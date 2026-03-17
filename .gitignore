@@ -1,0 +1,16 @@
+# Editor / OS
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Cursor / local
+.cursor/
+
+# Build artifacts (futuro)
+*.txz
+*.pkg
+dist/
+build/
