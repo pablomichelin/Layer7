@@ -7,5 +7,6 @@
 | [syslog-remote.md](syslog-remote.md) | Logs remotos no lab |
 | [snapshots-e-gate.md](snapshots-e-gate.md) | Snapshots + checklist gate Fase 1 |
 | [lab-inventory.template.md](lab-inventory.template.md) | Template de IPs/versões (cópia local) |
+| [../poc/README.md](../poc/README.md) | PoC nDPI e registro de resultados |
 
 Fase 1: [`../../03-ROADMAP-E-FASES.md`](../../03-ROADMAP-E-FASES.md) · Bloco 2: [`../../07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md`](../../07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md).

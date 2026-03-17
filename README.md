@@ -19,12 +19,17 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 (motor basea
 
 Os documentos numerados `01-`…`16-` na raiz são o **planejamento mestre** detalhado; `docs/` concentra SSOT operacional e decisões.
 
+## PoC nDPI (Bloco 3)
+
+No **FreeBSD** (builder): `./scripts/build/build-poc-freebsd.sh` → `build/poc-ndpi/layer7_ndpi_poc arquivo.pcap`. Ver `src/poc_ndpi/README.md`.
+
 ## Estrutura do repositório
 
 ```text
 docs/           # charter, arquitetura, roadmap, ADRs, changelog, runbooks…
+docs/poc/       # registro de resultados do PoC nDPI
 package/        # pfSense-pkg-layer7 (port — esqueleto)
-src/            # layer7d, classifier, policy, …
+src/            # layer7d, classifier, policy, poc_ndpi…
 webgui/         # XML / PHP / priv (futuro)
 scripts/        # build, release, lab, diagnostics
 tests/          # functional, traffic, package, lab, fixtures

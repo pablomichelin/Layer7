@@ -7,4 +7,4 @@
 - `runtime` — estado, reload, integração PF/DNS
 - `common` — utilitários compartilhados
 
-PoC do engine: ver Bloco 3 do plano em `07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md`.
+PoC nDPI: pasta **`poc_ndpi/`** + `scripts/build/build-poc-freebsd.sh` · doc resultados em `docs/poc/`.

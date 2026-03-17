@@ -53,20 +53,22 @@ Montar ambiente reproduzível.
 Provar a classificação Layer 7.
 
 ### Tarefas
-- [ ] integrar nDPI em PoC simples
-- [ ] gerar eventos normalizados
-- [ ] registrar confiança
-- [ ] testar tráfego real
-- [ ] medir performance
+- [x] integrar nDPI em PoC simples (`src/poc_ndpi/layer7_ndpi_poc.c` + `scripts/build/build-poc-freebsd.sh`)
+- [x] gerar eventos normalizados (JSONL v1 em stdout)
+- [x] registrar confiança (campo `confidence`, valor `detected` no PoC)
+- [ ] testar tráfego real (operador: PCAP no builder + preencher `docs/poc/resultados-poc.template.md`)
+- [x] medir performance (resumo em stderr: pkts/s, tempo)
 
 ### Saída
-PoC funcional documentada.
+PoC compilável no FreeBSD; documentação em `src/poc_ndpi/README.md` e `docs/poc/`.
 
 ### Critério de aceite
 Existe lista clara de:
 - apps detectados;
 - apps mal detectados;
 - limites conhecidos.
+
+*(Preenchimento da lista: após testes reais no lab.)*
 
 ---
 

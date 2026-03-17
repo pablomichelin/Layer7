@@ -5,7 +5,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Bloco 2 (lab): `docs/08-lab/` (topologia, builder, syslog, snapshots/gate, inventário template); `scripts/build/BUILDER.md`, `scripts/lab/LAB-SETUP.md`; checklist de execução no plano `07`.
+- Bloco 3: PoC `layer7_ndpi_poc`, `build-poc-freebsd.sh`, `docs/poc/`.
+- Bloco 2 (lab): `docs/08-lab/`, scripts lab/build, checklist no plano `07`.
 
 ## [0.0.1] - 2026-03-17
 

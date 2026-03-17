@@ -4,24 +4,25 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Bloco 2 (documentação):** topologia de lab, builder FreeBSD, syslog remoto, snapshots/gate descritos em `docs/08-lab/`. **Pendente operador:** provisionar VMs e fechar checklist em `docs/08-lab/snapshots-e-gate.md`.
+**Bloco 3 (código + build):** PoC `layer7_ndpi_poc` (PCAP → JSONL nDPI). Falta **operador** rodar no FreeBSD, capturar PCAP real e preencher `docs/poc/resultados-poc.template.md`.
 
 ## Fase atual
-Fase 1 — gate físico da bancada (quando checklist OK → avançar PoC)
+Fase 2 (PoC motor) — aceite quando resultados-poc estiver preenchido
 
 ## Última entrega
-- `docs/08-lab/lab-topology.md`, `builder-freebsd.md`, `syslog-remote.md`, `snapshots-e-gate.md`, `lab-inventory.template.md`
-- `scripts/build/BUILDER.md`, `scripts/lab/LAB-SETUP.md`
-- `.gitignore`: `docs/08-lab/lab-inventory.md` (cópia local preenchida)
+- `src/poc_ndpi/layer7_ndpi_poc.c`, `src/poc_ndpi/README.md`
+- `scripts/build/build-poc-freebsd.sh`
+- `docs/poc/README.md`, `docs/poc/resultados-poc.template.md`
 
 ## Objetivo imediato
-1. Operador: VMs builder + pfSense lab + syslog + snapshot (`snapshots-e-gate.md`).
-2. **Bloco 3:** PoC nDPI no builder (`src/`).
+1. No builder: `./scripts/build/build-poc-freebsd.sh` + testar com PCAP.
+2. Documentar bem/mal/limites em `docs/poc/`.
+3. **Bloco 4:** modelo de config/evento/policy.
 
 ## Próximos 3 passos
-1. Fechar gate Fase 1 (checklist) ou iniciar PoC em paralelo no builder.
-2. Stub CMake + submódulo ou fetch nDPI + binário mínimo de classificação.
-3. Formato de evento JSON documentado.
+1. Validar linkagem nDPI na sua versão (tag ajustável `NDPI_TAG`).
+2. Preencher resultados do PoC.
+3. Esboço de `config.xml` / evento daemon (Bloco 4).
 
 ## Decisões congeladas
 - foco em pfSense CE;
