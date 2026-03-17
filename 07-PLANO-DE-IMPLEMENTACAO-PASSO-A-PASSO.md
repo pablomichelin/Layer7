@@ -32,15 +32,18 @@ Repositório limpo e organizado.
 Montar ambiente reproduzível.
 
 ### Tarefas
-- [ ] criar builder FreeBSD
-- [ ] criar pfSense lab
-- [ ] definir rede de teste
-- [ ] criar host cliente
-- [ ] configurar syslog remoto
-- [ ] criar snapshots
+- [x] documentar builder FreeBSD (`docs/08-lab/builder-freebsd.md`, `scripts/build/BUILDER.md`)
+- [x] documentar lab pfSense + rede + cliente (`docs/08-lab/lab-topology.md`, `scripts/lab/LAB-SETUP.md`)
+- [x] definir rede de teste (topologia e endereçamento template)
+- [x] especificar host cliente (na topologia de lab)
+- [x] documentar syslog remoto (`docs/08-lab/syslog-remote.md`)
+- [x] documentar snapshots + gate Fase 1 (`docs/08-lab/snapshots-e-gate.md`)
+- [ ] **Execução (operador):** VM builder ativa com `git`/`pkg`
+- [ ] **Execução (operador):** pfSense lab + cliente + syslog validados + snapshot base
 
 ### Saída
-Bancada pronta.
+- **Documental:** bancada especificada em `docs/08-lab/`.
+- **Física:** checklist em `snapshots-e-gate.md` até todos os itens marcados.
 
 ---
 

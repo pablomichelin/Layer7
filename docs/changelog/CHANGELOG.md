@@ -5,10 +5,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Estrutura de repositório (`docs/`, `package/`, `src/`, `webgui/`, `scripts/`, `tests/`, `samples/`).
-- ADR-0001 (nDPI), ADR-0002 (distribuição `.txz`).
-- LICENSE BSD-2-Clause, README de produto, charter/resumos em `docs/`.
-- Template de PR em `.github/pull_request_template.md`.
+- Bloco 2 (lab): `docs/08-lab/` (topologia, builder, syslog, snapshots/gate, inventário template); `scripts/build/BUILDER.md`, `scripts/lab/LAB-SETUP.md`; checklist de execução no plano `07`.
 
 ## [0.0.1] - 2026-03-17
 

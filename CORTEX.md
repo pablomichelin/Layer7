@@ -4,28 +4,24 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Bloco 1 concluído:** estrutura de repositório, `docs/` operacional, ADR-0001/0002, LICENSE, README de produto, esqueleto `package/` e `src/`.
+**Bloco 2 (documentação):** topologia de lab, builder FreeBSD, syslog remoto, snapshots/gate descritos em `docs/08-lab/`. **Pendente operador:** provisionar VMs e fechar checklist em `docs/08-lab/snapshots-e-gate.md`.
 
 ## Fase atual
-Fase 1 (laboratório + builder) — **próximo gate**
+Fase 1 — gate físico da bancada (quando checklist OK → avançar PoC)
 
 ## Última entrega
-- Árvore `docs/` (`00-overview` … `08-lab`, `changelog`)
-- ADR-0001 (nDPI), ADR-0002 (`.txz`)
-- `package/pfSense-pkg-layer7/` (Makefile stub)
-- `src/`, `webgui/`, `scripts/`, `tests/`, `samples/`
-- `LICENSE` BSD-2-Clause, `.github/pull_request_template.md`
+- `docs/08-lab/lab-topology.md`, `builder-freebsd.md`, `syslog-remote.md`, `snapshots-e-gate.md`, `lab-inventory.template.md`
+- `scripts/build/BUILDER.md`, `scripts/lab/LAB-SETUP.md`
+- `.gitignore`: `docs/08-lab/lab-inventory.md` (cópia local preenchida)
 
 ## Objetivo imediato
-1. ~~criar repositório no GitHub~~ (`pablomichelin/pfsense-layer7`)
-2. ~~subir estrutura inicial~~
-3. **montar builder + lab** (Bloco 2)
-4. iniciar PoC do engine (Bloco 3)
+1. Operador: VMs builder + pfSense lab + syslog + snapshot (`snapshots-e-gate.md`).
+2. **Bloco 3:** PoC nDPI no builder (`src/`).
 
 ## Próximos 3 passos
-1. Definir host builder (FreeBSD alinhado ao CE) e documentar em `docs/08-lab/`
-2. Rede de lab + snapshots (runbook mínimo)
-3. PoC nDPI: binário mínimo + evento normalizado
+1. Fechar gate Fase 1 (checklist) ou iniciar PoC em paralelo no builder.
+2. Stub CMake + submódulo ou fetch nDPI + binário mínimo de classificação.
+3. Formato de evento JSON documentado.
 
 ## Decisões congeladas
 - foco em pfSense CE;

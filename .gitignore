@@ -9,6 +9,9 @@ Desktop.ini
 # Cursor / local
 .cursor/
 
+# Inventário do lab preenchido localmente (não commitar IPs/senhas)
+docs/08-lab/lab-inventory.md
+
 # Build artifacts (futuro) — só na raiz (não ignorar scripts/build/)
 *.txz
 *.pkg
