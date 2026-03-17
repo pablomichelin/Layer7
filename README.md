@@ -1,30 +1,40 @@
 # Layer7 para pfSense CE
 
-Pacote documental inicial para planejar, estruturar e executar o desenvolvimento de um pacote Layer 7 open source para pfSense CE.
+Pacote **open source** para **pfSense CE**: classificação Layer 7 (motor baseado em **nDPI**), políticas (`monitor`, `tag`, `allow`, `block`), enforcement via PF e integração DNS/host onde aplicável, GUI no ecossistema pfSense.
 
-## Conteúdo principal
-- `00-LEIA-ME-PRIMEIRO.md`
-- `01-VISAO-GERAL-E-ESCOPO.md`
-- `02-ARQUITETURA-ALVO.md`
-- `03-ROADMAP-E-FASES.md`
-- `04-BACKLOG-MVP-E-VERSOES.md`
-- `05-ESTRUTURA-REPOSITORIO-CURSOR-GITHUB.md`
-- `06-PADROES-DE-DESENVOLVIMENTO-E-SEGURANCA.md`
-- `07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md`
-- `08-PLANO-DE-TESTES-E-HOMOLOGACAO.md`
-- `09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md`
-- `10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md`
-- `11-RISCOS-LIMITACOES-E-DECISOES.md`
-- `12-PLANO-DE-DOCUMENTACAO-E-GITHUB.md`
-- `13-MODELOS-DE-ISSUES-E-PRS.md`
-- `14-CHECKLIST-MESTRE.md`
-- `15-PROMPT-MESTRE-CURSOR.md`
-- `CORTEX.md`
-- `AGENTS.md`
+**Estado:** início de execução — estrutura de repo e documentação; daemon/pacote instalável ainda não.
 
-## Leitura recomendada
-Comece por `00-LEIA-ME-PRIMEIRO.md`.
+| | |
+|--|--|
+| **Repositório** | <https://github.com/pablomichelin/pfsense-layer7> |
+| **Licença** | BSD-2-Clause (ver `LICENSE`) |
+| **Versão** | `0.x` até fechar V1 (SemVer) |
 
-## Finalidade
-Servir como base de planejamento, execução, documentação, testes, empacotamento, release e operação do projeto.
+## Leitura rápida
 
+1. [`00-LEIA-ME-PRIMEIRO.md`](00-LEIA-ME-PRIMEIRO.md)
+2. [`CORTEX.md`](CORTEX.md) · [`AGENTS.md`](AGENTS.md)
+3. Charter resumido: [`docs/00-overview/product-charter.md`](docs/00-overview/product-charter.md)
+4. ADRs: [`docs/03-adr/`](docs/03-adr/)
+
+Os documentos numerados `01-`…`16-` na raiz são o **planejamento mestre** detalhado; `docs/` concentra SSOT operacional e decisões.
+
+## Estrutura do repositório
+
+```text
+docs/           # charter, arquitetura, roadmap, ADRs, changelog, runbooks…
+package/        # pfSense-pkg-layer7 (port — esqueleto)
+src/            # layer7d, classifier, policy, …
+webgui/         # XML / PHP / priv (futuro)
+scripts/        # build, release, lab, diagnostics
+tests/          # functional, traffic, package, lab, fixtures
+samples/        # exemplos de config/log/política
+```
+
+## Distribuição (V1)
+
+Artefato **`.txz`** + releases no GitHub; não instalar “direto do clone” em produção. Ver [ADR-0002](docs/03-adr/ADR-0002-distribuicao-artefato-txz.md).
+
+## Contribuir
+
+Um bloco por vez; PR com objetivo, teste mínimo, rollback e docs (template em [`.github/pull_request_template.md`](.github/pull_request_template.md)).

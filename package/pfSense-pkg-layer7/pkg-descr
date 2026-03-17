@@ -1,0 +1,4 @@
+Layer 7 traffic classification and policy package for pfSense CE.
+Work in progress — not installable as a complete port yet.
+
+WWW: https://github.com/pablomichelin/pfsense-layer7

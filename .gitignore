@@ -9,8 +9,8 @@ Desktop.ini
 # Cursor / local
 .cursor/
 
-# Build artifacts (futuro)
+# Build artifacts (futuro) — só na raiz (não ignorar scripts/build/)
 *.txz
 *.pkg
-dist/
-build/
+/dist/
+/build/

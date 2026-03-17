@@ -13,13 +13,13 @@ Não pular blocos.
 Criar a base documental e de repositório.
 
 ### Tarefas
-- [ ] criar repositório
-- [ ] subir estrutura inicial
-- [ ] adicionar `AGENTS.md`
-- [ ] adicionar `CORTEX.md`
-- [ ] adicionar docs-base
-- [ ] definir license
-- [ ] definir convenção de versionamento
+- [x] criar repositório
+- [x] subir estrutura inicial
+- [x] adicionar `AGENTS.md`
+- [x] adicionar `CORTEX.md`
+- [x] adicionar docs-base (`docs/`, ADRs, changelog)
+- [x] definir license (BSD-2-Clause)
+- [x] definir convenção de versionamento (SemVer `0.x` até V1 — ver `README.md` / `docs/06-releases/`)
 
 ### Saída
 Repositório limpo e organizado.
