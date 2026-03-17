@@ -12,5 +12,6 @@
 | [07-prompts](07-prompts/) | Prompts / IA |
 | [08-lab](08-lab/) | Laboratório |
 | [changelog](changelog/) | CHANGELOG |
+| [core](core/) | Modelagem V1 (config/evento/policy) |
 
 Detalhamento longo permanece nos arquivos `01-`…`16-` na **raiz** do repositório.

@@ -8,6 +8,8 @@
 4. Policy engine (`allow` / `block` / `monitor` / `tag`)
 5. Enforcement + logging (PF, DNS/host onde couber)
 
+**Modelagem V1 (config/evento/policy):** [`../core/README.md`](../core/README.md).
+
 ## Documento expandido
 
 [`../../02-ARQUITETURA-ALVO.md`](../../02-ARQUITETURA-ALVO.md)

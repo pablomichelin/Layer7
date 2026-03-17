@@ -15,7 +15,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 (motor basea
 1. [`00-LEIA-ME-PRIMEIRO.md`](00-LEIA-ME-PRIMEIRO.md)
 2. [`CORTEX.md`](CORTEX.md) · [`AGENTS.md`](AGENTS.md)
 3. Charter resumido: [`docs/00-overview/product-charter.md`](docs/00-overview/product-charter.md)
-4. ADRs: [`docs/03-adr/`](docs/03-adr/)
+4. ADRs: [`docs/03-adr/`](docs/03-adr/) · Core V1: [`docs/core/`](docs/core/)
 
 Os documentos numerados `01-`…`16-` na raiz são o **planejamento mestre** detalhado; `docs/` concentra SSOT operacional e decisões.
 

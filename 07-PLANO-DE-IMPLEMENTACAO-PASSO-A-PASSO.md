@@ -78,15 +78,16 @@ Existe lista clara de:
 Definir internamente como o pacote pensa.
 
 ### Tarefas
-- [ ] definir modelo de config
-- [ ] definir modelo de evento
-- [ ] definir state runtime
-- [ ] definir policy matrix
-- [ ] definir categories
-- [ ] definir precedence
+- [x] definir modelo de config (`docs/core/config-model.md`, `samples/config/layer7-minimal.json`)
+- [x] definir modelo de evento (`docs/core/event-model.md`)
+- [x] definir state runtime (`docs/core/runtime-state.md`)
+- [x] definir policy matrix (`docs/core/policy-matrix.md`)
+- [x] definir categories (`docs/core/categories.md`)
+- [x] definir precedence (`docs/core/precedence.md`)
+- [x] tipos C compartilhados (`src/common/layer7_types.h`)
 
 ### Saída
-Core modelado em documentação e código-base.
+Core modelado em `docs/core/` + amostra JSON + `layer7_types.h`.
 
 ---
 

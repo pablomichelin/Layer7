@@ -4,25 +4,23 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Bloco 3 (código + build):** PoC `layer7_ndpi_poc` (PCAP → JSONL nDPI). Falta **operador** rodar no FreeBSD, capturar PCAP real e preencher `docs/poc/resultados-poc.template.md`.
+**Bloco 4 concluído:** `docs/core/` (config, evento, runtime, policy, categorias, precedência), `src/common/layer7_types.h`, `samples/config/layer7-minimal.json`.
 
 ## Fase atual
-Fase 2 (PoC motor) — aceite quando resultados-poc estiver preenchido
+Fase 3 (modelo de dados) — **próximo: Bloco 5** skeleton do pacote pfSense
 
 ## Última entrega
-- `src/poc_ndpi/layer7_ndpi_poc.c`, `src/poc_ndpi/README.md`
-- `scripts/build/build-poc-freebsd.sh`
-- `docs/poc/README.md`, `docs/poc/resultados-poc.template.md`
+- `docs/core/*.md`, `samples/config/layer7-minimal.json`
+- `src/common/layer7_types.h`
 
 ## Objetivo imediato
-1. No builder: `./scripts/build/build-poc-freebsd.sh` + testar com PCAP.
-2. Documentar bem/mal/limites em `docs/poc/`.
-3. **Bloco 4:** modelo de config/evento/policy.
+1. Bloco 5: XML pacote, rc script, página GUI mínima, Makefile/port utilizável em lab.
+2. (Paralelo) Fechar PoC resultados em `docs/poc/` se ainda pendente.
 
 ## Próximos 3 passos
-1. Validar linkagem nDPI na sua versão (tag ajustável `NDPI_TAG`).
-2. Preencher resultados do PoC.
-3. Esboço de `config.xml` / evento daemon (Bloco 4).
+1. Esqueleto `pfSense-pkg-layer7` instalável em VM lab.
+2. `layer7d` stub que lê config e loga `daemon_start`.
+3. Integrar tipos/enums com primeiro parse de config.
 
 ## Decisões congeladas
 - foco em pfSense CE;
