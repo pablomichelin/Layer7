@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+# PROVIDES: layer7d
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+#
+# Usa daemon(8) para não bloquear o boot/start (evita travar consola se
+# layer7d_enable=YES).
+
+. /etc/rc.subr
+
+name="layer7d"
+rcvar="${name}_enable"
+load_rc_config "${name}"
+
+: "${layer7d_enable:=NO}"
+
+pidfile="/var/run/${name}.pid"
+layer7d_bin="/usr/local/sbin/layer7d"
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+status_cmd="${name}_status"
+
+layer7d_start()
+{
+	/bin/mkdir -p /var/run
+	if [ -f "${pidfile}" ]; then
+		read -r _p < "${pidfile}" 2>/dev/null
+		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
+			return 0
+		fi
+		/bin/rm -f "${pidfile}"
+	fi
+	/usr/sbin/daemon -f -p "${pidfile}" "${layer7d_bin}"
+}
+
+layer7d_stop()
+{
+	if [ ! -f "${pidfile}" ]; then
+		return 0
+	fi
+	read -r _p < "${pidfile}" 2>/dev/null
+	/bin/rm -f "${pidfile}"
+	[ -n "${_p}" ] && /bin/kill "${_p}" 2>/dev/null
+	return 0
+}
+
+layer7d_status()
+{
+	if [ -f "${pidfile}" ]; then
+		read -r _p < "${pidfile}" 2>/dev/null
+		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
+			echo "${name} is running as pid ${_p}."
+			return 0
+		fi
+	fi
+	echo "${name} is not running."
+	return 1
+}
+
+run_rc_command "$1"

@@ -1,4 +1,6 @@
 Layer 7 traffic classification and policy package for pfSense CE.
-Work in progress — not installable as a complete port yet.
+
+WIP: port builds layer7d (C) from src; XML/PHP/rc.d in repo. Lab validation
+required before claiming install/GUI/service OK — see repo docs/04-package/.
 
 WWW: https://github.com/pablomichelin/pfsense-layer7

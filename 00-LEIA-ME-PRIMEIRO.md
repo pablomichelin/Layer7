@@ -167,6 +167,8 @@ No começo do projeto, trate o status assim:
 - Objetivo imediato: **PoC do engine + shape do pacote**
 - Objetivo proibido neste momento: **feature creep**
 
+**Continuidade:** o pacote e o daemon existem como **código no repositório**; a instalação e o serviço no pfSense **só contam como feitos após validação em lab** — ver **`docs/04-package/validacao-lab.md`**. O ponto de verdade operacional está em **`CORTEX.md`**.
+
 ---
 
 ## Entrega ideal da V1

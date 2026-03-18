@@ -1,2 +1,10 @@
-# Gerado/evoluído quando o pacote tiver arquivos instaláveis reais.
-# @comment pfSense-pkg-layer7 placeholder
+pkg/layer7.xml
+pkg/layer7.inc
+etc/inc/priv/layer7.priv.inc
+www/packages/layer7/layer7_status.php
+sbin/layer7d
+etc/layer7.json.sample
+etc/rc.d/layer7d
+%%DATADIR%%/info.xml
+@dir etc/inc/priv
+@dir www/packages/layer7

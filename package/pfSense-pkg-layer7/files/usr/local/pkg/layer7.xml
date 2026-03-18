@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>layer7</name>
+	<version>%%PKGVERSION%%</version>
+	<title>Layer 7</title>
+	<include_file>/usr/local/pkg/layer7.inc</include_file>
+	<menu>
+		<name>Layer7</name>
+		<section>Services</section>
+		<url>/packages/layer7/layer7_status.php</url>
+	</menu>
+</packagegui>

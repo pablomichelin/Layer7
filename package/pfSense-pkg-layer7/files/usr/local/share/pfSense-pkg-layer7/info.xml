@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pfsensepkgs>
+	<package>
+		<name>layer7</name>
+		<descr><![CDATA[Layer 7 traffic classification and policy for pfSense CE (work in progress).]]></descr>
+		<website>https://github.com/pablomichelin/pfsense-layer7</website>
+		<version>%%PKGVERSION%%</version>
+		<configurationfile>layer7.xml</configurationfile>
+	</package>
+</pfsensepkgs>

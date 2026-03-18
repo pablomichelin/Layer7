@@ -4,23 +4,23 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Bloco 4 concluído:** `docs/core/` (config, evento, runtime, policy, categorias, precedência), `src/common/layer7_types.h`, `samples/config/layer7-minimal.json`.
+**No repositório:** scaffold do port `pfSense-pkg-layer7` (Makefile que compila `layer7d` em C), ficheiros XML/PHP/rc.d/sample, daemon mínimo em `src/layer7d/main.c`.  
+**Não validado em lab:** build `.txz`, `pkg add` em pfSense, registo na GUI, serviço em execução no appliance — ver [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md).
 
 ## Fase atual
-Fase 3 (modelo de dados) — **próximo: Bloco 5** skeleton do pacote pfSense
+**Gate:** validação real em FreeBSD (build) + pfSense (instalação, serviço, GUI se aplicável). Nenhuma feature nova até fechar esse gate.
 
-## Última entrega
-- `docs/core/*.md`, `samples/config/layer7-minimal.json`
-- `src/common/layer7_types.h`
+## Última entrega (documental / repo)
+- Saneamento: docs alinhadas à realidade; `validacao-lab.md` + checklist executável.
+- Código existente sem alteração funcional neste bloco.
 
 ## Objetivo imediato
-1. Bloco 5: XML pacote, rc script, página GUI mínima, Makefile/port utilizável em lab.
-2. (Paralelo) Fechar PoC resultados em `docs/poc/` se ainda pendente.
+1. Executar [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md) no builder + pfSense lab e colar evidências.
+2. Só depois: próximo bloco técnico (a definir após resultado da validação).
 
-## Próximos 3 passos
-1. Esqueleto `pfSense-pkg-layer7` instalável em VM lab.
-2. `layer7d` stub que lê config e loga `daemon_start`.
-3. Integrar tipos/enums com primeiro parse de config.
+## Próximos 3 passos (após validação OK)
+1. Corrigir port/GUI/rc conforme falhas observadas no lab.
+2. Então retomar roadmap (ex.: parser JSON) — não antes do gate.
 
 ## Decisões congeladas
 - foco em pfSense CE;
@@ -33,10 +33,9 @@ Fase 3 (modelo de dados) — **próximo: Bloco 5** skeleton do pacote pfSense
 - engine classificação: **nDPI** (ADR-0001).
 
 ## Riscos ativos
-- escopo crescer cedo demais;
-- empacotamento ficar mais complexo que o core;
-- tentar resolver QUIC/ECH cedo demais;
-- dedicar esforço à GUI antes do runtime.
+- assumir GUI/menu/serviço OK sem corrida no lab;
+- escopo crescer antes da validação;
+- empacotamento ficar mais complexo que o core.
 
 ## Itens adiados
 - console central;
@@ -48,13 +47,13 @@ Fase 3 (modelo de dados) — **próximo: Bloco 5** skeleton do pacote pfSense
 ## Política de trabalho
 - um bloco por vez;
 - uma validação por vez;
-- docs no mesmo commit;
-- sem refactor amplo sem necessidade.
+- nada marcado como “feito” sem evidência de lab quando o critério for appliance;
+- docs no mesmo commit.
 
 ## Definition of Done da V1
-- pacote instalável
-- daemon funcional
-- GUI básica
+- pacote instalável *(com evidência)*
+- daemon funcional *(com evidência)*
+- GUI básica *(com evidência)*
 - policy engine
 - enforcement mínimo
 - observabilidade básica

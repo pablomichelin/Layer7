@@ -1,5 +1,7 @@
 # Checklist Mestre
 
+*Itens de lab só marcar após evidência em [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md) (ou anexo).*
+
 ## Fase 0 - Escopo
 - [ ] nome do projeto definido
 - [ ] escopo V1 fechado
@@ -27,18 +29,14 @@
 - [ ] precedence definida
 - [ ] fallback definido
 
-## Fase 4 - Package skeleton
-- [ ] Makefile
-- [ ] pkg-descr
-- [ ] pkg-plist
-- [ ] XML
-- [ ] página mínima
-- [ ] rc script
-- [ ] install/remove testados
+## Fase 4 - Package skeleton (repositório)
+- [x] Makefile, pkg-descr, pkg-plist, XML, PHP informativo, rc.d, hooks pkg
+- [ ] **Validação lab:** build `.txz`, `pkg add`, ficheiros, GUI/URL, remove — ver `validacao-lab.md`
 
 ## Fase 5 - Daemon
-- [ ] start/stop/status
-- [ ] leitura de config
+- [x] código C + integração no Makefile do port *(no repo)*
+- [ ] **Validação lab:** serviço sobe, logs, stop limpo no pfSense
+- [ ] leitura real de config (JSON) após validação do pacote
 - [ ] runtime state
 - [ ] counters
 - [ ] error handling
@@ -90,4 +88,3 @@
 - [ ] AGENTS atualizado
 - [ ] ADRs atualizadas
 - [ ] runbooks atualizados
-

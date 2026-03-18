@@ -5,6 +5,8 @@
 A execução deve seguir a ordem abaixo.  
 Não pular blocos.
 
+**Regra de evidência:** tarefas que exigem pfSense/FreeBSD só podem ser marcadas `[x]` após execução no ambiente correto e registo em [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md) (ou anexo).
+
 ---
 
 ## Bloco 1. Preparação do projeto
@@ -94,20 +96,23 @@ Core modelado em `docs/core/` + amostra JSON + `layer7_types.h`.
 ## Bloco 5. Package skeleton
 
 ### Objetivo
-Criar esqueleto do pacote pfSense.
+Criar esqueleto do pacote pfSense **no repositório**.
 
-### Tarefas
-- [ ] criar diretório do port
-- [ ] criar Makefile
-- [ ] criar pkg-descr
-- [ ] criar pkg-plist
-- [ ] criar XML básico
-- [ ] criar página simples na GUI
-- [ ] criar rc script
-- [ ] validar install/remove
+### Tarefas (código / artefactos — existem no Git)
+- [x] diretório do port, Makefile, pkg-descr, pkg-plist
+- [x] XML (`info.xml`, `layer7.xml`), `layer7.inc`, priv stub
+- [x] página PHP informativa (`layer7_status.php` — sem persistência)
+- [x] `rc.d/layer7d`, hooks `pkg-install` / `pkg-deinstall`, `layer7.json.sample`
+
+### Tarefas (lab — **não concluídas até haver evidência**)
+- [ ] `make package` OK no builder
+- [ ] `pkg add` + ficheiros instalados conforme `pkg-plist`
+- [ ] serviço `layer7d` onestart/status/logs no pfSense
+- [ ] URL/menu GUI verificados (registar OK/NOK)
+- [ ] remove do pacote validado
 
 ### Saída
-Pacote mínimo aparece e instala.
+Artefactos em `package/pfSense-pkg-layer7/`. Validação: [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md).
 
 ---
 
@@ -116,16 +121,20 @@ Pacote mínimo aparece e instala.
 ### Objetivo
 Substituir PoC solta por serviço real.
 
-### Tarefas
-- [ ] implementar `layer7d`
-- [ ] adicionar start/stop/status
-- [ ] ler config persistida
+### Tarefas (repositório)
+- [x] fonte C `src/layer7d/main.c` (mínimo: syslog, stat em path de config, loop, SIGHUP placeholder)
+- [x] Makefile do port compila para `sbin/layer7d` *(lógica no repo; build não validado em lab)*
+
+### Tarefas (lab + produto)
+- [ ] binário instalado e executável no pfSense após `pkg add`
+- [ ] start/stop/status via `service layer7d` **comprovado** no appliance
+- [ ] parser JSON + reload SIGHUP real
 - [ ] manter counters
 - [ ] logar estado
 - [ ] tratar falha de inicialização
 
 ### Saída
-Daemon gerenciável.
+Daemon gerenciável **com evidência no lab**.
 
 ---
 
@@ -227,13 +236,15 @@ Evidência de estabilidade mínima.
 Publicar de forma profissional.
 
 ### Tarefas
+- [ ] testes de regressão mínimos
+- [ ] documentação de operação + runbook rollback
 - [ ] version bump
 - [ ] changelog
 - [ ] release notes
 - [ ] build `.txz`
 - [ ] checksum
 - [ ] documentação de instalação
-- [ ] documentação de rollback
+- [ ] notas de compatibilidade pfSense CE
 
 ### Saída
 Release 0.1.0 utilizável.
@@ -254,8 +265,7 @@ Não fazer:
 ## Critério para encerrar cada bloco
 
 Encerrar apenas quando existir:
-- evidência de teste;
+- evidência de teste **quando o bloco envolver appliance ou build**;
 - documentação atualizada;
 - commit limpo;
 - próximos passos claros em `CORTEX.md`.
-

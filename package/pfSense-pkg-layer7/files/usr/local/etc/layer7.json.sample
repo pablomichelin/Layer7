@@ -1,0 +1,20 @@
+{
+  "layer7": {
+    "enabled": false,
+    "mode": "monitor",
+    "log_level": "info",
+    "syslog_remote": false,
+    "interfaces": ["lan"],
+    "policies": [
+      {
+        "id": "p-mon-001",
+        "name": "Monitor geral",
+        "enabled": true,
+        "action": "monitor",
+        "priority": 10,
+        "match": {}
+      }
+    ],
+    "exceptions": []
+  }
+}

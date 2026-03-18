@@ -5,9 +5,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Bloco 4: `docs/core/` (config, evento, runtime, policy, categorias, precedência), `layer7_types.h`, `samples/config/layer7-minimal.json`.
-- Bloco 3: PoC `layer7_ndpi_poc`, `build-poc-freebsd.sh`, `docs/poc/`.
-- Bloco 2 (lab): `docs/08-lab/`, scripts lab/build, checklist no plano `07`.
+- Scaffold do port `package/pfSense-pkg-layer7/` (Makefile, plist, XML, PHP informativo, rc.d, sample JSON, hooks pkg) — **código no repo; lab não validado**.
+- `src/layer7d/main.c` (daemon mínimo: syslog, stat em path de config, loop).
+- `docs/04-package/package-skeleton.md`, `docs/04-package/validacao-lab.md`, `docs/05-daemon/README.md`.
+- `package/pfSense-pkg-layer7/LICENSE` para build do port isolado.
+
+### Changed
+- Documentação alinhada: nada de build/install/GUI marcado como validado sem evidência de lab.
+- Port compila `layer7d` em C (`PORTVERSION` conforme Makefile).
+
+### Fixed (código)
+- `rc.d/layer7d` usa `daemon(8)` para arranque em background.
 
 ## [0.0.1] - 2026-03-17
 
