@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 static const char layer7d_version[] =
-#include "version.str"
+#include <version.str>
 ;
 
 #define DEFAULT_CONFIG "/usr/local/etc/layer7.json"
