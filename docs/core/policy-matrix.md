@@ -18,8 +18,8 @@ Todos os campos são **opcionais**; ausência = “qualquer”. Pelo menos um cr
 | `interfaces` | string[] | `["lan"]` |
 | `src_net` | CIDR[] | `["10.0.0.0/24"]` |
 | `dst_net` | CIDR[] | |
-| `ndpi_category` | string[] | nDPI category name |
-| `ndpi_app` | string[] | app protocol name (substring ou exato — ver implementação) |
+| `ndpi_category` | string[] | nDPI category name (**match exato** no daemon V1) |
+| `ndpi_app` | string[] | app protocol name (**match exato** no `layer7d` V1; substring = backlog) |
 | `ndpi_master` | string[] | master protocol |
 | `dst_port` | int / range | opcional |
 

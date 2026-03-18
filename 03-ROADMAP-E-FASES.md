@@ -2,7 +2,7 @@
 
 ## Visão geral
 
-O projeto deve ser executado em **12 fases**, cada uma com entrada, saída e gate claro.
+O projeto deve ser executado em **fases numeradas** com entrada, saída e gate claro: **V1 (0–11)**, **transição (12)**, **V2+ (13–22)** — as fases 13–22 são *backlog direcionado*; só entram em execução após gate da Fase 11 e estabilização da Fase 12.
 
 ---
 
@@ -265,6 +265,168 @@ Não perder o controle do produto depois da primeira entrega.
 
 ---
 
+## Fase 13. Motor nDPI no daemon (produção)
+
+### Objetivo
+Fechar o loop **captura → classificação nDPI → policy → enforce** no appliance, com o mesmo binário entregue pelo pacote.
+
+### Entregas
+- integração nDPI no `layer7d` (fora do PoC isolado);
+- seleção de interface(s) / espelhamento ou hook acordado com limites pfSense;
+- eventos alinhados a `docs/core/event-model.md`;
+- degradar com segurança se recurso ou PCAP falhar.
+
+### Gate
+- [ ] classificação real em lab com políticas aplicadas;
+- [ ] impacto CPU/RAM documentado;
+- [ ] fallback (monitor-only) definido.
+
+---
+
+## Fase 14. GUI V1 completa e sync config
+
+### Objetivo
+Eliminar lacunas entre GUI e ficheiro JSON consumido pelo daemon.
+
+### Entregas
+- editor completo de policies, exceptions, events view, diagnostics;
+- validação de input e mensagens de erro estáveis;
+- apply/reload sem drift GUI↔disco.
+
+### Gate
+- [ ] operador cobre fluxos V1 sem shell;
+- [ ] testes manuais/regressão GUI documentados.
+
+---
+
+## Fase 15. Política DNS / domínio / FQDN
+
+### Objetivo
+Aprofundar **host/domain policy** além de IP/CIDR onde o stack permitir.
+
+### Entregas
+- regras por domínio/FQDN (resolver + cache TTL definidos);
+- interação com Unbound/dnsmasq ou caminho suportado em CE;
+- documentação de limitações (TTL, DoH, etc.).
+
+### Gate
+- [ ] casos de teste DNS em lab;
+- [ ] sem bloqueio errado de tráfego não alvo (falso positivo aceite mapeado).
+
+---
+
+## Fase 16. Observabilidade e operações
+
+### Objetivo
+Operação em ambiente real sem depender só de syslog genérico.
+
+### Entregas
+- formato de logs estável + rotação;
+- syslog remoto configurável (host, facility, severidade);
+- counters exportáveis; modo debug temporário com guard-rails.
+
+### Gate
+- [ ] exportação validada contra coletor de teste;
+- [ ] runbook de troubleshooting atualizado.
+
+---
+
+## Fase 17. Identidade e contexto de utilizador (onde viável)
+
+### Objetivo
+Enriquecer decisão com **identidade** quando tecnicamente possível no ecossistema (sem prometer paridade com UTM enterprise).
+
+### Entregas
+- mapeamento IP↔utilizador ou grupo (fonte definida: captive portal, LDAP sync leve, etc.);
+- políticas condicionais a “grupo” quando suportado;
+- ADR por fonte de identidade.
+
+### Gate
+- [ ] pelo menos um modo de identidade validado em lab;
+- [ ] limitações explícitas na doc de produto.
+
+---
+
+## Fase 18. TLS inspection seletiva (opt-in)
+
+### Objetivo
+Piloto de **inspeção TLS não universal** (ex.: categorias/domínios específicos), alinhado a não objetivos da V1.
+
+### Entregas
+- desenho de trust chain e opt-in explícito;
+- integração mínima com proxy ou mecanismo escolhido;
+- auditoria e logging de exceções.
+
+### Gate
+- [ ] piloto interno/lab sem default-on;
+- [ ] risco legal/operacional documentado.
+
+---
+
+## Fase 19. Correlação com IDS (ex. Suricata)
+
+### Objetivo
+**Enriquecer eventos Layer7** com contexto IDS quando disponível (item adiado do CORTEX).
+
+### Entregas
+- consumo de eventos ou logs estruturados (formato acordado);
+- regras de correlação simples (app + alerta);
+- sem obrigatoriedade de Suricata instalado.
+
+### Gate
+- [ ] demo de correlação em lab;
+- [ ] degradação graciosa sem IDS.
+
+---
+
+## Fase 20. Escala, HA e performance
+
+### Objetivo
+Tuning para **múltiplas interfaces**, maior débito e notas de **HA/CARP** (sem console central).
+
+### Entregas
+- benchmarks e limites suportados;
+- documentação HA (estado, reload, split-brain);
+- filas e backpressure no daemon.
+
+### Gate
+- [ ] stress leve documentado;
+- [ ] sem regressão em instalação single-node.
+
+---
+
+## Fase 21. Ciclo de vida nDPI / assinaturas
+
+### Objetivo
+Processo claro de **atualização de biblioteca/assinaturas** nDPI sem infra proprietária obrigatória.
+
+### Entregas
+- procedimento de rebuild/repackage documentado;
+- versionamento de “rules bundle” se aplicável;
+- compatibilidade entre versões pfSense/nDPI.
+
+### Gate
+- [ ] upgrade testado em lab;
+- [ ] rollback de versão nDPI documentado.
+
+---
+
+## Fase 22. API local / automação / hooks
+
+### Objetivo
+Permitir automação **sem console central multi-firewall** (outro item adiado).
+
+### Entregas
+- API REST local ou hooks de script (decisão por ADR);
+- autenticação mínima (token/rota local);
+- exemplos Ansible/curl.
+
+### Gate
+- [ ] superfície de ataque revisada;
+- [ ] exemplos e runbook.
+
+---
+
 ## Cronograma sugerido em blocos
 
 ### Bloco 1
@@ -290,6 +452,18 @@ Fase 8 + Fase 9
 
 ### Bloco 8
 Fase 10 + Fase 11
+
+### Bloco 9 (pós-V1)
+Fase 12
+
+### Bloco 10 (V2 — sequência sugerida)
+Fase 13 → 14 → 15; em paralelo documental: 16, 21
+
+### Bloco 11 (V2 — ondas seguintes)
+Fases 17–20 conforme prioridade de mercado/lab
+
+### Bloco 12 (V2 — exposição programática)
+Fase 22 após endurecimento de 13–16
 
 ---
 

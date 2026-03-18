@@ -4,6 +4,32 @@
 	<version>%%PKGVERSION%%</version>
 	<title>Layer 7</title>
 	<include_file>/usr/local/pkg/layer7.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Status</text>
+			<url>/packages/layer7/layer7_status.php</url>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/packages/layer7/layer7_settings.php</url>
+		</tab>
+		<tab>
+			<text>Policies</text>
+			<url>/packages/layer7/layer7_policies.php</url>
+		</tab>
+		<tab>
+			<text>Exceptions</text>
+			<url>/packages/layer7/layer7_exceptions.php</url>
+		</tab>
+		<tab>
+			<text>Events</text>
+			<url>/packages/layer7/layer7_events.php</url>
+		</tab>
+		<tab>
+			<text>Diagnostics</text>
+			<url>/packages/layer7/layer7_diagnostics.php</url>
+		</tab>
+	</tabs>
 	<menu>
 		<name>Layer7</name>
 		<section>Services</section>

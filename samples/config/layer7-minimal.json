@@ -4,6 +4,9 @@
     "mode": "monitor",
     "log_level": "info",
     "syslog_remote": false,
+    "syslog_remote_host": "",
+    "syslog_remote_port": 514,
+    "debug_minutes": 0,
     "interfaces": ["lan"],
     "policies": [
       {
@@ -13,6 +16,27 @@
         "action": "monitor",
         "priority": 10,
         "match": {}
+      },
+      {
+        "id": "p-tag-http-055",
+        "name": "Tag HTTP (lab)",
+        "enabled": true,
+        "action": "tag",
+        "priority": 55,
+        "tag_table": "layer7_http_users",
+        "match": {
+          "ndpi_app": ["HTTP"]
+        }
+      },
+      {
+        "id": "p-web-050",
+        "name": "Monitor categoria Web",
+        "enabled": true,
+        "action": "monitor",
+        "priority": 50,
+        "match": {
+          "ndpi_category": ["Web"]
+        }
       },
       {
         "id": "p-blk-bt-001",
@@ -25,6 +49,21 @@
         }
       }
     ],
-    "exceptions": []
+    "exceptions": [
+      {
+        "id": "ex-mgmt-host",
+        "enabled": true,
+        "priority": 1000,
+        "action": "allow",
+        "host": "10.0.0.99"
+      },
+      {
+        "id": "ex-lab-cidr",
+        "enabled": true,
+        "priority": 500,
+        "action": "allow",
+        "cidr": "192.168.77.0/24"
+      }
+    ]
   }
 }

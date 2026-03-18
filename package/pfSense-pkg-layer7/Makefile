@@ -1,8 +1,8 @@
 # Layer7 para pfSense CE — port com binário layer7d (C).
-# Requer árvore completa do repo: src/layer7d/main.c em ../../src/layer7d/
+# Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	0.0.3
+PORTVERSION=	0.0.31
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -10,15 +10,16 @@ DISTFILES=	# empty
 EXTRACT_ONLY=	# empty
 
 MAINTAINER=	community@layer7-pfsense.local
-COMMENT=	Layer 7 classification for pfSense CE (daemon C stub)
+COMMENT=	Layer 7 for pfSense CE (layer7d + GUI settings JSON)
 
 LICENSE=	BSD2CLAUSE
 LICENSE_FILE=	${.CURDIR}/LICENSE
 
-LAYER7D_SRC=	${.CURDIR}/../../src/layer7d/main.c
+LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
-.if !exists(${LAYER7D_SRC})
-.error "layer7d: fonte em falta (${LAYER7D_SRC}). Mantém src/layer7d/main.c relativamente ao port (clone completo do repositório)."
+LAYER7_COMMON=	${.CURDIR}/../../src/common
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c)."
 .endif
 
 WRKSRC=		${WRKDIR}
@@ -32,7 +33,9 @@ do-extract:
 	${MKDIR} ${WRKSRC}
 
 do-build:
-	${CC} ${CFLAGS} -Wall -Wextra -O2 -o ${WRKSRC}/layer7d ${LAYER7D_SRC}
+	@${ECHO_CMD} '"${PORTVERSION}"' > ${WRKSRC}/version.str
+	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} -o ${WRKSRC}/layer7d \
+		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c ${LAYER7D_DIR}/enforce.c
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
@@ -52,6 +55,10 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/priv/layer7.priv.inc \
 		${STAGEDIR}/etc/inc/priv
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_status.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_settings.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_policies.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7d \
 		${STAGEDIR}${PREFIX}/etc/rc.d

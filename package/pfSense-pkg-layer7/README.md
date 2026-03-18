@@ -1,6 +1,6 @@
 # pfSense-pkg-layer7
 
-Port no estilo **FreeBSD/pfSense** com binário **`layer7d`** compilado a partir de `src/layer7d/main.c`, mais XML/PHP/rc.d de suporte.
+Port **FreeBSD/pfSense** com binário **`layer7d`** (`main.c` + `config_parse.c`), XML/PHP/rc.d de suporte.
 
 ## Estado honesto
 
@@ -14,19 +14,25 @@ Port no estilo **FreeBSD/pfSense** com binário **`layer7d`** compilado a partir
 
 | Caminho | Função |
 |---------|--------|
-| `../../src/layer7d/main.c` | Fonte do daemon (obrigatória no build; path relativo ao port) |
+| `../../src/layer7d/main.c`, `config_parse.c` | Fontes do daemon |
 | `files/usr/local/pkg/layer7.xml` | Metadados de menu/URL esperados pelo pfSense *(registo real só após install)* |
 | `files/.../info.xml` | Manifesto do pacote |
-| `files/.../layer7_status.php` | Página **informativa** (sem gravação de config) |
+| `files/.../layer7_status.php` | Diagnóstico (`layer7d -t`) |
+| `files/.../layer7_settings.php` | Globais JSON + **interfaces[]** (CSV) |
+| `files/.../layer7_policies.php` | Toggle + adicionar + **editar** (`?edit=N`) + remover |
+| `files/.../layer7_exceptions.php` | Toggle + adicionar + **editar** + remover exceção |
+| `files/.../layer7_events.php` | Events (orientação syslog / futuro event-model) |
+| `files/.../layer7_diagnostics.php` | Estado serviço, logs, comandos (Diagnostics) |
+| `files/.../layer7.inc` | load/save/CSRF/HUP; **`layer7_daemon_version()`** |
 | `files/.../layer7.json.sample` | Amostra estática |
 | `files/.../rc.d/layer7d` | Script de serviço (`layer7d_enable` default **NO**) |
 | `files/pkg-install.in` / `pkg-deinstall.in` | Hooks padrão pfSense |
 
 ## Build (só em host FreeBSD com `make` + toolchain)
 
-1. Clonar o **repositório completo** de forma que exista `package/pfSense-pkg-layer7/../../src/layer7d/main.c`.
-2. `cd package/pfSense-pkg-layer7 && make package`.
-3. O nome do `.txz` segue `PORTVERSION` no `Makefile` (ex.: `0.0.3`).
+1. Repo completo com `src/layer7d/main.c` e `config_parse.c`.
+2. Opcional: `sh scripts/package/smoke-layer7d.sh` (valida compile + `-t`).
+3. `cd package/pfSense-pkg-layer7 && make package` → artefacto `.txz` (nome inclui `PORTVERSION`). Localização típica: diretório do port ou subpastas de `work/` — usar `find . -maxdepth 5 -name 'pfSense-pkg-layer7*.txz'`.
 
 ## Instalação no pfSense (após build)
 
@@ -40,4 +46,5 @@ Comandos de verificação e critérios de aceite: **`docs/04-package/validacao-l
 
 `pkg delete pfSense-pkg-layer7` e, se necessário, reinstalar `.txz` anterior.
 
-Documentação geral: [`../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md`](../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md).
+Documentação geral: [`../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md`](../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md).  
+Validação GUI: [`../../docs/package/gui-validation.md`](../../docs/package/gui-validation.md).

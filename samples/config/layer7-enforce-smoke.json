@@ -1,0 +1,18 @@
+{
+  "layer7": {
+    "enabled": true,
+    "mode": "enforce",
+    "log_level": "info",
+    "policies": [
+      {
+        "id": "p-bt-block",
+        "name": "smoke block BT",
+        "enabled": true,
+        "action": "block",
+        "priority": 10,
+        "match": { "ndpi_app": ["BitTorrent"] }
+      }
+    ],
+    "exceptions": []
+  }
+}

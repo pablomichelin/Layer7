@@ -1,0 +1,46 @@
+#!/bin/sh
+# install-lab.sh — Instalação do pacote Layer7 no pfSense a partir de GitHub Release
+# Gerado por deployz.sh. Executar em Diagnostics > Command Prompt.
+# Placeholders: @REPO_OWNER@ @REPO_NAME@ @TAG@ @PACKAGE_NAME@ @SHA256_FILE@
+set -eu
+
+OWNER="@REPO_OWNER@"
+REPO="@REPO_NAME@"
+TAG="@TAG@"
+PKG_FILE="@PACKAGE_NAME@"
+SHA_FILE="@SHA256_FILE@"
+
+BASE_URL="https://github.com/${OWNER}/${REPO}/releases/download/${TAG}"
+PKG_URL="${BASE_URL}/${PKG_FILE}"
+SHA_URL="${BASE_URL}/${SHA_FILE}"
+
+echo "==> Layer7 lab install — ${TAG}"
+echo "==> Baixando pacote: ${PKG_FILE}"
+fetch -o "/tmp/${PKG_FILE}" "${PKG_URL}"
+
+echo "==> Baixando checksum (opcional)"
+fetch -o "/tmp/${SHA_FILE}" "${SHA_URL}" 2>/dev/null || true
+
+if [ -f "/tmp/${SHA_FILE}" ]; then
+  echo "==> Validando checksum"
+  (cd /tmp && sha256 -c "${SHA_FILE}") || {
+    echo "ERRO: checksum inválido." >&2
+    exit 1
+  }
+else
+  echo "==> Checksum não disponível — prosseguindo sem validação"
+fi
+
+echo "==> Instalando pacote"
+pkg add -f "/tmp/${PKG_FILE}"
+
+echo "==> Pacote instalado"
+pkg info pfSense-pkg-layer7 || pkg info | grep -i layer7 || true
+
+echo ""
+echo "Próximos passos:"
+echo "  cp /usr/local/etc/layer7.json.sample /usr/local/etc/layer7.json"
+echo "  service layer7d onestart"
+echo "  service layer7d status"
+echo ""
+echo "Rollback: pkg delete pfSense-pkg-layer7"

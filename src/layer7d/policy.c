@@ -1,0 +1,738 @@
+#include "policy.h"
+#include "enforce.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static void
+skip_ws(const char **p)
+{
+	while (**p == ' ' || **p == '\t' || **p == '\n' || **p == '\r')
+		(*p)++;
+}
+
+static const char *
+json_skip_string(const char *p)
+{
+	if (*p != '"')
+		return NULL;
+	p++;
+	while (*p && *p != '"') {
+		if (*p == '\\' && p[1])
+			p++;
+		p++;
+	}
+	return *p == '"' ? p + 1 : NULL;
+}
+
+static const char *
+json_obj_end(const char *p)
+{
+	int depth = 0;
+
+	if (*p != '{')
+		return NULL;
+	for (; *p; p++) {
+		if (*p == '"') {
+			p = json_skip_string(p);
+			if (!p)
+				return NULL;
+			p--;
+			continue;
+		}
+		if (*p == '{')
+			depth++;
+		else if (*p == '}') {
+			depth--;
+			if (depth == 0)
+				return p;
+		}
+	}
+	return NULL;
+}
+
+static int
+key_in_object(const char *obj, const char *obj_end, const char *key)
+{
+	char buf[64];
+	size_t kl = strlen(key);
+	const char *p;
+
+	if (kl + 3 >= sizeof(buf))
+		return 0;
+	buf[0] = '"';
+	memcpy(buf + 1, key, kl);
+	buf[1 + kl] = '"';
+	buf[2 + kl] = '\0';
+
+	p = obj;
+	while (p < obj_end) {
+		p = strstr(p, buf);
+		if (!p || p >= obj_end)
+			return 0;
+		if (p > obj && p[-1] == '\\') {
+			p++;
+			continue;
+		}
+		{
+			const char *after = p + strlen(buf);
+			skip_ws(&after);
+			if (*after == ':')
+				return 1;
+		}
+		p++;
+	}
+	return 0;
+}
+
+static int
+extract_quoted_after_key(const char *obj, const char *obj_end,
+    const char *key, char *out, size_t outsz)
+{
+	char pat[72];
+	size_t kl = strlen(key);
+	const char *p, *q;
+
+	if (kl + 4 >= sizeof(pat))
+		return -1;
+	pat[0] = '"';
+	memcpy(pat + 1, key, kl);
+	pat[1 + kl] = '"';
+	pat[2 + kl] = '\0';
+
+	p = obj;
+	for (;;) {
+		p = strstr(p, pat);
+		if (!p || p >= obj_end)
+			return -1;
+		q = p + strlen(pat);
+		skip_ws(&q);
+		if (*q != ':')
+			return -1;
+		q++;
+		skip_ws(&q);
+		if (*q != '"')
+			return -1;
+		q++;
+		{
+			size_t n = 0;
+			while (*q && *q != '"' && n + 1 < outsz) {
+				if (*q == '\\' && q[1])
+					q++;
+				out[n++] = *q++;
+			}
+			if (*q != '"')
+				return -1;
+			out[n] = '\0';
+			return 0;
+		}
+	}
+}
+
+static int
+extract_bool_after_key(const char *obj, const char *obj_end,
+    const char *key, int *out)
+{
+	char pat[72];
+	size_t kl = strlen(key);
+	const char *p, *q;
+
+	if (kl + 4 >= sizeof(pat))
+		return -1;
+	pat[0] = '"';
+	memcpy(pat + 1, key, kl);
+	pat[1 + kl] = '"';
+	pat[2 + kl] = '\0';
+
+	p = strstr(obj, pat);
+	if (!p || p >= obj_end)
+		return -1;
+	q = p + strlen(pat);
+	skip_ws(&q);
+	if (*q != ':')
+		return -1;
+	q++;
+	skip_ws(&q);
+	if (strncmp(q, "true", 4) == 0 && !isalnum((unsigned char)q[4]) &&
+	    q[4] != '_') {
+		*out = 1;
+		return 0;
+	}
+	if (strncmp(q, "false", 5) == 0 && !isalnum((unsigned char)q[5]) &&
+	    q[5] != '_') {
+		*out = 0;
+		return 0;
+	}
+	return -1;
+}
+
+static int
+extract_int_after_key(const char *obj, const char *obj_end,
+    const char *key, int *out)
+{
+	char pat[72];
+	size_t kl = strlen(key);
+	const char *p, *q;
+	long v;
+
+	if (kl + 4 >= sizeof(pat))
+		return -1;
+	pat[0] = '"';
+	memcpy(pat + 1, key, kl);
+	pat[1 + kl] = '"';
+	pat[2 + kl] = '\0';
+
+	p = strstr(obj, pat);
+	if (!p || p >= obj_end)
+		return -1;
+	q = p + strlen(pat);
+	skip_ws(&q);
+	if (*q != ':')
+		return -1;
+	q++;
+	skip_ws(&q);
+	if (!isdigit((unsigned char)*q) && *q != '-')
+		return -1;
+	v = strtol(q, (char **)&q, 10);
+	if (v > 2147483647L || v < -2147483647L)
+		return -1;
+	*out = (int)v;
+	return 0;
+}
+
+static enum layer7_action
+parse_action(const char *s)
+{
+	if (strcmp(s, "allow") == 0)
+		return LAYER7_ACTION_ALLOW;
+	if (strcmp(s, "block") == 0)
+		return LAYER7_ACTION_BLOCK;
+	if (strcmp(s, "monitor") == 0)
+		return LAYER7_ACTION_MONITOR;
+	if (strcmp(s, "tag") == 0)
+		return LAYER7_ACTION_TAG;
+	return LAYER7_ACTION_MONITOR;
+}
+
+static int
+parse_string_array_in_object(const char *ob, const char *oe_end,
+    const char *array_key, char *dest_flat, int max_items, size_t item_w,
+    int *n_out)
+{
+	char pat[72];
+	size_t kl = strlen(array_key);
+	const char *p;
+
+	if (kl + 3 >= sizeof(pat))
+		return -1;
+	pat[0] = '"';
+	memcpy(pat + 1, array_key, kl);
+	pat[1 + kl] = '"';
+	pat[2 + kl] = '\0';
+
+	*n_out = 0;
+	p = strstr(ob, pat);
+	if (!p || p >= oe_end)
+		return 0;
+	p = strchr(p + strlen(pat), '[');
+	if (!p || p >= oe_end)
+		return 0;
+	p++;
+	for (;;) {
+		skip_ws(&p);
+		if (*p == ']')
+			break;
+		if (*p == '"') {
+			const char *sq = p + 1;
+			size_t n = 0;
+			char *dest;
+
+			if (*n_out >= max_items)
+				return -1;
+			dest = dest_flat + (size_t)(*n_out) * item_w;
+			while (*sq && *sq != '"' && n + 1 < item_w) {
+				if (*sq == '\\' && sq[1])
+					sq++;
+				dest[n++] = *sq++;
+			}
+			if (*sq != '"')
+				return -1;
+			dest[n] = '\0';
+			(*n_out)++;
+			p = sq + 1;
+		} else if (*p == ',') {
+			p++;
+			continue;
+		} else
+			break;
+		skip_ws(&p);
+		if (*p == ',')
+			p++;
+	}
+	return 0;
+}
+
+static int
+parse_match_subobject(const char *obj, const char *obj_end,
+    struct layer7_policy_rule *r)
+{
+	const char *mk = strstr(obj, "\"match\"");
+	const char *ob, *oe;
+
+	if (!mk || mk >= obj_end)
+		return 0;
+	ob = strchr(mk, '{');
+	if (!ob || ob >= obj_end)
+		return 0;
+	oe = json_obj_end(ob);
+	if (!oe || oe > obj_end)
+		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "ndpi_app",
+		(char *)r->ndpi_apps, L7_MAX_APPS_PER_POLICY,
+		L7_POLICY_APP_LEN, &r->n_ndpi_apps) != 0)
+		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "ndpi_category",
+		(char *)r->ndpi_cats, L7_MAX_CATS_PER_POLICY,
+		L7_POLICY_CAT_LEN, &r->n_ndpi_cats) != 0)
+		return -1;
+	return 0;
+}
+
+static int
+parse_one_policy(const char *ob, const char *oe,
+    struct layer7_policy_rule *r)
+{
+	char act[16];
+
+	memset(r, 0, sizeof(*r));
+	r->enabled = 1;
+	r->action = LAYER7_ACTION_MONITOR;
+	r->priority = 0;
+
+	if (extract_quoted_after_key(ob, oe, "id", r->id, sizeof(r->id)) != 0)
+		return -1;
+	(void)extract_quoted_after_key(ob, oe, "name", r->name, sizeof(r->name));
+	if (extract_bool_after_key(ob, oe, "enabled", &r->enabled) != 0)
+		r->enabled = 1;
+	if (extract_quoted_after_key(ob, oe, "action", act, sizeof(act)) == 0)
+		r->action = parse_action(act);
+	if (extract_int_after_key(ob, oe, "priority", &r->priority) != 0)
+		r->priority = 0;
+	if (extract_quoted_after_key(ob, oe, "tag_table", r->tag_table,
+		sizeof(r->tag_table)) != 0)
+		r->tag_table[0] = '\0';
+	else if (!layer7_pf_table_name_ok(r->tag_table))
+		r->tag_table[0] = '\0';
+	if (key_in_object(ob, oe, "match")) {
+		if (parse_match_subobject(ob, oe, r) != 0)
+			return -1;
+	}
+	return 0;
+}
+
+static const char *
+find_layer7_key_array(const char *json, size_t len, const char *array_name)
+{
+	const char *end = json + len;
+	const char *layer, *pol;
+	char pat[48];
+	size_t nl = strlen(array_name);
+
+	if (nl + 5 >= sizeof(pat))
+		return NULL;
+	memcpy(pat, "\"", 1);
+	memcpy(pat + 1, array_name, nl);
+	pat[1 + nl] = '"';
+	pat[2 + nl] = '\0';
+
+	layer = strstr(json, "\"layer7\"");
+	if (!layer || layer >= end)
+		return NULL;
+	pol = strstr(layer, pat);
+	if (!pol || pol >= end)
+		return NULL;
+	pol = strchr(pol, '[');
+	return pol;
+}
+
+int
+layer7_policies_parse(const char *json, size_t len,
+    struct layer7_policy_rule *out, int *n_out, int max_out)
+{
+	const char *arr, *q, *end;
+	int n = 0;
+
+	*n_out = 0;
+	if (!json || max_out <= 0)
+		return -1;
+	end = json + (len ? len : strlen(json));
+	arr = find_layer7_key_array(json, len ? len : (size_t)(end - json),
+	    "policies");
+	if (!arr)
+		return 0;
+
+	q = arr + 1;
+	while (*q && *q != ']' && n < max_out) {
+		while (*q && (*q == ' ' || *q == '\t' || *q == '\n' || *q == '\r' ||
+		    *q == ','))
+			q++;
+		if (*q == ']' || !*q)
+			break;
+		if (*q == '{') {
+			const char *oe = json_obj_end(q);
+			if (!oe || oe >= end)
+				return -1;
+			if (parse_one_policy(q, oe + 1, &out[n]) != 0)
+				return -1;
+			n++;
+			q = oe + 1;
+		} else
+			q++;
+	}
+	*n_out = n;
+	return 0;
+}
+
+static int
+parse_one_exception(const char *ob, const char *oe,
+    struct layer7_exception *e)
+{
+	char act[16];
+	char cidr_buf[L7_EXC_HOST_LEN];
+
+	memset(e, 0, sizeof(*e));
+	e->enabled = 1;
+	e->action = LAYER7_ACTION_ALLOW;
+	e->priority = 0;
+
+	(void)extract_quoted_after_key(ob, oe, "id", e->id, sizeof(e->id));
+	if (extract_bool_after_key(ob, oe, "enabled", &e->enabled) != 0)
+		e->enabled = 1;
+	if (extract_quoted_after_key(ob, oe, "action", act, sizeof(act)) == 0)
+		e->action = parse_action(act);
+	if (extract_int_after_key(ob, oe, "priority", &e->priority) != 0)
+		e->priority = 0;
+
+	if (extract_quoted_after_key(ob, oe, "host", e->host,
+		sizeof(e->host)) == 0) {
+		e->has_host = 1;
+	}
+	if (extract_quoted_after_key(ob, oe, "cidr", cidr_buf,
+		sizeof(cidr_buf)) == 0) {
+		unsigned a, b, c, d;
+		int pref;
+		char *slash;
+
+		slash = strchr(cidr_buf, '/');
+		if (!slash)
+			return -1;
+		*slash = '\0';
+		pref = atoi(slash + 1);
+		if (pref < 0 || pref > 32)
+			return -1;
+		if (sscanf(cidr_buf, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+			return -1;
+		if (a > 255 || b > 255 || c > 255 || d > 255)
+			return -1;
+		e->cidr_net_u32 =
+		    (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+		e->cidr_prefix = pref;
+		e->has_cidr = 1;
+	}
+	if (!e->has_host && !e->has_cidr)
+		return -1;
+	return 0;
+}
+
+int
+layer7_exceptions_parse(const char *json, size_t len,
+    struct layer7_exception *out, int *n_out, int max_out)
+{
+	const char *arr, *q, *end;
+	int n = 0;
+
+	*n_out = 0;
+	if (!json || max_out <= 0)
+		return -1;
+	end = json + (len ? len : strlen(json));
+	arr = find_layer7_key_array(json, len ? len : (size_t)(end - json),
+	    "exceptions");
+	if (!arr)
+		return 0;
+
+	q = arr + 1;
+	while (*q && *q != ']' && n < max_out) {
+		while (*q && (*q == ' ' || *q == '\t' || *q == '\n' || *q == '\r' ||
+		    *q == ','))
+			q++;
+		if (*q == ']' || !*q)
+			break;
+		if (*q == '{') {
+			const char *oe = json_obj_end(q);
+			if (!oe || oe >= end)
+				return -1;
+			if (parse_one_exception(q, oe + 1, &out[n]) == 0)
+				n++;
+			q = oe + 1;
+		} else
+			q++;
+	}
+	*n_out = n;
+	return 0;
+}
+
+static int
+policy_cmp(const void *a, const void *b)
+{
+	const struct layer7_policy_rule *x = a;
+	const struct layer7_policy_rule *y = b;
+
+	if (x->priority != y->priority)
+		return y->priority - x->priority;
+	return strcmp(x->id, y->id);
+}
+
+static int
+exc_cmp(const void *a, const void *b)
+{
+	const struct layer7_exception *x = a;
+	const struct layer7_exception *y = b;
+
+	if (x->priority != y->priority)
+		return y->priority - x->priority;
+	return strcmp(x->id, y->id);
+}
+
+void
+layer7_policies_sort(struct layer7_policy_rule *rules, int n)
+{
+	if (n > 1)
+		qsort(rules, (size_t)n, sizeof(rules[0]), policy_cmp);
+}
+
+void
+layer7_exceptions_sort(struct layer7_exception *exc, int n)
+{
+	if (n > 1)
+		qsort(exc, (size_t)n, sizeof(exc[0]), exc_cmp);
+}
+
+static int
+ipv4_parse(const char *s, uint32_t *out)
+{
+	unsigned a, b, c, d;
+
+	if (!s || !*s)
+		return -1;
+	if (sscanf(s, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+		return -1;
+	if (a > 255 || b > 255 || c > 255 || d > 255)
+		return -1;
+	*out = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+	return 0;
+}
+
+static int
+cidr_u32_match(uint32_t ip, uint32_t net, int prefix)
+{
+	uint32_t mask;
+
+	if (prefix <= 0)
+		return 1;
+	if (prefix >= 32)
+		return ip == net;
+	mask = (uint32_t)(0xffffffffU << (unsigned)(32 - prefix));
+	return (ip & mask) == (net & mask);
+}
+
+static int
+exception_matches_src(const struct layer7_exception *e, const char *src_ip)
+{
+	uint32_t ip;
+
+	if (!src_ip || !*src_ip)
+		return 0;
+	if (e->has_host && strcmp(src_ip, e->host) == 0)
+		return 1;
+	if (e->has_cidr && ipv4_parse(src_ip, &ip) == 0 &&
+	    cidr_u32_match(ip, e->cidr_net_u32, e->cidr_prefix))
+		return 1;
+	return 0;
+}
+
+static int
+rule_matches(const struct layer7_policy_rule *r, const char *ndpi_app,
+    const char *ndpi_cat)
+{
+	int i;
+
+	if (r->n_ndpi_apps > 0) {
+		if (!ndpi_app)
+			return 0;
+		for (i = 0; i < r->n_ndpi_apps; i++) {
+			if (strcmp(ndpi_app, r->ndpi_apps[i]) == 0)
+				break;
+		}
+		if (i >= r->n_ndpi_apps)
+			return 0;
+	}
+	if (r->n_ndpi_cats > 0) {
+		if (!ndpi_cat)
+			return 0;
+		for (i = 0; i < r->n_ndpi_cats; i++) {
+			if (strcmp(ndpi_cat, r->ndpi_cats[i]) == 0)
+				return 1;
+		}
+		return 0;
+	}
+	return 1;
+}
+
+static void
+dec_clear_pf(struct layer7_decision *dec)
+{
+	dec->pf_table[0] = '\0';
+}
+
+static void
+dec_set_pf_block(struct layer7_decision *dec)
+{
+	strncpy(dec->pf_table, L7_PF_TABLE_BLOCK, sizeof(dec->pf_table) - 1);
+	dec->pf_table[sizeof(dec->pf_table) - 1] = '\0';
+}
+
+static void
+dec_set_pf_tag(struct layer7_decision *dec, const struct layer7_policy_rule *r)
+{
+	const char *t;
+
+	t = (r->tag_table[0] && layer7_pf_table_name_ok(r->tag_table)) ?
+	    r->tag_table :
+	    L7_PF_TABLE_TAG_DEFAULT;
+	strncpy(dec->pf_table, t, sizeof(dec->pf_table) - 1);
+	dec->pf_table[sizeof(dec->pf_table) - 1] = '\0';
+}
+
+static void
+fill_enforce(const struct layer7_policy_rule *r, int global_enforce,
+    struct layer7_decision *dec)
+{
+	dec_clear_pf(dec);
+	if (global_enforce &&
+	    (r->action == LAYER7_ACTION_BLOCK ||
+		r->action == LAYER7_ACTION_TAG)) {
+		dec->would_enforce_block_or_tag = 1;
+		if (r->action == LAYER7_ACTION_BLOCK)
+			dec_set_pf_block(dec);
+		else
+			dec_set_pf_tag(dec, r);
+	} else
+		dec->would_enforce_block_or_tag = 0;
+}
+
+static void
+fill_enforce_action(enum layer7_action act, int global_enforce,
+    struct layer7_decision *dec)
+{
+	dec_clear_pf(dec);
+	if (global_enforce &&
+	    (act == LAYER7_ACTION_BLOCK || act == LAYER7_ACTION_TAG)) {
+		dec->would_enforce_block_or_tag = 1;
+		if (act == LAYER7_ACTION_BLOCK)
+			dec_set_pf_block(dec);
+		else
+			strncpy(dec->pf_table, L7_PF_TABLE_TAG_DEFAULT,
+			    sizeof(dec->pf_table) - 1);
+	} else
+		dec->would_enforce_block_or_tag = 0;
+}
+
+void
+layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
+    const struct layer7_policy_rule *rules, int n_rules, int global_enforce,
+    const char *src_ip, const char *ndpi_app, const char *ndpi_category,
+    struct layer7_decision *dec)
+{
+	int i;
+
+	memset(dec, 0, sizeof(*dec));
+	dec->matched_policy_id[0] = '\0';
+	dec->matched_exception_id[0] = '\0';
+	dec_clear_pf(dec);
+
+	for (i = 0; i < n_exc; i++) {
+		if (!exc[i].enabled)
+			continue;
+		if (!exception_matches_src(&exc[i], src_ip))
+			continue;
+		dec->action = exc[i].action;
+		dec->reason = L7_DECIDE_EXCEPTION;
+		strncpy(dec->matched_exception_id, exc[i].id,
+		    sizeof(dec->matched_exception_id) - 1);
+		dec->matched_exception_id[sizeof(dec->matched_exception_id) - 1] =
+		    '\0';
+		fill_enforce_action(exc[i].action, global_enforce, dec);
+		return;
+	}
+
+	for (i = 0; i < n_rules; i++) {
+		const struct layer7_policy_rule *r = &rules[i];
+
+		if (!r->enabled)
+			continue;
+		if (!rule_matches(r, ndpi_app, ndpi_category))
+			continue;
+		dec->action = r->action;
+		dec->reason = L7_DECIDE_POLICY_MATCH;
+		strncpy(dec->matched_policy_id, r->id,
+		    sizeof(dec->matched_policy_id) - 1);
+		dec->matched_policy_id[sizeof(dec->matched_policy_id) - 1] =
+		    '\0';
+		fill_enforce(r, global_enforce, dec);
+		return;
+	}
+
+	if (global_enforce) {
+		dec->action = LAYER7_ACTION_ALLOW;
+		dec->reason = L7_DECIDE_DEFAULT_ALLOW;
+	} else {
+		dec->action = LAYER7_ACTION_MONITOR;
+		dec->reason = L7_DECIDE_DEFAULT_MONITOR;
+	}
+	dec->would_enforce_block_or_tag = 0;
+}
+
+const char *
+layer7_action_str(enum layer7_action a)
+{
+	switch (a) {
+	case LAYER7_ACTION_ALLOW:
+		return "allow";
+	case LAYER7_ACTION_BLOCK:
+		return "block";
+	case LAYER7_ACTION_MONITOR:
+		return "monitor";
+	case LAYER7_ACTION_TAG:
+		return "tag";
+	default:
+		return "?";
+	}
+}
+
+const char *
+layer7_decide_reason_str(enum layer7_decide_reason r)
+{
+	switch (r) {
+	case L7_DECIDE_EXCEPTION:
+		return "exception";
+	case L7_DECIDE_POLICY_MATCH:
+		return "policy_match";
+	case L7_DECIDE_DEFAULT_MONITOR:
+		return "default_monitor";
+	case L7_DECIDE_DEFAULT_ALLOW:
+		return "default_allow";
+	default:
+		return "?";
+	}
+}

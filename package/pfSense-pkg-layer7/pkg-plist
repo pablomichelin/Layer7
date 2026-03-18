@@ -2,6 +2,11 @@ pkg/layer7.xml
 pkg/layer7.inc
 etc/inc/priv/layer7.priv.inc
 www/packages/layer7/layer7_status.php
+www/packages/layer7/layer7_settings.php
+www/packages/layer7/layer7_policies.php
+www/packages/layer7/layer7_exceptions.php
+www/packages/layer7/layer7_events.php
+www/packages/layer7/layer7_diagnostics.php
 sbin/layer7d
 etc/layer7.json.sample
 etc/rc.d/layer7d

@@ -15,8 +15,11 @@ Descrever o que a **GUI** persiste e o **`layer7d`** lê após reload. No pfSens
 | `enabled` | bool | `false` | Serviço ativo |
 | `mode` | enum | `monitor` | `monitor` \| `enforce` |
 | `log_level` | enum | `info` | `error` \| `warn` \| `info` \| `debug` |
-| `syslog_remote` | bool | `false` | Espelhar eventos relevantes para syslog |
-| `interfaces` | lista iface | `[]` | Interfaces onde o daemon observa (nomes pfSense: `lan`, `opt1`…) |
+| `syslog_remote` | bool | `false` | Duplicar logs do daemon por UDP para servidor syslog |
+| `syslog_remote_host` | string | `""` | Hostname ou IPv4 do coletor (obrigatório se `syslog_remote`) |
+| `syslog_remote_port` | int | `514` | Porta UDP |
+| `debug_minutes` | int | `0` | `0` = normal; `1–720` = forçar LOG_DEBUG no daemon durante N min após cada **reload** (SIGHUP) |
+| `interfaces` | lista iface | `[]` | Interfaces alvo (nomes pfSense: `lan`, `opt1`…). **GUI:** **Settings** (CSV, até 8). Consumo pelo nDPI = backlog técnico. |
 
 ## Políticas (`policies[]`)
 
@@ -34,7 +37,18 @@ Cada item:
 
 ## Exceções (`exceptions[]`) — opcional V1
 
-Lista de `cidr` ou `host` + `policy_id` a isentar ou forçar.
+Avaliadas **antes** das políticas (ver [precedence](precedence.md)). Cada item:
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `id` | string | Opcional (útil em logs / dry-run) |
+| `enabled` | bool | Default `true` |
+| `priority` | int | Maior = primeiro (empate por `id`) |
+| `action` | enum | Tipicamente `allow` (bypass às políticas) |
+| `host` | IPv4 | Match exacto do **src** do fluxo (ex.: `10.0.0.99`) |
+| `cidr` | string | `a.b.c.d/nn` (IPv4). **Um** de `host` ou `cidr` por regra. |
+
+O `layer7d -t` lista exceções e inclui dry-run com `src` + app + categoria.
 
 ## Persistência e reload
 

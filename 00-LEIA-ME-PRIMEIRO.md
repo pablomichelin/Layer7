@@ -22,7 +22,7 @@ A ideia central é:
 
 1. `01-VISAO-GERAL-E-ESCOPO.md`
 2. `02-ARQUITETURA-ALVO.md`
-3. `03-ROADMAP-E-FASES.md`
+3. `03-ROADMAP-E-FASES.md` *(V1: fases 0–11; transição 12; **V2+ documentadas nas fases 13–22**)*
 4. `04-BACKLOG-MVP-E-VERSOES.md`
 5. `05-ESTRUTURA-REPOSITORIO-CURSOR-GITHUB.md`
 6. `06-PADROES-DE-DESENVOLVIMENTO-E-SEGURANCA.md`
@@ -80,6 +80,7 @@ Este projeto não promete, na V1:
 5. **Sem esconder limitações técnicas no marketing do produto.**
 6. **Sem deixar documentação para o final.**
 7. **Sem merge em `main` sem documentação, teste e rollback definidos.**
+8. **Não instalar no pfSense antes do pacote estar totalmente completo** — o pacote só será colocado no firewall quando estiver totalmente desenvolvido.
 
 ---
 

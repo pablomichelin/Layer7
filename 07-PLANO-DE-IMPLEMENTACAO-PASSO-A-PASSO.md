@@ -122,16 +122,18 @@ Artefactos em `package/pfSense-pkg-layer7/`. Validação: [`docs/04-package/vali
 Substituir PoC solta por serviço real.
 
 ### Tarefas (repositório)
-- [x] fonte C `src/layer7d/main.c` (mínimo: syslog, stat em path de config, loop, SIGHUP placeholder)
-- [x] Makefile do port compila para `sbin/layer7d` *(lógica no repo; build não validado em lab)*
+- [x] fonte C `main.c` + `config_parse.c` — `enabled`/`mode` no objeto `layer7` (heurística documentada)
+- [x] flag `-t` para testar JSON offline; SIGHUP re-lê config e loga valores
+- [x] Makefile compila ambos os `.c` → `sbin/layer7d` *(build lab: `validacao-lab.md`)*
+- [x] `scripts/package/smoke-layer7d.sh` — smoke compile + `-t` em samples
 
 ### Tarefas (lab + produto)
 - [ ] binário instalado e executável no pfSense após `pkg add`
 - [ ] start/stop/status via `service layer7d` **comprovado** no appliance
-- [ ] parser JSON + reload SIGHUP real
-- [ ] manter counters
-- [ ] logar estado
-- [ ] tratar falha de inicialização
+- [x] parser alargado (policies + exceptions + match categoria no motor; runtime ainda sem nDPI)
+- [x] manter counters (SIGUSR1 + `snapshot_fail`; `pf_add_ok`/`fail` reservados)
+- [x] logar estado (`periodic_state` ~1 h; reload syslog)
+- [x] tratar falha de inicialização (degraded se parse policies/exceptions falha com ficheiro presente)
 
 ### Saída
 Daemon gerenciável **com evidência no lab**.
@@ -144,12 +146,12 @@ Daemon gerenciável **com evidência no lab**.
 Transformar classificação em decisão.
 
 ### Tarefas
-- [ ] implementar matcher de exceções
-- [ ] implementar regra por app
-- [ ] implementar regra por categoria
-- [ ] implementar default action
-- [ ] adicionar reason code
-- [ ] gerar decisão final
+- [x] implementar matcher de exceções *(host IPv4 + CIDR; `layer7_flow_decide`; dry-run)*
+- [x] implementar regra por app *(nDPI app exato; `policy.c` + dry-run `-t`)*
+- [x] implementar regra por categoria *(match exato `ndpi_category[]`; AND com app)*
+- [x] implementar default action *(monitor vs allow conforme modo global)*
+- [x] adicionar reason code
+- [x] gerar decisão final *(first-match, prioridade + id)*
 
 ### Saída
 Policy engine previsível.
@@ -162,11 +164,11 @@ Policy engine previsível.
 Aplicar block/allow/monitor/tag.
 
 ### Tarefas
-- [ ] integrar aliases/tables
-- [ ] implementar block básico
+- [x] integrar aliases/tables *(nomes + comando `pfctl` gerado; tabela block default + `tag_table`; exec no loop = backlog pós-nDPI)*
+- [x] API `pfctl` no código (`layer7_pf_exec_table_add`/`delete`; loop+nDPI pendente)
 - [ ] implementar whitelist
-- [ ] implementar monitor
-- [ ] registrar ação aplicada
+- [x] implementar monitor *(já no motor; sem PF)*
+- [x] registrar ação aplicada *(dry-run `pfctl_suggest` + syslog reload/stats)*
 - [ ] validar sem quebrar tráfego geral
 
 ### Saída
@@ -180,12 +182,13 @@ Primeira ação real em campo.
 Permitir operação pela GUI.
 
 ### Tarefas
-- [ ] criar Settings
-- [ ] criar Policies
-- [ ] criar Exceptions
-- [ ] criar Events
-- [ ] criar Diagnostics
-- [ ] validação de input
+- [x] Settings + lista políticas com toggle `enabled` (`layer7_policies.php`) *(repo; lab)*
+- [x] criar política pela GUI *(adicionar; editar/remover = JSON)*
+- [x] editor de Policies na GUI *(editar nome/prioridade/ação/match/tag_table/ativa; **id** só JSON; remover via dropdown)*
+- [x] criar Exceptions *(GUI: lista + toggle + adicionar + **editar** + remover; **id** só JSON)*
+- [x] criar Events *(página events básica — aponta para syslog; eventos estruturados pós-nDPI)*
+- [x] criar Diagnostics *(página: estado serviço, logs, comandos)*
+- [x] validação de input *(Settings syslog host; restante já em policies/exceptions; ver `docs/package/gui-validation.md`)*
 
 ### Saída
 Pacote operável sem shell na maioria dos casos.
@@ -198,11 +201,11 @@ Pacote operável sem shell na maioria dos casos.
 Consolidar observabilidade.
 
 ### Tarefas
-- [ ] definir formato de logs
-- [ ] implementar syslog remoto
-- [ ] adicionar diagnostics
-- [ ] counters básicos
-- [ ] modo debug temporário
+- [x] definir formato de logs *(docs/10-logging/README.md — atual + planeado)*
+- [x] implementar syslog remoto *(UDP; `config_parse` + GUI Settings + `layer7d`)*
+- [x] adicionar diagnostics *(GUI layer7_diagnostics.php)*
+- [x] counters básicos *(SIGUSR1 no daemon)*
+- [x] modo debug temporário *(`debug_minutes` + GUI Settings)*
 
 ### Saída
 Operação e troubleshooting possíveis.
@@ -248,6 +251,25 @@ Publicar de forma profissional.
 
 ### Saída
 Release 0.1.0 utilizável.
+
+---
+
+## Blocos 13–22 (V2+ — referência)
+
+*Não executar antes do gate da Fase 11 e da triagem da Fase 12. Detalhe de gates: [`03-ROADMAP-E-FASES.md`](03-ROADMAP-E-FASES.md) (Fases 13–22).*
+
+| Bloco | Fase | Foco resumido |
+|-------|------|----------------|
+| 13 | 13 | nDPI no `layer7d` em produção |
+| 14 | 14 | GUI completa + sync config |
+| 15 | 15 | Política DNS/domínio |
+| 16 | 16 | Observabilidade (logs, syslog, counters) |
+| 17 | 17 | Identidade/contexto utilizador |
+| 18 | 18 | TLS inspection seletiva (opt-in) |
+| 19 | 19 | Correlação Suricata/IDS |
+| 20 | 20 | Escala, HA, performance |
+| 21 | 21 | Ciclo de vida nDPI/assinaturas |
+| 22 | 22 | API local / hooks automação |
 
 ---
 

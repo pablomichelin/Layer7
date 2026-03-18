@@ -2,6 +2,8 @@
 
 **Objetivo:** obter **evidência objetiva** de que o port gera um `.txz` instalável no pfSense CE, que os ficheiros aparecem no disco, que o serviço pode arrancar e que a página (se acessível) responde.
 
+**Política do projeto:** o pacote **só será instalado no pfSense quando estiver totalmente completo** (ver `00-LEIA-ME-PRIMEIRO.md` regra 8, `CORTEX.md`). Este documento descreve o procedimento de validação para quando esse momento chegar.
+
 **Regra:** colar saídas reais nas caixas abaixo. Sem outputs, o gate **não** está fechado.
 
 ---
@@ -29,6 +31,18 @@
 
 ## 3. Passo a passo — build
 
+**Antes do `make package`:** alinhar plist a `files/` (em Windows: `.\scripts\package\check-port-files.ps1`):
+
+```sh
+sh scripts/package/check-port-files.sh
+```
+
+**Opcional (antes do port):** no clone, com `cc` + `make`:
+
+```sh
+sh scripts/package/smoke-layer7d.sh
+```
+
 Execute no **builder** (ajuste o caminho ao teu clone):
 
 ```sh
@@ -48,6 +62,26 @@ make package
 ```
 (colar aqui)
 ```
+
+**Onde procurar o `.txz`:** depende do `make` do host; a partir do diretório do port:
+
+```sh
+ls -la *.txz 2>/dev/null || true
+find . -maxdepth 5 -name 'pfSense-pkg-layer7*.txz' 2>/dev/null
+```
+
+Anote o caminho completo para `pkg add` no pfSense.
+
+---
+
+### Troubleshooting (build)
+
+| Sintoma | Ação |
+|--------|------|
+| `layer7d: fontes em falta` | Garantir clone completo; `src/layer7d/main.c` e `config_parse.c` devem existir relativamente ao port. |
+| `LICENSE` em falta | Deve existir `package/pfSense-pkg-layer7/LICENSE`. |
+| `cc: not found` | Instalar toolchain no builder ou usar VM FreeBSD documentada em `docs/08-lab/`. |
+| `check-port-files: FALHOU` | Alinhar `pkg-plist` com ficheiros em `files/` (ver `scripts/package/check-port-files.sh`). |
 
 ---
 
@@ -118,6 +152,55 @@ clog /var/log/system.log 2>/dev/null | tail -n 80
 service layer7d onestop
 ```
 
+**Notas:**
+
+- `daemon_start` é registado no arranque **mesmo sem** `/usr/local/etc/layer7.json`; o sample só é necessário para testar parse completo via SIGHUP/reload.
+- Arranque no boot: `sysrc layer7d_enable=YES` (após validar manualmente com `onestart`).
+
+### 6b. PF — `pfctl` (opcional, código ≥ 0.0.12)
+
+O `layer7d` compila com **`layer7_pf_exec_table_add`/`delete`** (`/sbin/pfctl`); o **loop ainda não chama** estas funções (falta nDPI). Para ganhar confiança no appliance:
+
+1. Criar tabela **`layer7_block`** no ruleset PF (vazia + regra que a use).
+2. Como root: `pfctl -t layer7_block -T add 10.0.0.99` → `pfctl -t layer7_block -T show` → `… -T delete 10.0.0.99`.
+3. Registar OK/NOK abaixo.
+
+```
+(pfctl show / notas)
+```
+
+**Versão do binário:** `layer7d -V` (deve alinhar com o pacote / **Diagnostics**).
+
+### 6c. CLI **`layer7d -e`** (decisão + PF, sem nDPI)
+
+Confirma o caminho **política → `pfctl`** no appliance (útil antes do loop nDPI).
+
+1. Copiar temporariamente o sample de enforce (ou ajustar `layer7.json`):
+
+   ```sh
+   cp /usr/local/etc/layer7.json /usr/local/etc/layer7.json.bak
+   cp /caminho/no/builder/layer7-enforce-smoke.json /usr/local/etc/layer7.json
+   # ou: usar apenas o bloco policies/mode enforce do sample
+   ```
+
+2. **Dry-run** (não altera tabelas PF):
+
+   ```sh
+   /usr/local/sbin/layer7d -n -c /usr/local/etc/layer7.json -e 10.0.0.100 BitTorrent
+   ```
+
+   Esperado: linha com `dry-run: pfctl -t layer7_block -T add 10.0.0.100` (ou tabela configurada).
+
+3. Opcional — **executar** `pfctl` (só se a tabela existir no ruleset, ver §6b):
+
+   ```sh
+   /usr/local/sbin/layer7d -c /usr/local/etc/layer7.json -e 10.0.0.100 BitTorrent
+   ```
+
+4. Restaurar config: `mv /usr/local/etc/layer7.json.bak /usr/local/etc/layer7.json` e `service layer7d onerestart` se necessário.
+
+**Nota:** o sample `samples/config/layer7-enforce-smoke.json` está no repositório; no pfSense pode colar o conteúdo ou copiar via SCP.
+
 ---
 
 ## 7. Verificação — GUI / HTTP
@@ -128,6 +211,11 @@ service layer7d onestop
 
 - [ ] Abre sem erro PHP (sim / não): `____`
 - Evidência (screenshot ou código HTTP/curl): *(opcional colar)*
+
+**URL exceções (opcional):** `https://IP/packages/layer7/layer7_exceptions.php`  
+**Políticas — adicionar (≥0.0.14):** em **Policies**, formulário no fim; validar com **Estado**. **Remover (≥0.0.23):** dropdown + botão Remover + confirmar. **Editar (≥0.0.25):** botão Editar na linha → gravar → lista.  
+**Exceções — adicionar (≥0.0.16):** em **Exceptions**, formulário host (IPv4) ou CIDR; validar com `layer7d -t`. **Remover (≥0.0.24):** dropdown + Remover + confirmar. **Editar (≥0.0.26):** Editar na linha → gravar.  
+**Diagnostics (≥0.0.18):** tab **Diagnostics**. **Events (≥0.0.22):** tab **Events** (syslog / futuro event-model). **Syslog remoto (≥0.0.19):** Settings → host + porta; no coletor confirmar receção UDP 514 (ou porta definida).
 
 **Menu Services:**
 

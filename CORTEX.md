@@ -4,28 +4,37 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**No repositório:** scaffold do port `pfSense-pkg-layer7` (Makefile que compila `layer7d` em C), ficheiros XML/PHP/rc.d/sample, daemon mínimo em `src/layer7d/main.c`.  
-**Não validado em lab:** build `.txz`, `pkg add` em pfSense, registo na GUI, serviço em execução no appliance — ver [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md).
+**No repositório (0.0.31):** **Settings** grava **`interfaces[]`** (CSV).  
+**Anterior (0.0.30):** interfaces só leitura.  
+**Ainda não validado em lab:** `pkg add` + **teste de exec pfctl** no appliance — [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md).
 
 ## Fase atual
-**Gate:** validação real em FreeBSD (build) + pfSense (instalação, serviço, GUI se aplicável). Nenhuma feature nova até fechar esse gate.
+Há **código testável no builder** (`./layer7d -t -c samples/...` ou smoke). Gate pfSense mantém-se aberto até evidência no lab.
 
-## Última entrega (documental / repo)
-- Saneamento: docs alinhadas à realidade; `validacao-lab.md` + checklist executável.
-- Código existente sem alteração funcional neste bloco.
+## Última entrega
+- **README** — estado alinhado (daemon, pacote, GUI, CI; lab pendente).
+- **Guia Windows** — `docs/08-lab/guia-windows.md` + `check-port-files.ps1` para dev em Windows.
+- **Quick-start lab** — `docs/08-lab/quick-start-lab.md` (fluxo builder→pfSense→validação).
+- **Loop main.c** — comentário TODO(Fase 13) no ponto de integração nDPI→`layer7_on_classified_flow`.
+- **BUILDER.md** — port pronto para `make package`; referência validacao-lab e quick-start.
+- **CI** — job `check-windows` (PowerShell) em `smoke-layer7d.yml`.
+- **Runbooks** — link para validacao-lab e quick-start em `docs/05-runbooks/README.md`.
 
 ## Objetivo imediato
-1. Executar [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md) no builder + pfSense lab e colar evidências.
-2. Só depois: próximo bloco técnico (a definir após resultado da validação).
+1. No FreeBSD: `sh scripts/package/smoke-layer7d.sh` e/ou `make package` + procedimento em `validacao-lab.md`.
+2. Corrigir port/daemon só com base em falhas observadas no lab.
 
-## Próximos 3 passos (após validação OK)
-1. Corrigir port/GUI/rc conforme falhas observadas no lab.
-2. Então retomar roadmap (ex.: parser JSON) — não antes do gate.
+## Próximos 3 passos
+1. Fechar evidência lab (pacote + serviço + opcional §6b pfctl).
+2. No loop nDPI: chamar `layer7_on_classified_flow` (já implementado; hoje só **`-e`** / **`-e -n`** no CLI).
+3. nDPI no daemon (só após pacote estável no lab).
 
 ## Decisões congeladas
+- **instalação no pfSense apenas quando o pacote estiver totalmente completo** — não colocar no firewall antes de estar totalmente desenvolvido;
 - foco em pfSense CE;
 - pacote open source;
 - distribuição inicial por artefato `.txz`;
+- **lab distribution via GitHub Releases** — fluxo builder FreeBSD → GitHub Release → pfSense teste; comando único `fetch + sh`; não substitui Package Manager oficial; ver [`docs/04-package/deploy-github-lab.md`](docs/04-package/deploy-github-lab.md);
 - sem software pago obrigatório;
 - V1 sem TLS MITM universal;
 - V1 com modo monitor e enforce;
@@ -43,6 +52,8 @@ Layer7 para pfSense CE
 - TLS inspection seletiva;
 - integração profunda com Suricata;
 - console multi-firewall.
+
+**Trilha pós-V1 (documental):** fases **13–22** em `03-ROADMAP-E-FASES.md` (nDPI produção, GUI completa, DNS, observabilidade, identidade, TLS opt-in, IDS, escala/HA, ciclo nDPI, API local).
 
 ## Política de trabalho
 - um bloco por vez;

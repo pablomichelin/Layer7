@@ -17,3 +17,7 @@ docs/08-lab/lab-inventory.md
 *.pkg
 /dist/
 /build/
+
+# Binários locais (make / smoke em src/layer7d)
+src/layer7d/layer7d
+src/layer7d/layer7d-smoke

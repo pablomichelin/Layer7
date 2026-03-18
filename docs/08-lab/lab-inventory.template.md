@@ -11,4 +11,6 @@
 | IP syslog | |
 | Hipervisor | |
 | Nome snapshot base | |
+| Data última validação `.txz` (ref. [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)) | |
+| Resultado gate pacote (APROVADO / aberto) | |
 | Notas | |

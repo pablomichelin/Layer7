@@ -1,0 +1,30 @@
+# Compila layer7d (Linux) e corre scripts/package/smoke-layer7d.sh.
+# Não substitui validação do port .txz no FreeBSD / pfSense (validacao-lab.md).
+name: smoke layer7d
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: pkg-plist vs files/
+        run: sh scripts/package/check-port-files.sh
+      - name: Toolchain + smoke
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential
+          sh scripts/package/smoke-layer7d.sh
+
+  check-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: pkg-plist vs files/ (PowerShell)
+        run: .\scripts\package\check-port-files.ps1

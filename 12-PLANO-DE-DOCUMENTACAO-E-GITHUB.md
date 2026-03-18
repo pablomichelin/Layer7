@@ -67,6 +67,13 @@ Definir quais documentos existem, quando são atualizados e qual papel cada um c
 
 ---
 
+## 3b. CI no GitHub
+
+- Workflow **[`.github/workflows/smoke-layer7d.yml`](.github/workflows/smoke-layer7d.yml)** — smoke do binário `layer7d` em Ubuntu (não substitui `validacao-lab.md`).
+- Documentação: **[`docs/tests/README.md`](docs/tests/README.md)**.
+
+---
+
 ## 4. CORTEX.md como SSOT
 
 O `CORTEX.md` deve conter sempre:

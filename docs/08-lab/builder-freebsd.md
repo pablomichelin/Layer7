@@ -41,6 +41,18 @@ pkg install -y cmake pkgconf gcc
 2. Desenvolvimento da PoC em `src/` (Bloco 3).
 3. Binários de teste no builder; instalação no pfSense só via pacote `.txz` quando o empacotamento existir.
 
+### Compilar só o `layer7d` (sem `make package`)
+
+```sh
+cd src/layer7d
+make
+./layer7d -t -c ../../samples/config/layer7-minimal.json
+make check   # -V + parse sample (opcional)
+make clean
+```
+
+Flags alinhadas ao port; **`version.str`** em `src/layer7d/` define a string de **`layer7d -V`**. O script **`scripts/package/smoke-layer7d.sh`** usa o mesmo Makefile com **`VSTR_DIR`** temporário e binário **`layer7d-smoke`**.
+
 ## Segurança
 
 - Builder com acesso GitHub (HTTPS ou SSH).
