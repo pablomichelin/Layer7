@@ -55,6 +55,9 @@ static int s_syslog_remote;
 static int s_remote_port = 514;
 static time_t s_debug_until;
 
+static char *read_file(const char *path, size_t *out_len);
+static int cfg_disabled(const struct layer7_parsed *p);
+
 static int
 effective_ll(void)
 {
