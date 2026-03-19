@@ -1,17 +1,15 @@
-@cwd /
-etc/inc/priv/layer7.priv.inc
-@dir etc/inc/priv
-@cwd %%PREFIX%%
-pkg/layer7.xml
-pkg/layer7.inc
-www/packages/layer7/layer7_status.php
-www/packages/layer7/layer7_settings.php
-www/packages/layer7/layer7_policies.php
-www/packages/layer7/layer7_exceptions.php
-www/packages/layer7/layer7_events.php
-www/packages/layer7/layer7_diagnostics.php
-sbin/layer7d
-etc/layer7.json.sample
-etc/rc.d/layer7d
-%%DATADIR%%/info.xml
-@dir www/packages/layer7
+/usr/local/pkg/layer7.xml
+/usr/local/pkg/layer7.inc
+/etc/inc/priv/layer7.priv.inc
+/usr/local/www/packages/layer7/layer7_status.php
+/usr/local/www/packages/layer7/layer7_settings.php
+/usr/local/www/packages/layer7/layer7_policies.php
+/usr/local/www/packages/layer7/layer7_exceptions.php
+/usr/local/www/packages/layer7/layer7_events.php
+/usr/local/www/packages/layer7/layer7_diagnostics.php
+/usr/local/sbin/layer7d
+/usr/local/etc/layer7.json.sample
+/usr/local/etc/rc.d/layer7d
+/usr/local/share/pfSense-pkg-layer7/info.xml
+@dir /etc/inc/priv
+@dir /usr/local/www/packages/layer7
