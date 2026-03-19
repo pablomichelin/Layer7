@@ -5,3 +5,12 @@ if [ "${2}" != "POST-INSTALL" ]; then
 fi
 
 ${PKG_ROOTDIR}/usr/local/bin/php -f ${PKG_ROOTDIR}/etc/rc.packages %%PORTNAME%% ${2}
+
+if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ] && [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json.sample" ]; then
+	cp "${PKG_ROOTDIR}/usr/local/etc/layer7.json.sample" "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
+fi
+
+if [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ]; then
+	chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
+	chmod 0664 "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
+fi

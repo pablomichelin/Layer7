@@ -12,7 +12,7 @@ Referência rápida do que o PHP valida antes de gravar `layer7.json`.
 | `syslog_remote_host` | Se remoto ativo: não vazio; **IPv4** ou **hostname** (A–Z, a–z, 0–9, `.`, `-`; 1–255 chars; sem `..`) |
 | `syslog_remote_port` | 1–65535 |
 | `debug_minutes` | 0–720 (clamp no servidor) |
-| CSRF | `form_token` |
+| CSRF | Protecao nativa do pfSense WebGUI (`__csrf_magic`) |
 | `interfaces_csv` | Até 8 tokens `^[a-zA-Z0-9_.]{1,32}$`; vazio → `[]` |
 
 ## Policies (`layer7_policies.php`)

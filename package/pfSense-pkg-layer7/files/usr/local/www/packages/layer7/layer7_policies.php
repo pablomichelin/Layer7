@@ -12,9 +12,6 @@ require_once("/usr/local/pkg/layer7.inc");
 $layer7_policy_edit_retry = null;
 
 if ($_POST["add_policy"] ?? false) {
-	if (!layer7_csrf_verify_post()) {
-		$input_errors[] = gettext("Token invalido - atualize a pagina.");
-	} else {
 		$data = layer7_load_or_default();
 		if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
 			$data["layer7"]["policies"] = array();
@@ -98,19 +95,14 @@ if ($_POST["add_policy"] ?? false) {
 			}
 			$policies[] = $rule;
 			if (layer7_save_json($data)) {
-				layer7_csrf_rotate();
 				layer7_signal_reload();
 				$savemsg = gettext("Politica adicionada.");
 			}
 		}
 		unset($policies);
-	}
 }
 
 if ($_POST["save_policies"] ?? false) {
-	if (!layer7_csrf_verify_post()) {
-		$input_errors[] = gettext("Token invalido - atualize a pagina.");
-	} else {
 		$data = layer7_load_or_default();
 		if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
 			$data["layer7"]["policies"] = array();
@@ -122,17 +114,12 @@ if ($_POST["save_policies"] ?? false) {
 		}
 		unset($policies);
 		if (layer7_save_json($data)) {
-			layer7_csrf_rotate();
 			layer7_signal_reload();
 			$savemsg = gettext("Politicas atualizadas.");
 		}
-	}
 }
 
 if ($_POST["delete_policy"] ?? false) {
-	if (!layer7_csrf_verify_post()) {
-		$input_errors[] = gettext("Token invalido - atualize a pagina.");
-	} else {
 		$data = layer7_load_or_default();
 		if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
 			$data["layer7"]["policies"] = array();
@@ -145,19 +132,14 @@ if ($_POST["delete_policy"] ?? false) {
 		} else {
 			array_splice($policies, $idx, 1);
 			if (layer7_save_json($data)) {
-				layer7_csrf_rotate();
 				layer7_signal_reload();
 				$savemsg = gettext("Politica removida.");
 			}
 		}
 		unset($policies);
-	}
 }
 
 if ($_POST["save_policy_edit"] ?? false) {
-	if (!layer7_csrf_verify_post()) {
-		$input_errors[] = gettext("Token invalido - atualize a pagina.");
-	} else {
 		$data = layer7_load_or_default();
 		if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
 			$data["layer7"]["policies"] = array();
@@ -229,7 +211,6 @@ if ($_POST["save_policy_edit"] ?? false) {
 				}
 				$policies[$idx] = $rule;
 				if (layer7_save_json($data)) {
-					layer7_csrf_rotate();
 					layer7_signal_reload();
 					header("Location: layer7_policies.php");
 					exit;
@@ -238,7 +219,6 @@ if ($_POST["save_policy_edit"] ?? false) {
 			}
 		}
 		unset($policies);
-	}
 }
 
 $data = layer7_load_or_default();
@@ -281,7 +261,6 @@ layer7_render_styles();
 			<div class="alert alert-info"><?= gettext("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
 			<?php } else { ?>
 			<form method="post">
-				<input type="hidden" name="form_token" value="<?= htmlspecialchars(layer7_csrf_token()); ?>" />
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
 						<thead>
@@ -338,7 +317,6 @@ layer7_render_styles();
 
 			<form method="post" class="form-inline layer7-inline-form"
 				onsubmit='return confirm(<?= json_encode(gettext("Remover esta politica do JSON?")); ?>);'>
-				<input type="hidden" name="form_token" value="<?= htmlspecialchars(layer7_csrf_token()); ?>" />
 				<div class="form-group">
 					<label class="control-label" for="delete_policy_index"><?= gettext("Remover politica"); ?></label>
 					<select id="delete_policy_index" name="delete_policy_index" class="form-control">
@@ -382,7 +360,6 @@ layer7_render_styles();
 				<a href="layer7_policies.php" class="btn btn-default"><?= gettext("Cancelar edicao"); ?></a>
 			</div>
 			<form method="post" class="form-horizontal">
-				<input type="hidden" name="form_token" value="<?= htmlspecialchars(layer7_csrf_token()); ?>" />
 				<input type="hidden" name="edit_policy_index" value="<?= (int)$edit_idx; ?>" />
 
 				<div class="form-group">
@@ -470,7 +447,6 @@ layer7_render_styles();
 			<div class="alert alert-warning"><?= gettext("Limite de 24 politicas atingido."); ?></div>
 			<?php } else { ?>
 			<form method="post" class="form-horizontal">
-				<input type="hidden" name="form_token" value="<?= htmlspecialchars(layer7_csrf_token()); ?>" />
 
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><code>id</code></label>

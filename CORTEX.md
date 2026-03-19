@@ -4,9 +4,9 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**No repositorio (0.0.31):** Settings grava `interfaces[]` (CSV), a GUI Layer7 foi reorganizada para um layout consistente com o padrao visual do pfSense e a operacao segura da WebGUI do appliance ficou documentada em runbook.  
-**Validado em lab (2026-03-19):** build do pacote, `pkg add`, ficheiros instalados, `layer7d` a subir/parar, evidencia HTTP 200 para as paginas Layer7 no appliance e revalidacao do login/dashboard do pfSense apos incidente operacional na WebGUI.  
-**Ainda pendente em lab:** `pfctl`/enforce, reboot/persistencia e eliminar a necessidade de `IGNORE_OSVERSION=yes`.
+**No repositorio (0.0.31):** GUI Layer7 alinhada ao padrao visual do pfSense, CSRF da GUI migrado para o mecanismo nativo da WebGUI e `pkg-install` ajustado para preparar `layer7.json` de forma gravavel pela GUI no appliance.  
+**Validado em lab (2026-03-19):** build do pacote, `pkg add`, ficheiros instalados, `layer7d` a subir/parar, evidencia HTTP 200 para as paginas Layer7, revalidacao do login/dashboard do pfSense apos incidente operacional na WebGUI, reboot do appliance e save real em `Settings` com persistencia confirmada em `/usr/local/etc/layer7.json`.  
+**Ainda pendente em lab:** `pfctl`/enforce, whitelist/fallback e eliminar a necessidade de `IGNORE_OSVERSION=yes`.
 
 ## Fase atual
 Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos blocos, mas ainda faltam testes de appliance para endurecimento.
@@ -20,15 +20,17 @@ Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos bl
 - Pacote instalado e removido com sucesso no pfSense de lab
 - Logs do appliance com `daemon_start`, `daemon_stop` e instalacao/remocao do pacote
 - Incidente operacional na WebGUI do pfSense analisado e recuperado; runbook adicionado com causas, correcao e "nao fazer novamente"
+- Save da GUI `Settings` validado no appliance apos remocao do CSRF customizado e ajuste de permissao/ownership de `layer7.json`
+- `pkg-install` passa a criar `layer7.json` a partir do sample e aplicar `www:wheel` + `0664` para alinhar instalacao futura ao comportamento validado em lab
 
 ## Objetivo imediato
-1. Fechar os pendentes do lab: `pfctl`, reboot e persistencia.
-2. Remover ou reduzir a necessidade de `IGNORE_OSVERSION=yes` no pacote de lab.
-3. Corrigir port/daemon apenas com base nas falhas observadas nesses testes.
+1. Fechar os pendentes do lab: `pfctl`/enforce, whitelist e fallback.
+2. Revalidar numa reinstalacao limpa do pacote o comportamento de save da GUI agora coberto pelo `pkg-install`.
+3. Remover ou reduzir a necessidade de `IGNORE_OSVERSION=yes` no pacote de lab.
 
 ## Proximos 3 passos
 1. Validar `pfctl`/enforce no appliance.
-2. Validar reboot e persistencia da configuracao/servico.
+2. Validar whitelist e fallback no appliance.
 3. Integrar `layer7_on_classified_flow` no loop nDPI so depois do pacote ficar estavel em lab.
 
 ## Decisoes congeladas

@@ -350,6 +350,93 @@ Resultado:
 - [x] login e dashboard do pfSense revalidados apos a reinstalacao
 - [x] utilizador aprovou o visual final do pacote no browser
 
+### Correcoes de save da GUI (Settings / Policies / Exceptions)
+
+Objetivo:
+
+- eliminar o erro de token de formulario invalido e fechar o fluxo real de save da GUI no appliance
+
+Causa encontrada:
+
+- as paginas Layer7 usavam um CSRF customizado (`form_token`) em paralelo ao `__csrf_magic` nativo do pfSense
+- a WebGUI do pfSense corre como `www`, que nao consegue criar ficheiros novos em `/usr/local/etc`
+- o save inicial tentava criar ficheiro temporario e promover o resultado para `/usr/local/etc/layer7.json`, o que falhava no appliance
+
+Correcao aplicada no codigo:
+
+- remocao do CSRF customizado das paginas `Settings`, `Policies` e `Exceptions`
+- uso exclusivo do CSRF nativo da WebGUI do pfSense
+- `layer7_save_json()` ajustado para gravar diretamente no `layer7.json` existente com `LOCK_EX`
+- `pkg-install` ajustado para:
+  - criar `/usr/local/etc/layer7.json` a partir do sample quando ausente
+  - aplicar `chown www:wheel /usr/local/etc/layer7.json`
+  - aplicar `chmod 0664 /usr/local/etc/layer7.json`
+
+Ajuste aplicado no appliance de lab para alinhar ao comportamento final do pacote:
+
+```sh
+chown www:wheel /usr/local/etc/layer7.json
+chmod 0664 /usr/local/etc/layer7.json
+php -l /usr/local/pkg/layer7.inc
+service php_fpm onerestart
+/etc/rc.restart_webgui
+```
+
+Validacao real:
+
+- abertura de `Settings` sem erro
+- alteracao manual de valores na GUI
+- submit com sucesso
+- confirmacao de que `/usr/local/etc/layer7.json` mudou no appliance
+
+Evidencia relevante:
+
+```text
+stat -f '%Su %Sg %Sp %m %Sm %N' /usr/local/etc/layer7.json
+www wheel -rw-rw-r-- 1773886734 Mar 19 02:18:54 2026 /usr/local/etc/layer7.json
+```
+
+```text
+{
+    "layer7": {
+        "enabled": true,
+        "mode": "enforce",
+        "log_level": "debug",
+        "syslog_remote_port": 515,
+        "debug_minutes": 5,
+        "interfaces": [
+            "lan"
+        ]
+    }
+}
+```
+
+Resultado:
+
+- [x] erro de token removido do fluxo real da GUI
+- [x] save de `Settings` validado no browser com persistencia em disco
+- [x] codigo do pacote alinhado ao comportamento validado no appliance
+- [ ] revalidacao por reinstalacao limpa do pacote com o `pkg-install` novo ainda pendente
+
+### Reboot e persistencia da configuracao
+
+Objetivo:
+
+- confirmar que as definicoes gravadas pela GUI sobrevivem ao reboot do appliance
+
+Validacao real:
+
+- reboot do pfSense executado em lab
+- login na WebGUI revalidado apos o arranque
+- pagina `Settings` aberta apos reboot
+- opcoes previamente guardadas continuaram refletidas na GUI
+- persistencia revalidada no ficheiro `/usr/local/etc/layer7.json`
+
+Resultado:
+
+- [x] reboot do appliance validado
+- [x] persistencia da configuracao validada apos reboot
+
 ## 8. Remove / rollback
 
 Comandos:
@@ -376,7 +463,7 @@ pkg: No package(s) matching pfSense-pkg-layer7
 Pendencias conhecidas:
 
 - validar `pfctl` do fluxo de enforce (secao 6b do plano original)
-- validar reboot e persistencia
+- validar whitelist e fallback
 - fechar evidencia do menu GUI do pacote no fluxo manual completo
 - reduzir ou eliminar a dependencia de `IGNORE_OSVERSION=yes`
 

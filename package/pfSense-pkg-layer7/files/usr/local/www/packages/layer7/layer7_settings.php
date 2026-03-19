@@ -10,59 +10,54 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
 if ($_POST["save"] ?? false) {
-	if (!layer7_csrf_verify_post()) {
-		$input_errors[] = gettext("Token de formulario invalido - atualize a pagina.");
-	} else {
-		$mode = $_POST["mode"] ?? "monitor";
-		if (!in_array($mode, array("monitor", "enforce"), true)) {
-			$mode = "monitor";
-		}
-		$log_level = $_POST["log_level"] ?? "info";
-		if (!in_array($log_level, array("error", "warn", "info", "debug"), true)) {
-			$log_level = "info";
-		}
-		$enabled = isset($_POST["enabled"]);
-		$syslog_remote = isset($_POST["syslog_remote"]);
-		$sr_host = trim($_POST["syslog_remote_host"] ?? "");
-		$sr_port = (int)($_POST["syslog_remote_port"] ?? 514);
-		if ($sr_port < 1 || $sr_port > 65535) {
-			$sr_port = 514;
-		}
-		if ($syslog_remote && $sr_host === "") {
-			$input_errors[] = gettext("Syslog remoto: indique o host ou desative a opcao.");
-		}
-		if ($syslog_remote && $sr_host !== "" && !layer7_syslog_remote_host_valid($sr_host)) {
-			$input_errors[] = gettext("Host syslog: use IPv4 ou hostname valido.");
-		}
+	$mode = $_POST["mode"] ?? "monitor";
+	if (!in_array($mode, array("monitor", "enforce"), true)) {
+		$mode = "monitor";
+	}
+	$log_level = $_POST["log_level"] ?? "info";
+	if (!in_array($log_level, array("error", "warn", "info", "debug"), true)) {
+		$log_level = "info";
+	}
+	$enabled = isset($_POST["enabled"]);
+	$syslog_remote = isset($_POST["syslog_remote"]);
+	$sr_host = trim($_POST["syslog_remote_host"] ?? "");
+	$sr_port = (int)($_POST["syslog_remote_port"] ?? 514);
+	if ($sr_port < 1 || $sr_port > 65535) {
+		$sr_port = 514;
+	}
+	if ($syslog_remote && $sr_host === "") {
+		$input_errors[] = gettext("Syslog remoto: indique o host ou desative a opcao.");
+	}
+	if ($syslog_remote && $sr_host !== "" && !layer7_syslog_remote_host_valid($sr_host)) {
+		$input_errors[] = gettext("Host syslog: use IPv4 ou hostname valido.");
+	}
 
-		$iflist = layer7_parse_interfaces_csv($_POST["interfaces_csv"] ?? "", 8);
-		if ($iflist === null) {
-			$input_errors[] = gettext("Interfaces: ate 8 nomes separados por virgula; apenas letras, numeros, _ e .");
+	$iflist = layer7_parse_interfaces_csv($_POST["interfaces_csv"] ?? "", 8);
+	if ($iflist === null) {
+		$input_errors[] = gettext("Interfaces: ate 8 nomes separados por virgula; apenas letras, numeros, _ e .");
+	}
+
+	if (empty($input_errors)) {
+		$data = layer7_load_or_default();
+		$data["layer7"]["enabled"] = $enabled;
+		$data["layer7"]["mode"] = $mode;
+		$data["layer7"]["log_level"] = $log_level;
+		$data["layer7"]["syslog_remote"] = $syslog_remote;
+		$data["layer7"]["syslog_remote_host"] = $sr_host;
+		$data["layer7"]["syslog_remote_port"] = $sr_port;
+		$dbgm = (int)($_POST["debug_minutes"] ?? 0);
+		if ($dbgm < 0) {
+			$dbgm = 0;
 		}
+		if ($dbgm > 720) {
+			$dbgm = 720;
+		}
+		$data["layer7"]["debug_minutes"] = $dbgm;
+		$data["layer7"]["interfaces"] = $iflist;
 
-		if (empty($input_errors)) {
-			$data = layer7_load_or_default();
-			$data["layer7"]["enabled"] = $enabled;
-			$data["layer7"]["mode"] = $mode;
-			$data["layer7"]["log_level"] = $log_level;
-			$data["layer7"]["syslog_remote"] = $syslog_remote;
-			$data["layer7"]["syslog_remote_host"] = $sr_host;
-			$data["layer7"]["syslog_remote_port"] = $sr_port;
-			$dbgm = (int)($_POST["debug_minutes"] ?? 0);
-			if ($dbgm < 0) {
-				$dbgm = 0;
-			}
-			if ($dbgm > 720) {
-				$dbgm = 720;
-			}
-			$data["layer7"]["debug_minutes"] = $dbgm;
-			$data["layer7"]["interfaces"] = $iflist;
-
-			if (layer7_save_json($data)) {
-				layer7_csrf_rotate();
-				layer7_signal_reload();
-				$savemsg = gettext("Configuracao gravada. SIGHUP enviado ao layer7d se o servico estiver em execucao.");
-			}
+		if (layer7_save_json($data)) {
+			layer7_signal_reload();
+			$savemsg = gettext("Configuracao gravada. SIGHUP enviado ao layer7d se o servico estiver em execucao.");
 		}
 	}
 }
@@ -108,7 +103,6 @@ layer7_render_styles();
 			<p class="layer7-lead"><?= gettext("Parametros basicos do daemon, logging remoto e reservas de interface para a fase de captura nDPI."); ?></p>
 
 			<form method="post" class="form-horizontal">
-				<input type="hidden" name="form_token" value="<?= htmlspecialchars(layer7_csrf_token()); ?>" />
 
 			<div class="form-group">
 				<label class="col-sm-3 control-label"><?= gettext("Ativar pacote"); ?></label>

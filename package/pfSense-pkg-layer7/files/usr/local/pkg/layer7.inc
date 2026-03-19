@@ -1,6 +1,6 @@
 <?php
 /*
- * Funções partilhadas Layer 7 (JSON em /usr/local/etc/layer7.json).
+ * Funcoes partilhadas Layer 7 (JSON em /usr/local/etc/layer7.json).
  */
 if (defined("LAYER7_INC_LOADED")) {
 	return;
@@ -67,17 +67,19 @@ function layer7_save_json($data)
 		$input_errors[] = gettext("Erro ao serializar JSON.");
 		return false;
 	}
-	$tmp = $cfgpath . ".tmp." . getmypid();
-	if (file_put_contents($tmp, $json . "\n") === false) {
-		$input_errors[] = gettext("Não foi possível escrever ficheiro temporário.");
+
+	if (!file_exists($cfgpath)) {
+		$input_errors[] = gettext("Nao foi possivel gravar ") . $cfgpath;
 		return false;
 	}
-	if (!@rename($tmp, $cfgpath)) {
-		@unlink($tmp);
-		$input_errors[] = gettext("Não foi possível gravar ") . $cfgpath;
+	if (!is_writable($cfgpath)) {
+		$input_errors[] = gettext("Nao foi possivel gravar ") . $cfgpath;
 		return false;
 	}
-	@chmod($cfgpath, 0644);
+	if (file_put_contents($cfgpath, $json . "\n", LOCK_EX) === false) {
+		$input_errors[] = gettext("Nao foi possivel gravar ") . $cfgpath;
+		return false;
+	}
 	return true;
 }
 
@@ -98,28 +100,9 @@ function layer7_signal_reload()
 	}
 }
 
-function layer7_csrf_token()
-{
-	if (empty($_SESSION["layer7_csrf"])) {
-		$_SESSION["layer7_csrf"] = bin2hex(random_bytes(16));
-	}
-	return $_SESSION["layer7_csrf"];
-}
-
-function layer7_csrf_rotate()
-{
-	$_SESSION["layer7_csrf"] = bin2hex(random_bytes(16));
-}
-
-function layer7_csrf_verify_post()
-{
-	$tok = $_POST["form_token"] ?? "";
-	return hash_equals(layer7_csrf_token(), $tok);
-}
-
 /**
- * CSV de interfaces (lan, opt1, …) → array único; vazio → [].
- * @return array|null null se inválido ou > $max itens
+ * CSV de interfaces (lan, opt1, ...) -> array unico; vazio -> [].
+ * @return array|null null se invalido ou > $max itens
  */
 function layer7_parse_interfaces_csv($csv, $max = 8)
 {
@@ -147,7 +130,7 @@ function layer7_parse_interfaces_csv($csv, $max = 8)
 	return $out;
 }
 
-/** Saída de `layer7d -V` ou string vazia. */
+/* Saida de `layer7d -V` ou string vazia. */
 function layer7_daemon_version()
 {
 	$bin = "/usr/local/sbin/layer7d";
@@ -158,14 +141,14 @@ function layer7_daemon_version()
 	return ($code === 0 && !empty($out[0])) ? trim($out[0]) : "";
 }
 
-/** id de política: [A-Za-z0-9_-], 1–80 */
+/* id de politica: [A-Za-z0-9_-], 1-80 */
 function layer7_policy_id_valid($id)
 {
 	return is_string($id) && strlen($id) >= 1 && strlen($id) <= 80
 		&& preg_match('/^[a-zA-Z0-9_-]+$/', $id) === 1;
 }
 
-/** Nome de tabela PF (action=tag) */
+/* Nome de tabela PF (action=tag) */
 function layer7_pf_table_name_valid($name)
 {
 	return is_string($name) && strlen($name) >= 1 && strlen($name) <= 63
@@ -173,7 +156,7 @@ function layer7_pf_table_name_valid($name)
 }
 
 /**
- * CSV → array; cada token ≤ $maxlen; máx. $max tokens.
+ * CSV -> array; cada token <= $maxlen; max. $max tokens.
  * @return array|null null se token demasiado longo
  */
 function layer7_split_csv_tokens($s, $max, $maxlen)
@@ -200,7 +183,7 @@ function layer7_split_csv_tokens($s, $max, $maxlen)
 	return $out;
 }
 
-/** IPv4 dotted quad (ex.: 10.0.0.1); cada octeto 0–255 */
+/* IPv4 dotted quad (ex.: 10.0.0.1); cada octeto 0-255 */
 function layer7_ipv4_valid($s)
 {
 	if (!is_string($s) || strlen($s) > 48) {
@@ -217,7 +200,7 @@ function layer7_ipv4_valid($s)
 	return true;
 }
 
-/** CIDR a.b.c.d/n (n 0–32) */
+/* CIDR a.b.c.d/n (n 0-32) */
 function layer7_cidr_valid($s)
 {
 	if (!is_string($s) || strlen($s) > 48) {
@@ -231,7 +214,7 @@ function layer7_cidr_valid($s)
 }
 
 /**
- * Host para syslog remoto (UDP): IPv4 ou hostname conservador (labels alfanum + -).
+ * Host para syslog remoto (UDP): IPv4 ou hostname conservador.
  */
 function layer7_syslog_remote_host_valid($s)
 {

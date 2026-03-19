@@ -63,8 +63,8 @@
 
 ## Fase 9 - Testes
 - [x] instalacao
-- [ ] reboot
-- [ ] persistencia
+- [x] reboot
+- [x] persistencia *(save em `Settings` confirmado com alteracao de `/usr/local/etc/layer7.json` no appliance)*
 - [ ] whitelist
 - [ ] fallback
 - [x] rollback
