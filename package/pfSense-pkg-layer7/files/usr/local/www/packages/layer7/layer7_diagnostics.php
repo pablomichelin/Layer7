@@ -19,72 +19,78 @@ $pid = null;
 if (file_exists($pidfile)) {
 	$pid = trim(@file_get_contents($pidfile));
 	if ($pid !== "" && ctype_digit($pid)) {
-		$status_out = gettext("Serviço: layer7d está a correr (PID ") . $pid . ").";
+		$status_out = gettext("Servico layer7d em execucao (PID ") . $pid . ").";
 		$status_ok = true;
 	} else {
-		$status_out = gettext("Serviço: ficheiro PID inválido ou vazio.");
+		$status_out = gettext("Ficheiro PID invalido ou vazio.");
 		$status_ok = false;
 	}
 } else {
-	$status_out = gettext("Serviço: layer7d não está a correr (sem ficheiro PID).");
+	$status_out = gettext("Servico layer7d parado (sem ficheiro PID).");
 	$status_ok = false;
 }
 
-/* Se temos PID, verificar se o processo existe */
 if ($status_ok && $pid !== null) {
 	exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>&1", $kout, $kcode);
 	if ($kcode !== 0) {
-		$status_out = gettext("Serviço: PID ") . $pid . " " . gettext("não existe (processo terminado).");
+		$status_out = gettext("PID ") . $pid . gettext(" nao existe mais.");
 		$status_ok = false;
 	}
 }
 
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Diagnostics"));
 include("head.inc");
+layer7_render_styles();
 ?>
-<div class="panel panel-default">
+<div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 — diagnostics"); ?></h2>
+		<h2 class="panel-title"><?= gettext("Layer 7 - diagnostics"); ?></h2>
 	</div>
 	<div class="panel-body">
-		<p><a href="layer7_status.php"><?= gettext("← Estado"); ?></a>
-		&nbsp;|&nbsp; <a href="layer7_settings.php"><?= gettext("Definições"); ?></a>
-		&nbsp;|&nbsp; <a href="layer7_policies.php"><?= gettext("Políticas"); ?></a>
-		&nbsp;|&nbsp; <a href="layer7_exceptions.php"><?= gettext("Exceções"); ?></a>
-		&nbsp;|&nbsp; <a href="layer7_events.php"><?= gettext("Events"); ?></a></p>
+		<?php layer7_render_tabs("diagnostics"); ?>
+		<p class="layer7-lead"><?= gettext("Painel de apoio operacional para validar binario, estado do servico, sinais e caminhos de troubleshooting no pfSense."); ?></p>
 
-		<?php if ($layer7d_ver !== "") { ?>
-		<h3><?= gettext("Binário"); ?></h3>
-		<p class="small"><code>layer7d -V</code>: <strong><?= htmlspecialchars($layer7d_ver); ?></strong></p>
-		<?php } ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Resumo do binario"); ?></h3>
+			<dl class="dl-horizontal layer7-summary">
+				<dt><?= gettext("Versao"); ?></dt>
+				<dd><?php if ($layer7d_ver !== "") { ?><code>layer7d -V</code> <strong><?= htmlspecialchars($layer7d_ver); ?></strong><?php } else { ?><span class="text-warning"><?= gettext("Binario nao encontrado."); ?></span><?php } ?></dd>
+				<dt><?= gettext("Config"); ?></dt>
+				<dd><code><?= htmlspecialchars($cfgpath); ?></code></dd>
+			</dl>
+		</div>
 
-		<h3><?= gettext("Serviço"); ?></h3>
-		<p><?php if ($status_ok) { ?>
-			<span class="text-success"><?= htmlspecialchars($status_out); ?></span>
-		<?php } else { ?>
-			<span class="text-warning"><?= htmlspecialchars($status_out); ?></span>
-		<?php } ?></p>
-		<?php if ($pid !== null && $pid !== "" && $status_ok) { ?>
-		<p class="small"><?= gettext("Recarregar config (SIGHUP):"); ?> <code>kill -HUP <?= htmlspecialchars($pid); ?></code><br />
-		<?= gettext("Estatísticas no syslog (SIGUSR1):"); ?> <code>kill -USR1 <?= htmlspecialchars($pid); ?></code></p>
-		<?php } ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Estado do servico"); ?></h3>
+			<p><?php if ($status_ok) { ?>
+				<span class="text-success"><?= htmlspecialchars($status_out); ?></span>
+			<?php } else { ?>
+				<span class="text-warning"><?= htmlspecialchars($status_out); ?></span>
+			<?php } ?></p>
+			<?php if ($pid !== null && $pid !== "" && $status_ok) { ?>
+			<dl class="dl-horizontal layer7-summary">
+				<dt><?= gettext("Reload"); ?></dt>
+				<dd><code>kill -HUP <?= htmlspecialchars($pid); ?></code></dd>
+				<dt><?= gettext("Estatisticas"); ?></dt>
+				<dd><code>kill -USR1 <?= htmlspecialchars($pid); ?></code></dd>
+			</dl>
+			<?php } ?>
+		</div>
 
-		<h3><?= gettext("Logs"); ?></h3>
-		<p><?= gettext("Os logs do layer7d são enviados para o syslog do sistema (facilidade LOG_DAEMON, ident 'layer7d')."); ?>
-		<?= gettext("No pfSense: consulte os logs do sistema e filtre por 'layer7d'."); ?>
-		<?= gettext("O nível de detalhe depende de"); ?> <code>layer7.log_level</code> <?= gettext("em"); ?> <a href="layer7_settings.php"><?= gettext("Definições"); ?></a>.</p>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Logs"); ?></h3>
+			<p><?= gettext("Os eventos do daemon sao enviados para o syslog do sistema com ident 'layer7d'. Filtre os logs do pfSense por esse nome para acompanhar arranque, stop, reload e falhas."); ?></p>
+		</div>
 
-		<h3><?= gettext("Comandos úteis"); ?></h3>
-		<ul class="small">
-			<li><code>service layer7d onestart</code> — <?= gettext("arrancar"); ?></li>
-			<li><code>service layer7d onestop</code> — <?= gettext("parar"); ?></li>
-			<li><code>service layer7d status</code> — <?= gettext("estado"); ?></li>
-			<li><code>sysrc layer7d_enable=YES</code> — <?= gettext("ativar no boot"); ?></li>
-		</ul>
-		<p class="text-muted small"><?= gettext("Config:"); ?> <code><?= htmlspecialchars($cfgpath); ?></code>
-		<?php if (!file_exists($cfgpath)) { ?>
-			<span class="text-warning"><?= gettext("(ausente)"); ?></span>
-		<?php } ?></p>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Comandos uteis"); ?></h3>
+			<ul class="small">
+				<li><code>service layer7d onestart</code> - <?= gettext("arrancar para teste manual"); ?></li>
+				<li><code>service layer7d onestop</code> - <?= gettext("parar o daemon"); ?></li>
+				<li><code>service layer7d status</code> - <?= gettext("confirmar o estado atual"); ?></li>
+				<li><code>sysrc layer7d_enable=YES</code> - <?= gettext("ativar arranque no boot quando o gate de persistencia for fechado"); ?></li>
+			</ul>
+		</div>
 	</div>
 </div>
 <?php require_once("foot.inc"); ?>

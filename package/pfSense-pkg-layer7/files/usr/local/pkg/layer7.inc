@@ -253,3 +253,74 @@ function layer7_syslog_remote_host_valid($s)
 	}
 	return preg_match('/^[a-zA-Z0-9]([a-zA-Z0-9.-]{0,253}[a-zA-Z0-9])?$/', $s) === 1;
 }
+
+function layer7_nav_items()
+{
+	return array(
+		"status" => array("label" => gettext("Estado"), "href" => "layer7_status.php"),
+		"settings" => array("label" => gettext("Definicoes"), "href" => "layer7_settings.php"),
+		"policies" => array("label" => gettext("Politicas"), "href" => "layer7_policies.php"),
+		"exceptions" => array("label" => gettext("Excecoes"), "href" => "layer7_exceptions.php"),
+		"events" => array("label" => gettext("Events"), "href" => "layer7_events.php"),
+		"diagnostics" => array("label" => gettext("Diagnostics"), "href" => "layer7_diagnostics.php")
+	);
+}
+
+function layer7_render_styles()
+{
+	static $done = false;
+	if ($done) {
+		return;
+	}
+	$done = true;
+	echo '<style>
+	.layer7-page .panel-title { font-size: 20px; font-weight: 600; }
+	.layer7-page .layer7-lead { color: #666; margin: 0 0 18px; max-width: 980px; }
+	.layer7-page .nav-tabs { margin-bottom: 18px; }
+	.layer7-page .nav-tabs > li > a { padding: 10px 14px; font-weight: 600; }
+	.layer7-page .form-horizontal .control-label { padding-top: 10px; }
+	.layer7-page .form-control-static { padding-top: 8px; }
+	.layer7-page .layer7-section { margin-top: 24px; }
+	.layer7-page .layer7-section:first-child { margin-top: 0; }
+	.layer7-page .layer7-section-title { margin: 0 0 14px; font-size: 24px; font-weight: 600; }
+	.layer7-page .layer7-toolbar { margin: 14px 0 0; }
+	.layer7-page .layer7-toolbar .btn { margin-right: 8px; margin-bottom: 8px; }
+	.layer7-page .layer7-summary { margin-bottom: 18px; }
+	.layer7-page .layer7-summary dt { width: 180px; }
+	.layer7-page .layer7-summary dd { margin-left: 200px; margin-bottom: 10px; }
+	.layer7-page .layer7-muted-note { margin-top: 16px; color: #777; }
+	.layer7-page .layer7-table-actions .btn { margin-right: 6px; }
+	.layer7-page .help-block { margin-bottom: 0; max-width: 760px; }
+	.layer7-page .table > thead > tr > th { vertical-align: middle; }
+	.layer7-page .pre-scrollable { margin-bottom: 0; background: #fbfbfb; border: 1px solid #ddd; padding: 12px; }
+	.layer7-page .alert { margin-bottom: 18px; }
+	.layer7-page .checkbox-inline,
+	.layer7-page .radio-inline { padding-top: 0; }
+	.layer7-page .layer7-inline-form .form-control { display: inline-block; width: auto; vertical-align: middle; }
+	.layer7-page .layer7-inline-form .control-label { margin-right: 8px; }
+	.layer7-page .layer7-inline-form .btn { margin-left: 8px; }
+	</style>';
+}
+
+function layer7_render_tabs($active)
+{
+	$items = layer7_nav_items();
+	echo '<ul class="nav nav-tabs">';
+	foreach ($items as $key => $item) {
+		$cls = ($key === $active) ? ' class="active"' : '';
+		echo '<li' . $cls . '><a href="' . htmlspecialchars($item["href"]) . '">' .
+		    htmlspecialchars($item["label"]) . '</a></li>';
+	}
+	echo '</ul>';
+}
+
+function layer7_render_messages()
+{
+	global $input_errors, $savemsg;
+	if (!empty($input_errors) && function_exists("print_input_errors")) {
+		print_input_errors($input_errors);
+	}
+	if (!empty($savemsg) && function_exists("print_info_box")) {
+		print_info_box($savemsg, "success");
+	}
+}

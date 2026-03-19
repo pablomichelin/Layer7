@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**No repositorio (0.0.31):** Settings grava `interfaces[]` (CSV).  
+**No repositorio (0.0.31):** Settings grava `interfaces[]` (CSV) e a GUI Layer7 foi reorganizada para um layout consistente com o padrao visual do pfSense.  
 **Validado em lab (2026-03-19):** build do pacote, `pkg add`, ficheiros instalados, `layer7d` a subir/parar e evidencia HTTP 200 para as paginas Layer7 no appliance.  
 **Ainda pendente em lab:** `pfctl`/enforce, reboot/persistencia e eliminar a necessidade de `IGNORE_OSVERSION=yes`.
 
@@ -16,6 +16,7 @@ Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos bl
 - `smoke-layer7d.sh` validado no builder
 - Port ajustado para empacotar ficheiros GUI e `priv`
 - `pkg-plist` alinhado ao stage real do pacote
+- Layout das paginas `Status`, `Settings`, `Policies`, `Exceptions`, `Events` e `Diagnostics` reorganizado para melhorar espacamento, navegacao e legibilidade
 - Pacote instalado e removido com sucesso no pfSense de lab
 - Logs do appliance com `daemon_start`, `daemon_stop` e instalacao/remocao do pacote
 
