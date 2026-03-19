@@ -192,6 +192,51 @@ GET /packages/layer7/layer7_status.php HTTP/2.0" 200
 GET /packages/layer7/layer7_settings.php HTTP/2.0" 200
 ```
 
+### Revalidacao visual - commit `f7faecb`
+
+Objetivo:
+
+- reinstalar o pacote apos a reorganizacao visual das paginas `Status`, `Settings`, `Policies`, `Exceptions`, `Events` e `Diagnostics`
+
+Comandos:
+
+```sh
+env ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg add -f /root/pfSense-pkg-layer7-0.0.31.pkg
+php -l /usr/local/pkg/layer7.inc
+php -l /usr/local/www/packages/layer7/layer7_status.php
+php -l /usr/local/www/packages/layer7/layer7_settings.php
+php -l /usr/local/www/packages/layer7/layer7_policies.php
+php -l /usr/local/www/packages/layer7/layer7_exceptions.php
+php -l /usr/local/www/packages/layer7/layer7_events.php
+php -l /usr/local/www/packages/layer7/layer7_diagnostics.php
+service layer7d status
+```
+
+Saida relevante:
+
+```text
+Installing pfSense-pkg-layer7-0.0.31...
+package pfSense-pkg-layer7 is already installed, forced install
+Extracting pfSense-pkg-layer7-0.0.31: ......... done
+
+No syntax errors detected in /usr/local/pkg/layer7.inc
+No syntax errors detected in /usr/local/www/packages/layer7/layer7_status.php
+No syntax errors detected in /usr/local/www/packages/layer7/layer7_settings.php
+No syntax errors detected in /usr/local/www/packages/layer7/layer7_policies.php
+No syntax errors detected in /usr/local/www/packages/layer7/layer7_exceptions.php
+No syntax errors detected in /usr/local/www/packages/layer7/layer7_events.php
+No syntax errors detected in /usr/local/www/packages/layer7/layer7_diagnostics.php
+
+layer7d is running as pid 49115.
+```
+
+Resultado:
+
+- [x] pacote reinstalado com sucesso apos refresh visual
+- [x] sintaxe PHP valida em todas as paginas do pacote
+- [x] servico `layer7d` permaneceu operacional apos a reinstalacao
+- [ ] validacao visual humana final pendente no browser do pfSense
+
 ## 8. Remove / rollback
 
 Comandos:
