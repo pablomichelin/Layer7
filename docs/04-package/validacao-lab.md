@@ -237,6 +237,41 @@ Resultado:
 - [x] servico `layer7d` permaneceu operacional apos a reinstalacao
 - [ ] validacao visual humana final pendente no browser do pfSense
 
+### Ajuste fino de espacamento - commit `a294831`
+
+Objetivo:
+
+- introduzir padding interno adicional nas paginas para evitar textos e secoes colados na borda do painel
+
+Comandos:
+
+```sh
+env ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg add -f /root/pfSense-pkg-layer7-0.0.31.pkg
+service php_fpm onerestart
+service layer7d onestop
+service layer7d onestart
+service layer7d status
+```
+
+Saida relevante:
+
+```text
+Installing pfSense-pkg-layer7-0.0.31...
+package pfSense-pkg-layer7 is already installed, forced install
+Extracting pfSense-pkg-layer7-0.0.31: ......... done
+
+Stopping php_fpm.
+Starting php_fpm.
+
+layer7d is running as pid 89955.
+```
+
+Resultado:
+
+- [x] pacote reinstalado apos o ajuste fino visual
+- [x] `php_fpm` recarregado para reduzir risco de cache/opcache
+- [x] `layer7d` confirmado em execucao apos a troca
+
 ## 8. Remove / rollback
 
 Comandos:
