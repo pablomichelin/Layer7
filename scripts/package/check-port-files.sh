@@ -16,10 +16,16 @@ while IFS= read -r line || [ -n "$line" ]; do
 	case "$line" in
 	'' | \#*) continue ;;
 	@*) continue ;;
-	sbin/layer7d) continue ;;
+	/usr/local/sbin/layer7d | sbin/layer7d) continue ;;
 	esac
 
 	case "$line" in
+	/etc/inc/*)
+		rel="$PORT/files${line}"
+		;;
+	/usr/local/*)
+		rel="$PORT/files${line}"
+		;;
 	etc/inc/*)
 		rel="$PORT/files/$line"
 		;;

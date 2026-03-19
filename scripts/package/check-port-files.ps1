@@ -16,10 +16,14 @@ Get-Content $Plist | ForEach-Object {
     $line = $_.Trim()
     if ($line -eq "" -or $line.StartsWith("#")) { return }
     if ($line.StartsWith("@")) { return }
-    if ($line -eq "sbin/layer7d") { return }
+    if ($line -eq "sbin/layer7d" -or $line -eq "/usr/local/sbin/layer7d") { return }
 
     $rel = $null
-    if ($line.StartsWith("etc/inc/")) {
+    if ($line.StartsWith("/etc/inc/")) {
+        $rel = Join-Path $Port ("files" + $line)
+    } elseif ($line.StartsWith("/usr/local/")) {
+        $rel = Join-Path $Port ("files" + $line)
+    } elseif ($line.StartsWith("etc/inc/")) {
         $rel = Join-Path $Port "files\$line"
     } elseif ($line -match "^%%DATADIR%%/(.+)$") {
         $rel = Join-Path $Port "files\usr\local\share\pfSense-pkg-layer7\$($Matches[1])"
