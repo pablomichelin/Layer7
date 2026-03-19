@@ -1,6 +1,9 @@
+@cwd /
+etc/inc/priv/layer7.priv.inc
+@dir etc/inc/priv
+@cwd %%PREFIX%%
 pkg/layer7.xml
 pkg/layer7.inc
-etc/inc/priv/layer7.priv.inc
 www/packages/layer7/layer7_status.php
 www/packages/layer7/layer7_settings.php
 www/packages/layer7/layer7_policies.php
@@ -11,5 +14,4 @@ sbin/layer7d
 etc/layer7.json.sample
 etc/rc.d/layer7d
 %%DATADIR%%/info.xml
-@dir etc/inc/priv
 @dir www/packages/layer7
