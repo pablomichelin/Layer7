@@ -437,6 +437,46 @@ Resultado:
 - [x] reboot do appliance validado
 - [x] persistencia da configuracao validada apos reboot
 
+### Rebuild do pacote no builder apos as correcoes
+
+Objetivo:
+
+- garantir que o artefacto rebuilt do port incorpora as correcoes de GUI save e a correcao do `check-port-files`
+
+Builder:
+
+- FreeBSD `15.0-RELEASE-p4` em `192.168.0.129`
+
+Sequencia executada:
+
+```sh
+cd /root/pfsense-layer7
+git pull --ff-only origin main
+sh scripts/package/check-port-files.sh
+sh scripts/package/smoke-layer7d.sh
+cd package/pfSense-pkg-layer7
+make clean 2>/dev/null || true
+make package
+```
+
+Resultado:
+
+- [x] builder sincronizado com `origin/main`
+- [x] `check-port-files.sh` OK apos correcao para `pkg-plist` com caminhos absolutos
+- [x] `smoke-layer7d.sh` OK
+- [x] `make package` OK
+
+Artefacto gerado:
+
+```text
+/root/pfsense-layer7/package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-0.0.31.pkg
+```
+
+Estado:
+
+- [ ] artefacto rebuilt ainda nao reinstalado no pfSense de lab
+- [ ] artefacto rebuilt ainda nao publicado como GitHub Release / artefacto descarregavel
+
 ## 8. Remove / rollback
 
 Comandos:
@@ -462,6 +502,7 @@ pkg: No package(s) matching pfSense-pkg-layer7
 
 Pendencias conhecidas:
 
+- reinstalar no pfSense de lab o `.pkg` rebuilt no builder
 - validar `pfctl` do fluxo de enforce (secao 6b do plano original)
 - validar whitelist e fallback
 - fechar evidencia do menu GUI do pacote no fluxo manual completo
