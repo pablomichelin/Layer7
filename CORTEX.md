@@ -7,7 +7,8 @@ Layer7 para pfSense CE
 **No repositorio / GitHub (`main`):** GUI Layer7 alinhada ao padrao visual do pfSense, CSRF da GUI migrado para o mecanismo nativo da WebGUI, `pkg-install` ajustado para preparar `layer7.json` de forma gravavel pela GUI no appliance e fix do `check-port-files` para `pkg-plist` com caminhos absolutos.  
 **Validado em lab (2026-03-19):** build do pacote, `pkg add`, ficheiros instalados, `layer7d` a subir/parar, evidencia HTTP 200 para as paginas Layer7, revalidacao do login/dashboard do pfSense apos incidente operacional na WebGUI, reboot do appliance e save real em `Settings` com persistencia confirmada em `/usr/local/etc/layer7.json`.  
 **Artefacto rebuilt disponivel no builder:** `/root/pfsense-layer7/package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-0.0.31.pkg` (FreeBSD `15.0-RELEASE-p4`, builder `192.168.0.129`).  
-**Ainda pendente em lab:** reinstalacao do `.pkg` rebuilt no pfSense, `pfctl`/enforce, whitelist/fallback e eliminar a necessidade de `IGNORE_OSVERSION=yes`.
+**Artefacto publicado no GitHub:** release de lab `v0.0.31-lab1` com `pfSense-pkg-layer7-0.0.31.pkg` e `pfSense-pkg-layer7-0.0.31.pkg.sha256`.  
+**Ainda pendente em lab:** reinstalacao do `.pkg` publicado no GitHub no pfSense, `pfctl`/enforce, whitelist/fallback e eliminar a necessidade de `IGNORE_OSVERSION=yes`.
 
 ## Fase atual
 Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos blocos, mas ainda faltam testes de appliance para endurecimento.
@@ -26,14 +27,15 @@ Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos bl
 - Builder FreeBSD 15 de lab documentado em `docs/08-lab/builder-freebsd.md`
 - `check-port-files` corrigido para lidar com entradas absolutas do `pkg-plist`; validado no Windows e no builder FreeBSD
 - Rebuild do pacote concluido no builder apos sincronizacao com `origin/main`
+- Release de lab `v0.0.31-lab1` publicada no GitHub com o `.pkg` rebuilt e o respetivo `.sha256`
 
 ## Objetivo imediato
-1. Reinstalar no pfSense de lab o `.pkg` rebuilt no builder e revalidar save/reboot/persistencia sem ajuste manual adicional.
+1. Reinstalar no pfSense de lab o `.pkg` publicado no GitHub (`v0.0.31-lab1`) e revalidar save/reboot/persistencia sem ajuste manual adicional.
 2. Fechar os pendentes funcionais do lab: `pfctl`/enforce, whitelist e fallback.
 3. Remover ou reduzir a necessidade de `IGNORE_OSVERSION=yes` no pacote de lab.
 
 ## Proximos 3 passos
-1. Copiar e reinstalar no appliance o `.pkg` rebuilt no builder.
+1. Reinstalar no appliance o `.pkg` da release `v0.0.31-lab1`.
 2. Validar `pfctl`/enforce, whitelist e fallback no appliance.
 3. Integrar `layer7_on_classified_flow` no loop nDPI so depois do pacote ficar estavel em lab.
 

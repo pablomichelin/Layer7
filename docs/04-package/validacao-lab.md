@@ -475,7 +475,20 @@ Artefacto gerado:
 Estado:
 
 - [ ] artefacto rebuilt ainda nao reinstalado no pfSense de lab
-- [ ] artefacto rebuilt ainda nao publicado como GitHub Release / artefacto descarregavel
+- [x] artefacto rebuilt publicado como GitHub Release / artefacto descarregavel
+
+Release publicada:
+
+```text
+https://github.com/pablomichelin/pfsense-layer7/releases/tag/v0.0.31-lab1
+```
+
+Assets publicados:
+
+```text
+https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.0.31-lab1/pfSense-pkg-layer7-0.0.31.pkg
+https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.0.31-lab1/pfSense-pkg-layer7-0.0.31.pkg.sha256
+```
 
 ## 8. Remove / rollback
 
@@ -502,7 +515,7 @@ pkg: No package(s) matching pfSense-pkg-layer7
 
 Pendencias conhecidas:
 
-- reinstalar no pfSense de lab o `.pkg` rebuilt no builder
+- reinstalar no pfSense de lab o `.pkg` publicado na release `v0.0.31-lab1`
 - validar `pfctl` do fluxo de enforce (secao 6b do plano original)
 - validar whitelist e fallback
 - fechar evidencia do menu GUI do pacote no fluxo manual completo
