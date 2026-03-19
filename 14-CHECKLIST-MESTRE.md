@@ -1,16 +1,16 @@
 # Checklist Mestre
 
-*Itens de lab só marcar após evidência em [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md) (ou anexo).*
+*Itens de lab so marcar apos evidencia em [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md) (ou anexo).*
 
 ## Fase 0 - Escopo
 - [ ] nome do projeto definido
 - [ ] escopo V1 fechado
-- [ ] não objetivos definidos
+- [ ] nao objetivos definidos
 - [ ] DoD V1 definido
 
 ## Fase 1 - Lab
-- [ ] builder criado
-- [ ] pfSense lab criado
+- [x] builder criado
+- [x] pfSense lab criado
 - [ ] cliente de teste criado
 - [ ] syslog remoto criado
 - [ ] snapshots prontos
@@ -18,9 +18,9 @@
 ## Fase 2 - PoC
 - [ ] nDPI integrado em PoC
 - [ ] eventos gerados
-- [ ] tráfego real testado
+- [ ] trafego real testado
 - [ ] performance medida
-- [ ] limitações registradas
+- [ ] limitacoes registradas
 
 ## Fase 3 - Modelagem
 - [ ] modelo de config definido
@@ -29,50 +29,50 @@
 - [ ] precedence definida
 - [ ] fallback definido
 
-## Fase 4 - Package skeleton (repositório)
+## Fase 4 - Package skeleton (repositorio)
 - [x] Makefile, pkg-descr, pkg-plist, XML, PHP informativo, rc.d, hooks pkg
-- [ ] **Validação lab:** build `.txz`, `pkg add`, ficheiros, GUI/URL, remove — ver `validacao-lab.md`
+- [x] Validacao lab: build pacote, `pkg add`, ficheiros, GUI/URL, remove - ver `validacao-lab.md`
 
 ## Fase 5 - Daemon
-- [x] código C + parser mínimo `enabled`/`mode` + `-t` + SIGHUP reload *(repo)*
-- [ ] **Validação lab:** serviço sobe, logs, stop limpo no pfSense
-- [ ] parser alargado (policies, GUI→ficheiro) quando necessário
+- [x] codigo C + parser minimo `enabled`/`mode` + `-t` + SIGHUP reload *(repo)*
+- [x] Validacao lab: servico sobe, logs, stop limpo no pfSense
+- [ ] parser alargado (policies, GUI->ficheiro) quando necessario
 - [ ] runtime state
-- [x] counters (SIGUSR1 + snapshot_fail; lab operação pendente)
-- [x] error handling básico (degraded arranque; falha reload mantém snapshot anterior)
+- [x] counters (SIGUSR1 + snapshot_fail; lab operacao pendente)
+- [x] error handling basico (degraded arranque; falha reload mantem snapshot anterior)
 
 ## Fase 6 - Enforcement
-- [x] API block PF (`layer7_pf_exec_table_add`; integração nDPI pendente)
+- [x] API block PF (`layer7_pf_exec_table_add`; integracao nDPI pendente)
 - [ ] monitor
 - [ ] whitelist
 - [x] exceptions *(motor + GUI toggle)*
-- [ ] logs de ação
+- [ ] logs de acao
 
 ## Fase 7 - GUI
 - [x] settings *(repo)*
-- [x] policies *(toggle + adicionar + editar GUI + remover; id só JSON)*
-- [x] exceptions *(lista + toggle + adicionar + editar + remover; id só JSON)*
-- [x] events *(página básica; eventos estruturados seguem modelo event-model)*
-- [x] diagnostics *(página GUI)*
+- [x] policies *(toggle + adicionar + editar GUI + remover; id so JSON)*
+- [x] exceptions *(lista + toggle + adicionar + editar + remover; id so JSON)*
+- [x] events *(pagina basica; eventos estruturados seguem modelo event-model)*
+- [x] diagnostics *(pagina GUI)*
 
 ## Fase 8 - Observabilidade
-- [x] logs locais mínimos *(formato documentado em docs/10-logging)*
-- [x] syslog remoto *(código + GUI; validação lab com coletor)*
-- [x] modo debug *(debug_minutes 1–720 após reload)*
-- [x] diagnostics úteis *(página Diagnostics)*
+- [x] logs locais minimos *(formato documentado em docs/10-logging)*
+- [x] syslog remoto *(codigo + GUI; validacao lab com coletor)*
+- [x] modo debug *(debug_minutes 1-720 apos reload)*
+- [x] diagnostics uteis *(pagina Diagnostics)*
 
 ## Fase 9 - Testes
-- [ ] instalação
+- [x] instalacao
 - [ ] reboot
-- [ ] persistência
+- [ ] persistencia
 - [ ] whitelist
 - [ ] fallback
-- [ ] rollback
+- [x] rollback
 
 ## Fase 10 - Piloto
 - [ ] monitor mode validado
 - [ ] tuning inicial
-- [ ] exceções refinadas
+- [ ] excecoes refinadas
 - [ ] feedback coletado
 
 ## Fase 11 - Release
@@ -83,32 +83,32 @@
 - [ ] install doc
 - [ ] rollback doc
 
-## Fase 12 - Pós-release / trilha V2
+## Fase 12 - Pos-release / trilha V2
 - [ ] backlog V2 priorizado
 - [ ] bugs classificados
 - [ ] ADRs complementares
 - [ ] aprendizado do piloto registado
 
-## Fase 13 - nDPI no daemon (produção)
-- [ ] loop captura → classificação → policy → enforce no appliance
+## Fase 13 - nDPI no daemon (producao)
+- [ ] loop captura -> classificacao -> policy -> enforce no appliance
 - [ ] CPU/RAM documentados
 - [ ] fallback monitor-only
 
 ## Fase 14 - GUI V1 completa
 - [ ] policies/exceptions/events/diagnostics completos
-- [x] validação input *(syslog host + matriz em docs/package/gui-validation.md)*
-- [ ] sync GUI↔JSON sem drift
+- [x] validacao input *(syslog host + matriz em docs/package/gui-validation.md)*
+- [ ] sync GUI<->JSON sem drift
 
-## Fase 15 - Política DNS/domínio
-- [ ] regras FQDN/domínio (caminho CE definido)
-- [ ] testes lab + limitações (DoH, TTL)
+## Fase 15 - Politica DNS/dominio
+- [ ] regras FQDN/dominio (caminho CE definido)
+- [ ] testes lab + limitacoes (DoH, TTL)
 
 ## Fase 16 - Observabilidade
-- [ ] logs formato estável + rotação
+- [ ] logs formato estavel + rotacao
 - [ ] syslog remoto validado
-- [ ] counters exportáveis
+- [ ] counters exportaveis
 
-## Fase 17 - Identidade (onde viável)
+## Fase 17 - Identidade (onde viavel)
 - [ ] fonte identidade + ADR
 - [ ] um modo validado em lab
 
@@ -116,9 +116,9 @@
 - [ ] piloto lab, sem default-on
 - [ ] risco legal/ops documentado
 
-## Fase 19 - Correlação IDS/Suricata
-- [ ] demo correlação lab
-- [ ] degradação sem IDS
+## Fase 19 - Correlacao IDS/Suricata
+- [ ] demo correlacao lab
+- [ ] degradacao sem IDS
 
 ## Fase 20 - Escala / HA
 - [ ] stress leve documentado
@@ -126,14 +126,14 @@
 
 ## Fase 21 - Ciclo nDPI/assinaturas
 - [ ] procedimento upgrade/rebuild
-- [ ] rollback versão nDPI doc
+- [ ] rollback versao nDPI doc
 
-## Fase 22 - API local / automação
-- [ ] ADR superfície API/hooks
-- [ ] exemplos + runbook segurança
+## Fase 22 - API local / automacao
+- [ ] ADR superficie API/hooks
+- [ ] exemplos + runbook seguranca
 
-## Documentação contínua
-- [ ] CORTEX atualizado
+## Documentacao continua
+- [x] CORTEX atualizado
 - [ ] AGENTS atualizado
 - [ ] ADRs atualizadas
 - [ ] runbooks atualizados

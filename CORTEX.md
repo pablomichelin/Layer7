@@ -4,69 +4,67 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**No repositório (0.0.31):** **Settings** grava **`interfaces[]`** (CSV).  
-**Anterior (0.0.30):** interfaces só leitura.  
-**Ainda não validado em lab:** `pkg add` + **teste de exec pfctl** no appliance — [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md).
+**No repositorio (0.0.31):** Settings grava `interfaces[]` (CSV).  
+**Validado em lab (2026-03-19):** build do pacote, `pkg add`, ficheiros instalados, `layer7d` a subir/parar e evidencia HTTP 200 para as paginas Layer7 no appliance.  
+**Ainda pendente em lab:** `pfctl`/enforce, reboot/persistencia e eliminar a necessidade de `IGNORE_OSVERSION=yes`.
 
 ## Fase atual
-Há **código testável no builder** (`./layer7d -t -c samples/...` ou smoke). Gate pfSense mantém-se aberto até evidência no lab.
+Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos blocos, mas ainda faltam testes de appliance para endurecimento.
 
-## Última entrega
-- **README** — estado alinhado (daemon, pacote, GUI, CI; lab pendente).
-- **Guia Windows** — `docs/08-lab/guia-windows.md` + `check-port-files.ps1` para dev em Windows.
-- **Quick-start lab** — `docs/08-lab/quick-start-lab.md` (fluxo builder→pfSense→validação).
-- **Loop main.c** — comentário TODO(Fase 13) no ponto de integração nDPI→`layer7_on_classified_flow`.
-- **BUILDER.md** — port pronto para `make package`; referência validacao-lab e quick-start.
-- **CI** — job `check-windows` (PowerShell) em `smoke-layer7d.yml`.
-- **Runbooks** — link para validacao-lab e quick-start em `docs/05-runbooks/README.md`.
+## Ultima entrega
+- Builder FreeBSD 15 preparado com `git`, `gh`, `ca_root_nss` e `/usr/ports`
+- `smoke-layer7d.sh` validado no builder
+- Port ajustado para empacotar ficheiros GUI e `priv`
+- `pkg-plist` alinhado ao stage real do pacote
+- Pacote instalado e removido com sucesso no pfSense de lab
+- Logs do appliance com `daemon_start`, `daemon_stop` e instalacao/remocao do pacote
 
 ## Objetivo imediato
-1. No FreeBSD: `sh scripts/package/smoke-layer7d.sh` e/ou `make package` + procedimento em `validacao-lab.md`.
-2. Corrigir port/daemon só com base em falhas observadas no lab.
+1. Fechar os pendentes do lab: `pfctl`, reboot e persistencia.
+2. Remover ou reduzir a necessidade de `IGNORE_OSVERSION=yes` no pacote de lab.
+3. Corrigir port/daemon apenas com base nas falhas observadas nesses testes.
 
-## Próximos 3 passos
-1. Fechar evidência lab (pacote + serviço + opcional §6b pfctl).
-2. No loop nDPI: chamar `layer7_on_classified_flow` (já implementado; hoje só **`-e`** / **`-e -n`** no CLI).
-3. nDPI no daemon (só após pacote estável no lab).
+## Proximos 3 passos
+1. Validar `pfctl`/enforce no appliance.
+2. Validar reboot e persistencia da configuracao/servico.
+3. Integrar `layer7_on_classified_flow` no loop nDPI so depois do pacote ficar estavel em lab.
 
-## Decisões congeladas
-- **instalação no pfSense apenas quando o pacote estiver totalmente completo** — não colocar no firewall antes de estar totalmente desenvolvido;
-- foco em pfSense CE;
-- pacote open source;
-- distribuição inicial por artefato `.txz`;
-- **lab distribution via GitHub Releases** — fluxo builder FreeBSD → GitHub Release → pfSense teste; comando único `fetch + sh`; não substitui Package Manager oficial; ver [`docs/04-package/deploy-github-lab.md`](docs/04-package/deploy-github-lab.md);
-- sem software pago obrigatório;
-- V1 sem TLS MITM universal;
-- V1 com modo monitor e enforce;
-- documentação viva obrigatória;
-- engine classificação: **nDPI** (ADR-0001).
+## Decisoes congeladas
+- instalacao no pfSense apenas quando o pacote estiver totalmente completo
+- foco em pfSense CE
+- pacote open source
+- distribuicao inicial por artefacto `.txz`
+- lab distribution via GitHub Releases: builder FreeBSD -> GitHub Release -> pfSense teste
+- sem software pago obrigatorio
+- V1 sem TLS MITM universal
+- V1 com modo monitor e enforce
+- documentacao viva obrigatoria
+- engine de classificacao: nDPI (ADR-0001)
 
 ## Riscos ativos
-- assumir GUI/menu/serviço OK sem corrida no lab;
-- escopo crescer antes da validação;
-- empacotamento ficar mais complexo que o core.
+- assumir compatibilidade plena enquanto ainda depende de `IGNORE_OSVERSION=yes`
+- assumir GUI totalmente validada sem fechar o fluxo manual completo
+- escopo crescer antes de reboot/persistencia/enforce
 
 ## Itens adiados
-- console central;
-- identidade avançada;
-- TLS inspection seletiva;
-- integração profunda com Suricata;
-- console multi-firewall.
+- console central
+- identidade avancada
+- TLS inspection seletiva
+- integracao profunda com Suricata
+- console multi-firewall
 
-**Trilha pós-V1 (documental):** fases **13–22** em `03-ROADMAP-E-FASES.md` (nDPI produção, GUI completa, DNS, observabilidade, identidade, TLS opt-in, IDS, escala/HA, ciclo nDPI, API local).
-
-## Política de trabalho
-- um bloco por vez;
-- uma validação por vez;
-- nada marcado como “feito” sem evidência de lab quando o critério for appliance;
-- docs no mesmo commit.
+## Politica de trabalho
+- um bloco por vez
+- uma validacao por vez
+- nada marcado como feito sem evidencia de lab quando o criterio for appliance
+- docs no mesmo commit
 
 ## Definition of Done da V1
-- pacote instalável *(com evidência)*
-- daemon funcional *(com evidência)*
-- GUI básica *(com evidência)*
+- pacote instalavel com evidencia
+- daemon funcional com evidencia
+- GUI basica com evidencia
 - policy engine
-- enforcement mínimo
-- observabilidade básica
+- enforcement minimo
+- observabilidade basica
 - rollback validado
 - docs completas

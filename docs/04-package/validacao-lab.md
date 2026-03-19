@@ -1,304 +1,240 @@
-# Validação em lab — `pfSense-pkg-layer7`
+# Validacao em lab - `pfSense-pkg-layer7`
 
-**Objetivo:** obter **evidência objetiva** de que o port gera um `.txz` instalável no pfSense CE, que os ficheiros aparecem no disco, que o serviço pode arrancar e que a página (se acessível) responde.
+**Objetivo:** obter evidencia objetiva de que o port gera um pacote instalavel no pfSense CE (`.pkg` ou `.txz`, conforme o host), que os ficheiros aparecem no disco, que o servico pode arrancar e que a pagina responde sem erro fatal.
 
-**Política do projeto:** o pacote **só será instalado no pfSense quando estiver totalmente completo** (ver `00-LEIA-ME-PRIMEIRO.md` regra 8, `CORTEX.md`). Este documento descreve o procedimento de validação para quando esse momento chegar.
+**Politica do projeto:** o pacote so sera instalado no pfSense quando estiver totalmente completo. Este documento regista a execucao de validacao quando esse momento chegar.
 
-**Regra:** colar saídas reais nas caixas abaixo. Sem outputs, o gate **não** está fechado.
-
----
-
-## 1. Pré-requisitos — host builder (FreeBSD)
-
-- [ ] FreeBSD ou ambiente com **BSD `make`** + `cc` (toolchain base).
-- [ ] Clone completo do repositório Layer7, com:
-  - `package/pfSense-pkg-layer7/Makefile`
-  - `src/layer7d/main.c` acessível como `package/pfSense-pkg-layer7/../../src/layer7d/main.c`
-- [ ] Utilizador com permissão para compilar e gerar pacote.
-
-**Nota:** Windows sem `make`/ports **não** serve como builder para este port.
+**Regra:** sem outputs reais, o gate nao esta fechado.
 
 ---
 
-## 2. Pré-requisitos — pfSense lab
+## Execucao registada - 2026-03-19
 
-- [ ] VM/appliance pfSense CE (versão anotada: `____________`).
-- [ ] Snapshot antes da instalação (recomendado).
-- [ ] Acesso SSH ou consola como admin.
-- [ ] Caminho para copiar o `.txz` gerado no builder (SCP, datastore, etc.).
+- Builder: FreeBSD `15.0-RELEASE-p4` em `192.168.0.129`
+- pfSense CE lab: `2.8.1` em `192.168.0.195`
+- Artefacto gerado: `/root/pfsense-layer7/package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-0.0.31.pkg`
+- Smoke no builder: `check-port-files: OK`, `smoke-layer7d: OK`
+- Instalacao no pfSense: `pkg add` OK com `IGNORE_OSVERSION=yes`
+- Servico: `layer7d` sobe, para e volta a subir
+- Logs: `daemon_start version=0.0.31` e `daemon_stop` em `/var/log/system.log`
+- GUI: evidencia indireta em `/var/log/nginx.log` com HTTP `200` para `layer7_status.php` e `layer7_settings.php`
+- Rollback: `pkg delete -y pfSense-pkg-layer7` OK; pacote reinstalado no fim do teste
 
 ---
 
-## 3. Passo a passo — build
+## 1. Pre-requisitos - host builder (FreeBSD)
 
-**Antes do `make package`:** alinhar plist a `files/` (em Windows: `.\scripts\package\check-port-files.ps1`):
+- [x] FreeBSD com `make` + `cc`
+- [x] Clone completo do repositorio Layer7
+- [x] Utilizador com permissao para compilar e gerar pacote
+- [x] Arvore `/usr/ports` presente para `bsd.port.mk`
+
+## 2. Pre-requisitos - pfSense lab
+
+- [x] Appliance pfSense CE acessivel por SSH
+- [ ] Snapshot antes da instalacao
+- [x] Caminho para copiar o pacote do builder para o pfSense
+
+## 3. Build
+
+Comandos executados no builder:
 
 ```sh
+cd /root/pfsense-layer7
 sh scripts/package/check-port-files.sh
-```
-
-**Opcional (antes do port):** no clone, com `cc` + `make`:
-
-```sh
 sh scripts/package/smoke-layer7d.sh
-```
-
-Execute no **builder** (ajuste o caminho ao teu clone):
-
-```sh
-cd /caminho/para/Layer7/package/pfSense-pkg-layer7
+cd package/pfSense-pkg-layer7
 make clean 2>/dev/null || true
 make package
 ```
 
-**Output completo do build (colar):**
+Resultado minimo:
 
-```
-(colar aqui)
-```
-
-**Caminho absoluto do `.txz` gerado:**
-
-```
-(colar aqui)
+```text
+check-port-files: OK
+smoke-layer7d: OK
 ```
 
-**Onde procurar o `.txz`:** depende do `make` do host; a partir do diretório do port:
+Artefacto gerado:
+
+```text
+/root/pfsense-layer7/package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-0.0.31.pkg
+```
+
+Nota:
+
+- neste lab o builder FreeBSD 15 gerou `.pkg`
+- o documento e o fluxo do projeto continuam validos para `.txz` quando esse for o formato emitido no host de build
+
+## 4. Instalacao no pfSense
+
+Pacote copiado para:
+
+```text
+/root/pfSense-pkg-layer7-0.0.31.pkg
+```
+
+Comando usado:
 
 ```sh
-ls -la *.txz 2>/dev/null || true
-find . -maxdepth 5 -name 'pfSense-pkg-layer7*.txz' 2>/dev/null
+env ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg add -f /root/pfSense-pkg-layer7-0.0.31.pkg
 ```
 
-Anote o caminho completo para `pkg add` no pfSense.
+Saida relevante:
 
----
-
-### Troubleshooting (build)
-
-| Sintoma | Ação |
-|--------|------|
-| `layer7d: fontes em falta` | Garantir clone completo; `src/layer7d/main.c` e `config_parse.c` devem existir relativamente ao port. |
-| `LICENSE` em falta | Deve existir `package/pfSense-pkg-layer7/LICENSE`. |
-| `cc: not found` | Instalar toolchain no builder ou usar VM FreeBSD documentada em `docs/08-lab/`. |
-| `check-port-files: FALHOU` | Alinhar `pkg-plist` com ficheiros em `files/` (ver `scripts/package/check-port-files.sh`). |
-
----
-
-## 4. Passo a passo — instalação no pfSense
-
-Transfira o `.txz` para o pfSense. Depois:
-
-```sh
-cd /root
-# ou o diretório onde está o .txz
-ls -la pfSense-pkg-layer7*.txz
-pkg add ./pfSense-pkg-layer7-VERSÃO.txz
+```text
+Installing pfSense-pkg-layer7-0.0.31...
+Extracting pfSense-pkg-layer7-0.0.31: 100%
+Saving updated package information... done.
+Successfully installed package: layer7.
 ```
 
-**Output de `pkg add` (colar):**
+Nota:
 
-```
-(colar aqui)
-```
+- foi necessario `IGNORE_OSVERSION=yes` porque o pacote foi gerado com `FreeBSD_version 1500068`
+- o kernel do pfSense no lab reportou `1500029`
 
----
+## 5. Metadados do pacote
 
-## 5. Verificação — metadados do pacote
+Comandos:
 
 ```sh
 pkg info pfSense-pkg-layer7
 pkg info -l pfSense-pkg-layer7
-pkg info | grep -i layer7
 ```
 
-**Outputs (colar):**
+Saida relevante:
 
+```text
+Name           : pfSense-pkg-layer7
+Version        : 0.0.31
+Prefix         : /usr/local
+Architecture   : FreeBSD:15:amd64
 ```
-(colar aqui)
+
+Ficheiros confirmados por `pkg info -l`:
+
+```text
+/etc/inc/priv/layer7.priv.inc
+/usr/local/etc/layer7.json.sample
+/usr/local/etc/rc.d/layer7d
+/usr/local/pkg/layer7.inc
+/usr/local/pkg/layer7.xml
+/usr/local/sbin/layer7d
+/usr/local/share/pfSense-pkg-layer7/info.xml
+/usr/local/www/packages/layer7/layer7_diagnostics.php
+/usr/local/www/packages/layer7/layer7_events.php
+/usr/local/www/packages/layer7/layer7_exceptions.php
+/usr/local/www/packages/layer7/layer7_policies.php
+/usr/local/www/packages/layer7/layer7_settings.php
+/usr/local/www/packages/layer7/layer7_status.php
 ```
 
----
+## 6. Servico
 
-## 6. Passo a passo — serviço
+Comandos:
 
 ```sh
 cp /usr/local/etc/layer7.json.sample /usr/local/etc/layer7.json
 service layer7d onestart
 service layer7d status
 ps auxww | grep layer7d | grep -v grep
-sockstat -4 -6 2>/dev/null | grep layer7d || true
-```
-
-**Outputs (colar):**
-
-```
-(colar aqui)
-```
-
-**Logs (pfSense — exemplo com `clog`; ajustar se a tua versão usar outro caminho):**
-
-```sh
-clog /var/log/system.log 2>/dev/null | tail -n 80
-```
-
-```
-(colar aqui)
-```
-
-**Paragem de teste:**
-
-```sh
 service layer7d onestop
+service layer7d onestart
 ```
 
-**Notas:**
+Saida relevante:
 
-- `daemon_start` é registado no arranque **mesmo sem** `/usr/local/etc/layer7.json`; o sample só é necessário para testar parse completo via SIGHUP/reload.
-- Arranque no boot: `sysrc layer7d_enable=YES` (após validar manualmente com `onestart`).
-
-### 6b. PF — `pfctl` (opcional, código ≥ 0.0.12)
-
-O `layer7d` compila com **`layer7_pf_exec_table_add`/`delete`** (`/sbin/pfctl`); o **loop ainda não chama** estas funções (falta nDPI). Para ganhar confiança no appliance:
-
-1. Criar tabela **`layer7_block`** no ruleset PF (vazia + regra que a use).
-2. Como root: `pfctl -t layer7_block -T add 10.0.0.99` → `pfctl -t layer7_block -T show` → `… -T delete 10.0.0.99`.
-3. Registar OK/NOK abaixo.
-
-```
-(pfctl show / notas)
+```text
+layer7d is running as pid 49115.
+root ... daemon: /usr/local/sbin/layer7d[49115] (daemon)
+root ... /usr/local/sbin/layer7d
 ```
 
-**Versão do binário:** `layer7d -V` (deve alinhar com o pacote / **Diagnostics**).
+Versao do binario:
 
-### 6c. CLI **`layer7d -e`** (decisão + PF, sem nDPI)
+```sh
+/usr/local/sbin/layer7d -V
+```
 
-Confirma o caminho **política → `pfctl`** no appliance (útil antes do loop nDPI).
+```text
+0.0.31
+```
 
-1. Copiar temporariamente o sample de enforce (ou ajustar `layer7.json`):
+Logs relevantes:
 
-   ```sh
-   cp /usr/local/etc/layer7.json /usr/local/etc/layer7.json.bak
-   cp /caminho/no/builder/layer7-enforce-smoke.json /usr/local/etc/layer7.json
-   # ou: usar apenas o bloco policies/mode enforce do sample
-   ```
+```text
+Mar 19 00:22:30 pfSense pkg[58002]: pfSense-pkg-layer7-0.0.31 installed
+Mar 19 00:22:31 pfSense layer7d[65989]: daemon_start version=0.0.31
+Mar 19 00:22:31 pfSense layer7d[65989]: config file present: /usr/local/etc/layer7.json (452 bytes)
+Mar 19 00:22:31 pfSense layer7d[65989]: config: layer7.enabled=false - idle (sem motor L7)
+Mar 19 00:23:54 pfSense layer7d[65989]: daemon_stop
+Mar 19 00:23:54 pfSense layer7d[49115]: daemon_start version=0.0.31
+```
 
-2. **Dry-run** (não altera tabelas PF):
+## 7. GUI / HTTP
 
-   ```sh
-   /usr/local/sbin/layer7d -n -c /usr/local/etc/layer7.json -e 10.0.0.100 BitTorrent
-   ```
+URL:
 
-   Esperado: linha com `dry-run: pfctl -t layer7_block -T add 10.0.0.100` (ou tabela configurada).
+```text
+https://192.168.0.195/packages/layer7/layer7_status.php
+```
 
-3. Opcional — **executar** `pfctl` (só se a tabela existir no ruleset, ver §6b):
+Estado:
 
-   ```sh
-   /usr/local/sbin/layer7d -c /usr/local/etc/layer7.json -e 10.0.0.100 BitTorrent
-   ```
+- [x] Abre sem erro PHP: sim
+- [ ] Menu "Layer7" visivel: nao verificado
 
-4. Restaurar config: `mv /usr/local/etc/layer7.json.bak /usr/local/etc/layer7.json` e `service layer7d onerestart` se necessário.
+Evidencia capturada no appliance:
 
-**Nota:** o sample `samples/config/layer7-enforce-smoke.json` está no repositório; no pfSense pode colar o conteúdo ou copiar via SCP.
+```text
+GET /packages/layer7/layer7_status.php HTTP/2.0" 200
+GET /packages/layer7/layer7_settings.php HTTP/2.0" 200
+```
 
----
+## 8. Remove / rollback
 
-## 7. Verificação — GUI / HTTP
-
-**URL direta (substituir IP):**
-
-`https://IP_DO_PFSENSE/packages/layer7/layer7_status.php`
-
-- [ ] Abre sem erro PHP (sim / não): `____`
-- Evidência (screenshot ou código HTTP/curl): *(opcional colar)*
-
-**URL exceções (opcional):** `https://IP/packages/layer7/layer7_exceptions.php`  
-**Políticas — adicionar (≥0.0.14):** em **Policies**, formulário no fim; validar com **Estado**. **Remover (≥0.0.23):** dropdown + botão Remover + confirmar. **Editar (≥0.0.25):** botão Editar na linha → gravar → lista.  
-**Exceções — adicionar (≥0.0.16):** em **Exceptions**, formulário host (IPv4) ou CIDR; validar com `layer7d -t`. **Remover (≥0.0.24):** dropdown + Remover + confirmar. **Editar (≥0.0.26):** Editar na linha → gravar.  
-**Diagnostics (≥0.0.18):** tab **Diagnostics**. **Events (≥0.0.22):** tab **Events** (syslog / futuro event-model). **Syslog remoto (≥0.0.19):** Settings → host + porta; no coletor confirmar receção UDP 514 (ou porta definida).
-
-**Menu Services:**
-
-- [ ] Entrada “Layer7” (ou similar) visível: **OK** / **NOK** / **N/A (não verificado)**
-
-**Nota:** em algumas versões o menu só aparece após registo correto do pacote; **NOK** não invalida sozinho o pacote se a URL direta funcionar — registar na conclusão.
-
----
-
-## 8. Remove (opcional mas recomendado)
+Comandos:
 
 ```sh
 pkg delete -y pfSense-pkg-layer7
-pkg info pfSense-pkg-layer7 2>&1
+pkg info pfSense-pkg-layer7
 ```
 
-**Output (colar):**
+Saida relevante:
 
-```
-(colar aqui)
-```
-
----
-
-## 9. Critérios objetivos de aprovação / reprovação
-
-### Aprovação mínima (gate “pacote + daemon de smoke”)
-
-| Critério | Obrigatório |
-|----------|-------------|
-| `make package` termina sem erro | Sim |
-| `.txz` existe e é instalável | Sim |
-| `pkg add` sem erro fatal | Sim |
-| `/usr/local/sbin/layer7d` existe e é executável | Sim |
-| `service layer7d onestart` → processo em `ps` | Sim |
-| Logs mostram `daemon_start` | Sim |
-| `service layer7d onestop` → processo termina | Sim |
-
-### Reprovação (exemplos)
-
-- Build falha (fonte em falta, `cc` erro, etc.).
-- `pkg add` falha ou não instala `sbin/layer7d`.
-- Serviço não arranca ou morre de imediato sem log útil.
-- Erro PHP fatal na URL da página *(registar; pode ser bug de integração)*.
-
----
-
-## 10. Rollback
-
-1. `pkg delete pfSense-pkg-layer7` (se instalado).
-2. Restaurar **snapshot** da VM antes do teste, **ou**
-3. Remover manualmente ficheiros órfãos se o delete falhar (listar o que ficou e abrir issue).
-
----
-
-## 11. Conclusão do operador
-
-- Data: `____________`
-- Versão pfSense CE: `____________`
-- **Resultado:** APROVADO / REPROVADO
-- Notas:
-
-```
-(colar aqui)
+```text
+Deinstalling pfSense-pkg-layer7-0.0.31...
+Removing layer7 components...
+pkg: No package(s) matching pfSense-pkg-layer7
 ```
 
----
+## 9. Conclusao
 
-## Checklist executável (cópia rápida)
+- Data: `2026-03-19`
+- Versao pfSense CE: `2.8.1`
+- Resultado: `APROVADO` para o gate "pacote + daemon de smoke"
 
-Usar também [`checklist-validacao-lab.md`](checklist-validacao-lab.md).
+Pendencias conhecidas:
+
+- validar `pfctl` do fluxo de enforce (secao 6b do plano original)
+- validar reboot e persistencia
+- validar GUI manual completa e menu do pacote
+- reduzir ou eliminar a dependencia de `IGNORE_OSVERSION=yes`
+
+## 10. Checklist rapido
 
 | # | Item | OK |
-|---|------|-----|
-| 1 | Build `make package` sem erro | [ ] |
-| 2 | Ficheiro `.txz` gerado | [ ] |
-| 3 | `pkg add` OK | [ ] |
-| 4 | `pkg info pfSense-pkg-layer7` OK | [ ] |
-| 5 | Ficheiros instalados coerentes com `pkg info -l` | [ ] |
-| 6 | `service layer7d onestart` OK | [ ] |
-| 7 | `service layer7d status` OK | [ ] |
-| 8 | `ps` mostra `layer7d` | [ ] |
-| 9 | Logs com `daemon_start` | [ ] |
-| 10 | URL `/packages/layer7/layer7_status.php` OK | [ ] |
-| 11 | Menu GUI (se aplicável) OK/NOK anotado | [ ] |
-| 12 | `pkg delete` OK (teste de remove) | [ ] |
+|---|------|----|
+| 1 | Build `make package` sem erro | [x] |
+| 2 | Ficheiro de pacote gerado | [x] |
+| 3 | `pkg add` OK | [x] |
+| 4 | `pkg info pfSense-pkg-layer7` OK | [x] |
+| 5 | Ficheiros instalados coerentes com `pkg info -l` | [x] |
+| 6 | `service layer7d onestart` OK | [x] |
+| 7 | `service layer7d status` OK | [x] |
+| 8 | `ps` mostra `layer7d` | [x] |
+| 9 | Logs com `daemon_start` | [x] |
+| 10 | URL `/packages/layer7/layer7_status.php` OK | [x] |
+| 11 | Menu GUI anotado | [ ] |
+| 12 | `pkg delete` OK | [x] |
