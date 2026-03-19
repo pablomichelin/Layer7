@@ -4,8 +4,8 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**No repositorio (0.0.31):** Settings grava `interfaces[]` (CSV) e a GUI Layer7 foi reorganizada para um layout consistente com o padrao visual do pfSense.  
-**Validado em lab (2026-03-19):** build do pacote, `pkg add`, ficheiros instalados, `layer7d` a subir/parar e evidencia HTTP 200 para as paginas Layer7 no appliance.  
+**No repositorio (0.0.31):** Settings grava `interfaces[]` (CSV), a GUI Layer7 foi reorganizada para um layout consistente com o padrao visual do pfSense e a operacao segura da WebGUI do appliance ficou documentada em runbook.  
+**Validado em lab (2026-03-19):** build do pacote, `pkg add`, ficheiros instalados, `layer7d` a subir/parar, evidencia HTTP 200 para as paginas Layer7 no appliance e revalidacao do login/dashboard do pfSense apos incidente operacional na WebGUI.  
 **Ainda pendente em lab:** `pfctl`/enforce, reboot/persistencia e eliminar a necessidade de `IGNORE_OSVERSION=yes`.
 
 ## Fase atual
@@ -19,6 +19,7 @@ Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos bl
 - Layout das paginas `Status`, `Settings`, `Policies`, `Exceptions`, `Events` e `Diagnostics` reorganizado para melhorar espacamento, navegacao e legibilidade
 - Pacote instalado e removido com sucesso no pfSense de lab
 - Logs do appliance com `daemon_start`, `daemon_stop` e instalacao/remocao do pacote
+- Incidente operacional na WebGUI do pfSense analisado e recuperado; runbook adicionado com causas, correcao e "nao fazer novamente"
 
 ## Objetivo imediato
 1. Fechar os pendentes do lab: `pfctl`, reboot e persistencia.
@@ -44,7 +45,7 @@ Ha evidencia de pacote + daemon em lab. O gate pfSense abriu para os proximos bl
 
 ## Riscos ativos
 - assumir compatibilidade plena enquanto ainda depende de `IGNORE_OSVERSION=yes`
-- assumir GUI totalmente validada sem fechar o fluxo manual completo
+- mexer na WebGUI base do pfSense fora do fluxo oficial do appliance
 - escopo crescer antes de reboot/persistencia/enforce
 
 ## Itens adiados

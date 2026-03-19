@@ -1,7 +1,11 @@
 # Runbooks
 
-Operação e rollback: [`../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md`](../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md).
+Operacao e rollback: [`../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md`](../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md).
 
-Validação em lab (build `.txz`, `pkg add`, serviço): [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) · quick-start: [`../08-lab/quick-start-lab.md`](../08-lab/quick-start-lab.md).
+Validacao em lab (build `.txz`/`.pkg`, `pkg add`, servico): [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md).
 
-Runbooks específicos por release entram aqui quando existirem.
+Quick start do lab: [`../08-lab/quick-start-lab.md`](../08-lab/quick-start-lab.md).
+
+Seguranca da WebGUI do pfSense durante testes do pacote: [`pfsense-webgui-safety.md`](pfsense-webgui-safety.md).
+
+Runbooks especificos por release entram aqui quando existirem.

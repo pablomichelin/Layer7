@@ -272,6 +272,84 @@ Resultado:
 - [x] `php_fpm` recarregado para reduzir risco de cache/opcache
 - [x] `layer7d` confirmado em execucao apos a troca
 
+### Incidente da WebGUI do pfSense e recuperacao segura
+
+Objetivo:
+
+- registar a quebra da WebGUI do appliance durante a rodada visual, a causa real e o procedimento correto para nao repetir o incidente em proximas sessoes
+
+Causa encontrada:
+
+- o frontend base do pfSense foi tocado fora do fluxo oficial do appliance
+- o `webConfigurator` esperava `php-fpm` em `unix:/var/run/php-fpm.socket`
+- o `php-fpm` estava configurado para `127.0.0.1:9000`, o que produziu `502 Bad Gateway`
+- depois disso, o dashboard autenticado ainda falhava por permissoes incorretas em `/tmp/symfony-cache`
+
+Erro relevante do Crash Reporter:
+
+```text
+unlink(/tmp/symfony-cache/filesystem/...): Permission denied
+```
+
+Recuperacao aplicada no appliance:
+
+```sh
+service php_fpm onerestart
+/etc/rc.restart_webgui
+chown -R www:www /tmp/symfony-cache
+find /tmp/symfony-cache -type d -exec chmod 775 {} +
+find /tmp/symfony-cache -type f -exec chmod 664 {} +
+rm -f /tmp/sess_*
+rm -rf /tmp/symfony-cache
+install -d -o www -g www -m 775 /tmp/symfony-cache
+/etc/rc.restart_webgui
+```
+
+Configuracao operacional que ficou valida:
+
+```text
+/usr/local/etc/php-fpm.d/www.conf
+listen = /var/run/php-fpm.socket
+listen.owner = www
+listen.group = www
+listen.mode = 0660
+```
+
+Regra operacional resultante:
+
+- nunca usar `service nginx restart` ou `service nginx onerestart` para a WebGUI do pfSense
+- para reiniciar a GUI do appliance, usar apenas `/etc/rc.restart_webgui`
+- so marcar recuperacao como concluida depois de validar raiz, login, dashboard autenticado e paginas Layer7
+
+### Reinstalacao controlada apos recuperacao da WebGUI
+
+Objetivo:
+
+- recolocar o pacote no appliance apenas depois de estabilizar a GUI base do pfSense
+
+Comandos:
+
+```sh
+env ASSUME_ALWAYS_YES=yes IGNORE_OSVERSION=yes pkg add -f /root/pfSense-pkg-layer7-0.0.31.pkg
+pkg info pfSense-pkg-layer7
+service layer7d status
+```
+
+Validacao HTTP/autenticacao:
+
+- `curl -k -I https://192.168.0.195/` -> `HTTP/1.1 200 OK`
+- login autenticado `POST /` -> `HTTP/1.1 302 Found`
+- `GET /index.php` autenticado -> `HTTP/1.1 200 OK` repetido
+- `GET /packages/layer7/layer7_status.php` autenticado -> `HTTP/1.1 200 OK`
+- `GET /packages/layer7/layer7_settings.php` autenticado -> `HTTP/1.1 200 OK`
+
+Resultado:
+
+- [x] GUI base do pfSense recuperada antes da reinstalacao do pacote
+- [x] pacote reinstalado sem voltar a mexer manualmente no frontend base do appliance
+- [x] login e dashboard do pfSense revalidados apos a reinstalacao
+- [x] utilizador aprovou o visual final do pacote no browser
+
 ## 8. Remove / rollback
 
 Comandos:
@@ -299,7 +377,7 @@ Pendencias conhecidas:
 
 - validar `pfctl` do fluxo de enforce (secao 6b do plano original)
 - validar reboot e persistencia
-- validar GUI manual completa e menu do pacote
+- fechar evidencia do menu GUI do pacote no fluxo manual completo
 - reduzir ou eliminar a dependencia de `IGNORE_OSVERSION=yes`
 
 ## 10. Checklist rapido
