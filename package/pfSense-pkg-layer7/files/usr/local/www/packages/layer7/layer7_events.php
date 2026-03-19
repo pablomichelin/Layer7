@@ -23,6 +23,7 @@ layer7_render_styles();
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("events"); ?>
+		<div class="layer7-content">
 
 		<p class="layer7-lead"><?= gettext("Esta pagina concentra a orientacao operacional para leitura dos eventos do daemon enquanto a visao estruturada de eventos ainda nao faz parte da V1."); ?></p>
 
@@ -46,6 +47,7 @@ layer7_render_styles();
 			<div class="alert alert-info">
 				<?= gettext("A interface ainda nao expoe uma timeline propria de eventos. Nesta fase, o caminho oficial continua a ser o syslog do pfSense."); ?>
 			</div>
+		</div>
 		</div>
 	</div>
 </div>

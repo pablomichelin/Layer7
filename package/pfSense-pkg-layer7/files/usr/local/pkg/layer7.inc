@@ -274,16 +274,18 @@ function layer7_render_styles()
 	}
 	$done = true;
 	echo '<style>
+	.layer7-page .panel-body { padding: 0; }
 	.layer7-page .panel-title { font-size: 20px; font-weight: 600; }
-	.layer7-page .layer7-lead { color: #666; margin: 0 0 18px; max-width: 980px; }
-	.layer7-page .nav-tabs { margin-bottom: 18px; }
-	.layer7-page .nav-tabs > li > a { padding: 10px 14px; font-weight: 600; }
+	.layer7-page .layer7-content { padding: 24px 26px 26px; }
+	.layer7-page .layer7-lead { color: #666; line-height: 1.55; margin: 0 0 22px; max-width: 980px; }
+	.layer7-page .nav-tabs { margin: 0; padding: 10px 18px 0; border-bottom: 1px solid #e5e5e5; background: #fcfcfc; }
+	.layer7-page .nav-tabs > li > a { padding: 11px 14px; font-weight: 600; }
 	.layer7-page .form-horizontal .control-label { padding-top: 10px; }
 	.layer7-page .form-control-static { padding-top: 8px; }
-	.layer7-page .layer7-section { margin-top: 24px; }
+	.layer7-page .layer7-section { margin-top: 30px; }
 	.layer7-page .layer7-section:first-child { margin-top: 0; }
-	.layer7-page .layer7-section-title { margin: 0 0 14px; font-size: 24px; font-weight: 600; }
-	.layer7-page .layer7-toolbar { margin: 14px 0 0; }
+	.layer7-page .layer7-section-title { margin: 0 0 16px; font-size: 24px; font-weight: 600; }
+	.layer7-page .layer7-toolbar { margin: 18px 0 0; }
 	.layer7-page .layer7-toolbar .btn { margin-right: 8px; margin-bottom: 8px; }
 	.layer7-page .layer7-summary { margin-bottom: 18px; }
 	.layer7-page .layer7-summary dt { width: 180px; }
@@ -299,6 +301,9 @@ function layer7_render_styles()
 	.layer7-page .layer7-inline-form .form-control { display: inline-block; width: auto; vertical-align: middle; }
 	.layer7-page .layer7-inline-form .control-label { margin-right: 8px; }
 	.layer7-page .layer7-inline-form .btn { margin-left: 8px; }
+	.layer7-page .layer7-callout { background: #fbfbfb; border: 1px solid #e5e5e5; border-radius: 3px; padding: 16px 18px; }
+	.layer7-page .layer7-callout + .layer7-callout { margin-top: 14px; }
+	.layer7-page .table-responsive { margin-bottom: 0; }
 	</style>';
 }
 

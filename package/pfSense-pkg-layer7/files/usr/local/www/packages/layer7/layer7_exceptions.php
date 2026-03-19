@@ -246,9 +246,10 @@ layer7_render_styles();
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("exceptions"); ?>
-		<?php layer7_render_messages(); ?>
+		<div class="layer7-content">
+			<?php layer7_render_messages(); ?>
 
-		<p class="layer7-lead"><?= gettext("Excecoes sao avaliadas antes das politicas e ajudam a preservar trafego de gestao, redes internas e casos especiais durante os testes."); ?></p>
+			<p class="layer7-lead"><?= gettext("Excecoes sao avaliadas antes das politicas e ajudam a preservar trafego de gestao, redes internas e casos especiais durante os testes."); ?></p>
 
 		<div class="layer7-section">
 			<h3 class="layer7-section-title"><?= gettext("Excecoes atuais"); ?></h3>
@@ -482,6 +483,7 @@ layer7_render_styles();
 			<?php } ?>
 
 			<p class="layer7-muted-note small"><?= gettext("Para alterar o id de uma excecao existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
+		</div>
 		</div>
 	</div>
 </div>

@@ -103,11 +103,12 @@ layer7_render_styles();
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("settings"); ?>
-		<?php layer7_render_messages(); ?>
-		<p class="layer7-lead"><?= gettext("Parametros basicos do daemon, logging remoto e reservas de interface para a fase de captura nDPI."); ?></p>
+		<div class="layer7-content">
+			<?php layer7_render_messages(); ?>
+			<p class="layer7-lead"><?= gettext("Parametros basicos do daemon, logging remoto e reservas de interface para a fase de captura nDPI."); ?></p>
 
-		<form method="post" class="form-horizontal">
-			<input type="hidden" name="form_token" value="<?= htmlspecialchars(layer7_csrf_token()); ?>" />
+			<form method="post" class="form-horizontal">
+				<input type="hidden" name="form_token" value="<?= htmlspecialchars(layer7_csrf_token()); ?>" />
 
 			<div class="form-group">
 				<label class="col-sm-3 control-label"><?= gettext("Ativar pacote"); ?></label>
@@ -192,9 +193,10 @@ layer7_render_styles();
 					<button type="submit" name="save" value="1" class="btn btn-primary"><?= gettext("Guardar definicoes"); ?></button>
 				</div>
 			</div>
-		</form>
+			</form>
 
-		<p class="layer7-muted-note small"><?= gettext("Politicas e excecoes existentes sao preservadas quando as definicoes globais sao gravadas."); ?></p>
+			<p class="layer7-muted-note small"><?= gettext("Politicas e excecoes existentes sao preservadas quando as definicoes globais sao gravadas."); ?></p>
+		</div>
 	</div>
 </div>
 <?php require_once("foot.inc"); ?>

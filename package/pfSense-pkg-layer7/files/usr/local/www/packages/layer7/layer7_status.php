@@ -34,33 +34,36 @@ layer7_render_styles();
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("status"); ?>
+		<div class="layer7-content">
 		<p class="layer7-lead"><?= gettext("Resumo visual do daemon, do ficheiro de configuracao e da leitura atual do JSON pelo layer7d."); ?></p>
 
-		<dl class="dl-horizontal layer7-summary">
-			<?php if ($daemon_ver !== "") { ?>
-			<dt><?= gettext("Binario"); ?></dt>
-			<dd><code>layer7d -V</code> <strong><?= htmlspecialchars($daemon_ver); ?></strong></dd>
-			<?php } ?>
-
-			<dt><?= gettext("Config"); ?></dt>
-			<dd>
-				<code><?= htmlspecialchars($cfgpath); ?></code>
-				<?php if (!file_exists($cfgpath)) { ?>
-				<span class="text-warning"><?= gettext("Ficheiro ausente - copie layer7.json.sample."); ?></span>
+		<div class="layer7-callout">
+			<dl class="dl-horizontal layer7-summary">
+				<?php if ($daemon_ver !== "") { ?>
+				<dt><?= gettext("Binario"); ?></dt>
+				<dd><code>layer7d -V</code> <strong><?= htmlspecialchars($daemon_ver); ?></strong></dd>
 				<?php } ?>
-			</dd>
 
-			<dt><?= gettext("Interpretacao"); ?></dt>
-			<dd>
-				<?php if ($parse_ok === true) { ?>
-				<span class="text-success"><?= gettext("OK"); ?></span>
-				<?php } elseif ($parse_ok === false) { ?>
-				<span class="text-danger"><?= gettext("Falhou - ver saida abaixo."); ?></span>
-				<?php } else { ?>
-				<span class="text-muted"><?= gettext("Nao executado."); ?></span>
-				<?php } ?>
-			</dd>
-		</dl>
+				<dt><?= gettext("Config"); ?></dt>
+				<dd>
+					<code><?= htmlspecialchars($cfgpath); ?></code>
+					<?php if (!file_exists($cfgpath)) { ?>
+					<span class="text-warning"><?= gettext("Ficheiro ausente - copie layer7.json.sample."); ?></span>
+					<?php } ?>
+				</dd>
+
+				<dt><?= gettext("Interpretacao"); ?></dt>
+				<dd>
+					<?php if ($parse_ok === true) { ?>
+					<span class="text-success"><?= gettext("OK"); ?></span>
+					<?php } elseif ($parse_ok === false) { ?>
+					<span class="text-danger"><?= gettext("Falhou - ver saida abaixo."); ?></span>
+					<?php } else { ?>
+					<span class="text-muted"><?= gettext("Nao executado."); ?></span>
+					<?php } ?>
+				</dd>
+			</dl>
+		</div>
 
 		<div class="layer7-section">
 			<h3 class="layer7-section-title"><?= gettext("Saida do layer7d -t"); ?></h3>
@@ -74,6 +77,7 @@ layer7_render_styles();
 		</div>
 
 		<p class="layer7-muted-note small"><?= gettext("Quando enabled=false, o daemon permanece em idle, mas o pacote e a interface continuam acessiveis para configuracao e validacao."); ?></p>
+		</div>
 	</div>
 </div>
 <?php require_once("foot.inc"); ?>

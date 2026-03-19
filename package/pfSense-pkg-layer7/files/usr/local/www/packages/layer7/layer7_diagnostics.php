@@ -48,16 +48,19 @@ layer7_render_styles();
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("diagnostics"); ?>
+		<div class="layer7-content">
 		<p class="layer7-lead"><?= gettext("Painel de apoio operacional para validar binario, estado do servico, sinais e caminhos de troubleshooting no pfSense."); ?></p>
 
 		<div class="layer7-section">
 			<h3 class="layer7-section-title"><?= gettext("Resumo do binario"); ?></h3>
-			<dl class="dl-horizontal layer7-summary">
-				<dt><?= gettext("Versao"); ?></dt>
-				<dd><?php if ($layer7d_ver !== "") { ?><code>layer7d -V</code> <strong><?= htmlspecialchars($layer7d_ver); ?></strong><?php } else { ?><span class="text-warning"><?= gettext("Binario nao encontrado."); ?></span><?php } ?></dd>
-				<dt><?= gettext("Config"); ?></dt>
-				<dd><code><?= htmlspecialchars($cfgpath); ?></code></dd>
-			</dl>
+			<div class="layer7-callout">
+				<dl class="dl-horizontal layer7-summary">
+					<dt><?= gettext("Versao"); ?></dt>
+					<dd><?php if ($layer7d_ver !== "") { ?><code>layer7d -V</code> <strong><?= htmlspecialchars($layer7d_ver); ?></strong><?php } else { ?><span class="text-warning"><?= gettext("Binario nao encontrado."); ?></span><?php } ?></dd>
+					<dt><?= gettext("Config"); ?></dt>
+					<dd><code><?= htmlspecialchars($cfgpath); ?></code></dd>
+				</dl>
+			</div>
 		</div>
 
 		<div class="layer7-section">
@@ -90,6 +93,7 @@ layer7_render_styles();
 				<li><code>service layer7d status</code> - <?= gettext("confirmar o estado atual"); ?></li>
 				<li><code>sysrc layer7d_enable=YES</code> - <?= gettext("ativar arranque no boot quando o gate de persistencia for fechado"); ?></li>
 			</ul>
+		</div>
 		</div>
 	</div>
 </div>

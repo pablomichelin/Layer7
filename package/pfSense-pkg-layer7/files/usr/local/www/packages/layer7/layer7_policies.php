@@ -270,9 +270,10 @@ layer7_render_styles();
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("policies"); ?>
-		<?php layer7_render_messages(); ?>
+		<div class="layer7-content">
+			<?php layer7_render_messages(); ?>
 
-		<p class="layer7-lead"><?= gettext("Organize a ordem de avaliacao, ajuste o estado de cada regra e mantenha a base de politicas pronta para o modo de enforcement."); ?></p>
+			<p class="layer7-lead"><?= gettext("Organize a ordem de avaliacao, ajuste o estado de cada regra e mantenha a base de politicas pronta para o modo de enforcement."); ?></p>
 
 		<div class="layer7-section">
 			<h3 class="layer7-section-title"><?= gettext("Politicas atuais"); ?></h3>
@@ -549,6 +550,7 @@ layer7_render_styles();
 			<?php } ?>
 
 			<p class="layer7-muted-note small"><?= gettext("Para alterar o id de uma politica existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
+		</div>
 		</div>
 	</div>
 </div>
