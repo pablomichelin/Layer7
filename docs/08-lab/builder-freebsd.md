@@ -2,19 +2,19 @@
 
 ## Objetivo
 
-Host onde se compila código nativo (nDPI, PoC, futuro pacote) com **ABI/libs próximas** ao pfSense CE alvo.
+Host onde se compila codigo nativo (nDPI, PoC, futuro pacote) com ABI/libs proximas ao pfSense CE alvo.
 
-## Alinhamento de versão
+## Alinhamento de versao
 
-1. Anotar a versão do **pfSense CE** do lab (ex.: 2.7.x).
-2. Consultar a **versão base FreeBSD** dessa release (documentação Netgate/pfSense).
-3. Preferir **VM FreeBSD com a mesma major** (ex.: FreeBSD 14.x se o CE for 14.x).
+1. Anotar a versao do pfSense CE do lab (ex.: 2.7.x).
+2. Consultar a versao base FreeBSD dessa release (documentacao Netgate/pfSense).
+3. Preferir VM FreeBSD com a mesma major (ex.: FreeBSD 14.x se o CE for 14.x).
 
-> Desvio de major aumenta risco de binários incompatíveis no appliance.
+> Desvio de major aumenta risco de binarios incompativeis no appliance.
 
-## VM / host mínimo sugerido
+## VM / host minimo sugerido
 
-| Recurso | Mínimo razoável |
+| Recurso | Minimo razoavel |
 |---------|-----------------|
 | vCPU | 2 |
 | RAM | 4 GiB |
@@ -33,15 +33,15 @@ Opcional cedo na PoC:
 pkg install -y cmake pkgconf gcc
 ```
 
-Árvore **ports** ou **poudriere** entram quando o port `pfSense-pkg-layer7` estiver maduro (Bloco 5+).
+Arvore `ports` ou `poudriere` entram quando o port `pfSense-pkg-layer7` estiver maduro (Bloco 5+).
 
 ## Fluxo de trabalho
 
 1. Clonar: `git clone https://github.com/pablomichelin/pfsense-layer7.git`
 2. Desenvolvimento da PoC em `src/` (Bloco 3).
-3. Binários de teste no builder; instalação no pfSense só via pacote `.txz` quando o empacotamento existir.
+3. Binarios de teste no builder; instalacao no pfSense so via pacote `.txz` quando o empacotamento existir.
 
-### Compilar só o `layer7d` (sem `make package`)
+### Compilar so o `layer7d` (sem `make package`)
 
 ```sh
 cd src/layer7d
@@ -51,9 +51,11 @@ make check   # -V + parse sample (opcional)
 make clean
 ```
 
-Flags alinhadas ao port; **`version.str`** em `src/layer7d/` define a string de **`layer7d -V`**. O script **`scripts/package/smoke-layer7d.sh`** usa o mesmo Makefile com **`VSTR_DIR`** temporário e binário **`layer7d-smoke`**.
+Flags alinhadas ao port; `version.str` em `src/layer7d/` define a string de `layer7d -V`. O script `scripts/package/smoke-layer7d.sh` usa o mesmo Makefile com `VSTR_DIR` temporario e binario `layer7d-smoke`.
 
-## Segurança
+## Seguranca
 
 - Builder com acesso GitHub (HTTPS ou SSH).
-- Não reutilizar chaves de produção no lab sem isolamento.
+- Nao reutilizar chaves de producao no lab sem isolamento.
+- Builder de lab atualmente validado: FreeBSD 15 em `192.168.0.129` com acesso administrativo liberado para blocos de build e validacao.
+- Credenciais do builder devem ficar apenas em inventario local ou contexto operacional; nao versionar senha no repositorio.
