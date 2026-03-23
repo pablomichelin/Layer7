@@ -10,6 +10,8 @@
 #ifndef LAYER7_CAPTURE_H
 #define LAYER7_CAPTURE_H
 
+#include <stdint.h>
+
 /*
  * Callback invocado quando nDPI classifica um fluxo.
  *   iface:    nome da interface de captura (e.g. "em0")
