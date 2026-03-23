@@ -20,23 +20,15 @@ A ideia central é:
 
 ## Leitura recomendada em ordem
 
-1. `01-VISAO-GERAL-E-ESCOPO.md`
-2. `02-ARQUITETURA-ALVO.md`
-3. `03-ROADMAP-E-FASES.md` *(V1: fases 0–11; transição 12; **V2+ documentadas nas fases 13–22**)*
-4. `04-BACKLOG-MVP-E-VERSOES.md`
-5. `05-ESTRUTURA-REPOSITORIO-CURSOR-GITHUB.md`
-6. `06-PADROES-DE-DESENVOLVIMENTO-E-SEGURANCA.md`
-7. `07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md`
-8. `08-PLANO-DE-TESTES-E-HOMOLOGACAO.md`
-9. `09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md`
-10. `10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md`
-11. `11-RISCOS-LIMITACOES-E-DECISOES.md`
-12. `12-PLANO-DE-DOCUMENTACAO-E-GITHUB.md`
-13. `13-MODELOS-DE-ISSUES-E-PRS.md`
-14. `14-CHECKLIST-MESTRE.md`
-15. `15-PROMPT-MESTRE-CURSOR.md`
-16. `CORTEX.md`
-17. `AGENTS.md`
+1. **[`docs/tutorial/guia-completo-layer7.md`](docs/tutorial/guia-completo-layer7.md)** — **tutorial completo** (começo rápido)
+2. `CORTEX.md` — estado actual e decisões
+3. `AGENTS.md` — regras para agentes IA
+4. `03-ROADMAP-E-FASES.md` *(V1: fases 0–11; transição 12; **V2+ nas fases 13–22**)*
+5. `14-CHECKLIST-MESTRE.md` — progresso detalhado
+6. `07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md`
+
+**Planeamento mestre detalhado** (referência):
+`01-`…`16-` na raiz do repositório.
 
 ---
 
@@ -44,16 +36,16 @@ A ideia central é:
 
 Ao final da trilha V1, o projeto deve entregar:
 
-- um **pacote próprio para pfSense CE**;
-- um **daemon Layer 7** com classificação de tráfego;
-- políticas de **monitoramento**, **tag**, **allow** e **block**;
-- enforcement por:
-  - aliases/tables do PF;
-  - integração com DNS/host/domain policy;
-- GUI no padrão do ecossistema pfSense;
-- logs locais mínimos + exportação para syslog remoto;
-- build reproduzível;
-- documentação de instalação, upgrade e rollback;
+- um **pacote próprio para pfSense CE**; ✅
+- um **daemon Layer 7** com classificação de tráfego via nDPI; ✅
+- políticas de **monitoramento**, **tag**, **allow** e **block**; ✅
+- **políticas por interface** com listas de IPs/CIDRs; ✅
+- enforcement por **PF tables** (`pfctl`); ✅
+- GUI completa no padrão do ecossistema pfSense (6 páginas); ✅
+- logs locais mínimos + exportação para syslog remoto; ✅
+- selecção de ~350 apps/categorias nDPI na GUI; ✅
+- gestão de frota para múltiplos firewalls; ✅
+- documentação completa de utilização; ✅
 - base sólida para evoluir em V2.
 
 ---
@@ -161,15 +153,21 @@ Leia:
 
 ## Status do projeto
 
+- **Versão actual:** 0.2.0 (motor multi-interface)
 - Fases completas: **0–10** (58/58 testes OK + nDPI + enforce real validado)
-- Fase 11: **release V1 pronta para publicação**
-- Escopo ativo: **V1 MVP**
-- Objetivo imediato: **publicar release 0.1.0 no GitHub**
-- Objetivo proibido neste momento: **feature creep, Fase 13+ antes do gate V1**
+- Fase 11: **release V1 publicada (0.1.0)**
+- Motor multi-interface: **v0.2.0 implementado**
+- Escopo ativo: **teste em pfSense real de produção**
+- Objetivo imediato: **validar v0.2.0 em ambiente real**
+- Objetivo proibido neste momento: **feature creep, Fase 13+ antes do teste real**
 
-**Validação lab (2026-03-23):** **Enforce end-to-end funcional.** Pipeline nDPI → policy engine → pfctl comprovado: `pf_add_ok=7`, 6 IPs automaticamente adicionados à tabela PF (TuyaLP/IoT, SSDP, MDNS), exceções respeitadas, block/tag decisions logadas a NOTICE. CLI `-e` validou BitTorrent→block. Pacote v0.1.0 compilado e instalado.
+**Motor Multi-Interface v0.2.0 (2026-03-18):** Políticas por interface (LAN, WIFI, ADMIN), listas de IPs/CIDRs granulares, ~350 apps nDPI seleccionáveis na GUI com pesquisa, excepções multi-host/CIDR, daemon `--list-protos`.
 
-**Validação lab (2026-03-22):** 58/58 testes OK. nDPI integrado e a classificar tráfego real. GUI completa com 6 páginas. Fleet management. Custom protocols file. Plataforma: pfSense CE 2.8.1-dev (FreeBSD 15.0-CURRENT). O ponto de verdade operacional está em **`CORTEX.md`**.
+**Validação lab (2026-03-23):** Enforce end-to-end funcional. Pipeline nDPI → policy engine → pfctl comprovado: `pf_add_ok=7`, 6 IPs adicionados à tabela PF, excepções respeitadas, block/tag decisions logadas a NOTICE.
+
+**Documentação:** Guia Completo disponível em [`docs/tutorial/guia-completo-layer7.md`](docs/tutorial/guia-completo-layer7.md) com 18 secções.
+
+O ponto de verdade operacional está em **`CORTEX.md`**.
 
 ---
 

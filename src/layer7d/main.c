@@ -3,6 +3,9 @@
  */
 #if HAVE_NDPI
 #include "capture.h"
+#include <ndpi_api.h>
+#include <ndpi_main.h>
+#include <ndpi_typedefs.h>
 #endif
 #include "config_parse.h"
 #include "enforce.h"
@@ -59,6 +62,68 @@ static int s_remote_port = 514;
 static time_t s_debug_until;
 
 #if HAVE_NDPI
+static void
+json_escape_print(const char *s)
+{
+	for (; *s; s++) {
+		if (*s == '"' || *s == '\\')
+			putchar('\\');
+		putchar(*s);
+	}
+}
+
+static int
+list_ndpi_protos(void)
+{
+	struct ndpi_detection_module_struct *ndpi;
+	int i, n, first;
+
+	ndpi = ndpi_init_detection_module(NULL);
+	if (!ndpi) {
+		fprintf(stderr, "layer7d: ndpi_init failed\n");
+		return 1;
+	}
+	if (ndpi_finalize_initialization(ndpi) != 0) {
+		ndpi_exit_detection_module(ndpi);
+		fprintf(stderr, "layer7d: ndpi_finalize failed\n");
+		return 1;
+	}
+
+	n = (int)ndpi_get_num_protocols(ndpi);
+	printf("{\"protocols\":[");
+	first = 1;
+	for (i = 0; i < n; i++) {
+		const char *name = ndpi_get_proto_name(ndpi, (uint16_t)i);
+		if (!name || name[0] == '\0')
+			continue;
+		if (strcmp(name, "Unknown") == 0)
+			continue;
+		if (!first)
+			printf(",");
+		first = 0;
+		printf("\"");
+		json_escape_print(name);
+		printf("\"");
+	}
+	printf("],\"categories\":[");
+	first = 1;
+	for (i = 0; i < (int)NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
+		const char *cn = ndpi_category_get_name(ndpi,
+		    (ndpi_protocol_category_t)i);
+		if (!cn || cn[0] == '\0')
+			continue;
+		if (!first)
+			printf(",");
+		first = 0;
+		printf("\"");
+		json_escape_print(cn);
+		printf("\"");
+	}
+	printf("]}\n");
+	ndpi_exit_detection_module(ndpi);
+	return 0;
+}
+
 #define L7_MAX_IFACES 8
 static struct layer7_capture *s_captures[L7_MAX_IFACES];
 static int s_n_captures;
@@ -199,29 +264,31 @@ on_usr1(int sig)
  * mode=monitor → apenas loga a decisão, nunca chama pfctl.
  */
 static void
-layer7_on_classified_flow(const char *src_ip, const char *ndpi_app,
-    const char *ndpi_cat)
+layer7_on_classified_flow(const char *iface, const char *src_ip,
+    const char *ndpi_app, const char *ndpi_cat)
 {
 	struct layer7_decision dec;
 	int r;
 
 	if (!s_have_parse || !src_ip || cfg_disabled(&s_parsed))
 		return;
-	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, s_ge, src_ip, ndpi_app,
-	    ndpi_cat, &dec);
+	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, s_ge, iface, src_ip,
+	    ndpi_app, ndpi_cat, &dec);
 
 	if (dec.action == LAYER7_ACTION_BLOCK ||
 	    dec.action == LAYER7_ACTION_TAG) {
-		L7_NOTE("flow_decide: src=%s app=%s cat=%s action=%s "
+		L7_NOTE("flow_decide: iface=%s src=%s app=%s cat=%s action=%s "
 		    "reason=%s policy=%s",
+		    iface ? iface : "-",
 		    src_ip, ndpi_app ? ndpi_app : "(null)",
 		    ndpi_cat ? ndpi_cat : "(null)",
 		    layer7_action_str(dec.action),
 		    layer7_decide_reason_str(dec.reason),
 		    dec.matched_policy_id[0] ? dec.matched_policy_id : "-");
 	} else {
-		L7_DBG("flow_decide: src=%s app=%s cat=%s action=%s "
+		L7_DBG("flow_decide: iface=%s src=%s app=%s cat=%s action=%s "
 		    "reason=%s",
+		    iface ? iface : "-",
 		    src_ip, ndpi_app ? ndpi_app : "(null)",
 		    ndpi_cat ? ndpi_cat : "(null)",
 		    layer7_action_str(dec.action),
@@ -284,7 +351,7 @@ run_enforce_once_cli(const char *path, const char *ip, const char *app,
 	ge = p.has_mode && strcmp(p.mode, "enforce") == 0;
 	free(buf);
 
-	layer7_flow_decide(exc, nx, rules, np, ge, ip, app, cat, &dec);
+	layer7_flow_decide(exc, nx, rules, np, ge, NULL, ip, app, cat, &dec);
 	printf(
 	    "enforce-once: action=%s reason=%s would_enforce=%d table=%s\n",
 	    layer7_action_str(dec.action),
@@ -344,12 +411,14 @@ static void on_hup(int sig)
 static void usage(void)
 {
 	fprintf(stderr,
-	    "usage: layer7d [-V] [-t] [-c path] [-e IP APP [CAT]] [-n]\n"
-	    "  -V  versão do binário\n"
-	    "  -t  testa JSON (stdout)\n"
-	    "  -c  caminho (omissão: %s)\n"
-	    "  -e  uma decisão + opcional pfctl add (lab; após -c)\n"
-	    "  -n  com -e: não executar pfctl (dry)\n"
+	    "usage: layer7d [-V] [-t] [-c path] [-e IP APP [CAT]] [-n] "
+	    "[--list-protos]\n"
+	    "  -V             versão do binário\n"
+	    "  -t             testa JSON (stdout)\n"
+	    "  -c path        caminho (omissão: %s)\n"
+	    "  -e IP APP [CAT] uma decisão + opcional pfctl add\n"
+	    "  -n             com -e: não executar pfctl (dry)\n"
+	    "  --list-protos  lista protocolos e categorias nDPI em JSON\n"
 	    "  runtime: SIGHUP reload; SIGUSR1 stats; nDPI→pf via policy\n",
 	    DEFAULT_CONFIG);
 }
@@ -535,19 +604,46 @@ apply_config(int use_syslog)
 					}
 					printf("]");
 				}
+				if (rules[k].n_ifaces > 0) {
+					printf(" ifaces=[");
+					for (j = 0; j < rules[k].n_ifaces; j++) {
+						if (j) printf(",");
+						printf("%s", rules[k].ifaces[j]);
+					}
+					printf("]");
+				}
+				if (rules[k].n_src_hosts > 0) {
+					printf(" src_hosts=[");
+					for (j = 0; j < rules[k].n_src_hosts; j++){
+						if (j) printf(",");
+						printf("%s", rules[k].src_hosts[j]);
+					}
+					printf("]");
+				}
+				if (rules[k].n_src_cidrs > 0) {
+					printf(" src_cidrs=%d",
+					    rules[k].n_src_cidrs);
+				}
 				printf("\n");
 			}
 		}
 
 		printf("  exceptions: %d (priority desc)\n", nx);
 		for (k = 0; k < nx; k++) {
+			int h;
 			printf("    [%d] id=%s pri=%d action=%s", k,
 			    exc[k].id[0] ? exc[k].id : "(none)",
 			    exc[k].priority, layer7_action_str(exc[k].action));
-			if (exc[k].has_host)
-				printf(" host=%s", exc[k].host);
-			if (exc[k].has_cidr)
-				printf(" cidr/net pref=%d", exc[k].cidr_prefix);
+			for (h = 0; h < exc[k].n_hosts; h++)
+				printf(" host=%s", exc[k].hosts[h]);
+			for (h = 0; h < exc[k].n_cidrs; h++)
+				printf(" cidr/pref=%d", exc[k].cidrs[h].prefix);
+			if (exc[k].n_ifaces > 0) {
+				printf(" ifaces=");
+				for (h = 0; h < exc[k].n_ifaces; h++)
+					printf("%s%s", h ? "," : "",
+					    exc[k].ifaces[h]);
+			}
 			printf("\n");
 		}
 
@@ -567,8 +663,8 @@ apply_config(int use_syslog)
 			for (a = 0; a < ncase; a++) {
 				struct layer7_decision dec;
 
-				layer7_flow_decide(exc, nx, rules, np, ge, srcs[a],
-				    apps[a], cats[a], &dec);
+				layer7_flow_decide(exc, nx, rules, np, ge,
+				    NULL, srcs[a], apps[a], cats[a], &dec);
 				printf("      src=%s app=%s cat=%s -> %s reason=%s",
 				    srcs[a] ? srcs[a] : "(null)",
 				    apps[a] ? apps[a] : "(null)",
@@ -766,6 +862,11 @@ int main(int argc, char **argv)
 			puts(layer7d_version);
 			return 0;
 		}
+#if HAVE_NDPI
+		if (strcmp(argv[vi], "--list-protos") == 0) {
+			return list_ndpi_protos();
+		}
+#endif
 	}
 
 	i = 1;

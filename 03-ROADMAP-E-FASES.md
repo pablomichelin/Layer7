@@ -27,10 +27,10 @@ Definir exatamente:
 
 ### Gate
 Não avançar sem:
-- [ ] escopo aprovado
-- [ ] categorias iniciais aprovadas
-- [ ] ações iniciais aprovadas
-- [ ] modo monitor/enforce definidos
+- [x] escopo aprovado
+- [x] categorias iniciais aprovadas
+- [x] ações iniciais aprovadas
+- [x] modo monitor/enforce definidos
 
 ---
 
@@ -47,10 +47,10 @@ Montar a bancada.
 - syslog remoto
 
 ### Gate
-- [ ] build host funcional
-- [ ] snapshot do lab pronto
-- [ ] acesso SSH confiável
-- [ ] rede de teste validada
+- [x] build host funcional
+- [x] snapshot do lab pronto
+- [x] acesso SSH confiável
+- [x] rede de teste validada
 
 ---
 
@@ -66,10 +66,10 @@ Provar a classificação antes do pacote.
 - teste com tráfego real
 
 ### Gate
-- [ ] 20 casos de tráfego testados
-- [ ] baseline de CPU e RAM
-- [ ] acurácia inicial entendida
-- [ ] limitações iniciais anotadas
+- [x] 20 casos de tráfego testados
+- [x] baseline de CPU e RAM
+- [x] acurácia inicial entendida
+- [x] limitações iniciais anotadas
 
 ---
 
@@ -87,9 +87,9 @@ Definir como o pacote pensa.
 - exceções
 
 ### Gate
-- [ ] policy matrix aprovada
-- [ ] esquema de evento definido
-- [ ] ordem de prioridade definida
+- [x] policy matrix aprovada
+- [x] esquema de evento definido
+- [x] ordem de prioridade definida
 
 ---
 
@@ -107,10 +107,10 @@ Transformar a PoC em pacote instalável.
 - script rc
 
 ### Gate
-- [ ] pacote compila
-- [ ] instala
-- [ ] remove
-- [ ] não deixa lixo operacional grave
+- [x] pacote compila
+- [x] instala
+- [x] remove
+- [x] não deixa lixo operacional grave
 
 ---
 
@@ -127,9 +127,9 @@ Ter um `layer7d` real.
 - tratamento de erro
 
 ### Gate
-- [ ] daemon sobe após reboot
-- [ ] daemon aceita reload
-- [ ] daemon registra erro de forma útil
+- [x] daemon sobe após reboot
+- [x] daemon aceita reload
+- [x] daemon registra erro de forma útil
 
 ---
 
@@ -145,9 +145,9 @@ Aplicar decisões na prática.
 - allow/monitor/tag/block
 
 ### Gate
-- [ ] caso simples de block validado
-- [ ] whitelist validada
-- [ ] modo monitor não interfere
+- [x] caso simples de block validado — 2026-03-22
+- [x] whitelist validada — 2026-03-22
+- [x] modo monitor não interfere
 
 ---
 
@@ -165,9 +165,9 @@ Dar cara de produto.
 - Diagnostics
 
 ### Gate
-- [ ] salvar funciona
-- [ ] aplicar funciona
-- [ ] UI não quebra em erro de input
+- [x] salvar funciona
+- [x] aplicar funciona
+- [x] UI não quebra em erro de input
 
 ---
 
@@ -183,9 +183,9 @@ Tornar o pacote operável.
 - diagnostics
 
 ### Gate
-- [ ] logs legíveis
-- [ ] exportação remota validada
-- [ ] debug temporário disponível
+- [x] logs legíveis
+- [x] exportação remota validada
+- [x] debug temporário disponível
 
 ---
 
@@ -203,9 +203,9 @@ Parar de “achar” e começar a validar.
 - stress leve
 
 ### Gate
-- [ ] suite de testes executada
-- [ ] bugs críticos corrigidos
-- [ ] rollback validado
+- [x] suite de testes executada — 58/58 OK
+- [x] bugs críticos corrigidos
+- [x] rollback validado — 2026-03-22
 
 ---
 
@@ -221,9 +221,9 @@ Rodar em piloto.
 - feedback operacional
 
 ### Gate
-- [ ] piloto estável
-- [ ] sem incidentes graves
-- [ ] documentação ajustada
+- [x] enforce end-to-end validado — 2026-03-23 (pf_add_ok=7)
+- [ ] piloto estável 24h+ *(pendente: teste real)*
+- [x] documentação ajustada
 
 ---
 
@@ -240,10 +240,10 @@ Fechar primeira versão de verdade.
 - release notes
 
 ### Gate
-- [ ] DoD completo
-- [ ] release publicada
-- [ ] rollback documentado
-- [ ] roadmap V2 definido
+- [x] DoD completo
+- [x] release publicada — v0.1.0 (2026-03-23), v0.2.0 (2026-03-18)
+- [x] rollback documentado
+- [x] roadmap V2 definido *(fases 13-22)*
 
 ---
 

@@ -15,6 +15,7 @@ Definir quais documentos existem, quando são atualizados e qual papel cada um c
 - `LICENSE`
 
 ### Em `docs/`
+- **tutorial/** — Guia Completo Layer7 (ponto de partida recomendado)
 - charter do produto
 - arquitetura
 - roadmap
@@ -24,6 +25,9 @@ Definir quais documentos existem, quando são atualizados e qual papel cada um c
 - releases
 - prompts
 - topologia de lab
+- core (config, policy, nDPI strategy)
+- changelog
+- logging
 
 ---
 
@@ -54,16 +58,20 @@ Definir quais documentos existem, quando são atualizados e qual papel cada um c
 - enforcement design
 
 ## Fase 7
-- guia da GUI
+- guia da GUI *(concluído: `docs/tutorial/guia-completo-layer7.md`)*
 
 ## Fase 8/9
-- test plan
-- release checklist
+- test plan *(concluído)*
+- release checklist *(concluído)*
 
 ## Fase 10/11
-- release notes
-- rollback notes
-- operação
+- release notes *(concluído)*
+- rollback notes *(concluído)*
+- operação *(concluído)*
+
+## Motor Multi-Interface (v0.2.0)
+- guia completo actualizado com funcionalidades multi-interface
+- changelog actualizado
 
 ---
 

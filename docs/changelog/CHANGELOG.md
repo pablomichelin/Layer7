@@ -5,6 +5,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Guia Completo Layer7** (`docs/tutorial/guia-completo-layer7.md`) — tutorial com 18 secções: instalação, configuração, todos os menus da GUI, formato JSON, exemplos práticos de políticas, CLI do daemon, sinais, protocolos customizados, gestão de frota (fleet), troubleshooting e glossário.
+
+- **Motor Multi-Interface (2026-03-18):**
+  - GUI Settings: checkboxes dinâmicos de interfaces pfSense (substituiu campo CSV)
+  - `layer7d --list-protos`: enumera todos os protocolos e categorias nDPI em JSON
+  - GUI Policies: multi-select com pesquisa para apps e categorias nDPI (populados por `--list-protos`)
+  - Políticas: campo `interfaces[]` para regras por interface (vazio = todas)
+  - Políticas: campo `match.src_hosts[]` e `match.src_cidrs[]` para filtro granular por IP de origem
+  - Exceções: suporte a múltiplos hosts (`hosts[]`) e CIDRs (`cidrs[]`) por exceção
+  - Exceções: campo `interfaces[]` para limitar a interfaces específicas
+  - Callback de captura `layer7_flow_cb` agora inclui nome da interface
+  - `layer7_flow_decide` filtra por interface, IP de origem e CIDR
+  - Compatibilidade retroactiva: campos antigos `host`/`cidr` continuam a funcionar
+  - Helpers PHP: `layer7_ndpi_list()`, `layer7_get_pfsense_interfaces()`, `layer7_parse_ip_textarea()`, `layer7_parse_cidr_textarea()`
+
 - **Enforce end-to-end validado (2026-03-23)** — pipeline nDPI → policy engine → pfctl comprovado em pfSense CE real:
   - `pf_add_ok=7`, zero falhas, 6 IPs adicionados à tabela `layer7_tagged`
   - Protocolos detectados: TuyaLP (IoT), SSDP (System), MDNS (Network)

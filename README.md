@@ -1,53 +1,84 @@
 # Layer7 para pfSense CE
 
-Pacote **open source** para **pfSense CE**: classificação Layer 7 (motor baseado em **nDPI**), políticas (`monitor`, `tag`, `allow`, `block`), enforcement via PF e integração DNS/host onde aplicável, GUI no ecossistema pfSense.
-
-**Estado:** daemon **`layer7d`**, pacote pfSense e GUI no repositório; CI smoke em Ubuntu; **validação em lab pendente** ([`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md)).
+Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo real via **nDPI** (~350 aplicações detectáveis), políticas granulares por interface/IP (`monitor`, `tag`, `allow`, `block`), enforcement via PF tables e GUI completa no ecossistema pfSense.
 
 | | |
 |--|--|
 | **Repositório** | <https://github.com/pablomichelin/pfsense-layer7> |
 | **Licença** | BSD-2-Clause (ver `LICENSE`) |
-| **Versão** | `0.x` até fechar V1 (SemVer) |
+| **Versão actual** | **0.2.0** (motor multi-interface) |
+| **Compatibilidade** | pfSense CE 2.7.x / 2.8.x · FreeBSD 14/15 |
+
+## O que faz
+
+- **Identifica** aplicações e protocolos em tempo real (BitTorrent, YouTube, TikTok, redes sociais, VPN, streaming, etc.)
+- **Bloqueia** tráfego por aplicação, categoria, interface e IP de origem
+- **Monitoriza** sem interferir no tráfego
+- **Tagga** IPs em tabelas PF customizadas para regras avançadas
+- **Excepciona** IPs, sub-redes e interfaces específicas
+- **Gestão de frota** para 50+ firewalls com scripts automatizados
+
+## Funcionalidades v0.2.0
+
+- **Políticas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
+- **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes específicos
+- **Selecção de apps nDPI** — lista com pesquisa de ~350 aplicações e categorias
+- **Excepções granulares** — múltiplos hosts/CIDRs por excepção, por interface
+- **GUI completa** — 6 páginas (Estado, Definições, Políticas, Excepções, Events, Diagnostics)
+- **`layer7d --list-protos`** — enumera protocolos/categorias nDPI em JSON
+- **Protocolos customizados** — ficheiro de regras editável em runtime (sem recompilação)
+- **Fleet management** — scripts para actualizar 50+ firewalls por SSH
+
+## Guia de utilização
+
+**[Guia Completo Layer7](docs/tutorial/guia-completo-layer7.md)** — tutorial detalhado com 18 secções: instalação, configuração, todos os menus da GUI, formato JSON, exemplos práticos, CLI, gestão de frota, troubleshooting e glossário.
 
 ## Leitura rápida
 
-1. [`00-LEIA-ME-PRIMEIRO.md`](00-LEIA-ME-PRIMEIRO.md)
-2. [`CORTEX.md`](CORTEX.md) · [`AGENTS.md`](AGENTS.md)
-3. Charter resumido: [`docs/00-overview/product-charter.md`](docs/00-overview/product-charter.md)
-4. ADRs: [`docs/03-adr/`](docs/03-adr/) · Core V1: [`docs/core/`](docs/core/)
+1. [`docs/tutorial/guia-completo-layer7.md`](docs/tutorial/guia-completo-layer7.md) — **tutorial completo**
+2. [`CORTEX.md`](CORTEX.md) — estado do projecto e decisões
+3. [`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md) — histórico de alterações
+4. [`docs/core/ndpi-update-strategy.md`](docs/core/ndpi-update-strategy.md) — estratégia nDPI para frota
 
-Os documentos numerados `01-`…`16-` na raiz são o **planejamento mestre** detalhado; `docs/` concentra SSOT operacional e decisões.
+## Instalação rápida
 
-## PoC nDPI (Bloco 3)
+```bash
+# No pfSense (SSH como root):
+fetch -o /tmp/layer7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.2.0/pfSense-pkg-layer7-0.2.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/layer7.pkg
+sysrc layer7d_enable=YES
+service layer7d onestart
+layer7d -V   # deve mostrar: 0.2.0
+```
 
-No **FreeBSD** (builder): `./scripts/build/build-poc-freebsd.sh` → `build/poc-ndpi/layer7_ndpi_poc arquivo.pcap`. Ver `src/poc_ndpi/README.md`.
+Depois aceda a **Services > Layer 7** na GUI do pfSense.
+
+Ver instruções completas no [Guia Completo](docs/tutorial/guia-completo-layer7.md#3-instalacao).
 
 ## Estrutura do repositório
 
 ```text
-docs/           # charter, arquitetura, roadmap, ADRs, changelog, runbooks…
-docs/poc/       # registro de resultados do PoC nDPI
-package/        # pfSense-pkg-layer7 (port + GUI PHP)
-src/            # layer7d, poc_ndpi, common…
-scripts/package/# smoke-layer7d.sh, check-port-files.sh
-scripts/release/ # deployz.sh, install-lab (GitHub Releases lab)
-webgui/         # XML / PHP / priv (futuro)
-scripts/        # build, release, lab, diagnostics
-tests/          # functional, traffic, package, lab, fixtures
-samples/        # exemplos de config/log/política
+docs/              # documentação completa (tutorial, ADRs, changelog, runbooks)
+docs/tutorial/     # guia completo de utilização
+package/           # pfSense-pkg-layer7 (port FreeBSD + GUI PHP)
+src/layer7d/       # daemon C (main, capture nDPI, policy engine, enforce PF)
+src/common/        # tipos partilhados
+scripts/release/   # fleet-update.sh, fleet-protos-sync.sh
+scripts/lab/       # automação de lab (sync, build, install, test)
+scripts/package/   # smoke tests, check port files
+samples/config/    # exemplos de layer7.json
 ```
 
-## Distribuição (V1)
+## Distribuição
 
-Artefato **`.txz`** + releases no GitHub; não instalar “direto do clone” em produção. Ver [ADR-0002](docs/03-adr/ADR-0002-distribuicao-artefato-txz.md).
+Artefato **`.pkg`** via GitHub Releases. Ver [Guia Completo §3](docs/tutorial/guia-completo-layer7.md#3-instalacao).
 
-**Lab distribution via GitHub Releases:** para instalação em pfSense de lab com um único comando, ver [`docs/04-package/deploy-github-lab.md`](docs/04-package/deploy-github-lab.md) e [`scripts/release/README.md`](scripts/release/README.md). Isto **não substitui** o suporte oficial do Package Manager do pfSense; é fluxo de artefato para lab/teste.
+Para frota (múltiplos firewalls): [`scripts/release/fleet-update.sh`](scripts/release/fleet-update.sh) e [`scripts/release/fleet-protos-sync.sh`](scripts/release/fleet-protos-sync.sh).
 
 ## CI
 
-[![smoke layer7d](https://github.com/pablomichelin/pfsense-layer7/actions/workflows/smoke-layer7d.yml/badge.svg)](https://github.com/pablomichelin/pfsense-layer7/actions/workflows/smoke-layer7d.yml) — compila **`layer7d`** e corre o smoke em Ubuntu (ver [`docs/tests/README.md`](docs/tests/README.md)).
+[![smoke layer7d](https://github.com/pablomichelin/pfsense-layer7/actions/workflows/smoke-layer7d.yml/badge.svg)](https://github.com/pablomichelin/pfsense-layer7/actions/workflows/smoke-layer7d.yml) — compila `layer7d` e corre smoke em Ubuntu (ver [`docs/tests/README.md`](docs/tests/README.md)).
 
 ## Contribuir
 
-Um bloco por vez; PR com objetivo, teste mínimo, rollback e docs (template em [`.github/pull_request_template.md`](.github/pull_request_template.md)).
+Um bloco por vez; PR com objectivo, teste mínimo, rollback e docs (template em [`.github/pull_request_template.md`](.github/pull_request_template.md)).

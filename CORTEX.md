@@ -4,82 +4,94 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Validado em lab (2026-03-23):** **Enforce end-to-end funcional.** Pipeline completo nDPI → policy engine → pfctl comprovado em ambiente real:
-- `pf_add_ok=7`, zero falhas — 6 IPs de dispositivos IoT (TuyaLP), rede (SSDP, MDNS) automaticamente adicionados à tabela PF `layer7_tagged`
-- Exceções respeitadas (IPs .195 e .129 não tagados)
-- Decisões de block/tag logadas a nível NOTICE para visibilidade operacional
-- CLI `-e` valida: BitTorrent→block, HTTP→monitor, IP excecionado→allow
-- Pacote v0.1.0 compilado no builder (FreeBSD 15.0-RELEASE-p4) e instalado no pfSense CE 2.8.1-dev
+**Versão: 0.2.0 — Motor Multi-Interface**
 
-**Validado anteriormente (2026-03-22):** 58/58 testes OK. nDPI integrado e a classificar tráfego real. GUI completa com 6 páginas. Fleet management. Custom protocols file.
+Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
+
+**Validação lab (2026-03-23):** Enforce end-to-end funcional — pipeline nDPI → policy engine → pfctl comprovado:
+- `pf_add_ok=7`, zero falhas — 6 IPs automaticamente adicionados à tabela PF
+- Excepções respeitadas (IPs .195 e .129 não tagados)
+- Decisões block/tag logadas a NOTICE
+- CLI `-e` valida: BitTorrent→block, HTTP→monitor, IP excepcionado→allow
+
+**Motor Multi-Interface (v0.2.0):**
+- Políticas por interface (LAN, WIFI, ADMIN, etc.)
+- Listas de IPs/CIDRs por política e excepção
+- ~350 apps/categorias nDPI seleccionáveis na GUI
+- Daemon `--list-protos` para enumeração dinâmica
+- GUI completa com 6 páginas
 
 ## Fase atual
-Fases 0-10 completas (58/58 testes OK + nDPI + enforce real validado). Fase 11 (release V1) pronta para publicação.
+Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste em pfSense real de produção.
 
 ## Ultima entrega
-- **Enforce real validado (2026-03-23):** nDPI → policy → pfctl end-to-end, 7 adds OK, 6 IPs na tabela PF
-- Logging melhorado: block/tag decisions a LOG_NOTICE (visíveis), allow/monitor a LOG_DEBUG
-- Sync automático builder → pfSense via scripts lab
-- GUI melhorada: Diagnostics, Events, Status com dados operacionais reais
-- Fleet management: `fleet-update.sh` + `fleet-protos-sync.sh`
-- Port version 0.1.0 compilado e instalado
+- **v0.2.0 — Motor Multi-Interface (2026-03-18):**
+  - GUI Settings: checkboxes dinâmicos de interfaces pfSense
+  - Políticas: `interfaces[]`, `match.src_hosts[]`, `match.src_cidrs[]`
+  - Excepções: múltiplos `hosts[]`/`cidrs[]` + `interfaces[]`
+  - `layer7d --list-protos`: JSON com protocolos/categorias nDPI
+  - GUI Policies: multi-select com pesquisa para apps nDPI
+  - Policy engine filtra por interface, IP e CIDR de origem
+- **Documentação: Guia Completo** — `docs/tutorial/guia-completo-layer7.md` (18 secções)
+- **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**V1 PUBLICADA.** Release v0.1.0 disponível em https://github.com/pablomichelin/pfsense-layer7/releases/tag/v0.1.0
+**Teste em pfSense real** — validar v0.2.0 em ambiente de produção.
 
-## Proximos 3 passos (pos-V1)
-1. Piloto estável 24h+ (opcional — monitorar daemon running sem crash).
-2. Fase 13: nDPI produção (tunning, coverage de mais protocolos).
-3. Fase 14: GUI completa (gráficos, dashboards operacionais).
+## Proximos 3 passos
+1. Testar v0.2.0 em pfSense real (políticas por interface, excepções granulares)
+2. Piloto estável 24h+ com regras multi-interface
+3. Ajustes com base no feedback do teste real
 
 ## Gates pendentes para V1
-- [x] Fase 6: caso simples de block validado no appliance (`pfctl`) — OK 2026-03-22
+- [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
 - [x] Fase 6: whitelist validada no appliance — OK 2026-03-22
 - [x] Fase 9: whitelist e fallback testados — OK 2026-03-22
-- [x] Fase 10: nDPI integrado e a classificar trafego real — OK 2026-03-22
-- [x] Fase 10: enforce end-to-end via nDPI validado — OK 2026-03-23 (pf_add_ok=7, 6 IPs)
-- [ ] Fase 10: piloto estavel 24h+ sem incidente (opcional)
-- [x] Fase 11: release V1 final (0.1.0) — publicada 2026-03-23 no GitHub
+- [x] Fase 10: nDPI integrado e a classificar tráfego real — OK 2026-03-22
+- [x] Fase 10: enforce end-to-end via nDPI validado — OK 2026-03-23
+- [ ] Fase 10: piloto estável 24h+ sem incidente
+- [x] Fase 11: release V1 final (0.1.0) — publicada 2026-03-23
+- [x] Motor multi-interface v0.2.0 — implementado 2026-03-18
 
 ## Decisoes congeladas
-- instalacao no pfSense apenas quando o pacote estiver totalmente completo
 - foco em pfSense CE
 - pacote open source
-- distribuicao inicial por artefacto `.txz`
-- lab distribution via GitHub Releases: builder FreeBSD -> GitHub Release -> pfSense teste; ver [`docs/04-package/deploy-github-lab.md`](docs/04-package/deploy-github-lab.md)
-- sem software pago obrigatorio
+- distribuição por artefacto `.pkg`
+- lab distribution via GitHub Releases
+- sem software pago obrigatório
 - V1 sem TLS MITM universal
 - V1 com modo monitor e enforce
-- documentacao viva obrigatoria
-- engine de classificacao: nDPI (ADR-0001)
-- atualizacao nDPI: compilar 1x no builder + `fleet-update.sh` para N firewalls; custom protocols file em runtime via `fleet-protos-sync.sh`; ver [`docs/core/ndpi-update-strategy.md`](docs/core/ndpi-update-strategy.md)
+- documentação viva obrigatória
+- engine de classificação: nDPI (ADR-0001)
+- actualização nDPI: compilar 1x no builder + `fleet-update.sh`; custom protocols em runtime via `fleet-protos-sync.sh`
+- políticas granulares: por interface + por IP/CIDR + por app/categoria nDPI
 
 ## Riscos ativos
-- assumir compatibilidade plena enquanto ainda depende de `IGNORE_OSVERSION=yes`
-- mexer na WebGUI base do pfSense fora do fluxo oficial do appliance
-- escopo crescer antes de reboot/persistencia/enforce
+- assumir compatibilidade plena enquanto depende de `IGNORE_OSVERSION=yes`
+- mexer na WebGUI base do pfSense fora do fluxo oficial
+- primeiro teste real em produção pendente
 
 ## Itens adiados
 - console central
-- identidade avancada
-- TLS inspection seletiva
-- integracao profunda com Suricata
+- identidade avançada
+- TLS inspection selectiva
+- integração profunda com Suricata
 - console multi-firewall
 
-**Trilha pos-V1 (documental):** fases **13-22** em `03-ROADMAP-E-FASES.md` (nDPI producao, GUI completa, DNS, observabilidade, identidade, TLS opt-in, IDS, escala/HA, ciclo nDPI, API local).
+**Trilha pós-V1 (documental):** fases **13-22** em `03-ROADMAP-E-FASES.md`.
 
 ## Politica de trabalho
 - um bloco por vez
-- uma validacao por vez
-- nada marcado como feito sem evidencia de lab quando o criterio for appliance
+- uma validação por vez
+- nada marcado como feito sem evidência de lab
 - docs no mesmo commit
 
 ## Definition of Done da V1
-- pacote instalavel com evidencia
-- daemon funcional com evidencia
-- GUI basica com evidencia
-- policy engine
-- enforcement minimo
-- observabilidade basica
-- rollback validado
-- docs completas
+- [x] pacote instalável com evidência
+- [x] daemon funcional com evidência
+- [x] GUI básica com evidência
+- [x] policy engine
+- [x] enforcement mínimo
+- [x] observabilidade básica
+- [ ] rollback validado em produção
+- [x] docs completas

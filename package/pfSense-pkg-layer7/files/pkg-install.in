@@ -6,6 +6,7 @@ fi
 
 ${PKG_ROOTDIR}/usr/local/bin/php -f ${PKG_ROOTDIR}/etc/rc.packages %%PORTNAME%% ${2}
 
+# --- Config padrão (primeira instalação) ---
 if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ] && [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json.sample" ]; then
 	cp "${PKG_ROOTDIR}/usr/local/etc/layer7.json.sample" "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
 fi
@@ -18,3 +19,26 @@ fi
 if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt" ] && [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt.sample" ]; then
 	cp "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt.sample" "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt"
 fi
+
+# --- Tabelas PF (criadas automaticamente) ---
+for _table in layer7_block layer7_tagged; do
+	if ! pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
+		pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null
+		pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null
+		echo "layer7: tabela PF '$_table' criada."
+	fi
+done
+
+# --- Habilitar e iniciar o serviço ---
+sysrc layer7d_enable=YES > /dev/null 2>&1
+service layer7d onestart > /dev/null 2>&1 || true
+
+echo ""
+echo "=== Layer7 instalado com sucesso ==="
+echo "  Versão:  $(/usr/local/sbin/layer7d -V 2>/dev/null || echo '?')"
+echo "  Config:  /usr/local/etc/layer7.json"
+echo "  GUI:     Services > Layer 7"
+echo ""
+echo "  O pacote inicia em modo MONITOR (seguro)."
+echo "  Acesse a GUI para configurar interfaces e políticas."
+echo ""

@@ -39,23 +39,19 @@ if ($_POST["add_exception"] ?? false) {
 			}
 		}
 
-		$host = trim($_POST["new_host"] ?? "");
-		$cidr = trim($_POST["new_cidr"] ?? "");
-		if ($ok && $host !== "" && $cidr !== "") {
-			$input_errors[] = gettext("Indique apenas host ou CIDR, nao ambos.");
+		$hosts = layer7_parse_ip_textarea($_POST["new_hosts"] ?? "");
+		$cidrs = layer7_parse_cidr_textarea($_POST["new_cidrs"] ?? "");
+		if ($ok && empty($hosts) && empty($cidrs)) {
+			$input_errors[] = gettext("Indique pelo menos um host IPv4 ou CIDR.");
 			$ok = false;
 		}
-		if ($ok && $host === "" && $cidr === "") {
-			$input_errors[] = gettext("Indique host (IPv4) ou CIDR (ex.: 192.168.0.0/24).");
-			$ok = false;
-		}
-		if ($ok && $host !== "" && !layer7_ipv4_valid($host)) {
-			$input_errors[] = gettext("Host: IPv4 invalido (ex.: 10.0.0.1).");
-			$ok = false;
-		}
-		if ($ok && $cidr !== "" && !layer7_cidr_valid($cidr)) {
-			$input_errors[] = gettext("CIDR invalido (ex.: 192.168.0.0/24).");
-			$ok = false;
+
+		$new_exc_ifaces = array();
+		if (isset($_POST["new_exc_ifaces"]) && is_array($_POST["new_exc_ifaces"])) {
+			foreach ($_POST["new_exc_ifaces"] as $ifid) {
+				$real = convert_friendly_interface_to_real_interface_name($ifid);
+				$new_exc_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+			}
 		}
 
 		$pri = (int)($_POST["new_priority"] ?? 500);
@@ -76,10 +72,14 @@ if ($_POST["add_exception"] ?? false) {
 				"priority" => $pri,
 				"action" => $act
 			);
-			if ($host !== "") {
-				$rule["host"] = $host;
-			} else {
-				$rule["cidr"] = $cidr;
+			if (!empty($hosts)) {
+				$rule["hosts"] = $hosts;
+			}
+			if (!empty($cidrs)) {
+				$rule["cidrs"] = $cidrs;
+			}
+			if (!empty($new_exc_ifaces)) {
+				$rule["interfaces"] = array_values(array_unique($new_exc_ifaces));
 			}
 			$exceptions[] = $rule;
 			if (layer7_save_json($data)) {
@@ -143,23 +143,19 @@ if ($_POST["save_exception_edit"] ?? false) {
 			$eid = isset($orig["id"]) ? (string)$orig["id"] : "";
 
 			$ok = true;
-			$host = trim($_POST["edit_host"] ?? "");
-			$cidr = trim($_POST["edit_cidr"] ?? "");
-			if ($ok && $host !== "" && $cidr !== "") {
-				$input_errors[] = gettext("Indique apenas host ou CIDR, nao ambos.");
+			$hosts = layer7_parse_ip_textarea($_POST["edit_hosts"] ?? "");
+			$cidrs = layer7_parse_cidr_textarea($_POST["edit_cidrs"] ?? "");
+			if ($ok && empty($hosts) && empty($cidrs)) {
+				$input_errors[] = gettext("Indique pelo menos um host IPv4 ou CIDR.");
 				$ok = false;
 			}
-			if ($ok && $host === "" && $cidr === "") {
-				$input_errors[] = gettext("Indique host (IPv4) ou CIDR (ex.: 192.168.0.0/24).");
-				$ok = false;
-			}
-			if ($ok && $host !== "" && !layer7_ipv4_valid($host)) {
-				$input_errors[] = gettext("Host: IPv4 invalido (ex.: 10.0.0.1).");
-				$ok = false;
-			}
-			if ($ok && $cidr !== "" && !layer7_cidr_valid($cidr)) {
-				$input_errors[] = gettext("CIDR invalido (ex.: 192.168.0.0/24).");
-				$ok = false;
+
+			$edit_exc_ifaces = array();
+			if (isset($_POST["edit_exc_ifaces"]) && is_array($_POST["edit_exc_ifaces"])) {
+				foreach ($_POST["edit_exc_ifaces"] as $ifid) {
+					$real = convert_friendly_interface_to_real_interface_name($ifid);
+					$edit_exc_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+				}
 			}
 
 			$pri = (int)($_POST["edit_priority"] ?? 500);
@@ -180,10 +176,14 @@ if ($_POST["save_exception_edit"] ?? false) {
 					"priority" => $pri,
 					"action" => $act
 				);
-				if ($host !== "") {
-					$rule["host"] = $host;
-				} else {
-					$rule["cidr"] = $cidr;
+				if (!empty($hosts)) {
+					$rule["hosts"] = $hosts;
+				}
+				if (!empty($cidrs)) {
+					$rule["cidrs"] = $cidrs;
+				}
+				if (!empty($edit_exc_ifaces)) {
+					$rule["interfaces"] = array_values(array_unique($edit_exc_ifaces));
 				}
 				$exceptions[$idx] = $rule;
 				if (layer7_save_json($data)) {
@@ -219,6 +219,24 @@ if ($layer7_exception_edit_retry !== null && $layer7_exception_edit_retry >= 0 &
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Exceptions"));
 include("head.inc");
 layer7_render_styles();
+
+function layer7_exc_target_summary($exception) {
+	$parts = array();
+	if (!empty($exception["hosts"]) && is_array($exception["hosts"])) {
+		$parts[] = count($exception["hosts"]) . " host(s)";
+	} elseif (!empty($exception["host"])) {
+		$parts[] = "host " . $exception["host"];
+	}
+	if (!empty($exception["cidrs"]) && is_array($exception["cidrs"])) {
+		$parts[] = count($exception["cidrs"]) . " CIDR(s)";
+	} elseif (!empty($exception["cidr"])) {
+		$parts[] = "cidr " . $exception["cidr"];
+	}
+	if (!empty($exception["interfaces"]) && is_array($exception["interfaces"])) {
+		$parts[] = "ifaces: " . implode(",", $exception["interfaces"]);
+	}
+	return empty($parts) ? gettext("Nao definido") : implode(" | ", $parts);
+}
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
@@ -256,20 +274,14 @@ layer7_render_styles();
 							$action = isset($exception["action"]) ? (string)$exception["action"] : "";
 							$priority = isset($exception["priority"]) ? (int)$exception["priority"] : 0;
 							$enabled = !empty($exception["enabled"]);
-							if (!empty($exception["host"])) {
-								$target = "host " . $exception["host"];
-							} elseif (!empty($exception["cidr"])) {
-								$target = "cidr " . $exception["cidr"];
-							} else {
-								$target = gettext("Nao definido");
-							}
+							$target = layer7_exc_target_summary($exception);
 						?>
 							<tr>
 								<td><input type="checkbox" name="eon[<?= (int)$i; ?>]" value="1" <?= $enabled ? 'checked="checked"' : ''; ?> /></td>
 								<td><?= htmlspecialchars((string)$priority); ?></td>
 								<td><span class="label label-default"><?= htmlspecialchars($action); ?></span></td>
 								<td><code><?= htmlspecialchars($eid); ?></code></td>
-								<td><code><?= htmlspecialchars($target); ?></code></td>
+								<td class="small"><?= htmlspecialchars($target); ?></td>
 								<td class="layer7-table-actions">
 									<a href="layer7_exceptions.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= gettext("Editar"); ?></a>
 								</td>
@@ -290,14 +302,7 @@ layer7_render_styles();
 					<select id="delete_exception_index" name="delete_exception_index" class="form-control">
 						<?php foreach ($exceptions as $i => $exception) {
 							$eid = isset($exception["id"]) ? (string)$exception["id"] : ("#" . $i);
-							if (!empty($exception["host"])) {
-								$target = "host " . $exception["host"];
-							} elseif (!empty($exception["cidr"])) {
-								$target = "cidr " . $exception["cidr"];
-							} else {
-								$target = "?";
-							}
-							$label = $eid . " - " . $target;
+							$label = $eid . " - " . layer7_exc_target_summary($exception);
 						?>
 						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
 						<?php } ?>
@@ -310,14 +315,29 @@ layer7_render_styles();
 
 		<?php if ($edit_ex !== null && $edit_ex_idx !== null) {
 			$edit_id = isset($edit_ex["id"]) ? (string)$edit_ex["id"] : "";
-			$edit_host = !empty($edit_ex["host"]) ? (string)$edit_ex["host"] : "";
-			$edit_cidr = !empty($edit_ex["cidr"]) ? (string)$edit_ex["cidr"] : "";
+			$edit_hosts_val = "";
+			if (!empty($edit_ex["hosts"]) && is_array($edit_ex["hosts"])) {
+				$edit_hosts_val = implode("\n", $edit_ex["hosts"]);
+			} elseif (!empty($edit_ex["host"])) {
+				$edit_hosts_val = (string)$edit_ex["host"];
+			}
+			$edit_cidrs_val = "";
+			if (!empty($edit_ex["cidrs"]) && is_array($edit_ex["cidrs"])) {
+				$edit_cidrs_val = implode("\n", $edit_ex["cidrs"]);
+			} elseif (!empty($edit_ex["cidr"])) {
+				$edit_cidrs_val = (string)$edit_ex["cidr"];
+			}
 			$edit_priority = isset($edit_ex["priority"]) ? (int)$edit_ex["priority"] : 0;
 			$edit_action = isset($edit_ex["action"]) ? (string)$edit_ex["action"] : "allow";
 			if (!in_array($edit_action, array("allow", "block", "monitor", "tag"), true)) {
 				$edit_action = "allow";
 			}
 			$edit_enabled = !empty($edit_ex["enabled"]);
+			$edit_ex_ifaces_arr = array();
+			if (isset($edit_ex["interfaces"]) && is_array($edit_ex["interfaces"])) {
+				$edit_ex_ifaces_arr = $edit_ex["interfaces"];
+			}
+			$ee_ifaces = layer7_get_pfsense_interfaces();
 		?>
 		<div class="layer7-section">
 			<h3 class="layer7-section-title"><?= gettext("Editar excecao"); ?></h3>
@@ -338,17 +358,33 @@ layer7_render_styles();
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Host (IPv4)"); ?></label>
-					<div class="col-sm-4">
-						<input type="text" name="edit_host" class="form-control" value="<?= htmlspecialchars($edit_host); ?>" />
-						<p class="help-block"><?= gettext("Preencha host ou CIDR, nunca ambos."); ?></p>
+					<label class="col-sm-3 control-label"><?= gettext("Hosts (IPv4)"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="edit_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_hosts_val); ?></textarea>
+						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("CIDR"); ?></label>
-					<div class="col-sm-4">
-						<input type="text" name="edit_cidr" class="form-control" value="<?= htmlspecialchars($edit_cidr); ?>" />
+					<label class="col-sm-3 control-label"><?= gettext("CIDRs"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="edit_cidrs" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_cidrs_val); ?></textarea>
+						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8). Ex.: 192.168.0.0/24"); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
+					<div class="col-sm-9">
+						<?php foreach ($ee_ifaces as $ifc) {
+							$chk = in_array($ifc["real"], $edit_ex_ifaces_arr, true) ? 'checked="checked"' : '';
+						?>
+						<label class="checkbox-inline">
+							<input type="checkbox" name="edit_exc_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" <?= $chk; ?> />
+							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+						</label>
+						<?php } ?>
+						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
 
@@ -396,6 +432,7 @@ layer7_render_styles();
 			<?php if ($exc_limit) { ?>
 			<div class="alert alert-warning"><?= gettext("Limite de 16 excecoes atingido."); ?></div>
 			<?php } else { ?>
+			<?php $pf_ifaces_exc = layer7_get_pfsense_interfaces(); ?>
 			<form method="post" class="form-horizontal">
 
 				<div class="form-group">
@@ -407,17 +444,31 @@ layer7_render_styles();
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Host (IPv4)"); ?></label>
-					<div class="col-sm-4">
-						<input type="text" name="new_host" class="form-control" placeholder="10.0.0.99" />
-						<p class="help-block"><?= gettext("Ou preencha o CIDR abaixo."); ?></p>
+					<label class="col-sm-3 control-label"><?= gettext("Hosts (IPv4)"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="new_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="10.0.0.99&#10;10.0.0.100"></textarea>
+						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("CIDR"); ?></label>
-					<div class="col-sm-4">
-						<input type="text" name="new_cidr" class="form-control" placeholder="192.168.77.0/24" />
+					<label class="col-sm-3 control-label"><?= gettext("CIDRs"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="new_cidrs" class="form-control" rows="2" style="max-width:400px" placeholder="192.168.77.0/24"></textarea>
+						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8)."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
+					<div class="col-sm-9">
+						<?php foreach ($pf_ifaces_exc as $ifc) { ?>
+						<label class="checkbox-inline">
+							<input type="checkbox" name="new_exc_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
+							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+						</label>
+						<?php } ?>
+						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
 

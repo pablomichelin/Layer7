@@ -58,7 +58,7 @@ Provar a classificação Layer 7.
 - [x] integrar nDPI em PoC simples (`src/poc_ndpi/layer7_ndpi_poc.c` + `scripts/build/build-poc-freebsd.sh`)
 - [x] gerar eventos normalizados (JSONL v1 em stdout)
 - [x] registrar confiança (campo `confidence`, valor `detected` no PoC)
-- [ ] testar tráfego real (operador: PCAP no builder + preencher `docs/poc/resultados-poc.template.md`)
+- [x] testar tráfego real *(nDPI classificando tráfego real no pfSense 2026-03-22)*
 - [x] medir performance (resumo em stderr: pkts/s, tempo)
 
 ### Saída
@@ -104,12 +104,12 @@ Criar esqueleto do pacote pfSense **no repositório**.
 - [x] página PHP informativa (`layer7_status.php` — sem persistência)
 - [x] `rc.d/layer7d`, hooks `pkg-install` / `pkg-deinstall`, `layer7.json.sample`
 
-### Tarefas (lab — **não concluídas até haver evidência**)
-- [ ] `make package` OK no builder
-- [ ] `pkg add` + ficheiros instalados conforme `pkg-plist`
-- [ ] serviço `layer7d` onestart/status/logs no pfSense
-- [ ] URL/menu GUI verificados (registar OK/NOK)
-- [ ] remove do pacote validado
+### Tarefas (lab — validadas)
+- [x] `make package` OK no builder — v0.2.0 compilado
+- [x] `pkg add` + ficheiros instalados conforme `pkg-plist`
+- [x] serviço `layer7d` onestart/status/logs no pfSense
+- [x] URL/menu GUI verificados (6 páginas OK)
+- [x] remove do pacote validado — 2026-03-22
 
 ### Saída
 Artefactos em `package/pfSense-pkg-layer7/`. Validação: [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md).
@@ -128,8 +128,8 @@ Substituir PoC solta por serviço real.
 - [x] `scripts/package/smoke-layer7d.sh` — smoke compile + `-t` em samples
 
 ### Tarefas (lab + produto)
-- [ ] binário instalado e executável no pfSense após `pkg add`
-- [ ] start/stop/status via `service layer7d` **comprovado** no appliance
+- [x] binário instalado e executável no pfSense após `pkg add`
+- [x] start/stop/status via `service layer7d` comprovado no appliance
 - [x] parser alargado (policies + exceptions + match categoria no motor; runtime ainda sem nDPI)
 - [x] manter counters (SIGUSR1 + `snapshot_fail`; `pf_add_ok`/`fail` reservados)
 - [x] logar estado (`periodic_state` ~1 h; reload syslog)
@@ -166,10 +166,10 @@ Aplicar block/allow/monitor/tag.
 ### Tarefas
 - [x] integrar aliases/tables *(nomes + comando `pfctl` gerado; tabela block default + `tag_table`; exec no loop = backlog pós-nDPI)*
 - [x] API `pfctl` no código (`layer7_pf_exec_table_add`/`delete`; loop+nDPI pendente)
-- [ ] implementar whitelist
+- [x] implementar whitelist *(exceptions host/CIDR validado 2026-03-22)*
 - [x] implementar monitor *(já no motor; sem PF)*
 - [x] registrar ação aplicada *(dry-run `pfctl_suggest` + syslog reload/stats)*
-- [ ] validar sem quebrar tráfego geral
+- [x] validar sem quebrar tráfego geral *(enforce validado 2026-03-23)*
 
 ### Saída
 Primeira ação real em campo.
@@ -218,15 +218,15 @@ Operação e troubleshooting possíveis.
 Tirar a V1 do terreno da sorte.
 
 ### Tarefas
-- [ ] testar instalação
-- [ ] testar upgrade
-- [ ] testar reboot
-- [ ] testar persistência
-- [ ] testar block
-- [ ] testar whitelist
-- [ ] testar modo monitor
-- [ ] testar falha do daemon
-- [ ] testar rollback
+- [x] testar instalação *(pkg add validado 2026-03-22)*
+- [x] testar upgrade *(v0.1.0 → v0.2.0)*
+- [x] testar reboot *(daemon sobe após reboot)*
+- [x] testar persistência *(layer7.json preservado)*
+- [x] testar block *(pfctl enforce 2026-03-23)*
+- [x] testar whitelist *(exception host 2026-03-22)*
+- [x] testar modo monitor *(safeguard validado)*
+- [x] testar falha do daemon *(degraded mode OK)*
+- [x] testar rollback *(pkg delete: config preservado 2026-03-22)*
 
 ### Saída
 Evidência de estabilidade mínima.
@@ -239,18 +239,18 @@ Evidência de estabilidade mínima.
 Publicar de forma profissional.
 
 ### Tarefas
-- [ ] testes de regressão mínimos
-- [ ] documentação de operação + runbook rollback
-- [ ] version bump
-- [ ] changelog
-- [ ] release notes
-- [ ] build `.txz`
-- [ ] checksum
-- [ ] documentação de instalação
-- [ ] notas de compatibilidade pfSense CE
+- [x] testes de regressão mínimos *(58/58 OK)*
+- [x] documentação de operação + runbook rollback
+- [x] version bump *(0.2.0)*
+- [x] changelog *(docs/changelog/CHANGELOG.md)*
+- [x] release notes
+- [x] build `.pkg` *(v0.2.0 compilado no builder)*
+- [x] checksum *(sha256)*
+- [x] documentação de instalação *(Guia Completo)*
+- [x] notas de compatibilidade pfSense CE
 
 ### Saída
-Release 0.1.0 utilizável.
+Release 0.1.0 publicada. Release 0.2.0 (motor multi-interface) pronta para teste real.
 
 ---
 

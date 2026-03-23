@@ -19,6 +19,17 @@
 #define L7_MAX_CATS_PER_POLICY 8
 #define L7_EXC_HOST_LEN 48
 #define L7_TAG_TABLE_LEN 64
+#ifndef L7_IFACE_NAME_LEN
+#define L7_IFACE_NAME_LEN 32
+#endif
+#define L7_MAX_IFACES_PER_RULE 8
+#define L7_MAX_SRC_HOSTS 16
+#define L7_MAX_SRC_CIDRS 8
+
+struct l7_cidr {
+	uint32_t net;
+	int prefix;
+};
 
 struct layer7_policy_rule {
 	char id[L7_POLICY_ID_LEN];
@@ -26,21 +37,31 @@ struct layer7_policy_rule {
 	int enabled;
 	enum layer7_action action;
 	int priority;
-	char tag_table[L7_TAG_TABLE_LEN]; /* action=tag; vazio → default layer7_tagged */
+	char tag_table[L7_TAG_TABLE_LEN];
 	int n_ndpi_apps;
 	char ndpi_apps[L7_MAX_APPS_PER_POLICY][L7_POLICY_APP_LEN];
 	int n_ndpi_cats;
 	char ndpi_cats[L7_MAX_CATS_PER_POLICY][L7_POLICY_CAT_LEN];
+	int n_ifaces;
+	char ifaces[L7_MAX_IFACES_PER_RULE][L7_IFACE_NAME_LEN];
+	int n_src_hosts;
+	char src_hosts[L7_MAX_SRC_HOSTS][L7_EXC_HOST_LEN];
+	int n_src_cidrs;
+	struct l7_cidr src_cidrs[L7_MAX_SRC_CIDRS];
 };
+
+#define L7_EXC_MAX_HOSTS 8
+#define L7_EXC_MAX_CIDRS 8
 
 struct layer7_exception {
 	char id[L7_POLICY_ID_LEN];
 	int enabled;
-	int has_host;
-	char host[L7_EXC_HOST_LEN];
-	int has_cidr;
-	uint32_t cidr_net_u32; /* a.b.c.d como (a<<24)|(b<<16)|(c<<8)|d */
-	int cidr_prefix;       /* 0–32 */
+	int n_hosts;
+	char hosts[L7_EXC_MAX_HOSTS][L7_EXC_HOST_LEN];
+	int n_cidrs;
+	struct l7_cidr cidrs[L7_EXC_MAX_CIDRS];
+	int n_ifaces;
+	char ifaces[L7_MAX_IFACES_PER_RULE][L7_IFACE_NAME_LEN];
 	int priority;
 	enum layer7_action action;
 };
@@ -71,11 +92,13 @@ void layer7_exceptions_sort(struct layer7_exception *exc, int n);
 
 /*
  * Avalia exceções (por prioridade desc.) depois políticas.
+ * iface: nome da interface onde o fluxo foi capturado (e.g. "em0"); NULL = ignora
  * src_ip: IPv4 dotted ou NULL (exceções não casam sem IP).
  */
 void layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
     const struct layer7_policy_rule *rules, int n_rules, int global_enforce,
-    const char *src_ip, const char *ndpi_app, const char *ndpi_category,
+    const char *iface, const char *src_ip,
+    const char *ndpi_app, const char *ndpi_category,
     struct layer7_decision *dec);
 
 const char *layer7_action_str(enum layer7_action a);

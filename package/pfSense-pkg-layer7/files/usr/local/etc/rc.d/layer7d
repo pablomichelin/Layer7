@@ -3,9 +3,6 @@
 # PROVIDES: layer7d
 # REQUIRE: LOGIN
 # KEYWORD: shutdown
-#
-# Usa daemon(8) para não bloquear o boot/start (evita travar consola se
-# layer7d_enable=YES).
 
 . /etc/rc.subr
 
@@ -21,6 +18,18 @@ layer7d_bin="/usr/local/sbin/layer7d"
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 status_cmd="${name}_status"
+extra_commands="reload"
+reload_cmd="${name}_reload"
+
+layer7d_ensure_pf_tables()
+{
+	for _t in layer7_block layer7_tagged; do
+		if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
+			pfctl -t "$_t" -T add 127.0.0.254 2>/dev/null
+			pfctl -t "$_t" -T delete 127.0.0.254 2>/dev/null
+		fi
+	done
+}
 
 layer7d_start()
 {
@@ -32,6 +41,7 @@ layer7d_start()
 		fi
 		/bin/rm -f "${pidfile}"
 	fi
+	layer7d_ensure_pf_tables
 	/usr/sbin/daemon -f -p "${pidfile}" "${layer7d_bin}"
 }
 
@@ -57,6 +67,20 @@ layer7d_status()
 	fi
 	echo "${name} is not running."
 	return 1
+}
+
+layer7d_reload()
+{
+	if [ -f "${pidfile}" ]; then
+		read -r _p < "${pidfile}" 2>/dev/null
+		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
+			/bin/kill -HUP "${_p}"
+			echo "${name}: reload signal sent."
+			return 0
+		fi
+	fi
+	echo "${name}: not running, starting instead."
+	layer7d_start
 }
 
 run_rc_command "$1"

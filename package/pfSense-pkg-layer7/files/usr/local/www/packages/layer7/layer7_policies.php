@@ -56,8 +56,16 @@ if ($_POST["add_policy"] ?? false) {
 			$act = "monitor";
 		}
 
-		$apps = layer7_split_csv_tokens($_POST["new_ndpi_apps"] ?? "", 12, 64);
-		$cats = layer7_split_csv_tokens($_POST["new_ndpi_category"] ?? "", 8, 64);
+		if (isset($_POST["new_ndpi_apps"]) && is_array($_POST["new_ndpi_apps"])) {
+			$apps = array_slice(array_filter(array_map('trim', $_POST["new_ndpi_apps"]), 'strlen'), 0, 12);
+		} else {
+			$apps = layer7_split_csv_tokens($_POST["new_ndpi_apps_csv"] ?? "", 12, 64);
+		}
+		if (isset($_POST["new_ndpi_category"]) && is_array($_POST["new_ndpi_category"])) {
+			$cats = array_slice(array_filter(array_map('trim', $_POST["new_ndpi_category"]), 'strlen'), 0, 8);
+		} else {
+			$cats = layer7_split_csv_tokens($_POST["new_ndpi_category_csv"] ?? "", 8, 64);
+		}
 		if ($ok && ($apps === null || $cats === null)) {
 			$input_errors[] = gettext("App ou categoria: cada valor max. 64 caracteres.");
 			$ok = false;
@@ -75,6 +83,16 @@ if ($_POST["add_policy"] ?? false) {
 			$ok = false;
 		}
 
+		$new_rule_ifaces = array();
+		if (isset($_POST["new_ifaces"]) && is_array($_POST["new_ifaces"])) {
+			foreach ($_POST["new_ifaces"] as $ifid) {
+				$real = convert_friendly_interface_to_real_interface_name($ifid);
+				$new_rule_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+			}
+		}
+		$new_src_hosts = layer7_parse_ip_textarea($_POST["new_src_hosts"] ?? "");
+		$new_src_cidrs = layer7_parse_cidr_textarea($_POST["new_src_cidrs"] ?? "");
+
 		if ($ok && $apps !== null && $cats !== null) {
 			$rule = array(
 				"id" => $pid,
@@ -84,11 +102,20 @@ if ($_POST["add_policy"] ?? false) {
 				"priority" => $pri,
 				"match" => array()
 			);
+			if (!empty($new_rule_ifaces)) {
+				$rule["interfaces"] = array_values(array_unique($new_rule_ifaces));
+			}
 			if (count($apps) > 0) {
 				$rule["match"]["ndpi_app"] = $apps;
 			}
 			if (count($cats) > 0) {
 				$rule["match"]["ndpi_category"] = $cats;
+			}
+			if (!empty($new_src_hosts)) {
+				$rule["match"]["src_hosts"] = $new_src_hosts;
+			}
+			if (!empty($new_src_cidrs)) {
+				$rule["match"]["src_cidrs"] = $new_src_cidrs;
 			}
 			if ($act === "tag") {
 				$rule["tag_table"] = $tag_table;
@@ -172,8 +199,16 @@ if ($_POST["save_policy_edit"] ?? false) {
 				$act = "monitor";
 			}
 
-			$apps = layer7_split_csv_tokens($_POST["edit_ndpi_apps"] ?? "", 12, 64);
-			$cats = layer7_split_csv_tokens($_POST["edit_ndpi_category"] ?? "", 8, 64);
+			if (isset($_POST["edit_ndpi_apps"]) && is_array($_POST["edit_ndpi_apps"])) {
+				$apps = array_slice(array_filter(array_map('trim', $_POST["edit_ndpi_apps"]), 'strlen'), 0, 12);
+			} else {
+				$apps = layer7_split_csv_tokens($_POST["edit_ndpi_apps_csv"] ?? "", 12, 64);
+			}
+			if (isset($_POST["edit_ndpi_category"]) && is_array($_POST["edit_ndpi_category"])) {
+				$cats = array_slice(array_filter(array_map('trim', $_POST["edit_ndpi_category"]), 'strlen'), 0, 8);
+			} else {
+				$cats = layer7_split_csv_tokens($_POST["edit_ndpi_category_csv"] ?? "", 8, 64);
+			}
 			if ($ok && ($apps === null || $cats === null)) {
 				$input_errors[] = gettext("App ou categoria: cada valor max. 64 caracteres.");
 				$ok = false;
@@ -191,6 +226,16 @@ if ($_POST["save_policy_edit"] ?? false) {
 				$ok = false;
 			}
 
+			$edit_rule_ifaces = array();
+			if (isset($_POST["edit_ifaces"]) && is_array($_POST["edit_ifaces"])) {
+				foreach ($_POST["edit_ifaces"] as $ifid) {
+					$real = convert_friendly_interface_to_real_interface_name($ifid);
+					$edit_rule_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+				}
+			}
+			$edit_src_hosts = layer7_parse_ip_textarea($_POST["edit_src_hosts"] ?? "");
+			$edit_src_cidrs = layer7_parse_cidr_textarea($_POST["edit_src_cidrs"] ?? "");
+
 			if ($ok && $apps !== null && $cats !== null) {
 				$rule = array(
 					"id" => $pid,
@@ -200,11 +245,20 @@ if ($_POST["save_policy_edit"] ?? false) {
 					"priority" => $pri,
 					"match" => array()
 				);
+				if (!empty($edit_rule_ifaces)) {
+					$rule["interfaces"] = array_values(array_unique($edit_rule_ifaces));
+				}
 				if (count($apps) > 0) {
 					$rule["match"]["ndpi_app"] = $apps;
 				}
 				if (count($cats) > 0) {
 					$rule["match"]["ndpi_category"] = $cats;
+				}
+				if (!empty($edit_src_hosts)) {
+					$rule["match"]["src_hosts"] = $edit_src_hosts;
+				}
+				if (!empty($edit_src_cidrs)) {
+					$rule["match"]["src_cidrs"] = $edit_src_cidrs;
 				}
 				if ($act === "tag") {
 					$rule["tag_table"] = $tag_table;
@@ -239,6 +293,12 @@ if ($layer7_policy_edit_retry !== null && $layer7_policy_edit_retry >= 0 &&
 		$edit_policy = $policies[$edit_candidate];
 	}
 }
+
+$ndpi_list = layer7_ndpi_list();
+$ndpi_protos = isset($ndpi_list["protocols"]) ? $ndpi_list["protocols"] : array();
+$ndpi_cats = isset($ndpi_list["categories"]) ? $ndpi_list["categories"] : array();
+sort($ndpi_protos);
+sort($ndpi_cats);
 
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Policies"));
 include("head.inc");
@@ -282,11 +342,20 @@ layer7_render_styles();
 							$priority = isset($policy["priority"]) ? (int)$policy["priority"] : 0;
 							$enabled = !empty($policy["enabled"]);
 							$matches = array();
+							if (!empty($policy["interfaces"]) && is_array($policy["interfaces"])) {
+								$matches[] = gettext("Ifaces") . ": " . implode(", ", $policy["interfaces"]);
+							}
 							if (!empty($policy["match"]["ndpi_app"]) && is_array($policy["match"]["ndpi_app"])) {
 								$matches[] = gettext("Apps") . ": " . implode(", ", $policy["match"]["ndpi_app"]);
 							}
 							if (!empty($policy["match"]["ndpi_category"]) && is_array($policy["match"]["ndpi_category"])) {
 								$matches[] = gettext("Categorias") . ": " . implode(", ", $policy["match"]["ndpi_category"]);
+							}
+							if (!empty($policy["match"]["src_hosts"]) && is_array($policy["match"]["src_hosts"])) {
+								$matches[] = gettext("IPs") . ": " . implode(", ", $policy["match"]["src_hosts"]);
+							}
+							if (!empty($policy["match"]["src_cidrs"]) && is_array($policy["match"]["src_cidrs"])) {
+								$matches[] = gettext("CIDRs") . ": " . implode(", ", $policy["match"]["src_cidrs"]);
 							}
 							if ($action === "tag" && !empty($policy["tag_table"])) {
 								$matches[] = gettext("Tabela PF") . ": " . $policy["tag_table"];
@@ -396,19 +465,97 @@ layer7_render_styles();
 					</div>
 				</div>
 
+				<?php
+				$edit_policy_ifaces = array();
+				if (isset($edit_policy["interfaces"]) && is_array($edit_policy["interfaces"])) {
+					$edit_policy_ifaces = $edit_policy["interfaces"];
+				}
+				$edit_src_hosts_val = "";
+				if (isset($edit_policy["match"]["src_hosts"]) && is_array($edit_policy["match"]["src_hosts"])) {
+					$edit_src_hosts_val = implode("\n", $edit_policy["match"]["src_hosts"]);
+				}
+				$edit_src_cidrs_val = "";
+				if (isset($edit_policy["match"]["src_cidrs"]) && is_array($edit_policy["match"]["src_cidrs"])) {
+					$edit_src_cidrs_val = implode("\n", $edit_policy["match"]["src_cidrs"]);
+				}
+				$ep_ifaces = layer7_get_pfsense_interfaces();
+				?>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
 					<div class="col-sm-9">
-						<input type="text" name="edit_ndpi_apps" class="form-control" value="<?= htmlspecialchars($edit_apps); ?>" />
-						<p class="help-block"><?= gettext("Lista separada por virgulas (max. 12). Em branco = qualquer app, desde que haja outra condicao valida."); ?></p>
+						<?php foreach ($ep_ifaces as $ifc) {
+							$chk = in_array($ifc["real"], $edit_policy_ifaces, true) ? 'checked="checked"' : '';
+						?>
+						<label class="checkbox-inline">
+							<input type="checkbox" name="edit_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" <?= $chk; ?> />
+							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+						</label>
+						<?php } ?>
+						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Categorias"); ?></label>
+					<label class="col-sm-3 control-label"><?= gettext("IPs de origem"); ?></label>
 					<div class="col-sm-9">
-						<input type="text" name="edit_ndpi_category" class="form-control" value="<?= htmlspecialchars($edit_categories); ?>" />
-						<p class="help-block"><?= gettext("Lista separada por virgulas (max. 8)."); ?></p>
+						<textarea name="edit_src_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_src_hosts_val); ?></textarea>
+						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("CIDRs de origem"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="edit_src_cidrs" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_src_cidrs_val); ?></textarea>
+						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
+					<div class="col-sm-9">
+						<?php
+						$edit_apps_arr = array();
+						if (isset($edit_policy["match"]["ndpi_app"]) && is_array($edit_policy["match"]["ndpi_app"])) {
+							$edit_apps_arr = $edit_policy["match"]["ndpi_app"];
+						}
+						if (!empty($ndpi_protos)) { ?>
+						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'edit_apps_list')" style="max-width:400px" />
+						<div class="l7-multiselect-wrap" id="edit_apps_list" style="max-width:400px">
+						<?php foreach ($ndpi_protos as $proto) {
+							$chk = in_array($proto, $edit_apps_arr, true) ? 'checked="checked"' : '';
+						?>
+							<label><input type="checkbox" name="edit_ndpi_apps[]" value="<?= htmlspecialchars($proto); ?>" <?= $chk; ?> /> <?= htmlspecialchars($proto); ?></label>
+						<?php } ?>
+						</div>
+						<?php } else { ?>
+						<input type="text" name="edit_ndpi_apps_csv" class="form-control" value="<?= htmlspecialchars($edit_apps); ?>" />
+						<?php } ?>
+						<p class="help-block"><?= gettext("Selecione ate 12 aplicacoes."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Categorias nDPI"); ?></label>
+					<div class="col-sm-9">
+						<?php
+						$edit_cats_arr = array();
+						if (isset($edit_policy["match"]["ndpi_category"]) && is_array($edit_policy["match"]["ndpi_category"])) {
+							$edit_cats_arr = $edit_policy["match"]["ndpi_category"];
+						}
+						if (!empty($ndpi_cats)) { ?>
+						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'edit_cats_list')" style="max-width:400px" />
+						<div class="l7-multiselect-wrap" id="edit_cats_list" style="max-width:400px">
+						<?php foreach ($ndpi_cats as $cat) {
+							$chk = in_array($cat, $edit_cats_arr, true) ? 'checked="checked"' : '';
+						?>
+							<label><input type="checkbox" name="edit_ndpi_category[]" value="<?= htmlspecialchars($cat); ?>" <?= $chk; ?> /> <?= htmlspecialchars($cat); ?></label>
+						<?php } ?>
+						</div>
+						<?php } else { ?>
+						<input type="text" name="edit_ndpi_category_csv" class="form-control" value="<?= htmlspecialchars($edit_categories); ?>" />
+						<?php } ?>
+						<p class="help-block"><?= gettext("Selecione ate 8 categorias."); ?></p>
 					</div>
 				</div>
 
@@ -482,19 +629,67 @@ layer7_render_styles();
 					</div>
 				</div>
 
+				<?php $pf_ifaces = layer7_get_pfsense_interfaces(); ?>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
 					<div class="col-sm-9">
-						<input type="text" name="new_ndpi_apps" class="form-control" placeholder="HTTP, BitTorrent" />
-						<p class="help-block"><?= gettext("Separadas por virgula (max. 12). Em branco = qualquer app se nao houver categoria."); ?></p>
+						<?php foreach ($pf_ifaces as $ifc) { ?>
+						<label class="checkbox-inline">
+							<input type="checkbox" name="new_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
+							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+						</label>
+						<?php } ?>
+						<p class="help-block"><?= gettext("Nenhuma selecionada = aplica a todas as interfaces."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Categorias"); ?></label>
+					<label class="col-sm-3 control-label"><?= gettext("IPs de origem"); ?></label>
 					<div class="col-sm-9">
-						<input type="text" name="new_ndpi_category" class="form-control" placeholder="Web" />
-						<p class="help-block"><?= gettext("Separadas por virgula (max. 8)."); ?></p>
+						<textarea name="new_src_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="192.168.1.50&#10;192.168.1.51"></textarea>
+						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("CIDRs de origem"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="new_src_cidrs" class="form-control" rows="2" style="max-width:400px" placeholder="192.168.10.0/24"></textarea>
+						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
+					<div class="col-sm-9">
+						<?php if (!empty($ndpi_protos)) { ?>
+						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'new_apps_list')" style="max-width:400px" />
+						<div class="l7-multiselect-wrap" id="new_apps_list" style="max-width:400px">
+						<?php foreach ($ndpi_protos as $proto) { ?>
+							<label><input type="checkbox" name="new_ndpi_apps[]" value="<?= htmlspecialchars($proto); ?>" /> <?= htmlspecialchars($proto); ?></label>
+						<?php } ?>
+						</div>
+						<?php } else { ?>
+						<input type="text" name="new_ndpi_apps_csv" class="form-control" placeholder="HTTP, BitTorrent" />
+						<?php } ?>
+						<p class="help-block"><?= gettext("Selecione ate 12 aplicacoes. Em branco = qualquer app."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Categorias nDPI"); ?></label>
+					<div class="col-sm-9">
+						<?php if (!empty($ndpi_cats)) { ?>
+						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'new_cats_list')" style="max-width:400px" />
+						<div class="l7-multiselect-wrap" id="new_cats_list" style="max-width:400px">
+						<?php foreach ($ndpi_cats as $cat) { ?>
+							<label><input type="checkbox" name="new_ndpi_category[]" value="<?= htmlspecialchars($cat); ?>" /> <?= htmlspecialchars($cat); ?></label>
+						<?php } ?>
+						</div>
+						<?php } else { ?>
+						<input type="text" name="new_ndpi_category_csv" class="form-control" placeholder="Web" />
+						<?php } ?>
+						<p class="help-block"><?= gettext("Selecione ate 8 categorias."); ?></p>
 					</div>
 				</div>
 
@@ -530,4 +725,16 @@ layer7_render_styles();
 		</div>
 	</div>
 </div>
+<script>
+function l7filter(input, listId) {
+	var filter = input.value.toLowerCase();
+	var wrap = document.getElementById(listId);
+	if (!wrap) return;
+	var labels = wrap.getElementsByTagName('label');
+	for (var i = 0; i < labels.length; i++) {
+		var txt = labels[i].textContent.toLowerCase();
+		labels[i].style.display = txt.indexOf(filter) >= 0 ? '' : 'none';
+	}
+}
+</script>
 <?php require_once("foot.inc"); ?>

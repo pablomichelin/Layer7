@@ -59,6 +59,7 @@ struct layer7_capture {
 	struct ndpi_detection_module_struct  *ndpi;
 	struct l7c_flow                      flows[L7C_MAX_FLOWS];
 	layer7_flow_cb                       cb;
+	char                                 ifname[32];
 	unsigned long long                   stat_pkts;
 	unsigned long long                   stat_flows_classified;
 	unsigned long long                   stat_flows_expired;
@@ -227,6 +228,7 @@ layer7_capture_open(const char *ifname, int snaplen, layer7_flow_cb cb,
 	}
 
 	cap->cb = cb;
+	snprintf(cap->ifname, sizeof(cap->ifname), "%s", ifname);
 	cap->last_expire = time(NULL);
 	return cap;
 }
@@ -334,7 +336,7 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		inet_ntop(AF_INET, &addr, src_ip_str, sizeof(src_ip_str));
 
 		cap->stat_flows_classified++;
-		cap->cb(src_ip_str,
+		cap->cb(cap->ifname, src_ip_str,
 		    app_name ? app_name : "Unknown",
 		    cat_name ? cat_name : "Unspecified");
 	}

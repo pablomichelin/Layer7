@@ -274,6 +274,49 @@ parse_string_array_in_object(const char *ob, const char *oe_end,
 }
 
 static int
+parse_cidr_str(const char *s, struct l7_cidr *out)
+{
+	unsigned a, b, c, d;
+	int pref;
+	char buf[48];
+	char *slash;
+
+	snprintf(buf, sizeof(buf), "%s", s);
+	slash = strchr(buf, '/');
+	if (!slash)
+		return -1;
+	*slash = '\0';
+	pref = atoi(slash + 1);
+	if (pref < 0 || pref > 32)
+		return -1;
+	if (sscanf(buf, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+		return -1;
+	if (a > 255 || b > 255 || c > 255 || d > 255)
+		return -1;
+	out->net = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+	out->prefix = pref;
+	return 0;
+}
+
+static int
+parse_cidr_array_in_object(const char *ob, const char *oe,
+    const char *key, struct l7_cidr *out, int max, int *n_out)
+{
+	char tmp[L7_MAX_SRC_CIDRS][L7_EXC_HOST_LEN];
+	int n = 0, i;
+
+	if (parse_string_array_in_object(ob, oe, key,
+	    (char *)tmp, max, L7_EXC_HOST_LEN, &n) != 0)
+		return -1;
+	*n_out = 0;
+	for (i = 0; i < n && *n_out < max; i++) {
+		if (parse_cidr_str(tmp[i], &out[*n_out]) == 0)
+			(*n_out)++;
+	}
+	return 0;
+}
+
+static int
 parse_match_subobject(const char *obj, const char *obj_end,
     struct layer7_policy_rule *r)
 {
@@ -295,6 +338,13 @@ parse_match_subobject(const char *obj, const char *obj_end,
 	if (parse_string_array_in_object(ob, oe + 1, "ndpi_category",
 		(char *)r->ndpi_cats, L7_MAX_CATS_PER_POLICY,
 		L7_POLICY_CAT_LEN, &r->n_ndpi_cats) != 0)
+		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "src_hosts",
+		(char *)r->src_hosts, L7_MAX_SRC_HOSTS,
+		L7_EXC_HOST_LEN, &r->n_src_hosts) != 0)
+		return -1;
+	if (parse_cidr_array_in_object(ob, oe + 1, "src_cidrs",
+		r->src_cidrs, L7_MAX_SRC_CIDRS, &r->n_src_cidrs) != 0)
 		return -1;
 	return 0;
 }
@@ -324,6 +374,9 @@ parse_one_policy(const char *ob, const char *oe,
 		r->tag_table[0] = '\0';
 	else if (!layer7_pf_table_name_ok(r->tag_table))
 		r->tag_table[0] = '\0';
+	(void)parse_string_array_in_object(ob, oe, "interfaces",
+	    (char *)r->ifaces, L7_MAX_IFACES_PER_RULE,
+	    L7_IFACE_NAME_LEN, &r->n_ifaces);
 	if (key_in_object(ob, oe, "match")) {
 		if (parse_match_subobject(ob, oe, r) != 0)
 			return -1;
@@ -399,7 +452,8 @@ parse_one_exception(const char *ob, const char *oe,
     struct layer7_exception *e)
 {
 	char act[16];
-	char cidr_buf[L7_EXC_HOST_LEN];
+	char single_host[L7_EXC_HOST_LEN];
+	char single_cidr[L7_EXC_HOST_LEN];
 
 	memset(e, 0, sizeof(*e));
 	e->enabled = 1;
@@ -414,33 +468,37 @@ parse_one_exception(const char *ob, const char *oe,
 	if (extract_int_after_key(ob, oe, "priority", &e->priority) != 0)
 		e->priority = 0;
 
-	if (extract_quoted_after_key(ob, oe, "host", e->host,
-		sizeof(e->host)) == 0) {
-		e->has_host = 1;
-	}
-	if (extract_quoted_after_key(ob, oe, "cidr", cidr_buf,
-		sizeof(cidr_buf)) == 0) {
-		unsigned a, b, c, d;
-		int pref;
-		char *slash;
+	/* multi-host: "hosts": ["ip1","ip2",...] */
+	(void)parse_string_array_in_object(ob, oe, "hosts",
+	    (char *)e->hosts, L7_EXC_MAX_HOSTS,
+	    L7_EXC_HOST_LEN, &e->n_hosts);
 
-		slash = strchr(cidr_buf, '/');
-		if (!slash)
-			return -1;
-		*slash = '\0';
-		pref = atoi(slash + 1);
-		if (pref < 0 || pref > 32)
-			return -1;
-		if (sscanf(cidr_buf, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
-			return -1;
-		if (a > 255 || b > 255 || c > 255 || d > 255)
-			return -1;
-		e->cidr_net_u32 =
-		    (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
-		e->cidr_prefix = pref;
-		e->has_cidr = 1;
+	/* backward compat: single "host" field */
+	if (e->n_hosts == 0 &&
+	    extract_quoted_after_key(ob, oe, "host", single_host,
+	    sizeof(single_host)) == 0 && single_host[0]) {
+		snprintf(e->hosts[0], L7_EXC_HOST_LEN, "%s", single_host);
+		e->n_hosts = 1;
 	}
-	if (!e->has_host && !e->has_cidr)
+
+	/* multi-cidr: "cidrs": ["a.b.c.d/n",...] */
+	(void)parse_cidr_array_in_object(ob, oe, "cidrs",
+	    e->cidrs, L7_EXC_MAX_CIDRS, &e->n_cidrs);
+
+	/* backward compat: single "cidr" field */
+	if (e->n_cidrs == 0 &&
+	    extract_quoted_after_key(ob, oe, "cidr", single_cidr,
+	    sizeof(single_cidr)) == 0 && single_cidr[0]) {
+		if (parse_cidr_str(single_cidr, &e->cidrs[0]) == 0)
+			e->n_cidrs = 1;
+	}
+
+	/* interfaces */
+	(void)parse_string_array_in_object(ob, oe, "interfaces",
+	    (char *)e->ifaces, L7_MAX_IFACES_PER_RULE,
+	    L7_IFACE_NAME_LEN, &e->n_ifaces);
+
+	if (e->n_hosts == 0 && e->n_cidrs == 0)
 		return -1;
 	return 0;
 }
@@ -547,26 +605,80 @@ cidr_u32_match(uint32_t ip, uint32_t net, int prefix)
 }
 
 static int
-exception_matches_src(const struct layer7_exception *e, const char *src_ip)
+iface_list_matches(const char ifaces[][L7_IFACE_NAME_LEN], int n,
+    const char *iface)
 {
-	uint32_t ip;
-
-	if (!src_ip || !*src_ip)
+	int i;
+	if (n == 0)
+		return 1;
+	if (!iface || !*iface)
 		return 0;
-	if (e->has_host && strcmp(src_ip, e->host) == 0)
-		return 1;
-	if (e->has_cidr && ipv4_parse(src_ip, &ip) == 0 &&
-	    cidr_u32_match(ip, e->cidr_net_u32, e->cidr_prefix))
-		return 1;
+	for (i = 0; i < n; i++) {
+		if (strcmp(ifaces[i], iface) == 0)
+			return 1;
+	}
 	return 0;
 }
 
 static int
-rule_matches(const struct layer7_policy_rule *r, const char *ndpi_app,
-    const char *ndpi_cat)
+exception_matches_src(const struct layer7_exception *e, const char *src_ip,
+    const char *iface)
+{
+	uint32_t ip;
+	int i;
+
+	if (!iface_list_matches(e->ifaces, e->n_ifaces, iface))
+		return 0;
+	if (!src_ip || !*src_ip)
+		return 0;
+	for (i = 0; i < e->n_hosts; i++) {
+		if (strcmp(src_ip, e->hosts[i]) == 0)
+			return 1;
+	}
+	if (e->n_cidrs > 0 && ipv4_parse(src_ip, &ip) == 0) {
+		for (i = 0; i < e->n_cidrs; i++) {
+			if (cidr_u32_match(ip, e->cidrs[i].net,
+			    e->cidrs[i].prefix))
+				return 1;
+		}
+	}
+	return 0;
+}
+
+static int
+src_matches_rule(const struct layer7_policy_rule *r, const char *src_ip)
+{
+	int i;
+	uint32_t ip;
+
+	if (r->n_src_hosts == 0 && r->n_src_cidrs == 0)
+		return 1;
+	if (!src_ip || !*src_ip)
+		return 0;
+	for (i = 0; i < r->n_src_hosts; i++) {
+		if (strcmp(src_ip, r->src_hosts[i]) == 0)
+			return 1;
+	}
+	if (r->n_src_cidrs > 0 && ipv4_parse(src_ip, &ip) == 0) {
+		for (i = 0; i < r->n_src_cidrs; i++) {
+			if (cidr_u32_match(ip, r->src_cidrs[i].net,
+			    r->src_cidrs[i].prefix))
+				return 1;
+		}
+	}
+	return 0;
+}
+
+static int
+rule_matches(const struct layer7_policy_rule *r, const char *iface,
+    const char *src_ip, const char *ndpi_app, const char *ndpi_cat)
 {
 	int i;
 
+	if (!iface_list_matches(r->ifaces, r->n_ifaces, iface))
+		return 0;
+	if (!src_matches_rule(r, src_ip))
+		return 0;
 	if (r->n_ndpi_apps > 0) {
 		if (!ndpi_app)
 			return 0;
@@ -651,7 +763,8 @@ fill_enforce_action(enum layer7_action act, int global_enforce,
 void
 layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
     const struct layer7_policy_rule *rules, int n_rules, int global_enforce,
-    const char *src_ip, const char *ndpi_app, const char *ndpi_category,
+    const char *iface, const char *src_ip,
+    const char *ndpi_app, const char *ndpi_category,
     struct layer7_decision *dec)
 {
 	int i;
@@ -664,7 +777,7 @@ layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 	for (i = 0; i < n_exc; i++) {
 		if (!exc[i].enabled)
 			continue;
-		if (!exception_matches_src(&exc[i], src_ip))
+		if (!exception_matches_src(&exc[i], src_ip, iface))
 			continue;
 		dec->action = exc[i].action;
 		dec->reason = L7_DECIDE_EXCEPTION;
@@ -681,7 +794,7 @@ layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 
 		if (!r->enabled)
 			continue;
-		if (!rule_matches(r, ndpi_app, ndpi_category))
+		if (!rule_matches(r, iface, src_ip, ndpi_app, ndpi_category))
 			continue;
 		dec->action = r->action;
 		dec->reason = L7_DECIDE_POLICY_MATCH;

@@ -141,8 +141,18 @@ update_host() {
         return 1
     fi
 
-    echo "[$host] Iniciando daemon..." | tee -a "$log"
-    ssh $SSH_OPTS "${SSH_USER}@${host}" "service layer7d onestart" >> "$log" 2>&1
+    echo "[$host] Verificando tabelas PF..." | tee -a "$log"
+    ssh $SSH_OPTS "${SSH_USER}@${host}" '
+        for t in layer7_block layer7_tagged; do
+            if ! pfctl -s Tables 2>/dev/null | grep -qw "$t"; then
+                pfctl -t "$t" -T add 127.0.0.254 2>/dev/null
+                pfctl -t "$t" -T delete 127.0.0.254 2>/dev/null
+            fi
+        done
+    ' >> "$log" 2>&1
+
+    echo "[$host] Habilitando e iniciando daemon..." | tee -a "$log"
+    ssh $SSH_OPTS "${SSH_USER}@${host}" "sysrc layer7d_enable=YES >/dev/null 2>&1; service layer7d onestart" >> "$log" 2>&1
 
     sleep 2
 

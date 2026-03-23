@@ -237,6 +237,88 @@ function layer7_syslog_remote_host_valid($s)
 	return preg_match('/^[a-zA-Z0-9]([a-zA-Z0-9.-]{0,253}[a-zA-Z0-9])?$/', $s) === 1;
 }
 
+/**
+ * Load nDPI protocol and category lists from layer7d --list-protos.
+ * Caches result in /tmp for 1 hour.
+ * @return array("protocols" => [...], "categories" => [...]) or empty arrays
+ */
+function layer7_ndpi_list()
+{
+	$cache = "/tmp/layer7-ndpi-protos.json";
+	$bin = "/usr/local/sbin/layer7d";
+	if (file_exists($cache) && (time() - filemtime($cache)) < 3600) {
+		$j = json_decode(file_get_contents($cache), true);
+		if (is_array($j) && isset($j["protocols"])) {
+			return $j;
+		}
+	}
+	if (!is_executable($bin)) {
+		return array("protocols" => array(), "categories" => array());
+	}
+	$out = array();
+	exec(escapeshellarg($bin) . " --list-protos 2>/dev/null", $out, $rc);
+	if ($rc !== 0 || empty($out[0])) {
+		return array("protocols" => array(), "categories" => array());
+	}
+	$j = json_decode($out[0], true);
+	if (!is_array($j) || !isset($j["protocols"])) {
+		return array("protocols" => array(), "categories" => array());
+	}
+	@file_put_contents($cache, $out[0]);
+	return $j;
+}
+
+/**
+ * Get pfSense configured interfaces as array of [ifid, descr, real].
+ */
+function layer7_get_pfsense_interfaces()
+{
+	$result = array();
+	foreach (get_configured_interface_list(true) as $ifid => $ifdescr) {
+		$real = get_real_interface($ifid);
+		if ($real) {
+			$result[] = array("ifid" => $ifid, "descr" => $ifdescr, "real" => $real);
+		}
+	}
+	return $result;
+}
+
+/**
+ * Parse textarea with one IPv4 per line. Returns array of valid IPs (max 16).
+ */
+function layer7_parse_ip_textarea($text)
+{
+	$out = array();
+	$lines = preg_split('/[\r\n]+/', trim((string)$text));
+	foreach ($lines as $line) {
+		$line = trim($line);
+		if ($line === "" || $line[0] === '#')
+			continue;
+		if (layer7_ipv4_valid($line) && count($out) < 16) {
+			$out[] = $line;
+		}
+	}
+	return array_values(array_unique($out));
+}
+
+/**
+ * Parse textarea with one CIDR per line. Returns array of valid CIDRs (max 8).
+ */
+function layer7_parse_cidr_textarea($text)
+{
+	$out = array();
+	$lines = preg_split('/[\r\n]+/', trim((string)$text));
+	foreach ($lines as $line) {
+		$line = trim($line);
+		if ($line === "" || $line[0] === '#')
+			continue;
+		if (layer7_cidr_valid($line) && count($out) < 8) {
+			$out[] = $line;
+		}
+	}
+	return array_values(array_unique($out));
+}
+
 function layer7_nav_items()
 {
 	return array(
@@ -287,6 +369,11 @@ function layer7_render_styles()
 	.layer7-page .layer7-callout { background: #fbfbfb; border: 1px solid #e5e5e5; border-radius: 3px; padding: 16px 18px; }
 	.layer7-page .layer7-callout + .layer7-callout { margin-top: 14px; }
 	.layer7-page .table-responsive { margin-bottom: 0; }
+	.layer7-page .l7-multiselect-wrap { border: 1px solid #ccc; border-radius: 3px; max-height: 220px; overflow-y: auto; padding: 4px 6px; background: #fff; }
+	.layer7-page .l7-multiselect-wrap label { display: block; font-weight: normal; margin: 1px 0; padding: 2px 4px; cursor: pointer; }
+	.layer7-page .l7-multiselect-wrap label:hover { background: #f0f5ff; }
+	.layer7-page .l7-multiselect-wrap input[type=checkbox] { margin-right: 6px; }
+	.layer7-page .l7-filter { margin-bottom: 6px; }
 	</style>';
 }
 

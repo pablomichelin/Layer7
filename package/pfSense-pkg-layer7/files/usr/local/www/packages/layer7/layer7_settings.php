@@ -32,9 +32,17 @@ if ($_POST["save"] ?? false) {
 		$input_errors[] = gettext("Host syslog: use IPv4 ou hostname valido.");
 	}
 
-	$iflist = layer7_parse_interfaces_csv($_POST["interfaces_csv"] ?? "", 8);
-	if ($iflist === null) {
-		$input_errors[] = gettext("Interfaces: ate 8 nomes separados por virgula; apenas letras, numeros, _ e .");
+	$selected_ifaces = array();
+	if (isset($_POST["iface_sel"]) && is_array($_POST["iface_sel"])) {
+		foreach ($_POST["iface_sel"] as $ifid) {
+			if (is_string($ifid) && preg_match('/^[a-zA-Z0-9_.]+$/', $ifid)) {
+				$real = convert_friendly_interface_to_real_interface_name($ifid);
+				$selected_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+			}
+		}
+	}
+	if (count($selected_ifaces) > 8) {
+		$input_errors[] = gettext("Maximo de 8 interfaces.");
 	}
 
 	if (empty($input_errors)) {
@@ -53,16 +61,7 @@ if ($_POST["save"] ?? false) {
 			$dbgm = 720;
 		}
 		$data["layer7"]["debug_minutes"] = $dbgm;
-		$real_ifaces = array();
-		foreach ($iflist as $ifn) {
-			$real = convert_friendly_interface_to_real_interface_name($ifn);
-			if ($real && $real !== $ifn) {
-				$real_ifaces[] = $real;
-			} else {
-				$real_ifaces[] = $ifn;
-			}
-		}
-		$data["layer7"]["interfaces"] = $real_ifaces;
+		$data["layer7"]["interfaces"] = array_values(array_unique($selected_ifaces));
 
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
@@ -87,26 +86,27 @@ if ($dbgm < 0 || $dbgm > 720) {
 	$dbgm = 0;
 }
 
-$ifarr = array();
+$configured_real = array();
 if (isset($L["interfaces"]) && is_array($L["interfaces"])) {
-	$friendly_map = array();
-	foreach (get_configured_interface_list(true) as $ifid => $ifdescr) {
-		$real = get_real_interface($ifid);
-		if ($real) {
-			$friendly_map[$real] = $ifid;
-		}
-	}
 	foreach ($L["interfaces"] as $x) {
-		if (is_string($x) && strlen($x) <= 32 && preg_match('/^[a-zA-Z0-9_.]+$/', $x)) {
-			if (isset($friendly_map[$x])) {
-				$ifarr[] = $friendly_map[$x];
-			} else {
-				$ifarr[] = $x;
-			}
+		if (is_string($x) && strlen($x) <= 32) {
+			$configured_real[] = $x;
 		}
 	}
 }
-$interfaces_csv = implode(", ", $ifarr);
+
+$pfsense_ifaces = array();
+foreach (get_configured_interface_list(true) as $ifid => $ifdescr) {
+	$real = get_real_interface($ifid);
+	if ($real) {
+		$pfsense_ifaces[] = array(
+			"ifid" => $ifid,
+			"descr" => $ifdescr,
+			"real" => $real,
+			"checked" => in_array($real, $configured_real, true)
+		);
+	}
+}
 
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Settings"));
 include("head.inc");
@@ -194,11 +194,23 @@ layer7_render_styles();
 			</div>
 
 			<div class="form-group">
-				<label class="col-sm-3 control-label"><?= gettext("Interfaces reservadas"); ?></label>
+				<label class="col-sm-3 control-label"><?= gettext("Interfaces de captura"); ?></label>
 				<div class="col-sm-9">
-					<input type="text" name="interfaces_csv" class="form-control" style="max-width: 520px;" maxlength="320"
-						value="<?= htmlspecialchars($interfaces_csv); ?>" placeholder="lan, opt1" />
-					<p class="help-block"><?= gettext("Ate 8 nomes de interface pfSense (ex: lan, opt1). O nome e convertido automaticamente para o device real (em0, igb1, etc.) ao gravar."); ?></p>
+					<?php if (empty($pfsense_ifaces)) { ?>
+						<p class="form-control-static text-muted"><?= gettext("Nenhuma interface configurada no pfSense."); ?></p>
+					<?php } else { ?>
+					<?php foreach ($pfsense_ifaces as $ifc) { ?>
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" name="iface_sel[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>"
+								<?= $ifc["checked"] ? 'checked="checked"' : ''; ?> />
+							<strong><?= htmlspecialchars(strtoupper($ifc["descr"])); ?></strong>
+							<span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+						</label>
+					</div>
+					<?php } ?>
+					<?php } ?>
+					<p class="help-block"><?= gettext("Selecione as interfaces onde o Layer7 ira capturar e classificar trafego via nDPI. Maximo 8."); ?></p>
 				</div>
 			</div>
 

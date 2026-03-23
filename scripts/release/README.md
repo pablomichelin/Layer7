@@ -1,148 +1,185 @@
-# Release — Deploy lab via GitHub Releases
+# Release — Instalação e Gestão de Frota
 
-Scripts para publicar o pacote Layer7 como artefato em **GitHub Releases** e instalar no pfSense de lab com um único comando.
+## Instalação em 1 pfSense (um comando)
 
-**Objetivo:** distribuição de artefato `.txz` para lab/teste. **Não** substitui o Package Manager oficial do pfSense. **Não** usa repositório pkg alternativo.
-
----
-
-## Pré-requisitos
-
-### Builder (FreeBSD)
-
-- FreeBSD com toolchain (`cc`, `make`)
-- **git**
-- **gh** (GitHub CLI) — [instalação](https://cli.github.com/manual/installation)
-- **sha256** (comando nativo FreeBSD)
-- **find**, **awk**
-
-### Autenticação GitHub CLI
+No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:
 
 ```sh
-gh auth login
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
 ```
 
-Para CI/automação: `gh auth status` deve indicar autenticado. Token com scope `repo` para criar releases.
+O script faz **tudo automaticamente**:
+1. Baixa o `.pkg` do GitHub Releases
+2. Instala o pacote
+3. Cria tabelas PF (`layer7_block`, `layer7_tagged`)
+4. Habilita o serviço (`sysrc layer7d_enable=YES`)
+5. Inicia o daemon em modo **monitor** (seguro, não bloqueia nada)
+6. Mostra instruções para configuração via GUI
 
-### Repositório público para lab
+**Não precisa editar nada.** Funciona em qualquer pfSense CE.
 
-O fluxo funciona com repositório público. O `install-lab.sh` baixa o `.txz` e `.sha256` via URLs públicas do GitHub Releases. Não é necessário configurar repositório pkg no pfSense.
-
----
-
-## Como rodar deployz.sh
-
-**No builder FreeBSD**, a partir da raiz do clone:
+### Versão específica
 
 ```sh
-sh scripts/release/deployz.sh \
-  --repo-owner pablomichelin \
-  --repo-name pfsense-layer7 \
-  --version 0.0.31
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh --version 0.2.0
 ```
 
-### Parâmetros
-
-| Parâmetro     | Obrigatório | Descrição                                      |
-|---------------|-------------|------------------------------------------------|
-| `--repo-owner`| Sim         | Dono do repositório (ex: `pablomichelin`)      |
-| `--repo-name` | Sim         | Nome do repo (ex: `pfsense-layer7`)             |
-| `--version`   | Sim         | Versão (ex: `0.0.31`); tag será `v0.0.31`      |
-| `--port-dir`  | Não         | Default: `package/pfSense-pkg-layer7`          |
-| `--skip-tag`  | Não         | Não criar tag git                              |
-| `--skip-push` | Não         | Não fazer `git push` nem `git push --tags`     |
-
-### Exemplo com opções
+### Reinstalar
 
 ```sh
-# Só build + release, sem push (tag já existe)
-sh scripts/release/deployz.sh \
-  --repo-owner pablomichelin \
-  --repo-name pfsense-layer7 \
-  --version 0.0.31 \
-  --skip-push
+sh /tmp/install.sh --force
 ```
 
-### Validações do script
-
-- Working tree limpo (commit ou stash antes)
-- Execução em FreeBSD
-- Dependências presentes
-- Template `install-lab.sh.template` existe
-
----
-
-## Instalação no pfSense (comando único)
-
-Em **Diagnostics > Command Prompt** do pfSense:
-
-```sh
-fetch -o /tmp/install-lab.sh https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.0.31/install-lab.sh && sh /tmp/install-lab.sh
-```
-
-Substituir `pablomichelin`, `pfsense-layer7` e `v0.0.31` conforme o release.
-
-O script baixa o `.txz`, valida checksum (se disponível), instala com `pkg add -f` e mostra os próximos passos.
-
----
-
-## Limitações
-
-- **Build real** do pacote deve ocorrer em **builder FreeBSD** ou runner self-hosted. GitHub Actions não oferece host FreeBSD nativo; automação no GitHub exige runner FreeBSD próprio.
-- Não é repositório pkg oficial do pfSense — artefato para lab/teste apenas.
-- Instalação manual: um comando, mas executado pelo operador.
-
----
-
-## Rollback
-
-No pfSense:
+### Rollback
 
 ```sh
 pkg delete pfSense-pkg-layer7
 ```
 
-Para instalar versão anterior, usar o `install-lab.sh` do release desejado (ex: `v0.0.30`).
+---
+
+## Instalação em 52+ firewalls (frota)
+
+### Método 1: Script de frota (`fleet-update.sh`)
+
+Instala/actualiza **N firewalls em paralelo** via SSH. Um único comando.
+
+#### Pré-requisitos (uma única vez)
+
+1. **SSH keys**: configurar acesso SSH sem senha do builder (ou qualquer máquina Linux/FreeBSD) para todos os firewalls:
+
+```sh
+# Para cada firewall:
+ssh-copy-id root@192.168.1.1
+ssh-copy-id root@10.0.1.1
+ssh-copy-id root@10.0.2.1
+# ... etc
+```
+
+2. **Inventário**: criar ficheiro com IPs dos firewalls:
+
+```sh
+cat > firewalls.txt << 'EOF'
+192.168.1.1    # Matriz
+192.168.2.1    # Filial SP
+10.0.1.1       # Filial RJ
+10.0.2.1       # Filial MG
+10.0.3.1       # Filial RS
+# ... até 52 firewalls
+EOF
+```
+
+#### Instalar/actualizar todos
+
+```sh
+# Compilar o pacote no builder (1x):
+cd /root/pfsense-layer7
+make -C package/pfSense-pkg-layer7 package
+
+# Distribuir para todos (4 em paralelo):
+./scripts/release/fleet-update.sh \
+  -i firewalls.txt \
+  -p package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-0.2.0.pkg \
+  --parallel 4
+```
+
+O script faz em **cada firewall** automaticamente:
+1. Copia o `.pkg` via SCP
+2. Para o daemon
+3. Instala com `pkg add -f`
+4. Cria tabelas PF (se não existirem)
+5. Habilita e inicia o daemon
+6. Verifica versão e PID
+7. Limpa ficheiros temporários
+8. Gera log individual em `/tmp/layer7-fleet-*/`
+
+#### Verificar após
+
+```sh
+# Ver status de todos:
+for ip in $(grep -v '#' firewalls.txt); do
+    echo "$ip: $(ssh root@$ip '/usr/local/sbin/layer7d -V')"
+done
+```
+
+#### Dry-run (ver o que seria feito)
+
+```sh
+./scripts/release/fleet-update.sh -i firewalls.txt -p pkg.pkg --dry-run
+```
+
+### Método 2: Comando individual (sem SSH keys)
+
+Se preferir instalar um a um via GUI do pfSense:
+
+Em cada pfSense, **Diagnostics > Command Prompt**:
+```sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+```
 
 ---
 
-## Fleet: múltiplos firewalls
+## Actualizar regras nDPI (sem recompilação)
 
-Para ambientes com vários firewalls (10, 50, 100+):
-
-### Atualizar pacote (requer compilação prévia no builder)
+Para actualizar protocolos customizados em todos os firewalls **sem reinstalar o pacote**:
 
 ```sh
-# Compilar 1x no builder:
-./scripts/release/update-ndpi.sh
-
-# Distribuir para todos:
-./scripts/release/fleet-update.sh -i firewalls.txt -p pfSense-pkg-layer7-0.1.0.pkg --parallel 4
-```
-
-### Atualizar regras custom (sem recompilação)
-
-```sh
-# Editar regras localmente:
+# Editar regras:
 vim layer7-protos.txt
 
-# Sincronizar para todos + SIGHUP:
+# Sincronizar + reload em todos:
 ./scripts/release/fleet-protos-sync.sh -i firewalls.txt -f layer7-protos.txt
 ```
 
-Ver [`docs/core/ndpi-update-strategy.md`](../../docs/core/ndpi-update-strategy.md) para detalhes.
+---
+
+## Fluxo completo recomendado para 52 firewalls
+
+```
+1. Compilar no builder (1x)
+   └─> pfSense-pkg-layer7-0.2.0.pkg
+
+2. Testar em 1 pfSense de lab
+   └─> install.sh ou pkg add manual
+
+3. Configurar SSH keys para todos os firewalls
+   └─> ssh-copy-id root@IP (52x, uma única vez)
+
+4. Criar inventário (firewalls.txt)
+
+5. Distribuir para todos
+   └─> fleet-update.sh -i firewalls.txt -p pkg --parallel 4
+
+6. Cada admin configura via GUI
+   └─> Services > Layer 7 > Definições > Interfaces
+   └─> Services > Layer 7 > Políticas > Adicionar regras
+   └─> Services > Layer 7 > Definições > Modo enforce
+
+7. Actualizações futuras
+   └─> Regras: fleet-protos-sync.sh (sem reinstalar)
+   └─> Pacote: fleet-update.sh (nova versão)
+```
 
 ---
 
-## Arquivos
+## Publicar release no GitHub (builder FreeBSD)
 
-| Ficheiro                   | Descrição                                      |
+```sh
+sh scripts/release/deployz.sh \
+  --repo-owner pablomichelin \
+  --repo-name pfsense-layer7 \
+  --version 0.2.0
+```
+
+---
+
+## Ficheiros
+
+| Ficheiro                   | Descrição                                       |
 |----------------------------|------------------------------------------------|
-| `deployz.sh`               | Build + publish GitHub Release (builder)       |
-| `install-lab.sh.template`  | Template do script de instalação (1 firewall)  |
-| `update-ndpi.sh`           | Atualiza nDPI no builder e reconstrói pacote   |
+| `install.sh`               | Instalação universal (1 pfSense, zero config)  |
 | `fleet-update.sh`          | Distribui `.pkg` para N firewalls via SSH      |
-| `fleet-protos-sync.sh`     | Sincroniza `protos.txt` para N firewalls       |
-| `README.md`                | Este documento                                 |
-
-Documentação formal: [`docs/04-package/deploy-github-lab.md`](../../docs/04-package/deploy-github-lab.md).
+| `fleet-protos-sync.sh`     | Sincroniza regras custom para N firewalls      |
+| `update-ndpi.sh`           | Actualiza nDPI no builder e reconstrói pacote  |
+| `deployz.sh`               | Build + publish GitHub Release (builder)       |
+| `install-lab.sh.template`  | Template do script de instalação (legado)      |
