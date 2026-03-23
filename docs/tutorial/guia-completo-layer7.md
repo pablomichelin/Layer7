@@ -44,6 +44,12 @@ voce pode:
 O Layer7 nao faz proxy HTTP nem MITM TLS. Ele analisa os metadados dos pacotes
 (headers, SNI, padroes de protocolo) para classificar os fluxos.
 
+> **Estado atual do enforcement (2026-03-23):**
+> o pacote ja classifica, decide e alimenta PF tables, mas a trilha de
+> **bloqueio operacional total** ainda esta em evolucao.
+> O plano mestre desta etapa esta em
+> [`../09-blocking/blocking-master-plan.md`](../09-blocking/blocking-master-plan.md).
+
 ---
 
 ## 2. Arquitectura geral
@@ -69,7 +75,7 @@ O Layer7 nao faz proxy HTTP nem MITM TLS. Ele analisa os metadados dos pacotes
        |
        v
   +-----------+
-  |  pfctl    |   Adiciona IP a tabela PF (block ou tag)
+  |  pfctl    |   Enforcement PF (origem hoje; destino/perfis em evolucao)
   +-----------+
 ```
 
@@ -81,7 +87,7 @@ O Layer7 nao faz proxy HTTP nem MITM TLS. Ele analisa os metadados dos pacotes
 | `layer7.json` | Configuracao central (politicas, excepcoes, settings) |
 | `layer7-protos.txt` | Protocolos customizados (opcional) |
 | GUI (PHP) | 6 paginas no menu Services > Layer 7 do pfSense |
-| `pfctl` | Ferramenta nativa do pfSense para tabelas PF |
+| `pfctl` | Ferramenta nativa do pfSense para tables, regras e anchors PF |
 
 ---
 
@@ -93,27 +99,18 @@ O Layer7 nao faz proxy HTTP nem MITM TLS. Ele analisa os metadados dos pacotes
 2. Acesso SSH como root ao pfSense
 3. O pacote `.pkg` compilado (disponivel no GitHub Releases)
 
-### 3.2 Preparar tabelas PF
+### 3.2 Tabelas PF e enforcement
 
-Antes de instalar, crie as tabelas PF no pfSense. Va a:
+O instalador ja cria as tabelas `layer7_block` e `layer7_tagged`.
 
-**Firewall > Rules > (interface)** e adicione:
+**Importante:** a trilha de enforcement total ainda esta a ser fechada.
+O estado atual do produto e:
 
-```
-# Em /etc/pf.conf ou via GUI:
-table <layer7_block> persist
-table <layer7_tagged> persist
-block in quick on $if from <layer7_block>
-```
-
-Ou via shell:
-
-```bash
-pfctl -t layer7_block -T add 127.0.0.254    # cria tabela
-pfctl -t layer7_block -T delete 127.0.0.254  # remove dummy
-pfctl -t layer7_tagged -T add 127.0.0.254
-pfctl -t layer7_tagged -T delete 127.0.0.254
-```
+- classificacao funcional;
+- decisao de politica funcional;
+- add em PF table funcional;
+- bloqueio completo de apps/sites/servicos ainda em evolucao, conforme
+  [`../09-blocking/blocking-master-plan.md`](../09-blocking/blocking-master-plan.md).
 
 ### 3.3 Instalar o pacote
 
@@ -253,10 +250,27 @@ Botao **"Guardar estado das politicas"** grava o estado on/off de cada politica.
 | **Interfaces** | Checkboxes | Interfaces onde esta politica se aplica. Nenhuma = todas. |
 | **IPs de origem** | Textarea | Um IPv4 por linha (max 16). Vazio = qualquer IP. |
 | **CIDRs de origem** | Textarea | Um CIDR por linha (max 8). Ex: `192.168.10.0/24` |
+| **Sites/hosts** | Textarea | Um host por linha. Ex: `github.com`, `api.whatsapp.com`. |
 | **Apps nDPI** | Multi-select com pesquisa | Selecione ate 12 aplicacoes da lista nDPI. |
 | **Categorias nDPI** | Multi-select com pesquisa | Selecione ate 8 categorias. |
 | **tag_table** | Texto | Nome da tabela PF (obrigatorio se acao = tag). |
 | **Ativa** | Checkbox | Criar ja habilitada. |
+
+### 7.3 Nota importante sobre bloqueio
+
+No estado atual do produto:
+
+- `block` ja representa uma **decisao real de bloqueio** no motor;
+- o daemon ja popula tables PF;
+- a trilha para bloqueio total e automatico de apps, sites e servicos esta
+  documentada em [`../09-blocking/blocking-master-plan.md`](../09-blocking/blocking-master-plan.md).
+
+Esse plano cobre os proximos blocos para:
+
+- enforcement PF automatico do pacote;
+- bloqueio real por app/categoria;
+- bloqueio real por dominio/site;
+- perfis compostos de servico/funcao.
 
 ### 7.3 Acoes disponiveis
 

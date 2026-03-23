@@ -4,6 +4,24 @@
 
 Ligar decisões **block** / **tag** a **tabelas PF** no pfSense, sem MITM.
 
+## Estado atual
+
+O enforcement atual do produto já faz:
+
+- decisão `block` / `tag` no `layer7d`;
+- `pfctl -T add` do **IP de origem** em PF table;
+- logs e counters de enforcement.
+
+O enforcement total do produto ainda está em evolução para entregar, de forma
+automática e fechada:
+
+- regras/anchors PF geridos pelo próprio pacote;
+- bloqueio real por domínio/destino;
+- perfis compostos de serviço/função.
+
+Plano mestre desta trilha:
+[`../09-blocking/blocking-master-plan.md`](../09-blocking/blocking-master-plan.md)
+
 ## Tabelas
 
 | Uso | Nome default | Config |
@@ -56,3 +74,8 @@ Ordem típica: **`-c`**, **`-n`** (opcional), **`-e IP APP [categoria]`**. No ru
 1. Tabelas PF + regras que usem `layer7_block` / tag.  
 2. **`layer7d -e …`** como root no appliance (sem **`-n`**).  
 3. Ligar **nDPI** ao loop chamando `layer7_on_classified_flow`.
+
+## Próximo passo (produto)
+
+Implementar **enforcement PF automático do pacote** como primeiro bloco da
+trilha de bloqueio total.

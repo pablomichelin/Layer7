@@ -51,6 +51,20 @@ Pacote funcional com motor de políticas granulares por interface, listas de IPs
 ## Fase atual
 Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste em pfSense real de produção.
 
+## Estado real do enforcement
+
+**Classificação e decisão:** funcionais em pfSense real.
+
+**Enforcement atual:** o daemon adiciona o **IP de origem** a PF tables para
+ações `block`/`tag`, mas o produto ainda está a fechar a trilha de
+**bloqueio operacional completo** para:
+
+- bloquear automaticamente sem regra PF externa implícita;
+- bloquear sites/domínios por destino;
+- bloquear serviços/funções compostas (ex.: GitHub completo, YouTube, WhatsApp).
+
+**Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md)
+
 ## Ultima entrega
 - **v0.2.1 — Empacotamento autocontido (2026-03-23):**
   - build do port usa `/usr/local/lib/libndpi.a`
@@ -84,12 +98,13 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Teste em pfSense real** — validar v0.2.6 em ambiente de produção.
+**Planeamento da trilha de bloqueio total** concluído; próximo bloco recomendado:
+**enforcement PF automático do pacote**.
 
 ## Proximos 3 passos
-1. Testar v0.2.6 em pfSense real (sites manuais + listas + monitor ao vivo)
-2. Piloto estável 24h+ com regras multi-interface
-3. Ajustes com base no feedback do teste real
+1. Implementar enforcement PF automático do pacote
+2. Fechar bloqueio real por app/categoria
+3. Fechar bloqueio real por domínio/site e depois perfis de serviço/função
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

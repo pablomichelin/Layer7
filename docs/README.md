@@ -14,6 +14,7 @@
 | [06-releases](06-releases/) | Releases / versão |
 | [07-prompts](07-prompts/) | Prompts / IA |
 | [08-lab](08-lab/) | Laboratório (builder, topologia, guias) |
+| [09-blocking](09-blocking/) | Plano mestre para bloqueio real de apps, sites e serviços |
 | [10-logging](10-logging/) | Logging e observabilidade |
 | [changelog](changelog/) | CHANGELOG |
 | [core](core/) | Modelagem V1 (config/evento/policy/nDPI strategy) |

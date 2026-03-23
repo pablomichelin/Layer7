@@ -4,6 +4,9 @@
 
 O projeto deve ser executado em **fases numeradas** com entrada, saída e gate claro: **V1 (0–11)**, **transição (12)**, **V2+ (13–22)** — as fases 13–22 são *backlog direcionado*; só entram em execução após gate da Fase 11 e estabilização da Fase 12.
 
+**Trilha complementar de enforcement/bloqueio:** ver
+[`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md).
+
 ---
 
 ## Fase 0. Descoberta e congelamento do escopo
@@ -313,6 +316,9 @@ Aprofundar **host/domain policy** além de IP/CIDR onde o stack permitir.
 - [ ] casos de teste DNS em lab;
 - [ ] sem bloqueio errado de tráfego não alvo (falso positivo aceite mapeado).
 
+### Documento complementar
+- [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md)
+
 ---
 
 ## Fase 16. Observabilidade e operações
@@ -483,4 +489,3 @@ Só avançar quando:
 - não mexer no pacote e na policy engine e na GUI e no build sem fechamento de bloco;
 - não trocar dependência central no meio do bloco;
 - não aceitar “depois eu documento”.
-
