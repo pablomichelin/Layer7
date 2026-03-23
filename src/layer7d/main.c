@@ -113,6 +113,8 @@ counter_cmp_desc(const void *a, const void *b)
 
 #define L7_STATS_JSON_PATH "/tmp/layer7-stats.json"
 
+static void json_escape_fprint(FILE *f, const char *s);
+
 static void
 write_stats_json(void)
 {
