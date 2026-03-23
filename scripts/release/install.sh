@@ -7,7 +7,7 @@
 #
 # Ou com versão específica:
 #
-#   sh /tmp/install.sh --version 0.2.0
+#   sh /tmp/install.sh --version 0.2.1
 #
 # O script faz tudo automaticamente:
 #   1. Detecta a versão (ou usa a especificada)
@@ -42,7 +42,7 @@ done
 
 # --- Detecção de versão ---
 if [ -z "$VERSION" ]; then
-    VERSION="0.2.0"
+    VERSION="0.2.1"
 fi
 
 TAG="v${VERSION}"

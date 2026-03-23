@@ -1,9 +1,12 @@
-## Layer7 v0.2.0 — Motor Multi-Interface
+## Layer7 v0.2.1 — Empacotamento autocontido
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
+- **Pacote autocontido** — `layer7d` passa a usar `libndpi.a` no build, evitando erro de `libndpi.so` ausente no pfSense
+- **Install de um comando mantido** — o `install.sh` continua instalando direto do GitHub Releases, sem compilacao manual
+- **Validacao de release** — o processo de build agora falha se o binario final ainda depender de `libndpi.so`
 - **Politicas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
 - **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes especificos
 - **Seleccao de apps nDPI** — ~350 aplicacoes e categorias com pesquisa na GUI

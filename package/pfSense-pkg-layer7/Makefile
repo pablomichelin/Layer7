@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	0.2.0
+PORTVERSION=	0.2.1
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -25,7 +25,11 @@ LAYER7_COMMON=	${.CURDIR}/../../src/common
 NDPI_PREFIX=	/usr/local
 .if exists(${NDPI_PREFIX}/include/ndpi/ndpi_api.h)
 LAYER7_NDPI_CFLAGS=	-I${NDPI_PREFIX}/include/ndpi -DHAVE_NDPI=1
-LAYER7_NDPI_LDFLAGS=	-L${NDPI_PREFIX}/lib -lndpi -lpcap -lm -lpthread
+.if exists(${NDPI_PREFIX}/lib/libndpi.a)
+LAYER7_NDPI_LDFLAGS=	${NDPI_PREFIX}/lib/libndpi.a -lpcap -lm -lpthread
+.else
+.error "layer7d: falta ${NDPI_PREFIX}/lib/libndpi.a. Reinstale/compile nDPI com biblioteca estática para gerar pacote autocontido."
+.endif
 LAYER7_NDPI_SRCS=	${LAYER7D_DIR}/capture.c
 .else
 LAYER7_NDPI_CFLAGS=	-DHAVE_NDPI=0

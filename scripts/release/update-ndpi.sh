@@ -66,6 +66,17 @@ cd "$PKG_DIR"
 make clean 2>&1 | tail -2
 make package DISABLE_VULNERABILITIES=yes 2>&1 | tail -5
 
+STAGED_BIN="${PKG_DIR}/work/stage/usr/local/sbin/layer7d"
+if [ ! -x "$STAGED_BIN" ]; then
+    echo "ERRO: binário staged não encontrado: $STAGED_BIN"
+    exit 1
+fi
+if ldd "$STAGED_BIN" 2>/dev/null | grep -q 'libndpi\.so'; then
+    echo "ERRO: pacote gerado ainda depende de libndpi.so em runtime"
+    ldd "$STAGED_BIN" || true
+    exit 1
+fi
+
 PKG=$(ls -t "${PKG_DIR}/work/pkg/"*.pkg 2>/dev/null | head -1)
 if [ -z "$PKG" ]; then
     echo "ERRO: pacote não encontrado após build"

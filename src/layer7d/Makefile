@@ -20,7 +20,7 @@ NDPI ?= $(NDPI_DETECT)
 .if $(NDPI) == 1
 SRCS = $(SRCS_BASE) capture.c
 NDPI_CFLAGS = -I/usr/local/include/ndpi -DHAVE_NDPI=1
-NDPI_LDFLAGS = -L/usr/local/lib -lndpi -lpcap -lm -lpthread
+NDPI_LDFLAGS = /usr/local/lib/libndpi.a -lpcap -lm -lpthread
 .else
 SRCS = $(SRCS_BASE)
 NDPI_CFLAGS = -DHAVE_NDPI=0
@@ -34,6 +34,9 @@ all: $(OUT)
 $(OUT): $(SRCS)
 	@test -f "$(VSTR_DIR)/version.str" || { \
 		echo "layer7d Makefile: falta $(VSTR_DIR)/version.str"; exit 1; }
+	@if [ "$(NDPI)" = "1" ] && [ ! -f /usr/local/lib/libndpi.a ]; then \
+		echo "layer7d Makefile: falta /usr/local/lib/libndpi.a para gerar binário autocontido"; exit 1; \
+	fi
 	$(CC) $(CFLAGS) -Wall -Wextra -O2 -I$(VSTR_DIR) -I. -I$(LAYER7_COMMON) \
 		$(NDPI_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS)
 
