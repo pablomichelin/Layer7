@@ -12,12 +12,29 @@ require_once("/usr/local/pkg/layer7.inc");
 $filter = isset($_GET["filter"]) ? trim($_GET["filter"]) : "";
 $max_lines = 100;
 $log_path = "/var/log/layer7d.log";
+$live_lines = 40;
 
 $all_logs = array();
 if (file_exists($log_path)) {
 	exec("/usr/bin/tail -n " . (int)$max_lines . " " . escapeshellarg($log_path) . " 2>/dev/null", $all_logs);
 } elseif (file_exists("/var/log/system.log")) {
 	exec("grep 'layer7d' /var/log/system.log | tail -" . $max_lines . " 2>/dev/null", $all_logs);
+}
+
+if (isset($_GET["ajax"]) && $_GET["ajax"] === "1") {
+	$live_logs = $all_logs;
+	if ($filter !== "") {
+		$live_logs = array();
+		foreach ($all_logs as $line) {
+			if (stripos($line, $filter) !== false) {
+				$live_logs[] = $line;
+			}
+		}
+	}
+	$live_logs = array_slice($live_logs, -$live_lines);
+	header("Content-Type: text/plain; charset=utf-8");
+	echo implode("\n", $live_logs);
+	exit;
 }
 
 $filtered_logs = $all_logs;
@@ -56,6 +73,16 @@ layer7_render_styles();
 		<div class="layer7-content">
 
 		<p class="layer7-lead"><?= gettext("Eventos do daemon extraidos do syslog do sistema. Use os filtros para encontrar eventos especificos."); ?></p>
+
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Monitor ao vivo"); ?></h3>
+			<p class="small text-muted"><?= gettext("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
+			<div class="layer7-toolbar">
+				<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= gettext("Pausar"); ?></button>
+				<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= gettext("Atualizar agora"); ?></button>
+			</div>
+			<pre id="l7-live-view" class="pre-scrollable" style="max-height: 320px; font-size: 12px; white-space: pre-wrap;">Carregando...</pre>
+		</div>
 
 		<div class="layer7-section">
 			<h3 class="layer7-section-title"><?= gettext("Filtrar logs"); ?></h3>
@@ -121,4 +148,56 @@ layer7_render_styles();
 		</div>
 	</div>
 </div>
+<script>
+(function() {
+	var liveView = document.getElementById('l7-live-view');
+	var toggleBtn = document.getElementById('l7-live-toggle');
+	var refreshBtn = document.getElementById('l7-live-refresh');
+	var paused = false;
+	var timer = null;
+	var refreshMs = 2000;
+	var ajaxUrl = 'layer7_events.php?ajax=1&filter=<?= rawurlencode($filter); ?>';
+
+	function fetchLive() {
+		if (paused || !liveView) {
+			return;
+		}
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', ajaxUrl, true);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				liveView.textContent = xhr.responseText || 'Sem eventos recentes.';
+				liveView.scrollTop = liveView.scrollHeight;
+			}
+		};
+		xhr.send(null);
+	}
+
+	function schedule() {
+		if (timer) {
+			window.clearInterval(timer);
+		}
+		timer = window.setInterval(fetchLive, refreshMs);
+	}
+
+	if (toggleBtn) {
+		toggleBtn.addEventListener('click', function() {
+			paused = !paused;
+			toggleBtn.textContent = paused ? 'Retomar' : 'Pausar';
+			if (!paused) {
+				fetchLive();
+			}
+		});
+	}
+
+	if (refreshBtn) {
+		refreshBtn.addEventListener('click', function() {
+			fetchLive();
+		});
+	}
+
+	fetchLive();
+	schedule();
+})();
+</script>
 <?php require_once("foot.inc"); ?>

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.2.3 — Log local do daemon**
+**Versão: 0.2.4 — Monitor ao vivo na GUI**
 
 Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
 
@@ -13,6 +13,10 @@ Pacote funcional com motor de políticas granulares por interface, listas de IPs
 - Excepções respeitadas (IPs .195 e .129 não tagados)
 - Decisões block/tag logadas a NOTICE
 - CLI `-e` valida: BitTorrent→block, HTTP→monitor, IP excepcionado→allow
+
+**Monitor ao vivo na GUI (v0.2.4):**
+- aba `Events` com atualizacao automatica dos ultimos eventos
+- botoes para pausar e atualizar manualmente
 
 **Log local do daemon (v0.2.3):**
 - `layer7d` grava eventos em `/var/log/layer7d.log`
@@ -42,6 +46,9 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
   - build do port usa `/usr/local/lib/libndpi.a`
   - `update-ndpi.sh` aborta se o binário final ainda depender de `libndpi.so`
   - pacote validado em FreeBSD 15 lab sem dependência runtime de nDPI
+- **v0.2.4 — Monitor ao vivo na GUI (2026-03-23):**
+  - aba `Events` ganha monitor ao vivo com auto-refresh
+  - filtro atual da pagina tambem se aplica ao monitor ao vivo
 - **v0.2.3 — Log local do daemon (2026-03-23):**
   - `layer7d` passa a gravar eventos em `/var/log/layer7d.log`
   - GUI Events e Diagnostics deixam de depender do syslog do pfSense
@@ -59,10 +66,10 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Teste em pfSense real** — validar v0.2.3 em ambiente de produção.
+**Teste em pfSense real** — validar v0.2.4 em ambiente de produção.
 
 ## Proximos 3 passos
-1. Testar v0.2.3 em pfSense real (log local + labels amigaveis)
+1. Testar v0.2.4 em pfSense real (monitor ao vivo + log local)
 2. Piloto estável 24h+ com regras multi-interface
 3. Ajustes com base no feedback do teste real
 

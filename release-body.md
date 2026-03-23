@@ -1,9 +1,10 @@
-## Layer7 v0.2.3 — Log local do daemon
+## Layer7 v0.2.4 — Monitor ao vivo na GUI
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
+- **Monitor ao vivo** — a aba `Events` agora atualiza automaticamente os ultimos eventos do `layer7d`, no estilo de um tail em tempo real
 - **Log local dedicado** — `layer7d` agora grava eventos tambem em `/var/log/layer7d.log`, sem depender do syslog do pfSense para visibilidade na GUI
 - **Events e Diagnostics mais confiaveis** — as paginas passam a ler `/var/log/layer7d.log` diretamente
 - **Labels amigaveis na GUI** — Interfaces de captura, politicas e excecoes agora mostram a descricao configurada da interface no pfSense, em vez de `OPT1`, `OPT2`, etc., quando houver descricao definida
