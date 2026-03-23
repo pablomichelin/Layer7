@@ -55,6 +55,8 @@ static unsigned long long s_loop_ticks;
 /* Reservado pós-nDPI: adds reais às tabelas PF */
 static unsigned long long s_pf_table_add_ok;
 static unsigned long long s_pf_table_add_fail;
+static unsigned long long s_pf_dst_add_ok;
+static unsigned long long s_pf_dst_add_fail;
 static volatile sig_atomic_t usr1_req;
 
 static char s_remote_host[256];
@@ -304,9 +306,112 @@ on_usr1(int sig)
 	usr1_req = 1;
 }
 
+#define L7_DST_CACHE_MAX 2048
+#define L7_DST_TTL_MIN   300
+#define L7_DST_SWEEP_SEC  60
+
+struct l7_dst_entry {
+	char     ip[48];
+	time_t   expires;
+};
+static struct l7_dst_entry s_dst_cache[L7_DST_CACHE_MAX];
+static int s_n_dst;
+static time_t s_last_dst_sweep;
+
+static void
+dst_cache_add(const char *ip, uint32_t ttl)
+{
+	int i;
+	time_t expires;
+	uint32_t eff_ttl = ttl < L7_DST_TTL_MIN ? L7_DST_TTL_MIN : ttl;
+
+	expires = time(NULL) + (time_t)eff_ttl;
+
+	for (i = 0; i < s_n_dst; i++) {
+		if (strcmp(s_dst_cache[i].ip, ip) == 0) {
+			if (expires > s_dst_cache[i].expires)
+				s_dst_cache[i].expires = expires;
+			return;
+		}
+	}
+	if (s_n_dst >= L7_DST_CACHE_MAX) {
+		time_t now = time(NULL);
+		int oldest = 0;
+		for (i = 1; i < s_n_dst; i++) {
+			if (s_dst_cache[i].expires < s_dst_cache[oldest].expires)
+				oldest = i;
+		}
+		if (s_dst_cache[oldest].expires > now)
+			return;
+		layer7_pf_exec_table_delete(L7_PF_TABLE_BLOCK_DST,
+		    s_dst_cache[oldest].ip);
+		s_dst_cache[oldest] = s_dst_cache[--s_n_dst];
+	}
+	snprintf(s_dst_cache[s_n_dst].ip, sizeof(s_dst_cache[0].ip), "%s", ip);
+	s_dst_cache[s_n_dst].expires = expires;
+	s_n_dst++;
+}
+
+static void
+dst_cache_sweep(void)
+{
+	time_t now = time(NULL);
+	int i;
+
+	if (now - s_last_dst_sweep < L7_DST_SWEEP_SEC)
+		return;
+	s_last_dst_sweep = now;
+
+	for (i = 0; i < s_n_dst; ) {
+		if (s_dst_cache[i].expires < now) {
+			layer7_pf_exec_table_delete(L7_PF_TABLE_BLOCK_DST,
+			    s_dst_cache[i].ip);
+			s_dst_cache[i] = s_dst_cache[--s_n_dst];
+		} else
+			i++;
+	}
+}
+
+static void
+dst_cache_flush(void)
+{
+	int i;
+
+	for (i = 0; i < s_n_dst; i++) {
+		layer7_pf_exec_table_delete(L7_PF_TABLE_BLOCK_DST,
+		    s_dst_cache[i].ip);
+	}
+	s_n_dst = 0;
+}
+
+static void
+layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
+    uint32_t ttl)
+{
+	int r;
+
+	if (!s_have_parse || !s_ge)
+		return;
+	if (!layer7_domain_is_blocked(s_rules, s_np, domain))
+		return;
+
+	r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST, resolved_ip);
+	if (r == 0) {
+		s_pf_dst_add_ok++;
+		dst_cache_add(resolved_ip, ttl);
+		L7_INFO("dns_block: domain=%s ip=%s ttl=%u table=%s",
+		    domain, resolved_ip, ttl, L7_PF_TABLE_BLOCK_DST);
+	} else {
+		s_pf_dst_add_fail++;
+		L7_WARN("dns_block: pfctl add failed domain=%s ip=%s",
+		    domain, resolved_ip);
+	}
+}
+
 /*
  * Chamado pelo loop quando nDPI classificar um fluxo (origem + app/cat).
- * mode=enforce + decisão block/tag → pfctl -T add (ou dry em testes internos).
+ * mode=enforce + decisão block → dst_ip em layer7_block_dst.
+ * mode=enforce + decisão tag  → src_ip em layer7_tagged.
  * mode=monitor → apenas loga a decisão, nunca chama pfctl.
  */
 static void
@@ -346,22 +451,37 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		    layer7_decide_reason_str(dec.reason));
 	}
 
-	if (!s_ge) {
-		/* Modo monitor: nunca chamar pfctl */
+	if (!s_ge)
 		return;
-	}
 
-	r = layer7_pf_enforce_decision(&dec, src_ip, 0);
-	if (r == 1) {
-		s_pf_table_add_ok++;
-		L7_INFO("enforce_action: %s src=%s table=%s policy=%s",
-		    layer7_action_str(dec.action), src_ip, dec.pf_table,
-		    dec.matched_policy_id[0] ? dec.matched_policy_id :
-		    dec.matched_exception_id);
-	} else if (r == -1) {
-		s_pf_table_add_fail++;
-		L7_WARN("pfctl add failed table=%s ip=%s", dec.pf_table,
-		    src_ip);
+	if (dec.action == LAYER7_ACTION_BLOCK && dst_ip &&
+	    layer7_pf_ipv4_host_ok(dst_ip)) {
+		r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST, dst_ip);
+		if (r == 0) {
+			s_pf_dst_add_ok++;
+			dst_cache_add(dst_ip, L7_DST_TTL_MIN);
+			L7_INFO("enforce_block_dst: dst=%s policy=%s",
+			    dst_ip,
+			    dec.matched_policy_id[0] ?
+			    dec.matched_policy_id : "-");
+		} else if (r == -1) {
+			s_pf_dst_add_fail++;
+			L7_WARN("pfctl add failed table=%s ip=%s",
+			    L7_PF_TABLE_BLOCK_DST, dst_ip);
+		}
+	} else if (dec.action == LAYER7_ACTION_TAG) {
+		r = layer7_pf_enforce_decision(&dec, src_ip, 0);
+		if (r == 1) {
+			s_pf_table_add_ok++;
+			L7_INFO("enforce_tag: src=%s table=%s policy=%s",
+			    src_ip, dec.pf_table,
+			    dec.matched_policy_id[0] ?
+			    dec.matched_policy_id : "-");
+		} else if (r == -1) {
+			s_pf_table_add_fail++;
+			L7_WARN("pfctl add failed table=%s ip=%s",
+			    dec.pf_table, src_ip);
+		}
 	}
 }
 
@@ -871,7 +991,8 @@ open_captures(void)
 			struct layer7_capture *c;
 
 			c = layer7_capture_open(s_parsed.interfaces[i], 1536,
-			    layer7_on_classified_flow, pf,
+			    layer7_on_classified_flow,
+			    layer7_on_dns_resolved, pf,
 			    errbuf, (int)sizeof(errbuf));
 			if (!c) {
 				L7_WARN("capture_open(%s) failed: %s",
@@ -1051,6 +1172,7 @@ int main(int argc, char **argv)
 			    "sighup=%llu usr1=%llu loop_ticks=%llu "
 			    "policies=%d exceptions=%d enforce_cfg=%d "
 			    "have_parse=%d pf_add_ok=%llu pf_add_fail=%llu "
+			    "dst_add_ok=%llu dst_add_fail=%llu dst_cache=%d "
 			    "cap_pkts=%llu cap_classified=%llu cap_expired=%llu "
 			    "captures=%d",
 			    layer7d_version,
@@ -1062,6 +1184,9 @@ int main(int argc, char **argv)
 			    s_have_parse,
 			    (unsigned long long)s_pf_table_add_ok,
 			    (unsigned long long)s_pf_table_add_fail,
+			    (unsigned long long)s_pf_dst_add_ok,
+			    (unsigned long long)s_pf_dst_add_fail,
+			    s_n_dst,
 			    (unsigned long long)s_cap_pkts,
 			    (unsigned long long)s_cap_flows_classified,
 			    (unsigned long long)s_cap_flows_expired,
@@ -1087,6 +1212,7 @@ int main(int argc, char **argv)
 			reload_req = 0;
 			s_sighup_count++;
 			L7_NOTE("SIGHUP: reload config");
+			dst_cache_flush();
 			close_captures();
 			if (stat(config_path, &st) == 0)
 				(void)apply_config(1);
@@ -1112,6 +1238,7 @@ int main(int argc, char **argv)
 				if (r > 0)
 					total += r;
 			}
+			dst_cache_sweep();
 			if (total == 0)
 				usleep(10000);
 			if (tick % 600 == 0 && tick > 0) {

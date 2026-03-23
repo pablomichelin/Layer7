@@ -108,4 +108,11 @@ void layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 const char *layer7_action_str(enum layer7_action a);
 const char *layer7_decide_reason_str(enum layer7_decide_reason r);
 
+/*
+ * Verifica se um dominio DNS casa com alguma politica de bloqueio activa.
+ * Retorna 1 se bloqueado, 0 se nao.
+ */
+int layer7_domain_is_blocked(const struct layer7_policy_rule *rules,
+    int n_rules, const char *domain);
+
 #endif

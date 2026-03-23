@@ -38,10 +38,15 @@ function layer7_pf_default_rules_text()
 		"# Layer7 PF snippet (package-managed)",
 		"table <layer7_block> persist",
 		"table <layer7_tagged> persist",
+		"table <layer7_block_dst> persist",
 		"",
-		"# Bloqueio por origem do cliente apos decisao Layer7.",
+		"# Bloqueio por origem do cliente (quarentena/tag).",
 		"block drop quick inet from <layer7_block> to any label \"layer7:block:src\"",
 		"block drop quick inet6 from <layer7_block> to any label \"layer7:block:src6\"",
+		"",
+		"# Bloqueio por destino (sites/apps bloqueados).",
+		"block drop quick inet to <layer7_block_dst> label \"layer7:block:dst\"",
+		"block drop quick inet6 to <layer7_block_dst> label \"layer7:block:dst6\"",
 		"",
 		"# layer7_tagged permanece disponivel para regras manuais/encadeadas."
 	)) . "\n";

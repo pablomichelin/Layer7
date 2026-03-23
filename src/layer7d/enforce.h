@@ -11,6 +11,7 @@ struct layer7_decision;
 
 /* Tabela PF para block (admin cria em ruleset antes de enforce real) */
 #define L7_PF_TABLE_BLOCK "layer7_block"
+#define L7_PF_TABLE_BLOCK_DST "layer7_block_dst"
 #define L7_PF_TABLE_TAG_DEFAULT "layer7_tagged"
 
 /* 1 se nome só [A-Za-z0-9_] */

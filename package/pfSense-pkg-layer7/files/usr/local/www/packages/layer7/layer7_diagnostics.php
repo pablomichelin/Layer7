@@ -66,6 +66,10 @@ $pf_block_entries = array();
 exec("/sbin/pfctl -t layer7_block -T show 2>/dev/null", $pf_block_entries, $pf_block_code);
 $pf_block_count = ($pf_block_code === 0) ? count(array_filter($pf_block_entries, 'strlen')) : -1;
 
+$pf_block_dst_entries = array();
+exec("/sbin/pfctl -t layer7_block_dst -T show 2>/dev/null", $pf_block_dst_entries, $pf_block_dst_code);
+$pf_block_dst_count = ($pf_block_dst_code === 0) ? count(array_filter($pf_block_dst_entries, 'strlen')) : -1;
+
 $pf_tag_entries = array();
 exec("/sbin/pfctl -t layer7_tagged -T show 2>/dev/null", $pf_tag_entries, $pf_tag_code);
 $pf_tag_count = ($pf_tag_code === 0) ? count(array_filter($pf_tag_entries, 'strlen')) : -1;
@@ -87,11 +91,11 @@ $pf_rules_debug_path = "/tmp/rules.debug";
 $pf_rules_debug_hits = array();
 $pf_rules_debug_has_layer7 = false;
 if (file_exists($pf_rules_debug_path)) {
-	exec("/usr/bin/grep -n 'layer7:block:src' " . escapeshellarg($pf_rules_debug_path) . " 2>/dev/null", $pf_rules_debug_hits, $pf_rules_debug_code);
+	exec("/usr/bin/grep -n 'layer7:block' " . escapeshellarg($pf_rules_debug_path) . " 2>/dev/null", $pf_rules_debug_hits, $pf_rules_debug_code);
 	$pf_rules_debug_has_layer7 = ($pf_rules_debug_code === 0 && count($pf_rules_debug_hits) > 0);
 }
 $pf_active_rules_hits = array();
-exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:block:src' 2>/dev/null", $pf_active_rules_hits, $pf_active_rules_code);
+exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:block' 2>/dev/null", $pf_active_rules_hits, $pf_active_rules_code);
 $pf_active_rules_loaded = ($pf_active_rules_code === 0 && count($pf_active_rules_hits) > 0);
 
 $data = layer7_load_or_default();
@@ -261,6 +265,18 @@ layer7_render_styles();
 						<?php } ?>
 					</dd>
 
+					<dt><code>layer7_block_dst</code></dt>
+					<dd>
+						<?php if ($pf_block_dst_count >= 0) { ?>
+						<?= $pf_block_dst_count; ?> <?= gettext("entradas (destinos bloqueados)"); ?>
+						<?php if ($pf_block_dst_count > 0 && $pf_block_dst_count <= 20) { ?>
+						<br><small><code><?= htmlspecialchars(implode(", ", array_map('trim', $pf_block_dst_entries))); ?></code></small>
+						<?php } ?>
+						<?php } else { ?>
+						<span class="text-muted"><?= gettext("Tabela nao existe ainda."); ?></span>
+						<?php } ?>
+					</dd>
+
 					<dt><code>layer7_tagged</code></dt>
 					<dd>
 						<?php if ($pf_tag_count >= 0) { ?>
@@ -335,8 +351,10 @@ layer7_render_styles();
 				<li><code>service layer7d onerestart</code> — <?= gettext("reiniciar o daemon"); ?></li>
 				<li><code>kill -USR1 $(pgrep layer7d)</code> — <?= gettext("estatisticas (cap_pkts, cap_classified, pf_add_ok, ...)"); ?></li>
 				<li><code>tail -f /var/log/layer7d.log</code> — <?= gettext("acompanhar classificacoes e eventos em tempo real"); ?></li>
-				<li><code>pfctl -t layer7_block -T show</code> — <?= gettext("IPs bloqueados"); ?></li>
-				<li><code>pfctl -t layer7_block -T delete IP</code> — <?= gettext("desbloquear IP"); ?></li>
+				<li><code>pfctl -t layer7_block -T show</code> — <?= gettext("IPs de origem bloqueados (quarentena)"); ?></li>
+				<li><code>pfctl -t layer7_block_dst -T show</code> — <?= gettext("IPs de destino bloqueados (sites/apps)"); ?></li>
+				<li><code>pfctl -t layer7_block_dst -T delete IP</code> — <?= gettext("desbloquear destino"); ?></li>
+				<li><code>pfctl -t layer7_block -T delete IP</code> — <?= gettext("desbloquear origem"); ?></li>
 				<li><code>sysrc layer7d_enable=YES</code> — <?= gettext("ativar arranque automatico no boot"); ?></li>
 			</ul>
 		</div>

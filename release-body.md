@@ -1,12 +1,15 @@
-## Layer7 v0.2.7 — enforcement PF integrado ao filtro pfSense
+## Layer7 v0.3.0 — bloqueio por destino (sites/apps)
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Regras do pacote no filtro ativo do pfSense** — o XML do pacote agora declara `<filter_rules_needed>` para que o pfSense CE inclua automaticamente as regras de bloqueio do Layer7 no ruleset ativo durante `filter reload`
-- **Bloqueio operacional por origem** — IPs adicionados a `<layer7_block>` pelo daemon passam a ser bloqueados automaticamente sem necessidade de regra PF manual externa
-- **Persistencia apos reload/reboot** — a regra do pacote reaparece automaticamente em cada `filter_configure()` do pfSense
+- **Bloqueio por destino** — o daemon agora bloqueia IPs de DESTINO em vez de quarentenar o cliente inteiro. Sites/apps bloqueados ficam inacessiveis; o resto funciona normalmente.
+- **Bloqueio DNS** — quando um dominio em `Sites/hosts` de uma politica `block` e resolvido, o IP vai automaticamente para `layer7_block_dst` e o PF bloqueia trafego para esse IP.
+- **Bloqueio nDPI por destino** — classificacoes nDPI com `action=block` adicionam o IP de destino do fluxo (nao mais de origem) a tabela de bloqueio.
+- **Expiracao automatica** — entradas na tabela de destino expiram com base no TTL DNS (minimo 5 min) para evitar bloqueios permanentes de IPs dinamicos.
+- **Nova tabela PF** — `layer7_block_dst` com regras `block drop quick to` no snippet do pacote.
+- **Diagnostics actualizado** — GUI mostra contadores da tabela de destino.
 
 ### Instalacao (um comando)
 

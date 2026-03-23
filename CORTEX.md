@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.2.7 — enforcement PF integrado ao filtro pfSense**
+**Versão: 0.3.0 — bloqueio por destino (sites/apps)**
 
 Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
 
@@ -55,21 +55,31 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
 
 **Classificação e decisão:** funcionais em pfSense real.
 
-**Enforcement PF por origem (Fase A):** o daemon adiciona o **IP de origem** a
-PF tables para ações `block`/`tag`. O XML do pacote agora inclui o tag
-`<filter_rules_needed>layer7_generate_rules</filter_rules_needed>` para
-registar as regras do pacote no ciclo oficial do filtro do pfSense CE. Causa
-raiz anterior (regra não aparecia em `pfctl -sr`): o tag estava em falta no XML.
-Fix aplicado, **pendente de validação no appliance**.
+**Enforcement PF por destino (v0.3.0):** o daemon agora adiciona IPs de
+**destino** a `layer7_block_dst` quando uma politica de bloqueio casa. Dois
+caminhos complementares:
 
-**Trilha de bloqueio total** ainda em evolução para:
+1. **DNS**: daemon observa respostas DNS; se o dominio casa com `match.hosts[]`
+   de uma politica `block`, o IP resolvido entra em `layer7_block_dst`.
+2. **nDPI**: quando o fluxo e classificado e a politica e `block`, o IP de
+   destino do fluxo entra em `layer7_block_dst`.
 
-- bloquear sites/domínios por destino;
-- bloquear serviços/funções compostas (ex.: GitHub completo, YouTube, WhatsApp).
+A regra PF `block drop quick inet to <layer7_block_dst>` bloqueia o trafego
+para esses IPs. Entradas expiram automaticamente com base no TTL DNS (minimo
+5 min) para evitar crescimento indefinido da tabela.
+
+O modelo anterior (quarentena por origem) permanece disponivel via
+`layer7_block` para `action=tag` e cenarios de quarentena explicita.
 
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md)
 
 ## Ultima entrega
+- **v0.3.0 — bloqueio por destino (sites/apps) (2026-03-23):**
+  - nova tabela PF `layer7_block_dst` + regra `block to` no snippet do pacote
+  - DNS callback: daemon observa DNS e bloqueia IPs de dominios proibidos
+  - enforcement nDPI: `block` agora adiciona IP de destino (nao mais de origem)
+  - cache com TTL + sweep periodico para expirar entradas de destino
+  - diagnostics na GUI com contadores da tabela de destino
 - **v0.2.7 — enforcement PF integrado ao filtro pfSense (2026-03-23):**
   - XML do pacote declara `<filter_rules_needed>layer7_generate_rules</filter_rules_needed>`
   - regras de bloqueio entram no ruleset ativo via `discover_pkg_rules()`
@@ -106,14 +116,13 @@ Fix aplicado, **pendente de validação no appliance**.
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Fase A — enforcement PF automático do pacote:** fix do XML aplicado
-(`<filter_rules_needed>`); pendente de validação no appliance pfSense CE
-25.11.1 para confirmar presença em `rules.debug` e `pfctl -sr`.
+**v0.3.0 implementada.** Pendente de build, deploy e validação no appliance
+pfSense CE para confirmar bloqueio real de sites/apps por destino.
 
 ## Proximos 3 passos
-1. Validar fix no appliance (rules.debug, pfctl -sr, bloqueio real, reload, reboot)
-2. Fechar bloqueio real por app/categoria (Fase B)
-3. Fechar bloqueio real por domínio/site e depois perfis de serviço/função (Fases C/D)
+1. Build e deploy do pacote 0.3.0 no appliance
+2. Validar bloqueio por destino (DNS + nDPI) no appliance real
+3. Perfis compostos de servico/funcao e melhorias de UX na GUI
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

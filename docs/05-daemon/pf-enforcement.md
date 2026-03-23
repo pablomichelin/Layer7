@@ -31,7 +31,8 @@ Plano mestre desta trilha:
 
 | Uso | Nome default | Config |
 |-----|--------------|--------|
-| Block | `layer7_block` | Fixo no código (`enforce.h`) até haver campo JSON |
+| Block (origem/quarentena) | `layer7_block` | Fixo no código (`enforce.h`) |
+| Block (destino/sites/apps) | `layer7_block_dst` | Fixo no código (`enforce.h`) |
 | Tag | `layer7_tagged` ou **`tag_table`** na política | Por política `action=tag` |
 
 ## Assets do pacote
@@ -46,7 +47,7 @@ O pacote passa a concentrar o bootstrap PF em:
 
 Responsabilidades do helper:
 
-- garantir que `layer7_block` e `layer7_tagged` existem;
+- garantir que `layer7_block`, `layer7_block_dst` e `layer7_tagged` existem;
 - gerar o snippet PF gerido pelo pacote;
 - permitir flush controlado das tables no rollback/deinstall.
 
@@ -72,11 +73,13 @@ O tag critico no XML do pacote e:
 
 Sem ele, `discover_pkg_rules` ignora o pacote durante o reload do filtro.
 
-A regra publicada e:
+As regras publicadas sao:
 
 ```text
 block drop quick inet from <layer7_block> to any label "layer7:block:src"
 block drop quick inet6 from <layer7_block> to any label "layer7:block:src6"
+block drop quick inet to <layer7_block_dst> label "layer7:block:dst"
+block drop quick inet6 to <layer7_block_dst> label "layer7:block:dst6"
 ```
 
 O helper continua responsavel por gerar o snippet materializado e garantir as
@@ -103,6 +106,14 @@ O **`layer7d -t`** imprime `pfctl_suggest=...` no dry-run quando `mode=enforce` 
 | `layer7_pf_exec_table_add(table, ip)` | `/sbin/pfctl -t TABLE -T add IP` |
 | `layer7_pf_exec_table_delete(table, ip)` | `/sbin/pfctl -t TABLE -T delete IP` |
 | `layer7_pf_enforce_decision(dec, ip, dry_run)` | Se `dec` exige block/tag e IP válido: add (ou só simula se `dry_run`) |
+
+Constantes de tabela em `enforce.h`:
+
+| Constante | Valor | Uso |
+|-----------|-------|-----|
+| `L7_PF_TABLE_BLOCK` | `layer7_block` | Quarentena por origem (tag/legacy) |
+| `L7_PF_TABLE_BLOCK_DST` | `layer7_block_dst` | Bloqueio por destino (sites/apps) |
+| `L7_PF_TABLE_TAG_DEFAULT` | `layer7_tagged` | Tag por origem |
 
 - Validação igual a `layer7_pf_snprint_add` (nome de tabela + IPv4).
 - Implementação: **fork** + **execv**(`/sbin/pfctl`, …) + **waitpid** (sem shell).
@@ -171,6 +182,42 @@ Apos instalar o pacote com o XML corrigido:
    bloqueio real;
 4. recarregar filtro (`filter reload`) e confirmar persistencia;
 5. reboot e confirmar persistencia.
+
+## Modelo de bloqueio por destino (v0.3.0)
+
+A partir da v0.3.0, o daemon suporta bloqueio por **destino** em vez de
+quarentena do cliente. O modelo funciona por dois caminhos:
+
+### Caminho DNS
+
+1. O daemon observa respostas DNS (RR tipo A) em `capture.c`.
+2. Para cada IP resolvido, chama o callback `layer7_on_dns_resolved`.
+3. O callback verifica se o dominio casa com alguma politica `block` activa
+   (`layer7_domain_is_blocked` em `policy.c`).
+4. Se casa, adiciona o IP resolvido a `layer7_block_dst` via `pfctl -T add`.
+5. A regra PF `block drop quick inet to <layer7_block_dst>` bloqueia trafego
+   para esse IP.
+
+### Caminho nDPI
+
+1. nDPI classifica o fluxo (app/categoria).
+2. Se a politica decide `block`, o IP de **destino** do fluxo entra em
+   `layer7_block_dst`.
+3. O IP de origem ja nao e bloqueado (quarentenado) para `action=block`.
+4. `action=tag` continua a usar o IP de origem em `layer7_tagged`.
+
+### Expiracao de entradas
+
+IPs na tabela de destino sao registados com TTL (minimo 300s). A cada ~60s,
+entradas expiradas sao removidas automaticamente via `pfctl -T delete`.
+Em SIGHUP (reload), toda a cache e a tabela sao limpas.
+
+### Limitacoes
+
+- **DoH/DoT**: DNS cifrado nao e observavel; bloqueio DNS nao funciona.
+- **Primeiros pacotes**: nDPI precisa de alguns pacotes para classificar.
+- **IPs partilhados**: CDNs podem partilhar IPs entre sites.
+- **DNS cache do cliente**: bloqueio DNS so funciona apos TTL expirar.
 
 ## Risco aberto
 

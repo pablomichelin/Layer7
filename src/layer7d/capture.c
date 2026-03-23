@@ -61,6 +61,7 @@ struct layer7_capture {
 	struct ndpi_detection_module_struct  *ndpi;
 	struct l7c_flow                      flows[L7C_MAX_FLOWS];
 	layer7_flow_cb                       cb;
+	layer7_dns_cb                        dns_cb;
 	char                                 ifname[32];
 	unsigned long long                   stat_pkts;
 	unsigned long long                   stat_flows_classified;
@@ -198,8 +199,9 @@ dns_hint_lookup(uint32_t ip, time_t now)
 }
 
 static void
-observe_dns_response(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp,
-    const uint8_t *payload, uint16_t payload_len, time_t now)
+observe_dns_response(struct layer7_capture *cap, uint32_t sa, uint32_t da,
+    uint16_t sp, uint16_t dp, const uint8_t *payload, uint16_t payload_len,
+    time_t now)
 {
 	size_t off;
 	uint16_t qd, an, i;
@@ -245,7 +247,16 @@ observe_dns_response(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp,
 			    (uint32_t)payload[off + 3];
 			(void)sa;
 			(void)da;
-			dns_hint_store(ip, qname, now + (ttl > 0 ? 0 : 0));
+			dns_hint_store(ip, qname, now);
+
+			if (cap->dns_cb) {
+				char ip_str[INET_ADDRSTRLEN];
+				struct in_addr addr;
+				addr.s_addr = htonl(ip);
+				inet_ntop(AF_INET, &addr, ip_str,
+				    sizeof(ip_str));
+				cap->dns_cb(qname, ip_str, ttl);
+			}
 		}
 		off += rdlen;
 	}
@@ -339,7 +350,7 @@ expire_idle(struct layer7_capture *cap, time_t now)
 
 struct layer7_capture *
 layer7_capture_open(const char *ifname, int snaplen, layer7_flow_cb cb,
-    const char *protos_file, char *errbuf, int errbuflen)
+    layer7_dns_cb dns_cb, const char *protos_file, char *errbuf, int errbuflen)
 {
 	struct layer7_capture *cap;
 	char pcap_errbuf[PCAP_ERRBUF_SIZE];
@@ -410,6 +421,7 @@ layer7_capture_open(const char *ifname, int snaplen, layer7_flow_cb cb,
 	}
 
 	cap->cb = cb;
+	cap->dns_cb = dns_cb;
 	snprintf(cap->ifname, sizeof(cap->ifname), "%s", ifname);
 	cap->last_expire = time(NULL);
 	return cap;
@@ -496,7 +508,7 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	f->pkt_count++;
 
 	if (proto == IPPROTO_UDP && l4_data && l4_len >= 12 + 8)
-		observe_dns_response(sa, da, sp, dp, l4_data + 8,
+		observe_dns_response(cap, sa, da, sp, dp, l4_data + 8,
 		    (uint16_t)(l4_len - 8), now);
 
 	if (f->classified)

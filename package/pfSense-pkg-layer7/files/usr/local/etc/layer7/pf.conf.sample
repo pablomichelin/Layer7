@@ -2,6 +2,10 @@
 # O helper /usr/local/libexec/layer7-pfctl regenera /usr/local/etc/layer7/pf.conf.
 table <layer7_block> persist
 table <layer7_tagged> persist
+table <layer7_block_dst> persist
 
 block drop quick inet from <layer7_block> to any label "layer7:block:src"
 block drop quick inet6 from <layer7_block> to any label "layer7:block:src6"
+
+block drop quick inet to <layer7_block_dst> label "layer7:block:dst"
+block drop quick inet6 to <layer7_block_dst> label "layer7:block:dst6"

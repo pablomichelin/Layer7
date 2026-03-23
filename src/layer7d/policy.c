@@ -883,3 +883,25 @@ layer7_decide_reason_str(enum layer7_decide_reason r)
 		return "?";
 	}
 }
+
+int
+layer7_domain_is_blocked(const struct layer7_policy_rule *rules,
+    int n_rules, const char *domain)
+{
+	int i, j;
+
+	if (!rules || n_rules <= 0 || !domain || !*domain)
+		return 0;
+
+	for (i = 0; i < n_rules; i++) {
+		const struct layer7_policy_rule *r = &rules[i];
+
+		if (!r->enabled || r->action != LAYER7_ACTION_BLOCK)
+			continue;
+		for (j = 0; j < r->n_hosts; j++) {
+			if (host_matches_rule(domain, r->hosts[j]))
+				return 1;
+		}
+	}
+	return 0;
+}
