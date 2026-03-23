@@ -1,14 +1,18 @@
-## Layer7 v0.3.1 — anti-bypass DNS (DoH/DoT/iCloud Private Relay)
+## Layer7 v0.3.2 — actualizacao via GUI
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Anti-bypass DNS multi-camada** — impede que dispositivos contornem o bloqueio usando DNS cifrado (DoH, DoT, DoQ) ou iCloud Private Relay.
-- **Bloqueio DoT/DoQ** — regras PF automaticas bloqueiam TCP/UDP porta 853, cortando DNS over TLS e DNS over QUIC.
-- **Deteccao nDPI de DoH** — politica built-in `anti-bypass-dns` bloqueia fluxos classificados como `DoH_DoT` e `iCloudPrivateRelay` pelo nDPI, adicionando IPs de destino a tabela de bloqueio.
-- **Unbound anti-DoH** — script configura NXDOMAIN para dominios de bypass conhecidos (mask.icloud.com, dns.google, cloudflare-dns.com, etc.). iOS desativa Private Relay automaticamente.
-- **Instalacao integrada** — install.sh agora configura Unbound anti-DoH automaticamente.
+- **Actualizacao pela GUI** — novo botao "Verificar actualizacao" na pagina Definicoes. Consulta automaticamente o GitHub Releases, compara versoes, e permite actualizar com um clique. O daemon e parado/reiniciado e todas as configuracoes sao preservadas.
+
+### Inclui todas as funcionalidades anteriores
+
+- Anti-bypass DNS multi-camada (DoH/DoT/DoQ/iCloud Private Relay)
+- Bloqueio por destino (sites/apps) via DNS + nDPI
+- ~350 apps nDPI detectaveis (YouTube, Facebook, TikTok, etc.)
+- Politicas por interface, IP/CIDR, app e categoria
+- GUI completa com 6 paginas
 
 ### Instalacao (um comando)
 
@@ -31,4 +35,3 @@ pkg delete pfSense-pkg-layer7
 
 - [Guia Completo](docs/tutorial/guia-completo-layer7.md)
 - [CHANGELOG](docs/changelog/CHANGELOG.md)
-- [Anti-bypass DNS](docs/05-daemon/pf-enforcement.md)

@@ -9,6 +9,78 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
+$update_info = null;
+$update_msg = "";
+$update_err = "";
+
+if ($_POST["check_update"] ?? false) {
+	$current_ver = layer7_daemon_version();
+	if ($current_ver === "") {
+		$current_ver = "desconhecida";
+	}
+	$gh_api = "https://api.github.com/repos/pablomichelin/pfsense-layer7/releases/latest";
+	$tmp_json = "/tmp/layer7-gh-latest.json";
+	@unlink($tmp_json);
+	exec("/usr/bin/fetch -qo " . escapeshellarg($tmp_json) . " " . escapeshellarg($gh_api) . " 2>&1", $fetch_out, $fetch_rc);
+	if ($fetch_rc !== 0 || !file_exists($tmp_json)) {
+		$update_err = gettext("Nao foi possivel contactar o GitHub. Verifique a ligacao a Internet.");
+	} else {
+		$gh_raw = @file_get_contents($tmp_json);
+		$gh = is_string($gh_raw) ? @json_decode($gh_raw, true) : null;
+		@unlink($tmp_json);
+		if (!is_array($gh) || !isset($gh["tag_name"])) {
+			$update_err = gettext("Resposta do GitHub invalida ou repositorio sem releases.");
+		} else {
+			$latest_tag = $gh["tag_name"];
+			$latest_ver = ltrim($latest_tag, "vV");
+			$pkg_url = "";
+			if (isset($gh["assets"]) && is_array($gh["assets"])) {
+				foreach ($gh["assets"] as $asset) {
+					if (isset($asset["browser_download_url"]) && strpos($asset["browser_download_url"], ".pkg") !== false) {
+						$pkg_url = $asset["browser_download_url"];
+						break;
+					}
+				}
+			}
+			$update_info = array(
+				"current" => $current_ver,
+				"latest" => $latest_ver,
+				"tag" => $latest_tag,
+				"pkg_url" => $pkg_url,
+				"name" => isset($gh["name"]) ? $gh["name"] : $latest_tag
+			);
+		}
+	}
+}
+
+if ($_POST["do_update"] ?? false) {
+	$pkg_url = isset($_POST["pkg_url"]) ? trim($_POST["pkg_url"]) : "";
+	if ($pkg_url === "" || strpos($pkg_url, "https://github.com/") !== 0) {
+		$update_err = gettext("URL do pacote invalida.");
+	} else {
+		$pkg_file = "/tmp/layer7-update.pkg";
+		@unlink($pkg_file);
+
+		exec("service layer7d onestop 2>&1", $stop_out, $stop_rc);
+		exec("/usr/bin/fetch -qo " . escapeshellarg($pkg_file) . " " . escapeshellarg($pkg_url) . " 2>&1", $dl_out, $dl_rc);
+		if ($dl_rc !== 0 || !file_exists($pkg_file)) {
+			$update_err = gettext("Falha ao baixar o pacote do GitHub.");
+			exec("service layer7d onestart 2>&1");
+		} else {
+			exec("IGNORE_OSVERSION=yes /usr/sbin/pkg add -f " . escapeshellarg($pkg_file) . " 2>&1", $inst_out, $inst_rc);
+			@unlink($pkg_file);
+			if ($inst_rc !== 0) {
+				$update_err = gettext("Falha na instalacao do pacote: ") . implode(" ", $inst_out);
+			} else {
+				exec("service layer7d onestart 2>&1");
+				sleep(1);
+				$new_ver = layer7_daemon_version();
+				$update_msg = gettext("Pacote actualizado com sucesso para a versao ") . ($new_ver !== "" ? $new_ver : "nova") . ".";
+			}
+		}
+	}
+}
+
 if ($_POST["save"] ?? false) {
 	$mode = $_POST["mode"] ?? "monitor";
 	if (!in_array($mode, array("monitor", "enforce"), true)) {
@@ -215,6 +287,69 @@ layer7_render_styles();
 			</form>
 
 			<p class="layer7-muted-note small"><?= gettext("Politicas e excecoes existentes sao preservadas quando as definicoes globais sao gravadas."); ?></p>
+
+			<div class="layer7-section" style="margin-top: 36px;">
+				<h3 class="layer7-section-title"><?= gettext("Actualizacao do pacote"); ?></h3>
+				<div class="layer7-callout">
+
+				<?php if ($update_msg !== "") { ?>
+				<div class="alert alert-success"><?= htmlspecialchars($update_msg); ?></div>
+				<?php } ?>
+				<?php if ($update_err !== "") { ?>
+				<div class="alert alert-danger"><?= htmlspecialchars($update_err); ?></div>
+				<?php } ?>
+
+				<?php
+				$disp_ver = layer7_daemon_version();
+				if ($disp_ver === "") { $disp_ver = gettext("nao instalado"); }
+				?>
+
+				<dl class="dl-horizontal layer7-summary">
+					<dt><?= gettext("Versao instalada"); ?></dt>
+					<dd><code><?= htmlspecialchars($disp_ver); ?></code></dd>
+				</dl>
+
+				<?php if ($update_info !== null) { ?>
+				<dl class="dl-horizontal layer7-summary">
+					<dt><?= gettext("Versao mais recente"); ?></dt>
+					<dd>
+						<code><?= htmlspecialchars($update_info["latest"]); ?></code>
+						<small class="text-muted"> — <?= htmlspecialchars($update_info["name"]); ?></small>
+					</dd>
+				</dl>
+
+				<?php if (version_compare($update_info["latest"], $update_info["current"], ">") && $update_info["pkg_url"] !== "") { ?>
+				<form method="post" style="margin-top: 12px;">
+					<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
+					<button type="submit" name="do_update" value="1" class="btn btn-success"
+						onclick="return confirm('<?= gettext("Actualizar o pacote Layer7? O daemon sera reiniciado."); ?>');">
+						<i class="fa fa-download"></i>
+						<?= gettext("Actualizar para ") . htmlspecialchars($update_info["latest"]); ?>
+					</button>
+					<p class="help-block" style="margin-top: 8px;">
+						<?= gettext("O daemon sera parado, o pacote substituido e o daemon reiniciado. As politicas e configuracoes sao preservadas."); ?>
+					</p>
+				</form>
+				<?php } elseif ($update_info["pkg_url"] === "") { ?>
+				<div class="alert alert-warning" style="margin-top: 12px;"><?= gettext("Release encontrado mas sem artefacto .pkg. Verifique o GitHub."); ?></div>
+				<?php } else { ?>
+				<div class="alert alert-info" style="margin-top: 12px;">
+					<i class="fa fa-check-circle"></i> <?= gettext("Ja esta na versao mais recente."); ?>
+				</div>
+				<?php } ?>
+				<?php } ?>
+
+				<form method="post" style="margin-top: 12px;">
+					<button type="submit" name="check_update" value="1" class="btn btn-info">
+						<i class="fa fa-refresh"></i> <?= gettext("Verificar actualizacao"); ?>
+					</button>
+				</form>
+
+				<p class="layer7-muted-note small" style="margin-top: 12px;">
+					<?= gettext("Verifica a ultima versao publicada no GitHub Releases. As politicas, excecoes e configuracoes existentes sao sempre preservadas durante a actualizacao."); ?>
+				</p>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.3.1 — anti-bypass DNS (DoH/DoT/iCloud Private Relay)**
+**Versão: 0.3.2 — actualizacao via GUI + anti-bypass DNS**
 
 Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md)
 
 ## Ultima entrega
+- **v0.3.2 — actualizacao via GUI (2026-03-23):**
+  - botao "Verificar actualizacao" na pagina Definicoes
+  - consulta GitHub Releases API para detectar versao mais recente
+  - botao "Actualizar agora" faz download e instalacao do .pkg automaticamente
+  - daemon parado e reiniciado durante a actualizacao
+  - politicas, excecoes e configuracoes preservadas
 - **v0.3.1 — anti-bypass DNS (2026-03-23):**
   - regras PF anti-DoT/DoQ (porta 853) no snippet do pacote
   - politica nDPI built-in `anti-bypass-dns` (DoH_DoT + iCloudPrivateRelay)
@@ -122,14 +128,13 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v0.3.1 implementada.** Pendente de build, deploy e validação no appliance
-pfSense CE para confirmar que anti-bypass DNS funciona (DoT bloqueado,
-Unbound retorna NXDOMAIN para Private Relay, nDPI bloqueia fluxos DoH).
+**v0.3.2 implementada.** Botao de actualizacao na GUI permite manter o
+pacote actualizado sem linha de comando.
 
 ## Proximos 3 passos
-1. Build e deploy do pacote 0.3.1 no appliance
-2. Validar anti-bypass: porta 853 bloqueada, Private Relay desativado, DoH bloqueado
-3. Perfis compostos de servico/funcao e melhorias de UX na GUI
+1. Build e deploy do pacote 0.3.2 no appliance
+2. Validar actualizacao via GUI (verificar + instalar)
+3. Perfis compostos de servico/funcao e pagina de categorias nDPI
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
