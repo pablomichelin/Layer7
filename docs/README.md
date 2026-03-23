@@ -22,3 +22,6 @@
 | [tests](tests/) | Documentação de testes |
 
 Detalhamento longo permanece nos arquivos `01-`…`16-` na **raiz** do repositório.
+
+Prompt de continuidade para o proximo chat desta trilha:
+[`07-prompts/next-chat-phase-a-option1.md`](07-prompts/next-chat-phase-a-option1.md)

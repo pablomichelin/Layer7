@@ -23,12 +23,11 @@ reload_cmd="${name}_reload"
 
 layer7d_ensure_pf_tables()
 {
-	for _t in layer7_block layer7_tagged; do
-		if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
-			pfctl -t "$_t" -T add 127.0.0.254 2>/dev/null
-			pfctl -t "$_t" -T delete 127.0.0.254 2>/dev/null
-		fi
-	done
+	if [ -x /usr/local/libexec/layer7-pfctl ]; then
+		/usr/local/libexec/layer7-pfctl ensure
+		return $?
+	fi
+	return 0
 }
 
 layer7d_start()

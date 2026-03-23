@@ -17,6 +17,66 @@ function layer7_sample_path()
 	return "/usr/local/etc/layer7.json.sample";
 }
 
+function layer7_pf_helper_path()
+{
+	return "/usr/local/libexec/layer7-pfctl";
+}
+
+function layer7_pf_rules_path()
+{
+	return "/usr/local/etc/layer7/pf.conf";
+}
+
+function layer7_pf_rules_sample_path()
+{
+	return "/usr/local/etc/layer7/pf.conf.sample";
+}
+
+function layer7_pf_default_rules_text()
+{
+	return implode("\n", array(
+		"# Layer7 PF snippet (package-managed)",
+		"table <layer7_block> persist",
+		"table <layer7_tagged> persist",
+		"",
+		"# Bloqueio por origem do cliente apos decisao Layer7.",
+		"block drop quick inet from <layer7_block> to any label \"layer7:block:src\"",
+		"block drop quick inet6 from <layer7_block> to any label \"layer7:block:src6\"",
+		"",
+		"# layer7_tagged permanece disponivel para regras manuais/encadeadas."
+	)) . "\n";
+}
+
+function layer7_pf_rules_text()
+{
+	$paths = array(
+		layer7_pf_rules_path(),
+		layer7_pf_rules_sample_path()
+	);
+
+	foreach ($paths as $path) {
+		if (!is_string($path) || $path === "" || !is_readable($path)) {
+			continue;
+		}
+		$raw = @file_get_contents($path);
+		if (is_string($raw) && trim($raw) !== "") {
+			return rtrim($raw, "\r\n") . "\n";
+		}
+	}
+
+	return layer7_pf_default_rules_text();
+}
+
+function layer7_generate_rules($type)
+{
+	$type = (string)$type;
+	if ($type !== "filter" && $type !== "rule") {
+		return "";
+	}
+
+	return layer7_pf_rules_text();
+}
+
 function layer7_bare_config()
 {
 	return array(

@@ -11,6 +11,9 @@ require_once("/usr/local/pkg/layer7.inc");
 
 $cfgpath = layer7_cfg_path();
 $log_path = "/var/log/layer7d.log";
+$pf_helper = layer7_pf_helper_path();
+$pf_rules = layer7_pf_rules_path();
+$pf_rules_sample = layer7_pf_rules_sample_path();
 $layer7d_ver = layer7_daemon_version();
 $pidfile = "/var/run/layer7d.pid";
 $status_out = "";
@@ -66,6 +69,30 @@ $pf_block_count = ($pf_block_code === 0) ? count(array_filter($pf_block_entries,
 $pf_tag_entries = array();
 exec("/sbin/pfctl -t layer7_tagged -T show 2>/dev/null", $pf_tag_entries, $pf_tag_code);
 $pf_tag_count = ($pf_tag_code === 0) ? count(array_filter($pf_tag_entries, 'strlen')) : -1;
+
+$pf_rules_exists = file_exists($pf_rules);
+$pf_rules_preview = array();
+if ($pf_rules_exists) {
+	$pf_rules_preview = @file($pf_rules, FILE_IGNORE_NEW_LINES);
+	if (is_array($pf_rules_preview)) {
+		$pf_rules_preview = array_slice($pf_rules_preview, 0, 20);
+	} else {
+		$pf_rules_preview = array();
+	}
+}
+$pf_generated_rules = layer7_generate_rules("filter");
+$pf_generated_preview = array_slice(preg_split('/\r?\n/', trim($pf_generated_rules)), 0, 20);
+$pf_hook_ready = function_exists("layer7_generate_rules");
+$pf_rules_debug_path = "/tmp/rules.debug";
+$pf_rules_debug_hits = array();
+$pf_rules_debug_has_layer7 = false;
+if (file_exists($pf_rules_debug_path)) {
+	exec("/usr/bin/grep -n 'layer7:block:src' " . escapeshellarg($pf_rules_debug_path) . " 2>/dev/null", $pf_rules_debug_hits, $pf_rules_debug_code);
+	$pf_rules_debug_has_layer7 = ($pf_rules_debug_code === 0 && count($pf_rules_debug_hits) > 0);
+}
+$pf_active_rules_hits = array();
+exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:block:src' 2>/dev/null", $pf_active_rules_hits, $pf_active_rules_code);
+$pf_active_rules_loaded = ($pf_active_rules_code === 0 && count($pf_active_rules_hits) > 0);
 
 $data = layer7_load_or_default();
 $L = isset($data["layer7"]) ? $data["layer7"] : array();
@@ -168,6 +195,60 @@ layer7_render_styles();
 			<h3 class="layer7-section-title"><?= gettext("Tabelas PF (enforcement)"); ?></h3>
 			<div class="layer7-callout">
 				<dl class="dl-horizontal layer7-summary">
+					<dt><?= gettext("Helper PF"); ?></dt>
+					<dd>
+						<?php if (is_executable($pf_helper)) { ?>
+						<code><?= htmlspecialchars($pf_helper); ?></code>
+						<?php } else { ?>
+						<span class="text-warning"><?= gettext("Nao encontrado"); ?></span>
+						<?php } ?>
+					</dd>
+
+					<dt><?= gettext("Snippet PF"); ?></dt>
+					<dd>
+						<?php if ($pf_rules_exists) { ?>
+						<code><?= htmlspecialchars($pf_rules); ?></code>
+						<?php } else { ?>
+						<span class="text-warning"><?= gettext("Nao gerado"); ?></span>
+						<?php if (file_exists($pf_rules_sample)) { ?>
+						<small class="text-muted"> — <?= gettext("sample disponivel em"); ?> <code><?= htmlspecialchars($pf_rules_sample); ?></code></small>
+						<?php } ?>
+						<?php } ?>
+						<br><small class="text-muted"><?= gettext("A regra minima do pacote e publicada por layer7_generate_rules() durante o reload oficial do filtro; a prova final continua a ser confirmar a presenca em rules.debug e pfctl -sr no appliance."); ?></small>
+					</dd>
+
+					<dt><?= gettext("Hook do pacote"); ?></dt>
+					<dd>
+						<?php if ($pf_hook_ready) { ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i> <code>layer7_generate_rules("filter")</code></span>
+						<?php } else { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= gettext("Hook nao encontrado"); ?></span>
+						<?php } ?>
+					</dd>
+
+					<dt><?= gettext("rules.debug"); ?></dt>
+					<dd>
+						<?php if (file_exists($pf_rules_debug_path)) { ?>
+						<code><?= htmlspecialchars($pf_rules_debug_path); ?></code>
+						<?php if ($pf_rules_debug_has_layer7) { ?>
+						<br><span class="text-success"><?= gettext("Regra Layer7 encontrada no rules.debug atual."); ?></span>
+						<?php } else { ?>
+						<br><span class="text-warning"><?= gettext("Arquivo presente, mas sem label layer7:block:src."); ?></span>
+						<?php } ?>
+						<?php } else { ?>
+						<span class="text-muted"><?= gettext("Arquivo nao encontrado no appliance atual."); ?></span>
+						<?php } ?>
+					</dd>
+
+					<dt><?= gettext("Filtro ativo"); ?></dt>
+					<dd>
+						<?php if ($pf_active_rules_loaded) { ?>
+						<span class="text-success"><?= gettext("Regra Layer7 encontrada em pfctl -sr."); ?></span>
+						<?php } else { ?>
+						<span class="text-warning"><?= gettext("Regra Layer7 ainda nao apareceu em pfctl -sr."); ?></span>
+						<?php } ?>
+					</dd>
+
 					<dt><code>layer7_block</code></dt>
 					<dd>
 						<?php if ($pf_block_count >= 0) { ?>
@@ -194,6 +275,34 @@ layer7_render_styles();
 				</dl>
 			</div>
 		</div>
+
+		<?php if ($pf_rules_exists && count($pf_rules_preview) > 0) { ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Snippet PF gerado"); ?></h3>
+			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $pf_rules_preview)); ?></pre>
+		</div>
+		<?php } ?>
+
+		<?php if (count($pf_generated_preview) > 0) { ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Regra publicada pelo hook"); ?></h3>
+			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $pf_generated_preview)); ?></pre>
+		</div>
+		<?php } ?>
+
+		<?php if ($pf_rules_debug_has_layer7 && count($pf_rules_debug_hits) > 0) { ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Trecho de rules.debug"); ?></h3>
+			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_rules_debug_hits, 0, 20))); ?></pre>
+		</div>
+		<?php } ?>
+
+		<?php if ($pf_active_rules_loaded && count($pf_active_rules_hits) > 0) { ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Trecho de pfctl -sr"); ?></h3>
+			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_active_rules_hits, 0, 20))); ?></pre>
+		</div>
+		<?php } ?>
 
 		<?php if ($status_ok && $pid !== null) { ?>
 		<div class="layer7-section">

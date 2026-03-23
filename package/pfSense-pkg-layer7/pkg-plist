@@ -10,7 +10,10 @@
 /usr/local/sbin/layer7d
 /usr/local/etc/layer7.json.sample
 /usr/local/etc/layer7-protos.txt.sample
+/usr/local/etc/layer7/pf.conf.sample
 /usr/local/etc/rc.d/layer7d
+/usr/local/libexec/layer7-pfctl
 /usr/local/share/pfSense-pkg-layer7/info.xml
 @dir /etc/inc/priv
+@dir /usr/local/etc/layer7
 @dir /usr/local/www/packages/layer7

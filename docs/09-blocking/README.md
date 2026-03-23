@@ -8,6 +8,9 @@ de aplicações, sites, serviços e funções de produto.
 
 - [`blocking-master-plan.md`](blocking-master-plan.md) — plano mestre de
   implementação, riscos, fases, testes e rollout
+- [`phase-a-option1-package-rules-plan.md`](phase-a-option1-package-rules-plan.md) —
+  plano faseado da implementacao da Opcao 1 (regras do pacote no ciclo oficial
+  do filtro pfSense)
 
 ## Escopo
 

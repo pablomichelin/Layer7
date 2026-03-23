@@ -1,0 +1,68 @@
+#!/bin/sh
+
+set -eu
+
+TABLE_BLOCK="layer7_block"
+TABLE_TAGGED="layer7_tagged"
+RULES_DIR="/usr/local/etc/layer7"
+RULES_PATH="${RULES_DIR}/pf.conf"
+RULES_SAMPLE="${RULES_DIR}/pf.conf.sample"
+
+ensure_table() {
+	_table="$1"
+	if ! pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
+		pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null || true
+		pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null || true
+	fi
+}
+
+write_rules() {
+	/bin/mkdir -p "${RULES_DIR}"
+	cat > "${RULES_PATH}" <<EOF
+# Layer7 PF snippet (package-managed)
+# Estado atual: assets preparados para a Fase A.
+# A injecao deste snippet no ruleset ativo do pfSense CE deve ser validada
+# separadamente para evitar interferencia na ordem oficial do filtro.
+table <${TABLE_BLOCK}> persist
+table <${TABLE_TAGGED}> persist
+
+# Bloqueio por origem do cliente apos decisao Layer7.
+block drop quick inet from <${TABLE_BLOCK}> to any label "layer7:block:src"
+block drop quick inet6 from <${TABLE_BLOCK}> to any label "layer7:block:src6"
+
+# layer7_tagged permanece disponivel para regras manuais/encadeadas.
+EOF
+	if [ ! -f "${RULES_SAMPLE}" ]; then
+		cp "${RULES_PATH}" "${RULES_SAMPLE}"
+	fi
+}
+
+flush_tables() {
+	pfctl -t "${TABLE_BLOCK}" -T flush >/dev/null 2>&1 || true
+	pfctl -t "${TABLE_TAGGED}" -T flush >/dev/null 2>&1 || true
+}
+
+show_status() {
+	echo "helper=/usr/local/libexec/layer7-pfctl"
+	echo "rules=${RULES_PATH}"
+	pfctl -s Tables 2>/dev/null | grep -E "^${TABLE_BLOCK}$|^${TABLE_TAGGED}$" || true
+}
+
+cmd="${1:-ensure}"
+case "${cmd}" in
+ensure)
+		ensure_table "${TABLE_BLOCK}"
+		ensure_table "${TABLE_TAGGED}"
+		write_rules
+		;;
+flush)
+		flush_tables
+		;;
+show)
+		show_status
+		;;
+*)
+		echo "usage: $0 [ensure|flush|show]" >&2
+		exit 1
+		;;
+esac

@@ -11,11 +11,16 @@ O enforcement atual do produto já faz:
 - decisão `block` / `tag` no `layer7d`;
 - `pfctl -T add` do **IP de origem** em PF table;
 - logs e counters de enforcement.
+- helper do pacote para materializar assets PF (`/usr/local/libexec/layer7-pfctl`);
+- snippet de ruleset gerado em `/usr/local/etc/layer7/pf.conf`.
+- hook `layer7_generate_rules("filter")` em `/usr/local/pkg/layer7.inc`;
+- reload do filtro oficial no install/deinstall do pacote.
 
 O enforcement total do produto ainda está em evolução para entregar, de forma
 automática e fechada:
 
 - regras/anchors PF geridos pelo próprio pacote;
+- injecção validada dessas regras no filtro ativo do pfSense;
 - bloqueio real por domínio/destino;
 - perfis compostos de serviço/função.
 
@@ -28,6 +33,37 @@ Plano mestre desta trilha:
 |-----|--------------|--------|
 | Block | `layer7_block` | Fixo no código (`enforce.h`) até haver campo JSON |
 | Tag | `layer7_tagged` ou **`tag_table`** na política | Por política `action=tag` |
+
+## Assets do pacote
+
+O pacote passa a concentrar o bootstrap PF em:
+
+```text
+/usr/local/libexec/layer7-pfctl
+/usr/local/etc/layer7/pf.conf
+/usr/local/etc/layer7/pf.conf.sample
+```
+
+Responsabilidades do helper:
+
+- garantir que `layer7_block` e `layer7_tagged` existem;
+- gerar o snippet PF gerido pelo pacote;
+- permitir flush controlado das tables no rollback/deinstall.
+
+Neste bloco, o pacote passa a expor a regra minima via
+`layer7_generate_rules("filter")`, no padrao que o pfSense usa em
+`discover_pkg_rules()` para montar regras de pacotes durante o `filter reload`.
+
+A regra publicada neste passo e:
+
+```text
+block drop quick inet from <layer7_block> to any label "layer7:block:src"
+block drop quick inet6 from <layer7_block> to any label "layer7:block:src6"
+```
+
+O helper continua responsavel por gerar o snippet materializado e garantir as
+tabelas, enquanto o hook do pacote devolve esse mesmo texto ao ciclo oficial do
+filtro.
 
 Nomes de tabela: apenas `[A-Za-z0-9_]`, máx. 63 caracteres.
 
@@ -75,7 +111,17 @@ Ordem típica: **`-c`**, **`-n`** (opcional), **`-e IP APP [categoria]`**. No ru
 2. **`layer7d -e …`** como root no appliance (sem **`-n`**).  
 3. Ligar **nDPI** ao loop chamando `layer7_on_classified_flow`.
 
-## Próximo passo (produto)
+## Validacao minima desta fase
 
-Implementar **enforcement PF automático do pacote** como primeiro bloco da
-trilha de bloqueio total.
+No appliance pfSense CE, validar:
+
+1. install/upgrade do pacote dispara `filter_configure()`;
+2. `rules.debug` contem `layer7:block:src`;
+3. `pfctl -sr` contem a regra Layer7;
+4. IP em `<layer7_block>` passa a ser bloqueado sem regra manual externa.
+
+## Risco aberto
+
+A maior incerteza restante nao e mais o nome do hook, mas sim a ordem/precedencia
+real da regra no ruleset final do appliance. Por isso a confirmacao em
+`rules.debug` e `pfctl -sr` continua obrigatoria antes de fechar a fase.

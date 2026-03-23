@@ -1,5 +1,14 @@
 #!/bin/sh
 
+reload_filter() {
+	_php="${PKG_ROOTDIR}/usr/local/bin/php"
+	_filter_inc="${PKG_ROOTDIR}/etc/inc/filter.inc"
+
+	if [ -x "${_php}" ] && [ -f "${_filter_inc}" ]; then
+		"${_php}" -r "require_once('${_filter_inc}'); if (function_exists('filter_configure')) { filter_configure(); }" >/dev/null 2>&1 || true
+	fi
+}
+
 if [ "${2}" != "POST-INSTALL" ]; then
 	exit 0
 fi
@@ -20,14 +29,12 @@ if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt" ] && [ -f "${PKG_ROOT
 	cp "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt.sample" "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt"
 fi
 
-# --- Tabelas PF (criadas automaticamente) ---
-for _table in layer7_block layer7_tagged; do
-	if ! pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
-		pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null
-		pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null
-		echo "layer7: tabela PF '$_table' criada."
-	fi
-done
+# --- Assets PF do pacote ---
+if [ -x "${PKG_ROOTDIR}/usr/local/libexec/layer7-pfctl" ]; then
+	"${PKG_ROOTDIR}/usr/local/libexec/layer7-pfctl" ensure
+fi
+
+reload_filter
 
 # --- Habilitar e iniciar o serviço ---
 sysrc layer7d_enable=YES > /dev/null 2>&1

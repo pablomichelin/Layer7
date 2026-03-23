@@ -1,3 +1,19 @@
 #!/bin/sh
 
+reload_filter() {
+	_php="/usr/local/bin/php"
+	_filter_inc="/etc/inc/filter.inc"
+
+	if [ -x "${_php}" ] && [ -f "${_filter_inc}" ]; then
+		"${_php}" -r "require_once('${_filter_inc}'); if (function_exists('filter_configure')) { filter_configure(); }" >/dev/null 2>&1 || true
+	fi
+}
+
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
+
+if [ "${2}" = "POST-DEINSTALL" ]; then
+	reload_filter
+	if [ -x /usr/local/libexec/layer7-pfctl ]; then
+		/usr/local/libexec/layer7-pfctl flush >/dev/null 2>&1 || true
+	fi
+fi
