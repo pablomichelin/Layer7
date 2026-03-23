@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.2.1 — Empacotamento autocontido**
+**Versão: 0.2.2 — Labels amigaveis de interface**
 
 Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
 
@@ -13,6 +13,10 @@ Pacote funcional com motor de políticas granulares por interface, listas de IPs
 - Excepções respeitadas (IPs .195 e .129 não tagados)
 - Decisões block/tag logadas a NOTICE
 - CLI `-e` valida: BitTorrent→block, HTTP→monitor, IP excepcionado→allow
+
+**Labels amigaveis de interface (v0.2.2):**
+- GUI mostra a descricao configurada da interface no pfSense
+- fallback seguro para label padrao quando nao houver descricao
 
 **Empacotamento autocontido (v0.2.1):**
 - `layer7d` linkado com `libndpi.a` no builder
@@ -34,6 +38,9 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
   - build do port usa `/usr/local/lib/libndpi.a`
   - `update-ndpi.sh` aborta se o binário final ainda depender de `libndpi.so`
   - pacote validado em FreeBSD 15 lab sem dependência runtime de nDPI
+- **v0.2.2 — Labels amigaveis de interface (2026-03-23):**
+  - GUI Settings passa a mostrar a descricao configurada da interface
+  - GUI Policies e Exceptions reutilizam o mesmo label amigavel
 - **v0.2.0 — Motor Multi-Interface (2026-03-18):**
   - GUI Settings: checkboxes dinâmicos de interfaces pfSense
   - Políticas: `interfaces[]`, `match.src_hosts[]`, `match.src_cidrs[]`
@@ -45,10 +52,10 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Teste em pfSense real** — validar v0.2.1 em ambiente de produção.
+**Teste em pfSense real** — validar v0.2.2 em ambiente de produção.
 
 ## Proximos 3 passos
-1. Testar v0.2.1 em pfSense real (pacote autocontido + políticas por interface)
+1. Testar v0.2.2 em pfSense real (labels amigaveis + pacote autocontido)
 2. Piloto estável 24h+ com regras multi-interface
 3. Ajustes com base no feedback do teste real
 

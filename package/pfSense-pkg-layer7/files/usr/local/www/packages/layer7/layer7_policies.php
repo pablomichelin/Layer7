@@ -488,7 +488,7 @@ layer7_render_styles();
 						?>
 						<label class="checkbox-inline">
 							<input type="checkbox" name="edit_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" <?= $chk; ?> />
-							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 						<?php } ?>
 						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>

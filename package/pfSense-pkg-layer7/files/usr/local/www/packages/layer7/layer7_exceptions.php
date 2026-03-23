@@ -381,7 +381,7 @@ function layer7_exc_target_summary($exception) {
 						?>
 						<label class="checkbox-inline">
 							<input type="checkbox" name="edit_exc_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" <?= $chk; ?> />
-							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 						<?php } ?>
 						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
@@ -465,7 +465,7 @@ function layer7_exc_target_summary($exception) {
 						<?php foreach ($pf_ifaces_exc as $ifc) { ?>
 						<label class="checkbox-inline">
 							<input type="checkbox" name="new_exc_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
-							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 						<?php } ?>
 						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>

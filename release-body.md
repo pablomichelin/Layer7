@@ -1,9 +1,10 @@
-## Layer7 v0.2.1 — Empacotamento autocontido
+## Layer7 v0.2.2 — Labels amigaveis de interface
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
+- **Labels amigaveis na GUI** — Interfaces de captura, politicas e excecoes agora mostram a descricao configurada da interface no pfSense, em vez de `OPT1`, `OPT2`, etc., quando houver descricao definida
 - **Pacote autocontido** — `layer7d` passa a usar `libndpi.a` no build, evitando erro de `libndpi.so` ausente no pfSense
 - **Install de um comando mantido** — o `install.sh` continua instalando direto do GitHub Releases, sem compilacao manual
 - **Validacao de release** — o processo de build agora falha se o binario final ainda depender de `libndpi.so`

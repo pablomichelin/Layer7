@@ -273,12 +273,27 @@ function layer7_ndpi_list()
  */
 function layer7_get_pfsense_interfaces()
 {
+	global $config;
+
 	$result = array();
 	foreach (get_configured_interface_list(true) as $ifid => $ifdescr) {
 		$real = get_real_interface($ifid);
-		if ($real) {
-			$result[] = array("ifid" => $ifid, "descr" => $ifdescr, "real" => $real);
+		if (!$real) {
+			continue;
 		}
+
+		$label = "";
+		if (!empty($config["interfaces"][$ifid]["descr"]) && is_string($config["interfaces"][$ifid]["descr"])) {
+			$label = trim($config["interfaces"][$ifid]["descr"]);
+		}
+		if ($label === "" && is_string($ifdescr)) {
+			$label = trim($ifdescr);
+		}
+		if ($label === "") {
+			$label = strtoupper((string)$ifid);
+		}
+
+		$result[] = array("ifid" => $ifid, "descr" => $label, "real" => $real);
 	}
 	return $result;
 }

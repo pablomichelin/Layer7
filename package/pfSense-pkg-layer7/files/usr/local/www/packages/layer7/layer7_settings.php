@@ -96,16 +96,9 @@ if (isset($L["interfaces"]) && is_array($L["interfaces"])) {
 }
 
 $pfsense_ifaces = array();
-foreach (get_configured_interface_list(true) as $ifid => $ifdescr) {
-	$real = get_real_interface($ifid);
-	if ($real) {
-		$pfsense_ifaces[] = array(
-			"ifid" => $ifid,
-			"descr" => $ifdescr,
-			"real" => $real,
-			"checked" => in_array($real, $configured_real, true)
-		);
-	}
+foreach (layer7_get_pfsense_interfaces() as $ifc) {
+	$ifc["checked"] = in_array($ifc["real"], $configured_real, true);
+	$pfsense_ifaces[] = $ifc;
 }
 
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Settings"));
@@ -204,7 +197,7 @@ layer7_render_styles();
 						<label>
 							<input type="checkbox" name="iface_sel[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>"
 								<?= $ifc["checked"] ? 'checked="checked"' : ''; ?> />
-							<strong><?= htmlspecialchars(strtoupper($ifc["descr"])); ?></strong>
+							<strong><?= htmlspecialchars($ifc["descr"]); ?></strong>
 							<span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 					</div>
