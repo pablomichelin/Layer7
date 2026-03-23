@@ -6,7 +6,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 |--|--|
 | **Repositório** | <https://github.com/pablomichelin/pfsense-layer7> |
 | **Licença** | BSD-2-Clause (ver `LICENSE`) |
-| **Versão actual** | **0.2.5** (hostname e destino nos eventos) |
+| **Versão actual** | **0.2.6** (listas melhores e sites manuais) |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x · FreeBSD 14/15 |
 
 ## O que faz
@@ -18,11 +18,14 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 - **Excepciona** IPs, sub-redes e interfaces específicas
 - **Gestão de frota** para 50+ firewalls com scripts automatizados
 
-## Funcionalidades v0.2.5
+## Funcionalidades v0.2.6
 
 - **Políticas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
 - **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes específicos
+- **Sites/hosts manuais** — adicionar domínios manualmente nas políticas, com match por host e subdomínio observado
 - **Selecção de apps nDPI** — lista com pesquisa de ~350 aplicações e categorias
+- **Selecção em massa** — botões para selecionar tudo/limpar interfaces e selecionar itens visíveis nas listas nDPI
+- **Visualização das listas** — ação `Ver listas` para inspeccionar tudo o que a política cobre antes de editar
 - **Excepções granulares** — múltiplos hosts/CIDRs por excepção, por interface
 - **GUI completa** — 6 páginas (Estado, Definições, Políticas, Excepções, Events, Diagnostics)
 - **`layer7d --list-protos`** — enumera protocolos/categorias nDPI em JSON
@@ -44,11 +47,11 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 
 ```bash
 # No pfSense (SSH como root):
-fetch -o /tmp/layer7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.2.5/pfSense-pkg-layer7-0.2.5.pkg
+fetch -o /tmp/layer7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.2.6/pfSense-pkg-layer7-0.2.6.pkg
 IGNORE_OSVERSION=yes pkg add -f /tmp/layer7.pkg
 sysrc layer7d_enable=YES
 service layer7d onestart
-layer7d -V   # deve mostrar: 0.2.5
+layer7d -V   # deve mostrar: 0.2.6
 ```
 
 Depois aceda a **Services > Layer 7** na GUI do pfSense.

@@ -320,7 +320,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 	if (!s_have_parse || !src_ip || cfg_disabled(&s_parsed))
 		return;
 	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, s_ge, iface, src_ip,
-	    ndpi_app, ndpi_cat, &dec);
+	    ndpi_app, ndpi_cat, host, &dec);
 
 	if (dec.action == LAYER7_ACTION_BLOCK ||
 	    dec.action == LAYER7_ACTION_TAG) {
@@ -402,7 +402,8 @@ run_enforce_once_cli(const char *path, const char *ip, const char *app,
 	ge = p.has_mode && strcmp(p.mode, "enforce") == 0;
 	free(buf);
 
-	layer7_flow_decide(exc, nx, rules, np, ge, NULL, ip, app, cat, &dec);
+	layer7_flow_decide(exc, nx, rules, np, ge, NULL, ip, app, cat, NULL,
+	    &dec);
 	printf(
 	    "enforce-once: action=%s reason=%s would_enforce=%d table=%s\n",
 	    layer7_action_str(dec.action),
@@ -633,7 +634,8 @@ apply_config(int use_syslog)
 			    rules[k].enabled ? "true" : "false");
 			if (rules[k].tag_table[0])
 				printf(" tag_table=%s", rules[k].tag_table);
-			if (rules[k].n_ndpi_apps == 0 && rules[k].n_ndpi_cats == 0)
+			if (rules[k].n_ndpi_apps == 0 && rules[k].n_ndpi_cats == 0 &&
+			    rules[k].n_hosts == 0)
 				printf(" match.*\n");
 			else {
 				int j;
@@ -652,6 +654,15 @@ apply_config(int use_syslog)
 						if (j)
 							printf(",");
 						printf("%s", rules[k].ndpi_cats[j]);
+					}
+					printf("]");
+				}
+				if (rules[k].n_hosts > 0) {
+					printf(" hosts=[");
+					for (j = 0; j < rules[k].n_hosts; j++) {
+						if (j)
+							printf(",");
+						printf("%s", rules[k].hosts[j]);
 					}
 					printf("]");
 				}
@@ -715,7 +726,7 @@ apply_config(int use_syslog)
 				struct layer7_decision dec;
 
 				layer7_flow_decide(exc, nx, rules, np, ge,
-				    NULL, srcs[a], apps[a], cats[a], &dec);
+				    NULL, srcs[a], apps[a], cats[a], NULL, &dec);
 				printf("      src=%s app=%s cat=%s -> %s reason=%s",
 				    srcs[a] ? srcs[a] : "(null)",
 				    apps[a] ? apps[a] : "(null)",

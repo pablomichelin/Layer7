@@ -1,4 +1,5 @@
 #include "policy.h"
+#include <strings.h>
 #include "enforce.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -339,6 +340,10 @@ parse_match_subobject(const char *obj, const char *obj_end,
 		(char *)r->ndpi_cats, L7_MAX_CATS_PER_POLICY,
 		L7_POLICY_CAT_LEN, &r->n_ndpi_cats) != 0)
 		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "hosts",
+		(char *)r->hosts, L7_MAX_HOSTS_PER_POLICY,
+		L7_POLICY_HOST_LEN, &r->n_hosts) != 0)
+		return -1;
 	if (parse_string_array_in_object(ob, oe + 1, "src_hosts",
 		(char *)r->src_hosts, L7_MAX_SRC_HOSTS,
 		L7_EXC_HOST_LEN, &r->n_src_hosts) != 0)
@@ -670,8 +675,27 @@ src_matches_rule(const struct layer7_policy_rule *r, const char *src_ip)
 }
 
 static int
+host_matches_rule(const char *flow_host, const char *rule_host)
+{
+	size_t flow_len, rule_len;
+
+	if (!flow_host || !*flow_host || !rule_host || !*rule_host)
+		return 0;
+	flow_len = strlen(flow_host);
+	rule_len = strlen(rule_host);
+	if (flow_len == rule_len && strcasecmp(flow_host, rule_host) == 0)
+		return 1;
+	if (flow_len <= rule_len)
+		return 0;
+	if (flow_host[flow_len - rule_len - 1] != '.')
+		return 0;
+	return strcasecmp(flow_host + (flow_len - rule_len), rule_host) == 0;
+}
+
+static int
 rule_matches(const struct layer7_policy_rule *r, const char *iface,
-    const char *src_ip, const char *ndpi_app, const char *ndpi_cat)
+    const char *src_ip, const char *ndpi_app, const char *ndpi_cat,
+    const char *host)
 {
 	int i;
 
@@ -694,6 +718,16 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 			return 0;
 		for (i = 0; i < r->n_ndpi_cats; i++) {
 			if (strcmp(ndpi_cat, r->ndpi_cats[i]) == 0)
+				break;
+		}
+		if (i >= r->n_ndpi_cats)
+			return 0;
+	}
+	if (r->n_hosts > 0) {
+		if (!host || !*host)
+			return 0;
+		for (i = 0; i < r->n_hosts; i++) {
+			if (host_matches_rule(host, r->hosts[i]))
 				return 1;
 		}
 		return 0;
@@ -764,7 +798,7 @@ void
 layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
     const struct layer7_policy_rule *rules, int n_rules, int global_enforce,
     const char *iface, const char *src_ip,
-    const char *ndpi_app, const char *ndpi_category,
+    const char *ndpi_app, const char *ndpi_category, const char *host,
     struct layer7_decision *dec)
 {
 	int i;
@@ -794,7 +828,7 @@ layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 
 		if (!r->enabled)
 			continue;
-		if (!rule_matches(r, iface, src_ip, ndpi_app, ndpi_category))
+		if (!rule_matches(r, iface, src_ip, ndpi_app, ndpi_category, host))
 			continue;
 		dec->action = r->action;
 		dec->reason = L7_DECIDE_POLICY_MATCH;

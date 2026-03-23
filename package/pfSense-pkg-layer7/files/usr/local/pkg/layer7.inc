@@ -237,6 +237,30 @@ function layer7_syslog_remote_host_valid($s)
 	return preg_match('/^[a-zA-Z0-9]([a-zA-Z0-9.-]{0,253}[a-zA-Z0-9])?$/', $s) === 1;
 }
 
+function layer7_policy_host_valid($s)
+{
+	if (!is_string($s)) {
+		return false;
+	}
+	$s = strtolower(trim($s));
+	if (strlen($s) < 1 || strlen($s) > 128) {
+		return false;
+	}
+	if (strpos($s, "/") !== false || strpos($s, ":") !== false || strpos($s, " ") !== false) {
+		return false;
+	}
+	if (strpos($s, "..") !== false) {
+		return false;
+	}
+	if ($s[0] === '.') {
+		$s = substr($s, 1);
+	}
+	if ($s === "" || $s[0] === '-' || substr($s, -1) === '-' || substr($s, -1) === '.') {
+		return false;
+	}
+	return preg_match('/^[a-z0-9]([a-z0-9.-]{0,126}[a-z0-9])?$/', $s) === 1;
+}
+
 /**
  * Load nDPI protocol and category lists from layer7d --list-protos.
  * Caches result in /tmp for 1 hour.
@@ -334,6 +358,25 @@ function layer7_parse_cidr_textarea($text)
 	return array_values(array_unique($out));
 }
 
+function layer7_parse_host_textarea($text, $max = 16)
+{
+	$out = array();
+	$lines = preg_split('/[\r\n,]+/', trim((string)$text));
+	foreach ($lines as $line) {
+		$line = strtolower(trim($line));
+		if ($line === "" || $line[0] === '#') {
+			continue;
+		}
+		if ($line[0] === '.') {
+			$line = substr($line, 1);
+		}
+		if (layer7_policy_host_valid($line) && count($out) < $max) {
+			$out[] = $line;
+		}
+	}
+	return array_values(array_unique($out));
+}
+
 function layer7_nav_items()
 {
 	return array(
@@ -389,6 +432,10 @@ function layer7_render_styles()
 	.layer7-page .l7-multiselect-wrap label:hover { background: #f0f5ff; }
 	.layer7-page .l7-multiselect-wrap input[type=checkbox] { margin-right: 6px; }
 	.layer7-page .l7-filter { margin-bottom: 6px; }
+	.layer7-page .l7-bulk-tools { margin: 0 0 6px; }
+	.layer7-page .l7-bulk-tools .btn { margin-right: 6px; margin-bottom: 6px; }
+	.layer7-page .l7-detail-grid dt { width: 170px; }
+	.layer7-page .l7-detail-grid dd { margin-left: 190px; margin-bottom: 10px; }
 	</style>';
 }
 

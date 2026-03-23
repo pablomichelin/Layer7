@@ -376,6 +376,11 @@ function layer7_exc_target_summary($exception) {
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
 					<div class="col-sm-9">
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_exc_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_exc_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+						</div>
+						<div id="edit_exc_ifaces_list">
 						<?php foreach ($ee_ifaces as $ifc) {
 							$chk = in_array($ifc["real"], $edit_ex_ifaces_arr, true) ? 'checked="checked"' : '';
 						?>
@@ -384,6 +389,7 @@ function layer7_exc_target_summary($exception) {
 							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 						<?php } ?>
+						</div>
 						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
@@ -462,12 +468,18 @@ function layer7_exc_target_summary($exception) {
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
 					<div class="col-sm-9">
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_exc_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_exc_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+						</div>
+						<div id="new_exc_ifaces_list">
 						<?php foreach ($pf_ifaces_exc as $ifc) { ?>
 						<label class="checkbox-inline">
 							<input type="checkbox" name="new_exc_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
 							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 						<?php } ?>
+						</div>
 						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
@@ -514,4 +526,15 @@ function layer7_exc_target_summary($exception) {
 		</div>
 	</div>
 </div>
+<script>
+function l7setChecks(listId, checked) {
+	var wrap = document.getElementById(listId);
+	var i, boxes;
+	if (!wrap) return;
+	boxes = wrap.querySelectorAll('input[type="checkbox"]');
+	for (i = 0; i < boxes.length; i++) {
+		boxes[i].checked = checked;
+	}
+}
+</script>
 <?php require_once("foot.inc"); ?>

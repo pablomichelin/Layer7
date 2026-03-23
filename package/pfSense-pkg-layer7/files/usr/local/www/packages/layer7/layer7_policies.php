@@ -92,6 +92,7 @@ if ($_POST["add_policy"] ?? false) {
 		}
 		$new_src_hosts = layer7_parse_ip_textarea($_POST["new_src_hosts"] ?? "");
 		$new_src_cidrs = layer7_parse_cidr_textarea($_POST["new_src_cidrs"] ?? "");
+		$new_match_hosts = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "");
 
 		if ($ok && $apps !== null && $cats !== null) {
 			$rule = array(
@@ -110,6 +111,9 @@ if ($_POST["add_policy"] ?? false) {
 			}
 			if (count($cats) > 0) {
 				$rule["match"]["ndpi_category"] = $cats;
+			}
+			if (!empty($new_match_hosts)) {
+				$rule["match"]["hosts"] = $new_match_hosts;
 			}
 			if (!empty($new_src_hosts)) {
 				$rule["match"]["src_hosts"] = $new_src_hosts;
@@ -235,6 +239,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 			}
 			$edit_src_hosts = layer7_parse_ip_textarea($_POST["edit_src_hosts"] ?? "");
 			$edit_src_cidrs = layer7_parse_cidr_textarea($_POST["edit_src_cidrs"] ?? "");
+			$edit_match_hosts = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "");
 
 			if ($ok && $apps !== null && $cats !== null) {
 				$rule = array(
@@ -253,6 +258,9 @@ if ($_POST["save_policy_edit"] ?? false) {
 				}
 				if (count($cats) > 0) {
 					$rule["match"]["ndpi_category"] = $cats;
+				}
+				if (!empty($edit_match_hosts)) {
+					$rule["match"]["hosts"] = $edit_match_hosts;
 				}
 				if (!empty($edit_src_hosts)) {
 					$rule["match"]["src_hosts"] = $edit_src_hosts;
@@ -282,6 +290,8 @@ $at_limit = count($policies) >= 24;
 
 $edit_idx = null;
 $edit_policy = null;
+$view_idx = null;
+$view_policy = null;
 if ($layer7_policy_edit_retry !== null && $layer7_policy_edit_retry >= 0 &&
     $layer7_policy_edit_retry < count($policies)) {
 	$edit_idx = (int)$layer7_policy_edit_retry;
@@ -291,6 +301,13 @@ if ($layer7_policy_edit_retry !== null && $layer7_policy_edit_retry >= 0 &&
 	if ($edit_candidate >= 0 && $edit_candidate < count($policies)) {
 		$edit_idx = $edit_candidate;
 		$edit_policy = $policies[$edit_candidate];
+	}
+}
+if (isset($_GET["view"]) && ctype_digit((string)$_GET["view"])) {
+	$view_candidate = (int)$_GET["view"];
+	if ($view_candidate >= 0 && $view_candidate < count($policies)) {
+		$view_idx = $view_candidate;
+		$view_policy = $policies[$view_candidate];
 	}
 }
 
@@ -303,6 +320,32 @@ sort($ndpi_cats);
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Policies"));
 include("head.inc");
 layer7_render_styles();
+
+function layer7_policy_match_summary($policy) {
+	$matches = array();
+	if (!empty($policy["interfaces"]) && is_array($policy["interfaces"])) {
+		$matches[] = gettext("Ifaces") . ": " . implode(", ", $policy["interfaces"]);
+	}
+	if (!empty($policy["match"]["ndpi_app"]) && is_array($policy["match"]["ndpi_app"])) {
+		$matches[] = gettext("Apps") . ": " . implode(", ", $policy["match"]["ndpi_app"]);
+	}
+	if (!empty($policy["match"]["ndpi_category"]) && is_array($policy["match"]["ndpi_category"])) {
+		$matches[] = gettext("Categorias") . ": " . implode(", ", $policy["match"]["ndpi_category"]);
+	}
+	if (!empty($policy["match"]["hosts"]) && is_array($policy["match"]["hosts"])) {
+		$matches[] = gettext("Sites") . ": " . implode(", ", $policy["match"]["hosts"]);
+	}
+	if (!empty($policy["match"]["src_hosts"]) && is_array($policy["match"]["src_hosts"])) {
+		$matches[] = gettext("IPs") . ": " . implode(", ", $policy["match"]["src_hosts"]);
+	}
+	if (!empty($policy["match"]["src_cidrs"]) && is_array($policy["match"]["src_cidrs"])) {
+		$matches[] = gettext("CIDRs") . ": " . implode(", ", $policy["match"]["src_cidrs"]);
+	}
+	if (!empty($policy["tag_table"]) && (($policy["action"] ?? "") === "tag")) {
+		$matches[] = gettext("Tabela PF") . ": " . $policy["tag_table"];
+	}
+	return count($matches) > 0 ? $matches : array(gettext("Sem filtros especificos."));
+}
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
@@ -341,28 +384,7 @@ layer7_render_styles();
 							$action = isset($policy["action"]) ? (string)$policy["action"] : "";
 							$priority = isset($policy["priority"]) ? (int)$policy["priority"] : 0;
 							$enabled = !empty($policy["enabled"]);
-							$matches = array();
-							if (!empty($policy["interfaces"]) && is_array($policy["interfaces"])) {
-								$matches[] = gettext("Ifaces") . ": " . implode(", ", $policy["interfaces"]);
-							}
-							if (!empty($policy["match"]["ndpi_app"]) && is_array($policy["match"]["ndpi_app"])) {
-								$matches[] = gettext("Apps") . ": " . implode(", ", $policy["match"]["ndpi_app"]);
-							}
-							if (!empty($policy["match"]["ndpi_category"]) && is_array($policy["match"]["ndpi_category"])) {
-								$matches[] = gettext("Categorias") . ": " . implode(", ", $policy["match"]["ndpi_category"]);
-							}
-							if (!empty($policy["match"]["src_hosts"]) && is_array($policy["match"]["src_hosts"])) {
-								$matches[] = gettext("IPs") . ": " . implode(", ", $policy["match"]["src_hosts"]);
-							}
-							if (!empty($policy["match"]["src_cidrs"]) && is_array($policy["match"]["src_cidrs"])) {
-								$matches[] = gettext("CIDRs") . ": " . implode(", ", $policy["match"]["src_cidrs"]);
-							}
-							if ($action === "tag" && !empty($policy["tag_table"])) {
-								$matches[] = gettext("Tabela PF") . ": " . $policy["tag_table"];
-							}
-							if (count($matches) === 0) {
-								$matches[] = gettext("Sem filtros especificos.");
-							}
+							$matches = layer7_policy_match_summary($policy);
 						?>
 							<tr>
 								<td><input type="checkbox" name="pon[<?= (int)$i; ?>]" value="1" <?= $enabled ? 'checked="checked"' : ''; ?> /></td>
@@ -372,6 +394,7 @@ layer7_render_styles();
 								<td class="small"><?= htmlspecialchars(implode(" | ", $matches)); ?></td>
 								<td><code><?= htmlspecialchars($pid); ?></code></td>
 								<td class="layer7-table-actions">
+									<a href="layer7_policies.php?view=<?= (int)$i; ?>" class="btn btn-xs btn-default"><?= gettext("Ver listas"); ?></a>
 									<a href="layer7_policies.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= gettext("Editar"); ?></a>
 								</td>
 							</tr>
@@ -403,6 +426,37 @@ layer7_render_styles();
 			<?php } ?>
 		</div>
 
+		<?php if ($view_policy !== null && $view_idx !== null) { ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Listas da politica"); ?></h3>
+			<p class="layer7-lead"><?= gettext("Visualizacao rapida da regra, com todos os itens incluidos no match."); ?></p>
+			<div class="layer7-toolbar">
+				<a href="layer7_policies.php" class="btn btn-default"><?= gettext("Fechar"); ?></a>
+				<a href="layer7_policies.php?edit=<?= (int)$view_idx; ?>" class="btn btn-info"><?= gettext("Editar esta politica"); ?></a>
+			</div>
+			<dl class="dl-horizontal layer7-detail-grid">
+				<dt><code>id</code></dt>
+				<dd><code><?= htmlspecialchars((string)($view_policy["id"] ?? "")); ?></code></dd>
+				<dt><?= gettext("Nome"); ?></dt>
+				<dd><?= htmlspecialchars((string)($view_policy["name"] ?? "")); ?></dd>
+				<dt><?= gettext("Acao"); ?></dt>
+				<dd><span class="label label-default"><?= htmlspecialchars((string)($view_policy["action"] ?? "monitor")); ?></span></dd>
+				<dt><?= gettext("Interfaces"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["interfaces"]) ? implode("\n", $view_policy["interfaces"]) : gettext("Todas")); ?></pre></dd>
+				<dt><?= gettext("Apps nDPI"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ndpi_app"]) ? implode("\n", $view_policy["match"]["ndpi_app"]) : gettext("Qualquer app")); ?></pre></dd>
+				<dt><?= gettext("Categorias nDPI"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ndpi_category"]) ? implode("\n", $view_policy["match"]["ndpi_category"]) : gettext("Qualquer categoria")); ?></pre></dd>
+				<dt><?= gettext("Sites/hosts"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["hosts"]) ? implode("\n", $view_policy["match"]["hosts"]) : gettext("Qualquer host")); ?></pre></dd>
+				<dt><?= gettext("IPs de origem"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_hosts"]) ? implode("\n", $view_policy["match"]["src_hosts"]) : gettext("Qualquer IP")); ?></pre></dd>
+				<dt><?= gettext("CIDRs de origem"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_cidrs"]) ? implode("\n", $view_policy["match"]["src_cidrs"]) : gettext("Qualquer sub-rede")); ?></pre></dd>
+			</dl>
+		</div>
+		<?php } ?>
+
 		<?php if ($edit_policy !== null && $edit_idx !== null) {
 			$edit_id = isset($edit_policy["id"]) ? (string)$edit_policy["id"] : "";
 			$edit_name = isset($edit_policy["name"]) ? (string)$edit_policy["name"] : "";
@@ -419,6 +473,10 @@ layer7_render_styles();
 			$edit_categories = "";
 			if (isset($edit_policy["match"]["ndpi_category"]) && is_array($edit_policy["match"]["ndpi_category"])) {
 				$edit_categories = implode(", ", $edit_policy["match"]["ndpi_category"]);
+			}
+			$edit_hosts_match_val = "";
+			if (isset($edit_policy["match"]["hosts"]) && is_array($edit_policy["match"]["hosts"])) {
+				$edit_hosts_match_val = implode("\n", $edit_policy["match"]["hosts"]);
 			}
 			$edit_tag_table = isset($edit_policy["tag_table"]) ? (string)$edit_policy["tag_table"] : "";
 		?>
@@ -483,6 +541,11 @@ layer7_render_styles();
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
 					<div class="col-sm-9">
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+						</div>
+						<div id="edit_ifaces_list">
 						<?php foreach ($ep_ifaces as $ifc) {
 							$chk = in_array($ifc["real"], $edit_policy_ifaces, true) ? 'checked="checked"' : '';
 						?>
@@ -491,6 +554,7 @@ layer7_render_styles();
 							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 						<?php } ?>
+						</div>
 						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
@@ -512,6 +576,14 @@ layer7_render_styles();
 				</div>
 
 				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Sites/hosts"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="edit_match_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_hosts_match_val); ?></textarea>
+						<p class="help-block"><?= gettext("Um host por linha, ex.: youtube.com ou api.whatsapp.com. O match aceita o host exacto e subdominios."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
 					<div class="col-sm-9">
 						<?php
@@ -521,6 +593,10 @@ layer7_render_styles();
 						}
 						if (!empty($ndpi_protos)) { ?>
 						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'edit_apps_list')" style="max-width:400px" />
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+						</div>
 						<div class="l7-multiselect-wrap" id="edit_apps_list" style="max-width:400px">
 						<?php foreach ($ndpi_protos as $proto) {
 							$chk = in_array($proto, $edit_apps_arr, true) ? 'checked="checked"' : '';
@@ -545,6 +621,10 @@ layer7_render_styles();
 						}
 						if (!empty($ndpi_cats)) { ?>
 						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'edit_cats_list')" style="max-width:400px" />
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+						</div>
 						<div class="l7-multiselect-wrap" id="edit_cats_list" style="max-width:400px">
 						<?php foreach ($ndpi_cats as $cat) {
 							$chk = in_array($cat, $edit_cats_arr, true) ? 'checked="checked"' : '';
@@ -633,12 +713,18 @@ layer7_render_styles();
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
 					<div class="col-sm-9">
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+						</div>
+						<div id="new_ifaces_list">
 						<?php foreach ($pf_ifaces as $ifc) { ?>
 						<label class="checkbox-inline">
 							<input type="checkbox" name="new_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
-							<?= htmlspecialchars(strtoupper($ifc["descr"])); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+							<?= htmlspecialchars($ifc["descr"]); ?> <span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
 						</label>
 						<?php } ?>
+						</div>
 						<p class="help-block"><?= gettext("Nenhuma selecionada = aplica a todas as interfaces."); ?></p>
 					</div>
 				</div>
@@ -660,10 +746,22 @@ layer7_render_styles();
 				</div>
 
 				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= gettext("Sites/hosts"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="new_match_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="youtube.com&#10;api.whatsapp.com"></textarea>
+						<p class="help-block"><?= gettext("Um host por linha. O match aceita o host exacto e subdominios observados no log host=."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
 					<div class="col-sm-9">
 						<?php if (!empty($ndpi_protos)) { ?>
 						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'new_apps_list')" style="max-width:400px" />
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+						</div>
 						<div class="l7-multiselect-wrap" id="new_apps_list" style="max-width:400px">
 						<?php foreach ($ndpi_protos as $proto) { ?>
 							<label><input type="checkbox" name="new_ndpi_apps[]" value="<?= htmlspecialchars($proto); ?>" /> <?= htmlspecialchars($proto); ?></label>
@@ -681,6 +779,10 @@ layer7_render_styles();
 					<div class="col-sm-9">
 						<?php if (!empty($ndpi_cats)) { ?>
 						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'new_cats_list')" style="max-width:400px" />
+						<div class="l7-bulk-tools">
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+						</div>
 						<div class="l7-multiselect-wrap" id="new_cats_list" style="max-width:400px">
 						<?php foreach ($ndpi_cats as $cat) { ?>
 							<label><input type="checkbox" name="new_ndpi_category[]" value="<?= htmlspecialchars($cat); ?>" /> <?= htmlspecialchars($cat); ?></label>
@@ -734,6 +836,20 @@ function l7filter(input, listId) {
 	for (var i = 0; i < labels.length; i++) {
 		var txt = labels[i].textContent.toLowerCase();
 		labels[i].style.display = txt.indexOf(filter) >= 0 ? '' : 'none';
+	}
+}
+
+function l7setChecks(listId, checked, onlyVisible) {
+	var wrap = document.getElementById(listId);
+	var i, boxes, label;
+	if (!wrap) return;
+	boxes = wrap.querySelectorAll('input[type="checkbox"]');
+	for (i = 0; i < boxes.length; i++) {
+		label = boxes[i].closest('label');
+		if (onlyVisible && label && label.style.display === 'none') {
+			continue;
+		}
+		boxes[i].checked = checked;
 	}
 }
 </script>

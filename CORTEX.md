@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.2.5 — Hostname e destino nos eventos**
+**Versão: 0.2.6 — listas melhores e sites manuais**
 
 Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
 
@@ -13,6 +13,12 @@ Pacote funcional com motor de políticas granulares por interface, listas de IPs
 - Excepções respeitadas (IPs .195 e .129 não tagados)
 - Decisões block/tag logadas a NOTICE
 - CLI `-e` valida: BitTorrent→block, HTTP→monitor, IP excepcionado→allow
+
+**Listas melhores e sites manuais (v0.2.6):**
+- GUI de políticas com botões de seleção em massa para interfaces, apps e categorias
+- novo campo `Sites/hosts` em políticas, gravado como `match.hosts[]`
+- matching por host/subdomínio com base no `host=` inferido por DNS
+- ação `Ver listas` para abrir o conteúdo completo de uma política existente
 
 **Hostname e destino nos eventos (v0.2.5):**
 - logs passam a incluir `dst=` do fluxo
@@ -50,6 +56,11 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
   - build do port usa `/usr/local/lib/libndpi.a`
   - `update-ndpi.sh` aborta se o binário final ainda depender de `libndpi.so`
   - pacote validado em FreeBSD 15 lab sem dependência runtime de nDPI
+- **v0.2.6 — listas melhores e sites manuais (2026-03-23):**
+  - botões de seleção em massa nas listas da GUI
+  - novo campo `Sites/hosts` nas políticas
+  - `layer7d` passa a casar `match.hosts[]` com `host=` e subdomínios
+  - nova ação `Ver listas` nas políticas
 - **v0.2.5 — Hostname e destino nos eventos (2026-03-23):**
   - `flow_decide` passa a mostrar `dst=` e `host=`
   - `host=` e derivado por correlacao DNS observada na propria captura
@@ -73,10 +84,10 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Teste em pfSense real** — validar v0.2.5 em ambiente de produção.
+**Teste em pfSense real** — validar v0.2.6 em ambiente de produção.
 
 ## Proximos 3 passos
-1. Testar v0.2.5 em pfSense real (hostnames + monitor ao vivo)
+1. Testar v0.2.6 em pfSense real (sites manuais + listas + monitor ao vivo)
 2. Piloto estável 24h+ com regras multi-interface
 3. Ajustes com base no feedback do teste real
 
