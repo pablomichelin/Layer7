@@ -85,7 +85,16 @@ function layer7_generate_rules($type)
 		return "";
 	}
 
-	return layer7_pf_rules_text();
+	$rules = layer7_pf_rules_text();
+
+	$data = layer7_load_or_default();
+	if (!empty($data["layer7"]["block_quic"])) {
+		$rules .= "\n# Anti-QUIC: forcar fallback para TCP/TLS (melhor visibilidade SNI).\n";
+		$rules .= "block drop quick inet proto udp to port 443 label \"layer7:anti-quic\"\n";
+		$rules .= "block drop quick inet6 proto udp to port 443 label \"layer7:anti-quic6\"\n";
+	}
+
+	return $rules;
 }
 
 function layer7_bare_config()
@@ -99,7 +108,9 @@ function layer7_bare_config()
 			"syslog_remote_host" => "",
 			"syslog_remote_port" => 514,
 			"debug_minutes" => 0,
+			"block_quic" => false,
 			"interfaces" => array("lan"),
+			"groups" => array(),
 			"policies" => array(),
 			"exceptions" => array()
 		)
@@ -448,13 +459,193 @@ function layer7_parse_host_textarea($text, $max = 16)
 	return array_values(array_unique($out));
 }
 
+function layer7_stats_path()
+{
+	return "/tmp/layer7-stats.json";
+}
+
+/**
+ * Trigger SIGUSR1 to refresh stats, then read the JSON file.
+ * @return array|null parsed stats or null on failure
+ */
+function layer7_read_stats()
+{
+	$pidf = "/var/run/layer7d.pid";
+	if (file_exists($pidf)) {
+		$pid = trim(file_get_contents($pidf));
+		if ($pid !== "" && ctype_digit($pid)) {
+			$cmd = "/bin/kill -USR1 " . escapeshellarg($pid) . " 2>/dev/null";
+			if (function_exists("mwexec")) {
+				mwexec($cmd);
+			} else {
+				@shell_exec($cmd);
+			}
+			usleep(200000);
+		}
+	}
+	$path = layer7_stats_path();
+	if (!file_exists($path)) {
+		return null;
+	}
+	$raw = @file_get_contents($path);
+	if (!is_string($raw) || $raw === "") {
+		return null;
+	}
+	$j = json_decode($raw, true);
+	return is_array($j) ? $j : null;
+}
+
+function layer7_profiles_path()
+{
+	return "/usr/local/etc/layer7/profiles.json";
+}
+
+/**
+ * Load service profiles from profiles.json.
+ * @return array of profile arrays, empty array on failure
+ */
+function layer7_load_profiles()
+{
+	$path = layer7_profiles_path();
+	if (!file_exists($path)) {
+		return array();
+	}
+	$raw = @file_get_contents($path);
+	if (!is_string($raw) || $raw === "") {
+		return array();
+	}
+	$j = json_decode($raw, true);
+	if (!is_array($j) || !isset($j["profiles"]) || !is_array($j["profiles"])) {
+		return array();
+	}
+	return $j["profiles"];
+}
+
+/**
+ * Parse schedule fields from POST into a schedule array for the policy JSON.
+ * Returns the schedule array or null if no schedule configured.
+ */
+function layer7_parse_schedule_post($prefix)
+{
+	$days = array();
+	$day_names = array("mon", "tue", "wed", "thu", "fri", "sat", "sun");
+	foreach ($day_names as $d) {
+		if (isset($_POST[$prefix . "_sched_" . $d])) {
+			$days[] = $d;
+		}
+	}
+	$start = trim($_POST[$prefix . "_sched_start"] ?? "");
+	$end = trim($_POST[$prefix . "_sched_end"] ?? "");
+	if (empty($days) || $start === "" || $end === "") {
+		return null;
+	}
+	if (!preg_match('/^\d{1,2}:\d{2}$/', $start) || !preg_match('/^\d{1,2}:\d{2}$/', $end)) {
+		return null;
+	}
+	return array("days" => $days, "start" => $start, "end" => $end);
+}
+
+/**
+ * Format a schedule array for display in the policy list.
+ */
+function layer7_schedule_summary($policy)
+{
+	if (!isset($policy["schedule"]) || !is_array($policy["schedule"])) {
+		return gettext("Sempre activa");
+	}
+	$s = $policy["schedule"];
+	$days = isset($s["days"]) && is_array($s["days"]) ? $s["days"] : array();
+	$start = isset($s["start"]) ? $s["start"] : "";
+	$end = isset($s["end"]) ? $s["end"] : "";
+	if (empty($days) || $start === "" || $end === "") {
+		return gettext("Sempre activa");
+	}
+	$day_labels = array(
+		"mon" => "Seg", "tue" => "Ter", "wed" => "Qua",
+		"thu" => "Qui", "fri" => "Sex", "sat" => "Sab", "sun" => "Dom"
+	);
+	$labels = array();
+	foreach ($days as $d) {
+		$labels[] = isset($day_labels[$d]) ? $day_labels[$d] : $d;
+	}
+	return implode(",", $labels) . " " . $start . "-" . $end;
+}
+
+function layer7_group_id_valid($id)
+{
+	return is_string($id) && strlen($id) >= 1 && strlen($id) <= 80
+		&& preg_match('/^[a-zA-Z0-9_-]+$/', $id) === 1;
+}
+
+function layer7_load_groups()
+{
+	$data = layer7_load_or_default();
+	if (isset($data["layer7"]["groups"]) && is_array($data["layer7"]["groups"])) {
+		return $data["layer7"]["groups"];
+	}
+	return array();
+}
+
+function layer7_lic_path()
+{
+	return "/usr/local/etc/layer7.lic";
+}
+
+/**
+ * Read license status from the daemon stats JSON.
+ * Returns associative array with license_valid, license_expired, etc.
+ * Falls back to running layer7d --fingerprint for hardware_id if stats missing.
+ */
+function layer7_read_license_status()
+{
+	$stats = layer7_read_stats();
+	if (is_array($stats) && isset($stats["license_valid"])) {
+		return array(
+			"valid" => !empty($stats["license_valid"]),
+			"expired" => !empty($stats["license_expired"]),
+			"grace" => !empty($stats["license_grace"]),
+			"dev_mode" => !empty($stats["license_dev_mode"]),
+			"days_left" => isset($stats["license_days_left"]) ? (int)$stats["license_days_left"] : 0,
+			"customer" => isset($stats["license_customer"]) ? $stats["license_customer"] : "",
+			"expiry" => isset($stats["license_expiry"]) ? $stats["license_expiry"] : "",
+			"hardware_id" => isset($stats["license_hardware_id"]) ? $stats["license_hardware_id"] : "",
+			"error" => isset($stats["license_error"]) ? $stats["license_error"] : ""
+		);
+	}
+	$hw = "";
+	$bin = "/usr/local/sbin/layer7d";
+	if (is_executable($bin)) {
+		exec(escapeshellarg($bin) . " --fingerprint 2>/dev/null", $out, $rc);
+		if ($rc === 0 && !empty($out[0])) {
+			$hw = trim($out[0]);
+		}
+	}
+	$lic_path = layer7_lic_path();
+	$has_lic = file_exists($lic_path);
+	return array(
+		"valid" => false,
+		"expired" => false,
+		"grace" => false,
+		"dev_mode" => false,
+		"days_left" => 0,
+		"customer" => "",
+		"expiry" => "",
+		"hardware_id" => $hw,
+		"error" => $has_lic ? "daemon not running — cannot verify" : "no license file",
+		"has_file" => $has_lic
+	);
+}
+
 function layer7_nav_items()
 {
 	return array(
 		"status" => array("label" => gettext("Estado"), "href" => "layer7_status.php"),
 		"settings" => array("label" => gettext("Definicoes"), "href" => "layer7_settings.php"),
 		"policies" => array("label" => gettext("Politicas"), "href" => "layer7_policies.php"),
+		"groups" => array("label" => gettext("Grupos"), "href" => "layer7_groups.php"),
+		"categories" => array("label" => gettext("Categorias"), "href" => "layer7_categories.php"),
 		"exceptions" => array("label" => gettext("Excecoes"), "href" => "layer7_exceptions.php"),
+		"test" => array("label" => gettext("Teste"), "href" => "layer7_test.php"),
 		"events" => array("label" => gettext("Events"), "href" => "layer7_events.php"),
 		"diagnostics" => array("label" => gettext("Diagnostics"), "href" => "layer7_diagnostics.php")
 	);

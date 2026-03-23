@@ -1,38 +1,46 @@
 # Layer7 para pfSense CE
 
-Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo real via **nDPI** (~350 aplicações detectáveis), políticas granulares por interface/IP (`monitor`, `tag`, `allow`, `block`), enforcement via PF tables e GUI completa no ecossistema pfSense.
+Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **nDPI** (~350 aplicacoes detectaveis), politicas granulares por interface/IP/grupo/horario (`monitor`, `tag`, `allow`, `block`), enforcement via PF tables e GUI completa com 10 paginas no ecossistema pfSense.
 
 | | |
 |--|--|
-| **Repositório** | <https://github.com/pablomichelin/pfsense-layer7> |
-| **Licença** | BSD-2-Clause (ver `LICENSE`) |
-| **Versão actual** | **0.3.2** (actualizacao via GUI + anti-bypass DNS) |
-| **Compatibilidade** | pfSense CE 2.7.x / 2.8.x · FreeBSD 14/15 |
+| **Repositorio** | <https://github.com/pablomichelin/pfsense-layer7> |
+| **Licenca** | EULA (ver `LICENSE`) |
+| **Versao actual** | **1.0.0** |
+| **Compatibilidade** | pfSense CE 2.7.x / 2.8.x - FreeBSD 14/15 |
 
 ## O que faz
 
-- **Identifica** aplicações e protocolos em tempo real (BitTorrent, YouTube, TikTok, redes sociais, VPN, streaming, etc.)
-- **Bloqueia** tráfego por aplicação, categoria, interface e IP de origem
-- **Monitoriza** sem interferir no tráfego
-- **Tagga** IPs em tabelas PF customizadas para regras avançadas
-- **Excepciona** IPs, sub-redes e interfaces específicas
-- **Gestão de frota** para 50+ firewalls com scripts automatizados
+- **Identifica** aplicacoes e protocolos em tempo real (BitTorrent, YouTube, TikTok, redes sociais, VPN, streaming, etc.)
+- **Bloqueia** trafego por aplicacao, categoria, interface, IP de origem, grupo de dispositivos e horario
+- **Monitoriza** sem interferir no trafego
+- **Tagga** IPs em tabelas PF customizadas para regras avancadas
+- **Excepciona** IPs, sub-redes e interfaces especificas
+- **Gestao de frota** para 50+ firewalls com scripts automatizados
+- **Protege** com licenciamento Ed25519 e fingerprint de hardware
 
-## Funcionalidades v0.3.2
+## Funcionalidades v1.0
 
-- **Políticas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
-- **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes específicos
-- **Sites/hosts manuais** — adicionar domínios manualmente nas políticas, com match por host e subdomínio observado
-- **Selecção de apps nDPI** — lista com pesquisa de ~350 aplicações e categorias
-- **Selecção em massa** — botões para selecionar tudo/limpar interfaces e selecionar itens visíveis nas listas nDPI
-- **Visualização das listas** — ação `Ver listas` para inspeccionar tudo o que a política cobre antes de editar
-- **Excepções granulares** — múltiplos hosts/CIDRs por excepção, por interface
-- **GUI completa** — 6 páginas (Estado, Definições, Políticas, Excepções, Events, Diagnostics)
-- **`layer7d --list-protos`** — enumera protocolos/categorias nDPI em JSON
-- **Protocolos customizados** — ficheiro de regras editável em runtime (sem recompilação)
+- **Perfis de servico rapidos** — 15 perfis built-in (YouTube, Facebook, Instagram, TikTok, WhatsApp, Twitter/X, LinkedIn, Netflix, Spotify, Twitch, Redes Sociais, Streaming, Jogos, VPN/Proxy, AI Tools) com criacao de politica por 1 clique
+- **Politicas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
+- **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes especificos
+- **Grupos de dispositivos** — grupos nomeados (ex: "Funcionarios", "Visitantes") reutilizaveis em politicas
+- **Sites/hosts manuais** — adicionar dominios manualmente nas politicas, com match por host e subdominio
+- **Agendamento por horario** — politicas com dias da semana e faixa horaria (suporte overnight)
+- **Seleccao de apps nDPI** — lista com pesquisa de ~350 aplicacoes e categorias
+- **Seleccao em massa** — botoes para selecionar tudo/limpar interfaces e selecionar itens visiveis
+- **Dashboard operacional** — contadores em tempo real, top 10 apps bloqueadas, top 10 clientes
+- **Pagina de categorias nDPI** — todas as apps organizadas por categoria com pesquisa
+- **Teste de politica** — simulacao completa na GUI com veredicto visual (block/allow/monitor)
+- **Backup e restore** — export/import de configuracao completa em JSON
+- **Bloqueio QUIC selectivo** — toggle para forcar fallback TCP/TLS e melhorar visibilidade SNI
+- **Anti-bypass DNS** — bloqueio automatico de DoT/DoQ (porta 853), deteccao nDPI de DoH, e NXDOMAIN via Unbound para dominios de bypass conhecidos
+- **Licenciamento** — verificacao Ed25519 offline, fingerprint de hardware, grace period 14 dias, CLI de activacao
+- **Actualizacao pela GUI** — botao em Definicoes para verificar e instalar a ultima versao
+- **Excepcoes granulares** — multiplos hosts/CIDRs por excepcao, por interface
+- **GUI completa** — 10 paginas (Estado, Definicoes, Politicas, Grupos, Categorias, Teste, Excepcoes, Events, Diagnostics)
+- **Protocolos customizados** — ficheiro de regras editavel em runtime (sem recompilacao)
 - **Fleet management** — scripts para actualizar 50+ firewalls por SSH
-- **Anti-bypass DNS** — bloqueio automático de DoT/DoQ (porta 853), detecção nDPI de DoH, e NXDOMAIN via Unbound para domínios de bypass conhecidos (iCloud Private Relay, Firefox DoH, resolvers públicos)
-- **Actualização pela GUI** — botão em Definições para verificar e instalar a última versão directamente do GitHub Releases, sem necessidade de linha de comando
 
 ## Guia de utilização
 

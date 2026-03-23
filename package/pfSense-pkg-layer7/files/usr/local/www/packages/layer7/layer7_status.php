@@ -55,21 +55,125 @@ if (isset($L["policies"]) && is_array($L["policies"])) {
 	}
 }
 
+$stats = $running ? layer7_read_stats() : null;
+
+$uptime_str = "-";
+if ($stats && isset($stats["uptime_seconds"])) {
+	$up = (int)$stats["uptime_seconds"];
+	$days = floor($up / 86400);
+	$hours = floor(($up % 86400) / 3600);
+	$mins = floor(($up % 3600) / 60);
+	if ($days > 0) {
+		$uptime_str = sprintf("%dd %dh %dm", $days, $hours, $mins);
+	} elseif ($hours > 0) {
+		$uptime_str = sprintf("%dh %dm", $hours, $mins);
+	} else {
+		$uptime_str = sprintf("%dm", $mins);
+	}
+}
+
+$total_classified = ($stats && isset($stats["total_classified"])) ? (int)$stats["total_classified"] : 0;
+$total_blocked = ($stats && isset($stats["total_blocked"])) ? (int)$stats["total_blocked"] : 0;
+$total_allowed = ($stats && isset($stats["total_allowed"])) ? (int)$stats["total_allowed"] : 0;
+$top_apps = ($stats && isset($stats["top_apps_blocked"]) && is_array($stats["top_apps_blocked"])) ? $stats["top_apps_blocked"] : array();
+$top_sources = ($stats && isset($stats["top_sources_blocked"]) && is_array($stats["top_sources_blocked"])) ? $stats["top_sources_blocked"] : array();
+
 $pgtitle = array(gettext("Services"), gettext("Layer 7"));
 include("head.inc");
 layer7_render_styles();
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 - estado"); ?></h2>
+		<h2 class="panel-title"><?= gettext("Layer 7 - Dashboard"); ?></h2>
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("status"); ?>
 		<div class="layer7-content">
-		<p class="layer7-lead"><?= gettext("Visao geral do daemon, configuracao e estado operacional do Layer7."); ?></p>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Estado do sistema"); ?></h3>
+			<div class="l7-dashboard-cards">
+				<div class="l7-dash-card">
+					<div class="l7-dash-card-value"><?= number_format($total_classified); ?></div>
+					<div class="l7-dash-card-label"><?= gettext("Conexoes classificadas"); ?></div>
+				</div>
+				<div class="l7-dash-card l7-dash-card-danger">
+					<div class="l7-dash-card-value"><?= number_format($total_blocked); ?></div>
+					<div class="l7-dash-card-label"><?= gettext("Bloqueios"); ?></div>
+				</div>
+				<div class="l7-dash-card l7-dash-card-success">
+					<div class="l7-dash-card-value"><?= number_format($total_allowed); ?></div>
+					<div class="l7-dash-card-label"><?= gettext("Permitidos"); ?></div>
+				</div>
+				<div class="l7-dash-card">
+					<div class="l7-dash-card-value"><?= $n_policies_active; ?></div>
+					<div class="l7-dash-card-label"><?= gettext("Politicas activas"); ?></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="layer7-section">
+			<div class="row">
+				<div class="col-md-6">
+					<h3 class="layer7-section-title"><?= gettext("Top 10 apps bloqueadas"); ?></h3>
+					<?php if (empty($top_apps)) { ?>
+					<p class="text-muted"><?= gettext("Sem dados. O daemon precisa de trafego classificado para gerar estatisticas."); ?></p>
+					<?php } else { ?>
+					<table class="table table-striped table-condensed">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th><?= gettext("App"); ?></th>
+								<th><?= gettext("Bloqueios"); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php foreach ($top_apps as $rank => $entry) {
+							$app_name = isset($entry["app"]) ? $entry["app"] : "?";
+							$app_count = isset($entry["count"]) ? (int)$entry["count"] : 0;
+						?>
+							<tr>
+								<td><?= $rank + 1; ?></td>
+								<td><strong><?= htmlspecialchars($app_name); ?></strong></td>
+								<td><?= number_format($app_count); ?></td>
+							</tr>
+						<?php } ?>
+						</tbody>
+					</table>
+					<?php } ?>
+				</div>
+				<div class="col-md-6">
+					<h3 class="layer7-section-title"><?= gettext("Top 10 clientes bloqueados"); ?></h3>
+					<?php if (empty($top_sources)) { ?>
+					<p class="text-muted"><?= gettext("Sem dados."); ?></p>
+					<?php } else { ?>
+					<table class="table table-striped table-condensed">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th><?= gettext("IP de origem"); ?></th>
+								<th><?= gettext("Bloqueios"); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php foreach ($top_sources as $rank => $entry) {
+							$src_ip = isset($entry["ip"]) ? $entry["ip"] : "?";
+							$src_count = isset($entry["count"]) ? (int)$entry["count"] : 0;
+						?>
+							<tr>
+								<td><?= $rank + 1; ?></td>
+								<td><code><?= htmlspecialchars($src_ip); ?></code></td>
+								<td><?= number_format($src_count); ?></td>
+							</tr>
+						<?php } ?>
+						</tbody>
+					</table>
+					<?php } ?>
+				</div>
+			</div>
+		</div>
+
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Estado do daemon"); ?></h3>
 			<div class="layer7-callout">
 				<dl class="dl-horizontal layer7-summary">
 					<dt><?= gettext("Daemon"); ?></dt>
@@ -85,6 +189,9 @@ layer7_render_styles();
 					<dt><?= gettext("Versao"); ?></dt>
 					<dd><code><?= htmlspecialchars($daemon_ver); ?></code></dd>
 					<?php } ?>
+
+					<dt><?= gettext("Uptime"); ?></dt>
+					<dd><?= htmlspecialchars($uptime_str); ?></dd>
 
 					<dt><?= gettext("Modo"); ?></dt>
 					<dd>
@@ -118,6 +225,13 @@ layer7_render_styles();
 
 					<dt><?= gettext("Excecoes"); ?></dt>
 					<dd><?= $n_exceptions; ?></dd>
+
+					<?php if ($stats) { ?>
+					<dt><?= gettext("PF add OK"); ?></dt>
+					<dd><?= number_format((int)($stats["pf_add_ok"] ?? 0) + (int)($stats["dst_add_ok"] ?? 0)); ?></dd>
+					<dt><?= gettext("PF add fail"); ?></dt>
+					<dd><?= number_format((int)($stats["pf_add_fail"] ?? 0) + (int)($stats["dst_add_fail"] ?? 0)); ?></dd>
+					<?php } ?>
 				</dl>
 			</div>
 		</div>
@@ -156,8 +270,16 @@ layer7_render_styles();
 			<a href="layer7_events.php" class="btn btn-default"><?= gettext("Events"); ?></a>
 		</div>
 
-		<p class="layer7-muted-note small"><?= gettext("Quando enabled=false, o daemon permanece em idle. A interface continua acessivel para configuracao."); ?></p>
+		<p class="layer7-muted-note small"><?= gettext("Contadores sao reiniciados quando o daemon arranca. Estatisticas actualizam automaticamente a cada ~60 segundos."); ?></p>
 		</div>
 	</div>
 </div>
+<style>
+.l7-dashboard-cards { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 10px; }
+.l7-dash-card { flex: 1; min-width: 160px; max-width: 240px; background: #f9fafb; border: 1px solid #e5e5e5; border-radius: 6px; padding: 20px 18px; text-align: center; }
+.l7-dash-card-value { font-size: 32px; font-weight: 700; color: #333; line-height: 1.1; }
+.l7-dash-card-label { font-size: 13px; color: #777; margin-top: 6px; }
+.l7-dash-card-danger .l7-dash-card-value { color: #d9534f; }
+.l7-dash-card-success .l7-dash-card-value { color: #5cb85c; }
+</style>
 <?php require_once("foot.inc"); ?>

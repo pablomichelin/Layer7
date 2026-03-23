@@ -9,6 +9,7 @@
 #endif
 #include "config_parse.h"
 #include "enforce.h"
+#include "license.h"
 #include "policy.h"
 #include <errno.h>
 #include <netdb.h>
@@ -59,12 +60,150 @@ static unsigned long long s_pf_dst_add_ok;
 static unsigned long long s_pf_dst_add_fail;
 static volatile sig_atomic_t usr1_req;
 
+static unsigned long long s_total_classified;
+static unsigned long long s_total_blocked;
+static unsigned long long s_total_allowed;
+static time_t s_boot_time;
+
+static struct l7_license_info s_lic;
+static time_t s_last_lic_check;
+#define L7_LIC_CHECK_INTERVAL 3600
+
+#define L7_STATS_TOP_MAX 128
+
+struct l7_counter {
+	char key[64];
+	unsigned long long count;
+};
+
+static struct l7_counter s_app_blocks[L7_STATS_TOP_MAX];
+static int s_n_app_blocks;
+static struct l7_counter s_src_blocks[L7_STATS_TOP_MAX];
+static int s_n_src_blocks;
+
+static void
+stats_increment(struct l7_counter *arr, int *n, int max, const char *key)
+{
+	int i;
+	if (!key || key[0] == '\0')
+		return;
+	for (i = 0; i < *n; i++) {
+		if (strcmp(arr[i].key, key) == 0) {
+			arr[i].count++;
+			return;
+		}
+	}
+	if (*n < max) {
+		strncpy(arr[*n].key, key, sizeof(arr[0].key) - 1);
+		arr[*n].key[sizeof(arr[0].key) - 1] = '\0';
+		arr[*n].count = 1;
+		(*n)++;
+	}
+}
+
+static int
+counter_cmp_desc(const void *a, const void *b)
+{
+	const struct l7_counter *ca = (const struct l7_counter *)a;
+	const struct l7_counter *cb = (const struct l7_counter *)b;
+	if (cb->count > ca->count) return 1;
+	if (cb->count < ca->count) return -1;
+	return 0;
+}
+
+#define L7_STATS_JSON_PATH "/tmp/layer7-stats.json"
+
+static void
+write_stats_json(void)
+{
+	FILE *f;
+	int i, limit;
+	time_t now = time(NULL);
+
+	f = fopen(L7_STATS_JSON_PATH ".tmp", "w");
+	if (!f)
+		return;
+
+	fprintf(f, "{\n");
+	fprintf(f, "  \"version\": \"%s\",\n", layer7d_version);
+	fprintf(f, "  \"boot_time\": %lld,\n", (long long)s_boot_time);
+	fprintf(f, "  \"uptime_seconds\": %lld,\n",
+	    (long long)(now - s_boot_time));
+	fprintf(f, "  \"timestamp\": %lld,\n", (long long)now);
+	fprintf(f, "  \"total_classified\": %llu,\n",
+	    (unsigned long long)s_total_classified);
+	fprintf(f, "  \"total_blocked\": %llu,\n",
+	    (unsigned long long)s_total_blocked);
+	fprintf(f, "  \"total_allowed\": %llu,\n",
+	    (unsigned long long)s_total_allowed);
+	fprintf(f, "  \"policies_active\": %d,\n", s_np);
+	fprintf(f, "  \"exceptions\": %d,\n", s_nx);
+	fprintf(f, "  \"enforce_mode\": %d,\n", s_ge);
+	fprintf(f, "  \"pf_add_ok\": %llu,\n",
+	    (unsigned long long)s_pf_table_add_ok);
+	fprintf(f, "  \"pf_add_fail\": %llu,\n",
+	    (unsigned long long)s_pf_table_add_fail);
+	fprintf(f, "  \"dst_add_ok\": %llu,\n",
+	    (unsigned long long)s_pf_dst_add_ok);
+	fprintf(f, "  \"dst_add_fail\": %llu,\n",
+	    (unsigned long long)s_pf_dst_add_fail);
+
+	qsort(s_app_blocks, s_n_app_blocks, sizeof(s_app_blocks[0]),
+	    counter_cmp_desc);
+	fprintf(f, "  \"top_apps_blocked\": [");
+	limit = s_n_app_blocks < 10 ? s_n_app_blocks : 10;
+	for (i = 0; i < limit; i++) {
+		fprintf(f, "%s\n    {\"app\": \"", i > 0 ? "," : "");
+		json_escape_fprint(f, s_app_blocks[i].key);
+		fprintf(f, "\", \"count\": %llu}",
+		    (unsigned long long)s_app_blocks[i].count);
+	}
+	fprintf(f, "%s],\n", limit > 0 ? "\n  " : "");
+
+	qsort(s_src_blocks, s_n_src_blocks, sizeof(s_src_blocks[0]),
+	    counter_cmp_desc);
+	fprintf(f, "  \"top_sources_blocked\": [");
+	limit = s_n_src_blocks < 10 ? s_n_src_blocks : 10;
+	for (i = 0; i < limit; i++) {
+		fprintf(f, "%s\n    {\"ip\": \"", i > 0 ? "," : "");
+		json_escape_fprint(f, s_src_blocks[i].key);
+		fprintf(f, "\", \"count\": %llu}",
+		    (unsigned long long)s_src_blocks[i].count);
+	}
+	fprintf(f, "%s],\n", limit > 0 ? "\n  " : "");
+
+	fprintf(f, "  \"license_valid\": %s,\n",
+	    s_lic.valid ? "true" : "false");
+	fprintf(f, "  \"license_expired\": %s,\n",
+	    s_lic.expired ? "true" : "false");
+	fprintf(f, "  \"license_grace\": %s,\n",
+	    s_lic.grace ? "true" : "false");
+	fprintf(f, "  \"license_dev_mode\": %s,\n",
+	    s_lic.dev_mode ? "true" : "false");
+	fprintf(f, "  \"license_days_left\": %d,\n", s_lic.days_left);
+	fprintf(f, "  \"license_customer\": \"");
+	json_escape_fprint(f, s_lic.customer);
+	fprintf(f, "\",\n");
+	fprintf(f, "  \"license_expiry\": \"");
+	json_escape_fprint(f, s_lic.expiry);
+	fprintf(f, "\",\n");
+	fprintf(f, "  \"license_hardware_id\": \"");
+	json_escape_fprint(f, s_lic.hardware_id);
+	fprintf(f, "\",\n");
+	fprintf(f, "  \"license_error\": \"");
+	json_escape_fprint(f, s_lic.error);
+	fprintf(f, "\"\n");
+
+	fprintf(f, "}\n");
+	fclose(f);
+	rename(L7_STATS_JSON_PATH ".tmp", L7_STATS_JSON_PATH);
+}
+
 static char s_remote_host[256];
 static int s_syslog_remote;
 static int s_remote_port = 514;
 static time_t s_debug_until;
 
-#if HAVE_NDPI
 static void
 json_escape_print(const char *s)
 {
@@ -75,11 +214,23 @@ json_escape_print(const char *s)
 	}
 }
 
+static void
+json_escape_fprint(FILE *f, const char *s)
+{
+	for (; *s; s++) {
+		if (*s == '"' || *s == '\\')
+			fputc('\\', f);
+		fputc(*s, f);
+	}
+}
+
+#if HAVE_NDPI
+
 static int
 list_ndpi_protos(void)
 {
 	struct ndpi_detection_module_struct *ndpi;
-	int i, n, first;
+	int i, j, n, first;
 
 	ndpi = ndpi_init_detection_module(NULL);
 	if (!ndpi) {
@@ -122,7 +273,57 @@ list_ndpi_protos(void)
 		json_escape_print(cn);
 		printf("\"");
 	}
-	printf("]}\n");
+
+	printf("],\"protocols_by_category\":{");
+	first = 1;
+	for (i = 0; i < (int)NDPI_PROTOCOL_NUM_CATEGORIES; i++) {
+		const char *cn = ndpi_category_get_name(ndpi,
+		    (ndpi_protocol_category_t)i);
+		if (!cn || cn[0] == '\0')
+			continue;
+		int pfirst = 1, any = 0;
+		for (j = 0; j < n; j++) {
+			ndpi_protocol ptmp;
+			const char *pn;
+			memset(&ptmp, 0, sizeof(ptmp));
+			ptmp.proto.app_protocol = (uint16_t)j;
+			if ((int)ndpi_get_proto_category(ndpi, ptmp) != i)
+				continue;
+			pn = ndpi_get_proto_name(ndpi, (uint16_t)j);
+			if (!pn || pn[0] == '\0' || strcmp(pn, "Unknown") == 0)
+				continue;
+			any = 1;
+			break;
+		}
+		if (!any)
+			continue;
+		if (!first)
+			printf(",");
+		first = 0;
+		printf("\"");
+		json_escape_print(cn);
+		printf("\":[");
+		for (j = 0; j < n; j++) {
+			ndpi_protocol ptmp;
+			const char *pn;
+			memset(&ptmp, 0, sizeof(ptmp));
+			ptmp.proto.app_protocol = (uint16_t)j;
+			if ((int)ndpi_get_proto_category(ndpi, ptmp) != i)
+				continue;
+			pn = ndpi_get_proto_name(ndpi, (uint16_t)j);
+			if (!pn || pn[0] == '\0' || strcmp(pn, "Unknown") == 0)
+				continue;
+			if (!pfirst)
+				printf(",");
+			pfirst = 0;
+			printf("\"");
+			json_escape_print(pn);
+			printf("\"");
+		}
+		printf("]");
+	}
+	printf("}}\n");
+
 	ndpi_exit_detection_module(ndpi);
 	return 0;
 }
@@ -427,6 +628,17 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, s_ge, iface, src_ip,
 	    ndpi_app, ndpi_cat, host, &dec);
 
+	s_total_classified++;
+	if (dec.action == LAYER7_ACTION_BLOCK) {
+		s_total_blocked++;
+		stats_increment(s_app_blocks, &s_n_app_blocks,
+		    L7_STATS_TOP_MAX, ndpi_app);
+		stats_increment(s_src_blocks, &s_n_src_blocks,
+		    L7_STATS_TOP_MAX, src_ip);
+	} else {
+		s_total_allowed++;
+	}
+
 	if (dec.action == LAYER7_ACTION_BLOCK ||
 	    dec.action == LAYER7_ACTION_TAG) {
 		L7_NOTE("flow_decide: iface=%s src=%s dst=%s host=%s app=%s cat=%s action=%s "
@@ -517,6 +729,12 @@ run_enforce_once_cli(const char *path, const char *ip, const char *app,
 		free(buf);
 		return 1;
 	}
+	{
+		struct layer7_group grps[L7_MAX_GROUPS];
+		int ng = 0;
+		(void)layer7_groups_parse(buf, len, grps, &ng, L7_MAX_GROUPS);
+		layer7_policies_expand_groups(rules, np, grps, ng);
+	}
 	layer7_policies_sort(rules, np);
 	layer7_exceptions_sort(exc, nx);
 	ge = p.has_mode && strcmp(p.mode, "enforce") == 0;
@@ -585,12 +803,15 @@ static void usage(void)
 	fprintf(stderr,
 	    "usage: layer7d [-V] [-t] [-c path] [-e IP APP [CAT]] [-n] "
 	    "[--list-protos]\n"
-	    "  -V             versão do binário\n"
-	    "  -t             testa JSON (stdout)\n"
-	    "  -c path        caminho (omissão: %s)\n"
-	    "  -e IP APP [CAT] uma decisão + opcional pfctl add\n"
-	    "  -n             com -e: não executar pfctl (dry)\n"
-	    "  --list-protos  lista protocolos e categorias nDPI em JSON\n"
+	    "               [--fingerprint] [--activate KEY [URL]]\n"
+	    "  -V               versão do binário\n"
+	    "  -t               testa JSON (stdout)\n"
+	    "  -c path          caminho (omissão: %s)\n"
+	    "  -e IP APP [CAT]  uma decisão + opcional pfctl add\n"
+	    "  -n               com -e: não executar pfctl (dry)\n"
+	    "  --list-protos    lista protocolos e categorias nDPI em JSON\n"
+	    "  --fingerprint    mostra o hardware ID desta máquina\n"
+	    "  --activate KEY   activa licença online (KEY + URL opcional)\n"
 	    "  runtime: SIGHUP reload; SIGUSR1 stats; nDPI→pf via policy\n",
 	    DEFAULT_CONFIG);
 }
@@ -692,6 +913,13 @@ apply_config(int use_syslog)
 			fprintf(stderr, "layer7d: exceptions parse error\n");
 			free(buf);
 			return 1;
+		}
+		{
+			struct layer7_group grps[L7_MAX_GROUPS];
+			int ng = 0;
+			(void)layer7_groups_parse(buf, len, grps, &ng,
+			    L7_MAX_GROUPS);
+			layer7_policies_expand_groups(rules, np, grps, ng);
 		}
 		layer7_policies_sort(rules, np);
 		layer7_exceptions_sort(exc, nx);
@@ -893,6 +1121,14 @@ apply_config(int use_syslog)
 		okx = (layer7_exceptions_parse(buf, len, tmp_x, &tx,
 			  L7_MAX_EXCEPTIONS) == 0);
 		if (okp && okx) {
+			{
+				struct layer7_group grps[L7_MAX_GROUPS];
+				int ng = 0;
+				(void)layer7_groups_parse(buf, len, grps,
+				    &ng, L7_MAX_GROUPS);
+				layer7_policies_expand_groups(tmp_r, tn,
+				    grps, ng);
+			}
 			memcpy(s_rules, tmp_r, (size_t)tn * sizeof(s_rules[0]));
 			memcpy(s_exc, tmp_x, (size_t)tx * sizeof(s_exc[0]));
 			s_np = tn;
@@ -900,6 +1136,8 @@ apply_config(int use_syslog)
 			layer7_policies_sort(s_rules, s_np);
 			layer7_exceptions_sort(s_exc, s_nx);
 			s_ge = p.has_mode && strcmp(p.mode, "enforce") == 0;
+			if (s_ge && !s_lic.valid)
+				s_ge = 0;
 			s_reload_ok++;
 			pe_loaded = 1;
 		} else {
@@ -1050,6 +1288,30 @@ int main(int argc, char **argv)
 			return list_ndpi_protos();
 		}
 #endif
+		if (strcmp(argv[vi], "--fingerprint") == 0) {
+			char hwid[L7_HW_ID_LEN];
+			if (layer7_hw_fingerprint(hwid,
+			    sizeof(hwid)) != 0) {
+				fprintf(stderr,
+				    "layer7d: failed to compute "
+				    "hardware fingerprint\n");
+				return 1;
+			}
+			printf("%s\n", hwid);
+			return 0;
+		}
+		if (strcmp(argv[vi], "--activate") == 0) {
+			const char *key, *url = NULL;
+			if (vi + 1 >= argc) {
+				fprintf(stderr,
+				    "layer7d: --activate requires KEY\n");
+				return 1;
+			}
+			key = argv[vi + 1];
+			if (vi + 2 < argc && argv[vi + 2][0] != '-')
+				url = argv[vi + 2];
+			return layer7_activate(key, url);
+		}
 	}
 
 	i = 1;
@@ -1132,6 +1394,8 @@ int main(int argc, char **argv)
 	sa.sa_handler = on_usr1;
 	sigaction(SIGUSR1, &sa, NULL);
 
+	s_boot_time = time(NULL);
+
 	openlog("layer7d", LOG_PID | LOG_CONS, LOG_DAEMON);
 	syslog(LOG_NOTICE, "daemon_start version=%s", layer7d_version);
 
@@ -1153,6 +1417,26 @@ int main(int argc, char **argv)
 		    "carregado (%s)",
 		    config_path);
 
+	/* License check at startup */
+	memset(&s_lic, 0, sizeof(s_lic));
+	s_last_lic_check = time(NULL);
+	if (layer7_license_check(&s_lic) == 0) {
+		if (s_lic.dev_mode)
+			L7_WARN("license: DEV MODE — no production key "
+			    "embedded; enforce allowed");
+		else if (s_lic.grace)
+			L7_WARN("license: %s", s_lic.error);
+		else
+			L7_NOTE("license: valid customer=%s expiry=%s "
+			    "features=%s days_left=%d",
+			    s_lic.customer, s_lic.expiry,
+			    s_lic.features, s_lic.days_left);
+	} else {
+		L7_WARN("license: INVALID — %s", s_lic.error);
+		L7_WARN("license: enforce disabled, monitor-only mode");
+		s_ge = 0;
+	}
+
 	open_captures();
 
 	for (;;) {
@@ -1166,6 +1450,7 @@ int main(int argc, char **argv)
 			usr1_req = 0;
 			s_sigusr1_count++;
 			aggregate_capture_stats();
+			write_stats_json();
 #if HAVE_NDPI
 			L7_NOTE(
 			    "SIGUSR1 stats: ver=%s reload_ok=%llu snapshot_fail=%llu "
@@ -1223,6 +1508,29 @@ int main(int argc, char **argv)
 			open_captures();
 		}
 
+		/* Periodic license re-check (every L7_LIC_CHECK_INTERVAL) */
+		{
+			time_t tnow = time(NULL);
+			if (tnow - s_last_lic_check >= L7_LIC_CHECK_INTERVAL) {
+				struct l7_license_info li;
+				s_last_lic_check = tnow;
+				memset(&li, 0, sizeof(li));
+				if (layer7_license_check(&li) == 0) {
+					s_lic = li;
+					if (li.grace)
+						L7_WARN("license_recheck: %s",
+						    li.error);
+				} else {
+					s_lic = li;
+					L7_WARN("license_recheck: INVALID — "
+					    "%s", li.error);
+					L7_WARN("license_recheck: enforce "
+					    "disabled, monitor-only");
+					s_ge = 0;
+				}
+			}
+		}
+
 		s_loop_ticks++;
 		tick++;
 		if (s_have_parse && cfg_disabled(&s_parsed)) {
@@ -1243,14 +1551,18 @@ int main(int argc, char **argv)
 				usleep(10000);
 			if (tick % 600 == 0 && tick > 0) {
 				aggregate_capture_stats();
+				write_stats_json();
 				L7_INFO(
 				    "periodic: reload_ok=%llu policies=%d "
 				    "exceptions=%d enforce=%d "
-				    "pkts=%llu classified=%llu",
+				    "pkts=%llu classified=%llu "
+				    "blocked=%llu allowed=%llu",
 				    (unsigned long long)s_reload_ok, s_np,
 				    s_nx, s_ge,
 				    (unsigned long long)s_cap_pkts,
-				    (unsigned long long)s_cap_flows_classified);
+				    (unsigned long long)s_cap_flows_classified,
+				    (unsigned long long)s_total_blocked,
+				    (unsigned long long)s_total_allowed);
 			}
 		}
 #endif

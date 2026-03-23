@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 static void
 skip_ws(const char **p)
@@ -351,7 +352,126 @@ parse_match_subobject(const char *obj, const char *obj_end,
 	if (parse_cidr_array_in_object(ob, oe + 1, "src_cidrs",
 		r->src_cidrs, L7_MAX_SRC_CIDRS, &r->n_src_cidrs) != 0)
 		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "groups",
+		(char *)r->groups, L7_MAX_GROUPS_PER_POLICY,
+		L7_GROUP_ID_LEN, &r->n_groups) != 0)
+		return -1;
 	return 0;
+}
+
+static uint8_t
+day_str_to_bit(const char *s)
+{
+	if (strcasecmp(s, "sun") == 0) return 1 << 0;
+	if (strcasecmp(s, "mon") == 0) return 1 << 1;
+	if (strcasecmp(s, "tue") == 0) return 1 << 2;
+	if (strcasecmp(s, "wed") == 0) return 1 << 3;
+	if (strcasecmp(s, "thu") == 0) return 1 << 4;
+	if (strcasecmp(s, "fri") == 0) return 1 << 5;
+	if (strcasecmp(s, "sat") == 0) return 1 << 6;
+	return 0;
+}
+
+static int
+parse_time_hhmm(const char *s)
+{
+	int h, m;
+	if (!s || strlen(s) < 4)
+		return -1;
+	if (s[2] != ':' && s[1] != ':')
+		return -1;
+	h = atoi(s);
+	m = 0;
+	{
+		const char *colon = strchr(s, ':');
+		if (colon)
+			m = atoi(colon + 1);
+	}
+	if (h < 0 || h > 23 || m < 0 || m > 59)
+		return -1;
+	return h * 60 + m;
+}
+
+static void
+parse_schedule_in_policy(const char *ob, const char *oe,
+    struct l7_schedule *sched)
+{
+	const char *skey, *sobj, *send;
+	int n_days = 0, i;
+	char start_str[8], end_str[8];
+
+	sched->has_schedule = 0;
+	sched->days = 0;
+	sched->start_min = 0;
+	sched->end_min = 0;
+
+	if (!key_in_object(ob, oe, "schedule"))
+		return;
+
+	skey = strstr(ob, "\"schedule\"");
+	if (!skey || skey >= oe)
+		return;
+	sobj = strchr(skey + 10, '{');
+	if (!sobj || sobj >= oe)
+		return;
+	send = json_obj_end(sobj);
+	if (!send || send >= oe)
+		return;
+
+	{
+		char day_items[8][16];
+		int nd = 0;
+		(void)parse_string_array_in_object(sobj, send + 1, "days",
+		    (char *)day_items, 8, 16, &nd);
+		for (i = 0; i < nd; i++)
+			sched->days |= day_str_to_bit(day_items[i]);
+		n_days = nd;
+	}
+
+	start_str[0] = '\0';
+	end_str[0] = '\0';
+	(void)extract_quoted_after_key(sobj, send + 1, "start",
+	    start_str, sizeof(start_str));
+	(void)extract_quoted_after_key(sobj, send + 1, "end",
+	    end_str, sizeof(end_str));
+
+	if (n_days > 0 && start_str[0] && end_str[0]) {
+		int s = parse_time_hhmm(start_str);
+		int e = parse_time_hhmm(end_str);
+		if (s >= 0 && e >= 0) {
+			sched->has_schedule = 1;
+			sched->start_min = s;
+			sched->end_min = e;
+		}
+	}
+}
+
+int
+layer7_schedule_active(const struct l7_schedule *s)
+{
+	struct tm *tm;
+	time_t now;
+	int wday_bit, cur_min;
+
+	if (!s->has_schedule)
+		return 1;
+
+	now = time(NULL);
+	tm = localtime(&now);
+	if (!tm)
+		return 1;
+
+	wday_bit = 1 << tm->tm_wday;
+	if (!(s->days & wday_bit))
+		return 0;
+
+	cur_min = tm->tm_hour * 60 + tm->tm_min;
+
+	if (s->start_min <= s->end_min) {
+		return cur_min >= s->start_min && cur_min < s->end_min;
+	}
+	/* overnight range (e.g. 22:00-06:00) */
+	return cur_min >= s->start_min || cur_min < s->end_min;
 }
 
 static int
@@ -379,6 +499,7 @@ parse_one_policy(const char *ob, const char *oe,
 		r->tag_table[0] = '\0';
 	else if (!layer7_pf_table_name_ok(r->tag_table))
 		r->tag_table[0] = '\0';
+	parse_schedule_in_policy(ob, oe, &r->schedule);
 	(void)parse_string_array_in_object(ob, oe, "interfaces",
 	    (char *)r->ifaces, L7_MAX_IFACES_PER_RULE,
 	    L7_IFACE_NAME_LEN, &r->n_ifaces);
@@ -582,6 +703,96 @@ layer7_exceptions_sort(struct layer7_exception *exc, int n)
 }
 
 static int
+parse_one_group(const char *ob, const char *oe, struct layer7_group *g)
+{
+	memset(g, 0, sizeof(*g));
+	if (extract_quoted_after_key(ob, oe, "id", g->id, sizeof(g->id)) != 0)
+		return -1;
+	(void)extract_quoted_after_key(ob, oe, "name", g->name,
+	    sizeof(g->name));
+	(void)parse_cidr_array_in_object(ob, oe, "cidrs",
+	    g->cidrs, L7_MAX_GROUP_CIDRS, &g->n_cidrs);
+	(void)parse_string_array_in_object(ob, oe, "hosts",
+	    (char *)g->hosts, L7_MAX_GROUP_HOSTS,
+	    L7_EXC_HOST_LEN, &g->n_hosts);
+	if (g->n_cidrs == 0 && g->n_hosts == 0)
+		return -1;
+	return 0;
+}
+
+int
+layer7_groups_parse(const char *json, size_t len,
+    struct layer7_group *out, int *n_out, int max_out)
+{
+	const char *arr, *q, *end;
+	int n = 0;
+
+	*n_out = 0;
+	if (!json || max_out <= 0)
+		return -1;
+	end = json + (len ? len : strlen(json));
+	arr = find_layer7_key_array(json, len ? len : (size_t)(end - json),
+	    "groups");
+	if (!arr)
+		return 0;
+
+	q = arr + 1;
+	while (*q && *q != ']' && n < max_out) {
+		while (*q && (*q == ' ' || *q == '\t' || *q == '\n' ||
+		    *q == '\r' || *q == ','))
+			q++;
+		if (*q == ']' || !*q)
+			break;
+		if (*q == '{') {
+			const char *oe = json_obj_end(q);
+			if (!oe || oe >= end)
+				return -1;
+			if (parse_one_group(q, oe + 1, &out[n]) == 0)
+				n++;
+			q = oe + 1;
+		} else
+			q++;
+	}
+	*n_out = n;
+	return 0;
+}
+
+void
+layer7_policies_expand_groups(struct layer7_policy_rule *rules,
+    int n_rules, const struct layer7_group *groups, int n_groups)
+{
+	int i, j, k;
+
+	for (i = 0; i < n_rules; i++) {
+		struct layer7_policy_rule *r = &rules[i];
+		if (r->n_groups == 0)
+			continue;
+		for (j = 0; j < r->n_groups; j++) {
+			const struct layer7_group *g = NULL;
+			for (k = 0; k < n_groups; k++) {
+				if (strcmp(groups[k].id, r->groups[j]) == 0) {
+					g = &groups[k];
+					break;
+				}
+			}
+			if (!g)
+				continue;
+			for (k = 0; k < g->n_cidrs &&
+			    r->n_src_cidrs < L7_MAX_SRC_CIDRS; k++) {
+				r->src_cidrs[r->n_src_cidrs] = g->cidrs[k];
+				r->n_src_cidrs++;
+			}
+			for (k = 0; k < g->n_hosts &&
+			    r->n_src_hosts < L7_MAX_SRC_HOSTS; k++) {
+				snprintf(r->src_hosts[r->n_src_hosts],
+				    L7_EXC_HOST_LEN, "%s", g->hosts[k]);
+				r->n_src_hosts++;
+			}
+		}
+	}
+}
+
+static int
 ipv4_parse(const char *s, uint32_t *out)
 {
 	unsigned a, b, c, d;
@@ -699,6 +910,8 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 {
 	int i;
 
+	if (!layer7_schedule_active(&r->schedule))
+		return 0;
 	if (!iface_list_matches(r->ifaces, r->n_ifaces, iface))
 		return 0;
 	if (!src_matches_rule(r, src_ip))
@@ -897,6 +1110,8 @@ layer7_domain_is_blocked(const struct layer7_policy_rule *rules,
 		const struct layer7_policy_rule *r = &rules[i];
 
 		if (!r->enabled || r->action != LAYER7_ACTION_BLOCK)
+			continue;
+		if (!layer7_schedule_active(&r->schedule))
 			continue;
 		for (j = 0; j < r->n_hosts; j++) {
 			if (host_matches_rule(domain, r->hosts[j]))

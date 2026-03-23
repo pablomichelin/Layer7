@@ -19,8 +19,20 @@
 			<url>/packages/layer7/layer7_policies.php</url>
 		</tab>
 		<tab>
+			<text>Groups</text>
+			<url>/packages/layer7/layer7_groups.php</url>
+		</tab>
+		<tab>
+			<text>Categories</text>
+			<url>/packages/layer7/layer7_categories.php</url>
+		</tab>
+		<tab>
 			<text>Exceptions</text>
 			<url>/packages/layer7/layer7_exceptions.php</url>
+		</tab>
+		<tab>
+			<text>Test</text>
+			<url>/packages/layer7/layer7_test.php</url>
 		</tab>
 		<tab>
 			<text>Events</text>

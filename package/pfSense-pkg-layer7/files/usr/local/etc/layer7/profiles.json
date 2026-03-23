@@ -1,0 +1,230 @@
+{
+  "profiles": [
+    {
+      "id": "youtube",
+      "name": "YouTube",
+      "icon": "fa-youtube-play",
+      "description": "Bloqueia videos e uploads do YouTube.",
+      "ndpi_apps": ["YouTube", "YouTubeUpload"],
+      "ndpi_categories": [],
+      "hosts": [
+        "youtube.com",
+        "googlevideo.com",
+        "ytimg.com",
+        "youtu.be",
+        "youtube-nocookie.com",
+        "youtubei.googleapis.com",
+        "yt3.ggpht.com"
+      ]
+    },
+    {
+      "id": "facebook",
+      "name": "Facebook",
+      "icon": "fa-facebook",
+      "description": "Bloqueia Facebook e Messenger.",
+      "ndpi_apps": ["Facebook", "FacebookMessenger"],
+      "ndpi_categories": [],
+      "hosts": [
+        "facebook.com",
+        "fbcdn.net",
+        "fb.com",
+        "fbsbx.com"
+      ]
+    },
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "icon": "fa-instagram",
+      "description": "Bloqueia Instagram.",
+      "ndpi_apps": ["Instagram"],
+      "ndpi_categories": [],
+      "hosts": [
+        "instagram.com",
+        "cdninstagram.com"
+      ]
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "fa-music",
+      "description": "Bloqueia TikTok.",
+      "ndpi_apps": ["TikTok"],
+      "ndpi_categories": [],
+      "hosts": [
+        "tiktok.com",
+        "tiktokcdn.com",
+        "tiktokv.com",
+        "musical.ly"
+      ]
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp",
+      "icon": "fa-whatsapp",
+      "description": "Bloqueia WhatsApp e transferencias de ficheiros.",
+      "ndpi_apps": ["WhatsApp", "WhatsAppFiles"],
+      "ndpi_categories": [],
+      "hosts": [
+        "whatsapp.com",
+        "whatsapp.net"
+      ]
+    },
+    {
+      "id": "twitter",
+      "name": "Twitter/X",
+      "icon": "fa-twitter",
+      "description": "Bloqueia Twitter (X).",
+      "ndpi_apps": ["Twitter"],
+      "ndpi_categories": [],
+      "hosts": [
+        "twitter.com",
+        "x.com",
+        "twimg.com",
+        "t.co"
+      ]
+    },
+    {
+      "id": "linkedin",
+      "name": "LinkedIn",
+      "icon": "fa-linkedin",
+      "description": "Bloqueia LinkedIn.",
+      "ndpi_apps": ["LinkedIn"],
+      "ndpi_categories": [],
+      "hosts": [
+        "linkedin.com",
+        "licdn.com"
+      ]
+    },
+    {
+      "id": "netflix",
+      "name": "Netflix",
+      "icon": "fa-film",
+      "description": "Bloqueia Netflix.",
+      "ndpi_apps": ["Netflix"],
+      "ndpi_categories": [],
+      "hosts": [
+        "netflix.com",
+        "nflxvideo.net",
+        "nflximg.net"
+      ]
+    },
+    {
+      "id": "spotify",
+      "name": "Spotify",
+      "icon": "fa-spotify",
+      "description": "Bloqueia Spotify.",
+      "ndpi_apps": ["Spotify"],
+      "ndpi_categories": [],
+      "hosts": [
+        "spotify.com",
+        "scdn.co",
+        "spotifycdn.com"
+      ]
+    },
+    {
+      "id": "twitch",
+      "name": "Twitch",
+      "icon": "fa-twitch",
+      "description": "Bloqueia Twitch.",
+      "ndpi_apps": ["Twitch"],
+      "ndpi_categories": [],
+      "hosts": [
+        "twitch.tv",
+        "jtvnw.net",
+        "twitchcdn.net"
+      ]
+    },
+    {
+      "id": "social",
+      "name": "Redes Sociais",
+      "icon": "fa-users",
+      "description": "Agrega Facebook, Instagram, TikTok, Twitter/X, LinkedIn, Snapchat e Pinterest.",
+      "ndpi_apps": ["Facebook", "FacebookMessenger", "Instagram", "TikTok", "Twitter", "LinkedIn", "Snapchat", "Pinterest"],
+      "ndpi_categories": [],
+      "hosts": [
+        "facebook.com",
+        "fbcdn.net",
+        "fb.com",
+        "fbsbx.com",
+        "instagram.com",
+        "cdninstagram.com",
+        "tiktok.com",
+        "tiktokcdn.com",
+        "tiktokv.com",
+        "musical.ly",
+        "twitter.com",
+        "x.com",
+        "twimg.com",
+        "t.co",
+        "linkedin.com",
+        "licdn.com",
+        "snapchat.com",
+        "pinterest.com"
+      ]
+    },
+    {
+      "id": "streaming",
+      "name": "Streaming",
+      "icon": "fa-play-circle",
+      "description": "Agrega YouTube, Netflix, Spotify, Twitch, Vimeo e Disney+.",
+      "ndpi_apps": ["YouTube", "YouTubeUpload", "Netflix", "Spotify", "Twitch", "Vimeo", "DisneyPlus"],
+      "ndpi_categories": [],
+      "hosts": [
+        "youtube.com",
+        "googlevideo.com",
+        "ytimg.com",
+        "youtu.be",
+        "netflix.com",
+        "nflxvideo.net",
+        "nflximg.net",
+        "spotify.com",
+        "scdn.co",
+        "spotifycdn.com",
+        "twitch.tv",
+        "jtvnw.net",
+        "twitchcdn.net",
+        "vimeo.com",
+        "disneyplus.com",
+        "disney-plus.net"
+      ]
+    },
+    {
+      "id": "gaming",
+      "name": "Jogos",
+      "icon": "fa-gamepad",
+      "description": "Bloqueia Steam, Xbox, PlayStation e Epic Games.",
+      "ndpi_apps": ["Steam", "Xbox", "PlayStation", "EpicGames"],
+      "ndpi_categories": [],
+      "hosts": [
+        "store.steampowered.com",
+        "steamcommunity.com",
+        "xbox.com",
+        "playstation.com"
+      ]
+    },
+    {
+      "id": "vpn-proxy",
+      "name": "VPN/Proxy",
+      "icon": "fa-shield",
+      "description": "Detecta VPN e proxies via nDPI (sem dominios — deteccao por protocolo).",
+      "ndpi_apps": ["OpenVPN", "WireGuard", "Tor", "IPsec"],
+      "ndpi_categories": [],
+      "hosts": []
+    },
+    {
+      "id": "ai-tools",
+      "name": "AI Tools",
+      "icon": "fa-robot",
+      "description": "Bloqueia ferramentas de IA (ChatGPT, Claude, Gemini, Copilot).",
+      "ndpi_apps": ["OpenAI", "ChatGPT"],
+      "ndpi_categories": [],
+      "hosts": [
+        "openai.com",
+        "chat.openai.com",
+        "claude.ai",
+        "gemini.google.com",
+        "copilot.microsoft.com"
+      ]
+    }
+  ]
+}

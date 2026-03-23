@@ -212,7 +212,7 @@ anchors + tables + rules
 
 ## 6. Fases de implementação
 
-## Fase A — Enforcement PF automático do pacote
+## Fase A — Enforcement PF automático do pacote ✅ (v0.2.7)
 
 ### Objetivo
 
@@ -242,7 +242,7 @@ Se a política é `block` e o modo é `enforce`, o host para de passar tráfego.
 
 ---
 
-## Fase B — Bloqueio real por app/categoria
+## Fase B — Bloqueio real por app/categoria ✅ (v0.3.0)
 
 ### Objetivo
 
@@ -264,7 +264,7 @@ Fechar o bloqueio operacional de apps e categorias detectadas por nDPI.
 
 ---
 
-## Fase C — Bloqueio real por domínio/site
+## Fase C — Bloqueio real por domínio/site ✅ (v0.3.0)
 
 ### Objetivo
 
@@ -294,7 +294,7 @@ Transformar `Sites/hosts` em enforcement de destino, não apenas match lógico.
 
 ---
 
-## Fase D — Perfis de serviço/função
+## Fase D — Perfis de serviço/função ✅ (v0.4.0)
 
 ### Objetivo
 
@@ -324,7 +324,7 @@ Permitir bloquear “coisas que o usuário entende”, não só indicadores isol
 
 ---
 
-## Fase E — Tráfego evasivo e caminhos modernos
+## Fase E — Tráfego evasivo e caminhos modernos ✅ (v0.3.1 + v0.7.0)
 
 ### Objetivo
 
@@ -344,7 +344,7 @@ limite, não escondê-lo.
 
 ---
 
-## Fase F — UX, operação e troubleshooting
+## Fase F — UX, operação e troubleshooting ✅ (v0.5.0 + v0.8.0)
 
 ### Objetivo
 
@@ -519,15 +519,18 @@ Esta trilha só fecha quando:
 
 ---
 
-## 13. Próximo bloco recomendado
+## 13. Estado final
 
-O próximo bloco de desenvolvimento deve ser:
+**Todas as fases concluidas na v1.0.0 (2026-03-23).**
 
-**Fase A — Enforcement PF automático do pacote**
+| Fase | Descricao | Versao |
+|------|-----------|--------|
+| A | Enforcement PF automatico | v0.2.7 |
+| B | Bloqueio real por app/categoria | v0.3.0 |
+| C | Bloqueio real por dominio/site | v0.3.0 |
+| D | Perfis de servico/funcao | v0.4.0 |
+| E | Trafego evasivo (QUIC, DoH, DoT) | v0.3.1 + v0.7.0 |
+| F | UX, operacao e troubleshooting | v0.5.0 + v0.8.0 |
 
-Porque resolve o gap mais crítico:
-
-- o produto decide `block`, mas ainda não garante sozinho que o tráfego pare.
-
-Sem isso, qualquer avanço em sites, perfis ou UX continua apoiado em uma base
-de enforcement incompleta.
+O Layer7 atingiu todos os objetivos definidos neste plano mestre para a V1.
+Evolucoes futuras estao documentadas no roadmap pos-V1 (fases 13-22).

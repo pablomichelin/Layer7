@@ -12,6 +12,70 @@ require_once("/usr/local/pkg/layer7.inc");
 $update_info = null;
 $update_msg = "";
 $update_err = "";
+$backup_msg = "";
+$backup_err = "";
+
+if ($_POST["export_config"] ?? false) {
+	$data = layer7_load_or_default();
+	$export = isset($data["layer7"]) ? $data["layer7"] : array();
+	unset($export["protos_file"]);
+	$payload = array("layer7_backup" => true, "version" => layer7_daemon_version(), "timestamp" => date("c"), "layer7" => $export);
+	$json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	header("Content-Type: application/json");
+	header("Content-Disposition: attachment; filename=\"layer7-backup-" . date("Ymd-His") . ".json\"");
+	echo $json;
+	exit;
+}
+
+if ($_POST["import_config"] ?? false) {
+	if (!isset($_FILES["import_file"]) || $_FILES["import_file"]["error"] !== UPLOAD_ERR_OK) {
+		$backup_err = gettext("Nenhum ficheiro enviado ou erro no upload.");
+	} else {
+		$raw = @file_get_contents($_FILES["import_file"]["tmp_name"]);
+		if (!is_string($raw) || $raw === "") {
+			$backup_err = gettext("Ficheiro vazio.");
+		} else {
+			$imported = @json_decode($raw, true);
+			if (!is_array($imported)) {
+				$backup_err = gettext("JSON invalido.");
+			} else {
+				$l7_import = null;
+				if (isset($imported["layer7"]) && is_array($imported["layer7"])) {
+					$l7_import = $imported["layer7"];
+				} elseif (isset($imported["layer7_backup"]) && isset($imported["layer7"]) && is_array($imported["layer7"])) {
+					$l7_import = $imported["layer7"];
+				}
+				if ($l7_import === null) {
+					$backup_err = gettext("Ficheiro nao contem seccao 'layer7' valida.");
+				} else {
+					$data = layer7_load_or_default();
+					$preserve_keys = array("protos_file");
+					foreach ($preserve_keys as $pk) {
+						if (isset($data["layer7"][$pk])) {
+							$l7_import[$pk] = $data["layer7"][$pk];
+						}
+					}
+					$data["layer7"] = $l7_import;
+					if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
+						$data["layer7"]["policies"] = array();
+					}
+					if (!isset($data["layer7"]["exceptions"]) || !is_array($data["layer7"]["exceptions"])) {
+						$data["layer7"]["exceptions"] = array();
+					}
+					if (layer7_save_json($data)) {
+						layer7_signal_reload();
+						if (function_exists("filter_configure")) {
+							filter_configure();
+						}
+						$backup_msg = gettext("Configuracao importada com sucesso.");
+					} else {
+						$backup_err = gettext("Erro ao gravar a configuracao importada.");
+					}
+				}
+			}
+		}
+	}
+}
 
 if ($_POST["check_update"] ?? false) {
 	$current_ver = layer7_daemon_version();
@@ -135,8 +199,16 @@ if ($_POST["save"] ?? false) {
 		$data["layer7"]["debug_minutes"] = $dbgm;
 		$data["layer7"]["interfaces"] = array_values(array_unique($selected_ifaces));
 
+		$old_block_quic = !empty($data["layer7"]["block_quic"]);
+		$data["layer7"]["block_quic"] = isset($_POST["block_quic"]);
+
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
+			if ($old_block_quic !== $data["layer7"]["block_quic"]) {
+				if (function_exists("filter_configure")) {
+					filter_configure();
+				}
+			}
 			$savemsg = gettext("Configuracao gravada. SIGHUP enviado ao layer7d se o servico estiver em execucao.");
 		}
 	}
@@ -157,6 +229,7 @@ $dbgm = isset($L["debug_minutes"]) ? (int)$L["debug_minutes"] : 0;
 if ($dbgm < 0 || $dbgm > 720) {
 	$dbgm = 0;
 }
+$block_quic = !empty($L["block_quic"]);
 
 $configured_real = array();
 if (isset($L["interfaces"]) && is_array($L["interfaces"])) {
@@ -259,6 +332,17 @@ layer7_render_styles();
 			</div>
 
 			<div class="form-group">
+				<label class="col-sm-3 control-label"><?= gettext("Bloquear QUIC"); ?></label>
+				<div class="col-sm-9">
+					<label class="checkbox-inline">
+						<input type="checkbox" name="block_quic" value="1" <?= $block_quic ? 'checked="checked"' : ""; ?> />
+						<?= gettext("Bloquear QUIC (UDP 443) globalmente"); ?>
+					</label>
+					<p class="help-block"><?= gettext("Forca aplicacoes a usar HTTPS (TCP 443) em vez de QUIC, onde o SNI e visivel ao nDPI. Melhora significativamente a eficacia do bloqueio por DNS/SNI. Adiciona regra PF: block drop quick proto udp to port 443."); ?></p>
+				</div>
+			</div>
+
+			<div class="form-group">
 				<label class="col-sm-3 control-label"><?= gettext("Interfaces de captura"); ?></label>
 				<div class="col-sm-9">
 					<?php if (empty($pfsense_ifaces)) { ?>
@@ -287,6 +371,102 @@ layer7_render_styles();
 			</form>
 
 			<p class="layer7-muted-note small"><?= gettext("Politicas e excecoes existentes sao preservadas quando as definicoes globais sao gravadas."); ?></p>
+
+			<?php
+			$lic_status = layer7_read_license_status();
+			$lic_valid = !empty($lic_status["valid"]);
+			$lic_expired = !empty($lic_status["expired"]);
+			$lic_grace = !empty($lic_status["grace"]);
+			$lic_dev = !empty($lic_status["dev_mode"]);
+			$lic_hw = isset($lic_status["hardware_id"]) ? $lic_status["hardware_id"] : "";
+			$lic_customer = isset($lic_status["customer"]) ? $lic_status["customer"] : "";
+			$lic_expiry = isset($lic_status["expiry"]) ? $lic_status["expiry"] : "";
+			$lic_days = isset($lic_status["days_left"]) ? (int)$lic_status["days_left"] : 0;
+			$lic_err = isset($lic_status["error"]) ? $lic_status["error"] : "";
+
+			if ($lic_dev) {
+				$lic_badge = '<span class="label label-warning">DEV MODE</span>';
+				$lic_desc = gettext("Chave de desenvolvimento — sem verificacao de licenca. Substitua a chave publica no binario antes de distribuir.");
+			} elseif ($lic_valid && !$lic_expired) {
+				$lic_badge = '<span class="label label-success">' . gettext("Valida") . '</span>';
+				$lic_desc = sprintf(gettext("Licenca activa. Expira em %s (%d dias restantes)."), htmlspecialchars($lic_expiry), $lic_days);
+			} elseif ($lic_valid && $lic_grace) {
+				$lic_badge = '<span class="label label-warning">' . gettext("Grace period") . '</span>';
+				$lic_desc = sprintf(gettext("Licenca expirada em %s. Periodo de graca activo (%d dias restantes)."), htmlspecialchars($lic_expiry), 14 + $lic_days);
+			} else {
+				$lic_badge = '<span class="label label-danger">' . gettext("Sem licenca") . '</span>';
+				$lic_desc = gettext("Sem licenca valida. O daemon opera apenas em modo monitor.") . ($lic_err !== "" ? " " . htmlspecialchars($lic_err) : "");
+			}
+			?>
+
+			<div class="layer7-section" style="margin-top: 36px;">
+				<h3 class="layer7-section-title"><?= gettext("Licenca"); ?></h3>
+				<div class="layer7-callout">
+					<dl class="dl-horizontal layer7-summary">
+						<dt><?= gettext("Estado"); ?></dt>
+						<dd><?= $lic_badge; ?></dd>
+
+						<dt><?= gettext("Hardware ID"); ?></dt>
+						<dd><code style="font-size: 11px; word-break: break-all;"><?= htmlspecialchars($lic_hw); ?></code></dd>
+
+						<?php if ($lic_customer !== "") { ?>
+						<dt><?= gettext("Cliente"); ?></dt>
+						<dd><?= htmlspecialchars($lic_customer); ?></dd>
+						<?php } ?>
+
+						<?php if ($lic_expiry !== "") { ?>
+						<dt><?= gettext("Expira"); ?></dt>
+						<dd><?= htmlspecialchars($lic_expiry); ?>
+							<?php if ($lic_days > 0) { ?>
+							<small class="text-muted">(<?= $lic_days; ?> <?= gettext("dias restantes"); ?>)</small>
+							<?php } ?>
+						</dd>
+						<?php } ?>
+					</dl>
+
+					<p class="text-muted small"><?= $lic_desc; ?></p>
+
+					<p class="text-muted small" style="margin-top: 12px;">
+						<?= gettext("Para activar uma licenca: no terminal do pfSense execute"); ?>
+						<code>layer7d --activate CHAVE</code>
+						<?= gettext("ou coloque o ficheiro"); ?> <code>/usr/local/etc/layer7.lic</code> <?= gettext("manualmente."); ?>
+					</p>
+				</div>
+			</div>
+
+			<div class="layer7-section" style="margin-top: 36px;">
+				<h3 class="layer7-section-title"><?= gettext("Backup e restore"); ?></h3>
+				<div class="layer7-callout">
+
+				<?php if ($backup_msg !== "") { ?>
+				<div class="alert alert-success"><?= htmlspecialchars($backup_msg); ?></div>
+				<?php } ?>
+				<?php if ($backup_err !== "") { ?>
+				<div class="alert alert-danger"><?= htmlspecialchars($backup_err); ?></div>
+				<?php } ?>
+
+				<p><?= gettext("Exporte toda a configuracao Layer7 (definicoes, politicas, excepcoes, grupos) como ficheiro JSON. Importe noutro pfSense ou para restaurar uma configuracao anterior."); ?></p>
+
+				<form method="post" style="margin-bottom: 18px;">
+					<button type="submit" name="export_config" value="1" class="btn btn-info">
+						<i class="fa fa-download"></i> <?= gettext("Exportar configuracao"); ?>
+					</button>
+				</form>
+
+				<form method="post" enctype="multipart/form-data">
+					<div class="form-group">
+						<label><?= gettext("Importar configuracao"); ?></label>
+						<input type="file" name="import_file" accept=".json" />
+						<p class="help-block"><?= gettext("Selecione um ficheiro JSON exportado anteriormente. A configuracao actual sera substituida."); ?></p>
+					</div>
+					<button type="submit" name="import_config" value="1" class="btn btn-warning"
+						onclick="return confirm('<?= gettext("Substituir a configuracao actual? Esta accao nao pode ser desfeita."); ?>');">
+						<i class="fa fa-upload"></i> <?= gettext("Importar"); ?>
+					</button>
+				</form>
+
+				</div>
+			</div>
 
 			<div class="layer7-section" style="margin-top: 36px;">
 				<h3 class="layer7-section-title"><?= gettext("Actualizacao do pacote"); ?></h3>

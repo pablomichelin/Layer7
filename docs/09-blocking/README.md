@@ -1,36 +1,27 @@
 # Trilha de Bloqueio
 
-Documentos desta pasta descrevem a evolução do Layer7 para sair do estado atual
-de classificação + enforcement parcial e chegar a **bloqueio operacional real**
-de aplicações, sites, serviços e funções de produto.
+Documentos desta pasta descrevem a evolucao do Layer7 para bloqueio operacional
+real de aplicacoes, sites, servicos e funcoes de produto no pfSense CE.
+
+## Estado
+
+**Todas as fases concluidas na v1.0.0 (2026-03-23).**
 
 ## Documentos
 
 - [`blocking-master-plan.md`](blocking-master-plan.md) — plano mestre de
-  implementação, riscos, fases, testes e rollout
-- [`phase-a-option1-package-rules-plan.md`](phase-a-option1-package-rules-plan.md) —
-  plano faseado da implementacao da Opcao 1 (regras do pacote no ciclo oficial
-  do filtro pfSense)
+  implementacao, riscos, fases, testes e rollout (todas as fases concluidas)
 
-## Escopo
+## Funcionalidades de bloqueio na V1
 
-Esta trilha é **pós-V1 / V2 orientada**, mas foi aberta porque o objetivo de
-produto exige que o pacote bloqueie de forma efetiva no pfSense CE, sem depender
-de Squid/SquidGuard.
-
-## Estado atual resumido
-
-- classificação nDPI funcional
-- GUI operacional
-- eventos em tempo real
-- políticas por app/categoria/interface/IP/CIDR
-- `Sites/hosts` manuais na GUI
-- enforcement atual via PF table do **IP de origem**
-
-## Gap principal
-
-Ainda falta fechar o bloqueio real de:
-
-- domínio/site por destino
-- função/serviço com múltiplos domínios e endpoints
-- apps modernos com QUIC, DoH, cache DNS e CDNs partilhadas
+- Classificacao nDPI funcional (~350 apps)
+- Enforcement PF automatico (regras integradas ao filtro pfSense)
+- Bloqueio por destino (DNS + nDPI) com tabela `layer7_block_dst`
+- Bloqueio por origem com tabela `layer7_block`
+- Perfis de servico (15 built-in) para bloqueio com 1 clique
+- Politicas granulares: app/categoria/interface/IP/CIDR/grupo/horario/host
+- Anti-bypass DNS multi-camada (DoT/DoQ/DoH)
+- Bloqueio QUIC selectivo
+- GUI completa com 10 paginas
+- Dashboard operacional com contadores
+- Teste de politica com simulacao

@@ -4,9 +4,9 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.3.2 — actualizacao via GUI + anti-bypass DNS**
+**Versão: 1.0.0 — Release V1 Comercial**
 
-Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
+Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
 
 **Validação lab (2026-03-23):** Enforce end-to-end funcional — pipeline nDPI → policy engine → pfctl comprovado:
 - `pf_add_ok=7`, zero falhas — 6 IPs automaticamente adicionados à tabela PF
@@ -49,7 +49,7 @@ Pacote funcional com motor de políticas granulares por interface, listas de IPs
 - GUI completa com 6 páginas
 
 ## Fase atual
-Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste em pfSense real de produção.
+**V1 Comercial concluida.** Todas as fases e blocos do plano V1 completos. Release 1.0.0 pronta para build final e publicacao.
 
 ## Estado real do enforcement
 
@@ -71,9 +71,77 @@ para esses IPs. Entradas expiram automaticamente com base no TTL DNS (minimo
 O modelo anterior (quarentena por origem) permanece disponivel via
 `layer7_block` para `action=tag` e cenarios de quarentena explicita.
 
-**Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md)
+**Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.0.0 — Release V1 Comercial (2026-03-23):**
+  - Versao final com todas as funcionalidades V1
+  - PORTVERSION 1.0.0, install.sh actualizado
+  - CHANGELOG, README, CORTEX actualizados
+  - Documentacao de blocking-master-plan marcada como concluida
+  - Ficheiros obsoletos removidos (plano-v1-comercial.md, phase-a-option1)
+- **v0.9.0 — licenciamento e proteccao (2026-03-23):**
+  - hardware fingerprint: SHA256(kern.hostuuid + MAC) via nova funcao `layer7_hw_fingerprint()`
+  - ficheiro de licenca `.lic` com JSON assinado Ed25519, verificado via OpenSSL EVP API
+  - sem licenca valida: daemon opera em monitor-only (sem enforce/block)
+  - verificacao no arranque + periodica cada 1h
+  - grace period de 14 dias apos expiracao da licenca
+  - CLI `--fingerprint` para mostrar hardware ID da maquina
+  - CLI `--activate KEY [URL]` para activacao online (pronto para servidor futuro)
+  - seccao de licenca na GUI (Definicoes) com estado, hardware ID, cliente, expiry
+  - campos de licenca exportados no stats JSON para a GUI
+  - script `generate-license.py` para gerar pares de chaves e assinar licencas
+  - chave publica placeholder (all-zeros = dev mode, skip verificacao)
+  - EULA proprietaria substitui BSD-2-Clause
+  - link com `-lcrypto` (base system do FreeBSD)
+- **v0.8.0 — teste de politica + backup/restore (2026-03-23):**
+  - nova pagina "Teste" na GUI com formulario: dominio/IP destino, IP origem, app nDPI, categoria nDPI
+  - simulacao completa em PHP: excepcoes, politicas, groups, schedule, matching hosts/subdominios
+  - resolucao DNS automatica de dominios com exibicao dos IPs resolvidos
+  - veredicto visual colorido (block=vermelho, allow=verde, monitor=azul)
+  - tabela detalhada de cada politica avaliada com motivo de match/mismatch
+  - botoes "Exportar configuracao" e "Importar configuracao" na pagina Definicoes
+  - export gera JSON com definicoes, politicas, excepcoes e grupos (sem estado runtime)
+  - import valida JSON, substitui config e envia SIGHUP + filter_configure
+  - import de ficheiro invalido mostra erro sem perder config actual
+  - GUI passa a ter 10 paginas
+- **v0.7.0 — grupos de dispositivos + bloqueio QUIC (2026-03-23):**
+  - nova seccao `groups[]` no JSON config com id, name, cidrs[], hosts[]
+  - campo `match.groups` nas politicas para referenciar grupos em vez de CIDRs manuais
+  - daemon expande grupos para CIDRs/IPs no parse (reutiliza logica existente de `src_cidrs`/`src_hosts`)
+  - nova pagina GUI "Grupos" com CRUD completo
+  - dropdown de grupos nos formularios de adicionar, editar e perfis rapidos
+  - proteccao contra remocao de grupo em uso por politica
+  - toggle "Bloquear QUIC (UDP 443)" na pagina Definicoes
+  - regra PF anti-QUIC injectada dinamicamente via `layer7_generate_rules()`
+  - `filter_configure()` chamado automaticamente ao alterar o toggle
+  - GUI passa a ter 9 paginas
+- **v0.6.0 — agendamento por horario (2026-03-23):**
+  - campo `schedule` nas politicas JSON: `days` + `start` + `end`
+  - daemon verifica hora/dia local antes de casar politica (rule_matches + domain_is_blocked)
+  - suporte a overnight range (ex: 22:00-06:00)
+  - GUI de politicas com checkboxes de dias e inputs de hora inicio/fim
+  - "Ver listas" e tabela de politicas mostram horario configurado
+  - politica sem schedule continua sempre activa (retrocompativel)
+- **v0.5.0 — dashboard com contadores (2026-03-23):**
+  - contadores no daemon: total classificados, total bloqueados, total permitidos
+  - tracking de top 10 apps bloqueadas e top 10 IPs de origem
+  - SIGUSR1 + escrita periodica (~60s) de `/tmp/layer7-stats.json`
+  - pagina "Estado" redesenhada como dashboard operacional com cards de resumo
+  - tabelas top 10 apps e top 10 clientes bloqueados
+  - uptime do daemon calculado e exibido
+  - helper `layer7_read_stats()` em layer7.inc
+- **v0.4.0 — perfis de servico + categorias nDPI (2026-03-23):**
+  - ficheiro `profiles.json` com 15 perfis built-in (YouTube, Facebook, Instagram, TikTok, WhatsApp, Twitter/X, LinkedIn, Netflix, Spotify, Twitch, Redes Sociais, Streaming, Jogos, VPN/Proxy, AI Tools)
+  - seccao "Perfis rapidos" na pagina de politicas com cards visuais
+  - modal para escolher accao, interfaces e CIDRs antes de aplicar
+  - perfis expandem-se em politicas normais no JSON
+  - helper `layer7_load_profiles()` em layer7.inc
+  - nova pagina "Categorias" com todas as apps nDPI agrupadas por categoria
+  - campo de pesquisa filtra apps e categorias em tempo real
+  - accordion expansivel com contagem de apps por categoria
+  - daemon `--list-protos` estendido com `protocols_by_category`
+  - GUI passa a ter 8 paginas (Estado, Definicoes, Politicas, Categorias, Excecoes, Events, Diagnostics)
 - **v0.3.2 — actualizacao via GUI (2026-03-23):**
   - botao "Verificar actualizacao" na pagina Definicoes
   - consulta GitHub Releases API para detectar versao mais recente
@@ -128,27 +196,29 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v0.3.2 implementada.** Botao de actualizacao na GUI permite manter o
-pacote actualizado sem linha de comando.
+**V1 Comercial concluida.** Todos os 10 blocos do plano V1 executados. Proximo:
+build final no FreeBSD lab, publicacao do GitHub Release v1.0.0 e piloto em producao.
 
 ## Proximos 3 passos
-1. Build e deploy do pacote 0.3.2 no appliance
-2. Validar actualizacao via GUI (verificar + instalar)
-3. Perfis compostos de servico/funcao e pagina de categorias nDPI
+1. Build final no FreeBSD lab (192.168.100.12)
+2. Criar GitHub Release v1.0.0
+3. Piloto estavel 24h+ sem incidente + par de chaves Ed25519 de producao
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
 - [x] Fase 6: whitelist validada no appliance — OK 2026-03-22
 - [x] Fase 9: whitelist e fallback testados — OK 2026-03-22
-- [x] Fase 10: nDPI integrado e a classificar tráfego real — OK 2026-03-22
+- [x] Fase 10: nDPI integrado e a classificar trafego real — OK 2026-03-22
 - [x] Fase 10: enforce end-to-end via nDPI validado — OK 2026-03-23
-- [ ] Fase 10: piloto estável 24h+ sem incidente
+- [ ] Fase 10: piloto estavel 24h+ sem incidente
 - [x] Fase 11: release V1 final (0.1.0) — publicada 2026-03-23
 - [x] Motor multi-interface v0.2.0 — implementado 2026-03-18
+- [x] Plano V1 Comercial completo (Blocos 1-10) — 2026-03-23
+- [x] Release v1.0.0 preparada — 2026-03-23
 
 ## Decisoes congeladas
 - foco em pfSense CE
-- pacote open source
+- pacote proprietario (EULA)
 - distribuição por artefacto `.pkg`
 - lab distribution via GitHub Releases
 - sem software pago obrigatório
@@ -180,11 +250,15 @@ pacote actualizado sem linha de comando.
 - docs no mesmo commit
 
 ## Definition of Done da V1
-- [x] pacote instalável com evidência
-- [x] daemon funcional com evidência
-- [x] GUI básica com evidência
-- [x] policy engine
-- [x] enforcement mínimo
-- [x] observabilidade básica
-- [ ] rollback validado em produção
+- [x] pacote instalavel com evidencia
+- [x] daemon funcional com evidencia
+- [x] GUI completa (10 paginas) com evidencia
+- [x] policy engine (granular: interface/IP/grupo/horario/app/categoria/host)
+- [x] enforcement completo (PF por destino + origem)
+- [x] observabilidade (dashboard, contadores, logs, syslog remoto)
+- [x] perfis de servico (15 built-in)
+- [x] licenciamento Ed25519
+- [x] backup e restore
+- [x] teste de politica
+- [ ] rollback validado em producao
 - [x] docs completas

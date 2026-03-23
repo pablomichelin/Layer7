@@ -1,25 +1,109 @@
-BSD 2-Clause License
+LAYER7 FOR PFSENSE CE — END-USER LICENSE AGREEMENT (EULA)
 
-Copyright (c) 2026 Layer7 pfSense CE contributors.
-All rights reserved.
+Copyright (c) 2026 Pablo Michelin. All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+IMPORTANT — READ CAREFULLY BEFORE INSTALLING OR USING THIS SOFTWARE.
 
-1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer.
+By installing, copying, or otherwise using the Layer7 for pfSense CE software
+("Software"), you agree to be bound by the terms of this End-User License
+Agreement ("Agreement"). If you do not agree to these terms, do not install
+or use the Software.
 
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
+1. GRANT OF LICENSE
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Subject to the terms of this Agreement and a valid license key, the Licensor
+grants you a non-exclusive, non-transferable, limited license to install and
+use the Software on a single hardware appliance running pfSense CE. The
+license is bound to the hardware fingerprint of the appliance on which the
+Software is activated.
+
+2. LICENSE KEY AND ACTIVATION
+
+The Software requires a valid license key for full functionality. Without a
+valid license, the Software operates in monitor-only mode (no traffic
+enforcement). Each license key is tied to a specific hardware appliance and
+cannot be transferred to another machine without prior written authorisation
+from the Licensor. A grace period of fourteen (14) days is provided after
+license expiration, during which the Software continues to operate in full
+mode.
+
+3. RESTRICTIONS
+
+You may NOT:
+
+  a) Copy, modify, adapt, translate, reverse engineer, decompile,
+     disassemble, or create derivative works based on the Software;
+
+  b) Redistribute, sublicense, rent, lease, or lend the Software to any
+     third party;
+
+  c) Remove, alter, or obscure any proprietary notices, labels, or marks
+     on the Software;
+
+  d) Use the Software on more appliances than the number of licenses
+     purchased;
+
+  e) Circumvent, disable, or tamper with the license verification
+     mechanism embedded in the Software;
+
+  f) Use the Software for any unlawful purpose or in violation of any
+     applicable local, national, or international law.
+
+4. INTELLECTUAL PROPERTY
+
+The Software is protected by copyright and other intellectual property laws.
+The Licensor retains all right, title, and interest in and to the Software,
+including all intellectual property rights therein. This Agreement does not
+grant you any rights to trademarks or service marks of the Licensor.
+
+5. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. THE LICENSOR DOES NOT
+WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE OR UNINTERRUPTED.
+
+6. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
+SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO
+LOSS OF PROFITS, DATA, OR BUSINESS OPPORTUNITIES, ARISING OUT OF OR RELATED
+TO THIS AGREEMENT OR THE USE OF THE SOFTWARE, EVEN IF THE LICENSOR HAS BEEN
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THE LICENSOR'S TOTAL LIABILITY
+SHALL NOT EXCEED THE AMOUNT PAID BY YOU FOR THE LICENSE.
+
+7. TERMINATION
+
+This Agreement is effective until terminated. Your rights under this Agreement
+will terminate automatically without notice if you fail to comply with any of
+its terms. Upon termination, you must cease all use of the Software and
+destroy all copies in your possession.
+
+8. DATA COLLECTION
+
+The Software may transmit the hardware fingerprint and license key to the
+Licensor's activation server for the purpose of license verification. No
+network traffic data, user data, or personally identifiable information is
+collected or transmitted.
+
+9. GOVERNING LAW
+
+This Agreement shall be governed by and construed in accordance with the laws
+of Portugal. Any disputes arising under this Agreement shall be subject to the
+exclusive jurisdiction of the courts of Portugal.
+
+10. ENTIRE AGREEMENT
+
+This Agreement constitutes the entire agreement between you and the Licensor
+regarding the Software and supersedes all prior negotiations, understandings,
+and agreements between the parties.
+
+11. CONTACT
+
+For licensing enquiries, activation support, or authorisation requests:
+  Email: license@layer7-pfsense.com
+
+---
+
+Layer7 for pfSense CE is NOT affiliated with Netgate or the pfSense project.
+pfSense is a registered trademark of Electric Sheep Fencing LLC d/b/a Netgate.

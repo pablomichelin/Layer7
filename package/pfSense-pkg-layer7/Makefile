@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	0.3.2
+PORTVERSION=	1.0.0
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -12,14 +12,16 @@ EXTRACT_ONLY=	# empty
 MAINTAINER=	community@layer7-pfsense.local
 COMMENT=	Layer 7 for pfSense CE (layer7d + GUI settings JSON)
 
-LICENSE=	BSD2CLAUSE
-LICENSE_FILE=	${.CURDIR}/LICENSE
+LICENSE=	EULA
+LICENSE_NAME=	Layer7 End-User License Agreement
+LICENSE_PERMS=
+LICENSE_FILE=	${.CURDIR}/../../LICENSE
 
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c)
-.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c)."
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c)."
 .endif
 
 NDPI_PREFIX=	/usr/local
@@ -52,7 +54,8 @@ do-build:
 	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} \
 		${LAYER7_NDPI_CFLAGS} -o ${WRKSRC}/layer7d \
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
-		${LAYER7D_DIR}/enforce.c ${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS}
+		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
+		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} -lcrypto
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
@@ -81,9 +84,15 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_policies.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_groups.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_categories.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_exceptions.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_events.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_test.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_diagnostics.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
@@ -94,6 +103,8 @@ do-install:
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-unbound-anti-doh \
 		${STAGEDIR}${PREFIX}/libexec
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/pf.conf.sample \
+		${STAGEDIR}${PREFIX}/etc/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/profiles.json \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_DATA} ${FILESDIR}${DATADIR}/info.xml \
 		${STAGEDIR}${DATADIR}

@@ -26,11 +26,30 @@
 #endif
 #define L7_MAX_IFACES_PER_RULE 8
 #define L7_MAX_SRC_HOSTS 16
-#define L7_MAX_SRC_CIDRS 8
+#define L7_MAX_SRC_CIDRS 16
+
+#define L7_MAX_GROUPS 16
+#define L7_GROUP_ID_LEN 80
+#define L7_GROUP_NAME_LEN 160
+#define L7_MAX_GROUP_CIDRS 16
+#define L7_MAX_GROUP_HOSTS 16
+#define L7_MAX_GROUPS_PER_POLICY 8
 
 struct l7_cidr {
 	uint32_t net;
 	int prefix;
+};
+
+/*
+ * Schedule bitmask: bit 0=sun, 1=mon, 2=tue, 3=wed, 4=thu, 5=fri, 6=sat.
+ * Times in minutes from midnight (0-1439).
+ * has_schedule=0 means always active.
+ */
+struct l7_schedule {
+	int has_schedule;
+	uint8_t days;
+	int start_min;
+	int end_min;
 };
 
 struct layer7_policy_rule {
@@ -40,6 +59,7 @@ struct layer7_policy_rule {
 	enum layer7_action action;
 	int priority;
 	char tag_table[L7_TAG_TABLE_LEN];
+	struct l7_schedule schedule;
 	int n_ndpi_apps;
 	char ndpi_apps[L7_MAX_APPS_PER_POLICY][L7_POLICY_APP_LEN];
 	int n_ndpi_cats;
@@ -52,7 +72,20 @@ struct layer7_policy_rule {
 	char src_hosts[L7_MAX_SRC_HOSTS][L7_EXC_HOST_LEN];
 	int n_src_cidrs;
 	struct l7_cidr src_cidrs[L7_MAX_SRC_CIDRS];
+	int n_groups;
+	char groups[L7_MAX_GROUPS_PER_POLICY][L7_GROUP_ID_LEN];
 };
+
+struct layer7_group {
+	char id[L7_GROUP_ID_LEN];
+	char name[L7_GROUP_NAME_LEN];
+	int n_cidrs;
+	struct l7_cidr cidrs[L7_MAX_GROUP_CIDRS];
+	int n_hosts;
+	char hosts[L7_MAX_GROUP_HOSTS][L7_EXC_HOST_LEN];
+};
+
+int layer7_schedule_active(const struct l7_schedule *s);
 
 #define L7_EXC_MAX_HOSTS 8
 #define L7_EXC_MAX_CIDRS 8
@@ -89,6 +122,11 @@ struct layer7_decision {
 int layer7_policies_parse(const char *json, size_t len,
     struct layer7_policy_rule *out, int *n_out, int max_out);
 void layer7_policies_sort(struct layer7_policy_rule *rules, int n);
+
+int layer7_groups_parse(const char *json, size_t len,
+    struct layer7_group *out, int *n_out, int max_out);
+void layer7_policies_expand_groups(struct layer7_policy_rule *rules,
+    int n_rules, const struct layer7_group *groups, int n_groups);
 
 int layer7_exceptions_parse(const char *json, size_t len,
     struct layer7_exception *out, int *n_out, int max_out);
