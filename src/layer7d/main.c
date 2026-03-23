@@ -29,6 +29,7 @@ static const char layer7d_version[] =
 ;
 
 #define DEFAULT_CONFIG "/usr/local/etc/layer7.json"
+#define LAYER7_LOG_PATH "/var/log/layer7d.log"
 
 /* 0=error 1=warn 2=info 3=debug — mensagens com nível <= s_ll */
 static int s_ll = 2;
@@ -215,6 +216,50 @@ layer7_send_remote_syslog(int pri, const char *msg)
 }
 
 static void
+layer7_write_local_log(int pri, const char *msg)
+{
+	FILE *f;
+	time_t now;
+	struct tm tm;
+	char ts[32];
+	const char *sev;
+
+	if (!msg || msg[0] == '\0')
+		return;
+
+	switch (pri & LOG_PRIMASK) {
+	case LOG_ERR:
+		sev = "error";
+		break;
+	case LOG_WARNING:
+		sev = "warn";
+		break;
+	case LOG_NOTICE:
+		sev = "notice";
+		break;
+	case LOG_INFO:
+		sev = "info";
+		break;
+	case LOG_DEBUG:
+		sev = "debug";
+		break;
+	default:
+		sev = "log";
+		break;
+	}
+
+	now = time(NULL);
+	localtime_r(&now, &tm);
+	strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &tm);
+
+	f = fopen(LAYER7_LOG_PATH, "a");
+	if (!f)
+		return;
+	fprintf(f, "%s [%s] %s\n", ts, sev, msg);
+	fclose(f);
+}
+
+static void
 l7_log(int pri, const char *fmt, ...)
 {
 	va_list ap;
@@ -223,6 +268,7 @@ l7_log(int pri, const char *fmt, ...)
 	va_start(ap, fmt);
 	vsnprintf(line, sizeof(line), fmt, ap);
 	va_end(ap);
+	layer7_write_local_log(pri, line);
 	syslog(pri, "%s", line);
 	if (s_syslog_remote)
 		layer7_send_remote_syslog(pri, line);

@@ -10,6 +10,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
 $cfgpath = layer7_cfg_path();
+$log_path = "/var/log/layer7d.log";
 $layer7d_ver = layer7_daemon_version();
 $pidfile = "/var/run/layer7d.pid";
 $status_out = "";
@@ -52,7 +53,9 @@ if (isset($_POST["send_sighup"]) && $status_ok && $pid !== null) {
 }
 
 $recent_logs = array();
-if (file_exists("/var/log/system.log")) {
+if (file_exists($log_path)) {
+	exec("/usr/bin/tail -n 20 " . escapeshellarg($log_path) . " 2>/dev/null", $recent_logs);
+} elseif (file_exists("/var/log/system.log")) {
 	exec("grep 'layer7d' /var/log/system.log | tail -20 2>/dev/null", $recent_logs);
 }
 
@@ -154,6 +157,9 @@ layer7_render_styles();
 
 					<dt><?= gettext("Config"); ?></dt>
 					<dd><code><?= htmlspecialchars($cfgpath); ?></code></dd>
+
+					<dt><?= gettext("Log local"); ?></dt>
+					<dd><code><?= htmlspecialchars($log_path); ?></code></dd>
 				</dl>
 			</div>
 		</div>
@@ -208,7 +214,7 @@ layer7_render_styles();
 			<?php if (count($recent_logs) > 0) { ?>
 			<pre class="pre-scrollable" style="max-height: 350px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $recent_logs)); ?></pre>
 			<?php } else { ?>
-			<div class="alert alert-info"><?= gettext("Nenhum log do layer7d encontrado em /var/log/system.log."); ?></div>
+			<div class="alert alert-info"><?= gettext("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?></div>
 			<?php } ?>
 		</div>
 
@@ -219,6 +225,7 @@ layer7_render_styles();
 				<li><code>service layer7d onestop</code> — <?= gettext("parar o daemon"); ?></li>
 				<li><code>service layer7d onerestart</code> — <?= gettext("reiniciar o daemon"); ?></li>
 				<li><code>kill -USR1 $(pgrep layer7d)</code> — <?= gettext("estatisticas (cap_pkts, cap_classified, pf_add_ok, ...)"); ?></li>
+				<li><code>tail -f /var/log/layer7d.log</code> — <?= gettext("acompanhar classificacoes e eventos em tempo real"); ?></li>
 				<li><code>pfctl -t layer7_block -T show</code> — <?= gettext("IPs bloqueados"); ?></li>
 				<li><code>pfctl -t layer7_block -T delete IP</code> — <?= gettext("desbloquear IP"); ?></li>
 				<li><code>sysrc layer7d_enable=YES</code> — <?= gettext("ativar arranque automatico no boot"); ?></li>

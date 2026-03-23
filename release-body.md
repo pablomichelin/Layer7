@@ -1,9 +1,11 @@
-## Layer7 v0.2.2 — Labels amigaveis de interface
+## Layer7 v0.2.3 — Log local do daemon
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
+- **Log local dedicado** — `layer7d` agora grava eventos tambem em `/var/log/layer7d.log`, sem depender do syslog do pfSense para visibilidade na GUI
+- **Events e Diagnostics mais confiaveis** — as paginas passam a ler `/var/log/layer7d.log` diretamente
 - **Labels amigaveis na GUI** — Interfaces de captura, politicas e excecoes agora mostram a descricao configurada da interface no pfSense, em vez de `OPT1`, `OPT2`, etc., quando houver descricao definida
 - **Pacote autocontido** — `layer7d` passa a usar `libndpi.a` no build, evitando erro de `libndpi.so` ausente no pfSense
 - **Install de um comando mantido** — o `install.sh` continua instalando direto do GitHub Releases, sem compilacao manual

@@ -11,9 +11,12 @@ require_once("/usr/local/pkg/layer7.inc");
 
 $filter = isset($_GET["filter"]) ? trim($_GET["filter"]) : "";
 $max_lines = 100;
+$log_path = "/var/log/layer7d.log";
 
 $all_logs = array();
-if (file_exists("/var/log/system.log")) {
+if (file_exists($log_path)) {
+	exec("/usr/bin/tail -n " . (int)$max_lines . " " . escapeshellarg($log_path) . " 2>/dev/null", $all_logs);
+} elseif (file_exists("/var/log/system.log")) {
 	exec("grep 'layer7d' /var/log/system.log | tail -" . $max_lines . " 2>/dev/null", $all_logs);
 }
 
@@ -99,7 +102,7 @@ layer7_render_styles();
 				<?php if ($filter !== "") { ?>
 				<?= gettext("Nenhum log correspondente ao filtro."); ?>
 				<?php } else { ?>
-				<?= gettext("Nenhum log do layer7d encontrado em /var/log/system.log."); ?>
+				<?= gettext("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?>
 				<?php } ?>
 			</div>
 			<?php } ?>
@@ -112,6 +115,7 @@ layer7_render_styles();
 				<li><?= gettext("Use debug_minutes para elevar temporariamente sem editar o JSON."); ?></li>
 				<li><?= gettext("Configure syslog remoto em Definicoes para reter historico fora do appliance."); ?></li>
 				<li><?= gettext("SIGUSR1 (pagina Diagnostics) gera um resumo de estatisticas que aparece aqui."); ?></li>
+				<li><code><?= htmlspecialchars($log_path); ?></code> — <?= gettext("arquivo principal de eventos do daemon."); ?></li>
 			</ul>
 		</div>
 		</div>
