@@ -144,6 +144,48 @@ esperada pelo pfSense.
 
 Nenhum impacto permanente se ficar so em observacao.
 
+#### Estado validado em 2026-03-23
+
+- o repositorio passou a expor `layer7_generate_rules("filter")` em
+  `/usr/local/pkg/layer7.inc`;
+- o pacote passou a chamar `filter_configure()` no install/deinstall;
+- Diagnostics passaram a mostrar hook, `rules.debug` e `pfctl -sr`;
+- no appliance pfSense CE 25.11.1, o hook/local helper nao bastaram para fazer
+  a regra `layer7:block:src` aparecer em `pfctl -sr`.
+
+#### Causa raiz identificada em 2026-03-23
+
+O XML do pacote (`layer7.xml`) **nao tinha o tag `<filter_rules_needed>`**.
+
+O pfSense CE usa `discover_pkg_rules()` em `filter.inc` para montar regras de
+pacotes durante o `filter reload`. Esta funcao itera os pacotes registados em
+`config.xml` e, para cada um com `<filter_rules_needed>`, inclui o
+`include_file` e chama a funcao geradora de regras. Sem o tag, o pacote era
+simplesmente ignorado.
+
+Evidencia cruzada: os pacotes oficiais HAProxy e Snort do pfSense usam este
+mesmo tag nos seus XMLs para registar funcoes geradoras de regras.
+
+#### Fix aplicado
+
+Adicionado ao `layer7.xml`:
+
+```xml
+<filter_rules_needed>layer7_generate_rules</filter_rules_needed>
+```
+
+A funcao `layer7_generate_rules("filter")` ja existia em `layer7.inc` e estava
+correta. O unico ajuste necessario foi o tag no XML.
+
+#### Pendente de validacao no appliance
+
+Instalar o pacote com o XML corrigido e confirmar:
+
+1. `grep layer7 /tmp/rules.debug` — presenca em rules.debug;
+2. `pfctl -sr | grep layer7` — regra no ruleset ativo;
+3. bloqueio real de IP em `<layer7_block>`;
+4. persistencia apos reload e reboot.
+
 ### Passo 2 — Publicar a regra minima de block
 
 #### Objetivo
@@ -174,6 +216,31 @@ interferir mais do que o necessario.
 - remover retorno da regra do pacote;
 - recarregar filtro;
 - flush opcional da tabela.
+
+#### Estado validado em 2026-03-23
+
+No appliance, o caminho abaixo ja foi provado:
+
+- politica `block` em `mode=enforce` casou com `Github`;
+- o daemon registou `action=block reason=policy_match policy=teste1`;
+- o daemon registou `enforce_action: block src=10.0.85.165 table=layer7_block`;
+- `pfctl -t layer7_block -T show` mostrou `10.0.85.165`.
+
+Mas o bloqueio operacional ainda nao fechou porque:
+
+- `pfctl -vsr | grep 'layer7:block:src'` nao retornou nada;
+- `pfctl -ss` mostrou states ativos/pendentes mesmo apos `pfctl -k`;
+- sem regra ativa no ruleset, a table sozinha nao bloqueia.
+
+A causa raiz foi identificada no Passo 1 acima: o XML nao tinha
+`<filter_rules_needed>`. Apos o fix no XML, este passo deve ser revalidado
+no appliance.
+
+Conclusao parcial:
+
+- policy engine: OK;
+- add em PF table: OK;
+- regra PF ativa do pacote: fix aplicado (tag XML), pendente de revalidacao.
 
 ### Passo 3 — Amarrar diagnostics ao estado real do filtro
 

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.2.6 — listas melhores e sites manuais**
+**Versão: 0.2.7 — enforcement PF integrado ao filtro pfSense**
 
 Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
 
@@ -55,17 +55,25 @@ Fases 0-10 completas. Motor multi-interface v0.2.0 implementado. Próximo: teste
 
 **Classificação e decisão:** funcionais em pfSense real.
 
-**Enforcement atual:** o daemon adiciona o **IP de origem** a PF tables para
-ações `block`/`tag`, mas o produto ainda está a fechar a trilha de
-**bloqueio operacional completo** para:
+**Enforcement PF por origem (Fase A):** o daemon adiciona o **IP de origem** a
+PF tables para ações `block`/`tag`. O XML do pacote agora inclui o tag
+`<filter_rules_needed>layer7_generate_rules</filter_rules_needed>` para
+registar as regras do pacote no ciclo oficial do filtro do pfSense CE. Causa
+raiz anterior (regra não aparecia em `pfctl -sr`): o tag estava em falta no XML.
+Fix aplicado, **pendente de validação no appliance**.
 
-- bloquear automaticamente sem regra PF externa implícita;
+**Trilha de bloqueio total** ainda em evolução para:
+
 - bloquear sites/domínios por destino;
 - bloquear serviços/funções compostas (ex.: GitHub completo, YouTube, WhatsApp).
 
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md)
 
 ## Ultima entrega
+- **v0.2.7 — enforcement PF integrado ao filtro pfSense (2026-03-23):**
+  - XML do pacote declara `<filter_rules_needed>layer7_generate_rules</filter_rules_needed>`
+  - regras de bloqueio entram no ruleset ativo via `discover_pkg_rules()`
+  - bloqueio por origem automatico sem regra PF manual externa
 - **v0.2.1 — Empacotamento autocontido (2026-03-23):**
   - build do port usa `/usr/local/lib/libndpi.a`
   - `update-ndpi.sh` aborta se o binário final ainda depender de `libndpi.so`
@@ -98,13 +106,14 @@ ações `block`/`tag`, mas o produto ainda está a fechar a trilha de
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Planeamento da trilha de bloqueio total** concluído; próximo bloco recomendado:
-**enforcement PF automático do pacote**.
+**Fase A — enforcement PF automático do pacote:** fix do XML aplicado
+(`<filter_rules_needed>`); pendente de validação no appliance pfSense CE
+25.11.1 para confirmar presença em `rules.debug` e `pfctl -sr`.
 
 ## Proximos 3 passos
-1. Implementar enforcement PF automático do pacote
-2. Fechar bloqueio real por app/categoria
-3. Fechar bloqueio real por domínio/site e depois perfis de serviço/função
+1. Validar fix no appliance (rules.debug, pfctl -sr, bloqueio real, reload, reboot)
+2. Fechar bloqueio real por app/categoria (Fase B)
+3. Fechar bloqueio real por domínio/site e depois perfis de serviço/função (Fases C/D)
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

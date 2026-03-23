@@ -42,7 +42,7 @@ done
 
 # --- Detecção de versão ---
 if [ -z "$VERSION" ]; then
-    VERSION="0.2.6"
+    VERSION="0.2.7"
 fi
 
 TAG="v${VERSION}"

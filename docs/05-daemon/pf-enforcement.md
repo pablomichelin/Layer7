@@ -10,17 +10,17 @@ O enforcement atual do produto já faz:
 
 - decisão `block` / `tag` no `layer7d`;
 - `pfctl -T add` do **IP de origem** em PF table;
-- logs e counters de enforcement.
+- logs e counters de enforcement;
 - helper do pacote para materializar assets PF (`/usr/local/libexec/layer7-pfctl`);
-- snippet de ruleset gerado em `/usr/local/etc/layer7/pf.conf`.
+- snippet de ruleset gerado em `/usr/local/etc/layer7/pf.conf`;
 - hook `layer7_generate_rules("filter")` em `/usr/local/pkg/layer7.inc`;
+- **tag `<filter_rules_needed>` no XML do pacote** para registar a função
+  geradora de regras no ciclo oficial do filtro do pfSense;
 - reload do filtro oficial no install/deinstall do pacote.
 
 O enforcement total do produto ainda está em evolução para entregar, de forma
 automática e fechada:
 
-- regras/anchors PF geridos pelo próprio pacote;
-- injecção validada dessas regras no filtro ativo do pfSense;
 - bloqueio real por domínio/destino;
 - perfis compostos de serviço/função.
 
@@ -50,11 +50,29 @@ Responsabilidades do helper:
 - gerar o snippet PF gerido pelo pacote;
 - permitir flush controlado das tables no rollback/deinstall.
 
-Neste bloco, o pacote passa a expor a regra minima via
-`layer7_generate_rules("filter")`, no padrao que o pfSense usa em
-`discover_pkg_rules()` para montar regras de pacotes durante o `filter reload`.
+O pacote expoe a regra minima via `layer7_generate_rules("filter")`, no padrao
+que o pfSense usa em `discover_pkg_rules()` para montar regras de pacotes
+durante o `filter reload`.
 
-A regra publicada neste passo e:
+### Como funciona o ciclo do pfSense
+
+1. `filter_configure()` chama `discover_pkg_rules("filter")`.
+2. `discover_pkg_rules` itera os pacotes em `config.xml`
+   (`installedpackages/package`).
+3. Para cada pacote com `<filter_rules_needed>`, inclui o `include_file` e
+   chama a funcao indicada (ex.: `layer7_generate_rules`).
+4. Valida a saida com `pfctl -nf` antes de incorporar.
+5. Se valida, as regras entram em `rules.debug` e sao carregadas no PF.
+
+O tag critico no XML do pacote e:
+
+```xml
+<filter_rules_needed>layer7_generate_rules</filter_rules_needed>
+```
+
+Sem ele, `discover_pkg_rules` ignora o pacote durante o reload do filtro.
+
+A regra publicada e:
 
 ```text
 block drop quick inet from <layer7_block> to any label "layer7:block:src"
@@ -120,8 +138,44 @@ No appliance pfSense CE, validar:
 3. `pfctl -sr` contem a regra Layer7;
 4. IP em `<layer7_block>` passa a ser bloqueado sem regra manual externa.
 
+## Estado real validado em appliance (2026-03-23)
+
+Ja foi comprovado no pfSense CE:
+
+- politica `block` em `mode=enforce` casa com trafego `Github`;
+- `layer7d` regista `action=block reason=policy_match`;
+- `layer7d` adiciona o IP de origem a `<layer7_block>`;
+- `pfctl -t layer7_block -T show` mostra o IP bloqueado.
+
+### Causa raiz do gap anterior
+
+A regra `layer7:block:src` nao aparecia em `pfctl -sr` porque o XML do pacote
+(`layer7.xml`) nao tinha o tag `<filter_rules_needed>`. Sem esse tag, a funcao
+`discover_pkg_rules()` do pfSense ignora o pacote durante o ciclo de montagem
+do filtro. A funcao `layer7_generate_rules()` existia e estava correta, mas
+nunca era chamada.
+
+O fix foi adicionar ao XML:
+
+```xml
+<filter_rules_needed>layer7_generate_rules</filter_rules_needed>
+```
+
+### Pendente de validacao no appliance
+
+Apos instalar o pacote com o XML corrigido:
+
+1. `grep layer7 /tmp/rules.debug` — confirmar presenca das regras;
+2. `pfctl -sr | grep layer7` — confirmar regra no ruleset ativo;
+3. `pfctl -t layer7_block -T add 10.0.0.1 && curl http://10.0.0.1` — confirmar
+   bloqueio real;
+4. recarregar filtro (`filter reload`) e confirmar persistencia;
+5. reboot e confirmar persistencia.
+
 ## Risco aberto
 
-A maior incerteza restante nao e mais o nome do hook, mas sim a ordem/precedencia
-real da regra no ruleset final do appliance. Por isso a confirmacao em
-`rules.debug` e `pfctl -sr` continua obrigatoria antes de fechar a fase.
+A maior incerteza restante e a ordem/precedencia real da regra no ruleset final
+do appliance. A regra usa `block drop quick`, o que garante match imediato, mas
+a posicao exata em `rules.debug` depende de onde `PFCONFIG_PACKAGE_FILTER` e
+inserido pelo pfSense. A confirmacao em `rules.debug` e `pfctl -sr` continua
+obrigatoria antes de fechar a fase.

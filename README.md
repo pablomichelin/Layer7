@@ -6,7 +6,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 |--|--|
 | **Repositório** | <https://github.com/pablomichelin/pfsense-layer7> |
 | **Licença** | BSD-2-Clause (ver `LICENSE`) |
-| **Versão actual** | **0.2.6** (listas melhores e sites manuais) |
+| **Versão actual** | **0.2.7** (enforcement PF integrado ao filtro pfSense) |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x · FreeBSD 14/15 |
 
 ## O que faz
@@ -18,7 +18,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 - **Excepciona** IPs, sub-redes e interfaces específicas
 - **Gestão de frota** para 50+ firewalls com scripts automatizados
 
-## Funcionalidades v0.2.6
+## Funcionalidades v0.2.7
 
 - **Políticas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
 - **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes específicos

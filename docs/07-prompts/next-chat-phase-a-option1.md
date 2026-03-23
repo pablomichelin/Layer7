@@ -18,17 +18,28 @@ Contexto atual:
 - o produto ja classifica trafego com nDPI;
 - o daemon layer7d ja decide allow/monitor/tag/block;
 - o daemon ja adiciona IPs a PF tables (`layer7_block`, `layer7_tagged`);
-- o pacote ja ganhou um helper PF e diagnostics melhores;
-- a decisao arquitetural para a Fase A e usar a Opcao 1:
-  publicar regras do pacote no ciclo oficial do filtro do pfSense.
+- o pacote ja ganhou helper PF, hook `layer7_generate_rules("filter")`,
+  reload via `filter_configure()` e diagnostics melhores;
+- o pacote foi compilado e instalado no appliance pfSense CE;
+- o appliance ja provou que:
+  - a politica `block` casa com `Github`;
+  - o daemon regista `action=block reason=policy_match`;
+  - o IP entra em `layer7_block`;
+- o appliance ainda NAO provou que:
+  - a regra `layer7:block:src` entra no ruleset ativo;
+  - `pfctl -sr` mostra a regra do pacote;
+  - o bloqueio automatico acontece sem regra manual externa.
 
 Objetivo deste novo chat:
-- implementar a Opcao 1 em blocos pequenos, sem grande reestruturacao;
-- comecar pelo Passo 1 do plano:
-  confirmar no appliance/repositorio qual hook real do pacote deve ser usado
-  para gerar regras do filtro e como validar isso em diagnostics;
-- se houver confianca suficiente, implementar o menor bloco reversivel que
-  publique a regra minima de block para `<layer7_block>`;
+- continuar a Fase A sem reabrir trabalho ja validado;
+- focar especificamente no gap atual:
+  descobrir como o pfSense CE 25.11.1 realmente inclui regras de pacote no
+  filtro ativo, porque `layer7d -> layer7_block` ja funciona mas a regra
+  `layer7:block:src` ainda nao aparece em `pfctl -sr`;
+- validar isso com evidencias objetivas no appliance:
+  `pfctl -sr`, `rules.debug`, codigo/hook esperado pelo pfSense;
+- implementar o menor ajuste reversivel necessario para que a regra do pacote
+  realmente entre no ruleset ativo;
 - atualizar documentacao no mesmo bloco;
 - registrar claramente objetivo, impacto, risco, teste e rollback.
 

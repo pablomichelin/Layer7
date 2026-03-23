@@ -4,6 +4,7 @@
 	<version>%%PKGVERSION%%</version>
 	<title>Layer 7</title>
 	<include_file>/usr/local/pkg/layer7.inc</include_file>
+	<filter_rules_needed>layer7_generate_rules</filter_rules_needed>
 	<tabs>
 		<tab>
 			<text>Status</text>

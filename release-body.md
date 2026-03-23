@@ -1,14 +1,12 @@
-## Layer7 v0.2.6 — listas melhores e sites manuais
+## Layer7 v0.2.7 — enforcement PF integrado ao filtro pfSense
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Selecao em massa nas listas** — politicas e excecoes agora possuem botoes para selecionar tudo ou limpar interfaces; apps/categorias nDPI permitem selecionar os itens visiveis apos o filtro
-- **Sites/hosts manuais nas politicas** — novo campo `Sites/hosts` grava `match.hosts[]` no JSON e casa contra o `host=` observado nos eventos
-- **Match por dominio e subdominio** — uma regra com `youtube.com` tambem casa `www.youtube.com`, quando o hostname for inferido por DNS
-- **Ver listas existentes** — cada politica ganhou acao `Ver listas`, com visualizacao completa dos itens bloqueados/monitorados sem entrar direto em edicao
-- **Hostnames e destino nos eventos** — mantido o enriquecimento `dst=` e `host=`, que agora tambem suporta o matching manual por sites
+- **Regras do pacote no filtro ativo do pfSense** — o XML do pacote agora declara `<filter_rules_needed>` para que o pfSense CE inclua automaticamente as regras de bloqueio do Layer7 no ruleset ativo durante `filter reload`
+- **Bloqueio operacional por origem** — IPs adicionados a `<layer7_block>` pelo daemon passam a ser bloqueados automaticamente sem necessidade de regra PF manual externa
+- **Persistencia apos reload/reboot** — a regra do pacote reaparece automaticamente em cada `filter_configure()` do pfSense
 
 ### Instalacao (um comando)
 
@@ -24,7 +22,7 @@ pkg delete pfSense-pkg-layer7
 
 ### Compatibilidade
 
-- pfSense CE 2.7.x / 2.8.x
+- pfSense CE 2.7.x / 2.8.x / 25.x
 - FreeBSD 14 / 15
 
 ### Documentacao
