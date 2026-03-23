@@ -25,14 +25,12 @@ Fases 0-10 completas (58/58 testes OK + nDPI + enforce real validado). Fase 11 (
 - Port version 0.1.0 compilado e instalado
 
 ## Objetivo imediato
-1. Publicar release V1 (0.1.0) no GitHub.
-2. Documentar resultados finais do enforce.
-3. Validar piloto estável (24h+ opcional).
+**V1 PUBLICADA.** Release v0.1.0 disponível em https://github.com/pablomichelin/pfsense-layer7/releases/tag/v0.1.0
 
-## Proximos 3 passos
-1. Criar tag v0.1.0 e GitHub Release com o `.pkg` e release notes.
-2. Fechar gates V1 restantes.
-3. Iniciar piloto estável (opcional para V1).
+## Proximos 3 passos (pos-V1)
+1. Piloto estável 24h+ (opcional — monitorar daemon running sem crash).
+2. Fase 13: nDPI produção (tunning, coverage de mais protocolos).
+3. Fase 14: GUI completa (gráficos, dashboards operacionais).
 
 ## Gates pendentes para V1
 - [x] Fase 6: caso simples de block validado no appliance (`pfctl`) — OK 2026-03-22
@@ -41,7 +39,7 @@ Fases 0-10 completas (58/58 testes OK + nDPI + enforce real validado). Fase 11 (
 - [x] Fase 10: nDPI integrado e a classificar trafego real — OK 2026-03-22
 - [x] Fase 10: enforce end-to-end via nDPI validado — OK 2026-03-23 (pf_add_ok=7, 6 IPs)
 - [ ] Fase 10: piloto estavel 24h+ sem incidente (opcional)
-- [ ] Fase 11: release V1 final (0.1.0)
+- [x] Fase 11: release V1 final (0.1.0) — publicada 2026-03-23 no GitHub
 
 ## Decisoes congeladas
 - instalacao no pfSense apenas quando o pacote estiver totalmente completo
