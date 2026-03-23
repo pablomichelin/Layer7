@@ -311,7 +311,8 @@ on_usr1(int sig)
  */
 static void
 layer7_on_classified_flow(const char *iface, const char *src_ip,
-    const char *ndpi_app, const char *ndpi_cat)
+    const char *dst_ip, const char *ndpi_app, const char *ndpi_cat,
+    const char *host)
 {
 	struct layer7_decision dec;
 	int r;
@@ -323,19 +324,23 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 
 	if (dec.action == LAYER7_ACTION_BLOCK ||
 	    dec.action == LAYER7_ACTION_TAG) {
-		L7_NOTE("flow_decide: iface=%s src=%s app=%s cat=%s action=%s "
+		L7_NOTE("flow_decide: iface=%s src=%s dst=%s host=%s app=%s cat=%s action=%s "
 		    "reason=%s policy=%s",
 		    iface ? iface : "-",
-		    src_ip, ndpi_app ? ndpi_app : "(null)",
+		    src_ip, dst_ip ? dst_ip : "-",
+		    host ? host : "-",
+		    ndpi_app ? ndpi_app : "(null)",
 		    ndpi_cat ? ndpi_cat : "(null)",
 		    layer7_action_str(dec.action),
 		    layer7_decide_reason_str(dec.reason),
 		    dec.matched_policy_id[0] ? dec.matched_policy_id : "-");
 	} else {
-		L7_DBG("flow_decide: iface=%s src=%s app=%s cat=%s action=%s "
+		L7_DBG("flow_decide: iface=%s src=%s dst=%s host=%s app=%s cat=%s action=%s "
 		    "reason=%s",
 		    iface ? iface : "-",
-		    src_ip, ndpi_app ? ndpi_app : "(null)",
+		    src_ip, dst_ip ? dst_ip : "-",
+		    host ? host : "-",
+		    ndpi_app ? ndpi_app : "(null)",
 		    ndpi_cat ? ndpi_cat : "(null)",
 		    layer7_action_str(dec.action),
 		    layer7_decide_reason_str(dec.reason));

@@ -38,6 +38,8 @@
 #define L7C_SNAP_DEFAULT 1536
 #define L7C_EXPIRE_INTERVAL 10
 #define L7C_MAX_PKTS_PER_FLOW 48
+#define L7C_DNS_HINTS       1024
+#define L7C_DNS_HOST_MAX    256
 
 struct l7c_flow {
 	uint32_t src_ip;
@@ -68,6 +70,186 @@ struct layer7_capture {
 	int                                  datalink;
 	int                                  protos_loaded;
 };
+
+struct l7c_dns_hint {
+	uint32_t ip;
+	time_t   expires;
+	char     host[L7C_DNS_HOST_MAX];
+};
+
+static struct l7c_dns_hint s_dns_hints[L7C_DNS_HINTS];
+
+static int
+ip_is_private(uint32_t ip)
+{
+	if ((ip & 0xff000000U) == 0x0a000000U)
+		return 1;
+	if ((ip & 0xfff00000U) == 0xac100000U)
+		return 1;
+	if ((ip & 0xffff0000U) == 0xc0a80000U)
+		return 1;
+	return 0;
+}
+
+static int
+dns_read_name(const uint8_t *msg, size_t msg_len, size_t *off, char *out,
+    size_t out_len, int depth)
+{
+	size_t pos, nout = 0;
+	int jumped = 0;
+
+	if (!msg || !off || !out || out_len < 2 || depth > 8 || *off >= msg_len)
+		return -1;
+
+	pos = *off;
+	out[0] = '\0';
+
+	while (pos < msg_len) {
+		uint8_t len = msg[pos++];
+
+		if (len == 0) {
+			if (!jumped)
+				*off = pos;
+			if (nout == 0) {
+				out[0] = '.';
+				out[1] = '\0';
+			}
+			return 0;
+		}
+
+		if ((len & 0xc0U) == 0xc0U) {
+			size_t ptr;
+
+			if (pos >= msg_len)
+				return -1;
+			ptr = ((size_t)(len & 0x3fU) << 8) | msg[pos++];
+			if (ptr >= msg_len)
+				return -1;
+			if (!jumped) {
+				*off = pos;
+				jumped = 1;
+			}
+			pos = ptr;
+			if (++depth > 8)
+				return -1;
+			continue;
+		}
+
+		if (len > 63 || pos + len > msg_len)
+			return -1;
+		if (nout != 0) {
+			if (nout + 1 >= out_len)
+				return -1;
+			out[nout++] = '.';
+		}
+		if (nout + len >= out_len)
+			return -1;
+		memcpy(out + nout, msg + pos, len);
+		nout += len;
+		out[nout] = '\0';
+		pos += len;
+	}
+
+	return -1;
+}
+
+static void
+dns_hint_store(uint32_t ip, const char *host, time_t now)
+{
+	unsigned int i, slot;
+
+	if (!ip || !host || host[0] == '\0' || strcmp(host, ".") == 0)
+		return;
+
+	slot = (unsigned int)(ip % L7C_DNS_HINTS);
+	for (i = 0; i < 16; i++) {
+		struct l7c_dns_hint *h = &s_dns_hints[(slot + i) % L7C_DNS_HINTS];
+		if (h->ip == 0 || h->ip == ip || h->expires <= now) {
+			h->ip = ip;
+			h->expires = now + 600;
+			snprintf(h->host, sizeof(h->host), "%s", host);
+			return;
+		}
+	}
+}
+
+static const char *
+dns_hint_lookup(uint32_t ip, time_t now)
+{
+	unsigned int i, slot;
+
+	if (!ip)
+		return NULL;
+	slot = (unsigned int)(ip % L7C_DNS_HINTS);
+	for (i = 0; i < 16; i++) {
+		struct l7c_dns_hint *h = &s_dns_hints[(slot + i) % L7C_DNS_HINTS];
+		if (h->ip == ip) {
+			if (h->expires > now && h->host[0] != '\0')
+				return h->host;
+			h->ip = 0;
+			h->host[0] = '\0';
+			h->expires = 0;
+			return NULL;
+		}
+		if (h->ip == 0)
+			return NULL;
+	}
+	return NULL;
+}
+
+static void
+observe_dns_response(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp,
+    const uint8_t *payload, uint16_t payload_len, time_t now)
+{
+	size_t off;
+	uint16_t qd, an, i;
+	char qname[L7C_DNS_HOST_MAX];
+
+	if (sp != 53 || dp == 53 || !payload || payload_len < 12)
+		return;
+
+	qd = (uint16_t)((payload[4] << 8) | payload[5]);
+	an = (uint16_t)((payload[6] << 8) | payload[7]);
+	if (qd == 0 || an == 0)
+		return;
+
+	off = 12;
+	if (dns_read_name(payload, payload_len, &off, qname, sizeof(qname), 0) != 0)
+		return;
+	if (off + 4 > payload_len)
+		return;
+	off += 4; /* qtype + qclass */
+
+	for (i = 0; i < an && off < payload_len; i++) {
+		uint16_t type, class_, rdlen;
+		uint32_t ttl;
+
+		if (dns_read_name(payload, payload_len, &off, qname, sizeof(qname), 0) != 0)
+			return;
+		if (off + 10 > payload_len)
+			return;
+		type = (uint16_t)((payload[off] << 8) | payload[off + 1]);
+		class_ = (uint16_t)((payload[off + 2] << 8) | payload[off + 3]);
+		ttl = ((uint32_t)payload[off + 4] << 24) |
+		    ((uint32_t)payload[off + 5] << 16) |
+		    ((uint32_t)payload[off + 6] << 8) |
+		    (uint32_t)payload[off + 7];
+		rdlen = (uint16_t)((payload[off + 8] << 8) | payload[off + 9]);
+		off += 10;
+		if (off + rdlen > payload_len)
+			return;
+		if (type == 1 && class_ == 1 && rdlen == 4) {
+			uint32_t ip = ((uint32_t)payload[off] << 24) |
+			    ((uint32_t)payload[off + 1] << 16) |
+			    ((uint32_t)payload[off + 2] << 8) |
+			    (uint32_t)payload[off + 3];
+			(void)sa;
+			(void)da;
+			dns_hint_store(ip, qname, now + (ttl > 0 ? 0 : 0));
+		}
+		off += rdlen;
+	}
+}
 
 static uint32_t
 flow_hash(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp, uint8_t p)
@@ -247,6 +429,8 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	struct l7c_flow *f;
 	time_t now;
 	ndpi_protocol detected;
+	const uint8_t *l4_data = NULL;
+	uint16_t l4_len = 0;
 
 	cap->stat_pkts++;
 
@@ -291,12 +475,16 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		    (const struct tcphdr *)(ip_data + ip_hdr_len);
 		sp = ntohs(th->th_sport);
 		dp = ntohs(th->th_dport);
+		l4_data = ip_data + ip_hdr_len;
+		l4_len = (uint16_t)(ip_len - ip_hdr_len);
 	} else if (proto == IPPROTO_UDP &&
 	    ip_len >= (uint16_t)(ip_hdr_len + 4)) {
 		const struct udphdr *uh =
 		    (const struct udphdr *)(ip_data + ip_hdr_len);
 		sp = ntohs(uh->uh_sport);
 		dp = ntohs(uh->uh_dport);
+		l4_data = ip_data + ip_hdr_len;
+		l4_len = (uint16_t)(ip_len - ip_hdr_len);
 	}
 
 	f = flow_lookup(cap, sa, da, sp, dp, proto, 1);
@@ -306,6 +494,10 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	now = hdr->ts.tv_sec;
 	f->last_seen = now;
 	f->pkt_count++;
+
+	if (proto == IPPROTO_UDP && l4_data && l4_len >= 12 + 8)
+		observe_dns_response(sa, da, sp, dp, l4_data + 8,
+		    (uint16_t)(l4_len - 8), now);
 
 	if (f->classified)
 		return;
@@ -331,14 +523,28 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		    detected.category);
 
 		char src_ip_str[INET_ADDRSTRLEN];
+		char dst_ip_str[INET_ADDRSTRLEN];
 		struct in_addr addr;
-		addr.s_addr = htonl(sa);
+		uint32_t log_src = f->src_ip;
+		uint32_t log_dst = f->dst_ip;
+		const char *host_hint;
+
+		if (!ip_is_private(log_src) && ip_is_private(log_dst)) {
+			uint32_t tmp = log_src;
+			log_src = log_dst;
+			log_dst = tmp;
+		}
+
+		addr.s_addr = htonl(log_src);
 		inet_ntop(AF_INET, &addr, src_ip_str, sizeof(src_ip_str));
+		addr.s_addr = htonl(log_dst);
+		inet_ntop(AF_INET, &addr, dst_ip_str, sizeof(dst_ip_str));
+		host_hint = dns_hint_lookup(log_dst, now);
 
 		cap->stat_flows_classified++;
-		cap->cb(cap->ifname, src_ip_str,
+		cap->cb(cap->ifname, src_ip_str, dst_ip_str,
 		    app_name ? app_name : "Unknown",
-		    cat_name ? cat_name : "Unspecified");
+		    cat_name ? cat_name : "Unspecified", host_hint);
 	}
 
 	expire_idle(cap, now);

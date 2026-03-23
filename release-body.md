@@ -1,9 +1,10 @@
-## Layer7 v0.2.4 — Monitor ao vivo na GUI
+## Layer7 v0.2.5 — Hostname e destino nos eventos
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
+- **Hostname e destino nos eventos** — logs de classificacao passam a incluir `dst=` e `host=` quando houver correlacao DNS observada pelo daemon
 - **Monitor ao vivo** — a aba `Events` agora atualiza automaticamente os ultimos eventos do `layer7d`, no estilo de um tail em tempo real
 - **Log local dedicado** — `layer7d` agora grava eventos tambem em `/var/log/layer7d.log`, sem depender do syslog do pfSense para visibilidade na GUI
 - **Events e Diagnostics mais confiaveis** — as paginas passam a ler `/var/log/layer7d.log` diretamente

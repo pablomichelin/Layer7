@@ -13,12 +13,15 @@
 /*
  * Callback invocado quando nDPI classifica um fluxo.
  *   iface:    nome da interface de captura (e.g. "em0")
- *   src_ip:   IPv4 dotted-quad da origem do fluxo
+ *   src_ip:   IPv4 dotted-quad da origem escolhida para logging
+ *   dst_ip:   IPv4 dotted-quad do destino escolhido para logging
  *   app:      nome do protocolo detectado (e.g. "BitTorrent")
  *   category: categoria nDPI (e.g. "Download-FileTransfer-FileSharing")
+ *   host:     hint opcional de hostname obtido por correlação DNS (ou NULL)
  */
 typedef void (*layer7_flow_cb)(const char *iface, const char *src_ip,
-    const char *app, const char *category);
+    const char *dst_ip, const char *app, const char *category,
+    const char *host);
 
 struct layer7_capture;
 

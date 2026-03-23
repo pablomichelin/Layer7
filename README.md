@@ -6,7 +6,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 |--|--|
 | **Repositório** | <https://github.com/pablomichelin/pfsense-layer7> |
 | **Licença** | BSD-2-Clause (ver `LICENSE`) |
-| **Versão actual** | **0.2.4** (monitor ao vivo na GUI) |
+| **Versão actual** | **0.2.5** (hostname e destino nos eventos) |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x · FreeBSD 14/15 |
 
 ## O que faz
@@ -18,7 +18,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 - **Excepciona** IPs, sub-redes e interfaces específicas
 - **Gestão de frota** para 50+ firewalls com scripts automatizados
 
-## Funcionalidades v0.2.4
+## Funcionalidades v0.2.5
 
 - **Políticas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
 - **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes específicos
@@ -44,11 +44,11 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 
 ```bash
 # No pfSense (SSH como root):
-fetch -o /tmp/layer7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.2.4/pfSense-pkg-layer7-0.2.4.pkg
+fetch -o /tmp/layer7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.2.5/pfSense-pkg-layer7-0.2.5.pkg
 IGNORE_OSVERSION=yes pkg add -f /tmp/layer7.pkg
 sysrc layer7d_enable=YES
 service layer7d onestart
-layer7d -V   # deve mostrar: 0.2.4
+layer7d -V   # deve mostrar: 0.2.5
 ```
 
 Depois aceda a **Services > Layer 7** na GUI do pfSense.
