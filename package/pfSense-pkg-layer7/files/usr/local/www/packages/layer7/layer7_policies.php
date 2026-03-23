@@ -70,10 +70,12 @@ if ($_POST["add_policy"] ?? false) {
 			$input_errors[] = gettext("App ou categoria: cada valor max. 64 caracteres.");
 			$ok = false;
 		}
+		$new_match_hosts_pre = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "");
 		if ($ok && $apps !== null && $cats !== null &&
 		    ($act === "block" || $act === "tag") &&
-		    count($apps) + count($cats) === 0) {
-			$input_errors[] = gettext("Para block ou tag, indique app nDPI e/ou categoria.");
+		    count($apps) + count($cats) === 0 &&
+		    empty($new_match_hosts_pre)) {
+			$input_errors[] = gettext("Para block ou tag, indique app nDPI, categoria e/ou sites/hosts.");
 			$ok = false;
 		}
 
@@ -217,10 +219,12 @@ if ($_POST["save_policy_edit"] ?? false) {
 				$input_errors[] = gettext("App ou categoria: cada valor max. 64 caracteres.");
 				$ok = false;
 			}
+			$edit_match_hosts_pre = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "");
 			if ($ok && $apps !== null && $cats !== null &&
 			    ($act === "block" || $act === "tag") &&
-			    count($apps) + count($cats) === 0) {
-				$input_errors[] = gettext("Para block ou tag, indique app nDPI e/ou categoria.");
+			    count($apps) + count($cats) === 0 &&
+			    empty($edit_match_hosts_pre)) {
+				$input_errors[] = gettext("Para block ou tag, indique app nDPI, categoria e/ou sites/hosts.");
 				$ok = false;
 			}
 
@@ -749,7 +753,7 @@ function layer7_policy_match_summary($policy) {
 					<label class="col-sm-3 control-label"><?= gettext("Sites/hosts"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_match_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="youtube.com&#10;api.whatsapp.com"></textarea>
-						<p class="help-block"><?= gettext("Um host por linha. O match aceita o host exacto e subdominios observados no log host=."); ?></p>
+						<p class="help-block"><?= gettext("Um host por linha, ex.: youtube.com. Para block, basta indicar sites aqui (sem necessidade de app nDPI). O bloqueio DNS atua automaticamente."); ?></p>
 					</div>
 				</div>
 
