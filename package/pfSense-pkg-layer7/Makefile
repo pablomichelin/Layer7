@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	0.3.0
+PORTVERSION=	0.3.1
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -90,6 +90,8 @@ do-install:
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7d \
 		${STAGEDIR}${PREFIX}/etc/rc.d
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-pfctl \
+		${STAGEDIR}${PREFIX}/libexec
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-unbound-anti-doh \
 		${STAGEDIR}${PREFIX}/libexec
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/pf.conf.sample \
 		${STAGEDIR}${PREFIX}/etc/layer7

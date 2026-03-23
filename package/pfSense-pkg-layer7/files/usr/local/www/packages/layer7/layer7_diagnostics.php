@@ -95,8 +95,18 @@ if (file_exists($pf_rules_debug_path)) {
 	$pf_rules_debug_has_layer7 = ($pf_rules_debug_code === 0 && count($pf_rules_debug_hits) > 0);
 }
 $pf_active_rules_hits = array();
-exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:block' 2>/dev/null", $pf_active_rules_hits, $pf_active_rules_code);
+exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:' 2>/dev/null", $pf_active_rules_hits, $pf_active_rules_code);
 $pf_active_rules_loaded = ($pf_active_rules_code === 0 && count($pf_active_rules_hits) > 0);
+
+$pf_anti_dot_hits = array();
+exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:anti-' 2>/dev/null", $pf_anti_dot_hits, $pf_anti_dot_code);
+$pf_anti_dot_loaded = ($pf_anti_dot_code === 0 && count($pf_anti_dot_hits) > 0);
+
+$unbound_anti_doh = false;
+if (file_exists("/var/unbound/unbound.conf")) {
+	exec("/usr/bin/grep -c 'Layer7 anti-DoH' /var/unbound/unbound.conf 2>/dev/null", $ub_out, $ub_code);
+	$unbound_anti_doh = ($ub_code === 0 && !empty($ub_out[0]) && (int)$ub_out[0] > 0);
+}
 
 $data = layer7_load_or_default();
 $L = isset($data["layer7"]) ? $data["layer7"] : array();
@@ -292,6 +302,36 @@ layer7_render_styles();
 			</div>
 		</div>
 
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Anti-bypass DNS"); ?></h3>
+			<div class="layer7-callout">
+				<dl class="dl-horizontal layer7-summary">
+					<dt><?= gettext("DoT/DoQ (porta 853)"); ?></dt>
+					<dd>
+						<?php if ($pf_anti_dot_loaded) { ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i> <?= gettext("Regras anti-DoT/DoQ activas em pfctl -sr."); ?></span>
+						<?php } else { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= gettext("Regras anti-DoT/DoQ nao encontradas. Recarregue o filtro."); ?></span>
+						<?php } ?>
+					</dd>
+
+					<dt><?= gettext("Unbound anti-DoH"); ?></dt>
+					<dd>
+						<?php if ($unbound_anti_doh) { ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i> <?= gettext("Overrides anti-DoH configurados no Unbound."); ?></span>
+						<?php } else { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= gettext("Overrides nao encontrados. Execute: sh /usr/local/libexec/layer7-unbound-anti-doh"); ?></span>
+						<?php } ?>
+					</dd>
+
+					<dt><?= gettext("Politica nDPI"); ?></dt>
+					<dd>
+						<span class="text-muted"><?= gettext("Verifique se a politica 'anti-bypass-dns' esta ativa em Politicas (apps: DoH_DoT, iCloudPrivateRelay)."); ?></span>
+					</dd>
+				</dl>
+			</div>
+		</div>
+
 		<?php if ($pf_rules_exists && count($pf_rules_preview) > 0) { ?>
 		<div class="layer7-section">
 			<h3 class="layer7-section-title"><?= gettext("Snippet PF gerado"); ?></h3>
@@ -356,6 +396,9 @@ layer7_render_styles();
 				<li><code>pfctl -t layer7_block_dst -T delete IP</code> — <?= gettext("desbloquear destino"); ?></li>
 				<li><code>pfctl -t layer7_block -T delete IP</code> — <?= gettext("desbloquear origem"); ?></li>
 				<li><code>sysrc layer7d_enable=YES</code> — <?= gettext("ativar arranque automatico no boot"); ?></li>
+				<li><code>pfctl -sr | grep layer7:anti</code> — <?= gettext("verificar regras anti-DoT/DoQ activas"); ?></li>
+				<li><code>sh /usr/local/libexec/layer7-unbound-anti-doh</code> — <?= gettext("configurar Unbound anti-DoH/Relay"); ?></li>
+				<li><code>drill mask.icloud.com @127.0.0.1</code> — <?= gettext("verificar se Private Relay retorna NXDOMAIN"); ?></li>
 			</ul>
 		</div>
 		</div>

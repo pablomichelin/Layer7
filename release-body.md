@@ -1,15 +1,14 @@
-## Layer7 v0.3.0 — bloqueio por destino (sites/apps)
+## Layer7 v0.3.1 — anti-bypass DNS (DoH/DoT/iCloud Private Relay)
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Bloqueio por destino** — o daemon agora bloqueia IPs de DESTINO em vez de quarentenar o cliente inteiro. Sites/apps bloqueados ficam inacessiveis; o resto funciona normalmente.
-- **Bloqueio DNS** — quando um dominio em `Sites/hosts` de uma politica `block` e resolvido, o IP vai automaticamente para `layer7_block_dst` e o PF bloqueia trafego para esse IP.
-- **Bloqueio nDPI por destino** — classificacoes nDPI com `action=block` adicionam o IP de destino do fluxo (nao mais de origem) a tabela de bloqueio.
-- **Expiracao automatica** — entradas na tabela de destino expiram com base no TTL DNS (minimo 5 min) para evitar bloqueios permanentes de IPs dinamicos.
-- **Nova tabela PF** — `layer7_block_dst` com regras `block drop quick to` no snippet do pacote.
-- **Diagnostics actualizado** — GUI mostra contadores da tabela de destino.
+- **Anti-bypass DNS multi-camada** — impede que dispositivos contornem o bloqueio usando DNS cifrado (DoH, DoT, DoQ) ou iCloud Private Relay.
+- **Bloqueio DoT/DoQ** — regras PF automaticas bloqueiam TCP/UDP porta 853, cortando DNS over TLS e DNS over QUIC.
+- **Deteccao nDPI de DoH** — politica built-in `anti-bypass-dns` bloqueia fluxos classificados como `DoH_DoT` e `iCloudPrivateRelay` pelo nDPI, adicionando IPs de destino a tabela de bloqueio.
+- **Unbound anti-DoH** — script configura NXDOMAIN para dominios de bypass conhecidos (mask.icloud.com, dns.google, cloudflare-dns.com, etc.). iOS desativa Private Relay automaticamente.
+- **Instalacao integrada** — install.sh agora configura Unbound anti-DoH automaticamente.
 
 ### Instalacao (um comando)
 
@@ -32,3 +31,4 @@ pkg delete pfSense-pkg-layer7
 
 - [Guia Completo](docs/tutorial/guia-completo-layer7.md)
 - [CHANGELOG](docs/changelog/CHANGELOG.md)
+- [Anti-bypass DNS](docs/05-daemon/pf-enforcement.md)

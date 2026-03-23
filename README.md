@@ -6,7 +6,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 |--|--|
 | **Repositório** | <https://github.com/pablomichelin/pfsense-layer7> |
 | **Licença** | BSD-2-Clause (ver `LICENSE`) |
-| **Versão actual** | **0.3.0** (bloqueio por destino — sites/apps) |
+| **Versão actual** | **0.3.1** (anti-bypass DNS — DoH/DoT/Private Relay) |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x · FreeBSD 14/15 |
 
 ## O que faz
@@ -18,7 +18,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 - **Excepciona** IPs, sub-redes e interfaces específicas
 - **Gestão de frota** para 50+ firewalls com scripts automatizados
 
-## Funcionalidades v0.3.0
+## Funcionalidades v0.3.1
 
 - **Políticas por interface** — regras separadas para LAN, WIFI, ADMIN, etc.
 - **Listas de IPs/CIDRs** — bloquear apenas para IPs ou sub-redes específicos
@@ -31,6 +31,7 @@ Pacote **open source** para **pfSense CE**: classificação Layer 7 em tempo rea
 - **`layer7d --list-protos`** — enumera protocolos/categorias nDPI em JSON
 - **Protocolos customizados** — ficheiro de regras editável em runtime (sem recompilação)
 - **Fleet management** — scripts para actualizar 50+ firewalls por SSH
+- **Anti-bypass DNS** — bloqueio automático de DoT/DoQ (porta 853), detecção nDPI de DoH, e NXDOMAIN via Unbound para domínios de bypass conhecidos (iCloud Private Relay, Firefox DoH, resolvers públicos)
 
 ## Guia de utilização
 

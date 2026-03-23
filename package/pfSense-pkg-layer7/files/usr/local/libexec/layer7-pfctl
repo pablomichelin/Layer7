@@ -25,6 +25,12 @@ table <${TABLE_BLOCK}> persist
 table <${TABLE_TAGGED}> persist
 table <${TABLE_BLOCK_DST}> persist
 
+# Anti-bypass: bloquear DoT (TCP 853) e DoQ (UDP 853).
+block drop quick inet proto tcp to port 853 label "layer7:anti-dot"
+block drop quick inet6 proto tcp to port 853 label "layer7:anti-dot6"
+block drop quick inet proto udp to port 853 label "layer7:anti-doq"
+block drop quick inet6 proto udp to port 853 label "layer7:anti-doq6"
+
 # Bloqueio por origem do cliente (quarentena/tag).
 block drop quick inet from <${TABLE_BLOCK}> to any label "layer7:block:src"
 block drop quick inet6 from <${TABLE_BLOCK}> to any label "layer7:block:src6"

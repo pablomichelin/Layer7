@@ -214,10 +214,71 @@ Em SIGHUP (reload), toda a cache e a tabela sao limpas.
 
 ### Limitacoes
 
-- **DoH/DoT**: DNS cifrado nao e observavel; bloqueio DNS nao funciona.
 - **Primeiros pacotes**: nDPI precisa de alguns pacotes para classificar.
 - **IPs partilhados**: CDNs podem partilhar IPs entre sites.
 - **DNS cache do cliente**: bloqueio DNS so funciona apos TTL expirar.
+
+## Estrategia anti-bypass DNS (v0.3.1)
+
+Dispositivos modernos usam DNS cifrado (DoH, DoT, DoQ) e servicos como
+iCloud Private Relay para contornar bloqueio baseado em observacao DNS.
+A partir da v0.3.1, o Layer7 aplica uma estrategia multi-camada.
+
+### Camada 1: Bloqueio de DoT/DoQ (porta 853)
+
+Regras PF no snippet do pacote bloqueiam TCP e UDP na porta 853:
+
+```text
+block drop quick inet proto tcp to port 853 label "layer7:anti-dot"
+block drop quick inet proto udp to port 853 label "layer7:anti-doq"
+```
+
+Eficacia: 100% — porta 853 serve exclusivamente para DoT/DoQ.
+
+### Camada 2: Politica nDPI anti-bypass
+
+O nDPI classifica fluxos como `DoH_DoT` (protocolo 196) e
+`iCloudPrivateRelay` (protocolo 277). O sample config inclui uma politica
+built-in `anti-bypass-dns` com `action=block` para esses protocolos.
+
+Quando o nDPI classifica um fluxo como DoH, o IP de destino entra em
+`layer7_block_dst`, impedindo conexoes futuras ao resolver DoH.
+
+Limitacao: o nDPI precisa de 3-10 pacotes para classificar. Os primeiros
+pacotes de uma sessao DoH podem passar antes da detecao.
+
+### Camada 3: Unbound NXDOMAIN
+
+O script `/usr/local/libexec/layer7-unbound-anti-doh` configura o Unbound
+do pfSense para devolver NXDOMAIN para dominios de bypass conhecidos:
+
+- **Apple Private Relay**: `mask.icloud.com`, `mask-h2.icloud.com`
+  (metodo oficial Apple — iOS desativa Relay automaticamente)
+- **Firefox canary**: `use-application-dns.net`
+  (Firefox desativa DoH quando este dominio retorna NXDOMAIN)
+- **Resolvers DoH publicos**: `dns.google`, `cloudflare-dns.com`,
+  `dns.quad9.net`, `dns.adguard.com`, `doh.opendns.com`, etc.
+
+Eficacia: Alta. Forca fallback para DNS convencional na maioria dos casos.
+
+### Camada 4: DNS forçado (recomendacao manual)
+
+Para forcar todo o DNS pelo pfSense, o administrador pode configurar
+uma regra NAT redirect na GUI do pfSense:
+
+1. Firewall > NAT > Port Forward
+2. Redirecionar TCP/UDP porta 53 de qualquer origem LAN para o pfSense
+3. Isso impede que clientes usem DNS externo (8.8.8.8, 1.1.1.1, etc.)
+
+Nao e configurado automaticamente pelo pacote porque envolve NAT.
+
+### Limitacoes honestas
+
+- **DoH hardcoded**: apps que usam IP de DoH hardcoded (sem resolucao
+  DNS) nao sao afectadas pelo NXDOMAIN do Unbound. Dependem do nDPI.
+- **Novos provedores**: a lista de dominios precisa de manutencao.
+- **ECH**: TLS 1.3 com Encrypted Client Hello esconde o SNI.
+  Nao se resolve sem MITM (fora do escopo V1).
 
 ## Risco aberto
 

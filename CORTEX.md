@@ -4,7 +4,7 @@
 Layer7 para pfSense CE
 
 ## Status atual
-**Versão: 0.3.0 — bloqueio por destino (sites/apps)**
+**Versão: 0.3.1 — anti-bypass DNS (DoH/DoT/iCloud Private Relay)**
 
 Pacote funcional com motor de políticas granulares por interface, listas de IPs/CIDRs e selecção de apps nDPI na GUI. Pronto para teste em pfSense real.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md)
 
 ## Ultima entrega
+- **v0.3.1 — anti-bypass DNS (2026-03-23):**
+  - regras PF anti-DoT/DoQ (porta 853) no snippet do pacote
+  - politica nDPI built-in `anti-bypass-dns` (DoH_DoT + iCloudPrivateRelay)
+  - script Unbound anti-DoH com NXDOMAIN para dominios de bypass conhecidos
+  - instalacao automatica do anti-DoH via install.sh
+  - documentacao da estrategia multi-camada em pf-enforcement.md
 - **v0.3.0 — bloqueio por destino (sites/apps) (2026-03-23):**
   - nova tabela PF `layer7_block_dst` + regra `block to` no snippet do pacote
   - DNS callback: daemon observa DNS e bloqueia IPs de dominios proibidos
@@ -116,12 +122,13 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v0.3.0 implementada.** Pendente de build, deploy e validação no appliance
-pfSense CE para confirmar bloqueio real de sites/apps por destino.
+**v0.3.1 implementada.** Pendente de build, deploy e validação no appliance
+pfSense CE para confirmar que anti-bypass DNS funciona (DoT bloqueado,
+Unbound retorna NXDOMAIN para Private Relay, nDPI bloqueia fluxos DoH).
 
 ## Proximos 3 passos
-1. Build e deploy do pacote 0.3.0 no appliance
-2. Validar bloqueio por destino (DNS + nDPI) no appliance real
+1. Build e deploy do pacote 0.3.1 no appliance
+2. Validar anti-bypass: porta 853 bloqueada, Private Relay desativado, DoH bloqueado
 3. Perfis compostos de servico/funcao e melhorias de UX na GUI
 
 ## Gates pendentes para V1

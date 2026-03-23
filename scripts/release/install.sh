@@ -42,7 +42,7 @@ done
 
 # --- Detecção de versão ---
 if [ -z "$VERSION" ]; then
-    VERSION="0.3.0"
+    VERSION="0.3.1"
 fi
 
 TAG="v${VERSION}"
@@ -105,7 +105,7 @@ fi
 rm -f "/tmp/${PKG_NAME}"
 
 # --- Garantir tabelas PF ---
-echo "[4/5] Verificando tabelas PF..."
+echo "[4/6] Verificando tabelas PF..."
 for _table in layer7_block layer7_block_dst layer7_tagged; do
     if ! pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
         pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null
@@ -116,8 +116,17 @@ for _table in layer7_block layer7_block_dst layer7_tagged; do
     fi
 done
 
+# --- Configurar Unbound anti-DoH ---
+echo "[5/6] Configurando Unbound anti-DoH/Relay..."
+ANTI_DOH="/usr/local/libexec/layer7-unbound-anti-doh"
+if [ -x "$ANTI_DOH" ]; then
+    sh "$ANTI_DOH" 2>/dev/null || echo "  AVISO: script anti-DoH retornou erro (pode ja estar configurado)."
+else
+    echo "  Script anti-DoH nao encontrado (ignorado)."
+fi
+
 # --- Iniciar serviço ---
-echo "[5/5] Iniciando serviço..."
+echo "[6/6] Iniciando serviço..."
 sysrc layer7d_enable=YES > /dev/null 2>&1
 service layer7d onestart > /dev/null 2>&1 || true
 sleep 2

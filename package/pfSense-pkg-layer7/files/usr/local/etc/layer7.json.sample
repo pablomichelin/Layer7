@@ -17,6 +17,16 @@
         "action": "monitor",
         "priority": 10,
         "match": {}
+      },
+      {
+        "id": "anti-bypass-dns",
+        "name": "Anti-bypass DNS (DoH/DoT/Private Relay)",
+        "enabled": true,
+        "action": "block",
+        "priority": 1,
+        "match": {
+          "ndpi_app": ["DoH_DoT", "AppleiCloud", "iCloudPrivateRelay"]
+        }
       }
     ],
     "exceptions": []
