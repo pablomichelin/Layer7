@@ -1,8 +1,8 @@
-# Layer7 para pfSense CE — port com binário layer7d (C).
-# Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c
+# Layer7 para pfSense CE — port com binário layer7d (C) + nDPI.
+# Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	0.0.31
+PORTVERSION=	0.1.0
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -22,6 +22,17 @@ LAYER7_COMMON=	${.CURDIR}/../../src/common
 .error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c)."
 .endif
 
+NDPI_PREFIX=	/usr/local
+.if exists(${NDPI_PREFIX}/include/ndpi/ndpi_api.h)
+LAYER7_NDPI_CFLAGS=	-I${NDPI_PREFIX}/include/ndpi -DHAVE_NDPI=1
+LAYER7_NDPI_LDFLAGS=	-L${NDPI_PREFIX}/lib -lndpi -lpcap -lm -lpthread
+LAYER7_NDPI_SRCS=	${LAYER7D_DIR}/capture.c
+.else
+LAYER7_NDPI_CFLAGS=	-DHAVE_NDPI=0
+LAYER7_NDPI_LDFLAGS=
+LAYER7_NDPI_SRCS=
+.endif
+
 WRKSRC=		${WRKDIR}
 
 NO_MTREE=	yes
@@ -34,8 +45,10 @@ do-extract:
 
 do-build:
 	@${ECHO_CMD} '"${PORTVERSION}"' > ${WRKSRC}/version.str
-	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} -o ${WRKSRC}/layer7d \
-		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c ${LAYER7D_DIR}/enforce.c
+	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} \
+		${LAYER7_NDPI_CFLAGS} -o ${WRKSRC}/layer7d \
+		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
+		${LAYER7D_DIR}/enforce.c ${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS}
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
@@ -47,6 +60,8 @@ do-install:
 	${MKDIR} ${STAGEDIR}${DATADIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/layer7d ${STAGEDIR}${PREFIX}/sbin
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7.json.sample \
+		${STAGEDIR}${PREFIX}/etc
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7-protos.txt.sample \
 		${STAGEDIR}${PREFIX}/etc
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7.xml \
 		${STAGEDIR}${PREFIX}/pkg

@@ -186,5 +186,48 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 		}
 	}
 
+	{
+		const char *pf = strstr(layer, "\"protos_file\"");
+		if (pf && (!pol || pf < pol)) {
+			const char *q = strchr(pf + 13, ':');
+			if (q && q < end) {
+				q++;
+				skip_ws(&q);
+				if (parse_quoted_string(q, out->protos_file,
+				    sizeof(out->protos_file)) == 0)
+					out->has_protos_file = 1;
+			}
+		}
+	}
+
+	{
+		const char *ifc = strstr(layer, "\"interfaces\"");
+		if (ifc && (!pol || ifc < pol)) {
+			const char *arr = strchr(ifc, '[');
+			if (arr && arr < end) {
+				const char *p = arr + 1;
+				while (p < end && *p != ']' &&
+				    out->n_interfaces < L7_MAX_INTERFACES) {
+					while (p < end && (*p == ' ' ||
+					    *p == '\t' || *p == '\n' ||
+					    *p == '\r' || *p == ','))
+						p++;
+					if (*p == '"') {
+						if (parse_quoted_string(p,
+						    out->interfaces[out->n_interfaces],
+						    L7_IFACE_NAME_LEN) == 0)
+							out->n_interfaces++;
+						p++;
+						while (p < end && *p != '"')
+							p++;
+						if (*p == '"')
+							p++;
+					} else
+						break;
+				}
+			}
+		}
+	}
+
 	return 0;
 }

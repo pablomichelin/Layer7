@@ -53,7 +53,16 @@ if ($_POST["save"] ?? false) {
 			$dbgm = 720;
 		}
 		$data["layer7"]["debug_minutes"] = $dbgm;
-		$data["layer7"]["interfaces"] = $iflist;
+		$real_ifaces = array();
+		foreach ($iflist as $ifn) {
+			$real = convert_friendly_interface_to_real_interface_name($ifn);
+			if ($real && $real !== $ifn) {
+				$real_ifaces[] = $real;
+			} else {
+				$real_ifaces[] = $ifn;
+			}
+		}
+		$data["layer7"]["interfaces"] = $real_ifaces;
 
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
@@ -80,9 +89,20 @@ if ($dbgm < 0 || $dbgm > 720) {
 
 $ifarr = array();
 if (isset($L["interfaces"]) && is_array($L["interfaces"])) {
+	$friendly_map = array();
+	foreach (get_configured_interface_list(true) as $ifid => $ifdescr) {
+		$real = get_real_interface($ifid);
+		if ($real) {
+			$friendly_map[$real] = $ifid;
+		}
+	}
 	foreach ($L["interfaces"] as $x) {
 		if (is_string($x) && strlen($x) <= 32 && preg_match('/^[a-zA-Z0-9_.]+$/', $x)) {
-			$ifarr[] = $x;
+			if (isset($friendly_map[$x])) {
+				$ifarr[] = $friendly_map[$x];
+			} else {
+				$ifarr[] = $x;
+			}
 		}
 	}
 }
@@ -178,7 +198,7 @@ layer7_render_styles();
 				<div class="col-sm-9">
 					<input type="text" name="interfaces_csv" class="form-control" style="max-width: 520px;" maxlength="320"
 						value="<?= htmlspecialchars($interfaces_csv); ?>" placeholder="lan, opt1" />
-					<p class="help-block"><?= gettext("Ate 8 nomes de interface do pfSense. Este campo prepara a fase de captura, mas ainda nao ativa nDPI no appliance."); ?></p>
+					<p class="help-block"><?= gettext("Ate 8 nomes de interface pfSense (ex: lan, opt1). O nome e convertido automaticamente para o device real (em0, igb1, etc.) ao gravar."); ?></p>
 				</div>
 			</div>
 

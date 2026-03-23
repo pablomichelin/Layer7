@@ -1,0 +1,21 @@
+# Layer7 Custom Protocols — regras adicionais para nDPI
+# Formato: ver docs/core/ndpi-update-strategy.md
+#
+# Estas regras complementam os ~350 protocolos compilados no nDPI.
+# Editar este ficheiro e enviar SIGHUP ao daemon para recarregar.
+#
+# Exemplos:
+#
+# Por host/domínio (SNI, DNS, HTTP Host):
+# host:"app-interna.empresa.local"@CustomApp
+# host:"vpn.provider.com"@VPN
+#
+# Por porta:
+# tcp:9090@Prometheus
+# udp:51820@WireGuard
+#
+# Por IP:
+# ip:203.0.113.50@PartnerAPI
+#
+# Filtro nBPF:
+# nbpf:"host 10.0.0.1 and port 443"@SpecialTraffic

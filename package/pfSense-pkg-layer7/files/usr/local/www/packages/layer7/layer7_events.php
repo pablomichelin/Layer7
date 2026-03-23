@@ -5,13 +5,40 @@
 ##|*DESCR=View Layer 7 daemon events.
 ##|*MATCH=layer7_events.php*
 ##|-PRIV
-/*
- * Visao de eventos/logs do layer7d.
- * V1: aponta para o syslog do sistema e mostra ajuda operacional.
- */
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
+
+$filter = isset($_GET["filter"]) ? trim($_GET["filter"]) : "";
+$max_lines = 100;
+
+$all_logs = array();
+if (file_exists("/var/log/system.log")) {
+	exec("grep 'layer7d' /var/log/system.log | tail -" . $max_lines . " 2>/dev/null", $all_logs);
+}
+
+$filtered_logs = $all_logs;
+if ($filter !== "") {
+	$filtered_logs = array();
+	foreach ($all_logs as $line) {
+		if (stripos($line, $filter) !== false) {
+			$filtered_logs[] = $line;
+		}
+	}
+}
+
+$enforce_events = array();
+$classify_events = array();
+foreach ($all_logs as $line) {
+	if (strpos($line, "enforce_action") !== false || strpos($line, "pfctl add") !== false) {
+		$enforce_events[] = $line;
+	}
+	if (strpos($line, "flow_decide") !== false) {
+		$classify_events[] = $line;
+	}
+}
+$enforce_events = array_slice($enforce_events, -30);
+$classify_events = array_slice($classify_events, -30);
 
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Events"));
 include("head.inc");
@@ -25,28 +52,67 @@ layer7_render_styles();
 		<?php layer7_render_tabs("events"); ?>
 		<div class="layer7-content">
 
-		<p class="layer7-lead"><?= gettext("Esta pagina concentra a orientacao operacional para leitura dos eventos do daemon enquanto a visao estruturada de eventos ainda nao faz parte da V1."); ?></p>
+		<p class="layer7-lead"><?= gettext("Eventos do daemon extraidos do syslog do sistema. Use os filtros para encontrar eventos especificos."); ?></p>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Onde consultar"); ?></h3>
-			<p><?= gettext("Os eventos do layer7d sao enviados ao syslog do sistema com facility LOG_DAEMON e ident 'layer7d'."); ?></p>
-			<p><?= gettext("No pfSense, abra os logs do sistema e filtre por 'layer7d' para acompanhar start, stop, reload e mensagens de troubleshooting."); ?></p>
+			<h3 class="layer7-section-title"><?= gettext("Filtrar logs"); ?></h3>
+			<form method="get" class="form-inline">
+				<div class="form-group">
+					<input type="text" name="filter" class="form-control" style="width: 320px;" maxlength="100"
+						value="<?= htmlspecialchars($filter); ?>" placeholder="<?= gettext("Ex: enforce, flow_decide, BitTorrent, SIGUSR1..."); ?>" />
+				</div>
+				<button type="submit" class="btn btn-primary"><?= gettext("Filtrar"); ?></button>
+				<?php if ($filter !== "") { ?>
+				<a href="layer7_events.php" class="btn btn-default"><?= gettext("Limpar"); ?></a>
+				<?php } ?>
+			</form>
 		</div>
 
+		<?php if (count($enforce_events) > 0) { ?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Leitura recomendada"); ?></h3>
-			<ul>
-				<li><?= gettext("Use a pagina de Diagnostics para confirmar PID, comandos uteis e caminho da configuracao ativa."); ?></li>
-				<li><?= gettext("Ative syslog remoto em Definicoes quando quiser reter historico fora do appliance."); ?></li>
-				<li><?= gettext("Durante o lab, aumente temporariamente o debug para capturar reloads e comportamento do daemon."); ?></li>
-			</ul>
+			<h3 class="layer7-section-title"><?= gettext("Eventos de enforcement"); ?> <span class="badge"><?= count($enforce_events); ?></span></h3>
+			<p class="small text-muted"><?= gettext("Acoes de block/tag executadas pelo daemon (pfctl -T add). Ultimo evento no final."); ?></p>
+			<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $enforce_events)); ?></pre>
 		</div>
+		<?php } ?>
+
+		<?php if (count($classify_events) > 0) { ?>
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Classificacoes nDPI"); ?> <span class="badge"><?= count($classify_events); ?></span></h3>
+			<p class="small text-muted"><?= gettext("Fluxos classificados pelo nDPI (visivel com log_level=debug). Mostra src, app, cat, action, reason."); ?></p>
+			<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $classify_events)); ?></pre>
+		</div>
+		<?php } ?>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Estado da V1"); ?></h3>
+			<h3 class="layer7-section-title">
+				<?= gettext("Todos os logs"); ?>
+				<span class="badge"><?= count($filtered_logs); ?></span>
+				<?php if ($filter !== "") { ?>
+				<small class="text-muted"> (<?= gettext("filtro"); ?>: <?= htmlspecialchars($filter); ?>)</small>
+				<?php } ?>
+			</h3>
+			<?php if (count($filtered_logs) > 0) { ?>
+			<pre class="pre-scrollable" style="max-height: 400px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $filtered_logs)); ?></pre>
+			<?php } else { ?>
 			<div class="alert alert-info">
-				<?= gettext("A interface ainda nao expoe uma timeline propria de eventos. Nesta fase, o caminho oficial continua a ser o syslog do pfSense."); ?>
+				<?php if ($filter !== "") { ?>
+				<?= gettext("Nenhum log correspondente ao filtro."); ?>
+				<?php } else { ?>
+				<?= gettext("Nenhum log do layer7d encontrado em /var/log/system.log."); ?>
+				<?php } ?>
 			</div>
+			<?php } ?>
+		</div>
+
+		<div class="layer7-section">
+			<h3 class="layer7-section-title"><?= gettext("Dicas"); ?></h3>
+			<ul class="small">
+				<li><?= gettext("Ative log_level=debug em Definicoes para ver decisoes de cada fluxo classificado."); ?></li>
+				<li><?= gettext("Use debug_minutes para elevar temporariamente sem editar o JSON."); ?></li>
+				<li><?= gettext("Configure syslog remoto em Definicoes para reter historico fora do appliance."); ?></li>
+				<li><?= gettext("SIGUSR1 (pagina Diagnostics) gera um resumo de estatisticas que aparece aqui."); ?></li>
+			</ul>
 		</div>
 		</div>
 	</div>

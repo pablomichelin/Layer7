@@ -1,6 +1,9 @@
 /*
  * layer7d — config layer7; log_level filtra verbosidade; idle se enabled=false.
  */
+#if HAVE_NDPI
+#include "capture.h"
+#endif
 #include "config_parse.h"
 #include "enforce.h"
 #include "policy.h"
@@ -54,6 +57,15 @@ static char s_remote_host[256];
 static int s_syslog_remote;
 static int s_remote_port = 514;
 static time_t s_debug_until;
+
+#if HAVE_NDPI
+#define L7_MAX_IFACES 8
+static struct layer7_capture *s_captures[L7_MAX_IFACES];
+static int s_n_captures;
+static unsigned long long s_cap_pkts;
+static unsigned long long s_cap_flows_classified;
+static unsigned long long s_cap_flows_expired;
+#endif
 
 static char *read_file(const char *path, size_t *out_len);
 static int cfg_disabled(const struct layer7_parsed *p);
@@ -184,8 +196,9 @@ on_usr1(int sig)
 /*
  * Chamado pelo loop quando nDPI classificar um fluxo (origem + app/cat).
  * mode=enforce + decisão block/tag → pfctl -T add (ou dry em testes internos).
+ * mode=monitor → apenas loga a decisão, nunca chama pfctl.
  */
-static void __attribute__((unused))
+static void
 layer7_on_classified_flow(const char *src_ip, const char *ndpi_app,
     const char *ndpi_cat)
 {
@@ -196,12 +209,41 @@ layer7_on_classified_flow(const char *src_ip, const char *ndpi_app,
 		return;
 	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, s_ge, src_ip, ndpi_app,
 	    ndpi_cat, &dec);
+
+	if (dec.action == LAYER7_ACTION_BLOCK ||
+	    dec.action == LAYER7_ACTION_TAG) {
+		L7_NOTE("flow_decide: src=%s app=%s cat=%s action=%s "
+		    "reason=%s policy=%s",
+		    src_ip, ndpi_app ? ndpi_app : "(null)",
+		    ndpi_cat ? ndpi_cat : "(null)",
+		    layer7_action_str(dec.action),
+		    layer7_decide_reason_str(dec.reason),
+		    dec.matched_policy_id[0] ? dec.matched_policy_id : "-");
+	} else {
+		L7_DBG("flow_decide: src=%s app=%s cat=%s action=%s "
+		    "reason=%s",
+		    src_ip, ndpi_app ? ndpi_app : "(null)",
+		    ndpi_cat ? ndpi_cat : "(null)",
+		    layer7_action_str(dec.action),
+		    layer7_decide_reason_str(dec.reason));
+	}
+
+	if (!s_ge) {
+		/* Modo monitor: nunca chamar pfctl */
+		return;
+	}
+
 	r = layer7_pf_enforce_decision(&dec, src_ip, 0);
-	if (r == 1)
+	if (r == 1) {
 		s_pf_table_add_ok++;
-	else if (r == -1) {
+		L7_INFO("enforce_action: %s src=%s table=%s policy=%s",
+		    layer7_action_str(dec.action), src_ip, dec.pf_table,
+		    dec.matched_policy_id[0] ? dec.matched_policy_id :
+		    dec.matched_exception_id);
+	} else if (r == -1) {
 		s_pf_table_add_fail++;
-		L7_WARN("pfctl add failed table=%s ip=%s", dec.pf_table, src_ip);
+		L7_WARN("pfctl add failed table=%s ip=%s", dec.pf_table,
+		    src_ip);
 	}
 }
 
@@ -446,6 +488,22 @@ apply_config(int use_syslog)
 			    p.debug_minutes);
 		else
 			printf("  debug_minutes: (not set)\n");
+		if (p.has_protos_file)
+			printf("  protos_file: %s\n", p.protos_file);
+		else
+			printf("  protos_file: (default "
+			    "/usr/local/etc/layer7-protos.txt)\n");
+		if (p.n_interfaces > 0) {
+			int x;
+			printf("  interfaces: [");
+			for (x = 0; x < p.n_interfaces; x++) {
+				if (x)
+					printf(", ");
+				printf("%s", p.interfaces[x]);
+			}
+			printf("]\n");
+		} else
+			printf("  interfaces: (none)\n");
 
 		printf("  policies: %d (sorted priority desc, id asc)\n", np);
 		for (k = 0; k < np; k++) {
@@ -617,6 +675,84 @@ apply_config(int use_syslog)
 	return 0;
 }
 
+#if HAVE_NDPI
+static void
+close_captures(void)
+{
+	int i;
+
+	for (i = 0; i < s_n_captures; i++) {
+		if (s_captures[i]) {
+			layer7_capture_close(s_captures[i]);
+			s_captures[i] = NULL;
+		}
+	}
+	s_n_captures = 0;
+}
+
+static void
+open_captures(void)
+{
+	int i;
+	char errbuf[256];
+
+	close_captures();
+	if (!s_have_parse || cfg_disabled(&s_parsed))
+		return;
+	if (s_parsed.n_interfaces == 0) {
+		L7_NOTE("capture: no interfaces configured — nDPI idle");
+		return;
+	}
+	{
+		const char *pf = s_parsed.has_protos_file ?
+		    s_parsed.protos_file : NULL;
+		if (pf && pf[0])
+			L7_NOTE("capture: protos_file=%s", pf);
+		for (i = 0; i < s_parsed.n_interfaces &&
+		    s_n_captures < L7_MAX_IFACES; i++) {
+			struct layer7_capture *c;
+
+			c = layer7_capture_open(s_parsed.interfaces[i], 1536,
+			    layer7_on_classified_flow, pf,
+			    errbuf, (int)sizeof(errbuf));
+			if (!c) {
+				L7_WARN("capture_open(%s) failed: %s",
+				    s_parsed.interfaces[i], errbuf);
+				continue;
+			}
+			s_captures[s_n_captures++] = c;
+			L7_NOTE("capture: opened %s (nDPI active)",
+			    s_parsed.interfaces[i]);
+		}
+	}
+	if (s_n_captures == 0)
+		L7_WARN("capture: no interfaces opened — nDPI disabled");
+}
+
+static void
+aggregate_capture_stats(void)
+{
+	int i;
+	unsigned long long pkts = 0, cl = 0, ex = 0;
+
+	for (i = 0; i < s_n_captures; i++) {
+		unsigned long long p, a, c, e;
+		layer7_capture_stats(s_captures[i], &p, &a, &c, &e);
+		pkts += p;
+		cl += c;
+		ex += e;
+		(void)a;
+	}
+	s_cap_pkts = pkts;
+	s_cap_flows_classified = cl;
+	s_cap_flows_expired = ex;
+}
+#else
+static void close_captures(void) {}
+static void open_captures(void) {}
+static void aggregate_capture_stats(void) {}
+#endif
+
 int main(int argc, char **argv)
 {
 	struct sigaction sa;
@@ -733,8 +869,11 @@ int main(int argc, char **argv)
 		    "carregado (%s)",
 		    config_path);
 
+	open_captures();
+
 	for (;;) {
 		if (stop_req) {
+			close_captures();
 			l7_log(L7_PRI_FAC | LOG_NOTICE, "daemon_stop");
 			closelog();
 			return 0;
@@ -742,6 +881,29 @@ int main(int argc, char **argv)
 		if (usr1_req) {
 			usr1_req = 0;
 			s_sigusr1_count++;
+			aggregate_capture_stats();
+#if HAVE_NDPI
+			L7_NOTE(
+			    "SIGUSR1 stats: ver=%s reload_ok=%llu snapshot_fail=%llu "
+			    "sighup=%llu usr1=%llu loop_ticks=%llu "
+			    "policies=%d exceptions=%d enforce_cfg=%d "
+			    "have_parse=%d pf_add_ok=%llu pf_add_fail=%llu "
+			    "cap_pkts=%llu cap_classified=%llu cap_expired=%llu "
+			    "captures=%d",
+			    layer7d_version,
+			    (unsigned long long)s_reload_ok,
+			    (unsigned long long)s_snapshot_fail,
+			    (unsigned long long)s_sighup_count,
+			    (unsigned long long)s_sigusr1_count,
+			    (unsigned long long)s_loop_ticks, s_np, s_nx, s_ge,
+			    s_have_parse,
+			    (unsigned long long)s_pf_table_add_ok,
+			    (unsigned long long)s_pf_table_add_fail,
+			    (unsigned long long)s_cap_pkts,
+			    (unsigned long long)s_cap_flows_classified,
+			    (unsigned long long)s_cap_flows_expired,
+			    s_n_captures);
+#else
 			L7_NOTE(
 			    "SIGUSR1 stats: ver=%s reload_ok=%llu snapshot_fail=%llu "
 			    "sighup=%llu usr1=%llu loop_ticks=%llu "
@@ -756,32 +918,59 @@ int main(int argc, char **argv)
 			    s_have_parse,
 			    (unsigned long long)s_pf_table_add_ok,
 			    (unsigned long long)s_pf_table_add_fail);
+#endif
 		}
 		if (reload_req) {
 			reload_req = 0;
 			s_sighup_count++;
 			L7_NOTE("SIGHUP: reload config");
+			close_captures();
 			if (stat(config_path, &st) == 0)
 				(void)apply_config(1);
 			else {
 				L7_WARN("SIGHUP: missing %s", config_path);
 				s_have_parse = 0;
 			}
+			open_captures();
 		}
 
 		s_loop_ticks++;
 		tick++;
-		/* TODO(Fase 13): quando nDPI classificar fluxo → layer7_on_classified_flow(src_ip, ndpi_app, ndpi_cat) */
 		if (s_have_parse && cfg_disabled(&s_parsed)) {
 			if (tick % 20 == 0)
 				L7_INFO("layer7.enabled=false — still idle");
 			sleep(60);
-		} else {
+		}
+#if HAVE_NDPI
+		else if (s_n_captures > 0) {
+			int j, total = 0;
+			for (j = 0; j < s_n_captures; j++) {
+				int r = layer7_capture_poll(s_captures[j], 64);
+				if (r > 0)
+					total += r;
+			}
+			if (total == 0)
+				usleep(10000);
+			if (tick % 600 == 0 && tick > 0) {
+				aggregate_capture_stats();
+				L7_INFO(
+				    "periodic: reload_ok=%llu policies=%d "
+				    "exceptions=%d enforce=%d "
+				    "pkts=%llu classified=%llu",
+				    (unsigned long long)s_reload_ok, s_np,
+				    s_nx, s_ge,
+				    (unsigned long long)s_cap_pkts,
+				    (unsigned long long)s_cap_flows_classified);
+			}
+		}
+#endif
+		else {
 			if (tick % 120 == 0 && tick > 0)
 				L7_INFO(
 				    "periodic_state: reload_ok=%llu "
 				    "snapshot_fail=%llu policies=%d "
-				    "exceptions=%d enforce_cfg=%d",
+				    "exceptions=%d enforce_cfg=%d "
+				    "(no captures active)",
 				    (unsigned long long)s_reload_ok,
 				    (unsigned long long)s_snapshot_fail, s_np,
 				    s_nx, s_ge);

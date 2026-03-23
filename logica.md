@@ -32,8 +32,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-[ -n "$REPO_OWNER" ] || usage
-[ -n "$REPO_NAME" ] || usage
+como [ -n "$REPO_NAME" ] || usage
 [ -n "$VERSION" ] || usage
 
 [ "$(uname -s)" = "FreeBSD" ] || {

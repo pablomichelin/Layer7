@@ -14,3 +14,7 @@ if [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ]; then
 	chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
 	chmod 0664 "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
 fi
+
+if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt" ] && [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt.sample" ]; then
+	cp "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt.sample" "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt"
+fi

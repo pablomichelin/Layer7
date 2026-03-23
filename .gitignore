@@ -12,11 +12,19 @@ Desktop.ini
 # Inventário do lab preenchido localmente (não commitar IPs/senhas)
 docs/08-lab/lab-inventory.md
 
+# Scripts de lab com credenciais (não commitar)
+scripts/lab/
+
 # Build artifacts (futuro) — só na raiz (não ignorar scripts/build/)
 *.txz
 *.pkg
 /dist/
 /build/
+/release/
+/releases/
+
+# Tools locais
+/tools/
 
 # Binários locais (make / smoke em src/layer7d)
 src/layer7d/layer7d

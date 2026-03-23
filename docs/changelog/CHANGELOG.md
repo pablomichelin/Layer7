@@ -5,6 +5,60 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Enforce end-to-end validado (2026-03-23)** — pipeline nDPI → policy engine → pfctl comprovado em pfSense CE real:
+  - `pf_add_ok=7`, zero falhas, 6 IPs adicionados à tabela `layer7_tagged`
+  - Protocolos detectados: TuyaLP (IoT), SSDP (System), MDNS (Network)
+  - Exceções respeitadas: IPs .195 e .129 não foram afetados
+  - CLI `-e` validou: BitTorrent→block, HTTP→monitor, IP excecionado→allow
+- **Daemon: logging diferenciado** — block/tag decisions logadas a `LOG_NOTICE` (sempre visíveis); allow/monitor a `LOG_DEBUG` (sem poluir logs)
+- **Daemon: safeguard monitor mode** — `layer7_on_classified_flow` verifica modo global antes de chamar `pfctl`; em modo monitor, decisão logada mas nunca executada.
+- **Scripts lab** — `sync-to-builder.py` (SFTP sync), `transfer-and-install.py` (builder→pfSense), scripts de teste enforce
+- **Deploy lab via GitHub Releases** — `scripts/release/deployz.sh` (build + publish), `scripts/release/install-lab.sh.template` (instalação no pfSense com `fetch + sh`), `scripts/release/README.md`, `docs/04-package/deploy-github-lab.md`.
+- **Rollback doc** — `docs/05-runbooks/rollback.md` (procedimento completo com limpeza manual).
+- **Release notes template** — `docs/06-releases/release-notes-template.md`.
+- **Checklist mestre alinhado** — `14-CHECKLIST-MESTRE.md` atualizado para refletir o estado real do projeto: fases 0, 3, 5, 7, 8 marcadas como completas.
+- **Matriz de testes** — `docs/tests/test-matrix.md` com 58 testes em 10 categorias (47 OK, 11 pendentes no appliance).
+- **Smoke test melhorado** — `smoke-layer7d.sh` com cenários adicionais: exception por host (whitelist IP), exception por CIDR.
+- **Validação lab completa (2026-03-22)** — 57/58 testes OK no pfSense CE 2.8.1-dev (FreeBSD 15.0-CURRENT):
+  - Instalação via GitHub Release (`fetch` + `pkg add -f`) OK
+  - Daemon start/stop/SIGUSR1/SIGHUP OK
+  - pfctl enforce: dry-run, real add, show, delete OK
+  - Whitelist: exception host impede enforce OK
+  - GUI: 6 páginas HTTP 200 OK
+  - Rollback: `pkg delete` remove pacote, preserva config, dashboard OK
+  - Reinstalação do `.pkg` do GitHub Release OK
+
+- **Syslog remoto validado (2026-03-22)** — `nc -ul 5514` + daemon SIGUSR1, mensagens BSD syslog recebidas.
+- **nDPI integrado (0.1.0-alpha1, 2026-03-22):**
+  - Novo módulo `capture.c`/`capture.h`: pcap live capture + nDPI flow classification
+  - Tabela de fluxos hash (65536 slots, linear probing, expiração 120s)
+  - `main.c`: loop de captura integrado, `layer7_on_classified_flow` conectado ao nDPI
+  - `config_parse.c/h`: parsing de `interfaces[]` do JSON
+  - Makefile: auto-detect nDPI (`HAVE_NDPI`), compilação condicional, `NDPI=0` para CI
+  - Port Makefile: PORTVERSION 0.1.0.a1, link com libndpi + libpcap
+  - Validado no pfSense: `cap_pkts=360`, `cap_classified=8`, captura estável em `em0`
+  - Suporte a custom protocols file (`/usr/local/etc/layer7-protos.txt`) para regras por host/porta/IP sem recompilar
+- **Estratégia de atualização nDPI** — `docs/core/ndpi-update-strategy.md`: comparação com SquidGuard, fluxo de atualização, cadência recomendada, roadmap
+- **Script update-ndpi.sh** — `scripts/release/update-ndpi.sh`: atualiza nDPI no builder e reconstrói pacote
+- **Fleet update** — `scripts/release/fleet-update.sh`: distribui `.pkg` para N firewalls via SSH (compila 1x, instala em todos)
+- **Fleet protos sync** — `scripts/release/fleet-protos-sync.sh`: sincroniza `protos.txt` para N firewalls + SIGHUP (sem recompilação)
+- **Resolução automática de interfaces** — GUI Settings converte nomes pfSense (`lan`, `opt1`) para device real (`em0`, `igb1`) ao gravar JSON via `convert_friendly_interface_to_real_interface_name()`; exibição reversa ao carregar
+- **Custom protos sample** — `layer7-protos.txt.sample` incluído no pacote com exemplos de regras por host/porta/IP/nBPF
+- **Release notes V1** — `docs/06-releases/release-notes-v0.1.0.md` (draft)
+- **GUI Diagnostics melhorado** — stats live (SIGUSR1 button), PF tables (layer7_block, layer7_tagged com contagem e entradas), custom protos status, interfaces configuradas, SIGHUP button, logs recentes do layer7d
+- **GUI Events melhorado** — filtro de texto, seções separadas para eventos de enforcement e classificações nDPI, todos os logs do layer7d com filtro
+- **GUI Status melhorado** — resumo operacional com modo (badge colorido), interfaces, políticas ativas/block count, estado do daemon
+- **protos_file configurável** — campo `protos_file` no JSON config (`config_parse.c/h`), passado a `layer7_capture_open`, mostrado em `layer7d -t`
+- **pkg-install melhorado** — copia `layer7-protos.txt.sample` para `layer7-protos.txt` se não existir
+- **Port Makefile** — PORTVERSION bumped para 0.1.0, instalação de `layer7-protos.txt.sample`
+
+### Changed
+- **CORTEX.md** — nDPI integrado, Fase 10 em progresso, gates atualizados, estratégia de atualização nDPI documentada, fleet management.
+- **README.md** — seção Distribuição com link para deploy lab via GitHub Releases.
+- **14-CHECKLIST-MESTRE.md** — fases 6 e 9 fechadas com evidência de lab.
+- **docs/tests/test-matrix.md** — 58/58 testes OK.
+
+### Previously added
 - **GUI save no appliance** - CSRF customizado removido de `Settings`, `Policies` e `Exceptions`; `pkg-install` passa a criar `layer7.json` a partir do sample e aplicar `www:wheel` + `0664`; save real em `Settings` validado no pfSense com persistencia em `/usr/local/etc/layer7.json`.
 - **Guia Windows** — `docs/08-lab/guia-windows.md` (CI, WSL, lab); **`scripts/package/check-port-files.ps1`** (PowerShell, equivalente ao `.sh`); referência em `docs/08-lab/README.md` e `validacao-lab.md`.
 - **Quick-start lab** — `docs/08-lab/quick-start-lab.md` (fluxo encadeado builder→pfSense→validação); referência em `docs/08-lab/README.md`.

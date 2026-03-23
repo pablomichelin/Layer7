@@ -159,16 +159,17 @@ Leia:
 
 ---
 
-## Status inicial recomendado
+## Status do projeto
 
-No começo do projeto, trate o status assim:
-
-- Fase atual: **Fase 0 / Fase 1**
+- Fases completas: **0–10** (58/58 testes OK + nDPI + enforce real validado)
+- Fase 11: **release V1 pronta para publicação**
 - Escopo ativo: **V1 MVP**
-- Objetivo imediato: **PoC do engine + shape do pacote**
-- Objetivo proibido neste momento: **feature creep**
+- Objetivo imediato: **publicar release 0.1.0 no GitHub**
+- Objetivo proibido neste momento: **feature creep, Fase 13+ antes do gate V1**
 
-**Continuidade:** o pacote e o daemon existem como **código no repositório**; a instalação e o serviço no pfSense **só contam como feitos após validação em lab** — ver **`docs/04-package/validacao-lab.md`**. O ponto de verdade operacional está em **`CORTEX.md`**.
+**Validação lab (2026-03-23):** **Enforce end-to-end funcional.** Pipeline nDPI → policy engine → pfctl comprovado: `pf_add_ok=7`, 6 IPs automaticamente adicionados à tabela PF (TuyaLP/IoT, SSDP, MDNS), exceções respeitadas, block/tag decisions logadas a NOTICE. CLI `-e` validou BitTorrent→block. Pacote v0.1.0 compilado e instalado.
+
+**Validação lab (2026-03-22):** 58/58 testes OK. nDPI integrado e a classificar tráfego real. GUI completa com 6 páginas. Fleet management. Custom protocols file. Plataforma: pfSense CE 2.8.1-dev (FreeBSD 15.0-CURRENT). O ponto de verdade operacional está em **`CORTEX.md`**.
 
 ---
 

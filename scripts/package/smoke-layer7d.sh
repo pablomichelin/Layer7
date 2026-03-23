@@ -31,5 +31,15 @@ make OUT=layer7d-smoke VSTR_DIR="$SMOKE_VER"
 	echo "smoke-layer7d: esperado dry-run pfctl (enforce-smoke + BitTorrent)"
 	exit 1
 }
+./layer7d-smoke -n -c "$ROOT/samples/config/layer7-minimal.json" -e 10.0.0.99 BitTorrent 2>&1 |
+	grep -q "exception" || {
+	echo "smoke-layer7d: esperado exception match (IP 10.0.0.99 = whitelist)"
+	exit 1
+}
+./layer7d-smoke -n -c "$ROOT/samples/config/layer7-minimal.json" -e 192.168.77.10 HTTP Web 2>&1 |
+	grep -q "exception" || {
+	echo "smoke-layer7d: esperado exception match (CIDR 192.168.77.0/24)"
+	exit 1
+}
 rm -f layer7d-smoke
 echo "smoke-layer7d: OK"

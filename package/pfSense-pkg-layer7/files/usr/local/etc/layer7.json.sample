@@ -7,6 +7,7 @@
     "syslog_remote_host": "",
     "syslog_remote_port": 514,
     "debug_minutes": 0,
+    "protos_file": "/usr/local/etc/layer7-protos.txt",
     "interfaces": ["lan"],
     "policies": [
       {

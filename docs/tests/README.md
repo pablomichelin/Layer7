@@ -14,3 +14,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 - `sh scripts/package/smoke-layer7d.sh` (requer `cc` + `make`).
 - `make -C src/layer7d check` após `make` no mesmo diretório.
+
+## Matriz de testes
+
+[`test-matrix.md`](test-matrix.md) — 58 testes divididos por categoria (build, instalação, daemon, config, policy engine, enforcement, GUI, observabilidade, rollback). 47 OK, 11 pendentes no appliance.

@@ -7,6 +7,9 @@
 
 #include <stddef.h>
 
+#define L7_MAX_INTERFACES 8
+#define L7_IFACE_NAME_LEN 32
+
 struct layer7_parsed {
 	int has_layer7;   /* 1 se encontrou chave "layer7" */
 	int has_enabled;
@@ -23,6 +26,10 @@ struct layer7_parsed {
 	int syslog_remote_port; /* 1–65535; default 514 se remoto ativo */
 	int has_debug_minutes;
 	int debug_minutes; /* 0=cancela; 1–720 boost LOG_DEBUG até expirar */
+	int n_interfaces;
+	char interfaces[L7_MAX_INTERFACES][L7_IFACE_NAME_LEN];
+	int has_protos_file;
+	char protos_file[256];
 };
 
 /* json: conteúdo UTF-8; len: tamanho ou strlen se null-terminated com len=0 */

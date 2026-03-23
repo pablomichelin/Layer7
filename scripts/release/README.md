@@ -106,12 +106,43 @@ Para instalar versão anterior, usar o `install-lab.sh` do release desejado (ex:
 
 ---
 
+## Fleet: múltiplos firewalls
+
+Para ambientes com vários firewalls (10, 50, 100+):
+
+### Atualizar pacote (requer compilação prévia no builder)
+
+```sh
+# Compilar 1x no builder:
+./scripts/release/update-ndpi.sh
+
+# Distribuir para todos:
+./scripts/release/fleet-update.sh -i firewalls.txt -p pfSense-pkg-layer7-0.1.0.pkg --parallel 4
+```
+
+### Atualizar regras custom (sem recompilação)
+
+```sh
+# Editar regras localmente:
+vim layer7-protos.txt
+
+# Sincronizar para todos + SIGHUP:
+./scripts/release/fleet-protos-sync.sh -i firewalls.txt -f layer7-protos.txt
+```
+
+Ver [`docs/core/ndpi-update-strategy.md`](../../docs/core/ndpi-update-strategy.md) para detalhes.
+
+---
+
 ## Arquivos
 
 | Ficheiro                   | Descrição                                      |
 |----------------------------|------------------------------------------------|
-| `deployz.sh`               | Script principal; roda no builder FreeBSD      |
-| `install-lab.sh.template`  | Template do script de instalação               |
+| `deployz.sh`               | Build + publish GitHub Release (builder)       |
+| `install-lab.sh.template`  | Template do script de instalação (1 firewall)  |
+| `update-ndpi.sh`           | Atualiza nDPI no builder e reconstrói pacote   |
+| `fleet-update.sh`          | Distribui `.pkg` para N firewalls via SSH      |
+| `fleet-protos-sync.sh`     | Sincroniza `protos.txt` para N firewalls       |
 | `README.md`                | Este documento                                 |
 
 Documentação formal: [`docs/04-package/deploy-github-lab.md`](../../docs/04-package/deploy-github-lab.md).

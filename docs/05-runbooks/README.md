@@ -8,4 +8,6 @@ Quick start do lab: [`../08-lab/quick-start-lab.md`](../08-lab/quick-start-lab.m
 
 Seguranca da WebGUI do pfSense durante testes do pacote: [`pfsense-webgui-safety.md`](pfsense-webgui-safety.md).
 
+Rollback do pacote Layer7: [`rollback.md`](rollback.md).
+
 Runbooks especificos por release entram aqui quando existirem.
