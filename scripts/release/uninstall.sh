@@ -56,12 +56,17 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 if [ "$AUTO_YES" -eq 0 ]; then
-    printf "Deseja remover completamente o Layer7? [s/N] "
-    read -r resp
-    case "$resp" in
-        [sS]|[sS][iI][mM]|[yY]|[yY][eE][sS]) ;;
-        *) echo "Cancelado."; exit 0 ;;
-    esac
+    if [ -t 0 ]; then
+        printf "Deseja remover completamente o Layer7? [s/N] "
+        read -r resp
+        case "$resp" in
+            [sS]|[sS][iI][mM]|[yY]|[yY][eE][sS]) ;;
+            *) echo "Cancelado."; exit 0 ;;
+        esac
+    else
+        echo "Modo nao-interactivo detectado. Prosseguindo automaticamente."
+        echo "(Use --yes para suprimir esta mensagem.)"
+    fi
 fi
 
 echo ""
