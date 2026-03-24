@@ -2,8 +2,8 @@
 <pfsensepkgs>
 	<package>
 		<name>layer7</name>
-		<descr><![CDATA[Layer 7 traffic classification and policy for pfSense CE (work in progress).]]></descr>
-		<website>https://github.com/pablomichelin/pfsense-layer7</website>
+		<descr><![CDATA[Layer 7 traffic classification and policy for pfSense CE. A product by Systemup (www.systemup.inf.br).]]></descr>
+		<website>https://www.systemup.inf.br</website>
 		<version>%%PKGVERSION%%</version>
 		<configurationfile>layer7.xml</configurationfile>
 	</package>

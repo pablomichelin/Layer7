@@ -1,9 +1,13 @@
 # Layer7 para pfSense CE
 
+> **Um produto [Systemup](https://www.systemup.inf.br)**
+
 Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **nDPI** (~350 aplicacoes detectaveis), politicas granulares por interface/IP/grupo/horario (`monitor`, `tag`, `allow`, `block`), enforcement via PF tables e GUI completa com 10 paginas no ecossistema pfSense.
 
 | | |
 |--|--|
+| **Desenvolvido por** | [Systemup](https://www.systemup.inf.br) |
+| **Website** | <https://www.systemup.inf.br> |
 | **Repositorio** | <https://github.com/pablomichelin/pfsense-layer7> |
 | **Licenca** | EULA (ver `LICENSE`) |
 | **Versao actual** | **1.0.0** |
@@ -91,3 +95,9 @@ Para frota (múltiplos firewalls): [`scripts/release/fleet-update.sh`](scripts/r
 ## Contribuir
 
 Um bloco por vez; PR com objectivo, teste mínimo, rollback e docs (template em [`.github/pull_request_template.md`](.github/pull_request_template.md)).
+
+---
+
+**Layer7 para pfSense CE** e um produto da [Systemup](https://www.systemup.inf.br).
+
+Layer7 para pfSense CE NAO e afiliado com Netgate ou o projecto pfSense. pfSense e uma marca registada da Electric Sheep Fencing LLC d/b/a Netgate.

@@ -1,7 +1,7 @@
 # CORTEX.md
 
 ## Projeto
-Layer7 para pfSense CE
+Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
 **Versão: 1.0.0 — Release V1 Comercial**

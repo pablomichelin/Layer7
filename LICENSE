@@ -1,6 +1,6 @@
 LAYER7 FOR PFSENSE CE — END-USER LICENSE AGREEMENT (EULA)
 
-Copyright (c) 2026 Pablo Michelin. All rights reserved.
+Copyright (c) 2026 Systemup (www.systemup.inf.br). All rights reserved.
 
 IMPORTANT — READ CAREFULLY BEFORE INSTALLING OR USING THIS SOFTWARE.
 
@@ -89,8 +89,8 @@ collected or transmitted.
 9. GOVERNING LAW
 
 This Agreement shall be governed by and construed in accordance with the laws
-of Portugal. Any disputes arising under this Agreement shall be subject to the
-exclusive jurisdiction of the courts of Portugal.
+of Brazil. Any disputes arising under this Agreement shall be subject to the
+exclusive jurisdiction of the courts of Brazil.
 
 10. ENTIRE AGREEMENT
 
@@ -101,9 +101,11 @@ and agreements between the parties.
 11. CONTACT
 
 For licensing enquiries, activation support, or authorisation requests:
-  Email: license@layer7-pfsense.com
+  Website: https://www.systemup.inf.br
+  Email: contato@systemup.inf.br
 
 ---
 
+Layer7 for pfSense CE is a product of Systemup (www.systemup.inf.br).
 Layer7 for pfSense CE is NOT affiliated with Netgate or the pfSense project.
 pfSense is a registered trademark of Electric Sheep Fencing LLC d/b/a Netgate.

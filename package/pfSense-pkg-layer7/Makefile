@@ -9,8 +9,8 @@ MASTER_SITES=	# empty
 DISTFILES=	# empty
 EXTRACT_ONLY=	# empty
 
-MAINTAINER=	community@layer7-pfsense.local
-COMMENT=	Layer 7 for pfSense CE (layer7d + GUI settings JSON)
+MAINTAINER=	contato@systemup.inf.br
+COMMENT=	Layer 7 for pfSense CE by Systemup (www.systemup.inf.br)
 
 LICENSE=	EULA
 LICENSE_NAME=	Layer7 End-User License Agreement
