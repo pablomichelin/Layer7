@@ -67,12 +67,23 @@ $pf_repair_result = null;
 if (isset($_POST["repair_pf_tables"])) {
 	$helper = layer7_pf_helper_path();
 	if (is_executable($helper)) {
+		@shell_exec($helper . " ensure 2>&1");
 		if (function_exists("filter_configure")) {
 			filter_configure();
 		}
-		@shell_exec($helper . " ensure 2>/dev/null");
+		usleep(800000);
+		exec("/sbin/pfctl -t layer7_block -T show 2>/dev/null", $t_chk, $t_rc);
+		if ($t_rc !== 0 && file_exists("/tmp/rules.debug")) {
+			if (function_exists("mwexec")) {
+				mwexec("/sbin/pfctl -f /tmp/rules.debug");
+			} else {
+				@shell_exec("/sbin/pfctl -f /tmp/rules.debug 2>/dev/null");
+			}
+			usleep(300000);
+		}
 		layer7_signal_reload();
-		$pf_repair_result = true;
+		exec("/sbin/pfctl -t layer7_block -T show 2>/dev/null", $t_chk2, $t_rc2);
+		$pf_repair_result = ($t_rc2 === 0);
 	} else {
 		$pf_repair_result = false;
 	}

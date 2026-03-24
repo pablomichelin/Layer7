@@ -2,6 +2,22 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.4.2] — 2026-03-24
+
+### Fix criação robusta de tabelas PF
+
+- **Causa raiz:** `pfctl -t TABLE -T add` não cria tabelas no FreeBSD se não
+  estiverem declaradas no ruleset carregado; `ensure_table()` falhava
+  silenciosamente; `filter_configure()` pode ser assíncrono no pfSense CE
+- **layer7-pfctl ensure:** `write_rules()` agora executa antes de `ensure_table`;
+  nova verificação `tables_missing()` com fallback `pfctl -f /tmp/rules.debug`
+- **Reparar tabelas PF:** handler na página Diagnósticos agora chama ensure
+  primeiro, depois `filter_configure()`, espera 800ms, verifica tabelas, e se
+  ainda em falta força `pfctl -f /tmp/rules.debug`; resultado reflecte estado real
+- **layer7_bl_apply():** mesma lógica robusta (ensure→filter_configure→verify→force)
+- **install.sh:** usa `layer7-pfctl ensure` + `pfctl -f rules.debug` em vez de
+  tentativas individuais `pfctl -T add` que falhavam
+
 ## [1.0.0] — 2026-03-23
 
 ### Release V1 Comercial

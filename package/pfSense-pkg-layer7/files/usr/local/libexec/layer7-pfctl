@@ -12,9 +12,27 @@ BL_CONFIG="/usr/local/etc/layer7/blacklists/config.json"
 
 ensure_table() {
 	_table="$1"
-	if ! pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
-		pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null || true
-		pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null || true
+	if pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
+		return 0
+	fi
+	pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null && \
+		pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null && \
+		return 0
+	return 1
+}
+
+tables_missing() {
+	for _t in "${TABLE_BLOCK}" "${TABLE_BLOCK_DST}"; do
+		if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
+			return 0
+		fi
+	done
+	return 1
+}
+
+force_reload_rules_debug() {
+	if [ -f /tmp/rules.debug ]; then
+		/sbin/pfctl -f /tmp/rules.debug 2>/dev/null || true
 	fi
 }
 
@@ -71,17 +89,20 @@ flush_tables() {
 show_status() {
 	echo "helper=/usr/local/libexec/layer7-pfctl"
 	echo "rules=${RULES_PATH}"
-	pfctl -s Tables 2>/dev/null | grep -E "^layer7_" || true
+	pfctl -s Tables 2>/dev/null | grep "layer7_" || true
 }
 
 cmd="${1:-ensure}"
 case "${cmd}" in
 ensure)
-		ensure_table "${TABLE_BLOCK}"
-		ensure_table "${TABLE_TAGGED}"
-		ensure_table "${TABLE_BLOCK_DST}"
-		ensure_blacklist_tables
 		write_rules
+		ensure_table "${TABLE_BLOCK}" || true
+		ensure_table "${TABLE_TAGGED}" || true
+		ensure_table "${TABLE_BLOCK_DST}" || true
+		ensure_blacklist_tables
+		if tables_missing; then
+			force_reload_rules_debug
+		fi
 		;;
 flush)
 		flush_tables

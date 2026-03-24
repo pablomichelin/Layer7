@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.1 — Fix tabelas PF após filter_configure**
+**Versão: 1.4.2 — Fix criação robusta de tabelas PF**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,16 +74,20 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
-- **v1.4.1 — Fix tabelas PF após filter_configure (2026-03-24):**
-  - Causa raiz: filter_configure() do pfSense faz pfctl -f que substitui todo
-    o ruleset; tabelas criadas por layer7-pfctl ensure antes do filter_configure
-    eram eliminadas se nao declaradas no rules.debug
-  - layer7_generate_rules() agora declara table <layer7_bld_N> persist para
-    TODAS as regras de blacklist existentes (nao so as activas), garantindo que
-    filter_configure() preserva as tabelas
-  - Ordem corrigida em layer7_diagnostics.php e layer7_bl_apply(): ensure agora
-    executa DEPOIS de filter_configure (nao antes)
-  - PORTVERSION incrementado para 1.4.1
+- **v1.4.2 — Fix criação robusta de tabelas PF (2026-03-24):**
+  - Causa raiz: pfctl -t TABLE -T add não cria tabelas no FreeBSD se não
+    estiverem declaradas no ruleset carregado; ensure_table() falhava
+    silenciosamente; filter_configure() pode ser assíncrono no pfSense CE
+  - layer7-pfctl ensure: write_rules() agora executa ANTES dos ensure_table;
+    nova função tables_missing() verifica após tentativas; force_reload_rules_debug()
+    carrega rules.debug com pfctl -f como fallback síncrono
+  - layer7_diagnostics.php: reparação agora chama ensure primeiro, depois
+    filter_configure(), espera 800ms, verifica tabelas, e se ainda em falta
+    força pfctl -f /tmp/rules.debug; resultado reflecte estado real
+  - layer7_bl_apply(): mesma lógica robusta (ensure→filter_configure→verify→force)
+  - install.sh: usa layer7-pfctl ensure + pfctl -f rules.debug em vez de
+    tentativas individuais pfctl -T add que falhavam
+  - PORTVERSION incrementado para 1.4.2
 - **v1.4.0 — Módulo de Relatórios (2026-03-24):**
   - Novo módulo de relatórios com recolha automática de dados históricos
   - Script cron `layer7-stats-collect.sh` (default: cada 5 min) faz append ao JSONL
@@ -329,7 +333,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.4.1 — Fix tabelas PF após filter_configure.**
+**v1.4.2 — Fix criação robusta de tabelas PF.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
@@ -337,7 +341,8 @@ de libcrypto e install.sh auto-detect (v1.3.1). Quick profiles para acesso
 remoto e anti-bypass DNS (v1.3.2). Fix anti-DoH persistente (v1.3.3).
 Botao remover (v1.3.4). Fix base64 Unbound (v1.3.5). Criacao automatica
 de tabelas PF de blacklist + botao reparar (v1.3.6). Modulo de relatorios
-com historico, graficos e exportacao (v1.4.0).
+com historico, graficos e exportacao (v1.4.0). Fix criacao robusta de
+tabelas PF com fallback pfctl -f (v1.4.2).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -363,9 +368,9 @@ com historico, graficos e exportacao (v1.4.0).
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Build v1.4.1 no FreeBSD builder e publicar GitHub Release
-2. Instalar no pfSense e verificar que Reparar tabelas PF funciona correctamente
-3. Validar que tabelas layer7_bld_N sobrevivem a filter_configure()
+1. Build v1.4.2 no FreeBSD builder e publicar GitHub Release
+2. Instalar no pfSense e clicar "Reparar tabelas PF" — verificar que todas ficam verdes
+3. Validar que tabelas layer7_block, layer7_block_dst e layer7_bld_N existem após reboot
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

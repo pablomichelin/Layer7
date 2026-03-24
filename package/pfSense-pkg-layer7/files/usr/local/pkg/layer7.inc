@@ -1094,12 +1094,21 @@ function layer7_bl_download_status()
 
 function layer7_bl_apply()
 {
+	$helper = layer7_pf_helper_path();
+	if (is_executable($helper)) {
+		@shell_exec($helper . " ensure 2>&1");
+	}
 	if (function_exists("filter_configure")) {
 		filter_configure();
 	}
-	$helper = layer7_pf_helper_path();
-	if (is_executable($helper)) {
-		@shell_exec($helper . " ensure 2>/dev/null");
+	usleep(500000);
+	exec("/sbin/pfctl -t layer7_block -T show 2>/dev/null", $t_chk, $t_rc);
+	if ($t_rc !== 0 && file_exists("/tmp/rules.debug")) {
+		if (function_exists("mwexec")) {
+			mwexec("/sbin/pfctl -f /tmp/rules.debug");
+		} else {
+			@shell_exec("/sbin/pfctl -f /tmp/rules.debug 2>/dev/null");
+		}
 	}
 	layer7_signal_reload();
 }

@@ -118,13 +118,18 @@ rm -f "/tmp/${PKG_NAME}"
 
 # --- Garantir tabelas PF ---
 echo "[4/6] Verificando tabelas PF..."
-for _table in layer7_block layer7_block_dst layer7_tagged layer7_bld_0 layer7_bld_1 layer7_bld_2 layer7_bld_3; do
-    if ! pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
-        pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null
-        pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null
-        echo "  Tabela '$_table' criada."
-    else
+HELPER="/usr/local/libexec/layer7-pfctl"
+if [ -x "$HELPER" ]; then
+    sh "$HELPER" ensure 2>/dev/null || true
+fi
+if [ -f /tmp/rules.debug ]; then
+    /sbin/pfctl -f /tmp/rules.debug 2>/dev/null || true
+fi
+for _table in layer7_block layer7_block_dst layer7_tagged layer7_bld_0; do
+    if pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
         echo "  Tabela '$_table' OK."
+    else
+        echo "  Tabela '$_table' pendente (sera criada no proximo filter reload)."
     fi
 done
 
