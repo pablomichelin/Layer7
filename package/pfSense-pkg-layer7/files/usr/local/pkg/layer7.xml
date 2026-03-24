@@ -42,6 +42,10 @@
 			<text>Diagnostics</text>
 			<url>/packages/layer7/layer7_diagnostics.php</url>
 		</tab>
+		<tab>
+			<text>Blacklists</text>
+			<url>/packages/layer7/layer7_blacklists.php</url>
+		</tab>
 	</tabs>
 	<menu>
 		<name>Layer7</name>

@@ -7,6 +7,8 @@
 #include <ndpi_main.h>
 #include <ndpi_typedefs.h>
 #endif
+#include "blacklist.h"
+#include "bl_config.h"
 #include "config_parse.h"
 #include "enforce.h"
 #include "license.h"
@@ -67,6 +69,10 @@ static time_t s_boot_time;
 
 static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
+
+static struct l7_blacklist *s_blacklist;
+static unsigned long long s_bl_hits;
+static unsigned long long s_bl_lookups;
 #define L7_LIC_CHECK_INTERVAL 3600
 
 #define L7_STATS_TOP_MAX 128
@@ -194,7 +200,39 @@ write_stats_json(void)
 	fprintf(f, "\",\n");
 	fprintf(f, "  \"license_error\": \"");
 	json_escape_fprint(f, s_lic.error);
-	fprintf(f, "\"\n");
+	fprintf(f, "\",\n");
+
+	fprintf(f, "  \"bl_enabled\": %s,\n",
+	    s_blacklist ? "true" : "false");
+	fprintf(f, "  \"bl_domains_loaded\": %d,\n",
+	    s_blacklist ? l7_blacklist_count(s_blacklist) : 0);
+	fprintf(f, "  \"bl_categories_active\": %d,\n",
+	    s_blacklist ? l7_blacklist_cat_count(s_blacklist) : 0);
+	fprintf(f, "  \"bl_lookups\": %llu,\n",
+	    (unsigned long long)s_bl_lookups);
+	fprintf(f, "  \"bl_hits\": %llu,\n",
+	    (unsigned long long)s_bl_hits);
+
+	{
+		const char **bl_cat_names = NULL;
+		const unsigned long long *bl_cat_hits = NULL;
+		int bl_n_cats = 0, bli;
+
+		if (s_blacklist)
+			l7_blacklist_get_cat_hits(s_blacklist,
+			    &bl_cat_names, &bl_cat_hits, &bl_n_cats);
+
+		fprintf(f, "  \"bl_top_categories\": [");
+		for (bli = 0; bli < bl_n_cats && bli < 10; bli++) {
+			fprintf(f, "%s\n    {\"cat\": \"",
+			    bli > 0 ? "," : "");
+			json_escape_fprint(f, bl_cat_names[bli]);
+			fprintf(f, "\", \"hits\": %llu}",
+			    (unsigned long long)bl_cat_hits[bli]);
+		}
+		fprintf(f, "%s]\n",
+		    bl_n_cats > 0 ? "\n  " : "");
+	}
 
 	fprintf(f, "}\n");
 	fclose(f);
@@ -592,22 +630,44 @@ layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
     uint32_t ttl)
 {
 	int r;
+	const char *bl_cat;
 
 	if (!s_have_parse || !s_ge)
 		return;
-	if (!layer7_domain_is_blocked(s_rules, s_np, domain))
-		return;
 
-	r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST, resolved_ip);
-	if (r == 0) {
-		s_pf_dst_add_ok++;
-		dst_cache_add(resolved_ip, ttl);
-		L7_INFO("dns_block: domain=%s ip=%s ttl=%u table=%s",
-		    domain, resolved_ip, ttl, L7_PF_TABLE_BLOCK_DST);
-	} else {
-		s_pf_dst_add_fail++;
-		L7_WARN("dns_block: pfctl add failed domain=%s ip=%s",
-		    domain, resolved_ip);
+	if (layer7_domain_is_blocked(s_rules, s_np, domain)) {
+		r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST,
+		    resolved_ip);
+		if (r == 0) {
+			s_pf_dst_add_ok++;
+			dst_cache_add(resolved_ip, ttl);
+			L7_INFO("dns_block: domain=%s ip=%s ttl=%u table=%s",
+			    domain, resolved_ip, ttl, L7_PF_TABLE_BLOCK_DST);
+		} else {
+			s_pf_dst_add_fail++;
+			L7_WARN("dns_block: pfctl add failed domain=%s ip=%s",
+			    domain, resolved_ip);
+		}
+		return;
+	}
+
+	if (s_blacklist) {
+		s_bl_lookups++;
+		bl_cat = l7_blacklist_lookup(s_blacklist, domain);
+		if (bl_cat) {
+			s_bl_hits++;
+			r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST,
+			    resolved_ip);
+			if (r == 0) {
+				s_pf_dst_add_ok++;
+				dst_cache_add(resolved_ip, ttl);
+				L7_INFO("bl_block: domain=%s cat=%s ip=%s "
+				    "ttl=%u", domain, bl_cat,
+				    resolved_ip, ttl);
+			} else {
+				s_pf_dst_add_fail++;
+			}
+		}
 	}
 }
 
@@ -1444,6 +1504,10 @@ int main(int argc, char **argv)
 	for (;;) {
 		if (stop_req) {
 			close_captures();
+			if (s_blacklist) {
+				l7_blacklist_free(s_blacklist);
+				s_blacklist = NULL;
+			}
 			l7_log(L7_PRI_FAC | LOG_NOTICE, "daemon_stop");
 			closelog();
 			return 0;
@@ -1508,6 +1572,59 @@ int main(int argc, char **argv)
 				s_have_parse = 0;
 			}
 			open_captures();
+
+			/* Reload blacklists from separate config.json */
+			{
+				struct l7_bl_config bl_cfg;
+				struct l7_blacklist *new_bl = NULL;
+				struct l7_blacklist *old_bl;
+
+				if (l7_bl_config_load(
+				    L7_BL_DIR_DEFAULT "/config.json",
+				    &bl_cfg) == 0
+				    && bl_cfg.enabled
+				    && bl_cfg.n_categories > 0) {
+					const char *bcats[L7_BL_MAX_CATS];
+					const char *bwl[L7_BL_WL_MAX];
+					int bi;
+
+					for (bi = 0; bi < bl_cfg.n_categories;
+					    bi++)
+						bcats[bi] =
+						    bl_cfg.categories[bi];
+					for (bi = 0; bi < bl_cfg.n_whitelist;
+					    bi++)
+						bwl[bi] =
+						    bl_cfg.whitelist[bi];
+
+					new_bl = l7_blacklist_load(
+					    L7_BL_DIR_DEFAULT,
+					    bcats, bl_cfg.n_categories,
+					    bwl, bl_cfg.n_whitelist);
+
+					if (new_bl)
+						L7_NOTE("blacklists: loaded "
+						    "%d domains in %d "
+						    "categories",
+						    l7_blacklist_count(new_bl),
+						    l7_blacklist_cat_count(
+						    new_bl));
+					else
+						L7_WARN("blacklists: "
+						    "failed to load");
+
+					for (bi = 0;
+					    bi < bl_cfg.n_except_ips; bi++)
+						layer7_pf_exec_table_add(
+						    "layer7_bl_except",
+						    bl_cfg.except_ips[bi]);
+				}
+
+				old_bl = s_blacklist;
+				s_blacklist = new_bl;
+				if (old_bl)
+					l7_blacklist_free(old_bl);
+			}
 		}
 
 		/* Periodic license re-check (every L7_LIC_CHECK_INTERVAL) */

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.0.0 — Release V1 Comercial**
+**Versão: 1.1.0 — Blacklists UT1 (Categorias Web)**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
 
@@ -74,6 +74,22 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.1.0 — Blacklists UT1 / Categorias Web (2026-03-24):**
+  - Integracao de blacklists externas UT1 (Universite Toulouse Capitole)
+  - Script `update-blacklists.sh` com download, auto-descoberta de categorias, `discovered.json`
+  - Modulo C `blacklist.c` com hash table FNV-1a (1M buckets), suffix matching, whitelist interna
+  - Modulo C `bl_config.c` para parse do config.json separado (nao altera config_parse.c)
+  - Integracao no daemon: consulta blacklist no DNS callback apos politicas manuais
+  - Reload atomico (carregar novo -> trocar ponteiro -> libertar antigo)
+  - Contadores por categoria no stats JSON (bl_hits, bl_lookups, bl_top_categories)
+  - Nova pagina GUI "Blacklists" (11 paginas total) estilo SquidGuard: download com log, categorias auto-descobertas, dropdown ---/deny, excepcoes, definicoes
+  - AJAX endpoint para polling do progresso de download
+  - Tabela PF `layer7_bl_except` com regra `pass quick` antes de `block` (excepcoes por IP)
+  - Cron job via pfSense API (`install_cron_job`) para actualizacao automatica
+  - Whitelist global de dominios isentos
+  - Aviso visual para categorias com mais de 1M dominios
+  - Atribuicao CC-BY-SA 4.0 na GUI
+  - PORTVERSION incrementado para 1.1.0
 - **v1.0.2 — Melhorias operacionais (2026-03-23):**
   - Botao "Reiniciar servico" na pagina Status (dashboard) com confirmacao
   - Helper `layer7_restart_service()` em layer7.inc (stop + start + verificacao PID)
@@ -201,11 +217,11 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Blacklists UT1 — planeamento concluido, implementacao a iniciar.**
+**Blacklists UT1 — implementacao concluida, pendente build e testes.**
 
-V1 Comercial publicada. License server operacional. Proxima feature:
-integracao de blacklists UT1 (Universite Toulouse Capitole) para
-categorias web (pornografia, gambling, phishing, malware, etc.).
+V1 Comercial publicada. License server operacional. Feature blacklists UT1
+implementada (Blocos 1-7 concluidos). Pendente: build no FreeBSD builder,
+testes end-to-end e release v1.1.0.
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -221,19 +237,19 @@ categorias web (pornografia, gambling, phishing, malware, etc.).
 - [x] Guia passo-a-passo — `docs/11-blacklists/GUIA-PASSO-A-PASSO.md`
 - [x] Regras de qualidade — `docs/11-blacklists/REGRAS-QUALIDADE.md`
 - [x] Decisoes confirmadas (interfaces global, HTTP fetch, 1M buckets, whitelist global, fluxo SquidGuard, tabela PF except)
-- [ ] Bloco 1: Script de download + auto-descoberta
-- [ ] Bloco 2: Modulo C (hash table FNV-1a + whitelist)
-- [ ] Bloco 3: Integracao no daemon (bl_config.c + DNS callback)
-- [ ] Bloco 4: GUI PHP (4 seccoes estilo SquidGuard)
-- [ ] Bloco 5: Cron job
-- [ ] Bloco 6: Excepcoes PF (tabela layer7_bl_except)
-- [ ] Bloco 7: Estatisticas e dashboard
-- [ ] Bloco 8: Empacotamento, documentacao e testes
+- [x] Bloco 1: Script de download + auto-descoberta
+- [x] Bloco 2: Modulo C (hash table FNV-1a + whitelist)
+- [x] Bloco 3: Integracao no daemon (bl_config.c + DNS callback)
+- [x] Bloco 4: GUI PHP (4 seccoes estilo SquidGuard)
+- [x] Bloco 5: Cron job
+- [x] Bloco 6: Excepcoes PF (tabela layer7_bl_except)
+- [x] Bloco 7: Estatisticas e dashboard
+- [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Implementar Bloco 1 (script download) + Bloco 2 (modulo C) em paralelo
-2. Implementar Bloco 3 (daemon) + Bloco 4 (GUI)
-3. Blocos 5-8 (cron, PF except, stats, empacotamento + release v1.1.0)
+1. Build no FreeBSD builder (192.168.100.12) — validar compilacao
+2. Testes end-to-end no pfSense lab (download, categorias, bloqueio, excepcoes)
+3. Release v1.1.0 no GitHub com .pkg como artefacto
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

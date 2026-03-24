@@ -9,7 +9,7 @@
 # Smoke: make OUT=layer7d-smoke VSTR_DIR=/tmp/l7vers NDPI=0
 
 LAYER7_COMMON = ../common
-SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c
+SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c blacklist.c bl_config.c
 OUT ?= layer7d
 VSTR_DIR ?= .
 

@@ -50,6 +50,10 @@ function layer7_pf_default_rules_text()
 		"block drop quick inet from <layer7_block> to any label \"layer7:block:src\"",
 		"block drop quick inet6 from <layer7_block> to any label \"layer7:block:src6\"",
 		"",
+		"# Excepcoes blacklists: IPs que acedem a destinos bloqueados.",
+		"table <layer7_bl_except> persist",
+		"pass quick inet from <layer7_bl_except> to <layer7_block_dst> label \"layer7:bl:except\"",
+		"",
 		"# Bloqueio por destino (sites/apps bloqueados).",
 		"block drop quick inet to <layer7_block_dst> label \"layer7:block:dst\"",
 		"block drop quick inet6 to <layer7_block_dst> label \"layer7:block:dst6\"",
@@ -671,7 +675,8 @@ function layer7_nav_items()
 		"exceptions" => array("label" => gettext("Excecoes"), "href" => "layer7_exceptions.php"),
 		"test" => array("label" => gettext("Teste"), "href" => "layer7_test.php"),
 		"events" => array("label" => gettext("Events"), "href" => "layer7_events.php"),
-		"diagnostics" => array("label" => gettext("Diagnostics"), "href" => "layer7_diagnostics.php")
+		"diagnostics" => array("label" => gettext("Diagnostics"), "href" => "layer7_diagnostics.php"),
+		"blacklists" => array("label" => gettext("Blacklists"), "href" => "layer7_blacklists.php")
 	);
 }
 
@@ -755,4 +760,152 @@ function layer7_render_footer()
 	echo '<a href="https://www.systemup.inf.br" target="_blank" style="color:#337ab7; text-decoration:none;">Systemup</a>';
 	echo ' Solu&ccedil;&atilde;o em Tecnologia';
 	echo '</div>';
+}
+
+/* ---- Blacklists helpers ---- */
+
+define('L7_BL_DIR', '/usr/local/etc/layer7/blacklists');
+define('L7_BL_CONFIG', L7_BL_DIR . '/config.json');
+define('L7_BL_DISCOVERED', L7_BL_DIR . '/discovered.json');
+define('L7_BL_PROGRESS', '/tmp/layer7-bl-progress.txt');
+define('L7_BL_SCRIPT', '/usr/local/etc/layer7/update-blacklists.sh');
+
+function layer7_bl_config_defaults()
+{
+	return array(
+		"enabled" => false,
+		"source_url" => "http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
+		"auto_update" => false,
+		"update_interval_hours" => 24,
+		"categories" => array(),
+		"whitelist" => array(),
+		"except_ips" => array()
+	);
+}
+
+function layer7_bl_config_load()
+{
+	$path = L7_BL_CONFIG;
+	if (!file_exists($path)) {
+		return layer7_bl_config_defaults();
+	}
+	$raw = @file_get_contents($path);
+	if (!is_string($raw) || $raw === "") {
+		return layer7_bl_config_defaults();
+	}
+	$data = @json_decode($raw, true);
+	if (!is_array($data)) {
+		return layer7_bl_config_defaults();
+	}
+	$defaults = layer7_bl_config_defaults();
+	foreach ($defaults as $k => $v) {
+		if (!isset($data[$k])) {
+			$data[$k] = $v;
+		}
+	}
+	return $data;
+}
+
+function layer7_bl_config_save($config)
+{
+	@mkdir(L7_BL_DIR, 0755, true);
+	$json = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	file_put_contents(L7_BL_CONFIG, $json . "\n", LOCK_EX);
+}
+
+function layer7_bl_discovered_load()
+{
+	$path = L7_BL_DISCOVERED;
+	if (!file_exists($path)) {
+		return null;
+	}
+	$raw = @file_get_contents($path);
+	if (!is_string($raw) || $raw === "") {
+		return null;
+	}
+	$data = @json_decode($raw, true);
+	if (!is_array($data) || !isset($data["categories"])) {
+		return null;
+	}
+	return $data;
+}
+
+function layer7_bl_last_update()
+{
+	$path = L7_BL_DIR . '/last-update.txt';
+	if (!file_exists($path)) {
+		return null;
+	}
+	return trim(@file_get_contents($path));
+}
+
+function layer7_bl_download_start()
+{
+	@mkdir(L7_BL_DIR, 0755, true);
+	$cmd = L7_BL_SCRIPT . " --download";
+	if (function_exists("mwexec_bg")) {
+		mwexec_bg($cmd);
+	} else {
+		@shell_exec($cmd . " > /dev/null 2>&1 &");
+	}
+}
+
+function layer7_bl_download_status()
+{
+	if (file_exists(L7_BL_PROGRESS)) {
+		return @file_get_contents(L7_BL_PROGRESS);
+	}
+	return "";
+}
+
+function layer7_bl_apply()
+{
+	layer7_signal_reload();
+}
+
+function layer7_bl_pf_sync_except($ips)
+{
+	if (function_exists("mwexec")) {
+		mwexec("/sbin/pfctl -t layer7_bl_except -T flush 2>/dev/null");
+	} else {
+		@shell_exec("/sbin/pfctl -t layer7_bl_except -T flush 2>/dev/null");
+	}
+	if (!is_array($ips)) {
+		return;
+	}
+	foreach ($ips as $ip) {
+		$ip = trim($ip);
+		if ($ip !== "") {
+			$cmd = "/sbin/pfctl -t layer7_bl_except -T add " . escapeshellarg($ip) . " 2>/dev/null";
+			if (function_exists("mwexec")) {
+				mwexec($cmd);
+			} else {
+				@shell_exec($cmd);
+			}
+		}
+	}
+}
+
+function layer7_bl_setup_cron($enabled, $hour)
+{
+	$cmd = L7_BL_SCRIPT;
+	if (function_exists("install_cron_job")) {
+		install_cron_job($cmd, $enabled, "0", (string)$hour, "*", "*", "*");
+	}
+}
+
+function layer7_bl_get_stats()
+{
+	$stats = layer7_read_stats();
+	if (!is_array($stats)) {
+		return null;
+	}
+	$bl = array();
+	$bl["enabled"] = isset($stats["bl_enabled"]) ? $stats["bl_enabled"] : false;
+	$bl["domains_loaded"] = isset($stats["bl_domains_loaded"]) ? (int)$stats["bl_domains_loaded"] : 0;
+	$bl["categories_active"] = isset($stats["bl_categories_active"]) ? (int)$stats["bl_categories_active"] : 0;
+	$bl["lookups"] = isset($stats["bl_lookups"]) ? (int)$stats["bl_lookups"] : 0;
+	$bl["hits"] = isset($stats["bl_hits"]) ? (int)$stats["bl_hits"] : 0;
+	$bl["top_categories"] = isset($stats["bl_top_categories"]) ? $stats["bl_top_categories"] : array();
+	return $bl;
 }

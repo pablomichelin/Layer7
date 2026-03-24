@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.0.2
+PORTVERSION=	1.1.0
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -20,8 +20,8 @@ LICENSE_FILE=	${.CURDIR}/../../LICENSE
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c)
-.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c)."
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, blacklist.c, bl_config.c)."
 .endif
 
 NDPI_PREFIX=	/usr/local
@@ -55,6 +55,7 @@ do-build:
 		${LAYER7_NDPI_CFLAGS} -o ${WRKSRC}/layer7d \
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
 		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
+		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
 		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} -lcrypto
 
 do-install:
@@ -96,6 +97,10 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_diagnostics.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_blacklists.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_bl_ajax.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7d \
 		${STAGEDIR}${PREFIX}/etc/rc.d
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-pfctl \
@@ -106,6 +111,9 @@ do-install:
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/profiles.json \
 		${STAGEDIR}${PREFIX}/etc/layer7
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/update-blacklists.sh \
+		${STAGEDIR}${PREFIX}/etc/layer7
+	${MKDIR} ${STAGEDIR}${PREFIX}/etc/layer7/blacklists
 	${INSTALL_DATA} ${FILESDIR}${DATADIR}/info.xml \
 		${STAGEDIR}${DATADIR}
 	@${REINPLACE_CMD} -i '' -e "s|%%PKGVERSION%%|${PKGVERSION}|" \
