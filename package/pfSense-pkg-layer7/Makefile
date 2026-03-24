@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.3.0
+PORTVERSION=	1.3.1
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -56,7 +56,7 @@ do-build:
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
 		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
 		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
-		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} -lcrypto
+		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} /usr/lib/libcrypto.a
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg

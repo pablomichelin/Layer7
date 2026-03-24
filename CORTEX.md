@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.3.0 — Internacionalização (Português + English)**
+**Versão: 1.3.1 — Fix libcrypto + install.sh auto-version**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.3.1 — Fix libcrypto + install.sh auto-version (2026-03-24):**
+  - Fix critico: libcrypto linkada estaticamente (/usr/lib/libcrypto.a)
+    para evitar "libcrypto.so.35 not found" em pfSense CE
+  - install.sh agora detecta automaticamente a versao mais recente via GitHub API
+    em vez de usar versao hardcoded
+  - PORTVERSION incrementado para 1.3.1
 - **v1.3.0 — Internacionalização PT/EN (2026-03-24):**
   - Nova funcao l7_t() substitui gettext() em toda a GUI (11 paginas + layer7.inc)
   - Ficheiros de traducao em /usr/local/etc/layer7/lang/ (en.php, pt.php)
@@ -243,11 +249,11 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.3.0 — Internacionalização implementada, pendente build e testes.**
+**v1.3.1 — Fix libcrypto + install.sh publicado.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
-per-rule (v1.2.0), fix matching (v1.2.1). Internacionalização PT/EN (v1.3.0)
-implementada. Pendente: build no FreeBSD builder e release v1.3.0.
+per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
+de libcrypto e install.sh auto-detect (v1.3.1).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -273,9 +279,9 @@ implementada. Pendente: build no FreeBSD builder e release v1.3.0.
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Build no FreeBSD builder (192.168.100.12) — validar compilacao v1.3.0
+1. Testar instalacao limpa via install.sh (deve baixar v1.3.1 automaticamente)
 2. Testar alternancia de idioma na GUI (PT→EN→PT)
-3. Release v1.3.0 no GitHub com .pkg como artefacto
+3. Validar que daemon arranca sem erro de libcrypto
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

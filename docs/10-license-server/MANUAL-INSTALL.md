@@ -37,7 +37,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.3.0`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.3.1`
 
 **Comando unico manual (Command Prompt):**
 
@@ -46,17 +46,17 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.3.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.0/pfSense-pkg-layer7-1.3.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.3.1.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.1/pfSense-pkg-layer7-1.3.1.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.1.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.3.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.0/pfSense-pkg-layer7-1.3.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.3.1.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.1/pfSense-pkg-layer7-1.3.1.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.1.pkg
 ```
 
 ```sh
@@ -136,7 +136,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.3.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.0/pfSense-pkg-layer7-1.3.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.0.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.3.1.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.1/pfSense-pkg-layer7-1.3.1.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.1.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -146,11 +146,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.3.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.0/pfSense-pkg-layer7-1.3.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.3.1.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.1/pfSense-pkg-layer7-1.3.1.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.1.pkg
 ```
 
 ```sh
@@ -170,7 +170,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.1.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -184,7 +184,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.1.pkg
 ```
 
 ```sh

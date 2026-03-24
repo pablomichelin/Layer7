@@ -42,7 +42,18 @@ done
 
 # --- Detecção de versão ---
 if [ -z "$VERSION" ]; then
-    VERSION="1.2.0"
+    GH_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
+    GH_TMP="/tmp/layer7-gh-latest.json"
+    rm -f "$GH_TMP"
+    if fetch -qo "$GH_TMP" "$GH_API" 2>/dev/null && [ -f "$GH_TMP" ]; then
+        VERSION=$(sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v\([^"]*\)".*/\1/p' "$GH_TMP" | head -1)
+        rm -f "$GH_TMP"
+    fi
+    if [ -z "$VERSION" ]; then
+        echo "ERRO: Nao foi possivel detectar a versao mais recente do GitHub."
+        echo "  Use: sh install.sh --version X.Y.Z"
+        exit 1
+    fi
 fi
 
 TAG="v${VERSION}"
