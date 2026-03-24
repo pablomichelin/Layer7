@@ -535,8 +535,8 @@ function layer7_policy_match_summary($policy) {
 		<div class="l7-profiles-grid">
 		<?php foreach ($l7_profiles as $prof) {
 			$prof_id = isset($prof["id"]) ? htmlspecialchars($prof["id"]) : "";
-			$prof_name = isset($prof["name"]) ? htmlspecialchars($prof["name"]) : $prof_id;
-			$prof_desc = isset($prof["description"]) ? htmlspecialchars($prof["description"]) : "";
+			$prof_name = isset($prof["name"]) ? htmlspecialchars(l7_t($prof["name"])) : $prof_id;
+			$prof_desc = isset($prof["description"]) ? htmlspecialchars(l7_t($prof["description"])) : "";
 			$prof_apps_count = isset($prof["ndpi_apps"]) && is_array($prof["ndpi_apps"]) ? count($prof["ndpi_apps"]) : 0;
 			$prof_hosts_count = isset($prof["hosts"]) && is_array($prof["hosts"]) ? count($prof["hosts"]) : 0;
 			$prof_exists = false;
