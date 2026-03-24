@@ -84,9 +84,18 @@ Se algum passo falhar, reportar o erro e tentar resolver.
 ### Dados do builder
 
 - **IP**: 192.168.100.12
-- **Directório do port**: copiar repo para o builder ou fazer build direto
-- **Comando de build**: `cd package/pfSense-pkg-layer7 && make clean && make package DISABLE_VULNERABILITIES=yes`
-- **Pacote resultante**: `work/pkg/pfSense-pkg-layer7-X.Y.Z.pkg`
+- **SSH**: root / pablo
+- **OS**: FreeBSD 15.0-RELEASE
+- **Repositório no builder**: `/root/pfsense-layer7` (clone do GitHub)
+- **Mudanças locais no builder** (NÃO COMMITAR — contêm chave de produção):
+  - `src/layer7d/license.c` — chave pública Ed25519 de produção
+  - `src/layer7d/Makefile` — license.c e -lcrypto adicionados
+- **Fluxo de build**:
+  1. `sshpass -p 'pablo' ssh root@192.168.100.12`
+  2. `cd /root/pfsense-layer7 && git stash && git pull origin main && git checkout "stash@{0}" -- src/layer7d/license.c src/layer7d/Makefile && git stash drop`
+  3. `cd package/pfSense-pkg-layer7 && make clean && DISABLE_LICENSES=yes make package DISABLE_VULNERABILITIES=yes`
+  4. Pacote em: `work/pkg/pfSense-pkg-layer7-X.Y.Z.pkg`
+- **Copiar para local**: `sshpass -p 'pablo' scp root@192.168.100.12:/root/pfsense-layer7/package/pfSense-pkg-layer7/work/pkg/PACOTE.pkg .`
 
 ---
 
