@@ -4,9 +4,9 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.3.6 — Criação automática de tabelas PF**
+**Versão: 1.4.0 — Módulo de Relatórios**
 
-Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
+Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
 **Validação lab (2026-03-23):** Enforce end-to-end funcional — pipeline nDPI → policy engine → pfctl comprovado:
 - `pf_add_ok=7`, zero falhas — 6 IPs automaticamente adicionados à tabela PF
@@ -74,6 +74,24 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.0 — Módulo de Relatórios (2026-03-24):**
+  - Novo módulo de relatórios com recolha automática de dados históricos
+  - Script cron `layer7-stats-collect.sh` (default: cada 5 min) faz append ao JSONL
+  - Script cron `layer7-stats-purge.sh` remove dados mais antigos que N dias
+  - Nova página GUI "Relatórios" com 7 secções:
+    - Visão geral de tráfego (gráfico de linhas Chart.js)
+    - Top apps bloqueadas (gráfico de barras + tabela)
+    - Top clientes bloqueados (gráfico de barras + tabela)
+    - Blacklists por categoria (gráfico donut + tabela)
+    - Top domínios bloqueados (tabela com parse de log)
+    - Relatório por política (tabela com stats do log)
+    - Consulta por IP (timeline de eventos)
+  - Filtro de período: 1h, 6h, 24h, 7d, 30d, custom
+  - Exportação multi-formato: CSV, HTML (printer-friendly), JSON
+  - Definições de relatórios na página Settings (retenção, intervalo, on/off)
+  - Cron instalado automaticamente na instalação do pacote
+  - Traduções EN para todas as novas strings
+  - PORTVERSION incrementado para 1.4.0
 - **v1.3.6 — Criação automática de tabelas PF (2026-03-24):**
   - layer7-pfctl ensure agora cria automaticamente tabelas de blacklist
     (layer7_bld_N) com base no config.json existente
@@ -301,14 +319,15 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.3.6 — Criação automática de tabelas PF.**
+**v1.4.0 — Módulo de Relatórios.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
 de libcrypto e install.sh auto-detect (v1.3.1). Quick profiles para acesso
 remoto e anti-bypass DNS (v1.3.2). Fix anti-DoH persistente (v1.3.3).
 Botao remover (v1.3.4). Fix base64 Unbound (v1.3.5). Criacao automatica
-de tabelas PF de blacklist + botao reparar (v1.3.6).
+de tabelas PF de blacklist + botao reparar (v1.3.6). Modulo de relatorios
+com historico, graficos e exportacao (v1.4.0).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -334,9 +353,9 @@ de tabelas PF de blacklist + botao reparar (v1.3.6).
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Testar instalacao limpa via install.sh e criar regra de blacklist (tabelas PF devem ser criadas automaticamente)
-2. Verificar nos Diagnosticos que todas as tabelas PF (layer7_block, layer7_bld_0, etc.) aparecem com check verde
-3. Confirmar que o bloqueio de blacklist funciona — cliente com regra activa nao deve conseguir aceder sites bloqueados
+1. Build v1.4.0 no FreeBSD builder e publicar GitHub Release
+2. Instalar em pfSense de teste e verificar que a tab "Relatorios" aparece e os cron jobs estao activos
+3. Aguardar 10-15 min para que dados historicos acumulem e validar graficos e exportacoes
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

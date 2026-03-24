@@ -208,6 +208,18 @@ if ($_POST["save"] ?? false) {
 		$old_block_quic = !empty($data["layer7"]["block_quic"]);
 		$data["layer7"]["block_quic"] = isset($_POST["block_quic"]);
 
+		$rpt_enabled = isset($_POST["reports_enabled"]);
+		$rpt_retention = (int)($_POST["reports_retention"] ?? 30);
+		if ($rpt_retention < 1) $rpt_retention = 1;
+		if ($rpt_retention > 365) $rpt_retention = 365;
+		$rpt_interval = (int)($_POST["reports_interval"] ?? 5);
+		if (!in_array($rpt_interval, array(5, 10, 15, 30), true)) $rpt_interval = 5;
+		$data["layer7"]["reports"] = array(
+			"enabled" => $rpt_enabled,
+			"retention_days" => $rpt_retention,
+			"collect_interval" => $rpt_interval
+		);
+
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
 			if ($old_block_quic !== $data["layer7"]["block_quic"]) {
@@ -215,6 +227,7 @@ if ($_POST["save"] ?? false) {
 					filter_configure();
 				}
 			}
+			layer7_reports_setup_cron($rpt_enabled, $rpt_interval);
 			$savemsg = l7_t("Configuracao gravada. SIGHUP enviado ao layer7d se o servico estiver em execucao.");
 		}
 	}
@@ -485,6 +498,48 @@ layer7_render_styles();
 					</button>
 				</form>
 
+				</div>
+			</div>
+
+			<?php
+			$rpt_cfg = layer7_reports_config();
+			$rpt_en = !empty($rpt_cfg["enabled"]);
+			$rpt_ret = (int)($rpt_cfg["retention_days"] ?? 30);
+			$rpt_int = (int)($rpt_cfg["collect_interval"] ?? 5);
+			?>
+			<div class="layer7-section" style="margin-top: 36px;">
+				<h3 class="layer7-section-title"><?= l7_t("Relatorios"); ?></h3>
+				<div class="layer7-callout">
+					<p><?= l7_t("Os relatorios recolhem estatisticas periodicamente para gerar graficos e exportacoes historicas."); ?></p>
+					<form method="post">
+						<div class="form-group">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="reports_enabled" <?= $rpt_en ? 'checked' : ''; ?>>
+								<?= l7_t("Activar recolha de dados para relatorios"); ?>
+							</label>
+						</div>
+						<div class="form-group">
+							<label><?= l7_t("Retencao de dados (dias)"); ?></label>
+							<input type="number" class="form-control" name="reports_retention" value="<?= $rpt_ret; ?>" min="1" max="365" style="width:100px;">
+							<p class="help-block"><?= l7_t("Dados mais antigos sao removidos automaticamente. Maximo 365 dias."); ?></p>
+						</div>
+						<div class="form-group">
+							<label><?= l7_t("Intervalo de recolha"); ?></label>
+							<select class="form-control" name="reports_interval" style="width:150px;">
+								<?php foreach (array(5, 10, 15, 30) as $iv) { ?>
+								<option value="<?= $iv; ?>" <?= ($rpt_int === $iv) ? 'selected' : ''; ?>><?= $iv; ?> <?= l7_t("minutos"); ?></option>
+								<?php } ?>
+							</select>
+						</div>
+						<input type="hidden" name="save" value="1">
+						<input type="hidden" name="enabled" <?= (!empty($L["enabled"])) ? 'value="1" checked' : ''; ?>>
+						<input type="hidden" name="mode" value="<?= htmlspecialchars($mode); ?>">
+						<input type="hidden" name="language" value="<?= htmlspecialchars($L["language"] ?? "pt"); ?>">
+						<input type="hidden" name="log_level" value="<?= htmlspecialchars($ll); ?>">
+						<button type="submit" class="btn btn-primary">
+							<i class="fa fa-save"></i> <?= l7_t("Guardar definicoes de relatorios"); ?>
+						</button>
+					</form>
 				</div>
 			</div>
 

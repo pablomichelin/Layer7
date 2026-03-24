@@ -36,6 +36,16 @@ fi
 
 reload_filter
 
+# --- Directório de relatórios ---
+/bin/mkdir -p "${PKG_ROOTDIR}/usr/local/etc/layer7/reports"
+
+# --- Cron de recolha de stats (relatórios) ---
+"${PKG_ROOTDIR}/usr/local/bin/php" -r "
+require_once('${PKG_ROOTDIR}/etc/inc/filter.inc');
+require_once('${PKG_ROOTDIR}/usr/local/pkg/layer7.inc');
+layer7_reports_setup_cron(true, 5);
+" >/dev/null 2>&1 || true
+
 # --- Habilitar e iniciar o serviço ---
 sysrc layer7d_enable=YES > /dev/null 2>&1
 service layer7d onestart > /dev/null 2>&1 || true

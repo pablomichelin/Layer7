@@ -12,6 +12,8 @@
 /usr/local/www/packages/layer7/layer7_diagnostics.php
 /usr/local/www/packages/layer7/layer7_blacklists.php
 /usr/local/www/packages/layer7/layer7_bl_ajax.php
+/usr/local/www/packages/layer7/layer7_reports.php
+/usr/local/www/packages/layer7/layer7_reports_export.php
 /usr/local/sbin/layer7d
 /usr/local/etc/layer7.json.sample
 /usr/local/etc/layer7-protos.txt.sample
@@ -21,11 +23,14 @@
 /usr/local/libexec/layer7-pfctl
 /usr/local/libexec/layer7-unbound-anti-doh
 /usr/local/etc/layer7/update-blacklists.sh
+/usr/local/etc/layer7/layer7-stats-collect.sh
+/usr/local/etc/layer7/layer7-stats-purge.sh
 /usr/local/etc/layer7/lang/en.php
 /usr/local/etc/layer7/lang/pt.php
 /usr/local/share/pfSense-pkg-layer7/info.xml
 @dir /etc/inc/priv
 @dir /usr/local/etc/layer7/lang
+@dir /usr/local/etc/layer7/reports
 @dir /usr/local/etc/layer7/blacklists
 @dir /usr/local/etc/layer7
 @dir /usr/local/www/packages/layer7

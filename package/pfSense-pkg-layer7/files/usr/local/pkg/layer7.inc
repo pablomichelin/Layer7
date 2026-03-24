@@ -903,6 +903,7 @@ function layer7_nav_items()
 		"exceptions" => array("label" => l7_t("Excecoes"), "href" => "layer7_exceptions.php"),
 		"test" => array("label" => l7_t("Teste"), "href" => "layer7_test.php"),
 		"events" => array("label" => l7_t("Events"), "href" => "layer7_events.php"),
+		"reports" => array("label" => l7_t("Relatorios"), "href" => "layer7_reports.php"),
 		"diagnostics" => array("label" => l7_t("Diagnostics"), "href" => "layer7_diagnostics.php"),
 		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php")
 	);
@@ -1120,4 +1121,219 @@ function layer7_bl_get_stats()
 	$bl["rules_active"] = isset($stats["bl_rules_active"]) ? (int)$stats["bl_rules_active"] : 0;
 	$bl["top_categories"] = isset($stats["bl_top_categories"]) ? $stats["bl_top_categories"] : array();
 	return $bl;
+}
+
+/* ---- Reports helpers ---- */
+
+define('L7_REPORTS_DIR', '/usr/local/etc/layer7/reports');
+define('L7_REPORTS_HISTORY', L7_REPORTS_DIR . '/stats-history.jsonl');
+define('L7_REPORTS_COLLECT', '/usr/local/etc/layer7/layer7-stats-collect.sh');
+define('L7_REPORTS_PURGE', '/usr/local/etc/layer7/layer7-stats-purge.sh');
+
+function layer7_reports_defaults()
+{
+	return array(
+		"enabled" => true,
+		"retention_days" => 30,
+		"collect_interval" => 5
+	);
+}
+
+function layer7_reports_config()
+{
+	$data = layer7_load_or_default();
+	if (isset($data["layer7"]["reports"]) && is_array($data["layer7"]["reports"])) {
+		return array_merge(layer7_reports_defaults(), $data["layer7"]["reports"]);
+	}
+	return layer7_reports_defaults();
+}
+
+function layer7_reports_load_history($from_ts, $to_ts)
+{
+	$results = array();
+	if (!file_exists(L7_REPORTS_HISTORY)) {
+		return $results;
+	}
+	$fh = @fopen(L7_REPORTS_HISTORY, 'r');
+	if (!$fh) {
+		return $results;
+	}
+	while (($line = fgets($fh)) !== false) {
+		$line = trim($line);
+		if ($line === '') continue;
+		$obj = @json_decode($line, true);
+		if (!is_array($obj) || !isset($obj["ts"])) continue;
+		$ts = (int)$obj["ts"];
+		if ($ts >= $from_ts && $ts <= $to_ts) {
+			$results[] = $obj;
+		}
+	}
+	fclose($fh);
+	return $results;
+}
+
+function layer7_reports_aggregate_traffic($data, $granularity = 3600)
+{
+	$buckets = array();
+	foreach ($data as $row) {
+		$ts = (int)$row["ts"];
+		$bucket = intval(floor($ts / $granularity)) * $granularity;
+		if (!isset($buckets[$bucket])) {
+			$buckets[$bucket] = array("ts" => $bucket, "classified" => 0, "blocked" => 0, "allowed" => 0);
+		}
+		$buckets[$bucket]["classified"] = max($buckets[$bucket]["classified"], (int)($row["classified"] ?? 0));
+		$buckets[$bucket]["blocked"] = max($buckets[$bucket]["blocked"], (int)($row["blocked"] ?? 0));
+		$buckets[$bucket]["allowed"] = max($buckets[$bucket]["allowed"], (int)($row["allowed"] ?? 0));
+	}
+	ksort($buckets);
+
+	$result = array();
+	$prev = null;
+	foreach ($buckets as $b) {
+		$entry = array("ts" => $b["ts"]);
+		if ($prev !== null) {
+			$entry["classified"] = max(0, $b["classified"] - $prev["classified"]);
+			$entry["blocked"] = max(0, $b["blocked"] - $prev["blocked"]);
+			$entry["allowed"] = max(0, $b["allowed"] - $prev["allowed"]);
+		} else {
+			$entry["classified"] = 0;
+			$entry["blocked"] = 0;
+			$entry["allowed"] = 0;
+		}
+		$result[] = $entry;
+		$prev = $b;
+	}
+	return $result;
+}
+
+function layer7_reports_aggregate_top($data, $field, $limit = 20)
+{
+	$merged = array();
+	$last_snapshot = null;
+	foreach ($data as $row) {
+		if (!isset($row[$field]) || !is_array($row[$field])) continue;
+		$last_snapshot = $row[$field];
+	}
+	if ($last_snapshot === null) return array();
+
+	$key_field = ($field === "top_apps") ? "app" : (($field === "top_sources") ? "ip" : "cat");
+	$count_field = ($field === "bl_top_cats") ? "hits" : "count";
+
+	foreach ($data as $row) {
+		if (!isset($row[$field]) || !is_array($row[$field])) continue;
+		foreach ($row[$field] as $item) {
+			if (!isset($item[$key_field])) continue;
+			$k = $item[$key_field];
+			$v = isset($item[$count_field]) ? (int)$item[$count_field] : 0;
+			if (!isset($merged[$k]) || $v > $merged[$k]) {
+				$merged[$k] = $v;
+			}
+		}
+	}
+	arsort($merged);
+	$result = array();
+	$i = 0;
+	foreach ($merged as $name => $count) {
+		if ($i >= $limit) break;
+		$result[] = array("name" => $name, "count" => $count);
+		$i++;
+	}
+	return $result;
+}
+
+function layer7_reports_parse_log($from_ts, $to_ts, $filters = array())
+{
+	$log_path = "/var/log/layer7d.log";
+	$results = array();
+	if (!file_exists($log_path)) return $results;
+
+	$max_lines = 50000;
+	$type_filter = isset($filters["type"]) ? $filters["type"] : null;
+	$ip_filter = isset($filters["ip"]) ? $filters["ip"] : null;
+
+	$fh = @fopen($log_path, 'r');
+	if (!$fh) return $results;
+
+	$count = 0;
+	while (($line = fgets($fh)) !== false && $count < $max_lines) {
+		$count++;
+		$line = trim($line);
+		if (strlen($line) < 22) continue;
+
+		$ts_str = substr($line, 0, 19);
+		$ts = @strtotime($ts_str);
+		if ($ts === false || $ts < $from_ts || $ts > $to_ts) continue;
+
+		$rest = substr($line, 20);
+		$sev = "";
+		if (preg_match('/^\[(\w+)\]\s*(.*)$/', $rest, $m)) {
+			$sev = $m[1];
+			$rest = $m[2];
+		}
+
+		$entry = array("ts" => $ts, "severity" => $sev, "raw" => $rest);
+
+		if (strpos($rest, "flow_decide:") === 0) {
+			$entry["type"] = "flow";
+			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
+			if (!empty($kv[1])) {
+				$entry["fields"] = array_combine($kv[1], $kv[2]);
+			}
+		} elseif (strpos($rest, "bl_block:") === 0) {
+			$entry["type"] = "blacklist";
+			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
+			if (!empty($kv[1])) {
+				$entry["fields"] = array_combine($kv[1], $kv[2]);
+			}
+		} elseif (strpos($rest, "dns_block:") === 0) {
+			$entry["type"] = "dns_block";
+			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
+			if (!empty($kv[1])) {
+				$entry["fields"] = array_combine($kv[1], $kv[2]);
+			}
+		} elseif (strpos($rest, "enforce_block_dst:") === 0 || strpos($rest, "enforce_tag:") === 0) {
+			$entry["type"] = "enforce";
+			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
+			if (!empty($kv[1])) {
+				$entry["fields"] = array_combine($kv[1], $kv[2]);
+			}
+		} else {
+			continue;
+		}
+
+		if ($type_filter !== null && $entry["type"] !== $type_filter) continue;
+		if ($ip_filter !== null) {
+			$found = false;
+			if (isset($entry["fields"])) {
+				foreach ($entry["fields"] as $fv) {
+					if ($fv === $ip_filter) { $found = true; break; }
+				}
+			}
+			if (!$found) continue;
+		}
+
+		$results[] = $entry;
+	}
+	fclose($fh);
+	return $results;
+}
+
+function layer7_reports_setup_cron($enabled, $interval_minutes = 5)
+{
+	$cmd = "/bin/sh " . L7_REPORTS_COLLECT;
+	if (function_exists("install_cron_job")) {
+		install_cron_job($cmd, $enabled, "*/{$interval_minutes}", "*", "*", "*", "*");
+	}
+	$purge_cmd = "/bin/sh " . L7_REPORTS_PURGE;
+	if (function_exists("install_cron_job")) {
+		install_cron_job($purge_cmd, $enabled, "15", "3", "*", "*", "*");
+	}
+}
+
+function layer7_reports_granularity_for_range($from_ts, $to_ts)
+{
+	$range = $to_ts - $from_ts;
+	if ($range <= 172800) return 3600;
+	if ($range <= 604800) return 21600;
+	return 86400;
 }

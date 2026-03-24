@@ -37,7 +37,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.3.6`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.4.0`
 
 **Comando unico manual (Command Prompt):**
 
@@ -46,19 +46,19 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.3.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.6/pfSense-pkg-layer7-1.3.6.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.6.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.3.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.6/pfSense-pkg-layer7-1.3.6.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg
 ```
 ```sh
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.6.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg
 ```
 
 ```sh
@@ -138,7 +138,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.3.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.6/pfSense-pkg-layer7-1.3.6.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.6.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -148,11 +148,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.3.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.3.6/pfSense-pkg-layer7-1.3.6.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.6.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg
 ```
 
 ```sh
@@ -172,7 +172,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.6.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -186,7 +186,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.3.6.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg
 ```
 
 ```sh
@@ -413,7 +413,44 @@ cat /usr/local/etc/layer7.lic
 
 ---
 
-## 9. Caminhos importantes
+## 9. Relatorios
+
+A partir da v1.4.0, o Layer7 inclui um modulo de relatorios acessivel em
+**Services > Layer 7 > Relatorios**.
+
+### O que faz
+
+- Recolhe dados estatisticos automaticamente a cada 5 minutos (configuravel)
+- Gera graficos interactivos (trafego, apps bloqueadas, clientes, blacklists)
+- Permite consulta por IP (timeline de eventos)
+- Permite exportar relatorios em CSV, HTML ou JSON
+
+### Configuracao
+
+Em **Services > Layer 7 > Definicoes**, seccao **Relatorios**:
+
+- **Activar recolha**: liga/desliga o cron de recolha de dados
+- **Retencao**: quantos dias os dados historicos sao mantidos (default: 30)
+- **Intervalo**: frequencia de recolha (5, 10, 15 ou 30 minutos)
+
+### Ficheiros de dados
+
+| Ficheiro | Descricao |
+|----------|-----------|
+| `/usr/local/etc/layer7/reports/stats-history.jsonl` | Historico de stats (JSONL) |
+| `/usr/local/etc/layer7/layer7-stats-collect.sh` | Script colector (cron) |
+| `/usr/local/etc/layer7/layer7-stats-purge.sh` | Script de limpeza (cron) |
+
+### Exportacao
+
+Na pagina de Relatorios, clique nos botoes CSV, HTML ou JSON no topo.
+O ficheiro exportado cobre o periodo seleccionado no filtro.
+
+O formato HTML gera um relatorio formatado pronto para impressao ou email.
+
+---
+
+## 10. Caminhos importantes
 
 | Ficheiro                             | Descricao                        |
 |--------------------------------------|----------------------------------|
@@ -426,6 +463,9 @@ cat /usr/local/etc/layer7.lic
 | `/usr/local/etc/layer7/blacklists/config.json` | Config das blacklists   |
 | `/usr/local/etc/layer7/blacklists/discovered.json` | Categorias auto-descobertas |
 | `/usr/local/etc/layer7/update-blacklists.sh` | Script de download        |
+| `/usr/local/etc/layer7/reports/`             | Directorio de relatorios   |
+| `/usr/local/etc/layer7/layer7-stats-collect.sh` | Colector de stats (cron) |
+| `/usr/local/etc/layer7/layer7-stats-purge.sh` | Limpeza de historico (cron) |
 | `/usr/local/etc/rc.d/layer7d`        | Script rc.d do servico           |
 | `/var/run/layer7d.pid`               | PID do daemon                    |
 | `/var/log/system.log`                | Logs do daemon                   |
@@ -433,7 +473,7 @@ cat /usr/local/etc/layer7.lic
 
 ---
 
-## 10. Rollback de emergencia
+## 11. Rollback de emergencia
 
 Se algo der errado apos instalar ou actualizar, use o desinstalador
 automatico preservando a configuracao:

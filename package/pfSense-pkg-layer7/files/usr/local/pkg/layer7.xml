@@ -39,6 +39,10 @@
 			<url>/packages/layer7/layer7_events.php</url>
 		</tab>
 		<tab>
+			<text>Reports</text>
+			<url>/packages/layer7/layer7_reports.php</url>
+		</tab>
+		<tab>
 			<text>Diagnostics</text>
 			<url>/packages/layer7/layer7_diagnostics.php</url>
 		</tab>
