@@ -6,7 +6,8 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 
 | | |
 |--|--|
-| **Desenvolvido por** | [Systemup](https://www.systemup.inf.br) |
+| **Desenvolvido por** | [Systemup](https://www.systemup.inf.br) Solucao em Tecnologia |
+| **Desenvolvedor principal** | Pablo Michelin |
 | **Website** | <https://www.systemup.inf.br> |
 | **Repositorio** | <https://github.com/pablomichelin/pfsense-layer7> |
 | **Licenca** | EULA (ver `LICENSE`) |
@@ -98,6 +99,8 @@ Um bloco por vez; PR com objectivo, teste mínimo, rollback e docs (template em 
 
 ---
 
-**Layer7 para pfSense CE** e um produto da [Systemup](https://www.systemup.inf.br).
+**Layer7 para pfSense CE** e um produto da [Systemup](https://www.systemup.inf.br) Solucao em Tecnologia.
+
+Desenvolvedor principal: **Pablo Michelin**
 
 Layer7 para pfSense CE NAO e afiliado com Netgate ou o projecto pfSense. pfSense e uma marca registada da Electric Sheep Fencing LLC d/b/a Netgate.

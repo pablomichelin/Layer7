@@ -151,4 +151,5 @@ layer7_render_styles();
 	}
 })();
 </script>
+<?php layer7_render_footer(); ?>
 <?php require_once("foot.inc"); ?>

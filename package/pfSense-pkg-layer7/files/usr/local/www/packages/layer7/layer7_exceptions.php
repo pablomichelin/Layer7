@@ -537,4 +537,5 @@ function l7setChecks(listId, checked) {
 	}
 }
 </script>
+<?php layer7_render_footer(); ?>
 <?php require_once("foot.inc"); ?>

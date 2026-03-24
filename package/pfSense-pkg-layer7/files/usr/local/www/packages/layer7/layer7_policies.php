@@ -1222,4 +1222,5 @@ function l7setChecks(listId, checked, onlyVisible) {
 	}
 }
 </script>
+<?php layer7_render_footer(); ?>
 <?php require_once("foot.inc"); ?>

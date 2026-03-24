@@ -282,4 +282,5 @@ layer7_render_styles();
 .l7-dash-card-danger .l7-dash-card-value { color: #d9534f; }
 .l7-dash-card-success .l7-dash-card-value { color: #5cb85c; }
 </style>
+<?php layer7_render_footer(); ?>
 <?php require_once("foot.inc"); ?>

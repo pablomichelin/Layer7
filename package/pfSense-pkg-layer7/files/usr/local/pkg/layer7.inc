@@ -723,3 +723,12 @@ function layer7_render_messages()
 		print_info_box($savemsg, "success");
 	}
 }
+
+function layer7_render_footer()
+{
+	echo '<div style="text-align:center; padding:18px 0 8px; margin-top:24px; border-top:1px solid #e5e5e5; color:#888; font-size:12px;">';
+	echo 'Layer7 para pfSense CE &mdash; ';
+	echo '<a href="https://www.systemup.inf.br" target="_blank" style="color:#337ab7; text-decoration:none;">Systemup</a>';
+	echo ' Solu&ccedil;&atilde;o em Tecnologia';
+	echo '</div>';
+}

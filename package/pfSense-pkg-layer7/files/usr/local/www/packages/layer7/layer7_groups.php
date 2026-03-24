@@ -376,4 +376,5 @@ layer7_render_styles();
 		</div>
 	</div>
 </div>
+<?php layer7_render_footer(); ?>
 <?php require_once("foot.inc"); ?>
