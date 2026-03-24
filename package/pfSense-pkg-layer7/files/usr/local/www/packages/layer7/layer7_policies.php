@@ -513,36 +513,62 @@ function layer7_policy_match_summary($policy) {
 			<h3 class="layer7-section-title"><?= gettext("Perfis rapidos"); ?></h3>
 			<p class="layer7-lead"><?= gettext("Clique num perfil para criar automaticamente uma politica com todas as apps e dominios associados. Escolha a accao, interfaces e sub-redes antes de aplicar."); ?></p>
 
-			<div class="l7-profiles-grid">
-			<?php foreach ($l7_profiles as $prof) {
-				$prof_id = isset($prof["id"]) ? htmlspecialchars($prof["id"]) : "";
-				$prof_name = isset($prof["name"]) ? htmlspecialchars($prof["name"]) : $prof_id;
-				$prof_icon = isset($prof["icon"]) ? htmlspecialchars($prof["icon"]) : "fa-puzzle-piece";
-				$prof_desc = isset($prof["description"]) ? htmlspecialchars($prof["description"]) : "";
-				$prof_apps_count = isset($prof["ndpi_apps"]) && is_array($prof["ndpi_apps"]) ? count($prof["ndpi_apps"]) : 0;
-				$prof_hosts_count = isset($prof["hosts"]) && is_array($prof["hosts"]) ? count($prof["hosts"]) : 0;
-				$prof_exists = false;
-				$prof_pid = "profile-" . ($prof["id"] ?? "");
-				foreach ($policies as $existing) {
-					if (isset($existing["id"]) && (string)$existing["id"] === $prof_pid) {
-						$prof_exists = true;
-						break;
-					}
+		<?php
+		$l7_app_icons = array(
+			"youtube" => array("#FF0000", '<path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 4-8 4z" fill="#fff"/>'),
+			"facebook" => array("#1877F2", '<path d="M24 12c0-6.627-5.373-12-12-12S0 5.373 0 12c0 5.99 4.388 10.954 10.125 11.854V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.668 4.533-4.668 1.312 0 2.686.234 2.686.234v2.953H15.83c-1.491 0-1.956.925-1.956 1.875V12h3.328l-.532 3.47h-2.796v8.385C19.612 22.954 24 17.99 24 12z" fill="#fff"/>'),
+			"instagram" => array("#E4405F", '<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12s.014 3.668.072 4.948c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24s3.668-.014 4.948-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" fill="#fff"/>'),
+			"tiktok" => array("#010101", '<path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" fill="#fff"/>'),
+			"whatsapp" => array("#25D366", '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="#fff"/>'),
+			"twitter" => array("#000000", '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#fff"/>'),
+			"linkedin" => array("#0A66C2", '<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" fill="#fff"/>'),
+			"netflix" => array("#E50914", '<path d="M5.398 0v.006c3.028 8.556 5.37 15.175 8.348 23.596 2.344.058 4.85.398 4.854.398-2.8-7.924-5.923-16.747-8.487-24zm8.489 0v9.63L18.6 22.951c.043.043.105.065.18.096l.003-.003c0-7.681-.001-15.362 0-23.044H13.887zM5.398 1.05V24c1.873-.225 2.81-.312 4.715-.398v-9.22l-4.715-13.33z" fill="#fff"/>'),
+			"spotify" => array("#1DB954", '<path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" fill="#fff"/>'),
+			"twitch" => array("#9146FF", '<path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" fill="#fff"/>'),
+			"social" => array("#4267B2", '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#fff"/>'),
+			"streaming" => array("#FF6D00", '<circle cx="12" cy="12" r="10" fill="none" stroke="#fff" stroke-width="1.5"/><polygon points="10,8 16,12 10,16" fill="#fff"/>'),
+			"gaming" => array("#7B2FBE", '<path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.27 1.8-.75L9 16h6l2.25 2.25c.48.48 1.13.75 1.8.75 1.56 0 2.75-1.37 2.53-2.91zM11 11H9v2H8v-2H6v-1h2V8h1v2h2v1zm4 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm3-2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" fill="#fff"/>'),
+			"vpn-proxy" => array("#2C3E50", '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" fill="#fff"/>'),
+			"ai-tools" => array("#10A37F", '<path d="M22.282 9.821a5.985 5.985 0 00-.516-4.91 6.046 6.046 0 00-6.51-2.9A6.065 6.065 0 0011.694.14 6.016 6.016 0 005.21 2.253 6.09 6.09 0 001.634 7.96a6.027 6.027 0 00.72 5.027 5.985 5.985 0 00.516 4.911 6.046 6.046 0 006.51 2.9A6.06 6.06 0 0012.95 23.856a6.016 6.016 0 006.484-2.112 6.09 6.09 0 003.577-5.707 6.027 6.027 0 00-.73-6.216zm-9.332 12.66a4.508 4.508 0 01-2.888-1.04l.144-.082 4.795-2.77a.78.78 0 00.393-.68v-6.76l2.027 1.17a.071.071 0 01.039.052v5.6a4.536 4.536 0 01-4.51 4.51zm-9.707-4.14a4.483 4.483 0 01-.538-3.024l.144.086 4.796 2.77a.78.78 0 00.786 0l5.857-3.382v2.34a.073.073 0 01-.029.062L9.354 19.7a4.536 4.536 0 01-6.111-1.359zM2.14 7.847a4.49 4.49 0 012.35-1.979V11.6a.78.78 0 00.394.68l5.856 3.383-2.027 1.17a.072.072 0 01-.067.005L3.739 14.07A4.536 4.536 0 012.14 7.847zm16.653 3.872l-5.857-3.382 2.027-1.17a.072.072 0 01.067-.005l4.907 2.833a4.534 4.534 0 01-.7 8.177V12.4a.78.78 0 00-.394-.68zm2.016-3.036l-.144-.086-4.796-2.77a.78.78 0 00-.786 0l-5.857 3.382V6.87a.073.073 0 01.029-.062l4.907-2.832a4.536 4.536 0 016.647 4.707zM8.61 12.89l-2.027-1.17a.071.071 0 01-.039-.052V6.07a4.535 4.535 0 017.399-3.517l-.144.082-4.795 2.77a.78.78 0 00-.393.68v6.76zm1.1-2.378l2.608-1.506 2.608 1.506v3.012l-2.608 1.506-2.608-1.506v-3.012z" fill="#fff"/>')
+		);
+		?>
+		<div class="l7-profiles-grid">
+		<?php foreach ($l7_profiles as $prof) {
+			$prof_id = isset($prof["id"]) ? htmlspecialchars($prof["id"]) : "";
+			$prof_name = isset($prof["name"]) ? htmlspecialchars($prof["name"]) : $prof_id;
+			$prof_desc = isset($prof["description"]) ? htmlspecialchars($prof["description"]) : "";
+			$prof_apps_count = isset($prof["ndpi_apps"]) && is_array($prof["ndpi_apps"]) ? count($prof["ndpi_apps"]) : 0;
+			$prof_hosts_count = isset($prof["hosts"]) && is_array($prof["hosts"]) ? count($prof["hosts"]) : 0;
+			$prof_exists = false;
+			$prof_pid = "profile-" . ($prof["id"] ?? "");
+			foreach ($policies as $existing) {
+				if (isset($existing["id"]) && (string)$existing["id"] === $prof_pid) {
+					$prof_exists = true;
+					break;
 				}
-			?>
-				<div class="l7-profile-card<?= $prof_exists ? ' l7-profile-used' : ''; ?>">
-					<div class="l7-profile-icon"><i class="fa <?= $prof_icon; ?>"></i></div>
-					<div class="l7-profile-name"><?= $prof_name; ?></div>
-					<div class="l7-profile-desc"><?= $prof_desc; ?></div>
-					<div class="l7-profile-meta"><?= $prof_apps_count; ?> apps &middot; <?= $prof_hosts_count; ?> hosts</div>
-					<?php if ($prof_exists) { ?>
-					<span class="label label-info"><?= gettext("Ja aplicado"); ?></span>
-					<?php } else { ?>
-					<button type="button" class="btn btn-sm btn-success" onclick="l7showProfileModal('<?= $prof_id; ?>', '<?= $prof_name; ?>');"><?= gettext("Aplicar"); ?></button>
-					<?php } ?>
+			}
+			$icon_color = "#667";
+			$icon_svg = '<text x="12" y="17" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">' . strtoupper(substr($prof["id"] ?? "?", 0, 1)) . '</text>';
+			if (isset($l7_app_icons[$prof["id"]])) {
+				$icon_color = $l7_app_icons[$prof["id"]][0];
+				$icon_svg = $l7_app_icons[$prof["id"]][1];
+			}
+		?>
+			<div class="l7-profile-card<?= $prof_exists ? ' l7-profile-used' : ''; ?>">
+				<div class="l7-profile-icon-ios" style="background:<?= $icon_color; ?>;">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><?= $icon_svg; ?></svg>
 				</div>
-			<?php } ?>
+				<div class="l7-profile-name"><?= $prof_name; ?></div>
+				<div class="l7-profile-desc"><?= $prof_desc; ?></div>
+				<div class="l7-profile-meta"><?= $prof_apps_count; ?> apps &middot; <?= $prof_hosts_count; ?> hosts</div>
+				<?php if ($prof_exists) { ?>
+				<span class="label label-info"><?= gettext("Ja aplicado"); ?></span>
+				<?php } else { ?>
+				<button type="button" class="btn btn-sm btn-success" onclick="l7showProfileModal('<?= $prof_id; ?>', '<?= $prof_name; ?>');"><?= gettext("Aplicar"); ?></button>
+				<?php } ?>
 			</div>
+		<?php } ?>
+		</div>
 		</div>
 
 		<div id="l7ProfileModal" class="l7-modal-overlay" style="display:none;">
@@ -1179,7 +1205,7 @@ function layer7_policy_match_summary($policy) {
 .l7-profile-card { border: 1px solid #ddd; border-radius: 6px; padding: 16px; width: 180px; text-align: center; background: #fdfdfd; transition: box-shadow 0.15s; }
 .l7-profile-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
 .l7-profile-card.l7-profile-used { opacity: 0.6; }
-.l7-profile-icon { font-size: 28px; margin-bottom: 8px; color: #337ab7; }
+.l7-profile-icon-ios { width: 56px; height: 56px; border-radius: 13px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
 .l7-profile-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
 .l7-profile-desc { font-size: 12px; color: #666; margin-bottom: 6px; line-height: 1.4; min-height: 34px; }
 .l7-profile-meta { font-size: 11px; color: #999; margin-bottom: 8px; }
