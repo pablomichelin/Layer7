@@ -201,6 +201,71 @@ service layer7d onestart
 
 ## 6. Desinstalar
 
+### Desinstalador automatico (recomendado)
+
+O script `uninstall.sh` faz tudo automaticamente:
+1. Para o servico layer7d
+2. Remove o pacote `.pkg`
+3. Limpa todos os ficheiros residuais (binario, GUI, configs, logs)
+4. Limpa tabelas PF (layer7_block, layer7_block_dst, etc.)
+5. (Opcional) Remove overrides anti-DoH do Unbound no `config.xml`
+6. Remove o servico do boot (`sysrc`)
+
+**Command Prompt (uma linha — requer `--yes`):**
+
+```sh
+fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
+```
+
+> **IMPORTANTE:** No Command Prompt do pfSense nao e possivel responder a
+> perguntas interactivas. Use sempre `--yes` neste modo.
+
+**SSH/Console (com confirmacao interactiva):**
+
+```sh
+fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
+```
+
+### Opcoes do uninstall.sh
+
+| Flag | O que faz |
+|------|-----------|
+| `--clean-unbound` | Remove overrides anti-DoH do Unbound (`config.xml`) |
+| `--keep-config` | Preserva `layer7.json` e `layer7.lic` para reinstalacao futura |
+| `--keep-license` | Preserva apenas `layer7.lic` |
+| `--yes` | Nao pede confirmacao (obrigatorio no Command Prompt) |
+| `--help` | Mostra ajuda |
+
+### Exemplos de uso
+
+Remocao completa (remove tudo, incluindo licenca e configs):
+
+```sh
+sh /tmp/uninstall.sh --clean-unbound --yes
+```
+
+Remocao preservando licenca e configuracao (para reinstalar depois):
+
+```sh
+sh /tmp/uninstall.sh --keep-config --clean-unbound --yes
+```
+
+Remocao preservando apenas a licenca:
+
+```sh
+sh /tmp/uninstall.sh --keep-license --clean-unbound --yes
+```
+
+Remocao sem limpar o Unbound:
+
+```sh
+sh /tmp/uninstall.sh --yes
+```
+
+### Desinstalacao manual (SSH/Console)
+
+Se preferir fazer manualmente sem o script:
+
 ```sh
 service layer7d onestop
 ```
@@ -209,13 +274,45 @@ service layer7d onestop
 pkg delete -y pfSense-pkg-layer7
 ```
 
-Limpar configs (opcional — remove tudo):
+Limpar ficheiros residuais:
 
 ```sh
+rm -f /usr/local/sbin/layer7d
 rm -f /usr/local/etc/layer7.json
 rm -f /usr/local/etc/layer7.lic
 rm -f /usr/local/etc/layer7-protos.txt
-rm -rf /usr/local/etc/layer7/blacklists
+rm -rf /usr/local/etc/layer7
+rm -rf /usr/local/www/packages/layer7
+rm -f /usr/local/pkg/layer7.xml
+rm -f /usr/local/pkg/layer7.inc
+rm -f /etc/inc/priv/layer7.priv.inc
+rm -f /usr/local/libexec/layer7-pfctl
+rm -f /usr/local/libexec/layer7-unbound-anti-doh
+rm -f /var/run/layer7d.pid
+rm -f /var/log/layer7d.log
+```
+
+Limpar tabelas PF:
+
+```sh
+pfctl -t layer7_block -T flush
+pfctl -t layer7_block_dst -T flush
+pfctl -t layer7_bld_0 -T flush
+pfctl -t layer7_bld_1 -T flush
+```
+
+Limpar overrides anti-DoH do Unbound (manual):
+va em **Services > DNS Resolver**, clique em **Display Custom Options**,
+apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
+`# --- Layer7 anti-DoH/Relay END ---`, e clique **Save** + **Apply Changes**.
+
+### Apos desinstalar
+
+O pfSense volta ao funcionamento normal imediatamente.
+Para reinstalar:
+
+```sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -338,7 +435,14 @@ cat /usr/local/etc/layer7.lic
 
 ## 10. Rollback de emergencia
 
-Se algo der errado apos instalar ou actualizar:
+Se algo der errado apos instalar ou actualizar, use o desinstalador
+automatico preservando a configuracao:
+
+```sh
+fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
+```
+
+Ou manualmente:
 
 ```sh
 service layer7d onestop
