@@ -29,7 +29,17 @@ Cada seccao abaixo inclui:
 
 ## 1. Instalar (primeira vez)
 
-**Comando unico (Command Prompt):**
+**Instalador automatico (recomendado — uma linha):**
+
+```sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+```
+
+Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
+
+Para uma versao especifica: `sh /tmp/install.sh --version 1.1.0`
+
+**Comando unico manual (Command Prompt):**
 
 ```sh
 fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
@@ -111,7 +121,15 @@ layer7d --license-status
 
 ## 4. Actualizar (upgrade)
 
-**Comando unico (Command Prompt):**
+**Instalador automatico (recomendado — uma linha):**
+
+```sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+```
+
+O script detecta a versao instalada e faz o upgrade automaticamente.
+
+**Comando unico manual (Command Prompt):**
 
 ```sh
 service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && service layer7d onestart && layer7d -V
