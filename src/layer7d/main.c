@@ -73,6 +73,8 @@ static time_t s_last_lic_check;
 static struct l7_blacklist *s_blacklist;
 static unsigned long long s_bl_hits;
 static unsigned long long s_bl_lookups;
+static struct l7_bl_rule s_bl_rules[L7_BL_MAX_RULES];
+static int s_bl_n_rules;
 #define L7_LIC_CHECK_INTERVAL 3600
 
 #define L7_STATS_TOP_MAX 128
@@ -212,6 +214,7 @@ write_stats_json(void)
 	    (unsigned long long)s_bl_lookups);
 	fprintf(f, "  \"bl_hits\": %llu,\n",
 	    (unsigned long long)s_bl_hits);
+	fprintf(f, "  \"bl_rules_active\": %d,\n", s_bl_n_rules);
 
 	{
 		const char **bl_cat_names = NULL;
@@ -625,6 +628,29 @@ dst_cache_flush(void)
 	s_n_dst = 0;
 }
 
+static int
+bl_rule_has_cat(const struct l7_bl_rule *rule, const char *cat)
+{
+	int i;
+	for (i = 0; i < rule->n_categories; i++) {
+		if (strcmp(rule->categories[i], cat) == 0)
+			return 1;
+	}
+	return 0;
+}
+
+static void
+bl_flush_rule_tables(void)
+{
+	char cmd[128];
+	int i;
+	for (i = 0; i < L7_BL_MAX_RULES; i++) {
+		snprintf(cmd, sizeof(cmd),
+		    "/sbin/pfctl -t layer7_bld_%d -T flush 2>/dev/null", i);
+		(void)system(cmd);
+	}
+}
+
 static void
 layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
     uint32_t ttl)
@@ -651,21 +677,33 @@ layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
 		return;
 	}
 
-	if (s_blacklist) {
+	if (s_blacklist && s_bl_n_rules > 0) {
+		int ri;
 		s_bl_lookups++;
 		bl_cat = l7_blacklist_lookup(s_blacklist, domain);
 		if (bl_cat) {
 			s_bl_hits++;
-			r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST,
-			    resolved_ip);
-			if (r == 0) {
-				s_pf_dst_add_ok++;
-				dst_cache_add(resolved_ip, ttl);
-				L7_INFO("bl_block: domain=%s cat=%s ip=%s "
-				    "ttl=%u", domain, bl_cat,
-				    resolved_ip, ttl);
-			} else {
-				s_pf_dst_add_fail++;
+			for (ri = 0; ri < s_bl_n_rules; ri++) {
+				char tbl[32];
+				if (!s_bl_rules[ri].enabled)
+					continue;
+				if (!bl_rule_has_cat(&s_bl_rules[ri],
+				    bl_cat))
+					continue;
+				snprintf(tbl, sizeof(tbl),
+				    "layer7_bld_%d", ri);
+				r = layer7_pf_exec_table_add(tbl,
+				    resolved_ip);
+				if (r == 0) {
+					s_pf_dst_add_ok++;
+					L7_INFO("bl_block: domain=%s "
+					    "cat=%s ip=%s rule=%d/%s "
+					    "table=%s", domain, bl_cat,
+					    resolved_ip, ri,
+					    s_bl_rules[ri].name, tbl);
+				} else {
+					s_pf_dst_add_fail++;
+				}
 			}
 		}
 	}
@@ -1579,45 +1617,77 @@ int main(int argc, char **argv)
 				struct l7_blacklist *new_bl = NULL;
 				struct l7_blacklist *old_bl;
 
+				bl_flush_rule_tables();
+				memset(s_bl_rules, 0, sizeof(s_bl_rules));
+				s_bl_n_rules = 0;
+
 				if (l7_bl_config_load(
 				    L7_BL_DIR_DEFAULT "/config.json",
 				    &bl_cfg) == 0
 				    && bl_cfg.enabled
-				    && bl_cfg.n_categories > 0) {
-					const char *bcats[L7_BL_MAX_CATS];
+				    && bl_cfg.n_rules > 0) {
+					const char *all_cats[L7_BL_MAX_CATS];
 					const char *bwl[L7_BL_WL_MAX];
-					int bi;
+					int all_n = 0, ri, ci, ai, found;
 
-					for (bi = 0; bi < bl_cfg.n_categories;
-					    bi++)
-						bcats[bi] =
-						    bl_cfg.categories[bi];
-					for (bi = 0; bi < bl_cfg.n_whitelist;
-					    bi++)
-						bwl[bi] =
-						    bl_cfg.whitelist[bi];
+					for (ri = 0; ri < bl_cfg.n_rules;
+					    ri++) {
+						for (ci = 0; ci <
+						    bl_cfg.rules[ri]
+						    .n_categories; ci++) {
+							found = 0;
+							for (ai = 0;
+							    ai < all_n;
+							    ai++) {
+								if (strcmp(
+								    all_cats[ai],
+								    bl_cfg.rules[ri]
+								    .categories[ci])
+								    == 0) {
+									found = 1;
+									break;
+								}
+							}
+							if (!found &&
+							    all_n <
+							    L7_BL_MAX_CATS)
+								all_cats[all_n++] =
+								    bl_cfg
+								    .rules[ri]
+								    .categories[ci];
+						}
+					}
+
+					for (ai = 0;
+					    ai < bl_cfg.n_whitelist;
+					    ai++)
+						bwl[ai] =
+						    bl_cfg.whitelist[ai];
 
 					new_bl = l7_blacklist_load(
 					    L7_BL_DIR_DEFAULT,
-					    bcats, bl_cfg.n_categories,
+					    all_cats, all_n,
 					    bwl, bl_cfg.n_whitelist);
 
-					if (new_bl)
-						L7_NOTE("blacklists: loaded "
-						    "%d domains in %d "
-						    "categories",
-						    l7_blacklist_count(new_bl),
+					if (new_bl) {
+						memcpy(s_bl_rules,
+						    bl_cfg.rules,
+						    sizeof(bl_cfg.rules));
+						s_bl_n_rules =
+						    bl_cfg.n_rules;
+						L7_NOTE("blacklists: "
+						    "loaded %d domains "
+						    "in %d categories, "
+						    "%d rules",
+						    l7_blacklist_count(
+						    new_bl),
 						    l7_blacklist_cat_count(
-						    new_bl));
-					else
+						    new_bl),
+						    s_bl_n_rules);
+					} else {
 						L7_WARN("blacklists: "
 						    "failed to load");
-
-					for (bi = 0;
-					    bi < bl_cfg.n_except_ips; bi++)
-						layer7_pf_exec_table_add(
-						    "layer7_bl_except",
-						    bl_cfg.except_ips[bi]);
+					}
 				}
 
 				old_bl = s_blacklist;

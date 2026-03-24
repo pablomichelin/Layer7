@@ -50,11 +50,7 @@ function layer7_pf_default_rules_text()
 		"block drop quick inet from <layer7_block> to any label \"layer7:block:src\"",
 		"block drop quick inet6 from <layer7_block> to any label \"layer7:block:src6\"",
 		"",
-		"# Excepcoes blacklists: IPs que acedem a destinos bloqueados.",
-		"table <layer7_bl_except> persist",
-		"pass quick inet from <layer7_bl_except> to <layer7_block_dst> label \"layer7:bl:except\"",
-		"",
-		"# Bloqueio por destino (sites/apps bloqueados).",
+		"# Bloqueio por destino (sites/apps bloqueados via policies).",
 		"block drop quick inet to <layer7_block_dst> label \"layer7:block:dst\"",
 		"block drop quick inet6 to <layer7_block_dst> label \"layer7:block:dst6\"",
 		"",
@@ -96,6 +92,37 @@ function layer7_generate_rules($type)
 		$rules .= "\n# Anti-QUIC: forcar fallback para TCP/TLS (melhor visibilidade SNI).\n";
 		$rules .= "block drop quick inet proto udp to port 443 label \"layer7:anti-quic\"\n";
 		$rules .= "block drop quick inet6 proto udp to port 443 label \"layer7:anti-quic6\"\n";
+	}
+
+	$bl_config = layer7_bl_config_load();
+	if (!empty($bl_config["enabled"]) && !empty($bl_config["rules"])) {
+		$rules .= "\n# Blacklist rules (per-source/CIDR)\n";
+		foreach ($bl_config["rules"] as $idx => $brule) {
+			if (empty($brule["enabled"])) {
+				continue;
+			}
+			$table = "layer7_bld_" . (int)$idx;
+			$rname = preg_replace('/[^a-zA-Z0-9_-]/', '', $brule["name"] ?? "rule{$idx}");
+			$rules .= "table <{$table}> persist\n";
+			if (!empty($brule["except_ips"])) {
+				foreach ($brule["except_ips"] as $eip) {
+					$eip = trim($eip);
+					if ($eip !== "") {
+						$rules .= "pass quick inet from {$eip} to <{$table}> label \"layer7:bl:except:{$rname}\"\n";
+					}
+				}
+			}
+			if (!empty($brule["src_cidrs"])) {
+				foreach ($brule["src_cidrs"] as $cidr) {
+					$cidr = trim($cidr);
+					if ($cidr !== "") {
+						$rules .= "block drop quick inet from {$cidr} to <{$table}> label \"layer7:bl:{$rname}\"\n";
+					}
+				}
+			} else {
+				$rules .= "block drop quick inet to <{$table}> label \"layer7:bl:{$rname}\"\n";
+			}
+		}
 	}
 
 	return $rules;
@@ -777,9 +804,8 @@ function layer7_bl_config_defaults()
 		"source_url" => "http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
 		"auto_update" => false,
 		"update_interval_hours" => 24,
-		"categories" => array(),
 		"whitelist" => array(),
-		"except_ips" => array()
+		"rules" => array()
 	);
 }
 
@@ -860,30 +886,10 @@ function layer7_bl_download_status()
 
 function layer7_bl_apply()
 {
+	if (function_exists("filter_configure")) {
+		filter_configure();
+	}
 	layer7_signal_reload();
-}
-
-function layer7_bl_pf_sync_except($ips)
-{
-	if (function_exists("mwexec")) {
-		mwexec("/sbin/pfctl -t layer7_bl_except -T flush 2>/dev/null");
-	} else {
-		@shell_exec("/sbin/pfctl -t layer7_bl_except -T flush 2>/dev/null");
-	}
-	if (!is_array($ips)) {
-		return;
-	}
-	foreach ($ips as $ip) {
-		$ip = trim($ip);
-		if ($ip !== "") {
-			$cmd = "/sbin/pfctl -t layer7_bl_except -T add " . escapeshellarg($ip) . " 2>/dev/null";
-			if (function_exists("mwexec")) {
-				mwexec($cmd);
-			} else {
-				@shell_exec($cmd);
-			}
-		}
-	}
 }
 
 function layer7_bl_setup_cron($enabled, $hour)
@@ -906,6 +912,7 @@ function layer7_bl_get_stats()
 	$bl["categories_active"] = isset($stats["bl_categories_active"]) ? (int)$stats["bl_categories_active"] : 0;
 	$bl["lookups"] = isset($stats["bl_lookups"]) ? (int)$stats["bl_lookups"] : 0;
 	$bl["hits"] = isset($stats["bl_hits"]) ? (int)$stats["bl_hits"] : 0;
+	$bl["rules_active"] = isset($stats["bl_rules_active"]) ? (int)$stats["bl_rules_active"] : 0;
 	$bl["top_categories"] = isset($stats["bl_top_categories"]) ? $stats["bl_top_categories"] : array();
 	return $bl;
 }

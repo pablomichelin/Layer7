@@ -26,37 +26,113 @@ if (isset($_POST["do_download"])) {
 	$savemsg = gettext("Download iniciado. Acompanhe o progresso abaixo.");
 }
 
-/* POST: Save categories */
-if (isset($_POST["save_categories"])) {
-	$cats = array();
-	if ($discovered && is_array($discovered["categories"])) {
-		foreach ($discovered["categories"] as $cat) {
-			$key = "cat_" . $cat["id"];
-			$val = $_POST[$key] ?? "---";
-			if ($val === "deny") {
-				$cats[] = $cat["id"];
+/* POST: Save rule */
+if (isset($_POST["save_rule"])) {
+	$ridx = $_POST["rule_index"] ?? "";
+	$rname = trim($_POST["rule_name"] ?? "");
+	$renabled = isset($_POST["rule_enabled"]);
+	$rcats = isset($_POST["rule_cats"]) && is_array($_POST["rule_cats"]) ? $_POST["rule_cats"] : array();
+	$rcidrs_raw = trim($_POST["rule_cidrs"] ?? "");
+	$rexcept_raw = trim($_POST["rule_except"] ?? "");
+
+	if ($rname === "") {
+		$input_errors[] = gettext("O nome da regra e obrigatorio.");
+	}
+	if (empty($rcats)) {
+		$input_errors[] = gettext("Seleccione pelo menos uma categoria.");
+	}
+
+	$rcidrs = array();
+	if ($rcidrs_raw !== "") {
+		foreach (preg_split('/[\r\n]+/', $rcidrs_raw) as $line) {
+			$line = trim($line);
+			if ($line === "" || $line[0] === '#') continue;
+			if (layer7_ipv4_valid($line) || layer7_cidr_valid($line)) {
+				$rcidrs[] = $line;
+			} else {
+				$input_errors[] = gettext("IP/CIDR invalido: ") . htmlspecialchars($line);
 			}
 		}
 	}
-	$bl_config["categories"] = $cats;
-	$bl_config["enabled"] = (count($cats) > 0);
-	layer7_bl_config_save($bl_config);
-	layer7_bl_apply();
-	$savemsg = gettext("Categorias guardadas. Daemon recarregado.");
+
+	$rexcept = array();
+	if ($rexcept_raw !== "") {
+		foreach (preg_split('/[\r\n]+/', $rexcept_raw) as $line) {
+			$line = trim($line);
+			if ($line === "" || $line[0] === '#') continue;
+			if (layer7_ipv4_valid($line) || layer7_cidr_valid($line)) {
+				$rexcept[] = $line;
+			} else {
+				$input_errors[] = gettext("IP/CIDR de excepcao invalido: ") . htmlspecialchars($line);
+			}
+		}
+	}
+
+	if (empty($input_errors)) {
+		$rule = array(
+			"name" => $rname,
+			"enabled" => $renabled,
+			"categories" => array_values($rcats),
+			"src_cidrs" => array_values($rcidrs),
+			"except_ips" => array_values($rexcept)
+		);
+		if (!isset($bl_config["rules"]) || !is_array($bl_config["rules"])) {
+			$bl_config["rules"] = array();
+		}
+		if ($ridx !== "" && isset($bl_config["rules"][(int)$ridx])) {
+			$bl_config["rules"][(int)$ridx] = $rule;
+		} else {
+			if (count($bl_config["rules"]) >= 8) {
+				$input_errors[] = gettext("Maximo de 8 regras atingido.");
+			} else {
+				$bl_config["rules"][] = $rule;
+			}
+		}
+		if (empty($input_errors)) {
+			$bl_config["rules"] = array_values($bl_config["rules"]);
+			$has_any = false;
+			foreach ($bl_config["rules"] as $r) {
+				if (!empty($r["enabled"]) && !empty($r["categories"])) {
+					$has_any = true;
+					break;
+				}
+			}
+			$bl_config["enabled"] = $has_any;
+			layer7_bl_config_save($bl_config);
+			layer7_bl_apply();
+			$savemsg = gettext("Regra guardada. Daemon e regras PF actualizados.");
+		}
+	}
 }
 
-/* POST: Save exceptions */
-if (isset($_POST["save_exceptions"])) {
+/* POST: Delete rule */
+if (isset($_POST["delete_rule"])) {
+	$ridx = (int)($_POST["rule_index"] ?? -1);
+	if (isset($bl_config["rules"][$ridx])) {
+		array_splice($bl_config["rules"], $ridx, 1);
+		$bl_config["rules"] = array_values($bl_config["rules"]);
+		$has_any = false;
+		foreach ($bl_config["rules"] as $r) {
+			if (!empty($r["enabled"]) && !empty($r["categories"])) {
+				$has_any = true;
+				break;
+			}
+		}
+		$bl_config["enabled"] = $has_any;
+		layer7_bl_config_save($bl_config);
+		layer7_bl_apply();
+		$savemsg = gettext("Regra removida.");
+	}
+}
+
+/* POST: Save whitelist */
+if (isset($_POST["save_whitelist"])) {
 	$wl_raw = trim($_POST["whitelist"] ?? "");
-	$except_raw = trim($_POST["except_ips"] ?? "");
-	$wl = array_values(array_filter(array_map("trim", explode("\n", $wl_raw))));
-	$except = array_values(array_filter(array_map("trim", explode("\n", $except_raw))));
+	$wl = array_values(array_filter(array_map("trim", preg_split('/[\r\n]+/', $wl_raw))));
 	$bl_config["whitelist"] = $wl;
-	$bl_config["except_ips"] = $except;
 	layer7_bl_config_save($bl_config);
-	layer7_bl_pf_sync_except($except);
 	layer7_bl_apply();
-	$savemsg = gettext("Excepcoes guardadas. Tabela PF actualizada.");
+	$savemsg = gettext("Whitelist guardada. Daemon recarregado.");
 }
 
 /* POST: Save settings */
@@ -67,18 +143,25 @@ if (isset($_POST["save_settings"])) {
 	if ($hours > 168) $hours = 168;
 	$bl_config["update_interval_hours"] = $hours;
 	layer7_bl_config_save($bl_config);
-
 	$cron_hour = $hours <= 24 ? "3" : "*/" . (int)($hours / 24);
 	layer7_bl_setup_cron($bl_config["auto_update"], $cron_hour);
-
 	$savemsg = gettext("Definicoes guardadas.");
 }
 
-/* Reload config after any save */
+/* Reload after any save */
 $bl_config = layer7_bl_config_load();
 $discovered = layer7_bl_discovered_load();
 $bl_stats = layer7_bl_get_stats();
 $last_update = layer7_bl_last_update();
+$rules = isset($bl_config["rules"]) && is_array($bl_config["rules"]) ? $bl_config["rules"] : array();
+
+$edit_idx = -1;
+if (isset($_GET["edit"])) {
+	$edit_idx = (int)$_GET["edit"];
+}
+if (isset($_GET["add"])) {
+	$edit_idx = -2;
+}
 
 $pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Blacklists"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
@@ -105,7 +188,7 @@ layer7_render_styles();
 <div class="form-group">
 	<label><?=gettext("URL da blacklist")?></label>
 	<input type="text" class="form-control" name="source_url"
-		value="<?=htmlspecialchars($bl_config["source_url"])?>"
+		value="<?=htmlspecialchars($bl_config["source_url"] ?? "")?>"
 		placeholder="http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz">
 	<p class="help-block"><?=gettext("Endereco do arquivo blacklists.tar.gz (formato UT1 Toulouse).")?></p>
 </div>
@@ -125,82 +208,204 @@ layer7_render_styles();
 </div>
 </div>
 
-<!-- SECTION 2: Categories -->
+<!-- SECTION 2: Blacklist Rules -->
 <div class="layer7-section">
-<h3 class="layer7-section-title"><?=gettext("Categorias")?></h3>
-<?php if ($discovered === null): ?>
-	<div class="alert alert-warning">
-		<i class="fa fa-info-circle"></i>
-		<?=gettext("Faca o download da lista primeiro.")?>
-	</div>
-<?php else: ?>
-<form method="post">
-<div style="margin-bottom:10px;">
-	<input type="text" id="cat_filter" class="form-control" style="max-width:300px;"
-		placeholder="<?=gettext("Pesquisar categorias...")?>"
-		onkeyup="filterCategories();">
+<h3 class="layer7-section-title"><?=gettext("Regras de Blacklist")?></h3>
+<p class="layer7-lead"><?=gettext("Cada regra define quais categorias bloquear e para quais IPs/CIDRs de origem. Permite bloqueio granular: ex. bloquear gambling para 192.168.10.0/24 mas nao para o director (192.168.10.1).")?></p>
+
+<?php if (empty($rules)): ?>
+<div class="alert alert-info">
+	<i class="fa fa-info-circle"></i>
+	<?=gettext("Nenhuma regra configurada. Adicione uma regra para comecar a bloquear categorias.")?>
 </div>
+<?php else: ?>
 <div class="table-responsive">
-<table class="table table-striped table-hover" id="cat_table">
+<table class="table table-striped table-hover">
 <thead>
 <tr>
-	<th><?=gettext("Categoria")?></th>
-	<th style="text-align:right;"><?=gettext("Dominios")?></th>
-	<th><?=gettext("Accao")?></th>
+	<th>#</th>
+	<th><?=gettext("Nome")?></th>
+	<th><?=gettext("Categorias")?></th>
+	<th><?=gettext("Origem (CIDRs)")?></th>
+	<th><?=gettext("Excepcoes")?></th>
+	<th><?=gettext("Estado")?></th>
+	<th><?=gettext("Tabela PF")?></th>
+	<th><?=gettext("Accoes")?></th>
 </tr>
 </thead>
 <tbody>
-<?php
-$active_cats = is_array($bl_config["categories"]) ? $bl_config["categories"] : array();
-usort($discovered["categories"], function($a, $b) { return strcmp($a["id"], $b["id"]); });
-foreach ($discovered["categories"] as $cat):
-	$cat_id = $cat["id"];
-	$count = isset($cat["domains_count"]) ? (int)$cat["domains_count"] : 0;
-	$selected = in_array($cat_id, $active_cats) ? "deny" : "---";
-	$warning = ($count > 1000000) ? ' <span class="text-warning" title="' . gettext("Impacto significativo em RAM") . '">&#9888;</span>' : '';
-?>
-<tr class="cat-row" data-cat="<?=htmlspecialchars($cat_id)?>">
-	<td><strong><?=htmlspecialchars($cat_id)?></strong></td>
-	<td style="text-align:right;"><?=number_format($count, 0, ',', '.')?><?=$warning?></td>
+<?php foreach ($rules as $idx => $rule): ?>
+<tr>
+	<td><?=$idx?></td>
+	<td><strong><?=htmlspecialchars($rule["name"] ?? "regra_{$idx}")?></strong></td>
 	<td>
-		<select name="cat_<?=htmlspecialchars($cat_id)?>" class="form-control" style="width:100px;">
-			<option value="---" <?=($selected === "---") ? "selected" : ""?>>---</option>
-			<option value="deny" <?=($selected === "deny") ? "selected" : ""?>>deny</option>
-		</select>
+		<?php
+		$cats = $rule["categories"] ?? array();
+		$cat_display = implode(", ", array_slice($cats, 0, 5));
+		if (count($cats) > 5) $cat_display .= " (+" . (count($cats) - 5) . ")";
+		echo htmlspecialchars($cat_display);
+		?>
+		<br><small class="text-muted"><?=count($cats)?> <?=gettext("categorias")?></small>
+	</td>
+	<td>
+		<?php
+		$cidrs = $rule["src_cidrs"] ?? array();
+		if (empty($cidrs)) {
+			echo '<em class="text-warning">' . gettext("Todos (global)") . '</em>';
+		} else {
+			echo htmlspecialchars(implode(", ", $cidrs));
+		}
+		?>
+	</td>
+	<td>
+		<?php
+		$excepts = $rule["except_ips"] ?? array();
+		echo empty($excepts) ? '<em class="text-muted">-</em>' : htmlspecialchars(implode(", ", $excepts));
+		?>
+	</td>
+	<td>
+		<?php if (!empty($rule["enabled"])): ?>
+		<span class="label label-success"><?=gettext("Activa")?></span>
+		<?php else: ?>
+		<span class="label label-default"><?=gettext("Inactiva")?></span>
+		<?php endif; ?>
+	</td>
+	<td><code>layer7_bld_<?=$idx?></code></td>
+	<td class="layer7-table-actions">
+		<a href="?edit=<?=$idx?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+		<form method="post" style="display:inline;"
+			onsubmit="return confirm('<?=gettext("Remover esta regra?")?>');">
+			<input type="hidden" name="rule_index" value="<?=$idx?>">
+			<button type="submit" name="delete_rule" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
+		</form>
 	</td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
 </div>
-<p class="text-muted"><small>&#9888; = <?=gettext("categoria com mais de 1M dominios — impacto significativo em RAM.")?></small></p>
-<button type="submit" name="save_categories" class="btn btn-primary">
-	<i class="fa fa-save"></i> <?=gettext("Guardar categorias")?>
-</button>
+<?php endif; ?>
+
+<?php if ($edit_idx === -2 || $edit_idx === -1 && empty($rules)): ?>
+	<?php /* nothing — form shown below */ ?>
+<?php endif; ?>
+
+<?php if (count($rules) < 8): ?>
+<a href="?add=1" class="btn btn-success" style="margin-top:8px;">
+	<i class="fa fa-plus"></i> <?=gettext("Adicionar regra")?>
+</a>
+<?php endif; ?>
+
+<?php
+/* Edit/Add form */
+$show_form = ($edit_idx >= -2 && ($edit_idx === -2 || isset($rules[$edit_idx])));
+if ($edit_idx === -2) $show_form = true;
+if ($edit_idx >= 0 && !isset($rules[$edit_idx])) $show_form = false;
+
+if ($show_form):
+	$erule = ($edit_idx >= 0 && isset($rules[$edit_idx])) ? $rules[$edit_idx] : array(
+		"name" => "", "enabled" => true, "categories" => array(),
+		"src_cidrs" => array(), "except_ips" => array()
+	);
+	$form_title = ($edit_idx >= 0) ? gettext("Editar regra") : gettext("Nova regra");
+?>
+<div style="margin-top:18px; padding:18px; border:1px solid #ddd; border-radius:4px; background:#fcfcfc;">
+<h4><?=$form_title?></h4>
+<form method="post">
+<?php if ($edit_idx >= 0): ?>
+<input type="hidden" name="rule_index" value="<?=$edit_idx?>">
+<?php endif; ?>
+
+<div class="form-group">
+	<label><?=gettext("Nome da regra")?></label>
+	<input type="text" class="form-control" name="rule_name"
+		value="<?=htmlspecialchars($erule["name"])?>"
+		placeholder="<?=gettext("Ex: Funcionarios, Convidados, Alunos...")?>"
+		style="max-width:400px;" required>
+</div>
+
+<div class="form-group">
+	<label class="checkbox-inline">
+		<input type="checkbox" name="rule_enabled" value="1"
+			<?=(!empty($erule["enabled"])) ? "checked" : ""?>>
+		<?=gettext("Regra activa")?>
+	</label>
+</div>
+
+<div class="form-group">
+	<label><?=gettext("Categorias a bloquear")?></label>
+	<?php if ($discovered === null): ?>
+	<div class="alert alert-warning" style="margin:0;">
+		<i class="fa fa-exclamation-triangle"></i>
+		<?=gettext("Faca o download da lista primeiro para ver as categorias disponiveis.")?>
+	</div>
+	<?php else: ?>
+	<input type="text" id="rule_cat_filter" class="form-control l7-filter" style="max-width:300px;"
+		placeholder="<?=gettext("Pesquisar categorias...")?>" onkeyup="filterRuleCats();">
+	<div class="l7-bulk-tools">
+		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(true);"><?=gettext("Seleccionar todas")?></button>
+		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(false);"><?=gettext("Limpar todas")?></button>
+	</div>
+	<div class="l7-multiselect-wrap" id="rule_cats_wrap">
+	<?php
+	$ecats = is_array($erule["categories"]) ? $erule["categories"] : array();
+	usort($discovered["categories"], function($a, $b) { return strcmp($a["id"], $b["id"]); });
+	foreach ($discovered["categories"] as $cat):
+		$cid = $cat["id"];
+		$cnt = isset($cat["domains_count"]) ? (int)$cat["domains_count"] : 0;
+		$checked = in_array($cid, $ecats) ? "checked" : "";
+		$warn = ($cnt > 1000000) ? ' &#9888;' : '';
+	?>
+	<label class="rule-cat-item" data-cat="<?=htmlspecialchars($cid)?>">
+		<input type="checkbox" name="rule_cats[]" value="<?=htmlspecialchars($cid)?>" <?=$checked?>>
+		<?=htmlspecialchars($cid)?> <small class="text-muted">(<?=number_format($cnt, 0, ',', '.')?>)</small><?=$warn?>
+	</label>
+	<?php endforeach; ?>
+	</div>
+	<p class="help-block"><?=gettext("Seleccione as categorias que esta regra deve bloquear.")?></p>
+	<?php endif; ?>
+</div>
+
+<div class="form-group">
+	<label><?=gettext("Origem — IPs ou CIDRs (um por linha)")?></label>
+	<textarea class="form-control" name="rule_cidrs" rows="4"
+		placeholder="<?=gettext("Ex: 192.168.10.0/24\nDeixe vazio para bloquear TODOS os clientes (global).")?>"
+		style="font-family:monospace; max-width:400px;"><?=htmlspecialchars(implode("\n", $erule["src_cidrs"] ?? array()))?></textarea>
+	<p class="help-block"><?=gettext("IPs/CIDRs de origem sujeitos a esta regra. Se vazio, aplica-se a TODOS os clientes.")?></p>
+</div>
+
+<div class="form-group">
+	<label><?=gettext("Excepcoes — IPs excluidos desta regra (um por linha)")?></label>
+	<textarea class="form-control" name="rule_except" rows="3"
+		placeholder="<?=gettext("Ex: 192.168.10.1 (director)")?>"
+		style="font-family:monospace; max-width:400px;"><?=htmlspecialchars(implode("\n", $erule["except_ips"] ?? array()))?></textarea>
+	<p class="help-block"><?=gettext("IPs que NAO sao bloqueados por esta regra, mesmo estando no CIDR de origem.")?></p>
+</div>
+
+<div style="margin-top:14px;">
+	<button type="submit" name="save_rule" class="btn btn-primary">
+		<i class="fa fa-save"></i> <?=gettext("Guardar regra")?>
+	</button>
+	<a href="layer7_blacklists.php" class="btn btn-default"><?=gettext("Cancelar")?></a>
+</div>
 </form>
+</div>
 <?php endif; ?>
 </div>
 
-<!-- SECTION 3: Exceptions -->
+<!-- SECTION 3: Global Whitelist -->
 <div class="layer7-section">
-<h3 class="layer7-section-title"><?=gettext("Excepcoes")?></h3>
+<h3 class="layer7-section-title"><?=gettext("Whitelist Global")?></h3>
 <form method="post">
 <div class="form-group">
-	<label><?=gettext("Whitelist de dominios (nunca bloqueados pela blacklist)")?></label>
+	<label><?=gettext("Dominios nunca bloqueados (um por linha)")?></label>
 	<textarea class="form-control" name="whitelist" rows="5"
-		placeholder="<?=gettext("Um dominio por linha")?>"
-		style="font-family:monospace;"><?=htmlspecialchars(implode("\n", $bl_config["whitelist"] ?? array()))?></textarea>
-	<p class="help-block"><?=gettext("Dominios nesta lista nunca sao bloqueados pelas categorias, mesmo que estejam nas listas.")?></p>
+		placeholder="<?=gettext("Ex: google.com\nyoutube.com")?>"
+		style="font-family:monospace; max-width:500px;"><?=htmlspecialchars(implode("\n", $bl_config["whitelist"] ?? array()))?></textarea>
+	<p class="help-block"><?=gettext("Dominios nesta lista nunca sao bloqueados por NENHUMA regra, mesmo que estejam nas categorias.")?></p>
 </div>
-<div class="form-group">
-	<label><?=gettext("IPs excepcionados (acedem a destinos bloqueados)")?></label>
-	<textarea class="form-control" name="except_ips" rows="4"
-		placeholder="<?=gettext("Um IP ou CIDR por linha")?>"
-		style="font-family:monospace;"><?=htmlspecialchars(implode("\n", $bl_config["except_ips"] ?? array()))?></textarea>
-	<p class="help-block"><?=gettext("IPs nesta lista podem aceder a destinos bloqueados pela blacklist (tabela PF layer7_bl_except).")?></p>
-</div>
-<button type="submit" name="save_exceptions" class="btn btn-primary">
-	<i class="fa fa-save"></i> <?=gettext("Guardar excepcoes")?>
+<button type="submit" name="save_whitelist" class="btn btn-primary">
+	<i class="fa fa-save"></i> <?=gettext("Guardar whitelist")?>
 </button>
 </form>
 </div>
@@ -232,7 +437,9 @@ foreach ($discovered["categories"] as $cat):
 	<dt><?=gettext("Ultima actualizacao")?></dt>
 	<dd><?=$last_update ? htmlspecialchars($last_update) : '<em>' . gettext("Nunca") . '</em>'?></dd>
 <?php if ($bl_stats): ?>
-	<dt><?=gettext("Categorias activas")?></dt>
+	<dt><?=gettext("Regras activas")?></dt>
+	<dd><?=(int)$bl_stats["rules_active"]?></dd>
+	<dt><?=gettext("Categorias carregadas")?></dt>
 	<dd><?=(int)$bl_stats["categories_active"]?><?php if ($discovered): ?> / <?=count($discovered["categories"])?> <?=gettext("disponiveis")?><?php endif; ?></dd>
 	<dt><?=gettext("Dominios carregados")?></dt>
 	<dd><?=number_format((int)$bl_stats["domains_loaded"], 0, ',', '.')?></dd>
@@ -288,12 +495,22 @@ function pollDownloadLog() {
 	xhr.send();
 }
 
-function filterCategories() {
-	var filter = document.getElementById('cat_filter').value.toLowerCase();
-	var rows = document.querySelectorAll('#cat_table tbody .cat-row');
-	for (var i = 0; i < rows.length; i++) {
-		var cat = rows[i].getAttribute('data-cat');
-		rows[i].style.display = cat.indexOf(filter) !== -1 ? '' : 'none';
+function filterRuleCats() {
+	var filter = document.getElementById('rule_cat_filter').value.toLowerCase();
+	var items = document.querySelectorAll('#rule_cats_wrap .rule-cat-item');
+	for (var i = 0; i < items.length; i++) {
+		var cat = items[i].getAttribute('data-cat');
+		items[i].style.display = cat.indexOf(filter) !== -1 ? '' : 'none';
+	}
+}
+
+function toggleAllRuleCats(state) {
+	var cbs = document.querySelectorAll('#rule_cats_wrap input[type=checkbox]');
+	for (var i = 0; i < cbs.length; i++) {
+		var item = cbs[i].closest('.rule-cat-item');
+		if (item && item.style.display !== 'none') {
+			cbs[i].checked = state;
+		}
 	}
 }
 

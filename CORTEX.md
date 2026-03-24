@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.1.0 — Blacklists UT1 (Categorias Web)**
+**Versão: 1.2.0 — Blacklists per-rule (regras por IP/CIDR)**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
 
@@ -74,6 +74,18 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.2.0 — Blacklists per-rule / regras por IP/CIDR (2026-03-24):**
+  - Blacklists agora funcionam como regras granulares (semelhante a ACLs do SquidGuard)
+  - Cada regra especifica: nome, categorias a bloquear, CIDRs de origem, IPs excepcionados
+  - Tabelas PF separadas por regra (layer7_bld_0 a layer7_bld_7) com regras PF source-based
+  - Caso de uso: bloquear gambling para 192.168.10.0/24 mas permitir para o director (192.168.10.1)
+  - Até 8 regras de blacklist simultâneas
+  - GUI reescrita com CRUD completo de regras (adicionar, editar, remover)
+  - Backward compat: formato antigo (flat categories[]) convertido automaticamente para uma regra global
+  - Parser C (bl_config.c) suporta array de objectos JSON (rules[])
+  - DNS callback distribui IPs para tabelas per-rule com base nas categorias
+  - filter_configure() chamado automaticamente para regenerar regras PF
+  - Whitelist global mantida (aplica-se a TODAS as regras)
 - **v1.1.0 — Blacklists UT1 / Categorias Web (2026-03-24):**
   - Integracao de blacklists externas UT1 (Universite Toulouse Capitole)
   - Script `update-blacklists.sh` com download, auto-descoberta de categorias, `discovered.json`
@@ -217,11 +229,11 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Blacklists UT1 — implementacao concluida, pendente build e testes.**
+**Blacklists per-rule — implementacao concluida, pendente build e testes.**
 
 V1 Comercial publicada. License server operacional. Feature blacklists UT1
-implementada (Blocos 1-7 concluidos). Pendente: build no FreeBSD builder,
-testes end-to-end e release v1.1.0.
+implementada e melhorada com regras por IP/CIDR (v1.2.0). Pendente: build
+no FreeBSD builder, testes end-to-end e release v1.2.0.
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -248,8 +260,8 @@ testes end-to-end e release v1.1.0.
 
 ## Proximos 3 passos
 1. Build no FreeBSD builder (192.168.100.12) — validar compilacao
-2. Testes end-to-end no pfSense lab (download, categorias, bloqueio, excepcoes)
-3. Release v1.1.0 no GitHub com .pkg como artefacto
+2. Testes end-to-end no pfSense lab (regras per-rule, CIDRs, excepcoes)
+3. Release v1.2.0 no GitHub com .pkg como artefacto
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

@@ -37,22 +37,26 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.1.0`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.2.0`
 
 **Comando unico manual (Command Prompt):**
 
+Comando para instalar em uma linha
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+
+
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.2.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.2.0/pfSense-pkg-layer7-1.2.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.2.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.2.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.2.0/pfSense-pkg-layer7-1.2.0.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.2.0.pkg
 ```
 
 ```sh
@@ -132,7 +136,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.2.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.2.0/pfSense-pkg-layer7-1.2.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.2.0.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -142,11 +146,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.2.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.2.0/pfSense-pkg-layer7-1.2.0.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.2.0.pkg
 ```
 
 ```sh
@@ -166,7 +170,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.2.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -180,7 +184,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.2.0.pkg
 ```
 
 ```sh
@@ -278,10 +282,10 @@ Ver IPs de destino bloqueados (sites/blacklists):
 pfctl -t layer7_block_dst -T show
 ```
 
-Ver IPs excepcionados de blacklists:
+Ver IPs de destino bloqueados por regra de blacklist (N = 0-7):
 
 ```sh
-pfctl -t layer7_bl_except -T show
+pfctl -t layer7_bld_0 -T show
 ```
 
 Ver log de actualizacao de blacklists:
@@ -344,7 +348,8 @@ pkg delete -y pfSense-pkg-layer7
 ```sh
 pfctl -t layer7_block -T flush
 pfctl -t layer7_block_dst -T flush
-pfctl -t layer7_bl_except -T flush
+pfctl -t layer7_bld_0 -T flush
+pfctl -t layer7_bld_1 -T flush
 ```
 
 O pfSense volta ao funcionamento normal imediatamente.

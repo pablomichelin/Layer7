@@ -42,7 +42,7 @@ done
 
 # --- Detecção de versão ---
 if [ -z "$VERSION" ]; then
-    VERSION="1.1.0"
+    VERSION="1.2.0"
 fi
 
 TAG="v${VERSION}"
@@ -107,7 +107,7 @@ rm -f "/tmp/${PKG_NAME}"
 
 # --- Garantir tabelas PF ---
 echo "[4/6] Verificando tabelas PF..."
-for _table in layer7_block layer7_block_dst layer7_tagged layer7_bl_except; do
+for _table in layer7_block layer7_block_dst layer7_tagged layer7_bld_0 layer7_bld_1 layer7_bld_2 layer7_bld_3; do
     if ! pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
         pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null
         pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null
