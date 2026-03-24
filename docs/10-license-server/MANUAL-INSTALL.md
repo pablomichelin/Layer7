@@ -1,11 +1,41 @@
 # Manual de Instalacao — Layer7 para pfSense CE
 
-> Comandos prontos para copiar e colar no shell do pfSense (SSH ou Console).
+> Comandos prontos para copiar e colar no pfSense.
 > Executar tudo como **root**.
 
 ---
 
+## Como executar os comandos
+
+Existem duas formas de executar comandos no pfSense:
+
+### Opcao A: SSH ou Console (terminal)
+
+Aceda via SSH (`ssh admin@IP_PFSENSE`) ou pelo menu **Console** do pfSense.
+Neste modo pode executar os comandos um a um, como listados abaixo.
+
+### Opcao B: Diagnostics > Command Prompt (GUI web)
+
+Aceda pelo menu **Diagnostics > Command Prompt** no browser.
+**IMPORTANTE:** Neste modo, cole o **comando unico (uma linha)** indicado
+em cada seccao. Nao cole varios comandos separados — o pfSense executa
+tudo como um unico comando e os restantes sao ignorados silenciosamente.
+
+Cada seccao abaixo inclui:
+- **Comando unico** — para colar no Command Prompt (uma linha com `&&`)
+- **Passo a passo** — para executar no SSH/Console (um por vez)
+
+---
+
 ## 1. Instalar (primeira vez)
+
+**Comando unico (Command Prompt):**
+
+```sh
+fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+```
+
+**Passo a passo (SSH/Console):**
 
 ```sh
 fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg
@@ -81,6 +111,14 @@ layer7d --license-status
 
 ## 4. Actualizar (upgrade)
 
+**Comando unico (Command Prompt):**
+
+```sh
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg && service layer7d onestart && layer7d -V
+```
+
+**Passo a passo (SSH/Console):**
+
 ```sh
 service layer7d onestop
 ```
@@ -101,9 +139,19 @@ service layer7d onestart
 layer7d -V
 ```
 
+Politicas, excepcoes, grupos e licenca sao preservados durante o upgrade.
+
 ---
 
 ## 5. Reinstalar (mesma versao)
+
+**Comando unico (Command Prompt):**
+
+```sh
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+```
+
+**Passo a passo (SSH/Console):**
 
 ```sh
 service layer7d onestop
