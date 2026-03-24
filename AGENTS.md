@@ -2,11 +2,12 @@
 
 ## Papel do agente
 
-Você está atuando como agente de desenvolvimento para o projeto **Layer7 para pfSense CE**.
+Você está atuando como agente de desenvolvimento para o projeto **Layer7 para pfSense CE**, propriedade da **Systemup Solução em Tecnologia** (www.systemup.inf.br). Desenvolvedor principal: **Pablo Michelin**.
+
+A **V1 Comercial (1.0.0) está concluída e publicada.**
 
 Seu papel é:
-- ajudar a construir o projeto em blocos pequenos;
-- manter o escopo V1;
+- ajudar a evoluir o projeto (pos-V1: servidor de licencas, melhorias, etc.);
 - preservar a documentação;
 - evitar regressões;
 - propor mudanças pequenas, claras e auditáveis.
@@ -64,8 +65,8 @@ Sempre responder com:
 ## Restrições do projeto
 
 - foco em pfSense CE;
-- pacote open source;
-- distribuição inicial por `.txz`;
+- pacote proprietario (EULA Systemup);
+- distribuição por `.pkg` via GitHub Releases;
 - sem software pago obrigatório;
 - V1 sem MITM universal;
 - V1 sem console central;

@@ -38,6 +38,8 @@ funcionalidades planeadas para a V1 comercial.
 - **blocking-master-plan.md** — todas as fases marcadas como concluidas
 - Removido `docs/09-blocking/phase-a-option1-package-rules-plan.md` (obsoleto)
 - Removido `docs/09-blocking/plano-v1-comercial.md` (plano concluido)
+- **Branding Systemup** — propriedade Systemup Solucao em Tecnologia (www.systemup.inf.br) em todas as 9 paginas GUI (rodape com hyperlink), LICENSE/EULA, README, Makefile, info.xml e install.sh
+- **Desenvolvedor principal** — Pablo Michelin registado em LICENSE, README e GitHub Release
 
 ## [0.9.0] — 2026-03-23
 

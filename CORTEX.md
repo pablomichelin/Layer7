@@ -49,7 +49,7 @@ Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial c
 - GUI completa com 6 páginas
 
 ## Fase atual
-**V1 Comercial concluida.** Todas as fases e blocos do plano V1 completos. Release 1.0.0 pronta para build final e publicacao.
+**V1 Comercial concluida e publicada.** Todas as fases e blocos do plano V1 completos. Release v1.0.0 buildada, publicada no GitHub e pronta para deploy em producao.
 
 ## Estado real do enforcement
 
@@ -196,13 +196,14 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**V1 Comercial concluida.** Todos os 10 blocos do plano V1 executados. Proximo:
-build final no FreeBSD lab, publicacao do GitHub Release v1.0.0 e piloto em producao.
+**V1 Comercial publicada.** Todos os 10 blocos executados. Build final compilado
+no FreeBSD lab. GitHub Release v1.0.0 publicada. Propriedade Systemup Solucao em
+Tecnologia em todas as paginas GUI. Proximo: piloto em producao e frontend de licencas.
 
 ## Proximos 3 passos
-1. Build final no FreeBSD lab (192.168.100.12)
-2. Criar GitHub Release v1.0.0
-3. Piloto estavel 24h+ sem incidente + par de chaves Ed25519 de producao
+1. Piloto estavel 24h+ sem incidente em pfSense de producao
+2. Gerar par de chaves Ed25519 de producao e embutir no binario
+3. Frontend de gestao de licencas (servidor de licencas)
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
@@ -215,6 +216,9 @@ build final no FreeBSD lab, publicacao do GitHub Release v1.0.0 e piloto em prod
 - [x] Motor multi-interface v0.2.0 — implementado 2026-03-18
 - [x] Plano V1 Comercial completo (Blocos 1-10) — 2026-03-23
 - [x] Release v1.0.0 preparada — 2026-03-23
+- [x] Build final no FreeBSD lab — 2026-03-23
+- [x] GitHub Release v1.0.0 publicada — 2026-03-23
+- [x] Branding Systemup Solucao em Tecnologia — 2026-03-23
 
 ## Decisoes congeladas
 - foco em pfSense CE
