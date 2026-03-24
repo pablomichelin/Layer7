@@ -141,32 +141,38 @@ function layer7_generate_rules($type)
 	}
 
 	$bl_config = layer7_bl_config_load();
-	if (!empty($bl_config["enabled"]) && !empty($bl_config["rules"])) {
-		$rules .= "\n# Blacklist rules (per-source/CIDR)\n";
+	if (!empty($bl_config["rules"])) {
+		$rules .= "\n# Blacklist tables (persist across filter reloads)\n";
 		foreach ($bl_config["rules"] as $idx => $brule) {
-			if (empty($brule["enabled"])) {
-				continue;
-			}
 			$table = "layer7_bld_" . (int)$idx;
-			$rname = preg_replace('/[^a-zA-Z0-9_-]/', '', $brule["name"] ?? "rule{$idx}");
 			$rules .= "table <{$table}> persist\n";
-			if (!empty($brule["except_ips"])) {
-				foreach ($brule["except_ips"] as $eip) {
-					$eip = trim($eip);
-					if ($eip !== "") {
-						$rules .= "pass quick inet from {$eip} to <{$table}> label \"layer7:bl:except:{$rname}\"\n";
+		}
+		if (!empty($bl_config["enabled"])) {
+			$rules .= "\n# Blacklist rules (per-source/CIDR)\n";
+			foreach ($bl_config["rules"] as $idx => $brule) {
+				if (empty($brule["enabled"])) {
+					continue;
+				}
+				$table = "layer7_bld_" . (int)$idx;
+				$rname = preg_replace('/[^a-zA-Z0-9_-]/', '', $brule["name"] ?? "rule{$idx}");
+				if (!empty($brule["except_ips"])) {
+					foreach ($brule["except_ips"] as $eip) {
+						$eip = trim($eip);
+						if ($eip !== "") {
+							$rules .= "pass quick inet from {$eip} to <{$table}> label \"layer7:bl:except:{$rname}\"\n";
+						}
 					}
 				}
-			}
-			if (!empty($brule["src_cidrs"])) {
-				foreach ($brule["src_cidrs"] as $cidr) {
-					$cidr = trim($cidr);
-					if ($cidr !== "") {
-						$rules .= "block drop quick inet from {$cidr} to <{$table}> label \"layer7:bl:{$rname}\"\n";
+				if (!empty($brule["src_cidrs"])) {
+					foreach ($brule["src_cidrs"] as $cidr) {
+						$cidr = trim($cidr);
+						if ($cidr !== "") {
+							$rules .= "block drop quick inet from {$cidr} to <{$table}> label \"layer7:bl:{$rname}\"\n";
+						}
 					}
+				} else {
+					$rules .= "block drop quick inet to <{$table}> label \"layer7:bl:{$rname}\"\n";
 				}
-			} else {
-				$rules .= "block drop quick inet to <{$table}> label \"layer7:bl:{$rname}\"\n";
 			}
 		}
 	}
@@ -1088,12 +1094,12 @@ function layer7_bl_download_status()
 
 function layer7_bl_apply()
 {
+	if (function_exists("filter_configure")) {
+		filter_configure();
+	}
 	$helper = layer7_pf_helper_path();
 	if (is_executable($helper)) {
 		@shell_exec($helper . " ensure 2>/dev/null");
-	}
-	if (function_exists("filter_configure")) {
-		filter_configure();
 	}
 	layer7_signal_reload();
 }

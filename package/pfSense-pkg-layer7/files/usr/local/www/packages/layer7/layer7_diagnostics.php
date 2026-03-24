@@ -67,10 +67,10 @@ $pf_repair_result = null;
 if (isset($_POST["repair_pf_tables"])) {
 	$helper = layer7_pf_helper_path();
 	if (is_executable($helper)) {
-		@shell_exec($helper . " ensure 2>/dev/null");
 		if (function_exists("filter_configure")) {
 			filter_configure();
 		}
+		@shell_exec($helper . " ensure 2>/dev/null");
 		layer7_signal_reload();
 		$pf_repair_result = true;
 	} else {
