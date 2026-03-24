@@ -18,7 +18,8 @@ Seu papel é:
 
 1. Sempre começar lendo:
    - `CORTEX.md`
-   - `docs/10-license-server/PLANO-LICENSE-SERVER.md` (plano do servidor de licencas — PROXIMA TAREFA)
+   - `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md` (plano de blacklists UT1 — PROXIMA TAREFA)
+   - `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md` (directrizes de programacao)
    - `docs/00-overview/product-charter.md`
    - `docs/01-architecture/target-architecture.md`
    - `docs/02-roadmap/roadmap.md`
@@ -80,6 +81,30 @@ Isso significa que o agente deve executar o fluxo completo:
 
 **Nunca** entregar apenas edições de código sem completar este fluxo.
 Se algum passo falhar, reportar o erro e tentar resolver.
+
+### Regra de ouro: SEMPRE compilar, documentar e sincronizar
+
+**Após QUALQUER modificação no sistema**, o agente DEVE:
+
+1. **Compilar** — se houve alteração em código C, PHP, scripts ou
+   empacotamento, fazer build no FreeBSD builder (192.168.100.12)
+   para validar que compila sem erros
+2. **Actualizar documentação** — toda alteração deve reflectir-se nos
+   documentos relevantes: CORTEX.md, MANUAL-INSTALL.md, CHANGELOG,
+   README, guias passo-a-passo, directrizes, planos, e qualquer doc
+   afectado (caminhos, versões, ficheiros novos, APIs alteradas)
+3. **Push para o GitHub** — toda alteração deve ser commitada e pushada
+   para manter o repositório sempre actualizado e sincronizado
+
+**Estas 3 acções são INSEPARÁVEIS de qualquer modificação.**
+Nunca terminar uma sessão de trabalho sem:
+- verificar se há código não commitado (`git status`)
+- verificar se docs estão actualizados
+- verificar se o GitHub está sincronizado (`git push`)
+
+Se a modificação for apenas documental (sem código), os passos 5-9
+do fluxo completo (build, .pkg, release) podem ser omitidos, mas o
+commit e push são SEMPRE obrigatórios.
 
 ### Dados do builder
 

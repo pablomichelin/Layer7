@@ -201,11 +201,13 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**Servidor de licencas OPERACIONAL.** V1 Comercial publicada + license server
-completo em `192.168.100.244:8445` com activacao end-to-end validada.
-Pacote `pfSense-pkg-layer7-1.0.1.pkg` compilado com chave publica de producao.
+**Blacklists UT1 — planeamento concluido, implementacao a iniciar.**
 
-**Progresso license server:**
+V1 Comercial publicada. License server operacional. Proxima feature:
+integracao de blacklists UT1 (Universite Toulouse Capitole) para
+categorias web (pornografia, gambling, phishing, malware, etc.).
+
+**Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
 - [x] Bloco 2: Backend — Database e crypto (schema SQL, db.js, crypto.js, seed.js, package.json)
 - [x] Bloco 3: Backend — API (Express, JWT, login, activate, licenses CRUD, customers CRUD, dashboard)
@@ -213,10 +215,25 @@ Pacote `pfSense-pkg-layer7-1.0.1.pkg` compilado com chave publica de producao.
 - [x] Bloco 5: Deploy no 192.168.100.244 (4 containers up, seed OK, validacao LAN OK)
 - [x] Bloco 6: Integracao (URL+pubkey no license.c, fix parser JSON, rebuild 1.0.1, activacao end-to-end OK)
 
+**Progresso blacklists UT1 (v1.1.0):**
+- [x] Planeamento completo — `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`
+- [x] Directrizes de implementacao — `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`
+- [x] Guia passo-a-passo — `docs/11-blacklists/GUIA-PASSO-A-PASSO.md`
+- [x] Regras de qualidade — `docs/11-blacklists/REGRAS-QUALIDADE.md`
+- [x] Decisoes confirmadas (interfaces global, HTTP fetch, 1M buckets, whitelist global, fluxo SquidGuard, tabela PF except)
+- [ ] Bloco 1: Script de download + auto-descoberta
+- [ ] Bloco 2: Modulo C (hash table FNV-1a + whitelist)
+- [ ] Bloco 3: Integracao no daemon (bl_config.c + DNS callback)
+- [ ] Bloco 4: GUI PHP (4 seccoes estilo SquidGuard)
+- [ ] Bloco 5: Cron job
+- [ ] Bloco 6: Excepcoes PF (tabela layer7_bl_except)
+- [ ] Bloco 7: Estatisticas e dashboard
+- [ ] Bloco 8: Empacotamento, documentacao e testes
+
 ## Proximos 3 passos
-1. Configurar proxy reverso no ISPConfig para license.systemup.inf.br → 192.168.100.244:8445
-2. Publicar GitHub Release v1.0.1 com pacote pfSense-pkg-layer7-1.0.1.pkg
-3. Piloto em producao com licenca real emitida pelo servidor
+1. Implementar Bloco 1 (script download) + Bloco 2 (modulo C) em paralelo
+2. Implementar Bloco 3 (daemon) + Bloco 4 (GUI)
+3. Blocos 5-8 (cron, PF except, stats, empacotamento + release v1.1.0)
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
