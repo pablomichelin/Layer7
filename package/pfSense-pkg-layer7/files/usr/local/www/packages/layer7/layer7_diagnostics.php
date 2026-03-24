@@ -63,6 +63,21 @@ if (isset($_POST["remove_anti_doh"])) {
 	$anti_doh_result = layer7_remove_unbound_anti_doh();
 }
 
+$pf_repair_result = null;
+if (isset($_POST["repair_pf_tables"])) {
+	$helper = layer7_pf_helper_path();
+	if (is_executable($helper)) {
+		@shell_exec($helper . " ensure 2>/dev/null");
+		if (function_exists("filter_configure")) {
+			filter_configure();
+		}
+		layer7_signal_reload();
+		$pf_repair_result = true;
+	} else {
+		$pf_repair_result = false;
+	}
+}
+
 $recent_logs = array();
 if (file_exists($log_path)) {
 	exec("/usr/bin/tail -n 20 " . escapeshellarg($log_path) . " 2>/dev/null", $recent_logs);
@@ -81,6 +96,28 @@ $pf_block_dst_count = ($pf_block_dst_code === 0) ? count(array_filter($pf_block_
 $pf_tag_entries = array();
 exec("/sbin/pfctl -t layer7_tagged -T show 2>/dev/null", $pf_tag_entries, $pf_tag_code);
 $pf_tag_count = ($pf_tag_code === 0) ? count(array_filter($pf_tag_entries, 'strlen')) : -1;
+
+$pf_bld_tables = array();
+$bl_config_diag = layer7_bl_config_load();
+if (!empty($bl_config_diag["rules"])) {
+	foreach ($bl_config_diag["rules"] as $bidx => $brule) {
+		$tname = "layer7_bld_" . (int)$bidx;
+		$tent = array();
+		exec("/sbin/pfctl -t " . escapeshellarg($tname) . " -T show 2>/dev/null", $tent, $tcode);
+		$pf_bld_tables[$tname] = array(
+			"exists" => ($tcode === 0),
+			"count" => ($tcode === 0) ? count(array_filter($tent, 'strlen')) : -1,
+			"name" => $brule["name"] ?? "rule{$bidx}",
+			"enabled" => !empty($brule["enabled"])
+		);
+	}
+}
+$pf_any_missing = ($pf_block_count < 0 || $pf_block_dst_count < 0);
+foreach ($pf_bld_tables as $bt) {
+	if (!$bt["exists"]) {
+		$pf_any_missing = true;
+	}
+}
 
 $pf_rules_exists = file_exists($pf_rules);
 $pf_rules_preview = array();
@@ -273,31 +310,31 @@ layer7_render_styles();
 					<dt><code>layer7_block</code></dt>
 					<dd>
 						<?php if ($pf_block_count >= 0) { ?>
-						<?= $pf_block_count; ?> <?= l7_t("entradas"); ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i></span> <?= $pf_block_count; ?> <?= l7_t("entradas"); ?>
 						<?php if ($pf_block_count > 0 && $pf_block_count <= 20) { ?>
 						<br><small><code><?= htmlspecialchars(implode(", ", array_map('trim', $pf_block_entries))); ?></code></small>
 						<?php } ?>
 						<?php } else { ?>
-						<span class="text-muted"><?= l7_t("Tabela nao existe. Criar com: pfctl -t layer7_block -T add 127.0.0.255 && pfctl -t layer7_block -T delete 127.0.0.255"); ?></span>
+						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Tabela nao existe"); ?></span>
 						<?php } ?>
 					</dd>
 
 					<dt><code>layer7_block_dst</code></dt>
 					<dd>
 						<?php if ($pf_block_dst_count >= 0) { ?>
-						<?= $pf_block_dst_count; ?> <?= l7_t("entradas (destinos bloqueados)"); ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i></span> <?= $pf_block_dst_count; ?> <?= l7_t("entradas (destinos bloqueados)"); ?>
 						<?php if ($pf_block_dst_count > 0 && $pf_block_dst_count <= 20) { ?>
 						<br><small><code><?= htmlspecialchars(implode(", ", array_map('trim', $pf_block_dst_entries))); ?></code></small>
 						<?php } ?>
 						<?php } else { ?>
-						<span class="text-muted"><?= l7_t("Tabela nao existe ainda."); ?></span>
+						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Tabela nao existe"); ?></span>
 						<?php } ?>
 					</dd>
 
 					<dt><code>layer7_tagged</code></dt>
 					<dd>
 						<?php if ($pf_tag_count >= 0) { ?>
-						<?= $pf_tag_count; ?> <?= l7_t("entradas"); ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i></span> <?= $pf_tag_count; ?> <?= l7_t("entradas"); ?>
 						<?php if ($pf_tag_count > 0 && $pf_tag_count <= 20) { ?>
 						<br><small><code><?= htmlspecialchars(implode(", ", array_map('trim', $pf_tag_entries))); ?></code></small>
 						<?php } ?>
@@ -305,6 +342,48 @@ layer7_render_styles();
 						<span class="text-muted"><?= l7_t("Tabela nao existe (opcional, usada com action=tag)."); ?></span>
 						<?php } ?>
 					</dd>
+
+					<?php if (!empty($pf_bld_tables)) { ?>
+					<?php foreach ($pf_bld_tables as $btname => $bt) { ?>
+					<dt><code><?= htmlspecialchars($btname); ?></code></dt>
+					<dd>
+						<?php if ($bt["exists"]) { ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i></span>
+						<?= $bt["count"]; ?> <?= l7_t("entradas"); ?>
+						(<?= htmlspecialchars($bt["name"]); ?>
+						<?php if ($bt["enabled"]) { ?>
+						— <span class="label label-success"><?= l7_t("Activa"); ?></span>
+						<?php } else { ?>
+						— <span class="label label-default"><?= l7_t("Inactiva"); ?></span>
+						<?php } ?>)
+						<?php } else { ?>
+						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Tabela nao existe"); ?></span>
+						(<?= htmlspecialchars($bt["name"]); ?>)
+						<?php } ?>
+					</dd>
+					<?php } ?>
+					<?php } ?>
+
+					<?php if ($pf_any_missing) { ?>
+					<dt></dt>
+					<dd>
+						<?php if ($pf_repair_result === true) { ?>
+						<div class="alert alert-success" style="margin-top:8px; padding:8px 12px;">
+							<i class="fa fa-check-circle"></i> <?= l7_t("Tabelas PF criadas e filtro recarregado com sucesso."); ?>
+						</div>
+						<?php } elseif ($pf_repair_result === false) { ?>
+						<div class="alert alert-danger" style="margin-top:8px; padding:8px 12px;">
+							<i class="fa fa-times-circle"></i> <?= l7_t("Erro: helper PF nao encontrado."); ?>
+						</div>
+						<?php } ?>
+						<form method="post" style="margin-top:8px;">
+							<button type="submit" name="repair_pf_tables" value="1" class="btn btn-warning">
+								<i class="fa fa-wrench"></i> <?= l7_t("Reparar tabelas PF"); ?>
+							</button>
+							<small class="text-muted" style="margin-left:8px;"><?= l7_t("Cria todas as tabelas em falta e recarrega o filtro."); ?></small>
+						</form>
+					</dd>
+					<?php } ?>
 				</dl>
 			</div>
 		</div>

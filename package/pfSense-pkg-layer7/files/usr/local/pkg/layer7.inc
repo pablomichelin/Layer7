@@ -1087,6 +1087,10 @@ function layer7_bl_download_status()
 
 function layer7_bl_apply()
 {
+	$helper = layer7_pf_helper_path();
+	if (is_executable($helper)) {
+		@shell_exec($helper . " ensure 2>/dev/null");
+	}
 	if (function_exists("filter_configure")) {
 		filter_configure();
 	}
