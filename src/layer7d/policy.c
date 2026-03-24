@@ -562,9 +562,8 @@ layer7_policies_parse(const char *json, size_t len,
 			const char *oe = json_obj_end(q);
 			if (!oe || oe >= end)
 				return -1;
-			if (parse_one_policy(q, oe + 1, &out[n]) != 0)
-				return -1;
-			n++;
+			if (parse_one_policy(q, oe + 1, &out[n]) == 0)
+				n++;
 			q = oe + 1;
 		} else
 			q++;
@@ -909,6 +908,7 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
     const char *host)
 {
 	int i;
+	int app_matched = 0, host_matched = 0;
 
 	if (!layer7_schedule_active(&r->schedule))
 		return 0;
@@ -916,16 +916,7 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 		return 0;
 	if (!src_matches_rule(r, src_ip))
 		return 0;
-	if (r->n_ndpi_apps > 0) {
-		if (!ndpi_app)
-			return 0;
-		for (i = 0; i < r->n_ndpi_apps; i++) {
-			if (strcmp(ndpi_app, r->ndpi_apps[i]) == 0)
-				break;
-		}
-		if (i >= r->n_ndpi_apps)
-			return 0;
-	}
+
 	if (r->n_ndpi_cats > 0) {
 		if (!ndpi_cat)
 			return 0;
@@ -936,15 +927,38 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 		if (i >= r->n_ndpi_cats)
 			return 0;
 	}
-	if (r->n_hosts > 0) {
-		if (!host || !*host)
-			return 0;
-		for (i = 0; i < r->n_hosts; i++) {
-			if (host_matches_rule(host, r->hosts[i]))
-				return 1;
+
+	if (r->n_ndpi_apps > 0 && ndpi_app) {
+		for (i = 0; i < r->n_ndpi_apps; i++) {
+			if (strcmp(ndpi_app, r->ndpi_apps[i]) == 0) {
+				app_matched = 1;
+				break;
+			}
 		}
-		return 0;
 	}
+
+	if (r->n_hosts > 0 && host && *host) {
+		for (i = 0; i < r->n_hosts; i++) {
+			if (host_matches_rule(host, r->hosts[i])) {
+				host_matched = 1;
+				break;
+			}
+		}
+	}
+
+	/*
+	 * When BOTH apps AND hosts are configured: OR between them.
+	 * Catches QUIC/TLS flows by host when nDPI reports generic protocol.
+	 */
+	if (r->n_ndpi_apps > 0 && r->n_hosts > 0)
+		return app_matched || host_matched;
+
+	if (r->n_ndpi_apps > 0)
+		return app_matched;
+
+	if (r->n_hosts > 0)
+		return host_matched;
+
 	return 1;
 }
 
