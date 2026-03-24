@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.3.3 — Fix Unbound anti-DoH persistente via config.xml**
+**Versão: 1.3.4 — Fix anti-DoH defensivo + botão remover**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
 
@@ -74,6 +74,18 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.3.4 — Fix anti-DoH defensivo + botão remover (2026-03-24):**
+  - Reescrita completa de layer7_configure_unbound_anti_doh(): valida que
+    conteudo existente em custom_options é texto ASCII limpo antes de
+    concatenar; se estiver corrompido/binario, substitui por bloco limpo
+  - Nova funcao layer7_remove_unbound_anti_doh() para remover overrides
+  - Nova funcao layer7_anti_doh_block() / layer7_anti_doh_domains() (refactor)
+  - layer7_unbound_anti_doh_configured() agora verifica config.xml E
+    unbound.conf gerado (dupla verificacao)
+  - Botao "Remover" (vermelho, com confirmacao) na pagina Diagnosticos
+    quando anti-DoH ja esta configurado
+  - Traducoes EN para novas strings
+  - PORTVERSION incrementado para 1.3.4
 - **v1.3.3 — Fix Unbound anti-DoH persistente (2026-03-24):**
   - Corrigido: Unbound anti-DoH agora grava em custom_options do config.xml
     do pfSense (via write_config + services_unbound_configure) em vez de
@@ -268,13 +280,13 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.3.3 — Fix Unbound anti-DoH persistente.**
+**v1.3.4 — Fix anti-DoH defensivo + botão remover.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
 de libcrypto e install.sh auto-detect (v1.3.1). Quick profiles para acesso
-remoto e anti-bypass DNS (v1.3.2). Fix Unbound anti-DoH: agora grava em
-custom_options do config.xml para persistir entre reinícios (v1.3.3).
+remoto e anti-bypass DNS (v1.3.2). Fix anti-DoH persistente (v1.3.3).
+Fix defensivo: valida custom_options antes de concatenar, botao remover (v1.3.4).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -300,9 +312,9 @@ custom_options do config.xml para persistir entre reinícios (v1.3.3).
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Testar instalacao limpa via install.sh (deve baixar v1.3.3 automaticamente)
-2. Testar botao "Configurar agora" do Unbound anti-DoH nos Diagnosticos (deve persistir)
-3. Verificar que custom_options aparece em Services > DNS Resolver > Custom Options
+1. Testar instalacao limpa via install.sh (deve baixar v1.3.4 automaticamente)
+2. Limpar custom_options corrompido e testar "Configurar agora" (deve gravar texto limpo)
+3. Testar botao "Remover" nos Diagnosticos (deve limpar custom_options)
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

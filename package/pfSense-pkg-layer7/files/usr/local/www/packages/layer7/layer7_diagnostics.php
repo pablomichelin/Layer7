@@ -59,6 +59,9 @@ $anti_doh_result = null;
 if (isset($_POST["configure_anti_doh"])) {
 	$anti_doh_result = layer7_configure_unbound_anti_doh();
 }
+if (isset($_POST["remove_anti_doh"])) {
+	$anti_doh_result = layer7_remove_unbound_anti_doh();
+}
 
 $recent_logs = array();
 if (file_exists($log_path)) {
@@ -323,6 +326,11 @@ layer7_render_styles();
 					<dd>
 						<?php if ($unbound_anti_doh) { ?>
 						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Overrides anti-DoH configurados no Unbound."); ?></span>
+						<form method="post" style="display:inline; margin-left:8px;">
+							<button type="submit" name="remove_anti_doh" value="1" class="btn btn-xs btn-danger" title="<?= l7_t("Remove os overrides anti-DoH do Unbound."); ?>" onclick="return confirm('<?= l7_t("Remover overrides anti-DoH do Unbound?"); ?>');">
+								<i class="fa fa-trash"></i> <?= l7_t("Remover"); ?>
+							</button>
+						</form>
 						<?php } else { ?>
 						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Overrides nao encontrados."); ?></span>
 						<form method="post" style="display:inline; margin-left:8px;">

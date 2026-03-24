@@ -267,22 +267,11 @@ function layer7_restart_service()
 }
 
 /**
- * Configura Unbound anti-DoH via custom_options do pfSense config.xml.
- * Persiste entre reinícios do Unbound (ao contrário de editar unbound.conf directamente).
- * @return array ("ok" => bool, "msg" => string)
+ * Lista de dominios DoH/DoT para bloqueio via NXDOMAIN.
  */
-function layer7_configure_unbound_anti_doh()
+function layer7_anti_doh_domains()
 {
-	global $config;
-	if (!isset($config['unbound'])) {
-		$config['unbound'] = array();
-	}
-	$marker = "# --- Layer7 anti-DoH/Relay START ---";
-	$existing = isset($config['unbound']['custom_options']) ? (string)$config['unbound']['custom_options'] : "";
-	if (strpos($existing, $marker) !== false) {
-		return array("ok" => true, "msg" => l7_t("Overrides anti-DoH ja estao configurados."));
-	}
-	$doh_domains = array(
+	return array(
 		"mask.icloud.com", "mask-h2.icloud.com", "use-application-dns.net",
 		"dns.google", "dns.google.com", "8888.google", "dns64.dns.google",
 		"cloudflare-dns.com", "one.one.one.one", "1dot1dot1dot1.cloudflare-dns.com",
@@ -292,36 +281,118 @@ function layer7_configure_unbound_anti_doh()
 		"doh.opendns.com", "doh.cleanbrowsing.org", "dns.nextdns.io",
 		"doh.xfinity.com", "ordns.he.net"
 	);
-	$block = "\n{$marker}\n";
-	$block .= "# Layer7 anti-DoH: NXDOMAIN para resolvers DoH conhecidos\n";
-	foreach ($doh_domains as $d) {
-		$block .= "server:\n";
-		$block .= "local-zone: \"{$d}.\" always_nxdomain\n";
+}
+
+/**
+ * Gera o bloco de texto anti-DoH para custom_options do Unbound.
+ */
+function layer7_anti_doh_block()
+{
+	$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
+	$marker_end = "# --- Layer7 anti-DoH/Relay END ---";
+	$lines = array();
+	$lines[] = $marker_start;
+	$lines[] = "# Layer7 anti-DoH: NXDOMAIN para resolvers DoH conhecidos";
+	foreach (layer7_anti_doh_domains() as $d) {
+		$lines[] = "server:";
+		$lines[] = "local-zone: \"{$d}.\" always_nxdomain";
 	}
-	$block .= "# --- Layer7 anti-DoH/Relay END ---\n";
-	$config['unbound']['custom_options'] = $existing . $block;
-	if (function_exists("write_config")) {
-		write_config("Layer7: anti-DoH overrides added to Unbound custom_options");
+	$lines[] = $marker_end;
+	return implode("\n", $lines) . "\n";
+}
+
+/**
+ * Configura Unbound anti-DoH via custom_options do pfSense config.xml.
+ * Persiste entre reinícios do Unbound.
+ * @return array ("ok" => bool, "msg" => string)
+ */
+function layer7_configure_unbound_anti_doh()
+{
+	global $config;
+	if (!function_exists("write_config")) {
+		return array("ok" => false, "msg" => l7_t("Funcao write_config nao disponivel."));
 	}
+	if (!isset($config['unbound'])) {
+		return array("ok" => false, "msg" => l7_t("Seccao Unbound nao encontrada no config.xml."));
+	}
+	$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
+	$existing = isset($config['unbound']['custom_options']) ? $config['unbound']['custom_options'] : "";
+	if (!is_string($existing)) {
+		$existing = "";
+	}
+	if (strpos($existing, $marker_start) !== false) {
+		return array("ok" => true, "msg" => l7_t("Overrides anti-DoH ja estao configurados."));
+	}
+	$block = layer7_anti_doh_block();
+	$clean_existing = "";
+	if ($existing !== "" && preg_match('/^[\x09\x0A\x0D\x20-\x7E]*$/', $existing)) {
+		$clean_existing = rtrim($existing) . "\n\n";
+	}
+	$config['unbound']['custom_options'] = $clean_existing . $block;
+	write_config("Layer7: anti-DoH NXDOMAIN overrides");
 	if (function_exists("services_unbound_configure")) {
 		services_unbound_configure();
-	} else {
-		exec("/usr/local/sbin/pfSsh.php playback svc restart unbound 2>&1");
 	}
 	return array("ok" => true, "msg" => l7_t("Overrides anti-DoH configurados e Unbound reiniciado com sucesso."));
 }
 
 /**
- * Verifica se os overrides anti-DoH estão configurados no Unbound do pfSense.
- * Verifica no custom_options do config.xml (fonte de verdade).
+ * Remove os overrides anti-DoH do custom_options do Unbound.
+ * @return array ("ok" => bool, "msg" => string)
+ */
+function layer7_remove_unbound_anti_doh()
+{
+	global $config;
+	if (!function_exists("write_config") || !isset($config['unbound'])) {
+		return array("ok" => false, "msg" => l7_t("Config nao acessivel."));
+	}
+	$existing = isset($config['unbound']['custom_options']) ? $config['unbound']['custom_options'] : "";
+	if (!is_string($existing)) {
+		$existing = "";
+	}
+	$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
+	$marker_end = "# --- Layer7 anti-DoH/Relay END ---";
+	$pos_start = strpos($existing, $marker_start);
+	if ($pos_start === false) {
+		return array("ok" => true, "msg" => l7_t("Overrides anti-DoH nao encontrados."));
+	}
+	$pos_end = strpos($existing, $marker_end, $pos_start);
+	if ($pos_end !== false) {
+		$pos_end += strlen($marker_end);
+		while ($pos_end < strlen($existing) && ($existing[$pos_end] === "\n" || $existing[$pos_end] === "\r")) {
+			$pos_end++;
+		}
+		$existing = substr($existing, 0, $pos_start) . substr($existing, $pos_end);
+	}
+	$config['unbound']['custom_options'] = trim($existing);
+	write_config("Layer7: anti-DoH overrides removed");
+	if (function_exists("services_unbound_configure")) {
+		services_unbound_configure();
+	}
+	return array("ok" => true, "msg" => l7_t("Overrides anti-DoH removidos do Unbound."));
+}
+
+/**
+ * Verifica se os overrides anti-DoH estao configurados no Unbound.
+ * Verifica no custom_options do config.xml e tambem no ficheiro gerado.
  * @return bool
  */
 function layer7_unbound_anti_doh_configured()
 {
 	global $config;
 	$marker = "# --- Layer7 anti-DoH/Relay START ---";
-	$custom = isset($config['unbound']['custom_options']) ? (string)$config['unbound']['custom_options'] : "";
-	return (strpos($custom, $marker) !== false);
+	if (isset($config['unbound']['custom_options']) && is_string($config['unbound']['custom_options'])) {
+		if (strpos($config['unbound']['custom_options'], $marker) !== false) {
+			return true;
+		}
+	}
+	if (file_exists("/var/unbound/unbound.conf")) {
+		$content = @file_get_contents("/var/unbound/unbound.conf");
+		if ($content !== false && strpos($content, "Layer7 anti-DoH") !== false) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function layer7_signal_reload()
