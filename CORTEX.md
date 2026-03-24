@@ -196,14 +196,22 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**V1 Comercial publicada.** Todos os 10 blocos executados. Build final compilado
-no FreeBSD lab. GitHub Release v1.0.0 publicada. Propriedade Systemup Solucao em
-Tecnologia em todas as paginas GUI. Proximo: piloto em producao e frontend de licencas.
+**Servidor de licencas OPERACIONAL.** V1 Comercial publicada + license server
+completo em `192.168.100.244:8445` com activacao end-to-end validada.
+Pacote `pfSense-pkg-layer7-1.0.1.pkg` compilado com chave publica de producao.
+
+**Progresso license server:**
+- [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
+- [x] Bloco 2: Backend — Database e crypto (schema SQL, db.js, crypto.js, seed.js, package.json)
+- [x] Bloco 3: Backend — API (Express, JWT, login, activate, licenses CRUD, customers CRUD, dashboard)
+- [x] Bloco 4: Frontend (React 18, Vite, TailwindCSS, 7 paginas, 5 componentes)
+- [x] Bloco 5: Deploy no 192.168.100.244 (4 containers up, seed OK, validacao LAN OK)
+- [x] Bloco 6: Integracao (URL+pubkey no license.c, fix parser JSON, rebuild 1.0.1, activacao end-to-end OK)
 
 ## Proximos 3 passos
-1. Piloto estavel 24h+ sem incidente em pfSense de producao
-2. Gerar par de chaves Ed25519 de producao e embutir no binario
-3. Frontend de gestao de licencas (servidor de licencas)
+1. Configurar proxy reverso no ISPConfig para license.systemup.inf.br → 192.168.100.244:8445
+2. Publicar GitHub Release v1.0.1 com pacote pfSense-pkg-layer7-1.0.1.pkg
+3. Piloto em producao com licenca real emitida pelo servidor
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

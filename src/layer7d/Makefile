@@ -9,7 +9,7 @@
 # Smoke: make OUT=layer7d-smoke VSTR_DIR=/tmp/l7vers NDPI=0
 
 LAYER7_COMMON = ../common
-SRCS_BASE = main.c config_parse.c policy.c enforce.c
+SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c
 OUT ?= layer7d
 VSTR_DIR ?= .
 
@@ -38,7 +38,7 @@ $(OUT): $(SRCS)
 		echo "layer7d Makefile: falta /usr/local/lib/libndpi.a para gerar binário autocontido"; exit 1; \
 	fi
 	$(CC) $(CFLAGS) -Wall -Wextra -O2 -I$(VSTR_DIR) -I. -I$(LAYER7_COMMON) \
-		$(NDPI_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS)
+		$(NDPI_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS) -lcrypto
 
 clean:
 	rm -f layer7d layer7d-smoke

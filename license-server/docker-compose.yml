@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: layer7-license-db
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - layer7-license-pgdata:/var/lib/postgresql/data
+      - ./backend/migrations/001-init.sql:/docker-entrypoint-initdb.d/001-init.sql
+    networks:
+      - layer7-license-net
+
+  api:
+    container_name: layer7-license-api
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      ED25519_PRIVATE_KEY: ${ED25519_PRIVATE_KEY}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+    networks:
+      - layer7-license-net
+
+  web:
+    container_name: layer7-license-web
+    build: ./frontend
+    restart: unless-stopped
+    networks:
+      - layer7-license-net
+
+  nginx:
+    container_name: layer7-license-nginx
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+      - web
+    ports:
+      - "8445:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - layer7-license-net
+
+volumes:
+  layer7-license-pgdata:
+
+networks:
+  layer7-license-net:
+    driver: bridge

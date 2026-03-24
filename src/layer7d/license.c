@@ -28,10 +28,10 @@
  * Use scripts/license/generate-license.py to create a key pair.
  */
 static const unsigned char l7_ed25519_pubkey[32] = {
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	0x8c, 0x52, 0xb6, 0x77, 0x2a, 0x64, 0x74, 0x9e,
+	0x4a, 0x57, 0xb3, 0x4b, 0xa1, 0x65, 0x78, 0xa1,
+	0xb1, 0x30, 0x96, 0x0b, 0x1a, 0x8e, 0x88, 0xe6,
+	0xc1, 0xd8, 0x6d, 0xbd, 0x99, 0xfd, 0x18, 0x24
 };
 
 static int
@@ -147,8 +147,8 @@ static const char *
 json_find_string(const char *json, const char *key, char *val, size_t valsz)
 {
 	char needle[128];
-	const char *p, *start, *end;
-	size_t len;
+	const char *p;
+	size_t i = 0;
 
 	snprintf(needle, sizeof(needle), "\"%s\"", key);
 	p = strstr(json, needle);
@@ -159,16 +159,24 @@ json_find_string(const char *json, const char *key, char *val, size_t valsz)
 		p++;
 	if (*p != '"')
 		return NULL;
-	start = ++p;
-	end = strchr(start, '"');
-	if (!end)
-		return NULL;
-	len = (size_t)(end - start);
-	if (len >= valsz)
-		len = valsz - 1;
-	memcpy(val, start, len);
-	val[len] = '\0';
-	return val;
+	p++;
+
+	while (*p && i < valsz - 1) {
+		if (*p == '\\' && *(p + 1) == '"') {
+			val[i++] = '"';
+			p += 2;
+		} else if (*p == '\\' && *(p + 1) == '\\') {
+			val[i++] = '\\';
+			p += 2;
+		} else if (*p == '"') {
+			break;
+		} else {
+			val[i++] = *p;
+			p++;
+		}
+	}
+	val[i] = '\0';
+	return (i > 0) ? val : NULL;
 }
 
 /* --- license file verification --- */
@@ -415,7 +423,7 @@ layer7_activate(const char *key, const char *url)
 	}
 
 	if (!url || url[0] == '\0')
-		url = "https://license.layer7-pfsense.com/activate";
+		url = "https://license.systemup.inf.br/api/activate";
 
 	fprintf(stderr, "layer7d: activating...\n");
 	fprintf(stderr, "  server:       %s\n", url);

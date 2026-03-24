@@ -18,6 +18,7 @@ Seu papel é:
 
 1. Sempre começar lendo:
    - `CORTEX.md`
+   - `docs/10-license-server/PLANO-LICENSE-SERVER.md` (plano do servidor de licencas — PROXIMA TAREFA)
    - `docs/00-overview/product-charter.md`
    - `docs/01-architecture/target-architecture.md`
    - `docs/02-roadmap/roadmap.md`
