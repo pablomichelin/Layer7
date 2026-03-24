@@ -103,36 +103,9 @@ if ($_POST["add_profile_policy"] ?? false) {
 					$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
 
 					if (isset($profile["extra_action"]) && $profile["extra_action"] === "configure_unbound_anti_doh") {
-						$ub_conf = "/var/unbound/unbound.conf";
-						$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
-						if (file_exists($ub_conf)) {
-							$ub_content = @file_get_contents($ub_conf);
-							if (strpos($ub_content, $marker_start) === false) {
-								$marker_end = "# --- Layer7 anti-DoH/Relay END ---";
-								$doh_domains = array(
-									"mask.icloud.com", "mask-h2.icloud.com", "use-application-dns.net",
-									"dns.google", "dns.google.com", "8888.google", "dns64.dns.google",
-									"cloudflare-dns.com", "one.one.one.one", "1dot1dot1dot1.cloudflare-dns.com",
-									"security.cloudflare-dns.com", "family.cloudflare-dns.com",
-									"dns.quad9.net", "dns9.quad9.net", "dns10.quad9.net", "dns11.quad9.net",
-									"dns.adguard.com", "dns-family.adguard.com", "dns-unfiltered.adguard.com",
-									"doh.opendns.com", "doh.cleanbrowsing.org", "dns.nextdns.io",
-									"doh.xfinity.com", "ordns.he.net"
-								);
-								$block = "\n{$marker_start}\n";
-								$block .= "# Dominios de resolvers DoH/DoT e Apple Private Relay.\n";
-								$block .= "# Devolver NXDOMAIN forca fallback para DNS convencional.\n";
-								$block .= "# Gerado pela GUI Layer7.\n";
-								foreach ($doh_domains as $d) {
-									$block .= "server:\n    local-zone: \"{$d}.\" always_nxdomain\n";
-								}
-								$block .= "{$marker_end}\n";
-								@copy($ub_conf, $ub_conf . ".layer7-bak." . date("YmdHis"));
-								if (@file_put_contents($ub_conf, $ub_content . $block) !== false) {
-									exec("/usr/local/sbin/pfSsh.php playback svc restart unbound 2>&1", $restart_out, $restart_code);
-									$savemsg .= " " . l7_t("Unbound anti-DoH tambem configurado.");
-								}
-							}
+						$doh_result = layer7_configure_unbound_anti_doh();
+						if ($doh_result["ok"]) {
+							$savemsg .= " " . l7_t("Unbound anti-DoH tambem configurado.");
 						}
 					}
 				}

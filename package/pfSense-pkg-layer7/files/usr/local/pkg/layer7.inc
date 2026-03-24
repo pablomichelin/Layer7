@@ -266,6 +266,64 @@ function layer7_restart_service()
 	return false;
 }
 
+/**
+ * Configura Unbound anti-DoH via custom_options do pfSense config.xml.
+ * Persiste entre reinícios do Unbound (ao contrário de editar unbound.conf directamente).
+ * @return array ("ok" => bool, "msg" => string)
+ */
+function layer7_configure_unbound_anti_doh()
+{
+	global $config;
+	if (!isset($config['unbound'])) {
+		$config['unbound'] = array();
+	}
+	$marker = "# --- Layer7 anti-DoH/Relay START ---";
+	$existing = isset($config['unbound']['custom_options']) ? (string)$config['unbound']['custom_options'] : "";
+	if (strpos($existing, $marker) !== false) {
+		return array("ok" => true, "msg" => l7_t("Overrides anti-DoH ja estao configurados."));
+	}
+	$doh_domains = array(
+		"mask.icloud.com", "mask-h2.icloud.com", "use-application-dns.net",
+		"dns.google", "dns.google.com", "8888.google", "dns64.dns.google",
+		"cloudflare-dns.com", "one.one.one.one", "1dot1dot1dot1.cloudflare-dns.com",
+		"security.cloudflare-dns.com", "family.cloudflare-dns.com",
+		"dns.quad9.net", "dns9.quad9.net", "dns10.quad9.net", "dns11.quad9.net",
+		"dns.adguard.com", "dns-family.adguard.com", "dns-unfiltered.adguard.com",
+		"doh.opendns.com", "doh.cleanbrowsing.org", "dns.nextdns.io",
+		"doh.xfinity.com", "ordns.he.net"
+	);
+	$block = "\n{$marker}\n";
+	$block .= "# Layer7 anti-DoH: NXDOMAIN para resolvers DoH conhecidos\n";
+	foreach ($doh_domains as $d) {
+		$block .= "server:\n";
+		$block .= "local-zone: \"{$d}.\" always_nxdomain\n";
+	}
+	$block .= "# --- Layer7 anti-DoH/Relay END ---\n";
+	$config['unbound']['custom_options'] = $existing . $block;
+	if (function_exists("write_config")) {
+		write_config("Layer7: anti-DoH overrides added to Unbound custom_options");
+	}
+	if (function_exists("services_unbound_configure")) {
+		services_unbound_configure();
+	} else {
+		exec("/usr/local/sbin/pfSsh.php playback svc restart unbound 2>&1");
+	}
+	return array("ok" => true, "msg" => l7_t("Overrides anti-DoH configurados e Unbound reiniciado com sucesso."));
+}
+
+/**
+ * Verifica se os overrides anti-DoH estão configurados no Unbound do pfSense.
+ * Verifica no custom_options do config.xml (fonte de verdade).
+ * @return bool
+ */
+function layer7_unbound_anti_doh_configured()
+{
+	global $config;
+	$marker = "# --- Layer7 anti-DoH/Relay START ---";
+	$custom = isset($config['unbound']['custom_options']) ? (string)$config['unbound']['custom_options'] : "";
+	return (strpos($custom, $marker) !== false);
+}
+
 function layer7_signal_reload()
 {
 	$pidf = "/var/run/layer7d.pid";

@@ -57,47 +57,7 @@ if (isset($_POST["send_sighup"]) && $status_ok && $pid !== null) {
 
 $anti_doh_result = null;
 if (isset($_POST["configure_anti_doh"])) {
-	$ub_conf = "/var/unbound/unbound.conf";
-	$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
-	$marker_end = "# --- Layer7 anti-DoH/Relay END ---";
-	if (!file_exists($ub_conf)) {
-		$anti_doh_result = array("ok" => false, "msg" => l7_t("Ficheiro unbound.conf nao encontrado."));
-	} else {
-		$ub_content = @file_get_contents($ub_conf);
-		if (strpos($ub_content, $marker_start) !== false) {
-			$anti_doh_result = array("ok" => true, "msg" => l7_t("Overrides anti-DoH ja estao configurados."));
-		} else {
-			$doh_domains = array(
-				"mask.icloud.com", "mask-h2.icloud.com", "use-application-dns.net",
-				"dns.google", "dns.google.com", "8888.google", "dns64.dns.google",
-				"cloudflare-dns.com", "one.one.one.one", "1dot1dot1dot1.cloudflare-dns.com",
-				"security.cloudflare-dns.com", "family.cloudflare-dns.com",
-				"dns.quad9.net", "dns9.quad9.net", "dns10.quad9.net", "dns11.quad9.net",
-				"dns.adguard.com", "dns-family.adguard.com", "dns-unfiltered.adguard.com",
-				"doh.opendns.com", "doh.cleanbrowsing.org", "dns.nextdns.io",
-				"doh.xfinity.com", "ordns.he.net"
-			);
-			$block = "\n{$marker_start}\n";
-			$block .= "# Dominios de resolvers DoH/DoT e Apple Private Relay.\n";
-			$block .= "# Devolver NXDOMAIN forca fallback para DNS convencional.\n";
-			$block .= "# Gerado pela GUI Layer7.\n";
-			foreach ($doh_domains as $d) {
-				$block .= "server:\n    local-zone: \"{$d}.\" always_nxdomain\n";
-			}
-			$block .= "{$marker_end}\n";
-			@copy($ub_conf, $ub_conf . ".layer7-bak." . date("YmdHis"));
-			if (@file_put_contents($ub_conf, $ub_content . $block) !== false) {
-				exec("/usr/local/sbin/pfSsh.php playback svc restart unbound 2>&1", $restart_out, $restart_code);
-				if ($restart_code === 0) {
-					$anti_doh_result = array("ok" => true, "msg" => l7_t("Overrides anti-DoH configurados e Unbound reiniciado com sucesso."));
-				} else {
-					$anti_doh_result = array("ok" => true, "msg" => l7_t("Overrides adicionados, mas falha ao reiniciar Unbound. Reinicie manualmente."));
-				}
-			} else {
-				$anti_doh_result = array("ok" => false, "msg" => l7_t("Erro ao escrever em unbound.conf."));
-			}
-		}
-	}
+	$anti_doh_result = layer7_configure_unbound_anti_doh();
 }
 
 $recent_logs = array();
@@ -147,11 +107,7 @@ $pf_anti_dot_hits = array();
 exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:anti-' 2>/dev/null", $pf_anti_dot_hits, $pf_anti_dot_code);
 $pf_anti_dot_loaded = ($pf_anti_dot_code === 0 && count($pf_anti_dot_hits) > 0);
 
-$unbound_anti_doh = false;
-if (file_exists("/var/unbound/unbound.conf")) {
-	exec("/usr/bin/grep -c 'Layer7 anti-DoH' /var/unbound/unbound.conf 2>/dev/null", $ub_out, $ub_code);
-	$unbound_anti_doh = ($ub_code === 0 && !empty($ub_out[0]) && (int)$ub_out[0] > 0);
-}
+$unbound_anti_doh = layer7_unbound_anti_doh_configured();
 
 $data = layer7_load_or_default();
 $L = isset($data["layer7"]) ? $data["layer7"] : array();
