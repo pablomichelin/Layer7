@@ -23,7 +23,7 @@ if (isset($_POST["do_download"])) {
 		layer7_bl_config_save($bl_config);
 	}
 	layer7_bl_download_start();
-	$savemsg = gettext("Download iniciado. Acompanhe o progresso abaixo.");
+	$savemsg = l7_t("Download iniciado. Acompanhe o progresso abaixo.");
 }
 
 /* POST: Save rule */
@@ -36,10 +36,10 @@ if (isset($_POST["save_rule"])) {
 	$rexcept_raw = trim($_POST["rule_except"] ?? "");
 
 	if ($rname === "") {
-		$input_errors[] = gettext("O nome da regra e obrigatorio.");
+		$input_errors[] = l7_t("O nome da regra e obrigatorio.");
 	}
 	if (empty($rcats)) {
-		$input_errors[] = gettext("Seleccione pelo menos uma categoria.");
+		$input_errors[] = l7_t("Seleccione pelo menos uma categoria.");
 	}
 
 	$rcidrs = array();
@@ -50,7 +50,7 @@ if (isset($_POST["save_rule"])) {
 			if (layer7_ipv4_valid($line) || layer7_cidr_valid($line)) {
 				$rcidrs[] = $line;
 			} else {
-				$input_errors[] = gettext("IP/CIDR invalido: ") . htmlspecialchars($line);
+				$input_errors[] = l7_t("IP/CIDR invalido: ") . htmlspecialchars($line);
 			}
 		}
 	}
@@ -63,7 +63,7 @@ if (isset($_POST["save_rule"])) {
 			if (layer7_ipv4_valid($line) || layer7_cidr_valid($line)) {
 				$rexcept[] = $line;
 			} else {
-				$input_errors[] = gettext("IP/CIDR de excepcao invalido: ") . htmlspecialchars($line);
+				$input_errors[] = l7_t("IP/CIDR de excepcao invalido: ") . htmlspecialchars($line);
 			}
 		}
 	}
@@ -83,7 +83,7 @@ if (isset($_POST["save_rule"])) {
 			$bl_config["rules"][(int)$ridx] = $rule;
 		} else {
 			if (count($bl_config["rules"]) >= 8) {
-				$input_errors[] = gettext("Maximo de 8 regras atingido.");
+				$input_errors[] = l7_t("Maximo de 8 regras atingido.");
 			} else {
 				$bl_config["rules"][] = $rule;
 			}
@@ -100,7 +100,7 @@ if (isset($_POST["save_rule"])) {
 			$bl_config["enabled"] = $has_any;
 			layer7_bl_config_save($bl_config);
 			layer7_bl_apply();
-			$savemsg = gettext("Regra guardada. Daemon e regras PF actualizados.");
+			$savemsg = l7_t("Regra guardada. Daemon e regras PF actualizados.");
 		}
 	}
 }
@@ -121,7 +121,7 @@ if (isset($_POST["delete_rule"])) {
 		$bl_config["enabled"] = $has_any;
 		layer7_bl_config_save($bl_config);
 		layer7_bl_apply();
-		$savemsg = gettext("Regra removida.");
+		$savemsg = l7_t("Regra removida.");
 	}
 }
 
@@ -132,7 +132,7 @@ if (isset($_POST["save_whitelist"])) {
 	$bl_config["whitelist"] = $wl;
 	layer7_bl_config_save($bl_config);
 	layer7_bl_apply();
-	$savemsg = gettext("Whitelist guardada. Daemon recarregado.");
+	$savemsg = l7_t("Whitelist guardada. Daemon recarregado.");
 }
 
 /* POST: Save settings */
@@ -145,7 +145,7 @@ if (isset($_POST["save_settings"])) {
 	layer7_bl_config_save($bl_config);
 	$cron_hour = $hours <= 24 ? "3" : "*/" . (int)($hours / 24);
 	layer7_bl_setup_cron($bl_config["auto_update"], $cron_hour);
-	$savemsg = gettext("Definicoes guardadas.");
+	$savemsg = l7_t("Definicoes guardadas.");
 }
 
 /* Reload after any save */
@@ -163,7 +163,7 @@ if (isset($_GET["add"])) {
 	$edit_idx = -2;
 }
 
-$pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Blacklists"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Blacklists"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
 include("head.inc");
 
@@ -172,7 +172,7 @@ layer7_render_styles();
 
 <div class="layer7-page">
 <div class="panel panel-default">
-<div class="panel-heading"><h2 class="panel-title"><?=gettext("Categorias Web (Blacklists)")?></h2></div>
+<div class="panel-heading"><h2 class="panel-title"><?=l7_t("Categorias Web (Blacklists)")?></h2></div>
 <div class="panel-body">
 
 <?php layer7_render_tabs("blacklists"); ?>
@@ -183,40 +183,40 @@ layer7_render_styles();
 
 <!-- SECTION 1: URL & Download -->
 <div class="layer7-section">
-<h3 class="layer7-section-title"><?=gettext("URL e Download")?></h3>
+<h3 class="layer7-section-title"><?=l7_t("URL e Download")?></h3>
 <form method="post">
 <div class="form-group">
-	<label><?=gettext("URL da blacklist")?></label>
+	<label><?=l7_t("URL da blacklist")?></label>
 	<input type="text" class="form-control" name="source_url"
 		value="<?=htmlspecialchars($bl_config["source_url"] ?? "")?>"
 		placeholder="http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz">
-	<p class="help-block"><?=gettext("Endereco do arquivo blacklists.tar.gz (formato UT1 Toulouse).")?></p>
+	<p class="help-block"><?=l7_t("Endereco do arquivo blacklists.tar.gz (formato UT1 Toulouse).")?></p>
 </div>
 <button type="submit" name="do_download" class="btn btn-primary">
-	<i class="fa fa-download"></i> <?=gettext("Download")?>
+	<i class="fa fa-download"></i> <?=l7_t("Download")?>
 </button>
 </form>
 
 <div style="margin-top:14px;">
-	<label><?=gettext("Log de download")?></label>
+	<label><?=l7_t("Log de download")?></label>
 	<textarea id="download_log" class="form-control" rows="6" readonly
 		style="font-family:monospace; font-size:12px; background:#f8f8f8;"><?=htmlspecialchars(layer7_bl_download_status())?></textarea>
 	<button type="button" class="btn btn-default btn-xs" style="margin-top:6px;"
 		onclick="pollDownloadLog();">
-		<i class="fa fa-refresh"></i> <?=gettext("Actualizar log")?>
+		<i class="fa fa-refresh"></i> <?=l7_t("Actualizar log")?>
 	</button>
 </div>
 </div>
 
 <!-- SECTION 2: Blacklist Rules -->
 <div class="layer7-section">
-<h3 class="layer7-section-title"><?=gettext("Regras de Blacklist")?></h3>
-<p class="layer7-lead"><?=gettext("Cada regra define quais categorias bloquear e para quais IPs/CIDRs de origem. Permite bloqueio granular: ex. bloquear gambling para 192.168.10.0/24 mas nao para o director (192.168.10.1).")?></p>
+<h3 class="layer7-section-title"><?=l7_t("Regras de Blacklist")?></h3>
+<p class="layer7-lead"><?=l7_t("Cada regra define quais categorias bloquear e para quais IPs/CIDRs de origem. Permite bloqueio granular: ex. bloquear gambling para 192.168.10.0/24 mas nao para o director (192.168.10.1).")?></p>
 
 <?php if (empty($rules)): ?>
 <div class="alert alert-info">
 	<i class="fa fa-info-circle"></i>
-	<?=gettext("Nenhuma regra configurada. Adicione uma regra para comecar a bloquear categorias.")?>
+	<?=l7_t("Nenhuma regra configurada. Adicione uma regra para comecar a bloquear categorias.")?>
 </div>
 <?php else: ?>
 <div class="table-responsive">
@@ -224,13 +224,13 @@ layer7_render_styles();
 <thead>
 <tr>
 	<th>#</th>
-	<th><?=gettext("Nome")?></th>
-	<th><?=gettext("Categorias")?></th>
-	<th><?=gettext("Origem (CIDRs)")?></th>
-	<th><?=gettext("Excepcoes")?></th>
-	<th><?=gettext("Estado")?></th>
-	<th><?=gettext("Tabela PF")?></th>
-	<th><?=gettext("Accoes")?></th>
+	<th><?=l7_t("Nome")?></th>
+	<th><?=l7_t("Categorias")?></th>
+	<th><?=l7_t("Origem (CIDRs)")?></th>
+	<th><?=l7_t("Excepcoes")?></th>
+	<th><?=l7_t("Estado")?></th>
+	<th><?=l7_t("Tabela PF")?></th>
+	<th><?=l7_t("Accoes")?></th>
 </tr>
 </thead>
 <tbody>
@@ -245,13 +245,13 @@ layer7_render_styles();
 		if (count($cats) > 5) $cat_display .= " (+" . (count($cats) - 5) . ")";
 		echo htmlspecialchars($cat_display);
 		?>
-		<br><small class="text-muted"><?=count($cats)?> <?=gettext("categorias")?></small>
+		<br><small class="text-muted"><?=count($cats)?> <?=l7_t("categorias")?></small>
 	</td>
 	<td>
 		<?php
 		$cidrs = $rule["src_cidrs"] ?? array();
 		if (empty($cidrs)) {
-			echo '<em class="text-warning">' . gettext("Todos (global)") . '</em>';
+			echo '<em class="text-warning">' . l7_t("Todos (global)") . '</em>';
 		} else {
 			echo htmlspecialchars(implode(", ", $cidrs));
 		}
@@ -265,16 +265,16 @@ layer7_render_styles();
 	</td>
 	<td>
 		<?php if (!empty($rule["enabled"])): ?>
-		<span class="label label-success"><?=gettext("Activa")?></span>
+		<span class="label label-success"><?=l7_t("Activa")?></span>
 		<?php else: ?>
-		<span class="label label-default"><?=gettext("Inactiva")?></span>
+		<span class="label label-default"><?=l7_t("Inactiva")?></span>
 		<?php endif; ?>
 	</td>
 	<td><code>layer7_bld_<?=$idx?></code></td>
 	<td class="layer7-table-actions">
 		<a href="?edit=<?=$idx?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
 		<form method="post" style="display:inline;"
-			onsubmit="return confirm('<?=gettext("Remover esta regra?")?>');">
+			onsubmit="return confirm('<?=l7_t("Remover esta regra?")?>');">
 			<input type="hidden" name="rule_index" value="<?=$idx?>">
 			<button type="submit" name="delete_rule" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
 		</form>
@@ -292,7 +292,7 @@ layer7_render_styles();
 
 <?php if (count($rules) < 8): ?>
 <a href="?add=1" class="btn btn-success" style="margin-top:8px;">
-	<i class="fa fa-plus"></i> <?=gettext("Adicionar regra")?>
+	<i class="fa fa-plus"></i> <?=l7_t("Adicionar regra")?>
 </a>
 <?php endif; ?>
 
@@ -307,7 +307,7 @@ if ($show_form):
 		"name" => "", "enabled" => true, "categories" => array(),
 		"src_cidrs" => array(), "except_ips" => array()
 	);
-	$form_title = ($edit_idx >= 0) ? gettext("Editar regra") : gettext("Nova regra");
+	$form_title = ($edit_idx >= 0) ? l7_t("Editar regra") : l7_t("Nova regra");
 ?>
 <div style="margin-top:18px; padding:18px; border:1px solid #ddd; border-radius:4px; background:#fcfcfc;">
 <h4><?=$form_title?></h4>
@@ -317,10 +317,10 @@ if ($show_form):
 <?php endif; ?>
 
 <div class="form-group">
-	<label><?=gettext("Nome da regra")?></label>
+	<label><?=l7_t("Nome da regra")?></label>
 	<input type="text" class="form-control" name="rule_name"
 		value="<?=htmlspecialchars($erule["name"])?>"
-		placeholder="<?=gettext("Ex: Funcionarios, Convidados, Alunos...")?>"
+		placeholder="<?=l7_t("Ex: Funcionarios, Convidados, Alunos...")?>"
 		style="max-width:400px;" required>
 </div>
 
@@ -328,23 +328,23 @@ if ($show_form):
 	<label class="checkbox-inline">
 		<input type="checkbox" name="rule_enabled" value="1"
 			<?=(!empty($erule["enabled"])) ? "checked" : ""?>>
-		<?=gettext("Regra activa")?>
+		<?=l7_t("Regra activa")?>
 	</label>
 </div>
 
 <div class="form-group">
-	<label><?=gettext("Categorias a bloquear")?></label>
+	<label><?=l7_t("Categorias a bloquear")?></label>
 	<?php if ($discovered === null): ?>
 	<div class="alert alert-warning" style="margin:0;">
 		<i class="fa fa-exclamation-triangle"></i>
-		<?=gettext("Faca o download da lista primeiro para ver as categorias disponiveis.")?>
+		<?=l7_t("Faca o download da lista primeiro para ver as categorias disponiveis.")?>
 	</div>
 	<?php else: ?>
 	<input type="text" id="rule_cat_filter" class="form-control l7-filter" style="max-width:300px;"
-		placeholder="<?=gettext("Pesquisar categorias...")?>" onkeyup="filterRuleCats();">
+		placeholder="<?=l7_t("Pesquisar categorias...")?>" onkeyup="filterRuleCats();">
 	<div class="l7-bulk-tools">
-		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(true);"><?=gettext("Seleccionar todas")?></button>
-		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(false);"><?=gettext("Limpar todas")?></button>
+		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(true);"><?=l7_t("Seleccionar todas")?></button>
+		<button type="button" class="btn btn-xs btn-default" onclick="toggleAllRuleCats(false);"><?=l7_t("Limpar todas")?></button>
 	</div>
 	<div class="l7-multiselect-wrap" id="rule_cats_wrap">
 	<?php
@@ -362,31 +362,31 @@ if ($show_form):
 	</label>
 	<?php endforeach; ?>
 	</div>
-	<p class="help-block"><?=gettext("Seleccione as categorias que esta regra deve bloquear.")?></p>
+	<p class="help-block"><?=l7_t("Seleccione as categorias que esta regra deve bloquear.")?></p>
 	<?php endif; ?>
 </div>
 
 <div class="form-group">
-	<label><?=gettext("Origem — IPs ou CIDRs (um por linha)")?></label>
+	<label><?=l7_t("Origem — IPs ou CIDRs (um por linha)")?></label>
 	<textarea class="form-control" name="rule_cidrs" rows="4"
-		placeholder="<?=gettext("Ex: 192.168.10.0/24\nDeixe vazio para bloquear TODOS os clientes (global).")?>"
+		placeholder="<?=l7_t("Ex: 192.168.10.0/24\nDeixe vazio para bloquear TODOS os clientes (global).")?>"
 		style="font-family:monospace; max-width:400px;"><?=htmlspecialchars(implode("\n", $erule["src_cidrs"] ?? array()))?></textarea>
-	<p class="help-block"><?=gettext("IPs/CIDRs de origem sujeitos a esta regra. Se vazio, aplica-se a TODOS os clientes.")?></p>
+	<p class="help-block"><?=l7_t("IPs/CIDRs de origem sujeitos a esta regra. Se vazio, aplica-se a TODOS os clientes.")?></p>
 </div>
 
 <div class="form-group">
-	<label><?=gettext("Excepcoes — IPs excluidos desta regra (um por linha)")?></label>
+	<label><?=l7_t("Excepcoes — IPs excluidos desta regra (um por linha)")?></label>
 	<textarea class="form-control" name="rule_except" rows="3"
-		placeholder="<?=gettext("Ex: 192.168.10.1 (director)")?>"
+		placeholder="<?=l7_t("Ex: 192.168.10.1 (director)")?>"
 		style="font-family:monospace; max-width:400px;"><?=htmlspecialchars(implode("\n", $erule["except_ips"] ?? array()))?></textarea>
-	<p class="help-block"><?=gettext("IPs que NAO sao bloqueados por esta regra, mesmo estando no CIDR de origem.")?></p>
+	<p class="help-block"><?=l7_t("IPs que NAO sao bloqueados por esta regra, mesmo estando no CIDR de origem.")?></p>
 </div>
 
 <div style="margin-top:14px;">
 	<button type="submit" name="save_rule" class="btn btn-primary">
-		<i class="fa fa-save"></i> <?=gettext("Guardar regra")?>
+		<i class="fa fa-save"></i> <?=l7_t("Guardar regra")?>
 	</button>
-	<a href="layer7_blacklists.php" class="btn btn-default"><?=gettext("Cancelar")?></a>
+	<a href="layer7_blacklists.php" class="btn btn-default"><?=l7_t("Cancelar")?></a>
 </div>
 </form>
 </div>
@@ -395,65 +395,65 @@ if ($show_form):
 
 <!-- SECTION 3: Global Whitelist -->
 <div class="layer7-section">
-<h3 class="layer7-section-title"><?=gettext("Whitelist Global")?></h3>
+<h3 class="layer7-section-title"><?=l7_t("Whitelist Global")?></h3>
 <form method="post">
 <div class="form-group">
-	<label><?=gettext("Dominios nunca bloqueados (um por linha)")?></label>
+	<label><?=l7_t("Dominios nunca bloqueados (um por linha)")?></label>
 	<textarea class="form-control" name="whitelist" rows="5"
-		placeholder="<?=gettext("Ex: google.com\nyoutube.com")?>"
+		placeholder="<?=l7_t("Ex: google.com\nyoutube.com")?>"
 		style="font-family:monospace; max-width:500px;"><?=htmlspecialchars(implode("\n", $bl_config["whitelist"] ?? array()))?></textarea>
-	<p class="help-block"><?=gettext("Dominios nesta lista nunca sao bloqueados por NENHUMA regra, mesmo que estejam nas categorias.")?></p>
+	<p class="help-block"><?=l7_t("Dominios nesta lista nunca sao bloqueados por NENHUMA regra, mesmo que estejam nas categorias.")?></p>
 </div>
 <button type="submit" name="save_whitelist" class="btn btn-primary">
-	<i class="fa fa-save"></i> <?=gettext("Guardar whitelist")?>
+	<i class="fa fa-save"></i> <?=l7_t("Guardar whitelist")?>
 </button>
 </form>
 </div>
 
 <!-- SECTION 4: Settings & State -->
 <div class="layer7-section">
-<h3 class="layer7-section-title"><?=gettext("Definicoes e Estado")?></h3>
+<h3 class="layer7-section-title"><?=l7_t("Definicoes e Estado")?></h3>
 <form method="post">
 <div class="form-group">
 	<label class="checkbox-inline">
 		<input type="checkbox" name="auto_update" value="1"
 			<?=(!empty($bl_config["auto_update"])) ? "checked" : ""?>>
-		<?=gettext("Actualizacao automatica")?>
+		<?=l7_t("Actualizacao automatica")?>
 	</label>
 </div>
 <div class="form-group">
-	<label><?=gettext("Intervalo (horas)")?></label>
+	<label><?=l7_t("Intervalo (horas)")?></label>
 	<input type="number" class="form-control" name="update_interval_hours"
 		value="<?=(int)($bl_config["update_interval_hours"] ?? 24)?>"
 		min="1" max="168" style="width:100px;">
 </div>
 <button type="submit" name="save_settings" class="btn btn-primary">
-	<i class="fa fa-save"></i> <?=gettext("Guardar definicoes")?>
+	<i class="fa fa-save"></i> <?=l7_t("Guardar definicoes")?>
 </button>
 </form>
 
 <div style="margin-top:18px;">
 <dl class="dl-horizontal layer7-summary">
-	<dt><?=gettext("Ultima actualizacao")?></dt>
-	<dd><?=$last_update ? htmlspecialchars($last_update) : '<em>' . gettext("Nunca") . '</em>'?></dd>
+	<dt><?=l7_t("Ultima actualizacao")?></dt>
+	<dd><?=$last_update ? htmlspecialchars($last_update) : '<em>' . l7_t("Nunca") . '</em>'?></dd>
 <?php if ($bl_stats): ?>
-	<dt><?=gettext("Regras activas")?></dt>
+	<dt><?=l7_t("Regras activas")?></dt>
 	<dd><?=(int)$bl_stats["rules_active"]?></dd>
-	<dt><?=gettext("Categorias carregadas")?></dt>
-	<dd><?=(int)$bl_stats["categories_active"]?><?php if ($discovered): ?> / <?=count($discovered["categories"])?> <?=gettext("disponiveis")?><?php endif; ?></dd>
-	<dt><?=gettext("Dominios carregados")?></dt>
+	<dt><?=l7_t("Categorias carregadas")?></dt>
+	<dd><?=(int)$bl_stats["categories_active"]?><?php if ($discovered): ?> / <?=count($discovered["categories"])?> <?=l7_t("disponiveis")?><?php endif; ?></dd>
+	<dt><?=l7_t("Dominios carregados")?></dt>
 	<dd><?=number_format((int)$bl_stats["domains_loaded"], 0, ',', '.')?></dd>
-	<dt><?=gettext("Lookups totais")?></dt>
+	<dt><?=l7_t("Lookups totais")?></dt>
 	<dd><?=number_format((int)$bl_stats["lookups"], 0, ',', '.')?></dd>
-	<dt><?=gettext("Hits de blacklist")?></dt>
+	<dt><?=l7_t("Hits de blacklist")?></dt>
 	<dd><?=number_format((int)$bl_stats["hits"], 0, ',', '.')?></dd>
 <?php endif; ?>
 </dl>
 
 <?php if ($bl_stats && is_array($bl_stats["top_categories"]) && count($bl_stats["top_categories"]) > 0): ?>
-<h4><?=gettext("Top categorias bloqueadas")?></h4>
+<h4><?=l7_t("Top categorias bloqueadas")?></h4>
 <table class="table table-condensed" style="max-width:400px;">
-<thead><tr><th><?=gettext("Categoria")?></th><th style="text-align:right;"><?=gettext("Hits")?></th></tr></thead>
+<thead><tr><th><?=l7_t("Categoria")?></th><th style="text-align:right;"><?=l7_t("Hits")?></th></tr></thead>
 <tbody>
 <?php foreach ($bl_stats["top_categories"] as $tc): ?>
 <tr>
@@ -467,8 +467,8 @@ if ($show_form):
 </div>
 
 <div class="layer7-muted-note" style="margin-top:24px; font-size:11px;">
-	<?=gettext("Listas mantidas pela")?> <a href="https://dsi.ut-capitole.fr/blacklists/index_en.php" target="_blank">Universit&eacute; Toulouse Capitole</a>.
-	<?=gettext("Licenca")?> <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA 4.0</a>.
+	<?=l7_t("Listas mantidas pela")?> <a href="https://dsi.ut-capitole.fr/blacklists/index_en.php" target="_blank">Universit&eacute; Toulouse Capitole</a>.
+	<?=l7_t("Licenca")?> <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA 4.0</a>.
 </div>
 
 </div>

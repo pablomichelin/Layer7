@@ -22,7 +22,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 			}
 		}
 		if ($profile === null) {
-			$input_errors[] = gettext("Perfil nao encontrado.");
+			$input_errors[] = l7_t("Perfil nao encontrado.");
 		} else {
 			$data = layer7_load_or_default();
 			if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
@@ -31,7 +31,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 			$policies = &$data["layer7"]["policies"];
 
 			if (count($policies) >= 24) {
-				$input_errors[] = gettext("Limite de 24 politicas.");
+				$input_errors[] = l7_t("Limite de 24 politicas.");
 			} else {
 				$pid = "profile-" . $profile_id;
 				$dup = false;
@@ -42,7 +42,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 					}
 				}
 				if ($dup) {
-					$input_errors[] = sprintf(gettext("Ja existe uma politica com id '%s'. Remova-a primeiro para recriar."), $pid);
+					$input_errors[] = sprintf(l7_t("Ja existe uma politica com id '%s'. Remova-a primeiro para recriar."), $pid);
 				} else {
 					$prof_act = trim($_POST["profile_action"] ?? "block");
 					if (!in_array($prof_act, array("monitor", "allow", "block", "tag"), true)) {
@@ -100,7 +100,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 					$policies[] = $rule;
 					if (layer7_save_json($data)) {
 						layer7_signal_reload();
-						$savemsg = sprintf(gettext("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
+						$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
 					}
 				}
 			}
@@ -117,19 +117,19 @@ if ($_POST["add_policy"] ?? false) {
 		$ok = true;
 
 		if (count($policies) >= 24) {
-			$input_errors[] = gettext("Limite de 24 politicas.");
+			$input_errors[] = l7_t("Limite de 24 politicas.");
 			$ok = false;
 		}
 
 		$pid = trim($_POST["new_id"] ?? "");
 		if ($ok && !layer7_policy_id_valid($pid)) {
-			$input_errors[] = gettext("ID invalido (letras, numeros, _ e -; max. 80).");
+			$input_errors[] = l7_t("ID invalido (letras, numeros, _ e -; max. 80).");
 			$ok = false;
 		}
 		if ($ok) {
 			foreach ($policies as $existing_policy) {
 				if (isset($existing_policy["id"]) && (string)$existing_policy["id"] === $pid) {
-					$input_errors[] = gettext("Ja existe uma politica com esse ID.");
+					$input_errors[] = l7_t("Ja existe uma politica com esse ID.");
 					$ok = false;
 					break;
 				}
@@ -138,13 +138,13 @@ if ($_POST["add_policy"] ?? false) {
 
 		$name = trim($_POST["new_name"] ?? "");
 		if ($ok && strlen($name) > 160) {
-			$input_errors[] = gettext("Nome demasiado longo (max. 160).");
+			$input_errors[] = l7_t("Nome demasiado longo (max. 160).");
 			$ok = false;
 		}
 
 		$pri = (int)($_POST["new_priority"] ?? 50);
 		if ($ok && ($pri < 0 || $pri > 99999)) {
-			$input_errors[] = gettext("Prioridade invalida (0-99999).");
+			$input_errors[] = l7_t("Prioridade invalida (0-99999).");
 			$ok = false;
 		}
 
@@ -164,7 +164,7 @@ if ($_POST["add_policy"] ?? false) {
 			$cats = layer7_split_csv_tokens($_POST["new_ndpi_category_csv"] ?? "", 8, 64);
 		}
 		if ($ok && ($apps === null || $cats === null)) {
-			$input_errors[] = gettext("App ou categoria: cada valor max. 64 caracteres.");
+			$input_errors[] = l7_t("App ou categoria: cada valor max. 64 caracteres.");
 			$ok = false;
 		}
 		$new_match_hosts_pre = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "");
@@ -172,13 +172,13 @@ if ($_POST["add_policy"] ?? false) {
 		    ($act === "block" || $act === "tag") &&
 		    count($apps) + count($cats) === 0 &&
 		    empty($new_match_hosts_pre)) {
-			$input_errors[] = gettext("Para block ou tag, indique app nDPI, categoria e/ou sites/hosts.");
+			$input_errors[] = l7_t("Para block ou tag, indique app nDPI, categoria e/ou sites/hosts.");
 			$ok = false;
 		}
 
 		$tag_table = trim($_POST["new_tag_table"] ?? "");
 		if ($ok && $act === "tag" && !layer7_pf_table_name_valid($tag_table)) {
-			$input_errors[] = gettext("Tabela PF (tag): apenas A-Z, a-z, 0-9, _ (1-63 caracteres).");
+			$input_errors[] = l7_t("Tabela PF (tag): apenas A-Z, a-z, 0-9, _ (1-63 caracteres).");
 			$ok = false;
 		}
 
@@ -244,7 +244,7 @@ if ($_POST["add_policy"] ?? false) {
 			$policies[] = $rule;
 			if (layer7_save_json($data)) {
 				layer7_signal_reload();
-				$savemsg = gettext("Politica adicionada.");
+				$savemsg = l7_t("Politica adicionada.");
 			}
 		}
 		unset($policies);
@@ -263,7 +263,7 @@ if ($_POST["save_policies"] ?? false) {
 		unset($policies);
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
-			$savemsg = gettext("Politicas atualizadas.");
+			$savemsg = l7_t("Politicas atualizadas.");
 		}
 }
 
@@ -276,12 +276,12 @@ if ($_POST["delete_policy"] ?? false) {
 		$idx = (int)($_POST["delete_policy_index"] ?? -1);
 		$count = count($policies);
 		if ($idx < 0 || $idx >= $count) {
-			$input_errors[] = gettext("Indice de politica invalido.");
+			$input_errors[] = l7_t("Indice de politica invalido.");
 		} else {
 			array_splice($policies, $idx, 1);
 			if (layer7_save_json($data)) {
 				layer7_signal_reload();
-				$savemsg = gettext("Politica removida.");
+				$savemsg = l7_t("Politica removida.");
 			}
 		}
 		unset($policies);
@@ -296,7 +296,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 		$idx = (int)($_POST["edit_policy_index"] ?? -1);
 		$count = count($policies);
 		if ($idx < 0 || $idx >= $count) {
-			$input_errors[] = gettext("Indice de politica invalido.");
+			$input_errors[] = l7_t("Indice de politica invalido.");
 		} else {
 			$layer7_policy_edit_retry = $idx;
 			$orig = $policies[$idx];
@@ -305,13 +305,13 @@ if ($_POST["save_policy_edit"] ?? false) {
 			$ok = true;
 			$name = trim($_POST["edit_name"] ?? "");
 			if ($ok && strlen($name) > 160) {
-				$input_errors[] = gettext("Nome demasiado longo (max. 160).");
+				$input_errors[] = l7_t("Nome demasiado longo (max. 160).");
 				$ok = false;
 			}
 
 			$pri = (int)($_POST["edit_priority"] ?? 50);
 			if ($ok && ($pri < 0 || $pri > 99999)) {
-				$input_errors[] = gettext("Prioridade invalida (0-99999).");
+				$input_errors[] = l7_t("Prioridade invalida (0-99999).");
 				$ok = false;
 			}
 
@@ -331,7 +331,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 				$cats = layer7_split_csv_tokens($_POST["edit_ndpi_category_csv"] ?? "", 8, 64);
 			}
 			if ($ok && ($apps === null || $cats === null)) {
-				$input_errors[] = gettext("App ou categoria: cada valor max. 64 caracteres.");
+				$input_errors[] = l7_t("App ou categoria: cada valor max. 64 caracteres.");
 				$ok = false;
 			}
 			$edit_match_hosts_pre = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "");
@@ -339,13 +339,13 @@ if ($_POST["save_policy_edit"] ?? false) {
 			    ($act === "block" || $act === "tag") &&
 			    count($apps) + count($cats) === 0 &&
 			    empty($edit_match_hosts_pre)) {
-				$input_errors[] = gettext("Para block ou tag, indique app nDPI, categoria e/ou sites/hosts.");
+				$input_errors[] = l7_t("Para block ou tag, indique app nDPI, categoria e/ou sites/hosts.");
 				$ok = false;
 			}
 
 			$tag_table = trim($_POST["edit_tag_table"] ?? "");
 			if ($ok && $act === "tag" && !layer7_pf_table_name_valid($tag_table)) {
-				$input_errors[] = gettext("Tabela PF (tag): apenas A-Z, a-z, 0-9, _ (1-63 caracteres).");
+				$input_errors[] = l7_t("Tabela PF (tag): apenas A-Z, a-z, 0-9, _ (1-63 caracteres).");
 				$ok = false;
 			}
 
@@ -414,7 +414,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 					header("Location: layer7_policies.php");
 					exit;
 				}
-				$input_errors[] = gettext("Nao foi possivel gravar a configuracao.");
+				$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
 			}
 		}
 		unset($policies);
@@ -456,53 +456,53 @@ $ndpi_cats = isset($ndpi_list["categories"]) ? $ndpi_list["categories"] : array(
 sort($ndpi_protos);
 sort($ndpi_cats);
 
-$pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Policies"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Policies"));
 include("head.inc");
 layer7_render_styles();
 
 function layer7_policy_match_summary($policy) {
 	$matches = array();
 	if (!empty($policy["interfaces"]) && is_array($policy["interfaces"])) {
-		$matches[] = gettext("Ifaces") . ": " . implode(", ", $policy["interfaces"]);
+		$matches[] = l7_t("Ifaces") . ": " . implode(", ", $policy["interfaces"]);
 	}
 	if (!empty($policy["match"]["ndpi_app"]) && is_array($policy["match"]["ndpi_app"])) {
-		$matches[] = gettext("Apps") . ": " . implode(", ", $policy["match"]["ndpi_app"]);
+		$matches[] = l7_t("Apps") . ": " . implode(", ", $policy["match"]["ndpi_app"]);
 	}
 	if (!empty($policy["match"]["ndpi_category"]) && is_array($policy["match"]["ndpi_category"])) {
-		$matches[] = gettext("Categorias") . ": " . implode(", ", $policy["match"]["ndpi_category"]);
+		$matches[] = l7_t("Categorias") . ": " . implode(", ", $policy["match"]["ndpi_category"]);
 	}
 	if (!empty($policy["match"]["hosts"]) && is_array($policy["match"]["hosts"])) {
-		$matches[] = gettext("Sites") . ": " . implode(", ", $policy["match"]["hosts"]);
+		$matches[] = l7_t("Sites") . ": " . implode(", ", $policy["match"]["hosts"]);
 	}
 	if (!empty($policy["match"]["src_hosts"]) && is_array($policy["match"]["src_hosts"])) {
-		$matches[] = gettext("IPs") . ": " . implode(", ", $policy["match"]["src_hosts"]);
+		$matches[] = l7_t("IPs") . ": " . implode(", ", $policy["match"]["src_hosts"]);
 	}
 	if (!empty($policy["match"]["src_cidrs"]) && is_array($policy["match"]["src_cidrs"])) {
-		$matches[] = gettext("CIDRs") . ": " . implode(", ", $policy["match"]["src_cidrs"]);
+		$matches[] = l7_t("CIDRs") . ": " . implode(", ", $policy["match"]["src_cidrs"]);
 	}
 	if (!empty($policy["match"]["groups"]) && is_array($policy["match"]["groups"])) {
-		$matches[] = gettext("Grupos") . ": " . implode(", ", $policy["match"]["groups"]);
+		$matches[] = l7_t("Grupos") . ": " . implode(", ", $policy["match"]["groups"]);
 	}
 	if (!empty($policy["tag_table"]) && (($policy["action"] ?? "") === "tag")) {
-		$matches[] = gettext("Tabela PF") . ": " . $policy["tag_table"];
+		$matches[] = l7_t("Tabela PF") . ": " . $policy["tag_table"];
 	}
 	$sched_label = layer7_schedule_summary($policy);
-	if ($sched_label !== gettext("Sempre activa")) {
-		$matches[] = gettext("Horario") . ": " . $sched_label;
+	if ($sched_label !== l7_t("Sempre activa")) {
+		$matches[] = l7_t("Horario") . ": " . $sched_label;
 	}
-	return count($matches) > 0 ? $matches : array(gettext("Sem filtros especificos."));
+	return count($matches) > 0 ? $matches : array(l7_t("Sem filtros especificos."));
 }
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 - politicas"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Layer 7 - politicas"); ?></h2>
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 
-			<p class="layer7-lead"><?= gettext("Organize a ordem de avaliacao, ajuste o estado de cada regra e mantenha a base de politicas pronta para o modo de enforcement."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Organize a ordem de avaliacao, ajuste o estado de cada regra e mantenha a base de politicas pronta para o modo de enforcement."); ?></p>
 
 		<?php
 		$l7_profiles = layer7_load_profiles();
@@ -510,8 +510,8 @@ function layer7_policy_match_summary($policy) {
 		$prof_ifaces = layer7_get_pfsense_interfaces();
 		?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Perfis rapidos"); ?></h3>
-			<p class="layer7-lead"><?= gettext("Clique num perfil para criar automaticamente uma politica com todas as apps e dominios associados. Escolha a accao, interfaces e sub-redes antes de aplicar."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Perfis rapidos"); ?></h3>
+			<p class="layer7-lead"><?= l7_t("Clique num perfil para criar automaticamente uma politica com todas as apps e dominios associados. Escolha a accao, interfaces e sub-redes antes de aplicar."); ?></p>
 
 		<?php
 		$l7_app_icons = array(
@@ -562,9 +562,9 @@ function layer7_policy_match_summary($policy) {
 				<div class="l7-profile-desc"><?= $prof_desc; ?></div>
 				<div class="l7-profile-meta"><?= $prof_apps_count; ?> apps &middot; <?= $prof_hosts_count; ?> hosts</div>
 				<?php if ($prof_exists) { ?>
-				<span class="label label-info"><?= gettext("Ja aplicado"); ?></span>
+				<span class="label label-info"><?= l7_t("Ja aplicado"); ?></span>
 				<?php } else { ?>
-				<button type="button" class="btn btn-sm btn-success" onclick="l7showProfileModal('<?= $prof_id; ?>', '<?= $prof_name; ?>');"><?= gettext("Aplicar"); ?></button>
+				<button type="button" class="btn btn-sm btn-success" onclick="l7showProfileModal('<?= $prof_id; ?>', '<?= $prof_name; ?>');"><?= l7_t("Aplicar"); ?></button>
 				<?php } ?>
 			</div>
 		<?php } ?>
@@ -579,18 +579,18 @@ function layer7_policy_match_summary($policy) {
 					<input type="hidden" name="add_profile_policy" value="1" />
 
 					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= gettext("Accao"); ?></label>
+						<label class="col-sm-4 control-label"><?= l7_t("Accao"); ?></label>
 						<div class="col-sm-8">
 							<select name="profile_action" class="form-control">
-								<option value="block" selected="selected"><?= gettext("block"); ?></option>
-								<option value="monitor"><?= gettext("monitor"); ?></option>
-								<option value="allow"><?= gettext("allow"); ?></option>
+								<option value="block" selected="selected"><?= l7_t("block"); ?></option>
+								<option value="monitor"><?= l7_t("monitor"); ?></option>
+								<option value="allow"><?= l7_t("allow"); ?></option>
 							</select>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= gettext("Interfaces"); ?></label>
+						<label class="col-sm-4 control-label"><?= l7_t("Interfaces"); ?></label>
 						<div class="col-sm-8">
 						<?php foreach ($prof_ifaces as $ifc) { ?>
 							<label class="checkbox-inline">
@@ -598,21 +598,21 @@ function layer7_policy_match_summary($policy) {
 								<?= htmlspecialchars($ifc["descr"]); ?>
 							</label>
 						<?php } ?>
-							<p class="help-block"><?= gettext("Nenhuma = todas."); ?></p>
+							<p class="help-block"><?= l7_t("Nenhuma = todas."); ?></p>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= gettext("CIDRs de origem"); ?></label>
+						<label class="col-sm-4 control-label"><?= l7_t("CIDRs de origem"); ?></label>
 						<div class="col-sm-8">
 							<textarea name="profile_src_cidrs" class="form-control" rows="2" placeholder="192.168.10.0/24"></textarea>
-							<p class="help-block"><?= gettext("Vazio = qualquer sub-rede."); ?></p>
+							<p class="help-block"><?= l7_t("Vazio = qualquer sub-rede."); ?></p>
 						</div>
 					</div>
 
 					<?php if (!empty($l7_groups)) { ?>
 					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= gettext("Grupos"); ?></label>
+						<label class="col-sm-4 control-label"><?= l7_t("Grupos"); ?></label>
 						<div class="col-sm-8">
 						<?php foreach ($l7_groups as $grp) {
 							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
@@ -623,15 +623,15 @@ function layer7_policy_match_summary($policy) {
 								<?= $gname; ?>
 							</label>
 						<?php } ?>
-							<p class="help-block"><?= gettext("Alternativa a CIDRs manuais."); ?></p>
+							<p class="help-block"><?= l7_t("Alternativa a CIDRs manuais."); ?></p>
 						</div>
 					</div>
 					<?php } ?>
 
 					<div class="form-group">
 						<div class="col-sm-offset-4 col-sm-8">
-							<button type="submit" class="btn btn-success"><?= gettext("Criar politica"); ?></button>
-							<button type="button" class="btn btn-default" onclick="l7hideProfileModal();"><?= gettext("Cancelar"); ?></button>
+							<button type="submit" class="btn btn-success"><?= l7_t("Criar politica"); ?></button>
+							<button type="button" class="btn btn-default" onclick="l7hideProfileModal();"><?= l7_t("Cancelar"); ?></button>
 						</div>
 					</div>
 				</form>
@@ -640,22 +640,22 @@ function layer7_policy_match_summary($policy) {
 		<?php } ?>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Politicas atuais"); ?></h3>
+			<h3 class="layer7-section-title"><?= l7_t("Politicas atuais"); ?></h3>
 			<?php if (count($policies) === 0) { ?>
-			<div class="alert alert-info"><?= gettext("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
+			<div class="alert alert-info"><?= l7_t("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
 			<?php } else { ?>
 			<form method="post">
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
 						<thead>
 							<tr>
-								<th><?= gettext("Ativa"); ?></th>
-								<th><?= gettext("Prioridade"); ?></th>
-								<th><?= gettext("Nome"); ?></th>
-								<th><?= gettext("Acao"); ?></th>
-								<th><?= gettext("Correspondencia"); ?></th>
+								<th><?= l7_t("Ativa"); ?></th>
+								<th><?= l7_t("Prioridade"); ?></th>
+								<th><?= l7_t("Nome"); ?></th>
+								<th><?= l7_t("Acao"); ?></th>
+								<th><?= l7_t("Correspondencia"); ?></th>
 								<th><code>id</code></th>
-								<th><?= gettext("Acoes"); ?></th>
+								<th><?= l7_t("Acoes"); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -675,8 +675,8 @@ function layer7_policy_match_summary($policy) {
 								<td class="small"><?= htmlspecialchars(implode(" | ", $matches)); ?></td>
 								<td><code><?= htmlspecialchars($pid); ?></code></td>
 								<td class="layer7-table-actions">
-									<a href="layer7_policies.php?view=<?= (int)$i; ?>" class="btn btn-xs btn-default"><?= gettext("Ver listas"); ?></a>
-									<a href="layer7_policies.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= gettext("Editar"); ?></a>
+									<a href="layer7_policies.php?view=<?= (int)$i; ?>" class="btn btn-xs btn-default"><?= l7_t("Ver listas"); ?></a>
+									<a href="layer7_policies.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
 								</td>
 							</tr>
 						<?php } ?>
@@ -684,14 +684,14 @@ function layer7_policy_match_summary($policy) {
 					</table>
 				</div>
 				<div class="layer7-toolbar">
-					<button type="submit" name="save_policies" value="1" class="btn btn-primary"><?= gettext("Guardar estado das politicas"); ?></button>
+					<button type="submit" name="save_policies" value="1" class="btn btn-primary"><?= l7_t("Guardar estado das politicas"); ?></button>
 				</div>
 			</form>
 
 			<form method="post" class="form-inline layer7-inline-form"
-				onsubmit='return confirm(<?= json_encode(gettext("Remover esta politica do JSON?")); ?>);'>
+				onsubmit='return confirm(<?= json_encode(l7_t("Remover esta politica do JSON?")); ?>);'>
 				<div class="form-group">
-					<label class="control-label" for="delete_policy_index"><?= gettext("Remover politica"); ?></label>
+					<label class="control-label" for="delete_policy_index"><?= l7_t("Remover politica"); ?></label>
 					<select id="delete_policy_index" name="delete_policy_index" class="form-control">
 						<?php foreach ($policies as $i => $policy) {
 							$pid = isset($policy["id"]) ? (string)$policy["id"] : ("#" . $i);
@@ -701,7 +701,7 @@ function layer7_policy_match_summary($policy) {
 						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
 						<?php } ?>
 					</select>
-					<button type="submit" name="delete_policy" value="1" class="btn btn-danger"><?= gettext("Remover"); ?></button>
+					<button type="submit" name="delete_policy" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
 				</div>
 			</form>
 			<?php } ?>
@@ -709,34 +709,34 @@ function layer7_policy_match_summary($policy) {
 
 		<?php if ($view_policy !== null && $view_idx !== null) { ?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Listas da politica"); ?></h3>
-			<p class="layer7-lead"><?= gettext("Visualizacao rapida da regra, com todos os itens incluidos no match."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Listas da politica"); ?></h3>
+			<p class="layer7-lead"><?= l7_t("Visualizacao rapida da regra, com todos os itens incluidos no match."); ?></p>
 			<div class="layer7-toolbar">
-				<a href="layer7_policies.php" class="btn btn-default"><?= gettext("Fechar"); ?></a>
-				<a href="layer7_policies.php?edit=<?= (int)$view_idx; ?>" class="btn btn-info"><?= gettext("Editar esta politica"); ?></a>
+				<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Fechar"); ?></a>
+				<a href="layer7_policies.php?edit=<?= (int)$view_idx; ?>" class="btn btn-info"><?= l7_t("Editar esta politica"); ?></a>
 			</div>
 			<dl class="dl-horizontal layer7-detail-grid">
 				<dt><code>id</code></dt>
 				<dd><code><?= htmlspecialchars((string)($view_policy["id"] ?? "")); ?></code></dd>
-				<dt><?= gettext("Nome"); ?></dt>
+				<dt><?= l7_t("Nome"); ?></dt>
 				<dd><?= htmlspecialchars((string)($view_policy["name"] ?? "")); ?></dd>
-				<dt><?= gettext("Acao"); ?></dt>
+				<dt><?= l7_t("Acao"); ?></dt>
 				<dd><span class="label label-default"><?= htmlspecialchars((string)($view_policy["action"] ?? "monitor")); ?></span></dd>
-				<dt><?= gettext("Interfaces"); ?></dt>
-				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["interfaces"]) ? implode("\n", $view_policy["interfaces"]) : gettext("Todas")); ?></pre></dd>
-				<dt><?= gettext("Apps nDPI"); ?></dt>
-				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ndpi_app"]) ? implode("\n", $view_policy["match"]["ndpi_app"]) : gettext("Qualquer app")); ?></pre></dd>
-				<dt><?= gettext("Categorias nDPI"); ?></dt>
-				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ndpi_category"]) ? implode("\n", $view_policy["match"]["ndpi_category"]) : gettext("Qualquer categoria")); ?></pre></dd>
-				<dt><?= gettext("Sites/hosts"); ?></dt>
-				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["hosts"]) ? implode("\n", $view_policy["match"]["hosts"]) : gettext("Qualquer host")); ?></pre></dd>
-				<dt><?= gettext("IPs de origem"); ?></dt>
-				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_hosts"]) ? implode("\n", $view_policy["match"]["src_hosts"]) : gettext("Qualquer IP")); ?></pre></dd>
-				<dt><?= gettext("CIDRs de origem"); ?></dt>
-				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_cidrs"]) ? implode("\n", $view_policy["match"]["src_cidrs"]) : gettext("Qualquer sub-rede")); ?></pre></dd>
-				<dt><?= gettext("Grupos"); ?></dt>
-				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["groups"]) ? implode("\n", $view_policy["match"]["groups"]) : gettext("Nenhum grupo")); ?></pre></dd>
-				<dt><?= gettext("Horario"); ?></dt>
+				<dt><?= l7_t("Interfaces"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["interfaces"]) ? implode("\n", $view_policy["interfaces"]) : l7_t("Todas")); ?></pre></dd>
+				<dt><?= l7_t("Apps nDPI"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ndpi_app"]) ? implode("\n", $view_policy["match"]["ndpi_app"]) : l7_t("Qualquer app")); ?></pre></dd>
+				<dt><?= l7_t("Categorias nDPI"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ndpi_category"]) ? implode("\n", $view_policy["match"]["ndpi_category"]) : l7_t("Qualquer categoria")); ?></pre></dd>
+				<dt><?= l7_t("Sites/hosts"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["hosts"]) ? implode("\n", $view_policy["match"]["hosts"]) : l7_t("Qualquer host")); ?></pre></dd>
+				<dt><?= l7_t("IPs de origem"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_hosts"]) ? implode("\n", $view_policy["match"]["src_hosts"]) : l7_t("Qualquer IP")); ?></pre></dd>
+				<dt><?= l7_t("CIDRs de origem"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_cidrs"]) ? implode("\n", $view_policy["match"]["src_cidrs"]) : l7_t("Qualquer sub-rede")); ?></pre></dd>
+				<dt><?= l7_t("Grupos"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["groups"]) ? implode("\n", $view_policy["match"]["groups"]) : l7_t("Nenhum grupo")); ?></pre></dd>
+				<dt><?= l7_t("Horario"); ?></dt>
 				<dd><?= htmlspecialchars(layer7_schedule_summary($view_policy)); ?></dd>
 			</dl>
 		</div>
@@ -774,10 +774,10 @@ function layer7_policy_match_summary($policy) {
 			}
 		?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Editar politica"); ?></h3>
-			<p class="layer7-lead"><?= gettext("Atualize os detalhes da regra selecionada. O identificador permanece fixo para manter a referencia no JSON."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Editar politica"); ?></h3>
+			<p class="layer7-lead"><?= l7_t("Atualize os detalhes da regra selecionada. O identificador permanece fixo para manter a referencia no JSON."); ?></p>
 			<div class="layer7-toolbar">
-				<a href="layer7_policies.php" class="btn btn-default"><?= gettext("Cancelar edicao"); ?></a>
+				<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
 			</div>
 			<form method="post" class="form-horizontal">
 				<input type="hidden" name="edit_policy_index" value="<?= (int)$edit_idx; ?>" />
@@ -786,32 +786,32 @@ function layer7_policy_match_summary($policy) {
 					<label class="col-sm-3 control-label"><code>id</code></label>
 					<div class="col-sm-9">
 						<p class="form-control-static"><code><?= htmlspecialchars($edit_id !== "" ? $edit_id : "(vazio)"); ?></code></p>
-						<p class="help-block"><?= gettext("O id nao pode ser alterado pela GUI."); ?></p>
+						<p class="help-block"><?= l7_t("O id nao pode ser alterado pela GUI."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Nome"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Nome"); ?></label>
 					<div class="col-sm-9">
 						<input type="text" name="edit_name" class="form-control" maxlength="160" value="<?= htmlspecialchars($edit_name); ?>" />
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Prioridade"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Prioridade"); ?></label>
 					<div class="col-sm-3">
 						<input type="number" name="edit_priority" class="form-control" value="<?= (int)$edit_priority; ?>" min="0" max="99999" />
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Acao"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Acao"); ?></label>
 					<div class="col-sm-4">
 						<select name="edit_action" class="form-control">
-							<option value="monitor" <?= $edit_action === "monitor" ? 'selected="selected"' : ''; ?>><?= gettext("monitor"); ?></option>
-							<option value="allow" <?= $edit_action === "allow" ? 'selected="selected"' : ''; ?>><?= gettext("allow"); ?></option>
-							<option value="block" <?= $edit_action === "block" ? 'selected="selected"' : ''; ?>><?= gettext("block"); ?></option>
-							<option value="tag" <?= $edit_action === "tag" ? 'selected="selected"' : ''; ?>><?= gettext("tag"); ?></option>
+							<option value="monitor" <?= $edit_action === "monitor" ? 'selected="selected"' : ''; ?>><?= l7_t("monitor"); ?></option>
+							<option value="allow" <?= $edit_action === "allow" ? 'selected="selected"' : ''; ?>><?= l7_t("allow"); ?></option>
+							<option value="block" <?= $edit_action === "block" ? 'selected="selected"' : ''; ?>><?= l7_t("block"); ?></option>
+							<option value="tag" <?= $edit_action === "tag" ? 'selected="selected"' : ''; ?>><?= l7_t("tag"); ?></option>
 						</select>
 					</div>
 				</div>
@@ -832,11 +832,11 @@ function layer7_policy_match_summary($policy) {
 				$ep_ifaces = layer7_get_pfsense_interfaces();
 				?>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Interfaces"); ?></label>
 					<div class="col-sm-9">
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', true);"><?= l7_t("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_ifaces_list', false);"><?= l7_t("Limpar"); ?></button>
 						</div>
 						<div id="edit_ifaces_list">
 						<?php foreach ($ep_ifaces as $ifc) {
@@ -848,23 +848,23 @@ function layer7_policy_match_summary($policy) {
 						</label>
 						<?php } ?>
 						</div>
-						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
+						<p class="help-block"><?= l7_t("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("IPs de origem"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("IPs de origem"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_src_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_src_hosts_val); ?></textarea>
-						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
+						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("CIDRs de origem"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("CIDRs de origem"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_src_cidrs" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_src_cidrs_val); ?></textarea>
-						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
+						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
 					</div>
 				</div>
 
@@ -875,7 +875,7 @@ function layer7_policy_match_summary($policy) {
 					}
 				?>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Grupos"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Grupos"); ?></label>
 					<div class="col-sm-9">
 						<div class="l7-multiselect-wrap" id="edit_groups_list" style="max-width:400px;max-height:160px;">
 						<?php foreach ($l7_groups as $grp) {
@@ -886,21 +886,21 @@ function layer7_policy_match_summary($policy) {
 							<label><input type="checkbox" name="edit_groups[]" value="<?= $gid; ?>" <?= $gchk; ?> /> <?= $gname; ?> <span class="text-muted">(<?= $gid; ?>)</span></label>
 						<?php } ?>
 						</div>
-						<p class="help-block"><?= gettext("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem."); ?></p>
+						<p class="help-block"><?= l7_t("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem."); ?></p>
 					</div>
 				</div>
 				<?php } ?>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Sites/hosts"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_match_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_hosts_match_val); ?></textarea>
-						<p class="help-block"><?= gettext("Um host por linha, ex.: youtube.com ou api.whatsapp.com. O match aceita o host exacto e subdominios."); ?></p>
+						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com ou api.whatsapp.com. O match aceita o host exacto e subdominios."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Apps nDPI"); ?></label>
 					<div class="col-sm-9">
 						<?php
 						$edit_apps_arr = array();
@@ -908,10 +908,10 @@ function layer7_policy_match_summary($policy) {
 							$edit_apps_arr = $edit_policy["match"]["ndpi_app"];
 						}
 						if (!empty($ndpi_protos)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'edit_apps_list')" style="max-width:400px" />
+						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'edit_apps_list')" style="max-width:400px" />
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_apps_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
 						</div>
 						<div class="l7-multiselect-wrap" id="edit_apps_list" style="max-width:400px">
 						<?php foreach ($ndpi_protos as $proto) {
@@ -923,12 +923,12 @@ function layer7_policy_match_summary($policy) {
 						<?php } else { ?>
 						<input type="text" name="edit_ndpi_apps_csv" class="form-control" value="<?= htmlspecialchars($edit_apps); ?>" />
 						<?php } ?>
-						<p class="help-block"><?= gettext("Selecione ate 12 aplicacoes."); ?></p>
+						<p class="help-block"><?= l7_t("Selecione ate 12 aplicacoes."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Categorias nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Categorias nDPI"); ?></label>
 					<div class="col-sm-9">
 						<?php
 						$edit_cats_arr = array();
@@ -936,10 +936,10 @@ function layer7_policy_match_summary($policy) {
 							$edit_cats_arr = $edit_policy["match"]["ndpi_category"];
 						}
 						if (!empty($ndpi_cats)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'edit_cats_list')" style="max-width:400px" />
+						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'edit_cats_list')" style="max-width:400px" />
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_cats_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
 						</div>
 						<div class="l7-multiselect-wrap" id="edit_cats_list" style="max-width:400px">
 						<?php foreach ($ndpi_cats as $cat) {
@@ -951,7 +951,7 @@ function layer7_policy_match_summary($policy) {
 						<?php } else { ?>
 						<input type="text" name="edit_ndpi_category_csv" class="form-control" value="<?= htmlspecialchars($edit_categories); ?>" />
 						<?php } ?>
-						<p class="help-block"><?= gettext("Selecione ate 8 categorias."); ?></p>
+						<p class="help-block"><?= l7_t("Selecione ate 8 categorias."); ?></p>
 					</div>
 				</div>
 
@@ -960,12 +960,12 @@ function layer7_policy_match_summary($policy) {
 					<div class="col-sm-6">
 						<input type="text" name="edit_tag_table" class="form-control" maxlength="63"
 							pattern="[A-Za-z0-9_]+" value="<?= htmlspecialchars($edit_tag_table !== "" ? $edit_tag_table : "layer7_tagged"); ?>" />
-						<p class="help-block"><?= gettext("Obrigatorio quando a acao for tag."); ?></p>
+						<p class="help-block"><?= l7_t("Obrigatorio quando a acao for tag."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Horario"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Horario"); ?></label>
 					<div class="col-sm-9">
 						<?php $ed_days = array("mon" => "Seg", "tue" => "Ter", "wed" => "Qua", "thu" => "Qui", "fri" => "Sex", "sat" => "Sab", "sun" => "Dom"); ?>
 						<?php foreach ($ed_days as $dk => $dl) { ?>
@@ -975,28 +975,28 @@ function layer7_policy_match_summary($policy) {
 						</label>
 						<?php } ?>
 						<div style="margin-top:8px;">
-							<label class="control-label" style="display:inline;"><?= gettext("De"); ?></label>
+							<label class="control-label" style="display:inline;"><?= l7_t("De"); ?></label>
 							<input type="time" name="edit_sched_start" value="<?= htmlspecialchars($edit_sched_start); ?>" class="form-control" style="width:120px;display:inline-block;" />
-							<label class="control-label" style="display:inline;margin-left:10px;"><?= gettext("ate"); ?></label>
+							<label class="control-label" style="display:inline;margin-left:10px;"><?= l7_t("ate"); ?></label>
 							<input type="time" name="edit_sched_end" value="<?= htmlspecialchars($edit_sched_end); ?>" class="form-control" style="width:120px;display:inline-block;" />
 						</div>
-						<p class="help-block"><?= gettext("Vazio = sempre activa. Preencha dias + horas para restringir."); ?></p>
+						<p class="help-block"><?= l7_t("Vazio = sempre activa. Preencha dias + horas para restringir."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Ativa"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Ativa"); ?></label>
 					<div class="col-sm-9">
 						<label class="checkbox-inline">
 							<input type="checkbox" name="edit_enabled" value="1" <?= $edit_enabled ? 'checked="checked"' : ''; ?> />
-							<?= gettext("Regra habilitada"); ?>
+							<?= l7_t("Regra habilitada"); ?>
 						</label>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="save_policy_edit" value="1" class="btn btn-primary"><?= gettext("Guardar alteracoes"); ?></button>
+						<button type="submit" name="save_policy_edit" value="1" class="btn btn-primary"><?= l7_t("Guardar alteracoes"); ?></button>
 					</div>
 				</div>
 			</form>
@@ -1004,10 +1004,10 @@ function layer7_policy_match_summary($policy) {
 		<?php } ?>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Adicionar politica"); ?></h3>
-			<p class="layer7-lead"><?= gettext("Use nomes claros e prioridades previsiveis para manter a leitura do conjunto simples durante o troubleshooting."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Adicionar politica"); ?></h3>
+			<p class="layer7-lead"><?= l7_t("Use nomes claros e prioridades previsiveis para manter a leitura do conjunto simples durante o troubleshooting."); ?></p>
 			<?php if ($at_limit) { ?>
-			<div class="alert alert-warning"><?= gettext("Limite de 24 politicas atingido."); ?></div>
+			<div class="alert alert-warning"><?= l7_t("Limite de 24 politicas atingido."); ?></div>
 			<?php } else { ?>
 			<form method="post" class="form-horizontal">
 
@@ -1020,38 +1020,38 @@ function layer7_policy_match_summary($policy) {
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Nome"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Nome"); ?></label>
 					<div class="col-sm-9">
-						<input type="text" name="new_name" class="form-control" maxlength="160" placeholder="<?= gettext("Ex.: Monitor geral"); ?>" />
+						<input type="text" name="new_name" class="form-control" maxlength="160" placeholder="<?= l7_t("Ex.: Monitor geral"); ?>" />
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Prioridade"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Prioridade"); ?></label>
 					<div class="col-sm-3">
 						<input type="number" name="new_priority" class="form-control" value="50" min="0" max="99999" />
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Acao"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Acao"); ?></label>
 					<div class="col-sm-4">
 						<select name="new_action" class="form-control">
-							<option value="monitor"><?= gettext("monitor"); ?></option>
-							<option value="allow"><?= gettext("allow"); ?></option>
-							<option value="block"><?= gettext("block"); ?></option>
-							<option value="tag"><?= gettext("tag"); ?></option>
+							<option value="monitor"><?= l7_t("monitor"); ?></option>
+							<option value="allow"><?= l7_t("allow"); ?></option>
+							<option value="block"><?= l7_t("block"); ?></option>
+							<option value="tag"><?= l7_t("tag"); ?></option>
 						</select>
 					</div>
 				</div>
 
 				<?php $pf_ifaces = layer7_get_pfsense_interfaces(); ?>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Interfaces"); ?></label>
 					<div class="col-sm-9">
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', true);"><?= l7_t("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_ifaces_list', false);"><?= l7_t("Limpar"); ?></button>
 						</div>
 						<div id="new_ifaces_list">
 						<?php foreach ($pf_ifaces as $ifc) { ?>
@@ -1061,29 +1061,29 @@ function layer7_policy_match_summary($policy) {
 						</label>
 						<?php } ?>
 						</div>
-						<p class="help-block"><?= gettext("Nenhuma selecionada = aplica a todas as interfaces."); ?></p>
+						<p class="help-block"><?= l7_t("Nenhuma selecionada = aplica a todas as interfaces."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("IPs de origem"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("IPs de origem"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_src_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="192.168.1.50&#10;192.168.1.51"></textarea>
-						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
+						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Vazio = qualquer IP."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("CIDRs de origem"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("CIDRs de origem"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_src_cidrs" class="form-control" rows="2" style="max-width:400px" placeholder="192.168.10.0/24"></textarea>
-						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
+						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
 					</div>
 				</div>
 
 				<?php if (!empty($l7_groups)) { ?>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Grupos"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Grupos"); ?></label>
 					<div class="col-sm-9">
 						<div class="l7-multiselect-wrap" id="new_groups_list" style="max-width:400px;max-height:160px;">
 						<?php foreach ($l7_groups as $grp) {
@@ -1093,27 +1093,27 @@ function layer7_policy_match_summary($policy) {
 							<label><input type="checkbox" name="new_groups[]" value="<?= $gid; ?>" /> <?= $gname; ?> <span class="text-muted">(<?= $gid; ?>)</span></label>
 						<?php } ?>
 						</div>
-						<p class="help-block"><?= gettext("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem. Alternativa a digitar CIDRs manualmente."); ?></p>
+						<p class="help-block"><?= l7_t("Selecione grupos de dispositivos. Os CIDRs/IPs do grupo sao aplicados como origem. Alternativa a digitar CIDRs manualmente."); ?></p>
 					</div>
 				</div>
 				<?php } ?>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Sites/hosts"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_match_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="youtube.com&#10;api.whatsapp.com"></textarea>
-						<p class="help-block"><?= gettext("Um host por linha, ex.: youtube.com. Para block, basta indicar sites aqui (sem necessidade de app nDPI). O bloqueio DNS atua automaticamente."); ?></p>
+						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com. Para block, basta indicar sites aqui (sem necessidade de app nDPI). O bloqueio DNS atua automaticamente."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Apps nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Apps nDPI"); ?></label>
 					<div class="col-sm-9">
 						<?php if (!empty($ndpi_protos)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'new_apps_list')" style="max-width:400px" />
+						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar apps..."); ?>" onkeyup="l7filter(this,'new_apps_list')" style="max-width:400px" />
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_apps_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
 						</div>
 						<div class="l7-multiselect-wrap" id="new_apps_list" style="max-width:400px">
 						<?php foreach ($ndpi_protos as $proto) { ?>
@@ -1123,18 +1123,18 @@ function layer7_policy_match_summary($policy) {
 						<?php } else { ?>
 						<input type="text" name="new_ndpi_apps_csv" class="form-control" placeholder="HTTP, BitTorrent" />
 						<?php } ?>
-						<p class="help-block"><?= gettext("Selecione ate 12 aplicacoes. Em branco = qualquer app."); ?></p>
+						<p class="help-block"><?= l7_t("Selecione ate 12 aplicacoes. Em branco = qualquer app."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Categorias nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Categorias nDPI"); ?></label>
 					<div class="col-sm-9">
 						<?php if (!empty($ndpi_cats)) { ?>
-						<input type="text" class="form-control l7-filter" placeholder="<?= gettext("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'new_cats_list')" style="max-width:400px" />
+						<input type="text" class="form-control l7-filter" placeholder="<?= l7_t("Pesquisar categorias..."); ?>" onkeyup="l7filter(this,'new_cats_list')" style="max-width:400px" />
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', true, true);"><?= gettext("Selecionar visiveis"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', false, false);"><?= gettext("Limpar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', true, true);"><?= l7_t("Selecionar visiveis"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_cats_list', false, false);"><?= l7_t("Limpar tudo"); ?></button>
 						</div>
 						<div class="l7-multiselect-wrap" id="new_cats_list" style="max-width:400px">
 						<?php foreach ($ndpi_cats as $cat) { ?>
@@ -1144,7 +1144,7 @@ function layer7_policy_match_summary($policy) {
 						<?php } else { ?>
 						<input type="text" name="new_ndpi_category_csv" class="form-control" placeholder="Web" />
 						<?php } ?>
-						<p class="help-block"><?= gettext("Selecione ate 8 categorias."); ?></p>
+						<p class="help-block"><?= l7_t("Selecione ate 8 categorias."); ?></p>
 					</div>
 				</div>
 
@@ -1153,12 +1153,12 @@ function layer7_policy_match_summary($policy) {
 					<div class="col-sm-6">
 						<input type="text" name="new_tag_table" class="form-control" maxlength="63"
 							pattern="[A-Za-z0-9_]+" placeholder="layer7_tagged" />
-						<p class="help-block"><?= gettext("Obrigatorio quando a acao for tag."); ?></p>
+						<p class="help-block"><?= l7_t("Obrigatorio quando a acao for tag."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Horario"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Horario"); ?></label>
 					<div class="col-sm-9">
 						<?php $new_days = array("mon" => "Seg", "tue" => "Ter", "wed" => "Qua", "thu" => "Qui", "fri" => "Sex", "sat" => "Sab", "sun" => "Dom"); ?>
 						<?php foreach ($new_days as $dk => $dl) { ?>
@@ -1168,34 +1168,34 @@ function layer7_policy_match_summary($policy) {
 						</label>
 						<?php } ?>
 						<div style="margin-top:8px;">
-							<label class="control-label" style="display:inline;"><?= gettext("De"); ?></label>
+							<label class="control-label" style="display:inline;"><?= l7_t("De"); ?></label>
 							<input type="time" name="new_sched_start" value="" class="form-control" style="width:120px;display:inline-block;" />
-							<label class="control-label" style="display:inline;margin-left:10px;"><?= gettext("ate"); ?></label>
+							<label class="control-label" style="display:inline;margin-left:10px;"><?= l7_t("ate"); ?></label>
 							<input type="time" name="new_sched_end" value="" class="form-control" style="width:120px;display:inline-block;" />
 						</div>
-						<p class="help-block"><?= gettext("Vazio = sempre activa. Preencha dias + horas para restringir."); ?></p>
+						<p class="help-block"><?= l7_t("Vazio = sempre activa. Preencha dias + horas para restringir."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Ativa"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Ativa"); ?></label>
 					<div class="col-sm-9">
 						<label class="checkbox-inline">
 							<input type="checkbox" name="new_enabled" value="1" checked="checked" />
-							<?= gettext("Criar politica ja habilitada"); ?>
+							<?= l7_t("Criar politica ja habilitada"); ?>
 						</label>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="add_policy" value="1" class="btn btn-success"><?= gettext("Adicionar politica"); ?></button>
+						<button type="submit" name="add_policy" value="1" class="btn btn-success"><?= l7_t("Adicionar politica"); ?></button>
 					</div>
 				</div>
 			</form>
 			<?php } ?>
 
-			<p class="layer7-muted-note small"><?= gettext("Para alterar o id de uma politica existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
+			<p class="layer7-muted-note small"><?= l7_t("Para alterar o id de uma politica existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
 		</div>
 		</div>
 	</div>

@@ -60,66 +60,66 @@ foreach ($all_logs as $line) {
 $enforce_events = array_slice($enforce_events, -30);
 $classify_events = array_slice($classify_events, -30);
 
-$pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Events"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Events"));
 include("head.inc");
 layer7_render_styles();
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 - events"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Layer 7 - events"); ?></h2>
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("events"); ?>
 		<div class="layer7-content">
 
-		<p class="layer7-lead"><?= gettext("Eventos do daemon extraidos do syslog do sistema. Use os filtros para encontrar eventos especificos."); ?></p>
+		<p class="layer7-lead"><?= l7_t("Eventos do daemon extraidos do syslog do sistema. Use os filtros para encontrar eventos especificos."); ?></p>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Monitor ao vivo"); ?></h3>
-			<p class="small text-muted"><?= gettext("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Monitor ao vivo"); ?></h3>
+			<p class="small text-muted"><?= l7_t("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
 			<div class="layer7-toolbar">
-				<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= gettext("Pausar"); ?></button>
-				<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= gettext("Atualizar agora"); ?></button>
+				<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
+				<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
 			</div>
 			<pre id="l7-live-view" class="pre-scrollable" style="max-height: 320px; font-size: 12px; white-space: pre-wrap;">Carregando...</pre>
 		</div>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Filtrar logs"); ?></h3>
+			<h3 class="layer7-section-title"><?= l7_t("Filtrar logs"); ?></h3>
 			<form method="get" class="form-inline">
 				<div class="form-group">
 					<input type="text" name="filter" class="form-control" style="width: 320px;" maxlength="100"
-						value="<?= htmlspecialchars($filter); ?>" placeholder="<?= gettext("Ex: enforce, flow_decide, BitTorrent, SIGUSR1..."); ?>" />
+						value="<?= htmlspecialchars($filter); ?>" placeholder="<?= l7_t("Ex: enforce, flow_decide, BitTorrent, SIGUSR1..."); ?>" />
 				</div>
-				<button type="submit" class="btn btn-primary"><?= gettext("Filtrar"); ?></button>
+				<button type="submit" class="btn btn-primary"><?= l7_t("Filtrar"); ?></button>
 				<?php if ($filter !== "") { ?>
-				<a href="layer7_events.php" class="btn btn-default"><?= gettext("Limpar"); ?></a>
+				<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Limpar"); ?></a>
 				<?php } ?>
 			</form>
 		</div>
 
 		<?php if (count($enforce_events) > 0) { ?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Eventos de enforcement"); ?> <span class="badge"><?= count($enforce_events); ?></span></h3>
-			<p class="small text-muted"><?= gettext("Acoes de block/tag executadas pelo daemon (pfctl -T add). Ultimo evento no final."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Eventos de enforcement"); ?> <span class="badge"><?= count($enforce_events); ?></span></h3>
+			<p class="small text-muted"><?= l7_t("Acoes de block/tag executadas pelo daemon (pfctl -T add). Ultimo evento no final."); ?></p>
 			<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $enforce_events)); ?></pre>
 		</div>
 		<?php } ?>
 
 		<?php if (count($classify_events) > 0) { ?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Classificacoes nDPI"); ?> <span class="badge"><?= count($classify_events); ?></span></h3>
-			<p class="small text-muted"><?= gettext("Fluxos classificados pelo nDPI (visivel com log_level=debug). Mostra src, app, cat, action, reason."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Classificacoes nDPI"); ?> <span class="badge"><?= count($classify_events); ?></span></h3>
+			<p class="small text-muted"><?= l7_t("Fluxos classificados pelo nDPI (visivel com log_level=debug). Mostra src, app, cat, action, reason."); ?></p>
 			<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $classify_events)); ?></pre>
 		</div>
 		<?php } ?>
 
 		<div class="layer7-section">
 			<h3 class="layer7-section-title">
-				<?= gettext("Todos os logs"); ?>
+				<?= l7_t("Todos os logs"); ?>
 				<span class="badge"><?= count($filtered_logs); ?></span>
 				<?php if ($filter !== "") { ?>
-				<small class="text-muted"> (<?= gettext("filtro"); ?>: <?= htmlspecialchars($filter); ?>)</small>
+				<small class="text-muted"> (<?= l7_t("filtro"); ?>: <?= htmlspecialchars($filter); ?>)</small>
 				<?php } ?>
 			</h3>
 			<?php if (count($filtered_logs) > 0) { ?>
@@ -127,22 +127,22 @@ layer7_render_styles();
 			<?php } else { ?>
 			<div class="alert alert-info">
 				<?php if ($filter !== "") { ?>
-				<?= gettext("Nenhum log correspondente ao filtro."); ?>
+				<?= l7_t("Nenhum log correspondente ao filtro."); ?>
 				<?php } else { ?>
-				<?= gettext("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?>
+				<?= l7_t("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?>
 				<?php } ?>
 			</div>
 			<?php } ?>
 		</div>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Dicas"); ?></h3>
+			<h3 class="layer7-section-title"><?= l7_t("Dicas"); ?></h3>
 			<ul class="small">
-				<li><?= gettext("Ative log_level=debug em Definicoes para ver decisoes de cada fluxo classificado."); ?></li>
-				<li><?= gettext("Use debug_minutes para elevar temporariamente sem editar o JSON."); ?></li>
-				<li><?= gettext("Configure syslog remoto em Definicoes para reter historico fora do appliance."); ?></li>
-				<li><?= gettext("SIGUSR1 (pagina Diagnostics) gera um resumo de estatisticas que aparece aqui."); ?></li>
-				<li><code><?= htmlspecialchars($log_path); ?></code> — <?= gettext("arquivo principal de eventos do daemon."); ?></li>
+				<li><?= l7_t("Ative log_level=debug em Definicoes para ver decisoes de cada fluxo classificado."); ?></li>
+				<li><?= l7_t("Use debug_minutes para elevar temporariamente sem editar o JSON."); ?></li>
+				<li><?= l7_t("Configure syslog remoto em Definicoes para reter historico fora do appliance."); ?></li>
+				<li><?= l7_t("SIGUSR1 (pagina Diagnostics) gera um resumo de estatisticas que aparece aqui."); ?></li>
+				<li><code><?= htmlspecialchars($log_path); ?></code> — <?= l7_t("arquivo principal de eventos do daemon."); ?></li>
 			</ul>
 		</div>
 		</div>

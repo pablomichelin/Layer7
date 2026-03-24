@@ -327,10 +327,10 @@ if ($_POST["run_test"] ?? false) {
 	$test_ndpi_app = trim($_POST["test_ndpi_app"] ?? "");
 	$test_ndpi_cat = trim($_POST["test_ndpi_cat"] ?? "");
 	if ($test_domain === "" && $test_ndpi_app === "") {
-		$input_errors[] = gettext("Indique pelo menos um dominio/IP ou app nDPI para testar.");
+		$input_errors[] = l7_t("Indique pelo menos um dominio/IP ou app nDPI para testar.");
 	} else {
 		if ($test_src_ip !== "" && !layer7_ipv4_valid($test_src_ip)) {
-			$input_errors[] = gettext("IP de origem invalido.");
+			$input_errors[] = l7_t("IP de origem invalido.");
 		}
 	}
 	if (empty($input_errors)) {
@@ -344,75 +344,75 @@ $ndpi_cats = isset($ndpi_list["categories"]) ? $ndpi_list["categories"] : array(
 sort($ndpi_protos);
 sort($ndpi_cats);
 
-$pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Teste"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Teste"));
 include("head.inc");
 layer7_render_styles();
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 - teste de politica"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Layer 7 - teste de politica"); ?></h2>
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("test"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 
-			<p class="layer7-lead"><?= gettext("Simule o que aconteceria a um fluxo de trafego com as politicas e excepcoes actuais. Util para diagnostico antes de activar o modo enforce."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Simule o que aconteceria a um fluxo de trafego com as politicas e excepcoes actuais. Util para diagnostico antes de activar o modo enforce."); ?></p>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Parametros do teste"); ?></h3>
+			<h3 class="layer7-section-title"><?= l7_t("Parametros do teste"); ?></h3>
 			<form method="post" class="form-horizontal">
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Dominio ou IP destino"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Dominio ou IP destino"); ?></label>
 					<div class="col-sm-6">
 						<input type="text" name="test_domain" class="form-control" maxlength="255"
 							value="<?= htmlspecialchars($test_domain); ?>"
 							placeholder="youtube.com ou 142.250.185.46" />
-						<p class="help-block"><?= gettext("Dominio (ex.: youtube.com) ou IPv4 de destino. Dominios sao comparados com match.hosts das politicas."); ?></p>
+						<p class="help-block"><?= l7_t("Dominio (ex.: youtube.com) ou IPv4 de destino. Dominios sao comparados com match.hosts das politicas."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("IP de origem"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("IP de origem"); ?></label>
 					<div class="col-sm-6">
 						<input type="text" name="test_src_ip" class="form-control" maxlength="48"
 							value="<?= htmlspecialchars($test_src_ip); ?>"
 							placeholder="10.0.85.50" />
-						<p class="help-block"><?= gettext("Opcional. IPv4 do cliente. Vazio = ignora filtro por origem."); ?></p>
+						<p class="help-block"><?= l7_t("Opcional. IPv4 do cliente. Vazio = ignora filtro por origem."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("App nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("App nDPI"); ?></label>
 					<div class="col-sm-6">
 						<select name="test_ndpi_app" class="form-control">
-							<option value=""><?= gettext("— qualquer —"); ?></option>
+							<option value=""><?= l7_t("— qualquer —"); ?></option>
 							<?php foreach ($ndpi_protos as $proto) { ?>
 							<option value="<?= htmlspecialchars($proto); ?>" <?= $test_ndpi_app === $proto ? 'selected="selected"' : ''; ?>><?= htmlspecialchars($proto); ?></option>
 							<?php } ?>
 						</select>
-						<p class="help-block"><?= gettext("Opcional. Selecione a app nDPI que o fluxo teria."); ?></p>
+						<p class="help-block"><?= l7_t("Opcional. Selecione a app nDPI que o fluxo teria."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Categoria nDPI"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Categoria nDPI"); ?></label>
 					<div class="col-sm-6">
 						<select name="test_ndpi_cat" class="form-control">
-							<option value=""><?= gettext("— qualquer —"); ?></option>
+							<option value=""><?= l7_t("— qualquer —"); ?></option>
 							<?php foreach ($ndpi_cats as $cat) { ?>
 							<option value="<?= htmlspecialchars($cat); ?>" <?= $test_ndpi_cat === $cat ? 'selected="selected"' : ''; ?>><?= htmlspecialchars($cat); ?></option>
 							<?php } ?>
 						</select>
-						<p class="help-block"><?= gettext("Opcional. Categoria nDPI do fluxo."); ?></p>
+						<p class="help-block"><?= l7_t("Opcional. Categoria nDPI do fluxo."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-9">
 						<button type="submit" name="run_test" value="1" class="btn btn-primary">
-							<i class="fa fa-play"></i> <?= gettext("Testar"); ?>
+							<i class="fa fa-play"></i> <?= l7_t("Testar"); ?>
 						</button>
 					</div>
 				</div>
@@ -425,18 +425,18 @@ layer7_render_styles();
 			$cur_mode = $test_results["mode"];
 		?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Resultado do teste"); ?></h3>
+			<h3 class="layer7-section-title"><?= l7_t("Resultado do teste"); ?></h3>
 
 			<?php if (!empty($resolved)) { ?>
 			<div class="alert alert-info">
-				<strong><?= gettext("DNS:"); ?></strong>
+				<strong><?= l7_t("DNS:"); ?></strong>
 				<?= htmlspecialchars($test_domain); ?> &rarr;
 				<?= htmlspecialchars(implode(", ", $resolved)); ?>
 			</div>
 			<?php } ?>
 
 			<div class="alert alert-info">
-				<strong><?= gettext("Modo actual:"); ?></strong>
+				<strong><?= l7_t("Modo actual:"); ?></strong>
 				<code><?= htmlspecialchars($cur_mode); ?></code>
 			</div>
 
@@ -458,15 +458,15 @@ layer7_render_styles();
 				}
 			?>
 			<div class="alert <?= $vclass; ?>" style="font-size:15px;">
-				<strong><?= gettext("Veredicto:"); ?></strong>
+				<strong><?= l7_t("Veredicto:"); ?></strong>
 				<span class="label label-<?= $verdict["action"] === "block" ? "danger" : ($verdict["action"] === "allow" ? "success" : "default"); ?>">
 					<?= htmlspecialchars($verdict["action"]); ?>
 				</span>
 				&mdash; <?= htmlspecialchars($verdict["reason"]); ?>
 				<?php if ($verdict["enforce"]) { ?>
-				<br /><small class="text-muted"><?= gettext("Modo enforce activo: esta accao seria aplicada em producao."); ?></small>
+				<br /><small class="text-muted"><?= l7_t("Modo enforce activo: esta accao seria aplicada em producao."); ?></small>
 				<?php } else { ?>
-				<br /><small class="text-muted"><?= gettext("Modo monitor: nenhuma accao de bloqueio seria aplicada."); ?></small>
+				<br /><small class="text-muted"><?= l7_t("Modo monitor: nenhuma accao de bloqueio seria aplicada."); ?></small>
 				<?php } ?>
 			</div>
 			<?php } ?>
@@ -483,18 +483,18 @@ layer7_render_styles();
 				<table class="table table-striped table-hover">
 					<thead>
 						<tr>
-							<th><?= gettext("Tipo"); ?></th>
+							<th><?= l7_t("Tipo"); ?></th>
 							<th><code>id</code></th>
-							<th><?= gettext("Nome"); ?></th>
-							<th><?= gettext("Acao"); ?></th>
-							<th><?= gettext("Casou?"); ?></th>
-							<th><?= gettext("Motivo"); ?></th>
+							<th><?= l7_t("Nome"); ?></th>
+							<th><?= l7_t("Acao"); ?></th>
+							<th><?= l7_t("Casou?"); ?></th>
+							<th><?= l7_t("Motivo"); ?></th>
 						</tr>
 					</thead>
 					<tbody>
 					<?php foreach ($policy_rows as $pr) { ?>
 						<tr class="<?= $pr["matched"] ? "success" : ""; ?>">
-							<td><?= htmlspecialchars($pr["type"] === "exception" ? gettext("Excepcao") : gettext("Politica")); ?></td>
+							<td><?= htmlspecialchars($pr["type"] === "exception" ? l7_t("Excepcao") : l7_t("Politica")); ?></td>
 							<td><code><?= htmlspecialchars($pr["id"]); ?></code></td>
 							<td><?= htmlspecialchars($pr["name"]); ?></td>
 							<td><span class="label label-<?= $pr["action"] === "block" ? "danger" : ($pr["action"] === "allow" ? "success" : "default"); ?>"><?= htmlspecialchars($pr["action"]); ?></span></td>
@@ -507,7 +507,7 @@ layer7_render_styles();
 			</div>
 			<?php } ?>
 
-			<p class="layer7-muted-note small"><?= gettext("Esta simulacao usa as politicas e excepcoes do JSON actual. O daemon nDPI pode ter resultados diferentes dependendo da classificacao real do trafego."); ?></p>
+			<p class="layer7-muted-note small"><?= l7_t("Esta simulacao usa as politicas e excepcoes do JSON actual. O daemon nDPI pode ter resultados diferentes dependendo da classificacao real do trafego."); ?></p>
 		</div>
 		<?php } ?>
 		</div>

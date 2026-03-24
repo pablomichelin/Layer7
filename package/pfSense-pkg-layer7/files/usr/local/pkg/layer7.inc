@@ -7,6 +7,52 @@ if (defined("LAYER7_INC_LOADED")) {
 }
 define("LAYER7_INC_LOADED", true);
 
+/**
+ * Translation helper. Returns the translated string for the current language.
+ * Keys are the original Portuguese strings. When lang=pt, returns the key as-is.
+ * When lang=en (or other), looks up the translation file.
+ */
+function l7_t($key)
+{
+	static $strings = null;
+	static $lang_loaded = "";
+
+	$lang = layer7_get_language();
+	if ($lang === "pt") {
+		return $key;
+	}
+
+	if ($strings === null || $lang_loaded !== $lang) {
+		$path = "/usr/local/etc/layer7/lang/{$lang}.php";
+		if (file_exists($path)) {
+			$L7_STRINGS = array();
+			include($path);
+			$strings = $L7_STRINGS;
+		} else {
+			$strings = array();
+		}
+		$lang_loaded = $lang;
+	}
+
+	return isset($strings[$key]) ? $strings[$key] : $key;
+}
+
+function layer7_get_language()
+{
+	$cfgpath = "/usr/local/etc/layer7.json";
+	if (file_exists($cfgpath)) {
+		$raw = @file_get_contents($cfgpath);
+		$j = @json_decode($raw, true);
+		if (is_array($j) && isset($j["layer7"]["language"])) {
+			$l = $j["layer7"]["language"];
+			if ($l === "en" || $l === "pt") {
+				return $l;
+			}
+		}
+	}
+	return "pt";
+}
+
 function layer7_cfg_path()
 {
 	return "/usr/local/etc/layer7.json";
@@ -177,20 +223,20 @@ function layer7_save_json($data)
 	$cfgpath = layer7_cfg_path();
 	$json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	if ($json === false) {
-		$input_errors[] = gettext("Erro ao serializar JSON.");
+		$input_errors[] = l7_t("Erro ao serializar JSON.");
 		return false;
 	}
 
 	if (!file_exists($cfgpath)) {
-		$input_errors[] = gettext("Nao foi possivel gravar ") . $cfgpath;
+		$input_errors[] = l7_t("Nao foi possivel gravar ") . $cfgpath;
 		return false;
 	}
 	if (!is_writable($cfgpath)) {
-		$input_errors[] = gettext("Nao foi possivel gravar ") . $cfgpath;
+		$input_errors[] = l7_t("Nao foi possivel gravar ") . $cfgpath;
 		return false;
 	}
 	if (file_put_contents($cfgpath, $json . "\n", LOCK_EX) === false) {
-		$input_errors[] = gettext("Nao foi possivel gravar ") . $cfgpath;
+		$input_errors[] = l7_t("Nao foi possivel gravar ") . $cfgpath;
 		return false;
 	}
 	return true;
@@ -606,14 +652,14 @@ function layer7_parse_schedule_post($prefix)
 function layer7_schedule_summary($policy)
 {
 	if (!isset($policy["schedule"]) || !is_array($policy["schedule"])) {
-		return gettext("Sempre activa");
+		return l7_t("Sempre activa");
 	}
 	$s = $policy["schedule"];
 	$days = isset($s["days"]) && is_array($s["days"]) ? $s["days"] : array();
 	$start = isset($s["start"]) ? $s["start"] : "";
 	$end = isset($s["end"]) ? $s["end"] : "";
 	if (empty($days) || $start === "" || $end === "") {
-		return gettext("Sempre activa");
+		return l7_t("Sempre activa");
 	}
 	$day_labels = array(
 		"mon" => "Seg", "tue" => "Ter", "wed" => "Qua",
@@ -694,16 +740,16 @@ function layer7_read_license_status()
 function layer7_nav_items()
 {
 	return array(
-		"status" => array("label" => gettext("Estado"), "href" => "layer7_status.php"),
-		"settings" => array("label" => gettext("Definicoes"), "href" => "layer7_settings.php"),
-		"policies" => array("label" => gettext("Politicas"), "href" => "layer7_policies.php"),
-		"groups" => array("label" => gettext("Grupos"), "href" => "layer7_groups.php"),
-		"categories" => array("label" => gettext("Categorias"), "href" => "layer7_categories.php"),
-		"exceptions" => array("label" => gettext("Excecoes"), "href" => "layer7_exceptions.php"),
-		"test" => array("label" => gettext("Teste"), "href" => "layer7_test.php"),
-		"events" => array("label" => gettext("Events"), "href" => "layer7_events.php"),
-		"diagnostics" => array("label" => gettext("Diagnostics"), "href" => "layer7_diagnostics.php"),
-		"blacklists" => array("label" => gettext("Blacklists"), "href" => "layer7_blacklists.php")
+		"status" => array("label" => l7_t("Estado"), "href" => "layer7_status.php"),
+		"settings" => array("label" => l7_t("Definicoes"), "href" => "layer7_settings.php"),
+		"policies" => array("label" => l7_t("Politicas"), "href" => "layer7_policies.php"),
+		"groups" => array("label" => l7_t("Grupos"), "href" => "layer7_groups.php"),
+		"categories" => array("label" => l7_t("Categorias"), "href" => "layer7_categories.php"),
+		"exceptions" => array("label" => l7_t("Excecoes"), "href" => "layer7_exceptions.php"),
+		"test" => array("label" => l7_t("Teste"), "href" => "layer7_test.php"),
+		"events" => array("label" => l7_t("Events"), "href" => "layer7_events.php"),
+		"diagnostics" => array("label" => l7_t("Diagnostics"), "href" => "layer7_diagnostics.php"),
+		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php")
 	);
 }
 

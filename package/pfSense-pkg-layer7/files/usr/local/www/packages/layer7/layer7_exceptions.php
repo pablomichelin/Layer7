@@ -20,19 +20,19 @@ if ($_POST["add_exception"] ?? false) {
 		$ok = true;
 
 		if (count($exceptions) >= 16) {
-			$input_errors[] = gettext("Limite de 16 excecoes.");
+			$input_errors[] = l7_t("Limite de 16 excecoes.");
 			$ok = false;
 		}
 
 		$eid = trim($_POST["new_id"] ?? "");
 		if ($ok && !layer7_policy_id_valid($eid)) {
-			$input_errors[] = gettext("ID invalido (letras, numeros, _ e -; max. 80).");
+			$input_errors[] = l7_t("ID invalido (letras, numeros, _ e -; max. 80).");
 			$ok = false;
 		}
 		if ($ok) {
 			foreach ($exceptions as $existing_exception) {
 				if (isset($existing_exception["id"]) && (string)$existing_exception["id"] === $eid) {
-					$input_errors[] = gettext("Ja existe uma excecao com esse ID.");
+					$input_errors[] = l7_t("Ja existe uma excecao com esse ID.");
 					$ok = false;
 					break;
 				}
@@ -42,7 +42,7 @@ if ($_POST["add_exception"] ?? false) {
 		$hosts = layer7_parse_ip_textarea($_POST["new_hosts"] ?? "");
 		$cidrs = layer7_parse_cidr_textarea($_POST["new_cidrs"] ?? "");
 		if ($ok && empty($hosts) && empty($cidrs)) {
-			$input_errors[] = gettext("Indique pelo menos um host IPv4 ou CIDR.");
+			$input_errors[] = l7_t("Indique pelo menos um host IPv4 ou CIDR.");
 			$ok = false;
 		}
 
@@ -56,7 +56,7 @@ if ($_POST["add_exception"] ?? false) {
 
 		$pri = (int)($_POST["new_priority"] ?? 500);
 		if ($ok && ($pri < 0 || $pri > 99999)) {
-			$input_errors[] = gettext("Prioridade invalida (0-99999).");
+			$input_errors[] = l7_t("Prioridade invalida (0-99999).");
 			$ok = false;
 		}
 
@@ -84,7 +84,7 @@ if ($_POST["add_exception"] ?? false) {
 			$exceptions[] = $rule;
 			if (layer7_save_json($data)) {
 				layer7_signal_reload();
-				$savemsg = gettext("Excecao adicionada.");
+				$savemsg = l7_t("Excecao adicionada.");
 			}
 		}
 		unset($exceptions);
@@ -103,7 +103,7 @@ if ($_POST["save_exceptions"] ?? false) {
 		unset($exceptions);
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
-			$savemsg = gettext("Excecoes atualizadas.");
+			$savemsg = l7_t("Excecoes atualizadas.");
 		}
 }
 
@@ -116,12 +116,12 @@ if ($_POST["delete_exception"] ?? false) {
 		$idx = (int)($_POST["delete_exception_index"] ?? -1);
 		$count = count($exceptions);
 		if ($idx < 0 || $idx >= $count) {
-			$input_errors[] = gettext("Indice de excecao invalido.");
+			$input_errors[] = l7_t("Indice de excecao invalido.");
 		} else {
 			array_splice($exceptions, $idx, 1);
 			if (layer7_save_json($data)) {
 				layer7_signal_reload();
-				$savemsg = gettext("Excecao removida.");
+				$savemsg = l7_t("Excecao removida.");
 			}
 		}
 		unset($exceptions);
@@ -136,7 +136,7 @@ if ($_POST["save_exception_edit"] ?? false) {
 		$idx = (int)($_POST["edit_exception_index"] ?? -1);
 		$count = count($exceptions);
 		if ($idx < 0 || $idx >= $count) {
-			$input_errors[] = gettext("Indice de excecao invalido.");
+			$input_errors[] = l7_t("Indice de excecao invalido.");
 		} else {
 			$layer7_exception_edit_retry = $idx;
 			$orig = $exceptions[$idx];
@@ -146,7 +146,7 @@ if ($_POST["save_exception_edit"] ?? false) {
 			$hosts = layer7_parse_ip_textarea($_POST["edit_hosts"] ?? "");
 			$cidrs = layer7_parse_cidr_textarea($_POST["edit_cidrs"] ?? "");
 			if ($ok && empty($hosts) && empty($cidrs)) {
-				$input_errors[] = gettext("Indique pelo menos um host IPv4 ou CIDR.");
+				$input_errors[] = l7_t("Indique pelo menos um host IPv4 ou CIDR.");
 				$ok = false;
 			}
 
@@ -160,7 +160,7 @@ if ($_POST["save_exception_edit"] ?? false) {
 
 			$pri = (int)($_POST["edit_priority"] ?? 500);
 			if ($ok && ($pri < 0 || $pri > 99999)) {
-				$input_errors[] = gettext("Prioridade invalida (0-99999).");
+				$input_errors[] = l7_t("Prioridade invalida (0-99999).");
 				$ok = false;
 			}
 
@@ -191,7 +191,7 @@ if ($_POST["save_exception_edit"] ?? false) {
 					header("Location: layer7_exceptions.php");
 					exit;
 				}
-				$input_errors[] = gettext("Nao foi possivel gravar a configuracao.");
+				$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
 			}
 		}
 		unset($exceptions);
@@ -216,7 +216,7 @@ if ($layer7_exception_edit_retry !== null && $layer7_exception_edit_retry >= 0 &
 	}
 }
 
-$pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Exceptions"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Exceptions"));
 include("head.inc");
 layer7_render_styles();
 
@@ -235,37 +235,37 @@ function layer7_exc_target_summary($exception) {
 	if (!empty($exception["interfaces"]) && is_array($exception["interfaces"])) {
 		$parts[] = "ifaces: " . implode(",", $exception["interfaces"]);
 	}
-	return empty($parts) ? gettext("Nao definido") : implode(" | ", $parts);
+	return empty($parts) ? l7_t("Nao definido") : implode(" | ", $parts);
 }
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 - excecoes"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Layer 7 - excecoes"); ?></h2>
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("exceptions"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 
-			<p class="layer7-lead"><?= gettext("Excecoes sao avaliadas antes das politicas e ajudam a preservar trafego de gestao, redes internas e casos especiais durante os testes."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Excecoes sao avaliadas antes das politicas e ajudam a preservar trafego de gestao, redes internas e casos especiais durante os testes."); ?></p>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Excecoes atuais"); ?></h3>
-			<p class="help-block"><?= gettext("Prioridade maior = regra avaliada primeiro."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Excecoes atuais"); ?></h3>
+			<p class="help-block"><?= l7_t("Prioridade maior = regra avaliada primeiro."); ?></p>
 			<?php if (count($exceptions) === 0) { ?>
-			<div class="alert alert-info"><?= gettext("Nenhuma excecao cadastrada no momento."); ?></div>
+			<div class="alert alert-info"><?= l7_t("Nenhuma excecao cadastrada no momento."); ?></div>
 			<?php } else { ?>
 			<form method="post">
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
 						<thead>
 							<tr>
-								<th><?= gettext("Ativa"); ?></th>
-								<th><?= gettext("Prioridade"); ?></th>
-								<th><?= gettext("Acao"); ?></th>
+								<th><?= l7_t("Ativa"); ?></th>
+								<th><?= l7_t("Prioridade"); ?></th>
+								<th><?= l7_t("Acao"); ?></th>
 								<th><code>id</code></th>
-								<th><?= gettext("Alvo"); ?></th>
-								<th><?= gettext("Acoes"); ?></th>
+								<th><?= l7_t("Alvo"); ?></th>
+								<th><?= l7_t("Acoes"); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -283,7 +283,7 @@ function layer7_exc_target_summary($exception) {
 								<td><code><?= htmlspecialchars($eid); ?></code></td>
 								<td class="small"><?= htmlspecialchars($target); ?></td>
 								<td class="layer7-table-actions">
-									<a href="layer7_exceptions.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= gettext("Editar"); ?></a>
+									<a href="layer7_exceptions.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
 								</td>
 							</tr>
 						<?php } ?>
@@ -291,14 +291,14 @@ function layer7_exc_target_summary($exception) {
 					</table>
 				</div>
 				<div class="layer7-toolbar">
-					<button type="submit" name="save_exceptions" value="1" class="btn btn-primary"><?= gettext("Guardar estado das excecoes"); ?></button>
+					<button type="submit" name="save_exceptions" value="1" class="btn btn-primary"><?= l7_t("Guardar estado das excecoes"); ?></button>
 				</div>
 			</form>
 
 			<form method="post" class="form-inline layer7-inline-form"
-				onsubmit='return confirm(<?= json_encode(gettext("Remover esta excecao do JSON?")); ?>);'>
+				onsubmit='return confirm(<?= json_encode(l7_t("Remover esta excecao do JSON?")); ?>);'>
 				<div class="form-group">
-					<label class="control-label" for="delete_exception_index"><?= gettext("Remover excecao"); ?></label>
+					<label class="control-label" for="delete_exception_index"><?= l7_t("Remover excecao"); ?></label>
 					<select id="delete_exception_index" name="delete_exception_index" class="form-control">
 						<?php foreach ($exceptions as $i => $exception) {
 							$eid = isset($exception["id"]) ? (string)$exception["id"] : ("#" . $i);
@@ -307,7 +307,7 @@ function layer7_exc_target_summary($exception) {
 						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
 						<?php } ?>
 					</select>
-					<button type="submit" name="delete_exception" value="1" class="btn btn-danger"><?= gettext("Remover"); ?></button>
+					<button type="submit" name="delete_exception" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
 				</div>
 			</form>
 			<?php } ?>
@@ -340,10 +340,10 @@ function layer7_exc_target_summary($exception) {
 			$ee_ifaces = layer7_get_pfsense_interfaces();
 		?>
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Editar excecao"); ?></h3>
-			<p class="layer7-lead"><?= gettext("Use excecoes para trafego de gestao, IPs criticos e redes que nao devem ser avaliadas pelas politicas gerais."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Editar excecao"); ?></h3>
+			<p class="layer7-lead"><?= l7_t("Use excecoes para trafego de gestao, IPs criticos e redes que nao devem ser avaliadas pelas politicas gerais."); ?></p>
 			<div class="layer7-toolbar">
-				<a href="layer7_exceptions.php" class="btn btn-default"><?= gettext("Cancelar edicao"); ?></a>
+				<a href="layer7_exceptions.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
 			</div>
 
 			<form method="post" class="form-horizontal">
@@ -353,32 +353,32 @@ function layer7_exc_target_summary($exception) {
 					<label class="col-sm-3 control-label"><code>id</code></label>
 					<div class="col-sm-9">
 						<p class="form-control-static"><code><?= htmlspecialchars($edit_id !== "" ? $edit_id : "(vazio)"); ?></code></p>
-						<p class="help-block"><?= gettext("O id nao pode ser alterado pela GUI."); ?></p>
+						<p class="help-block"><?= l7_t("O id nao pode ser alterado pela GUI."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Hosts (IPv4)"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Hosts (IPv4)"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_hosts_val); ?></textarea>
-						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
+						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("CIDRs"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("CIDRs"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_cidrs" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_cidrs_val); ?></textarea>
-						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8). Ex.: 192.168.0.0/24"); ?></p>
+						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Ex.: 192.168.0.0/24"); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Interfaces"); ?></label>
 					<div class="col-sm-9">
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_exc_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_exc_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_exc_ifaces_list', true);"><?= l7_t("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('edit_exc_ifaces_list', false);"><?= l7_t("Limpar"); ?></button>
 						</div>
 						<div id="edit_exc_ifaces_list">
 						<?php foreach ($ee_ifaces as $ifc) {
@@ -390,42 +390,42 @@ function layer7_exc_target_summary($exception) {
 						</label>
 						<?php } ?>
 						</div>
-						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
+						<p class="help-block"><?= l7_t("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Prioridade"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Prioridade"); ?></label>
 					<div class="col-sm-3">
 						<input type="number" name="edit_priority" class="form-control" value="<?= (int)$edit_priority; ?>" min="0" max="99999" />
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Acao"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Acao"); ?></label>
 					<div class="col-sm-4">
 						<select name="edit_action" class="form-control">
-							<option value="allow" <?= $edit_action === "allow" ? 'selected="selected"' : ''; ?>><?= gettext("allow"); ?></option>
-							<option value="block" <?= $edit_action === "block" ? 'selected="selected"' : ''; ?>><?= gettext("block"); ?></option>
-							<option value="monitor" <?= $edit_action === "monitor" ? 'selected="selected"' : ''; ?>><?= gettext("monitor"); ?></option>
-							<option value="tag" <?= $edit_action === "tag" ? 'selected="selected"' : ''; ?>><?= gettext("tag"); ?></option>
+							<option value="allow" <?= $edit_action === "allow" ? 'selected="selected"' : ''; ?>><?= l7_t("allow"); ?></option>
+							<option value="block" <?= $edit_action === "block" ? 'selected="selected"' : ''; ?>><?= l7_t("block"); ?></option>
+							<option value="monitor" <?= $edit_action === "monitor" ? 'selected="selected"' : ''; ?>><?= l7_t("monitor"); ?></option>
+							<option value="tag" <?= $edit_action === "tag" ? 'selected="selected"' : ''; ?>><?= l7_t("tag"); ?></option>
 						</select>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Ativa"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Ativa"); ?></label>
 					<div class="col-sm-9">
 						<label class="checkbox-inline">
 							<input type="checkbox" name="edit_enabled" value="1" <?= $edit_enabled ? 'checked="checked"' : ''; ?> />
-							<?= gettext("Regra habilitada"); ?>
+							<?= l7_t("Regra habilitada"); ?>
 						</label>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="save_exception_edit" value="1" class="btn btn-primary"><?= gettext("Guardar alteracoes"); ?></button>
+						<button type="submit" name="save_exception_edit" value="1" class="btn btn-primary"><?= l7_t("Guardar alteracoes"); ?></button>
 					</div>
 				</div>
 			</form>
@@ -433,10 +433,10 @@ function layer7_exc_target_summary($exception) {
 		<?php } ?>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Adicionar excecao"); ?></h3>
-			<p class="layer7-lead"><?= gettext("Cadastre aqui os alvos que devem fugir do fluxo padrao de classificacao, sem precisar editar o JSON manualmente."); ?></p>
+			<h3 class="layer7-section-title"><?= l7_t("Adicionar excecao"); ?></h3>
+			<p class="layer7-lead"><?= l7_t("Cadastre aqui os alvos que devem fugir do fluxo padrao de classificacao, sem precisar editar o JSON manualmente."); ?></p>
 			<?php if ($exc_limit) { ?>
-			<div class="alert alert-warning"><?= gettext("Limite de 16 excecoes atingido."); ?></div>
+			<div class="alert alert-warning"><?= l7_t("Limite de 16 excecoes atingido."); ?></div>
 			<?php } else { ?>
 			<?php $pf_ifaces_exc = layer7_get_pfsense_interfaces(); ?>
 			<form method="post" class="form-horizontal">
@@ -450,27 +450,27 @@ function layer7_exc_target_summary($exception) {
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Hosts (IPv4)"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Hosts (IPv4)"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="10.0.0.99&#10;10.0.0.100"></textarea>
-						<p class="help-block"><?= gettext("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
+						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("CIDRs"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("CIDRs"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_cidrs" class="form-control" rows="2" style="max-width:400px" placeholder="192.168.77.0/24"></textarea>
-						<p class="help-block"><?= gettext("Um CIDR por linha (max. 8)."); ?></p>
+						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8)."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Interfaces"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Interfaces"); ?></label>
 					<div class="col-sm-9">
 						<div class="l7-bulk-tools">
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_exc_ifaces_list', true);"><?= gettext("Selecionar tudo"); ?></button>
-							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_exc_ifaces_list', false);"><?= gettext("Limpar"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_exc_ifaces_list', true);"><?= l7_t("Selecionar tudo"); ?></button>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks('new_exc_ifaces_list', false);"><?= l7_t("Limpar"); ?></button>
 						</div>
 						<div id="new_exc_ifaces_list">
 						<?php foreach ($pf_ifaces_exc as $ifc) { ?>
@@ -480,48 +480,48 @@ function layer7_exc_target_summary($exception) {
 						</label>
 						<?php } ?>
 						</div>
-						<p class="help-block"><?= gettext("Nenhuma = aplica a todas."); ?></p>
+						<p class="help-block"><?= l7_t("Nenhuma = aplica a todas."); ?></p>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Prioridade"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Prioridade"); ?></label>
 					<div class="col-sm-3">
 						<input type="number" name="new_priority" class="form-control" value="500" min="0" max="99999" />
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Acao"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Acao"); ?></label>
 					<div class="col-sm-4">
 						<select name="new_action" class="form-control">
-							<option value="allow" selected="selected"><?= gettext("allow"); ?></option>
-							<option value="block"><?= gettext("block"); ?></option>
-							<option value="monitor"><?= gettext("monitor"); ?></option>
-							<option value="tag"><?= gettext("tag"); ?></option>
+							<option value="allow" selected="selected"><?= l7_t("allow"); ?></option>
+							<option value="block"><?= l7_t("block"); ?></option>
+							<option value="monitor"><?= l7_t("monitor"); ?></option>
+							<option value="tag"><?= l7_t("tag"); ?></option>
 						</select>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?= gettext("Ativa"); ?></label>
+					<label class="col-sm-3 control-label"><?= l7_t("Ativa"); ?></label>
 					<div class="col-sm-9">
 						<label class="checkbox-inline">
 							<input type="checkbox" name="new_enabled" value="1" checked="checked" />
-							<?= gettext("Criar excecao ja habilitada"); ?>
+							<?= l7_t("Criar excecao ja habilitada"); ?>
 						</label>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-9">
-						<button type="submit" name="add_exception" value="1" class="btn btn-success"><?= gettext("Adicionar excecao"); ?></button>
+						<button type="submit" name="add_exception" value="1" class="btn btn-success"><?= l7_t("Adicionar excecao"); ?></button>
 					</div>
 				</div>
 			</form>
 			<?php } ?>
 
-			<p class="layer7-muted-note small"><?= gettext("Para alterar o id de uma excecao existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
+			<p class="layer7-muted-note small"><?= l7_t("Para alterar o id de uma excecao existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
 		</div>
 		</div>
 	</div>

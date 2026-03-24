@@ -18,27 +18,27 @@ $total_cats = count($by_cat);
 
 ksort($by_cat);
 
-$pgtitle = array(gettext("Services"), gettext("Layer 7"), gettext("Categorias"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Categorias"));
 include("head.inc");
 layer7_render_styles();
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 - Categorias nDPI"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Layer 7 - Categorias nDPI"); ?></h2>
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("categories"); ?>
 		<div class="layer7-content">
 
 		<div class="layer7-section">
-			<p class="layer7-lead"><?= sprintf(gettext("Referencia de todas as aplicacoes detectaveis pelo nDPI, organizadas por categoria. Total: %d apps em %d categorias."), $total_protos, $total_cats); ?></p>
+			<p class="layer7-lead"><?= sprintf(l7_t("Referencia de todas as aplicacoes detectaveis pelo nDPI, organizadas por categoria. Total: %d apps em %d categorias."), $total_protos, $total_cats); ?></p>
 
 			<?php if (empty($by_cat)) { ?>
-			<div class="alert alert-warning"><?= gettext("Nao foi possivel obter a lista de protocolos. Verifique se o daemon (layer7d) esta instalado e funcional."); ?></div>
+			<div class="alert alert-warning"><?= l7_t("Nao foi possivel obter a lista de protocolos. Verifique se o daemon (layer7d) esta instalado e funcional."); ?></div>
 			<?php } else { ?>
 
 			<div class="form-group" style="max-width:400px;">
-				<input type="text" id="l7CatSearch" class="form-control" placeholder="<?= gettext("Pesquisar app ou categoria..."); ?>" />
+				<input type="text" id="l7CatSearch" class="form-control" placeholder="<?= l7_t("Pesquisar app ou categoria..."); ?>" />
 			</div>
 
 			<div id="l7CatAccordion">

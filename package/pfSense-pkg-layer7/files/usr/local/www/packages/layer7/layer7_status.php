@@ -21,7 +21,7 @@ if (is_executable($layer7d)) {
 	$parse_out = implode("\n", $lines);
 	$parse_ok = ($code === 0);
 } else {
-	$parse_out = gettext("Binario layer7d nao encontrado ou nao executavel.");
+	$parse_out = l7_t("Binario layer7d nao encontrado ou nao executavel.");
 }
 
 $pidfile = "/var/run/layer7d.pid";
@@ -82,9 +82,9 @@ $restart_msg = "";
 $restart_err = "";
 if (isset($_POST["restart_service"])) {
 	if (layer7_restart_service()) {
-		$restart_msg = gettext("Servico layer7d reiniciado com sucesso.");
+		$restart_msg = l7_t("Servico layer7d reiniciado com sucesso.");
 	} else {
-		$restart_err = gettext("Falha ao reiniciar o servico layer7d. Verifique o estado no terminal.");
+		$restart_err = l7_t("Falha ao reiniciar o servico layer7d. Verifique o estado no terminal.");
 	}
 	$pid = null;
 	$running = false;
@@ -99,13 +99,13 @@ if (isset($_POST["restart_service"])) {
 	$stats = $running ? layer7_read_stats() : null;
 }
 
-$pgtitle = array(gettext("Services"), gettext("Layer 7"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"));
 include("head.inc");
 layer7_render_styles();
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= gettext("Layer 7 - Dashboard"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Layer 7 - Dashboard"); ?></h2>
 	</div>
 	<div class="panel-body">
 		<?php layer7_render_tabs("status"); ?>
@@ -122,19 +122,19 @@ layer7_render_styles();
 			<div class="l7-dashboard-cards">
 				<div class="l7-dash-card">
 					<div class="l7-dash-card-value"><?= number_format($total_classified); ?></div>
-					<div class="l7-dash-card-label"><?= gettext("Conexoes classificadas"); ?></div>
+					<div class="l7-dash-card-label"><?= l7_t("Conexoes classificadas"); ?></div>
 				</div>
 				<div class="l7-dash-card l7-dash-card-danger">
 					<div class="l7-dash-card-value"><?= number_format($total_blocked); ?></div>
-					<div class="l7-dash-card-label"><?= gettext("Bloqueios"); ?></div>
+					<div class="l7-dash-card-label"><?= l7_t("Bloqueios"); ?></div>
 				</div>
 				<div class="l7-dash-card l7-dash-card-success">
 					<div class="l7-dash-card-value"><?= number_format($total_allowed); ?></div>
-					<div class="l7-dash-card-label"><?= gettext("Permitidos"); ?></div>
+					<div class="l7-dash-card-label"><?= l7_t("Permitidos"); ?></div>
 				</div>
 				<div class="l7-dash-card">
 					<div class="l7-dash-card-value"><?= $n_policies_active; ?></div>
-					<div class="l7-dash-card-label"><?= gettext("Politicas activas"); ?></div>
+					<div class="l7-dash-card-label"><?= l7_t("Politicas activas"); ?></div>
 				</div>
 			</div>
 		</div>
@@ -142,16 +142,16 @@ layer7_render_styles();
 		<div class="layer7-section">
 			<div class="row">
 				<div class="col-md-6">
-					<h3 class="layer7-section-title"><?= gettext("Top 10 apps bloqueadas"); ?></h3>
+					<h3 class="layer7-section-title"><?= l7_t("Top 10 apps bloqueadas"); ?></h3>
 					<?php if (empty($top_apps)) { ?>
-					<p class="text-muted"><?= gettext("Sem dados. O daemon precisa de trafego classificado para gerar estatisticas."); ?></p>
+					<p class="text-muted"><?= l7_t("Sem dados. O daemon precisa de trafego classificado para gerar estatisticas."); ?></p>
 					<?php } else { ?>
 					<table class="table table-striped table-condensed">
 						<thead>
 							<tr>
 								<th>#</th>
-								<th><?= gettext("App"); ?></th>
-								<th><?= gettext("Bloqueios"); ?></th>
+								<th><?= l7_t("App"); ?></th>
+								<th><?= l7_t("Bloqueios"); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -170,16 +170,16 @@ layer7_render_styles();
 					<?php } ?>
 				</div>
 				<div class="col-md-6">
-					<h3 class="layer7-section-title"><?= gettext("Top 10 clientes bloqueados"); ?></h3>
+					<h3 class="layer7-section-title"><?= l7_t("Top 10 clientes bloqueados"); ?></h3>
 					<?php if (empty($top_sources)) { ?>
-					<p class="text-muted"><?= gettext("Sem dados."); ?></p>
+					<p class="text-muted"><?= l7_t("Sem dados."); ?></p>
 					<?php } else { ?>
 					<table class="table table-striped table-condensed">
 						<thead>
 							<tr>
 								<th>#</th>
-								<th><?= gettext("IP de origem"); ?></th>
-								<th><?= gettext("Bloqueios"); ?></th>
+								<th><?= l7_t("IP de origem"); ?></th>
+								<th><?= l7_t("Bloqueios"); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -201,63 +201,63 @@ layer7_render_styles();
 		</div>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Estado do daemon"); ?></h3>
+			<h3 class="layer7-section-title"><?= l7_t("Estado do daemon"); ?></h3>
 			<div class="layer7-callout">
 				<dl class="dl-horizontal layer7-summary">
-					<dt><?= gettext("Daemon"); ?></dt>
+					<dt><?= l7_t("Daemon"); ?></dt>
 					<dd>
 						<?php if ($running) { ?>
-						<span class="text-success"><i class="fa fa-check-circle"></i> <?= gettext("Em execucao"); ?> (PID <?= htmlspecialchars($pid); ?>)</span>
+						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Em execucao"); ?> (PID <?= htmlspecialchars($pid); ?>)</span>
 						<?php } else { ?>
-						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= gettext("Parado"); ?></span>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Parado"); ?></span>
 						<?php } ?>
 					</dd>
 
 					<?php if ($daemon_ver !== "") { ?>
-					<dt><?= gettext("Versao"); ?></dt>
+					<dt><?= l7_t("Versao"); ?></dt>
 					<dd><code><?= htmlspecialchars($daemon_ver); ?></code></dd>
 					<?php } ?>
 
-					<dt><?= gettext("Uptime"); ?></dt>
+					<dt><?= l7_t("Uptime"); ?></dt>
 					<dd><?= htmlspecialchars($uptime_str); ?></dd>
 
-					<dt><?= gettext("Modo"); ?></dt>
+					<dt><?= l7_t("Modo"); ?></dt>
 					<dd>
 						<?php if (!$cfg_enabled) { ?>
-						<span class="label label-warning"><?= gettext("desativado"); ?></span>
+						<span class="label label-warning"><?= l7_t("desativado"); ?></span>
 						<?php } elseif ($cfg_mode === "enforce") { ?>
-						<span class="label label-danger"><?= gettext("enforce"); ?></span>
-						— <?= gettext("o daemon bloqueia trafego conforme as politicas"); ?>
+						<span class="label label-danger"><?= l7_t("enforce"); ?></span>
+						— <?= l7_t("o daemon bloqueia trafego conforme as politicas"); ?>
 						<?php } else { ?>
-						<span class="label label-info"><?= gettext("monitor"); ?></span>
-						— <?= gettext("o daemon classifica mas nao bloqueia"); ?>
+						<span class="label label-info"><?= l7_t("monitor"); ?></span>
+						— <?= l7_t("o daemon classifica mas nao bloqueia"); ?>
 						<?php } ?>
 					</dd>
 
-					<dt><?= gettext("Interfaces"); ?></dt>
+					<dt><?= l7_t("Interfaces"); ?></dt>
 					<dd>
 						<?php if (count($cfg_ifaces) > 0) { ?>
 						<code><?= htmlspecialchars(implode(", ", $cfg_ifaces)); ?></code>
 						<?php } else { ?>
-						<span class="text-muted"><?= gettext("Nenhuma"); ?></span>
+						<span class="text-muted"><?= l7_t("Nenhuma"); ?></span>
 						<?php } ?>
 					</dd>
 
-					<dt><?= gettext("Politicas"); ?></dt>
+					<dt><?= l7_t("Politicas"); ?></dt>
 					<dd>
-						<?= $n_policies_active; ?>/<?= $n_policies; ?> <?= gettext("ativas"); ?>
+						<?= $n_policies_active; ?>/<?= $n_policies; ?> <?= l7_t("ativas"); ?>
 						<?php if ($n_block_policies > 0) { ?>
 						(<span class="text-danger"><?= $n_block_policies; ?> block</span>)
 						<?php } ?>
 					</dd>
 
-					<dt><?= gettext("Excecoes"); ?></dt>
+					<dt><?= l7_t("Excecoes"); ?></dt>
 					<dd><?= $n_exceptions; ?></dd>
 
 					<?php if ($stats) { ?>
-					<dt><?= gettext("PF add OK"); ?></dt>
+					<dt><?= l7_t("PF add OK"); ?></dt>
 					<dd><?= number_format((int)($stats["pf_add_ok"] ?? 0) + (int)($stats["dst_add_ok"] ?? 0)); ?></dd>
-					<dt><?= gettext("PF add fail"); ?></dt>
+					<dt><?= l7_t("PF add fail"); ?></dt>
 					<dd><?= number_format((int)($stats["pf_add_fail"] ?? 0) + (int)($stats["dst_add_fail"] ?? 0)); ?></dd>
 					<?php } ?>
 				</dl>
@@ -265,25 +265,25 @@ layer7_render_styles();
 		</div>
 
 		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= gettext("Validacao da configuracao"); ?></h3>
+			<h3 class="layer7-section-title"><?= l7_t("Validacao da configuracao"); ?></h3>
 			<div class="layer7-callout">
 				<dl class="dl-horizontal layer7-summary">
-					<dt><?= gettext("Config"); ?></dt>
+					<dt><?= l7_t("Config"); ?></dt>
 					<dd>
 						<code><?= htmlspecialchars($cfgpath); ?></code>
 						<?php if (!file_exists($cfgpath)) { ?>
-						<span class="text-warning"> — <?= gettext("ausente, copie layer7.json.sample"); ?></span>
+						<span class="text-warning"> — <?= l7_t("ausente, copie layer7.json.sample"); ?></span>
 						<?php } ?>
 					</dd>
 
-					<dt><?= gettext("Interpretacao"); ?></dt>
+					<dt><?= l7_t("Interpretacao"); ?></dt>
 					<dd>
 						<?php if ($parse_ok === true) { ?>
-						<span class="text-success"><i class="fa fa-check"></i> <?= gettext("OK"); ?></span>
+						<span class="text-success"><i class="fa fa-check"></i> <?= l7_t("OK"); ?></span>
 						<?php } elseif ($parse_ok === false) { ?>
-						<span class="text-danger"><i class="fa fa-times"></i> <?= gettext("Falhou"); ?></span>
+						<span class="text-danger"><i class="fa fa-times"></i> <?= l7_t("Falhou"); ?></span>
 						<?php } else { ?>
-						<span class="text-muted"><?= gettext("Nao executado"); ?></span>
+						<span class="text-muted"><?= l7_t("Nao executado"); ?></span>
 						<?php } ?>
 					</dd>
 				</dl>
@@ -294,17 +294,17 @@ layer7_render_styles();
 		<div class="layer7-toolbar">
 			<form method="post" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
 				<button type="submit" name="restart_service" value="1" class="btn btn-warning"
-					onclick="return confirm('<?= gettext("Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart."); ?>');">
-					<i class="fa fa-refresh"></i> <?= gettext("Reiniciar servico"); ?>
+					onclick="return confirm('<?= l7_t("Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart."); ?>');">
+					<i class="fa fa-refresh"></i> <?= l7_t("Reiniciar servico"); ?>
 				</button>
 			</form>
-			<a href="layer7_settings.php" class="btn btn-primary"><?= gettext("Abrir definicoes"); ?></a>
-			<a href="layer7_policies.php" class="btn btn-default"><?= gettext("Ver politicas"); ?></a>
-			<a href="layer7_diagnostics.php" class="btn btn-default"><?= gettext("Diagnostics"); ?></a>
-			<a href="layer7_events.php" class="btn btn-default"><?= gettext("Events"); ?></a>
+			<a href="layer7_settings.php" class="btn btn-primary"><?= l7_t("Abrir definicoes"); ?></a>
+			<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Ver politicas"); ?></a>
+			<a href="layer7_diagnostics.php" class="btn btn-default"><?= l7_t("Diagnostics"); ?></a>
+			<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Events"); ?></a>
 		</div>
 
-		<p class="layer7-muted-note small"><?= gettext("Contadores sao reiniciados quando o daemon arranca. Estatisticas actualizam automaticamente a cada ~60 segundos."); ?></p>
+		<p class="layer7-muted-note small"><?= l7_t("Contadores sao reiniciados quando o daemon arranca. Estatisticas actualizam automaticamente a cada ~60 segundos."); ?></p>
 		</div>
 	</div>
 </div>
