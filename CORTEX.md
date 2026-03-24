@@ -290,9 +290,9 @@ remoto e anti-bypass DNS com configuracao automatica do Unbound (v1.3.2).
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Testar instalacao limpa via install.sh (deve baixar v1.3.1 automaticamente)
-2. Testar alternancia de idioma na GUI (PT→EN→PT)
-3. Validar que daemon arranca sem erro de libcrypto
+1. Testar instalacao limpa via install.sh (deve baixar v1.3.2 automaticamente)
+2. Testar quick profile "Acesso Remoto" e "Anti-bypass DNS" na GUI
+3. Validar que botao "Configurar agora" do Unbound anti-DoH funciona nos Diagnosticos
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
