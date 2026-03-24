@@ -302,8 +302,40 @@ function layer7_anti_doh_block()
 }
 
 /**
+ * Le custom_options do Unbound decodificando base64 (formato pfSense).
+ * @return string texto decodificado (vazio se nao existir)
+ */
+function layer7_unbound_custom_options_read()
+{
+	global $config;
+	if (!isset($config['unbound']['custom_options'])) {
+		return "";
+	}
+	$raw = $config['unbound']['custom_options'];
+	if (!is_string($raw) || $raw === "") {
+		return "";
+	}
+	$decoded = @base64_decode($raw, true);
+	if ($decoded === false) {
+		return $raw;
+	}
+	return $decoded;
+}
+
+/**
+ * Grava custom_options do Unbound codificando em base64 (formato pfSense).
+ * @param string $text texto em claro
+ */
+function layer7_unbound_custom_options_write($text)
+{
+	global $config;
+	$text = str_replace("\r\n", "\n", $text);
+	$config['unbound']['custom_options'] = base64_encode($text);
+}
+
+/**
  * Configura Unbound anti-DoH via custom_options do pfSense config.xml.
- * Persiste entre reinícios do Unbound.
+ * Persiste entre reinicios do Unbound. Campo e base64 no config.xml.
  * @return array ("ok" => bool, "msg" => string)
  */
 function layer7_configure_unbound_anti_doh()
@@ -316,19 +348,17 @@ function layer7_configure_unbound_anti_doh()
 		return array("ok" => false, "msg" => l7_t("Seccao Unbound nao encontrada no config.xml."));
 	}
 	$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
-	$existing = isset($config['unbound']['custom_options']) ? $config['unbound']['custom_options'] : "";
-	if (!is_string($existing)) {
-		$existing = "";
-	}
+	$existing = layer7_unbound_custom_options_read();
 	if (strpos($existing, $marker_start) !== false) {
 		return array("ok" => true, "msg" => l7_t("Overrides anti-DoH ja estao configurados."));
 	}
 	$block = layer7_anti_doh_block();
-	$clean_existing = "";
-	if ($existing !== "" && preg_match('/^[\x09\x0A\x0D\x20-\x7E]*$/', $existing)) {
-		$clean_existing = rtrim($existing) . "\n\n";
+	$new_content = "";
+	if ($existing !== "") {
+		$new_content = rtrim($existing) . "\n\n";
 	}
-	$config['unbound']['custom_options'] = $clean_existing . $block;
+	$new_content .= $block;
+	layer7_unbound_custom_options_write($new_content);
 	write_config("Layer7: anti-DoH NXDOMAIN overrides");
 	if (function_exists("services_unbound_configure")) {
 		services_unbound_configure();
@@ -346,10 +376,7 @@ function layer7_remove_unbound_anti_doh()
 	if (!function_exists("write_config") || !isset($config['unbound'])) {
 		return array("ok" => false, "msg" => l7_t("Config nao acessivel."));
 	}
-	$existing = isset($config['unbound']['custom_options']) ? $config['unbound']['custom_options'] : "";
-	if (!is_string($existing)) {
-		$existing = "";
-	}
+	$existing = layer7_unbound_custom_options_read();
 	$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
 	$marker_end = "# --- Layer7 anti-DoH/Relay END ---";
 	$pos_start = strpos($existing, $marker_start);
@@ -364,7 +391,7 @@ function layer7_remove_unbound_anti_doh()
 		}
 		$existing = substr($existing, 0, $pos_start) . substr($existing, $pos_end);
 	}
-	$config['unbound']['custom_options'] = trim($existing);
+	layer7_unbound_custom_options_write(trim($existing));
 	write_config("Layer7: anti-DoH overrides removed");
 	if (function_exists("services_unbound_configure")) {
 		services_unbound_configure();
@@ -374,17 +401,16 @@ function layer7_remove_unbound_anti_doh()
 
 /**
  * Verifica se os overrides anti-DoH estao configurados no Unbound.
- * Verifica no custom_options do config.xml e tambem no ficheiro gerado.
+ * Verifica no custom_options (base64) do config.xml e no ficheiro gerado.
  * @return bool
  */
 function layer7_unbound_anti_doh_configured()
 {
 	global $config;
 	$marker = "# --- Layer7 anti-DoH/Relay START ---";
-	if (isset($config['unbound']['custom_options']) && is_string($config['unbound']['custom_options'])) {
-		if (strpos($config['unbound']['custom_options'], $marker) !== false) {
-			return true;
-		}
+	$decoded = layer7_unbound_custom_options_read();
+	if ($decoded !== "" && strpos($decoded, $marker) !== false) {
+		return true;
 	}
 	if (file_exists("/var/unbound/unbound.conf")) {
 		$content = @file_get_contents("/var/unbound/unbound.conf");

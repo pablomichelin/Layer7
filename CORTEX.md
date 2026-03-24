@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.3.4 — Fix anti-DoH defensivo + botão remover**
+**Versão: 1.3.5 — Fix base64 custom_options Unbound**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
 
@@ -74,6 +74,15 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.3.5 — Fix base64 custom_options Unbound (2026-03-24):**
+  - Causa raiz: pfSense armazena custom_options do Unbound em base64 no
+    config.xml; nosso codigo escrevia texto puro, gerando garbled na GUI
+  - Novas funcoes layer7_unbound_custom_options_read/write() com
+    base64_decode/base64_encode
+  - Todas as funcoes anti-DoH (configure, remove, configured) corrigidas
+  - uninstall.sh --clean-unbound corrigido para base64
+  - uninstall.sh: auto-detecta modo nao-interactivo (Command Prompt)
+  - PORTVERSION incrementado para 1.3.5
 - **v1.3.4 — Fix anti-DoH defensivo + botão remover (2026-03-24):**
   - Reescrita completa de layer7_configure_unbound_anti_doh(): valida que
     conteudo existente em custom_options é texto ASCII limpo antes de
@@ -280,13 +289,14 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.3.4 — Fix anti-DoH defensivo + botão remover.**
+**v1.3.5 — Fix base64 custom_options Unbound.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
 de libcrypto e install.sh auto-detect (v1.3.1). Quick profiles para acesso
 remoto e anti-bypass DNS (v1.3.2). Fix anti-DoH persistente (v1.3.3).
-Fix defensivo: valida custom_options antes de concatenar, botao remover (v1.3.4).
+Botao remover (v1.3.4). Fix base64: pfSense armazena custom_options em
+base64 no config.xml, corrigidas todas as funcoes anti-DoH (v1.3.5).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -312,9 +322,9 @@ Fix defensivo: valida custom_options antes de concatenar, botao remover (v1.3.4)
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Testar instalacao limpa via install.sh (deve baixar v1.3.4 automaticamente)
-2. Limpar custom_options corrompido e testar "Configurar agora" (deve gravar texto limpo)
-3. Testar botao "Remover" nos Diagnosticos (deve limpar custom_options)
+1. Testar instalacao limpa via install.sh num pfSense zerado (deve baixar v1.3.5)
+2. Clicar "Configurar agora" nos Diagnosticos (custom_options deve ficar legivel)
+3. Verificar em Services > DNS Resolver que Custom Options mostra texto correcto
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

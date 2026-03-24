@@ -135,7 +135,7 @@ if [ "$CLEAN_UNBOUND" -eq 1 ]; then
     MARKER_END="# --- Layer7 anti-DoH/Relay END ---"
 
     if [ -f /conf/config.xml ]; then
-        if grep -q "$MARKER_START" /conf/config.xml 2>/dev/null; then
+        if grep -q "custom_options" /conf/config.xml 2>/dev/null; then
             cp /conf/config.xml /conf/config.xml.bak.layer7
             php -r '
                 require_once("config.inc");
@@ -144,7 +144,9 @@ if [ "$CLEAN_UNBOUND" -eq 1 ]; then
                 $ms = "# --- Layer7 anti-DoH/Relay START ---";
                 $me = "# --- Layer7 anti-DoH/Relay END ---";
                 if (isset($config["unbound"]["custom_options"])) {
-                    $co = $config["unbound"]["custom_options"];
+                    $raw = $config["unbound"]["custom_options"];
+                    $co = @base64_decode($raw, true);
+                    if ($co === false) { $co = $raw; }
                     $ps = strpos($co, $ms);
                     if ($ps !== false) {
                         $pe = strpos($co, $me, $ps);
@@ -153,7 +155,7 @@ if [ "$CLEAN_UNBOUND" -eq 1 ]; then
                             while ($pe < strlen($co) && ($co[$pe] === "\n" || $co[$pe] === "\r")) $pe++;
                             $co = substr($co, 0, $ps) . substr($co, $pe);
                         }
-                        $config["unbound"]["custom_options"] = trim($co);
+                        $config["unbound"]["custom_options"] = base64_encode(trim($co));
                         write_config("Layer7 uninstall: anti-DoH overrides removed");
                         echo "OK\n";
                     } else {
