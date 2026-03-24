@@ -225,6 +225,57 @@
         "gemini.google.com",
         "copilot.microsoft.com"
       ]
+    },
+    {
+      "id": "remote-access",
+      "name": "Acesso Remoto",
+      "icon": "fa-desktop",
+      "description": "Bloqueia softwares de acesso remoto (TeamViewer, AnyDesk, RustDesk, etc.).",
+      "ndpi_apps": ["TeamViewer", "AnyDesk", "VNC", "RDP"],
+      "ndpi_categories": [],
+      "hosts": [
+        "teamviewer.com",
+        "anydesk.com",
+        "rustdesk.com",
+        "rustdesk.net",
+        "splashtop.com",
+        "remotedesktop.google.com",
+        "remotdesktop.corp.google.com",
+        "zohoassist.com",
+        "zoho.com",
+        "screenconnect.com",
+        "connectwise.com",
+        "supremocontrol.com",
+        "nanosystems.it",
+        "islonline.com",
+        "islonline.net",
+        "dwservice.net",
+        "realvnc.com",
+        "remotepc.com"
+      ]
+    },
+    {
+      "id": "anti-bypass-dns",
+      "name": "Anti-bypass DNS",
+      "icon": "fa-shield",
+      "description": "Bloqueia bypass DNS: DoH, DoT e iCloud Private Relay. Tambem configura Unbound anti-DoH.",
+      "ndpi_apps": ["DoH_DoT"],
+      "ndpi_categories": [],
+      "hosts": [
+        "mask.icloud.com",
+        "mask-h2.icloud.com",
+        "use-application-dns.net",
+        "dns.google",
+        "dns.google.com",
+        "cloudflare-dns.com",
+        "one.one.one.one",
+        "dns.quad9.net",
+        "dns.adguard.com",
+        "doh.opendns.com",
+        "doh.cleanbrowsing.org",
+        "dns.nextdns.io"
+      ],
+      "extra_action": "configure_unbound_anti_doh"
     }
   ]
 }

@@ -55,6 +55,51 @@ if (isset($_POST["send_sighup"]) && $status_ok && $pid !== null) {
 	$sighup_sent = ($sig_code === 0);
 }
 
+$anti_doh_result = null;
+if (isset($_POST["configure_anti_doh"])) {
+	$ub_conf = "/var/unbound/unbound.conf";
+	$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
+	$marker_end = "# --- Layer7 anti-DoH/Relay END ---";
+	if (!file_exists($ub_conf)) {
+		$anti_doh_result = array("ok" => false, "msg" => l7_t("Ficheiro unbound.conf nao encontrado."));
+	} else {
+		$ub_content = @file_get_contents($ub_conf);
+		if (strpos($ub_content, $marker_start) !== false) {
+			$anti_doh_result = array("ok" => true, "msg" => l7_t("Overrides anti-DoH ja estao configurados."));
+		} else {
+			$doh_domains = array(
+				"mask.icloud.com", "mask-h2.icloud.com", "use-application-dns.net",
+				"dns.google", "dns.google.com", "8888.google", "dns64.dns.google",
+				"cloudflare-dns.com", "one.one.one.one", "1dot1dot1dot1.cloudflare-dns.com",
+				"security.cloudflare-dns.com", "family.cloudflare-dns.com",
+				"dns.quad9.net", "dns9.quad9.net", "dns10.quad9.net", "dns11.quad9.net",
+				"dns.adguard.com", "dns-family.adguard.com", "dns-unfiltered.adguard.com",
+				"doh.opendns.com", "doh.cleanbrowsing.org", "dns.nextdns.io",
+				"doh.xfinity.com", "ordns.he.net"
+			);
+			$block = "\n{$marker_start}\n";
+			$block .= "# Dominios de resolvers DoH/DoT e Apple Private Relay.\n";
+			$block .= "# Devolver NXDOMAIN forca fallback para DNS convencional.\n";
+			$block .= "# Gerado pela GUI Layer7.\n";
+			foreach ($doh_domains as $d) {
+				$block .= "server:\n    local-zone: \"{$d}.\" always_nxdomain\n";
+			}
+			$block .= "{$marker_end}\n";
+			@copy($ub_conf, $ub_conf . ".layer7-bak." . date("YmdHis"));
+			if (@file_put_contents($ub_conf, $ub_content . $block) !== false) {
+				exec("/usr/local/sbin/pfSsh.php playback svc restart unbound 2>&1", $restart_out, $restart_code);
+				if ($restart_code === 0) {
+					$anti_doh_result = array("ok" => true, "msg" => l7_t("Overrides anti-DoH configurados e Unbound reiniciado com sucesso."));
+				} else {
+					$anti_doh_result = array("ok" => true, "msg" => l7_t("Overrides adicionados, mas falha ao reiniciar Unbound. Reinicie manualmente."));
+				}
+			} else {
+				$anti_doh_result = array("ok" => false, "msg" => l7_t("Erro ao escrever em unbound.conf."));
+			}
+		}
+	}
+}
+
 $recent_logs = array();
 if (file_exists($log_path)) {
 	exec("/usr/bin/tail -n 20 " . escapeshellarg($log_path) . " 2>/dev/null", $recent_logs);
@@ -146,6 +191,9 @@ layer7_render_styles();
 		<?php } ?>
 		<?php if ($sighup_sent) { ?>
 		<div class="alert alert-success"><?= l7_t("SIGHUP enviado. O daemon recarregou a configuracao."); ?></div>
+		<?php } ?>
+		<?php if ($anti_doh_result !== null) { ?>
+		<div class="alert alert-<?= $anti_doh_result["ok"] ? "success" : "danger"; ?>"><?= htmlspecialchars($anti_doh_result["msg"]); ?></div>
 		<?php } ?>
 
 		<div class="layer7-section">
@@ -320,7 +368,12 @@ layer7_render_styles();
 						<?php if ($unbound_anti_doh) { ?>
 						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Overrides anti-DoH configurados no Unbound."); ?></span>
 						<?php } else { ?>
-						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Overrides nao encontrados. Execute: sh /usr/local/libexec/layer7-unbound-anti-doh"); ?></span>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Overrides nao encontrados."); ?></span>
+						<form method="post" style="display:inline; margin-left:8px;">
+							<button type="submit" name="configure_anti_doh" value="1" class="btn btn-xs btn-success" title="<?= l7_t("Adiciona NXDOMAIN para resolvers DoH conhecidos e reinicia o Unbound."); ?>">
+								<i class="fa fa-magic"></i> <?= l7_t("Configurar agora"); ?>
+							</button>
+						</form>
 						<?php } ?>
 					</dd>
 

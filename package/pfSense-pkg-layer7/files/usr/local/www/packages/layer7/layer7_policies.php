@@ -97,11 +97,45 @@ if ($_POST["add_profile_policy"] ?? false) {
 						$rule["match"]["hosts"] = array_slice($hosts, 0, 64);
 					}
 
-					$policies[] = $rule;
-					if (layer7_save_json($data)) {
-						layer7_signal_reload();
-						$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
+				$policies[] = $rule;
+				if (layer7_save_json($data)) {
+					layer7_signal_reload();
+					$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
+
+					if (isset($profile["extra_action"]) && $profile["extra_action"] === "configure_unbound_anti_doh") {
+						$ub_conf = "/var/unbound/unbound.conf";
+						$marker_start = "# --- Layer7 anti-DoH/Relay START ---";
+						if (file_exists($ub_conf)) {
+							$ub_content = @file_get_contents($ub_conf);
+							if (strpos($ub_content, $marker_start) === false) {
+								$marker_end = "# --- Layer7 anti-DoH/Relay END ---";
+								$doh_domains = array(
+									"mask.icloud.com", "mask-h2.icloud.com", "use-application-dns.net",
+									"dns.google", "dns.google.com", "8888.google", "dns64.dns.google",
+									"cloudflare-dns.com", "one.one.one.one", "1dot1dot1dot1.cloudflare-dns.com",
+									"security.cloudflare-dns.com", "family.cloudflare-dns.com",
+									"dns.quad9.net", "dns9.quad9.net", "dns10.quad9.net", "dns11.quad9.net",
+									"dns.adguard.com", "dns-family.adguard.com", "dns-unfiltered.adguard.com",
+									"doh.opendns.com", "doh.cleanbrowsing.org", "dns.nextdns.io",
+									"doh.xfinity.com", "ordns.he.net"
+								);
+								$block = "\n{$marker_start}\n";
+								$block .= "# Dominios de resolvers DoH/DoT e Apple Private Relay.\n";
+								$block .= "# Devolver NXDOMAIN forca fallback para DNS convencional.\n";
+								$block .= "# Gerado pela GUI Layer7.\n";
+								foreach ($doh_domains as $d) {
+									$block .= "server:\n    local-zone: \"{$d}.\" always_nxdomain\n";
+								}
+								$block .= "{$marker_end}\n";
+								@copy($ub_conf, $ub_conf . ".layer7-bak." . date("YmdHis"));
+								if (@file_put_contents($ub_conf, $ub_content . $block) !== false) {
+									exec("/usr/local/sbin/pfSsh.php playback svc restart unbound 2>&1", $restart_out, $restart_code);
+									$savemsg .= " " . l7_t("Unbound anti-DoH tambem configurado.");
+								}
+							}
+						}
 					}
+				}
 				}
 			}
 			unset($policies);
@@ -529,7 +563,9 @@ function layer7_policy_match_summary($policy) {
 			"streaming" => array("#FF6D00", '<circle cx="12" cy="12" r="10" fill="none" stroke="#fff" stroke-width="1.5"/><polygon points="10,8 16,12 10,16" fill="#fff"/>'),
 			"gaming" => array("#7B2FBE", '<path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.27 1.8-.75L9 16h6l2.25 2.25c.48.48 1.13.75 1.8.75 1.56 0 2.75-1.37 2.53-2.91zM11 11H9v2H8v-2H6v-1h2V8h1v2h2v1zm4 2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm3-2c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z" fill="#fff"/>'),
 			"vpn-proxy" => array("#2C3E50", '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" fill="#fff"/>'),
-			"ai-tools" => array("#10A37F", '<path d="M22.282 9.821a5.985 5.985 0 00-.516-4.91 6.046 6.046 0 00-6.51-2.9A6.065 6.065 0 0011.694.14 6.016 6.016 0 005.21 2.253 6.09 6.09 0 001.634 7.96a6.027 6.027 0 00.72 5.027 5.985 5.985 0 00.516 4.911 6.046 6.046 0 006.51 2.9A6.06 6.06 0 0012.95 23.856a6.016 6.016 0 006.484-2.112 6.09 6.09 0 003.577-5.707 6.027 6.027 0 00-.73-6.216zm-9.332 12.66a4.508 4.508 0 01-2.888-1.04l.144-.082 4.795-2.77a.78.78 0 00.393-.68v-6.76l2.027 1.17a.071.071 0 01.039.052v5.6a4.536 4.536 0 01-4.51 4.51zm-9.707-4.14a4.483 4.483 0 01-.538-3.024l.144.086 4.796 2.77a.78.78 0 00.786 0l5.857-3.382v2.34a.073.073 0 01-.029.062L9.354 19.7a4.536 4.536 0 01-6.111-1.359zM2.14 7.847a4.49 4.49 0 012.35-1.979V11.6a.78.78 0 00.394.68l5.856 3.383-2.027 1.17a.072.072 0 01-.067.005L3.739 14.07A4.536 4.536 0 012.14 7.847zm16.653 3.872l-5.857-3.382 2.027-1.17a.072.072 0 01.067-.005l4.907 2.833a4.534 4.534 0 01-.7 8.177V12.4a.78.78 0 00-.394-.68zm2.016-3.036l-.144-.086-4.796-2.77a.78.78 0 00-.786 0l-5.857 3.382V6.87a.073.073 0 01.029-.062l4.907-2.832a4.536 4.536 0 016.647 4.707zM8.61 12.89l-2.027-1.17a.071.071 0 01-.039-.052V6.07a4.535 4.535 0 017.399-3.517l-.144.082-4.795 2.77a.78.78 0 00-.393.68v6.76zm1.1-2.378l2.608-1.506 2.608 1.506v3.012l-2.608 1.506-2.608-1.506v-3.012z" fill="#fff"/>')
+			"ai-tools" => array("#10A37F", '<path d="M22.282 9.821a5.985 5.985 0 00-.516-4.91 6.046 6.046 0 00-6.51-2.9A6.065 6.065 0 0011.694.14 6.016 6.016 0 005.21 2.253 6.09 6.09 0 001.634 7.96a6.027 6.027 0 00.72 5.027 5.985 5.985 0 00.516 4.911 6.046 6.046 0 006.51 2.9A6.06 6.06 0 0012.95 23.856a6.016 6.016 0 006.484-2.112 6.09 6.09 0 003.577-5.707 6.027 6.027 0 00-.73-6.216zm-9.332 12.66a4.508 4.508 0 01-2.888-1.04l.144-.082 4.795-2.77a.78.78 0 00.393-.68v-6.76l2.027 1.17a.071.071 0 01.039.052v5.6a4.536 4.536 0 01-4.51 4.51zm-9.707-4.14a4.483 4.483 0 01-.538-3.024l.144.086 4.796 2.77a.78.78 0 00.786 0l5.857-3.382v2.34a.073.073 0 01-.029.062L9.354 19.7a4.536 4.536 0 01-6.111-1.359zM2.14 7.847a4.49 4.49 0 012.35-1.979V11.6a.78.78 0 00.394.68l5.856 3.383-2.027 1.17a.072.072 0 01-.067.005L3.739 14.07A4.536 4.536 0 012.14 7.847zm16.653 3.872l-5.857-3.382 2.027-1.17a.072.072 0 01.067-.005l4.907 2.833a4.534 4.534 0 01-.7 8.177V12.4a.78.78 0 00-.394-.68zm2.016-3.036l-.144-.086-4.796-2.77a.78.78 0 00-.786 0l-5.857 3.382V6.87a.073.073 0 01.029-.062l4.907-2.832a4.536 4.536 0 016.647 4.707zM8.61 12.89l-2.027-1.17a.071.071 0 01-.039-.052V6.07a4.535 4.535 0 017.399-3.517l-.144.082-4.795 2.77a.78.78 0 00-.393.68v6.76zm1.1-2.378l2.608-1.506 2.608 1.506v3.012l-2.608 1.506-2.608-1.506v-3.012z" fill="#fff"/>'),
+		"remote-access" => array("#E74C3C", '<path d="M21 2H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h7v2H8v2h8v-2h-2v-2h7c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H3V4h18v12z" fill="#fff"/>'),
+		"anti-bypass-dns" => array("#E67E22", '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v2h-2V7zm0 4h2v6h-2v-6z" fill="#fff"/>')
 		);
 		?>
 		<div class="l7-profiles-grid">

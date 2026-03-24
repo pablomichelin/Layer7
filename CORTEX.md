@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.3.1 — Fix libcrypto + install.sh auto-version**
+**Versão: 1.3.2 — Quick profiles: Acesso Remoto + Anti-bypass DNS + botao Unbound**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 10 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls.
 
@@ -74,6 +74,16 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.3.2 — Quick profiles: Acesso Remoto + Anti-bypass DNS (2026-03-24):**
+  - Novo quick profile "Acesso Remoto" (TeamViewer, AnyDesk, RustDesk, Splashtop,
+    Chrome Remote Desktop, Zoho Assist, ScreenConnect, Supremo, ISL Online,
+    DWService, RealVNC, RemotePC) com 4 apps nDPI + 18 hosts
+  - Novo quick profile "Anti-bypass DNS" (DoH_DoT + hosts de resolvers DoH)
+    com accao especial: ao aplicar, configura automaticamente Unbound anti-DoH
+  - Botao "Configurar agora" na pagina Diagnosticos para configurar Unbound
+    anti-DoH com um clique (sem necessidade de SSH)
+  - Traducoes EN para todas as novas strings
+  - PORTVERSION incrementado para 1.3.2
 - **v1.3.1 — Fix libcrypto + install.sh auto-version (2026-03-24):**
   - Fix critico: libcrypto linkada estaticamente (/usr/lib/libcrypto.a)
     para evitar "libcrypto.so.35 not found" em pfSense CE
@@ -249,11 +259,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.3.1 — Fix libcrypto + install.sh publicado.**
+**v1.3.2 — Quick profiles: Acesso Remoto + Anti-bypass DNS.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
-de libcrypto e install.sh auto-detect (v1.3.1).
+de libcrypto e install.sh auto-detect (v1.3.1). Quick profiles para acesso
+remoto e anti-bypass DNS com configuracao automatica do Unbound (v1.3.2).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
