@@ -32,17 +32,17 @@ Cada seccao abaixo inclui:
 **Comando unico (Command Prompt):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg
 ```
 
 ```sh
@@ -114,7 +114,7 @@ layer7d --license-status
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -124,11 +124,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.1.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.1.0/pfSense-pkg-layer7-1.1.0.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg
 ```
 
 ```sh
@@ -139,7 +139,7 @@ service layer7d onestart
 layer7d -V
 ```
 
-Politicas, excepcoes, grupos e licenca sao preservados durante o upgrade.
+Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upgrade.
 
 ---
 
@@ -148,7 +148,7 @@ Politicas, excepcoes, grupos e licenca sao preservados durante o upgrade.
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -162,7 +162,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.1.0.pkg
 ```
 
 ```sh
@@ -191,6 +191,7 @@ Limpar configs (opcional — remove tudo):
 rm -f /usr/local/etc/layer7.json
 rm -f /usr/local/etc/layer7.lic
 rm -f /usr/local/etc/layer7-protos.txt
+rm -rf /usr/local/etc/layer7/blacklists
 ```
 
 ---
@@ -253,6 +254,24 @@ Ver IPs bloqueados:
 pfctl -t layer7_block -T show
 ```
 
+Ver IPs de destino bloqueados (sites/blacklists):
+
+```sh
+pfctl -t layer7_block_dst -T show
+```
+
+Ver IPs excepcionados de blacklists:
+
+```sh
+pfctl -t layer7_bl_except -T show
+```
+
+Ver log de actualizacao de blacklists:
+
+```sh
+tail -30 /var/log/layer7-bl-update.log
+```
+
 Verificar se o binario esta presente:
 
 ```sh
@@ -281,9 +300,14 @@ cat /usr/local/etc/layer7.lic
 | `/usr/local/etc/layer7.json`         | Configuracao principal           |
 | `/usr/local/etc/layer7.lic`          | Ficheiro de licenca              |
 | `/usr/local/etc/layer7-protos.txt`   | Lista de protocolos conhecidos   |
+| `/usr/local/etc/layer7/blacklists/`  | Directorio de blacklists UT1     |
+| `/usr/local/etc/layer7/blacklists/config.json` | Config das blacklists   |
+| `/usr/local/etc/layer7/blacklists/discovered.json` | Categorias auto-descobertas |
+| `/usr/local/etc/layer7/update-blacklists.sh` | Script de download        |
 | `/usr/local/etc/rc.d/layer7d`        | Script rc.d do servico           |
 | `/var/run/layer7d.pid`               | PID do daemon                    |
 | `/var/log/system.log`                | Logs do daemon                   |
+| `/var/log/layer7-bl-update.log`      | Log de actualizacao de blacklists|
 
 ---
 
@@ -302,8 +326,9 @@ pkg delete -y pfSense-pkg-layer7
 ```sh
 pfctl -t layer7_block -T flush
 pfctl -t layer7_block_dst -T flush
+pfctl -t layer7_bl_except -T flush
 ```
 
 O pfSense volta ao funcionamento normal imediatamente.
-A configuracao (`layer7.json`) e a licenca (`layer7.lic`) sao preservadas
-para uma reinstalacao futura.
+A configuracao (`layer7.json`), a licenca (`layer7.lic`) e as blacklists
+sao preservadas para uma reinstalacao futura.
