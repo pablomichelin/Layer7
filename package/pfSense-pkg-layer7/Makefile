@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.0.1
+PORTVERSION=	1.0.2
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty

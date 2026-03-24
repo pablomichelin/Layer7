@@ -78,6 +78,27 @@ $total_allowed = ($stats && isset($stats["total_allowed"])) ? (int)$stats["total
 $top_apps = ($stats && isset($stats["top_apps_blocked"]) && is_array($stats["top_apps_blocked"])) ? $stats["top_apps_blocked"] : array();
 $top_sources = ($stats && isset($stats["top_sources_blocked"]) && is_array($stats["top_sources_blocked"])) ? $stats["top_sources_blocked"] : array();
 
+$restart_msg = "";
+$restart_err = "";
+if (isset($_POST["restart_service"])) {
+	if (layer7_restart_service()) {
+		$restart_msg = gettext("Servico layer7d reiniciado com sucesso.");
+	} else {
+		$restart_err = gettext("Falha ao reiniciar o servico layer7d. Verifique o estado no terminal.");
+	}
+	$pid = null;
+	$running = false;
+	$pidfile = "/var/run/layer7d.pid";
+	if (file_exists($pidfile)) {
+		$pid = trim(@file_get_contents($pidfile));
+		if ($pid !== "" && ctype_digit($pid)) {
+			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>&1", $chk2, $chk2_code);
+			$running = ($chk2_code === 0);
+		}
+	}
+	$stats = $running ? layer7_read_stats() : null;
+}
+
 $pgtitle = array(gettext("Services"), gettext("Layer 7"));
 include("head.inc");
 layer7_render_styles();
@@ -89,6 +110,13 @@ layer7_render_styles();
 	<div class="panel-body">
 		<?php layer7_render_tabs("status"); ?>
 		<div class="layer7-content">
+
+		<?php if ($restart_msg !== "") { ?>
+		<div class="alert alert-success"><i class="fa fa-check-circle"></i> <?= htmlspecialchars($restart_msg); ?></div>
+		<?php } ?>
+		<?php if ($restart_err !== "") { ?>
+		<div class="alert alert-danger"><i class="fa fa-times-circle"></i> <?= htmlspecialchars($restart_err); ?></div>
+		<?php } ?>
 
 		<div class="layer7-section">
 			<div class="l7-dashboard-cards">
@@ -264,6 +292,12 @@ layer7_render_styles();
 		</div>
 
 		<div class="layer7-toolbar">
+			<form method="post" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
+				<button type="submit" name="restart_service" value="1" class="btn btn-warning"
+					onclick="return confirm('<?= gettext("Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart."); ?>');">
+					<i class="fa fa-refresh"></i> <?= gettext("Reiniciar servico"); ?>
+				</button>
+			</form>
 			<a href="layer7_settings.php" class="btn btn-primary"><?= gettext("Abrir definicoes"); ?></a>
 			<a href="layer7_policies.php" class="btn btn-default"><?= gettext("Ver politicas"); ?></a>
 			<a href="layer7_diagnostics.php" class="btn btn-default"><?= gettext("Diagnostics"); ?></a>

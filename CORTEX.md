@@ -74,6 +74,11 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.0.2 — Melhorias operacionais (2026-03-23):**
+  - Botao "Reiniciar servico" na pagina Status (dashboard) com confirmacao
+  - Helper `layer7_restart_service()` em layer7.inc (stop + start + verificacao PID)
+  - Servico layer7d registado em Status > Services do pfSense (bloco `<service>` no layer7.xml)
+  - pfSense passa a mostrar layer7d com botoes nativos start/stop/restart em Status > Services
 - **v1.0.0 — Release V1 Comercial (2026-03-23):**
   - Versao final com todas as funcionalidades V1
   - PORTVERSION 1.0.0, install.sh actualizado

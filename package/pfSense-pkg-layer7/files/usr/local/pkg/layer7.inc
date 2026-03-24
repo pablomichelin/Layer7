@@ -165,6 +165,30 @@ function layer7_save_json($data)
 	return true;
 }
 
+function layer7_restart_service()
+{
+	$rc = "/usr/local/etc/rc.d/layer7d";
+	if (!file_exists($rc)) {
+		return false;
+	}
+	$cmd = "/bin/sh " . escapeshellarg($rc) . " onestop 2>/dev/null; sleep 1; /bin/sh " . escapeshellarg($rc) . " onestart 2>/dev/null";
+	if (function_exists("mwexec")) {
+		mwexec($cmd);
+	} else {
+		@shell_exec($cmd);
+	}
+	usleep(500000);
+	$pidf = "/var/run/layer7d.pid";
+	if (file_exists($pidf)) {
+		$pid = trim(file_get_contents($pidf));
+		if ($pid !== "" && ctype_digit($pid)) {
+			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>&1", $chk, $code);
+			return ($code === 0);
+		}
+	}
+	return false;
+}
+
 function layer7_signal_reload()
 {
 	$pidf = "/var/run/layer7d.pid";

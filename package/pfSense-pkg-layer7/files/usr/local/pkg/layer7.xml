@@ -48,4 +48,10 @@
 		<section>Services</section>
 		<url>/packages/layer7/layer7_status.php</url>
 	</menu>
+	<service>
+		<name>layer7d</name>
+		<rcfile>layer7d</rcfile>
+		<executable>layer7d</executable>
+		<description><![CDATA[Layer 7 Traffic Classification and Policy Engine]]></description>
+	</service>
 </packagegui>

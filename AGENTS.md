@@ -63,6 +63,33 @@ Sempre responder com:
 
 ---
 
+## Fluxo de entrega obrigatório
+
+**Toda modificação solicitada pelo Pablo deve ser entregue PRONTA para uso.**
+Isso significa que o agente deve executar o fluxo completo:
+
+1. Editar os ficheiros fonte necessários
+2. Atualizar o PORTVERSION no Makefile (incrementar patch)
+3. Atualizar CORTEX.md, MANUAL-INSTALL.md e demais docs afetados
+4. Fazer commit no git local
+5. Fazer build do pacote no FreeBSD builder (192.168.100.12) via SSH
+6. Copiar o `.pkg` resultante para a máquina local
+7. Push para o GitHub
+8. Criar GitHub Release com o `.pkg` como artefato
+9. Confirmar que o pacote está disponível para download
+
+**Nunca** entregar apenas edições de código sem completar este fluxo.
+Se algum passo falhar, reportar o erro e tentar resolver.
+
+### Dados do builder
+
+- **IP**: 192.168.100.12
+- **Directório do port**: copiar repo para o builder ou fazer build direto
+- **Comando de build**: `cd package/pfSense-pkg-layer7 && make clean && make package DISABLE_VULNERABILITIES=yes`
+- **Pacote resultante**: `work/pkg/pfSense-pkg-layer7-X.Y.Z.pkg`
+
+---
+
 ## Restrições do projeto
 
 - foco em pfSense CE;

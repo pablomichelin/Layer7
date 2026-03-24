@@ -8,11 +8,11 @@
 ## 1. Instalar (primeira vez)
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.0.1.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.1/pfSense-pkg-layer7-1.0.1.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.1.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg
 ```
 
 ```sh
@@ -86,11 +86,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.0.1.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.1/pfSense-pkg-layer7-1.0.1.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.0.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.0.2/pfSense-pkg-layer7-1.0.2.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.1.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg
 ```
 
 ```sh
@@ -114,7 +114,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.1.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.0.2.pkg
 ```
 
 ```sh
