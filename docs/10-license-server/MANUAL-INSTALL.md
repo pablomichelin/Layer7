@@ -5,6 +5,56 @@
 
 ---
 
+## Regra operacional deste manual
+
+**SEMPRE actualizar este ficheiro quando houver nova versao publicada.**
+
+Ao subir uma nova versao, actualizar no mesmo bloco:
+- links directos da release
+- nome do `.pkg`
+- comandos de install, upgrade e reinstall
+- exemplos com `--version`
+
+---
+
+## Links da versao actual (para teste)
+
+**Versao actual:** `1.4.9`
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.4.9`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.9/pfSense-pkg-layer7-1.4.9.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.9/pfSense-pkg-layer7-1.4.9.pkg.sha256`
+- **Install script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh`
+- **Uninstall script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh`
+
+**Comandos rapidos de teste:**
+
+Instalar ultima versao publicada:
+
+```sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+```
+
+Instalar explicitamente a versao `1.4.9`:
+
+```sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.9
+```
+
+Baixar o `.pkg` directo da versao `1.4.9`:
+
+```sh
+fetch -o /tmp/pfSense-pkg-layer7-1.4.9.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.9/pfSense-pkg-layer7-1.4.9.pkg
+```
+
+Desinstalar com script publico:
+
+```sh
+fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
+```
+
+---
+
 ## Como executar os comandos
 
 Existem duas formas de executar comandos no pfSense:

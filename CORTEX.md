@@ -78,6 +78,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
   - `install.sh` e `uninstall.sh` passam a apontar para o repositório público `pablomichelin/Layer7`
   - GUI `Settings` passa a consultar updates e assets no novo repositório público de distribuição
   - `MANUAL-INSTALL.md`, `README.md`, `scripts/release/README.md` e `release-body.md` actualizados para os novos URLs públicos
+  - `MANUAL-INSTALL.md` passa a manter um bloco fixo com links directos da versão actual para teste rápido
   - Preparação para tornar o repositório principal privado sem quebrar instalação, upgrade nem atualização pela GUI
   - PORTVERSION incrementado para 1.4.9
 - **v1.4.8 — Correção de registo de licença por case (2026-03-24):**
