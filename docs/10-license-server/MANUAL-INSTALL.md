@@ -37,7 +37,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.4.0`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.4.2`
 
 **Comando unico manual (Command Prompt):**
 
@@ -46,19 +46,19 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.4.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.2/pfSense-pkg-layer7-1.4.2.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.2.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.2/pfSense-pkg-layer7-1.4.2.pkg
 ```
 ```sh
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.2.pkg
 ```
 
 ```sh
@@ -138,7 +138,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.2/pfSense-pkg-layer7-1.4.2.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.2.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -148,11 +148,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.0.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.0/pfSense-pkg-layer7-1.4.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.2.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.2/pfSense-pkg-layer7-1.4.2.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.2.pkg
 ```
 
 ```sh
@@ -172,7 +172,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.2.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -186,7 +186,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.2.pkg
 ```
 
 ```sh
@@ -415,7 +415,7 @@ cat /usr/local/etc/layer7.lic
 
 ## 9. Relatorios
 
-A partir da v1.4.0, o Layer7 inclui um modulo de relatorios acessivel em
+A partir da v1.4.2, o Layer7 inclui um modulo de relatorios acessivel em
 **Services > Layer 7 > Relatorios**.
 
 ### O que faz
@@ -450,7 +450,67 @@ O formato HTML gera um relatorio formatado pronto para impressao ou email.
 
 ---
 
-## 10. Caminhos importantes
+## 10. Troubleshooting — Tabelas PF
+
+Se apos instalar ou actualizar, a pagina **Diagnosticos** mostra
+"Tabela nao existe" para `layer7_block`, `layer7_block_dst` ou
+`layer7_bld_N`, execute os passos abaixo.
+
+### Reparacao pela GUI (recomendado)
+
+Na pagina **Services > Layer 7 > Diagnosticos**, clique no botao
+**Reparar tabelas PF**. A partir da v1.4.2, esta accao:
+1. Escreve o snippet `pf.conf` com as declaracoes de tabelas
+2. Tenta criar as tabelas via `pfctl`
+3. Chama `filter_configure()` para recarregar o filtro
+4. Verifica se as tabelas foram criadas
+5. Se necessario, forca `pfctl -f /tmp/rules.debug` como fallback sincrono
+
+### Reparacao manual (SSH/Console)
+
+Se o botao nao resolver, force manualmente:
+
+```sh
+/usr/local/libexec/layer7-pfctl ensure && pfctl -f /tmp/rules.debug
+```
+
+Verificar que as tabelas existem:
+
+```sh
+pfctl -s Tables | grep layer7
+```
+
+Resultado esperado:
+
+```
+layer7_block
+layer7_block_dst
+layer7_tagged
+layer7_bld_0
+```
+
+Se as tabelas continuarem em falta, reinicie o servico:
+
+```sh
+service layer7d onerestart
+```
+
+O rc.d do layer7d chama `layer7-pfctl ensure` automaticamente no arranque.
+
+### Causa raiz (v1.4.0 e anteriores)
+
+Nas versoes anteriores a v1.4.2, o `ensure_table()` usava `pfctl -t TABLE -T add`
+para criar tabelas ad-hoc, mas essa tecnica podia falhar silenciosamente se
+o PF nao tivesse as tabelas declaradas no ruleset carregado. Alem disso,
+`filter_configure()` no pfSense CE e assincrono, o que causava uma race
+condition entre a criacao e a verificacao.
+
+A v1.4.2 corrige isto com: escrita de `pf.conf` antes da criacao,
+verificacao pos-tentativa, e fallback sincrono via `pfctl -f rules.debug`.
+
+---
+
+## 11. Caminhos importantes
 
 | Ficheiro                             | Descricao                        |
 |--------------------------------------|----------------------------------|
@@ -473,7 +533,7 @@ O formato HTML gera um relatorio formatado pronto para impressao ou email.
 
 ---
 
-## 11. Rollback de emergencia
+## 12. Rollback de emergencia
 
 Se algo der errado apos instalar ou actualizar, use o desinstalador
 automatico preservando a configuracao:

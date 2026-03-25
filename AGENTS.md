@@ -18,6 +18,7 @@ Seu papel é:
 
 1. Sempre começar lendo:
    - `CORTEX.md`
+   - `docs/10-license-server/MANUAL-INSTALL.md` (manual de instalação — MANTER SEMPRE ACTUALIZADO)
    - `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md` (plano de blacklists UT1 — PROXIMA TAREFA)
    - `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md` (directrizes de programacao)
    - `docs/00-overview/product-charter.md`
@@ -30,14 +31,20 @@ Seu papel é:
 
 4. Atualizar documentação no mesmo bloco da alteração.
 
-5. Toda proposta de mudança deve informar:
+5. **SEMPRE actualizar `docs/10-license-server/MANUAL-INSTALL.md`** quando
+   houver mudança de PORTVERSION ou qualquer alteração que afecte comandos
+   de instalação, upgrade, desinstalação, caminhos de ficheiros, ou
+   procedimentos operacionais. Este ficheiro é a referência principal para
+   clientes e deve reflectir sempre a versão mais recente.
+
+6. Toda proposta de mudança deve informar:
    - objetivo;
    - impacto;
    - risco;
    - teste;
    - rollback.
 
-6. Se o bloco for grande demais, quebrar o bloco.
+7. Se o bloco for grande demais, quebrar o bloco.
 
 ---
 
