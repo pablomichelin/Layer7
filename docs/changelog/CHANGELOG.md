@@ -2,6 +2,15 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.4.11] — 2026-03-25
+
+### Changed
+
+- **Controle de versão** — nova release patch para manter o histórico após a entrega funcional da v1.4.10
+- **Documentação operacional** — `MANUAL-INSTALL.md`, `README.md`, `release-body.md` e scripts de release sincronizados com a nova versão pública
+- **Links públicos** — comandos, URLs do `.pkg` e exemplos com `--version` passam a apontar para `v1.4.11`
+- **PORTVERSION** bumped para 1.4.11
+
 ## [1.4.10] — 2026-03-25
 
 ### Changed

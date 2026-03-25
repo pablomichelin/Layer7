@@ -1,4 +1,8 @@
-# Manual — Relatorios Executivos (v1.4.10+)
+# Manual — Relatorios Executivos (v1.4.11+)
+
+## Ajuste de controlo na v1.4.11
+
+- Release patch apenas para manter o versionamento, os links publicos e a documentacao sincronizados apos a entrega funcional da v1.4.10.
 
 ## Objetivo
 

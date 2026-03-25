@@ -1,14 +1,12 @@
-## Layer7 v1.4.10 — relatorios estilo NGFW
+## Layer7 v1.4.11 — controlo de versao e links sincronizados
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Relatorios estilo NGFW** — historico executivo separado do log detalhado para reduzir uso local
-- **Log detalhado opcional** — operador pode activar/desactivar a gravacao detalhada em SQLite
-- **Escopo por interface** — log detalhado pode ser limitado a uma ou mais interfaces
-- **Retencao separada** — historico executivo e log detalhado passam a ter retenções independentes
-- **Paginacao compacta** — a tela de relatorios deixa de renderizar milhares de paginas no HTML
+- **Release de controlo** — consolida a entrega funcional publicada na `v1.4.10` sob uma nova versao patch para manter o historico consistente
+- **Documentacao sincronizada** — links, exemplos de install/upgrade e referencias publicas passam a apontar para `v1.4.11`
+- **Mesmo comportamento funcional da v1.4.10** — relatorios estilo NGFW, log detalhado opcional, seleccao por interface e retencao separada permanecem incluidos
 
 ### Inclui todas as funcionalidades anteriores
 
