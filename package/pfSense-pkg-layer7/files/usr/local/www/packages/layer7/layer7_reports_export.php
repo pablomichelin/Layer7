@@ -115,28 +115,28 @@ if ($format === "csv") {
 	header("Content-Disposition: attachment; filename=\"{$filename_base}.csv\"");
 	$out = fopen("php://output", "w");
 
-	fputcsv($out, array("Layer7 Executive Report", $period_label));
-	fputcsv($out, array("Total", $total_events, "Blocked", $blocked_events, "Allowed", $allowed_events, "Monitor", $monitor_events));
-	fputcsv($out, array("Unique Devices", $unique_devices, "Unique Sites", $unique_sites, "Block Rate %", $block_rate));
+	fputcsv($out, array(l7_t("Relatorio executivo Layer7"), $period_label));
+	fputcsv($out, array(l7_t("Total"), $total_events, l7_t("Bloqueados"), $blocked_events, l7_t("Permitidos"), $allowed_events, l7_t("Monitorados"), $monitor_events));
+	fputcsv($out, array(l7_t("Dispositivos unicos"), $unique_devices, l7_t("Sites unicos"), $unique_sites, l7_t("Indice de bloqueio %"), $block_rate));
 	fputcsv($out, array());
 
-	fputcsv($out, array("Top Devices"));
-	fputcsv($out, array("Rank", "Device", "IP", "Blocked", "Total"));
+	fputcsv($out, array(l7_t("Dispositivos com maior incidencia")));
+	fputcsv($out, array(l7_t("Posicao"), l7_t("Dispositivo"), "IP", l7_t("Bloqueados"), l7_t("Total")));
 	foreach ($top_devices as $i => $d) {
 		$id = resolveIdentityByIp($d["src_ip"]);
 		fputcsv($out, array($i + 1, $id["display_name"], $d["src_ip"], (int)$d["blocked_events"], (int)$d["total_events"]));
 	}
 	fputcsv($out, array());
 
-	fputcsv($out, array("Top Sites"));
-	fputcsv($out, array("Rank", "Site", "Blocked", "Total"));
+	fputcsv($out, array(l7_t("Sites mais tentados")));
+	fputcsv($out, array(l7_t("Posicao"), l7_t("Site"), l7_t("Bloqueados"), l7_t("Total")));
 	foreach ($top_sites as $i => $s) {
 		fputcsv($out, array($i + 1, $s["host"], (int)$s["blocked_events"], (int)$s["total_events"]));
 	}
 	fputcsv($out, array());
 
-	fputcsv($out, array("Detailed Events"));
-	fputcsv($out, array("Timestamp", "Device", "IP", "Site", "App", "Category", "Action", "Policy", "Interface", "Destination"));
+	fputcsv($out, array(l7_t("Eventos detalhados")));
+	fputcsv($out, array(l7_t("Data/Hora"), l7_t("Dispositivo"), "IP", l7_t("Site"), l7_t("Aplicacao"), l7_t("Categoria"), l7_t("Resultado"), l7_t("Politica"), l7_t("Interface"), l7_t("Destino")));
 	foreach ($rows as $ev) {
 		$id = resolveIdentityByIp($ev["src_ip"]);
 		fputcsv($out, array(
@@ -163,7 +163,7 @@ header("Content-Disposition: attachment; filename=\"{$filename_base}.html\"");
 <html lang="pt">
 <head>
 <meta charset="utf-8">
-<title>Layer7 - Relatorio Executivo</title>
+<title><?= htmlspecialchars(l7_t("Layer7 - Relatorio Executivo")); ?></title>
 <style>
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:980px;margin:0 auto;padding:26px;color:#222}
 h1{font-size:24px;margin:0 0 10px}
@@ -179,29 +179,29 @@ th{background:#f6f8fa}
 </style>
 </head>
 <body>
-<h1>Layer7 - Relatorio Executivo</h1>
-<p><strong>Periodo:</strong> <?= htmlspecialchars($period_label); ?><br>
-<strong>Gerado em:</strong> <?= date("Y-m-d H:i:s"); ?></p>
+<h1><?= htmlspecialchars(l7_t("Layer7 - Relatorio Executivo")); ?></h1>
+<p><strong><?= l7_t("Periodo"); ?>:</strong> <?= htmlspecialchars($period_label); ?><br>
+<strong><?= l7_t("Gerado em"); ?>:</strong> <?= date("Y-m-d H:i:s"); ?></p>
 
 <div class="cards">
-	<div class="card"><div class="val"><?= number_format($total_events); ?></div><div class="lbl">Tentativas totais</div></div>
-	<div class="card"><div class="val" style="color:#d9534f;"><?= number_format($blocked_events); ?></div><div class="lbl">Bloqueadas</div></div>
-	<div class="card"><div class="val" style="color:#5cb85c;"><?= number_format($allowed_events); ?></div><div class="lbl">Permitidas</div></div>
-	<div class="card"><div class="val"><?= $block_rate; ?>%</div><div class="lbl">Indice de bloqueio</div></div>
-	<div class="card"><div class="val"><?= number_format($unique_devices); ?></div><div class="lbl">Dispositivos</div></div>
-	<div class="card"><div class="val"><?= number_format($unique_sites); ?></div><div class="lbl">Sites</div></div>
+	<div class="card"><div class="val"><?= number_format($total_events); ?></div><div class="lbl"><?= l7_t("Tentativas totais"); ?></div></div>
+	<div class="card"><div class="val" style="color:#d9534f;"><?= number_format($blocked_events); ?></div><div class="lbl"><?= l7_t("Tentativas bloqueadas"); ?></div></div>
+	<div class="card"><div class="val" style="color:#5cb85c;"><?= number_format($allowed_events); ?></div><div class="lbl"><?= l7_t("Tentativas permitidas"); ?></div></div>
+	<div class="card"><div class="val"><?= $block_rate; ?>%</div><div class="lbl"><?= l7_t("Indice de bloqueio"); ?></div></div>
+	<div class="card"><div class="val"><?= number_format($unique_devices); ?></div><div class="lbl"><?= l7_t("Dispositivos observados"); ?></div></div>
+	<div class="card"><div class="val"><?= number_format($unique_sites); ?></div><div class="lbl"><?= l7_t("Sites observados"); ?></div></div>
 </div>
 
-<h2>Resumo</h2>
+<h2><?= l7_t("Resumo executivo"); ?></h2>
 <ul>
-	<li>Foram registadas <?= number_format($total_events); ?> tentativas no periodo.</li>
-	<li><?= number_format($blocked_events); ?> tentativas foram bloqueadas (<?= $block_rate; ?>%).</li>
-	<li><?= number_format($unique_devices); ?> dispositivos tentaram acesso a <?= number_format($unique_sites); ?> sites.</li>
+	<li><?= sprintf(l7_t("Foram registadas %s tentativas no periodo."), number_format($total_events)); ?></li>
+	<li><?= sprintf(l7_t("%s tentativas foram bloqueadas (%s)."), number_format($blocked_events), $block_rate . "%"); ?></li>
+	<li><?= sprintf(l7_t("%s dispositivos tentaram acesso a %s sites."), number_format($unique_devices), number_format($unique_sites)); ?></li>
 </ul>
 
-<h2>Dispositivos com maior incidência</h2>
+<h2><?= l7_t("Dispositivos com maior incidencia"); ?></h2>
 <table>
-<tr><th>#</th><th>Dispositivo</th><th>IP</th><th>Bloqueios</th><th>Total</th></tr>
+<tr><th>#</th><th><?= l7_t("Dispositivo"); ?></th><th>IP</th><th><?= l7_t("Bloqueios"); ?></th><th><?= l7_t("Total"); ?></th></tr>
 <?php foreach ($top_devices as $i => $d) {
 	$id = resolveIdentityByIp($d["src_ip"]); ?>
 <tr>
@@ -214,9 +214,9 @@ th{background:#f6f8fa}
 <?php } ?>
 </table>
 
-<h2>Sites mais tentados</h2>
+<h2><?= l7_t("Sites mais tentados"); ?></h2>
 <table>
-<tr><th>#</th><th>Site</th><th>Bloqueios</th><th>Total</th></tr>
+<tr><th>#</th><th><?= l7_t("Site"); ?></th><th><?= l7_t("Bloqueios"); ?></th><th><?= l7_t("Total"); ?></th></tr>
 <?php foreach ($top_sites as $i => $s) { ?>
 <tr>
 	<td><?= $i + 1; ?></td>
@@ -227,9 +227,9 @@ th{background:#f6f8fa}
 <?php } ?>
 </table>
 
-<h2>Eventos detalhados (amostra)</h2>
+<h2><?= l7_t("Eventos detalhados (amostra)"); ?></h2>
 <table>
-<tr><th>Data/Hora</th><th>Dispositivo</th><th>IP</th><th>Site</th><th>Aplicacao</th><th>Resultado</th></tr>
+<tr><th><?= l7_t("Data/Hora"); ?></th><th><?= l7_t("Dispositivo"); ?></th><th>IP</th><th><?= l7_t("Site"); ?></th><th><?= l7_t("Aplicacao"); ?></th><th><?= l7_t("Resultado"); ?></th></tr>
 <?php foreach (array_slice($rows, 0, 300) as $ev) {
 	$id = resolveIdentityByIp($ev["src_ip"]); ?>
 <tr>
@@ -243,7 +243,7 @@ th{background:#f6f8fa}
 <?php } ?>
 </table>
 
-<div class="footer">Gerado por Layer7 para pfSense CE - Systemup Solucao em Tecnologia</div>
+<div class="footer"><?= l7_t("Gerado por Layer7 para pfSense CE - Systemup Solucao em Tecnologia"); ?></div>
 </body>
 </html>
 <?php exit; ?>

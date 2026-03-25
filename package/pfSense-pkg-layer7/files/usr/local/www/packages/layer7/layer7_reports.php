@@ -99,9 +99,20 @@ $block_rate = $total_events > 0 ? round(($blocked_events / $total_events) * 100,
 
 $period_label = date("d/m/Y H:i", $from_ts) . " - " . date("d/m/Y H:i", $to_ts);
 $exec_summary = array();
-$exec_summary[] = "No periodo seleccionado, foram registadas " . number_format($total_events) . " tentativas de acesso.";
-$exec_summary[] = number_format($blocked_events) . " tentativas foram bloqueadas (" . $block_rate . "% do total).";
-$exec_summary[] = "Foram observados " . number_format($unique_devices) . " dispositivos e " . number_format($unique_sites) . " sites distintos.";
+$exec_summary[] = sprintf(
+	l7_t("No periodo seleccionado, foram registadas %s tentativas de acesso."),
+	number_format($total_events)
+);
+$exec_summary[] = sprintf(
+	l7_t("%s tentativas foram bloqueadas (%s do total)."),
+	number_format($blocked_events),
+	$block_rate . "%"
+);
+$exec_summary[] = sprintf(
+	l7_t("Foram observados %s dispositivos e %s sites distintos."),
+	number_format($unique_devices),
+	number_format($unique_sites)
+);
 
 $pgtitle = array("Services", "Layer 7", l7_t("Relatorios"));
 include("head.inc");
