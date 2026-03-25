@@ -42,21 +42,38 @@ switch ($range) {
 $to_ts = $now;
 $period_label = date("Y-m-d H:i", $from_ts) . " - " . date("Y-m-d H:i", $to_ts);
 $filename_base = "layer7-executive-" . date("Ymd", $from_ts) . "-" . date("Ymd", $to_ts);
+$granularity = layer7_reports_granularity_for_range($from_ts, $to_ts);
+$rpt_cfg = layer7_reports_config();
+$rpt_enabled = !empty($rpt_cfg["enabled"]);
+$rpt_detail_enabled = !empty($rpt_cfg["event_log_enabled"]);
+$rpt_event_retention = (int)($rpt_cfg["event_retention_days"] ?? 15);
+$detail_cutoff_ts = time() - ($rpt_event_retention * 86400);
+$detail_range_truncated = ($from_ts < $detail_cutoff_ts);
+$filters_empty = layer7_reports_filters_empty($filters);
+$use_history_summary = (($rpt_enabled && !$rpt_detail_enabled) ||
+	($rpt_enabled && $filters_empty && $detail_range_truncated) ||
+	(!$rpt_enabled && !$rpt_detail_enabled));
 
-if (layer7_reports_db_available()) {
+if (layer7_reports_db_available() && $rpt_detail_enabled) {
 	layer7_reports_ingest_log_incremental();
 }
 
-$summary = layer7_reports_fetch_summary($from_ts, $to_ts, $filters);
-$timeline = layer7_reports_fetch_timeline($from_ts, $to_ts, layer7_reports_granularity_for_range($from_ts, $to_ts), $filters);
-$top_devices = layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters, 30);
-$top_sites = layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters, 50);
-$events = layer7_reports_fetch_events($from_ts, $to_ts, $filters, 1, 2000);
+$summary = (!$use_history_summary && layer7_reports_db_available()) ?
+	layer7_reports_fetch_summary($from_ts, $to_ts, $filters) : null;
+$timeline = (!$use_history_summary && layer7_reports_db_available()) ?
+	layer7_reports_fetch_timeline($from_ts, $to_ts, $granularity, $filters) : array();
+$top_devices = ($rpt_detail_enabled && layer7_reports_db_available()) ?
+	layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters, 30) : array();
+$top_sites = ($rpt_detail_enabled && layer7_reports_db_available()) ?
+	layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters, 50) : array();
+$events = ($rpt_detail_enabled && layer7_reports_db_available()) ?
+	layer7_reports_fetch_events($from_ts, $to_ts, $filters, 1, 2000) :
+	array("rows" => array(), "total" => 0, "page" => 1, "page_size" => 2000);
 $rows = $events["rows"];
 
 if ($summary === null) {
 	$history = layer7_reports_load_history($from_ts, $to_ts);
-	$traffic = layer7_reports_aggregate_traffic($history, layer7_reports_granularity_for_range($from_ts, $to_ts));
+	$traffic = layer7_reports_aggregate_traffic($history, $granularity);
 	$classified = 0; $blocked = 0; $allowed = 0;
 	foreach ($traffic as $t) {
 		$classified += (int)($t["classified"] ?? 0);

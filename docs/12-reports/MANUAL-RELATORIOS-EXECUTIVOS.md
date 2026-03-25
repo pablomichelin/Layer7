@@ -1,4 +1,4 @@
-# Manual — Relatorios Executivos (v1.4.7+)
+# Manual — Relatorios Executivos (v1.4.10+)
 
 ## Objetivo
 
@@ -32,12 +32,29 @@ orientado a publico nao tecnico (diretoria e gestao).
 - Top sites e contagem de sites unicos passam a ignorar resolvedores publicos (ex.: `dns.google`).
 - Eventos com dominio inferido passam a mostrar etiqueta visual **Host inferido (DNS)** na tabela detalhada.
 
+## Evolucao na v1.4.10
+
+- O modulo passa a seguir um modelo mais proximo de NGFW:
+  - **historico executivo** separado
+  - **log detalhado pesquisavel** separado
+- O operador pode **activar ou desactivar o log detalhado**
+- O operador pode escolher **uma ou mais interfaces** para guardar no log detalhado
+- A retencao do **historico executivo** e do **log detalhado** passa a ser independente
+- Os dois controlos passam a ser **independentes**:
+  - historico executivo ligado + log detalhado desligado = visao leve de appliance
+  - log detalhado ligado + historico executivo desligado = pesquisa operacional sem historico longo
+- A tabela de eventos detalhados usa **paginacao compacta**
+- Eventos DNS e enforcement passam a incluir `iface=` para melhorar o filtro por interface
+
 ## Onde configurar
 
 No pfSense: **Services > Layer 7 > Definicoes > Relatorios**
 
-- Activar recolha de dados para relatorios
-- Retencao (7/15/30/60/90/180/365 dias ou custom)
+- Activar historico executivo
+- Retencao do historico executivo
+- Activar ou desactivar log detalhado
+- Retencao do log detalhado
+- Interfaces do log detalhado (uma, varias ou vazio = todas)
 - Intervalo de recolha (5/10/15/30/60 min)
 
 ## Onde consultar
@@ -70,9 +87,19 @@ Visoes principais:
 
 Recomendacao inicial:
 
-- Ambientes pequenos: 30 dias
-- Ambientes medios: 60 dias
-- Ambientes com alto volume: 15 ou 30 dias
+- Historico executivo:
+  - ambientes pequenos: 30 a 90 dias
+  - ambientes medios: 60 a 180 dias
+- Log detalhado:
+  - ambientes pequenos: 15 dias
+  - ambientes medios: 7 a 15 dias
+  - ambientes com alto volume: 3 a 7 dias
+
+**Importante:** no appliance local, o consumo de disco vem principalmente do
+log detalhado em SQLite. O historico executivo tende a ser muito mais leve.
+
+Para periodos como **30d, 90d ou 180d**, mantenha o **historico executivo**
+activo. O log detalhado deve ser tratado como janela curta para investigacao.
 
 O purge diario remove dados antigos da base e executa compactacao quando ha
 remocao de registros.
@@ -89,7 +116,7 @@ remocao de registros.
 
 Se houver qualquer problema no modulo executivo:
 
-1. Desactivar recolha em **Definicoes > Relatorios**
+1. Desactivar historico executivo em **Definicoes > Relatorios**
 2. Manter operacao normal de enforcement (nao e afectada)
 3. Se necessario, remover apenas os artefactos de relatorio:
    - `rm -f /usr/local/etc/layer7/reports/reports.db`

@@ -2,6 +2,19 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.4.10] — 2026-03-25
+
+### Changed
+
+- **Relatorios estilo NGFW** — histórico executivo e log detalhado passam a ser tratados separadamente no appliance
+- **Log detalhado opcional** — operador pode activar/desactivar a ingestão detalhada em SQLite
+- **Escopo por interface** — log detalhado pode ser limitado a uma ou mais interfaces
+- **Retenção separada** — histórico executivo e log detalhado passam a ter janelas próprias de retenção
+- **Paginação compacta** — a tela de eventos detalhados deixa de renderizar milhares de páginas no HTML
+- **Contexto de interface nos logs** — eventos `dns_query`, `dns_block` e `enforce_*` passam a incluir `iface=` para melhorar pesquisa e filtragem
+- **Settings mais seguro** — guardar apenas a seção de relatórios preserva correctamente as demais definições globais
+- **PORTVERSION** bumped para 1.4.10
+
 ## [1.4.9] — 2026-03-25
 
 ### Changed

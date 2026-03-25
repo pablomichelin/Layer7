@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.9 — Migração do canal público de distribuição**
+**Versão: 1.4.10 — Relatórios estilo NGFW com log detalhado opcional**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,16 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.10 — Relatórios estilo NGFW com controlo de log detalhado (2026-03-25):**
+  - Relatórios passam a separar histórico executivo do log detalhado, reduzindo pressão de armazenamento local
+  - Novo toggle para activar/desactivar log detalhado pesquisável em SQLite
+  - Novo filtro por uma ou mais interfaces para o log detalhado
+  - Retenção separada para histórico executivo e log detalhado
+  - Paginação compacta na tela de relatórios, eliminando listas gigantes de páginas
+  - Eventos `dns_query`, `dns_block` e `enforce_*` passam a incluir `iface=` no log para melhorar o filtro por interface
+  - Correcção de persistência parcial em Settings para não sobrescrever outras definições ao guardar apenas relatórios
+  - `MANUAL-RELATORIOS-EXECUTIVOS.md` e `MANUAL-INSTALL.md` actualizados
+  - PORTVERSION incrementado para 1.4.10
 - **v1.4.9 — Migração do canal público de distribuição (2026-03-25):**
   - `install.sh` e `uninstall.sh` passam a apontar para o repositório público `pablomichelin/Layer7`
   - GUI `Settings` passa a consultar updates e assets no novo repositório público de distribuição

@@ -1,10 +1,14 @@
-## Layer7 v0.3.2 — actualizacao via GUI
+## Layer7 v1.4.10 — relatorios estilo NGFW
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Actualizacao pela GUI** — novo botao "Verificar actualizacao" na pagina Definicoes. Consulta automaticamente o GitHub Releases, compara versoes, e permite actualizar com um clique. O daemon e parado/reiniciado e todas as configuracoes sao preservadas.
+- **Relatorios estilo NGFW** — historico executivo separado do log detalhado para reduzir uso local
+- **Log detalhado opcional** — operador pode activar/desactivar a gravacao detalhada em SQLite
+- **Escopo por interface** — log detalhado pode ser limitado a uma ou mais interfaces
+- **Retencao separada** — historico executivo e log detalhado passam a ter retenções independentes
+- **Paginacao compacta** — a tela de relatorios deixa de renderizar milhares de paginas no HTML
 
 ### Inclui todas as funcionalidades anteriores
 

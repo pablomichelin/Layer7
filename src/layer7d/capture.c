@@ -256,7 +256,7 @@ observe_dns_response(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 				addr.s_addr = htonl(ip);
 				inet_ntop(AF_INET, &addr, ip_str,
 				    sizeof(ip_str));
-				cap->dns_cb(qname, ip_str, ttl);
+				cap->dns_cb(cap->ifname, qname, ip_str, ttl);
 			}
 		}
 		off += rdlen;
@@ -293,7 +293,7 @@ observe_dns_query(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 	inet_ntop(AF_INET, &addr, src_ip_str, sizeof(src_ip_str));
 	addr.s_addr = htonl(da);
 	inet_ntop(AF_INET, &addr, resolver_ip_str, sizeof(resolver_ip_str));
-	cap->dns_query_cb(src_ip_str, resolver_ip_str, qname);
+	cap->dns_query_cb(cap->ifname, src_ip_str, resolver_ip_str, qname);
 }
 
 static uint32_t

@@ -652,8 +652,8 @@ bl_flush_rule_tables(void)
 }
 
 static void
-layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
-    uint32_t ttl)
+layer7_on_dns_resolved(const char *iface, const char *domain,
+    const char *resolved_ip, uint32_t ttl)
 {
 	int r;
 	const char *bl_cat;
@@ -667,12 +667,13 @@ layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
 		if (r == 0) {
 			s_pf_dst_add_ok++;
 			dst_cache_add(resolved_ip, ttl);
-			L7_INFO("dns_block: domain=%s ip=%s ttl=%u table=%s",
-			    domain, resolved_ip, ttl, L7_PF_TABLE_BLOCK_DST);
+			L7_INFO("dns_block: iface=%s domain=%s ip=%s ttl=%u table=%s",
+			    iface ? iface : "-", domain, resolved_ip, ttl,
+			    L7_PF_TABLE_BLOCK_DST);
 		} else {
 			s_pf_dst_add_fail++;
-			L7_WARN("dns_block: pfctl add failed domain=%s ip=%s",
-			    domain, resolved_ip);
+			L7_WARN("dns_block: pfctl add failed iface=%s domain=%s ip=%s",
+			    iface ? iface : "-", domain, resolved_ip);
 		}
 		return;
 	}
@@ -696,9 +697,10 @@ layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
 				    resolved_ip);
 				if (r == 0) {
 					s_pf_dst_add_ok++;
-					L7_INFO("bl_block: domain=%s "
+					L7_INFO("bl_block: iface=%s domain=%s "
 					    "cat=%s ip=%s rule=%d/%s "
-					    "table=%s", domain, bl_cat,
+					    "table=%s", iface ? iface : "-",
+					    domain, bl_cat,
 					    resolved_ip, ri,
 					    s_bl_rules[ri].name, tbl);
 				} else {
@@ -710,16 +712,17 @@ layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
 }
 
 static void
-layer7_on_dns_query(const char *src_ip, const char *resolver_ip,
-    const char *qname)
+layer7_on_dns_query(const char *iface, const char *src_ip,
+    const char *resolver_ip, const char *qname)
 {
 	if (!src_ip || !qname || qname[0] == '\0')
 		return;
 	if (strstr(qname, ".in-addr.arpa") || strstr(qname, ".ip6.arpa"))
 		return;
 
-	L7_INFO("dns_query: src=%s resolver=%s qname=%s",
-	    src_ip, resolver_ip ? resolver_ip : "-", qname);
+	L7_INFO("dns_query: iface=%s src=%s resolver=%s qname=%s",
+	    iface ? iface : "-", src_ip, resolver_ip ? resolver_ip : "-",
+	    qname);
 }
 
 /*
@@ -785,8 +788,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		if (r == 0) {
 			s_pf_dst_add_ok++;
 			dst_cache_add(dst_ip, L7_DST_TTL_MIN);
-			L7_INFO("enforce_block_dst: dst=%s policy=%s",
-			    dst_ip,
+			L7_INFO("enforce_block_dst: iface=%s dst=%s policy=%s",
+			    iface ? iface : "-", dst_ip,
 			    dec.matched_policy_id[0] ?
 			    dec.matched_policy_id : "-");
 		} else if (r == -1) {
@@ -798,8 +801,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		r = layer7_pf_enforce_decision(&dec, src_ip, 0);
 		if (r == 1) {
 			s_pf_table_add_ok++;
-			L7_INFO("enforce_tag: src=%s table=%s policy=%s",
-			    src_ip, dec.pf_table,
+			L7_INFO("enforce_tag: iface=%s src=%s table=%s policy=%s",
+			    iface ? iface : "-", src_ip, dec.pf_table,
 			    dec.matched_policy_id[0] ?
 			    dec.matched_policy_id : "-");
 		} else if (r == -1) {

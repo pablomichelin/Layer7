@@ -9,6 +9,21 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
+function layer7_reports_compact_pages($page, $total_pages, $radius = 2)
+{
+	$pages = array(1, $total_pages);
+	$start = max(1, (int)$page - (int)$radius);
+	$end = min((int)$total_pages, (int)$page + (int)$radius);
+	$p = 0;
+
+	for ($p = $start; $p <= $end; $p++) {
+		$pages[] = $p;
+	}
+	$pages = array_values(array_unique($pages));
+	sort($pages, SORT_NUMERIC);
+	return $pages;
+}
+
 $range = isset($_GET["range"]) ? (string)$_GET["range"] : "24h";
 $custom_from = isset($_GET["from"]) ? (string)$_GET["from"] : "";
 $custom_to = isset($_GET["to"]) ? (string)$_GET["to"] : "";
@@ -45,20 +60,37 @@ switch ($range) {
 }
 $to_ts = $now;
 $granularity = layer7_reports_granularity_for_range($from_ts, $to_ts);
+$rpt_cfg = layer7_reports_config();
+$rpt_enabled = !empty($rpt_cfg["enabled"]);
+$rpt_detail_enabled = !empty($rpt_cfg["event_log_enabled"]);
+$rpt_event_retention = (int)($rpt_cfg["event_retention_days"] ?? 15);
+$rpt_detail_ifaces = layer7_reports_normalize_interfaces(
+	$rpt_cfg["event_interfaces"] ?? array());
+$detail_cutoff_ts = time() - ($rpt_event_retention * 86400);
+$detail_range_truncated = ($from_ts < $detail_cutoff_ts);
+$filters_empty = layer7_reports_filters_empty($filters);
+$use_history_summary = (($rpt_enabled && !$rpt_detail_enabled) ||
+	($rpt_enabled && $filters_empty && $detail_range_truncated) ||
+	(!$rpt_enabled && !$rpt_detail_enabled));
 
 $db_ready = layer7_reports_db_available();
 $ingest_failed = false;
-if ($db_ready) {
+if ($db_ready && $rpt_detail_enabled) {
 	$ing = layer7_reports_ingest_log_incremental();
 	if (!is_array($ing) || empty($ing["ok"])) {
 		$ingest_failed = true;
 	}
 }
-$summary = $db_ready ? layer7_reports_fetch_summary($from_ts, $to_ts, $filters) : null;
-$timeline = $db_ready ? layer7_reports_fetch_timeline($from_ts, $to_ts, $granularity, $filters) : array();
-$top_devices = $db_ready ? layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters, 15) : array();
-$top_sites = $db_ready ? layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters, 20) : array();
-$events_page = $db_ready ? layer7_reports_fetch_events($from_ts, $to_ts, $filters, $page, $page_size) : array(
+$summary = (!$use_history_summary && $db_ready) ?
+	layer7_reports_fetch_summary($from_ts, $to_ts, $filters) : null;
+$timeline = (!$use_history_summary && $db_ready) ?
+	layer7_reports_fetch_timeline($from_ts, $to_ts, $granularity, $filters) : array();
+$top_devices = ($db_ready && $rpt_detail_enabled) ?
+	layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters, 15) : array();
+$top_sites = ($db_ready && $rpt_detail_enabled) ?
+	layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters, 20) : array();
+$events_page = ($db_ready && $rpt_detail_enabled) ?
+	layer7_reports_fetch_events($from_ts, $to_ts, $filters, $page, $page_size) : array(
 	"rows" => array(), "total" => 0, "page" => 1, "page_size" => $page_size
 );
 
@@ -158,9 +190,32 @@ layer7_render_styles();
 		<?= l7_t("SQLite nao esta disponivel neste ambiente. O modulo executivo de relatorios requer suporte SQLite no PHP."); ?>
 	</div>
 <?php } ?>
+<?php if (!$rpt_enabled) { ?>
+	<div class="alert alert-warning">
+		<?= $rpt_detail_enabled ?
+			l7_t("O historico executivo esta desactivado em Definicoes. Novas agregacoes historicas deixam de ser recolhidas; o log detalhado continua disponivel para pesquisa operacional.") :
+			l7_t("O historico executivo esta desactivado em Definicoes. Os relatorios exibem apenas o que ja estava previamente recolhido."); ?>
+	</div>
+<?php } ?>
+<?php if (!$rpt_detail_enabled) { ?>
+	<div class="alert alert-info">
+		<?= l7_t("O log detalhado esta desactivado. A tela opera em modo executivo leve, sem armazenar eventos detalhados em SQLite."); ?>
+	</div>
+<?php } ?>
 <?php if ($ingest_failed) { ?>
 	<div class="alert alert-warning">
 		<?= l7_t("Coleta incremental de relatorios falhou nesta tentativa. Verifique diagnosticos e permissoes do ficheiro de log."); ?>
+	</div>
+<?php } ?>
+<?php if ($rpt_detail_enabled && !empty($rpt_detail_ifaces)) { ?>
+	<div class="alert alert-info">
+		<?= l7_t("Log detalhado limitado as interfaces seleccionadas: "); ?>
+		<code><?= htmlspecialchars(implode(", ", $rpt_detail_ifaces)); ?></code>
+	</div>
+<?php } ?>
+<?php if ($rpt_enabled && $rpt_detail_enabled && $detail_range_truncated) { ?>
+	<div class="alert alert-info">
+		<?= sprintf(l7_t("O log detalhado local retem %d dias. Para periodos maiores, os indicadores executivos usam historico agregado e os detalhes ficam limitados ao intervalo retido."), $rpt_event_retention); ?>
 	</div>
 <?php } ?>
 
@@ -244,6 +299,9 @@ layer7_render_styles();
 <div class="row l7r-section">
 	<div class="col-md-6">
 		<h3 class="l7r-title"><?= l7_t("Dispositivos com mais bloqueios"); ?></h3>
+		<?php if (!$rpt_detail_enabled) { ?>
+		<div class="alert alert-info"><?= l7_t("Esta visao requer log detalhado activo."); ?></div>
+		<?php } else { ?>
 		<table class="table table-striped table-condensed">
 			<thead><tr><th>#</th><th><?= l7_t("Dispositivo"); ?></th><th><?= l7_t("Bloqueios"); ?></th><th><?= l7_t("Total"); ?></th></tr></thead>
 			<tbody>
@@ -262,9 +320,13 @@ layer7_render_styles();
 			<?php }} ?>
 			</tbody>
 		</table>
+		<?php } ?>
 	</div>
 	<div class="col-md-6">
 		<h3 class="l7r-title"><?= l7_t("Sites mais tentados"); ?></h3>
+		<?php if (!$rpt_detail_enabled) { ?>
+		<div class="alert alert-info"><?= l7_t("Esta visao requer log detalhado activo."); ?></div>
+		<?php } else { ?>
 		<table class="table table-striped table-condensed">
 			<thead><tr><th>#</th><th><?= l7_t("Site"); ?></th><th><?= l7_t("Bloqueios"); ?></th><th><?= l7_t("Total"); ?></th></tr></thead>
 			<tbody>
@@ -280,11 +342,15 @@ layer7_render_styles();
 			<?php }} ?>
 			</tbody>
 		</table>
+		<?php } ?>
 	</div>
 </div>
 
 <div class="l7r-section">
 	<h3 class="l7r-title"><?= l7_t("Eventos detalhados"); ?></h3>
+	<?php if (!$rpt_detail_enabled) { ?>
+		<div class="alert alert-info"><?= l7_t("Eventos detalhados estao desactivados neste appliance. Active o log detalhado em Definicoes para pesquisa operacional."); ?></div>
+	<?php } else { ?>
 	<table class="table table-striped table-condensed">
 		<thead>
 			<tr>
@@ -329,16 +395,31 @@ layer7_render_styles();
 
 	<?php if ($total_pages > 1) {
 		$query = $_GET;
+		$compact_pages = layer7_reports_compact_pages($page, $total_pages, 2);
+		$last_drawn = 0;
 		?>
 		<nav>
 			<ul class="pagination pagination-sm">
-				<?php for ($p = 1; $p <= $total_pages; $p++) {
+				<?php if ($page > 1) {
+					$query["page"] = $page - 1;
+					echo '<li><a href="?' . htmlspecialchars(http_build_query($query)) . '">&laquo;</a></li>';
+				}
+				foreach ($compact_pages as $p) {
+					if ($last_drawn !== 0 && ($p - $last_drawn) > 1) {
+						echo '<li class="disabled"><span>...</span></li>';
+					}
 					$query["page"] = $p;
 					$cls = ($p === $page) ? ' class="active"' : '';
 					echo '<li' . $cls . '><a href="?' . htmlspecialchars(http_build_query($query)) . '">' . $p . '</a></li>';
+					$last_drawn = $p;
+				}
+				if ($page < $total_pages) {
+					$query["page"] = $page + 1;
+					echo '<li><a href="?' . htmlspecialchars(http_build_query($query)) . '">&raquo;</a></li>';
 				} ?>
 			</ul>
 		</nav>
+	<?php } ?>
 	<?php } ?>
 </div>
 

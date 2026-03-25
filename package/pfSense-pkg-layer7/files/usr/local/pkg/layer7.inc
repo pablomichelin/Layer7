@@ -1157,17 +1157,105 @@ function layer7_reports_defaults()
 	return array(
 		"enabled" => true,
 		"retention_days" => 30,
-		"collect_interval" => 5
+		"collect_interval" => 5,
+		"event_log_enabled" => true,
+		"event_retention_days" => 15,
+		"event_interfaces" => array()
 	);
+}
+
+function layer7_reports_normalize_interfaces($ifaces)
+{
+	$out = array();
+
+	if (!is_array($ifaces)) {
+		return $out;
+	}
+	foreach ($ifaces as $iface) {
+		$iface = trim((string)$iface);
+		if ($iface === "" || strlen($iface) > 32) {
+			continue;
+		}
+		if (!preg_match('/^[a-zA-Z0-9_.-]+$/', $iface)) {
+			continue;
+		}
+		$out[] = $iface;
+	}
+	return array_values(array_unique($out));
 }
 
 function layer7_reports_config()
 {
 	$data = layer7_load_or_default();
+	$cfg = layer7_reports_defaults();
+
 	if (isset($data["layer7"]["reports"]) && is_array($data["layer7"]["reports"])) {
-		return array_merge(layer7_reports_defaults(), $data["layer7"]["reports"]);
+		$stored = $data["layer7"]["reports"];
+
+		$cfg = array_merge($cfg, $stored);
+		if (!array_key_exists("event_log_enabled", $stored)) {
+			$cfg["event_log_enabled"] = true;
+		}
+		if (!array_key_exists("event_retention_days", $stored)) {
+			$cfg["event_retention_days"] = min(15,
+			    max(1, (int)($cfg["retention_days"] ?? 30)));
+		}
 	}
-	return layer7_reports_defaults();
+	$cfg["enabled"] = !empty($cfg["enabled"]);
+	$cfg["event_log_enabled"] = !empty($cfg["event_log_enabled"]);
+
+	$cfg["retention_days"] = (int)$cfg["retention_days"];
+	if ($cfg["retention_days"] < 1) {
+		$cfg["retention_days"] = 1;
+	}
+	if ($cfg["retention_days"] > 365) {
+		$cfg["retention_days"] = 365;
+	}
+
+	$cfg["collect_interval"] = (int)$cfg["collect_interval"];
+	if (!in_array($cfg["collect_interval"], array(5, 10, 15, 30, 60), true)) {
+		$cfg["collect_interval"] = 5;
+	}
+
+	$cfg["event_retention_days"] = (int)$cfg["event_retention_days"];
+	if ($cfg["event_retention_days"] < 1) {
+		$cfg["event_retention_days"] = 1;
+	}
+	if ($cfg["event_retention_days"] > 365) {
+		$cfg["event_retention_days"] = 365;
+	}
+
+	$cfg["event_interfaces"] = layer7_reports_normalize_interfaces(
+	    $cfg["event_interfaces"] ?? array());
+	return $cfg;
+}
+
+function layer7_reports_filters_empty($filters)
+{
+	if (!is_array($filters)) {
+		return true;
+	}
+	foreach ($filters as $value) {
+		if (trim((string)$value) !== "") {
+			return false;
+		}
+	}
+	return true;
+}
+
+function layer7_reports_event_iface_allowed($cfg, $event)
+{
+	$selected = layer7_reports_normalize_interfaces(
+	    $cfg["event_interfaces"] ?? array());
+	$iface = trim((string)($event["iface"] ?? ""));
+
+	if (empty($selected)) {
+		return true;
+	}
+	if ($iface === "") {
+		return false;
+	}
+	return in_array($iface, $selected, true);
 }
 
 function layer7_reports_load_history($from_ts, $to_ts)
@@ -1708,6 +1796,11 @@ function layer7_reports_refresh_daily_kpi($db, $day_keys)
 function layer7_reports_ingest_log_incremental()
 {
 	$log_path = "/var/log/layer7d.log";
+	$cfg = layer7_reports_config();
+
+	if (empty($cfg["event_log_enabled"])) {
+		return array("ok" => true, "ingested" => 0, "reason" => "event_log_disabled");
+	}
 	if (!file_exists($log_path)) {
 		return array("ok" => true, "ingested" => 0, "reason" => "log_missing");
 	}
@@ -1751,6 +1844,9 @@ function layer7_reports_ingest_log_incremental()
 		if (!is_array($event)) {
 			continue;
 		}
+		if (!layer7_reports_event_iface_allowed($cfg, $event)) {
+			continue;
+		}
 		$insert->reset();
 		$insert->bindValue(":ts", (int)$event["ts"], SQLITE3_INTEGER);
 		$insert->bindValue(":ts_text", (string)$event["ts_text"], SQLITE3_TEXT);
@@ -1781,7 +1877,7 @@ function layer7_reports_ingest_log_incremental()
 	return array("ok" => true, "ingested" => $ingested, "reason" => "ok");
 }
 
-function layer7_reports_purge_db($retention_days)
+function layer7_reports_purge_db($retention_days, $summary_retention_days = null)
 {
 	$retention_days = (int)$retention_days;
 	if ($retention_days < 1) {
@@ -1789,6 +1885,14 @@ function layer7_reports_purge_db($retention_days)
 	}
 	if ($retention_days > 365) {
 		$retention_days = 365;
+	}
+	$summary_retention_days = $summary_retention_days === null ?
+	    $retention_days : (int)$summary_retention_days;
+	if ($summary_retention_days < 1) {
+		$summary_retention_days = 1;
+	}
+	if ($summary_retention_days > 365) {
+		$summary_retention_days = 365;
 	}
 	$db = layer7_reports_db_connect(false);
 	if (!$db) {
@@ -1798,6 +1902,7 @@ function layer7_reports_purge_db($retention_days)
 		return array("ok" => false, "deleted" => 0, "reason" => "schema_failed");
 	}
 	$cutoff = time() - ($retention_days * 86400);
+	$summary_cutoff = time() - ($summary_retention_days * 86400);
 	$before = @$db->querySingle("SELECT COUNT(*) FROM events");
 	$del = @$db->prepare("DELETE FROM events WHERE ts < :cutoff");
 	if ($del) {
@@ -1805,7 +1910,7 @@ function layer7_reports_purge_db($retention_days)
 		@$del->execute();
 	}
 	@$db->exec("DELETE FROM identity_map WHERE last_seen < " . (int)$cutoff);
-	@$db->exec("DELETE FROM daily_kpi WHERE day_key < '" . date("Y-m-d", $cutoff) . "'");
+	@$db->exec("DELETE FROM daily_kpi WHERE day_key < '" . date("Y-m-d", $summary_cutoff) . "'");
 	$after = @$db->querySingle("SELECT COUNT(*) FROM events");
 	$deleted = max(0, (int)$before - (int)$after);
 	if ($deleted > 0) {

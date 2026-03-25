@@ -27,20 +27,22 @@ typedef void (*layer7_flow_cb)(const char *iface, const char *src_ip,
 
 /*
  * Callback invocado quando uma resposta DNS (RR tipo A) e observada.
+ *   iface:       nome da interface de captura (e.g. "em0")
  *   domain:      nome do dominio resolvido (e.g. "youtube.com")
  *   resolved_ip: IPv4 dotted-quad do IP resolvido
  *   ttl:         TTL do record DNS (em segundos)
  */
-typedef void (*layer7_dns_cb)(const char *domain, const char *resolved_ip,
-    uint32_t ttl);
+typedef void (*layer7_dns_cb)(const char *iface, const char *domain,
+    const char *resolved_ip, uint32_t ttl);
 
 /*
  * Callback invocado quando uma query DNS (cliente -> resolver) e observada.
+ *   iface:       nome da interface de captura (e.g. "em0")
  *   src_ip:      IPv4 do cliente
  *   resolver_ip: IPv4 do resolver de destino
  *   qname:       dominio consultado
  */
-typedef void (*layer7_dns_query_cb)(const char *src_ip,
+typedef void (*layer7_dns_query_cb)(const char *iface, const char *src_ip,
     const char *resolver_ip, const char *qname);
 
 struct layer7_capture;

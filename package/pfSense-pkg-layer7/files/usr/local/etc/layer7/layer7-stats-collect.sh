@@ -12,6 +12,7 @@ HISTORY_FILE="${REPORTS_DIR}/stats-history.jsonl"
 PIDFILE="/var/run/layer7d.pid"
 PHP="/usr/local/bin/php"
 COLLECT_PHP="/usr/local/etc/layer7/layer7-reports-collect.php"
+COLLECT_LIB="/usr/local/pkg/layer7.inc"
 
 /bin/mkdir -p "${REPORTS_DIR}"
 
@@ -42,6 +43,14 @@ if [ ! -x "${PHP}" ]; then
 fi
 
 "${PHP}" -r '
+$history_enabled = true;
+if (file_exists("'"${COLLECT_LIB}"'")) {
+	require_once("'"${COLLECT_LIB}"'");
+	$cfg = layer7_reports_config();
+	$history_enabled = !empty($cfg["enabled"]);
+}
+if (!$history_enabled) exit(0);
+
 $raw = @file_get_contents("/tmp/layer7-stats.json");
 if (!$raw) exit(0);
 $s = @json_decode($raw, true);

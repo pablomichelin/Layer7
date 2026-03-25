@@ -12,10 +12,6 @@ CONFIG="/usr/local/etc/layer7.json"
 PHP="/usr/local/bin/php"
 COLLECT_LIB="/usr/local/pkg/layer7.inc"
 
-if [ ! -f "${HISTORY_FILE}" ]; then
-	exit 0
-fi
-
 if [ ! -x "${PHP}" ]; then
 	exit 1
 fi
@@ -24,8 +20,9 @@ fi
 if (file_exists("'"${COLLECT_LIB}"'")) {
 	require_once("'"${COLLECT_LIB}"'");
 	$cfg = layer7_reports_config();
-	$ret = isset($cfg["retention_days"]) ? (int)$cfg["retention_days"] : 30;
-	layer7_reports_purge_db($ret);
+	$ret = isset($cfg["event_retention_days"]) ? (int)$cfg["event_retention_days"] : 15;
+	$sum = isset($cfg["retention_days"]) ? (int)$cfg["retention_days"] : 30;
+	layer7_reports_purge_db($ret, $sum);
 }
 '
 
@@ -34,14 +31,22 @@ $config_path = "'"${CONFIG}"'";
 $history_path = "'"${HISTORY_FILE}"'";
 
 $retention_days = 30;
+$history_enabled = true;
 if (file_exists($config_path)) {
 	$cfg = @json_decode(@file_get_contents($config_path), true);
+	if (isset($cfg["layer7"]["reports"]["enabled"])) {
+		$history_enabled = !empty($cfg["layer7"]["reports"]["enabled"]);
+	}
 	if (isset($cfg["layer7"]["reports"]["retention_days"])) {
 		$r = (int)$cfg["layer7"]["reports"]["retention_days"];
 		if ($r >= 1 && $r <= 365) {
 			$retention_days = $r;
 		}
 	}
+}
+
+if (!$history_enabled || !file_exists($history_path)) {
+	exit(0);
 }
 
 $cutoff = time() - ($retention_days * 86400);

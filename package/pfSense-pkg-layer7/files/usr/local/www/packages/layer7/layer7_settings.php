@@ -185,30 +185,53 @@ if ($_POST["revoke_license"] ?? false) {
 }
 
 if ($_POST["save"] ?? false) {
-	$mode = $_POST["mode"] ?? "monitor";
+	$current_data = layer7_load_or_default();
+	$current_l7 = isset($current_data["layer7"]) && is_array($current_data["layer7"]) ?
+	    $current_data["layer7"] : array();
+	$current_reports = layer7_reports_config();
+	$save_scope = trim((string)($_POST["save_scope"] ?? "general"));
+	$is_reports_save = ($save_scope === "reports");
+	$is_general_save = !$is_reports_save;
+
+	$mode = $is_general_save ? ($_POST["mode"] ?? "monitor") :
+	    (isset($current_l7["mode"]) ? $current_l7["mode"] : "monitor");
 	if (!in_array($mode, array("monitor", "enforce"), true)) {
 		$mode = "monitor";
 	}
-	$log_level = $_POST["log_level"] ?? "info";
+	$log_level = $is_general_save ? ($_POST["log_level"] ?? "info") :
+	    (isset($current_l7["log_level"]) ? $current_l7["log_level"] : "info");
 	if (!in_array($log_level, array("error", "warn", "info", "debug"), true)) {
 		$log_level = "info";
 	}
-	$enabled = isset($_POST["enabled"]);
-	$syslog_remote = isset($_POST["syslog_remote"]);
-	$sr_host = trim($_POST["syslog_remote_host"] ?? "");
-	$sr_port = (int)($_POST["syslog_remote_port"] ?? 514);
+	$enabled = $is_general_save ? isset($_POST["enabled"]) :
+	    !empty($current_l7["enabled"]);
+	$syslog_remote = $is_general_save ? isset($_POST["syslog_remote"]) :
+	    !empty($current_l7["syslog_remote"]);
+	$sr_host = $is_general_save ? trim($_POST["syslog_remote_host"] ?? "") :
+	    trim((string)($current_l7["syslog_remote_host"] ?? ""));
+	$sr_port = $is_general_save ? (int)($_POST["syslog_remote_port"] ?? 514) :
+	    (int)($current_l7["syslog_remote_port"] ?? 514);
 	if ($sr_port < 1 || $sr_port > 65535) {
 		$sr_port = 514;
 	}
-	if ($syslog_remote && $sr_host === "") {
+	if ($is_general_save && $syslog_remote && $sr_host === "") {
 		$input_errors[] = l7_t("Syslog remoto: indique o host ou desative a opcao.");
 	}
-	if ($syslog_remote && $sr_host !== "" && !layer7_syslog_remote_host_valid($sr_host)) {
+	if ($is_general_save && $syslog_remote && $sr_host !== "" && !layer7_syslog_remote_host_valid($sr_host)) {
 		$input_errors[] = l7_t("Host syslog: use IPv4 ou hostname valido.");
 	}
 
 	$selected_ifaces = array();
-	if (isset($_POST["iface_sel"]) && is_array($_POST["iface_sel"])) {
+	if (!$is_general_save && isset($current_l7["interfaces"]) &&
+	    is_array($current_l7["interfaces"])) {
+		foreach ($current_l7["interfaces"] as $ifname) {
+			$ifname = trim((string)$ifname);
+			if ($ifname !== "" && preg_match('/^[a-zA-Z0-9_.-]+$/', $ifname)) {
+				$selected_ifaces[] = $ifname;
+			}
+		}
+	}
+	if ($is_general_save && isset($_POST["iface_sel"]) && is_array($_POST["iface_sel"])) {
 		foreach ($_POST["iface_sel"] as $ifid) {
 			if (is_string($ifid) && preg_match('/^[a-zA-Z0-9_.]+$/', $ifid)) {
 				$real = convert_friendly_interface_to_real_interface_name($ifid);
@@ -216,37 +239,37 @@ if ($_POST["save"] ?? false) {
 			}
 		}
 	}
-	if (count($selected_ifaces) > 8) {
+	$selected_ifaces = array_values(array_unique($selected_ifaces));
+	if ($is_general_save && count($selected_ifaces) > 8) {
 		$input_errors[] = l7_t("Maximo de 8 interfaces.");
 	}
 
-	$language = $_POST["language"] ?? "pt";
+	$language = $is_general_save ? ($_POST["language"] ?? "pt") :
+	    (isset($current_l7["language"]) ? $current_l7["language"] : "pt");
 	if (!in_array($language, array("pt", "en"), true)) {
 		$language = "pt";
 	}
 
-	if (empty($input_errors)) {
-		$data = layer7_load_or_default();
-		$data["layer7"]["language"] = $language;
-		$data["layer7"]["enabled"] = $enabled;
-		$data["layer7"]["mode"] = $mode;
-		$data["layer7"]["log_level"] = $log_level;
-		$data["layer7"]["syslog_remote"] = $syslog_remote;
-		$data["layer7"]["syslog_remote_host"] = $sr_host;
-		$data["layer7"]["syslog_remote_port"] = $sr_port;
-		$dbgm = (int)($_POST["debug_minutes"] ?? 0);
-		if ($dbgm < 0) {
-			$dbgm = 0;
-		}
-		if ($dbgm > 720) {
-			$dbgm = 720;
-		}
-		$data["layer7"]["debug_minutes"] = $dbgm;
-		$data["layer7"]["interfaces"] = array_values(array_unique($selected_ifaces));
+	$dbgm = $is_general_save ? (int)($_POST["debug_minutes"] ?? 0) :
+	    (int)($current_l7["debug_minutes"] ?? 0);
+	if ($dbgm < 0) {
+		$dbgm = 0;
+	}
+	if ($dbgm > 720) {
+		$dbgm = 720;
+	}
 
-		$old_block_quic = !empty($data["layer7"]["block_quic"]);
-		$data["layer7"]["block_quic"] = isset($_POST["block_quic"]);
+	$block_quic = $is_general_save ? isset($_POST["block_quic"]) :
+	    !empty($current_l7["block_quic"]);
 
+	$rpt_enabled = !empty($current_reports["enabled"]);
+	$rpt_retention = (int)($current_reports["retention_days"] ?? 30);
+	$rpt_interval = (int)($current_reports["collect_interval"] ?? 5);
+	$rpt_event_enabled = !empty($current_reports["event_log_enabled"]);
+	$rpt_event_retention = (int)($current_reports["event_retention_days"] ?? 15);
+	$rpt_event_ifaces = layer7_reports_normalize_interfaces(
+	    $current_reports["event_interfaces"] ?? array());
+	if ($is_reports_save) {
 		$rpt_enabled = isset($_POST["reports_enabled"]);
 		$rpt_preset = trim((string)($_POST["reports_retention_preset"] ?? "custom"));
 		if ($rpt_preset !== "custom" && ctype_digit($rpt_preset)) {
@@ -254,14 +277,68 @@ if ($_POST["save"] ?? false) {
 		} else {
 			$rpt_retention = (int)($_POST["reports_retention"] ?? 30);
 		}
-		if ($rpt_retention < 1) $rpt_retention = 1;
-		if ($rpt_retention > 365) $rpt_retention = 365;
+		if ($rpt_retention < 1) {
+			$rpt_retention = 1;
+		}
+		if ($rpt_retention > 365) {
+			$rpt_retention = 365;
+		}
 		$rpt_interval = (int)($_POST["reports_interval"] ?? 5);
-		if (!in_array($rpt_interval, array(5, 10, 15, 30, 60), true)) $rpt_interval = 5;
+		if (!in_array($rpt_interval, array(5, 10, 15, 30, 60), true)) {
+			$rpt_interval = 5;
+		}
+
+		$rpt_event_enabled = isset($_POST["reports_event_log_enabled"]);
+		$rpt_event_preset = trim((string)($_POST["reports_event_retention_preset"] ?? "custom"));
+		if ($rpt_event_preset !== "custom" && ctype_digit($rpt_event_preset)) {
+			$rpt_event_retention = (int)$rpt_event_preset;
+		} else {
+			$rpt_event_retention = (int)($_POST["reports_event_retention"] ?? 15);
+		}
+		if ($rpt_event_retention < 1) {
+			$rpt_event_retention = 1;
+		}
+		if ($rpt_event_retention > 365) {
+			$rpt_event_retention = 365;
+		}
+
+		$rpt_event_ifaces = array();
+		if (isset($_POST["reports_iface_sel"]) && is_array($_POST["reports_iface_sel"])) {
+			foreach ($_POST["reports_iface_sel"] as $ifid) {
+				if (is_string($ifid) && preg_match('/^[a-zA-Z0-9_.]+$/', $ifid)) {
+					$real = convert_friendly_interface_to_real_interface_name($ifid);
+					$rpt_event_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+				}
+			}
+		}
+		$rpt_event_ifaces = layer7_reports_normalize_interfaces($rpt_event_ifaces);
+		if (count($rpt_event_ifaces) > 8) {
+			$input_errors[] = l7_t("Maximo de 8 interfaces para log detalhado.");
+		}
+	}
+
+	if (empty($input_errors)) {
+		$data = $current_data;
+		$data["layer7"]["language"] = $language;
+		$data["layer7"]["enabled"] = $enabled;
+		$data["layer7"]["mode"] = $mode;
+		$data["layer7"]["log_level"] = $log_level;
+		$data["layer7"]["syslog_remote"] = $syslog_remote;
+		$data["layer7"]["syslog_remote_host"] = $sr_host;
+		$data["layer7"]["syslog_remote_port"] = $sr_port;
+		$data["layer7"]["debug_minutes"] = $dbgm;
+		$data["layer7"]["interfaces"] = array_values(array_unique($selected_ifaces));
+
+		$old_block_quic = !empty($current_l7["block_quic"]);
+		$data["layer7"]["block_quic"] = $block_quic;
+
 		$data["layer7"]["reports"] = array(
 			"enabled" => $rpt_enabled,
 			"retention_days" => $rpt_retention,
-			"collect_interval" => $rpt_interval
+			"collect_interval" => $rpt_interval,
+			"event_log_enabled" => $rpt_event_enabled,
+			"event_retention_days" => $rpt_event_retention,
+			"event_interfaces" => $rpt_event_ifaces
 		);
 
 		if (layer7_save_json($data)) {
@@ -271,7 +348,7 @@ if ($_POST["save"] ?? false) {
 					filter_configure();
 				}
 			}
-			layer7_reports_setup_cron($rpt_enabled, $rpt_interval);
+			layer7_reports_setup_cron(($rpt_enabled || $rpt_event_enabled), $rpt_interval);
 			$savemsg = l7_t("Configuracao gravada. SIGHUP enviado ao layer7d se o servico estiver em execucao.");
 		}
 	}
@@ -329,6 +406,7 @@ layer7_render_styles();
 
 			<div class="layer7-form-card">
 			<form method="post" class="form-horizontal">
+			<input type="hidden" name="save_scope" value="general" />
 
 			<div class="form-group">
 				<label class="col-sm-3 control-label"><?= l7_t("Idioma"); ?> / Language</label>
@@ -580,22 +658,27 @@ layer7_render_styles();
 			$rpt_en = !empty($rpt_cfg["enabled"]);
 			$rpt_ret = (int)($rpt_cfg["retention_days"] ?? 30);
 			$rpt_int = (int)($rpt_cfg["collect_interval"] ?? 5);
+			$rpt_evt_en = !empty($rpt_cfg["event_log_enabled"]);
+			$rpt_evt_ret = (int)($rpt_cfg["event_retention_days"] ?? 15);
+			$rpt_evt_ifaces = layer7_reports_normalize_interfaces($rpt_cfg["event_interfaces"] ?? array());
 			$rpt_presets = array(7, 15, 30, 60, 90, 180, 365);
 			$rpt_selected_preset = in_array($rpt_ret, $rpt_presets, true) ? (string)$rpt_ret : "custom";
+			$rpt_evt_selected_preset = in_array($rpt_evt_ret, $rpt_presets, true) ? (string)$rpt_evt_ret : "custom";
 			?>
 			<div class="layer7-section" style="margin-top: 36px;">
 				<h3 class="layer7-section-title"><?= l7_t("Relatorios"); ?></h3>
 				<div class="layer7-callout">
-					<p><?= l7_t("Os relatorios recolhem estatisticas periodicamente para gerar graficos e exportacoes historicas."); ?></p>
+					<p><?= l7_t("Os relatorios passam a seguir um modelo mais proximo de NGFW: historico executivo separado do log detalhado, com controlo de retencao e escopo por interface."); ?></p>
 					<form method="post" class="layer7-form-card">
+						<input type="hidden" name="save_scope" value="reports">
 						<div class="form-group">
 							<label class="checkbox-inline">
 								<input type="checkbox" name="reports_enabled" <?= $rpt_en ? 'checked' : ''; ?>>
-								<?= l7_t("Activar recolha de dados para relatorios"); ?>
+								<?= l7_t("Activar historico executivo"); ?>
 							</label>
 						</div>
 						<div class="form-group">
-							<label><?= l7_t("Retencao de dados (dias)"); ?></label>
+							<label><?= l7_t("Retencao do historico executivo (dias)"); ?></label>
 							<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
 								<select class="form-control" name="reports_retention_preset" style="width:180px;">
 									<?php foreach ($rpt_presets as $rp) { ?>
@@ -605,7 +688,27 @@ layer7_render_styles();
 								</select>
 								<input type="number" class="form-control" name="reports_retention" value="<?= $rpt_ret; ?>" min="1" max="365" style="width:110px;">
 							</div>
-							<p class="help-block"><?= l7_t("Faixas rapidas: 7/15/30/60/90/180/365 dias. Para valor especifico, selecione Customizado e informe os dias."); ?></p>
+							<p class="help-block"><?= l7_t("Faixas rapidas: 7/15/30/60/90/180/365 dias. Este historico alimenta visoes executivas e tende a ser muito mais leve que o log detalhado."); ?></p>
+						</div>
+						<div class="form-group">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="reports_event_log_enabled" <?= $rpt_evt_en ? 'checked' : ''; ?>>
+								<?= l7_t("Activar log detalhado pesquisavel"); ?>
+							</label>
+							<p class="help-block"><?= l7_t("Quando desactivado, o appliance deixa de armazenar eventos detalhados em SQLite. O historico executivo continua activo se a recolha acima estiver ligada."); ?></p>
+						</div>
+						<div class="form-group">
+							<label><?= l7_t("Retencao do log detalhado (dias)"); ?></label>
+							<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+								<select class="form-control" name="reports_event_retention_preset" style="width:180px;">
+									<?php foreach ($rpt_presets as $rp) { ?>
+									<option value="<?= $rp; ?>" <?= $rpt_evt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
+									<?php } ?>
+									<option value="custom" <?= $rpt_evt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Customizado"); ?></option>
+								</select>
+								<input type="number" class="form-control" name="reports_event_retention" value="<?= $rpt_evt_ret; ?>" min="1" max="365" style="width:110px;">
+							</div>
+							<p class="help-block"><?= l7_t("Recomendado para appliance local: 7 a 15 dias. Este e o bloco que mais cresce em disco."); ?></p>
 						</div>
 						<div class="form-group">
 							<label><?= l7_t("Intervalo de recolha"); ?></label>
@@ -615,11 +718,25 @@ layer7_render_styles();
 								<?php } ?>
 							</select>
 						</div>
+						<div class="form-group">
+							<label><?= l7_t("Interfaces do log detalhado"); ?></label>
+							<?php if (empty($pfsense_ifaces)) { ?>
+								<p class="form-control-static text-muted"><?= l7_t("Nenhuma interface configurada no pfSense."); ?></p>
+							<?php } else { ?>
+								<?php foreach ($pfsense_ifaces as $ifc) { ?>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="reports_iface_sel[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>"
+											<?= in_array($ifc["real"], $rpt_evt_ifaces, true) ? 'checked="checked"' : ''; ?> />
+										<strong><?= htmlspecialchars($ifc["descr"]); ?></strong>
+										<span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+									</label>
+								</div>
+								<?php } ?>
+							<?php } ?>
+							<p class="help-block"><?= l7_t("Selecione uma ou mais interfaces para guardar eventos detalhados. Se deixar vazio, o Layer7 guarda eventos de todas as interfaces capturadas."); ?></p>
+						</div>
 						<input type="hidden" name="save" value="1">
-						<input type="hidden" name="enabled" <?= (!empty($L["enabled"])) ? 'value="1" checked' : ''; ?>>
-						<input type="hidden" name="mode" value="<?= htmlspecialchars($mode); ?>">
-						<input type="hidden" name="language" value="<?= htmlspecialchars($L["language"] ?? "pt"); ?>">
-						<input type="hidden" name="log_level" value="<?= htmlspecialchars($ll); ?>">
 						<div class="layer7-form-card__actions">
 							<button type="submit" class="btn btn-primary">
 								<i class="fa fa-save"></i> <?= l7_t("Guardar definicoes de relatorios"); ?>
