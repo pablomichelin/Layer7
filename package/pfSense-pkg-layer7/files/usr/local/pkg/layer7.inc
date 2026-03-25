@@ -1352,3 +1352,642 @@ function layer7_reports_granularity_for_range($from_ts, $to_ts)
 	if ($range <= 604800) return 21600;
 	return 86400;
 }
+
+define('L7_REPORTS_DB', L7_REPORTS_DIR . '/reports.db');
+define('L7_REPORTS_CURSOR', L7_REPORTS_DIR . '/ingest.cursor');
+define('L7_REPORTS_COLLECT_PHP', '/usr/local/etc/layer7/layer7-reports-collect.php');
+
+function layer7_reports_db_available()
+{
+	return class_exists("SQLite3");
+}
+
+function layer7_reports_db_connect($readonly = false)
+{
+	if (!layer7_reports_db_available()) {
+		return null;
+	}
+	@mkdir(L7_REPORTS_DIR, 0755, true);
+	$flags = SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE;
+	if ($readonly) {
+		$flags = SQLITE3_OPEN_READONLY;
+	}
+	try {
+		$db = new SQLite3(L7_REPORTS_DB, $flags);
+		$db->busyTimeout(3000);
+		return $db;
+	} catch (Exception $e) {
+		return null;
+	}
+}
+
+function layer7_reports_init_schema($db)
+{
+	if (!$db) {
+		return false;
+	}
+	$sql = array(
+		"CREATE TABLE IF NOT EXISTS events (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			ts INTEGER NOT NULL,
+			ts_text TEXT NOT NULL,
+			type TEXT NOT NULL,
+			src_ip TEXT NOT NULL DEFAULT '',
+			src_hostname TEXT NOT NULL DEFAULT '',
+			dst_ip TEXT NOT NULL DEFAULT '',
+			host TEXT NOT NULL DEFAULT '',
+			app TEXT NOT NULL DEFAULT '',
+			category TEXT NOT NULL DEFAULT '',
+			action TEXT NOT NULL DEFAULT '',
+			policy TEXT NOT NULL DEFAULT '',
+			iface TEXT NOT NULL DEFAULT '',
+			raw TEXT NOT NULL DEFAULT ''
+		)",
+		"CREATE INDEX IF NOT EXISTS idx_events_ts ON events(ts)",
+		"CREATE INDEX IF NOT EXISTS idx_events_src_ip ON events(src_ip)",
+		"CREATE INDEX IF NOT EXISTS idx_events_host ON events(host)",
+		"CREATE INDEX IF NOT EXISTS idx_events_action ON events(action)",
+		"CREATE INDEX IF NOT EXISTS idx_events_policy ON events(policy)",
+		"CREATE TABLE IF NOT EXISTS identity_map (
+			src_ip TEXT PRIMARY KEY,
+			hostname TEXT NOT NULL DEFAULT '',
+			source TEXT NOT NULL DEFAULT 'ip_hostname',
+			first_seen INTEGER NOT NULL,
+			last_seen INTEGER NOT NULL
+		)",
+		"CREATE TABLE IF NOT EXISTS daily_kpi (
+			day_key TEXT PRIMARY KEY,
+			total_events INTEGER NOT NULL DEFAULT 0,
+			blocked_events INTEGER NOT NULL DEFAULT 0,
+			allowed_events INTEGER NOT NULL DEFAULT 0,
+			monitor_events INTEGER NOT NULL DEFAULT 0,
+			unique_devices INTEGER NOT NULL DEFAULT 0,
+			updated_at INTEGER NOT NULL DEFAULT 0
+		)",
+		"CREATE TABLE IF NOT EXISTS meta (
+			k TEXT PRIMARY KEY,
+			v TEXT NOT NULL
+		)"
+	);
+	foreach ($sql as $q) {
+		if (@$db->exec($q) === false) {
+			return false;
+		}
+	}
+	return true;
+}
+
+function layer7_reports_parse_kv_line($text)
+{
+	$out = array();
+	if (!is_string($text) || $text === "") {
+		return $out;
+	}
+	if (preg_match_all('/(\w+)=(".*?"|\S+)/', $text, $m, PREG_SET_ORDER)) {
+		foreach ($m as $kv) {
+			$key = $kv[1];
+			$val = trim($kv[2], "\"");
+			$out[$key] = $val;
+		}
+	}
+	return $out;
+}
+
+function layer7_reports_event_from_log_line($line)
+{
+	$line = trim((string)$line);
+	if (strlen($line) < 22) {
+		return null;
+	}
+	$ts_str = substr($line, 0, 19);
+	$ts = @strtotime($ts_str);
+	if ($ts === false) {
+		return null;
+	}
+	$rest = substr($line, 20);
+	if (preg_match('/^\[(\w+)\]\s*(.*)$/', $rest, $m)) {
+		$rest = $m[2];
+	}
+
+	$type = "";
+	$action = "";
+	if (strpos($rest, "flow_decide:") === 0) {
+		$type = "flow";
+	} elseif (strpos($rest, "bl_block:") === 0) {
+		$type = "blacklist";
+		$action = "block";
+	} elseif (strpos($rest, "dns_block:") === 0) {
+		$type = "dns_block";
+		$action = "block";
+	} elseif (strpos($rest, "enforce_block_dst:") === 0 || strpos($rest, "enforce_tag:") === 0) {
+		$type = "enforce";
+		$action = "block";
+	} else {
+		return null;
+	}
+
+	$f = layer7_reports_parse_kv_line($rest);
+	if ($action === "" && isset($f["action"])) {
+		$action = (string)$f["action"];
+	}
+	if ($action === "") {
+		$action = "monitor";
+	}
+
+	return array(
+		"ts" => (int)$ts,
+		"ts_text" => $ts_str,
+		"type" => $type,
+		"src_ip" => (string)($f["src"] ?? ""),
+		"src_hostname" => (string)($f["src_host"] ?? ""),
+		"dst_ip" => (string)($f["dst"] ?? ""),
+		"host" => (string)($f["host"] ?? ""),
+		"app" => (string)($f["app"] ?? ""),
+		"category" => (string)($f["cat"] ?? ""),
+		"action" => (string)$action,
+		"policy" => (string)($f["policy"] ?? ""),
+		"iface" => (string)($f["iface"] ?? ""),
+		"raw" => $rest
+	);
+}
+
+function layer7_reports_cursor_load($path, $default_inode, $default_offset)
+{
+	if (!file_exists($path)) {
+		return array("inode" => (string)$default_inode, "offset" => (int)$default_offset);
+	}
+	$raw = @file_get_contents($path);
+	$obj = @json_decode($raw, true);
+	if (!is_array($obj)) {
+		return array("inode" => (string)$default_inode, "offset" => (int)$default_offset);
+	}
+	return array(
+		"inode" => isset($obj["inode"]) ? (string)$obj["inode"] : (string)$default_inode,
+		"offset" => isset($obj["offset"]) ? (int)$obj["offset"] : (int)$default_offset
+	);
+}
+
+function layer7_reports_cursor_save($path, $inode, $offset)
+{
+	$payload = json_encode(array("inode" => (string)$inode, "offset" => (int)$offset), JSON_UNESCAPED_SLASHES);
+	if (!is_string($payload)) {
+		return;
+	}
+	@file_put_contents($path, $payload . "\n", LOCK_EX);
+}
+
+function layer7_reports_update_identity_map($db, $src_ip, $hostname, $ts)
+{
+	if (!$db || !is_string($src_ip) || $src_ip === "") {
+		return;
+	}
+	$hostname = trim((string)$hostname);
+	$stmt = @$db->prepare("INSERT INTO identity_map(src_ip, hostname, source, first_seen, last_seen)
+		VALUES(:ip, :hn, 'ip_hostname', :ts, :ts)
+		ON CONFLICT(src_ip) DO UPDATE SET
+			hostname = CASE WHEN excluded.hostname <> '' THEN excluded.hostname ELSE identity_map.hostname END,
+			last_seen = excluded.last_seen");
+	if (!$stmt) {
+		return;
+	}
+	$stmt->bindValue(":ip", $src_ip, SQLITE3_TEXT);
+	$stmt->bindValue(":hn", $hostname, SQLITE3_TEXT);
+	$stmt->bindValue(":ts", (int)$ts, SQLITE3_INTEGER);
+	@$stmt->execute();
+}
+
+function layer7_reports_refresh_daily_kpi($db, $day_keys)
+{
+	if (!$db || empty($day_keys)) {
+		return;
+	}
+	$days = array_values(array_unique($day_keys));
+	foreach ($days as $day) {
+		$start = @strtotime($day . " 00:00:00");
+		$end = @strtotime($day . " 23:59:59");
+		if ($start === false || $end === false) {
+			continue;
+		}
+		$q = @$db->prepare("SELECT
+			COUNT(*) AS total_events,
+			SUM(CASE WHEN action='block' THEN 1 ELSE 0 END) AS blocked_events,
+			SUM(CASE WHEN action='allow' THEN 1 ELSE 0 END) AS allowed_events,
+			SUM(CASE WHEN action NOT IN ('block','allow') THEN 1 ELSE 0 END) AS monitor_events,
+			COUNT(DISTINCT CASE WHEN src_ip <> '' THEN src_ip END) AS unique_devices
+			FROM events WHERE ts BETWEEN :start AND :end");
+		if (!$q) {
+			continue;
+		}
+		$q->bindValue(":start", (int)$start, SQLITE3_INTEGER);
+		$q->bindValue(":end", (int)$end, SQLITE3_INTEGER);
+		$r = @$q->execute();
+		$row = $r ? $r->fetchArray(SQLITE3_ASSOC) : null;
+		if (!is_array($row)) {
+			continue;
+		}
+		$up = @$db->prepare("INSERT INTO daily_kpi(day_key, total_events, blocked_events, allowed_events, monitor_events, unique_devices, updated_at)
+			VALUES(:day, :t, :b, :a, :m, :u, :now)
+			ON CONFLICT(day_key) DO UPDATE SET
+			total_events=excluded.total_events,
+			blocked_events=excluded.blocked_events,
+			allowed_events=excluded.allowed_events,
+			monitor_events=excluded.monitor_events,
+			unique_devices=excluded.unique_devices,
+			updated_at=excluded.updated_at");
+		if (!$up) {
+			continue;
+		}
+		$up->bindValue(":day", (string)$day, SQLITE3_TEXT);
+		$up->bindValue(":t", (int)$row["total_events"], SQLITE3_INTEGER);
+		$up->bindValue(":b", (int)$row["blocked_events"], SQLITE3_INTEGER);
+		$up->bindValue(":a", (int)$row["allowed_events"], SQLITE3_INTEGER);
+		$up->bindValue(":m", (int)$row["monitor_events"], SQLITE3_INTEGER);
+		$up->bindValue(":u", (int)$row["unique_devices"], SQLITE3_INTEGER);
+		$up->bindValue(":now", time(), SQLITE3_INTEGER);
+		@$up->execute();
+	}
+}
+
+function layer7_reports_ingest_log_incremental()
+{
+	$log_path = "/var/log/layer7d.log";
+	if (!file_exists($log_path)) {
+		return array("ok" => true, "ingested" => 0, "reason" => "log_missing");
+	}
+	$db = layer7_reports_db_connect(false);
+	if (!$db) {
+		return array("ok" => false, "ingested" => 0, "reason" => "sqlite_unavailable");
+	}
+	if (!layer7_reports_init_schema($db)) {
+		return array("ok" => false, "ingested" => 0, "reason" => "schema_failed");
+	}
+
+	$st = @stat($log_path);
+	$inode = isset($st["ino"]) ? (string)$st["ino"] : "";
+	$size = isset($st["size"]) ? (int)$st["size"] : 0;
+	$cursor = layer7_reports_cursor_load(L7_REPORTS_CURSOR, $inode, 0);
+	$offset = (int)$cursor["offset"];
+	if ((string)$cursor["inode"] !== $inode || $offset > $size || $offset < 0) {
+		$offset = 0;
+	}
+
+	$fh = @fopen($log_path, "r");
+	if (!$fh) {
+		return array("ok" => false, "ingested" => 0, "reason" => "open_failed");
+	}
+	if ($offset > 0) {
+		@fseek($fh, $offset);
+	}
+
+	$insert = @$db->prepare("INSERT INTO events(ts, ts_text, type, src_ip, src_hostname, dst_ip, host, app, category, action, policy, iface, raw)
+		VALUES(:ts,:ts_text,:type,:src_ip,:src_hostname,:dst_ip,:host,:app,:category,:action,:policy,:iface,:raw)");
+	if (!$insert) {
+		@fclose($fh);
+		return array("ok" => false, "ingested" => 0, "reason" => "insert_prepare_failed");
+	}
+
+	$ingested = 0;
+	$day_keys = array();
+	@$db->exec("BEGIN IMMEDIATE TRANSACTION");
+	while (($line = fgets($fh)) !== false) {
+		$event = layer7_reports_event_from_log_line($line);
+		if (!is_array($event)) {
+			continue;
+		}
+		$insert->reset();
+		$insert->bindValue(":ts", (int)$event["ts"], SQLITE3_INTEGER);
+		$insert->bindValue(":ts_text", (string)$event["ts_text"], SQLITE3_TEXT);
+		$insert->bindValue(":type", (string)$event["type"], SQLITE3_TEXT);
+		$insert->bindValue(":src_ip", (string)$event["src_ip"], SQLITE3_TEXT);
+		$insert->bindValue(":src_hostname", (string)$event["src_hostname"], SQLITE3_TEXT);
+		$insert->bindValue(":dst_ip", (string)$event["dst_ip"], SQLITE3_TEXT);
+		$insert->bindValue(":host", (string)$event["host"], SQLITE3_TEXT);
+		$insert->bindValue(":app", (string)$event["app"], SQLITE3_TEXT);
+		$insert->bindValue(":category", (string)$event["category"], SQLITE3_TEXT);
+		$insert->bindValue(":action", (string)$event["action"], SQLITE3_TEXT);
+		$insert->bindValue(":policy", (string)$event["policy"], SQLITE3_TEXT);
+		$insert->bindValue(":iface", (string)$event["iface"], SQLITE3_TEXT);
+		$insert->bindValue(":raw", (string)$event["raw"], SQLITE3_TEXT);
+		$res = @$insert->execute();
+		if ($res !== false) {
+			$ingested++;
+			layer7_reports_update_identity_map($db, $event["src_ip"], $event["src_hostname"], $event["ts"]);
+			$day_keys[] = date("Y-m-d", (int)$event["ts"]);
+		}
+	}
+	@$db->exec("COMMIT");
+	$new_offset = @ftell($fh);
+	@fclose($fh);
+	layer7_reports_cursor_save(L7_REPORTS_CURSOR, $inode, ($new_offset === false ? 0 : (int)$new_offset));
+	layer7_reports_refresh_daily_kpi($db, $day_keys);
+
+	return array("ok" => true, "ingested" => $ingested, "reason" => "ok");
+}
+
+function layer7_reports_purge_db($retention_days)
+{
+	$retention_days = (int)$retention_days;
+	if ($retention_days < 1) {
+		$retention_days = 1;
+	}
+	if ($retention_days > 365) {
+		$retention_days = 365;
+	}
+	$db = layer7_reports_db_connect(false);
+	if (!$db) {
+		return array("ok" => false, "deleted" => 0, "reason" => "sqlite_unavailable");
+	}
+	if (!layer7_reports_init_schema($db)) {
+		return array("ok" => false, "deleted" => 0, "reason" => "schema_failed");
+	}
+	$cutoff = time() - ($retention_days * 86400);
+	$before = @$db->querySingle("SELECT COUNT(*) FROM events");
+	$del = @$db->prepare("DELETE FROM events WHERE ts < :cutoff");
+	if ($del) {
+		$del->bindValue(":cutoff", (int)$cutoff, SQLITE3_INTEGER);
+		@$del->execute();
+	}
+	@$db->exec("DELETE FROM identity_map WHERE last_seen < " . (int)$cutoff);
+	@$db->exec("DELETE FROM daily_kpi WHERE day_key < '" . date("Y-m-d", $cutoff) . "'");
+	$after = @$db->querySingle("SELECT COUNT(*) FROM events");
+	$deleted = max(0, (int)$before - (int)$after);
+	if ($deleted > 0) {
+		@$db->exec("VACUUM");
+	}
+	return array("ok" => true, "deleted" => $deleted, "reason" => "ok");
+}
+
+function layer7_reports_filter_build($from_ts, $to_ts, $filters, &$params)
+{
+	$where = array("ts BETWEEN :from_ts AND :to_ts");
+	$params[":from_ts"] = (int)$from_ts;
+	$params[":to_ts"] = (int)$to_ts;
+
+	$map = array(
+		"src_ip" => "src_ip",
+		"host" => "host",
+		"app" => "app",
+		"category" => "category",
+		"policy" => "policy",
+		"action" => "action"
+	);
+	foreach ($map as $fk => $col) {
+		if (isset($filters[$fk]) && trim((string)$filters[$fk]) !== "") {
+			$p = ":f_" . $fk;
+			$where[] = "{$col} = {$p}";
+			$params[$p] = trim((string)$filters[$fk]);
+		}
+	}
+	if (isset($filters["q"]) && trim((string)$filters["q"]) !== "") {
+		$q = trim((string)$filters["q"]);
+		$where[] = "(host LIKE :f_q OR app LIKE :f_q OR category LIKE :f_q OR policy LIKE :f_q OR src_ip LIKE :f_q OR src_hostname LIKE :f_q)";
+		$params[":f_q"] = "%" . $q . "%";
+	}
+	return implode(" AND ", $where);
+}
+
+function layer7_reports_fetch_summary($from_ts, $to_ts, $filters = array())
+{
+	$db = layer7_reports_db_connect(true);
+	if (!$db || !layer7_reports_init_schema($db)) {
+		return null;
+	}
+	$params = array();
+	$where = layer7_reports_filter_build($from_ts, $to_ts, $filters, $params);
+	$sql = "SELECT
+		COUNT(*) AS total_events,
+		SUM(CASE WHEN action='block' THEN 1 ELSE 0 END) AS blocked_events,
+		SUM(CASE WHEN action='allow' THEN 1 ELSE 0 END) AS allowed_events,
+		SUM(CASE WHEN action NOT IN ('block','allow') THEN 1 ELSE 0 END) AS monitor_events,
+		COUNT(DISTINCT CASE WHEN src_ip <> '' THEN src_ip END) AS unique_devices,
+		COUNT(DISTINCT CASE WHEN host <> '' THEN host END) AS unique_sites
+		FROM events WHERE {$where}";
+	$stmt = @$db->prepare($sql);
+	if (!$stmt) {
+		return null;
+	}
+	foreach ($params as $k => $v) {
+		$type = is_int($v) ? SQLITE3_INTEGER : SQLITE3_TEXT;
+		$stmt->bindValue($k, $v, $type);
+	}
+	$res = @$stmt->execute();
+	$row = $res ? $res->fetchArray(SQLITE3_ASSOC) : null;
+	return is_array($row) ? $row : null;
+}
+
+function layer7_reports_fetch_timeline($from_ts, $to_ts, $granularity, $filters = array())
+{
+	$db = layer7_reports_db_connect(true);
+	if (!$db || !layer7_reports_init_schema($db)) {
+		return array();
+	}
+	$params = array();
+	$where = layer7_reports_filter_build($from_ts, $to_ts, $filters, $params);
+	$bucket_expr = "strftime('%Y-%m-%d %H:00:00', ts, 'unixepoch')";
+	if ((int)$granularity >= 86400) {
+		$bucket_expr = "strftime('%Y-%m-%d 00:00:00', ts, 'unixepoch')";
+	} elseif ((int)$granularity >= 21600) {
+		$bucket_expr = "strftime('%Y-%m-%d %H:00:00', ts - (ts % 21600), 'unixepoch')";
+	}
+	$sql = "SELECT {$bucket_expr} AS bucket,
+		COUNT(*) AS total_events,
+		SUM(CASE WHEN action='block' THEN 1 ELSE 0 END) AS blocked_events,
+		SUM(CASE WHEN action='allow' THEN 1 ELSE 0 END) AS allowed_events
+		FROM events WHERE {$where}
+		GROUP BY bucket ORDER BY bucket";
+	$stmt = @$db->prepare($sql);
+	if (!$stmt) {
+		return array();
+	}
+	foreach ($params as $k => $v) {
+		$stmt->bindValue($k, $v, is_int($v) ? SQLITE3_INTEGER : SQLITE3_TEXT);
+	}
+	$r = @$stmt->execute();
+	$out = array();
+	while ($r && ($row = $r->fetchArray(SQLITE3_ASSOC))) {
+		$ts = @strtotime($row["bucket"]);
+		if ($ts === false) {
+			continue;
+		}
+		$out[] = array(
+			"ts" => (int)$ts,
+			"total_events" => (int)$row["total_events"],
+			"blocked_events" => (int)$row["blocked_events"],
+			"allowed_events" => (int)$row["allowed_events"]
+		);
+	}
+	return $out;
+}
+
+function layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters = array(), $limit = 20)
+{
+	$db = layer7_reports_db_connect(true);
+	if (!$db || !layer7_reports_init_schema($db)) {
+		return array();
+	}
+	$params = array();
+	$where = layer7_reports_filter_build($from_ts, $to_ts, $filters, $params);
+	$sql = "SELECT src_ip,
+		MAX(src_hostname) AS src_hostname,
+		COUNT(*) AS total_events,
+		SUM(CASE WHEN action='block' THEN 1 ELSE 0 END) AS blocked_events
+		FROM events
+		WHERE {$where} AND src_ip <> ''
+		GROUP BY src_ip
+		ORDER BY blocked_events DESC, total_events DESC
+		LIMIT " . (int)$limit;
+	$stmt = @$db->prepare($sql);
+	if (!$stmt) {
+		return array();
+	}
+	foreach ($params as $k => $v) {
+		$stmt->bindValue($k, $v, is_int($v) ? SQLITE3_INTEGER : SQLITE3_TEXT);
+	}
+	$r = @$stmt->execute();
+	$out = array();
+	while ($r && ($row = $r->fetchArray(SQLITE3_ASSOC))) {
+		$out[] = $row;
+	}
+	return $out;
+}
+
+function layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters = array(), $limit = 20)
+{
+	$db = layer7_reports_db_connect(true);
+	if (!$db || !layer7_reports_init_schema($db)) {
+		return array();
+	}
+	$params = array();
+	$where = layer7_reports_filter_build($from_ts, $to_ts, $filters, $params);
+	$sql = "SELECT host,
+		COUNT(*) AS total_events,
+		SUM(CASE WHEN action='block' THEN 1 ELSE 0 END) AS blocked_events
+		FROM events
+		WHERE {$where} AND host <> ''
+		GROUP BY host
+		ORDER BY blocked_events DESC, total_events DESC
+		LIMIT " . (int)$limit;
+	$stmt = @$db->prepare($sql);
+	if (!$stmt) {
+		return array();
+	}
+	foreach ($params as $k => $v) {
+		$stmt->bindValue($k, $v, is_int($v) ? SQLITE3_INTEGER : SQLITE3_TEXT);
+	}
+	$r = @$stmt->execute();
+	$out = array();
+	while ($r && ($row = $r->fetchArray(SQLITE3_ASSOC))) {
+		$out[] = $row;
+	}
+	return $out;
+}
+
+function layer7_reports_fetch_events($from_ts, $to_ts, $filters = array(), $page = 1, $page_size = 50)
+{
+	$db = layer7_reports_db_connect(true);
+	if (!$db || !layer7_reports_init_schema($db)) {
+		return array("rows" => array(), "total" => 0, "page" => 1, "page_size" => $page_size);
+	}
+	$page = max(1, (int)$page);
+	$page_size = max(10, min(200, (int)$page_size));
+	$offset = ($page - 1) * $page_size;
+	$params = array();
+	$where = layer7_reports_filter_build($from_ts, $to_ts, $filters, $params);
+
+	$count_sql = "SELECT COUNT(*) AS c FROM events WHERE {$where}";
+	$cstmt = @$db->prepare($count_sql);
+	if ($cstmt) {
+		foreach ($params as $k => $v) {
+			$cstmt->bindValue($k, $v, is_int($v) ? SQLITE3_INTEGER : SQLITE3_TEXT);
+		}
+		$cr = @$cstmt->execute();
+		$crow = $cr ? $cr->fetchArray(SQLITE3_ASSOC) : array("c" => 0);
+		$total = (int)($crow["c"] ?? 0);
+	} else {
+		$total = 0;
+	}
+
+	$sql = "SELECT ts, ts_text, type, src_ip, src_hostname, dst_ip, host, app, category, action, policy, iface
+		FROM events WHERE {$where}
+		ORDER BY ts DESC
+		LIMIT :limit OFFSET :offset";
+	$stmt = @$db->prepare($sql);
+	if (!$stmt) {
+		return array("rows" => array(), "total" => $total, "page" => $page, "page_size" => $page_size);
+	}
+	foreach ($params as $k => $v) {
+		$stmt->bindValue($k, $v, is_int($v) ? SQLITE3_INTEGER : SQLITE3_TEXT);
+	}
+	$stmt->bindValue(":limit", $page_size, SQLITE3_INTEGER);
+	$stmt->bindValue(":offset", $offset, SQLITE3_INTEGER);
+	$r = @$stmt->execute();
+	$rows = array();
+	while ($r && ($row = $r->fetchArray(SQLITE3_ASSOC))) {
+		$rows[] = $row;
+	}
+	return array("rows" => $rows, "total" => $total, "page" => $page, "page_size" => $page_size);
+}
+
+function layer7_reports_identity_provider_ip_hostname($ip)
+{
+	$ip = trim((string)$ip);
+	if ($ip === "" || !filter_var($ip, FILTER_VALIDATE_IP)) {
+		return null;
+	}
+	$db = layer7_reports_db_connect(true);
+	if ($db && layer7_reports_init_schema($db)) {
+		$stmt = @$db->prepare("SELECT hostname FROM identity_map WHERE src_ip=:ip");
+		if ($stmt) {
+			$stmt->bindValue(":ip", $ip, SQLITE3_TEXT);
+			$res = @$stmt->execute();
+			$row = $res ? $res->fetchArray(SQLITE3_ASSOC) : null;
+			if (is_array($row) && trim((string)$row["hostname"]) !== "") {
+				return array(
+					"display_name" => $row["hostname"],
+					"source" => "ip_hostname",
+					"confidence" => 90
+				);
+			}
+		}
+	}
+	$rdns = @gethostbyaddr($ip);
+	if (is_string($rdns) && $rdns !== "" && $rdns !== $ip) {
+		return array(
+			"display_name" => $rdns,
+			"source" => "ip_hostname",
+			"confidence" => 60
+		);
+	}
+	return array(
+		"display_name" => $ip,
+		"source" => "ip_hostname",
+		"confidence" => 30
+	);
+}
+
+function layer7_reports_identity_providers()
+{
+	return array(
+		"ip_hostname" => "layer7_reports_identity_provider_ip_hostname",
+		"captive_portal" => null,
+		"ad_radius" => null
+	);
+}
+
+function resolveIdentityByIp($ip)
+{
+	foreach (layer7_reports_identity_providers() as $provider => $resolver) {
+		if (!is_string($resolver) || !function_exists($resolver)) {
+			continue;
+		}
+		$identity = $resolver($ip);
+		if (is_array($identity) && !empty($identity["display_name"])) {
+			return $identity;
+		}
+	}
+	return array(
+		"display_name" => (string)$ip,
+		"source" => "ip_hostname",
+		"confidence" => 10
+	);
+}

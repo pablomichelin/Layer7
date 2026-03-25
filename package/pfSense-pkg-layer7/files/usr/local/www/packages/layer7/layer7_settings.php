@@ -209,11 +209,16 @@ if ($_POST["save"] ?? false) {
 		$data["layer7"]["block_quic"] = isset($_POST["block_quic"]);
 
 		$rpt_enabled = isset($_POST["reports_enabled"]);
-		$rpt_retention = (int)($_POST["reports_retention"] ?? 30);
+		$rpt_preset = trim((string)($_POST["reports_retention_preset"] ?? "custom"));
+		if ($rpt_preset !== "custom" && ctype_digit($rpt_preset)) {
+			$rpt_retention = (int)$rpt_preset;
+		} else {
+			$rpt_retention = (int)($_POST["reports_retention"] ?? 30);
+		}
 		if ($rpt_retention < 1) $rpt_retention = 1;
 		if ($rpt_retention > 365) $rpt_retention = 365;
 		$rpt_interval = (int)($_POST["reports_interval"] ?? 5);
-		if (!in_array($rpt_interval, array(5, 10, 15, 30), true)) $rpt_interval = 5;
+		if (!in_array($rpt_interval, array(5, 10, 15, 30, 60), true)) $rpt_interval = 5;
 		$data["layer7"]["reports"] = array(
 			"enabled" => $rpt_enabled,
 			"retention_days" => $rpt_retention,
@@ -506,6 +511,8 @@ layer7_render_styles();
 			$rpt_en = !empty($rpt_cfg["enabled"]);
 			$rpt_ret = (int)($rpt_cfg["retention_days"] ?? 30);
 			$rpt_int = (int)($rpt_cfg["collect_interval"] ?? 5);
+			$rpt_presets = array(7, 15, 30, 60, 90, 180, 365);
+			$rpt_selected_preset = in_array($rpt_ret, $rpt_presets, true) ? (string)$rpt_ret : "custom";
 			?>
 			<div class="layer7-section" style="margin-top: 36px;">
 				<h3 class="layer7-section-title"><?= l7_t("Relatorios"); ?></h3>
@@ -520,13 +527,21 @@ layer7_render_styles();
 						</div>
 						<div class="form-group">
 							<label><?= l7_t("Retencao de dados (dias)"); ?></label>
-							<input type="number" class="form-control" name="reports_retention" value="<?= $rpt_ret; ?>" min="1" max="365" style="width:100px;">
-							<p class="help-block"><?= l7_t("Dados mais antigos sao removidos automaticamente. Maximo 365 dias."); ?></p>
+							<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+								<select class="form-control" name="reports_retention_preset" style="width:180px;">
+									<?php foreach ($rpt_presets as $rp) { ?>
+									<option value="<?= $rp; ?>" <?= $rpt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
+									<?php } ?>
+									<option value="custom" <?= $rpt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Customizado"); ?></option>
+								</select>
+								<input type="number" class="form-control" name="reports_retention" value="<?= $rpt_ret; ?>" min="1" max="365" style="width:110px;">
+							</div>
+							<p class="help-block"><?= l7_t("Faixas rapidas: 7/15/30/60/90/180/365 dias. Para valor especifico, selecione Customizado e informe os dias."); ?></p>
 						</div>
 						<div class="form-group">
 							<label><?= l7_t("Intervalo de recolha"); ?></label>
 							<select class="form-control" name="reports_interval" style="width:150px;">
-								<?php foreach (array(5, 10, 15, 30) as $iv) { ?>
+								<?php foreach (array(5, 10, 15, 30, 60) as $iv) { ?>
 								<option value="<?= $iv; ?>" <?= ($rpt_int === $iv) ? 'selected' : ''; ?>><?= $iv; ?> <?= l7_t("minutos"); ?></option>
 								<?php } ?>
 							</select>

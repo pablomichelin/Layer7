@@ -16,6 +16,7 @@
 | [08-lab](08-lab/) | Laboratório (builder, topologia, guias) |
 | [09-blocking](09-blocking/) | Plano mestre para bloqueio real de apps, sites e serviços |
 | [10-logging](10-logging/) | Logging e observabilidade |
+| [12-reports](12-reports/) | Relatórios executivos (SQLite, filtros, retenção, exportação) |
 | [changelog](changelog/) | CHANGELOG |
 | [core](core/) | Modelagem V1 (config/evento/policy/nDPI strategy) |
 | [package](package/) | Validação GUI |

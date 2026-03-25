@@ -2,18 +2,26 @@
 ##|+PRIV
 ##|*IDENT=page-services-layer7-reports-export
 ##|*NAME=Services: Layer 7 (reports export)
-##|*DESCR=Export Layer 7 reports.
+##|*DESCR=Export Layer 7 executive reports.
 ##|*MATCH=layer7_reports_export.php*
 ##|-PRIV
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
-$format = isset($_GET["format"]) ? $_GET["format"] : "csv";
-$range = isset($_GET["range"]) ? $_GET["range"] : "24h";
-$custom_from = isset($_GET["from"]) ? $_GET["from"] : "";
-$custom_to = isset($_GET["to"]) ? $_GET["to"] : "";
-$sections = isset($_GET["sections"]) ? explode(",", $_GET["sections"]) : array("traffic", "apps", "clients", "blacklists", "policies");
+$format = isset($_GET["format"]) ? (string)$_GET["format"] : "html";
+$range = isset($_GET["range"]) ? (string)$_GET["range"] : "24h";
+$custom_from = isset($_GET["from"]) ? (string)$_GET["from"] : "";
+$custom_to = isset($_GET["to"]) ? (string)$_GET["to"] : "";
+$filters = array(
+	"src_ip" => trim((string)($_GET["src_ip"] ?? "")),
+	"host" => trim((string)($_GET["host"] ?? "")),
+	"action" => trim((string)($_GET["action"] ?? "")),
+	"q" => trim((string)($_GET["q"] ?? ""))
+);
+if (!in_array($filters["action"], array("", "block", "allow", "monitor"), true)) {
+	$filters["action"] = "";
+}
 
 $now = time();
 switch ($range) {
@@ -23,151 +31,131 @@ switch ($range) {
 	case "7d":   $from_ts = $now - 604800; break;
 	case "30d":  $from_ts = $now - 2592000; break;
 	case "custom":
-		$from_ts = $custom_from ? strtotime($custom_from) : ($now - 86400);
+		$from_ts = $custom_from ? strtotime($custom_from . " 00:00:00") : ($now - 86400);
 		$now = $custom_to ? strtotime($custom_to . " 23:59:59") : $now;
-		if ($from_ts === false) $from_ts = $now - 86400;
+		if ($from_ts === false) {
+			$from_ts = $now - 86400;
+		}
 		break;
-	default:     $from_ts = $now - 86400; break;
+	default: $from_ts = $now - 86400; break;
 }
 $to_ts = $now;
+$period_label = date("Y-m-d H:i", $from_ts) . " - " . date("Y-m-d H:i", $to_ts);
+$filename_base = "layer7-executive-" . date("Ymd", $from_ts) . "-" . date("Ymd", $to_ts);
 
-$history = layer7_reports_load_history($from_ts, $to_ts);
-$granularity = layer7_reports_granularity_for_range($from_ts, $to_ts);
-$traffic = layer7_reports_aggregate_traffic($history, $granularity);
-$top_apps = layer7_reports_aggregate_top($history, "top_apps", 50);
-$top_sources = layer7_reports_aggregate_top($history, "top_sources", 50);
-$top_bl_cats = layer7_reports_aggregate_top($history, "bl_top_cats", 50);
+$summary = layer7_reports_fetch_summary($from_ts, $to_ts, $filters);
+$timeline = layer7_reports_fetch_timeline($from_ts, $to_ts, layer7_reports_granularity_for_range($from_ts, $to_ts), $filters);
+$top_devices = layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters, 30);
+$top_sites = layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters, 50);
+$events = layer7_reports_fetch_events($from_ts, $to_ts, $filters, 1, 2000);
+$rows = $events["rows"];
 
-$total_classified = 0; $total_blocked = 0; $total_allowed = 0;
-foreach ($traffic as $t) {
-	$total_classified += $t["classified"];
-	$total_blocked += $t["blocked"];
-	$total_allowed += $t["allowed"];
-}
-
-$policy_stats = array();
-if (in_array("policies", $sections)) {
-	$log_events = layer7_reports_parse_log($from_ts, $to_ts, array("type" => "flow"));
-	foreach ($log_events as $ev) {
-		if (isset($ev["fields"]["policy"]) && $ev["fields"]["policy"] !== "-") {
-			$pid = $ev["fields"]["policy"];
-			if (!isset($policy_stats[$pid])) {
-				$policy_stats[$pid] = array("name" => $pid, "block" => 0, "tag" => 0, "total" => 0);
-			}
-			$policy_stats[$pid]["total"]++;
-			$act = isset($ev["fields"]["action"]) ? $ev["fields"]["action"] : "";
-			if ($act === "block") $policy_stats[$pid]["block"]++;
-			elseif ($act === "tag") $policy_stats[$pid]["tag"]++;
-		}
+if ($summary === null) {
+	$history = layer7_reports_load_history($from_ts, $to_ts);
+	$traffic = layer7_reports_aggregate_traffic($history, layer7_reports_granularity_for_range($from_ts, $to_ts));
+	$classified = 0; $blocked = 0; $allowed = 0;
+	foreach ($traffic as $t) {
+		$classified += (int)($t["classified"] ?? 0);
+		$blocked += (int)($t["blocked"] ?? 0);
+		$allowed += (int)($t["allowed"] ?? 0);
 	}
-	usort($policy_stats, function($a, $b) { return $b["total"] - $a["total"]; });
-}
-
-$bl_domains = array();
-if (in_array("blacklists", $sections)) {
-	$bl_log = layer7_reports_parse_log($from_ts, $to_ts, array("type" => "blacklist"));
-	foreach ($bl_log as $ev) {
-		if (isset($ev["fields"]["domain"])) {
-			$d = $ev["fields"]["domain"];
-			$c = isset($ev["fields"]["cat"]) ? $ev["fields"]["cat"] : "?";
-			if (!isset($bl_domains[$d])) $bl_domains[$d] = array("domain" => $d, "cat" => $c, "count" => 0);
-			$bl_domains[$d]["count"]++;
-		}
+	$summary = array(
+		"total_events" => $classified,
+		"blocked_events" => $blocked,
+		"allowed_events" => $allowed,
+		"monitor_events" => max(0, $classified - $blocked - $allowed),
+		"unique_devices" => 0,
+		"unique_sites" => 0
+	);
+	$timeline = array();
+	foreach ($traffic as $t) {
+		$timeline[] = array(
+			"ts" => (int)$t["ts"],
+			"total_events" => (int)($t["classified"] ?? 0),
+			"blocked_events" => (int)($t["blocked"] ?? 0),
+			"allowed_events" => (int)($t["allowed"] ?? 0)
+		);
 	}
-	usort($bl_domains, function($a, $b) { return $b["count"] - $a["count"]; });
 }
 
-$period_label = date("Y-m-d H:i", $from_ts) . " — " . date("Y-m-d H:i", $to_ts);
-$filename_base = "layer7-report-" . date("Ymd", $from_ts) . "-" . date("Ymd", $to_ts);
+$total_events = (int)($summary["total_events"] ?? 0);
+$blocked_events = (int)($summary["blocked_events"] ?? 0);
+$allowed_events = (int)($summary["allowed_events"] ?? 0);
+$monitor_events = (int)($summary["monitor_events"] ?? 0);
+$unique_devices = (int)($summary["unique_devices"] ?? 0);
+$unique_sites = (int)($summary["unique_sites"] ?? 0);
+$block_rate = $total_events > 0 ? round(($blocked_events / $total_events) * 100, 1) : 0;
 
 if ($format === "json") {
 	header("Content-Type: application/json; charset=utf-8");
 	header("Content-Disposition: attachment; filename=\"{$filename_base}.json\"");
-
-	$export = array(
-		"generated" => date("c"),
+	echo json_encode(array(
+		"generated_at" => date("c"),
 		"period" => array("from" => date("c", $from_ts), "to" => date("c", $to_ts)),
-		"summary" => array("classified" => $total_classified, "blocked" => $total_blocked, "allowed" => $total_allowed)
-	);
-	if (in_array("traffic", $sections)) $export["traffic"] = $traffic;
-	if (in_array("apps", $sections)) $export["top_apps"] = $top_apps;
-	if (in_array("clients", $sections)) $export["top_clients"] = $top_sources;
-	if (in_array("blacklists", $sections)) {
-		$export["blacklist_categories"] = $top_bl_cats;
-		$export["blacklist_domains"] = $bl_domains;
-	}
-	if (in_array("policies", $sections)) $export["policies"] = $policy_stats;
-
-	echo json_encode($export, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+		"filters" => $filters,
+		"summary" => array(
+			"total_events" => $total_events,
+			"blocked_events" => $blocked_events,
+			"allowed_events" => $allowed_events,
+			"monitor_events" => $monitor_events,
+			"unique_devices" => $unique_devices,
+			"unique_sites" => $unique_sites,
+			"block_rate_pct" => $block_rate
+		),
+		"timeline" => $timeline,
+		"top_devices" => $top_devices,
+		"top_sites" => $top_sites,
+		"events" => $rows
+	), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	exit;
 }
 
 if ($format === "csv") {
 	header("Content-Type: text/csv; charset=utf-8");
 	header("Content-Disposition: attachment; filename=\"{$filename_base}.csv\"");
-
 	$out = fopen("php://output", "w");
 
-	fputcsv($out, array("Layer7 Report", $period_label));
+	fputcsv($out, array("Layer7 Executive Report", $period_label));
+	fputcsv($out, array("Total", $total_events, "Blocked", $blocked_events, "Allowed", $allowed_events, "Monitor", $monitor_events));
+	fputcsv($out, array("Unique Devices", $unique_devices, "Unique Sites", $unique_sites, "Block Rate %", $block_rate));
 	fputcsv($out, array());
 
-	if (in_array("traffic", $sections)) {
-		fputcsv($out, array("=== Traffic ==="));
-		fputcsv($out, array("Timestamp", "Classified", "Blocked", "Allowed"));
-		foreach ($traffic as $t) {
-			fputcsv($out, array(date("Y-m-d H:i", $t["ts"]), $t["classified"], $t["blocked"], $t["allowed"]));
-		}
-		fputcsv($out, array());
+	fputcsv($out, array("Top Devices"));
+	fputcsv($out, array("Rank", "Device", "IP", "Blocked", "Total"));
+	foreach ($top_devices as $i => $d) {
+		$id = resolveIdentityByIp($d["src_ip"]);
+		fputcsv($out, array($i + 1, $id["display_name"], $d["src_ip"], (int)$d["blocked_events"], (int)$d["total_events"]));
 	}
+	fputcsv($out, array());
 
-	if (in_array("apps", $sections) && !empty($top_apps)) {
-		fputcsv($out, array("=== Top Apps Blocked ==="));
-		fputcsv($out, array("Rank", "App", "Count"));
-		foreach ($top_apps as $i => $a) {
-			fputcsv($out, array($i + 1, $a["name"], $a["count"]));
-		}
-		fputcsv($out, array());
+	fputcsv($out, array("Top Sites"));
+	fputcsv($out, array("Rank", "Site", "Blocked", "Total"));
+	foreach ($top_sites as $i => $s) {
+		fputcsv($out, array($i + 1, $s["host"], (int)$s["blocked_events"], (int)$s["total_events"]));
 	}
+	fputcsv($out, array());
 
-	if (in_array("clients", $sections) && !empty($top_sources)) {
-		fputcsv($out, array("=== Top Clients Blocked ==="));
-		fputcsv($out, array("Rank", "IP", "Count"));
-		foreach ($top_sources as $i => $s) {
-			fputcsv($out, array($i + 1, $s["name"], $s["count"]));
-		}
-		fputcsv($out, array());
+	fputcsv($out, array("Detailed Events"));
+	fputcsv($out, array("Timestamp", "Device", "IP", "Site", "App", "Category", "Action", "Policy", "Interface", "Destination"));
+	foreach ($rows as $ev) {
+		$id = resolveIdentityByIp($ev["src_ip"]);
+		fputcsv($out, array(
+			$ev["ts_text"],
+			$id["display_name"],
+			$ev["src_ip"],
+			$ev["host"],
+			$ev["app"],
+			$ev["category"],
+			$ev["action"],
+			$ev["policy"],
+			$ev["iface"],
+			$ev["dst_ip"]
+		));
 	}
-
-	if (in_array("blacklists", $sections) && !empty($top_bl_cats)) {
-		fputcsv($out, array("=== Blacklist Categories ==="));
-		fputcsv($out, array("Category", "Hits"));
-		foreach ($top_bl_cats as $c) {
-			fputcsv($out, array($c["name"], $c["count"]));
-		}
-		fputcsv($out, array());
-		if (!empty($bl_domains)) {
-			fputcsv($out, array("=== Top Blocked Domains ==="));
-			fputcsv($out, array("Rank", "Domain", "Category", "Count"));
-			foreach ($bl_domains as $i => $d) {
-				fputcsv($out, array($i + 1, $d["domain"], $d["cat"], $d["count"]));
-			}
-			fputcsv($out, array());
-		}
-	}
-
-	if (in_array("policies", $sections) && !empty($policy_stats)) {
-		fputcsv($out, array("=== Policy Report ==="));
-		fputcsv($out, array("Policy", "Total", "Blocks", "Tags"));
-		foreach ($policy_stats as $ps) {
-			fputcsv($out, array($ps["name"], $ps["total"], $ps["block"], $ps["tag"]));
-		}
-	}
-
 	fclose($out);
 	exit;
 }
 
-/* HTML report */
 header("Content-Type: text/html; charset=utf-8");
 header("Content-Disposition: attachment; filename=\"{$filename_base}.html\"");
 ?>
@@ -175,102 +163,87 @@ header("Content-Disposition: attachment; filename=\"{$filename_base}.html\"");
 <html lang="pt">
 <head>
 <meta charset="utf-8">
-<title>Layer7 — <?= htmlspecialchars($period_label); ?></title>
+<title>Layer7 - Relatorio Executivo</title>
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 900px; margin: 0 auto; padding: 30px; color: #333; line-height: 1.5; }
-h1 { font-size: 22px; border-bottom: 2px solid #337ab7; padding-bottom: 8px; color: #337ab7; }
-h2 { font-size: 17px; margin-top: 32px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
-table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; font-size: 13px; }
-th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
-th { background: #f5f7fa; font-weight: 600; }
-tr:nth-child(even) { background: #fafbfc; }
-.summary { display: flex; gap: 16px; margin: 16px 0 24px; }
-.summary-card { flex: 1; border: 1px solid #ddd; border-radius: 4px; padding: 12px; text-align: center; }
-.summary-card .val { font-size: 24px; font-weight: 700; }
-.summary-card .lbl { font-size: 12px; color: #777; }
-.block .val { color: #d9534f; }
-.footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid #ddd; text-align: center; font-size: 11px; color: #999; }
-@media print { body { padding: 10px; } }
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:980px;margin:0 auto;padding:26px;color:#222}
+h1{font-size:24px;margin:0 0 10px}
+h2{font-size:18px;margin:26px 0 8px}
+table{width:100%;border-collapse:collapse;margin:10px 0 20px;font-size:13px}
+th,td{border:1px solid #ddd;padding:6px 8px;text-align:left}
+th{background:#f6f8fa}
+.cards{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.card{flex:1;min-width:160px;border:1px solid #ddd;border-radius:5px;padding:10px;text-align:center}
+.val{font-size:24px;font-weight:700}
+.lbl{font-size:12px;color:#666}
+.footer{margin-top:30px;padding-top:10px;border-top:1px solid #ddd;color:#777;font-size:11px;text-align:center}
 </style>
 </head>
 <body>
-<h1>Layer7 — Relatorio</h1>
+<h1>Layer7 - Relatorio Executivo</h1>
 <p><strong>Periodo:</strong> <?= htmlspecialchars($period_label); ?><br>
 <strong>Gerado em:</strong> <?= date("Y-m-d H:i:s"); ?></p>
 
-<div class="summary">
-	<div class="summary-card"><div class="val"><?= number_format($total_classified); ?></div><div class="lbl">Classificados</div></div>
-	<div class="summary-card block"><div class="val"><?= number_format($total_blocked); ?></div><div class="lbl">Bloqueados</div></div>
-	<div class="summary-card"><div class="val"><?= number_format($total_allowed); ?></div><div class="lbl">Permitidos</div></div>
-	<div class="summary-card"><div class="val"><?= ($total_classified > 0) ? round(($total_blocked / $total_classified) * 100, 1) : 0; ?>%</div><div class="lbl">Taxa bloqueio</div></div>
+<div class="cards">
+	<div class="card"><div class="val"><?= number_format($total_events); ?></div><div class="lbl">Tentativas totais</div></div>
+	<div class="card"><div class="val" style="color:#d9534f;"><?= number_format($blocked_events); ?></div><div class="lbl">Bloqueadas</div></div>
+	<div class="card"><div class="val" style="color:#5cb85c;"><?= number_format($allowed_events); ?></div><div class="lbl">Permitidas</div></div>
+	<div class="card"><div class="val"><?= $block_rate; ?>%</div><div class="lbl">Indice de bloqueio</div></div>
+	<div class="card"><div class="val"><?= number_format($unique_devices); ?></div><div class="lbl">Dispositivos</div></div>
+	<div class="card"><div class="val"><?= number_format($unique_sites); ?></div><div class="lbl">Sites</div></div>
 </div>
 
-<?php if (in_array("traffic", $sections) && !empty($traffic)) { ?>
-<h2>Trafego ao longo do tempo</h2>
-<table>
-<tr><th>Hora</th><th>Classificados</th><th>Bloqueados</th><th>Permitidos</th></tr>
-<?php foreach ($traffic as $t) { ?>
-<tr><td><?= date("Y-m-d H:i", $t["ts"]); ?></td><td><?= number_format($t["classified"]); ?></td><td><?= number_format($t["blocked"]); ?></td><td><?= number_format($t["allowed"]); ?></td></tr>
-<?php } ?>
-</table>
-<?php } ?>
+<h2>Resumo</h2>
+<ul>
+	<li>Foram registadas <?= number_format($total_events); ?> tentativas no periodo.</li>
+	<li><?= number_format($blocked_events); ?> tentativas foram bloqueadas (<?= $block_rate; ?>%).</li>
+	<li><?= number_format($unique_devices); ?> dispositivos tentaram acesso a <?= number_format($unique_sites); ?> sites.</li>
+</ul>
 
-<?php if (in_array("apps", $sections) && !empty($top_apps)) { ?>
-<h2>Top Apps Bloqueadas</h2>
+<h2>Dispositivos com maior incidência</h2>
 <table>
-<tr><th>#</th><th>App</th><th>Bloqueios</th></tr>
-<?php foreach ($top_apps as $i => $a) { ?>
-<tr><td><?= $i + 1; ?></td><td><?= htmlspecialchars($a["name"]); ?></td><td><?= number_format($a["count"]); ?></td></tr>
+<tr><th>#</th><th>Dispositivo</th><th>IP</th><th>Bloqueios</th><th>Total</th></tr>
+<?php foreach ($top_devices as $i => $d) {
+	$id = resolveIdentityByIp($d["src_ip"]); ?>
+<tr>
+	<td><?= $i + 1; ?></td>
+	<td><?= htmlspecialchars($id["display_name"]); ?></td>
+	<td><?= htmlspecialchars($d["src_ip"]); ?></td>
+	<td><?= number_format((int)$d["blocked_events"]); ?></td>
+	<td><?= number_format((int)$d["total_events"]); ?></td>
+</tr>
 <?php } ?>
 </table>
-<?php } ?>
 
-<?php if (in_array("clients", $sections) && !empty($top_sources)) { ?>
-<h2>Top Clientes Bloqueados</h2>
+<h2>Sites mais tentados</h2>
 <table>
-<tr><th>#</th><th>IP</th><th>Bloqueios</th></tr>
-<?php foreach ($top_sources as $i => $s) { ?>
-<tr><td><?= $i + 1; ?></td><td><?= htmlspecialchars($s["name"]); ?></td><td><?= number_format($s["count"]); ?></td></tr>
+<tr><th>#</th><th>Site</th><th>Bloqueios</th><th>Total</th></tr>
+<?php foreach ($top_sites as $i => $s) { ?>
+<tr>
+	<td><?= $i + 1; ?></td>
+	<td><?= htmlspecialchars($s["host"]); ?></td>
+	<td><?= number_format((int)$s["blocked_events"]); ?></td>
+	<td><?= number_format((int)$s["total_events"]); ?></td>
+</tr>
 <?php } ?>
 </table>
-<?php } ?>
 
-<?php if (in_array("blacklists", $sections) && !empty($top_bl_cats)) { ?>
-<h2>Blacklists — Categorias</h2>
+<h2>Eventos detalhados (amostra)</h2>
 <table>
-<tr><th>Categoria</th><th>Hits</th><th>%</th></tr>
-<?php
-$bl_total = array_sum(array_column($top_bl_cats, "count"));
-foreach ($top_bl_cats as $c) {
-	$pct = ($bl_total > 0) ? round(($c["count"] / $bl_total) * 100, 1) : 0;
-	echo '<tr><td>' . htmlspecialchars($c["name"]) . '</td><td>' . number_format($c["count"]) . '</td><td>' . $pct . '%</td></tr>';
-}
-?>
-</table>
-<?php if (!empty($bl_domains)) { ?>
-<h2>Top Dominios Bloqueados</h2>
-<table>
-<tr><th>#</th><th>Dominio</th><th>Categoria</th><th>Bloqueios</th></tr>
-<?php foreach (array_slice($bl_domains, 0, 50) as $i => $d) { ?>
-<tr><td><?= $i + 1; ?></td><td><?= htmlspecialchars($d["domain"]); ?></td><td><?= htmlspecialchars($d["cat"]); ?></td><td><?= number_format($d["count"]); ?></td></tr>
+<tr><th>Data/Hora</th><th>Dispositivo</th><th>IP</th><th>Site</th><th>Aplicacao</th><th>Resultado</th></tr>
+<?php foreach (array_slice($rows, 0, 300) as $ev) {
+	$id = resolveIdentityByIp($ev["src_ip"]); ?>
+<tr>
+	<td><?= htmlspecialchars($ev["ts_text"]); ?></td>
+	<td><?= htmlspecialchars($id["display_name"]); ?></td>
+	<td><?= htmlspecialchars($ev["src_ip"]); ?></td>
+	<td><?= htmlspecialchars($ev["host"]); ?></td>
+	<td><?= htmlspecialchars($ev["app"]); ?></td>
+	<td><?= htmlspecialchars($ev["action"]); ?></td>
+</tr>
 <?php } ?>
 </table>
-<?php } ?>
-<?php } ?>
 
-<?php if (in_array("policies", $sections) && !empty($policy_stats)) { ?>
-<h2>Relatorio por Politica</h2>
-<table>
-<tr><th>Politica</th><th>Total</th><th>Bloqueios</th><th>Tags</th></tr>
-<?php foreach ($policy_stats as $ps) { ?>
-<tr><td><?= htmlspecialchars($ps["name"]); ?></td><td><?= number_format($ps["total"]); ?></td><td><?= number_format($ps["block"]); ?></td><td><?= number_format($ps["tag"]); ?></td></tr>
-<?php } ?>
-</table>
-<?php } ?>
-
-<div class="footer">
-	Gerado por Layer7 para pfSense CE &mdash; <a href="https://www.systemup.inf.br">Systemup</a> Solucao em Tecnologia
-</div>
+<div class="footer">Gerado por Layer7 para pfSense CE - Systemup Solucao em Tecnologia</div>
 </body>
 </html>
 <?php exit; ?>

@@ -11,6 +11,13 @@ REPORTS_DIR="/usr/local/etc/layer7/reports"
 HISTORY_FILE="${REPORTS_DIR}/stats-history.jsonl"
 PIDFILE="/var/run/layer7d.pid"
 PHP="/usr/local/bin/php"
+COLLECT_PHP="/usr/local/etc/layer7/layer7-reports-collect.php"
+
+/bin/mkdir -p "${REPORTS_DIR}"
+
+if [ -x "${PHP}" ] && [ -f "${COLLECT_PHP}" ]; then
+	"${PHP}" "${COLLECT_PHP}" >/dev/null 2>&1 || true
+fi
 
 if [ ! -f "${PIDFILE}" ]; then
 	exit 0
@@ -29,8 +36,6 @@ sleep 1
 if [ ! -f "${STATS_JSON}" ]; then
 	exit 0
 fi
-
-/bin/mkdir -p "${REPORTS_DIR}"
 
 if [ ! -x "${PHP}" ]; then
 	exit 1

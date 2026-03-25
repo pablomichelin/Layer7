@@ -24,6 +24,7 @@
 /usr/local/libexec/layer7-unbound-anti-doh
 /usr/local/etc/layer7/update-blacklists.sh
 /usr/local/etc/layer7/layer7-stats-collect.sh
+/usr/local/etc/layer7/layer7-reports-collect.php
 /usr/local/etc/layer7/layer7-stats-purge.sh
 /usr/local/etc/layer7/lang/en.php
 /usr/local/etc/layer7/lang/pt.php

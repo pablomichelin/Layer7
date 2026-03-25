@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.4.2
+PORTVERSION=	1.4.3
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -118,6 +118,8 @@ do-install:
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/update-blacklists.sh \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/layer7-stats-collect.sh \
+		${STAGEDIR}${PREFIX}/etc/layer7
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/layer7-reports-collect.php \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/layer7-stats-purge.sh \
 		${STAGEDIR}${PREFIX}/etc/layer7

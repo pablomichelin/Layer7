@@ -10,6 +10,7 @@ REPORTS_DIR="/usr/local/etc/layer7/reports"
 HISTORY_FILE="${REPORTS_DIR}/stats-history.jsonl"
 CONFIG="/usr/local/etc/layer7.json"
 PHP="/usr/local/bin/php"
+COLLECT_LIB="/usr/local/pkg/layer7.inc"
 
 if [ ! -f "${HISTORY_FILE}" ]; then
 	exit 0
@@ -18,6 +19,15 @@ fi
 if [ ! -x "${PHP}" ]; then
 	exit 1
 fi
+
+"${PHP}" -r '
+if (file_exists("'"${COLLECT_LIB}"'")) {
+	require_once("'"${COLLECT_LIB}"'");
+	$cfg = layer7_reports_config();
+	$ret = isset($cfg["retention_days"]) ? (int)$cfg["retention_days"] : 30;
+	layer7_reports_purge_db($ret);
+}
+'
 
 "${PHP}" -r '
 $config_path = "'"${CONFIG}"'";

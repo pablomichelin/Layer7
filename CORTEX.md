@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.2 — Fix criação robusta de tabelas PF**
+**Versão: 1.4.3 — Relatórios Executivos com SQLite**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,16 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.3 — Relatórios Executivos com SQLite (2026-03-24):**
+  - Novo backend de relatórios em SQLite local (`/usr/local/etc/layer7/reports/reports.db`)
+  - Ingestão incremental de eventos via cursor de log (`ingest.cursor`) sem reprocessar histórico
+  - Novo script `layer7-reports-collect.php` integrado ao cron de recolha
+  - Purge diário agora limpa JSONL e SQLite conforme retenção configurada
+  - Página de Relatórios reescrita para visão executiva (filtros por IP/site/resultado, resumo textual, timeline, top dispositivos e sites, tabela detalhada paginada)
+  - Exportação executiva (HTML/CSV/JSON) baseada em dados detalhados por evento
+  - Abstração de identidade pronta para evolução futura (`resolveIdentityByIp` + providers `ip_hostname`, `captive_portal`, `ad_radius`)
+  - Definições de relatórios: presets de retenção (7/15/30/60/90/180/365 + custom) e intervalo até 60 min
+  - PORTVERSION incrementado para 1.4.3
 - **v1.4.2 — Fix criação robusta de tabelas PF (2026-03-24):**
   - Causa raiz: pfctl -t TABLE -T add não cria tabelas no FreeBSD se não
     estiverem declaradas no ruleset carregado; ensure_table() falhava
@@ -333,7 +343,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.4.2 — Fix criação robusta de tabelas PF.**
+**v1.4.3 — Relatórios Executivos com SQLite.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
@@ -342,7 +352,8 @@ remoto e anti-bypass DNS (v1.3.2). Fix anti-DoH persistente (v1.3.3).
 Botao remover (v1.3.4). Fix base64 Unbound (v1.3.5). Criacao automatica
 de tabelas PF de blacklist + botao reparar (v1.3.6). Modulo de relatorios
 com historico, graficos e exportacao (v1.4.0). Fix criacao robusta de
-tabelas PF com fallback pfctl -f (v1.4.2).
+tabelas PF com fallback pfctl -f (v1.4.2). Relatorios executivos com
+SQLite e filtros orientados a diretoria (v1.4.3).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -368,9 +379,9 @@ tabelas PF com fallback pfctl -f (v1.4.2).
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Build v1.4.2 no FreeBSD builder e publicar GitHub Release
-2. Instalar no pfSense e clicar "Reparar tabelas PF" — verificar que todas ficam verdes
-3. Validar que tabelas layer7_block, layer7_block_dst e layer7_bld_N existem após reboot
+1. Build v1.4.3 no FreeBSD builder e publicar GitHub Release
+2. Validar ingestão incremental no pfSense (events no `reports.db`, cursor a avançar, cron ativo)
+3. Validar relatório executivo com filtros por IP/site/resultado e exportação HTML para diretoria
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

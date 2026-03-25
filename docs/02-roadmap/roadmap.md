@@ -16,3 +16,9 @@ Para a evolução específica do enforcement até bloqueio operacional real de a
 sites, serviços e funções, ver:
 
 [`../09-blocking/blocking-master-plan.md`](../09-blocking/blocking-master-plan.md)
+
+## Trilha pos-V1 (relatorios executivos)
+
+Para a evolução do módulo de relatórios orientado a diretoria (SQLite local,
+filtros por dispositivo/IP/site, retenção configurável e exportação executiva),
+seguir `docs/12-reports/MANUAL-RELATORIOS-EXECUTIVOS.md`.
