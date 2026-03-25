@@ -1,5 +1,5 @@
 #!/bin/sh
-# uninstall.sh — Remoção completa do Layer7 para pfSense CE (v1.4.11+)
+# uninstall.sh — Remoção completa do Layer7 para pfSense CE (v1.4.12+)
 #
 # Uso (executar no pfSense como root):
 #
