@@ -18,7 +18,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/
 Para instalar uma versão específica:
 
 ```sh
-sh /tmp/install.sh --version 1.4.9
+sh /tmp/install.sh --version 1.4.10
 ```
 
 ## Desinstalação

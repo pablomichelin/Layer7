@@ -1,5 +1,5 @@
 #!/bin/sh
-# uninstall.sh — Remoção completa do Layer7 para pfSense CE (v1.4.9+)
+# uninstall.sh — Remoção completa do Layer7 para pfSense CE (v1.4.10+)
 #
 # Uso (executar no pfSense como root):
 #
@@ -10,6 +10,13 @@
 #   --keep-license  Preserva apenas layer7.lic
 #   --clean-unbound Remove overrides anti-DoH do Unbound custom_options (config.xml)
 #   --yes           Nao pedir confirmacao
+#
+# O script faz:
+#   1. Para o servico layer7d
+#   2. Remove o pacote .pkg
+#   3. Limpa ficheiros residuais
+#   4. Limpa tabelas PF
+#   5. (Opcional) Limpa custom_options do Unbound
 
 set -eu
 
@@ -124,6 +131,9 @@ echo "      Tabelas PF limpas."
 
 if [ "$CLEAN_UNBOUND" -eq 1 ]; then
     echo "[5/5] Limpando overrides anti-DoH do Unbound..."
+    MARKER_START="# --- Layer7 anti-DoH/Relay START ---"
+    MARKER_END="# --- Layer7 anti-DoH/Relay END ---"
+
     if [ -f /conf/config.xml ]; then
         if grep -q "custom_options" /conf/config.xml 2>/dev/null; then
             cp /conf/config.xml /conf/config.xml.bak.layer7

@@ -7,7 +7,7 @@
 #
 # Ou com versão específica:
 #
-#   sh /tmp/install.sh --version 1.4.9
+#   sh /tmp/install.sh --version 1.4.10
 #
 # O script faz tudo automaticamente:
 #   1. Detecta a versão (ou usa a especificada)
@@ -40,6 +40,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+# --- Detecção de versão ---
 if [ -z "$VERSION" ]; then
     GH_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
     GH_TMP="/tmp/layer7-gh-latest.json"
@@ -70,6 +71,7 @@ echo "  Versão:  ${VERSION}"
 echo "  Pacote:  ${PKG_NAME}"
 echo ""
 
+# --- Verificar se já está instalado ---
 INSTALLED_VER=""
 if command -v layer7d >/dev/null 2>&1; then
     INSTALLED_VER=$(layer7d -V 2>/dev/null || echo "")
@@ -86,6 +88,7 @@ if [ -n "$INSTALLED_VER" ] && [ "$FORCE" -eq 0 ]; then
     echo ""
 fi
 
+# --- Parar daemon se estiver a correr ---
 if pgrep -q layer7d 2>/dev/null; then
     echo "[1/5] Parando daemon existente..."
     service layer7d onestop 2>/dev/null || true
@@ -94,6 +97,7 @@ else
     echo "[1/5] Nenhum daemon a correr."
 fi
 
+# --- Baixar pacote ---
 echo "[2/5] Baixando pacote do GitHub..."
 if ! fetch -o "/tmp/${PKG_NAME}" "${PKG_URL}" 2>/dev/null; then
     echo ""
@@ -103,6 +107,7 @@ if ! fetch -o "/tmp/${PKG_NAME}" "${PKG_URL}" 2>/dev/null; then
 fi
 echo "  Baixado: $(ls -lh /tmp/${PKG_NAME} | awk '{print $5}')"
 
+# --- Instalar ---
 echo "[3/5] Instalando pacote..."
 if ! IGNORE_OSVERSION=yes pkg add -f "/tmp/${PKG_NAME}" 2>&1; then
     echo ""
@@ -111,6 +116,7 @@ if ! IGNORE_OSVERSION=yes pkg add -f "/tmp/${PKG_NAME}" 2>&1; then
 fi
 rm -f "/tmp/${PKG_NAME}"
 
+# --- Garantir tabelas PF ---
 echo "[4/6] Verificando tabelas PF..."
 HELPER="/usr/local/libexec/layer7-pfctl"
 if [ -x "$HELPER" ]; then
@@ -127,6 +133,7 @@ for _table in layer7_block layer7_block_dst layer7_tagged layer7_bld_0; do
     fi
 done
 
+# --- Configurar Unbound anti-DoH ---
 echo "[5/6] Configurando Unbound anti-DoH/Relay..."
 ANTI_DOH="/usr/local/libexec/layer7-unbound-anti-doh"
 if [ -x "$ANTI_DOH" ]; then
@@ -135,11 +142,13 @@ else
     echo "  Script anti-DoH nao encontrado (ignorado)."
 fi
 
+# --- Iniciar serviço ---
 echo "[6/6] Iniciando serviço..."
 sysrc layer7d_enable=YES > /dev/null 2>&1
 service layer7d onestart > /dev/null 2>&1 || true
 sleep 2
 
+# --- Verificação final ---
 VER_CHECK=$(layer7d -V 2>/dev/null || echo "?")
 PID_CHECK=$(pgrep layer7d 2>/dev/null || echo "")
 
