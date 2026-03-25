@@ -146,9 +146,9 @@ if ($_POST["do_update"] ?? false) {
 }
 
 if ($_POST["register_license"] ?? false) {
-	$license_code_raw = strtoupper(trim((string)($_POST["license_code"] ?? "")));
-	$license_code = preg_replace('/[^A-Z0-9]/', '', $license_code_raw);
-	if ($license_code === "" || preg_match('/^[A-Z0-9]{16,128}$/', $license_code) !== 1) {
+	$license_code_raw = trim((string)($_POST["license_code"] ?? ""));
+	$license_code = preg_replace('/[^A-Za-z0-9]/', '', $license_code_raw);
+	if ($license_code === "" || preg_match('/^[A-Za-z0-9]{16,128}$/', $license_code) !== 1) {
 		$input_errors[] = l7_t("Informe um codigo de licenca valido.");
 	} else {
 		$out = array();
