@@ -5,7 +5,7 @@
 No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
 O script faz **tudo automaticamente**:
@@ -21,7 +21,7 @@ O script faz **tudo automaticamente**:
 ### Versão específica
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh --version 0.2.0
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.9
 ```
 
 ### Reinstalar
@@ -114,7 +114,7 @@ Se preferir instalar um a um via GUI do pfSense:
 
 Em cada pfSense, **Diagnostics > Command Prompt**:
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -167,8 +167,8 @@ vim layer7-protos.txt
 ```sh
 sh scripts/release/deployz.sh \
   --repo-owner pablomichelin \
-  --repo-name pfsense-layer7 \
-  --version 0.2.0
+  --repo-name Layer7 \
+  --version 1.4.9
 ```
 
 ---

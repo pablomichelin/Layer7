@@ -9,6 +9,8 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
+$layer7_release_owner = "pablomichelin";
+$layer7_release_repo = "Layer7";
 $update_info = null;
 $update_msg = "";
 $update_err = "";
@@ -82,7 +84,7 @@ if ($_POST["check_update"] ?? false) {
 	if ($current_ver === "") {
 		$current_ver = "desconhecida";
 	}
-	$gh_api = "https://api.github.com/repos/pablomichelin/pfsense-layer7/releases/latest";
+	$gh_api = "https://api.github.com/repos/" . $layer7_release_owner . "/" . $layer7_release_repo . "/releases/latest";
 	$tmp_json = "/tmp/layer7-gh-latest.json";
 	@unlink($tmp_json);
 	exec("/usr/bin/fetch -qo " . escapeshellarg($tmp_json) . " " . escapeshellarg($gh_api) . " 2>&1", $fetch_out, $fetch_rc);

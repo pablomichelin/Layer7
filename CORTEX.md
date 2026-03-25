@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.8 — Correção de registo de licença por case**
+**Versão: 1.4.9 — Migração do canal público de distribuição**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.9 — Migração do canal público de distribuição (2026-03-25):**
+  - `install.sh` e `uninstall.sh` passam a apontar para o repositório público `pablomichelin/Layer7`
+  - GUI `Settings` passa a consultar updates e assets no novo repositório público de distribuição
+  - `MANUAL-INSTALL.md`, `README.md`, `scripts/release/README.md` e `release-body.md` actualizados para os novos URLs públicos
+  - Preparação para tornar o repositório principal privado sem quebrar instalação, upgrade nem atualização pela GUI
+  - PORTVERSION incrementado para 1.4.9
 - **v1.4.8 — Correção de registo de licença por case (2026-03-24):**
   - GUI de Settings/Licença deixa de forçar `uppercase` no código antes de activar
   - Validação local passa a aceitar alfanumérico com letras minúsculas e maiúsculas

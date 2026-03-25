@@ -2,6 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.4.9] — 2026-03-25
+
+### Changed
+
+- **Canal público de distribuição** — `install.sh`, `uninstall.sh`, documentação operacional e release notes passam a usar o repositório público `pablomichelin/Layer7`
+- **Actualização via GUI** — a página Definições passa a consultar a última release e o `.pkg` no novo repositório público, preservando o fluxo actual de upgrade
+- **PORTVERSION** bumped para 1.4.9
+
 ## [1.4.2] — 2026-03-24
 
 ### Fix criação robusta de tabelas PF

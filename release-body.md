@@ -17,7 +17,7 @@ Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 ### Instalacao (um comando)
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
 ### Rollback

@@ -32,33 +32,33 @@ Cada seccao abaixo inclui:
 **Instalador automatico (recomendado — uma linha):**
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.4.8`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.4.9`
 
 **Comando unico manual (Command Prompt):**
 
 Comando para instalar em uma linha
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.8.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.8/pfSense-pkg-layer7-1.4.8.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.8.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.4.9.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.9/pfSense-pkg-layer7-1.4.9.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.9.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.8.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.8/pfSense-pkg-layer7-1.4.8.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.9.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.9/pfSense-pkg-layer7-1.4.9.pkg
 ```
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh --force
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.8.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.9.pkg
 ```
 
 ```sh
@@ -138,7 +138,7 @@ layer7d --license-status
 **Instalador automatico (recomendado — uma linha):**
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
 O script detecta a versao instalada e faz o upgrade automaticamente.
@@ -146,7 +146,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.8.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.8/pfSense-pkg-layer7-1.4.8.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.8.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.9.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.9/pfSense-pkg-layer7-1.4.9.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.9.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -156,11 +156,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.8.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.8/pfSense-pkg-layer7-1.4.8.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.9.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.9/pfSense-pkg-layer7-1.4.9.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.8.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.9.pkg
 ```
 
 ```sh
@@ -180,7 +180,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.8.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.9.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -194,7 +194,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.8.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.9.pkg
 ```
 
 ```sh
@@ -222,7 +222,7 @@ O script `uninstall.sh` faz tudo automaticamente:
 **Command Prompt (uma linha — requer `--yes`):**
 
 ```sh
-fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
+fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
 ```
 
 > **IMPORTANTE:** No Command Prompt do pfSense nao e possivel responder a
@@ -231,7 +231,7 @@ fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsen
 **SSH/Console (com confirmacao interactiva):**
 
 ```sh
-fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
+fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
 ```
 
 ### Opcoes do uninstall.sh
@@ -320,7 +320,7 @@ O pfSense volta ao funcionamento normal imediatamente.
 Para reinstalar:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -558,7 +558,7 @@ Se algo der errado apos instalar ou actualizar, use o desinstalador
 automatico preservando a configuracao:
 
 ```sh
-fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
+fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
 ```
 
 Ou manualmente:
