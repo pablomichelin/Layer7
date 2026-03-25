@@ -140,6 +140,8 @@ layer7_render_styles();
 .l7r-summary{background:#fbfbfb;border:1px solid #e5e5e5;padding:12px 14px;border-radius:6px}
 .l7r-summary ul{margin:0;padding-left:20px}
 .l7r-summary li{margin:4px 0}
+.l7r-inferred{display:inline-block;margin-left:6px;font-size:10px;padding:2px 6px;border-radius:10px;background:#f0ad4e;color:#fff;vertical-align:middle}
+.l7r-note{margin-top:10px;color:#666;font-size:12px}
 </style>
 
 <div class="panel panel-default layer7-page">
@@ -222,6 +224,7 @@ layer7_render_styles();
 		<li><?= htmlspecialchars($line); ?></li>
 		<?php } ?>
 	</ul>
+	<div class="l7r-note"><?= l7_t("Eventos com etiqueta 'Host inferido (DNS)' usam correlacao temporal de consultas DNS do mesmo IP para identificar o dominio tentado."); ?></div>
 </div>
 
 <div class="l7r-cards">
@@ -302,7 +305,12 @@ layer7_render_styles();
 			<tr>
 				<td><?= htmlspecialchars($ev["ts_text"]); ?></td>
 				<td><?= htmlspecialchars($disp); ?></td>
-				<td><?= htmlspecialchars($ev["host"] ?: "-"); ?></td>
+				<td>
+					<?= htmlspecialchars($ev["host"] ?: "-"); ?>
+					<?php if (!empty($ev["host_inferred"])) { ?>
+						<span class="l7r-inferred"><?= l7_t("Host inferido (DNS)"); ?></span>
+					<?php } ?>
+				</td>
 				<td><?= htmlspecialchars($ev["app"] ?: "-"); ?></td>
 				<td>
 					<?php

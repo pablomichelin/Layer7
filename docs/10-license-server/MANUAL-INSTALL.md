@@ -37,7 +37,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.4.6`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.4.7`
 
 **Comando unico manual (Command Prompt):**
 
@@ -46,19 +46,19 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense
 
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.6/pfSense-pkg-layer7-1.4.6.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.6.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.4.7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.7/pfSense-pkg-layer7-1.4.7.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.7.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.6/pfSense-pkg-layer7-1.4.6.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.7/pfSense-pkg-layer7-1.4.7.pkg
 ```
 ```sh
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.6.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.7.pkg
 ```
 
 ```sh
@@ -101,7 +101,7 @@ Verificar estado da licenca:
 layer7d --license-status
 ```
 
-Pela GUI (v1.4.6+), tambem pode registar e revogar em:
+Pela GUI (v1.4.7+), tambem pode registar e revogar em:
 **Services > Layer 7 > Definicoes > Licenca**.
 
 - Registo: introduzir o codigo e clicar **Registar licenca**
@@ -145,7 +145,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.6/pfSense-pkg-layer7-1.4.6.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.6.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.7/pfSense-pkg-layer7-1.4.7.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.7.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -155,11 +155,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.6.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.6/pfSense-pkg-layer7-1.4.6.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.7.pkg https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.4.7/pfSense-pkg-layer7-1.4.7.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.6.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.7.pkg
 ```
 
 ```sh
@@ -179,7 +179,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.6.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.7.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -193,7 +193,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.6.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.7.pkg
 ```
 
 ```sh
@@ -422,7 +422,7 @@ cat /usr/local/etc/layer7.lic
 
 ## 9. Relatorios
 
-A partir da v1.4.6, o Layer7 inclui um modulo de relatorios executivos acessivel em
+A partir da v1.4.7, o Layer7 inclui um modulo de relatorios executivos acessivel em
 **Services > Layer 7 > Relatorios**.
 
 ### O que faz
@@ -433,7 +433,8 @@ A partir da v1.4.6, o Layer7 inclui um modulo de relatorios executivos acessivel
 - Permite exportar relatorios em CSV, HTML ou JSON para diretoria e auditoria
 - v1.4.4: melhora visual da GUI para separar claramente blocos com acoes de guardar
 - v1.4.5: ingestao incremental forcada na abertura/exportacao e parser de log robusto (ISO + syslog)
-- v1.4.6: correlacao DNS por `dns_query` para mostrar dominio realmente tentado por IP
+- v1.4.7: correlacao DNS por `dns_query` para mostrar dominio realmente tentado por IP
+- v1.4.7: eventos com dominio inferido ficam identificados com etiqueta visual **Host inferido (DNS)**
 
 ### Configuracao
 

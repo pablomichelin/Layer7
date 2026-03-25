@@ -2043,10 +2043,12 @@ function layer7_reports_fetch_events($from_ts, $to_ts, $filters = array(), $page
 	while ($r && ($row = $r->fetchArray(SQLITE3_ASSOC))) {
 		$host = trim((string)($row["host"] ?? ""));
 		$action = (string)($row["action"] ?? "");
+		$row["host_inferred"] = 0;
 		if ($action === "block" && ($host === "" || layer7_reports_host_is_resolver($host))) {
 			$guess = layer7_reports_guess_attempted_host($db, (string)($row["src_ip"] ?? ""), (int)($row["ts"] ?? 0), 120);
 			if ($guess !== "") {
 				$row["host"] = $guess;
+				$row["host_inferred"] = 1;
 			}
 		}
 		$rows[] = $row;
