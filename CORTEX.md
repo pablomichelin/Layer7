@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.11 — Relatórios estilo NGFW com controlo de versão sincronizado**
+**Versão: 1.4.12 — Refino visual da GUI Settings em blocos estilo pfSense**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.12 — Refino visual da página Definições (2026-03-25):**
+  - Página `Definicoes` reorganizada em blocos separados com cabeçalhos fortes, no padrão administrativo do pfSense
+  - Secções visuais distintas para definições gerais, logging/debug, captura/interfaces, licença, backup/restore, relatórios e actualização
+  - Traduções EN adicionadas para os novos títulos visuais, preservando o modo bilingue PT/EN
+  - Sem alterações de lógica funcional, handlers POST, licenciamento, relatórios ou fluxo de update
+  - PORTVERSION incrementado para 1.4.12
 - **v1.4.11 — Sincronização de versão, docs e links públicos (2026-03-25):**
   - Nova release patch para manter o controlo de versionamento após a entrega funcional dos relatórios estilo NGFW
   - `MANUAL-INSTALL.md` actualizado para apontar para os links públicos da nova versão

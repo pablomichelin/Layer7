@@ -1,12 +1,13 @@
-## Layer7 v1.4.11 — controlo de versao e links sincronizados
+## Layer7 v1.4.12 — ajuste visual da GUI Settings
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Release de controlo** — consolida a entrega funcional publicada na `v1.4.10` sob uma nova versao patch para manter o historico consistente
-- **Documentacao sincronizada** — links, exemplos de install/upgrade e referencias publicas passam a apontar para `v1.4.11`
-- **Mesmo comportamento funcional da v1.4.10** — relatorios estilo NGFW, log detalhado opcional, seleccao por interface e retencao separada permanecem incluidos
+- **Settings em blocos** — a página `Definicoes` passa a usar blocos visuais separados com cabeçalhos fortes, no estilo administrativo do pfSense
+- **Leitura mais clara** — definições gerais, logging/debug, captura/interfaces, licença, backup/restore, relatórios e actualização ficam visualmente isolados
+- **PT/EN mantido** — os novos títulos dos blocos foram traduzidos para inglês sem alterar o selector de idioma
+- **Sem alteração funcional** — a release é estritamente visual; persistência, relatórios, licenciamento e upgrade continuam com o mesmo comportamento da `v1.4.11`
 
 ### Inclui todas as funcionalidades anteriores
 
@@ -14,7 +15,7 @@ Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 - Bloqueio por destino (sites/apps) via DNS + nDPI
 - ~350 apps nDPI detectaveis (YouTube, Facebook, TikTok, etc.)
 - Politicas por interface, IP/CIDR, app e categoria
-- GUI completa com 6 paginas
+- GUI administrativa integrada ao pfSense CE
 
 ### Instalacao (um comando)
 

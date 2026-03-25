@@ -11,7 +11,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 | **Website** | <https://www.systemup.inf.br> |
 | **Distribuicao publica** | <https://github.com/pablomichelin/Layer7> |
 | **Licenca** | EULA (ver `LICENSE`) |
-| **Versao actual** | **1.4.11** |
+| **Versao actual** | **1.4.12** |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x - FreeBSD 14/15 |
 
 ## O que faz
@@ -42,6 +42,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 - **Anti-bypass DNS** — bloqueio automatico de DoT/DoQ (porta 853), deteccao nDPI de DoH, e NXDOMAIN via Unbound para dominios de bypass conhecidos
 - **Licenciamento** — verificacao Ed25519 offline, fingerprint de hardware, grace period 14 dias, CLI de activacao
 - **Actualizacao pela GUI** — botao em Definicoes para verificar e instalar a ultima versao
+- **GUI bilingue PT/EN** — pagina Definicoes organizada em blocos visuais separados, alinhados ao estilo administrativo do pfSense
 - **Relatorios estilo NGFW** — historico executivo separado do log detalhado, com retencao propria e seleccao de interfaces para reduzir uso local
 - **Excepcoes granulares** — multiplos hosts/CIDRs por excepcao, por interface
 - **GUI completa** — 10 paginas (Estado, Definicoes, Politicas, Grupos, Categorias, Teste, Excepcoes, Events, Diagnostics)

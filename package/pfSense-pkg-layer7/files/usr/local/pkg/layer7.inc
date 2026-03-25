@@ -934,6 +934,21 @@ function layer7_render_styles()
 	.layer7-page .layer7-section { margin-top: 30px; }
 	.layer7-page .layer7-section:first-child { margin-top: 0; }
 	.layer7-page .layer7-section-title { margin: 0 0 16px; font-size: 24px; font-weight: 600; }
+	.layer7-page .layer7-admin-block { margin-top: 26px; }
+	.layer7-page .layer7-admin-block:first-child { margin-top: 0; }
+	.layer7-page .layer7-admin-block__header { background: #4b4b4b; color: #fff; border: 1px solid #3f3f3f; border-bottom: 0; padding: 9px 12px; font-size: 15px; font-weight: 700; line-height: 1.35; }
+	.layer7-page .layer7-admin-block__body { background: #fff; border: 1px solid #d7d7d7; padding: 16px 18px 18px; }
+	.layer7-page .layer7-admin-block__body .alert:last-child { margin-bottom: 0; }
+	.layer7-page .layer7-admin-block__body .dl-horizontal:last-child { margin-bottom: 0; }
+	.layer7-page .layer7-admin-block__body .layer7-form-card { margin-top: 12px; background: #fafafa; border-color: #dcdcdc; }
+	.layer7-page .layer7-admin-block__body .layer7-form-card:first-child { margin-top: 0; }
+	.layer7-page .layer7-admin-block__body .layer7-form-card__title { margin: 0 0 10px; font-size: 15px; font-weight: 700; }
+	.layer7-page .layer7-admin-block__body .form-horizontal .form-group { margin: 0; padding: 12px 0; border-top: 1px solid #ececec; }
+	.layer7-page .layer7-admin-block__body .form-horizontal .form-group:first-child { padding-top: 0; border-top: 0; }
+	.layer7-page .layer7-admin-block__body .form-horizontal .form-group:last-child { padding-bottom: 0; }
+	.layer7-page .layer7-admin-block__body .form-horizontal .help-block { margin-top: 4px; }
+	.layer7-page .layer7-admin-block__actions { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+	.layer7-page .layer7-admin-block__note { margin-top: 12px; color: #666; }
 	.layer7-page .layer7-toolbar { margin: 18px 0 0; }
 	.layer7-page .layer7-toolbar .btn { margin-right: 8px; margin-bottom: 8px; }
 	.layer7-page .layer7-summary { margin-bottom: 18px; }
