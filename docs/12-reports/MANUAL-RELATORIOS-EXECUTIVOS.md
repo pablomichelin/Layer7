@@ -1,4 +1,4 @@
-# Manual — Relatorios Executivos (v1.4.4+)
+# Manual — Relatorios Executivos (v1.4.5+)
 
 ## Objetivo
 
@@ -18,6 +18,12 @@ orientado a publico nao tecnico (diretoria e gestao).
 - Refino visual das telas para separar melhor quadros e acoes de guardar.
 - Cada bloco de configuracao passou a ter delimitacao visual propria em telas criticas.
 - Sem impacto funcional no motor de politicas, bloqueio, ingestao ou exportacao.
+
+## Correcao operacional na v1.4.5
+
+- A pagina de relatorios executa ingestao incremental ao abrir, reduzindo dependencia exclusiva do cron.
+- Exportacoes (HTML/CSV/JSON) tambem disparam ingestao incremental antes da consulta.
+- Parser de log agora aceita timestamp ISO e formato syslog, evitando perda de eventos por formato.
 
 ## Onde configurar
 

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.4 — Refino Visual da GUI (UX)**
+**Versão: 1.4.5 — Licença na GUI + Fix de Relatórios**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,14 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.5 — Licença na GUI + fix de relatórios (2026-03-24):**
+  - Settings/Licença: campo para registo de código de licença com botão **Registar licenca**
+  - Após registo válido: código exibido mascarado (5 primeiros caracteres + `************`), sem edição
+  - Botão **Revogar licenca** para remoção da licença ativa diretamente na GUI
+  - Mensagem de erro para código inválido e confirmação de sucesso para registo/revogação
+  - Relatórios: ingestão incremental executada ao abrir a página e também na exportação
+  - Parser de logs robustecido para múltiplos formatos de timestamp (ISO e estilo syslog), evitando base vazia por falha de parse
+  - PORTVERSION incrementado para 1.4.5
 - **v1.4.4 — Refino visual da GUI (2026-03-24):**
   - Padronização visual das telas com múltiplas ações para reduzir confusão de uso
   - Novos cartões de formulário e zonas visuais de remoção (`layer7-form-card`, `layer7-danger-zone`)
@@ -349,7 +357,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.4.4 — Refino Visual da GUI (UX).**
+**v1.4.5 — Licença na GUI + Fix de Relatórios.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
@@ -360,7 +368,8 @@ de tabelas PF de blacklist + botao reparar (v1.3.6). Modulo de relatorios
 com historico, graficos e exportacao (v1.4.0). Fix criacao robusta de
 tabelas PF com fallback pfctl -f (v1.4.2). Relatorios executivos com
 SQLite e filtros orientados a diretoria (v1.4.3). Refino visual da GUI
-para clareza operacional (v1.4.4).
+para clareza operacional (v1.4.4). Gestão de licença via GUI e
+robustez de ingestão/parse de relatórios (v1.4.5).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -386,9 +395,9 @@ para clareza operacional (v1.4.4).
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Build v1.4.4 no FreeBSD builder e publicar GitHub Release
-2. Validar revisão visual das telas críticas (Settings/Blacklists/Policies/Exceptions/Groups/Diagnostics)
-3. Confirmar fluxo funcional inalterado (salvar/editar/remover/exportar) após refinamento visual
+1. Build v1.4.5 no FreeBSD builder e publicar GitHub Release
+2. Validar fluxo completo de licença na GUI (registar, mascarar, revogar)
+3. Validar relatórios com dados reais (consulta por IP/site e exportação após 10+ minutos)
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22

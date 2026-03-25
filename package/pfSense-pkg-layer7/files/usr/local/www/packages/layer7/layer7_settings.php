@@ -145,6 +145,43 @@ if ($_POST["do_update"] ?? false) {
 	}
 }
 
+if ($_POST["register_license"] ?? false) {
+	$license_code_raw = strtoupper(trim((string)($_POST["license_code"] ?? "")));
+	$license_code = preg_replace('/[^A-Z0-9]/', '', $license_code_raw);
+	if ($license_code === "" || preg_match('/^[A-Z0-9]{16,128}$/', $license_code) !== 1) {
+		$input_errors[] = l7_t("Informe um codigo de licenca valido.");
+	} else {
+		$out = array();
+		$rc = 0;
+		exec("/usr/local/sbin/layer7d --activate " . escapeshellarg($license_code) . " 2>&1", $out, $rc);
+		if ($rc === 0) {
+			$data = layer7_load_or_default();
+			$data["layer7"]["license_key_mask"] = substr($license_code, 0, 5) . "************";
+			if (layer7_save_json($data)) {
+				layer7_restart_service();
+				$savemsg = l7_t("Licenca registada com sucesso.");
+			}
+		} else {
+			$input_errors[] = l7_t("Licenca invalida.");
+		}
+	}
+}
+
+if ($_POST["revoke_license"] ?? false) {
+	$lic_file = layer7_lic_path();
+	if (file_exists($lic_file)) {
+		@unlink($lic_file);
+	}
+	$data = layer7_load_or_default();
+	if (isset($data["layer7"]["license_key_mask"])) {
+		unset($data["layer7"]["license_key_mask"]);
+	}
+	if (layer7_save_json($data)) {
+		layer7_restart_service();
+		$savemsg = l7_t("Licenca revogada com sucesso.");
+	}
+}
+
 if ($_POST["save"] ?? false) {
 	$mode = $_POST["mode"] ?? "monitor";
 	if (!in_array($mode, array("monitor", "enforce"), true)) {
@@ -423,6 +460,7 @@ layer7_render_styles();
 			$lic_expiry = isset($lic_status["expiry"]) ? $lic_status["expiry"] : "";
 			$lic_days = isset($lic_status["days_left"]) ? (int)$lic_status["days_left"] : 0;
 			$lic_err = isset($lic_status["error"]) ? $lic_status["error"] : "";
+			$lic_mask = isset($L["license_key_mask"]) ? trim((string)$L["license_key_mask"]) : "";
 
 			if ($lic_dev) {
 				$lic_badge = '<span class="label label-warning">DEV MODE</span>';
@@ -466,11 +504,32 @@ layer7_render_styles();
 
 					<p class="text-muted small"><?= $lic_desc; ?></p>
 
-					<p class="text-muted small" style="margin-top: 12px;">
-						<?= l7_t("Para activar uma licenca: no terminal do pfSense execute"); ?>
-						<code>layer7d --activate CHAVE</code>
-						<?= l7_t("ou coloque o ficheiro"); ?> <code>/usr/local/etc/layer7.lic</code> <?= l7_t("manualmente."); ?>
-					</p>
+					<div class="layer7-form-card" style="margin-top: 12px;">
+					<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>
+						<div class="form-group">
+							<label><?= l7_t("Codigo de licenca"); ?></label>
+							<input type="text" class="form-control" value="<?= htmlspecialchars($lic_mask !== "" ? $lic_mask : "*****************"); ?>" readonly="readonly" style="max-width: 360px;">
+							<p class="help-block"><?= l7_t("O codigo fica protegido e nao pode ser editado pela GUI."); ?></p>
+						</div>
+						<form method="post" class="layer7-inline-form">
+							<button type="submit" name="revoke_license" value="1" class="btn btn-danger"
+								onclick="return confirm('<?= l7_t("Deseja revogar a licenca activa?"); ?>');">
+								<i class="fa fa-ban"></i> <?= l7_t("Revogar licenca"); ?>
+							</button>
+						</form>
+					<?php else: ?>
+						<p class="text-muted small"><?= l7_t("Registe a licenca para activar o sistema."); ?></p>
+						<form method="post" class="layer7-form-card__actions">
+							<div class="form-group">
+								<label><?= l7_t("Codigo de licenca"); ?></label>
+								<input type="text" name="license_code" class="form-control" maxlength="128" style="max-width: 360px;" placeholder="ABCD1234EFGH5678">
+							</div>
+							<button type="submit" name="register_license" value="1" class="btn btn-success">
+								<i class="fa fa-check"></i> <?= l7_t("Registar licenca"); ?>
+							</button>
+						</form>
+					<?php endif; ?>
+					</div>
 				</div>
 			</div>
 

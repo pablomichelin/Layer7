@@ -1279,47 +1279,28 @@ function layer7_reports_parse_log($from_ts, $to_ts, $filters = array())
 	$count = 0;
 	while (($line = fgets($fh)) !== false && $count < $max_lines) {
 		$count++;
-		$line = trim($line);
-		if (strlen($line) < 22) continue;
-
-		$ts_str = substr($line, 0, 19);
-		$ts = @strtotime($ts_str);
-		if ($ts === false || $ts < $from_ts || $ts > $to_ts) continue;
-
-		$rest = substr($line, 20);
-		$sev = "";
-		if (preg_match('/^\[(\w+)\]\s*(.*)$/', $rest, $m)) {
-			$sev = $m[1];
-			$rest = $m[2];
+		$event = layer7_reports_event_from_log_line($line);
+		if (!is_array($event)) {
+			continue;
 		}
-
-		$entry = array("ts" => $ts, "severity" => $sev, "raw" => $rest);
-
-		if (strpos($rest, "flow_decide:") === 0) {
-			$entry["type"] = "flow";
-			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
-			if (!empty($kv[1])) {
-				$entry["fields"] = array_combine($kv[1], $kv[2]);
-			}
-		} elseif (strpos($rest, "bl_block:") === 0) {
-			$entry["type"] = "blacklist";
-			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
-			if (!empty($kv[1])) {
-				$entry["fields"] = array_combine($kv[1], $kv[2]);
-			}
-		} elseif (strpos($rest, "dns_block:") === 0) {
-			$entry["type"] = "dns_block";
-			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
-			if (!empty($kv[1])) {
-				$entry["fields"] = array_combine($kv[1], $kv[2]);
-			}
-		} elseif (strpos($rest, "enforce_block_dst:") === 0 || strpos($rest, "enforce_tag:") === 0) {
-			$entry["type"] = "enforce";
-			preg_match_all('/(\w+)=(\S+)/', $rest, $kv);
-			if (!empty($kv[1])) {
-				$entry["fields"] = array_combine($kv[1], $kv[2]);
-			}
-		} else {
+		$entry = array(
+			"ts" => (int)$event["ts"],
+			"severity" => "",
+			"raw" => (string)$event["raw"],
+			"type" => (string)$event["type"],
+			"fields" => array(
+				"src" => (string)$event["src_ip"],
+				"src_host" => (string)$event["src_hostname"],
+				"dst" => (string)$event["dst_ip"],
+				"host" => (string)$event["host"],
+				"app" => (string)$event["app"],
+				"cat" => (string)$event["category"],
+				"action" => (string)$event["action"],
+				"policy" => (string)$event["policy"],
+				"iface" => (string)$event["iface"]
+			)
+		);
+		if ($entry["ts"] < $from_ts || $entry["ts"] > $to_ts) {
 			continue;
 		}
 
@@ -1460,18 +1441,58 @@ function layer7_reports_parse_kv_line($text)
 	return $out;
 }
 
-function layer7_reports_event_from_log_line($line)
+function layer7_reports_parse_line_timestamp($line, &$ts, &$ts_text, &$rest)
 {
 	$line = trim((string)$line);
-	if (strlen($line) < 22) {
+	$ts = 0;
+	$ts_text = "";
+	$rest = "";
+	if ($line === "") {
+		return false;
+	}
+
+	if (preg_match('/^(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2})\s+(.*)$/', $line, $m)) {
+		$parsed = @strtotime(str_replace("T", " ", $m[1]));
+		if ($parsed === false) {
+			return false;
+		}
+		$ts = (int)$parsed;
+		$ts_text = date("Y-m-d H:i:s", $ts);
+		$rest = (string)$m[2];
+		return true;
+	}
+
+	if (preg_match('/^([A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+(.*)$/', $line, $m)) {
+		$stamp = preg_replace('/\s+/', ' ', trim($m[1]));
+		$year = date("Y");
+		$parsed = @strtotime($stamp . " " . $year);
+		if ($parsed !== false && $parsed > (time() + 86400)) {
+			$parsed = @strtotime($stamp . " " . ((int)$year - 1));
+		}
+		if ($parsed === false) {
+			return false;
+		}
+		$msg = (string)$m[2];
+		if (preg_match('/^[^ ]+\s+layer7d(?:\[\d+\])?:\s*(.*)$/', $msg, $m2)) {
+			$msg = $m2[1];
+		}
+		$ts = (int)$parsed;
+		$ts_text = date("Y-m-d H:i:s", $ts);
+		$rest = $msg;
+		return true;
+	}
+
+	return false;
+}
+
+function layer7_reports_event_from_log_line($line)
+{
+	$ts = 0;
+	$ts_str = "";
+	$rest = "";
+	if (!layer7_reports_parse_line_timestamp($line, $ts, $ts_str, $rest)) {
 		return null;
 	}
-	$ts_str = substr($line, 0, 19);
-	$ts = @strtotime($ts_str);
-	if ($ts === false) {
-		return null;
-	}
-	$rest = substr($line, 20);
 	if (preg_match('/^\[(\w+)\]\s*(.*)$/', $rest, $m)) {
 		$rest = $m[2];
 	}

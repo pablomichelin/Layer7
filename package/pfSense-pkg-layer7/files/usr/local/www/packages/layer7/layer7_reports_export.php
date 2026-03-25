@@ -43,6 +43,10 @@ $to_ts = $now;
 $period_label = date("Y-m-d H:i", $from_ts) . " - " . date("Y-m-d H:i", $to_ts);
 $filename_base = "layer7-executive-" . date("Ymd", $from_ts) . "-" . date("Ymd", $to_ts);
 
+if (layer7_reports_db_available()) {
+	layer7_reports_ingest_log_incremental();
+}
+
 $summary = layer7_reports_fetch_summary($from_ts, $to_ts, $filters);
 $timeline = layer7_reports_fetch_timeline($from_ts, $to_ts, layer7_reports_granularity_for_range($from_ts, $to_ts), $filters);
 $top_devices = layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters, 30);

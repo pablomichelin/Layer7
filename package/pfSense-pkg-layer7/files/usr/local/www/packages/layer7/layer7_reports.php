@@ -47,6 +47,13 @@ $to_ts = $now;
 $granularity = layer7_reports_granularity_for_range($from_ts, $to_ts);
 
 $db_ready = layer7_reports_db_available();
+$ingest_failed = false;
+if ($db_ready) {
+	$ing = layer7_reports_ingest_log_incremental();
+	if (!is_array($ing) || empty($ing["ok"])) {
+		$ingest_failed = true;
+	}
+}
 $summary = $db_ready ? layer7_reports_fetch_summary($from_ts, $to_ts, $filters) : null;
 $timeline = $db_ready ? layer7_reports_fetch_timeline($from_ts, $to_ts, $granularity, $filters) : array();
 $top_devices = $db_ready ? layer7_reports_fetch_top_devices($from_ts, $to_ts, $filters, 15) : array();
@@ -147,6 +154,11 @@ layer7_render_styles();
 <?php if (!$db_ready) { ?>
 	<div class="alert alert-warning">
 		<?= l7_t("SQLite nao esta disponivel neste ambiente. O modulo executivo de relatorios requer suporte SQLite no PHP."); ?>
+	</div>
+<?php } ?>
+<?php if ($ingest_failed) { ?>
+	<div class="alert alert-warning">
+		<?= l7_t("Coleta incremental de relatorios falhou nesta tentativa. Verifique diagnosticos e permissoes do ficheiro de log."); ?>
 	</div>
 <?php } ?>
 
