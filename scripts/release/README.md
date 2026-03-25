@@ -21,7 +21,7 @@ O script faz **tudo automaticamente**:
 ### Versão específica
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.12
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.13
 ```
 
 ### Reinstalar
@@ -168,7 +168,7 @@ vim layer7-protos.txt
 sh scripts/release/deployz.sh \
   --repo-owner pablomichelin \
   --repo-name Layer7 \
-  --version 1.4.12
+  --version 1.4.13
 ```
 
 ---

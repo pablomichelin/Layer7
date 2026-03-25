@@ -203,9 +203,9 @@ layer7_render_styles();
 		<div class="alert alert-<?= $anti_doh_result["ok"] ? "success" : "danger"; ?>"><?= htmlspecialchars($anti_doh_result["msg"]); ?></div>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Resumo operacional"); ?></h3>
-			<div class="layer7-callout">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Resumo operacional"); ?></div>
+			<div class="layer7-admin-block__body">
 				<dl class="dl-horizontal layer7-summary">
 					<dt><?= l7_t("Daemon"); ?></dt>
 					<dd>
@@ -260,9 +260,9 @@ layer7_render_styles();
 			</div>
 		</div>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Tabelas PF (enforcement)"); ?></h3>
-			<div class="layer7-callout">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Tabelas PF (enforcement)"); ?></div>
+			<div class="layer7-admin-block__body">
 				<dl class="dl-horizontal layer7-summary">
 					<dt><?= l7_t("Helper PF"); ?></dt>
 					<dd>
@@ -399,9 +399,9 @@ layer7_render_styles();
 			</div>
 		</div>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Anti-bypass DNS"); ?></h3>
-			<div class="layer7-callout">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Anti-bypass DNS"); ?></div>
+			<div class="layer7-admin-block__body">
 				<dl class="dl-horizontal layer7-summary">
 					<dt><?= l7_t("DoT/DoQ (porta 853)"); ?></dt>
 					<dd>
@@ -440,36 +440,45 @@ layer7_render_styles();
 		</div>
 
 		<?php if ($pf_rules_exists && count($pf_rules_preview) > 0) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Snippet PF gerado"); ?></h3>
-			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $pf_rules_preview)); ?></pre>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Snippet PF gerado"); ?></div>
+			<div class="layer7-admin-block__body">
+				<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $pf_rules_preview)); ?></pre>
+			</div>
 		</div>
 		<?php } ?>
 
 		<?php if (count($pf_generated_preview) > 0) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Regra publicada pelo hook"); ?></h3>
-			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $pf_generated_preview)); ?></pre>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Regra publicada pelo hook"); ?></div>
+			<div class="layer7-admin-block__body">
+				<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $pf_generated_preview)); ?></pre>
+			</div>
 		</div>
 		<?php } ?>
 
 		<?php if ($pf_rules_debug_has_layer7 && count($pf_rules_debug_hits) > 0) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Trecho de rules.debug"); ?></h3>
-			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_rules_debug_hits, 0, 20))); ?></pre>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Trecho de rules.debug"); ?></div>
+			<div class="layer7-admin-block__body">
+				<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_rules_debug_hits, 0, 20))); ?></pre>
+			</div>
 		</div>
 		<?php } ?>
 
 		<?php if ($pf_active_rules_loaded && count($pf_active_rules_hits) > 0) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Trecho de pfctl -sr"); ?></h3>
-			<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_active_rules_hits, 0, 20))); ?></pre>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Trecho de pfctl -sr"); ?></div>
+			<div class="layer7-admin-block__body">
+				<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_active_rules_hits, 0, 20))); ?></pre>
+			</div>
 		</div>
 		<?php } ?>
 
 		<?php if ($status_ok && $pid !== null) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Acoes"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Acoes"); ?></div>
+			<div class="layer7-admin-block__body">
 			<div class="layer7-form-card">
 				<form method="post" class="form-inline layer7-inline-form">
 					<button type="submit" name="send_sigusr1" value="1" class="btn btn-info">
@@ -480,35 +489,40 @@ layer7_render_styles();
 					</button>
 				</form>
 			</div>
+			</div>
 		</div>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Logs recentes"); ?></h3>
-			<?php if (count($recent_logs) > 0) { ?>
-			<pre class="pre-scrollable" style="max-height: 350px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $recent_logs)); ?></pre>
-			<?php } else { ?>
-			<div class="alert alert-info"><?= l7_t("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?></div>
-			<?php } ?>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Logs recentes"); ?></div>
+			<div class="layer7-admin-block__body">
+				<?php if (count($recent_logs) > 0) { ?>
+				<pre class="pre-scrollable" style="max-height: 350px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $recent_logs)); ?></pre>
+				<?php } else { ?>
+				<div class="alert alert-info"><?= l7_t("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?></div>
+				<?php } ?>
+			</div>
 		</div>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Comandos uteis"); ?></h3>
-			<ul class="small">
-				<li><code>service layer7d onestart</code> — <?= l7_t("arrancar o daemon"); ?></li>
-				<li><code>service layer7d onestop</code> — <?= l7_t("parar o daemon"); ?></li>
-				<li><code>service layer7d onerestart</code> — <?= l7_t("reiniciar o daemon"); ?></li>
-				<li><code>kill -USR1 $(pgrep layer7d)</code> — <?= l7_t("estatisticas (cap_pkts, cap_classified, pf_add_ok, ...)"); ?></li>
-				<li><code>tail -f /var/log/layer7d.log</code> — <?= l7_t("acompanhar classificacoes e eventos em tempo real"); ?></li>
-				<li><code>pfctl -t layer7_block -T show</code> — <?= l7_t("IPs de origem bloqueados (quarentena)"); ?></li>
-				<li><code>pfctl -t layer7_block_dst -T show</code> — <?= l7_t("IPs de destino bloqueados (sites/apps)"); ?></li>
-				<li><code>pfctl -t layer7_block_dst -T delete IP</code> — <?= l7_t("desbloquear destino"); ?></li>
-				<li><code>pfctl -t layer7_block -T delete IP</code> — <?= l7_t("desbloquear origem"); ?></li>
-				<li><code>sysrc layer7d_enable=YES</code> — <?= l7_t("ativar arranque automatico no boot"); ?></li>
-				<li><code>pfctl -sr | grep layer7:anti</code> — <?= l7_t("verificar regras anti-DoT/DoQ activas"); ?></li>
-				<li><code>sh /usr/local/libexec/layer7-unbound-anti-doh</code> — <?= l7_t("configurar Unbound anti-DoH/Relay"); ?></li>
-				<li><code>drill mask.icloud.com @127.0.0.1</code> — <?= l7_t("verificar se Private Relay retorna NXDOMAIN"); ?></li>
-			</ul>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Comandos uteis"); ?></div>
+			<div class="layer7-admin-block__body">
+				<ul class="small">
+					<li><code>service layer7d onestart</code> — <?= l7_t("arrancar o daemon"); ?></li>
+					<li><code>service layer7d onestop</code> — <?= l7_t("parar o daemon"); ?></li>
+					<li><code>service layer7d onerestart</code> — <?= l7_t("reiniciar o daemon"); ?></li>
+					<li><code>kill -USR1 $(pgrep layer7d)</code> — <?= l7_t("estatisticas (cap_pkts, cap_classified, pf_add_ok, ...)"); ?></li>
+					<li><code>tail -f /var/log/layer7d.log</code> — <?= l7_t("acompanhar classificacoes e eventos em tempo real"); ?></li>
+					<li><code>pfctl -t layer7_block -T show</code> — <?= l7_t("IPs de origem bloqueados (quarentena)"); ?></li>
+					<li><code>pfctl -t layer7_block_dst -T show</code> — <?= l7_t("IPs de destino bloqueados (sites/apps)"); ?></li>
+					<li><code>pfctl -t layer7_block_dst -T delete IP</code> — <?= l7_t("desbloquear destino"); ?></li>
+					<li><code>pfctl -t layer7_block -T delete IP</code> — <?= l7_t("desbloquear origem"); ?></li>
+					<li><code>sysrc layer7d_enable=YES</code> — <?= l7_t("ativar arranque automatico no boot"); ?></li>
+					<li><code>pfctl -sr | grep layer7:anti</code> — <?= l7_t("verificar regras anti-DoT/DoQ activas"); ?></li>
+					<li><code>sh /usr/local/libexec/layer7-unbound-anti-doh</code> — <?= l7_t("configurar Unbound anti-DoH/Relay"); ?></li>
+					<li><code>drill mask.icloud.com @127.0.0.1</code> — <?= l7_t("verificar se Private Relay retorna NXDOMAIN"); ?></li>
+				</ul>
+			</div>
 		</div>
 		</div>
 	</div>

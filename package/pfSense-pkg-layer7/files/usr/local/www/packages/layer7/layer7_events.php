@@ -74,76 +74,89 @@ layer7_render_styles();
 
 		<p class="layer7-lead"><?= l7_t("Eventos do daemon extraidos do syslog do sistema. Use os filtros para encontrar eventos especificos."); ?></p>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Monitor ao vivo"); ?></h3>
-			<p class="small text-muted"><?= l7_t("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
-			<div class="layer7-toolbar">
-				<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
-				<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Monitor ao vivo"); ?></div>
+			<div class="layer7-admin-block__body">
+				<p class="small text-muted"><?= l7_t("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
+				<div class="layer7-toolbar">
+					<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
+					<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
+				</div>
+				<pre id="l7-live-view" class="pre-scrollable" style="max-height: 320px; font-size: 12px; white-space: pre-wrap;">Carregando...</pre>
 			</div>
-			<pre id="l7-live-view" class="pre-scrollable" style="max-height: 320px; font-size: 12px; white-space: pre-wrap;">Carregando...</pre>
 		</div>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Filtrar logs"); ?></h3>
-			<form method="get" class="form-inline">
-				<div class="form-group">
-					<input type="text" name="filter" class="form-control" style="width: 320px;" maxlength="100"
-						value="<?= htmlspecialchars($filter); ?>" placeholder="<?= l7_t("Ex: enforce, flow_decide, BitTorrent, SIGUSR1..."); ?>" />
-				</div>
-				<button type="submit" class="btn btn-primary"><?= l7_t("Filtrar"); ?></button>
-				<?php if ($filter !== "") { ?>
-				<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Limpar"); ?></a>
-				<?php } ?>
-			</form>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Filtrar logs"); ?></div>
+			<div class="layer7-admin-block__body">
+				<form method="get" class="form-inline">
+					<div class="form-group">
+						<input type="text" name="filter" class="form-control" style="width: 320px;" maxlength="100"
+							value="<?= htmlspecialchars($filter); ?>" placeholder="<?= l7_t("Ex: enforce, flow_decide, BitTorrent, SIGUSR1..."); ?>" />
+					</div>
+					<button type="submit" class="btn btn-primary"><?= l7_t("Filtrar"); ?></button>
+					<?php if ($filter !== "") { ?>
+					<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Limpar"); ?></a>
+					<?php } ?>
+				</form>
+			</div>
 		</div>
 
 		<?php if (count($enforce_events) > 0) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Eventos de enforcement"); ?> <span class="badge"><?= count($enforce_events); ?></span></h3>
-			<p class="small text-muted"><?= l7_t("Acoes de block/tag executadas pelo daemon (pfctl -T add). Ultimo evento no final."); ?></p>
-			<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $enforce_events)); ?></pre>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Eventos de enforcement"); ?> <span class="badge"><?= count($enforce_events); ?></span></div>
+			<div class="layer7-admin-block__body">
+				<p class="small text-muted"><?= l7_t("Acoes de block/tag executadas pelo daemon (pfctl -T add). Ultimo evento no final."); ?></p>
+				<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $enforce_events)); ?></pre>
+			</div>
 		</div>
 		<?php } ?>
 
 		<?php if (count($classify_events) > 0) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Classificacoes nDPI"); ?> <span class="badge"><?= count($classify_events); ?></span></h3>
-			<p class="small text-muted"><?= l7_t("Fluxos classificados pelo nDPI (visivel com log_level=debug). Mostra src, app, cat, action, reason."); ?></p>
-			<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $classify_events)); ?></pre>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Classificacoes nDPI"); ?> <span class="badge"><?= count($classify_events); ?></span></div>
+			<div class="layer7-admin-block__body">
+				<p class="small text-muted"><?= l7_t("Fluxos classificados pelo nDPI (visivel com log_level=debug). Mostra src, app, cat, action, reason."); ?></p>
+				<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $classify_events)); ?></pre>
+			</div>
 		</div>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header">
 				<?= l7_t("Todos os logs"); ?>
 				<span class="badge"><?= count($filtered_logs); ?></span>
+			</div>
+			<div class="layer7-admin-block__body">
 				<?php if ($filter !== "") { ?>
-				<small class="text-muted"> (<?= l7_t("filtro"); ?>: <?= htmlspecialchars($filter); ?>)</small>
-				<?php } ?>
-			</h3>
-			<?php if (count($filtered_logs) > 0) { ?>
-			<pre class="pre-scrollable" style="max-height: 400px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $filtered_logs)); ?></pre>
-			<?php } else { ?>
-			<div class="alert alert-info">
-				<?php if ($filter !== "") { ?>
-				<?= l7_t("Nenhum log correspondente ao filtro."); ?>
+				<p class="small text-muted"><?= l7_t("filtro"); ?>: <?= htmlspecialchars($filter); ?></p>
 				<?php } else { ?>
-				<?= l7_t("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?>
+				<?php } ?>
+				<?php if (count($filtered_logs) > 0) { ?>
+				<pre class="pre-scrollable" style="max-height: 400px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $filtered_logs)); ?></pre>
+				<?php } else { ?>
+				<div class="alert alert-info">
+					<?php if ($filter !== "") { ?>
+					<?= l7_t("Nenhum log correspondente ao filtro."); ?>
+					<?php } else { ?>
+					<?= l7_t("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?>
+					<?php } ?>
+				</div>
 				<?php } ?>
 			</div>
-			<?php } ?>
 		</div>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Dicas"); ?></h3>
-			<ul class="small">
-				<li><?= l7_t("Ative log_level=debug em Definicoes para ver decisoes de cada fluxo classificado."); ?></li>
-				<li><?= l7_t("Use debug_minutes para elevar temporariamente sem editar o JSON."); ?></li>
-				<li><?= l7_t("Configure syslog remoto em Definicoes para reter historico fora do appliance."); ?></li>
-				<li><?= l7_t("SIGUSR1 (pagina Diagnostics) gera um resumo de estatisticas que aparece aqui."); ?></li>
-				<li><code><?= htmlspecialchars($log_path); ?></code> — <?= l7_t("arquivo principal de eventos do daemon."); ?></li>
-			</ul>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Dicas"); ?></div>
+			<div class="layer7-admin-block__body">
+				<ul class="small">
+					<li><?= l7_t("Ative log_level=debug em Definicoes para ver decisoes de cada fluxo classificado."); ?></li>
+					<li><?= l7_t("Use debug_minutes para elevar temporariamente sem editar o JSON."); ?></li>
+					<li><?= l7_t("Configure syslog remoto em Definicoes para reter historico fora do appliance."); ?></li>
+					<li><?= l7_t("SIGUSR1 (pagina Diagnostics) gera um resumo de estatisticas que aparece aqui."); ?></li>
+					<li><code><?= htmlspecialchars($log_path); ?></code> — <?= l7_t("arquivo principal de eventos do daemon."); ?></li>
+				</ul>
+			</div>
 		</div>
 		</div>
 	</div>

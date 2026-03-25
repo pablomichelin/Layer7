@@ -210,65 +210,67 @@ layer7_render_styles();
 
 			<p class="layer7-lead"><?= l7_t("Crie grupos nomeados de dispositivos (ex.: Funcionarios, Visitantes) e aplique politicas por grupo em vez de repetir CIDRs manualmente."); ?></p>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Grupos actuais"); ?></h3>
-			<?php if (count($groups) === 0) { ?>
-			<div class="alert alert-info"><?= l7_t("Nenhum grupo criado. Adicione o primeiro grupo abaixo."); ?></div>
-			<?php } else { ?>
-			<div class="table-responsive">
-				<table class="table table-striped table-hover">
-					<thead>
-						<tr>
-							<th><code>id</code></th>
-							<th><?= l7_t("Nome"); ?></th>
-							<th><?= l7_t("CIDRs"); ?></th>
-							<th><?= l7_t("IPs"); ?></th>
-							<th><?= l7_t("Politicas"); ?></th>
-							<th><?= l7_t("Acoes"); ?></th>
-						</tr>
-					</thead>
-					<tbody>
-					<?php foreach ($groups as $i => $grp) {
-						$gid = isset($grp["id"]) ? (string)$grp["id"] : "";
-						$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
-						$gcidrs = isset($grp["cidrs"]) && is_array($grp["cidrs"]) ? $grp["cidrs"] : array();
-						$ghosts = isset($grp["hosts"]) && is_array($grp["hosts"]) ? $grp["hosts"] : array();
-						$pcount = layer7_group_policy_count($gid, $policies);
-					?>
-						<tr>
-							<td><code><?= htmlspecialchars($gid); ?></code></td>
-							<td><?= htmlspecialchars($gname); ?></td>
-							<td class="small"><?= htmlspecialchars(implode(", ", $gcidrs)); ?></td>
-							<td class="small"><?= htmlspecialchars(implode(", ", $ghosts)); ?></td>
-							<td><?= (int)$pcount; ?></td>
-							<td class="layer7-table-actions">
-								<a href="layer7_groups.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
-							</td>
-						</tr>
-					<?php } ?>
-					</tbody>
-				</table>
-			</div>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Grupos actuais"); ?></div>
+			<div class="layer7-admin-block__body">
+				<?php if (count($groups) === 0) { ?>
+				<div class="alert alert-info"><?= l7_t("Nenhum grupo criado. Adicione o primeiro grupo abaixo."); ?></div>
+				<?php } else { ?>
+				<div class="table-responsive">
+					<table class="table table-striped table-hover">
+						<thead>
+							<tr>
+								<th><code>id</code></th>
+								<th><?= l7_t("Nome"); ?></th>
+								<th><?= l7_t("CIDRs"); ?></th>
+								<th><?= l7_t("IPs"); ?></th>
+								<th><?= l7_t("Politicas"); ?></th>
+								<th><?= l7_t("Acoes"); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php foreach ($groups as $i => $grp) {
+							$gid = isset($grp["id"]) ? (string)$grp["id"] : "";
+							$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
+							$gcidrs = isset($grp["cidrs"]) && is_array($grp["cidrs"]) ? $grp["cidrs"] : array();
+							$ghosts = isset($grp["hosts"]) && is_array($grp["hosts"]) ? $grp["hosts"] : array();
+							$pcount = layer7_group_policy_count($gid, $policies);
+						?>
+							<tr>
+								<td><code><?= htmlspecialchars($gid); ?></code></td>
+								<td><?= htmlspecialchars($gname); ?></td>
+								<td class="small"><?= htmlspecialchars(implode(", ", $gcidrs)); ?></td>
+								<td class="small"><?= htmlspecialchars(implode(", ", $ghosts)); ?></td>
+								<td><?= (int)$pcount; ?></td>
+								<td class="layer7-table-actions">
+									<a href="layer7_groups.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
+								</td>
+							</tr>
+						<?php } ?>
+						</tbody>
+					</table>
+				</div>
 
-			<div class="layer7-callout layer7-danger-zone">
-				<form method="post" class="form-inline layer7-inline-form"
-					onsubmit='return confirm(<?= json_encode(l7_t("Remover este grupo?")); ?>);'>
-					<div class="form-group">
-						<label class="control-label" for="delete_group_index"><?= l7_t("Remover grupo"); ?></label>
-						<select id="delete_group_index" name="delete_group_index" class="form-control">
-							<?php foreach ($groups as $i => $grp) {
-								$gid = isset($grp["id"]) ? (string)$grp["id"] : ("#" . $i);
-								$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
-								$label = $gid . ($gname !== "" ? " - " . $gname : "");
-							?>
-							<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
-							<?php } ?>
-						</select>
-						<button type="submit" name="delete_group" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
-					</div>
-				</form>
+				<div class="layer7-callout layer7-danger-zone">
+					<form method="post" class="form-inline layer7-inline-form"
+						onsubmit='return confirm(<?= json_encode(l7_t("Remover este grupo?")); ?>);'>
+						<div class="form-group">
+							<label class="control-label" for="delete_group_index"><?= l7_t("Remover grupo"); ?></label>
+							<select id="delete_group_index" name="delete_group_index" class="form-control">
+								<?php foreach ($groups as $i => $grp) {
+									$gid = isset($grp["id"]) ? (string)$grp["id"] : ("#" . $i);
+									$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
+									$label = $gid . ($gname !== "" ? " - " . $gname : "");
+								?>
+								<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
+								<?php } ?>
+							</select>
+							<button type="submit" name="delete_group" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
+						</div>
+					</form>
+				</div>
+				<?php } ?>
 			</div>
-			<?php } ?>
 		</div>
 
 		<?php if ($edit_group !== null && $edit_idx !== null) {
@@ -279,8 +281,9 @@ layer7_render_styles();
 			$eg_hosts = isset($edit_group["hosts"]) && is_array($edit_group["hosts"])
 				? implode("\n", $edit_group["hosts"]) : "";
 		?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Editar grupo"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Editar grupo"); ?></div>
+			<div class="layer7-admin-block__body">
 			<div class="layer7-toolbar">
 				<a href="layer7_groups.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
 			</div>
@@ -323,11 +326,13 @@ layer7_render_styles();
 					</div>
 				</div>
 			</form>
+			</div>
 		</div>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Adicionar grupo"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Adicionar grupo"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Defina um grupo de dispositivos com CIDRs e/ou IPs individuais. Depois associe o grupo a politicas na pagina de politicas."); ?></p>
 			<?php if ($at_limit) { ?>
 			<div class="alert alert-warning"><?= l7_t("Limite de 16 grupos atingido."); ?></div>
@@ -374,6 +379,7 @@ layer7_render_styles();
 				</div>
 			</form>
 			<?php } ?>
+			</div>
 		</div>
 		</div>
 	</div>

@@ -182,8 +182,9 @@ layer7_render_styles();
 <?php layer7_render_messages(); ?>
 
 <!-- SECTION 1: URL & Download -->
-<div class="layer7-section">
-<h3 class="layer7-section-title"><?=l7_t("URL e Download")?></h3>
+<div class="layer7-admin-block">
+<div class="layer7-admin-block__header"><?=l7_t("URL e Download")?></div>
+<div class="layer7-admin-block__body">
 <div class="layer7-form-card">
 <form method="post">
 <div class="form-group">
@@ -211,10 +212,12 @@ layer7_render_styles();
 	</button>
 </div>
 </div>
+</div>
 
 <!-- SECTION 2: Blacklist Rules -->
-<div class="layer7-section">
-<h3 class="layer7-section-title"><?=l7_t("Regras de Blacklist")?></h3>
+<div class="layer7-admin-block">
+<div class="layer7-admin-block__header"><?=l7_t("Regras de Blacklist")?></div>
+<div class="layer7-admin-block__body">
 <p class="layer7-lead"><?=l7_t("Cada regra define quais categorias bloquear e para quais IPs/CIDRs de origem. Permite bloqueio granular: ex. bloquear gambling para 192.168.10.0/24 mas nao para o director (192.168.10.1).")?></p>
 
 <?php if (empty($rules)): ?>
@@ -398,10 +401,12 @@ if ($show_form):
 </div>
 <?php endif; ?>
 </div>
+</div>
 
 <!-- SECTION 3: Global Whitelist -->
-<div class="layer7-section">
-<h3 class="layer7-section-title"><?=l7_t("Whitelist Global")?></h3>
+<div class="layer7-admin-block">
+<div class="layer7-admin-block__header"><?=l7_t("Whitelist Global")?></div>
+<div class="layer7-admin-block__body">
 <div class="layer7-form-card">
 <form method="post">
 <div class="form-group">
@@ -419,10 +424,12 @@ if ($show_form):
 </form>
 </div>
 </div>
+</div>
 
 <!-- SECTION 4: Settings & State -->
-<div class="layer7-section">
-<h3 class="layer7-section-title"><?=l7_t("Definicoes e Estado")?></h3>
+<div class="layer7-admin-block">
+<div class="layer7-admin-block__header"><?=l7_t("Definicoes e Estado")?></div>
+<div class="layer7-admin-block__body">
 <div class="layer7-form-card">
 <form method="post">
 <div class="form-group">
@@ -485,6 +492,7 @@ if ($show_form):
 	<?=l7_t("Licenca")?> <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA 4.0</a>.
 </div>
 
+</div>
 </div>
 
 </div><!-- layer7-content -->

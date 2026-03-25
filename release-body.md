@@ -1,13 +1,13 @@
-## Layer7 v1.4.12 — ajuste visual da GUI Settings
+## Layer7 v1.4.13 — expansão visual dos blocos administrativos
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **Settings em blocos** — a página `Definicoes` passa a usar blocos visuais separados com cabeçalhos fortes, no estilo administrativo do pfSense
-- **Leitura mais clara** — definições gerais, logging/debug, captura/interfaces, licença, backup/restore, relatórios e actualização ficam visualmente isolados
-- **PT/EN mantido** — os novos títulos dos blocos foram traduzidos para inglês sem alterar o selector de idioma
-- **Sem alteração funcional** — a release é estritamente visual; persistência, relatórios, licenciamento e upgrade continuam com o mesmo comportamento da `v1.4.11`
+- **Blocos visuais expandidos** — as páginas `Politicas`, `Grupos`, `Events`, `Diagnostics` e `Blacklist` passam a usar blocos administrativos com cabeçalhos fortes, seguindo o padrão já aplicado em `Definicoes`
+- **Leitura mais clara** — listagens, filtros, formulários e áreas operacionais ficam melhor segmentados para o utilizador final
+- **PT/EN mantido** — o modo bilingue continua preservado, reutilizando as legendas existentes da interface
+- **Sem alteração funcional** — a release é estritamente visual; persistência, relatórios, licenciamento, upgrade e enforcement continuam com o mesmo comportamento da `v1.4.12`
 
 ### Inclui todas as funcionalidades anteriores
 

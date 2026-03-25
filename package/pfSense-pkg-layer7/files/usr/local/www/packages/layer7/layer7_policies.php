@@ -516,8 +516,9 @@ function layer7_policy_match_summary($policy) {
 		if (!empty($l7_profiles) && !$at_limit) {
 		$prof_ifaces = layer7_get_pfsense_interfaces();
 		?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Perfis rapidos"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Perfis rapidos"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Clique num perfil para criar automaticamente uma politica com todas as apps e dominios associados. Escolha a accao, interfaces e sub-redes antes de aplicar."); ?></p>
 
 		<?php
@@ -644,12 +645,14 @@ function layer7_policy_match_summary($policy) {
 						</div>
 					</div>
 				</form>
-			</div>
+		</div>
+		</div>
 		</div>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Politicas atuais"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Politicas atuais"); ?></div>
+			<div class="layer7-admin-block__body">
 			<?php if (count($policies) === 0) { ?>
 			<div class="alert alert-info"><?= l7_t("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
 			<?php } else { ?>
@@ -718,11 +721,13 @@ function layer7_policy_match_summary($policy) {
 				</form>
 			</div>
 			<?php } ?>
+			</div>
 		</div>
 
 		<?php if ($view_policy !== null && $view_idx !== null) { ?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Listas da politica"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Listas da politica"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Visualizacao rapida da regra, com todos os itens incluidos no match."); ?></p>
 			<div class="layer7-toolbar">
 				<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Fechar"); ?></a>
@@ -752,6 +757,7 @@ function layer7_policy_match_summary($policy) {
 				<dt><?= l7_t("Horario"); ?></dt>
 				<dd><?= htmlspecialchars(layer7_schedule_summary($view_policy)); ?></dd>
 			</dl>
+			</div>
 		</div>
 		<?php } ?>
 
@@ -786,8 +792,9 @@ function layer7_policy_match_summary($policy) {
 				$edit_sched_end = isset($edit_policy["schedule"]["end"]) ? (string)$edit_policy["schedule"]["end"] : "";
 			}
 		?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Editar politica"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Editar politica"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Atualize os detalhes da regra selecionada. O identificador permanece fixo para manter a referencia no JSON."); ?></p>
 			<div class="layer7-toolbar">
 				<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
@@ -1013,11 +1020,13 @@ function layer7_policy_match_summary($policy) {
 					</div>
 				</div>
 			</form>
+			</div>
 		</div>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Adicionar politica"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Adicionar politica"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Use nomes claros e prioridades previsiveis para manter a leitura do conjunto simples durante o troubleshooting."); ?></p>
 			<?php if ($at_limit) { ?>
 			<div class="alert alert-warning"><?= l7_t("Limite de 24 politicas atingido."); ?></div>
@@ -1209,6 +1218,7 @@ function layer7_policy_match_summary($policy) {
 			<?php } ?>
 
 			<p class="layer7-muted-note small"><?= l7_t("Para alterar o id de uma politica existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
+			</div>
 		</div>
 		</div>
 	</div>

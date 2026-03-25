@@ -19,11 +19,11 @@ Ao subir uma nova versao, actualizar no mesmo bloco:
 
 ## Links da versao actual (para teste)
 
-**Versao actual:** `1.4.12`
+**Versao actual:** `1.4.13`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.4.12`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.12/pfSense-pkg-layer7-1.4.12.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.12/pfSense-pkg-layer7-1.4.12.pkg.sha256`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.4.13`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg.sha256`
 - **Install script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh`
 - **Uninstall script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh`
 
@@ -35,16 +35,16 @@ Instalar ultima versao publicada:
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
-Instalar explicitamente a versao `1.4.12`:
+Instalar explicitamente a versao `1.4.13`:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.12
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.13
 ```
 
-Baixar o `.pkg` directo da versao `1.4.12`:
+Baixar o `.pkg` directo da versao `1.4.13`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.12/pfSense-pkg-layer7-1.4.12.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg
 ```
 
 Desinstalar com script publico:
@@ -87,7 +87,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.4.12`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.4.13`
 
 **Comando unico manual (Command Prompt):**
 
@@ -96,19 +96,19 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/
 
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.12/pfSense-pkg-layer7-1.4.12.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.12.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.12/pfSense-pkg-layer7-1.4.12.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg
 ```
 ```sh
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.12.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg
 ```
 
 ```sh
@@ -196,7 +196,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.12/pfSense-pkg-layer7-1.4.12.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.12.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -206,11 +206,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.12/pfSense-pkg-layer7-1.4.12.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.12.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg
 ```
 
 ```sh
@@ -230,7 +230,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.12.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -244,7 +244,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.12.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg
 ```
 
 ```sh
