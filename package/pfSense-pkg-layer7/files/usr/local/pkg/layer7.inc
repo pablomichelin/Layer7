@@ -952,6 +952,13 @@ function layer7_render_styles()
 	.layer7-page .layer7-inline-form .btn { margin-left: 8px; }
 	.layer7-page .layer7-callout { background: #fbfbfb; border: 1px solid #e5e5e5; border-radius: 3px; padding: 16px 18px; }
 	.layer7-page .layer7-callout + .layer7-callout { margin-top: 14px; }
+	.layer7-page .layer7-form-card { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 16px 18px; margin-top: 14px; }
+	.layer7-page .layer7-form-card:first-child { margin-top: 0; }
+	.layer7-page .layer7-form-card__title { margin: 0 0 12px; font-size: 16px; font-weight: 600; }
+	.layer7-page .layer7-form-card__actions { margin-top: 14px; }
+	.layer7-page .layer7-form-card__actions .btn { margin-right: 8px; margin-bottom: 6px; }
+	.layer7-page .layer7-danger-zone { background: #fff8f8; border-color: #ebcccc; }
+	.layer7-page .layer7-readonly-block { background: #f7f7f7; border: 1px solid #e5e5e5; border-radius: 3px; padding: 12px 14px; }
 	.layer7-page .table-responsive { margin-bottom: 0; }
 	.layer7-page .l7-multiselect-wrap { border: 1px solid #ccc; border-radius: 3px; max-height: 220px; overflow-y: auto; padding: 4px 6px; background: #fff; }
 	.layer7-page .l7-multiselect-wrap label { display: block; font-weight: normal; margin: 1px 0; padding: 2px 4px; cursor: pointer; }

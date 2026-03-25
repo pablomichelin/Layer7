@@ -1,4 +1,4 @@
-# Manual — Relatorios Executivos (v1.4.3+)
+# Manual — Relatorios Executivos (v1.4.4+)
 
 ## Objetivo
 
@@ -12,6 +12,12 @@ orientado a publico nao tecnico (diretoria e gestao).
 - Filtros por periodo, dispositivo/IP, site e resultado.
 - Resumo executivo automatico e exportacao HTML/CSV/JSON.
 - Retencao configuravel com presets para controlar espaco em disco.
+
+## Ajuste visual na v1.4.4
+
+- Refino visual das telas para separar melhor quadros e acoes de guardar.
+- Cada bloco de configuracao passou a ter delimitacao visual propria em telas criticas.
+- Sem impacto funcional no motor de politicas, bloqueio, ingestao ou exportacao.
 
 ## Onde configurar
 

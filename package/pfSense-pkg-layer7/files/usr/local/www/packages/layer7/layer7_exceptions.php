@@ -255,6 +255,7 @@ function layer7_exc_target_summary($exception) {
 			<?php if (count($exceptions) === 0) { ?>
 			<div class="alert alert-info"><?= l7_t("Nenhuma excecao cadastrada no momento."); ?></div>
 			<?php } else { ?>
+			<div class="layer7-form-card">
 			<form method="post">
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
@@ -294,22 +295,25 @@ function layer7_exc_target_summary($exception) {
 					<button type="submit" name="save_exceptions" value="1" class="btn btn-primary"><?= l7_t("Guardar estado das excecoes"); ?></button>
 				</div>
 			</form>
+			</div>
 
-			<form method="post" class="form-inline layer7-inline-form"
-				onsubmit='return confirm(<?= json_encode(l7_t("Remover esta excecao do JSON?")); ?>);'>
-				<div class="form-group">
-					<label class="control-label" for="delete_exception_index"><?= l7_t("Remover excecao"); ?></label>
-					<select id="delete_exception_index" name="delete_exception_index" class="form-control">
-						<?php foreach ($exceptions as $i => $exception) {
-							$eid = isset($exception["id"]) ? (string)$exception["id"] : ("#" . $i);
-							$label = $eid . " - " . layer7_exc_target_summary($exception);
-						?>
-						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
-						<?php } ?>
-					</select>
-					<button type="submit" name="delete_exception" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
-				</div>
-			</form>
+			<div class="layer7-callout layer7-danger-zone">
+				<form method="post" class="form-inline layer7-inline-form"
+					onsubmit='return confirm(<?= json_encode(l7_t("Remover esta excecao do JSON?")); ?>);'>
+					<div class="form-group">
+						<label class="control-label" for="delete_exception_index"><?= l7_t("Remover excecao"); ?></label>
+						<select id="delete_exception_index" name="delete_exception_index" class="form-control">
+							<?php foreach ($exceptions as $i => $exception) {
+								$eid = isset($exception["id"]) ? (string)$exception["id"] : ("#" . $i);
+								$label = $eid . " - " . layer7_exc_target_summary($exception);
+							?>
+							<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
+							<?php } ?>
+						</select>
+						<button type="submit" name="delete_exception" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
+					</div>
+				</form>
+			</div>
 			<?php } ?>
 		</div>
 

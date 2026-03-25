@@ -250,22 +250,24 @@ layer7_render_styles();
 				</table>
 			</div>
 
-			<form method="post" class="form-inline layer7-inline-form"
-				onsubmit='return confirm(<?= json_encode(l7_t("Remover este grupo?")); ?>);'>
-				<div class="form-group">
-					<label class="control-label" for="delete_group_index"><?= l7_t("Remover grupo"); ?></label>
-					<select id="delete_group_index" name="delete_group_index" class="form-control">
-						<?php foreach ($groups as $i => $grp) {
-							$gid = isset($grp["id"]) ? (string)$grp["id"] : ("#" . $i);
-							$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
-							$label = $gid . ($gname !== "" ? " - " . $gname : "");
-						?>
-						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
-						<?php } ?>
-					</select>
-					<button type="submit" name="delete_group" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
-				</div>
-			</form>
+			<div class="layer7-callout layer7-danger-zone">
+				<form method="post" class="form-inline layer7-inline-form"
+					onsubmit='return confirm(<?= json_encode(l7_t("Remover este grupo?")); ?>);'>
+					<div class="form-group">
+						<label class="control-label" for="delete_group_index"><?= l7_t("Remover grupo"); ?></label>
+						<select id="delete_group_index" name="delete_group_index" class="form-control">
+							<?php foreach ($groups as $i => $grp) {
+								$gid = isset($grp["id"]) ? (string)$grp["id"] : ("#" . $i);
+								$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
+								$label = $gid . ($gname !== "" ? " - " . $gname : "");
+							?>
+							<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
+							<?php } ?>
+						</select>
+						<button type="submit" name="delete_group" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
+					</div>
+				</form>
+			</div>
 			<?php } ?>
 		</div>
 

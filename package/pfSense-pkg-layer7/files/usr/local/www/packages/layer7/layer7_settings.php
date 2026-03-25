@@ -288,6 +288,7 @@ layer7_render_styles();
 			<?php layer7_render_messages(); ?>
 			<p class="layer7-lead"><?= l7_t("Parametros basicos do daemon, logging remoto e reservas de interface para a fase de captura nDPI."); ?></p>
 
+			<div class="layer7-form-card">
 			<form method="post" class="form-horizontal">
 
 			<div class="form-group">
@@ -407,6 +408,7 @@ layer7_render_styles();
 				</div>
 			</div>
 			</form>
+			</div>
 
 			<p class="layer7-muted-note small"><?= l7_t("Politicas e excecoes existentes sao preservadas quando as definicoes globais sao gravadas."); ?></p>
 
@@ -485,23 +487,29 @@ layer7_render_styles();
 
 				<p><?= l7_t("Exporte toda a configuracao Layer7 (definicoes, politicas, excepcoes, grupos) como ficheiro JSON. Importe noutro pfSense ou para restaurar uma configuracao anterior."); ?></p>
 
-				<form method="post" style="margin-bottom: 18px;">
-					<button type="submit" name="export_config" value="1" class="btn btn-info">
-						<i class="fa fa-download"></i> <?= l7_t("Exportar configuracao"); ?>
-					</button>
-				</form>
+				<div class="layer7-form-card">
+					<form method="post">
+						<button type="submit" name="export_config" value="1" class="btn btn-info">
+							<i class="fa fa-download"></i> <?= l7_t("Exportar configuracao"); ?>
+						</button>
+					</form>
+				</div>
 
-				<form method="post" enctype="multipart/form-data">
-					<div class="form-group">
-						<label><?= l7_t("Importar configuracao"); ?></label>
-						<input type="file" name="import_file" accept=".json" />
-						<p class="help-block"><?= l7_t("Selecione um ficheiro JSON exportado anteriormente. A configuracao actual sera substituida."); ?></p>
-					</div>
-					<button type="submit" name="import_config" value="1" class="btn btn-warning"
-						onclick="return confirm('<?= l7_t("Substituir a configuracao actual? Esta accao nao pode ser desfeita."); ?>');">
-						<i class="fa fa-upload"></i> <?= l7_t("Importar"); ?>
-					</button>
-				</form>
+				<div class="layer7-form-card">
+					<form method="post" enctype="multipart/form-data">
+						<div class="form-group">
+							<label><?= l7_t("Importar configuracao"); ?></label>
+							<input type="file" name="import_file" accept=".json" />
+							<p class="help-block"><?= l7_t("Selecione um ficheiro JSON exportado anteriormente. A configuracao actual sera substituida."); ?></p>
+						</div>
+						<div class="layer7-form-card__actions">
+							<button type="submit" name="import_config" value="1" class="btn btn-warning"
+								onclick="return confirm('<?= l7_t("Substituir a configuracao actual? Esta accao nao pode ser desfeita."); ?>');">
+								<i class="fa fa-upload"></i> <?= l7_t("Importar"); ?>
+							</button>
+						</div>
+					</form>
+				</div>
 
 				</div>
 			</div>
@@ -518,7 +526,7 @@ layer7_render_styles();
 				<h3 class="layer7-section-title"><?= l7_t("Relatorios"); ?></h3>
 				<div class="layer7-callout">
 					<p><?= l7_t("Os relatorios recolhem estatisticas periodicamente para gerar graficos e exportacoes historicas."); ?></p>
-					<form method="post">
+					<form method="post" class="layer7-form-card">
 						<div class="form-group">
 							<label class="checkbox-inline">
 								<input type="checkbox" name="reports_enabled" <?= $rpt_en ? 'checked' : ''; ?>>
@@ -551,9 +559,11 @@ layer7_render_styles();
 						<input type="hidden" name="mode" value="<?= htmlspecialchars($mode); ?>">
 						<input type="hidden" name="language" value="<?= htmlspecialchars($L["language"] ?? "pt"); ?>">
 						<input type="hidden" name="log_level" value="<?= htmlspecialchars($ll); ?>">
-						<button type="submit" class="btn btn-primary">
-							<i class="fa fa-save"></i> <?= l7_t("Guardar definicoes de relatorios"); ?>
-						</button>
+						<div class="layer7-form-card__actions">
+							<button type="submit" class="btn btn-primary">
+								<i class="fa fa-save"></i> <?= l7_t("Guardar definicoes de relatorios"); ?>
+							</button>
+						</div>
 					</form>
 				</div>
 			</div>
@@ -589,7 +599,7 @@ layer7_render_styles();
 				</dl>
 
 				<?php if (version_compare($update_info["latest"], $update_info["current"], ">") && $update_info["pkg_url"] !== "") { ?>
-				<form method="post" style="margin-top: 12px;">
+				<form method="post" class="layer7-form-card" style="margin-top: 12px;">
 					<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
 					<button type="submit" name="do_update" value="1" class="btn btn-success"
 						onclick="return confirm('<?= l7_t("Actualizar o pacote Layer7? O daemon sera reiniciado."); ?>');">
@@ -609,7 +619,7 @@ layer7_render_styles();
 				<?php } ?>
 				<?php } ?>
 
-				<form method="post" style="margin-top: 12px;">
+				<form method="post" class="layer7-form-card" style="margin-top: 12px;">
 					<button type="submit" name="check_update" value="1" class="btn btn-info">
 						<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
 					</button>

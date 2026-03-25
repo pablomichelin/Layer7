@@ -184,6 +184,7 @@ layer7_render_styles();
 <!-- SECTION 1: URL & Download -->
 <div class="layer7-section">
 <h3 class="layer7-section-title"><?=l7_t("URL e Download")?></h3>
+<div class="layer7-form-card">
 <form method="post">
 <div class="form-group">
 	<label><?=l7_t("URL da blacklist")?></label>
@@ -192,12 +193,15 @@ layer7_render_styles();
 		placeholder="http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz">
 	<p class="help-block"><?=l7_t("Endereco do arquivo blacklists.tar.gz (formato UT1 Toulouse).")?></p>
 </div>
+<div class="layer7-form-card__actions">
 <button type="submit" name="do_download" class="btn btn-primary">
 	<i class="fa fa-download"></i> <?=l7_t("Download")?>
 </button>
+</div>
 </form>
+</div>
 
-<div style="margin-top:14px;">
+<div class="layer7-readonly-block" style="margin-top:14px;">
 	<label><?=l7_t("Log de download")?></label>
 	<textarea id="download_log" class="form-control" rows="6" readonly
 		style="font-family:monospace; font-size:12px; background:#f8f8f8;"><?=htmlspecialchars(layer7_bl_download_status())?></textarea>
@@ -291,9 +295,11 @@ layer7_render_styles();
 <?php endif; ?>
 
 <?php if (count($rules) < 8): ?>
-<a href="?add=1" class="btn btn-success" style="margin-top:8px;">
-	<i class="fa fa-plus"></i> <?=l7_t("Adicionar regra")?>
-</a>
+<div class="layer7-toolbar">
+	<a href="?add=1" class="btn btn-success">
+		<i class="fa fa-plus"></i> <?=l7_t("Adicionar regra")?>
+	</a>
+</div>
 <?php endif; ?>
 
 <?php
@@ -309,8 +315,8 @@ if ($show_form):
 	);
 	$form_title = ($edit_idx >= 0) ? l7_t("Editar regra") : l7_t("Nova regra");
 ?>
-<div style="margin-top:18px; padding:18px; border:1px solid #ddd; border-radius:4px; background:#fcfcfc;">
-<h4><?=$form_title?></h4>
+<div class="layer7-form-card">
+<h4 class="layer7-form-card__title"><?=$form_title?></h4>
 <form method="post">
 <?php if ($edit_idx >= 0): ?>
 <input type="hidden" name="rule_index" value="<?=$edit_idx?>">
@@ -382,7 +388,7 @@ if ($show_form):
 	<p class="help-block"><?=l7_t("IPs que NAO sao bloqueados por esta regra, mesmo estando no CIDR de origem.")?></p>
 </div>
 
-<div style="margin-top:14px;">
+<div class="layer7-form-card__actions">
 	<button type="submit" name="save_rule" class="btn btn-primary">
 		<i class="fa fa-save"></i> <?=l7_t("Guardar regra")?>
 	</button>
@@ -396,6 +402,7 @@ if ($show_form):
 <!-- SECTION 3: Global Whitelist -->
 <div class="layer7-section">
 <h3 class="layer7-section-title"><?=l7_t("Whitelist Global")?></h3>
+<div class="layer7-form-card">
 <form method="post">
 <div class="form-group">
 	<label><?=l7_t("Dominios nunca bloqueados (um por linha)")?></label>
@@ -404,15 +411,19 @@ if ($show_form):
 		style="font-family:monospace; max-width:500px;"><?=htmlspecialchars(implode("\n", $bl_config["whitelist"] ?? array()))?></textarea>
 	<p class="help-block"><?=l7_t("Dominios nesta lista nunca sao bloqueados por NENHUMA regra, mesmo que estejam nas categorias.")?></p>
 </div>
-<button type="submit" name="save_whitelist" class="btn btn-primary">
-	<i class="fa fa-save"></i> <?=l7_t("Guardar whitelist")?>
-</button>
+<div class="layer7-form-card__actions">
+	<button type="submit" name="save_whitelist" class="btn btn-primary">
+		<i class="fa fa-save"></i> <?=l7_t("Guardar whitelist")?>
+	</button>
+</div>
 </form>
+</div>
 </div>
 
 <!-- SECTION 4: Settings & State -->
 <div class="layer7-section">
 <h3 class="layer7-section-title"><?=l7_t("Definicoes e Estado")?></h3>
+<div class="layer7-form-card">
 <form method="post">
 <div class="form-group">
 	<label class="checkbox-inline">
@@ -427,10 +438,13 @@ if ($show_form):
 		value="<?=(int)($bl_config["update_interval_hours"] ?? 24)?>"
 		min="1" max="168" style="width:100px;">
 </div>
-<button type="submit" name="save_settings" class="btn btn-primary">
-	<i class="fa fa-save"></i> <?=l7_t("Guardar definicoes")?>
-</button>
+<div class="layer7-form-card__actions">
+	<button type="submit" name="save_settings" class="btn btn-primary">
+		<i class="fa fa-save"></i> <?=l7_t("Guardar definicoes")?>
+	</button>
+</div>
 </form>
+</div>
 
 <div style="margin-top:18px;">
 <dl class="dl-horizontal layer7-summary">

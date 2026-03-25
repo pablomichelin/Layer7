@@ -653,6 +653,7 @@ function layer7_policy_match_summary($policy) {
 			<?php if (count($policies) === 0) { ?>
 			<div class="alert alert-info"><?= l7_t("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
 			<?php } else { ?>
+			<div class="layer7-form-card">
 			<form method="post">
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
@@ -696,23 +697,26 @@ function layer7_policy_match_summary($policy) {
 					<button type="submit" name="save_policies" value="1" class="btn btn-primary"><?= l7_t("Guardar estado das politicas"); ?></button>
 				</div>
 			</form>
+			</div>
 
-			<form method="post" class="form-inline layer7-inline-form"
-				onsubmit='return confirm(<?= json_encode(l7_t("Remover esta politica do JSON?")); ?>);'>
-				<div class="form-group">
-					<label class="control-label" for="delete_policy_index"><?= l7_t("Remover politica"); ?></label>
-					<select id="delete_policy_index" name="delete_policy_index" class="form-control">
-						<?php foreach ($policies as $i => $policy) {
-							$pid = isset($policy["id"]) ? (string)$policy["id"] : ("#" . $i);
-							$pname = isset($policy["name"]) ? (string)$policy["name"] : "";
-							$label = $pid . ($pname !== "" ? " - " . $pname : "");
-						?>
-						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
-						<?php } ?>
-					</select>
-					<button type="submit" name="delete_policy" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
-				</div>
-			</form>
+			<div class="layer7-callout layer7-danger-zone">
+				<form method="post" class="form-inline layer7-inline-form"
+					onsubmit='return confirm(<?= json_encode(l7_t("Remover esta politica do JSON?")); ?>);'>
+					<div class="form-group">
+						<label class="control-label" for="delete_policy_index"><?= l7_t("Remover politica"); ?></label>
+						<select id="delete_policy_index" name="delete_policy_index" class="form-control">
+							<?php foreach ($policies as $i => $policy) {
+								$pid = isset($policy["id"]) ? (string)$policy["id"] : ("#" . $i);
+								$pname = isset($policy["name"]) ? (string)$policy["name"] : "";
+								$label = $pid . ($pname !== "" ? " - " . $pname : "");
+							?>
+							<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
+							<?php } ?>
+						</select>
+						<button type="submit" name="delete_policy" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
+					</div>
+				</form>
+			</div>
 			<?php } ?>
 		</div>
 

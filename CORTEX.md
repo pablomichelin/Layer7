@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.3 — Relatórios Executivos com SQLite**
+**Versão: 1.4.4 — Refino Visual da GUI (UX)**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.4 — Refino visual da GUI (2026-03-24):**
+  - Padronização visual das telas com múltiplas ações para reduzir confusão de uso
+  - Novos cartões de formulário e zonas visuais de remoção (`layer7-form-card`, `layer7-danger-zone`)
+  - Separação explícita de ações em `Settings`, `Blacklists`, `Policies`, `Exceptions`, `Groups` e `Diagnostics`
+  - Sem alteração de lógica funcional (POST/handlers/regras de negócio preservados)
+  - PORTVERSION incrementado para 1.4.4
 - **v1.4.3 — Relatórios Executivos com SQLite (2026-03-24):**
   - Novo backend de relatórios em SQLite local (`/usr/local/etc/layer7/reports/reports.db`)
   - Ingestão incremental de eventos via cursor de log (`ingest.cursor`) sem reprocessar histórico
@@ -343,7 +349,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.4.3 — Relatórios Executivos com SQLite.**
+**v1.4.4 — Refino Visual da GUI (UX).**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
@@ -353,7 +359,8 @@ Botao remover (v1.3.4). Fix base64 Unbound (v1.3.5). Criacao automatica
 de tabelas PF de blacklist + botao reparar (v1.3.6). Modulo de relatorios
 com historico, graficos e exportacao (v1.4.0). Fix criacao robusta de
 tabelas PF com fallback pfctl -f (v1.4.2). Relatorios executivos com
-SQLite e filtros orientados a diretoria (v1.4.3).
+SQLite e filtros orientados a diretoria (v1.4.3). Refino visual da GUI
+para clareza operacional (v1.4.4).
 
 **Progresso license server (CONCLUIDO):**
 - [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
@@ -379,9 +386,9 @@ SQLite e filtros orientados a diretoria (v1.4.3).
 - [ ] Bloco 8: Build, testes end-to-end e release
 
 ## Proximos 3 passos
-1. Build v1.4.3 no FreeBSD builder e publicar GitHub Release
-2. Validar ingestão incremental no pfSense (events no `reports.db`, cursor a avançar, cron ativo)
-3. Validar relatório executivo com filtros por IP/site/resultado e exportação HTML para diretoria
+1. Build v1.4.4 no FreeBSD builder e publicar GitHub Release
+2. Validar revisão visual das telas críticas (Settings/Blacklists/Policies/Exceptions/Groups/Diagnostics)
+3. Confirmar fluxo funcional inalterado (salvar/editar/remover/exportar) após refinamento visual
 
 ## Gates pendentes para V1
 - [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
