@@ -1120,15 +1120,28 @@ function layer7_bl_download_status()
 function layer7_bl_apply()
 {
 	$helper = layer7_pf_helper_path();
+	$ensure_ok = true;
 	if (is_executable($helper)) {
-		@shell_exec($helper . " ensure 2>&1");
+		exec(escapeshellarg($helper) . " ensure 2>/dev/null", $ensure_out, $ensure_rc);
+		$ensure_ok = ($ensure_rc === 0);
 	}
 	if (function_exists("filter_configure")) {
 		filter_configure();
 	}
 	usleep(500000);
-	exec("/sbin/pfctl -t layer7_block -T show 2>/dev/null", $t_chk, $t_rc);
-	if ($t_rc !== 0 && file_exists("/tmp/rules.debug")) {
+	$tables_raw = array();
+	exec("/sbin/pfctl -s Tables 2>/dev/null", $tables_raw, $tables_rc);
+	$tables = array();
+	if ($tables_rc === 0) {
+		foreach ($tables_raw as $line) {
+			$line = trim((string)$line);
+			if ($line !== "") {
+				$tables[$line] = true;
+			}
+		}
+	}
+	$tables_ok = isset($tables["layer7_block"]) && isset($tables["layer7_block_dst"]);
+	if ((!$ensure_ok || !$tables_ok) && file_exists("/tmp/rules.debug")) {
 		if (function_exists("mwexec")) {
 			mwexec("/sbin/pfctl -f /tmp/rules.debug");
 		} else {

@@ -33,6 +33,9 @@ static const char layer7d_version[] =
 
 #define DEFAULT_CONFIG "/usr/local/etc/layer7.json"
 #define LAYER7_LOG_PATH "/var/log/layer7d.log"
+#define L7_PF_HELPER_PATH "/usr/local/libexec/layer7-pfctl"
+#define L7_PF_RULES_DEBUG_PATH "/tmp/rules.debug"
+#define L7_PF_SELFHEAL_MIN_SEC 10
 
 /* 0=error 1=warn 2=info 3=debug — mensagens com nível <= s_ll */
 static int s_ll = 2;
@@ -75,6 +78,7 @@ static unsigned long long s_bl_hits;
 static unsigned long long s_bl_lookups;
 static struct l7_bl_rule s_bl_rules[L7_BL_MAX_RULES];
 static int s_bl_n_rules;
+static time_t s_last_pf_selfheal;
 #define L7_LIC_CHECK_INTERVAL 3600
 
 #define L7_STATS_TOP_MAX 128
@@ -639,6 +643,95 @@ bl_rule_has_cat(const struct l7_bl_rule *rule, const char *cat)
 	return 0;
 }
 
+static int
+run_shell_cmd_ok(const char *cmd)
+{
+	int rc;
+
+	if (!cmd || !*cmd)
+		return 0;
+	rc = system(cmd);
+	return rc == 0;
+}
+
+static int
+pf_table_exists(const char *table)
+{
+	char cmd[192];
+
+	if (!table || !*table)
+		return 0;
+	snprintf(cmd, sizeof(cmd),
+	    "/sbin/pfctl -s Tables 2>/dev/null | /usr/bin/grep -qw %s",
+	    table);
+	return run_shell_cmd_ok(cmd);
+}
+
+static int
+pf_base_tables_ok(void)
+{
+	if (!pf_table_exists(L7_PF_TABLE_BLOCK))
+		return 0;
+	if (!pf_table_exists(L7_PF_TABLE_BLOCK_DST))
+		return 0;
+	return 1;
+}
+
+static int
+layer7_pf_selfheal(const char *reason)
+{
+	time_t now;
+	int have_base;
+	int did_force = 0;
+
+	now = time(NULL);
+	if (s_last_pf_selfheal != 0 &&
+	    now - s_last_pf_selfheal < L7_PF_SELFHEAL_MIN_SEC) {
+		L7_WARN("pf_selfheal: throttled reason=%s last=%lld",
+		    reason ? reason : "-", (long long)s_last_pf_selfheal);
+		return 0;
+	}
+	s_last_pf_selfheal = now;
+
+	L7_WARN("pf_selfheal: start reason=%s", reason ? reason : "-");
+	if (!run_shell_cmd_ok(L7_PF_HELPER_PATH " ensure >/dev/null 2>&1")) {
+		L7_WARN("pf_selfheal: helper ensure failed");
+	}
+
+	have_base = pf_base_tables_ok();
+	if (!have_base && access(L7_PF_RULES_DEBUG_PATH, R_OK) == 0) {
+		did_force = run_shell_cmd_ok(
+		    "/sbin/pfctl -f " L7_PF_RULES_DEBUG_PATH " >/dev/null 2>&1");
+	}
+
+	have_base = pf_base_tables_ok();
+	if (have_base) {
+		L7_NOTE("pf_selfheal: success reason=%s fallback=%d",
+		    reason ? reason : "-", did_force ? 1 : 0);
+		return 1;
+	}
+	L7_WARN("pf_selfheal: failed reason=%s fallback=%d",
+	    reason ? reason : "-", did_force ? 1 : 0);
+	return 0;
+}
+
+static int
+layer7_pf_add_with_selfheal(const char *table, const char *ip,
+    const char *reason)
+{
+	int r;
+
+	r = layer7_pf_exec_table_add(table, ip);
+	if (r == 0)
+		return 0;
+	if (!layer7_pf_selfheal(reason))
+		return -1;
+	r = layer7_pf_exec_table_add(table, ip);
+	if (r == 0)
+		return 0;
+	return -1;
+}
+
 static void
 bl_flush_rule_tables(void)
 {
@@ -662,8 +755,8 @@ layer7_on_dns_resolved(const char *iface, const char *domain,
 		return;
 
 	if (layer7_domain_is_blocked(s_rules, s_np, domain)) {
-		r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST,
-		    resolved_ip);
+		r = layer7_pf_add_with_selfheal(L7_PF_TABLE_BLOCK_DST,
+		    resolved_ip, "dns_block_dst");
 		if (r == 0) {
 			s_pf_dst_add_ok++;
 			dst_cache_add(resolved_ip, ttl);
@@ -693,8 +786,8 @@ layer7_on_dns_resolved(const char *iface, const char *domain,
 					continue;
 				snprintf(tbl, sizeof(tbl),
 				    "layer7_bld_%d", ri);
-				r = layer7_pf_exec_table_add(tbl,
-				    resolved_ip);
+				r = layer7_pf_add_with_selfheal(tbl,
+				    resolved_ip, "dns_blacklist_rule");
 				if (r == 0) {
 					s_pf_dst_add_ok++;
 					L7_INFO("bl_block: iface=%s domain=%s "
@@ -784,7 +877,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 
 	if (dec.action == LAYER7_ACTION_BLOCK && dst_ip &&
 	    layer7_pf_ipv4_host_ok(dst_ip)) {
-		r = layer7_pf_exec_table_add(L7_PF_TABLE_BLOCK_DST, dst_ip);
+		r = layer7_pf_add_with_selfheal(L7_PF_TABLE_BLOCK_DST, dst_ip,
+		    "flow_block_dst");
 		if (r == 0) {
 			s_pf_dst_add_ok++;
 			dst_cache_add(dst_ip, L7_DST_TTL_MIN);
@@ -798,7 +892,13 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 			    L7_PF_TABLE_BLOCK_DST, dst_ip);
 		}
 	} else if (dec.action == LAYER7_ACTION_TAG) {
-		r = layer7_pf_enforce_decision(&dec, src_ip, 0);
+		r = -1;
+		if (dec.would_enforce_block_or_tag && dec.pf_table[0] &&
+		    layer7_pf_ipv4_host_ok(src_ip)) {
+			if (layer7_pf_add_with_selfheal(dec.pf_table, src_ip,
+			    "flow_tag_src") == 0)
+				r = 1;
+		}
 		if (r == 1) {
 			s_pf_table_add_ok++;
 			L7_INFO("enforce_tag: iface=%s src=%s table=%s policy=%s",
@@ -1626,6 +1726,10 @@ int main(int argc, char **argv)
 				L7_WARN("SIGHUP: missing %s", config_path);
 				s_have_parse = 0;
 			}
+
+			if (!pf_base_tables_ok())
+				(void)layer7_pf_selfheal("sighup_reload");
+
 			open_captures();
 
 			/* Reload blacklists from separate config.json */

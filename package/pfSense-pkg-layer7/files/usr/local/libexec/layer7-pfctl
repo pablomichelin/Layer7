@@ -30,6 +30,31 @@ tables_missing() {
 	return 1
 }
 
+required_tables_ok() {
+	for _t in "${TABLE_BLOCK}" "${TABLE_TAGGED}" "${TABLE_BLOCK_DST}"; do
+		if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
+			echo "layer7-pfctl: missing required table ${_t}" >&2
+			return 1
+		fi
+	done
+	if [ -f "${BL_CONFIG}" ]; then
+		_count=$(/usr/local/bin/php -r '
+			$c = @json_decode(@file_get_contents("'"${BL_CONFIG}"'"), true);
+			echo isset($c["rules"]) ? count($c["rules"]) : 0;
+		' 2>/dev/null)
+		_idx=0
+		while [ "$_idx" -lt "${_count:-0}" ]; do
+			_t="layer7_bld_${_idx}"
+			if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
+				echo "layer7-pfctl: missing blacklist table ${_t}" >&2
+				return 1
+			fi
+			_idx=$((_idx + 1))
+		done
+	fi
+	return 0
+}
+
 force_reload_rules_debug() {
 	if [ -f /tmp/rules.debug ]; then
 		/sbin/pfctl -f /tmp/rules.debug 2>/dev/null || true
@@ -102,6 +127,9 @@ ensure)
 		ensure_blacklist_tables
 		if tables_missing; then
 			force_reload_rules_debug
+		fi
+		if ! required_tables_ok; then
+			exit 1
 		fi
 		;;
 flush)

@@ -19,11 +19,11 @@ Ao subir uma nova versao, actualizar no mesmo bloco:
 
 ## Links da versao actual (para teste)
 
-**Versao actual:** `1.4.13`
+**Versao actual:** `1.4.14`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.4.13`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg.sha256`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.4.14`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg.sha256`
 - **Install script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh`
 - **Uninstall script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh`
 
@@ -35,16 +35,16 @@ Instalar ultima versao publicada:
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
-Instalar explicitamente a versao `1.4.13`:
+Instalar explicitamente a versao `1.4.14`:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.13
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.14
 ```
 
-Baixar o `.pkg` directo da versao `1.4.13`:
+Baixar o `.pkg` directo da versao `1.4.14`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg
 ```
 
 Desinstalar com script publico:
@@ -87,7 +87,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.4.13`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.4.14`
 
 **Comando unico manual (Command Prompt):**
 
@@ -96,19 +96,19 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/
 
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg
 ```
 ```sh
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg
 ```
 
 ```sh
@@ -196,7 +196,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -206,11 +206,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.13.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.13/pfSense-pkg-layer7-1.4.13.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg
 ```
 
 ```sh
@@ -230,7 +230,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -244,7 +244,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.13.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg
 ```
 
 ```sh
@@ -531,6 +531,18 @@ Na pagina **Services > Layer 7 > Diagnosticos**, clique no botao
 3. Chama `filter_configure()` para recarregar o filtro
 4. Verifica se as tabelas foram criadas
 5. Se necessario, forca `pfctl -f /tmp/rules.debug` como fallback sincrono
+
+### Auto-recuperacao em runtime (v1.4.14+)
+
+Quando o daemon detectar falha de `pfctl -T add` por ausencia de tabela,
+ele tenta auto-recuperar automaticamente:
+1. executa `layer7-pfctl ensure`
+2. valida novamente as tabelas
+3. aplica fallback com `pfctl -f /tmp/rules.debug` se necessario
+4. repete o `add` uma unica vez
+
+Esta rotina reduz o estado inconsistente de "daemon em execucao + tabelas
+ausentes" apos reloads de filtro externos.
 
 ### Reparacao manual (SSH/Console)
 

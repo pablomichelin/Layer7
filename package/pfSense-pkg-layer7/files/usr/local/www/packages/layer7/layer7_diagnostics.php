@@ -9,6 +9,25 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
+function layer7_diag_pf_required_tables_ok($tables, $bl_config)
+{
+	if (!is_array($tables)) {
+		return false;
+	}
+	if (empty($tables["layer7_block"]) || empty($tables["layer7_block_dst"])) {
+		return false;
+	}
+	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
+		foreach ($bl_config["rules"] as $idx => $rule) {
+			$tname = "layer7_bld_" . (int)$idx;
+			if (empty($tables[$tname])) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 $cfgpath = layer7_cfg_path();
 $log_path = "/var/log/layer7d.log";
 $pf_helper = layer7_pf_helper_path();
@@ -63,17 +82,30 @@ if (isset($_POST["remove_anti_doh"])) {
 	$anti_doh_result = layer7_remove_unbound_anti_doh();
 }
 
+$bl_config_diag = layer7_bl_config_load();
+
 $pf_repair_result = null;
 if (isset($_POST["repair_pf_tables"])) {
 	$helper = layer7_pf_helper_path();
 	if (is_executable($helper)) {
-		@shell_exec($helper . " ensure 2>&1");
+		exec(escapeshellarg($helper) . " ensure 2>/dev/null", $ensure_out, $ensure_rc);
 		if (function_exists("filter_configure")) {
 			filter_configure();
 		}
 		usleep(800000);
-		exec("/sbin/pfctl -t layer7_block -T show 2>/dev/null", $t_chk, $t_rc);
-		if ($t_rc !== 0 && file_exists("/tmp/rules.debug")) {
+		$tables_raw = array();
+		exec("/sbin/pfctl -s Tables 2>/dev/null", $tables_raw, $tables_rc);
+		$tables_map = array();
+		if ($tables_rc === 0) {
+			foreach ($tables_raw as $line) {
+				$line = trim((string)$line);
+				if ($line !== "") {
+					$tables_map[$line] = true;
+				}
+			}
+		}
+		$required_ok = layer7_diag_pf_required_tables_ok($tables_map, $bl_config_diag);
+		if (($ensure_rc !== 0 || !$required_ok) && file_exists("/tmp/rules.debug")) {
 			if (function_exists("mwexec")) {
 				mwexec("/sbin/pfctl -f /tmp/rules.debug");
 			} else {
@@ -82,8 +114,18 @@ if (isset($_POST["repair_pf_tables"])) {
 			usleep(300000);
 		}
 		layer7_signal_reload();
-		exec("/sbin/pfctl -t layer7_block -T show 2>/dev/null", $t_chk2, $t_rc2);
-		$pf_repair_result = ($t_rc2 === 0);
+		$tables_after_raw = array();
+		exec("/sbin/pfctl -s Tables 2>/dev/null", $tables_after_raw, $tables_after_rc);
+		$tables_after = array();
+		if ($tables_after_rc === 0) {
+			foreach ($tables_after_raw as $line) {
+				$line = trim((string)$line);
+				if ($line !== "") {
+					$tables_after[$line] = true;
+				}
+			}
+		}
+		$pf_repair_result = layer7_diag_pf_required_tables_ok($tables_after, $bl_config_diag);
 	} else {
 		$pf_repair_result = false;
 	}
@@ -109,7 +151,6 @@ exec("/sbin/pfctl -t layer7_tagged -T show 2>/dev/null", $pf_tag_entries, $pf_ta
 $pf_tag_count = ($pf_tag_code === 0) ? count(array_filter($pf_tag_entries, 'strlen')) : -1;
 
 $pf_bld_tables = array();
-$bl_config_diag = layer7_bl_config_load();
 if (!empty($bl_config_diag["rules"])) {
 	foreach ($bl_config_diag["rules"] as $bidx => $brule) {
 		$tname = "layer7_bld_" . (int)$bidx;
@@ -153,6 +194,8 @@ if (file_exists($pf_rules_debug_path)) {
 $pf_active_rules_hits = array();
 exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:' 2>/dev/null", $pf_active_rules_hits, $pf_active_rules_code);
 $pf_active_rules_loaded = ($pf_active_rules_code === 0 && count($pf_active_rules_hits) > 0);
+$pf_required_tables_ok = !$pf_any_missing;
+$pf_enforcement_real_ok = ($pf_active_rules_loaded && $pf_required_tables_ok);
 
 $pf_anti_dot_hits = array();
 exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:anti-' 2>/dev/null", $pf_anti_dot_hits, $pf_anti_dot_code);
@@ -315,6 +358,17 @@ layer7_render_styles();
 						<span class="text-success"><?= l7_t("Regra Layer7 encontrada em pfctl -sr."); ?></span>
 						<?php } else { ?>
 						<span class="text-warning"><?= l7_t("Regra Layer7 ainda nao apareceu em pfctl -sr."); ?></span>
+						<?php } ?>
+					</dd>
+
+					<dt><?= l7_t("Enforcement real"); ?></dt>
+					<dd>
+						<?php if ($pf_enforcement_real_ok) { ?>
+						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Regra ativa e tabelas PF obrigatorias presentes."); ?></span>
+						<?php } elseif ($pf_active_rules_loaded && !$pf_required_tables_ok) { ?>
+						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Regra ativa, mas faltam tabelas PF obrigatorias."); ?></span>
+						<?php } else { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Enforcement ainda nao validado no filtro ativo."); ?></span>
 						<?php } ?>
 					</dd>
 

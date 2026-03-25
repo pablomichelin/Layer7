@@ -51,6 +51,20 @@ Responsabilidades do helper:
 - gerar o snippet PF gerido pelo pacote;
 - permitir flush controlado das tables no rollback/deinstall.
 
+### Robustez operacional (v1.4.14)
+
+Para evitar estado inconsistente apos reloads externos do filtro, o runtime do
+daemon aplica auto-recuperacao quando um `pfctl -T add` falha por tabela
+ausente:
+
+1. tenta `layer7-pfctl ensure`;
+2. valida as tabelas base;
+3. se necessario, aplica fallback com `pfctl -f /tmp/rules.debug`;
+4. repete o `add` uma unica vez.
+
+No ciclo de `SIGHUP`, o daemon tambem valida tabelas base apos reload e tenta
+recuperacao quando detectar ausencia.
+
 O pacote expoe a regra minima via `layer7_generate_rules("filter")`, no padrao
 que o pfSense usa em `discover_pkg_rules()` para montar regras de pacotes
 durante o `filter reload`.
