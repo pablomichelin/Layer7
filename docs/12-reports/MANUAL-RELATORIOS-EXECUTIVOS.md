@@ -1,4 +1,4 @@
-# Manual — Relatorios Executivos (v1.4.5+)
+# Manual — Relatorios Executivos (v1.4.6+)
 
 ## Objetivo
 
@@ -24,6 +24,12 @@ orientado a publico nao tecnico (diretoria e gestao).
 - A pagina de relatorios executa ingestao incremental ao abrir, reduzindo dependencia exclusiva do cron.
 - Exportacoes (HTML/CSV/JSON) tambem disparam ingestao incremental antes da consulta.
 - Parser de log agora aceita timestamp ISO e formato syslog, evitando perda de eventos por formato.
+
+## Evolucao na v1.4.6
+
+- Daemon registra eventos `dns_query` com `src`, `resolver` e `qname`.
+- Relatorios passam a gravar consultas DNS e correlacionar bloqueios com o dominio tentado.
+- Top sites e contagem de sites unicos passam a ignorar resolvedores publicos (ex.: `dns.google`).
 
 ## Onde configurar
 

@@ -62,6 +62,7 @@ struct layer7_capture {
 	struct l7c_flow                      flows[L7C_MAX_FLOWS];
 	layer7_flow_cb                       cb;
 	layer7_dns_cb                        dns_cb;
+	layer7_dns_query_cb                  dns_query_cb;
 	char                                 ifname[32];
 	unsigned long long                   stat_pkts;
 	unsigned long long                   stat_flows_classified;
@@ -262,6 +263,39 @@ observe_dns_response(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 	}
 }
 
+static void
+observe_dns_query(struct layer7_capture *cap, uint32_t sa, uint32_t da,
+    uint16_t sp, uint16_t dp, const uint8_t *payload, uint16_t payload_len)
+{
+	size_t off;
+	uint16_t qd;
+	char qname[L7C_DNS_HOST_MAX];
+	char src_ip_str[INET_ADDRSTRLEN];
+	char resolver_ip_str[INET_ADDRSTRLEN];
+	struct in_addr addr;
+
+	if (dp != 53 || sp == 53 || !payload || payload_len < 12)
+		return;
+	if (!cap->dns_query_cb)
+		return;
+
+	qd = (uint16_t)((payload[4] << 8) | payload[5]);
+	if (qd == 0)
+		return;
+
+	off = 12;
+	if (dns_read_name(payload, payload_len, &off, qname, sizeof(qname), 0) != 0)
+		return;
+	if (qname[0] == '\0' || strcmp(qname, ".") == 0)
+		return;
+
+	addr.s_addr = htonl(sa);
+	inet_ntop(AF_INET, &addr, src_ip_str, sizeof(src_ip_str));
+	addr.s_addr = htonl(da);
+	inet_ntop(AF_INET, &addr, resolver_ip_str, sizeof(resolver_ip_str));
+	cap->dns_query_cb(src_ip_str, resolver_ip_str, qname);
+}
+
 static uint32_t
 flow_hash(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp, uint8_t p)
 {
@@ -350,7 +384,8 @@ expire_idle(struct layer7_capture *cap, time_t now)
 
 struct layer7_capture *
 layer7_capture_open(const char *ifname, int snaplen, layer7_flow_cb cb,
-    layer7_dns_cb dns_cb, const char *protos_file, char *errbuf, int errbuflen)
+    layer7_dns_cb dns_cb, layer7_dns_query_cb dns_query_cb,
+    const char *protos_file, char *errbuf, int errbuflen)
 {
 	struct layer7_capture *cap;
 	char pcap_errbuf[PCAP_ERRBUF_SIZE];
@@ -422,6 +457,7 @@ layer7_capture_open(const char *ifname, int snaplen, layer7_flow_cb cb,
 
 	cap->cb = cb;
 	cap->dns_cb = dns_cb;
+	cap->dns_query_cb = dns_query_cb;
 	snprintf(cap->ifname, sizeof(cap->ifname), "%s", ifname);
 	cap->last_expire = time(NULL);
 	return cap;
@@ -506,6 +542,10 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	now = hdr->ts.tv_sec;
 	f->last_seen = now;
 	f->pkt_count++;
+
+	if (proto == IPPROTO_UDP && l4_data && l4_len >= 12 + 8)
+		observe_dns_query(cap, sa, da, sp, dp, l4_data + 8,
+		    (uint16_t)(l4_len - 8));
 
 	if (proto == IPPROTO_UDP && l4_data && l4_len >= 12 + 8)
 		observe_dns_response(cap, sa, da, sp, dp, l4_data + 8,

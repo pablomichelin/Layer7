@@ -1441,6 +1441,72 @@ function layer7_reports_parse_kv_line($text)
 	return $out;
 }
 
+function layer7_reports_resolver_domains()
+{
+	return array(
+		"dns.google",
+		"dns.google.com",
+		"dns.quad9.net",
+		"dns9.quad9.net",
+		"dns10.quad9.net",
+		"dns11.quad9.net",
+		"one.one.one.one",
+		"cloudflare-dns.com",
+		"security.cloudflare-dns.com",
+		"family.cloudflare-dns.com",
+		"dns.adguard.com",
+		"dns-family.adguard.com",
+		"dns-unfiltered.adguard.com",
+		"doh.opendns.com",
+		"doh.cleanbrowsing.org",
+		"dns.nextdns.io"
+	);
+}
+
+function layer7_reports_host_is_resolver($host)
+{
+	$host = strtolower(trim((string)$host));
+	if ($host === "" || $host === "-") {
+		return false;
+	}
+	foreach (layer7_reports_resolver_domains() as $resolver) {
+		if ($host === $resolver || substr($host, -strlen("." . $resolver)) === "." . $resolver) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function layer7_reports_guess_attempted_host($db, $src_ip, $ts, $window_seconds = 120)
+{
+	if (!$db || trim((string)$src_ip) === "" || (int)$ts <= 0) {
+		return "";
+	}
+	$stmt = @$db->prepare("SELECT host
+		FROM events
+		WHERE type='dns_query'
+		  AND src_ip=:src_ip
+		  AND host <> ''
+		  AND ts BETWEEN :from_ts AND :to_ts
+		ORDER BY ts DESC
+		LIMIT 10");
+	if (!$stmt) {
+		return "";
+	}
+	$stmt->bindValue(":src_ip", (string)$src_ip, SQLITE3_TEXT);
+	$stmt->bindValue(":from_ts", (int)$ts - (int)$window_seconds, SQLITE3_INTEGER);
+	$stmt->bindValue(":to_ts", (int)$ts, SQLITE3_INTEGER);
+	$res = @$stmt->execute();
+	while ($res && ($row = $res->fetchArray(SQLITE3_ASSOC))) {
+		$host = trim((string)($row["host"] ?? ""));
+		if ($host === "" || layer7_reports_host_is_resolver($host)) {
+			continue;
+		}
+		return $host;
+	}
+	return "";
+}
+
 function layer7_reports_parse_line_timestamp($line, &$ts, &$ts_text, &$rest)
 {
 	$line = trim((string)$line);
@@ -1504,6 +1570,9 @@ function layer7_reports_event_from_log_line($line)
 	} elseif (strpos($rest, "bl_block:") === 0) {
 		$type = "blacklist";
 		$action = "block";
+	} elseif (strpos($rest, "dns_query:") === 0) {
+		$type = "dns_query";
+		$action = "query";
 	} elseif (strpos($rest, "dns_block:") === 0) {
 		$type = "dns_block";
 		$action = "block";
@@ -1528,10 +1597,10 @@ function layer7_reports_event_from_log_line($line)
 		"type" => $type,
 		"src_ip" => (string)($f["src"] ?? ""),
 		"src_hostname" => (string)($f["src_host"] ?? ""),
-		"dst_ip" => (string)($f["dst"] ?? ""),
-		"host" => (string)($f["host"] ?? ""),
-		"app" => (string)($f["app"] ?? ""),
-		"category" => (string)($f["cat"] ?? ""),
+		"dst_ip" => (string)($f["dst"] ?? ($f["resolver"] ?? "")),
+		"host" => (string)($f["host"] ?? ($f["qname"] ?? ($f["domain"] ?? ""))),
+		"app" => (string)($f["app"] ?? ($type === "dns_query" ? "DNS" : "")),
+		"category" => (string)($f["cat"] ?? ($type === "dns_query" ? "DNS" : "")),
 		"action" => (string)$action,
 		"policy" => (string)($f["policy"] ?? ""),
 		"iface" => (string)($f["iface"] ?? ""),
@@ -1800,6 +1869,21 @@ function layer7_reports_fetch_summary($from_ts, $to_ts, $filters = array())
 	}
 	$res = @$stmt->execute();
 	$row = $res ? $res->fetchArray(SQLITE3_ASSOC) : null;
+	if (is_array($row)) {
+		$row["unique_sites"] = 0;
+		$sstmt = @$db->prepare("SELECT host, COUNT(*) AS c FROM events WHERE {$where} AND host <> '' GROUP BY host");
+		if ($sstmt) {
+			foreach ($params as $k => $v) {
+				$sstmt->bindValue($k, $v, is_int($v) ? SQLITE3_INTEGER : SQLITE3_TEXT);
+			}
+			$sr = @$sstmt->execute();
+			while ($sr && ($srow = $sr->fetchArray(SQLITE3_ASSOC))) {
+				if (!layer7_reports_host_is_resolver($srow["host"] ?? "")) {
+					$row["unique_sites"]++;
+				}
+			}
+		}
+	}
 	return is_array($row) ? $row : null;
 }
 
@@ -1893,8 +1977,8 @@ function layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters = array(), $l
 		FROM events
 		WHERE {$where} AND host <> ''
 		GROUP BY host
-		ORDER BY blocked_events DESC, total_events DESC
-		LIMIT " . (int)$limit;
+		ORDER BY total_events DESC
+		LIMIT " . max(50, ((int)$limit * 8));
 	$stmt = @$db->prepare($sql);
 	if (!$stmt) {
 		return array();
@@ -1905,7 +1989,13 @@ function layer7_reports_fetch_top_sites($from_ts, $to_ts, $filters = array(), $l
 	$r = @$stmt->execute();
 	$out = array();
 	while ($r && ($row = $r->fetchArray(SQLITE3_ASSOC))) {
+		if (layer7_reports_host_is_resolver($row["host"] ?? "")) {
+			continue;
+		}
 		$out[] = $row;
+		if (count($out) >= (int)$limit) {
+			break;
+		}
 	}
 	return $out;
 }
@@ -1951,6 +2041,14 @@ function layer7_reports_fetch_events($from_ts, $to_ts, $filters = array(), $page
 	$r = @$stmt->execute();
 	$rows = array();
 	while ($r && ($row = $r->fetchArray(SQLITE3_ASSOC))) {
+		$host = trim((string)($row["host"] ?? ""));
+		$action = (string)($row["action"] ?? "");
+		if ($action === "block" && ($host === "" || layer7_reports_host_is_resolver($host))) {
+			$guess = layer7_reports_guess_attempted_host($db, (string)($row["src_ip"] ?? ""), (int)($row["ts"] ?? 0), 120);
+			if ($guess !== "") {
+				$row["host"] = $guess;
+			}
+		}
 		$rows[] = $row;
 	}
 	return array("rows" => $rows, "total" => $total, "page" => $page, "page_size" => $page_size);

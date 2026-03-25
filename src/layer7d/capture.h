@@ -34,6 +34,15 @@ typedef void (*layer7_flow_cb)(const char *iface, const char *src_ip,
 typedef void (*layer7_dns_cb)(const char *domain, const char *resolved_ip,
     uint32_t ttl);
 
+/*
+ * Callback invocado quando uma query DNS (cliente -> resolver) e observada.
+ *   src_ip:      IPv4 do cliente
+ *   resolver_ip: IPv4 do resolver de destino
+ *   qname:       dominio consultado
+ */
+typedef void (*layer7_dns_query_cb)(const char *src_ip,
+    const char *resolver_ip, const char *qname);
+
 struct layer7_capture;
 
 /*
@@ -46,8 +55,8 @@ struct layer7_capture;
  * Retorno:     handle opaco ou NULL em erro (errmsg em errbuf se != NULL).
  */
 struct layer7_capture *layer7_capture_open(const char *ifname, int snaplen,
-    layer7_flow_cb cb, layer7_dns_cb dns_cb, const char *protos_file,
-    char *errbuf, int errbuflen);
+    layer7_flow_cb cb, layer7_dns_cb dns_cb, layer7_dns_query_cb dns_query_cb,
+    const char *protos_file, char *errbuf, int errbuflen);
 
 /*
  * Processa até batch_size pacotes (non-blocking se timeout_ms <= 0).

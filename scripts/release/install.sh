@@ -7,7 +7,7 @@
 #
 # Ou com versão específica:
 #
-#   sh /tmp/install.sh --version 1.4.5
+#   sh /tmp/install.sh --version 1.4.6
 #
 # O script faz tudo automaticamente:
 #   1. Detecta a versão (ou usa a especificada)

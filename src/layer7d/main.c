@@ -709,6 +709,19 @@ layer7_on_dns_resolved(const char *domain, const char *resolved_ip,
 	}
 }
 
+static void
+layer7_on_dns_query(const char *src_ip, const char *resolver_ip,
+    const char *qname)
+{
+	if (!src_ip || !qname || qname[0] == '\0')
+		return;
+	if (strstr(qname, ".in-addr.arpa") || strstr(qname, ".ip6.arpa"))
+		return;
+
+	L7_INFO("dns_query: src=%s resolver=%s qname=%s",
+	    src_ip, resolver_ip ? resolver_ip : "-", qname);
+}
+
 /*
  * Chamado pelo loop quando nDPI classificar um fluxo (origem + app/cat).
  * mode=enforce + decisão block → dst_ip em layer7_block_dst.
@@ -1330,7 +1343,8 @@ open_captures(void)
 
 			c = layer7_capture_open(s_parsed.interfaces[i], 1536,
 			    layer7_on_classified_flow,
-			    layer7_on_dns_resolved, pf,
+			    layer7_on_dns_resolved,
+			    layer7_on_dns_query, pf,
 			    errbuf, (int)sizeof(errbuf));
 			if (!c) {
 				L7_WARN("capture_open(%s) failed: %s",
