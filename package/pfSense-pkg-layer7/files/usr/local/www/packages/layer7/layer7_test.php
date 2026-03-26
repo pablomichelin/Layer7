@@ -192,6 +192,12 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 		}
 	}
 
+	usort($policies, function($a, $b) {
+		$pa = isset($a["priority"]) ? (int)$a["priority"] : 50;
+		$pb = isset($b["priority"]) ? (int)$b["priority"] : 50;
+		return $pb - $pa;
+	});
+
 	$matched_policy = null;
 	foreach ($policies as $pol) {
 		if (empty($pol["enabled"])) {

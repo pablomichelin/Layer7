@@ -2,6 +2,39 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.5.0] — 2026-03-26
+
+### Security
+
+- **FIX CRITICO: blacklists no arranque** — daemon passa a carregar blacklists UT1/custom no startup (antes exigia SIGHUP manual para activar bloqueio)
+- **FIX CRITICO: injecção em layer7_activate** — chaves com aspas, backslash ou control chars são rejeitadas antes de interpolar em JSON/shell
+- **FIX CRITICO: password removida do seed.js** — admin password do license server agora é lida da variável `ADMIN_PASSWORD`
+- **FIX ALTO: validação de octetos CIDR** — `layer7_cidr_valid()` passa a rejeitar octetos > 255 em endereços de rede
+- **FIX ALTO: sanitização PF** — `except_ips` e `src_cidrs` de blacklist validados com `layer7_ipv4_valid()`/`layer7_cidr_valid()` antes de interpolar em regras PF
+- **FIX ALTO: XSS/JS em confirm()** — 7 instâncias de `confirm('<?= l7_t(...) ?>')` e 3 labels Chart.js + 1 profileModal corrigidas para usar `json_encode()`
+
+### Fixed
+
+- **NULL safety no daemon** — `json_escape_fprint()`, `json_escape_print()` e `dst_cache_add()` protegidos contra ponteiro NULL
+- **Swap de blacklists seguro** — reload falhado preserva blacklist anterior funcional em vez de destruí-la
+- **Warning de categoria vazia** — log restaurado quando ambos ficheiros (UT1 base + custom overlay) falham para uma categoria
+- **Whitelist normalizada** — domínios da whitelist de blacklists passam por `layer7_bl_domains_normalize()` (validação + dedup)
+- **source_url validada** — apenas esquemas HTTP/HTTPS aceites na URL de download de blacklists
+- **Simulação por priority** — `layer7_test.php` ordena políticas por `priority` desc (consistente com o daemon)
+- **Lock atómico no update-blacklists.sh** — `mkdir` atómico substitui padrão TOCTOU `test -f` + `echo $$`
+- **Numeração install.sh** — passos corrigidos de [1/5]-[3/5] para [1/6]-[3/6]
+- **Help text excepções** — "max. 8" corrigido para "max. 16" (alinhado com o parser real)
+- **rename() stats** — verificação de retorno com log de erro
+
+### Changed
+
+- **PORTVERSION** bumped para 1.5.0
+
+### Documentation
+
+- CORTEX.md, MANUAL-INSTALL.md e CHANGELOG actualizado para v1.5.0
+- Traduções EN actualizadas para novas strings
+
 ## [1.4.17] — 2026-03-26
 
 ### Added

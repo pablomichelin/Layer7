@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.17 — Categorias customizadas de blacklist (UT1 + local)**
+**Versão: 1.5.0 — Auditoria de segurança e robustez**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,25 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.5.0 — Auditoria de segurança e robustez (2026-03-26):**
+  - FIX CRITICO: daemon passa a carregar blacklists UT1/custom no arranque (antes só carregava após SIGHUP)
+  - FIX CRITICO: `layer7_activate` passa a rejeitar chaves com caracteres perigosos (aspas, backslash, control chars) para evitar injecção JSON/shell
+  - FIX CRITICO: password de admin removida do `seed.js` do license server (lida de variável de ambiente `ADMIN_PASSWORD`)
+  - FIX ALTO: `layer7_cidr_valid()` passa a validar octetos 0-255 (antes aceitava `999.999.0.0/24`)
+  - FIX ALTO: regras PF de blacklist passam a validar `except_ips` e `src_cidrs` antes de interpolar no ruleset
+  - FIX ALTO: todos os `confirm()` e labels JS em 6 paginas PHP passam a usar `json_encode()` para prevenir quebra de JS/XSS
+  - FIX MEDIO: NULL checks em `json_escape_fprint`, `json_escape_print` e `dst_cache_add` para prevenir crash
+  - FIX MEDIO: swap de blacklists protegido contra reload falhado (preserva versao anterior funcional)
+  - FIX MEDIO: warning restaurado no carregamento de categorias quando ambos ficheiros (UT1 + custom) falham
+  - FIX MEDIO: whitelist de blacklists passa a usar `layer7_bl_domains_normalize()` para validar dominios
+  - FIX MEDIO: `source_url` de blacklists validado contra esquemas nao-HTTP (javascript:, file:, etc.)
+  - FIX MEDIO: simulação de políticas em `layer7_test.php` passa a ordenar por `priority` (consistente com daemon)
+  - FIX MEDIO: lock atomico no `update-blacklists.sh` (mkdir em vez de test+echo para evitar TOCTOU)
+  - FIX BAIXO: numeração de passos no `install.sh` corrigida ([1/5]-[3/5] → [1/6]-[3/6])
+  - FIX BAIXO: texto de ajuda de excepcoes corrigido (max. 8 → max. 16, alinhado com o parser)
+  - FIX BAIXO: verificação de retorno de `rename()` no stats JSON com log de erro
+  - Traduções EN actualizadas para novas strings
+  - PORTVERSION incrementado para 1.5.0
 - **v1.4.17 — Categorias customizadas de blacklist no mesmo fluxo UT1 (2026-03-26):**
   - pagina `Blacklists` passa a permitir criar categorias locais com dominios proprios sem criar nova tela
   - operador passa a poder estender categorias existentes da UT1 com dominios adicionais nao presentes no feed da Capitole
@@ -418,7 +437,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.4.17 — Publicar release com categorias customizadas de blacklist (UT1 + local).**
+**v1.5.0 — Publicar release com auditoria de segurança e robustez.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico

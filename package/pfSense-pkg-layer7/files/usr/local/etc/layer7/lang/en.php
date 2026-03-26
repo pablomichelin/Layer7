@@ -647,4 +647,9 @@ $L7_STRINGS = array(
     "verificar regras anti-DoT/DoQ activas" => "check active anti-DoT/DoQ rules",
     "verificar se Private Relay retorna NXDOMAIN" => "check if Private Relay returns NXDOMAIN",
     "— qualquer —" => "— any —",
+    "Um IPv4 por linha (max. 16). Pode combinar com CIDRs." => "One IPv4 per line (max. 16). Can combine with CIDRs.",
+    "Um CIDR por linha (max. 16). Ex.: 192.168.0.0/24" => "One CIDR per line (max. 16). E.g.: 192.168.0.0/24",
+    "Um CIDR por linha (max. 16)." => "One CIDR per line (max. 16).",
+    "URL invalida. Apenas HTTP e HTTPS sao suportados." => "Invalid URL. Only HTTP and HTTPS are supported.",
+    "Sem categorias disponiveis. Faca o download da UT1 ou adicione uma categoria personalizada abaixo." => "No categories available. Download the UT1 list or add a custom category below.",
 );

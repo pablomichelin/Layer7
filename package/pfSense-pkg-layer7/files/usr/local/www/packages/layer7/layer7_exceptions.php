@@ -365,7 +365,7 @@ function layer7_exc_target_summary($exception) {
 					<label class="col-sm-3 control-label"><?= l7_t("Hosts (IPv4)"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_hosts_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
+						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Pode combinar com CIDRs."); ?></p>
 					</div>
 				</div>
 
@@ -373,7 +373,7 @@ function layer7_exc_target_summary($exception) {
 					<label class="col-sm-3 control-label"><?= l7_t("CIDRs"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_cidrs" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_cidrs_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Ex.: 192.168.0.0/24"); ?></p>
+						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 16). Ex.: 192.168.0.0/24"); ?></p>
 					</div>
 				</div>
 
@@ -457,7 +457,7 @@ function layer7_exc_target_summary($exception) {
 					<label class="col-sm-3 control-label"><?= l7_t("Hosts (IPv4)"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="10.0.0.99&#10;10.0.0.100"></textarea>
-						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 8). Pode combinar com CIDRs."); ?></p>
+						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Pode combinar com CIDRs."); ?></p>
 					</div>
 				</div>
 
@@ -465,7 +465,7 @@ function layer7_exc_target_summary($exception) {
 					<label class="col-sm-3 control-label"><?= l7_t("CIDRs"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_cidrs" class="form-control" rows="2" style="max-width:400px" placeholder="192.168.77.0/24"></textarea>
-						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8)."); ?></p>
+						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 16)."); ?></p>
 					</div>
 				</div>
 

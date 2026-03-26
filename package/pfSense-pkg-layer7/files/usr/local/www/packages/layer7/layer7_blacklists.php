@@ -54,9 +54,11 @@ $custom_map = layer7_bl_category_custom_get($bl_config);
 /* POST: Download */
 if (isset($_POST["do_download"])) {
 	$url = trim($_POST["source_url"] ?? "");
-	if ($url !== "") {
+	if ($url !== "" && preg_match('#^https?://#i', $url)) {
 		$bl_config["source_url"] = $url;
 		layer7_bl_config_save($bl_config);
+	} elseif ($url !== "") {
+		$input_errors[] = l7_t("URL invalida. Apenas HTTP e HTTPS sao suportados.");
 	}
 	layer7_bl_download_start();
 	$savemsg = l7_t("Download iniciado. Acompanhe o progresso abaixo.");
@@ -165,7 +167,7 @@ if (isset($_POST["delete_rule"])) {
 /* POST: Save whitelist */
 if (isset($_POST["save_whitelist"])) {
 	$wl_raw = trim($_POST["whitelist"] ?? "");
-	$wl = array_values(array_filter(array_map("trim", preg_split('/[\r\n]+/', $wl_raw))));
+	$wl = layer7_bl_domains_normalize($wl_raw);
 	$bl_config["whitelist"] = $wl;
 	layer7_bl_config_save($bl_config);
 	layer7_bl_apply();
@@ -359,7 +361,7 @@ layer7_render_styles();
 	<td class="layer7-table-actions">
 		<a href="?edit=<?=$idx?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
 		<form method="post" style="display:inline;"
-			onsubmit="return confirm('<?=l7_t("Remover esta regra?")?>');">
+			onsubmit="return confirm(<?=json_encode(l7_t('Remover esta regra'))?>);">
 			<input type="hidden" name="rule_index" value="<?=$idx?>">
 			<button type="submit" name="delete_rule" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
 		</form>
@@ -522,7 +524,7 @@ if ($show_form):
 	<td><?=number_format(count($domains), 0, ',', '.')?></td>
 	<td class="layer7-table-actions">
 		<a href="?cat_edit=<?=urlencode($cid)?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
-		<form method="post" style="display:inline;" onsubmit="return confirm('<?=l7_t("Remover categoria personalizada?")?>');">
+		<form method="post" style="display:inline;" onsubmit="return confirm(<?=json_encode(l7_t('Remover categoria personalizada?'))?>);">
 			<input type="hidden" name="cat_id" value="<?=htmlspecialchars($cid)?>">
 			<button type="submit" name="delete_cat_sites" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
 		</form>

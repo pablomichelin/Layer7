@@ -574,7 +574,7 @@ function layer7_policy_match_summary($policy) {
 				<?php if ($prof_exists) { ?>
 				<span class="label label-info"><?= l7_t("Ja aplicado"); ?></span>
 				<?php } else { ?>
-				<button type="button" class="btn btn-sm btn-success" onclick="l7showProfileModal('<?= $prof_id; ?>', '<?= $prof_name; ?>');"><?= l7_t("Aplicar"); ?></button>
+				<button type="button" class="btn btn-sm btn-success" onclick="l7showProfileModal(<?= json_encode($prof_id) ?>, <?= json_encode($prof_name) ?>);"><?= l7_t("Aplicar"); ?></button>
 				<?php } ?>
 			</div>
 		<?php } ?>

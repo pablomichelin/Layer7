@@ -403,6 +403,17 @@ layer7_license_check(struct l7_license_info *info)
 
 /* --- online activation (stub — requires license server) --- */
 
+static int
+json_safe_string(const char *s)
+{
+	for (; *s; s++) {
+		if (*s == '"' || *s == '\\' || *s == '\'' ||
+		    (unsigned char)*s < 0x20)
+			return 0;
+	}
+	return 1;
+}
+
 int
 layer7_activate(const char *key, const char *url)
 {
@@ -413,6 +424,13 @@ layer7_activate(const char *key, const char *url)
 
 	if (!key || key[0] == '\0') {
 		fprintf(stderr, "layer7d: activation key is required\n");
+		return -1;
+	}
+
+	if (!json_safe_string(key)) {
+		fprintf(stderr,
+		    "layer7d: activation key contains invalid characters "
+		    "(no quotes, backslashes or control chars allowed)\n");
 		return -1;
 	}
 
@@ -433,16 +451,6 @@ layer7_activate(const char *key, const char *url)
 	snprintf(body, sizeof(body),
 	    "{\"key\":\"%s\",\"hardware_id\":\"%s\"}", key, hw_id);
 
-	snprintf(cmd, sizeof(cmd),
-	    "/usr/bin/fetch -qo %s -T 15 "
-	    "-H 'Content-Type: application/json' "
-	    "\"POST:%s\" <<'EOFBODY'\n%s\nEOFBODY",
-	    L7_LIC_PATH, url, body);
-
-	/*
-	 * For V1 without a license server, use curl if available,
-	 * otherwise fall back to fetch. Both are common on FreeBSD.
-	 */
 	snprintf(cmd, sizeof(cmd),
 	    "curl -sf -o %s -X POST "
 	    "-H 'Content-Type: application/json' "

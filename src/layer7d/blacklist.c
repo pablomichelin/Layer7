@@ -327,6 +327,9 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 				loaded += custom_loaded;
 		}
 		if (loaded <= 0) {
+			L7_WARN("bl_load: category %s — no domains "
+			    "found (base=%s custom=%s)",
+			    cats[i], path, custom_path);
 			continue;
 		}
 

@@ -90,15 +90,15 @@ fi
 
 # --- Parar daemon se estiver a correr ---
 if pgrep -q layer7d 2>/dev/null; then
-    echo "[1/5] Parando daemon existente..."
+    echo "[1/6] Parando daemon existente..."
     service layer7d onestop 2>/dev/null || true
     sleep 1
 else
-    echo "[1/5] Nenhum daemon a correr."
+    echo "[1/6] Nenhum daemon a correr."
 fi
 
 # --- Baixar pacote ---
-echo "[2/5] Baixando pacote do GitHub..."
+echo "[2/6] Baixando pacote do GitHub..."
 if ! fetch -o "/tmp/${PKG_NAME}" "${PKG_URL}" 2>/dev/null; then
     echo ""
     echo "ERRO: Não foi possível baixar ${PKG_URL}"
@@ -108,7 +108,7 @@ fi
 echo "  Baixado: $(ls -lh /tmp/${PKG_NAME} | awk '{print $5}')"
 
 # --- Instalar ---
-echo "[3/5] Instalando pacote..."
+echo "[3/6] Instalando pacote..."
 if ! IGNORE_OSVERSION=yes pkg add -f "/tmp/${PKG_NAME}" 2>&1; then
     echo ""
     echo "ERRO: Instalação falhou."

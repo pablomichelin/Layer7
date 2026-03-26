@@ -606,7 +606,7 @@ layer7_render_styles();
 						</div>
 						<form method="post" class="layer7-inline-form">
 							<button type="submit" name="revoke_license" value="1" class="btn btn-danger"
-								onclick="return confirm('<?= l7_t("Deseja revogar a licenca activa?"); ?>');">
+								onclick="return confirm(<?= json_encode(l7_t('Deseja revogar a licenca activa?')) ?>);">
 								<i class="fa fa-ban"></i> <?= l7_t("Revogar licenca"); ?>
 							</button>
 						</form>
@@ -658,7 +658,7 @@ layer7_render_styles();
 						</div>
 						<div class="layer7-form-card__actions">
 							<button type="submit" name="import_config" value="1" class="btn btn-warning"
-								onclick="return confirm('<?= l7_t("Substituir a configuracao actual? Esta accao nao pode ser desfeita."); ?>');">
+								onclick="return confirm(<?= json_encode(l7_t('Substituir a configuracao actual? Esta accao nao pode ser desfeita.')) ?>);">
 								<i class="fa fa-upload"></i> <?= l7_t("Importar"); ?>
 							</button>
 						</div>
@@ -812,7 +812,7 @@ layer7_render_styles();
 					<form method="post">
 						<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
 						<button type="submit" name="do_update" value="1" class="btn btn-success"
-							onclick="return confirm('<?= l7_t("Actualizar o pacote Layer7? O daemon sera reiniciado."); ?>');">
+							onclick="return confirm(<?= json_encode(l7_t('Actualizar o pacote Layer7? O daemon sera reiniciado.')) ?>);">
 							<i class="fa fa-download"></i>
 							<?= l7_t("Actualizar para ") . htmlspecialchars($update_info["latest"]); ?>
 						</button>

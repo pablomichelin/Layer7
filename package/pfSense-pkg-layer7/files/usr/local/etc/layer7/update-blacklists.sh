@@ -31,7 +31,7 @@ log() {
 
 cleanup() {
 	rm -rf "$TMP"
-	rm -f "$LOCK"
+	rmdir "$LOCK" 2>/dev/null || true
 }
 trap cleanup EXIT
 
@@ -50,11 +50,10 @@ do_apply() {
 }
 
 do_download() {
-	if [ -f "$LOCK" ]; then
+	if ! mkdir "$LOCK" 2>/dev/null; then
 		log "ERROR: update already running (lock exists)"
 		exit 1
 	fi
-	echo $$ > "$LOCK"
 
 	BL_URL=""
 	if [ -f "$CONFIG" ]; then

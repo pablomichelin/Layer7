@@ -441,9 +441,9 @@ if (typeof Chart !== 'undefined' && timeline.length > 0) {
 		data: {
 			labels: labels,
 			datasets: [
-				{ label: '<?= l7_t("Bloqueados"); ?>', data: timeline.map(function(x){return x.blocked_events;}), borderColor: '#d9534f', backgroundColor: 'rgba(217,83,79,0.08)', fill: true, tension: 0.25, pointRadius: 2 },
-				{ label: '<?= l7_t("Permitidos"); ?>', data: timeline.map(function(x){return x.allowed_events;}), borderColor: '#5cb85c', backgroundColor: 'rgba(92,184,92,0.08)', fill: true, tension: 0.25, pointRadius: 2 },
-				{ label: '<?= l7_t("Total"); ?>', data: timeline.map(function(x){return x.total_events;}), borderColor: '#337ab7', backgroundColor: 'rgba(51,122,183,0.08)', fill: true, tension: 0.25, pointRadius: 2 }
+			{ label: <?= json_encode(l7_t("Bloqueados")) ?>, data: timeline.map(function(x){return x.blocked_events;}), borderColor: '#d9534f', backgroundColor: 'rgba(217,83,79,0.08)', fill: true, tension: 0.25, pointRadius: 2 },
+			{ label: <?= json_encode(l7_t("Permitidos")) ?>, data: timeline.map(function(x){return x.allowed_events;}), borderColor: '#5cb85c', backgroundColor: 'rgba(92,184,92,0.08)', fill: true, tension: 0.25, pointRadius: 2 },
+			{ label: <?= json_encode(l7_t("Total")) ?>, data: timeline.map(function(x){return x.total_events;}), borderColor: '#337ab7', backgroundColor: 'rgba(51,122,183,0.08)', fill: true, tension: 0.25, pointRadius: 2 }
 			]
 		},
 		options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }

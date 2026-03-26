@@ -2,10 +2,15 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const pool = require('./src/db');
 
-const ADMIN_EMAIL = 'pablo@systemup.inf.br';
-const ADMIN_NAME = 'Pablo Michelin';
-const ADMIN_PASSWORD = 'P@blo.147';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'pablo@systemup.inf.br';
+const ADMIN_NAME = process.env.ADMIN_NAME || 'Pablo Michelin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const BCRYPT_ROUNDS = 12;
+
+if (!ADMIN_PASSWORD) {
+  console.error('[SEED] ERRO: variavel ADMIN_PASSWORD nao definida. Defina em .env ou como variavel de ambiente.');
+  process.exit(1);
+}
 
 async function seed() {
   try {

@@ -155,22 +155,22 @@ function layer7_generate_rules($type)
 				}
 				$table = "layer7_bld_" . (int)$idx;
 				$rname = preg_replace('/[^a-zA-Z0-9_-]/', '', $brule["name"] ?? "rule{$idx}");
-				if (!empty($brule["except_ips"])) {
-					foreach ($brule["except_ips"] as $eip) {
-						$eip = trim($eip);
-						if ($eip !== "") {
-							$rules .= "pass quick inet from {$eip} to <{$table}> label \"layer7:bl:except:{$rname}\"\n";
-						}
+			if (!empty($brule["except_ips"])) {
+				foreach ($brule["except_ips"] as $eip) {
+					$eip = trim($eip);
+					if ($eip !== "" && layer7_ipv4_valid($eip)) {
+						$rules .= "pass quick inet from {$eip} to <{$table}> label \"layer7:bl:except:{$rname}\"\n";
 					}
 				}
-				if (!empty($brule["src_cidrs"])) {
-					foreach ($brule["src_cidrs"] as $cidr) {
-						$cidr = trim($cidr);
-						if ($cidr !== "") {
-							$rules .= "block drop quick inet from {$cidr} to <{$table}> label \"layer7:bl:{$rname}\"\n";
-						}
+			}
+			if (!empty($brule["src_cidrs"])) {
+				foreach ($brule["src_cidrs"] as $cidr) {
+					$cidr = trim($cidr);
+					if ($cidr !== "" && (layer7_cidr_valid($cidr) || layer7_ipv4_valid($cidr))) {
+						$rules .= "block drop quick inet from {$cidr} to <{$table}> label \"layer7:bl:{$rname}\"\n";
 					}
-				} else {
+				}
+			} else {
 					$rules .= "block drop quick inet to <{$table}> label \"layer7:bl:{$rname}\"\n";
 				}
 			}
@@ -544,7 +544,7 @@ function layer7_ipv4_valid($s)
 	return true;
 }
 
-/* CIDR a.b.c.d/n (n 0-32) */
+/* CIDR a.b.c.d/n (n 0-32, octetos 0-255) */
 function layer7_cidr_valid($s)
 {
 	if (!is_string($s) || strlen($s) > 48) {
@@ -552,6 +552,11 @@ function layer7_cidr_valid($s)
 	}
 	if (preg_match('/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d+)$/', $s, $m) !== 1) {
 		return false;
+	}
+	for ($i = 1; $i <= 4; $i++) {
+		if ((int)$m[$i] > 255) {
+			return false;
+		}
 	}
 	$n = (int)$m[5];
 	return $n >= 0 && $n <= 32;

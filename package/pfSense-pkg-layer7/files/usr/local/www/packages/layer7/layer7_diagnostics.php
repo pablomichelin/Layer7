@@ -552,7 +552,7 @@ layer7_render_styles();
 						<?php if ($unbound_anti_doh) { ?>
 						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Overrides anti-DoH configurados no Unbound."); ?></span>
 						<form method="post" class="layer7-inline-form" style="display:inline; margin-left:8px;">
-							<button type="submit" name="remove_anti_doh" value="1" class="btn btn-xs btn-danger" title="<?= l7_t("Remove os overrides anti-DoH do Unbound."); ?>" onclick="return confirm('<?= l7_t("Remover overrides anti-DoH do Unbound?"); ?>');">
+							<button type="submit" name="remove_anti_doh" value="1" class="btn btn-xs btn-danger" title="<?= l7_t("Remove os overrides anti-DoH do Unbound."); ?>" onclick="return confirm(<?= json_encode(l7_t('Remover overrides anti-DoH do Unbound?')) ?>);">
 								<i class="fa fa-trash"></i> <?= l7_t("Remover"); ?>
 							</button>
 						</form>

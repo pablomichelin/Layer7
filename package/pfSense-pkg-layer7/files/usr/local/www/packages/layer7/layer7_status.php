@@ -294,7 +294,7 @@ layer7_render_styles();
 		<div class="layer7-toolbar">
 			<form method="post" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
 				<button type="submit" name="restart_service" value="1" class="btn btn-warning"
-					onclick="return confirm('<?= l7_t("Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart."); ?>');">
+					onclick="return confirm(<?= json_encode(l7_t('Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart.')) ?>);">
 					<i class="fa fa-refresh"></i> <?= l7_t("Reiniciar servico"); ?>
 				</button>
 			</form>

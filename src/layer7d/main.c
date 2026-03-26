@@ -243,7 +243,8 @@ write_stats_json(void)
 
 	fprintf(f, "}\n");
 	fclose(f);
-	rename(L7_STATS_JSON_PATH ".tmp", L7_STATS_JSON_PATH);
+	if (rename(L7_STATS_JSON_PATH ".tmp", L7_STATS_JSON_PATH) != 0)
+		L7_WARN("stats: rename tmp failed: %s", strerror(errno));
 }
 
 static char s_remote_host[256];
@@ -254,6 +255,8 @@ static time_t s_debug_until;
 static void
 json_escape_print(const char *s)
 {
+	if (!s)
+		return;
 	for (; *s; s++) {
 		if (*s == '"' || *s == '\\')
 			putchar('\\');
@@ -264,6 +267,8 @@ json_escape_print(const char *s)
 static void
 json_escape_fprint(FILE *f, const char *s)
 {
+	if (!s)
+		return;
 	for (; *s; s++) {
 		if (*s == '"' || *s == '\\')
 			fputc('\\', f);
@@ -572,6 +577,9 @@ dst_cache_add(const char *ip, uint32_t ttl)
 	int i;
 	time_t expires;
 	uint32_t eff_ttl = ttl < L7_DST_TTL_MIN ? L7_DST_TTL_MIN : ttl;
+
+	if (!ip || ip[0] == '\0')
+		return;
 
 	expires = time(NULL) + (time_t)eff_ttl;
 
@@ -1667,6 +1675,59 @@ int main(int argc, char **argv)
 		s_ge = 0;
 	}
 
+	/* Load blacklists at startup (same logic as SIGHUP reload) */
+	{
+		struct l7_bl_config bl_cfg;
+		memset(&bl_cfg, 0, sizeof(bl_cfg));
+		if (l7_bl_config_load(L7_BL_DIR_DEFAULT "/config.json",
+		    &bl_cfg) == 0
+		    && bl_cfg.enabled && bl_cfg.n_rules > 0) {
+			const char *all_cats[L7_BL_MAX_CATS];
+			const char *bwl[L7_BL_WL_MAX];
+			int all_n = 0, ri, ci, ai, found;
+
+			for (ri = 0; ri < bl_cfg.n_rules; ri++) {
+				for (ci = 0;
+				    ci < bl_cfg.rules[ri].n_categories;
+				    ci++) {
+					found = 0;
+					for (ai = 0; ai < all_n; ai++) {
+						if (strcmp(all_cats[ai],
+						    bl_cfg.rules[ri]
+						    .categories[ci]) == 0) {
+							found = 1;
+							break;
+						}
+					}
+					if (!found &&
+					    all_n < L7_BL_MAX_CATS)
+						all_cats[all_n++] =
+						    bl_cfg.rules[ri]
+						    .categories[ci];
+				}
+			}
+			for (ai = 0; ai < bl_cfg.n_whitelist; ai++)
+				bwl[ai] = bl_cfg.whitelist[ai];
+
+			memcpy(s_bl_rules, bl_cfg.rules,
+			    sizeof(bl_cfg.rules));
+			s_bl_n_rules = bl_cfg.n_rules;
+
+			if (all_n > 0) {
+				s_blacklist = l7_blacklist_load(
+				    L7_BL_DIR_DEFAULT, all_cats, all_n,
+				    bwl, bl_cfg.n_whitelist);
+			}
+			L7_NOTE("blacklists_startup: %d domains in "
+			    "%d categories, %d rules",
+			    s_blacklist ?
+			    l7_blacklist_count(s_blacklist) : 0,
+			    s_blacklist ?
+			    l7_blacklist_cat_count(s_blacklist) : 0,
+			    s_bl_n_rules);
+		}
+	}
+
 	open_captures();
 
 	for (;;) {
@@ -1831,10 +1892,16 @@ int main(int argc, char **argv)
 					}
 				}
 
-				old_bl = s_blacklist;
-				s_blacklist = new_bl;
-				if (old_bl)
-					l7_blacklist_free(old_bl);
+				if (new_bl || all_n == 0) {
+					old_bl = s_blacklist;
+					s_blacklist = new_bl;
+					if (old_bl)
+						l7_blacklist_free(old_bl);
+				} else if (s_blacklist) {
+					L7_WARN("blacklists: keeping "
+					    "previous blacklist "
+					    "(reload failed)");
+				}
 			}
 		}
 
