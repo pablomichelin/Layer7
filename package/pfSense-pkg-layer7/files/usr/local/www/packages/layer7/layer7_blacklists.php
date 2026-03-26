@@ -238,10 +238,6 @@ if (isset($_GET["add"])) {
 	$edit_idx = -2;
 }
 
-$cat_edit = strtolower(trim($_GET["cat_edit"] ?? ""));
-if (!layer7_bl_category_id_valid($cat_edit) || !isset($custom_map[$cat_edit])) {
-	$cat_edit = "";
-}
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Blacklists"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
@@ -521,7 +517,6 @@ if ($show_form):
 	</td>
 	<td><?=number_format(count($domains), 0, ',', '.')?></td>
 	<td class="layer7-table-actions">
-		<a href="?cat_edit=<?=urlencode($cid)?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
 		<form method="post" style="display:inline;" onsubmit="return confirm(<?=json_encode(l7_t('Remover categoria personalizada?'))?>);">
 			<input type="hidden" name="cat_id" value="<?=htmlspecialchars($cid)?>">
 			<button type="submit" name="delete_cat_sites" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
@@ -534,42 +529,27 @@ if ($show_form):
 </div>
 <?php endif; ?>
 
-<?php
-$cat_form_id = $cat_edit !== "" ? $cat_edit : "";
-$cat_form_sites = $cat_edit !== "" && isset($custom_map[$cat_edit]) ? implode("\n", $custom_map[$cat_edit]) : "";
-$_cat_editing = ($cat_edit !== "");
-?>
-<?php if (!$_cat_editing) { ?>
 <div style="margin-top:12px; margin-bottom:8px;">
 	<a data-toggle="collapse" href="#l7-new-cat-form" class="btn btn-sm btn-success">
 		<i class="fa fa-plus"></i> <?= l7_t("Nova categoria personalizada") ?>
 	</a>
 </div>
-<?php } ?>
-<div id="l7-new-cat-form" class="<?= $_cat_editing ? '' : 'collapse' ?>">
+<div id="l7-new-cat-form" class="collapse">
 <div class="layer7-form-card">
-<h4 class="layer7-form-card__title"><?= $_cat_editing ? l7_t("Editar categoria personalizada") : l7_t("Nova categoria personalizada") ?></h4>
+<h4 class="layer7-form-card__title"><?= l7_t("Nova categoria personalizada") ?></h4>
 <form method="post">
 <div class="form-group">
 	<label><?=l7_t("ID da categoria")?></label>
-	<input type="text" class="form-control" name="cat_id" value="<?=htmlspecialchars($cat_form_id)?>" list="l7_category_ids" placeholder="<?=l7_t("Ex: bloqueios_internos, erp, cloud_apps")?>" style="max-width:360px;" required>
-	<datalist id="l7_category_ids">
-	<?php foreach ($merged_categories as $mc): ?>
-	<option value="<?=htmlspecialchars($mc["id"] ?? "")?>"></option>
-	<?php endforeach; ?>
-	</datalist>
+	<input type="text" class="form-control" name="cat_id" value="" placeholder="<?=l7_t("Ex: bloqueios_internos, erp, cloud_apps")?>" style="max-width:360px;" required>
 	<p class="help-block"><?=l7_t("Use letras minusculas, numeros, underscore (_) e hifen (-).")?></p>
 </div>
 <div class="form-group">
 	<label><?=l7_t("Dominios da categoria (um por linha)")?></label>
-	<textarea class="form-control" name="cat_sites" rows="6" style="font-family:monospace; max-width:520px;" placeholder="<?=l7_t("Ex: site1.com\nsub.site2.com")?>" required><?=htmlspecialchars($cat_form_sites)?></textarea>
+	<textarea class="form-control" name="cat_sites" rows="6" style="font-family:monospace; max-width:520px;" placeholder="<?=l7_t("Ex: site1.com\nsub.site2.com")?>" required></textarea>
 	<p class="help-block"><?=l7_t("Se o ID for de uma categoria UT1 existente, estes dominios serao adicionados a ela. Se for novo, cria uma categoria local.")?></p>
 </div>
 <div class="layer7-form-card__actions">
 	<button type="submit" name="save_cat_sites" class="btn btn-primary"><i class="fa fa-save"></i> <?=l7_t("Guardar categoria")?></button>
-	<?php if ($cat_edit !== ""): ?>
-	<a href="layer7_blacklists.php" class="btn btn-default"><?=l7_t("Cancelar")?></a>
-	<?php endif; ?>
 </div>
 </form>
 </div>

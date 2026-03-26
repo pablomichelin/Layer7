@@ -2,6 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.1] — 2026-03-26
+
+### Changed
+
+- **Blacklists: removida opção de editar categorias** — mantém apenas criar novas e apagar; datalist de categorias UT1 removida para evitar confusão
+- **Backup completo** — export/import passa a incluir configuração de blacklists (regras, whitelist, categorias personalizadas, definições de update); permite restaurar TODAS as configurações do pacote após formatação
+- **PORTVERSION** bumped para 1.6.1
+
 ## [1.6.0] — 2026-03-25
 
 ### Changed

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.6.0 — Reorganização do Frontend**
+**Versão: 1.6.1 — Blacklists simplificadas + Backup completo**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.6.1 — Blacklists simplificadas + Backup completo (2026-03-26):**
+  - Removida opção de editar categorias personalizadas em Blacklists — mantém criar novas e apagar
+  - Removida datalist de categorias UT1 do formulário de nova categoria (evita confusão)
+  - Backup completo: export/import passa a incluir configuração de blacklists (regras, whitelist, categorias custom, definições)
+  - Import restaura automaticamente blacklists config e sincroniza ficheiros de categorias personalizadas
+  - PORTVERSION incrementado para 1.6.1
 - **v1.5.3 — Tabelas PF persistentes (2026-03-26):**
   - FIX: tabelas PF (layer7_block, layer7_block_dst, layer7_bld_N) agora são materializadas automaticamente após cada reload do filtro via hook `custom_php_resync_command`
   - No FreeBSD 15 / pfSense 2.8.1, tabelas declaradas com `persist` no ruleset existem internamente mas não aparecem em `pfctl -s Tables` até terem pelo menos uma entrada — causando falso negativo no diagnóstico

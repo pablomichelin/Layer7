@@ -1,18 +1,12 @@
-## Layer7 v1.6.0 — Reorganização do Frontend
+## Layer7 v1.6.1 — Blacklists simplificadas + Backup completo
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Principais mudanças
 
-- **Navegação reduzida de 11 para 7 abas** — Grupos, Excepções, Categorias e Teste movidos para links rápidos em Políticas
-- **Dashboard simplificado** — removidos bloco de validação de config e contadores PF duplicados
-- **Definições reorganizadas** — 3 blocos claros: Serviço, Relatórios, Sistema (licença + backup + update)
-- **Eventos limpos** — apenas Monitor ao vivo + Filtro + Todos os logs
-- **Relatórios limpos** — alertas consolidados, removido resumo em prosa duplicado
-- **Diagnósticos limpos** — secções PF verbose colapsáveis, removidos "Comandos úteis"
-- **Blacklists limpos** — form "Nova categoria" agora colapsável
-- **Políticas limpos** — barra de links rápidos, zona remover colapsável
-- **i18n padronizado** — nomes de abas em português
+- **Blacklists: removida opção de editar categorias** — mantém criar novas e apagar; datalist de categorias UT1 removida
+- **Backup completo** — export/import inclui configuração de blacklists (regras, whitelist, categorias personalizadas, definições de update)
+- Permite restaurar TODAS as configurações do pacote após formatação da máquina
 
 ### Instalacao (um comando)
 
