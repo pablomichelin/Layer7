@@ -2,6 +2,18 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.5.3] — 2026-03-26
+
+### Fixed
+
+- **Tabelas PF persistentes após reload** — novo hook `custom_php_resync_command` materializa todas as tabelas PF obrigatórias (`layer7_block`, `layer7_block_dst`, `layer7_tagged`, `layer7_bld_N`) adicionando e removendo um IP dummy (127.0.0.254) após cada `filter_configure()`
+- **Causa raiz**: no FreeBSD 15 / pfSense 2.8.1, tabelas declaradas com `table <name> persist` no ruleset existem internamente no PF mas não são listadas por `pfctl -s Tables` nem acessíveis por `pfctl -t <name> -T show` até terem pelo menos uma entrada. Isso causava falsos negativos recorrentes na página de Diagnósticos
+- **Nova função `layer7_resync()`** chamada automaticamente pelo pfSense após cada reload do filtro
+
+### Changed
+
+- **PORTVERSION** bumped para 1.5.3
+
 ## [1.5.2] — 2026-03-26
 
 ### Fixed

@@ -1,10 +1,10 @@
-## Layer7 v1.5.2 — Fix limpeza de relatórios
+## Layer7 v1.5.3 — Tabelas PF persistentes
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Correcção
 
-- **Fix crítico na limpeza de relatórios** — ao clicar "Limpar todos os dados", o cursor de ingestão agora é posicionado no fim do ficheiro de log actual, evitando que todo o histórico seja reimportado imediatamente na mesma carga da página (causava o efeito de "dados não foram apagados")
+- **Fix definitivo para tabelas PF em vermelho** — no FreeBSD 15 / pfSense 2.8.1, tabelas PF declaradas com `persist` no ruleset existem internamente mas não são visíveis em `pfctl -s Tables` até terem pelo menos uma entrada. Novo hook `custom_php_resync_command` materializa automaticamente todas as tabelas obrigatórias após cada reload do filtro, eliminando o erro recorrente na página de Diagnósticos.
 
 ### Inclui todas as funcionalidades anteriores
 

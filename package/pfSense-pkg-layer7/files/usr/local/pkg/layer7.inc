@@ -124,6 +124,35 @@ function layer7_pf_rules_text()
 	return layer7_pf_default_rules_text();
 }
 
+function layer7_ensure_pf_table($table)
+{
+	$out = array();
+	$rc = 0;
+	exec("/sbin/pfctl -t " . escapeshellarg($table) . " -T show 2>/dev/null", $out, $rc);
+	if ($rc === 0) {
+		return true;
+	}
+	exec("/sbin/pfctl -t " . escapeshellarg($table) .
+		" -T add 127.0.0.254 2>/dev/null", $out, $rc);
+	exec("/sbin/pfctl -t " . escapeshellarg($table) .
+		" -T delete 127.0.0.254 2>/dev/null", $out, $rc);
+	return true;
+}
+
+function layer7_resync()
+{
+	layer7_ensure_pf_table("layer7_block");
+	layer7_ensure_pf_table("layer7_block_dst");
+	layer7_ensure_pf_table("layer7_tagged");
+
+	$bl_config = layer7_bl_config_load();
+	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
+		foreach ($bl_config["rules"] as $idx => $rule) {
+			layer7_ensure_pf_table("layer7_bld_" . (int)$idx);
+		}
+	}
+}
+
 function layer7_generate_rules($type)
 {
 	$type = (string)$type;
