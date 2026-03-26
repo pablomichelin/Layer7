@@ -9,9 +9,9 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 | **Desenvolvido por** | [Systemup](https://www.systemup.inf.br) Solucao em Tecnologia |
 | **Desenvolvedor principal** | Pablo Michelin |
 | **Website** | <https://www.systemup.inf.br> |
-| **Distribuicao publica** | <https://github.com/pablomichelin/pfsense-layer7> |
+| **Distribuicao publica** | <https://github.com/pablomichelin/Layer7> |
 | **Licenca** | EULA (ver `LICENSE`) |
-| **Versao actual** | **1.4.15** |
+| **Versao actual** | **1.4.13** |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x - FreeBSD 14/15 |
 
 ## O que faz
@@ -64,7 +64,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 
 ```bash
 # No pfSense (SSH como root):
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
 Depois aceda a **Services > Layer 7** na GUI do pfSense.
@@ -87,7 +87,7 @@ samples/config/    # exemplos de layer7.json
 
 ## Distribuição
 
-Artefato **`.pkg`** via GitHub Releases do repositório público de distribuição `pablomichelin/pfsense-layer7`. Ver [Guia Completo §3](docs/tutorial/guia-completo-layer7.md#3-instalacao).
+Artefato **`.pkg`** via GitHub Releases do repositório público de distribuição `pablomichelin/Layer7`. Ver [Guia Completo §3](docs/tutorial/guia-completo-layer7.md#3-instalacao).
 
 Para frota (múltiplos firewalls): [`scripts/release/fleet-update.sh`](scripts/release/fleet-update.sh) e [`scripts/release/fleet-protos-sync.sh`](scripts/release/fleet-protos-sync.sh).
 
