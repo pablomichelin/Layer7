@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.14 — Robustez operacional das tabelas PF**
+**Versão: 1.4.15 — Correção enforce/licença e auditoria operacional**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,14 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.15 — Correção enforce/licença e auditoria operacional (2026-03-26):**
+  - `layer7d` passa a recomputar `enforce_cfg` por helper único após parse/licença (startup + recheck), removendo estado inconsistente com licença válida
+  - parser de `layer7` deixa de depender da ordem de chaves para `enabled`, `mode` e `log_level`
+  - `layer7-pfctl` e `rc.d` passam a expor falhas críticas de ensure de tabelas PF com logs claros (sem mascaramento silencioso)
+  - `Diagnostics` separa melhor “regras Layer7” de “enforcement real”, exigindo regras `layer7:block:*` + tabelas obrigatórias para estado saudável
+  - `MANUAL-INSTALL.md` alinhado aos comandos reais de serviço e rollback operacional
+  - `layer7_bl_ajax.php` alinhado ao bootstrap padrão (`guiconfig.inc`) e `en.php` sem duplicidade de chave
+  - PORTVERSION incrementado para 1.4.15
 - **v1.4.14 — Auto-recuperação de tabelas PF em runtime (2026-03-25):**
   - `layer7d` passa a tentar auto-recuperação quando `pfctl -T add` falha por tabela ausente, com `layer7-pfctl ensure`, fallback por `rules.debug` e retry único
   - ciclo de `SIGHUP` passa a validar tabelas base (`layer7_block`, `layer7_block_dst`) após reload, reduzindo estado inconsistente entre daemon activo e PF inválido

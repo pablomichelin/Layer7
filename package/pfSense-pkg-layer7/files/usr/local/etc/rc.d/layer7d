@@ -32,6 +32,8 @@ layer7d_ensure_pf_tables()
 
 layer7d_start()
 {
+	local _ensure_rc
+
 	/bin/mkdir -p /var/run
 	if [ -f "${pidfile}" ]; then
 		read -r _p < "${pidfile}" 2>/dev/null
@@ -41,6 +43,10 @@ layer7d_start()
 		/bin/rm -f "${pidfile}"
 	fi
 	layer7d_ensure_pf_tables
+	_ensure_rc=$?
+	if [ "${_ensure_rc}" -ne 0 ]; then
+		echo "${name}: PF ensure reported errors (rc=${_ensure_rc}), starting daemon in degraded mode." >&2
+	fi
 	/usr/sbin/daemon -f -p "${pidfile}" "${layer7d_bin}"
 }
 

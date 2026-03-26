@@ -1074,6 +1074,19 @@ cfg_disabled(const struct layer7_parsed *p)
 	return p->has_enabled && !p->enabled;
 }
 
+static void
+refresh_enforce_cfg(void)
+{
+	int ge = 0;
+
+	if (s_have_parse && !cfg_disabled(&s_parsed) &&
+	    s_parsed.has_mode && strcmp(s_parsed.mode, "enforce") == 0)
+		ge = 1;
+	if (ge && !s_lic.valid)
+		ge = 0;
+	s_ge = ge;
+}
+
 static int
 apply_config(int use_syslog)
 {
@@ -1351,9 +1364,6 @@ apply_config(int use_syslog)
 			s_nx = tx;
 			layer7_policies_sort(s_rules, s_np);
 			layer7_exceptions_sort(s_exc, s_nx);
-			s_ge = p.has_mode && strcmp(p.mode, "enforce") == 0;
-			if (s_ge && !s_lic.valid)
-				s_ge = 0;
 			s_reload_ok++;
 			pe_loaded = 1;
 		} else {
@@ -1372,6 +1382,8 @@ apply_config(int use_syslog)
 	s_parsed = p;
 	s_have_parse = 1;
 	set_ll_from_parsed(&p);
+	if (pe_loaded)
+		refresh_enforce_cfg();
 
 	if (p.has_debug_minutes) {
 		if (p.debug_minutes <= 0)
@@ -1648,6 +1660,7 @@ int main(int argc, char **argv)
 			    "features=%s days_left=%d",
 			    s_lic.customer, s_lic.expiry,
 			    s_lic.features, s_lic.days_left);
+		refresh_enforce_cfg();
 	} else {
 		L7_WARN("license: INVALID — %s", s_lic.error);
 		L7_WARN("license: enforce disabled, monitor-only mode");
@@ -1827,6 +1840,7 @@ int main(int argc, char **argv)
 				memset(&li, 0, sizeof(li));
 				if (layer7_license_check(&li) == 0) {
 					s_lic = li;
+					refresh_enforce_cfg();
 					if (li.grace)
 						L7_WARN("license_recheck: %s",
 						    li.error);

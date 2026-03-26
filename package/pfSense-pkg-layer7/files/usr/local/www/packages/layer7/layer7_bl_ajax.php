@@ -6,6 +6,7 @@
 ##|*MATCH=layer7_bl_ajax.php*
 ##|-PRIV
 
+require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
 $action = isset($_GET["action"]) ? $_GET["action"] : "";
@@ -18,4 +19,5 @@ if ($action === "progress") {
 }
 
 header("HTTP/1.1 400 Bad Request");
+header("Content-Type: text/plain; charset=utf-8");
 echo "Unknown action";

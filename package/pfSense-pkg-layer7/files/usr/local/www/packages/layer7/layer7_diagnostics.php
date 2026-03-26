@@ -191,11 +191,16 @@ if (file_exists($pf_rules_debug_path)) {
 	exec("/usr/bin/grep -n 'layer7:block' " . escapeshellarg($pf_rules_debug_path) . " 2>/dev/null", $pf_rules_debug_hits, $pf_rules_debug_code);
 	$pf_rules_debug_has_layer7 = ($pf_rules_debug_code === 0 && count($pf_rules_debug_hits) > 0);
 }
-$pf_active_rules_hits = array();
-exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:' 2>/dev/null", $pf_active_rules_hits, $pf_active_rules_code);
-$pf_active_rules_loaded = ($pf_active_rules_code === 0 && count($pf_active_rules_hits) > 0);
+$pf_active_any_rules_hits = array();
+exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:' 2>/dev/null", $pf_active_any_rules_hits, $pf_active_any_rules_code);
+$pf_active_any_rules_loaded = ($pf_active_any_rules_code === 0 && count($pf_active_any_rules_hits) > 0);
+
+$pf_active_block_rules_hits = array();
+exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:block:' 2>/dev/null", $pf_active_block_rules_hits, $pf_active_block_rules_code);
+$pf_active_block_rules_loaded = ($pf_active_block_rules_code === 0 && count($pf_active_block_rules_hits) > 0);
+
 $pf_required_tables_ok = !$pf_any_missing;
-$pf_enforcement_real_ok = ($pf_active_rules_loaded && $pf_required_tables_ok);
+$pf_enforcement_real_ok = ($pf_active_block_rules_loaded && $pf_required_tables_ok);
 
 $pf_anti_dot_hits = array();
 exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:anti-' 2>/dev/null", $pf_anti_dot_hits, $pf_anti_dot_code);
@@ -345,7 +350,7 @@ layer7_render_styles();
 						<?php if ($pf_rules_debug_has_layer7) { ?>
 						<br><span class="text-success"><?= l7_t("Regra Layer7 encontrada no rules.debug atual."); ?></span>
 						<?php } else { ?>
-						<br><span class="text-warning"><?= l7_t("Arquivo presente, mas sem label layer7:block:src."); ?></span>
+						<br><span class="text-warning"><?= l7_t("Arquivo presente, mas sem regras layer7:block no rules.debug."); ?></span>
 						<?php } ?>
 						<?php } else { ?>
 						<span class="text-muted"><?= l7_t("Arquivo nao encontrado no appliance atual."); ?></span>
@@ -354,19 +359,21 @@ layer7_render_styles();
 
 					<dt><?= l7_t("Filtro ativo"); ?></dt>
 					<dd>
-						<?php if ($pf_active_rules_loaded) { ?>
-						<span class="text-success"><?= l7_t("Regra Layer7 encontrada em pfctl -sr."); ?></span>
+						<?php if ($pf_active_any_rules_loaded) { ?>
+						<span class="text-success"><?= l7_t("Regras Layer7 encontradas em pfctl -sr."); ?></span>
 						<?php } else { ?>
-						<span class="text-warning"><?= l7_t("Regra Layer7 ainda nao apareceu em pfctl -sr."); ?></span>
+						<span class="text-warning"><?= l7_t("Regras Layer7 ainda nao apareceram em pfctl -sr."); ?></span>
 						<?php } ?>
 					</dd>
 
 					<dt><?= l7_t("Enforcement real"); ?></dt>
 					<dd>
 						<?php if ($pf_enforcement_real_ok) { ?>
-						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Regra ativa e tabelas PF obrigatorias presentes."); ?></span>
-						<?php } elseif ($pf_active_rules_loaded && !$pf_required_tables_ok) { ?>
-						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Regra ativa, mas faltam tabelas PF obrigatorias."); ?></span>
+						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Regras layer7:block ativas e tabelas PF obrigatorias presentes."); ?></span>
+						<?php } elseif ($pf_active_block_rules_loaded && !$pf_required_tables_ok) { ?>
+						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Regras layer7:block ativas, mas faltam tabelas PF obrigatorias."); ?></span>
+						<?php } elseif ($pf_active_any_rules_loaded && !$pf_active_block_rules_loaded) { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Somente regras anti-bypass estao ativas; bloqueio por tabelas ainda nao esta ativo."); ?></span>
 						<?php } else { ?>
 						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Enforcement ainda nao validado no filtro ativo."); ?></span>
 						<?php } ?>
@@ -520,11 +527,11 @@ layer7_render_styles();
 		</div>
 		<?php } ?>
 
-		<?php if ($pf_active_rules_loaded && count($pf_active_rules_hits) > 0) { ?>
+		<?php if ($pf_active_any_rules_loaded && count($pf_active_any_rules_hits) > 0) { ?>
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Trecho de pfctl -sr"); ?></div>
 			<div class="layer7-admin-block__body">
-				<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_active_rules_hits, 0, 20))); ?></pre>
+				<pre class="pre-scrollable" style="max-height: 220px; font-size: 12px;"><?= htmlspecialchars(implode("\n", array_slice($pf_active_any_rules_hits, 0, 20))); ?></pre>
 			</div>
 		</div>
 		<?php } ?>

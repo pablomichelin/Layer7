@@ -116,7 +116,7 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 	srp = strstr(layer, "\"syslog_remote_port\"");
 	dm = strstr(layer, "\"debug_minutes\"");
 
-	if (en && (!pol || en < pol)) {
+	if (en) {
 		const char *q = strchr(en + 9, ':');
 		if (q && q < end) {
 			q++;
@@ -126,7 +126,7 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 		}
 	}
 
-	if (mo && (!pol || mo < pol)) {
+	if (mo) {
 		const char *q = strchr(mo + 6, ':');
 		if (q && q < end) {
 			q++;
@@ -137,7 +137,7 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 		}
 	}
 
-	if (ll && (!pol || ll < pol)) {
+	if (ll) {
 		const char *q = strchr(ll + 11, ':');
 		if (q && q < end) {
 			q++;

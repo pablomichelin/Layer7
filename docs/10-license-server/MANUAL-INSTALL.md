@@ -19,11 +19,11 @@ Ao subir uma nova versao, actualizar no mesmo bloco:
 
 ## Links da versao actual (para teste)
 
-**Versao actual:** `1.4.14`
+**Versao actual:** `1.4.15`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.4.14`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg.sha256`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.4.15`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.15/pfSense-pkg-layer7-1.4.15.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.4.15/pfSense-pkg-layer7-1.4.15.pkg.sha256`
 - **Install script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh`
 - **Uninstall script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh`
 
@@ -35,16 +35,16 @@ Instalar ultima versao publicada:
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
-Instalar explicitamente a versao `1.4.14`:
+Instalar explicitamente a versao `1.4.15`:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.14
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.15
 ```
 
-Baixar o `.pkg` directo da versao `1.4.14`:
+Baixar o `.pkg` directo da versao `1.4.15`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.15.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.15/pfSense-pkg-layer7-1.4.15.pkg
 ```
 
 Desinstalar com script publico:
@@ -87,28 +87,24 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.4.14`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.4.15`
 
 **Comando unico manual (Command Prompt):**
 
-Comando para instalar em uma linha
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
-
-
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.4.15.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.15/pfSense-pkg-layer7-1.4.15.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.15.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.15.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.15/pfSense-pkg-layer7-1.4.15.pkg
 ```
 ```sh
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.15.pkg
 ```
 
 ```sh
@@ -196,7 +192,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.4.15.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.15/pfSense-pkg-layer7-1.4.15.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.15.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -206,11 +202,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.4.14.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.14/pfSense-pkg-layer7-1.4.14.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.4.15.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.4.15/pfSense-pkg-layer7-1.4.15.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.15.pkg
 ```
 
 ```sh
@@ -230,7 +226,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.15.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -244,7 +240,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.14.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.4.15.pkg
 ```
 
 ```sh
@@ -355,8 +351,7 @@ Limpar tabelas PF:
 ```sh
 pfctl -t layer7_block -T flush
 pfctl -t layer7_block_dst -T flush
-pfctl -t layer7_bld_0 -T flush
-pfctl -t layer7_bld_1 -T flush
+for t in $(pfctl -s Tables 2>/dev/null | awk '/^layer7_bld_[0-9]+$/{print $1}'); do pfctl -t "$t" -T flush; done
 ```
 
 Limpar overrides anti-DoH do Unbound (manual):
@@ -383,7 +378,7 @@ fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/
 | Parar      | `service layer7d onestop`        |
 | Reiniciar  | `service layer7d onerestart`     |
 | Status     | `service layer7d onestatus`      |
-| Reload     | `service layer7d onereload`      |
+| Reload     | `service layer7d reload`         |
 | Habilitar  | `sysrc layer7d_enable=YES`       |
 | Desabilitar| `sysrc layer7d_enable=NO`        |
 
@@ -460,13 +455,13 @@ ls -la /usr/local/sbin/layer7d
 Verificar se a config existe:
 
 ```sh
-cat /usr/local/etc/layer7.json
+ls -l /usr/local/etc/layer7.json
 ```
 
 Verificar se a licenca existe:
 
 ```sh
-cat /usr/local/etc/layer7.lic
+ls -l /usr/local/etc/layer7.lic
 ```
 
 ---
@@ -636,8 +631,7 @@ pkg delete -y pfSense-pkg-layer7
 ```sh
 pfctl -t layer7_block -T flush
 pfctl -t layer7_block_dst -T flush
-pfctl -t layer7_bld_0 -T flush
-pfctl -t layer7_bld_1 -T flush
+for t in $(pfctl -s Tables 2>/dev/null | awk '/^layer7_bld_[0-9]+$/{print $1}'); do pfctl -t "$t" -T flush; done
 ```
 
 O pfSense volta ao funcionamento normal imediatamente.

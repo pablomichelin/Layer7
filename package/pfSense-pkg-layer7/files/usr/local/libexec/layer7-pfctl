@@ -18,11 +18,12 @@ ensure_table() {
 	pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null && \
 		pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null && \
 		return 0
+	echo "layer7-pfctl: failed to ensure table ${_table}" >&2
 	return 1
 }
 
 tables_missing() {
-	for _t in "${TABLE_BLOCK}" "${TABLE_BLOCK_DST}"; do
+	for _t in "${TABLE_BLOCK}" "${TABLE_TAGGED}" "${TABLE_BLOCK_DST}"; do
 		if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
 			return 0
 		fi
@@ -57,11 +58,15 @@ required_tables_ok() {
 
 force_reload_rules_debug() {
 	if [ -f /tmp/rules.debug ]; then
-		/sbin/pfctl -f /tmp/rules.debug 2>/dev/null || true
+		/sbin/pfctl -f /tmp/rules.debug 2>/dev/null || \
+			echo "layer7-pfctl: failed to reload /tmp/rules.debug" >&2
+	else
+		echo "layer7-pfctl: /tmp/rules.debug not found for fallback reload" >&2
 	fi
 }
 
 ensure_blacklist_tables() {
+	_rc=0
 	if [ ! -f "${BL_CONFIG}" ]; then
 		return 0
 	fi
@@ -71,9 +76,10 @@ ensure_blacklist_tables() {
 	' 2>/dev/null)
 	_idx=0
 	while [ "$_idx" -lt "${_count:-0}" ]; do
-		ensure_table "layer7_bld_${_idx}"
+		ensure_table "layer7_bld_${_idx}" || _rc=1
 		_idx=$((_idx + 1))
 	done
+	return "$_rc"
 }
 
 write_rules() {
@@ -121,15 +127,20 @@ cmd="${1:-ensure}"
 case "${cmd}" in
 ensure)
 		write_rules
-		ensure_table "${TABLE_BLOCK}" || true
-		ensure_table "${TABLE_TAGGED}" || true
-		ensure_table "${TABLE_BLOCK_DST}" || true
-		ensure_blacklist_tables
+		_rc=0
+		ensure_table "${TABLE_BLOCK}" || _rc=1
+		ensure_table "${TABLE_TAGGED}" || _rc=1
+		ensure_table "${TABLE_BLOCK_DST}" || _rc=1
+		ensure_blacklist_tables || _rc=1
 		if tables_missing; then
+			echo "layer7-pfctl: required tables missing, trying rules.debug reload" >&2
 			force_reload_rules_debug
 		fi
 		if ! required_tables_ok; then
 			exit 1
+		fi
+		if [ "$_rc" -ne 0 ]; then
+			echo "layer7-pfctl: recovered after ensure warnings" >&2
 		fi
 		;;
 flush)
