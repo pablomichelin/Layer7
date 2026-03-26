@@ -2056,7 +2056,17 @@ function layer7_reports_clear_all()
 		$deleted = max(0, (int)$before - (int)$after);
 	}
 	@unlink(L7_REPORTS_HISTORY);
-	@unlink(L7_REPORTS_CURSOR);
+
+	$log_path = "/var/log/layer7d.log";
+	if (file_exists($log_path)) {
+		$st = @stat($log_path);
+		$inode = isset($st["ino"]) ? (string)$st["ino"] : "";
+		$size = isset($st["size"]) ? (int)$st["size"] : 0;
+		layer7_reports_cursor_save(L7_REPORTS_CURSOR, $inode, $size);
+	} else {
+		@unlink(L7_REPORTS_CURSOR);
+	}
+
 	return array("ok" => true, "deleted" => $deleted);
 }
 

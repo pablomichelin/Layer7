@@ -1,19 +1,17 @@
-## Layer7 v1.5.1 — Limpeza total de relatórios
+## Layer7 v1.5.2 — Fix limpeza de relatórios
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
-### Novidades
+### Correcção
 
-- **Limpar todos os dados de relatórios** — novo botão na página de Relatórios permite apagar toda a base SQLite (eventos, identity_map, daily_kpi), histórico JSONL e cursor de ingestão com um clique
-- **Resolve travamentos** em servidores com milhares de páginas de eventos acumulados (9000+ páginas)
-- **Confirmação obrigatória** antes da limpeza (acção irreversível)
+- **Fix crítico na limpeza de relatórios** — ao clicar "Limpar todos os dados", o cursor de ingestão agora é posicionado no fim do ficheiro de log actual, evitando que todo o histórico seja reimportado imediatamente na mesma carga da página (causava o efeito de "dados não foram apagados")
 
 ### Inclui todas as funcionalidades anteriores
 
+- Botão "Limpar todos os dados" na página de Relatórios (v1.5.1)
 - Auditoria de segurança e robustez completa (v1.5.0)
 - Categorias customizadas de blacklist (v1.4.17)
 - Anti-bypass DNS multi-camada (DoH/DoT/DoQ/iCloud Private Relay)
-- Bloqueio por destino (sites/apps) via DNS + nDPI
 - ~350 apps nDPI detectaveis (YouTube, Facebook, TikTok, etc.)
 - Politicas por interface, IP/CIDR, app e categoria
 - GUI administrativa integrada ao pfSense CE

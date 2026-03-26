@@ -2,6 +2,16 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.5.2] — 2026-03-26
+
+### Fixed
+
+- **Cursor de ingestão na limpeza de relatórios** — ao limpar todos os dados, o cursor agora é posicionado no fim do ficheiro de log actual (`/var/log/layer7d.log`) em vez de ser apagado, evitando que a função de ingestão incremental reimporte todo o histórico na mesma carga da página
+
+### Changed
+
+- **PORTVERSION** bumped para 1.5.2
+
 ## [1.5.1] — 2026-03-26
 
 ### Added
