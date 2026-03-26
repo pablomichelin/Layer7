@@ -9,20 +9,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
-$cfgpath = layer7_cfg_path();
-$layer7d = "/usr/local/sbin/layer7d";
 $daemon_ver = layer7_daemon_version();
-$parse_out = "";
-$parse_ok = null;
-
-if (is_executable($layer7d)) {
-	$cmd = escapeshellarg($layer7d) . " -t -c " . escapeshellarg($cfgpath) . " 2>&1";
-	exec($cmd, $lines, $code);
-	$parse_out = implode("\n", $lines);
-	$parse_ok = ($code === 0);
-} else {
-	$parse_out = l7_t("Binario layer7d nao encontrado ou nao executavel.");
-}
 
 $pidfile = "/var/run/layer7d.pid";
 $running = false;
@@ -227,10 +214,8 @@ layer7_render_styles();
 						<span class="label label-warning"><?= l7_t("desativado"); ?></span>
 						<?php } elseif ($cfg_mode === "enforce") { ?>
 						<span class="label label-danger"><?= l7_t("enforce"); ?></span>
-						— <?= l7_t("o daemon bloqueia trafego conforme as politicas"); ?>
 						<?php } else { ?>
 						<span class="label label-info"><?= l7_t("monitor"); ?></span>
-						— <?= l7_t("o daemon classifica mas nao bloqueia"); ?>
 						<?php } ?>
 					</dd>
 
@@ -251,44 +236,8 @@ layer7_render_styles();
 						<?php } ?>
 					</dd>
 
-					<dt><?= l7_t("Excecoes"); ?></dt>
-					<dd><?= $n_exceptions; ?></dd>
-
-					<?php if ($stats) { ?>
-					<dt><?= l7_t("PF add OK"); ?></dt>
-					<dd><?= number_format((int)($stats["pf_add_ok"] ?? 0) + (int)($stats["dst_add_ok"] ?? 0)); ?></dd>
-					<dt><?= l7_t("PF add fail"); ?></dt>
-					<dd><?= number_format((int)($stats["pf_add_fail"] ?? 0) + (int)($stats["dst_add_fail"] ?? 0)); ?></dd>
-					<?php } ?>
-				</dl>
+					</dl>
 			</div>
-		</div>
-
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Validacao da configuracao"); ?></h3>
-			<div class="layer7-callout">
-				<dl class="dl-horizontal layer7-summary">
-					<dt><?= l7_t("Config"); ?></dt>
-					<dd>
-						<code><?= htmlspecialchars($cfgpath); ?></code>
-						<?php if (!file_exists($cfgpath)) { ?>
-						<span class="text-warning"> — <?= l7_t("ausente, copie layer7.json.sample"); ?></span>
-						<?php } ?>
-					</dd>
-
-					<dt><?= l7_t("Interpretacao"); ?></dt>
-					<dd>
-						<?php if ($parse_ok === true) { ?>
-						<span class="text-success"><i class="fa fa-check"></i> <?= l7_t("OK"); ?></span>
-						<?php } elseif ($parse_ok === false) { ?>
-						<span class="text-danger"><i class="fa fa-times"></i> <?= l7_t("Falhou"); ?></span>
-						<?php } else { ?>
-						<span class="text-muted"><?= l7_t("Nao executado"); ?></span>
-						<?php } ?>
-					</dd>
-				</dl>
-			</div>
-			<pre class="pre-scrollable" style="max-height: 280px;"><?= htmlspecialchars($parse_out); ?></pre>
 		</div>
 
 		<div class="layer7-toolbar">
@@ -300,11 +249,9 @@ layer7_render_styles();
 			</form>
 			<a href="layer7_settings.php" class="btn btn-primary"><?= l7_t("Abrir definicoes"); ?></a>
 			<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Ver politicas"); ?></a>
-			<a href="layer7_diagnostics.php" class="btn btn-default"><?= l7_t("Diagnostics"); ?></a>
-			<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Events"); ?></a>
+			<a href="layer7_diagnostics.php" class="btn btn-default"><?= l7_t("Diagnosticos"); ?></a>
+			<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Eventos"); ?></a>
 		</div>
-
-		<p class="layer7-muted-note small"><?= l7_t("Contadores sao reiniciados quando o daemon arranca. Estatisticas actualizam automaticamente a cada ~60 segundos."); ?></p>
 		</div>
 	</div>
 </div>

@@ -47,32 +47,17 @@ if ($filter !== "") {
 	}
 }
 
-$enforce_events = array();
-$classify_events = array();
-foreach ($all_logs as $line) {
-	if (strpos($line, "enforce_action") !== false || strpos($line, "pfctl add") !== false) {
-		$enforce_events[] = $line;
-	}
-	if (strpos($line, "flow_decide") !== false) {
-		$classify_events[] = $line;
-	}
-}
-$enforce_events = array_slice($enforce_events, -30);
-$classify_events = array_slice($classify_events, -30);
-
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Events"));
 include("head.inc");
 layer7_render_styles();
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= l7_t("Layer 7 - events"); ?></h2>
+		<h2 class="panel-title"><?= l7_t("Layer 7 - Eventos"); ?></h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("events"); ?>
+		<?php layer7_render_tabs("eventos"); ?>
 		<div class="layer7-content">
-
-		<p class="layer7-lead"><?= l7_t("Eventos do daemon extraidos do syslog do sistema. Use os filtros para encontrar eventos especificos."); ?></p>
 
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Monitor ao vivo"); ?></div>
@@ -102,26 +87,6 @@ layer7_render_styles();
 			</div>
 		</div>
 
-		<?php if (count($enforce_events) > 0) { ?>
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Eventos de enforcement"); ?> <span class="badge"><?= count($enforce_events); ?></span></div>
-			<div class="layer7-admin-block__body">
-				<p class="small text-muted"><?= l7_t("Acoes de block/tag executadas pelo daemon (pfctl -T add). Ultimo evento no final."); ?></p>
-				<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $enforce_events)); ?></pre>
-			</div>
-		</div>
-		<?php } ?>
-
-		<?php if (count($classify_events) > 0) { ?>
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Classificacoes nDPI"); ?> <span class="badge"><?= count($classify_events); ?></span></div>
-			<div class="layer7-admin-block__body">
-				<p class="small text-muted"><?= l7_t("Fluxos classificados pelo nDPI (visivel com log_level=debug). Mostra src, app, cat, action, reason."); ?></p>
-				<pre class="pre-scrollable" style="max-height: 250px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $classify_events)); ?></pre>
-			</div>
-		</div>
-		<?php } ?>
-
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header">
 				<?= l7_t("Todos os logs"); ?>
@@ -146,18 +111,6 @@ layer7_render_styles();
 			</div>
 		</div>
 
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Dicas"); ?></div>
-			<div class="layer7-admin-block__body">
-				<ul class="small">
-					<li><?= l7_t("Ative log_level=debug em Definicoes para ver decisoes de cada fluxo classificado."); ?></li>
-					<li><?= l7_t("Use debug_minutes para elevar temporariamente sem editar o JSON."); ?></li>
-					<li><?= l7_t("Configure syslog remoto em Definicoes para reter historico fora do appliance."); ?></li>
-					<li><?= l7_t("SIGUSR1 (pagina Diagnostics) gera um resumo de estatisticas que aparece aqui."); ?></li>
-					<li><code><?= htmlspecialchars($log_path); ?></code> — <?= l7_t("arquivo principal de eventos do daemon."); ?></li>
-				</ul>
-			</div>
-		</div>
 		</div>
 	</div>
 </div>

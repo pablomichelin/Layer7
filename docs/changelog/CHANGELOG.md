@@ -2,6 +2,21 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.0] — 2026-03-25
+
+### Changed
+
+- **Navegação consolidada: 11 → 7 abas** — removidas Grupos, Excepções, Categorias e Teste da barra principal; acessíveis via links rápidos em Políticas
+- **Dashboard simplificado** — removidos bloco "Validação da configuração" e contadores PF duplicados (pertencem a Diagnósticos)
+- **Definições reorganizadas em 3 blocos** — "Configuração do serviço" (com logging avançado colapsável), "Relatórios" (presets com custom toggle), "Sistema" (licença + backup + update compactos)
+- **Eventos limpos** — removidos blocos duplicados "Eventos de enforcement", "Classificações nDPI" e "Dicas"; mantidos Monitor ao vivo + Filtro + Todos os logs
+- **Relatórios limpos** — alertas colapsados em 1 único; removido resumo executivo em prosa (cards já mostram os dados)
+- **Diagnósticos limpos** — secções PF verbose convertidas em acordeões colapsáveis; removida lista "Comandos úteis"
+- **Blacklists limpos** — removidos textos introdutórios verbosos; formulário "Nova categoria" agora colapsável
+- **Políticas limpos** — texto introdutório reduzido; zona "Remover política" agora colapsável; barra de links rápidos para Grupos/Excepções/Categorias/Teste
+- **i18n padronizado** — "Events" → "Eventos", "Diagnostics" → "Diagnósticos"; novas chaves EN adicionadas
+- **PORTVERSION** bumped para 1.6.0
+
 ## [1.5.3] — 2026-03-26
 
 ### Fixed

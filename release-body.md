@@ -1,20 +1,18 @@
-## Layer7 v1.5.3 — Tabelas PF persistentes
+## Layer7 v1.6.0 — Reorganização do Frontend
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
-### Correcção
+### Principais mudanças
 
-- **Fix definitivo para tabelas PF em vermelho** — no FreeBSD 15 / pfSense 2.8.1, tabelas PF declaradas com `persist` no ruleset existem internamente mas não são visíveis em `pfctl -s Tables` até terem pelo menos uma entrada. Novo hook `custom_php_resync_command` materializa automaticamente todas as tabelas obrigatórias após cada reload do filtro, eliminando o erro recorrente na página de Diagnósticos.
-
-### Inclui todas as funcionalidades anteriores
-
-- Botão "Limpar todos os dados" na página de Relatórios (v1.5.1)
-- Auditoria de segurança e robustez completa (v1.5.0)
-- Categorias customizadas de blacklist (v1.4.17)
-- Anti-bypass DNS multi-camada (DoH/DoT/DoQ/iCloud Private Relay)
-- ~350 apps nDPI detectaveis (YouTube, Facebook, TikTok, etc.)
-- Politicas por interface, IP/CIDR, app e categoria
-- GUI administrativa integrada ao pfSense CE
+- **Navegação reduzida de 11 para 7 abas** — Grupos, Excepções, Categorias e Teste movidos para links rápidos em Políticas
+- **Dashboard simplificado** — removidos bloco de validação de config e contadores PF duplicados
+- **Definições reorganizadas** — 3 blocos claros: Serviço, Relatórios, Sistema (licença + backup + update)
+- **Eventos limpos** — apenas Monitor ao vivo + Filtro + Todos os logs
+- **Relatórios limpos** — alertas consolidados, removido resumo em prosa duplicado
+- **Diagnósticos limpos** — secções PF verbose colapsáveis, removidos "Comandos úteis"
+- **Blacklists limpos** — form "Nova categoria" agora colapsável
+- **Políticas limpos** — barra de links rápidos, zona remover colapsável
+- **i18n padronizado** — nomes de abas em português
 
 ### Instalacao (um comando)
 

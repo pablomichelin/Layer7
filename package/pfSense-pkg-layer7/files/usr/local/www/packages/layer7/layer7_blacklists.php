@@ -298,7 +298,6 @@ layer7_render_styles();
 <div class="layer7-admin-block">
 <div class="layer7-admin-block__header"><?=l7_t("Regras de Blacklist")?></div>
 <div class="layer7-admin-block__body">
-<p class="layer7-lead"><?=l7_t("Cada regra define quais categorias bloquear e para quais IPs/CIDRs de origem. Permite bloqueio granular: ex. bloquear gambling para 192.168.10.0/24 mas nao para o director (192.168.10.1).")?></p>
 
 <?php if (empty($rules)): ?>
 <div class="alert alert-info">
@@ -487,7 +486,6 @@ if ($show_form):
 <div class="layer7-admin-block">
 <div class="layer7-admin-block__header"><?=l7_t("Categorias personalizadas e extensoes")?></div>
 <div class="layer7-admin-block__body">
-<p class="layer7-lead"><?=l7_t("Aqui pode criar categorias novas com os seus sites e tambem adicionar sites em categorias ja existentes da UT1.")?></p>
 
 <?php if (empty($custom_map)): ?>
 <div class="alert alert-info">
@@ -539,9 +537,18 @@ if ($show_form):
 <?php
 $cat_form_id = $cat_edit !== "" ? $cat_edit : "";
 $cat_form_sites = $cat_edit !== "" && isset($custom_map[$cat_edit]) ? implode("\n", $custom_map[$cat_edit]) : "";
+$_cat_editing = ($cat_edit !== "");
 ?>
+<?php if (!$_cat_editing) { ?>
+<div style="margin-top:12px; margin-bottom:8px;">
+	<a data-toggle="collapse" href="#l7-new-cat-form" class="btn btn-sm btn-success">
+		<i class="fa fa-plus"></i> <?= l7_t("Nova categoria personalizada") ?>
+	</a>
+</div>
+<?php } ?>
+<div id="l7-new-cat-form" class="<?= $_cat_editing ? '' : 'collapse' ?>">
 <div class="layer7-form-card">
-<h4 class="layer7-form-card__title"><?= $cat_edit !== "" ? l7_t("Editar categoria personalizada") : l7_t("Nova categoria personalizada") ?></h4>
+<h4 class="layer7-form-card__title"><?= $_cat_editing ? l7_t("Editar categoria personalizada") : l7_t("Nova categoria personalizada") ?></h4>
 <form method="post">
 <div class="form-group">
 	<label><?=l7_t("ID da categoria")?></label>
@@ -565,6 +572,7 @@ $cat_form_sites = $cat_edit !== "" && isset($custom_map[$cat_edit]) ? implode("\
 	<?php endif; ?>
 </div>
 </form>
+</div>
 </div>
 </div>
 </div>

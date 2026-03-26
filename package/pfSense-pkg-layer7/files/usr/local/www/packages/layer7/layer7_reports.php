@@ -145,21 +145,6 @@ $unique_sites = (int)($summary["unique_sites"] ?? 0);
 $block_rate = $total_events > 0 ? round(($blocked_events / $total_events) * 100, 1) : 0;
 
 $period_label = date("d/m/Y H:i", $from_ts) . " - " . date("d/m/Y H:i", $to_ts);
-$exec_summary = array();
-$exec_summary[] = sprintf(
-	l7_t("No periodo seleccionado, foram registadas %s tentativas de acesso."),
-	number_format($total_events)
-);
-$exec_summary[] = sprintf(
-	l7_t("%s tentativas foram bloqueadas (%s do total)."),
-	number_format($blocked_events),
-	$block_rate . "%"
-);
-$exec_summary[] = sprintf(
-	l7_t("Foram observados %s dispositivos e %s sites distintos."),
-	number_format($unique_devices),
-	number_format($unique_sites)
-);
 
 $pgtitle = array("Services", "Layer 7", l7_t("Relatorios"));
 include("head.inc");
@@ -196,38 +181,30 @@ layer7_render_styles();
 <div class="alert alert-success"><i class="fa fa-check-circle"></i> <?= htmlspecialchars($clear_msg); ?></div>
 <?php } ?>
 
-<?php if (!$db_ready) { ?>
-	<div class="alert alert-warning">
-		<?= l7_t("SQLite nao esta disponivel neste ambiente. O modulo executivo de relatorios requer suporte SQLite no PHP."); ?>
-	</div>
-<?php } ?>
-<?php if (!$rpt_enabled) { ?>
-	<div class="alert alert-warning">
-		<?= $rpt_detail_enabled ?
-			l7_t("O historico executivo esta desactivado em Definicoes. Novas agregacoes historicas deixam de ser recolhidas; o log detalhado continua disponivel para pesquisa operacional.") :
-			l7_t("O historico executivo esta desactivado em Definicoes. Os relatorios exibem apenas o que ja estava previamente recolhido."); ?>
-	</div>
-<?php } ?>
-<?php if (!$rpt_detail_enabled) { ?>
-	<div class="alert alert-info">
-		<?= l7_t("O log detalhado esta desactivado. A tela opera em modo executivo leve, sem armazenar eventos detalhados em SQLite."); ?>
-	</div>
-<?php } ?>
-<?php if ($ingest_failed) { ?>
-	<div class="alert alert-warning">
-		<?= l7_t("Coleta incremental de relatorios falhou nesta tentativa. Verifique diagnosticos e permissoes do ficheiro de log."); ?>
-	</div>
-<?php } ?>
-<?php if ($rpt_detail_enabled && !empty($rpt_detail_ifaces)) { ?>
-	<div class="alert alert-info">
-		<?= l7_t("Log detalhado limitado as interfaces seleccionadas: "); ?>
-		<code><?= htmlspecialchars(implode(", ", $rpt_detail_ifaces)); ?></code>
-	</div>
-<?php } ?>
-<?php if ($rpt_enabled && $rpt_detail_enabled && $detail_range_truncated) { ?>
-	<div class="alert alert-info">
-		<?= sprintf(l7_t("O log detalhado local retem %d dias. Para periodos maiores, os indicadores executivos usam historico agregado e os detalhes ficam limitados ao intervalo retido."), $rpt_event_retention); ?>
-	</div>
+<?php
+$_rpt_notices = array();
+if (!$db_ready) {
+	$_rpt_notices[] = l7_t("SQLite indisponivel.");
+}
+if (!$rpt_enabled) {
+	$_rpt_notices[] = l7_t("Historico executivo desactivado.");
+}
+if (!$rpt_detail_enabled) {
+	$_rpt_notices[] = l7_t("Log detalhado desactivado.");
+}
+if ($ingest_failed) {
+	$_rpt_notices[] = l7_t("Coleta incremental falhou.");
+}
+if ($rpt_detail_enabled && !empty($rpt_detail_ifaces)) {
+	$_rpt_notices[] = l7_t("Log limitado a: ") . implode(", ", $rpt_detail_ifaces);
+}
+if ($rpt_enabled && $rpt_detail_enabled && $detail_range_truncated) {
+	$_rpt_notices[] = sprintf(l7_t("Retencao: %d dias."), $rpt_event_retention);
+}
+if (!empty($_rpt_notices)) { ?>
+<div class="alert alert-warning" style="margin-bottom:12px;">
+	<i class="fa fa-info-circle"></i> <?= implode(" &middot; ", array_map('htmlspecialchars', $_rpt_notices)); ?>
+</div>
 <?php } ?>
 
 <form method="get" class="l7r-filters">
@@ -291,15 +268,7 @@ layer7_render_styles();
 	</form>
 </div>
 
-<div class="l7r-summary">
-	<strong><?= l7_t("Resumo executivo"); ?> (<?= htmlspecialchars($period_label); ?>)</strong>
-	<ul>
-		<?php foreach ($exec_summary as $line) { ?>
-		<li><?= htmlspecialchars($line); ?></li>
-		<?php } ?>
-	</ul>
-	<div class="l7r-note"><?= l7_t("Eventos com etiqueta 'Host inferido (DNS)' usam correlacao temporal de consultas DNS do mesmo IP para identificar o dominio tentado."); ?></div>
-</div>
+<p class="text-muted small"><?= htmlspecialchars($period_label); ?></p>
 
 <div class="l7r-cards">
 	<div class="l7r-card"><div class="l7r-val"><?= number_format($total_events); ?></div><div class="l7r-label"><?= l7_t("Tentativas totais"); ?></div></div>

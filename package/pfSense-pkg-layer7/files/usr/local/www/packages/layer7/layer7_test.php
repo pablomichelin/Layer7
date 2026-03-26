@@ -359,7 +359,7 @@ layer7_render_styles();
 		<h2 class="panel-title"><?= l7_t("Layer 7 - teste de politica"); ?></h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("test"); ?>
+		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 

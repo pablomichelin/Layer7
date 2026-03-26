@@ -12,28 +12,12 @@
 			<url>/packages/layer7/layer7_status.php</url>
 		</tab>
 		<tab>
-			<text>Settings</text>
-			<url>/packages/layer7/layer7_settings.php</url>
-		</tab>
-		<tab>
 			<text>Policies</text>
 			<url>/packages/layer7/layer7_policies.php</url>
 		</tab>
 		<tab>
-			<text>Groups</text>
-			<url>/packages/layer7/layer7_groups.php</url>
-		</tab>
-		<tab>
-			<text>Categories</text>
-			<url>/packages/layer7/layer7_categories.php</url>
-		</tab>
-		<tab>
-			<text>Exceptions</text>
-			<url>/packages/layer7/layer7_exceptions.php</url>
-		</tab>
-		<tab>
-			<text>Test</text>
-			<url>/packages/layer7/layer7_test.php</url>
+			<text>Blacklists</text>
+			<url>/packages/layer7/layer7_blacklists.php</url>
 		</tab>
 		<tab>
 			<text>Events</text>
@@ -44,12 +28,12 @@
 			<url>/packages/layer7/layer7_reports.php</url>
 		</tab>
 		<tab>
-			<text>Diagnostics</text>
-			<url>/packages/layer7/layer7_diagnostics.php</url>
+			<text>Settings</text>
+			<url>/packages/layer7/layer7_settings.php</url>
 		</tab>
 		<tab>
-			<text>Blacklists</text>
-			<url>/packages/layer7/layer7_blacklists.php</url>
+			<text>Diagnostics</text>
+			<url>/packages/layer7/layer7_diagnostics.php</url>
 		</tab>
 	</tabs>
 	<menu>

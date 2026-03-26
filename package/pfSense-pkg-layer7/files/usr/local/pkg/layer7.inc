@@ -936,16 +936,12 @@ function layer7_nav_items()
 {
 	return array(
 		"status" => array("label" => l7_t("Estado"), "href" => "layer7_status.php"),
-		"settings" => array("label" => l7_t("Definicoes"), "href" => "layer7_settings.php"),
 		"policies" => array("label" => l7_t("Politicas"), "href" => "layer7_policies.php"),
-		"groups" => array("label" => l7_t("Grupos"), "href" => "layer7_groups.php"),
-		"categories" => array("label" => l7_t("Categorias"), "href" => "layer7_categories.php"),
-		"exceptions" => array("label" => l7_t("Excecoes"), "href" => "layer7_exceptions.php"),
-		"test" => array("label" => l7_t("Teste"), "href" => "layer7_test.php"),
-		"events" => array("label" => l7_t("Events"), "href" => "layer7_events.php"),
+		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php"),
+		"eventos" => array("label" => l7_t("Eventos"), "href" => "layer7_events.php"),
 		"reports" => array("label" => l7_t("Relatorios"), "href" => "layer7_reports.php"),
-		"diagnostics" => array("label" => l7_t("Diagnostics"), "href" => "layer7_diagnostics.php"),
-		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php")
+		"settings" => array("label" => l7_t("Definicoes"), "href" => "layer7_settings.php"),
+		"diagnosticos" => array("label" => l7_t("Diagnosticos"), "href" => "layer7_diagnostics.php")
 	);
 }
 

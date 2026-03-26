@@ -509,7 +509,19 @@ function layer7_policy_match_summary($policy) {
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 
-			<p class="layer7-lead"><?= l7_t("Organize a ordem de avaliacao, ajuste o estado de cada regra e mantenha a base de politicas pronta para o modo de enforcement."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Gerir politicas de classificacao e bloqueio."); ?></p>
+
+		<?php
+		$_nav_data = layer7_load_or_default();
+		$_nav_groups = isset($_nav_data["layer7"]["groups"]) ? count($_nav_data["layer7"]["groups"]) : 0;
+		$_nav_exceptions = isset($_nav_data["layer7"]["exceptions"]) ? count($_nav_data["layer7"]["exceptions"]) : 0;
+		?>
+		<div class="layer7-toolbar" style="margin-bottom:16px;">
+			<a href="layer7_groups.php" class="btn btn-default btn-sm"><i class="fa fa-users"></i> <?= l7_t("Grupos"); ?> (<?= $_nav_groups; ?>)</a>
+			<a href="layer7_exceptions.php" class="btn btn-default btn-sm"><i class="fa fa-shield"></i> <?= l7_t("Excecoes"); ?> (<?= $_nav_exceptions; ?>)</a>
+			<a href="layer7_categories.php" class="btn btn-default btn-sm"><i class="fa fa-th-list"></i> <?= l7_t("Categorias nDPI"); ?></a>
+			<a href="layer7_test.php" class="btn btn-default btn-sm"><i class="fa fa-play-circle"></i> <?= l7_t("Simular teste"); ?></a>
+		</div>
 
 		<?php
 		$l7_profiles = layer7_load_profiles();
@@ -702,22 +714,24 @@ function layer7_policy_match_summary($policy) {
 			</form>
 			</div>
 
-			<div class="layer7-callout layer7-danger-zone">
-				<form method="post" class="form-inline layer7-inline-form"
+			<div style="margin-top:12px;">
+				<a data-toggle="collapse" href="#l7-delete-policy" style="cursor:pointer; color:#d9534f;">
+					<i class="fa fa-trash"></i> <?= l7_t("Remover politica"); ?>
+				</a>
+			</div>
+			<div id="l7-delete-policy" class="collapse" style="margin-top:8px;">
+				<form method="post" class="form-inline"
 					onsubmit='return confirm(<?= json_encode(l7_t("Remover esta politica do JSON?")); ?>);'>
-					<div class="form-group">
-						<label class="control-label" for="delete_policy_index"><?= l7_t("Remover politica"); ?></label>
-						<select id="delete_policy_index" name="delete_policy_index" class="form-control">
-							<?php foreach ($policies as $i => $policy) {
-								$pid = isset($policy["id"]) ? (string)$policy["id"] : ("#" . $i);
-								$pname = isset($policy["name"]) ? (string)$policy["name"] : "";
-								$label = $pid . ($pname !== "" ? " - " . $pname : "");
-							?>
-							<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
-							<?php } ?>
-						</select>
-						<button type="submit" name="delete_policy" value="1" class="btn btn-danger"><?= l7_t("Remover"); ?></button>
-					</div>
+					<select name="delete_policy_index" class="form-control input-sm">
+						<?php foreach ($policies as $i => $policy) {
+							$pid = isset($policy["id"]) ? (string)$policy["id"] : ("#" . $i);
+							$pname = isset($policy["name"]) ? (string)$policy["name"] : "";
+							$label = $pid . ($pname !== "" ? " - " . $pname : "");
+						?>
+						<option value="<?= (int)$i; ?>"><?= htmlspecialchars($label); ?></option>
+						<?php } ?>
+					</select>
+					<button type="submit" name="delete_policy" value="1" class="btn btn-sm btn-danger"><?= l7_t("Remover"); ?></button>
 				</form>
 			</div>
 			<?php } ?>

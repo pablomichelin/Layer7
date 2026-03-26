@@ -402,12 +402,11 @@ layer7_render_styles();
 		<?php layer7_render_tabs("settings"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
-			<p class="layer7-lead"><?= l7_t("Parametros basicos do daemon, logging remoto e reservas de interface para a fase de captura nDPI."); ?></p>
 			<form method="post" class="form-horizontal">
 			<input type="hidden" name="save_scope" value="general" />
 
 			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= l7_t("Definicoes gerais"); ?></div>
+				<div class="layer7-admin-block__header"><?= l7_t("Configuracao do servico"); ?></div>
 				<div class="layer7-admin-block__body">
 					<div class="form-group">
 						<label class="col-sm-3 control-label"><?= l7_t("Idioma"); ?> / Language</label>
@@ -426,7 +425,6 @@ layer7_render_styles();
 								<input type="checkbox" name="enabled" value="1" <?= $en ? 'checked="checked"' : ""; ?> />
 								<?= l7_t("Executar o daemon Layer7"); ?>
 							</label>
-							<p class="help-block"><?= l7_t("Quando desmarcado, o layer7d permanece em idle para permitir validacao segura da GUI e do pacote."); ?></p>
 						</div>
 					</div>
 
@@ -437,67 +435,9 @@ layer7_render_styles();
 								<option value="monitor" <?= $mode === "monitor" ? 'selected="selected"' : ""; ?>><?= l7_t("monitor"); ?></option>
 								<option value="enforce" <?= $mode === "enforce" ? 'selected="selected"' : ""; ?>><?= l7_t("enforce"); ?></option>
 							</select>
-							<p class="help-block"><?= l7_t("Monitor apenas observa e regista. Enforce prepara o caminho para acoes reais quando o loop de classificacao estiver ativo."); ?></p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= l7_t("Logging e debug"); ?></div>
-				<div class="layer7-admin-block__body">
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Nivel de log"); ?></label>
-						<div class="col-sm-9">
-							<select name="log_level" class="form-control" style="max-width: 260px;">
-								<?php foreach (array("error", "warn", "info", "debug") as $v) { ?>
-								<option value="<?= htmlspecialchars($v); ?>" <?= $ll === $v ? 'selected="selected"' : ""; ?>><?= htmlspecialchars($v); ?></option>
-								<?php } ?>
-							</select>
-							<p class="help-block"><?= l7_t("Define a verbosidade do daemon no syslog local e, se ativo, no syslog remoto."); ?></p>
 						</div>
 					</div>
 
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Syslog remoto"); ?></label>
-						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="syslog_remote" value="1" <?= $sr ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Duplicar eventos por UDP (RFC 3164)"); ?>
-							</label>
-							<p class="help-block"><?= l7_t("Use um coletor do lab para validar eventos do daemon fora do syslog local do pfSense."); ?></p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Host syslog"); ?></label>
-						<div class="col-sm-9">
-							<input type="text" name="syslog_remote_host" class="form-control" style="max-width: 360px;" maxlength="255"
-								value="<?= htmlspecialchars($sr_host); ?>" placeholder="192.168.1.50" />
-							<p class="help-block"><?= l7_t("Aceita IPv4 ou hostname simples. Deixe vazio se o envio remoto estiver desativado."); ?></p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Porta UDP"); ?></label>
-						<div class="col-sm-9">
-							<input type="number" name="syslog_remote_port" class="form-control" style="max-width: 140px;" value="<?= (int)$sr_port; ?>" min="1" max="65535" />
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Janela debug (min)"); ?></label>
-						<div class="col-sm-9">
-							<input type="number" name="debug_minutes" class="form-control" style="max-width: 140px;" value="<?= (int)$dbgm; ?>" min="0" max="720" />
-							<p class="help-block"><?= l7_t("0 = normal. Entre 1 e 720 para elevar temporariamente o daemon a LOG_DEBUG apos cada reload."); ?></p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= l7_t("Captura e interfaces"); ?></div>
-				<div class="layer7-admin-block__body">
 					<div class="form-group">
 						<label class="col-sm-3 control-label"><?= l7_t("Bloquear QUIC"); ?></label>
 						<div class="col-sm-9">
@@ -505,7 +445,7 @@ layer7_render_styles();
 								<input type="checkbox" name="block_quic" value="1" <?= $block_quic ? 'checked="checked"' : ""; ?> />
 								<?= l7_t("Bloquear QUIC (UDP 443) globalmente"); ?>
 							</label>
-							<p class="help-block"><?= l7_t("Forca aplicacoes a usar HTTPS (TCP 443) em vez de QUIC, onde o SNI e visivel ao nDPI. Melhora significativamente a eficacia do bloqueio por DNS/SNI. Adiciona regra PF: block drop quick proto udp to port 443."); ?></p>
+							<p class="help-block"><?= l7_t("Forca apps a usar HTTPS em vez de QUIC, melhorando a deteccao por SNI."); ?></p>
 						</div>
 					</div>
 
@@ -526,17 +466,63 @@ layer7_render_styles();
 							</div>
 							<?php } ?>
 							<?php } ?>
-							<p class="help-block"><?= l7_t("Selecione as interfaces onde o Layer7 ira capturar e classificar trafego via nDPI. Maximo 8."); ?></p>
 						</div>
 					</div>
-				</div>
-			</div>
 
-			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= l7_t("Acoes de configuracao"); ?></div>
-				<div class="layer7-admin-block__body">
-					<button type="submit" name="save" value="1" class="btn btn-primary"><?= l7_t("Guardar definicoes"); ?></button>
-					<p class="layer7-admin-block__note small"><?= l7_t("Politicas e excecoes existentes sao preservadas quando as definicoes globais sao gravadas."); ?></p>
+					<div style="margin-top:12px;">
+						<a data-toggle="collapse" href="#l7-logging-advanced" style="cursor:pointer;">
+							<i class="fa fa-cog"></i> <?= l7_t("Logging avancado"); ?> <i class="fa fa-chevron-down"></i>
+						</a>
+					</div>
+					<div id="l7-logging-advanced" class="collapse" style="margin-top:12px; padding-top:12px; border-top:1px solid #eee;">
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Nivel de log"); ?></label>
+							<div class="col-sm-9">
+								<select name="log_level" class="form-control" style="max-width: 260px;">
+									<?php foreach (array("error", "warn", "info", "debug") as $v) { ?>
+									<option value="<?= htmlspecialchars($v); ?>" <?= $ll === $v ? 'selected="selected"' : ""; ?>><?= htmlspecialchars($v); ?></option>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Syslog remoto"); ?></label>
+							<div class="col-sm-9">
+								<label class="checkbox-inline">
+									<input type="checkbox" name="syslog_remote" value="1" <?= $sr ? 'checked="checked"' : ""; ?> />
+									<?= l7_t("Duplicar eventos por UDP (RFC 3164)"); ?>
+								</label>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Host syslog"); ?></label>
+							<div class="col-sm-9">
+								<input type="text" name="syslog_remote_host" class="form-control" style="max-width: 360px;" maxlength="255"
+									value="<?= htmlspecialchars($sr_host); ?>" placeholder="192.168.1.50" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Porta UDP"); ?></label>
+							<div class="col-sm-9">
+								<input type="number" name="syslog_remote_port" class="form-control" style="max-width: 140px;" value="<?= (int)$sr_port; ?>" min="1" max="65535" />
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Janela debug (min)"); ?></label>
+							<div class="col-sm-9">
+								<input type="number" name="debug_minutes" class="form-control" style="max-width: 140px;" value="<?= (int)$dbgm; ?>" min="0" max="720" />
+								<p class="help-block"><?= l7_t("0 = normal. 1-720 para LOG_DEBUG temporario."); ?></p>
+							</div>
+						</div>
+					</div>
+
+					<div style="margin-top:16px;">
+						<button type="submit" name="save" value="1" class="btn btn-primary"><?= l7_t("Guardar definicoes"); ?></button>
+					</div>
 				</div>
 			</div>
 			</form>
@@ -556,117 +542,14 @@ layer7_render_styles();
 
 			if ($lic_dev) {
 				$lic_badge = '<span class="label label-warning">DEV MODE</span>';
-				$lic_desc = l7_t("Chave de desenvolvimento — sem verificacao de licenca. Substitua a chave publica no binario antes de distribuir.");
 			} elseif ($lic_valid && !$lic_expired) {
 				$lic_badge = '<span class="label label-success">' . l7_t("Valida") . '</span>';
-				$lic_desc = sprintf(l7_t("Licenca activa. Expira em %s (%d dias restantes)."), htmlspecialchars($lic_expiry), $lic_days);
 			} elseif ($lic_valid && $lic_grace) {
 				$lic_badge = '<span class="label label-warning">' . l7_t("Grace period") . '</span>';
-				$lic_desc = sprintf(l7_t("Licenca expirada em %s. Periodo de graca activo (%d dias restantes)."), htmlspecialchars($lic_expiry), 14 + $lic_days);
 			} else {
 				$lic_badge = '<span class="label label-danger">' . l7_t("Sem licenca") . '</span>';
-				$lic_desc = l7_t("Sem licenca valida. O daemon opera apenas em modo monitor.") . ($lic_err !== "" ? " " . htmlspecialchars($lic_err) : "");
 			}
 			?>
-
-			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= l7_t("Licenca"); ?></div>
-				<div class="layer7-admin-block__body">
-					<dl class="dl-horizontal layer7-summary">
-						<dt><?= l7_t("Estado"); ?></dt>
-						<dd><?= $lic_badge; ?></dd>
-
-						<dt><?= l7_t("Hardware ID"); ?></dt>
-						<dd><code style="font-size: 11px; word-break: break-all;"><?= htmlspecialchars($lic_hw); ?></code></dd>
-
-						<?php if ($lic_customer !== "") { ?>
-						<dt><?= l7_t("Cliente"); ?></dt>
-						<dd><?= htmlspecialchars($lic_customer); ?></dd>
-						<?php } ?>
-
-						<?php if ($lic_expiry !== "") { ?>
-						<dt><?= l7_t("Expira"); ?></dt>
-						<dd><?= htmlspecialchars($lic_expiry); ?>
-							<?php if ($lic_days > 0) { ?>
-							<small class="text-muted">(<?= $lic_days; ?> <?= l7_t("dias restantes"); ?>)</small>
-							<?php } ?>
-						</dd>
-						<?php } ?>
-					</dl>
-
-					<p class="text-muted small"><?= $lic_desc; ?></p>
-
-					<div class="layer7-form-card">
-					<h4 class="layer7-form-card__title"><?= l7_t("Acoes"); ?></h4>
-					<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>
-						<div class="form-group">
-							<label><?= l7_t("Codigo de licenca"); ?></label>
-							<input type="text" class="form-control" value="<?= htmlspecialchars($lic_mask !== "" ? $lic_mask : "*****************"); ?>" readonly="readonly" style="max-width: 360px;">
-							<p class="help-block"><?= l7_t("O codigo fica protegido e nao pode ser editado pela GUI."); ?></p>
-						</div>
-						<form method="post" class="layer7-inline-form">
-							<button type="submit" name="revoke_license" value="1" class="btn btn-danger"
-								onclick="return confirm(<?= json_encode(l7_t('Deseja revogar a licenca activa?')) ?>);">
-								<i class="fa fa-ban"></i> <?= l7_t("Revogar licenca"); ?>
-							</button>
-						</form>
-					<?php else: ?>
-						<p class="text-muted small"><?= l7_t("Registe a licenca para activar o sistema."); ?></p>
-						<form method="post" class="layer7-form-card__actions">
-							<div class="form-group">
-								<label><?= l7_t("Codigo de licenca"); ?></label>
-								<input type="text" name="license_code" class="form-control" maxlength="128" style="max-width: 360px;" placeholder="ABCD1234EFGH5678">
-							</div>
-							<button type="submit" name="register_license" value="1" class="btn btn-success">
-								<i class="fa fa-check"></i> <?= l7_t("Registar licenca"); ?>
-							</button>
-						</form>
-					<?php endif; ?>
-					</div>
-				</div>
-			</div>
-
-			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= l7_t("Backup e restore"); ?></div>
-				<div class="layer7-admin-block__body">
-
-				<?php if ($backup_msg !== "") { ?>
-				<div class="alert alert-success"><?= htmlspecialchars($backup_msg); ?></div>
-				<?php } ?>
-				<?php if ($backup_err !== "") { ?>
-				<div class="alert alert-danger"><?= htmlspecialchars($backup_err); ?></div>
-				<?php } ?>
-
-				<p><?= l7_t("Exporte toda a configuracao Layer7 (definicoes, politicas, excepcoes, grupos) como ficheiro JSON. Importe noutro pfSense ou para restaurar uma configuracao anterior."); ?></p>
-
-				<div class="layer7-form-card">
-					<h4 class="layer7-form-card__title"><?= l7_t("Exportar configuracao"); ?></h4>
-					<form method="post">
-						<button type="submit" name="export_config" value="1" class="btn btn-info">
-							<i class="fa fa-download"></i> <?= l7_t("Exportar configuracao"); ?>
-						</button>
-					</form>
-				</div>
-
-				<div class="layer7-form-card">
-					<h4 class="layer7-form-card__title"><?= l7_t("Importar configuracao"); ?></h4>
-					<form method="post" enctype="multipart/form-data">
-						<div class="form-group">
-							<label><?= l7_t("Importar configuracao"); ?></label>
-							<input type="file" name="import_file" accept=".json" />
-							<p class="help-block"><?= l7_t("Selecione um ficheiro JSON exportado anteriormente. A configuracao actual sera substituida."); ?></p>
-						</div>
-						<div class="layer7-form-card__actions">
-							<button type="submit" name="import_config" value="1" class="btn btn-warning"
-								onclick="return confirm(<?= json_encode(l7_t('Substituir a configuracao actual? Esta accao nao pode ser desfeita.')) ?>);">
-								<i class="fa fa-upload"></i> <?= l7_t("Importar"); ?>
-							</button>
-						</div>
-					</form>
-				</div>
-
-				</div>
-			</div>
 
 			<?php
 			$rpt_cfg = layer7_reports_config();
@@ -683,98 +566,170 @@ layer7_render_styles();
 			<div class="layer7-admin-block">
 				<div class="layer7-admin-block__header"><?= l7_t("Relatorios"); ?></div>
 				<div class="layer7-admin-block__body">
-					<p><?= l7_t("Os relatorios passam a seguir um modelo mais proximo de NGFW: historico executivo separado do log detalhado, com controlo de retencao e escopo por interface."); ?></p>
-					<form method="post">
+					<form method="post" class="form-horizontal">
 						<input type="hidden" name="save_scope" value="reports">
-						<div class="layer7-form-card">
-							<h4 class="layer7-form-card__title"><?= l7_t("Historico executivo"); ?></h4>
-							<div class="form-group">
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Historico executivo"); ?></label>
+							<div class="col-sm-9">
 								<label class="checkbox-inline">
 									<input type="checkbox" name="reports_enabled" <?= $rpt_en ? 'checked' : ''; ?>>
-									<?= l7_t("Activar historico executivo"); ?>
+									<?= l7_t("Activar"); ?>
 								</label>
 							</div>
-							<div class="form-group">
-								<label><?= l7_t("Retencao do historico executivo (dias)"); ?></label>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Retencao executivo"); ?></label>
+							<div class="col-sm-9">
 								<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-									<select class="form-control" name="reports_retention_preset" style="width:180px;">
+									<select class="form-control" name="reports_retention_preset" id="l7_rpt_preset" style="width:180px;" onchange="document.getElementById('l7_rpt_custom').style.display=this.value==='custom'?'inline-block':'none';">
 										<?php foreach ($rpt_presets as $rp) { ?>
 										<option value="<?= $rp; ?>" <?= $rpt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
 										<?php } ?>
-										<option value="custom" <?= $rpt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Customizado"); ?></option>
+										<option value="custom" <?= $rpt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Personalizado"); ?></option>
 									</select>
-									<input type="number" class="form-control" name="reports_retention" value="<?= $rpt_ret; ?>" min="1" max="365" style="width:110px;">
+									<input type="number" class="form-control" name="reports_retention" id="l7_rpt_custom" value="<?= $rpt_ret; ?>" min="1" max="365" style="width:110px;<?= $rpt_selected_preset !== "custom" ? 'display:none;' : ''; ?>">
 								</div>
-								<p class="help-block"><?= l7_t("Faixas rapidas: 7/15/30/60/90/180/365 dias. Este historico alimenta visoes executivas e tende a ser muito mais leve que o log detalhado."); ?></p>
 							</div>
 						</div>
 
-						<div class="layer7-form-card">
-							<h4 class="layer7-form-card__title"><?= l7_t("Log detalhado"); ?></h4>
-							<div class="form-group">
+						<hr style="margin:12px 0;">
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Log detalhado"); ?></label>
+							<div class="col-sm-9">
 								<label class="checkbox-inline">
 									<input type="checkbox" name="reports_event_log_enabled" <?= $rpt_evt_en ? 'checked' : ''; ?>>
-									<?= l7_t("Activar log detalhado pesquisavel"); ?>
+									<?= l7_t("Activar"); ?>
 								</label>
-								<p class="help-block"><?= l7_t("Quando desactivado, o appliance deixa de armazenar eventos detalhados em SQLite. O historico executivo continua activo se a recolha acima estiver ligada."); ?></p>
 							</div>
-							<div class="form-group">
-								<label><?= l7_t("Retencao do log detalhado (dias)"); ?></label>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Retencao detalhado"); ?></label>
+							<div class="col-sm-9">
 								<div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-									<select class="form-control" name="reports_event_retention_preset" style="width:180px;">
+									<select class="form-control" name="reports_event_retention_preset" id="l7_evt_preset" style="width:180px;" onchange="document.getElementById('l7_evt_custom').style.display=this.value==='custom'?'inline-block':'none';">
 										<?php foreach ($rpt_presets as $rp) { ?>
 										<option value="<?= $rp; ?>" <?= $rpt_evt_selected_preset === (string)$rp ? 'selected' : ''; ?>><?= $rp; ?> <?= l7_t("dias"); ?></option>
 										<?php } ?>
-										<option value="custom" <?= $rpt_evt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Customizado"); ?></option>
+										<option value="custom" <?= $rpt_evt_selected_preset === "custom" ? 'selected' : ''; ?>><?= l7_t("Personalizado"); ?></option>
 									</select>
-									<input type="number" class="form-control" name="reports_event_retention" value="<?= $rpt_evt_ret; ?>" min="1" max="365" style="width:110px;">
+									<input type="number" class="form-control" name="reports_event_retention" id="l7_evt_custom" value="<?= $rpt_evt_ret; ?>" min="1" max="365" style="width:110px;<?= $rpt_evt_selected_preset !== "custom" ? 'display:none;' : ''; ?>">
 								</div>
-								<p class="help-block"><?= l7_t("Recomendado para appliance local: 7 a 15 dias. Este e o bloco que mais cresce em disco."); ?></p>
+								<p class="help-block"><?= l7_t("Recomendado: 7 a 15 dias. Bloco que mais cresce em disco."); ?></p>
 							</div>
 						</div>
 
-						<div class="layer7-form-card">
-							<h4 class="layer7-form-card__title"><?= l7_t("Coleta e escopo"); ?></h4>
-							<div class="form-group">
-								<label><?= l7_t("Intervalo de recolha"); ?></label>
+						<hr style="margin:12px 0;">
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Intervalo de recolha"); ?></label>
+							<div class="col-sm-9">
 								<select class="form-control" name="reports_interval" style="width:150px;">
 									<?php foreach (array(5, 10, 15, 30, 60) as $iv) { ?>
 									<option value="<?= $iv; ?>" <?= ($rpt_int === $iv) ? 'selected' : ''; ?>><?= $iv; ?> <?= l7_t("minutos"); ?></option>
 									<?php } ?>
 								</select>
 							</div>
-							<div class="form-group">
-								<label><?= l7_t("Interfaces do log detalhado"); ?></label>
-								<?php if (empty($pfsense_ifaces)) { ?>
-									<p class="form-control-static text-muted"><?= l7_t("Nenhuma interface configurada no pfSense."); ?></p>
-								<?php } else { ?>
-									<?php foreach ($pfsense_ifaces as $ifc) { ?>
-									<div class="checkbox">
-										<label>
-											<input type="checkbox" name="reports_iface_sel[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>"
-												<?= in_array($ifc["real"], $rpt_evt_ifaces, true) ? 'checked="checked"' : ''; ?> />
-											<strong><?= htmlspecialchars($ifc["descr"]); ?></strong>
-											<span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
-										</label>
-									</div>
-									<?php } ?>
-								<?php } ?>
-								<p class="help-block"><?= l7_t("Selecione uma ou mais interfaces para guardar eventos detalhados. Se deixar vazio, o Layer7 guarda eventos de todas as interfaces capturadas."); ?></p>
-							</div>
 						</div>
 
+						<?php if (!empty($pfsense_ifaces)) { ?>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Interfaces do log"); ?></label>
+							<div class="col-sm-9">
+								<?php foreach ($pfsense_ifaces as $ifc) { ?>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" name="reports_iface_sel[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>"
+											<?= in_array($ifc["real"], $rpt_evt_ifaces, true) ? 'checked="checked"' : ''; ?> />
+										<strong><?= htmlspecialchars($ifc["descr"]); ?></strong>
+										<span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+									</label>
+								</div>
+								<?php } ?>
+								<p class="help-block"><?= l7_t("Vazio = todas as interfaces capturadas."); ?></p>
+							</div>
+						</div>
+						<?php } ?>
+
 						<input type="hidden" name="save" value="1">
-						<div class="layer7-admin-block__actions">
-							<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?= l7_t("Guardar definicoes de relatorios"); ?></button>
+						<div style="margin-top:12px;">
+							<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?= l7_t("Guardar relatorios"); ?></button>
 						</div>
 					</form>
 				</div>
 			</div>
 
 			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= l7_t("Actualizacao do pacote"); ?></div>
+				<div class="layer7-admin-block__header"><?= l7_t("Sistema"); ?></div>
 				<div class="layer7-admin-block__body">
 
+				<h4 style="margin-top:0;"><?= l7_t("Licenca"); ?></h4>
+				<dl class="dl-horizontal layer7-summary">
+					<dt><?= l7_t("Estado"); ?></dt>
+					<dd><?= $lic_badge; ?></dd>
+					<dt><?= l7_t("Hardware ID"); ?></dt>
+					<dd><code style="font-size: 11px; word-break: break-all;"><?= htmlspecialchars($lic_hw); ?></code></dd>
+					<?php if ($lic_customer !== "") { ?>
+					<dt><?= l7_t("Cliente"); ?></dt>
+					<dd><?= htmlspecialchars($lic_customer); ?></dd>
+					<?php } ?>
+					<?php if ($lic_expiry !== "") { ?>
+					<dt><?= l7_t("Expira"); ?></dt>
+					<dd><?= htmlspecialchars($lic_expiry); ?>
+						<?php if ($lic_days > 0) { ?>
+						<small class="text-muted">(<?= $lic_days; ?> <?= l7_t("dias restantes"); ?>)</small>
+						<?php } ?>
+					</dd>
+					<?php } ?>
+				</dl>
+				<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>
+					<form method="post" style="display:inline;">
+						<button type="submit" name="revoke_license" value="1" class="btn btn-sm btn-danger"
+							onclick="return confirm(<?= json_encode(l7_t('Deseja revogar a licenca activa?')) ?>);">
+							<i class="fa fa-ban"></i> <?= l7_t("Revogar licenca"); ?>
+						</button>
+					</form>
+				<?php else: ?>
+					<form method="post" style="margin-top:8px;">
+						<div class="input-group" style="max-width:400px;">
+							<input type="text" name="license_code" class="form-control" maxlength="128" placeholder="ABCD1234EFGH5678">
+							<span class="input-group-btn">
+								<button type="submit" name="register_license" value="1" class="btn btn-success">
+									<i class="fa fa-check"></i> <?= l7_t("Registar"); ?>
+								</button>
+							</span>
+						</div>
+					</form>
+				<?php endif; ?>
+
+				<hr>
+
+				<h4><?= l7_t("Backup e restore"); ?></h4>
+				<?php if ($backup_msg !== "") { ?>
+				<div class="alert alert-success"><?= htmlspecialchars($backup_msg); ?></div>
+				<?php } ?>
+				<?php if ($backup_err !== "") { ?>
+				<div class="alert alert-danger"><?= htmlspecialchars($backup_err); ?></div>
+				<?php } ?>
+				<div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:12px;">
+					<form method="post" style="display:inline;">
+						<button type="submit" name="export_config" value="1" class="btn btn-sm btn-info">
+							<i class="fa fa-download"></i> <?= l7_t("Exportar"); ?>
+						</button>
+					</form>
+					<form method="post" enctype="multipart/form-data" style="display:inline-flex; gap:6px; align-items:center;">
+						<input type="file" name="import_file" accept=".json" style="display:inline-block; width:auto;" />
+						<button type="submit" name="import_config" value="1" class="btn btn-sm btn-warning"
+							onclick="return confirm(<?= json_encode(l7_t('Substituir a configuracao actual? Esta accao nao pode ser desfeita.')) ?>);">
+							<i class="fa fa-upload"></i> <?= l7_t("Importar"); ?>
+						</button>
+					</form>
+				</div>
+
+				<hr>
+
+				<h4><?= l7_t("Actualizacao"); ?></h4>
 				<?php if ($update_msg !== "") { ?>
 				<div class="alert alert-success"><?= htmlspecialchars($update_msg); ?></div>
 				<?php } ?>
@@ -786,59 +741,34 @@ layer7_render_styles();
 				$disp_ver = layer7_daemon_version();
 				if ($disp_ver === "") { $disp_ver = l7_t("nao instalado"); }
 				?>
+				<p><?= l7_t("Versao instalada"); ?>: <code><?= htmlspecialchars($disp_ver); ?></code>
+				<?php if ($update_info !== null) { ?>
+				&nbsp;|&nbsp; <?= l7_t("Mais recente"); ?>: <code><?= htmlspecialchars($update_info["latest"]); ?></code>
+				<?php } ?>
+				</p>
 
-				<div class="layer7-form-card">
-					<h4 class="layer7-form-card__title"><?= l7_t("Estado"); ?></h4>
-					<dl class="dl-horizontal layer7-summary">
-						<dt><?= l7_t("Versao instalada"); ?></dt>
-						<dd><code><?= htmlspecialchars($disp_ver); ?></code></dd>
-					</dl>
-
-					<?php if ($update_info !== null) { ?>
-					<dl class="dl-horizontal layer7-summary">
-						<dt><?= l7_t("Versao mais recente"); ?></dt>
-						<dd>
-							<code><?= htmlspecialchars($update_info["latest"]); ?></code>
-							<small class="text-muted"> — <?= htmlspecialchars($update_info["name"]); ?></small>
-						</dd>
-					</dl>
-					<?php } ?>
-				</div>
-
-				<div class="layer7-form-card">
-					<h4 class="layer7-form-card__title"><?= l7_t("Acoes"); ?></h4>
-					<?php if ($update_info !== null) { ?>
+				<?php if ($update_info !== null) { ?>
 					<?php if (version_compare($update_info["latest"], $update_info["current"], ">") && $update_info["pkg_url"] !== "") { ?>
-					<form method="post">
+					<form method="post" style="display:inline;">
 						<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
-						<button type="submit" name="do_update" value="1" class="btn btn-success"
+						<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success"
 							onclick="return confirm(<?= json_encode(l7_t('Actualizar o pacote Layer7? O daemon sera reiniciado.')) ?>);">
 							<i class="fa fa-download"></i>
 							<?= l7_t("Actualizar para ") . htmlspecialchars($update_info["latest"]); ?>
 						</button>
-						<p class="help-block" style="margin-top: 8px;">
-							<?= l7_t("O daemon sera parado, o pacote substituido e o daemon reiniciado. As politicas e configuracoes sao preservadas."); ?>
-						</p>
 					</form>
 					<?php } elseif ($update_info["pkg_url"] === "") { ?>
-					<div class="alert alert-warning"><?= l7_t("Release encontrado mas sem artefacto .pkg. Verifique o GitHub."); ?></div>
+					<div class="alert alert-warning"><?= l7_t("Release encontrado mas sem artefacto .pkg."); ?></div>
 					<?php } else { ?>
-					<div class="alert alert-info">
-						<i class="fa fa-check-circle"></i> <?= l7_t("Ja esta na versao mais recente."); ?>
-					</div>
+					<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Ja esta na versao mais recente."); ?></span>
 					<?php } ?>
-					<?php } ?>
+				<?php } ?>
+				<form method="post" style="display:inline; margin-left:8px;">
+					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-info">
+						<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
+					</button>
+				</form>
 
-					<form method="post">
-						<button type="submit" name="check_update" value="1" class="btn btn-info">
-							<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
-						</button>
-					</form>
-				</div>
-
-				<p class="layer7-admin-block__note small">
-					<?= l7_t("Verifica a ultima versao publicada no GitHub Releases. As politicas, excecoes e configuracoes existentes sao sempre preservadas durante a actualizacao."); ?>
-				</p>
 				</div>
 			</div>
 		</div>
