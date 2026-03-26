@@ -365,9 +365,9 @@ layer7_render_styles();
 
 			<p class="layer7-lead"><?= l7_t("Simule o que aconteceria a um fluxo de trafego com as politicas e excepcoes actuais. Util para diagnostico antes de activar o modo enforce."); ?></p>
 
-		<div class="layer7-section">
+		<div class="layer7-section" id="l7-test">
 			<h3 class="layer7-section-title"><?= l7_t("Parametros do teste"); ?></h3>
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_test.php#l7-test" class="form-horizontal">
 
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= l7_t("Dominio ou IP destino"); ?></label>

@@ -414,10 +414,10 @@ layer7_render_styles();
 		<?php layer7_render_tabs("settings"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_settings.php#l7-servico" class="form-horizontal">
 			<input type="hidden" name="save_scope" value="general" />
 
-			<div class="layer7-admin-block">
+			<div class="layer7-admin-block" id="l7-servico">
 				<div class="layer7-admin-block__header"><?= l7_t("Configuracao do servico"); ?></div>
 				<div class="layer7-admin-block__body">
 					<div class="form-group">
@@ -575,10 +575,10 @@ layer7_render_styles();
 			$rpt_selected_preset = in_array($rpt_ret, $rpt_presets, true) ? (string)$rpt_ret : "custom";
 			$rpt_evt_selected_preset = in_array($rpt_evt_ret, $rpt_presets, true) ? (string)$rpt_evt_ret : "custom";
 			?>
-			<div class="layer7-admin-block">
+			<div class="layer7-admin-block" id="l7-relatorios">
 				<div class="layer7-admin-block__header"><?= l7_t("Relatorios"); ?></div>
 				<div class="layer7-admin-block__body">
-					<form method="post" class="form-horizontal">
+					<form method="post" action="layer7_settings.php#l7-relatorios" class="form-horizontal">
 						<input type="hidden" name="save_scope" value="reports">
 
 						<div class="form-group">
@@ -672,7 +672,7 @@ layer7_render_styles();
 				</div>
 			</div>
 
-			<div class="layer7-admin-block">
+			<div class="layer7-admin-block" id="l7-sistema">
 				<div class="layer7-admin-block__header"><?= l7_t("Sistema"); ?></div>
 				<div class="layer7-admin-block__body">
 
@@ -696,14 +696,14 @@ layer7_render_styles();
 					<?php } ?>
 				</dl>
 				<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>
-					<form method="post" style="display:inline;">
+					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
 						<button type="submit" name="revoke_license" value="1" class="btn btn-sm btn-danger"
 							onclick="return confirm(<?= json_encode(l7_t('Deseja revogar a licenca activa?')) ?>);">
 							<i class="fa fa-ban"></i> <?= l7_t("Revogar licenca"); ?>
 						</button>
 					</form>
 				<?php else: ?>
-					<form method="post" style="margin-top:8px;">
+					<form method="post" action="layer7_settings.php#l7-sistema" style="margin-top:8px;">
 						<div class="input-group" style="max-width:400px;">
 							<input type="text" name="license_code" class="form-control" maxlength="128" placeholder="ABCD1234EFGH5678">
 							<span class="input-group-btn">
@@ -725,12 +725,12 @@ layer7_render_styles();
 				<div class="alert alert-danger"><?= htmlspecialchars($backup_err); ?></div>
 				<?php } ?>
 				<div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:12px;">
-					<form method="post" style="display:inline;">
+					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
 						<button type="submit" name="export_config" value="1" class="btn btn-sm btn-info">
 							<i class="fa fa-download"></i> <?= l7_t("Exportar"); ?>
 						</button>
 					</form>
-					<form method="post" enctype="multipart/form-data" style="display:inline-flex; gap:6px; align-items:center;">
+					<form method="post" action="layer7_settings.php#l7-sistema" enctype="multipart/form-data" style="display:inline-flex; gap:6px; align-items:center;">
 						<input type="file" name="import_file" accept=".json" style="display:inline-block; width:auto;" />
 						<button type="submit" name="import_config" value="1" class="btn btn-sm btn-warning"
 							onclick="return confirm(<?= json_encode(l7_t('Substituir a configuracao actual? Esta accao nao pode ser desfeita.')) ?>);">
@@ -761,7 +761,7 @@ layer7_render_styles();
 
 				<?php if ($update_info !== null) { ?>
 					<?php if (version_compare($update_info["latest"], $update_info["current"], ">") && $update_info["pkg_url"] !== "") { ?>
-					<form method="post" style="display:inline;">
+					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
 						<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
 						<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success"
 							onclick="return confirm(<?= json_encode(l7_t('Actualizar o pacote Layer7? O daemon sera reiniciado.')) ?>);">
@@ -775,7 +775,7 @@ layer7_render_styles();
 					<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Ja esta na versao mais recente."); ?></span>
 					<?php } ?>
 				<?php } ?>
-				<form method="post" style="display:inline; margin-left:8px;">
+				<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline; margin-left:8px;">
 					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-info">
 						<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
 					</button>

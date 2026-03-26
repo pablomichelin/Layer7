@@ -1,12 +1,12 @@
-## Layer7 v1.6.2 — Fix edição de categorias custom
+## Layer7 v1.6.3 — Scroll fix: âncoras HTML em todos os formulários
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Correção
 
-- Restaurado botão de editar para categorias personalizadas criadas pelo utilizador
-- Ao editar, campo ID fica readonly (apenas domínios podem ser alterados)
-- Categorias UT1 pré-definidas continuam sem opção de edição
+- Adicionadas âncoras HTML a todos os formulários POST em todas as páginas
+- Ao submeter um form, a página volta à secção relevante em vez de saltar para o topo
+- Páginas afectadas: Settings, Blacklists, Policies, Diagnostics, Reports, Status, Groups, Exceptions, Test
 
 ### Instalacao (um comando)
 

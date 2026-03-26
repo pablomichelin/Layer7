@@ -596,7 +596,7 @@ function layer7_policy_match_summary($policy) {
 		<div id="l7ProfileModal" class="l7-modal-overlay" style="display:none;">
 			<div class="l7-modal-box">
 				<h4 id="l7ProfileModalTitle"></h4>
-				<form method="post" class="form-horizontal">
+				<form method="post" action="layer7_policies.php#l7-policies" class="form-horizontal">
 					<input type="hidden" name="profile_id" id="l7ProfileId" value="" />
 					<input type="hidden" name="add_profile_policy" value="1" />
 
@@ -662,14 +662,14 @@ function layer7_policy_match_summary($policy) {
 		</div>
 		<?php } ?>
 
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-policies">
 			<div class="layer7-admin-block__header"><?= l7_t("Politicas atuais"); ?></div>
 			<div class="layer7-admin-block__body">
 			<?php if (count($policies) === 0) { ?>
 			<div class="alert alert-info"><?= l7_t("Nenhuma politica cadastrada. Adicione a primeira regra abaixo ou importe um layer7.json existente."); ?></div>
 			<?php } else { ?>
 			<div class="layer7-form-card">
-			<form method="post">
+			<form method="post" action="layer7_policies.php#l7-policies">
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
 						<thead>
@@ -720,7 +720,7 @@ function layer7_policy_match_summary($policy) {
 				</a>
 			</div>
 			<div id="l7-delete-policy" class="collapse" style="margin-top:8px;">
-				<form method="post" class="form-inline"
+				<form method="post" action="layer7_policies.php#l7-policies" class="form-inline"
 					onsubmit='return confirm(<?= json_encode(l7_t("Remover esta politica do JSON?")); ?>);'>
 					<select name="delete_policy_index" class="form-control input-sm">
 						<?php foreach ($policies as $i => $policy) {
@@ -806,14 +806,14 @@ function layer7_policy_match_summary($policy) {
 				$edit_sched_end = isset($edit_policy["schedule"]["end"]) ? (string)$edit_policy["schedule"]["end"] : "";
 			}
 		?>
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-edit">
 			<div class="layer7-admin-block__header"><?= l7_t("Editar politica"); ?></div>
 			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Atualize os detalhes da regra selecionada. O identificador permanece fixo para manter a referencia no JSON."); ?></p>
 			<div class="layer7-toolbar">
 				<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
 			</div>
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_policies.php#l7-edit" class="form-horizontal">
 				<input type="hidden" name="edit_policy_index" value="<?= (int)$edit_idx; ?>" />
 
 				<div class="form-group">
@@ -1038,14 +1038,14 @@ function layer7_policy_match_summary($policy) {
 		</div>
 		<?php } ?>
 
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-add">
 			<div class="layer7-admin-block__header"><?= l7_t("Adicionar politica"); ?></div>
 			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Use nomes claros e prioridades previsiveis para manter a leitura do conjunto simples durante o troubleshooting."); ?></p>
 			<?php if ($at_limit) { ?>
 			<div class="alert alert-warning"><?= l7_t("Limite de 24 politicas atingido."); ?></div>
 			<?php } else { ?>
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_policies.php#l7-add" class="form-horizontal">
 
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><code>id</code></label>

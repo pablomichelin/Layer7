@@ -240,8 +240,8 @@ layer7_render_styles();
 			</div>
 		</div>
 
-		<div class="layer7-toolbar">
-			<form method="post" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
+		<div class="layer7-toolbar" id="l7-toolbar">
+			<form method="post" action="layer7_status.php#l7-toolbar" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
 				<button type="submit" name="restart_service" value="1" class="btn btn-warning"
 					onclick="return confirm(<?= json_encode(l7_t('Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart.')) ?>);">
 					<i class="fa fa-refresh"></i> <?= l7_t("Reiniciar servico"); ?>

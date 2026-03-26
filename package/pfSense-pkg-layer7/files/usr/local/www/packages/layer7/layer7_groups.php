@@ -210,7 +210,7 @@ layer7_render_styles();
 
 			<p class="layer7-lead"><?= l7_t("Crie grupos nomeados de dispositivos (ex.: Funcionarios, Visitantes) e aplique politicas por grupo em vez de repetir CIDRs manualmente."); ?></p>
 
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-groups">
 			<div class="layer7-admin-block__header"><?= l7_t("Grupos actuais"); ?></div>
 			<div class="layer7-admin-block__body">
 				<?php if (count($groups) === 0) { ?>
@@ -252,7 +252,7 @@ layer7_render_styles();
 				</div>
 
 				<div class="layer7-callout layer7-danger-zone">
-					<form method="post" class="form-inline layer7-inline-form"
+					<form method="post" action="layer7_groups.php#l7-groups" class="form-inline layer7-inline-form"
 						onsubmit='return confirm(<?= json_encode(l7_t("Remover este grupo?")); ?>);'>
 						<div class="form-group">
 							<label class="control-label" for="delete_group_index"><?= l7_t("Remover grupo"); ?></label>
@@ -281,13 +281,13 @@ layer7_render_styles();
 			$eg_hosts = isset($edit_group["hosts"]) && is_array($edit_group["hosts"])
 				? implode("\n", $edit_group["hosts"]) : "";
 		?>
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-edit-group">
 			<div class="layer7-admin-block__header"><?= l7_t("Editar grupo"); ?></div>
 			<div class="layer7-admin-block__body">
 			<div class="layer7-toolbar">
 				<a href="layer7_groups.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
 			</div>
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_groups.php#l7-edit-group" class="form-horizontal">
 				<input type="hidden" name="edit_group_index" value="<?= (int)$edit_idx; ?>" />
 
 				<div class="form-group">
@@ -330,14 +330,14 @@ layer7_render_styles();
 		</div>
 		<?php } ?>
 
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-add-group">
 			<div class="layer7-admin-block__header"><?= l7_t("Adicionar grupo"); ?></div>
 			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Defina um grupo de dispositivos com CIDRs e/ou IPs individuais. Depois associe o grupo a politicas na pagina de politicas."); ?></p>
 			<?php if ($at_limit) { ?>
 			<div class="alert alert-warning"><?= l7_t("Limite de 16 grupos atingido."); ?></div>
 			<?php } else { ?>
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_groups.php#l7-add-group" class="form-horizontal">
 
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><code>id</code></label>

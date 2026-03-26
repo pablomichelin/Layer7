@@ -2,6 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.3] — 2026-03-26
+
+### Fixed
+
+- **Scroll fix** — adicionadas âncoras HTML (`id` + `action`) a todos os formulários POST em todas as páginas do pacote; ao submeter um form a página volta à secção relevante em vez de saltar para o topo
+- Páginas afectadas: Settings, Blacklists, Policies, Diagnostics, Reports, Status, Groups, Exceptions, Test
+- **PORTVERSION** bumped para 1.6.3
+
 ## [1.6.2] — 2026-03-26
 
 ### Fixed

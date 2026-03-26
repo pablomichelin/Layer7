@@ -249,14 +249,14 @@ function layer7_exc_target_summary($exception) {
 
 			<p class="layer7-lead"><?= l7_t("Excecoes sao avaliadas antes das politicas e ajudam a preservar trafego de gestao, redes internas e casos especiais durante os testes."); ?></p>
 
-		<div class="layer7-section">
+		<div class="layer7-section" id="l7-exceptions">
 			<h3 class="layer7-section-title"><?= l7_t("Excecoes atuais"); ?></h3>
 			<p class="help-block"><?= l7_t("Prioridade maior = regra avaliada primeiro."); ?></p>
 			<?php if (count($exceptions) === 0) { ?>
 			<div class="alert alert-info"><?= l7_t("Nenhuma excecao cadastrada no momento."); ?></div>
 			<?php } else { ?>
 			<div class="layer7-form-card">
-			<form method="post">
+			<form method="post" action="layer7_exceptions.php#l7-exceptions">
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
 						<thead>
@@ -298,7 +298,7 @@ function layer7_exc_target_summary($exception) {
 			</div>
 
 			<div class="layer7-callout layer7-danger-zone">
-				<form method="post" class="form-inline layer7-inline-form"
+				<form method="post" action="layer7_exceptions.php#l7-exceptions" class="form-inline layer7-inline-form"
 					onsubmit='return confirm(<?= json_encode(l7_t("Remover esta excecao do JSON?")); ?>);'>
 					<div class="form-group">
 						<label class="control-label" for="delete_exception_index"><?= l7_t("Remover excecao"); ?></label>
@@ -343,14 +343,14 @@ function layer7_exc_target_summary($exception) {
 			}
 			$ee_ifaces = layer7_get_pfsense_interfaces();
 		?>
-		<div class="layer7-section">
+		<div class="layer7-section" id="l7-edit-exc">
 			<h3 class="layer7-section-title"><?= l7_t("Editar excecao"); ?></h3>
 			<p class="layer7-lead"><?= l7_t("Use excecoes para trafego de gestao, IPs criticos e redes que nao devem ser avaliadas pelas politicas gerais."); ?></p>
 			<div class="layer7-toolbar">
 				<a href="layer7_exceptions.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
 			</div>
 
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_exceptions.php#l7-edit-exc" class="form-horizontal">
 				<input type="hidden" name="edit_exception_index" value="<?= (int)$edit_ex_idx; ?>" />
 
 				<div class="form-group">
@@ -436,14 +436,14 @@ function layer7_exc_target_summary($exception) {
 		</div>
 		<?php } ?>
 
-		<div class="layer7-section">
+		<div class="layer7-section" id="l7-add-exc">
 			<h3 class="layer7-section-title"><?= l7_t("Adicionar excecao"); ?></h3>
 			<p class="layer7-lead"><?= l7_t("Cadastre aqui os alvos que devem fugir do fluxo padrao de classificacao, sem precisar editar o JSON manualmente."); ?></p>
 			<?php if ($exc_limit) { ?>
 			<div class="alert alert-warning"><?= l7_t("Limite de 16 excecoes atingido."); ?></div>
 			<?php } else { ?>
 			<?php $pf_ifaces_exc = layer7_get_pfsense_interfaces(); ?>
-			<form method="post" class="form-horizontal">
+			<form method="post" action="layer7_exceptions.php#l7-add-exc" class="form-horizontal">
 
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><code>id</code></label>

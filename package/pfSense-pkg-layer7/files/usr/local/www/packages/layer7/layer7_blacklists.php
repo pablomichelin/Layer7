@@ -262,11 +262,11 @@ layer7_render_styles();
 <?php layer7_render_messages(); ?>
 
 <!-- SECTION 1: URL & Download -->
-<div class="layer7-admin-block">
+<div class="layer7-admin-block" id="l7-download">
 <div class="layer7-admin-block__header"><?=l7_t("URL e Download")?></div>
 <div class="layer7-admin-block__body">
 <div class="layer7-form-card">
-<form method="post">
+<form method="post" action="layer7_blacklists.php#l7-download">
 <div class="form-group">
 	<label><?=l7_t("URL da blacklist")?></label>
 	<input type="text" class="form-control" name="source_url"
@@ -295,7 +295,7 @@ layer7_render_styles();
 </div>
 
 <!-- SECTION 2: Blacklist Rules -->
-<div class="layer7-admin-block">
+<div class="layer7-admin-block" id="l7-rules">
 <div class="layer7-admin-block__header"><?=l7_t("Regras de Blacklist")?></div>
 <div class="layer7-admin-block__body">
 
@@ -359,7 +359,7 @@ layer7_render_styles();
 	<td><code>layer7_bld_<?=$idx?></code></td>
 	<td class="layer7-table-actions">
 		<a href="?edit=<?=$idx?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
-		<form method="post" style="display:inline;"
+		<form method="post" action="layer7_blacklists.php#l7-rules" style="display:inline;"
 			onsubmit="return confirm(<?=json_encode(l7_t('Remover esta regra'))?>);">
 			<input type="hidden" name="rule_index" value="<?=$idx?>">
 			<button type="submit" name="delete_rule" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
@@ -399,7 +399,7 @@ if ($show_form):
 ?>
 <div class="layer7-form-card">
 <h4 class="layer7-form-card__title"><?=$form_title?></h4>
-<form method="post">
+<form method="post" action="layer7_blacklists.php#l7-rules">
 <?php if ($edit_idx >= 0): ?>
 <input type="hidden" name="rule_index" value="<?=$edit_idx?>">
 <?php endif; ?>
@@ -483,7 +483,7 @@ if ($show_form):
 </div>
 
 <!-- SECTION 3: Custom categories/extensions -->
-<div class="layer7-admin-block">
+<div class="layer7-admin-block" id="l7-custom">
 <div class="layer7-admin-block__header"><?=l7_t("Categorias personalizadas e extensoes")?></div>
 <div class="layer7-admin-block__body">
 
@@ -522,7 +522,7 @@ if ($show_form):
 	<td><?=number_format(count($domains), 0, ',', '.')?></td>
 	<td class="layer7-table-actions">
 		<a href="?cat_edit=<?=urlencode($cid)?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
-		<form method="post" style="display:inline;" onsubmit="return confirm(<?=json_encode(l7_t('Remover categoria personalizada?'))?>);">
+		<form method="post" action="layer7_blacklists.php#l7-custom" style="display:inline;" onsubmit="return confirm(<?=json_encode(l7_t('Remover categoria personalizada?'))?>);">
 			<input type="hidden" name="cat_id" value="<?=htmlspecialchars($cid)?>">
 			<button type="submit" name="delete_cat_sites" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
 		</form>
@@ -549,7 +549,7 @@ $cat_form_sites = $_cat_editing && isset($custom_map[$cat_edit]) ? implode("\n",
 <div id="l7-new-cat-form" class="<?= $_cat_editing ? '' : 'collapse' ?>">
 <div class="layer7-form-card">
 <h4 class="layer7-form-card__title"><?= $_cat_editing ? l7_t("Editar categoria personalizada") : l7_t("Nova categoria personalizada") ?></h4>
-<form method="post">
+<form method="post" action="layer7_blacklists.php#l7-custom">
 <div class="form-group">
 	<label><?=l7_t("ID da categoria")?></label>
 	<input type="text" class="form-control" name="cat_id" value="<?=htmlspecialchars($cat_form_id)?>" placeholder="<?=l7_t("Ex: bloqueios_internos, erp, cloud_apps")?>" style="max-width:360px;" <?= $_cat_editing ? 'readonly' : '' ?> required>
@@ -572,11 +572,11 @@ $cat_form_sites = $_cat_editing && isset($custom_map[$cat_edit]) ? implode("\n",
 </div>
 
 <!-- SECTION 3: Global Whitelist -->
-<div class="layer7-admin-block">
+<div class="layer7-admin-block" id="l7-whitelist">
 <div class="layer7-admin-block__header"><?=l7_t("Whitelist Global")?></div>
 <div class="layer7-admin-block__body">
 <div class="layer7-form-card">
-<form method="post">
+<form method="post" action="layer7_blacklists.php#l7-whitelist">
 <div class="form-group">
 	<label><?=l7_t("Dominios nunca bloqueados (um por linha)")?></label>
 	<textarea class="form-control" name="whitelist" rows="5"
@@ -595,11 +595,11 @@ $cat_form_sites = $_cat_editing && isset($custom_map[$cat_edit]) ? implode("\n",
 </div>
 
 <!-- SECTION 4: Settings & State -->
-<div class="layer7-admin-block">
+<div class="layer7-admin-block" id="l7-bl-settings">
 <div class="layer7-admin-block__header"><?=l7_t("Definicoes e Estado")?></div>
 <div class="layer7-admin-block__body">
 <div class="layer7-form-card">
-<form method="post">
+<form method="post" action="layer7_blacklists.php#l7-bl-settings">
 <div class="form-group">
 	<label class="checkbox-inline">
 		<input type="checkbox" name="auto_update" value="1"

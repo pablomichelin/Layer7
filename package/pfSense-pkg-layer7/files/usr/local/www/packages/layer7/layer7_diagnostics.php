@@ -373,7 +373,7 @@ layer7_render_styles();
 			</div>
 		</div>
 
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-pf">
 			<div class="layer7-admin-block__header"><?= l7_t("Tabelas PF (enforcement)"); ?></div>
 			<div class="layer7-admin-block__body">
 				<dl class="dl-horizontal layer7-summary">
@@ -522,7 +522,7 @@ layer7_render_styles();
 							<i class="fa fa-times-circle"></i> <?= l7_t("Erro: helper PF nao encontrado."); ?>
 						</div>
 						<?php } ?>
-						<form method="post" class="layer7-inline-form" style="margin-top:8px;">
+						<form method="post" action="layer7_diagnostics.php#l7-pf" class="layer7-inline-form" style="margin-top:8px;">
 							<button type="submit" name="repair_pf_tables" value="1" class="btn btn-warning">
 								<i class="fa fa-wrench"></i> <?= l7_t("Reparar tabelas PF"); ?>
 							</button>
@@ -534,7 +534,7 @@ layer7_render_styles();
 			</div>
 		</div>
 
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-dns">
 			<div class="layer7-admin-block__header"><?= l7_t("Anti-bypass DNS"); ?></div>
 			<div class="layer7-admin-block__body">
 				<dl class="dl-horizontal layer7-summary">
@@ -551,14 +551,14 @@ layer7_render_styles();
 					<dd>
 						<?php if ($unbound_anti_doh) { ?>
 						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Overrides anti-DoH configurados no Unbound."); ?></span>
-						<form method="post" class="layer7-inline-form" style="display:inline; margin-left:8px;">
+						<form method="post" action="layer7_diagnostics.php#l7-dns" class="layer7-inline-form" style="display:inline; margin-left:8px;">
 							<button type="submit" name="remove_anti_doh" value="1" class="btn btn-xs btn-danger" title="<?= l7_t("Remove os overrides anti-DoH do Unbound."); ?>" onclick="return confirm(<?= json_encode(l7_t('Remover overrides anti-DoH do Unbound?')) ?>);">
 								<i class="fa fa-trash"></i> <?= l7_t("Remover"); ?>
 							</button>
 						</form>
 						<?php } else { ?>
 						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Overrides nao encontrados."); ?></span>
-						<form method="post" class="layer7-inline-form" style="display:inline; margin-left:8px;">
+						<form method="post" action="layer7_diagnostics.php#l7-dns" class="layer7-inline-form" style="display:inline; margin-left:8px;">
 							<button type="submit" name="configure_anti_doh" value="1" class="btn btn-xs btn-success" title="<?= l7_t("Adiciona NXDOMAIN para resolvers DoH conhecidos e reinicia o Unbound."); ?>">
 								<i class="fa fa-magic"></i> <?= l7_t("Configurar agora"); ?>
 							</button>
@@ -607,11 +607,11 @@ layer7_render_styles();
 		<?php } ?>
 
 		<?php if ($status_ok && $pid !== null) { ?>
-		<div class="layer7-admin-block">
+		<div class="layer7-admin-block" id="l7-actions">
 			<div class="layer7-admin-block__header"><?= l7_t("Acoes"); ?></div>
 			<div class="layer7-admin-block__body">
 			<div class="layer7-form-card">
-				<form method="post" class="form-inline layer7-inline-form">
+				<form method="post" action="layer7_diagnostics.php#l7-actions" class="form-inline layer7-inline-form">
 					<button type="submit" name="send_sigusr1" value="1" class="btn btn-info">
 						<i class="fa fa-bar-chart"></i> <?= l7_t("Obter estatisticas (SIGUSR1)"); ?>
 					</button>
