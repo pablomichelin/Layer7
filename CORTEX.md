@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.15 — Correção enforce/licença e auditoria operacional**
+**Versão: 1.4.16 — Diagnóstico PF sem falso negativo**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.16 — Diagnóstico PF sem falso negativo (2026-03-26):**
+  - `layer7-pfctl` passa a validar “tabela pronta” por presença real em `pfctl -s Tables` OU referência activa no filtro (`pfctl -sr`)
+  - `Diagnostics` passa a avaliar tabelas obrigatórias com estado combinado, eliminando falso erro recorrente em tabelas referenciadas porém sem materialização imediata
+  - linhas de tabela na GUI passam a distinguir “não existe” de “referenciada no filtro activo (sem entradas)”
+  - troubleshooting PF fica objectivo: foco em falha real de enforcement, não em estado cosmético de materialização
+  - PORTVERSION incrementado para 1.4.16
 - **v1.4.15 — Correção enforce/licença e auditoria operacional (2026-03-26):**
   - `layer7d` passa a recomputar `enforce_cfg` por helper único após parse/licença (startup + recheck), removendo estado inconsistente com licença válida
   - parser de `layer7` deixa de depender da ordem de chaves para `enabled`, `mode` e `log_level`

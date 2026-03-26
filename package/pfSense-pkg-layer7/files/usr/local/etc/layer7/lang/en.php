@@ -183,6 +183,7 @@ $L7_STRINGS = array(
     "Regras layer7:block ativas e tabelas PF obrigatorias presentes." => "Active layer7:block rules and required PF tables are present.",
     "Regras layer7:block ativas, mas faltam tabelas PF obrigatorias." => "Active layer7:block rules, but required PF tables are missing.",
     "Somente regras anti-bypass estao ativas; bloqueio por tabelas ainda nao esta ativo." => "Only anti-bypass rules are active; table-based blocking is not active yet.",
+    "Tabela referenciada no filtro activo (sem entradas no momento)." => "Table referenced in active filter (no entries at the moment).",
     "Enforcement ainda nao validado no filtro ativo." => "Enforcement not yet validated in the active filter.",
     "Fluxos classificados pelo nDPI (visivel com log_level=debug). Mostra src, app, cat, action, reason." => "Flows classified by nDPI (visible with log_level=debug). Shows src, app, cat, action, reason.",
     "Forca aplicacoes a usar HTTPS (TCP 443) em vez de QUIC, onde o SNI e visivel ao nDPI. Melhora significativamente a eficacia do bloqueio por DNS/SNI. Adiciona regra PF: block drop quick proto udp to port 443." => "Forces applications to use HTTPS (TCP 443) instead of QUIC, where the SNI is visible to nDPI. Significantly improves DNS/SNI blocking effectiveness. Adds PF rule: block drop quick proto udp to port 443.",

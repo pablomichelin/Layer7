@@ -28,6 +28,50 @@ function layer7_diag_pf_required_tables_ok($tables, $bl_config)
 	return true;
 }
 
+function layer7_diag_table_referenced($table, $rules_raw)
+{
+	if (!is_string($table) || $table === "" || !is_array($rules_raw)) {
+		return false;
+	}
+	$pattern = '/<' . preg_quote($table, '/') . '[:>]/';
+	foreach ($rules_raw as $line) {
+		if (preg_match($pattern, (string)$line)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function layer7_diag_table_ready($table, $tables, $rules_raw)
+{
+	if (is_array($tables) && !empty($tables[$table])) {
+		return true;
+	}
+	return layer7_diag_table_referenced($table, $rules_raw);
+}
+
+function layer7_diag_pf_required_tables_ready($tables, $bl_config, $rules_raw)
+{
+	if (!layer7_diag_table_ready("layer7_block", $tables, $rules_raw) ||
+	    !layer7_diag_table_ready("layer7_block_dst", $tables, $rules_raw)) {
+		return false;
+	}
+	if (!empty($bl_config["enabled"]) &&
+	    !empty($bl_config["rules"]) &&
+	    is_array($bl_config["rules"])) {
+		foreach ($bl_config["rules"] as $idx => $rule) {
+			if (empty($rule["enabled"])) {
+				continue;
+			}
+			$tname = "layer7_bld_" . (int)$idx;
+			if (!layer7_diag_table_ready($tname, $tables, $rules_raw)) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 $cfgpath = layer7_cfg_path();
 $log_path = "/var/log/layer7d.log";
 $pf_helper = layer7_pf_helper_path();
@@ -104,7 +148,9 @@ if (isset($_POST["repair_pf_tables"])) {
 				}
 			}
 		}
-		$required_ok = layer7_diag_pf_required_tables_ok($tables_map, $bl_config_diag);
+		$rules_raw = array();
+		exec("/sbin/pfctl -sr 2>/dev/null", $rules_raw);
+		$required_ok = layer7_diag_pf_required_tables_ready($tables_map, $bl_config_diag, $rules_raw);
 		if (($ensure_rc !== 0 || !$required_ok) && file_exists("/tmp/rules.debug")) {
 			if (function_exists("mwexec")) {
 				mwexec("/sbin/pfctl -f /tmp/rules.debug");
@@ -125,7 +171,9 @@ if (isset($_POST["repair_pf_tables"])) {
 				}
 			}
 		}
-		$pf_repair_result = layer7_diag_pf_required_tables_ok($tables_after, $bl_config_diag);
+		$rules_after = array();
+		exec("/sbin/pfctl -sr 2>/dev/null", $rules_after);
+		$pf_repair_result = layer7_diag_pf_required_tables_ready($tables_after, $bl_config_diag, $rules_after);
 	} else {
 		$pf_repair_result = false;
 	}
@@ -160,15 +208,31 @@ if (!empty($bl_config_diag["rules"])) {
 			"exists" => ($tcode === 0),
 			"count" => ($tcode === 0) ? count(array_filter($tent, 'strlen')) : -1,
 			"name" => $brule["name"] ?? "rule{$bidx}",
-			"enabled" => !empty($brule["enabled"])
+			"enabled" => !empty($brule["enabled"]),
+			"ready" => false
 		);
 	}
 }
-$pf_any_missing = ($pf_block_count < 0 || $pf_block_dst_count < 0);
-foreach ($pf_bld_tables as $bt) {
-	if (!$bt["exists"]) {
-		$pf_any_missing = true;
+$pf_tables_raw = array();
+exec("/sbin/pfctl -s Tables 2>/dev/null", $pf_tables_raw, $pf_tables_rc);
+$pf_tables_map = array();
+if ($pf_tables_rc === 0) {
+	foreach ($pf_tables_raw as $line) {
+		$line = trim((string)$line);
+		if ($line !== "") {
+			$pf_tables_map[$line] = true;
+		}
 	}
+}
+$pf_active_rules_raw = array();
+exec("/sbin/pfctl -sr 2>/dev/null", $pf_active_rules_raw, $pf_active_rules_rc);
+
+$pf_block_ready = layer7_diag_table_ready("layer7_block", $pf_tables_map, $pf_active_rules_raw);
+$pf_block_dst_ready = layer7_diag_table_ready("layer7_block_dst", $pf_tables_map, $pf_active_rules_raw);
+$pf_tag_ready = layer7_diag_table_ready("layer7_tagged", $pf_tables_map, $pf_active_rules_raw);
+
+foreach ($pf_bld_tables as $btname => $bt) {
+	$pf_bld_tables[$btname]["ready"] = layer7_diag_table_ready($btname, $pf_tables_map, $pf_active_rules_raw);
 }
 
 $pf_rules_exists = file_exists($pf_rules);
@@ -199,7 +263,8 @@ $pf_active_block_rules_hits = array();
 exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep 'layer7:block:' 2>/dev/null", $pf_active_block_rules_hits, $pf_active_block_rules_code);
 $pf_active_block_rules_loaded = ($pf_active_block_rules_code === 0 && count($pf_active_block_rules_hits) > 0);
 
-$pf_required_tables_ok = !$pf_any_missing;
+$pf_required_tables_ok = layer7_diag_pf_required_tables_ready($pf_tables_map, $bl_config_diag, $pf_active_rules_raw);
+$pf_any_missing = !$pf_required_tables_ok;
 $pf_enforcement_real_ok = ($pf_active_block_rules_loaded && $pf_required_tables_ok);
 
 $pf_anti_dot_hits = array();
@@ -386,6 +451,8 @@ layer7_render_styles();
 						<?php if ($pf_block_count > 0 && $pf_block_count <= 20) { ?>
 						<br><small><code><?= htmlspecialchars(implode(", ", array_map('trim', $pf_block_entries))); ?></code></small>
 						<?php } ?>
+						<?php } elseif ($pf_block_ready) { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Tabela referenciada no filtro activo (sem entradas no momento)."); ?></span>
 						<?php } else { ?>
 						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Tabela nao existe"); ?></span>
 						<?php } ?>
@@ -398,6 +465,8 @@ layer7_render_styles();
 						<?php if ($pf_block_dst_count > 0 && $pf_block_dst_count <= 20) { ?>
 						<br><small><code><?= htmlspecialchars(implode(", ", array_map('trim', $pf_block_dst_entries))); ?></code></small>
 						<?php } ?>
+						<?php } elseif ($pf_block_dst_ready) { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Tabela referenciada no filtro activo (sem entradas no momento)."); ?></span>
 						<?php } else { ?>
 						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Tabela nao existe"); ?></span>
 						<?php } ?>
@@ -410,6 +479,8 @@ layer7_render_styles();
 						<?php if ($pf_tag_count > 0 && $pf_tag_count <= 20) { ?>
 						<br><small><code><?= htmlspecialchars(implode(", ", array_map('trim', $pf_tag_entries))); ?></code></small>
 						<?php } ?>
+						<?php } elseif ($pf_tag_ready) { ?>
+						<span class="text-muted"><?= l7_t("Tabela referenciada no filtro activo (sem entradas no momento)."); ?></span>
 						<?php } else { ?>
 						<span class="text-muted"><?= l7_t("Tabela nao existe (opcional, usada com action=tag)."); ?></span>
 						<?php } ?>
@@ -428,6 +499,9 @@ layer7_render_styles();
 						<?php } else { ?>
 						— <span class="label label-default"><?= l7_t("Inactiva"); ?></span>
 						<?php } ?>)
+						<?php } elseif ($bt["ready"]) { ?>
+						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Tabela referenciada no filtro activo (sem entradas no momento)."); ?></span>
+						(<?= htmlspecialchars($bt["name"]); ?>)
 						<?php } else { ?>
 						<span class="text-danger"><i class="fa fa-times-circle"></i> <?= l7_t("Tabela nao existe"); ?></span>
 						(<?= htmlspecialchars($bt["name"]); ?>)

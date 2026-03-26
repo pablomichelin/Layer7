@@ -10,9 +10,25 @@ RULES_PATH="${RULES_DIR}/pf.conf"
 RULES_SAMPLE="${RULES_DIR}/pf.conf.sample"
 BL_CONFIG="/usr/local/etc/layer7/blacklists/config.json"
 
+table_referenced() {
+	_table="$1"
+	/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep -Eq "<${_table}[:>]"
+}
+
+table_ready() {
+	_table="$1"
+	if /sbin/pfctl -s Tables 2>/dev/null | /usr/bin/grep -qw "$_table"; then
+		return 0
+	fi
+	if table_referenced "$_table"; then
+		return 0
+	fi
+	return 1
+}
+
 ensure_table() {
 	_table="$1"
-	if pfctl -s Tables 2>/dev/null | grep -qw "$_table"; then
+	if table_ready "$_table"; then
 		return 0
 	fi
 	pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null && \
@@ -24,7 +40,7 @@ ensure_table() {
 
 tables_missing() {
 	for _t in "${TABLE_BLOCK}" "${TABLE_TAGGED}" "${TABLE_BLOCK_DST}"; do
-		if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
+		if ! table_ready "$_t"; then
 			return 0
 		fi
 	done
@@ -33,7 +49,7 @@ tables_missing() {
 
 required_tables_ok() {
 	for _t in "${TABLE_BLOCK}" "${TABLE_TAGGED}" "${TABLE_BLOCK_DST}"; do
-		if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
+		if ! table_ready "$_t"; then
 			echo "layer7-pfctl: missing required table ${_t}" >&2
 			return 1
 		fi
@@ -46,7 +62,7 @@ required_tables_ok() {
 		_idx=0
 		while [ "$_idx" -lt "${_count:-0}" ]; do
 			_t="layer7_bld_${_idx}"
-			if ! pfctl -s Tables 2>/dev/null | grep -qw "$_t"; then
+			if ! table_ready "$_t"; then
 				echo "layer7-pfctl: missing blacklist table ${_t}" >&2
 				return 1
 			fi
