@@ -244,7 +244,8 @@ write_stats_json(void)
 	fprintf(f, "}\n");
 	fclose(f);
 	if (rename(L7_STATS_JSON_PATH ".tmp", L7_STATS_JSON_PATH) != 0)
-		L7_WARN("stats: rename tmp failed: %s", strerror(errno));
+		syslog(LOG_WARNING, "stats: rename tmp failed: %s",
+		    strerror(errno));
 }
 
 static char s_remote_host[256];
@@ -1811,6 +1812,7 @@ int main(int argc, char **argv)
 				struct l7_bl_config bl_cfg;
 				struct l7_blacklist *new_bl = NULL;
 				struct l7_blacklist *old_bl;
+				int bl_load_ok = 0;
 
 				bl_flush_rule_tables();
 				memset(s_bl_rules, 0, sizeof(s_bl_rules));
@@ -1872,6 +1874,7 @@ int main(int argc, char **argv)
 					}
 
 					if (new_bl || all_n == 0) {
+						bl_load_ok = 1;
 						L7_NOTE("blacklists: "
 						    "loaded %d domains "
 						    "in %d categories, "
@@ -1890,9 +1893,11 @@ int main(int argc, char **argv)
 						    "UT1 categories",
 						    s_bl_n_rules);
 					}
+				} else {
+					bl_load_ok = 1;
 				}
 
-				if (new_bl || all_n == 0) {
+				if (bl_load_ok) {
 					old_bl = s_blacklist;
 					s_blacklist = new_bl;
 					if (old_bl)
