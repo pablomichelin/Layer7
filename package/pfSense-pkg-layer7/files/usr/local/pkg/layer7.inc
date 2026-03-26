@@ -2042,6 +2042,24 @@ function layer7_reports_purge_db($retention_days, $summary_retention_days = null
 	return array("ok" => true, "deleted" => $deleted, "reason" => "ok");
 }
 
+function layer7_reports_clear_all()
+{
+	$deleted = 0;
+	$db = layer7_reports_db_connect(false);
+	if ($db) {
+		$before = @$db->querySingle("SELECT COUNT(*) FROM events");
+		@$db->exec("DELETE FROM events");
+		@$db->exec("DELETE FROM identity_map");
+		@$db->exec("DELETE FROM daily_kpi");
+		@$db->exec("VACUUM");
+		$after = @$db->querySingle("SELECT COUNT(*) FROM events");
+		$deleted = max(0, (int)$before - (int)$after);
+	}
+	@unlink(L7_REPORTS_HISTORY);
+	@unlink(L7_REPORTS_CURSOR);
+	return array("ok" => true, "deleted" => $deleted);
+}
+
 function layer7_reports_filter_build($from_ts, $to_ts, $filters, &$params)
 {
 	$where = array("ts BETWEEN :from_ts AND :to_ts");

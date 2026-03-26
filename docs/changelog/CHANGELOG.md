@@ -2,6 +2,18 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.5.1] — 2026-03-26
+
+### Added
+
+- **Limpar todos os dados de relatórios** — novo botão na página de Relatórios permite apagar toda a base SQLite (eventos, identity_map, daily_kpi), o histórico JSONL e o cursor de ingestão, resolvendo travamentos em servidores com milhares de páginas acumuladas
+- **Confirmação obrigatória** — acção protegida com `confirm()` informando que é irreversível
+
+### Changed
+
+- **PORTVERSION** bumped para 1.5.1
+- Traduções EN actualizadas para novas strings
+
 ## [1.5.0] — 2026-03-26
 
 ### Security

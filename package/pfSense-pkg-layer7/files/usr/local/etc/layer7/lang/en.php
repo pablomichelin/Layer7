@@ -652,4 +652,8 @@ $L7_STRINGS = array(
     "Um CIDR por linha (max. 16)." => "One CIDR per line (max. 16).",
     "URL invalida. Apenas HTTP e HTTPS sao suportados." => "Invalid URL. Only HTTP and HTTPS are supported.",
     "Sem categorias disponiveis. Faca o download da UT1 ou adicione uma categoria personalizada abaixo." => "No categories available. Download the UT1 list or add a custom category below.",
+    "Todos os dados de relatorios foram apagados." => "All report data has been cleared.",
+    "eventos removidos" => "events removed",
+    "Apagar TODOS os dados de relatorios? Esta accao nao pode ser desfeita." => "Delete ALL report data? This action cannot be undone.",
+    "Limpar todos os dados" => "Clear all data",
 );

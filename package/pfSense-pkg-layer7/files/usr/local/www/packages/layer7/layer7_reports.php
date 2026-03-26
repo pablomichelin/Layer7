@@ -24,6 +24,14 @@ function layer7_reports_compact_pages($page, $total_pages, $radius = 2)
 	return $pages;
 }
 
+$clear_msg = "";
+if (isset($_POST["clear_all_reports"])) {
+	$result = layer7_reports_clear_all();
+	if ($result["ok"]) {
+		$clear_msg = l7_t("Todos os dados de relatorios foram apagados.") . " (" . number_format($result["deleted"]) . " " . l7_t("eventos removidos") . ")";
+	}
+}
+
 $range = isset($_GET["range"]) ? (string)$_GET["range"] : "24h";
 $custom_from = isset($_GET["from"]) ? (string)$_GET["from"] : "";
 $custom_to = isset($_GET["to"]) ? (string)$_GET["to"] : "";
@@ -184,6 +192,9 @@ layer7_render_styles();
 <?php layer7_render_tabs("reports"); ?>
 <div class="layer7-content">
 <?php layer7_render_messages(); ?>
+<?php if ($clear_msg !== "") { ?>
+<div class="alert alert-success"><i class="fa fa-check-circle"></i> <?= htmlspecialchars($clear_msg); ?></div>
+<?php } ?>
 
 <?php if (!$db_ready) { ?>
 	<div class="alert alert-warning">
@@ -266,10 +277,18 @@ layer7_render_styles();
 	</div>
 </form>
 
-<div style="margin-bottom:12px;">
-	<a href="layer7_reports_export.php?format=html&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">HTML</a>
-	<a href="layer7_reports_export.php?format=csv&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">CSV</a>
-	<a href="layer7_reports_export.php?format=json&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">JSON</a>
+<div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+	<div>
+		<a href="layer7_reports_export.php?format=html&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">HTML</a>
+		<a href="layer7_reports_export.php?format=csv&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">CSV</a>
+		<a href="layer7_reports_export.php?format=json&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">JSON</a>
+	</div>
+	<form method="post" style="display:inline;">
+		<button type="submit" name="clear_all_reports" value="1" class="btn btn-sm btn-danger"
+			onclick="return confirm(<?= json_encode(l7_t('Apagar TODOS os dados de relatorios? Esta accao nao pode ser desfeita.')) ?>);">
+			<i class="fa fa-trash"></i> <?= l7_t("Limpar todos os dados"); ?>
+		</button>
+	</form>
 </div>
 
 <div class="l7r-summary">

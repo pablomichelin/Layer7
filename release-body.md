@@ -1,18 +1,16 @@
-## Layer7 v1.5.0 — Auditoria de segurança e robustez
+## Layer7 v1.5.1 — Limpeza total de relatórios
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Novidades
 
-- **FIX CRITICO: blacklists no arranque** — daemon carrega blacklists UT1/custom automaticamente no startup (antes exigia SIGHUP manual)
-- **FIX CRITICO: injecção em activação** — chaves com caracteres perigosos são rejeitadas antes de interpolar em JSON/shell
-- **FIX CRITICO: password removida do seed.js** — admin password do license server lida de variável de ambiente
-- **FIX ALTO: validação CIDR/PF** — octetos validados a 0-255, CIDRs/IPs sanitizados antes de regras PF
-- **FIX ALTO: XSS/JS** — confirm() e labels Chart.js corrigidos com json_encode() em 6 páginas PHP
-- **Varias correcções de robustez** — NULL safety no daemon, swap seguro de blacklists, lock atómico, validação de URL/whitelist, ordenação de políticas no simulador
+- **Limpar todos os dados de relatórios** — novo botão na página de Relatórios permite apagar toda a base SQLite (eventos, identity_map, daily_kpi), histórico JSONL e cursor de ingestão com um clique
+- **Resolve travamentos** em servidores com milhares de páginas de eventos acumulados (9000+ páginas)
+- **Confirmação obrigatória** antes da limpeza (acção irreversível)
 
 ### Inclui todas as funcionalidades anteriores
 
+- Auditoria de segurança e robustez completa (v1.5.0)
 - Categorias customizadas de blacklist (v1.4.17)
 - Anti-bypass DNS multi-camada (DoH/DoT/DoQ/iCloud Private Relay)
 - Bloqueio por destino (sites/apps) via DNS + nDPI

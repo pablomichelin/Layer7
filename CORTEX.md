@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.5.0 — Auditoria de segurança e robustez**
+**Versão: 1.5.1 — Limpeza total de relatórios**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.5.1 — Limpeza total de relatórios (2026-03-26):**
+  - NOVO: botão "Limpar todos os dados" na página de Relatórios para apagar toda a base SQLite, histórico JSONL e cursor de ingestão
+  - Resolve travamentos em servidores com milhares de páginas de eventos acumulados
+  - Confirmação obrigatória antes de executar (acção irreversível)
+  - Traduções EN actualizadas
+  - PORTVERSION incrementado para 1.5.1
 - **v1.5.0 — Auditoria de segurança e robustez (2026-03-26):**
   - FIX CRITICO: daemon passa a carregar blacklists UT1/custom no arranque (antes só carregava após SIGHUP)
   - FIX CRITICO: `layer7_activate` passa a rejeitar chaves com caracteres perigosos (aspas, backslash, control chars) para evitar injecção JSON/shell
