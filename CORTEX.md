@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.6.1 — Blacklists simplificadas + Backup completo**
+**Versão: 1.6.2 — Fix edição de categorias custom**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,11 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.6.2 — Fix edição de categorias custom (2026-03-26):**
+  - Restaurado botão de editar para categorias personalizadas criadas pelo utilizador
+  - Ao editar, campo ID fica readonly (não pode alterar o ID, apenas os domínios)
+  - Categorias UT1 pré-definidas continuam sem opção de edição
+  - PORTVERSION incrementado para 1.6.2
 - **v1.6.1 — Blacklists simplificadas + Backup completo (2026-03-26):**
   - Removida opção de editar categorias personalizadas em Blacklists — mantém criar novas e apagar
   - Removida datalist de categorias UT1 do formulário de nova categoria (evita confusão)

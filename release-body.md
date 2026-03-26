@@ -1,12 +1,12 @@
-## Layer7 v1.6.1 — Blacklists simplificadas + Backup completo
+## Layer7 v1.6.2 — Fix edição de categorias custom
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
-### Principais mudanças
+### Correção
 
-- **Blacklists: removida opção de editar categorias** — mantém criar novas e apagar; datalist de categorias UT1 removida
-- **Backup completo** — export/import inclui configuração de blacklists (regras, whitelist, categorias personalizadas, definições de update)
-- Permite restaurar TODAS as configurações do pacote após formatação da máquina
+- Restaurado botão de editar para categorias personalizadas criadas pelo utilizador
+- Ao editar, campo ID fica readonly (apenas domínios podem ser alterados)
+- Categorias UT1 pré-definidas continuam sem opção de edição
 
 ### Instalacao (um comando)
 
@@ -24,8 +24,3 @@ pkg delete pfSense-pkg-layer7
 
 - pfSense CE 2.7.x / 2.8.x / 25.x
 - FreeBSD 14 / 15
-
-### Documentacao
-
-- [Guia Completo](docs/tutorial/guia-completo-layer7.md)
-- [CHANGELOG](docs/changelog/CHANGELOG.md)

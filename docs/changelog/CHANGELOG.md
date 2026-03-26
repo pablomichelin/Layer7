@@ -2,6 +2,13 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.2] — 2026-03-26
+
+### Fixed
+
+- **Categorias custom editáveis** — restaurado botão de editar para categorias personalizadas criadas pelo utilizador; campo ID fica readonly ao editar
+- **PORTVERSION** bumped para 1.6.2
+
 ## [1.6.1] — 2026-03-26
 
 ### Changed
