@@ -65,6 +65,35 @@ ausente:
 No ciclo de `SIGHUP`, o daemon tambem valida tabelas base apos reload e tenta
 recuperacao quando detectar ausencia.
 
+### Diagnostico sem falso negativo (v1.4.16)
+
+Durante validacoes em appliance real, foi confirmado um comportamento de PF em
+que uma tabela pode estar **referenciada no filtro ativo** (`pfctl -sr`) antes
+de aparecer materializada em `pfctl -s Tables` no mesmo ciclo operacional.
+
+Isso gerava falso negativo operacional em troubleshootings anteriores
+(`"Tabela nao existe"`) mesmo com enforcement funcional por destino.
+
+Correcao aplicada na v1.4.16:
+
+1. `layer7-pfctl` passou a considerar tabela "pronta" quando:
+   - existe em `pfctl -s Tables`; **ou**
+   - ja esta referenciada em regra ativa (`<table:...>` em `pfctl -sr`).
+2. Diagnostics passou a usar o mesmo criterio combinado.
+3. A GUI diferencia:
+   - tabela realmente ausente; de
+   - tabela referenciada no filtro ativo (sem entradas no momento).
+
+Criterio objetivo de estado saudavel (apos v1.4.16):
+
+- `layer7d` em execucao com `enforce_mode=1`;
+- regras `layer7:block:*` presentes em `pfctl -sr`;
+- contadores de bloqueio/enforcement evoluindo em log/stats;
+- tabelas avaliadas pelo criterio combinado acima.
+
+Com isso, o foco do diagnostico volta para falha real de enforcement, e nao
+para estado cosmetico/transitorio de materializacao de tabela.
+
 O pacote expoe a regra minima via `layer7_generate_rules("filter")`, no padrao
 que o pfSense usa em `discover_pkg_rules()` para montar regras de pacotes
 durante o `filter reload`.

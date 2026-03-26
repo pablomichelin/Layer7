@@ -79,6 +79,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
   - `Diagnostics` passa a avaliar tabelas obrigatórias com estado combinado, eliminando falso erro recorrente em tabelas referenciadas porém sem materialização imediata
   - linhas de tabela na GUI passam a distinguir “não existe” de “referenciada no filtro activo (sem entradas)”
   - troubleshooting PF fica objectivo: foco em falha real de enforcement, não em estado cosmético de materialização
+  - documentação operacional consolidada em `pf-enforcement.md` e `MANUAL-INSTALL.md` com critério de validação pós-correção
   - PORTVERSION incrementado para 1.4.16
 - **v1.4.15 — Correção enforce/licença e auditoria operacional (2026-03-26):**
   - `layer7d` passa a recomputar `enforce_cfg` por helper único após parse/licença (startup + recheck), removendo estado inconsistente com licença válida

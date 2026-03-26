@@ -539,6 +539,22 @@ ele tenta auto-recuperar automaticamente:
 Esta rotina reduz o estado inconsistente de "daemon em execucao + tabelas
 ausentes" apos reloads de filtro externos.
 
+### Leitura correcta de tabelas no PF (v1.4.16+)
+
+Em alguns ciclos do pfSense, a tabela pode estar referenciada no filtro ativo
+(`pfctl -sr`, formato `<layer7_xxx:...>`) e ainda nao aparecer em
+`pfctl -s Tables` no mesmo instante.
+
+A partir da v1.4.16, o pacote considera estado valido quando a tabela:
+
+1. existe em `pfctl -s Tables`; **ou**
+2. esta referenciada no filtro ativo em `pfctl -sr`.
+
+Na GUI de Diagnostics, esse caso aparece como:
+**"Tabela referenciada no filtro activo (sem entradas no momento)."**
+
+Isto evita falso erro operacional quando o enforcement esta funcional.
+
 ### Reparacao manual (SSH/Console)
 
 Se o botao nao resolver, force manualmente:
