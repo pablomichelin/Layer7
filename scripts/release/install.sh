@@ -3,11 +3,11 @@
 #
 # Uso (executar no pfSense como root):
 #
-#   fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+#   fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh
 #
 # Ou com versão específica:
 #
-#   sh /tmp/install.sh --version 1.4.13
+#   sh /tmp/install.sh --version 1.4.15
 #
 # O script faz tudo automaticamente:
 #   1. Detecta a versão (ou usa a especificada)
@@ -20,7 +20,7 @@
 set -eu
 
 REPO_OWNER="pablomichelin"
-REPO_NAME="Layer7"
+REPO_NAME="pfsense-layer7"
 VERSION=""
 PKG_PREFIX="pfSense-pkg-layer7"
 FORCE=0

@@ -3,7 +3,7 @@
 #
 # Uso (executar no pfSense como root):
 #
-#   fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh
+#   fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/uninstall.sh && sh /tmp/uninstall.sh
 #
 # Opcoes:
 #   --keep-config   Preserva layer7.json e layer7.lic para reinstalacao futura
@@ -199,5 +199,5 @@ if [ "$KEEP_CONFIG" -eq 1 ] || [ "$KEEP_LICENSE" -eq 1 ]; then
     echo ""
 fi
 echo "Para reinstalar:"
-echo "  fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh"
+echo "  fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/pfsense-layer7/main/scripts/release/install.sh && sh /tmp/install.sh"
 echo ""
