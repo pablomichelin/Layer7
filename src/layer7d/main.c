@@ -209,7 +209,7 @@ write_stats_json(void)
 	fprintf(f, "\",\n");
 
 	fprintf(f, "  \"bl_enabled\": %s,\n",
-	    s_blacklist ? "true" : "false");
+	    s_bl_n_rules > 0 ? "true" : "false");
 	fprintf(f, "  \"bl_domains_loaded\": %d,\n",
 	    s_blacklist ? l7_blacklist_count(s_blacklist) : 0);
 	fprintf(f, "  \"bl_categories_active\": %d,\n",
@@ -1798,29 +1798,36 @@ int main(int argc, char **argv)
 						bwl[ai] =
 						    bl_cfg.whitelist[ai];
 
-					new_bl = l7_blacklist_load(
-					    L7_BL_DIR_DEFAULT,
-					    all_cats, all_n,
-					    bwl, bl_cfg.n_whitelist);
+					memcpy(s_bl_rules, bl_cfg.rules,
+					    sizeof(bl_cfg.rules));
+					s_bl_n_rules = bl_cfg.n_rules;
 
-					if (new_bl) {
-						memcpy(s_bl_rules,
-						    bl_cfg.rules,
-						    sizeof(bl_cfg.rules));
-						s_bl_n_rules =
-						    bl_cfg.n_rules;
+					if (all_n > 0) {
+						new_bl = l7_blacklist_load(
+						    L7_BL_DIR_DEFAULT,
+						    all_cats, all_n,
+						    bwl,
+						    bl_cfg.n_whitelist);
+					}
+
+					if (new_bl || all_n == 0) {
 						L7_NOTE("blacklists: "
 						    "loaded %d domains "
 						    "in %d categories, "
 						    "%d rules",
+						    new_bl ?
 						    l7_blacklist_count(
-						    new_bl),
+						    new_bl) : 0,
+						    new_bl ?
 						    l7_blacklist_cat_count(
-						    new_bl),
+						    new_bl) : 0,
 						    s_bl_n_rules);
 					} else {
 						L7_WARN("blacklists: "
-						    "failed to load");
+						    "rules loaded (%d), "
+						    "but failed to load "
+						    "UT1 categories",
+						    s_bl_n_rules);
 					}
 				}
 

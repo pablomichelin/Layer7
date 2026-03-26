@@ -11,7 +11,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 | **Website** | <https://www.systemup.inf.br> |
 | **Distribuicao publica** | <https://github.com/pablomichelin/Layer7> |
 | **Licenca** | EULA (ver `LICENSE`) |
-| **Versao actual** | **1.4.16** |
+| **Versao actual** | **1.4.17** |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x - FreeBSD 14/15 |
 
 ## O que faz
@@ -43,6 +43,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 - **Licenciamento** — verificacao Ed25519 offline, fingerprint de hardware, grace period 14 dias, CLI de activacao
 - **Actualizacao pela GUI** — botao em Definicoes para verificar e instalar a ultima versao
 - **GUI bilingue PT/EN** — principais páginas administrativas organizadas em blocos visuais separados, alinhados ao estilo administrativo do pfSense
+- **Blacklists com categorias customizadas** — na mesma tela de Blacklists, permite criar categorias locais com sites proprios e estender categorias UT1 existentes com dominios adicionais
 - **Relatorios estilo NGFW** — historico executivo separado do log detalhado, com retencao propria e seleccao de interfaces para reduzir uso local
 - **Excepcoes granulares** — multiplos hosts/CIDRs por excepcao, por interface
 - **GUI completa** — 10 paginas (Estado, Definicoes, Politicas, Grupos, Categorias, Teste, Excepcoes, Events, Diagnostics)

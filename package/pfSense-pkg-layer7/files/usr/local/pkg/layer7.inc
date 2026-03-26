@@ -1038,7 +1038,8 @@ function layer7_bl_config_defaults()
 		"auto_update" => false,
 		"update_interval_hours" => 24,
 		"whitelist" => array(),
-		"rules" => array()
+		"rules" => array(),
+		"category_custom" => array()
 	);
 }
 
@@ -1119,6 +1120,8 @@ function layer7_bl_download_status()
 
 function layer7_bl_apply()
 {
+	layer7_bl_sync_custom_category_files();
+
 	$helper = layer7_pf_helper_path();
 	$ensure_ok = true;
 	if (is_executable($helper)) {
@@ -1149,6 +1152,90 @@ function layer7_bl_apply()
 		}
 	}
 	layer7_signal_reload();
+}
+
+function layer7_bl_category_id_valid($id)
+{
+	$id = strtolower(trim((string)$id));
+	if ($id === "" || strlen($id) > 47) {
+		return false;
+	}
+	return preg_match('/^[a-z0-9_-]+$/', $id) === 1;
+}
+
+function layer7_bl_domains_normalize($raw)
+{
+	$out = array();
+	if (is_array($raw)) {
+		$lines = $raw;
+	} else {
+		$lines = preg_split('/[\r\n]+/', (string)$raw);
+	}
+	foreach ($lines as $line) {
+		$line = strtolower(trim((string)$line));
+		if ($line === "" || $line[0] === '#') {
+			continue;
+		}
+		if ($line[0] === '.') {
+			$line = substr($line, 1);
+		}
+		if (!layer7_policy_host_valid($line)) {
+			continue;
+		}
+		$out[] = $line;
+	}
+	$out = array_values(array_unique($out));
+	sort($out);
+	return $out;
+}
+
+function layer7_bl_category_custom_get($cfg = null)
+{
+	if (!is_array($cfg)) {
+		$cfg = layer7_bl_config_load();
+	}
+	$raw = isset($cfg["category_custom"]) && is_array($cfg["category_custom"])
+		? $cfg["category_custom"] : array();
+	$out = array();
+	foreach ($raw as $cat => $domains) {
+		$cat = strtolower(trim((string)$cat));
+		if (!layer7_bl_category_id_valid($cat)) {
+			continue;
+		}
+		$norm = layer7_bl_domains_normalize($domains);
+		if (!empty($norm)) {
+			$out[$cat] = $norm;
+		}
+	}
+	ksort($out);
+	return $out;
+}
+
+function layer7_bl_sync_custom_category_files($cfg = null)
+{
+	if (!is_array($cfg)) {
+		$cfg = layer7_bl_config_load();
+	}
+	$custom = layer7_bl_category_custom_get($cfg);
+	$dir = L7_BL_DIR . '/_custom';
+	@mkdir($dir, 0755, true);
+
+	$keep = array();
+	foreach ($custom as $cat => $domains) {
+		$path = $dir . '/' . $cat . '.domains';
+		$keep[$path] = true;
+		$content = implode("\n", $domains) . "\n";
+		@file_put_contents($path, $content, LOCK_EX);
+	}
+
+	$existing = glob($dir . '/*.domains');
+	if (is_array($existing)) {
+		foreach ($existing as $path) {
+			if (!isset($keep[$path])) {
+				@unlink($path);
+			}
+		}
+	}
 }
 
 function layer7_bl_setup_cron($enabled, $hour)

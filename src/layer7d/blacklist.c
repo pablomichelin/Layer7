@@ -277,6 +277,7 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 	struct l7_blacklist *bl;
 	int i, loaded;
 	char path[512];
+	char custom_path[512];
 
 	if (!dir || !cats || n_cats <= 0)
 		return NULL;
@@ -308,10 +309,24 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 
 		snprintf(path, sizeof(path), "%s/%s/domains", dir, cats[i]);
 
-		loaded = load_domains_file(bl, path, (uint8_t)bl->n_cats);
-		if (loaded < 0) {
-			L7_WARN("bl_load: cannot open %s: %s",
-			    path, strerror(errno));
+		loaded = 0;
+		{
+			int base_loaded;
+			base_loaded = load_domains_file(bl, path,
+			    (uint8_t)bl->n_cats);
+			if (base_loaded > 0)
+				loaded += base_loaded;
+		}
+		snprintf(custom_path, sizeof(custom_path),
+		    "%s/_custom/%s.domains", dir, cats[i]);
+		{
+			int custom_loaded;
+			custom_loaded = load_domains_file(bl, custom_path,
+			    (uint8_t)bl->n_cats);
+			if (custom_loaded > 0)
+				loaded += custom_loaded;
+		}
+		if (loaded <= 0) {
 			continue;
 		}
 
@@ -320,8 +335,8 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 		bl->cats[bl->n_cats][sizeof(bl->cats[0]) - 1] = '\0';
 		bl->cat_hits[bl->n_cats] = 0;
 
-		L7_NOTE("bl_load: category %s — %d domains from %s",
-		    cats[i], loaded, path);
+		L7_NOTE("bl_load: category %s — %d domains",
+		    cats[i], loaded);
 		bl->n_cats++;
 
 		if (bl->n_entries >= L7_BL_MAX_TOTAL) {

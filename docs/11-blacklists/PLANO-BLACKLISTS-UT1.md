@@ -7,6 +7,22 @@
 
 ---
 
+## Estado atual (v1.4.17)
+
+Implementado no produto:
+
+- criacao de categorias locais com dominios proprios na mesma pagina de Blacklists;
+- extensao de categorias UT1 existentes (mesmo ID da categoria) com dominios adicionais;
+- seletor de regras com lista combinada (UT1 + custom), sem tela adicional.
+
+Persistencia operacional:
+
+- `config.json` passa a guardar `category_custom`;
+- overlays locais por categoria sao sincronizados em `blacklists/_custom/<categoria>.domains`;
+- daemon carrega dominios UT1 e overlays locais por categoria ativa.
+
+---
+
 ## 1. Contexto do projecto Layer7
 
 Layer7 é um produto comercial da **Systemup Solução em Tecnologia**

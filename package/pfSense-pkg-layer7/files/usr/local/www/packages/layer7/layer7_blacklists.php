@@ -9,11 +9,47 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
+function l7_bl_merged_categories($discovered, $custom_map)
+{
+	$idx = array();
+	if (is_array($discovered) && isset($discovered["categories"]) && is_array($discovered["categories"])) {
+		foreach ($discovered["categories"] as $cat) {
+			$cid = strtolower(trim((string)($cat["id"] ?? "")));
+			if ($cid === "") {
+				continue;
+			}
+			$idx[$cid] = array(
+				"id" => $cid,
+				"domains_count" => (int)($cat["domains_count"] ?? 0),
+				"custom_domains_count" => 0,
+				"custom_only" => false
+			);
+		}
+	}
+	foreach ($custom_map as $cid => $domains) {
+		$n = is_array($domains) ? count($domains) : 0;
+		if (!isset($idx[$cid])) {
+			$idx[$cid] = array(
+				"id" => $cid,
+				"domains_count" => $n,
+				"custom_domains_count" => $n,
+				"custom_only" => true
+			);
+		} else {
+			$idx[$cid]["custom_domains_count"] = $n;
+			$idx[$cid]["domains_count"] += $n;
+		}
+	}
+	ksort($idx);
+	return array_values($idx);
+}
+
 $input_errors = array();
 $savemsg = "";
 
 $bl_config = layer7_bl_config_load();
 $discovered = layer7_bl_discovered_load();
+$custom_map = layer7_bl_category_custom_get($bl_config);
 
 /* POST: Download */
 if (isset($_POST["do_download"])) {
@@ -37,9 +73,6 @@ if (isset($_POST["save_rule"])) {
 
 	if ($rname === "") {
 		$input_errors[] = l7_t("O nome da regra e obrigatorio.");
-	}
-	if (empty($rcats)) {
-		$input_errors[] = l7_t("Seleccione pelo menos uma categoria.");
 	}
 
 	$rcidrs = array();
@@ -66,6 +99,10 @@ if (isset($_POST["save_rule"])) {
 				$input_errors[] = l7_t("IP/CIDR de excepcao invalido: ") . htmlspecialchars($line);
 			}
 		}
+	}
+
+	if (empty($rcats)) {
+		$input_errors[] = l7_t("Seleccione pelo menos uma categoria.");
 	}
 
 	if (empty($input_errors)) {
@@ -135,6 +172,40 @@ if (isset($_POST["save_whitelist"])) {
 	$savemsg = l7_t("Whitelist guardada. Daemon recarregado.");
 }
 
+/* POST: Save custom category/extension */
+if (isset($_POST["save_cat_sites"])) {
+	$cat_id = strtolower(trim($_POST["cat_id"] ?? ""));
+	$cat_sites_raw = trim($_POST["cat_sites"] ?? "");
+	if (!layer7_bl_category_id_valid($cat_id)) {
+		$input_errors[] = l7_t("ID de categoria invalido. Use apenas letras minusculas, numeros, underscore e hifen.");
+	}
+	$cat_sites = layer7_bl_domains_normalize($cat_sites_raw);
+	if (empty($cat_sites)) {
+		$input_errors[] = l7_t("Adicione pelo menos um dominio valido na categoria.");
+	}
+	if (empty($input_errors)) {
+		if (!isset($bl_config["category_custom"]) || !is_array($bl_config["category_custom"])) {
+			$bl_config["category_custom"] = array();
+		}
+		$bl_config["category_custom"][$cat_id] = $cat_sites;
+		ksort($bl_config["category_custom"]);
+		layer7_bl_config_save($bl_config);
+		layer7_bl_apply();
+		$savemsg = l7_t("Categoria personalizada guardada.");
+	}
+}
+
+/* POST: Delete custom category/extension */
+if (isset($_POST["delete_cat_sites"])) {
+	$cat_id = strtolower(trim($_POST["cat_id"] ?? ""));
+	if (isset($bl_config["category_custom"][$cat_id])) {
+		unset($bl_config["category_custom"][$cat_id]);
+		layer7_bl_config_save($bl_config);
+		layer7_bl_apply();
+		$savemsg = l7_t("Categoria personalizada removida.");
+	}
+}
+
 /* POST: Save settings */
 if (isset($_POST["save_settings"])) {
 	$bl_config["auto_update"] = isset($_POST["auto_update"]);
@@ -151,6 +222,8 @@ if (isset($_POST["save_settings"])) {
 /* Reload after any save */
 $bl_config = layer7_bl_config_load();
 $discovered = layer7_bl_discovered_load();
+$custom_map = layer7_bl_category_custom_get($bl_config);
+$merged_categories = l7_bl_merged_categories($discovered, $custom_map);
 $bl_stats = layer7_bl_get_stats();
 $last_update = layer7_bl_last_update();
 $rules = isset($bl_config["rules"]) && is_array($bl_config["rules"]) ? $bl_config["rules"] : array();
@@ -161,6 +234,11 @@ if (isset($_GET["edit"])) {
 }
 if (isset($_GET["add"])) {
 	$edit_idx = -2;
+}
+
+$cat_edit = strtolower(trim($_GET["cat_edit"] ?? ""));
+if (!layer7_bl_category_id_valid($cat_edit) || !isset($custom_map[$cat_edit])) {
+	$cat_edit = "";
 }
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Blacklists"));
@@ -343,10 +421,10 @@ if ($show_form):
 
 <div class="form-group">
 	<label><?=l7_t("Categorias a bloquear")?></label>
-	<?php if ($discovered === null): ?>
+	<?php if (empty($merged_categories)): ?>
 	<div class="alert alert-warning" style="margin:0;">
 		<i class="fa fa-exclamation-triangle"></i>
-		<?=l7_t("Faca o download da lista primeiro para ver as categorias disponiveis.")?>
+		<?=l7_t("Sem categorias disponiveis. Faca o download da UT1 ou adicione uma categoria personalizada abaixo.")?>
 	</div>
 	<?php else: ?>
 	<input type="text" id="rule_cat_filter" class="form-control l7-filter" style="max-width:300px;"
@@ -358,16 +436,16 @@ if ($show_form):
 	<div class="l7-multiselect-wrap" id="rule_cats_wrap">
 	<?php
 	$ecats = is_array($erule["categories"]) ? $erule["categories"] : array();
-	usort($discovered["categories"], function($a, $b) { return strcmp($a["id"], $b["id"]); });
-	foreach ($discovered["categories"] as $cat):
+	foreach ($merged_categories as $cat):
 		$cid = $cat["id"];
 		$cnt = isset($cat["domains_count"]) ? (int)$cat["domains_count"] : 0;
+		$custom_cnt = isset($cat["custom_domains_count"]) ? (int)$cat["custom_domains_count"] : 0;
 		$checked = in_array($cid, $ecats) ? "checked" : "";
 		$warn = ($cnt > 1000000) ? ' &#9888;' : '';
 	?>
 	<label class="rule-cat-item" data-cat="<?=htmlspecialchars($cid)?>">
 		<input type="checkbox" name="rule_cats[]" value="<?=htmlspecialchars($cid)?>" <?=$checked?>>
-		<?=htmlspecialchars($cid)?> <small class="text-muted">(<?=number_format($cnt, 0, ',', '.')?>)</small><?=$warn?>
+		<?=htmlspecialchars($cid)?> <small class="text-muted">(<?=number_format($cnt, 0, ',', '.')?><?php if ($custom_cnt > 0): ?> +<?=number_format($custom_cnt, 0, ',', '.')?> <?=l7_t("custom")?><?php endif; ?>)</small><?=$warn?>
 	</label>
 	<?php endforeach; ?>
 	</div>
@@ -400,6 +478,92 @@ if ($show_form):
 </form>
 </div>
 <?php endif; ?>
+</div>
+</div>
+
+<!-- SECTION 3: Custom categories/extensions -->
+<div class="layer7-admin-block">
+<div class="layer7-admin-block__header"><?=l7_t("Categorias personalizadas e extensoes")?></div>
+<div class="layer7-admin-block__body">
+<p class="layer7-lead"><?=l7_t("Aqui pode criar categorias novas com os seus sites e tambem adicionar sites em categorias ja existentes da UT1.")?></p>
+
+<?php if (empty($custom_map)): ?>
+<div class="alert alert-info">
+	<i class="fa fa-info-circle"></i>
+	<?=l7_t("Nenhuma categoria personalizada configurada ainda.")?>
+</div>
+<?php else: ?>
+<div class="table-responsive">
+<table class="table table-striped table-hover">
+<thead>
+<tr>
+	<th><?=l7_t("Categoria")?></th>
+	<th><?=l7_t("Tipo")?></th>
+	<th><?=l7_t("Dominios custom")?></th>
+	<th><?=l7_t("Accoes")?></th>
+</tr>
+</thead>
+<tbody>
+<?php foreach ($custom_map as $cid => $domains): ?>
+<tr>
+	<td><code><?=htmlspecialchars($cid)?></code></td>
+	<td>
+		<?php
+		$is_ut1 = false;
+		foreach ($merged_categories as $mc) {
+			if (($mc["id"] ?? "") === $cid && empty($mc["custom_only"])) {
+				$is_ut1 = true;
+				break;
+			}
+		}
+		?>
+		<?= $is_ut1 ? l7_t("Extensao UT1") : l7_t("Categoria local") ?>
+	</td>
+	<td><?=number_format(count($domains), 0, ',', '.')?></td>
+	<td class="layer7-table-actions">
+		<a href="?cat_edit=<?=urlencode($cid)?>" class="btn btn-xs btn-default"><i class="fa fa-pencil"></i></a>
+		<form method="post" style="display:inline;" onsubmit="return confirm('<?=l7_t("Remover categoria personalizada?")?>');">
+			<input type="hidden" name="cat_id" value="<?=htmlspecialchars($cid)?>">
+			<button type="submit" name="delete_cat_sites" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
+		</form>
+	</td>
+</tr>
+<?php endforeach; ?>
+</tbody>
+</table>
+</div>
+<?php endif; ?>
+
+<?php
+$cat_form_id = $cat_edit !== "" ? $cat_edit : "";
+$cat_form_sites = $cat_edit !== "" && isset($custom_map[$cat_edit]) ? implode("\n", $custom_map[$cat_edit]) : "";
+?>
+<div class="layer7-form-card">
+<h4 class="layer7-form-card__title"><?= $cat_edit !== "" ? l7_t("Editar categoria personalizada") : l7_t("Nova categoria personalizada") ?></h4>
+<form method="post">
+<div class="form-group">
+	<label><?=l7_t("ID da categoria")?></label>
+	<input type="text" class="form-control" name="cat_id" value="<?=htmlspecialchars($cat_form_id)?>" list="l7_category_ids" placeholder="<?=l7_t("Ex: bloqueios_internos, erp, cloud_apps")?>" style="max-width:360px;" required>
+	<datalist id="l7_category_ids">
+	<?php foreach ($merged_categories as $mc): ?>
+	<option value="<?=htmlspecialchars($mc["id"] ?? "")?>"></option>
+	<?php endforeach; ?>
+	</datalist>
+	<p class="help-block"><?=l7_t("Use letras minusculas, numeros, underscore (_) e hifen (-).")?></p>
+</div>
+<div class="form-group">
+	<label><?=l7_t("Dominios da categoria (um por linha)")?></label>
+	<textarea class="form-control" name="cat_sites" rows="6" style="font-family:monospace; max-width:520px;" placeholder="<?=l7_t("Ex: site1.com\nsub.site2.com")?>" required><?=htmlspecialchars($cat_form_sites)?></textarea>
+	<p class="help-block"><?=l7_t("Se o ID for de uma categoria UT1 existente, estes dominios serao adicionados a ela. Se for novo, cria uma categoria local.")?></p>
+</div>
+<div class="layer7-form-card__actions">
+	<button type="submit" name="save_cat_sites" class="btn btn-primary"><i class="fa fa-save"></i> <?=l7_t("Guardar categoria")?></button>
+	<?php if ($cat_edit !== ""): ?>
+	<a href="layer7_blacklists.php" class="btn btn-default"><?=l7_t("Cancelar")?></a>
+	<?php endif; ?>
+</div>
+</form>
+</div>
 </div>
 </div>
 
@@ -461,7 +625,7 @@ if ($show_form):
 	<dt><?=l7_t("Regras activas")?></dt>
 	<dd><?=(int)$bl_stats["rules_active"]?></dd>
 	<dt><?=l7_t("Categorias carregadas")?></dt>
-	<dd><?=(int)$bl_stats["categories_active"]?><?php if ($discovered): ?> / <?=count($discovered["categories"])?> <?=l7_t("disponiveis")?><?php endif; ?></dd>
+	<dd><?=(int)$bl_stats["categories_active"]?><?php if (!empty($merged_categories)): ?> / <?=count($merged_categories)?> <?=l7_t("disponiveis")?><?php endif; ?></dd>
 	<dt><?=l7_t("Dominios carregados")?></dt>
 	<dd><?=number_format((int)$bl_stats["domains_loaded"], 0, ',', '.')?></dd>
 	<dt><?=l7_t("Lookups totais")?></dt>

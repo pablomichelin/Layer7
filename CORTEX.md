@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.4.16 — Diagnóstico PF sem falso negativo**
+**Versão: 1.4.17 — Categorias customizadas de blacklist (UT1 + local)**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 12 paginas. Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,14 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.4.17 — Categorias customizadas de blacklist no mesmo fluxo UT1 (2026-03-26):**
+  - pagina `Blacklists` passa a permitir criar categorias locais com dominios proprios sem criar nova tela
+  - operador passa a poder estender categorias existentes da UT1 com dominios adicionais nao presentes no feed da Capitole
+  - seletor de categorias nas regras passa a trabalhar com lista combinada (UT1 + custom)
+  - daemon passa a carregar overlays locais por categoria (`blacklists/_custom/<categoria>.domains`) alem dos ficheiros UT1 originais
+  - `config.json` passa a persistir `category_custom` e o apply sincroniza automaticamente os ficheiros de overlay antes do reload
+  - documentação de cliente actualizada (README, CHANGELOG, MANUAL-INSTALL)
+  - PORTVERSION incrementado para 1.4.17
 - **v1.4.16 — Diagnóstico PF sem falso negativo (2026-03-26):**
   - `layer7-pfctl` passa a validar “tabela pronta” por presença real em `pfctl -s Tables` OU referência activa no filtro (`pfctl -sr`)
   - `Diagnostics` passa a avaliar tabelas obrigatórias com estado combinado, eliminando falso erro recorrente em tabelas referenciadas porém sem materialização imediata
@@ -410,7 +418,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.4.8 — Correção de registo de licença por case.**
+**v1.4.17 — Publicar release com categorias customizadas de blacklist (UT1 + local).**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
