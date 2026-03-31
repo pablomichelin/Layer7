@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.6.6 — Fix crítico: blacklists nunca carregavam no daemon**
+**Versão: 1.6.7 — Fix SIGSEGV: cast inválido char[64][48] → char** em get_cat_hits**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.6.7 — Fix SIGSEGV em l7_blacklist_get_cat_hits (2026-03-31):**
+  - FIX CRÍTICO: `blacklist.c` — `l7_blacklist_get_cat_hits()` fazia cast inválido `(const char **)bl->cats` onde `bl->cats` é `char[64][48]` (array 2D de chars, não array de ponteiros)
+  - Causa raiz: código de stats (SIGUSR1) usava `bl_cat_names[bli]` como ponteiro mas recebia o endereço de uma string de 48 bytes, interpretando os primeiros 8 bytes como endereço → SIGSEGV ao imprimir
+  - Bug pré-existia desde v1.1.0 mas ficou oculto enquanto `s_blacklist` era sempre NULL (bug de parse em v1.6.5)
+  - Correcção: substituída por API com índice directo `l7_blacklist_get_cat_name(bl, idx)` e `l7_blacklist_get_cat_hit_count(bl, idx)`
+  - PORTVERSION incrementado para 1.6.7
 - **v1.6.6 — Fix crítico: blacklists nunca carregavam no daemon (2026-03-31):**
   - FIX CRÍTICO: `bl_config.c` — `match_key()` avançava o ponteiro `p` além do `"` ao falhar na comparação de chaves JSON
   - Causa raiz: ao tentar cada chave no if-else chain, `p` ficava posicionado no meio da string após falha — todas as chaves seguintes (`whitelist`, `rules`, etc.) eram ignoradas

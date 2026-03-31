@@ -43,8 +43,9 @@ void l7_blacklist_free(struct l7_blacklist *bl);
 int l7_blacklist_count(const struct l7_blacklist *bl);
 int l7_blacklist_cat_count(const struct l7_blacklist *bl);
 
-/* Contadores de hits por categoria (indice = cat_idx). */
-void l7_blacklist_get_cat_hits(const struct l7_blacklist *bl,
-    const char ***names, const unsigned long long **hits, int *n);
+/* Contadores de hits por categoria: usa índice directo. */
+const char *l7_blacklist_get_cat_name(const struct l7_blacklist *bl, int idx);
+unsigned long long l7_blacklist_get_cat_hit_count(const struct l7_blacklist *bl,
+    int idx);
 
 #endif /* LAYER7_BLACKLIST_H */

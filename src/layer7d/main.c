@@ -221,21 +221,22 @@ write_stats_json(void)
 	fprintf(f, "  \"bl_rules_active\": %d,\n", s_bl_n_rules);
 
 	{
-		const char **bl_cat_names = NULL;
-		const unsigned long long *bl_cat_hits = NULL;
-		int bl_n_cats = 0, bli;
-
-		if (s_blacklist)
-			l7_blacklist_get_cat_hits(s_blacklist,
-			    &bl_cat_names, &bl_cat_hits, &bl_n_cats);
+		int bl_n_cats = s_blacklist ?
+		    l7_blacklist_cat_count(s_blacklist) : 0;
+		int bli;
 
 		fprintf(f, "  \"bl_top_categories\": [");
 		for (bli = 0; bli < bl_n_cats && bli < 10; bli++) {
+			const char *cn =
+			    l7_blacklist_get_cat_name(s_blacklist, bli);
+			unsigned long long ch =
+			    l7_blacklist_get_cat_hit_count(s_blacklist, bli);
+			if (!cn)
+				cn = "?";
 			fprintf(f, "%s\n    {\"cat\": \"",
 			    bli > 0 ? "," : "");
-			json_escape_fprint(f, bl_cat_names[bli]);
-			fprintf(f, "\", \"hits\": %llu}",
-			    (unsigned long long)bl_cat_hits[bli]);
+			json_escape_fprint(f, cn);
+			fprintf(f, "\", \"hits\": %llu}", ch);
 		}
 		fprintf(f, "%s]\n",
 		    bl_n_cats > 0 ? "\n  " : "");

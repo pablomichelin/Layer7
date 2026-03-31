@@ -2,6 +2,15 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.7] — 2026-03-31
+
+### Fixed
+
+- **SIGSEGV no daemon ao gerar stats com blacklists activas** — `blacklist.c`: `l7_blacklist_get_cat_hits()` fazia cast inválido `(const char **)bl->cats`; `bl->cats` é `char[64][48]` (array 2D), não `char**`; os primeiros 8 bytes de cada categoria eram interpretados como ponteiro → crash ao imprimir nomes de categorias via SIGUSR1
+- **Bug estava oculto** desde v1.1.0 porque `s_blacklist` era sempre NULL antes de v1.6.6; a correção do parser (v1.6.6) activou o código e expôs o crash
+- **Correcção**: API substituída por `l7_blacklist_get_cat_name(bl, idx)` e `l7_blacklist_get_cat_hit_count(bl, idx)` — acesso seguro por índice
+- **PORTVERSION** bumped para 1.6.7
+
 ## [1.6.6] — 2026-03-31
 
 ### Fixed

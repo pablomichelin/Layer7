@@ -446,15 +446,17 @@ l7_blacklist_cat_count(const struct l7_blacklist *bl)
 }
 
 void
-l7_blacklist_get_cat_hits(const struct l7_blacklist *bl,
-    const char ***names, const unsigned long long **hits, int *n)
+l7_blacklist_get_cat_name(const struct l7_blacklist *bl, int idx)
 {
-	if (!bl || !names || !hits || !n) {
-		if (n)
-			*n = 0;
-		return;
-	}
-	*n = bl->n_cats;
-	*names = (const char **)bl->cats;
-	*hits = bl->cat_hits;
+	if (!bl || idx < 0 || idx >= bl->n_cats)
+		return NULL;
+	return bl->cats[idx];
+}
+
+unsigned long long
+l7_blacklist_get_cat_hit_count(const struct l7_blacklist *bl, int idx)
+{
+	if (!bl || idx < 0 || idx >= bl->n_cats)
+		return 0;
+	return bl->cat_hits[idx];
 }
