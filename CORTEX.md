@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.7.4 — Segunda revisão: código morto removido, s_bl_lookups e validação GUI**
+**Versão: 1.7.5 — Fix botão Aplicar (Perfis Rápidos) quebrado por json_encode em atributo HTML**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,10 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.7.5 — Fix botão Aplicar nos Perfis Rápidos (2026-03-31):**
+  - BUG: `layer7_policies.php` — `json_encode($prof_id)` e `json_encode($prof_name)` inseriam strings com `"` directamente no atributo `onclick="..."` sem HTML escaping; browser truncava o handler → onclick não funcionava
+  - Correcção: `htmlspecialchars(json_encode(...), ENT_QUOTES)` converte `"` em `&quot;` no HTML; o browser executa o JS correctamente
+  - PORTVERSION bumped para 1.7.5
 - **v1.7.4 — Segunda revisão: 3 bugs adicionais (2026-03-31):**
   - BUG MÉDIO: `generate_rdr_rules()` em `layer7-pfctl` era código morto após v1.7.3 (nunca chamado) — removida
   - BUG MENOR: `s_bl_lookups` não era incrementado no SNI check em `main.c`; adicionado `s_bl_lookups++` antes do lookup SNI
@@ -505,7 +509,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.7.4 — Publicar segunda revisão com bugs residuais corrigidos.**
+**v1.7.5 — Publicar fix do botão Aplicar nos Perfis Rápidos.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico

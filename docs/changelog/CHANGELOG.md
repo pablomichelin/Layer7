@@ -2,6 +2,15 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.5] — 2026-03-31
+
+### Fixed — Botão "Aplicar" nos Perfis Rápidos não funcionava
+
+- **`layer7_policies.php`**: `json_encode($prof_id)` e `json_encode($prof_name)` produzem strings com aspas duplas (`"youtube"`) que eram inseridas directamente no atributo `onclick="..."` sem escaping HTML; o browser terminava o atributo na primeira `"`, truncando o handler para `l7showProfileModal(` (JavaScript inválido); o clique não fazia nada
+- **Correcção**: envolver em `htmlspecialchars(..., ENT_QUOTES)` → as `"` tornam-se `&quot;` no HTML (válido em atributos) e o browser converte de volta para `"` ao executar o JS; `onclick` resultante: `l7showProfileModal(&quot;youtube&quot;, &quot;YouTube&quot;)` → executa `l7showProfileModal("youtube", "YouTube")` correctamente
+
+- **PORTVERSION** bumped para 1.7.5
+
 ## [1.7.4] — 2026-03-31
 
 ### Fixed — Segunda revisão: 3 bugs adicionais
