@@ -1,13 +1,13 @@
-## Layer7 v1.6.5 — Fix CI smoke layer7d
+## Layer7 v1.6.6 — Fix crítico: blacklists nunca carregavam no daemon
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
 ### Correção
 
-- **GitHub Actions (smoke)** falhava no job Linux com `Makefile:20: *** missing separator`
-- **Causa raiz**: o script usava `make` (GNU make no Ubuntu), mas o `src/layer7d/Makefile` usa sintaxe BSD make (`.if`)
-- **Fix**: `scripts/package/smoke-layer7d.sh` agora detecta e prioriza `bmake` (fallback para `make`)
-- **Fix**: workflow `.github/workflows/smoke-layer7d.yml` agora instala `bmake` no runner Ubuntu
+- **BUG CRÍTICO**: blacklists (categorias web UT1) nunca bloqueavam — `layer7_bld_N` sempre vazia
+- **Causa raiz**: `bl_config.c` — `match_key()` avançava o ponteiro além do `"` ao falhar comparação; todas as chaves do JSON (incluindo `"rules"`) eram ignoradas após `"enabled"`
+- **Efeito**: `n_rules=0` → daemon operava sem blacklists → regras PF referenciavam tabelas sempre vazias
+- **Fix**: `match_key()` agora salva e restaura o ponteiro em qualquer falha de validação
 
 ### Instalacao (um comando)
 

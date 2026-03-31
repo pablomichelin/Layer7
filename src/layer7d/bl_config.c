@@ -47,19 +47,27 @@ static int
 match_key(const char **p, const char *key)
 {
 	size_t klen = strlen(key);
+	const char *save;
 
 	skip_ws(p);
 	if (**p != '"')
 		return 0;
+	save = *p;
 	(*p)++;
-	if (strncmp(*p, key, klen) != 0)
+	if (strncmp(*p, key, klen) != 0) {
+		*p = save;
 		return 0;
-	if ((*p)[klen] != '"')
+	}
+	if ((*p)[klen] != '"') {
+		*p = save;
 		return 0;
+	}
 	*p += klen + 1;
 	skip_ws(p);
-	if (**p != ':')
+	if (**p != ':') {
+		*p = save;
 		return 0;
+	}
 	(*p)++;
 	skip_ws(p);
 	return 1;

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.6.5 — CI smoke corrigido (GNU make vs bmake)**
+**Versão: 1.6.6 — Fix crítico: blacklists nunca carregavam no daemon**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,12 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.6.6 — Fix crítico: blacklists nunca carregavam no daemon (2026-03-31):**
+  - FIX CRÍTICO: `bl_config.c` — `match_key()` avançava o ponteiro `p` além do `"` ao falhar na comparação de chaves JSON
+  - Causa raiz: ao tentar cada chave no if-else chain, `p` ficava posicionado no meio da string após falha — todas as chaves seguintes (`whitelist`, `rules`, etc.) eram ignoradas
+  - Efeito: apenas `"enabled"` era lido correctamente; `rules[]` nunca era parseado → `n_rules=0` → `bl_enabled: false` → nenhum domínio carregado → tabelas PF `layer7_bld_N` vazias → blacklists sem efeito
+  - Correcção: `match_key()` agora salva o ponteiro antes de avançar e restaura-o em qualquer falha de validação
+  - PORTVERSION incrementado para 1.6.6
 - **v1.6.5 — Fix CI smoke layer7d (2026-03-31):**
   - FIX: workflow `smoke layer7d` no GitHub Actions falhava com `Makefile:20: *** missing separator`
   - Causa raiz: script de smoke usava `make` (GNU make no Ubuntu), mas o `src/layer7d/Makefile` usa sintaxe BSD make (`.if`)

@@ -2,6 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.6] — 2026-03-31
+
+### Fixed
+
+- **BUG CRÍTICO: blacklists nunca carregavam no daemon** — `bl_config.c`: `match_key()` avançava o ponteiro além do `"` ao falhar comparação de chave JSON; todas as chaves após `"enabled"` (incluindo `"rules"`) eram ignoradas; `n_rules=0` → `bl_enabled: false` → tabelas PF `layer7_bld_N` sempre vazias → bloqueio por categorias web sem efeito
+- **Correcção**: `match_key()` salva o ponteiro antes de avançar e restaura-o em qualquer falha de validação
+- **PORTVERSION** bumped para 1.6.6
+
 ## [1.6.5] — 2026-03-31
 
 ### Fixed
