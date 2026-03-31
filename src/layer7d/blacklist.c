@@ -445,7 +445,7 @@ l7_blacklist_cat_count(const struct l7_blacklist *bl)
 	return bl->n_cats;
 }
 
-void
+const char *
 l7_blacklist_get_cat_name(const struct l7_blacklist *bl, int idx)
 {
 	if (!bl || idx < 0 || idx >= bl->n_cats)
