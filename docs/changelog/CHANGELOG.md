@@ -2,6 +2,17 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.6] — 2026-03-31
+
+### Fixed — Monitor ao vivo acumulativo (comportamento tipo Squid)
+
+- **`layer7_events.php`**: monitor substituía o conteúdo inteiro a cada poll (a cada 2s); quando as últimas N linhas do log já não continham a IP filtrada (empurrada por novos eventos de outros dispositivos), o monitor mostrava "Sem eventos recentes" e o histórico desaparecia
+- **Nova lógica JS — buffer acumulativo**: o monitor mantém um buffer de até 500 linhas em memória; a cada poll detecta quais linhas são novas (usando sobreposição com a última linha vista) e **apenas acrescenta**; nunca apaga o histórico existente
+- **Botão "Limpar"**: reset manual do buffer sem sair da página
+- **Contador de linhas**: mostra quantas linhas estão acumuladas no buffer
+- **Servidor**: aumentado tail de 100→300 linhas e retorno de 40→60 linhas por poll para melhor cobertura histórica
+- **PORTVERSION** bumped para 1.7.6
+
 ## [1.7.5] — 2026-03-31
 
 ### Fixed — Botão "Aplicar" nos Perfis Rápidos não funcionava

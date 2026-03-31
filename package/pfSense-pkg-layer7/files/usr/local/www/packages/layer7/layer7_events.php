@@ -10,9 +10,9 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
 $filter = isset($_GET["filter"]) ? trim($_GET["filter"]) : "";
-$max_lines = 100;
+$max_lines = 300;
 $log_path = "/var/log/layer7d.log";
-$live_lines = 40;
+$live_lines = 60;
 
 $all_logs = array();
 if (file_exists($log_path)) {
@@ -63,10 +63,12 @@ layer7_render_styles();
 			<div class="layer7-admin-block__header"><?= l7_t("Monitor ao vivo"); ?></div>
 			<div class="layer7-admin-block__body">
 				<p class="small text-muted"><?= l7_t("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
-				<div class="layer7-toolbar">
-					<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
-					<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
-				</div>
+			<div class="layer7-toolbar">
+				<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
+				<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
+				<button type="button" class="btn btn-danger btn-sm" id="l7-live-clear"><?= l7_t("Limpar"); ?></button>
+				<span id="l7-live-count" class="text-muted" style="font-size:12px; margin-left:8px;"></span>
+			</div>
 				<pre id="l7-live-view" class="pre-scrollable" style="max-height: 320px; font-size: 12px; white-space: pre-wrap;">Carregando...</pre>
 			</div>
 		</div>
@@ -116,52 +118,130 @@ layer7_render_styles();
 </div>
 <script>
 (function() {
-	var liveView = document.getElementById('l7-live-view');
+	var liveView  = document.getElementById('l7-live-view');
 	var toggleBtn = document.getElementById('l7-live-toggle');
 	var refreshBtn = document.getElementById('l7-live-refresh');
-	var paused = false;
-	var timer = null;
+	var clearBtn  = document.getElementById('l7-live-clear');
+	var countEl   = document.getElementById('l7-live-count');
+	var paused    = false;
+	var timer     = null;
 	var refreshMs = 2000;
-	var ajaxUrl = 'layer7_events.php?ajax=1&filter=<?= rawurlencode($filter); ?>';
+	var ajaxUrl   = 'layer7_events.php?ajax=1&filter=<?= rawurlencode($filter); ?>';
+
+	/* Buffer acumulado — novas linhas sao sempre adicionadas, nunca removidas */
+	var seenLines = [];
+	var maxLines  = 500;
+
+	function updateView() {
+		if (!liveView) return;
+		liveView.textContent = seenLines.length > 0
+			? seenLines.join('\n')
+			: 'Aguardando eventos...';
+		liveView.scrollTop = liveView.scrollHeight;
+		if (countEl) {
+			countEl.textContent = seenLines.length > 0
+				? seenLines.length + ' linha(s)' : '';
+		}
+	}
+
+	function mergeIncoming(incoming) {
+		if (!incoming || incoming.length === 0) return;
+
+		var newLines = [];
+
+		if (seenLines.length === 0) {
+			/* Buffer vazio — aceitar tudo */
+			newLines = incoming;
+		} else {
+			/*
+			 * Procurar a ultima linha ja vista dentro das incoming.
+			 * O que vier depois e novo.
+			 */
+			var lastSeen   = seenLines[seenLines.length - 1];
+			var overlapIdx = -1;
+			for (var i = incoming.length - 1; i >= 0; i--) {
+				if (incoming[i] === lastSeen) {
+					overlapIdx = i;
+					break;
+				}
+			}
+
+			if (overlapIdx >= 0) {
+				/* Sobreposicao encontrada — so o que vem depois e novo */
+				newLines = incoming.slice(overlapIdx + 1);
+			} else {
+				/*
+				 * Sem sobreposicao (linhas antigas saiam do tail).
+				 * Filtrar duplicados recentes para evitar repeticoes.
+				 */
+				var recentSet = {};
+				var window100 = seenLines.slice(-100);
+				for (var j = 0; j < window100.length; j++) {
+					recentSet[window100[j]] = true;
+				}
+				newLines = incoming.filter(function(l) {
+					return !recentSet[l];
+				});
+			}
+		}
+
+		if (newLines.length === 0) return;
+
+		for (var k = 0; k < newLines.length; k++) {
+			seenLines.push(newLines[k]);
+		}
+		/* Limitar tamanho maximo do buffer */
+		if (seenLines.length > maxLines) {
+			seenLines = seenLines.slice(seenLines.length - maxLines);
+		}
+		updateView();
+	}
 
 	function fetchLive() {
-		if (paused || !liveView) {
-			return;
-		}
+		if (paused || !liveView) return;
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', ajaxUrl, true);
 		xhr.onreadystatechange = function() {
-			if (xhr.readyState === 4 && xhr.status === 200) {
-				liveView.textContent = xhr.responseText || 'Sem eventos recentes.';
-				liveView.scrollTop = liveView.scrollHeight;
-			}
+			if (xhr.readyState !== 4 || xhr.status !== 200) return;
+			var text = xhr.responseText.trim();
+			if (!text) return; /* Resposta vazia — manter o buffer actual */
+			var incoming = text.split('\n').filter(function(l) {
+				return l.trim() !== '';
+			});
+			mergeIncoming(incoming);
 		};
 		xhr.send(null);
 	}
 
 	function schedule() {
-		if (timer) {
-			window.clearInterval(timer);
-		}
-		timer = window.setInterval(fetchLive, refreshMs);
+		if (timer) clearInterval(timer);
+		timer = setInterval(fetchLive, refreshMs);
 	}
 
 	if (toggleBtn) {
 		toggleBtn.addEventListener('click', function() {
 			paused = !paused;
-			toggleBtn.textContent = paused ? 'Retomar' : 'Pausar';
-			if (!paused) {
-				fetchLive();
-			}
+			toggleBtn.textContent   = paused ? '<?= l7_t("Retomar") ?>' : '<?= l7_t("Pausar") ?>';
+			toggleBtn.className     = paused
+				? 'btn btn-warning btn-sm'
+				: 'btn btn-success btn-sm';
+			if (!paused) fetchLive();
 		});
 	}
 
 	if (refreshBtn) {
-		refreshBtn.addEventListener('click', function() {
-			fetchLive();
+		refreshBtn.addEventListener('click', function() { fetchLive(); });
+	}
+
+	if (clearBtn) {
+		clearBtn.addEventListener('click', function() {
+			seenLines = [];
+			updateView();
 		});
 	}
 
+	/* Carregar contexto inicial */
+	liveView.textContent = 'Aguardando eventos...';
 	fetchLive();
 	schedule();
 })();
