@@ -1,12 +1,13 @@
-## Layer7 v1.6.4 — Auto-start do daemon após reboot do pfSense
+## Layer7 v1.6.5 — Fix CI smoke layer7d
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
-### Correção crítica
+### Correção
 
-- **Daemon não reiniciava após reboot** — o serviço layer7d parava com o shutdown mas não voltava a iniciar automaticamente quando o pfSense reiniciava
-- **rc.d fix**: dependência `REQUIRE: LOGIN` (inexistente no pfSense) alterada para `REQUIRE: DAEMON NETWORKING`
-- **resync hook**: nova função `layer7_ensure_daemon_running()` garante que o daemon é iniciado durante o boot do pfSense mesmo se o mecanismo rc.d falhar
+- **GitHub Actions (smoke)** falhava no job Linux com `Makefile:20: *** missing separator`
+- **Causa raiz**: o script usava `make` (GNU make no Ubuntu), mas o `src/layer7d/Makefile` usa sintaxe BSD make (`.if`)
+- **Fix**: `scripts/package/smoke-layer7d.sh` agora detecta e prioriza `bmake` (fallback para `make`)
+- **Fix**: workflow `.github/workflows/smoke-layer7d.yml` agora instala `bmake` no runner Ubuntu
 
 ### Instalacao (um comando)
 

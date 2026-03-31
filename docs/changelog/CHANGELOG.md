@@ -2,6 +2,16 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.5] — 2026-03-31
+
+### Fixed
+
+- **CI smoke layer7d** — workflow Linux falhava com `Makefile:20: *** missing separator`
+- **Causa raiz**: job usava `make` (GNU make no Ubuntu), mas `src/layer7d/Makefile` usa sintaxe BSD make (`.if`)
+- **scripts/package/smoke-layer7d.sh** agora detecta `bmake` e prioriza BSD make; fallback para `make`
+- **.github/workflows/smoke-layer7d.yml** agora instala `bmake` no runner Ubuntu
+- **PORTVERSION** bumped para 1.6.5
+
 ## [1.6.4] — 2026-03-31
 
 ### Fixed

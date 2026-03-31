@@ -11,7 +11,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 | **Website** | <https://www.systemup.inf.br> |
 | **Distribuicao publica** | <https://github.com/pablomichelin/Layer7> |
 | **Licenca** | EULA (ver `LICENSE`) |
-| **Versao actual** | **1.6.4** |
+| **Versao actual** | **1.6.5** |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x - FreeBSD 14/15 |
 
 ## O que faz
