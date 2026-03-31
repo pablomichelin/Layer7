@@ -2,6 +2,25 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.2] — 2026-03-31
+
+### Added — Bloqueio Total: 3 melhorias para fechar brechas de bypass DNS
+
+#### Melhoria A — DNS Forçado via PF `rdr`
+- **`bl_config.h` / `bl_config.c`**: campo `int force_dns` adicionado à `struct l7_bl_rule`; `parse_one_rule()` lê `"force_dns"` do JSON; retrocompatível (ausência = `false`)
+- **`layer7-pfctl`**: nova função `generate_rdr_rules()` que lê `config.json` e `layer7.json`; `write_rules()` passa a incluir regras `rdr pass on <iface> inet proto udp/tcp from <cidr> to !127.0.0.1 port 53 -> 127.0.0.1 label "layer7:force_dns"` para cada regra com `force_dns: true` e respectivos src_cidrs
+- **`layer7.inc`**: nova função `layer7_generate_rdr_rules_snippet()` que gera regras rdr dinamicamente (acesso a `get_real_interface()`); `layer7_pf_default_rules_text()` passa a ser dinâmica incluindo o snippet rdr; nova função `layer7_generate_nat_rules()` registada como `nat_rules_needed` no `layer7.xml`
+- **`layer7.xml`**: adicionado `<nat_rules_needed>layer7_generate_nat_rules</nat_rules_needed>` para injectar regras rdr na secção NAT do pfSense
+- **`layer7_blacklists.php`**: nova checkbox "Forçar DNS local para estes CIDRs" no formulário de regras (activada por defeito em novas regras); gravada como `"force_dns": true` no `config.json`
+
+#### Melhoria B — Bloqueio por TLS SNI via nDPI
+- **`main.c`**: include `<arpa/inet.h>` adicionado; variáveis `s_bl_dns_hits` e `s_bl_sni_hits`; nova função `ip_in_cidr(src_ip, cidr_str)` com parse manual + CIDR matching (sem dependências); nova função `bl_rule_matches_src(rule, src_ip)` para verificar se origem está no src_cidrs da regra (sem restrição = aplica a todos); check SNI blacklist em `layer7_on_classified_flow()` — após decisão de política manual — adiciona dst_ip à tabela `layer7_bld_N` correcta quando o SNI/host casa com a blacklist
+
+#### Melhoria C — Estatísticas DNS vs SNI
+- **`main.c`**: `s_bl_dns_hits` incrementado no DNS callback; `s_bl_sni_hits` incrementado no SNI callback; ambos expostos em `write_stats_json()` como `"bl_dns_hits"` e `"bl_sni_hits"`
+
+- **PORTVERSION** bumped para 1.7.2
+
 ## [1.6.7] — 2026-03-31
 
 ### Fixed

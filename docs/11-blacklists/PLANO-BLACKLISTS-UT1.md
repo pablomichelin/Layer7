@@ -7,7 +7,17 @@
 
 ---
 
-## Estado atual (v1.4.17)
+## Estado atual (v1.7.2)
+
+### Melhorias pós-V1 implementadas (2026-03-31)
+
+- [x] **Melhoria A — DNS Forçado via PF `rdr`**: campo `force_dns` por regra; regras `rdr pass` geradas dinamicamente por `layer7-pfctl` e `layer7_pf_default_rules_text()`; checkbox na GUI; `nat_rules_needed` hook no `layer7.xml`
+- [x] **Melhoria B — Bloqueio por TLS SNI**: `layer7_on_classified_flow()` verifica SNI/host contra blacklist; `ip_in_cidr()` + `bl_rule_matches_src()` em `main.c`; dst_ip adicionado à tabela `layer7_bld_N` correcta
+- [x] **Melhoria C — Estatísticas DNS vs SNI**: contadores `bl_dns_hits` e `bl_sni_hits` no stats JSON
+
+---
+
+## Estado anterior (v1.4.17)
 
 Implementado no produto:
 

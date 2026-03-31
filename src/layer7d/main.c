@@ -13,6 +13,7 @@
 #include "enforce.h"
 #include "license.h"
 #include "policy.h"
+#include <arpa/inet.h>
 #include <errno.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -76,6 +77,8 @@ static time_t s_last_lic_check;
 static struct l7_blacklist *s_blacklist;
 static unsigned long long s_bl_hits;
 static unsigned long long s_bl_lookups;
+static unsigned long long s_bl_dns_hits;
+static unsigned long long s_bl_sni_hits;
 static struct l7_bl_rule s_bl_rules[L7_BL_MAX_RULES];
 static int s_bl_n_rules;
 static time_t s_last_pf_selfheal;
@@ -218,6 +221,10 @@ write_stats_json(void)
 	    (unsigned long long)s_bl_lookups);
 	fprintf(f, "  \"bl_hits\": %llu,\n",
 	    (unsigned long long)s_bl_hits);
+	fprintf(f, "  \"bl_dns_hits\": %llu,\n",
+	    (unsigned long long)s_bl_dns_hits);
+	fprintf(f, "  \"bl_sni_hits\": %llu,\n",
+	    (unsigned long long)s_bl_sni_hits);
 	fprintf(f, "  \"bl_rules_active\": %d,\n", s_bl_n_rules);
 
 	{
@@ -653,6 +660,77 @@ bl_rule_has_cat(const struct l7_bl_rule *rule, const char *cat)
 	return 0;
 }
 
+/*
+ * Verifica se src_ip (string "a.b.c.d") esta dentro de cidr_str
+ * (string "a.b.c.d/prefix" ou "a.b.c.d"). Retorna 1 se sim, 0 se nao.
+ * Falha graciosamente: retorna 0 se o parse falhar.
+ */
+static int
+ip_in_cidr(const char *src_ip, const char *cidr_str)
+{
+	char addr_buf[48];
+	char *slash;
+	int prefix;
+	uint32_t src, net, mask;
+	unsigned int a, b, c, d;
+
+	if (!src_ip || !cidr_str || !*src_ip || !*cidr_str)
+		return 0;
+
+	strncpy(addr_buf, cidr_str, sizeof(addr_buf) - 1);
+	addr_buf[sizeof(addr_buf) - 1] = '\0';
+
+	slash = strchr(addr_buf, '/');
+	if (slash) {
+		*slash = '\0';
+		prefix = atoi(slash + 1);
+		if (prefix < 0 || prefix > 32)
+			return 0;
+	} else {
+		prefix = 32;
+	}
+
+	if (sscanf(src_ip, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+		return 0;
+	if (a > 255 || b > 255 || c > 255 || d > 255)
+		return 0;
+	src = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+
+	if (sscanf(addr_buf, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+		return 0;
+	if (a > 255 || b > 255 || c > 255 || d > 255)
+		return 0;
+	net = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+
+	if (prefix == 0)
+		return 1;
+	if (prefix >= 32)
+		return src == net;
+	mask = (uint32_t)(0xffffffffU << (unsigned)(32 - prefix));
+	return (src & mask) == (net & mask);
+}
+
+/*
+ * Verifica se src_ip pertence a algum dos src_cidrs da regra.
+ * Se a regra nao tem CIDRs de origem, aplica-se a todos (retorna 1).
+ * Falha graciosamente: se ip_in_cidr falhar, nao bloqueia.
+ */
+static int
+bl_rule_matches_src(const struct l7_bl_rule *rule, const char *src_ip)
+{
+	int i;
+
+	if (!rule || !src_ip || !*src_ip)
+		return 0;
+	if (rule->n_src_cidrs == 0)
+		return 1;
+	for (i = 0; i < rule->n_src_cidrs; i++) {
+		if (ip_in_cidr(src_ip, rule->src_cidrs[i]))
+			return 1;
+	}
+	return 0;
+}
+
 static int
 run_shell_cmd_ok(const char *cmd)
 {
@@ -787,6 +865,7 @@ layer7_on_dns_resolved(const char *iface, const char *domain,
 		bl_cat = l7_blacklist_lookup(s_blacklist, domain);
 		if (bl_cat) {
 			s_bl_hits++;
+			s_bl_dns_hits++;
 			for (ri = 0; ri < s_bl_n_rules; ri++) {
 				char tbl[32];
 				if (!s_bl_rules[ri].enabled)
@@ -901,7 +980,48 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 			L7_WARN("pfctl add failed table=%s ip=%s",
 			    L7_PF_TABLE_BLOCK_DST, dst_ip);
 		}
-	} else if (dec.action == LAYER7_ACTION_TAG) {
+	}
+
+	/* SNI/host blacklist check (Melhoria B) — apos decisao de politica manual */
+	if (s_blacklist && s_bl_n_rules > 0 && host && *host &&
+	    dec.action != LAYER7_ACTION_BLOCK && dst_ip &&
+	    layer7_pf_ipv4_host_ok(dst_ip)) {
+		const char *bl_cat;
+		int ri;
+
+		bl_cat = l7_blacklist_lookup(s_blacklist, host);
+		if (bl_cat) {
+			for (ri = 0; ri < s_bl_n_rules; ri++) {
+				char tbl[32];
+				if (!s_bl_rules[ri].enabled)
+					continue;
+				if (!bl_rule_has_cat(&s_bl_rules[ri], bl_cat))
+					continue;
+				if (!bl_rule_matches_src(&s_bl_rules[ri],
+				    src_ip))
+					continue;
+				snprintf(tbl, sizeof(tbl),
+				    "layer7_bld_%d", ri);
+				r = layer7_pf_add_with_selfheal(tbl, dst_ip,
+				    "sni_blacklist");
+				if (r == 0) {
+					s_pf_dst_add_ok++;
+					s_bl_sni_hits++;
+					s_bl_hits++;
+					L7_INFO("sni_bl_block: iface=%s "
+					    "host=%s cat=%s src=%s dst=%s "
+					    "rule=%d/%s table=%s",
+					    iface ? iface : "-",
+					    host, bl_cat, src_ip, dst_ip,
+					    ri, s_bl_rules[ri].name, tbl);
+				} else {
+					s_pf_dst_add_fail++;
+				}
+			}
+		}
+	}
+
+	if (dec.action == LAYER7_ACTION_TAG) {
 		r = -1;
 		if (dec.would_enforce_block_or_tag && dec.pf_table[0] &&
 		    layer7_pf_ipv4_host_ok(src_ip)) {

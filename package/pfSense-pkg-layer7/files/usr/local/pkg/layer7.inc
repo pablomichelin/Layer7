@@ -78,9 +78,89 @@ function layer7_pf_rules_sample_path()
 	return "/usr/local/etc/layer7/pf.conf.sample";
 }
 
+/**
+ * Gera regras rdr para DNS forcado para CIDRs das regras blacklist com
+ * force_dns=true. Requer acesso a pfSense's get_real_interface().
+ * Retorna string vazia se nao houver regras rdr activas.
+ */
+function layer7_generate_rdr_rules_snippet()
+{
+	$bl_config = layer7_bl_config_load();
+	if (empty($bl_config["rules"]) || !is_array($bl_config["rules"])) {
+		return "";
+	}
+
+	$l7config = layer7_load_or_default();
+	$iface_ids = isset($l7config["layer7"]["interfaces"]) &&
+	    is_array($l7config["layer7"]["interfaces"])
+	    ? $l7config["layer7"]["interfaces"]
+	    : array("lan");
+
+	$real_ifaces = array();
+	foreach ($iface_ids as $ifid) {
+		if (function_exists("get_real_interface")) {
+			$real = get_real_interface($ifid);
+		} else {
+			$real = null;
+		}
+		if ($real) {
+			$real_ifaces[] = $real;
+		} elseif (preg_match('/^[a-z][a-z0-9]+[0-9]$/', $ifid)) {
+			$real_ifaces[] = $ifid;
+		}
+	}
+	if (empty($real_ifaces)) {
+		return "";
+	}
+
+	$lines = array();
+	$lines[] = "";
+	$lines[] = "# DNS forcado para CIDRs com blacklist (force_dns).";
+	$has_rules = false;
+	foreach ($bl_config["rules"] as $rule) {
+		if (!isset($rule["enabled"]) || !$rule["enabled"]) {
+			continue;
+		}
+		if (empty($rule["force_dns"])) {
+			continue;
+		}
+		if (empty($rule["src_cidrs"]) || !is_array($rule["src_cidrs"])) {
+			continue;
+		}
+		foreach ($real_ifaces as $iface) {
+			foreach ($rule["src_cidrs"] as $cidr) {
+				$cidr = trim((string)$cidr);
+				if ($cidr === "") {
+					continue;
+				}
+				$has_rules = true;
+				$lines[] = "rdr pass on {$iface} inet proto udp" .
+				    " from {$cidr} to !127.0.0.1 port 53" .
+				    " -> 127.0.0.1 label \"layer7:force_dns\"";
+				$lines[] = "rdr pass on {$iface} inet proto tcp" .
+				    " from {$cidr} to !127.0.0.1 port 53" .
+				    " -> 127.0.0.1 label \"layer7:force_dns\"";
+			}
+		}
+	}
+	if (!$has_rules) {
+		return "";
+	}
+	return implode("\n", $lines) . "\n";
+}
+
+/**
+ * Registado como nat_rules_needed em layer7.xml.
+ * Retorna regras rdr de DNS forcado para o pfSense injectar na seccao NAT.
+ */
+function layer7_generate_nat_rules()
+{
+	return layer7_generate_rdr_rules_snippet();
+}
+
 function layer7_pf_default_rules_text()
 {
-	return implode("\n", array(
+	$filter_rules = implode("\n", array(
 		"# Layer7 PF snippet (package-managed)",
 		"table <layer7_block> persist",
 		"table <layer7_tagged> persist",
@@ -102,6 +182,9 @@ function layer7_pf_default_rules_text()
 		"",
 		"# layer7_tagged permanece disponivel para regras manuais/encadeadas."
 	)) . "\n";
+
+	$rdr_snippet = layer7_generate_rdr_rules_snippet();
+	return $filter_rules . $rdr_snippet;
 }
 
 function layer7_pf_rules_text()

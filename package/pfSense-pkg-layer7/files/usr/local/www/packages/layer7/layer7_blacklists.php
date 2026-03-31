@@ -69,6 +69,7 @@ if (isset($_POST["save_rule"])) {
 	$ridx = $_POST["rule_index"] ?? "";
 	$rname = trim($_POST["rule_name"] ?? "");
 	$renabled = isset($_POST["rule_enabled"]);
+	$rforce_dns = isset($_POST["rule_force_dns"]);
 	$rcats = isset($_POST["rule_cats"]) && is_array($_POST["rule_cats"]) ? $_POST["rule_cats"] : array();
 	$rcidrs_raw = trim($_POST["rule_cidrs"] ?? "");
 	$rexcept_raw = trim($_POST["rule_except"] ?? "");
@@ -111,6 +112,7 @@ if (isset($_POST["save_rule"])) {
 		$rule = array(
 			"name" => $rname,
 			"enabled" => $renabled,
+			"force_dns" => $rforce_dns,
 			"categories" => array_values($rcats),
 			"src_cidrs" => array_values($rcidrs),
 			"except_ips" => array_values($rexcept)
@@ -392,8 +394,8 @@ if ($edit_idx >= 0 && !isset($rules[$edit_idx])) $show_form = false;
 
 if ($show_form):
 	$erule = ($edit_idx >= 0 && isset($rules[$edit_idx])) ? $rules[$edit_idx] : array(
-		"name" => "", "enabled" => true, "categories" => array(),
-		"src_cidrs" => array(), "except_ips" => array()
+		"name" => "", "enabled" => true, "force_dns" => true,
+		"categories" => array(), "src_cidrs" => array(), "except_ips" => array()
 	);
 	$form_title = ($edit_idx >= 0) ? l7_t("Editar regra") : l7_t("Nova regra");
 ?>
@@ -418,6 +420,17 @@ if ($show_form):
 			<?=(!empty($erule["enabled"])) ? "checked" : ""?>>
 		<?=l7_t("Regra activa")?>
 	</label>
+</div>
+
+<div class="form-group">
+	<label class="checkbox-inline">
+		<input type="checkbox" name="rule_force_dns" value="1"
+			<?=(!empty($erule["force_dns"])) ? "checked" : ""?>>
+		<?=l7_t("Forcar DNS local para estes CIDRs")?>
+	</label>
+	<p class="help-block">
+		<?=l7_t("Redireciona todo o DNS (porta 53) dos CIDRs de origem para o Unbound local, mesmo que o dispositivo tenha DNS externo (ex: 8.8.8.8) configurado. Requer CIDRs de origem definidos.")?>
+	</p>
 </div>
 
 <div class="form-group">

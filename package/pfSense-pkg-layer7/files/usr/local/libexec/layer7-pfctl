@@ -98,9 +98,53 @@ ensure_blacklist_tables() {
 	return "$_rc"
 }
 
+generate_rdr_rules() {
+	/usr/local/bin/php -r '
+$l7  = @json_decode(@file_get_contents("/usr/local/etc/layer7.json"), true);
+$ids = isset($l7["layer7"]["interfaces"]) && is_array($l7["layer7"]["interfaces"])
+     ? $l7["layer7"]["interfaces"] : array("lan");
+
+$cfg = @simplexml_load_file("/cf/conf/config.xml");
+$reals = array();
+foreach ($ids as $id) {
+    if ($cfg) {
+        $real = (string)($cfg->interfaces->$id->if ?? "");
+    } else {
+        $real = "";
+    }
+    if ($real !== "") {
+        $reals[] = $real;
+    } elseif (preg_match("/^[a-z][a-z0-9]+[0-9]$/", $id)) {
+        $reals[] = $id;
+    }
+}
+if (empty($reals)) { exit(0); }
+
+$bl = @json_decode(@file_get_contents("/usr/local/etc/layer7/blacklists/config.json"), true);
+if (!isset($bl["rules"]) || !is_array($bl["rules"])) { exit(0); }
+
+foreach ($bl["rules"] as $rule) {
+    if (!isset($rule["enabled"]) || !$rule["enabled"]) { continue; }
+    if (empty($rule["force_dns"])) { continue; }
+    if (empty($rule["src_cidrs"]) || !is_array($rule["src_cidrs"])) { continue; }
+    foreach ($reals as $iface) {
+        foreach ($rule["src_cidrs"] as $cidr) {
+            $cidr = trim((string)$cidr);
+            if ($cidr === "") { continue; }
+            echo "rdr pass on {$iface} inet proto udp from {$cidr} to !127.0.0.1 port 53 -> 127.0.0.1 label \"layer7:force_dns\"\n";
+            echo "rdr pass on {$iface} inet proto tcp from {$cidr} to !127.0.0.1 port 53 -> 127.0.0.1 label \"layer7:force_dns\"\n";
+        }
+    }
+}
+' 2>/dev/null
+}
+
 write_rules() {
+	_rdr_rules="$(generate_rdr_rules)"
+
 	/bin/mkdir -p "${RULES_DIR}"
-	cat > "${RULES_PATH}" <<EOF
+	{
+	cat <<EOF
 # Layer7 PF snippet (package-managed)
 table <${TABLE_BLOCK}> persist
 table <${TABLE_TAGGED}> persist
@@ -122,6 +166,12 @@ block drop quick inet6 to <${TABLE_BLOCK_DST}> label "layer7:block:dst6"
 
 # layer7_tagged permanece disponivel para regras manuais/encadeadas.
 EOF
+	if [ -n "${_rdr_rules}" ]; then
+		printf '\n# DNS forcado para CIDRs com blacklist (force_dns).\n'
+		printf '%s\n' "${_rdr_rules}"
+	fi
+	} > "${RULES_PATH}"
+
 	if [ ! -f "${RULES_SAMPLE}" ]; then
 		cp "${RULES_PATH}" "${RULES_SAMPLE}"
 	fi

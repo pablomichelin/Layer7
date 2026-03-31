@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.6.7 — Fix SIGSEGV: cast inválido char[64][48] → char** em get_cat_hits**
+**Versão: 1.7.2 — Bloqueio Total: DNS Forçado (rdr), SNI Blacklist, Estatísticas DNS/SNI**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,11 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.7.2 — Bloqueio Total: 3 melhorias para fechar brechas de bypass DNS (2026-03-31):**
+  - MELHORIA A: DNS forçado via PF `rdr` — regras `rdr pass on <iface> proto udp/tcp from <cidr> to !127.0.0.1 port 53 -> 127.0.0.1` geradas dinamicamente por `layer7-pfctl` e `layer7_pf_default_rules_text()` para regras blacklist com `force_dns: true`; campo `force_dns` adicionado à `struct l7_bl_rule` e `parse_one_rule()` em `bl_config.c`; checkbox "Forçar DNS local" na GUI activada por defeito; `nat_rules_needed` hook adicionado ao `layer7.xml`
+  - MELHORIA B: Bloqueio por TLS SNI — `layer7_on_classified_flow()` verifica SNI/host contra blacklist após decisão de política manual; funções `ip_in_cidr()` e `bl_rule_matches_src()` criadas em `main.c`; match por src_ip → regra correcta → tabela `layer7_bld_N`
+  - MELHORIA C: Contadores `bl_dns_hits` e `bl_sni_hits` no stats JSON; `s_bl_dns_hits` incrementado no DNS callback; `s_bl_sni_hits` incrementado no SNI check
+  - PORTVERSION bumped para 1.7.2
 - **v1.6.7 — Fix SIGSEGV em l7_blacklist_get_cat_hits (2026-03-31):**
   - FIX CRÍTICO: `blacklist.c` — `l7_blacklist_get_cat_hits()` fazia cast inválido `(const char **)bl->cats` onde `bl->cats` é `char[64][48]` (array 2D de chars, não array de ponteiros)
   - Causa raiz: código de stats (SIGUSR1) usava `bl_cat_names[bli]` como ponteiro mas recebia o endereço de uma string de 48 bytes, interpretando os primeiros 8 bytes como endereço → SIGSEGV ao imprimir
@@ -490,7 +495,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.5.0 — Publicar release com auditoria de segurança e robustez.**
+**v1.7.2 — Publicar release com Bloqueio Total (DNS forçado + SNI blocking + stats).**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico

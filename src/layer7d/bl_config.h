@@ -17,6 +17,7 @@
 struct l7_bl_rule {
 	char name[L7_BL_RULE_NAME_LEN];
 	int enabled;
+	int force_dns;	/* redirect all DNS from src_cidrs to local Unbound */
 	char categories[L7_BL_MAX_CATS][L7_BL_CAT_LEN];
 	int n_categories;
 	char src_cidrs[L7_BL_RULE_CIDRS][48];

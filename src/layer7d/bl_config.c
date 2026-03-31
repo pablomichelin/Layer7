@@ -312,6 +312,8 @@ parse_one_rule(const char **p, struct l7_bl_rule *rule)
 			    sizeof(rule->name));
 		} else if (match_key(p, "enabled")) {
 			rule->enabled = parse_bool(p);
+		} else if (match_key(p, "force_dns")) {
+			rule->force_dns = parse_bool(p);
 		} else if (match_key(p, "categories")) {
 			rule->n_categories = parse_cat_array(p,
 			    rule->categories, L7_BL_MAX_CATS);
