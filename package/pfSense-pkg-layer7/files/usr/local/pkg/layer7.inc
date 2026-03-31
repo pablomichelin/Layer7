@@ -105,7 +105,7 @@ function layer7_generate_rdr_rules_snippet()
 		}
 		if ($real) {
 			$real_ifaces[] = $real;
-		} elseif (preg_match('/^[a-z][a-z0-9]+[0-9]$/', $ifid)) {
+		} elseif (preg_match('/^[a-z][a-z0-9]+$/i', $ifid)) {
 			$real_ifaces[] = $ifid;
 		}
 	}
@@ -183,8 +183,7 @@ function layer7_pf_default_rules_text()
 		"# layer7_tagged permanece disponivel para regras manuais/encadeadas."
 	)) . "\n";
 
-	$rdr_snippet = layer7_generate_rdr_rules_snippet();
-	return $filter_rules . $rdr_snippet;
+	return $filter_rules;
 }
 
 function layer7_pf_rules_text()

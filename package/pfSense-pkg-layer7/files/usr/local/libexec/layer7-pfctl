@@ -114,7 +114,7 @@ foreach ($ids as $id) {
     }
     if ($real !== "") {
         $reals[] = $real;
-    } elseif (preg_match("/^[a-z][a-z0-9]+[0-9]$/", $id)) {
+    } elseif (preg_match("/^[a-z][a-z0-9]+$/i", $id)) {
         $reals[] = $id;
     }
 }
@@ -140,11 +140,8 @@ foreach ($bl["rules"] as $rule) {
 }
 
 write_rules() {
-	_rdr_rules="$(generate_rdr_rules)"
-
 	/bin/mkdir -p "${RULES_DIR}"
-	{
-	cat <<EOF
+	cat <<EOF > "${RULES_PATH}"
 # Layer7 PF snippet (package-managed)
 table <${TABLE_BLOCK}> persist
 table <${TABLE_TAGGED}> persist
@@ -166,16 +163,14 @@ block drop quick inet6 to <${TABLE_BLOCK_DST}> label "layer7:block:dst6"
 
 # layer7_tagged permanece disponivel para regras manuais/encadeadas.
 EOF
-	if [ -n "${_rdr_rules}" ]; then
-		printf '\n# DNS forcado para CIDRs com blacklist (force_dns).\n'
-		printf '%s\n' "${_rdr_rules}"
-	fi
-	} > "${RULES_PATH}"
 
 	if [ ! -f "${RULES_SAMPLE}" ]; then
 		cp "${RULES_PATH}" "${RULES_SAMPLE}"
 	fi
 }
+
+# Nota: as regras rdr para DNS forcado (force_dns) sao injectadas pelo pfSense
+# via o hook nat_rules_needed -> layer7_generate_nat_rules() em layer7.inc.
 
 flush_tables() {
 	pfctl -t "${TABLE_BLOCK}" -T flush >/dev/null 2>&1 || true

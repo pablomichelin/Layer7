@@ -991,6 +991,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 
 		bl_cat = l7_blacklist_lookup(s_blacklist, host);
 		if (bl_cat) {
+			s_bl_hits++;
+			s_bl_sni_hits++;
 			for (ri = 0; ri < s_bl_n_rules; ri++) {
 				char tbl[32];
 				if (!s_bl_rules[ri].enabled)
@@ -1006,8 +1008,6 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 				    "sni_blacklist");
 				if (r == 0) {
 					s_pf_dst_add_ok++;
-					s_bl_sni_hits++;
-					s_bl_hits++;
 					L7_INFO("sni_bl_block: iface=%s "
 					    "host=%s cat=%s src=%s dst=%s "
 					    "rule=%d/%s table=%s",

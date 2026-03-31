@@ -2,6 +2,22 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.3] — 2026-03-31
+
+### Fixed — Correcção de 3 bugs nas melhorias de Bloqueio Total
+
+#### Bug Crítico — `rdr` rules no filter anchor
+- **`layer7.inc`**: `layer7_pf_default_rules_text()` deixou de concatenar o snippet `rdr` com as filter rules — no FreeBSD PF, `rdr` só é válido na secção NAT; tê-las no filter anchor causava rejeição do ruleset inteiro (`rdr rule not allowed in filter ruleset`)
+- **`layer7-pfctl`**: `write_rules()` deixou de incluir as regras `rdr` no ficheiro `/usr/local/etc/layer7/pf.conf` (filter rules); as `rdr` continuam a ser injectadas correctamente via o hook `nat_rules_needed` → `layer7_generate_nat_rules()` registado no `layer7.xml`
+
+#### Bug Médio — Regex de fallback de interface incorrecto
+- **`layer7-pfctl`** e **`layer7.inc`**: regex `^[a-z][a-z0-9]+[0-9]$` alterado para `^[a-z][a-z0-9]+$/i`; o regex anterior não cobria interfaces como `lan`, `wan`, `opt2` (último caractere não dígito); o novo cobre todos os nomes de interface válidos do pfSense
+
+#### Bug Menor — `s_bl_sni_hits` incrementado por pfctl-add em vez de por host-match
+- **`main.c`**: `s_bl_hits++` e `s_bl_sni_hits++` movidos para antes do loop de regras no SNI check, tornando o comportamento consistente com o DNS callback (onde os contadores são incrementados uma vez por domínio encontrado na blacklist, não por pfctl-add)
+
+- **PORTVERSION** bumped para 1.7.3
+
 ## [1.7.2] — 2026-03-31
 
 ### Added — Bloqueio Total: 3 melhorias para fechar brechas de bypass DNS

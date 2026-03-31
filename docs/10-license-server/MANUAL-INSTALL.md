@@ -19,11 +19,11 @@ Ao subir uma nova versao, actualizar no mesmo bloco:
 
 ## Links da versao actual (para teste)
 
-**Versao actual:** `1.7.2`
+**Versao actual:** `1.7.3`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.7.2`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.7.2/pfSense-pkg-layer7-1.7.2.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.7.2/pfSense-pkg-layer7-1.7.2.pkg.sha256`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.7.3`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.7.3/pfSense-pkg-layer7-1.7.3.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.7.3/pfSense-pkg-layer7-1.7.3.pkg.sha256`
 - **Install script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh`
 - **Uninstall script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh`
 
@@ -35,16 +35,16 @@ Instalar ultima versao publicada:
 fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
 ```
 
-Instalar explicitamente a versao `1.7.2`:
+Instalar explicitamente a versao `1.7.3`:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.7.2
+fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.7.3
 ```
 
-Baixar o `.pkg` directo da versao `1.7.2`:
+Baixar o `.pkg` directo da versao `1.7.3`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.7.2.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.7.2/pfSense-pkg-layer7-1.7.2.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.7.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.7.3/pfSense-pkg-layer7-1.7.3.pkg
 ```
 
 Desinstalar com script publico:

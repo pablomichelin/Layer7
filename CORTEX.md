@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.7.2 — Bloqueio Total: DNS Forçado (rdr), SNI Blacklist, Estatísticas DNS/SNI**
+**Versão: 1.7.3 — Correcção de bugs críticos das melhorias de Bloqueio Total**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,8 +74,13 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.7.3 — Correcção de 3 bugs nas melhorias de Bloqueio Total (2026-03-31):**
+  - BUG CRÍTICO: `layer7.inc` e `layer7-pfctl` — regras `rdr` estavam a ser injectadas no filter anchor (pfctl rejeita com "rdr rule not allowed in filter ruleset"); correcção: removidas das filter rules; existem exclusivamente via `nat_rules_needed` → `layer7_generate_nat_rules()`
+  - BUG MÉDIO: regex `^[a-z][a-z0-9]+[0-9]$` não cobria interfaces como `lan`, `wan`; corrigido para `^[a-z][a-z0-9]+$/i` em `layer7-pfctl` e `layer7.inc`
+  - BUG MENOR: `s_bl_sni_hits` e `s_bl_hits` no SNI check eram incrementados dentro do `if (r == 0)` por pfctl-add; movidos para antes do loop para ser consistente com o DNS callback (um incremento por host match)
+  - PORTVERSION bumped para 1.7.3
 - **v1.7.2 — Bloqueio Total: 3 melhorias para fechar brechas de bypass DNS (2026-03-31):**
-  - MELHORIA A: DNS forçado via PF `rdr` — regras `rdr pass on <iface> proto udp/tcp from <cidr> to !127.0.0.1 port 53 -> 127.0.0.1` geradas dinamicamente por `layer7-pfctl` e `layer7_pf_default_rules_text()` para regras blacklist com `force_dns: true`; campo `force_dns` adicionado à `struct l7_bl_rule` e `parse_one_rule()` em `bl_config.c`; checkbox "Forçar DNS local" na GUI activada por defeito; `nat_rules_needed` hook adicionado ao `layer7.xml`
+  - MELHORIA A: DNS forçado via PF `rdr` — regras `rdr pass on <iface> proto udp/tcp from <cidr> to !127.0.0.1 port 53 -> 127.0.0.1` geradas dinamicamente por `layer7-pfctl` e `layer7_generate_nat_rules()` para regras blacklist com `force_dns: true`; campo `force_dns` adicionado à `struct l7_bl_rule` e `parse_one_rule()` em `bl_config.c`; checkbox "Forçar DNS local" na GUI activada por defeito; `nat_rules_needed` hook adicionado ao `layer7.xml`
   - MELHORIA B: Bloqueio por TLS SNI — `layer7_on_classified_flow()` verifica SNI/host contra blacklist após decisão de política manual; funções `ip_in_cidr()` e `bl_rule_matches_src()` criadas em `main.c`; match por src_ip → regra correcta → tabela `layer7_bld_N`
   - MELHORIA C: Contadores `bl_dns_hits` e `bl_sni_hits` no stats JSON; `s_bl_dns_hits` incrementado no DNS callback; `s_bl_sni_hits` incrementado no SNI check
   - PORTVERSION bumped para 1.7.2
@@ -495,7 +500,7 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 - **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
 
 ## Objetivo imediato
-**v1.7.2 — Publicar release com Bloqueio Total (DNS forçado + SNI blocking + stats).**
+**v1.7.3 — Publicar hotfix dos bugs críticos das melhorias de Bloqueio Total.**
 
 V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
 per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
