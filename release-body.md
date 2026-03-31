@@ -1,12 +1,12 @@
-## Layer7 v1.6.3 — Scroll fix: âncoras HTML em todos os formulários
+## Layer7 v1.6.4 — Auto-start do daemon após reboot do pfSense
 
 Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
 
-### Correção
+### Correção crítica
 
-- Adicionadas âncoras HTML a todos os formulários POST em todas as páginas
-- Ao submeter um form, a página volta à secção relevante em vez de saltar para o topo
-- Páginas afectadas: Settings, Blacklists, Policies, Diagnostics, Reports, Status, Groups, Exceptions, Test
+- **Daemon não reiniciava após reboot** — o serviço layer7d parava com o shutdown mas não voltava a iniciar automaticamente quando o pfSense reiniciava
+- **rc.d fix**: dependência `REQUIRE: LOGIN` (inexistente no pfSense) alterada para `REQUIRE: DAEMON NETWORKING`
+- **resync hook**: nova função `layer7_ensure_daemon_running()` garante que o daemon é iniciado durante o boot do pfSense mesmo se o mecanismo rc.d falhar
 
 ### Instalacao (um comando)
 

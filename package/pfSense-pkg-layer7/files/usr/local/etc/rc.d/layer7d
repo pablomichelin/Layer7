@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # PROVIDES: layer7d
-# REQUIRE: LOGIN
+# REQUIRE: DAEMON NETWORKING
 # KEYWORD: shutdown
 
 . /etc/rc.subr

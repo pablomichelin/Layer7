@@ -151,6 +151,44 @@ function layer7_resync()
 			layer7_ensure_pf_table("layer7_bld_" . (int)$idx);
 		}
 	}
+
+	layer7_ensure_daemon_running();
+}
+
+/**
+ * If the service is enabled but the daemon is not running, start it.
+ * Called by layer7_resync() (pfSense boot + filter reload) to guarantee
+ * the daemon survives reboots even when the rc.d ordering fails.
+ */
+function layer7_ensure_daemon_running()
+{
+	$data = layer7_load_or_default();
+	if (empty($data["layer7"]["enabled"])) {
+		return;
+	}
+
+	$pidf = "/var/run/layer7d.pid";
+	if (file_exists($pidf)) {
+		$pid = trim(@file_get_contents($pidf));
+		if ($pid !== "" && ctype_digit($pid)) {
+			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $code);
+			if ($code === 0) {
+				return;
+			}
+		}
+		@unlink($pidf);
+	}
+
+	$rc = "/usr/local/etc/rc.d/layer7d";
+	if (!file_exists($rc)) {
+		return;
+	}
+	$cmd = "/bin/sh " . escapeshellarg($rc) . " onestart 2>/dev/null";
+	if (function_exists("mwexec")) {
+		mwexec($cmd);
+	} else {
+		@shell_exec($cmd);
+	}
 }
 
 function layer7_generate_rules($type)

@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.6.3 — Scroll fix: âncoras HTML em todos os formulários**
+**Versão: 1.6.4 — Auto-start do daemon após reboot do pfSense**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,14 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.6.4 — Auto-start do daemon após reboot (2026-03-31):**
+  - FIX CRITICO: daemon não reiniciava automaticamente após reboot do pfSense
+  - Causa raiz 1: rc.d script declarava `REQUIRE: LOGIN` — facility inexistente no pfSense, impedindo execução no boot
+  - Causa raiz 2: `layer7_resync()` (chamada pelo pfSense no boot) apenas garantia tabelas PF, sem verificar se o daemon estava a correr
+  - Correcção rc.d: `REQUIRE: LOGIN` alterado para `REQUIRE: DAEMON NETWORKING` (providers válidos no pfSense)
+  - Correcção resync: nova função `layer7_ensure_daemon_running()` chamada no fim de `layer7_resync()` — verifica se o serviço está enabled e o daemon não está a correr, e inicia-o automaticamente
+  - Dupla garantia: o daemon agora inicia tanto pelo mecanismo rc.d do FreeBSD quanto pelo hook resync do pfSense
+  - PORTVERSION incrementado para 1.6.4
 - **v1.6.2 — Fix edição de categorias custom (2026-03-26):**
   - Restaurado botão de editar para categorias personalizadas criadas pelo utilizador
   - Ao editar, campo ID fica readonly (não pode alterar o ID, apenas os domínios)

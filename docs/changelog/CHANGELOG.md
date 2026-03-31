@@ -2,6 +2,15 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.6.4] — 2026-03-31
+
+### Fixed
+
+- **Auto-start após reboot** — daemon layer7d não reiniciava automaticamente após reboot do pfSense
+- **rc.d**: `REQUIRE: LOGIN` alterado para `REQUIRE: DAEMON NETWORKING` (facility `LOGIN` não existe no pfSense)
+- **layer7_resync()**: nova função `layer7_ensure_daemon_running()` inicia o daemon se o serviço estiver enabled mas o processo não estiver a correr (hook chamado pelo pfSense em cada boot e reload do filtro)
+- **PORTVERSION** bumped para 1.6.4
+
 ## [1.6.3] — 2026-03-26
 
 ### Fixed
