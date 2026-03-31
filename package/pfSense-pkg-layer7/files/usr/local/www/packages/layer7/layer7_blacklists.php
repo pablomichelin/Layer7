@@ -108,6 +108,10 @@ if (isset($_POST["save_rule"])) {
 		$input_errors[] = l7_t("Seleccione pelo menos uma categoria.");
 	}
 
+	if ($rforce_dns && empty($rcidrs)) {
+		$input_errors[] = l7_t("\"Forcar DNS local\" requer pelo menos um CIDR de origem. Defina os IPs/CIDRs no campo Origem ou desactive a opcao.");
+	}
+
 	if (empty($input_errors)) {
 		$rule = array(
 			"name" => $rname,

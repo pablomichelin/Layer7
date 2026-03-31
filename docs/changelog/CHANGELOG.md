@@ -2,6 +2,21 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.4] — 2026-03-31
+
+### Fixed — Segunda revisão: 3 bugs adicionais
+
+#### Bug Médio — `generate_rdr_rules()` código morto em `layer7-pfctl`
+- Após o fix v1.7.3, a função `generate_rdr_rules()` (40 linhas de PHP inline) permanecia no script mas nunca era chamada — `write_rules()` foi alterado e não a invoca; removida para evitar confusão e facilitar manutenção
+
+#### Bug Menor — `s_bl_lookups` não incrementado no SNI check
+- **`main.c`**: `l7_blacklist_lookup()` era chamado no SNI check (`layer7_on_classified_flow()`) sem incrementar `s_bl_lookups`; o stat `bl_lookups` no JSON ficava subestimado (representava apenas lookups DNS); corrigido com `s_bl_lookups++` antes do lookup SNI
+
+#### Bug Menor — `force_dns` activo sem `src_cidrs` não gerava aviso
+- **`layer7_blacklists.php`**: utilizador podia activar "Forçar DNS local" sem definir CIDRs de origem; o backend ignorava silenciosamente a regra (sem gerar nenhuma regra `rdr`); adicionada validação que bloqueia o formulário com mensagem de erro clara
+
+- **PORTVERSION** bumped para 1.7.4
+
 ## [1.7.3] — 2026-03-31
 
 ### Fixed — Correcção de 3 bugs nas melhorias de Bloqueio Total

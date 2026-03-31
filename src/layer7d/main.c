@@ -989,6 +989,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		const char *bl_cat;
 		int ri;
 
+		s_bl_lookups++;
 		bl_cat = l7_blacklist_lookup(s_blacklist, host);
 		if (bl_cat) {
 			s_bl_hits++;
