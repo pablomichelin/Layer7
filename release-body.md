@@ -1,14 +1,22 @@
-## Layer7 v1.7.7 — Correcção crítica: regras `rdr` (force_dns) agora funcionam em interfaces VLAN
+## Layer7 v1.7.8 — Fix crítico: regras `rdr` DNS forçado agora funcionam
 
 ### O que foi corrigido
 
-**Bug crítico — `force_dns` não gerava regras `rdr` em interfaces VLAN**
+**Bug crítico — pfSense CE nunca processava `nat_rules_needed` do package XML**
 
-O campo `force_dns: true` na configuração de blacklists (que redireciona DNS externo para o Unbound local via `rdr`) **nunca gerava regras PF** quando a interface de captura usava um nome de device VLAN com ponto — como `em1.46`, `igb0.100`, `vtnet0.200`.
+O campo `force_dns: true` na configuração de blacklists, que deveria redirecionar DNS externo para o Unbound local via regras `rdr`, **nunca gerava regras PF** — mesmo com o campo activado e o sub-anchor `natrules/layer7_nat` referenciado.
 
-**Causa raiz:** A função `layer7_generate_rdr_rules_snippet()` em `layer7.inc` usava o regex `/^[a-z][a-z0-9]+$/i` como fallback quando `get_real_interface()` retornava NULL. Interfaces VLAN do tipo `em1.46` contêm um ponto — o regex rejeitava-as. Resultado: `$real_ifaces` ficava vazio, a função retornava string vazia, e **zero regras `rdr` eram injectadas no PF**, mesmo com `force_dns: true` activo.
+**Causa raiz dupla:**
 
-**Correcção:** Regex actualizado para `/^[a-z][a-z0-9]*(\.[0-9]+)?$/i` — aceita `em1.46`, `igb0.100`, `vtnet0.200`, `lagg0.10`, além de `lan`, `wan`, `em0`, `vtnet0`, etc.
+1. **`nat_rules_needed` não é suportado no pfSense CE**: o `pkg-utils.inc` do pfSense CE só processa `filter_rules_needed`. O tag `<nat_rules_needed>` do nosso XML era completamente ignorado — a função `layer7_generate_nat_rules()` nunca era chamada pelo pfSense.
+
+2. **Tag XML `custom_php_resync_command` errado**: pfSense CE espera `<custom_php_resync_config_command>` (com valor PHP eval-safe). O tag que tínhamos (`custom_php_resync_command`) não existe no pfSense → `layer7_resync()` nunca era chamado automaticamente no save de configuração.
+
+**Correcção:**
+- Nova função `layer7_inject_nat_to_anchor()` que carrega as `rdr` rules directamente em `natrules/layer7_nat` via `pfctl -a natrules/layer7_nat -N -f`
+- Chamada em `layer7_generate_rules()` — executada a cada reload PF via `filter_rule_function` (o único hook que pfSense CE garante)
+- Chamada em `layer7_resync()` — executada no save de configuração
+- pfSense usa `pfctl -f` sem `-F flush` → sub-anchor `natrules/layer7_nat` persiste entre reloads
 
 ---
 
@@ -17,51 +25,49 @@ O campo `force_dns: true` na configuração de blacklists (que redireciona DNS e
 ```sh
 # 1. Ver versão instalada
 layer7d -V
-# Deve mostrar: 1.7.7
+# Deve mostrar: 1.7.8
 
-# 2. Verificar se regras rdr foram geradas (requer force_dns: true na blacklist)
-pfctl -s nat | grep force_dns
-# Deve mostrar: rdr pass on em1.46 inet proto udp from 10.x.y.0/z to !127.0.0.1 port 53 -> 127.0.0.1 ...
+# 2. Verificar se regras rdr foram geradas
+pfctl -a natrules/layer7_nat -s Nat 2>/dev/null
+# Deve mostrar:
+# rdr pass on em1.46 inet proto udp from 10.0.60.0/23 to !127.0.0.1 port 53 -> 127.0.0.1 label "layer7:force_dns"
+# rdr pass on em1.46 inet proto tcp from 10.0.60.0/23 to !127.0.0.1 port 53 -> 127.0.0.1 label "layer7:force_dns"
 
-# 3. Testar que DNS externo é redirecionado para o Unbound
-# (num cliente no CIDR coberto pela blacklist)
-nslookup xvideos.com 8.8.8.8
-# Deve retornar resultado do Unbound local (sem resolver o domínio no 8.8.8.8)
+# 3. Confirmar referência no NAT principal
+pfctl -s nat | grep natrules
+# Deve mostrar: nat-anchor "natrules/*" all
+
+# 4. Verificar QUIC bloqueado
+pfctl -sr | grep anti-quic
+# Deve mostrar: block drop quick inet proto udp from any to any port = https label "layer7:anti-quic"
 ```
 
 ---
 
-### Quem é afectado
+### Notas de upgrade
 
-Todos os clientes com:
-- Interface de captura VLAN (nome com ponto: `em1.46`, `igb0.100`, etc.)
-- Blacklist configurada com `force_dns: true`
-
-Se usas `force_dns: true` mas as regras `rdr` não aparecem em `pfctl -s nat | grep force_dns`, esta actualização resolve o problema.
+Após instalação, forçar reload das regras PF em **Layer7 → Configurações → Guardar** para injectar as regras `rdr` imediatamente. Em reboots futuros e reloads de firewall, a injecção ocorre automaticamente.
 
 ---
 
 ### Instalação / Actualização
 
 ```sh
-# Actualizar
-fetch -o /tmp/pfSense-pkg-layer7-1.7.7.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.7.7/pfSense-pkg-layer7-1.7.7.pkg \
-  && IGNORE_OSVERSION=yes pkg upgrade -y -f /tmp/pfSense-pkg-layer7-1.7.7.pkg \
+fetch -o /tmp/pfSense-pkg-layer7-1.7.8.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.7.8/pfSense-pkg-layer7-1.7.8.pkg \
+  && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.7.8.pkg \
   && service layer7d restart \
   && layer7d -V
 ```
-
-Após actualizar, aplicar as regras PF em **Layer7 → Configurações → Guardar** para forçar regeneração das regras `rdr`.
 
 ---
 
 ### Rollback
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.7.6.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.7.6/pfSense-pkg-layer7-1.7.6.pkg \
-  && IGNORE_OSVERSION=yes pkg upgrade -y -f /tmp/pfSense-pkg-layer7-1.7.6.pkg \
+fetch -o /tmp/pfSense-pkg-layer7-1.7.7.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.7.7/pfSense-pkg-layer7-1.7.7.pkg \
+  && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.7.7.pkg \
   && service layer7d restart
 ```
 
@@ -71,4 +77,4 @@ fetch -o /tmp/pfSense-pkg-layer7-1.7.6.pkg \
 
 - pfSense CE 2.7.x / 2.8.x
 - FreeBSD 14.x / 15.x
-- Retrocompatível: instalações sem `force_dns` ou com interfaces não-VLAN não são afectadas
+- Retrocompatível: instalações sem `force_dns` não são afectadas

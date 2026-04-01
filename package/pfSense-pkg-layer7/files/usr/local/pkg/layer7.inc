@@ -150,8 +150,36 @@ function layer7_generate_rdr_rules_snippet()
 }
 
 /**
- * Registado como nat_rules_needed em layer7.xml.
- * Retorna regras rdr de DNS forcado para o pfSense injectar na seccao NAT.
+ * Injeta regras rdr de DNS forcado no sub-anchor natrules/layer7_nat via
+ * pfctl directo. Necessario porque pfSense CE nao processa nat_rules_needed
+ * do XML do package — apenas filter_rules_needed e suportado.
+ * pfSense usa "pfctl -f" sem "-F", pelo que o sub-anchor nao e limpo no
+ * reload do firewall. Chamado em layer7_generate_rules() (filter_rule_function,
+ * invocado em todo reload) e em layer7_resync() (save de configuracao).
+ */
+function layer7_inject_nat_to_anchor()
+{
+	$anchor = "natrules/layer7_nat";
+	$snippet = layer7_generate_rdr_rules_snippet();
+	if ($snippet === "") {
+		@exec("/sbin/pfctl -a " . escapeshellarg($anchor) .
+		    " -F Nat 2>/dev/null");
+		return;
+	}
+	$tmp = @tempnam("/tmp", "l7nat_");
+	if ($tmp === false) {
+		return;
+	}
+	@file_put_contents($tmp, $snippet);
+	@exec("/sbin/pfctl -a " . escapeshellarg($anchor) .
+	    " -N -f " . escapeshellarg($tmp) . " 2>/dev/null");
+	@unlink($tmp);
+}
+
+/**
+ * Mantido por retrocompatibilidade com layer7.xml (nat_rules_needed).
+ * Em pfSense CE, nat_rules_needed nao e processado — usar
+ * layer7_inject_nat_to_anchor() que injecta directamente via pfctl.
  */
 function layer7_generate_nat_rules()
 {
@@ -234,6 +262,7 @@ function layer7_resync()
 		}
 	}
 
+	layer7_inject_nat_to_anchor();
 	layer7_ensure_daemon_running();
 }
 
@@ -325,6 +354,11 @@ function layer7_generate_rules($type)
 			}
 		}
 	}
+
+	/* Injectar regras rdr no anchor NAT como efeito colateral.
+	 * pfSense CE nao processa nat_rules_needed; esta e a unica forma
+	 * de garantir que as rdr rules sao carregadas em todo reload PF. */
+	layer7_inject_nat_to_anchor();
 
 	return $rules;
 }

@@ -6,7 +6,7 @@
 	<include_file>/usr/local/pkg/layer7.inc</include_file>
 	<filter_rules_needed>layer7_generate_rules</filter_rules_needed>
 	<nat_rules_needed>layer7_generate_nat_rules</nat_rules_needed>
-	<custom_php_resync_command>layer7_resync</custom_php_resync_command>
+	<custom_php_resync_config_command>layer7_resync();</custom_php_resync_config_command>
 	<tabs>
 		<tab>
 			<text>Status</text>

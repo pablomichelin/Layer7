@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.7.7 — Correcção crítica: rdr rules force_dns agora funcionam em interfaces VLAN**
+**Versão: 1.7.8 — Correcção: rdr DNS forçado agora injectado via pfctl directo (pfSense CE não processa nat_rules_needed)**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,13 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.7.8 — Fix rdr DNS forçado via pfctl directo (2026-04-01):**
+  - pfSense CE não processa `nat_rules_needed` do XML do package — o tag `<nat_rules_needed>` nunca foi chamado; as regras `rdr` para `force_dns` nunca chegaram ao PF NAT
+  - Além disso, o tag XML estava errado: `<custom_php_resync_command>` não existe no pfSense CE — o correcto é `<custom_php_resync_config_command>` com valor PHP eval-safe (ex: `layer7_resync();`)
+  - Nova função `layer7_inject_nat_to_anchor()`: injeta as regras `rdr` directamente em `natrules/layer7_nat` via `pfctl -a ... -N -f`
+  - Chamada em `layer7_generate_rules()` (a cada reload PF) e `layer7_resync()` (a cada save de config)
+  - pfSense usa `pfctl -f` sem `-F` → sub-anchor `natrules/layer7_nat` persiste entre reloads
+  - PORTVERSION bumped para 1.7.8
 - **v1.7.7 — Correcção crítica: rdr rules force_dns em interfaces VLAN (2026-04-01):**
   - BUG CRÍTICO: regex `/^[a-z][a-z0-9]+$/i` em `layer7.inc` não aceitava interfaces VLAN com ponto (ex: `em1.46`, `igb0.100`); `get_real_interface("em1.46")` retorna NULL (nome já é o device real), o fallback regex falhava → `$real_ifaces` ficava vazio → `layer7_generate_nat_rules()` retornava `""` → **nenhuma regra `rdr` DNS era gerada mesmo com `force_dns: true`**
   - Correcção: regex actualizado para `/^[a-z][a-z0-9]*(\.[0-9]+)?$/i` — aceita `em1`, `em1.46`, `igb0.100`, `lan`, `vtnet0.200`, etc.

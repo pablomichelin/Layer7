@@ -2,6 +2,19 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.8] — 2026-04-01
+
+### Fixed — Regras `rdr` (force_dns) agora injectadas via pfctl directo
+
+#### Bug Crítico — pfSense CE não processa `nat_rules_needed` do XML do package
+
+- **Root cause**: o tag `<nat_rules_needed>layer7_generate_nat_rules</nat_rules_needed>` em `layer7.xml` nunca é processado por pfSense CE. O `pkg-utils.inc` do pfSense só processa `filter_rules_needed` (guardado como `filter_rule_function`) — não existe equivalente para NAT. As regras `rdr` de DNS forçado geradas por `layer7_generate_rdr_rules_snippet()` nunca chegavam ao PF
+- **Tag XML errado**: `<custom_php_resync_command>` não existe no pfSense CE — o correcto é `<custom_php_resync_config_command>` com valor PHP executável via `eval()` (ex: `layer7_resync();`); por isso `layer7_resync()` nunca era chamado automaticamente via `sync_package()`
+- **Solução**: nova função `layer7_inject_nat_to_anchor()` que injeta as regras `rdr` directamente no sub-anchor `natrules/layer7_nat` via `pfctl -a natrules/layer7_nat -N -f <tmp>`. pfSense CE usa `pfctl -f` sem `-F flush` → sub-anchor persiste entre reloads
+- **Integração**: chamada em `layer7_generate_rules()` (chamada em todo reload PF via `filter_rule_function`) e em `layer7_resync()` (chamada no save de config)
+- **Tag XML**: corrigido para `<custom_php_resync_config_command>layer7_resync();</custom_php_resync_config_command>`
+- **PORTVERSION** bumped para 1.7.8
+
 ## [1.7.7] — 2026-04-01
 
 ### Fixed — Regras rdr (force_dns) nunca geradas em interfaces VLAN
