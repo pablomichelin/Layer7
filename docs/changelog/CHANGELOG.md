@@ -40,6 +40,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   estado activo rastreavel em `.state/active-snapshot.state` e restauro
   explicito via `update-blacklists.sh --restore-lkg`
 
+## [1.8.2] — 2026-04-01
+
+### Fixed — Regras de bloqueio afectavam tráfego interno (impressoras, bancos locais)
+
+- **Arquitectura corrigida**: Layer7 passa a bloquear **apenas tráfego com destino externo à rede local**. Tráfego entre hosts da LAN não é afectado.
+- **`layer7_pf_default_rules_text()`** (`layer7.inc`): regras anti-DoT/DoQ (porta 853 TCP/UDP) e block:src (`<layer7_block>`) agora incluem `to !<localsubnets>` em inet e inet6
+- **`layer7_generate_rules()`** (`layer7.inc`): regra anti-QUIC (UDP 443) agora inclui `to !<localsubnets>` em inet e inet6
+- **`write_rules()`** (`layer7-pfctl`): sincronizado com as mesmas correcções
+- **`pf.conf.sample`**: sincronizado com as mesmas correcções
+- `<localsubnets>` é o alias nativo do pfSense que contém todas as sub-redes directamente conectadas (LAN, VLANs, etc.)
+- **Impacto**: impressoras locais, serviços bancários em rede corporativa e qualquer serviço interno que use UDP 443 (QUIC) voltam a funcionar normalmente
+- **PORTVERSION** bumped para 1.8.2
+
 ## [1.8.0] — 2026-04-01
 
 ### Fixed — `label` em regras `rdr` causa syntax error no FreeBSD 15
