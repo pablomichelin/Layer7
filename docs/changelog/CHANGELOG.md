@@ -4,6 +4,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F2.3 protecao da superficie administrativa do license server
+
+- **CORS same-origin oficial** — o backend deixa de aplicar `cors()` aberto
+  e passa a aceitar apenas o origin administrativo oficial em producao,
+  falhando fechado para requests de browser fora da allowlist
+- **Login endurecido contra abuso** — `POST /api/auth/login` passa a operar
+  com limiter dedicado por IP e por `email + IP`, lockout temporario por
+  falhas repetidas e respostas `401`/`429` genericas sem enumeracao de
+  credenciais
+- **Auditoria minima persistida** — auth/sessao e mutacoes administrativas
+  passam a gerar rasto minimo em `admin_audit_log`, enquanto os guardas de
+  brute force/lockout passam a viver em `admin_login_guards`
+
 ### Changed — F2.2 autenticacao e sessao administrativa do license server
 
 - **Sessao stateful oficial** — o painel administrativo deixa de depender de

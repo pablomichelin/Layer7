@@ -5,7 +5,7 @@
 Este documento organiza a implementação da F2 em blocos pequenos, seguros e
 reversíveis. Ele continua a definir ordem, dependências, gates, rollback
 conceitual e testes mínimos, e passa a registar os checkpoints
-materializados da F2.1 e da F2.2.
+materializados da F2.1, da F2.2 e da F2.3.
 
 Referências obrigatórias:
 
@@ -43,7 +43,13 @@ Referências obrigatórias:
   operar com sessao stateful no backend, cookie `HttpOnly + Secure +
   SameSite=Strict`, expiracao ociosa/absoluta, renovacao controlada, logout
   com invalidacao real e remocao do JWT em `localStorage` da trilha activa.
-- **Próxima subfase elegível:** `F2.3 — Proteção da superfície administrativa`
+- **F2.3 concluída em `2026-04-01`:** a superficie administrativa passa a
+  operar com same-origin only em producao, sem `cors()` aberto; o login
+  administrativo passa a ter limiter dedicado por IP e por `email + IP`,
+  lockout temporario por conta/IP, politica minima de erro sem enumeracao de
+  credenciais e trilha minima de auditoria persistida em `admin_audit_log`
+  e `admin_login_guards`.
+- **Próxima subfase elegível:** `F2.4 — Validação de input e integridade transacional`
 
 ---
 
@@ -106,6 +112,8 @@ inseguro.
 - sessão expirada deixa rota privada em fail-closed.
 
 ### Subfase F2.3 - Proteção da superfície administrativa
+
+**Status actual:** concluida em `2026-04-01`
 
 **Objectivo:** endurecer login, rotas administrativas, CORS e auditoria.
 

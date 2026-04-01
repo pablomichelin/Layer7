@@ -3,7 +3,7 @@
 ## Finalidade
 
 Este documento consolidou o desenho completo da F2 e passa a registar os
-checkpoints materializados da F2.1 e da F2.2. Ele traduz o estado real observado em
+checkpoints materializados da F2.1, da F2.2 e da F2.3. Ele traduz o estado real observado em
 `license-server/` para uma arquitetura de hardening simples, auditável e
 operacionalmente viável.
 
@@ -102,6 +102,31 @@ Documentos normativos desta arquitetura:
   contrato operativo da F2.2
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md` passa a usar `cookie jar`
   e `GET /api/auth/session` como referencia operacional de auth/sessao
+
+## 1.3 Estado materializado apos a F2.3
+
+### Superficie administrativa
+
+- `license-server/backend/src/index.js` deixa de aplicar `cors()` aberto e
+  passa a falhar fechado requests administrativas com `Origin` fora do
+  canal oficial `https://license.systemup.inf.br`
+- `license-server/backend/src/routes/auth.js` passa a exigir limiter
+  dedicado por IP e por `email + IP`, alem de lockout temporario por falhas
+  repetidas por conta/IP
+- a politica minima de erro administrativa passa a devolver mensagens
+  genericas para credenciais invalidas, `429` generico para limite/lockout,
+  `403` para origin nao autorizado e `Cache-Control: no-store` nas rotas
+  administrativas
+
+### Auditoria
+
+- `license-server/backend/src/admin-surface.js` passa a concentrar a politica
+  da superficie administrativa, os limiters e a trilha minima de auditoria
+- `001-init.sql` passa a trazer `admin_audit_log` e `admin_login_guards` para
+  persistir auth, lockouts e mutacoes administrativas
+- `customers.js` e `licenses.js` passam a registar sucesso/negacao/erro de
+  create, update, revoke, delete e download sem alterar a politica de
+  validacao/transacao reservada para a F2.4
 
 ---
 
@@ -268,9 +293,8 @@ Superfície mais sensível. Exige:
 
 Estas decisões ficam abertas para implementação, não para filosofia:
 
-- calibragem exacta de limits/lockouts;
 - shape final da política de arquivo lógico;
-- detalhe final do logging/auditoria administrativa;
+- detalhe final da validacao forte de payload e dos códigos HTTP do CRUD;
 - runbook final de backup/restore e rotação de segredos.
 
 ---

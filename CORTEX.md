@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F2 — Execucao tecnica iniciada; F2.1 e F2.2 concluidas em 2026-04-01`
+**Fase actual consolidada:** `F2 — Execucao tecnica iniciada; F2.1, F2.2 e F2.3 concluidas em 2026-04-01`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -129,9 +129,15 @@ autenticacao e sessao administrativa: login passa a exigir HTTPS/TLS real,
 o frontend deixa de depender de JWT em `localStorage`, a sessao passa a ser
 stateful no backend com `admin_sessions`, cookie `HttpOnly + Secure +
 SameSite=Strict`, expiracao ociosa/absoluta, renovacao controlada e logout
-com invalidacao real no servidor.
+com invalidacao real no servidor. A **F2.3** materializou a protecao da
+superficie administrativa: o backend deixa de operar com `cors()` aberto, o
+painel passa a aceitar apenas o origin oficial same-origin em producao, o
+login administrativo passa a ter limiter dedicado por IP e por `email + IP`,
+lockout temporario por falhas repetidas, politica minima de erro sem
+enumeracao de credenciais e trilha minima de auditoria em `admin_audit_log`
+e `admin_login_guards` para auth e mutacoes administrativas.
 
-**Proxima subfase elegivel da F2:** `F2.3 — Protecao da superficie administrativa`
+**Proxima subfase elegivel da F2:** `F2.4 — Validacao de input e integridade transacional`
 
 ### Ordem segura das fases
 
@@ -139,7 +145,7 @@ com invalidacao real no servidor.
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
 | F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
-| F2 | Hardening do license server | execucao iniciada; F2.1 e F2.2 concluidas em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
+| F2 | Hardening do license server | execucao iniciada; F2.1, F2.2 e F2.3 concluidas em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
 | F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
@@ -152,8 +158,9 @@ com invalidacao real no servidor.
 
 1. Prosseguir na F2 apenas pela ordem segura declarada em
    `docs/02-roadmap/f2-plano-de-implementacao.md`, com foco exclusivo em
-   `F2.3` para CORS same-origin, rate limit, brute force protection e
-   logging minimo da superficie administrativa.
+   `F2.4` para validacao de input, coerencia HTTP, transacoes e integridade
+   do CRUD, sem regredir o contrato de publicacao, sessao e superficie
+   administrativa ja fechado nas F2.1-F2.3.
 2. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
@@ -182,15 +189,21 @@ com invalidacao real no servidor.
   publico oficial passa a ser `https://license.systemup.inf.br`, o origin
   `8445` fica preso ao loopback por defeito e o Nginx interno passa a
   aceitar apenas o host oficial e troubleshooting local controlado.
-- O license server continua funcional, mas o estado actual ainda opera com
-  `cors()` aberto, login sem rate limit dedicado, brute force protection
-  pendente e CRUD sem transacoes explicitas.
 - A F2.1 passa a depender operacionalmente de certificado valido na borda,
   redirect `HTTP -> HTTPS`, allowlist/firewall coerente para o origin
   `8445` e ausencia de exposicao publica directa desse origin.
 - A F2.2 passa a depender operacionalmente de o canal administrativo ficar
   sempre atras de HTTPS/TLS real e de o cookie `Secure` nao ser degradado por
   acessos directos ao origin privado.
+- A F2.3 passa a depender operacionalmente de o origin oficial
+  `https://license.systemup.inf.br` continuar a ser o unico origin de browser
+  permitido em producao, de os limites de login (`10/10 min` por IP e
+  `5/10 min` por `email + IP`) permanecerem calibrados para o uso real e de
+  os operadores consultarem `admin_audit_log`/`admin_login_guards` em
+  incidente em vez de alargarem a superficie administrativa.
+- O license server continua funcional, mas o CRUD administrativo ainda opera
+  sem validacao forte de payload, sem transacoes explicitas e com delete
+  fisico, todos reservados para a F2.4.
 - A F2 agora tem arquitectura e ordem segura definidas, mas continua a exigir
   implementacao tecnica controlada em subfases pequenas e reversiveis.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;

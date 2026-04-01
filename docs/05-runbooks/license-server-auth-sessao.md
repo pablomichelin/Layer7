@@ -2,8 +2,9 @@
 
 ## Finalidade
 
-Este runbook materializa a F2.2 e define o contrato operativo oficial da
-sessao administrativa do license server.
+Este runbook materializa a F2.2 e a F2.3 e define o contrato operativo
+oficial da sessao administrativa e da superficie administrativa do license
+server.
 
 Referencias normativas:
 
@@ -23,6 +24,18 @@ Referencias normativas:
 - Estado de autenticacao: cookie `layer7_admin_session`
 - Atributos do cookie: `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/`
 - Storage de sessao: tabela PostgreSQL `admin_sessions`
+- CORS de browser em producao: `same-origin only` para
+  `https://license.systemup.inf.br`
+- Rate limit de login:
+  - `10 requests / 10 minutos` por IP
+  - `5 requests / 10 minutos` por `email + IP`
+- Lockout de login:
+  - `5` falhas por conta alvo em `15 minutos`
+  - `10` falhas por IP em `15 minutos`
+  - bloqueio temporario de `15 minutos`
+- Auditoria minima:
+  - auth/sessao e mutacoes administrativas em `admin_audit_log`
+  - guardas de lockout em `admin_login_guards`
 - Politica de sessao:
   - expiracao ociosa: `30 minutos`
   - expiracao absoluta: `8 horas`
@@ -35,6 +48,11 @@ Referencias normativas:
 ## 2. Regras operacionais
 
 - O login administrativo deve falhar fechado fora de HTTPS/TLS real.
+- Browser com `Origin` fora da allowlist same-origin deve falhar fechado.
+- Respostas de auth devem permanecer genericas:
+  - `401` para credenciais invalidas
+  - `429` para limite/lockout
+  - `403` para origin administrativo nao autorizado
 - O cookie de sessao nao deve ser lido nem persistido pelo JavaScript da SPA.
 - O frontend deve manter apenas estado transitório em memoria.
 - O origin privado `127.0.0.1:8445` nao e canal oficial para operacao humana.
@@ -92,6 +110,28 @@ curl -s -X POST -b "$COOKIE_JAR" \
 - Validar forwarding `X-Forwarded-Proto=https` na borda
 - Nao usar `http://IP:8445` como URL administrativa
 
+### Login falha com `429`
+
+- Verificar se o IP excedeu `10 requests / 10 minutos`
+- Verificar se o par `email + IP` excedeu `5 requests / 10 minutos`
+- Verificar lockout temporario em `admin_login_guards`:
+
+```sql
+SELECT
+  scope_type,
+  scope_key,
+  failure_count,
+  locked_until,
+  last_failure_at,
+  last_success_at
+FROM admin_login_guards
+WHERE locked_until IS NOT NULL
+ORDER BY locked_until DESC;
+```
+
+- Se o bloqueio for legitimo, aguardar a expiracao; nao alargar limites nem
+  reabrir origins como medida de incidente
+
 ### Sessao invalida ou expirada
 
 - O frontend deve voltar ao ecrã de login
@@ -120,6 +160,34 @@ FROM admin_sessions
 ORDER BY created_at DESC;
 ```
 
+### Ver trilha minima de auditoria
+
+```sql
+SELECT
+  created_at,
+  component,
+  event_type,
+  actor_identifier,
+  ip_address,
+  result,
+  reason
+FROM admin_audit_log
+ORDER BY created_at DESC
+LIMIT 50;
+```
+
+### Validar fail-closed de origin administrativo
+
+```bash
+curl -s -o /tmp/layer7-origin-check.out -w '%{http_code}\n' \
+  https://license.systemup.inf.br/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://evil.example' \
+  -d '{"email":"pablo@systemup.inf.br","password":"invalid"}'
+```
+
+Resultado esperado: `403`
+
 ### Testar o origin privado no host
 
 ```bash
@@ -133,23 +201,22 @@ permanece `HTTPS/TLS` na borda.
 
 ---
 
-## 6. Fora de escopo da F2.2
+## 6. Fora de escopo apos a F2.3
 
-Os pontos abaixo permanecem explicitamente reservados para a F2.3 ou fases
+Os pontos abaixo permanecem explicitamente reservados para a F2.4 ou fases
 posteriores:
 
-- CORS same-origin em producao
-- rate limit dedicado para login
-- brute force protection e lockout
-- logging/auditoria minima da superficie administrativa
 - validacao forte de payload, transacoes e CRUD
+- delete seguro/arquivo logico
+- atomicidade transacional de `activate`, `customers` e `licenses`
 
 ---
 
 ## 7. Rollback
 
-- Rollback de codigo/docs: `git revert <commit-da-f2.2>`
+- Rollback de codigo/docs: `git revert <commit-da-f2.3>`
 - Rollback operacional: redeploy do stack com a revisao anterior
-- Regra de rollback: nao reintroduzir JWT em `localStorage`; se houver
+- Regra de rollback: nao reintroduzir JWT em `localStorage`, nao reabrir
+  `cors()` global e nao remover limiter/lockout silenciosamente; se houver
   incidente, manter o login indisponivel ate restaurar o modelo stateful
-  sobre HTTPS/TLS
+  sobre HTTPS/TLS e same-origin oficial

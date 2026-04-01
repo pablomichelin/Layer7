@@ -1,6 +1,10 @@
 const { Router } = require('express');
 const pool = require('../db');
 const auth = require('../auth');
+const {
+  ADMIN_INTERNAL_ERROR_MESSAGE,
+  auditAdminEvent,
+} = require('../admin-surface');
 
 const router = Router();
 router.use(auth);
@@ -54,6 +58,15 @@ router.post('/', async (req, res) => {
   try {
     const { name, email, phone, notes } = req.body;
     if (!name) {
+      await auditAdminEvent({
+        component: 'customers',
+        eventType: 'customer_create_denied',
+        adminId: req.admin.id,
+        actorIdentifier: req.admin.email,
+        req,
+        result: 'denied',
+        reason: 'missing_name',
+      });
       return res.status(400).json({ error: 'Nome obrigatorio' });
     }
 
@@ -62,10 +75,30 @@ router.post('/', async (req, res) => {
       [name, email || null, phone || null, notes || null]
     );
 
+    await auditAdminEvent({
+      component: 'customers',
+      eventType: 'customer_created',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'success',
+      reason: 'customer_created',
+      metadata: { customer_id: result.rows[0].id },
+    });
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('[CUSTOMERS] Create error:', err.message);
-    res.status(500).json({ error: 'Erro ao criar cliente' });
+    await auditAdminEvent({
+      component: 'customers',
+      eventType: 'customer_create_error',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'error',
+      reason: 'customer_create_exception',
+    });
+    res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
   }
 });
 
@@ -107,13 +140,44 @@ router.put('/:id', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
+      await auditAdminEvent({
+        component: 'customers',
+        eventType: 'customer_update_denied',
+        adminId: req.admin.id,
+        actorIdentifier: req.admin.email,
+        req,
+        result: 'denied',
+        reason: 'customer_not_found',
+        metadata: { customer_id: parseInt(id, 10) },
+      });
       return res.status(404).json({ error: 'Cliente nao encontrado' });
     }
+
+    await auditAdminEvent({
+      component: 'customers',
+      eventType: 'customer_updated',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'success',
+      reason: 'customer_updated',
+      metadata: { customer_id: result.rows[0].id },
+    });
 
     res.json(result.rows[0]);
   } catch (err) {
     console.error('[CUSTOMERS] Update error:', err.message);
-    res.status(500).json({ error: 'Erro ao actualizar cliente' });
+    await auditAdminEvent({
+      component: 'customers',
+      eventType: 'customer_update_error',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'error',
+      reason: 'customer_update_exception',
+      metadata: { customer_id: parseInt(req.params.id, 10) },
+    });
+    res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
   }
 });
 
@@ -126,6 +190,16 @@ router.delete('/:id', async (req, res) => {
     );
     const { total, active } = licCheck.rows[0];
     if (parseInt(active) > 0) {
+      await auditAdminEvent({
+        component: 'customers',
+        eventType: 'customer_delete_denied',
+        adminId: req.admin.id,
+        actorIdentifier: req.admin.email,
+        req,
+        result: 'denied',
+        reason: 'active_licenses_present',
+        metadata: { customer_id: parseInt(id, 10), active_licenses: parseInt(active, 10) },
+      });
       return res.status(409).json({ error: `Cliente possui ${active} licenca(s) activa(s). Revogue-as primeiro.` });
     }
     if (parseInt(total) > 0) {
@@ -135,13 +209,44 @@ router.delete('/:id', async (req, res) => {
 
     const result = await pool.query('DELETE FROM customers WHERE id = $1 RETURNING id', [id]);
     if (result.rows.length === 0) {
+      await auditAdminEvent({
+        component: 'customers',
+        eventType: 'customer_delete_denied',
+        adminId: req.admin.id,
+        actorIdentifier: req.admin.email,
+        req,
+        result: 'denied',
+        reason: 'customer_not_found',
+        metadata: { customer_id: parseInt(id, 10) },
+      });
       return res.status(404).json({ error: 'Cliente nao encontrado' });
     }
+
+    await auditAdminEvent({
+      component: 'customers',
+      eventType: 'customer_deleted',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'success',
+      reason: 'customer_deleted',
+      metadata: { customer_id: parseInt(id, 10) },
+    });
 
     res.json({ message: 'Cliente removido', id: parseInt(id) });
   } catch (err) {
     console.error('[CUSTOMERS] Delete error:', err.message);
-    res.status(500).json({ error: 'Erro ao remover cliente' });
+    await auditAdminEvent({
+      component: 'customers',
+      eventType: 'customer_delete_error',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'error',
+      reason: 'customer_delete_exception',
+      metadata: { customer_id: parseInt(req.params.id, 10) },
+    });
+    res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
   }
 });
 

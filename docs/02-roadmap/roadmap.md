@@ -16,7 +16,7 @@ com hardening tecnico ou com release engineering.
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
 | F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
-| F2 | Hardening do license server | execucao iniciada; F2.1 e F2.2 concluidas | stack de licencas opera com segredos, backup e fronteiras sob controlo |
+| F2 | Hardening do license server | execucao iniciada; F2.1, F2.2 e F2.3 concluidas | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
@@ -181,6 +181,12 @@ Tornar auditavel a cadeia de confianca entre:
   stateful no backend, cookie `HttpOnly + Secure + SameSite=Strict`,
   expiracao ociosa/absoluta, renovacao controlada, logout com invalidacao
   real e bootstrap de sessao via `/api/auth/session`.
+- **F2.3 concluida em `2026-04-01`:** a superficie administrativa passa a
+  operar com same-origin only em producao, sem `cors()` aberto; o login
+  administrativo passa a ter limiter dedicado por IP e por `email + IP`,
+  lockout temporario por conta/IP, politica minima de erro sem enumeracao de
+  credenciais e trilha minima de auditoria em banco para auth e mutacoes
+  administrativas.
 
 ### Documentacao obrigatoria da fase
 

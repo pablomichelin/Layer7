@@ -3,13 +3,14 @@
 > Documento operacional para gerar, gerir, instalar e manter licencas
 > do produto Layer7 para pfSense CE.
 
-> Estado oficial apos a F2.2: o unico canal publico permitido para painel
+> Estado oficial apos a F2.3: o unico canal publico permitido para painel
 > administrativo e activacao online passa a ser
 > `https://license.systemup.inf.br`. O origin `8445/TCP` passa a ser privado
 > para o reverse proxy e troubleshooting controlado; acesso humano directo por
 > HTTP ao IP do host deixa de ser caminho normativo. A autenticacao
 > administrativa passa a usar sessao stateful com cookie seguro, sem JWT em
-> `localStorage`.
+> `localStorage`, same-origin only em producao, limiter dedicado no login e
+> trilha minima de auditoria administrativa.
 
 ---
 
@@ -78,12 +79,19 @@ O sistema de licencas Layer7 funciona com dois componentes:
 - **Canal oficial:** apenas `https://license.systemup.inf.br`
 - **Estado de autenticacao:** cookie `layer7_admin_session`
 - **Atributos do cookie:** `HttpOnly`, `Secure`, `SameSite=Strict`
+- **Origin de browser em producao:** apenas `https://license.systemup.inf.br`
+- **Rate limit de login:** `10 requests / 10 minutos` por IP e
+  `5 requests / 10 minutos` por `email + IP`
+- **Lockout de login:** `15 minutos` apos `5` falhas por conta alvo ou
+  `10` falhas por IP dentro de `15 minutos`
 - **Expiracao ociosa:** `30 minutos`
 - **Expiracao absoluta:** `8 horas`
 - **Renovacao:** controlada pelo backend perto da expiracao ociosa
 - **Logout:** invalida a sessao no backend e limpa o cookie
 - **Concorrencia:** novo login revoga sessoes activas anteriores do mesmo
   admin
+- **Auditoria minima:** auth/sessao e mutacoes administrativas ficam em
+  `admin_audit_log`; guardas de login/lockout ficam em `admin_login_guards`
 
 ### 2.3 Paginas do painel
 
@@ -452,8 +460,15 @@ O daemon verifica a licenca:
 O endpoint `/api/activate` tem limite de **10 requisicoes por minuto
 por IP** para prevenir abuso.
 
-`/api/auth/login`, CORS same-origin e brute force protection ficam
-explicitamente reservados para a F2.3.
+O endpoint `/api/auth/login` passa a operar com:
+
+- **10 requests / 10 minutos por IP**
+- **5 requests / 10 minutos por `email + IP`**
+- **lockout de 15 minutos** apos repeticao anomala por conta/IP
+- **erro `429` generico** sem enumeracao de credenciais
+
+As validacoes fortes de payload, transacoes e delete seguro do CRUD
+continuam explicitamente reservadas para a F2.4.
 
 ---
 

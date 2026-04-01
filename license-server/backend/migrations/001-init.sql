@@ -55,6 +55,33 @@ CREATE TABLE admin_sessions (
     user_agent  VARCHAR(255)
 );
 
+CREATE TABLE admin_audit_log (
+    id          SERIAL PRIMARY KEY,
+    component   VARCHAR(64) NOT NULL,
+    event_type  VARCHAR(64) NOT NULL,
+    actor_admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL,
+    actor_identifier VARCHAR(255),
+    ip_address  VARCHAR(45),
+    user_agent  VARCHAR(255),
+    route       VARCHAR(255),
+    result      VARCHAR(32) NOT NULL,
+    reason      VARCHAR(255),
+    metadata    JSONB,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE admin_login_guards (
+    id          SERIAL PRIMARY KEY,
+    scope_type  VARCHAR(32) NOT NULL,
+    scope_key   VARCHAR(255) NOT NULL,
+    failure_count INTEGER NOT NULL DEFAULT 0,
+    first_failure_at TIMESTAMPTZ,
+    last_failure_at TIMESTAMPTZ,
+    locked_until TIMESTAMPTZ,
+    last_success_at TIMESTAMPTZ,
+    UNIQUE(scope_type, scope_key)
+);
+
 CREATE INDEX idx_licenses_key ON licenses(license_key);
 CREATE INDEX idx_licenses_status ON licenses(status);
 CREATE INDEX idx_licenses_customer ON licenses(customer_id);
@@ -63,3 +90,7 @@ CREATE INDEX idx_activations_created ON activations_log(created_at);
 CREATE INDEX idx_admin_sessions_admin ON admin_sessions(admin_id);
 CREATE INDEX idx_admin_sessions_expires ON admin_sessions(expires_at);
 CREATE INDEX idx_admin_sessions_revoked ON admin_sessions(revoked_at);
+CREATE INDEX idx_admin_audit_log_created_at ON admin_audit_log(created_at);
+CREATE INDEX idx_admin_audit_log_event_type ON admin_audit_log(event_type);
+CREATE INDEX idx_admin_audit_log_actor_admin ON admin_audit_log(actor_admin_id);
+CREATE INDEX idx_admin_login_guards_locked_until ON admin_login_guards(locked_until);

@@ -308,6 +308,7 @@ module.exports = {
   clearSessionCookie,
   createSession,
   ensureSessionSchema,
+  getClientIp,
   getSessionTokenFromRequest,
   requireSecureSessionRequest,
   resolveSession,

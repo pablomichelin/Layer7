@@ -80,8 +80,8 @@ endpoint público de activação.
 
 Baseline F2:
 
-- janela curta por IP
-- limitação adicional por par `email + IP`
+- janela curta por IP: `10 requests / 10 minutos`
+- limitação adicional por par `email + IP`: `5 requests / 10 minutos`
 - resposta `429` genérica
 - sem enumerar utilizadores
 
@@ -98,6 +98,12 @@ Para login administrativo:
 - bloqueio temporário após repetição anómala;
 - reset controlado após autenticação bem-sucedida;
 - auditoria de lockouts e tentativas.
+
+Baseline F2:
+
+- lockout por conta alvo após `5` falhas dentro de `15 minutos`;
+- lockout por IP após `10` falhas dentro de `15 minutos`;
+- duração do lockout: `15 minutos`.
 
 Não é permitido depender apenas de bcrypt lento como protecção de brute force.
 
@@ -124,6 +130,12 @@ O log deve registar, no mínimo:
 - resultado;
 - motivo resumido;
 - timestamp UTC.
+
+Materialização mínima da F2.3:
+
+- persistência em `admin_audit_log` para auth e mutações administrativas;
+- persistência em `admin_login_guards` para contagem e lockout de login;
+- emissão adicional em stdout/stderr do backend para troubleshooting rápido.
 
 ### 6. Política de erro
 
@@ -158,6 +170,8 @@ Para superfícies administrativas autenticadas:
 
 - `Cache-Control: no-store`
 - sem cache de respostas de login/sessão
+- origin browser fora da allowlist same-origin deve ser rejeitado antes do
+  fluxo administrativo prosseguir
 
 ### 9. Política de falha
 
