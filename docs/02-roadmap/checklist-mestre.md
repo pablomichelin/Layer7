@@ -124,7 +124,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 |------|-------------|
 | F0 | um novo agente entende o projecto lendo poucos documentos canónicos |
 | F1 | cadeia de confianca de distribuicao, blacklists e fallback deixa de depender de conhecimento implícito |
-| F2 | license server opera com publicacao segura, sessao administrativa revogavel e operacao sob controlo |
+| F2 | license server opera com publicacao segura, sessao administrativa revogavel, bootstrap controlado e operacao sob controlo |
 | F3 | activacao, revogacao e offline ficam previsiveis |
 | F4 | package, daemon e blacklists operam com runtime mais confiavel |
 | F5 | existe malha real de nao regressao por componente |
@@ -139,7 +139,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 |------|--------------|
 | F0 | `CORTEX`, `AGENTS`, indice docs, roadmap, backlog, checklist, classificacao, equivalencia, ADR index |
 | F1 | `CORTEX`, `docs/01-architecture/f1-arquitetura-de-confianca.md`, backlog, `docs/02-roadmap/f1-plano-de-implementacao.md`, ADR-0003 a ADR-0006 |
-| F2 | `CORTEX`, `docs/01-architecture/f2-arquitetura-license-server.md`, `docs/02-roadmap/f2-plano-de-implementacao.md`, backlog, docs de licencas, runbooks de publicacao/sessao do servidor, ADR-0007 a ADR-0010 |
+| F2 | `CORTEX`, `docs/01-architecture/f2-arquitetura-license-server.md`, `docs/02-roadmap/f2-plano-de-implementacao.md`, backlog, docs de licencas, runbooks de publicacao/sessao/segredos/backup-restore do servidor, ADR-0007 a ADR-0010 |
 | F3 | `CORTEX`, backlog, docs de licencas, matriz de testes, ADRs afectados |
 | F4 | `CORTEX`, backlog, `MANUAL-INSTALL`, docs de blacklists, runbooks, changelog |
 | F5 | `CORTEX`, backlog, docs de testes, checklist mestre, evidencias |

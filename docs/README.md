@@ -47,7 +47,7 @@ Quando houver conflito, seguir esta ordem:
 | ADRs | [`03-adr/README.md`](03-adr/README.md) | canónico |
 | Package e validacao | [`04-package/README.md`](04-package/README.md), [`04-package/validacao-lab.md`](04-package/validacao-lab.md) | suplementar/operacional |
 | Daemon e enforcement | [`05-daemon/README.md`](05-daemon/README.md), [`05-daemon/pf-enforcement.md`](05-daemon/pf-enforcement.md) | suplementar com partes historicas |
-| Runbooks | [`05-runbooks/README.md`](05-runbooks/README.md), [`05-runbooks/license-server-publicacao-segura.md`](05-runbooks/license-server-publicacao-segura.md), [`05-runbooks/license-server-auth-sessao.md`](05-runbooks/license-server-auth-sessao.md) | misto: indice suplementar + runbooks canónicos da publicacao segura e da sessao administrativa do license server |
+| Runbooks | [`05-runbooks/README.md`](05-runbooks/README.md), [`05-runbooks/license-server-publicacao-segura.md`](05-runbooks/license-server-publicacao-segura.md), [`05-runbooks/license-server-auth-sessao.md`](05-runbooks/license-server-auth-sessao.md), [`05-runbooks/license-server-segredos-bootstrap.md`](05-runbooks/license-server-segredos-bootstrap.md), [`05-runbooks/license-server-backup-restore.md`](05-runbooks/license-server-backup-restore.md) | misto: indice suplementar + runbooks canónicos da publicacao segura, da sessao administrativa, dos segredos/bootstrap e do backup/restore do license server |
 | Releases | [`06-releases/README.md`](06-releases/README.md), [`06-releases/RELEASE-SIGNING.md`](06-releases/RELEASE-SIGNING.md) | canónico para governanca de release |
 | Lab | [`08-lab/README.md`](08-lab/README.md) | suplementar |
 | Bloqueio | [`09-blocking/README.md`](09-blocking/README.md) | historico/preservado |

@@ -52,9 +52,16 @@ reavaliacao formal.
   backend, cookie `HttpOnly + Secure + SameSite=Strict`, expiracao
   ociosa/absoluta, renovacao controlada, logout com invalidacao real e
   remocao do JWT em `localStorage` da trilha activa.
-- A execucao tecnica da F2 deve continuar a seguir a ordem segura:
-  publicacao/TLS -> sessao -> protecao administrativa -> CRUD/transacoes ->
-  segredos/runbooks.
+- A F2.3 foi concluida em `2026-04-01` com same-origin only em producao,
+  limiter dedicado no login, lockout temporario e auditoria minima para auth
+  e mutacoes administrativas.
+- A F2.4 foi concluida em `2026-04-01` com validacao forte de payload/query,
+  transacoes explicitas em `activate` e mutacoes administrativas, e arquivo
+  logico no painel em vez de delete fisico.
+- A F2.5 foi concluida em `2026-04-01` com ownership minimo de segredos,
+  bootstrap administrativo explicito, backup/restore minimo do PostgreSQL e
+  runbooks essenciais; a F2 fica encerrada e a proxima fase elegivel passa a
+  ser a F3.
 
 ---
 
@@ -65,7 +72,7 @@ reavaliacao formal.
 | BG-001 | Formalizar a cadeia de confianca entre repo, builder, chave publica embutida, servidor de licencas e artefacto publicado | Critica | seguranca/governanca | F1 | decisao tecnica continuar baseada em suposicoes sobre confianca | M | Alto | Planeamento F1 concluido | coberto por ADR-0004 e pelo documento consolidado de arquitectura F1; implementacao pendente |
 | BG-002 | Governar a custodia da chave de producao e o tratamento dos ficheiros sensiveis locais no builder | Critica | builder/licencas | F1 | risco operacional e de seguranca concentrado em conhecimento implícito | M | Alto | Planeamento F1 concluido | politica de papeis, assinatura e tratamento de builder suspeito definida; execucao fica para F1 |
 | BG-003 | Criar ADR que substitua a ambiguidade historica entre `.txz` e `.pkg` como artefacto de distribuicao | Critica | distribuicao/ADR | F1 | documentos historicos continuam a confundir instalacao e release | P | Alto | Planeamento F1 concluido | ADR-0003 passa a ser a referencia normativa; ADR-0002 fica historico |
-| BG-004 | Hardening da stack do license server: segredos, fronteira HTTP/HTTPS, backup, restore e operacao administrativa | Critica | license-server | F2 | indisponibilidade ou exposicao do servidor comprometer activacao | M | Alto | Planeamento F2 concluido | arquitetura e ordem segura consolidadas; execucao pendente em subfases |
+| BG-004 | Hardening da stack do license server: segredos, fronteira HTTP/HTTPS, backup, restore e operacao administrativa | Critica | license-server | F2 | indisponibilidade ou exposicao do servidor comprometer activacao | M | Alto | Acompanhar | F2.1-F2.5 materializaram publicacao segura, sessao, superficie administrativa, CRUD, segredos/bootstrap e backup/restore; F3 herda apenas o que pertence ao modelo de licenciamento |
 | BG-005 | Endurecer o endpoint de activacao e os controlos de abuso, auditoria e monitorizacao minima | Alta | license-server | F2 | abuso ou comportamento opaco em incidente | M | Alto | Planeamento F2 concluido | F2 definiu rate limit, logging e separacao entre activate publico e admin |
 | BG-023 | Fechar a politica oficial de publicacao segura do license server com TLS, edge proxy e portas permitidas | Critica | license-server/publicacao | F2 | exposicao ambigua do painel e do endpoint publico | M | Alto | Acompanhar | materializado na F2.1 com `443/TLS` oficial, origin `8445` privado por defeito, headers minimos e runbook de borda/TLS |
 | BG-024 | Substituir JWT em `localStorage` por sessao administrativa segura e fechar CORS/login/brute force | Critica | license-server/auth | F2 | roubo de sessao, abuso administrativo e superficie web permissiva | M | Alto | Acompanhar | F2.2 materializou sessao stateful com cookie seguro e logout real; F2.3 fechou same-origin, limiter dedicado, lockout temporario, politica minima de erro e auditoria administrativa |

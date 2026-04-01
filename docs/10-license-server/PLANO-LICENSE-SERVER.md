@@ -108,16 +108,19 @@ Browser/pfSense --> license.systemup.inf.br:443 (HTTPS, ISPConfig)
 
 ## 5. Credenciais do admin
 
-O sistema tem um script `seed.js` que cria o utilizador admin no
-primeiro deploy:
+O bootstrap administrativo oficial da F2.5 passa a ser o CLI
+`backend/bootstrap-admin.js`, com tres modos:
 
-- **Email**: `pablo@systemup.inf.br`
-- **Password**: `P@blo.147`
+- `status` — inventario rapido do estado da tabela `admins`
+- `init` — cria o primeiro admin apenas quando nao existe nenhum
+- `reset-password` — redefine a password de um admin existente e revoga as
+  sessoes activas do utilizador
 
-A password e armazenada com **bcrypt salt 12**. O seed verifica se o
-utilizador ja existe antes de criar (nao duplica).
+`seed.js` permanece apenas por compatibilidade e delega internamente para o
+bootstrap oficial. Nao existe mais credencial default documentada.
 
-O login no frontend usa email + password.
+A password continua armazenada com **bcrypt salt 12**. O login no frontend
+continua a usar email + password pelo canal oficial HTTPS/TLS.
 
 ---
 
@@ -190,12 +193,14 @@ license-server/
 ├── backend/
 │   ├── Dockerfile
 │   ├── package.json
-│   ├── seed.js               (criar admin default)
+│   ├── seed.js               (wrapper de compatibilidade)
+│   ├── bootstrap-admin.js    (bootstrap oficial do admin)
 │   ├── migrations/
 │   │   └── 001-init.sql      (schema PostgreSQL)
 │   └── src/
 │       ├── index.js           (Express server, porta 3001)
 │       ├── db.js              (PostgreSQL pool via pg)
+│       ├── secret-config.js   (leitura de segredos e *_FILE)
 │       ├── auth.js            (middleware de sessao administrativa)
 │       ├── session.js         (storage/validacao/renovacao de sessao)
 │       ├── crypto.js          (Ed25519 sign/verify via tweetnacl)
@@ -460,6 +465,13 @@ POSTGRES_PASSWORD=<gerar_password_forte>
 
 # Ed25519 (chave privada, 64 hex chars)
 ED25519_PRIVATE_KEY=<conteudo_de_layer7-private.key>
+# ED25519_PRIVATE_KEY_FILE=/run/secrets/layer7-ed25519.key
+
+# Bootstrap administrativo one-shot/recovery only
+ADMIN_BOOTSTRAP_EMAIL=admin@systemup.inf.br
+ADMIN_BOOTSTRAP_NAME=Layer7 Admin
+# ADMIN_BOOTSTRAP_PASSWORD=<gerar_password_forte>
+# ADMIN_BOOTSTRAP_PASSWORD_FILE=/run/secrets/layer7-admin-bootstrap.txt
 
 # Node
 NODE_ENV=production
@@ -502,6 +514,7 @@ services:
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       ED25519_PRIVATE_KEY: ${ED25519_PRIVATE_KEY}
+      ED25519_PRIVATE_KEY_FILE: ${ED25519_PRIVATE_KEY_FILE:-}
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3001
     networks:
@@ -678,7 +691,9 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 - [x] Criar `backend/migrations/001-init.sql`
 - [x] Criar `backend/src/db.js` (pool PostgreSQL)
 - [x] Criar `backend/src/crypto.js` (Ed25519 sign com tweetnacl)
-- [x] Criar `backend/seed.js` (criar admin pablo@systemup.inf.br / P@blo.147)
+- [x] Criar `backend/seed.js` (wrapper de compatibilidade)
+- [x] Criar `backend/bootstrap-admin.js` (bootstrap oficial do admin)
+- [x] Criar `backend/src/secret-config.js` (segredos via env e `*_FILE`)
 
 ### Bloco 3: Backend — API ✓ (2026-03-23)
 - [x] Criar `backend/src/index.js` (Express server)
@@ -705,7 +720,8 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 - [x] Gerar par de chaves Ed25519 (seed: `3a54c...`, pubkey: `8c52b...`)
 - [x] Criar `.env` com as variaveis
 - [x] Executar `docker compose -p layer7-license up -d --build`
-- [x] Executar seed: `docker exec layer7-license-api node seed.js`
+- [x] Executar bootstrap do admin via `docker compose exec -T api node bootstrap-admin.js init`
+- [x] Materializar scripts `backup-postgres.sh` e `restore-postgres.sh`
 - [x] Verificar que o origin privado `8445` responde apenas no contexto
   controlado (health OK)
 - [x] Verificar que os servicos existentes continuam funcionando (Apache:80 OK, Grafana:3000 OK, Monitor:8088 OK)
@@ -740,8 +756,15 @@ cp .env.example .env
 # Subir a stack
 docker compose -p layer7-license up -d --build
 
-# Criar admin
-docker exec layer7-license-api node seed.js
+# Criar primeiro admin
+docker compose exec -T \
+  -e ADMIN_BOOTSTRAP_EMAIL='admin@systemup.inf.br' \
+  -e ADMIN_BOOTSTRAP_NAME='Layer7 Admin' \
+  -e ADMIN_BOOTSTRAP_PASSWORD='substituir_por_segredo_real' \
+  api node bootstrap-admin.js init
+
+# Backup do PostgreSQL
+./backup-postgres.sh
 
 # Ver logs
 docker compose -p layer7-license logs -f

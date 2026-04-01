@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "node src/index.js",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "bootstrap-admin": "node bootstrap-admin.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

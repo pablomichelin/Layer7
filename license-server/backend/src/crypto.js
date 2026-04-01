@@ -1,4 +1,5 @@
 const nacl = require('tweetnacl');
+const { readSecret } = require('./secret-config');
 
 /**
  * Assina uma string com Ed25519 (tweetnacl).
@@ -21,10 +22,10 @@ function signData(dataString, privateKeyHex) {
  * Retorna { data: "<json-string>", sig: "<hex-64-bytes>" }
  */
 function generateSignedLicense({ hardware_id, expiry, customer, features }) {
-  const privateKeyHex = process.env.ED25519_PRIVATE_KEY;
-  if (!privateKeyHex) {
-    throw new Error('ED25519_PRIVATE_KEY nao configurada no .env');
-  }
+  const privateKeyHex = readSecret('ED25519_PRIVATE_KEY', {
+    required: true,
+    emptyMessage: 'ED25519_PRIVATE_KEY nao configurada no ambiente',
+  });
 
   const payload = JSON.stringify({
     hardware_id,

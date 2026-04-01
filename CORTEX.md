@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F2 — Execucao tecnica iniciada; F2.1, F2.2, F2.3 e F2.4 concluidas em 2026-04-01`
+**Fase actual consolidada:** `F2 — Concluida em 2026-04-01; F3 ainda nao iniciada`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -142,9 +142,15 @@ passam a rejeitar parametros invalidos, mutacoes administrativas passam a
 operar com codigos HTTP coerentes (`400`, `404`, `409`, `500`), `activate`
 e mutacoes com auditoria passam a usar transacoes explicitas, e o delete
 normal do painel passa de remocao fisica para arquivo logico com preservacao
-de historico via `archived_at` / `archived_by_admin_id`.
+de historico via `archived_at` / `archived_by_admin_id`. A **F2.5**
+materializou o fecho operacional da fase: `ED25519_PRIVATE_KEY` passa a
+aceitar tambem `_FILE`, o bootstrap administrativo ganha CLI explicito para
+`init` e `reset-password`, `seed.js` fica apenas como compatibilidade, o
+stack passa a ter scripts minimos de `backup-postgres.sh` /
+`restore-postgres.sh`, e a operacao oficial passa a ter runbooks canónicos
+de segredos/bootstrap e backup/restore.
 
-**Proxima subfase elegivel da F2:** `F2.5 — Segredos, bootstrap, backup/restore e runbooks`
+**Proxima fase elegivel:** `F3 — Robustez de licenciamento/activacao`
 
 ### Ordem segura das fases
 
@@ -152,7 +158,7 @@ de historico via `archived_at` / `archived_by_admin_id`.
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
 | F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
-| F2 | Hardening do license server | execucao iniciada; F2.1, F2.2, F2.3 e F2.4 concluidas em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
+| F2 | Hardening do license server | concluida em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
 | F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
@@ -163,11 +169,8 @@ de historico via `archived_at` / `archived_by_admin_id`.
 
 ## Proximos passos autorizados
 
-1. Prosseguir na F2 apenas pela ordem segura declarada em
-   `docs/02-roadmap/f2-plano-de-implementacao.md`, com foco exclusivo em
-   `F2.5` para segredos, bootstrap, backup/restore e runbooks, sem reabrir
-   o contrato de publicacao, sessao, superficie administrativa e integridade
-   do CRUD ja fechado nas F2.1-F2.4.
+1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
+   sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
 2. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
@@ -208,9 +211,9 @@ de historico via `archived_at` / `archived_by_admin_id`.
   `5/10 min` por `email + IP`) permanecerem calibrados para o uso real e de
   os operadores consultarem `admin_audit_log`/`admin_login_guards` em
   incidente em vez de alargarem a superficie administrativa.
-- A F2.4 reduziu a frouxidao de payload e removeu o delete fisico do fluxo
-  administrativo normal, mas a stack ainda depende da F2.5 para fechar
-  ownership de segredos, bootstrap e recuperacao operacional do banco.
+- A F2.5 fechou o ownership minimo de segredos, bootstrap administrativo e
+  backup/restore do banco, mas a rotacao formal da chave Ed25519 em incidente
+  e a automacao ampliada de retention/observabilidade continuam fora da F2.
 - A F2 agora tem arquitectura e ordem segura definidas, mas continua a exigir
   implementacao tecnica controlada em subfases pequenas e reversiveis.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;
@@ -423,9 +426,9 @@ CHECKPOINT CANONICO
 - Produto: Layer7 para pfSense CE
 - Versao segura conhecida: 1.8.3
 - Estado funcional: V1 Comercial concluida e publicada
-- Estado documental: governanca F0 consolidada + F2.4 de integridade transacional do CRUD concluida
-- Fase actual: F2 (execucao tecnica controlada)
-- Proxima subfase elegivel: F2.5
+- Estado documental: governanca F0 consolidada + F2 concluida ate F2.5
+- Fase actual: F2 concluida; F3 ainda nao iniciada
+- Proxima fase elegivel: F3
 - Reorganizacao fisica autorizada: nao
 - Artefacto publico actual: .pkg via GitHub Releases
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md

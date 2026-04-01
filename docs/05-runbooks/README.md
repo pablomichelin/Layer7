@@ -17,4 +17,10 @@ Autenticacao e sessao administrativa do license server (login, cookie seguro,
 expiracao, logout e troubleshooting):
 [`license-server-auth-sessao.md`](license-server-auth-sessao.md).
 
+Segredos, ownership operacional e bootstrap administrativo do license server:
+[`license-server-segredos-bootstrap.md`](license-server-segredos-bootstrap.md).
+
+Backup/restore e recuperacao minima do PostgreSQL do license server:
+[`license-server-backup-restore.md`](license-server-backup-restore.md).
+
 Runbooks especificos por release entram aqui quando existirem.

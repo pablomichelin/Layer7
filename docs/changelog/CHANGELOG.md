@@ -4,6 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F2.5 segredos, bootstrap, backup/restore e runbooks do license server
+
+- **Segredos e ownership minimo materializados** — o stack passa a declarar
+  oficialmente a custodia de `POSTGRES_PASSWORD`, `ED25519_PRIVATE_KEY` e
+  `ADMIN_BOOTSTRAP_PASSWORD`, com suporte a `ED25519_PRIVATE_KEY_FILE` no
+  backend e runbook canónico para uso/rotacao operacional minima
+- **Bootstrap administrativo endurecido** — `bootstrap-admin.js` passa a ser o
+  fluxo oficial para `status`, `init` e `reset-password`, com auditoria em
+  banco e revogacao de sessoes no reset; `seed.js` fica apenas como wrapper
+  de compatibilidade
+- **Backup/restore minimo executavel** — o repositório passa a incluir
+  `backup-postgres.sh` e `restore-postgres.sh`, e a operacao oficial do banco
+  deixa de depender apenas de memoria oral
+- **F2 encerrada documentalmente** — arquitetura, roadmap, backlog, manuais e
+  runbooks passam a tratar a F2 como concluida e a apontar a F3 como proxima
+  fase elegivel
+
 ### Changed — F2.4 integridade transacional e validacao do CRUD do license server
 
 - **Validacao forte por rota** — `activate`, `customers` e `licenses` passam a

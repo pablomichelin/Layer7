@@ -3,7 +3,7 @@
 > Documento operacional para gerar, gerir, instalar e manter licencas
 > do produto Layer7 para pfSense CE.
 
-> Estado oficial apos a F2.4: o unico canal publico permitido para painel
+> Estado oficial apos a F2.5: o unico canal publico permitido para painel
 > administrativo e activacao online passa a ser
 > `https://license.systemup.inf.br`. O origin `8445/TCP` passa a ser privado
 > para o reverse proxy e troubleshooting controlado; acesso humano directo por
@@ -12,7 +12,9 @@
 > `localStorage`, same-origin only em producao, limiter dedicado no login e
 > trilha minima de auditoria administrativa. O CRUD administrativo passa a
 > usar validacao forte de payload/query, transacoes explicitas e arquivo
-> logico no fluxo normal do painel.
+> logico no fluxo normal do painel. O fecho operacional da F2 passa a exigir
+> runbooks especificos para segredos/bootstrap administrativo e para
+> backup/restore do PostgreSQL.
 
 ---
 
@@ -76,8 +78,8 @@ O sistema de licencas Layer7 funciona com dois componentes:
 
 ### 2.2 Login
 
-- **Email:** `pablo@systemup.inf.br`
-- **Password:** `P@blo.147`
+- **Credencial administrativa:** criada e recuperada apenas pelo fluxo oficial
+  de bootstrap da F2.5
 - **Canal oficial:** apenas `https://license.systemup.inf.br`
 - **Estado de autenticacao:** cookie `layer7_admin_session`
 - **Atributos do cookie:** `HttpOnly`, `Secure`, `SameSite=Strict`
@@ -94,6 +96,8 @@ O sistema de licencas Layer7 funciona com dois componentes:
   admin
 - **Auditoria minima:** auth/sessao e mutacoes administrativas ficam em
   `admin_audit_log`; guardas de login/lockout ficam em `admin_login_guards`
+- **Bootstrap e recuperacao de password:** ver
+  `docs/05-runbooks/license-server-segredos-bootstrap.md`
 
 ### 2.3 Paginas do painel
 
@@ -135,10 +139,12 @@ Antes de gerar uma licenca, e necessario criar o cliente.
 ```bash
 # Criar sessao administrativa
 COOKIE_JAR=/tmp/layer7-license.cookies.txt
+ADMIN_EMAIL='admin@systemup.inf.br'
+ADMIN_PASSWORD='substituir_por_segredo_real'
 
 curl -s -c "$COOKIE_JAR" https://license.systemup.inf.br/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}'
+  -d "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\"}"
 
 # Criar cliente
 curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/customers \
@@ -557,10 +563,10 @@ grep license /var/log/layer7d.log  # qual o erro?
 
 | Item | Localizacao | Proteccao |
 |------|-------------|-----------|
-| Chave privada Ed25519 | `.env` no servidor (variavel `ED25519_PRIVATE_KEY`) | Nunca sai do servidor. Nao commitar. |
+| Chave privada Ed25519 | `.env` no servidor (`ED25519_PRIVATE_KEY`) ou ficheiro montado (`ED25519_PRIVATE_KEY_FILE`) | Nunca sai do servidor. Nao commitar. |
 | Chave publica Ed25519 | Embutida no binario `layer7d` (compile-time) | Distribuida com o pacote |
 | Sessao administrativa | Tabela `admin_sessions` + cookie `layer7_admin_session` | Cookie `HttpOnly + Secure + SameSite=Strict`; token opaco so e validado no backend |
-| Password admin | Armazenada com bcrypt (salt 12) no PostgreSQL | Nunca em texto limpo |
+| Password admin | Armazenada com bcrypt (salt 12) no PostgreSQL | Nunca em texto limpo; recuperacao apenas via `bootstrap-admin.js` |
 
 ### Modelo de confianca
 
@@ -576,18 +582,17 @@ grep license /var/log/layer7d.log  # qual o erro?
 - certificados, redirect `HTTP -> HTTPS` e ACL do origin sao dependencias
   operacionais obrigatorias da F2.1
 
-### Backup das chaves
+### Segredos, bootstrap e backup/restore
 
-**CRITICO:** Fazer backup seguro de:
-
-```
-ED25519_PRIVATE_KEY=3a54c7423b182bdce4007fda43aa4ba5826d1c9c58082a657f7971f3c1e253b3
-```
-
-Se esta chave for perdida, todas as licencas existentes continuam
-validas (verificacao offline), mas nao sera possivel gerar novas
-licencas nem re-activar as existentes ate gerar novo par de chaves e
-recompilar o binario.
+- a custodia operacional de `POSTGRES_PASSWORD`,
+  `ED25519_PRIVATE_KEY`/`ED25519_PRIVATE_KEY_FILE` e
+  `ADMIN_BOOTSTRAP_PASSWORD` passa a ser regida por
+  `docs/05-runbooks/license-server-segredos-bootstrap.md`
+- o backup/restore minimo do banco passa a ser regido por
+  `docs/05-runbooks/license-server-backup-restore.md`
+- se a `ED25519_PRIVATE_KEY` for perdida, as licencas ja emitidas continuam
+  validas offline, mas novas emissoes e re-activacoes ficam bloqueadas ate
+  procedimento formal de rotacao
 
 ---
 
@@ -596,10 +601,12 @@ recompilar o binario.
 ```bash
 # 1. Login no servidor
 COOKIE_JAR=/tmp/layer7-license.cookies.txt
+ADMIN_EMAIL='admin@systemup.inf.br'
+ADMIN_PASSWORD='substituir_por_segredo_real'
 
 curl -s -c "$COOKIE_JAR" https://license.systemup.inf.br/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}'
+  -d "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\"}"
 
 # 2. Criar cliente
 curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/customers \

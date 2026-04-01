@@ -16,7 +16,7 @@ com hardening tecnico ou com release engineering.
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
 | F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
-| F2 | Hardening do license server | execucao iniciada; F2.1, F2.2 e F2.3 concluidas | stack de licencas opera com segredos, backup e fronteiras sob controlo |
+| F2 | Hardening do license server | concluida em `2026-04-01` | stack de licencas opera com segredos, bootstrap, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
@@ -192,6 +192,10 @@ Tornar auditavel a cadeia de confianca entre:
   `404` / `409` coerentes, transacoes explicitas nas mutacoes multi-query e
   arquivo logico no fluxo administrativo normal, preservando historico em vez
   de delete fisico.
+- **F2.5 concluida em `2026-04-01`:** ownership minimo de segredos,
+  bootstrap administrativo explicito, backup/restore minimo do PostgreSQL e
+  runbooks essenciais passam a ficar materializados; a F2 fica encerrada e a
+  proxima fase elegivel passa a ser a F3.
 
 ### Documentacao obrigatoria da fase
 
@@ -247,7 +251,7 @@ features comerciais.
 
 ### Criterios de saida
 
-- stack opera com segredos e backup sob controlo;
+- stack opera com segredos, bootstrap e backup sob controlo;
 - publicacao/TLS, auth/sessao, CORS, brute force e CRUD ficam sob politica
   explicita e implementada;
 - operacao e incidentes basicos ficam documentados;

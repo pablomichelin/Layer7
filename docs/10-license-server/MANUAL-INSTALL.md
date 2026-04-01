@@ -41,6 +41,13 @@ da public key ou checksum divergirem, o comportamento passa a ser
 (PF, Unbound, arranque do servico) ficam rastreaveis como `DEGRADED` no
 stdout e no syslog (`layer7-install`).
 
+**Addendum operacional da F2.5:** a operacao do license server passa a usar
+runbooks canónicos especificos para segredos/bootstrap administrativo e
+backup/restore do PostgreSQL:
+
+- `docs/05-runbooks/license-server-segredos-bootstrap.md`
+- `docs/05-runbooks/license-server-backup-restore.md`
+
 ---
 
 ## Links da versao actual (para teste)

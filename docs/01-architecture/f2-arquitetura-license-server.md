@@ -3,7 +3,7 @@
 ## Finalidade
 
 Este documento consolidou o desenho completo da F2 e passa a registar os
-checkpoints materializados da F2.1, da F2.2, da F2.3 e da F2.4. Ele traduz o estado real observado em
+checkpoints materializados da F2.1, da F2.2, da F2.3, da F2.4 e da F2.5. Ele traduz o estado real observado em
 `license-server/` para uma arquitetura de hardening simples, auditável e
 operacionalmente viável.
 
@@ -47,9 +47,10 @@ Documentos normativos desta arquitetura:
 
 ### Segredos e operação
 
-- `.env.example` concentra `POSTGRES_PASSWORD`, `JWT_SECRET` e
-  `ED25519_PRIVATE_KEY`
-- `seed.js` bootstrapa admin por variáveis de ambiente
+- `.env.example` concentra `POSTGRES_PASSWORD`, `ED25519_PRIVATE_KEY` e os
+  placeholders de bootstrap administrativo
+- `seed.js` permanece apenas como compatibilidade e delega para
+  `bootstrap-admin.js`
 - não existe política documental fechada para rotação, ownership e incidentes
 
 ## 1.1 Estado materializado apos a F2.1
@@ -164,6 +165,30 @@ Documentos normativos desta arquitetura:
 - download de `.lic` passa a exigir licenca nao arquivada, activada e em
   estado logicamente consistente
 
+## 1.5 Estado materializado apos a F2.5
+
+### Segredos e bootstrap
+
+- `license-server/backend/src/secret-config.js` passa a concentrar a leitura
+  segura de segredos por variavel directa ou `*_FILE`
+- `license-server/backend/src/crypto.js` passa a aceitar
+  `ED25519_PRIVATE_KEY_FILE` alem da variavel directa
+- `license-server/backend/bootstrap-admin.js` passa a concentrar o bootstrap
+  administrativo oficial com `status`, `init` e `reset-password`
+- `license-server/backend/seed.js` passa a existir apenas como wrapper de
+  compatibilidade para o bootstrap oficial, sem credencial default embutida
+
+### Backup/restore e operacao
+
+- `license-server/backup-postgres.sh` passa a gerar dump SQL restauravel do
+  PostgreSQL com `pg_dump --clean --if-exists`
+- `license-server/restore-postgres.sh` passa a exigir confirmacao explicita
+  `--yes` para aplicar restore sobre o `POSTGRES_DB`
+- `docs/05-runbooks/license-server-segredos-bootstrap.md` passa a concentrar
+  ownership operacional, custodia minima e recuperacao da password admin
+- `docs/05-runbooks/license-server-backup-restore.md` passa a concentrar o
+  procedimento minimo de dump, restore e recomposicao do stack
+
 ---
 
 ## 2. Visão alvo da F2
@@ -242,7 +267,7 @@ Superfície mais sensível. Exige:
 | login sem limiter | brute force administrativo | abuso e enumeração operacional |
 | CRUD sem transação | multi-query parcial | estado inconsistente e perda de integridade |
 | delete físico | remoção de histórico | perda de auditoria e troubleshooting |
-| `seed` por `.env` | bootstrap sensível | risco operacional se tratado como credencial permanente |
+| `bootstrap-admin.js` | bootstrap sensível | exige disciplina para nao transformar segredo transitório em credencial permanente |
 | segredo Ed25519 no `.env` | signing centralizado | alto impacto se host ou env forem expostos |
 
 ---
@@ -281,9 +306,12 @@ Superfície mais sensível. Exige:
 ### 5.5 Segredos e operação
 
 - segredos fora do Git
-- owner claro da credencial bootstrap, do cookie seguro em HTTPS/TLS, da
-  `ED25519_PRIVATE_KEY` e da password bootstrap
-- rotação planejada
+- owner claro de `POSTGRES_PASSWORD`, `ED25519_PRIVATE_KEY`,
+  `ADMIN_BOOTSTRAP_PASSWORD` e do cookie seguro em HTTPS/TLS
+- `ED25519_PRIVATE_KEY` aceite por ambiente directo ou `*_FILE`
+- bootstrap administrativo oficial por CLI (`status`, `init`,
+  `reset-password`)
+- rotação planejada e tratada por runbook
 - backup/restore e bootstrap documentados
 
 ---
@@ -308,8 +336,8 @@ Superfície mais sensível. Exige:
 - indisponibilidade temporária do painel não autoriza fallback para HTTP
 - manutenção do origin pode degradar disponibilidade, mas sem alterar a
   fronteira de confiança
-- bootstrap inicial do admin pode continuar via seed controlado enquanto a
-  credencial inicial for rotacionada e tratada como transitória
+- indisponibilidade temporaria do bootstrap nao autoriza criar endpoints
+  administrativos alternativos
 
 ---
 
@@ -319,7 +347,8 @@ Superfície mais sensível. Exige:
 2. CORS permissivo contradiz o modelo real same-origin.
 3. Sessão administrativa em `localStorage` é inadequada para hardening.
 4. Login não tem `rate limit` nem trilha formal de brute force.
-5. Segredos e bootstrap ainda nao tem contrato operacional claro.
+5. Segredos e bootstrap deixam de depender apenas de `seed.js`, mas a F3/F7
+   ainda podem acrescentar governanca e automacao fora do minimo fechado.
 
 ---
 
@@ -327,7 +356,7 @@ Superfície mais sensível. Exige:
 
 Estas decisões ficam abertas para implementação, não para filosofia:
 
-- runbook final de backup/restore e rotação de segredos.
+- automacao ampliada de retention e observabilidade de backup fica para F7.
 
 ---
 

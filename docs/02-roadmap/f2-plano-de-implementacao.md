@@ -5,7 +5,7 @@
 Este documento organiza a implementação da F2 em blocos pequenos, seguros e
 reversíveis. Ele continua a definir ordem, dependências, gates, rollback
 conceitual e testes mínimos, e passa a registar os checkpoints
-materializados da F2.1, da F2.2, da F2.3 e da F2.4.
+materializados da F2.1, da F2.2, da F2.3, da F2.4 e da F2.5.
 
 Referências obrigatórias:
 
@@ -54,7 +54,13 @@ Referências obrigatórias:
   de `400` / `404` / `409`, transacoes explicitas nas mutacoes multi-query e
   arquivo logico no painel administrativo por `archived_at` /
   `archived_by_admin_id`.
-- **Próxima subfase elegível:** `F2.5 — Segredos, bootstrap, backup/restore e runbooks`
+- **F2.5 concluída em `2026-04-01`:** `ED25519_PRIVATE_KEY` passa a aceitar
+  tambem `*_FILE`, o bootstrap administrativo ganha CLI explicito e
+  auditavel (`status`, `init`, `reset-password`), `seed.js` fica reduzido a
+  compatibilidade, o stack passa a ter scripts minimos de backup/restore do
+  PostgreSQL e a operacao ganha runbooks canónicos de segredos/bootstrap e
+  recuperacao do banco.
+- **Próxima fase elegível:** `F3 — Robustez de licenciamento/activacao`
 
 ---
 
@@ -173,6 +179,8 @@ auth endurecida.
 - erro numa query faz rollback do conjunto.
 
 ### Subfase F2.5 - Segredos, bootstrap, backup/restore e runbooks
+
+**Status actual:** concluida em `2026-04-01`
 
 **Objectivo:** fechar o hardening operacional da stack.
 

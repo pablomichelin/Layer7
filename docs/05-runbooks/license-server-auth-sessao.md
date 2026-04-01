@@ -80,12 +80,14 @@ Referencias normativas:
 
 ```bash
 COOKIE_JAR=/tmp/layer7-license.cookies.txt
+ADMIN_EMAIL='admin@systemup.inf.br'
+ADMIN_PASSWORD='substituir_por_segredo_real'
 
 # Login
 curl -s -c "$COOKIE_JAR" \
   https://license.systemup.inf.br/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}'
+  -d "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\"}"
 
 # Sessao activa
 curl -s -b "$COOKIE_JAR" \
@@ -184,7 +186,7 @@ curl -s -o /tmp/layer7-origin-check.out -w '%{http_code}\n' \
   https://license.systemup.inf.br/api/auth/login \
   -H 'Content-Type: application/json' \
   -H 'Origin: https://evil.example' \
-  -d '{"email":"pablo@systemup.inf.br","password":"invalid"}'
+  -d '{"email":"admin@systemup.inf.br","password":"invalid"}'
 ```
 
 Resultado esperado: `403`
@@ -202,14 +204,16 @@ permanece `HTTPS/TLS` na borda.
 
 ---
 
-## 6. Fora de escopo apos a F2.4
+## 6. Integracao com a F2.5
 
-Os pontos abaixo permanecem explicitamente reservados para a F2.5 ou fases
-posteriores:
+Os pontos abaixo passam a ter runbook proprio:
 
-- ownership e rotacao de segredos
-- bootstrap administrativo fora do seed inicial
-- backup/restore e recuperacao operacional do PostgreSQL
+- ownership e custodia minima de segredos:
+  `docs/05-runbooks/license-server-segredos-bootstrap.md`
+- bootstrap administrativo e recuperacao de password:
+  `docs/05-runbooks/license-server-segredos-bootstrap.md`
+- backup/restore e recuperacao operacional do PostgreSQL:
+  `docs/05-runbooks/license-server-backup-restore.md`
 
 ---
 
