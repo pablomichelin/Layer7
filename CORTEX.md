@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F2 — Execucao tecnica iniciada; F2.1, F2.2 e F2.3 concluidas em 2026-04-01`
+**Fase actual consolidada:** `F2 — Execucao tecnica iniciada; F2.1, F2.2, F2.3 e F2.4 concluidas em 2026-04-01`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -135,9 +135,16 @@ painel passa a aceitar apenas o origin oficial same-origin em producao, o
 login administrativo passa a ter limiter dedicado por IP e por `email + IP`,
 lockout temporario por falhas repetidas, politica minima de erro sem
 enumeracao de credenciais e trilha minima de auditoria em `admin_audit_log`
-e `admin_login_guards` para auth e mutacoes administrativas.
+e `admin_login_guards` para auth e mutacoes administrativas. A **F2.4**
+materializou a integridade do CRUD administrativo: `activate`, `licenses` e
+`customers` passam a validar payload com schema fechado, queries/listagens
+passam a rejeitar parametros invalidos, mutacoes administrativas passam a
+operar com codigos HTTP coerentes (`400`, `404`, `409`, `500`), `activate`
+e mutacoes com auditoria passam a usar transacoes explicitas, e o delete
+normal do painel passa de remocao fisica para arquivo logico com preservacao
+de historico via `archived_at` / `archived_by_admin_id`.
 
-**Proxima subfase elegivel da F2:** `F2.4 — Validacao de input e integridade transacional`
+**Proxima subfase elegivel da F2:** `F2.5 — Segredos, bootstrap, backup/restore e runbooks`
 
 ### Ordem segura das fases
 
@@ -145,7 +152,7 @@ e `admin_login_guards` para auth e mutacoes administrativas.
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
 | F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
-| F2 | Hardening do license server | execucao iniciada; F2.1, F2.2 e F2.3 concluidas em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
+| F2 | Hardening do license server | execucao iniciada; F2.1, F2.2, F2.3 e F2.4 concluidas em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
 | F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
@@ -158,9 +165,9 @@ e `admin_login_guards` para auth e mutacoes administrativas.
 
 1. Prosseguir na F2 apenas pela ordem segura declarada em
    `docs/02-roadmap/f2-plano-de-implementacao.md`, com foco exclusivo em
-   `F2.4` para validacao de input, coerencia HTTP, transacoes e integridade
-   do CRUD, sem regredir o contrato de publicacao, sessao e superficie
-   administrativa ja fechado nas F2.1-F2.3.
+   `F2.5` para segredos, bootstrap, backup/restore e runbooks, sem reabrir
+   o contrato de publicacao, sessao, superficie administrativa e integridade
+   do CRUD ja fechado nas F2.1-F2.4.
 2. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
@@ -201,9 +208,9 @@ e `admin_login_guards` para auth e mutacoes administrativas.
   `5/10 min` por `email + IP`) permanecerem calibrados para o uso real e de
   os operadores consultarem `admin_audit_log`/`admin_login_guards` em
   incidente em vez de alargarem a superficie administrativa.
-- O license server continua funcional, mas o CRUD administrativo ainda opera
-  sem validacao forte de payload, sem transacoes explicitas e com delete
-  fisico, todos reservados para a F2.4.
+- A F2.4 reduziu a frouxidao de payload e removeu o delete fisico do fluxo
+  administrativo normal, mas a stack ainda depende da F2.5 para fechar
+  ownership de segredos, bootstrap e recuperacao operacional do banco.
 - A F2 agora tem arquitectura e ordem segura definidas, mas continua a exigir
   implementacao tecnica controlada em subfases pequenas e reversiveis.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;
@@ -416,9 +423,9 @@ CHECKPOINT CANONICO
 - Produto: Layer7 para pfSense CE
 - Versao segura conhecida: 1.8.3
 - Estado funcional: V1 Comercial concluida e publicada
-- Estado documental: governanca F0 consolidada + F1.3 de blacklists seguras concluida
-- Fase actual: F1 (implementacao controlada)
-- Proxima subfase elegivel: F1.4
+- Estado documental: governanca F0 consolidada + F2.4 de integridade transacional do CRUD concluida
+- Fase actual: F2 (execucao tecnica controlada)
+- Proxima subfase elegivel: F2.5
 - Reorganizacao fisica autorizada: nao
 - Artefacto publico actual: .pkg via GitHub Releases
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md

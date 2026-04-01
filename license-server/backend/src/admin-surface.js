@@ -122,8 +122,11 @@ async function auditAdminEvent({
   result,
   reason = null,
   metadata = null,
+  client = null,
+  strict = false,
 }) {
   const context = getAuditContext(req);
+  const queryable = client || pool;
 
   emitAuditLine({
     component,
@@ -137,7 +140,7 @@ async function auditAdminEvent({
   });
 
   try {
-    await pool.query(
+    await queryable.query(
       `INSERT INTO admin_audit_log (
           component,
           event_type,
@@ -166,6 +169,10 @@ async function auditAdminEvent({
     );
   } catch (err) {
     console.error('[AUDIT] Persist error:', err.message);
+
+    if (strict) {
+      throw err;
+    }
   }
 }
 

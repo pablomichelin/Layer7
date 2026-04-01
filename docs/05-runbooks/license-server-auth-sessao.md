@@ -2,7 +2,7 @@
 
 ## Finalidade
 
-Este runbook materializa a F2.2 e a F2.3 e define o contrato operativo
+Este runbook materializa a F2.2, a F2.3 e convive com a F2.4 para definir o contrato operativo
 oficial da sessao administrativa e da superficie administrativa do license
 server.
 
@@ -10,6 +10,7 @@ Referencias normativas:
 
 - `docs/03-adr/ADR-0008-autenticacao-e-sessao-license-server.md`
 - `docs/03-adr/ADR-0009-protecao-superficie-administrativa-license-server.md`
+- `docs/03-adr/ADR-0010-integridade-transacional-e-validacao-crud-license-server.md`
 - `docs/01-architecture/f2-arquitetura-license-server.md`
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`
 
@@ -201,20 +202,20 @@ permanece `HTTPS/TLS` na borda.
 
 ---
 
-## 6. Fora de escopo apos a F2.3
+## 6. Fora de escopo apos a F2.4
 
-Os pontos abaixo permanecem explicitamente reservados para a F2.4 ou fases
+Os pontos abaixo permanecem explicitamente reservados para a F2.5 ou fases
 posteriores:
 
-- validacao forte de payload, transacoes e CRUD
-- delete seguro/arquivo logico
-- atomicidade transacional de `activate`, `customers` e `licenses`
+- ownership e rotacao de segredos
+- bootstrap administrativo fora do seed inicial
+- backup/restore e recuperacao operacional do PostgreSQL
 
 ---
 
 ## 7. Rollback
 
-- Rollback de codigo/docs: `git revert <commit-da-f2.3>`
+- Rollback de codigo/docs: `git revert <commit-da-f2.4>`
 - Rollback operacional: redeploy do stack com a revisao anterior
 - Regra de rollback: nao reintroduzir JWT em `localStorage`, nao reabrir
   `cors()` global e nao remover limiter/lockout silenciosamente; se houver

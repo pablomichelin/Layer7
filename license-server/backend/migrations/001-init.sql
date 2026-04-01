@@ -12,6 +12,8 @@ CREATE TABLE customers (
     email       VARCHAR(255),
     phone       VARCHAR(50),
     notes       TEXT,
+    archived_at TIMESTAMPTZ,
+    archived_by_admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL,
     created_at  TIMESTAMP DEFAULT NOW(),
     updated_at  TIMESTAMP DEFAULT NOW()
 );
@@ -28,6 +30,8 @@ CREATE TABLE licenses (
     activated_at TIMESTAMP,
     revoked_at  TIMESTAMP,
     notes       TEXT,
+    archived_at TIMESTAMPTZ,
+    archived_by_admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL,
     created_at  TIMESTAMP DEFAULT NOW(),
     updated_at  TIMESTAMP DEFAULT NOW()
 );
@@ -85,6 +89,8 @@ CREATE TABLE admin_login_guards (
 CREATE INDEX idx_licenses_key ON licenses(license_key);
 CREATE INDEX idx_licenses_status ON licenses(status);
 CREATE INDEX idx_licenses_customer ON licenses(customer_id);
+CREATE INDEX idx_licenses_archived_at ON licenses(archived_at);
+CREATE INDEX idx_customers_archived_at ON customers(archived_at);
 CREATE INDEX idx_activations_license ON activations_log(license_id);
 CREATE INDEX idx_activations_created ON activations_log(created_at);
 CREATE INDEX idx_admin_sessions_admin ON admin_sessions(admin_id);

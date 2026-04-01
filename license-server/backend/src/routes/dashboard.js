@@ -9,17 +9,28 @@ router.get('/', async (_req, res) => {
   try {
     const stats = await pool.query(`
       SELECT
-        COUNT(*) FILTER (WHERE status = 'active' AND expiry >= CURRENT_DATE)  AS active,
-        COUNT(*) FILTER (WHERE status = 'expired' OR (status = 'active' AND expiry < CURRENT_DATE)) AS expired,
-        COUNT(*) FILTER (WHERE status = 'revoked') AS revoked,
-        COUNT(*) AS total
+        COUNT(*) FILTER (WHERE archived_at IS NULL AND status = 'active' AND expiry >= CURRENT_DATE) AS active,
+        COUNT(*) FILTER (
+          WHERE archived_at IS NULL
+            AND (status = 'expired' OR (status = 'active' AND expiry < CURRENT_DATE))
+        ) AS expired,
+        COUNT(*) FILTER (WHERE archived_at IS NULL AND status = 'revoked') AS revoked,
+        COUNT(*) FILTER (WHERE archived_at IS NULL) AS total
       FROM licenses
     `);
 
-    const customers = await pool.query('SELECT COUNT(*) FROM customers');
+    const customers = await pool.query(`
+      SELECT COUNT(*) AS total
+        FROM customers
+       WHERE archived_at IS NULL
+    `);
 
     const activations24h = await pool.query(
-      `SELECT COUNT(*) FROM activations_log WHERE created_at > NOW() - INTERVAL '24 hours'`
+      `SELECT COUNT(*)
+         FROM activations_log al
+         LEFT JOIN licenses l ON l.id = al.license_id
+        WHERE al.created_at > NOW() - INTERVAL '24 hours'
+          AND (l.id IS NULL OR l.archived_at IS NULL)`
     );
 
     const recentActivations = await pool.query(`
@@ -28,6 +39,7 @@ router.get('/', async (_req, res) => {
       FROM activations_log al
       LEFT JOIN licenses l ON l.id = al.license_id
       LEFT JOIN customers c ON c.id = l.customer_id
+      WHERE l.id IS NULL OR (l.archived_at IS NULL AND (c.id IS NULL OR c.archived_at IS NULL))
       ORDER BY al.created_at DESC
       LIMIT 10
     `);
@@ -39,7 +51,7 @@ router.get('/', async (_req, res) => {
         revoked: parseInt(stats.rows[0].revoked),
         total: parseInt(stats.rows[0].total),
       },
-      customers: parseInt(customers.rows[0].count),
+      customers: parseInt(customers.rows[0].total, 10),
       activations_24h: parseInt(activations24h.rows[0].count),
       recent_activations: recentActivations.rows,
     });

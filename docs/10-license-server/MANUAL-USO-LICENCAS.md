@@ -3,14 +3,16 @@
 > Documento operacional para gerar, gerir, instalar e manter licencas
 > do produto Layer7 para pfSense CE.
 
-> Estado oficial apos a F2.3: o unico canal publico permitido para painel
+> Estado oficial apos a F2.4: o unico canal publico permitido para painel
 > administrativo e activacao online passa a ser
 > `https://license.systemup.inf.br`. O origin `8445/TCP` passa a ser privado
 > para o reverse proxy e troubleshooting controlado; acesso humano directo por
 > HTTP ao IP do host deixa de ser caminho normativo. A autenticacao
 > administrativa passa a usar sessao stateful com cookie seguro, sem JWT em
 > `localStorage`, same-origin only em producao, limiter dedicado no login e
-> trilha minima de auditoria administrativa.
+> trilha minima de auditoria administrativa. O CRUD administrativo passa a
+> usar validacao forte de payload/query, transacoes explicitas e arquivo
+> logico no fluxo normal do painel.
 
 ---
 
@@ -98,8 +100,18 @@ O sistema de licencas Layer7 funciona com dois componentes:
 | Pagina | Funcao |
 |--------|--------|
 | **Dashboard** | Resumo: licencas activas/expiradas/revogadas, total clientes, ultimas 10 activacoes |
-| **Licencas** | Lista paginada, filtro por status, criar/ver/revogar |
-| **Clientes** | Lista paginada, busca por nome/email, criar/editar/remover |
+| **Licencas** | Lista paginada, filtro por status, criar/ver/revogar/arquivar |
+| **Clientes** | Lista paginada, busca por nome/email, criar/editar/arquivar |
+
+### 2.4 Regras operacionais do CRUD apos a F2.4
+
+- payloads administrativos passam a usar validacao forte e schema fechado
+- campos inesperados, IDs invalidos, paginacao fora da politica e JSON
+  malformado passam a falhar com `400`
+- conflitos logicos de activacao, revogacao, download e arquivo passam a
+  responder com `409`
+- o delete normal do painel deixa de apagar historico e passa a arquivar
+  clientes/licencas com `archived_at`, ocultando-os das listagens normais
 
 ---
 
@@ -298,7 +310,7 @@ service layer7d restart
 ```
 
 - Qualquer tentativa futura de `--activate` com essa chave retornara
-  erro 403 (`Licenca revogada`)
+  erro 409 (`Licenca revogada`)
 
 ---
 
@@ -443,17 +455,18 @@ O daemon verifica a licenca:
 | `GET` | `/api/auth/session` | Resolve sessao activa, renova janela ociosa quando aplicavel |
 | `POST` | `/api/auth/logout` | Invalida sessao activa e limpa cookie |
 | `GET` | `/api/dashboard` | Metricas e ultimas activacoes |
-| `GET` | `/api/licenses?status=&page=&limit=` | Listar licencas |
+| `GET` | `/api/licenses?status=&customer_id=&search=&page=&limit=` | Listar licencas |
 | `POST` | `/api/licenses` | Criar licenca |
 | `GET` | `/api/licenses/:id` | Detalhes + historico activacoes |
-| `PUT` | `/api/licenses/:id` | Editar (expiry, features, notes) |
+| `PUT` | `/api/licenses/:id` | Editar (expiry, features, customer_id, notes) |
 | `POST` | `/api/licenses/:id/revoke` | Revogar licenca |
+| `DELETE` | `/api/licenses/:id` | Arquivar licenca nao activa; preserva historico |
 | `GET` | `/api/licenses/:id/download` | Download ficheiro .lic |
 | `GET` | `/api/customers?search=&page=&limit=` | Listar clientes |
 | `POST` | `/api/customers` | Criar cliente |
 | `GET` | `/api/customers/:id` | Detalhes + licencas |
 | `PUT` | `/api/customers/:id` | Editar cliente |
-| `DELETE` | `/api/customers/:id` | Remover (so se sem licencas) |
+| `DELETE` | `/api/customers/:id` | Arquivar cliente; bloqueia se ainda houver licencas activas |
 
 ### Rate limiting
 
@@ -467,8 +480,9 @@ O endpoint `/api/auth/login` passa a operar com:
 - **lockout de 15 minutos** apos repeticao anomala por conta/IP
 - **erro `429` generico** sem enumeracao de credenciais
 
-As validacoes fortes de payload, transacoes e delete seguro do CRUD
-continuam explicitamente reservadas para a F2.4.
+As mutacoes administrativas e `POST /api/activate` passam a operar em
+fail-closed: payload invalido devolve `400`, recurso inexistente devolve
+`404` e conflito logico devolve `409`.
 
 ---
 
@@ -487,18 +501,26 @@ A chave de licenca esta incorrecta ou nao existe no servidor.
 - Verificar a chave com `layer7d --activate CHAVE_CORRECTA`
 - Verificar no painel web se a licenca existe
 
-### "Hardware ID nao corresponde" (403)
+### "Hardware ID nao corresponde" (409)
 
 A licenca ja foi activada noutro hardware.
 - Cada licenca e vinculada ao primeiro hardware que a activa
 - Para mudar de hardware: criar nova licenca ou pedir ao admin
   para limpar o hardware_id (via base de dados)
 
-### "Licenca revogada" (403)
+### "Licenca revogada" (409)
 
 A licenca foi revogada pelo admin. Contactar o admin.
 
-### "Licenca expirada" (403)
+### "Licenca expirada" (409)
+
+### "Licenca ainda nao foi activada" (409)
+
+O download administrativo do `.lic` exige `hardware_id` ja vinculado.
+
+### "Nao e possivel arquivar licenca activa" (409)
+
+Revogar primeiro a licenca antes de arquivar no painel.
 
 A data de expiracao ja passou. O admin precisa renovar (editar
 expiry) e o cliente precisa re-activar.

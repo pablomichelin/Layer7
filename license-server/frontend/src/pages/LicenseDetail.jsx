@@ -84,10 +84,10 @@ export default function LicenseDetail() {
           )}
           {license.status !== 'active' && (
             <button onClick={async () => {
-              if (!confirm('Apagar esta licença permanentemente?')) return;
+              if (!confirm('Arquivar esta licença?')) return;
               try { await del(`/licenses/${id}`); navigate('/licenses'); } catch (err) { alert(err.message); }
             }} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
-              Apagar Licença
+              Arquivar Licença
             </button>
           )}
           {license.hardware_id && (

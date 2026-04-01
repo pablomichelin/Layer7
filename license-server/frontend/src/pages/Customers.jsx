@@ -24,9 +24,9 @@ export default function Customers() {
 
   useEffect(() => { load(); }, [page, search]);
 
-  async function handleDelete(id, name, e) {
+  async function handleArchive(id, name, e) {
     e.stopPropagation();
-    if (!confirm(`Remover cliente "${name}"?`)) return;
+    if (!confirm(`Arquivar cliente "${name}"?`)) return;
     try {
       await del(`/customers/${id}`);
       load();
@@ -45,7 +45,7 @@ export default function Customers() {
         <div className="flex gap-2">
           <button onClick={() => navigate(`/customers/${r.id}`)} className="text-xs text-brand-600 hover:underline">Ver</button>
           <button onClick={() => navigate(`/customers/${r.id}/edit`)} className="text-xs text-brand-600 hover:underline">Editar</button>
-          <button onClick={(e) => handleDelete(r.id, r.name, e)} className="text-xs text-red-600 hover:underline">Remover</button>
+          <button onClick={(e) => handleArchive(r.id, r.name, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
         </div>
       ),
     },

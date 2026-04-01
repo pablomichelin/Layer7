@@ -336,11 +336,12 @@ CREATE INDEX idx_activations_created ON activations_log(created_at);
 | GET    | /api/licenses/:id         | Detalhes + activations_log              |
 | PUT    | /api/licenses/:id         | Editar: expiry, features, customer_id, notes |
 | POST   | /api/licenses/:id/revoke  | Revogar: muda status para 'revoked', grava revoked_at |
+| DELETE | /api/licenses/:id         | Arquivar licenca nao activa; preserva historico |
 | GET    | /api/customers            | Lista paginada. Query: `?search=&page=&limit=` |
 | POST   | /api/customers            | Criar cliente. Body: `{name, email, phone, notes}` |
 | PUT    | /api/customers/:id        | Editar cliente                          |
 | GET    | /api/customers/:id        | Detalhes + licencas associadas          |
-| DELETE | /api/customers/:id        | Remover (so se sem licencas)            |
+| DELETE | /api/customers/:id        | Arquivar cliente; bloqueia se houver licencas activas |
 
 ---
 

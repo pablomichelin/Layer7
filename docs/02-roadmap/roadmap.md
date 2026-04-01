@@ -187,6 +187,11 @@ Tornar auditavel a cadeia de confianca entre:
   lockout temporario por conta/IP, politica minima de erro sem enumeracao de
   credenciais e trilha minima de auditoria em banco para auth e mutacoes
   administrativas.
+- **F2.4 concluida em `2026-04-01`:** `activate`, `licenses` e `customers`
+  passam a operar com validacao forte de payload e query, respostas `400` /
+  `404` / `409` coerentes, transacoes explicitas nas mutacoes multi-query e
+  arquivo logico no fluxo administrativo normal, preservando historico em vez
+  de delete fisico.
 
 ### Documentacao obrigatoria da fase
 

@@ -4,6 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F2.4 integridade transacional e validacao do CRUD do license server
+
+- **Validacao forte por rota** — `activate`, `customers` e `licenses` passam a
+  operar com schema fechado para payload e query, rejeicao explicita de
+  campos inesperados, IDs/paginacao invalidos e `JSON` malformado com `400`
+- **CRUD administrativo coerente** — mutacoes e downloads passam a distinguir
+  payload invalido (`400`), recurso inexistente (`404`) e conflito logico
+  (`409`) sem vazar detalhe interno do banco
+- **Atomicidade minima materializada** — activacao passa a usar
+  `SELECT ... FOR UPDATE` com bind/timestamps/log de sucesso na mesma
+  transacao, e create/update/revoke/archive administrativos passam a commitar
+  junto com a auditoria em banco
+- **Delete seguro no painel** — clientes e licencas deixam de sofrer delete
+  fisico no fluxo administrativo normal e passam a usar arquivo logico com
+  `archived_at` / `archived_by_admin_id`, ocultando historico das listagens
+  sem o destruir
+
 ### Changed — F2.3 protecao da superficie administrativa do license server
 
 - **CORS same-origin oficial** — o backend deixa de aplicar `cors()` aberto

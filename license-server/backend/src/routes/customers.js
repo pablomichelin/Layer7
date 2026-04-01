@@ -5,90 +5,123 @@ const {
   ADMIN_INTERNAL_ERROR_MESSAGE,
   auditAdminEvent,
 } = require('../admin-surface');
+const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
+const {
+  assertEmptyBody,
+  isLicenseExpired,
+  parseCustomerCreatePayload,
+  parseCustomersListQuery,
+  parseCustomerUpdatePayload,
+  parseIdParam,
+} = require('../crud-validation');
 
 const router = Router();
 router.use(auth);
 
+function normalizeLicenseRow(license) {
+  if (license.status === 'active' && isLicenseExpired(license)) {
+    return { ...license, status: 'expired' };
+  }
+
+  return license;
+}
+
 router.get('/', async (req, res) => {
   try {
-    const { search, page = 1, limit = 20 } = req.query;
-    const offset = (Math.max(1, parseInt(page)) - 1) * parseInt(limit);
+    const { search, page, limit, offset } = parseCustomersListQuery(req.query);
+    const conditions = ['c.archived_at IS NULL'];
     const params = [];
-    let idx = 1;
-    let where = '';
 
     if (search) {
-      where = `WHERE c.name ILIKE $${idx} OR c.email ILIKE $${idx}`;
       params.push(`%${search}%`);
-      idx++;
+      conditions.push(`(c.name ILIKE $${params.length} OR c.email ILIKE $${params.length})`);
     }
 
-    const countResult = await pool.query(
-      `SELECT COUNT(*) FROM customers c ${where}`, params
-    );
-    const total = parseInt(countResult.rows[0].count);
+    const whereClause = `WHERE ${conditions.join(' AND ')}`;
 
-    params.push(parseInt(limit));
-    params.push(offset);
+    const countResult = await pool.query(
+      `SELECT COUNT(*) FROM customers c ${whereClause}`,
+      params
+    );
+    const total = Number.parseInt(countResult.rows[0].count, 10);
 
     const result = await pool.query(
       `SELECT c.*,
-              (SELECT COUNT(*) FROM licenses WHERE customer_id = c.id) AS license_count
-       FROM customers c
-       ${where}
-       ORDER BY c.created_at DESC
-       LIMIT $${idx++} OFFSET $${idx++}`,
-      params
+              (
+                SELECT COUNT(*)
+                  FROM licenses l
+                 WHERE l.customer_id = c.id
+                   AND l.archived_at IS NULL
+              ) AS license_count
+         FROM customers c
+         ${whereClause}
+        ORDER BY c.created_at DESC
+        LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, limit, offset]
     );
 
-    res.json({
+    return res.json({
       customers: result.rows,
       total,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(total / parseInt(limit)),
+      page,
+      limit,
+      pages: Math.max(1, Math.ceil(total / limit)),
     });
-  } catch (err) {
-    console.error('[CUSTOMERS] List error:', err.message);
-    res.status(500).json({ error: 'Erro ao listar clientes' });
+  } catch (error) {
+    if (isHttpError(error)) {
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[CUSTOMERS] List error:', error.message);
+    return res.status(500).json({ error: 'Erro ao listar clientes.' });
   }
 });
 
 router.post('/', async (req, res) => {
   try {
-    const { name, email, phone, notes } = req.body;
-    if (!name) {
+    const payload = parseCustomerCreatePayload(req.body);
+
+    const customer = await runInTransaction(async (client) => {
+      const result = await client.query(
+        `INSERT INTO customers (name, email, phone, notes)
+         VALUES ($1, $2, $3, $4)
+         RETURNING *`,
+        [payload.name, payload.email ?? null, payload.phone ?? null, payload.notes ?? null]
+      );
+
       await auditAdminEvent({
         component: 'customers',
-        eventType: 'customer_create_denied',
+        eventType: 'customer_created',
         adminId: req.admin.id,
         actorIdentifier: req.admin.email,
         req,
-        result: 'denied',
-        reason: 'missing_name',
+        result: 'success',
+        reason: 'customer_created',
+        metadata: { customer_id: result.rows[0].id },
+        client,
+        strict: true,
       });
-      return res.status(400).json({ error: 'Nome obrigatorio' });
-    }
 
-    const result = await pool.query(
-      `INSERT INTO customers (name, email, phone, notes) VALUES ($1, $2, $3, $4) RETURNING *`,
-      [name, email || null, phone || null, notes || null]
-    );
-
-    await auditAdminEvent({
-      component: 'customers',
-      eventType: 'customer_created',
-      adminId: req.admin.id,
-      actorIdentifier: req.admin.email,
-      req,
-      result: 'success',
-      reason: 'customer_created',
-      metadata: { customer_id: result.rows[0].id },
+      return result.rows[0];
     });
 
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error('[CUSTOMERS] Create error:', err.message);
+    return res.status(201).json(customer);
+  } catch (error) {
+    if (isHttpError(error)) {
+      await auditAdminEvent({
+        component: 'customers',
+        eventType: 'customer_create_denied',
+        adminId: req.admin?.id || null,
+        actorIdentifier: req.admin?.email || null,
+        req,
+        result: 'denied',
+        reason: 'invalid_payload',
+        metadata: { status: error.status, error: error.message },
+      });
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[CUSTOMERS] Create error:', error.message);
     await auditAdminEvent({
       component: 'customers',
       eventType: 'customer_create_error',
@@ -98,75 +131,132 @@ router.post('/', async (req, res) => {
       result: 'error',
       reason: 'customer_create_exception',
     });
-    res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
+    return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
   }
 });
 
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    const customerId = parseIdParam(req.params.id, 'customer_id');
 
-    const custResult = await pool.query('SELECT * FROM customers WHERE id = $1', [id]);
-    if (custResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Cliente nao encontrado' });
-    }
-
-    const licResult = await pool.query(
-      'SELECT * FROM licenses WHERE customer_id = $1 ORDER BY created_at DESC',
-      [id]
+    const customerResult = await pool.query(
+      `SELECT *
+         FROM customers
+        WHERE id = $1
+          AND archived_at IS NULL`,
+      [customerId]
     );
 
-    res.json({ customer: custResult.rows[0], licenses: licResult.rows });
-  } catch (err) {
-    console.error('[CUSTOMERS] Detail error:', err.message);
-    res.status(500).json({ error: 'Erro ao buscar cliente' });
+    if (customerResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Cliente nao encontrado.' });
+    }
+
+    const licensesResult = await pool.query(
+      `SELECT *
+         FROM licenses
+        WHERE customer_id = $1
+          AND archived_at IS NULL
+        ORDER BY created_at DESC`,
+      [customerId]
+    );
+
+    return res.json({
+      customer: customerResult.rows[0],
+      licenses: licensesResult.rows.map(normalizeLicenseRow),
+    });
+  } catch (error) {
+    if (isHttpError(error)) {
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[CUSTOMERS] Detail error:', error.message);
+    return res.status(500).json({ error: 'Erro ao buscar cliente.' });
   }
 });
 
 router.put('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    const { name, email, phone, notes } = req.body;
+    const customerId = parseIdParam(req.params.id, 'customer_id');
+    const payload = parseCustomerUpdatePayload(req.body);
 
-    const result = await pool.query(
-      `UPDATE customers
-       SET name = COALESCE($1, name),
-           email = COALESCE($2, email),
-           phone = COALESCE($3, phone),
-           notes = COALESCE($4, notes),
-           updated_at = NOW()
-       WHERE id = $5 RETURNING *`,
-      [name, email, phone, notes, id]
-    );
+    const updatedCustomer = await runInTransaction(async (client) => {
+      const existing = await client.query(
+        `SELECT id
+           FROM customers
+          WHERE id = $1
+            AND archived_at IS NULL
+          FOR UPDATE`,
+        [customerId]
+      );
 
-    if (result.rows.length === 0) {
+      if (existing.rows.length === 0) {
+        throw createHttpError(404, 'Cliente nao encontrado.');
+      }
+
+      const updates = [];
+      const params = [];
+
+      if (Object.prototype.hasOwnProperty.call(payload, 'name')) {
+        params.push(payload.name);
+        updates.push(`name = $${params.length}`);
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'email')) {
+        params.push(payload.email);
+        updates.push(`email = $${params.length}`);
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'phone')) {
+        params.push(payload.phone);
+        updates.push(`phone = $${params.length}`);
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'notes')) {
+        params.push(payload.notes);
+        updates.push(`notes = $${params.length}`);
+      }
+
+      updates.push('updated_at = NOW()');
+      params.push(customerId);
+
+      const result = await client.query(
+        `UPDATE customers
+            SET ${updates.join(', ')}
+          WHERE id = $${params.length}
+          RETURNING *`,
+        params
+      );
+
       await auditAdminEvent({
         component: 'customers',
-        eventType: 'customer_update_denied',
+        eventType: 'customer_updated',
         adminId: req.admin.id,
         actorIdentifier: req.admin.email,
         req,
-        result: 'denied',
-        reason: 'customer_not_found',
-        metadata: { customer_id: parseInt(id, 10) },
+        result: 'success',
+        reason: 'customer_updated',
+        metadata: { customer_id: result.rows[0].id },
+        client,
+        strict: true,
       });
-      return res.status(404).json({ error: 'Cliente nao encontrado' });
-    }
 
-    await auditAdminEvent({
-      component: 'customers',
-      eventType: 'customer_updated',
-      adminId: req.admin.id,
-      actorIdentifier: req.admin.email,
-      req,
-      result: 'success',
-      reason: 'customer_updated',
-      metadata: { customer_id: result.rows[0].id },
+      return result.rows[0];
     });
 
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('[CUSTOMERS] Update error:', err.message);
+    return res.json(updatedCustomer);
+  } catch (error) {
+    if (isHttpError(error)) {
+      await auditAdminEvent({
+        component: 'customers',
+        eventType: 'customer_update_denied',
+        adminId: req.admin?.id || null,
+        actorIdentifier: req.admin?.email || null,
+        req,
+        result: 'denied',
+        reason: error.status === 404 ? 'customer_not_found' : 'customer_update_rejected',
+        metadata: { customer_id: Number.parseInt(req.params.id, 10) || null, status: error.status, error: error.message },
+      });
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[CUSTOMERS] Update error:', error.message);
     await auditAdminEvent({
       component: 'customers',
       eventType: 'customer_update_error',
@@ -175,67 +265,107 @@ router.put('/:id', async (req, res) => {
       req,
       result: 'error',
       reason: 'customer_update_exception',
-      metadata: { customer_id: parseInt(req.params.id, 10) },
+      metadata: { customer_id: Number.parseInt(req.params.id, 10) || null },
     });
-    res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
+    return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
   }
 });
 
 router.delete('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
+    assertEmptyBody(req.body);
+    const customerId = parseIdParam(req.params.id, 'customer_id');
 
-    const licCheck = await pool.query(
-      "SELECT COUNT(*) AS total, COUNT(*) FILTER (WHERE status = 'active') AS active FROM licenses WHERE customer_id = $1", [id]
-    );
-    const { total, active } = licCheck.rows[0];
-    if (parseInt(active) > 0) {
+    const archivedCustomer = await runInTransaction(async (client) => {
+      const customerResult = await client.query(
+        `SELECT id
+           FROM customers
+          WHERE id = $1
+            AND archived_at IS NULL
+          FOR UPDATE`,
+        [customerId]
+      );
+
+      if (customerResult.rows.length === 0) {
+        throw createHttpError(404, 'Cliente nao encontrado.');
+      }
+
+      const licenseStats = await client.query(
+        `SELECT
+            COUNT(*) FILTER (WHERE archived_at IS NULL) AS total,
+            COUNT(*) FILTER (
+              WHERE archived_at IS NULL
+                AND status = 'active'
+                AND expiry >= CURRENT_DATE
+            ) AS active
+           FROM licenses
+          WHERE customer_id = $1`,
+        [customerId]
+      );
+
+      const totalLicenses = Number.parseInt(licenseStats.rows[0].total, 10);
+      const activeLicenses = Number.parseInt(licenseStats.rows[0].active, 10);
+
+      if (activeLicenses > 0) {
+        throw createHttpError(409, `Cliente possui ${activeLicenses} licenca(s) activa(s). Revogue-as primeiro.`);
+      }
+
+      await client.query(
+        `UPDATE licenses
+            SET archived_at = NOW(),
+                archived_by_admin_id = $1,
+                updated_at = NOW()
+          WHERE customer_id = $2
+            AND archived_at IS NULL`,
+        [req.admin.id, customerId]
+      );
+
+      const result = await client.query(
+        `UPDATE customers
+            SET archived_at = NOW(),
+                archived_by_admin_id = $1,
+                updated_at = NOW()
+          WHERE id = $2
+          RETURNING id`,
+        [req.admin.id, customerId]
+      );
+
       await auditAdminEvent({
         component: 'customers',
-        eventType: 'customer_delete_denied',
+        eventType: 'customer_archived',
         adminId: req.admin.id,
         actorIdentifier: req.admin.email,
         req,
-        result: 'denied',
-        reason: 'active_licenses_present',
-        metadata: { customer_id: parseInt(id, 10), active_licenses: parseInt(active, 10) },
+        result: 'success',
+        reason: totalLicenses > 0 ? 'customer_archived_with_related_licenses' : 'customer_archived',
+        metadata: {
+          customer_id: customerId,
+          archived_licenses: totalLicenses,
+        },
+        client,
+        strict: true,
       });
-      return res.status(409).json({ error: `Cliente possui ${active} licenca(s) activa(s). Revogue-as primeiro.` });
-    }
-    if (parseInt(total) > 0) {
-      await pool.query('DELETE FROM activations_log WHERE license_id IN (SELECT id FROM licenses WHERE customer_id = $1)', [id]);
-      await pool.query('DELETE FROM licenses WHERE customer_id = $1', [id]);
-    }
 
-    const result = await pool.query('DELETE FROM customers WHERE id = $1 RETURNING id', [id]);
-    if (result.rows.length === 0) {
-      await auditAdminEvent({
-        component: 'customers',
-        eventType: 'customer_delete_denied',
-        adminId: req.admin.id,
-        actorIdentifier: req.admin.email,
-        req,
-        result: 'denied',
-        reason: 'customer_not_found',
-        metadata: { customer_id: parseInt(id, 10) },
-      });
-      return res.status(404).json({ error: 'Cliente nao encontrado' });
-    }
-
-    await auditAdminEvent({
-      component: 'customers',
-      eventType: 'customer_deleted',
-      adminId: req.admin.id,
-      actorIdentifier: req.admin.email,
-      req,
-      result: 'success',
-      reason: 'customer_deleted',
-      metadata: { customer_id: parseInt(id, 10) },
+      return result.rows[0];
     });
 
-    res.json({ message: 'Cliente removido', id: parseInt(id) });
-  } catch (err) {
-    console.error('[CUSTOMERS] Delete error:', err.message);
+    return res.json({ message: 'Cliente arquivado.', id: archivedCustomer.id });
+  } catch (error) {
+    if (isHttpError(error)) {
+      await auditAdminEvent({
+        component: 'customers',
+        eventType: 'customer_delete_denied',
+        adminId: req.admin?.id || null,
+        actorIdentifier: req.admin?.email || null,
+        req,
+        result: 'denied',
+        reason: error.status === 404 ? 'customer_not_found' : 'customer_archive_rejected',
+        metadata: { customer_id: Number.parseInt(req.params.id, 10) || null, status: error.status, error: error.message },
+      });
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[CUSTOMERS] Delete error:', error.message);
     await auditAdminEvent({
       component: 'customers',
       eventType: 'customer_delete_error',
@@ -243,10 +373,10 @@ router.delete('/:id', async (req, res) => {
       actorIdentifier: req.admin.email,
       req,
       result: 'error',
-      reason: 'customer_delete_exception',
-      metadata: { customer_id: parseInt(req.params.id, 10) },
+      reason: 'customer_archive_exception',
+      metadata: { customer_id: Number.parseInt(req.params.id, 10) || null },
     });
-    res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
+    return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
   }
 });
 

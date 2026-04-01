@@ -38,9 +38,9 @@ export default function Licenses() {
     }
   }
 
-  async function handleDelete(id, e) {
+  async function handleArchive(id, e) {
     e.stopPropagation();
-    if (!confirm('Apagar esta licença permanentemente?')) return;
+    if (!confirm('Arquivar esta licença?')) return;
     try {
       await del(`/licenses/${id}`);
       load();
@@ -63,7 +63,7 @@ export default function Licenses() {
             <button onClick={(e) => handleRevoke(r.id, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
           )}
           {r.status !== 'active' && (
-            <button onClick={(e) => handleDelete(r.id, e)} className="text-xs text-red-600 hover:underline">Apagar</button>
+            <button onClick={(e) => handleArchive(r.id, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
           )}
         </div>
       ),

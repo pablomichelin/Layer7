@@ -14,6 +14,7 @@ const activateRoutes = require('./routes/activate');
 const licensesRoutes = require('./routes/licenses');
 const customersRoutes = require('./routes/customers');
 const dashboardRoutes = require('./routes/dashboard');
+const { ensureCrudIntegritySchema } = require('./crud-integrity');
 const { ensureSessionSchema } = require('./session');
 
 const app = express();
@@ -37,6 +38,10 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use(async (err, req, res, _next) => {
   console.error('[API] Error:', err.message);
 
+  if (err instanceof SyntaxError && err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'JSON invalido.' });
+  }
+
   if (isAdminApiPath(req.path)) {
     await auditAdminEvent({
       component: 'admin-surface',
@@ -56,6 +61,7 @@ async function startServer() {
   try {
     await ensureSessionSchema();
     await ensureAdminSurfaceSchema();
+    await ensureCrudIntegritySchema();
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`[API] Layer7 License Server running on port ${PORT}`);
     });

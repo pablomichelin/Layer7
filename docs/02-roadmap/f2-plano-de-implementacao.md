@@ -5,7 +5,7 @@
 Este documento organiza a implementação da F2 em blocos pequenos, seguros e
 reversíveis. Ele continua a definir ordem, dependências, gates, rollback
 conceitual e testes mínimos, e passa a registar os checkpoints
-materializados da F2.1, da F2.2 e da F2.3.
+materializados da F2.1, da F2.2, da F2.3 e da F2.4.
 
 Referências obrigatórias:
 
@@ -49,7 +49,12 @@ Referências obrigatórias:
   lockout temporario por conta/IP, politica minima de erro sem enumeracao de
   credenciais e trilha minima de auditoria persistida em `admin_audit_log`
   e `admin_login_guards`.
-- **Próxima subfase elegível:** `F2.4 — Validação de input e integridade transacional`
+- **F2.4 concluída em `2026-04-01`:** `activate`, `licenses` e `customers`
+  passam a operar com validacao forte de payload/query, respostas coerentes
+  de `400` / `404` / `409`, transacoes explicitas nas mutacoes multi-query e
+  arquivo logico no painel administrativo por `archived_at` /
+  `archived_by_admin_id`.
+- **Próxima subfase elegível:** `F2.5 — Segredos, bootstrap, backup/restore e runbooks`
 
 ---
 
@@ -141,6 +146,8 @@ origins ou reduzir limites silenciosamente.
 - eventos mínimos aparecem no log.
 
 ### Subfase F2.4 - Validação de input e integridade transacional
+
+**Status actual:** concluida em `2026-04-01`
 
 **Objectivo:** impedir estado parcial e CRUD ambíguo.
 

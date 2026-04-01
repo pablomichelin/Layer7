@@ -14,8 +14,8 @@ export default function CustomerDetail() {
     get(`/customers/${id}`).then(setData).catch(console.error).finally(() => setLoading(false));
   }, [id]);
 
-  async function handleDelete() {
-    if (!confirm('Remover este cliente e todas as licenças revogadas/expiradas?')) return;
+  async function handleArchive() {
+    if (!confirm('Arquivar este cliente e as licenças não activas associadas?')) return;
     try {
       await del(`/customers/${id}`);
       navigate('/customers');
@@ -55,8 +55,8 @@ export default function CustomerDetail() {
           <button onClick={() => navigate(`/customers/${id}/edit`)} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
             Editar
           </button>
-          <button onClick={handleDelete} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
-            Remover Cliente
+          <button onClick={handleArchive} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
+            Arquivar Cliente
           </button>
         </div>
       </div>

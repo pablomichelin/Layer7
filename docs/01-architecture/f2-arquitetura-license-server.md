@@ -3,7 +3,7 @@
 ## Finalidade
 
 Este documento consolidou o desenho completo da F2 e passa a registar os
-checkpoints materializados da F2.1, da F2.2 e da F2.3. Ele traduz o estado real observado em
+checkpoints materializados da F2.1, da F2.2, da F2.3 e da F2.4. Ele traduz o estado real observado em
 `license-server/` para uma arquitetura de hardening simples, auditável e
 operacionalmente viável.
 
@@ -125,8 +125,44 @@ Documentos normativos desta arquitetura:
 - `001-init.sql` passa a trazer `admin_audit_log` e `admin_login_guards` para
   persistir auth, lockouts e mutacoes administrativas
 - `customers.js` e `licenses.js` passam a registar sucesso/negacao/erro de
-  create, update, revoke, delete e download sem alterar a politica de
-  validacao/transacao reservada para a F2.4
+  create, update, revoke, delete e download, preparando a integridade
+  transacional materializada na F2.4
+
+## 1.4 Estado materializado apos a F2.4
+
+### Integridade do CRUD
+
+- `license-server/backend/src/crud-validation.js` passa a concentrar schemas
+  fechados de payload/query para `activate`, `customers` e `licenses`, com
+  rejeicao explicita de campos inesperados, IDs/paginacao invalidos,
+  `license_key` fora do formato esperado, `hardware_id` invalido, `email`
+  malformado e `features` fora da lista controlada
+- `license-server/backend/src/crud-integrity.js` passa a concentrar
+  `HttpError`, transacoes explicitas e bootstrap de schema para arquivo
+  logico em `customers`/`licenses`
+- `license-server/backend/src/index.js` passa a tratar JSON invalido como
+  `400` em vez de erro interno, e garante o schema minimo da F2.4 no arranque
+
+### Atomicidade e delete seguro
+
+- `license-server/backend/src/routes/activate.js` passa a executar bind de
+  `hardware_id`, actualizacao de timestamps e gravacao de `activations_log`
+  dentro da mesma transacao bem-sucedida, com `SELECT ... FOR UPDATE`
+- `license-server/backend/src/routes/customers.js` e
+  `license-server/backend/src/routes/licenses.js` passam a fazer create,
+  update, revoke e archive dentro de transacoes com auditoria associada no
+  mesmo commit
+- `001-init.sql` passa a trazer `archived_at` e `archived_by_admin_id` em
+  `customers` e `licenses`; o delete administrativo normal deixa de apagar
+  historico e passa a arquivar logicamente as entidades
+
+### Coerencia operacional
+
+- listagens, detalhes e dashboard passam a ocultar entidades arquivadas e a
+  tratar licencas `active` com `expiry < CURRENT_DATE` como `expired` para
+  fins de leitura e regras do painel
+- download de `.lic` passa a exigir licenca nao arquivada, activada e em
+  estado logicamente consistente
 
 ---
 
@@ -277,24 +313,20 @@ Superfície mais sensível. Exige:
 
 ---
 
-## 8. Pontos frágeis actuais que a F2 precisa fechar
+## 8. Pontos frageis actuais que a F2 precisa fechar
 
 1. Publicação administrativa ainda depende de `8445` host + convenção oral.
 2. CORS permissivo contradiz o modelo real same-origin.
 3. Sessão administrativa em `localStorage` é inadequada para hardening.
 4. Login não tem `rate limit` nem trilha formal de brute force.
-5. CRUD e activação podem deixar estado parcial por falta de transação.
-6. Delete físico actual apaga histórico operacional sensível.
-7. Segredos e bootstrap ainda não têm contrato operacional claro.
+5. Segredos e bootstrap ainda nao tem contrato operacional claro.
 
 ---
 
-## 9. Decisões em aberto
+## 9. Decisoes em aberto
 
 Estas decisões ficam abertas para implementação, não para filosofia:
 
-- shape final da política de arquivo lógico;
-- detalhe final da validacao forte de payload e dos códigos HTTP do CRUD;
 - runbook final de backup/restore e rotação de segredos.
 
 ---
