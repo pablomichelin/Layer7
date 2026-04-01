@@ -15,7 +15,7 @@ com hardening tecnico ou com release engineering.
 | Fase | Nome | Estado | Gate central |
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
-| F1 | Cadeia de confianca e seguranca critica | planeada | confianca entre repo, builder, chaves e artefacto fica auditavel |
+| F1 | Cadeia de confianca e seguranca critica | planeamento consolidado | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
 | F2 | Hardening do license server | planeada | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
@@ -95,27 +95,34 @@ daemon, license server, frontend, scripts operacionais ou estrutura fisica.
 
 Tornar auditavel a cadeia de confianca entre:
 
-- repositório;
+- repositório de codigo;
+- canal oficial de distribuicao;
 - builder;
-- chave publica embutida;
-- chave privada de emissao de licencas;
+- checksum e assinatura de release;
 - artefacto publico distribuido;
-- processo de activacao.
+- instalacao/actualizacao;
+- pipeline de blacklists;
+- politicas de fallback e degradacao segura.
 
 ### Escopo
 
-- mapear fronteiras de confianca;
-- documentar segredos e custodia;
-- rever builder com ficheiros locais sensiveis;
-- rever como a chave publica entra no binario;
-- rever verificacao do artefacto distribuido;
-- formalizar ADRs de confianca e distribuicao.
+- formalizar a hierarquia oficial de distribuicao;
+- declarar `.pkg` como artefacto oficial e o papel historico de `.txz`;
+- definir contrato de checksums, manifesto e assinatura;
+- separar papeis de origem do codigo, builder, assinante e canal publico;
+- definir o pipeline seguro de blacklists com origem, mirror/cache e rejeicao;
+- definir politica de fallback e degradacao segura por componente;
+- mapear dependencias externas criticas e estrategia de reducao de risco;
+- formalizar ADRs e documento consolidado de arquitectura F1;
+- formalizar o plano de implementacao futura da F1.
 
 ### Exclusoes
 
 - sem reorganizacao estrutural;
 - sem redesign do license server como produto;
-- sem adicionar funcionalidades novas ao utilizador final.
+- sem adicionar funcionalidades novas ao utilizador final;
+- sem alterar build, release, instalacao, package, daemon, frontend ou scripts;
+- sem implementar validacao criptografica nesta etapa.
 
 ### Dependencias
 
@@ -130,22 +137,31 @@ Tornar auditavel a cadeia de confianca entre:
 
 ### Criterios de saida
 
-- cadeia de confianca documentada ponta a ponta;
-- segredos e ficheiros especiais identificados;
-- ADRs criticos criados ou actualizados;
-- rollback e impacto definidos para a proxima fase tecnica.
+- cadeia de confianca documentada ponta a ponta para artefactos e blacklists;
+- artefacto oficial, canal oficial e legado historico ficam inequívocos;
+- politica de checksum, assinatura, espelhamento e rejeicao fica definida;
+- politica de fallback e degradacao segura fica definida por componente;
+- dependencias externas criticas ficam mapeadas com reducao de risco;
+- ADRs criticos da F1 ficam criados e coerentes entre si;
+- ordem segura de implementacao futura fica declarada com gates e rollback conceitual.
 
 ### Gate
 
-- nenhuma dependencia critica de confianca fica “implícita”;
-- qualquer maintainer consegue explicar como a confianca e preservada.
+- nenhuma dependencia critica de confianca, distribuicao, blacklists ou fallback fica implícita;
+- qualquer maintainer consegue explicar qual e o artefacto oficial, como ele sera validado e o que acontece quando a validacao falha.
 
 ### Documentacao obrigatoria da fase
 
 - `CORTEX.md`
-- backlog
-- ADR index + ADRs afectados
-- runbook de builder/segredos afectados
+- `docs/01-architecture/f1-arquitetura-de-confianca.md`
+- `docs/02-roadmap/backlog.md`
+- `docs/02-roadmap/checklist-mestre.md`
+- `docs/02-roadmap/f1-plano-de-implementacao.md`
+- `docs/03-adr/README.md`
+- `docs/03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md`
+- `docs/03-adr/ADR-0004-cadeia-de-confianca-dos-artefatos.md`
+- `docs/03-adr/ADR-0005-pipeline-seguro-de-blacklists.md`
+- `docs/03-adr/ADR-0006-fallback-e-degradacao-segura.md`
 
 ---
 

@@ -56,6 +56,9 @@ controladas, com governanca forte e zero regressao desnecessaria.
 
 - A Fase 0 documental foi usada para consolidar governanca, canonicidade,
   backlog, roadmap, checklist mestre e mapas de classificacao/equivalencia.
+- O planeamento detalhado da F1 foi consolidado sem implementacao tecnica,
+  com ADRs formais para distribuicao, cadeia de confianca, blacklists e
+  fallback/degradacao segura.
 - O directorio `docs/` passa a ser o **centro documental canónico**.
 - A raiz actual do repositório continua preservada como **legado importante**.
 - **Nao houve reorganizacao fisica** do repositório nesta fase.
@@ -98,20 +101,20 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F0 — Governanca documental`
+**Fase actual consolidada:** `F1 — Planeamento detalhado concluido (sem implementacao)`
 
-**Resultado esperado da F0:** criar a base canónica que permite abrir as
-fases tecnicas seguintes com contexto preservado e sem drift documental
-critico.
+**Resultado actual conhecido da F1:** cadeia de confianca, contrato de
+distribuicao, pipeline de blacklists e politica de fallback foram
+formalizados documentalmente, mas ainda **nao foram implementados**.
 
-**Proxima fase elegivel:** `F1 — Cadeia de confianca e seguranca critica`
+**Proxima subfase elegivel:** `F1.1 — Contrato oficial de distribuicao`
 
 ### Ordem segura das fases
 
 | Fase | Nome | Estado | Intencao |
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
-| F1 | Cadeia de confianca e seguranca critica | pronta para abrir | mapear e fechar confianca entre repo, builder, chaves e artefactos |
+| F1 | Cadeia de confianca e seguranca critica | planeamento concluido; implementacao nao iniciada | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
 | F2 | Hardening do license server | planeada | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
@@ -123,11 +126,15 @@ critico.
 
 ## Proximos passos autorizados
 
-1. Abrir a F1 com foco exclusivo em cadeia de confianca, sem puxar ainda
-   features novas.
-2. Formalizar ADRs que faltam para distribuicao actual, fronteiras de
-   confianca e hardening do servidor de licencas.
-3. Usar o backlog canónico como fila unica de priorizacao antes de tocar em
+1. Executar F1.1 para fechar o contrato oficial de distribuicao sobre
+   `.pkg`, manifesto, checksum, assinatura e URLs imutaveis de release.
+2. Executar F1.2 para ligar builder, validacao e publicacao ao manifesto
+   assinado, sem confiar em `main` mutavel como origem de instalacao.
+3. Executar F1.3 para introduzir a trilha segura de blacklists com origem
+   aprovada, HTTPS obrigatorio, cache/mirror e ultima versao valida.
+4. Executar F1.4 para aplicar a matriz de fallback/degradacao segura sem
+   permitir conteudo suspeito.
+5. Usar o backlog canónico e o plano F1 como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
 ---
@@ -136,6 +143,13 @@ critico.
 
 - A cadeia actual entre repositório, builder com ficheiros sensiveis locais,
   chave publica embutida e artefacto publicado ainda precisa de formalizacao.
+- A instalacao ainda depende de URLs mutaveis em `main`, o que conflita com
+  o contrato de distribuicao segura planeado para a F1.
+- O pipeline de blacklists continua historicamente associado a UT1 com
+  transporte inseguro por omissao, sem garantia forte de autenticidade.
+- GitHub, builder e origem UT1 continuam como dependencias externas fortes
+  ate que espelhamento, manifesto assinado e ultima versao valida entrem em
+  operacao.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;
   sem ler a classificacao, um agente pode seguir um documento antigo.
 - Existem documentos antigos ainda a mencionar `.txz`, `v0.x` e estados
@@ -158,7 +172,8 @@ critico.
 - V1 sem analytics pesado;
 - sem reorganizacao fisica antes da F6;
 - sem alterar codigo-fonte, package, daemon, license server, frontend,
-  scripts operacionais ou logica funcional durante a F0.
+  scripts operacionais ou logica funcional durante a F0 e durante o
+  planeamento documental da F1.
 
 ---
 
@@ -191,6 +206,7 @@ critico.
 - [`docs/02-roadmap/roadmap.md`](docs/02-roadmap/roadmap.md)
 - [`docs/02-roadmap/backlog.md`](docs/02-roadmap/backlog.md)
 - [`docs/02-roadmap/checklist-mestre.md`](docs/02-roadmap/checklist-mestre.md)
+- [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md)
 - [`docs/00-overview/document-classification.md`](docs/00-overview/document-classification.md)
 - [`docs/00-overview/document-equivalence-map.md`](docs/00-overview/document-equivalence-map.md)
 - [`docs/03-adr/README.md`](docs/03-adr/README.md)
@@ -199,6 +215,7 @@ critico.
 
 - Produto/escopo: [`docs/00-overview/product-charter.md`](docs/00-overview/product-charter.md)
 - Arquitectura alvo: [`docs/01-architecture/target-architecture.md`](docs/01-architecture/target-architecture.md)
+- Arquitectura de confianca F1: [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
 - Instalacao/operacao do pacote: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md)
 - Changelog: [`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md)
 - Core tecnico: [`docs/core/README.md`](docs/core/README.md)
@@ -223,6 +240,9 @@ critico.
 5. [`docs/02-roadmap/checklist-mestre.md`](docs/02-roadmap/checklist-mestre.md)
 6. [`docs/00-overview/document-classification.md`](docs/00-overview/document-classification.md)
 7. [`docs/00-overview/document-equivalence-map.md`](docs/00-overview/document-equivalence-map.md)
+8. [`docs/03-adr/README.md`](docs/03-adr/README.md)
+9. [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
+10. [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md)
 
 ### Para trabalho tecnico numa area especifica
 
@@ -234,6 +254,10 @@ critico.
 - License server e licenciamento:
   [`docs/10-license-server/PLANO-LICENSE-SERVER.md`](docs/10-license-server/PLANO-LICENSE-SERVER.md)
   e [`docs/10-license-server/MANUAL-USO-LICENCAS.md`](docs/10-license-server/MANUAL-USO-LICENCAS.md)
+- Distribuicao, builder, blacklists e fallback seguro:
+  [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md),
+  [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md),
+  [`docs/03-adr/README.md`](docs/03-adr/README.md)
 - Blacklists UT1:
   [`docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`](docs/11-blacklists/PLANO-BLACKLISTS-UT1.md),
   [`docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`](docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md),
@@ -318,6 +342,7 @@ Para isso:
 |-------------------|-------------------------|
 | fase actual, gate ou sequencia aprovada | `CORTEX.md`, `docs/02-roadmap/roadmap.md`, `docs/02-roadmap/backlog.md`, `docs/02-roadmap/checklist-mestre.md` |
 | decisao arquitectural, de seguranca ou de distribuicao | `docs/03-adr/README.md`, ADR novo/actualizado, `CORTEX.md` |
+| cadeia de confianca, distribuicao, blacklists ou fallback seguro | `docs/01-architecture/f1-arquitetura-de-confianca.md`, `docs/02-roadmap/f1-plano-de-implementacao.md`, backlog, ADR index |
 | instalacao, upgrade, uninstall, rollback, caminhos, comandos ou versao publicada | `docs/10-license-server/MANUAL-INSTALL.md`, runbooks afectados, changelog, release docs |
 | mudanca funcional relevante | changelog, docs da area, `CORTEX.md`, backlog/status da fase |
 | reorganizacao estrutural | mapa de equivalencia, classificacao documental, roadmap/checklist da F6 |
@@ -333,9 +358,9 @@ CHECKPOINT CANONICO
 - Produto: Layer7 para pfSense CE
 - Versao segura conhecida: 1.8.0
 - Estado funcional: V1 Comercial concluida e publicada
-- Estado documental: governanca F0 consolidada
-- Fase actual: F0
-- Proxima fase elegivel: F1
+- Estado documental: governanca F0 consolidada + planeamento F1 consolidado
+- Fase actual: F1 (planeamento)
+- Proxima subfase elegivel: F1.1
 - Reorganizacao fisica autorizada: nao
 - Artefacto publico actual: .pkg via GitHub Releases
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
@@ -360,9 +385,11 @@ CHECKPOINT CANONICO
 - O projecto ja nao depende da raiz como fonte principal de governanca.
 - O backlog, o roadmap, o checklist mestre e o mapa de equivalencia passam a
   servir de ponte segura entre chats e entre fases.
+- A F1 passou a ter arquitectura consolidada, ADRs normativos e ordem segura
+  de implementacao sem tocar em codigo.
 
 ### Operacional
 
 - Qualquer proxima intervencao tecnica deve partir deste checkpoint e abrir a
-  F1 de forma controlada, sem puxar ao mesmo tempo licenciamento, package,
-  daemon, blacklists, reorganizacao estrutural e release engineering.
+  F1.1 antes de qualquer trabalho em blacklist, fallback, release ou
+  licenciamento dependente da cadeia de confianca.

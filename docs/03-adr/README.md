@@ -22,11 +22,15 @@ Criar ADR quando a mudanca afectar:
 | ID | Titulo | Estado | Papel actual |
 |----|--------|--------|--------------|
 | [ADR-0001](ADR-0001-engine-classificacao-ndpi.md) | Engine de classificacao Layer 7 — nDPI | Aceito | decisao canónica e congelada |
-| [ADR-0002](ADR-0002-distribuicao-artefato-txz.md) | Distribuicao V1 — artefacto `.txz` | Historico / precisa de substituicao | nao deve ser usado como referencia actual para distribuicao publica |
+| [ADR-0002](ADR-0002-distribuicao-artefato-txz.md) | Distribuicao V1 — artefacto `.txz` | Historico / substituido na pratica | preservado por rastreabilidade; nao deve ser usado como referencia actual |
+| [ADR-0003](ADR-0003-hierarquia-oficial-de-distribuicao.md) | Hierarquia oficial de distribuicao | Aceito | define `.pkg` como artefacto oficial, a hierarquia builder -> release -> instalacao e o estatuto do legado `.txz` |
+| [ADR-0004](ADR-0004-cadeia-de-confianca-dos-artefatos.md) | Cadeia de confianca dos artefactos | Aceito | define checksum, assinatura, papeis de geracao/validacao e tratamento de builder suspeito |
+| [ADR-0005](ADR-0005-pipeline-seguro-de-blacklists.md) | Pipeline seguro de blacklists | Aceito | define origem oficial, requisitos de HTTPS, mirror/cache e politica de rejeicao/degradacao |
+| [ADR-0006](ADR-0006-fallback-e-degradacao-segura.md) | Fallback e degradacao segura | Aceito | define fail-open vs fail-closed e a fronteira entre disponibilidade e integridade |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
-O ADR-0002 fica preservado por rastreabilidade, mas ja nao representa a
-realidade operacional actual.
+O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa
+actual passa a ser a combinacao de ADR-0003 + ADR-0004.
 
 ---
 
@@ -45,15 +49,13 @@ Sempre que um ADR nascer, actualizar tambem:
 
 ---
 
-## ADRs recomendados para nascer de imediato
+## Proximos ADRs recomendados
 
 | Proximo ID sugerido | Tema | Fase | Motivo |
 |---------------------|------|------|--------|
-| ADR-0003 | Cadeia de confianca entre repo, builder, chaves e artefacto | F1 | fechar o maior risco de governanca tecnica actual |
-| ADR-0004 | Artefacto oficial de distribuicao e verificacao (`.pkg`) | F1/F7 | substituir a ambiguidade historica do ADR-0002 |
-| ADR-0005 | Fronteira operacional e hardening do license server | F2 | formalizar segredos, TLS, backup e isolamento |
-| ADR-0006 | Modelo de estados do licenciamento e activacao | F3 | tornar activacao/revogacao/offline previsiveis |
-| ADR-0007 | Reorganizacao estrutural controlada do repositório | F6 | garantir que mover ficheiros nao destrua contexto |
+| ADR-0007 | Hardening operacional do license server | F2 | formalizar segredos, TLS, backup, restore e fronteiras administrativas |
+| ADR-0008 | Modelo de estados do licenciamento e activacao | F3 | tornar activacao/revogacao/offline previsiveis e rastreaveis |
+| ADR-0009 | Reorganizacao estrutural controlada do repositório | F6 | garantir que mover ficheiros nao destrua contexto |
 
 ---
 

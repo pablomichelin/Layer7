@@ -58,12 +58,18 @@ vence o canónico.
 | `docs/00-overview/document-classification.md` | classificacao | matriz de estatuto dos docs | Canónico | novo | manter vivo quando surgirem conflitos | F0+ |
 | `docs/00-overview/document-equivalence-map.md` | equivalencia | mapa raiz <-> docs | Canónico | novo | manter vivo ate a F6 | F0-F6 |
 | `docs/01-architecture/target-architecture.md` | arquitectura | resumo canónico da arquitectura | Canónico | resume `02-ARQUITETURA-ALVO.md` | manter vivo | F0+ |
+| `docs/01-architecture/f1-arquitetura-de-confianca.md` | arquitectura F1 | consolidado da cadeia de confianca, blacklists e fallback | Canónico | novo | manter vivo durante F1 e rever quando a implementacao avancar | F1 |
 | `docs/02-roadmap/roadmap.md` | fases F0-F7 | roadmap canónico | Canónico | substitui `03-ROADMAP-E-FASES.md` como SSOT | manter vivo | F0+ |
 | `docs/02-roadmap/backlog.md` | backlog | backlog unico priorizado | Canónico | substitui `04-BACKLOG-MVP-E-VERSOES.md` | manter vivo | F0+ |
 | `docs/02-roadmap/checklist-mestre.md` | gates | checklist mestre da evolucao segura | Canónico | substitui `14-CHECKLIST-MESTRE.md` | manter vivo | F0+ |
+| `docs/02-roadmap/f1-plano-de-implementacao.md` | plano F1 | ordem segura de implementacao futura da F1 | Canónico | novo | manter vivo ate ao fecho tecnico da F1 | F1 |
 | `docs/03-adr/README.md` | indice ADR | politica e indice de decisoes | Canónico | substitui resumo antigo insuficiente | manter vivo | F0+ |
 | `docs/03-adr/ADR-0001-engine-classificacao-ndpi.md` | decisao nDPI | ADR aceite e normativo | Canónico | — | manter | F0+ |
 | `docs/03-adr/ADR-0002-distribuicao-artefato-txz.md` | distribuicao antiga | ADR preservado para rastreabilidade | Historico | precisa de ADR substituto | preservar ate ser superado formalmente | F1/F7 |
+| `docs/03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md` | distribuicao oficial | ADR normativo da hierarquia oficial de distribuicao | Canónico | substitui ADR-0002 como referencia operacional | manter vivo | F1+ |
+| `docs/03-adr/ADR-0004-cadeia-de-confianca-dos-artefatos.md` | confianca de artefactos | ADR normativo da autenticidade e integridade de artefactos | Canónico | novo | manter vivo | F1+ |
+| `docs/03-adr/ADR-0005-pipeline-seguro-de-blacklists.md` | blacklists seguras | ADR normativo do pipeline seguro de blacklists | Canónico | novo | manter vivo | F1+ |
+| `docs/03-adr/ADR-0006-fallback-e-degradacao-segura.md` | fallback seguro | ADR normativo da degradacao segura | Canónico | novo | manter vivo | F1+ |
 | `docs/04-package/README.md` | package docs | indice local da area | Suplementar | complementar ao roadmap e `MANUAL-INSTALL.md` | manter leve | F4/F5 |
 | `docs/04-package/checklist-validacao-lab.md` | validacao rapida | checklist operacional de lab | Suplementar | complementar a `validacao-lab.md` | rever quando a F5 fechar a malha de testes | F5 |
 | `docs/04-package/deploy-github-lab.md` | deploy lab antigo | fluxo historico de distribuicao | Historico | parcialmente substituido por docs de release e install | preservar; harmonizar mais tarde | F7 |

@@ -92,7 +92,7 @@ Usar apenas quando o bloco envolver artefacto, publicacao ou distribuicao.
 - [ ] release notes revistas
 - [ ] `MANUAL-INSTALL.md` sincronizado com a versao real
 - [ ] artefacto correcto identificado como `.pkg`
-- [ ] checksum/validacao do artefacto preparados
+- [ ] manifesto, checksum e assinatura do artefacto preparados
 - [ ] disponibilidade do download verificada
 - [ ] rollback de release documentado
 
@@ -119,7 +119,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | Fase | Gate minimo |
 |------|-------------|
 | F0 | um novo agente entende o projecto lendo poucos documentos canónicos |
-| F1 | cadeia de confianca deixa de depender de conhecimento implícito |
+| F1 | cadeia de confianca de distribuicao, blacklists e fallback deixa de depender de conhecimento implícito |
 | F2 | license server opera com segredos, backup e fronteiras sob controlo |
 | F3 | activacao, revogacao e offline ficam previsiveis |
 | F4 | package, daemon e blacklists operam com runtime mais confiavel |
@@ -134,7 +134,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | Fase | Docs minimas |
 |------|--------------|
 | F0 | `CORTEX`, `AGENTS`, indice docs, roadmap, backlog, checklist, classificacao, equivalencia, ADR index |
-| F1 | `CORTEX`, backlog, ADRs de confianca/distribuicao, runbooks afectados |
+| F1 | `CORTEX`, `docs/01-architecture/f1-arquitetura-de-confianca.md`, backlog, `docs/02-roadmap/f1-plano-de-implementacao.md`, ADR-0003 a ADR-0006 |
 | F2 | `CORTEX`, backlog, docs de licencas, runbooks do servidor, ADRs afectados |
 | F3 | `CORTEX`, backlog, docs de licencas, matriz de testes, ADRs afectados |
 | F4 | `CORTEX`, backlog, `MANUAL-INSTALL`, docs de blacklists, runbooks, changelog |

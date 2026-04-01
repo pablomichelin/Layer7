@@ -13,6 +13,9 @@ Quando houver conflito, seguir esta ordem:
 5. [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md)
 6. [`00-overview/document-classification.md`](00-overview/document-classification.md)
 7. [`00-overview/document-equivalence-map.md`](00-overview/document-equivalence-map.md)
+8. [`03-adr/README.md`](03-adr/README.md)
+9. [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md)
+10. [`02-roadmap/f1-plano-de-implementacao.md`](02-roadmap/f1-plano-de-implementacao.md)
 8. documentacao canónica por area
 
 ---
@@ -39,8 +42,8 @@ Quando houver conflito, seguir esta ordem:
 | Area | Documento(s) de entrada | Estado |
 |------|--------------------------|--------|
 | Visao de produto | [`00-overview/product-charter.md`](00-overview/product-charter.md) | canónico |
-| Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`core/README.md`](core/README.md) | canónico |
-| Roadmap e execucao | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md), [`02-roadmap/backlog.md`](02-roadmap/backlog.md), [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md) | canónico |
+| Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md), [`core/README.md`](core/README.md) | canónico |
+| Roadmap e execucao | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md), [`02-roadmap/backlog.md`](02-roadmap/backlog.md), [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md), [`02-roadmap/f1-plano-de-implementacao.md`](02-roadmap/f1-plano-de-implementacao.md) | canónico |
 | ADRs | [`03-adr/README.md`](03-adr/README.md) | canónico |
 | Package e validacao | [`04-package/README.md`](04-package/README.md), [`04-package/validacao-lab.md`](04-package/validacao-lab.md) | suplementar/operacional |
 | Daemon e enforcement | [`05-daemon/README.md`](05-daemon/README.md), [`05-daemon/pf-enforcement.md`](05-daemon/pf-enforcement.md) | suplementar com partes historicas |
@@ -102,6 +105,8 @@ Quando houver conflito, seguir esta ordem:
 2. Em caso de conflito, consulte a classificacao e o mapa de equivalencia.
 3. Ao abrir uma nova fase, actualize primeiro `CORTEX`, roadmap, backlog e
    checklist mestre.
-4. Ao alterar comportamento tecnico, actualize tambem as docs da area,
+4. Ao tocar em distribuicao, builder, blacklists ou fallback, leia antes a
+   arquitectura consolidada da F1 e os ADRs 0003 a 0006.
+5. Ao alterar comportamento tecnico, actualize tambem as docs da area,
    changelog e manuais operacionais afectados.
-5. Evite criar ficheiros novos sem necessidade; prefira consolidar.
+6. Evite criar ficheiros novos sem necessidade; prefira consolidar.
