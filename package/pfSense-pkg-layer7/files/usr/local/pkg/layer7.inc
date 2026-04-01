@@ -105,7 +105,7 @@ function layer7_generate_rdr_rules_snippet()
 		}
 		if ($real) {
 			$real_ifaces[] = $real;
-		} elseif (preg_match('/^[a-z][a-z0-9]+$/i', $ifid)) {
+		} elseif (preg_match('/^[a-z][a-z0-9]*(\.[0-9]+)?$/i', $ifid)) {
 			$real_ifaces[] = $ifid;
 		}
 	}

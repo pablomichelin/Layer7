@@ -2,6 +2,19 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.7] — 2026-04-01
+
+### Fixed — Regras rdr (force_dns) nunca geradas em interfaces VLAN
+
+#### Bug Crítico — Regex não aceitava interfaces VLAN com ponto (ex: `em1.46`)
+
+- **Root cause**: `layer7_generate_rdr_rules_snippet()` em `layer7.inc` tentava obter o device real via `get_real_interface($ifid)`. Quando o layer7 é configurado com uma interface VLAN cujo ID já é o device name (ex: `"em1.46"`), o pfSense retorna `NULL` porque `em1.46` não é um friendly name (é o device). O fallback regex `/^[a-z][a-z0-9]+$/i` **não aceita pontos** → interface ignorada → `$real_ifaces` vazio → função retorna `""` → **zero regras `rdr` geradas**, mesmo com `force_dns: true` na blacklist
+- **Correcção**: regex actualizado para `/^[a-z][a-z0-9]*(\.[0-9]+)?$/i`
+  - Aceita: `lan`, `wan`, `em0`, `em1`, `em1.46`, `igb0.100`, `vtnet0`, `vtnet0.200`, `lagg0.10`
+  - Rejeita: strings inválidas como `../../etc`, `; rm -rf`, etc. (segurança mantida)
+- **Ficheiro**: `package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc`, linha 108
+- **PORTVERSION** bumped para 1.7.7
+
 ## [1.7.6] — 2026-03-31
 
 ### Fixed — Monitor ao vivo acumulativo (comportamento tipo Squid)

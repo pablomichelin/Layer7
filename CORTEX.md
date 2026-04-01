@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.7.6 — Monitor ao vivo acumulativo (eventos filtrados não desaparecem)**
+**Versão: 1.7.7 — Correcção crítica: rdr rules force_dns agora funcionam em interfaces VLAN**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,10 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.7.7 — Correcção crítica: rdr rules force_dns em interfaces VLAN (2026-04-01):**
+  - BUG CRÍTICO: regex `/^[a-z][a-z0-9]+$/i` em `layer7.inc` não aceitava interfaces VLAN com ponto (ex: `em1.46`, `igb0.100`); `get_real_interface("em1.46")` retorna NULL (nome já é o device real), o fallback regex falhava → `$real_ifaces` ficava vazio → `layer7_generate_nat_rules()` retornava `""` → **nenhuma regra `rdr` DNS era gerada mesmo com `force_dns: true`**
+  - Correcção: regex actualizado para `/^[a-z][a-z0-9]*(\.[0-9]+)?$/i` — aceita `em1`, `em1.46`, `igb0.100`, `lan`, `vtnet0.200`, etc.
+  - PORTVERSION bumped para 1.7.7
 - **v1.7.6 — Monitor ao vivo acumulativo (2026-03-31):**
   - Monitor substituía conteúdo a cada poll; eventos filtrados desapareciam quando a IP saia do tail do log
   - Nova lógica JS: buffer acumulativo de 500 linhas, só acrescenta linhas novas, nunca apaga histórico

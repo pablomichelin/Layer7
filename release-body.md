@@ -1,70 +1,74 @@
-## Layer7 v1.7.5 — Fix: botão "Aplicar" nos Perfis Rápidos não funcionava
+## Layer7 v1.7.7 — Correcção crítica: regras `rdr` (force_dns) agora funcionam em interfaces VLAN
 
-Pacote Layer 7 para pfSense CE com classificacao em tempo real via nDPI.
+### O que foi corrigido
 
-### O que foi corrigido (v1.7.5)
+**Bug crítico — `force_dns` não gerava regras `rdr` em interfaces VLAN**
 
-**Bug: botão "Aplicar" nos Perfis Rápidos não abria o modal nem criava a política**
+O campo `force_dns: true` na configuração de blacklists (que redireciona DNS externo para o Unbound local via `rdr`) **nunca gerava regras PF** quando a interface de captura usava um nome de device VLAN com ponto — como `em1.46`, `igb0.100`, `vtnet0.200`.
 
-**Causa raiz:**
-`json_encode($prof_id)` e `json_encode($prof_name)` produzem strings JSON com aspas duplas literais — por exemplo, `"youtube"`. Estas strings eram inseridas directamente no atributo `onclick="..."` sem escaping HTML:
+**Causa raiz:** A função `layer7_generate_rdr_rules_snippet()` em `layer7.inc` usava o regex `/^[a-z][a-z0-9]+$/i` como fallback quando `get_real_interface()` retornava NULL. Interfaces VLAN do tipo `em1.46` contêm um ponto — o regex rejeitava-as. Resultado: `$real_ifaces` ficava vazio, a função retornava string vazia, e **zero regras `rdr` eram injectadas no PF**, mesmo com `force_dns: true` activo.
 
-```html
-<!-- HTML gerado (errado): -->
-<button onclick="l7showProfileModal("youtube", "YouTube");">Aplicar</button>
+**Correcção:** Regex actualizado para `/^[a-z][a-z0-9]*(\.[0-9]+)?$/i` — aceita `em1.46`, `igb0.100`, `vtnet0.200`, `lagg0.10`, além de `lan`, `wan`, `em0`, `vtnet0`, etc.
+
+---
+
+### Como verificar após actualização
+
+```sh
+# 1. Ver versão instalada
+layer7d -V
+# Deve mostrar: 1.7.7
+
+# 2. Verificar se regras rdr foram geradas (requer force_dns: true na blacklist)
+pfctl -s nat | grep force_dns
+# Deve mostrar: rdr pass on em1.46 inet proto udp from 10.x.y.0/z to !127.0.0.1 port 53 -> 127.0.0.1 ...
+
+# 3. Testar que DNS externo é redirecionado para o Unbound
+# (num cliente no CIDR coberto pela blacklist)
+nslookup xvideos.com 8.8.8.8
+# Deve retornar resultado do Unbound local (sem resolver o domínio no 8.8.8.8)
 ```
 
-O browser HTML5 termina o valor do atributo na primeira `"` não escapada, truncando o handler para `l7showProfileModal(` (JavaScript inválido → SyntaxError silencioso). Clicar no botão não fazia absolutamente nada.
+---
 
-**Correcção:**
-`htmlspecialchars(json_encode(...), ENT_QUOTES)` converte `"` em `&quot;` no HTML. O browser converte `&quot;` de volta para `"` antes de executar o JavaScript:
+### Quem é afectado
 
-```html
-<!-- HTML gerado (correcto): -->
-<button onclick="l7showProfileModal(&quot;youtube&quot;, &quot;YouTube&quot;);">Aplicar</button>
-<!-- JS executado: l7showProfileModal("youtube", "YouTube") ✓ -->
-```
+Todos os clientes com:
+- Interface de captura VLAN (nome com ponto: `em1.46`, `igb0.100`, etc.)
+- Blacklist configurada com `force_dns: true`
+
+Se usas `force_dns: true` mas as regras `rdr` não aparecem em `pfctl -s nat | grep force_dns`, esta actualização resolve o problema.
 
 ---
 
 ### Instalação / Actualização
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+# Actualizar
+fetch -o /tmp/pfSense-pkg-layer7-1.7.7.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.7.7/pfSense-pkg-layer7-1.7.7.pkg \
+  && IGNORE_OSVERSION=yes pkg upgrade -y -f /tmp/pfSense-pkg-layer7-1.7.7.pkg \
+  && service layer7d restart \
+  && layer7d -V
 ```
 
-Ou directamente:
-
-```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.7.5.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.7.5/pfSense-pkg-layer7-1.7.5.pkg
-pkg add /tmp/pfSense-pkg-layer7-1.7.5.pkg
-```
-
----
-
-### Verificação pós-instalação
-
-```sh
-layer7d -V   # deve mostrar 1.7.5
-```
-
-Aceder a **Services → Layer7 → Políticas → Perfis Rápidos** e clicar "Aplicar" num perfil — o modal deve abrir correctamente.
+Após actualizar, aplicar as regras PF em **Layer7 → Configurações → Guardar** para forçar regeneração das regras `rdr`.
 
 ---
 
 ### Rollback
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.7.4.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.7.4/pfSense-pkg-layer7-1.7.4.pkg
-pkg delete pfSense-pkg-layer7 && pkg add /tmp/pfSense-pkg-layer7-1.7.4.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.7.6.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.7.6/pfSense-pkg-layer7-1.7.6.pkg \
+  && IGNORE_OSVERSION=yes pkg upgrade -y -f /tmp/pfSense-pkg-layer7-1.7.6.pkg \
+  && service layer7d restart
 ```
 
 ---
 
 ### Compatibilidade
 
-- pfSense CE 2.7.x e 2.8.x
+- pfSense CE 2.7.x / 2.8.x
 - FreeBSD 14.x / 15.x
-- Retrocompatível com configurações existentes
+- Retrocompatível: instalações sem `force_dns` ou com interfaces não-VLAN não são afectadas
