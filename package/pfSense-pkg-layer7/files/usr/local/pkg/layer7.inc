@@ -134,12 +134,12 @@ function layer7_generate_rdr_rules_snippet()
 					continue;
 				}
 				$has_rules = true;
-				$lines[] = "rdr pass on {$iface} inet proto udp" .
-				    " from {$cidr} to !127.0.0.1 port 53" .
-				    " -> 127.0.0.1 label \"layer7:force_dns\"";
-				$lines[] = "rdr pass on {$iface} inet proto tcp" .
-				    " from {$cidr} to !127.0.0.1 port 53" .
-				    " -> 127.0.0.1 label \"layer7:force_dns\"";
+			$lines[] = "rdr on {$iface} inet proto udp" .
+			    " from {$cidr} to !127.0.0.1 port 53" .
+			    " -> 127.0.0.1 label \"layer7:force_dns\"";
+			$lines[] = "rdr on {$iface} inet proto tcp" .
+			    " from {$cidr} to !127.0.0.1 port 53" .
+			    " -> 127.0.0.1 label \"layer7:force_dns\"";
 			}
 		}
 	}

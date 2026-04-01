@@ -2,6 +2,15 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.7.9] — 2026-04-01
+
+### Fixed — Sintaxe `rdr pass` inválida em pfSense 2.8 / FreeBSD 15
+
+- **`layer7_generate_rdr_rules_snippet()`**: as regras `rdr` eram geradas com o keyword `pass` (`rdr pass on <iface> ...`), que causa "syntax error" no pfctl do FreeBSD 15 (pfSense 2.8). Apenas `rdr on <iface> ...` (sem `pass`) é válido. O pfctl normaliza o output para `rdr pass on ...` mas a sintaxe de INPUT deve ser `rdr on`
+- Correcção: removido `pass` das strings geradas em `layer7_generate_rdr_rules_snippet()`
+- Resultado: ambas as regras (UDP port 53 e TCP port 53) carregam correctamente no anchor `natrules/layer7_nat`
+- **PORTVERSION** bumped para 1.7.9
+
 ## [1.7.8] — 2026-04-01
 
 ### Fixed — Regras `rdr` (force_dns) agora injectadas via pfctl directo

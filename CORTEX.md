@@ -4,7 +4,7 @@
 Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
 
 ## Status atual
-**Versão: 1.7.8 — Correcção: rdr DNS forçado agora injectado via pfctl directo (pfSense CE não processa nat_rules_needed)**
+**Versão: 1.7.9 — Fix sintaxe rdr: `rdr pass` → `rdr` (pfSense 2.8/FreeBSD 15 rejeita `pass` em regras rdr)**
 
 Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
 
@@ -74,6 +74,10 @@ O modelo anterior (quarentena por origem) permanece disponivel via
 **Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
 
 ## Ultima entrega
+- **v1.7.9 — Fix sintaxe rdr: `rdr pass` inválido em pfSense 2.8 (2026-04-01):**
+  - `rdr pass on <iface> ...` causa "syntax error" no pfctl do FreeBSD 15 / pfSense 2.8 — apenas `rdr on <iface> ...` é válido
+  - `layer7_generate_rdr_rules_snippet()`: removido `pass` das regras geradas → ambas as regras (UDP + TCP) carregam correctamente
+  - PORTVERSION bumped para 1.7.9
 - **v1.7.8 — Fix rdr DNS forçado via pfctl directo (2026-04-01):**
   - pfSense CE não processa `nat_rules_needed` do XML do package — o tag `<nat_rules_needed>` nunca foi chamado; as regras `rdr` para `force_dns` nunca chegaram ao PF NAT
   - Além disso, o tag XML estava errado: `<custom_php_resync_command>` não existe no pfSense CE — o correcto é `<custom_php_resync_config_command>` com valor PHP eval-safe (ex: `layer7_resync();`)
