@@ -16,7 +16,7 @@ com hardening tecnico ou com release engineering.
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
 | F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
-| F2 | Hardening do license server | planejamento detalhado concluido; execucao pendente | stack de licencas opera com segredos, backup e fronteiras sob controlo |
+| F2 | Hardening do license server | execucao iniciada; F2.1 concluida | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
@@ -172,6 +172,10 @@ Tornar auditavel a cadeia de confianca entre:
   consolidada do license server, ADRs 0007 a 0010 e plano
   `f2-plano-de-implementacao.md` passam a definir a ordem segura de hardening,
   sem implementacao tecnica ainda.
+- **F2.1 concluida em `2026-04-01`:** `443/TLS` passa a ser o unico canal
+  publico oficial do license server; `8445` passa a operar como origin
+  privado com bind local por defeito, headers basicos publicados pelo nginx
+  interno e runbook explicito para edge proxy, certificado e validacao.
 
 ### Documentacao obrigatoria da fase
 

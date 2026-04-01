@@ -47,7 +47,7 @@ Quando houver conflito, seguir esta ordem:
 | ADRs | [`03-adr/README.md`](03-adr/README.md) | canónico |
 | Package e validacao | [`04-package/README.md`](04-package/README.md), [`04-package/validacao-lab.md`](04-package/validacao-lab.md) | suplementar/operacional |
 | Daemon e enforcement | [`05-daemon/README.md`](05-daemon/README.md), [`05-daemon/pf-enforcement.md`](05-daemon/pf-enforcement.md) | suplementar com partes historicas |
-| Runbooks | [`05-runbooks/README.md`](05-runbooks/README.md) | suplementar |
+| Runbooks | [`05-runbooks/README.md`](05-runbooks/README.md), [`05-runbooks/license-server-publicacao-segura.md`](05-runbooks/license-server-publicacao-segura.md) | misto: indice suplementar + runbook canónico da publicacao segura do license server |
 | Releases | [`06-releases/README.md`](06-releases/README.md), [`06-releases/RELEASE-SIGNING.md`](06-releases/RELEASE-SIGNING.md) | canónico para governanca de release |
 | Lab | [`08-lab/README.md`](08-lab/README.md) | suplementar |
 | Bloqueio | [`09-blocking/README.md`](09-blocking/README.md) | historico/preservado |

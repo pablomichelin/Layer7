@@ -10,4 +10,7 @@ Seguranca da WebGUI do pfSense durante testes do pacote: [`pfsense-webgui-safety
 
 Rollback do pacote Layer7: [`rollback.md`](rollback.md).
 
+Publicacao segura do license server (TLS, edge proxy, origin privado `8445`):
+[`license-server-publicacao-segura.md`](license-server-publicacao-segura.md).
+
 Runbooks especificos por release entram aqui quando existirem.

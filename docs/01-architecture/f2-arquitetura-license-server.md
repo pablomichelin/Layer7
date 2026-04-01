@@ -2,9 +2,10 @@
 
 ## Finalidade
 
-Este documento consolida o desenho completo da F2 sem implementar mudanças
-técnicas. Ele traduz o estado real observado em `license-server/` para uma
-arquitetura de hardening simples, auditável e operacionalmente viável.
+Este documento consolidou o desenho completo da F2 e passa a registar o
+checkpoint materializado da F2.1. Ele traduz o estado real observado em
+`license-server/` para uma arquitetura de hardening simples, auditável e
+operacionalmente viável.
 
 Documentos normativos desta arquitetura:
 
@@ -15,7 +16,7 @@ Documentos normativos desta arquitetura:
 
 ---
 
-## 1. Estado real actual observado
+## 1. Estado real de partida observado no planeamento
 
 ### Publicação
 
@@ -50,6 +51,25 @@ Documentos normativos desta arquitetura:
   `ED25519_PRIVATE_KEY`
 - `seed.js` bootstrapa admin por variáveis de ambiente
 - não existe política documental fechada para rotação, ownership e incidentes
+
+## 1.1 Estado materializado apos a F2.1
+
+### Publicação
+
+- `license-server/docker-compose.yml` passa a prender `8445` ao loopback por
+  defeito via `LICENSE_SERVER_ORIGIN_BIND_IP=127.0.0.1`
+- `license-server/nginx/nginx.conf` passa a rejeitar hosts inesperados,
+  preservar `license.systemup.inf.br`/`localhost`, normalizar headers
+  `X-Forwarded-*` e publicar headers basicos de seguranca
+- a operacao oficial passa a tratar `443/TLS` como unico canal publico e
+  `8445` apenas como origin privado/troubleshooting controlado
+
+### Operação
+
+- `docs/10-license-server/MANUAL-USO-LICENCAS.md` passa a usar
+  `https://license.systemup.inf.br` como caminho normativo
+- `docs/05-runbooks/license-server-publicacao-segura.md` passa a concentrar
+  certificado, edge proxy, ACL do origin e validacoes minimas da F2.1
 
 ---
 

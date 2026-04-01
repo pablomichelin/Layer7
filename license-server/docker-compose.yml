@@ -45,7 +45,8 @@ services:
       - api
       - web
     ports:
-      - "8445:80"
+      # F2.1: o origin 8445 passa a ser privado por defeito.
+      - "${LICENSE_SERVER_ORIGIN_BIND_IP:-127.0.0.1}:${LICENSE_SERVER_ORIGIN_PORT:-8445}:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:

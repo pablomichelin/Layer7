@@ -79,6 +79,7 @@ vence o canónico.
 | `docs/05-daemon/README.md` | daemon overview | resumo tecnico desactualizado em partes | Historico | complementar a `docs/core/` e changelog | rever na F4 ou F6 | F4/F6 |
 | `docs/05-daemon/pf-enforcement.md` | enforcement PF | explicacao detalhada do enforcement | Suplementar | complementar ao changelog e docs core | manter/rever quando F4 mexer em enforcement | F4 |
 | `docs/05-runbooks/README.md` | indice de runbooks | agregador operacional local | Suplementar | complementar ao `MANUAL-INSTALL.md` | manter leve | F4/F7 |
+| `docs/05-runbooks/license-server-publicacao-segura.md` | publicacao segura do license server | runbook operativo da F2.1 para edge proxy, TLS, origin privado e validacoes de exposicao | Canónico | complementar ao ADR-0007 e ao `MANUAL-USO-LICENCAS.md` | manter vivo enquanto a F2/F7 exigirem governanca da borda | F2/F7 |
 | `docs/05-runbooks/pfsense-webgui-safety.md` | seguranca de lab | runbook especifico de lab | Suplementar | — | manter | F4/F5 |
 | `docs/05-runbooks/rollback.md` | rollback | rollback do pacote Layer7 | Canónico | complementar ao `MANUAL-INSTALL.md` | manter vivo | F4/F7 |
 | `docs/06-releases/README.md` | governanca de release | indice canónico de release docs | Canónico | substitui indicacoes antigas dispersas | manter vivo | F7 |

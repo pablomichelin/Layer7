@@ -4,6 +4,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F2.1 publicacao segura do license server
+
+- **Canal publico oficial** — `https://license.systemup.inf.br` em `443/TCP`
+  passa a ser o unico caminho normativo para painel administrativo e
+  activacao online; o origin `8445` deixa de ser tratado como endpoint
+  publico
+- **Origin privado por defeito** — `docker-compose.yml` passa a prender
+  `8445` ao loopback do host por defeito, mantendo override apenas para rede
+  privada controlada com ACL/firewall explicitos
+- **Borda e documentacao operacional** — `nginx.conf` interno passa a
+  rejeitar hosts inesperados e a publicar headers basicos de seguranca, e o
+  runbook/manual de licencas passam a exigir edge proxy com certificado
+  valido, redirect `HTTP -> HTTPS` e troubleshooting controlado do origin
+
 ### Changed — F1.1 contrato oficial de distribuicao
 
 - **Canal oficial de instalacao** — `install.sh` e `uninstall.sh` passam a ser

@@ -3,6 +3,12 @@
 > Documento operacional para gerar, gerir, instalar e manter licencas
 > do produto Layer7 para pfSense CE.
 
+> Estado oficial apos a F2.1: o unico canal publico permitido para painel
+> administrativo e activacao online passa a ser
+> `https://license.systemup.inf.br`. O origin `8445/TCP` passa a ser privado
+> para o reverse proxy e troubleshooting controlado; acesso humano directo por
+> HTTP ao IP do host deixa de ser caminho normativo.
+
 ---
 
 ## Indice
@@ -30,10 +36,11 @@ O sistema de licencas Layer7 funciona com dois componentes:
 ```
 ┌──────────────────────────┐        ┌──────────────────────────────┐
 │   SERVIDOR DE LICENCAS   │        │       pfSense CE             │
-│   192.168.100.244:8445   │        │       (cliente)              │
-│   license.systemup.inf.br│        │                              │
+│ https://license.systemup │        │       (cliente)              │
+│ .inf.br (publico, 443)   │        │                              │
+│ origin privado :8445     │        │                              │
 │                          │        │   layer7d (daemon)           │
-│   - Painel web (React)   │  HTTP  │   - Pede activacao           │
+│   - Painel web (React)   │ HTTPS  │   - Pede activacao           │
 │   - API (Node.js)        │◄──────►│   - Recebe .lic assinado     │
 │   - PostgreSQL           │        │   - Verifica Ed25519         │
 │   - Ed25519 signing      │        │   - Enforce se valida        │
@@ -58,16 +65,17 @@ O sistema de licencas Layer7 funciona com dois componentes:
 
 ### 2.1 Aceder ao painel
 
-- **URL interna (LAN):** `http://192.168.100.244:8445`
-- **URL externa (quando ISPConfig configurado):** `https://license.systemup.inf.br`
+- **URL oficial do painel:** `https://license.systemup.inf.br`
+- **Origin privado (`8445`)**: apenas reverse proxy de borda e troubleshooting
+  controlado no host; nao e URL normativa para operadores humanos
 
 ### 2.2 Login
 
 - **Email:** `pablo@systemup.inf.br`
 - **Password:** `P@blo.147`
 
-Ao fazer login, o sistema gera um token JWT valido por 24 horas.
-Apos 24h, sera necessario fazer login novamente.
+No estado actual do software (ainda antes da F2.2), o login gera um token JWT
+valido por 24 horas. Apos 24h, sera necessario fazer login novamente.
 
 ### 2.3 Paginas do painel
 
@@ -98,13 +106,13 @@ Antes de gerar uma licenca, e necessario criar o cliente.
 
 ```bash
 # Obter token
-TOKEN=$(curl -s http://192.168.100.244:8445/api/auth/login \
+TOKEN=$(curl -s https://license.systemup.inf.br/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}' \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
 
 # Criar cliente
-curl -s http://192.168.100.244:8445/api/customers \
+curl -s https://license.systemup.inf.br/api/customers \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"name":"Empresa ABC Ltda","email":"ti@empresaabc.com","phone":"11999998888"}'
@@ -130,7 +138,7 @@ curl -s http://192.168.100.244:8445/api/customers \
 ### Via API (curl)
 
 ```bash
-curl -s http://192.168.100.244:8445/api/licenses \
+curl -s https://license.systemup.inf.br/api/licenses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"customer_id":1,"expiry":"2027-12-31","features":"full","notes":"Firewall principal"}'
@@ -160,10 +168,7 @@ Resposta:
 No pfSense, via SSH ou console:
 
 ```bash
-# Activacao usando URL interna (LAN)
-layer7d --activate a1b2c3d4e5f6789012345678abcdef01 http://192.168.100.244:8445/api/activate
-
-# Activacao usando URL publica (quando ISPConfig configurado)
+# Activacao usando URL publica oficial
 layer7d --activate a1b2c3d4e5f6789012345678abcdef01 https://license.systemup.inf.br/api/activate
 
 # Activacao usando URL default (embutida no binario)
@@ -173,7 +178,7 @@ layer7d --activate a1b2c3d4e5f6789012345678abcdef01
 **Saida esperada (sucesso):**
 ```
 layer7d: activating...
-  server:       http://192.168.100.244:8445/api/activate
+  server:       https://license.systemup.inf.br/api/activate
   hardware_id:  7209217784b0ca2c9584fa39437e2b001757b5c8a2c2af8835ff0e25ae620966
   key:          a1b2c3d4...
 layer7d: license saved to /usr/local/etc/layer7.lic
@@ -259,7 +264,7 @@ grep -i license /var/log/layer7d.log
 
 ```bash
 # Revogar licenca ID 3
-curl -s -X POST http://192.168.100.244:8445/api/licenses/3/revoke \
+curl -s -X POST https://license.systemup.inf.br/api/licenses/3/revoke \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -295,7 +300,7 @@ Para renovar (estender a data de expiracao):
 
 ```bash
 # Estender expiracao da licenca ID 3 para 2028-12-31
-curl -s -X PUT http://192.168.100.244:8445/api/licenses/3 \
+curl -s -X PUT https://license.systemup.inf.br/api/licenses/3 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"expiry":"2028-12-31"}'
@@ -307,7 +312,7 @@ O cliente precisa **re-activar** no pfSense para obter o novo `.lic`:
 
 ```bash
 # No pfSense
-layer7d --activate a1b2c3d4e5f6789012345678abcdef01 http://192.168.100.244:8445/api/activate
+layer7d --activate a1b2c3d4e5f6789012345678abcdef01 https://license.systemup.inf.br/api/activate
 ```
 
 O novo `.lic` tera a data de expiracao actualizada.
@@ -331,7 +336,7 @@ Prerequisito: a licenca deve ter sido activada pelo menos uma vez
 
 **Via API:**
 ```bash
-curl -s http://192.168.100.244:8445/api/licenses/3/download \
+curl -s https://license.systemup.inf.br/api/licenses/3/download \
   -H "Authorization: Bearer $TOKEN" \
   -o layer7.lic
 ```
@@ -366,13 +371,13 @@ Se o pfSense nao consegue contactar o servidor, faca assim:
    ```bash
    # Via API: editar a licenca (nao ha campo directo,
    # mas a activacao via curl simula o daemon)
-   curl -s http://192.168.100.244:8445/api/activate \
+   curl -s https://license.systemup.inf.br/api/activate \
      -H "Content-Type: application/json" \
      -d '{"key":"a1b2c3d4e5f6789012345678abcdef01","hardware_id":"7209217784b0ca2c..."}'
    ```
    Isso retorna o `.lic` assinado. Salve-o:
    ```bash
-   curl -s http://192.168.100.244:8445/api/activate \
+   curl -s https://license.systemup.inf.br/api/activate \
      -H "Content-Type: application/json" \
      -d '{"key":"a1b2c3d4...","hardware_id":"7209..."}' \
      -o layer7.lic
@@ -417,11 +422,11 @@ O daemon verifica a licenca:
 | `POST` | `/api/activate` | Activacao de licenca (chamado pelo daemon) |
 | `GET` | `/api/health` | Health check do servidor |
 
-### Endpoints autenticados (Bearer JWT)
+### Endpoints autenticados (estado actual do software: Bearer JWT)
 
 | Metodo | Rota | Descricao |
 |--------|------|-----------|
-| `POST` | `/api/auth/login` | Login → JWT (24h) |
+| `POST` | `/api/auth/login` | Login → JWT (24h, transitorio ate a F2.2) |
 | `GET` | `/api/dashboard` | Metricas e ultimas activacoes |
 | `GET` | `/api/licenses?status=&page=&limit=` | Listar licencas |
 | `POST` | `/api/licenses` | Criar licenca |
@@ -475,8 +480,10 @@ O ficheiro `.lic` foi corrompido ou gerado com chave diferente.
 ### "could not reach license server"
 
 O pfSense nao consegue contactar o servidor.
-- Verificar conectividade: `curl http://192.168.100.244:8445/api/health`
+- Verificar conectividade publica: `curl -fsS https://license.systemup.inf.br/api/health`
 - Verificar firewall/rotas entre pfSense e o servidor
+- Para troubleshooting no host do servidor, validar o origin privado:
+  `curl -s -H 'Host: license.systemup.inf.br' http://127.0.0.1:8445/api/health`
 - Alternativa: instalar `.lic` manualmente (seccao 9)
 
 ### Daemon em monitor-only mesmo com licenca
@@ -508,6 +515,13 @@ grep license /var/log/layer7d.log  # qual o erro?
 - O daemon verifica **offline** — nao precisa de conexao permanente
 - A activacao requer **conexao unica** ao servidor
 
+### Publicacao segura
+
+- o unico canal publico oficial e `https://license.systemup.inf.br`
+- `8445/TCP` e origin privado do reverse proxy, nao URL publica normativa
+- certificados, redirect `HTTP -> HTTPS` e ACL do origin sao dependencias
+  operacionais obrigatorias da F2.1
+
 ### Backup das chaves
 
 **CRITICO:** Fazer backup seguro de:
@@ -527,20 +541,20 @@ recompilar o binario.
 
 ```bash
 # 1. Login no servidor
-TOKEN=$(curl -s http://192.168.100.244:8445/api/auth/login \
+TOKEN=$(curl -s https://license.systemup.inf.br/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}' \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
 
 # 2. Criar cliente
-curl -s http://192.168.100.244:8445/api/customers \
+curl -s https://license.systemup.inf.br/api/customers \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"name":"Escola Municipal XYZ","email":"ti@escolaxyz.com.br","phone":"21988887777"}'
 # Resposta: {"id":2, ...}
 
 # 3. Criar licenca (1 ano)
-curl -s http://192.168.100.244:8445/api/licenses \
+curl -s https://license.systemup.inf.br/api/licenses \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"customer_id":2,"expiry":"2027-03-24","features":"full","notes":"Contrato anual"}'
@@ -549,7 +563,7 @@ curl -s http://192.168.100.244:8445/api/licenses \
 # 4. Enviar a chave ao cliente: abcdef1234567890abcdef1234567890
 
 # 5. No pfSense do cliente (via SSH):
-layer7d --activate abcdef1234567890abcdef1234567890 http://192.168.100.244:8445/api/activate
+layer7d --activate abcdef1234567890abcdef1234567890 https://license.systemup.inf.br/api/activate
 # Saida: license valid — customer=Escola Municipal XYZ expiry=2027-03-24 features=full
 
 # 6. Verificar no dashboard do servidor — a activacao aparece na lista

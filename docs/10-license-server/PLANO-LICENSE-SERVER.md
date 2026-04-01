@@ -4,6 +4,12 @@
 > necessario para implementar o servidor de licencas. Nao e necessario
 > contexto anterior. Leia este documento do inicio ao fim antes de comecar.
 
+> Checkpoint apos a F2.1: a publicacao segura do license server ja foi
+> materializada. O unico canal publico oficial passa a ser
+> `https://license.systemup.inf.br` em `443/TCP`; `8445/TCP` permanece como
+> origin privado do edge proxy, com bind local por defeito e sem exposicao
+> publica directa.
+
 ---
 
 ## 1. O que e o projecto Layer7
@@ -81,15 +87,19 @@ isolado). NAO usar nem conectar-se a nenhuma rede Docker existente.
 ## 4. Dominio e acesso externo
 
 - **Dominio**: `license.systemup.inf.br`
-- Um **ISPConfig de borda** fara proxy reverso HTTPS (porta 443) para
-  `192.168.100.244:8445`
-- O TLS/HTTPS e terminado no ISPConfig; a comunicacao interna e HTTP
-- O Docker Compose expoe apenas a porta **8445** no host
+- O **unico canal publico oficial** e `443/TCP` com HTTPS/TLS valido
+- `80/TCP` publico e aceite apenas para redirecionar para `443/TCP`
+- Um **ISPConfig de borda** (ou equivalente) fara proxy reverso para o
+  origin privado `127.0.0.1:8445` por defeito
+- O TLS/HTTPS e terminado na borda; a comunicacao interna pode permanecer
+  HTTP apenas no hop privado edge -> origin
+- O Docker Compose publica apenas a porta **8445** no host, presa ao
+  loopback por defeito
 
 **Fluxo:**
 ```
 Browser/pfSense --> license.systemup.inf.br:443 (HTTPS, ISPConfig)
-    --> proxy_pass --> 192.168.100.244:8445 (HTTP, Nginx no Docker)
+    --> proxy_pass --> 127.0.0.1:8445 (HTTP privado, Nginx no Docker)
         --> /api/* --> Node.js API
         --> /* --> React SPA (build estatico)
 ```
@@ -140,7 +150,7 @@ O login no frontend usa email + password.
 | layer7-license-db   | postgres:17    | NENHUMA    | 5432          |
 | layer7-license-api  | node:22-slim   | NENHUMA    | 3001          |
 | layer7-license-web  | node+nginx     | NENHUMA    | 80            |
-| layer7-license-nginx| nginx:alpine   | **8445**   | 80            |
+| layer7-license-nginx| nginx:alpine   | **8445** (origin privado) | 80 |
 
 - Nome do projecto Docker Compose: `layer7-license`
 - Rede: `layer7-license-net` (bridge isolado)
@@ -452,6 +462,10 @@ ED25519_PRIVATE_KEY=<conteudo_de_layer7-private.key>
 # Node
 NODE_ENV=production
 PORT=3001
+
+# Publicacao segura F2.1
+LICENSE_SERVER_ORIGIN_BIND_IP=127.0.0.1
+LICENSE_SERVER_ORIGIN_PORT=8445
 ```
 
 ---
@@ -509,7 +523,7 @@ services:
       - api
       - web
     ports:
-      - "8445:80"
+      - "${LICENSE_SERVER_ORIGIN_BIND_IP:-127.0.0.1}:${LICENSE_SERVER_ORIGIN_PORT:-8445}:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
@@ -533,6 +547,12 @@ events {
 }
 
 http {
+    map $http_x_forwarded_proto $layer7_forwarded_proto {
+        default $scheme;
+        "~*^https$" https;
+        "~*^http$" http;
+    }
+
     upstream api {
         server api:3001;
     }
@@ -541,8 +561,33 @@ http {
     }
 
     server {
-        listen 80;
+        listen 80 default_server;
         server_name _;
+
+        return 444;
+    }
+
+    server {
+        listen 80;
+        server_name license.systemup.inf.br localhost 127.0.0.1;
+        server_tokens off;
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "same-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self' data:" always;
+
+        # API de auth sem cache
+        location /api/auth/ {
+            proxy_pass http://api;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Proto $layer7_forwarded_proto;
+            add_header Cache-Control "no-store" always;
+        }
 
         # API
         location /api/ {
@@ -550,7 +595,8 @@ http {
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Proto $layer7_forwarded_proto;
         }
 
         # Frontend SPA
@@ -558,6 +604,9 @@ http {
             proxy_pass http://web;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Proto $layer7_forwarded_proto;
         }
     }
 }
@@ -605,7 +654,9 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 - Chave privada Ed25519 apenas no `.env` (nunca no codigo)
 - `.env` no `.gitignore`
 - PostgreSQL sem porta exposta ao host
-- HTTPS terminado no ISPConfig
+- `443/TLS` como unico canal publico oficial
+- `8445` apenas como origin privado do edge proxy
+- redirect `HTTP -> HTTPS` e certificado valido obrigatorios na borda
 - Nomes de containers com prefixo `layer7-license-` para evitar conflitos
 
 ---
@@ -654,9 +705,10 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 - [x] Criar `.env` com as variaveis
 - [x] Executar `docker compose -p layer7-license up -d --build`
 - [x] Executar seed: `docker exec layer7-license-api node seed.js`
-- [x] Verificar que a porta 8445 responde (health OK)
+- [x] Verificar que o origin privado `8445` responde apenas no contexto
+  controlado (health OK)
 - [x] Verificar que os servicos existentes continuam funcionando (Apache:80 OK, Grafana:3000 OK, Monitor:8088 OK)
-- [x] Validacao extra: login, criar cliente, criar licenca, simular activacao pela LAN, testar falhas (404/403)
+- [x] Validacao extra: login, criar cliente, criar licenca, simular activacao pelo canal oficial HTTPS, testar falhas (404/403)
 
 ### Bloco 6: Integracao ✓ (2026-03-23)
 - [x] Actualizar URL no `license.c` (para `https://license.systemup.inf.br/api/activate`)
@@ -664,7 +716,7 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 - [x] Corrigir parser JSON no `license.c` (suporte a aspas escapadas `\"`)
 - [x] Adicionar `license.c` e `-lcrypto` ao Makefile standalone
 - [x] Recompilar pacote no FreeBSD builder (192.168.100.12) — `pfSense-pkg-layer7-1.0.1.pkg` (791KB)
-- [x] Testar activacao end-to-end: `layer7d --activate <key> http://192.168.100.244:8445/api/activate`
+- [x] Testar activacao end-to-end: `layer7d --activate <key> https://license.systemup.inf.br/api/activate`
 - [x] Resultado: `license valid — customer=Empresa Teste Lab expiry=2027-12-31 features=full`
 
 ---
@@ -693,8 +745,14 @@ docker exec layer7-license-api node seed.js
 # Ver logs
 docker compose -p layer7-license logs -f
 
-# Verificar saude
-curl -s http://localhost:8445/api/dashboard  # deve retornar 401
+# Verificar saude do origin privado
+curl -s -H 'Host: license.systemup.inf.br' http://127.0.0.1:8445/api/health
+
+# Verificar publicacao oficial na borda
+curl -I http://license.systemup.inf.br
+curl -I https://license.systemup.inf.br
+
+# Garantir que outros servicos nao foram afectados
 curl -s http://localhost:80                   # Zabbix (deve continuar OK)
 curl -s http://localhost:3000                 # Grafana (deve continuar OK)
 ```

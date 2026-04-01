@@ -45,7 +45,10 @@ reavaliacao formal.
 - O planejamento detalhado da F2 foi concluido em `2026-04-01` com ADRs de
   publicacao segura, autenticacao/sessao, protecao da superficie
   administrativa e integridade transacional/validacao do CRUD.
-- A execucao tecnica da F2 continua pendente e deve seguir a ordem segura:
+- A F2.1 foi concluida em `2026-04-01` com `443/TLS` como canal publico
+  oficial, `8445` restrito a origin privado por defeito e documentacao
+  operacional explicita para edge proxy, certificado e troubleshooting.
+- A execucao tecnica da F2 deve continuar a seguir a ordem segura:
   publicacao/TLS -> sessao -> protecao administrativa -> CRUD/transacoes ->
   segredos/runbooks.
 
@@ -60,7 +63,7 @@ reavaliacao formal.
 | BG-003 | Criar ADR que substitua a ambiguidade historica entre `.txz` e `.pkg` como artefacto de distribuicao | Critica | distribuicao/ADR | F1 | documentos historicos continuam a confundir instalacao e release | P | Alto | Planeamento F1 concluido | ADR-0003 passa a ser a referencia normativa; ADR-0002 fica historico |
 | BG-004 | Hardening da stack do license server: segredos, fronteira HTTP/HTTPS, backup, restore e operacao administrativa | Critica | license-server | F2 | indisponibilidade ou exposicao do servidor comprometer activacao | M | Alto | Planeamento F2 concluido | arquitetura e ordem segura consolidadas; execucao pendente em subfases |
 | BG-005 | Endurecer o endpoint de activacao e os controlos de abuso, auditoria e monitorizacao minima | Alta | license-server | F2 | abuso ou comportamento opaco em incidente | M | Alto | Planeamento F2 concluido | F2 definiu rate limit, logging e separacao entre activate publico e admin |
-| BG-023 | Fechar a politica oficial de publicacao segura do license server com TLS, edge proxy e portas permitidas | Critica | license-server/publicacao | F2 | exposicao ambigua do painel e do endpoint publico | M | Alto | Planeamento F2 concluido | coberto por ADR-0007 e pela arquitetura F2 |
+| BG-023 | Fechar a politica oficial de publicacao segura do license server com TLS, edge proxy e portas permitidas | Critica | license-server/publicacao | F2 | exposicao ambigua do painel e do endpoint publico | M | Alto | Acompanhar | materializado na F2.1 com `443/TLS` oficial, origin `8445` privado por defeito, headers minimos e runbook de borda/TLS |
 | BG-024 | Substituir JWT em `localStorage` por sessao administrativa segura e fechar CORS/login/brute force | Critica | license-server/auth | F2 | roubo de sessao, abuso administrativo e superficie web permissiva | M | Alto | Planeamento F2 concluido | coberto por ADR-0008 e ADR-0009 |
 | BG-025 | Endurecer validacao, transacoes, arquivo/delete seguro e atomicidade do CRUD do license server | Alta | license-server/crud | F2 | estado parcial, perda de auditoria e conflitos silenciosos | M | Alto | Planeamento F2 concluido | coberto por ADR-0010 e pela arquitetura F2 |
 | BG-006 | Definir modelo de estados do licenciamento: activar, reactivar, renovar, revogar, expirar, grace e offline | Alta | licenciamento | F3 | suporte e troubleshooting continuarem dependentes de tentativa e erro | M | Alto | Planeado | precisa de ADR ou especificacao formal |

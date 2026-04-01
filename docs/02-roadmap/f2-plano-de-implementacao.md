@@ -2,9 +2,10 @@
 
 ## Finalidade
 
-Este documento organiza a implementação futura da F2 em blocos pequenos,
-seguros e reversíveis. Não implementa nada. Apenas define ordem, dependências,
-gates, rollback conceitual e testes mínimos.
+Este documento organiza a implementação da F2 em blocos pequenos, seguros e
+reversíveis. Ele continua a definir ordem, dependências, gates, rollback
+conceitual e testes mínimos, e passa a registar o checkpoint materializado da
+F2.1.
 
 Referências obrigatórias:
 
@@ -32,11 +33,21 @@ Referências obrigatórias:
   - bootstrap do admin
   - rotas públicas vs administrativas
 
+## 1.1 Checkpoint actual de execução
+
+- **F2.1 concluída em `2026-04-01`:** `443/TLS` passa a ser o unico canal
+  publico oficial, `8445` fica preso ao loopback por defeito, e a
+  documentacao operacional passa a explicitar edge proxy, certificado,
+  headers minimos e troubleshooting do origin privado.
+- **Próxima subfase elegível:** `F2.2 — Autenticação e sessão administrativa`
+
 ---
 
 ## 2. Ordem segura de implementação
 
 ### Subfase F2.1 - Publicação segura, TLS e fronteiras de rede
+
+**Status actual:** concluida em `2026-04-01`
 
 **Objectivo:** fechar primeiro o canal oficial de publicação.
 
