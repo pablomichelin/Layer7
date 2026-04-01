@@ -37,41 +37,41 @@ O restauro explicito da ultima snapshot valida passa a ser:
 
 ## Links da versao actual (para teste)
 
-**Versao actual:** `1.8.0`
+**Versao actual:** `1.8.2`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.0`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg.sha256`
-- **Manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/release-manifest.v1.txt`
-- **Assinatura do manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/release-manifest.v1.txt.sig`
-- **Public key:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/release-signing-public-key.pem`
-- **Install script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh`
-- **Uninstall script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.2`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/pfSense-pkg-layer7-1.8.2.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/pfSense-pkg-layer7-1.8.2.pkg.sha256`
+- **Manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/release-manifest.v1.txt`
+- **Assinatura do manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/release-manifest.v1.txt.sig`
+- **Public key:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/release-signing-public-key.pem`
+- **Install script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/install.sh`
+- **Uninstall script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/uninstall.sh`
 
 **Comandos rapidos de teste:**
 
 Instalar a release oficial actual:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/install.sh && sh /tmp/install.sh
 ```
 
-Instalar explicitamente a versao `1.8.0`:
+Instalar explicitamente a versao `1.8.2`:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh --version 1.8.0
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/install.sh && sh /tmp/install.sh --version 1.8.2
 ```
 
-Baixar o `.pkg` directo da versao `1.8.0`:
+Baixar o `.pkg` directo da versao `1.8.2`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.2.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/pfSense-pkg-layer7-1.8.2.pkg
 ```
 
 Desinstalar com script publico:
 
 ```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
 ```
 
 ---

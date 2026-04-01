@@ -4,14 +4,15 @@ table <layer7_block> persist
 table <layer7_tagged> persist
 table <layer7_block_dst> persist
 
-# Anti-bypass: bloquear DoT (TCP 853) e DoQ (UDP 853).
-block drop quick inet proto tcp to port 853 label "layer7:anti-dot"
-block drop quick inet6 proto tcp to port 853 label "layer7:anti-dot6"
-block drop quick inet proto udp to port 853 label "layer7:anti-doq"
-block drop quick inet6 proto udp to port 853 label "layer7:anti-doq6"
+# Anti-bypass: bloquear DoT (TCP 853) e DoQ (UDP 853) apenas para destinos externos.
+block drop quick inet proto tcp to !<localsubnets> port 853 label "layer7:anti-dot"
+block drop quick inet6 proto tcp to !<localsubnets> port 853 label "layer7:anti-dot6"
+block drop quick inet proto udp to !<localsubnets> port 853 label "layer7:anti-doq"
+block drop quick inet6 proto udp to !<localsubnets> port 853 label "layer7:anti-doq6"
 
-block drop quick inet from <layer7_block> to any label "layer7:block:src"
-block drop quick inet6 from <layer7_block> to any label "layer7:block:src6"
+# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.
+block drop quick inet from <layer7_block> to !<localsubnets> label "layer7:block:src"
+block drop quick inet6 from <layer7_block> to !<localsubnets> label "layer7:block:src6"
 
 block drop quick inet to <layer7_block_dst> label "layer7:block:dst"
 block drop quick inet6 to <layer7_block_dst> label "layer7:block:dst6"

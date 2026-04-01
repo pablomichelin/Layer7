@@ -25,7 +25,7 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada
-**Versao segura conhecida do pacote:** `1.8.0`
+**Versao segura conhecida do pacote:** `1.8.2`
 **Data-base deste checkpoint:** `2026-04-01`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
@@ -46,8 +46,9 @@ controladas, com governanca forte e zero regressao desnecessaria.
 - V1 Comercial ja foi concluida e publicada.
 - O pacote publico de referencia continua a ser o `.pkg` distribuido via
   GitHub Releases.
-- O estado tecnico seguro conhecido continua associado ao pacote `1.8.0`,
-  com correccoes recentes no forcing de DNS via `rdr`.
+- O estado tecnico seguro conhecido continua associado ao pacote `1.8.2`,
+  com correccao arquitectural que restringe todos os bloqueios Layer7 a
+  destinos externos (`to !<localsubnets>`), eliminando impacto em trafego interno.
 - O license server existe e esta operacional como componente separado,
   mas a sua cadeia de confianca e o seu hardening ainda pertencem as
   proximas fases planeadas.
@@ -361,7 +362,7 @@ Para isso:
 CHECKPOINT CANONICO
 - Data base: 2026-04-01
 - Produto: Layer7 para pfSense CE
-- Versao segura conhecida: 1.8.0
+- Versao segura conhecida: 1.8.2
 - Estado funcional: V1 Comercial concluida e publicada
 - Estado documental: governanca F0 consolidada + F1.3 de blacklists seguras concluida
 - Fase actual: F1 (implementacao controlada)
@@ -379,10 +380,11 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia tecnica segura continua a ser o pacote `1.8.0`.
+- A referencia tecnica segura e o pacote `1.8.2`.
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.
-- Nenhuma alteracao funcional foi introduzida nesta Fase 0.
+- v1.8.2: correccao arquitectural — todos os bloqueios Layer7 passam
+  a usar `to !<localsubnets>`, sem impacto em trafego interno (impressoras, LAN).
 
 ### Documental
 

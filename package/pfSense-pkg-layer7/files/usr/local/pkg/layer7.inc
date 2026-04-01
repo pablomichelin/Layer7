@@ -194,15 +194,15 @@ function layer7_pf_default_rules_text()
 		"table <layer7_tagged> persist",
 		"table <layer7_block_dst> persist",
 		"",
-		"# Anti-bypass: bloquear DoT (TCP 853) e DoQ (UDP 853).",
-		"block drop quick inet proto tcp to port 853 label \"layer7:anti-dot\"",
-		"block drop quick inet6 proto tcp to port 853 label \"layer7:anti-dot6\"",
-		"block drop quick inet proto udp to port 853 label \"layer7:anti-doq\"",
-		"block drop quick inet6 proto udp to port 853 label \"layer7:anti-doq6\"",
+		"# Anti-bypass: bloquear DoT (TCP 853) e DoQ (UDP 853) apenas para destinos externos.",
+		"block drop quick inet proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot\"",
+		"block drop quick inet6 proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot6\"",
+		"block drop quick inet proto udp to !<localsubnets> port 853 label \"layer7:anti-doq\"",
+		"block drop quick inet6 proto udp to !<localsubnets> port 853 label \"layer7:anti-doq6\"",
 		"",
-		"# Bloqueio por origem do cliente (quarentena/tag).",
-		"block drop quick inet from <layer7_block> to any label \"layer7:block:src\"",
-		"block drop quick inet6 from <layer7_block> to any label \"layer7:block:src6\"",
+		"# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.",
+		"block drop quick inet from <layer7_block> to !<localsubnets> label \"layer7:block:src\"",
+		"block drop quick inet6 from <layer7_block> to !<localsubnets> label \"layer7:block:src6\"",
 		"",
 		"# Bloqueio por destino (sites/apps bloqueados via policies).",
 		"block drop quick inet to <layer7_block_dst> label \"layer7:block:dst\"",
@@ -313,9 +313,9 @@ function layer7_generate_rules($type)
 
 	$data = layer7_load_or_default();
 	if (!empty($data["layer7"]["block_quic"])) {
-		$rules .= "\n# Anti-QUIC: forcar fallback para TCP/TLS (melhor visibilidade SNI).\n";
-		$rules .= "block drop quick inet proto udp to port 443 label \"layer7:anti-quic\"\n";
-		$rules .= "block drop quick inet6 proto udp to port 443 label \"layer7:anti-quic6\"\n";
+		$rules .= "\n# Anti-QUIC: forcar fallback para TCP/TLS (melhor visibilidade SNI) — apenas destinos externos.\n";
+		$rules .= "block drop quick inet proto udp to !<localsubnets> port 443 label \"layer7:anti-quic\"\n";
+		$rules .= "block drop quick inet6 proto udp to !<localsubnets> port 443 label \"layer7:anti-quic6\"\n";
 	}
 
 	$bl_config = layer7_bl_config_load();

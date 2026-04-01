@@ -1,80 +1,72 @@
-## Layer7 v1.8.0 — rdr DNS forçado totalmente funcional (FreeBSD 15)
+# Layer7 v1.8.2 — Bloqueio restrito a destinos externos
 
-### O que foi corrigido
+## Resumo
 
-**Bug crítico — pfSense CE nunca processava `nat_rules_needed` do package XML**
+Correcção arquitectural: todas as regras de bloqueio PF geradas pelo Layer7 passam a aplicar `to !<localsubnets>`, garantindo que **apenas tráfego com destino à internet é bloqueado**. Tráfego interno (impressoras, serviços de rede local, bancos via VPN corporativa) não é afectado.
 
-O campo `force_dns: true` na configuração de blacklists, que deveria redirecionar DNS externo para o Unbound local via regras `rdr`, **nunca gerava regras PF** — mesmo com o campo activado e o sub-anchor `natrules/layer7_nat` referenciado.
+## Problema corrigido
 
-**Causa raiz dupla:**
+O Layer7 v1.8.0 gerava regras `from any to any`, o que causava:
 
-1. **`nat_rules_needed` não é suportado no pfSense CE**: o `pkg-utils.inc` do pfSense CE só processa `filter_rules_needed`. O tag `<nat_rules_needed>` do nosso XML era completamente ignorado — a função `layer7_generate_nat_rules()` nunca era chamada pelo pfSense.
+- Impressoras locais com acesso a serviços cloud (UDP 443 / QUIC) deixavam de responder
+- Serviços bancários que usam HTTP/3 apresentavam lentidão ou falha de conexão
+- Qualquer serviço interno usando UDP 443 era bloqueado mesmo sem estar em nenhuma blacklist
 
-2. **Tag XML `custom_php_resync_command` errado**: pfSense CE espera `<custom_php_resync_config_command>` (com valor PHP eval-safe). O tag que tínhamos (`custom_php_resync_command`) não existe no pfSense → `layer7_resync()` nunca era chamado automaticamente no save de configuração.
+## O que mudou (regras PF geradas)
 
-**Correcção:**
-- Nova função `layer7_inject_nat_to_anchor()` que carrega as `rdr` rules directamente em `natrules/layer7_nat` via `pfctl -a natrules/layer7_nat -N -f`
-- Chamada em `layer7_generate_rules()` — executada a cada reload PF via `filter_rule_function` (o único hook que pfSense CE garante)
-- Chamada em `layer7_resync()` — executada no save de configuração
-- pfSense usa `pfctl -f` sem `-F flush` → sub-anchor `natrules/layer7_nat` persiste entre reloads
-
----
-
-### Como verificar após actualização
-
-```sh
-# 1. Ver versão instalada
-layer7d -V
-# Deve mostrar: 1.8.0
-
-# 2. Verificar se regras rdr foram geradas
-pfctl -a natrules/layer7_nat -s Nat 2>/dev/null
-# Deve mostrar:
-# rdr pass on em1.46 inet proto udp from 10.0.60.0/23 to !127.0.0.1 port 53 -> 127.0.0.1 label "layer7:force_dns"
-# rdr pass on em1.46 inet proto tcp from 10.0.60.0/23 to !127.0.0.1 port 53 -> 127.0.0.1 label "layer7:force_dns"
-
-# 3. Confirmar referência no NAT principal
-pfctl -s nat | grep natrules
-# Deve mostrar: nat-anchor "natrules/*" all
-
-# 4. Verificar QUIC bloqueado
-pfctl -sr | grep anti-quic
-# Deve mostrar: block drop quick inet proto udp from any to any port = https label "layer7:anti-quic"
+**Antes:**
+```
+block drop quick inet proto udp to port 443 label "layer7:anti-quic"
+block drop quick inet proto tcp to port 853 label "layer7:anti-dot"
+block drop quick inet from <layer7_block> to any label "layer7:block:src"
 ```
 
----
-
-### Notas de upgrade
-
-Após instalação, forçar reload das regras PF em **Layer7 → Configurações → Guardar** para injectar as regras `rdr` imediatamente. Em reboots futuros e reloads de firewall, a injecção ocorre automaticamente.
-
----
-
-### Instalação / Actualização
-
-```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg \
-  && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg \
-  && service layer7d restart \
-  && layer7d -V
+**Depois:**
+```
+block drop quick inet proto udp to !<localsubnets> port 443 label "layer7:anti-quic"
+block drop quick inet proto tcp to !<localsubnets> port 853 label "layer7:anti-dot"
+block drop quick inet from <layer7_block> to !<localsubnets> label "layer7:block:src"
 ```
 
----
+`<localsubnets>` é o alias nativo do pfSense contendo todas as sub-redes directamente conectadas.
 
-### Rollback
+## Ficheiros alterados
+
+- `package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc`
+- `package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-pfctl`
+- `package/pfSense-pkg-layer7/files/usr/local/etc/layer7/pf.conf.sample`
+
+## Instalação / Upgrade
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.7.7.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.7.7/pfSense-pkg-layer7-1.7.7.pkg \
-  && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.7.7.pkg \
-  && service layer7d restart
+# Upgrade directo
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/install.sh
+sh /tmp/install.sh --version 1.8.2
+
+# Após instalar: forçar reload das regras PF
+pfctl -f /tmp/rules.debug 2>/dev/null || true
+# Ou via GUI: Firewall > Rules > Apply
 ```
 
----
+## Verificação
 
-### Compatibilidade
+```sh
+# Confirmar que as regras incluem !<localsubnets>
+pfctl -a layer7 -sr 2>/dev/null | grep localsubnets
 
-- pfSense CE 2.7.x / 2.8.x
-- FreeBSD 14.x / 15.x
-- Retrocompatível: instalações sem `force_dns` não são afectadas
+# Confirmar que impressora local passa (exemplo: 192.168.1.100)
+# pfctl -a layer7 -sr não deve mostrar nenhuma regra bloqueando esse IP
+```
+
+## Rollback
+
+```sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh
+sh /tmp/install.sh --version 1.8.0
+```
+
+## Compatibilidade
+
+- pfSense CE 2.7.x e 2.8.x
+- FreeBSD 14 e 15
+- Sem alteração no schema de configuração (zero migração necessária)
