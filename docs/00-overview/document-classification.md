@@ -82,6 +82,7 @@ vence o canónico.
 | `docs/05-runbooks/pfsense-webgui-safety.md` | seguranca de lab | runbook especifico de lab | Suplementar | — | manter | F4/F5 |
 | `docs/05-runbooks/rollback.md` | rollback | rollback do pacote Layer7 | Canónico | complementar ao `MANUAL-INSTALL.md` | manter vivo | F4/F7 |
 | `docs/06-releases/README.md` | governanca de release | indice canónico de release docs | Canónico | substitui indicacoes antigas dispersas | manter vivo | F7 |
+| `docs/06-releases/RELEASE-SIGNING.md` | cadeia de release assinada | guia canónico da F1.2 para manifesto, assinatura e validacao | Canónico | detalha a operacao prevista pelos ADR-0003/0004 | manter vivo durante F1/F7 | F1/F7 |
 | `docs/06-releases/release-notes-template.md` | template release | modelo reutilizavel | Suplementar | — | manter | F7 |
 | `docs/06-releases/release-notes-v0.1.0.md` | release antiga | release notes historicas | Historico | — | preservar | F7 |
 | `docs/07-prompts/README.md` | prompts/IA | area auxiliar de prompts | Suplementar | complementar a `AGENTS.md` | manter leve; nao tratar como SSOT | F6 |

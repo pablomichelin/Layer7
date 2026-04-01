@@ -162,10 +162,45 @@ vim layer7-protos.txt
 
 ---
 
-## Publicar release no GitHub (builder FreeBSD)
+## Release oficial assinada (F1.2)
+
+### Passo 1: builder prepara o stage dir
 
 ```sh
 sh scripts/release/deployz.sh \
+  --repo-owner pablomichelin \
+  --repo-name Layer7 \
+  --version 1.8.0
+```
+
+O builder passa a gerar apenas o **stage dir** com:
+
+- `.pkg`
+- `.pkg.sha256`
+- `install.sh`
+- `uninstall.sh`
+- `release-manifest.v1.txt`
+
+### Passo 2: signer assina fora do builder
+
+```sh
+sh scripts/release/sign-release.sh \
+  --stage-dir /tmp/layer7-release-v1.8.0 \
+  --private-key /caminho/seguro/layer7-release-ed25519.pem
+```
+
+### Passo 3: validar o conjunto assinado
+
+```sh
+sh scripts/release/verify-release.sh \
+  --stage-dir /tmp/layer7-release-v1.8.0
+```
+
+### Passo 4: publicar no GitHub Releases
+
+```sh
+sh scripts/release/publish-release.sh \
+  --stage-dir /tmp/layer7-release-v1.8.0 \
   --repo-owner pablomichelin \
   --repo-name Layer7 \
   --version 1.8.0
@@ -181,5 +216,9 @@ sh scripts/release/deployz.sh \
 | `fleet-update.sh`          | Distribui `.pkg` para N firewalls via SSH      |
 | `fleet-protos-sync.sh`     | Sincroniza regras custom para N firewalls      |
 | `update-ndpi.sh`           | Actualiza nDPI no builder e reconstrói pacote  |
-| `deployz.sh`               | Build + publish GitHub Release versionado      |
+| `deployz.sh`               | Builder: prepara stage dir com manifesto       |
+| `sign-release.sh`          | Signer: assina o manifesto fora do builder     |
+| `verify-release.sh`        | Verifica manifesto, assets e assinatura        |
+| `publish-release.sh`       | Publica o stage dir já assinado                |
+| `generate-release-signing-key.sh` | Gera par Ed25519 fora do builder      |
 | `install-lab.sh.template`  | Template de lab preservado como legado         |

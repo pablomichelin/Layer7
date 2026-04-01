@@ -1,15 +1,17 @@
 #!/bin/sh
-# deployz.sh — Publicacao do pacote Layer7 no canal oficial de GitHub Releases
-# Executar no builder FreeBSD. Gera .pkg, .pkg.sha256, install.sh e
-# uninstall.sh versionados e publica o conjunto no release.
-# Ver: scripts/release/README.md e docs/10-license-server/MANUAL-INSTALL.md
+# deployz.sh — Preparacao do stage dir oficial de release no builder
+# Executar no builder FreeBSD. Gera .pkg, .pkg.sha256, install.sh,
+# uninstall.sh e o manifesto versionado ainda nao assinado.
+# A assinatura e a publicacao acontecem fora do builder.
+# Ver: scripts/release/README.md e docs/06-releases/RELEASE-SIGNING.md
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+. "$SCRIPT_DIR/common.sh"
 
 usage() {
-  echo "Uso: $0 --repo-owner OWNER --repo-name REPO --version VERSION [--port-dir DIR] [--skip-tag] [--skip-push]"
+  echo "Uso: $0 --repo-owner OWNER --repo-name REPO --version VERSION [--port-dir DIR] [--stage-dir DIR] [--source-repo-url URL]"
   echo ""
   echo "Exemplo:"
   echo "  $0 --repo-owner pablomichelin --repo-name Layer7 --version 1.8.0"
@@ -19,24 +21,17 @@ usage() {
   echo "  --repo-name    Nome do repositório"
   echo "  --version      Versão (ex: 1.8.0); tag será v<VERSION>"
   echo "  --port-dir     Diretório do port (default: package/pfSense-pkg-layer7)"
-  echo "  --skip-tag     Não criar tag git"
-  echo "  --skip-push    Não fazer git push nem push --tags"
+  echo "  --stage-dir    Diretório de staging da release (default: /tmp/layer7-release-v<VERSION>)"
+  echo "  --source-repo-url URL  URL do repositório de origem (default: https://github.com/pablomichelin/pfsense-layer7)"
   exit 1
-}
-
-require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || {
-    echo "ERRO: comando obrigatório não encontrado: $1" >&2
-    exit 1
-  }
 }
 
 REPO_OWNER=""
 REPO_NAME=""
 VERSION=""
 PORT_DIR="package/pfSense-pkg-layer7"
-SKIP_TAG="0"
-SKIP_PUSH="0"
+STAGE_DIR=""
+SOURCE_REPO_URL="https://github.com/pablomichelin/pfsense-layer7"
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -44,8 +39,8 @@ while [ $# -gt 0 ]; do
     --repo-name)  REPO_NAME="$2";  shift 2 ;;
     --version)    VERSION="$2";     shift 2 ;;
     --port-dir)   PORT_DIR="$2";    shift 2 ;;
-    --skip-tag)   SKIP_TAG="1";     shift 1 ;;
-    --skip-push)  SKIP_PUSH="1";    shift 1 ;;
+    --stage-dir)  STAGE_DIR="$2";   shift 2 ;;
+    --source-repo-url) SOURCE_REPO_URL="$2"; shift 2 ;;
     *) usage ;;
   esac
 done
@@ -57,9 +52,8 @@ done
 # Validar dependências
 require_cmd git
 require_cmd make
-require_cmd gh
-require_cmd sha256
 require_cmd find
+require_cmd sed
 
 # Validar FreeBSD
 [ "$(uname -s)" = "FreeBSD" ] || {
@@ -88,6 +82,11 @@ PORT_ABS="$REPO_ROOT/$PORT_DIR"
 }
 
 TAG="v$VERSION"
+[ -n "$STAGE_DIR" ] || STAGE_DIR="/tmp/layer7-release-${TAG}"
+[ ! -e "$STAGE_DIR" ] || die "stage dir ja existe: $STAGE_DIR"
+
+SOURCE_COMMIT="$(git rev-parse HEAD)"
+DISTRIBUTION_REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}"
 
 echo "==> Build do pacote em $PORT_DIR"
 (
@@ -103,68 +102,65 @@ PKG_PATH="$(find "$PORT_ABS" -type f -name '*.pkg' 2>/dev/null | sort | tail -n 
   exit 1
 }
 
-# Gerar .sha256
-SHA_PATH="${PKG_PATH}.sha256"
-sha256 "$PKG_PATH" > "$SHA_PATH"
+mkdir -p "$STAGE_DIR"
 
 PKG_FILE="$(basename "$PKG_PATH")"
-SHA_FILE="$(basename "$SHA_PATH")"
+STAGED_PKG="$STAGE_DIR/$PKG_FILE"
+cp "$PKG_PATH" "$STAGED_PKG"
+
+SHA_FILE="${PKG_FILE}.sha256"
+STAGED_SHA="$STAGE_DIR/$SHA_FILE"
+write_sha256_file "$STAGED_PKG" "$STAGED_SHA"
 
 # Gerar install.sh e uninstall.sh fixados a esta release
-TMP_INSTALL="$(mktemp /tmp/install-release.XXXXXX.sh)"
+STAGED_INSTALL="$STAGE_DIR/install.sh"
 sed \
   -e "s/^REPO_OWNER=\".*\"$/REPO_OWNER=\"${REPO_OWNER}\"/" \
   -e "s/^REPO_NAME=\".*\"$/REPO_NAME=\"${REPO_NAME}\"/" \
   -e "s/^DEFAULT_VERSION=\"\"$/DEFAULT_VERSION=\"${VERSION}\"/" \
-  "$SCRIPT_DIR/install.sh" > "$TMP_INSTALL"
-chmod +x "$TMP_INSTALL"
+  "$SCRIPT_DIR/install.sh" > "$STAGED_INSTALL"
+chmod +x "$STAGED_INSTALL"
 
-TMP_UNINSTALL="$(mktemp /tmp/uninstall-release.XXXXXX.sh)"
+STAGED_UNINSTALL="$STAGE_DIR/uninstall.sh"
 sed \
   -e "s/^REPO_OWNER=\".*\"$/REPO_OWNER=\"${REPO_OWNER}\"/" \
   -e "s/^REPO_NAME=\".*\"$/REPO_NAME=\"${REPO_NAME}\"/" \
   -e "s/^RELEASE_VERSION_HINT=\"\"$/RELEASE_VERSION_HINT=\"${VERSION}\"/" \
-  "$SCRIPT_DIR/uninstall.sh" > "$TMP_UNINSTALL"
-chmod +x "$TMP_UNINSTALL"
+  "$SCRIPT_DIR/uninstall.sh" > "$STAGED_UNINSTALL"
+chmod +x "$STAGED_UNINSTALL"
 
-# Criar tag se necessário
-if [ "$SKIP_TAG" = "0" ]; then
-  if ! git rev-parse "$TAG" >/dev/null 2>&1; then
-    echo "==> Criando tag $TAG"
-    git tag "$TAG"
-  fi
-fi
-
-# Push se não skip
-if [ "$SKIP_PUSH" = "0" ]; then
-  echo "==> git push"
-  git push
-  if [ "$SKIP_TAG" = "0" ]; then
-    echo "==> git push origin $TAG"
-    git push origin "$TAG"
-  fi
-fi
-
-# Criar GitHub Release
-echo "==> Criando GitHub Release $TAG"
-gh release create "$TAG" \
-  "$PKG_PATH" \
-  "$SHA_PATH" \
-  "$TMP_INSTALL#install.sh" \
-  "$TMP_UNINSTALL#uninstall.sh" \
-  --title "$TAG" \
-  --notes "Release oficial do Layer7 para pfSense CE. Ver docs/10-license-server/MANUAL-INSTALL.md"
-
-# Limpar temp
-rm -f "$TMP_INSTALL"
-rm -f "$TMP_UNINSTALL"
+MANIFEST_PATH="$(manifest_path "$STAGE_DIR")"
+{
+  echo "manifest_version=1"
+  echo "release_version=$VERSION"
+  echo "release_tag=$TAG"
+  echo "source_repo=$SOURCE_REPO_URL"
+  echo "source_commit=$SOURCE_COMMIT"
+  echo "distribution_repo=$DISTRIBUTION_REPO_URL"
+  echo "builder_role=builder"
+  echo "builder_hostname=$(host_name_safe)"
+  echo "builder_generated_at_utc=$(utc_now)"
+  echo "checksum_algorithm=sha256"
+  echo "signing_scheme=ed25519-openssl-pkeyutl-v1"
+  echo "signature_asset=$(signature_name)"
+  echo "public_key_asset=$(public_key_asset_name)"
+  echo ""
+  emit_asset_line "$STAGED_PKG" "package"
+  emit_asset_line "$STAGED_SHA" "package-checksum"
+  emit_asset_line "$STAGED_INSTALL" "installer"
+  emit_asset_line "$STAGED_UNINSTALL" "uninstaller"
+} > "$MANIFEST_PATH"
 
 # Saída final
 echo ""
-echo "=============================================="
-echo "Release criado: $TAG"
+echo "============================================================"
+echo "Stage dir preparado no builder: $STAGE_DIR"
 echo "Asset principal: $PKG_FILE"
+echo "Manifesto (ainda nao assinado): $(basename "$MANIFEST_PATH")"
 echo ""
-echo "Comando único para instalar no pfSense:"
-echo "  fetch -o /tmp/install.sh https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${TAG}/install.sh && sh /tmp/install.sh"
-echo "=============================================="
+echo "Proximos passos:"
+echo "  1. copiar o stage dir para o signer"
+echo "  2. assinar: sh scripts/release/sign-release.sh --stage-dir $STAGE_DIR --private-key /caminho/seguro/release-key.pem"
+echo "  3. validar: sh scripts/release/verify-release.sh --stage-dir $STAGE_DIR"
+echo "  4. publicar: sh scripts/release/publish-release.sh --stage-dir $STAGE_DIR --repo-owner ${REPO_OWNER} --repo-name ${REPO_NAME} --version ${VERSION}"
+echo "============================================================"

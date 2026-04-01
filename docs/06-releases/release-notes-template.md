@@ -4,6 +4,9 @@
 **Tag:** `v__VERSION__`
 **Artefato:** `pfSense-pkg-layer7-__VERSION__.pkg`
 **Checksum:** `pfSense-pkg-layer7-__VERSION__.pkg.sha256`
+**Manifesto:** `release-manifest.v1.txt`
+**Assinatura:** `release-manifest.v1.txt.sig`
+**Public key:** `release-signing-public-key.pem`
 
 ---
 

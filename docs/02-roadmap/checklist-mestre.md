@@ -94,7 +94,9 @@ Usar apenas quando o bloco envolver artefacto, publicacao ou distribuicao.
 - [ ] artefacto correcto identificado como `.pkg`
 - [ ] `.pkg.sha256` publicado para o mesmo artefacto
 - [ ] `install.sh` e `uninstall.sh` versionados publicados no release
-- [ ] manifesto e assinatura tratados conforme a subfase actual
+- [ ] manifesto versionado publicado
+- [ ] assinatura destacada do manifesto publicada
+- [ ] public key de verificacao publicada
 - [ ] disponibilidade do download verificada
 - [ ] rollback de release documentado
 

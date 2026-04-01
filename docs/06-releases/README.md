@@ -8,6 +8,8 @@ Esta pasta concentra a governanca documental de release.
 - o artefacto publico actual conhecido e o **`.pkg`**;
 - o conjunto operacional vigente da F1.1 e `.pkg` + `.pkg.sha256` +
   `install.sh`/`uninstall.sh` versionados por tag;
+- a F1.2 acrescenta `release-manifest.v1.txt`,
+  `release-manifest.v1.txt.sig` e `release-signing-public-key.pem`;
 - `docs/changelog/CHANGELOG.md` e a linha temporal oficial;
 - `docs/10-license-server/MANUAL-INSTALL.md` e o manual operacional canónico
   de instalacao, upgrade e uninstall.
@@ -16,6 +18,7 @@ Esta pasta concentra a governanca documental de release.
 
 - notas de release por tag;
 - template de release notes;
+- documentacao operacional da assinatura de release;
 - referencias cruzadas para rollback e distribuicao.
 
 ## Regras
@@ -24,14 +27,15 @@ Esta pasta concentra a governanca documental de release.
 2. Nao publicar release sem `MANUAL-INSTALL.md` sincronizado com a versao real.
 3. Nao assumir `.txz` como artefacto actual; esse tema fica preservado apenas
    em material historico e no ADR-0002.
-4. Manifesto e assinatura continuam contratados pelos ADRs, mas so entram
-   como gate operacional a partir da F1.2.
+4. A partir da F1.2, release oficial exige manifesto versionado, assinatura
+   destacada e public key de verificacao.
 5. Quando a F7 abrir, esta pasta passa a concentrar tambem o checklist
    operacional de publicacao.
 
 ## Arquivos desta area
 
 - [`release-notes-template.md`](release-notes-template.md)
+- [`RELEASE-SIGNING.md`](RELEASE-SIGNING.md)
 - [`release-notes-v0.1.0.md`](release-notes-v0.1.0.md) — historico
 - [`../05-runbooks/rollback.md`](../05-runbooks/rollback.md)
 - [`../10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md)

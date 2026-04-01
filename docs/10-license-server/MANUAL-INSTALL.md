@@ -15,10 +15,12 @@ Ao subir uma nova versao, actualizar no mesmo bloco:
 - comandos de install, upgrade e reinstall
 - exemplos com `--version`
 
-**Contrato operacional vigente da F1.1:** o canal oficial usa GitHub Releases
-versionado para `install.sh`, `uninstall.sh`, `.pkg` e `.pkg.sha256`.
-Manifesto e assinatura continuam planeados para a F1.2 e ainda nao sao gate
-operacional deste manual.
+**Contrato operacional vigente da F1.2:** o canal oficial usa GitHub Releases
+versionado para `install.sh`, `uninstall.sh`, `.pkg`, `.pkg.sha256`,
+`release-manifest.v1.txt`, `release-manifest.v1.txt.sig` e
+`release-signing-public-key.pem`.
+O fluxo de validacao detalhado da release fica em
+`docs/06-releases/RELEASE-SIGNING.md`.
 
 ---
 
@@ -29,6 +31,9 @@ operacional deste manual.
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.0`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg.sha256`
+- **Manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/release-manifest.v1.txt`
+- **Assinatura do manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/release-manifest.v1.txt.sig`
+- **Public key:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/release-signing-public-key.pem`
 - **Install script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh`
 - **Uninstall script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh`
 

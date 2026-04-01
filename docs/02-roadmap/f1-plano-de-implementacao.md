@@ -84,6 +84,11 @@ continuar a usar a ultima release valida conhecida.
 - rejeicao de checksum divergente;
 - rejeicao com chave publica errada.
 
+**Checkpoint de execucao:** concluida em `2026-04-01` com manifesto
+`release-manifest.v1.txt`, assinatura destacada Ed25519 via OpenSSL,
+public key de verificacao publicada no release e separacao builder/signer
+materializada em scripts distintos.
+
 ### Subfase F1.3 - Politica de origem e mirror de blacklists
 
 **Objectivo:** cortar a dependencia directa de feed insegura.

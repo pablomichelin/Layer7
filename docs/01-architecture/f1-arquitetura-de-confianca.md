@@ -56,8 +56,8 @@ Repo de origem
   historicas em `main` ainda coexistem em material legado;
 - coexistencia de repositório de origem e repositorio publico de distribuicao;
 - legado `.txz` ainda presente em docs antigas;
-- checksum existe e integra o conjunto minimo da F1.1, mas manifesto assinado
-  e validacao criptografica ainda nao estao implementados;
+- checksum, manifesto assinado e public key de verificacao passam a existir na
+  F1.2, mas a integracao directa no instalador/GUI updater continua pendente;
 - builder possui ficheiros sensiveis locais e precisa de politica formal.
 
 ---
@@ -152,7 +152,8 @@ aceites se a validacao falhar.
 - canal oficial: GitHub Releases do repositorio publico de distribuicao
 - pacote minimo em F1.1: `.pkg` + `.pkg.sha256` + `install.sh` +
   `uninstall.sh` versionados
-- extensao prevista para F1.2: manifesto + assinatura
+- pacote minimo em F1.2: todo o conjunto da F1.1 + manifesto versionado +
+  assinatura destacada + public key de verificacao
 
 ### Contrato de verificacao
 
@@ -172,10 +173,9 @@ aceites se a validacao falhar.
 
 Estas decisoes ficam abertas para implementacao, nao para filosofia:
 
-- formato final do manifesto de release;
-- mecanismo operacional da assinatura Ed25519;
+- integracao directa da validacao no instalador e GUI updater;
 - local exacto do espelho oficial de snapshots de blacklists;
-- forma final de distribuir a chave publica no instalador e GUI updater;
+- forma final de pin da chave publica no instalador e GUI updater;
 - nivel de automacao permitido antes da assinatura final.
 
 ---

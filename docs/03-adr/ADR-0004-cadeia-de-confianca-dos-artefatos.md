@@ -116,6 +116,16 @@ simples, desde que preserve este contrato e publique o fingerprint da chave.
 - **F1.2:** transforma manifesto versionado e assinatura destacada em gate
   operacional obrigatorio do release oficial.
 
+### 7.2. Materializacao conservadora da F1.2
+
+A implementacao operacional da F1.2 adopta:
+
+- manifesto legivel e estavel em `release-manifest.v1.txt`;
+- `sha256` como algoritmo unico de checksum;
+- assinatura destacada Ed25519 via OpenSSL;
+- public key distribuida como asset oficial da release;
+- scripts separados para **builder**, **signer**, **verify** e **publish**.
+
 ### 8. Distribuicao da chave publica
 
 A chave publica de verificacao de release deve ser distribuida em pelo menos:

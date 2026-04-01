@@ -131,8 +131,8 @@ subfase correspondente:
 - **F1.1:** tag versionada, `.pkg`, `.pkg.sha256`, `install.sh`,
   `uninstall.sh`, changelog/release notes sincronizados e manual de
   instalacao sincronizado.
-- **F1.2 em diante:** todo o conjunto acima, mais manifesto de release e
-  assinatura destacada do manifesto.
+- **F1.2 em diante:** todo o conjunto acima, mais manifesto de release,
+  assinatura destacada do manifesto e public key de verificacao publicada.
 
 ### 11. Compatibilidade historica
 

@@ -101,22 +101,23 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F1 — Implementacao em curso (F1.1 concluida)`
+**Fase actual consolidada:** `F1 — Implementacao em curso (F1.2 concluida)`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
-install/uninstall no canal publico. Manifesto assinado, chave publica de
-release, blacklists seguras e matriz de fallback continuam **pendentes das
-subfases seguintes**.
+install/uninstall no canal publico. A F1.2 materializou manifesto versionado,
+assinatura destacada Ed25519, public key de verificacao e separacao
+builder/signer na cadeia de release. Blacklists seguras e matriz de fallback
+continuam **pendentes das subfases seguintes**.
 
-**Proxima subfase elegivel:** `F1.2 — Manifesto, checksum e assinatura de release`
+**Proxima subfase elegivel:** `F1.3 — Politica de origem e mirror de blacklists`
 
 ### Ordem segura das fases
 
 | Fase | Nome | Estado | Intencao |
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
-| F1 | Cadeia de confianca e seguranca critica | em execucao; F1.1 concluida | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
+| F1 | Cadeia de confianca e seguranca critica | em execucao; F1.2 concluida | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
 | F2 | Hardening do license server | planeada | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
@@ -128,13 +129,11 @@ subfases seguintes**.
 
 ## Proximos passos autorizados
 
-1. Executar F1.2 para ligar builder, validacao e publicacao ao manifesto
-   assinado, sem confiar em `main` mutavel como origem de instalacao.
-2. Executar F1.3 para introduzir a trilha segura de blacklists com origem
+1. Executar F1.3 para introduzir a trilha segura de blacklists com origem
    aprovada, HTTPS obrigatorio, cache/mirror e ultima versao valida.
-3. Executar F1.4 para aplicar a matriz de fallback/degradacao segura sem
+2. Executar F1.4 para aplicar a matriz de fallback/degradacao segura sem
    permitir conteudo suspeito.
-4. Usar o backlog canónico e o plano F1 como fila unica antes de tocar em
+3. Usar o backlog canónico e o plano F1 como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
 ---
@@ -146,9 +145,10 @@ subfases seguintes**.
 - O fluxo oficial ja saiu de `main`, mas referencias historicas a
   `raw.githubusercontent.com/.../main` ainda coexistem em material legado e
   precisam continuar classificadas como nao normativas.
-- O canal oficial ja publica `.pkg`, `.pkg.sha256`, `install.sh` e
-  `uninstall.sh` versionados, mas manifesto assinado e validacao criptografica
-  ainda permanecem pendentes da F1.2.
+- O canal oficial passa a publicar `.pkg`, `.pkg.sha256`, `install.sh`,
+  `uninstall.sh`, `release-manifest.v1.txt`, assinatura destacada e public key
+  de verificacao, mas a integracao directa dessa validacao no instalador e no
+  GUI updater ainda permanece pendente.
 - O pipeline de blacklists continua historicamente associado a UT1 com
   transporte inseguro por omissao, sem garantia forte de autenticidade.
 - GitHub, builder e origem UT1 continuam como dependencias externas fortes
@@ -362,9 +362,9 @@ CHECKPOINT CANONICO
 - Produto: Layer7 para pfSense CE
 - Versao segura conhecida: 1.8.0
 - Estado funcional: V1 Comercial concluida e publicada
-- Estado documental: governanca F0 consolidada + F1.1 de distribuicao concluida
+- Estado documental: governanca F0 consolidada + F1.2 de release signing concluida
 - Fase actual: F1 (implementacao controlada)
-- Proxima subfase elegivel: F1.2
+- Proxima subfase elegivel: F1.3
 - Reorganizacao fisica autorizada: nao
 - Artefacto publico actual: .pkg via GitHub Releases
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
@@ -389,11 +389,11 @@ CHECKPOINT CANONICO
 - O projecto ja nao depende da raiz como fonte principal de governanca.
 - O backlog, o roadmap, o checklist mestre e o mapa de equivalencia passam a
   servir de ponte segura entre chats e entre fases.
-- A F1.1 passou a ter instalador oficial, URLs versionadas e contrato
-  operacional `.pkg` coerente com a base canónica.
+- A F1.2 passou a ter manifesto versionado, assinatura destacada e cadeia
+  builder -> signer -> publish documentada e executavel.
 
 ### Operacional
 
 - Qualquer proxima intervencao tecnica deve partir deste checkpoint e abrir a
-  F1.2 antes de qualquer trabalho em blacklists, fallback, release signing ou
-  licenciamento dependente da cadeia de confianca.
+  F1.3 antes de qualquer trabalho em fallback por componente, hardening do
+  license server ou licenciamento dependente da cadeia de confianca.

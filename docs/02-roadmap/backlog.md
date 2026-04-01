@@ -28,9 +28,12 @@ reavaliacao formal.
 - F1.1 foi concluida em `2026-04-01` com o contrato operacional oficial de
   distribuicao em `.pkg`, URLs versionadas de release e scripts
   `install.sh`/`uninstall.sh` publicados no canal oficial.
-- BG-001, BG-002 e BG-022 permanecem abertos para a F1.2-F1.4, porque a
-  assinatura, o manifesto e o tratamento completo das dependencias externas
-  ainda nao entraram em operacao.
+- F1.2 foi concluida em `2026-04-01` com manifesto versionado, assinatura
+  destacada Ed25519, public key de verificacao e separacao operacional entre
+  builder, signer e publisher.
+- BG-020, BG-021 e BG-022 permanecem abertos para a F1.3-F1.4, porque mirror,
+  origem confiavel de blacklists e politica completa de degradacao segura ainda
+  nao entraram em operacao.
 
 ---
 

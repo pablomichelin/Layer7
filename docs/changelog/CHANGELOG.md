@@ -15,6 +15,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Documentacao canónica e operacional** — manuais, runbooks, roadmap e
   arquitectura passam a tratar `.txz` apenas como legado historico
 
+### Changed — F1.2 manifesto, checksum e assinatura de release
+
+- **Trust chain de release** — builder passa a preparar stage dir sem assinar;
+  signer passa a assinar o manifesto fora do builder; publicacao passa a
+  aceitar apenas stage dir ja assinado
+- **Manifesto oficial** — `release-manifest.v1.txt` passa a listar metadados
+  de origem, papeis builder/signer e hashes SHA256 dos assets oficiais
+- **Assinatura oficial** — `release-manifest.v1.txt.sig` passa a usar
+  Ed25519 com OpenSSL (`pkeyutl -sign -rawin`) e a public key correspondente
+  passa a integrar o conjunto oficial da release
+
 ## [1.8.0] — 2026-04-01
 
 ### Fixed — `label` em regras `rdr` causa syntax error no FreeBSD 15

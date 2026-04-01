@@ -15,7 +15,7 @@ com hardening tecnico ou com release engineering.
 | Fase | Nome | Estado | Gate central |
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
-| F1 | Cadeia de confianca e seguranca critica | em execucao (F1.1 concluida) | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
+| F1 | Cadeia de confianca e seguranca critica | em execucao (F1.2 concluida) | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
 | F2 | Hardening do license server | planeada | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
@@ -121,8 +121,11 @@ Tornar auditavel a cadeia de confianca entre:
 - sem reorganizacao estrutural;
 - sem redesign do license server como produto;
 - sem adicionar funcionalidades novas ao utilizador final;
-- sem alterar build, release, instalacao, package, daemon, frontend ou scripts;
-- sem implementar validacao criptografica nesta etapa.
+- sem misturar F1 com hardening do license server, blacklists fora da ordem
+  segura ou fallback antes da subfase correspondente;
+- sem alterar codigo funcional do produto para alem do estritamente necessario
+  ao contrato de distribuicao e trust chain da release;
+- sem inventar PKI complexa ou operacao dificil de manter.
 
 ### Dependencias
 
@@ -149,6 +152,16 @@ Tornar auditavel a cadeia de confianca entre:
 
 - nenhuma dependencia critica de confianca, distribuicao, blacklists ou fallback fica implícita;
 - qualquer maintainer consegue explicar qual e o artefacto oficial, como ele sera validado e o que acontece quando a validacao falha.
+
+### Checkpoint actual
+
+- **F1.1 concluida em `2026-04-01`:** `.pkg` oficial, URLs versionadas e
+  scripts `install.sh`/`uninstall.sh` alinhados ao canal oficial.
+- **F1.2 concluida em `2026-04-01`:** manifesto `release-manifest.v1.txt`,
+  `sha256`, assinatura destacada Ed25519, public key de verificacao e
+  separacao builder/signer/publisher materializadas na trilha de release.
+- **F1.3-F1.4 pendentes:** blacklists seguras, mirror/cache e matriz de
+  fallback/degradacao continuam fora do bloco ja executado.
 
 ### Documentacao obrigatoria da fase
 
