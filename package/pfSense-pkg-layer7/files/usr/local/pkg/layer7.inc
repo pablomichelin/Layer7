@@ -136,10 +136,10 @@ function layer7_generate_rdr_rules_snippet()
 				$has_rules = true;
 			$lines[] = "rdr on {$iface} inet proto udp" .
 			    " from {$cidr} to !127.0.0.1 port 53" .
-			    " -> 127.0.0.1 label \"layer7:force_dns\"";
+			    " -> 127.0.0.1";
 			$lines[] = "rdr on {$iface} inet proto tcp" .
 			    " from {$cidr} to !127.0.0.1 port 53" .
-			    " -> 127.0.0.1 label \"layer7:force_dns\"";
+			    " -> 127.0.0.1";
 			}
 		}
 	}

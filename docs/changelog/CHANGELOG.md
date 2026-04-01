@@ -2,6 +2,15 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.0] — 2026-04-01
+
+### Fixed — `label` em regras `rdr` causa syntax error no FreeBSD 15
+
+- **`layer7_generate_rdr_rules_snippet()`**: o keyword `label "..."` nas regras `rdr` causa "syntax error" no pfctl do FreeBSD 15 quando carregado num anchor via `pfctl -a anchor -N -f`. Removido `label` das regras geradas
+- Regras agora no formato válido: `rdr on <iface> inet proto {udp|tcp} from <cidr> to !127.0.0.1 port 53 -> 127.0.0.1`
+- Ambas as regras (UDP + TCP port 53) carregam em `natrules/layer7_nat`
+- **PORTVERSION** bumped para 1.8.0
+
 ## [1.7.9] — 2026-04-01
 
 ### Fixed — Sintaxe `rdr pass` inválida em pfSense 2.8 / FreeBSD 15

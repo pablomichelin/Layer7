@@ -1,4 +1,4 @@
-## Layer7 v1.7.9 — Fix sintaxe rdr (pfSense 2.8/FreeBSD 15)
+## Layer7 v1.8.0 — rdr DNS forçado totalmente funcional (FreeBSD 15)
 
 ### O que foi corrigido
 
@@ -25,7 +25,7 @@ O campo `force_dns: true` na configuração de blacklists, que deveria redirecio
 ```sh
 # 1. Ver versão instalada
 layer7d -V
-# Deve mostrar: 1.7.9
+# Deve mostrar: 1.8.0
 
 # 2. Verificar se regras rdr foram geradas
 pfctl -a natrules/layer7_nat -s Nat 2>/dev/null
@@ -53,9 +53,9 @@ Após instalação, forçar reload das regras PF em **Layer7 → Configurações
 ### Instalação / Actualização
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.7.9.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.7.9/pfSense-pkg-layer7-1.7.9.pkg \
-  && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.7.9.pkg \
+fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg \
+  && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg \
   && service layer7d restart \
   && layer7d -V
 ```
