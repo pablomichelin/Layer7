@@ -21,6 +21,7 @@ PID_FILE="/var/run/layer7d.pid"
 STATE_DIR="$BL_DIR/.state"
 ACTIVE_STATE="$STATE_DIR/active-snapshot.state"
 MANAGED_LIST="$STATE_DIR/managed-categories.txt"
+FALLBACK_STATE="$STATE_DIR/fallback.state"
 CACHE_DIR="$BL_DIR/.cache"
 LKG_DIR="$BL_DIR/.last-known-good"
 LKG_STATE="$LKG_DIR/snapshot.state"
@@ -145,8 +146,88 @@ manifest_value() {
 	sed -n "s/^${_key}=//p" "$_manifest" | head -1
 }
 
+state_value() {
+	_key="$1"
+	_state_file="$2"
+	if [ ! -f "$_state_file" ]; then
+		return 0
+	fi
+	manifest_value "$_key" "$_state_file"
+}
+
 json_escape() {
 	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+write_fallback_state() {
+	_status="$1"
+	_component="$2"
+	_mode="$3"
+	_reason="$4"
+	_safe_state="$5"
+	_operator_action="$6"
+	mkdir -p "$STATE_DIR"
+	cat > "$FALLBACK_STATE" <<-EOF
+		status=$_status
+		component=$_component
+		mode=$_mode
+		updated_at_utc=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+		reason=$_reason
+		safe_state=$_safe_state
+		operator_action=$_operator_action
+		active_snapshot_id=$(state_value snapshot_id "$ACTIVE_STATE")
+		lkg_snapshot_id=$(state_value snapshot_id "$LKG_STATE")
+	EOF
+}
+
+mark_blacklists_healthy() {
+	write_fallback_state \
+		"healthy" \
+		"blacklists-update" \
+		"normal" \
+		"validated snapshot promoted from official source" \
+		"snapshot:$CANDIDATE_SNAPSHOT_ID" \
+		"none"
+}
+
+mark_blacklists_degraded() {
+	_reason="$1"
+	_action="$2"
+	_active_snapshot_id="$(state_value snapshot_id "$ACTIVE_STATE")"
+	_lkg_snapshot_id="$(state_value snapshot_id "$LKG_STATE")"
+
+	if [ -n "${_active_snapshot_id:-}" ]; then
+		write_fallback_state \
+			"degraded" \
+			"blacklists-update" \
+			"hold-active" \
+			"$_reason" \
+			"active-snapshot:$_active_snapshot_id" \
+			"$_action"
+		log "DEGRADED: $_reason; keeping active snapshot $_active_snapshot_id"
+		return
+	fi
+
+	if [ -n "${_lkg_snapshot_id:-}" ]; then
+		write_fallback_state \
+			"fail-closed" \
+			"blacklists-update" \
+			"manual-restore-required" \
+			"$_reason" \
+			"last-known-good:$_lkg_snapshot_id" \
+			"$_action"
+		log "FAIL-CLOSED: $_reason; no active snapshot, explicit LKG restore required"
+		return
+	fi
+
+	write_fallback_state \
+		"fail-closed" \
+		"blacklists-update" \
+		"no-safe-blacklist" \
+		"$_reason" \
+		"none" \
+		"$_action"
+	log "FAIL-CLOSED: $_reason; no active snapshot and no last-known-good available"
 }
 
 read_config_source_url() {
@@ -375,6 +456,7 @@ promote_candidate() {
 	INCOMING_DIR=""
 
 	send_sighup
+	mark_blacklists_healthy
 	log "INFO: activated snapshot $CANDIDATE_SNAPSHOT_ID from $CANDIDATE_SOURCE_ROLE"
 }
 
@@ -616,6 +698,14 @@ do_restore_lkg() {
 	CANDIDATE_VALIDATED_AT="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 
 	promote_candidate
+	write_fallback_state \
+		"degraded" \
+		"blacklists-last-known-good" \
+		"last-known-good" \
+		"operator restored last-known-good snapshot" \
+		"last-known-good:$CANDIDATE_SNAPSHOT_ID" \
+		"publish or validate a newer official snapshot to return to healthy mode"
+	log "DEGRADED: operating from explicit last-known-good restore"
 	log "INFO: restored last-known-good snapshot $CANDIDATE_SNAPSHOT_ID"
 }
 
@@ -627,6 +717,13 @@ do_download() {
 	LOCK_HELD="1"
 
 	if [ ! -f "$PUBKEY" ]; then
+		write_fallback_state \
+			"fail-closed" \
+			"blacklists-update" \
+			"trust-anchor-missing" \
+			"blacklist public key not found in package" \
+			"active-snapshot:$(state_value snapshot_id "$ACTIVE_STATE")" \
+			"reinstall the package or restore the public key before retrying the update"
 		log "ERROR: blacklist public key not found at $PUBKEY"
 		exit 1
 	fi
@@ -636,6 +733,9 @@ do_download() {
 
 	AVAIL=$(df -k /usr/local/etc 2>/dev/null | tail -1 | awk '{print $4}')
 	if [ -n "$AVAIL" ] && [ "$AVAIL" -lt 250000 ] 2>/dev/null; then
+		mark_blacklists_degraded \
+			"insufficient disk space for trusted blacklist update" \
+			"free at least 250MB under /usr/local/etc before retrying"
 		log "ERROR: insufficient disk space (need 250MB, have ${AVAIL}KB)"
 		exit 1
 	fi
@@ -653,6 +753,9 @@ do_download() {
 	done < "$_candidates_file"
 
 	if [ "$_success" != "1" ]; then
+		mark_blacklists_degraded \
+			"no official blacklist source produced a valid snapshot" \
+			"inspect /var/log/layer7-bl-update.log and use --restore-lkg if recovery is required"
 		log "ERROR: no official blacklist source produced a valid snapshot; keeping current active version"
 		exit 1
 	fi

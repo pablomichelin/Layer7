@@ -12,6 +12,12 @@
 > O upstream UT1 continua apenas como **autoridade de conteúdo** na fase de
 > aquisição controlada fora do firewall do cliente.
 
+> **ADDENDUM NORMATIVO F1.4 (2026-04-01)** — a degradação desta trilha deixa
+> de ser implícita. O updater passa a materializar:
+> `healthy -> degraded (hold-active ou last-known-good) -> fail-closed`
+> em `/usr/local/etc/layer7/blacklists/.state/fallback.state`, sempre sem
+> promover conteúdo novo não validado.
+
 ---
 
 ## Estado atual (v1.7.2)

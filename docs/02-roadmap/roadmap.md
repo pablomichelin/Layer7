@@ -164,8 +164,10 @@ Tornar auditavel a cadeia de confianca entre:
   `layer7-blacklists-manifest.v1.txt`, public key propria de blacklists,
   origem oficial HTTPS, mirror controlado em GitHub Releases, cache local e
   last-known-good restauravel passam a existir na trilha do consumidor.
-- **F1.4 pendente:** matriz de fallback/degradacao segura por componente
-  continua fora do bloco ja executado.
+- **F1.4 concluida em `2026-04-01`:** install/update da release passa a
+  operar em fail-closed perante manifesto/assinatura/checksum suspeitos;
+  blacklists passam a registar `healthy`, `degraded` e `fail-closed` com
+  estado seguro preservado e acao do operador explicita.
 
 ### Documentacao obrigatoria da fase
 

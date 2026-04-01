@@ -2,8 +2,8 @@
 
 ## Finalidade
 
-Este documento consolida a arquitectura da F1 sem implementar nada.
-Ele descreve as cadeias de confianca, os pontos de risco, as dependencias
+Este documento consolida a arquitectura e o contrato operacional fechados na
+F1. Ele descreve as cadeias de confianca, os pontos de risco, as dependencias
 externas e os contratos que os ADRs da F1 tornaram canónicos.
 
 Documentos normativos desta arquitectura:
@@ -57,7 +57,8 @@ Repo de origem
 - coexistencia de repositório de origem e repositorio publico de distribuicao;
 - legado `.txz` ainda presente em docs antigas;
 - checksum, manifesto assinado e public key de verificacao passam a existir na
-  F1.2, mas a integracao directa no instalador/GUI updater continua pendente;
+  F1.2 e a F1.4 integra essa validacao no `install.sh`; a visibilidade mais
+  ampla em GUI updater/observabilidade continua para fases futuras;
 - builder possui ficheiros sensiveis locais e precisa de politica formal.
 
 ---
@@ -91,8 +92,8 @@ Upstream UT1 (conteudo)
   publisher e do mirror controlado;
 - a indisponibilidade simultanea da origem oficial e do mirror continua a
   exigir intervencao operacional, embora a LKG preserve o ultimo estado seguro;
-- a fase actual ainda nao traduziu toda a filosofia de degradacao para outros
-  componentes fora da trilha de blacklists.
+- a F1.4 passou a registar degradacao/fail-closed por ficheiro de estado no
+  updater de blacklists, mas a observabilidade mais ampla continua para F7.
 
 ---
 
@@ -143,6 +144,20 @@ aceites se a validacao falhar.
 - trocar automaticamente para origem nao oficial;
 - promover output de builder suspeito.
 
+### Matriz final materializada na F1.4
+
+| Componente | Condicao de falha | Politica | Estado seguro mantido | Rastro/log | Recuperacao do operador |
+|------------|-------------------|----------|------------------------|------------|-------------------------|
+| release trust chain | manifesto ausente/invalido, assinatura invalida, fingerprint divergente, checksum divergente | fail-closed | nenhum pacote novo e instalado | `install.sh` escreve `FAIL-CLOSED` no stdout/syslog (`layer7-install`) | baixar de novo o asset versionado oficial ou republicar release valida |
+| install.sh / upgrade | trust chain valida, mas passos locais pos-install falham (PF, Unbound, start do servico) | degradacao segura | pacote ja validado fica instalado; operador completa verificacao local | `install.sh` escreve `DEGRADED` no stdout/syslog | validar tabelas PF, Unbound e `service layer7d onestatus` |
+| uninstall.sh | pacote ausente ou residuos ja nao existem | degradacao segura/idempotente | sistema continua sem reinstalar conteudo novo | saida local do script | repetir limpeza ou remover residuos manualmente |
+| manifesto/assinatura/checksum de release | divergencia em qualquer etapa | fail-closed | artefacto anterior permanece o unico confiavel | `verify-release.sh`/`install.sh` falham explicitamente | corrigir stage dir ou refazer signing/publicacao |
+| pipeline de blacklists | snapshot nova falha em origem, assinatura, hash, tamanho ou estrutura | fail-closed para conteudo novo | snapshot activa validada permanece | `/var/log/layer7-bl-update.log` + `.state/fallback.state` | investigar origem/mirror e repetir update |
+| mirror/cache de blacklists | origem primaria falha ou mirror falha | degradacao segura enquanto houver snapshot activa validada | snapshot activa e cache validas | `source_role`, `fallback.state`, log de update | restaurar disponibilidade da origem oficial/mirror |
+| last-known-good de blacklists | novo conteudo rejeitado | degradacao segura permitida por restauro explicito | `.last-known-good/` | `fallback.state` com `mode=last-known-good` | `update-blacklists.sh --restore-lkg` |
+| auto-update de blacklists | nenhuma origem oficial gera snapshot valida | degradacao segura se houver activa; fail-closed se nao houver estado seguro | activa validada ou LKG explicitamente restauravel | `fallback.state` + log | analisar log e usar `--restore-lkg` se necessario |
+| release assets versionados | asset faltante no stage dir ou release inconsistente | fail-closed | release anterior continua referencia segura | `publish-release.sh` depende de `verify-release.sh` | regenerar stage dir e republicar |
+
 ---
 
 ## 7. Contratos operacionais da F1
@@ -186,12 +201,11 @@ aceites se a validacao falhar.
 
 Estas decisoes ficam abertas para implementacao, nao para filosofia:
 
-- integracao directa desta validacao noutras superficies alem do script
-  `update-blacklists.sh`;
 - automatizacao completa da publicacao do publisher para origem primaria e
   mirror controlado;
 - forma final de auditoria/alerta quando origem e mirror falham em simultaneo;
-- traducao da filosofia de degradacao segura para F1.4 por componente.
+- integracao futura desta visibilidade de degradacao em observabilidade mais
+  ampla e testes automatizados.
 
 ---
 
@@ -209,7 +223,7 @@ Estas decisoes ficam abertas para implementacao, nao para filosofia:
 
 ## 10. Resultado esperado da F1
 
-Ao fim da F1 implementada no futuro, deve ficar claro e verificavel:
+Ao fim da F1, fica claro e verificavel:
 
 - qual e o artefacto oficial;
 - quem gera, quem assina e quem publica;

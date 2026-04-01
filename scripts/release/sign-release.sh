@@ -32,6 +32,50 @@ done
 
 require_cmd openssl
 
+manifest_asset_name_by_role() {
+  _role="$1"
+  _manifest="$2"
+
+  grep '^asset|' "$_manifest" | while IFS= read -r _line; do
+    _name=""
+    _role_value=""
+
+    OLD_IFS="$IFS"
+    IFS='|'
+    set -- ${_line#asset|}
+    IFS="$OLD_IFS"
+
+    for _field in "$@"; do
+      _key="${_field%%=*}"
+      _value="${_field#*=}"
+      case "$_key" in
+        name) _name="$_value" ;;
+        role) _role_value="$_value" ;;
+      esac
+    done
+
+    [ "$_role_value" = "$_role" ] || continue
+    printf '%s\n' "$_name"
+    break
+  done
+}
+
+stamp_install_script() {
+  _install_path="$1"
+  _pubkey_path="$2"
+  _fingerprint="$3"
+  _tmp_install="$(mktemp /tmp/layer7-install-stage.XXXXXX.sh)"
+  _pubkey_b64="$(openssl base64 -A -in "$_pubkey_path")"
+
+  sed \
+    -e "s|^EMBEDDED_RELEASE_PUBKEY_B64=\".*\"$|EMBEDDED_RELEASE_PUBKEY_B64=\"${_pubkey_b64}\"|" \
+    -e "s|^EXPECTED_RELEASE_PUBKEY_FINGERPRINT_SHA256=\".*\"$|EXPECTED_RELEASE_PUBKEY_FINGERPRINT_SHA256=\"${_fingerprint}\"|" \
+    "$_install_path" > "$_tmp_install"
+
+  mv "$_tmp_install" "$_install_path"
+  chmod 0755 "$_install_path"
+}
+
 MANIFEST="$(manifest_path "$STAGE_DIR")"
 SIG_PATH="$(signature_path "$STAGE_DIR")"
 PUBKEY_PATH="$(public_key_asset_path "$STAGE_DIR")"
@@ -79,6 +123,21 @@ PUBLIC_KEY_ASSET="$(manifest_value public_key_asset "$MANIFEST")"
 [ "$PUBLIC_KEY_ASSET" = "$(public_key_asset_name)" ] || die "public_key_asset inesperado: $PUBLIC_KEY_ASSET"
 
 PUBKEY_FINGERPRINT="$(fingerprint_public_key_sha256 "$PUBKEY_PATH")"
+PKG_ASSET_NAME="$(manifest_asset_name_by_role package "$MANIFEST")"
+PKG_SHA_ASSET_NAME="$(manifest_asset_name_by_role package-checksum "$MANIFEST")"
+INSTALL_ASSET_NAME="$(manifest_asset_name_by_role installer "$MANIFEST")"
+UNINSTALL_ASSET_NAME="$(manifest_asset_name_by_role uninstaller "$MANIFEST")"
+
+[ -n "$PKG_ASSET_NAME" ] || die "asset package nao encontrado no manifesto"
+[ -n "$PKG_SHA_ASSET_NAME" ] || die "asset package-checksum nao encontrado no manifesto"
+[ -n "$INSTALL_ASSET_NAME" ] || die "asset installer nao encontrado no manifesto"
+[ -n "$UNINSTALL_ASSET_NAME" ] || die "asset uninstaller nao encontrado no manifesto"
+[ -f "$STAGE_DIR/$INSTALL_ASSET_NAME" ] || die "installer ausente no stage dir"
+[ -f "$STAGE_DIR/$UNINSTALL_ASSET_NAME" ] || die "uninstaller ausente no stage dir"
+[ -f "$STAGE_DIR/$PKG_ASSET_NAME" ] || die "package ausente no stage dir"
+[ -f "$STAGE_DIR/$PKG_SHA_ASSET_NAME" ] || die "package-checksum ausente no stage dir"
+
+stamp_install_script "$STAGE_DIR/$INSTALL_ASSET_NAME" "$PUBKEY_PATH" "$PUBKEY_FINGERPRINT"
 
 TMP_MANIFEST="$(mktemp /tmp/layer7-release-manifest.XXXXXX.txt)"
 {
@@ -99,7 +158,10 @@ TMP_MANIFEST="$(mktemp /tmp/layer7-release-manifest.XXXXXX.txt)"
   echo "signer_generated_at_utc=$(utc_now)"
   echo "public_key_fingerprint_sha256=$PUBKEY_FINGERPRINT"
   echo ""
-  grep '^asset|' "$MANIFEST" | grep -v "^asset|name=$(public_key_asset_name)|" || true
+  emit_asset_line "$STAGE_DIR/$PKG_ASSET_NAME" "package"
+  emit_asset_line "$STAGE_DIR/$PKG_SHA_ASSET_NAME" "package-checksum"
+  emit_asset_line "$STAGE_DIR/$INSTALL_ASSET_NAME" "installer"
+  emit_asset_line "$STAGE_DIR/$UNINSTALL_ASSET_NAME" "uninstaller"
   emit_asset_line "$PUBKEY_PATH" "release-public-key"
 } > "$TMP_MANIFEST"
 

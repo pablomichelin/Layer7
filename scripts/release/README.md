@@ -5,7 +5,7 @@
 No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
 ```
 
 O script faz **tudo automaticamente**:
@@ -21,7 +21,7 @@ O script faz **tudo automaticamente**:
 ### Versão específica
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh --version 1.8.0
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh --version 1.8.3
 ```
 
 ### Reinstalar
@@ -114,7 +114,7 @@ Se preferir instalar um a um via GUI do pfSense:
 
 Em cada pfSense, **Diagnostics > Command Prompt**:
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -170,7 +170,7 @@ vim layer7-protos.txt
 sh scripts/release/deployz.sh \
   --repo-owner pablomichelin \
   --repo-name Layer7 \
-  --version 1.8.0
+  --version 1.8.3
 ```
 
 O builder passa a gerar apenas o **stage dir** com:
@@ -185,7 +185,7 @@ O builder passa a gerar apenas o **stage dir** com:
 
 ```sh
 sh scripts/release/sign-release.sh \
-  --stage-dir /tmp/layer7-release-v1.8.0 \
+  --stage-dir /tmp/layer7-release-v1.8.3 \
   --private-key /caminho/seguro/layer7-release-ed25519.pem
 ```
 
@@ -193,17 +193,17 @@ sh scripts/release/sign-release.sh \
 
 ```sh
 sh scripts/release/verify-release.sh \
-  --stage-dir /tmp/layer7-release-v1.8.0
+  --stage-dir /tmp/layer7-release-v1.8.3
 ```
 
 ### Passo 4: publicar no GitHub Releases
 
 ```sh
 sh scripts/release/publish-release.sh \
-  --stage-dir /tmp/layer7-release-v1.8.0 \
+  --stage-dir /tmp/layer7-release-v1.8.3 \
   --repo-owner pablomichelin \
   --repo-name Layer7 \
-  --version 1.8.0
+  --version 1.8.3
 ```
 
 ---

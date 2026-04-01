@@ -133,6 +133,8 @@ Responsavel por:
 - manter a **private key** de release fora do builder;
 - gerar ou fornecer a public key correspondente;
 - completar o manifesto com metadados do signer;
+- carimbar o `install.sh` versionado com a public key oficial e o fingerprint
+  esperado da release;
 - assinar o manifesto;
 - validar localmente assinatura e fingerprint antes de promover.
 
@@ -196,6 +198,8 @@ O stage dir so pode ser promovido se:
 - o fingerprint da public key bater com o manifesto;
 - os hashes dos assets baterem com o manifesto;
 - o `.pkg.sha256` bater com o hash do `.pkg`.
+- o `install.sh` staged estiver coerente com a public key/fingerprint da
+  release que acabou de ser assinada.
 
 ### 4. Publicacao
 
@@ -233,6 +237,15 @@ Isto e intencional:
   da chave de release;
 - deixa claro que a provisao da chave oficial e um acto operacional fora do
   builder e fora do commit.
+
+## Comportamento em falha da F1.4
+
+- `install.sh` publicado por tag passa a validar `release-manifest.v1.txt`,
+  `release-manifest.v1.txt.sig` e o hash do `.pkg` antes da instalacao;
+- se assinatura, fingerprint ou checksum divergirem, o instalador entra em
+  **fail-closed** e nao chama `pkg add`;
+- falhas pos-instalacao local (PF, Unbound, arranque do servico) passam a ser
+  emitidas como `DEGRADED`, nunca como sucesso silencioso.
 
 ## Validacao manual com OpenSSL
 

@@ -40,6 +40,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   estado activo rastreavel em `.state/active-snapshot.state` e restauro
   explicito via `update-blacklists.sh --restore-lkg`
 
+### Changed — F1.4 matriz de fallback e degradacao segura
+
+- **Install/update fail-closed** — o `install.sh` versionado passa a validar
+  `release-manifest.v1.txt`, assinatura destacada e checksum do `.pkg` antes
+  do `pkg add`; release suspeita deixa de ser instalada
+- **Signer carimba o trust anchor do instalador** — `sign-release.sh` passa a
+  embutir a public key oficial e o fingerprint esperado no `install.sh`
+  staged, mantendo a validacao ancorada fora do builder
+- **Blacklists com estado degradado explicito** — `update-blacklists.sh`
+  passa a escrever `.state/fallback.state` com `healthy`, `degraded` e
+  `fail-closed`, sempre preservando apenas material previamente validado
+
 ## [1.8.3] — 2026-04-01
 
 ### Changed — Bloqueio de QUIC (UDP 443) por interface seleccionável

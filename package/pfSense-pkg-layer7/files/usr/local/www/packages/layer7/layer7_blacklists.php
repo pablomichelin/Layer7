@@ -230,6 +230,7 @@ $merged_categories = l7_bl_merged_categories($discovered, $custom_map);
 $bl_stats = layer7_bl_get_stats();
 $last_update = layer7_bl_last_update();
 $runtime_state = layer7_bl_runtime_state_load();
+$fallback_state = layer7_bl_fallback_state_load();
 $lkg_state = layer7_bl_lkg_state_load();
 $rules = isset($bl_config["rules"]) && is_array($bl_config["rules"]) ? $bl_config["rules"] : array();
 
@@ -305,7 +306,18 @@ htmlspecialchars(implode("\n", layer7_bl_official_mirror_urls()))?></textarea>
 		<dd><code>/usr/local/etc/layer7/blacklists/.last-known-good</code></dd>
 		<dt><?=l7_t("Cache local")?></dt>
 		<dd><code>/usr/local/etc/layer7/blacklists/.cache</code></dd>
+		<dt><?=l7_t("Estado de degradacao")?></dt>
+		<dd><?=htmlspecialchars($fallback_state["status"] ?? "-")?></dd>
+		<dt><?=l7_t("Modo de fallback")?></dt>
+		<dd><?=htmlspecialchars($fallback_state["mode"] ?? "-")?></dd>
+		<dt><?=l7_t("Estado seguro mantido")?></dt>
+		<dd><?=htmlspecialchars($fallback_state["safe_state"] ?? "-")?></dd>
+		<dt><?=l7_t("Motivo da degradacao")?></dt>
+		<dd><?=htmlspecialchars($fallback_state["reason"] ?? "-")?></dd>
+		<dt><?=l7_t("Acao do operador")?></dt>
+		<dd><?=htmlspecialchars($fallback_state["operator_action"] ?? "-")?></dd>
 	</dl>
+	<p class="help-block" style="margin-top:10px;"><?=l7_t("Falha nova nao vira sucesso silencioso: a pagina mostra explicitamente se a trilha ficou healthy, degraded ou fail-closed e qual estado seguro foi preservado.")?></p>
 </div>
 
 <div class="layer7-readonly-block" style="margin-top:14px;">

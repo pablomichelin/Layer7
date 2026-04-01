@@ -1234,6 +1234,7 @@ define('L7_BL_PROGRESS', '/tmp/layer7-bl-progress.txt');
 define('L7_BL_SCRIPT', '/usr/local/etc/layer7/update-blacklists.sh');
 define('L7_BL_STATE_DIR', L7_BL_DIR . '/.state');
 define('L7_BL_ACTIVE_STATE', L7_BL_STATE_DIR . '/active-snapshot.state');
+define('L7_BL_FALLBACK_STATE', L7_BL_STATE_DIR . '/fallback.state');
 define('L7_BL_LKG_DIR', L7_BL_DIR . '/.last-known-good');
 define('L7_BL_LKG_STATE', L7_BL_LKG_DIR . '/snapshot.state');
 
@@ -1307,6 +1308,11 @@ function layer7_bl_runtime_state_load()
 function layer7_bl_lkg_state_load()
 {
 	return layer7_bl_state_file_load(L7_BL_LKG_STATE);
+}
+
+function layer7_bl_fallback_state_load()
+{
+	return layer7_bl_state_file_load(L7_BL_FALLBACK_STATE);
 }
 
 function layer7_bl_config_defaults()

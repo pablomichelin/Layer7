@@ -11,6 +11,11 @@
 > assinado em HTTPS, public key dedicada, mirror controlado e
 > last-known-good local.
 
+> **ADDENDUM NORMATIVO F1.4 (2026-04-01)** — falha nova nao pode virar sucesso
+> silencioso. O updater passa a deixar rasto explicito em
+> `/usr/local/etc/layer7/blacklists/.state/fallback.state` com `status`,
+> `mode`, `reason`, `safe_state` e `operator_action`.
+
 ---
 
 ## Índice

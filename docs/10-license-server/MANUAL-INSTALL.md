@@ -33,6 +33,14 @@ O restauro explicito da ultima snapshot valida passa a ser:
 /usr/local/etc/layer7/update-blacklists.sh --restore-lkg
 ```
 
+**Addendum operacional da F1.4:** o `install.sh` oficial publicado por tag
+passa a validar `release-manifest.v1.txt`, `release-manifest.v1.txt.sig` e o
+`sha256` do `.pkg` antes de instalar. Se manifesto, assinatura, fingerprint
+da public key ou checksum divergirem, o comportamento passa a ser
+**fail-closed**: o pacote novo nao e instalado. Falhas locais pos-install
+(PF, Unbound, arranque do servico) ficam rastreaveis como `DEGRADED` no
+stdout e no syslog (`layer7-install`).
+
 ---
 
 ## Links da versao actual (para teste)
@@ -103,29 +111,29 @@ Cada seccao abaixo inclui:
 **Instalador automatico (recomendado — uma linha):**
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
 ```
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
 
-Para uma versao especifica: `sh /tmp/install.sh --version 1.8.0`
+Para uma versao especifica: `sh /tmp/install.sh --version 1.8.3`
 
 **Comando unico manual (Command Prompt):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg
 ```
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh --force
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg
 ```
 
 ```sh
@@ -205,7 +213,7 @@ layer7d --license-status
 **Instalador automatico (recomendado — uma linha):**
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
 ```
 
 O script detecta a versao instalada e faz o upgrade automaticamente.
@@ -213,7 +221,7 @@ O script detecta a versao instalada e faz o upgrade automaticamente.
 **Comando unico manual (Command Prompt):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -223,11 +231,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg
 ```
 
 ```sh
@@ -247,7 +255,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -261,7 +269,7 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg
 ```
 
 ```sh
@@ -289,7 +297,7 @@ O script `uninstall.sh` faz tudo automaticamente:
 **Command Prompt (uma linha — requer `--yes`):**
 
 ```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
 ```
 
 > **IMPORTANTE:** No Command Prompt do pfSense nao e possivel responder a
@@ -298,7 +306,7 @@ fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/down
 **SSH/Console (com confirmacao interactiva):**
 
 ```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
 ```
 
 ### Opcoes do uninstall.sh
@@ -386,7 +394,7 @@ O pfSense volta ao funcionamento normal imediatamente.
 Para reinstalar:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -465,6 +473,12 @@ Ver log de actualizacao de blacklists:
 
 ```sh
 tail -30 /var/log/layer7-bl-update.log
+```
+
+Ver eventos do instalador oficial:
+
+```sh
+tail -50 /var/log/system.log | grep layer7-install
 ```
 
 Blacklists UT1 + categorias personalizadas (v1.6.5+):
@@ -660,7 +674,7 @@ Se algo der errado apos instalar ou actualizar, use o desinstalador
 automatico preservando a configuracao:
 
 ```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
 ```
 
 Ou manualmente:

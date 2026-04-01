@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F1 — Implementacao em curso (F1.3 concluida)`
+**Fase actual consolidada:** `F1 — Concluida em 2026-04-01 (F1.4 concluida)`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -110,17 +110,20 @@ install/uninstall no canal publico. A F1.2 materializou manifesto versionado,
 assinatura destacada Ed25519, public key de verificacao e separacao
 builder/signer na cadeia de release. A F1.3 materializou manifesto dedicado
 de blacklists, public key propria, origem oficial HTTPS, mirror controlado,
-cache local e last-known-good restauravel no appliance. A matriz de fallback
-ampla por componente continua **pendente da F1.4**.
+cache local e last-known-good restauravel no appliance. A F1.4 materializou a
+matriz de fallback por componente: install/update da release passa a validar
+manifesto, assinatura e checksum antes do `pkg add`, blacklists passam a
+registar `healthy`/`degraded`/`fail-closed` em `.state/fallback.state`, e a
+degradacao deixa de ficar implícita na trilha F1.
 
-**Proxima subfase elegivel:** `F1.4 — Matriz de fallback e degradacao segura`
+**Proxima fase elegivel:** `F2 — Hardening do license server`
 
 ### Ordem segura das fases
 
 | Fase | Nome | Estado | Intencao |
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
-| F1 | Cadeia de confianca e seguranca critica | em execucao; F1.3 concluida | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
+| F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
 | F2 | Hardening do license server | planeada | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
@@ -132,9 +135,9 @@ ampla por componente continua **pendente da F1.4**.
 
 ## Proximos passos autorizados
 
-1. Executar F1.4 para aplicar a matriz de fallback/degradacao segura sem
-   permitir conteudo suspeito.
-2. Usar o backlog canónico e o plano F1 como fila unica antes de tocar em
+1. Abrir F2 apenas quando houver bloco fechado e segregado de hardening do
+   license server.
+2. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
 ---
@@ -148,14 +151,16 @@ ampla por componente continua **pendente da F1.4**.
   precisam continuar classificadas como nao normativas.
 - O canal oficial passa a publicar `.pkg`, `.pkg.sha256`, `install.sh`,
   `uninstall.sh`, `release-manifest.v1.txt`, assinatura destacada e public key
-  de verificacao, mas a integracao directa dessa validacao no instalador e no
-  GUI updater ainda permanece pendente.
+  de verificacao; a F1.4 integrou esta validacao no `install.sh` publicado,
+  mas isso continua a depender de o signer carimbar o asset versionado com a
+  public key oficial e o fingerprint esperado.
 - A trilha de blacklists deixou o feed HTTP directo, mas a disponibilidade
   ainda depende de publicar o manifesto assinado na origem oficial
   `downloads.systemup.inf.br` e no mirror controlado em GitHub Releases.
 - GitHub, builder e origem UT1 continuam como dependencias externas fortes;
-  a F1.3 reduziu o risco do lado do consumidor com mirror/cache/LKG, mas nao
-  elimina a necessidade operacional de publicar snapshots aprovadas.
+  a F1 reduziu o risco do lado do consumidor com manifesto assinado,
+  mirror/cache/LKG e install fail-closed, mas nao elimina a necessidade
+  operacional de publicar snapshots e releases aprovadas.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;
   sem ler a classificacao, um agente pode seguir um documento antigo.
 - Existem documentos antigos ainda a mencionar `.txz`, `v0.x` e estados

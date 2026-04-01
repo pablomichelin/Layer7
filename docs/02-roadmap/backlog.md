@@ -34,9 +34,10 @@ reavaliacao formal.
 - F1.3 foi concluida em `2026-04-01` com origem oficial HTTPS de blacklists,
   manifesto dedicado, public key propria, mirror controlado, cache local e
   last-known-good materializados na trilha do consumidor.
-- BG-021 permanece aberto para a F1.4; BG-020 foi materializado na F1.3 e
-  BG-022 ficou reduzido na trilha de blacklists, mas continua a exigir
-  acompanhamento das dependencias externas.
+- BG-020 foi materializado na F1.3, BG-021 foi materializado na F1.4 com
+  matriz explicita de fallback/fail-closed por componente, e BG-022 ficou
+  reduzido na trilha do consumidor, mas continua a exigir acompanhamento das
+  dependencias externas.
 
 ---
 
@@ -64,7 +65,7 @@ reavaliacao formal.
 | BG-018 | Definir telemetria operacional minima para pacote, daemon e servidor de licencas | Media | observabilidade | F7 | troubleshooting e auditoria continuarem com visibilidade insuficiente | M | Medio | Planeado | sem analytics pesado |
 | BG-019 | Rever e refrescar tutorial longo, guias comerciais e docs preservadas por compatibilidade | Baixa | documentacao/comercial | F7 | materiais antigos continuarem a coexistir com a base canónica | M | Medio | Acompanhar | so depois das fases tecnicas centrais |
 | BG-020 | Formalizar pipeline seguro de blacklists com origem aprovada, HTTPS obrigatorio, checksum/assinatura e politica de espelhamento | Critica | blacklists/seguranca | F1 | feed continuar dependente de transporte inseguro ou de origem nao autenticada | M | Alto | Acompanhar | F1.3 materializou origem oficial, manifesto assinado, mirror controlado e last-known-good; F4 herda a robustez operacional do runtime |
-| BG-021 | Definir politica de fallback e degradacao segura por componente, distinguindo disponibilidade de integridade | Critica | seguranca/operacao | F1 | produto continuar susceptivel a aplicar conteudo suspeito em nome de disponibilidade | M | Alto | Planeamento F1 concluido | coberto por ADR-0006 e pelo plano F1; matriz tecnica ainda precisa ser implementada |
+| BG-021 | Definir politica de fallback e degradacao segura por componente, distinguindo disponibilidade de integridade | Critica | seguranca/operacao | F1 | produto continuar susceptivel a aplicar conteudo suspeito em nome de disponibilidade | M | Alto | Acompanhar | materializado na F1.4 em `install.sh`, `update-blacklists.sh` e docs canónicas; F5 herda a formalizacao de testes |
 | BG-022 | Reduzir o risco das dependencias externas criticas de distribuicao e blacklists | Alta | distribuicao/dependencias | F1 | GitHub, UT1 e builder continuarem como pontos unicos de falha sem contrato formal | M | Alto | Acompanhar | F1.3 reduziu o risco no consumo de blacklists com origem oficial, mirror GitHub e cache/LKG local; operacao de publicacao e builder continuam monitorados |
 
 ---

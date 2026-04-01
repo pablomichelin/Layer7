@@ -131,6 +131,15 @@ Releases, cache local em `.cache`, estado activo em `.state` e
 - regras de “nao promover”;
 - integracao com runbooks e checklist.
 
+**Resultado materializado em `2026-04-01`:**
+
+- `install.sh` versionado passa a validar manifesto, assinatura e checksum
+  antes do `pkg add`, falhando em `fail-closed` perante release suspeita;
+- `update-blacklists.sh` passa a materializar `healthy`, `degraded` e
+  `fail-closed` em `.state/fallback.state`, preservando apenas material
+  previamente validado;
+- a arquitectura e os manuais passam a ter matriz explicita por componente.
+
 **Dependencia:** F1.1 a F1.3 desenhadas.
 
 **Risco principal:** implementar validacao sem politica uniforme de falha.
@@ -167,6 +176,11 @@ como concluida.
 
 - novo agente explica a cadeia de confianca e o comportamento em falha lendo
   poucos documentos canónicos.
+
+**Estado final:** o fecho documental previsto para esta subfase foi absorvido
+no mesmo bloco da F1.4 para evitar abrir uma subfase separada apenas
+burocratica. Com isso, a F1 fica encerrada e a proxima fase elegivel passa a
+ser a F2.
 
 ---
 

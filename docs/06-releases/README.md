@@ -10,6 +10,8 @@ Esta pasta concentra a governanca documental de release.
   `install.sh`/`uninstall.sh` versionados por tag;
 - a F1.2 acrescenta `release-manifest.v1.txt`,
   `release-manifest.v1.txt.sig` e `release-signing-public-key.pem`;
+- a F1.4 faz o `install.sh` versionado validar esse conjunto antes do
+  `pkg add`, falhando em `fail-closed` se a trust chain da release divergir;
 - `docs/changelog/CHANGELOG.md` e a linha temporal oficial;
 - `docs/10-license-server/MANUAL-INSTALL.md` e o manual operacional canónico
   de instalacao, upgrade e uninstall.
