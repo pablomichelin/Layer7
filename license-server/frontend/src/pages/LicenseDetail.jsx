@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { get, post, del } from '../api';
+import { get, post, del, download } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
 
@@ -27,20 +27,18 @@ export default function LicenseDetail() {
     }
   }
 
-  function handleDownload() {
-    const token = localStorage.getItem('token');
-    fetch(`/api/licenses/${id}/download`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (res) => {
-        if (!res.ok) throw new Error((await res.json()).error);
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `layer7-${data.license.license_key.slice(0, 8)}.lic`;
-        a.click();
-        URL.revokeObjectURL(url);
-      })
-      .catch((err) => alert(err.message));
+  async function handleDownload() {
+    try {
+      const blob = await download(`/licenses/${id}/download`);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `layer7-${data.license.license_key.slice(0, 8)}.lic`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.message);
+    }
   }
 
   if (loading) return <p className="text-gray-500">Carregando...</p>;

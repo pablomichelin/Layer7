@@ -4,6 +4,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F2.2 autenticacao e sessao administrativa do license server
+
+- **Sessao stateful oficial** — o painel administrativo deixa de depender de
+  JWT em `localStorage` e passa a operar com sessao stateful em
+  `admin_sessions`, cookie `HttpOnly + Secure + SameSite=Strict`,
+  expiracao ociosa/absoluta, renovacao controlada e logout com invalidacao
+  real no backend
+- **Contrato frontend/backend alinhado** — a SPA passa a fazer bootstrap por
+  `GET /api/auth/session`, chamadas autenticadas same-origin por cookie e
+  tratamento consistente de sessao invalida/expirada sem bearer manual
+- **Documentacao operacional** — runbook, manuais e arquitetura passam a
+  tratar `https://license.systemup.inf.br` como canal oficial tambem para
+  login administrativo, deixando CORS/rate limit/brute force explicitamente
+  para a F2.3
+
 ### Changed — F2.1 publicacao segura do license server
 
 - **Canal publico oficial** — `https://license.systemup.inf.br` em `443/TCP`

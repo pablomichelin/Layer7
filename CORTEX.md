@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F2 — Execucao tecnica iniciada; F2.1 concluida em 2026-04-01`
+**Fase actual consolidada:** `F2 — Execucao tecnica iniciada; F2.1 e F2.2 concluidas em 2026-04-01`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -124,9 +124,14 @@ a **F2.1** materializou a politica de publicacao segura: `443/TLS` passa a
 ser o unico canal publico oficial, `8445` permanece como origin privado com
 bind local por defeito, o Nginx interno deixa explicita a fronteira com o
 edge proxy, e a documentacao operacional passa a tratar HTTP directo apenas
-como troubleshooting controlado.
+como troubleshooting controlado. A **F2.2** materializou o contrato de
+autenticacao e sessao administrativa: login passa a exigir HTTPS/TLS real,
+o frontend deixa de depender de JWT em `localStorage`, a sessao passa a ser
+stateful no backend com `admin_sessions`, cookie `HttpOnly + Secure +
+SameSite=Strict`, expiracao ociosa/absoluta, renovacao controlada e logout
+com invalidacao real no servidor.
 
-**Proxima subfase elegivel da F2:** `F2.2 — Autenticacao e sessao administrativa`
+**Proxima subfase elegivel da F2:** `F2.3 — Protecao da superficie administrativa`
 
 ### Ordem segura das fases
 
@@ -134,7 +139,7 @@ como troubleshooting controlado.
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
 | F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
-| F2 | Hardening do license server | execucao iniciada; F2.1 concluida em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
+| F2 | Hardening do license server | execucao iniciada; F2.1 e F2.2 concluidas em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
 | F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
@@ -146,8 +151,9 @@ como troubleshooting controlado.
 ## Proximos passos autorizados
 
 1. Prosseguir na F2 apenas pela ordem segura declarada em
-   `docs/02-roadmap/f2-plano-de-implementacao.md`, sem misturar auth,
-   CRUD e operacao antes de fechar sessao administrativa.
+   `docs/02-roadmap/f2-plano-de-implementacao.md`, com foco exclusivo em
+   `F2.3` para CORS same-origin, rate limit, brute force protection e
+   logging minimo da superficie administrativa.
 2. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
@@ -177,11 +183,14 @@ como troubleshooting controlado.
   `8445` fica preso ao loopback por defeito e o Nginx interno passa a
   aceitar apenas o host oficial e troubleshooting local controlado.
 - O license server continua funcional, mas o estado actual ainda opera com
-  `cors()` aberto, JWT em `localStorage`, login sem rate limit dedicado e
-  CRUD sem transacoes explicitas.
+  `cors()` aberto, login sem rate limit dedicado, brute force protection
+  pendente e CRUD sem transacoes explicitas.
 - A F2.1 passa a depender operacionalmente de certificado valido na borda,
   redirect `HTTP -> HTTPS`, allowlist/firewall coerente para o origin
   `8445` e ausencia de exposicao publica directa desse origin.
+- A F2.2 passa a depender operacionalmente de o canal administrativo ficar
+  sempre atras de HTTPS/TLS real e de o cookie `Secure` nao ser degradado por
+  acessos directos ao origin privado.
 - A F2 agora tem arquitectura e ordem segura definidas, mas continua a exigir
   implementacao tecnica controlada em subfases pequenas e reversiveis.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;

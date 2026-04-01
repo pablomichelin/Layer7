@@ -4,8 +4,8 @@
 
 Este documento organiza a implementação da F2 em blocos pequenos, seguros e
 reversíveis. Ele continua a definir ordem, dependências, gates, rollback
-conceitual e testes mínimos, e passa a registar o checkpoint materializado da
-F2.1.
+conceitual e testes mínimos, e passa a registar os checkpoints
+materializados da F2.1 e da F2.2.
 
 Referências obrigatórias:
 
@@ -39,7 +39,11 @@ Referências obrigatórias:
   publico oficial, `8445` fica preso ao loopback por defeito, e a
   documentacao operacional passa a explicitar edge proxy, certificado,
   headers minimos e troubleshooting do origin privado.
-- **Próxima subfase elegível:** `F2.2 — Autenticação e sessão administrativa`
+- **F2.2 concluída em `2026-04-01`:** a autenticacao administrativa passa a
+  operar com sessao stateful no backend, cookie `HttpOnly + Secure +
+  SameSite=Strict`, expiracao ociosa/absoluta, renovacao controlada, logout
+  com invalidacao real e remocao do JWT em `localStorage` da trilha activa.
+- **Próxima subfase elegível:** `F2.3 — Proteção da superfície administrativa`
 
 ---
 
@@ -74,6 +78,8 @@ controlada; nunca abrir fallback público directo.
 - `/api/health` continua funcional conforme política definida.
 
 ### Subfase F2.2 - Autenticação e sessão administrativa
+
+**Status actual:** concluida em `2026-04-01`
 
 **Objectivo:** substituir token em `localStorage` por sessão segura.
 

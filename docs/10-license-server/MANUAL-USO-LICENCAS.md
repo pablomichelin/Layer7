@@ -3,11 +3,13 @@
 > Documento operacional para gerar, gerir, instalar e manter licencas
 > do produto Layer7 para pfSense CE.
 
-> Estado oficial apos a F2.1: o unico canal publico permitido para painel
+> Estado oficial apos a F2.2: o unico canal publico permitido para painel
 > administrativo e activacao online passa a ser
 > `https://license.systemup.inf.br`. O origin `8445/TCP` passa a ser privado
 > para o reverse proxy e troubleshooting controlado; acesso humano directo por
-> HTTP ao IP do host deixa de ser caminho normativo.
+> HTTP ao IP do host deixa de ser caminho normativo. A autenticacao
+> administrativa passa a usar sessao stateful com cookie seguro, sem JWT em
+> `localStorage`.
 
 ---
 
@@ -73,9 +75,15 @@ O sistema de licencas Layer7 funciona com dois componentes:
 
 - **Email:** `pablo@systemup.inf.br`
 - **Password:** `P@blo.147`
-
-No estado actual do software (ainda antes da F2.2), o login gera um token JWT
-valido por 24 horas. Apos 24h, sera necessario fazer login novamente.
+- **Canal oficial:** apenas `https://license.systemup.inf.br`
+- **Estado de autenticacao:** cookie `layer7_admin_session`
+- **Atributos do cookie:** `HttpOnly`, `Secure`, `SameSite=Strict`
+- **Expiracao ociosa:** `30 minutos`
+- **Expiracao absoluta:** `8 horas`
+- **Renovacao:** controlada pelo backend perto da expiracao ociosa
+- **Logout:** invalida a sessao no backend e limpa o cookie
+- **Concorrencia:** novo login revoga sessoes activas anteriores do mesmo
+  admin
 
 ### 2.3 Paginas do painel
 
@@ -105,16 +113,16 @@ Antes de gerar uma licenca, e necessario criar o cliente.
 ### Via API (curl)
 
 ```bash
-# Obter token
-TOKEN=$(curl -s https://license.systemup.inf.br/api/auth/login \
+# Criar sessao administrativa
+COOKIE_JAR=/tmp/layer7-license.cookies.txt
+
+curl -s -c "$COOKIE_JAR" https://license.systemup.inf.br/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}' \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+  -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}'
 
 # Criar cliente
-curl -s https://license.systemup.inf.br/api/customers \
+curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/customers \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
   -d '{"name":"Empresa ABC Ltda","email":"ti@empresaabc.com","phone":"11999998888"}'
 ```
 
@@ -138,9 +146,8 @@ curl -s https://license.systemup.inf.br/api/customers \
 ### Via API (curl)
 
 ```bash
-curl -s https://license.systemup.inf.br/api/licenses \
+curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
   -d '{"customer_id":1,"expiry":"2027-12-31","features":"full","notes":"Firewall principal"}'
 ```
 
@@ -264,8 +271,8 @@ grep -i license /var/log/layer7d.log
 
 ```bash
 # Revogar licenca ID 3
-curl -s -X POST https://license.systemup.inf.br/api/licenses/3/revoke \
-  -H "Authorization: Bearer $TOKEN"
+curl -s -X POST -b "$COOKIE_JAR" \
+  https://license.systemup.inf.br/api/licenses/3/revoke
 ```
 
 ### O que acontece ao revogar
@@ -300,9 +307,8 @@ Para renovar (estender a data de expiracao):
 
 ```bash
 # Estender expiracao da licenca ID 3 para 2028-12-31
-curl -s -X PUT https://license.systemup.inf.br/api/licenses/3 \
+curl -s -X PUT -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses/3 \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
   -d '{"expiry":"2028-12-31"}'
 ```
 
@@ -336,8 +342,7 @@ Prerequisito: a licenca deve ter sido activada pelo menos uma vez
 
 **Via API:**
 ```bash
-curl -s https://license.systemup.inf.br/api/licenses/3/download \
-  -H "Authorization: Bearer $TOKEN" \
+curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses/3/download \
   -o layer7.lic
 ```
 
@@ -422,11 +427,13 @@ O daemon verifica a licenca:
 | `POST` | `/api/activate` | Activacao de licenca (chamado pelo daemon) |
 | `GET` | `/api/health` | Health check do servidor |
 
-### Endpoints autenticados (estado actual do software: Bearer JWT)
+### Endpoints autenticados (cookie de sessao administrativa)
 
 | Metodo | Rota | Descricao |
 |--------|------|-----------|
-| `POST` | `/api/auth/login` | Login → JWT (24h, transitorio ate a F2.2) |
+| `POST` | `/api/auth/login` | Login administrativo via HTTPS; cria sessao stateful e devolve cookie `HttpOnly` |
+| `GET` | `/api/auth/session` | Resolve sessao activa, renova janela ociosa quando aplicavel |
+| `POST` | `/api/auth/logout` | Invalida sessao activa e limpa cookie |
 | `GET` | `/api/dashboard` | Metricas e ultimas activacoes |
 | `GET` | `/api/licenses?status=&page=&limit=` | Listar licencas |
 | `POST` | `/api/licenses` | Criar licenca |
@@ -445,9 +452,19 @@ O daemon verifica a licenca:
 O endpoint `/api/activate` tem limite de **10 requisicoes por minuto
 por IP** para prevenir abuso.
 
+`/api/auth/login`, CORS same-origin e brute force protection ficam
+explicitamente reservados para a F2.3.
+
 ---
 
 ## 12. Troubleshooting
+
+### "Sessao invalida ou expirada" (401)
+
+- O frontend volta para o ecrã de login
+- Repetir o login em `https://license.systemup.inf.br`
+- Confirmar que o acesso esta a passar por HTTPS/TLS real
+- Se necessario, invalidar sessoes activas e autenticar novamente
 
 ### "Licenca nao encontrada" (404)
 
@@ -505,7 +522,7 @@ grep license /var/log/layer7d.log  # qual o erro?
 |------|-------------|-----------|
 | Chave privada Ed25519 | `.env` no servidor (variavel `ED25519_PRIVATE_KEY`) | Nunca sai do servidor. Nao commitar. |
 | Chave publica Ed25519 | Embutida no binario `layer7d` (compile-time) | Distribuida com o pacote |
-| JWT secret | `.env` no servidor (variavel `JWT_SECRET`) | Nunca sai do servidor |
+| Sessao administrativa | Tabela `admin_sessions` + cookie `layer7_admin_session` | Cookie `HttpOnly + Secure + SameSite=Strict`; token opaco so e validado no backend |
 | Password admin | Armazenada com bcrypt (salt 12) no PostgreSQL | Nunca em texto limpo |
 
 ### Modelo de confianca
@@ -541,22 +558,21 @@ recompilar o binario.
 
 ```bash
 # 1. Login no servidor
-TOKEN=$(curl -s https://license.systemup.inf.br/api/auth/login \
+COOKIE_JAR=/tmp/layer7-license.cookies.txt
+
+curl -s -c "$COOKIE_JAR" https://license.systemup.inf.br/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}' \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+  -d '{"email":"pablo@systemup.inf.br","password":"P@blo.147"}'
 
 # 2. Criar cliente
-curl -s https://license.systemup.inf.br/api/customers \
+curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/customers \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
   -d '{"name":"Escola Municipal XYZ","email":"ti@escolaxyz.com.br","phone":"21988887777"}'
 # Resposta: {"id":2, ...}
 
 # 3. Criar licenca (1 ano)
-curl -s https://license.systemup.inf.br/api/licenses \
+curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TOKEN" \
   -d '{"customer_id":2,"expiry":"2027-03-24","features":"full","notes":"Contrato anual"}'
 # Resposta: {"license_key":"abcdef1234567890abcdef1234567890", ...}
 

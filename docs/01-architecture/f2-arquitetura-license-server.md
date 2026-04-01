@@ -2,8 +2,8 @@
 
 ## Finalidade
 
-Este documento consolidou o desenho completo da F2 e passa a registar o
-checkpoint materializado da F2.1. Ele traduz o estado real observado em
+Este documento consolidou o desenho completo da F2 e passa a registar os
+checkpoints materializados da F2.1 e da F2.2. Ele traduz o estado real observado em
 `license-server/` para uma arquitetura de hardening simples, auditável e
 operacionalmente viável.
 
@@ -70,6 +70,38 @@ Documentos normativos desta arquitetura:
   `https://license.systemup.inf.br` como caminho normativo
 - `docs/05-runbooks/license-server-publicacao-segura.md` passa a concentrar
   certificado, edge proxy, ACL do origin e validacoes minimas da F2.1
+
+## 1.2 Estado materializado apos a F2.2
+
+### Autenticacao e sessao
+
+- `license-server/backend/src/session.js` passa a concentrar o contrato de
+  sessao stateful com `admin_sessions` em PostgreSQL
+- `license-server/backend/src/routes/auth.js` passa a expor
+  `POST /api/auth/login`, `GET /api/auth/session` e `POST /api/auth/logout`
+- o login administrativo passa a exigir `req.secure` e o canal oficial da
+  F2.1, falhando fechado fora de HTTPS/TLS
+- o estado de autenticacao deixa de usar JWT bearer e passa a usar cookie
+  `HttpOnly + Secure + SameSite=Strict`
+- a expiracao passa a ser dupla: `30 minutos` de ociosidade e `8 horas` de
+  vida absoluta, com renovacao controlada perto da janela ociosa
+- novo login passa a revogar sessoes activas anteriores do mesmo admin
+
+### Frontend
+
+- `license-server/frontend/src/auth.jsx` passa a centralizar bootstrap de
+  sessao, login, logout e tratamento de sessao invalida/expirada
+- `license-server/frontend/src/api.js` deixa de usar `localStorage` e bearer
+  manual; as chamadas autenticadas passam a usar cookie same-origin
+- `license-server/frontend/src/App.jsx` passa a proteger rotas por sessao
+  resolvida no backend em vez de apenas testar presenca de token local
+
+### Operacao
+
+- `docs/05-runbooks/license-server-auth-sessao.md` passa a concentrar o
+  contrato operativo da F2.2
+- `docs/10-license-server/MANUAL-USO-LICENCAS.md` passa a usar `cookie jar`
+  e `GET /api/auth/session` como referencia operacional de auth/sessao
 
 ---
 
@@ -188,7 +220,8 @@ Superfície mais sensível. Exige:
 ### 5.5 Segredos e operação
 
 - segredos fora do Git
-- owner claro de `JWT_SECRET`, `ED25519_PRIVATE_KEY` e password bootstrap
+- owner claro da credencial bootstrap, do cookie seguro em HTTPS/TLS, da
+  `ED25519_PRIVATE_KEY` e da password bootstrap
 - rotação planejada
 - backup/restore e bootstrap documentados
 
@@ -235,10 +268,9 @@ Superfície mais sensível. Exige:
 
 Estas decisões ficam abertas para implementação, não para filosofia:
 
-- storage final de sessão (`admin_sessions` em PostgreSQL ou equivalente);
-- shape final da política de arquivo lógico;
 - calibragem exacta de limits/lockouts;
-- definição final do endpoint de logout e renovação;
+- shape final da política de arquivo lógico;
+- detalhe final do logging/auditoria administrativa;
 - runbook final de backup/restore e rotação de segredos.
 
 ---

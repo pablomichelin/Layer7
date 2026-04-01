@@ -23,7 +23,6 @@ services:
       - db
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      JWT_SECRET: ${JWT_SECRET}
       ED25519_PRIVATE_KEY: ${ED25519_PRIVATE_KEY}
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3001

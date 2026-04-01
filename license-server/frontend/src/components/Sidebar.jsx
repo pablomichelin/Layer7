@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { clearToken } from '../api';
+import { useAuth } from '../auth';
 
 const links = [
   { to: '/dashboard', label: 'Dashboard', icon: '📊' },
@@ -9,10 +9,11 @@ const links = [
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const { admin, logout } = useAuth();
 
-  function handleLogout() {
-    clearToken();
-    navigate('/login');
+  async function handleLogout() {
+    await logout();
+    navigate('/login', { replace: true });
   }
 
   return (
@@ -20,6 +21,7 @@ export default function Sidebar() {
       <div className="p-6 border-b border-brand-600">
         <h1 className="text-lg font-bold tracking-tight">Layer7 License Manager</h1>
         <p className="text-brand-200 text-xs mt-1">por Systemup</p>
+        {admin && <p className="text-brand-100 text-xs mt-3">{admin.email}</p>}
       </div>
 
       <nav className="flex-1 py-4">

@@ -13,4 +13,8 @@ Rollback do pacote Layer7: [`rollback.md`](rollback.md).
 Publicacao segura do license server (TLS, edge proxy, origin privado `8445`):
 [`license-server-publicacao-segura.md`](license-server-publicacao-segura.md).
 
+Autenticacao e sessao administrativa do license server (login, cookie seguro,
+expiracao, logout e troubleshooting):
+[`license-server-auth-sessao.md`](license-server-auth-sessao.md).
+
 Runbooks especificos por release entram aqui quando existirem.

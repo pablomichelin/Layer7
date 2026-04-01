@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { post, setToken, isAuthenticated } from '../api';
+import { useAuth } from '../auth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -8,25 +8,30 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading, login } = useAuth();
 
-  if (isAuthenticated()) {
-    navigate('/dashboard', { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [authLoading, isAuthenticated, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const data = await post('/auth/login', { email, password });
-      setToken(data.token);
+      await login(email, password);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(err.message || 'Erro ao fazer login');
     } finally {
       setLoading(false);
     }
+  }
+
+  if (authLoading) {
+    return <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">Validando sessão...</div>;
   }
 
   return (
@@ -70,7 +75,7 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || authLoading}
             className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
           >
             {loading ? 'Entrando...' : 'Entrar'}

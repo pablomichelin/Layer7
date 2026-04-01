@@ -16,7 +16,7 @@ com hardening tecnico ou com release engineering.
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
 | F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
-| F2 | Hardening do license server | execucao iniciada; F2.1 concluida | stack de licencas opera com segredos, backup e fronteiras sob controlo |
+| F2 | Hardening do license server | execucao iniciada; F2.1 e F2.2 concluidas | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
@@ -176,6 +176,11 @@ Tornar auditavel a cadeia de confianca entre:
   publico oficial do license server; `8445` passa a operar como origin
   privado com bind local por defeito, headers basicos publicados pelo nginx
   interno e runbook explicito para edge proxy, certificado e validacao.
+- **F2.2 concluida em `2026-04-01`:** autenticacao administrativa deixa de
+  depender de JWT em `localStorage`; a stack passa a operar com sessao
+  stateful no backend, cookie `HttpOnly + Secure + SameSite=Strict`,
+  expiracao ociosa/absoluta, renovacao controlada, logout com invalidacao
+  real e bootstrap de sessao via `/api/auth/session`.
 
 ### Documentacao obrigatoria da fase
 

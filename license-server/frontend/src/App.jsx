@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { isAuthenticated } from './api';
+import { useAuth } from './auth';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -11,7 +11,13 @@ import CustomerForm from './pages/CustomerForm';
 import CustomerDetail from './pages/CustomerDetail';
 
 function PrivateRoute({ children }) {
-  return isAuthenticated() ? children : <Navigate to="/login" replace />;
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">Validando sessão...</div>;
+  }
+
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 export default function App() {

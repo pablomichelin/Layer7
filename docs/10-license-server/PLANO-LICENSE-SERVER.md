@@ -167,7 +167,7 @@ O login no frontend usa email + password.
 | Database   | PostgreSQL 17 |
 | ORM/Query  | node-postgres (pg) |
 | Crypto     | tweetnacl (Ed25519 sign/verify) |
-| Auth       | jsonwebtoken + bcryptjs |
+| Auth       | sessao stateful em PostgreSQL + cookie seguro + bcryptjs |
 | Rate limit | express-rate-limit |
 | Frontend   | React 18 + Vite + React Router v6 |
 | CSS        | TailwindCSS 3 |
@@ -196,7 +196,8 @@ license-server/
 │   └── src/
 │       ├── index.js           (Express server, porta 3001)
 │       ├── db.js              (PostgreSQL pool via pg)
-│       ├── auth.js            (JWT middleware)
+│       ├── auth.js            (middleware de sessao administrativa)
+│       ├── session.js         (storage/validacao/renovacao de sessao)
 │       ├── crypto.js          (Ed25519 sign/verify via tweetnacl)
 │       └── routes/
 │           ├── activate.js    (POST /api/activate — publico)
@@ -215,7 +216,7 @@ license-server/
 │   └── src/
 │       ├── main.jsx
 │       ├── App.jsx            (React Router)
-│       ├── api.js             (fetch wrapper com JWT)
+│       ├── api.js             (fetch wrapper same-origin com cookie de sessao)
 │       ├── pages/
 │       │   ├── Login.jsx
 │       │   ├── Dashboard.jsx
@@ -322,11 +323,13 @@ CREATE INDEX idx_activations_created ON activations_log(created_at);
 10. Gravar activacao em `activations_log` com result=success
 11. Actualizar `activated_at` na licenca
 
-### 10.2 Autenticado (painel admin, JWT)
+### 10.2 Autenticado (painel admin, sessao stateful)
 
 | Metodo | Rota                      | Descricao                               |
 |--------|---------------------------|-----------------------------------------|
-| POST   | /api/auth/login           | Body: `{email, password}` → JWT (24h)   |
+| POST   | /api/auth/login           | Body: `{email, password}` → cria sessao segura em cookie |
+| GET    | /api/auth/session         | Resolve sessao activa e renova janela ociosa quando aplicavel |
+| POST   | /api/auth/logout          | Invalida a sessao activa no backend |
 | GET    | /api/dashboard            | Metricas: totais, activas, expiradas, revogadas, clientes, activacoes 24h |
 | GET    | /api/licenses             | Lista paginada. Query: `?status=&customer_id=&page=&limit=` |
 | POST   | /api/licenses             | Criar licenca. Body: `{customer_id, expiry, features, notes}`. Auto-gera `license_key` (32 hex random) |
@@ -398,7 +401,8 @@ function signLicense(dataString, privateKeyHex) {
 - Campos: email, password
 - Logo Systemup no topo
 - Redirect para Dashboard apos login
-- JWT guardado no localStorage
+- Sessao resolvida por `GET /api/auth/session`
+- Sem `localStorage` para credenciais; browser usa cookie `HttpOnly`
 
 ### 12.2 Dashboard
 - 4 cards de metricas: Licencas Activas (verde), Expiradas (amarelo), Revogadas (vermelho), Total Clientes (azul)
@@ -453,9 +457,6 @@ POSTGRES_DB=layer7_license
 POSTGRES_USER=layer7
 POSTGRES_PASSWORD=<gerar_password_forte>
 
-# JWT
-JWT_SECRET=<gerar_string_aleatoria_32+_chars>
-
 # Ed25519 (chave privada, 64 hex chars)
 ED25519_PRIVATE_KEY=<conteudo_de_layer7-private.key>
 
@@ -499,7 +500,6 @@ services:
       - db
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      JWT_SECRET: ${JWT_SECRET}
       ED25519_PRIVATE_KEY: ${ED25519_PRIVATE_KEY}
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3001
@@ -648,7 +648,7 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 
 ## 17. Seguranca
 
-- JWT com expiracao de 24h para o painel admin
+- Sessao administrativa stateful com cookie `HttpOnly + Secure + SameSite=Strict`
 - Endpoint `/api/activate` publico mas rate-limited (10 req/min por IP)
 - Password do admin com bcrypt (salt rounds 12)
 - Chave privada Ed25519 apenas no `.env` (nunca no codigo)
@@ -673,7 +673,7 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 - [x] Criar `nginx/nginx.conf`
 
 ### Bloco 2: Backend — Database e crypto ✓ (2026-03-23)
-- [x] Criar `backend/package.json` (dependencias: express, pg, jsonwebtoken, bcryptjs, tweetnacl, express-rate-limit, cors, dotenv)
+- [x] Criar `backend/package.json` (dependencias: express, pg, bcryptjs, tweetnacl, express-rate-limit, cors, dotenv)
 - [x] Criar `backend/migrations/001-init.sql`
 - [x] Criar `backend/src/db.js` (pool PostgreSQL)
 - [x] Criar `backend/src/crypto.js` (Ed25519 sign com tweetnacl)
@@ -681,7 +681,7 @@ Compilar no FreeBSD builder (192.168.100.12) e gerar novo `.pkg`.
 
 ### Bloco 3: Backend — API ✓ (2026-03-23)
 - [x] Criar `backend/src/index.js` (Express server)
-- [x] Criar `backend/src/auth.js` (JWT middleware)
+- [x] Criar `backend/src/auth.js` (middleware de sessao administrativa)
 - [x] Criar `backend/src/routes/auth.js` (login)
 - [x] Criar `backend/src/routes/activate.js` (activacao publica)
 - [x] Criar `backend/src/routes/licenses.js` (CRUD)
@@ -801,7 +801,11 @@ docker compose -p layer7-license down -v
 }
 ```
 
-**JWT payload**: `{id, email, name, iat, exp}`
+**Sessao administrativa**:
+- cookie: `layer7_admin_session`
+- expiracao ociosa: `30 minutos`
+- expiracao absoluta: `8 horas`
+- revogacao: real no backend via tabela `admin_sessions`
 
 ---
 

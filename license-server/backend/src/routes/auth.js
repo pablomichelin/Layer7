@@ -1,7 +1,16 @@
 const { Router } = require('express');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const auth = require('../auth');
+const {
+  clearSessionCookie,
+  createSession,
+  getSessionTokenFromRequest,
+  requireSecureSessionRequest,
+  revokeSessionByToken,
+  setSessionCookie,
+  toSessionResponsePayload,
+} = require('../session');
 
 const router = Router();
 
@@ -10,6 +19,10 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: 'Email e password obrigatorios' });
+    }
+    if (!requireSecureSessionRequest(req)) {
+      clearSessionCookie(res);
+      return res.status(400).json({ error: 'Login administrativo exige HTTPS/TLS oficial' });
     }
 
     const result = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
@@ -23,15 +36,34 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenciais invalidas' });
     }
 
-    const token = jwt.sign(
-      { id: admin.id, email: admin.email, name: admin.name },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.json({ token, admin: { id: admin.id, email: admin.email, name: admin.name } });
+    const session = await createSession(admin, req);
+    setSessionCookie(res, session.token, session.metadata.session.expires_at);
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(toSessionResponsePayload(session.metadata));
   } catch (err) {
     console.error('[AUTH] Login error:', err.message);
+    res.status(500).json({ error: 'Erro interno' });
+  }
+});
+
+router.get('/session', auth, async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.json(toSessionResponsePayload({
+    admin: req.admin,
+    session: req.adminSession,
+  }));
+});
+
+router.post('/logout', async (req, res) => {
+  try {
+    const token = getSessionTokenFromRequest(req);
+    await revokeSessionByToken(token);
+    clearSessionCookie(res);
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ message: 'Sessao encerrada' });
+  } catch (err) {
+    console.error('[AUTH] Logout error:', err.message);
+    clearSessionCookie(res);
     res.status(500).json({ error: 'Erro interno' });
   }
 });

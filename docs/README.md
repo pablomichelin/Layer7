@@ -43,11 +43,11 @@ Quando houver conflito, seguir esta ordem:
 |------|--------------------------|--------|
 | Visao de produto | [`00-overview/product-charter.md`](00-overview/product-charter.md) | canónico |
 | Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md), [`core/README.md`](core/README.md) | canónico |
-| Roadmap e execucao | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md), [`02-roadmap/backlog.md`](02-roadmap/backlog.md), [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md), [`02-roadmap/f1-plano-de-implementacao.md`](02-roadmap/f1-plano-de-implementacao.md) | canónico |
+| Roadmap e execucao | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md), [`02-roadmap/backlog.md`](02-roadmap/backlog.md), [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md), [`02-roadmap/f1-plano-de-implementacao.md`](02-roadmap/f1-plano-de-implementacao.md), [`02-roadmap/f2-plano-de-implementacao.md`](02-roadmap/f2-plano-de-implementacao.md) | canónico |
 | ADRs | [`03-adr/README.md`](03-adr/README.md) | canónico |
 | Package e validacao | [`04-package/README.md`](04-package/README.md), [`04-package/validacao-lab.md`](04-package/validacao-lab.md) | suplementar/operacional |
 | Daemon e enforcement | [`05-daemon/README.md`](05-daemon/README.md), [`05-daemon/pf-enforcement.md`](05-daemon/pf-enforcement.md) | suplementar com partes historicas |
-| Runbooks | [`05-runbooks/README.md`](05-runbooks/README.md), [`05-runbooks/license-server-publicacao-segura.md`](05-runbooks/license-server-publicacao-segura.md) | misto: indice suplementar + runbook canónico da publicacao segura do license server |
+| Runbooks | [`05-runbooks/README.md`](05-runbooks/README.md), [`05-runbooks/license-server-publicacao-segura.md`](05-runbooks/license-server-publicacao-segura.md), [`05-runbooks/license-server-auth-sessao.md`](05-runbooks/license-server-auth-sessao.md) | misto: indice suplementar + runbooks canónicos da publicacao segura e da sessao administrativa do license server |
 | Releases | [`06-releases/README.md`](06-releases/README.md), [`06-releases/RELEASE-SIGNING.md`](06-releases/RELEASE-SIGNING.md) | canónico para governanca de release |
 | Lab | [`08-lab/README.md`](08-lab/README.md) | suplementar |
 | Bloqueio | [`09-blocking/README.md`](09-blocking/README.md) | historico/preservado |

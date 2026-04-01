@@ -7,6 +7,7 @@ const activateRoutes = require('./routes/activate');
 const licensesRoutes = require('./routes/licenses');
 const customersRoutes = require('./routes/customers');
 const dashboardRoutes = require('./routes/dashboard');
+const { ensureSessionSchema } = require('./session');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -30,6 +31,16 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[API] Layer7 License Server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await ensureSessionSchema();
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`[API] Layer7 License Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('[API] Startup error:', err.message);
+    process.exit(1);
+  }
+}
+
+startServer();

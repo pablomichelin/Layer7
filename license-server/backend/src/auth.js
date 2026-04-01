@@ -1,18 +1,20 @@
-const jwt = require('jsonwebtoken');
+const { clearSessionCookie, resolveSession } = require('./session');
 
-function authMiddleware(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header || !header.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Token nao fornecido' });
-  }
-
-  const token = header.slice(7);
+async function authMiddleware(req, res, next) {
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.admin = payload;
+    const session = await resolveSession(req, res);
+    if (!session) {
+      clearSessionCookie(res);
+      return res.status(401).json({ error: 'Sessao invalida ou expirada' });
+    }
+
+    req.admin = session.metadata.admin;
+    req.adminSession = session.metadata.session;
     next();
-  } catch {
-    return res.status(401).json({ error: 'Token invalido ou expirado' });
+  } catch (err) {
+    console.error('[AUTH] Session validation error:', err.message);
+    clearSessionCookie(res);
+    return res.status(500).json({ error: 'Erro interno' });
   }
 }
 

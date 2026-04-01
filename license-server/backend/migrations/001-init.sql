@@ -43,8 +43,23 @@ CREATE TABLE activations_log (
     created_at  TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE admin_sessions (
+    id          SERIAL PRIMARY KEY,
+    admin_id    INTEGER NOT NULL REFERENCES admins(id) ON DELETE CASCADE,
+    session_token_hash VARCHAR(64) UNIQUE NOT NULL,
+    created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at  TIMESTAMP NOT NULL,
+    last_seen_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    revoked_at  TIMESTAMP,
+    ip_address  VARCHAR(45),
+    user_agent  VARCHAR(255)
+);
+
 CREATE INDEX idx_licenses_key ON licenses(license_key);
 CREATE INDEX idx_licenses_status ON licenses(status);
 CREATE INDEX idx_licenses_customer ON licenses(customer_id);
 CREATE INDEX idx_activations_license ON activations_log(license_id);
 CREATE INDEX idx_activations_created ON activations_log(created_at);
+CREATE INDEX idx_admin_sessions_admin ON admin_sessions(admin_id);
+CREATE INDEX idx_admin_sessions_expires ON admin_sessions(expires_at);
+CREATE INDEX idx_admin_sessions_revoked ON admin_sessions(revoked_at);
