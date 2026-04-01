@@ -17,6 +17,7 @@ com criterio de risco, beneficio e ordem de execucao.
   - `Planeado`
   - `Planeamento F1 concluido`
   - `Planeamento F2 concluido`
+  - `Em execucao na F3.1`
   - `Bloqueado pela fase`
   - `Acompanhar`
 
@@ -63,6 +64,17 @@ reavaliacao formal.
   runbooks essenciais; a F2 fica encerrada e a proxima fase elegivel passa a
   ser a F3.
 
+## Checkpoint actual da F3
+
+- A F3 foi aberta formalmente em `2026-04-01` com o documento canónico
+  `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`.
+- A F3.1 mapeou o estado real do codigo: activacao publica em
+  `POST /api/activate`, estado persistido em `licenses`, estado derivado por
+  expiracao em leituras/listagens e grace local apenas no daemon.
+- O primeiro endurecimento minimo desta fase passa a tornar a reactivacao do
+  mesmo hardware mais idempotente no backend, sem rebind, sem mudanca de
+  contrato e sem abrir trilhas paralelas.
+
 ---
 
 ## Backlog priorizado
@@ -77,9 +89,9 @@ reavaliacao formal.
 | BG-023 | Fechar a politica oficial de publicacao segura do license server com TLS, edge proxy e portas permitidas | Critica | license-server/publicacao | F2 | exposicao ambigua do painel e do endpoint publico | M | Alto | Acompanhar | materializado na F2.1 com `443/TLS` oficial, origin `8445` privado por defeito, headers minimos e runbook de borda/TLS |
 | BG-024 | Substituir JWT em `localStorage` por sessao administrativa segura e fechar CORS/login/brute force | Critica | license-server/auth | F2 | roubo de sessao, abuso administrativo e superficie web permissiva | M | Alto | Acompanhar | F2.2 materializou sessao stateful com cookie seguro e logout real; F2.3 fechou same-origin, limiter dedicado, lockout temporario, politica minima de erro e auditoria administrativa |
 | BG-025 | Endurecer validacao, transacoes, arquivo/delete seguro e atomicidade do CRUD do license server | Alta | license-server/crud | F2 | estado parcial, perda de auditoria e conflitos silenciosos | M | Alto | Acompanhar | materializado na F2.4 com validacao forte, transacoes explicitas em `activate`/mutacoes administrativas e arquivo logico no painel |
-| BG-006 | Definir modelo de estados do licenciamento: activar, reactivar, renovar, revogar, expirar, grace e offline | Alta | licenciamento | F3 | suporte e troubleshooting continuarem dependentes de tentativa e erro | M | Alto | Planeado | precisa de ADR ou especificacao formal |
+| BG-006 | Definir modelo de estados do licenciamento: activar, reactivar, renovar, revogar, expirar, grace e offline | Alta | licenciamento | F3 | suporte e troubleshooting continuarem dependentes de tentativa e erro | M | Alto | Em execucao na F3.1 | contrato canónico inicial e estados/transicoes foram formalizados; validar casos reais segue na F3.2 |
 | BG-007 | Validar robustez do hardware fingerprint em cenarios de mudanca de NIC, VM, reinstall e clock | Alta | licenciamento | F3 | activacoes legitimas falharem ou exigirem workaround manual | M | Alto | Planeado | usar matriz de casos e rollback |
-| BG-008 | Fechar lacunas de previsibilidade em activacao offline e revogacao sem quebrar comportamento actual | Alta | licenciamento | F3 | operador assumir garantias que o sistema ainda nao oferece | M | Alto | Planeado | documentar sem expandir escopo comercial |
+| BG-008 | Fechar lacunas de previsibilidade em activacao offline e revogacao sem quebrar comportamento actual | Alta | licenciamento | F3 | operador assumir garantias que o sistema ainda nao oferece | M | Alto | Em execucao na F3.1 | F3.1 clarifica o contrato actual e a diferenca entre activacao online e grace/offline; endurecimento operacional continua na F3.2 |
 | BG-009 | Consolidar confiabilidade de package/daemon em reboot, reload, upgrade, rollback e reinicio de servico | Alta | package/daemon | F4 | runtime continuar a divergir entre estado desejado e estado real | G | Alto | Planeado | exige evidencias em appliance |
 | BG-010 | Hardening da trilha de blacklists UT1: download, cron, reload, fallback, except tables e forcing DNS | Alta | blacklists | F4 | subsistema seguir operacionalmente fragil apesar de funcional | G | Alto | Bloqueado pela fase | documentos da trilha ja existem e devem ser usados |
 | BG-011 | Validar forcing DNS e anti-bypass em cenarios reais de VLAN/interface, excepcoes e tabelas PF | Alta | daemon/enforcement | F4 | bypass continuar a aparecer em combinacoes menos comuns | M | Alto | Planeado | derivado das correccoes recentes em `rdr` |

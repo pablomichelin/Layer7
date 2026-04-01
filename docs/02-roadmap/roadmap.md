@@ -17,7 +17,7 @@ com hardening tecnico ou com release engineering.
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
 | F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
 | F2 | Hardening do license server | concluida em `2026-04-01` | stack de licencas opera com segredos, bootstrap, backup e fronteiras sob controlo |
-| F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
+| F3 | Robustez de licenciamento/activacao | aberta em `2026-04-01` | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
 | F6 | Reorganizacao estrutural controlada | planeada | reorganizacao fisica acontece com mapa, links e rollback |
@@ -312,6 +312,20 @@ falha.
 - risco critico do servidor estabilizado;
 - modelo de confianca conhecido.
 
+### Checkpoint actual
+
+- **F3 aberta em `2026-04-01`:** a arquitectura canónica passa a viver em
+  `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`, com
+  mapeamento factual do fluxo actual de activacao/licenciamento no backend e
+  no daemon.
+- **F3.1 em execucao:** o contrato canónico passa a distinguir estado
+  persistido (`active`, `revoked`, `expired`) de estado derivado por
+  expiracao, a clarificar a diferenca entre activacao online e grace local do
+  daemon, e a materializar um primeiro endurecimento de idempotencia segura
+  em `POST /api/activate`.
+- **Proxima subfase elegivel:** `F3.2 — expiracao, grace, offline e matriz de
+  fingerprint em cenarios reais`.
+
 ### Criterios de saida
 
 - fluxo de licenciamento explicado por estado e transicao;
@@ -326,6 +340,7 @@ falha.
 ### Documentacao obrigatoria da fase
 
 - `CORTEX.md`
+- `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`

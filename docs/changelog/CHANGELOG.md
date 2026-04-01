@@ -4,6 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.1 abertura formal da robustez de licenciamento/activacao
+
+- **Contrato canónico da F3 aberto** — `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`
+  passa a registar o estado real observado no backend e no daemon, os
+  estados/transicoes do licenciamento e a diferenca entre expiracao online e
+  grace local
+- **Compatibilidade preservada** — `POST /api/activate` continua a responder
+  `{"data","sig"}` e a usar os mesmos codigos `400` / `404` / `409`, sem
+  mudar o formato `.lic` nem o algoritmo de fingerprint
+- **Idempotencia defensiva na activacao** — a reactivacao do mesmo hardware
+  deixa de mutar a licenca sem necessidade, o `.lic` passa a ser assinado a
+  partir do `hardware_id` efectivamente persistido, e o `UPDATE` do bind fica
+  reforcado pela propria condicao de `hardware_id`
+- **Trilha documental alinhada** — `CORTEX`, roadmap, backlog, checklist,
+  manual de licencas e matriz de testes passam a tratar a F3 como aberta e a
+  reservar a F3.2 para grace/offline/fingerprint em appliance
+
 ### Changed — F2.5 segredos, bootstrap, backup/restore e runbooks do license server
 
 - **Segredos e ownership minimo materializados** — o stack passa a declarar

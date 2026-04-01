@@ -34,9 +34,11 @@ async function logActivationBestEffort(licenseId, hardwareId, ip, ua, result, er
 router.post('/activate', activateLimiter, async (req, res) => {
   const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip;
   const ua = req.headers['user-agent'] || '';
+  let requestedHardwareId = null;
 
   try {
     const { key, hardwareId } = parseActivatePayload(req.body);
+    requestedHardwareId = hardwareId;
 
     const signedLicense = await runInTransaction(async (client) => {
       const result = await client.query(
@@ -55,6 +57,7 @@ router.post('/activate', activateLimiter, async (req, res) => {
       }
 
       const license = result.rows[0];
+      let effectiveHardwareId = license.hardware_id || hardwareId;
 
       if (license.status === 'revoked') {
         const error = createHttpError(409, 'Licenca revogada.');
@@ -74,23 +77,35 @@ router.post('/activate', activateLimiter, async (req, res) => {
         throw error;
       }
 
-      await client.query(
-        `UPDATE licenses
-            SET hardware_id = COALESCE(hardware_id, $1),
-                activated_at = COALESCE(activated_at, NOW()),
-                updated_at = NOW()
-          WHERE id = $2`,
-        [hardwareId, license.id]
-      );
+      if (!license.hardware_id || !license.activated_at) {
+        const updateResult = await client.query(
+          `UPDATE licenses
+              SET hardware_id = COALESCE(hardware_id, $1),
+                  activated_at = COALESCE(activated_at, NOW()),
+                  updated_at = NOW()
+            WHERE id = $2
+              AND (hardware_id IS NULL OR hardware_id = $1)
+            RETURNING hardware_id`,
+          [hardwareId, license.id]
+        );
+
+        if (updateResult.rows.length === 0) {
+          const error = createHttpError(409, 'Hardware ID nao corresponde.');
+          error.licenseId = license.id;
+          throw error;
+        }
+
+        effectiveHardwareId = updateResult.rows[0].hardware_id || effectiveHardwareId;
+      }
 
       const signed = generateSignedLicense({
-        hardware_id: hardwareId,
+        hardware_id: effectiveHardwareId,
         expiry: new Date(license.expiry).toISOString().slice(0, 10),
         customer: license.customer_name || 'Unknown',
         features: license.features || 'full',
       });
 
-      await logActivation(client, license.id, hardwareId, ip, ua, 'success', null);
+      await logActivation(client, license.id, effectiveHardwareId, ip, ua, 'success', null);
 
       return signed;
     });
@@ -100,7 +115,7 @@ router.post('/activate', activateLimiter, async (req, res) => {
     if (isHttpError(error)) {
       await logActivationBestEffort(
         error.licenseId || null,
-        req.body?.hardware_id || null,
+        requestedHardwareId,
         ip,
         ua,
         'fail',

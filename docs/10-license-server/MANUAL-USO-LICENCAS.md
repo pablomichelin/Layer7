@@ -15,6 +15,15 @@
 > logico no fluxo normal do painel. O fecho operacional da F2 passa a exigir
 > runbooks especificos para segredos/bootstrap administrativo e para
 > backup/restore do PostgreSQL.
+>
+> Estado canónico apos a abertura da F3.1: o contrato de licenciamento e
+> activacao passa a estar formalizado em
+> `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`. A activacao
+> online continua compativel com o contrato actual, mas fica explicitado que:
+> a primeira activacao fixa o `hardware_id`, a reactivacao valida do mesmo
+> hardware e tratada como idempotente, licencas expiradas sao recusadas pelo
+> servidor na activacao online, e o grace period de `14` dias continua a
+> existir apenas na verificacao local do daemon para um `.lic` ja emitido.
 
 ---
 
@@ -65,6 +74,17 @@ O sistema de licencas Layer7 funciona com dois componentes:
 6. O daemon grava em `/usr/local/etc/layer7.lic` e valida
 7. Com licenca valida: **enforce** (bloqueio activo)
 8. Sem licenca valida: **monitor-only** (sem bloqueio)
+
+### 1.1 Contrato minimo actual de licenciamento
+
+- licenca nova nasce `active` e sem `hardware_id`
+- a primeira activacao valida fixa o `hardware_id`
+- a reactivacao com o mesmo `hardware_id` pode reemitir o `.lic`, sem trocar
+  o bind
+- activacao com `hardware_id` diferente apos o bind falha com `409`
+- licenca revogada falha na activacao online
+- licenca expirada falha na activacao online
+- o daemon ainda aceita grace local de `14` dias para um `.lic` ja emitido
 
 ---
 
@@ -225,6 +245,8 @@ layer7d: license valid — customer=Empresa ABC Ltda expiry=2027-12-31 features=
 3. O servidor:
    - Valida a chave
    - Se e a primeira activacao, grava o hardware_id na licenca
+   - Se o mesmo hardware reactivar, mantem o bind existente e apenas reemite o `.lic`
+   - Se outro hardware tentar reactivar depois do bind, responde `409`
    - Gera e assina o ficheiro `.lic` com Ed25519
    - Retorna o JSON assinado
 4. O daemon grava em `/usr/local/etc/layer7.lic`
@@ -235,7 +257,15 @@ layer7d: license valid — customer=Empresa ABC Ltda expiry=2027-12-31 features=
 
 Pode executar `--activate` novamente a qualquer momento (ex: apos
 renovacao). O servidor ira gerar um novo `.lic` com a data de
-expiracao actualizada, desde que o hardware_id corresponda.
+expiracao actualizada, desde que o `hardware_id` corresponda ao bind
+ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
+
+### 5.4 Expiracao online vs grace local
+
+- `POST /api/activate` recusa licenca expirada no servidor
+- um `.lic` ja emitido continua sujeito ao grace local de `14` dias no daemon
+- esta diferenca e comportamento actual oficial; a harmonizacao operacional
+  fica para as proximas subfases da F3
 
 ---
 

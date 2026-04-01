@@ -50,8 +50,8 @@ controladas, com governanca forte e zero regressao desnecessaria.
   com bloqueio QUIC configuravel por interface seleccionavel na GUI
   e restricao `to !<localsubnets>` em todos os bloqueios.
 - O license server existe e esta operacional como componente separado,
-  mas a sua cadeia de confianca e o seu hardening ainda pertencem as
-  proximas fases planeadas.
+  com F2 concluida e a F3 aberta para endurecer o contrato real de
+  licenciamento/activacao sem regressao.
 
 ### Estado documental
 
@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F2 — Concluida em 2026-04-01; F3 ainda nao iniciada`
+**Fase actual consolidada:** `F3 — Abertura controlada em 2026-04-01; F3.1 (robustez do contrato de licenciamento/activacao) em execucao`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -150,7 +150,16 @@ stack passa a ter scripts minimos de `backup-postgres.sh` /
 `restore-postgres.sh`, e a operacao oficial passa a ter runbooks canónicos
 de segredos/bootstrap e backup/restore.
 
-**Proxima fase elegivel:** `F3 — Robustez de licenciamento/activacao`
+**Resultado actual conhecido da F3:** a fase foi formalmente aberta em
+`2026-04-01` pela **F3.1**, com mapeamento factual do fluxo actual de
+licenciamento/activacao no backend e no daemon, contrato canónico minimo de
+estados/transicoes, clarificacao da diferenca entre expiracao online e grace
+local do daemon, e um primeiro endurecimento defensivo em `POST /api/activate`
+para tornar a reactivacao do mesmo hardware mais idempotente e previsivel sem
+quebrar compatibilidade.
+
+**Proxima subfase elegivel dentro da F3:** `F3.2 — expiracao, grace, offline e
+matriz de fingerprint em cenarios reais`
 
 ### Ordem segura das fases
 
@@ -159,7 +168,7 @@ de segredos/bootstrap e backup/restore.
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
 | F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
 | F2 | Hardening do license server | concluida em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
-| F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
+| F3 | Robustez de licenciamento/activacao | aberta em `2026-04-01` | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
 | F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
 | F6 | Reorganizacao estrutural controlada | planeada | mover/normalizar estrutura apenas com mapa e rollback |
@@ -171,7 +180,10 @@ de segredos/bootstrap e backup/restore.
 
 1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
-2. Usar o backlog canónico como fila unica antes de tocar em
+2. Executar a F3.2 em bloco proprio para fechar a semantica de expiracao,
+   grace period, reemissao offline e matriz de casos do fingerprint, sem
+   misturar package/daemon/runtime da F4.
+3. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
 ---
@@ -214,8 +226,16 @@ de segredos/bootstrap e backup/restore.
 - A F2.5 fechou o ownership minimo de segredos, bootstrap administrativo e
   backup/restore do banco, mas a rotacao formal da chave Ed25519 em incidente
   e a automacao ampliada de retention/observabilidade continuam fora da F2.
-- A F2 agora tem arquitectura e ordem segura definidas, mas continua a exigir
-  implementacao tecnica controlada em subfases pequenas e reversiveis.
+- A F3.1 clarificou o contrato actual, mas o modelo ainda depende de estado
+  derivado em vez de estado totalmente persistido: `licenses.status = 'expired'`
+  continua opcional/legado e a leitura operacional trata expiracao tambem por
+  `expiry < CURRENT_DATE`.
+- O daemon aceita `.lic` expirado em grace local de `14` dias, enquanto a
+  activacao online recusa imediatamente licencas expiradas; a diferenca agora
+  esta documentada, mas ainda precisa de tratamento operacional/testes na F3.2.
+- O fingerprint continua dependente de `SHA256(kern.hostuuid + ":" + primeira
+  MAC Ethernet nao-loopback)`; mudanca de NIC, VM, reinstall ou ordem de
+  interfaces ainda pode exigir validacao dedicada na F3.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;
   sem ler a classificacao, um agente pode seguir um documento antigo.
 - Existem documentos antigos ainda a mencionar `.txz`, `v0.x` e estados

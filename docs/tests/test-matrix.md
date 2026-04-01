@@ -1,4 +1,4 @@
-# Matriz de testes — V1
+# Matriz de testes — V1 + addendum F3
 
 Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Actions / Ubuntu), no **builder** (FreeBSD) ou no **appliance** (pfSense lab).
 
@@ -112,6 +112,18 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 10.2 | pfSense funciona normalmente após delete | appliance | OK |
 | 10.3 | Reinstalar versão anterior funciona | appliance | OK (2026-03-22, reinstall via GitHub) |
 
+## 11. Licenciamento e activação
+
+| # | Teste | Onde | Status |
+|---|-------|------|--------|
+| 11.1 | Primeira activação válida fixa `hardware_id` uma única vez e grava `activated_at` | revisão de código/backend | OK (2026-04-01) |
+| 11.2 | Re-activação do mesmo hardware não rebinda a licença e preserva o primeiro `activated_at` | revisão de código/backend | OK (2026-04-01) |
+| 11.3 | Corrida de primeira activação com `hardware_id` diferente mantém bind único e rejeita o segundo com `409` | revisão de código/backend | OK (2026-04-01) |
+| 11.4 | Grace local de `14` dias continua funcional no daemon com `.lic` expirado já emitido | appliance | Pendente (F3.2) |
+| 11.5 | Activação online de licença expirada continua a falhar fechado sem quebrar a licença local já emitida | appliance | Pendente (F3.2) |
+| 11.6 | Fingerprint mantém previsibilidade em reinstall, VM e troca de NIC sem workaround não documentado | appliance/lab | Pendente (F3.2) |
+| 11.7 | Renovação + re-activação reemite `.lic` actualizado sem quebrar o bind existente | appliance | Pendente (F3.2) |
+
 ---
 
 ## Resumo
@@ -128,6 +140,10 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | GUI | 13 | 13 | 0 |
 | Observabilidade | 4 | 4 | 0 |
 | Rollback | 3 | 3 | 0 |
-| **Total** | **58** | **58** | **0** |
+| Licenciamento/activação | 7 | 3 | 4 |
+| **Total** | **65** | **61** | **4** |
 
-Todos os 58 testes OK. Validação completa em 2026-03-22 no pfSense CE 2.8.1-dev (FreeBSD 15.0-CURRENT).
+A base V1 continua com 58 testes OK. O addendum da F3.1 acrescenta 7 cenarios
+de licenciamento/activacao: 3 ficam fechados por revisao de codigo e contrato
+canónico em `2026-04-01`, e 4 seguem pendentes de validacao em appliance/lab
+para a F3.2.

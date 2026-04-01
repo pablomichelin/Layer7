@@ -17,4 +17,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 ## Matriz de testes
 
-[`test-matrix.md`](test-matrix.md) — 58 testes divididos por categoria (build, instalação, daemon, config, policy engine, enforcement, GUI, observabilidade, rollback). 47 OK, 11 pendentes no appliance.
+[`test-matrix.md`](test-matrix.md) — 65 testes divididos por categoria
+(build, instalação, daemon, config, policy engine, enforcement, GUI,
+observabilidade, rollback e addendum de licenciamento/activação da F3.1).
+Estado actual: 61 OK e 4 pendentes em appliance/lab para fechar os cenarios
+reais da F3.2.
