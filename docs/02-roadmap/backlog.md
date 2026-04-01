@@ -1,0 +1,74 @@
+# Backlog Canónico
+
+Este backlog passa a ser a fila unica de priorizacao do projecto apos a F0.
+Nao serve para listar “ideias soltas”; serve para orientar as proximas fases
+com criterio de risco, beneficio e ordem de execucao.
+
+---
+
+## Legenda
+
+- **Severidade:** `Critica`, `Alta`, `Media`, `Baixa`
+- **Risco se adiado:** impacto principal de deixar o item para depois
+- **Esforco:** `P`, `M`, `G`
+- **Beneficio:** `Alto`, `Medio`, `Baixo`
+- **Status:**
+  - `Pronto apos F0`
+  - `Planeado`
+  - `Bloqueado pela fase`
+  - `Acompanhar`
+
+**Regra de priorizacao:** severidade e fase sugerida prevalecem sobre
+conveniencia local. Itens fora da fase actual nao devem ser puxados sem
+reavaliacao formal.
+
+---
+
+## Backlog priorizado
+
+| ID | Item | Severidade | Componente | Fase sugerida | Risco se adiado | Esforco | Beneficio | Status | Observacoes |
+|----|------|------------|------------|---------------|-----------------|---------|-----------|--------|-------------|
+| BG-001 | Formalizar a cadeia de confianca entre repo, builder, chave publica embutida, servidor de licencas e artefacto publicado | Critica | seguranca/governanca | F1 | decisao tecnica continuar baseada em suposicoes sobre confianca | M | Alto | Pronto apos F0 | deve produzir mapa de confianca e gate claro |
+| BG-002 | Governar a custodia da chave de producao e o tratamento dos ficheiros sensiveis locais no builder | Critica | builder/licencas | F1 | risco operacional e de seguranca concentrado em conhecimento implícito | M | Alto | Pronto apos F0 | incluir backup, rotacao e limite de commit |
+| BG-003 | Criar ADR que substitua a ambiguidade historica entre `.txz` e `.pkg` como artefacto de distribuicao | Critica | distribuicao/ADR | F1 | documentos historicos continuam a confundir instalacao e release | P | Alto | Planeado | ADR-0002 fica historico ate ser superado |
+| BG-004 | Hardening da stack do license server: segredos, fronteira HTTP/HTTPS, backup, restore e operacao administrativa | Critica | license-server | F2 | indisponibilidade ou exposicao do servidor comprometer activacao | M | Alto | Planeado | alinhar deploy real e runbooks |
+| BG-005 | Endurecer o endpoint de activacao e os controlos de abuso, auditoria e monitorizacao minima | Alta | license-server | F2 | abuso ou comportamento opaco em incidente | M | Alto | Planeado | incluir rate limit, health e logs minimos |
+| BG-006 | Definir modelo de estados do licenciamento: activar, reactivar, renovar, revogar, expirar, grace e offline | Alta | licenciamento | F3 | suporte e troubleshooting continuarem dependentes de tentativa e erro | M | Alto | Planeado | precisa de ADR ou especificacao formal |
+| BG-007 | Validar robustez do hardware fingerprint em cenarios de mudanca de NIC, VM, reinstall e clock | Alta | licenciamento | F3 | activacoes legitimas falharem ou exigirem workaround manual | M | Alto | Planeado | usar matriz de casos e rollback |
+| BG-008 | Fechar lacunas de previsibilidade em activacao offline e revogacao sem quebrar comportamento actual | Alta | licenciamento | F3 | operador assumir garantias que o sistema ainda nao oferece | M | Alto | Planeado | documentar sem expandir escopo comercial |
+| BG-009 | Consolidar confiabilidade de package/daemon em reboot, reload, upgrade, rollback e reinicio de servico | Alta | package/daemon | F4 | runtime continuar a divergir entre estado desejado e estado real | G | Alto | Planeado | exige evidencias em appliance |
+| BG-010 | Hardening da trilha de blacklists UT1: download, cron, reload, fallback, except tables e forcing DNS | Alta | blacklists | F4 | subsistema seguir operacionalmente fragil apesar de funcional | G | Alto | Bloqueado pela fase | documentos da trilha ja existem e devem ser usados |
+| BG-011 | Validar forcing DNS e anti-bypass em cenarios reais de VLAN/interface, excepcoes e tabelas PF | Alta | daemon/enforcement | F4 | bypass continuar a aparecer em combinacoes menos comuns | M | Alto | Planeado | derivado das correccoes recentes em `rdr` |
+| BG-012 | Transformar os riscos principais em malha canónica de testes e regressao por componente | Critica | testes/governanca | F5 | cada nova mudanca voltar a depender de memoria humana | G | Alto | Planeado | unir smoke, builder e appliance |
+| BG-013 | Fechar cobertura minima de testes para licenciamento, blacklists, package e rollback | Alta | testes | F5 | regressao funcional escapar entre fases tecnicas | G | Alto | Planeado | alinhar com checklist mestre |
+| BG-014 | Criar trilha de evidencias e gates para mudancas sensiveis, com ligacao directa entre backlog, checklist e changelog | Media | governanca/testes | F5 | perda de rastreabilidade entre decisao e validacao | M | Medio | Planeado | reforca continuidade entre chats |
+| BG-015 | Reorganizar fisicamente a documentacao e normalizar duplicidades de directorios e readmes | Media | estrutura/documentacao | F6 | legado continuar confuso e caro de manter | G | Medio | Bloqueado pela fase | so apos estabilidade tecnica e malha de regressao |
+| BG-016 | Normalizar areas sobrepostas como `docs/04-tests` vs `docs/tests`, `docs/04-package` vs docs historicos e prompts antigos | Media | estrutura/documentacao | F6 | agentes continuarem a abrir documentos errados | M | Medio | Bloqueado pela fase | depende do mapa de equivalencia |
+| BG-017 | Instituir checklist interno de release com verificacao de artefacto, docs sincronizadas e disponibilidade de download | Media | release-engineering | F7 | publicacoes continuarem dependentes de memoria operacional | M | Alto | Planeado | ligar changelog, release notes e manual install |
+| BG-018 | Definir telemetria operacional minima para pacote, daemon e servidor de licencas | Media | observabilidade | F7 | troubleshooting e auditoria continuarem com visibilidade insuficiente | M | Medio | Planeado | sem analytics pesado |
+| BG-019 | Rever e refrescar tutorial longo, guias comerciais e docs preservadas por compatibilidade | Baixa | documentacao/comercial | F7 | materiais antigos continuarem a coexistir com a base canónica | M | Medio | Acompanhar | so depois das fases tecnicas centrais |
+
+---
+
+## Itens explicitamente fora da fila imediata
+
+Os itens abaixo continuam conhecidos, mas **nao entram agora**:
+
+- console central multi-firewall;
+- MITM/TLS inspection universal;
+- analytics pesado;
+- reestruturacao fisica precoce;
+- refactor amplo de package/daemon/frontend sem gate especifico.
+
+---
+
+## Politica de manutencao do backlog
+
+1. Todo item novo entra com componente, fase sugerida, risco, esforco,
+   beneficio e status.
+2. Nenhum item tecnico fora da fase actual deve ser executado sem ser puxado
+   formalmente para a frente.
+3. Quando um item mudar de fase, estado ou severidade, actualizar tambem:
+   - `CORTEX.md`
+   - `docs/02-roadmap/roadmap.md`
+   - `docs/02-roadmap/checklist-mestre.md` se afectar gate

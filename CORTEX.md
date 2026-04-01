@@ -1,640 +1,368 @@
 # CORTEX.md
 
-## Projeto
-Layer7 para pfSense CE — por [Systemup](https://www.systemup.inf.br)
+## Finalidade
 
-## Status atual
-**Versão: 1.8.0 — rdr DNS forçado totalmente funcional: sem `pass`, sem `label` (FreeBSD 15)**
+Este ficheiro e o **SSOT operacional e documental** do projecto Layer7.
+Qualquer agente, maintainer ou novo chat deve conseguir retomar o contexto
+do projecto a partir daqui sem depender de memoria implícita.
 
-Primeira versao estavel e completa do Layer7 para pfSense CE. Pacote comercial com motor de politicas granulares por interface, listas de IPs/CIDRs, seleccao de apps nDPI, perfis de servico rapidos (15 built-in), pagina de categorias nDPI, dashboard com contadores em tempo real, agendamento por horario, grupos de dispositivos nomeados, bloqueio QUIC selectivo, teste de politica com simulacao completa, backup e restore de configuracao, licenciamento Ed25519 com fingerprint de hardware. EULA proprietaria. GUI com 7 abas principais (reduzida de 11). Enforcement PF por destino e origem. Anti-bypass DNS multi-camada. Fleet management para 50+ firewalls. Modulo de relatorios com historico, graficos Chart.js, e exportacao multi-formato.
+Se houver conflito entre documentos, a ordem de prevalencia e:
 
-**Validação lab (2026-03-23):** Enforce end-to-end funcional — pipeline nDPI → policy engine → pfctl comprovado:
-- `pf_add_ok=7`, zero falhas — 6 IPs automaticamente adicionados à tabela PF
-- Excepções respeitadas (IPs .195 e .129 não tagados)
-- Decisões block/tag logadas a NOTICE
-- CLI `-e` valida: BitTorrent→block, HTTP→monitor, IP excepcionado→allow
+1. `CORTEX.md`
+2. `docs/README.md`
+3. `docs/02-roadmap/roadmap.md`
+4. `docs/02-roadmap/backlog.md`
+5. `docs/02-roadmap/checklist-mestre.md`
+6. `docs/00-overview/document-classification.md`
+7. `docs/00-overview/document-equivalence-map.md`
+8. Documentacao canónica por area
+9. Documentos historicos preservados na raiz e em subpastas
 
-**Listas melhores e sites manuais (v0.2.6):**
-- GUI de políticas com botões de seleção em massa para interfaces, apps e categorias
-- novo campo `Sites/hosts` em políticas, gravado como `match.hosts[]`
-- matching por host/subdomínio com base no `host=` inferido por DNS
-- ação `Ver listas` para abrir o conteúdo completo de uma política existente
+---
 
-**Hostname e destino nos eventos (v0.2.5):**
-- logs passam a incluir `dst=` do fluxo
-- logs passam a incluir `host=` quando houver correlacao DNS
+## Visao executiva do projecto
 
-**Monitor ao vivo na GUI (v0.2.4):**
-- aba `Events` com atualizacao automatica dos ultimos eventos
-- botoes para pausar e atualizar manualmente
+**Produto:** Layer7 para pfSense CE
+**Empresa:** Systemup Solucao em Tecnologia
+**Estado funcional conhecido:** V1 Comercial concluida e publicada
+**Versao segura conhecida do pacote:** `1.8.0`
+**Data-base deste checkpoint:** `2026-04-01`
 
-**Log local do daemon (v0.2.3):**
-- `layer7d` grava eventos em `/var/log/layer7d.log`
-- GUI Events/Diagnostics leem o log local diretamente
+O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
+GUI integrada, classificacao Layer 7 via nDPI, politicas granulares,
+enforcement PF, anti-bypass DNS, blacklists UT1, relatorios locais e
+licenciamento baseado em ficheiro `.lic` assinado com Ed25519.
 
-**Labels amigaveis de interface (v0.2.2):**
-- GUI mostra a descricao configurada da interface no pfSense
-- fallback seguro para label padrao quando nao houver descricao
+O produto **nao esta em fase de descoberta funcional**. A prioridade agora
+e preservar o que ja funciona, reduzir risco tecnico e evoluir por fases
+controladas, com governanca forte e zero regressao desnecessaria.
 
-**Empacotamento autocontido (v0.2.1):**
-- `layer7d` linkado com `libndpi.a` no builder
-- pacote `.pkg` sem dependência de `libndpi.so` no pfSense
-- script de release valida `ldd` do binário staged
+---
 
-**Motor Multi-Interface (v0.2.0):**
-- Políticas por interface (LAN, WIFI, ADMIN, etc.)
-- Listas de IPs/CIDRs por política e excepção
-- ~350 apps/categorias nDPI seleccionáveis na GUI
-- Daemon `--list-protos` para enumeração dinâmica
-- GUI completa com 6 páginas
+## Estado actual
 
-## Fase atual
-**V1 Comercial concluida e publicada.** Todas as fases e blocos do plano V1 completos. Release v1.0.0 buildada, publicada no GitHub e pronta para deploy em producao.
+### Estado funcional
 
-## Estado real do enforcement
+- V1 Comercial ja foi concluida e publicada.
+- O pacote publico de referencia continua a ser o `.pkg` distribuido via
+  GitHub Releases.
+- O estado tecnico seguro conhecido continua associado ao pacote `1.8.0`,
+  com correccoes recentes no forcing de DNS via `rdr`.
+- O license server existe e esta operacional como componente separado,
+  mas a sua cadeia de confianca e o seu hardening ainda pertencem as
+  proximas fases planeadas.
 
-**Classificação e decisão:** funcionais em pfSense real.
+### Estado documental
 
-**Enforcement PF por destino (v0.3.0):** o daemon agora adiciona IPs de
-**destino** a `layer7_block_dst` quando uma politica de bloqueio casa. Dois
-caminhos complementares:
+- A Fase 0 documental foi usada para consolidar governanca, canonicidade,
+  backlog, roadmap, checklist mestre e mapas de classificacao/equivalencia.
+- O directorio `docs/` passa a ser o **centro documental canónico**.
+- A raiz actual do repositório continua preservada como **legado importante**.
+- **Nao houve reorganizacao fisica** do repositório nesta fase.
 
-1. **DNS**: daemon observa respostas DNS; se o dominio casa com `match.hosts[]`
-   de uma politica `block`, o IP resolvido entra em `layer7_block_dst`.
-2. **nDPI**: quando o fluxo e classificado e a politica e `block`, o IP de
-   destino do fluxo entra em `layer7_block_dst`.
+### Estado de governanca
 
-A regra PF `block drop quick inet to <layer7_block_dst>` bloqueia o trafego
-para esses IPs. Entradas expiram automaticamente com base no TTL DNS (minimo
-5 min) para evitar crescimento indefinido da tabela.
+- O projecto passa a trabalhar pela ordem segura **F0 -> F7**.
+- Nenhuma reorganizacao fisica de pastas esta autorizada antes da **F6**.
+- Nenhuma alteracao tecnica deve avancar sem impacto, risco, teste e rollback
+  declarados.
 
-O modelo anterior (quarentena por origem) permanece disponivel via
-`layer7_block` para `action=tag` e cenarios de quarentena explicita.
+---
 
-**Plano mestre desta trilha:** [`docs/09-blocking/blocking-master-plan.md`](docs/09-blocking/blocking-master-plan.md) (todas as fases concluidas na v1.0.0)
+## Objectivo estrategico
 
-## Ultima entrega
-- **v1.8.0 — rdr DNS forçado totalmente funcional em FreeBSD 15 (2026-04-01):**
-  - `label "..."` em regras `rdr` também causa "syntax error" no pfctl do FreeBSD 15 quando carregado via anchor com `-N -f` — removido
-  - Regras `rdr` agora no formato mínimo: `rdr on <iface> inet proto {udp|tcp} from <cidr> to !127.0.0.1 port 53 -> 127.0.0.1`
-  - Ambas as regras (UDP + TCP) carregam correctamente em `natrules/layer7_nat`
-  - PORTVERSION bumped para 1.8.0
-- **v1.7.9 — Fix sintaxe rdr: `rdr pass` inválido em pfSense 2.8 (2026-04-01):**
-  - `rdr pass on <iface> ...` causa "syntax error" no pfctl do FreeBSD 15 / pfSense 2.8 — apenas `rdr on <iface> ...` é válido
-  - `layer7_generate_rdr_rules_snippet()`: removido `pass` das regras geradas → ambas as regras (UDP + TCP) carregam correctamente
-  - PORTVERSION bumped para 1.7.9
-- **v1.7.8 — Fix rdr DNS forçado via pfctl directo (2026-04-01):**
-  - pfSense CE não processa `nat_rules_needed` do XML do package — o tag `<nat_rules_needed>` nunca foi chamado; as regras `rdr` para `force_dns` nunca chegaram ao PF NAT
-  - Além disso, o tag XML estava errado: `<custom_php_resync_command>` não existe no pfSense CE — o correcto é `<custom_php_resync_config_command>` com valor PHP eval-safe (ex: `layer7_resync();`)
-  - Nova função `layer7_inject_nat_to_anchor()`: injeta as regras `rdr` directamente em `natrules/layer7_nat` via `pfctl -a ... -N -f`
-  - Chamada em `layer7_generate_rules()` (a cada reload PF) e `layer7_resync()` (a cada save de config)
-  - pfSense usa `pfctl -f` sem `-F` → sub-anchor `natrules/layer7_nat` persiste entre reloads
-  - PORTVERSION bumped para 1.7.8
-- **v1.7.7 — Correcção crítica: rdr rules force_dns em interfaces VLAN (2026-04-01):**
-  - BUG CRÍTICO: regex `/^[a-z][a-z0-9]+$/i` em `layer7.inc` não aceitava interfaces VLAN com ponto (ex: `em1.46`, `igb0.100`); `get_real_interface("em1.46")` retorna NULL (nome já é o device real), o fallback regex falhava → `$real_ifaces` ficava vazio → `layer7_generate_nat_rules()` retornava `""` → **nenhuma regra `rdr` DNS era gerada mesmo com `force_dns: true`**
-  - Correcção: regex actualizado para `/^[a-z][a-z0-9]*(\.[0-9]+)?$/i` — aceita `em1`, `em1.46`, `igb0.100`, `lan`, `vtnet0.200`, etc.
-  - PORTVERSION bumped para 1.7.7
-- **v1.7.6 — Monitor ao vivo acumulativo (2026-03-31):**
-  - Monitor substituía conteúdo a cada poll; eventos filtrados desapareciam quando a IP saia do tail do log
-  - Nova lógica JS: buffer acumulativo de 500 linhas, só acrescenta linhas novas, nunca apaga histórico
-  - Botão "Limpar" para reset manual; contador de linhas acumuladas
-  - Tail aumentado de 100→300 linhas; retorno de 40→60 linhas por poll
-  - PORTVERSION bumped para 1.7.6
-- **v1.7.5 — Fix botão Aplicar nos Perfis Rápidos (2026-03-31):**
-  - BUG: `layer7_policies.php` — `json_encode($prof_id)` e `json_encode($prof_name)` inseriam strings com `"` directamente no atributo `onclick="..."` sem HTML escaping; browser truncava o handler → onclick não funcionava
-  - Correcção: `htmlspecialchars(json_encode(...), ENT_QUOTES)` converte `"` em `&quot;` no HTML; o browser executa o JS correctamente
-  - PORTVERSION bumped para 1.7.5
-- **v1.7.4 — Segunda revisão: 3 bugs adicionais (2026-03-31):**
-  - BUG MÉDIO: `generate_rdr_rules()` em `layer7-pfctl` era código morto após v1.7.3 (nunca chamado) — removida
-  - BUG MENOR: `s_bl_lookups` não era incrementado no SNI check em `main.c`; adicionado `s_bl_lookups++` antes do lookup SNI
-  - BUG MENOR: `layer7_blacklists.php` — `force_dns` activo sem `src_cidrs` falhava silenciosamente; adicionada validação com mensagem de erro clara
-  - PORTVERSION bumped para 1.7.4
-- **v1.7.3 — Correcção de 3 bugs nas melhorias de Bloqueio Total (2026-03-31):**
-  - BUG CRÍTICO: `layer7.inc` e `layer7-pfctl` — regras `rdr` estavam a ser injectadas no filter anchor (pfctl rejeita com "rdr rule not allowed in filter ruleset"); correcção: removidas das filter rules; existem exclusivamente via `nat_rules_needed` → `layer7_generate_nat_rules()`
-  - BUG MÉDIO: regex `^[a-z][a-z0-9]+[0-9]$` não cobria interfaces como `lan`, `wan`; corrigido para `^[a-z][a-z0-9]+$/i` em `layer7-pfctl` e `layer7.inc`
-  - BUG MENOR: `s_bl_sni_hits` e `s_bl_hits` no SNI check eram incrementados dentro do `if (r == 0)` por pfctl-add; movidos para antes do loop para ser consistente com o DNS callback (um incremento por host match)
-  - PORTVERSION bumped para 1.7.3
-- **v1.7.2 — Bloqueio Total: 3 melhorias para fechar brechas de bypass DNS (2026-03-31):**
-  - MELHORIA A: DNS forçado via PF `rdr` — regras `rdr pass on <iface> proto udp/tcp from <cidr> to !127.0.0.1 port 53 -> 127.0.0.1` geradas dinamicamente por `layer7-pfctl` e `layer7_generate_nat_rules()` para regras blacklist com `force_dns: true`; campo `force_dns` adicionado à `struct l7_bl_rule` e `parse_one_rule()` em `bl_config.c`; checkbox "Forçar DNS local" na GUI activada por defeito; `nat_rules_needed` hook adicionado ao `layer7.xml`
-  - MELHORIA B: Bloqueio por TLS SNI — `layer7_on_classified_flow()` verifica SNI/host contra blacklist após decisão de política manual; funções `ip_in_cidr()` e `bl_rule_matches_src()` criadas em `main.c`; match por src_ip → regra correcta → tabela `layer7_bld_N`
-  - MELHORIA C: Contadores `bl_dns_hits` e `bl_sni_hits` no stats JSON; `s_bl_dns_hits` incrementado no DNS callback; `s_bl_sni_hits` incrementado no SNI check
-  - PORTVERSION bumped para 1.7.2
-- **v1.6.7 — Fix SIGSEGV em l7_blacklist_get_cat_hits (2026-03-31):**
-  - FIX CRÍTICO: `blacklist.c` — `l7_blacklist_get_cat_hits()` fazia cast inválido `(const char **)bl->cats` onde `bl->cats` é `char[64][48]` (array 2D de chars, não array de ponteiros)
-  - Causa raiz: código de stats (SIGUSR1) usava `bl_cat_names[bli]` como ponteiro mas recebia o endereço de uma string de 48 bytes, interpretando os primeiros 8 bytes como endereço → SIGSEGV ao imprimir
-  - Bug pré-existia desde v1.1.0 mas ficou oculto enquanto `s_blacklist` era sempre NULL (bug de parse em v1.6.5)
-  - Correcção: substituída por API com índice directo `l7_blacklist_get_cat_name(bl, idx)` e `l7_blacklist_get_cat_hit_count(bl, idx)`
-  - PORTVERSION incrementado para 1.6.7
-- **v1.6.6 — Fix crítico: blacklists nunca carregavam no daemon (2026-03-31):**
-  - FIX CRÍTICO: `bl_config.c` — `match_key()` avançava o ponteiro `p` além do `"` ao falhar na comparação de chaves JSON
-  - Causa raiz: ao tentar cada chave no if-else chain, `p` ficava posicionado no meio da string após falha — todas as chaves seguintes (`whitelist`, `rules`, etc.) eram ignoradas
-  - Efeito: apenas `"enabled"` era lido correctamente; `rules[]` nunca era parseado → `n_rules=0` → `bl_enabled: false` → nenhum domínio carregado → tabelas PF `layer7_bld_N` vazias → blacklists sem efeito
-  - Correcção: `match_key()` agora salva o ponteiro antes de avançar e restaura-o em qualquer falha de validação
-  - PORTVERSION incrementado para 1.6.6
-- **v1.6.5 — Fix CI smoke layer7d (2026-03-31):**
-  - FIX: workflow `smoke layer7d` no GitHub Actions falhava com `Makefile:20: *** missing separator`
-  - Causa raiz: script de smoke usava `make` (GNU make no Ubuntu), mas o `src/layer7d/Makefile` usa sintaxe BSD make (`.if`)
-  - Correcção: `scripts/package/smoke-layer7d.sh` agora detecta `bmake` e prioriza o uso de BSD make; fallback para `make`
-  - Correcção: workflow `.github/workflows/smoke-layer7d.yml` passa a instalar `bmake` no job Linux
-  - Resultado: pipeline smoke volta a compilar o daemon no CI Linux de forma compatível
-  - PORTVERSION incrementado para 1.6.5
-- **v1.6.4 — Auto-start do daemon após reboot (2026-03-31):**
-  - FIX CRITICO: daemon não reiniciava automaticamente após reboot do pfSense
-  - Causa raiz 1: rc.d script declarava `REQUIRE: LOGIN` — facility inexistente no pfSense, impedindo execução no boot
-  - Causa raiz 2: `layer7_resync()` (chamada pelo pfSense no boot) apenas garantia tabelas PF, sem verificar se o daemon estava a correr
-  - Correcção rc.d: `REQUIRE: LOGIN` alterado para `REQUIRE: DAEMON NETWORKING` (providers válidos no pfSense)
-  - Correcção resync: nova função `layer7_ensure_daemon_running()` chamada no fim de `layer7_resync()` — verifica se o serviço está enabled e o daemon não está a correr, e inicia-o automaticamente
-  - Dupla garantia: o daemon agora inicia tanto pelo mecanismo rc.d do FreeBSD quanto pelo hook resync do pfSense
-  - PORTVERSION incrementado para 1.6.4
-- **v1.6.2 — Fix edição de categorias custom (2026-03-26):**
-  - Restaurado botão de editar para categorias personalizadas criadas pelo utilizador
-  - Ao editar, campo ID fica readonly (não pode alterar o ID, apenas os domínios)
-  - Categorias UT1 pré-definidas continuam sem opção de edição
-  - PORTVERSION incrementado para 1.6.2
-- **v1.6.1 — Blacklists simplificadas + Backup completo (2026-03-26):**
-  - Removida opção de editar categorias personalizadas em Blacklists — mantém criar novas e apagar
-  - Removida datalist de categorias UT1 do formulário de nova categoria (evita confusão)
-  - Backup completo: export/import passa a incluir configuração de blacklists (regras, whitelist, categorias custom, definições)
-  - Import restaura automaticamente blacklists config e sincroniza ficheiros de categorias personalizadas
-  - PORTVERSION incrementado para 1.6.1
-- **v1.5.3 — Tabelas PF persistentes (2026-03-26):**
-  - FIX: tabelas PF (layer7_block, layer7_block_dst, layer7_bld_N) agora são materializadas automaticamente após cada reload do filtro via hook `custom_php_resync_command`
-  - No FreeBSD 15 / pfSense 2.8.1, tabelas declaradas com `persist` no ruleset existem internamente mas não aparecem em `pfctl -s Tables` até terem pelo menos uma entrada — causando falso negativo no diagnóstico
-  - Nova função `layer7_resync()` cria todas as tabelas obrigatórias (incluindo blacklists) adicionando e removendo um IP dummy
-  - Resolve o problema persistente de tabelas PF em vermelho na página de Diagnósticos
-  - PORTVERSION incrementado para 1.5.3
-- **v1.5.2 — Fix limpeza de relatórios (2026-03-26):**
-  - FIX: ao limpar dados de relatórios, cursor de ingestão agora aponta para o fim do log actual em vez de ser apagado — evita que o log inteiro seja reimportado na mesma carga da página
-  - PORTVERSION incrementado para 1.5.2
-- **v1.5.1 — Limpeza total de relatórios (2026-03-26):**
-  - NOVO: botão "Limpar todos os dados" na página de Relatórios para apagar toda a base SQLite, histórico JSONL e cursor de ingestão
-  - Resolve travamentos em servidores com milhares de páginas de eventos acumulados
-  - Confirmação obrigatória antes de executar (acção irreversível)
-  - Traduções EN actualizadas
-  - PORTVERSION incrementado para 1.5.1
-- **v1.5.0 — Auditoria de segurança e robustez (2026-03-26):**
-  - FIX CRITICO: daemon passa a carregar blacklists UT1/custom no arranque (antes só carregava após SIGHUP)
-  - FIX CRITICO: `layer7_activate` passa a rejeitar chaves com caracteres perigosos (aspas, backslash, control chars) para evitar injecção JSON/shell
-  - FIX CRITICO: password de admin removida do `seed.js` do license server (lida de variável de ambiente `ADMIN_PASSWORD`)
-  - FIX ALTO: `layer7_cidr_valid()` passa a validar octetos 0-255 (antes aceitava `999.999.0.0/24`)
-  - FIX ALTO: regras PF de blacklist passam a validar `except_ips` e `src_cidrs` antes de interpolar no ruleset
-  - FIX ALTO: todos os `confirm()` e labels JS em 6 paginas PHP passam a usar `json_encode()` para prevenir quebra de JS/XSS
-  - FIX MEDIO: NULL checks em `json_escape_fprint`, `json_escape_print` e `dst_cache_add` para prevenir crash
-  - FIX MEDIO: swap de blacklists protegido contra reload falhado (preserva versao anterior funcional)
-  - FIX MEDIO: warning restaurado no carregamento de categorias quando ambos ficheiros (UT1 + custom) falham
-  - FIX MEDIO: whitelist de blacklists passa a usar `layer7_bl_domains_normalize()` para validar dominios
-  - FIX MEDIO: `source_url` de blacklists validado contra esquemas nao-HTTP (javascript:, file:, etc.)
-  - FIX MEDIO: simulação de políticas em `layer7_test.php` passa a ordenar por `priority` (consistente com daemon)
-  - FIX MEDIO: lock atomico no `update-blacklists.sh` (mkdir em vez de test+echo para evitar TOCTOU)
-  - FIX BAIXO: numeração de passos no `install.sh` corrigida ([1/5]-[3/5] → [1/6]-[3/6])
-  - FIX BAIXO: texto de ajuda de excepcoes corrigido (max. 8 → max. 16, alinhado com o parser)
-  - FIX BAIXO: verificação de retorno de `rename()` no stats JSON com log de erro
-  - Traduções EN actualizadas para novas strings
-  - PORTVERSION incrementado para 1.5.0
-- **v1.4.17 — Categorias customizadas de blacklist no mesmo fluxo UT1 (2026-03-26):**
-  - pagina `Blacklists` passa a permitir criar categorias locais com dominios proprios sem criar nova tela
-  - operador passa a poder estender categorias existentes da UT1 com dominios adicionais nao presentes no feed da Capitole
-  - seletor de categorias nas regras passa a trabalhar com lista combinada (UT1 + custom)
-  - daemon passa a carregar overlays locais por categoria (`blacklists/_custom/<categoria>.domains`) alem dos ficheiros UT1 originais
-  - `config.json` passa a persistir `category_custom` e o apply sincroniza automaticamente os ficheiros de overlay antes do reload
-  - documentação de cliente actualizada (README, CHANGELOG, MANUAL-INSTALL)
-  - PORTVERSION incrementado para 1.4.17
-- **v1.4.16 — Diagnóstico PF sem falso negativo (2026-03-26):**
-  - `layer7-pfctl` passa a validar “tabela pronta” por presença real em `pfctl -s Tables` OU referência activa no filtro (`pfctl -sr`)
-  - `Diagnostics` passa a avaliar tabelas obrigatórias com estado combinado, eliminando falso erro recorrente em tabelas referenciadas porém sem materialização imediata
-  - linhas de tabela na GUI passam a distinguir “não existe” de “referenciada no filtro activo (sem entradas)”
-  - troubleshooting PF fica objectivo: foco em falha real de enforcement, não em estado cosmético de materialização
-  - documentação operacional consolidada em `pf-enforcement.md` e `MANUAL-INSTALL.md` com critério de validação pós-correção
-  - PORTVERSION incrementado para 1.4.16
-- **v1.4.15 — Correção enforce/licença e auditoria operacional (2026-03-26):**
-  - `layer7d` passa a recomputar `enforce_cfg` por helper único após parse/licença (startup + recheck), removendo estado inconsistente com licença válida
-  - parser de `layer7` deixa de depender da ordem de chaves para `enabled`, `mode` e `log_level`
-  - `layer7-pfctl` e `rc.d` passam a expor falhas críticas de ensure de tabelas PF com logs claros (sem mascaramento silencioso)
-  - `Diagnostics` separa melhor “regras Layer7” de “enforcement real”, exigindo regras `layer7:block:*` + tabelas obrigatórias para estado saudável
-  - `MANUAL-INSTALL.md` alinhado aos comandos reais de serviço e rollback operacional
-  - `layer7_bl_ajax.php` alinhado ao bootstrap padrão (`guiconfig.inc`) e `en.php` sem duplicidade de chave
-  - PORTVERSION incrementado para 1.4.15
-- **v1.4.14 — Auto-recuperação de tabelas PF em runtime (2026-03-25):**
-  - `layer7d` passa a tentar auto-recuperação quando `pfctl -T add` falha por tabela ausente, com `layer7-pfctl ensure`, fallback por `rules.debug` e retry único
-  - ciclo de `SIGHUP` passa a validar tabelas base (`layer7_block`, `layer7_block_dst`) após reload, reduzindo estado inconsistente entre daemon activo e PF inválido
-  - `layer7-pfctl ensure` deixa de falhar silenciosamente e retorna erro quando tabelas obrigatórias continuam ausentes após tentativa de reparo
-  - página `Diagnostics` passa a separar presença do hook de estado real de enforcement, exigindo regra activa + tabelas obrigatórias para estado saudável
-  - PORTVERSION incrementado para 1.4.14
-- **v1.4.13 — Expansão visual dos blocos administrativos (2026-03-25):**
-  - Páginas `Politicas`, `Grupos`, `Events`, `Diagnostics` e `Blacklist` passam a seguir o mesmo padrão visual por blocos já aplicado em `Definicoes`
-  - Cabeçalhos administrativos fortes agora separam melhor listagens, filtros, formulários e áreas operacionais nas principais telas da GUI
-  - Ajuste estritamente visual, sem alteração de lógica funcional, persistência, handlers POST, licenciamento, relatórios ou enforcement
-  - Modo bilingue PT/EN preservado, reutilizando as legendas já existentes da interface
-  - PORTVERSION incrementado para 1.4.13
-- **v1.4.12 — Refino visual da página Definições (2026-03-25):**
-  - Página `Definicoes` reorganizada em blocos separados com cabeçalhos fortes, no padrão administrativo do pfSense
-  - Secções visuais distintas para definições gerais, logging/debug, captura/interfaces, licença, backup/restore, relatórios e actualização
-  - Traduções EN adicionadas para os novos títulos visuais, preservando o modo bilingue PT/EN
-  - Sem alterações de lógica funcional, handlers POST, licenciamento, relatórios ou fluxo de update
-  - PORTVERSION incrementado para 1.4.12
-- **v1.4.11 — Sincronização de versão, docs e links públicos (2026-03-25):**
-  - Nova release patch para manter o controlo de versionamento após a entrega funcional dos relatórios estilo NGFW
-  - `MANUAL-INSTALL.md` actualizado para apontar para os links públicos da nova versão
-  - `README.md`, `release-body.md`, scripts de release e changelog sincronizados com a nova versão
-  - Sem alteração funcional adicional no motor de políticas, GUI ou enforcement em relação à v1.4.10
-  - PORTVERSION incrementado para 1.4.11
-- **v1.4.10 — Relatórios estilo NGFW com controlo de log detalhado (2026-03-25):**
-  - Relatórios passam a separar histórico executivo do log detalhado, reduzindo pressão de armazenamento local
-  - Novo toggle para activar/desactivar log detalhado pesquisável em SQLite
-  - Novo filtro por uma ou mais interfaces para o log detalhado
-  - Retenção separada para histórico executivo e log detalhado
-  - Paginação compacta na tela de relatórios, eliminando listas gigantes de páginas
-  - Eventos `dns_query`, `dns_block` e `enforce_*` passam a incluir `iface=` no log para melhorar o filtro por interface
-  - Correcção de persistência parcial em Settings para não sobrescrever outras definições ao guardar apenas relatórios
-  - `MANUAL-RELATORIOS-EXECUTIVOS.md` e `MANUAL-INSTALL.md` actualizados
-  - PORTVERSION incrementado para 1.4.10
-- **v1.4.9 — Migração do canal público de distribuição (2026-03-25):**
-  - `install.sh` e `uninstall.sh` passam a apontar para o repositório público `pablomichelin/Layer7`
-  - GUI `Settings` passa a consultar updates e assets no novo repositório público de distribuição
-  - `MANUAL-INSTALL.md`, `README.md`, `scripts/release/README.md` e `release-body.md` actualizados para os novos URLs públicos
-  - `MANUAL-INSTALL.md` passa a manter um bloco fixo com links directos da versão actual para teste rápido
-  - Preparação para tornar o repositório principal privado sem quebrar instalação, upgrade nem atualização pela GUI
-  - PORTVERSION incrementado para 1.4.9
-- **v1.4.8 — Correção de registo de licença por case (2026-03-24):**
-  - GUI de Settings/Licença deixa de forçar `uppercase` no código antes de activar
-  - Validação local passa a aceitar alfanumérico com letras minúsculas e maiúsculas
-  - Corrige casos de chave válida no servidor a aparecer como inválida no pfSense por alteração de case
-  - PORTVERSION incrementado para 1.4.8
-- **v1.4.4 — Refino visual da GUI (2026-03-24):**
-  - Padronização visual das telas com múltiplas ações para reduzir confusão de uso
-  - Novos cartões de formulário e zonas visuais de remoção (`layer7-form-card`, `layer7-danger-zone`)
-  - Separação explícita de ações em `Settings`, `Blacklists`, `Policies`, `Exceptions`, `Groups` e `Diagnostics`
-  - Sem alteração de lógica funcional (POST/handlers/regras de negócio preservados)
-  - PORTVERSION incrementado para 1.4.4
-- **v1.4.3 — Relatórios Executivos com SQLite (2026-03-24):**
-  - Novo backend de relatórios em SQLite local (`/usr/local/etc/layer7/reports/reports.db`)
-  - Ingestão incremental de eventos via cursor de log (`ingest.cursor`) sem reprocessar histórico
-  - Novo script `layer7-reports-collect.php` integrado ao cron de recolha
-  - Purge diário agora limpa JSONL e SQLite conforme retenção configurada
-  - Página de Relatórios reescrita para visão executiva (filtros por IP/site/resultado, resumo textual, timeline, top dispositivos e sites, tabela detalhada paginada)
-  - Exportação executiva (HTML/CSV/JSON) baseada em dados detalhados por evento
-  - Abstração de identidade pronta para evolução futura (`resolveIdentityByIp` + providers `ip_hostname`, `captive_portal`, `ad_radius`)
-  - Definições de relatórios: presets de retenção (7/15/30/60/90/180/365 + custom) e intervalo até 60 min
-  - PORTVERSION incrementado para 1.4.3
-- **v1.4.2 — Fix criação robusta de tabelas PF (2026-03-24):**
-  - Causa raiz: pfctl -t TABLE -T add não cria tabelas no FreeBSD se não
-    estiverem declaradas no ruleset carregado; ensure_table() falhava
-    silenciosamente; filter_configure() pode ser assíncrono no pfSense CE
-  - layer7-pfctl ensure: write_rules() agora executa ANTES dos ensure_table;
-    nova função tables_missing() verifica após tentativas; force_reload_rules_debug()
-    carrega rules.debug com pfctl -f como fallback síncrono
-  - layer7_diagnostics.php: reparação agora chama ensure primeiro, depois
-    filter_configure(), espera 800ms, verifica tabelas, e se ainda em falta
-    força pfctl -f /tmp/rules.debug; resultado reflecte estado real
-  - layer7_bl_apply(): mesma lógica robusta (ensure→filter_configure→verify→force)
-  - install.sh: usa layer7-pfctl ensure + pfctl -f rules.debug em vez de
-    tentativas individuais pfctl -T add que falhavam
-  - PORTVERSION incrementado para 1.4.2
-- **v1.4.0 — Módulo de Relatórios (2026-03-24):**
-  - Novo módulo de relatórios com recolha automática de dados históricos
-  - Script cron `layer7-stats-collect.sh` (default: cada 5 min) faz append ao JSONL
-  - Script cron `layer7-stats-purge.sh` remove dados mais antigos que N dias
-  - Nova página GUI "Relatórios" com 7 secções:
-    - Visão geral de tráfego (gráfico de linhas Chart.js)
-    - Top apps bloqueadas (gráfico de barras + tabela)
-    - Top clientes bloqueados (gráfico de barras + tabela)
-    - Blacklists por categoria (gráfico donut + tabela)
-    - Top domínios bloqueados (tabela com parse de log)
-    - Relatório por política (tabela com stats do log)
-    - Consulta por IP (timeline de eventos)
-  - Filtro de período: 1h, 6h, 24h, 7d, 30d, custom
-  - Exportação multi-formato: CSV, HTML (printer-friendly), JSON
-  - Definições de relatórios na página Settings (retenção, intervalo, on/off)
-  - Cron instalado automaticamente na instalação do pacote
-  - Traduções EN para todas as novas strings
-  - PORTVERSION incrementado para 1.4.0
-- **v1.3.6 — Criação automática de tabelas PF (2026-03-24):**
-  - layer7-pfctl ensure agora cria automaticamente tabelas de blacklist
-    (layer7_bld_N) com base no config.json existente
-  - layer7_bl_apply() chama layer7-pfctl ensure antes de filter_configure()
-    para garantir que tabelas existem antes do daemon receber SIGHUP
-  - Novo botão "Reparar tabelas PF" na página Diagnósticos — cria todas
-    as tabelas em falta com um clique e recarrega o filtro
-  - Diagnósticos agora mostram estado de cada tabela de blacklist
-    (layer7_bld_N) com ícone de estado e contagem de entradas
-  - Eliminadas mensagens manuais "Criar com pfctl..." — substituídas por
-    acção automática
-  - PORTVERSION incrementado para 1.3.6
-- **v1.3.5 — Fix base64 custom_options Unbound (2026-03-24):**
-  - Causa raiz: pfSense armazena custom_options do Unbound em base64 no
-    config.xml; nosso codigo escrevia texto puro, gerando garbled na GUI
-  - Novas funcoes layer7_unbound_custom_options_read/write() com
-    base64_decode/base64_encode
-  - Todas as funcoes anti-DoH (configure, remove, configured) corrigidas
-  - uninstall.sh --clean-unbound corrigido para base64
-  - uninstall.sh: auto-detecta modo nao-interactivo (Command Prompt)
-  - PORTVERSION incrementado para 1.3.5
-- **v1.3.4 — Fix anti-DoH defensivo + botão remover (2026-03-24):**
-  - Reescrita completa de layer7_configure_unbound_anti_doh(): valida que
-    conteudo existente em custom_options é texto ASCII limpo antes de
-    concatenar; se estiver corrompido/binario, substitui por bloco limpo
-  - Nova funcao layer7_remove_unbound_anti_doh() para remover overrides
-  - Nova funcao layer7_anti_doh_block() / layer7_anti_doh_domains() (refactor)
-  - layer7_unbound_anti_doh_configured() agora verifica config.xml E
-    unbound.conf gerado (dupla verificacao)
-  - Botao "Remover" (vermelho, com confirmacao) na pagina Diagnosticos
-    quando anti-DoH ja esta configurado
-  - Traducoes EN para novas strings
-  - PORTVERSION incrementado para 1.3.4
-- **v1.3.3 — Fix Unbound anti-DoH persistente (2026-03-24):**
-  - Corrigido: Unbound anti-DoH agora grava em custom_options do config.xml
-    do pfSense (via write_config + services_unbound_configure) em vez de
-    editar /var/unbound/unbound.conf directamente (que era sobrescrito a
-    cada reinicio do Unbound)
-  - Nova funcao layer7_configure_unbound_anti_doh() em layer7.inc
-  - Nova funcao layer7_unbound_anti_doh_configured() em layer7.inc
-  - Handler de diagnosticos e quick profile simplificados (usam funcao central)
-  - PORTVERSION incrementado para 1.3.3
-- **v1.3.2 — Quick profiles: Acesso Remoto + Anti-bypass DNS (2026-03-24):**
-  - Novo quick profile "Acesso Remoto" (TeamViewer, AnyDesk, RustDesk, Splashtop,
-    Chrome Remote Desktop, Zoho Assist, ScreenConnect, Supremo, ISL Online,
-    DWService, RealVNC, RemotePC) com 4 apps nDPI + 18 hosts
-  - Novo quick profile "Anti-bypass DNS" (DoH_DoT + hosts de resolvers DoH)
-    com accao especial: ao aplicar, configura automaticamente Unbound anti-DoH
-  - Botao "Configurar agora" na pagina Diagnosticos para configurar Unbound
-    anti-DoH com um clique (sem necessidade de SSH)
-  - Traducoes EN para todas as novas strings
-  - PORTVERSION incrementado para 1.3.2
-- **v1.3.1 — Fix libcrypto + install.sh auto-version (2026-03-24):**
-  - Fix critico: libcrypto linkada estaticamente (/usr/lib/libcrypto.a)
-    para evitar "libcrypto.so.35 not found" em pfSense CE
-  - install.sh agora detecta automaticamente a versao mais recente via GitHub API
-    em vez de usar versao hardcoded
-  - PORTVERSION incrementado para 1.3.1
-- **v1.3.0 — Internacionalização PT/EN (2026-03-24):**
-  - Nova funcao l7_t() substitui gettext() em toda a GUI (11 paginas + layer7.inc)
-  - Ficheiros de traducao em /usr/local/etc/layer7/lang/ (en.php, pt.php)
-  - ~472 strings traduzidas para ingles
-  - Selector de idioma na pagina Definicoes (Portugues / English)
-  - Idioma gravado em layer7.json ("language": "pt" ou "en")
-  - Default: portugues (retrocompativel)
-  - PORTVERSION incrementado para 1.3.0
-- **v1.2.1 — Fix policy matching (2026-03-24):**
-  - Corrigido L7_MAX_HOSTS_PER_POLICY de 16 para 32 (perfis com muitos sites falhavam o parse)
-  - Matching de políticas agora usa OR entre apps e hosts (QUIC/TLS já não escapa ao bloqueio por host)
-  - Parser de políticas resiliente: skip de política inválida em vez de abortar todas
-  - Caso real: perfil "Redes Sociais" com 18 hosts causava parse error e impedia carga de TODAS as políticas
-  - PORTVERSION incrementado para 1.2.1
-- **v1.2.0 — Blacklists per-rule / regras por IP/CIDR (2026-03-24):**
-  - Blacklists agora funcionam como regras granulares (semelhante a ACLs do SquidGuard)
-  - Cada regra especifica: nome, categorias a bloquear, CIDRs de origem, IPs excepcionados
-  - Tabelas PF separadas por regra (layer7_bld_0 a layer7_bld_7) com regras PF source-based
-  - Caso de uso: bloquear gambling para 192.168.10.0/24 mas permitir para o director (192.168.10.1)
-  - Até 8 regras de blacklist simultâneas
-  - GUI reescrita com CRUD completo de regras (adicionar, editar, remover)
-  - Backward compat: formato antigo (flat categories[]) convertido automaticamente para uma regra global
-  - Parser C (bl_config.c) suporta array de objectos JSON (rules[])
-  - DNS callback distribui IPs para tabelas per-rule com base nas categorias
-  - filter_configure() chamado automaticamente para regenerar regras PF
-  - Whitelist global mantida (aplica-se a TODAS as regras)
-- **v1.1.0 — Blacklists UT1 / Categorias Web (2026-03-24):**
-  - Integracao de blacklists externas UT1 (Universite Toulouse Capitole)
-  - Script `update-blacklists.sh` com download, auto-descoberta de categorias, `discovered.json`
-  - Modulo C `blacklist.c` com hash table FNV-1a (1M buckets), suffix matching, whitelist interna
-  - Modulo C `bl_config.c` para parse do config.json separado (nao altera config_parse.c)
-  - Integracao no daemon: consulta blacklist no DNS callback apos politicas manuais
-  - Reload atomico (carregar novo -> trocar ponteiro -> libertar antigo)
-  - Contadores por categoria no stats JSON (bl_hits, bl_lookups, bl_top_categories)
-  - Nova pagina GUI "Blacklists" (11 paginas total) estilo SquidGuard: download com log, categorias auto-descobertas, dropdown ---/deny, excepcoes, definicoes
-  - AJAX endpoint para polling do progresso de download
-  - Tabela PF `layer7_bl_except` com regra `pass quick` antes de `block` (excepcoes por IP)
-  - Cron job via pfSense API (`install_cron_job`) para actualizacao automatica
-  - Whitelist global de dominios isentos
-  - Aviso visual para categorias com mais de 1M dominios
-  - Atribuicao CC-BY-SA 4.0 na GUI
-  - PORTVERSION incrementado para 1.1.0
-- **v1.0.2 — Melhorias operacionais (2026-03-23):**
-  - Botao "Reiniciar servico" na pagina Status (dashboard) com confirmacao
-  - Helper `layer7_restart_service()` em layer7.inc (stop + start + verificacao PID)
-  - Servico layer7d registado em Status > Services do pfSense (bloco `<service>` no layer7.xml)
-  - pfSense passa a mostrar layer7d com botoes nativos start/stop/restart em Status > Services
-- **v1.0.0 — Release V1 Comercial (2026-03-23):**
-  - Versao final com todas as funcionalidades V1
-  - PORTVERSION 1.0.0, install.sh actualizado
-  - CHANGELOG, README, CORTEX actualizados
-  - Documentacao de blocking-master-plan marcada como concluida
-  - Ficheiros obsoletos removidos (plano-v1-comercial.md, phase-a-option1)
-- **v0.9.0 — licenciamento e proteccao (2026-03-23):**
-  - hardware fingerprint: SHA256(kern.hostuuid + MAC) via nova funcao `layer7_hw_fingerprint()`
-  - ficheiro de licenca `.lic` com JSON assinado Ed25519, verificado via OpenSSL EVP API
-  - sem licenca valida: daemon opera em monitor-only (sem enforce/block)
-  - verificacao no arranque + periodica cada 1h
-  - grace period de 14 dias apos expiracao da licenca
-  - CLI `--fingerprint` para mostrar hardware ID da maquina
-  - CLI `--activate KEY [URL]` para activacao online (pronto para servidor futuro)
-  - seccao de licenca na GUI (Definicoes) com estado, hardware ID, cliente, expiry
-  - campos de licenca exportados no stats JSON para a GUI
-  - script `generate-license.py` para gerar pares de chaves e assinar licencas
-  - chave publica placeholder (all-zeros = dev mode, skip verificacao)
-  - EULA proprietaria substitui BSD-2-Clause
-  - link com `-lcrypto` (base system do FreeBSD)
-- **v0.8.0 — teste de politica + backup/restore (2026-03-23):**
-  - nova pagina "Teste" na GUI com formulario: dominio/IP destino, IP origem, app nDPI, categoria nDPI
-  - simulacao completa em PHP: excepcoes, politicas, groups, schedule, matching hosts/subdominios
-  - resolucao DNS automatica de dominios com exibicao dos IPs resolvidos
-  - veredicto visual colorido (block=vermelho, allow=verde, monitor=azul)
-  - tabela detalhada de cada politica avaliada com motivo de match/mismatch
-  - botoes "Exportar configuracao" e "Importar configuracao" na pagina Definicoes
-  - export gera JSON com definicoes, politicas, excepcoes e grupos (sem estado runtime)
-  - import valida JSON, substitui config e envia SIGHUP + filter_configure
-  - import de ficheiro invalido mostra erro sem perder config actual
-  - GUI passa a ter 10 paginas
-- **v0.7.0 — grupos de dispositivos + bloqueio QUIC (2026-03-23):**
-  - nova seccao `groups[]` no JSON config com id, name, cidrs[], hosts[]
-  - campo `match.groups` nas politicas para referenciar grupos em vez de CIDRs manuais
-  - daemon expande grupos para CIDRs/IPs no parse (reutiliza logica existente de `src_cidrs`/`src_hosts`)
-  - nova pagina GUI "Grupos" com CRUD completo
-  - dropdown de grupos nos formularios de adicionar, editar e perfis rapidos
-  - proteccao contra remocao de grupo em uso por politica
-  - toggle "Bloquear QUIC (UDP 443)" na pagina Definicoes
-  - regra PF anti-QUIC injectada dinamicamente via `layer7_generate_rules()`
-  - `filter_configure()` chamado automaticamente ao alterar o toggle
-  - GUI passa a ter 9 paginas
-- **v0.6.0 — agendamento por horario (2026-03-23):**
-  - campo `schedule` nas politicas JSON: `days` + `start` + `end`
-  - daemon verifica hora/dia local antes de casar politica (rule_matches + domain_is_blocked)
-  - suporte a overnight range (ex: 22:00-06:00)
-  - GUI de politicas com checkboxes de dias e inputs de hora inicio/fim
-  - "Ver listas" e tabela de politicas mostram horario configurado
-  - politica sem schedule continua sempre activa (retrocompativel)
-- **v0.5.0 — dashboard com contadores (2026-03-23):**
-  - contadores no daemon: total classificados, total bloqueados, total permitidos
-  - tracking de top 10 apps bloqueadas e top 10 IPs de origem
-  - SIGUSR1 + escrita periodica (~60s) de `/tmp/layer7-stats.json`
-  - pagina "Estado" redesenhada como dashboard operacional com cards de resumo
-  - tabelas top 10 apps e top 10 clientes bloqueados
-  - uptime do daemon calculado e exibido
-  - helper `layer7_read_stats()` em layer7.inc
-- **v0.4.0 — perfis de servico + categorias nDPI (2026-03-23):**
-  - ficheiro `profiles.json` com 15 perfis built-in (YouTube, Facebook, Instagram, TikTok, WhatsApp, Twitter/X, LinkedIn, Netflix, Spotify, Twitch, Redes Sociais, Streaming, Jogos, VPN/Proxy, AI Tools)
-  - seccao "Perfis rapidos" na pagina de politicas com cards visuais
-  - modal para escolher accao, interfaces e CIDRs antes de aplicar
-  - perfis expandem-se em politicas normais no JSON
-  - helper `layer7_load_profiles()` em layer7.inc
-  - nova pagina "Categorias" com todas as apps nDPI agrupadas por categoria
-  - campo de pesquisa filtra apps e categorias em tempo real
-  - accordion expansivel com contagem de apps por categoria
-  - daemon `--list-protos` estendido com `protocols_by_category`
-  - GUI passa a ter 8 paginas (Estado, Definicoes, Politicas, Categorias, Excecoes, Events, Diagnostics)
-- **v0.3.2 — actualizacao via GUI (2026-03-23):**
-  - botao "Verificar actualizacao" na pagina Definicoes
-  - consulta GitHub Releases API para detectar versao mais recente
-  - botao "Actualizar agora" faz download e instalacao do .pkg automaticamente
-  - daemon parado e reiniciado durante a actualizacao
-  - politicas, excecoes e configuracoes preservadas
-- **v0.3.1 — anti-bypass DNS (2026-03-23):**
-  - regras PF anti-DoT/DoQ (porta 853) no snippet do pacote
-  - politica nDPI built-in `anti-bypass-dns` (DoH_DoT + iCloudPrivateRelay)
-  - script Unbound anti-DoH com NXDOMAIN para dominios de bypass conhecidos
-  - instalacao automatica do anti-DoH via install.sh
-  - documentacao da estrategia multi-camada em pf-enforcement.md
-- **v0.3.0 — bloqueio por destino (sites/apps) (2026-03-23):**
-  - nova tabela PF `layer7_block_dst` + regra `block to` no snippet do pacote
-  - DNS callback: daemon observa DNS e bloqueia IPs de dominios proibidos
-  - enforcement nDPI: `block` agora adiciona IP de destino (nao mais de origem)
-  - cache com TTL + sweep periodico para expirar entradas de destino
-  - diagnostics na GUI com contadores da tabela de destino
-- **v0.2.7 — enforcement PF integrado ao filtro pfSense (2026-03-23):**
-  - XML do pacote declara `<filter_rules_needed>layer7_generate_rules</filter_rules_needed>`
-  - regras de bloqueio entram no ruleset ativo via `discover_pkg_rules()`
-  - bloqueio por origem automatico sem regra PF manual externa
-- **v0.2.1 — Empacotamento autocontido (2026-03-23):**
-  - build do port usa `/usr/local/lib/libndpi.a`
-  - `update-ndpi.sh` aborta se o binário final ainda depender de `libndpi.so`
-  - pacote validado em FreeBSD 15 lab sem dependência runtime de nDPI
-- **v0.2.6 — listas melhores e sites manuais (2026-03-23):**
-  - botões de seleção em massa nas listas da GUI
-  - novo campo `Sites/hosts` nas políticas
-  - `layer7d` passa a casar `match.hosts[]` com `host=` e subdomínios
-  - nova ação `Ver listas` nas políticas
-- **v0.2.5 — Hostname e destino nos eventos (2026-03-23):**
-  - `flow_decide` passa a mostrar `dst=` e `host=`
-  - `host=` e derivado por correlacao DNS observada na propria captura
-- **v0.2.4 — Monitor ao vivo na GUI (2026-03-23):**
-  - aba `Events` ganha monitor ao vivo com auto-refresh
-  - filtro atual da pagina tambem se aplica ao monitor ao vivo
-- **v0.2.3 — Log local do daemon (2026-03-23):**
-  - `layer7d` passa a gravar eventos em `/var/log/layer7d.log`
-  - GUI Events e Diagnostics deixam de depender do syslog do pfSense
-- **v0.2.2 — Labels amigaveis de interface (2026-03-23):**
-  - GUI Settings passa a mostrar a descricao configurada da interface
-  - GUI Policies e Exceptions reutilizam o mesmo label amigavel
-- **v0.2.0 — Motor Multi-Interface (2026-03-18):**
-  - GUI Settings: checkboxes dinâmicos de interfaces pfSense
-  - Políticas: `interfaces[]`, `match.src_hosts[]`, `match.src_cidrs[]`
-  - Excepções: múltiplos `hosts[]`/`cidrs[]` + `interfaces[]`
-  - `layer7d --list-protos`: JSON com protocolos/categorias nDPI
-  - GUI Policies: multi-select com pesquisa para apps nDPI
-  - Policy engine filtra por interface, IP e CIDR de origem
-- **Documentação: Guia Completo** — `docs/tutorial/guia-completo-layer7.md` (18 secções)
-- **Documentação GitHub actualizada** — README, CORTEX, CHANGELOG, checklist, roadmap
+Manter o Layer7 operacionalmente previsivel e tecnicamente auditavel,
+priorizando:
 
-## Objetivo imediato
-**v1.7.6 — Publicar monitor acumulativo.**
+- preservacao da V1 ja entregue;
+- cadeia de confianca real entre codigo, builder, servidor de licencas e
+  artefacto distribuido;
+- hardening de componentes pos-V1 sem inflar escopo;
+- continuidade entre chats e entre mantenedores;
+- documentacao viva, rastreavel e com canonicidade explicita.
 
-V1 Comercial publicada. License server operacional. Blacklists UT1 (v1.1.0),
-per-rule (v1.2.0), fix matching (v1.2.1), i18n PT/EN (v1.3.0). Fix critico
-de libcrypto e install.sh auto-detect (v1.3.1). Quick profiles para acesso
-remoto e anti-bypass DNS (v1.3.2). Fix anti-DoH persistente (v1.3.3).
-Botao remover (v1.3.4). Fix base64 Unbound (v1.3.5). Criacao automatica
-de tabelas PF de blacklist + botao reparar (v1.3.6). Modulo de relatorios
-com historico, graficos e exportacao (v1.4.0). Fix criacao robusta de
-tabelas PF com fallback pfctl -f (v1.4.2). Relatorios executivos com
-SQLite e filtros orientados a diretoria (v1.4.3). Refino visual da GUI
-para clareza operacional (v1.4.4). Gestão de licença via GUI (v1.4.5) e
-correlação DNS para mostrar domínio realmente tentado (v1.4.8).
+---
 
-**Progresso license server (CONCLUIDO):**
-- [x] Bloco 1: Estrutura do projecto (docker-compose, Dockerfiles, nginx, .env.example, .gitignore)
-- [x] Bloco 2: Backend — Database e crypto (schema SQL, db.js, crypto.js, seed.js, package.json)
-- [x] Bloco 3: Backend — API (Express, JWT, login, activate, licenses CRUD, customers CRUD, dashboard)
-- [x] Bloco 4: Frontend (React 18, Vite, TailwindCSS, 7 paginas, 5 componentes)
-- [x] Bloco 5: Deploy no 192.168.100.244 (4 containers up, seed OK, validacao LAN OK)
-- [x] Bloco 6: Integracao (URL+pubkey no license.c, fix parser JSON, rebuild 1.0.1, activacao end-to-end OK)
+## Principios obrigatorios
 
-**Progresso blacklists UT1 (v1.1.0):**
-- [x] Planeamento completo — `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`
-- [x] Directrizes de implementacao — `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`
-- [x] Guia passo-a-passo — `docs/11-blacklists/GUIA-PASSO-A-PASSO.md`
-- [x] Regras de qualidade — `docs/11-blacklists/REGRAS-QUALIDADE.md`
-- [x] Decisoes confirmadas (interfaces global, HTTP fetch, 1M buckets, whitelist global, fluxo SquidGuard, tabela PF except)
-- [x] Bloco 1: Script de download + auto-descoberta
-- [x] Bloco 2: Modulo C (hash table FNV-1a + whitelist)
-- [x] Bloco 3: Integracao no daemon (bl_config.c + DNS callback)
-- [x] Bloco 4: GUI PHP (4 seccoes estilo SquidGuard)
-- [x] Bloco 5: Cron job
-- [x] Bloco 6: Excepcoes PF (tabela layer7_bl_except)
-- [x] Bloco 7: Estatisticas e dashboard
-- [ ] Bloco 8: Build, testes end-to-end e release
+1. **Nao regredir comportamento existente.**
+2. **Um bloco pequeno por vez.**
+3. **Documentacao e execucao caminham juntas.**
+4. **Sem reestruturacao fisica antes da hora.**
+5. **Sem “solucoes magicas” nem refactors impulsivos.**
+6. **Tudo relevante precisa de gate, risco, teste e rollback.**
+7. **Se existir conflito documental, ele deve ser declarado e classificado.**
+8. **Na duvida, conservar e documentar.**
 
-## Proximos 3 passos
-1. Build v1.4.8 no FreeBSD builder e publicar GitHub Release
-2. Validar activação com chave minúscula e mista via GUI
-3. Confirmar estado da licença como válida no pfSense após registo
+---
 
-## Gates pendentes para V1
-- [x] Fase 6: block validado no appliance (`pfctl`) — OK 2026-03-22
-- [x] Fase 6: whitelist validada no appliance — OK 2026-03-22
-- [x] Fase 9: whitelist e fallback testados — OK 2026-03-22
-- [x] Fase 10: nDPI integrado e a classificar trafego real — OK 2026-03-22
-- [x] Fase 10: enforce end-to-end via nDPI validado — OK 2026-03-23
-- [ ] Fase 10: piloto estavel 24h+ sem incidente
-- [x] Fase 11: release V1 final (0.1.0) — publicada 2026-03-23
-- [x] Motor multi-interface v0.2.0 — implementado 2026-03-18
-- [x] Plano V1 Comercial completo (Blocos 1-10) — 2026-03-23
-- [x] Release v1.0.0 preparada — 2026-03-23
-- [x] Build final no FreeBSD lab — 2026-03-23
-- [x] GitHub Release v1.0.0 publicada — 2026-03-23
-- [x] Branding Systemup Solucao em Tecnologia — 2026-03-23
+## Fase actual
+
+**Fase actual consolidada:** `F0 — Governanca documental`
+
+**Resultado esperado da F0:** criar a base canónica que permite abrir as
+fases tecnicas seguintes com contexto preservado e sem drift documental
+critico.
+
+**Proxima fase elegivel:** `F1 — Cadeia de confianca e seguranca critica`
+
+### Ordem segura das fases
+
+| Fase | Nome | Estado | Intencao |
+|------|------|--------|----------|
+| F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
+| F1 | Cadeia de confianca e seguranca critica | pronta para abrir | mapear e fechar confianca entre repo, builder, chaves e artefactos |
+| F2 | Hardening do license server | planeada | endurecer deploy, segredos, backup e fronteiras operacionais |
+| F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
+| F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
+| F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
+| F6 | Reorganizacao estrutural controlada | planeada | mover/normalizar estrutura apenas com mapa e rollback |
+| F7 | Observabilidade e release engineering | planeada | fortalecer telemetria, verificacao de artefactos e governanca de release |
+
+---
+
+## Proximos passos autorizados
+
+1. Abrir a F1 com foco exclusivo em cadeia de confianca, sem puxar ainda
+   features novas.
+2. Formalizar ADRs que faltam para distribuicao actual, fronteiras de
+   confianca e hardening do servidor de licencas.
+3. Usar o backlog canónico como fila unica de priorizacao antes de tocar em
+   codigo, empacotamento, daemon, frontend ou scripts operacionais.
+
+---
+
+## Riscos abertos
+
+- A cadeia actual entre repositório, builder com ficheiros sensiveis locais,
+  chave publica embutida e artefacto publicado ainda precisa de formalizacao.
+- O `docs/` tem areas canónicas e areas apenas suplementares/historicas;
+  sem ler a classificacao, um agente pode seguir um documento antigo.
+- Existem documentos antigos ainda a mencionar `.txz`, `v0.x` e estados
+  pre-V1; isso esta agora classificado, mas a limpeza fisica fica para a F6.
+- O tutorial longo e alguns guias de lab continuam uteis, mas nao devem ser
+  tratados como SSOT para instalacao ou governanca.
+- O builder possui alteracoes locais de producao que **nao podem ser
+  commitadas**, exigindo disciplina operacional.
+
+---
+
+## Restricoes
+
+- foco em **pfSense CE**;
+- pacote **proprietario** com EULA Systemup;
+- distribuicao publica por **`.pkg` via GitHub Releases**;
+- sem software pago obrigatorio;
+- V1 sem MITM TLS universal;
+- V1 sem console central multi-firewall;
+- V1 sem analytics pesado;
+- sem reorganizacao fisica antes da F6;
+- sem alterar codigo-fonte, package, daemon, license server, frontend,
+  scripts operacionais ou logica funcional durante a F0.
+
+---
+
+## Regras de nao regressao
+
+1. Nenhuma fase tecnica pode alterar mais de um subsistema critico ao mesmo
+   tempo sem justificacao e rollback explicitos.
+2. Nenhuma alteracao funcional entra sem declarar:
+   - objectivo;
+   - impacto;
+   - risco;
+   - teste;
+   - rollback.
+3. `docs/10-license-server/MANUAL-INSTALL.md` e a referencia canónica para
+   instalacao, upgrade, reinstall e desinstalacao do pacote.
+4. `docs/changelog/CHANGELOG.md` e a linha temporal oficial de releases e
+   correccoes; o `CORTEX.md` nao deve voltar a carregar changelog detalhado.
+5. Nenhum agente deve assumir que documentos da raiz ainda sao canónicos so
+   porque foram a base original do projecto.
+6. Antes da F6, conflitos estruturais resolvem-se por **classificacao e
+   equivalencia**, nao por mover/apagar ficheiros.
+
+---
+
+## Hierarquia documental
+
+### Documentos canónicos de governanca
+
+- [`docs/README.md`](docs/README.md)
+- [`docs/02-roadmap/roadmap.md`](docs/02-roadmap/roadmap.md)
+- [`docs/02-roadmap/backlog.md`](docs/02-roadmap/backlog.md)
+- [`docs/02-roadmap/checklist-mestre.md`](docs/02-roadmap/checklist-mestre.md)
+- [`docs/00-overview/document-classification.md`](docs/00-overview/document-classification.md)
+- [`docs/00-overview/document-equivalence-map.md`](docs/00-overview/document-equivalence-map.md)
+- [`docs/03-adr/README.md`](docs/03-adr/README.md)
+
+### Documentos canónicos por area
+
+- Produto/escopo: [`docs/00-overview/product-charter.md`](docs/00-overview/product-charter.md)
+- Arquitectura alvo: [`docs/01-architecture/target-architecture.md`](docs/01-architecture/target-architecture.md)
+- Instalacao/operacao do pacote: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md)
+- Changelog: [`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md)
+- Core tecnico: [`docs/core/README.md`](docs/core/README.md)
+- Testes: [`docs/tests/README.md`](docs/tests/README.md)
+
+### Legado preservado
+
+- Os documentos `00-` a `16-` na raiz continuam preservados para contexto,
+  rastreabilidade e compatibilidade de links, mas deixaram de ser a fonte
+  primaria de decisao.
+
+---
+
+## Ordem de leitura obrigatoria
+
+### Para qualquer novo chat ou agente
+
+1. `CORTEX.md`
+2. [`docs/README.md`](docs/README.md)
+3. [`docs/02-roadmap/roadmap.md`](docs/02-roadmap/roadmap.md)
+4. [`docs/02-roadmap/backlog.md`](docs/02-roadmap/backlog.md)
+5. [`docs/02-roadmap/checklist-mestre.md`](docs/02-roadmap/checklist-mestre.md)
+6. [`docs/00-overview/document-classification.md`](docs/00-overview/document-classification.md)
+7. [`docs/00-overview/document-equivalence-map.md`](docs/00-overview/document-equivalence-map.md)
+
+### Para trabalho tecnico numa area especifica
+
+- Instalacao, upgrade, desinstalacao, rollback operacional:
+  [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md)
+- Arquitectura/config/policy:
+  [`docs/01-architecture/target-architecture.md`](docs/01-architecture/target-architecture.md)
+  e [`docs/core/README.md`](docs/core/README.md)
+- License server e licenciamento:
+  [`docs/10-license-server/PLANO-LICENSE-SERVER.md`](docs/10-license-server/PLANO-LICENSE-SERVER.md)
+  e [`docs/10-license-server/MANUAL-USO-LICENCAS.md`](docs/10-license-server/MANUAL-USO-LICENCAS.md)
+- Blacklists UT1:
+  [`docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`](docs/11-blacklists/PLANO-BLACKLISTS-UT1.md),
+  [`docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`](docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md),
+  [`docs/11-blacklists/REGRAS-QUALIDADE.md`](docs/11-blacklists/REGRAS-QUALIDADE.md)
+- Testes e validacao:
+  [`docs/tests/README.md`](docs/tests/README.md)
+  e [`docs/04-package/validacao-lab.md`](docs/04-package/validacao-lab.md)
+
+---
+
+## Mapa rapido do repositorio
+
+- `docs/` -> centro documental canónico progressivo
+- `src/` -> codigo-fonte do daemon, PoC e modulos de runtime
+- `package/pfSense-pkg-layer7/` -> port e ficheiros do pacote pfSense
+- `webgui/` -> documentacao curta da GUI e referencias auxiliares
+- `license-server/` -> backend, frontend e nginx do servidor de licencas
+- `scripts/` -> build, package, lab, diagnostico e release
+- `tests/` -> material de teste e fixtures
+- `samples/` -> amostras de configuracao e politicas
+- raiz `00-16` -> legado documental preservado
+
+---
+
+## Componentes principais
+
+1. **Pacote pfSense**
+   - entrega o pacote instalavel, metadados, hooks e GUI integrada
+2. **Daemon `layer7d`**
+   - carrega configuracao, classifica trafego, decide politicas e alimenta PF
+3. **Engine de classificacao**
+   - nDPI como decisao congelada de V1
+4. **Policy engine**
+   - regras por interface, IP/CIDR, grupo, horario, host, app e categoria
+5. **Enforcement PF**
+   - bloqueio por origem/destino, forcing DNS, tabelas de excepcoes e blacklist
+6. **Servidor de licencas**
+   - stack separada para activacao, gestao administrativa e emissao de `.lic`
+7. **Sistema documental**
+   - governanca, roadmap, backlog, ADRs, runbooks, changelog e guias por area
+
+---
 
 ## Decisoes congeladas
-- foco em pfSense CE
-- pacote proprietario (EULA)
-- distribuição por artefacto `.pkg`
-- lab distribution via GitHub Releases
-- sem software pago obrigatório
-- V1 sem TLS MITM universal
-- V1 com modo monitor e enforce
-- documentação viva obrigatória
-- engine de classificação: nDPI (ADR-0001)
-- actualização nDPI: compilar 1x no builder + `fleet-update.sh`; custom protocols em runtime via `fleet-protos-sync.sh`
-- políticas granulares: por interface + por IP/CIDR + por app/categoria nDPI
 
-## Riscos ativos
-- assumir compatibilidade plena enquanto depende de `IGNORE_OSVERSION=yes`
-- mexer na WebGUI base do pfSense fora do fluxo oficial
-- primeiro teste real em produção pendente
+- foco exclusivo em **pfSense CE**
+- produto comercial/proprietario da **Systemup**
+- artefacto publico de distribuicao: **`.pkg`**
+- activacao/licenciamento via ficheiro `.lic` assinado com **Ed25519**
+- nDPI continua como engine de classificacao
+- sem MITM universal na V1
+- sem console central nesta etapa
+- `docs/` e o centro canónico progressivo
+- a raiz actual e **legado importante**, nao lixo
+- reorganizacao fisica so na **F6**
 
-## Itens adiados
-- console central
-- identidade avançada
-- TLS inspection selectiva
-- integração profunda com Suricata
-- console multi-firewall
+---
 
-**Trilha pós-V1 (documental):** fases **13-22** em `03-ROADMAP-E-FASES.md`.
+## Politica de continuidade entre chats
 
-## Politica de trabalho
-- um bloco por vez
-- uma validação por vez
-- nada marcado como feito sem evidência de lab
-- docs no mesmo commit
+Cada novo chat deve conseguir responder, sem ambiguidade:
 
-## Definition of Done da V1
-- [x] pacote instalavel com evidencia
-- [x] daemon funcional com evidencia
-- [x] GUI completa (10 paginas) com evidencia
-- [x] policy engine (granular: interface/IP/grupo/horario/app/categoria/host)
-- [x] enforcement completo (PF por destino + origem)
-- [x] observabilidade (dashboard, contadores, logs, syslog remoto)
-- [x] perfis de servico (15 built-in)
-- [x] licenciamento Ed25519
-- [x] backup e restore
-- [x] teste de politica
-- [ ] rollback validado em producao
-- [x] docs completas
+1. Em que fase o projecto esta.
+2. O que e canónico e o que e historico.
+3. Qual e o ultimo estado seguro conhecido.
+4. O que pode e o que nao pode ser mexido agora.
+5. Qual e o proximo passo autorizado.
+
+Para isso:
+
+- o `CORTEX.md` deve ser lido antes de qualquer accao;
+- o estado de fase deve ser mantido alinhado ao roadmap canónico;
+- backlog, ADR index e checklist mestre devem ser actualizados sempre que
+  houver mudanca real de prioridade, decisao ou gate;
+- no fim de cada bloco relevante, registrar um checkpoint seguro.
+
+---
+
+## Politica de documentacao viva
+
+| Quando algo mudar | Documentos obrigatorios |
+|-------------------|-------------------------|
+| fase actual, gate ou sequencia aprovada | `CORTEX.md`, `docs/02-roadmap/roadmap.md`, `docs/02-roadmap/backlog.md`, `docs/02-roadmap/checklist-mestre.md` |
+| decisao arquitectural, de seguranca ou de distribuicao | `docs/03-adr/README.md`, ADR novo/actualizado, `CORTEX.md` |
+| instalacao, upgrade, uninstall, rollback, caminhos, comandos ou versao publicada | `docs/10-license-server/MANUAL-INSTALL.md`, runbooks afectados, changelog, release docs |
+| mudanca funcional relevante | changelog, docs da area, `CORTEX.md`, backlog/status da fase |
+| reorganizacao estrutural | mapa de equivalencia, classificacao documental, roadmap/checklist da F6 |
+| release publicada | changelog, release notes, `MANUAL-INSTALL.md`, `CORTEX.md` |
+
+---
+
+## Bloco fixo de checkpoint
+
+```text
+CHECKPOINT CANONICO
+- Data base: 2026-04-01
+- Produto: Layer7 para pfSense CE
+- Versao segura conhecida: 1.8.0
+- Estado funcional: V1 Comercial concluida e publicada
+- Estado documental: governanca F0 consolidada
+- Fase actual: F0
+- Proxima fase elegivel: F1
+- Reorganizacao fisica autorizada: nao
+- Artefacto publico actual: .pkg via GitHub Releases
+- Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
+- Fonte canónica de prioridade: docs/02-roadmap/backlog.md
+- Fonte canónica de gates: docs/02-roadmap/checklist-mestre.md
+```
+
+---
+
+## Ultimo status seguro conhecido
+
+### Tecnico
+
+- A referencia tecnica segura continua a ser o pacote `1.8.0`.
+- O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
+  relatorios locais e licenciamento funcional.
+- Nenhuma alteracao funcional foi introduzida nesta Fase 0.
+
+### Documental
+
+- A canonicidade passou a estar explicitamente declarada.
+- O projecto ja nao depende da raiz como fonte principal de governanca.
+- O backlog, o roadmap, o checklist mestre e o mapa de equivalencia passam a
+  servir de ponte segura entre chats e entre fases.
+
+### Operacional
+
+- Qualquer proxima intervencao tecnica deve partir deste checkpoint e abrir a
+  F1 de forma controlada, sem puxar ao mesmo tempo licenciamento, package,
+  daemon, blacklists, reorganizacao estrutural e release engineering.

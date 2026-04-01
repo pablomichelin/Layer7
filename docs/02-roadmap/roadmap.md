@@ -1,24 +1,487 @@
-# Roadmap (resumo)
+# Roadmap Canónico — F0 a F7
 
-Execução em **fases** com gates; não pular blocos do plano de implementação.
+Este roadmap substitui o papel de SSOT que antes estava diluido entre a raiz
+e resumos curtos. A ordem segura aprovada para evolucao do Layer7 e:
 
-- **Fase 0:** escopo congelado
-- **Fase 1:** laboratório + builder
-- **Seguintes:** PoC engine → core → skeleton pacote → integração → homologação
+`F0 -> F1 -> F2 -> F3 -> F4 -> F5 -> F6 -> F7`
 
-## Documento expandido
+**Regra principal:** nao pular fases e nao misturar reorganizacao estrutural
+com hardening tecnico ou com release engineering.
 
-[`../../03-ROADMAP-E-FASES.md`](../../03-ROADMAP-E-FASES.md)
+---
 
-## Trilha complementar
+## Visao geral
 
-Para a evolução específica do enforcement até bloqueio operacional real de apps,
-sites, serviços e funções, ver:
+| Fase | Nome | Estado | Gate central |
+|------|------|--------|--------------|
+| F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
+| F1 | Cadeia de confianca e seguranca critica | planeada | confianca entre repo, builder, chaves e artefacto fica auditavel |
+| F2 | Hardening do license server | planeada | stack de licencas opera com segredos, backup e fronteiras sob controlo |
+| F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
+| F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
+| F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
+| F6 | Reorganizacao estrutural controlada | planeada | reorganizacao fisica acontece com mapa, links e rollback |
+| F7 | Observabilidade e release engineering | planeada | release e operacao passam a ter governanca forte e verificavel |
 
-[`../09-blocking/blocking-master-plan.md`](../09-blocking/blocking-master-plan.md)
+---
 
-## Trilha pos-V1 (relatorios executivos)
+## F0 — Governanca documental
 
-Para a evolução do módulo de relatórios orientado a diretoria (SQLite local,
-filtros por dispositivo/IP/site, retenção configurável e exportação executiva),
-seguir `docs/12-reports/MANUAL-RELATORIOS-EXECUTIVOS.md`.
+### Objectivo
+
+Consolidar a base canónica do projecto sem tocar em codigo, logica, package,
+daemon, license server, frontend, scripts operacionais ou estrutura fisica.
+
+### Escopo
+
+- consolidar `CORTEX.md` como SSOT;
+- consolidar `AGENTS.md`;
+- criar indice oficial em `docs/README.md`;
+- criar roadmap, backlog e checklist mestre canónicos;
+- criar ADR index canónico;
+- classificar os documentos actuais;
+- criar mapa de equivalencia entre raiz e `docs/`;
+- explicitar continuidade entre chats.
+
+### Exclusoes
+
+- sem mudanca de codigo;
+- sem mexer em `PORTVERSION`;
+- sem build, release ou empacotamento;
+- sem mover/apagar/renomear ficheiros;
+- sem limpar legado por forca.
+
+### Dependencias
+
+- documentacao existente na raiz e em `docs/`;
+- estado funcional seguro ja conhecido da V1.
+
+### Criterios de entrada
+
+- V1 Comercial concluida;
+- drift documental identificado;
+- necessidade de preparar continuidade segura para fases tecnicas.
+
+### Criterios de saida
+
+- canonicidade declarada;
+- novo agente consegue localizar SSOT e backlog sem ambiguidade;
+- conflitos documentais principais ficam mapeados;
+- nenhuma alteracao acidental no produto.
+
+### Gate
+
+- `CORTEX`, `AGENTS`, indice, roadmap, backlog, checklist, classificacao e
+  equivalencia coerentes entre si;
+- `git diff` apenas documental.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- `AGENTS.md`
+- `docs/README.md`
+- `docs/02-roadmap/roadmap.md`
+- `docs/02-roadmap/backlog.md`
+- `docs/02-roadmap/checklist-mestre.md`
+- `docs/00-overview/document-classification.md`
+- `docs/00-overview/document-equivalence-map.md`
+- `docs/03-adr/README.md`
+
+---
+
+## F1 — Cadeia de confianca e seguranca critica
+
+### Objectivo
+
+Tornar auditavel a cadeia de confianca entre:
+
+- repositório;
+- builder;
+- chave publica embutida;
+- chave privada de emissao de licencas;
+- artefacto publico distribuido;
+- processo de activacao.
+
+### Escopo
+
+- mapear fronteiras de confianca;
+- documentar segredos e custodia;
+- rever builder com ficheiros locais sensiveis;
+- rever como a chave publica entra no binario;
+- rever verificacao do artefacto distribuido;
+- formalizar ADRs de confianca e distribuicao.
+
+### Exclusoes
+
+- sem reorganizacao estrutural;
+- sem redesign do license server como produto;
+- sem adicionar funcionalidades novas ao utilizador final.
+
+### Dependencias
+
+- F0 consolidada;
+- backlog priorizado;
+- capacidade de descrever risco real sem ambiguidade.
+
+### Criterios de entrada
+
+- base canónica pronta;
+- lista de riscos criticos aprovada.
+
+### Criterios de saida
+
+- cadeia de confianca documentada ponta a ponta;
+- segredos e ficheiros especiais identificados;
+- ADRs criticos criados ou actualizados;
+- rollback e impacto definidos para a proxima fase tecnica.
+
+### Gate
+
+- nenhuma dependencia critica de confianca fica “implícita”;
+- qualquer maintainer consegue explicar como a confianca e preservada.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- backlog
+- ADR index + ADRs afectados
+- runbook de builder/segredos afectados
+
+---
+
+## F2 — Hardening do license server
+
+### Objectivo
+
+Endurecer o servidor de licencas sem misturar esse trabalho com novas
+features comerciais.
+
+### Escopo
+
+- segredos e variaveis de ambiente;
+- fronteira HTTP/HTTPS e terminacao TLS;
+- backup e restore;
+- health checks e verificabilidade;
+- logs operacionais minimos;
+- rate limiting e superficies de abuso;
+- operacao administrativa segura.
+
+### Exclusoes
+
+- sem refactor visual amplo do frontend;
+- sem mudar o modelo comercial;
+- sem reorganizacao fisica do repositório.
+
+### Dependencias
+
+- F1 concluida;
+- ADRs de confianca criados;
+- runbooks de producao revistos.
+
+### Criterios de entrada
+
+- fronteiras de confianca conhecidas;
+- riscos criticos do server priorizados.
+
+### Criterios de saida
+
+- stack opera com segredos e backup sob controlo;
+- operacao e incidentes basicos ficam documentados;
+- risco de exposicao ou recuperacao manual improvisada e reduzido.
+
+### Gate
+
+- um incidente operacional simples consegue ser tratado por runbook;
+- credenciais, segredos e processo de recuperacao deixam de ser conhecimento
+  oral.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- backlog
+- ADRs afectados
+- docs de licencas e runbooks operacionais afectados
+
+---
+
+## F3 — Robustez de licenciamento/activacao
+
+### Objectivo
+
+Tornar o comportamento de licenciamento previsivel em cenarios normais e de
+falha.
+
+### Escopo
+
+- activacao online;
+- reactivacao;
+- revogacao;
+- renovacao;
+- activacao offline;
+- grace period;
+- consistencia do hardware fingerprint;
+- estados e mensagens de erro.
+
+### Exclusoes
+
+- sem expandir produto comercial;
+- sem mudar arquitectura de release;
+- sem reorganizacao fisica.
+
+### Dependencias
+
+- F1 e F2 concluidas;
+- stack de licencas sob hardening minimo.
+
+### Criterios de entrada
+
+- risco critico do servidor estabilizado;
+- modelo de confianca conhecido.
+
+### Criterios de saida
+
+- fluxo de licenciamento explicado por estado e transicao;
+- casos de falha principais cobertos por testes/registo;
+- comportamento offline deixa de depender de tentativa e erro.
+
+### Gate
+
+- activacao, revogacao, expiracao e modo offline ficam previsiveis e
+  rastreaveis.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- backlog
+- ADRs afectados
+- `docs/10-license-server/MANUAL-USO-LICENCAS.md`
+- matriz de testes afectada
+
+---
+
+## F4 — Confiabilidade package/daemon/blacklists
+
+### Objectivo
+
+Reduzir fragilidade operacional no pacote, no daemon e no subsistema de
+blacklists, sem misturar ainda reorganizacao estrutural.
+
+### Escopo
+
+- confiabilidade de boot/reload/restart;
+- convergencia entre runtime, PF e docs;
+- update/reload de blacklists com fallback seguro;
+- forcing DNS e excepcoes em cenarios reais;
+- install/upgrade/remove/rollback com previsibilidade;
+- correcao de drift documental operacional remanescente.
+
+### Exclusoes
+
+- sem reforma estrutural ampla;
+- sem observabilidade “pesada” ainda;
+- sem abrir multiplas frentes de funcionalidade nova.
+
+### Dependencias
+
+- F3 concluida;
+- backlog e risks priorizados.
+
+### Criterios de entrada
+
+- cadeia de confianca e licenciamento mais estaveis;
+- documentos operacionais de base actualizados.
+
+### Criterios de saida
+
+- runtime e package comportam-se de forma consistente em reboot, reload,
+  upgrade e rollback;
+- trilha de blacklists deixa de depender de suposicoes operacionais.
+
+### Gate
+
+- os principais cenarios operacionais de package/daemon/blacklists possuem
+  evidencia minima e rollback claro.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- backlog
+- `docs/10-license-server/MANUAL-INSTALL.md`
+- docs de blacklists afectadas
+- runbooks e changelog afectados
+
+---
+
+## F5 — Malha de testes e regressao
+
+### Objectivo
+
+Transformar evidencias dispersas numa malha real de nao regressao.
+
+### Escopo
+
+- matriz de testes canónica;
+- separacao entre smoke, builder, appliance e operacao;
+- cobertura minima por fase/area;
+- gates repetiveis;
+- registo de evidencias e pendencias.
+
+### Exclusoes
+
+- sem reorganizacao estrutural ainda;
+- sem tratar observabilidade avancada como substituto de testes.
+
+### Dependencias
+
+- F4 concluida;
+- fluxos operacionais minimamente estaveis.
+
+### Criterios de entrada
+
+- principais frentes funcionais estabilizadas;
+- backlog de risco traduzido em casos de teste.
+
+### Criterios de saida
+
+- existe malha minima de regressao por componente;
+- gates deixam de ser opinativos;
+- qualquer mudanca tecnica sabe que suite minima deve executar.
+
+### Gate
+
+- falhar um gate deixa de ser ambiguidade documental e passa a ser sinal claro.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- backlog
+- `docs/tests/README.md`
+- `docs/tests/test-matrix.md`
+- checklist mestre
+
+---
+
+## F6 — Reorganizacao estrutural controlada
+
+### Objectivo
+
+Reorganizar fisicamente o repositório apenas quando a base tecnica e
+documental ja estiver segura para isso.
+
+### Escopo
+
+- mover ou consolidar documentos da raiz;
+- normalizar duplicidades (`docs/tests` vs `docs/04-tests`, etc.);
+- racionalizar pastas e readmes historicos;
+- actualizar links, indices e referencias cruzadas.
+
+### Exclusoes
+
+- sem alterar logica funcional na mesma entrega;
+- sem hardening tecnico misturado com reestrutura estrutural.
+
+### Dependencias
+
+- F5 concluida;
+- mapas de classificacao e equivalencia maduros;
+- backlog estrutural aprovado.
+
+### Criterios de entrada
+
+- canonicidade ja estabilizada por varias fases;
+- risco de perda de contexto suficientemente baixo.
+
+### Criterios de saida
+
+- estrutura fisica mais limpa sem perda de rastreabilidade;
+- links afectados mapeados;
+- rollback estrutural praticavel.
+
+### Gate
+
+- qualquer ficheiro movido ou renomeado tem justificacao, equivalencia e
+  rollback documentados.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- backlog
+- checklist mestre
+- classificacao documental
+- equivalencia documental
+- changelog estrutural da fase
+
+---
+
+## F7 — Observabilidade e release engineering
+
+### Objectivo
+
+Fechar a camada de governanca operacional da distribuicao e da observabilidade.
+
+### Escopo
+
+- telemetria operacional relevante;
+- checklist interno de release;
+- verificacao de artefactos;
+- alinhamento entre changelog, release notes e disponibilidade de download;
+- governanca de publicacao.
+
+### Exclusoes
+
+- sem inflar escopo funcional do produto;
+- sem usar automacao para mascarar falta de disciplina documental.
+
+### Dependencias
+
+- F6 concluida;
+- estrutura e malha de testes suficientemente previsiveis.
+
+### Criterios de entrada
+
+- package, daemon e licenciamento estabilizados;
+- reorganizacao estrutural encerrada ou congelada.
+
+### Criterios de saida
+
+- releases deixam de depender de memoria operacional;
+- observabilidade passa a apoiar incidentes e validacoes;
+- disponibilidade de pacote e rastreabilidade documental ficam acopladas.
+
+### Gate
+
+- uma release interna ou publica consegue ser executada por checklist, com
+  verificacao de artefacto e docs sincronizadas.
+
+### Documentacao obrigatoria da fase
+
+- `CORTEX.md`
+- backlog
+- checklist mestre
+- changelog
+- docs de releases
+- `docs/10-license-server/MANUAL-INSTALL.md`
+
+---
+
+## Regras de actualizacao documental por fase
+
+### Ao entrar numa fase
+
+- actualizar `CORTEX.md`;
+- marcar a fase no roadmap;
+- rever backlog e checklist mestre;
+- confirmar se ADR novo e necessario.
+
+### Durante a fase
+
+- manter backlog e docs da area sincronizados com as decisoes tomadas;
+- registar conflitos e riscos abertos no `CORTEX.md`;
+- actualizar runbooks/manuais quando houver impacto operacional.
+
+### Ao sair da fase
+
+- actualizar checkpoint no `CORTEX.md`;
+- rever criterios de saida e gate;
+- consolidar pendencias para a fase seguinte no backlog;
+- registar changelog quando houver mudanca tecnica ou release.

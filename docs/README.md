@@ -1,28 +1,107 @@
-# Documentação (índice)
+# Documentacao Canónica
 
-| Pasta | Conteúdo |
-|-------|----------|
-| [tutorial](tutorial/) | **Guia Completo Layer7** (ponto de partida recomendado) |
-| [00-overview](00-overview/) | Charter do produto |
-| [01-architecture](01-architecture/) | Arquitetura alvo (resumo) |
-| [02-roadmap](02-roadmap/) | Roadmap (resumo) |
-| [03-adr](03-adr/) | Decisões de arquitetura |
-| [04-package](04-package/) | Pacote pfSense, validação lab |
-| [04-tests](04-tests/) | Plano de testes |
-| [05-daemon](05-daemon/) | Daemon layer7d (enforce, PF) |
-| [05-runbooks](05-runbooks/) | Operação e rollback |
-| [06-releases](06-releases/) | Releases / versão |
-| [07-prompts](07-prompts/) | Prompts / IA |
-| [08-lab](08-lab/) | Laboratório (builder, topologia, guias) |
-| [09-blocking](09-blocking/) | Plano mestre para bloqueio real de apps, sites e serviços |
-| [10-logging](10-logging/) | Logging e observabilidade |
-| [12-reports](12-reports/) | Relatórios executivos (SQLite, filtros, retenção, exportação) |
-| [changelog](changelog/) | CHANGELOG |
-| [core](core/) | Modelagem V1 (config/evento/policy/nDPI strategy) |
-| [package](package/) | Validação GUI |
-| [tests](tests/) | Documentação de testes |
+Este directorio e o **centro documental canónico** do projecto Layer7.
+Nem todo ficheiro aqui dentro tem o mesmo peso: alguns sao SSOT, outros sao
+suplementares, historicos, placeholders ou preservados por compatibilidade.
 
-Detalhamento longo permanece nos arquivos `01-`…`16-` na **raiz** do repositório.
+Quando houver conflito, seguir esta ordem:
 
-Prompt de continuidade para o proximo chat desta trilha:
-[`07-prompts/next-chat-phase-a-option1.md`](07-prompts/next-chat-phase-a-option1.md)
+1. [`../CORTEX.md`](../CORTEX.md)
+2. [`README.md`](README.md)
+3. [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md)
+4. [`02-roadmap/backlog.md`](02-roadmap/backlog.md)
+5. [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md)
+6. [`00-overview/document-classification.md`](00-overview/document-classification.md)
+7. [`00-overview/document-equivalence-map.md`](00-overview/document-equivalence-map.md)
+8. documentacao canónica por area
+
+---
+
+## Documentos canónicos principais
+
+| Tema | Documento canónico | Papel |
+|------|--------------------|-------|
+| Estado global do projecto | [`../CORTEX.md`](../CORTEX.md) | SSOT operacional, fase actual e checkpoint |
+| Uso desta arvore documental | [`README.md`](README.md) | indice oficial e ordem de leitura |
+| Fases aprovadas | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md) | roadmap F0-F7 com gates |
+| Priorizacao | [`02-roadmap/backlog.md`](02-roadmap/backlog.md) | backlog unico priorizado |
+| Gates e disciplina de execucao | [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md) | checklist de entrada, execucao e saida |
+| Classificacao dos documentos | [`00-overview/document-classification.md`](00-overview/document-classification.md) | diz o que e canónico, historico, placeholder ou preservado |
+| Equivalencia raiz <-> docs | [`00-overview/document-equivalence-map.md`](00-overview/document-equivalence-map.md) | resolve sobreposicoes e conflitos |
+| Decisoes formais | [`03-adr/README.md`](03-adr/README.md) | indice e politica de ADR |
+| Instalacao/upgrade/uninstall | [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md) | referencia operacional canónica |
+| Linha temporal de releases | [`changelog/CHANGELOG.md`](changelog/CHANGELOG.md) | changelog oficial |
+
+---
+
+## Mapa das areas documentais
+
+| Area | Documento(s) de entrada | Estado |
+|------|--------------------------|--------|
+| Visao de produto | [`00-overview/product-charter.md`](00-overview/product-charter.md) | canónico |
+| Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`core/README.md`](core/README.md) | canónico |
+| Roadmap e execucao | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md), [`02-roadmap/backlog.md`](02-roadmap/backlog.md), [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md) | canónico |
+| ADRs | [`03-adr/README.md`](03-adr/README.md) | canónico |
+| Package e validacao | [`04-package/README.md`](04-package/README.md), [`04-package/validacao-lab.md`](04-package/validacao-lab.md) | suplementar/operacional |
+| Daemon e enforcement | [`05-daemon/README.md`](05-daemon/README.md), [`05-daemon/pf-enforcement.md`](05-daemon/pf-enforcement.md) | suplementar com partes historicas |
+| Runbooks | [`05-runbooks/README.md`](05-runbooks/README.md) | suplementar |
+| Releases | [`06-releases/README.md`](06-releases/README.md) | canónico para governanca de release |
+| Lab | [`08-lab/README.md`](08-lab/README.md) | suplementar |
+| Bloqueio | [`09-blocking/README.md`](09-blocking/README.md) | historico/preservado |
+| Licencas | [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md), [`10-license-server/MANUAL-USO-LICENCAS.md`](10-license-server/MANUAL-USO-LICENCAS.md) | canónico por area |
+| Blacklists UT1 | [`11-blacklists/PLANO-BLACKLISTS-UT1.md`](11-blacklists/PLANO-BLACKLISTS-UT1.md), [`11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`](11-blacklists/DIRETRIZES-IMPLEMENTACAO.md) | canónico da trilha F4 |
+| Testes | [`tests/README.md`](tests/README.md), [`tests/test-matrix.md`](tests/test-matrix.md) | canónico por area |
+| Tutorial longo | [`tutorial/guia-completo-layer7.md`](tutorial/guia-completo-layer7.md) | preservado por compatibilidade; nao e SSOT de instalacao |
+
+---
+
+## O que e historico ou preservado
+
+- Os documentos `00-` a `16-` na raiz continuam preservados como legado
+  importante e contexto de origem.
+- Alguns readmes curtos em `package/`, `src/`, `webgui/` e `scripts/`
+  permanecem preservados para navegacao local, nao para governanca.
+- A trilha antiga em `docs/07-prompts/` fica preservada, mas a continuidade
+  oficial entre chats passa a viver no `CORTEX.md`.
+- Documentos que ainda citam estados pre-V1, `.txz` ou `v0.x` nao devem ser
+  usados como fonte primaria sem consultar antes a classificacao documental.
+
+---
+
+## Ordem sugerida de leitura
+
+### Novo agente ou novo chat
+
+1. [`../CORTEX.md`](../CORTEX.md)
+2. [`README.md`](README.md)
+3. [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md)
+4. [`02-roadmap/backlog.md`](02-roadmap/backlog.md)
+5. [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md)
+6. [`00-overview/document-classification.md`](00-overview/document-classification.md)
+7. [`00-overview/document-equivalence-map.md`](00-overview/document-equivalence-map.md)
+
+### Mudanca tecnica em area especifica
+
+1. Ler a base acima.
+2. Ler os documentos canónicos da area.
+3. Consultar changelog, ADR index e runbooks afectados.
+4. So depois abrir documentos historicos ou legados da raiz.
+
+### Instalacao ou operacao real
+
+1. [`../CORTEX.md`](../CORTEX.md)
+2. [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md)
+3. [`05-runbooks/README.md`](05-runbooks/README.md)
+4. [`changelog/CHANGELOG.md`](changelog/CHANGELOG.md)
+
+---
+
+## Como usar esta documentacao
+
+1. Use este ficheiro para localizar a fonte certa antes de ler “qualquer doc”.
+2. Em caso de conflito, consulte a classificacao e o mapa de equivalencia.
+3. Ao abrir uma nova fase, actualize primeiro `CORTEX`, roadmap, backlog e
+   checklist mestre.
+4. Ao alterar comportamento tecnico, actualize tambem as docs da area,
+   changelog e manuais operacionais afectados.
+5. Evite criar ficheiros novos sem necessidade; prefira consolidar.

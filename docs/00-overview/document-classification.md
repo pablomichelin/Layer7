@@ -1,0 +1,148 @@
+# Classificacao Documental
+
+## Finalidade
+
+Este documento regista formalmente o papel de cada documento Markdown actual
+do repositório apos a consolidacao da F0.
+
+### Classes usadas
+
+- **Canónico**: fonte activa de verdade para o tema.
+- **Suplementar**: apoio valido, mas nao e a primeira fonte de decisao.
+- **Historico**: preservado por contexto/rastreabilidade; pode conter estado antigo.
+- **Placeholder**: template, esqueleto ou stub para uso futuro.
+- **Preservado por compatibilidade**: mantido no caminho actual porque ainda
+  serve navegacao, links, clientes ou processos, embora nao seja SSOT.
+
+**Regra:** se houver conflito entre um documento canónico e um historico,
+vence o canónico.
+
+---
+
+## 1. Raiz do repositório
+
+| Arquivo | Tema | Papel actual | Classificacao | Substitui ou e substituido por | Accao futura sugerida | Fase |
+|---------|------|--------------|---------------|--------------------------------|-----------------------|------|
+| `CORTEX.md` | estado global | SSOT operacional e checkpoint | Canónico | substitui status disperso da raiz e resumos antigos | manter vivo a cada fase | F0+ |
+| `AGENTS.md` | execucao por agentes | regra de actuacao do agente | Canónico | substitui prompt operativo disperso | manter vivo a cada fase | F0+ |
+| `README.md` | visao publica do repo | porta de entrada publica do projecto | Preservado por compatibilidade | complementar a `docs/README.md` | rever apenas quando o posicionamento publico mudar | F7 |
+| `00-LEIA-ME-PRIMEIRO.md` | onboarding original | contexto historico do arranque do projecto | Historico | substituido por `CORTEX.md` + `docs/README.md` | preservar; nao usar como SSOT | F6 |
+| `01-VISAO-GERAL-E-ESCOPO.md` | escopo V1 detalhado | base expandida do charter | Historico | complementar a `docs/00-overview/product-charter.md` | preservar e referenciar so quando precisar de contexto longo | F6 |
+| `02-ARQUITETURA-ALVO.md` | arquitectura detalhada | contexto expandido da arquitectura | Historico | complementar a `docs/01-architecture/target-architecture.md` + `docs/core/` | preservar | F6 |
+| `03-ROADMAP-E-FASES.md` | roadmap V1-V2 original | referencia historica do plano antigo | Historico | substituido por `docs/02-roadmap/roadmap.md` | preservar | F6 |
+| `04-BACKLOG-MVP-E-VERSOES.md` | backlog antigo | backlog historico pre-F0 | Historico | substituido por `docs/02-roadmap/backlog.md` | preservar | F6 |
+| `05-ESTRUTURA-REPOSITORIO-CURSOR-GITHUB.md` | estrutura desejada do repo | contexto historico de organizacao | Historico | complementar a `docs/README.md` e equivalencia documental | preservar | F6 |
+| `06-PADROES-DE-DESENVOLVIMENTO-E-SEGURANCA.md` | padroes gerais | base historica de disciplina | Historico | complementar a `AGENTS.md` + checklist mestre | preservar | F6 |
+| `07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md` | plano V1 original | trilha historica de implementacao | Historico | complementar ao roadmap canónico | preservar | F6 |
+| `08-PLANO-DE-TESTES-E-HOMOLOGACAO.md` | testes V1 originais | plano expandido historico | Historico | complementar a `docs/tests/README.md` e `docs/tests/test-matrix.md` | preservar | F6 |
+| `09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md` | distribuicao antiga | contexto expandido de empacotamento | Historico | complementar a `docs/10-license-server/MANUAL-INSTALL.md` e `docs/06-releases/README.md` | preservar | F6 |
+| `10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md` | operacao e rollback | runbook expandido legado | Historico | complementar a `docs/05-runbooks/` e `MANUAL-INSTALL.md` | preservar | F6 |
+| `11-RISCOS-LIMITACOES-E-DECISOES.md` | riscos originais | contexto historico de risco | Historico | complementar ao `CORTEX.md` e backlog | preservar | F6 |
+| `12-PLANO-DE-DOCUMENTACAO-E-GITHUB.md` | plano de docs antigo | origem da governanca documental | Historico | substituido por `docs/README.md` + roadmap/checklist | preservar | F6 |
+| `13-MODELOS-DE-ISSUES-E-PRS.md` | modelos de governance | referencia util, nao activa | Suplementar | complementar a `.github/pull_request_template.md` e ADR index | preservar e reutilizar conforme necessidade | F7 |
+| `14-CHECKLIST-MESTRE.md` | checklist antigo | base historica de gates V1 | Historico | substituido por `docs/02-roadmap/checklist-mestre.md` | preservar | F6 |
+| `15-PROMPT-MESTRE-CURSOR.md` | prompt antigo | memoria de abordagem anterior | Historico | complementar a `AGENTS.md` | preservar; nao usar como SSOT | F6 |
+| `16-REFERENCIAS-OFICIAIS.md` | links externos | lista curta de referencias | Suplementar | sem equivalente directo | manter enquanto util | F7 |
+| `release-body.md` | texto de release | artefacto auxiliar de publicacao | Preservado por compatibilidade | complementar a `docs/06-releases/` e changelog | rever quando release engineering entrar | F7 |
+| `logica.md` | notas avulsas | material fora da governanca formal | Placeholder | sem equivalente canónico | preservar sem expandir | F6 |
+| `.github/pull_request_template.md` | template de PR | apoio leve a mudancas | Suplementar | complementar a `AGENTS.md` e `13-MODELOS-DE-ISSUES-E-PRS.md` | manter alinhado quando fluxo de PR mudar | F7 |
+
+---
+
+## 2. Centro documental `docs/`
+
+| Arquivo | Tema | Papel actual | Classificacao | Substitui ou e substituido por | Accao futura sugerida | Fase |
+|---------|------|--------------|---------------|--------------------------------|-----------------------|------|
+| `docs/README.md` | indice oficial | porta de entrada canónica da arvore `docs/` | Canónico | substitui a falta de indice formal | manter vivo | F0+ |
+| `docs/00-overview/product-charter.md` | charter | resumo canónico de produto/escopo | Canónico | resume `01-VISAO-GERAL-E-ESCOPO.md` | manter vivo | F0+ |
+| `docs/00-overview/document-classification.md` | classificacao | matriz de estatuto dos docs | Canónico | novo | manter vivo quando surgirem conflitos | F0+ |
+| `docs/00-overview/document-equivalence-map.md` | equivalencia | mapa raiz <-> docs | Canónico | novo | manter vivo ate a F6 | F0-F6 |
+| `docs/01-architecture/target-architecture.md` | arquitectura | resumo canónico da arquitectura | Canónico | resume `02-ARQUITETURA-ALVO.md` | manter vivo | F0+ |
+| `docs/02-roadmap/roadmap.md` | fases F0-F7 | roadmap canónico | Canónico | substitui `03-ROADMAP-E-FASES.md` como SSOT | manter vivo | F0+ |
+| `docs/02-roadmap/backlog.md` | backlog | backlog unico priorizado | Canónico | substitui `04-BACKLOG-MVP-E-VERSOES.md` | manter vivo | F0+ |
+| `docs/02-roadmap/checklist-mestre.md` | gates | checklist mestre da evolucao segura | Canónico | substitui `14-CHECKLIST-MESTRE.md` | manter vivo | F0+ |
+| `docs/03-adr/README.md` | indice ADR | politica e indice de decisoes | Canónico | substitui resumo antigo insuficiente | manter vivo | F0+ |
+| `docs/03-adr/ADR-0001-engine-classificacao-ndpi.md` | decisao nDPI | ADR aceite e normativo | Canónico | — | manter | F0+ |
+| `docs/03-adr/ADR-0002-distribuicao-artefato-txz.md` | distribuicao antiga | ADR preservado para rastreabilidade | Historico | precisa de ADR substituto | preservar ate ser superado formalmente | F1/F7 |
+| `docs/04-package/README.md` | package docs | indice local da area | Suplementar | complementar ao roadmap e `MANUAL-INSTALL.md` | manter leve | F4/F5 |
+| `docs/04-package/checklist-validacao-lab.md` | validacao rapida | checklist operacional de lab | Suplementar | complementar a `validacao-lab.md` | rever quando a F5 fechar a malha de testes | F5 |
+| `docs/04-package/deploy-github-lab.md` | deploy lab antigo | fluxo historico de distribuicao | Historico | parcialmente substituido por docs de release e install | preservar; harmonizar mais tarde | F7 |
+| `docs/04-package/package-skeleton.md` | esqueleto do package | memoria util da fase inicial | Historico | complementar a package docs | preservar | F6 |
+| `docs/04-package/validacao-lab.md` | evidencia em appliance | runbook de validacao de package/lab | Suplementar | complementar a `docs/tests/` | harmonizar termos de artefacto na F4/F5 | F4/F5 |
+| `docs/04-tests/README.md` | tests stub | indice antigo e minimo | Historico | sobreposto por `docs/tests/README.md` | preservar ate consolidacao estrutural | F6 |
+| `docs/05-daemon/README.md` | daemon overview | resumo tecnico desactualizado em partes | Historico | complementar a `docs/core/` e changelog | rever na F4 ou F6 | F4/F6 |
+| `docs/05-daemon/pf-enforcement.md` | enforcement PF | explicacao detalhada do enforcement | Suplementar | complementar ao changelog e docs core | manter/rever quando F4 mexer em enforcement | F4 |
+| `docs/05-runbooks/README.md` | indice de runbooks | agregador operacional local | Suplementar | complementar ao `MANUAL-INSTALL.md` | manter leve | F4/F7 |
+| `docs/05-runbooks/pfsense-webgui-safety.md` | seguranca de lab | runbook especifico de lab | Suplementar | — | manter | F4/F5 |
+| `docs/05-runbooks/rollback.md` | rollback | rollback do pacote Layer7 | Canónico | complementar ao `MANUAL-INSTALL.md` | manter vivo | F4/F7 |
+| `docs/06-releases/README.md` | governanca de release | indice canónico de release docs | Canónico | substitui indicacoes antigas dispersas | manter vivo | F7 |
+| `docs/06-releases/release-notes-template.md` | template release | modelo reutilizavel | Suplementar | — | manter | F7 |
+| `docs/06-releases/release-notes-v0.1.0.md` | release antiga | release notes historicas | Historico | — | preservar | F7 |
+| `docs/07-prompts/README.md` | prompts/IA | area auxiliar de prompts | Suplementar | complementar a `AGENTS.md` | manter leve; nao tratar como SSOT | F6 |
+| `docs/07-prompts/next-chat-phase-a-option1.md` | continuidade antiga | prompt historico de fase antiga | Historico | substituido pelo checkpoint do `CORTEX.md` | preservar | F6 |
+| `docs/08-lab/README.md` | indice do lab | agregador da area de laboratorio | Suplementar | complementar ao roadmap e package docs | manter leve | F4/F5 |
+| `docs/08-lab/builder-freebsd.md` | builder | guia operacional do builder | Suplementar | complementar ao `AGENTS.md` | rever quando F1/F4 mexerem no builder | F1/F4 |
+| `docs/08-lab/guia-windows.md` | desenvolvimento Windows | apoio lateral | Suplementar | — | manter se continuar util | F6 |
+| `docs/08-lab/lab-inventory.template.md` | inventario de lab | template local | Placeholder | — | preencher localmente quando necessario | F4/F5 |
+| `docs/08-lab/lab-topology.md` | topologia de lab | referencia de ambiente | Suplementar | — | manter | F4/F5 |
+| `docs/08-lab/quick-start-lab.md` | fluxo rapido antigo | runbook historico com termos pre-V1 | Historico | parcialmente substituido por `MANUAL-INSTALL.md` e validacao-lab | preservar e rever na F5/F6 | F5/F6 |
+| `docs/08-lab/snapshots-e-gate.md` | snapshots | runbook de gate de lab | Suplementar | — | manter | F5 |
+| `docs/08-lab/syslog-remote.md` | syslog remoto | guia especifico de lab | Suplementar | complementar a docs de logging | manter | F5/F7 |
+| `docs/09-blocking/README.md` | trilha de bloqueio | resumo de trilha concluida | Historico | complementar ao changelog | preservar | F6 |
+| `docs/09-blocking/blocking-master-plan.md` | plano de bloqueio | referencia historica de implementacao concluida | Historico | — | preservar | F6 |
+| `docs/10-license-server/MANUAL-INSTALL.md` | instalacao/upgrade/uninstall | manual operacional principal do pacote | Canónico | substitui instrucoes operacionais dispersas | manter sempre sincronizado | F0+ |
+| `docs/10-license-server/MANUAL-USO-LICENCAS.md` | operacao de licencas | manual canónico do uso do sistema de licencas | Canónico | — | manter vivo quando F2/F3 mexerem em licenciamento | F2/F3 |
+| `docs/10-license-server/PLANO-LICENSE-SERVER.md` | plano completo server | base detalhada da trilha do servidor | Suplementar | complementar ao backlog/roadmap | manter como referencia da F2 | F2 |
+| `docs/10-logging/README.md` | logging | referencia de observabilidade minima | Suplementar | complementar ao changelog e runbooks | rever na F7 | F7 |
+| `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md` | plano blacklists | documento canónico da trilha blacklists | Canónico | — | manter para F4 | F4 |
+| `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md` | regras blacklists | documento canónico de implementacao da trilha | Canónico | — | manter para F4 | F4 |
+| `docs/11-blacklists/GUIA-PASSO-A-PASSO.md` | execucao detalhada | guia complementar da trilha | Suplementar | complementar ao plano e directrizes | manter para F4 | F4 |
+| `docs/11-blacklists/REGRAS-QUALIDADE.md` | qualidade blacklists | apoio tecnico da trilha | Suplementar | complementar as directrizes | manter para F4 | F4 |
+| `docs/12-reports/MANUAL-RELATORIOS-EXECUTIVOS.md` | relatorios | manual especifico do modulo de relatorios | Suplementar | — | rever quando a observabilidade entrar forte | F7 |
+| `docs/changelog/CHANGELOG.md` | changelog | linha temporal oficial | Canónico | substitui historicos dispersos de entrega | manter vivo | F0+ |
+| `docs/commercial/LAYER7-PRODUCT-OVERVIEW-PT.md` | collateral PT | material comercial/publico | Suplementar | — | rever quando docs publicas forem refrescadas | F7 |
+| `docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md` | collateral EN | material comercial/publico | Suplementar | — | rever quando docs publicas forem refrescadas | F7 |
+| `docs/core/README.md` | indice do core | entrada canónica do modelo tecnico | Canónico | resume e aponta para docs core | manter vivo | F0+ |
+| `docs/core/categories.md` | categorias | referencia canónica de categorias | Canónico | — | manter/rever quando politica mudar | F4/F5 |
+| `docs/core/config-model.md` | configuracao | referencia canónica de persistencia/config | Canónico | — | manter | F4/F5 |
+| `docs/core/event-model.md` | eventos | referencia canónica do evento | Canónico | — | manter | F5/F7 |
+| `docs/core/ndpi-update-strategy.md` | nDPI | estrategia tecnica especializada | Suplementar | — | rever quando houver mudanca de engine/update | F4/F7 |
+| `docs/core/policy-matrix.md` | politica | referencia canónica de decisoes/policy | Canónico | — | manter | F4/F5 |
+| `docs/core/precedence.md` | precedencia | referencia canónica de ordem de avaliacao | Canónico | — | manter | F4/F5 |
+| `docs/core/runtime-state.md` | estado runtime | referencia canónica do estado interno | Canónico | — | manter | F4/F5 |
+| `docs/package/gui-validation.md` | validacao GUI | material auxiliar de validacao | Suplementar | complementar a package docs | rever na F5 | F5 |
+| `docs/poc/README.md` | POC index | memoria util da fase POC | Suplementar | — | manter como historico de suporte | F6 |
+| `docs/poc/resultados-poc.template.md` | resultados POC | template de evidencias | Placeholder | — | preencher apenas se a POC for retomada | F6 |
+| `docs/tests/README.md` | estrategia de testes | entrada canónica da area de testes | Canónico | sobrepoe `docs/04-tests/README.md` | manter vivo | F5 |
+| `docs/tests/test-matrix.md` | matriz de testes | matriz canónica de referencia | Canónico | complementar ao plano antigo de testes | manter/rever na F5 | F5 |
+| `docs/tutorial/guia-completo-layer7.md` | tutorial longo | guia amplo preservado para contexto e clientes | Preservado por compatibilidade | nao substitui `MANUAL-INSTALL.md` nem `CORTEX.md` | refrescar numa fase posterior | F7 |
+
+---
+
+## 3. Documentacao embutida em areas de codigo e scripts
+
+| Arquivo | Tema | Papel actual | Classificacao | Substitui ou e substituido por | Accao futura sugerida | Fase |
+|---------|------|--------------|---------------|--------------------------------|-----------------------|------|
+| `package/pfSense-pkg-layer7/README.md` | package local | orientacao local do port, com drift historico | Preservado por compatibilidade | nao substitui docs canónicas de instalacao/release | rever so na F6/F7 | F6/F7 |
+| `samples/README.md` | amostras | apoio leve de navegacao | Suplementar | — | manter leve | F6 |
+| `scripts/build/BUILDER.md` | ordem de build | nota util de build | Suplementar | complementar a docs de lab e AGENTS | rever quando builder mudar | F1/F4 |
+| `scripts/build/README.md` | build scripts | indice curto | Suplementar | — | manter leve | F6 |
+| `scripts/diagnostics/README.md` | diagnostics scripts | stub para uso futuro | Placeholder | — | manter sem expandir ate existir conteudo | F6 |
+| `scripts/lab/LAB-SETUP.md` | setup do lab | guia local do lab | Suplementar | complementar a docs de lab | rever se o lab mudar | F5 |
+| `scripts/lab/README.md` | automacao lab | indice curto | Suplementar | — | manter leve | F6 |
+| `scripts/package/README.md` | scripts do pacote | apoio tecnico local | Suplementar | complementar a docs package/tests | rever na F5/F7 | F5/F7 |
+| `scripts/release/README.md` | release/frota | referencia local de release | Suplementar | complementar a `docs/06-releases/` | rever quando F7 abrir | F7 |
+| `src/README.md` | mapa do codigo | guia local antigo da arvore de codigo | Historico | complementar a docs core | rever na F6 | F6 |
+| `src/layer7d/README.md` | daemon source | contexto local do daemon | Suplementar | complementar a docs core/daemon | rever na F4/F6 | F4/F6 |
+| `src/poc_ndpi/README.md` | POC nDPI | memoria tecnica da POC | Suplementar | complementar a docs/poc | preservar | F6 |
+| `webgui/README.md` | gui local | stub de navegacao | Historico | complementar a docs package/gui | rever na F6 | F6 |
+
+---
+
+## Regras de manutencao desta classificacao
+
+1. Sempre que nascer documento novo de governanca, classificá-lo aqui.
+2. Sempre que um documento deixar de ser SSOT, marcar explicitamente a sua
+   nova classe.
+3. Nao apagar historico apenas porque ficou antigo; primeiro classificar.
+4. Mover/renomear so na F6, depois de rever tambem o mapa de equivalencia.

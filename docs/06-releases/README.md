@@ -1,9 +1,33 @@
 # Releases
 
-Notas de release e artefatos referenciados por tag Git.
+Esta pasta concentra a governanca documental de release.
 
-- Versão até V1 estável: **0.x** (SemVer).
-- Artefato principal: `.pkg`/`.txz` + checksum (ver [ADR-0002](../03-adr/ADR-0002-distribuicao-artefato-txz.md)).
-- Template para release notes: [`release-notes-template.md`](release-notes-template.md).
-- Deploy lab via GitHub Releases: [`../04-package/deploy-github-lab.md`](../04-package/deploy-github-lab.md).
-- Rollback: [`../05-runbooks/rollback.md`](../05-runbooks/rollback.md).
+## Estado actual conhecido
+
+- a V1 Comercial ja foi publicada;
+- o artefacto publico actual conhecido e o **`.pkg`**;
+- `docs/changelog/CHANGELOG.md` e a linha temporal oficial;
+- `docs/10-license-server/MANUAL-INSTALL.md` e o manual operacional canónico
+  de instalacao, upgrade e uninstall.
+
+## O que fica aqui
+
+- notas de release por tag;
+- template de release notes;
+- referencias cruzadas para rollback e distribuicao.
+
+## Regras
+
+1. Nao publicar release sem changelog sincronizado.
+2. Nao publicar release sem `MANUAL-INSTALL.md` sincronizado com a versao real.
+3. Nao assumir `.txz` como artefacto actual; esse tema fica preservado apenas
+   em material historico e no ADR-0002.
+4. Quando a F7 abrir, esta pasta passa a concentrar tambem o checklist
+   operacional de publicacao.
+
+## Arquivos desta area
+
+- [`release-notes-template.md`](release-notes-template.md)
+- [`release-notes-v0.1.0.md`](release-notes-v0.1.0.md) — historico
+- [`../05-runbooks/rollback.md`](../05-runbooks/rollback.md)
+- [`../10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md)
