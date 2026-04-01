@@ -92,7 +92,9 @@ Usar apenas quando o bloco envolver artefacto, publicacao ou distribuicao.
 - [ ] release notes revistas
 - [ ] `MANUAL-INSTALL.md` sincronizado com a versao real
 - [ ] artefacto correcto identificado como `.pkg`
-- [ ] manifesto, checksum e assinatura do artefacto preparados
+- [ ] `.pkg.sha256` publicado para o mesmo artefacto
+- [ ] `install.sh` e `uninstall.sh` versionados publicados no release
+- [ ] manifesto e assinatura tratados conforme a subfase actual
 - [ ] disponibilidade do download verificada
 - [ ] rollback de release documentado
 

@@ -3,11 +3,11 @@
 #
 # Uso (executar no pfSense como root):
 #
-#   fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+#   fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/vX.Y.Z/install.sh && sh /tmp/install.sh
 #
 # Ou com versão específica:
 #
-#   sh /tmp/install.sh --version 1.4.13
+#   sh /tmp/install.sh --version X.Y.Z
 #
 # O script faz tudo automaticamente:
 #   1. Detecta a versão (ou usa a especificada)
@@ -22,6 +22,10 @@ set -eu
 REPO_OWNER="pablomichelin"
 REPO_NAME="Layer7"
 VERSION=""
+# O pipeline de release fixa este valor quando publica install.sh como asset
+# versionado. No source tree ele permanece vazio e o script detecta a ultima
+# release publicada.
+DEFAULT_VERSION=""
 PKG_PREFIX="pfSense-pkg-layer7"
 FORCE=0
 
@@ -41,6 +45,10 @@ while [ $# -gt 0 ]; do
 done
 
 # --- Detecção de versão ---
+if [ -z "$VERSION" ] && [ -n "$DEFAULT_VERSION" ]; then
+    VERSION="$DEFAULT_VERSION"
+fi
+
 if [ -z "$VERSION" ]; then
     GH_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
     GH_TMP="/tmp/layer7-gh-latest.json"

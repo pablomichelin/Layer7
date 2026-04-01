@@ -3,7 +3,7 @@
 #
 # Uso (executar no pfSense como root):
 #
-#   fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh
+#   fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/vX.Y.Z/uninstall.sh && sh /tmp/uninstall.sh
 #
 # Opcoes:
 #   --keep-config   Preserva layer7.json e layer7.lic para reinstalacao futura
@@ -19,6 +19,10 @@
 #   5. (Opcional) Limpa custom_options do Unbound
 
 set -eu
+
+REPO_OWNER="pablomichelin"
+REPO_NAME="Layer7"
+RELEASE_VERSION_HINT=""
 
 KEEP_CONFIG=0
 KEEP_LICENSE=0
@@ -199,5 +203,9 @@ if [ "$KEEP_CONFIG" -eq 1 ] || [ "$KEEP_LICENSE" -eq 1 ]; then
     echo ""
 fi
 echo "Para reinstalar:"
-echo "  fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh"
+if [ -n "$RELEASE_VERSION_HINT" ]; then
+    echo "  fetch -o /tmp/install.sh https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/v${RELEASE_VERSION_HINT}/install.sh && sh /tmp/install.sh"
+else
+    echo "  fetch -o /tmp/install.sh https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/vX.Y.Z/install.sh && sh /tmp/install.sh"
+fi
 echo ""

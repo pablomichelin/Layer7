@@ -52,10 +52,12 @@ Repo de origem
 
 ### Pontos de risco actuais
 
-- URLs mutaveis ainda usadas em `main` para install/uninstall;
+- o fluxo oficial ja migrou para assets versionados de release, mas refs
+  historicas em `main` ainda coexistem em material legado;
 - coexistencia de repositório de origem e repositorio publico de distribuicao;
 - legado `.txz` ainda presente em docs antigas;
-- checksum existe, mas assinatura ainda nao esta contratualmente implementada;
+- checksum existe e integra o conjunto minimo da F1.1, mas manifesto assinado
+  e validacao criptografica ainda nao estao implementados;
 - builder possui ficheiros sensiveis locais e precisa de politica formal.
 
 ---
@@ -148,7 +150,9 @@ aceites se a validacao falhar.
 
 - artefacto oficial: `.pkg`
 - canal oficial: GitHub Releases do repositorio publico de distribuicao
-- pacote minimo: `.pkg` + `.pkg.sha256` + manifesto + assinatura
+- pacote minimo em F1.1: `.pkg` + `.pkg.sha256` + `install.sh` +
+  `uninstall.sh` versionados
+- extensao prevista para F1.2: manifesto + assinatura
 
 ### Contrato de verificacao
 

@@ -59,10 +59,10 @@ pfctl -t layer7_block -T flush 2>/dev/null || true
 
 ## Reinstalar versão anterior
 
-Usar o `install-lab.sh` da release desejada:
+Usar o `install.sh` versionado da release desejada:
 
 ```sh
-fetch -o /tmp/install-lab.sh https://github.com/REPO_OWNER/REPO_NAME/releases/download/vVERSAO_ANTERIOR/install-lab.sh && sh /tmp/install-lab.sh
+fetch -o /tmp/install.sh https://github.com/REPO_OWNER/REPO_NAME/releases/download/vVERSAO_ANTERIOR/install.sh && sh /tmp/install.sh
 ```
 
 ---

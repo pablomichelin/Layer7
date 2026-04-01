@@ -1,23 +1,23 @@
 #!/bin/sh
-# deployz.sh — Deploy de pacote Layer7 para GitHub Release (lab/teste)
-# Executar no builder FreeBSD. Gera .txz, .sha256, install-lab.sh e publica.
-# Ver: scripts/release/README.md e docs/04-package/deploy-github-lab.md
+# deployz.sh — Publicacao do pacote Layer7 no canal oficial de GitHub Releases
+# Executar no builder FreeBSD. Gera .pkg, .pkg.sha256, install.sh e
+# uninstall.sh versionados e publica o conjunto no release.
+# Ver: scripts/release/README.md e docs/10-license-server/MANUAL-INSTALL.md
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-TEMPLATE="$SCRIPT_DIR/install-lab.sh.template"
 
 usage() {
   echo "Uso: $0 --repo-owner OWNER --repo-name REPO --version VERSION [--port-dir DIR] [--skip-tag] [--skip-push]"
   echo ""
   echo "Exemplo:"
-  echo "  $0 --repo-owner pablomichelin --repo-name pfsense-layer7 --version 0.0.31"
+  echo "  $0 --repo-owner pablomichelin --repo-name Layer7 --version 1.8.0"
   echo ""
   echo "Opções:"
   echo "  --repo-owner   Dono do repositório GitHub"
   echo "  --repo-name    Nome do repositório"
-  echo "  --version      Versão (ex: 0.0.31); tag será v<VERSION>"
+  echo "  --version      Versão (ex: 1.8.0); tag será v<VERSION>"
   echo "  --port-dir     Diretório do port (default: package/pfSense-pkg-layer7)"
   echo "  --skip-tag     Não criar tag git"
   echo "  --skip-push    Não fazer git push nem push --tags"
@@ -60,7 +60,6 @@ require_cmd make
 require_cmd gh
 require_cmd sha256
 require_cmd find
-require_cmd awk
 
 # Validar FreeBSD
 [ "$(uname -s)" = "FreeBSD" ] || {
@@ -81,12 +80,6 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 
-# Validar template
-[ -f "$TEMPLATE" ] || {
-  echo "ERRO: template em falta: $TEMPLATE" >&2
-  exit 1
-}
-
 # Port dir absoluto (relativo à raiz do repo)
 PORT_ABS="$REPO_ROOT/$PORT_DIR"
 [ -d "$PORT_ABS" ] || {
@@ -102,35 +95,37 @@ echo "==> Build do pacote em $PORT_DIR"
   make package
 )
 
-# Localizar .txz mais recente
-TXZ_PATH="$(find "$PORT_ABS" -type f -name '*.txz' 2>/dev/null | sort | tail -n 1)"
-[ -n "$TXZ_PATH" ] || {
-  echo "ERRO: nenhum .txz encontrado após make package em $PORT_DIR." >&2
-  echo "      Procurar com: find $PORT_DIR -name '*.txz'" >&2
+# Localizar .pkg mais recente
+PKG_PATH="$(find "$PORT_ABS" -type f -name '*.pkg' 2>/dev/null | sort | tail -n 1)"
+[ -n "$PKG_PATH" ] || {
+  echo "ERRO: nenhum .pkg encontrado após make package em $PORT_DIR." >&2
+  echo "      Procurar com: find $PORT_DIR -name '*.pkg'" >&2
   exit 1
 }
 
 # Gerar .sha256
-SHA_PATH="${TXZ_PATH}.sha256"
-sha256 "$TXZ_PATH" > "$SHA_PATH"
+SHA_PATH="${PKG_PATH}.sha256"
+sha256 "$PKG_PATH" > "$SHA_PATH"
 
-PKG_FILE="$(basename "$TXZ_PATH")"
+PKG_FILE="$(basename "$PKG_PATH")"
 SHA_FILE="$(basename "$SHA_PATH")"
 
-# Gerar install-lab.sh a partir do template
-TMP_INSTALL="$(mktemp /tmp/install-lab.XXXXXX.sh)"
-awk -v owner="$REPO_OWNER" -v repo="$REPO_NAME" -v ver="$VERSION" -v tag="$TAG" -v pkg="$PKG_FILE" -v sha="$SHA_FILE" '
-  {
-    gsub(/@REPO_OWNER@/, owner);
-    gsub(/@REPO_NAME@/, repo);
-    gsub(/@VERSION@/, ver);
-    gsub(/@TAG@/, tag);
-    gsub(/@PACKAGE_NAME@/, pkg);
-    gsub(/@SHA256_FILE@/, sha);
-    print
-  }
-' "$TEMPLATE" > "$TMP_INSTALL"
+# Gerar install.sh e uninstall.sh fixados a esta release
+TMP_INSTALL="$(mktemp /tmp/install-release.XXXXXX.sh)"
+sed \
+  -e "s/^REPO_OWNER=\".*\"$/REPO_OWNER=\"${REPO_OWNER}\"/" \
+  -e "s/^REPO_NAME=\".*\"$/REPO_NAME=\"${REPO_NAME}\"/" \
+  -e "s/^DEFAULT_VERSION=\"\"$/DEFAULT_VERSION=\"${VERSION}\"/" \
+  "$SCRIPT_DIR/install.sh" > "$TMP_INSTALL"
 chmod +x "$TMP_INSTALL"
+
+TMP_UNINSTALL="$(mktemp /tmp/uninstall-release.XXXXXX.sh)"
+sed \
+  -e "s/^REPO_OWNER=\".*\"$/REPO_OWNER=\"${REPO_OWNER}\"/" \
+  -e "s/^REPO_NAME=\".*\"$/REPO_NAME=\"${REPO_NAME}\"/" \
+  -e "s/^RELEASE_VERSION_HINT=\"\"$/RELEASE_VERSION_HINT=\"${VERSION}\"/" \
+  "$SCRIPT_DIR/uninstall.sh" > "$TMP_UNINSTALL"
+chmod +x "$TMP_UNINSTALL"
 
 # Criar tag se necessário
 if [ "$SKIP_TAG" = "0" ]; then
@@ -153,14 +148,16 @@ fi
 # Criar GitHub Release
 echo "==> Criando GitHub Release $TAG"
 gh release create "$TAG" \
-  "$TXZ_PATH" \
+  "$PKG_PATH" \
   "$SHA_PATH" \
-  "$TMP_INSTALL#install-lab.sh" \
+  "$TMP_INSTALL#install.sh" \
+  "$TMP_UNINSTALL#uninstall.sh" \
   --title "$TAG" \
-  --notes "Release de lab para instalação manual no pfSense. Ver docs/04-package/deploy-github-lab.md"
+  --notes "Release oficial do Layer7 para pfSense CE. Ver docs/10-license-server/MANUAL-INSTALL.md"
 
 # Limpar temp
 rm -f "$TMP_INSTALL"
+rm -f "$TMP_UNINSTALL"
 
 # Saída final
 echo ""
@@ -169,5 +166,5 @@ echo "Release criado: $TAG"
 echo "Asset principal: $PKG_FILE"
 echo ""
 echo "Comando único para instalar no pfSense:"
-echo "  fetch -o /tmp/install-lab.sh https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${TAG}/install-lab.sh && sh /tmp/install-lab.sh"
+echo "  fetch -o /tmp/install.sh https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${TAG}/install.sh && sh /tmp/install.sh"
 echo "=============================================="

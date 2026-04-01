@@ -15,6 +15,11 @@ Ao subir uma nova versao, actualizar no mesmo bloco:
 - comandos de install, upgrade e reinstall
 - exemplos com `--version`
 
+**Contrato operacional vigente da F1.1:** o canal oficial usa GitHub Releases
+versionado para `install.sh`, `uninstall.sh`, `.pkg` e `.pkg.sha256`.
+Manifesto e assinatura continuam planeados para a F1.2 e ainda nao sao gate
+operacional deste manual.
+
 ---
 
 ## Links da versao actual (para teste)
@@ -24,21 +29,21 @@ Ao subir uma nova versao, actualizar no mesmo bloco:
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.0`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg.sha256`
-- **Install script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh`
-- **Uninstall script:** `https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh`
+- **Install script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh`
+- **Uninstall script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh`
 
 **Comandos rapidos de teste:**
 
-Instalar ultima versao publicada:
+Instalar a release oficial actual:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
 ```
 
 Instalar explicitamente a versao `1.8.0`:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.8.0
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh --version 1.8.0
 ```
 
 Baixar o `.pkg` directo da versao `1.8.0`:
@@ -50,7 +55,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Laye
 Desinstalar com script publico:
 
 ```sh
-fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
 ```
 
 ---
@@ -82,7 +87,7 @@ Cada seccao abaixo inclui:
 **Instalador automatico (recomendado — uma linha):**
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
 ```
 
 Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
@@ -101,7 +106,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Laye
 fetch -o /tmp/pfSense-pkg-layer7-1.8.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/pfSense-pkg-layer7-1.8.0.pkg
 ```
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --force
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh --force
 ```
 ```sh
 IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.0.pkg
@@ -184,7 +189,7 @@ layer7d --license-status
 **Instalador automatico (recomendado — uma linha):**
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
 ```
 
 O script detecta a versao instalada e faz o upgrade automaticamente.
@@ -268,7 +273,7 @@ O script `uninstall.sh` faz tudo automaticamente:
 **Command Prompt (uma linha — requer `--yes`):**
 
 ```sh
-fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
 ```
 
 > **IMPORTANTE:** No Command Prompt do pfSense nao e possivel responder a
@@ -277,7 +282,7 @@ fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer
 **SSH/Console (com confirmacao interactiva):**
 
 ```sh
-fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
 ```
 
 ### Opcoes do uninstall.sh
@@ -365,7 +370,7 @@ O pfSense volta ao funcionamento normal imediatamente.
 Para reinstalar:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -639,7 +644,7 @@ Se algo der errado apos instalar ou actualizar, use o desinstalador
 automatico preservando a configuracao:
 
 ```sh
-fetch -o /tmp/uninstall.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
 ```
 
 Ou manualmente:

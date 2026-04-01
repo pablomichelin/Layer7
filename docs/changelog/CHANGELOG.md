@@ -2,6 +2,19 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Unreleased]
+
+### Changed — F1.1 contrato oficial de distribuicao
+
+- **Canal oficial de instalacao** — `install.sh` e `uninstall.sh` passam a ser
+  consumidos por URLs versionadas de GitHub Releases, retirando `main` mutavel
+  da trilha normativa
+- **Contrato operacional de release** — o conjunto minimo vigente da F1.1
+  fica alinhado em `.pkg`, `.pkg.sha256`, `install.sh` e `uninstall.sh`
+  versionados; manifesto e assinatura continuam reservados para a F1.2
+- **Documentacao canónica e operacional** — manuais, runbooks, roadmap e
+  arquitectura passam a tratar `.txz` apenas como legado historico
+
 ## [1.8.0] — 2026-04-01
 
 ### Fixed — `label` em regras `rdr` causa syntax error no FreeBSD 15

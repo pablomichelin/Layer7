@@ -107,14 +107,16 @@ versionadas do canal de distribuicao.
 
 ### 8. Checksums
 
-Toda release oficial deve publicar pelo menos:
+Na **F1.1**, toda release oficial deve publicar pelo menos:
 
 - `.pkg`
 - `.pkg.sha256`
+- `install.sh`
+- `uninstall.sh`
 
 ### 9. Assinatura
 
-Toda release oficial da F1 em diante deve publicar, alem do checksum:
+A **F1.2** passa a introduzir, alem do checksum:
 
 - um **manifesto de release versionado**
 - uma **assinatura destacada** desse manifesto
@@ -123,15 +125,14 @@ O detalhe da cadeia de assinatura fica definido pelo ADR-0004.
 
 ### 10. Politica de publicacao
 
-Uma release so e considerada oficial quando publicar o conjunto minimo:
+Uma release so e considerada oficial quando publicar o conjunto minimo da
+subfase correspondente:
 
-- tag versionada;
-- `.pkg`;
-- `.pkg.sha256`;
-- manifesto de release;
-- assinatura do manifesto;
-- changelog/release notes sincronizados;
-- manual de instalacao sincronizado.
+- **F1.1:** tag versionada, `.pkg`, `.pkg.sha256`, `install.sh`,
+  `uninstall.sh`, changelog/release notes sincronizados e manual de
+  instalacao sincronizado.
+- **F1.2 em diante:** todo o conjunto acima, mais manifesto de release e
+  assinatura destacada do manifesto.
 
 ### 11. Compatibilidade historica
 

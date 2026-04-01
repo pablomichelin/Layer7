@@ -54,6 +54,10 @@ o legado durante a transicao.
 - um maintainer novo consegue apontar o artefacto oficial e o URL oficial sem
   ambiguidade.
 
+**Checkpoint de execucao:** concluida em `2026-04-01` com `.pkg` como
+artefacto oficial, scripts `install.sh`/`uninstall.sh` publicados por tag e
+o legado `.txz` explicitamente removido da trilha normativa.
+
 ### Subfase F1.2 - Manifesto, checksum e assinatura de release
 
 **Objectivo:** tornar autenticidade e integridade verificaveis.

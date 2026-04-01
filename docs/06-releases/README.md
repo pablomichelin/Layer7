@@ -6,6 +6,8 @@ Esta pasta concentra a governanca documental de release.
 
 - a V1 Comercial ja foi publicada;
 - o artefacto publico actual conhecido e o **`.pkg`**;
+- o conjunto operacional vigente da F1.1 e `.pkg` + `.pkg.sha256` +
+  `install.sh`/`uninstall.sh` versionados por tag;
 - `docs/changelog/CHANGELOG.md` e a linha temporal oficial;
 - `docs/10-license-server/MANUAL-INSTALL.md` e o manual operacional canónico
   de instalacao, upgrade e uninstall.
@@ -22,7 +24,9 @@ Esta pasta concentra a governanca documental de release.
 2. Nao publicar release sem `MANUAL-INSTALL.md` sincronizado com a versao real.
 3. Nao assumir `.txz` como artefacto actual; esse tema fica preservado apenas
    em material historico e no ADR-0002.
-4. Quando a F7 abrir, esta pasta passa a concentrar tambem o checklist
+4. Manifesto e assinatura continuam contratados pelos ADRs, mas so entram
+   como gate operacional a partir da F1.2.
+5. Quando a F7 abrir, esta pasta passa a concentrar tambem o checklist
    operacional de publicacao.
 
 ## Arquivos desta area

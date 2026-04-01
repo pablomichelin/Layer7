@@ -1,6 +1,6 @@
 # Validacao em lab - `pfSense-pkg-layer7`
 
-**Objetivo:** obter evidencia objetiva de que o port gera um pacote instalavel no pfSense CE (`.pkg` ou `.txz`, conforme o host), que os ficheiros aparecem no disco, que o servico pode arrancar e que a pagina responde sem erro fatal.
+**Objetivo:** obter evidencia objetiva de que o port gera o pacote instalavel oficial em `.pkg` para pfSense CE, que os ficheiros aparecem no disco, que o servico pode arrancar e que a pagina responde sem erro fatal.
 
 **Politica do projeto:** o pacote so sera instalado no pfSense quando estiver totalmente completo. Este documento regista a execucao de validacao quando esse momento chegar.
 
@@ -64,7 +64,8 @@ Artefacto gerado:
 Nota:
 
 - neste lab o builder FreeBSD 15 gerou `.pkg`
-- o documento e o fluxo do projeto continuam validos para `.txz` quando esse for o formato emitido no host de build
+- referencias antigas a `.txz` ficam preservadas apenas como historico e nao
+  fazem parte do contrato oficial de distribuicao da F1.1
 
 ## 4. Instalacao no pfSense
 

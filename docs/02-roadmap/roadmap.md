@@ -15,7 +15,7 @@ com hardening tecnico ou com release engineering.
 | Fase | Nome | Estado | Gate central |
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
-| F1 | Cadeia de confianca e seguranca critica | planeamento consolidado | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
+| F1 | Cadeia de confianca e seguranca critica | em execucao (F1.1 concluida) | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
 | F2 | Hardening do license server | planeada | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |

@@ -11,7 +11,7 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 1.1 | `make` compila `layer7d` sem erro | CI, builder | OK |
 | 1.2 | `smoke-layer7d.sh` passa | CI, builder | OK |
 | 1.3 | `check-port-files.sh` sem falhas | CI, builder | OK |
-| 1.4 | `make package` gera `.pkg`/`.txz` | builder | OK |
+| 1.4 | `make package` gera `.pkg` oficial | builder | OK |
 
 ## 2. Instalação e remoção
 

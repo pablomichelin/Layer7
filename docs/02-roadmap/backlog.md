@@ -23,6 +23,15 @@ com criterio de risco, beneficio e ordem de execucao.
 conveniencia local. Itens fora da fase actual nao devem ser puxados sem
 reavaliacao formal.
 
+## Checkpoint actual da F1
+
+- F1.1 foi concluida em `2026-04-01` com o contrato operacional oficial de
+  distribuicao em `.pkg`, URLs versionadas de release e scripts
+  `install.sh`/`uninstall.sh` publicados no canal oficial.
+- BG-001, BG-002 e BG-022 permanecem abertos para a F1.2-F1.4, porque a
+  assinatura, o manifesto e o tratamento completo das dependencias externas
+  ainda nao entraram em operacao.
+
 ---
 
 ## Backlog priorizado

@@ -5,7 +5,7 @@
 No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
 ```
 
 O script faz **tudo automaticamente**:
@@ -21,7 +21,7 @@ O script faz **tudo automaticamente**:
 ### Versão específica
 
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh --version 1.4.13
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh --version 1.8.0
 ```
 
 ### Reinstalar
@@ -114,7 +114,7 @@ Se preferir instalar um a um via GUI do pfSense:
 
 Em cada pfSense, **Diagnostics > Command Prompt**:
 ```sh
-fetch -o /tmp/install.sh https://raw.githubusercontent.com/pablomichelin/Layer7/main/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -168,7 +168,7 @@ vim layer7-protos.txt
 sh scripts/release/deployz.sh \
   --repo-owner pablomichelin \
   --repo-name Layer7 \
-  --version 1.4.13
+  --version 1.8.0
 ```
 
 ---
@@ -181,5 +181,5 @@ sh scripts/release/deployz.sh \
 | `fleet-update.sh`          | Distribui `.pkg` para N firewalls via SSH      |
 | `fleet-protos-sync.sh`     | Sincroniza regras custom para N firewalls      |
 | `update-ndpi.sh`           | Actualiza nDPI no builder e reconstrói pacote  |
-| `deployz.sh`               | Build + publish GitHub Release (builder)       |
-| `install-lab.sh.template`  | Template do script de instalação (legado)      |
+| `deployz.sh`               | Build + publish GitHub Release versionado      |
+| `install-lab.sh.template`  | Template de lab preservado como legado         |

@@ -33,7 +33,7 @@ Descrever em 1–3 frases o que esta release entrega.
 ### Primeira instalação (Diagnostics > Command Prompt)
 
 ```sh
-fetch -o /tmp/install-lab.sh https://github.com/REPO_OWNER/REPO_NAME/releases/download/vVERSION/install-lab.sh && sh /tmp/install-lab.sh
+fetch -o /tmp/install.sh https://github.com/REPO_OWNER/REPO_NAME/releases/download/v__VERSION__/install.sh && sh /tmp/install.sh
 ```
 
 ### Upgrade de versão anterior
@@ -60,7 +60,7 @@ service layer7d status
 pkg delete pfSense-pkg-layer7
 ```
 
-Para reinstalar versão anterior, usar `install-lab.sh` do release desejado.
+Para reinstalar versão anterior, usar `install.sh` versionado do release desejado.
 
 Ver [`docs/05-runbooks/rollback.md`](../05-runbooks/rollback.md).
 

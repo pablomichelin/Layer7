@@ -33,21 +33,22 @@ Port **FreeBSD/pfSense** com binário **`layer7d`** (`main.c` + `config_parse.c`
 1. Repo completo com `src/layer7d/main.c` e `config_parse.c`.
 2. `nDPI` instalada no builder com header em `/usr/local/include/ndpi/ndpi_api.h` e archive estático em `/usr/local/lib/libndpi.a`.
 3. Opcional: `sh scripts/package/smoke-layer7d.sh` (valida compile + `-t`).
-4. `cd package/pfSense-pkg-layer7 && make package` → artefacto `.txz` (nome inclui `PORTVERSION`). Localização típica: diretório do port ou subpastas de `work/` — usar `find . -maxdepth 5 -name 'pfSense-pkg-layer7*.txz'`.
+4. `cd package/pfSense-pkg-layer7 && make package` → artefacto `.pkg` (nome inclui `PORTVERSION`). Localização típica: subpastas de `work/pkg/` — usar `find . -maxdepth 5 -name 'pfSense-pkg-layer7*.pkg'`.
 
 O build falha de propósito se `libndpi.a` não existir, para evitar gerar pacote que exija instalar `libndpi.so` separadamente no pfSense.
 
 ## Instalação no pfSense (após build)
 
 ```sh
-pkg add ./pfSense-pkg-layer7-<versão>.txz
+pkg add ./pfSense-pkg-layer7-<versão>.pkg
 ```
 
 Comandos de verificação e critérios de aceite: **`docs/04-package/validacao-lab.md`**.
 
 ## Rollback
 
-`pkg delete pfSense-pkg-layer7` e, se necessário, reinstalar `.txz` anterior.
+`pkg delete pfSense-pkg-layer7` e, se necessário, reinstalar o `.pkg`
+anterior. Menções a `.txz` nesta área devem ser tratadas como legado.
 
 Documentação geral: [`../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md`](../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md).  
 Validação GUI: [`../../docs/package/gui-validation.md`](../../docs/package/gui-validation.md).

@@ -108,6 +108,14 @@ O contrato criptografico da release passa a ser:
 O mecanismo concreto pode ser implementado depois com ferramenta operacional
 simples, desde que preserve este contrato e publique o fingerprint da chave.
 
+### 7.1. Entrada em vigor operacional
+
+- **F1.1:** remove a dependencia de `main` mutavel e fixa a instalacao em
+  assets versionados do release (`install.sh`, `uninstall.sh`, `.pkg`,
+  `.pkg.sha256`).
+- **F1.2:** transforma manifesto versionado e assinatura destacada em gate
+  operacional obrigatorio do release oficial.
+
 ### 8. Distribuicao da chave publica
 
 A chave publica de verificacao de release deve ser distribuida em pelo menos:

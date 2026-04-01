@@ -39,7 +39,8 @@ Arvore `ports` ou `poudriere` entram quando o port `pfSense-pkg-layer7` estiver 
 
 1. Clonar: `git clone https://github.com/pablomichelin/pfsense-layer7.git`
 2. Desenvolvimento da PoC em `src/` (Bloco 3).
-3. Binarios de teste no builder; instalacao no pfSense so via pacote `.txz` quando o empacotamento existir.
+3. Binarios de teste no builder; instalacao no pfSense so via pacote `.pkg`
+   quando o empacotamento existir.
 
 ### Compilar so o `layer7d` (sem `make package`)
 
