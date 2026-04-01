@@ -1213,12 +1213,89 @@ define('L7_BL_CONFIG', L7_BL_DIR . '/config.json');
 define('L7_BL_DISCOVERED', L7_BL_DIR . '/discovered.json');
 define('L7_BL_PROGRESS', '/tmp/layer7-bl-progress.txt');
 define('L7_BL_SCRIPT', '/usr/local/etc/layer7/update-blacklists.sh');
+define('L7_BL_STATE_DIR', L7_BL_DIR . '/.state');
+define('L7_BL_ACTIVE_STATE', L7_BL_STATE_DIR . '/active-snapshot.state');
+define('L7_BL_LKG_DIR', L7_BL_DIR . '/.last-known-good');
+define('L7_BL_LKG_STATE', L7_BL_LKG_DIR . '/snapshot.state');
+
+function layer7_bl_official_manifest_url()
+{
+	return "https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt";
+}
+
+function layer7_bl_official_mirror_urls()
+{
+	return array(
+		"https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt"
+	);
+}
+
+function layer7_bl_legacy_source_urls()
+{
+	return array(
+		"http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
+		"https://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz"
+	);
+}
+
+function layer7_bl_normalize_source_url($url)
+{
+	$url = trim((string)$url);
+	if ($url === "" || in_array($url, layer7_bl_legacy_source_urls(), true)) {
+		return layer7_bl_official_manifest_url();
+	}
+	if ($url === layer7_bl_official_manifest_url()) {
+		return $url;
+	}
+	foreach (layer7_bl_official_mirror_urls() as $mirror_url) {
+		if ($url === $mirror_url) {
+			return $url;
+		}
+	}
+	return layer7_bl_official_manifest_url();
+}
+
+function layer7_bl_state_file_load($path)
+{
+	$state = array();
+	if (!file_exists($path)) {
+		return $state;
+	}
+	$lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	if (!is_array($lines)) {
+		return $state;
+	}
+	foreach ($lines as $line) {
+		$line = trim((string)$line);
+		if ($line === "" || strpos($line, '=') === false) {
+			continue;
+		}
+		list($key, $value) = explode('=', $line, 2);
+		$key = trim($key);
+		if ($key === "") {
+			continue;
+		}
+		$state[$key] = trim($value);
+	}
+	return $state;
+}
+
+function layer7_bl_runtime_state_load()
+{
+	return layer7_bl_state_file_load(L7_BL_ACTIVE_STATE);
+}
+
+function layer7_bl_lkg_state_load()
+{
+	return layer7_bl_state_file_load(L7_BL_LKG_STATE);
+}
 
 function layer7_bl_config_defaults()
 {
 	return array(
 		"enabled" => false,
-		"source_url" => "http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
+		"source_url" => layer7_bl_official_manifest_url(),
+		"mirror_urls" => layer7_bl_official_mirror_urls(),
 		"auto_update" => false,
 		"update_interval_hours" => 24,
 		"whitelist" => array(),
@@ -1247,12 +1324,16 @@ function layer7_bl_config_load()
 			$data[$k] = $v;
 		}
 	}
+	$data["source_url"] = layer7_bl_normalize_source_url($data["source_url"] ?? "");
+	$data["mirror_urls"] = layer7_bl_official_mirror_urls();
 	return $data;
 }
 
 function layer7_bl_config_save($config)
 {
 	@mkdir(L7_BL_DIR, 0755, true);
+	$config["source_url"] = layer7_bl_normalize_source_url($config["source_url"] ?? "");
+	$config["mirror_urls"] = layer7_bl_official_mirror_urls();
 	$json = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	file_put_contents(L7_BL_CONFIG, $json . "\n", LOCK_EX);
 }

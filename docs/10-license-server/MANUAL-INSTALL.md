@@ -22,6 +22,17 @@ versionado para `install.sh`, `uninstall.sh`, `.pkg`, `.pkg.sha256`,
 O fluxo de validacao detalhado da release fica em
 `docs/06-releases/RELEASE-SIGNING.md`.
 
+**Addendum operacional da F1.3:** o pacote em `main` passa a incluir a trilha
+segura de blacklists com manifesto dedicado, public key propria de
+blacklists, origem oficial HTTPS, mirror controlado, cache local em
+`/usr/local/etc/layer7/blacklists/.cache/` e last-known-good em
+`/usr/local/etc/layer7/blacklists/.last-known-good/`.
+O restauro explicito da ultima snapshot valida passa a ser:
+
+```sh
+/usr/local/etc/layer7/update-blacklists.sh --restore-lkg
+```
+
 ---
 
 ## Links da versao actual (para teste)

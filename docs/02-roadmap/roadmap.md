@@ -15,7 +15,7 @@ com hardening tecnico ou com release engineering.
 | Fase | Nome | Estado | Gate central |
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
-| F1 | Cadeia de confianca e seguranca critica | em execucao (F1.2 concluida) | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
+| F1 | Cadeia de confianca e seguranca critica | em execucao (F1.3 concluida) | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
 | F2 | Hardening do license server | planeada | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
@@ -160,8 +160,12 @@ Tornar auditavel a cadeia de confianca entre:
 - **F1.2 concluida em `2026-04-01`:** manifesto `release-manifest.v1.txt`,
   `sha256`, assinatura destacada Ed25519, public key de verificacao e
   separacao builder/signer/publisher materializadas na trilha de release.
-- **F1.3-F1.4 pendentes:** blacklists seguras, mirror/cache e matriz de
-  fallback/degradacao continuam fora do bloco ja executado.
+- **F1.3 concluida em `2026-04-01`:** manifesto dedicado
+  `layer7-blacklists-manifest.v1.txt`, public key propria de blacklists,
+  origem oficial HTTPS, mirror controlado em GitHub Releases, cache local e
+  last-known-good restauravel passam a existir na trilha do consumidor.
+- **F1.4 pendente:** matriz de fallback/degradacao segura por componente
+  continua fora do bloco ja executado.
 
 ### Documentacao obrigatoria da fase
 

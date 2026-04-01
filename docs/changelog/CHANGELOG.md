@@ -26,6 +26,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   Ed25519 com OpenSSL (`pkeyutl -sign -rawin`) e a public key correspondente
   passa a integrar o conjunto oficial da release
 
+### Changed — F1.3 origem confiavel, mirror/cache e last-known-good de blacklists
+
+- **Origem oficial de blacklists** — o pacote deixa de tratar UT1 directo
+  como origem de auto-update e passa a consumir apenas
+  `layer7-blacklists-manifest.v1.txt` assinado em HTTPS por canal oficial
+  Layer7/Systemup
+- **Mirror/cache controlado** — GitHub Releases entra como mirror controlado
+  da mesma snapshot assinada, enquanto o appliance passa a guardar cache local
+  por `snapshot_id` em `/usr/local/etc/layer7/blacklists/.cache/`
+- **Last-known-good materializada** — a ultima snapshot validada passa a ser
+  preservada em `/usr/local/etc/layer7/blacklists/.last-known-good/` com
+  estado activo rastreavel em `.state/active-snapshot.state` e restauro
+  explicito via `update-blacklists.sh --restore-lkg`
+
 ## [1.8.0] — 2026-04-01
 
 ### Fixed — `label` em regras `rdr` causa syntax error no FreeBSD 15

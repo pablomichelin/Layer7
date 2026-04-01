@@ -5,6 +5,12 @@
 > projecto Layer7. Violar qualquer regra resulta em bugs, falhas de build
 > ou regressões.
 
+> **ADDENDUM NORMATIVO F1.3 (2026-04-01)** — qualquer exemplo antigo neste
+> documento que aponte para `blacklists.tar.gz` directo via HTTP deve ser lido
+> como **historico**. A trilha actual de consumo confiavel usa manifesto
+> assinado em HTTPS, public key dedicada, mirror controlado e
+> last-known-good local.
+
 ---
 
 ## Índice
@@ -687,7 +693,10 @@ o risco de regressão.
 ```json
 {
   "enabled": true,
-  "source_url": "http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
+  "source_url": "https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt",
+  "mirror_urls": [
+    "https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt"
+  ],
   "auto_update": true,
   "update_interval_hours": 24,
   "categories": ["adult", "gambling", "malware", "phishing"],
@@ -699,7 +708,8 @@ o risco de regressão.
 | Campo | Tipo | Descrição |
 |-------|------|-----------|
 | `enabled` | boolean | Activar/desactivar blacklists |
-| `source_url` | string | URL do arquivo tar.gz |
+| `source_url` | string | URL do manifesto oficial assinado |
+| `mirror_urls` | string[] | Mirrors oficiais apenas para disponibilidade |
 | `auto_update` | boolean | Actualização automática via cron |
 | `update_interval_hours` | int | Intervalo em horas (mínimo 1) |
 | `categories` | string[] | IDs das categorias com acção `deny` |
@@ -710,7 +720,7 @@ o risco de regressão.
 
 ```json
 {
-  "source": "http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
+  "source": "https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt",
   "discovered_at": "2026-03-24T03:00:00Z",
   "categories": [
     {"id": "adult", "domains_count": 4623451},
@@ -719,6 +729,14 @@ o risco de regressão.
   ]
 }
 ```
+
+**Persistencia minima F1.3 obrigatoria:**
+
+- `/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem`
+- `/usr/local/etc/layer7/blacklists/.cache/<snapshot_id>/`
+- `/usr/local/etc/layer7/blacklists/.state/active-snapshot.state`
+- `/usr/local/etc/layer7/blacklists/.last-known-good/`
+- `/usr/local/etc/layer7/update-blacklists.sh --restore-lkg`
 
 A GUI lê `discovered.json` para listar categorias disponíveis com
 contagem de domínios. Se não existir, mostra "Faça o download primeiro".

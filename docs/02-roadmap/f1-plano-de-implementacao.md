@@ -114,6 +114,12 @@ apenas snapshot aprovada ou ultima valida.
 - rejeicao de snapshot sem assinatura;
 - preservacao da ultima snapshot valida em falha.
 
+**Checkpoint de execucao:** concluida em `2026-04-01` com manifesto dedicado
+`layer7-blacklists-manifest.v1.txt`, public key propria empacotada no pacote,
+origem oficial `downloads.systemup.inf.br`, mirror controlado em GitHub
+Releases, cache local em `.cache`, estado activo em `.state` e
+`--restore-lkg` para reutilizar a ultima snapshot validada.
+
 ### Subfase F1.4 - Matriz de fallback e degradacao segura
 
 **Objectivo:** traduzir a filosofia de seguranca em comportamento por componente.

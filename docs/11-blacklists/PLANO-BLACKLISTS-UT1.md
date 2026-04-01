@@ -5,6 +5,13 @@
 > Não é necessário contexto anterior. Leia este documento do início ao fim
 > antes de começar.
 
+> **ADDENDUM NORMATIVO F1.3 (2026-04-01)** — o consumo automático no
+> appliance deixou de usar UT1 directo em HTTP/FTP/rsync. A trilha oficial de
+> consumo agora é:
+> `manifesto assinado HTTPS -> snapshot validada -> cache local -> last-known-good`.
+> O upstream UT1 continua apenas como **autoridade de conteúdo** na fase de
+> aquisição controlada fora do firewall do cliente.
+
 ---
 
 ## Estado atual (v1.7.2)
@@ -402,7 +409,10 @@ Gerido pelo PHP (GUI). Lido pelo daemon no startup e SIGHUP.
 ```json
 {
   "enabled": true,
-  "source_url": "http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
+  "source_url": "https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt",
+  "mirror_urls": [
+    "https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt"
+  ],
   "auto_update": true,
   "update_interval_hours": 24,
   "categories": ["adult", "gambling", "malware", "phishing"],
@@ -422,7 +432,8 @@ Gerado automaticamente pelo script de download após extrair o arquivo.
 
 ```json
 {
-  "source": "http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz",
+  "source": "https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt",
+  "snapshot_id": "ut1-20260401T030000Z",
   "discovered_at": "2026-03-24T03:00:00Z",
   "categories": [
     {"id": "adult", "domains_count": 4623451},
@@ -434,6 +445,23 @@ Gerado automaticamente pelo script de download após extrair o arquivo.
   ]
 }
 ```
+
+**Estado e persistencia F1.3 no appliance:**
+
+- origem oficial primaria:
+  `https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt`
+- mirror controlado:
+  `https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt`
+- chave publica pinned:
+  `/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem`
+- cache local:
+  `/usr/local/etc/layer7/blacklists/.cache/<snapshot_id>/`
+- estado activo:
+  `/usr/local/etc/layer7/blacklists/.state/active-snapshot.state`
+- last-known-good:
+  `/usr/local/etc/layer7/blacklists/.last-known-good/`
+- restauro da ultima versao valida:
+  `/usr/local/etc/layer7/update-blacklists.sh --restore-lkg`
 
 A GUI lê este ficheiro para listar categorias disponíveis. Se não existir
 (primeiro uso), mostra mensagem "Faça o download da lista primeiro".

@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.8.0
+PORTVERSION=	1.8.1
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -130,6 +130,8 @@ do-install:
 		${STAGEDIR}${PREFIX}/etc/layer7/lang
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/lang/pt.php \
 		${STAGEDIR}${PREFIX}/etc/layer7/lang
+	${INSTALL_DATA} ${FILESDIR}${DATADIR}/blacklists-signing-public-key.pem \
+		${STAGEDIR}${DATADIR}
 	${INSTALL_DATA} ${FILESDIR}${DATADIR}/info.xml \
 		${STAGEDIR}${DATADIR}
 	@${REINPLACE_CMD} -i '' -e "s|%%PKGVERSION%%|${PKGVERSION}|" \

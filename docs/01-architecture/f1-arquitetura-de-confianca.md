@@ -87,11 +87,12 @@ Upstream UT1 (conteudo)
 
 ### Pontos de risco actuais
 
-- feed default em HTTP;
-- ausencia de autenticidade do feed;
-- dependencia de origem externa unica;
-- ausencia de contrato formal de mirror/cache;
-- possibilidade de confundir “feed indisponivel” com “feed suspeito”.
+- a operacao de publicacao da snapshot oficial ainda depende de disciplina do
+  publisher e do mirror controlado;
+- a indisponibilidade simultanea da origem oficial e do mirror continua a
+  exigir intervencao operacional, embora a LKG preserve o ultimo estado seguro;
+- a fase actual ainda nao traduziu toda a filosofia de degradacao para outros
+  componentes fora da trilha de blacklists.
 
 ---
 
@@ -167,16 +168,30 @@ aceites se a validacao falhar.
 - sem aceitar feed nova sem autenticidade/integridade
 - last known good obrigatoria
 
+### Materializacao conservadora da F1.3
+
+- **origem oficial primaria:** `https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt`
+- **mirror controlado:** `https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt`
+- **artefactos publicados:** `layer7-blacklists-manifest.v1.txt`,
+  `layer7-blacklists-manifest.v1.txt.sig` e `layer7-blacklists-ut1.tar.gz`
+- **chave publica pinned no pacote:** `/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem`
+- **cache local do consumidor:** `/usr/local/etc/layer7/blacklists/.cache/<snapshot_id>/`
+- **estado activo auditavel:** `/usr/local/etc/layer7/blacklists/.state/active-snapshot.state`
+- **last-known-good:** `/usr/local/etc/layer7/blacklists/.last-known-good/`
+- **restauro explicito da LKG:** `/usr/local/etc/layer7/update-blacklists.sh --restore-lkg`
+
 ---
 
 ## 8. Decisoes em aberto
 
 Estas decisoes ficam abertas para implementacao, nao para filosofia:
 
-- integracao directa da validacao no instalador e GUI updater;
-- local exacto do espelho oficial de snapshots de blacklists;
-- forma final de pin da chave publica no instalador e GUI updater;
-- nivel de automacao permitido antes da assinatura final.
+- integracao directa desta validacao noutras superficies alem do script
+  `update-blacklists.sh`;
+- automatizacao completa da publicacao do publisher para origem primaria e
+  mirror controlado;
+- forma final de auditoria/alerta quando origem e mirror falham em simultaneo;
+- traducao da filosofia de degradacao segura para F1.4 por componente.
 
 ---
 

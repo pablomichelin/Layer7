@@ -53,13 +53,8 @@ $custom_map = layer7_bl_category_custom_get($bl_config);
 
 /* POST: Download */
 if (isset($_POST["do_download"])) {
-	$url = trim($_POST["source_url"] ?? "");
-	if ($url !== "" && preg_match('#^https?://#i', $url)) {
-		$bl_config["source_url"] = $url;
-		layer7_bl_config_save($bl_config);
-	} elseif ($url !== "") {
-		$input_errors[] = l7_t("URL invalida. Apenas HTTP e HTTPS sao suportados.");
-	}
+	$bl_config["source_url"] = layer7_bl_official_manifest_url();
+	layer7_bl_config_save($bl_config);
 	layer7_bl_download_start();
 	$savemsg = l7_t("Download iniciado. Acompanhe o progresso abaixo.");
 }
@@ -234,6 +229,8 @@ $custom_map = layer7_bl_category_custom_get($bl_config);
 $merged_categories = l7_bl_merged_categories($discovered, $custom_map);
 $bl_stats = layer7_bl_get_stats();
 $last_update = layer7_bl_last_update();
+$runtime_state = layer7_bl_runtime_state_load();
+$lkg_state = layer7_bl_lkg_state_load();
 $rules = isset($bl_config["rules"]) && is_array($bl_config["rules"]) ? $bl_config["rules"] : array();
 
 $edit_idx = -1;
@@ -267,25 +264,48 @@ layer7_render_styles();
 
 <?php layer7_render_messages(); ?>
 
-<!-- SECTION 1: URL & Download -->
+<!-- SECTION 1: Official Origin & Download -->
 <div class="layer7-admin-block" id="l7-download">
-<div class="layer7-admin-block__header"><?=l7_t("URL e Download")?></div>
+<div class="layer7-admin-block__header"><?=l7_t("Origem oficial e download")?></div>
 <div class="layer7-admin-block__body">
 <div class="layer7-form-card">
 <form method="post" action="layer7_blacklists.php#l7-download">
 <div class="form-group">
-	<label><?=l7_t("URL da blacklist")?></label>
-	<input type="text" class="form-control" name="source_url"
-		value="<?=htmlspecialchars($bl_config["source_url"] ?? "")?>"
-		placeholder="http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz">
-	<p class="help-block"><?=l7_t("Endereco do arquivo blacklists.tar.gz (formato UT1 Toulouse).")?></p>
+	<label><?=l7_t("Origem oficial primaria")?></label>
+	<input type="text" class="form-control" readonly
+		value="<?=htmlspecialchars(layer7_bl_official_manifest_url())?>">
+	<p class="help-block"><?=l7_t("O auto-update confiavel consome apenas manifesto assinado em HTTPS publicado pelo canal oficial Layer7/Systemup.")?></p>
+</div>
+<div class="form-group">
+	<label><?=l7_t("Mirrors oficiais")?></label>
+	<textarea class="form-control" rows="2" readonly style="font-family:monospace; font-size:12px; background:#f8f8f8;"><?=
+htmlspecialchars(implode("\n", layer7_bl_official_mirror_urls()))?></textarea>
+	<p class="help-block"><?=l7_t("Mirror e apenas disponibilidade. A confianca continua ancorada na assinatura do manifesto e na chave publica embutida no pacote.")?></p>
 </div>
 <div class="layer7-form-card__actions">
 <button type="submit" name="do_download" class="btn btn-primary">
-	<i class="fa fa-download"></i> <?=l7_t("Download")?>
+	<i class="fa fa-download"></i> <?=l7_t("Download snapshot assinada")?>
 </button>
 </div>
 </form>
+</div>
+
+<div class="layer7-readonly-block" style="margin-top:14px;">
+	<label><?=l7_t("Estado da trust chain")?></label>
+	<dl class="dl-horizontal" style="margin-bottom:0;">
+		<dt><?=l7_t("Snapshot activa")?></dt>
+		<dd><?=htmlspecialchars($runtime_state["snapshot_id"] ?? "-")?></dd>
+		<dt><?=l7_t("Origem aplicada")?></dt>
+		<dd><?=htmlspecialchars($runtime_state["manifest_url"] ?? "-")?></dd>
+		<dt><?=l7_t("Fonte activa")?></dt>
+		<dd><?=htmlspecialchars($runtime_state["source_role"] ?? "-")?></dd>
+		<dt><?=l7_t("Ultima versao valida")?></dt>
+		<dd><?=htmlspecialchars($lkg_state["snapshot_id"] ?? "-")?></dd>
+		<dt><?=l7_t("LKG guardada em")?></dt>
+		<dd><code>/usr/local/etc/layer7/blacklists/.last-known-good</code></dd>
+		<dt><?=l7_t("Cache local")?></dt>
+		<dd><code>/usr/local/etc/layer7/blacklists/.cache</code></dd>
+	</dl>
 </div>
 
 <div class="layer7-readonly-block" style="margin-top:14px;">
