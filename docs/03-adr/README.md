@@ -27,6 +27,10 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0004](ADR-0004-cadeia-de-confianca-dos-artefatos.md) | Cadeia de confianca dos artefactos | Aceito | define checksum, assinatura, papeis de geracao/validacao e tratamento de builder suspeito |
 | [ADR-0005](ADR-0005-pipeline-seguro-de-blacklists.md) | Pipeline seguro de blacklists | Aceito | define origem oficial, requisitos de HTTPS, mirror/cache e politica de rejeicao/degradacao |
 | [ADR-0006](ADR-0006-fallback-e-degradacao-segura.md) | Fallback e degradacao segura | Aceito | define fail-open vs fail-closed e a fronteira entre disponibilidade e integridade |
+| [ADR-0007](ADR-0007-publicacao-segura-license-server.md) | Publicacao segura do license server | Aceito | define HTTPS/TLS obrigatorio, edge proxy, canais/portas permitidos e politica de headers/publicacao |
+| [ADR-0008](ADR-0008-autenticacao-e-sessao-license-server.md) | Autenticacao e sessao do license server | Aceito | define modelo de login, sessao stateful, cookie seguro e proibicao de token em `localStorage` |
+| [ADR-0009](ADR-0009-protecao-superficie-administrativa-license-server.md) | Protecao da superficie administrativa do license server | Aceito | define rate limit, brute force protection, CORS, logging e politica de erro/admin surface |
+| [ADR-0010](ADR-0010-integridade-transacional-e-validacao-crud-license-server.md) | Integridade transacional e validacao do CRUD do license server | Aceito | define validacao de payload, transacoes, delete seguro e falha fechada no CRUD/activate |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa
@@ -53,9 +57,8 @@ Sempre que um ADR nascer, actualizar tambem:
 
 | Proximo ID sugerido | Tema | Fase | Motivo |
 |---------------------|------|------|--------|
-| ADR-0007 | Hardening operacional do license server | F2 | formalizar segredos, TLS, backup, restore e fronteiras administrativas |
-| ADR-0008 | Modelo de estados do licenciamento e activacao | F3 | tornar activacao/revogacao/offline previsiveis e rastreaveis |
-| ADR-0009 | Reorganizacao estrutural controlada do repositório | F6 | garantir que mover ficheiros nao destrua contexto |
+| ADR-0011 | Modelo de estados do licenciamento e activacao | F3 | tornar activacao/revogacao/offline previsiveis e rastreaveis |
+| ADR-0012 | Reorganizacao estrutural controlada do repositório | F6 | garantir que mover ficheiros nao destrua contexto |
 
 ---
 

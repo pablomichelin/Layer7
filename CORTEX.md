@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F1 — Concluida em 2026-04-01 (F1.4 concluida)`
+**Fase actual consolidada:** `F2 — Planejamento detalhado concluido em 2026-04-01 (execucao ainda nao iniciada)`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -116,7 +116,14 @@ manifesto, assinatura e checksum antes do `pkg add`, blacklists passam a
 registar `healthy`/`degraded`/`fail-closed` em `.state/fallback.state`, e a
 degradacao deixa de ficar implícita na trilha F1.
 
-**Proxima fase elegivel:** `F2 — Hardening do license server`
+**Resultado actual conhecido da F2:** o estado real do license server foi
+consolidado em `license-server/` e o planejamento detalhado da fase foi
+fechado com ADRs normativos para publicacao segura, autenticacao/sessao,
+protecao da superficie administrativa e integridade transacional do CRUD,
+além de arquitectura consolidada e plano de implementacao futura da F2. A
+execucao tecnica da F2 ainda **nao foi iniciada**.
+
+**Proxima subfase elegivel da F2:** `F2.1 — Publicacao segura, TLS e fronteiras de rede`
 
 ### Ordem segura das fases
 
@@ -124,7 +131,7 @@ degradacao deixa de ficar implícita na trilha F1.
 |------|------|--------|----------|
 | F0 | Governanca documental | consolidada em `2026-04-01` | fixar canonicidade, continuidade e backlog |
 | F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
-| F2 | Hardening do license server | planeada | endurecer deploy, segredos, backup e fronteiras operacionais |
+| F2 | Hardening do license server | planejamento detalhado concluido; execucao pendente | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | planeada | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
 | F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
@@ -135,8 +142,9 @@ degradacao deixa de ficar implícita na trilha F1.
 
 ## Proximos passos autorizados
 
-1. Abrir F2 apenas quando houver bloco fechado e segregado de hardening do
-   license server.
+1. Iniciar a F2 apenas pela ordem segura declarada em
+   `docs/02-roadmap/f2-plano-de-implementacao.md`, sem misturar auth,
+   CRUD e operacao antes de fechar publicacao/TLS.
 2. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
@@ -161,6 +169,12 @@ degradacao deixa de ficar implícita na trilha F1.
   a F1 reduziu o risco do lado do consumidor com manifesto assinado,
   mirror/cache/LKG e install fail-closed, mas nao elimina a necessidade
   operacional de publicar snapshots e releases aprovadas.
+- O license server continua funcional, mas o estado actual ainda opera com
+  `cors()` aberto, JWT em `localStorage`, login sem rate limit dedicado,
+  CRUD sem transacoes explicitas e publicacao dependente de um origin HTTP
+  privado (`8445`) por tras de TLS de borda.
+- A F2 agora tem arquitectura e ordem segura definidas, mas continua a exigir
+  implementacao tecnica controlada em subfases pequenas e reversiveis.
 - O `docs/` tem areas canónicas e areas apenas suplementares/historicas;
   sem ler a classificacao, um agente pode seguir um documento antigo.
 - Existem documentos antigos ainda a mencionar `.txz`, `v0.x` e estados
@@ -227,6 +241,8 @@ degradacao deixa de ficar implícita na trilha F1.
 - Produto/escopo: [`docs/00-overview/product-charter.md`](docs/00-overview/product-charter.md)
 - Arquitectura alvo: [`docs/01-architecture/target-architecture.md`](docs/01-architecture/target-architecture.md)
 - Arquitectura de confianca F1: [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
+- Arquitectura de seguranca F2 do license server: [`docs/01-architecture/f2-arquitetura-license-server.md`](docs/01-architecture/f2-arquitetura-license-server.md)
+- Plano F2: [`docs/02-roadmap/f2-plano-de-implementacao.md`](docs/02-roadmap/f2-plano-de-implementacao.md)
 - Instalacao/operacao do pacote: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md)
 - Changelog: [`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md)
 - Core tecnico: [`docs/core/README.md`](docs/core/README.md)

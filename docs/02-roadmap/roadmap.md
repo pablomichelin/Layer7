@@ -15,8 +15,8 @@ com hardening tecnico ou com release engineering.
 | Fase | Nome | Estado | Gate central |
 |------|------|--------|--------------|
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
-| F1 | Cadeia de confianca e seguranca critica | em execucao (F1.3 concluida) | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
-| F2 | Hardening do license server | planeada | stack de licencas opera com segredos, backup e fronteiras sob controlo |
+| F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
+| F2 | Hardening do license server | planejamento detalhado concluido; execucao pendente | stack de licencas opera com segredos, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | planeada | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
@@ -168,6 +168,10 @@ Tornar auditavel a cadeia de confianca entre:
   operar em fail-closed perante manifesto/assinatura/checksum suspeitos;
   blacklists passam a registar `healthy`, `degraded` e `fail-closed` com
   estado seguro preservado e acao do operador explicita.
+- **Planejamento detalhado da F2 concluido em `2026-04-01`:** arquitetura
+  consolidada do license server, ADRs 0007 a 0010 e plano
+  `f2-plano-de-implementacao.md` passam a definir a ordem segura de hardening,
+  sem implementacao tecnica ainda.
 
 ### Documentacao obrigatoria da fase
 
@@ -199,7 +203,10 @@ features comerciais.
 - health checks e verificabilidade;
 - logs operacionais minimos;
 - rate limiting e superficies de abuso;
-- operacao administrativa segura.
+- operacao administrativa segura;
+- modelo de sessao/token do painel;
+- politica de CORS;
+- validacao de input, transacoes e delete seguro do CRUD.
 
 ### Exclusoes
 
@@ -221,6 +228,8 @@ features comerciais.
 ### Criterios de saida
 
 - stack opera com segredos e backup sob controlo;
+- publicacao/TLS, auth/sessao, CORS, brute force e CRUD ficam sob politica
+  explicita e implementada;
 - operacao e incidentes basicos ficam documentados;
 - risco de exposicao ou recuperacao manual improvisada e reduzido.
 
@@ -228,13 +237,19 @@ features comerciais.
 
 - um incidente operacional simples consegue ser tratado por runbook;
 - credenciais, segredos e processo de recuperacao deixam de ser conhecimento
-  oral.
+  oral;
+- o canal oficial do painel e do endpoint publico fica inequívoco;
+- a sessao administrativa deixa de depender de `localStorage` e de CORS
+  permissivo;
+- CRUD e activacao deixam de depender de multi-query sem transacao.
 
 ### Documentacao obrigatoria da fase
 
 - `CORTEX.md`
+- `docs/01-architecture/f2-arquitetura-license-server.md`
+- `docs/02-roadmap/f2-plano-de-implementacao.md`
 - backlog
-- ADRs afectados
+- ADR-0007 a ADR-0010
 - docs de licencas e runbooks operacionais afectados
 
 ---

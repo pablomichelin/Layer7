@@ -16,6 +16,7 @@ com criterio de risco, beneficio e ordem de execucao.
   - `Pronto apos F0`
   - `Planeado`
   - `Planeamento F1 concluido`
+  - `Planeamento F2 concluido`
   - `Bloqueado pela fase`
   - `Acompanhar`
 
@@ -39,6 +40,15 @@ reavaliacao formal.
   reduzido na trilha do consumidor, mas continua a exigir acompanhamento das
   dependencias externas.
 
+## Checkpoint actual da F2
+
+- O planejamento detalhado da F2 foi concluido em `2026-04-01` com ADRs de
+  publicacao segura, autenticacao/sessao, protecao da superficie
+  administrativa e integridade transacional/validacao do CRUD.
+- A execucao tecnica da F2 continua pendente e deve seguir a ordem segura:
+  publicacao/TLS -> sessao -> protecao administrativa -> CRUD/transacoes ->
+  segredos/runbooks.
+
 ---
 
 ## Backlog priorizado
@@ -48,8 +58,11 @@ reavaliacao formal.
 | BG-001 | Formalizar a cadeia de confianca entre repo, builder, chave publica embutida, servidor de licencas e artefacto publicado | Critica | seguranca/governanca | F1 | decisao tecnica continuar baseada em suposicoes sobre confianca | M | Alto | Planeamento F1 concluido | coberto por ADR-0004 e pelo documento consolidado de arquitectura F1; implementacao pendente |
 | BG-002 | Governar a custodia da chave de producao e o tratamento dos ficheiros sensiveis locais no builder | Critica | builder/licencas | F1 | risco operacional e de seguranca concentrado em conhecimento implícito | M | Alto | Planeamento F1 concluido | politica de papeis, assinatura e tratamento de builder suspeito definida; execucao fica para F1 |
 | BG-003 | Criar ADR que substitua a ambiguidade historica entre `.txz` e `.pkg` como artefacto de distribuicao | Critica | distribuicao/ADR | F1 | documentos historicos continuam a confundir instalacao e release | P | Alto | Planeamento F1 concluido | ADR-0003 passa a ser a referencia normativa; ADR-0002 fica historico |
-| BG-004 | Hardening da stack do license server: segredos, fronteira HTTP/HTTPS, backup, restore e operacao administrativa | Critica | license-server | F2 | indisponibilidade ou exposicao do servidor comprometer activacao | M | Alto | Planeado | alinhar deploy real e runbooks |
-| BG-005 | Endurecer o endpoint de activacao e os controlos de abuso, auditoria e monitorizacao minima | Alta | license-server | F2 | abuso ou comportamento opaco em incidente | M | Alto | Planeado | incluir rate limit, health e logs minimos |
+| BG-004 | Hardening da stack do license server: segredos, fronteira HTTP/HTTPS, backup, restore e operacao administrativa | Critica | license-server | F2 | indisponibilidade ou exposicao do servidor comprometer activacao | M | Alto | Planeamento F2 concluido | arquitetura e ordem segura consolidadas; execucao pendente em subfases |
+| BG-005 | Endurecer o endpoint de activacao e os controlos de abuso, auditoria e monitorizacao minima | Alta | license-server | F2 | abuso ou comportamento opaco em incidente | M | Alto | Planeamento F2 concluido | F2 definiu rate limit, logging e separacao entre activate publico e admin |
+| BG-023 | Fechar a politica oficial de publicacao segura do license server com TLS, edge proxy e portas permitidas | Critica | license-server/publicacao | F2 | exposicao ambigua do painel e do endpoint publico | M | Alto | Planeamento F2 concluido | coberto por ADR-0007 e pela arquitetura F2 |
+| BG-024 | Substituir JWT em `localStorage` por sessao administrativa segura e fechar CORS/login/brute force | Critica | license-server/auth | F2 | roubo de sessao, abuso administrativo e superficie web permissiva | M | Alto | Planeamento F2 concluido | coberto por ADR-0008 e ADR-0009 |
+| BG-025 | Endurecer validacao, transacoes, arquivo/delete seguro e atomicidade do CRUD do license server | Alta | license-server/crud | F2 | estado parcial, perda de auditoria e conflitos silenciosos | M | Alto | Planeamento F2 concluido | coberto por ADR-0010 e pela arquitetura F2 |
 | BG-006 | Definir modelo de estados do licenciamento: activar, reactivar, renovar, revogar, expirar, grace e offline | Alta | licenciamento | F3 | suporte e troubleshooting continuarem dependentes de tentativa e erro | M | Alto | Planeado | precisa de ADR ou especificacao formal |
 | BG-007 | Validar robustez do hardware fingerprint em cenarios de mudanca de NIC, VM, reinstall e clock | Alta | licenciamento | F3 | activacoes legitimas falharem ou exigirem workaround manual | M | Alto | Planeado | usar matriz de casos e rollback |
 | BG-008 | Fechar lacunas de previsibilidade em activacao offline e revogacao sem quebrar comportamento actual | Alta | licenciamento | F3 | operador assumir garantias que o sistema ainda nao oferece | M | Alto | Planeado | documentar sem expandir escopo comercial |
