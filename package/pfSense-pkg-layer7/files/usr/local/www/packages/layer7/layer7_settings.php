@@ -271,8 +271,26 @@ if ($_POST["save"] ?? false) {
 		$dbgm = 720;
 	}
 
-	$block_quic = $is_general_save ? isset($_POST["block_quic"]) :
-	    !empty($current_l7["block_quic"]);
+	/* block_quic_interfaces: nova forma (array de interfaces reais). */
+	$block_quic_ifaces = array();
+	if ($is_general_save) {
+		if (isset($_POST["block_quic_iface_sel"]) && is_array($_POST["block_quic_iface_sel"])) {
+			foreach ($_POST["block_quic_iface_sel"] as $ifid) {
+				$ifid = trim((string)$ifid);
+				if ($ifid === "" || !preg_match('/^[a-zA-Z0-9_.]+$/', $ifid)) {
+					continue;
+				}
+				$real = function_exists("get_real_interface") ? get_real_interface($ifid) : null;
+				$block_quic_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+			}
+		}
+		$block_quic_ifaces = array_values(array_unique($block_quic_ifaces));
+	} else {
+		if (!empty($current_l7["block_quic_interfaces"]) &&
+		    is_array($current_l7["block_quic_interfaces"])) {
+			$block_quic_ifaces = $current_l7["block_quic_interfaces"];
+		}
+	}
 
 	$rpt_enabled = !empty($current_reports["enabled"]);
 	$rpt_retention = (int)($current_reports["retention_days"] ?? 30);
@@ -341,8 +359,11 @@ if ($_POST["save"] ?? false) {
 		$data["layer7"]["debug_minutes"] = $dbgm;
 		$data["layer7"]["interfaces"] = array_values(array_unique($selected_ifaces));
 
-		$old_block_quic = !empty($current_l7["block_quic"]);
-		$data["layer7"]["block_quic"] = $block_quic;
+		$old_quic_ifaces = isset($current_l7["block_quic_interfaces"]) &&
+		    is_array($current_l7["block_quic_interfaces"])
+		    ? $current_l7["block_quic_interfaces"] : array();
+		$data["layer7"]["block_quic"] = false;
+		$data["layer7"]["block_quic_interfaces"] = $block_quic_ifaces;
 
 		$data["layer7"]["reports"] = array(
 			"enabled" => $rpt_enabled,
@@ -355,7 +376,7 @@ if ($_POST["save"] ?? false) {
 
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
-			if ($old_block_quic !== $data["layer7"]["block_quic"]) {
+			if ($old_quic_ifaces !== $data["layer7"]["block_quic_interfaces"]) {
 				if (function_exists("filter_configure")) {
 					filter_configure();
 				}
@@ -381,7 +402,8 @@ $dbgm = isset($L["debug_minutes"]) ? (int)$L["debug_minutes"] : 0;
 if ($dbgm < 0 || $dbgm > 720) {
 	$dbgm = 0;
 }
-$block_quic = !empty($L["block_quic"]);
+$block_quic_ifaces = isset($L["block_quic_interfaces"]) && is_array($L["block_quic_interfaces"])
+    ? $L["block_quic_interfaces"] : array();
 $cur_lang = isset($L["language"]) ? $L["language"] : "pt";
 if (!in_array($cur_lang, array("pt", "en"), true)) {
 	$cur_lang = "pt";
@@ -451,13 +473,24 @@ layer7_render_styles();
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Bloquear QUIC"); ?></label>
+						<label class="col-sm-3 control-label"><?= l7_t("Bloquear QUIC (UDP 443)"); ?></label>
 						<div class="col-sm-9">
-							<label class="checkbox-inline">
-								<input type="checkbox" name="block_quic" value="1" <?= $block_quic ? 'checked="checked"' : ""; ?> />
-								<?= l7_t("Bloquear QUIC (UDP 443) globalmente"); ?>
-							</label>
-							<p class="help-block"><?= l7_t("Forca apps a usar HTTPS em vez de QUIC, melhorando a deteccao por SNI."); ?></p>
+							<?php if (empty($pfsense_ifaces)) { ?>
+								<p class="form-control-static text-muted"><?= l7_t("Nenhuma interface configurada no pfSense."); ?></p>
+							<?php } else { ?>
+							<?php foreach ($pfsense_ifaces as $ifc) { ?>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="block_quic_iface_sel[]"
+										value="<?= htmlspecialchars($ifc["ifid"]); ?>"
+										<?= in_array($ifc["real"], $block_quic_ifaces, true) ? 'checked="checked"' : ''; ?> />
+									<strong><?= htmlspecialchars($ifc["descr"]); ?></strong>
+									<span class="text-muted">(<?= htmlspecialchars($ifc["real"]); ?>)</span>
+								</label>
+							</div>
+							<?php } ?>
+							<?php } ?>
+							<p class="help-block"><?= l7_t("Selecione as interfaces onde QUIC (UDP 443) deve ser bloqueado. Vazio = desativado. Forca apps a usar HTTPS/TLS, melhorando a deteccao por SNI."); ?></p>
 						</div>
 					</div>
 

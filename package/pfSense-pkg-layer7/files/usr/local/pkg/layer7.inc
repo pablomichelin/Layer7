@@ -312,8 +312,26 @@ function layer7_generate_rules($type)
 	$rules = layer7_pf_rules_text();
 
 	$data = layer7_load_or_default();
-	if (!empty($data["layer7"]["block_quic"])) {
-		$rules .= "\n# Anti-QUIC: forcar fallback para TCP/TLS (melhor visibilidade SNI) — apenas destinos externos.\n";
+	$quic_ifaces = isset($data["layer7"]["block_quic_interfaces"]) &&
+	    is_array($data["layer7"]["block_quic_interfaces"])
+	    ? $data["layer7"]["block_quic_interfaces"]
+	    : array();
+	if (!empty($quic_ifaces)) {
+		/* Nova forma: bloquear QUIC apenas nas interfaces seleccionadas. */
+		$rules .= "\n# Anti-QUIC por interface — apenas destinos externos.\n";
+		foreach ($quic_ifaces as $qi) {
+			$qi = trim((string)$qi);
+			if ($qi === "" || !preg_match('/^[a-z][a-z0-9]*(\.[0-9]+)?$/i', $qi)) {
+				continue;
+			}
+			$rules .= "block drop quick inet on {$qi} proto udp" .
+			    " to !<localsubnets> port 443 label \"layer7:anti-quic:{$qi}\"\n";
+			$rules .= "block drop quick inet6 on {$qi} proto udp" .
+			    " to !<localsubnets> port 443 label \"layer7:anti-quic6:{$qi}\"\n";
+		}
+	} elseif (!empty($data["layer7"]["block_quic"])) {
+		/* Legado: block_quic:true sem interfaces definidas — comportamento global. */
+		$rules .= "\n# Anti-QUIC global (legado) — apenas destinos externos.\n";
 		$rules .= "block drop quick inet proto udp to !<localsubnets> port 443 label \"layer7:anti-quic\"\n";
 		$rules .= "block drop quick inet6 proto udp to !<localsubnets> port 443 label \"layer7:anti-quic6\"\n";
 	}
@@ -375,6 +393,7 @@ function layer7_bare_config()
 			"syslog_remote_port" => 514,
 			"debug_minutes" => 0,
 			"block_quic" => false,
+			"block_quic_interfaces" => array(),
 			"interfaces" => array("lan"),
 			"groups" => array(),
 			"policies" => array(),

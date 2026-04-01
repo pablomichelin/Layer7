@@ -40,6 +40,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   estado activo rastreavel em `.state/active-snapshot.state` e restauro
   explicito via `update-blacklists.sh --restore-lkg`
 
+## [1.8.3] — 2026-04-01
+
+### Changed — Bloqueio de QUIC (UDP 443) por interface seleccionável
+
+- **Nova funcionalidade**: o bloqueio de QUIC deixa de ser um checkbox global e passa a ser uma **lista de interfaces seleccionáveis** em `Layer7 → Configurações Gerais`
+- Cada interface pode ser activada/desactivada independentemente para bloqueio QUIC
+- Regras PF geradas com `on <iface>` por cada interface seleccionada, mantendo `to !<localsubnets>`
+- **Retrocompatibilidade**: instalações com `block_quic: true` no JSON (formato antigo) continuam a funcionar com regra global até o utilizador gravar pela nova GUI
+- Novo campo no schema de config: `"block_quic_interfaces": ["em0", "em1.46"]`
+- **PORTVERSION** bumped para 1.8.3
+
 ## [1.8.2] — 2026-04-01
 
 ### Fixed — Regras de bloqueio afectavam tráfego interno (impressoras, bancos locais)

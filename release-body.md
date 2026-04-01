@@ -1,72 +1,75 @@
-# Layer7 v1.8.2 — Bloqueio restrito a destinos externos
+# Layer7 v1.8.3 — Bloqueio de QUIC por interface seleccionável
 
 ## Resumo
 
-Correcção arquitectural: todas as regras de bloqueio PF geradas pelo Layer7 passam a aplicar `to !<localsubnets>`, garantindo que **apenas tráfego com destino à internet é bloqueado**. Tráfego interno (impressoras, serviços de rede local, bancos via VPN corporativa) não é afectado.
+O bloqueio de QUIC (UDP 443) deixa de ser um checkbox global e passa a ser uma lista de interfaces seleccionáveis em `Layer7 → Configurações Gerais`. Cada interface pode ser activada ou desactivada independentemente.
 
-## Problema corrigido
+## O que mudou na GUI
 
-O Layer7 v1.8.0 gerava regras `from any to any`, o que causava:
+Em `Layer7 → Configurações Gerais`, a opção "Bloquear QUIC" agora mostra a lista de todas as interfaces do pfSense com checkboxes individuais:
 
-- Impressoras locais com acesso a serviços cloud (UDP 443 / QUIC) deixavam de responder
-- Serviços bancários que usam HTTP/3 apresentavam lentidão ou falha de conexão
-- Qualquer serviço interno usando UDP 443 era bloqueado mesmo sem estar em nenhuma blacklist
-
-## O que mudou (regras PF geradas)
-
-**Antes:**
 ```
-block drop quick inet proto udp to port 443 label "layer7:anti-quic"
-block drop quick inet proto tcp to port 853 label "layer7:anti-dot"
-block drop quick inet from <layer7_block> to any label "layer7:block:src"
+Bloquear QUIC (UDP 443)
+  [x] LAN (em0)
+  [ ] WAN (igb0)
+  [x] VLAN_Alunos (em1.46)
+  [ ] ADM (em1.10)
+
+  Selecione as interfaces onde QUIC deve ser bloqueado.
+  Vazio = desativado.
 ```
 
-**Depois:**
+## Regras PF geradas
+
+Para cada interface seleccionada, são geradas regras específicas:
+
 ```
-block drop quick inet proto udp to !<localsubnets> port 443 label "layer7:anti-quic"
-block drop quick inet proto tcp to !<localsubnets> port 853 label "layer7:anti-dot"
-block drop quick inet from <layer7_block> to !<localsubnets> label "layer7:block:src"
+block drop quick inet on em0 proto udp to !<localsubnets> port 443 label "layer7:anti-quic:em0"
+block drop quick inet6 on em0 proto udp to !<localsubnets> port 443 label "layer7:anti-quic6:em0"
+block drop quick inet on em1.46 proto udp to !<localsubnets> port 443 label "layer7:anti-quic:em1.46"
+block drop quick inet6 on em1.46 proto udp to !<localsubnets> port 443 label "layer7:anti-quic6:em1.46"
 ```
 
-`<localsubnets>` é o alias nativo do pfSense contendo todas as sub-redes directamente conectadas.
+O `to !<localsubnets>` mantém-se — tráfego interno nunca é bloqueado.
 
-## Ficheiros alterados
+## Retrocompatibilidade
 
-- `package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc`
-- `package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-pfctl`
-- `package/pfSense-pkg-layer7/files/usr/local/etc/layer7/pf.conf.sample`
+Instalações existentes com `block_quic: true` (checkbox antigo activado) continuam a funcionar com regra global **até o utilizador abrir e gravar** as Configurações Gerais. Após gravar, o campo legado é limpo e passa a usar a nova configuração por interface.
+
+## Novo campo no config JSON
+
+```json
+{
+  "layer7": {
+    "block_quic_interfaces": ["em0", "em1.46"],
+    "block_quic": false
+  }
+}
+```
 
 ## Instalação / Upgrade
 
 ```sh
-# Upgrade directo
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/install.sh
-sh /tmp/install.sh --version 1.8.2
-
-# Após instalar: forçar reload das regras PF
-pfctl -f /tmp/rules.debug 2>/dev/null || true
-# Ou via GUI: Firewall > Rules > Apply
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh
+sh /tmp/install.sh --version 1.8.3
 ```
 
 ## Verificação
 
 ```sh
-# Confirmar que as regras incluem !<localsubnets>
-pfctl -a layer7 -sr 2>/dev/null | grep localsubnets
-
-# Confirmar que impressora local passa (exemplo: 192.168.1.100)
-# pfctl -a layer7 -sr não deve mostrar nenhuma regra bloqueando esse IP
+# Confirmar regras geradas por interface
+pfctl -a layer7 -sr 2>/dev/null | grep anti-quic
 ```
 
 ## Rollback
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh
-sh /tmp/install.sh --version 1.8.0
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.2/install.sh
+sh /tmp/install.sh --version 1.8.2
 ```
 
 ## Compatibilidade
 
 - pfSense CE 2.7.x e 2.8.x
 - FreeBSD 14 e 15
-- Sem alteração no schema de configuração (zero migração necessária)
+- Zero migração de configuração necessária
