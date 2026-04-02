@@ -389,10 +389,17 @@ falha.
   `docs/01-architecture/f3-runbook-proxima-campanha-real.md` passa a definir
   a ordem sequencial, os criterios de aborto antecipado e as evidencias
   obrigatorias da proxima rodada, sem mudar o gate da F3.
-- **Proximo passo seguro dentro da F3:** abrir a F3.11 apenas depois de
-  satisfazer a matriz de pre-requisitos da F3.10 e de eliminar ou contornar
-  com ambiente elegivel os drifts criticos observados na F3.9; sem isso, a
-  campanha seguinte nao deve ser tratada como rodada valida de fechamento.
+- **F3.11 readiness check executado em `2026-04-02`:**
+  `docs/01-architecture/f3-11-readiness-check.md` passou a registar a
+  verificacao real do ambiente. O resultado foi `F3.11 bloqueada por
+  pre-requisitos nao satisfeitos`: backend publico e origin responderam, mas
+  nao houve shell/DB access ao deploy observado, nao houve credencial
+  administrativa autorizada, nao houve appliance pfSense autenticavel e nao
+  houve inventario real `LIC-A` a `LIC-F`.
+- **Proximo passo seguro dentro da F3:** manter a F3.11 fechada ate os
+  pre-requisitos pendentes ficarem verdes em nova verificacao de readiness;
+  sem isso, a campanha seguinte nao deve ser tratada como rodada valida de
+  fechamento.
 
 ### Criterios de saida
 
