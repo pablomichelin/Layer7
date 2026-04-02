@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F3 — aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha, ainda pendente de execucao real em lab/appliance`
+**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -185,12 +185,23 @@ backend sem mudar o contrato do produto. A **F3.8** passa a formalizar em
 fechamento da F3, a matriz objectiva de decisao por cenario, a classificacao
 de pendencias bloqueantes vs nao bloqueantes e o relatorio final unico de
 campanha em `docs/tests/templates/f3-validation-campaign-report.md`, sem
-declarar a F3 fechada sem outputs reais.
+declarar a F3 fechada sem outputs reais. A **F3.9** executou a primeira
+campanha real controlada dessa trilha no `run_id`
+`20260402T130015Z-deploy244`, usando o backend vivo
+`https://license.systemup.inf.br` / `192.168.100.244:8445` como ambiente
+observado. O resultado foi objectivo e binario: `0 PASS`, `3 FAIL`,
+`1 INCONCLUSIVE` e `9 BLOCKED`, com veredito final `F3 nao pode fechar`.
+Os blockers concretos observados foram: drift do deploy real face ao contrato
+canónico da F2/F3 (schema live sem `admin_sessions`, `admin_audit_log` e
+`admin_login_guards`, e `POST /api/activate` live a responder `403` onde a
+F3.8 exige `409`), ausencia de appliance pfSense autenticavel para a metade
+local da campanha e ausencia de credencial administrativa autorizada para
+S04-S06/S10 sem mexer no deploy vivo.
 
-**Trilha activa dentro da F3:** `F3.8 — executar em lab/appliance a campanha
-real da F3 usando a matriz da F3.6, o pack da F3.7 e o gate formal da F3.8,
-recolhendo outputs reais por cenario e por run_id antes de decidir com
-honestidade se a F3 pode ou nao fechar`
+**Trilha activa dentro da F3:** `F3.9 — alinhar o ambiente real da campanha
+(deploy, credencial administrativa e appliance pfSense) ao contrato canónico
+do repositório e reexecutar a campanha com novo run_id; a F3 permanece
+aberta enquanto qualquer obrigatorio continuar fora de PASS`
 
 ### Ordem segura das fases
 
@@ -211,17 +222,21 @@ honestidade se a F3 pode ou nao fechar`
 
 1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
-2. Executar a campanha real da F3 em bloco proprio, usando
+2. Alinhar o ambiente da campanha real da F3 ao contrato canónico do
+   repositório antes de nova rodada, fechando explicitamente os blockers
+   revelados pela F3.9: drift do deploy observado, falta de credencial
+   administrativa autorizada e falta de appliance pfSense autenticavel.
+3. Reexecutar a campanha real da F3 em novo bloco proprio, usando
    `docs/01-architecture/f3-validacao-manual-evidencias.md` como matriz
    factual, `docs/01-architecture/f3-pack-operacional-validacao.md` como
    runbook de recolha/classificacao das evidencias e
    `docs/01-architecture/f3-gate-fechamento-validacao.md` como gate oficial
    de saida e regra de decisao final da fase.
-3. So declarar a F3 fechada se o relatorio final de campanha indicar
+4. So declarar a F3 fechada se o relatorio final de campanha indicar
    explicitamente `F3 pode fechar`, com todos os cenarios obrigatorios da
    F3.8 em `PASS`; qualquer `FAIL`, `INCONCLUSIVE` ou `BLOCKED` obrigatorio
    mantem a F3 aberta.
-4. Usar o backlog canónico como fila unica antes de tocar em
+5. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
 ---
@@ -287,6 +302,16 @@ honestidade se a F3 pode ou nao fechar`
   continua dependente de executar em lab/appliance os cenarios obrigatorios
   de grace, revogacao com `.lic` antigo, coexistencia de artefactos e drift
   real de fingerprint sem abrir escopo tecnico novo.
+- A F3.9 revelou drift operacional relevante entre o contrato canónico do
+  repositório e o deploy real observado em `192.168.100.244`: o schema live
+  nao contem `admin_sessions`, `admin_audit_log` nem `admin_login_guards`, e
+  o `activate.js` live continua a responder `403` em cenarios onde a F3.8
+  exige `409`; esta divergencia invalida qualquer leitura optimista de fecho
+  da F3 ate o ambiente ser alinhado ou substituido.
+- A F3.9 tambem ficou limitada por falta de appliance pfSense autenticavel e
+  por ausencia de credencial administrativa autorizada para a campanha; sem
+  esses pre-requisitos, S01, S04-S06, S08, S10-S13 continuam sem prova real
+  suficiente.
 - Nao existe ainda trilha dedicada para transferencia entre clientes,
   desrevogacao ou rebind seguro com governanca explicita.
 - O fingerprint continua dependente de `SHA256(kern.hostuuid + ":" + primeira

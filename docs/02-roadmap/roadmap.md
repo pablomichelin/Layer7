@@ -371,12 +371,19 @@ falha.
   bloqueantes vs nao bloqueantes e o relatorio final unico de campanha em
   `docs/tests/templates/f3-validation-campaign-report.md`, sem declarar a F3
   fechada antes da execucao real.
-- **Proximo passo seguro dentro da F3:** executar a campanha real da F3 em
-  ambiente controlado para os cenarios pendentes de expiracao com `.lic` ja
-  emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
-  reactivacao, coexistencia de artefactos, indisponibilidade do servidor,
-  reinstall, troca de NIC, clone de VM, restore e migracao, preenchendo o
-  relatorio final e aplicando o gate da F3.8 sem abrir F4/F5/F6/F7.
+- **F3.9 executada como primeira campanha real controlada em `2026-04-02`:**
+  a rodada `20260402T130015Z-deploy244` produziu evidencias reais de backend,
+  relatorio final unico de campanha e veredito explicito `F3 nao pode
+  fechar`, com `0 PASS`, `3 FAIL`, `1 INCONCLUSIVE` e `9 BLOCKED`. A campanha
+  revelou drift do deploy real face ao contrato canónico do repositório
+  (schema live sem `admin_sessions`, `admin_audit_log` e
+  `admin_login_guards`, e `activate` live a responder `403` onde a F3.8 exige
+  `409`), alem de falta de appliance pfSense autenticavel e de credencial
+  administrativa autorizada para os cenarios administrativos.
+- **Proximo passo seguro dentro da F3:** alinhar o ambiente real da campanha
+  (deploy, credencial administrativa e appliance pfSense) ao contrato
+  canónico e so depois reexecutar a F3.9 com novo `run_id`, sem abrir
+  F4/F5/F6/F7.
 
 ### Criterios de saida
 
