@@ -4,6 +4,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.7 pack operacional da validacao manual
+
+- **Pack canónico da F3.7** —
+  `docs/01-architecture/f3-pack-operacional-validacao.md` passa a
+  operacionalizar a matriz da F3.6 com directoria por `run_id`, nomes fixos
+  para outputs, classificacao uniforme `PASS` / `FAIL` / `INCONCLUSIVE` /
+  `BLOCKED` e politica conservadora de recolha/retencao de evidencias
+- **Helper shell barato fora do produto** —
+  `scripts/license-validation/export-license-evidence.sh` passa a exportar
+  snapshot da licenca, `activations_log` e `admin_audit_log` de forma
+  reproduzivel, sem mudar endpoints, schema, `.lic` ou daemon
+- **Template minimo por cenario** —
+  `docs/tests/templates/f3-scenario-evidence.md` passa a servir como molde
+  para registo operacional por cenario, reduzindo ambiguidade sem criar suite
+  nova nem automacao pesada
+
 ### Changed — F3.6 validacao manual controlada e evidencias
 
 - **Matriz canónica da F3.6** —

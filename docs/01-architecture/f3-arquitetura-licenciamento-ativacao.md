@@ -31,6 +31,10 @@ Documento complementar canónico da mesma fase:
 - [`f3-validacao-manual-evidencias.md`](f3-validacao-manual-evidencias.md)
   para a matriz manual de cenarios, evidencias minimas, comandos objectivos e
   politica conservadora de validacao suficiente da F3.6.
+- [`f3-pack-operacional-validacao.md`](f3-pack-operacional-validacao.md)
+  para o pack operacional da F3.7, a convencao de ficheiros de evidencia, os
+  estados `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED` e o helper shell
+  barato de exportacao do backend.
 
 ---
 
@@ -432,13 +436,22 @@ Resultado esperado:
 - formalizar comandos objectivos, evidencias minimas e criterios de
   aprovacao/reprovacao sem fingir que a execucao real ja aconteceu.
 
+### F3.7 — pack operacional da validacao manual
+
+- transformar a matriz da F3.6 num pack executavel por `run_id` e por
+  cenario;
+- padronizar outputs, nomes de ficheiros e classificacao final do resultado;
+- acrescentar apenas tooling barato fora do produto para exportar evidencias
+  de backend e reduzir ambiguidade humana.
+
 ---
 
 ## 10. Riscos fora de escopo que permanecem
 
 - semantica persistida de `expired` continua incompleta;
 - grace local continua apenas no daemon, agora com politica operacional
-  documentada, mas ainda sem validacao manual/appliance fechada;
+  documentada e operacionalizada em pack, mas ainda sem validacao
+  manual/appliance fechada;
 - fingerprint continua sensivel a mudancas reais do hardware/base system;
 - a revogacao actual continua sem invalidacao offline do `.lic` ja emitido;
 - nao houve nesta subfase mudanca de revogacao offline, rotacao de chaves,

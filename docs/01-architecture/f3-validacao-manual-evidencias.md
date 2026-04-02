@@ -4,6 +4,14 @@
 
 Este documento fecha a parte canónica da **F3.6** sem abrir F4/F5/F6/F7.
 
+Complemento operacional da fase:
+
+- [`f3-pack-operacional-validacao.md`](f3-pack-operacional-validacao.md)
+  transforma esta matriz num pack executavel da F3.7, com convencao de
+  directoria, nomes de ficheiros, estados `PASS` / `FAIL` /
+  `INCONCLUSIVE` / `BLOCKED`, template de registo e helper shell barato para
+  exportar evidencias de backend.
+
 Objectivo da subfase:
 
 - transformar o contrato ja implementado na F3 em matriz manual controlada;
@@ -684,6 +692,13 @@ Mesmo com esta subfase documentada, continuam pendentes:
 ---
 
 ## 10. Proximos passos seguros apos a F3.6
+
+Checkpoint adicional apos a F3.7:
+
+- operacionalizar esta matriz usando
+  `docs/01-architecture/f3-pack-operacional-validacao.md`;
+- recolher evidencias brutas por `run_id` e por cenario antes de qualquer
+  declaracao de fecho da F3.
 
 1. Executar primeiro os cenarios obrigatorios `S01` a `S09`, `S11`, `S12`
    e `S13` em ambiente controlado.

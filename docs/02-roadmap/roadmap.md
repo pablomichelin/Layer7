@@ -358,7 +358,13 @@ falha.
   obrigatorios/desejaveis, os comandos objectivos de recolha de evidencia e a
   politica de "validacao suficiente" da F3, sem fingir que a validacao real
   em lab/appliance ja ocorreu.
-- **Proximo passo seguro dentro da F3:** executar a matriz canónica da F3.6
+- **F3.7 formalizada de forma conservadora em `2026-04-02`:**
+  `docs/01-architecture/f3-pack-operacional-validacao.md` passa a
+  operacionalizar a F3.6 com estrutura por `run_id`, convencao de ficheiros,
+  classificacao `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`, template
+  markdown por cenario e helper shell barato para exportar evidencias do
+  backend sem tocar no contrato do produto.
+- **Proximo passo seguro dentro da F3:** executar o pack operacional da F3.7
   em ambiente controlado para os cenarios pendentes de expiracao com `.lic`
   ja emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
   reactivacao, coexistencia de artefactos, indisponibilidade do servidor,
@@ -370,7 +376,7 @@ falha.
 - fluxo de licenciamento explicado por estado e transicao;
 - casos de falha principais cobertos por matriz manual e evidencias minimas;
 - comportamento offline deixa de depender de tentativa e erro documental;
-- os cenarios obrigatorios da F3.6 ficam executados com outputs reais antes
+- os cenarios obrigatorios da F3.6/F3.7 ficam executados com outputs reais antes
   do fecho formal da fase.
 
 ### Gate
@@ -389,6 +395,7 @@ falha.
 - `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`
 - `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`
 - `docs/01-architecture/f3-validacao-manual-evidencias.md`
+- `docs/01-architecture/f3-pack-operacional-validacao.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`

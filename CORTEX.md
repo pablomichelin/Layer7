@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F3 — aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias, ainda pendente de execucao real em lab/appliance`
+**Fase actual consolidada:** `F3 — aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato, ainda pendente de execucao real em lab/appliance`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -175,11 +175,16 @@ artefacto emitido em `activate` e `download`, sem mudar payload, formato
 da validabilidade actual, a matriz de cenarios obrigatorios/desejaveis, os
 comandos objectivos de recolha de evidencia e a politica oficial de
 "validacao suficiente" da F3, sem fingir que a execucao real em
-lab/appliance ja aconteceu.
+lab/appliance ja aconteceu. A **F3.7** passa a formalizar em
+`docs/01-architecture/f3-pack-operacional-validacao.md` o pack operacional
+para essa execucao, com directoria por `run_id`, nomes uniformes de
+ficheiros, estados `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`, template
+markdown por cenario e helper shell barato para exportar evidencias de
+backend sem mudar o contrato do produto.
 
-**Trilha activa dentro da F3:** `F3.6 — executar em lab/appliance a matriz
-canónica de validacao manual/evidencias ja formalizada, recolhendo outputs
-reais antes de declarar a F3 substancialmente validada`
+**Trilha activa dentro da F3:** `F3.7 — executar em lab/appliance o pack
+operacional de validacao da F3, recolhendo outputs reais por cenario e por
+run_id antes de declarar a fase substancialmente validada`
 
 ### Ordem segura das fases
 
@@ -200,11 +205,12 @@ reais antes de declarar a F3 substancialmente validada`
 
 1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
-2. Executar a matriz canónica da F3.6 em bloco proprio, usando
-   `docs/01-architecture/f3-validacao-manual-evidencias.md` como runbook de
-   evidencias para os cenarios de expiracao, revogacao, grace, renovacao,
-   indisponibilidade do servidor, coexistencia de artefactos e matriz real do
-   fingerprint, sem misturar package/daemon/runtime da F4.
+2. Executar o pack operacional da F3.7 em bloco proprio, usando
+   `docs/01-architecture/f3-validacao-manual-evidencias.md` como matriz
+   factual e `docs/01-architecture/f3-pack-operacional-validacao.md` como
+   runbook de recolha e classificacao das evidencias para os cenarios de
+   expiracao, revogacao, grace, renovacao, coexistencia de artefactos e
+   matriz real do fingerprint, sem misturar package/daemon/runtime da F4.
 3. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
@@ -266,7 +272,8 @@ reais antes de declarar a F3 substancialmente validada`
   nao tem contador/versionamento consumido pelo daemon nem enforcement de
   "artefacto mais recente unico".
 - A F3.6 formaliza a matriz de evidencias e os comandos de validacao manual,
-  mas a robustez da F3 ainda depende de executar em lab/appliance os cenarios
+  e a F3.7 operacionaliza essa recolha com pack e helper shell baratos, mas
+  a robustez da F3 ainda depende de executar em lab/appliance os cenarios
   obrigatorios de grace, revogacao com `.lic` antigo, coexistencia de
   artefactos e drift real de fingerprint sem abrir escopo tecnico novo.
 - Nao existe ainda trilha dedicada para transferencia entre clientes,

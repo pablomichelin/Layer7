@@ -69,6 +69,13 @@
 > manual continua a ser a referencia operacional do uso de licencas, mas o
 > fecho honesto da robustez da F3 passa a depender da execucao controlada dos
 > cenarios obrigatorios e da recolha de outputs reais em backend e appliance.
+>
+> Estado canónico apos a F3.7: o pack operacional dessa execucao passa a viver
+> em `docs/01-architecture/f3-pack-operacional-validacao.md`, com directoria
+> por `run_id`, nomes padronizados de ficheiros de evidencia, classificacao
+> `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`, template markdown por cenario
+> e helper shell barato para exportar `licenses`, `activations_log` e
+> `admin_audit_log` sem mudar o produto.
 
 ---
 
@@ -362,6 +369,8 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
 - a leitura factual do que ja esta robusto em codigo e do que ainda depende
   de appliance/lab passa a estar consolidada em
   `docs/01-architecture/f3-validacao-manual-evidencias.md`
+- a operacionalizacao dessa leitura passa a estar consolidada em
+  `docs/01-architecture/f3-pack-operacional-validacao.md`
 - os cenarios obrigatorios da F3.6 incluem:
   - activacao inicial e reactivacao legitima
   - `409` para hardware diferente em licenca bindada
@@ -374,8 +383,8 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
   - resposta CLI/API
   - query de estado/auditoria no backend quando aplicavel
   - evidencia local do appliance quando aplicavel
-- a F3.6 **nao** cria nova feature; ela governa a prova minima do que ja foi
-  implementado.
+- a F3.7 acrescenta apenas o pack operacional, o template e o helper shell
+  barato para reduzir ambiguidade humana; ela **nao** cria nova feature.
 
 ---
 

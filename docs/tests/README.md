@@ -25,3 +25,7 @@ esses 4 blocos pendentes numa matriz manual explicita de 13 cenarios,
 pre-requisitos, comandos, evidencias minimas e criterios de
 aprovacao/reprovacao, descrita em
 [`../01-architecture/f3-validacao-manual-evidencias.md`](../01-architecture/f3-validacao-manual-evidencias.md).
+A F3.7 operacionaliza essa matriz em
+[`../01-architecture/f3-pack-operacional-validacao.md`](../01-architecture/f3-pack-operacional-validacao.md)
+e acrescenta um template minimo em
+[`templates/f3-scenario-evidence.md`](templates/f3-scenario-evidence.md).
