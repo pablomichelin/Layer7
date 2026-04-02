@@ -8,6 +8,7 @@ const {
 } = require('../admin-surface');
 const { generateSignedLicense } = require('../crypto');
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
+const { buildLicenseArtifactAuditMetadata } = require('../license-artifact-audit');
 const {
   assertEmptyBody,
   normalizeStoredHardwareId,
@@ -587,7 +588,15 @@ router.get('/:id/download', async (req, res) => {
       req,
       result: 'success',
       reason: 'license_downloaded',
-      metadata: { license_id: license.id },
+      metadata: buildLicenseArtifactAuditMetadata({
+        license,
+        signedLicense: signed,
+        flow: 'admin_download',
+        emissionKind: 'admin_download_reissue',
+        effectiveStatus: license.status,
+        effectiveHardwareId,
+        customerName: license.customer_name || 'Unknown',
+      }),
     });
 
     return res.json(signed);

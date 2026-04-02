@@ -4,6 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.5 emissao, reemissao e rastreabilidade do artefacto
+
+- **Trilha canónica do `.lic` na F3.5** —
+  `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md` passa a
+  registar de forma factual onde o artefacto e emitido, como a activacao
+  publica difere do download administrativo, qual o risco de coexistencia de
+  multiplos artefactos validos e o que continua impossivel resolver sem
+  mudar formato, daemon ou revogacao offline
+- **Emissao publica auditavel sem mudar o contrato** — `POST /api/activate`
+  continua a devolver `{ data, sig }`, mas passa a deixar rasto adicional do
+  artefacto emitido com `flow`, `emission_kind`, contexto da licenca e hashes
+  baratos do payload/assinatura/envelope
+- **Download administrativo com contexto do artefacto** — o evento
+  `license_downloaded` passa a registar metadados suficientes para
+  investigacao futura, sem schema novo, sem versionamento obrigatorio e sem
+  mudar o formato do `.lic`
+
 ### Changed — F3.4 mutacao administrativa, reemissao e guardrails
 
 - **Superficie administrativa canónica da F3.4** —

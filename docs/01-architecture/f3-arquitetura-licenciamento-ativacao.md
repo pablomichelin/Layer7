@@ -25,6 +25,9 @@ Documento complementar canónico da mesma fase:
 - [`f3-mutacao-admin-reemissao-guardrails.md`](f3-mutacao-admin-reemissao-guardrails.md)
   para a superficie administrativa real, a politica conservadora de
   imutabilidade parcial apos bind e os guardrails minimos da F3.4.
+- [`f3-emissao-reemissao-rastreabilidade.md`](f3-emissao-reemissao-rastreabilidade.md)
+  para a trilha real de emissao/reemissao do `.lic`, a governanca do
+  artefacto e a rastreabilidade minima da F3.5.
 
 ---
 
@@ -48,6 +51,14 @@ Checkpoint adicional da F3.4:
   mutacao/reemissao e a bloquear apenas a transferencia silenciosa de
   `customer_id` em licenca ja activada/bindada, sem abrir rebind dedicado,
   sem mudar `.lic` e sem mexer no daemon.
+
+Checkpoint adicional da F3.5:
+
+- a F3.5 passa a formalizar separadamente a trilha real de emissao e
+  reemissao do `.lic`, a distinguir emissao inicial de reemissao legitima e a
+  reforcar a auditoria minima do artefacto devolvido em `activate` e
+  `download`, sem mudar payload, formato `.lic` ou criterio de validacao do
+  daemon.
 
 ---
 
@@ -406,7 +417,13 @@ Resultado esperado:
 - bloquear apenas o minimo necessario para impedir transferencia silenciosa
   de licenca bindada.
 
-### F3.5 — testes e evidencias de licenciamento
+### F3.5 — emissao, reemissao e rastreabilidade do artefacto
+
+- mapear a trilha real de emissao e download do `.lic`;
+- distinguir emissao inicial, reemissao legitima e reemissao administrativa;
+- reforcar a auditoria minima do artefacto emitido sem mudar o contrato.
+
+### F3.6 — testes e evidencias de licenciamento
 
 - transformar o contrato da F3 em matriz de casos repetiveis em appliance.
 

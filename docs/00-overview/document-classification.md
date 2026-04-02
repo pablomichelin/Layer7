@@ -64,6 +64,7 @@ vence o canónico.
 | `docs/01-architecture/f3-fingerprint-e-binding.md` | fingerprint e binding F3.2 | consolidado canónico da matriz real de fingerprint/binding em appliance e da politica conservadora de compatibilidade | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/01-architecture/f3-expiracao-revogacao-grace.md` | expiracao/revogacao/grace F3.3 | consolidado canónico da semantica real de expiracao, revogacao, validade offline e grace local | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md` | mutacao admin/reemissao F3.4 | consolidado canónico da superficie administrativa, da imutabilidade parcial apos bind e dos guardrails minimos contra transferencia silenciosa | Canónico | novo | manter vivo durante a F3 | F3 |
+| `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md` | emissao/reemissao/rastreabilidade F3.5 | consolidado canónico da trilha real de emissao do `.lic`, da governanca de reemissao e da rastreabilidade minima do artefacto | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/02-roadmap/roadmap.md` | fases F0-F7 | roadmap canónico | Canónico | substitui `03-ROADMAP-E-FASES.md` como SSOT | manter vivo | F0+ |
 | `docs/02-roadmap/backlog.md` | backlog | backlog unico priorizado | Canónico | substitui `04-BACKLOG-MVP-E-VERSOES.md` | manter vivo | F0+ |
 | `docs/02-roadmap/checklist-mestre.md` | gates | checklist mestre da evolucao segura | Canónico | substitui `14-CHECKLIST-MESTRE.md` | manter vivo | F0+ |

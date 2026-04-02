@@ -53,6 +53,16 @@
 > `customer_id` deixa de poder ser alterado pelo CRUD normal para impedir
 > transferencia silenciosa de ownership enquanto um `.lic` antigo ainda pode
 > continuar valido offline.
+>
+> Estado canónico apos a F3.5: a trilha de emissao e reemissao do `.lic`
+> passa a viver em
+> `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`. A politica
+> oficial fica conservadora: activacao publica e download administrativo
+> continuam a devolver o mesmo contrato `{ data, sig }`, mas o backend passa a
+> auditar melhor o artefacto devolvido, distinguindo emissao inicial de
+> reemissao legitima no fluxo publico e registando hashes/contexto do
+> artefacto emitido. Isto melhora a investigacao futura, mas **nao** cria
+> versionamento forte nem invalida automaticamente um `.lic` antigo.
 
 ---
 
@@ -110,6 +120,8 @@ O sistema de licencas Layer7 funciona com dois componentes:
 - a primeira activacao valida fixa o `hardware_id`
 - a reactivacao com o mesmo `hardware_id` pode reemitir o `.lic`, sem trocar
   o bind
+- o download administrativo de licenca bindada e uma reemissao governada do
+  mesmo artefacto contratual, nao um novo tipo de licenca
 - activacao com `hardware_id` diferente apos o bind falha com `409`
 - licenca revogada falha na activacao online
 - licenca expirada falha na activacao online
@@ -575,7 +587,7 @@ O daemon verifica a licenca:
 | `PUT` | `/api/licenses/:id` | Editar (`customer_id` apenas antes do bind; `expiry`, `features` e `notes` continuam permitidos) |
 | `POST` | `/api/licenses/:id/revoke` | Revogar licenca |
 | `DELETE` | `/api/licenses/:id` | Arquivar licenca nao activa; preserva historico |
-| `GET` | `/api/licenses/:id/download` | Download ficheiro .lic |
+| `GET` | `/api/licenses/:id/download` | Download/reemissao administrativa do ficheiro `.lic`, com trilha de auditoria do artefacto |
 | `GET` | `/api/customers?search=&page=&limit=` | Listar clientes |
 | `POST` | `/api/customers` | Criar cliente |
 | `GET` | `/api/customers/:id` | Detalhes + licencas |
@@ -597,6 +609,15 @@ O endpoint `/api/auth/login` passa a operar com:
 As mutacoes administrativas e `POST /api/activate` passam a operar em
 fail-closed: payload invalido devolve `400`, recurso inexistente devolve
 `404` e conflito logico devolve `409`.
+
+Na F3.5, os caminhos que entregam `.lic` passam a deixar rasto adicional de:
+
+- flow de emissao
+- tipo de emissao/reemissao
+- `license_id` / `customer_id`
+- `hardware_id` efectivo
+- `expiry` / `issued_on`
+- hashes do artefacto devolvido
 
 ---
 

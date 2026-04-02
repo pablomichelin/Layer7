@@ -132,6 +132,10 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 11.14 | Update administrativo continua a permitir mudança de `customer_id` antes do bind/activação | revisão de código/backend | OK (2026-04-01) |
 | 11.15 | Renovação por `expiry` continua permitida em licença bindada sem alterar o bind | revisão de código/backend | OK (2026-04-01) |
 | 11.16 | Auditoria de `license_updated` passa a registar campos alterados e flags de bind/activação | revisão de código/backend | OK (2026-04-01) |
+| 11.17 | Activação pública passa a auditar emissão do artefacto com `flow` e `emission_kind` | revisão de código/backend | OK (2026-04-01) |
+| 11.18 | Download administrativo passa a auditar hashes e contexto do artefacto devolvido | revisão de código/backend | OK (2026-04-01) |
+| 11.19 | Backend distingue `initial_issue` de `reactivation_reissue` no fluxo público sem mudar `{ data, sig }` | revisão de código/backend | OK (2026-04-01) |
+| 11.20 | O sistema continua sem enforcement de "artefacto mais recente único", mas a limitação fica formalizada e rastreável | revisão arquitectural/F3.5 | OK (2026-04-01) |
 
 ### Addendum operativo da F3.2
 
@@ -165,6 +169,16 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | Reemitir `.lic` da mesma licenca apos renovar `expiry` | permitido no mesmo hardware/bind |
 | Tentar editar `hardware_id`, `status`, `revoked_at` ou `license_key` via `PUT /api/licenses/:id` | rejeitado pelo schema/validacao do CRUD normal |
 
+### Addendum operativo da F3.5
+
+| Cenario manual a observar | Expectativa conservadora actual |
+|---------------------------|---------------------------------|
+| Primeira activacao valida | `activations_log` regista sucesso e a auditoria regista `initial_issue` |
+| Re-activacao legitima do mesmo hardware | auditoria regista `reactivation_reissue` |
+| Download administrativo de licenca bindada | auditoria regista `admin_download_reissue` com hashes do artefacto |
+| Dois downloads administrativos da mesma licenca | cada acto fica auditado, mesmo sem versionamento forte no `.lic` |
+| Artefacto antigo e artefacto novo coexistirem em campo | continua possivel; a trilha auditada melhora investigacao, nao enforcement |
+
 ---
 
 ## Resumo
@@ -181,11 +195,11 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | GUI | 13 | 13 | 0 |
 | Observabilidade | 4 | 4 | 0 |
 | Rollback | 3 | 3 | 0 |
-| Licenciamento/activação | 16 | 12 | 4 |
-| **Total** | **74** | **70** | **4** |
+| Licenciamento/activação | 20 | 16 | 4 |
+| **Total** | **78** | **74** | **4** |
 
-A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 16 cenarios
-de licenciamento/activacao: 12 ficam fechados por revisao de codigo,
+A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
+de licenciamento/activacao: 16 ficam fechados por revisao de codigo,
 arquitectura e contrato canónico em `2026-04-01`, e 4 seguem pendentes de
 validacao em appliance/lab para fechar grace/offline, expiracao/revogacao com
 `.lic` ja emitido, renovacao + reactivacao e a matriz real do fingerprint.

@@ -269,7 +269,9 @@ evita uma classe concreta e evitavel de mutacao perigosa.
 
 ## 9. Proximos passos seguros da F3
 
-- F3.5: consolidar evidencias e validacoes manuais/appliance para os cenarios
+- F3.5: fechar a trilha canónica de emissao/reemissao e a rastreabilidade
+  minima do artefacto `.lic`, sem alterar o formato consumido pelo daemon;
+- F3.6: consolidar evidencias e validacoes manuais/appliance para os cenarios
   pendentes de offline, grace, renovacao + reactivacao e fingerprint real;
 - so depois disso avaliar, em trilha propria, se existe espaco para
   transferencia/rebind com governanca dedicada e politica explicita para

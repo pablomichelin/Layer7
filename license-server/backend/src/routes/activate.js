@@ -1,8 +1,10 @@
 const { Router } = require('express');
 const rateLimit = require('express-rate-limit');
 const pool = require('../db');
+const { auditAdminEvent } = require('../admin-surface');
 const { generateSignedLicense } = require('../crypto');
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
+const { buildLicenseArtifactAuditMetadata } = require('../license-artifact-audit');
 const { getEffectiveLicenseState } = require('../license-state');
 const {
   normalizeStoredHardwareId,
@@ -44,7 +46,7 @@ router.post('/activate', activateLimiter, async (req, res) => {
     const { key, hardwareId } = parseActivatePayload(req.body);
     requestedHardwareId = hardwareId;
 
-    const signedLicense = await runInTransaction(async (client) => {
+    const activationResult = await runInTransaction(async (client) => {
       const result = await client.query(
         `SELECT l.*, c.name AS customer_name
            FROM licenses l
@@ -62,6 +64,9 @@ router.post('/activate', activateLimiter, async (req, res) => {
 
       const license = result.rows[0];
       const effectiveState = getEffectiveLicenseState(license);
+      const emissionKind = effectiveState.activated && license.activated_at
+        ? 'reactivation_reissue'
+        : 'initial_issue';
 
       if (effectiveState.revoked) {
         const error = createHttpError(409, 'Licenca revogada.');
@@ -136,10 +141,30 @@ router.post('/activate', activateLimiter, async (req, res) => {
 
       await logActivation(client, license.id, effectiveHardwareId, ip, ua, 'success', null);
 
-      return signed;
+      return {
+        signedLicense: signed,
+        artifactAuditMetadata: buildLicenseArtifactAuditMetadata({
+          license,
+          signedLicense: signed,
+          flow: 'public_activate',
+          emissionKind,
+          effectiveStatus: effectiveState.effectiveStatus,
+          effectiveHardwareId,
+          customerName: license.customer_name || 'Unknown',
+        }),
+      };
     });
 
-    return res.json(signedLicense);
+    await auditAdminEvent({
+      component: 'activate',
+      eventType: 'license_artifact_issued',
+      req,
+      result: 'success',
+      reason: activationResult.artifactAuditMetadata.emission_kind,
+      metadata: activationResult.artifactAuditMetadata,
+    });
+
+    return res.json(activationResult.signedLicense);
   } catch (error) {
     if (isHttpError(error)) {
       await logActivationBestEffort(

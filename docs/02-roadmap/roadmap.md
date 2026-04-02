@@ -345,11 +345,19 @@ falha.
   antigo ainda valido offline; o unico ajuste tecnico aceite fica restrito a
   bloquear mudanca de `customer_id` em licenca activada/bindada e a enriquecer
   a auditoria minima do update, sem abrir workflow novo nem mexer em `.lic`.
+- **F3.5 executada de forma conservadora em `2026-04-01`:**
+  `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md` passa a
+  formalizar a trilha real de emissao/reemissao do `.lic`, a diferenca entre
+  emissao inicial, reemissao legitima e reemissao administrativa e o risco de
+  multiplos artefactos coexistirem sem exclusividade forte; o unico ajuste
+  tecnico aceite fica restrito a enriquecer a auditoria do artefacto emitido
+  em `activate` e `download`, sem mudar payload, formato `.lic` ou daemon.
 - **Proximo passo seguro dentro da F3:** consolidar evidencias e validacao
   manual/appliance para os cenarios pendentes de expiracao com `.lic` ja
   emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
   reactivacao, indisponibilidade do servidor, reinstall, troca de NIC, clone
-  de VM, restore e migracao, sem abrir F4/F5/F6/F7.
+  de VM, restore e migracao, sem abrir F4/F5/F6/F7. Esta trilha passa a ser
+  tratada como **F3.6** para evitar colisao de numeracao.
 
 ### Criterios de saida
 
@@ -369,6 +377,7 @@ falha.
 - `docs/01-architecture/f3-fingerprint-e-binding.md`
 - `docs/01-architecture/f3-expiracao-revogacao-grace.md`
 - `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`
+- `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`
