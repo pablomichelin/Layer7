@@ -119,10 +119,10 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 11.1 | Primeira activação válida fixa `hardware_id` uma única vez e grava `activated_at` | revisão de código/backend | OK (2026-04-01) |
 | 11.2 | Re-activação do mesmo hardware não rebinda a licença e preserva o primeiro `activated_at` | revisão de código/backend | OK (2026-04-01) |
 | 11.3 | Corrida de primeira activação com `hardware_id` diferente mantém bind único e rejeita o segundo com `409` | revisão de código/backend | OK (2026-04-01) |
-| 11.4 | Grace local de `14` dias continua funcional no daemon com `.lic` expirado já emitido | appliance | Pendente (F3.2) |
-| 11.5 | Activação online de licença expirada continua a falhar fechado sem quebrar a licença local já emitida | appliance | Pendente (F3.2) |
-| 11.6 | Fingerprint mantém previsibilidade documentada em reinstall, troca de NIC, clone de VM, restore, migracao de hypervisor e appliance com multiplas NICs | appliance/lab | Pendente (F3.2) |
-| 11.7 | Renovação + re-activação reemite `.lic` actualizado sem quebrar o bind existente | appliance | Pendente (F3.2) |
+| 11.4 | Grace local de `14` dias continua funcional no daemon com `.lic` expirado já emitido | appliance | Pendente (F3.6; ver matriz detalhada) |
+| 11.5 | Activação online de licença expirada continua a falhar fechado sem quebrar a licença local já emitida | appliance | Pendente (F3.6; ver matriz detalhada) |
+| 11.6 | Fingerprint mantém previsibilidade documentada em reinstall, troca de NIC, clone de VM, restore, migracao de hypervisor e appliance com multiplas NICs | appliance/lab | Pendente (F3.6; ver matriz detalhada) |
+| 11.7 | Renovação + re-activação reemite `.lic` actualizado sem quebrar o bind existente | appliance | Pendente (F3.6; ver matriz detalhada) |
 | 11.8 | Estado efectivo (`active` / `expired` / `revoked`) permanece coerente entre `activate`, `licenses`, `customers` e `dashboard` | revisão de código/backend | OK (2026-04-01) |
 | 11.9 | Download administrativo de licença efectivamente expirada falha fechado | revisão de código/backend | OK (2026-04-01) |
 | 11.10 | Download administrativo de licença revogada falha fechado | revisão de código/backend | OK (2026-04-01) |
@@ -179,6 +179,27 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | Dois downloads administrativos da mesma licenca | cada acto fica auditado, mesmo sem versionamento forte no `.lic` |
 | Artefacto antigo e artefacto novo coexistirem em campo | continua possivel; a trilha auditada melhora investigacao, nao enforcement |
 
+### Addendum operativo da F3.6
+
+Referencia canónica detalhada:
+`docs/01-architecture/f3-validacao-manual-evidencias.md`
+
+| ID | Cenario manual a observar | Classificacao F3.6 | Evidencia minima esperada |
+|----|---------------------------|--------------------|---------------------------|
+| S01 | Activacao inicial valida | Obrigatorio | saida do `--activate`, estado da licenca, `activations_log`, `license_artifact_issued` |
+| S02 | Re-activacao legitima do mesmo hardware | Obrigatorio | saida do `--activate`, `activated_at` preservado, `reactivation_reissue` |
+| S03 | Activacao com hardware diferente para licenca bindada | Obrigatorio | HTTP `409`, `activations_log.result='fail'`, bind inalterado |
+| S04 | Download administrativo de licenca bindada | Obrigatorio | download `{ data, sig }`, `license_downloaded`, hashes do artefacto |
+| S05 | Mutacao permitida de `expiry` e reemissao | Obrigatorio | `PUT` bem-sucedido, bind preservado, download/reativacao do mesmo hardware |
+| S06 | Tentativa de mudar `customer_id` em licenca bindada | Obrigatorio | HTTP `409`, estado persistido inalterado, `license_update_denied` |
+| S07 | Licenca expirada no backend sem `.lic` local | Obrigatorio | activacao falha fechada, ausencia de `.lic` novo, estado efectivo `expired` |
+| S08 | Licenca expirada no backend com `.lic` local ainda dentro da grace | Obrigatorio | backend `expired`, stats locais com `license_valid=true` e `license_grace=true` |
+| S09 | Licenca revogada no backend com `.lic` antigo offline | Obrigatorio | revogacao no backend, activacao/download negados, appliance ainda valido localmente |
+| S10 | Multiplos downloads/reemissoes da mesma licenca | Desejavel | dois actos auditados; ficheiros podem ser identicos no mesmo dia |
+| S11 | Coexistencia de artefacto antigo e artefacto novo | Obrigatorio | dois `.lic` guardados, stats do appliance com cada artefacto, trilha de auditoria |
+| S12 | Appliance offline antes e depois do grace | Obrigatorio | stats locais antes/dentro/depois da grace, transicao para monitor-only apos `14` dias |
+| S13 | Divergencia de fingerprint por mudanca de NIC/UUID | Obrigatorio | `kern.hostuuid` e fingerprint antes/depois, stats locais, tentativa online se houve drift |
+
 ---
 
 ## Resumo
@@ -200,6 +221,7 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,
-arquitectura e contrato canónico em `2026-04-01`, e 4 seguem pendentes de
-validacao em appliance/lab para fechar grace/offline, expiracao/revogacao com
-`.lic` ja emitido, renovacao + reactivacao e a matriz real do fingerprint.
+arquitectura e contrato canónico em `2026-04-01`, e 4 seguem pendentes como
+blocos de validacao em appliance/lab. A F3.6 decompõe esses 4 blocos em 13
+cenarios manuais explicitos com comandos, evidencias minimas e classificacao
+obrigatorio/desejavel, sem fingir que a execucao real ja aconteceu.

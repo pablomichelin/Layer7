@@ -63,6 +63,12 @@
 > reemissao legitima no fluxo publico e registando hashes/contexto do
 > artefacto emitido. Isto melhora a investigacao futura, mas **nao** cria
 > versionamento forte nem invalida automaticamente um `.lic` antigo.
+>
+> Estado canónico apos a F3.6: a matriz manual de validacao/evidencias passa a
+> viver em `docs/01-architecture/f3-validacao-manual-evidencias.md`. Este
+> manual continua a ser a referencia operacional do uso de licencas, mas o
+> fecho honesto da robustez da F3 passa a depender da execucao controlada dos
+> cenarios obrigatorios e da recolha de outputs reais em backend e appliance.
 
 ---
 
@@ -350,6 +356,26 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
   fechado na activacao online e exigir decisao administrativa explicita
 - detalhes da matriz operacional estao em
   `docs/01-architecture/f3-fingerprint-e-binding.md`
+
+### 5.8 Validacao manual controlada da F3
+
+- a leitura factual do que ja esta robusto em codigo e do que ainda depende
+  de appliance/lab passa a estar consolidada em
+  `docs/01-architecture/f3-validacao-manual-evidencias.md`
+- os cenarios obrigatorios da F3.6 incluem:
+  - activacao inicial e reactivacao legitima
+  - `409` para hardware diferente em licenca bindada
+  - download administrativo de licenca bindada
+  - renovacao de `expiry` + reemissao
+  - bloqueio de `customer_id` em licenca bindada
+  - grace local, expiracao/revogacao online e coexistencia de artefactos
+  - drift real de fingerprint por mudanca de NIC/UUID
+- nenhum destes cenarios deve ser marcado como OK sem:
+  - resposta CLI/API
+  - query de estado/auditoria no backend quando aplicavel
+  - evidencia local do appliance quando aplicavel
+- a F3.6 **nao** cria nova feature; ela governa a prova minima do que ja foi
+  implementado.
 
 ---
 

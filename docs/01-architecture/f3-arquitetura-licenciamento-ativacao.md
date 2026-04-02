@@ -28,6 +28,9 @@ Documento complementar canónico da mesma fase:
 - [`f3-emissao-reemissao-rastreabilidade.md`](f3-emissao-reemissao-rastreabilidade.md)
   para a trilha real de emissao/reemissao do `.lic`, a governanca do
   artefacto e a rastreabilidade minima da F3.5.
+- [`f3-validacao-manual-evidencias.md`](f3-validacao-manual-evidencias.md)
+  para a matriz manual de cenarios, evidencias minimas, comandos objectivos e
+  politica conservadora de validacao suficiente da F3.6.
 
 ---
 
@@ -425,7 +428,9 @@ Resultado esperado:
 
 ### F3.6 — testes e evidencias de licenciamento
 
-- transformar o contrato da F3 em matriz de casos repetiveis em appliance.
+- transformar o contrato da F3 em matriz de casos repetiveis em appliance;
+- formalizar comandos objectivos, evidencias minimas e criterios de
+  aprovacao/reprovacao sem fingir que a execucao real ja aconteceu.
 
 ---
 

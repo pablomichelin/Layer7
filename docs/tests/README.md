@@ -20,8 +20,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 [`test-matrix.md`](test-matrix.md) — 78 testes divididos por categoria
 (build, instalação, daemon, config, policy engine, enforcement, GUI,
 observabilidade, rollback e addendum de licenciamento/activação da F3).
-Estado actual: 74 OK e 4 pendentes em appliance/lab para fechar a validacao
-manual de grace/offline, expiracao/revogacao com `.lic` ja emitido e da
-matriz real de fingerprint em reinstall, troca de NIC, clone de VM, restore
-e migracao; a F3.5 acrescenta checks de rastreabilidade de emissao/reemissao
-e governanca minima do artefacto no backend.
+Estado actual: 74 OK e 4 pendentes em appliance/lab. A F3.6 passa a decompor
+esses 4 blocos pendentes numa matriz manual explicita de 13 cenarios,
+pre-requisitos, comandos, evidencias minimas e criterios de
+aprovacao/reprovacao, descrita em
+[`../01-architecture/f3-validacao-manual-evidencias.md`](../01-architecture/f3-validacao-manual-evidencias.md).

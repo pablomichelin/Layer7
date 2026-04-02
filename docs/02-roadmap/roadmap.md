@@ -352,23 +352,33 @@ falha.
   multiplos artefactos coexistirem sem exclusividade forte; o unico ajuste
   tecnico aceite fica restrito a enriquecer a auditoria do artefacto emitido
   em `activate` e `download`, sem mudar payload, formato `.lic` ou daemon.
-- **Proximo passo seguro dentro da F3:** consolidar evidencias e validacao
-  manual/appliance para os cenarios pendentes de expiracao com `.lic` ja
-  emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
-  reactivacao, indisponibilidade do servidor, reinstall, troca de NIC, clone
-  de VM, restore e migracao, sem abrir F4/F5/F6/F7. Esta trilha passa a ser
-  tratada como **F3.6** para evitar colisao de numeracao.
+- **F3.6 formalizada documentalmente em `2026-04-01`:**
+  `docs/01-architecture/f3-validacao-manual-evidencias.md` passa a consolidar
+  a leitura factual da validabilidade actual, a matriz de cenarios
+  obrigatorios/desejaveis, os comandos objectivos de recolha de evidencia e a
+  politica de "validacao suficiente" da F3, sem fingir que a validacao real
+  em lab/appliance ja ocorreu.
+- **Proximo passo seguro dentro da F3:** executar a matriz canónica da F3.6
+  em ambiente controlado para os cenarios pendentes de expiracao com `.lic`
+  ja emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
+  reactivacao, coexistencia de artefactos, indisponibilidade do servidor,
+  reinstall, troca de NIC, clone de VM, restore e migracao, sem abrir
+  F4/F5/F6/F7.
 
 ### Criterios de saida
 
 - fluxo de licenciamento explicado por estado e transicao;
-- casos de falha principais cobertos por testes/registo;
-- comportamento offline deixa de depender de tentativa e erro.
+- casos de falha principais cobertos por matriz manual e evidencias minimas;
+- comportamento offline deixa de depender de tentativa e erro documental;
+- os cenarios obrigatorios da F3.6 ficam executados com outputs reais antes
+  do fecho formal da fase.
 
 ### Gate
 
 - activacao, revogacao, expiracao e modo offline ficam previsiveis e
-  rastreaveis.
+  rastreaveis;
+- nenhum "OK" de licenciamento e aceite sem evidencia minima de backend e,
+  quando aplicavel, de appliance.
 
 ### Documentacao obrigatoria da fase
 
@@ -378,6 +388,7 @@ falha.
 - `docs/01-architecture/f3-expiracao-revogacao-grace.md`
 - `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`
 - `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`
+- `docs/01-architecture/f3-validacao-manual-evidencias.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`

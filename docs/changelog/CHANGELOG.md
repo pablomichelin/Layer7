@@ -4,6 +4,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.6 validacao manual controlada e evidencias
+
+- **Matriz canónica da F3.6** —
+  `docs/01-architecture/f3-validacao-manual-evidencias.md` passa a registar
+  de forma factual o que ja esta robusto em codigo, o que so pode ser provado
+  em backend, o que exige appliance/relogio/fingerprint real e o que continua
+  impossivel comprovar sem mudar o modelo actual
+- **Politica oficial de "validacao suficiente"** — roadmap, backlog,
+  checklist, manual de licencas e docs de testes passam a exigir cenarios
+  obrigatorios, evidencias minimas e outputs reais antes de tratar a F3 como
+  substancialmente validada
+- **Fecho honesto sem mudar codigo** — a F3.6 nao adiciona feature nova nem
+  mexe em `.lic`, daemon ou fingerprint; ela transforma os pendentes de
+  appliance/lab em matriz operacional explicita, incluindo grace, revogacao
+  com `.lic` antigo, coexistencia de artefactos e drift real de fingerprint
+
 ### Changed — F3.5 emissao, reemissao e rastreabilidade do artefacto
 
 - **Trilha canónica do `.lic` na F3.5** —
