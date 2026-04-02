@@ -18,6 +18,7 @@ const {
 } = require('../crud-validation');
 const {
   applyEffectiveLicenseState,
+  getEffectiveLicenseState,
   LICENSE_SQL_ACTIVE_CONDITION,
   LICENSE_SQL_EXPIRED_CONDITION,
   LICENSE_SQL_REVOKED_CONDITION,
@@ -38,6 +39,29 @@ async function ensureVisibleCustomer(client, customerId) {
   if (result.rows.length === 0) {
     throw createHttpError(404, 'Cliente nao encontrado.');
   }
+}
+
+function listChangedLicenseFields(existingLicense, payload) {
+  const changedFields = [];
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'customerId')
+    && payload.customerId !== existingLicense.customer_id) {
+    changedFields.push('customer_id');
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, 'expiry')
+    && payload.expiry !== existingLicense.expiry) {
+    changedFields.push('expiry');
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, 'features')
+    && payload.features !== (existingLicense.features || 'full')) {
+    changedFields.push('features');
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, 'notes')
+    && payload.notes !== existingLicense.notes) {
+    changedFields.push('notes');
+  }
+
+  return changedFields;
 }
 
 router.get('/', async (req, res) => {
@@ -214,7 +238,7 @@ router.put('/:id', async (req, res) => {
 
     const updatedLicense = await runInTransaction(async (client) => {
       const existingResult = await client.query(
-        `SELECT id
+        `SELECT *
            FROM licenses
           WHERE id = $1
             AND archived_at IS NULL
@@ -224,6 +248,18 @@ router.put('/:id', async (req, res) => {
 
       if (existingResult.rows.length === 0) {
         throw createHttpError(404, 'Licenca nao encontrada.');
+      }
+
+      const existingLicense = existingResult.rows[0];
+      const existingState = getEffectiveLicenseState(existingLicense);
+      const changedFields = listChangedLicenseFields(existingLicense, payload);
+
+      if (changedFields.includes('customer_id')
+        && (existingState.activated || Boolean(existingLicense.activated_at))) {
+        throw createHttpError(
+          409,
+          'Licenca activada/bindada nao permite mudar customer_id. Crie nova licenca para outro cliente.'
+        );
       }
 
       if (Object.prototype.hasOwnProperty.call(payload, 'customerId')) {
@@ -269,7 +305,12 @@ router.put('/:id', async (req, res) => {
         req,
         result: 'success',
         reason: 'license_updated',
-        metadata: { license_id: result.rows[0].id },
+        metadata: {
+          license_id: result.rows[0].id,
+          changed_fields: changedFields,
+          activated: existingState.activated || Boolean(existingLicense.activated_at),
+          bound: Boolean(existingState.normalizedHardwareId),
+        },
         client,
         strict: true,
       });

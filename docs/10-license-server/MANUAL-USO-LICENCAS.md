@@ -43,6 +43,16 @@
 > real; por isso, um `.lic` ja emitido pode continuar valido offline no mesmo
 > hardware ate `expiry + grace`, e qualquer rebind administrativo precoce
 > continua bloqueado por risco real do `.lic` antigo permanecer operacional.
+>
+> Estado canónico apos a F3.4: a superficie administrativa de mutacao e
+> reemissao passa a viver em
+> `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`. A politica
+> oficial fica conservadora: `customer_id`, `expiry`, `features` e `notes`
+> continuam editaveis antes do bind; depois do bind, `expiry`, `features` e
+> `notes` continuam disponiveis para renovacao/ajuste da mesma licenca, mas
+> `customer_id` deixa de poder ser alterado pelo CRUD normal para impedir
+> transferencia silenciosa de ownership enquanto um `.lic` antigo ainda pode
+> continuar valido offline.
 
 ---
 
@@ -230,6 +240,10 @@ Resposta:
 > **IMPORTANTE:** A licenca e criada sem `hardware_id`. O hardware sera
 > vinculado automaticamente na primeira activacao. Depois disso, a
 > licenca so funciona naquele hardware especifico.
+>
+> **Politica F3.4:** enquanto a licenca ainda nao foi activada, o
+> `customer_id` pode ser corrigido administrativamente. Depois do bind, essa
+> alteracao deixa de ser permitida no CRUD normal.
 
 ---
 
@@ -558,7 +572,7 @@ O daemon verifica a licenca:
 | `GET` | `/api/licenses?status=&customer_id=&search=&page=&limit=` | Listar licencas |
 | `POST` | `/api/licenses` | Criar licenca |
 | `GET` | `/api/licenses/:id` | Detalhes + historico activacoes |
-| `PUT` | `/api/licenses/:id` | Editar (expiry, features, customer_id, notes) |
+| `PUT` | `/api/licenses/:id` | Editar (`customer_id` apenas antes do bind; `expiry`, `features` e `notes` continuam permitidos) |
 | `POST` | `/api/licenses/:id/revoke` | Revogar licenca |
 | `DELETE` | `/api/licenses/:id` | Arquivar licenca nao activa; preserva historico |
 | `GET` | `/api/licenses/:id/download` | Download ficheiro .lic |
@@ -605,8 +619,17 @@ A chave de licenca esta incorrecta ou nao existe no servidor.
 
 A licenca ja foi activada noutro hardware.
 - Cada licenca e vinculada ao primeiro hardware que a activa
-- Para mudar de hardware: criar nova licenca ou pedir ao admin
-  para limpar o hardware_id (via base de dados)
+- Para mudar de hardware: criar nova licenca
+- Rebind administrativo dedicado continua fora de escopo nesta fase
+
+### "Licenca activada/bindada nao permite mudar customer_id" (409)
+
+O CRUD administrativo normal ja nao permite transferir uma licenca bindada
+para outro cliente.
+- Antes da activacao, `customer_id` ainda pode ser corrigido
+- Depois do bind, criar nova licenca para outro cliente
+- Esta restricao evita reemissao administrativa perigosa enquanto um `.lic`
+  antigo ainda pode continuar valido offline
 
 ### "Licenca revogada" (409)
 

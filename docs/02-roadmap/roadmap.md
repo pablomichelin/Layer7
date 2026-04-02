@@ -338,11 +338,18 @@ falha.
   antigo continuar valido offline; o unico ajuste tecnico aceite fica
   restrito a centralizacao do estado efectivo da licenca no backend para
   alinhar `activate`, `licenses`, `customers` e `dashboard`.
-- **Proximo passo seguro dentro da F3:** validar em appliance/lab os cenarios
-  pendentes de expiracao com `.lic` ja emitido, revogacao com `.lic` ja
-  emitido, grace local, renovacao + reactivacao, indisponibilidade do
-  servidor, reinstall, troca de NIC, clone de VM, restore e migracao, sem
-  abrir F4/F5/F6/F7.
+- **F3.4 executada de forma conservadora em `2026-04-01`:**
+  `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md` passa a
+  formalizar a superficie administrativa real da licenca, a diferenca entre
+  mutacoes seguras e perigosas apos bind e o risco de reemissao com artefacto
+  antigo ainda valido offline; o unico ajuste tecnico aceite fica restrito a
+  bloquear mudanca de `customer_id` em licenca activada/bindada e a enriquecer
+  a auditoria minima do update, sem abrir workflow novo nem mexer em `.lic`.
+- **Proximo passo seguro dentro da F3:** consolidar evidencias e validacao
+  manual/appliance para os cenarios pendentes de expiracao com `.lic` ja
+  emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
+  reactivacao, indisponibilidade do servidor, reinstall, troca de NIC, clone
+  de VM, restore e migracao, sem abrir F4/F5/F6/F7.
 
 ### Criterios de saida
 
@@ -361,6 +368,7 @@ falha.
 - `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`
 - `docs/01-architecture/f3-fingerprint-e-binding.md`
 - `docs/01-architecture/f3-expiracao-revogacao-grace.md`
+- `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`

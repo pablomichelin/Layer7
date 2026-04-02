@@ -4,6 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.4 mutacao administrativa, reemissao e guardrails
+
+- **Superficie administrativa canónica da F3.4** —
+  `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md` passa a
+  registar de forma factual quais campos de licenca sao mutaveis via CRUD
+  normal, quais mutacoes continuam seguras antes/depois do bind e onde a
+  reemissao administrativa se torna perigosa por coexistir com `.lic` antigo
+  ainda valido offline
+- **Transferencia silenciosa de licenca bindada bloqueada** — o backend passa
+  a negar com `409` a mudanca de `customer_id` em licenca ja
+  activada/bindada, reduzindo o risco de mover ownership comercial sem trilha
+  dedicada de rebind/transferencia
+- **Auditoria minima de update reforcada** — `license_updated` passa a
+  registar os campos alterados e flags de bind/activacao, melhorando
+  previsibilidade operacional sem criar workflow novo nem mudar o formato do
+  `.lic`
+
 ### Changed — F3.3 expiracao, revogacao, grace e validade offline
 
 - **Semantica canónica da F3.3** —

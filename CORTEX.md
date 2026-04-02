@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F3 — aberta em 2026-04-01; F3.1, F3.2 e F3.3 executadas de forma conservadora em 2026-04-01`
+**Fase actual consolidada:** `F3 — aberta em 2026-04-01; F3.1, F3.2, F3.3 e F3.4 executadas de forma conservadora em 2026-04-01`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -162,11 +162,15 @@ do `hardware_id` persistido. A **F3.3** fechou a semantica real de expiracao,
 revogacao, validade offline e grace em documento canónico proprio, e
 materializou um helper minimo de estado efectivo no backend para alinhar
 `activate`, `licenses`, `customers` e `dashboard` sem mudar schema, formato
-`.lic` ou algoritmo de fingerprint.
+`.lic` ou algoritmo de fingerprint. A **F3.4** fechou a superficie
+administrativa real de mutacao/reemissao, formalizou a imutabilidade parcial
+de campos criticos apos bind e bloqueou a mudanca de `customer_id` em licenca
+activada/bindada no CRUD normal, evitando transferencia silenciosa de
+ownership sem abrir workflow novo de rebind.
 
-**Proxima subfase elegivel dentro da F3:** `F3.4 — evidencias e validacao
-manual/appliance da matriz de expiracao, revogacao, grace, renovacao e uso
-offline`
+**Proxima subfase elegivel dentro da F3:** `F3.5 — evidencias e validacao
+manual/appliance da matriz de expiracao, revogacao, grace, renovacao, uso
+offline e cenarios reais do fingerprint`
 
 ### Ordem segura das fases
 
@@ -187,7 +191,7 @@ offline`
 
 1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
-2. Executar a F3.4 em bloco proprio para validar em appliance/lab os cenarios
+2. Executar a F3.5 em bloco proprio para validar em appliance/lab os cenarios
    ja formalizados de expiracao, revogacao, grace, renovacao, indisponibilidade
    do servidor e matriz real do fingerprint, sem misturar package/daemon/runtime
    da F4.
@@ -240,11 +244,16 @@ offline`
   tambem por `expiry < CURRENT_DATE`.
 - O daemon aceita `.lic` expirado em grace local de `14` dias, enquanto a
   activacao online recusa imediatamente licencas expiradas; a diferenca esta
-  agora formalizada, mas ainda exige validacao manual/appliance na F3.4.
+  agora formalizada, mas ainda exige validacao manual/appliance na F3.5.
 - A revogacao actual corta activacao e download no servidor, mas **nao**
   invalida imediatamente um `.lic` ja emitido que continue em uso offline; o
   risco operacional fica explicito e bloqueia qualquer rebind administrativo
   precoce.
+- A F3.4 bloqueia a mudanca de `customer_id` em licenca bindada no CRUD
+  normal, mas reemissao legitima da mesma licenca continua a poder coexistir
+  com um `.lic` antigo ainda valido offline ate data/grace.
+- Nao existe ainda trilha dedicada para transferencia entre clientes,
+  desrevogacao ou rebind seguro com governanca explicita.
 - O fingerprint continua dependente de `SHA256(kern.hostuuid + ":" + primeira
   MAC Ethernet nao-loopback)`; mudanca de NIC, VM, reinstall ou ordem de
   interfaces ainda pode exigir validacao dedicada na F3.

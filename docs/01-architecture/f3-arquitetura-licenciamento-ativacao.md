@@ -22,6 +22,9 @@ Documento complementar canónico da mesma fase:
 - [`f3-expiracao-revogacao-grace.md`](f3-expiracao-revogacao-grace.md) para a
   semantica real de expiracao, revogacao, validade offline e grace local
   fechada na F3.3.
+- [`f3-mutacao-admin-reemissao-guardrails.md`](f3-mutacao-admin-reemissao-guardrails.md)
+  para a superficie administrativa real, a politica conservadora de
+  imutabilidade parcial apos bind e os guardrails minimos da F3.4.
 
 ---
 
@@ -38,6 +41,13 @@ Checkpoint adicional da F3.2:
   a matriz conservadora de cenarios reais de appliance e uma unica melhoria
   tecnica defensiva de normalizacao de formato do `hardware_id` persistido no
   servidor, sem alterar a formula base do fingerprint.
+
+Checkpoint adicional da F3.4:
+
+- a F3.4 passa a formalizar separadamente a superficie administrativa real de
+  mutacao/reemissao e a bloquear apenas a transferencia silenciosa de
+  `customer_id` em licenca ja activada/bindada, sem abrir rebind dedicado,
+  sem mudar `.lic` e sem mexer no daemon.
 
 ---
 
@@ -389,7 +399,14 @@ Resultado esperado:
 - declarar o limite real da revogacao actual e da validade offline do `.lic`;
 - bloquear rebind administrativo precoce por risco real do `.lic` antigo.
 
-### F3.4 — testes e evidencias de licenciamento
+### F3.4 — mutacao administrativa, reemissao e guardrails
+
+- mapear a superficie administrativa real da licenca;
+- distinguir mutacoes seguras de mutacoes perigosas apos bind;
+- bloquear apenas o minimo necessario para impedir transferencia silenciosa
+  de licenca bindada.
+
+### F3.5 — testes e evidencias de licenciamento
 
 - transformar o contrato da F3 em matriz de casos repetiveis em appliance.
 

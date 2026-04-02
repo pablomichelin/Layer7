@@ -143,7 +143,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | F0 | `CORTEX`, `AGENTS`, indice docs, roadmap, backlog, checklist, classificacao, equivalencia, ADR index |
 | F1 | `CORTEX`, `docs/01-architecture/f1-arquitetura-de-confianca.md`, backlog, `docs/02-roadmap/f1-plano-de-implementacao.md`, ADR-0003 a ADR-0006 |
 | F2 | `CORTEX`, `docs/01-architecture/f2-arquitetura-license-server.md`, `docs/02-roadmap/f2-plano-de-implementacao.md`, backlog, docs de licencas, runbooks de publicacao/sessao/segredos/backup-restore do servidor, ADR-0007 a ADR-0010 |
-| F3 | `CORTEX`, `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`, `docs/01-architecture/f3-fingerprint-e-binding.md`, `docs/01-architecture/f3-expiracao-revogacao-grace.md`, backlog, docs de licencas, matriz de testes, ADRs afectados |
+| F3 | `CORTEX`, `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`, `docs/01-architecture/f3-fingerprint-e-binding.md`, `docs/01-architecture/f3-expiracao-revogacao-grace.md`, `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`, backlog, docs de licencas, matriz de testes, ADRs afectados |
 | F4 | `CORTEX`, backlog, `MANUAL-INSTALL`, docs de blacklists, runbooks, changelog |
 | F5 | `CORTEX`, backlog, docs de testes, checklist mestre, evidencias |
 | F6 | `CORTEX`, backlog, classificacao, equivalencia, changelog estrutural |

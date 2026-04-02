@@ -128,6 +128,10 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 11.10 | Download administrativo de licença revogada falha fechado | revisão de código/backend | OK (2026-04-01) |
 | 11.11 | Revogação no servidor não invalida imediatamente um `.lic` já emitido em appliance offline | revisão de código/backend + daemon | OK (2026-04-01) |
 | 11.12 | Rebind administrativo permanece bloqueado na F3.3 por risco de `.lic` antigo continuar válido offline | revisão arquitectural/F3.3 | OK (2026-04-01) |
+| 11.13 | Update administrativo bloqueia mudança de `customer_id` em licença activada/bindada com `409` | revisão de código/backend | OK (2026-04-01) |
+| 11.14 | Update administrativo continua a permitir mudança de `customer_id` antes do bind/activação | revisão de código/backend | OK (2026-04-01) |
+| 11.15 | Renovação por `expiry` continua permitida em licença bindada sem alterar o bind | revisão de código/backend | OK (2026-04-01) |
+| 11.16 | Auditoria de `license_updated` passa a registar campos alterados e flags de bind/activação | revisão de código/backend | OK (2026-04-01) |
 
 ### Addendum operativo da F3.2
 
@@ -151,6 +155,16 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | Appliance offline apos o grace | daemon invalida licenca e cai para monitor-only |
 | Rebind administrativo com `.lic` antigo em campo | continua inseguro e fora de escopo enquanto nao houver politica para invalidacao offline |
 
+### Addendum operativo da F3.4
+
+| Cenario manual a observar | Expectativa conservadora actual |
+|---------------------------|---------------------------------|
+| Mudar `customer_id` antes do bind | permitido no CRUD normal |
+| Mudar `customer_id` depois do bind | falhar fechado com `409` |
+| Renovar `expiry` em licenca bindada | permitido; bind mantido |
+| Reemitir `.lic` da mesma licenca apos renovar `expiry` | permitido no mesmo hardware/bind |
+| Tentar editar `hardware_id`, `status`, `revoked_at` ou `license_key` via `PUT /api/licenses/:id` | rejeitado pelo schema/validacao do CRUD normal |
+
 ---
 
 ## Resumo
@@ -167,11 +181,11 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | GUI | 13 | 13 | 0 |
 | Observabilidade | 4 | 4 | 0 |
 | Rollback | 3 | 3 | 0 |
-| Licenciamento/activação | 12 | 8 | 4 |
-| **Total** | **70** | **66** | **4** |
+| Licenciamento/activação | 16 | 12 | 4 |
+| **Total** | **74** | **70** | **4** |
 
-A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 12 cenarios
-de licenciamento/activacao: 8 ficam fechados por revisao de codigo,
+A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 16 cenarios
+de licenciamento/activacao: 12 ficam fechados por revisao de codigo,
 arquitectura e contrato canónico em `2026-04-01`, e 4 seguem pendentes de
 validacao em appliance/lab para fechar grace/offline, expiracao/revogacao com
 `.lic` ja emitido, renovacao + reactivacao e a matriz real do fingerprint.
