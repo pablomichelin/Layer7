@@ -61,6 +61,7 @@ vence o canónico.
 | `docs/01-architecture/f1-arquitetura-de-confianca.md` | arquitectura F1 | consolidado da cadeia de confianca, blacklists e fallback | Canónico | novo | manter vivo durante F1 e rever quando a implementacao avancar | F1 |
 | `docs/01-architecture/f2-arquitetura-license-server.md` | arquitectura F2 | consolidado canónico da publicacao segura, sessao e hardening do license server | Canónico | novo | manter vivo durante a F2 | F2 |
 | `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md` | arquitectura F3 | consolidado canónico do contrato de licenciamento, estados/transicoes e endurecimento minimo da activacao | Canónico | novo | manter vivo durante a F3 | F3 |
+| `docs/01-architecture/f3-fingerprint-e-binding.md` | fingerprint e binding F3.2 | consolidado canónico da matriz real de fingerprint/binding em appliance e da politica conservadora de compatibilidade | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/02-roadmap/roadmap.md` | fases F0-F7 | roadmap canónico | Canónico | substitui `03-ROADMAP-E-FASES.md` como SSOT | manter vivo | F0+ |
 | `docs/02-roadmap/backlog.md` | backlog | backlog unico priorizado | Canónico | substitui `04-BACKLOG-MVP-E-VERSOES.md` | manter vivo | F0+ |
 | `docs/02-roadmap/checklist-mestre.md` | gates | checklist mestre da evolucao segura | Canónico | substitui `14-CHECKLIST-MESTRE.md` | manter vivo | F0+ |

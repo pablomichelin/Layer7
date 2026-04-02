@@ -11,6 +11,7 @@ const { createHttpError, isHttpError, runInTransaction } = require('../crud-inte
 const {
   assertEmptyBody,
   isLicenseExpired,
+  normalizeStoredHardwareId,
   parseIdParam,
   parseLicenseCreatePayload,
   parseLicensesListQuery,
@@ -501,7 +502,9 @@ router.get('/:id/download', async (req, res) => {
     }
 
     const license = normalizeLicenseRow(result.rows[0]);
-    if (!license.hardware_id) {
+    const effectiveHardwareId = normalizeStoredHardwareId(license.hardware_id) || license.hardware_id;
+
+    if (!effectiveHardwareId) {
       await auditAdminEvent({
         component: 'licenses',
         eventType: 'license_download_denied',
@@ -530,7 +533,7 @@ router.get('/:id/download', async (req, res) => {
     }
 
     const signed = generateSignedLicense({
-      hardware_id: license.hardware_id,
+      hardware_id: effectiveHardwareId,
       expiry: new Date(license.expiry).toISOString().slice(0, 10),
       customer: license.customer_name || 'Unknown',
       features: license.features || 'full',

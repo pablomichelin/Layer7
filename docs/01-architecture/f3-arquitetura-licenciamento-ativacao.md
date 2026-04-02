@@ -14,6 +14,12 @@ Escopo desta abertura controlada:
 - materializar apenas o primeiro endurecimento defensivo e compativel do fluxo
   de activacao, sem refactor amplo e sem mudar o modelo comercial.
 
+Documento complementar canónico da mesma fase:
+
+- [`f3-fingerprint-e-binding.md`](f3-fingerprint-e-binding.md) para a
+  matriz real do fingerprint, binding ao hardware e politica conservadora da
+  F3.2 em cenarios de appliance.
+
 ---
 
 ## 1. Objectivo da F3
@@ -21,6 +27,14 @@ Escopo desta abertura controlada:
 Tornar o comportamento de licenciamento previsivel em cenarios normais e de
 falha, sem remover nenhuma funcionalidade existente e sem misturar a F3 com
 auth/admin/TLS/CORS/CRUD fora do que ja foi fechado na F2.
+
+Checkpoint adicional da F3.2:
+
+- a F3.2 passa a formalizar separadamente a leitura factual do fingerprint,
+  as dependencias de `kern.hostuuid` e da primeira MAC Ethernet nao-loopback,
+  a matriz conservadora de cenarios reais de appliance e uma unica melhoria
+  tecnica defensiva de normalizacao de formato do `hardware_id` persistido no
+  servidor, sem alterar a formula base do fingerprint.
 
 ---
 

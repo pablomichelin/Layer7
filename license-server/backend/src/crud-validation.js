@@ -71,6 +71,19 @@ function normalizeRequiredText(value, fieldName, maxLength) {
   return normalized;
 }
 
+function normalizeStoredHardwareId(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (!normalized || !HARDWARE_ID_PATTERN.test(normalized)) {
+    return null;
+  }
+
+  return normalized;
+}
+
 function normalizeEmail(value) {
   if (value === undefined) {
     return undefined;
@@ -337,12 +350,14 @@ function parseActivatePayload(body) {
   rejectUnexpectedFields(payload, ['key', 'hardware_id']);
 
   const key = normalizeRequiredText(payload.key, 'key', 32).toLowerCase();
-  const hardwareId = normalizeRequiredText(payload.hardware_id, 'hardware_id', 64).toLowerCase();
+  const hardwareId = normalizeStoredHardwareId(
+    normalizeRequiredText(payload.hardware_id, 'hardware_id', 64)
+  );
 
   if (!LICENSE_KEY_PATTERN.test(key)) {
     throw createHttpError(400, 'key invalida.');
   }
-  if (!HARDWARE_ID_PATTERN.test(hardwareId)) {
+  if (!hardwareId) {
     throw createHttpError(400, 'hardware_id invalido.');
   }
 
@@ -373,6 +388,7 @@ function isLicenseExpired(license) {
 module.exports = {
   assertEmptyBody,
   isLicenseExpired,
+  normalizeStoredHardwareId,
   parseActivatePayload,
   parseCustomerCreatePayload,
   parseCustomerUpdatePayload,

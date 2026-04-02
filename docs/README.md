@@ -42,7 +42,7 @@ Quando houver conflito, seguir esta ordem:
 | Area | Documento(s) de entrada | Estado |
 |------|--------------------------|--------|
 | Visao de produto | [`00-overview/product-charter.md`](00-overview/product-charter.md) | canónico |
-| Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md), [`01-architecture/f2-arquitetura-license-server.md`](01-architecture/f2-arquitetura-license-server.md), [`01-architecture/f3-arquitetura-licenciamento-ativacao.md`](01-architecture/f3-arquitetura-licenciamento-ativacao.md), [`core/README.md`](core/README.md) | canónico |
+| Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md), [`01-architecture/f2-arquitetura-license-server.md`](01-architecture/f2-arquitetura-license-server.md), [`01-architecture/f3-arquitetura-licenciamento-ativacao.md`](01-architecture/f3-arquitetura-licenciamento-ativacao.md), [`01-architecture/f3-fingerprint-e-binding.md`](01-architecture/f3-fingerprint-e-binding.md), [`core/README.md`](core/README.md) | canónico |
 | Roadmap e execucao | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md), [`02-roadmap/backlog.md`](02-roadmap/backlog.md), [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md), [`02-roadmap/f1-plano-de-implementacao.md`](02-roadmap/f1-plano-de-implementacao.md), [`02-roadmap/f2-plano-de-implementacao.md`](02-roadmap/f2-plano-de-implementacao.md) | canónico |
 | ADRs | [`03-adr/README.md`](03-adr/README.md) | canónico |
 | Package e validacao | [`04-package/README.md`](04-package/README.md), [`04-package/validacao-lab.md`](04-package/validacao-lab.md) | suplementar/operacional |
@@ -108,7 +108,8 @@ Quando houver conflito, seguir esta ordem:
 4. Ao tocar em distribuicao, builder, blacklists ou fallback, leia antes a
    arquitectura consolidada da F1 e os ADRs 0003 a 0006.
 5. Ao tocar em licenciamento/activacao, leia tambem
-   `01-architecture/f3-arquitetura-licenciamento-ativacao.md`.
+   `01-architecture/f3-arquitetura-licenciamento-ativacao.md` e
+   `01-architecture/f3-fingerprint-e-binding.md`.
 6. Ao alterar comportamento tecnico, actualize tambem as docs da area,
    changelog e manuais operacionais afectados.
 7. Evite criar ficheiros novos sem necessidade; prefira consolidar.

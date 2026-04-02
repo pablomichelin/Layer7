@@ -3,7 +3,11 @@ const rateLimit = require('express-rate-limit');
 const pool = require('../db');
 const { generateSignedLicense } = require('../crypto');
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
-const { isLicenseExpired, parseActivatePayload } = require('../crud-validation');
+const {
+  isLicenseExpired,
+  normalizeStoredHardwareId,
+  parseActivatePayload,
+} = require('../crud-validation');
 
 const router = Router();
 
@@ -57,8 +61,6 @@ router.post('/activate', activateLimiter, async (req, res) => {
       }
 
       const license = result.rows[0];
-      let effectiveHardwareId = license.hardware_id || hardwareId;
-
       if (license.status === 'revoked') {
         const error = createHttpError(409, 'Licenca revogada.');
         error.licenseId = license.id;
@@ -71,13 +73,35 @@ router.post('/activate', activateLimiter, async (req, res) => {
         throw error;
       }
 
-      if (license.hardware_id && license.hardware_id !== hardwareId) {
+      if (license.hardware_id) {
+        const normalizedStoredHardwareId = normalizeStoredHardwareId(license.hardware_id);
+
+        if (normalizedStoredHardwareId && normalizedStoredHardwareId !== license.hardware_id) {
+          const normalizedResult = await client.query(
+            `UPDATE licenses
+                SET hardware_id = $1,
+                    updated_at = NOW()
+              WHERE id = $2
+            RETURNING hardware_id`,
+            [normalizedStoredHardwareId, license.id]
+          );
+
+          if (normalizedResult.rows.length > 0) {
+            license.hardware_id = normalizedResult.rows[0].hardware_id;
+          }
+        }
+      }
+
+      const boundHardwareId = normalizeStoredHardwareId(license.hardware_id) || license.hardware_id;
+      let effectiveHardwareId = boundHardwareId || hardwareId;
+
+      if (boundHardwareId && boundHardwareId !== hardwareId) {
         const error = createHttpError(409, 'Hardware ID nao corresponde.');
         error.licenseId = license.id;
         throw error;
       }
 
-      if (!license.hardware_id || !license.activated_at) {
+      if (!boundHardwareId || !license.activated_at) {
         const updateResult = await client.query(
           `UPDATE licenses
               SET hardware_id = COALESCE(hardware_id, $1),
@@ -95,7 +119,10 @@ router.post('/activate', activateLimiter, async (req, res) => {
           throw error;
         }
 
-        effectiveHardwareId = updateResult.rows[0].hardware_id || effectiveHardwareId;
+        effectiveHardwareId =
+          normalizeStoredHardwareId(updateResult.rows[0].hardware_id) ||
+          updateResult.rows[0].hardware_id ||
+          effectiveHardwareId;
       }
 
       const signed = generateSignedLicense({

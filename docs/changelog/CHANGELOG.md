@@ -4,6 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.2 fingerprint, binding e cenarios reais de appliance
+
+- **Matriz canónica de fingerprint/binding** —
+  `docs/01-architecture/f3-fingerprint-e-binding.md` passa a registar a
+  formula real do fingerprint observada no daemon, as dependencias de
+  `kern.hostuuid` e da primeira MAC Ethernet nao-loopback, os riscos de falso
+  bloqueio em reinstall/NIC/VM/restore/migracao e a politica conservadora da
+  fase para primeira activacao, reactivacao legitima, reactivacao suspeita e
+  mudanca que exige accao administrativa
+- **Compatibilidade preservada** — a F3.2 nao muda a formula do fingerprint,
+  nao abre tolerancia ampla, nao quebra `.lic` existente e nao altera o
+  contrato publico de `POST /api/activate`
+- **Normalizacao defensiva do bind persistido** — o backend passa a
+  canonicalizar `hardware_id` legacy por `trim + lowercase` antes de comparar
+  e assinar o `.lic`, reduzindo falso bloqueio por drift de formato sem
+  alterar o fingerprint real
+
 ### Changed — F3.1 abertura formal da robustez de licenciamento/activacao
 
 - **Contrato canónico da F3 aberto** — `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`

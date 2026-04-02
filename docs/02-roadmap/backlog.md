@@ -18,6 +18,7 @@ com criterio de risco, beneficio e ordem de execucao.
   - `Planeamento F1 concluido`
   - `Planeamento F2 concluido`
   - `Em execucao na F3.1`
+  - `Em execucao na F3.2`
   - `Bloqueado pela fase`
   - `Acompanhar`
 
@@ -74,6 +75,15 @@ reavaliacao formal.
 - O primeiro endurecimento minimo desta fase passa a tornar a reactivacao do
   mesmo hardware mais idempotente no backend, sem rebind, sem mudanca de
   contrato e sem abrir trilhas paralelas.
+- A F3.2 passa a formalizar a matriz real de fingerprint/binding em
+  `docs/01-architecture/f3-fingerprint-e-binding.md`, com politica
+  conservadora para reinstall, troca de NIC, clone de VM, restore, migracao
+  de hypervisor e appliances com multiplas interfaces, sem alterar a formula
+  do fingerprint.
+- O unico endurecimento tecnico adicional aceite nesta subfase fica limitado
+  a normalizacao defensiva do `hardware_id` persistido no servidor antes de
+  comparar ou assinar o `.lic`, reduzindo falso bloqueio por drift de
+  formato legacy sem abrir rebind automatico.
 
 ---
 
@@ -90,8 +100,8 @@ reavaliacao formal.
 | BG-024 | Substituir JWT em `localStorage` por sessao administrativa segura e fechar CORS/login/brute force | Critica | license-server/auth | F2 | roubo de sessao, abuso administrativo e superficie web permissiva | M | Alto | Acompanhar | F2.2 materializou sessao stateful com cookie seguro e logout real; F2.3 fechou same-origin, limiter dedicado, lockout temporario, politica minima de erro e auditoria administrativa |
 | BG-025 | Endurecer validacao, transacoes, arquivo/delete seguro e atomicidade do CRUD do license server | Alta | license-server/crud | F2 | estado parcial, perda de auditoria e conflitos silenciosos | M | Alto | Acompanhar | materializado na F2.4 com validacao forte, transacoes explicitas em `activate`/mutacoes administrativas e arquivo logico no painel |
 | BG-006 | Definir modelo de estados do licenciamento: activar, reactivar, renovar, revogar, expirar, grace e offline | Alta | licenciamento | F3 | suporte e troubleshooting continuarem dependentes de tentativa e erro | M | Alto | Em execucao na F3.1 | contrato canónico inicial e estados/transicoes foram formalizados; validar casos reais segue na F3.2 |
-| BG-007 | Validar robustez do hardware fingerprint em cenarios de mudanca de NIC, VM, reinstall e clock | Alta | licenciamento | F3 | activacoes legitimas falharem ou exigirem workaround manual | M | Alto | Planeado | usar matriz de casos e rollback |
-| BG-008 | Fechar lacunas de previsibilidade em activacao offline e revogacao sem quebrar comportamento actual | Alta | licenciamento | F3 | operador assumir garantias que o sistema ainda nao oferece | M | Alto | Em execucao na F3.1 | F3.1 clarifica o contrato actual e a diferenca entre activacao online e grace/offline; endurecimento operacional continua na F3.2 |
+| BG-007 | Validar robustez do hardware fingerprint em cenarios de mudanca de NIC, VM, reinstall e clock | Alta | licenciamento | F3 | activacoes legitimas falharem ou exigirem workaround manual | M | Alto | Em execucao na F3.2 | matriz canónica de cenarios e politica conservadora fechadas; validacao em appliance/lab continua pendente |
+| BG-008 | Fechar lacunas de previsibilidade em activacao offline e revogacao sem quebrar comportamento actual | Alta | licenciamento | F3 | operador assumir garantias que o sistema ainda nao oferece | M | Alto | Em execucao na F3.2 | F3.1 clarifica o contrato actual e a diferenca entre activacao online e grace/offline; F3.2 fecha fingerprint/binding e preserva a validacao pratica de offline/grace para lab |
 | BG-009 | Consolidar confiabilidade de package/daemon em reboot, reload, upgrade, rollback e reinicio de servico | Alta | package/daemon | F4 | runtime continuar a divergir entre estado desejado e estado real | G | Alto | Planeado | exige evidencias em appliance |
 | BG-010 | Hardening da trilha de blacklists UT1: download, cron, reload, fallback, except tables e forcing DNS | Alta | blacklists | F4 | subsistema seguir operacionalmente fragil apesar de funcional | G | Alto | Bloqueado pela fase | documentos da trilha ja existem e devem ser usados |
 | BG-011 | Validar forcing DNS e anti-bypass em cenarios reais de VLAN/interface, excepcoes e tabelas PF | Alta | daemon/enforcement | F4 | bypass continuar a aparecer em combinacoes menos comuns | M | Alto | Planeado | derivado das correccoes recentes em `rdr` |

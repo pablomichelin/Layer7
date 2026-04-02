@@ -121,8 +121,19 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 11.3 | Corrida de primeira activação com `hardware_id` diferente mantém bind único e rejeita o segundo com `409` | revisão de código/backend | OK (2026-04-01) |
 | 11.4 | Grace local de `14` dias continua funcional no daemon com `.lic` expirado já emitido | appliance | Pendente (F3.2) |
 | 11.5 | Activação online de licença expirada continua a falhar fechado sem quebrar a licença local já emitida | appliance | Pendente (F3.2) |
-| 11.6 | Fingerprint mantém previsibilidade em reinstall, VM e troca de NIC sem workaround não documentado | appliance/lab | Pendente (F3.2) |
+| 11.6 | Fingerprint mantém previsibilidade documentada em reinstall, troca de NIC, clone de VM, restore, migracao de hypervisor e appliance com multiplas NICs | appliance/lab | Pendente (F3.2) |
 | 11.7 | Renovação + re-activação reemite `.lic` actualizado sem quebrar o bind existente | appliance | Pendente (F3.2) |
+
+### Addendum operativo da F3.2
+
+| Cenario manual a observar | Expectativa conservadora actual |
+|---------------------------|---------------------------------|
+| Reinstalacao sem troca de hardware | manter bind apenas se `kern.hostuuid` e MAC efectiva permanecerem iguais |
+| Troca de NIC / MAC | tender a gerar fingerprint novo e exigir accao administrativa |
+| Reordenacao de interfaces | pode trocar a primeira NIC elegivel e provocar falso bloqueio |
+| Clone de VM | tratar como reactivacao suspeita por defeito |
+| Restore de snapshot | aceitar apenas se o fingerprint resultante continuar igual |
+| Migracao de hypervisor | nao assumir compatibilidade sem validar fingerprint antes e depois |
 
 ---
 

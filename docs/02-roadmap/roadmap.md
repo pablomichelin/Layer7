@@ -323,8 +323,16 @@ falha.
   expiracao, a clarificar a diferenca entre activacao online e grace local do
   daemon, e a materializar um primeiro endurecimento de idempotencia segura
   em `POST /api/activate`.
-- **Proxima subfase elegivel:** `F3.2 — expiracao, grace, offline e matriz de
-  fingerprint em cenarios reais`.
+- **F3.2 executada de forma conservadora em `2026-04-01`:**
+  `docs/01-architecture/f3-fingerprint-e-binding.md` passa a formalizar a
+  formula real do fingerprint, a dependencia de `kern.hostuuid` e da primeira
+  MAC Ethernet nao-loopback, a matriz de cenarios reais do appliance e a
+  politica de compatibilidade da fase; o unico ajuste tecnico aceite fica
+  restrito a normalizacao defensiva do `hardware_id` persistido no servidor
+  antes de comparacao/emissao do `.lic`, sem mudar o algoritmo base.
+- **Proximo passo seguro dentro da F3:** validar em appliance/lab os cenarios
+  pendentes de reinstall, troca de NIC, clone de VM, restore, grace e
+  migracao, sem abrir F4/F5/F6/F7.
 
 ### Criterios de saida
 
@@ -341,6 +349,7 @@ falha.
 
 - `CORTEX.md`
 - `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`
+- `docs/01-architecture/f3-fingerprint-e-binding.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`

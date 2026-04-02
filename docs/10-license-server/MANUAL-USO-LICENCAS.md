@@ -24,6 +24,16 @@
 > hardware e tratada como idempotente, licencas expiradas sao recusadas pelo
 > servidor na activacao online, e o grace period de `14` dias continua a
 > existir apenas na verificacao local do daemon para um `.lic` ja emitido.
+>
+> Estado canónico apos a F3.2: a matriz real de fingerprint/binding do
+> appliance passa a viver em
+> `docs/01-architecture/f3-fingerprint-e-binding.md`. A politica oficial fica
+> conservadora: o bind continua ancorado ao `hardware_id` exacto calculado
+> pelo daemon actual, sem rebind automatico; reinstall, restore e migracao so
+> sao tratados como reactivacao legitima quando preservam o mesmo fingerprint;
+> clone de VM, troca de NIC, regeneracao de MAC e mudanca de `kern.hostuuid`
+> passam a ser tratados como cenarios que exigem validacao humana e eventual
+> accao administrativa.
 
 ---
 
@@ -266,6 +276,20 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
 - um `.lic` ja emitido continua sujeito ao grace local de `14` dias no daemon
 - esta diferenca e comportamento actual oficial; a harmonizacao operacional
   fica para as proximas subfases da F3
+
+### 5.5 Politica conservadora de fingerprint e binding
+
+- o fingerprint oficial continua a ser `SHA256(kern.hostuuid + ":" + primeira MAC Ethernet nao-loopback)`
+- o servidor nao recalcula o fingerprint; trata `hardware_id` como valor
+  opaco e exige igualdade exacta apos o primeiro bind
+- reinstall ou restore so contam como reactivacao legitima se o fingerprint
+  resultante continuar exactamente igual
+- clone de VM, troca de NIC, MAC regenerado, mudanca de `kern.hostuuid` ou
+  reorder efectivo da primeira NIC elegivel podem produzir novo fingerprint
+- se o fingerprint mudou, o comportamento oficial continua a ser falhar
+  fechado na activacao online e exigir decisao administrativa explicita
+- detalhes da matriz operacional estao em
+  `docs/01-architecture/f3-fingerprint-e-binding.md`
 
 ---
 
