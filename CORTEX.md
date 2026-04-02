@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`
+**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -208,7 +208,14 @@ seguinte, materializada em
 backend publico e o origin continuaram acessiveis, mas a F3.11 ficou
 bloqueada por falta de acesso a shell/DB do deploy observado, falta de
 credencial administrativa autorizada, falta de appliance pfSense
-autenticavel e falta de inventario real `LIC-A` a `LIC-F`.
+autenticavel e falta de inventario real `LIC-A` a `LIC-F`. O saneamento
+minimo seguinte, registado em
+`docs/01-architecture/f3-11-readiness-saneamento.md`, confirmou ainda que
+`origin/main` permanece em `66e00f5a36e78056aae27df6aea0ccbd0ed78553`,
+enquanto o branch local continuava `ahead 18`, e observou no live uma
+divergencia adicional de politica HTTP/admin: `/api/auth/login` continua a
+aceitar `Origin` externo com `Access-Control-Allow-Origin: *`, contrariando o
+contrato canónico `same-origin only` da F2.3.
 
 **Trilha activa dentro da F3:** `F3.11 bloqueada — a campanha real nao foi
 aberta porque os pre-requisitos da F3.10 continuam incompletos no ambiente
@@ -344,6 +351,14 @@ appliance pfSense autenticavel e inventario minimo de licencas por cenario`
   `https://license.systemup.inf.br` e ao origin
   `http://192.168.100.244:8445`, mas isso nao substitui shell/DB access ao
   deploy observado nem prova a revisao efectiva do ambiente.
+- O saneamento minimo seguinte confirmou remotamente que `origin/main` esta
+  em `66e00f5a36e78056aae27df6aea0ccbd0ed78553`, enquanto o branch local
+  seguia `ahead 18`; continua sem prova se o live observado corresponde ao
+  remoto, ao local ou a outro estado intermédio.
+- O live observado em `/api/auth/login` continua a expor
+  `Access-Control-Allow-Origin: *` e a aceitar preflight com `Origin`
+  externo, o que diverge do contrato `same-origin only` aceite na F2.3; isto
+  e drift operacional/documental a registar, nao a corrigir no escuro.
 - Antes da F3.11 tem de existir, no ambiente escolhido para a campanha:
   deploy observavel face ao repo com acesso suficiente a queries objectivas,
   schema alinhado ao contrato canónico, credencial administrativa
