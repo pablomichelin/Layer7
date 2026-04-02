@@ -380,10 +380,19 @@ falha.
   `admin_login_guards`, e `activate` live a responder `403` onde a F3.8 exige
   `409`), alem de falta de appliance pfSense autenticavel e de credencial
   administrativa autorizada para os cenarios administrativos.
-- **Proximo passo seguro dentro da F3:** alinhar o ambiente real da campanha
-  (deploy, credencial administrativa e appliance pfSense) ao contrato
-  canónico e so depois reexecutar a F3.9 com novo `run_id`, sem abrir
-  F4/F5/F6/F7.
+- **F3.10 concluida como saneamento documental-operacional em `2026-04-02`:**
+  `docs/01-architecture/f3-matriz-prerequisitos-campanha.md` passa a fixar o
+  minimo obrigatorio de credenciais, acessos, estado de deploy/schema,
+  appliance e inventario de licencas para a proxima campanha;
+  `docs/01-architecture/f3-matriz-drift-operacional.md` passa a classificar
+  os drifts observados na F3.9; e
+  `docs/01-architecture/f3-runbook-proxima-campanha-real.md` passa a definir
+  a ordem sequencial, os criterios de aborto antecipado e as evidencias
+  obrigatorias da proxima rodada, sem mudar o gate da F3.
+- **Proximo passo seguro dentro da F3:** abrir a F3.11 apenas depois de
+  satisfazer a matriz de pre-requisitos da F3.10 e de eliminar ou contornar
+  com ambiente elegivel os drifts criticos observados na F3.9; sem isso, a
+  campanha seguinte nao deve ser tratada como rodada valida de fechamento.
 
 ### Criterios de saida
 

@@ -26,7 +26,7 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada
 **Versao segura conhecida do pacote:** `1.8.3`
-**Data-base deste checkpoint:** `2026-04-01`
+**Data-base deste checkpoint:** `2026-04-02`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
 GUI integrada, classificacao Layer 7 via nDPI, politicas granulares,
@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`
+**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -196,12 +196,20 @@ canónico da F2/F3 (schema live sem `admin_sessions`, `admin_audit_log` e
 `admin_login_guards`, e `POST /api/activate` live a responder `403` onde a
 F3.8 exige `409`), ausencia de appliance pfSense autenticavel para a metade
 local da campanha e ausencia de credencial administrativa autorizada para
-S04-S06/S10 sem mexer no deploy vivo.
+S04-S06/S10 sem mexer no deploy vivo. A **F3.10** converteu estes achados em
+artefactos canónicos de saneamento: a matriz de pre-requisitos em
+`docs/01-architecture/f3-matriz-prerequisitos-campanha.md`, a matriz de
+drift operacional em
+`docs/01-architecture/f3-matriz-drift-operacional.md` e o runbook sequencial
+da proxima campanha em
+`docs/01-architecture/f3-runbook-proxima-campanha-real.md`.
 
-**Trilha activa dentro da F3:** `F3.9 — alinhar o ambiente real da campanha
-(deploy, credencial administrativa e appliance pfSense) ao contrato canónico
-do repositório e reexecutar a campanha com novo run_id; a F3 permanece
-aberta enquanto qualquer obrigatorio continuar fora de PASS`
+**Trilha activa dentro da F3:** `F3.10 concluida — a F3.11 so pode abrir
+como nova campanha real depois de satisfazer a matriz de pre-requisitos,
+saneando os drifts criticos do deploy observado, confirmando credencial
+administrativa autorizada, disponibilizando appliance pfSense autenticavel e
+montando inventario minimo de licencas por cenario; a F3 permanece aberta
+enquanto qualquer obrigatorio continuar fora de PASS`
 
 ### Ordem segura das fases
 
@@ -222,21 +230,28 @@ aberta enquanto qualquer obrigatorio continuar fora de PASS`
 
 1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
-2. Alinhar o ambiente da campanha real da F3 ao contrato canónico do
-   repositório antes de nova rodada, fechando explicitamente os blockers
-   revelados pela F3.9: drift do deploy observado, falta de credencial
-   administrativa autorizada e falta de appliance pfSense autenticavel.
-3. Reexecutar a campanha real da F3 em novo bloco proprio, usando
+2. Satisfazer explicitamente a
+   `docs/01-architecture/f3-matriz-prerequisitos-campanha.md` antes de nova
+   rodada, saneando os blockers revelados pela F3.9: drift do deploy
+   observado, falta de credencial administrativa autorizada, falta de
+   appliance pfSense autenticavel e falta de inventario minimo por cenario.
+3. Tratar a
+   `docs/01-architecture/f3-matriz-drift-operacional.md` como lista canónica
+   de desvios a eliminar ou contornar com ambiente substituto antes da
+   F3.11, sem corrigir live "no escuro".
+4. Reexecutar a campanha real da F3 em novo bloco proprio, usando
    `docs/01-architecture/f3-validacao-manual-evidencias.md` como matriz
    factual, `docs/01-architecture/f3-pack-operacional-validacao.md` como
-   runbook de recolha/classificacao das evidencias e
+   pack de recolha/classificacao das evidencias,
    `docs/01-architecture/f3-gate-fechamento-validacao.md` como gate oficial
-   de saida e regra de decisao final da fase.
-4. So declarar a F3 fechada se o relatorio final de campanha indicar
+   de saida, e
+   `docs/01-architecture/f3-runbook-proxima-campanha-real.md` como ordem
+   sequencial minima da F3.11.
+5. So declarar a F3 fechada se o relatorio final de campanha indicar
    explicitamente `F3 pode fechar`, com todos os cenarios obrigatorios da
    F3.8 em `PASS`; qualquer `FAIL`, `INCONCLUSIVE` ou `BLOCKED` obrigatorio
    mantem a F3 aberta.
-5. Usar o backlog canónico como fila unica antes de tocar em
+6. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
 ---
@@ -312,6 +327,14 @@ aberta enquanto qualquer obrigatorio continuar fora de PASS`
   por ausencia de credencial administrativa autorizada para a campanha; sem
   esses pre-requisitos, S01, S04-S06, S08, S10-S13 continuam sem prova real
   suficiente.
+- A F3.10 fixa como blockers operacionais actuais: drift de schema, drift de
+  contrato HTTP em `activate`, falta de credencial administrativa autorizada,
+  falta de appliance pfSense autenticavel e falta de inventario minimo de
+  licencas por cenario; a F3.11 nao deve reaprender estes blockers na marra.
+- Antes da F3.11 tem de existir, no ambiente escolhido para a campanha:
+  deploy observavel face ao repo, schema alinhado ao contrato canónico,
+  credencial administrativa exercitavel, appliance com baseline recolhivel e
+  inventario LIC-A a LIC-F preparado para os cenarios obrigatorios.
 - Nao existe ainda trilha dedicada para transferencia entre clientes,
   desrevogacao ou rebind seguro com governanca explicita.
 - O fingerprint continua dependente de `SHA256(kern.hostuuid + ":" + primeira
