@@ -23,4 +23,8 @@ Segredos, ownership operacional e bootstrap administrativo do license server:
 Backup/restore e recuperacao minima do PostgreSQL do license server:
 [`license-server-backup-restore.md`](license-server-backup-restore.md).
 
+Checklist live de desbloqueio da F3.11 (host, DB, admin, appliance e
+inventario reais):
+[`f3-11-live-access-checklist.md`](f3-11-live-access-checklist.md).
+
 Runbooks especificos por release entram aqui quando existirem.
