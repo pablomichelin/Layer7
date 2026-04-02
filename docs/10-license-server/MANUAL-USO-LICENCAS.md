@@ -76,6 +76,13 @@
 > `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`, template markdown por cenario
 > e helper shell barato para exportar `licenses`, `activations_log` e
 > `admin_audit_log` sem mudar o produto.
+>
+> Estado canónico apos a F3.8: o gate oficial de fechamento da F3 passa a
+> viver em `docs/01-architecture/f3-gate-fechamento-validacao.md`, com matriz
+> objectiva por cenario, classificacao de pendencias bloqueantes vs
+> nao bloqueantes e exigencia de relatorio final unico de campanha em
+> `docs/tests/templates/f3-validation-campaign-report.md`. Ausencia de
+> evidencia deixa de poder ser tratada como `PASS`.
 
 ---
 
@@ -371,6 +378,9 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
   `docs/01-architecture/f3-validacao-manual-evidencias.md`
 - a operacionalizacao dessa leitura passa a estar consolidada em
   `docs/01-architecture/f3-pack-operacional-validacao.md`
+- o gate oficial de fechamento e o relatorio final unico da campanha passam
+  a estar consolidados em
+  `docs/01-architecture/f3-gate-fechamento-validacao.md`
 - os cenarios obrigatorios da F3.6 incluem:
   - activacao inicial e reactivacao legitima
   - `409` para hardware diferente em licenca bindada
@@ -385,6 +395,9 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
   - evidencia local do appliance quando aplicavel
 - a F3.7 acrescenta apenas o pack operacional, o template e o helper shell
   barato para reduzir ambiguidade humana; ela **nao** cria nova feature.
+- a F3.8 acrescenta apenas o gate final, o relatorio unico de campanha e um
+  helper opcional de inicializacao da campanha; ela **nao** cria nova
+  feature nem permite fechar a F3 por ausencia de prova.
 
 ---
 

@@ -36,6 +36,7 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] na F3.3, semantica de expiracao/revogacao/grace e validade offline do `.lic` foi formalizada antes de qualquer ajuste adicional de codigo
 - [ ] na F3.6, matriz canónica de validacao manual/evidencias foi formalizada antes de qualquer ajuste adicional de codigo
 - [ ] na F3.7, pack operacional com nomes de ficheiros, estados de resultado e template de evidencia foi formalizado antes de qualquer tentativa de “automatizar” o laboratorio
+- [ ] na F3.8, gate canónico de fechamento, classificacao bloqueante/nao bloqueante e relatorio final unico de campanha foram formalizados antes de qualquer declaracao de fecho da F3
 - [ ] sem refactor amplo nao solicitado
 - [ ] sem mover/apagar/renomear antes da F6
 - [ ] sem tratar documento historico como SSOT
@@ -78,6 +79,8 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] nenhum “OK” foi marcado sem prova minima
 - [ ] na F3.6, cada cenario obrigatorio tem comando objectivo, expectativa e evidencia minima declarados
 - [ ] na F3.7, cada execucao manual obrigatoria tem directoria por `run_id`, ficheiros de evidencia com nome padronizado e decisao final `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`
+- [ ] na F3.8, cada cenario obrigatorio so fecha a F3 se estiver em `PASS` com evidencia real; `FAIL`, `INCONCLUSIVE` ou `BLOCKED` obrigatorio mantem a fase aberta
+- [ ] na F3.8, existe relatorio final unico de campanha com contagem de resultados e conclusao explicita `F3 pode fechar` / `F3 nao pode fechar`
 
 ---
 
@@ -132,7 +135,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | F0 | um novo agente entende o projecto lendo poucos documentos canónicos |
 | F1 | cadeia de confianca de distribuicao, blacklists e fallback deixa de depender de conhecimento implícito |
 | F2 | license server opera com publicacao segura, sessao administrativa revogavel, bootstrap controlado e operacao sob controlo |
-| F3 | activacao, revogacao e offline ficam previsiveis, com estados/transicoes explicitos e semantica documentada para repeticao, concorrencia e expiracao |
+| F3 | activacao, revogacao e offline ficam previsiveis, com estados/transicoes explicitos, evidencias reais dos cenarios obrigatorios e relatorio final de campanha antes do fecho |
 | F4 | package, daemon e blacklists operam com runtime mais confiavel |
 | F5 | existe malha real de nao regressao por componente |
 | F6 | reorganizacao fisica acontece sem perda de contexto nem links quebrados |
@@ -147,7 +150,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | F0 | `CORTEX`, `AGENTS`, indice docs, roadmap, backlog, checklist, classificacao, equivalencia, ADR index |
 | F1 | `CORTEX`, `docs/01-architecture/f1-arquitetura-de-confianca.md`, backlog, `docs/02-roadmap/f1-plano-de-implementacao.md`, ADR-0003 a ADR-0006 |
 | F2 | `CORTEX`, `docs/01-architecture/f2-arquitetura-license-server.md`, `docs/02-roadmap/f2-plano-de-implementacao.md`, backlog, docs de licencas, runbooks de publicacao/sessao/segredos/backup-restore do servidor, ADR-0007 a ADR-0010 |
-| F3 | `CORTEX`, `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`, `docs/01-architecture/f3-fingerprint-e-binding.md`, `docs/01-architecture/f3-expiracao-revogacao-grace.md`, `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`, `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`, `docs/01-architecture/f3-validacao-manual-evidencias.md`, `docs/01-architecture/f3-pack-operacional-validacao.md`, backlog, docs de licencas, matriz de testes, ADRs afectados |
+| F3 | `CORTEX`, `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`, `docs/01-architecture/f3-fingerprint-e-binding.md`, `docs/01-architecture/f3-expiracao-revogacao-grace.md`, `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`, `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`, `docs/01-architecture/f3-validacao-manual-evidencias.md`, `docs/01-architecture/f3-pack-operacional-validacao.md`, `docs/01-architecture/f3-gate-fechamento-validacao.md`, backlog, docs de licencas, matriz de testes, ADRs afectados |
 | F4 | `CORTEX`, backlog, `MANUAL-INSTALL`, docs de blacklists, runbooks, changelog |
 | F5 | `CORTEX`, backlog, docs de testes, checklist mestre, evidencias |
 | F6 | `CORTEX`, backlog, classificacao, equivalencia, changelog estrutural |

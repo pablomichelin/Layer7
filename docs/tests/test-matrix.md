@@ -179,13 +179,16 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | Dois downloads administrativos da mesma licenca | cada acto fica auditado, mesmo sem versionamento forte no `.lic` |
 | Artefacto antigo e artefacto novo coexistirem em campo | continua possivel; a trilha auditada melhora investigacao, nao enforcement |
 
-### Addendum operativo da F3.6/F3.7
+### Addendum operativo da F3.6/F3.7/F3.8
 
 Referencia canónica detalhada:
 `docs/01-architecture/f3-validacao-manual-evidencias.md`
 
 Pack operacional, template e convencao de ficheiros:
 `docs/01-architecture/f3-pack-operacional-validacao.md`
+
+Gate oficial de fechamento e relatorio final unico de campanha:
+`docs/01-architecture/f3-gate-fechamento-validacao.md`
 
 | ID | Cenario manual a observar | Classificacao F3.6 | Evidencia minima esperada |
 |----|---------------------------|--------------------|---------------------------|
@@ -229,4 +232,6 @@ blocos de validacao em appliance/lab. A F3.6 decompõe esses 4 blocos em 13
 cenarios manuais explicitos com comandos, evidencias minimas e classificacao
 obrigatorio/desejavel, sem fingir que a execucao real ja aconteceu; a F3.7
 operacionaliza a recolha dessas evidencias com pack por `run_id`, nomes
-padronizados de ficheiros e template minimo por cenario.
+padronizados de ficheiros e template minimo por cenario; a F3.8 acrescenta o
+gate final e o relatorio unico da campanha para impedir fecho da fase sem
+todos os obrigatorios em `PASS`.

@@ -28,4 +28,9 @@ aprovacao/reprovacao, descrita em
 A F3.7 operacionaliza essa matriz em
 [`../01-architecture/f3-pack-operacional-validacao.md`](../01-architecture/f3-pack-operacional-validacao.md)
 e acrescenta um template minimo em
-[`templates/f3-scenario-evidence.md`](templates/f3-scenario-evidence.md).
+[`templates/f3-scenario-evidence.md`](templates/f3-scenario-evidence.md). A
+F3.8 acrescenta o gate oficial de fechamento em
+[`../01-architecture/f3-gate-fechamento-validacao.md`](../01-architecture/f3-gate-fechamento-validacao.md)
+e o relatorio final unico da campanha em
+[`templates/f3-validation-campaign-report.md`](templates/f3-validation-campaign-report.md):
+sem esse relatorio e sem todos os obrigatorios em `PASS`, a F3 nao fecha.

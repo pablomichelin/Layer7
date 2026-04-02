@@ -67,6 +67,7 @@ vence o canónico.
 | `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md` | emissao/reemissao/rastreabilidade F3.5 | consolidado canónico da trilha real de emissao do `.lic`, da governanca de reemissao e da rastreabilidade minima do artefacto | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/01-architecture/f3-validacao-manual-evidencias.md` | validacao manual/evidencias F3.6 | consolidado canónico da matriz manual de cenarios, evidencias minimas, comandos objectivos e politica de validacao suficiente da F3 | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/01-architecture/f3-pack-operacional-validacao.md` | pack operacional F3.7 | consolidado canónico da estrutura de evidencias, convencoes de nomes, estados de resultado e runbook operacional da validacao manual | Canónico | novo | manter vivo durante a F3 | F3 |
+| `docs/01-architecture/f3-gate-fechamento-validacao.md` | gate de fechamento F3.8 | consolidado canónico do gate oficial de saida da F3, da matriz objectiva de decisao por cenario e da classificacao de pendencias bloqueantes/nao bloqueantes | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/02-roadmap/roadmap.md` | fases F0-F7 | roadmap canónico | Canónico | substitui `03-ROADMAP-E-FASES.md` como SSOT | manter vivo | F0+ |
 | `docs/02-roadmap/backlog.md` | backlog | backlog unico priorizado | Canónico | substitui `04-BACKLOG-MVP-E-VERSOES.md` | manter vivo | F0+ |
 | `docs/02-roadmap/checklist-mestre.md` | gates | checklist mestre da evolucao segura | Canónico | substitui `14-CHECKLIST-MESTRE.md` | manter vivo | F0+ |
@@ -140,6 +141,7 @@ vence o canónico.
 | `docs/tests/README.md` | estrategia de testes | entrada canónica da area de testes | Canónico | sobrepoe `docs/04-tests/README.md` | manter vivo | F5 |
 | `docs/tests/test-matrix.md` | matriz de testes | matriz canónica de referencia | Canónico | complementar ao plano antigo de testes | manter/rever na F5 | F5 |
 | `docs/tests/templates/f3-scenario-evidence.md` | template de evidencia F3 | template minimo para registo operacional por cenario da F3.7 | Placeholder | novo | manter enquanto a F3 estiver aberta | F3/F5 |
+| `docs/tests/templates/f3-validation-campaign-report.md` | relatorio final de campanha F3 | template canónico do relatorio final unico da campanha de validacao da F3.8 | Placeholder | novo | manter enquanto a F3 estiver aberta | F3/F5 |
 | `docs/tutorial/guia-completo-layer7.md` | tutorial longo | guia amplo preservado para contexto e clientes | Preservado por compatibilidade | nao substitui `MANUAL-INSTALL.md` nem `CORTEX.md` | refrescar numa fase posterior | F7 |
 
 ---
@@ -156,6 +158,7 @@ vence o canónico.
 | `scripts/lab/LAB-SETUP.md` | setup do lab | guia local do lab | Suplementar | complementar a docs de lab | rever se o lab mudar | F5 |
 | `scripts/lab/README.md` | automacao lab | indice curto | Suplementar | — | manter leve | F6 |
 | `scripts/license-validation/export-license-evidence.sh` | exportacao de evidencias F3 | helper shell barato para exportar snapshot de licenca e trilhas de auditoria sem tocar no produto | Suplementar | novo | manter apenas como apoio operacional conservador | F3/F5 |
+| `scripts/license-validation/init-f3-validation-campaign.sh` | inicializacao de campanha F3 | helper shell barato para materializar directoria de campanha, manifest inicial e relatorio final da F3.8 sem tocar no produto | Suplementar | novo | manter apenas como apoio operacional conservador | F3/F5 |
 | `scripts/package/README.md` | scripts do pacote | apoio tecnico local | Suplementar | complementar a docs package/tests | rever na F5/F7 | F5/F7 |
 | `scripts/release/README.md` | release/frota | referencia local de release | Suplementar | complementar a `docs/06-releases/` | rever quando F7 abrir | F7 |
 | `src/README.md` | mapa do codigo | guia local antigo da arvore de codigo | Historico | complementar a docs core | rever na F6 | F6 |

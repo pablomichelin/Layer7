@@ -18,6 +18,15 @@ Incluido na F3.7:
 - disponibilizar um helper shell barato para exportar contexto do backend;
 - disponibilizar um template markdown para registo da execucao por cenario.
 
+Complemento formal apos a F3.8:
+
+- [`f3-gate-fechamento-validacao.md`](f3-gate-fechamento-validacao.md)
+  passa a fixar o gate final de saida da F3;
+- `docs/tests/templates/f3-validation-campaign-report.md` passa a ser o
+  relatorio final unico da campanha;
+- `scripts/license-validation/init-f3-validation-campaign.sh` passa a ser o
+  helper shell opcional para materializar a directoria raiz da campanha.
+
 Fora de escopo na F3.7:
 
 - mexer em `activate`, `download`, `.lic`, daemon ou fingerprint;
@@ -103,6 +112,8 @@ Regra conservadora:
 ```text
 ${TMPDIR:-/tmp}/layer7-f3-evidence/
 └── <RUN_ID>/
+    ├── 00-campaign-manifest.txt
+    ├── f3-validation-campaign-report.md
     ├── S01/
     ├── S02/
     ├── S03/
@@ -189,6 +200,18 @@ Limites do helper:
 - nao altera relogio nem appliance;
 - nao chama endpoints de mutacao;
 - nao muda schema, contrato ou dados do produto.
+
+Helper opcional de campanha apos a F3.8:
+
+```text
+scripts/license-validation/init-f3-validation-campaign.sh
+```
+
+Finalidade:
+
+- criar a directoria raiz da campanha por `run_id`;
+- copiar o relatorio final canónico da campanha;
+- preparar directoria/manifest minimo por cenario.
 
 ### 3.2 Template markdown
 

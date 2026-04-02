@@ -11,6 +11,10 @@ Complemento operacional da fase:
   directoria, nomes de ficheiros, estados `PASS` / `FAIL` /
   `INCONCLUSIVE` / `BLOCKED`, template de registo e helper shell barato para
   exportar evidencias de backend.
+- [`f3-gate-fechamento-validacao.md`](f3-gate-fechamento-validacao.md)
+  transforma esta politica de validacao suficiente no gate oficial de
+  fechamento da F3.8, com relatorio final unico de campanha e regra explicita
+  para decidir se a F3 pode ou nao fechar.
 
 Objectivo da subfase:
 
@@ -193,6 +197,12 @@ A F3 so pode ser tratada como **substancialmente validada** quando:
    - estado efectivo do backend;
    - auditoria do artefacto;
    - estado local do daemon.
+
+Leitura adicional obrigatoria apos a F3.8:
+
+- a decisao formal de fecho da F3 deixa de viver implicitamente nesta
+  definicao e passa a ser regida por
+  [`f3-gate-fechamento-validacao.md`](f3-gate-fechamento-validacao.md).
 
 ### 3.2 O que nao e necessario para "substancialmente validada"
 

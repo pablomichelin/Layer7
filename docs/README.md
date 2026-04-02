@@ -42,7 +42,7 @@ Quando houver conflito, seguir esta ordem:
 | Area | Documento(s) de entrada | Estado |
 |------|--------------------------|--------|
 | Visao de produto | [`00-overview/product-charter.md`](00-overview/product-charter.md) | canónico |
-| Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md), [`01-architecture/f2-arquitetura-license-server.md`](01-architecture/f2-arquitetura-license-server.md), [`01-architecture/f3-arquitetura-licenciamento-ativacao.md`](01-architecture/f3-arquitetura-licenciamento-ativacao.md), [`01-architecture/f3-fingerprint-e-binding.md`](01-architecture/f3-fingerprint-e-binding.md), [`01-architecture/f3-expiracao-revogacao-grace.md`](01-architecture/f3-expiracao-revogacao-grace.md), [`01-architecture/f3-mutacao-admin-reemissao-guardrails.md`](01-architecture/f3-mutacao-admin-reemissao-guardrails.md), [`01-architecture/f3-emissao-reemissao-rastreabilidade.md`](01-architecture/f3-emissao-reemissao-rastreabilidade.md), [`01-architecture/f3-validacao-manual-evidencias.md`](01-architecture/f3-validacao-manual-evidencias.md), [`01-architecture/f3-pack-operacional-validacao.md`](01-architecture/f3-pack-operacional-validacao.md), [`core/README.md`](core/README.md) | canónico |
+| Arquitectura | [`01-architecture/target-architecture.md`](01-architecture/target-architecture.md), [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md), [`01-architecture/f2-arquitetura-license-server.md`](01-architecture/f2-arquitetura-license-server.md), [`01-architecture/f3-arquitetura-licenciamento-ativacao.md`](01-architecture/f3-arquitetura-licenciamento-ativacao.md), [`01-architecture/f3-fingerprint-e-binding.md`](01-architecture/f3-fingerprint-e-binding.md), [`01-architecture/f3-expiracao-revogacao-grace.md`](01-architecture/f3-expiracao-revogacao-grace.md), [`01-architecture/f3-mutacao-admin-reemissao-guardrails.md`](01-architecture/f3-mutacao-admin-reemissao-guardrails.md), [`01-architecture/f3-emissao-reemissao-rastreabilidade.md`](01-architecture/f3-emissao-reemissao-rastreabilidade.md), [`01-architecture/f3-validacao-manual-evidencias.md`](01-architecture/f3-validacao-manual-evidencias.md), [`01-architecture/f3-pack-operacional-validacao.md`](01-architecture/f3-pack-operacional-validacao.md), [`01-architecture/f3-gate-fechamento-validacao.md`](01-architecture/f3-gate-fechamento-validacao.md), [`core/README.md`](core/README.md) | canónico |
 | Roadmap e execucao | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md), [`02-roadmap/backlog.md`](02-roadmap/backlog.md), [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md), [`02-roadmap/f1-plano-de-implementacao.md`](02-roadmap/f1-plano-de-implementacao.md), [`02-roadmap/f2-plano-de-implementacao.md`](02-roadmap/f2-plano-de-implementacao.md) | canónico |
 | ADRs | [`03-adr/README.md`](03-adr/README.md) | canónico |
 | Package e validacao | [`04-package/README.md`](04-package/README.md), [`04-package/validacao-lab.md`](04-package/validacao-lab.md) | suplementar/operacional |
@@ -53,7 +53,7 @@ Quando houver conflito, seguir esta ordem:
 | Bloqueio | [`09-blocking/README.md`](09-blocking/README.md) | historico/preservado |
 | Licencas | [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md), [`10-license-server/MANUAL-USO-LICENCAS.md`](10-license-server/MANUAL-USO-LICENCAS.md) | canónico por area |
 | Blacklists UT1 | [`11-blacklists/PLANO-BLACKLISTS-UT1.md`](11-blacklists/PLANO-BLACKLISTS-UT1.md), [`11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`](11-blacklists/DIRETRIZES-IMPLEMENTACAO.md) | canónico da trilha F4 |
-| Testes | [`tests/README.md`](tests/README.md), [`tests/test-matrix.md`](tests/test-matrix.md) | canónico por area |
+| Testes | [`tests/README.md`](tests/README.md), [`tests/test-matrix.md`](tests/test-matrix.md), [`tests/templates/f3-validation-campaign-report.md`](tests/templates/f3-validation-campaign-report.md) | canónico por area |
 | Tutorial longo | [`tutorial/guia-completo-layer7.md`](tutorial/guia-completo-layer7.md) | preservado por compatibilidade; nao e SSOT de instalacao |
 
 ---
@@ -114,7 +114,8 @@ Quando houver conflito, seguir esta ordem:
    `01-architecture/f3-mutacao-admin-reemissao-guardrails.md` e
    `01-architecture/f3-emissao-reemissao-rastreabilidade.md` e
    `01-architecture/f3-validacao-manual-evidencias.md` e
-   `01-architecture/f3-pack-operacional-validacao.md`.
+   `01-architecture/f3-pack-operacional-validacao.md` e
+   `01-architecture/f3-gate-fechamento-validacao.md`.
 6. Ao alterar comportamento tecnico, actualize tambem as docs da area,
    changelog e manuais operacionais afectados.
 7. Evite criar ficheiros novos sem necessidade; prefira consolidar.

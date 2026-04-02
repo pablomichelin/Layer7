@@ -364,27 +364,38 @@ falha.
   classificacao `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`, template
   markdown por cenario e helper shell barato para exportar evidencias do
   backend sem tocar no contrato do produto.
-- **Proximo passo seguro dentro da F3:** executar o pack operacional da F3.7
-  em ambiente controlado para os cenarios pendentes de expiracao com `.lic`
-  ja emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
+- **F3.8 formalizada de forma conservadora em `2026-04-02`:**
+  `docs/01-architecture/f3-gate-fechamento-validacao.md` passa a fixar o
+  gate oficial de fechamento da F3, a matriz objectiva de `PASS` / `FAIL` /
+  `INCONCLUSIVE` / `BLOCKED` por cenario, a classificacao de pendencias
+  bloqueantes vs nao bloqueantes e o relatorio final unico de campanha em
+  `docs/tests/templates/f3-validation-campaign-report.md`, sem declarar a F3
+  fechada antes da execucao real.
+- **Proximo passo seguro dentro da F3:** executar a campanha real da F3 em
+  ambiente controlado para os cenarios pendentes de expiracao com `.lic` ja
+  emitido, revogacao com `.lic` ja emitido, grace local, renovacao +
   reactivacao, coexistencia de artefactos, indisponibilidade do servidor,
-  reinstall, troca de NIC, clone de VM, restore e migracao, sem abrir
-  F4/F5/F6/F7.
+  reinstall, troca de NIC, clone de VM, restore e migracao, preenchendo o
+  relatorio final e aplicando o gate da F3.8 sem abrir F4/F5/F6/F7.
 
 ### Criterios de saida
 
 - fluxo de licenciamento explicado por estado e transicao;
 - casos de falha principais cobertos por matriz manual e evidencias minimas;
 - comportamento offline deixa de depender de tentativa e erro documental;
-- os cenarios obrigatorios da F3.6/F3.7 ficam executados com outputs reais antes
-  do fecho formal da fase.
+- os cenarios obrigatorios da F3.6/F3.7/F3.8 ficam executados com outputs
+  reais antes do fecho formal da fase;
+- existe relatorio final unico de campanha com decisao explicita `F3 pode
+  fechar` ou `F3 nao pode fechar`.
 
 ### Gate
 
 - activacao, revogacao, expiracao e modo offline ficam previsiveis e
   rastreaveis;
 - nenhum "OK" de licenciamento e aceite sem evidencia minima de backend e,
-  quando aplicavel, de appliance.
+  quando aplicavel, de appliance;
+- nenhum cenario obrigatorio da F3 fecha com `FAIL`, `INCONCLUSIVE` ou
+  `BLOCKED`.
 
 ### Documentacao obrigatoria da fase
 
@@ -396,6 +407,7 @@ falha.
 - `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`
 - `docs/01-architecture/f3-validacao-manual-evidencias.md`
 - `docs/01-architecture/f3-pack-operacional-validacao.md`
+- `docs/01-architecture/f3-gate-fechamento-validacao.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`

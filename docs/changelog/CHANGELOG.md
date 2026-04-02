@@ -4,6 +4,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.8 gate de fechamento e relatorio final de campanha
+
+- **Gate canónico da F3.8** —
+  `docs/01-architecture/f3-gate-fechamento-validacao.md` passa a fixar o
+  gate oficial de fechamento da F3, a matriz objectiva de `PASS` / `FAIL` /
+  `INCONCLUSIVE` / `BLOCKED` por cenario e a classificacao explicita de
+  pendencias bloqueantes vs nao bloqueantes
+- **Relatorio final unico da campanha** —
+  `docs/tests/templates/f3-validation-campaign-report.md` passa a servir
+  como artefacto final canónico da execucao real da F3, com resumo
+  executivo, ambiente, veredito por cenario, riscos remanescentes e decisao
+  explicita `F3 pode fechar` / `F3 nao pode fechar`
+- **Helper shell opcional e barato** —
+  `scripts/license-validation/init-f3-validation-campaign.sh` passa a
+  materializar a directoria de campanha por `run_id`, o manifest inicial, os
+  directórios dos cenarios e o template do relatorio, sem tocar produto,
+  daemon, runtime, schema ou contrato externo
+
 ### Changed — F3.7 pack operacional da validacao manual
 
 - **Pack canónico da F3.7** —
