@@ -10,24 +10,21 @@ const { generateSignedLicense } = require('../crypto');
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
 const {
   assertEmptyBody,
-  isLicenseExpired,
   normalizeStoredHardwareId,
   parseIdParam,
   parseLicenseCreatePayload,
   parseLicensesListQuery,
   parseLicenseUpdatePayload,
 } = require('../crud-validation');
+const {
+  applyEffectiveLicenseState,
+  LICENSE_SQL_ACTIVE_CONDITION,
+  LICENSE_SQL_EXPIRED_CONDITION,
+  LICENSE_SQL_REVOKED_CONDITION,
+} = require('../license-state');
 
 const router = Router();
 router.use(auth);
-
-function normalizeLicenseRow(license) {
-  if (license.status === 'active' && isLicenseExpired(license)) {
-    return { ...license, status: 'expired' };
-  }
-
-  return license;
-}
 
 async function ensureVisibleCustomer(client, customerId) {
   const result = await client.query(
@@ -50,12 +47,11 @@ router.get('/', async (req, res) => {
     const params = [];
 
     if (status === 'active') {
-      conditions.push(`l.status = 'active'`);
-      conditions.push('l.expiry >= CURRENT_DATE');
+      conditions.push(LICENSE_SQL_ACTIVE_CONDITION);
     } else if (status === 'expired') {
-      conditions.push(`(l.status = 'expired' OR (l.status = 'active' AND l.expiry < CURRENT_DATE))`);
+      conditions.push(LICENSE_SQL_EXPIRED_CONDITION);
     } else if (status === 'revoked') {
-      conditions.push(`l.status = 'revoked'`);
+      conditions.push(LICENSE_SQL_REVOKED_CONDITION);
     }
 
     if (customerId) {
@@ -90,7 +86,7 @@ router.get('/', async (req, res) => {
     );
 
     return res.json({
-      licenses: result.rows.map(normalizeLicenseRow),
+      licenses: result.rows.map(applyEffectiveLicenseState),
       total,
       page,
       limit,
@@ -140,7 +136,7 @@ router.post('/', async (req, res) => {
       return result.rows[0];
     });
 
-    return res.status(201).json(normalizeLicenseRow(license));
+    return res.status(201).json(applyEffectiveLicenseState(license));
   } catch (error) {
     if (isHttpError(error)) {
       await auditAdminEvent({
@@ -198,7 +194,7 @@ router.get('/:id', async (req, res) => {
     );
 
     return res.json({
-      license: normalizeLicenseRow(licenseResult.rows[0]),
+      license: applyEffectiveLicenseState(licenseResult.rows[0]),
       activations: activationsResult.rows,
     });
   } catch (error) {
@@ -281,7 +277,7 @@ router.put('/:id', async (req, res) => {
       return result.rows[0];
     });
 
-    return res.json(normalizeLicenseRow(updatedLicense));
+    return res.json(applyEffectiveLicenseState(updatedLicense));
   } catch (error) {
     if (isHttpError(error)) {
       await auditAdminEvent({
@@ -361,7 +357,7 @@ router.post('/:id/revoke', async (req, res) => {
       return result.rows[0];
     });
 
-    return res.json(normalizeLicenseRow(revokedLicense));
+    return res.json(applyEffectiveLicenseState(revokedLicense));
   } catch (error) {
     if (isHttpError(error)) {
       await auditAdminEvent({
@@ -411,7 +407,7 @@ router.delete('/:id', async (req, res) => {
         throw createHttpError(404, 'Licenca nao encontrada.');
       }
 
-      const existingLicense = normalizeLicenseRow(existingResult.rows[0]);
+      const existingLicense = applyEffectiveLicenseState(existingResult.rows[0]);
       if (existingLicense.status === 'active') {
         throw createHttpError(409, 'Nao e possivel arquivar licenca activa. Revogue primeiro.');
       }
@@ -501,7 +497,7 @@ router.get('/:id/download', async (req, res) => {
       return res.status(404).json({ error: 'Licenca nao encontrada.' });
     }
 
-    const license = normalizeLicenseRow(result.rows[0]);
+    const license = applyEffectiveLicenseState(result.rows[0]);
     const effectiveHardwareId = normalizeStoredHardwareId(license.hardware_id) || license.hardware_id;
 
     if (!effectiveHardwareId) {

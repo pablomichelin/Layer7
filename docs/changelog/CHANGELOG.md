@@ -4,6 +4,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F3.3 expiracao, revogacao, grace e validade offline
+
+- **Semantica canónica da F3.3** —
+  `docs/01-architecture/f3-expiracao-revogacao-grace.md` passa a registar de
+  forma factual a diferenca entre estado persistido e estado efectivo, o papel
+  exacto do grace local, o limite real da revogacao actual e as condicoes em
+  que um `.lic` antigo continua valido offline
+- **Risco de rebind explicitado** — a trilha documental passa a declarar de
+  forma objectiva que um eventual rebind administrativo e perigoso nesta fase,
+  porque o `.lic` antigo pode continuar operativo offline no hardware antigo
+  ate `expiry + grace`
+- **Estado efectivo centralizado no backend** — o backend passa a usar um
+  helper minimo comum para derivar `active`, `expired` e `revoked` em
+  `activate`, `licenses`, `customers` e `dashboard`, reduzindo ambiguidade
+  sem mudar schema, formato `.lic` ou algoritmo de fingerprint
+
 ### Changed — F3.2 fingerprint, binding e cenarios reais de appliance
 
 - **Matriz canónica de fingerprint/binding** —

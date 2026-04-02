@@ -34,6 +34,15 @@
 > clone de VM, troca de NIC, regeneracao de MAC e mudanca de `kern.hostuuid`
 > passam a ser tratados como cenarios que exigem validacao humana e eventual
 > accao administrativa.
+>
+> Estado canónico apos a F3.3: a semantica real de expiracao, revogacao,
+> validade offline e grace local passa a viver em
+> `docs/01-architecture/f3-expiracao-revogacao-grace.md`. O contrato
+> operacional oficial fica explicito: o servidor corta activacao e download
+> de licenca expirada/revogada, mas o daemon nao consulta o servidor em tempo
+> real; por isso, um `.lic` ja emitido pode continuar valido offline no mesmo
+> hardware ate `expiry + grace`, e qualquer rebind administrativo precoce
+> continua bloqueado por risco real do `.lic` antigo permanecer operacional.
 
 ---
 
@@ -274,10 +283,35 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
 
 - `POST /api/activate` recusa licenca expirada no servidor
 - um `.lic` ja emitido continua sujeito ao grace local de `14` dias no daemon
+- `GET /api/licenses/:id/download` tambem recusa licenca efectivamente
+  expirada
+- o daemon nao faz chamada online para rever expiracao depois de o `.lic`
+  estar em campo
 - esta diferenca e comportamento actual oficial; a harmonizacao operacional
   fica para as proximas subfases da F3
 
-### 5.5 Politica conservadora de fingerprint e binding
+### 5.5 Revogacao online vs validade offline do `.lic`
+
+- `POST /api/licenses/:id/revoke` muda o estado da licenca para `revoked`
+- qualquer activacao futura dessa chave passa a falhar com `409`
+- qualquer download administrativo futuro do `.lic` passa a falhar com `409`
+- o daemon nao consulta o servidor para rever revogacao de um `.lic` ja
+  instalado
+- por isso, um `.lic` ja emitido continua localmente valido ate falhar por:
+  - assinatura
+  - mismatch de `hardware_id`
+  - expiracao + fim do grace
+
+### 5.6 Politica conservadora oficial sobre rebind
+
+- nao existe rebind administrativo oficial nesta fase
+- isso e deliberado: um eventual rebind para novo hardware deixaria o `.lic`
+  antigo ainda potencialmente valido offline no hardware antigo ate
+  `expiry + grace`
+- qualquer futura trilha de rebind fica bloqueada ate existir politica
+  explicita para esse risco
+
+### 5.7 Politica conservadora de fingerprint e binding
 
 - o fingerprint oficial continua a ser `SHA256(kern.hostuuid + ":" + primeira MAC Ethernet nao-loopback)`
 - o servidor nao recalcula o fingerprint; trata `hardware_id` como valor
@@ -358,8 +392,9 @@ curl -s -X POST -b "$COOKIE_JAR" \
 ### O que acontece ao revogar
 
 - O status da licenca muda para `revoked` no servidor
-- O ficheiro `.lic` existente no pfSense **continua valido** ate
-  expirar (o daemon verifica assinatura + data, nao consulta o
+- O ficheiro `.lic` existente no pfSense **continua potencialmente valido**
+  ate falhar por assinatura, mismatch de hardware ou expiracao + grace
+  (o daemon verifica assinatura + fingerprint + data, nao consulta o
   servidor em tempo real)
 - Para efeito imediato: remover o `.lic` do pfSense manualmente
 
@@ -402,6 +437,11 @@ layer7d --activate a1b2c3d4e5f6789012345678abcdef01 https://license.systemup.inf
 ```
 
 O novo `.lic` tera a data de expiracao actualizada.
+
+> **Nota operacional importante:** renovar no servidor nao invalida um `.lic`
+> antigo ja emitido. O novo `.lic` actualiza a expiracao para o mesmo
+> hardware bindado; sem revogacao offline pesada, o artefacto antigo so deixa
+> de valer quando falhar localmente por data/hardware/assinatura.
 
 ---
 

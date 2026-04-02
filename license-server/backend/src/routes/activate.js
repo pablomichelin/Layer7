@@ -3,8 +3,8 @@ const rateLimit = require('express-rate-limit');
 const pool = require('../db');
 const { generateSignedLicense } = require('../crypto');
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
+const { getEffectiveLicenseState } = require('../license-state');
 const {
-  isLicenseExpired,
   normalizeStoredHardwareId,
   parseActivatePayload,
 } = require('../crud-validation');
@@ -61,13 +61,15 @@ router.post('/activate', activateLimiter, async (req, res) => {
       }
 
       const license = result.rows[0];
-      if (license.status === 'revoked') {
+      const effectiveState = getEffectiveLicenseState(license);
+
+      if (effectiveState.revoked) {
         const error = createHttpError(409, 'Licenca revogada.');
         error.licenseId = license.id;
         throw error;
       }
 
-      if (isLicenseExpired(license) || license.status === 'expired') {
+      if (effectiveState.effectiveStatus === 'expired') {
         const error = createHttpError(409, 'Licenca expirada.');
         error.licenseId = license.id;
         throw error;

@@ -8,23 +8,18 @@ const {
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
 const {
   assertEmptyBody,
-  isLicenseExpired,
   parseCustomerCreatePayload,
   parseCustomersListQuery,
   parseCustomerUpdatePayload,
   parseIdParam,
 } = require('../crud-validation');
+const {
+  applyEffectiveLicenseState,
+  LICENSE_SQL_ACTIVE_CONDITION,
+} = require('../license-state');
 
 const router = Router();
 router.use(auth);
-
-function normalizeLicenseRow(license) {
-  if (license.status === 'active' && isLicenseExpired(license)) {
-    return { ...license, status: 'expired' };
-  }
-
-  return license;
-}
 
 router.get('/', async (req, res) => {
   try {
@@ -162,7 +157,7 @@ router.get('/:id', async (req, res) => {
 
     return res.json({
       customer: customerResult.rows[0],
-      licenses: licensesResult.rows.map(normalizeLicenseRow),
+      licenses: licensesResult.rows.map(applyEffectiveLicenseState),
     });
   } catch (error) {
     if (isHttpError(error)) {
@@ -295,8 +290,7 @@ router.delete('/:id', async (req, res) => {
             COUNT(*) FILTER (WHERE archived_at IS NULL) AS total,
             COUNT(*) FILTER (
               WHERE archived_at IS NULL
-                AND status = 'active'
-                AND expiry >= CURRENT_DATE
+                AND ${LICENSE_SQL_ACTIVE_CONDITION}
             ) AS active
            FROM licenses
           WHERE customer_id = $1`,

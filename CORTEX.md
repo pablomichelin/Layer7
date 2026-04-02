@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** `F3 — Abertura controlada em 2026-04-01; F3.1 (robustez do contrato de licenciamento/activacao) em execucao`
+**Fase actual consolidada:** `F3 — aberta em 2026-04-01; F3.1, F3.2 e F3.3 executadas de forma conservadora em 2026-04-01`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -156,10 +156,17 @@ licenciamento/activacao no backend e no daemon, contrato canónico minimo de
 estados/transicoes, clarificacao da diferenca entre expiracao online e grace
 local do daemon, e um primeiro endurecimento defensivo em `POST /api/activate`
 para tornar a reactivacao do mesmo hardware mais idempotente e previsivel sem
-quebrar compatibilidade.
+quebrar compatibilidade. A **F3.2** fechou de forma conservadora a leitura do
+fingerprint/binding em cenarios reais de appliance e a normalizacao defensiva
+do `hardware_id` persistido. A **F3.3** fechou a semantica real de expiracao,
+revogacao, validade offline e grace em documento canónico proprio, e
+materializou um helper minimo de estado efectivo no backend para alinhar
+`activate`, `licenses`, `customers` e `dashboard` sem mudar schema, formato
+`.lic` ou algoritmo de fingerprint.
 
-**Proxima subfase elegivel dentro da F3:** `F3.2 — expiracao, grace, offline e
-matriz de fingerprint em cenarios reais`
+**Proxima subfase elegivel dentro da F3:** `F3.4 — evidencias e validacao
+manual/appliance da matriz de expiracao, revogacao, grace, renovacao e uso
+offline`
 
 ### Ordem segura das fases
 
@@ -180,9 +187,10 @@ matriz de fingerprint em cenarios reais`
 
 1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
-2. Executar a F3.2 em bloco proprio para fechar a semantica de expiracao,
-   grace period, reemissao offline e matriz de casos do fingerprint, sem
-   misturar package/daemon/runtime da F4.
+2. Executar a F3.4 em bloco proprio para validar em appliance/lab os cenarios
+   ja formalizados de expiracao, revogacao, grace, renovacao, indisponibilidade
+   do servidor e matriz real do fingerprint, sem misturar package/daemon/runtime
+   da F4.
 3. Usar o backlog canónico como fila unica antes de tocar em
    codigo, empacotamento, daemon, frontend ou scripts operacionais.
 
@@ -226,13 +234,17 @@ matriz de fingerprint em cenarios reais`
 - A F2.5 fechou o ownership minimo de segredos, bootstrap administrativo e
   backup/restore do banco, mas a rotacao formal da chave Ed25519 em incidente
   e a automacao ampliada de retention/observabilidade continuam fora da F2.
-- A F3.1 clarificou o contrato actual, mas o modelo ainda depende de estado
-  derivado em vez de estado totalmente persistido: `licenses.status = 'expired'`
-  continua opcional/legado e a leitura operacional trata expiracao tambem por
-  `expiry < CURRENT_DATE`.
+- A F3.3 passou a centralizar o estado efectivo da licenca no backend, mas o
+  modelo continua deliberadamente hibrido: `licenses.status = 'expired'`
+  continua opcional/legado e a expiracao efectiva continua a ser derivada
+  tambem por `expiry < CURRENT_DATE`.
 - O daemon aceita `.lic` expirado em grace local de `14` dias, enquanto a
-  activacao online recusa imediatamente licencas expiradas; a diferenca agora
-  esta documentada, mas ainda precisa de tratamento operacional/testes na F3.2.
+  activacao online recusa imediatamente licencas expiradas; a diferenca esta
+  agora formalizada, mas ainda exige validacao manual/appliance na F3.4.
+- A revogacao actual corta activacao e download no servidor, mas **nao**
+  invalida imediatamente um `.lic` ja emitido que continue em uso offline; o
+  risco operacional fica explicito e bloqueia qualquer rebind administrativo
+  precoce.
 - O fingerprint continua dependente de `SHA256(kern.hostuuid + ":" + primeira
   MAC Ethernet nao-loopback)`; mudanca de NIC, VM, reinstall ou ordem de
   interfaces ainda pode exigir validacao dedicada na F3.

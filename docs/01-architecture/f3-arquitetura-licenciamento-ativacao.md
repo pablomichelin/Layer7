@@ -19,6 +19,9 @@ Documento complementar canónico da mesma fase:
 - [`f3-fingerprint-e-binding.md`](f3-fingerprint-e-binding.md) para a
   matriz real do fingerprint, binding ao hardware e politica conservadora da
   F3.2 em cenarios de appliance.
+- [`f3-expiracao-revogacao-grace.md`](f3-expiracao-revogacao-grace.md) para a
+  semantica real de expiracao, revogacao, validade offline e grace local
+  fechada na F3.3.
 
 ---
 
@@ -375,16 +378,16 @@ Resultado esperado:
 
 ## 9. Ordem conservadora das proximas subfases da F3
 
-### F3.2 — expiracao, grace, offline e matriz de fingerprint
+### F3.2 — fingerprint, binding e cenarios reais de appliance
 
-- validar a diferenca entre expiracao online e grace local;
-- documentar e testar reinstall, VM, troca de NIC e clock;
-- fechar o contrato minimo de activacao offline e reemissao manual.
+- formalizar a formula real do fingerprint e os riscos de appliance;
+- fechar a politica conservadora de binding sem alterar o algoritmo base.
 
-### F3.3 — revogacao, renovacao e consistencia administrativa
+### F3.3 — expiracao, revogacao, grace e validade offline
 
-- formalizar como a renovacao volta a ficar activavel sem ambiguidade;
-- revisar a semantica de `status = 'expired'` versus expiracao derivada.
+- formalizar a diferenca entre estado persistido e estado efectivo;
+- declarar o limite real da revogacao actual e da validade offline do `.lic`;
+- bloquear rebind administrativo precoce por risco real do `.lic` antigo.
 
 ### F3.4 — testes e evidencias de licenciamento
 
@@ -395,9 +398,10 @@ Resultado esperado:
 ## 10. Riscos fora de escopo que permanecem
 
 - semantica persistida de `expired` continua incompleta;
-- grace local continua apenas no daemon, sem politica operacional fechada no
-  servidor;
+- grace local continua apenas no daemon, agora com politica operacional
+  documentada, mas ainda sem validacao manual/appliance fechada;
 - fingerprint continua sensivel a mudancas reais do hardware/base system;
+- a revogacao actual continua sem invalidacao offline do `.lic` ja emitido;
 - nao houve nesta subfase mudanca de revogacao offline, rotacao de chaves,
   package/runtime ou observabilidade ampliada.
 

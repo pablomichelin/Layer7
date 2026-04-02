@@ -123,6 +123,11 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 11.5 | Activação online de licença expirada continua a falhar fechado sem quebrar a licença local já emitida | appliance | Pendente (F3.2) |
 | 11.6 | Fingerprint mantém previsibilidade documentada em reinstall, troca de NIC, clone de VM, restore, migracao de hypervisor e appliance com multiplas NICs | appliance/lab | Pendente (F3.2) |
 | 11.7 | Renovação + re-activação reemite `.lic` actualizado sem quebrar o bind existente | appliance | Pendente (F3.2) |
+| 11.8 | Estado efectivo (`active` / `expired` / `revoked`) permanece coerente entre `activate`, `licenses`, `customers` e `dashboard` | revisão de código/backend | OK (2026-04-01) |
+| 11.9 | Download administrativo de licença efectivamente expirada falha fechado | revisão de código/backend | OK (2026-04-01) |
+| 11.10 | Download administrativo de licença revogada falha fechado | revisão de código/backend | OK (2026-04-01) |
+| 11.11 | Revogação no servidor não invalida imediatamente um `.lic` já emitido em appliance offline | revisão de código/backend + daemon | OK (2026-04-01) |
+| 11.12 | Rebind administrativo permanece bloqueado na F3.3 por risco de `.lic` antigo continuar válido offline | revisão arquitectural/F3.3 | OK (2026-04-01) |
 
 ### Addendum operativo da F3.2
 
@@ -134,6 +139,17 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | Clone de VM | tratar como reactivacao suspeita por defeito |
 | Restore de snapshot | aceitar apenas se o fingerprint resultante continuar igual |
 | Migracao de hypervisor | nao assumir compatibilidade sem validar fingerprint antes e depois |
+
+### Addendum operativo da F3.3
+
+| Cenario manual a observar | Expectativa conservadora actual |
+|---------------------------|---------------------------------|
+| Licenca expirada no servidor com `.lic` ja emitido | activacao/download negados no servidor; daemon ainda pode aceitar ate `expiry + 14 dias` |
+| Licenca revogada no servidor com `.lic` ja emitido | activacao/download negados no servidor; daemon nao corta offline imediatamente |
+| Servidor indisponivel com `.lic` local valido | appliance continua localmente; activacao nova falha |
+| Appliance offline dentro do grace | enforce continua localmente com `license_grace=true` |
+| Appliance offline apos o grace | daemon invalida licenca e cai para monitor-only |
+| Rebind administrativo com `.lic` antigo em campo | continua inseguro e fora de escopo enquanto nao houver politica para invalidacao offline |
 
 ---
 
@@ -151,10 +167,11 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | GUI | 13 | 13 | 0 |
 | Observabilidade | 4 | 4 | 0 |
 | Rollback | 3 | 3 | 0 |
-| Licenciamento/activação | 7 | 3 | 4 |
-| **Total** | **65** | **61** | **4** |
+| Licenciamento/activação | 12 | 8 | 4 |
+| **Total** | **70** | **66** | **4** |
 
-A base V1 continua com 58 testes OK. O addendum da F3.1 acrescenta 7 cenarios
-de licenciamento/activacao: 3 ficam fechados por revisao de codigo e contrato
-canónico em `2026-04-01`, e 4 seguem pendentes de validacao em appliance/lab
-para a F3.2.
+A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 12 cenarios
+de licenciamento/activacao: 8 ficam fechados por revisao de codigo,
+arquitectura e contrato canónico em `2026-04-01`, e 4 seguem pendentes de
+validacao em appliance/lab para fechar grace/offline, expiracao/revogacao com
+`.lic` ja emitido, renovacao + reactivacao e a matriz real do fingerprint.

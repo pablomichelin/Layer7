@@ -1,6 +1,11 @@
 const { Router } = require('express');
 const pool = require('../db');
 const auth = require('../auth');
+const {
+  LICENSE_SQL_ACTIVE_CONDITION,
+  LICENSE_SQL_EXPIRED_CONDITION,
+  LICENSE_SQL_REVOKED_CONDITION,
+} = require('../license-state');
 
 const router = Router();
 router.use(auth);
@@ -9,12 +14,12 @@ router.get('/', async (_req, res) => {
   try {
     const stats = await pool.query(`
       SELECT
-        COUNT(*) FILTER (WHERE archived_at IS NULL AND status = 'active' AND expiry >= CURRENT_DATE) AS active,
+        COUNT(*) FILTER (WHERE archived_at IS NULL AND ${LICENSE_SQL_ACTIVE_CONDITION}) AS active,
         COUNT(*) FILTER (
           WHERE archived_at IS NULL
-            AND (status = 'expired' OR (status = 'active' AND expiry < CURRENT_DATE))
+            AND ${LICENSE_SQL_EXPIRED_CONDITION}
         ) AS expired,
-        COUNT(*) FILTER (WHERE archived_at IS NULL AND status = 'revoked') AS revoked,
+        COUNT(*) FILTER (WHERE archived_at IS NULL AND ${LICENSE_SQL_REVOKED_CONDITION}) AS revoked,
         COUNT(*) FILTER (WHERE archived_at IS NULL) AS total
       FROM licenses
     `);

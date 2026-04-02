@@ -318,7 +318,8 @@ falha.
   `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`, com
   mapeamento factual do fluxo actual de activacao/licenciamento no backend e
   no daemon.
-- **F3.1 em execucao:** o contrato canónico passa a distinguir estado
+- **F3.1 executada de forma conservadora em `2026-04-01`:** o contrato
+  canónico passa a distinguir estado
   persistido (`active`, `revoked`, `expired`) de estado derivado por
   expiracao, a clarificar a diferenca entre activacao online e grace local do
   daemon, e a materializar um primeiro endurecimento de idempotencia segura
@@ -330,9 +331,18 @@ falha.
   politica de compatibilidade da fase; o unico ajuste tecnico aceite fica
   restrito a normalizacao defensiva do `hardware_id` persistido no servidor
   antes de comparacao/emissao do `.lic`, sem mudar o algoritmo base.
+- **F3.3 executada de forma conservadora em `2026-04-01`:**
+  `docs/01-architecture/f3-expiracao-revogacao-grace.md` passa a formalizar a
+  semantica real de expiracao, revogacao, grace e validade offline do `.lic`,
+  incluindo o limite real da revogacao actual e o risco objectivo de um `.lic`
+  antigo continuar valido offline; o unico ajuste tecnico aceite fica
+  restrito a centralizacao do estado efectivo da licenca no backend para
+  alinhar `activate`, `licenses`, `customers` e `dashboard`.
 - **Proximo passo seguro dentro da F3:** validar em appliance/lab os cenarios
-  pendentes de reinstall, troca de NIC, clone de VM, restore, grace e
-  migracao, sem abrir F4/F5/F6/F7.
+  pendentes de expiracao com `.lic` ja emitido, revogacao com `.lic` ja
+  emitido, grace local, renovacao + reactivacao, indisponibilidade do
+  servidor, reinstall, troca de NIC, clone de VM, restore e migracao, sem
+  abrir F4/F5/F6/F7.
 
 ### Criterios de saida
 
@@ -350,6 +360,7 @@ falha.
 - `CORTEX.md`
 - `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`
 - `docs/01-architecture/f3-fingerprint-e-binding.md`
+- `docs/01-architecture/f3-expiracao-revogacao-grace.md`
 - backlog
 - ADRs afectados
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`
