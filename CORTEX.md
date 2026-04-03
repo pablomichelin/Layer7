@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/05-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`
+**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/05-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional actual materializa `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/05-runbooks/f3-11-evidence-intake-template.md`, `docs/05-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -219,12 +219,15 @@ contrato canónico `same-origin only` da F2.3.
 
 **Trilha activa dentro da F3:** `F3.11 bloqueada — a campanha real nao foi
 aberta porque os pre-requisitos da F3.10 continuam incompletos no ambiente
-actual; o pacote canonico de habilitacao de acessos e o checklist live da
-F3.11 passam agora a definir exactamente o que falta entregar, por quem,
-com que evidencia e com que criterio de liberacao; a F3 permanece aberta
-enquanto nao existirem evidencias reais de deploy observavel com shell/DB,
-credencial administrativa autorizada, appliance pfSense autenticavel,
-controlos legitimos do lab e inventario minimo de licencas por cenario`
+actual; o pacote canonico de habilitacao de acessos, o pacote canonico de
+solicitacao externa, a matriz de aceite, o template de intake, o runbook de
+triagem e o gate de reabertura da readiness passam agora a definir
+exactamente o que falta entregar, como a entrega deve ser recebida, como ela
+deve ser aceite ou rejeitada e quando a readiness pode ser repetida; a F3
+permanece aberta enquanto nao existirem evidencias reais de deploy
+observavel com shell/DB, credencial administrativa autorizada, appliance
+pfSense autenticavel, controlos legitimos do lab e inventario minimo de
+licencas por cenario`
 
 ### Ordem segura das fases
 
@@ -247,13 +250,17 @@ controlos legitimos do lab e inventario minimo de licencas por cenario`
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
 2. Satisfazer explicitamente a
    `docs/01-architecture/f3-matriz-prerequisitos-campanha.md` e o novo
-   `docs/01-architecture/f3-11-access-enablement-package.md` antes de nova
+   `docs/01-architecture/f3-11-access-enablement-package.md`,
+   `docs/01-architecture/f3-11-external-input-request-package.md`,
+   `docs/01-architecture/f3-11-input-acceptance-matrix.md` e
+   `docs/01-architecture/f3-11-readiness-reopen-gate.md` antes de nova
    rodada; a verificacao em
-   `docs/01-architecture/f3-11-readiness-check.md` e o saneamento em
-   `docs/01-architecture/f3-11-readiness-saneamento.md` confirmaram que
-   continuam pendentes o acesso a shell/DB do deploy observado, a
-   credencial administrativa autorizada, o appliance pfSense autenticavel,
-   os controlos legitimos do lab e o inventario minimo por cenario.
+   `docs/01-architecture/f3-11-readiness-check.md`, o saneamento em
+   `docs/01-architecture/f3-11-readiness-saneamento.md` e o novo kit
+   documental da F3.11 confirmam que continuam pendentes o acesso a
+   shell/DB do deploy observado, a credencial administrativa autorizada, o
+   appliance pfSense autenticavel, os controlos legitimos do lab e o
+   inventario minimo por cenario.
 3. Tratar a
    `docs/01-architecture/f3-matriz-drift-operacional.md` e o novo
    `docs/01-architecture/f3-11-drift-registry.md` como listas canónicas de
@@ -261,7 +268,9 @@ controlos legitimos do lab e inventario minimo de licencas por cenario`
    escuro".
 4. So reexecutar o readiness check da F3.11 depois de os pre-requisitos
    pendentes estarem realmente disponiveis e o
-   `docs/05-runbooks/f3-11-live-access-checklist.md` poder ser executado sem
+   `docs/05-runbooks/f3-11-input-triage-runbook.md`,
+   `docs/05-runbooks/f3-11-evidence-intake-template.md` e
+   `docs/05-runbooks/f3-11-live-access-checklist.md` poderem ser usados sem
    placeholders; sem isso, nao abrir campanha.
 5. Reexecutar a campanha real da F3 em novo bloco proprio, usando
    `docs/01-architecture/f3-validacao-manual-evidencias.md` como matriz
@@ -378,6 +387,11 @@ controlos legitimos do lab e inventario minimo de licencas por cenario`
   de drift em `docs/01-architecture/f3-11-drift-registry.md`; estes
   documentos reduzem ambiguidade operacional, mas nao removem blockers por si
   so.
+- A rodada documental-operacional actual entrou com o branch local
+  `main...origin/main [ahead 20]`, nao faz push e materializa o kit canonico
+  de solicitacao externa, aceite, intake, triagem e gate de reabertura da
+  readiness; um push agora publicaria historico local acumulado e, por isso,
+  permanece fora deste bloco.
 - Antes da F3.11 tem de existir, no ambiente escolhido para a campanha:
   deploy observavel face ao repo com acesso suficiente a queries objectivas,
   schema alinhado ao contrato canónico, credencial administrativa
