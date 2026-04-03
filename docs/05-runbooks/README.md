@@ -34,4 +34,8 @@ Template canónico de intake para registar recepcao, validacao e conclusao
 de cada insumo externo da F3.11:
 [`f3-11-evidence-intake-template.md`](f3-11-evidence-intake-template.md).
 
+Template canónico de ciclo operacional para consolidar cada rodada inteira
+de recepcao, triagem, aceite/rejeicao e actualizacao do gate da F3.11:
+[`f3-11-cycle-report-template.md`](f3-11-cycle-report-template.md).
+
 Runbooks especificos por release entram aqui quando existirem.

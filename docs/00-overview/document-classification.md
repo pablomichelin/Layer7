@@ -57,6 +57,7 @@ vence o canónico.
 | `docs/00-overview/product-charter.md` | charter | resumo canónico de produto/escopo | Canónico | resume `01-VISAO-GERAL-E-ESCOPO.md` | manter vivo | F0+ |
 | `docs/00-overview/document-classification.md` | classificacao | matriz de estatuto dos docs | Canónico | novo | manter vivo quando surgirem conflitos | F0+ |
 | `docs/00-overview/document-equivalence-map.md` | equivalencia | mapa raiz <-> docs | Canónico | novo | manter vivo ate a F6 | F0-F6 |
+| `docs/00-overview/f3-11-document-traceability-map.md` | rastreabilidade F3.11 | mapa canónico de navegacao e de registo entre os artefactos da trilha F3.11 | Canónico | novo | manter vivo enquanto a F3.11 depender de multiplos artefactos coordenados | F3 |
 | `docs/01-architecture/target-architecture.md` | arquitectura | resumo canónico da arquitectura | Canónico | resume `02-ARQUITETURA-ALVO.md` | manter vivo | F0+ |
 | `docs/01-architecture/f1-arquitetura-de-confianca.md` | arquitectura F1 | consolidado da cadeia de confianca, blacklists e fallback | Canónico | novo | manter vivo durante F1 e rever quando a implementacao avancar | F1 |
 | `docs/01-architecture/f2-arquitetura-license-server.md` | arquitectura F2 | consolidado canónico da publicacao segura, sessao e hardening do license server | Canónico | novo | manter vivo durante a F2 | F2 |
@@ -74,6 +75,9 @@ vence o canónico.
 | `docs/01-architecture/f3-11-drift-registry.md` | drift registry F3.11 | consolidado canónico do registo cumulativo de drifts entre F3.9 e o estado actual da F3.11 | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/01-architecture/f3-11-external-input-request-package.md` | pacote de solicitacao externa F3.11 | consolidado canónico do pedido formal dos cinco insumos externos, com especificacao minima, aceite/rejeicao e impacto operacional | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/01-architecture/f3-11-input-acceptance-matrix.md` | matriz de aceite F3.11 | consolidado canónico do gate objectivo de aceite/rejeicao dos cinco insumos externos | Canónico | novo | manter vivo durante a F3 | F3 |
+| `docs/01-architecture/f3-11-execution-master-register.md` | registro mestre de execucao F3.11 | cockpit canónico central do estado operacional dos cinco insumos, blockers, evidencias e proximos passos da F3.11 | Canónico | novo | manter vivo durante a F3 | F3 |
+| `docs/01-architecture/f3-11-operational-decisions-ledger.md` | ledger de decisoes operacionais F3.11 | registo cumulativo e auditavel das microdecisoes operacionais da trilha F3.11 | Canónico | novo | manter vivo durante a F3 | F3 |
+| `docs/01-architecture/f3-11-readiness-scorecard.md` | scorecard de readiness F3.11 | pagina executiva canónica de `GO/NO-GO`, resumo dos insumos, blockers e drifts da F3.11 | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/01-architecture/f3-11-readiness-reopen-gate.md` | gate de reabertura da readiness F3.11 | consolidado canónico do `go/no-go` para repetir a readiness e distinguir blockers da readiness vs blockers da campanha | Canónico | novo | manter vivo durante a F3 | F3 |
 | `docs/02-roadmap/roadmap.md` | fases F0-F7 | roadmap canónico | Canónico | substitui `03-ROADMAP-E-FASES.md` como SSOT | manter vivo | F0+ |
 | `docs/02-roadmap/backlog.md` | backlog | backlog unico priorizado | Canónico | substitui `04-BACKLOG-MVP-E-VERSOES.md` | manter vivo | F0+ |
@@ -107,6 +111,7 @@ vence o canónico.
 | `docs/05-runbooks/f3-11-live-access-checklist.md` | checklist live F3.11 | runbook operativo canonico para validar acessos, host, schema, admin, appliance e inventario antes de nova readiness/campanha da F3.11 | Canónico | novo | manter vivo enquanto a F3.11 permanecer bloqueada ou em preparacao | F3 |
 | `docs/05-runbooks/f3-11-input-triage-runbook.md` | triagem de entrega F3.11 | runbook operativo canonico para receber, validar, aceitar ou rejeitar cada insumo externo antes da readiness | Canónico | novo | manter vivo enquanto a F3.11 permanecer bloqueada ou em preparacao | F3 |
 | `docs/05-runbooks/f3-11-evidence-intake-template.md` | intake de evidencias F3.11 | template canónico preenchivel para registar recepcao, validacao e conclusao de cada insumo externo | Canónico | novo | manter vivo enquanto a F3.11 permanecer bloqueada ou em preparacao | F3 |
+| `docs/05-runbooks/f3-11-cycle-report-template.md` | ciclo operacional F3.11 | template canónico da rodada completa de recepcao, triagem, actualizacao de blockers e decisao final da F3.11 | Canónico | novo | manter vivo enquanto a F3.11 permanecer bloqueada ou em preparacao | F3 |
 | `docs/05-runbooks/pfsense-webgui-safety.md` | seguranca de lab | runbook especifico de lab | Suplementar | — | manter | F4/F5 |
 | `docs/05-runbooks/rollback.md` | rollback | rollback do pacote Layer7 | Canónico | complementar ao `MANUAL-INSTALL.md` | manter vivo | F4/F7 |
 | `docs/06-releases/README.md` | governanca de release | indice canónico de release docs | Canónico | substitui indicacoes antigas dispersas | manter vivo | F7 |
