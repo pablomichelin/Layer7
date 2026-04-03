@@ -25,15 +25,20 @@ Estado formal preservado nesta rodada:
 
 Leitura complementar obrigatoria:
 
+- [`../00-overview/f3-11-start-here.md`](../00-overview/f3-11-start-here.md)
 - [`f3-11-access-enablement-package.md`](f3-11-access-enablement-package.md)
 - [`f3-11-drift-registry.md`](f3-11-drift-registry.md)
 - [`f3-11-input-acceptance-matrix.md`](f3-11-input-acceptance-matrix.md)
 - [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md)
 - [`f3-11-readiness-scorecard.md`](f3-11-readiness-scorecard.md)
+- [`f3-11-state-machine.md`](f3-11-state-machine.md)
+- [`f3-11-document-sync-protocol.md`](f3-11-document-sync-protocol.md)
+- [`f3-11-operational-responsibility-matrix.md`](f3-11-operational-responsibility-matrix.md)
 - [`f3-11-operational-decisions-ledger.md`](f3-11-operational-decisions-ledger.md)
 - [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md)
 - [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md)
 - [`../05-runbooks/f3-11-cycle-report-template.md`](../05-runbooks/f3-11-cycle-report-template.md)
+- [`../05-runbooks/f3-11-cycle-closure-criteria.md`](../05-runbooks/f3-11-cycle-closure-criteria.md)
 
 ---
 
@@ -98,19 +103,22 @@ Leitura operacional:
 
 Sempre que houver nova entrega real:
 
-1. abrir um registo com base em
+1. abrir [`../00-overview/f3-11-start-here.md`](../00-overview/f3-11-start-here.md)
+   e seguir o
+   [`f3-11-document-sync-protocol.md`](f3-11-document-sync-protocol.md);
+2. abrir um registo com base em
    [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md);
-2. aplicar a triagem em
+3. aplicar a triagem em
    [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md);
-3. registar a microdecisao em
+4. registar a microdecisao em
    [`f3-11-operational-decisions-ledger.md`](f3-11-operational-decisions-ledger.md);
-4. actualizar este registro mestre;
-5. actualizar o
+5. actualizar este registro mestre;
+6. actualizar o
    [`f3-11-readiness-scorecard.md`](f3-11-readiness-scorecard.md);
-6. so depois verificar o
+7. so depois verificar o
    [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md).
 
-Sem estes seis passos, nao existe progresso operacional valido da F3.11.
+Sem estes sete passos, nao existe progresso operacional valido da F3.11.
 
 ---
 

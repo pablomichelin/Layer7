@@ -24,27 +24,34 @@ Estado formal preservado:
 
 ## 1. Ordem recomendada de uso
 
-1. [`../01-architecture/f3-11-readiness-scorecard.md`](../01-architecture/f3-11-readiness-scorecard.md)
-   para leitura executiva imediata de `GO/NO-GO`.
+1. [`f3-11-start-here.md`](f3-11-start-here.md)
+   como porta de entrada unica da trilha.
 2. [`../01-architecture/f3-11-execution-master-register.md`](../01-architecture/f3-11-execution-master-register.md)
    para ler o estado detalhado dos cinco insumos.
-3. [`../01-architecture/f3-11-drift-registry.md`](../01-architecture/f3-11-drift-registry.md)
+3. [`../01-architecture/f3-11-readiness-scorecard.md`](../01-architecture/f3-11-readiness-scorecard.md)
+   para leitura executiva imediata de `GO/NO-GO`.
+4. [`../01-architecture/f3-11-document-sync-protocol.md`](../01-architecture/f3-11-document-sync-protocol.md)
+   para seguir a ordem obrigatoria de actualizacao.
+5. [`../01-architecture/f3-11-state-machine.md`](../01-architecture/f3-11-state-machine.md)
+   para entender os estados e as transicoes permitidas.
+6. [`../01-architecture/f3-11-drift-registry.md`](../01-architecture/f3-11-drift-registry.md)
    para entender os drifts ainda abertos.
-4. [`../01-architecture/f3-11-external-input-request-package.md`](../01-architecture/f3-11-external-input-request-package.md)
+7. [`../01-architecture/f3-11-external-input-request-package.md`](../01-architecture/f3-11-external-input-request-package.md)
    para saber exactamente o que precisa ser pedido ao exterior.
-5. [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md)
+8. [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md)
    quando um insumo real chegar.
-6. [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md)
+9. [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md)
    para aceitar, rejeitar ou classificar como parcial.
-7. [`../01-architecture/f3-11-input-acceptance-matrix.md`](../01-architecture/f3-11-input-acceptance-matrix.md)
-   para marcar o status objectivo do insumo.
-8. [`../01-architecture/f3-11-operational-decisions-ledger.md`](../01-architecture/f3-11-operational-decisions-ledger.md)
-   para registar a microdecisao da rodada.
-9. [`../05-runbooks/f3-11-cycle-report-template.md`](../05-runbooks/f3-11-cycle-report-template.md)
-   para consolidar a rodada completa.
-10. [`../01-architecture/f3-11-readiness-reopen-gate.md`](../01-architecture/f3-11-readiness-reopen-gate.md)
+10. [`../01-architecture/f3-11-input-acceptance-matrix.md`](../01-architecture/f3-11-input-acceptance-matrix.md)
+    para marcar o status objectivo do insumo.
+11. [`../01-architecture/f3-11-operational-decisions-ledger.md`](../01-architecture/f3-11-operational-decisions-ledger.md)
+    para registar a microdecisao da rodada.
+12. [`../05-runbooks/f3-11-cycle-report-template.md`](../05-runbooks/f3-11-cycle-report-template.md)
+    e [`../05-runbooks/f3-11-cycle-closure-criteria.md`](../05-runbooks/f3-11-cycle-closure-criteria.md)
+    para consolidar e fechar a rodada.
+13. [`../01-architecture/f3-11-readiness-reopen-gate.md`](../01-architecture/f3-11-readiness-reopen-gate.md)
     para decidir se a readiness pode ser repetida.
-11. [`../05-runbooks/f3-11-live-access-checklist.md`](../05-runbooks/f3-11-live-access-checklist.md)
+14. [`../05-runbooks/f3-11-live-access-checklist.md`](../05-runbooks/f3-11-live-access-checklist.md)
     apenas se o gate da readiness estiver em `GO`.
 
 ---
@@ -53,8 +60,11 @@ Estado formal preservado:
 
 | Documento | Papel canónico | Consulta-se quando | Actualiza-se quando | Alimenta qual decisao seguinte |
 |-----------|----------------|--------------------|---------------------|--------------------------------|
+| [`f3-11-start-here.md`](f3-11-start-here.md) | ponto unico de entrada operacional | no arranque de qualquer rodada | quando o estado formal ou a ordem de arranque mudar | por onde comecar sem ambiguidade |
 | [`../01-architecture/f3-11-external-input-request-package.md`](../01-architecture/f3-11-external-input-request-package.md) | define o pedido formal dos cinco insumos | antes de qualquer contacto externo | quando o pedido minimo por insumo mudar formalmente | o que deve ser recebido |
 | [`../01-architecture/f3-11-input-acceptance-matrix.md`](../01-architecture/f3-11-input-acceptance-matrix.md) | define `nao entregue`, `invalido`, `parcial`, `valido` | durante a triagem | quando o criterio objectivo de aceite mudar | se o insumo liberta ou nao o subgate |
+| [`../01-architecture/f3-11-state-machine.md`](../01-architecture/f3-11-state-machine.md) | define estados e transicoes da trilha | quando houver duvida sobre "ja pode" ou "ainda nao pode" | quando a semantica operacional dos estados mudar formalmente | em que estado a F3.11 fica depois da rodada |
+| [`../01-architecture/f3-11-document-sync-protocol.md`](../01-architecture/f3-11-document-sync-protocol.md) | define a ordem obrigatoria de actualizacao | sempre que houver rodada nova ou evidencia nova | quando a ordem canónica entre artefactos mudar | qual documento actualizar a seguir |
 | [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md) | regista a recepcao de cada insumo | no momento em que algo chega | em cada nova entrega real | qual foi exactamente a evidencia recebida |
 | [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md) | governa a validacao de cada entrega | depois do intake | nao se actualiza a cada rodada; usa-se | se a entrega deve ser aceite, rejeitada ou tratada como parcial |
 | [`../01-architecture/f3-11-readiness-reopen-gate.md`](../01-architecture/f3-11-readiness-reopen-gate.md) | decide `GO/NO-GO` para repetir a readiness | depois de actualizar os cinco insumos | quando o gate formal mudar | se a readiness pode reabrir |
@@ -64,6 +74,8 @@ Estado formal preservado:
 | [`../01-architecture/f3-11-operational-decisions-ledger.md`](../01-architecture/f3-11-operational-decisions-ledger.md) | historico auditavel das microdecisoes | depois de cada triagem ou decisao operacional | em toda nova microdecisao relevante | como a rodada actual afecta readiness/campanha |
 | [`../01-architecture/f3-11-readiness-scorecard.md`](../01-architecture/f3-11-readiness-scorecard.md) | pagina executiva de estado | na abertura de qualquer rodada | depois de cada mudanca material | leitura rapida de `GO/NO-GO` |
 | [`../05-runbooks/f3-11-cycle-report-template.md`](../05-runbooks/f3-11-cycle-report-template.md) | registo padronizado de cada rodada | sempre que houver ciclo operacional real | em toda rodada real | fecho formal da rodada e proximo passo |
+| [`../05-runbooks/f3-11-cycle-closure-criteria.md`](../05-runbooks/f3-11-cycle-closure-criteria.md) | define quando um ciclo esta fechado, incompleto ou invalido | no fecho de cada rodada | quando a semantica de fecho mudar formalmente | se o ciclo pode ser tratado como valido |
+| [`../01-architecture/f3-11-operational-responsibility-matrix.md`](../01-architecture/f3-11-operational-responsibility-matrix.md) | define papeis, limites e handoffs | quando houver duvida sobre quem actualiza ou decide | quando a distribuicao de responsabilidades mudar formalmente | quem actua no passo seguinte |
 
 ---
 
@@ -87,19 +99,22 @@ Estado formal preservado:
 
 ## 4. Fluxo minimo ponta a ponta
 
-1. ler scorecard;
-2. ler registro mestre;
-3. se faltar pedir algo, usar o pacote de solicitacao externa;
-4. quando chegar algo, abrir intake;
-5. triar;
-6. actualizar matriz, ledger e registro mestre;
-7. fechar o ciclo da rodada;
-8. actualizar scorecard;
-9. verificar gate;
-10. so depois usar o checklist live.
+1. ler `start-here`;
+2. ler scorecard;
+3. ler registro mestre;
+4. seguir o protocolo de sincronizacao;
+5. se faltar pedir algo, usar o pacote de solicitacao externa;
+6. quando chegar algo, abrir intake;
+7. triar;
+8. actualizar matriz, ledger e registro mestre;
+9. actualizar scorecard;
+10. verificar gate;
+11. fechar o ciclo da rodada;
+12. so depois usar o checklist live.
 
-Qualquer atalho que salte intake, triagem, ledger ou scorecard reintroduz
-ambiguidade e nao deve ser tratado como progresso valido da F3.11.
+Qualquer atalho que salte `start-here`, intake, triagem, ledger, registro
+mestre, scorecard ou criterio de fecho reintroduz ambiguidade e nao deve ser
+tratado como progresso valido da F3.11.
 
 ---
 

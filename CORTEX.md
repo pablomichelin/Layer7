@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/05-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/05-runbooks/f3-11-evidence-intake-template.md`, `docs/05-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional actual materializa `docs/01-architecture/f3-11-execution-master-register.md`, `docs/01-architecture/f3-11-operational-decisions-ledger.md`, `docs/01-architecture/f3-11-readiness-scorecard.md`, `docs/05-runbooks/f3-11-cycle-report-template.md` e `docs/00-overview/f3-11-document-traceability-map.md` para converter o kit da F3.11 num cockpit canónico unico de acompanhamento, decisao, score, rastreabilidade e execucao operacional ponta a ponta, sem codigo, sem push, sem campanha e sem reabrir a readiness; o estado formal continua `F3 aberta` e `F3.11 bloqueada`
+**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/05-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/05-runbooks/f3-11-evidence-intake-template.md`, `docs/05-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-execution-master-register.md`, `docs/01-architecture/f3-11-operational-decisions-ledger.md`, `docs/01-architecture/f3-11-readiness-scorecard.md`, `docs/05-runbooks/f3-11-cycle-report-template.md` e `docs/00-overview/f3-11-document-traceability-map.md` para converter o kit da F3.11 num cockpit canónico unico de acompanhamento, decisao, score, rastreabilidade e execucao operacional ponta a ponta, sem codigo, sem push, sem campanha e sem reabrir a readiness; a rodada documental-operacional actual materializa `docs/01-architecture/f3-11-state-machine.md`, `docs/01-architecture/f3-11-document-sync-protocol.md`, `docs/00-overview/f3-11-start-here.md`, `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e `docs/05-runbooks/f3-11-cycle-closure-criteria.md` para transformar o cockpit da F3.11 num sistema canonico completo de estados, sincronizacao, entrada unica, responsabilidades e fecho de ciclo, mantendo explicitamente `F3 aberta`, `F3.11 bloqueada`, `readiness = NO-GO`, `campanha = NO-GO`, sem codigo, sem push e sem reabrir a readiness; o branch local entrou nesta rodada `main...origin/main [ahead 22]` e continua sem prova de publicacao integral no remoto
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -222,13 +222,16 @@ aberta porque os pre-requisitos da F3.10 continuam incompletos no ambiente
 actual; o pacote canonico de habilitacao de acessos, o pacote canonico de
 solicitacao externa, a matriz de aceite, o template de intake, o runbook de
 triagem, o gate de reabertura, o registro mestre de execucao, o ledger de
-microdecisoes, o scorecard executivo, o template de ciclo e o mapa de
-rastreabilidade passam agora a definir exactamente o que falta entregar,
-onde cada accao deve ser registada, como a entrega deve ser aceite ou
-rejeitada e quando a readiness pode ser repetida; a F3 permanece aberta
-enquanto nao existirem evidencias reais de deploy observavel com shell/DB,
-credencial administrativa autorizada, appliance pfSense autenticavel,
-controlos legitimos do lab e inventario minimo de licencas por cenario`
+microdecisoes, o scorecard executivo, o template de ciclo, o mapa de
+rastreabilidade, a maquina de estados, o protocolo de sincronizacao, o
+`start-here`, a matriz de responsabilidades e o criterio de fecho de ciclo
+passam agora a definir exactamente por onde o operador entra, em que ordem
+cada artefacto deve ser actualizado, que estados sao permitidos, quem decide
+o que e quando um ciclo pode ser dado por fechado sem reabrir readiness antes
+da hora; a F3 permanece aberta enquanto nao existirem evidencias reais de
+deploy observavel com shell/DB, credencial administrativa autorizada,
+appliance pfSense autenticavel, controlos legitimos do lab e inventario
+minimo de licencas por cenario`
 
 ### Ordem segura das fases
 
@@ -256,8 +259,13 @@ controlos legitimos do lab e inventario minimo de licencas por cenario`
    `docs/01-architecture/f3-11-input-acceptance-matrix.md` e
    `docs/01-architecture/f3-11-execution-master-register.md`,
    `docs/01-architecture/f3-11-operational-decisions-ledger.md`,
-   `docs/01-architecture/f3-11-readiness-scorecard.md` e
-   `docs/01-architecture/f3-11-readiness-reopen-gate.md` antes de nova
+   `docs/01-architecture/f3-11-readiness-scorecard.md`,
+   `docs/01-architecture/f3-11-state-machine.md`,
+   `docs/01-architecture/f3-11-document-sync-protocol.md`,
+   `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e
+   `docs/01-architecture/f3-11-readiness-reopen-gate.md`, seguindo o ponto
+   unico de entrada em `docs/00-overview/f3-11-start-here.md` e o criterio
+   de fecho em `docs/05-runbooks/f3-11-cycle-closure-criteria.md`, antes de nova
    rodada; a verificacao em
    `docs/01-architecture/f3-11-readiness-check.md`, o saneamento em
    `docs/01-architecture/f3-11-readiness-saneamento.md` e o novo kit

@@ -38,4 +38,7 @@ Template canónico de ciclo operacional para consolidar cada rodada inteira
 de recepcao, triagem, aceite/rejeicao e actualizacao do gate da F3.11:
 [`f3-11-cycle-report-template.md`](f3-11-cycle-report-template.md).
 
+Criterio canonico de fecho, invalidacao e numeracao de ciclos da F3.11:
+[`f3-11-cycle-closure-criteria.md`](f3-11-cycle-closure-criteria.md).
+
 Runbooks especificos por release entram aqui quando existirem.
