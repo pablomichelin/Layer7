@@ -26,8 +26,8 @@ Regras deste ledger:
 Estado formal preservado:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada`;
-- `este ledger nao reabre readiness`;
+- `F3.11 alinhada no license-server live`;
+- `este ledger nao fecha a F3`;
 - `este ledger nao abre campanha`.
 
 ---
@@ -57,20 +57,19 @@ Estado formal preservado:
 | `ODL-004` | `2026-04-02 (hora exacta nao registada no artefacto de origem)` | transformacao dos cinco insumos externos em processo canonico de solicitacao, aceite, intake, triagem e gate | [`f3-11-external-input-request-package.md`](f3-11-external-input-request-package.md) + [`f3-11-input-acceptance-matrix.md`](f3-11-input-acceptance-matrix.md) + [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md) + [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md) + [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md) | nenhum insumo foi dado por entregue; gate de reabertura mantido em `NO-GO` | [`f3-11-input-acceptance-matrix.md`](f3-11-input-acceptance-matrix.md), [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md) | readiness e campanha permanecem bloqueadas ate `5/5` insumos validos | criar cockpit unico de acompanhamento e execucao ponta a ponta |
 | `ODL-005` | `2026-04-02 (hora exacta nao registada neste ledger)` | cockpit documental da F3.11 consolidado em registro mestre, ledger, scorecard, template de ciclo e mapa de rastreabilidade | [`f3-11-execution-master-register.md`](f3-11-execution-master-register.md) + [`f3-11-readiness-scorecard.md`](f3-11-readiness-scorecard.md) + [`../05-runbooks/f3-11-cycle-report-template.md`](../05-runbooks/f3-11-cycle-report-template.md) + [`../00-overview/f3-11-document-traceability-map.md`](../00-overview/f3-11-document-traceability-map.md) + `git status --short --branch` com `main...origin/main [ahead 21]` no inicio da rodada | processo interno pronto; nenhum insumo real validado; sem push; sem campanha; sem reabertura da readiness | [`f3-11-execution-master-register.md`](f3-11-execution-master-register.md), [`f3-11-readiness-scorecard.md`](f3-11-readiness-scorecard.md), [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md) | readiness continua `NO-GO` com cockpit completo e sem ambiguidade operacional | aguardar primeiro insumo real e abrir o primeiro ciclo padronizado de intake/triagem |
 | `ODL-006` | `2026-04-02 (hora exacta nao registada neste ledger)` | governanca operacional final da F3.11 consolidada com entrada unica, maquina de estados, protocolo de sincronizacao, matriz de responsabilidades e criterio de fecho de ciclo | [`../00-overview/f3-11-start-here.md`](../00-overview/f3-11-start-here.md) + [`f3-11-state-machine.md`](f3-11-state-machine.md) + [`f3-11-document-sync-protocol.md`](f3-11-document-sync-protocol.md) + [`f3-11-operational-responsibility-matrix.md`](f3-11-operational-responsibility-matrix.md) + [`../05-runbooks/f3-11-cycle-closure-criteria.md`](../05-runbooks/f3-11-cycle-closure-criteria.md) + `git status --short --branch` com `main...origin/main [ahead 22]` no inicio da rodada | sistema documental-operacional da F3.11 fechado sem mudar escopo, sem reabrir readiness, sem campanha e sem push | [`f3-11-document-sync-protocol.md`](f3-11-document-sync-protocol.md), [`f3-11-state-machine.md`](f3-11-state-machine.md), [`../00-overview/f3-11-start-here.md`](../00-overview/f3-11-start-here.md), [`../05-runbooks/f3-11-cycle-closure-criteria.md`](../05-runbooks/f3-11-cycle-closure-criteria.md) | readiness continua `NO-GO`; campanha continua `NO-GO`; estado formal mantido em `F3 aberta` e `F3.11 bloqueada` | aguardar o primeiro insumo real e operar a partir do `start-here` com sincronizacao obrigatoria de ciclo |
+| `ODL-007` | `2026-04-14 (hora exacta nao registada neste ledger)` | checkpoint live reclassifica a F3.11: license-server, auth/admin, same-origin e inventario ficam alinhados para a F3; resta apenas DR-05 no appliance | [`f3-11-drift-registry.md`](f3-11-drift-registry.md) + [`f3-11-readiness-scorecard.md`](f3-11-readiness-scorecard.md) + [`f3-11-execution-master-register.md`](f3-11-execution-master-register.md) + [`../00-overview/f3-11-start-here.md`](../00-overview/f3-11-start-here.md) | `GO condicional`; gate antigo de `5/5` insumos deixa de ser o caminho corrente; `DR-05` fica como unico blocker real | [`../00-overview/f3-organizacao-local-e-fecho.md`](../00-overview/f3-organizacao-local-e-fecho.md), [`f3-11-drift-registry.md`](f3-11-drift-registry.md), [`f3-fecho-operacional-restante.md`](f3-fecho-operacional-restante.md) | readiness/campanha ficam condicionais apenas aos cenarios mutaveis do appliance; F3 continua aberta | executar `DR-05` com permissao suficiente, snapshot/rollback e evidencias por `run_id` |
 
 ---
 
 ## 3. Instrucoes de uso nas proximas rodadas
 
-Quando um insumo real chegar:
+Quando houver nova evidencia real:
 
-1. abrir intake;
-2. executar triagem;
-3. registar aqui a microdecisao tomada;
-4. actualizar o registro mestre;
-5. actualizar o scorecard;
-6. se e somente se os cinco insumos ficarem validos, verificar o gate de
-   reabertura da readiness.
+1. se for evidencia do `DR-05`, registar o resultado directamente neste
+   ledger, no registro mestre, no scorecard e no drift registry;
+2. se for um insumo externo antigo, abrir intake e executar triagem apenas
+   quando ele mudar materialmente o estado corrente;
+3. nao regressar ao gate de `5/5` sem drift novo objectivo.
 
 Exemplos de assuntos validos para novas entradas:
 

@@ -16,6 +16,8 @@ Incluido na F3.7:
   `INCONCLUSIVE` / `BLOCKED`;
 - formalizar a evidencia minima e a evidencia complementar por cenario;
 - disponibilizar um helper shell barato para exportar contexto do backend;
+- disponibilizar um helper shell barato para recolher baseline e estado local
+  do appliance;
 - disponibilizar um template markdown para registo da execucao por cenario.
 
 Complemento formal apos a F3.8:
@@ -201,6 +203,88 @@ Limites do helper:
 - nao chama endpoints de mutacao;
 - nao muda schema, contrato ou dados do produto.
 
+Helper complementar de appliance:
+
+```text
+scripts/license-validation/export-appliance-evidence.sh
+```
+
+Finalidade:
+
+- recolher baseline local do appliance por SSH;
+- guardar `service layer7d status`, `kern.hostuuid`, `ifconfig -a`,
+  `layer7d --fingerprint` e stats JSON no ficheiro canónico de CLI;
+- exportar o `.lic` local em formato legivel quando existir;
+- guardar hash local do `.lic` e a origem do stats JSON usada na recolha.
+
+Limites do helper:
+
+- nao executa activacao nem mutacao administrativa;
+- nao altera relogio, NIC, UUID, `.lic` ou configuracao;
+- nao substitui snapshot, janela de manutencao ou leitura humana do cenario.
+- com `--update-root-preflight`, apenas consolida a baseline recolhida no
+  artefacto raiz `40-preflight-appliance.txt`; continua sem validar o
+  preflight por si so.
+
+Helper complementar de live preflight:
+
+```text
+scripts/license-validation/export-live-preflight.sh
+```
+
+Finalidade:
+
+- recolher health publico e health do origin observado por `curl`;
+- guardar probes minimos de origin/CORS/login no artefacto raiz da campanha;
+- preencher `10-preflight-deploy.txt` e `30-preflight-admin.txt` com output
+  bruto, sem depender de copia manual da consola.
+
+Limites do helper:
+
+- nao prova schema nem revisao Git do deploy por si so;
+- nao substitui acesso SSH/DB ao host live;
+- se o live divergir do contrato canónico, apenas regista o desvio.
+
+Helper complementar de schema preflight:
+
+```text
+scripts/license-validation/export-schema-preflight.sh
+```
+
+Finalidade:
+
+- consultar o PostgreSQL observado via `docker compose exec` read-only;
+- materializar `20-preflight-schema.txt` com identidade da base, tabelas
+  exigidas, contagem minima e colunas administrativas;
+- reduzir copia manual de queries do preflight da F3.10.
+
+Limites do helper:
+
+- depende de acesso legitimo ao host/directorio real da stack;
+- falha legitimamente se o schema live estiver incompleto;
+- nao substitui classificacao humana do drift observado.
+
+Helper orquestrador de preflight:
+
+```text
+scripts/license-validation/prepare-f3-preflight.sh
+```
+
+Finalidade:
+
+- inicializar a campanha e encadear, no mesmo `run_id`, os helpers de
+  estrutura, live, schema e appliance;
+- reduzir cola manual entre scripts antes da abertura real da F3.11;
+- permitir preflight parcial quando apenas alguns acessos estiverem
+  disponiveis, registando explicitamente o que foi ignorado.
+
+Limites do helper:
+
+- nao inventa acessos nem credenciais ausentes;
+- nao substitui a decisao humana de `GO/NO-GO`;
+- se um helper subjacente falhar, a campanha continua a exigir triagem humana
+  do blocker e do drift observado.
+
 Helper opcional de campanha apos a F3.8:
 
 ```text
@@ -211,6 +295,7 @@ Finalidade:
 
 - criar a directoria raiz da campanha por `run_id`;
 - copiar o relatorio final canónico da campanha;
+- materializar os artefactos raiz de preflight exigidos pela F3.10;
 - preparar directoria/manifest minimo por cenario.
 
 ### 3.2 Template markdown
@@ -303,6 +388,38 @@ Exemplo:
   --scenario-code S01 \
   --run-id "$RUN_ID" \
   --output-root "$EVIDENCE_ROOT"
+
+./scripts/license-validation/export-appliance-evidence.sh \
+  --scenario-code S01 \
+  --run-id "$RUN_ID" \
+  --output-root "$EVIDENCE_ROOT" \
+  --ssh-target root@192.168.100.254 \
+  --update-root-preflight
+
+./scripts/license-validation/export-live-preflight.sh \
+  --run-id "$RUN_ID" \
+  --output-root "$EVIDENCE_ROOT" \
+  --base-url "$L7_BASE_URL" \
+  --origin-url "http://192.168.100.244:8445" \
+  --admin-email "$ADMIN_EMAIL" \
+  --admin-password "$ADMIN_PASSWORD" \
+  --curl-insecure
+
+./scripts/license-validation/export-schema-preflight.sh \
+  --run-id "$RUN_ID" \
+  --output-root "$EVIDENCE_ROOT" \
+  --compose-dir /opt/layer7-license
+
+./scripts/license-validation/prepare-f3-preflight.sh \
+  --run-id "$RUN_ID" \
+  --output-root "$EVIDENCE_ROOT" \
+  --base-url "$L7_BASE_URL" \
+  --origin-url "http://192.168.100.244:8445" \
+  --admin-email "$ADMIN_EMAIL" \
+  --admin-password "$ADMIN_PASSWORD" \
+  --curl-insecure \
+  --compose-dir /opt/layer7-license \
+  --ssh-target root@192.168.100.254
 ```
 
 Isto cria:
@@ -332,6 +449,33 @@ $PF_SSH 'sha256 /usr/local/etc/layer7.lic' \
 $PF_SSH '/bin/kill -USR1 "$(cat /var/run/layer7d.pid)" && cat /tmp/layer7-stats.json' \
   | tee -a "$SCENARIO_DIR/50-appliance-cli.txt"
 ```
+
+### 5.5 Helper orquestrador para cenarios do appliance
+
+Quando o objectivo for executar um cenario de activacao no pfSense com
+snapshot antes/depois do backend e baseline local no mesmo `run_id`, pode-se
+usar o helper:
+
+```bash
+./scripts/license-validation/run-appliance-activation-scenario.sh \
+  --scenario-code S01 \
+  --run-id "$RUN_ID" \
+  --output-root "$EVIDENCE_ROOT" \
+  --license-id "$LICENSE_ID" \
+  --license-key "$LICENSE_KEY" \
+  --compose-dir "$COMPOSE_DIR" \
+  --ssh-target "$PF_SSH_TARGET"
+```
+
+Para cenarios como `S07`, em que o `.lic` local deve ser removido antes da
+tentativa, acrescentar `--clear-local-license`.
+
+O helper:
+
+- exporta evidencia do backend antes do passo local;
+- executa `layer7d --activate` no appliance quando aplicavel;
+- recolhe baseline local via `export-appliance-evidence.sh`;
+- exporta evidencia do backend depois do passo local.
 
 ---
 

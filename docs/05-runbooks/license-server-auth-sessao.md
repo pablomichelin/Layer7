@@ -56,6 +56,15 @@ Referencias normativas:
   - `403` para origin administrativo nao autorizado
 - O cookie de sessao nao deve ser lido nem persistido pelo JavaScript da SPA.
 - O frontend deve manter apenas estado transitório em memoria.
+- A ponte Bearer administrativa, quando activada para compatibilidade, deve:
+  - preferir `ADMIN_BEARER_JWT_SECRET`;
+  - aceitar `JWT_SECRET` apenas como compatibilidade transitória de upgrade
+    para stacks antigas;
+  - usar token assinado e de curta duracao derivado da sessao stateful;
+  - ficar apenas em memoria transitoria no frontend;
+  - nunca reutilizar `ED25519_PRIVATE_KEY`;
+  - nunca cair para token opaco cru em `Authorization`.
+  - nunca ser reenviada automaticamente no `POST /api/auth/login`.
 - O origin privado `127.0.0.1:8445` nao e canal oficial para operacao humana.
 - Troubleshooting no origin privado e aceite apenas no host, com `Host`
   correcto e sem degradar o contrato oficial de TLS.
@@ -67,11 +76,15 @@ Referencias normativas:
 1. O operador faz `POST /api/auth/login` em `https://license.systemup.inf.br`.
 2. O backend valida email/password e cria um registo em `admin_sessions`.
 3. O servidor devolve `Set-Cookie: layer7_admin_session=...; HttpOnly; Secure; SameSite=Strict`.
-4. O frontend faz bootstrap via `GET /api/auth/session`.
-5. Cada rota administrativa autenticada valida a sessao no backend.
-6. Perto da expiracao ociosa, o backend renova `last_seen_at` e reemite o
+4. Quando `ADMIN_BEARER_JWT_SECRET` estiver configurada, ou quando um deploy
+   antigo ainda expuser apenas `JWT_SECRET`, o backend pode devolver tambem
+   um Bearer assinado de compatibilidade, sem alterar o papel normativo do
+   cookie stateful.
+5. O frontend faz bootstrap via `GET /api/auth/session`.
+6. Cada rota administrativa autenticada valida a sessao no backend.
+7. Perto da expiracao ociosa, o backend renova `last_seen_at` e reemite o
    cookie.
-7. Em logout ou expiracao, a sessao e invalidada no backend e o cookie e
+8. Em logout ou expiracao, a sessao e invalidada no backend e o cookie e
    limpo.
 
 ---

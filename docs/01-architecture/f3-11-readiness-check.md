@@ -16,6 +16,11 @@ Objectivo deste bloco:
 **Resultado formal desta rodada:** `RESULTADO A — F3.11 BLOQUEADA POR
 PRE-REQUISITOS`.
 
+**Nota de estado actual (`2026-04-14`):** este documento e historico da
+verificacao de `2026-04-02`. O checkpoint posterior alinhou o license-server
+live, auth/admin, same-origin e inventario; o blocker corrente da F3 e
+apenas `DR-05` no appliance.
+
 ---
 
 ## 1. Base factual usada nesta verificacao

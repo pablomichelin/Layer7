@@ -15,9 +15,17 @@ Objectivo:
 Estado formal preservado:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada`;
+- `F3.11 alinhada no license-server live`;
+- `DR-05 pendente`;
 - `esta matriz nao abre campanha`;
-- `esta matriz nao reabre readiness`.
+- `esta matriz nao fecha a F3`.
+
+Nota de actualizacao em `2026-04-14`:
+
+- os papeis ligados a cinco insumos ficam preservados como compatibilidade;
+- a responsabilidade operacional corrente concentra-se em executar e
+  documentar `DR-05` no appliance, com permissao suficiente,
+  snapshot/rollback e evidencias por `run_id`.
 
 ---
 

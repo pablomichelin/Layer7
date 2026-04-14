@@ -14,6 +14,18 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 - `sh scripts/package/smoke-layer7d.sh` (requer `cc` + `make`).
 - `make -C src/layer7d check` após `make` no mesmo diretório.
+- `cd license-server/backend && npm test` para smoke tests puros da trilha
+  de sessao/Bearer do painel administrativo.
+- `cd license-server/frontend && npm test` para smoke tests puros da camada
+  `api.js` e do estado autenticado da SPA.
+- `cd license-server/frontend && npm run build` para validar que a SPA ainda
+  compila apos mudancas na trilha administrativa.
+- `bash -n scripts/license-validation/export-license-evidence.sh` e
+  `bash -n scripts/license-validation/export-appliance-evidence.sh` e
+  `bash -n scripts/license-validation/export-live-preflight.sh` e
+  `bash -n scripts/license-validation/export-schema-preflight.sh` e
+  `bash -n scripts/license-validation/prepare-f3-preflight.sh` para smoke
+  syntax dos helpers shell da campanha F3.
 
 ## Matriz de testes
 

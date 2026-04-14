@@ -21,6 +21,13 @@ Estados operacionais usados nesta matriz:
 - `entregue parcial`
 - `entregue valido`
 
+Nota de actualizacao em `2026-04-14`:
+
+- esta matriz fica preservada como historico/compatibilidade do pacote de
+  cinco insumos;
+- host live, PostgreSQL, credencial admin e inventario ja nao bloqueiam a F3;
+- o gate corrente e `DR-05` no appliance, nao `5/5` insumos.
+
 ---
 
 ## 1. Matriz de aceite/rejeicao
@@ -48,18 +55,21 @@ Estados operacionais usados nesta matriz:
 
 ## 3. Gate por insumo
 
-1. A readiness da F3.11 so pode ser repetida quando os cinco insumos
-   estiverem em `entregue valido`.
+1. Historicamente, a readiness da F3.11 so podia ser repetida quando os
+   cinco insumos estivessem em `entregue valido`.
 2. A campanha so pode ser aberta depois de uma readiness repetida com
    resultado `GO` e sem blocker nao negociavel.
-3. `entregue parcial` nunca libera readiness.
+3. No estado corrente de `2026-04-14`, a matriz nao reabre o gate de cinco
+   insumos; o blocker real remanescente e `DR-05`.
 4. `entregue invalido` nunca conta como progresso.
 
 ---
 
 ## 4. Leitura formal desta matriz
 
-- todos os cinco insumos sao obrigatorios para a readiness;
-- todos os cinco insumos sao obrigatorios para a campanha;
-- nao existe combinacao parcial que autorize reabrir a F3.11;
-- esta matriz nao corrige os blockers; apenas governa aceite/rejeicao.
+- esta matriz governa a leitura historica de aceite/rejeicao dos cinco
+  insumos;
+- nao deve ser usada para reabrir blockers ja saneados no live em
+  `2026-04-14`;
+- para a rodada corrente, usar scorecard, registro mestre, drift registry e
+  `f3-fecho-operacional-restante.md`.

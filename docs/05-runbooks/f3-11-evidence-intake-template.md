@@ -7,6 +7,12 @@
 - preencher apenas com factos observados;
 - anexar ou referenciar output bruto sempre que existir.
 
+Nota de actualizacao em `2026-04-14`:
+
+- este template continua util para evidencia nova;
+- para o estado corrente da F3, priorizar evidencias do `DR-05` no appliance;
+- nao usar este template para reabrir insumos ja saneados sem drift novo.
+
 ---
 
 ## 1. Identificacao

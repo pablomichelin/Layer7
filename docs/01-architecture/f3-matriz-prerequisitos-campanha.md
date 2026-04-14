@@ -27,10 +27,16 @@ Leitura complementar obrigatoria:
 - [`f3-runbook-proxima-campanha-real.md`](f3-runbook-proxima-campanha-real.md)
   passa a definir a ordem sequencial da proxima rodada.
 
-**Regra central da F3.10:** a F3.11 so pode ser aberta como campanha real de
-fechamento se esta matriz estiver satisfeita. Se um item obrigatorio faltar,
-o correcto e parar antes da execucao ou marcar o cenario afectado como
-`BLOCKED`, nunca forcando `FAIL`.
+**Nota de estado actual (`2026-04-14`):** esta matriz preserva os
+pre-requisitos definidos apos a F3.9. Para a rodada corrente, o
+license-server live, auth/admin, same-origin e inventario ja estao saneados
+para a F3; resta executar `DR-05` no appliance.
+
+**Regra central historica da F3.10:** a F3.11 so podia ser aberta como
+campanha real de fechamento se esta matriz estivesse satisfeita. No estado
+actual, esta regra nao reabre blockers ja saneados; resta executar `DR-05`.
+Se um item obrigatorio reaparecer por drift novo, o correcto e parar antes da
+execucao ou marcar o cenario afectado como `BLOCKED`, nunca forcando `FAIL`.
 
 ---
 

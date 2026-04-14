@@ -27,11 +27,13 @@ Checklist live de desbloqueio da F3.11 (host, DB, admin, appliance e
 inventario reais):
 [`f3-11-live-access-checklist.md`](f3-11-live-access-checklist.md).
 
-Runbook de triagem de entrega dos cinco insumos externos da F3.11:
+Runbook historico/compatibilidade de triagem de entrega dos cinco insumos
+externos da F3.11; no estado corrente, usar apenas se drift novo reabrir
+essa necessidade:
 [`f3-11-input-triage-runbook.md`](f3-11-input-triage-runbook.md).
 
 Template canónico de intake para registar recepcao, validacao e conclusao
-de cada insumo externo da F3.11:
+de evidencia nova da F3.11:
 [`f3-11-evidence-intake-template.md`](f3-11-evidence-intake-template.md).
 
 Template canónico de ciclo operacional para consolidar cada rodada inteira

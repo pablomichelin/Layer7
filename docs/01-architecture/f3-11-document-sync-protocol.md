@@ -19,11 +19,11 @@ Objectivo:
 Estado formal preservado:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada`;
+- `F3.11 alinhada no license-server live`;
 - `sem codigo`;
 - `sem push`;
 - `sem campanha`;
-- `sem reabertura da readiness nesta rodada`.
+- `DR-05 continua como unico blocker real para fechar a F3`.
 
 Leitura complementar obrigatoria:
 
@@ -41,17 +41,17 @@ Leitura complementar obrigatoria:
 
 | Artefacto | Papel canónico | Usa-se para | Nao usar para |
 |-----------|----------------|-------------|---------------|
-| `f3-11-external-input-request-package.md` | especificar o pedido minimo dos cinco insumos | pedir e conferir o que deve chegar | registar estado corrente |
+| `f3-11-external-input-request-package.md` | especificar o pedido minimo historico dos cinco insumos | pedir e conferir o que deve chegar se drift novo reabrir insumo externo | registar estado corrente |
 | `f3-11-input-acceptance-matrix.md` | definir estados de aceite objectivos | decidir `nao entregue`, `entregue invalido`, `entregue parcial`, `entregue valido` | registar historia da rodada |
-| `f3-11-readiness-reopen-gate.md` | definir a regra formal de `GO/NO-GO` para repetir a readiness | reavaliar readiness quando `5/5` validos | receber primeira evidencia |
+| `f3-11-readiness-reopen-gate.md` | definir a regra formal de `GO/NO-GO` para repetir a readiness | reavaliar readiness quando o estado corrente ou o `DR-05` mudar | receber primeira evidencia |
 | `f3-11-input-triage-runbook.md` | governar a triagem | validar ou rejeitar o que chegou | consolidar estado executivo |
 | `f3-11-evidence-intake-template.md` | primeira aterragem da evidencia | registar o que chegou e o que foi observado | decidir estado macro da trilha sozinho |
-| `f3-11-execution-master-register.md` | SSOT corrente do estado operacional da F3.11 | ler e manter estado actual dos cinco insumos | substituir a trilha historica |
+| `f3-11-execution-master-register.md` | SSOT corrente do estado operacional da F3.11 | ler e manter estado actual, incluindo `DR-05` | substituir a trilha historica |
 | `f3-11-operational-decisions-ledger.md` | consolidar microdecisoes e historico cumulativo | registar aceite, rejeicao, parcial, blockers e `GO/NO-GO` | funcionar como painel de estado corrente isolado |
 | `f3-11-readiness-scorecard.md` | espelho executivo do estado corrente | mostrar `GO/NO-GO` e contagem de insumos | substituir o gate formal |
 | `f3-11-cycle-report-template.md` | registar e fechar cada ciclo | consolidar a rodada completa | substituir intake ou ledger |
 | `f3-11-document-traceability-map.md` | mapa de navegacao e rastreabilidade | orientar consulta e local de registo | decidir estado |
-| `f3-11-live-access-checklist.md` | executar a readiness repetida com ambiente real | validar host, DB, admin, appliance e inventario apos gate `GO` | ser usado com gate `NO-GO` |
+| `f3-11-live-access-checklist.md` | executar a readiness repetida com ambiente real | validar evidencia nova sem reabrir blockers ja saneados | substituir evidencia do appliance |
 | `f3-11-drift-registry.md` | registo cumulativo de drifts | guardar divergencias e blockers estruturais | resumir o estado corrente sozinho |
 
 ---
@@ -87,16 +87,16 @@ Leitura complementar obrigatoria:
 10. fechar o ciclo com
     [`../05-runbooks/f3-11-cycle-report-template.md`](../05-runbooks/f3-11-cycle-report-template.md).
 
-### 2.3 Quando a readiness puder ser repetida
+### 2.3 Quando a readiness ou o DR-05 puderem avancar
 
-1. confirmar `5/5` insumos `entregue valido` no scorecard e no registro
-   mestre;
-2. rever o gate de reabertura e registar a decisao no ledger;
-3. iniciar o
-   [`../05-runbooks/f3-11-live-access-checklist.md`](../05-runbooks/f3-11-live-access-checklist.md);
-4. registar resultados da readiness repetida no ciclo, no ledger, no registro
-   mestre e no scorecard;
-5. so depois classificar `GO/NO-GO` final para campanha.
+1. confirmar no scorecard e no registro mestre que o unico blocker corrente
+   continua a ser `DR-05`;
+2. confirmar que ha permissao suficiente no appliance, snapshot/rollback e
+   `run_id` de evidencias;
+3. executar apenas os cenarios locais do appliance definidos na F3.6/F3.7;
+4. registar resultados no ciclo, no ledger, no registro mestre, no scorecard
+   e no drift registry;
+5. so depois classificar se a F3 pode ou nao seguir para relatorio final.
 
 ---
 

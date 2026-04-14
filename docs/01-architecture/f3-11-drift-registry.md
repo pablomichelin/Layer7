@@ -24,17 +24,84 @@ F3.
 
 | ID | Origem temporal | Categoria | Evidencia objectiva | Contrato canonico | Impacto | Bloqueia campanha F3.11 | Tratamento correcto nesta fase |
 |----|-----------------|-----------|---------------------|-------------------|---------|-------------------------|--------------------------------|
-| DR-01 | F3.9 | Schema live | ausencia observada de `admin_sessions`, `admin_audit_log` e `admin_login_guards` no ambiente live observado | F2.2/F2.3 exigem sessao stateful, auditoria e login guards | torna metade administrativa e a trilha de sessao/auditoria nao confiaveis | sim | confirmar por query live e alinhar ambiente antes da campanha |
-| DR-02 | F3.9 | Contrato HTTP de activacao | `POST /api/activate` respondeu `403` onde a F3.8 exige `409` em cenario obrigatorio | F3.8 exige leitura binaria coerente do contrato de activacao | contamina S03 e parte da leitura online de S07 | sim | repetir o controlo em cenario real apenas depois de deploy e inventario estarem comprovados |
-| DR-03 | F3.9 | Governanca administrativa | campanha real sem credencial administrativa autorizada | F3.10 exige admin autorizado para S04/S05/S06/S10 | metade administrativa fica `BLOCKED` por governanca | sim | obter credencial com escopo formal antes de qualquer nova rodada |
-| DR-04 | F3.9 | Inventario de licencas | ausencia de pool minimo `LIC-A` a `LIC-F` em estado dedicado por cenario | F3.10 exige inventario minimo por cenario | campanha fica dependente de improviso e reuso arriscado | sim | materializar inventario real e provado no backend |
-| DR-05 | F3.9 | Ambiente de appliance | ausencia de appliance pfSense autenticavel, com baseline e controlos do lab | F3.10 exige SSH, baseline e controlos legitimos | metade local da campanha fica bloqueada | sim | disponibilizar appliance e controlos reais antes da campanha |
-| DR-06 | F3.11 saneamento | Politica CORS / same-origin | `POST` e `OPTIONS` em `/api/auth/login` com `Origin: https://evil.example` responderam com `Access-Control-Allow-Origin: *` | F2.3 aceita apenas `same-origin only` em producao | mostra divergencia entre live observado e contrato de auth/admin | sim | registar drift; confirmar runtime/config/publicacao; corrigir apenas em bloco proprio e autorizado |
-| DR-07 | F3.11 saneamento | Publicacao / revisao | `origin/main` remoto confirmado em `66e00f5...`; branch local entrou nesta rodada `ahead 19`; live sem commit provado | nenhuma equivalencia live/local/remoto pode ser assumida sem prova | impede usar o repositorio local como prova suficiente do estado do live | sim | obter shell/DB access ao host e provar revisao/stack efectiva antes da campanha |
+| DR-01 | F3.9 | Schema live | observacao antiga do live sem `admin_sessions`, `admin_audit_log` e `admin_login_guards`; em `2026-04-14` o ambiente activo em `/opt/layer7-license` passou a expor as tres tabelas | F2.2/F2.3 exigem sessao stateful, auditoria e login guards | historico resolvido no ambiente live actual | nao | manter apenas como historico de drift ja saneado |
+| DR-02 | F3.9 | Contrato HTTP de activacao | `POST /api/activate` respondeu `403` onde a F3.8 exige `409`; em `2026-04-03`, os cenarios de hw diferente, revogada, expirada e reactivacao legitima foram revalidados no live | F3.8 exige leitura binaria coerente do contrato de activacao | drift cosmetico de codigo HTTP; logica de negocio correcta | nao | alinhar `403` -> `409` em bloco futuro proprio, sem bloquear a F3 |
+| DR-03 | F3.9-F3.11 | Auth/admin live | observacao antiga do live com JWT no body, mas sem `/api/auth/session`; em `2026-04-14`, o ambiente activo passou a responder `/api/auth/session` e a manter bridge Bearer compativel | F2.2/F2.3 exigem sessao stateful canónica por cookie no painel admin | historico resolvido no ambiente live actual | nao | manter apenas como historico de drift ja saneado |
+| DR-04 | F3.9 | Inventario de licencas | ausencia antiga de pool minimo `LIC-A` a `LIC-F`; em `2026-04-03`, 4 licencas reais foram obtidas do backend live | F3.10 exige inventario minimo por cenario | resolvido por inventario real suficiente para a leitura actual da F3 | nao | manter apenas como historico de drift ja saneado |
+| DR-05 | F3.9-F3.11 | Ambiente de appliance | appliance real `192.168.100.254` ja observado com Layer7 activo, mas sem prova completa de snapshot/restore, offline/online, NIC/UUID e clone/restore | F3.10 exige SSH, baseline e controlos legitimos | metade local da campanha continua incompleta para os cenarios do appliance | sim | completar agora os cenarios locais restantes com permissao suficiente, snapshot/rollback e evidencias por `run_id` |
+| DR-06 | F3.11 saneamento | Politica CORS / same-origin | observacao antiga do live com `Access-Control-Allow-Origin: *`; em `2026-04-14`, `POST` e `OPTIONS` em `/api/auth/login` com `Origin: https://evil.example` passaram a responder `403 {\"error\":\"Origem administrativa nao autorizada.\"}` | F2.3 aceita apenas `same-origin only` em producao | historico resolvido no ambiente live actual | nao | manter apenas como historico de drift ja saneado |
+| DR-07 | F3.11 saneamento | Publicacao / revisao | stack viva observada em `/opt/layer7-license`, mas o host actual nao fornece checkout Git, bind mount ou metadata util de commit; a revisao exacta do deploy continua nao demonstravel | nenhuma equivalencia live/local/remoto pode ser assumida sem prova | impede usar o repositorio local como prova suficiente do estado do live, mas nao bloqueia os cenarios de licenciamento do appliance | nao | manter aberto para F7/governanca operacional, sem bloquear a F3 |
 
 ---
 
-## 2. Detalhe do drift adicional de CORS
+## 2. Evidencia nova obtida em 2026-04-03
+
+### Bearer JWT funciona no live
+
+Em `2026-04-03`, foi executado login fresco seguido de `GET /api/licenses`
+com `Authorization: Bearer <token>`. Resultado:
+
+- `POST /api/auth/login` com credencial real => `200 OK` com JWT e objecto
+  `admin`;
+- `GET /api/licenses` com `Authorization: Bearer <jwt>` => `200 OK` com
+  listagem real de 4 licencas.
+
+Isto prova que:
+
+- o live ja aceita Bearer JWT para endpoints autenticados;
+- o erro anterior `401 Token invalido ou expirado` era apenas token expirado;
+- a listagem real do inventario esta agora disponivel sem deploy de codigo
+  novo.
+
+### Inventario real obtido
+
+4 licencas reais no live:
+
+| ID | Cliente | Status | Expiry | Hardware bound? |
+|----|---------|--------|--------|-----------------|
+| 8 | Compasi | `active` | 2026-12-31 | sim |
+| 7 | Systemup | `active` | 2033-10-24 | sim |
+| 6 | Lasalle Agro | `revoked` | 2026-04-30 | sim |
+| 5 | Lasalle | `active` (expirada por data) | 2026-03-31 | sim |
+
+Observacoes:
+
+- licencas 7 e 5 partilham o mesmo `hardware_id`;
+- licenca 5 esta expirada por data (`expiry < hoje`) mas `status` continua
+  `active`, confirmando o modelo hibrido da F3.3;
+- licenca 6 esta revogada com `revoked_at` preenchido.
+
+### License-server live alinhado em 2026-04-14
+
+Em `2026-04-14`, o ambiente activo em `/opt/layer7-license` foi observado com:
+
+- stack Docker viva com `api`, `db`, `web` e `nginx`;
+- tabelas `admin_sessions`, `admin_audit_log` e `admin_login_guards`
+  presentes na base `layer7_license`;
+- `node bootstrap-admin.js status` a devolver `total_admins: 1`;
+- `POST` e `OPTIONS` em `/api/auth/login` com `Origin` externo a responder
+  `403` fail-closed.
+
+Isto prova que o drift administrativo do live deixou de ser blocker real da
+F3.
+
+---
+
+## 3. Reclassificacao dos drifts apos evidencia de 2026-04-03
+
+| ID | Estado anterior | Estado actual | Razao da mudanca |
+|----|-----------------|---------------|------------------|
+| DR-01 | aberto, bloqueante | resolvido | ambiente activo agora expoe `admin_sessions`, `admin_audit_log` e `admin_login_guards` |
+| DR-02 | aberto, bloqueante | resolvido como drift cosmético | revalidado em 2026-04-03: live usa `403` onde repo usa `409`, mas logica de negocio esta correcta (rejeita binding conflituante, revogada e expirada; aceita reactivacao legitima) |
+| DR-03 | aberto, bloqueante | resolvido | `/api/auth/session` e a bridge Bearer estao alinhados no live actual |
+| DR-04 | aberto, bloqueante | resolvido | inventario real de 4 licencas obtido |
+| DR-05 | aberto, bloqueante | aberto, pendente | cenarios locais continuam pendentes |
+| DR-06 | aberto, bloqueante | resolvido | live voltou a responder `403` fail-closed para `Origin` externo em `/api/auth/login` |
+| DR-07 | aberto, bloqueante | aberto, nao bloqueante para F3 | proveniencia do deploy nao bloqueia validacao de licenciamento |
+
+---
+
+## 4. Detalhe historico do drift de CORS
 
 ### DR-06 - `/api/auth/login` aceita `Origin` externo com wildcard
 
@@ -62,77 +129,57 @@ Classificacao:
 - **Natureza:** divergencia observada no live, nao inferencia sobre codigo;
 - **Tratamento nesta rodada:** apenas registo formal.
 
-Impacto:
+Impacto historico:
 
 - reforca que o deploy observado nao pode ser tratado como equivalente ao
   contrato documental da F2/F3;
 - impede leitura optimista de readiness administrativa;
 - exige nova confirmacao interna do runtime/config do ambiente escolhido.
 
-Bloqueio sobre a F3.11:
+Bloqueio historico sobre a F3.11:
 
-- **bloqueia** usar o live observado como ambiente elegivel sem nova prova e
+- **bloqueava** usar o live observado como ambiente elegivel sem nova prova e
   saneamento;
-- **nao autoriza** corrigir runtime/config/publicacao nesta rodada;
-- a dependencia futura fica registada como
-  `correcao de runtime/config/publicacao em bloco proprio, sem campanha em
-  paralelo`.
+- depois do checkpoint de `2026-04-14`, deixa de bloquear a F3 porque o live
+  voltou a responder `403` fail-closed para `Origin` externo;
+- a secao permanece apenas para preservar a memoria factual do drift antigo.
 
 ---
 
-## 3. Leitura consolidada de impacto
+## 5. Leitura consolidada de impacto pos-2026-04-03
 
-### Drifts que bloqueiam a campanha F3.11
+### Drifts que bloqueiam a campanha F3
 
-- `DR-01` schema live nao comprovado/alinhado;
-- `DR-02` contrato `409` vs `403` ainda sem revalidacao real;
-- `DR-03` ausencia de credencial admin autorizada;
-- `DR-04` ausencia de inventario `LIC-A` a `LIC-F`;
-- `DR-05` ausencia de appliance/lab autenticavel;
-- `DR-06` politica same-origin divergente no live observado;
-- `DR-07` equivalencia entre live, remoto e branch local nao demonstrada.
+- `DR-05` cenarios locais do appliance — pendentes de execucao.
 
-### Drifts que nao podem ser "resolvidos" durante a campanha
+### Drifts reclassificados como fora do escopo F3
 
-- qualquer drift de schema;
-- qualquer drift de runtime/config da superficie administrativa;
-- qualquer drift de publicacao/revisao do deploy;
-- qualquer falta de governanca de acesso.
+- `DR-07` proveniencia do deploy — F7/operacional.
 
-Se qualquer um desses pontos persistir no inicio da proxima rodada, o
-resultado correcto continua a ser:
+### Drifts resolvidos
 
-- abortar antes da campanha; ou
-- marcar cenario afectado como `BLOCKED`;
-
-nunca reinterpretar `FAIL` como aceitavel.
+- `DR-01` schema/admin live — alinhado no ambiente activo;
+- `DR-02` contrato `409` vs `403` — revalidado: drift cosmetico, logica correcta;
+- `DR-03` auth/admin live — sessao stateful + Bearer alinhados no ambiente activo;
+- `DR-04` inventario — 4 licencas reais obtidas;
+- `DR-06` CORS/same-origin — fail-closed no ambiente activo.
 
 ---
 
-## 4. Dependencias futuras registadas
+## 6. Dependencias futuras
 
-Pendencias que ficam abertas para bloco futuro proprio, sem execucao nesta
-rodada:
-
-1. confirmar revisao exacta, directorio real e compose activa do ambiente
-   observado;
-2. confirmar schema live por query read-only;
-3. obter credencial administrativa autorizada e escopo formal;
-4. disponibilizar appliance pfSense com snapshot/restore e controlos
-   legitimos;
-5. materializar inventario `LIC-A` a `LIC-F`;
-6. corrigir o drift `same-origin only` vs `Access-Control-Allow-Origin: *`
-   apenas em bloco de runtime/config/publicacao autorizado.
+1. executar cenarios locais do appliance para fechar DR-05;
+2. alinhar codigos HTTP do activate (`403` -> `409`) quando o live for
+   actualizado;
+3. resolver proveniencia do deploy quando oportuno.
 
 ---
 
-## 5. Objectivo, impacto, risco, teste e rollback deste bloco
+## 7. Objectivo, impacto, risco, teste e rollback
 
-- **Objectivo:** consolidar os drifts acumulados da F3.9 ate ao estado actual
-  da F3.11.
-- **Impacto:** documental-operacional apenas; nenhum ficheiro de codigo foi
-  alterado.
-- **Risco:** baixo; o documento apenas classifica desvios ja observados.
-- **Teste minimo:** coerencia cruzada com F3.10, readiness check e
-  saneamento minimo.
+- **Objectivo:** reclassificar drifts com base em evidencia real de
+  2026-04-03.
+- **Impacto:** documental; reclassifica blockers sem alterar codigo.
+- **Risco:** baixo; baseado em evidencia objectiva.
+- **Teste minimo:** coerencia com inventario real e escopo F3 vs F2.
 - **Rollback:** `git revert <commit-deste-bloco>`.

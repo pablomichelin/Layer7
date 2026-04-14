@@ -26,7 +26,7 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada
 **Versao segura conhecida do pacote:** `1.8.3`
-**Data-base deste checkpoint:** `2026-04-02`
+**Data-base deste checkpoint:** `2026-04-14`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
 GUI integrada, classificacao Layer 7 via nDPI, politicas granulares,
@@ -102,7 +102,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/05-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/05-runbooks/f3-11-evidence-intake-template.md`, `docs/05-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-execution-master-register.md`, `docs/01-architecture/f3-11-operational-decisions-ledger.md`, `docs/01-architecture/f3-11-readiness-scorecard.md`, `docs/05-runbooks/f3-11-cycle-report-template.md` e `docs/00-overview/f3-11-document-traceability-map.md` para converter o kit da F3.11 num cockpit canónico unico de acompanhamento, decisao, score, rastreabilidade e execucao operacional ponta a ponta, sem codigo, sem push, sem campanha e sem reabrir a readiness; a rodada documental-operacional actual materializa `docs/01-architecture/f3-11-state-machine.md`, `docs/01-architecture/f3-11-document-sync-protocol.md`, `docs/00-overview/f3-11-start-here.md`, `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e `docs/05-runbooks/f3-11-cycle-closure-criteria.md` para transformar o cockpit da F3.11 num sistema canonico completo de estados, sincronizacao, entrada unica, responsabilidades e fecho de ciclo, mantendo explicitamente `F3 aberta`, `F3.11 bloqueada`, `readiness = NO-GO`, `campanha = NO-GO`, sem codigo, sem push e sem reabrir a readiness; o branch local entrou nesta rodada `main...origin/main [ahead 22]` e continua sem prova de publicacao integral no remoto
+**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/05-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/05-runbooks/f3-11-evidence-intake-template.md`, `docs/05-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-execution-master-register.md`, `docs/01-architecture/f3-11-operational-decisions-ledger.md`, `docs/01-architecture/f3-11-readiness-scorecard.md`, `docs/05-runbooks/f3-11-cycle-report-template.md` e `docs/00-overview/f3-11-document-traceability-map.md` para converter o kit da F3.11 num cockpit canónico unico de acompanhamento, decisao, score, rastreabilidade e execucao operacional ponta a ponta, sem codigo, sem push, sem campanha e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-state-machine.md`, `docs/01-architecture/f3-11-document-sync-protocol.md`, `docs/00-overview/f3-11-start-here.md`, `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e `docs/05-runbooks/f3-11-cycle-closure-criteria.md` para transformar o cockpit da F3.11 num sistema canonico completo de estados, sincronizacao, entrada unica, responsabilidades e fecho de ciclo, mantendo explicitamente `F3 aberta`, `F3.11 bloqueada`, `readiness = NO-GO`, `campanha = NO-GO`, sem codigo, sem push e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/00-overview/f3-organizacao-local-e-fecho.md` e `docs/01-architecture/f3-fecho-operacional-restante.md`, e corrigiu o `start-here`, o mapa de rastreabilidade, o registro mestre, o scorecard e o drift registry para o estado real observado da fase: license-server live alinhado, auth administrativa alinhada, inventario real obtido, DR-01/DR-03/DR-04/DR-06 resolvidos, DR-02 reclassificado como cosmetico nao bloqueante e DR-05 mantido como unico blocker real para fechar a F3; o branch local entrou nesta rodada `main...origin/main [ahead 23]` e continua sem prova de publicacao integral no remoto
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -217,21 +217,15 @@ divergencia adicional de politica HTTP/admin: `/api/auth/login` continua a
 aceitar `Origin` externo com `Access-Control-Allow-Origin: *`, contrariando o
 contrato canónico `same-origin only` da F2.3.
 
-**Trilha activa dentro da F3:** `F3.11 bloqueada — a campanha real nao foi
-aberta porque os pre-requisitos da F3.10 continuam incompletos no ambiente
-actual; o pacote canonico de habilitacao de acessos, o pacote canonico de
-solicitacao externa, a matriz de aceite, o template de intake, o runbook de
-triagem, o gate de reabertura, o registro mestre de execucao, o ledger de
-microdecisoes, o scorecard executivo, o template de ciclo, o mapa de
-rastreabilidade, a maquina de estados, o protocolo de sincronizacao, o
-`start-here`, a matriz de responsabilidades e o criterio de fecho de ciclo
-passam agora a definir exactamente por onde o operador entra, em que ordem
-cada artefacto deve ser actualizado, que estados sao permitidos, quem decide
-o que e quando um ciclo pode ser dado por fechado sem reabrir readiness antes
-da hora; a F3 permanece aberta enquanto nao existirem evidencias reais de
-deploy observavel com shell/DB, credencial administrativa autorizada,
-appliance pfSense autenticavel, controlos legitimos do lab e inventario
-minimo de licencas por cenario`
+O checkpoint seguinte de `2026-04-14` alinhou o `license-server` live em
+`192.168.100.244:/opt/layer7-license`: `admin_sessions`,
+`admin_audit_log` e `admin_login_guards` passam a existir no ambiente activo,
+`/api/auth/session` volta a responder no contrato stateful actual e
+`/api/auth/login` volta a falhar fechado para `Origin` externo. Com isso, os
+blockers administrativos do live deixam de bloquear a F3, ficando apenas o
+`DR-05` do appliance como blocker real remanescente.
+
+**Trilha activa dentro da F3:** `F3.11 alinhada no license-server live em 2026-04-14 — o ambiente activo em 192.168.100.244:/opt/layer7-license passa a expor admin_sessions, admin_audit_log e admin_login_guards, /api/auth/session volta a responder com sessao stateful e bridge Bearer, e /api/auth/login volta a falhar fechado para Origin externo com 403; DR-01 (schema admin), DR-03 (auth/admin), DR-04 (inventario) e DR-06 (same-origin) ficam resolvidos no ambiente activo; DR-02 (contrato 409 vs 403) continua apenas como drift cosmetico nao bloqueante; resta como unico blocker real da F3 apenas DR-05 (cenarios locais do appliance); a F3 permanece aberta ate os cenarios do appliance serem executados`
 
 ### Ordem segura das fases
 
@@ -252,27 +246,14 @@ minimo de licencas por cenario`
 
 1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
    sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
-2. Satisfazer explicitamente a
-   `docs/01-architecture/f3-matriz-prerequisitos-campanha.md` e o novo
-   `docs/01-architecture/f3-11-access-enablement-package.md`,
-   `docs/01-architecture/f3-11-external-input-request-package.md`,
-   `docs/01-architecture/f3-11-input-acceptance-matrix.md` e
-   `docs/01-architecture/f3-11-execution-master-register.md`,
-   `docs/01-architecture/f3-11-operational-decisions-ledger.md`,
-   `docs/01-architecture/f3-11-readiness-scorecard.md`,
-   `docs/01-architecture/f3-11-state-machine.md`,
-   `docs/01-architecture/f3-11-document-sync-protocol.md`,
-   `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e
-   `docs/01-architecture/f3-11-readiness-reopen-gate.md`, seguindo o ponto
-   unico de entrada em `docs/00-overview/f3-11-start-here.md` e o criterio
-   de fecho em `docs/05-runbooks/f3-11-cycle-closure-criteria.md`, antes de nova
-   rodada; a verificacao em
-   `docs/01-architecture/f3-11-readiness-check.md`, o saneamento em
-   `docs/01-architecture/f3-11-readiness-saneamento.md` e o novo kit
-   documental da F3.11 confirmam que continuam pendentes o acesso a
-   shell/DB do deploy observado, a credencial administrativa autorizada, o
-   appliance pfSense autenticavel, os controlos legitimos do lab e o
-   inventario minimo por cenario.
+2. Usar `docs/00-overview/f3-11-start-here.md`,
+   `docs/00-overview/f3-organizacao-local-e-fecho.md` e
+   `docs/01-architecture/f3-fecho-operacional-restante.md` como entrada
+   curta da rodada actual: o license-server live, a auth administrativa e o
+   inventario real ja estao alinhados para a F3; o proximo passo pratico
+   seguro e executar somente o `DR-05` no appliance `192.168.100.254`, com
+   snapshot/rollback, permissao suficiente para os cenarios mutaveis e
+   evidencias por `run_id`.
 3. Tratar a
    `docs/01-architecture/f3-matriz-drift-operacional.md` e o novo
    `docs/01-architecture/f3-11-drift-registry.md` como listas canónicas de
@@ -365,57 +346,29 @@ minimo de licencas por cenario`
   continua dependente de executar em lab/appliance os cenarios obrigatorios
   de grace, revogacao com `.lic` antigo, coexistencia de artefactos e drift
   real de fingerprint sem abrir escopo tecnico novo.
-- A F3.9 revelou drift operacional relevante entre o contrato canónico do
-  repositório e o deploy real observado em `192.168.100.244`: o schema live
-  nao contem `admin_sessions`, `admin_audit_log` nem `admin_login_guards`, e
-  o `activate.js` live continua a responder `403` em cenarios onde a F3.8
-  exige `409`; esta divergencia invalida qualquer leitura optimista de fecho
-  da F3 ate o ambiente ser alinhado ou substituido.
-- A F3.9 tambem ficou limitada por falta de appliance pfSense autenticavel e
-  por ausencia de credencial administrativa autorizada para a campanha; sem
-  esses pre-requisitos, S01, S04-S06, S08, S10-S13 continuam sem prova real
-  suficiente.
-- A F3.10 fixa como blockers operacionais actuais: drift de schema, drift de
-  contrato HTTP em `activate`, falta de credencial administrativa autorizada,
-  falta de appliance pfSense autenticavel e falta de inventario minimo de
-  licencas por cenario; a F3.11 nao deve reaprender estes blockers na marra.
-- A verificacao da F3.11 confirmou conectividade publica a
-  `https://license.systemup.inf.br` e ao origin
-  `http://192.168.100.244:8445`, mas isso nao substitui shell/DB access ao
-  deploy observado nem prova a revisao efectiva do ambiente.
-- O saneamento minimo seguinte confirmou remotamente que `origin/main` esta
-  em `66e00f5a36e78056aae27df6aea0ccbd0ed78553`, enquanto o branch local
-  seguia `ahead 18`; continua sem prova se o live observado corresponde ao
-  remoto, ao local ou a outro estado intermédio.
-- O live observado em `/api/auth/login` continua a expor
-  `Access-Control-Allow-Origin: *` e a aceitar preflight com `Origin`
-  externo, o que diverge do contrato `same-origin only` aceite na F2.3; isto
-  e drift operacional/documental a registar, nao a corrigir no escuro.
-- A rodada documental-operacional seguinte da F3.11 entrou ainda com o
-  repositório local `ahead 19`; sem shell/DB access ao live e sem prova da
-  revisao exacta do deploy, continua proibido assumir equivalencia entre o
-  estado local, `origin/main` e o ambiente observado em producao.
-- A F3.11 passa a ter pacote canonico de desbloqueio em
-  `docs/01-architecture/f3-11-access-enablement-package.md`, checklist live
-  em `docs/05-runbooks/f3-11-live-access-checklist.md` e registry cumulativo
-  de drift em `docs/01-architecture/f3-11-drift-registry.md`; estes
-  documentos reduzem ambiguidade operacional, mas nao removem blockers por si
-  so.
-- A rodada documental-operacional seguinte entrou com o branch local
-  `main...origin/main [ahead 20]`, nao fez push e materializou o kit
-  canonico de solicitacao externa, aceite, intake, triagem e gate de
-  reabertura da readiness; um push nessa altura ja publicaria historico local
-  acumulado.
-- A rodada documental-operacional actual entrou com o branch local
-  `main...origin/main [ahead 21]`, nao faz push e materializa o cockpit
-  canónico da F3.11 em registro mestre, ledger, scorecard, template de ciclo
-  e mapa de rastreabilidade; qualquer push agora continuaria a publicar
-  historico local acumulado e, por isso, permanece fora deste bloco.
-- Antes da F3.11 tem de existir, no ambiente escolhido para a campanha:
-  deploy observavel face ao repo com acesso suficiente a queries objectivas,
-  schema alinhado ao contrato canónico, credencial administrativa
-  exercitavel, appliance com baseline recolhivel e inventario LIC-A a LIC-F
-  preparado para os cenarios obrigatorios.
+- A F3.9 revelou drifts reais no ambiente observado, mas o checkpoint de
+  `2026-04-14` reclassificou o estado corrente: `DR-01` schema/admin,
+  `DR-03` auth/admin, `DR-04` inventario e `DR-06` same-origin foram
+  saneados no `license-server` live activo; `DR-02` ficou como divergencia
+  cosmetica de codigo HTTP (`403` vs `409`) sem bloquear a F3.
+- O unico blocker real remanescente da F3 e `DR-05`: cenarios locais do
+  appliance `192.168.100.254` que ainda exigem permissao suficiente para
+  reescrever `/usr/local/etc/layer7.lic`, controlar o daemon, executar
+  offline/online, grace/relogio, snapshot/restore e NIC/UUID/clone com
+  evidencias por `run_id`.
+- Os pacotes antigos de cinco insumos da F3.11 permanecem como memoria
+  documental-operacional, mas nao sao mais o gate corrente para continuar a
+  F3. O caminho actual e consultar `f3-11-start-here.md`,
+  `f3-organizacao-local-e-fecho.md`, `f3-fecho-operacional-restante.md`,
+  o scorecard, o registro mestre e o drift registry, e executar apenas o
+  bloco `DR-05`.
+- `DR-07` proveniencia exacta do deploy continua aberto como governanca
+  operacional/F7: nao autoriza inferir live = local = remoto, mas tambem nao
+  bloqueia os cenarios de licenciamento do appliance na F3.
+- A rodada documental-operacional actual continua com o branch local
+  `main...origin/main [ahead 23]` e sem prova de publicacao integral no
+  remoto; qualquer commit/push deve ser feito em bloco proprio e sem misturar
+  alteracoes tecnicas pendentes com saneamento documental.
 - O branch local continua `ahead` de `origin/main`; o estado documental
   efectivo da F3 deve ser lido a partir do repositório local ate a publicacao
   do push ser confirmada.

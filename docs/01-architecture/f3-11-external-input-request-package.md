@@ -3,11 +3,12 @@
 ## Finalidade
 
 Este documento formaliza, em modo **documental-operacional estrito**, o
-pedido tecnico dos cinco insumos externos que continuam a bloquear a F3.11.
+pedido tecnico historico dos cinco insumos externos que bloqueavam a F3.11
+antes do checkpoint de `2026-04-14`.
 
 Objectivo deste pacote:
 
-- pedir os cinco insumos sem linguagem vaga;
+- preservar o pedido dos cinco insumos sem linguagem vaga;
 - tornar a entrega verificavel por qualquer operador ou gestor;
 - reduzir rejeicoes por ambiguidade;
 - impedir que a readiness da F3.11 seja repetida com dependencias
@@ -18,10 +19,20 @@ Objectivo deste pacote:
 Estado formal herdado e preservado:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada`;
+- `F3.11 alinhada no license-server live em 2026-04-14`;
 - `nenhum ficheiro de codigo foi alterado`;
 - `nao foi feito push`;
-- `o drift de CORS/same-origin continua apenas registado`.
+- `o pacote de cinco insumos permanece historico/compatibilidade`;
+- `o gate corrente e executar DR-05 no appliance`.
+
+Nota de actualizacao em `2026-04-14`:
+
+- os insumos de host live, PostgreSQL, credencial admin e inventario ja foram
+  saneados para a leitura actual da F3;
+- este documento so deve ser reactivado se um drift novo invalidar essa
+  leitura;
+- o proximo passo operacional corrente nao e pedir cinco insumos, e sim
+  completar `DR-05`.
 
 Leitura complementar obrigatoria:
 
@@ -136,13 +147,12 @@ Leitura complementar obrigatoria:
 
 ---
 
-## 4. Impacto operacional consolidado
+## 4. Impacto operacional consolidado historico
 
-- Se um unico insumo ficar ausente, a F3.11 continua bloqueada.
-- Se um insumo for entregue de forma parcial ou invalida, a F3.11 continua
-  bloqueada.
-- So depois de os cinco insumos estarem `entregue valido` a readiness pode
-  ser reaberta pelo gate formal proprio.
+- Antes do checkpoint de `2026-04-14`, um unico insumo ausente mantinha a
+  F3.11 bloqueada.
+- No estado corrente, este impacto nao deve reabrir blockers ja saneados.
+- O gate actual e completar `DR-05` no appliance.
 - Este documento nao autoriza push, nao autoriza campanha e nao altera o
   estado de fase.
 

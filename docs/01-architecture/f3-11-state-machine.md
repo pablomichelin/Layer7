@@ -18,9 +18,18 @@ Objectivo:
 Estado formal preservado:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada`;
-- `readiness = NO-GO`;
-- `campanha = NO-GO`.
+- `F3.11 alinhada no license-server live`;
+- `readiness = GO condicional`;
+- `campanha = GO condicional`;
+- `DR-05 continua bloqueante para o fecho da F3`.
+
+Nota de actualizacao em `2026-04-14`:
+
+- o modelo original de cinco insumos permanece abaixo como historico de
+  governanca e compatibilidade documental;
+- o gate corrente deixou de ser `5/5 insumos entregue valido`;
+- o estado corrente e `SM-10 - ALINHADA_COM_DR05_PENDENTE`, descrito na
+  secao 4.
 
 Leitura complementar obrigatoria:
 
@@ -36,11 +45,11 @@ Leitura complementar obrigatoria:
 
 ## 1. Regras invariaveis da maquina
 
-1. A F3.11 nao sai de estado bloqueado enquanto os cinco insumos nao
-   estiverem `entregue valido`.
-2. Nenhum estado autoriza campanha por inferencia; a campanha so deixa de ser
-   `NO-GO` depois de readiness repetida, scorecard sincronizado e gate
-   formalmente revisto.
+1. Depois do checkpoint de `2026-04-14`, a F3.11 nao deve regressar ao gate
+   de cinco insumos sem evidencia nova que invalide o live/admin/inventario
+   ja saneados.
+2. Nenhum estado autoriza fecho da F3 por inferencia; a fase so fecha depois
+   de `DR-05` ter evidencia real suficiente e relatorio final binario.
 3. Nenhum estado pode ser alterado apenas por conversa, memoria oral ou
    expectativa de entrega. E preciso evidenciar o evento.
 4. Intake, triagem, ledger, registro mestre, scorecard e gate devem estar
@@ -53,6 +62,9 @@ Leitura complementar obrigatoria:
 ---
 
 ## 2. Estados canonicos
+
+Nota: os estados `SM-01` a `SM-09` documentam o modelo operacional anterior
+da F3.11. Para a rodada actual, usar a leitura da secao 4.
 
 ### `SM-01 - BLOQUEADA_SEM_INSUMOS`
 
@@ -220,19 +232,24 @@ Leitura complementar obrigatoria:
 
 ## 4. Leitura do estado actual
 
-No estado comprovado desta rodada, a F3.11 permanece em:
+No estado comprovado da rodada actual, a F3.11 permanece em:
 
-- `SM-01 - BLOQUEADA_SEM_INSUMOS` como leitura formal corrente do cockpit,
-  porque nenhum dos cinco insumos foi validado;
-- com possibilidade apenas de transitar para `SM-02` ou `SM-03` quando
-  chegar evidencia real.
+- `SM-10 - ALINHADA_COM_DR05_PENDENTE` como leitura formal corrente do
+  cockpit;
+- license-server live, PostgreSQL, auth/admin e inventario real ja estao
+  suficientes para a F3;
+- a unica transicao operacional valida e executar ou complementar `DR-05`
+  no appliance com snapshot/rollback e evidencias por `run_id`;
+- qualquer regresso ao modelo `5/5` exige drift novo objectivo, nao apenas
+  leitura de documentos antigos.
 
 Leitura binaria:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada`;
-- `readiness continua NO-GO`;
-- `campanha continua NO-GO`.
+- `F3.11 alinhada no license-server live`;
+- `readiness = GO condicional`;
+- `campanha = GO condicional`;
+- `DR-05 continua bloqueante para o fecho da F3`.
 
 ---
 

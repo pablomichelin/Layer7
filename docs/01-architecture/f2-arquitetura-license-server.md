@@ -84,6 +84,10 @@ Documentos normativos desta arquitetura:
   F2.1, falhando fechado fora de HTTPS/TLS
 - o estado de autenticacao deixa de usar JWT bearer e passa a usar cookie
   `HttpOnly + Secure + SameSite=Strict`
+- a ponte Bearer administrativa passa a ser apenas compatibilidade transitória
+  e opcional, preferindo `ADMIN_BEARER_JWT_SECRET` e aceitando `JWT_SECRET`
+  apenas como compatibilidade de upgrade; sem reutilizar a
+  `ED25519_PRIVATE_KEY` e sem substituir a sessao stateful
 - a expiracao passa a ser dupla: `30 minutos` de ociosidade e `8 horas` de
   vida absoluta, com renovacao controlada perto da janela ociosa
 - novo login passa a revogar sessoes activas anteriores do mesmo admin
@@ -92,8 +96,9 @@ Documentos normativos desta arquitetura:
 
 - `license-server/frontend/src/auth.jsx` passa a centralizar bootstrap de
   sessao, login, logout e tratamento de sessao invalida/expirada
-- `license-server/frontend/src/api.js` deixa de usar `localStorage` e bearer
-  manual; as chamadas autenticadas passam a usar cookie same-origin
+- `license-server/frontend/src/api.js` deixa de usar `localStorage`; quando a
+  ponte Bearer estiver activa, o token fica apenas em memoria transitoria,
+  enquanto o contrato normativo continua a ser cookie same-origin
 - `license-server/frontend/src/App.jsx` passa a proteger rotas por sessao
   resolvida no backend em vez de apenas testar presenca de token local
 

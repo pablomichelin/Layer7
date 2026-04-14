@@ -55,6 +55,31 @@ No directorio raiz do `run_id`, recolher antes de S01:
 - `40-preflight-appliance.txt`
 - `50-preflight-inventory.md`
 
+O helper `scripts/license-validation/init-f3-validation-campaign.sh` passa a
+materializar estes cinco artefactos como placeholders minimos, para reduzir
+erro humano antes do primeiro cenario. A campanha continua a exigir
+preenchimento real e evidencias objectivas; o helper nao substitui a
+validacao de entrada.
+
+Os helpers complementares passam a cobrir duas metades do preflight:
+
+- `scripts/license-validation/prepare-f3-preflight.sh` pode orquestrar, no
+  mesmo `run_id`, a inicializacao da campanha e os helpers de live/schema/
+  appliance quando os acessos existirem;
+- `scripts/license-validation/export-live-preflight.sh` pode actualizar
+  `10-preflight-deploy.txt` e `30-preflight-admin.txt` com output bruto de
+  health/login/CORS;
+- `scripts/license-validation/export-schema-preflight.sh` pode actualizar
+  `20-preflight-schema.txt` com identidade da base, presenca das tabelas e
+  contagem minima via `docker compose exec` read-only;
+- `scripts/license-validation/export-appliance-evidence.sh --update-root-preflight`
+  pode consolidar a baseline do pfSense em `40-preflight-appliance.txt`.
+
+Quando a baseline do appliance for recolhida via
+`scripts/license-validation/export-appliance-evidence.sh`, o operador pode
+usar `--update-root-preflight` para consolidar a mesma captura no
+`40-preflight-appliance.txt` da campanha, sem copiar/colar manual.
+
 Conteudo minimo desses artefactos:
 
 | Ficheiro | Conteudo minimo obrigatorio |

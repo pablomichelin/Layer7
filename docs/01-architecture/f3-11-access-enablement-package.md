@@ -20,9 +20,17 @@ Objectivo deste bloco:
 Estado formal deste pacote:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada`;
+- `F3.11 alinhada no license-server live em 2026-04-14`;
 - `a campanha real nao foi aberta`;
-- `existe agora pacote operacional de desbloqueio definido`.
+- `este pacote permanece como memoria historica/compatibilidade`;
+- `o gate corrente e executar DR-05 no appliance`.
+
+Nota de actualizacao em `2026-04-14`:
+
+- host live, PostgreSQL, auth/admin e inventario ja nao bloqueiam a F3;
+- `DR-07` fica fora do escopo F3;
+- nao usar este pacote para reabrir a burocracia de cinco insumos sem drift
+  novo objectivo.
 
 Leitura complementar obrigatoria:
 
@@ -35,7 +43,7 @@ Leitura complementar obrigatoria:
 
 ---
 
-## 1. Base factual herdada
+## 1. Base factual herdada historica
 
 Factos ja comprovados antes deste pacote:
 
@@ -57,13 +65,12 @@ Factos ja comprovados antes deste pacote:
 - o live observado em `/api/auth/login` continua a aceitar `Origin` externo
   com `Access-Control-Allow-Origin: *`.
 
-Leitura operacional obrigatoria desta base:
+Leitura historica desta base:
 
 - ha prova de conectividade HTTP e de estado Git remoto;
-- nao ha prova suficiente de shell/DB live, credencial admin autorizada,
-  appliance pfSense utilizavel nem inventario real `LIC-A` a `LIC-F`;
-- sem esses acessos, a F3.11 continua bloqueada por governanca e ambiente,
-  nao por falta de mais um teste improvisado.
+- no checkpoint de `2026-04-14`, shell/DB live, credencial admin,
+  same-origin e inventario foram saneados para a leitura actual da F3;
+- o que permanece operacionalmente pendente e `DR-05` no appliance.
 
 ---
 
@@ -230,7 +237,7 @@ Evidencia **nao** aceite:
 
 ## 6. Estado canonico de publicacao e revisao
 
-Leitura canonica, sem extrapolacao:
+Leitura historica, sem extrapolacao:
 
 - `origin/main` remoto foi confirmado em
   `66e00f5a36e78056aae27df6aea0ccbd0ed78553`;
@@ -239,9 +246,9 @@ Leitura canonica, sem extrapolacao:
 - a rodada actual iniciou com `main...origin/main [ahead 19]`;
 - o ultimo commit local antes desta rodada continua a ser
   `5f62035227f061d7f8dc1dd6fce2be7f530146b0`;
-- sem shell/DB access ao live e com o branch local ainda `ahead` do remoto,
-  e proibido assumir equivalencia entre documentacao/codigo local e ambiente
-  observado em producao.
+- na rodada original, sem shell/DB access ao live e com o branch local ainda
+  `ahead` do remoto, era proibido assumir equivalencia entre documentacao/
+  codigo local e ambiente observado em producao.
 
 Isto **nao** prova que o live esteja desactualizado.
 Isto **tambem nao** prova que o live esteja alinhado.
@@ -249,10 +256,10 @@ Isto prova apenas que a equivalencia continua **nao demonstrada**.
 
 ---
 
-## 7. Criterios de liberacao
+## 7. Criterios de liberacao historicos
 
-A F3.11 so pode sair de `bloqueada` para `elegivel para nova readiness` se
-todos os itens abaixo forem satisfeitos:
+Na rodada original, a F3.11 so poderia sair de `bloqueada` para `elegivel
+para nova readiness` se todos os itens abaixo fossem satisfeitos:
 
 1. host live acessivel por `ssh` com output objectivo de stack e revisao;
 2. PostgreSQL live consultavel em modo read-only;
@@ -267,10 +274,11 @@ todos os itens abaixo forem satisfeitos:
 9. nova readiness executada sem ambiguidade sobre deploy, schema, admin,
    appliance e inventario.
 
-Enquanto qualquer item acima faltar:
+No estado actual de `2026-04-14`, estes criterios nao sao o gate corrente.
+Enquanto `DR-05` faltar:
 
-- a F3.11 continua bloqueada;
-- a campanha real nao abre;
+- a F3.11 permanece alinhada no license-server live, mas condicional;
+- a campanha real nao deve ser tratada como fechamento da F3;
 - a F3 continua aberta.
 
 ---

@@ -13,9 +13,10 @@
 Estado formal de arranque que deve ser preservado ate prova em contrario:
 
 - `F3 aberta`;
-- `F3.11 bloqueada`;
-- `readiness = NO-GO`;
-- `campanha = NO-GO`;
+- `F3.11 alinhada no license-server live`;
+- `readiness = GO condicional`;
+- `campanha = GO condicional`;
+- `DR-05 pendente`;
 - `sem push automatico`.
 
 ---
@@ -36,7 +37,7 @@ Estado formal de arranque que deve ser preservado ate prova em contrario:
 ## 2. Estado herdado no inicio do ciclo
 
 - **Fase:** `F3 aberta`
-- **Subtrilha:** `F3.11 bloqueada`
+- **Subtrilha:** `F3.11 alinhada no license-server live`
 - **Readiness herdada:** `GO / NO-GO`
 - **Campanha herdada:** `GO / NO-GO`
 - **Drifts abertos herdados:**
@@ -102,7 +103,7 @@ Estado formal de arranque que deve ser preservado ate prova em contrario:
 
 | Pergunta | Resposta desta rodada | Fundamento |
 |----------|-----------------------|------------|
-| Todos os cinco insumos estao `entregue valido`? | `SIM / NAO` |  |
+| O blocker corrente e apenas `DR-05`? | `SIM / NAO` |  |
 | A readiness pode ser reaberta? | `GO / NO-GO` | [`../01-architecture/f3-11-readiness-reopen-gate.md`](../01-architecture/f3-11-readiness-reopen-gate.md) |
 | A campanha pode ser aberta? | `GO / NO-GO` | [`../01-architecture/f3-11-readiness-reopen-gate.md`](../01-architecture/f3-11-readiness-reopen-gate.md) |
 | Existe drift novo a registar? | `SIM / NAO` |  |
@@ -138,4 +139,3 @@ Estado formal de arranque que deve ser preservado ate prova em contrario:
 - **Quem precisa actuar:**
 - **Condicao exacta para nova reavaliacao:**
 - **Documentos a consultar a seguir:**
-

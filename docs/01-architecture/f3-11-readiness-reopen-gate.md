@@ -8,9 +8,18 @@ pode ser reaberta.
 Estado formal preservado:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada ate cumprimento integral dos pre-requisitos criticos`;
-- `esta rodada nao corrige o drift de CORS`;
+- `F3.11 alinhada no license-server live`;
+- `DR-05 continua como unico blocker real para fechar a F3`;
 - `esta rodada nao faz push`.
+
+Nota de actualizacao em `2026-04-14`:
+
+- o gate antigo de cinco insumos fica preservado neste documento apenas como
+  historico/compatibilidade;
+- o gate corrente para continuar a F3 e executar `DR-05` no appliance com
+  permissao suficiente, snapshot/rollback e evidencias por `run_id`;
+- `DR-01`, `DR-03`, `DR-04` e `DR-06` ja nao bloqueiam a F3 no ambiente live
+  activo.
 
 ---
 
@@ -18,10 +27,10 @@ Estado formal preservado:
 
 Pergunta unica:
 
-> Os cinco insumos externos criticos estao `entregue valido`, com evidencia
-> minima registada e aceite formal documentado?
+> O `DR-05` do appliance ja tem evidencia real suficiente para fechar os
+> cenarios locais obrigatorios da F3?
 
-Se a resposta for `nao`, a readiness **nao** pode ser repetida.
+Se a resposta for `nao`, a F3 permanece aberta.
 
 ---
 
@@ -35,7 +44,8 @@ Se a resposta for `nao`, a readiness **nao** pode ser repetida.
 | appliance pfSense com SSH, baseline e controlos legitimos | `entregue valido` | SSH funcional + baseline + prova real de snapshot/restore e controlos do lab |
 | inventario real `LIC-A` a `LIC-F` | `entregue valido` | artefacto de inventario + prova objectiva em backend |
 
-**Regra:** a readiness nao reabre com `4/5`. O gate e binario.
+**Regra actual:** esta tabela e historica. O gate corrente nao exige voltar a
+`5/5`; exige apenas fechar `DR-05` sem reabrir blockers ja saneados.
 
 ---
 
@@ -62,15 +72,12 @@ Sem estes cinco grupos de evidencia, a readiness nao reabre.
 
 Os itens abaixo impedem a readiness automaticamente:
 
-1. qualquer um dos cinco insumos ainda em `nao entregue`,
-   `entregue invalido` ou `entregue parcial`;
-2. impossibilidade de provar revisao exacta e stack efectiva do ambiente
-   observado;
-3. impossibilidade de provar schema live e estado das tabelas
-   `admin_sessions`, `admin_audit_log` e `admin_login_guards`;
-4. credencial administrativa sem owner e sem escopo formal;
-5. appliance sem SSH funcional, sem baseline ou sem controlos legitimos;
-6. inventario `LIC-A` a `LIC-F` sem prova objectiva no backend.
+1. appliance sem permissao suficiente para os cenarios mutaveis;
+2. ausencia de snapshot/rollback antes de relogio, offline, NIC/UUID ou
+   clone/restore;
+3. ausencia de evidencias por `run_id`;
+4. qualquer novo drift objectivo que invalide o live/admin/inventario ja
+   saneados.
 
 ---
 
@@ -82,7 +89,8 @@ como autorizacao para campanha:
 
 1. o branch local continuar ahead do remoto;
 2. a inexistencia de push nesta rodada;
-3. a necessidade de manter o live observado como ambiente "provado por
+3. `DR-07` proveniencia exacta do deploy continuar aberto para F7;
+4. a necessidade de manter o live observado como ambiente "provado por
    evidencia" e nao "assumido igual ao repositorio".
 
 **Importante:** estes riscos nao impedem repetir a readiness, mas continuam a
@@ -95,12 +103,12 @@ proibir qualquer inferencia livre sobre live = local = remoto.
 `NO-GO` automatico para repetir a readiness quando ocorrer qualquer um dos
 casos abaixo:
 
-- falta de um dos cinco insumos criticos;
-- prova incompleta da stack live;
-- prova incompleta do PostgreSQL live;
-- escopo administrativo nao formalizado;
-- appliance sem controlos legitimos;
-- inventario parcial ou inconsistente.
+- appliance sem controlos legitimos para `DR-05`;
+- ausencia de permissao para reescrever `/usr/local/etc/layer7.lic` quando o
+  cenario exigir;
+- ausencia de snapshot/rollback para cenario mutavel;
+- ausencia de evidencia bruta por `run_id`;
+- drift novo que invalide a leitura actual do live.
 
 ---
 
@@ -109,29 +117,23 @@ casos abaixo:
 Mesmo depois de a readiness ser repetida, a campanha continua `NO-GO`
 automatico se qualquer um dos pontos abaixo persistir:
 
-- qualquer insumo critico deixar de estar `entregue valido`;
-- a readiness repetida concluir que o deploy observado continua sem prova de
-  revisao, schema ou sessao administrativa;
-- o controlo real do contrato `409` vs `403` continuar incompativel com o
-  contrato canónico da F3;
-- o drift de CORS/same-origin continuar presente no ambiente observado e a
-  readiness o classificar como blocker activo;
-- qualquer cenario obrigatorio permanecer estruturalmente `BLOCKED`.
+- `DR-05` permanecer sem `PASS` ou sem classificacao conclusiva aceitavel;
+- qualquer cenario obrigatorio permanecer estruturalmente `BLOCKED`;
+- aparecer drift novo que invalide o license-server live, auth/admin ou
+  inventario ja saneados.
 
 ---
 
 ## 8. Leitura formal do drift de CORS nesta fase
 
-O drift ja registado continua a valer:
+O drift historico ja registado fica preservado:
 
 - `/api/auth/login` live aceitou `Origin` externo com
   `Access-Control-Allow-Origin: *`;
 - isso diverge do contrato canónico `same-origin only`;
-- esta rodada **nao** corrige esse drift;
-- a repeticao da readiness deve considerá-lo explicitamente no ambiente
-  observado;
-- se o drift persistir como blocker no ambiente candidato, a campanha nao
-  abre.
+- em `2026-04-14`, o ambiente activo voltou a responder `403` fail-closed
+  para `Origin` externo;
+- portanto, `DR-06` nao bloqueia a F3 no estado corrente.
 
 ---
 
@@ -139,7 +141,7 @@ O drift ja registado continua a valer:
 
 Leitura factual desta rodada:
 
-- o branch local entrou nesta rodada `ahead 20` do remoto;
+- o branch local entrou nesta rodada `ahead 23` do remoto;
 - nao foi feito push;
 - um push agora publicaria historico local acumulado;
 - por isso, este gate e apenas documental-operacional e nao altera o estado
@@ -153,9 +155,9 @@ Leitura factual desta rodada:
 
 So existe `GO` quando:
 
-1. os cinco insumos estiverem `entregue valido`;
-2. as evidencias minimas estiverem registadas;
-3. o aceite estiver documentado;
+1. `DR-05` tiver permissao suficiente no appliance;
+2. snapshot/rollback estiverem garantidos antes de cenario mutavel;
+3. evidencias por `run_id` estiverem registadas;
 4. o estado de publicacao estiver anotado sem push.
 
 ### `NO-GO`
@@ -163,4 +165,5 @@ So existe `GO` quando:
 Qualquer falta nos pontos acima mantem:
 
 - `F3 aberta`;
-- `F3.11 bloqueada`.
+- `F3.11 alinhada no license-server live`;
+- `DR-05 pendente`.

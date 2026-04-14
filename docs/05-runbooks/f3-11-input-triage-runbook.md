@@ -11,6 +11,15 @@ Este runbook **nao** substitui o checklist live:
 - no checklist live valida-se o ambiente depois de os insumos estarem em
   verde.
 
+Nota de actualizacao em `2026-04-14`:
+
+- este runbook fica preservado para compatibilidade com o pacote antigo de
+  cinco insumos;
+- nao usar este runbook para reabrir host live, PostgreSQL, auth/admin ou
+  inventario ja saneados;
+- para a rodada corrente, triar apenas evidencia nova que afecte `DR-05` ou
+  drift novo objectivo.
+
 ---
 
 ## 1. Ordem obrigatoria de triagem
@@ -122,4 +131,7 @@ Os pontos abaixo parecem pequenos, mas continuam a bloquear a F3.11:
 
 - este runbook decide aceite/rejeicao da entrega;
 - este runbook nao substitui a readiness;
-- sem os cinco insumos em verde, a F3.11 continua bloqueada.
+- a regra antiga dos cinco insumos fica preservada apenas como
+  compatibilidade;
+- no estado corrente, a F3.11 esta alinhada no license-server live e o
+  blocker real remanescente e `DR-05`.

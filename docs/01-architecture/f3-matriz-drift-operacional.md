@@ -16,6 +16,10 @@ Objectivo desta subfase:
 nao desculpa para reinterpretar `FAIL` como `PASS` nem para alterar o live
 sem plano.
 
+**Nota de estado actual (`2026-04-14`):** esta matriz preserva os drifts
+observados na F3.9. O checkpoint posterior saneou os drifts administrativos
+do live e deixou `DR-05` do appliance como blocker real remanescente da F3.
+
 ---
 
 ## 1. Matriz canónica de drift observada na F3.9

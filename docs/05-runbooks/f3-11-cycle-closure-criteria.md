@@ -15,9 +15,17 @@ Objectivo:
 Estado formal preservado:
 
 - `F3 continua aberta`;
-- `F3.11 continua bloqueada` ate prova em contrario;
-- `este documento nao reabre readiness`;
+- `F3.11 alinhada no license-server live`;
+- `DR-05 pendente`;
+- `este documento nao fecha a F3`;
 - `este documento nao abre campanha`.
+
+Nota de actualizacao em `2026-04-14`:
+
+- ciclos baseados no pacote antigo de cinco insumos permanecem validos como
+  historico;
+- o ciclo operacional corrente deve focar `DR-05` e nao reabrir
+  host/DB/admin/inventario ja saneados sem drift novo.
 
 ---
 

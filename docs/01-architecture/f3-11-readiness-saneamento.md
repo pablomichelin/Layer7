@@ -25,6 +25,11 @@ Isto significa:
   administrativa, appliance pfSense real nem inventario `LIC-A` a `LIC-F`;
 - a F3.11 **nao** pode ser aberta nesta rodada.
 
+**Nota de estado actual (`2026-04-14`):** esta conclusao permanece como
+historico da rodada de saneamento. O checkpoint posterior alinhou o
+license-server live, auth/admin, same-origin e inventario; o blocker corrente
+da F3 e apenas `DR-05` no appliance.
+
 ---
 
 ## 1. Ambiente validado e base factual

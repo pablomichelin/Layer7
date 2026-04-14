@@ -4,6 +4,224 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — alinhamento do license-server live
+
+- **License-server live alinhado ao contrato administrativo actual** —
+  o ambiente activo em `192.168.100.244:/opt/layer7-license` passa a expor
+  `admin_sessions`, `admin_audit_log` e `admin_login_guards`, responde
+  `GET /api/auth/session`, mantem a bridge Bearer administrativa e volta a
+  falhar fechado para `Origin` externo em `/api/auth/login`
+- **DR-05 do appliance passa a ter baseline real e SSH funcional** —
+  o utilizador temporario `codex` em `192.168.100.254` passa a permitir
+  exportar baseline canónico do appliance, confirmar fingerprint/licenca
+  actual e validar restart de `layer7d`; os cenarios mutaveis continuam
+  dependentes de permissao de escrita em `/usr/local/etc/layer7.lic`
+
+### Fixed — auth bridge do painel administrativo
+
+- **Bootstrap da sessao sincroniza a ponte Bearer sem storage persistente** —
+  `license-server/frontend/src/auth.jsx` continua a absorver o token
+  devolvido por `GET /api/auth/session`, mas a credencial de compatibilidade
+  passa a ficar apenas em memoria, evitando reintroduzir `localStorage`
+- **Estado autenticado consolidado num helper pequeno** —
+  `license-server/frontend/src/auth-session-state.js` centraliza aplicar e
+  limpar sessao/token no frontend, reduzindo duplicacao e risco de esquecer
+  a limpeza da credencial transitória em falhas/logout
+- **Payload autenticado do frontend passa a exigir coerencia minima** —
+  `license-server/frontend/src/auth-payload.js` passa a normalizar respostas
+  de auth e a rejeitar payload parcial sem `admin` e `session`, evitando
+  manter token em memoria quando o backend devolve estado malformado
+- **Controller puro da auth do frontend agora e testavel em isolamento** —
+  `license-server/frontend/src/auth-controller.js` passa a concentrar
+  bootstrap, login, refresh, logout e limpeza do estado autenticado, enquanto
+  `auth-controller.test.js` cobre sucesso, falha e view inactiva sem exigir
+  harness React mais pesado
+- **Login e refresh do frontend rejeitam payload parcial sem reter estado velho** —
+  `auth-controller.test.js` passa a provar que respostas malformadas de
+  `/auth/login` e `/auth/session` limpam `admin/session` locais em vez de
+  manter estado stale ao lado de um token transitório
+- **Login deixa de prosseguir com sessao parcial de sucesso** —
+  `loginWithPassword()` passa a falhar explicitamente quando o backend devolve
+  `200` com payload de auth incoerente, evitando navegar para a area privada
+  com estado local ja limpo
+- **Refresh deixa de tratar sessao parcial como sucesso silencioso** —
+  `refreshAuthSession()` passa a falhar explicitamente quando `/auth/session`
+  devolve payload incoerente, evitando revalidacao enganosa com estado local
+  previamente limpo
+- **Regra de consistencia de sessao do frontend vira helper puro** —
+  `license-server/frontend/src/auth-payload.js` passa a centralizar tambem a
+  validacao que levanta erro para payload incoerente, evitando drift entre
+  `loginWithPassword()` e `refreshAuthSession()`
+- **Aplicar e validar sessao autenticada vira operacao unica** —
+  `license-server/frontend/src/auth-session-state.js` passa a expor
+  `syncAuthenticatedSession()`, reduzindo duplicacao entre `login` e `refresh`
+  ao aplicar estado e validar coerencia no mesmo helper
+- **Flags canonicas da auth administrativa deixam de ficar repetidas** —
+  `license-server/frontend/src/auth-request-options.js` passa a centralizar
+  `skipAuthRedirect: true`, reduzindo drift entre bootstrap, login, refresh e
+  logout do frontend
+- **Caminhos de auth do frontend passam a ser canónicos** —
+  `license-server/frontend/src/auth-paths.js` passa a concentrar os endpoints
+  de login, logout e sessao, reduzindo risco de drift entre controller e
+  camada API
+- **Rotas principais do painel passam a ter destino canónico unico** —
+  `license-server/frontend/src/panel-routes.js` passa a concentrar os
+  destinos de login e dashboard usados por `App`, `Login` e `Sidebar`,
+  reduzindo drift entre navegação protegida e navegação pós-login
+- **Links principais da navegação lateral também passam a usar rotas canónicas** —
+  `license-server/frontend/src/panel-routes.js` passa a concentrar também os
+  destinos de licenças e clientes usados pela `Sidebar`, reduzindo mais um
+  ponto de drift entre a navegação lateral e as rotas oficiais da SPA
+- **Detalhe, criação e edição do painel passam a usar builders canónicos de rota** —
+  `license-server/frontend/src/panel-routes.js` passa a expor também os
+  destinos `new`, detalhe e `edit` de licenças/clientes, reduzindo drift
+  entre listagens, formulários, detalhe e navegação de retorno do painel
+- **Redirect de sessao invalida passa a reutilizar a rota canónica de login** —
+  `license-server/frontend/src/api.js` passa a consumir
+  `ADMIN_LOGIN_ROUTE` em vez de repetir `'/login'`, alinhando a camada API
+  ao mesmo destino oficial já usado pelo restante fluxo de navegação do painel
+- **Logout do frontend preserva a resposta do backend sem perder limpeza local** —
+  `logoutAuthSession()` passa a devolver o payload de sucesso de
+  `/auth/logout` quando existir, mantendo a limpeza defensiva do estado
+  autenticado tanto em sucesso quanto em erro
+- **Escuta do evento de sessao invalida sai do componente e vira helper puro** —
+  `license-server/frontend/src/auth-invalid-listener.js` passa a concentrar
+  a inscricao e limpeza do `layer7:auth-invalid`, com cobertura dedicada para
+  estado activo, inactivo e ausencia de target de eventos
+- **Provider de auth deixa de declarar autenticacao com estado parcial** —
+  `license-server/frontend/src/auth-context-value.js` passa a exigir
+  `admin + session` para `isAuthenticated`, evitando falso positivo quando o
+  estado local estiver parcialmente hidratado ou limpo
+- **Gate de auth do frontend passa a usar decisao unica de estado** —
+  `license-server/frontend/src/auth-gate.js` centraliza a leitura
+  `loading` / `authenticated` / `anonymous`, reduzindo drift entre `App` e
+  `Login` na hora de mostrar loading ou redirecionar
+- **Fluxo de sessao invalida da API sai do corpo da request** —
+  `license-server/frontend/src/api-auth-redirect.js` passa a centralizar a
+  limpeza do token em memoria, a emissao do evento e o redirect para login,
+  reduzindo acoplamento na camada `api`
+- **Evento de sessao invalida passa a ter nome canónico unico** —
+  `license-server/frontend/src/auth-events.js` passa a concentrar o nome do
+  evento usado por `api` e pelo listener de auth, reduzindo risco de drift
+  entre emissao e subscricao
+- **Mensagens criticas de auth do frontend passam a ser canónicas** —
+  `license-server/frontend/src/auth-messages.js` passa a concentrar as
+  mensagens de sessao expirada e sessao incoerente, reduzindo drift entre
+  controller, payload, camada API e testes
+- **Fallback de erro no login também passa a ter mensagem canónica** —
+  `license-server/frontend/src/auth-messages.js` passa a concentrar também a
+  mensagem padrão de falha do formulário de login, reduzindo mais um literal
+  solto dentro da tela administrativa
+- **Mensagem de validacao da sessao tambem passa a ser partilhada** —
+  `App` e `Login` passam a reutilizar a mesma constante de loading da auth,
+  evitando drift visual pequeno entre as duas entradas principais do painel
+- **Cobertura automatizada leve da trilha** —
+  `license-server/frontend/src/auth-session-state.test.js` passa a provar que
+  o token de compatibilidade vive apenas em memoria e e limpo junto com o
+  estado autenticado, sem exigir infra adicional nem tocar no contrato do backend
+- **Camada API agora tem smoke tests locais repetiveis** —
+  `license-server/frontend/src/api.test.js` e o script `npm test` do frontend
+  passam a verificar injecao do header Bearer em memoria, limpeza do token em
+  `401` e o comportamento de `skipAuthRedirect`, reduzindo regressao silenciosa na SPA
+- **Redirect 401 e parsing da API viram helpers puros** —
+  `license-server/frontend/src/api-response.js` passa a concentrar a decisao
+  de sessao invalida, o parsing de erro e o parsing de sucesso da camada API,
+  com cobertura dedicada para `401`, fallback de erro, `204`, JSON e texto
+- **Headers da camada API ficam robustos a casing misto** —
+  `license-server/frontend/src/api.js` passa a tratar `Authorization` e
+  `Content-Type` de forma case-insensitive, evitando injectar Bearer extra ou
+  sobrescrever `content-type` custom quando o caller usa chaves em lowercase
+- **Login deixa de reutilizar Bearer herdado por acidente** —
+  `license-server/frontend/src/api.js` passa a nunca injectar a credencial
+  transitória em `POST /api/auth/login`, evitando enviar token antigo para o
+  endpoint que deve depender apenas das credenciais fornecidas no momento
+- **Bridge Bearer do backend ganha segredo dedicado e nao vaza token cru** —
+  `license-server/backend/src/bearer-session-token.js` extrai a logica pura
+  de assinatura/verificacao do token administrativo para um modulo pequeno;
+  a emissao passa a depender so de `ADMIN_BEARER_JWT_SECRET`, sem fallback
+  para `ED25519_PRIVATE_KEY` nem para o token opaco cru da sessao
+- **Resposta de auth do backend passa a ter montagem unica e testavel** —
+  `license-server/backend/src/auth-response.js` centraliza o payload comum de
+  `login` e `session`, reduzindo drift entre as duas rotas e cobrindo quando
+  o token Bearer de compatibilidade deve ou nao aparecer
+- **Precedencia Bearer/cookie do backend passa a ser helper puro** —
+  `license-server/backend/src/auth-access.js` centraliza a seleccao e a fila
+  de candidatos de acesso administrativo, deixando explicita a prioridade do
+  Bearer validado sobre o cookie e cobrindo deduplicacao em teste local leve
+- **Middleware de auth administrativa ganha cobertura dedicada** —
+  `license-server/backend/src/auth.test.js` passa a cobrir sessao valida,
+  sessao invalida e erro interno do resolvedor, enquanto
+  `license-server/backend/src/auth-middleware.js` isola o factory puro para
+  injeção de dependências e teste sem DB
+- **Login failure e logout audit do backend ganham helpers puros** —
+  `license-server/backend/src/auth-route-helpers.js` centraliza a montagem
+  de `lockout_scopes`, `admin_id` opcional e do payload de auditoria do
+  logout, reduzindo duplicacao e cobrindo a regra em teste local leve
+- **Ciclo de vida da sessao administrativa vira regra pura e testavel** —
+  `license-server/backend/src/session-lifecycle.js` passa a centralizar a
+  decisao de expirar, renovar ou apenas actualizar `last_seen_at`, reduzindo
+  risco de drift na janela de renovacao e no timeout absoluto
+- **Falhas de login do backend passam a ter payload de auditoria centralizado** —
+  `license-server/backend/src/auth-route-helpers.js` passa a montar tambem os
+  eventos de `login_rejected`, `login_locked`, `login_failed` e `login_error`,
+  reduzindo repeticao na rota de auth e deixando a trilha negativa mais
+  previsivel em teste local
+- **Eventos positivos e erro de logout da auth tambem saem da rota** —
+  `license-server/backend/src/auth-route-helpers.js` passa a centralizar
+  tambem `login_succeeded`, `session_created` e `logout_error`, deixando a
+  auditoria administrativa da auth concentrada num unico ponto testavel
+- **Middleware de sessao passa a usar payloads de auditoria centralizados** —
+  `license-server/backend/src/auth-middleware.js` passa a consumir helpers
+  para `admin_access_denied` e `session_validation_error`, fechando a trilha
+  de auditoria da auth administrativa num unico modulo puro
+- **Respostas HTTP da rota de auth deixam de ser montadas inline** —
+  `license-server/backend/src/auth-route-response.js` passa a centralizar
+  payloads de erro e a resposta de sucesso do logout, reduzindo repeticao e
+  deixando a rota administrativa mais previsivel em manutencao futura
+- **Middleware de auth passa a reutilizar o mesmo contrato de erro** —
+  `license-server/backend/src/auth-middleware.js` passa a consumir
+  `buildAuthErrorResponse()`, evitando drift entre a rota de auth e a
+  proteccao das rotas privadas quando devolvem `401` ou `500`
+- **Helper de appliance entra no pack da F3** —
+  `scripts/license-validation/export-appliance-evidence.sh` passa a recolher
+  baseline local, stats JSON, fingerprint, `.lic` e hash local do appliance
+  por SSH, reduzindo atrito operacional em `S07` a `S13` sem tocar no produto
+- **Campanha F3 nasce com preflight estruturado** —
+  `scripts/license-validation/init-f3-validation-campaign.sh` passa a criar
+  tambem `10-preflight-deploy.txt`, `20-preflight-schema.txt`,
+  `30-preflight-admin.txt`, `40-preflight-appliance.txt` e
+  `50-preflight-inventory.md`, alinhando o helper ao runbook canónico da
+  F3.10 antes de qualquer `S01`
+- **Baseline do appliance sobe para o preflight da campanha** —
+  `scripts/license-validation/export-appliance-evidence.sh` passa a aceitar
+  `--update-root-preflight`, consolidando `50-appliance-cli.txt`,
+  `60-appliance-license.json` e `70-local-hashes.txt` no
+  `40-preflight-appliance.txt` do `run_id`
+- **Deploy/admin do live ganham helper de preflight** —
+  `scripts/license-validation/export-live-preflight.sh` passa a materializar
+  `10-preflight-deploy.txt` e `30-preflight-admin.txt` com health publico,
+  origin observado, probes de CORS e, quando houver credenciais, login e
+  sessao administrativa via `curl`
+- **Schema do live ganha helper de preflight** —
+  `scripts/license-validation/export-schema-preflight.sh` passa a
+  materializar `20-preflight-schema.txt` com identidade da base, presenca das
+  tabelas canónicas, contagem minima e colunas administrativas via
+  `docker compose exec` read-only
+- **Preflight completo ganha orquestrador leve** —
+  `scripts/license-validation/prepare-f3-preflight.sh` passa a inicializar a
+  campanha e encadear os helpers de live, schema e appliance no mesmo
+  `run_id`, reduzindo cola manual antes da abertura real da F3.11
+- **DR-05 ganha helper de orquestracao para cenarios do appliance** —
+  `scripts/license-validation/run-appliance-activation-scenario.sh` passa a
+  encadear snapshot inicial/final do backend, passo local de `layer7d
+  --activate` e baseline do appliance no mesmo `run_id`, reduzindo o atrito
+  operacional para executar `S01`, `S02` e `S07` no pfSense real
+- **Upgrade do license-server antigo ganha compatibilidade conservadora de Bearer bridge** —
+  `license-server/backend/src/session.js` passa a preferir
+  `ADMIN_BEARER_JWT_SECRET`, mas aceita `JWT_SECRET` como fallback de
+  compatibilidade para deploys antigos; `docker-compose.yml` passa a expor
+  ambos ao container da API e `.env.example` documenta a transicao esperada
+
 ### Changed — F3.8 gate de fechamento e relatorio final de campanha
 
 - **Gate canónico da F3.8** —

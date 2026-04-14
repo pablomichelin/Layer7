@@ -41,6 +41,8 @@ Referencias normativas:
 | Segredo / activo | Quem gera | Quem guarda | Quem usa | Rotacao minima |
 |------------------|-----------|-------------|----------|----------------|
 | `POSTGRES_PASSWORD` | owner operacional do license server | cofre interno da Systemup + `.env` local do host | PostgreSQL e API via `DATABASE_URL` | em incidente, troca de host ou suspeita de exposicao |
+| `ADMIN_BEARER_JWT_SECRET` | owner operacional do license server | cofre interno da Systemup + `.env` local do host | backend da API para a ponte Bearer administrativa opcional | em incidente, troca de host ou suspeita de exposicao |
+| `JWT_SECRET` | legado de deploys antigos | `.env` local do host apenas enquanto houver stack antiga | compatibilidade transitória de upgrade para a ponte Bearer | remover/substituir por `ADMIN_BEARER_JWT_SECRET` apos alinhar o deploy |
 | `ED25519_PRIVATE_KEY` | owner de licenciamento/Systemup | cofre interno offline + host de producao | backend da API para assinar `.lic` | em incidente de exposicao ou troca formal do par de chaves |
 | `ADMIN_BOOTSTRAP_PASSWORD` | owner operacional do license server | temporariamente no shell seguro ou cofre interno | apenas operador autorizado durante `init` ou `reset-password` | a cada bootstrap, recuperacao ou suspeita de exposicao |
 | cookie `layer7_admin_session` | backend em runtime | browser do operador + tabela `admin_sessions` | frontend/backend same-origin | revogacao por logout, reset de password ou expiracao |

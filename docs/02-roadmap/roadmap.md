@@ -396,10 +396,16 @@ falha.
   nao houve shell/DB access ao deploy observado, nao houve credencial
   administrativa autorizada, nao houve appliance pfSense autenticavel e nao
   houve inventario real `LIC-A` a `LIC-F`.
+- **Alinhamento do license-server live confirmado em `2026-04-14`:**
+  o ambiente activo em `192.168.100.244:/opt/layer7-license` passa a expor
+  `admin_sessions`, `admin_audit_log` e `admin_login_guards`, `/api/auth/session`
+  volta a responder no contrato stateful actual e `/api/auth/login` volta a
+  falhar fechado para `Origin` externo. Com isso, o unico blocker real
+  remanescente da F3 fica reduzido a `DR-05` no appliance.
 - **Proximo passo seguro dentro da F3:** manter a F3.11 fechada ate os
-  pre-requisitos pendentes ficarem verdes em nova verificacao de readiness;
-  sem isso, a campanha seguinte nao deve ser tratada como rodada valida de
-  fechamento.
+  cenarios do appliance (`DR-05`) ficarem verdes em nova verificacao de
+  readiness; sem isso, a campanha seguinte nao deve ser tratada como rodada
+  valida de fechamento.
 
 ### Criterios de saida
 
