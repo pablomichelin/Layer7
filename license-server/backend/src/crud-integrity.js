@@ -1,20 +1,5 @@
 const pool = require('./db');
-
-class HttpError extends Error {
-  constructor(status, message) {
-    super(message);
-    this.name = 'HttpError';
-    this.status = status;
-  }
-}
-
-function createHttpError(status, message) {
-  return new HttpError(status, message);
-}
-
-function isHttpError(error) {
-  return error instanceof HttpError;
-}
+const { createHttpError, isHttpError } = require('./http-error');
 
 async function runInTransaction(work) {
   const client = await pool.connect();

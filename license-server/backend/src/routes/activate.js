@@ -2,6 +2,11 @@ const { Router } = require('express');
 const rateLimit = require('express-rate-limit');
 const pool = require('../db');
 const { auditAdminEvent } = require('../admin-surface');
+const {
+  createActivationStateError,
+  createHardwareBindingError,
+  getBoundHardwareId,
+} = require('../activation-policy');
 const { generateSignedLicense } = require('../crypto');
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
 const { buildLicenseArtifactAuditMetadata } = require('../license-artifact-audit');
@@ -68,16 +73,9 @@ router.post('/activate', activateLimiter, async (req, res) => {
         ? 'reactivation_reissue'
         : 'initial_issue';
 
-      if (effectiveState.revoked) {
-        const error = createHttpError(409, 'Licenca revogada.');
-        error.licenseId = license.id;
-        throw error;
-      }
-
-      if (effectiveState.effectiveStatus === 'expired') {
-        const error = createHttpError(409, 'Licenca expirada.');
-        error.licenseId = license.id;
-        throw error;
+      const activationStateError = createActivationStateError(license, effectiveState);
+      if (activationStateError) {
+        throw activationStateError;
       }
 
       if (license.hardware_id) {
@@ -99,14 +97,13 @@ router.post('/activate', activateLimiter, async (req, res) => {
         }
       }
 
-      const boundHardwareId = normalizeStoredHardwareId(license.hardware_id) || license.hardware_id;
-      let effectiveHardwareId = boundHardwareId || hardwareId;
-
-      if (boundHardwareId && boundHardwareId !== hardwareId) {
-        const error = createHttpError(409, 'Hardware ID nao corresponde.');
-        error.licenseId = license.id;
-        throw error;
+      const hardwareBindingError = createHardwareBindingError(license, hardwareId);
+      if (hardwareBindingError) {
+        throw hardwareBindingError;
       }
+
+      const boundHardwareId = getBoundHardwareId(license);
+      let effectiveHardwareId = boundHardwareId || hardwareId;
 
       if (!boundHardwareId || !license.activated_at) {
         const updateResult = await client.query(

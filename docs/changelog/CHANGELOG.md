@@ -33,6 +33,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   a SPA passa a expor `/licenses/:id/edit`, reutiliza o endpoint
   `PUT /api/licenses/:id`, bloqueia a troca de cliente quando a licenca ja
   esta activada/bindada e cobre a normalizacao do formulario com teste puro
+- **Contrato de rejeicao de activacao passa a ter regressao dedicada** —
+  a politica do `POST /api/activate` para licenca revogada, licenca expirada
+  e hardware divergente passa a ficar isolada em helper testavel e coberta
+  por testes que preservam `409`, reduzindo o risco de reintroduzir o drift
+  cosmetico `403` observado anteriormente no live
 
 ### Fixed — auth bridge do painel administrativo
 

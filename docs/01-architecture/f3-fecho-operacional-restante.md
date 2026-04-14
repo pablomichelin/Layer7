@@ -84,9 +84,12 @@ Testes executados no live (`POST /api/activate`):
 | licenca expirada | ID 5 (Lasalle) | 409 | 403 | correcta (rejeita) |
 | reactivacao legitima | ID 7 (Systemup) | 200 | 200 | correcta (aceita) |
 
-**Veredicto:** drift cosmetico de codigo HTTP (`403` vs `409`). A logica de
-negocio esta correcta em todos os cenarios. O alinhamento de codigo HTTP
-permanece pendente num bloco proprio. Nao bloqueia a F3.
+**Veredicto:** drift cosmetico de codigo HTTP (`403` vs `409`) observado no
+live anterior. A logica de negocio esta correcta em todos os cenarios. No
+branch actual, a politica de rejeicao do `POST /api/activate` fica isolada
+em helper testavel e coberta por regressao para `409` em licenca revogada,
+licenca expirada e hardware divergente. O que resta aqui e alinhamento do
+deploy vivo quando houver publicacao, nao blocker da F3.
 
 ### 2.2 Cenarios locais do appliance (DR-05) — PENDENTE
 

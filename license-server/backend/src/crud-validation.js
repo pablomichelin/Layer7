@@ -1,4 +1,4 @@
-const { createHttpError } = require('./crud-integrity');
+const { createHttpError } = require('./http-error');
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_PATTERN = /^[0-9+()\-\s]{7,32}$/;
