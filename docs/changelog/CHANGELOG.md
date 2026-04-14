@@ -16,8 +16,32 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   exportar baseline canónico do appliance, confirmar fingerprint/licenca
   actual e validar restart de `layer7d`; os cenarios mutaveis continuam
   dependentes de permissao de escrita em `/usr/local/etc/layer7.lic`
+- **Baseline canónica do appliance ganha novo run real via helper** —
+  `scripts/license-validation/export-appliance-evidence.sh` foi executado com
+  sucesso no `run_id` `20260414T000000Z-appliance254-continue`, materializando
+  `40-preflight-appliance.txt`, `50-appliance-cli.txt`,
+  `60-appliance-license.json` e `70-local-hashes.txt` com o estado real do
+  appliance sob o utilizador `codex`
+- **Trilha GUI autenticada do pfSense ganha helper canónico de campanha** —
+  `scripts/license-validation/run-pfsense-gui-license-flow.sh` passa a
+  materializar `probe`, `register` e `revoke` com captura de `headers`,
+  `HTML`, `cookie jar` e notas por `run_id`, incluindo execucao via
+  `--ssh-target` quando a GUI util so responde em
+  `https://127.0.0.1:9999/` no proprio appliance, reduzindo improviso
+  operacional no `DR-05`
+- **Painel administrativo passa a editar licencas existentes** —
+  a SPA passa a expor `/licenses/:id/edit`, reutiliza o endpoint
+  `PUT /api/licenses/:id`, bloqueia a troca de cliente quando a licenca ja
+  esta activada/bindada e cobre a normalizacao do formulario com teste puro
 
 ### Fixed — auth bridge do painel administrativo
+
+- **Helpers shell da F3 deixam de falhar no bash 3.2 do macOS quando `SSH_OPTIONS` esta vazio** —
+  `scripts/license-validation/export-appliance-evidence.sh`,
+  `scripts/license-validation/run-appliance-activation-scenario.sh` e
+  `scripts/license-validation/prepare-f3-preflight.sh` passam a proteger os
+  loops de `SSH_OPTIONS` sob `set -u`, evitando erro `unbound variable`
+  antes de qualquer tentativa real de SSH
 
 - **Bootstrap da sessao sincroniza a ponte Bearer sem storage persistente** —
   `license-server/frontend/src/auth.jsx` continua a absorver o token

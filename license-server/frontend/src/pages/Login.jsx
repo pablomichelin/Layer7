@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { getAuthGateState } from '../auth-gate.js';
+import {
+  AUTH_LOGIN_ERROR_MESSAGE,
+  AUTH_SESSION_VALIDATING_MESSAGE,
+} from '../auth-messages.js';
+import { ADMIN_DASHBOARD_ROUTE } from '../panel-routes.js';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -9,12 +15,16 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading, login } = useAuth();
+  const gateState = getAuthGateState({
+    loading: authLoading,
+    isAuthenticated,
+  });
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+    if (gateState === 'authenticated') {
+      navigate(ADMIN_DASHBOARD_ROUTE, { replace: true });
     }
-  }, [authLoading, isAuthenticated, navigate]);
+  }, [gateState, navigate]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -22,16 +32,16 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/dashboard', { replace: true });
+      navigate(ADMIN_DASHBOARD_ROUTE, { replace: true });
     } catch (err) {
-      setError(err.message || 'Erro ao fazer login');
+      setError(err.message || AUTH_LOGIN_ERROR_MESSAGE);
     } finally {
       setLoading(false);
     }
   }
 
-  if (authLoading) {
-    return <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">Validando sessão...</div>;
+  if (gateState === 'loading') {
+    return <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">{AUTH_SESSION_VALIDATING_MESSAGE}</div>;
   }
 
   return (

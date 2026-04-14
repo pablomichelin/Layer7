@@ -1,10 +1,25 @@
 const crypto = require('crypto');
 const pool = require('./db');
+const { getAdminBearerJwtSecret } = require('./admin-bearer-secret');
+const {
+  getAdminAccessTokenCandidates: buildAdminAccessTokenCandidates,
+  getAdminAccessTokenFromSources,
+} = require('./auth-access');
+const {
+  createBearerSessionToken: createSignedBearerSessionToken,
+  extractBearerTokenFromAuthorizationHeader,
+  verifyBearerSessionToken,
+} = require('./bearer-session-token');
+const { getSessionLifecycleDecision } = require('./session-lifecycle');
 
 const SESSION_COOKIE_NAME = 'layer7_admin_session';
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
 const SESSION_RENEW_WINDOW_MS = 5 * 60 * 1000;
+
+function getBearerJwtSecret() {
+  return getAdminBearerJwtSecret(process.env) || null;
+}
 
 function hashSessionToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
@@ -40,6 +55,36 @@ function parseCookies(req) {
 function getSessionTokenFromRequest(req) {
   const cookies = parseCookies(req);
   return cookies[SESSION_COOKIE_NAME] || null;
+}
+
+function getBearerTokenFromRequest(req) {
+  return extractBearerTokenFromAuthorizationHeader(
+    req.headers.authorization || req.headers.Authorization
+  );
+}
+
+function verifyAdminBearerSessionToken(token) {
+  return verifyBearerSessionToken(token, { secret: getBearerJwtSecret() });
+}
+
+function getAdminAccessTokenFromRequest(req) {
+  const bearerToken = getBearerTokenFromRequest(req);
+  return getAdminAccessTokenFromSources({
+    bearerSessionToken: verifyAdminBearerSessionToken(bearerToken),
+    sessionToken: getSessionTokenFromRequest(req),
+  });
+}
+
+function getAdminAccessTokenCandidates(req) {
+  const candidates = [];
+  const bearerToken = getBearerTokenFromRequest(req);
+  const bearerSessionToken = verifyAdminBearerSessionToken(bearerToken);
+  const sessionToken = getSessionTokenFromRequest(req);
+
+  return buildAdminAccessTokenCandidates({
+    bearerSessionToken,
+    sessionToken,
+  });
 }
 
 function getClientIp(req) {
@@ -201,8 +246,7 @@ async function createSession(admin, req) {
   };
 }
 
-async function resolveSession(req, res) {
-  const token = getSessionTokenFromRequest(req);
+async function resolveSessionToken({ token, source }, res) {
   if (!token) {
     return null;
   }
@@ -231,44 +275,49 @@ async function resolveSession(req, res) {
 
   const row = result.rows[0];
   if (row.revoked_at) {
-    clearSessionCookie(res);
+    if (source === 'cookie') {
+      clearSessionCookie(res);
+    }
     return null;
   }
 
   const metadata = buildSessionMetadata(row);
   const now = new Date();
+  const lifecycle = getSessionLifecycleDecision({
+    now,
+    expiresAt: metadata.session.expires_at,
+    absoluteExpiresAt: metadata.session.absolute_expires_at,
+    renewWindowMs: SESSION_RENEW_WINDOW_MS,
+    idleTimeoutMs: SESSION_IDLE_TIMEOUT_MS,
+  });
 
-  if (now >= metadata.session.expires_at || now >= metadata.session.absolute_expires_at) {
+  if (lifecycle.action === 'expired') {
     await pool.query(
       `UPDATE admin_sessions
           SET revoked_at = COALESCE(revoked_at, NOW())
         WHERE id = $1`,
       [row.id]
     );
-    clearSessionCookie(res);
+    if (source === 'cookie') {
+      clearSessionCookie(res);
+    }
     return null;
   }
 
-  const timeUntilIdleExpiry = metadata.session.expires_at.getTime() - now.getTime();
-  let nextExpiresAt = metadata.session.expires_at;
-
-  if (timeUntilIdleExpiry <= SESSION_RENEW_WINDOW_MS) {
-    nextExpiresAt = new Date(Math.min(
-      now.getTime() + SESSION_IDLE_TIMEOUT_MS,
-      metadata.session.absolute_expires_at.getTime()
-    ));
-
+  if (lifecycle.action === 'renew') {
     await pool.query(
       `UPDATE admin_sessions
           SET last_seen_at = NOW(),
               expires_at = $2
         WHERE id = $1`,
-      [row.id, nextExpiresAt]
+      [row.id, lifecycle.nextExpiresAt]
     );
 
     metadata.session.last_seen_at = now;
-    metadata.session.expires_at = nextExpiresAt;
-    setSessionCookie(res, token, nextExpiresAt);
+    metadata.session.expires_at = lifecycle.nextExpiresAt;
+    if (source === 'cookie') {
+      setSessionCookie(res, token, lifecycle.nextExpiresAt);
+    }
   } else {
     await pool.query(
       `UPDATE admin_sessions
@@ -280,9 +329,26 @@ async function resolveSession(req, res) {
   }
 
   return {
+    authSource: source,
     token,
     metadata,
   };
+}
+
+async function resolveSession(req, res) {
+  const candidates = getAdminAccessTokenCandidates(req);
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  for (const candidate of candidates) {
+    const session = await resolveSessionToken(candidate, res);
+    if (session) {
+      return session;
+    }
+  }
+
+  return null;
 }
 
 function requireSecureSessionRequest(req) {
@@ -293,6 +359,7 @@ function toSessionResponsePayload(metadata) {
   return {
     admin: metadata.admin,
     session: {
+      id: metadata.session.id,
       idle_timeout_minutes: SESSION_IDLE_TIMEOUT_MS / 60000,
       absolute_timeout_hours: SESSION_ABSOLUTE_TIMEOUT_MS / 3600000,
       created_at: metadata.session.created_at.toISOString(),
@@ -303,10 +370,27 @@ function toSessionResponsePayload(metadata) {
   };
 }
 
+function createBearerSessionToken(session) {
+  const secret = getBearerJwtSecret();
+  if (!secret) {
+    return null;
+  }
+
+  return createSignedBearerSessionToken({
+    secret,
+    sessionToken: session.token,
+    admin: session.metadata.admin,
+    session: session.metadata.session,
+  });
+}
+
 module.exports = {
   SESSION_COOKIE_NAME,
   clearSessionCookie,
+  createBearerSessionToken,
   createSession,
+  getAdminAccessTokenFromRequest,
+  getBearerTokenFromRequest,
   ensureSessionSchema,
   getClientIp,
   getSessionTokenFromRequest,

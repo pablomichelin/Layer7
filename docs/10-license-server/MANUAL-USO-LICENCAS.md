@@ -185,7 +185,7 @@ O sistema de licencas Layer7 funciona com dois componentes:
 | Pagina | Funcao |
 |--------|--------|
 | **Dashboard** | Resumo: licencas activas/expiradas/revogadas, total clientes, ultimas 10 activacoes |
-| **Licencas** | Lista paginada, filtro por status, criar/ver/revogar/arquivar |
+| **Licencas** | Lista paginada, filtro por status, criar/ver/editar/revogar/arquivar |
 | **Clientes** | Lista paginada, busca por nome/email, criar/editar/arquivar |
 
 ### 2.4 Regras operacionais do CRUD apos a F2.4
@@ -276,6 +276,35 @@ Resposta:
 > **Politica F3.4:** enquanto a licenca ainda nao foi activada, o
 > `customer_id` pode ser corrigido administrativamente. Depois do bind, essa
 > alteracao deixa de ser permitida no CRUD normal.
+
+### 4.1 Editar uma licenca
+
+### Via painel web
+
+1. Aceder a pagina **Licencas**
+2. Abrir **Editar** pela listagem ou pelo detalhe da licenca
+3. Ajustar:
+   - **Cliente** — permitido apenas enquanto a licenca ainda nao estiver
+     activada/bindada
+   - **Data de expiracao**
+   - **Features**
+   - **Notas**
+4. Clicar em **Salvar Alteracoes**
+
+O painel bloqueia a troca de cliente quando a licenca ja tem `hardware_id`
+ou activacao registada, alinhado ao guardrail do backend.
+
+### Via API (curl)
+
+```bash
+curl -s -X PUT -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses/3 \
+  -H "Content-Type: application/json" \
+  -d '{"expiry":"2028-12-31","features":"full","notes":"Renovacao anual"}'
+```
+
+Para licencas ainda nao activadas/bindadas, `customer_id` tambem pode ser
+enviado no `PUT`. Para licencas ja activadas/bindadas, a troca de cliente
+deve falhar com `409`.
 
 ---
 

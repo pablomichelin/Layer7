@@ -3,6 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { get, del } from '../api';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
+import {
+  ADMIN_CUSTOMERS_ROUTE,
+  buildAdminCustomerEditRoute,
+  buildAdminLicenseDetailRoute,
+} from '../panel-routes.js';
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -18,7 +23,7 @@ export default function CustomerDetail() {
     if (!confirm('Arquivar este cliente e as licenças não activas associadas?')) return;
     try {
       await del(`/customers/${id}`);
-      navigate('/customers');
+      navigate(ADMIN_CUSTOMERS_ROUTE);
     } catch (err) {
       alert(err.message);
     }
@@ -35,13 +40,13 @@ export default function CustomerDetail() {
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     { key: 'activated_at', label: 'Activada', render: (r) => r.activated_at ? new Date(r.activated_at).toLocaleDateString('pt-BR') : 'Nunca' },
     { key: 'actions', label: '', render: (r) => (
-      <button onClick={() => navigate(`/licenses/${r.id}`)} className="text-xs text-brand-600 hover:underline">Ver</button>
+      <button onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
     )},
   ];
 
   return (
     <div>
-      <button onClick={() => navigate('/customers')} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
+      <button onClick={() => navigate(ADMIN_CUSTOMERS_ROUTE)} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-bold text-gray-800 mb-4">{customer.name}</h2>
@@ -52,7 +57,7 @@ export default function CustomerDetail() {
           {customer.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{customer.notes}</span></div>}
         </div>
         <div className="flex gap-3 mt-6">
-          <button onClick={() => navigate(`/customers/${id}/edit`)} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
+          <button onClick={() => navigate(buildAdminCustomerEditRoute(id))} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
             Editar
           </button>
           <button onClick={handleArchive} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">

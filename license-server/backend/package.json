@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "start": "node src/index.js",
+    "test": "node --test src/*.test.js",
     "seed": "node seed.js",
     "bootstrap-admin": "node bootstrap-admin.js"
   },

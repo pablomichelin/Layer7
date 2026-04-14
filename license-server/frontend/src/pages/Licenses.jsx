@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { get, post, del } from '../api';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
+import {
+  ADMIN_LICENSES_NEW_ROUTE,
+  buildAdminLicenseEditRoute,
+  buildAdminLicenseDetailRoute,
+} from '../panel-routes.js';
 
 export default function Licenses() {
   const [licenses, setLicenses] = useState([]);
@@ -58,7 +63,8 @@ export default function Licenses() {
     {
       key: 'actions', label: '', render: (r) => (
         <div className="flex gap-2">
-          <button onClick={() => navigate(`/licenses/${r.id}`)} className="text-xs text-brand-600 hover:underline">Ver</button>
+          <button onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
+          <button onClick={() => navigate(buildAdminLicenseEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
           {r.status === 'active' && (
             <button onClick={(e) => handleRevoke(r.id, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
           )}
@@ -75,7 +81,7 @@ export default function Licenses() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Licenças ({total})</h2>
         <button
-          onClick={() => navigate('/licenses/new')}
+          onClick={() => navigate(ADMIN_LICENSES_NEW_ROUTE)}
           className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           Nova Licença

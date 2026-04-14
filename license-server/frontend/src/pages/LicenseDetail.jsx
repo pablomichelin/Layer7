@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { get, post, del, download } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
+import {
+  ADMIN_LICENSES_ROUTE,
+  buildAdminLicenseEditRoute,
+} from '../panel-routes.js';
 
 export default function LicenseDetail() {
   const { id } = useParams();
@@ -56,7 +60,7 @@ export default function LicenseDetail() {
 
   return (
     <div>
-      <button onClick={() => navigate('/licenses')} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
+      <button onClick={() => navigate(ADMIN_LICENSES_ROUTE)} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
@@ -77,6 +81,9 @@ export default function LicenseDetail() {
         </div>
 
         <div className="flex gap-3 mt-6">
+          <button onClick={() => navigate(buildAdminLicenseEditRoute(id))} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
+            Editar
+          </button>
           {license.status === 'active' && (
             <button onClick={handleRevoke} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Revogar
@@ -85,7 +92,7 @@ export default function LicenseDetail() {
           {license.status !== 'active' && (
             <button onClick={async () => {
               if (!confirm('Arquivar esta licença?')) return;
-              try { await del(`/licenses/${id}`); navigate('/licenses'); } catch (err) { alert(err.message); }
+              try { await del(`/licenses/${id}`); navigate(ADMIN_LICENSES_ROUTE); } catch (err) { alert(err.message); }
             }} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Arquivar Licença
             </button>

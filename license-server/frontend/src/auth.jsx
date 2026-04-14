@@ -1,5 +1,14 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { get, post } from './api';
+import { get, post } from './api.js';
+import {
+  bootstrapAuthSession,
+  clearAuthSessionState,
+  loginWithPassword,
+  logoutAuthSession,
+  refreshAuthSession,
+} from './auth-controller.js';
+import { buildAuthContextValue } from './auth-context-value.js';
+import { subscribeToInvalidAuthSession } from './auth-invalid-listener.js';
 
 const AuthContext = createContext(null);
 
@@ -12,78 +21,67 @@ export function AuthProvider({ children }) {
     let active = true;
 
     async function bootstrapSession() {
-      try {
-        const data = await get('/auth/session', { skipAuthRedirect: true });
-        if (!active) {
-          return;
-        }
-
-        setAdmin(data.admin);
-        setSession(data.session);
-      } catch {
-        if (!active) {
-          return;
-        }
-
-        setAdmin(null);
-        setSession(null);
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    function handleInvalidSession() {
-      if (!active) {
-        return;
-      }
-
-      setAdmin(null);
-      setSession(null);
+      await bootstrapAuthSession({
+        getSession: get,
+        setAdmin,
+        setSession,
+        setLoading,
+        isActive() {
+          return active;
+        },
+      });
     }
 
     bootstrapSession();
-    window.addEventListener('layer7:auth-invalid', handleInvalidSession);
+    const unsubscribeInvalidSession = subscribeToInvalidAuthSession({
+      clearAuthState() {
+        clearAuthSessionState({ setAdmin, setSession });
+      },
+      isActive() {
+        return active;
+      },
+    });
 
     return () => {
       active = false;
-      window.removeEventListener('layer7:auth-invalid', handleInvalidSession);
+      unsubscribeInvalidSession();
     };
   }, []);
 
   async function login(email, password) {
-    const data = await post('/auth/login', { email, password }, { skipAuthRedirect: true });
-    setAdmin(data.admin);
-    setSession(data.session);
-    return data;
+    return loginWithPassword({
+      postSession: post,
+      email,
+      password,
+      setAdmin,
+      setSession,
+    });
   }
 
   async function refreshSession() {
-    const data = await get('/auth/session', { skipAuthRedirect: true });
-    setAdmin(data.admin);
-    setSession(data.session);
-    return data;
+    return refreshAuthSession({
+      getSession: get,
+      setAdmin,
+      setSession,
+    });
   }
 
   async function logout() {
-    try {
-      await post('/auth/logout', undefined, { skipAuthRedirect: true });
-    } finally {
-      setAdmin(null);
-      setSession(null);
-    }
+    return logoutAuthSession({
+      postSession: post,
+      setAdmin,
+      setSession,
+    });
   }
 
-  const value = {
+  const value = buildAuthContextValue({
     admin,
     session,
     loading,
-    isAuthenticated: !!admin,
     login,
     logout,
     refreshSession,
-  };
+  });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

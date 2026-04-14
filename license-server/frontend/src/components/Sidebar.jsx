@@ -1,10 +1,16 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
+import {
+  ADMIN_CUSTOMERS_ROUTE,
+  ADMIN_DASHBOARD_ROUTE,
+  ADMIN_LICENSES_ROUTE,
+  ADMIN_LOGIN_ROUTE,
+} from '../panel-routes.js';
 
 const links = [
-  { to: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { to: '/licenses', label: 'Licenças', icon: '🔑' },
-  { to: '/customers', label: 'Clientes', icon: '👥' },
+  { to: ADMIN_DASHBOARD_ROUTE, label: 'Dashboard', icon: '📊' },
+  { to: ADMIN_LICENSES_ROUTE, label: 'Licenças', icon: '🔑' },
+  { to: ADMIN_CUSTOMERS_ROUTE, label: 'Clientes', icon: '👥' },
 ];
 
 export default function Sidebar() {
@@ -13,7 +19,7 @@ export default function Sidebar() {
 
   async function handleLogout() {
     await logout();
-    navigate('/login', { replace: true });
+    navigate(ADMIN_LOGIN_ROUTE, { replace: true });
   }
 
   return (

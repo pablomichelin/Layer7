@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { get, post, put } from '../api';
+import { ADMIN_CUSTOMERS_ROUTE } from '../panel-routes.js';
 
 export default function CustomerForm() {
   const { id } = useParams();
@@ -35,7 +36,7 @@ export default function CustomerForm() {
       } else {
         await post('/customers', form);
       }
-      navigate('/customers');
+      navigate(ADMIN_CUSTOMERS_ROUTE);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -45,7 +46,7 @@ export default function CustomerForm() {
 
   return (
     <div>
-      <button onClick={() => navigate('/customers')} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
+      <button onClick={() => navigate(ADMIN_CUSTOMERS_ROUTE)} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
 
       <div className="bg-white rounded-lg shadow p-6 max-w-lg">
         <h2 className="text-xl font-bold text-gray-800 mb-6">{isEdit ? 'Editar Cliente' : 'Novo Cliente'}</h2>

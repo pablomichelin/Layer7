@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get, del } from '../api';
 import DataTable from '../components/DataTable';
+import {
+  ADMIN_CUSTOMERS_NEW_ROUTE,
+  buildAdminCustomerDetailRoute,
+  buildAdminCustomerEditRoute,
+} from '../panel-routes.js';
 
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -43,8 +48,8 @@ export default function Customers() {
     {
       key: 'actions', label: '', render: (r) => (
         <div className="flex gap-2">
-          <button onClick={() => navigate(`/customers/${r.id}`)} className="text-xs text-brand-600 hover:underline">Ver</button>
-          <button onClick={() => navigate(`/customers/${r.id}/edit`)} className="text-xs text-brand-600 hover:underline">Editar</button>
+          <button onClick={() => navigate(buildAdminCustomerDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
+          <button onClick={() => navigate(buildAdminCustomerEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
           <button onClick={(e) => handleArchive(r.id, r.name, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
         </div>
       ),
@@ -56,7 +61,7 @@ export default function Customers() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Clientes ({total})</h2>
         <button
-          onClick={() => navigate('/customers/new')}
+          onClick={() => navigate(ADMIN_CUSTOMERS_NEW_ROUTE)}
           className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
         >
           Novo Cliente
