@@ -38,6 +38,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   e hardware divergente passa a ficar isolada em helper testavel e coberta
   por testes que preservam `409`, reduzindo o risco de reintroduzir o drift
   cosmetico `403` observado anteriormente no live
+- **Auditoria de emissao/reemissao do `.lic` passa a ter regressao dedicada** —
+  a metadata auditada dos artefactos emitidos por `activate` e por download
+  administrativo passa a ser coberta por testes puros, preservando
+  `flow`, `emission_kind`, binding, customer/features e hashes SHA-256 de
+  payload, assinatura e envelope
 
 ### Fixed — auth bridge do painel administrativo
 

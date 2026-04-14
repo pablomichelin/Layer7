@@ -339,7 +339,9 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
   com um `.lic` antigo ainda valido offline ate data/grace.
 - A F3.5 melhora a trilha auditada do artefacto emitido, mas o sistema ainda
   nao tem contador/versionamento consumido pelo daemon nem enforcement de
-  "artefacto mais recente unico".
+  "artefacto mais recente unico"; em 2026-04-14, a metadata auditada de
+  emissao/reemissao passou a ter regressao dedicada para `flow`,
+  `emission_kind`, binding, customer/features e hashes SHA-256 do artefacto.
 - A F3.6 formaliza a matriz de evidencias, a F3.7 operacionaliza essa
   recolha com pack e helper shell baratos, e a F3.8 formaliza o gate de
   fechamento e o relatorio final de campanha; ainda assim, a robustez da F3
