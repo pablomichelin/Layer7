@@ -10,6 +10,10 @@ const { generateSignedLicense } = require('../crypto');
 const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
 const { buildLicenseArtifactAuditMetadata } = require('../license-artifact-audit');
 const {
+  createLicenseUpdateGuardError,
+  listChangedLicenseFields,
+} = require('../license-update-policy');
+const {
   assertEmptyBody,
   normalizeStoredHardwareId,
   parseIdParam,
@@ -40,29 +44,6 @@ async function ensureVisibleCustomer(client, customerId) {
   if (result.rows.length === 0) {
     throw createHttpError(404, 'Cliente nao encontrado.');
   }
-}
-
-function listChangedLicenseFields(existingLicense, payload) {
-  const changedFields = [];
-
-  if (Object.prototype.hasOwnProperty.call(payload, 'customerId')
-    && payload.customerId !== existingLicense.customer_id) {
-    changedFields.push('customer_id');
-  }
-  if (Object.prototype.hasOwnProperty.call(payload, 'expiry')
-    && payload.expiry !== existingLicense.expiry) {
-    changedFields.push('expiry');
-  }
-  if (Object.prototype.hasOwnProperty.call(payload, 'features')
-    && payload.features !== (existingLicense.features || 'full')) {
-    changedFields.push('features');
-  }
-  if (Object.prototype.hasOwnProperty.call(payload, 'notes')
-    && payload.notes !== existingLicense.notes) {
-    changedFields.push('notes');
-  }
-
-  return changedFields;
 }
 
 router.get('/', async (req, res) => {
@@ -254,13 +235,10 @@ router.put('/:id', async (req, res) => {
       const existingLicense = existingResult.rows[0];
       const existingState = getEffectiveLicenseState(existingLicense);
       const changedFields = listChangedLicenseFields(existingLicense, payload);
+      const updateGuardError = createLicenseUpdateGuardError(existingLicense, changedFields);
 
-      if (changedFields.includes('customer_id')
-        && (existingState.activated || Boolean(existingLicense.activated_at))) {
-        throw createHttpError(
-          409,
-          'Licenca activada/bindada nao permite mudar customer_id. Crie nova licenca para outro cliente.'
-        );
+      if (updateGuardError) {
+        throw updateGuardError;
       }
 
       if (Object.prototype.hasOwnProperty.call(payload, 'customerId')) {

@@ -51,6 +51,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `parseActivatePayload` passa a cobrir normalizacao de `key` e
   `hardware_id`, rejeicao de campos inesperados e erros `400` para chave ou
   hardware invalidos antes de tocar na transacao de activacao
+- **Guardrail de update administrativo de licenca passa a ter regressao dedicada** —
+  a deteccao de campos alterados e o bloqueio `409` contra troca de
+  `customer_id` em licenca activada/bindada passam a ficar isolados em helper
+  testavel, preservando a proteccao contra transferencia silenciosa de
+  ownership
 
 ### Fixed — auth bridge do painel administrativo
 
