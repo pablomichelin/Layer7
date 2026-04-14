@@ -120,9 +120,11 @@ SSH_CMD=(ssh -p "$SSH_PORT" -o BatchMode=yes)
 if [[ -n "$SSH_KEY" ]]; then
   SSH_CMD+=(-i "$SSH_KEY")
 fi
-for opt in "${SSH_OPTIONS[@]}"; do
-  SSH_CMD+=(-o "$opt")
-done
+if [[ ${#SSH_OPTIONS[@]} -gt 0 ]]; then
+  for opt in "${SSH_OPTIONS[@]}"; do
+    SSH_CMD+=(-o "$opt")
+  done
+fi
 SSH_CMD+=("$SSH_TARGET")
 
 run_remote_script_to_file() {

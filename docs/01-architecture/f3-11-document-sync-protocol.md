@@ -25,6 +25,14 @@ Estado formal preservado:
 - `sem campanha`;
 - `DR-05 continua como unico blocker real para fechar a F3`.
 
+Nota operacional corrente:
+
+- no estado actual, quando uma rodada tocar o `DR-05` de forma mutavel, a
+  sincronizacao deve distinguir explicitamente baseline read-only de control
+  plane legitimo observado pela GUI autenticada do pacote (`PHPSESSID`,
+  `__csrf_magic`, `layer7_settings.php`, `register_license` /
+  `revoke_license`).
+
 Leitura complementar obrigatoria:
 
 - [`../00-overview/f3-11-start-here.md`](../00-overview/f3-11-start-here.md)
@@ -91,8 +99,8 @@ Leitura complementar obrigatoria:
 
 1. confirmar no scorecard e no registro mestre que o unico blocker corrente
    continua a ser `DR-05`;
-2. confirmar que ha permissao suficiente no appliance, snapshot/rollback e
-   `run_id` de evidencias;
+2. confirmar que ha control plane legitimo observado no appliance para o
+   cenario mutavel, com snapshot/rollback e `run_id` de evidencias;
 3. executar apenas os cenarios locais do appliance definidos na F3.6/F3.7;
 4. registar resultados no ciclo, no ledger, no registro mestre, no scorecard
    e no drift registry;

@@ -29,10 +29,11 @@ Nota de actualizacao em `2026-04-14`:
 ## 2. Artefactos fornecidos
 
 - **Acesso entregue:** `SIM / NAO`
-- **Tipo de acesso ou artefacto:** `ssh` / `psql` / `credencial` / `documento` / `output bruto` / `outro`
+- **Tipo de acesso ou artefacto:** `ssh` / `psql` / `credencial` / `sessao GUI` / `documento` / `output bruto` / `outro`
 - **Artefactos anexados/fornecidos:**
 - **Janela de uso ou validade da entrega:**
 - **Escopo formal documentado:** `SIM / NAO`
+- **Inclui cookies/token/sessao autenticada da GUI?** `SIM / NAO`
 
 ---
 
@@ -50,6 +51,17 @@ Nota de actualizacao em `2026-04-14`:
 
 ```text
 [listar aqui os comandos, queries ou verificacoes que deviam ser possiveis]
+```
+
+Se o insumo for `PFSENSE_APPLIANCE` e tocar `DR-05`, registar tambem, quando
+aplicavel:
+
+```text
+- prova de PHPSESSID
+- prova de __csrf_magic da mesma sessao
+- GET autenticado a /packages/layer7/layer7_settings.php
+- tentativa legitima de register_license ou revoke_license
+- classificacao PASS / BLOCKED / FAIL sem confundir falta de control plane com falha do produto
 ```
 
 ---

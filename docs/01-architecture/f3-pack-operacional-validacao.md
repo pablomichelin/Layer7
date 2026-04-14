@@ -66,6 +66,8 @@ Pode ser padronizado sem tocar no produto:
 - directoria unica por execucao (`run_id`);
 - subdirectoria por cenario (`S01`, `S02`, ...);
 - nomes fixos para outputs de backend, CLI, `.lic` e hashes;
+- nomes fixos tambem para `headers`, `HTML` e `cookie jar` da trilha GUI
+  autenticada do pfSense quando o `DR-05` usar esse caminho;
 - template markdown unico para registo do resultado;
 - script shell apenas para exportar `licenses`, `activations_log` e
   `admin_audit_log`.
@@ -136,6 +138,16 @@ Cada cenario deve usar ficheiros fixos, com o minimo de liberdade possivel:
 - `60-appliance-license.json`
 - `70-local-hashes.txt`
 - `80-extra-notes.txt`
+- `41-gui-login-headers.txt`
+- `42-gui-login.html`
+- `43-gui-auth-headers.txt`
+- `44-gui-auth.html`
+- `45-gui-layer7-headers.txt`
+- `46-gui-layer7.html`
+- `47-gui-action-headers.txt`
+- `48-gui-action.html`
+- `49-gui-post-action-headers.txt`
+- `50-gui-post-action.html`
 
 Regra:
 
@@ -227,6 +239,43 @@ Limites do helper:
 - com `--update-root-preflight`, apenas consolida a baseline recolhida no
   artefacto raiz `40-preflight-appliance.txt`; continua sem validar o
   preflight por si so.
+
+Helper complementar da trilha GUI autenticada:
+
+```text
+scripts/license-validation/run-pfsense-gui-license-flow.sh
+```
+
+Finalidade:
+
+- abrir a login page da GUI do pfSense;
+- recolher `PHPSESSID` e `__csrf_magic` no mesmo fluxo real;
+- confirmar acesso autenticado a `layer7_settings.php`;
+- materializar `probe`, `register` ou `revoke` com evidencias por `run_id`,
+  inclusive em modo `--ssh-target` quando a GUI util so responder em
+  `https://127.0.0.1:9999/` no proprio appliance.
+
+Evidencias tipicas desta trilha:
+
+- `40-gui-cookie-jar.txt`
+- `41-gui-login-headers.txt`
+- `42-gui-login.html`
+- `43-gui-auth-headers.txt`
+- `44-gui-auth.html`
+- `45-gui-layer7-headers.txt`
+- `46-gui-layer7.html`
+- `47-gui-action-headers.txt`
+- `48-gui-action.html`
+- `49-gui-post-action-headers.txt`
+- `50-gui-post-action.html`
+- `39-gui-flow-notes.txt`
+
+Limites do helper:
+
+- nao inventa credencial, cookie ou sessao;
+- nao substitui autorizacao humana legitima da GUI;
+- se a trilha devolver login page, `403 CSRF Error` ou sessao incoerente,
+  o resultado correcto continua a ser `BLOCKED`.
 
 Helper complementar de live preflight:
 

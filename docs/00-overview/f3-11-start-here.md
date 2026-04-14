@@ -11,6 +11,8 @@
 - Blocker F3 restante: DR-05 (cenarios do appliance)
 - Baseline read-only mais recente do appliance:
   `20260414T123526Z-appliance254-permissions`
+- Run canónico mais recente do appliance:
+  `20260414T000000Z-appliance254-continue`
 
 ---
 
@@ -36,10 +38,13 @@
 ## O que falta para fechar a F3
 
 1. **Fechar DR-05**: executar cenarios do appliance (snapshot/restore,
-   offline/online, NIC/UUID) — roteiro completo e comandos no prompt
-   [`docs/07-prompts/f3-prompt-continuacao-2026-04-03.md`](../07-prompts/f3-prompt-continuacao-2026-04-03.md)
-   (secao DR-05) e em
-   [`docs/01-architecture/f3-fecho-operacional-restante.md`](../01-architecture/f3-fecho-operacional-restante.md)
+   offline/online, NIC/UUID) — roteiro completo e comandos em
+   [`../01-architecture/f3-runbook-proxima-campanha-real.md`](../01-architecture/f3-runbook-proxima-campanha-real.md)
+   (secao `8. Roteiro operacional do DR-05 no appliance`, incluindo a
+   trilha GUI autenticada, a sequencia `curl` e o helper
+   `run-pfsense-gui-license-flow.sh`, inclusive no modo
+   `--ssh-target <utilizador@host>` + `--gui-base https://127.0.0.1:9999`) e em
+   [`../01-architecture/f3-fecho-operacional-restante.md`](../01-architecture/f3-fecho-operacional-restante.md)
 2. Consolidar evidencias e decidir fecho da F3
 
 ---

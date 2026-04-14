@@ -43,7 +43,7 @@ Aplicar o criterio objectivo correspondente:
 | host live | SSH/read-only ou output bruto de host, directorio, Git e compose | existe prova suficiente da stack observada, sem adivinhacao |
 | PostgreSQL live | identidade da base e queries read-only de schema | existe prova do schema e das tabelas administrativas no ambiente observado |
 | credencial admin | owner, escopo formal e login real | existe sessao valida no fluxo oficial e escopo documentado |
-| appliance pfSense | SSH, baseline e controlos do lab | existe baseline completa e controlos legitimos de snapshot/relogio/offline/NIC/UUID |
+| appliance pfSense | SSH, baseline, controlos do lab e control plane mutavel quando aplicavel | existe baseline completa, controlos legitimos de snapshot/relogio/offline/NIC/UUID e, para cenarios mutaveis, prova de `PHPSESSID`, `__csrf_magic` e `layer7_settings.php` autenticado; quando a rodada usar o helper GUI, os artefactos `39-gui-flow-notes.txt`, `41-gui-login-headers.txt`, `42-gui-login.html`, `45-gui-layer7-headers.txt` e `46-gui-layer7.html` passam a ser evidencias objectivas aceitaveis |
 | inventario `LIC-A` a `LIC-F` | artefacto preenchido e prova objectiva em backend | o inventario bate com o backend e reserva licencas reais por cenario |
 
 ### 3. Rejeitar com base objectiva quando necessario

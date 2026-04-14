@@ -239,7 +239,8 @@ No estado comprovado da rodada actual, a F3.11 permanece em:
 - license-server live, PostgreSQL, auth/admin e inventario real ja estao
   suficientes para a F3;
 - a unica transicao operacional valida e executar ou complementar `DR-05`
-  no appliance com snapshot/rollback e evidencias por `run_id`;
+  no appliance com snapshot/rollback, evidencias por `run_id` e control
+  plane legitimo observado quando o cenario for mutavel;
 - qualquer regresso ao modelo `5/5` exige drift novo objectivo, nao apenas
   leitura de documentos antigos.
 

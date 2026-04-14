@@ -18,6 +18,14 @@ Nota de actualizacao em `2026-04-14`:
   historico/compatibilidade;
 - o gate corrente para continuar a F3 e executar `DR-05` no appliance com
   permissao suficiente, snapshot/rollback e evidencias por `run_id`;
+- para cenarios mutaveis, "permissao suficiente" passa a significar control
+  plane legitimo efectivamente observado, hoje descrito pela trilha GUI
+  autenticada do pacote (`PHPSESSID` + `__csrf_magic` + acesso autenticado a
+  `layer7_settings.php` e submissao legitima de `register_license` /
+  `revoke_license`);
+- quando operacionalmente util, essa trilha pode ser materializada pelo
+  helper `scripts/license-validation/run-pfsense-gui-license-flow.sh`,
+  desde que as credenciais/sessao usadas sejam legitimamente autorizadas;
 - `DR-01`, `DR-03`, `DR-04` e `DR-06` ja nao bloqueiam a F3 no ambiente live
   activo.
 
@@ -72,7 +80,7 @@ Sem estes cinco grupos de evidencia, a readiness nao reabre.
 
 Os itens abaixo impedem a readiness automaticamente:
 
-1. appliance sem permissao suficiente para os cenarios mutaveis;
+1. appliance sem control plane legitimo observado para os cenarios mutaveis;
 2. ausencia de snapshot/rollback antes de relogio, offline, NIC/UUID ou
    clone/restore;
 3. ausencia de evidencias por `run_id`;
@@ -104,8 +112,8 @@ proibir qualquer inferencia livre sobre live = local = remoto.
 casos abaixo:
 
 - appliance sem controlos legitimos para `DR-05`;
-- ausencia de permissao para reescrever `/usr/local/etc/layer7.lic` quando o
-  cenario exigir;
+- ausencia de trilha GUI autenticada valida quando o cenario exigir
+  reescrever `/usr/local/etc/layer7.lic` ou revogar artefacto local;
 - ausencia de snapshot/rollback para cenario mutavel;
 - ausencia de evidencia bruta por `run_id`;
 - drift novo que invalide a leitura actual do live.
@@ -156,9 +164,12 @@ Leitura factual desta rodada:
 So existe `GO` quando:
 
 1. `DR-05` tiver permissao suficiente no appliance;
-2. snapshot/rollback estiverem garantidos antes de cenario mutavel;
-3. evidencias por `run_id` estiverem registadas;
-4. o estado de publicacao estiver anotado sem push.
+2. essa permissao estiver provada por control plane legitimo observado
+   (`PHPSESSID`, `__csrf_magic`, `layer7_settings.php` autenticado e
+   submissao valida quando aplicavel);
+3. snapshot/rollback estiverem garantidos antes de cenario mutavel;
+4. evidencias por `run_id` estiverem registadas;
+5. o estado de publicacao estiver anotado sem push.
 
 ### `NO-GO`
 

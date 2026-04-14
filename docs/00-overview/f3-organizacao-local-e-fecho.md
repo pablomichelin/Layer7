@@ -233,8 +233,8 @@ Enquanto a F3 estiver aberta, o fluxo seguro e:
 1. usar este mapa para escolher o documento certo;
 2. manter `F3 aberta` ate evidencia real dos cenarios do appliance;
 3. nao reabrir blockers ja saneados do live/admin/inventario;
-4. executar apenas o bloco restante `DR-05` com permissao suficiente,
-   snapshot/rollback e evidencias por `run_id`;
+4. executar apenas o bloco restante `DR-05` com control plane legitimo
+   observado, snapshot/rollback e evidencias por `run_id`;
 5. so depois consolidar relatorio final;
 6. so depois decidir fecho da F3.
 

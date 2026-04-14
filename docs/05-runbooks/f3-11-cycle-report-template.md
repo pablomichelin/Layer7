@@ -19,6 +19,13 @@ Estado formal de arranque que deve ser preservado ate prova em contrario:
 - `DR-05 pendente`;
 - `sem push automatico`.
 
+Nota operacional corrente:
+
+- no estado actual da F3.11, avancos relevantes do `DR-05` tendem a vir de
+  evidencia do appliance e, quando houver mutacao legitima, da trilha GUI
+  autenticada do pacote (`PHPSESSID` + `__csrf_magic` + acesso autenticado a
+  `layer7_settings.php`).
+
 ---
 
 ## 1. Identificacao do ciclo
@@ -84,6 +91,16 @@ Estado formal de arranque que deve ser preservado ate prova em contrario:
 
 - 
 
+### Nota especifica para `DR-05`
+
+- **Houve evidencia nova da GUI autenticada do pfSense?** `SIM / NAO`
+- **Se sim, houve prova de `PHPSESSID` + `__csrf_magic` da mesma sessao viva?**
+  `SIM / NAO`
+- **`layer7_settings.php` abriu autenticado?** `SIM / NAO`
+- **Houve tentativa legitima de `register_license` / `revoke_license`?**
+  `SIM / NAO`
+- **Classificacao correcta do resultado:** `PASS / BLOCKED / FAIL / nao aplicavel`
+
 ---
 
 ## 6. Impacto sobre blockers e drifts
@@ -94,6 +111,7 @@ Estado formal de arranque que deve ser preservado ate prova em contrario:
 | query read-only ao PostgreSQL |  |  | `SIM / NAO` |  | [`../01-architecture/f3-11-execution-master-register.md`](../01-architecture/f3-11-execution-master-register.md) |
 | credencial admin autorizada |  |  | `SIM / NAO` |  | [`../01-architecture/f3-11-execution-master-register.md`](../01-architecture/f3-11-execution-master-register.md) |
 | appliance pfSense verificavel |  |  | `SIM / NAO` |  | [`../01-architecture/f3-11-execution-master-register.md`](../01-architecture/f3-11-execution-master-register.md) |
+| trilha GUI autenticada do pacote |  |  | `SIM / NAO` |  | [`../01-architecture/f3-11-execution-master-register.md`](../01-architecture/f3-11-execution-master-register.md) |
 | inventario `LIC-A` a `LIC-F` |  |  | `SIM / NAO` |  | [`../01-architecture/f3-11-execution-master-register.md`](../01-architecture/f3-11-execution-master-register.md) |
 | `DR-01` a `DR-07` |  |  | `SIM / NAO` |  | [`../01-architecture/f3-11-drift-registry.md`](../01-architecture/f3-11-drift-registry.md) |
 
@@ -104,6 +122,7 @@ Estado formal de arranque que deve ser preservado ate prova em contrario:
 | Pergunta | Resposta desta rodada | Fundamento |
 |----------|-----------------------|------------|
 | O blocker corrente e apenas `DR-05`? | `SIM / NAO` |  |
+| O `DR-05` continua dependente de control plane/auth GUI? | `SIM / NAO` |  |
 | A readiness pode ser reaberta? | `GO / NO-GO` | [`../01-architecture/f3-11-readiness-reopen-gate.md`](../01-architecture/f3-11-readiness-reopen-gate.md) |
 | A campanha pode ser aberta? | `GO / NO-GO` | [`../01-architecture/f3-11-readiness-reopen-gate.md`](../01-architecture/f3-11-readiness-reopen-gate.md) |
 | Existe drift novo a registar? | `SIM / NAO` |  |

@@ -184,8 +184,8 @@ Resultados objectivos:
      formal foram disponibilizados.
 3. **Appliance pfSense real continua inexistente do ponto de vista
    verificavel**
-   - Sem SSH, baseline e snapshot legitimo, os cenarios locais permanecem
-     bloqueados.
+   - Sem SSH, baseline, snapshot legitimo e control plane mutavel
+     efectivamente observado, os cenarios locais permanecem bloqueados.
 4. **Inventario `LIC-A` a `LIC-F` continua inexistente**
    - Sem mapeamento real `licenca -> cliente -> appliance -> cenario`, a
      campanha continua dependente de improviso, o que e proibido.

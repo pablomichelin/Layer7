@@ -33,6 +33,9 @@ Nota de actualizacao em `2026-04-14`:
   leitura;
 - o proximo passo operacional corrente nao e pedir cinco insumos, e sim
   completar `DR-05`.
+- se o documento for reactivado por drift novo no appliance, a solicitacao do
+  insumo pfSense deve pedir nao so SSH/baseline, mas tambem control plane
+  legitimo da GUI autenticada do pacote para cenarios mutaveis.
 
 Leitura complementar obrigatoria:
 
@@ -50,7 +53,8 @@ Leitura complementar obrigatoria:
 1. acesso read-only ao host live `192.168.100.244`
 2. query read-only ao PostgreSQL live
 3. credencial admin autorizada com escopo formal
-4. appliance pfSense com SSH, baseline e controlos legitimos
+4. appliance pfSense com SSH, baseline, controlos legitimos e control plane
+   mutavel
 5. inventario real `LIC-A` a `LIC-F`
 
 ---
@@ -102,16 +106,16 @@ Leitura complementar obrigatoria:
 | Impacto directo sobre a F3.11 | sem este insumo a metade administrativa da readiness/campanha permanece fechada |
 | Status de bloqueio enquanto ausente | `bloqueio total da readiness e da campanha` |
 
-### 2.4 Insumo 04 - appliance pfSense com SSH, baseline e controlos legitimos
+### 2.4 Insumo 04 - appliance pfSense com SSH, baseline, controlos legitimos e control plane mutavel
 
 | Campo | Especificacao canonica |
 |-------|-------------------------|
-| Nome do insumo | appliance pfSense com SSH, baseline e controlos legitimos |
+| Nome do insumo | appliance pfSense com SSH, baseline, controlos legitimos e control plane mutavel |
 | Finalidade operacional | executar a metade local da F3, recolher baseline real e tornar legitimos os cenarios de relogio, offline e drift de fingerprint |
-| Acesso minimo aceitavel | host/IP real com `ssh root@<HOST_REAL>` funcional, `layer7d` operacional e evidencia de snapshot/restore, relogio, offline/online e NIC/UUID/clone/restore |
-| Formato de entrega aceitavel | dados reais do appliance + artefacto de controlos do lab/hypervisor + acesso SSH funcional |
-| Evidencia minima exigida | output de `hostname`, `date -u`, `sysctl -n kern.hostuuid`, `ifconfig -a`, `service layer7d status`, `layer7d --fingerprint`, estado do `.lic` local, stats JSON e prova real dos controlos do lab |
-| Exemplos de aceite | SSH funciona; baseline completa e reproduzivel; existe snapshot identificavel; owner do lab confirma controlos legitimos |
+| Acesso minimo aceitavel | host/IP real com `ssh root@<HOST_REAL>` funcional, `layer7d` operacional, evidencia de snapshot/restore, relogio, offline/online e NIC/UUID/clone/restore, e trilha GUI autenticada do pacote para os cenarios mutaveis |
+| Formato de entrega aceitavel | dados reais do appliance + artefacto de controlos do lab/hypervisor + acesso SSH funcional + prova da GUI autenticada do pacote quando aplicavel |
+| Evidencia minima exigida | output de `hostname`, `date -u`, `sysctl -n kern.hostuuid`, `ifconfig -a`, `service layer7d status`, `layer7d --fingerprint`, estado do `.lic` local, stats JSON, prova real dos controlos do lab e prova de `PHPSESSID`, `__csrf_magic` e `layer7_settings.php` autenticado quando o cenario exigir mutacao |
+| Exemplos de aceite | SSH funciona; baseline completa e reproduzivel; existe snapshot identificavel; owner do lab confirma controlos legitimos; a GUI autenticada do pacote abre `layer7_settings.php` com a mesma sessao viva |
 | Exemplos de rejeicao | apenas `<PFSENSE_IP>`; VM "parecida" sem snapshot; acesso via consola informal sem baseline; promessa de alterar relogio sem prova de controlo |
 | Risco de entrega incompleta | executar S01/S02/S07/S08/S09/S11/S12/S13 em ambiente nao controlado ou nao reversivel |
 | Impacto directo sobre a F3.11 | sem este insumo a metade local da readiness/campanha continua inviavel |

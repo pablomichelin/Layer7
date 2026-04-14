@@ -24,8 +24,15 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
   `bash -n scripts/license-validation/export-appliance-evidence.sh` e
   `bash -n scripts/license-validation/export-live-preflight.sh` e
   `bash -n scripts/license-validation/export-schema-preflight.sh` e
-  `bash -n scripts/license-validation/prepare-f3-preflight.sh` para smoke
-  syntax dos helpers shell da campanha F3.
+  `bash -n scripts/license-validation/init-f3-validation-campaign.sh` e
+  `bash -n scripts/license-validation/prepare-f3-preflight.sh` e
+  `bash -n scripts/license-validation/run-appliance-activation-scenario.sh` e
+  `bash -n scripts/license-validation/run-pfsense-gui-license-flow.sh`
+  para smoke syntax dos helpers shell da campanha F3.
+- `scripts/license-validation/run-pfsense-gui-license-flow.sh --help` para
+  validar a interface minima do helper GUI, incluindo o modo
+  `--ssh-target` para GUI no loopback do appliance
+  (`https://127.0.0.1:9999/`).
 
 ## Matriz de testes
 

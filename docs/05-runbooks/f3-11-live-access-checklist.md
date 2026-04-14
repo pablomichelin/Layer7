@@ -12,6 +12,8 @@ Escopo deste runbook:
 - confirmar schema e tabelas administrativas no PostgreSQL live;
 - confirmar credencial admin no fluxo oficial de sessao;
 - confirmar appliance pfSense, baseline e controlos do lab;
+- confirmar a trilha legitima autenticada da GUI do pacote no pfSense para
+  cenarios mutaveis;
 - confirmar inventario real `LIC-A` a `LIC-F`;
 - repetir a readiness da F3.11 com base em ambiente e cenario reais.
 
@@ -38,6 +40,12 @@ export ADMIN_EMAIL='<ADMIN_EMAIL_AUTORIZADO>'
 export ADMIN_PASSWORD='<ADMIN_PASSWORD_AUTORIZADA>'
 export COOKIE_JAR="$(mktemp)"
 export PFSENSE_HOST='<HOST_OU_IP_REAL_DO_APPLIANCE>'
+export PFSENSE_GUI_BASE='https://<HOST_OU_IP_REAL_DO_APPLIANCE>:9999'
+export PFSENSE_GUI_COOKIE_JAR="$(mktemp)"
+export PFSENSE_GUI_LOGIN_HTML="$(mktemp)"
+export PFSENSE_GUI_LAYER7_HTML="$(mktemp)"
+export PFSENSE_GUI_USER='<UTILIZADOR_GUI_AUTORIZADO>'
+export PFSENSE_GUI_PASSWORD='<PASSWORD_GUI_AUTORIZADA>'
 export PFSENSE_CONTROL_EVIDENCE='<ARTEFACTO_REAL_COM_SNAPSHOT_E_CONTROLOS>'
 export LIC_A_ID='<ID_REAL>'
 export LIC_B_ID='<ID_REAL>'
@@ -150,10 +158,10 @@ curl -k -si --max-time 15 -b "$COOKIE_JAR" \
 - **Se falhar:** `NO-GO`. Sem sessao valida, a metade administrativa da F3.11
   continua fechada.
 
-### 6. Confirmar pfSense via SSH e baseline
+### 6. Confirmar pfSense via SSH, baseline e control plane legitimo
 
 - **Objectivo:** provar appliance real, baseline recolhivel e existencia de
-  controlos do lab.
+  controlos do lab, sem assumir acesso mutavel onde ele nao existir.
 - **Comandos:**
 
 ```bash
@@ -177,7 +185,79 @@ ssh root@"$PFSENSE_HOST" '
 - **Se falhar:** `NO-GO` para S01/S02/S07/S08/S09/S11/S12/S13. Sem baseline
   e sem controlos, a campanha nao abre.
 
-### 7. Confirmar inventario real `LIC-A` a `LIC-F`
+### 7. Confirmar a trilha autenticada da GUI do pacote no pfSense
+
+- **Objectivo:** provar que existe sessao GUI autorizada e utilizavel para os
+  cenarios mutaveis que dependem de `register_license` / `revoke_license`.
+- **Comandos:**
+
+```bash
+rm -f "$PFSENSE_GUI_COOKIE_JAR" "$PFSENSE_GUI_LOGIN_HTML" "$PFSENSE_GUI_LAYER7_HTML"
+
+curl -k -sS --max-time 15 \
+  -c "$PFSENSE_GUI_COOKIE_JAR" \
+  "$PFSENSE_GUI_BASE/" >"$PFSENSE_GUI_LOGIN_HTML"
+
+export PFSENSE_GUI_CSRF_TOKEN="$(sed -n 's/.*csrfMagicToken = \"\\([^\"]*\\)\".*/\\1/p' "$PFSENSE_GUI_LOGIN_HTML" | head -n1)"
+
+test -n "$PFSENSE_GUI_CSRF_TOKEN"
+
+curl -k -sS --max-time 15 \
+  -b "$PFSENSE_GUI_COOKIE_JAR" \
+  -c "$PFSENSE_GUI_COOKIE_JAR" \
+  -X POST "$PFSENSE_GUI_BASE/" \
+  --data-urlencode "__csrf_magic=$PFSENSE_GUI_CSRF_TOKEN" \
+  --data-urlencode "usernamefld=$PFSENSE_GUI_USER" \
+  --data-urlencode "passwordfld=$PFSENSE_GUI_PASSWORD" \
+  --data-urlencode "login=Sign In" >/dev/null
+
+curl -k -sS --max-time 15 \
+  -b "$PFSENSE_GUI_COOKIE_JAR" \
+  "$PFSENSE_GUI_BASE/packages/layer7/layer7_settings.php" >"$PFSENSE_GUI_LAYER7_HTML"
+
+rg -n "register_license|revoke_license|license_code" "$PFSENSE_GUI_LAYER7_HTML"
+```
+
+Opcionalmente, a mesma verificacao pode ser materializada pelo helper:
+
+```bash
+scripts/license-validation/run-pfsense-gui-license-flow.sh \
+  --scenario-code S07 \
+  --run-id "$RUN_ID" \
+  --output-root "${TMPDIR:-/tmp}/layer7-f3-evidence" \
+  --gui-base "$PFSENSE_GUI_BASE" \
+  --gui-user "$PFSENSE_GUI_USER" \
+  --gui-password "$PFSENSE_GUI_PASSWORD" \
+  --action probe
+```
+
+Se a GUI estiver disponivel apenas no loopback do appliance, usar:
+
+```bash
+scripts/license-validation/run-pfsense-gui-license-flow.sh \
+  --scenario-code S07 \
+  --run-id "$RUN_ID" \
+  --output-root "${TMPDIR:-/tmp}/layer7-f3-evidence" \
+  --ssh-target "$PFSENSE_HOST" \
+  --gui-base 'https://127.0.0.1:9999' \
+  --gui-user "$PFSENSE_GUI_USER" \
+  --gui-password "$PFSENSE_GUI_PASSWORD" \
+  --action probe
+```
+
+- **Saida esperada:** login page inicial com `PHPSESSID`, extraccao valida de
+  `__csrf_magic`, `POST` de login sem erro explicito e
+  `layer7_settings.php` aberto como pagina autenticada do pacote, contendo
+  `register_license`, `revoke_license` ou `license_code`.
+- **Artefactos aceitaveis do helper:** `39-gui-flow-notes.txt`,
+  `40-gui-cookie-jar.txt`, `41-gui-login-headers.txt`,
+  `42-gui-login.html`, `45-gui-layer7-headers.txt`,
+  `46-gui-layer7.html`.
+- **Se falhar:** `NO-GO` para S07/S08/S09/S11/S12/S13. Se `layer7_settings.php`
+  continuar a devolver login page, redirect inesperado ou `HTTP 403 CSRF Error`,
+  classificar como `BLOCKED` de control plane e nao como `FAIL` do produto.
+
+### 8. Confirmar inventario real `LIC-A` a `LIC-F`
 
 - **Objectivo:** provar que o inventario existe no backend e que os IDs
   reservados batem com o estado real.
@@ -191,7 +271,7 @@ $PG_READONLY_CMD -c "SELECT id, license_key, customer_id, hardware_id, status, e
   campanha e sem IDs inexistentes.
 - **Se falhar:** `NO-GO`. Nao improvisar licencas no dia da campanha.
 
-### 8. Repetir a readiness da F3.11 com cenario real
+### 9. Repetir a readiness da F3.11 com cenario real
 
 - **Objectivo:** repetir a readiness com ambiente real e, no minimo, revalidar
   o controlo binario `409` vs `403` do S03.
@@ -229,12 +309,12 @@ curl -k -si --max-time 15 -X POST "$L7_BASE_URL/api/activate" \
 
 So existe `GO` se:
 
-1. os oito passos acima concluirem com output real e coerente;
+1. os nove passos acima concluirem com output real e coerente;
 2. o live tiver revisao e stack provadas;
 3. o schema live contiver as tabelas canonicas obrigatorias;
 4. a credencial admin funcionar no fluxo oficial;
 5. o appliance e o inventario estiverem em verde;
-6. o controlo do passo 8 nao revelar drift bloqueante novo.
+6. o controlo do passo 9 nao revelar drift bloqueante novo.
 
 ### `NO-GO`
 
@@ -247,8 +327,9 @@ Qualquer uma das condicoes abaixo fecha a rodada como `NO-GO`:
 - `admin_sessions`, `admin_audit_log` ou `admin_login_guards` faltam;
 - login admin nao fecha sessao valida;
 - appliance ou controlos do lab continuam incompletos;
+- trilha GUI autenticada do pacote continua indisponivel;
 - inventario `LIC-A` a `LIC-F` continua parcial;
-- o controlo real do passo 8 continua a devolver contrato incompativel.
+- o controlo real do passo 9 continua a devolver contrato incompativel.
 
 ---
 

@@ -26,6 +26,10 @@ Nota de actualizacao em `2026-04-14`:
   historico;
 - o ciclo operacional corrente deve focar `DR-05` e nao reabrir
   host/DB/admin/inventario ja saneados sem drift novo.
+- quando a rodada tocar o appliance de forma mutavel, o ciclo deve registar
+  explicitamente se houve ou nao trilha GUI autenticada valida do pacote
+  (`PHPSESSID`, `__csrf_magic` e acesso autenticado a
+  `layer7_settings.php`).
 
 ---
 
@@ -41,6 +45,10 @@ ou live que:
 5. fecha com conclusao binaria ou parcial explicita.
 
 Sem estes cinco elementos, nao ha ciclo valido.
+
+Para o estado corrente do `DR-05`, considera-se ainda parte material do
+ciclo indicar se a rodada apenas confirmou baseline read-only ou se chegou a
+validar control plane mutavel pela GUI autenticada.
 
 ---
 
@@ -111,6 +119,13 @@ Um ciclo fecha com avancos reais quando:
 5. o registro mestre e o scorecard reflectem a mudanca;
 6. o gate foi reavaliado quando aplicavel;
 7. o fecho do ciclo mostra o novo estado da trilha sem ambiguidade.
+
+Se o avanco real estiver no `DR-05`, o fecho deve deixar claro se:
+
+- houve apenas baseline/appliance read-only; ou
+- houve sessao GUI autenticada valida; ou
+- houve tentativa legitima de `register_license` / `revoke_license`; ou
+- o resultado correcto continua a ser `BLOCKED`.
 
 Avanco real nao significa automaticamente `GO` para readiness nem para
 campanha.

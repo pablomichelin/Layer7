@@ -31,6 +31,11 @@ Nota de actualizacao em `2026-04-14`:
 - `DR-07` fica fora do escopo F3;
 - nao usar este pacote para reabrir a burocracia de cinco insumos sem drift
   novo objectivo.
+- para o `DR-05` mutavel, o que falta deixou de ser apenas "SSH ao
+  appliance" e passou a ser control plane legitimo observado, hoje
+  materializado pela GUI autenticada do pacote (`PHPSESSID`,
+  `__csrf_magic`, `layer7_settings.php`, `register_license` /
+  `revoke_license`).
 
 Leitura complementar obrigatoria:
 
@@ -84,7 +89,7 @@ e passam a ser dependencias externas formais:
 | Host live `192.168.100.244` | acesso read-only legitimado ao host observado | owner operacional do license server / gestor do ambiente live | `ssh` bem sucedido + output do checklist live |
 | PostgreSQL live | meio read-only de consulta ao banco do deploy observado | owner operacional do banco/stack | `SELECT current_database(), current_user...` + queries de schema/tabelas |
 | Credencial administrativa | credencial autorizada com escopo formal para login e checks administrativos | owner operacional do painel / gestor da campanha | login real em `/api/auth/login` + cookie de sessao + escopo registado |
-| Appliance pfSense | host/IP real com SSH funcional e baseline recolhivel | owner do lab/appliance | `ssh root@<host>` funcional + baseline recolhida |
+| Appliance pfSense | host/IP real com SSH funcional, baseline recolhivel e control plane legitimo para cenarios mutaveis | owner do lab/appliance | `ssh root@<host>` funcional + baseline recolhida + prova da trilha GUI autenticada do pacote |
 | Controlo de snapshot/relogio/offline/NIC/UUID | meios legitimos para S08/S09/S11/S12/S13 | owner do lab/hypervisor | identificadores reais de snapshot/restore e controlos aprovados |
 | Inventario `LIC-A` a `LIC-F` | pool real de licencas dedicadas por cenario | owner administrativo do licenciamento | artefacto de inventario + query/objecto correspondente no backend |
 
@@ -148,8 +153,9 @@ de uso.
 | IP/host esperado | ainda **nao fornecido**; placeholder `<PFSENSE_IP>` nao e aceite |
 | Acesso SSH necessario | `ssh root@<HOST_REAL>` funcional |
 | Baseline minima a recolher | `hostname`, `date -u`, `sysctl -n kern.hostuuid`, `ifconfig -a`, `service layer7d status`, `layer7d --fingerprint`, estado do `.lic` local e do stats JSON |
+| Control plane minimo para cenarios mutaveis | sessao GUI autenticada do pacote com `PHPSESSID`, `__csrf_magic`, acesso autenticado a `layer7_settings.php` e submissao legitima de `register_license` / `revoke_license` quando aplicavel |
 | Controles necessarios | snapshot/restore real, controlo legitimo de relogio, capacidade de offline/online e controlo real de NIC/UUID/clone/restore |
-| Evidencia esperada | SSH bem sucedido + baseline recolhida + identificadores reais dos controlos de snapshot/restore |
+| Evidencia esperada | SSH bem sucedido + baseline recolhida + identificadores reais dos controlos de snapshot/restore + prova do control plane legitimo quando o cenario exigir mutacao |
 
 Riscos mitigados por este acesso:
 
@@ -157,8 +163,9 @@ Riscos mitigados por este acesso:
 - impedir S08/S09/S11/S12/S13 sem snapshot/restore legitimos;
 - provar baseline real antes de qualquer drift de relogio ou fingerprint.
 
-**O que continua em falta hoje:** host/IP real do appliance, SSH funcional e
-evidencia de controlos do lab.
+**O que continua em falta hoje:** host/IP real do appliance, SSH funcional,
+evidencia de controlos do lab e control plane legitimo para os cenarios
+mutaveis.
 
 ### 3.5 Inventario `LIC-A` a `LIC-F`
 
@@ -228,7 +235,7 @@ Evidencia **nao** aceite:
 | Schema live | bloqueado | baseline documental em `001-init.sql` | queries read-only ao PostgreSQL live | acesso DB live | owner operacional do banco/stack | output de `SELECT ... information_schema.tables ...` | impede confirmar `admin_sessions`, `admin_audit_log` e `admin_login_guards` | nao |
 | Tabelas administrativas reais | bloqueado | contrato do repo exige as tres tabelas | query com `count(*)` nas tres tabelas | acesso DB live | owner operacional do banco/stack | output de `SELECT ... FROM admin_sessions/admin_audit_log/admin_login_guards` | impede fechar S04/S05/S06/S10/S11 com prova suficiente | nao |
 | Credencial administrativa autorizada | bloqueado | endpoint `/api/auth/login` responde | credencial real + escopo formal | governanca administrativa | owner do painel / gestor da campanha | login real + `GET /api/auth/session` + nota de escopo | metade administrativa da F3.11 continua fechada | nao |
-| Appliance pfSense por SSH | bloqueado | apenas placeholder `<PFSENSE_IP>` no repo | host/IP real + SSH funcional | lab/appliance | owner do lab/pfSense | output de `ssh root@<host> ...` | S01/S02/S07/S08/S09/S11/S12/S13 continuam bloqueados | nao |
+| Appliance pfSense por SSH/control plane | bloqueado | apenas placeholder `<PFSENSE_IP>` no repo | host/IP real + SSH funcional + trilha GUI autenticada do pacote quando o cenario for mutavel | lab/appliance | owner do lab/pfSense | output de `ssh root@<host> ...` + prova de `PHPSESSID` / `__csrf_magic` / `layer7_settings.php` autenticado | S01/S02/S07/S08/S09/S11/S12/S13 continuam bloqueados | nao |
 | Snapshot/restore e controlos do appliance | bloqueado | nenhum | snapshot ID real + prova de controlo de relogio/offline/NIC/UUID | lab/hypervisor | owner do lab/hypervisor | artefacto de controlo + baseline do appliance | S08/S09/S11/S12/S13 nao podem ser iniciados legitimamente | nao |
 | Inventario real `LIC-A` a `LIC-F` | bloqueado | apenas placeholders documentais | inventario mapeado e provado no backend | inventario de campanha | owner administrativo do licenciamento | artefacto `50-preflight-inventory.md` + query `licenses` | sem pool real nao existe campanha limpa | nao |
 | Revalidacao `409` vs `403` em cenario real | bloqueado | drift historico de `403` continua sem nova prova | tentativa controlada com licenca bindada e `hardware_id` alternativo | deploy + inventario + licenca bindada real | gestor da campanha F3.11 | resposta de `POST /api/activate` em cenario S03 | sem isso o drift DO-02 continua aberto | nao |
@@ -266,7 +273,8 @@ para nova readiness` se todos os itens abaixo fossem satisfeitos:
 3. `admin_sessions`, `admin_audit_log` e `admin_login_guards` confirmadas por
    query real;
 4. credencial admin autorizada e testada no fluxo oficial de sessao;
-5. appliance pfSense real, com SSH funcional e baseline recolhivel;
+5. appliance pfSense real, com SSH funcional, baseline recolhivel e control
+   plane legitimo para cenarios mutaveis;
 6. controlos legitimos de snapshot/restore, relogio, offline e NIC/UUID
    comprovados;
 7. inventario `LIC-A` a `LIC-F` materializado e coerente com o backend;

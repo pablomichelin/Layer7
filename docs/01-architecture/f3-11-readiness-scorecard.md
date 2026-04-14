@@ -62,8 +62,36 @@ Pagina executiva de estado da F3.11 — responde se a campanha pode avancar.
 - baseline `20260414T123526Z-appliance254-permissions` confirma que o falso
   negativo de `service layer7d status` vem da falta de leitura do pidfile
   `0600 root:wheel`; `pgrep -fl layer7d` e stats JSON confirmam daemon vivo;
+- o run canónico `20260414T000000Z-appliance254-continue` confirma tambem
+  que `export-appliance-evidence.sh` corre de ponta a ponta com `codex`,
+  materializa `40-preflight-appliance.txt`, preserva a leitura do `.lic`
+  actual e regista o hash local do artefacto;
+- verificacao adicional de control plane confirma `codex` sem `sudo`, sem
+  `doas` e sem prova actual de playback livre em `pfSsh.php` para mutacao
+  arbitraria do `.lic`;
+- inspeccao read-only do pacote instalado confirma via legitima de mutacao
+  na GUI (`register_license` / `revoke_license` em `layer7_settings.php`),
+  apoiada por `layer7_lic_path()` e `layer7_restart_service()`, mas essa
+  trilha continua dependente de contexto autenticado ainda nao disponivel ao
+  `codex`;
+- observacao HTTP local da GUI confirma `301` de `http://127.0.0.1/` para
+  `https://127.0.0.1:9999/`, emissao de `PHPSESSID`, injecao de
+  `__csrf_magic`, devolucao da login page quando `layer7_settings.php` e
+  aberto sem sessao e `HTTP 403 CSRF Error` quando o token nao casa;
+- a trilha GUI autenticada passa a ter tambem o helper canónico
+  `scripts/license-validation/run-pfsense-gui-license-flow.sh` para
+  materializar `probe`, `register` e `revoke` com evidencias por `run_id`,
+  inclusive a partir do proprio appliance com `--ssh-target` quando a GUI
+  util so responde em `https://127.0.0.1:9999/`;
 - cenarios que exigem reescrever `/usr/local/etc/layer7.lic` continuam
   pendentes porque `codex` nao tem permissao de escrita nesse ficheiro.
+
+Leitura operacional actual: o proximo passo sensato para destravar o
+`DR-05` e usar a trilha GUI autenticada descrita em
+`f3-runbook-proxima-campanha-real.md`, incluindo a sequencia `curl` e o
+helper `run-pfsense-gui-license-flow.sh`, inclusive no modo
+`--ssh-target <utilizador@host>` + `--gui-base https://127.0.0.1:9999`,
+sempre com `PHPSESSID` + `__csrf_magic` da mesma sessao viva.
 
 ### Evidencia DR-02 (obtida em 2026-04-03)
 

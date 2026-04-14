@@ -19,7 +19,10 @@ PRE-REQUISITOS`.
 **Nota de estado actual (`2026-04-14`):** este documento e historico da
 verificacao de `2026-04-02`. O checkpoint posterior alinhou o license-server
 live, auth/admin, same-origin e inventario; o blocker corrente da F3 e
-apenas `DR-05` no appliance.
+apenas `DR-05` no appliance, e o desbloqueio mutavel deixou de depender de
+"SSH generico" para passar a depender de control plane legitimo observado na
+GUI autenticada do pacote (`PHPSESSID`, `__csrf_magic`,
+`layer7_settings.php`, `register_license` / `revoke_license`).
 
 ---
 
@@ -127,8 +130,10 @@ Conclusao binaria:
 2. Fornecer credencial administrativa autorizada para a campanha, com escopo
    registado explicitamente.
 3. Materializar o inventario real `LIC-A` a `LIC-F` em artefacto de preflight.
-4. Disponibilizar appliance pfSense autenticavel por SSH, com snapshot e
-   controlo de relogio/offline/NIC/UUID.
+4. Disponibilizar appliance pfSense com baseline, snapshot e control plane
+   legitimo para mutacao, hoje observado pela GUI autenticada do pacote
+   (`PHPSESSID`, `__csrf_magic`, acesso autenticado a
+   `layer7_settings.php` e submissao valida quando aplicavel).
 5. So depois reexecutar o readiness check; apenas se todos os itens ficarem
    verdes a F3.11 pode comecar.
 
