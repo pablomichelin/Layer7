@@ -192,7 +192,7 @@ quote_sh() {
 }
 
 remote_run() {
-  "${SSH_CMD[@]}" sh -lc "$1"
+  printf '%s\n' "$1" | "${SSH_CMD[@]}" sh
 }
 
 remote_copy_to_local() {
@@ -207,7 +207,7 @@ remote_init_workspace() {
     return
   fi
 
-  REMOTE_TMP_DIR="$(remote_run "mktemp -d /tmp/l7-gui-flow.XXXXXX")"
+  REMOTE_TMP_DIR="$(remote_run 'tmp="/tmp/l7-gui-flow.$$"; while [ -e "$tmp" ]; do tmp="/tmp/l7-gui-flow.$$.$(date +%s)"; done; umask 077; mkdir "$tmp" && printf "%s\n" "$tmp"')"
   REMOTE_COOKIE_JAR="$REMOTE_TMP_DIR/cookie-jar.txt"
   remote_run ": > $(quote_sh "$REMOTE_COOKIE_JAR")"
   printf 'remote_tmp_dir=%s\n' "$REMOTE_TMP_DIR" >> "$NOTES_FILE"

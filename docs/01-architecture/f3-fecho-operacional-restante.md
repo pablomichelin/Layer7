@@ -135,6 +135,15 @@ Hoje ja esta provado que:
   `60-appliance-license.json`, `70-local-hashes.txt` e
   `40-preflight-appliance.txt` no `run_id`
   `20260414T000000Z-appliance254-continue`;
+- o helper canónico `run-pfsense-gui-license-flow.sh` foi exercitado em
+  modo `probe` via `--ssh-target codex@192.168.100.254` e
+  `--gui-base https://127.0.0.1:9999` no `run_id`
+  `20260414T000000Z-dr05-gui-probe-invalid`, com credencial
+  deliberadamente invalida: o fluxo abriu a GUI, capturou `PHPSESSID`,
+  extraiu `__csrf_magic`, tentou autenticar, leu `layer7_settings.php` e
+  classificou correctamente o resultado como `BLOCKED /
+  layer7_settings_not_authenticated`, preservando evidencias em
+  `/tmp/layer7-f3-evidence/20260414T000000Z-dr05-gui-probe-invalid/S07`;
 - `service layer7d status` via `codex` reporta falso negativo por falta de
   leitura do pidfile `0600 root:wheel`, mas `pgrep -fl layer7d` confirma o
   daemon vivo (`/usr/local/sbin/layer7d`) e o stats JSON confirma runtime
