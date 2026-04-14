@@ -9,6 +9,8 @@
 - Same-origin administrativo voltou a falhar fechado no live
 - DR-02 resolvido (drift cosmetico 403 vs 409, logica correcta)
 - Blocker F3 restante: DR-05 (cenarios do appliance)
+- Baseline read-only mais recente do appliance:
+  `20260414T123526Z-appliance254-permissions`
 
 ---
 
@@ -18,7 +20,8 @@
 2. `/api/auth/session` funciona e a bridge Bearer administrativa tambem
    funciona para endpoints autenticados
 3. Inventario real: 4 licencas (IDs 5, 6, 7, 8)
-4. Appliance existe e funciona (192.168.100.254)
+4. Appliance existe e funciona (192.168.100.254), com daemon vivo confirmado
+   por processo/stats apesar de falso negativo em `service layer7d status`
 5. Host live acessivel (192.168.100.244)
 6. PostgreSQL live com `admin_sessions`, `admin_audit_log` e
    `admin_login_guards`

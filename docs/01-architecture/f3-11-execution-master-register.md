@@ -12,7 +12,7 @@ Painel central da F3.11 — estado real dos insumos e proximos passos.
 |-------|---------------|
 | Fase | `F3 aberta` |
 | Subtrilha | `F3.11 alinhada no license-server live` |
-| Ultima evidencia real | `2026-04-14` — live alinhado + baseline real do appliance |
+| Ultima evidencia real | `2026-04-14` — live alinhado + baseline real/permissoes do appliance |
 | Blockers F3 restantes | `DR-05` (appliance) |
 | Drifts fora do escopo F3 | `DR-07` |
 
@@ -25,7 +25,7 @@ Painel central da F3.11 — estado real dos insumos e proximos passos.
 | host `192.168.100.244` | disponivel | SSH confirmado, stack viva observada com 4 containers |
 | PostgreSQL live | disponivel | base `layer7_license` com `admin_sessions`, `admin_audit_log` e `admin_login_guards` presentes |
 | credencial admin | disponivel | `pablo@systemup.inf.br` observado no live; bootstrap administrativo e superficie de sessao alinhados |
-| appliance `192.168.100.254` | parcial | SSH funcional via `codex`; baseline `S13` e runtime `S07` exportados; cenarios mutaveis ainda pendentes por falta de escrita no `.lic` |
+| appliance `192.168.100.254` | parcial | SSH funcional via `codex`; baseline `S13`, runtime `S07` e baseline de permissoes exportados; daemon vivo confirmado por processo/stats; cenarios mutaveis ainda pendentes por falta de escrita no `.lic` |
 | inventario | disponivel | 4 licencas reais: IDs 5, 6, 7, 8 — cobrindo active, revoked, expired-by-date e coexistencia |
 
 ---
@@ -51,8 +51,12 @@ rejeitado com `403`.
 `codex`, fingerprint `e31560f5...f826`, hostuuid
 `f44d4d56-4a12-95c7-1099-1ebd8b33f579`, licenca local valida de `Systemup`
 com expiracao `2033-10-24`, evidencias exportadas em
-`/tmp/layer7-f3-evidence/20260414T111500Z-appliance-baseline/S13` e
-`/tmp/layer7-f3-evidence/20260414T113500Z-appliance-runtime/S07`.
+`/tmp/layer7-f3-evidence/20260414T111500Z-appliance-baseline/S13`,
+`/tmp/layer7-f3-evidence/20260414T113500Z-appliance-runtime/S07` e
+`${TMPDIR:-/tmp}/layer7-f3-evidence/20260414T123526Z-appliance254-permissions/S07`.
+O ultimo run confirma tambem que `service layer7d status` sofre falso
+negativo por permissao de pidfile, enquanto `pgrep -fl layer7d` e o stats
+JSON confirmam o daemon vivo.
 
 ---
 

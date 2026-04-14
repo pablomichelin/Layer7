@@ -214,6 +214,8 @@ Finalidade:
 - recolher baseline local do appliance por SSH;
 - guardar `service layer7d status`, `kern.hostuuid`, `ifconfig -a`,
   `layer7d --fingerprint` e stats JSON no ficheiro canónico de CLI;
+- registar usuario efectivo, permissoes do `.lic`/pidfile e processo real do
+  `layer7d`, para distinguir daemon parado de falso negativo por permissao;
 - exportar o `.lic` local em formato legivel quando existir;
 - guardar hash local do `.lic` e a origem do stats JSON usada na recolha.
 

@@ -28,7 +28,7 @@ F3.
 | DR-02 | F3.9 | Contrato HTTP de activacao | `POST /api/activate` respondeu `403` onde a F3.8 exige `409`; em `2026-04-03`, os cenarios de hw diferente, revogada, expirada e reactivacao legitima foram revalidados no live | F3.8 exige leitura binaria coerente do contrato de activacao | drift cosmetico de codigo HTTP; logica de negocio correcta | nao | alinhar `403` -> `409` em bloco futuro proprio, sem bloquear a F3 |
 | DR-03 | F3.9-F3.11 | Auth/admin live | observacao antiga do live com JWT no body, mas sem `/api/auth/session`; em `2026-04-14`, o ambiente activo passou a responder `/api/auth/session` e a manter bridge Bearer compativel | F2.2/F2.3 exigem sessao stateful canónica por cookie no painel admin | historico resolvido no ambiente live actual | nao | manter apenas como historico de drift ja saneado |
 | DR-04 | F3.9 | Inventario de licencas | ausencia antiga de pool minimo `LIC-A` a `LIC-F`; em `2026-04-03`, 4 licencas reais foram obtidas do backend live | F3.10 exige inventario minimo por cenario | resolvido por inventario real suficiente para a leitura actual da F3 | nao | manter apenas como historico de drift ja saneado |
-| DR-05 | F3.9-F3.11 | Ambiente de appliance | appliance real `192.168.100.254` ja observado com Layer7 activo, mas sem prova completa de snapshot/restore, offline/online, NIC/UUID e clone/restore | F3.10 exige SSH, baseline e controlos legitimos | metade local da campanha continua incompleta para os cenarios do appliance | sim | completar agora os cenarios locais restantes com permissao suficiente, snapshot/rollback e evidencias por `run_id` |
+| DR-05 | F3.9-F3.11 | Ambiente de appliance | appliance real `192.168.100.254` ja observado com Layer7 activo; baseline read-only `20260414T123526Z-appliance254-permissions` confirma `codex`, `.lic` legivel mas nao escrevivel, pidfile `0600 root:wheel`, processo `layer7d` vivo e stats JSON valido | F3.10 exige SSH, baseline e controlos legitimos | metade local da campanha continua incompleta para cenarios mutaveis: snapshot/restore, offline/online, grace/relogio, NIC/UUID e clone/restore | sim | completar agora os cenarios locais restantes com permissao suficiente para escrita/control plane, snapshot/rollback e evidencias por `run_id` |
 | DR-06 | F3.11 saneamento | Politica CORS / same-origin | observacao antiga do live com `Access-Control-Allow-Origin: *`; em `2026-04-14`, `POST` e `OPTIONS` em `/api/auth/login` com `Origin: https://evil.example` passaram a responder `403 {\"error\":\"Origem administrativa nao autorizada.\"}` | F2.3 aceita apenas `same-origin only` em producao | historico resolvido no ambiente live actual | nao | manter apenas como historico de drift ja saneado |
 | DR-07 | F3.11 saneamento | Publicacao / revisao | stack viva observada em `/opt/layer7-license`, mas o host actual nao fornece checkout Git, bind mount ou metadata util de commit; a revisao exacta do deploy continua nao demonstravel | nenhuma equivalencia live/local/remoto pode ser assumida sem prova | impede usar o repositorio local como prova suficiente do estado do live, mas nao bloqueia os cenarios de licenciamento do appliance | nao | manter aberto para F7/governanca operacional, sem bloquear a F3 |
 
@@ -95,7 +95,7 @@ F3.
 | DR-02 | aberto, bloqueante | resolvido como drift cosmético | revalidado em 2026-04-03: live usa `403` onde repo usa `409`, mas logica de negocio esta correcta (rejeita binding conflituante, revogada e expirada; aceita reactivacao legitima) |
 | DR-03 | aberto, bloqueante | resolvido | `/api/auth/session` e a bridge Bearer estao alinhados no live actual |
 | DR-04 | aberto, bloqueante | resolvido | inventario real de 4 licencas obtido |
-| DR-05 | aberto, bloqueante | aberto, pendente | cenarios locais continuam pendentes |
+| DR-05 | aberto, bloqueante | aberto, pendente | baseline read-only reforcada em 2026-04-14; cenarios mutaveis continuam pendentes por falta de permissao de escrita/control plane suficiente |
 | DR-06 | aberto, bloqueante | resolvido | live voltou a responder `403` fail-closed para `Origin` externo em `/api/auth/login` |
 | DR-07 | aberto, bloqueante | aberto, nao bloqueante para F3 | proveniencia do deploy nao bloqueia validacao de licenciamento |
 
@@ -150,7 +150,8 @@ Bloqueio historico sobre a F3.11:
 
 ### Drifts que bloqueiam a campanha F3
 
-- `DR-05` cenarios locais do appliance — pendentes de execucao.
+- `DR-05` cenarios locais mutaveis do appliance — pendentes de execucao com
+  permissao suficiente para escrita/control plane.
 
 ### Drifts reclassificados como fora do escopo F3
 
@@ -168,7 +169,7 @@ Bloqueio historico sobre a F3.11:
 
 ## 6. Dependencias futuras
 
-1. executar cenarios locais do appliance para fechar DR-05;
+1. executar cenarios locais mutaveis do appliance para fechar DR-05;
 2. alinhar codigos HTTP do activate (`403` -> `409`) quando o live for
    actualizado;
 3. resolver proveniencia do deploy quando oportuno.

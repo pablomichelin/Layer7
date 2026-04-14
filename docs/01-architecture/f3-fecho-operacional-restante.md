@@ -41,6 +41,10 @@ e no inventario real ja obtido.
 - baseline canónico exportado em
   `/tmp/layer7-f3-evidence/20260414T111500Z-appliance-baseline/S13` e
   `/tmp/layer7-f3-evidence/20260414T113500Z-appliance-runtime/S07`;
+- baseline read-only adicional exportado em
+  `${TMPDIR:-/tmp}/layer7-f3-evidence/20260414T123526Z-appliance254-permissions/S07`,
+  confirmando usuario efectivo, permissoes de ficheiros e processo real do
+  `layer7d`;
 - appliance actualmente coerente com a licenca `ID 7 / Systemup /
   2033-10-24`, fingerprint
   `e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826`.
@@ -95,6 +99,10 @@ Hoje ja esta provado que:
 - `layer7d --fingerprint` funciona;
 - `kern.hostuuid` e stats JSON sao observaveis;
 - o `.lic` actual e legivel, mas **nao e escrevivel** por `codex`.
+- `service layer7d status` via `codex` reporta falso negativo por falta de
+  leitura do pidfile `0600 root:wheel`, mas `pgrep -fl layer7d` confirma o
+  daemon vivo (`/usr/local/sbin/layer7d`) e o stats JSON confirma runtime
+  activo.
 
 Portanto, a metade read-only do DR-05 ja esta desbloqueada e parcialmente
 executada; os cenarios que exigem nova activacao, limpeza do `.lic`, grace

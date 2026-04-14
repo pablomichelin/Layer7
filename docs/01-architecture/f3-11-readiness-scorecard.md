@@ -28,7 +28,7 @@ Pagina executiva de estado da F3.11 — responde se a campanha pode avancar.
 | acesso ao host `192.168.100.244` | `disponivel` — SSH confirmado, stack observada | nao |
 | PostgreSQL live | `disponivel` — schema de licenciamento e tabelas admin presentes no ambiente activo | nao |
 | credencial admin | `disponivel` — superficie admin alinhada; bootstrap e sessao observados no live | nao |
-| appliance pfSense `192.168.100.254` | `parcial` — SSH funcional, baseline exportado, mas cenarios mutaveis ainda pendentes | sim (DR-05) |
+| appliance pfSense `192.168.100.254` | `parcial` — SSH funcional, baseline exportado, daemon vivo confirmado por processo/stats, mas cenarios mutaveis ainda pendentes | sim (DR-05) |
 | inventario de licencas | `disponivel` — 4 licencas reais obtidas do live em 2026-04-03 | nao |
 
 ---
@@ -59,6 +59,9 @@ Pagina executiva de estado da F3.11 — responde se a campanha pode avancar.
   `ID 7` do backend;
 - runtime exportado com stats JSON validos e restart de `layer7d` por
   `pfSsh.php playback svc restart layer7d`;
+- baseline `20260414T123526Z-appliance254-permissions` confirma que o falso
+  negativo de `service layer7d status` vem da falta de leitura do pidfile
+  `0600 root:wheel`; `pgrep -fl layer7d` e stats JSON confirmam daemon vivo;
 - cenarios que exigem reescrever `/usr/local/etc/layer7.lic` continuam
   pendentes porque `codex` nao tem permissao de escrita nesse ficheiro.
 

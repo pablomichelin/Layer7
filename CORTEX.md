@@ -356,6 +356,12 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
   reescrever `/usr/local/etc/layer7.lic`, controlar o daemon, executar
   offline/online, grace/relogio, snapshot/restore e NIC/UUID/clone com
   evidencias por `run_id`.
+- Em `2026-04-14`, o run read-only
+  `20260414T123526Z-appliance254-permissions` confirmou que `codex` nao tem
+  escrita no `.lic`, que o pidfile `0600 root:wheel` gera falso negativo em
+  `service layer7d status`, e que o daemon esta vivo por `pgrep` e stats
+  JSON; isto melhora a evidencia de DR-05, mas nao fecha os cenarios
+  mutaveis.
 - Os pacotes antigos de cinco insumos da F3.11 permanecem como memoria
   documental-operacional, mas nao sao mais o gate corrente para continuar a
   F3. O caminho actual e consultar `f3-11-start-here.md`,
