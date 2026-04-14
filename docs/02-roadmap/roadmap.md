@@ -402,6 +402,11 @@ falha.
   volta a responder no contrato stateful actual e `/api/auth/login` volta a
   falhar fechado para `Origin` externo. Com isso, o unico blocker real
   remanescente da F3 fica reduzido a `DR-05` no appliance.
+- **Contrato de rejeicao do activate coberto no branch em `2026-04-14`:**
+  o repositório passa a ter testes dedicados para preservar `409` em
+  licenca revogada, licenca expirada e hardware divergente no
+  `POST /api/activate`, mantendo `DR-02` como alinhamento de deploy e nao
+  como blocker da F3.
 - **Proximo passo seguro dentro da F3:** manter a F3.11 fechada ate os
   cenarios do appliance (`DR-05`) ficarem verdes em nova verificacao de
   readiness; sem isso, a campanha seguinte nao deve ser tratada como rodada
