@@ -355,6 +355,9 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
   cosmetica de codigo HTTP (`403` vs `409`) sem bloquear a F3, e o branch
   actual passou a cobrir o contrato `409` do `activate` com testes de
   regressao.
+- O contrato de estado efectivo do license-server (`active`, `expired`,
+  `revoked`, expiracao por data, precedencia de revogacao, binding e
+  predicados SQL) passou a ter regressao dedicada em 2026-04-14.
 - O unico blocker real remanescente da F3 e `DR-05`: cenarios locais do
   appliance `192.168.100.254` que ainda exigem permissao suficiente para
   reescrever `/usr/local/etc/layer7.lic`, controlar o daemon, executar

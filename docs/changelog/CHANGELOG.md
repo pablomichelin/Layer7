@@ -43,6 +43,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   administrativo passa a ser coberta por testes puros, preservando
   `flow`, `emission_kind`, binding, customer/features e hashes SHA-256 de
   payload, assinatura e envelope
+- **Estado efectivo de licencas passa a ter regressao dedicada** —
+  `license-state` passa a cobrir por testes o contrato `active` /
+  `expired` / `revoked`, expiracao por data, precedencia de revogacao,
+  normalizacao de hardware e predicados SQL usados por listagens e dashboard
 
 ### Fixed — auth bridge do painel administrativo
 
