@@ -144,6 +144,11 @@ Hoje ja esta provado que:
   classificou correctamente o resultado como `BLOCKED /
   layer7_settings_not_authenticated`, preservando evidencias em
   `/tmp/layer7-f3-evidence/20260414T000000Z-dr05-gui-probe-invalid/S07`;
+- o mesmo helper tambem foi validado com password da GUI fornecida por
+  ficheiro local, sem expor o segredo na linha de comando, no `run_id`
+  `20260414T000000Z-dr05-gui-probe-password-file-v2`; as notas registaram
+  `gui_password_source=file`, `license_key_source=none` e o mesmo resultado
+  esperado `BLOCKED / layer7_settings_not_authenticated`;
 - `service layer7d status` via `codex` reporta falso negativo por falta de
   leitura do pidfile `0600 root:wheel`, mas `pgrep -fl layer7d` confirma o
   daemon vivo (`/usr/local/sbin/layer7d`) e o stats JSON confirma runtime

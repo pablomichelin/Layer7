@@ -221,13 +221,16 @@ rg -n "register_license|revoke_license|license_code" "$PFSENSE_GUI_LAYER7_HTML"
 Opcionalmente, a mesma verificacao pode ser materializada pelo helper:
 
 ```bash
+printf '%s\n' "$PFSENSE_GUI_PASSWORD" > /tmp/l7-pfsense-gui-password.txt
+chmod 600 /tmp/l7-pfsense-gui-password.txt
+
 scripts/license-validation/run-pfsense-gui-license-flow.sh \
   --scenario-code S07 \
   --run-id "$RUN_ID" \
   --output-root "${TMPDIR:-/tmp}/layer7-f3-evidence" \
   --gui-base "$PFSENSE_GUI_BASE" \
   --gui-user "$PFSENSE_GUI_USER" \
-  --gui-password "$PFSENSE_GUI_PASSWORD" \
+  --gui-password-file /tmp/l7-pfsense-gui-password.txt \
   --action probe
 ```
 
@@ -241,7 +244,7 @@ scripts/license-validation/run-pfsense-gui-license-flow.sh \
   --ssh-target "$PFSENSE_HOST" \
   --gui-base 'https://127.0.0.1:9999' \
   --gui-user "$PFSENSE_GUI_USER" \
-  --gui-password "$PFSENSE_GUI_PASSWORD" \
+  --gui-password-file /tmp/l7-pfsense-gui-password.txt \
   --action probe
 ```
 

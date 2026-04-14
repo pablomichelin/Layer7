@@ -310,12 +310,14 @@ Baseline/preflight local do appliance:
 Cenario mutavel com orquestracao no mesmo `run_id`:
 
 ```bash
+export L7_LICENSE_KEY="$(cat /caminho/seguro/licenca.key)"
+
 ./scripts/license-validation/run-appliance-activation-scenario.sh \
   --scenario-code S07 \
   --run-id "$RUN_ID" \
   --output-root "$EVIDENCE_ROOT" \
   --license-id "$LICENSE_ID" \
-  --license-key "$LICENSE_KEY" \
+  --license-key "$L7_LICENSE_KEY" \
   --compose-dir "$L7_SERVER_DIR" \
   --ssh-target "$PF_SSH_TARGET"
 ```
@@ -460,6 +462,9 @@ Helper opcional desta trilha:
 - quando a GUI estiver acessivel apenas no proprio appliance, o helper pode
   ser executado com `--ssh-target <utilizador@host>` e `--gui-base`
   apontando para `https://127.0.0.1:9999`.
+- para reduzir exposicao de segredos na linha de comando, o helper aceita
+  `--gui-password-file <path>` ou `L7_GUI_PASSWORD`, e aceita
+  `--license-key-file <path>` ou `L7_LICENSE_KEY` no fluxo `register`.
 
 ### 8.4 Mapa minimo de cenarios do DR-05
 

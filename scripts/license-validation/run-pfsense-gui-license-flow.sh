@@ -4,7 +4,7 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Uso:
-  run-pfsense-gui-license-flow.sh --scenario-code <S07> --gui-base <url> --gui-user <user> --gui-password <pass> --action <probe|register|revoke> [opcoes]
+  run-pfsense-gui-license-flow.sh --scenario-code <S07> --gui-base <url> --gui-user <user> --action <probe|register|revoke> [opcoes]
 
 Opcoes:
   --run-id <id>             Identificador do bloco de execucao.
@@ -17,11 +17,17 @@ Opcoes:
   --ssh-option <opt>        Opcao extra passada ao ssh. Pode repetir.
   --gui-user <user>         Utilizador autorizado da GUI.
   --gui-password <pass>     Password autorizada da GUI.
+  --gui-password-file <p>   Ficheiro local com a password da GUI.
   --action <acao>           Uma de: probe, register, revoke.
   --license-key <key>       Obrigatoria em --action register.
+  --license-key-file <p>    Ficheiro local com a chave de licenca.
   --layer7-path <path>      Caminho do settings do pacote (default: /packages/layer7/layer7_settings.php).
   --cookie-jar <path>       Caminho fixo do cookie jar. Default: dentro do directorio do cenario.
   --help                    Mostra esta ajuda.
+
+Ambiente:
+  L7_GUI_PASSWORD           Alternativa a --gui-password/--gui-password-file.
+  L7_LICENSE_KEY            Alternativa a --license-key/--license-key-file.
 EOF
 }
 
@@ -35,8 +41,10 @@ SSH_KEY=""
 SSH_OPTIONS=()
 GUI_USER=""
 GUI_PASSWORD=""
+GUI_PASSWORD_FILE=""
 ACTION=""
 LICENSE_KEY=""
+LICENSE_KEY_FILE=""
 LAYER7_PATH="/packages/layer7/layer7_settings.php"
 COOKIE_JAR=""
 
@@ -82,12 +90,20 @@ while [[ $# -gt 0 ]]; do
       GUI_PASSWORD="${2:-}"
       shift 2
       ;;
+    --gui-password-file)
+      GUI_PASSWORD_FILE="${2:-}"
+      shift 2
+      ;;
     --action)
       ACTION="${2:-}"
       shift 2
       ;;
     --license-key)
       LICENSE_KEY="${2:-}"
+      shift 2
+      ;;
+    --license-key-file)
+      LICENSE_KEY_FILE="${2:-}"
       shift 2
       ;;
     --layer7-path)
@@ -110,8 +126,42 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+read_secret_file() {
+  local path="$1"
+  local value=""
+
+  if [[ ! -r "$path" ]]; then
+    echo "[run-pfsense-gui-license-flow] ficheiro de segredo ilegivel: $path" >&2
+    exit 1
+  fi
+
+  IFS= read -r value < "$path" || true
+  printf '%s' "$value"
+}
+
+GUI_PASSWORD_SOURCE="argument"
+if [[ -z "$GUI_PASSWORD" && -n "$GUI_PASSWORD_FILE" ]]; then
+  GUI_PASSWORD="$(read_secret_file "$GUI_PASSWORD_FILE")"
+  GUI_PASSWORD_SOURCE="file"
+elif [[ -z "$GUI_PASSWORD" && -n "${L7_GUI_PASSWORD:-}" ]]; then
+  GUI_PASSWORD="$L7_GUI_PASSWORD"
+  GUI_PASSWORD_SOURCE="env"
+fi
+
+LICENSE_KEY_SOURCE="argument"
+if [[ -z "$LICENSE_KEY" && -n "$LICENSE_KEY_FILE" ]]; then
+  LICENSE_KEY="$(read_secret_file "$LICENSE_KEY_FILE")"
+  LICENSE_KEY_SOURCE="file"
+elif [[ -z "$LICENSE_KEY" && -n "${L7_LICENSE_KEY:-}" ]]; then
+  LICENSE_KEY="$L7_LICENSE_KEY"
+  LICENSE_KEY_SOURCE="env"
+fi
+if [[ -z "$LICENSE_KEY" ]]; then
+  LICENSE_KEY_SOURCE="none"
+fi
+
 if [[ -z "$SCENARIO_CODE" || -z "$GUI_BASE" || -z "$GUI_USER" || -z "$GUI_PASSWORD" || -z "$ACTION" ]]; then
-  echo "[run-pfsense-gui-license-flow] --scenario-code, --gui-base, --gui-user, --gui-password e --action sao obrigatorios." >&2
+  echo "[run-pfsense-gui-license-flow] --scenario-code, --gui-base, --gui-user, password da GUI e --action sao obrigatorios." >&2
   usage >&2
   exit 1
 fi
@@ -185,6 +235,8 @@ ssh_port=$SSH_PORT
 layer7_path=$LAYER7_PATH
 action=$ACTION
 cookie_jar=$COOKIE_JAR
+gui_password_source=$GUI_PASSWORD_SOURCE
+license_key_source=$LICENSE_KEY_SOURCE
 EOF
 
 quote_sh() {
