@@ -358,6 +358,9 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 - O contrato de estado efectivo do license-server (`active`, `expired`,
   `revoked`, expiracao por data, precedencia de revogacao, binding e
   predicados SQL) passou a ter regressao dedicada em 2026-04-14.
+- O payload publico de activacao (`key` + `hardware_id`) passou a ter
+  regressao dedicada em 2026-04-14, cobrindo normalizacao, campos
+  inesperados e rejeicoes `400` antes da transacao de activacao.
 - O unico blocker real remanescente da F3 e `DR-05`: cenarios locais do
   appliance `192.168.100.254` que ainda exigem permissao suficiente para
   reescrever `/usr/local/etc/layer7.lic`, controlar o daemon, executar

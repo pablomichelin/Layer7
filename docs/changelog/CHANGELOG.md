@@ -47,6 +47,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `license-state` passa a cobrir por testes o contrato `active` /
   `expired` / `revoked`, expiracao por data, precedencia de revogacao,
   normalizacao de hardware e predicados SQL usados por listagens e dashboard
+- **Payload publico de activacao passa a ter regressao dedicada** —
+  `parseActivatePayload` passa a cobrir normalizacao de `key` e
+  `hardware_id`, rejeicao de campos inesperados e erros `400` para chave ou
+  hardware invalidos antes de tocar na transacao de activacao
 
 ### Fixed — auth bridge do painel administrativo
 
