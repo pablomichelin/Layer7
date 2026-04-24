@@ -530,6 +530,12 @@ Pendencias conhecidas:
 | **10b** | BG-010 (F4.2) | updater assinado, `send_sighup`, `fallback.state` | **12.1**, **12.2** |
 | **11** | BG-011 (F4.3) | DNS forçado, anchor `natrules/layer7_nat`, `pfctl -s nat` | **6.7** |
 
+**Antes do appliance:** nos três roteiros acima, instalar no pfSense apenas
+depois de `check-port-files.sh` + `smoke-layer7d.sh` na raiz do clone e
+`make package` no builder quando o bloco exigir `.pkg` novo (disciplina da
+secção **3** e parágrafo *Pré-requisito (repositório / builder)* em cada
+secção 10a / 10b / 11).
+
 O checklist rápido abaixo (itens 13–15) referencia estas secções.
 
 ---

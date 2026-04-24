@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validação lab (índice F4)
+
+- **`validacao-lab.md`** — *Índice dos roteiros F4*: nota única sobre
+  pré-requisito builder (secção 3) antes do appliance para 10a / 10b / 11
+
 ### Documentation — validação lab (F4.1 / roteiro 10a)
 
 - **`validacao-lab.md`** — secção **10a**: pré-requisito builder (`check-port-files`,
