@@ -8,7 +8,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 - instala toolchain no **Ubuntu**;
 - executa **`scripts/package/smoke-layer7d.sh`** (compilação + `-t` + cenários **`-e -n`**).
 
-**Limitações:** não compila o **port** `.pkg`, não corre no **pfSense**, não executa **pfctl**. Gate de pacote: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início: *Gates oficiais F4*; indice em [`../04-package/README.md`](../04-package/README.md); contexto de lab em [`../08-lab/README.md`](../08-lab/README.md)).
+**Limitações:** não compila o **port** `.pkg`, não corre no **pfSense**, não executa **pfctl**, não cobre os roteiros **10a** / **10b** / **11** no appliance. Gate de pacote: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início: *Gates oficiais F4*; indice em [`../04-package/README.md`](../04-package/README.md); contexto de lab em [`../08-lab/README.md`](../08-lab/README.md)).
 
 ## Local
 

@@ -94,6 +94,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/04-package/deploy-github-lab.md`** — próximos passos no pfSense.
 - **`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`** — checklist pré-publicação.
 
+### Documentation — inventário de lab, quick-start, CI/tests e guia Windows
+
+- **`docs/08-lab/lab-inventory.template.md`** — colunas de validação / gate F4.
+- **`docs/08-lab/quick-start-lab.md`** — introdução e passo **6** (F4).
+- **`docs/tests/README.md`** — limitações do workflow: não cobre **10a**–**11**.
+- **`docs/08-lab/guia-windows.md`** (legado) — fonte vigente: `validacao-lab` com F4.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.

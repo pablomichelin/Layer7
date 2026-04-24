@@ -1,6 +1,7 @@
 # Quick start — validação lab completa
 
-Fluxo encadeado para fechar o gate **pacote + serviço** em [`validacao-lab.md`](../04-package/validacao-lab.md).
+Fluxo encadeado para fechar o gate **pacote + serviço** (e, quando o projecto
+exigir, evidência **F4** — passo **6** abaixo) em [`validacao-lab.md`](../04-package/validacao-lab.md).
 O artefacto de instalação no ramo actual é o **`.pkg`** gerado pelo port (ver
 [`CORTEX.md`](../../CORTEX.md) e [`MANUAL-INSTALL`](../10-license-server/MANUAL-INSTALL.md));
 nao confundir com o historico de `.txz` em notas antigas.

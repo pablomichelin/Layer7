@@ -32,7 +32,8 @@ Para executar qualquer validacao tecnica, seguir:
   roadmap, F4) e ligacao a [`deploy-github-lab`](../04-package/deploy-github-lab.md);
 - [`builder-freebsd.md`](builder-freebsd.md) para o builder FreeBSD;
 - [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) para build,
-  pacote `.pkg`, instalacao e validacao no pfSense;
+  pacote `.pkg`, instalacao e validacao no pfSense (inicio: *Gates oficiais F4*;
+  roteiros **10a** / **10b** / **11** no appliance quando aplicavel);
 - [`lab-topology.md`](lab-topology.md) para topologia do appliance/lab.
 
 ## Regra operacional
