@@ -77,7 +77,7 @@ camada 7 e aplica políticas de bloqueio/monitoramento. O produto inclui
 uma GUI PHP integrada ao pfSense com 10 páginas.
 
 **Referência publica actual: 1.8.3** — V1 Comercial concluída e publicada.
-**Branch de trabalho:** `1.8.11_11` no port, ainda sujeito aos gates F4 em
+**Branch de trabalho:** `1.8.11_12` no port, ainda sujeito aos gates F4 em
 builder FreeBSD e appliance pfSense antes de release.
 
 O daemon já suporta bloqueio por domínio/site via observação DNS:

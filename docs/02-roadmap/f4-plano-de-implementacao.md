@@ -171,6 +171,10 @@ CIDR em cada interface e estabiliza a ordem face a permutações de
 reutiliza `layer7_pf_ifname_for_rules()` no ramo de fallback quando
 `get_real_interface()` não devolve nome (mesma validação que antes; DRY).
 
+**Bloco (`PORTREVISION` `12` / `1.8.11_12`):** `layer7_generate_rules()` — loop
+anti-QUIC por interface reutiliza `layer7_pf_ifname_for_rules()` em vez de
+duplicar a regex (DRY; sem mudança de comportamento).
+
 **Bloco documental (`2026-04-24`, continuacao):** [`validacao-lab.md`](../04-package/validacao-lab.md) secção **11** — cenario de lab sugerido **multi-interface / VLAN** para recolha de evidencia **BG-011** (sem alteração de código nem de `PORTVERSION`); [`test-matrix.md`](../tests/test-matrix.md) ponto **6.7** referencia esse paragrafo.
 
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog

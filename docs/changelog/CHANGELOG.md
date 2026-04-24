@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — `pfSense-pkg-layer7` (`1.8.11_12`)
+
+- **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=12`.
+- **`layer7.inc`** — anti-QUIC por interface: validação de nome com
+  `layer7_pf_ifname_for_rules()` em vez de regex duplicada em
+  `layer7_generate_rules()` (DRY; sem alteração de comportamento). Docblock da
+  função actualizado.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.

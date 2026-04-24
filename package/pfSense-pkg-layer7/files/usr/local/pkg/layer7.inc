@@ -81,6 +81,9 @@ function layer7_pf_rules_sample_path()
 /**
  * Nome de interface PF aceitavel em regras geradas (alinhado ao anti-QUIC).
  * Rejeita caracteres inesperados evitam sintaxe invalida no ruleset.
+ * Usado em `layer7_generate_rules` (anti-QUIC por interface), em
+ * `layer7_generate_rdr_rules_snippet` (fallback `force_dns`) e no filtro
+ * `array_filter` das interfaces efectivas.
  */
 function layer7_pf_ifname_for_rules($s)
 {
@@ -414,7 +417,7 @@ function layer7_generate_rules($type)
 		$rules .= "\n# Anti-QUIC por interface — apenas destinos externos.\n";
 		foreach ($quic_ifaces as $qi) {
 			$qi = trim((string)$qi);
-			if ($qi === "" || !preg_match('/^[a-z][a-z0-9]*(\.[0-9]+)?$/i', $qi)) {
+			if ($qi === "" || !layer7_pf_ifname_for_rules($qi)) {
 				continue;
 			}
 			$rules .= "block drop quick inet on {$qi} proto udp" .

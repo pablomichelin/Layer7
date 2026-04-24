@@ -8,7 +8,7 @@ Marque só após **evidência** (output colado em [`validacao-lab.md`](validacao
 [`../tests/test-matrix.md`](../tests/test-matrix.md) (testes **3.8**,
 **12.1–12.2**, **6.7**) e o [checklist mestre](../02-roadmap/checklist-mestre.md)
 para o critério de fecho de trilha (incl. `CORTEX` ponto 7 e DRAFT
-`1.8.11_11` no branch, quando aplicável).
+`1.8.11_12` no branch, quando aplicável).
 
 - [ ] **1.** Build: `make package` completa sem erro (builder FreeBSD)
 - [ ] **2.** Artefacto `.pkg` presente no disco (caminho anotado)
