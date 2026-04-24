@@ -493,8 +493,12 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   PID e exige `kill -0` antes de `HUP` (alinhado à trilha F4.1 no daemon);
   `--restore-lkg` partilha lock com o update; `layer7-pfctl` usa `/sbin/pfctl`
   de forma consistente; `PORTVERSION` `1.8.11`.
-- **Seguinte:** F4.1 (BG-009) e F4.2 (BG-010) conforme plano, em blocos
-  pequenos com teste e rollback.
+- **Seguinte:** evidencia em appliance/lab (BG-009/010: validacao segundo
+  [`validacao-lab.md`](../04-package/validacao-lab.md) e
+  `scripts/package/smoke-layer7d.sh` no builder); F4.3 (BG-011) em bloco
+  proprio; fecho formal de BG-009/010 quando a matriz de saida F4 tiver
+  evidencia minima; em paralelo, **DR-05** no appliance `192.168.100.254` para
+  fechar a F3 sob gate F3.8.
 
 ### Criterios de entrada
 

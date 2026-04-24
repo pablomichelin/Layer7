@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — F4.1 (BG-009) e roadmap F4
+
+- **`MANUAL-INSTALL.md`** — addendum operacional F4.1: `POST-INSTALL` com
+  `onestop` antes de `onestart` no upgrade, pidfile e `status`, alinhamento
+  do reload da GUI com o `rc.d`; nota de que a referencia de `.pkg` publica
+  segue a versao listada em **Links da versao actual** ate nova release
+- **`roadmap.md`** (checkpoint F4) — proximo passo explicito: evidencia em
+  lab/appliance e F4.3, em paralelo ao **DR-05** para a F3
+
 ### Changed — F4.2 blacklists (BG-010)
 
 - **`update-blacklists.sh` (`send_sighup`)** — leitura segura do pidfile

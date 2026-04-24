@@ -41,6 +41,18 @@ da public key ou checksum divergirem, o comportamento passa a ser
 (PF, Unbound, arranque do servico) ficam rastreaveis como `DEGRADED` no
 stdout e no syslog (`layer7-install`).
 
+**Addendum operacional da F4.1 (BG-009, branch / `PORTVERSION` de trabalho):**
+o hook **POST-INSTALL** do port executa `service layer7d onestop` antes de
+`onestart`, para que um **upgrade** por `pkg` carregue o binario do pacote
+de novo instalado (evita processo antigo a continuar a correr). O **rc.d**
+`layer7d` ajusta as permissoes do **pidfile** apos o arranque de forma
+coerente com `service layer7d status`. A reconfiguracao via GUI
+(`layer7_apply`, reload) alinha-se ao `reload` do script: sinal `HUP` se o
+processo estiver vivo; caso contrario, arranque do daemon conforme
+`layer7.enabled` no JSON. Isto entra nas proximas release notes quando o
+`.pkg` correspondente for publicado; ate la, a referencia de instalacao
+publica continua a versao listada em **Links da versao actual** abaixo.
+
 **Addendum operacional da F2.5:** a operacao do license server passa a usar
 runbooks canónicos especificos para segredos/bootstrap administrativo e
 backup/restore do PostgreSQL:
