@@ -9,9 +9,18 @@ reload_filter() {
 	fi
 }
 
+# Parar o daemon enquanto o rc.d ainda existe (POST-DEINSTALL corre depois da remocao).
+if [ "${2}" = "PRE-DEINSTALL" ]; then
+	/usr/sbin/service layer7d onestop >/dev/null 2>&1 || true
+fi
+
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
 
 if [ "${2}" = "POST-DEINSTALL" ]; then
+	/bin/rm -f /var/run/layer7d.pid >/dev/null 2>&1 || true
+	if command -v sysrc >/dev/null 2>&1; then
+		sysrc layer7d_enable=NO >/dev/null 2>&1 || true
+	fi
 	reload_filter
 	if [ -x /usr/local/libexec/layer7-pfctl ]; then
 		/usr/local/libexec/layer7-pfctl flush >/dev/null 2>&1 || true

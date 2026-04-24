@@ -17,7 +17,7 @@ $pid = null;
 if (file_exists($pidfile)) {
 	$pid = trim(@file_get_contents($pidfile));
 	if ($pid !== "" && ctype_digit($pid)) {
-		exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>&1", $chk, $chk_code);
+		exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $chk_code);
 		$running = ($chk_code === 0);
 	}
 }
@@ -79,7 +79,7 @@ if (isset($_POST["restart_service"])) {
 	if (file_exists($pidfile)) {
 		$pid = trim(@file_get_contents($pidfile));
 		if ($pid !== "" && ctype_digit($pid)) {
-			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>&1", $chk2, $chk2_code);
+			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk2, $chk2_code);
 			$running = ($chk2_code === 0);
 		}
 	}

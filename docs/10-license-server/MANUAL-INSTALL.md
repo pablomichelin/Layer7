@@ -356,6 +356,12 @@ sh /tmp/uninstall.sh --yes
 
 Se preferir fazer manualmente sem o script:
 
+A partir do pacote **1.8.8** (branch de desenvolvimento / próxima release), o
+`pkg delete` dispara hooks do port: em **PRE-DEINSTALL** o serviço é parado
+(`onestop`); em **POST-DEINSTALL** remove-se um `layer7d.pid` stale e define-se
+`layer7d_enable=NO`. Em releases anteriores, o `onestop` manual antes do delete
+continua recomendado.
+
 ```sh
 service layer7d onestop
 ```

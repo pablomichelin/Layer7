@@ -20,7 +20,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`layer7.inc` (`layer7_restart_service`, `layer7_read_stats`)** — leitura do
   pidfile com `@file_get_contents`; `kill -0` antes de `USR1` nas estatisticas;
   verificacao pos-restart com `kill -0` redireccionado para `/dev/null`
-- **`PORTVERSION`** — `1.8.7` (artefacto publico de referencia continua
+- **`pkg-deinstall`** — `PRE-DEINSTALL`: `service layer7d onestop`; `POST-DEINSTALL`:
+  remover `/var/run/layer7d.pid` stale e `sysrc layer7d_enable=NO` antes do
+  reload PF (evita processo orfao e arranque pendente apos `pkg delete`)
+- **`layer7_status.php`** — `kill -0` com stderr para `/dev/null` (alinhado ao
+  resto da trilha F4.1)
+- **`PORTVERSION`** — `1.8.8` (artefacto publico de referencia continua
   `1.8.3` ate nova release)
 
 ### Added — continuidade entre chats longos

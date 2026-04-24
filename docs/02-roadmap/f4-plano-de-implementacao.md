@@ -77,7 +77,9 @@ arranque (evita falso negativo de `status` quando o pidfile era `0600`);
 upgrade carregar o binario novo; `layer7_signal_reload()` alinha-se ao
 `reload` do rc.d (HUP se vivo, senão `layer7_ensure_daemon_running()`);
 `layer7_restart_service` / `layer7_read_stats` endurecem leitura do pidfile e
-`USR1` só com processo vivo; `PORTVERSION` `1.8.7`.
+`USR1` só com processo vivo; `pkg-deinstall` para o servico em
+`PRE-DEINSTALL` e limpa pid/rcvar em `POST-DEINSTALL`; `layer7_status.php`
+alinha `kill -0`; `PORTVERSION` `1.8.8`.
 
 **Liga a:** BG-009.
 
