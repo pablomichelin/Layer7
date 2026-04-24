@@ -31,8 +31,8 @@ ensure_table() {
 	if table_ready "$_table"; then
 		return 0
 	fi
-	pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null && \
-		pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null && \
+	/sbin/pfctl -t "$_table" -T add 127.0.0.254 2>/dev/null && \
+		/sbin/pfctl -t "$_table" -T delete 127.0.0.254 2>/dev/null && \
 		return 0
 	echo "layer7-pfctl: failed to ensure table ${_table}" >&2
 	return 1
@@ -132,15 +132,15 @@ EOF
 # via o hook nat_rules_needed -> layer7_generate_nat_rules() em layer7.inc.
 
 flush_tables() {
-	pfctl -t "${TABLE_BLOCK}" -T flush >/dev/null 2>&1 || true
-	pfctl -t "${TABLE_TAGGED}" -T flush >/dev/null 2>&1 || true
-	pfctl -t "${TABLE_BLOCK_DST}" -T flush >/dev/null 2>&1 || true
+	/sbin/pfctl -t "${TABLE_BLOCK}" -T flush >/dev/null 2>&1 || true
+	/sbin/pfctl -t "${TABLE_TAGGED}" -T flush >/dev/null 2>&1 || true
+	/sbin/pfctl -t "${TABLE_BLOCK_DST}" -T flush >/dev/null 2>&1 || true
 }
 
 show_status() {
 	echo "helper=/usr/local/libexec/layer7-pfctl"
 	echo "rules=${RULES_PATH}"
-	pfctl -s Tables 2>/dev/null | grep "layer7_" || true
+	/sbin/pfctl -s Tables 2>/dev/null | grep "layer7_" || true
 }
 
 cmd="${1:-ensure}"

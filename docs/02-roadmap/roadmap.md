@@ -412,7 +412,7 @@ falha.
   readiness; sem isso, a campanha seguinte nao deve ser tratada como rodada
   valida de fechamento.
 - **Nota 2026-04-24:** `CORTEX`, backlog e `CHANGELOG` explicitam
-  publicado `1.8.3` vs `PORTVERSION` de trabalho `1.8.10`; download
+  publicado `1.8.3` vs `PORTVERSION` de trabalho `1.8.11`; download
   administrativo do `.lic` concentra-se em `license-download-policy.js` com
   teste e rota a reusar a politica.
 
@@ -491,7 +491,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   de trabalho F4 em paralelo ao fecho de evidência F3 (DR-05) explícita.
 - **F4.2 bloco `2026-04-24`:** `update-blacklists.sh` — `send_sighup` valida
   PID e exige `kill -0` antes de `HUP` (alinhado à trilha F4.1 no daemon);
-  `--restore-lkg` partilha lock com o update; `PORTVERSION` `1.8.10`.
+  `--restore-lkg` partilha lock com o update; `layer7-pfctl` usa `/sbin/pfctl`
+  de forma consistente; `PORTVERSION` `1.8.11`.
 - **Seguinte:** F4.1 (BG-009) e F4.2 (BG-010) conforme plano, em blocos
   pequenos com teste e rollback.
 

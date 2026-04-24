@@ -98,8 +98,8 @@ diretório e feeds.
 
 **Checkpoint `2026-04-24`:** `update-blacklists.sh` — função `send_sighup`
 valida o conteúdo do pidfile e só envia `HUP` se `kill -0` confirmar processo
-vivo; `do_restore_lkg` adquire o mesmo lock que `do_download`; `PORTVERSION`
-`1.8.10`.
+vivo; `do_restore_lkg` adquire o mesmo lock que `do_download`; `layer7-pfctl`
+invoca `/sbin/pfctl` em todos os ramos; `PORTVERSION` `1.8.11`.
 
 **Liga a:** BG-010, aspectos de BG-020/021 no runtime do consumidor.
 

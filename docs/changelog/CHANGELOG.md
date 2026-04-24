@@ -13,7 +13,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`update-blacklists.sh` (`--restore-lkg`)** — adquire o mesmo lock exclusivo
   que `do_download`, impedindo restauracao LKG concorrente com um update
   (evita corrida em `promote_candidate`)
-- **`PORTVERSION`** — `1.8.10` (artefacto publico de referencia continua
+- **`layer7-pfctl`** — todas as invocacoes de `pfctl` passam a usar
+  `/sbin/pfctl` (PATH minimo em cron/rc alinhado a `table_ready` / `pfctl -sr`)
+- **`PORTVERSION`** — `1.8.11` (artefacto publico de referencia continua
   `1.8.3` ate nova release)
 
 ### Changed — F4.1 package/daemon (BG-009)
