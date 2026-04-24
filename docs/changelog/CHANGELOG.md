@@ -17,6 +17,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/05-daemon/pf-enforcement.md`** — secção **Anti-QUIC por interface**
   (`layer7_generate_rules`, DRY `1.8.11_12`).
 
+### Documentation — arquitectura alvo, README do port e índice `docs/`
+
+- **`docs/01-architecture/target-architecture.md`** — item enforcement: pacote,
+  NAT `force_dns`, anti-QUIC, `layer7_pf_ifname_for_rules`; ligação a
+  `pf-enforcement.md`.
+- **`package/pfSense-pkg-layer7/README.md`** — tabela: papel de `layer7.inc` na
+  geração PF.
+- **`docs/README.md`** — área Releases: DRAFT vs port no branch / `CORTEX`.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.

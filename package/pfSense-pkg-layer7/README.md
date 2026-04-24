@@ -23,7 +23,7 @@ Port **FreeBSD/pfSense** com binário **`layer7d`** (`main.c` + `config_parse.c`
 | `files/.../layer7_exceptions.php` | Toggle + adicionar + **editar** + remover exceção |
 | `files/.../layer7_events.php` | Events (orientação syslog / futuro event-model) |
 | `files/.../layer7_diagnostics.php` | Estado serviço, logs, comandos (Diagnostics) |
-| `files/.../layer7.inc` | load/save/CSRF/HUP; **`layer7_daemon_version()`** |
+| `files/.../layer7.inc` | load/save/CSRF/HUP; geração PF (tabelas blacklist, anti-QUIC por interface, inject NAT **force_dns**); **`layer7_daemon_version()`** |
 | `files/.../layer7.json.sample` | Amostra estática |
 | `files/.../rc.d/layer7d` | Script de serviço (`layer7d_enable` default **NO**) |
 | `files/pkg-install.in` / `pkg-deinstall.in` | Hooks padrão pfSense |
