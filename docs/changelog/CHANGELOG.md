@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — F4: índice package + plano + checklist
+
+- **`04-package/README.md`** — nota no item `validacao-lab` sobre o parágrafo
+  *Gates oficiais F4*.
+- **`f4-plano-de-implementacao.md`** — `checklist-mestre` e remissão ao início
+  de `validacao-lab` nas referências obrigatórias.
+- **`checklist-validacao-lab.md`** — bloco F4 alinhado ao início de
+  `validacao-lab` (DRAFT / CORTEX quando aplicável).
+
 ### Documentation — ligação `validacao-lab` / DRAFT `1.8.11_10`
 
 - **`validacao-lab.md`** — parágrafo *Gates oficiais F4*: remissões a

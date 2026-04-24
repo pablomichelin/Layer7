@@ -13,7 +13,8 @@ Referencias obrigatorias:
 - [`../11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`](../11-blacklists/DIRETRIZES-IMPLEMENTACAO.md)
 - [`../01-architecture/f1-arquitetura-de-confianca.md`](../01-architecture/f1-arquitetura-de-confianca.md) (F1.3 blacklists, F1.4 fallback)
 - [`../01-architecture/target-architecture.md`](../01-architecture/target-architecture.md)
-- [`../05-daemon/README.md`](../05-daemon/README.md) e [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
+- [`../05-daemon/README.md`](../05-daemon/README.md) e [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início: parágrafo **Gates oficiais F4**)
+- [`checklist-mestre.md`](checklist-mestre.md) — itens de gate F4.1 / F4.2 / F4.3 antes de relatar trilha fechada
 - `package/pfSense-pkg-layer7/`, `src/layer7d/`, scripts de update de blacklists em `scripts/`
 
 ---
