@@ -167,6 +167,10 @@ unicos e ordenados antes do cruzamento com interfaces; evita validar o mesmo
 CIDR em cada interface e estabiliza a ordem face a permutações de
 `src_cidrs` no JSON.
 
+**Bloco (`PORTREVISION` `11` / `1.8.11_11`):** `layer7_generate_rdr_rules_snippet`
+reutiliza `layer7_pf_ifname_for_rules()` no ramo de fallback quando
+`get_real_interface()` não devolve nome (mesma validação que antes; DRY).
+
 **Bloco documental (`2026-04-24`, continuacao):** [`validacao-lab.md`](../04-package/validacao-lab.md) secção **11** — cenario de lab sugerido **multi-interface / VLAN** para recolha de evidencia **BG-011** (sem alteração de código nem de `PORTVERSION`); [`test-matrix.md`](../tests/test-matrix.md) ponto **6.7** referencia esse paragrafo.
 
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog

@@ -520,7 +520,7 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 - **F4 (gates):** `checklist-mestre` — evidência mínima **F4.1** / BG-009 (10a,
   3.8), **F4.2** / BG-010 (10b, 12.1–12.2), **F4.3** / BG-011 (11, 6.7) antes
   de declarar cada trilha fechada em relatório.
-- **Port no branch (`2026-04-24`):** `1.8.11_10` (`package/pfSense-pkg-layer7/Makefile`) — consolida entregas cumulativas F4.1–F4.3; F4.2 `PORTREVISION` `7` (reload seguro de blacklists, etc.); F4.3 `PORTREVISION` `8`–`10` — `force_dns` deduplica pares (interface, CIDR), ordena interfaces e CIDRs por regra no anchor NAT (ver `f4-plano-de-implementacao.md`).
+- **Port no branch (`2026-04-24`):** `1.8.11_11` (`package/pfSense-pkg-layer7/Makefile`) — consolida entregas cumulativas F4.1–F4.3; F4.2 `PORTREVISION` `7` (reload seguro de blacklists, etc.); F4.3 `PORTREVISION` `8`–`11` — `force_dns` deduplica pares (interface, CIDR), ordena interfaces e CIDRs por regra no anchor NAT; `_11`: fallback de interface alinhado a `layer7_pf_ifname_for_rules` (DRY; ver `f4-plano-de-implementacao.md`).
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

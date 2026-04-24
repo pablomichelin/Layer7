@@ -28,7 +28,7 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Ultima versao do pacote publicada em release:** `1.8.3` (referencia de instalacao
 em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases).
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_10` (`PORTVERSION=1.8.11`, `PORTREVISION=10`;
++ `PORTREVISION`):** `1.8.11_11` (`PORTVERSION=1.8.11`, `PORTREVISION=11`;
 artefacto ainda nao publicado; actualizar manual e procedimentos na mesma
 entrega de release).
 **Data-base deste checkpoint:** `2026-04-24`
@@ -250,7 +250,7 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 
 ---
 
-### Checkpoint F4 adicional (`1.8.11_10`)
+### Checkpoint F4 adicional (`1.8.11_11`)
 
 Bloco tecnico em curso no branch de trabalho, ainda sem release publica:
 reload seguro de blacklists passa a preservar a blacklist anterior e as
@@ -265,9 +265,11 @@ CI ganha syntax check shell; `force_dns` deduplica pares (interface, CIDR)
 entre regras de blacklist ao injectar `natrules/layer7_nat`; a lista de
 interfaces efectivas para `rdr` e ordenada alfabeticamente; CIDRs validos por
 regra sao unicos, ordenados e validados uma vez por regra antes do cruzamento
-com interfaces. Gate real permanece no builder FreeBSD e no appliance pfSense;
-smoke local em macOS nao conta como evidencia de fase e fica bloqueado por
-defeito no script.
+com interfaces. **`1.8.11_11`:** `layer7_generate_rdr_rules_snippet()` passa a
+usar `layer7_pf_ifname_for_rules()` no fallback quando `get_real_interface()`
+esta vazio (mesma regex, sem mudanca de comportamento; DRY). Gate real
+permanece no builder FreeBSD e no appliance pfSense; smoke local em macOS nao
+conta como evidencia de fase e fica bloqueado por defeito no script.
 
 **Checkpoint documental-operacional adicional:** `docs/08-lab/guia-windows.md`
 foi reclassificado como historico/legado, sem comandos activos. O fluxo
@@ -327,8 +329,9 @@ validacao fora da operacao real.
    o pacote for afectado. Nao declarar as trilhas concluidas em relatorio sem
    evidencia minima do `validacao-lab` (**10a**, **10b**, **11**) e da
    `test-matrix` (**3.8**, **12.1–12.2**, **6.7**), conforme `checklist-mestre`. Para
-   o port `1.8.11_10` no branch, a preparacao de release publica segue
-   `docs/06-releases/release-notes-1.8.11_10-DRAFT.md` ate existir tag e `.pkg`.
+   o port `1.8.11_11` no branch, a preparacao de release publica segue
+   `docs/06-releases/release-notes-1.8.11_10-DRAFT.md` (conteudo alinhado ao
+   `PORTREVISION` actual) ate existir tag e `.pkg`.
 8. **F5:** tratar `docs/02-roadmap/f5-preparacao-malha.md` como roteiro de
    preparacao; a fase F5 fica “em execucao plena” depois de cumprir os
    criterios de saida da F4 e de actualizar a matriz em `docs/tests/`.
@@ -676,7 +679,7 @@ CHECKPOINT CANONICO
 - Data base: 2026-04-24
 - Produto: Layer7 para pfSense CE
 - Ultima versao .pkg publicada (referencia operacional): 1.8.3
-- PORTVERSION no repositorio (pre-release / proximo build): 1.8.11 (PORTREVISION 10)
+- PORTVERSION no repositorio (pre-release / proximo build): 1.8.11 (PORTREVISION 11)
 - Estado funcional: V1 Comercial concluida e publicada; F3 aberta
 - Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
   fecho operacional (blocker: DR-05 no appliance)
@@ -696,7 +699,7 @@ CHECKPOINT CANONICO
 ### Tecnico
 
 - A referencia de **instalacao publica** continua a ser o pacote `1.8.3` ate
-  nova release; o branch carrega `PORTVERSION=1.8.11` com `PORTREVISION=10` para
+  nova release; o branch carrega `PORTVERSION=1.8.11` com `PORTREVISION=11` para
   o proximo empacotamento.
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.

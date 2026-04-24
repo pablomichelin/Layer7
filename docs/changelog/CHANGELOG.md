@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
+
+- **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.
+- **`layer7.inc`** — em `layer7_generate_rdr_rules_snippet()`, o fallback quando
+  `get_real_interface()` não preenche o nome reutiliza `layer7_pf_ifname_for_rules()`
+  em vez de duplicar a regex (DRY; sem alteração de comportamento).
+
 ### Documentation — F4.3 / BG-011: roteiro VLAN multi-interface e rastreabilidade
 
 - **`docs/04-package/validacao-lab.md`** (secção **11**) — cenário de lab sugerido

@@ -38,7 +38,8 @@ Esta pasta concentra a governanca documental de release.
 
 - [`release-notes-template.md`](release-notes-template.md)
 - [`release-notes-1.8.11_10-DRAFT.md`](release-notes-1.8.11_10-DRAFT.md) — rascunho
-  pre-publicacao (port `1.8.11_10` no branch; nao confundir com a release
+  pre-publicacao (conteudo alinhado ao port `1.8.11_11` no branch; nome do ficheiro
+  legado ate F6/F7; nao confundir com a release
   publica listada no `MANUAL-INSTALL` ate que a tag e o `.pkg` existam)
 - [`RELEASE-SIGNING.md`](RELEASE-SIGNING.md)
 - [`release-notes-v0.1.0.md`](release-notes-v0.1.0.md) — historico
