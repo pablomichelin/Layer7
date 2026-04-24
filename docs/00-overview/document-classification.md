@@ -174,7 +174,7 @@ vence o canónico.
 
 | Arquivo | Tema | Papel actual | Classificacao | Substitui ou e substituido por | Accao futura sugerida | Fase |
 |---------|------|--------------|---------------|--------------------------------|-----------------------|------|
-| `package/pfSense-pkg-layer7/README.md` | package local | orientacao local do port, com drift historico | Preservado por compatibilidade | nao substitui docs canónicas de instalacao/release | rever so na F6/F7 | F6/F7 |
+| `package/pfSense-pkg-layer7/README.md` | package local | port: check-port-files, smoke, `make package`; notas de estrutura | Preservado por compatibilidade | nao substitui docs canónicas de instalacao/release | rever so na F6/F7 | F6/F7 |
 | `samples/README.md` | amostras | apoio leve de navegacao | Suplementar | — | manter leve | F6 |
 | `scripts/build/BUILDER.md` | ordem de build | nota util: check-port-files, smoke, make package; remissao a `builder-freebsd` | Suplementar | complementar a docs de lab e AGENTS | rever quando builder mudar | F1/F4 |
 | `scripts/build/README.md` | build scripts | indice curto | Suplementar | — | manter leve | F6 |

@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — README do port e do daemon (ordem de build)
+
+- **`package/pfSense-pkg-layer7/README.md`** — passo `check-port-files` antes do
+  smoke e do `make package`.
+- **`docs/05-daemon/README.md`** — secção *Build* alinhada a check → smoke →
+  port, com `builder-freebsd.md`.
+- **`document-classification.md`** — linha `package/pfSense-pkg-layer7/README.md`.
+
 ### Documentation — `scripts/release/README.md` (ADR-0003 + build frota)
 
 - **`scripts/release/README.md`** — bloco inicial: repositório de desenvolvimento

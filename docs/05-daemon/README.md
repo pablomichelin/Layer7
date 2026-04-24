@@ -31,9 +31,8 @@ ver changelog e `f4-plano-de-implementacao.md` (F4.1 / F4.2).
 
 ## Build
 
-- Port: `package/pfSense-pkg-layer7` → `make package` (quatro `.c` + `-I` para `src/common`).
-- Smoke: `sh scripts/package/smoke-layer7d.sh` (precisa de `cc`).
-- Manual: `cc … main.c config_parse.c policy.c enforce.c` em `src/layer7d/`.
+- **Port (ordem canónica na raiz do clone):** `sh scripts/package/check-port-files.sh`, `sh scripts/package/smoke-layer7d.sh` (precisa de `cc`), depois `make package` em `package/pfSense-pkg-layer7/` (quatro `.c` + `-I` para `src/common`); detalhe em [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md).
+- Manual sem port: compilar `cc … main.c config_parse.c policy.c enforce.c` em `src/layer7d/`.
 
 ## Logging
 
