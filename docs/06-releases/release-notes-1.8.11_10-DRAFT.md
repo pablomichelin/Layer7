@@ -12,7 +12,8 @@
 > `docs/changelog/CHANGELOG.md` ([Unreleased] / pacote de trabalho `1.8.11_12`).
 > Evidencia de lab exigida antes de declarar F4.1–F4.3 fechadas: `CORTEX.md`
 > (*Próximos passos*, ponto 7), `checklist-mestre` (gates F4) e
-> `validacao-lab` **10a** / **10b** / **11** com a `test-matrix` alinhada.
+> `validacao-lab` **10a** / **10b** / **11** (na **11**: `force_dns` / NAT,
+> anti-QUIC opcional, VLAN sugerido) com a `test-matrix` alinhada.
 
 **Data (branch):** 2026-04-24  
 **Tag prevista (exemplo):** `v1.8.11_12` (confirmar com convenção de tags do repositório)  

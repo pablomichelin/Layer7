@@ -29,4 +29,4 @@ sh scripts/package/smoke-layer7d.sh
   CI e nao substitui builder/appliance.
 - Em **macOS**, o script bloqueia por defeito. O Mac e workspace de
   edicao/git/docs, nao ambiente de validacao tecnica do produto.
-- O pacote instalável oficial (`.pkg`) é gerado com **`make package`** em `package/pfSense-pkg-layer7/` no builder — ver [`docs/04-package/validacao-lab.md`](../../docs/04-package/validacao-lab.md). Referências a `.txz` ficam apenas como legado histórico.
+- O pacote instalável oficial (`.pkg`) é gerado com **`make package`** em `package/pfSense-pkg-layer7/` no builder — ver [`docs/04-package/validacao-lab.md`](../../docs/04-package/validacao-lab.md) (início: *Gates oficiais F4*; secções **10a** / **10b** / **11**). Referências a `.txz` ficam apenas como legado histórico.

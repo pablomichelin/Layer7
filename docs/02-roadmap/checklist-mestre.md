@@ -98,7 +98,7 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   (`force_dns` / anchor `natrules/layer7_nat`; anti-QUIC por interface no branch,
   ex. `1.8.11_12`) concluida em relatorio, existe evidencia minima alinhada a
   [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção **11**,
-  incl. cenário opcional multi-interface / VLAN no mesmo roteiro) e ao teste **6.7**
+  incl. anti-QUIC opcional e cenário opcional multi-interface / VLAN no mesmo roteiro) e ao teste **6.7**
   de [`../tests/test-matrix.md`](../tests/test-matrix.md)
 
 ---

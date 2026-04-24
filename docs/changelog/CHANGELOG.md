@@ -67,6 +67,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`** — remissão à sec. **11**.
 - **`docs/04-package/README.md`** — entrada `validacao-lab`: sec. **11**.
 
+### Documentation — F4.3 remissões (checklist, backlog, scripts, DIRETRIZES)
+
+- **`docs/02-roadmap/checklist-mestre.md`** — gate F4.3: anti-QUIC opcional na
+  sec. **11**.
+- **`docs/02-roadmap/backlog.md`** — **BG-011**: observações.
+- **`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`** — bloco de evidência F4.
+- **`scripts/package/README.md`**, **`scripts/build/BUILDER.md`** — ligação aos
+  roteiros **10a**–**11**.
+- **`docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`** — addendum F4.3
+  normativo.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.

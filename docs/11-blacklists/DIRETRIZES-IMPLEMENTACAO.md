@@ -16,6 +16,14 @@
 > `/usr/local/etc/layer7/blacklists/.state/fallback.state` com `status`,
 > `mode`, `reason`, `safe_state` e `operator_action`.
 
+> **ADDENDUM F4.3 (2026-04-24)** — mudanças em `layer7.inc` que afectem **DNS
+> forçado** (`force_dns` / anchor `natrules/layer7_nat`) ou **anti-QUIC** por
+> interface devem acompanhar o roteiro de evidência em
+> [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção **11**;
+> anti-QUIC opcional no mesmo roteiro) e o teste **6.7** em
+> [`docs/tests/test-matrix.md`](../tests/test-matrix.md), sem declarar trilha
+> fechada só com build no builder.
+
 ---
 
 ## Índice
