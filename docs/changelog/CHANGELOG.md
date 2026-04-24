@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — rascunho de release 1.8.11_10 (F7)
+
+- **`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`** — rascunho
+  pre-publicacao com resumo F4, checklist de fecho, ligacoes a
+  `MANUAL-INSTALL` e `validacao-lab` (ate existir tag e `.pkg`).
+- **`docs/06-releases/README.md`** — listagem do rascunho; **`document-classification.md`**
+  — linha *Placeholder* para o mesmo ficheiro.
+
 ### Documentation — checklist validação lab (F4)
 
 - **`docs/04-package/checklist-validacao-lab.md`** — nota no topo com roteiros
