@@ -412,7 +412,7 @@ falha.
   readiness; sem isso, a campanha seguinte nao deve ser tratada como rodada
   valida de fechamento.
 - **Nota 2026-04-24:** `CORTEX`, backlog e `CHANGELOG` explicitam
-  publicado `1.8.3` vs `PORTVERSION` de trabalho `1.8.5`; download
+  publicado `1.8.3` vs `PORTVERSION` de trabalho `1.8.6`; download
   administrativo do `.lic` concentra-se em `license-download-policy.js` com
   teste e rota a reusar a politica.
 

@@ -74,7 +74,9 @@ comportamento documentado; reduzir estados "metade activos" após upgrade.
 **Checkpoint `2026-04-24`:** `rc.d/layer7d` aplica `chmod 0644` ao pidfile apos
 arranque (evita falso negativo de `status` quando o pidfile era `0600`);
 `pkg-install` passa a `onestop` antes de `onestart` no `POST-INSTALL` para
-upgrade carregar o binario novo; `PORTVERSION` `1.8.5`.
+upgrade carregar o binario novo; `layer7_signal_reload()` alinha-se ao
+`reload` do rc.d (HUP se vivo, senão `layer7_ensure_daemon_running()`);
+`PORTVERSION` `1.8.6`.
 
 **Liga a:** BG-009.
 

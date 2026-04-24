@@ -12,7 +12,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`pkg-install` (`POST-INSTALL`)** — `service layer7d onestop` antes de
   `onestart` para upgrades aplicarem o binario do pacote recém-instalado
   (antes, `onestart` com processo vivo saia cedo sem reiniciar)
-- **`PORTVERSION`** — `1.8.5` (artefacto publico de referencia continua
+- **`layer7.inc` (`layer7_signal_reload`)** — se o pidfile estiver ausente,
+  invalido ou o processo nao existir, passa a invocar
+  `layer7_ensure_daemon_running()` (sobe o daemon quando `layer7.enabled` no
+  JSON), em linha com o `reload` do `rc.d` (HUP apenas quando o processo esta
+  vivo); leitura do pidfile com `@file_get_contents` para evitar avisos
+- **`PORTVERSION`** — `1.8.6` (artefacto publico de referencia continua
   `1.8.3` ate nova release)
 
 ### Added — continuidade entre chats longos

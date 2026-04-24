@@ -632,18 +632,24 @@ function layer7_unbound_anti_doh_configured()
 function layer7_signal_reload()
 {
 	$pidf = "/var/run/layer7d.pid";
-	if (!file_exists($pidf)) {
-		return;
-	}
-	$pid = trim(file_get_contents($pidf));
-	if ($pid !== "" && ctype_digit($pid)) {
-		$cmd = "/bin/kill -HUP " . escapeshellarg($pid) . " 2>/dev/null";
-		if (function_exists("mwexec")) {
-			mwexec($cmd);
-		} else {
-			@shell_exec($cmd);
+	/* Alinhar ao `reload` do rc.d: HUP se vivo; senão tentar arranque via
+	 * layer7_ensure_daemon_running() (só sobe se layer7.enabled no JSON). */
+	if (file_exists($pidf)) {
+		$pid = trim(@file_get_contents($pidf));
+		if ($pid !== "" && ctype_digit($pid)) {
+			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $lr_chk, $lr_code);
+			if ($lr_code === 0) {
+				$cmd = "/bin/kill -HUP " . escapeshellarg($pid) . " 2>/dev/null";
+				if (function_exists("mwexec")) {
+					mwexec($cmd);
+				} else {
+					@shell_exec($cmd);
+				}
+				return;
+			}
 		}
 	}
+	layer7_ensure_daemon_running();
 }
 
 /**
