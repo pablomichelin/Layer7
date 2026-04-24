@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — F5 (preparação / ponte F4)
+
+- **`f5-preparacao-malha.md`** — pré-requisitos e ordem de trabalho alinhados aos
+  três gates F4 (10a / 10b / 11, matriz 3.8, 12.x, 6.7) e ao índice em
+  `validacao-lab.md`
+
 ### Documentation — validação lab (índice F4)
 
 - **`validacao-lab.md`** — *Índice dos roteiros F4*: nota única sobre
