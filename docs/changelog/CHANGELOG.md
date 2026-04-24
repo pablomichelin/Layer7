@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — helpers F3 (pidfile no appliance)
+
+- **`scripts/license-validation/export-appliance-evidence.sh`** — no bloco
+  remoto que força `USR1` para refrescar `layer7-stats.json`, leitura de
+  `/var/run/layer7d.pid` alinhada aos scripts do pacote (`read -r`, trim,
+  PID numerico, `kill -0` antes de `USR1`)
+
 ### Changed — F4.1 / cron (pidfile)
 
 - **`layer7-stats-collect.sh`** — leitura de `/var/run/layer7d.pid` alinhada a

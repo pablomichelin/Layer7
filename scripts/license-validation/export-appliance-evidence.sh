@@ -231,8 +231,16 @@ echo "# fingerprint"
 echo
 echo "# stats-json"
 if [ -f "$PIDFILE" ]; then
-  _pid="$(cat "$PIDFILE" 2>/dev/null || true)"
-  if [ -n "$_pid" ]; then
+  _pid=""
+  if read -r _pid <"$PIDFILE" 2>/dev/null; then
+    _pid=$(printf '%s' "$_pid" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+  fi
+  case "$_pid" in
+  '' | *[!0-9]*)
+    _pid=""
+    ;;
+  esac
+  if [ -n "$_pid" ] && kill -0 "$_pid" 2>/dev/null; then
     kill -USR1 "$_pid" 2>/dev/null || true
     sleep 1
   fi
