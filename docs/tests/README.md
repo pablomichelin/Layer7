@@ -41,7 +41,12 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 `force_dns` / anchor NAT ponto 6.7**, **blacklists F4.2 (12.1–12.2)**,
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3). Estado actual: 74 OK e **8**
-pendentes (1 em daemon F4.1 ponto 3.8; 2 em blacklists F4.2; 1 em enforcement F4.3; 4 no addendum F3.6). A F3.6 passa a decompor
+pendentes (1 em daemon F4.1 ponto 3.8; 2 em blacklists F4.2; 1 em enforcement F4.3; 4 no addendum F3.6).
+Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz): tabela
+*Índice dos roteiros F4* em
+[`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (antes da
+secção 10).
+A F3.6 passa a decompor
 esses 4 blocos pendentes numa matriz manual explicita de 13 cenarios,
 pre-requisitos, comandos, evidencias minimas e criterios de
 aprovacao/reprovacao, descrita em

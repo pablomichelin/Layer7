@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — roadmap / testes (gates F4)
+
+- **`roadmap.md`** — checkpoint F4: gates do `checklist-mestre` para F4.1, F4.2
+  e F4.3 (secções / pontos da matriz)
+- **`docs/tests/README.md`** — ligação ao *Índice dos roteiros F4* em
+  `validacao-lab.md`
+
 ### Documentation — validação lab / matriz (F4.1, PHP pidfile)
 
 - **`validacao-lab.md`** — secção **10a** e índice F4: critérios e versão mínima

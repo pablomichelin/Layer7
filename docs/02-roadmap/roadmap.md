@@ -516,7 +516,9 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   NAT / `force_dns`); `PLANO-BLACKLISTS-UT1` addendum F4.3;
   `docs/tests/README` alinhado a contagens actuais da matriz (inclui F4.1–F4.3
   e F3.6) e teste **6.7**.
-- **F4 (gates):** `checklist-mestre` — testes F4 / F4.3 (evidência mínima BG-011).
+- **F4 (gates):** `checklist-mestre` — evidência mínima **F4.1** / BG-009 (10a,
+  3.8), **F4.2** / BG-010 (10b, 12.1–12.2), **F4.3** / BG-011 (11, 6.7) antes
+  de declarar cada trilha fechada em relatório.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /
