@@ -8,7 +8,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 - instala toolchain no **Ubuntu**;
 - executa **`scripts/package/smoke-layer7d.sh`** (compilação + `-t` + cenários **`-e -n`**).
 
-**Limitações:** não compila o **port** `.pkg`, não corre no **pfSense**, não executa **pfctl**. Gate de pacote: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (e indice da area em [`../04-package/README.md`](../04-package/README.md), com ligacao ao [`../08-lab/README.md`](../08-lab/README.md) para lab).
+**Limitações:** não compila o **port** `.pkg`, não corre no **pfSense**, não executa **pfctl**. Gate de pacote: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início: *Gates oficiais F4*; indice em [`../04-package/README.md`](../04-package/README.md); contexto de lab em [`../08-lab/README.md`](../08-lab/README.md)).
 
 ## Local
 
@@ -42,10 +42,10 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3). Estado actual: 74 OK e **8**
 pendentes (1 em daemon F4.1 ponto 3.8; 2 em blacklists F4.2; 1 em enforcement F4.3; 4 no addendum F3.6).
-Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz): tabela
-*Índice dos roteiros F4* em
-[`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (antes da
-secção 10).
+Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz):
+parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em
+[`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início;
+secção 10+).
 A F3.6 passa a decompor
 esses 4 blocos pendentes numa matriz manual explicita de 13 cenarios,
 pre-requisitos, comandos, evidencias minimas e criterios de

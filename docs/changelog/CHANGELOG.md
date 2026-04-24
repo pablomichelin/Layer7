@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — lab e `tests/README` (Gates F4 no `validacao-lab`)
+
+- **`08-lab/README.md`** — remissão ao início de `validacao-lab` (*Gates
+  oficiais F4*); tabela do `validacao-lab` ajustada.
+- **`docs/tests/README.md`** — gate de pacote e roteiros F4 alinhados ao
+  início de `validacao-lab` (Gates + índice 10a/10b/11).
+
 ### Documentation — F4: índice package + plano + checklist
 
 - **`04-package/README.md`** — nota no item `validacao-lab` sobre o parágrafo
