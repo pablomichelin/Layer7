@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — contrato do pidfile do daemon
+
+- **`docs/05-daemon/README.md`** — secção *Pidfile* (`/var/run/layer7d.pid`):
+  formato esperado, consumidores (GUI, `layer7.inc`, updater, cron, helpers F3)
+  e referência às entregas F4 / `f4-plano`
+
 ### Changed — helpers F3 (pidfile no appliance)
 
 - **`scripts/license-validation/export-appliance-evidence.sh`** — no bloco

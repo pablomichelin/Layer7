@@ -13,6 +13,20 @@ Serviço gerido pelo pfSense com config completa, counters, nDPI.
 - **Sinais:** **SIGHUP** reload; **SIGUSR1** stats. **Syslog remoto:** UDP para `syslog_remote_host` (ver Settings / `docs/10-logging`).
 - **Daemon:** syslog no arranque; aviso **degraded** se ficheiro existe mas policies/exceptions falham no parse; **SIGHUP** re-lê ficheiro; **~1 h** `periodic_state` (info) quando não idle; SIGTERM/SIGINT — `daemon_stop`.
 
+## Pidfile (`/var/run/layer7d.pid`)
+
+Ficheiro com **uma linha**, valor **numérico** (PID do processo `layer7d`).
+O **rc.d** regista o PID e (em releases recentes) ajusta permissões para
+leitura coerente com `service layer7d status`.
+
+**Consumidores** (leitura defensiva alinhada na F4 / helpers F3): PHP em
+`layer7.inc` e páginas (`trim` + `ctype_digit` / `kill -0`); shell em
+`update-blacklists.sh` (`send_sighup`), `layer7-stats-collect.sh` (cron de
+relatórios) e, para evidências de campanha, `scripts/license-validation/`
+(p.ex. `export-appliance-evidence.sh`). Não tratar o pidfile como texto
+livre: evitar espaços ou caracteres não numéricos; ver changelog e
+`f4-plano-de-implementacao.md` (F4.1 / F4.2).
+
 ## Build
 
 - Port: `package/pfSense-pkg-layer7` → `make package` (quatro `.c` + `-I` para `src/common`).
