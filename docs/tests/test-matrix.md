@@ -69,7 +69,7 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 6.4 | `pfctl -t layer7_block -T show` confirma IP | appliance | OK (2026-03-22) |
 | 6.5 | `pfctl -t layer7_block -T delete` remove IP | appliance | OK (2026-03-22) |
 | 6.6 | Block com tabela PF real bloqueia tráfego | appliance | OK (2026-03-22, cli -e) |
-| 6.7 | DNS forcado (`force_dns`): `pfctl -a natrules/layer7_nat -s nat` mostra `rdr` coerente após reload PF | appliance | Pendente (F4.3; `validacao-lab` sec. 11) |
+| 6.7 | DNS forcado (`force_dns`): `pfctl -a natrules/layer7_nat -s nat` mostra `rdr` coerente após reload PF; em pacote >= `1.8.11_8`, pares (interface, CIDR) repetidos entre regras não duplicam `rdr`; em >= `1.8.11_9`, interfaces por ordem alfabética; em >= `1.8.11_10`, CIDRs válidos por regra únicos e ordenados alfabeticamente | appliance | Pendente (F4.3; `validacao-lab` sec. 11) |
 
 ## 7. Whitelist e fallback
 

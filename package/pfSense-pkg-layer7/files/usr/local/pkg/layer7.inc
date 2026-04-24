@@ -133,6 +133,12 @@ function layer7_daemon_pid_from_file($pidf = null)
 /**
  * Gera regras rdr para DNS forcado para CIDRs das regras blacklist com
  * force_dns=true. Requer acesso a pfSense's get_real_interface().
+ * Pares (interface, CIDR) repetidos em mais do que uma regra sao emitidos
+ * uma unica vez (evita linhas redundantes no anchor NAT).
+ * A lista de interfaces efectivas e ordenada alfabeticamente para saida
+ * estavel entre reloads (mesma configuracao, mesma ordem de `rdr`).
+ * Os CIDRs IPv4 validos de cada regra sao unicos, ordenados alfabeticamente
+ * e validados uma vez por regra antes de cruzar com as interfaces.
  * Retorna string vazia se nao houver regras rdr activas.
  */
 function layer7_generate_rdr_rules_snippet()
@@ -165,6 +171,7 @@ function layer7_generate_rdr_rules_snippet()
 	    array_unique($real_ifaces),
 	    "layer7_pf_ifname_for_rules"
 	));
+	sort($real_ifaces, SORT_STRING);
 	if (empty($real_ifaces)) {
 		return "";
 	}
@@ -173,6 +180,7 @@ function layer7_generate_rdr_rules_snippet()
 	$lines[] = "";
 	$lines[] = "# DNS forcado para CIDRs com blacklist (force_dns).";
 	$has_rules = false;
+	$seen_rdr = array();
 	foreach ($bl_config["rules"] as $rule) {
 		if (!isset($rule["enabled"]) || !$rule["enabled"]) {
 			continue;
@@ -183,15 +191,29 @@ function layer7_generate_rdr_rules_snippet()
 		if (empty($rule["src_cidrs"]) || !is_array($rule["src_cidrs"])) {
 			continue;
 		}
+		$cidrs_ok = array();
+		foreach ($rule["src_cidrs"] as $craw) {
+			$cidr = trim((string)$craw);
+			if ($cidr === "") {
+				continue;
+			}
+			if (!layer7_cidr_valid($cidr) && !layer7_ipv4_valid($cidr)) {
+				continue;
+			}
+			$cidrs_ok[] = $cidr;
+		}
+		$cidrs_ok = array_values(array_unique($cidrs_ok));
+		sort($cidrs_ok, SORT_STRING);
+		if (empty($cidrs_ok)) {
+			continue;
+		}
 		foreach ($real_ifaces as $iface) {
-			foreach ($rule["src_cidrs"] as $cidr) {
-				$cidr = trim((string)$cidr);
-				if ($cidr === "") {
+			foreach ($cidrs_ok as $cidr) {
+				$key = $iface . "\0" . $cidr;
+				if (isset($seen_rdr[$key])) {
 					continue;
 				}
-				if (!layer7_cidr_valid($cidr) && !layer7_ipv4_valid($cidr)) {
-					continue;
-				}
+				$seen_rdr[$key] = true;
 				$has_rules = true;
 			$lines[] = "rdr on {$iface} inet proto udp" .
 			    " from {$cidr} to !127.0.0.1 port 53" .

@@ -1,13 +1,16 @@
 # Quick start — validação lab completa
 
 Fluxo encadeado para fechar o gate **pacote + serviço** em [`validacao-lab.md`](../04-package/validacao-lab.md).
+O artefacto de instalação no ramo actual é o **`.pkg`** gerado pelo port (ver
+[`CORTEX.md`](../../CORTEX.md) e [`MANUAL-INSTALL`](../10-license-server/MANUAL-INSTALL.md));
+nao confundir com o historico de `.txz` em notas antigas.
 
 ## Pré-requisitos
 
 - [ ] **Builder FreeBSD** conforme [`builder-freebsd.md`](builder-freebsd.md) (VM com `git`, `pkg`, toolchain)
 - [ ] **pfSense CE** conforme [`lab-topology.md`](lab-topology.md) (WAN+LAN, cliente)
 - [ ] **Snapshot** antes de instalar o pacote ([`snapshots-e-gate.md`](snapshots-e-gate.md))
-- [ ] Caminho para copiar `.txz` do builder para pfSense (SCP, pasta partilhada, etc.)
+- [ ] Caminho para copiar o **`.pkg`** do builder para o pfSense (SCP, pasta partilhada, etc.)
 
 ## Sequência
 
@@ -20,18 +23,18 @@ sh scripts/package/smoke-layer7d.sh
 cd package/pfSense-pkg-layer7
 make clean 2>/dev/null || true
 make package
-# Anotar caminho do .txz (ex.: ./work/pkg/pfSense-pkg-layer7-0.0.31.txz)
+# Anotar caminho do .pkg (ex.: package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-<versao>.pkg)
 ```
 
-### 2. Transferir `.txz` para pfSense
+### 2. Transferir o `.pkg` para pfSense
 
 SCP, datastore, ou pasta partilhada — conforme o seu ambiente.
 
 ### 3. No pfSense (SSH ou consola)
 
 ```sh
-cd /root   # ou diretório do .txz
-pkg add ./pfSense-pkg-layer7-*.txz
+cd /root   # ou diretório do .pkg
+pkg add ./pfSense-pkg-layer7-*.pkg
 cp /usr/local/etc/layer7.json.sample /usr/local/etc/layer7.json
 service layer7d onestart
 service layer7d status

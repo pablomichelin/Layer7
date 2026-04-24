@@ -59,7 +59,7 @@ Ele existe para evitar tres erros comuns:
 | testes | `docs/04-tests/README.md` vs `docs/tests/README.md` | `docs/tests/README.md` | a area `04-tests` fica historica ate F6 |
 | roadmap/backlog/checklist | resumos antigos em raiz vs docs novos | `docs/02-roadmap/*` | raiz fica historica |
 | instalacao | tutorial longo vs manual install | `docs/10-license-server/MANUAL-INSTALL.md` | tutorial fica preservado por compatibilidade |
-| release/distribuicao | ADR-0002 `.txz` vs distribuicao actual `.pkg` | `CORTEX.md` + releases README + `MANUAL-INSTALL.md` | precisa de ADR substituto |
+| release/distribuicao | ADR-0002 `.txz` (historico) vs ADR-0003 **`.pkg`** (canonico) | `docs/03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md` + `CORTEX.md` + `docs/06-releases/README.md` + `MANUAL-INSTALL.md` | ADR-0002 preservado; confusao resolvida na hierarquia oficial |
 | prompts/continuidade | `docs/07-prompts/next-chat-phase-a-option1.md` vs checkpoint do `CORTEX.md` | `CORTEX.md` | prompt antigo fica historico |
 
 ---

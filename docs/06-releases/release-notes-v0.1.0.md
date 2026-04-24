@@ -5,6 +5,12 @@
 **Artefato:** `pfSense-pkg-layer7-0.1.0.pkg`
 **Checksum:** `pfSense-pkg-layer7-0.1.0.pkg.sha256`
 
+**Nota (alinhamento documental):** a instalação a partir de GitHub Release segue
+hoje o script **`install.sh`** e o **`.pkg`** (ver
+[`MANUAL-INSTALL`](../10-license-server/MANUAL-INSTALL.md) e
+[`scripts/release/README.md`](../../scripts/release/README.md)). O comando abaixo
+foi actualizado a partir de referencias antigas a `install-lab.sh`.
+
 ---
 
 ## Resumo
@@ -59,7 +65,7 @@ block drop quick on egress from <layer7_block>
 ### Primeira instalação (Diagnostics > Command Prompt)
 
 ```sh
-fetch -o /tmp/install-lab.sh https://github.com/OWNER/REPO/releases/download/v0.1.0/install-lab.sh && sh /tmp/install-lab.sh
+fetch -o /tmp/install.sh https://github.com/OWNER/REPO/releases/download/v0.1.0/install.sh && sh /tmp/install.sh
 ```
 
 ### Pós-instalação
@@ -94,7 +100,8 @@ service layer7d onestop
 pkg delete -y pfSense-pkg-layer7
 ```
 
-Para reinstalar versão anterior, usar `install-lab.sh` do release desejado.
+Para reinstalar versão anterior, usar o `install.sh` (ou o `.pkg` com `pkg add
+-f`) do release desejado.
 Ver [`docs/05-runbooks/rollback.md`](../05-runbooks/rollback.md).
 
 ---

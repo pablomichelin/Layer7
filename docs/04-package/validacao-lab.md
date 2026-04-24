@@ -726,6 +726,22 @@ alteracao, execute **Apply** / reload de filtro na GUI e volte a verificar.
 - Saida de `pfctl -a natrules/layer7_nat -s nat` coerente com a configuracao
   (regras presentes ou ausentes de forma explicavel)
 
+**Nota (pacote >= `1.8.11_8`):** se varias regras de blacklist com `force_dns`
+partilharem o mesmo par **(interface, CIDR)**, o pacote emite **uma** dupla
+`rdr` UDP/TCP para esse par (sem linhas duplicadas no anchor). Ao contar
+regras esperadas no lab, usar esta regra e nao o produto bruto
+`regras × CIDRs × interfaces`.
+
+**Nota (pacote >= `1.8.11_9`):** a ordem das interfaces na geracao de `rdr` e
+**alfabetica** (nao depende da ordem em **Services → Layer 7**); a ordem das
+regras de blacklist no `config.json` continua a determinar a sequencia global
+das linhas.
+
+**Nota (pacote >= `1.8.11_10`):** dentro de cada regra com `force_dns`, os
+CIDRs IPv4 validos sao **unicos** e ordenados **alfabeticamente** antes de
+cruzar com as interfaces; duplicar o mesmo CIDR na lista da regra nao duplica
+`rdr` para esse par (interface, CIDR) gracas ao `seen` global.
+
 **Nota:** nesta fase a trilha gera apenas regras **inet** (IPv4); nao exige
 `rdr` IPv6. Ver addendum F4.3 em `docs/10-license-server/MANUAL-INSTALL.md`.
 

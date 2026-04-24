@@ -2,9 +2,16 @@
 
 Operacao e rollback: [`../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md`](../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md).
 
-Validacao em lab (build `.pkg`, `pkg add`, servico): [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md).
+Validacao em lab (build `.pkg`, `pkg add`, servico, roteiros F4 no appliance
+**10a** / **10b** / **11**): [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md).
+
+Indice da area **package** (lab + `MANUAL-INSTALL`): [`../04-package/README.md`](../04-package/README.md).
+
+Indice do **laboratorio**: [`../08-lab/README.md`](../08-lab/README.md).
 
 Quick start do lab: [`../08-lab/quick-start-lab.md`](../08-lab/quick-start-lab.md).
+
+Deploy lab / GitHub Release (`.pkg`, `install.sh`; suplementar ao release oficial): [`../04-package/deploy-github-lab.md`](../04-package/deploy-github-lab.md), [`../../scripts/release/README.md`](../../scripts/release/README.md).
 
 Seguranca da WebGUI do pfSense durante testes do pacote: [`pfsense-webgui-safety.md`](pfsense-webgui-safety.md).
 

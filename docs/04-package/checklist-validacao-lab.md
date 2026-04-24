@@ -2,6 +2,12 @@
 
 Marque só após **evidência** (output colado em [`validacao-lab.md`](validacao-lab.md)).
 
+**F4 (BG-009 / BG-010 / BG-011):** além desta lista curta, use o *Índice dos
+roteiros F4* em `validacao-lab` (secções **10a**, **10b**, **11**) e a matriz
+em [`../tests/test-matrix.md`](../tests/test-matrix.md) (testes **3.8**,
+**12.1–12.2**, **6.7**) quando precisar de critério de fecho de trilha com o
+[checklist mestre](../02-roadmap/checklist-mestre.md).
+
 - [ ] **1.** Build: `make package` completa sem erro (builder FreeBSD)
 - [ ] **2.** Artefacto `.pkg` presente no disco (caminho anotado)
 - [ ] **3.** `pkg add ./pfSense-pkg-layer7-….pkg` sem erro no pfSense

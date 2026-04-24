@@ -28,6 +28,8 @@ errado. Por isso, este documento deixa de conter comandos operacionais.
 
 Para executar qualquer validacao tecnica, seguir:
 
+- [`README.md`](README.md) — indice do laboratorio, SSOT de fluxo (CORTEX,
+  roadmap, F4) e ligacao a [`deploy-github-lab`](../04-package/deploy-github-lab.md);
 - [`builder-freebsd.md`](builder-freebsd.md) para o builder FreeBSD;
 - [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) para build,
   pacote `.pkg`, instalacao e validacao no pfSense;

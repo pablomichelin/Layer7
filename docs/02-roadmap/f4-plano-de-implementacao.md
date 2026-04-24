@@ -152,6 +152,20 @@ de CIDR, dedupe, nota **inet** vs IPv6).
 interfaces; `layer7_inject_nat_to_anchor` com diagnóstico em falha de
 `pfctl` / temp; `PORTREVISION` `2` (`1.8.11_2`).
 
+**Bloco (`PORTREVISION` `8` / `1.8.11_8`):** `layer7_generate_rdr_rules_snippet`
+deduplica pares **(interface, CIDR)** quando varias regras de blacklist com
+`force_dns` partilham o mesmo par, evitando `rdr` redundantes no anchor
+`natrules/layer7_nat`.
+
+**Bloco (`PORTREVISION` `9` / `1.8.11_9`):** após deduplicação de nomes de
+interface, a lista efectiva é ordenada alfabeticamente antes de gerar `rdr`,
+para ordem estável no anchor entre reloads.
+
+**Bloco (`PORTREVISION` `10` / `1.8.11_10`):** por regra, CIDRs IPv4 validos
+unicos e ordenados antes do cruzamento com interfaces; evita validar o mesmo
+CIDR em cada interface e estabiliza a ordem face a permutações de
+`src_cidrs` no JSON.
+
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog
 históricos de `rdr` e `get_real_interface`); `check-port-files.sh` +
 `smoke-layer7d.sh` e `make package` no builder quando aplicável; roteiro de

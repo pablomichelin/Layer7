@@ -74,7 +74,13 @@ injecta regras no sub-anchor NAT `natrules/layer7_nat` (via
 origem em **CIDRs** deve ser **IPv4** valido (CIDR ou host); valores que
 nao passam a validacao sao **ignorados** na geracao, para o `pfctl` nao
 rejeitar o anchor. A lista de interfaces do Layer7 fica **deduplicada** ao
-gerar as linhas. Esta trilha gera apenas regras **inet** (IPv4); nao
+gerar as linhas; pares **(interface, CIDR)** repetidos em mais do que uma regra
+com `force_dns` geram uma unica dupla de `rdr` UDP/TCP (evita entradas
+redundantes no anchor). A partir de `1.8.11_9`, as interfaces efectivas sao
+ordenadas **alfabeticamente** antes da emissao das linhas `rdr`, para ordem
+estavel no anchor entre reloads. A partir de `1.8.11_10`, em cada regra, os
+CIDRs IPv4 validos sao unicos, ordenados alfabeticamente e validados uma vez
+antes do cruzamento com as interfaces. Esta trilha gera apenas regras **inet** (IPv4); nao
 inclui `rdr` **inet6** para DNS. Comportamento alinhado ao branch com
 `PORTVERSION` / `PORTREVISION` de trabalho; a referencia de `.pkg` publica
 continua a seccao **Links da versao actual** ate nova release. Nomes de

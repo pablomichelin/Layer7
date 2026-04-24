@@ -1,37 +1,49 @@
 # Deploy lab via GitHub Releases
 
-**Objetivo:** distribuir o pacote Layer7 como artefato em GitHub Releases e permitir instalação no pfSense de lab com um único comando (fetch + sh), sem depender de repositório pkg alternativo do pfSense.
+**Papel:** documento **suplementar** — descreve a cadeia **builder → stage →
+release** alinhada ao [`scripts/release/README.md`](../../scripts/release/README.md)
+e ao [`MANUAL-INSTALL`](../10-license-server/MANUAL-INSTALL.md). A **fonte
+operacional** para instalação a partir de release continua a ser o próprio
+`README` de `scripts/release/` e o manual de instalação.
+
+**Artefacto canónico:** **`.pkg`** (ver [ADR-0003](../03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md)).
+Referências antigas a **`.txz`** são só histórico ([ADR-0002](../03-adr/ADR-0002-distribuicao-artefato-txz.md)).
+
+**Objetivo:** permitir instalação no pfSense de lab com **um comando** no
+appliance (`fetch` + `install.sh`), sem repositório pkg alternativo do pfSense.
 
 ---
 
-## Arquitetura do fluxo
+## Arquitetura do fluxo (estado actual)
 
 ```
 ┌─────────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
 │  Builder FreeBSD    │     │   GitHub Release     │     │  pfSense lab    │
 │                     │     │                      │     │                 │
-│  deployz.sh         │────>│  .txz                │<────│  fetch + sh     │
-│  make package       │     │  .sha256             │     │  install-lab.sh │
-│  gh release create  │     │  install-lab.sh      │     │  pkg add -f     │
+│  deployz.sh         │────>│  .pkg                │<────│  fetch + sh     │
+│  make package       │     │  .pkg.sha256         │     │  install.sh     │
+│  sign / publish     │     │  install.sh          │     │  pkg add -f     │
+│                     │     │  uninstall.sh        │     │                 │
+│                     │     │  manifest + assinat. │     │                 │
 └─────────────────────┘     └──────────────────────┘     └─────────────────┘
 ```
 
-1. **Builder FreeBSD:** executa `deployz.sh`; gera `.txz`, `.sha256`, `install-lab.sh`; publica em GitHub Release.
-2. **GitHub Release:** armazena os artefatos; URLs públicas para download.
-3. **pfSense lab:** baixa `install-lab.sh`, executa; o script baixa `.txz`, valida checksum, instala com `pkg add -f`.
+1. **Builder FreeBSD:** `sh scripts/release/deployz.sh --repo-owner … --repo-name … --version …` — corre `make package` no port, localiza o **`.pkg`**, gera checksum, `install.sh` / `uninstall.sh` e manifesto no **stage dir** (ver saída do script). A assinatura e a publicação seguem [`RELEASE-SIGNING.md`](../06-releases/RELEASE-SIGNING.md) e `publish-release.sh`.
+2. **GitHub Release:** armazena os assets; URLs públicas para download.
+3. **pfSense lab:** tal como em [`scripts/release/README.md`](../../scripts/release/README.md) — `fetch` do **`install.sh`** do release; o script obtém o **`.pkg`**, valida checksum quando aplicável e instala com `pkg add -f`.
 
 ---
 
-## Por que GitHub Release asset e não repo pkg alternativo
+## Por que GitHub Release como asset e não repo pkg alternativo
 
-- **Simplicidade:** um único comando no pfSense; não exige configurar repositório pkg no firewall.
+- **Simplicidade:** um comando no pfSense; não exige configurar repositório pkg no firewall.
 - **Independência:** o pacote não depende de repo alternativo do pfSense; evita colisão com upgrades do CE.
-- **Reprodutibilidade:** artefato versionado; checksum para validação.
-- **Escopo:** fluxo para lab/teste; não substitui suporte oficial do Package Manager do pfSense.
+- **Reprodutibilidade:** artefacto versionado; checksum / manifesto na trilha F1.
+- **Escopo:** fluxo para lab/teste; não substitui o suporte oficial do Package Manager do pfSense.
 
 ---
 
-## Sequência: builder → GitHub Release → pfSense
+## Sequência: builder → stage → publicar
 
 ### 1. No builder FreeBSD
 
@@ -40,53 +52,39 @@ cd /caminho/para/Layer7
 sh scripts/release/deployz.sh \
   --repo-owner pablomichelin \
   --repo-name pfsense-layer7 \
-  --version 0.0.31
+  --version 1.8.11
 ```
 
-O script:
-- valida dependências e working tree limpo;
-- executa `make package` no port;
-- gera `.sha256`;
-- gera `install-lab.sh` a partir do template;
-- cria tag `v0.0.31` (se não existir);
-- faz `git push` e `git push --tags`;
-- cria GitHub Release com `.txz`, `.sha256`, `install-lab.sh`.
+O script (resumo):
 
-### 2. No pfSense (Diagnostics > Command Prompt)
+- valida árvore git e dependências;
+- executa `make package` no port;
+- localiza o **`.pkg`** mais recente (`find … -name '*.pkg'`);
+- grava **`.pkg.sha256`**, gera **`install.sh`** / **`uninstall.sh`** e manifesto no stage;
+- indica os passos seguintes: assinar, verificar, **publicar** com `publish-release.sh`.
+
+Seguir a saída do script e [`scripts/release/README.md`](../../scripts/release/README.md) para o caminho completo até ao release.
+
+### 2. No pfSense (SSH ou Diagnostics > Command Prompt)
+
+Alinhado ao README de release — usar o **`install.sh`** do asset publicado (versão/tag conforme o teu release):
 
 ```sh
-fetch -o /tmp/install-lab.sh https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.0.31/install-lab.sh && sh /tmp/install-lab.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
 ```
 
-O `install-lab.sh`:
-- baixa o `.txz` do release;
-- baixa o `.sha256` (opcional);
-- valida checksum com `sha256 -c` se disponível;
-- instala com `pkg add -f`;
-- mostra `pkg info` e próximos passos.
+(Substituir owner/repo/tag pela combinação do teu fork e versão.)
 
 ### 3. Próximos passos no pfSense
 
-```sh
-cp /usr/local/etc/layer7.json.sample /usr/local/etc/layer7.json
-service layer7d onestart
-service layer7d status
-```
+Conforme o próprio `install.sh` e [`validacao-lab.md`](validacao-lab.md) (configuração, serviço, GUI).
 
 ---
 
-## Comando único de instalação
-
-Formato genérico:
+## Comando único de instalação (formato genérico)
 
 ```sh
-fetch -o /tmp/install-lab.sh https://github.com/REPO_OWNER/REPO_NAME/releases/download/TAG/install-lab.sh && sh /tmp/install-lab.sh
-```
-
-Exemplo real:
-
-```sh
-fetch -o /tmp/install-lab.sh https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.0.31/install-lab.sh && sh /tmp/install-lab.sh
+fetch -o /tmp/install.sh https://github.com/REPO_OWNER/REPO_NAME/releases/download/TAG/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -101,11 +99,7 @@ pkg delete pfSense-pkg-layer7
 
 ### Reinstalar versão anterior
 
-Usar o `install-lab.sh` do release desejado:
-
-```sh
-fetch -o /tmp/install-lab.sh https://github.com/pablomichelin/pfsense-layer7/releases/download/v0.0.30/install-lab.sh && sh /tmp/install-lab.sh
-```
+Usar o **`install.sh`** (e tag) do release desejado, como no passo 2.
 
 ---
 
@@ -113,18 +107,29 @@ fetch -o /tmp/install-lab.sh https://github.com/pablomichelin/pfsense-layer7/rel
 
 | Sintoma | Ação |
 |---------|------|
-| `working tree não está limpo` | `git status`; commit ou stash antes do deploy. |
-| `comando obrigatório não encontrado: gh` | Instalar GitHub CLI: `pkg install gh` ou [instalação oficial](https://cli.github.com/manual/installation). |
-| `nenhum .txz encontrado` | Verificar `make package` no port; `find package/pfSense-pkg-layer7 -name '*.txz'`. |
-| `gh release create` falha (release já existe) | Usar tag diferente ou `gh release delete` antes. |
-| `fetch` falha no pfSense | Verificar conectividade; URL correta; release público. |
-| `checksum inválido` | Re-baixar; verificar integridade do release. |
-| `pkg add -f` falha | Verificar compatibilidade pfSense/FreeBSD; logs em `/var/log/pkg*.log`. |
+| `working tree não está limpo` | `git status`; commit ou stash antes do `deployz.sh`. |
+| `nenhum .pkg encontrado` após `make package` | No port: `find package/pfSense-pkg-layer7 -name '*.pkg'`; corrigir build. |
+| `gh` / publicação falha | Ver [`scripts/release/README.md`](../../scripts/release/README.md) e credenciais GitHub. |
+| `fetch` falha no pfSense | Conectividade; URL do release; asset `install.sh` publicado. |
+| `checksum inválido` | Re-baixar assets; verificar manifesto / integridade do release. |
+| `pkg add -f` falha | Compatibilidade pfSense/FreeBSD; logs em `/var/log/pkg*.log`. |
+
+---
+
+## Legado: `install-lab.sh.template`
+
+Existe [`install-lab.sh.template`](../../scripts/release/install-lab.sh.template) —
+modelo antigo de instalação por `fetch` direto ao **`.pkg`**; o fluxo suportado
+para releases oficiais passa pelo **`install.sh`** gerado a partir de
+[`scripts/release/install.sh`](../../scripts/release/install.sh). Manter o
+template apenas como referência histórica até decisão da F6.
 
 ---
 
 ## Referências
 
-- [`scripts/release/README.md`](../../scripts/release/README.md) — uso do deployz.sh
-- [`docs/04-package/validacao-lab.md`](validacao-lab.md) — validação do pacote no lab
-- [ADR-0002](../03-adr/ADR-0002-distribuicao-artefato-txz.md) — distribuição por artefato `.txz`
+- [`scripts/release/README.md`](../../scripts/release/README.md) — instalação, frota, deploy
+- [`docs/04-package/validacao-lab.md`](validacao-lab.md) — validação no lab
+- [`docs/10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md) — instalação canónica
+- [ADR-0003](../03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md) — hierarquia `.pkg`
+- [ADR-0002](../03-adr/ADR-0002-distribuicao-artefato-txz.md) — histórico `.txz`

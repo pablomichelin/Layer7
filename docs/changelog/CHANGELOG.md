@@ -4,6 +4,94 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — checklist validação lab (F4)
+
+- **`docs/04-package/checklist-validacao-lab.md`** — nota no topo com roteiros
+  F4 (10a/10b/11), `test-matrix` e ligação ao `checklist-mestre`.
+
+### Documentation — `05-runbooks/README` (validação F4 no lab)
+
+- **`docs/05-runbooks/README.md`** — descrição da ligação a `validacao-lab`
+  explicita roteiros **F4** no appliance (secções **10a** / **10b** / **11**).
+
+### Documentation — `docs/tests/README` (gate pacote / lab)
+
+- **`docs/tests/README.md`** — secção CI: gate de pacote referencia tambem
+  `04-package/README` e `08-lab/README` para navegacao coerente.
+
+### Documentation — `04-package/README` (ligação ao lab)
+
+- **`docs/04-package/README.md`** — paragrafo introdutorio com ligacoes a
+  `MANUAL-INSTALL`, `08-lab/README` e `quick-start-lab` (artefacto `.pkg`).
+
+### Documentation — `docs/README` (área Lab)
+
+- **`docs/README.md`** — tabela *Mapa das areas documentais*: entrada **Lab**
+  referencia o indice, o `quick-start-lab` e marca `guia-windows` como legado.
+
+### Documentation — classificação `08-lab` (matriz)
+
+- **`docs/00-overview/document-classification.md`** — `quick-start-lab.md`
+  reclassificado como **suplementar** (antes “histórico”); `guia-windows.md`
+  com coluna *Substitui* actualizada ao indice do lab e a `deploy-github-lab`.
+
+### Documentation — guia Windows (legado) / índice lab
+
+- **`docs/08-lab/guia-windows.md`** — em *Fonte vigente*, ligação ao
+  `docs/08-lab/README.md` e a `docs/04-package/deploy-github-lab.md`, para
+  quem cair neste ficheiro legado ser desviado de imediato para o fluxo
+  canónico.
+
+### Documentation — equivalência release / índice releases
+
+- **`docs/00-overview/document-equivalence-map.md`** — linha release/distribuição
+  actualizada: **ADR-0003** como norma do **`.pkg`**; ADR-0002 como histórico;
+  removida a nota obsoleta «precisa de ADR substituto».
+- **`docs/06-releases/README.md`** — ligação a `deploy-github-lab.md` e ao
+  `scripts/release/README.md` na lista de ficheiros da área.
+
+### Documentation — release notes v0.1.0 (instalação)
+
+- **`docs/06-releases/release-notes-v0.1.0.md`** — comando de instalação e
+  rollback alinhados a **`install.sh`** + **`.pkg`**; nota de contexto
+  documental; removida dependência de `install-lab.sh` na secção de primeira
+  instalação.
+
+### Documentation — deploy lab / GitHub Releases (artefacto `.pkg`)
+
+- **`docs/04-package/deploy-github-lab.md`** — reescrito para o fluxo actual:
+  `deployz.sh` gera **`.pkg`**, checksum, `install.sh` / `uninstall.sh` e
+  manifesto; no pfSense usa-se **`install.sh`** do release (como em
+  `scripts/release/README.md`), não `.txz` nem `install-lab.sh` como caminho
+  principal. Secção de legado para `install-lab.sh.template`.
+- **`docs/00-overview/document-classification.md`** — `deploy-github-lab.md`
+  reclassificado como **suplementar** (antes historico pendente de harmonia).
+
+### Changed — F4.3 DNS forcado (`1.8.11_10`)
+
+- **`layer7.inc`** — `layer7_generate_rdr_rules_snippet` prepara por regra a
+  lista de CIDRs IPv4 validos (unicos, ordenados) antes de cruzar com
+  interfaces, reduzindo validacao repetida e estabilizando a ordem das linhas
+  `rdr` face a reordenacao accidental de `src_cidrs` no JSON.
+- **`package/pfSense-pkg-layer7/Makefile` (`PORTREVISION`)** — `10` (rebuild
+  `1.8.11_10`).
+
+### Changed — F4.3 DNS forcado (`1.8.11_9`)
+
+- **`layer7.inc`** — `layer7_generate_rdr_rules_snippet` ordena alfabeticamente
+  as interfaces efectivas antes de emitir `rdr`, para ordem estavel no anchor
+  `natrules/layer7_nat` entre reloads com a mesma configuracao.
+- **`package/pfSense-pkg-layer7/Makefile` (`PORTREVISION`)** — `9` (rebuild
+  `1.8.11_9`).
+
+### Changed — F4.3 DNS forcado (`1.8.11_8`)
+
+- **`layer7.inc`** — `layer7_generate_rdr_rules_snippet` deduplica pares
+  **(interface, CIDR)** entre regras de blacklist com `force_dns`, evitando
+  regras `rdr` UDP/TCP redundantes no sub-anchor `natrules/layer7_nat`.
+- **`package/pfSense-pkg-layer7/Makefile` (`PORTREVISION`)** — `8` (rebuild
+  `1.8.11_8`).
+
 ### Documentation / CI — saneamento do fluxo Windows/macOS
 
 - **`docs/08-lab/guia-windows.md`** — reclassificado como documento legado,

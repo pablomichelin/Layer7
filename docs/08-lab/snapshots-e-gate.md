@@ -6,7 +6,7 @@
 |---------|----------------|
 | pfSense instalado, WAN/LAN básico, sem Layer7 | `lab-pfsense-base` |
 | Após syslog remoto validado | `lab-pfsense-syslog-ok` |
-| Antes de instalar primeiro `.txz` Layer7 | `lab-pre-layer7-pkg` |
+| Antes de instalar o primeiro pacote **`.pkg`** Layer7 | `lab-pre-layer7-pkg` |
 
 Plataforma (Proxmox, VMware, Hyper-V, etc.): usar snapshot **da VM pfSense** no hipervisor; no CE também é possível backup XML, mas snapshot de VM é mais rápido para iterar.
 

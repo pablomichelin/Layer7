@@ -103,7 +103,7 @@ vence o canónico.
 | `docs/03-adr/ADR-0010-integridade-transacional-e-validacao-crud-license-server.md` | CRUD e integridade | ADR normativo da F2.4 para validacao e transacoes do CRUD | Canónico | novo | manter vivo | F2+ |
 | `docs/04-package/README.md` | package docs | indice local da area | Suplementar | complementar ao roadmap e `MANUAL-INSTALL.md` | manter leve | F4/F5 |
 | `docs/04-package/checklist-validacao-lab.md` | validacao rapida | checklist operacional de lab | Suplementar | complementar a `validacao-lab.md` | rever quando a F5 fechar a malha de testes | F5 |
-| `docs/04-package/deploy-github-lab.md` | deploy lab antigo | fluxo historico de distribuicao | Historico | parcialmente substituido por docs de release e install | preservar; harmonizar mais tarde | F7 |
+| `docs/04-package/deploy-github-lab.md` | deploy lab GitHub | cadeia builder → stage → release (`.pkg`, `install.sh`); suplementar ao `scripts/release/README` | Suplementar | complementa `MANUAL-INSTALL` e ADR-0003; nao substitui o README de release | manter alinhado a `deployz.sh` / publicacao | F4/F7 |
 | `docs/04-package/package-skeleton.md` | esqueleto do package | memoria util da fase inicial | Historico | complementar a package docs | preservar | F6 |
 | `docs/04-package/validacao-lab.md` | evidencia em appliance | runbook de validacao de package/lab | Suplementar | complementar a `docs/tests/` | harmonizar termos de artefacto na F4/F5 | F4/F5 |
 | `docs/04-tests/README.md` | tests stub | indice antigo e minimo | Historico | sobreposto por `docs/tests/README.md` | preservar ate consolidacao estrutural | F6 |
@@ -130,10 +130,10 @@ vence o canónico.
 | `docs/07-prompts/next-chat-phase-a-option1.md` | continuidade antiga | prompt historico de fase antiga | Historico | substituido pelo checkpoint do `CORTEX.md` | preservar | F6 |
 | `docs/08-lab/README.md` | indice do lab | agregador da area de laboratorio | Suplementar | complementar ao roadmap e package docs | manter leve | F4/F5 |
 | `docs/08-lab/builder-freebsd.md` | builder | guia operacional do builder | Suplementar | complementar ao `AGENTS.md` | rever quando F1/F4 mexerem no builder | F1/F4 |
-| `docs/08-lab/guia-windows.md` | Windows legado | preservado apenas para rastreabilidade; nao e fluxo vigente | Historico | substituido por `docs/08-lab/builder-freebsd.md` + `docs/04-package/validacao-lab.md` | remover ou arquivar fisicamente apenas na F6 | F6 |
+| `docs/08-lab/guia-windows.md` | Windows legado | preservado para rastreabilidade; **nao** e fluxo vigente; *Fonte vigente* aponta para o indice do lab e `deploy-github-lab` | Historico | substituido operacionalmente por `docs/08-lab/README.md` + `builder-freebsd` + `validacao-lab` + `deploy-github-lab` | remover ou arquivar fisicamente apenas na F6 | F6 |
 | `docs/08-lab/lab-inventory.template.md` | inventario de lab | template local | Placeholder | — | preencher localmente quando necessario | F4/F5 |
 | `docs/08-lab/lab-topology.md` | topologia de lab | referencia de ambiente | Suplementar | — | manter | F4/F5 |
-| `docs/08-lab/quick-start-lab.md` | fluxo rapido antigo | runbook historico com termos pre-V1 | Historico | parcialmente substituido por `MANUAL-INSTALL.md` e validacao-lab | preservar e rever na F5/F6 | F5/F6 |
+| `docs/08-lab/quick-start-lab.md` | quick start lab | sequencia builder → `.pkg` → pfSense; suplementar a `validacao-lab` | Suplementar | parcialmente sobreposto por `MANUAL-INSTALL` e `scripts/release/README` para install oficial | manter alinhado ao artefacto `.pkg` (nao `.txz`) | F4/F5 |
 | `docs/08-lab/snapshots-e-gate.md` | snapshots | runbook de gate de lab | Suplementar | — | manter | F5 |
 | `docs/08-lab/syslog-remote.md` | syslog remoto | guia especifico de lab | Suplementar | complementar a docs de logging | manter | F5/F7 |
 | `docs/09-blocking/README.md` | trilha de bloqueio | resumo de trilha concluida | Historico | complementar ao changelog | preservar | F6 |
