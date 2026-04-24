@@ -53,6 +53,22 @@ processo estiver vivo; caso contrario, arranque do daemon conforme
 `.pkg` correspondente for publicado; ate la, a referencia de instalacao
 publica continua a versao listada em **Links da versao actual** abaixo.
 
+**Addendum operacional da F4.3 (BG-011, `force_dns` / DNS forcado):** nas
+regras de **blacklist** com opcao *Forcar DNS local* (`force_dns`), o
+pfSense **nao** aplica `rdr` pelo fluxo `nat_rules_needed` do XML; o pacote
+injecta regras no sub-anchor NAT `natrules/layer7_nat` (via
+`layer7_inject_nat_to_anchor` em todo reload de filtro coerente com a GUI).
+**Se** existem regras activas, verifique-as com
+`pfctl -a natrules/layer7_nat -s nat` (isto nao e o mesmo que o ficheiro
+`/usr/local/etc/layer7/pf.conf` das tabelas de bloqueio). Cada
+origem em **CIDRs** deve ser **IPv4** valido (CIDR ou host); valores que
+nao passam a validacao sao **ignorados** na geracao, para o `pfctl` nao
+rejeitar o anchor. A lista de interfaces do Layer7 fica **deduplicada** ao
+gerar as linhas. Esta trilha gera apenas regras **inet** (IPv4); nao
+inclui `rdr` **inet6** para DNS. Comportamento alinhado ao branch com
+`PORTVERSION` / `PORTREVISION` de trabalho; a referencia de `.pkg` publica
+continua a seccao **Links da versao actual** ate nova release.
+
 **Addendum operacional da F2.5:** a operacao do license server passa a usar
 runbooks canónicos especificos para segredos/bootstrap administrativo e
 backup/restore do PostgreSQL:

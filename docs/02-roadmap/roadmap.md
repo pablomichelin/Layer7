@@ -496,6 +496,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 - **F4.3 bloco `2026-04-24` (inicio):** `layer7.inc` — `rdr` / `force_dns`
   com interfaces unicas, validacao de CIDR/IPv4 antes de injectar no anchor
   NAT; guardas em `layer7_get_pfsense_interfaces`; `PORTREVISION` `1`.
+- **F4.3 bloco `2026-04-24` (doc):** `MANUAL-INSTALL` — addendum operacional
+  `force_dns`, anchor `natrules/layer7_nat`, `pfctl -s nat`, ambito IPv4.
 - **Seguinte:** evidencia em appliance/lab (BG-009/010: validacao segundo
   [`validacao-lab.md`](../04-package/validacao-lab.md) e
   `scripts/package/smoke-layer7d.sh` no builder); continuar **F4.3** (BG-011:

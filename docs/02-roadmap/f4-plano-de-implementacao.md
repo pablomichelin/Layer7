@@ -119,6 +119,10 @@ deduplica interfaces; valida cada CIDR/IP de origem antes de emitir `rdr`;
 `layer7_get_pfsense_interfaces` deixa de assumir sempre API pfSense;
 `PORTREVISION` incrementado (rebuild `1.8.11_1`).
 
+**Bloco `2026-04-24` (documentação operacional):** `MANUAL-INSTALL.md` com
+addendum F4.3 (anchor `natrules/layer7_nat`, verificação `pfctl`, validade
+de CIDR, dedupe, nota **inet** vs IPv6).
+
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog
 históricos de `rdr` e `get_real_interface`); evidência em lab quando
 possível.

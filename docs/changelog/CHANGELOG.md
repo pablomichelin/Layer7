@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — F4.3 (BG-011) e manual operacional
+
+- **`MANUAL-INSTALL.md`** — addendum F4.3: `force_dns` injectado no anchor NAT
+  `natrules/layer7_nat`, comando de verificacao `pfctl -a natrules/layer7_nat
+  -s nat`, validacao/dedup de origens, ambito **inet** (IPv4) sem `rdr` IPv6
+  nesta trilha
+
 ### Changed — F4.3 enforcement / DNS forcado (BG-011)
 
 - **`layer7.inc` (`layer7_generate_rdr_rules_snippet`)** — deduplica nomes de
