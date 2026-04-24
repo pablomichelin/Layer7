@@ -14,12 +14,10 @@ $daemon_ver = layer7_daemon_version();
 $pidfile = "/var/run/layer7d.pid";
 $running = false;
 $pid = null;
-if (file_exists($pidfile)) {
-	$pid = trim(@file_get_contents($pidfile));
-	if ($pid !== "" && ctype_digit($pid)) {
-		exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $chk_code);
-		$running = ($chk_code === 0);
-	}
+$pid = layer7_daemon_pid_from_file($pidfile);
+if ($pid !== null) {
+	exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $chk_code);
+	$running = ($chk_code === 0);
 }
 
 $data = layer7_load_or_default();
@@ -76,12 +74,10 @@ if (isset($_POST["restart_service"])) {
 	$pid = null;
 	$running = false;
 	$pidfile = "/var/run/layer7d.pid";
-	if (file_exists($pidfile)) {
-		$pid = trim(@file_get_contents($pidfile));
-		if ($pid !== "" && ctype_digit($pid)) {
-			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk2, $chk2_code);
-			$running = ($chk2_code === 0);
-		}
+	$pid = layer7_daemon_pid_from_file($pidfile);
+	if ($pid !== null) {
+		exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk2, $chk2_code);
+		$running = ($chk2_code === 0);
 	}
 	$stats = $running ? layer7_read_stats() : null;
 }

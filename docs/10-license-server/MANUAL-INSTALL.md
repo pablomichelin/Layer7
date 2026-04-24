@@ -48,7 +48,10 @@ de novo instalado (evita processo antigo a continuar a correr). O **rc.d**
 `layer7d` ajusta as permissoes do **pidfile** apos o arranque de forma
 coerente com `service layer7d status` e valida o conteudo do ficheiro
 (PID numerico, sem espacos parasitas) em `start`/`stop`/`status`/`reload`,
-na mesma linha que `update-blacklists.sh` e `layer7-stats-collect.sh`. Nao
+na mesma linha que `update-blacklists.sh` e `layer7-stats-collect.sh`. Em
+PHP, `layer7_daemon_pid_from_file()` em `usr/local/pkg/layer7.inc` le so a
+primeira linha do pidfile antes de validar o PID (Dashboard, reload via
+GUI, stats). Nao
 editar `/var/run/layer7d.pid` manualmente; em duvida, `service layer7d
 restart`. A reconfiguracao via GUI (`layer7_apply`, reload) alinha-se ao
 `reload` do script: sinal `HUP` se o processo estiver vivo; caso contrario,

@@ -103,6 +103,34 @@ function layer7_log_pkg_warn($msg)
 }
 
 /**
+ * Le a primeira linha do pidfile do layer7d e devolve o PID (só dígitos) ou null.
+ * Alinhado a `layer7d_pid_from_file` / `send_sighup` nos scripts sh (F4.1).
+ *
+ * @param string|null $pidf caminho absoluto; por defeito /var/run/layer7d.pid
+ * @return string|null PID como string de dígitos ou null se ausente/ilegível/inválido
+ */
+function layer7_daemon_pid_from_file($pidf = null)
+{
+	if ($pidf === null || $pidf === "") {
+		$pidf = "/var/run/layer7d.pid";
+	}
+	if (!is_string($pidf) || $pidf === "" || !file_exists($pidf) || !is_readable($pidf)) {
+		return null;
+	}
+	$raw = @file_get_contents($pidf);
+	if (!is_string($raw)) {
+		return null;
+	}
+	$parts = preg_split('/\r\n|\r|\n/', $raw, 2);
+	$line = isset($parts[0]) ? $parts[0] : "";
+	$pid = trim($line);
+	if ($pid === "" || !ctype_digit($pid)) {
+		return null;
+	}
+	return $pid;
+}
+
+/**
  * Gera regras rdr para DNS forcado para CIDRs das regras blacklist com
  * force_dns=true. Requer acesso a pfSense's get_real_interface().
  * Retorna string vazia se nao houver regras rdr activas.
@@ -323,8 +351,8 @@ function layer7_ensure_daemon_running()
 
 	$pidf = "/var/run/layer7d.pid";
 	if (file_exists($pidf)) {
-		$pid = trim(@file_get_contents($pidf));
-		if ($pid !== "" && ctype_digit($pid)) {
+		$pid = layer7_daemon_pid_from_file($pidf);
+		if ($pid !== null) {
 			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $code);
 			if ($code === 0) {
 				return;
@@ -506,13 +534,10 @@ function layer7_restart_service()
 		@shell_exec($cmd);
 	}
 	usleep(500000);
-	$pidf = "/var/run/layer7d.pid";
-	if (file_exists($pidf)) {
-		$pid = trim(@file_get_contents($pidf));
-		if ($pid !== "" && ctype_digit($pid)) {
-			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $code);
-			return ($code === 0);
-		}
+	$pid = layer7_daemon_pid_from_file("/var/run/layer7d.pid");
+	if ($pid !== null) {
+		exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $code);
+		return ($code === 0);
 	}
 	return false;
 }
@@ -677,19 +702,17 @@ function layer7_signal_reload()
 	$pidf = "/var/run/layer7d.pid";
 	/* Alinhar ao `reload` do rc.d: HUP se vivo; senão tentar arranque via
 	 * layer7_ensure_daemon_running() (só sobe se layer7.enabled no JSON). */
-	if (file_exists($pidf)) {
-		$pid = trim(@file_get_contents($pidf));
-		if ($pid !== "" && ctype_digit($pid)) {
-			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $lr_chk, $lr_code);
-			if ($lr_code === 0) {
-				$cmd = "/bin/kill -HUP " . escapeshellarg($pid) . " 2>/dev/null";
-				if (function_exists("mwexec")) {
-					mwexec($cmd);
-				} else {
-					@shell_exec($cmd);
-				}
-				return;
+	$pid = layer7_daemon_pid_from_file($pidf);
+	if ($pid !== null) {
+		exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $lr_chk, $lr_code);
+		if ($lr_code === 0) {
+			$cmd = "/bin/kill -HUP " . escapeshellarg($pid) . " 2>/dev/null";
+			if (function_exists("mwexec")) {
+				mwexec($cmd);
+			} else {
+				@shell_exec($cmd);
 			}
+			return;
 		}
 	}
 	layer7_ensure_daemon_running();
@@ -991,20 +1014,17 @@ function layer7_stats_path()
  */
 function layer7_read_stats()
 {
-	$pidf = "/var/run/layer7d.pid";
-	if (file_exists($pidf)) {
-		$pid = trim(@file_get_contents($pidf));
-		if ($pid !== "" && ctype_digit($pid)) {
-			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $st_chk, $st_code);
-			if ($st_code === 0) {
-				$cmd = "/bin/kill -USR1 " . escapeshellarg($pid) . " 2>/dev/null";
-				if (function_exists("mwexec")) {
-					mwexec($cmd);
-				} else {
-					@shell_exec($cmd);
-				}
-				usleep(200000);
+	$pid = layer7_daemon_pid_from_file("/var/run/layer7d.pid");
+	if ($pid !== null) {
+		exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $st_chk, $st_code);
+		if ($st_code === 0) {
+			$cmd = "/bin/kill -USR1 " . escapeshellarg($pid) . " 2>/dev/null";
+			if (function_exists("mwexec")) {
+				mwexec($cmd);
+			} else {
+				@shell_exec($cmd);
 			}
+			usleep(200000);
 		}
 	}
 	$path = layer7_stats_path();

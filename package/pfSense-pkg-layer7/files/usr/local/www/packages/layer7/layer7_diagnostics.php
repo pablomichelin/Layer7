@@ -83,18 +83,18 @@ $status_out = "";
 $status_ok = null;
 $pid = null;
 
-if (file_exists($pidfile)) {
-	$pid = trim(@file_get_contents($pidfile));
-	if ($pid !== "" && ctype_digit($pid)) {
-		$status_out = l7_t("Servico layer7d em execucao (PID ") . $pid . ").";
-		$status_ok = true;
-	} else {
-		$status_out = l7_t("Ficheiro PID invalido ou vazio.");
-		$status_ok = false;
-	}
-} else {
+if (!file_exists($pidfile)) {
 	$status_out = l7_t("Servico layer7d parado (sem ficheiro PID).");
 	$status_ok = false;
+} else {
+	$pid = layer7_daemon_pid_from_file($pidfile);
+	if ($pid === null) {
+		$status_out = l7_t("Ficheiro PID invalido ou vazio.");
+		$status_ok = false;
+	} else {
+		$status_out = l7_t("Servico layer7d em execucao (PID ") . $pid . ").";
+		$status_ok = true;
+	}
 }
 
 if ($status_ok && $pid !== null) {

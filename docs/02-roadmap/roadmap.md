@@ -499,6 +499,9 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   disciplina de leitura do pidfile que `send_sighup`; `PORTREVISION` `4`.
 - **F4.1 bloco (rc.d / pidfile):** `rc.d/layer7d` — `layer7d_pid_from_file` em
   `start`/`stop`/`status`/`reload`; `PORTREVISION` `5` (`1.8.11_5`).
+- **F4.1 bloco (PHP / pidfile):** `layer7.inc` — `layer7_daemon_pid_from_file`
+  e substituição de leituras cruas nas páginas Status/Diagnostics e funções
+  de serviço/stats; `PORTREVISION` `6` (`1.8.11_6`).
 - **F4.3 bloco `2026-04-24` (inicio):** `layer7.inc` — `rdr` / `force_dns`
   com interfaces unicas, validacao de CIDR/IPv4 antes de injectar no anchor
   NAT; guardas em `layer7_get_pfsense_interfaces`; `PORTREVISION` `1`.

@@ -86,6 +86,11 @@ PID numerico); `PORTREVISION` `4` (`1.8.11_4`).
 **Bloco adicional (rc.d / servico):** `rc.d/layer7d` — `layer7d_pid_from_file`
 (`read -r`, trim, PID numerico) em `start`/`stop`/`status`/`reload`;
 `PORTREVISION` `5` (`1.8.11_5`).
+**Bloco adicional (PHP / pidfile):** `layer7.inc` — `layer7_daemon_pid_from_file`
+(primeira linha, trim, só dígitos) partilhado por
+`layer7_ensure_daemon_running`, `layer7_restart_service`, `layer7_signal_reload`,
+`layer7_read_stats`, `layer7_status.php`, `layer7_diagnostics.php`;
+`PORTREVISION` `6` (`1.8.11_6`).
 
 **Liga a:** BG-009.
 

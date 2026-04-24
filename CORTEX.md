@@ -28,7 +28,7 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Ultima versao do pacote publicada em release:** `1.8.3` (referencia de instalacao
 em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases).
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_5` (`PORTVERSION=1.8.11`, `PORTREVISION=5`;
++ `PORTREVISION`):** `1.8.11_6` (`PORTVERSION=1.8.11`, `PORTREVISION=6`;
 artefacto ainda nao publicado; actualizar manual e procedimentos na mesma
 entrega de release).
 **Data-base deste checkpoint:** `2026-04-24`
@@ -644,7 +644,7 @@ CHECKPOINT CANONICO
 - Data base: 2026-04-24
 - Produto: Layer7 para pfSense CE
 - Ultima versao .pkg publicada (referencia operacional): 1.8.3
-- PORTVERSION no repositorio (pre-release / proximo build): 1.8.11 (PORTREVISION 5)
+- PORTVERSION no repositorio (pre-release / proximo build): 1.8.11 (PORTREVISION 6)
 - Estado funcional: V1 Comercial concluida e publicada; F3 aberta
 - Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
   fecho operacional (blocker: DR-05 no appliance)
@@ -664,7 +664,7 @@ CHECKPOINT CANONICO
 ### Tecnico
 
 - A referencia de **instalacao publica** continua a ser o pacote `1.8.3` ate
-  nova release; o branch carrega `PORTVERSION=1.8.11` com `PORTREVISION=5` para
+  nova release; o branch carrega `PORTVERSION=1.8.11` com `PORTREVISION=6` para
   o proximo empacotamento.
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.

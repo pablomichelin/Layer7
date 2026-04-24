@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F4.1 / PHP (pidfile)
+
+- **`layer7.inc`** — `layer7_daemon_pid_from_file()` (primeira linha, trim,
+  só dígitos); uso em `layer7_ensure_daemon_running`, `layer7_restart_service`,
+  `layer7_signal_reload`, `layer7_read_stats`
+- **`layer7_status.php`**, **`layer7_diagnostics.php`** — leitura do pidfile
+  via helper (alinhado a `rc.d` / scripts sh)
+- **`Makefile` (`PORTREVISION`)** — `6` (rebuild `1.8.11_6`)
+
 ### Documentation — gates F4 e índice de roteiros (lab)
 
 - **`validacao-lab.md`** — tabela **Índice dos roteiros F4** (10a / 10b / 11 ↔
