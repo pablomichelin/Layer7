@@ -649,17 +649,6 @@ dst_cache_flush(void)
 	s_n_dst = 0;
 }
 
-static int
-bl_rule_has_cat(const struct l7_bl_rule *rule, const char *cat)
-{
-	int i;
-	for (i = 0; i < rule->n_categories; i++) {
-		if (strcmp(rule->categories[i], cat) == 0)
-			return 1;
-	}
-	return 0;
-}
-
 /*
  * Verifica se src_ip (string "a.b.c.d") esta dentro de cidr_str
  * (string "a.b.c.d/prefix" ou "a.b.c.d"). Retorna 1 se sim, 0 se nao.
@@ -708,6 +697,21 @@ ip_in_cidr(const char *src_ip, const char *cidr_str)
 		return src == net;
 	mask = (uint32_t)(0xffffffffU << (unsigned)(32 - prefix));
 	return (src & mask) == (net & mask);
+}
+
+static int
+bl_rule_matches_domain(const struct l7_bl_rule *rule, const char *domain,
+    const char **matched_cat)
+{
+	const char *cats[L7_BL_MAX_CATS];
+	int i;
+
+	if (!rule || !domain || rule->n_categories <= 0)
+		return 0;
+	for (i = 0; i < rule->n_categories && i < L7_BL_MAX_CATS; i++)
+		cats[i] = rule->categories[i];
+	return l7_blacklist_lookup_categories(s_blacklist, domain, cats, i,
+	    matched_cat);
 }
 
 /*
@@ -833,11 +837,10 @@ bl_flush_rule_tables(void)
 }
 
 static void
-layer7_on_dns_resolved(const char *iface, const char *domain,
-    const char *resolved_ip, uint32_t ttl)
+layer7_on_dns_resolved(const char *iface, const char *client_ip,
+    const char *domain, const char *resolved_ip, uint32_t ttl)
 {
 	int r;
-	const char *bl_cat;
 
 	if (!s_have_parse || !s_ge)
 		return;
@@ -862,32 +865,31 @@ layer7_on_dns_resolved(const char *iface, const char *domain,
 	if (s_blacklist && s_bl_n_rules > 0) {
 		int ri;
 		s_bl_lookups++;
-		bl_cat = l7_blacklist_lookup(s_blacklist, domain);
-		if (bl_cat) {
+		for (ri = 0; ri < s_bl_n_rules; ri++) {
+			char tbl[32];
+			const char *matched_cat = NULL;
+			if (!s_bl_rules[ri].enabled)
+				continue;
+			if (!bl_rule_matches_src(&s_bl_rules[ri], client_ip))
+				continue;
+			if (!bl_rule_matches_domain(&s_bl_rules[ri], domain,
+			    &matched_cat))
+				continue;
 			s_bl_hits++;
 			s_bl_dns_hits++;
-			for (ri = 0; ri < s_bl_n_rules; ri++) {
-				char tbl[32];
-				if (!s_bl_rules[ri].enabled)
-					continue;
-				if (!bl_rule_has_cat(&s_bl_rules[ri],
-				    bl_cat))
-					continue;
-				snprintf(tbl, sizeof(tbl),
-				    "layer7_bld_%d", ri);
-				r = layer7_pf_add_with_selfheal(tbl,
-				    resolved_ip, "dns_blacklist_rule");
-				if (r == 0) {
-					s_pf_dst_add_ok++;
-					L7_INFO("bl_block: iface=%s domain=%s "
-					    "cat=%s ip=%s rule=%d/%s "
-					    "table=%s", iface ? iface : "-",
-					    domain, bl_cat,
-					    resolved_ip, ri,
-					    s_bl_rules[ri].name, tbl);
-				} else {
-					s_pf_dst_add_fail++;
-				}
+			snprintf(tbl, sizeof(tbl), "layer7_bld_%d", ri);
+			r = layer7_pf_add_with_selfheal(tbl, resolved_ip,
+			    "dns_blacklist_rule");
+			if (r == 0) {
+				s_pf_dst_add_ok++;
+				L7_INFO("bl_block: iface=%s domain=%s "
+				    "cat=%s client=%s ip=%s rule=%d/%s "
+				    "table=%s", iface ? iface : "-",
+				    domain, matched_cat ? matched_cat : "-",
+				    client_ip ? client_ip : "-", resolved_ip,
+				    ri, s_bl_rules[ri].name, tbl);
+			} else {
+				s_pf_dst_add_fail++;
 			}
 		}
 	}
@@ -982,29 +984,26 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		}
 	}
 
-	/* SNI/host blacklist check (Melhoria B) — apos decisao de politica manual */
-	if (s_blacklist && s_bl_n_rules > 0 && host && *host &&
-	    dec.action != LAYER7_ACTION_BLOCK && dst_ip &&
-	    layer7_pf_ipv4_host_ok(dst_ip)) {
-		const char *bl_cat;
-		int ri;
+		/* SNI/host blacklist check (Melhoria B) — apos decisao de politica manual */
+		if (s_blacklist && s_bl_n_rules > 0 && host && *host &&
+		    dec.action != LAYER7_ACTION_BLOCK && dst_ip &&
+		    layer7_pf_ipv4_host_ok(dst_ip)) {
+			int ri;
 
-		s_bl_lookups++;
-		bl_cat = l7_blacklist_lookup(s_blacklist, host);
-		if (bl_cat) {
-			s_bl_hits++;
-			s_bl_sni_hits++;
+			s_bl_lookups++;
 			for (ri = 0; ri < s_bl_n_rules; ri++) {
 				char tbl[32];
+				const char *matched_cat = NULL;
 				if (!s_bl_rules[ri].enabled)
 					continue;
-				if (!bl_rule_has_cat(&s_bl_rules[ri], bl_cat))
+				if (!bl_rule_matches_src(&s_bl_rules[ri], src_ip))
 					continue;
-				if (!bl_rule_matches_src(&s_bl_rules[ri],
-				    src_ip))
+				if (!bl_rule_matches_domain(&s_bl_rules[ri],
+				    host, &matched_cat))
 					continue;
-				snprintf(tbl, sizeof(tbl),
-				    "layer7_bld_%d", ri);
+				s_bl_hits++;
+				s_bl_sni_hits++;
+				snprintf(tbl, sizeof(tbl), "layer7_bld_%d", ri);
 				r = layer7_pf_add_with_selfheal(tbl, dst_ip,
 				    "sni_blacklist");
 				if (r == 0) {
@@ -1012,15 +1011,15 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 					L7_INFO("sni_bl_block: iface=%s "
 					    "host=%s cat=%s src=%s dst=%s "
 					    "rule=%d/%s table=%s",
-					    iface ? iface : "-",
-					    host, bl_cat, src_ip, dst_ip,
-					    ri, s_bl_rules[ri].name, tbl);
+					    iface ? iface : "-", host,
+					    matched_cat ? matched_cat : "-",
+					    src_ip, dst_ip, ri,
+					    s_bl_rules[ri].name, tbl);
 				} else {
 					s_pf_dst_add_fail++;
 				}
 			}
 		}
-	}
 
 	if (dec.action == LAYER7_ACTION_TAG) {
 		r = -1;
@@ -1936,63 +1935,42 @@ int main(int argc, char **argv)
 				struct l7_blacklist *old_bl;
 				int bl_load_ok = 0;
 
-				bl_flush_rule_tables();
-				memset(s_bl_rules, 0, sizeof(s_bl_rules));
-				s_bl_n_rules = 0;
-
+				memset(&bl_cfg, 0, sizeof(bl_cfg));
 				if (l7_bl_config_load(
 				    L7_BL_DIR_DEFAULT "/config.json",
-				    &bl_cfg) == 0
-				    && bl_cfg.enabled
-				    && bl_cfg.n_rules > 0) {
+				    &bl_cfg) == 0 && bl_cfg.enabled &&
+				    bl_cfg.n_rules > 0) {
 					const char *all_cats[L7_BL_MAX_CATS];
 					const char *bwl[L7_BL_WL_MAX];
 					int all_n = 0, ri, ci, ai, found;
 
-					for (ri = 0; ri < bl_cfg.n_rules;
-					    ri++) {
-						for (ci = 0; ci <
-						    bl_cfg.rules[ri]
-						    .n_categories; ci++) {
+					for (ri = 0; ri < bl_cfg.n_rules; ri++) {
+						for (ci = 0;
+						    ci < bl_cfg.rules[ri].n_categories;
+						    ci++) {
 							found = 0;
-							for (ai = 0;
-							    ai < all_n;
-							    ai++) {
+							for (ai = 0; ai < all_n; ai++) {
 								if (strcmp(
 								    all_cats[ai],
-								    bl_cfg.rules[ri]
-								    .categories[ci])
-								    == 0) {
+								    bl_cfg.rules[ri].categories[ci]) == 0) {
 									found = 1;
 									break;
 								}
 							}
-							if (!found &&
-							    all_n <
-							    L7_BL_MAX_CATS)
+							if (!found && all_n < L7_BL_MAX_CATS)
 								all_cats[all_n++] =
-								    bl_cfg
-								    .rules[ri]
-								    .categories[ci];
+								    bl_cfg.rules[ri].categories[ci];
 						}
 					}
 
-					for (ai = 0;
-					    ai < bl_cfg.n_whitelist;
-					    ai++)
-						bwl[ai] =
-						    bl_cfg.whitelist[ai];
-
-					memcpy(s_bl_rules, bl_cfg.rules,
-					    sizeof(bl_cfg.rules));
-					s_bl_n_rules = bl_cfg.n_rules;
+					for (ai = 0; ai < bl_cfg.n_whitelist; ai++)
+						bwl[ai] = bl_cfg.whitelist[ai];
 
 					if (all_n > 0) {
 						new_bl = l7_blacklist_load(
 						    L7_BL_DIR_DEFAULT,
 						    all_cats, all_n,
-						    bwl,
-						    bl_cfg.n_whitelist);
+						    bwl, bl_cfg.n_whitelist);
 					}
 
 					if (new_bl || all_n == 0) {
@@ -2007,19 +1985,28 @@ int main(int argc, char **argv)
 						    new_bl ?
 						    l7_blacklist_cat_count(
 						    new_bl) : 0,
-						    s_bl_n_rules);
+						    bl_cfg.n_rules);
 					} else {
 						L7_WARN("blacklists: "
 						    "rules loaded (%d), "
 						    "but failed to load "
 						    "UT1 categories",
-						    s_bl_n_rules);
+						    bl_cfg.n_rules);
 					}
 				} else {
 					bl_load_ok = 1;
 				}
 
 				if (bl_load_ok) {
+					bl_flush_rule_tables();
+					memset(s_bl_rules, 0, sizeof(s_bl_rules));
+					if (bl_cfg.enabled && bl_cfg.n_rules > 0) {
+						memcpy(s_bl_rules, bl_cfg.rules,
+						    sizeof(bl_cfg.rules));
+						s_bl_n_rules = bl_cfg.n_rules;
+					} else {
+						s_bl_n_rules = 0;
+					}
 					old_bl = s_blacklist;
 					s_blacklist = new_bl;
 					if (old_bl)

@@ -21,6 +21,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends build-essential bmake
           sh scripts/package/smoke-layer7d.sh
+      - name: Shell syntax
+        run: |
+          find scripts package/pfSense-pkg-layer7/files -type f \( -name '*.sh' -o -name 'pkg-*' -o -name 'layer7-pfctl' -o -path '*/rc.d/*' \) -print0 |
+            xargs -0 -n1 sh -n
 
   # Só valida pkg-plist vs files/ — não compila layer7d (smoke completo: job Linux ou FreeBSD).
   check-windows:

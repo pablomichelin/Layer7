@@ -36,6 +36,14 @@ struct l7_blacklist *l7_blacklist_load(const char *dir,
 const char *l7_blacklist_lookup(const struct l7_blacklist *bl,
     const char *domain);
 
+/*
+ * Verifica se dominio pertence a uma das categorias fornecidas.
+ * matched_cat, quando nao-NULL, recebe a categoria exacta encontrada.
+ */
+int l7_blacklist_lookup_categories(const struct l7_blacklist *bl,
+    const char *domain, const char **cats, int n_cats,
+    const char **matched_cat);
+
 /* Liberta toda a memoria da blacklist. */
 void l7_blacklist_free(struct l7_blacklist *bl);
 

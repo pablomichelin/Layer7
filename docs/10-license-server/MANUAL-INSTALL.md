@@ -82,6 +82,19 @@ interface na geracao de `rdr` seguem o mesmo padrao restritivo que o
 anti-QUIC; se o `pfctl` falhar ao carregar o anchor, o sistema pode registar
 um aviso no log do pfSense (`log_error`).
 
+**Addendum operacional da F4.2 adicional (`1.8.11_7`, branch de trabalho):**
+a trilha de blacklists passa a falhar de forma mais segura em reload: se uma
+nova carga de categorias falhar, o daemon preserva a blacklist anterior e as
+tabelas activas, em vez de limpar o estado antes de validar a nova carga. A
+classificacao por DNS passa a usar o IP do cliente observado na resposta DNS
+para respeitar `src_cidrs` por regra, alinhando-se ao comportamento por SNI.
+A GUI passa a mostrar erro quando nao conseguir gravar
+`/usr/local/etc/layer7/blacklists/config.json` ou os overlays
+`_custom/*.domains`; o package ajusta permissoes para `www:wheel`. O cron de
+auto-update usa `update_interval_hours` para gerar campos cron coerentes. Estes
+pontos exigem build no FreeBSD builder e evidencia no appliance antes de
+fechamento F4.2/F4.3.
+
 **Addendum operacional da F2.5:** a operacao do license server passa a usar
 runbooks canónicos especificos para segredos/bootstrap administrativo e
 backup/restore do PostgreSQL:

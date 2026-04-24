@@ -208,6 +208,7 @@ observe_dns_response(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 	uint16_t qd, an, i;
 	char qname[L7C_DNS_HOST_MAX];
 
+	(void)sa;
 	if (sp != 53 || dp == 53 || !payload || payload_len < 12)
 		return;
 
@@ -246,17 +247,20 @@ observe_dns_response(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 			    ((uint32_t)payload[off + 1] << 16) |
 			    ((uint32_t)payload[off + 2] << 8) |
 			    (uint32_t)payload[off + 3];
-			(void)sa;
-			(void)da;
 			dns_hint_store(ip, qname, now);
 
 			if (cap->dns_cb) {
 				char ip_str[INET_ADDRSTRLEN];
+				char client_ip_str[INET_ADDRSTRLEN];
 				struct in_addr addr;
 				addr.s_addr = htonl(ip);
 				inet_ntop(AF_INET, &addr, ip_str,
 				    sizeof(ip_str));
-				cap->dns_cb(cap->ifname, qname, ip_str, ttl);
+				addr.s_addr = htonl(da);
+				inet_ntop(AF_INET, &addr, client_ip_str,
+				    sizeof(client_ip_str));
+				cap->dns_cb(cap->ifname, client_ip_str, qname,
+				    ip_str, ttl);
 			}
 		}
 		off += rdlen;

@@ -28,7 +28,7 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Ultima versao do pacote publicada em release:** `1.8.3` (referencia de instalacao
 em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases).
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_6` (`PORTVERSION=1.8.11`, `PORTREVISION=6`;
++ `PORTREVISION`):** `1.8.11_7` (`PORTVERSION=1.8.11`, `PORTREVISION=7`;
 artefacto ainda nao publicado; actualizar manual e procedimentos na mesma
 entrega de release).
 **Data-base deste checkpoint:** `2026-04-24`
@@ -247,6 +247,22 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 | F5 | Malha de testes e regressao | preparacao (`f5-preparacao-malha.md`); fase plena apos criterio F4 | formalizar cobertura, evidencias e gates de nao regressao |
 | F6 | Reorganizacao estrutural controlada | planeada | mover/normalizar estrutura apenas com mapa e rollback |
 | F7 | Observabilidade e release engineering | planeada | fortalecer telemetria, verificacao de artefactos e governanca de release |
+
+---
+
+### Checkpoint F4 adicional (`1.8.11_7`)
+
+Bloco tecnico em curso no branch de trabalho, ainda sem release publica:
+reload seguro de blacklists passa a preservar a blacklist anterior e as
+tabelas activas se a nova carga falhar; DNS/SNI de blacklists passam a casar
+categoria por regra e origem do cliente antes de popular `layer7_bld_N`;
+dominios pertencentes a multiplas categorias passam a preservar mascara de
+categorias; GUI/package passam a preparar permissoes de
+`/usr/local/etc/layer7/blacklists` para `www:wheel` e a falhar visivelmente se
+`config.json` ou `_custom/*.domains` nao puderem ser gravados; cron de
+auto-update passa a mapear `update_interval_hours` para campos cron coerentes;
+CI ganha syntax check shell. Gate real permanece no builder FreeBSD e no
+appliance pfSense; smoke local em macOS nao conta como evidencia de fase.
 
 ---
 

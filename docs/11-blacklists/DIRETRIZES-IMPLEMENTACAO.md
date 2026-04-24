@@ -70,7 +70,8 @@ docs/11-blacklists/             ← documentação desta feature
 ### 1.4 Versionamento
 
 - **PORTVERSION** no `package/pfSense-pkg-layer7/Makefile` deve ser
-  incrementado (ex: `1.0.2` → `1.1.0` para esta feature)
+  incrementado apenas quando a mudanca exigir nova versao base; para rebuilds
+  do mesmo port, incrementar `PORTREVISION` (ex.: `1.8.11_6` -> `1.8.11_7`)
 - O `version.str` é gerado automaticamente pelo build
 - Nunca hardcodar versões em código C ou PHP
 

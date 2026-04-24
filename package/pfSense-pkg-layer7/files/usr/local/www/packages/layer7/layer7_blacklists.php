@@ -54,9 +54,12 @@ $custom_map = layer7_bl_category_custom_get($bl_config);
 /* POST: Download */
 if (isset($_POST["do_download"])) {
 	$bl_config["source_url"] = layer7_bl_official_manifest_url();
-	layer7_bl_config_save($bl_config);
-	layer7_bl_download_start();
-	$savemsg = l7_t("Download iniciado. Acompanhe o progresso abaixo.");
+	if (!layer7_bl_config_save($bl_config)) {
+		$input_errors[] = l7_t("Nao foi possivel guardar a configuracao de blacklists.");
+	} else {
+		layer7_bl_download_start();
+		$savemsg = l7_t("Download iniciado. Acompanhe o progresso abaixo.");
+	}
 }
 
 /* POST: Save rule */
@@ -138,9 +141,13 @@ if (isset($_POST["save_rule"])) {
 				}
 			}
 			$bl_config["enabled"] = $has_any;
-			layer7_bl_config_save($bl_config);
-			layer7_bl_apply();
-			$savemsg = l7_t("Regra guardada. Daemon e regras PF actualizados.");
+				if (!layer7_bl_config_save($bl_config)) {
+					$input_errors[] = l7_t("Nao foi possivel guardar a regra de blacklist.");
+				} elseif (!layer7_bl_apply()) {
+					$input_errors[] = l7_t("Configuracao guardada, mas nao foi possivel aplicar as blacklists.");
+				} else {
+					$savemsg = l7_t("Regra guardada. Daemon e regras PF actualizados.");
+				}
 		}
 	}
 }
@@ -159,9 +166,13 @@ if (isset($_POST["delete_rule"])) {
 			}
 		}
 		$bl_config["enabled"] = $has_any;
-		layer7_bl_config_save($bl_config);
-		layer7_bl_apply();
-		$savemsg = l7_t("Regra removida.");
+			if (!layer7_bl_config_save($bl_config)) {
+				$input_errors[] = l7_t("Nao foi possivel remover a regra de blacklist.");
+			} elseif (!layer7_bl_apply()) {
+				$input_errors[] = l7_t("Regra removida, mas nao foi possivel aplicar as blacklists.");
+			} else {
+				$savemsg = l7_t("Regra removida.");
+			}
 	}
 }
 
@@ -170,9 +181,13 @@ if (isset($_POST["save_whitelist"])) {
 	$wl_raw = trim($_POST["whitelist"] ?? "");
 	$wl = layer7_bl_domains_normalize($wl_raw);
 	$bl_config["whitelist"] = $wl;
-	layer7_bl_config_save($bl_config);
-	layer7_bl_apply();
-	$savemsg = l7_t("Whitelist guardada. Daemon recarregado.");
+	if (!layer7_bl_config_save($bl_config)) {
+		$input_errors[] = l7_t("Nao foi possivel guardar a whitelist.");
+	} elseif (!layer7_bl_apply()) {
+		$input_errors[] = l7_t("Whitelist guardada, mas nao foi possivel aplicar as blacklists.");
+	} else {
+		$savemsg = l7_t("Whitelist guardada. Daemon recarregado.");
+	}
 }
 
 /* POST: Save custom category/extension */
@@ -190,23 +205,31 @@ if (isset($_POST["save_cat_sites"])) {
 		if (!isset($bl_config["category_custom"]) || !is_array($bl_config["category_custom"])) {
 			$bl_config["category_custom"] = array();
 		}
-		$bl_config["category_custom"][$cat_id] = $cat_sites;
-		ksort($bl_config["category_custom"]);
-		layer7_bl_config_save($bl_config);
-		layer7_bl_apply();
-		$savemsg = l7_t("Categoria personalizada guardada.");
+			$bl_config["category_custom"][$cat_id] = $cat_sites;
+			ksort($bl_config["category_custom"]);
+			if (!layer7_bl_config_save($bl_config)) {
+				$input_errors[] = l7_t("Nao foi possivel guardar a categoria personalizada.");
+			} elseif (!layer7_bl_apply()) {
+				$input_errors[] = l7_t("Categoria guardada, mas nao foi possivel sincronizar os ficheiros de dominios.");
+			} else {
+				$savemsg = l7_t("Categoria personalizada guardada.");
+			}
 	}
 }
 
 /* POST: Delete custom category/extension */
 if (isset($_POST["delete_cat_sites"])) {
-	$cat_id = strtolower(trim($_POST["cat_id"] ?? ""));
-	if (isset($bl_config["category_custom"][$cat_id])) {
-		unset($bl_config["category_custom"][$cat_id]);
-		layer7_bl_config_save($bl_config);
-		layer7_bl_apply();
-		$savemsg = l7_t("Categoria personalizada removida.");
-	}
+		$cat_id = strtolower(trim($_POST["cat_id"] ?? ""));
+		if (isset($bl_config["category_custom"][$cat_id])) {
+			unset($bl_config["category_custom"][$cat_id]);
+			if (!layer7_bl_config_save($bl_config)) {
+				$input_errors[] = l7_t("Nao foi possivel remover a categoria personalizada.");
+			} elseif (!layer7_bl_apply()) {
+				$input_errors[] = l7_t("Categoria removida, mas nao foi possivel aplicar as blacklists.");
+			} else {
+				$savemsg = l7_t("Categoria personalizada removida.");
+			}
+		}
 }
 
 /* POST: Save settings */
@@ -216,10 +239,12 @@ if (isset($_POST["save_settings"])) {
 	if ($hours < 1) $hours = 1;
 	if ($hours > 168) $hours = 168;
 	$bl_config["update_interval_hours"] = $hours;
-	layer7_bl_config_save($bl_config);
-	$cron_hour = $hours <= 24 ? "3" : "*/" . (int)($hours / 24);
-	layer7_bl_setup_cron($bl_config["auto_update"], $cron_hour);
-	$savemsg = l7_t("Definicoes guardadas.");
+	if (!layer7_bl_config_save($bl_config)) {
+		$input_errors[] = l7_t("Nao foi possivel guardar as definicoes.");
+	} else {
+		layer7_bl_setup_cron($bl_config["auto_update"], $hours);
+		$savemsg = l7_t("Definicoes guardadas.");
+	}
 }
 
 /* Reload after any save */

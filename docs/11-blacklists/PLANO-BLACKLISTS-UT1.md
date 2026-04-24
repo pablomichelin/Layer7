@@ -33,15 +33,19 @@
 > `fallback.state` e `send_sighup`: secção **10b** de
 > [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md); testes
 > **12.1–12.2** em [`docs/tests/test-matrix.md`](../tests/test-matrix.md).
+> Bloco F4.2 adicional (`1.8.11_7`): reload falhado preserva a blacklist
+> anterior e as tabelas activas ate a nova carga ser valida; DNS/SNI validam a
+> regra e a origem antes de popular `layer7_bld_N`; dominios em multiplas
+> categorias passam a casar com a categoria seleccionada pela regra.
 
 ---
 
-## Estado atual (v1.7.2)
+## Estado actual da trilha F4
 
 ### Melhorias pós-V1 implementadas (2026-03-31)
 
-- [x] **Melhoria A — DNS Forçado via PF `rdr`**: campo `force_dns` por regra; regras `rdr pass` geradas dinamicamente por `layer7-pfctl` e `layer7_pf_default_rules_text()`; checkbox na GUI; `nat_rules_needed` hook no `layer7.xml`
-- [x] **Melhoria B — Bloqueio por TLS SNI**: `layer7_on_classified_flow()` verifica SNI/host contra blacklist; `ip_in_cidr()` + `bl_rule_matches_src()` em `main.c`; dst_ip adicionado à tabela `layer7_bld_N` correcta
+- [x] **Melhoria A — DNS Forçado via PF `rdr`**: campo `force_dns` por regra; regras `rdr pass` geradas dinamicamente por `layer7_inject_nat_to_anchor()` no anchor `natrules/layer7_nat`; checkbox na GUI
+- [x] **Melhoria B — Bloqueio por DNS/SNI**: DNS e SNI validam categoria da regra, origem (`src_cidrs`) e dominios sobrepostos antes de adicionar IP à tabela `layer7_bld_N` correcta
 - [x] **Melhoria C — Estatísticas DNS vs SNI**: contadores `bl_dns_hits` e `bl_sni_hits` no stats JSON
 
 ---
@@ -71,7 +75,9 @@ Layer7 é um produto comercial da **Systemup Solução em Tecnologia**
 camada 7 e aplica políticas de bloqueio/monitoramento. O produto inclui
 uma GUI PHP integrada ao pfSense com 10 páginas.
 
-**Versão actual: 1.0.2** — V1 Comercial concluída e publicada.
+**Referência publica actual: 1.8.3** — V1 Comercial concluída e publicada.
+**Branch de trabalho:** `1.8.11_7` no port, ainda sujeito aos gates F4 em
+builder FreeBSD e appliance pfSense antes de release.
 
 O daemon já suporta bloqueio por domínio/site via observação DNS:
 quando uma resposta DNS é capturada e o domínio pertence a uma política

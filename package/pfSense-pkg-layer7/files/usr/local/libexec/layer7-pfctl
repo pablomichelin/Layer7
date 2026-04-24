@@ -128,8 +128,9 @@ EOF
 	fi
 }
 
-# Nota: as regras rdr para DNS forcado (force_dns) sao injectadas pelo pfSense
-# via o hook nat_rules_needed -> layer7_generate_nat_rules() em layer7.inc.
+	# Nota: as regras rdr para DNS forcado (force_dns) sao injectadas
+	# directamente por layer7_inject_nat_to_anchor() em layer7.inc, porque
+	# pfSense CE nao processa nat_rules_needed para packages.
 
 flush_tables() {
 	/sbin/pfctl -t "${TABLE_BLOCK}" -T flush >/dev/null 2>&1 || true

@@ -31,7 +31,7 @@ sh scripts/package/check-port-files.sh
 sh scripts/package/smoke-layer7d.sh
 ```
 
-O `make package` (gerar `.txz`) continua a exigir **FreeBSD** — WSL Ubuntu não produz binário compatível com pfSense.
+O `make package` (gerar `.pkg`) continua a exigir **FreeBSD** — WSL Ubuntu não produz binário compatível com pfSense.
 
 ### 3. Verificação local (PowerShell)
 
@@ -45,7 +45,7 @@ Ver [`scripts/package/README.md`](../../scripts/package/README.md).
 
 ### 4. Lab completo (builder + pfSense)
 
-Para **validação em lab** (build `.txz`, `pkg add`, serviço, GUI):
+Para **validação em lab** (build `.pkg`, `pkg add`, serviço, GUI):
 
 1. Provisionar **VM FreeBSD** conforme [`builder-freebsd.md`](builder-freebsd.md)
 2. Provisionar **pfSense CE** conforme [`lab-topology.md`](lab-topology.md)
@@ -59,5 +59,5 @@ Pode usar Hyper-V, VMware ou VirtualBox no Windows para as VMs.
 |---------------------|----------------|------------|-----------|-------------|
 | check-port-files    | PowerShell     | sh         | sim       | sh          |
 | smoke layer7d       | não            | sim        | sim       | sim         |
-| make package (.txz) | não            | não        | não       | sim         |
+| make package (.pkg) | não            | não        | não       | sim         |
 | pkg add + serviço   | não            | não        | não       | pfSense VM  |

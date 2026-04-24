@@ -414,6 +414,23 @@ json_safe_string(const char *s)
 	return 1;
 }
 
+static int
+shell_safe_url(const char *s)
+{
+	const unsigned char *p;
+
+	if (!s || strncmp(s, "https://", 8) != 0)
+		return 0;
+	for (p = (const unsigned char *)s; *p; p++) {
+		if (*p <= 0x20 || *p == 0x7f || *p == '\'' || *p == '"' ||
+		    *p == '\\' || *p == '`' || *p == '$' || *p == ';' ||
+		    *p == '|' || *p == '&' || *p == '<' || *p == '>' ||
+		    *p == '(' || *p == ')')
+			return 0;
+	}
+	return 1;
+}
+
 int
 layer7_activate(const char *key, const char *url)
 {
@@ -442,6 +459,11 @@ layer7_activate(const char *key, const char *url)
 
 	if (!url || url[0] == '\0')
 		url = "https://license.systemup.inf.br/api/activate";
+	if (!shell_safe_url(url)) {
+		fprintf(stderr,
+		    "layer7d: activation URL must be https and shell-safe\n");
+		return -1;
+	}
 
 	fprintf(stderr, "layer7d: activating...\n");
 	fprintf(stderr, "  server:       %s\n", url);
@@ -454,16 +476,15 @@ layer7_activate(const char *key, const char *url)
 	snprintf(cmd, sizeof(cmd),
 	    "curl -sf -o %s -X POST "
 	    "-H 'Content-Type: application/json' "
-	    "-d '%s' '%s' 2>/dev/null || "
-	    "fetch -qo %s -T 15 '%s' 2>/dev/null",
-	    L7_LIC_PATH, body, url,
-	    L7_LIC_PATH, url);
+	    "-d '%s' '%s' 2>/dev/null",
+	    L7_LIC_PATH, body, url);
 
 	rc = system(cmd);
 	if (rc != 0) {
 		fprintf(stderr,
 		    "layer7d: activation failed — could not reach "
 		    "license server at %s\n"
+		    "  The activation client requires curl for POST.\n"
 		    "  Ensure the server is running and reachable.\n"
 		    "  Alternatively, place a valid .lic file at %s\n",
 		    url, L7_LIC_PATH);

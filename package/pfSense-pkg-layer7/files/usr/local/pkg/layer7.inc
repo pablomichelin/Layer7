@@ -1431,11 +1431,25 @@ function layer7_bl_config_load()
 
 function layer7_bl_config_save($config)
 {
-	@mkdir(L7_BL_DIR, 0755, true);
+	if (!is_dir(L7_BL_DIR) && !@mkdir(L7_BL_DIR, 0775, true)) {
+		return false;
+	}
+	@chown(L7_BL_DIR, "www");
+	@chgrp(L7_BL_DIR, "wheel");
+	@chmod(L7_BL_DIR, 0775);
 	$config["source_url"] = layer7_bl_normalize_source_url($config["source_url"] ?? "");
 	$config["mirror_urls"] = layer7_bl_official_mirror_urls();
 	$json = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-	file_put_contents(L7_BL_CONFIG, $json . "\n", LOCK_EX);
+	if (!is_string($json)) {
+		return false;
+	}
+	if (@file_put_contents(L7_BL_CONFIG, $json . "\n", LOCK_EX) === false) {
+		return false;
+	}
+	@chown(L7_BL_CONFIG, "www");
+	@chgrp(L7_BL_CONFIG, "wheel");
+	@chmod(L7_BL_CONFIG, 0664);
+	return true;
 }
 
 function layer7_bl_discovered_load()
@@ -1466,7 +1480,12 @@ function layer7_bl_last_update()
 
 function layer7_bl_download_start()
 {
-	@mkdir(L7_BL_DIR, 0755, true);
+	if (!is_dir(L7_BL_DIR)) {
+		@mkdir(L7_BL_DIR, 0775, true);
+	}
+	@chown(L7_BL_DIR, "www");
+	@chgrp(L7_BL_DIR, "wheel");
+	@chmod(L7_BL_DIR, 0775);
 	$cmd = L7_BL_SCRIPT . " --download";
 	if (function_exists("mwexec_bg")) {
 		mwexec_bg($cmd);
@@ -1485,7 +1504,9 @@ function layer7_bl_download_status()
 
 function layer7_bl_apply()
 {
-	layer7_bl_sync_custom_category_files();
+	if (!layer7_bl_sync_custom_category_files()) {
+		return false;
+	}
 
 	$helper = layer7_pf_helper_path();
 	$ensure_ok = true;
@@ -1517,6 +1538,7 @@ function layer7_bl_apply()
 		}
 	}
 	layer7_signal_reload();
+	return true;
 }
 
 function layer7_bl_category_id_valid($id)
@@ -1583,31 +1605,76 @@ function layer7_bl_sync_custom_category_files($cfg = null)
 	}
 	$custom = layer7_bl_category_custom_get($cfg);
 	$dir = L7_BL_DIR . '/_custom';
-	@mkdir($dir, 0755, true);
+	if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+		return false;
+	}
+	@chown($dir, "www");
+	@chgrp($dir, "wheel");
+	@chmod($dir, 0775);
 
 	$keep = array();
 	foreach ($custom as $cat => $domains) {
 		$path = $dir . '/' . $cat . '.domains';
 		$keep[$path] = true;
 		$content = implode("\n", $domains) . "\n";
-		@file_put_contents($path, $content, LOCK_EX);
+		if (@file_put_contents($path, $content, LOCK_EX) === false) {
+			return false;
+		}
+		@chown($path, "www");
+		@chgrp($path, "wheel");
+		@chmod($path, 0664);
 	}
 
 	$existing = glob($dir . '/*.domains');
 	if (is_array($existing)) {
 		foreach ($existing as $path) {
-			if (!isset($keep[$path])) {
-				@unlink($path);
+				if (!isset($keep[$path])) {
+					@unlink($path);
+				}
 			}
 		}
-	}
+	return true;
 }
 
-function layer7_bl_setup_cron($enabled, $hour)
+function layer7_bl_cron_fields_for_interval($hours)
+{
+	$hours = (int)$hours;
+	if ($hours < 1) {
+		$hours = 1;
+	}
+	if ($hours > 168) {
+		$hours = 168;
+	}
+	if ($hours < 24) {
+		return array("minute" => "0", "hour" => "*/" . $hours,
+		    "day" => "*", "month" => "*", "dow" => "*");
+	}
+	if ($hours === 168) {
+		return array("minute" => "0", "hour" => "3",
+		    "day" => "*", "month" => "*", "dow" => "0");
+	}
+	if ($hours === 24) {
+		return array("minute" => "0", "hour" => "3",
+		    "day" => "*", "month" => "*", "dow" => "*");
+	}
+	$days = (int)ceil($hours / 24);
+	if ($days < 2) {
+		$days = 2;
+	}
+	if ($days > 6) {
+		$days = 6;
+	}
+	return array("minute" => "0", "hour" => "3",
+	    "day" => "*/" . $days, "month" => "*", "dow" => "*");
+}
+
+function layer7_bl_setup_cron($enabled, $interval_hours)
 {
 	$cmd = L7_BL_SCRIPT;
 	if (function_exists("install_cron_job")) {
-		install_cron_job($cmd, $enabled, "0", (string)$hour, "*", "*", "*");
+		$f = layer7_bl_cron_fields_for_interval($interval_hours);
+		install_cron_job($cmd, $enabled, $f["minute"], $f["hour"],
+		    $f["day"], $f["month"], $f["dow"]);
 	}
 }
 

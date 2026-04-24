@@ -114,6 +114,14 @@ vivo; `do_restore_lkg` adquire o mesmo lock que `do_download`; `layer7-pfctl`
 invoca `/sbin/pfctl` em todos os ramos; `PORTVERSION` `1.8.11`.
 **Bloco adicional:** `send_sighup` normaliza espaços em branco em volta do
 PID lido; `PORTREVISION` `3` (`1.8.11_3`).
+**Bloco adicional (`PORTREVISION` `7` / `1.8.11_7`):** reload do daemon passa
+a manter blacklist e tabelas anteriores se a nova carga falhar; DNS passa a
+receber IP do cliente observado na resposta e a respeitar `src_cidrs` por
+regra; DNS/SNI passam a fazer lookup por categorias da regra, corrigindo
+dominios presentes em mais de uma categoria; GUI/package passam a garantir
+permissoes gravaveis para `config.json` e overlays `_custom`, com erro visivel
+ao operador; cron de auto-update passa a usar campos coerentes com
+`update_interval_hours`.
 
 **Liga a:** BG-010, aspectos de BG-020/021 no runtime do consumidor.
 

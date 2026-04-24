@@ -71,11 +71,11 @@ if ($_POST["import_config"] ?? false) {
 					if (!isset($data["layer7"]["exceptions"]) || !is_array($data["layer7"]["exceptions"])) {
 						$data["layer7"]["exceptions"] = array();
 					}
-					$save_ok = layer7_save_json($data);
-					if ($save_ok && isset($imported["blacklists"]) && is_array($imported["blacklists"])) {
-						layer7_bl_config_save($imported["blacklists"]);
-						layer7_bl_sync_custom_category_files($imported["blacklists"]);
-					}
+						$save_ok = layer7_save_json($data);
+						if ($save_ok && isset($imported["blacklists"]) && is_array($imported["blacklists"])) {
+							$save_ok = layer7_bl_config_save($imported["blacklists"]) &&
+								layer7_bl_sync_custom_category_files($imported["blacklists"]);
+						}
 					if ($save_ok) {
 						layer7_signal_reload();
 						if (function_exists("filter_configure")) {

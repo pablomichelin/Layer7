@@ -11,7 +11,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 | **Website** | <https://www.systemup.inf.br> |
 | **Distribuicao publica** | <https://github.com/pablomichelin/Layer7> |
 | **Licenca** | EULA (ver `LICENSE`) |
-| **Versao actual** | **1.8.0** |
+| **Versao publica actual** | **1.8.3** |
 | **Compatibilidade** | pfSense CE 2.7.x / 2.8.x - FreeBSD 14/15 |
 
 ## O que faz
@@ -65,7 +65,7 @@ Pacote comercial para **pfSense CE**: classificacao Layer 7 em tempo real via **
 
 ```bash
 # No pfSense (SSH como root):
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.0/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
 ```
 
 Depois aceda a **Services > Layer 7** na GUI do pfSense.

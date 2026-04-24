@@ -215,8 +215,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 
 | # | Teste | Onde | Status |
 |---|-------|------|--------|
-| 12.1 | `update-blacklists.sh --apply` (ou ciclo `--download`): log coerente; `send_sighup` só com PID vivo; sem falha indevida do updater | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
-| 12.2 | `blacklists/.state/fallback.state` reflecte `healthy` após promoção válida; `degraded`/`fail-closed` em cenário de falha controlada (F1.4) | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
+| 12.1 | `update-blacklists.sh --apply` (ou ciclo `--download`): log coerente; `send_sighup` só com PID vivo; sem falha indevida do updater; reload falhado preserva blacklist/tabelas anteriores em pacote >= `1.8.11_7` | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
+| 12.2 | `blacklists/.state/fallback.state` reflecte `healthy` após promoção válida; `degraded`/`fail-closed` em cenário de falha controlada (F1.4); GUI reporta erro de gravação em `config.json`/`_custom` | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
 
 ---
 

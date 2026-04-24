@@ -4,6 +4,36 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed — F4.2/F4.3 blacklists runtime (`1.8.11_7`)
+
+- **`layer7d` DNS blacklist** — respostas DNS passam a transportar o IP do
+  cliente para o callback e a validar `src_cidrs` por regra antes de popular
+  `layer7_bld_N`, evitando vazamento de bloqueio entre redes/regras.
+- **`layer7d` reload blacklists** — SIGHUP deixa de limpar regras/tabelas antes
+  de validar a nova carga; falha de carga preserva blacklist e tabelas
+  anteriores.
+- **`blacklist.c`** — dominios presentes em multiplas categorias passam a
+  guardar mascara de categorias; DNS/SNI fazem lookup contra as categorias da
+  regra, corrigindo falso negativo em categoria sobreposta.
+- **GUI/package blacklists** — `pkg-install` prepara
+  `/usr/local/etc/layer7/blacklists` e `_custom` para `www:wheel`; saves da GUI
+  passam a reportar erro quando `config.json` ou overlays nao puderem ser
+  gravados.
+- **Auto-update cron** — `update_interval_hours` passa a ser convertido para
+  campos cron coerentes, em vez de inverter intervalos curtos/longos.
+- **Activacao CLI** — removido fallback `fetch` que fazia GET sem payload; URL
+  customizada de activacao passa a exigir HTTPS e caracteres seguros para shell.
+- **CI** — workflow smoke passa a incluir syntax check dos scripts shell do
+  pacote.
+
+### Documentation — conflitos visiveis
+
+- **`README.md`** — versao publica e install rapido alinhados para `1.8.3`.
+- **`docs/README.md`** — hierarquia de leitura renumerada sem duplicar item.
+- **`docs/08-lab/guia-windows.md`** — build de lab alinhado para `.pkg`.
+- **Blacklists docs** — versao/caminho F4 alinhados ao branch `1.8.11_7` e ao
+  consumo assinado.
+
 ### Documentation — scripts de pacote / CI
 
 - **`scripts/package/README.md`** — `smoke-layer7d.sh`: nota Darwin/macOS vs

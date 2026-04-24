@@ -25,6 +25,17 @@ if [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ]; then
 	chmod 0664 "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
 fi
 
+/bin/mkdir -p "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists" \
+	"${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists/_custom"
+chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists" \
+	"${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists/_custom" 2>/dev/null || true
+chmod 0775 "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists" \
+	"${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists/_custom" 2>/dev/null || true
+if [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists/config.json" ]; then
+	chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists/config.json" 2>/dev/null || true
+	chmod 0664 "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists/config.json" 2>/dev/null || true
+fi
+
 if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt" ] && [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt.sample" ]; then
 	cp "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt.sample" "${PKG_ROOTDIR}/usr/local/etc/layer7-protos.txt"
 fi

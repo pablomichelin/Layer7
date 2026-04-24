@@ -29,7 +29,7 @@
 
 struct l7_bl_entry {
 	char *domain;
-	uint8_t cat_idx;
+	uint64_t cat_mask;
 	struct l7_bl_entry *next;
 };
 
@@ -133,6 +133,20 @@ domain_lower(char *dst, const char *src, size_t dstsize)
 /* --- Insert domain into hash table ----------------------------------- */
 
 static int
+cat_index_by_name(const struct l7_blacklist *bl, const char *cat)
+{
+	int i;
+
+	if (!bl || !cat)
+		return -1;
+	for (i = 0; i < bl->n_cats; i++) {
+		if (strcmp(bl->cats[i], cat) == 0)
+			return i;
+	}
+	return -1;
+}
+
+static int
 insert_domain(struct l7_blacklist *bl, const char *raw_domain, uint8_t cat_idx)
 {
 	char norm[L7_BL_DOMAIN_MAX];
@@ -140,8 +154,11 @@ insert_domain(struct l7_blacklist *bl, const char *raw_domain, uint8_t cat_idx)
 	int bucket;
 	struct l7_bl_entry *e;
 	size_t dlen;
+	uint64_t cat_bit;
 
 	if (bl->n_entries >= L7_BL_MAX_TOTAL)
+		return -1;
+	if (cat_idx >= L7_BL_MAX_CATS)
 		return -1;
 
 	domain_lower(norm, raw_domain, sizeof(norm));
@@ -152,10 +169,16 @@ insert_domain(struct l7_blacklist *bl, const char *raw_domain, uint8_t cat_idx)
 	h = fnv1a_hash(norm);
 	bucket = (int)(h & (L7_BL_HASH_SIZE - 1));
 
+	cat_bit = ((uint64_t)1 << cat_idx);
+
 	/* check duplicate */
 	for (e = bl->buckets[bucket]; e; e = e->next) {
-		if (strcmp(e->domain, norm) == 0)
+		if (strcmp(e->domain, norm) == 0) {
+			if ((e->cat_mask & cat_bit) != 0)
+				return 0;
+			e->cat_mask |= cat_bit;
 			return 0;
+		}
 	}
 
 	dlen = strlen(norm);
@@ -166,7 +189,7 @@ insert_domain(struct l7_blacklist *bl, const char *raw_domain, uint8_t cat_idx)
 	}
 	e->domain = (char *)(e + 1);
 	memcpy(e->domain, norm, dlen + 1);
-	e->cat_idx = cat_idx;
+	e->cat_mask = cat_bit;
 	e->next = bl->buckets[bucket];
 	bl->buckets[bucket] = e;
 	bl->n_entries++;
@@ -384,11 +407,76 @@ l7_blacklist_lookup(const struct l7_blacklist *bl, const char *domain)
 		h = fnv1a_hash(p);
 		bucket = (int)(h & (L7_BL_HASH_SIZE - 1));
 
+			for (e = bl->buckets[bucket]; e; e = e->next) {
+				if (strcmp(e->domain, p) == 0) {
+					int ci;
+					/* cast away const for hit counter */
+					for (ci = 0; ci < bl->n_cats; ci++) {
+						if ((e->cat_mask & ((uint64_t)1 << ci)) != 0) {
+							((struct l7_blacklist *)bl)->cat_hits[ci]++;
+							return bl->cats[ci];
+						}
+					}
+				}
+			}
+
+		p = strchr(p, '.');
+		if (p)
+			p++;
+	}
+	return NULL;
+}
+
+int
+l7_blacklist_lookup_categories(const struct l7_blacklist *bl,
+    const char *domain, const char **cats, int n_cats, const char **matched_cat)
+{
+	char norm[L7_BL_DOMAIN_MAX];
+	const char *p;
+	uint32_t h;
+	uint64_t wanted = 0;
+	int bucket, i;
+	struct l7_bl_entry *e;
+
+	if (matched_cat)
+		*matched_cat = NULL;
+	if (!bl || !bl->buckets || !domain || !*domain || !cats || n_cats <= 0)
+		return 0;
+
+	for (i = 0; i < n_cats; i++) {
+		int ci = cat_index_by_name(bl, cats[i]);
+		if (ci >= 0)
+			wanted |= ((uint64_t)1 << ci);
+	}
+	if (wanted == 0)
+		return 0;
+
+	domain_lower(norm, domain, sizeof(norm));
+	if (is_whitelisted(bl, norm))
+		return 0;
+
+	p = norm;
+	while (p && *p) {
+		if (count_labels(p) < 2)
+			break;
+
+		h = fnv1a_hash(p);
+		bucket = (int)(h & (L7_BL_HASH_SIZE - 1));
+
 		for (e = bl->buckets[bucket]; e; e = e->next) {
-			if (strcmp(e->domain, p) == 0) {
-				/* cast away const for hit counter */
-				((struct l7_blacklist *)bl)->cat_hits[e->cat_idx]++;
-				return bl->cats[e->cat_idx];
+			uint64_t hit_mask;
+			if (strcmp(e->domain, p) != 0)
+				continue;
+			hit_mask = e->cat_mask & wanted;
+			if (hit_mask == 0)
+				continue;
+			for (i = 0; i < bl->n_cats; i++) {
+				if ((hit_mask & ((uint64_t)1 << i)) != 0) {
+					((struct l7_blacklist *)bl)->cat_hits[i]++;
+					if (matched_cat)
+						*matched_cat = bl->cats[i];
+					return 1;
+				}
 			}
 		}
 
@@ -396,7 +484,7 @@ l7_blacklist_lookup(const struct l7_blacklist *bl, const char *domain)
 		if (p)
 			p++;
 	}
-	return NULL;
+	return 0;
 }
 
 void

@@ -672,6 +672,12 @@ do manifesto/snapshot conforme runbook interno; verificar que o ficheiro passa
 a `degraded` ou `fail-closed` com `reason=` e `operator_action=` preenchidos,
 sem promover ficheiros não validados — alinhado a F1.4.
 
+**Critério adicional para pacote >= `1.8.11_7`:** provocar reload com
+`config.json` valido mas categorias indisponiveis/incompletas e confirmar que
+as tabelas `layer7_bld_N` e a blacklist anterior continuam activas; pela GUI,
+confirmar que falhas de escrita em `config.json` ou `_custom/*.domains` geram
+erro visivel e nao mensagem de sucesso.
+
 **Rollback:** restaurar snapshot anterior com
 `update-blacklists.sh --restore-lkg` quando aplicável; último `.pkg` seguro;
 consultar `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md` e plano F4.

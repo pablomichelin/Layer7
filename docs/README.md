@@ -16,7 +16,7 @@ Quando houver conflito, seguir esta ordem:
 8. [`03-adr/README.md`](03-adr/README.md)
 9. [`01-architecture/f1-arquitetura-de-confianca.md`](01-architecture/f1-arquitetura-de-confianca.md)
 10. [`02-roadmap/f1-plano-de-implementacao.md`](02-roadmap/f1-plano-de-implementacao.md)
-8. documentacao canónica por area
+11. documentacao canónica por area
 
 ---
 
