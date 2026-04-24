@@ -502,7 +502,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   nomes de interface para `rdr`, log de falha de `pfctl`/`tempnam`;
   `PORTREVISION` `2`.
 - **F4.3 (doc lab):** `validacao-lab.md` — secção 11 e checklist #13 (anchor
-  NAT / `force_dns`).
+  NAT / `force_dns`); `PLANO-BLACKLISTS-UT1` addendum F4.3; `docs/tests/README`
+  alinhado a 79/74/5 e 6.7.
 - **Seguinte:** evidencia em appliance/lab (BG-009/010: validacao segundo
   [`validacao-lab.md`](../04-package/validacao-lab.md) e
   `scripts/package/smoke-layer7d.sh` no builder); continuar **F4.3** (BG-011:

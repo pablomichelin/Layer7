@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — blacklists (F4.3) e índice de testes
+
+- **`PLANO-BLACKLISTS-UT1.md`** — addendum F4.3: links a `f4-plano`,
+  `validacao-lab` sec. 11, `test-matrix` 6.7, `MANUAL-INSTALL`, **BG-011**
+- **`docs/tests/README.md`** — contagem 79/74/5; menção explícita ao **6.7**
+  (F4.3) na matriz
+
 ### Documentation — matriz de testes (F4.3)
 
 - **`docs/tests/test-matrix.md`** — ponto **6.7** (anchor NAT `force_dns` /

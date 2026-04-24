@@ -18,6 +18,17 @@
 > em `/usr/local/etc/layer7/blacklists/.state/fallback.state`, sempre sem
 > promover conteúdo novo não validado.
 
+> **ADDENDUM F4.3 (2026-04-24)** — a trilha de **DNS forçado** (`force_dns`)
+> por regra de blacklist injecta `rdr` no anchor NAT `natrules/layer7_nat`
+> (ver `layer7.inc` / plano
+> [`docs/02-roadmap/f4-plano-de-implementacao.md`](../02-roadmap/f4-plano-de-implementacao.md)).
+> Evidencia em laboratório: secção 11 de
+> [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md);
+> teste **6.7** em [`docs/tests/test-matrix.md`](../tests/test-matrix.md);
+> addendum F4.3 em
+> [`docs/10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md).
+> Ver backlog **BG-011** (em curso na F4.3).
+
 ---
 
 ## Estado atual (v1.7.2)
