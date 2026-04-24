@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — gates F4 no checklist mestre
+
+- **`checklist-mestre.md`** — checklist de testes e gates: itens F4 (paralelismo
+  com F3) e F4.3 / BG-011 (evidência `validacao-lab` sec. 11 e `test-matrix`
+  6.7); gate resumido F4 com referência a evidência por subfase
+- **`CORTEX.md`** — `Proximos passos` ponto 10 aponta para estes gates
+
 ### Documentation — blacklists (F4.3) e índice de testes
 
 - **`PLANO-BLACKLISTS-UT1.md`** — addendum F4.3: links a `f4-plano`,

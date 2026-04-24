@@ -301,8 +301,11 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
    preparacao; a fase F5 fica “em execucao plena” depois de cumprir os
    criterios de saida da F4 e de actualizar a matriz em `docs/tests/`.
 9. Usar o backlog canónico como fila unica antes de tocar em
-   codigo, empacotamento, daemon, frontend ou scripts operacionais, salvo
-   excepção explícita no plano de fase (F4 paralela a F3).
+  codigo, empacotamento, daemon, frontend ou scripts operacionais, salvo
+  excepção explícita no plano de fase (F4 paralela a F3).
+10. O **checklist mestre** inclui gates de teste para **F4** (paralelismo com
+  a F3) e **F4.3** / **BG-011** (evidencia `validacao-lab` sec. 11 e
+  `test-matrix` 6.7 antes de fechar a trilha de `force_dns`).
 
 ---
 

@@ -81,6 +81,14 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] na F3.7, cada execucao manual obrigatoria tem directoria por `run_id`, ficheiros de evidencia com nome padronizado e decisao final `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`
 - [ ] na F3.8, cada cenario obrigatorio so fecha a F3 se estiver em `PASS` com evidencia real; `FAIL`, `INCONCLUSIVE` ou `BLOCKED` obrigatorio mantem a fase aberta
 - [ ] na F3.8, existe relatorio final unico de campanha com contagem de resultados e conclusao explicita `F3 pode fechar` / `F3 nao pode fechar`
+- [ ] na F4 com F3 ainda aberta, blocos tecnicos respeitam o paralelismo do
+  [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md) (secção 0) —
+  nao alterar o contrato de licenciamento salvo decisao e documentacao no
+  mesmo bloco
+- [ ] na F4.3 (**BG-011**), antes de declarar a trilha de **DNS forçado**
+  (`force_dns` / anchor `natrules/layer7_nat`) concluida em relatorio, existe
+  evidencia minima alinhada a [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
+  (secção 11) e ao teste **6.7** de [`../tests/test-matrix.md`](../tests/test-matrix.md)
 
 ---
 
@@ -136,7 +144,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | F1 | cadeia de confianca de distribuicao, blacklists e fallback deixa de depender de conhecimento implícito |
 | F2 | license server opera com publicacao segura, sessao administrativa revogavel, bootstrap controlado e operacao sob controlo |
 | F3 | activacao, revogacao e offline ficam previsiveis, com estados/transicoes explicitos, evidencias reais dos cenarios obrigatorios e relatorio final de campanha antes do fecho |
-| F4 | package, daemon e blacklists operam com runtime mais confiavel |
+| F4 | package, daemon e blacklists com runtime mais confiavel e evidencia minima por subfase (ex.: F4.3 em `validacao-lab` / `test-matrix`); ver plano e backlog |
 | F5 | existe malha real de nao regressao por componente |
 | F6 | reorganizacao fisica acontece sem perda de contexto nem links quebrados |
 | F7 | release e observabilidade deixam de depender de memoria operacional |
