@@ -43,6 +43,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/04-package/checklist-validacao-lab.md`** — remissão à sec. **11**
   (anti-QUIC opcional).
 
+### Documentation — SSOT F4.3 (CORTEX, roadmap, plano F4)
+
+- **`CORTEX.md`** — pontos 7 e 10: sec. **11** com anti-QUIC opcional.
+- **`docs/02-roadmap/roadmap.md`** — bloco F4.3 (doc lab) e *Seguinte*.
+- **`docs/02-roadmap/f4-plano-de-implementacao.md`** — bloco documental F4.3 e
+  teste mínimo.
+- **`docs/02-roadmap/f5-preparacao-malha.md`** — pré-requisitos e docs vivas:
+  sec. **11** com anti-QUIC opcional.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.

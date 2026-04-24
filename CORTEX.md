@@ -329,7 +329,9 @@ validacao fora da operacao real.
    F4.1 (package/daemon), F4.2 (blacklists), F4.3 (enforcement), um bloco de
    risco de cada vez, com `MANUAL-INSTALL` e docs de area actualizados quando
    o pacote for afectado. Nao declarar as trilhas concluidas em relatorio sem
-   evidencia minima do `validacao-lab` (**10a**, **10b**, **11**) e da
+   evidencia minima do `validacao-lab` (**10a**, **10b**, **11** — na **11**,
+   `force_dns` / anchor NAT e evidencia **opcional** anti-QUIC; ver inicio e
+   secção **11** do doc) e da
    `test-matrix` (**3.8**, **12.1–12.2**, **6.7**), conforme `checklist-mestre`. Para
    o port `1.8.11_12` no branch, a preparacao de release publica segue
    `docs/06-releases/release-notes-1.8.11_10-DRAFT.md` (conteudo alinhado ao
@@ -343,7 +345,8 @@ validacao fora da operacao real.
 10. O **checklist mestre** inclui gates de teste para **F4** (paralelismo com
   a F3): **F4.1** / **BG-009** (`validacao-lab` sec. **10a**, `test-matrix`
   **3.8**), **F4.2** / **BG-010** (sec. **10b**, **12.1–12.2**), **F4.3** /
-  **BG-011** (sec. **11**, **6.7**) antes de declarar fechadas as trilhas
+  **BG-011** (sec. **11** com `force_dns` e, onde aplicável, anti-QUIC opcional;
+  **6.7**) antes de declarar fechadas as trilhas
   respectivas em relatorio.
 
 ---

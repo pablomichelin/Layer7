@@ -175,14 +175,14 @@ reutiliza `layer7_pf_ifname_for_rules()` no ramo de fallback quando
 anti-QUIC por interface reutiliza `layer7_pf_ifname_for_rules()` em vez de
 duplicar a regex (DRY; sem mudança de comportamento).
 
-**Bloco documental (`2026-04-24`, continuacao):** [`validacao-lab.md`](../04-package/validacao-lab.md) secção **11** — cenario de lab sugerido **multi-interface / VLAN** para recolha de evidencia **BG-011** (sem alteração de código nem de `PORTVERSION`); [`test-matrix.md`](../tests/test-matrix.md) ponto **6.7** referencia esse paragrafo.
+**Bloco documental (`2026-04-24`, continuacao):** [`validacao-lab.md`](../04-package/validacao-lab.md) secção **11** — cenario de lab sugerido **multi-interface / VLAN** para recolha de evidencia **BG-011** (sem alteração de código nem de `PORTVERSION`); no mesmo roteiro, evidência **opcional** anti-QUIC (`pfctl -s rules`, labels `layer7:anti-quic:*`); [`test-matrix.md`](../tests/test-matrix.md) ponto **6.7** referencia esse paragrafo.
 
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog
 históricos de `rdr` e `get_real_interface`); `check-port-files.sh` +
 `smoke-layer7d.sh` e `make package` no builder quando aplicável; roteiro de
 inspecção do anchor em
 [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção
-**11**); evidência em lab quando possível.
+**11**; opcionalmente anti-QUIC conforme o mesmo doc); evidência em lab quando possível.
 
 ---
 

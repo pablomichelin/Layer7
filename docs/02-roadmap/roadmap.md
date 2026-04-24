@@ -513,7 +513,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 - **F4.2 (doc lab):** `validacao-lab.md` — secção **10b** e checklist #15
   (updater / `fallback.state` / `send_sighup`); `test-matrix` **12.1–12.2**.
 - **F4.3 (doc lab):** `validacao-lab.md` — secção 11 e checklist #13 (anchor
-  NAT / `force_dns`; cenário opcional multi-interface / VLAN na mesma secção);
+  NAT / `force_dns`; anti-QUIC opcional no mesmo roteiro; cenário opcional
+  multi-interface / VLAN na mesma secção);
   `PLANO-BLACKLISTS-UT1` addendum F4.3;
   `docs/tests/README` alinhado a contagens actuais da matriz (inclui F4.1–F4.3
   e F3.6) e teste **6.7**.
@@ -526,7 +527,7 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   [`validacao-lab.md`](../04-package/validacao-lab.md) /
   [`test-matrix.md`](../tests/test-matrix.md); smoke no builder:
   `scripts/package/smoke-layer7d.sh`); continuar **F4.3** (BG-011:
-  forcing DNS / excepcoes em cenarios VLAN) em blocos pequenos; fecho formal
+  forcing DNS / excepcoes em cenarios VLAN; anti-QUIC opcional na sec. **11**) em blocos pequenos; fecho formal
   de BG-009/010 quando a matriz de saida F4 tiver evidencia minima; em
   paralelo, **DR-05** no appliance `192.168.100.254` para fechar a F3 sob
   gate F3.8.
