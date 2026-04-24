@@ -10,7 +10,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   (`read -r`), rejeita PID nao numerico, `kill -0` antes de `HUP`; regista
   WARN quando o daemon nao esta a correr em vez de `HUP` silencioso a PID
   invalido
-- **`PORTVERSION`** — `1.8.9` (artefacto publico de referencia continua
+- **`update-blacklists.sh` (`--restore-lkg`)** — adquire o mesmo lock exclusivo
+  que `do_download`, impedindo restauracao LKG concorrente com um update
+  (evita corrida em `promote_candidate`)
+- **`PORTVERSION`** — `1.8.10` (artefacto publico de referencia continua
   `1.8.3` ate nova release)
 
 ### Changed — F4.1 package/daemon (BG-009)

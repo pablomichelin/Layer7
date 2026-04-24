@@ -685,6 +685,13 @@ do_restore_lkg() {
 		exit 1
 	fi
 
+	# Mesmo lock que `do_download` — evita `promote_candidate` concorrente.
+	if ! mkdir "$LOCK" 2>/dev/null; then
+		log "ERROR: update already running (lock exists); cannot restore LKG concurrently"
+		exit 1
+	fi
+	LOCK_HELD="1"
+
 	CANDIDATE_MANIFEST_LOCAL="$LKG_DIR/$MANIFEST_NAME"
 	CANDIDATE_SIG_LOCAL="$LKG_DIR/$SIG_NAME"
 	CANDIDATE_ARCHIVE_LOCAL="$LKG_DIR/$SNAPSHOT_ASSET"
