@@ -9,6 +9,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`08-lab/quick-start-lab.md`** — passo **6** (*F4*): remissão a Gates,
   **10a/10b/11**, `test-matrix` e `checklist-mestre` após a sequência builder →
   `.pkg` → serviço.
+- **`document-classification.md`** e **`08-lab/README.md`** — linha do
+  quick-start alinhada ao passo 6 (F4).
 
 ### Documentation — runbooks e handoff (F4 / `validacao-lab`)
 

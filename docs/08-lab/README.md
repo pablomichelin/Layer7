@@ -16,7 +16,7 @@ Windows como gate (ver [guia-windows.md](guia-windows.md) legado).
 | [lab-topology.md](lab-topology.md) | Rede de teste, cliente, interfaces |
 | [builder-freebsd.md](builder-freebsd.md) | VM FreeBSD para compilar PoC/pacote |
 | [guia-windows.md](guia-windows.md) | Documento legado: Windows nao e fluxo vigente; preservado ate F6 |
-| [quick-start-lab.md](quick-start-lab.md) | Fluxo encadeado: builder → pfSense → validação |
+| [quick-start-lab.md](quick-start-lab.md) | Fluxo encadeado: builder → pfSense → validação; passo **6** (F4) |
 | [syslog-remote.md](syslog-remote.md) | Logs remotos no lab |
 | [snapshots-e-gate.md](snapshots-e-gate.md) | Snapshots + checklist gate (contexto legado) |
 | [lab-inventory.template.md](lab-inventory.template.md) | Template de IPs/versões (cópia local) |
