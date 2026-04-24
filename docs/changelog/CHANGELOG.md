@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — `quick-start-lab` (passo F4 após gate base)
+
+- **`08-lab/quick-start-lab.md`** — passo **6** (*F4*): remissão a Gates,
+  **10a/10b/11**, `test-matrix` e `checklist-mestre` após a sequência builder →
+  `.pkg` → serviço.
+
 ### Documentation — runbooks e handoff (F4 / `validacao-lab`)
 
 - **`05-runbooks/README.md`** — validacao em lab: *Gates oficiais F4* no

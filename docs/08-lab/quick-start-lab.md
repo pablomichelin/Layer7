@@ -51,6 +51,16 @@ ps auxww | grep layer7d
 
 Preencher as caixas em [`validacao-lab.md`](../04-package/validacao-lab.md) com os outputs reais. Sem evidência, o gate não fecha.
 
+### 6. (F4) Roteiros por subfase
+
+Depois do pacote base a funcionar, o fecho **F4.1 / F4.2 / F4.3** exige
+evidência nos roteiros do appliance: ver o início de
+[`validacao-lab.md`](../04-package/validacao-lab.md) (*Gates oficiais F4*), as
+secções **10a** (serviço/pid), **10b** (blacklists) e **11** (`force_dns` /
+NAT), e a matriz em [`../tests/test-matrix.md`](../tests/test-matrix.md)
+(pontos **3.8**, **12.1–12.2**, **6.7**), conforme
+[`../02-roadmap/checklist-mestre.md`](../02-roadmap/checklist-mestre.md).
+
 ## Opcional
 
 - **§6b** — testar `pfctl -t layer7_block -T add/show/delete`
