@@ -4,6 +4,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Added — continuidade entre chats longos
+
+- [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md) — quando mudar para um chat novo no Cursor, sinais práticos e **prompt modelo** para colar na primeira mensagem; referência no `CORTEX`, `docs/README` e `AGENTS.md`
+
 ### Changed — F4 e F5 (governança) em 2026-04-24
 
 - **F4.0 aberta** com [`docs/02-roadmap/f4-plano-de-implementacao.md`](docs/02-roadmap/f4-plano-de-implementacao.md) — subfases

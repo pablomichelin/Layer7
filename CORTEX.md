@@ -604,6 +604,17 @@ Para isso:
   houver mudanca real de prioridade, decisao ou gate;
 - no fim de cada bloco relevante, registrar um checkpoint seguro.
 
+### Chat longo no Cursor (handoff)
+
+Quando a conversa se tornar **demasiado longa** (muitas trocas, contexto
+difícil de seguir, ou limites do produto), mudar para **um chat novo** em vez
+de empurrar todo o historico. O procedimento canónico e o **prompt modelo**
+estao em
+[`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md).
+O agente pode sugerir esse movimento; o utilizador pode exigi-lo a qualquer
+momento. O estado oficial do projecto continua sempre no **Git** e no
+**CORTEX**, nao na memoria do chat.
+
 ---
 
 ## Politica de documentacao viva

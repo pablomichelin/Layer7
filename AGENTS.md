@@ -55,6 +55,10 @@ Depois disso, ler apenas a documentacao da area em causa:
 
 **Regra inviolavel:** nenhum agente deve actuar sem ler o `CORTEX.md` antes.
 
+**Chat muito longo:** se o contexto da conversa estiver esgotado ou a tarefa
+for continuar trabalho pesado, sugere handoff para um chat novo e aponta para
+`docs/00-overview/handoff-chat-novo.md` (prompt modelo incluido).
+
 ---
 
 ## Regras gerais de trabalho
