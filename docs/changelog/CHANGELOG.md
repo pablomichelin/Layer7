@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validação lab / matriz (F4.2 BG-010)
+
+- **`validacao-lab.md`** — secção **10b**: roteiro do updater, log, SIGHUP,
+  `fallback.state` (healthy / degraded / fail-closed); checklist **#15**
+- **`test-matrix.md`** — secção **12** (blacklists F4.2), testes **12.1–12.2**
+  pendentes; **Resumo** alinhado (82 totais, daemon 8/7/1, 8 pendentes)
+- **`docs/tests/README.md`** — contagens 82 / 8 pendentes + menção F4.2
+- **`f4-plano-de-implementacao.md`**, **`roadmap.md`**, **`backlog.md`**,
+  **`PLANO-BLACKLISTS-UT1.md`** — referências cruzadas ao roteiro 10b
+
 ### Documentation — validação lab / matriz (F4.1 BG-009)
 
 - **`validacao-lab.md`** — secção **10a**: roteiro objectivo no appliance para

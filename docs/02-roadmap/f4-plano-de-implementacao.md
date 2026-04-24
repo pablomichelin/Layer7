@@ -114,7 +114,9 @@ PID lido; `PORTREVISION` `3` (`1.8.11_3`).
 
 **Teste mínimo:** simulação de feed indisponível e verificação de
 degradação/fail-closed; `layer7-pfctl ensure` e regras presentes após
-reload.
+reload; no appliance, roteiro objectivo em
+[`validacao-lab.md`](../04-package/validacao-lab.md) secção **10b** (BG-010:
+log do updater, `send_sighup`, `fallback.state`).
 
 ### F4.3 — Enforcement: forcing DNS e excepções
 

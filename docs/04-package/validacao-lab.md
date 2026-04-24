@@ -540,6 +540,7 @@ Pendencias conhecidas:
 | 12 | `pkg delete` OK | [x] |
 | 13 | F4.3: anchor NAT `force_dns` (ver secção 11) | [ ] |
 | 14 | F4.1: pidfile / `rc.d` / consumidores (ver secção 10a) | [ ] |
+| 15 | F4.2: updater blacklists / fallback (ver secção 10b) | [ ] |
 
 ---
 
@@ -585,6 +586,59 @@ segredo; evita regressão da página Status na mesma linha).
 
 **Registo sugerido:** data, `pkg info pfSense-pkg-layer7`, saída de `service
 layer7d status`, `ls -l /var/run/layer7d.pid`.
+
+---
+
+## 10b. Roteiro F4.2 — updater de blacklists, SIGHUP e fallback (BG-010)
+
+**Objectivo:** recolher evidência de que o script oficial
+`/usr/local/etc/layer7/update-blacklists.sh` consome a trilha F1.3 (manifesto
+assinado), regista degradação em
+`/usr/local/etc/layer7/blacklists/.state/fallback.state` e só envia **SIGHUP**
+ao `layer7d` quando o PID do pidfile é válido e o processo responde a
+`kill -0` (alinhado a `send_sighup` e ao passo 12 do
+`PLANO-BLACKLISTS-UT1.md`).
+
+**Onde:** appliance com pacote F4.x; rede com acesso à origem oficial de
+manifesto/snapshot ou cenário de falha controlada (ver critérios abaixo).
+
+**Comandos úteis (SSH como root):**
+
+```sh
+# Últimas linhas do log do updater (progresso + SIGHUP)
+tail -n 40 /var/log/layer7-bl-update.log
+
+# Estado de fallback F1.4 (key=value)
+sed -n '1,12p' /usr/local/etc/layer7/blacklists/.state/fallback.state
+
+# Reload apenas sinal (equivalente útil a validar send_sighup)
+/usr/local/etc/layer7/update-blacklists.sh --apply
+```
+
+**Critério mínimo de PASS (evidência) — cenário feliz:**
+
+- Com daemon activo e snapshot válida, o log contém linha do tipo
+  `INFO: sent SIGHUP to daemon` **ou** o fluxo documenta skip explícito com
+  `WARN` coerente (pidfile ausente, PID inválido, processo morto) **sem**
+  erro fatal do shell por `set -e` inesperado.
+- `fallback.state` existe e, após promoção bem-sucedida, inclui
+  `status=healthy` e `component=blacklists-update` (formato do script).
+
+**Critério complementar (opcional, cenário de stress):** simular indisponibilidade
+do manifesto/snapshot conforme runbook interno; verificar que o ficheiro passa
+a `degraded` ou `fail-closed` com `reason=` e `operator_action=` preenchidos,
+sem promover ficheiros não validados — alinhado a F1.4.
+
+**Rollback:** restaurar snapshot anterior com
+`update-blacklists.sh --restore-lkg` quando aplicável; último `.pkg` seguro;
+consultar `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md` e plano F4.
+
+**Referências:** `docs/02-roadmap/f4-plano-de-implementacao.md` (F4.2),
+`docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`,
+`docs/01-architecture/f1-arquitetura-de-confianca.md` (pipeline blacklists).
+
+**Registo sugerido:** data, `pkg info`, excerto do log do updater, conteúdo
+redigido de `fallback.state`.
 
 ---
 

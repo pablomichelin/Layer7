@@ -1,6 +1,6 @@
 # Matriz de testes — V1 + addendum F3 + F4.3 (enforcement)
 
-Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Actions / Ubuntu), no **builder** (FreeBSD) ou no **appliance** (pfSense lab). O ponto **3.8** liga-se ao roteiro F4.1 (BG-009) em `docs/04-package/validacao-lab.md` (secção 10a). O ponto **6.7** liga-se ao roteiro F4.3 (BG-011) em
+Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Actions / Ubuntu), no **builder** (FreeBSD) ou no **appliance** (pfSense lab). O ponto **3.8** liga-se ao roteiro F4.1 (BG-009) em `docs/04-package/validacao-lab.md` (secção 10a). Os pontos **12.1** e **12.2** ligam-se ao roteiro F4.2 (BG-010) na secção **10b**. O ponto **6.7** liga-se ao roteiro F4.3 (BG-011) em
 `docs/04-package/validacao-lab.md` (secção 11).
 
 ---
@@ -211,13 +211,22 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 
 ---
 
+## 12. Blacklists UT1 (F4.2 / consumo assinado)
+
+| # | Teste | Onde | Status |
+|---|-------|------|--------|
+| 12.1 | `update-blacklists.sh --apply` (ou ciclo `--download`): log coerente; `send_sighup` só com PID vivo; sem falha indevida do updater | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
+| 12.2 | `blacklists/.state/fallback.state` reflecte `healthy` após promoção válida; `degraded`/`fail-closed` em cenário de falha controlada (F1.4) | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
+
+---
+
 ## Resumo
 
 | Categoria | Total | OK | Pendente |
 |-----------|-------|----|----------|
 | Build | 4 | 4 | 0 |
 | Instalação | 5 | 5 | 0 |
-| Daemon | 7 | 7 | 0 |
+| Daemon | 8 | 7 | 1 |
 | Config | 5 | 5 | 0 |
 | Policy engine | 7 | 7 | 0 |
 | Enforcement PF | 7 | 6 | 1 |
@@ -226,7 +235,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Observabilidade | 4 | 4 | 0 |
 | Rollback | 3 | 3 | 0 |
 | Licenciamento/activação | 20 | 16 | 4 |
-| **Total** | **79** | **74** | **5** |
+| Blacklists UT1 (F4.2) | 2 | 0 | 2 |
+| **Total** | **82** | **74** | **8** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

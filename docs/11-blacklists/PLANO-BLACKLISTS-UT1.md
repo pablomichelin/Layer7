@@ -29,6 +29,11 @@
 > [`docs/10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md).
 > Ver backlog **BG-011** (em curso na F4.3).
 
+> **ADDENDUM F4.2 (BG-010)** — roteiro de evidência no appliance para updater,
+> `fallback.state` e `send_sighup`: secção **10b** de
+> [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md); testes
+> **12.1–12.2** em [`docs/tests/test-matrix.md`](../tests/test-matrix.md).
+
 ---
 
 ## Estado atual (v1.7.2)

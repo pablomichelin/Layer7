@@ -507,15 +507,18 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 - **F4.3 bloco `2026-04-24` (codigo, 2.ª rodada):** `layer7.inc` — filtro de
   nomes de interface para `rdr`, log de falha de `pfctl`/`tempnam`;
   `PORTREVISION` `2`.
+- **F4.2 (doc lab):** `validacao-lab.md` — secção **10b** e checklist #15
+  (updater / `fallback.state` / `send_sighup`); `test-matrix` **12.1–12.2**.
 - **F4.3 (doc lab):** `validacao-lab.md` — secção 11 e checklist #13 (anchor
   NAT / `force_dns`); `PLANO-BLACKLISTS-UT1` addendum F4.3;
-  `docs/tests/README`
-  alinhado a 79/74/5 e 6.7.
+  `docs/tests/README` alinhado a contagens actuais da matriz (inclui F4.1–F4.3
+  e F3.6) e teste **6.7**.
 - **F4 (gates):** `checklist-mestre` — testes F4 / F4.3 (evidência mínima BG-011).
-- **Seguinte:** evidencia em appliance/lab (BG-009: roteiro F4.1 na secção
-  **10a** de [`validacao-lab.md`](../04-package/validacao-lab.md); BG-010:
-  validacao segundo o mesmo documento e
-  `scripts/package/smoke-layer7d.sh` no builder); continuar **F4.3** (BG-011:
+- **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
+  BG-010: secção **10b** e testes **12.1–12.2** em
+  [`validacao-lab.md`](../04-package/validacao-lab.md) /
+  [`test-matrix.md`](../tests/test-matrix.md); smoke no builder:
+  `scripts/package/smoke-layer7d.sh`); continuar **F4.3** (BG-011:
   forcing DNS / excepcoes em cenarios VLAN) em blocos pequenos; fecho formal
   de BG-009/010 quando a matriz de saida F4 tiver evidencia minima; em
   paralelo, **DR-05** no appliance `192.168.100.254` para fechar a F3 sob

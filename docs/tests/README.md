@@ -36,11 +36,12 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 ## Matriz de testes
 
-[`test-matrix.md`](test-matrix.md) — 80 testes divididos por categoria
+[`test-matrix.md`](test-matrix.md) — 82 testes divididos por categoria
 (build, instalação, daemon, config, policy engine, enforcement **inclui F4.3
-`force_dns` / anchor NAT ponto 6.7**, GUI, observabilidade, rollback e
-addendum de licenciamento/activação da F3). Estado actual: 74 OK e **6**
-pendentes (1 em daemon F4.1 ponto 3.8; 1 em enforcement F4.3; 4 no addendum F3.6). A F3.6 passa a decompor
+`force_dns` / anchor NAT ponto 6.7**, **blacklists F4.2 (12.1–12.2)**,
+GUI, observabilidade, rollback e
+addendum de licenciamento/activação da F3). Estado actual: 74 OK e **8**
+pendentes (1 em daemon F4.1 ponto 3.8; 2 em blacklists F4.2; 1 em enforcement F4.3; 4 no addendum F3.6). A F3.6 passa a decompor
 esses 4 blocos pendentes numa matriz manual explicita de 13 cenarios,
 pre-requisitos, comandos, evidencias minimas e criterios de
 aprovacao/reprovacao, descrita em
