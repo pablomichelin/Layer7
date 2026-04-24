@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — F4.3 / BG-011: roteiro VLAN multi-interface e rastreabilidade
+
+- **`docs/04-package/validacao-lab.md`** (secção **11**) — cenário de lab sugerido
+  **multi-interface / VLAN** para evidência de `force_dns` / `natrules/layer7_nat`.
+- **`docs/tests/test-matrix.md`** — ponto **6.7** remete a esse parágrafo.
+- **`docs/02-roadmap/f4-plano-de-implementacao.md`** — checkpoint documental
+  (continuação) ligando `validacao-lab` §11 e matriz **6.7**.
+- **`docs/10-license-server/MANUAL-INSTALL.md`** — addendum F4.3: remissão ao
+  roteiro (secção **11**).
+
 ### Documentation — `scripts/package/README` (ordem canónica no índice)
 
 - **`scripts/package/README.md`** — parágrafo inicial com check → smoke →

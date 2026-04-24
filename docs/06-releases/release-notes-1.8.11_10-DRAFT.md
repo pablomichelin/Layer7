@@ -40,7 +40,9 @@ com deduplicação, ordem estável de interfaces e CIDRs por regra.
 
 Ver detalhe operacional e comandos de verificação: `docs/10-license-server/MANUAL-INSTALL.md`
 (addenda F4.3) e `docs/04-package/validacao-lab.md` (secção **11** e notas
-`1.8.11_8`–`10`).
+`1.8.11_8`–`10`). A mesma secção **11** inclui um **cenário de lab sugerido**
+multi-interface / VLAN para aproximar a evidência **BG-011** / matriz **6.7**
+a combinações com vários segmentos.
 
 ---
 

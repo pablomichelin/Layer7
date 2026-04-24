@@ -543,7 +543,7 @@ Pendencias conhecidas:
 |--------|---------|-------------------|---------------------------|
 | **10a** | BG-009 (F4.1) | pidfile, `rc.d`, permissões, consumidores do PID (sh + PHP ≥ `_6`) | **3.8** |
 | **10b** | BG-010 (F4.2) | updater assinado, `send_sighup`, `fallback.state` | **12.1**, **12.2** |
-| **11** | BG-011 (F4.3) | DNS forçado, anchor `natrules/layer7_nat`, `pfctl -s nat` | **6.7** |
+| **11** | BG-011 (F4.3) | DNS forçado, anchor `natrules/layer7_nat`, `pfctl -s nat`; cenário opcional multi-interface / VLAN no mesmo roteiro | **6.7** |
 
 **Antes do appliance:** nos três roteiros acima, instalar no pfSense apenas
 depois de `check-port-files.sh` + `smoke-layer7d.sh` na raiz do clone e
