@@ -39,6 +39,14 @@ Isto alinha anti-bypass DNS ao enforcement sem MITM. Detalhe operacional:
 (secção **11**, incl. cenário opcional multi-interface / VLAN); matriz:
 [`../tests/test-matrix.md`](../tests/test-matrix.md) ponto **6.7**.
 
+## Anti-QUIC por interface (`layer7.inc`)
+
+Com **interfaces seleccionadas** na GUI (bloquear QUIC só nesses segmentos),
+`layer7_generate_rules()` em `layer7.inc` emite linhas `block drop quick … on
+<interface>`. Desde **`1.8.11_12`**, a validação do nome PF reutiliza a mesma
+função **`layer7_pf_ifname_for_rules()`** que o trilho **DNS forcado** / `rdr`
+(refactor DRY; sem mudança de comportamento face a `_11`).
+
 ## Tabelas
 
 | Uso | Nome default | Config |

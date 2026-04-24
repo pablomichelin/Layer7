@@ -12,6 +12,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `layer7_generate_rules()` (DRY; sem alteração de comportamento). Docblock da
   função actualizado.
 
+### Documentation — anti-QUIC e `layer7_pf_ifname_for_rules`
+
+- **`docs/05-daemon/pf-enforcement.md`** — secção **Anti-QUIC por interface**
+  (`layer7_generate_rules`, DRY `1.8.11_12`).
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.
