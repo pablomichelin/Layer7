@@ -12,7 +12,8 @@ concluidas em relatorio, cumprir
 (itens F4.1, F4.2, F4.3) e
 [`docs/tests/test-matrix.md`](../tests/test-matrix.md) (testes **3.8**,
 **12.1–12.2**, **6.7**), mapeando as seccoes **10a**, **10b** e **11** deste
-ficheiro. Sobre o port `1.8.11_10` no branch: [`CORTEX.md`](../../CORTEX.md)
+ficheiro; na **11**, cenário opcional multi-interface / VLAN para aproximar a
+evidência **6.7** / **BG-011**. Sobre o port `1.8.11_10` no branch: [`CORTEX.md`](../../CORTEX.md)
 (*Próximos passos*, ponto 7) e o rascunho de publicacao
 [`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`](../06-releases/release-notes-1.8.11_10-DRAFT.md)
 (sem tag nem `.pkg` publico ainda).

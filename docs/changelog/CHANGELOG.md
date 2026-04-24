@@ -28,6 +28,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   **`docs/02-roadmap/f5-preparacao-malha.md`** — gates F4 / preparação F5 com a
   mesma pista (sec. **11** / VLAN opcional); **`validacao-lab.md`** checklist
   #**13** qualificado.
+- **`docs/04-package/validacao-lab.md`** (topo, *Gates oficiais F4*) —
+  qualificação da secção **11** / **BG-011**.
+- **`docs/04-package/deploy-github-lab.md`** — referências: gates F4 e cenário
+  VLAN opcional na **11**.
+- **`docs/02-roadmap/backlog.md`** — **BG-011**, observações alinhadas ao roteiro.
 
 ### Documentation — `scripts/package/README` (ordem canónica no índice)
 
