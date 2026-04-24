@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F4.2 blacklists (BG-010)
+
+- **`update-blacklists.sh` (`send_sighup`)** — leitura segura do pidfile
+  (`read -r`), rejeita PID nao numerico, `kill -0` antes de `HUP`; regista
+  WARN quando o daemon nao esta a correr em vez de `HUP` silencioso a PID
+  invalido
+- **`PORTVERSION`** — `1.8.9` (artefacto publico de referencia continua
+  `1.8.3` ate nova release)
+
 ### Changed — F4.1 package/daemon (BG-009)
 
 - **`rc.d/layer7d`** — apos `daemon -p`, o pidfile fica `0644` para
@@ -25,8 +34,6 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   reload PF (evita processo orfao e arranque pendente apos `pkg delete`)
 - **`layer7_status.php`** — `kill -0` com stderr para `/dev/null` (alinhado ao
   resto da trilha F4.1)
-- **`PORTVERSION`** — `1.8.8` (artefacto publico de referencia continua
-  `1.8.3` ate nova release)
 
 ### Added — continuidade entre chats longos
 

@@ -79,7 +79,7 @@ upgrade carregar o binario novo; `layer7_signal_reload()` alinha-se ao
 `layer7_restart_service` / `layer7_read_stats` endurecem leitura do pidfile e
 `USR1` só com processo vivo; `pkg-deinstall` para o servico em
 `PRE-DEINSTALL` e limpa pid/rcvar em `POST-DEINSTALL`; `layer7_status.php`
-alinha `kill -0`; `PORTVERSION` `1.8.8`.
+alinha `kill -0`.
 
 **Liga a:** BG-009.
 
@@ -95,6 +95,10 @@ appliance segundo [`validacao-lab.md`](../04-package/validacao-lab.md).
 **Objectivo:** robustez do consumo pós-F1.3, escrita de
 `.state/fallback.state`, tabelas PF e reload seguro; GUI coerente com o
 diretório e feeds.
+
+**Checkpoint `2026-04-24`:** `update-blacklists.sh` — função `send_sighup`
+valida o conteúdo do pidfile e só envia `HUP` se `kill -0` confirmar processo
+vivo; `PORTVERSION` `1.8.9`.
 
 **Liga a:** BG-010, aspectos de BG-020/021 no runtime do consumidor.
 

@@ -103,11 +103,33 @@ cleanup() {
 trap cleanup EXIT
 
 send_sighup() {
-	if [ -f "$PID_FILE" ]; then
-		kill -HUP "$(cat "$PID_FILE")" 2>/dev/null || true
-		log "INFO: sent SIGHUP to daemon"
-	else
+	if [ ! -f "$PID_FILE" ]; then
 		log "WARN: PID file not found, daemon may not be running"
+		return
+	fi
+	_pid=""
+	if ! read -r _pid <"$PID_FILE" 2>/dev/null; then
+		log "WARN: cannot read $PID_FILE, skipping SIGHUP"
+		return
+	fi
+	if [ -z "$_pid" ]; then
+		log "WARN: empty PID in $PID_FILE, skipping SIGHUP"
+		return
+	fi
+	case "$_pid" in
+	*[!0-9]*)
+		log "WARN: invalid PID '$_pid' in $PID_FILE, skipping SIGHUP"
+		return
+		;;
+	esac
+	if ! kill -0 "$_pid" 2>/dev/null; then
+		log "WARN: layer7d pid $_pid not running, skipping SIGHUP"
+		return
+	fi
+	if kill -HUP "$_pid" 2>/dev/null; then
+		log "INFO: sent SIGHUP to daemon (pid $_pid)"
+	else
+		log "WARN: kill -HUP failed for pid $_pid"
 	fi
 }
 
