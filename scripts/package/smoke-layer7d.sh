@@ -1,15 +1,26 @@
 #!/bin/sh
 # Compila layer7d via src/layer7d/Makefile e testa -t / -e (versão embutida "smoke").
 # Não substitui `make package` no builder FreeBSD (ver docs/04-package/validacao-lab.md).
+#
+# Plataformas:
+#   - FreeBSD: compila o license.c real e linka -lcrypto (idêntico ao port).
+#   - Linux/Darwin: substitui license.c por um stub local (dev_mode=1) gerado em
+#     $SMOKE_VER, porque license.c usa headers FreeBSD-only (net/if_dl.h,
+#     sysctlbyname kern.hostuuid, sockaddr_dl, IFT_ETHER, etc.). O smoke não
+#     valida licenciamento — a trilha canónica é o builder FreeBSD.
 set -e
 if ! command -v cc >/dev/null 2>&1; then
 	echo "smoke-layer7d: 'cc' não encontrado. Instale toolchain ou corra no builder FreeBSD." >&2
 	exit 1
 fi
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-case "$(uname -s)" in
+SMOKE_OS="$(uname -s)"
+case "$SMOKE_OS" in
 Darwin)
-	echo "smoke-layer7d: aviso: em Darwin/macOS o link com -lcrypto costuma falhar (OpenSSL/arquitectura); o smoke canónico é no builder FreeBSD (AGENTS.md, validacao-lab sec. 3)." >&2
+	echo "smoke-layer7d: aviso: em Darwin/macOS o smoke usa stub de licenciamento (license.c é FreeBSD-only); o smoke canónico é no builder FreeBSD (AGENTS.md, validacao-lab sec. 3)." >&2
+	;;
+Linux)
+	echo "smoke-layer7d: nota: em Linux o smoke usa stub de licenciamento (license.c é FreeBSD-only)." >&2
 	;;
 esac
 cd "$ROOT/src/layer7d"
@@ -18,7 +29,60 @@ mkdir "$SMOKE_VER" || exit 1
 trap 'rm -rf "$SMOKE_VER"; rm -f layer7d-smoke' EXIT
 printf '"smoke"\n' > "$SMOKE_VER/version.str"
 rm -f layer7d-smoke
-SRCS="main.c config_parse.c policy.c enforce.c license.c blacklist.c bl_config.c"
+
+LICENSE_SRC="license.c"
+LDFLAGS_CRYPTO="-lcrypto"
+if [ "$SMOKE_OS" != "FreeBSD" ]; then
+	cat > "$SMOKE_VER/license_smoke_stub.c" <<'STUB'
+/* Stub de licenciamento — exclusivo para smoke em Linux/Darwin.
+ * Substitui src/layer7d/license.c (que usa headers FreeBSD-only).
+ * Sempre devolve dev_mode=1 / valid=1, equivalente ao comportamento do
+ * license.c real quando a chave Ed25519 embutida está zerada (DEV MODE).
+ * Não é instalado no pacote; nunca executa fora do CI/smoke.
+ */
+#include "license.h"
+#include <stdio.h>
+#include <string.h>
+
+int
+layer7_hw_fingerprint(char *out, size_t outsz)
+{
+	if (out == NULL || outsz < L7_HW_ID_LEN)
+		return -1;
+	memset(out, '0', L7_HW_ID_LEN - 1);
+	out[L7_HW_ID_LEN - 1] = '\0';
+	return 0;
+}
+
+int
+layer7_license_check(struct l7_license_info *info)
+{
+	if (info == NULL)
+		return -1;
+	memset(info, 0, sizeof(*info));
+	info->dev_mode = 1;
+	info->valid = 1;
+	(void)layer7_hw_fingerprint(info->hardware_id,
+	    sizeof(info->hardware_id));
+	snprintf(info->error, sizeof(info->error),
+	    "smoke stub — license verification skipped");
+	return 0;
+}
+
+int
+layer7_activate(const char *key, const char *url)
+{
+	(void)key;
+	(void)url;
+	fprintf(stderr, "smoke stub: layer7_activate is a no-op\n");
+	return 0;
+}
+STUB
+	LICENSE_SRC="$SMOKE_VER/license_smoke_stub.c"
+	LDFLAGS_CRYPTO=""
+fi
+
+SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC blacklist.c bl_config.c"
 CFLAGS_NDPI="-DHAVE_NDPI=0"
 LDFLAGS_NDPI=""
 if [ -f /usr/local/include/ndpi/ndpi_api.h ] && [ -f /usr/local/lib/libndpi.a ]; then
@@ -27,7 +91,7 @@ if [ -f /usr/local/include/ndpi/ndpi_api.h ] && [ -f /usr/local/lib/libndpi.a ];
 	LDFLAGS_NDPI="/usr/local/lib/libndpi.a -lpcap -lm -lpthread"
 fi
 cc -Wall -Wextra -O2 -I"$SMOKE_VER" -I. -I../common $CFLAGS_NDPI \
-	-o layer7d-smoke $SRCS $LDFLAGS_NDPI -lcrypto
+	-o layer7d-smoke $SRCS $LDFLAGS_NDPI $LDFLAGS_CRYPTO
 ./layer7d-smoke -V | grep -q smoke || { echo "smoke-layer7d: -V falhou"; exit 1; }
 ./layer7d-smoke -t -c "$ROOT/samples/config/layer7-minimal.json" | grep -q layer7d_version || { echo "smoke-layer7d: falta layer7d_version no -t"; exit 1; }
 ./layer7d-smoke -t -c "$ROOT/package/pfSense-pkg-layer7/files/usr/local/etc/layer7.json.sample"
