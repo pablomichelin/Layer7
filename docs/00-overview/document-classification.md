@@ -176,7 +176,7 @@ vence o canónico.
 |---------|------|--------------|---------------|--------------------------------|-----------------------|------|
 | `package/pfSense-pkg-layer7/README.md` | package local | orientacao local do port, com drift historico | Preservado por compatibilidade | nao substitui docs canónicas de instalacao/release | rever so na F6/F7 | F6/F7 |
 | `samples/README.md` | amostras | apoio leve de navegacao | Suplementar | — | manter leve | F6 |
-| `scripts/build/BUILDER.md` | ordem de build | nota util de build | Suplementar | complementar a docs de lab e AGENTS | rever quando builder mudar | F1/F4 |
+| `scripts/build/BUILDER.md` | ordem de build | nota util: check-port-files, smoke, make package; remissao a `builder-freebsd` | Suplementar | complementar a docs de lab e AGENTS | rever quando builder mudar | F1/F4 |
 | `scripts/build/README.md` | build scripts | indice curto | Suplementar | — | manter leve | F6 |
 | `scripts/diagnostics/README.md` | diagnostics scripts | stub para uso futuro | Placeholder | — | manter sem expandir ate existir conteudo | F6 |
 | `scripts/lab/LAB-SETUP.md` | setup do lab | guia local do lab | Suplementar | complementar a docs de lab | rever se o lab mudar | F5 |

@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — `scripts/build/BUILDER.md` (ordem canónica)
+
+- **`scripts/build/BUILDER.md`** — passo 5: `check-port-files` antes de smoke e
+  `make package`; remissão a *Verificação mínima* em `builder-freebsd.md`.
+- **`document-classification.md`** — linha `scripts/build/BUILDER.md` actualizada.
+
 ### Documentation — `AGENTS.md` (ponte para builder)
 
 - **`AGENTS.md`** — *Dados do builder:* remissao a `docs/08-lab/builder-freebsd.md`
