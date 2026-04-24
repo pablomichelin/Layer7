@@ -18,8 +18,8 @@ com hardening tecnico ou com release engineering.
 | F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
 | F2 | Hardening do license server | concluida em `2026-04-01` | stack de licencas opera com segredos, bootstrap, backup e fronteiras sob controlo |
 | F3 | Robustez de licenciamento/activacao | aberta em `2026-04-01` | activacao, revogacao e offline deixam de depender de suposicoes |
-| F4 | Confiabilidade package/daemon/blacklists | planeada | runtime e operacao ficam mais previsiveis |
-| F5 | Malha de testes e regressao | planeada | gates de nao regressao ficam executaveis e repetiveis |
+| F4 | Confiabilidade package/daemon/blacklists | **F4.0 aberta** em `2026-04-24` (plano: [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md); F3 pode permanecer aberta com DR-05 em paralelo) | runtime e operacao ficam mais previsiveis |
+| F5 | Malha de testes e regressao | preparacao em [`f5-preparacao-malha.md`](f5-preparacao-malha.md); execucao plena apos saida F4 | gates de nao regressao ficam executaveis e repetiveis |
 | F6 | Reorganizacao estrutural controlada | planeada | reorganizacao fisica acontece com mapa, links e rollback |
 | F7 | Observabilidade e release engineering | planeada | release e operacao passam a ter governanca forte e verificavel |
 
@@ -477,8 +477,20 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 
 ### Dependencias
 
-- F3 concluida;
-- backlog e risks priorizados.
+- (Normativo) F3 concluida; (Execução) em `2026-04-24` autorizou-se
+  **paralelismo** documentado: F4.0+ pode avançar enquanto a F3 permanece
+  aberta com pendência **DR-05** e relatorio de campanha, **sem** declarar
+  F3 fechada e **sem** alterar contrato de licenciamento em blocos F4
+  (ver seccao 0 de [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md)).
+- Backlog e riscos priorizados.
+
+### Checkpoint actual (F4)
+
+- **F4.0 `2026-04-24`:** `f4-plano-de-implementacao.md` e
+  `f5-preparacao-malha.md` criados; CORTEX e roadmap actualizados; política
+  de trabalho F4 em paralelo ao fecho de evidência F3 (DR-05) explícita.
+- **Seguinte:** F4.1 (BG-009) e F4.2 (BG-010) conforme plano, em blocos
+  pequenos com teste e rollback.
 
 ### Criterios de entrada
 

@@ -176,6 +176,17 @@ reavaliacao formal.
   (`1.8.4`); politica de `GET /api/licenses/:id/download` concentrada em
   modulo com teste; `npm test` do backend a cobrir `src/**/*.test.js`.
 
+## Checkpoint actual da F4 (aberta F4.0 em 2026-04-24)
+
+- `f4-plano-de-implementacao.md` fixa subfases F4.0–F4.3, mapeia BG-009 a
+  F4.1, BG-010/020/021 a F4.2 e BG-011 a F4.3, e declara **paralelismo**
+  autorizado com a F3 (DR-05 ainda pendentes do fecho formal da fase
+  de licenciamento).
+- `f5-preparacao-malha.md` prepara a F5 (malha de testes) sem antecipar
+  reestruturacao (F6).
+- BG-009 e BG-010 passam a `Em curso` na fila, com criterio de conclusao
+  documentado no plano F4 e no roadmap.
+
 ---
 
 ## Backlog priorizado
@@ -195,8 +206,8 @@ reavaliacao formal.
 | BG-008 | Fechar lacunas de previsibilidade em activacao offline e revogacao sem quebrar comportamento actual | Alta | licenciamento | F3 | operador assumir garantias que o sistema ainda nao oferece | M | Alto | Bloqueado por DR-05 no appliance | F3.3 declarou o limite real da revogacao actual e da validade offline do `.lic`; com o live alinhado, S08, S09 e S12 passam a depender apenas do appliance e do controlo real de relogio/offline |
 | BG-026 | Endurecer a mutacao administrativa e a reemissao para impedir transferencia silenciosa de licenca bindada | Alta | license-server/licenciamento | F3 | operador conseguir mover ownership da licenca bindada sem invalidar o artefacto antigo em campo | P | Alto | Acompanhar | F3.4 bloqueia `customer_id` apos bind/activacao no CRUD normal, reserva rebind/transferencia para trilha futura dedicada e agora cobre por teste o guardrail de update administrativo |
 | BG-027 | Reforcar a rastreabilidade de emissao e reemissao do `.lic` sem mudar o formato do artefacto | Alta | license-server/licenciamento | F3 | operador nao conseguir distinguir com clareza quando, como e em que contexto um artefacto foi emitido/reenviado | P | Alto | Bloqueado por DR-05 no appliance | F3.5 audita contexto do artefacto em `activate` e `download`; o branch cobre por teste a metadata de emissao/reemissao e hashes do artefacto; o checkpoint de 2026-04-14 alinhou o live e removeu a duvida de schema/admin, restando apenas a validacao final em appliance |
-| BG-009 | Consolidar confiabilidade de package/daemon em reboot, reload, upgrade, rollback e reinicio de servico | Alta | package/daemon | F4 | runtime continuar a divergir entre estado desejado e estado real | G | Alto | Planeado | exige evidencias em appliance |
-| BG-010 | Hardening da trilha de blacklists UT1: download, cron, reload, fallback, except tables e forcing DNS | Alta | blacklists | F4 | subsistema seguir operacionalmente fragil apesar de funcional | G | Alto | Bloqueado pela fase | documentos da trilha ja existem e devem ser usados |
+| BG-009 | Consolidar confiabilidade de package/daemon em reboot, reload, upgrade, rollback e reinicio de servico | Alta | package/daemon | F4 | runtime continuar a divergir entre estado desejado e estado real | G | Alto | Em curso (F4.1) | aberto em F4.0 (2026-04-24); exige evidencias em appliance; ver `f4-plano-de-implementacao.md` |
+| BG-010 | Hardening da trilha de blacklists UT1: download, cron, reload, fallback, except tables e forcing DNS | Alta | blacklists | F4 | subsistema seguir operacionalmente fragil apesar de funcional | G | Alto | Em curso (F4.2) | F4.0 abriu a fase; `PLANO-BLACKLISTS-UT1` + `DIRETRIZES-IMPLEMENTACAO` + plano F4; sem bloquear fecho F3/DR-05 |
 | BG-011 | Validar forcing DNS e anti-bypass em cenarios reais de VLAN/interface, excepcoes e tabelas PF | Alta | daemon/enforcement | F4 | bypass continuar a aparecer em combinacoes menos comuns | M | Alto | Planeado | derivado das correccoes recentes em `rdr` |
 | BG-012 | Transformar os riscos principais em malha canónica de testes e regressao por componente | Critica | testes/governanca | F5 | cada nova mudanca voltar a depender de memoria humana | G | Alto | Planeado | unir smoke, builder e appliance |
 | BG-013 | Fechar cobertura minima de testes para licenciamento, blacklists, package e rollback | Alta | testes | F5 | regressao funcional escapar entre fases tecnicas | G | Alto | Planeado | alinhar com checklist mestre |

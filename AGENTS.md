@@ -40,9 +40,12 @@ Depois disso, ler apenas a documentacao da area em causa:
 - licenciamento e license server:
   `docs/10-license-server/PLANO-LICENSE-SERVER.md`
   e `docs/10-license-server/MANUAL-USO-LICENCAS.md`
-- blacklists:
+- blacklists e F4 (package/daemon trilha consumo):
   `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`
   e `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`
+  e `docs/02-roadmap/f4-plano-de-implementacao.md`
+- preparacao da malha de testes (F5):
+  `docs/02-roadmap/f5-preparacao-malha.md`
 - arquitectura e core:
   `docs/01-architecture/target-architecture.md`
   e `docs/core/README.md`

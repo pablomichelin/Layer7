@@ -4,6 +4,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F4 e F5 (governança) em 2026-04-24
+
+- **F4.0 aberta** com [`docs/02-roadmap/f4-plano-de-implementacao.md`](docs/02-roadmap/f4-plano-de-implementacao.md) — subfases
+  F4.1 (package/daemon, BG-009), F4.2 (blacklists, BG-010), F4.3 (enforcement,
+  BG-011); **paralelismo** explicito com a F3 ainda aberta (pendência DR-05)
+  **sem** alterar o contrato de licenciamento em blocos F4
+- **F5 (preparacao)** com [`docs/02-roadmap/f5-preparacao-malha.md`](docs/02-roadmap/f5-preparacao-malha.md) — roteiro
+  para malha de testes antes da execução plena (BG-012 a BG-014)
+- **`CORTEX`**, **roadmap** e **backlog** actualizados: tabela de fases,
+  `Proximos passos` (F4 e F5), estados de BG-009/BG-010; `docs/README` indexa
+  os planos
+
 ### Changed — governanca e license-server (2026-04-24)
 
 - **Politica reutilizavel do download administrativo do `.lic` (`GET /api/licenses/:id/download`)** —

@@ -242,8 +242,8 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 | F1 | Cadeia de confianca e seguranca critica | concluida em `2026-04-01` | fechar contrato oficial de distribuicao, autenticidade de artefactos, blacklists e fallback |
 | F2 | Hardening do license server | concluida em `2026-04-01` | endurecer deploy, segredos, backup e fronteiras operacionais |
 | F3 | Robustez de licenciamento/activacao | aberta em `2026-04-01` | tornar activacao, revogacao e modo offline previsiveis |
-| F4 | Confiabilidade package/daemon/blacklists | planeada | reduzir falhas operacionais e alinhar runtime com docs e gates |
-| F5 | Malha de testes e regressao | planeada | formalizar cobertura, evidencias e gates de nao regressao |
+| F4 | Confiabilidade package/daemon/blacklists | **F4.0 aberta** em `2026-04-24` (F3 ainda aberta; ver `f4-plano-de-implementacao.md`) | reduzir falhas operacionais e alinhar runtime com docs e gates |
+| F5 | Malha de testes e regressao | preparacao (`f5-preparacao-malha.md`); fase plena apos criterio F4 | formalizar cobertura, evidencias e gates de nao regressao |
 | F6 | Reorganizacao estrutural controlada | planeada | mover/normalizar estrutura apenas com mapa e rollback |
 | F7 | Observabilidade e release engineering | planeada | fortalecer telemetria, verificacao de artefactos e governanca de release |
 
@@ -251,8 +251,13 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 
 ## Proximos passos autorizados
 
-1. Abrir a F3 apenas pela ordem segura declarada no roadmap e no backlog,
-   sem reabrir F2.1-F2.5 nem antecipar F4/F5/F6/F7.
+1. Manter a **ordem segura** de fases (F0–F7) e o backlog; **nao reabrir** F1/F2
+   como trabalho novo; **F6/F7** continuam fora de escopo ate os gates
+   respectivos. A **F3** permanece em fecho: **DR-05** (appliance) e relatorio
+   de campanha sob gate F3.8. Em **paralelo operacional e documental**,
+   a **F4.0+** esta autorizada conforme
+   `docs/02-roadmap/f4-plano-de-implementacao.md` (package/daemon/blacklists
+   **sem** mudar o contrato de licenciamento salvo bloco aprovado).
 2. Usar `docs/00-overview/f3-11-start-here.md`,
    `docs/00-overview/f3-organizacao-local-e-fecho.md` e
    `docs/01-architecture/f3-fecho-operacional-restante.md` como entrada
@@ -287,8 +292,16 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
    explicitamente `F3 pode fechar`, com todos os cenarios obrigatorios da
    F3.8 em `PASS`; qualquer `FAIL`, `INCONCLUSIVE` ou `BLOCKED` obrigatorio
    mantem a F3 aberta.
-7. Usar o backlog canónico como fila unica antes de tocar em
-   codigo, empacotamento, daemon, frontend ou scripts operacionais.
+7. **F4:** seguir `docs/02-roadmap/f4-plano-de-implementacao.md` — subfases
+   F4.1 (package/daemon), F4.2 (blacklists), F4.3 (enforcement), um bloco de
+   risco de cada vez, com `MANUAL-INSTALL` e docs de area actualizados quando
+   o pacote for afectado.
+8. **F5:** tratar `docs/02-roadmap/f5-preparacao-malha.md` como roteiro de
+   preparacao; a fase F5 fica “em execucao plena” depois de cumprir os
+   criterios de saida da F4 e de actualizar a matriz em `docs/tests/`.
+9. Usar o backlog canónico como fila unica antes de tocar em
+   codigo, empacotamento, daemon, frontend ou scripts operacionais, salvo
+   excepção explícita no plano de fase (F4 paralela a F3).
 
 ---
 
@@ -457,6 +470,8 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 - [`docs/02-roadmap/backlog.md`](docs/02-roadmap/backlog.md)
 - [`docs/02-roadmap/checklist-mestre.md`](docs/02-roadmap/checklist-mestre.md)
 - [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md)
+- [`docs/02-roadmap/f4-plano-de-implementacao.md`](docs/02-roadmap/f4-plano-de-implementacao.md)
+- [`docs/02-roadmap/f5-preparacao-malha.md`](docs/02-roadmap/f5-preparacao-malha.md)
 - [`docs/00-overview/document-classification.md`](docs/00-overview/document-classification.md)
 - [`docs/00-overview/document-equivalence-map.md`](docs/00-overview/document-equivalence-map.md)
 - [`docs/03-adr/README.md`](docs/03-adr/README.md)
@@ -468,6 +483,8 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 - Arquitectura de confianca F1: [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
 - Arquitectura de seguranca F2 do license server: [`docs/01-architecture/f2-arquitetura-license-server.md`](docs/01-architecture/f2-arquitetura-license-server.md)
 - Plano F2: [`docs/02-roadmap/f2-plano-de-implementacao.md`](docs/02-roadmap/f2-plano-de-implementacao.md)
+- Plano F4: [`docs/02-roadmap/f4-plano-de-implementacao.md`](docs/02-roadmap/f4-plano-de-implementacao.md)
+- Preparacao F5: [`docs/02-roadmap/f5-preparacao-malha.md`](docs/02-roadmap/f5-preparacao-malha.md)
 - Instalacao/operacao do pacote: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md)
 - Changelog: [`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md)
 - Core tecnico: [`docs/core/README.md`](docs/core/README.md)
