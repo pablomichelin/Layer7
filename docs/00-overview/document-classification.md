@@ -189,7 +189,7 @@ vence o canónico.
 | `scripts/license-validation/init-f3-validation-campaign.sh` | inicializacao de campanha F3 | helper shell barato para materializar directoria de campanha, manifest inicial e relatorio final da F3.8 sem tocar no produto | Suplementar | novo | manter apenas como apoio operacional conservador | F3/F5 |
 | `scripts/license-validation/run-appliance-activation-scenario.sh` | orquestracao de cenario mutavel do appliance F3 | helper shell barato para encadear snapshot inicial/final do backend, activacao local e baseline do appliance no mesmo `run_id` | Suplementar | novo | manter apenas como apoio operacional conservador | F3/F5 |
 | `scripts/package/README.md` | scripts do pacote | apoio tecnico local | Suplementar | complementar a docs package/tests | rever na F5/F7 | F5/F7 |
-| `scripts/release/README.md` | release/frota | referencia local de release | Suplementar | complementar a `docs/06-releases/` | rever quando F7 abrir | F7 |
+| `scripts/release/README.md` | release/frota | install/frota; nota ADR-0003 (`pfsense-layer7` vs `Layer7`); build com check/smoke + `make package` | Suplementar | complementar a `docs/06-releases/` | rever quando F7 abrir | F7 |
 | `src/README.md` | mapa do codigo | guia local antigo da arvore de codigo | Historico | complementar a docs core | rever na F6 | F6 |
 | `src/layer7d/README.md` | daemon source | contexto local do daemon | Suplementar | complementar a docs core/daemon | rever na F4/F6 | F4/F6 |
 | `src/poc_ndpi/README.md` | POC nDPI | memoria tecnica da POC | Suplementar | complementar a docs/poc | preservar | F6 |

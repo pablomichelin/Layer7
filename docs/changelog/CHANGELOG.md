@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — `scripts/release/README.md` (ADR-0003 + build frota)
+
+- **`scripts/release/README.md`** — bloco inicial: repositório de desenvolvimento
+  vs canal público `pablomichelin/Layer7` (ADR-0003); compilação na frota com
+  `check-port-files` e `smoke-layer7d` antes de `make package`.
+- **`document-classification.md`** — linha `scripts/release/README` actualizada.
+
 ### Documentation — `scripts/build/BUILDER.md` (ordem canónica)
 
 - **`scripts/build/BUILDER.md`** — passo 5: `check-port-files` antes de smoke e

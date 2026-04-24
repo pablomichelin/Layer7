@@ -1,5 +1,11 @@
 # Release — Instalação e Gestão de Frota
 
+> **Repositórios (ADR-0003):** o código e a documentação canónica vivem em
+> **`pfsense-layer7`**. As URLs `https://github.com/pablomichelin/Layer7/...`
+> abaixo são o **canal público de instalação** (GitHub Releases do produto);
+> não substituam por caminhos do repositório de desenvolvimento salvo
+> referência operacional explícita.
+
 ## Instalação em 1 pfSense (um comando)
 
 No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:
@@ -74,6 +80,8 @@ EOF
 ```sh
 # Compilar o pacote no builder (1x):
 cd /root/pfsense-layer7
+sh scripts/package/check-port-files.sh
+sh scripts/package/smoke-layer7d.sh
 make -C package/pfSense-pkg-layer7 package
 
 # Distribuir para todos (4 em paralelo):
