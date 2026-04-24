@@ -57,6 +57,6 @@ Ajuste faixas conforme sua rede; mantenha **anotado** neste doc ou em `docs/08-l
 Fluxo condensado: [`quick-start-lab.md`](quick-start-lab.md).
 
 1. **Builder FreeBSD:** [`builder-freebsd.md`](builder-freebsd.md) → `sh scripts/package/check-port-files.sh`, `sh scripts/package/smoke-layer7d.sh` e `make package` no port.
-2. **Gate pacote + serviço no pfSense:** [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (incl. §6b PF opcional, §6c **`layer7d -e`**).
+2. **Gate pacote + serviço no pfSense:** [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início: *Gates oficiais F4* e roteiros **10a** / **10b** / **11** quando aplicável; §6b PF opcional, §6c **`layer7d -e`**).
 3. **Snapshots:** [`snapshots-e-gate.md`](snapshots-e-gate.md) antes de instalar o `.pkg`.
 4. **PoC nDPI (tráfego real):** [`../poc/README.md`](../poc/README.md).

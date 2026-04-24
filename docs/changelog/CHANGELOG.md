@@ -85,6 +85,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`.github/workflows/smoke-layer7d.yml`** — comentário: não substitui roteiros
   **10a**–**11**.
 
+### Documentation — builder, topologia, deploy e DRAFT (F4)
+
+- **`docs/08-lab/builder-freebsd.md`** — após verificação mínima do port:
+  não substitui roteiros F4 no appliance.
+- **`docs/08-lab/lab-topology.md`** — trilha pós-topologia: gates F4 no link ao
+  `validacao-lab`.
+- **`docs/04-package/deploy-github-lab.md`** — próximos passos no pfSense.
+- **`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`** — checklist pré-publicação.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.

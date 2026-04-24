@@ -91,7 +91,7 @@ Reinstalar a versão anterior com o `install.sh` da tag desejada. Ver
 ## Itens a fechar antes de publicar (checklist mínima)
 
 - [ ] Build e `.pkg` no builder; ficheiro e checksum alinhados ao manifesto
-- [ ] Roteiros **10a** / **10b** / **11** do `validacao-lab` executados no lab (evidência)
+- [ ] Roteiros **10a** / **10b** / **11** do `validacao-lab` executados no lab (evidência; na **11**: `force_dns`, anti-QUIC opcional, VLAN opcional)
 - [ ] `CHANGELOG.md`: mover itens de interesse de [Unreleased] para a secção da tag
 - [ ] `MANUAL-INSTALL.md`: **Links da versão actual** e comandos com a nova tag
 - [ ] CORTEX: última release publica vs branch (se alterar o SSOT)

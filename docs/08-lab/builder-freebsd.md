@@ -75,6 +75,13 @@ O `smoke-layer7d.sh` recusa propositadamente correr em **macOS**; no portatil
 pode correr `check-port-files.sh` local. O smoke de compilacao e testes
 leves (Linux) repete no GitHub Actions (`.github/workflows/smoke-layer7d.yml`).
 
+Isto **não** substitui a evidência no **appliance** nem o fecho formal das
+subfases **F4**: roteiros **10a**, **10b** e **11** em
+[`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início:
+*Gates oficiais F4*), com a [`test-matrix.md`](../tests/test-matrix.md) e o
+[`checklist-mestre.md`](../02-roadmap/checklist-mestre.md) quando o projecto
+exigir esse gate.
+
 ## Acesso SSH (automacao e scripts)
 
 Sessoes nao interactivas e ferramentas com `BatchMode` necessitam de

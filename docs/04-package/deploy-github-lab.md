@@ -77,7 +77,9 @@ fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/downlo
 
 ### 3. Próximos passos no pfSense
 
-Conforme o próprio `install.sh` e [`validacao-lab.md`](validacao-lab.md) (configuração, serviço, GUI).
+Conforme o próprio `install.sh` e [`validacao-lab.md`](validacao-lab.md)
+(configuração, serviço, GUI; para fecho **F4**, *Gates oficiais F4* e roteiros
+**10a** / **10b** / **11** no appliance).
 
 ---
 
