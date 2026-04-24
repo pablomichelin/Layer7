@@ -94,11 +94,12 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção
   **10b**) e aos testes **12.1** e **12.2** de
   [`../tests/test-matrix.md`](../tests/test-matrix.md)
-- [ ] na F4.3 (**BG-011**), antes de declarar a trilha de **DNS forçado**
-  (`force_dns` / anchor `natrules/layer7_nat`) concluida em relatorio, existe
-  evidencia minima alinhada a [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
-  (secção **11**, incl. cenário opcional multi-interface / VLAN no mesmo roteiro)
-  e ao teste **6.7** de [`../tests/test-matrix.md`](../tests/test-matrix.md)
+- [ ] na F4.3 (**BG-011**), antes de declarar a trilha de **DNS forçado / anti-bypass**
+  (`force_dns` / anchor `natrules/layer7_nat`; anti-QUIC por interface no branch,
+  ex. `1.8.11_12`) concluida em relatorio, existe evidencia minima alinhada a
+  [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção **11**,
+  incl. cenário opcional multi-interface / VLAN no mesmo roteiro) e ao teste **6.7**
+  de [`../tests/test-matrix.md`](../tests/test-matrix.md)
 
 ---
 

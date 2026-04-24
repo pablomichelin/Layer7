@@ -26,6 +26,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   geração PF.
 - **`docs/README.md`** — área Releases: DRAFT vs port no branch / `CORTEX`.
 
+### Documentation — governança F4.3 / BG-011
+
+- **`docs/02-roadmap/backlog.md`** — observações **BG-011**: `_11`/`_12` e DRY
+  explícitos; docs de enforcement/arquitectura.
+- **`docs/02-roadmap/checklist-mestre.md`** — gate F4.3: anti-bypass inclui
+  anti-QUIC e referência ao port em branch.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.
