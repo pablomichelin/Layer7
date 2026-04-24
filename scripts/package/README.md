@@ -25,4 +25,8 @@ sh scripts/package/smoke-layer7d.sh
 ```
 
 - Requer **`cc`** e **`make`** no PATH; compila com **`src/layer7d/Makefile`** (`OUT=layer7d-smoke`, `version.str` temporário `"smoke"`).
+- Em **Darwin (macOS)** o script imprime um **aviso** antes de compilar: o link
+  com **`-lcrypto`** costuma falhar (OpenSSL / arquitectura). O smoke **canónico**
+  é no **builder FreeBSD**; **Linux** (incl. `ubuntu-latest` no GitHub Actions)
+  costuma passar com `build-essential`.
 - O pacote instalável oficial (`.pkg`) é gerado com **`make package`** em `package/pfSense-pkg-layer7/` no builder — ver [`docs/04-package/validacao-lab.md`](../../docs/04-package/validacao-lab.md). Referências a `.txz` ficam apenas como legado histórico.
