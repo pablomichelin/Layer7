@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — blacklists (alinhamento F4.1 / pidfile)
+
+- **`PLANO-BLACKLISTS-UT1.md`** — pseudo-código do fluxo de update: passo 12
+  deixa de sugerir `cat` cru no pidfile; descreve `send_sighup` e
+  `service layer7d reload`
+
 ### Documentation — MANUAL-INSTALL (F4.1)
 
 - **`docs/10-license-server/MANUAL-INSTALL.md`** — addendum F4.1 (BG-009):

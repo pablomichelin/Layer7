@@ -555,7 +555,11 @@ LOG="/var/log/layer7-bl-update.log"
 # 10. Se modo --apply: ler categories[] do config.json
 #     (o daemon carrega apenas estas, mas os ficheiros ficam todos)
 # 11. Gravar timestamp em last-update.txt
-# 12. Enviar SIGHUP ao daemon: kill -HUP $(cat /var/run/layer7d.pid)
+# 12. Enviar SIGHUP ao daemon: a implementacao em `update-blacklists.sh`
+#     (`send_sighup`) le o pidfile com `read -r`, aplica trim, rejeita PID
+#     nao numerico e exige `kill -0` antes de `HUP`; nao usar
+#     `kill -HUP $(cat /var/run/layer7d.pid)` (fragil a espacos/corrompido).
+#     Em operacao manual: `service layer7d reload` (F4.1, `DIRETRIZES`).
 # 13. Limpar temporários
 # 14. Log do resultado com progresso
 ```
