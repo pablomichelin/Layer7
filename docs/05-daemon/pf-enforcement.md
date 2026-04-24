@@ -27,6 +27,18 @@ automática e fechada:
 Plano mestre desta trilha:
 [`../09-blocking/blocking-master-plan.md`](../09-blocking/blocking-master-plan.md)
 
+## DNS forcado (`force_dns`, F4.3 / BG-011)
+
+Para regras de **blacklist** com *Forçar DNS local*, o pacote gera `rdr` **inet**
+(UDP/TCP porta 53) e injecta-as no sub-anchor NAT **`natrules/layer7_nat`**
+via `layer7_inject_nat_to_anchor()` em `layer7.inc` — caminho **distinto** do
+snippet em `/usr/local/etc/layer7/pf.conf` usado para tabelas de bloqueio.
+Isto alinha anti-bypass DNS ao enforcement sem MITM. Detalhe operacional:
+[`../10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md)
+(addendum F4.3); evidência no appliance: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
+(secção **11**, incl. cenário opcional multi-interface / VLAN); matriz:
+[`../tests/test-matrix.md`](../tests/test-matrix.md) ponto **6.7**.
+
 ## Tabelas
 
 | Uso | Nome default | Config |

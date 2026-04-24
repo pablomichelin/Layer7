@@ -33,6 +33,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/04-package/deploy-github-lab.md`** — referências: gates F4 e cenário
   VLAN opcional na **11**.
 - **`docs/02-roadmap/backlog.md`** — **BG-011**, observações alinhadas ao roteiro.
+- **`docs/05-daemon/pf-enforcement.md`** — secção **DNS forcado** (`force_dns`,
+  anchor `natrules/layer7_nat`, remissões MANUAL / `validacao-lab` §11 / **6.7**).
+- **`docs/05-daemon/README.md`** — bullet *Enforcement*: pista F4.3 / `force_dns`.
 
 ### Documentation — `scripts/package/README` (ordem canónica no índice)
 
