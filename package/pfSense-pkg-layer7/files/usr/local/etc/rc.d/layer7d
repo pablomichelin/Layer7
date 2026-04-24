@@ -30,14 +30,33 @@ layer7d_ensure_pf_tables()
 	return 0
 }
 
+# Le ${pidfile} e define _p como PID numerico, ou vazio se invalido/ausente.
+# Alinhado a update-blacklists.sh / layer7-stats-collect.sh (F4.1).
+layer7d_pid_from_file()
+{
+	_p=""
+	[ -f "${pidfile}" ] || return 1
+	if ! read -r _p <"${pidfile}" 2>/dev/null; then
+		_p=""
+		return 1
+	fi
+	_p=$(printf '%s' "${_p}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+	case "${_p}" in
+	''|*[!0-9]*)
+		_p=""
+		return 1
+		;;
+	esac
+	return 0
+}
+
 layer7d_start()
 {
 	local _ensure_rc
 
 	/bin/mkdir -p /var/run
 	if [ -f "${pidfile}" ]; then
-		read -r _p < "${pidfile}" 2>/dev/null
-		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
+		if layer7d_pid_from_file && /bin/kill -0 "${_p}" 2>/dev/null; then
 			return 0
 		fi
 		/bin/rm -f "${pidfile}"
@@ -59,7 +78,9 @@ layer7d_stop()
 	if [ ! -f "${pidfile}" ]; then
 		return 0
 	fi
-	read -r _p < "${pidfile}" 2>/dev/null
+	if ! layer7d_pid_from_file; then
+		_p=""
+	fi
 	/bin/rm -f "${pidfile}"
 	[ -n "${_p}" ] && /bin/kill "${_p}" 2>/dev/null
 	return 0
@@ -67,12 +88,9 @@ layer7d_stop()
 
 layer7d_status()
 {
-	if [ -f "${pidfile}" ]; then
-		read -r _p < "${pidfile}" 2>/dev/null
-		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
-			echo "${name} is running as pid ${_p}."
-			return 0
-		fi
+	if [ -f "${pidfile}" ] && layer7d_pid_from_file && /bin/kill -0 "${_p}" 2>/dev/null; then
+		echo "${name} is running as pid ${_p}."
+		return 0
 	fi
 	echo "${name} is not running."
 	return 1
@@ -80,13 +98,10 @@ layer7d_status()
 
 layer7d_reload()
 {
-	if [ -f "${pidfile}" ]; then
-		read -r _p < "${pidfile}" 2>/dev/null
-		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
-			/bin/kill -HUP "${_p}"
-			echo "${name}: reload signal sent."
-			return 0
-		fi
+	if [ -f "${pidfile}" ] && layer7d_pid_from_file && /bin/kill -0 "${_p}" 2>/dev/null; then
+		/bin/kill -HUP "${_p}"
+		echo "${name}: reload signal sent."
+		return 0
 	fi
 	echo "${name}: not running, starting instead."
 	layer7d_start

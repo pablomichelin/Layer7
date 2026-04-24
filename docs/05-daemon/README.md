@@ -19,13 +19,14 @@ Ficheiro com **uma linha**, valor **numérico** (PID do processo `layer7d`).
 O **rc.d** regista o PID e (em releases recentes) ajusta permissões para
 leitura coerente com `service layer7d status`.
 
-**Consumidores** (leitura defensiva alinhada na F4 / helpers F3): PHP em
-`layer7.inc` e páginas (`trim` + `ctype_digit` / `kill -0`); shell em
-`update-blacklists.sh` (`send_sighup`), `layer7-stats-collect.sh` (cron de
-relatórios) e, para evidências de campanha, `scripts/license-validation/`
-(p.ex. `export-appliance-evidence.sh`). Não tratar o pidfile como texto
-livre: evitar espaços ou caracteres não numéricos; ver changelog e
-`f4-plano-de-implementacao.md` (F4.1 / F4.2).
+**Consumidores** (leitura defensiva alinhada na F4 / helpers F3): rc.d
+`usr/local/etc/rc.d/layer7d` (função `layer7d_pid_from_file` em
+`start`/`stop`/`status`/`reload`); PHP em `layer7.inc` e páginas (`trim` +
+`ctype_digit` / `kill -0`); shell em `update-blacklists.sh` (`send_sighup`),
+`layer7-stats-collect.sh` (cron de relatórios) e, para evidências de campanha,
+`scripts/license-validation/` (p.ex. `export-appliance-evidence.sh`). Não
+tratar o pidfile como texto livre: evitar espaços ou caracteres não numéricos;
+ver changelog e `f4-plano-de-implementacao.md` (F4.1 / F4.2).
 
 ## Build
 

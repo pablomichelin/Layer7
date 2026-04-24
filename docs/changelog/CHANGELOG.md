@@ -17,12 +17,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `/var/run/layer7d.pid` alinhada aos scripts do pacote (`read -r`, trim,
   PID numerico, `kill -0` antes de `USR1`)
 
+### Changed — F4.1 / rc.d (pidfile)
+
+- **`files/usr/local/etc/rc.d/layer7d`** — `layer7d_pid_from_file` (trim,
+  PID numerico) usado em `start`, `stop`, `status` e `reload`, alinhado a
+  `update-blacklists.sh` / `layer7-stats-collect.sh`
+- **`Makefile` (`PORTREVISION`)** — `5` (rebuild `1.8.11_5`)
+
 ### Changed — F4.1 / cron (pidfile)
 
 - **`layer7-stats-collect.sh`** — leitura de `/var/run/layer7d.pid` alinhada a
   `update-blacklists.sh` (`send_sighup`): `read -r`, trim com `sed`, rejeicao
-  de PID nao numerico antes de `kill -0` / `USR1`
-- **`Makefile` (`PORTREVISION`)** — `4` (rebuild `1.8.11_4`)
+  de PID nao numerico antes de `kill -0` / `USR1` (`PORTREVISION` `4` / build
+  `1.8.11_4` nesse bloco)
 
 ### Documentation — F5 (preparacao) alinhada a F4
 
