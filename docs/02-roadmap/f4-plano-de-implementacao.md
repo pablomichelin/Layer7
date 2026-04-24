@@ -76,7 +76,8 @@ arranque (evita falso negativo de `status` quando o pidfile era `0600`);
 `pkg-install` passa a `onestop` antes de `onestart` no `POST-INSTALL` para
 upgrade carregar o binario novo; `layer7_signal_reload()` alinha-se ao
 `reload` do rc.d (HUP se vivo, senão `layer7_ensure_daemon_running()`);
-`PORTVERSION` `1.8.6`.
+`layer7_restart_service` / `layer7_read_stats` endurecem leitura do pidfile e
+`USR1` só com processo vivo; `PORTVERSION` `1.8.7`.
 
 **Liga a:** BG-009.
 

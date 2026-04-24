@@ -465,9 +465,9 @@ function layer7_restart_service()
 	usleep(500000);
 	$pidf = "/var/run/layer7d.pid";
 	if (file_exists($pidf)) {
-		$pid = trim(file_get_contents($pidf));
+		$pid = trim(@file_get_contents($pidf));
 		if ($pid !== "" && ctype_digit($pid)) {
-			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>&1", $chk, $code);
+			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $chk, $code);
 			return ($code === 0);
 		}
 	}
@@ -947,15 +947,18 @@ function layer7_read_stats()
 {
 	$pidf = "/var/run/layer7d.pid";
 	if (file_exists($pidf)) {
-		$pid = trim(file_get_contents($pidf));
+		$pid = trim(@file_get_contents($pidf));
 		if ($pid !== "" && ctype_digit($pid)) {
-			$cmd = "/bin/kill -USR1 " . escapeshellarg($pid) . " 2>/dev/null";
-			if (function_exists("mwexec")) {
-				mwexec($cmd);
-			} else {
-				@shell_exec($cmd);
+			exec("/bin/kill -0 " . escapeshellarg($pid) . " 2>/dev/null", $st_chk, $st_code);
+			if ($st_code === 0) {
+				$cmd = "/bin/kill -USR1 " . escapeshellarg($pid) . " 2>/dev/null";
+				if (function_exists("mwexec")) {
+					mwexec($cmd);
+				} else {
+					@shell_exec($cmd);
+				}
+				usleep(200000);
 			}
-			usleep(200000);
 		}
 	}
 	$path = layer7_stats_path();

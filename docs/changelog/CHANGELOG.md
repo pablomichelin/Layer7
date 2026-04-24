@@ -17,7 +17,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `layer7_ensure_daemon_running()` (sobe o daemon quando `layer7.enabled` no
   JSON), em linha com o `reload` do `rc.d` (HUP apenas quando o processo esta
   vivo); leitura do pidfile com `@file_get_contents` para evitar avisos
-- **`PORTVERSION`** — `1.8.6` (artefacto publico de referencia continua
+- **`layer7.inc` (`layer7_restart_service`, `layer7_read_stats`)** — leitura do
+  pidfile com `@file_get_contents`; `kill -0` antes de `USR1` nas estatisticas;
+  verificacao pos-restart com `kill -0` redireccionado para `/dev/null`
+- **`PORTVERSION`** — `1.8.7` (artefacto publico de referencia continua
   `1.8.3` ate nova release)
 
 ### Added — continuidade entre chats longos
