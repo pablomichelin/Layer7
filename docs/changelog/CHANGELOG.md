@@ -13,6 +13,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   (continuação) ligando `validacao-lab` §11 e matriz **6.7**.
 - **`docs/10-license-server/MANUAL-INSTALL.md`** — addendum F4.3: remissão ao
   roteiro (secção **11**).
+- **`docs/08-lab/quick-start-lab.md`** — passo **6** (F4): secção **11** com
+  cenário opcional multi-interface / VLAN.
+- **`docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`** — addendum F4.3: mesma pista
+  no roteiro de evidência.
+- **`docs/04-package/README.md`** — índice: nota na entrada `validacao-lab`.
 
 ### Documentation — `scripts/package/README` (ordem canónica no índice)
 
