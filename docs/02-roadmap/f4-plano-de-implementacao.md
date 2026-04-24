@@ -97,10 +97,10 @@ PID numerico); `PORTREVISION` `4` (`1.8.11_4`).
 **Exclusões:** mudança estrutural de directórios; observabilidade pesada
 (F7).
 
-**Teste mínimo:** smoke do daemon (CI e/ou
-`scripts/package/smoke-layer7d.sh`); no appliance, roteiro objectivo em
+**Teste mínimo:** `check-port-files.sh` + `smoke-layer7d.sh` (CI/builder) e
+`make package` quando aplicável; no appliance, roteiro em
 [`validacao-lab.md`](../04-package/validacao-lab.md) secção **10a** (BG-009:
-pidfile, `rc.d`, permissões e alinhamento com scripts).
+pidfile, `rc.d`, permissões, scripts e alinhamento PHP).
 
 ### F4.2 — Blacklists: updater, estado e tabelas PF
 

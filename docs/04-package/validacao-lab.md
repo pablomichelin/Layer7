@@ -570,6 +570,13 @@ ficheiro após arranque normal (`chmod 0644` no bloco F4.1).
 reload/stats via `layer7.inc`) à mesma semântica (**primeira linha**, trim,
 só dígitos), usar pacote com **`PORTREVISION` ≥ 6** (`layer7_daemon_pid_from_file`).
 
+**Pré-requisito (repositório / builder):** antes de instalar o `.pkg` no
+pfSense, na raiz do clone correr `sh scripts/package/check-port-files.sh` e
+`sh scripts/package/smoke-layer7d.sh` (secção **3**); no builder,
+`make package` quando o bloco exigir artefacto com `rc.d`, scripts de cron/
+blacklists e/ou `layer7.inc` actualizados. Isto não substitui a evidência no
+appliance (`service layer7d status`, GUI, pidfile).
+
 **Comandos (SSH como root):**
 
 ```sh
