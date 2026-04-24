@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — `builder-freebsd` (verificacao + SSH)
+
+- **`08-lab/builder-freebsd.md`** — seccao *Verificacao minima do port* (check,
+  smoke, `make package`); nota macOS/CI; *Acesso SSH* (chave publica vs
+  `publickey`).
+- **`document-classification.md`** — linha `builder-freebsd` actualizada.
+
 ### Documentation — `quick-start-lab` (passo F4 após gate base)
 
 - **`08-lab/quick-start-lab.md`** — passo **6** (*F4*): remissão a Gates,

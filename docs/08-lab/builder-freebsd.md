@@ -60,3 +60,25 @@ Flags alinhadas ao port; `version.str` em `src/layer7d/` define a string de `lay
 - Nao reutilizar chaves de producao no lab sem isolamento.
 - Builder de lab atualmente validado: FreeBSD 15 em `192.168.0.129` com acesso administrativo liberado para blocos de build e validacao.
 - Credenciais do builder devem ficar apenas em inventario local ou contexto operacional; nao versionar senha no repositorio.
+
+## Verificacao minima do port (no builder)
+
+Apos `git pull` no clone do repositorio (caminho tipico, ex.: `/root/pfsense-layer7`):
+
+```sh
+sh scripts/package/check-port-files.sh
+sh scripts/package/smoke-layer7d.sh
+cd package/pfSense-pkg-layer7 && make clean 2>/dev/null || true && make package
+```
+
+O `smoke-layer7d.sh` recusa propositadamente correr em **macOS**; no portatil
+pode correr `check-port-files.sh` local. O smoke de compilacao e testes
+leves (Linux) repete no GitHub Actions (`.github/workflows/smoke-layer7d.yml`).
+
+## Acesso SSH (automacao e scripts)
+
+Sessoes nao interactivas e ferramentas com `BatchMode` necessitam de
+**chave publica** autorizada no `authorized_keys` do builder. Se vir
+`Permission denied (publickey)`, falta essa chave (ou o host nao e o
+builder certo). Isto e independente de ter password para login
+interactivo: scripts nao devem depender de password em claro.

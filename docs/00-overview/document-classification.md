@@ -130,7 +130,7 @@ vence o canónico.
 | `docs/07-prompts/README.md` | prompts/IA | area auxiliar de prompts | Suplementar | complementar a `AGENTS.md` | manter leve; nao tratar como SSOT | F6 |
 | `docs/07-prompts/next-chat-phase-a-option1.md` | continuidade antiga | prompt historico de fase antiga | Historico | substituido pelo checkpoint do `CORTEX.md` | preservar | F6 |
 | `docs/08-lab/README.md` | indice do lab | agregador da area de laboratorio | Suplementar | complementar ao roadmap e package docs | manter leve | F4/F5 |
-| `docs/08-lab/builder-freebsd.md` | builder | guia operacional do builder | Suplementar | complementar ao `AGENTS.md` | rever quando F1/F4 mexerem no builder | F1/F4 |
+| `docs/08-lab/builder-freebsd.md` | builder | guia do builder: verificacao minima do port, smoke, acesso SSH por chave | Suplementar | complementar ao `AGENTS.md` | rever quando F1/F4 mexerem no builder | F1/F4 |
 | `docs/08-lab/guia-windows.md` | Windows legado | preservado para rastreabilidade; **nao** e fluxo vigente; *Fonte vigente* aponta para o indice do lab e `deploy-github-lab` | Historico | substituido operacionalmente por `docs/08-lab/README.md` + `builder-freebsd` + `validacao-lab` + `deploy-github-lab` | remover ou arquivar fisicamente apenas na F6 | F6 |
 | `docs/08-lab/lab-inventory.template.md` | inventario de lab | template local | Placeholder | — | preencher localmente quando necessario | F4/F5 |
 | `docs/08-lab/lab-topology.md` | topologia de lab | referencia de ambiente | Suplementar | — | manter | F4/F5 |
