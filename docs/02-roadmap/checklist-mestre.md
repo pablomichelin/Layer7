@@ -85,6 +85,15 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md) (secção 0) —
   nao alterar o contrato de licenciamento salvo decisao e documentacao no
   mesmo bloco
+- [ ] na F4.1 (**BG-009**), antes de declarar a trilha de **serviço/pidfile**
+  concluida em relatorio, existe evidencia minima alinhada a
+  [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção
+  **10a**) e ao teste **3.8** de [`../tests/test-matrix.md`](../tests/test-matrix.md)
+- [ ] na F4.2 (**BG-010**), antes de declarar a trilha de **blacklists updater**
+  concluida em relatorio, existe evidencia minima alinhada a
+  [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção
+  **10b**) e aos testes **12.1** e **12.2** de
+  [`../tests/test-matrix.md`](../tests/test-matrix.md)
 - [ ] na F4.3 (**BG-011**), antes de declarar a trilha de **DNS forçado**
   (`force_dns` / anchor `natrules/layer7_nat`) concluida em relatorio, existe
   evidencia minima alinhada a [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)

@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — gates F4 e índice de roteiros (lab)
+
+- **`validacao-lab.md`** — tabela **Índice dos roteiros F4** (10a / 10b / 11 ↔
+  BG-009 / BG-010 / BG-011 ↔ matriz)
+- **`checklist-mestre.md`** — itens de evidência mínima para **F4.1** e **F4.2**
+  (paralelos ao gate já existente da **F4.3**)
+- **`CORTEX.md`** — ponto 10 dos próximos passos alinhado aos três gates F4.1–F4.3
+
 ### Documentation — validação lab / matriz (F4.2 BG-010)
 
 - **`validacao-lab.md`** — secção **10b**: roteiro do updater, log, SIGHUP,

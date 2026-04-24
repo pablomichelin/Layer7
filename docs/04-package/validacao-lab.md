@@ -522,6 +522,18 @@ Pendencias conhecidas:
 - fechar evidencia do menu GUI do pacote no fluxo manual completo
 - reduzir ou eliminar a dependencia de `IGNORE_OSVERSION=yes`
 
+## Índice dos roteiros F4 (evidência em lab / appliance)
+
+| Secção | Backlog | Objectivo resumido | Matriz (`test-matrix.md`) |
+|--------|---------|-------------------|---------------------------|
+| **10a** | BG-009 (F4.1) | pidfile, `rc.d`, permissões, consumidores do PID | **3.8** |
+| **10b** | BG-010 (F4.2) | updater assinado, `send_sighup`, `fallback.state` | **12.1**, **12.2** |
+| **11** | BG-011 (F4.3) | DNS forçado, anchor `natrules/layer7_nat`, `pfctl -s nat` | **6.7** |
+
+O checklist rápido abaixo (itens 13–15) referencia estas secções.
+
+---
+
 ## 10. Checklist rapido
 
 | # | Item | OK |

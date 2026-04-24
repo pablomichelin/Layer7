@@ -304,8 +304,10 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
   codigo, empacotamento, daemon, frontend ou scripts operacionais, salvo
   excepção explícita no plano de fase (F4 paralela a F3).
 10. O **checklist mestre** inclui gates de teste para **F4** (paralelismo com
-  a F3) e **F4.3** / **BG-011** (evidencia `validacao-lab` sec. 11 e
-  `test-matrix` 6.7 antes de fechar a trilha de `force_dns`).
+  a F3): **F4.1** / **BG-009** (`validacao-lab` sec. **10a**, `test-matrix`
+  **3.8**), **F4.2** / **BG-010** (sec. **10b**, **12.1–12.2**), **F4.3** /
+  **BG-011** (sec. **11**, **6.7**) antes de declarar fechadas as trilhas
+  respectivas em relatorio.
 
 ---
 
