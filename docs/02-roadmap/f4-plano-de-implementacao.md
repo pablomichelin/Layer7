@@ -114,6 +114,11 @@ excepções) alinhado a [`layer7.inc`](../../package/pfSense-pkg-layer7/files/us
 
 **Liga a:** BG-011.
 
+**Checkpoint `2026-04-24` (primeiro bloco):** `layer7_generate_rdr_rules_snippet`
+deduplica interfaces; valida cada CIDR/IP de origem antes de emitir `rdr`;
+`layer7_get_pfsense_interfaces` deixa de assumir sempre API pfSense;
+`PORTREVISION` incrementado (rebuild `1.8.11_1`).
+
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog
 históricos de `rdr` e `get_real_interface`); evidência em lab quando
 possível.

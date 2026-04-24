@@ -4,6 +4,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F4.3 enforcement / DNS forcado (BG-011)
+
+- **`layer7.inc` (`layer7_generate_rdr_rules_snippet`)** — deduplica nomes de
+  interface apos `get_real_interface` / fallback VLAN, evitando linhas `rdr`
+  repetidas; so emite `rdr` para `src_cidrs` que passam `layer7_cidr_valid`
+  ou `layer7_ipv4_valid` (evita `pfctl` a rejeitar o anchor NAT por texto
+  invalido)
+- **`layer7.inc` (`layer7_get_pfsense_interfaces`)** — retorna lista vazia se
+  `get_configured_interface_list` ou `get_real_interface` nao existirem
+  (contexto nao-pfSense / testes), em vez de erro fatal
+- **`Makefile` (`PORTREVISION`)** — `1` (rebuild do port; `PORTVERSION`
+  mantem-se `1.8.11`)
+
 ### Documentation — F4.1 (BG-009) e roadmap F4
 
 - **`MANUAL-INSTALL.md`** — addendum operacional F4.1: `POST-INSTALL` com

@@ -109,6 +109,7 @@ function layer7_generate_rdr_rules_snippet()
 			$real_ifaces[] = $ifid;
 		}
 	}
+	$real_ifaces = array_values(array_unique($real_ifaces));
 	if (empty($real_ifaces)) {
 		return "";
 	}
@@ -131,6 +132,9 @@ function layer7_generate_rdr_rules_snippet()
 			foreach ($rule["src_cidrs"] as $cidr) {
 				$cidr = trim((string)$cidr);
 				if ($cidr === "") {
+					continue;
+				}
+				if (!layer7_cidr_valid($cidr) && !layer7_ipv4_valid($cidr)) {
 					continue;
 				}
 				$has_rules = true;
@@ -857,6 +861,9 @@ function layer7_get_pfsense_interfaces()
 	global $config;
 
 	$result = array();
+	if (!function_exists("get_configured_interface_list") || !function_exists("get_real_interface")) {
+		return $result;
+	}
 	foreach (get_configured_interface_list(true) as $ifid => $ifdescr) {
 		$real = get_real_interface($ifid);
 		if (!$real) {

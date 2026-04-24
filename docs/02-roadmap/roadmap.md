@@ -493,12 +493,16 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   PID e exige `kill -0` antes de `HUP` (alinhado à trilha F4.1 no daemon);
   `--restore-lkg` partilha lock com o update; `layer7-pfctl` usa `/sbin/pfctl`
   de forma consistente; `PORTVERSION` `1.8.11`.
+- **F4.3 bloco `2026-04-24` (inicio):** `layer7.inc` — `rdr` / `force_dns`
+  com interfaces unicas, validacao de CIDR/IPv4 antes de injectar no anchor
+  NAT; guardas em `layer7_get_pfsense_interfaces`; `PORTREVISION` `1`.
 - **Seguinte:** evidencia em appliance/lab (BG-009/010: validacao segundo
   [`validacao-lab.md`](../04-package/validacao-lab.md) e
-  `scripts/package/smoke-layer7d.sh` no builder); F4.3 (BG-011) em bloco
-  proprio; fecho formal de BG-009/010 quando a matriz de saida F4 tiver
-  evidencia minima; em paralelo, **DR-05** no appliance `192.168.100.254` para
-  fechar a F3 sob gate F3.8.
+  `scripts/package/smoke-layer7d.sh` no builder); continuar **F4.3** (BG-011:
+  forcing DNS / excepcoes em cenarios VLAN) em blocos pequenos; fecho formal
+  de BG-009/010 quando a matriz de saida F4 tiver evidencia minima; em
+  paralelo, **DR-05** no appliance `192.168.100.254` para fechar a F3 sob
+  gate F3.8.
 
 ### Criterios de entrada
 
