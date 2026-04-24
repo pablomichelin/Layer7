@@ -21,6 +21,11 @@ Itens de backlog: BG-012, BG-013, BG-014.
 
 - F4: trilha package/daemon/blacklists com comportamento previsível e docs
   alinhados (criterio de saída do roadmap F4).
+- [`checklist-mestre.md`](checklist-mestre.md) com gates de teste
+  assinaláveis para **F4** (paralelismo com a F3) e, onde aplicável, **F4.3**
+  / **BG-011** (evidência mínima em
+  [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) sec. 11 e
+  teste **6.7** de [`../tests/test-matrix.md`](../tests/test-matrix.md)).
 - `docs/tests/test-matrix.md` e
   [`../tests/README.md`](../tests/README.md) revistos; CI
   (`.github/workflows/smoke-layer7d.yml`) como mínimo de regressão
@@ -31,6 +36,11 @@ Itens de backlog: BG-012, BG-013, BG-014.
 
 ## 3. Ordem de trabalho sugerida (F5.1+)
 
+0. Garantir que as subfases **F4** em curso têm **evidência mínima** e
+   **rollback** coerentes com o
+   [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md) e com os
+   itens de teste do [`checklist-mestre.md`](checklist-mestre.md) (não
+   antecipar "malha F5" sem cumprir o que a F4 ainda exige, ex.: **6.7** / BG-011).
 1. **F5.1** — Inventariar o que já existe: smoke, `make check`, `npm test`
   do license server, validação de lab.
 2. **F5.2** — Definir "gate mínimo" por alteração (matriz: área do produto
@@ -54,3 +64,5 @@ Itens de backlog: BG-012, BG-013, BG-014.
 - `docs/tests/README.md`
 - `docs/tests/test-matrix.md`
 - `CORTEX.md` e `backlog.md` ao mudar o estado da F5.
+- `checklist-mestre.md` (gates F4 / F4.3) e `validacao-lab.md` (roteiros de
+  appliance) como fontes de critério antes de alargar a malha de regressão.

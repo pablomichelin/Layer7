@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — F5 (preparacao) alinhada a F4
+
+- **`f5-preparacao-malha.md`** — prerequisitos com gates do `checklist-mestre`
+  (F4 / F4.3) e ligação a `validacao-lab` / `test-matrix` 6.7; passo 0 na
+  ordem de trabalho (evidencia F4 antes de prometer F5 plena); secção 5 com
+  referencia a checklist e roteiros de lab
+
 ### Documentation — gates F4 no checklist mestre
 
 - **`checklist-mestre.md`** — checklist de testes e gates: itens F4 (paralelismo
