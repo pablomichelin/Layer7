@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — `AGENTS.md` (ponte para builder)
+
+- **`AGENTS.md`** — *Dados do builder:* remissao a `docs/08-lab/builder-freebsd.md`
+  (verificacao minima, smoke, SSH por chave).
+
 ### Documentation — `builder-freebsd` (verificacao + SSH)
 
 - **`08-lab/builder-freebsd.md`** — seccao *Verificacao minima do port* (check,

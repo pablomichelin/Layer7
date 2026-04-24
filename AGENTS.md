@@ -188,6 +188,7 @@ como um unico bloco governado por checklist.
 - **SSH:** `root / pablo`
 - **OS:** `FreeBSD 15.0-RELEASE`
 - **Repo no builder:** `/root/pfsense-layer7`
+- **Guia (verificacao minima, smoke, acesso SSH por chave):** `docs/08-lab/builder-freebsd.md`
 
 ### Ficheiros locais sensiveis no builder
 
