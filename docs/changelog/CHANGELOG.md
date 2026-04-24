@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — `lab-topology` e `src/layer7d/README` (ordem de build)
+
+- **`08-lab/lab-topology.md`** — trilha builder: `check-port-files` antes de
+  smoke e `make package`.
+- **`src/layer7d/README.md`** — bloco *Pacote pfSense* + smoke; ligação ao
+  README do port.
+- **`document-classification.md`** — linha `src/layer7d/README.md`.
+
 ### Documentation — README do port e do daemon (ordem de build)
 
 - **`package/pfSense-pkg-layer7/README.md`** — passo `check-port-files` antes do

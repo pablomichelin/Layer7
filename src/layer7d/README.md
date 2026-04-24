@@ -21,4 +21,6 @@ cc -Wall -Wextra -O2 -I. -I../common -o layer7d main.c config_parse.c policy.c e
 
 Para ver **block** no dry-run na regra BitTorrent do sample, ative `enabled: true` em `p-blk-bt-001`.
 
-Smoke (raiz do clone): `sh scripts/package/smoke-layer7d.sh` — usa este Makefile com **`OUT=layer7d-smoke`** e **`VSTR_DIR`** temporário. **Syslog remoto:** `syslog_remote` + `syslog_remote_host` + porta (UDP RFC 3164).
+**Pacote pfSense (port):** na raiz do clone, ordem canónica `sh scripts/package/check-port-files.sh`, `sh scripts/package/smoke-layer7d.sh`, depois `make package` em `package/pfSense-pkg-layer7/` — ver [`package/pfSense-pkg-layer7/README.md`](../../package/pfSense-pkg-layer7/README.md).
+
+Smoke (raiz do clone, binário / CI): `sh scripts/package/smoke-layer7d.sh` — usa este Makefile com **`OUT=layer7d-smoke`** e **`VSTR_DIR`** temporário. **Syslog remoto:** `syslog_remote` + `syslog_remote_host` + porta (UDP RFC 3164).
