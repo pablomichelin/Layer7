@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validação lab / matriz (F4.1 BG-009)
+
+- **`validacao-lab.md`** — secção **10a**: roteiro objectivo no appliance para
+  pidfile, `rc.d`, permissões 0644 e critérios mínimos de PASS; checklist
+  rápido com item 14
+- **`test-matrix.md`** — teste **3.8** (daemon) pendente, ligado à secção 10a
+- **`docs/tests/README.md`** — contagens 80 testes / 6 pendentes
+- **`f4-plano-de-implementacao.md`** — teste mínimo F4.1 referencia a secção 10a
+
 ### Documentation — blacklists (alinhamento F4.1 / pidfile)
 
 - **`PLANO-BLACKLISTS-UT1.md`** — pseudo-código do fluxo de update: passo 12

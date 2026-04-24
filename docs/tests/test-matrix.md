@@ -1,6 +1,6 @@
 # Matriz de testes — V1 + addendum F3 + F4.3 (enforcement)
 
-Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Actions / Ubuntu), no **builder** (FreeBSD) ou no **appliance** (pfSense lab). O ponto **6.7** liga-se ao roteiro F4.3 (BG-011) em
+Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Actions / Ubuntu), no **builder** (FreeBSD) ou no **appliance** (pfSense lab). O ponto **3.8** liga-se ao roteiro F4.1 (BG-009) em `docs/04-package/validacao-lab.md` (secção 10a). O ponto **6.7** liga-se ao roteiro F4.3 (BG-011) em
 `docs/04-package/validacao-lab.md` (secção 11).
 
 ---
@@ -35,6 +35,7 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 3.5 | Daemon sobe após reboot (`sysrc layer7d_enable=YES`) | appliance | OK |
 | 3.6 | SIGHUP reload sem crash | appliance | OK |
 | 3.7 | SIGUSR1 mostra stats | appliance | OK (2026-03-22) |
+| 3.8 | `service layer7d status`, pidfile 0644 e leitura coerente (trim/PID numérico; sem falso negativo de permissão) | appliance | Pendente (F4.1; `validacao-lab` sec. 10a) |
 
 ## 4. Configuração e persistência
 

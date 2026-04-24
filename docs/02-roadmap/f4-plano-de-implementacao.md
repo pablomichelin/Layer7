@@ -93,8 +93,9 @@ PID numerico); `PORTREVISION` `4` (`1.8.11_4`).
 (F7).
 
 **Teste mínimo:** smoke do daemon (CI e/ou
-`scripts/package/smoke-layer7d.sh`); onde aplicável, validação no lab
-appliance segundo [`validacao-lab.md`](../04-package/validacao-lab.md).
+`scripts/package/smoke-layer7d.sh`); no appliance, roteiro objectivo em
+[`validacao-lab.md`](../04-package/validacao-lab.md) secção **10a** (BG-009:
+pidfile, `rc.d`, permissões e alinhamento com scripts).
 
 ### F4.2 — Blacklists: updater, estado e tabelas PF
 

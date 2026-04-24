@@ -512,8 +512,9 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   `docs/tests/README`
   alinhado a 79/74/5 e 6.7.
 - **F4 (gates):** `checklist-mestre` — testes F4 / F4.3 (evidência mínima BG-011).
-- **Seguinte:** evidencia em appliance/lab (BG-009/010: validacao segundo
-  [`validacao-lab.md`](../04-package/validacao-lab.md) e
+- **Seguinte:** evidencia em appliance/lab (BG-009: roteiro F4.1 na secção
+  **10a** de [`validacao-lab.md`](../04-package/validacao-lab.md); BG-010:
+  validacao segundo o mesmo documento e
   `scripts/package/smoke-layer7d.sh` no builder); continuar **F4.3** (BG-011:
   forcing DNS / excepcoes em cenarios VLAN) em blocos pequenos; fecho formal
   de BG-009/010 quando a matriz de saida F4 tiver evidencia minima; em

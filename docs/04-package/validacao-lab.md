@@ -539,6 +539,52 @@ Pendencias conhecidas:
 | 11 | Menu GUI anotado | [ ] |
 | 12 | `pkg delete` OK | [x] |
 | 13 | F4.3: anchor NAT `force_dns` (ver secção 11) | [ ] |
+| 14 | F4.1: pidfile / `rc.d` / consumidores (ver secção 10a) | [ ] |
+
+---
+
+## 10a. Roteiro F4.1 — pidfile, `rc.d` e consumidores (BG-009)
+
+**Objectivo:** recolher evidência de que `/var/run/layer7d.pid` é tratado de
+forma consistente pelo `rc.d`, pela GUI, pelo updater de blacklists e pelo
+cron de stats (leitura com trim, só dígitos, `kill -0` antes de sinais), e
+que `service layer7d status` não falha indevidamente por permissões do
+ficheiro após arranque normal (`chmod 0644` no bloco F4.1).
+
+**Onde:** appliance pfSense com pacote que inclua o bloco F4.1 (ex. linha
+`1.8.11` com `PORTREVISION` ≥ 4 no port; ver `CORTEX.md` / `Makefile`).
+
+**Comandos (SSH como root):**
+
+```sh
+service layer7d status
+ls -l /var/run/layer7d.pid
+```
+
+Com o daemon activo, espera-se mensagem do tipo `layer7d is running as pid
+<N>.` e um pidfile com modo **`-rw-r--r--`** (0644).
+
+**Critério mínimo de PASS (evidência):**
+
+- `status` coerente com `ps` / `pgrep layer7d`
+- pidfile presente após `onestart`, conteúdo uma linha só com PID numérico
+  (sem lixo visível); após edição manual acidental, os scripts devem recusar
+  `HUP`/`USR1` em vez de enviar sinal a PID inválido (comportamento documentado
+  em `update-blacklists.sh` / `layer7-stats-collect.sh`)
+
+**Opcional (suporte sem shell root):** se existir utilizador local de teste,
+confirmar que consegue **ler** `/var/run/layer7d.pid` (o número exposto não é
+segredo; evita regressão da página Status na mesma linha).
+
+**Rollback:** reinstalar o `.pkg` anterior documentado como seguro;
+`service layer7d onerestart` após substituir o pacote.
+
+**Referências:** `docs/02-roadmap/f4-plano-de-implementacao.md` (F4.1),
+`docs/05-daemon/README.md` (Pidfile), addendum F4.1 em
+`docs/10-license-server/MANUAL-INSTALL.md`.
+
+**Registo sugerido:** data, `pkg info pfSense-pkg-layer7`, saída de `service
+layer7d status`, `ls -l /var/run/layer7d.pid`.
 
 ---
 
