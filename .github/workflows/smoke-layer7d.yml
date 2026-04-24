@@ -1,5 +1,6 @@
 # Compila layer7d (Linux) e corre scripts/package/smoke-layer7d.sh.
-# Não substitui validação do port `.pkg` no FreeBSD / pfSense (validacao-lab.md).
+# Não substitui validação do port `.pkg` no FreeBSD / pfSense nem os roteiros F4
+# no appliance (docs/04-package/validacao-lab.md: 10a / 10b / 11).
 name: smoke layer7d
 
 on:

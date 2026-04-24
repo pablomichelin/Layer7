@@ -78,6 +78,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`** — addendum F4.3
   normativo.
 
+### Documentation — package-skeleton e CI (remissão F4)
+
+- **`docs/04-package/package-skeleton.md`** — critério “pacote OK”: gates F4,
+  matriz e checklist mestre.
+- **`.github/workflows/smoke-layer7d.yml`** — comentário: não substitui roteiros
+  **10a**–**11**.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.
