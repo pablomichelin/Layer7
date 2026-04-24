@@ -28,7 +28,7 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Ultima versao do pacote publicada em release:** `1.8.3` (referencia de instalacao
 em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases).
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`):**
-`1.8.4` (artefacto ainda nao publicado; actualizar manual e procedimentos na
+`1.8.5` (artefacto ainda nao publicado; actualizar manual e procedimentos na
 mesma entrega de release).
 **Data-base deste checkpoint:** `2026-04-24`
 
@@ -52,7 +52,7 @@ controladas, com governanca forte e zero regressao desnecessaria.
   GitHub Releases.
 - A ultima publicacao conhecida no canal publico continua a ser o pacote
   `1.8.3` (V1 comercial estavel). O repositório pode antecipar o proximo
-  `pkgver` (actualmente `1.8.4` no `Makefile` do port) antes da release; nao
+  `pkgver` (actualmente `1.8.5` no `Makefile` do port) antes da release; nao
   misturar isso com o pacote publicado sem fechar o bloco de build/validacao.
 - Bloqueio QUIC configuravel por interface na GUI e restricao
   `to !<localsubnets>` em bloqueios permanecem como base funcional conhecida.
@@ -392,10 +392,10 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
   evidencias por `run_id`.
 - Em `2026-04-14`, o run read-only
   `20260414T123526Z-appliance254-permissions` confirmou que `codex` nao tem
-  escrita no `.lic`, que o pidfile `0600 root:wheel` gera falso negativo em
-  `service layer7d status`, e que o daemon esta vivo por `pgrep` e stats
-  JSON; isto melhora a evidencia de DR-05, mas nao fecha os cenarios
-  mutaveis.
+  escrita no `.lic`; o rc.d passou a aplicar `chmod 0644` ao pidfile apos
+  arranque (F4.1) para `service layer7d status` nao falhar por falta de
+  leitura do PID; o daemon continua auditavel por `pgrep` e stats JSON; isto
+  melhora a evidencia de DR-05, mas nao fecha os cenarios mutaveis.
 - Os pacotes antigos de cinco insumos da F3.11 permanecem como memoria
   documental-operacional, mas nao sao mais o gate corrente para continuar a
   F3. O caminho actual e consultar `f3-11-start-here.md`,
@@ -638,7 +638,7 @@ CHECKPOINT CANONICO
 - Data base: 2026-04-24
 - Produto: Layer7 para pfSense CE
 - Ultima versao .pkg publicada (referencia operacional): 1.8.3
-- PORTVERSION no repositorio (pre-release / proximo build): 1.8.4
+- PORTVERSION no repositorio (pre-release / proximo build): 1.8.5
 - Estado funcional: V1 Comercial concluida e publicada; F3 aberta
 - Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
   fecho operacional (blocker: DR-05 no appliance)
@@ -658,7 +658,7 @@ CHECKPOINT CANONICO
 ### Tecnico
 
 - A referencia de **instalacao publica** continua a ser o pacote `1.8.3` ate
-  nova release; o branch pode carregar `PORTVERSION=1.8.4` para o proximo
+  nova release; o branch pode carregar `PORTVERSION=1.8.5` para o proximo
   empacotamento.
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.

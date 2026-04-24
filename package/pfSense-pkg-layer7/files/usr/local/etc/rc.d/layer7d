@@ -48,6 +48,10 @@ layer7d_start()
 		echo "${name}: PF ensure reported errors (rc=${_ensure_rc}), starting daemon in degraded mode." >&2
 	fi
 	/usr/sbin/daemon -f -p "${pidfile}" "${layer7d_bin}"
+	# `daemon` cria o pidfile tipicamente como 0600 root:wheel; operadores sem
+	# privilegio nao conseguiam ler o PID e `service layer7d status` falhava
+	# indevidamente. 0644 expoe apenas o numero do processo.
+	/bin/chmod 0644 "${pidfile}" 2>/dev/null || true
 }
 
 layer7d_stop()

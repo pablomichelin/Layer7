@@ -46,8 +46,11 @@ require_once('${PKG_ROOTDIR}/usr/local/pkg/layer7.inc');
 layer7_reports_setup_cron(true, 5);
 " >/dev/null 2>&1 || true
 
-# --- Habilitar e iniciar o serviço ---
+# --- Habilitar e (re)iniciar o serviço ---
+# `onestart` sozinho nao substitui um layer7d ja em execução (upgrade deixa o
+# binario antigo em memoria). Parar antes garante arranque com o pacote novo.
 sysrc layer7d_enable=YES > /dev/null 2>&1
+service layer7d onestop > /dev/null 2>&1 || true
 service layer7d onestart > /dev/null 2>&1 || true
 
 echo ""

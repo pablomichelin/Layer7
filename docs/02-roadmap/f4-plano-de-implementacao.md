@@ -71,6 +71,11 @@ backlog, changelog; **não** exige `PORTVERSION` sozinha.
 **Objectivo:** alinhar `rc.d`, arranque, reload e resincronização com
 comportamento documentado; reduzir estados "metade activos" após upgrade.
 
+**Checkpoint `2026-04-24`:** `rc.d/layer7d` aplica `chmod 0644` ao pidfile apos
+arranque (evita falso negativo de `status` quando o pidfile era `0600`);
+`pkg-install` passa a `onestop` antes de `onestart` no `POST-INSTALL` para
+upgrade carregar o binario novo; `PORTVERSION` `1.8.5`.
+
 **Liga a:** BG-009.
 
 **Exclusões:** mudança estrutural de directórios; observabilidade pesada

@@ -4,6 +4,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F4.1 package/daemon (BG-009)
+
+- **`rc.d/layer7d`** — apos `daemon -p`, o pidfile fica `0644` para
+  `service layer7d status` nao falhar por permissoes quando o ficheiro era
+  `0600 root:wheel`
+- **`pkg-install` (`POST-INSTALL`)** — `service layer7d onestop` antes de
+  `onestart` para upgrades aplicarem o binario do pacote recém-instalado
+  (antes, `onestart` com processo vivo saia cedo sem reiniciar)
+- **`PORTVERSION`** — `1.8.5` (artefacto publico de referencia continua
+  `1.8.3` ate nova release)
+
 ### Added — continuidade entre chats longos
 
 - [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md) — quando mudar para um chat novo no Cursor, sinais práticos e **prompt modelo** para colar na primeira mensagem; referência no `CORTEX`, `docs/README` e `AGENTS.md`

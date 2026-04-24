@@ -173,7 +173,7 @@ reavaliacao formal.
   pre-requisitos em verde.
 - Em `2026-04-24`, o `CORTEX.md` e o `CHANGELOG.md` foram alinhados ao estado
   real: distincao entre .pkg publicado (`1.8.3`) e `PORTVERSION` de trabalho
-  (`1.8.4`); politica de `GET /api/licenses/:id/download` concentrada em
+  (`1.8.5`); politica de `GET /api/licenses/:id/download` concentrada em
   modulo com teste; `npm test` do backend a cobrir `src/**/*.test.js`.
 
 ## Checkpoint actual da F4 (aberta F4.0 em 2026-04-24)
