@@ -1,5 +1,9 @@
 # Scripts de pacote / daemon
 
+**Ordem canónica** para gerar o **`.pkg`** do port (raiz do clone, no
+**builder FreeBSD**): `check-port-files.sh` → `smoke-layer7d.sh` →
+`cd package/pfSense-pkg-layer7 && make package`. Detalhe: [`docs/08-lab/builder-freebsd.md`](../../docs/08-lab/builder-freebsd.md).
+
 ## `check-port-files.sh`
 
 Confirma que **`package/pfSense-pkg-layer7/pkg-plist`** tem ficheiro em **`files/`** para cada linha (exceto `@…` e **`sbin/layer7d`**, gerado no build).

@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — `scripts/package/README` (ordem canónica no índice)
+
+- **`scripts/package/README.md`** — parágrafo inicial com check → smoke →
+  `make package` e ligação a `builder-freebsd.md`.
+- **`document-classification.md`** — linha `scripts/package/README.md`.
+
 ### Documentation — `lab-topology` e `src/layer7d/README` (ordem de build)
 
 - **`08-lab/lab-topology.md`** — trilha builder: `check-port-files` antes de
