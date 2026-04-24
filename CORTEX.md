@@ -25,8 +25,12 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada
-**Versao segura conhecida do pacote:** `1.8.3`
-**Data-base deste checkpoint:** `2026-04-14`
+**Ultima versao do pacote publicada em release:** `1.8.3` (referencia de instalacao
+em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases).
+**Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`):**
+`1.8.4` (artefacto ainda nao publicado; actualizar manual e procedimentos na
+mesma entrega de release).
+**Data-base deste checkpoint:** `2026-04-24`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
 GUI integrada, classificacao Layer 7 via nDPI, politicas granulares,
@@ -46,9 +50,12 @@ controladas, com governanca forte e zero regressao desnecessaria.
 - V1 Comercial ja foi concluida e publicada.
 - O pacote publico de referencia continua a ser o `.pkg` distribuido via
   GitHub Releases.
-- O estado tecnico seguro conhecido continua associado ao pacote `1.8.3`,
-  com bloqueio QUIC configuravel por interface seleccionavel na GUI
-  e restricao `to !<localsubnets>` em todos os bloqueios.
+- A ultima publicacao conhecida no canal publico continua a ser o pacote
+  `1.8.3` (V1 comercial estavel). O repositório pode antecipar o proximo
+  `pkgver` (actualmente `1.8.4` no `Makefile` do port) antes da release; nao
+  misturar isso com o pacote publicado sem fechar o bloco de build/validacao.
+- Bloqueio QUIC configuravel por interface na GUI e restricao
+  `to !<localsubnets>` em bloqueios permanecem como base funcional conhecida.
 - O license server existe e esta operacional como componente separado,
   com F2 concluida e a F3 aberta para endurecer o contrato real de
   licenciamento/activacao sem regressao.
@@ -385,12 +392,9 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 - `DR-07` proveniencia exacta do deploy continua aberto como governanca
   operacional/F7: nao autoriza inferir live = local = remoto, mas tambem nao
   bloqueia os cenarios de licenciamento do appliance na F3.
-- A rodada actual ja publicou os commits locais no `origin/main`; qualquer
-  novo commit/push deve continuar a ser feito em bloco proprio e sem misturar
-  alteracoes tecnicas pendentes com saneamento documental.
-- O branch local continua `ahead` de `origin/main`; o estado documental
-  efectivo da F3 deve ser lido a partir do repositório local ate a publicacao
-  do push ser confirmada.
+- Apos cada bloco de alteracoes, confirmar `git status` e `main` alinhado a
+  `origin/main` antes de assumir o estado alheio; commits/push em bloco unico
+  (sem misturar saneamento documental com mudanca funcional nao relacionada).
 - Nao existe ainda trilha dedicada para transferencia entre clientes,
   desrevogacao ou rebind seguro com governanca explicita.
 - O fingerprint continua dependente de `SHA256(kern.hostuuid + ":" + primeira
@@ -603,14 +607,16 @@ Para isso:
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-04-01
+- Data base: 2026-04-24
 - Produto: Layer7 para pfSense CE
-- Versao segura conhecida: 1.8.3
-- Estado funcional: V1 Comercial concluida e publicada
-- Estado documental: governanca F0 consolidada + F2 concluida ate F2.5
-- Fase actual: F2 concluida; F3 ainda nao iniciada
-- Proxima fase elegivel: F3
-- Reorganizacao fisica autorizada: nao
+- Ultima versao .pkg publicada (referencia operacional): 1.8.3
+- PORTVERSION no repositorio (pre-release / proximo build): 1.8.4
+- Estado funcional: V1 Comercial concluida e publicada; F3 aberta
+- Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
+  fecho operacional (blocker: DR-05 no appliance)
+- Fase actual: F3 (robustez de licenciamento/activacao)
+- Proxima fase elegivel apos F3: F4
+- Reorganizacao fisica autorizada: nao (F6)
 - Artefacto publico actual: .pkg via GitHub Releases
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canónica de prioridade: docs/02-roadmap/backlog.md
@@ -623,11 +629,13 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia tecnica segura e o pacote `1.8.3`.
+- A referencia de **instalacao publica** continua a ser o pacote `1.8.3` ate
+  nova release; o branch pode carregar `PORTVERSION=1.8.4` para o proximo
+  empacotamento.
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.
-- v1.8.3: bloqueio QUIC passa a ser por interface seleccionavel na GUI;
-  retrocompat com `block_quic:true` (legado global).
+- Na linha 1.8.3+ conhecida: bloqueio QUIC por interface na GUI; retrocompat
+  com `block_quic:true` (legado global).
 
 ### Documental
 
@@ -644,7 +652,7 @@ CHECKPOINT CANONICO
 
 ### Operacional
 
-- Qualquer proxima intervencao tecnica deve partir deste checkpoint e abrir a
-  F1.4 antes de qualquer trabalho em hardening do license server,
-  licenciamento dependente da cadeia de confianca ou reorganizacao
-  estrutural.
+- A F1.4 (fallback/fail-closed da distribuicao) ja esta concluida; a
+  intervencao corrente prioriza o **fecho da F3** (validacao com evidencia,
+  sobretudo `DR-05` no appliance) antes de abrir a F4. Reorganizacao de
+  arvore de ficheiros continua proibida antes da F6.

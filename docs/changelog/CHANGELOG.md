@@ -4,6 +4,27 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — governanca e license-server (2026-04-24)
+
+- **Politica reutilizavel do download administrativo do `.lic` (`GET /api/licenses/:id/download`)** —
+  a validacao (licenca activada, hardware, estado) passa a concentrar-se em
+  `license-server/backend/src/license-download-policy.js`, com testes
+  `license-download-policy.test.js` e reutilizacao na rota em
+  `routes/licenses.js` para alinhar ao padrao de politicas testaveis
+  (`activation-policy`, `license-update-policy`)
+- **`npm test` no backend do license-server** — o script passa a incluir
+  todos os ficheiros `src/**/*.test.js` (nao so `src/*.test.js`), garantindo
+  que modulos em subpastas com testes associados entram na suite
+- **Documentacao (`CORTEX.md`)** — checkpoint fixo, bloco de
+  "ultimo status" e riscos actualizados: F3 como fase aberta, distincao
+  explicita entre versao .pkg publicada (`1.8.3`) e `PORTVERSION` de
+  trabalho no repositorio (`1.8.4`), e paragrafo operacional alinhado ao
+  estado pos-F1.4 (sem pedir reabertura de F1.4)
+- **Integridade de ficheiros do port** — se ficheiros canónicos do pacote
+  (ex. `layer7.inc`, `layer7-pfctl`, `pf.conf.sample`) aparecerem vazios ou
+  truncados no disco, restaurar a partir de `origin/main` antes de
+  qualquer build; o estado "0 bytes" local nao e commitavel nem releasavel
+
 ### Changed — alinhamento do license-server live
 
 - **License-server live alinhado ao contrato administrativo actual** —

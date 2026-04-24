@@ -5,7 +5,10 @@
 O que ainda falta para fechar a F3 com evidencia real.
 
 Actualizado em `2026-04-14` com base no alinhamento do `license-server` live
-e no inventario real ja obtido.
+e no inventario real ja obtido. Em `2026-04-24`, o `CORTEX.md` e o backlog
+foram ressincronizados com a distincao publicado (`1.8.3`) vs `PORTVERSION`
+de trabalho (`1.8.4`) e a politica de download administrativo do `.lic` passou
+a ter modulo dedicado com regressao no backend (`license-download-policy.js`).
 
 ---
 

@@ -171,6 +171,10 @@ reavaliacao formal.
 - A F3 continua aberta depois desta verificacao: a F3.11 so passa a ser
   elegivel para execucao real depois de nova readiness check com todos os
   pre-requisitos em verde.
+- Em `2026-04-24`, o `CORTEX.md` e o `CHANGELOG.md` foram alinhados ao estado
+  real: distincao entre .pkg publicado (`1.8.3`) e `PORTVERSION` de trabalho
+  (`1.8.4`); politica de `GET /api/licenses/:id/download` concentrada em
+  modulo com teste; `npm test` do backend a cobrir `src/**/*.test.js`.
 
 ---
 

@@ -14,6 +14,10 @@ const {
   listChangedLicenseFields,
 } = require('../license-update-policy');
 const {
+  createLicenseDownloadGuardError,
+  getDownloadHardwareId,
+} = require('../license-download-policy');
+const {
   assertEmptyBody,
   normalizeStoredHardwareId,
   parseIdParam,
@@ -518,9 +522,8 @@ router.get('/:id/download', async (req, res) => {
     }
 
     const license = applyEffectiveLicenseState(result.rows[0]);
-    const effectiveHardwareId = normalizeStoredHardwareId(license.hardware_id) || license.hardware_id;
-
-    if (!effectiveHardwareId) {
+    const downloadGuard = createLicenseDownloadGuardError(license);
+    if (downloadGuard) {
       await auditAdminEvent({
         component: 'licenses',
         eventType: 'license_download_denied',
@@ -528,25 +531,13 @@ router.get('/:id/download', async (req, res) => {
         actorIdentifier: req.admin.email,
         req,
         result: 'denied',
-        reason: 'license_not_activated',
-        metadata: { license_id: license.id },
+        reason: downloadGuard.reason,
+        metadata: downloadGuard.metadata,
       });
-      return res.status(409).json({ error: 'Licenca ainda nao foi activada.' });
+      return res.status(downloadGuard.error.status).json({ error: downloadGuard.error.message });
     }
 
-    if (license.status !== 'active') {
-      await auditAdminEvent({
-        component: 'licenses',
-        eventType: 'license_download_denied',
-        adminId: req.admin.id,
-        actorIdentifier: req.admin.email,
-        req,
-        result: 'denied',
-        reason: 'license_state_invalid_for_download',
-        metadata: { license_id: license.id, status: license.status },
-      });
-      return res.status(409).json({ error: 'Licenca nao esta em estado valido para download.' });
-    }
+    const effectiveHardwareId = getDownloadHardwareId(license);
 
     const signed = generateSignedLicense({
       hardware_id: effectiveHardwareId,

@@ -411,6 +411,10 @@ falha.
   cenarios do appliance (`DR-05`) ficarem verdes em nova verificacao de
   readiness; sem isso, a campanha seguinte nao deve ser tratada como rodada
   valida de fechamento.
+- **Nota 2026-04-24:** `CORTEX`, backlog e `CHANGELOG` explicitam
+  publicado `1.8.3` vs `PORTVERSION` de trabalho `1.8.4`; download
+  administrativo do `.lic` concentra-se em `license-download-policy.js` com
+  teste e rota a reusar a politica.
 
 ### Criterios de saida
 
