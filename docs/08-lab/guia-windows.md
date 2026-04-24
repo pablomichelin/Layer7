@@ -1,63 +1,41 @@
-# Desenvolvimento em Windows
+# Guia Windows — legado, nao vigente
 
-## Objetivo
+## Estado deste documento
 
-Permitir que quem desenvolve em **Windows** contribua e valide o projeto sem builder FreeBSD local.
+Este ficheiro fica preservado apenas por compatibilidade historica ate uma
+reorganizacao estrutural controlada em **F6**.
 
-## Limitações
+**Nao usar este documento como guia de desenvolvimento activo.**
 
-- **Windows sem `make`/ports não serve como builder** para o port `pfSense-pkg-layer7` (ver [`validacao-lab.md`](../04-package/validacao-lab.md)).
-- O smoke `scripts/package/smoke-layer7d.sh` exige `cc` e `make`.
+O fluxo vigente do projecto Layer7 e:
 
-## Opções para o desenvolvedor Windows
+1. editar ficheiros e documentacao no workspace local em **macOS**;
+2. compilar e gerar `.pkg` apenas no **builder FreeBSD**;
+3. instalar e validar comportamento real apenas no **pfSense appliance**;
+4. tratar CI/Linux/Windows como apoio auxiliar, nunca como gate final.
 
-### 1. CI (recomendado para smoke)
+## Porque o guia Windows foi desactivado
 
-O workflow **smoke-layer7d** corre em cada push/PR para `main`/`master`:
+O projecto nao usa Windows como ambiente de desenvolvimento, build ou
+validacao. As instrucoes antigas de WSL, PowerShell e smoke local criavam uma
+ambiguidade operacional: pareciam oferecer um caminho valido para validar o
+produto, mas o pacote depende de FreeBSD/pfSense.
 
-- Compila `layer7d` em Ubuntu
-- Executa `check-port-files.sh` e `smoke-layer7d.sh`
+Essa ambiguidade aumenta o risco de falso positivo e execucao no ambiente
+errado. Por isso, este documento deixa de conter comandos operacionais.
 
-**Uso:** faça push e verifique o badge no README ou em **Actions** do GitHub. Se passar, o código compila e o smoke básico está OK.
+## Fonte vigente
 
-### 2. WSL2 + Ubuntu
+Para executar qualquer validacao tecnica, seguir:
 
-Com **WSL2** e distro Ubuntu:
+- [`builder-freebsd.md`](builder-freebsd.md) para o builder FreeBSD;
+- [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) para build,
+  pacote `.pkg`, instalacao e validacao no pfSense;
+- [`lab-topology.md`](lab-topology.md) para topologia do appliance/lab.
 
-```powershell
-wsl
-cd /mnt/d/Layer7   # ou caminho do clone
-sh scripts/package/check-port-files.sh
-sh scripts/package/smoke-layer7d.sh
-```
+## Regra operacional
 
-O `make package` (gerar `.pkg`) continua a exigir **FreeBSD** — WSL Ubuntu não produz binário compatível com pfSense.
-
-### 3. Verificação local (PowerShell)
-
-Para checar alinhamento `pkg-plist` ↔ `files/` sem `sh`:
-
-```powershell
-.\scripts\package\check-port-files.ps1
-```
-
-Ver [`scripts/package/README.md`](../../scripts/package/README.md).
-
-### 4. Lab completo (builder + pfSense)
-
-Para **validação em lab** (build `.pkg`, `pkg add`, serviço, GUI):
-
-1. Provisionar **VM FreeBSD** conforme [`builder-freebsd.md`](builder-freebsd.md)
-2. Provisionar **pfSense CE** conforme [`lab-topology.md`](lab-topology.md)
-3. Seguir [`validacao-lab.md`](../04-package/validacao-lab.md)
-
-Pode usar Hyper-V, VMware ou VirtualBox no Windows para as VMs.
-
-## Resumo
-
-| Tarefa              | Windows nativo | WSL Ubuntu | CI GitHub | FreeBSD lab |
-|---------------------|----------------|------------|-----------|-------------|
-| check-port-files    | PowerShell     | sh         | sim       | sh          |
-| smoke layer7d       | não            | sim        | sim       | sim         |
-| make package (.pkg) | não            | não        | não       | sim         |
-| pkg add + serviço   | não            | não        | não       | pfSense VM  |
+No macOS, o agente pode editar ficheiros, consultar `git status`, rever `diff`
+e actualizar documentacao. Build, smoke tecnico, package e validacao funcional
+devem acontecer no builder FreeBSD e no appliance pfSense, conforme o gate da
+fase.

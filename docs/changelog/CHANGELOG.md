@@ -4,6 +4,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation / CI — saneamento do fluxo Windows/macOS
+
+- **`docs/08-lab/guia-windows.md`** — reclassificado como documento legado,
+  sem comandos activos de WSL/PowerShell/smoke local.
+- **`docs/08-lab/README.md`** e **`document-classification.md`** — Windows deixa
+  de aparecer como fluxo suplementar vigente.
+- **`validacao-lab.md`** e **`scripts/package/README.md`** — macOS fica
+  explicitamente limitado a workspace de edicao/git/docs; build/smoke tecnico
+  ficam no builder FreeBSD e validacao funcional no pfSense appliance.
+- **`scripts/package/smoke-layer7d.sh`** — macOS/Darwin passa a falhar fechado
+  por defeito para impedir falso gate local.
+- **`.github/workflows/smoke-layer7d.yml`** — removido job Windows para nao
+  sugerir validacao fora do fluxo real.
+
 ### Fixed — F4.2/F4.3 blacklists runtime (`1.8.11_7`)
 
 - **`layer7d` DNS blacklist** — respostas DNS passam a transportar o IP do

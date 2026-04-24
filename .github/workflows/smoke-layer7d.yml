@@ -25,11 +25,3 @@ jobs:
         run: |
           find scripts package/pfSense-pkg-layer7/files -type f \( -name '*.sh' -o -name 'pkg-*' -o -name 'layer7-pfctl' -o -path '*/rc.d/*' \) -print0 |
             xargs -0 -n1 sh -n
-
-  # Só valida pkg-plist vs files/ — não compila layer7d (smoke completo: job Linux ou FreeBSD).
-  check-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: pkg-plist vs files/ (PowerShell)
-        run: .\scripts\package\check-port-files.ps1

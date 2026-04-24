@@ -4,7 +4,7 @@
 |-----------|-----|
 | [lab-topology.md](lab-topology.md) | Rede de teste, cliente, interfaces |
 | [builder-freebsd.md](builder-freebsd.md) | VM FreeBSD para compilar PoC/pacote |
-| [guia-windows.md](guia-windows.md) | Desenvolvimento em Windows (CI, WSL, PowerShell) |
+| [guia-windows.md](guia-windows.md) | Documento legado: Windows nao e fluxo vigente; preservado ate F6 |
 | [quick-start-lab.md](quick-start-lab.md) | Fluxo encadeado: builder → pfSense → validação |
 | [syslog-remote.md](syslog-remote.md) | Logs remotos no lab |
 | [snapshots-e-gate.md](snapshots-e-gate.md) | Snapshots + checklist gate Fase 1 |

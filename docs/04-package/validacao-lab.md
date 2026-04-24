@@ -66,11 +66,10 @@ Nota:
 - neste lab o builder FreeBSD 15 gerou `.pkg`
 - referencias antigas a `.txz` ficam preservadas apenas como historico e nao
   fazem parte do contrato oficial de distribuicao da F1.1
-- em **Darwin (macOS)** o `smoke-layer7d.sh` pode falhar no link com
-  `-lcrypto` (OpenSSL / arquitectura); o script imprime um **aviso** antes de
-  compilar. A validação canónica do smoke + `make package` permanece no
-  **builder FreeBSD**; o CI em **Linux** (GitHub Actions) costuma passar o
-  mesmo script com `build-essential`.
+- **macOS e Windows nao sao ambientes de validacao tecnica do produto**. No
+  macOS, usar apenas como workspace de edicao/git/documentacao. A validacao
+  canónica do smoke + `make package` permanece no **builder FreeBSD**; a
+  validacao funcional permanece no **pfSense appliance**.
 
 ## 4. Instalacao no pfSense
 

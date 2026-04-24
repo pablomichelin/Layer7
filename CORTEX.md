@@ -262,7 +262,15 @@ categorias; GUI/package passam a preparar permissoes de
 `config.json` ou `_custom/*.domains` nao puderem ser gravados; cron de
 auto-update passa a mapear `update_interval_hours` para campos cron coerentes;
 CI ganha syntax check shell. Gate real permanece no builder FreeBSD e no
-appliance pfSense; smoke local em macOS nao conta como evidencia de fase.
+appliance pfSense; smoke local em macOS nao conta como evidencia de fase e
+fica bloqueado por defeito no script.
+
+**Checkpoint documental-operacional adicional:** `docs/08-lab/guia-windows.md`
+foi reclassificado como historico/legado, sem comandos activos. O fluxo
+vigente passa a ficar explicito: macOS e apenas workspace de edicao/git/docs;
+build e smoke tecnico no builder FreeBSD; validacao funcional no pfSense
+appliance. O job Windows do CI foi removido para nao sugerir caminho de
+validacao fora da operacao real.
 
 ---
 

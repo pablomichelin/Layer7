@@ -130,7 +130,7 @@ vence o canónico.
 | `docs/07-prompts/next-chat-phase-a-option1.md` | continuidade antiga | prompt historico de fase antiga | Historico | substituido pelo checkpoint do `CORTEX.md` | preservar | F6 |
 | `docs/08-lab/README.md` | indice do lab | agregador da area de laboratorio | Suplementar | complementar ao roadmap e package docs | manter leve | F4/F5 |
 | `docs/08-lab/builder-freebsd.md` | builder | guia operacional do builder | Suplementar | complementar ao `AGENTS.md` | rever quando F1/F4 mexerem no builder | F1/F4 |
-| `docs/08-lab/guia-windows.md` | desenvolvimento Windows | apoio lateral | Suplementar | — | manter se continuar util | F6 |
+| `docs/08-lab/guia-windows.md` | Windows legado | preservado apenas para rastreabilidade; nao e fluxo vigente | Historico | substituido por `docs/08-lab/builder-freebsd.md` + `docs/04-package/validacao-lab.md` | remover ou arquivar fisicamente apenas na F6 | F6 |
 | `docs/08-lab/lab-inventory.template.md` | inventario de lab | template local | Placeholder | — | preencher localmente quando necessario | F4/F5 |
 | `docs/08-lab/lab-topology.md` | topologia de lab | referencia de ambiente | Suplementar | — | manter | F4/F5 |
 | `docs/08-lab/quick-start-lab.md` | fluxo rapido antigo | runbook historico com termos pre-V1 | Historico | parcialmente substituido por `MANUAL-INSTALL.md` e validacao-lab | preservar e rever na F5/F6 | F5/F6 |

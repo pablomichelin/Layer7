@@ -4,10 +4,8 @@
 #
 # Plataformas:
 #   - FreeBSD: compila o license.c real e linka -lcrypto (idêntico ao port).
-#   - Linux/Darwin: substitui license.c por um stub local (dev_mode=1) gerado em
-#     $SMOKE_VER, porque license.c usa headers FreeBSD-only (net/if_dl.h,
-#     sysctlbyname kern.hostuuid, sockaddr_dl, IFT_ETHER, etc.). O smoke não
-#     valida licenciamento — a trilha canónica é o builder FreeBSD.
+#   - Linux: apoio de CI com stub local de licenciamento.
+#   - macOS/Darwin: bloqueado por defeito; o Mac e workspace de edicao/git/docs.
 set -e
 if ! command -v cc >/dev/null 2>&1; then
 	echo "smoke-layer7d: 'cc' não encontrado. Instale toolchain ou corra no builder FreeBSD." >&2
@@ -17,7 +15,9 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SMOKE_OS="$(uname -s)"
 case "$SMOKE_OS" in
 Darwin)
-	echo "smoke-layer7d: aviso: em Darwin/macOS o smoke usa stub de licenciamento (license.c é FreeBSD-only); o smoke canónico é no builder FreeBSD (AGENTS.md, validacao-lab sec. 3)." >&2
+	echo "smoke-layer7d: erro: macOS nao e ambiente de validacao tecnica do Layer7." >&2
+	echo "smoke-layer7d: use o builder FreeBSD para smoke/build e o pfSense appliance para validacao." >&2
+	exit 2
 	;;
 Linux)
 	echo "smoke-layer7d: nota: em Linux o smoke usa stub de licenciamento (license.c é FreeBSD-only)." >&2
