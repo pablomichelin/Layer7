@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — CORTEX e `docs/README` (F4 lab + rascunho F7)
+
+- **`CORTEX.md`** — ponto 7 (*Proximos passos*): liga F4 a evidencia minima
+  (`validacao-lab` **10a**/**10b**/**11**, `test-matrix` **3.8**/**12.1–12.2**/**6.7**)
+  e ao rascunho de release `1.8.11_10`.
+- **`docs/README.md`** — area **Releases**: liga o DRAFT `1.8.11_10` (pre-tag).
+
 ### Documentation — rascunho de release 1.8.11_10 (F7)
 
 - **`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`** — rascunho

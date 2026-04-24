@@ -324,7 +324,11 @@ validacao fora da operacao real.
 7. **F4:** seguir `docs/02-roadmap/f4-plano-de-implementacao.md` — subfases
    F4.1 (package/daemon), F4.2 (blacklists), F4.3 (enforcement), um bloco de
    risco de cada vez, com `MANUAL-INSTALL` e docs de area actualizados quando
-   o pacote for afectado.
+   o pacote for afectado. Nao declarar as trilhas concluidas em relatorio sem
+   evidencia minima do `validacao-lab` (**10a**, **10b**, **11**) e da
+   `test-matrix` (**3.8**, **12.1–12.2**, **6.7**), conforme `checklist-mestre`. Para
+   o port `1.8.11_10` no branch, a preparacao de release publica segue
+   `docs/06-releases/release-notes-1.8.11_10-DRAFT.md` ate existir tag e `.pkg`.
 8. **F5:** tratar `docs/02-roadmap/f5-preparacao-malha.md` como roteiro de
    preparacao; a fase F5 fica “em execucao plena” depois de cumprir os
    criterios de saida da F4 e de actualizar a matriz em `docs/tests/`.
