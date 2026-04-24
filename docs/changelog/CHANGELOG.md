@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validação lab / matriz (F4.1, PHP pidfile)
+
+- **`validacao-lab.md`** — secção **10a** e índice F4: critérios e versão mínima
+  (`PORTREVISION` ≥ 6) para paridade PHP (`layer7_daemon_pid_from_file`) com
+  scripts/`rc.d`
+- **`test-matrix.md`** — teste **3.8** explicita verificação na GUI para pacote
+  ≥ `1.8.11_6`
+
 ### Changed — F4.1 / PHP (pidfile)
 
 - **`layer7.inc`** — `layer7_daemon_pid_from_file()` (primeira linha, trim,

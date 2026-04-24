@@ -526,7 +526,7 @@ Pendencias conhecidas:
 
 | Secção | Backlog | Objectivo resumido | Matriz (`test-matrix.md`) |
 |--------|---------|-------------------|---------------------------|
-| **10a** | BG-009 (F4.1) | pidfile, `rc.d`, permissões, consumidores do PID | **3.8** |
+| **10a** | BG-009 (F4.1) | pidfile, `rc.d`, permissões, consumidores do PID (sh + PHP ≥ `_6`) | **3.8** |
 | **10b** | BG-010 (F4.2) | updater assinado, `send_sighup`, `fallback.state` | **12.1**, **12.2** |
 | **11** | BG-011 (F4.3) | DNS forçado, anchor `natrules/layer7_nat`, `pfctl -s nat` | **6.7** |
 
@@ -565,7 +565,10 @@ que `service layer7d status` não falha indevidamente por permissões do
 ficheiro após arranque normal (`chmod 0644` no bloco F4.1).
 
 **Onde:** appliance pfSense com pacote que inclua o bloco F4.1 (ex. linha
-`1.8.11` com `PORTREVISION` ≥ 4 no port; ver `CORTEX.md` / `Makefile`).
+`1.8.11` com `PORTREVISION` ≥ 4 no port para `rc.d`/scripts; ver
+`CORTEX.md` / `Makefile`). Para alinhar **GUI PHP** (Dashboard, Diagnostics,
+reload/stats via `layer7.inc`) à mesma semântica (**primeira linha**, trim,
+só dígitos), usar pacote com **`PORTREVISION` ≥ 6** (`layer7_daemon_pid_from_file`).
 
 **Comandos (SSH como root):**
 
@@ -584,6 +587,10 @@ Com o daemon activo, espera-se mensagem do tipo `layer7d is running as pid
   (sem lixo visível); após edição manual acidental, os scripts devem recusar
   `HUP`/`USR1` em vez de enviar sinal a PID inválido (comportamento documentado
   em `update-blacklists.sh` / `layer7-stats-collect.sh`)
+- Com **`PORTREVISION` ≥ 6**, a página **Services → Layer 7** (e Diagnostics)
+  obtém o PID via `layer7_daemon_pid_from_file()` em `usr/local/pkg/layer7.inc`
+  — coerente com `read -r` + trim nos shells; validar que o estado «Em execução»
+  na GUI coincide com `service layer7d status` quando o daemon está activo.
 
 **Opcional (suporte sem shell root):** se existir utilizador local de teste,
 confirmar que consegue **ler** `/var/run/layer7d.pid` (o número exposto não é
