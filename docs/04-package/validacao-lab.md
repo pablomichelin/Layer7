@@ -13,7 +13,9 @@ concluidas em relatorio, cumprir
 [`docs/tests/test-matrix.md`](../tests/test-matrix.md) (testes **3.8**,
 **12.1–12.2**, **6.7**), mapeando as seccoes **10a**, **10b** e **11** deste
 ficheiro; na **11**, cenário opcional multi-interface / VLAN para aproximar a
-evidência **6.7** / **BG-011**. Sobre o port `1.8.11_12` no branch: [`CORTEX.md`](../../CORTEX.md)
+evidência **6.7** / **BG-011** (incl. **anti-QUIC** opcional na mesma secção **11**,
+labels `layer7:anti-quic` em `pfctl -s rules` quando a GUI tiver interfaces
+seleccionadas). Sobre o port `1.8.11_12` no branch: [`CORTEX.md`](../../CORTEX.md)
 (*Próximos passos*, ponto 7) e o rascunho de publicacao
 [`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`](../06-releases/release-notes-1.8.11_10-DRAFT.md)
 (sem tag nem `.pkg` publico ainda).
@@ -544,7 +546,7 @@ Pendencias conhecidas:
 |--------|---------|-------------------|---------------------------|
 | **10a** | BG-009 (F4.1) | pidfile, `rc.d`, permissões, consumidores do PID (sh + PHP ≥ `_6`) | **3.8** |
 | **10b** | BG-010 (F4.2) | updater assinado, `send_sighup`, `fallback.state` | **12.1**, **12.2** |
-| **11** | BG-011 (F4.3) | DNS forçado, anchor `natrules/layer7_nat`, `pfctl -s nat`; cenário opcional multi-interface / VLAN no mesmo roteiro | **6.7** |
+| **11** | BG-011 (F4.3) | DNS forçado, anchor `natrules/layer7_nat`, `pfctl -s nat`; anti-QUIC opcional (`pfctl -s rules`, labels `layer7:anti-quic:*`); cenário opcional multi-interface / VLAN no mesmo roteiro | **6.7** |
 
 **Antes do appliance:** nos três roteiros acima, instalar no pfSense apenas
 depois de `check-port-files.sh` + `smoke-layer7d.sh` na raiz do clone e
@@ -572,7 +574,7 @@ O checklist rápido abaixo (itens 13–15) referencia estas secções.
 | 10 | URL `/packages/layer7/layer7_status.php` OK | [x] |
 | 11 | Menu GUI anotado | [ ] |
 | 12 | `pkg delete` OK | [x] |
-| 13 | F4.3: anchor NAT `force_dns` (ver secção **11**; cenário opcional multi-interface / VLAN no mesmo roteiro) | [ ] |
+| 13 | F4.3: `force_dns` / anchor NAT e, se aplicável, anti-QUIC (ver secção **11**; cenário opcional multi-interface / VLAN no mesmo roteiro) | [ ] |
 | 14 | F4.1: pidfile / `rc.d` / consumidores (ver secção 10a) | [ ] |
 | 15 | F4.2: updater blacklists / fallback (ver secção 10b) | [ ] |
 
@@ -702,11 +704,13 @@ redigido de `fallback.state`.
 
 ---
 
-## 11. Roteiro F4.3 — DNS forcado (`natrules/layer7_nat`)
+## 11. Roteiro F4.3 — DNS forcado (`natrules/layer7_nat`) e anti-QUIC (opcional)
 
 **Objectivo:** recolher evidencia de que as regras `rdr` de **Forcar DNS local**
 (`force_dns` nas blacklists) carregam sem rejeitar o `pfctl` e que o anchor
-pode ser inspeccionado.
+pode ser inspeccionado; e, **opcionalmente no mesmo roteiro**, que regras
+**anti-QUIC** por interface (GUI) aparecem no ruleset com labels coerentes
+(`layer7:anti-quic:*`), alinhado a [`../05-daemon/pf-enforcement.md`](../05-daemon/pf-enforcement.md).
 
 **Pre-requisitos:** pacote com o bloco F4.3; em **Services > Layer 7** (ou
 equivalente), interfaces correctas; pelo menos uma regra de blacklist com
@@ -724,6 +728,18 @@ pfSense, na raiz do clone correr `sh scripts/package/check-port-files.sh` e
 ```sh
 pfctl -a natrules/layer7_nat -s nat
 ```
+
+**Opcional (anti-QUIC):** com bloqueio QUIC por interface activo na GUI e
+**Apply** / reload do filtro:
+
+```sh
+pfctl -s rules | grep -F layer7:anti-quic
+```
+
+Esperam-se linhas `block drop quick ... label "layer7:anti-quic:<if>"` (e
+variante IPv6 `layer7:anti-quic6:`) para cada interface PF válida; desde
+**`1.8.11_12`**, nomes de interface inválidos são omitidos antes de gerar a
+linha (mesmo critério DRY que `force_dns` — `layer7_pf_ifname_for_rules`).
 
 Com `force_dns` activo e CIDRs validos, esperam-se linhas contendo
 `rdr` para UDP/TCP porta 53 com destino `127.0.0.1`. Se desactivar

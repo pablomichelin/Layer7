@@ -38,7 +38,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 [`test-matrix.md`](test-matrix.md) — 82 testes divididos por categoria
 (build, instalação, daemon, config, policy engine, enforcement **inclui F4.3
-`force_dns` / anchor NAT ponto 6.7**, **blacklists F4.2 (12.1–12.2)**,
+`force_dns` / anchor NAT e anti-QUIC opcional (ponto 6.7 / sec. 11)**, **blacklists F4.2 (12.1–12.2)**,
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3). Estado actual: 74 OK e **8**
 pendentes (1 em daemon F4.1 ponto 3.8; 2 em blacklists F4.2; 1 em enforcement F4.3; 4 no addendum F3.6).

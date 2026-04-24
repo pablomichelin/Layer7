@@ -33,6 +33,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/02-roadmap/checklist-mestre.md`** — gate F4.3: anti-bypass inclui
   anti-QUIC e referência ao port em branch.
 
+### Documentation — roteiro lab F4.3 (anti-QUIC opcional)
+
+- **`docs/04-package/validacao-lab.md`** — gates, índice F4, checklist #13 e
+  secção **11**: evidência opcional `pfctl -s rules` / labels `layer7:anti-quic`;
+  nota `1.8.11_12` / `layer7_pf_ifname_for_rules`.
+- **`docs/tests/test-matrix.md`** — teste **6.7** alinhado ao mesmo critério.
+- **`docs/tests/README.md`** — parágrafo da matriz: F4.3 inclui anti-QUIC.
+- **`docs/04-package/checklist-validacao-lab.md`** — remissão à sec. **11**
+  (anti-QUIC opcional).
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.
