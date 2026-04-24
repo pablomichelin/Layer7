@@ -112,6 +112,9 @@ send_sighup() {
 		log "WARN: cannot read $PID_FILE, skipping SIGHUP"
 		return
 	fi
+	# Normalizar espacos em branco (pidfile nao devia ter, mas evita falso
+	# "invalid PID" se o ficheiro for editado manualmente).
+	_pid=$(printf '%s' "$_pid" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 	if [ -z "$_pid" ]; then
 		log "WARN: empty PID in $PID_FILE, skipping SIGHUP"
 		return

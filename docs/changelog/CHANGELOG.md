@@ -72,16 +72,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Changed — F4.2 blacklists (BG-010)
 
 - **`update-blacklists.sh` (`send_sighup`)** — leitura segura do pidfile
-  (`read -r`), rejeita PID nao numerico, `kill -0` antes de `HUP`; regista
-  WARN quando o daemon nao esta a correr em vez de `HUP` silencioso a PID
-  invalido
+  (`read -r`); normalizacao de espacos em branco à volta do PID (`sed`) antes
+  da validacao numerica; rejeita PID nao numerico; `kill -0` antes de `HUP`;
+  regista WARN quando o daemon nao esta a correr em vez de `HUP` silencioso a
+  PID invalido
 - **`update-blacklists.sh` (`--restore-lkg`)** — adquire o mesmo lock exclusivo
   que `do_download`, impedindo restauracao LKG concorrente com um update
   (evita corrida em `promote_candidate`)
 - **`layer7-pfctl`** — todas as invocacoes de `pfctl` passam a usar
   `/sbin/pfctl` (PATH minimo em cron/rc alinhado a `table_ready` / `pfctl -sr`)
-- **`PORTVERSION`** — `1.8.11` (artefacto publico de referencia continua
-  `1.8.3` ate nova release)
+- **`PORTVERSION` / `PORTREVISION`** — `1.8.11` com `PORTREVISION` `3`
+  (`1.8.11_3`; artefacto publico de referencia continua `1.8.3` ate nova
+  release)
 
 ### Changed — F4.1 package/daemon (BG-009)
 

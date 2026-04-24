@@ -100,6 +100,8 @@ diretório e feeds.
 valida o conteúdo do pidfile e só envia `HUP` se `kill -0` confirmar processo
 vivo; `do_restore_lkg` adquire o mesmo lock que `do_download`; `layer7-pfctl`
 invoca `/sbin/pfctl` em todos os ramos; `PORTVERSION` `1.8.11`.
+**Bloco adicional:** `send_sighup` normaliza espaços em branco em volta do
+PID lido; `PORTREVISION` `3` (`1.8.11_3`).
 
 **Liga a:** BG-010, aspectos de BG-020/021 no runtime do consumidor.
 
