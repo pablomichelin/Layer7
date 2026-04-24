@@ -24,7 +24,8 @@ Itens de backlog: BG-012, BG-013, BG-014.
 - [`checklist-mestre.md`](checklist-mestre.md) com gates de teste
   assinaláveis para **F4** (paralelismo com a F3): **F4.1** / BG-009 (sec. **10a**,
   teste **3.8**), **F4.2** / BG-010 (sec. **10b**, **12.1–12.2**), **F4.3** /
-  BG-011 (sec. **11**, **6.7**), com roteiros e pré-requisito de builder em
+  BG-011 (sec. **11**, **6.7**; na **11**, cenário opcional multi-interface / VLAN),
+  com roteiros e pré-requisito de builder em
   [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (*Índice dos
   roteiros F4* + secções 10a / 10b / 11).
 - `docs/tests/test-matrix.md` e
@@ -69,5 +70,5 @@ Itens de backlog: BG-012, BG-013, BG-014.
 - `docs/tests/test-matrix.md`
 - `CORTEX.md` e `backlog.md` ao mudar o estado da F5.
 - `checklist-mestre.md` (gates **F4.1–F4.3**) e `validacao-lab.md` (índice +
-  roteiros **10a** / **10b** / **11**) como fontes de critério antes de alargar
-  a malha de regressão.
+  roteiros **10a** / **10b** / **11**; na **11**, cenário VLAN opcional para **BG-011**)
+  como fontes de critério antes de alargar a malha de regressão.

@@ -97,7 +97,8 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] na F4.3 (**BG-011**), antes de declarar a trilha de **DNS forçado**
   (`force_dns` / anchor `natrules/layer7_nat`) concluida em relatorio, existe
   evidencia minima alinhada a [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
-  (secção 11) e ao teste **6.7** de [`../tests/test-matrix.md`](../tests/test-matrix.md)
+  (secção **11**, incl. cenário opcional multi-interface / VLAN no mesmo roteiro)
+  e ao teste **6.7** de [`../tests/test-matrix.md`](../tests/test-matrix.md)
 
 ---
 

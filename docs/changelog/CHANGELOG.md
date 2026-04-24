@@ -24,6 +24,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   **`docs/00-overview/document-classification.md`**,
   **`docs/02-roadmap/roadmap.md`** — remissões / checkpoint F4.3 ao cenário
   opcional multi-interface / VLAN na secção **11** / teste **6.7**.
+- **`docs/05-runbooks/README.md`**, **`docs/02-roadmap/checklist-mestre.md`**,
+  **`docs/02-roadmap/f5-preparacao-malha.md`** — gates F4 / preparação F5 com a
+  mesma pista (sec. **11** / VLAN opcional); **`validacao-lab.md`** checklist
+  #**13** qualificado.
 
 ### Documentation — `scripts/package/README` (ordem canónica no índice)
 

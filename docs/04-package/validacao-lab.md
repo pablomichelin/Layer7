@@ -571,7 +571,7 @@ O checklist rápido abaixo (itens 13–15) referencia estas secções.
 | 10 | URL `/packages/layer7/layer7_status.php` OK | [x] |
 | 11 | Menu GUI anotado | [ ] |
 | 12 | `pkg delete` OK | [x] |
-| 13 | F4.3: anchor NAT `force_dns` (ver secção 11) | [ ] |
+| 13 | F4.3: anchor NAT `force_dns` (ver secção **11**; cenário opcional multi-interface / VLAN no mesmo roteiro) | [ ] |
 | 14 | F4.1: pidfile / `rc.d` / consumidores (ver secção 10a) | [ ] |
 | 15 | F4.2: updater blacklists / fallback (ver secção 10b) | [ ] |
 
