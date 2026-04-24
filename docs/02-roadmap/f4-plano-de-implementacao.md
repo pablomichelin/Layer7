@@ -80,6 +80,9 @@ upgrade carregar o binario novo; `layer7_signal_reload()` alinha-se ao
 `USR1` só com processo vivo; `pkg-deinstall` para o servico em
 `PRE-DEINSTALL` e limpa pid/rcvar em `POST-DEINSTALL`; `layer7_status.php`
 alinha `kill -0`.
+**Bloco adicional (cron / relatorios):** `layer7-stats-collect.sh` alinha a
+leitura de `/var/run/layer7d.pid` a `update-blacklists.sh` (`read -r`, trim,
+PID numerico); `PORTREVISION` `4` (`1.8.11_4`).
 
 **Liga a:** BG-009.
 

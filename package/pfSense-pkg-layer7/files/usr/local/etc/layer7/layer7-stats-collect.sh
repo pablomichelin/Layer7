@@ -24,10 +24,19 @@ if [ ! -f "${PIDFILE}" ]; then
 	exit 0
 fi
 
-_pid=$(cat "${PIDFILE}" 2>/dev/null)
+_pid=""
+if ! read -r _pid <"${PIDFILE}" 2>/dev/null; then
+	exit 0
+fi
+_pid=$(printf '%s' "$_pid" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 if [ -z "${_pid}" ]; then
 	exit 0
 fi
+case "$_pid" in
+*[!0-9]*)
+	exit 0
+	;;
+esac
 
 kill -0 "${_pid}" 2>/dev/null || exit 0
 

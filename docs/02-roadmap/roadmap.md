@@ -495,6 +495,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   de forma consistente; `PORTVERSION` `1.8.11`.
 - **F4.2 bloco (pidfile trim):** `send_sighup` — normalização de espaços em
   branco no PID lido (`sed`); `PORTREVISION` `3`.
+- **F4.1 bloco (cron / pidfile):** `layer7-stats-collect.sh` — mesma
+  disciplina de leitura do pidfile que `send_sighup`; `PORTREVISION` `4`.
 - **F4.3 bloco `2026-04-24` (inicio):** `layer7.inc` — `rdr` / `force_dns`
   com interfaces unicas, validacao de CIDR/IPv4 antes de injectar no anchor
   NAT; guardas em `layer7_get_pfsense_interfaces`; `PORTREVISION` `1`.

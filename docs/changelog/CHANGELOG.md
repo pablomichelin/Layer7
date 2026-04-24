@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — F4.1 / cron (pidfile)
+
+- **`layer7-stats-collect.sh`** — leitura de `/var/run/layer7d.pid` alinhada a
+  `update-blacklists.sh` (`send_sighup`): `read -r`, trim com `sed`, rejeicao
+  de PID nao numerico antes de `kill -0` / `USR1`
+- **`Makefile` (`PORTREVISION`)** — `4` (rebuild `1.8.11_4`)
+
 ### Documentation — F5 (preparacao) alinhada a F4
 
 - **`f5-preparacao-malha.md`** — prerequisitos com gates do `checklist-mestre`
@@ -81,9 +88,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   (evita corrida em `promote_candidate`)
 - **`layer7-pfctl`** — todas as invocacoes de `pfctl` passam a usar
   `/sbin/pfctl` (PATH minimo em cron/rc alinhado a `table_ready` / `pfctl -sr`)
-- **`PORTVERSION` / `PORTREVISION`** — `1.8.11` com `PORTREVISION` `3`
-  (`1.8.11_3`; artefacto publico de referencia continua `1.8.3` ate nova
-  release)
+- **`PORTVERSION` / `PORTREVISION`** — `1.8.11` com incrementos de
+  `PORTREVISION` em blocos F4.2 (ex.: `3` com trim em `send_sighup`; ver
+  entradas mais recentes no topo de `[Unreleased]` para o número actual);
+  artefacto publico de referencia continua `1.8.3` ate nova release
 
 ### Changed — F4.1 package/daemon (BG-009)
 
