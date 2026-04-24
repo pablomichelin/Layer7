@@ -4,13 +4,6 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Documentation — F4.3 (BG-011) e manual operacional
-
-- **`MANUAL-INSTALL.md`** — addendum F4.3: `force_dns` injectado no anchor NAT
-  `natrules/layer7_nat`, comando de verificacao `pfctl -a natrules/layer7_nat
-  -s nat`, validacao/dedup de origens, ambito **inet** (IPv4) sem `rdr` IPv6
-  nesta trilha
-
 ### Changed — F4.3 enforcement / DNS forcado (BG-011)
 
 - **`layer7.inc` (`layer7_generate_rdr_rules_snippet`)** — deduplica nomes de
@@ -21,8 +14,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`layer7.inc` (`layer7_get_pfsense_interfaces`)** — retorna lista vazia se
   `get_configured_interface_list` ou `get_real_interface` nao existirem
   (contexto nao-pfSense / testes), em vez de erro fatal
-- **`Makefile` (`PORTREVISION`)** — `1` (rebuild do port; `PORTVERSION`
-  mantem-se `1.8.11`)
+- **`layer7.inc` (`layer7_pf_ifname_for_rules` / `layer7_log_pkg_warn`)** —
+  nomes de interface em `rdr` alinham-se ao padrao do anti-QUIC; interfaces
+  filtradas antes de gerar o snippet; falha de `tempnam`, escrita do ficheiro
+  temp ou `pfctl -N -f` no anchor `natrules/layer7_nat` regista aviso via
+  `log_error` / `error_log`
+- **`Makefile` (`PORTREVISION`)** — `2` (rebuild; `1.8.11_2`)
+
+### Documentation — F4.3 (BG-011) e manual operacional
+
+- **`MANUAL-INSTALL.md`** — addendum F4.3: `force_dns` injectado no anchor NAT
+  `natrules/layer7_nat`, comando de verificacao `pfctl -a natrules/layer7_nat
+  -s nat`, validacao/dedup de origens, ambito **inet** (IPv4) sem `rdr` IPv6
+  nesta trilha
 
 ### Documentation — F4.1 (BG-009) e roadmap F4
 

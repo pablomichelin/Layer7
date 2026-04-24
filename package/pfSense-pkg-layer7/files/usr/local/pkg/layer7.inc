@@ -79,6 +79,30 @@ function layer7_pf_rules_sample_path()
 }
 
 /**
+ * Nome de interface PF aceitavel em regras geradas (alinhado ao anti-QUIC).
+ * Rejeita caracteres inesperados evitam sintaxe invalida no ruleset.
+ */
+function layer7_pf_ifname_for_rules($s)
+{
+	if (!is_string($s) || $s === "") {
+		return false;
+	}
+	return preg_match('/^[a-z][a-z0-9]*(\.[0-9]+)?$/i', $s) === 1;
+}
+
+/**
+ * Registo minimo de aviso (pfSense `log_error` ou fallback `error_log`).
+ */
+function layer7_log_pkg_warn($msg)
+{
+	if (function_exists("log_error")) {
+		log_error($msg);
+	} else {
+		error_log($msg);
+	}
+}
+
+/**
  * Gera regras rdr para DNS forcado para CIDRs das regras blacklist com
  * force_dns=true. Requer acesso a pfSense's get_real_interface().
  * Retorna string vazia se nao houver regras rdr activas.
@@ -109,7 +133,10 @@ function layer7_generate_rdr_rules_snippet()
 			$real_ifaces[] = $ifid;
 		}
 	}
-	$real_ifaces = array_values(array_unique($real_ifaces));
+	$real_ifaces = array_values(array_filter(
+	    array_unique($real_ifaces),
+	    "layer7_pf_ifname_for_rules"
+	));
 	if (empty($real_ifaces)) {
 		return "";
 	}
@@ -166,18 +193,30 @@ function layer7_inject_nat_to_anchor()
 	$anchor = "natrules/layer7_nat";
 	$snippet = layer7_generate_rdr_rules_snippet();
 	if ($snippet === "") {
-		@exec("/sbin/pfctl -a " . escapeshellarg($anchor) .
-		    " -F Nat 2>/dev/null");
+		/* Best-effort: anchor pode ainda nao existir; evitar ruido no log. */
+		@exec("/sbin/pfctl -a " . escapeshellarg($anchor) . " -F Nat 2>/dev/null");
 		return;
 	}
 	$tmp = @tempnam("/tmp", "l7nat_");
 	if ($tmp === false) {
+		layer7_log_pkg_warn("Layer7: tempnam falhou ao injectar regras NAT em {$anchor}");
 		return;
 	}
-	@file_put_contents($tmp, $snippet);
-	@exec("/sbin/pfctl -a " . escapeshellarg($anchor) .
-	    " -N -f " . escapeshellarg($tmp) . " 2>/dev/null");
+	if (@file_put_contents($tmp, $snippet) === false) {
+		layer7_log_pkg_warn("Layer7: nao foi possivel escrever ficheiro temporario NAT ({$tmp})");
+		@unlink($tmp);
+		return;
+	}
+	exec(
+	    "/sbin/pfctl -a " . escapeshellarg($anchor) . " -N -f " . escapeshellarg($tmp) . " 2>&1",
+	    $out,
+	    $rc
+	);
 	@unlink($tmp);
+	if ($rc !== 0) {
+		layer7_log_pkg_warn("Layer7: pfctl nat load rc={$rc} anchor={$anchor} " .
+		    trim(implode(" ", (array) $out)));
+	}
 }
 
 /**

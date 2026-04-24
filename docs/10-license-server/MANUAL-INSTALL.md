@@ -67,7 +67,10 @@ rejeitar o anchor. A lista de interfaces do Layer7 fica **deduplicada** ao
 gerar as linhas. Esta trilha gera apenas regras **inet** (IPv4); nao
 inclui `rdr` **inet6** para DNS. Comportamento alinhado ao branch com
 `PORTVERSION` / `PORTREVISION` de trabalho; a referencia de `.pkg` publica
-continua a seccao **Links da versao actual** ate nova release.
+continua a seccao **Links da versao actual** ate nova release. Nomes de
+interface na geracao de `rdr` seguem o mesmo padrao restritivo que o
+anti-QUIC; se o `pfctl` falhar ao carregar o anchor, o sistema pode registar
+um aviso no log do pfSense (`log_error`).
 
 **Addendum operacional da F2.5:** a operacao do license server passa a usar
 runbooks canónicos especificos para segredos/bootstrap administrativo e

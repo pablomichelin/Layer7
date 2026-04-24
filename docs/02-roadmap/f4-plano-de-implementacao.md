@@ -123,6 +123,10 @@ deduplica interfaces; valida cada CIDR/IP de origem antes de emitir `rdr`;
 addendum F4.3 (anchor `natrules/layer7_nat`, verificação `pfctl`, validade
 de CIDR, dedupe, nota **inet** vs IPv6).
 
+**Bloco `2026-04-24` (código):** `layer7_pf_ifname_for_rules` + filtro de
+interfaces; `layer7_inject_nat_to_anchor` com diagnóstico em falha de
+`pfctl` / temp; `PORTREVISION` `2` (`1.8.11_2`).
+
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog
 históricos de `rdr` e `get_real_interface`); evidência em lab quando
 possível.
