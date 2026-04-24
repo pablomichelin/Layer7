@@ -11,6 +11,7 @@ builder → **`.pkg`** → pfSense,
 - [`validacao-lab.md`](validacao-lab.md) — procedimento e evidências; no
   início, *Gates oficiais F4* (ligação a `checklist-mestre`, `test-matrix`,
   secções **10a/10b/11**, `CORTEX` e rascunho de release do port em branch);
-  na **11**, cenário opcional multi-interface / VLAN para `force_dns`.
+  na **11**, anti-QUIC opcional e cenário opcional multi-interface / VLAN para
+  `force_dns`.
 - [`checklist-validacao-lab.md`](checklist-validacao-lab.md) — checklist rápido.
 - [`deploy-github-lab.md`](deploy-github-lab.md) — cadeia builder → release (`.pkg`, `install.sh`); suplementar a [`scripts/release/README.md`](../../scripts/release/README.md).

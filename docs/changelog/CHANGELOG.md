@@ -52,6 +52,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/02-roadmap/f5-preparacao-malha.md`** — pré-requisitos e docs vivas:
   sec. **11** com anti-QUIC opcional.
 
+### Documentation — índices e addenda (sec. **11**, anti-QUIC opcional)
+
+- **`docs/tests/test-matrix.md`** — parágrafo intro: sec. **11** com anti-QUIC.
+- **`docs/tests/README.md`** — roteiros F4 / **6.7**: anti-QUIC na **11**.
+- **`docs/05-runbooks/README.md`**, **`docs/04-package/deploy-github-lab.md`** —
+  remissão ao `validacao-lab`.
+- **`docs/00-overview/handoff-chat-novo.md`** — prompt F4.
+- **`docs/08-lab/README.md`**, **`docs/08-lab/quick-start-lab.md`** — lab e
+  passo **6** (F4).
+- **`docs/05-daemon/pf-enforcement.md`** — evidência `force_dns`.
+- **`docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`** — addendum F4.3.
+- **`docs/10-license-server/MANUAL-INSTALL.md`** — addendum F4.3 (roteiro **11**).
+- **`docs/06-releases/release-notes-1.8.11_10-DRAFT.md`** — remissão à sec. **11**.
+- **`docs/04-package/README.md`** — entrada `validacao-lab`: sec. **11**.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_11`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=11`.

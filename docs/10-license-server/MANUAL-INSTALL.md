@@ -87,8 +87,9 @@ continua a seccao **Links da versao actual** ate nova release. Nomes de
 interface na geracao de `rdr` seguem o mesmo padrao restritivo que o
 anti-QUIC; se o `pfctl` falhar ao carregar o anchor, o sistema pode registar
 um aviso no log do pfSense (`log_error`). Roteiro de validacao no appliance
-para esta trilha (comandos `pfctl`, critérios de **PASS** e cenario sugerido
-multi-interface / VLAN): `docs/04-package/validacao-lab.md`, seccao **11**.
+para esta trilha (comandos `pfctl`, critérios de **PASS**, anti-QUIC opcional no
+mesmo roteiro e cenario sugerido multi-interface / VLAN):
+`docs/04-package/validacao-lab.md`, seccao **11**.
 
 **Addendum operacional da F4.2 adicional (`1.8.11_7`, branch de trabalho):**
 a trilha de blacklists passa a falhar de forma mais segura em reload: se uma

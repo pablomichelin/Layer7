@@ -60,7 +60,7 @@ Estado que quero que assumes ate verificar no repo:
 - Proximo passo desejado: <um frase>
 
 Regras: ordem de fases F0-F7; um subsistema critico por vez; documentacao junto da mudanca; ver docs/00-overview/handoff-chat-novo.md para politica de handoff.
-Se a fase for F4: gates e roteiros de evidencia no inicio e nas seccoes 10a/10b/11 de docs/04-package/validacao-lab.md (sec. 11 inclui cenario opcional multi-interface/VLAN para BG-011 / teste 6.7; checklist-mestre, test-matrix).
+Se a fase for F4: gates e roteiros de evidencia no inicio e nas seccoes 10a/10b/11 de docs/04-package/validacao-lab.md (sec. 11: force_dns/NAT, anti-QUIC opcional, cenario opcional multi-interface/VLAN para BG-011 / teste 6.7; checklist-mestre, test-matrix).
 
 Executa o proximo passo seguro e diz o que alteraste.
 ```

@@ -36,7 +36,8 @@ snippet em `/usr/local/etc/layer7/pf.conf` usado para tabelas de bloqueio.
 Isto alinha anti-bypass DNS ao enforcement sem MITM. Detalhe operacional:
 [`../10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md)
 (addendum F4.3); evidência no appliance: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
-(secção **11**, incl. cenário opcional multi-interface / VLAN); matriz:
+(secção **11**, incl. anti-QUIC opcional no mesmo roteiro e cenário opcional
+multi-interface / VLAN); matriz:
 [`../tests/test-matrix.md`](../tests/test-matrix.md) ponto **6.7**.
 
 ## Anti-QUIC por interface (`layer7.inc`)

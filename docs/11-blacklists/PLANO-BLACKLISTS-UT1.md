@@ -24,7 +24,7 @@
 > [`docs/02-roadmap/f4-plano-de-implementacao.md`](../02-roadmap/f4-plano-de-implementacao.md)).
 > Evidencia em laboratório: secção 11 de
 > [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md)
-> (incl. cenário sugerido multi-interface / VLAN para **BG-011**);
+> (incl. anti-QUIC opcional e cenário sugerido multi-interface / VLAN para **BG-011**);
 > teste **6.7** em [`docs/tests/test-matrix.md`](../tests/test-matrix.md);
 > addendum F4.3 em
 > [`docs/10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md).

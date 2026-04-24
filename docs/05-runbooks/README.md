@@ -3,8 +3,9 @@
 Operacao e rollback: [`../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md`](../../10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md).
 
 Validacao em lab (inicio: *Gates oficiais F4*; build `.pkg`, `pkg add`, servico;
-roteiros F4 no appliance **10a** / **10b** / **11**; na **11**, cenário opcional
-multi-interface / VLAN para **BG-011** / teste **6.7**):
+roteiros F4 no appliance **10a** / **10b** / **11**; na **11**, `force_dns` /
+NAT, anti-QUIC opcional e cenário opcional multi-interface / VLAN para **BG-011**
+/ teste **6.7**):
 [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md).
 
 Indice da area **package** (lab + `MANUAL-INSTALL`): [`../04-package/README.md`](../04-package/README.md).

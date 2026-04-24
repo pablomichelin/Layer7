@@ -130,8 +130,8 @@ template apenas como referência histórica até decisão da F6.
 
 - [`scripts/release/README.md`](../../scripts/release/README.md) — instalação, frota, deploy
 - [`docs/04-package/validacao-lab.md`](validacao-lab.md) — validação no lab
-  (gates F4: secções **10a** / **10b** / **11**; na **11**, cenário opcional
-  multi-interface / VLAN para **BG-011** / teste **6.7**)
+  (gates F4: secções **10a** / **10b** / **11**; na **11**, anti-QUIC opcional,
+  cenário opcional multi-interface / VLAN para **BG-011** / teste **6.7**)
 - [`docs/10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md) — instalação canónica
 - [ADR-0003](../03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md) — hierarquia `.pkg`
 - [ADR-0002](../03-adr/ADR-0002-distribuicao-artefato-txz.md) — histórico `.txz`
