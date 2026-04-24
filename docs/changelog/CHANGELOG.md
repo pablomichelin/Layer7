@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — MANUAL-INSTALL (F4.1)
+
+- **`docs/10-license-server/MANUAL-INSTALL.md`** — addendum F4.1 (BG-009):
+  validacao do pidfile no `rc.d` e alinhamento com scripts do pacote;
+  aviso para nao editar `/var/run/layer7d.pid`; referencia a
+  `CORTEX.md`/`Makefile` para `PORTVERSION`/`PORTREVISION` de trabalho vs
+  `.pkg` publico
+
 ### Documentation — contrato do pidfile do daemon
 
 - **`docs/05-daemon/README.md`** — secção *Pidfile* (`/var/run/layer7d.pid`):

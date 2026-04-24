@@ -46,12 +46,19 @@ o hook **POST-INSTALL** do port executa `service layer7d onestop` antes de
 `onestart`, para que um **upgrade** por `pkg` carregue o binario do pacote
 de novo instalado (evita processo antigo a continuar a correr). O **rc.d**
 `layer7d` ajusta as permissoes do **pidfile** apos o arranque de forma
-coerente com `service layer7d status`. A reconfiguracao via GUI
-(`layer7_apply`, reload) alinha-se ao `reload` do script: sinal `HUP` se o
-processo estiver vivo; caso contrario, arranque do daemon conforme
-`layer7.enabled` no JSON. Isto entra nas proximas release notes quando o
-`.pkg` correspondente for publicado; ate la, a referencia de instalacao
-publica continua a versao listada em **Links da versao actual** abaixo.
+coerente com `service layer7d status` e valida o conteudo do ficheiro
+(PID numerico, sem espacos parasitas) em `start`/`stop`/`status`/`reload`,
+na mesma linha que `update-blacklists.sh` e `layer7-stats-collect.sh`. Nao
+editar `/var/run/layer7d.pid` manualmente; em duvida, `service layer7d
+restart`. A reconfiguracao via GUI (`layer7_apply`, reload) alinha-se ao
+`reload` do script: sinal `HUP` se o processo estiver vivo; caso contrario,
+arranque do daemon conforme `layer7.enabled` no JSON. O par
+`PORTVERSION`/`PORTREVISION` em desenvolvimento no branch consta em
+`CORTEX.md` e no `Makefile` do port (nao confundir com o `.pkg` listado em
+**Links da versao actual** ate nova release). Isto entra nas proximas
+release notes quando o `.pkg` correspondente for publicado; ate la, a
+referencia de instalacao publica continua a versao listada em **Links da
+versao actual** abaixo.
 
 **Addendum operacional da F4.3 (BG-011, `force_dns` / DNS forcado):** nas
 regras de **blacklist** com opcao *Forcar DNS local* (`force_dns`), o
