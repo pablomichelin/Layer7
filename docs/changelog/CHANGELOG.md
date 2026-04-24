@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — runbooks e handoff (F4 / `validacao-lab`)
+
+- **`05-runbooks/README.md`** — validacao em lab: *Gates oficiais F4* no
+  inicio de `validacao-lab`.
+- **`00-overview/handoff-chat-novo.md`** — prompt de continuacao: pista F4
+  (gates + 10a/10b/11, `checklist-mestre`, `test-matrix`).
+
 ### Documentation — lab e `tests/README` (Gates F4 no `validacao-lab`)
 
 - **`08-lab/README.md`** — remissão ao início de `validacao-lab` (*Gates
