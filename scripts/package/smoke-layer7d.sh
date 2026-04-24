@@ -7,6 +7,11 @@ if ! command -v cc >/dev/null 2>&1; then
 	exit 1
 fi
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+case "$(uname -s)" in
+Darwin)
+	echo "smoke-layer7d: aviso: em Darwin/macOS o link com -lcrypto costuma falhar (OpenSSL/arquitectura); o smoke canónico é no builder FreeBSD (AGENTS.md, validacao-lab sec. 3)." >&2
+	;;
+esac
 cd "$ROOT/src/layer7d"
 SMOKE_VER="${TMPDIR:-/tmp}/l7smoke.$$"
 mkdir "$SMOKE_VER" || exit 1

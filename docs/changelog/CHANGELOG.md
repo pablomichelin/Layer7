@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed — smoke layer7d (mensagem em Darwin)
+
+- **`scripts/package/smoke-layer7d.sh`** — aviso em **Darwin/macOS** de que o
+  link com `-lcrypto` pode falhar; smoke canónico no builder FreeBSD
+
 ### Documentation — F5 (preparação / ponte F4)
 
 - **`f5-preparacao-malha.md`** — pré-requisitos e ordem de trabalho alinhados aos
