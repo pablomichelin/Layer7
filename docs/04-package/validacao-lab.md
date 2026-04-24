@@ -753,6 +753,23 @@ CIDRs IPv4 validos sao **unicos** e ordenados **alfabeticamente** antes de
 cruzar com as interfaces; duplicar o mesmo CIDR na lista da regra nao duplica
 `rdr` para esse par (interface, CIDR) gracas ao `seen` global.
 
+**Cenario lab sugerido (multi-interface / VLAN):** para aproximar o backlog
+**BG-011** de combinacoes com varios segmentos sem mudar codigo no repositorio,
+configurar em **Services → Layer 7** pelo menos **duas** interfaces cujo
+`get_real_interface` no pfSense produza nomes PF distintos (ex.: LAN e uma
+opt/VLAN com nomes do tipo `em0` e `em0.20`). Usar uma ou mais regras de
+blacklist com `force_dns` e `src_cidrs` apenas com sub-redes IPv4 validas que
+existem por tras de cada segmento. Apos **Apply** / reload do filtro:
+
+1. `pfctl -a natrules/layer7_nat -s nat` deve listar `rdr` **inet** UDP e TCP
+   porta 53 para cada par **(interface real, CIDR)** esperado, sem linhas
+   duplicadas quando o dedupe (>= `1.8.11_8`) se aplica.
+2. Opcional: trafego de teste a partir de um host em cada sub-rede para
+   confirmar comportamento de DNS no desenho do lab (evidencia qualitativa;
+   o criterio minimo de **PASS** continua a ser a saida de `pfctl` coerente e
+   ausencia de avisos recorrentes `Layer7: pfctl nat load` com configuracao
+   intencionalmente valida).
+
 **Nota:** nesta fase a trilha gera apenas regras **inet** (IPv4); nao exige
 `rdr` IPv6. Ver addendum F4.3 em `docs/10-license-server/MANUAL-INSTALL.md`.
 
