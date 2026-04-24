@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validação lab (F4.2 / roteiro 10b)
+
+- **`validacao-lab.md`** — secção **10b**: pré-requisito explícito
+  (`check-port-files.sh`, `smoke-layer7d.sh`, `make package`) antes da
+  evidência no appliance
+
 ### Documentation — roadmap / testes (gates F4)
 
 - **`roadmap.md`** — checkpoint F4: gates do `checklist-mestre` para F4.1, F4.2

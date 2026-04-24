@@ -621,6 +621,12 @@ ao `layer7d` quando o PID do pidfile é válido e o processo responde a
 **Onde:** appliance com pacote F4.x; rede com acesso à origem oficial de
 manifesto/snapshot ou cenário de falha controlada (ver critérios abaixo).
 
+**Pré-requisito (repositório / builder):** antes de instalar o `.pkg` no
+pfSense, na raiz do clone correr `sh scripts/package/check-port-files.sh` e
+`sh scripts/package/smoke-layer7d.sh` (mesma disciplina da secção **3**); no
+builder FreeBSD, `make package` no port quando o bloco exigir artefacto novo.
+Isto não substitui a evidência no appliance (updater + `fallback.state`).
+
 **Comandos úteis (SSH como root):**
 
 ```sh

@@ -119,7 +119,8 @@ PID lido; `PORTREVISION` `3` (`1.8.11_3`).
 
 **Teste mínimo:** simulação de feed indisponível e verificação de
 degradação/fail-closed; `layer7-pfctl ensure` e regras presentes após
-reload; no appliance, roteiro objectivo em
+reload; antes do appliance, `check-port-files.sh` + `smoke-layer7d.sh` (e
+`make package` no builder quando aplicável); no appliance, roteiro em
 [`validacao-lab.md`](../04-package/validacao-lab.md) secção **10b** (BG-010:
 log do updater, `send_sighup`, `fallback.state`).
 
