@@ -538,3 +538,42 @@ Pendencias conhecidas:
 | 10 | URL `/packages/layer7/layer7_status.php` OK | [x] |
 | 11 | Menu GUI anotado | [ ] |
 | 12 | `pkg delete` OK | [x] |
+| 13 | F4.3: anchor NAT `force_dns` (ver secção 11) | [ ] |
+
+---
+
+## 11. Roteiro F4.3 — DNS forcado (`natrules/layer7_nat`)
+
+**Objectivo:** recolher evidencia de que as regras `rdr` de **Forcar DNS local**
+(`force_dns` nas blacklists) carregam sem rejeitar o `pfctl` e que o anchor
+pode ser inspeccionado.
+
+**Pre-requisitos:** pacote com o bloco F4.3; em **Services > Layer 7** (ou
+equivalente), interfaces correctas; pelo menos uma regra de blacklist com
+`force_dns` activo, **CIDRs de origem** IPv4 validos; Layer7 e resolver
+conforme o teu cenario de lab.
+
+**Comandos (SSH no pfSense, como root):**
+
+```sh
+pfctl -a natrules/layer7_nat -s nat
+```
+
+Com `force_dns` activo e CIDRs validos, esperam-se linhas contendo
+`rdr` para UDP/TCP porta 53 com destino `127.0.0.1`. Se desactivar
+`force_dns` e nao houver outras regras, o anchor pode ficar vazio; apos
+alteracao, execute **Apply** / reload de filtro na GUI e volte a verificar.
+
+**Criterio minimo de PASS (evidencia):**
+
+- Nenhum aviso recorrente no log do sistema do tipo
+  `Layer7: pfctl nat load` com configuracao intencionalmente valida
+  (falha pontual de `tempnam` ou ruleset nao e objectivo deste teste)
+- Saida de `pfctl -a natrules/layer7_nat -s nat` coerente com a configuracao
+  (regras presentes ou ausentes de forma explicavel)
+
+**Nota:** nesta fase a trilha gera apenas regras **inet** (IPv4); nao exige
+`rdr` IPv6. Ver addendum F4.3 em `docs/10-license-server/MANUAL-INSTALL.md`.
+
+**Registo sugerido no relatorio de campanha / evidencias:** data, versao do
+`.pkg` (`pkg info`), saida (redigida) de `pfctl -a natrules/layer7_nat -s nat`.

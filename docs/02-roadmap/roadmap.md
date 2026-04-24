@@ -501,6 +501,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 - **F4.3 bloco `2026-04-24` (codigo, 2.ª rodada):** `layer7.inc` — filtro de
   nomes de interface para `rdr`, log de falha de `pfctl`/`tempnam`;
   `PORTREVISION` `2`.
+- **F4.3 (doc lab):** `validacao-lab.md` — secção 11 e checklist #13 (anchor
+  NAT / `force_dns`).
 - **Seguinte:** evidencia em appliance/lab (BG-009/010: validacao segundo
   [`validacao-lab.md`](../04-package/validacao-lab.md) e
   `scripts/package/smoke-layer7d.sh` no builder); continuar **F4.3** (BG-011:

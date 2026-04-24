@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validacao de lab (F4.3)
+
+- **`docs/04-package/validacao-lab.md`** — secção 11: roteiro e criterio PASS
+  para o anchor NAT `natrules/layer7_nat` / `force_dns`; linha 13 no checklist
+  rapido; ligacao ao addendum F4.3 do `MANUAL-INSTALL`
+
 ### Changed — F4.3 enforcement / DNS forcado (BG-011)
 
 - **`layer7.inc` (`layer7_generate_rdr_rules_snippet`)** — deduplica nomes de

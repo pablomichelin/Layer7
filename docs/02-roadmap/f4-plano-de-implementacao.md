@@ -128,8 +128,9 @@ interfaces; `layer7_inject_nat_to_anchor` com diagnóstico em falha de
 `pfctl` / temp; `PORTREVISION` `2` (`1.8.11_2`).
 
 **Teste mínimo:** matriz alargada de interfaces (cfr. ADR/changelog
-históricos de `rdr` e `get_real_interface`); evidência em lab quando
-possível.
+históricos de `rdr` e `get_real_interface`); roteiro de inspecção do anchor
+em [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção
+**11. Roteiro F4.3**); evidência em lab quando possível.
 
 ---
 
