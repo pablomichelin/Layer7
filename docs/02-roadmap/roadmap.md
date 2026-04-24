@@ -513,7 +513,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 - **F4.2 (doc lab):** `validacao-lab.md` — secção **10b** e checklist #15
   (updater / `fallback.state` / `send_sighup`); `test-matrix` **12.1–12.2**.
 - **F4.3 (doc lab):** `validacao-lab.md` — secção 11 e checklist #13 (anchor
-  NAT / `force_dns`); `PLANO-BLACKLISTS-UT1` addendum F4.3;
+  NAT / `force_dns`; cenário opcional multi-interface / VLAN na mesma secção);
+  `PLANO-BLACKLISTS-UT1` addendum F4.3;
   `docs/tests/README` alinhado a contagens actuais da matriz (inclui F4.1–F4.3
   e F3.6) e teste **6.7**.
 - **F4 (gates):** `checklist-mestre` — evidência mínima **F4.1** / BG-009 (10a,

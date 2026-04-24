@@ -4,7 +4,7 @@ Marque só após **evidência** (output colado em [`validacao-lab.md`](validacao
 
 **F4 (BG-009 / BG-010 / BG-011):** além desta lista curta, use o início de
 `validacao-lab` (parágrafo **Gates oficiais F4**), o *Índice dos roteiros F4*
-(secções **10a**, **10b**, **11**), a matriz em
+(secções **10a**, **10b**, **11** — na **11**, cenário opcional multi-interface / VLAN), a matriz em
 [`../tests/test-matrix.md`](../tests/test-matrix.md) (testes **3.8**,
 **12.1–12.2**, **6.7**) e o [checklist mestre](../02-roadmap/checklist-mestre.md)
 para o critério de fecho de trilha (incl. `CORTEX` ponto 7 e DRAFT

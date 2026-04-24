@@ -42,7 +42,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3). Estado actual: 74 OK e **8**
 pendentes (1 em daemon F4.1 ponto 3.8; 2 em blacklists F4.2; 1 em enforcement F4.3; 4 no addendum F3.6).
-Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz):
+Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
+cenário multi-interface / VLAN opcional na secção **11**):
 parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em
 [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início;
 secção 10+).

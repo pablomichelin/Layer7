@@ -134,7 +134,7 @@ vence o canónico.
 | `docs/08-lab/guia-windows.md` | Windows legado | preservado para rastreabilidade; **nao** e fluxo vigente; *Fonte vigente* aponta para o indice do lab e `deploy-github-lab` | Historico | substituido operacionalmente por `docs/08-lab/README.md` + `builder-freebsd` + `validacao-lab` + `deploy-github-lab` | remover ou arquivar fisicamente apenas na F6 | F6 |
 | `docs/08-lab/lab-inventory.template.md` | inventario de lab | template local | Placeholder | — | preencher localmente quando necessario | F4/F5 |
 | `docs/08-lab/lab-topology.md` | topologia de lab | referencia de ambiente | Suplementar | — | manter | F4/F5 |
-| `docs/08-lab/quick-start-lab.md` | quick start lab | sequencia builder → `.pkg` → pfSense; passo 6 remete a Gates F4, `10a`/`10b`/`11` e matriz; suplementar a `validacao-lab` | Suplementar | parcialmente sobreposto por `MANUAL-INSTALL` e `scripts/release/README` para install oficial | manter alinhado ao artefacto `.pkg` (nao `.txz`) | F4/F5 |
+| `docs/08-lab/quick-start-lab.md` | quick start lab | sequencia builder → `.pkg` → pfSense; passo 6 remete a Gates F4, `10a`/`10b`/`11` (na 11, VLAN opcional) e matriz; suplementar a `validacao-lab` | Suplementar | parcialmente sobreposto por `MANUAL-INSTALL` e `scripts/release/README` para install oficial | manter alinhado ao artefacto `.pkg` (nao `.txz`) | F4/F5 |
 | `docs/08-lab/snapshots-e-gate.md` | snapshots | runbook de gate de lab | Suplementar | — | manter | F5 |
 | `docs/08-lab/syslog-remote.md` | syslog remoto | guia especifico de lab | Suplementar | complementar a docs de logging | manter | F5/F7 |
 | `docs/09-blocking/README.md` | trilha de bloqueio | resumo de trilha concluida | Historico | complementar ao changelog | preservar | F6 |

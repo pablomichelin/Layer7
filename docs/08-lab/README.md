@@ -5,7 +5,8 @@ prioridades, port em desenvolvimento) vive no [`CORTEX.md`](../../CORTEX.md) e
 no [roadmap canónico F0–F7](../02-roadmap/roadmap.md). A **F4** (package, daemon,
 blacklists, `force_dns`) segue
 [`f4-plano-de-implementacao.md`](../02-roadmap/f4-plano-de-implementacao.md);
-os roteiros de evidência mínima no pfSense (secções **10a** / **10b** / **11**)
+os roteiros de evidência mínima no pfSense (secções **10a** / **10b** / **11**;
+na **11**, cenário opcional multi-interface / VLAN para **BG-011**)
 e o parágrafo inicial *Gates oficiais F4* (checklist, matriz, CORTEX) estão no
 [validacao-lab](../04-package/validacao-lab.md). Build do `.pkg` no
 builder **FreeBSD**; validação funcional no **appliance** pfSense — nunca
@@ -20,7 +21,7 @@ Windows como gate (ver [guia-windows.md](guia-windows.md) legado).
 | [syslog-remote.md](syslog-remote.md) | Logs remotos no lab |
 | [snapshots-e-gate.md](snapshots-e-gate.md) | Snapshots + checklist gate (contexto legado) |
 | [lab-inventory.template.md](lab-inventory.template.md) | Template de IPs/versões (cópia local) |
-| [../04-package/validacao-lab.md](../04-package/validacao-lab.md) | Início: *Gates oficiais F4*; build `.pkg`, `pkg add`, serviço, GUI, roteiros F4 (10a, 10b, 11), §6c CLI |
+| [../04-package/validacao-lab.md](../04-package/validacao-lab.md) | Início: *Gates oficiais F4*; build `.pkg`, `pkg add`, serviço, GUI, roteiros F4 (10a, 10b, 11 + VLAN opcional na 11), §6c CLI |
 | [../poc/README.md](../poc/README.md) | PoC nDPI e registro de resultados |
 
 **Equivalencia documental (raiz vs `docs/`):** os ficheiros

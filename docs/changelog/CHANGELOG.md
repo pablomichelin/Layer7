@@ -18,6 +18,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **`docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`** — addendum F4.3: mesma pista
   no roteiro de evidência.
 - **`docs/04-package/README.md`** — índice: nota na entrada `validacao-lab`.
+- **`docs/04-package/checklist-validacao-lab.md`**, **`docs/08-lab/README.md`**,
+  **`docs/tests/README.md`**, **`docs/tests/test-matrix.md`** (intro),
+  **`docs/00-overview/handoff-chat-novo.md`**,
+  **`docs/00-overview/document-classification.md`**,
+  **`docs/02-roadmap/roadmap.md`** — remissões / checkpoint F4.3 ao cenário
+  opcional multi-interface / VLAN na secção **11** / teste **6.7**.
 
 ### Documentation — `scripts/package/README` (ordem canónica no índice)
 
