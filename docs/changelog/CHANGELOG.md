@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — ligação `validacao-lab` / DRAFT `1.8.11_10`
+
+- **`validacao-lab.md`** — parágrafo *Gates oficiais F4*: remissões a
+  `checklist-mestre`, `test-matrix`, seções **10a/10b/11**, `CORTEX` ponto 7 e
+  `release-notes-1.8.11_10-DRAFT.md`.
+- **`release-notes-1.8.11_10-DRAFT.md`** — bloco de estado com ligação inversa
+  aos mesmos gates de evidência de lab.
+
 ### Documentation — CORTEX e `docs/README` (F4 lab + rascunho F7)
 
 - **`CORTEX.md`** — ponto 7 (*Proximos passos*): liga F4 a evidencia minima

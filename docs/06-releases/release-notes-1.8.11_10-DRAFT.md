@@ -6,6 +6,9 @@
 > Após a tag e upload, alinhar este ficheiro (tag, datas, checksum) e
 > `MANUAL-INSTALL` no **mesmo** bloco de entrega; ver também
 > `docs/changelog/CHANGELOG.md` ([Unreleased] / secção F4.3 `1.8.11_10`).
+> Evidencia de lab exigida antes de declarar F4.1–F4.3 fechadas: `CORTEX.md`
+> (*Próximos passos*, ponto 7), `checklist-mestre` (gates F4) e
+> `validacao-lab` **10a** / **10b** / **11** com a `test-matrix` alinhada.
 
 **Data (branch):** 2026-04-24  
 **Tag prevista (exemplo):** `v1.8.11_10` (confirmar com convenção de tags do repositório)  
