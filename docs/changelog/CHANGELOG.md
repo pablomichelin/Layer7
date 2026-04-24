@@ -4,6 +4,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validação lab (F4.3 / roteiro 11)
+
+- **`validacao-lab.md`** — secção **11**: pré-requisito builder (`check-port-files`,
+  `smoke-layer7d`, `make package` com F4.3) antes da evidência `pfctl` no appliance
+- **`f4-plano-de-implementacao.md`** — teste mínimo F4.3 alinhado
+
 ### Documentation — validação lab (F4.2 / roteiro 10b)
 
 - **`validacao-lab.md`** — secção **10b**: pré-requisito explícito

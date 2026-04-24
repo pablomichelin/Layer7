@@ -678,6 +678,12 @@ equivalente), interfaces correctas; pelo menos uma regra de blacklist com
 `force_dns` activo, **CIDRs de origem** IPv4 validos; Layer7 e resolver
 conforme o teu cenario de lab.
 
+**Pré-requisito (repositório / builder):** antes de instalar o `.pkg` no
+pfSense, na raiz do clone correr `sh scripts/package/check-port-files.sh` e
+`sh scripts/package/smoke-layer7d.sh` (secção **3**); no builder,
+`make package` quando o bloco exigir artefacto com o código F4.3 de
+`layer7.inc`. Isto não substitui a evidência no appliance (`pfctl` no anchor).
+
 **Comandos (SSH no pfSense, como root):**
 
 ```sh
