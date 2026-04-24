@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — validação lab / CI
+
+- **`validacao-lab.md`** — secção **3** (Build): nota Darwin/macOS vs smoke
+  canónico no FreeBSD e CI Linux
+- **`.github/workflows/smoke-layer7d.yml`** — comentário: artefacto oficial
+  `.pkg` (não `.txz`)
+
 ### Changed — smoke layer7d (mensagem em Darwin)
 
 - **`scripts/package/smoke-layer7d.sh`** — aviso em **Darwin/macOS** de que o
