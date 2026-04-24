@@ -1,6 +1,7 @@
-# Matriz de testes — V1 + addendum F3
+# Matriz de testes — V1 + addendum F3 + F4.3 (enforcement)
 
-Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Actions / Ubuntu), no **builder** (FreeBSD) ou no **appliance** (pfSense lab).
+Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Actions / Ubuntu), no **builder** (FreeBSD) ou no **appliance** (pfSense lab). O ponto **6.7** liga-se ao roteiro F4.3 (BG-011) em
+`docs/04-package/validacao-lab.md` (secção 11).
 
 ---
 
@@ -67,6 +68,7 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 6.4 | `pfctl -t layer7_block -T show` confirma IP | appliance | OK (2026-03-22) |
 | 6.5 | `pfctl -t layer7_block -T delete` remove IP | appliance | OK (2026-03-22) |
 | 6.6 | Block com tabela PF real bloqueia tráfego | appliance | OK (2026-03-22, cli -e) |
+| 6.7 | DNS forcado (`force_dns`): `pfctl -a natrules/layer7_nat -s nat` mostra `rdr` coerente após reload PF | appliance | Pendente (F4.3; `validacao-lab` sec. 11) |
 
 ## 7. Whitelist e fallback
 
@@ -217,13 +219,13 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Daemon | 7 | 7 | 0 |
 | Config | 5 | 5 | 0 |
 | Policy engine | 7 | 7 | 0 |
-| Enforcement PF | 6 | 6 | 0 |
+| Enforcement PF | 7 | 6 | 1 |
 | Whitelist/fallback | 4 | 4 | 0 |
 | GUI | 13 | 13 | 0 |
 | Observabilidade | 4 | 4 | 0 |
 | Rollback | 3 | 3 | 0 |
 | Licenciamento/activação | 20 | 16 | 4 |
-| **Total** | **78** | **74** | **4** |
+| **Total** | **79** | **74** | **5** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

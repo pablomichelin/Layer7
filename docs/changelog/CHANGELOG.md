@@ -4,6 +4,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation — matriz de testes (F4.3)
+
+- **`docs/tests/test-matrix.md`** — ponto **6.7** (anchor NAT `force_dns` /
+  `pfctl`); resumo 79/74/5; título e referência ao `validacao-lab` sec. 11
+
 ### Documentation — validacao de lab (F4.3)
 
 - **`docs/04-package/validacao-lab.md`** — secção 11: roteiro e criterio PASS
