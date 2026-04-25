@@ -659,7 +659,11 @@ estao em
 [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md).
 O agente pode sugerir esse movimento; o utilizador pode exigi-lo a qualquer
 momento. O estado oficial do projecto continua sempre no **Git** e no
-**CORTEX**, nao na memoria do chat.
+**CORTEX**, nao na memoria do chat. A relacao **CORTEX** / handoff / prompts
+historicos de continuidade em `docs/07-prompts` esta resolvida no
+[`docs/00-overview/document-equivalence-map.md`](docs/00-overview/document-equivalence-map.md)
+(secção *Sobreposicoes internas relevantes em `docs/`* e ponto 4 da lista
+*Conflitos documentais formais registados na F0*).
 
 ---
 
