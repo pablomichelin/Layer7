@@ -90,5 +90,8 @@ Executa o proximo passo seguro e diz o que alteraste.
 
 - Continuidade geral: `CORTEX.md` — secção "Politica de continuidade entre chats".
 - Hierarquia de leitura do agente: `AGENTS.md`.
+- Sobreposicao CORTEX / este handoff / prompts antigos em `docs/07-prompts`:
+  [`docs/00-overview/document-equivalence-map.md`](../00-overview/document-equivalence-map.md)
+  (tabela *Sobreposicoes internas* e ponto 4 na lista *Conflitos documentais*).
 - Fluxo de lab, builder e o papel do macOS: [`docs/08-lab/README.md`](../08-lab/README.md);
   gates e roteiros F4: inicio de [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md).
