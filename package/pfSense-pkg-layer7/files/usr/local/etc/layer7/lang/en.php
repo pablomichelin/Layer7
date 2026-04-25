@@ -709,4 +709,6 @@ $L7_STRINGS = array(
     "Editar categoria personalizada" => "Edit custom category",
     "Categorias personalizadas e extensoes" => "Custom categories and extensions",
     "Release encontrado mas sem artefacto .pkg." => "Release found but without .pkg artifact.",
+    "daemon" => "daemon",
+    "Release mais recente nao e uma versao do pacote (tag ignorada): " => "Latest release is not a package version (tag ignored): ",
 );

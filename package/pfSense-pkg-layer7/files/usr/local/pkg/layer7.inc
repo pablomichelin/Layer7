@@ -784,6 +784,21 @@ function layer7_daemon_version()
 	return ($code === 0 && !empty($out[0])) ? trim($out[0]) : "";
 }
 
+/*
+ * Versao real do pacote pfSense actualmente instalado, no formato
+ * <PORTVERSION>[_<PORTREVISION>] (ex.: "1.8.11_14"). Devolve "" se o pkg
+ * nao estiver instalado. Esta e a fonte canonica para comparacoes do
+ * updater do GUI; o banner do daemon (`layer7d -V`) e cosmetico e pode
+ * estar atrasado em releases que so mexem em PHP/scripts.
+ */
+function layer7_pkg_version()
+{
+	$out = array();
+	$rc = 0;
+	exec("/usr/sbin/pkg query %v pfSense-pkg-layer7 2>/dev/null", $out, $rc);
+	return ($rc === 0 && !empty($out[0])) ? trim($out[0]) : "";
+}
+
 /* id de politica: [A-Za-z0-9_-], 1-80 */
 function layer7_policy_id_valid($id)
 {

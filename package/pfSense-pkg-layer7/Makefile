@@ -3,7 +3,7 @@
 
 PORTNAME=	pfSense-pkg-layer7
 PORTVERSION=	1.8.11
-PORTREVISION=	13
+PORTREVISION=	14
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -50,7 +50,7 @@ do-extract:
 	${MKDIR} ${WRKSRC}
 
 do-build:
-	@${ECHO_CMD} '"${PORTVERSION}"' > ${WRKSRC}/version.str
+	@${ECHO_CMD} '"${PKGVERSION}"' > ${WRKSRC}/version.str
 	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} \
 		${LAYER7_NDPI_CFLAGS} -o ${WRKSRC}/layer7d \
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \

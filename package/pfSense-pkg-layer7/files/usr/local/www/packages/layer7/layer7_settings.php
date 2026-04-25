@@ -92,7 +92,14 @@ if ($_POST["import_config"] ?? false) {
 }
 
 if ($_POST["check_update"] ?? false) {
-	$current_ver = layer7_daemon_version();
+	/*
+	 * Fonte canonica de "versao instalada" e o pkg manager (PORTVERSION +
+	 * PORTREVISION, ex. "1.8.11_14"); fallback para layer7d -V (cosmetico).
+	 */
+	$current_ver = layer7_pkg_version();
+	if ($current_ver === "") {
+		$current_ver = layer7_daemon_version();
+	}
 	if ($current_ver === "") {
 		$current_ver = "desconhecida";
 	}
@@ -110,23 +117,34 @@ if ($_POST["check_update"] ?? false) {
 			$update_err = l7_t("Resposta do GitHub invalida ou repositorio sem releases.");
 		} else {
 			$latest_tag = $gh["tag_name"];
-			$latest_ver = ltrim($latest_tag, "vV");
-			$pkg_url = "";
-			if (isset($gh["assets"]) && is_array($gh["assets"])) {
-				foreach ($gh["assets"] as $asset) {
-					if (isset($asset["browser_download_url"]) && strpos($asset["browser_download_url"], ".pkg") !== false) {
-						$pkg_url = $asset["browser_download_url"];
-						break;
+			/*
+			 * Defesa em profundidade (BG-030): so considera releases cujo
+			 * tag respeita o padrao de versao do pacote
+			 * (v<MAJOR>.<MINOR>[.<PATCH>][_<REVISION>]). Tags como
+			 * "blacklists-ut1-current" sao ignoradas mesmo que ganhem o
+			 * latest do GitHub por engano.
+			 */
+			if (preg_match('/^v?\d+\.\d+/', $latest_tag) !== 1) {
+				$update_err = l7_t("Release mais recente nao e uma versao do pacote (tag ignorada): ") . $latest_tag;
+			} else {
+				$latest_ver = ltrim($latest_tag, "vV");
+				$pkg_url = "";
+				if (isset($gh["assets"]) && is_array($gh["assets"])) {
+					foreach ($gh["assets"] as $asset) {
+						if (isset($asset["browser_download_url"]) && strpos($asset["browser_download_url"], ".pkg") !== false) {
+							$pkg_url = $asset["browser_download_url"];
+							break;
+						}
 					}
 				}
+				$update_info = array(
+					"current" => $current_ver,
+					"latest" => $latest_ver,
+					"tag" => $latest_tag,
+					"pkg_url" => $pkg_url,
+					"name" => isset($gh["name"]) ? $gh["name"] : $latest_tag
+				);
 			}
-			$update_info = array(
-				"current" => $current_ver,
-				"latest" => $latest_ver,
-				"tag" => $latest_tag,
-				"pkg_url" => $pkg_url,
-				"name" => isset($gh["name"]) ? $gh["name"] : $latest_tag
-			);
 		}
 	}
 }
@@ -152,7 +170,10 @@ if ($_POST["do_update"] ?? false) {
 			} else {
 				exec("service layer7d onestart 2>&1");
 				sleep(1);
-				$new_ver = layer7_daemon_version();
+				$new_ver = layer7_pkg_version();
+				if ($new_ver === "") {
+					$new_ver = layer7_daemon_version();
+				}
 				$update_msg = l7_t("Pacote actualizado com sucesso para a versao ") . ($new_ver !== "" ? $new_ver : "nova") . ".";
 			}
 		}
@@ -783,10 +804,20 @@ layer7_render_styles();
 				<?php } ?>
 
 				<?php
-				$disp_ver = layer7_daemon_version();
-				if ($disp_ver === "") { $disp_ver = l7_t("nao instalado"); }
+				$disp_pkg = layer7_pkg_version();
+				$disp_daemon = layer7_daemon_version();
+				if ($disp_pkg === "" && $disp_daemon === "") {
+					$disp_ver = l7_t("nao instalado");
+				} elseif ($disp_pkg !== "") {
+					$disp_ver = $disp_pkg;
+				} else {
+					$disp_ver = $disp_daemon;
+				}
 				?>
 				<p><?= l7_t("Versao instalada"); ?>: <code><?= htmlspecialchars($disp_ver); ?></code>
+				<?php if ($disp_pkg !== "" && $disp_daemon !== "" && $disp_pkg !== $disp_daemon) { ?>
+				&nbsp;<small class="text-muted">(<?= l7_t("daemon"); ?>: <code><?= htmlspecialchars($disp_daemon); ?></code>)</small>
+				<?php } ?>
 				<?php if ($update_info !== null) { ?>
 				&nbsp;|&nbsp; <?= l7_t("Mais recente"); ?>: <code><?= htmlspecialchars($update_info["latest"]); ?></code>
 				<?php } ?>
