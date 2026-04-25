@@ -25,15 +25,24 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada
-**Ultima versao do pacote publicada em release:** `1.8.11_12` (referencia de
+**Ultima versao do pacote publicada em release:** `1.8.11_13` (referencia de
 instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
-`pablomichelin/Layer7`, tag `v1.8.11_12`,
-`SHA256=902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7`).
+`pablomichelin/Layer7`, tag `v1.8.11_13`,
+`SHA256=041e1ace4611ebb1cebd7bfadc22e0bb2c9b2b24b99900e3034f107b534351ae`).
 A release publica apenas `.pkg` + `.pkg.sha256` (mesmo padrao de `v1.7.8` a
-`v1.8.3`); a trust chain F1.2/F1.4 assinada continua **nao activada** na
-publicacao de pacote (gate `BG-028` aberto, ADR a registar num bloco futuro).
+`v1.8.11_12`); a trust chain F1.2/F1.4 do **pacote** continua **nao
+activada** (gate `BG-028` aberto, ADR a registar num bloco futuro). A
+novidade da `1.8.11_13` e a **rotacao da chave Ed25519 publica embutida** que
+valida a trilha **F1.3 de blacklists** e a **primeira publicacao real** da
+snapshot UT1 assinada em `pablomichelin/Layer7` rolling tag
+`blacklists-ut1-current` (`snapshot_id=ut1-2026-04-25`,
+`SHA256=4191e2ebdc13e3c87d777103528bab4fda6b273bc40c62a2c39cb820ad493d36`).
+Fingerprint da chave publica embutida:
+`6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc`. Chave
+**privada** correspondente em custodia humana, fora do builder e fora do
+repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_12` (`PORTVERSION=1.8.11`, `PORTREVISION=12`).
++ `PORTREVISION`):** `1.8.11_13` (`PORTVERSION=1.8.11`, `PORTREVISION=13`).
 **Data-base deste checkpoint:** `2026-04-24`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
@@ -690,10 +699,15 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-04-24
 - Produto: Layer7 para pfSense CE
-- Ultima versao .pkg publicada (referencia operacional): 1.8.11_12
-  (SHA256 902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7;
-   trust chain F1.2 ainda nao activado nesta release; ver BG-028)
-- PORTVERSION no repositorio: 1.8.11 (PORTREVISION 12)
+- Ultima versao .pkg publicada (referencia operacional): 1.8.11_13
+  (SHA256 041e1ace4611ebb1cebd7bfadc22e0bb2c9b2b24b99900e3034f107b534351ae;
+   trust chain F1.2 do pacote ainda nao activado nesta release; ver BG-028;
+   trust chain F1.3 de blacklists efectivamente activado e em uso desde
+   esta release, com chave publica nova embutida no pacote (fingerprint
+   6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc) e
+   primeira snapshot UT1 publicada em
+   pablomichelin/Layer7 release blacklists-ut1-current)
+- PORTVERSION no repositorio: 1.8.11 (PORTREVISION 13)
 - Estado funcional: V1 Comercial concluida e publicada; F3 aberta
 - Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
   fecho operacional (blocker: DR-05 no appliance)
@@ -712,11 +726,20 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **instalacao publica** passa a ser o pacote `1.8.11_12`
-  publicado em 2026-04-24 em `pablomichelin/Layer7` tag `v1.8.11_12`. O port
-  no branch mantem-se em `PORTVERSION=1.8.11`, `PORTREVISION=12`. A versao
-  anterior `1.8.3` continua disponivel publicamente em `v1.8.3` para
-  rollback.
+- A referencia de **instalacao publica** passa a ser o pacote `1.8.11_13`
+  publicado em 2026-04-24 em `pablomichelin/Layer7` tag `v1.8.11_13`. O port
+  no branch mantem-se em `PORTVERSION=1.8.11`, `PORTREVISION=13`. As versoes
+  anteriores `1.8.11_12` e `1.8.3` continuam disponiveis publicamente em
+  `v1.8.11_12` e `v1.8.3` para rollback.
+- A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
+  assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
+  (`snapshot_id=ut1-2026-04-25`,
+  `SHA256=4191e2ebdc13e3c87d777103528bab4fda6b273bc40c62a2c39cb820ad493d36`).
+  A chave publica embutida foi rotacionada (nova fingerprint
+  `6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc`); a
+  privada correspondente fica em custodia humana, fora do builder e fora do
+  repositorio. Pacotes `<= 1.8.11_12` recusam este manifesto por
+  fingerprint mismatch (fail-closed F1.4 — comportamento correcto).
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.
 - Na linha 1.8.3+ conhecida: bloqueio QUIC por interface na GUI; retrocompat

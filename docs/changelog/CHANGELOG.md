@@ -4,6 +4,62 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.8.11_13] - 2026-04-24
+
+### Released
+
+- **`pfSense-pkg-layer7-1.8.11_13.pkg`** publicado em
+  `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_13`
+  (`SHA256=041e1ace4611ebb1cebd7bfadc22e0bb2c9b2b24b99900e3034f107b534351ae`).
+  Esta release publica apenas `.pkg` + `.pkg.sha256` (mesmo padrao de
+  `v1.7.8` a `v1.8.11_12`); o trust chain F1.2/F1.4 do **pacote**
+  (`release-manifest`/`install.sh` carimbado) **continua nao activado**
+  (gate `BG-028`).
+- **Primeira publicacao real da trilha F1.3 (blacklists assinadas).**
+  Release rolling `blacklists-ut1-current` em
+  `https://github.com/pablomichelin/Layer7/releases/tag/blacklists-ut1-current`
+  com `layer7-blacklists-manifest.v1.txt` (823 B),
+  `layer7-blacklists-manifest.v1.txt.sig` (64 B),
+  `blacklists-signing-public-key.pem` (113 B) e
+  `layer7-blacklists-ut1.tar.gz` (31 169 229 B,
+  `SHA256=4191e2ebdc13e3c87d777103528bab4fda6b273bc40c62a2c39cb820ad493d36`,
+  `snapshot_id=ut1-2026-04-25`, 69 categorias, 6 623 069 dominios). Upstream
+  (autoridade de conteudo): UT1 / Universite Toulouse Capitole
+  (`https://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz`).
+- Comportamento `update-blacklists.sh`: **so aceita** snapshots assinadas
+  pela chave embutida na `1.8.11_13` (fingerprint
+  `6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc`); os
+  pacotes anteriores recusam este manifesto por fingerprint mismatch
+  (`fail-closed` F1.4, comportamento correcto).
+
+### Changed — `pfSense-pkg-layer7` (`1.8.11_13`)
+
+- **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=13`.
+- **`package/pfSense-pkg-layer7/files/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem`**
+  — chave publica Ed25519 rotacionada de
+  `e501f5635bf56c6dfc6891ee969ef04ff193ed3afc879997bd4066b6ba3cb064` para
+  `6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc`. A
+  chave anterior nunca foi usada para assinar uma snapshot publica; a
+  rotacao e gratuita e nao afecta nenhuma instalacao em campo. A **chave
+  privada** correspondente ficou em custodia humana, fora do builder e fora
+  do repositorio (alinhado com F1.3 / `AGENTS.md`).
+
+### Documentation — release `1.8.11_13`
+
+- **`docs/10-license-server/MANUAL-INSTALL.md`** — actualizado com **Links
+  da versao actual** `1.8.11_13`, comandos `fetch + pkg add -f` para Command
+  Prompt nas seccoes **1** (instalar), **4** (upgrade), **5** (reinstalar),
+  **6** (desinstalar manual). Adicionado novo addendum operacional da
+  release `1.8.11_13` (rotacao chave F1.3) e nova **seccao 11b: activar
+  blacklists UT1 apos `1.8.11_13`**.
+- **`docs/06-releases/release-notes-1.8.11_13.md`** — notas dedicadas a esta
+  release.
+- **`docs/02-roadmap/backlog.md`** — observacoes na **BG-020/BG-022**: F1.3
+  passou a estar **realmente activa** com primeira snapshot publica
+  assinada.
+- **`CORTEX.md`** — **Ultima versao do pacote publicada em release** passa
+  para `1.8.11_13`; checkpoint canonico actualizado.
+
 ## [1.8.11_12] - 2026-04-24
 
 ### Released
