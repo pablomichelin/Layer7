@@ -4,6 +4,39 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Operational — convencao de releases no GitHub
+
+- **Release rolling `blacklists-ut1-current` marcada como `prerelease`** em
+  `pablomichelin/Layer7`. Motivo: o updater do GUI Layer7 consulta
+  `https://api.github.com/repos/pablomichelin/Layer7/releases/latest` e essa
+  API **ignora** releases marcadas como `prerelease`/`draft`. Sem esta marca,
+  a release rolling de blacklists (publicada em paralelo a `v1.8.11_13`)
+  passou a ser devolvida como "latest" e o GUI mostrava o aviso
+  *"Release encontrado mas sem artefacto .pkg."* — porque a release rolling
+  intencionalmente nao publica `.pkg`, so manifesto + assinatura + chave +
+  `tar.gz` da snapshot UT1.
+- **Convencao canonica** (vale para releases futuras): releases que nao sao
+  versoes do pacote (ex.: `blacklists-*`, futuras `signatures-*`) **devem
+  ser publicadas como `prerelease`** no GitHub para nao "roubar" o `latest`
+  do canal de versoes do pacote (`v<MAJOR>.<MINOR>.<PATCH>[_<REVISION>]`).
+- Comando aplicado:
+
+  ```bash
+  gh release edit blacklists-ut1-current --repo pablomichelin/Layer7 --prerelease
+  ```
+
+- Nenhum codigo alterado, nenhum novo build necessario. Efeito imediato no
+  GUI da `1.8.11_13` (e em qualquer versao instalada que use o mesmo
+  endpoint `/releases/latest`).
+
+### Backlog — abertos por esta operacao
+
+- **`BG-030`** — endurecer `layer7_settings.php` (updater do GUI) para
+  ignorar tags que nao casem com o padrao de versao do pacote
+  (`/^v\d+\.\d+/`) e/ou cair na primeira release seguinte que tenha asset
+  `.pkg`. Defesa em profundidade caso uma release nao-pacote seja publicada
+  no futuro sem o flag `prerelease`. Ver `docs/02-roadmap/backlog.md`.
+
 ## [1.8.11_13] - 2026-04-24
 
 ### Released

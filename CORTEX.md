@@ -740,6 +740,16 @@ CHECKPOINT CANONICO
   privada correspondente fica em custodia humana, fora do builder e fora do
   repositorio. Pacotes `<= 1.8.11_12` recusam este manifesto por
   fingerprint mismatch (fail-closed F1.4 — comportamento correcto).
+- **Convencao operacional do GitHub Releases (2026-04-24):** releases que
+  nao sao versoes do pacote (ex.: `blacklists-ut1-current`, futuras
+  `signatures-*`) sao **publicadas como `prerelease`** em
+  `pablomichelin/Layer7`. A API `repos/.../releases/latest` (consumida pelo
+  GUI Layer7 — `layer7_settings.php > check_update`) ignora prereleases,
+  pelo que o `latest` continua a ser sempre a ultima versao do pacote.
+  Sem esta convencao o GUI mostra erradamente *"Release encontrado mas sem
+  artefacto .pkg."*. Detalhes em
+  `docs/changelog/CHANGELOG.md` (Unreleased / Operational),
+  `docs/10-license-server/MANUAL-INSTALL.md` §11b.1 e backlog `BG-030`.
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.
 - Na linha 1.8.3+ conhecida: bloqueio QUIC por interface na GUI; retrocompat

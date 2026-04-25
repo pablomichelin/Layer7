@@ -830,6 +830,31 @@ Blacklists**); restauro explicito da last-known-good fica em:
 /usr/local/etc/layer7/update-blacklists.sh --restore-lkg
 ```
 
+### 11b.1 Convencao de releases no GitHub (botao "Verificar actualizacao" no GUI)
+
+A pagina **Services > Layer 7 > Definicoes > Sistema > Actualizacao** chama
+`https://api.github.com/repos/pablomichelin/Layer7/releases/latest` para
+descobrir a versao mais recente do pacote. Esse endpoint **ignora**
+releases marcadas como `prerelease`/`draft`.
+
+Por convencao canonica deste projecto, releases que **nao sao** versoes do
+pacote (ex.: `blacklists-ut1-current`, futuras `signatures-*`) sao **sempre
+publicadas como `prerelease`** no GitHub para nao "roubar" o `latest` do
+canal de versoes do pacote (`v<MAJOR>.<MINOR>.<PATCH>[_<REVISION>]`). Caso
+contrario o GUI mostra erradamente *"Release encontrado mas sem artefacto
+.pkg."*.
+
+Comando operacional (caso a release rolling tenha ficado por engano sem o
+flag):
+
+```sh
+gh release edit blacklists-ut1-current --repo pablomichelin/Layer7 --prerelease
+```
+
+Esta convencao tambem esta descrita em
+`docs/changelog/CHANGELOG.md` (entrada **[Unreleased] - Operational**) e
+acompanhada pelo backlog `BG-030` (hardening defensivo do updater PHP).
+
 ---
 
 ## 12. Rollback de emergencia
