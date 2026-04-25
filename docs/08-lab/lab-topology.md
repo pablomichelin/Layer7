@@ -37,6 +37,12 @@ Isolar tráfego de teste, permitir captura/classificação no pfSense e validar 
 - **1 VM ou físico** na mesma LAN de teste (ex.: `10.20.30.100`).
 - Navegador, `curl`, `iperf3` cliente, atualizações opcionais — para gerar fluxos classificáveis na PoC (HTTP/S, DNS, etc.).
 
+## SSH no pfSense (menu vs shell)
+
+- Com utilizador **admin** (e em muitas consolas pfSense), a sessão SSH abre o **menu de texto** do pfSense; **não** cai de imediato num shell. Para trabalhar com comandos, escolhe normalmente a opção **8 (Shell)**.
+- Comandos remotos *numa linha* (`ssh … 'comando'`) a partir de scripts ou agente podem **falhar** ou colidir com o menu. Para automação, costuma ser preferível: **SSHD com acesso** que entregue *shell* directo (ex.: `root` com login SSH permitido em *System* > *Advanced* se a tua politica o permitir) ou sessão interactiva; validar a política de segurança do teu lab antes.
+- Nunca colocar credenciais no repositório; usar `lab-inventory` local ou segredo fora de Git.
+
 ## Regras de firewall (lab)
 
 - Começar permissivo na LAN de teste (apenas lab).
