@@ -1,28 +1,26 @@
-# Release Notes — 1.8.11_12 (RASCUNHO / PRÉ-PUBLICAÇÃO)
+# Release Notes — 1.8.11_12
 
 > **Naming:** o ficheiro mantém o nome `release-notes-1.8.11_10-DRAFT.md` até
-> reorganização F6/F7; o **port** e os artefactos abaixo reflectem **`1.8.11_12`**
-> (`PORTREVISION=12`).
+> reorganização F6/F7 (proibido renomear/mover ficheiros antes da F6, ver
+> `AGENTS.md`). O **port**, os artefactos e os comandos abaixo reflectem
+> **`1.8.11_12`** (`PORTREVISION=12`).
 
-> **Estado:** rascunho. O **`.pkg`** correspondente ainda **não** foi publicado
-> em GitHub Releases. A referência de instalação pública continua a listada em
-> `docs/10-license-server/MANUAL-INSTALL.md` em **Links da versão actual**.
-> Após a tag e upload, alinhar este ficheiro (tag, datas, checksum) e
-> `MANUAL-INSTALL` no **mesmo** bloco de entrega; ver também
-> `docs/changelog/CHANGELOG.md` ([Unreleased] / pacote de trabalho `1.8.11_12`).
-> Evidencia de lab exigida antes de declarar F4.1–F4.3 fechadas: `CORTEX.md`
-> (*Próximos passos*, ponto 7), `checklist-mestre` (gates F4) e
-> `validacao-lab` **10a** / **10b** / **11** (na **11**: `force_dns` / NAT,
-> anti-QUIC opcional, VLAN sugerido) com a `test-matrix` alinhada.
+**Estado:** publicada.
 
-**Data (branch):** 2026-04-24  
-**Tag prevista (exemplo):** `v1.8.11_12` (confirmar com convenção de tags do repositório)  
-**Artefato (port `package/pfSense-pkg-layer7`):** `PORTVERSION=1.8.11`, `PORTREVISION=12`  
-**Nome de pacote FreeBSD típico:** `pfSense-pkg-layer7-1.8.11_12.pkg` (ajustar ao nome exacto do build)
+**Data:** 2026-04-24
+**Tag:** `v1.8.11_12`
+**Repositório de distribuição:** `pablomichelin/Layer7` (público, ADR-0003)
+**Artefacto (port `package/pfSense-pkg-layer7`):** `PORTVERSION=1.8.11`, `PORTREVISION=12`
+**Nome do pacote FreeBSD:** `pfSense-pkg-layer7-1.8.11_12.pkg`
 
-**Checksum / manifesto / assinatura (F1.2+):** preencher após o stage de release
-(`pfSense-pkg-layer7-1.8.11_12.pkg.sha256`, `release-manifest.v1.txt`, etc.); ver
-[`RELEASE-SIGNING.md`](RELEASE-SIGNING.md).
+**Checksum:** `SHA256=902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7`
+
+**Trust chain F1.2/F1.4 (manifesto assinado, `install.sh` carimbado
+fail-closed):** **não activada** nesta release, mantendo o padrão das
+publicações anteriores (`v1.7.8` a `v1.8.3`). A activação formal pela
+primeira vez é tratada em `docs/02-roadmap/backlog.md` **BG-028** num bloco
+controlado próprio com ADR. Esta release publica apenas `.pkg` +
+`.pkg.sha256` no GitHub Releases.
 
 ---
 
@@ -57,43 +55,55 @@ a combinações com vários segmentos.
 
 ---
 
-## Instalação (modelo; substituir `v…` pela tag real)
+## Instalação (caminho oficial nesta release)
 
-Alinhar ao [`release-notes-template.md`](release-notes-template.md) e ao
-`install.sh` publicado; exemplo genérico:
+Esta release **não publica** `install.sh` assinado (gate F1.2 ainda não
+activo — ver **BG-028**). O caminho oficial é o **comando único manual**
+documentado em `docs/10-license-server/MANUAL-INSTALL.md` §1/§4:
 
 ```sh
-fetch -o /tmp/install.sh "https://github.com/pablomichelin/pfsense-layer7/releases/download/v1.8.11_12/install.sh" && sh /tmp/install.sh
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
-(Confirmar `REPO_OWNER/REPO_NAME` e padrão de tag no release real.)
+**Após instalar/actualizar**, recompilar o ruleset PF uma vez para garantir
+que as regras Layer7 entram em `/tmp/rules.debug`:
+
+```sh
+/etc/rc.filter_configure_sync && pfctl -sr | grep -i layer7
+```
 
 ---
 
 ## Rollback
 
 ```sh
-pkg delete pfSense-pkg-layer7
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
-Reinstalar a versão anterior com o `install.sh` da tag desejada. Ver
-[`docs/05-runbooks/rollback.md`](../05-runbooks/rollback.md).
+Reinstalar a versão anterior `1.8.3` (canal antigo público, último `.pkg`
+estável no padrão `.pkg + .sha256`):
+
+```sh
+fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+```
+
+Ver também [`docs/05-runbooks/rollback.md`](../05-runbooks/rollback.md).
 
 ---
 
-## Compatibilidade (preencher na publicação)
+## Compatibilidade
 
-- **pfSense CE:** (lab / versão alvo)
-- **FreeBSD builder:** 15.0-RELEASE (referência conhecida do projecto)
+- **pfSense CE:** 2.7.x / 2.8.x (validado em pfSense Plus 25.11.1, mesma base
+  FreeBSD/pacote)
+- **FreeBSD builder:** 15.0-RELEASE-p4
 
 ---
 
-## Itens a fechar antes de publicar (checklist mínima)
+## Itens fechados nesta publicação
 
-- [ ] Build e `.pkg` no builder; ficheiro e checksum alinhados ao manifesto
-- [ ] Roteiros **10a** / **10b** / **11** do `validacao-lab` executados no lab (evidência; na **11**: `force_dns`, anti-QUIC opcional, VLAN opcional)
-- [ ] `CHANGELOG.md`: mover itens de interesse de [Unreleased] para a secção da tag
-- [ ] `MANUAL-INSTALL.md`: **Links da versão actual** e comandos com a nova tag
-- [ ] CORTEX: última release publica vs branch (se alterar o SSOT)
-- [ ] Remover do título/introdução o estado *RASCUNHO* (ou arquivar este ficheiro
-  e deixar só a nota de release final por tag)
+- [x] Build e `.pkg` no builder (`SHA256 902736db…`)
+- [x] `CHANGELOG.md`: secção `[1.8.11_12] - 2026-04-24` aberta
+- [x] `MANUAL-INSTALL.md`: **Links da versão actual** e comandos com `v1.8.11_12`
+- [x] `CORTEX.md`: última release publicada actualizada para `1.8.11_12`
+- [x] `BG-028` aberto no backlog para activar F1.2 num bloco futuro
+- [ ] Roteiros **10a** / **10b** / **11** do `validacao-lab` executados no lab — pendentes (entram quando F4.1/F4.2/F4.3 fecharem com run_id)

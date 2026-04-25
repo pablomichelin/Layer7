@@ -4,6 +4,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.8.11_12] - 2026-04-24
+
+### Released
+
+- **`pfSense-pkg-layer7-1.8.11_12.pkg`** publicado em
+  `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_12`
+  (`SHA256=902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7`).
+  Esta release publica apenas `.pkg` + `.pkg.sha256` (mesmo padrao de
+  `v1.7.8` a `v1.8.3`); o trust chain F1.2/F1.4 (manifesto assinado +
+  `install.sh` carimbado fail-closed) nao esta activo nesta release. Ver
+  `docs/02-roadmap/backlog.md` **BG-028** para activacao formal num bloco
+  futuro com ADR.
+- **`docs/10-license-server/MANUAL-INSTALL.md`** — actualizado com **Links
+  da versao actual** `1.8.11_12`, comandos `fetch + pkg add -f` para Command
+  Prompt nas seccoes **1** (instalar), **4** (upgrade), **5** (reinstalar),
+  **6** (desinstalar manual), **12** (rollback). Adicionado **Addendum
+  operacional pos-upgrade** com `/etc/rc.filter_configure_sync` para garantir
+  que as regras `block drop quick` da trilha Layer7 entram em
+  `/tmp/rules.debug` apos `pkg add`.
+
 ### Changed — `pfSense-pkg-layer7` (`1.8.11_12`)
 
 - **`package/pfSense-pkg-layer7/Makefile`** — `PORTREVISION=12`.

@@ -111,46 +111,65 @@ backup/restore do PostgreSQL:
 - `docs/05-runbooks/license-server-segredos-bootstrap.md`
 - `docs/05-runbooks/license-server-backup-restore.md`
 
+**Addendum operacional da release `1.8.11_12` (publicacao de pacote sem
+trust chain F1.2 activo):** esta release publica em `pablomichelin/Layer7`
+**apenas** os assets `pfSense-pkg-layer7-1.8.11_12.pkg` e
+`pfSense-pkg-layer7-1.8.11_12.pkg.sha256`, mantendo o padrao operacional das
+releases publicas anteriores (`v1.7.8` a `v1.8.3`). O trust chain F1.2/F1.4
+(`release-manifest.v1.txt`, `release-manifest.v1.txt.sig`,
+`release-signing-public-key.pem` e `install.sh` carimbado fail-closed) nao foi
+activado nesta release; a activacao formal pela primeira vez fica registada
+em `docs/02-roadmap/backlog.md` como **BG-028** e sera tratada num bloco
+controlado proprio com ADR. O caminho oficial nesta release e o **comando
+unico manual** das seccoes **1**/**4**/**5** (sem `install.sh`/`uninstall.sh`).
+
+**Addendum operacional pos-upgrade (recompilacao obrigatoria do filtro PF):**
+`pfctl -sr | grep -i layer7` deve devolver as regras `block drop quick` da
+trilha Layer7 apos o `pkg add`. Se devolver vazio (regras nao integradas no
+ruleset activo), executar **uma vez** `/etc/rc.filter_configure_sync` para
+forcar a recompilacao do filtro pelo pfSense. Esta etapa **deve** ser feita
+sempre que o pacote for instalado/actualizado num ambiente onde o filtro nao
+foi recompilado desde a versao anterior, e e segura (e o mesmo procedimento
+disparado por **Apply** em **Firewall > Rules** na GUI).
+
 ---
 
 ## Links da versao actual (para teste)
 
-**Versao actual:** `1.8.3`
+**Versao actual:** `1.8.11_12`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.3`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg.sha256`
-- **Manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/release-manifest.v1.txt`
-- **Assinatura do manifesto:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/release-manifest.v1.txt.sig`
-- **Public key:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/release-signing-public-key.pem`
-- **Install script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh`
-- **Uninstall script:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_12`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg.sha256`
+- **SHA256 esperado (`pfSense-pkg-layer7-1.8.11_12.pkg`):** `902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7`
+
+> **Nota operacional sobre F1.2 nesta release:** o trust chain F1.2/F1.4
+> (`release-manifest.v1.txt`, `release-manifest.v1.txt.sig`,
+> `release-signing-public-key.pem`, `install.sh` carimbado e fail-closed) **nao
+> esta activo nesta release**, mantendo o padrao operacional das releases
+> publicas anteriores (`v1.7.8` a `v1.8.3`), que tambem so publicaram `.pkg` +
+> `.pkg.sha256`. A activacao formal da F1.2 assinada pela primeira vez fica
+> registada como item dedicado no backlog (ver `docs/02-roadmap/backlog.md`,
+> **BG-028**) e sera tratada num bloco controlado proprio com ADR. Nesta
+> release, instalar/actualizar via **comando unico manual** desta seccao (sem
+> `install.sh`/`uninstall.sh`).
 
 **Comandos rapidos de teste:**
 
-Instalar a release oficial actual:
+Baixar o `.pkg` directo da versao `1.8.11_12`:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg
 ```
 
-Instalar explicitamente a versao `1.8.3`:
+Validar checksum:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh --version 1.8.3
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg.sha256 https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg.sha256 && sha256 -q /tmp/pfSense-pkg-layer7-1.8.11_12.pkg | tee /tmp/l7-actual.sha256 && cat /tmp/pfSense-pkg-layer7-1.8.11_12.pkg.sha256
 ```
 
-Baixar o `.pkg` directo da versao `1.8.3`:
-
-```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg
-```
-
-Desinstalar com script publico:
-
-```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
-```
+Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
+`902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7`.
 
 ---
 
@@ -178,32 +197,25 @@ Cada seccao abaixo inclui:
 
 ## 1. Instalar (primeira vez)
 
-**Instalador automatico (recomendado — uma linha):**
+> **Nesta release (`1.8.11_12`)** o caminho oficial e o **comando unico manual**
+> abaixo. O `install.sh` automatico (carimbado/assinado F1.2) nao e publicado
+> nesta release: ver nota em **Links da versao actual** e **BG-028** no
+> backlog.
+
+**Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
-```
-
-Este script faz tudo automaticamente: baixa o `.pkg`, instala, cria tabelas PF, configura e inicia o servico.
-
-Para uma versao especifica: `sh /tmp/install.sh --version 1.8.3`
-
-**Comando unico manual (Command Prompt):**
-
-```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg
 ```
+
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh --force
-```
-```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg
 ```
 
 ```sh
@@ -280,18 +292,14 @@ layer7d --license-status
 
 ## 4. Actualizar (upgrade)
 
-**Instalador automatico (recomendado — uma linha):**
+> **Nesta release (`1.8.11_12`)** o caminho oficial e o **comando unico manual**
+> abaixo (sem `install.sh`). Ver nota em **Links da versao actual** e
+> **BG-028**.
+
+**Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
-```
-
-O script detecta a versao instalada e faz o upgrade automaticamente.
-
-**Comando unico manual (Command Prompt):**
-
-```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -301,11 +309,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg
 ```
 
 ```sh
@@ -318,6 +326,19 @@ layer7d -V
 
 Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upgrade.
 
+**Apos o upgrade, recompilar o ruleset PF (uma vez) para garantir que as regras
+Layer7 entram em `/tmp/rules.debug`:**
+
+```sh
+/etc/rc.filter_configure_sync
+```
+
+Verificar (deve retornar varias linhas):
+
+```sh
+pfctl -sr | grep -i layer7
+```
+
 ---
 
 ## 5. Reinstalar (mesma versao)
@@ -325,7 +346,7 @@ Politicas, excepcoes, grupos, blacklists e licenca sao preservados durante o upg
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -339,7 +360,11 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg
+```
+
+```sh
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg
 ```
 
 ```sh
@@ -354,30 +379,11 @@ service layer7d onestart
 
 ## 6. Desinstalar
 
-### Desinstalador automatico (recomendado)
-
-O script `uninstall.sh` faz tudo automaticamente:
-1. Para o servico layer7d
-2. Remove o pacote `.pkg`
-3. Limpa todos os ficheiros residuais (binario, GUI, configs, logs)
-4. Limpa tabelas PF (layer7_block, layer7_block_dst, etc.)
-5. (Opcional) Remove overrides anti-DoH do Unbound no `config.xml`
-6. Remove o servico do boot (`sysrc`)
-
-**Command Prompt (uma linha — requer `--yes`):**
-
-```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound --yes
-```
-
-> **IMPORTANTE:** No Command Prompt do pfSense nao e possivel responder a
-> perguntas interactivas. Use sempre `--yes` neste modo.
-
-**SSH/Console (com confirmacao interactiva):**
-
-```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh && sh /tmp/uninstall.sh --clean-unbound
-```
+> **Nesta release (`1.8.11_12`)** o `uninstall.sh` automatico nao e publicado
+> como asset (depende do trust chain F1.2 — ver **BG-028**). Use a
+> **desinstalacao manual** abaixo, que executa as mesmas etapas: stop do
+> servico, `pkg delete`, limpeza de ficheiros residuais, flush das tabelas PF
+> e remocao do servico do boot.
 
 ### Opcoes do uninstall.sh
 
@@ -467,10 +473,11 @@ apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
 ### Apos desinstalar
 
 O pfSense volta ao funcionamento normal imediatamente.
-Para reinstalar:
+Para reinstalar a versao actual (`1.8.11_12`), usar o **comando unico manual**
+da seccao **1**:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh && sh /tmp/install.sh
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_12/pfSense-pkg-layer7-1.8.11_12.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_12.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 ---
@@ -746,14 +753,25 @@ verificacao pos-tentativa, e fallback sincrono via `pfctl -f rules.debug`.
 
 ## 12. Rollback de emergencia
 
-Se algo der errado apos instalar ou actualizar, use o desinstalador
-automatico preservando a configuracao:
+Se algo der errado apos instalar ou actualizar, fazer rollback **manual**
+preservando a configuracao (o `uninstall.sh` automatico nao e publicado nesta
+release — ver nota em **Links da versao actual** e **BG-028**):
 
 ```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/uninstall.sh && sh /tmp/uninstall.sh --keep-config --yes
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
-Ou manualmente:
+Para reinstalar uma versao anterior conhecida (ex.: `1.8.3`, ultima publicada
+no canal antigo):
+
+```sh
+fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+```
+
+A configuracao (`/usr/local/etc/layer7.json`, `/usr/local/etc/layer7.lic`) e
+preservada por defeito durante `pkg delete`/`pkg add -f`.
+
+Ou limpeza manual completa:
 
 ```sh
 service layer7d onestop

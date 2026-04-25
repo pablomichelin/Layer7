@@ -25,12 +25,15 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada
-**Ultima versao do pacote publicada em release:** `1.8.3` (referencia de instalacao
-em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases).
+**Ultima versao do pacote publicada em release:** `1.8.11_12` (referencia de
+instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
+`pablomichelin/Layer7`, tag `v1.8.11_12`,
+`SHA256=902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7`).
+A release publica apenas `.pkg` + `.pkg.sha256` (mesmo padrao de `v1.7.8` a
+`v1.8.3`); a trust chain F1.2/F1.4 assinada continua **nao activada** na
+publicacao de pacote (gate `BG-028` aberto, ADR a registar num bloco futuro).
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_12` (`PORTVERSION=1.8.11`, `PORTREVISION=12`;
-artefacto ainda nao publicado; actualizar manual e procedimentos na mesma
-entrega de release).
++ `PORTREVISION`):** `1.8.11_12` (`PORTVERSION=1.8.11`, `PORTREVISION=12`).
 **Data-base deste checkpoint:** `2026-04-24`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
@@ -687,8 +690,10 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-04-24
 - Produto: Layer7 para pfSense CE
-- Ultima versao .pkg publicada (referencia operacional): 1.8.3
-- PORTVERSION no repositorio (pre-release / proximo build): 1.8.11 (PORTREVISION 12)
+- Ultima versao .pkg publicada (referencia operacional): 1.8.11_12
+  (SHA256 902736db23fc94ae5f52d9aeaf71fcf5e75c723799209b55e5e51dcb00138dc7;
+   trust chain F1.2 ainda nao activado nesta release; ver BG-028)
+- PORTVERSION no repositorio: 1.8.11 (PORTREVISION 12)
 - Estado funcional: V1 Comercial concluida e publicada; F3 aberta
 - Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
   fecho operacional (blocker: DR-05 no appliance)
@@ -707,9 +712,11 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **instalacao publica** continua a ser o pacote `1.8.3` ate
-  nova release; o branch carrega `PORTVERSION=1.8.11` com `PORTREVISION=12` para
-  o proximo empacotamento.
+- A referencia de **instalacao publica** passa a ser o pacote `1.8.11_12`
+  publicado em 2026-04-24 em `pablomichelin/Layer7` tag `v1.8.11_12`. O port
+  no branch mantem-se em `PORTVERSION=1.8.11`, `PORTREVISION=12`. A versao
+  anterior `1.8.3` continua disponivel publicamente em `v1.8.3` para
+  rollback.
 - O produto ja contem enforcement PF, forcing DNS, blacklists UT1,
   relatorios locais e licenciamento funcional.
 - Na linha 1.8.3+ conhecida: bloqueio QUIC por interface na GUI; retrocompat
