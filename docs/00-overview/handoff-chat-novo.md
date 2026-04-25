@@ -39,6 +39,16 @@ estado actual deixa de ser suficiente para agir sem reler o repo; o
 3. **Colar** na primeira mensagem o bloco [Prompt de continuação](#prompt-de-continuacao-copiar-e-colar), preenchendo os campos entre `<>`.
 4. Opcional: anexar ou mencionar ficheiros abertos relevantes.
 5. No chat antigo, **nao** apagar; serve de arquivo informal.
+6. Opcional: na **raiz do clone**, `sh scripts/package/check-port-files.sh` — confirma
+   que as entradas do `pkg-plist` (excepto o binario gerado no build) existem em
+   `package/pfSense-pkg-layer7/files/` (qualquer `sh` Unix; saida `OK`). O
+   `sh scripts/package/smoke-layer7d.sh` e para **FreeBSD** (builder) ou **Linux**
+   (CI com stub de licenciamento); em **macOS** o script **termina com codigo 2** de
+   proposito (workspace de edicao/git/docs, nao gate de fase; ver
+   `CORTEX.md` e [`docs/08-lab/README.md`](../08-lab/README.md)). O fecho **F3**
+   (**DR-05** no appliance) e a evidencia **F4** (seccoes **10a** / **10b** / **11** de
+   [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)) exigem **pfSense**
+   e, quando aplicavel, o builder.
 
 ---
 
@@ -80,3 +90,5 @@ Executa o proximo passo seguro e diz o que alteraste.
 
 - Continuidade geral: `CORTEX.md` — secção "Politica de continuidade entre chats".
 - Hierarquia de leitura do agente: `AGENTS.md`.
+- Fluxo de lab, builder e o papel do macOS: [`docs/08-lab/README.md`](../08-lab/README.md);
+  gates e roteiros F4: inicio de [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md).
