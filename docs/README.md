@@ -65,7 +65,9 @@ Quando houver conflito, seguir esta ordem:
 - Alguns readmes curtos em `package/`, `src/`, `webgui/` e `scripts/`
   permanecem preservados para navegacao local, nao para governanca.
 - A trilha antiga em `docs/07-prompts/` fica preservada, mas a continuidade
-  oficial entre chats passa a viver no `CORTEX.md`.
+  oficial entre chats passa a viver no `CORTEX.md`, com o procedimento de
+  *handoff* em `docs/00-overview/handoff-chat-novo.md` e a hierarquia
+  CORTEX/handoff/`07-prompts` em `docs/00-overview/document-equivalence-map.md`.
 - Documentos que ainda citam estados pre-V1, `.txz` ou `v0.x` nao devem ser
   usados como fonte primaria sem consultar antes a classificacao documental.
 

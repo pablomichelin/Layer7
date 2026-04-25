@@ -128,7 +128,7 @@ vence o canónico.
 | `docs/06-releases/release-notes-template.md` | template release | modelo reutilizavel | Suplementar | — | manter | F7 |
 | `docs/06-releases/release-notes-v0.1.0.md` | release antiga | release notes historicas | Historico | — | preservar | F7 |
 | `docs/06-releases/release-notes-1.8.11_10-DRAFT.md` | rascunho (conteudo `1.8.11_12`) | release notes pre-publicacao; nome do ficheiro legado; nao confundir com artefacto publico | Placeholder | completar na tag ou arquivar; `MANUAL-INSTALL` e changelog na entrega | concluir checksum/tag ou remover rascunho na F7 | F7 |
-| `docs/07-prompts/README.md` | prompts/IA | area auxiliar de prompts | Suplementar | complementar a `AGENTS.md` | manter leve; nao tratar como SSOT | F6 |
+| `docs/07-prompts/README.md` | prompts/IA | area auxiliar de prompts; explica canonicidade vs `CORTEX`/handoff | Suplementar | complementar a `AGENTS.md` e apontar para `CORTEX`, `handoff-chat-novo` e o mapa de equivalencia | manter leve; nao tratar como SSOT | F6 |
 | `docs/07-prompts/next-chat-phase-a-option1.md` | continuidade antiga | prompt historico de fase antiga | Historico | substituido pelo checkpoint do `CORTEX.md` | preservar | F6 |
 | `docs/08-lab/README.md` | indice do lab | agregador da area de laboratorio | Suplementar | complementar ao roadmap e package docs | manter leve | F4/F5 |
 | `docs/08-lab/builder-freebsd.md` | builder | guia do builder: verificacao minima do port, smoke, acesso SSH por chave | Suplementar | complementar ao `AGENTS.md` | rever quando F1/F4 mexerem no builder | F1/F4 |
