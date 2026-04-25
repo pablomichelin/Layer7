@@ -61,6 +61,7 @@ Ele existe para evitar tres erros comuns:
 | instalacao | tutorial longo vs manual install | `docs/10-license-server/MANUAL-INSTALL.md` | tutorial fica preservado por compatibilidade |
 | release/distribuicao | ADR-0002 `.txz` (historico) vs ADR-0003 **`.pkg`** (canonico) | `docs/03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md` + `CORTEX.md` + `docs/06-releases/README.md` + `MANUAL-INSTALL.md` | ADR-0002 preservado; confusao resolvida na hierarquia oficial |
 | prompts/continuidade | `docs/07-prompts/next-chat-phase-a-option1.md` vs checkpoint do `CORTEX.md` | `CORTEX.md` | prompt antigo fica historico |
+| continuidade (chat longo, handoff) | `docs/00-overview/handoff-chat-novo.md` (procedimento, prompt, pos-clone) vs `CORTEX.md` (Politica de continuidade entre chats) | `CORTEX.md` para estado e prioridade; `handoff-chat-novo.md` para o *como* sem contrariar o SSOT | o handoff expande; nunca substitui fase, backlog ou checkpoint do CORTEX |
 
 ---
 
@@ -73,7 +74,9 @@ Ele existe para evitar tres erros comuns:
 3. **Artefacto de distribuicao**: ADR historico e varias docs antigas falam em
    `.txz`; o estado operacional conhecido e `.pkg`.
 4. **Continuidade entre chats**: prompts antigos existiam em `docs/07-prompts`,
-   mas a continuidade oficial passa a viver no `CORTEX.md`.
+   mas a continuidade oficial passa a viver no `CORTEX.md`, complementada em
+   `docs/00-overview/handoff-chat-novo.md` (procedimento, prompt modelo e
+   verificacao opcional pos-clone), sem conflito com a hierarquia do CORTEX.
 
 ---
 
