@@ -57,7 +57,10 @@ Depois disso, ler apenas a documentacao da area em causa:
 
 **Chat muito longo:** se o contexto da conversa estiver esgotado ou a tarefa
 for continuar trabalho pesado, sugere handoff para um chat novo e aponta para
-`docs/00-overview/handoff-chat-novo.md` (prompt modelo incluido).
+`docs/00-overview/handoff-chat-novo.md` (prompt modelo incluido). A hierarquia
+CORTEX / handoff / `docs/07-prompts` (continuidade) esta resolvida em
+`docs/00-overview/document-equivalence-map.md` (tabela *Sobreposicoes internas*;
+ponto 4 da lista *Conflitos documentais formais registados na F0*).
 
 ---
 
