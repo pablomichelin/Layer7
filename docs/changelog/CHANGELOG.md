@@ -4,38 +4,85 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Operational — convencao de releases no GitHub
+## [1.8.11_14] - 2026-04-24
 
-- **Release rolling `blacklists-ut1-current` marcada como `prerelease`** em
-  `pablomichelin/Layer7`. Motivo: o updater do GUI Layer7 consulta
-  `https://api.github.com/repos/pablomichelin/Layer7/releases/latest` e essa
-  API **ignora** releases marcadas como `prerelease`/`draft`. Sem esta marca,
-  a release rolling de blacklists (publicada em paralelo a `v1.8.11_13`)
-  passou a ser devolvida como "latest" e o GUI mostrava o aviso
-  *"Release encontrado mas sem artefacto .pkg."* — porque a release rolling
-  intencionalmente nao publica `.pkg`, so manifesto + assinatura + chave +
-  `tar.gz` da snapshot UT1.
-- **Convencao canonica** (vale para releases futuras): releases que nao sao
-  versoes do pacote (ex.: `blacklists-*`, futuras `signatures-*`) **devem
-  ser publicadas como `prerelease`** no GitHub para nao "roubar" o `latest`
-  do canal de versoes do pacote (`v<MAJOR>.<MINOR>.<PATCH>[_<REVISION>]`).
-- Comando aplicado:
+### Released
 
-  ```bash
-  gh release edit blacklists-ut1-current --repo pablomichelin/Layer7 --prerelease
-  ```
+- **`pfSense-pkg-layer7-1.8.11_14.pkg`** publicado em
+  `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_14`
+  (`SHA256=f9fb1217780bfb90e83821c2652d7177d92eaf5b83f3dfa1fe29d85eaf284705`).
+  Hotfix do **GUI updater** sobre `1.8.11_13`. **Sem alteracao de logica
+  de bloqueio** (PF, nDPI, force_dns, anti-QUIC, blacklists), **sem
+  rotacao de chave** (a chave Ed25519 de blacklists embutida e a mesma
+  da `1.8.11_13`, fingerprint
+  `6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc`),
+  **sem republicacao de snapshot UT1** (a snapshot publicada em
+  `pablomichelin/Layer7 / blacklists-ut1-current` continua valida e e
+  aceite por esta release).
+- O trust chain F1.2 do **pacote** continua **nao activado** (`BG-028`);
+  esta release publica apenas `.pkg` + `.pkg.sha256` (mesmo padrao de
+  `v1.7.8` a `v1.8.11_13`).
 
-- Nenhum codigo alterado, nenhum novo build necessario. Efeito imediato no
-  GUI da `1.8.11_13` (e em qualquer versao instalada que use o mesmo
-  endpoint `/releases/latest`).
+### Fixed — GUI "Verificar actualizacao" entrava em loop em `1.8.11_13`
 
-### Backlog — abertos por esta operacao
+Sintoma observado em `1.8.11_13`: clicar **Verificar actualizacao**
+mostrava `latest=1.8.11_13` mas `Versao instalada=1.8.11`, oferecia o
+update, o `pkg add -f` reinstalava o mesmo `.pkg`, o daemon reiniciava
+com banner `1.8.11`, e o ciclo recomecava. Causa raiz: o `version.str`
+gerado pelo Makefile do port estava a usar apenas `${PORTVERSION}` (sem
+`${PORTREVISION}`), pelo que `layer7d -V` ficou eternamente preso em
+`1.8.11`; o updater do GUI usava esse banner como fonte de "versao
+instalada" e comparava-o contra a tag GitHub `v1.8.11_13`.
 
-- **`BG-030`** — endurecer `layer7_settings.php` (updater do GUI) para
-  ignorar tags que nao casem com o padrao de versao do pacote
-  (`/^v\d+\.\d+/`) e/ou cair na primeira release seguinte que tenha asset
-  `.pkg`. Defesa em profundidade caso uma release nao-pacote seja publicada
-  no futuro sem o flag `prerelease`. Ver `docs/02-roadmap/backlog.md`.
+### Changed — `pfSense-pkg-layer7` (`1.8.11_14`)
+
+- **`package/pfSense-pkg-layer7/Makefile`**
+  - `PORTREVISION` `13` -> `14`.
+  - `do-build`: `version.str` passa a conter `${PKGVERSION}` em vez de
+    `${PORTVERSION}` (= `PORTVERSION_PORTREVISION`, formato canonico do
+    `bsd.port.mk` ja usado para `info.xml` e `layer7.xml` na linha 137).
+    Resultado: `layer7d -V` passa a imprimir a versao real do pacote
+    (ex.: `1.8.11_14`).
+- **`files/usr/local/pkg/layer7.inc`**
+  - nova `layer7_pkg_version()` — devolve
+    `pkg query %v pfSense-pkg-layer7` (fonte canonica do pkg manager
+    pfSense). E a unica funcao em que o updater do GUI passa a confiar
+    para "versao instalada"; o banner do daemon
+    (`layer7_daemon_version()`) fica como fallback cosmetico.
+- **`files/usr/local/www/packages/layer7/layer7_settings.php`**
+  - `check_update`: `current` passa a vir de `layer7_pkg_version()`
+    (com fallback para `layer7_daemon_version()`); o display mostra a
+    versao do pkg, e exibe o banner do daemon entre parenteses *so se
+    divergir* da versao do pkg.
+  - `do_update`: a mensagem verde de sucesso passa a usar
+    `layer7_pkg_version()` (no caminho antigo, devolvia o banner que
+    nao tinha sido recompilado).
+  - **Defesa em profundidade (`BG-030`):** o updater **ignora** releases
+    cujo `tag_name` nao case com `/^v?\d+\.\d+/` (ex.:
+    `blacklists-ut1-current`), mesmo que o GitHub as devolva como
+    `latest` por engano. Reforca a convencao operacional registada na
+    `1.8.11_13` (releases nao-pacote sao publicadas como `prerelease`).
+- **`files/usr/local/etc/layer7/lang/en.php`**
+  - novas keys `daemon` e
+    `Release mais recente nao e uma versao do pacote (tag ignorada): `;
+    `pt` continua como lingua base.
+
+### Backlog — atendidos
+
+- **`BG-030`** marcado como **Concluido em `1.8.11_14`** (ver
+  `docs/02-roadmap/backlog.md`).
+
+### Documentation — release `1.8.11_14`
+
+- **`docs/06-releases/release-notes-1.8.11_14.md`** — notas dedicadas.
+- **`docs/10-license-server/MANUAL-INSTALL.md`** — links e comandos das
+  seccoes **1**/**4**/**5**/**12** actualizados para `1.8.11_14`;
+  novo addendum operacional desta release. A seccao **11b** (activar
+  blacklists UT1) continua valida sem alteracao porque a chave nao
+  rodou.
+- **`CORTEX.md`** — `Ultima versao do pacote publicada em release` passa
+  a `1.8.11_14`; checkpoint canonico actualizado.
+- **`docs/02-roadmap/backlog.md`** — `BG-030` Concluido.
 
 ## [1.8.11_13] - 2026-04-24
 
