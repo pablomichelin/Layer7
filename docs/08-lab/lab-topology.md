@@ -42,6 +42,7 @@ Isolar tráfego de teste, permitir captura/classificação no pfSense e validar 
 - Com utilizador **admin** (e em muitas consolas pfSense), a sessão SSH abre o **menu de texto** do pfSense; **não** cai de imediato num shell. Para trabalhar com comandos, escolhe normalmente a opção **8 (Shell)**.
 - Comandos remotos *numa linha* (`ssh … 'comando'`) a partir de scripts ou agente podem **falhar** ou colidir com o menu. Para automação, costuma ser preferível: **SSHD com acesso** que entregue *shell* directo (ex.: `root` com login SSH permitido em *System* > *Advanced* se a tua politica o permitir) ou sessão interactiva; validar a política de segurança do teu lab antes.
 - Nunca colocar credenciais no repositório; usar `lab-inventory` local ou segredo fora de Git.
+- Diagnóstico rápido (copiar o script para o pfSense e correr com `sh`): [`../../scripts/diagnose-layer7-appliance.sh`](../../scripts/diagnose-layer7-appliance.sh) — gera resumo: pacote, `layer7d`, `layer7.json` (`mode`), regras PF, tabelas.
 
 ## Regras de firewall (lab)
 
