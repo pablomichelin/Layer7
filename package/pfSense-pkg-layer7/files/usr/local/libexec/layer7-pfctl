@@ -138,6 +138,22 @@ flush_tables() {
 	/sbin/pfctl -t "${TABLE_BLOCK_DST}" -T flush >/dev/null 2>&1 || true
 }
 
+# Tabelas layer7_bld_* (blacklist por IP) e excepcoes — necessario para remocao
+# limpa e para evitar bloqueio residual apos pkg delete.
+flush_tables_blacklist() {
+	_i=0
+	while [ "${_i}" -lt 32 ]; do
+		/sbin/pfctl -t "layer7_bld_${_i}" -T flush >/dev/null 2>&1 || true
+		_i=$((_i + 1))
+	done
+	/sbin/pfctl -t layer7_bl_except -T flush >/dev/null 2>&1 || true
+}
+
+flush_tables_all() {
+	flush_tables
+	flush_tables_blacklist
+}
+
 show_status() {
 	echo "helper=/usr/local/libexec/layer7-pfctl"
 	echo "rules=${RULES_PATH}"
@@ -167,11 +183,14 @@ ensure)
 flush)
 		flush_tables
 		;;
+flush-all)
+		flush_tables_all
+		;;
 show)
 		show_status
 		;;
 *)
-		echo "usage: $0 [ensure|flush|show]" >&2
+		echo "usage: $0 [ensure|flush|flush-all|show]" >&2
 		exit 1
 		;;
 esac

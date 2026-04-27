@@ -75,14 +75,30 @@ layer7d_start()
 
 layer7d_stop()
 {
-	if [ ! -f "${pidfile}" ]; then
-		return 0
-	fi
-	if ! layer7d_pid_from_file; then
+	local _i
+
+	_p=""
+	if [ -f "${pidfile}" ] && layer7d_pid_from_file; then
+		:
+	else
 		_p=""
 	fi
 	/bin/rm -f "${pidfile}"
-	[ -n "${_p}" ] && /bin/kill "${_p}" 2>/dev/null
+	# Sinal preferencial ao PID do pidfile (tipicamente o filho sob daemon(8)).
+	[ -n "${_p}" ] && /bin/kill -TERM "${_p}" 2>/dev/null
+	# Garantir paragem mesmo quando o pidfile aponta só para metade da arvore
+	# (supervisor `daemon` + `layer7d`) ou ficou orfao — evita "Stop" no GUI
+	# sem efeito e processos residuais.
+	if [ -x /usr/bin/pkill ]; then
+		/usr/bin/pkill -TERM -f "/usr/local/sbin/layer7d" 2>/dev/null || true
+		_i=0
+		while [ "${_i}" -lt 5 ]; do
+			/usr/bin/pgrep -f "/usr/local/sbin/layer7d" >/dev/null 2>&1 || break
+			_i=$(( _i + 1 ))
+			sleep 1
+		done
+		/usr/bin/pkill -KILL -f "/usr/local/sbin/layer7d" 2>/dev/null || true
+	fi
 	return 0
 }
 

@@ -84,6 +84,10 @@ else
 fi
 
 echo "[2/5] Removendo pacote..."
+if [ -x /usr/local/libexec/layer7-pfctl ]; then
+    echo "      A limpar tabelas PF layer7 (flush-all)..."
+    /usr/local/libexec/layer7-pfctl flush-all 2>/dev/null || true
+fi
 if pkg info pfSense-pkg-layer7 >/dev/null 2>&1; then
     pkg delete -y pfSense-pkg-layer7 2>/dev/null || true
     echo "      Pacote removido."

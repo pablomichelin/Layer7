@@ -50,8 +50,12 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_14` (`PORTVERSION=1.8.11`, `PORTREVISION=14`).
-**Data-base deste checkpoint:** `2026-04-24`
++ `PORTREVISION`):** `1.8.11_16` (`PORTVERSION=1.8.11`, `PORTREVISION=16`).
+Bloco **F4.1**: `rc.d/layer7d` com `layer7d_stop()` robusto (`BG-031`);
+**remocao completa** via GUI **Services > Layer 7 > Removal**, hooks
+`pkg-deinstall` alargados e `layer7-pfctl flush-all` (`BG-033`); **ainda sem
+release publica** (ultima publicada continua `1.8.11_14`).
+**Data-base deste checkpoint:** `2026-04-27`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
 GUI integrada, classificacao Layer 7 via nDPI, politicas granulares,
@@ -705,7 +709,7 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-04-24
+- Data base: 2026-04-27
 - Produto: Layer7 para pfSense CE
 - Ultima versao .pkg publicada (referencia operacional): 1.8.11_14
   (SHA256 f9fb1217780bfb90e83821c2652d7177d92eaf5b83f3dfa1fe29d85eaf284705;
@@ -717,7 +721,8 @@ CHECKPOINT CANONICO
    blacklists-ut1-current; 1.8.11_14 e hotfix do GUI updater (loop
    "Verificar actualizacao") + defesa em profundidade BG-030, sem
    alteracao de logica de bloqueio)
-- PORTVERSION no repositorio: 1.8.11 (PORTREVISION 14)
+- PORTVERSION no repositorio: 1.8.11 (PORTREVISION 16 em branch; F4.1 BG-031
+  + BG-033 remocao completa; sem .pkg publicado para 1.8.11_16)
 - Estado funcional: V1 Comercial concluida e publicada; F3 aberta
 - Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
   fecho operacional (blocker: DR-05 no appliance)

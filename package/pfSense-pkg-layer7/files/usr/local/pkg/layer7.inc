@@ -1229,7 +1229,8 @@ function layer7_nav_items()
 		"eventos" => array("label" => l7_t("Eventos"), "href" => "layer7_events.php"),
 		"reports" => array("label" => l7_t("Relatorios"), "href" => "layer7_reports.php"),
 		"settings" => array("label" => l7_t("Definicoes"), "href" => "layer7_settings.php"),
-		"diagnosticos" => array("label" => l7_t("Diagnosticos"), "href" => "layer7_diagnostics.php")
+		"diagnosticos" => array("label" => l7_t("Diagnosticos"), "href" => "layer7_diagnostics.php"),
+		"removal" => array("label" => l7_t("Remocao do pacote"), "href" => "layer7_removal.php")
 	);
 }
 

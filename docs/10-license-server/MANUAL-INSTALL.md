@@ -421,6 +421,17 @@ service layer7d onestart
 > servico, `pkg delete`, limpeza de ficheiros residuais, flush das tabelas PF
 > e remocao do servico do boot.
 
+### Remocao pela GUI (desde `1.8.11_16` no branch / proxima release)
+
+No pfSense: **Services > Layer 7 > Removal** (ou **Remocao do pacote** na
+barra de separadores). Leia o aviso, opcionalmente marque preservar licenca
+ou configuracao, escreva **REMOVER** e confirme. O pedido corre em segundo
+plano (`pkg delete` + hooks do pacote: cron, `layer7.json` / `layer7.lic`,
+`/usr/local/etc/layer7/`, flush das tabelas `layer7_*`, reload do filtro).
+
+Equivalente a **System > Package Manager > Installed Packages > Remove**,
+com opcoes de preservacao e limpeza alargada nos hooks `pkg-deinstall`.
+
 ### Opcoes do uninstall.sh
 
 | Flag | O que faz |

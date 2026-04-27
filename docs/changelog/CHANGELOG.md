@@ -4,6 +4,42 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Added — remocao completa do pacote (GUI + hooks)
+
+- **Nova pagina** `files/usr/local/www/packages/layer7/layer7_removal.php`
+  (**Services > Layer 7 > Removal**): desinstalacao com confirmacao **REMOVER**,
+  opcoes para preservar `layer7.lic` e/ou `layer7.json`, e `pkg delete` em
+  segundo plano (com `flush-all` das tabelas PF antes do delete quando o
+  helper ainda existe).
+- **`files/pkg-deinstall.in`**: em **PRE-DEINSTALL** remove cron de blacklists
+  e relatorios via PHP; em **POST-DEINSTALL** `filter_configure`, flush de
+  `layer7_block` / `layer7_block_dst` / `layer7_tagged` / `layer7_bl_except` /
+  `layer7_bld_0`–`31`, remocao de residuos (`layer7.json` / `layer7.lic` salvo
+  flags em `/var/run/layer7-uninstall-keep-*`), `rm -rf /usr/local/etc/layer7`,
+  logs.
+- **`files/usr/local/libexec/layer7-pfctl`**: comando **`flush-all`** (tabelas
+  base + blacklist).
+- **`scripts/release/uninstall.sh`**: chama `layer7-pfctl flush-all` antes do
+  `pkg delete` quando disponivel.
+- **Backlog:** `BG-033`.
+
+### Changed — `pfSense-pkg-layer7` (`1.8.11_15` / `1.8.11_16`, branch; ainda sem release publica)
+
+- **`files/usr/local/etc/rc.d/layer7d`** (`1.8.11_15`)
+  - `layer7d_stop()` passa a enviar **SIGTERM** ao PID do pidfile, depois
+    **`pkill -TERM -f /usr/local/sbin/layer7d`**, espera até **5 s** pela
+    saida, e por fim **`pkill -KILL`** se ainda existir processo. Cobre a
+    arvore **daemon(8) + layer7d** quando o botao **Stop** (Status →
+    Services) ou `service layer7d stop` deixavam o binario a correr.
+  - Remove o pidfile **antes** do kill em cadeia (comportamento anterior
+    preservado para o primeiro sinal).
+- **`package/pfSense-pkg-layer7/Makefile`**: `PORTREVISION` `16` (GUI remocao +
+  `pkg-deinstall` completo + `layer7-pfctl flush-all`).
+
+### Backlog
+
+- **`BG-031`**, **`BG-033`**: ver `docs/02-roadmap/backlog.md`.
+
 ## [1.8.11_14] - 2026-04-24
 
 ### Released

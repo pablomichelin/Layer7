@@ -9,9 +9,28 @@ reload_filter() {
 	fi
 }
 
+layer7_remove_crontabs() {
+	_php="/usr/local/bin/php"
+	if [ ! -x "${_php}" ] || [ ! -f "/usr/local/pkg/layer7.inc" ]; then
+		return 0
+	fi
+	"${_php}" -r "
+require_once('/etc/inc/filter.inc');
+require_once('/etc/inc/service-utils.inc');
+require_once('/usr/local/pkg/layer7.inc');
+if (function_exists('layer7_bl_setup_cron')) {
+	layer7_bl_setup_cron(false, 24);
+}
+if (function_exists('layer7_reports_setup_cron')) {
+	layer7_reports_setup_cron(false, 5);
+}
+" >/dev/null 2>&1 || true
+}
+
 # Parar o daemon enquanto o rc.d ainda existe (POST-DEINSTALL corre depois da remocao).
 if [ "${2}" = "PRE-DEINSTALL" ]; then
 	/usr/sbin/service layer7d onestop >/dev/null 2>&1 || true
+	layer7_remove_crontabs
 fi
 
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
@@ -22,7 +41,27 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 		sysrc layer7d_enable=NO >/dev/null 2>&1 || true
 	fi
 	reload_filter
-	if [ -x /usr/local/libexec/layer7-pfctl ]; then
-		/usr/local/libexec/layer7-pfctl flush >/dev/null 2>&1 || true
+	# Limpar entradas das tabelas layer7 apos o ruleset deixar de as referenciar
+	for _t in layer7_block layer7_block_dst layer7_tagged layer7_bl_except; do
+		/sbin/pfctl -t "${_t}" -T flush >/dev/null 2>&1 || true
+	done
+	_i=0
+	while [ "${_i}" -lt 32 ]; do
+		/sbin/pfctl -t "layer7_bld_${_i}" -T flush >/dev/null 2>&1 || true
+		_i=$((_i + 1))
+	done
+	# Ficheiros de configuracao nao listados no plist (ou gerados em runtime)
+	if [ -f /var/run/layer7-uninstall-keep-config ]; then
+		/bin/rm -f /var/run/layer7-uninstall-keep-config
+	elif [ -f /var/run/layer7-uninstall-keep-license ]; then
+		/bin/rm -f /usr/local/etc/layer7.json >/dev/null 2>&1 || true
+		/bin/rm -f /var/run/layer7-uninstall-keep-license
+	else
+		/bin/rm -f /usr/local/etc/layer7.json /usr/local/etc/layer7.lic >/dev/null 2>&1 || true
 	fi
+	# Cache blacklists, relatorios, estado — alinhado a scripts/release/uninstall.sh
+	/bin/rm -rf /usr/local/etc/layer7 >/dev/null 2>&1 || true
+	/bin/rm -f /usr/local/etc/layer7-protos.txt >/dev/null 2>&1 || true
+	/bin/rm -f /var/log/layer7d.log /var/log/layer7-bl-update.log >/dev/null 2>&1 || true
+	/bin/rm -f /tmp/layer7-stats.json /tmp/layer7_pkg_rm_started >/dev/null 2>&1 || true
 fi

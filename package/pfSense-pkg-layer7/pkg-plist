@@ -10,6 +10,7 @@
 /usr/local/www/packages/layer7/layer7_test.php
 /usr/local/www/packages/layer7/layer7_events.php
 /usr/local/www/packages/layer7/layer7_diagnostics.php
+/usr/local/www/packages/layer7/layer7_removal.php
 /usr/local/www/packages/layer7/layer7_blacklists.php
 /usr/local/www/packages/layer7/layer7_bl_ajax.php
 /usr/local/www/packages/layer7/layer7_reports.php

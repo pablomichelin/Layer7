@@ -36,6 +36,10 @@
 			<text>Diagnostics</text>
 			<url>/packages/layer7/layer7_diagnostics.php</url>
 		</tab>
+		<tab>
+			<text>Removal</text>
+			<url>/packages/layer7/layer7_removal.php</url>
+		</tab>
 	</tabs>
 	<menu>
 		<name>Layer7</name>
