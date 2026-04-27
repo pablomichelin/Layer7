@@ -34,7 +34,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   - Remove o pidfile **antes** do kill em cadeia (comportamento anterior
     preservado para o primeiro sinal).
 - **`package/pfSense-pkg-layer7/Makefile`**: `PORTREVISION` `16` (GUI remocao +
-  `pkg-deinstall` completo + `layer7-pfctl flush-all`).
+  `pkg-deinstall` completo + `layer7-pfctl flush-all`); `do-install` passa a
+  copiar `layer7_removal.php` para o stage (corrige falha de `make package`).
 
 ### Backlog
 

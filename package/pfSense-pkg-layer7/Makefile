@@ -105,6 +105,8 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_reports_export.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_removal.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7d \
 		${STAGEDIR}${PREFIX}/etc/rc.d
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-pfctl \
