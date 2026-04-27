@@ -8,6 +8,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [1.8.11_17] - 2026-04-27
 
+### Released
+
+- **`pfSense-pkg-layer7-1.8.11_17.pkg`** em
+  `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_17`
+  (`SHA256=787fcad80f00c085040a38745cf55ccf5870261f5d3ebc762f8ab643c3d81735`).
+  Commit: `0b9717e`.
+
 ### Fixed
 
 - **`layer7_removal.php`:** erro de sintaxe PHP (`unexpected token "<<"`) — o

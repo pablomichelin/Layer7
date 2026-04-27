@@ -25,19 +25,17 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada
-**Ultima versao do pacote publicada em release:** `1.8.11_16` (referencia de
+**Ultima versao do pacote publicada em release:** `1.8.11_17` (referencia de
 instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
-`pablomichelin/Layer7`, tag `v1.8.11_16`,
-`SHA256=a46e710692b466a6a5573d38c42cc686eb1a6bd4fc93684f288147dd96402425`).
-A release publica apenas `.pkg` + `.pkg.sha256` (mesmo padrao anterior); a
-trust chain F1.2/F1.4 do **pacote** continua **nao activada** (`BG-028`).
-Esta versao acrescenta **F4.1**: `rc.d/layer7d` com `layer7d_stop()` robusto
-(`BG-031`); **remocao completa** via GUI **Removal**, `pkg-deinstall`
-alargado e `layer7-pfctl flush-all` (`BG-033`). **Sem rotacao de chave** de
-blacklists nem republicacao de snapshot UT1.
+`pablomichelin/Layer7`, tag `v1.8.11_17`,
+`SHA256=787fcad80f00c085040a38745cf55ccf5870261f5d3ebc762f8ab643c3d81735`).
+Hotfix sobre `1.8.11_16`: pagina **Remocao do pacote** (`layer7_removal.php`)
+deixava de carregar por **parse error** (`<<'EOSH'` em vez de `<<<'EOSH'`);
+corrigido com `implode()` sem heredoc. O restante (F4.1, trust chain, UT1) e
+o mesmo que em `1.8.11_16`.
 
 O hotfix **`1.8.11_14`** (GUI updater / `BG-030`) permanece descrito no
-`CHANGELOG`; `1.8.11_16` herda esse comportamento no updater.
+`CHANGELOG`; linha `1.8.11_17` herda esse comportamento no updater.
 
 A trilha **F1.3 de blacklists** continua activa desde `1.8.11_13` com a
 mesma chave: fingerprint da chave publica embutida
@@ -48,8 +46,8 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_16` (`PORTVERSION=1.8.11`, `PORTREVISION=16`),
-alinhada a **release publica** `v1.8.11_16` (commit `b3e0ccb`).
++ `PORTREVISION`):** `1.8.11_17` (`PORTVERSION=1.8.11`, `PORTREVISION=17`),
+alinhada a **release publica** `v1.8.11_17` (commit `0b9717e`).
 **Data-base deste checkpoint:** `2026-04-27`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
@@ -70,10 +68,10 @@ controladas, com governanca forte e zero regressao desnecessaria.
 - V1 Comercial ja foi concluida e publicada.
 - O pacote publico de referencia continua a ser o `.pkg` distribuido via
   GitHub Releases.
-- A ultima publicacao conhecida no canal publico e o pacote **`1.8.11_16`**
-  (GitHub `pablomichelin/Layer7`, tag `v1.8.11_16`). A linha **`1.8.3`**
+- A ultima publicacao conhecida no canal publico e o pacote **`1.8.11_17`**
+  (GitHub `pablomichelin/Layer7`, tag `v1.8.11_17`). A linha **`1.8.3`**
   permanece como referencia historica de V1 comercial estavel; rollbacks
-  adicionais: `1.8.11_14`, `1.8.11_13`, `1.8.11_12`, `1.8.3`.
+  adicionais: `1.8.11_16`, `1.8.11_14`, `1.8.11_13`, `1.8.11_12`, `1.8.3`.
 - Bloqueio QUIC configuravel por interface na GUI e restricao
   `to !<localsubnets>` em bloqueios permanecem como base funcional conhecida.
 - O license server existe e esta operacional como componente separado,
@@ -706,15 +704,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-04-27
 - Produto: Layer7 para pfSense CE
-- Ultima versao .pkg publicada (referencia operacional): 1.8.11_16
-  (SHA256 a46e710692b466a6a5573d38c42cc686eb1a6bd4fc93684f288147dd96402425;
+- Ultima versao .pkg publicada (referencia operacional): 1.8.11_17
+  (SHA256 787fcad80f00c085040a38745cf55ccf5870261f5d3ebc762f8ab643c3d81735;
+   hotfix GUI Remocao do pacote; ver CHANGELOG 1.8.11_17;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
-   trust chain F1.3 de blacklists activa desde 1.8.11_13, chave embutida
-   inalterada (fingerprint
-   6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc);
-   1.8.11_16 = F4.1 BG-031/BG-033 stop fiavel + remocao completa + flush-all)
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 16, alinhado a release
-  publica v1.8.11_16 (commit b3e0ccb)
+   trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 17, alinhado a release
+  publica v1.8.11_17 (commit 0b9717e)
 - Estado funcional: V1 Comercial concluida e publicada; F3 aberta
 - Estado documental: governanca F0 consolidada; F1 e F2 concluidas; F3 em
   fecho operacional (blocker: DR-05 no appliance)
@@ -733,11 +729,11 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **instalacao publica** e o pacote **`1.8.11_16`**
-  publicado em 2026-04-27 em `pablomichelin/Layer7` tag `v1.8.11_16`
-  (`SHA256=a46e710692b466a6a5573d38c42cc686eb1a6bd4fc93684f288147dd96402425`).
-  O port no branch: `PORTVERSION=1.8.11`, `PORTREVISION=16`. Rollback:
-  `v1.8.11_14`, `v1.8.11_13`, `v1.8.11_12`, `v1.8.3`, etc.
+- A referencia de **instalacao publica** e o pacote **`1.8.11_17`**
+  publicado em 2026-04-27 em `pablomichelin/Layer7` tag `v1.8.11_17`
+  (`SHA256=787fcad80f00c085040a38745cf55ccf5870261f5d3ebc762f8ab643c3d81735`).
+  O port no branch: `PORTVERSION=1.8.11`, `PORTREVISION=17`. Rollback:
+  `v1.8.11_16`, `v1.8.11_14`, `v1.8.11_13`, `v1.8.11_12`, `v1.8.3`, etc.
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
   (`snapshot_id=ut1-2026-04-25`,
