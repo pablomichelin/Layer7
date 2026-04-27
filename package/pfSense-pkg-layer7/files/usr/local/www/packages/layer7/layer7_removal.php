@@ -33,27 +33,28 @@ if ($_POST["layer7_pkg_remove_do"] ?? false) {
 		}
 		@file_put_contents($log_rm, gmdate('c') . " GUI: pedido de remocao do pacote\n", FILE_APPEND);
 		@touch($flag_started);
-		$sh = <<'EOSH'
-#!/bin/sh
-set -eu
-PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-export PATH
-LOG=/tmp/layer7_pkg_rm.log
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) job: parar layer7d" >>"$LOG"
-/usr/sbin/service layer7d onestop >>"$LOG" 2>&1 || true
-if [ -x /usr/local/libexec/layer7-pfctl ]; then
-	/usr/local/libexec/layer7-pfctl flush-all >>"$LOG" 2>&1 || true
-fi
-sleep 2
-if /usr/sbin/pkg info -e pfSense-pkg-layer7 >>"$LOG" 2>&1; then
-	echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) job: pkg delete" >>"$LOG"
-	/usr/sbin/pkg delete -y pfSense-pkg-layer7 >>"$LOG" 2>&1 || echo "pkg delete rc=$?" >>"$LOG"
-else
-	echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) job: pacote ja ausente" >>"$LOG"
-fi
-rm -f /tmp/layer7_pkg_rm.sh /tmp/layer7_pkg_rm_started
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) job: fim" >>"$LOG"
-EOSH;
+		/* Sem nowdoc (evita typo << vs <<< e parse errors no PHP do pfSense). */
+		$sh = implode("\n", array(
+			"#!/bin/sh",
+			"set -eu",
+			"PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin",
+			"export PATH",
+			"LOG=/tmp/layer7_pkg_rm.log",
+			"echo \"\$(date -u +%Y-%m-%dT%H:%M:%SZ) job: parar layer7d\" >>\"\$LOG\"",
+			"/usr/sbin/service layer7d onestop >>\"\$LOG\" 2>&1 || true",
+			"if [ -x /usr/local/libexec/layer7-pfctl ]; then",
+			"	/usr/local/libexec/layer7-pfctl flush-all >>\"\$LOG\" 2>&1 || true",
+			"fi",
+			"sleep 2",
+			"if /usr/sbin/pkg info -e pfSense-pkg-layer7 >>\"\$LOG\" 2>&1; then",
+			"	echo \"\$(date -u +%Y-%m-%dT%H:%M:%SZ) job: pkg delete\" >>\"\$LOG\"",
+			"	/usr/sbin/pkg delete -y pfSense-pkg-layer7 >>\"\$LOG\" 2>&1 || echo \"pkg delete rc=\$?\" >>\"\$LOG\"",
+			"else",
+			"	echo \"\$(date -u +%Y-%m-%dT%H:%M:%SZ) job: pacote ja ausente\" >>\"\$LOG\"",
+			"fi",
+			"rm -f /tmp/layer7_pkg_rm.sh /tmp/layer7_pkg_rm_started",
+			"echo \"\$(date -u +%Y-%m-%dT%H:%M:%SZ) job: fim\" >>\"\$LOG\"",
+		)) . "\n";
 		$script_path = "/tmp/layer7_pkg_rm.sh";
 		@file_put_contents($script_path, $sh);
 		@chmod($script_path, 0700);

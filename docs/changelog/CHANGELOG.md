@@ -6,6 +6,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 (nada)
 
+## [1.8.11_17] - 2026-04-27
+
+### Fixed
+
+- **`layer7_removal.php`:** erro de sintaxe PHP (`unexpected token "<<"`) — o
+  nowdoc estava escrito como `<<'EOSH'` em vez de `<<<'EOSH'`. O script shell
+  embutido passou a ser gerado com `implode()` (sem heredoc), para a pagina
+  **Remocao do pacote** voltar a carregar na GUI.
+
 ## [1.8.11_16] - 2026-04-27
 
 ### Released
