@@ -60,7 +60,9 @@ risco; plano em `docs/09-blocking/caminho-a-plano-de-implementacao.md`
   (`SHA256=a89f280714b984ad1dec8823185c18d7d1b73c37e45aafc76d33171e160945bb`),
   instalado e validado no appliance (`layer7d -V=1.8.11_19`, 18 perfis com
   `github`, `smoke-monitor-mode.sh` exit 0). Release publica do Caminho A sera
-  agrupada num milestone (apos A1), para evitar churn de releases por bloco.
+  agrupada num milestone (alvo: apos A2, primeiro incremento com enforcement
+  por dispositivo), para evitar churn de releases por bloco. Builds `_19`/`_20`
+  ja validados no appliance e em `main`.
 
 ## [1.8.11_18] - 2026-05-30
 
