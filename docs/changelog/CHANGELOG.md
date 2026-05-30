@@ -33,6 +33,14 @@ Regras por dispositivo estilo UDM "client rules" (BG-041). Decisao em
 - `PORTREVISION` -> `21`. Fail-safe: grupo so com dispositivos offline nao gera
   hosts (nao bloqueia o que nao localiza). Drift de IP dinamico mitigado por
   resync + recomendacao de DHCP static mapping.
+- Validacao no appliance (`1.8.11_21`,
+  `SHA256=5e0789dab274a756ea6da0c1fbc493a343789ffad4d3cc481cc5d1d18611ba21`):
+  MAC `7c:aa:de:4a:5e:8d` -> IP `10.0.85.89` resolvido e gravado em
+  `device_ips`; daemon carregou `policies=1` sem erro de parse (grupo com
+  `device_ips` aceite); regras PF de enforce presentes; `smoke-monitor-mode.sh`
+  exit 0 (gate de monitor intacto). Nota: o enforce ao vivo e **license-gated**
+  e este appliance de teste nao tem `layer7.lic` (`valid=0`), logo corre
+  monitor-only; o pipeline de configuracao/parse/PF foi validado.
 
 ### Caminho A / A1 — inventario de dispositivos (em curso, `PORTREVISION=20`)
 
