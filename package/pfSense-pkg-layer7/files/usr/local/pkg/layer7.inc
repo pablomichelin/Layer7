@@ -590,18 +590,25 @@ function layer7_generate_rules($type)
 		return "";
 	}
 
-	$rules = layer7_pf_rules_text();
-
 	$data = layer7_load_or_default();
 
 	/* Gate F4/Bloco 1: em modo passivo (monitor / desactivado) o produto nao
-	 * emite anti-QUIC, blacklists, nem injecta NAT. As tabelas persist sao
-	 * mantidas vazias e o anchor `natrules/layer7_nat` e limpo para nao
-	 * deixar regras rdr residuais a forcar DNS. */
+	 * emite NENHUM block drop, anti-QUIC, blacklists nem injecta NAT.
+	 *
+	 * IMPORTANTE: nao usar `layer7_pf_rules_text()` aqui — essa funcao
+	 * prefere o `pf.conf` em disco (escrito por `layer7-pfctl` com os blocks
+	 * sempre presentes), o que contornava este gate. Retornamos apenas as
+	 * tabelas `persist` (mode-aware via `layer7_pf_tables_text()`), limpamos
+	 * o anchor NAT e nao deixamos regras de bloqueio. */
 	if (!layer7_pf_should_enforce($data)) {
 		@exec("/sbin/pfctl -a natrules/layer7_nat -F Nat 2>/dev/null");
-		return $rules;
+		return layer7_pf_tables_text();
 	}
+
+	/* Enforce: construir a partir da fonte mode-aware (inclui allowlist
+	 * `pass quick`, toggle `block_dot_doq` e os blocks por src/dst), em vez
+	 * do `pf.conf` em disco, para garantir coerencia com a config actual. */
+	$rules = layer7_pf_default_rules_text();
 
 	$quic_ifaces = isset($data["layer7"]["block_quic_interfaces"]) &&
 	    is_array($data["layer7"]["block_quic_interfaces"])
