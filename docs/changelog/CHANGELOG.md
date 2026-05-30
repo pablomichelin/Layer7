@@ -4,13 +4,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Pending build/release: `1.8.11_18`
+### Build candidato pronto, pendente validacao appliance: `1.8.11_18`
 
 Fase 1 da estabilizacao da V1 comercial (correccao dos erros que provocam
 bloqueio indevido em modo monitor, incluindo bancos/servicos protegidos).
-Codigo pronto em `main` local; falta build no builder FreeBSD
-(`192.168.100.12`) e validacao real no appliance pfSense (smoke
-`tests/lab/smoke-monitor-mode.sh`) antes de publicar a release.
+
+**Estado:** codigo em `origin/main` (commit `da7d133`); **build concluido**
+no builder FreeBSD `192.168.100.12` em `2026-05-30`:
+
+- Artefacto: `pfSense-pkg-layer7-1.8.11_18.pkg` (2377782 bytes).
+- `SHA256=c99153283396a489ec9d9a35cbcda9759f2f2ae51d7d74a878b8ea0043a184d4`.
+- Testes unitarios `test_allowlist` recompilados e PASS no FreeBSD do builder.
+
+**Falta** (gate antes de publicar release): validacao real no appliance
+pfSense — instalar o `.pkg`, gravar `enabled=true`/`mode=monitor`, e correr
+`sh tests/lab/smoke-monitor-mode.sh` com exit 0. So depois de PASS se publica
+a tag `v1.8.11_18` no GitHub Releases.
 
 #### Fixed (Bloco 1) — monitor e monitor de verdade
 

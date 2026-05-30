@@ -25,11 +25,15 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada;
-**Fase 1 de estabilizacao da V1 em pre-release** (`1.8.11_18`) — codigo em
-`main` local, build no builder FreeBSD (`192.168.100.12`) e validacao no
-appliance pfSense ainda pendentes. Esta Fase 1 corrige a causa-raiz de
-"bloqueia bancos em modo monitor" e nao deve sair como release publica
-antes de PASS no smoke `tests/lab/smoke-monitor-mode.sh`.
+**Fase 1 de estabilizacao da V1 com build candidato pronto** (`1.8.11_18`) —
+codigo em `origin/main` (commit `da7d133`), **build concluido** no builder
+FreeBSD (`192.168.100.12`) em `2026-05-30`
+(`pfSense-pkg-layer7-1.8.11_18.pkg`,
+`SHA256=c99153283396a489ec9d9a35cbcda9759f2f2ae51d7d74a878b8ea0043a184d4`).
+Falta **validacao no appliance pfSense** (instalar + `mode=monitor` +
+`sh tests/lab/smoke-monitor-mode.sh` com exit 0) antes de publicar a release.
+Esta Fase 1 corrige a causa-raiz de "bloqueia bancos em modo monitor" e nao
+deve sair como release publica antes do PASS no smoke.
 **Ultima versao do pacote publicada em release:** `1.8.11_17` (referencia de
 instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
 `pablomichelin/Layer7`, tag `v1.8.11_17`,

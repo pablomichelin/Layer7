@@ -112,9 +112,12 @@ backup/restore do PostgreSQL:
 - `docs/05-runbooks/license-server-backup-restore.md`
 
 **Addendum pre-release `1.8.11_18` (Fase 1 — estabilizacao para escolas):**
-Codigo pronto em `main` local; build no builder FreeBSD (`192.168.100.12`) e
-validacao no appliance ainda **pendentes**. Esta release corrige os erros que
-levavam o produto a bloquear bancos/servicos em modo `monitor`:
+Codigo em `origin/main` (commit `da7d133`); **build concluido** no builder
+FreeBSD (`192.168.100.12`) em `2026-05-30` — artefacto
+`pfSense-pkg-layer7-1.8.11_18.pkg` (`SHA256=c99153283396a489ec9d9a35cbcda9759f2f2ae51d7d74a878b8ea0043a184d4`).
+Validacao no appliance pfSense ainda **pendente** (gate antes da release
+publica). Esta release corrige os erros que levavam o produto a bloquear
+bancos/servicos em modo `monitor`:
 - Em `mode=monitor` ou `enabled=false`, o pacote **deixa de injectar** qualquer
   `block drop` (`layer7.inc::layer7_pf_default_rules_text()` so emite tabelas).
 - Anti-DoT/DoQ (porta 853) passa a ser **toggle explicito** `block_dot_doq` em
