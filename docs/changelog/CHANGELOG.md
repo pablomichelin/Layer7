@@ -4,22 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Build candidato pronto, pendente validacao appliance: `1.8.11_18`
+(nada)
 
-Fase 1 da estabilizacao da V1 comercial (correccao dos erros que provocam
-bloqueio indevido em modo monitor, incluindo bancos/servicos protegidos).
+## [1.8.11_18] - 2026-05-30
 
-**Estado:** codigo em `origin/main` (commit `da7d133`); **build concluido**
-no builder FreeBSD `192.168.100.12` em `2026-05-30`:
+### Released
 
-- Artefacto: `pfSense-pkg-layer7-1.8.11_18.pkg` (2377782 bytes).
-- `SHA256=c99153283396a489ec9d9a35cbcda9759f2f2ae51d7d74a878b8ea0043a184d4`.
-- Testes unitarios `test_allowlist` recompilados e PASS no FreeBSD do builder.
+- **`pfSense-pkg-layer7-1.8.11_18.pkg`** em
+  `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_18`
+  (`SHA256=98374806be31094a3835bcae0c96164369860aef82db3bfb4255f44c9d60b876`).
+  Build no builder FreeBSD `192.168.100.12`; **validado no appliance pfSense
+  Plus 26.03** (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh`
+  (exit 0), incluindo enforce, transicao enforce->monitor e CLI
+  `--license-status`.
 
-**Falta** (gate antes de publicar release): validacao real no appliance
-pfSense — instalar o `.pkg`, gravar `enabled=true`/`mode=monitor`, e correr
-`sh tests/lab/smoke-monitor-mode.sh` com exit 0. So depois de PASS se publica
-a tag `v1.8.11_18` no GitHub Releases.
+Fase 1 da estabilizacao da V1 comercial — corrige os erros que provocavam
+bloqueio indevido em modo monitor (incluindo bancos/servicos) e adiciona a
+primeira camada de allowlist de destinos.
 
 #### Fixed (Bloco 1) — monitor e monitor de verdade
 
@@ -33,6 +34,13 @@ a tag `v1.8.11_18` no GitHub Releases.
 - `layer7_settings.php`: `filter_configure()` passa a ser disparado tambem
   quando mudam `mode`, `enabled` ou `block_dot_doq` (nao so QUIC).
 - Novo helper `layer7_pf_should_enforce($data)` — gate auditavel unico.
+- **Correccao apanhada na validacao do appliance:** `layer7_generate_rules()`
+  retornava `layer7_pf_rules_text()`, que prefere o `pf.conf` em disco
+  (escrito por `layer7-pfctl write_rules()` com os blocks sempre presentes),
+  contornando o gate. Agora, em modo passivo retorna so `layer7_pf_tables_text()`
+  e, em enforce, constroi a partir de `layer7_pf_default_rules_text()`
+  (mode-aware) em vez do `pf.conf` em disco. Smoke no appliance confirmou
+  0 `block drop` em monitor.
 
 #### Changed (Bloco 2) — anti-bypass como toggle, OFF por defeito
 
@@ -83,12 +91,14 @@ a tag `v1.8.11_18` no GitHub Releases.
 
 #### Notes
 
-- **PORTREVISION** -> `18`. Builder FreeBSD (`192.168.100.12`) e o caminho
-  oficial (`AGENTS.md > Fluxo de build padrao`). Validar no appliance
-  com `tests/lab/smoke-monitor-mode.sh` antes de publicar.
+- **PORTREVISION** -> `18`. Build no builder FreeBSD (`192.168.100.12`),
+  caminho oficial (`AGENTS.md > Fluxo de build padrao`). Validacao real no
+  appliance pfSense Plus 26.03 (`192.168.100.254`) com instalacao via
+  `IGNORE_OSVERSION=yes pkg add -f` (builder FreeBSD 15 vs appliance 16):
+  matriz `monitor` / `enforce` / transicao / CLI licenca toda em PASS.
 - A allowlist e a base para a Fase 2 (Caminho A — UX tipo UDM Pro, listas
   selecionaveis, identificacao por dispositivo), que so arranca depois
-  desta release estar validada (gate documental em `docs/02-roadmap/`).
+  desta release validada (gate documental em `docs/02-roadmap/`).
 
 ## [1.8.11_17] - 2026-04-27
 

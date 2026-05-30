@@ -25,28 +25,27 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada;
-**Fase 1 de estabilizacao da V1 com build candidato pronto** (`1.8.11_18`) —
-codigo em `origin/main` (commit `da7d133`), **build concluido** no builder
-FreeBSD (`192.168.100.12`) em `2026-05-30`
-(`pfSense-pkg-layer7-1.8.11_18.pkg`,
-`SHA256=c99153283396a489ec9d9a35cbcda9759f2f2ae51d7d74a878b8ea0043a184d4`).
-Falta **validacao no appliance pfSense** (instalar + `mode=monitor` +
-`sh tests/lab/smoke-monitor-mode.sh` com exit 0) antes de publicar a release.
-Esta Fase 1 corrige a causa-raiz de "bloqueia bancos em modo monitor" e nao
-deve sair como release publica antes do PASS no smoke.
-**Ultima versao do pacote publicada em release:** `1.8.11_17` (referencia de
+**Fase 1 de estabilizacao da V1 publicada** como `1.8.11_18`. Esta Fase 1
+corrige a causa-raiz de "bloqueia bancos em modo monitor" e adiciona a
+allowlist de destinos. **Build + validacao reais concluidos** em `2026-05-30`:
+build no builder FreeBSD (`192.168.100.12`), validado no appliance pfSense
+Plus 26.03 (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh` (exit 0),
+matriz monitor/enforce/transicao/CLI-licenca toda PASS.
+**Ultima versao do pacote publicada em release:** `1.8.11_18` (referencia de
 instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
-`pablomichelin/Layer7`, tag `v1.8.11_17`,
-`SHA256=787fcad80f00c085040a38745cf55ccf5870261f5d3ebc762f8ab643c3d81735`).
-Hotfix sobre `1.8.11_16`: pagina **Remocao do pacote** (`layer7_removal.php`)
-deixava de carregar por **parse error** (`<<'EOSH'` em vez de `<<<'EOSH'`);
-corrigido com `implode()` sem heredoc. O restante (F4.1, trust chain, UT1) e
-o mesmo que em `1.8.11_16`.
+`pablomichelin/Layer7`, tag `v1.8.11_18`,
+`SHA256=98374806be31094a3835bcae0c96164369860aef82db3bfb4255f44c9d60b876`).
+Fase 1 de estabilizacao (monitor passivo, allowlist de destinos, flush
+fiavel, CLI `--license-status`). A versao anterior `1.8.11_17` foi hotfix de
+GUI (`layer7_removal.php`).
 
-### Pre-release `1.8.11_18` — Fase 1 de estabilizacao
+### Release `1.8.11_18` — Fase 1 de estabilizacao (publicada `2026-05-30`)
 
-Bloqueios resolvidos no codigo (Blocos 1-3, 5 e 6 do plano `Layer7
-estabilizacao e Caminho A`); detalhes completos em
+Artefacto `pfSense-pkg-layer7-1.8.11_18.pkg`
+(`SHA256=98374806be31094a3835bcae0c96164369860aef82db3bfb4255f44c9d60b876`),
+build no builder FreeBSD e validado no appliance pfSense Plus 26.03.
+Bloqueios resolvidos (Blocos 1-3, 5 e 6 do plano `Layer7 estabilizacao e
+Caminho A`); detalhes completos em
 `docs/changelog/CHANGELOG.md > [Unreleased]` e `docs/02-roadmap/backlog.md`
 (BG-032 fechado; novos BG-034..BG-038 registados):
 
@@ -69,8 +68,9 @@ estabilizacao e Caminho A`); detalhes completos em
 
 `PORTVERSION=1.8.11`, `PORTREVISION=18` no `package/pfSense-pkg-layer7/Makefile`.
 Caminho B (inline/divert) e qualquer reorganizacao F6 continuam fora desta
-fase. Caminho A (UX tipo UDM Pro, Bloco 4 CDN-aware) so arranca apos
-`1.8.11_18` estar validado no appliance.
+fase. Caminho A (UX tipo UDM Pro, Bloco 4 CDN-aware) fica **desbloqueado**
+agora que `1.8.11_18` esta validado no appliance — arranca em chat novo, com
+a F5 alargada (BG-038) a proteger contra regressao.
 
 O hotfix **`1.8.11_14`** (GUI updater / `BG-030`) permanece descrito no
 `CHANGELOG`; linha `1.8.11_17` herda esse comportamento no updater.
@@ -84,10 +84,9 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_18` (`PORTVERSION=1.8.11`, `PORTREVISION=18`) —
-**pre-release** com Fase 1 de estabilizacao implementada em codigo (Blocos
-1-3, 5 e 6); falta build no builder FreeBSD e validacao no appliance.
-Ultima release publica continua a ser `v1.8.11_17` (commit `0b9717e`).
++ `PORTREVISION`):** `1.8.11_18` (`PORTVERSION=1.8.11`, `PORTREVISION=18`),
+alinhada a **release publica** `v1.8.11_18` (Fase 1 de estabilizacao,
+validada no appliance).
 **Data-base deste checkpoint:** `2026-04-27`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
