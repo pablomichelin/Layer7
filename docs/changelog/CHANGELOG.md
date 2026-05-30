@@ -25,6 +25,11 @@ Base de identidade tipo UDM (BG-040). Decisao em
 - A1 **nao altera enforcement** (so observa). Base para A2 (politicas por
   dispositivo). `PORTREVISION` -> `20`. Limites honestos: so dispositivos
   adjacentes L2; MAC pode ser aleatorizado; vendor depende de base OUI no sistema.
+- Build + validacao no appliance (`1.8.11_20`,
+  `SHA256=ae02b1abb7d48a6bac8a792fb770a20c9dc28ca3a9f0d1c2bbd022f1b545621b`):
+  `layer7_device_inventory()` devolveu 470 dispositivos (469 com MAC, 230 com
+  fabricante OUI, 29 hostname); alias save/load/remove OK; `smoke-monitor-mode.sh`
+  exit 0 (sem regressao).
 
 ### Caminho A / A0 — higiene (em curso, `PORTREVISION=19`)
 
