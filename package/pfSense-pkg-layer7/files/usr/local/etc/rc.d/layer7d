@@ -99,6 +99,13 @@ layer7d_stop()
 		done
 		/usr/bin/pkill -KILL -f "/usr/local/sbin/layer7d" 2>/dev/null || true
 	fi
+	# Bloco 5: defesa em profundidade — apos o daemon parar, garantir que
+	# `layer7_block`, `layer7_block_dst` e blacklists ficam vazios.
+	# (O proprio daemon ja faz isto no path normal de stop_req, mas se foi
+	# kill -9 nao tem hipotese.)
+	if [ -x /usr/local/libexec/layer7-pfctl ]; then
+		/usr/local/libexec/layer7-pfctl flush-all >/dev/null 2>&1 || true
+	fi
 	return 0
 }
 

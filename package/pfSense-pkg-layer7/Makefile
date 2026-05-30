@@ -3,7 +3,7 @@
 
 PORTNAME=	pfSense-pkg-layer7
 PORTVERSION=	1.8.11
-PORTREVISION=	17
+PORTREVISION=	18
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -20,8 +20,8 @@ LICENSE_FILE=	${.CURDIR}/../../LICENSE
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c)
-.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, blacklist.c, bl_config.c)."
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, blacklist.c, bl_config.c, allowlist.c)."
 .endif
 
 NDPI_PREFIX=	/usr/local
@@ -56,6 +56,7 @@ do-build:
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
 		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
 		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
+		${LAYER7D_DIR}/allowlist.c \
 		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} /usr/lib/libcrypto.a
 
 do-install:
@@ -101,6 +102,8 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_bl_ajax.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_allowlist.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_reports.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_reports_export.php \
@@ -116,6 +119,8 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/pf.conf.sample \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/profiles.json \
+		${STAGEDIR}${PREFIX}/etc/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/allowlist-seed.txt \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/update-blacklists.sh \
 		${STAGEDIR}${PREFIX}/etc/layer7

@@ -282,19 +282,85 @@ function layer7_generate_nat_rules()
 	return layer7_generate_rdr_rules_snippet();
 }
 
-function layer7_pf_default_rules_text()
+/**
+ * Decide se o produto deve emitir regras `block drop` do Layer7.
+ * Regra unica e auditavel: enabled=true E mode=="enforce".
+ * Em qualquer outro estado (monitor / disabled / mode em falta) o snippet PF
+ * fica passivo: apenas as tabelas `persist` sao mantidas para o daemon poder
+ * operar / fazer self-heal, mas nenhuma regra de bloqueio do core e emitida.
+ */
+function layer7_pf_should_enforce($data = null)
 {
-	$filter_rules = implode("\n", array(
-		"# Layer7 PF snippet (package-managed)",
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (!is_array($data) || !isset($data["layer7"]) ||
+	    !is_array($data["layer7"])) {
+		return false;
+	}
+	$l7 = $data["layer7"];
+	if (empty($l7["enabled"])) {
+		return false;
+	}
+	$mode = isset($l7["mode"]) ? (string)$l7["mode"] : "monitor";
+	return ($mode === "enforce");
+}
+
+/**
+ * Tabelas PF persist do Layer7. Sao sempre emitidas (mesmo em monitor) para
+ * que `pfctl -t ... -T show` continue a funcionar e `layer7_pf_selfheal()` no
+ * daemon nao falhe so por mudanca de modo.
+ *
+ * `layer7_allow_dst` (Bloco 3) e populada pelo daemon (via DNS hint) e pelo
+ * pacote (com IPs/CIDRs estaticos da allowlist).
+ */
+function layer7_pf_tables_text()
+{
+	return implode("\n", array(
+		"# Layer7 PF snippet (package-managed): tables",
 		"table <layer7_block> persist",
 		"table <layer7_tagged> persist",
 		"table <layer7_block_dst> persist",
+		"table <layer7_allow_dst> persist",
+		""
+	)) . "\n";
+}
+
+function layer7_pf_default_rules_text()
+{
+	$data = layer7_load_or_default();
+	$out = layer7_pf_tables_text();
+
+	if (!layer7_pf_should_enforce($data)) {
+		$out .= "# Layer7 passivo (enabled=false ou mode!=enforce):" .
+		    " sem regras de bloqueio do core.\n";
+		return $out;
+	}
+
+	$l7 = $data["layer7"];
+	$block_dot_doq = !empty($l7["block_dot_doq"]);
+
+	/* Bloco 3: pass quick para destinos da allowlist — bancos/gov/push.
+	 * Tem de aparecer ANTES de qualquer `block drop quick` para que
+	 * destinos protegidos nunca sejam intercetados em enforce. */
+	$out .= implode("\n", array(
 		"",
-		"# Anti-bypass: bloquear DoT (TCP 853) e DoQ (UDP 853) apenas para destinos externos.",
-		"block drop quick inet proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot\"",
-		"block drop quick inet6 proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot6\"",
-		"block drop quick inet proto udp to !<localsubnets> port 853 label \"layer7:anti-doq\"",
-		"block drop quick inet6 proto udp to !<localsubnets> port 853 label \"layer7:anti-doq6\"",
+		"# Allowlist (Bloco 3) — destinos protegidos contra bloqueio.",
+		"pass quick inet to <layer7_allow_dst> label \"layer7:allow:dst\"",
+	)) . "\n";
+
+	if ($block_dot_doq) {
+		$out .= implode("\n", array(
+			"",
+			"# Anti-bypass DoT/DoQ (porta 853) — toggle explicito 'block_dot_doq'.",
+			"block drop quick inet proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot\"",
+			"block drop quick inet6 proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot6\"",
+			"block drop quick inet proto udp to !<localsubnets> port 853 label \"layer7:anti-doq\"",
+			"block drop quick inet6 proto udp to !<localsubnets> port 853 label \"layer7:anti-doq6\""
+		)) . "\n";
+	}
+
+	$out .= implode("\n", array(
 		"",
 		"# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.",
 		"block drop quick inet from <layer7_block> to !<localsubnets> label \"layer7:block:src\"",
@@ -307,7 +373,7 @@ function layer7_pf_default_rules_text()
 		"# layer7_tagged permanece disponivel para regras manuais/encadeadas."
 	)) . "\n";
 
-	return $filter_rules;
+	return $out;
 }
 
 function layer7_pf_rules_text()
@@ -350,6 +416,7 @@ function layer7_resync()
 	layer7_ensure_pf_table("layer7_block");
 	layer7_ensure_pf_table("layer7_block_dst");
 	layer7_ensure_pf_table("layer7_tagged");
+	layer7_ensure_pf_table("layer7_allow_dst");
 
 	$bl_config = layer7_bl_config_load();
 	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
@@ -358,8 +425,126 @@ function layer7_resync()
 		}
 	}
 
-	layer7_inject_nat_to_anchor();
+	/* Bloco 3: popular `layer7_allow_dst` com IPs/CIDRs estaticos da
+	 * allowlist (JSON + seed). Dominios sao adicionados em runtime pelo
+	 * daemon, via DNS hint. */
+	layer7_dst_allowlist_apply_to_pf();
+
+	/* Gate Bloco 1: em modo passivo (monitor / disabled) nao injecta
+	 * regras rdr no anchor NAT — limpa-o para evitar forcing DNS residual,
+	 * e flusha as tabelas dinamicas (Bloco 5: evitar IPs `stale`). */
+	if (!layer7_pf_should_enforce()) {
+		@exec("/sbin/pfctl -a natrules/layer7_nat -F Nat 2>/dev/null");
+		layer7_flush_dynamic_tables();
+	} else {
+		layer7_inject_nat_to_anchor();
+	}
 	layer7_ensure_daemon_running();
+}
+
+/**
+ * Le o ficheiro semente da allowlist (`/usr/local/etc/layer7/allowlist-seed.txt`).
+ * Devolve array de strings (uma por entrada). Linhas vazias e `#` sao
+ * ignoradas. Limita a 512 entradas como defesa em profundidade.
+ */
+function layer7_dst_allowlist_seed_entries()
+{
+	$path = "/usr/local/etc/layer7/allowlist-seed.txt";
+	$out = array();
+	if (!is_readable($path)) {
+		return $out;
+	}
+	$lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	if (!is_array($lines)) {
+		return $out;
+	}
+	$count = 0;
+	foreach ($lines as $ln) {
+		$s = trim((string)$ln);
+		if ($s === "" || $s[0] === "#") {
+			continue;
+		}
+		$out[] = $s;
+		if (++$count >= 512) {
+			break;
+		}
+	}
+	return $out;
+}
+
+/**
+ * Devolve a allowlist combinada (JSON do operador + seed embutida) como
+ * array de strings unicas.
+ */
+function layer7_dst_allowlist_merged()
+{
+	$data = layer7_load_or_default();
+	$user = isset($data["layer7"]["dst_allowlist"]) &&
+	    is_array($data["layer7"]["dst_allowlist"])
+	    ? $data["layer7"]["dst_allowlist"]
+	    : array();
+	$seed = layer7_dst_allowlist_seed_entries();
+	$all = array();
+	foreach (array_merge($seed, $user) as $e) {
+		$s = trim((string)$e);
+		if ($s !== "" && $s[0] !== "#") {
+			$all[] = $s;
+		}
+	}
+	return array_values(array_unique($all));
+}
+
+/**
+ * Popula `layer7_allow_dst` com IPv4 hosts/CIDRs da allowlist combinada.
+ * Faz `flush` antes para garantir coerencia com a config actual. Dominios
+ * sao saltados (adicionados pelo daemon via DNS hint).
+ */
+function layer7_dst_allowlist_apply_to_pf()
+{
+	$entries = layer7_dst_allowlist_merged();
+	$ips = array();
+	foreach ($entries as $e) {
+		if (preg_match('/^[0-9]{1,3}(\.[0-9]{1,3}){3}$/', $e)) {
+			if (layer7_ipv4_valid($e)) {
+				$ips[] = $e;
+			}
+		} elseif (strpos($e, "/") !== false) {
+			if (layer7_cidr_valid($e)) {
+				$ips[] = $e;
+			}
+		}
+	}
+	$ips = array_values(array_unique($ips));
+
+	@exec("/sbin/pfctl -t layer7_allow_dst -T flush 2>/dev/null");
+	foreach ($ips as $ip) {
+		$cmd = "/sbin/pfctl -t layer7_allow_dst -T add " .
+		    escapeshellarg($ip) . " 2>/dev/null";
+		@exec($cmd);
+	}
+	return count($ips);
+}
+
+/**
+ * Esvazia as tabelas PF dinamicas (`layer7_block`, `layer7_block_dst` e
+ * `layer7_bld_N` de blacklists). Usado quando o modo passa para
+ * monitor/disabled ou ao desinstalar — evita que IPs adicionados num enforce
+ * anterior continuem a bloquear apos a mudanca (Bloco 5). Mantem as tabelas
+ * `persist` na pf, apenas remove os enderecos.
+ */
+function layer7_flush_dynamic_tables()
+{
+	$tables = array("layer7_block", "layer7_block_dst", "layer7_tagged");
+	$bl_config = layer7_bl_config_load();
+	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
+		foreach (array_keys($bl_config["rules"]) as $idx) {
+			$tables[] = "layer7_bld_" . (int)$idx;
+		}
+	}
+	foreach ($tables as $t) {
+		@exec("/sbin/pfctl -t " . escapeshellarg($t) .
+		    " -T flush 2>/dev/null");
+	}
 }
 
 /**
@@ -408,6 +593,16 @@ function layer7_generate_rules($type)
 	$rules = layer7_pf_rules_text();
 
 	$data = layer7_load_or_default();
+
+	/* Gate F4/Bloco 1: em modo passivo (monitor / desactivado) o produto nao
+	 * emite anti-QUIC, blacklists, nem injecta NAT. As tabelas persist sao
+	 * mantidas vazias e o anchor `natrules/layer7_nat` e limpo para nao
+	 * deixar regras rdr residuais a forcar DNS. */
+	if (!layer7_pf_should_enforce($data)) {
+		@exec("/sbin/pfctl -a natrules/layer7_nat -F Nat 2>/dev/null");
+		return $rules;
+	}
+
 	$quic_ifaces = isset($data["layer7"]["block_quic_interfaces"]) &&
 	    is_array($data["layer7"]["block_quic_interfaces"])
 	    ? $data["layer7"]["block_quic_interfaces"]
@@ -490,10 +685,12 @@ function layer7_bare_config()
 			"debug_minutes" => 0,
 			"block_quic" => false,
 			"block_quic_interfaces" => array(),
+			"block_dot_doq" => false,
 			"interfaces" => array("lan"),
 			"groups" => array(),
 			"policies" => array(),
-			"exceptions" => array()
+			"exceptions" => array(),
+			"dst_allowlist" => array()
 		)
 	);
 }
@@ -1226,6 +1423,7 @@ function layer7_nav_items()
 		"status" => array("label" => l7_t("Estado"), "href" => "layer7_status.php"),
 		"policies" => array("label" => l7_t("Politicas"), "href" => "layer7_policies.php"),
 		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php"),
+		"allowlist" => array("label" => l7_t("Allowlist"), "href" => "layer7_allowlist.php"),
 		"eventos" => array("label" => l7_t("Eventos"), "href" => "layer7_events.php"),
 		"reports" => array("label" => l7_t("Relatorios"), "href" => "layer7_reports.php"),
 		"settings" => array("label" => l7_t("Definicoes"), "href" => "layer7_settings.php"),

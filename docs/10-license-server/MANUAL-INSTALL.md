@@ -111,6 +111,32 @@ backup/restore do PostgreSQL:
 - `docs/05-runbooks/license-server-segredos-bootstrap.md`
 - `docs/05-runbooks/license-server-backup-restore.md`
 
+**Addendum pre-release `1.8.11_18` (Fase 1 — estabilizacao para escolas):**
+Codigo pronto em `main` local; build no builder FreeBSD (`192.168.100.12`) e
+validacao no appliance ainda **pendentes**. Esta release corrige os erros que
+levavam o produto a bloquear bancos/servicos em modo `monitor`:
+- Em `mode=monitor` ou `enabled=false`, o pacote **deixa de injectar** qualquer
+  `block drop` (`layer7.inc::layer7_pf_default_rules_text()` so emite tabelas).
+- Anti-DoT/DoQ (porta 853) passa a ser **toggle explicito** `block_dot_doq` em
+  `Settings > Servico`, **OFF por defeito** (evita quebrar "DNS privado" Android
+  e algumas apps de banco que precisam de DoT).
+- Nova **allowlist de destinos** (`layer7.dst_allowlist[]` + seed embutida) com
+  pagina propria (`Services > Layer 7 > Allowlist`) e regra PF
+  `pass quick inet to <layer7_allow_dst>`. Bancos BR, gov.br, push Apple/Google
+  e Microsoft 365 ja vem na seed (`/usr/local/etc/layer7/allowlist-seed.txt`).
+- **Flush fiavel** das tabelas dinamicas (`layer7_block_dst`, `layer7_block`,
+  `layer7_bld_*`) ao trocar de `enforce` para passivo, parar o daemon ou
+  desinstalar — sem deixar IPs `stale` a bloquear.
+- CLI `layer7d --license-status` (BG-032) imprime `chave=valor` (ver
+  Operacao > Estado da licenca).
+
+**Validacao recomendada antes de publicar:**
+1. Build no builder FreeBSD (ver `AGENTS.md > Fluxo de build padrao`).
+2. Instalar o `.pkg` no appliance.
+3. Correr `sh /caminho/para/tests/lab/smoke-monitor-mode.sh` no appliance:
+   sem `block drop` em monitor, tabelas presentes mas `layer7_block_dst`
+   vazia, daemon vivo.
+
 **Addendum operacional da release `1.8.11_17` (hotfix GUI):** corrige erro de
 parse PHP na pagina **Remocao do pacote** (`layer7_removal.php`: heredoc
 invalido `<<'EOSH'`). Pacote `pfSense-pkg-layer7-1.8.11_17.pkg` na tag

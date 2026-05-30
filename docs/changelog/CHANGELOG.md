@@ -4,7 +4,82 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-(nada)
+### Pending build/release: `1.8.11_18`
+
+Fase 1 da estabilizacao da V1 comercial (correccao dos erros que provocam
+bloqueio indevido em modo monitor, incluindo bancos/servicos protegidos).
+Codigo pronto em `main` local; falta build no builder FreeBSD
+(`192.168.100.12`) e validacao real no appliance pfSense (smoke
+`tests/lab/smoke-monitor-mode.sh`) antes de publicar a release.
+
+#### Fixed (Bloco 1) — monitor e monitor de verdade
+
+- `layer7.inc`: `layer7_pf_default_rules_text()` agora emite **apenas as
+  tabelas** `persist` quando `enabled=false` ou `mode!=enforce`; nenhum
+  `block drop` do core e injectado em modo passivo. Causa-raiz do
+  "bloqueia bancos em monitor".
+- `layer7_generate_rules()` suprime anti-QUIC, blacklists e injeccao no
+  anchor NAT em modo passivo, e limpa `natrules/layer7_nat` para nao deixar
+  forcing de DNS residual.
+- `layer7_settings.php`: `filter_configure()` passa a ser disparado tambem
+  quando mudam `mode`, `enabled` ou `block_dot_doq` (nao so QUIC).
+- Novo helper `layer7_pf_should_enforce($data)` — gate auditavel unico.
+
+#### Changed (Bloco 2) — anti-bypass como toggle, OFF por defeito
+
+- Anti-DoT/DoQ (porta 853) passa a ser **toggle explicito** `block_dot_doq`
+  em **Settings > Servico**, desligado por defeito. Antes era injectado
+  incondicionalmente, podendo quebrar "DNS privado" em Android / apps
+  moveis. Anti-QUIC ja era opcional por interface; defeito mantido OFF.
+- Sample `pf.conf.sample` actualizado para o novo layout.
+
+#### Added (Bloco 3) — allowlist de destinos
+
+- Novo campo `layer7.dst_allowlist[]` em `layer7.json` (dominios, IPv4 host
+  ou CIDRs IPv4) + lista-semente embutida em
+  `/usr/local/etc/layer7/allowlist-seed.txt` (bancos BR, gov, pagamentos,
+  push Apple/Google, Microsoft 365). Editor em
+  **Services > Layer 7 > Allowlist** (`layer7_allowlist.php`).
+- Novo modulo daemon `allowlist.{c,h}` — antes de adicionar IP a
+  `layer7_block_dst` ou `layer7_bld_N`, o `layer7d` verifica se o
+  dominio/IP esta na allowlist. Em DNS hint, popula `layer7_allow_dst`
+  com o IP resolvido.
+- Nova tabela PF `layer7_allow_dst` + regra `pass quick inet to
+  <layer7_allow_dst>` emitida **antes** de qualquer `block drop`.
+- 24 testes unitarios em `tests/functional/test_allowlist.c` (todos PASS).
+
+#### Fixed (Bloco 5) — flush fiavel de tabelas dinamicas
+
+- `dst_cache_flush()` reforcado com `pfctl -T flush` defensivo no fim.
+- Nova `enforcement_flush_all_tables()` no daemon: limpa
+  `layer7_block_dst`, `layer7_block` e `layer7_bld_*` na transicao
+  enforce -> passivo (via SIGHUP) e no shutdown limpo (SIGTERM).
+- `rc.d/layer7d stop` chama `layer7-pfctl flush-all` como defesa em
+  profundidade caso o daemon seja morto com SIGKILL.
+- `layer7_resync()` flush automatico das tabelas dinamicas quando o
+  pacote esta em modo passivo (`layer7_flush_dynamic_tables()`).
+
+#### Fixed (Bloco 6 / BG-032) — CLI `--license-status`
+
+- `layer7d --license-status` impressao em `chave=valor` (compativel com
+  `awk -F=`), exit `0` se valida (inclui grace) e `1` caso contrario.
+  Sai sem inicializar nDPI/captura.
+
+#### Added (F5 minima)
+
+- `tests/functional/test_allowlist.c` (24 casos, todos PASS local).
+- `tests/lab/smoke-monitor-mode.sh` — smoke para o appliance pfSense
+  validar "monitor nao bloqueia, tabelas vazias, daemon vivo".
+- `tests/run-local.sh` — runner local (`cc` + `php -l` + `sh -n`).
+
+#### Notes
+
+- **PORTREVISION** -> `18`. Builder FreeBSD (`192.168.100.12`) e o caminho
+  oficial (`AGENTS.md > Fluxo de build padrao`). Validar no appliance
+  com `tests/lab/smoke-monitor-mode.sh` antes de publicar.
+- A allowlist e a base para a Fase 2 (Caminho A — UX tipo UDM Pro, listas
+  selecionaveis, identificacao por dispositivo), que so arranca depois
+  desta release estar validada (gate documental em `docs/02-roadmap/`).
 
 ## [1.8.11_17] - 2026-04-27
 

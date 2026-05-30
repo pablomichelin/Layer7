@@ -313,6 +313,13 @@ if ($_POST["save"] ?? false) {
 		}
 	}
 
+	/* block_dot_doq: toggle explicito do anti-bypass porta 853 (Bloco 2).
+	 * Defeito false para evitar falsos positivos (ex.: DNS privado Android,
+	 * apps de banco que falham se 853 nao resolver). */
+	$block_dot_doq = $is_general_save
+	    ? isset($_POST["block_dot_doq"])
+	    : !empty($current_l7["block_dot_doq"]);
+
 	$rpt_enabled = !empty($current_reports["enabled"]);
 	$rpt_retention = (int)($current_reports["retention_days"] ?? 30);
 	$rpt_interval = (int)($current_reports["collect_interval"] ?? 5);
@@ -385,6 +392,7 @@ if ($_POST["save"] ?? false) {
 		    ? $current_l7["block_quic_interfaces"] : array();
 		$data["layer7"]["block_quic"] = false;
 		$data["layer7"]["block_quic_interfaces"] = $block_quic_ifaces;
+		$data["layer7"]["block_dot_doq"] = $block_dot_doq;
 
 		$data["layer7"]["reports"] = array(
 			"enabled" => $rpt_enabled,
@@ -397,7 +405,16 @@ if ($_POST["save"] ?? false) {
 
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
-			if ($old_quic_ifaces !== $data["layer7"]["block_quic_interfaces"]) {
+			$old_mode = isset($current_l7["mode"]) ? (string)$current_l7["mode"] : "monitor";
+			$old_enabled = !empty($current_l7["enabled"]);
+			$old_dot_doq = !empty($current_l7["block_dot_doq"]);
+			$pf_relevant_changed = (
+			    $old_quic_ifaces !== $data["layer7"]["block_quic_interfaces"] ||
+			    $old_mode !== $data["layer7"]["mode"] ||
+			    $old_enabled !== (bool)$data["layer7"]["enabled"] ||
+			    $old_dot_doq !== (bool)$data["layer7"]["block_dot_doq"]
+			);
+			if ($pf_relevant_changed) {
 				if (function_exists("filter_configure")) {
 					filter_configure();
 				}
@@ -425,6 +442,7 @@ if ($dbgm < 0 || $dbgm > 720) {
 }
 $block_quic_ifaces = isset($L["block_quic_interfaces"]) && is_array($L["block_quic_interfaces"])
     ? $L["block_quic_interfaces"] : array();
+$block_dot_doq = !empty($L["block_dot_doq"]);
 $cur_lang = isset($L["language"]) ? $L["language"] : "pt";
 if (!in_array($cur_lang, array("pt", "en"), true)) {
 	$cur_lang = "pt";
@@ -512,6 +530,17 @@ layer7_render_styles();
 							<?php } ?>
 							<?php } ?>
 							<p class="help-block"><?= l7_t("Selecione as interfaces onde QUIC (UDP 443) deve ser bloqueado. Vazio = desativado. Forca apps a usar HTTPS/TLS, melhorando a deteccao por SNI."); ?></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Bloquear DoT / DoQ (porta 853)"); ?></label>
+						<div class="col-sm-9">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="block_dot_doq" value="1" <?= $block_dot_doq ? 'checked="checked"' : ""; ?> />
+								<?= l7_t("Bloquear DNS-over-TLS / DNS-over-QUIC (TCP/UDP 853) para destinos externos"); ?>
+							</label>
+							<p class="help-block"><?= l7_t("Desligado por defeito. Activar reforca o anti-bypass DNS, mas pode quebrar 'DNS privado' em Android e algumas apps moveis (incluindo bancos) que dependem de DoT. So activar apos confirmar em laboratorio."); ?></p>
 						</div>
 					</div>
 

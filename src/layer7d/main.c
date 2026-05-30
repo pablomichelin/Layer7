@@ -7,6 +7,7 @@
 #include <ndpi_main.h>
 #include <ndpi_typedefs.h>
 #endif
+#include "allowlist.h"
 #include "blacklist.h"
 #include "bl_config.h"
 #include "config_parse.h"
@@ -37,6 +38,7 @@ static const char layer7d_version[] =
 #define L7_PF_HELPER_PATH "/usr/local/libexec/layer7-pfctl"
 #define L7_PF_RULES_DEBUG_PATH "/tmp/rules.debug"
 #define L7_PF_SELFHEAL_MIN_SEC 10
+#define L7_ALLOWLIST_SEED_PATH "/usr/local/etc/layer7/allowlist-seed.txt"
 
 /* 0=error 1=warn 2=info 3=debug — mensagens com nível <= s_ll */
 static int s_ll = 2;
@@ -75,6 +77,8 @@ static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
 
 static struct l7_blacklist *s_blacklist;
+static struct l7_allowlist s_allowlist;
+static unsigned long long s_allow_hits;
 static unsigned long long s_bl_hits;
 static unsigned long long s_bl_lookups;
 static unsigned long long s_bl_dns_hits;
@@ -647,6 +651,47 @@ dst_cache_flush(void)
 		    s_dst_cache[i].ip);
 	}
 	s_n_dst = 0;
+	/* Bloco 5: garantir que a tabela fica vazia mesmo se houverem
+	 * entradas residuais nao reflectidas no cache (ex.: enforce anterior
+	 * num pid antigo). Defensivo: nao depende de pidfile/conhecimento. */
+	{
+		char cmd[160];
+		snprintf(cmd, sizeof(cmd),
+		    "/sbin/pfctl -t %s -T flush 2>/dev/null",
+		    L7_PF_TABLE_BLOCK_DST);
+		(void)system(cmd);
+	}
+}
+
+/*
+ * Esvazia todas as tabelas PF dinamicas controladas pelo Layer7
+ * (Bloco 5): `layer7_block_dst`, `layer7_block`, e qualquer `layer7_bld_N`.
+ * Usada nas transicoes enforce -> passivo e no shutdown limpo do daemon.
+ * Mantem `layer7_allow_dst` intacta (e estatica + alimentada por DNS).
+ */
+static void
+enforcement_flush_all_tables(void)
+{
+	char cmd[256];
+	int i;
+
+	snprintf(cmd, sizeof(cmd),
+	    "/sbin/pfctl -t %s -T flush 2>/dev/null",
+	    L7_PF_TABLE_BLOCK_DST);
+	(void)system(cmd);
+
+	snprintf(cmd, sizeof(cmd),
+	    "/sbin/pfctl -t %s -T flush 2>/dev/null",
+	    L7_PF_TABLE_BLOCK);
+	(void)system(cmd);
+
+	for (i = 0; i < s_bl_n_rules; i++) {
+		snprintf(cmd, sizeof(cmd),
+		    "/sbin/pfctl -t layer7_bld_%d -T flush 2>/dev/null", i);
+		(void)system(cmd);
+	}
+
+	s_n_dst = 0;
 }
 
 /*
@@ -759,6 +804,80 @@ pf_table_exists(const char *table)
 	return run_shell_cmd_ok(cmd);
 }
 
+/* Aceita IPv4 host (`a.b.c.d`) ou CIDR (`a.b.c.d/n`) — usado para popular
+ * `layer7_allow_dst` a partir da allowlist (Bloco 3). Conservador: rejeita
+ * tudo o que nao seja digito/ponto/barra para evitar shell injection mesmo
+ * que a fonte ja tenha validado. */
+static int
+pf_entry_strict_ok(const char *entry)
+{
+	const char *p;
+
+	if (!entry || !*entry)
+		return 0;
+	for (p = entry; *p; p++) {
+		if (!((*p >= '0' && *p <= '9') || *p == '.' || *p == '/'))
+			return 0;
+	}
+	return 1;
+}
+
+static int
+pf_table_add_entry(const char *table, const char *entry)
+{
+	char cmd[128];
+
+	if (!layer7_pf_table_name_ok(table) || !pf_entry_strict_ok(entry))
+		return -1;
+	snprintf(cmd, sizeof(cmd),
+	    "/sbin/pfctl -t %s -T add %s 2>/dev/null", table, entry);
+	return run_shell_cmd_ok(cmd) ? 0 : -1;
+}
+
+static void
+pf_table_flush(const char *table)
+{
+	char cmd[96];
+
+	if (!layer7_pf_table_name_ok(table))
+		return;
+	snprintf(cmd, sizeof(cmd),
+	    "/sbin/pfctl -t %s -T flush 2>/dev/null", table);
+	(void)system(cmd);
+}
+
+/*
+ * (Re)carrega a allowlist de destinos (Bloco 3):
+ *   1. reset estrutura
+ *   2. carrega seed embutido (`/usr/local/etc/layer7/allowlist-seed.txt`)
+ *   3. acrescenta entradas do JSON activo (`layer7.dst_allowlist`)
+ *   4. popula a tabela PF `layer7_allow_dst` com IPv4 host/CIDR estaticos
+ *      (entradas de dominio sao adicionadas em runtime quando o cliente
+ *      resolver o dominio via DNS).
+ */
+static void
+reload_allowlist(const char *json, size_t len)
+{
+	int seed_n, json_n, i, ok_n = 0;
+
+	l7_allowlist_reset(&s_allowlist);
+	seed_n = l7_allowlist_load_seed_file(&s_allowlist,
+	    L7_ALLOWLIST_SEED_PATH);
+	json_n = json ? l7_allowlist_parse_json(&s_allowlist, json, len) : 0;
+
+	pf_table_flush(L7_PF_TABLE_ALLOW_DST);
+	for (i = 0; i < s_allowlist.n; i++) {
+		const struct l7_allowlist_entry *e = &s_allowlist.entries[i];
+		if (e->kind == L7_AL_DOMAIN)
+			continue;
+		if (pf_table_add_entry(L7_PF_TABLE_ALLOW_DST,
+		    e->value) == 0)
+			ok_n++;
+	}
+	L7_NOTE("allowlist: seed=%d json=%d total=%d pf_add_ok=%d",
+	    seed_n, json_n, s_allowlist.n, ok_n);
+}
+
 static int
 pf_base_tables_ok(void)
 {
@@ -841,9 +960,30 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
     const char *domain, const char *resolved_ip, uint32_t ttl)
 {
 	int r;
+	int dom_allow, ip_allow;
 
 	if (!s_have_parse || !s_ge)
 		return;
+
+	/* Allowlist gate (Bloco 3): se o dominio resolvido estiver na lista
+	 * branca, popular layer7_allow_dst para o PF passar este IP, e SKIP
+	 * todas as decisoes de bloqueio (politica e blacklist). */
+	dom_allow = (domain && *domain &&
+	    l7_allowlist_contains_domain(&s_allowlist, domain));
+	ip_allow = (resolved_ip && *resolved_ip &&
+	    l7_allowlist_contains_ip(&s_allowlist, resolved_ip));
+	if (dom_allow || ip_allow) {
+		if (resolved_ip && *resolved_ip)
+			(void)pf_table_add_entry(L7_PF_TABLE_ALLOW_DST,
+			    resolved_ip);
+		s_allow_hits++;
+		L7_INFO("allowlist_dns: iface=%s domain=%s ip=%s "
+		    "(%s) — pf_pass",
+		    iface ? iface : "-", domain ? domain : "-",
+		    resolved_ip ? resolved_ip : "-",
+		    dom_allow ? "domain" : "ip");
+		return;
+	}
 
 	if (layer7_domain_is_blocked(s_rules, s_np, domain)) {
 		r = layer7_pf_add_with_selfheal(L7_PF_TABLE_BLOCK_DST,
@@ -968,26 +1108,50 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 
 	if (dec.action == LAYER7_ACTION_BLOCK && dst_ip &&
 	    layer7_pf_ipv4_host_ok(dst_ip)) {
-		r = layer7_pf_add_with_selfheal(L7_PF_TABLE_BLOCK_DST, dst_ip,
-		    "flow_block_dst");
-		if (r == 0) {
-			s_pf_dst_add_ok++;
-			dst_cache_add(dst_ip, L7_DST_TTL_MIN);
-			L7_INFO("enforce_block_dst: iface=%s dst=%s policy=%s",
-			    iface ? iface : "-", dst_ip,
+		/* Allowlist gate (Bloco 3): nunca bloquear destinos da lista
+		 * branca (dominios — via SNI/host — ou IPs/CIDRs). Adiciona
+		 * o IP a `layer7_allow_dst` se bateu por dominio, para o PF
+		 * continuar a passar nas proximas conexoes ao mesmo IP. */
+		int dom_allow = (host && *host &&
+		    l7_allowlist_contains_domain(&s_allowlist, host));
+		int ip_allow =
+		    l7_allowlist_contains_ip(&s_allowlist, dst_ip);
+		if (dom_allow || ip_allow) {
+			if (dom_allow)
+				(void)pf_table_add_entry(
+				    L7_PF_TABLE_ALLOW_DST, dst_ip);
+			s_allow_hits++;
+			L7_NOTE("allowlist_flow: iface=%s host=%s dst=%s "
+			    "(%s) — skip block policy=%s",
+			    iface ? iface : "-", host ? host : "-", dst_ip,
+			    dom_allow ? "domain" : "ip",
 			    dec.matched_policy_id[0] ?
 			    dec.matched_policy_id : "-");
-		} else if (r == -1) {
-			s_pf_dst_add_fail++;
-			L7_WARN("pfctl add failed table=%s ip=%s",
-			    L7_PF_TABLE_BLOCK_DST, dst_ip);
+		} else {
+			r = layer7_pf_add_with_selfheal(L7_PF_TABLE_BLOCK_DST,
+			    dst_ip, "flow_block_dst");
+			if (r == 0) {
+				s_pf_dst_add_ok++;
+				dst_cache_add(dst_ip, L7_DST_TTL_MIN);
+				L7_INFO("enforce_block_dst: iface=%s dst=%s "
+				    "policy=%s",
+				    iface ? iface : "-", dst_ip,
+				    dec.matched_policy_id[0] ?
+				    dec.matched_policy_id : "-");
+			} else if (r == -1) {
+				s_pf_dst_add_fail++;
+				L7_WARN("pfctl add failed table=%s ip=%s",
+				    L7_PF_TABLE_BLOCK_DST, dst_ip);
+			}
 		}
 	}
 
 		/* SNI/host blacklist check (Melhoria B) — apos decisao de politica manual */
 		if (s_blacklist && s_bl_n_rules > 0 && host && *host &&
 		    dec.action != LAYER7_ACTION_BLOCK && dst_ip &&
-		    layer7_pf_ipv4_host_ok(dst_ip)) {
+		    layer7_pf_ipv4_host_ok(dst_ip) &&
+		    !l7_allowlist_contains_domain(&s_allowlist, host) &&
+		    !l7_allowlist_contains_ip(&s_allowlist, dst_ip)) {
 			int ri;
 
 			s_bl_lookups++;
@@ -1158,6 +1322,7 @@ static void usage(void)
 	    "  --list-protos    lista protocolos e categorias nDPI em JSON\n"
 	    "  --fingerprint    mostra o hardware ID desta máquina\n"
 	    "  --activate KEY   activa licença online (KEY + URL opcional)\n"
+	    "  --license-status estado da licença em chave=valor (exit 0 se válida)\n"
 	    "  runtime: SIGHUP reload; SIGUSR1 stats; nDPI→pf via policy\n",
 	    DEFAULT_CONFIG);
 }
@@ -1508,6 +1673,8 @@ apply_config(int use_syslog)
 			}
 		}
 	}
+	if (use_syslog)
+		reload_allowlist(buf, len);
 	free(buf);
 	s_parsed = p;
 	s_have_parse = 1;
@@ -1670,6 +1837,33 @@ int main(int argc, char **argv)
 			if (vi + 2 < argc && argv[vi + 2][0] != '-')
 				url = argv[vi + 2];
 			return layer7_activate(key, url);
+		}
+		/*
+		 * BG-032 (Bloco 6): CLI `--license-status` para inspeccao
+		 * sem precisar de syslog. Imprime estado da licenca actual
+		 * em formato chave=valor (compativel com `awk -F=`).
+		 * Retorna 0 se valida (incl. grace) e 1 se invalida/ausente.
+		 */
+		if (strcmp(argv[vi], "--license-status") == 0) {
+			struct l7_license_info li;
+
+			memset(&li, 0, sizeof(li));
+			(void)layer7_license_check(&li);
+			printf("valid=%d\n", li.valid ? 1 : 0);
+			printf("expired=%d\n", li.expired ? 1 : 0);
+			printf("grace=%d\n", li.grace ? 1 : 0);
+			printf("dev_mode=%d\n", li.dev_mode ? 1 : 0);
+			printf("days_left=%d\n", li.days_left);
+			printf("hardware_id=%s\n",
+			    li.hardware_id[0] ? li.hardware_id : "");
+			printf("customer=%s\n",
+			    li.customer[0] ? li.customer : "");
+			printf("expiry=%s\n", li.expiry[0] ? li.expiry : "");
+			printf("features=%s\n",
+			    li.features[0] ? li.features : "");
+			if (li.error[0])
+				printf("error=%s\n", li.error);
+			return li.valid ? 0 : 1;
 		}
 	}
 
@@ -1855,6 +2049,11 @@ int main(int argc, char **argv)
 	for (;;) {
 		if (stop_req) {
 			close_captures();
+			/* Bloco 5: ao parar/desinstalar, garantir que nenhuma
+			 * tabela dinamica fica com IPs `stale` que continuariam
+			 * a ser bloqueados pelas regras PF que persistem ate
+			 * proximo reload do firewall. */
+			enforcement_flush_all_tables();
 			if (s_blacklist) {
 				l7_blacklist_free(s_blacklist);
 				s_blacklist = NULL;
@@ -1911,8 +2110,11 @@ int main(int argc, char **argv)
 #endif
 		}
 		if (reload_req) {
+			int prev_ge;
+
 			reload_req = 0;
 			s_sighup_count++;
+			prev_ge = s_ge;
 			L7_NOTE("SIGHUP: reload config");
 			dst_cache_flush();
 			close_captures();
@@ -1925,6 +2127,15 @@ int main(int argc, char **argv)
 
 			if (!pf_base_tables_ok())
 				(void)layer7_pf_selfheal("sighup_reload");
+
+			/* Bloco 5: transicao enforce -> passivo (monitor /
+			 * disabled / license invalid). Flush forte de todas as
+			 * tabelas dinamicas para evitar bloqueio residual. */
+			if (prev_ge && !s_ge) {
+				L7_NOTE("mode transition enforce->passive: "
+				    "flushing PF dynamic tables");
+				enforcement_flush_all_tables();
+			}
 
 			open_captures();
 

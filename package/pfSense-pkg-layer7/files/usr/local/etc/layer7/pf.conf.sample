@@ -1,18 +1,26 @@
-# Layer7 PF snippet (sample)
-# O helper /usr/local/libexec/layer7-pfctl regenera /usr/local/etc/layer7/pf.conf.
+# Layer7 PF snippet (sample) — gerado pelo pacote em runtime via
+# layer7_pf_default_rules_text() e por /usr/local/libexec/layer7-pfctl ensure.
+#
+# Este sample documenta o layout em modo ENFORCE com toggles default
+# (block_dot_doq=false). Em monitor / desactivado, so as tabelas persistem.
+
 table <layer7_block> persist
 table <layer7_tagged> persist
 table <layer7_block_dst> persist
+table <layer7_allow_dst> persist
 
-# Anti-bypass: bloquear DoT (TCP 853) e DoQ (UDP 853) apenas para destinos externos.
-block drop quick inet proto tcp to !<localsubnets> port 853 label "layer7:anti-dot"
-block drop quick inet6 proto tcp to !<localsubnets> port 853 label "layer7:anti-dot6"
-block drop quick inet proto udp to !<localsubnets> port 853 label "layer7:anti-doq"
-block drop quick inet6 proto udp to !<localsubnets> port 853 label "layer7:anti-doq6"
+# Allowlist (Bloco 3): destinos protegidos contra bloqueio. SEMPRE antes
+# dos blocks para garantir pass-quick em bancos/gov/push mobile.
+pass quick inet to <layer7_allow_dst> label "layer7:allow:dst"
 
 # Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.
 block drop quick inet from <layer7_block> to !<localsubnets> label "layer7:block:src"
 block drop quick inet6 from <layer7_block> to !<localsubnets> label "layer7:block:src6"
 
+# Bloqueio por destino (sites/apps bloqueados via policies / blacklists).
 block drop quick inet to <layer7_block_dst> label "layer7:block:dst"
 block drop quick inet6 to <layer7_block_dst> label "layer7:block:dst6"
+
+# Anti-bypass DoT/DoQ (porta 853) e anti-QUIC (UDP 443) sao opcionais e
+# controlados via GUI (Settings -> "Bloquear DoT / DoQ" e "Bloquear QUIC").
+# Por defeito ambos OFF — activar so depois de validar em laboratorio.

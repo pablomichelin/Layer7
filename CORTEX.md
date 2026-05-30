@@ -24,7 +24,12 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
-**Estado funcional conhecido:** V1 Comercial concluida e publicada
+**Estado funcional conhecido:** V1 Comercial concluida e publicada;
+**Fase 1 de estabilizacao da V1 em pre-release** (`1.8.11_18`) — codigo em
+`main` local, build no builder FreeBSD (`192.168.100.12`) e validacao no
+appliance pfSense ainda pendentes. Esta Fase 1 corrige a causa-raiz de
+"bloqueia bancos em modo monitor" e nao deve sair como release publica
+antes de PASS no smoke `tests/lab/smoke-monitor-mode.sh`.
 **Ultima versao do pacote publicada em release:** `1.8.11_17` (referencia de
 instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
 `pablomichelin/Layer7`, tag `v1.8.11_17`,
@@ -33,6 +38,35 @@ Hotfix sobre `1.8.11_16`: pagina **Remocao do pacote** (`layer7_removal.php`)
 deixava de carregar por **parse error** (`<<'EOSH'` em vez de `<<<'EOSH'`);
 corrigido com `implode()` sem heredoc. O restante (F4.1, trust chain, UT1) e
 o mesmo que em `1.8.11_16`.
+
+### Pre-release `1.8.11_18` — Fase 1 de estabilizacao
+
+Bloqueios resolvidos no codigo (Blocos 1-3, 5 e 6 do plano `Layer7
+estabilizacao e Caminho A`); detalhes completos em
+`docs/changelog/CHANGELOG.md > [Unreleased]` e `docs/02-roadmap/backlog.md`
+(BG-032 fechado; novos BG-034..BG-038 registados):
+
+- **BG-034 (Bloco 1) — Monitor passivo de verdade:** em `mode=monitor` ou
+  `enabled=false` o pacote deixa de injectar qualquer `block drop`; novo
+  `layer7_pf_should_enforce()` gate em `layer7.inc`.
+- **BG-035 (Bloco 2) — Anti-DoT/DoQ como toggle (OFF por defeito):** novo
+  campo `block_dot_doq` em **Settings > Servico**.
+- **BG-036 (Bloco 3) — Allowlist de destinos:** novo modulo `allowlist.{c,h}`
+  no daemon, pagina `Services > Layer 7 > Allowlist`, seed embutida
+  (`allowlist-seed.txt`: bancos BR, gov, push Apple/Google, MS 365), tabela
+  PF `layer7_allow_dst` com `pass quick` antes dos blocks.
+- **BG-037 (Bloco 5) — Flush fiavel de tabelas:** `enforcement_flush_all_tables()`
+  no daemon (transicao enforce->passivo + shutdown); `rc.d/layer7d stop`
+  chama `layer7-pfctl flush-all` como defesa em profundidade.
+- **BG-032 (Bloco 6) — CLI `--license-status`:** restaurado em formato
+  `chave=valor`, exit 0 se valida (incl. grace).
+- **BG-038 (F5 minima):** 24 testes unitarios da allowlist (PASS local) +
+  smoke `tests/lab/smoke-monitor-mode.sh` para o appliance.
+
+`PORTVERSION=1.8.11`, `PORTREVISION=18` no `package/pfSense-pkg-layer7/Makefile`.
+Caminho B (inline/divert) e qualquer reorganizacao F6 continuam fora desta
+fase. Caminho A (UX tipo UDM Pro, Bloco 4 CDN-aware) so arranca apos
+`1.8.11_18` estar validado no appliance.
 
 O hotfix **`1.8.11_14`** (GUI updater / `BG-030`) permanece descrito no
 `CHANGELOG`; linha `1.8.11_17` herda esse comportamento no updater.
@@ -46,8 +80,10 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_17` (`PORTVERSION=1.8.11`, `PORTREVISION=17`),
-alinhada a **release publica** `v1.8.11_17` (commit `0b9717e`).
++ `PORTREVISION`):** `1.8.11_18` (`PORTVERSION=1.8.11`, `PORTREVISION=18`) —
+**pre-release** com Fase 1 de estabilizacao implementada em codigo (Blocos
+1-3, 5 e 6); falta build no builder FreeBSD e validacao no appliance.
+Ultima release publica continua a ser `v1.8.11_17` (commit `0b9717e`).
 **Data-base deste checkpoint:** `2026-04-27`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,

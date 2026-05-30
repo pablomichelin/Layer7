@@ -13,6 +13,9 @@ struct layer7_decision;
 #define L7_PF_TABLE_BLOCK "layer7_block"
 #define L7_PF_TABLE_BLOCK_DST "layer7_block_dst"
 #define L7_PF_TABLE_TAG_DEFAULT "layer7_tagged"
+/* Allowlist de destinos (Bloco 3 / Fase 1) — usada pelo `pass quick`
+ * inserido pelo pacote antes dos `block drop`. */
+#define L7_PF_TABLE_ALLOW_DST "layer7_allow_dst"
 
 /* 1 se nome só [A-Za-z0-9_] */
 int layer7_pf_table_name_ok(const char *name);

@@ -10,6 +10,10 @@ Desktop.ini
 # Cursor / local
 .cursor/
 
+# Artefactos locais de diagnostico/release/validacao (podem conter IPs/dados
+# do appliance e .pkg) — nunca commitar
+.local/
+
 # Inventário do lab preenchido localmente (não commitar IPs/senhas)
 docs/08-lab/lab-inventory.md
 
