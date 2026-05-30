@@ -96,6 +96,26 @@
       ]
     },
     {
+      "id": "github",
+      "name": "GitHub",
+      "icon": "fa-github",
+      "description": "Bloqueia GitHub (repositorios, raw, pages, releases e Copilot).",
+      "ndpi_apps": ["GitHub"],
+      "ndpi_categories": [],
+      "hosts": [
+        "github.com",
+        "api.github.com",
+        "codeload.github.com",
+        "raw.githubusercontent.com",
+        "githubusercontent.com",
+        "githubassets.com",
+        "github.io",
+        "ghcr.io",
+        "githubcopilot.com",
+        "copilot-proxy.githubusercontent.com"
+      ]
+    },
+    {
       "id": "netflix",
       "name": "Netflix",
       "icon": "fa-film",

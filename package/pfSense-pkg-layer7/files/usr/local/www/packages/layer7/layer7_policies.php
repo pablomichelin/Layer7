@@ -174,7 +174,7 @@ if ($_POST["add_policy"] ?? false) {
 			$input_errors[] = l7_t("App ou categoria: cada valor max. 64 caracteres.");
 			$ok = false;
 		}
-		$new_match_hosts_pre = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "");
+		$new_match_hosts_pre = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "", 64);
 		if ($ok && $apps !== null && $cats !== null &&
 		    ($act === "block" || $act === "tag") &&
 		    count($apps) + count($cats) === 0 &&
@@ -198,7 +198,7 @@ if ($_POST["add_policy"] ?? false) {
 		}
 		$new_src_hosts = layer7_parse_ip_textarea($_POST["new_src_hosts"] ?? "");
 		$new_src_cidrs = layer7_parse_cidr_textarea($_POST["new_src_cidrs"] ?? "");
-		$new_match_hosts = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "");
+		$new_match_hosts = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "", 64);
 
 		$new_groups_sel = array();
 		if (isset($_POST["new_groups"]) && is_array($_POST["new_groups"])) {
@@ -341,7 +341,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 				$input_errors[] = l7_t("App ou categoria: cada valor max. 64 caracteres.");
 				$ok = false;
 			}
-			$edit_match_hosts_pre = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "");
+			$edit_match_hosts_pre = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "", 64);
 			if ($ok && $apps !== null && $cats !== null &&
 			    ($act === "block" || $act === "tag") &&
 			    count($apps) + count($cats) === 0 &&
@@ -365,7 +365,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 			}
 			$edit_src_hosts = layer7_parse_ip_textarea($_POST["edit_src_hosts"] ?? "");
 			$edit_src_cidrs = layer7_parse_cidr_textarea($_POST["edit_src_cidrs"] ?? "");
-			$edit_match_hosts = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "");
+			$edit_match_hosts = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "", 64);
 
 			$edit_groups_sel = array();
 			if (isset($_POST["edit_groups"]) && is_array($_POST["edit_groups"])) {
@@ -929,7 +929,7 @@ function layer7_policy_match_summary($policy) {
 					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_match_hosts" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_hosts_match_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com ou api.whatsapp.com. O match aceita o host exacto e subdominios."); ?></p>
+						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com ou api.whatsapp.com. O match aceita o host exacto e subdominios. Maximo 64 hosts por politica."); ?></p>
 					</div>
 				</div>
 
@@ -1138,7 +1138,7 @@ function layer7_policy_match_summary($policy) {
 					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_match_hosts" class="form-control" rows="3" style="max-width:400px" placeholder="youtube.com&#10;api.whatsapp.com"></textarea>
-						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com. Para block, basta indicar sites aqui (sem necessidade de app nDPI). O bloqueio DNS atua automaticamente."); ?></p>
+						<p class="help-block"><?= l7_t("Um host por linha, ex.: youtube.com. Para block, basta indicar sites aqui (sem necessidade de app nDPI). O bloqueio DNS atua automaticamente. Maximo 64 hosts por politica."); ?></p>
 					</div>
 				</div>
 

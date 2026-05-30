@@ -4,12 +4,21 @@
 
 Ligar decisões **block** / **tag** a **tabelas PF** no pfSense, sem MITM.
 
+> **Semantica de `block` (importante, esclarecido no Caminho A / A0):** em
+> runtime nDPI/DNS, `action=block` bloqueia o **DESTINO** (IP de destino entra
+> em `layer7_block_dst`), **nao** quarentena o IP de origem do cliente. A
+> quarentena por origem (`layer7_block`) e usada por `action=tag` e pelo
+> caminho de laboratorio `layer7d -e`. Ver "Modelo de bloqueio por destino"
+> mais abaixo. Em `mode=monitor`/`enabled=false` nao ha qualquer `block drop`
+> (gate da Fase 1, release `v1.8.11_18`).
+
 ## Estado atual
 
 O enforcement atual do produto já faz:
 
 - decisão `block` / `tag` no `layer7d`;
-- `pfctl -T add` do **IP de origem** em PF table;
+- `block` -> `pfctl -T add` do **IP de destino** em `layer7_block_dst`;
+  `tag` -> `pfctl -T add` do **IP de origem** em `layer7_tagged`;
 - logs e counters de enforcement;
 - helper do pacote para materializar assets PF (`/usr/local/libexec/layer7-pfctl`);
 - snippet de ruleset gerado em `/usr/local/etc/layer7/pf.conf`;

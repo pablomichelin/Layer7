@@ -4,7 +4,33 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-(nada)
+### Caminho A / A0 — higiene (em curso, `PORTREVISION=19`)
+
+Primeiro bloco do Caminho A (UX/eficacia tipo UDM Pro). Quick wins de baixo
+risco; plano em `docs/09-blocking/caminho-a-plano-de-implementacao.md`
+(BG-039).
+
+#### Added
+
+- Perfil **GitHub** em `profiles.json` (estava prometido no plano mestre mas
+  ausente): `ndpi_apps=[GitHub]` + hosts (github.com, api/codeload/raw,
+  githubusercontent/assets, github.io, ghcr.io, copilot). Total de perfis: 18.
+
+#### Fixed
+
+- **Limite de hosts por politica alinhado em 64** (eliminado truncamento
+  silencioso): daemon `L7_MAX_HOSTS_PER_POLICY` `32 -> 64` (`policy.h`);
+  formulario manual da GUI passava o default `16` ao `layer7_parse_host_textarea`
+  — agora passa `64` nos quatro pontos de match de hosts (`layer7_policies.php`);
+  aplicacao de perfil ja usava `64`. Texto de ajuda da GUI indica o limite.
+- **Docs:** `docs/05-daemon/pf-enforcement.md` clarifica no topo que
+  `action=block` em runtime bloqueia o **destino** (`layer7_block_dst`), nao a
+  origem; `tag` e o caminho `-e` e que usam origem.
+
+#### Notes
+
+- `PORTREVISION` -> `19`. Mudanca de codigo (daemon + GUI + bundle de perfis);
+  requer build no builder FreeBSD e validacao no appliance antes de release.
 
 ## [1.8.11_18] - 2026-05-30
 

@@ -18,7 +18,9 @@
 #define L7_POLICY_CAT_LEN 64
 #define L7_MAX_CATS_PER_POLICY 8
 #define L7_POLICY_HOST_LEN 128
-#define L7_MAX_HOSTS_PER_POLICY 32
+/* Caminho A / A0: alinhado com o limite da GUI (perfis e formulario manual)
+ * para evitar truncamento silencioso de hosts em politicas grandes. */
+#define L7_MAX_HOSTS_PER_POLICY 64
 #define L7_EXC_HOST_LEN 48
 #define L7_TAG_TABLE_LEN 64
 #ifndef L7_IFACE_NAME_LEN
