@@ -68,9 +68,16 @@ Caminho A`); detalhes completos em
 
 `PORTVERSION=1.8.11`, `PORTREVISION=18` no `package/pfSense-pkg-layer7/Makefile`.
 Caminho B (inline/divert) e qualquer reorganizacao F6 continuam fora desta
-fase. Caminho A (UX tipo UDM Pro, Bloco 4 CDN-aware) fica **desbloqueado**
-agora que `1.8.11_18` esta validado no appliance — arranca em chat novo, com
-a F5 alargada (BG-038) a proteger contra regressao.
+fase. Caminho A (UX tipo UDM Pro, CDN-aware) fica **desbloqueado** agora que
+`1.8.11_18` esta validado no appliance.
+
+**Plano do Caminho A:** `docs/09-blocking/caminho-a-plano-de-implementacao.md`
+(blocos A0-A5; mapeia fases V2 15/17/18; backlog BG-039 a BG-044). O produto
+**ja tem** perfis de servico, politicas nDPI/host/CIDR e bloqueio por destino;
+os gaps reais face ao UDM Pro sao identidade de dispositivo (MAC/DHCP/ARP),
+SNI real (parser ClientHello) e UX de toggle/vista unificada. Recomenda-se
+arrancar pelo bloco **A0** (higiene, baixo risco) e seguir A1 (inventario de
+dispositivos, read-only). A F5 alargada (BG-044) protege contra regressao.
 
 O hotfix **`1.8.11_14`** (GUI updater / `BG-030`) permanece descrito no
 `CHANGELOG`; linha `1.8.11_17` herda esse comportamento no updater.
