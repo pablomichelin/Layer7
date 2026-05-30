@@ -4,6 +4,36 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Caminho A / A2 — politicas por dispositivo (em curso, `PORTREVISION=21`)
+
+Regras por dispositivo estilo UDM "client rules" (BG-041). Decisao em
+`docs/03-adr/ADR-0012-politicas-por-dispositivo-mac-para-ip.md`.
+
+#### Added
+
+- Grupos aceitam **dispositivos por MAC** (`device_macs`). O pacote resolve
+  MAC -> IP actual (DHCP leases online + ARP) e grava `device_ips`; o daemon
+  le `device_ips` como hosts de origem do grupo (`policy.c parse_group`),
+  retrocompativel. Imposicao continua por IP em PF.
+- GUI Grupos: campo "Dispositivos (MAC)" em adicionar/editar, coluna com
+  contagem dispositivos -> IPs, e botao **"Resync IPs dos dispositivos"**
+  (`layer7_devices_resync()`).
+- GUI Dispositivos: checkboxes + **"Atribuir selecionados a grupo"** (fluxo
+  natural de associar clientes a grupos).
+- `layer7.inc`: `layer7_resolve_macs_to_ips()`, `layer7_normalize_macs()`,
+  `layer7_devices_resync()`.
+
+#### Changed
+
+- `L7_MAX_GROUP_HOSTS` e `L7_MAX_SRC_HOSTS` `16 -> 64` (acomodar uma turma de
+  dispositivos por grupo/origem). Para escala maior usar grupo por CIDR.
+
+#### Notes
+
+- `PORTREVISION` -> `21`. Fail-safe: grupo so com dispositivos offline nao gera
+  hosts (nao bloqueia o que nao localiza). Drift de IP dinamico mitigado por
+  resync + recomendacao de DHCP static mapping.
+
 ### Caminho A / A1 — inventario de dispositivos (em curso, `PORTREVISION=20`)
 
 Base de identidade tipo UDM (BG-040). Decisao em

@@ -57,6 +57,16 @@ Com **interfaces seleccionadas** na GUI (bloquear QUIC só nesses segmentos),
 função **`layer7_pf_ifname_for_rules()`** que o trilho **DNS forcado** / `rdr`
 (refactor DRY; sem mudança de comportamento face a `_11`).
 
+## Politicas por dispositivo (Caminho A / A2)
+
+Um **grupo** pode conter `device_macs` (dispositivos por MAC). O pacote resolve
+MAC -> IP actual (DHCP leases + ARP) e grava `device_ips` no grupo; o daemon le
+`device_ips` como hosts de origem do grupo (`parse_group`), alem dos `hosts`
+manuais. A imposicao continua por IP em PF (o PF nao faz match por MAC).
+Re-resolucao via "Resync IPs dos dispositivos" e ao gravar/atribuir. Ver
+`docs/03-adr/ADR-0012-politicas-por-dispositivo-mac-para-ip.md`. Recomenda-se
+DHCP static mapping para IP estavel. Limite: 64 hosts de origem por grupo.
+
 ## Tabelas
 
 | Uso | Nome default | Config |

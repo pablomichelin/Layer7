@@ -45,9 +45,10 @@ if ($_POST["add_group"] ?? false) {
 
 	$cidrs = layer7_parse_cidr_textarea($_POST["new_group_cidrs"] ?? "");
 	$hosts = layer7_parse_ip_textarea($_POST["new_group_hosts"] ?? "");
+	$dev_macs = layer7_normalize_macs($_POST["new_group_devices"] ?? "");
 
-	if ($ok && empty($cidrs) && empty($hosts)) {
-		$input_errors[] = l7_t("Indique pelo menos um CIDR ou IP.");
+	if ($ok && empty($cidrs) && empty($hosts) && empty($dev_macs)) {
+		$input_errors[] = l7_t("Indique pelo menos um CIDR, IP ou dispositivo (MAC).");
 		$ok = false;
 	}
 
@@ -62,10 +63,17 @@ if ($_POST["add_group"] ?? false) {
 		if (!empty($hosts)) {
 			$group["hosts"] = $hosts;
 		}
+		if (!empty($dev_macs)) {
+			$group["device_macs"] = $dev_macs;
+			$group["device_ips"] = layer7_resolve_macs_to_ips($dev_macs);
+		}
 		$groups[] = $group;
 		if (layer7_save_json($data)) {
 			layer7_signal_reload();
-			$savemsg = l7_t("Grupo adicionado.");
+			$n_ips = isset($group["device_ips"]) ? count($group["device_ips"]) : 0;
+			$savemsg = empty($dev_macs)
+				? l7_t("Grupo adicionado.")
+				: sprintf(l7_t("Grupo adicionado. %d dispositivos, %d IPs resolvidos agora."), count($dev_macs), $n_ips);
 		}
 	}
 	unset($groups);
@@ -131,9 +139,10 @@ if ($_POST["save_group_edit"] ?? false) {
 
 		$cidrs = layer7_parse_cidr_textarea($_POST["edit_group_cidrs"] ?? "");
 		$hosts = layer7_parse_ip_textarea($_POST["edit_group_hosts"] ?? "");
+		$dev_macs = layer7_normalize_macs($_POST["edit_group_devices"] ?? "");
 
-		if ($ok && empty($cidrs) && empty($hosts)) {
-			$input_errors[] = l7_t("Indique pelo menos um CIDR ou IP.");
+		if ($ok && empty($cidrs) && empty($hosts) && empty($dev_macs)) {
+			$input_errors[] = l7_t("Indique pelo menos um CIDR, IP ou dispositivo (MAC).");
 			$ok = false;
 		}
 
@@ -148,6 +157,10 @@ if ($_POST["save_group_edit"] ?? false) {
 			if (!empty($hosts)) {
 				$group["hosts"] = $hosts;
 			}
+			if (!empty($dev_macs)) {
+				$group["device_macs"] = $dev_macs;
+				$group["device_ips"] = layer7_resolve_macs_to_ips($dev_macs);
+			}
 			$groups[$idx] = $group;
 			if (layer7_save_json($data)) {
 				layer7_signal_reload();
@@ -160,10 +173,17 @@ if ($_POST["save_group_edit"] ?? false) {
 	unset($groups);
 }
 
+if ($_POST["resync_devices"] ?? false) {
+	$n_ips = layer7_devices_resync();
+	$savemsg = sprintf(l7_t("IPs dos dispositivos re-resolvidos (%d IPs activos nos grupos)."), $n_ips);
+}
+
 $data = layer7_load_or_default();
 $groups = isset($data["layer7"]["groups"]) && is_array($data["layer7"]["groups"])
 	? $data["layer7"]["groups"] : array();
 $at_limit = count($groups) >= 16;
+
+$l7_inventory = layer7_device_inventory();
 
 $edit_idx = null;
 $edit_group = null;
@@ -208,7 +228,14 @@ layer7_render_styles();
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 
-			<p class="layer7-lead"><?= l7_t("Crie grupos nomeados de dispositivos (ex.: Funcionarios, Visitantes) e aplique politicas por grupo em vez de repetir CIDRs manualmente."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Crie grupos nomeados (ex.: Funcionarios, Visitantes, Sala 3) por CIDR/sub-rede, por IPs individuais ou por dispositivos (MAC). Depois aplique politicas por grupo. Dispositivos por MAC sao resolvidos para o IP actual via DHCP/ARP."); ?></p>
+
+			<div class="layer7-toolbar" style="margin-bottom:10px;">
+				<form method="post" action="layer7_groups.php#l7-groups" class="form-inline" style="display:inline;">
+					<button type="submit" name="resync_devices" value="1" class="btn btn-default btn-sm"><i class="fa fa-refresh"></i> <?= l7_t("Resync IPs dos dispositivos"); ?></button>
+					<span class="text-muted" style="margin-left:8px;"><?= l7_t("Re-resolve MAC -> IP de todos os grupos (use apos mudancas de DHCP)."); ?></span>
+				</form>
+			</div>
 
 		<div class="layer7-admin-block" id="l7-groups">
 			<div class="layer7-admin-block__header"><?= l7_t("Grupos actuais"); ?></div>
@@ -224,6 +251,7 @@ layer7_render_styles();
 								<th><?= l7_t("Nome"); ?></th>
 								<th><?= l7_t("CIDRs"); ?></th>
 								<th><?= l7_t("IPs"); ?></th>
+								<th><?= l7_t("Dispositivos (MAC -> IP)"); ?></th>
 								<th><?= l7_t("Politicas"); ?></th>
 								<th><?= l7_t("Acoes"); ?></th>
 							</tr>
@@ -234,6 +262,8 @@ layer7_render_styles();
 							$gname = isset($grp["name"]) ? (string)$grp["name"] : "";
 							$gcidrs = isset($grp["cidrs"]) && is_array($grp["cidrs"]) ? $grp["cidrs"] : array();
 							$ghosts = isset($grp["hosts"]) && is_array($grp["hosts"]) ? $grp["hosts"] : array();
+							$gmacs = isset($grp["device_macs"]) && is_array($grp["device_macs"]) ? $grp["device_macs"] : array();
+							$gdips = isset($grp["device_ips"]) && is_array($grp["device_ips"]) ? $grp["device_ips"] : array();
 							$pcount = layer7_group_policy_count($gid, $policies);
 						?>
 							<tr>
@@ -241,6 +271,7 @@ layer7_render_styles();
 								<td><?= htmlspecialchars($gname); ?></td>
 								<td class="small"><?= htmlspecialchars(implode(", ", $gcidrs)); ?></td>
 								<td class="small"><?= htmlspecialchars(implode(", ", $ghosts)); ?></td>
+								<td class="small"><?php if (empty($gmacs)) { echo "-"; } else { echo (int)count($gmacs) . " " . htmlspecialchars(l7_t("dispositivos")) . " &rarr; " . (int)count($gdips) . " IP"; } ?></td>
 								<td><?= (int)$pcount; ?></td>
 								<td class="layer7-table-actions">
 									<a href="layer7_groups.php?edit=<?= (int)$i; ?>" class="btn btn-xs btn-info"><?= l7_t("Editar"); ?></a>
@@ -280,6 +311,10 @@ layer7_render_styles();
 				? implode("\n", $edit_group["cidrs"]) : "";
 			$eg_hosts = isset($edit_group["hosts"]) && is_array($edit_group["hosts"])
 				? implode("\n", $edit_group["hosts"]) : "";
+			$eg_devices = isset($edit_group["device_macs"]) && is_array($edit_group["device_macs"])
+				? implode("\n", $edit_group["device_macs"]) : "";
+			$eg_dips = isset($edit_group["device_ips"]) && is_array($edit_group["device_ips"])
+				? $edit_group["device_ips"] : array();
 		?>
 		<div class="layer7-admin-block" id="l7-edit-group">
 			<div class="layer7-admin-block__header"><?= l7_t("Editar grupo"); ?></div>
@@ -317,6 +352,19 @@ layer7_render_styles();
 					<div class="col-sm-6">
 						<textarea name="edit_group_hosts" class="form-control" rows="4" placeholder="10.0.85.100&#10;10.0.85.101"><?= htmlspecialchars($eg_hosts); ?></textarea>
 						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16)."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Dispositivos (MAC)"); ?></label>
+					<div class="col-sm-6">
+						<textarea name="edit_group_devices" class="form-control" rows="4" placeholder="aa:bb:cc:dd:ee:ff" style="font-family:monospace;"><?= htmlspecialchars($eg_devices); ?></textarea>
+						<p class="help-block"><?= l7_t("Um MAC por linha (max. 64). Resolvido para o IP actual via DHCP/ARP. Veja a aba Dispositivos para copiar MACs."); ?></p>
+						<?php if (!empty($eg_dips)) { ?>
+						<p class="help-block"><strong><?= l7_t("IPs resolvidos agora"); ?>:</strong> <span class="small"><?= htmlspecialchars(implode(", ", $eg_dips)); ?></span></p>
+						<?php } else if ($eg_devices !== "") { ?>
+						<p class="help-block text-warning"><?= l7_t("Nenhum IP resolvido (dispositivos offline ou sem lease/ARP). Recomenda-se DHCP static mapping."); ?></p>
+						<?php } ?>
 					</div>
 				</div>
 
@@ -369,6 +417,14 @@ layer7_render_styles();
 					<div class="col-sm-6">
 						<textarea name="new_group_hosts" class="form-control" rows="4" placeholder="10.0.85.100&#10;10.0.85.101"></textarea>
 						<p class="help-block"><?= l7_t("Um IPv4 por linha (max. 16). Opcional se ja tiver CIDRs."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Dispositivos (MAC)"); ?></label>
+					<div class="col-sm-6">
+						<textarea name="new_group_devices" class="form-control" rows="4" placeholder="aa:bb:cc:dd:ee:ff" style="font-family:monospace;"></textarea>
+						<p class="help-block"><?= l7_t("Um MAC por linha (max. 64). Resolvido para o IP actual via DHCP/ARP. Veja a aba Dispositivos para copiar MACs."); ?></p>
 					</div>
 				</div>
 

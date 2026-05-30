@@ -27,14 +27,17 @@
 #define L7_IFACE_NAME_LEN 32
 #endif
 #define L7_MAX_IFACES_PER_RULE 8
-#define L7_MAX_SRC_HOSTS 16
+/* Caminho A / A2: capacidade para politicas por dispositivo (MAC->IP),
+ * ex. uma turma. IPs de dispositivos resolvidos entram como src hosts. */
+#define L7_MAX_SRC_HOSTS 64
 #define L7_MAX_SRC_CIDRS 16
 
 #define L7_MAX_GROUPS 16
 #define L7_GROUP_ID_LEN 80
 #define L7_GROUP_NAME_LEN 160
 #define L7_MAX_GROUP_CIDRS 16
-#define L7_MAX_GROUP_HOSTS 16
+/* Caminho A / A2: alargado para acomodar IPs de dispositivos resolvidos. */
+#define L7_MAX_GROUP_HOSTS 64
 #define L7_MAX_GROUPS_PER_POLICY 8
 
 struct l7_cidr {

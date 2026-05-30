@@ -1645,6 +1645,116 @@ function layer7_device_inventory()
 	return $out;
 }
 
+/* ============================================================
+ * Caminho A / A2 — politicas por dispositivo (MAC -> IP).
+ *
+ * Em pfSense o PF impoe por IP (nao ha match por MAC). Tal como o proprio
+ * pfSense faz "regras por dispositivo" via static mapping -> IP, aqui o
+ * operador escolhe dispositivos por MAC num grupo; o pacote resolve MAC->IP
+ * actual (DHCP leases + ARP) e grava em `device_ips` no grupo. O daemon le
+ * `device_ips` como hosts de origem (ver policy.c parse_group).
+ * ============================================================ */
+
+/* Resolve um conjunto de MACs para os IPv4 actuais (DHCP leases + ARP).
+ * Prefere lease online/activo; ARP preenche clientes de IP estatico. */
+function layer7_resolve_macs_to_ips($macs)
+{
+	$want = array();
+	foreach ((array)$macs as $m) {
+		$m = strtolower(trim((string)$m));
+		if (layer7_device_mac_valid($m)) {
+			$want[$m] = true;
+		}
+	}
+	if (empty($want)) {
+		return array();
+	}
+	$map = array();
+	if (function_exists("system_get_dhcpleases")) {
+		$lr = system_get_dhcpleases();
+		$leases = (isset($lr["lease"]) && is_array($lr["lease"])) ? $lr["lease"] : array();
+		foreach ($leases as $l) {
+			$mac = strtolower(trim($l["mac"] ?? ""));
+			$ip = trim($l["ip"] ?? "");
+			if (!isset($want[$mac]) || $ip === "" || !layer7_ipv4_valid($ip)) {
+				continue;
+			}
+			$online = strtolower((string)($l["online"] ?? ""));
+			$is_on = (strpos($online, "online") !== false || strpos($online, "active") !== false);
+			if (!isset($map[$mac]) || $is_on) {
+				$map[$mac] = $ip;
+			}
+		}
+	}
+	$arp = array();
+	@exec("/usr/sbin/arp -an 2>/dev/null", $arp);
+	foreach ($arp as $line) {
+		if (!preg_match('/\(([0-9.]+)\) at ([0-9a-fA-F:]+)/', $line, $mm)) {
+			continue;
+		}
+		$ip = $mm[1];
+		$mac = strtolower($mm[2]);
+		if (!isset($want[$mac]) || !layer7_ipv4_valid($ip)) {
+			continue;
+		}
+		if (!isset($map[$mac])) {
+			$map[$mac] = $ip;
+		}
+	}
+	return array_values(array_unique(array_values($map)));
+}
+
+/* Normaliza uma lista de MACs (textarea ou array) para MACs validos. */
+function layer7_normalize_macs($raw, $max = 64)
+{
+	$lines = is_array($raw) ? $raw : preg_split('/[\r\n,]+/', (string)$raw);
+	$out = array();
+	foreach ($lines as $ln) {
+		$m = strtolower(trim((string)$ln));
+		if ($m !== "" && layer7_device_mac_valid($m) && count($out) < $max) {
+			$out[$m] = true;
+		}
+	}
+	return array_keys($out);
+}
+
+/* Re-resolve `device_ips` de todos os grupos a partir de `device_macs`.
+ * Grava e sinaliza reload apenas se algo mudou. Devolve total de IPs. */
+function layer7_devices_resync()
+{
+	$data = layer7_load_or_default();
+	if (!isset($data["layer7"]["groups"]) || !is_array($data["layer7"]["groups"])) {
+		return 0;
+	}
+	$changed = false;
+	$total = 0;
+	foreach ($data["layer7"]["groups"] as $i => $g) {
+		$macs = (isset($g["device_macs"]) && is_array($g["device_macs"])) ? $g["device_macs"] : array();
+		if (empty($macs)) {
+			if (isset($data["layer7"]["groups"][$i]["device_ips"])) {
+				unset($data["layer7"]["groups"][$i]["device_ips"]);
+				$changed = true;
+			}
+			continue;
+		}
+		$ips = layer7_resolve_macs_to_ips($macs);
+		$old = (isset($g["device_ips"]) && is_array($g["device_ips"])) ? $g["device_ips"] : array();
+		sort($ips);
+		$old_sorted = $old;
+		sort($old_sorted);
+		if ($ips !== $old_sorted) {
+			$changed = true;
+		}
+		$data["layer7"]["groups"][$i]["device_ips"] = $ips;
+		$total += count($ips);
+	}
+	if ($changed) {
+		layer7_save_json($data);
+		layer7_signal_reload();
+	}
+	return $total;
+}
+
 function layer7_nav_items()
 {
 	return array(

@@ -32,6 +32,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0009](ADR-0009-protecao-superficie-administrativa-license-server.md) | Protecao da superficie administrativa do license server | Aceito | define rate limit, brute force protection, CORS, logging e politica de erro/admin surface |
 | [ADR-0010](ADR-0010-integridade-transacional-e-validacao-crud-license-server.md) | Integridade transacional e validacao do CRUD do license server | Aceito | define validacao de payload, transacoes, delete seguro e falha fechada no CRUD/activate |
 | [ADR-0011](ADR-0011-fonte-de-identidade-de-dispositivo.md) | Fonte de identidade de dispositivo (Caminho A / A1) | Aceito | define DHCP leases + ARP como fonte de inventario, vendor OUI best-effort, alias em `device_aliases` e limites honestos (L2, MAC aleatorizado) |
+| [ADR-0012](ADR-0012-politicas-por-dispositivo-mac-para-ip.md) | Politicas por dispositivo: resolucao MAC -> IP (Caminho A / A2) | Aceito | grupo aceita `device_macs`, pacote resolve para `device_ips` (DHCP/ARP), daemon le `device_ips` como src hosts; imposicao por IP; resync + static mapping; limite 64 |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

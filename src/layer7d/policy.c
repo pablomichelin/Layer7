@@ -714,6 +714,21 @@ parse_one_group(const char *ob, const char *oe, struct layer7_group *g)
 	(void)parse_string_array_in_object(ob, oe, "hosts",
 	    (char *)g->hosts, L7_MAX_GROUP_HOSTS,
 	    L7_EXC_HOST_LEN, &g->n_hosts);
+	/*
+	 * Caminho A / A2: IPs de dispositivos resolvidos pelo pacote
+	 * (MAC->IP via DHCP leases/ARP) sao gravados em "device_ips" e
+	 * entram tambem como hosts de origem do grupo. Append apos os
+	 * hosts manuais, respeitando o limite. Retrocompatível: configs
+	 * sem "device_ips" mantem o comportamento anterior.
+	 */
+	if (g->n_hosts < L7_MAX_GROUP_HOSTS) {
+		int n_dev = 0;
+		(void)parse_string_array_in_object(ob, oe, "device_ips",
+		    (char *)g->hosts[g->n_hosts],
+		    L7_MAX_GROUP_HOSTS - g->n_hosts,
+		    L7_EXC_HOST_LEN, &n_dev);
+		g->n_hosts += n_dev;
+	}
 	if (g->n_cidrs == 0 && g->n_hosts == 0)
 		return -1;
 	return 0;
