@@ -31,6 +31,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0008](ADR-0008-autenticacao-e-sessao-license-server.md) | Autenticacao e sessao do license server | Aceito | define modelo de login, sessao stateful, cookie seguro e proibicao de token em `localStorage` |
 | [ADR-0009](ADR-0009-protecao-superficie-administrativa-license-server.md) | Protecao da superficie administrativa do license server | Aceito | define rate limit, brute force protection, CORS, logging e politica de erro/admin surface |
 | [ADR-0010](ADR-0010-integridade-transacional-e-validacao-crud-license-server.md) | Integridade transacional e validacao do CRUD do license server | Aceito | define validacao de payload, transacoes, delete seguro e falha fechada no CRUD/activate |
+| [ADR-0011](ADR-0011-fonte-de-identidade-de-dispositivo.md) | Fonte de identidade de dispositivo (Caminho A / A1) | Aceito | define DHCP leases + ARP como fonte de inventario, vendor OUI best-effort, alias em `device_aliases` e limites honestos (L2, MAC aleatorizado) |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

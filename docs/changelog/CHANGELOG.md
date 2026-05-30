@@ -4,6 +4,28 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Caminho A / A1 — inventario de dispositivos (em curso, `PORTREVISION=20`)
+
+Base de identidade tipo UDM (BG-040). Decisao em
+`docs/03-adr/ADR-0011-fonte-de-identidade-de-dispositivo.md`.
+
+#### Added
+
+- Nova pagina GUI **Services > Layer 7 > Dispositivos** (`layer7_devices.php`),
+  **read-only** (so o alias e editavel): lista IP, MAC, hostname, fabricante
+  (OUI), interface, estado online e fonte.
+- `layer7.inc`: `layer7_device_inventory()` combina `system_get_dhcpleases()`
+  (ISC+Kea) com a tabela ARP (`arp -an`), enriquece com vendor OUI (best-effort,
+  unica passagem) e alias por MAC.
+- Alias persistente do operador em `layer7.json` (`device_aliases`, MAC->alias);
+  **ignorado pelo daemon** (estritamente observacional). Item no nav "Dispositivos".
+
+#### Notes
+
+- A1 **nao altera enforcement** (so observa). Base para A2 (politicas por
+  dispositivo). `PORTREVISION` -> `20`. Limites honestos: so dispositivos
+  adjacentes L2; MAC pode ser aleatorizado; vendor depende de base OUI no sistema.
+
 ### Caminho A / A0 — higiene (em curso, `PORTREVISION=19`)
 
 Primeiro bloco do Caminho A (UX/eficacia tipo UDM Pro). Quick wins de baixo

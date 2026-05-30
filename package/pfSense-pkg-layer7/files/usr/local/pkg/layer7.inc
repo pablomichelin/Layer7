@@ -697,7 +697,8 @@ function layer7_bare_config()
 			"groups" => array(),
 			"policies" => array(),
 			"exceptions" => array(),
-			"dst_allowlist" => array()
+			"dst_allowlist" => array(),
+			"device_aliases" => array()
 		)
 	);
 }
@@ -1424,10 +1425,231 @@ function layer7_read_license_status()
 	);
 }
 
+/* ============================================================
+ * Caminho A / A1 — inventario de dispositivos (read-only).
+ *
+ * Fontes de identidade (ver ADR-0011):
+ *   - DHCP leases via API canonica do pfSense `system_get_dhcpleases()`
+ *     (unifica ISC dhcpd e Kea; traz ip/mac/hostname/descr/if/online).
+ *   - Tabela ARP (`arp -an`) para vizinhos L2 activos, incluindo clientes
+ *     de IP estatico sem lease.
+ * Limitacoes honestas: so ve dispositivos adjacentes em L2 (mesmo segmento);
+ * nao ha 802.1x/LDAP; vendor depende de base OUI presente no sistema.
+ * Este modulo NAO altera enforcement; e estritamente observacional.
+ * ============================================================ */
+
+function layer7_device_oui_files()
+{
+	/* Bases OUI possiveis no sistema (best-effort, sem dependencia rigida). */
+	return array(
+		"/usr/local/share/ntopng/httpdocs/other/EtherOUI.txt",
+		"/usr/local/share/wireshark/manuf",
+		"/usr/share/misc/oui.txt",
+	);
+}
+
+/* Resolve vendor para um conjunto de prefixos OUI (aa:bb:cc) numa unica
+ * passagem pelo ficheiro OUI (evita carregar a base inteira por dispositivo). */
+function layer7_device_vendor_map($prefixes)
+{
+	$want = array();
+	foreach ($prefixes as $p) {
+		$p = strtolower($p);
+		if (strlen($p) >= 8) {
+			$want[substr($p, 0, 8)] = "";
+		}
+	}
+	if (empty($want)) {
+		return array();
+	}
+	foreach (layer7_device_oui_files() as $f) {
+		if (!is_file($f) || !is_readable($f)) {
+			continue;
+		}
+		$fh = @fopen($f, "r");
+		if (!$fh) {
+			continue;
+		}
+		$remaining = count($want);
+		while (($line = fgets($fh)) !== false) {
+			$line = trim($line);
+			if ($line === "" || $line[0] === "#") {
+				continue;
+			}
+			/* Formato tshark manuf: PREFIX<TAB>SHORT<TAB>LONG */
+			$parts = preg_split('/\t+/', $line);
+			if (count($parts) < 2) {
+				continue;
+			}
+			$pfx = strtolower(str_replace("-", ":", trim($parts[0])));
+			if (strpos($pfx, "/") !== false || strlen($pfx) < 8) {
+				continue;
+			}
+			$key = substr($pfx, 0, 8);
+			if (array_key_exists($key, $want) && $want[$key] === "") {
+				$want[$key] = trim($parts[count($parts) - 1]);
+				$remaining--;
+				if ($remaining <= 0) {
+					break;
+				}
+			}
+		}
+		fclose($fh);
+		$found = false;
+		foreach ($want as $v) {
+			if ($v !== "") { $found = true; break; }
+		}
+		if ($found) {
+			break;
+		}
+	}
+	$out = array();
+	foreach ($want as $k => $v) {
+		if ($v !== "") {
+			$out[$k] = $v;
+		}
+	}
+	return $out;
+}
+
+/* Aliases persistentes por MAC, guardados em layer7.json (`device_aliases`).
+ * O daemon ignora esta chave (so observacional). */
+function layer7_device_aliases_load()
+{
+	$data = layer7_load_or_default();
+	$a = isset($data["layer7"]["device_aliases"]) ? $data["layer7"]["device_aliases"] : array();
+	return is_array($a) ? $a : array();
+}
+
+function layer7_device_mac_valid($mac)
+{
+	return (bool)preg_match('/^[0-9a-f]{2}(:[0-9a-f]{2}){5}$/', strtolower((string)$mac));
+}
+
+function layer7_device_alias_save($mac, $alias)
+{
+	$mac = strtolower(trim((string)$mac));
+	if (!layer7_device_mac_valid($mac)) {
+		return false;
+	}
+	$alias = trim((string)$alias);
+	$alias = preg_replace('/[^\p{L}\p{N} ._\-]/u', '', $alias);
+	if (function_exists("mb_substr")) {
+		$alias = mb_substr($alias, 0, 64);
+	} else {
+		$alias = substr($alias, 0, 64);
+	}
+	$data = layer7_load_or_default();
+	if (!isset($data["layer7"]["device_aliases"]) || !is_array($data["layer7"]["device_aliases"])) {
+		$data["layer7"]["device_aliases"] = array();
+	}
+	if ($alias === "") {
+		unset($data["layer7"]["device_aliases"][$mac]);
+	} else {
+		$data["layer7"]["device_aliases"][$mac] = $alias;
+	}
+	return layer7_save_json($data);
+}
+
+/* Constroi o inventario combinado (DHCP leases + ARP), enriquecido com vendor
+ * (OUI) e alias do operador. Devolve array ordenado por IP. */
+function layer7_device_inventory()
+{
+	$devices = array();
+
+	if (function_exists("system_get_dhcpleases")) {
+		$lr = system_get_dhcpleases();
+		$leases = (isset($lr["lease"]) && is_array($lr["lease"])) ? $lr["lease"] : array();
+		foreach ($leases as $l) {
+			$ip = trim($l["ip"] ?? "");
+			$mac = strtolower(trim($l["mac"] ?? ""));
+			if ($ip === "" && $mac === "") {
+				continue;
+			}
+			$key = ($mac !== "") ? $mac : ("ip:" . $ip);
+			$devices[$key] = array(
+				"ip" => $ip,
+				"mac" => $mac,
+				"hostname" => trim($l["hostname"] ?? ""),
+				"descr" => trim($l["descr"] ?? ""),
+				"iface" => trim($l["if"] ?? ""),
+				"online" => trim($l["online"] ?? ""),
+				"type" => trim($l["type"] ?? ""),
+				"source" => "dhcp",
+			);
+		}
+	}
+
+	$arp = array();
+	@exec("/usr/sbin/arp -an 2>/dev/null", $arp);
+	foreach ($arp as $line) {
+		if (!preg_match('/\(([0-9.]+)\) at ([0-9a-fA-F:]+) on ([A-Za-z0-9_.]+)/', $line, $m)) {
+			continue;
+		}
+		$ip = $m[1];
+		$mac = strtolower($m[2]);
+		$iface = $m[3];
+		if (!layer7_device_mac_valid($mac)) {
+			continue;
+		}
+		if (isset($devices[$mac])) {
+			if (($devices[$mac]["ip"] ?? "") === "") {
+				$devices[$mac]["ip"] = $ip;
+			}
+			if (($devices[$mac]["iface"] ?? "") === "") {
+				$devices[$mac]["iface"] = $iface;
+			}
+			$devices[$mac]["source"] = (strpos((string)$devices[$mac]["source"], "dhcp") !== false) ? "dhcp+arp" : "arp";
+			if (($devices[$mac]["online"] ?? "") === "") {
+				$devices[$mac]["online"] = "active/online";
+			}
+		} else {
+			$devices[$mac] = array(
+				"ip" => $ip,
+				"mac" => $mac,
+				"hostname" => "",
+				"descr" => "",
+				"iface" => $iface,
+				"online" => "active/online",
+				"type" => "dynamic",
+				"source" => "arp",
+			);
+		}
+	}
+
+	$prefixes = array();
+	foreach ($devices as $d) {
+		$mac = $d["mac"] ?? "";
+		if ($mac !== "" && strlen($mac) >= 8) {
+			$prefixes[substr($mac, 0, 8)] = true;
+		}
+	}
+	$vmap = layer7_device_vendor_map(array_keys($prefixes));
+	$aliases = layer7_device_aliases_load();
+
+	$out = array();
+	foreach ($devices as $d) {
+		$mac = $d["mac"] ?? "";
+		$d["vendor"] = ($mac !== "" && isset($vmap[substr($mac, 0, 8)])) ? $vmap[substr($mac, 0, 8)] : "";
+		$d["alias"] = ($mac !== "" && isset($aliases[$mac])) ? $aliases[$mac] : "";
+		$out[] = $d;
+	}
+
+	usort($out, function ($a, $b) {
+		$la = @ip2long($a["ip"] ?? "");
+		$lb = @ip2long($b["ip"] ?? "");
+		if ($la === false) { $la = -1; }
+		if ($lb === false) { $lb = -1; }
+		return $la <=> $lb;
+	});
+	return $out;
+}
+
 function layer7_nav_items()
 {
 	return array(
 		"status" => array("label" => l7_t("Estado"), "href" => "layer7_status.php"),
+		"devices" => array("label" => l7_t("Dispositivos"), "href" => "layer7_devices.php"),
 		"policies" => array("label" => l7_t("Politicas"), "href" => "layer7_policies.php"),
 		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php"),
 		"allowlist" => array("label" => l7_t("Allowlist"), "href" => "layer7_allowlist.php"),
