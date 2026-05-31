@@ -187,8 +187,11 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 	}
 
 	{
+		/* "sni_inspection" so existe no nivel de topo de "layer7"; nao ha
+		 * o gate `< pol` (a chave nao aparece dentro de policies[]). O
+		 * objeto guardado pela GUI pode coloca-la depois de "policies". */
 		const char *si = strstr(layer, "\"sni_inspection\"");
-		if (si && (!pol || si < pol)) {
+		if (si) {
 			const char *q = strchr(si + 16, ':');
 			if (q && q < end) {
 				q++;
