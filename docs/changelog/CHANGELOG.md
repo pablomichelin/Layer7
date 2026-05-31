@@ -4,6 +4,40 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Caminho A / A4 + A5 — UX tipo UDM e F5 alargada (em curso, `PORTREVISION=23`)
+
+UX de perfis com toggle directo e contadores (BG-043) + suite de regressao do
+Caminho A (BG-044).
+
+#### Added (A4 — UX)
+
+- **Toggle on/off directo por perfil** nos "Perfis rapidos" (Politicas): um
+  clique liga (cria politica `profile-<id>`, accao block — em monitor fica
+  apenas observado) ou desliga (remove a politica). O modal "Opcoes" mantem-se
+  para escolha de accao/interfaces/sub-redes/grupos.
+- **Estado visual por perfil** (ponto verde Ligado / cinza Desligado, moldura
+  verde quando activo) e **contador de hits por perfil** a partir das stats do
+  daemon (`top_apps_blocked`), via novo `layer7_profile_hit_counts()`.
+- **Top clientes bloqueados** (Estado) agora mostra o **nome/alias do
+  dispositivo** (inventario A1) ao lado do IP de origem.
+- Traducoes EN das novas strings.
+
+#### Added (A5 — testes/F5 alargada)
+
+- `tests/functional/test_config_parse.c`: teste unitario do parser do daemon,
+  cobrindo `sni_inspection` antes/depois de `policies` (regressao do bug do A3),
+  `false`, ausente, e `enabled`/`mode`. Ligado ao `tests/run-local.sh`.
+- `tests/lab/smoke-caminho-a.sh`: suite de regressao do Caminho A no appliance
+  (A0 perfis+github, A1 inventario, A2 helpers MAC->IP, A3 parse sni, A4
+  contadores), read-only de enforcement.
+
+#### Notes
+
+- `PORTREVISION` -> `23`. A4 reutiliza a estrutura de politicas existente (o
+  toggle apenas cria/remove `profile-<id>`); rollback = desligar o perfil ou
+  remover a politica. Sem alteracao do daemon em A4 (so PHP/GUI). A5 nao altera
+  o produto (apenas testes).
+
 ### Caminho A / A3 — bloqueio por SNI/Host via nDPI (em curso, `PORTREVISION=22`)
 
 Eficacia tipo UDM contra CDNs e DNS cifrado/cache (BG-042). Decisao em

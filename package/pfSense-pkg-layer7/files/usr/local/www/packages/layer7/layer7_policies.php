@@ -115,6 +115,93 @@ if ($_POST["add_profile_policy"] ?? false) {
 		}
 }
 
+/* Caminho A / A4 — toggle directo de perfil ON (um clique). Cria a politica
+ * `profile-<id>` com accao block (em modo monitor fica apenas observada). Para
+ * controlo fino (interfaces, CIDRs, grupos) continua a existir o modal. */
+if ($_POST["toggle_profile_on"] ?? false) {
+		$profile_id = trim($_POST["profile_id"] ?? "");
+		if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $profile_id)) {
+			$input_errors[] = l7_t("Perfil invalido.");
+		} else {
+			$profiles = layer7_load_profiles();
+			$profile = null;
+			foreach ($profiles as $p) {
+				if (($p["id"] ?? "") === $profile_id) { $profile = $p; break; }
+			}
+			if ($profile === null) {
+				$input_errors[] = l7_t("Perfil nao encontrado.");
+			} else {
+				$data = layer7_load_or_default();
+				if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
+					$data["layer7"]["policies"] = array();
+				}
+				$policies = &$data["layer7"]["policies"];
+				$pid = "profile-" . $profile_id;
+				$dup = false;
+				foreach ($policies as $ex) {
+					if (($ex["id"] ?? "") === $pid) { $dup = true; break; }
+				}
+				if ($dup) {
+					$savemsg = sprintf(l7_t("Perfil '%s' ja esta ligado."), $profile["name"] ?? $profile_id);
+				} elseif (count($policies) >= 24) {
+					$input_errors[] = l7_t("Limite de 24 politicas.");
+				} else {
+					$rule = array(
+						"id" => $pid,
+						"name" => $profile["name"] ?? $pid,
+						"enabled" => true,
+						"action" => "block",
+						"priority" => 20,
+						"match" => array(),
+					);
+					$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"])) ? $profile["ndpi_apps"] : array();
+					$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"])) ? $profile["hosts"] : array();
+					$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"])) ? $profile["ndpi_categories"] : array();
+					if (!empty($apps)) { $rule["match"]["ndpi_app"] = array_slice($apps, 0, 64); }
+					if (!empty($cats)) { $rule["match"]["ndpi_category"] = array_slice($cats, 0, 8); }
+					if (!empty($hosts)) { $rule["match"]["hosts"] = array_slice($hosts, 0, 64); }
+					$policies[] = $rule;
+					if (layer7_save_json($data)) {
+						layer7_signal_reload();
+						$savemsg = sprintf(l7_t("Perfil '%s' ligado (accao block; em modo monitor fica apenas observado)."), $profile["name"] ?? $profile_id);
+						if (($profile["extra_action"] ?? "") === "configure_unbound_anti_doh") {
+							$doh_result = layer7_configure_unbound_anti_doh();
+							if ($doh_result["ok"]) { $savemsg .= " " . l7_t("Unbound anti-DoH tambem configurado."); }
+						}
+					}
+				}
+				unset($policies);
+			}
+		}
+}
+
+/* Caminho A / A4 — toggle directo de perfil OFF. Remove a politica
+ * `profile-<id>`. Seguro: so remove politicas cujo id casa exactamente. */
+if ($_POST["toggle_profile_off"] ?? false) {
+		$profile_id = trim($_POST["profile_id"] ?? "");
+		if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $profile_id)) {
+			$input_errors[] = l7_t("Perfil invalido.");
+		} else {
+			$pid = "profile-" . $profile_id;
+			$data = layer7_load_or_default();
+			if (isset($data["layer7"]["policies"]) && is_array($data["layer7"]["policies"])) {
+				$before = count($data["layer7"]["policies"]);
+				$data["layer7"]["policies"] = array_values(array_filter(
+					$data["layer7"]["policies"],
+					function ($p) use ($pid) { return ($p["id"] ?? "") !== $pid; }
+				));
+				if (count($data["layer7"]["policies"]) !== $before) {
+					if (layer7_save_json($data)) {
+						layer7_signal_reload();
+						$savemsg = sprintf(l7_t("Perfil '%s' desligado."), $profile_id);
+					}
+				} else {
+					$savemsg = sprintf(l7_t("Perfil '%s' ja estava desligado."), $profile_id);
+				}
+			}
+		}
+}
+
 if ($_POST["add_policy"] ?? false) {
 		$data = layer7_load_or_default();
 		if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
@@ -528,10 +615,14 @@ function layer7_policy_match_summary($policy) {
 		if (!empty($l7_profiles) && !$at_limit) {
 		$prof_ifaces = layer7_get_pfsense_interfaces();
 		?>
+		<?php
+		/* A4: contadores de hits por perfil a partir das stats do daemon. */
+		$l7_prof_hits = layer7_profile_hit_counts($l7_profiles, layer7_read_stats());
+		?>
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Perfis rapidos"); ?></div>
 			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Clique num perfil para criar automaticamente uma politica com todas as apps e dominios associados. Escolha a accao, interfaces e sub-redes antes de aplicar."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Ligue ou desligue um perfil com um clique — cria/remove automaticamente a politica com todas as apps e dominios associados (accao block; em modo monitor fica apenas observado). Use 'Opcoes' para escolher accao, interfaces e sub-redes."); ?></p>
 
 		<?php
 		$l7_app_icons = array(
@@ -576,17 +667,28 @@ function layer7_policy_match_summary($policy) {
 				$icon_svg = $l7_app_icons[$prof["id"]][1];
 			}
 		?>
-			<div class="l7-profile-card<?= $prof_exists ? ' l7-profile-used' : ''; ?>">
+			<?php $prof_hit = isset($l7_prof_hits[$prof["id"] ?? ""]) ? (int)$l7_prof_hits[$prof["id"] ?? ""] : 0; ?>
+			<div class="l7-profile-card<?= $prof_exists ? ' l7-profile-on' : ''; ?>">
+				<div class="l7-profile-state"><?php if ($prof_exists) { ?><span class="l7-dot l7-dot-on" title="<?= l7_t("Ligado"); ?>"></span><?php } else { ?><span class="l7-dot l7-dot-off" title="<?= l7_t("Desligado"); ?>"></span><?php } ?></div>
 				<div class="l7-profile-icon-ios" style="background:<?= $icon_color; ?>;">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><?= $icon_svg; ?></svg>
 				</div>
 				<div class="l7-profile-name"><?= $prof_name; ?></div>
 				<div class="l7-profile-desc"><?= $prof_desc; ?></div>
-				<div class="l7-profile-meta"><?= $prof_apps_count; ?> apps &middot; <?= $prof_hosts_count; ?> hosts</div>
+				<div class="l7-profile-meta"><?= $prof_apps_count; ?> apps &middot; <?= $prof_hosts_count; ?> hosts<?php if ($prof_exists && $prof_hit > 0) { ?> &middot; <span class="l7-profile-hits" title="<?= l7_t("Bloqueios observados pelo daemon"); ?>"><?= $prof_hit; ?> <?= l7_t("hits"); ?></span><?php } ?></div>
 				<?php if ($prof_exists) { ?>
-				<span class="label label-info"><?= l7_t("Ja aplicado"); ?></span>
+				<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;" onsubmit='return confirm(<?= htmlspecialchars(json_encode(l7_t("Desligar este perfil (remove a politica)?")), ENT_QUOTES); ?>);'>
+					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
+					<button type="submit" name="toggle_profile_off" value="1" class="btn btn-sm btn-danger"><i class="fa fa-power-off"></i> <?= l7_t("Desligar"); ?></button>
+				</form>
 				<?php } else { ?>
-				<button type="button" class="btn btn-sm btn-success" onclick="l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof_name), ENT_QUOTES) ?>);"><?= l7_t("Aplicar"); ?></button>
+				<div class="l7-profile-actions">
+					<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;display:inline-block;">
+						<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
+						<button type="submit" name="toggle_profile_on" value="1" class="btn btn-sm btn-success"><i class="fa fa-power-off"></i> <?= l7_t("Ligar"); ?></button>
+					</form>
+					<button type="button" class="btn btn-sm btn-default" onclick="l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof_name), ENT_QUOTES) ?>);"><?= l7_t("Opcoes"); ?></button>
+				</div>
 				<?php } ?>
 			</div>
 		<?php } ?>
@@ -1239,9 +1341,15 @@ function layer7_policy_match_summary($policy) {
 </div>
 <style>
 .l7-profiles-grid { display: flex; flex-wrap: wrap; gap: 14px; }
-.l7-profile-card { border: 1px solid #ddd; border-radius: 6px; padding: 16px; width: 180px; text-align: center; background: #fdfdfd; transition: box-shadow 0.15s; }
+.l7-profile-card { position: relative; border: 1px solid #ddd; border-radius: 6px; padding: 16px; width: 180px; text-align: center; background: #fdfdfd; transition: box-shadow 0.15s; }
 .l7-profile-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
-.l7-profile-card.l7-profile-used { opacity: 0.6; }
+.l7-profile-card.l7-profile-on { border-color: #4cae4c; box-shadow: 0 0 0 1px #4cae4c inset; }
+.l7-profile-state { position: absolute; top: 8px; right: 8px; }
+.l7-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+.l7-dot-on { background: #5cb85c; box-shadow: 0 0 4px #5cb85c; }
+.l7-dot-off { background: #ccc; }
+.l7-profile-hits { color: #5cb85c; font-weight: 600; }
+.l7-profile-actions { display: flex; gap: 6px; justify-content: center; }
 .l7-profile-icon-ios { width: 56px; height: 56px; border-radius: 13px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
 .l7-profile-name { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
 .l7-profile-desc { font-size: 12px; color: #666; margin-bottom: 6px; line-height: 1.4; min-height: 34px; }

@@ -33,6 +33,20 @@ else
 	fail "test_allowlist compile"
 fi
 
+step "Unit: config_parse (sni_inspection / A3)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_config_parse \
+    tests/functional/test_config_parse.c src/layer7d/config_parse.c 2>/tmp/test_config_parse.cc.err; then
+	if /tmp/test_config_parse; then
+		pass "test_config_parse"
+	else
+		fail "test_config_parse runtime"
+	fi
+else
+	cat /tmp/test_config_parse.cc.err
+	fail "test_config_parse compile"
+fi
+
 step "Lint: PHP do pacote (php -l)"
 PHP_BIN=$(command -v php 2>/dev/null || true)
 if [ -z "$PHP_BIN" ]; then
@@ -62,6 +76,7 @@ for f in package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d \
     package/pfSense-pkg-layer7/files/usr/local/etc/layer7/*.sh \
     scripts/diagnose-layer7-appliance.sh \
     tests/lab/smoke-monitor-mode.sh \
+    tests/lab/smoke-caminho-a.sh \
     tests/run-local.sh; do
 	[ -f "$f" ] || continue
 	if /bin/sh -n "$f" 2>/dev/null; then

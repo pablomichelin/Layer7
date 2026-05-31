@@ -156,12 +156,27 @@ layer7_render_styles();
 					<h3 class="layer7-section-title"><?= l7_t("Top 10 clientes bloqueados"); ?></h3>
 					<?php if (empty($top_sources)) { ?>
 					<p class="text-muted"><?= l7_t("Sem dados."); ?></p>
-					<?php } else { ?>
+					<?php } else {
+						/* A4: enriquece com nome/alias do dispositivo (inventario A1). */
+						$dev_by_ip = array();
+						if (function_exists("layer7_device_inventory")) {
+							$inv = layer7_device_inventory();
+							foreach ((is_array($inv) ? $inv : array()) as $d) {
+								$ip = (string)($d["ip"] ?? "");
+								if ($ip === "") { continue; }
+								$lbl = trim((string)($d["alias"] ?? ""));
+								if ($lbl === "") { $lbl = trim((string)($d["hostname"] ?? "")); }
+								if ($lbl === "") { $lbl = trim((string)($d["vendor"] ?? "")); }
+								if ($lbl !== "" && $lbl !== "-") { $dev_by_ip[$ip] = $lbl; }
+							}
+						}
+					?>
 					<table class="table table-striped table-condensed">
 						<thead>
 							<tr>
 								<th>#</th>
 								<th><?= l7_t("IP de origem"); ?></th>
+								<th><?= l7_t("Dispositivo"); ?></th>
 								<th><?= l7_t("Bloqueios"); ?></th>
 							</tr>
 						</thead>
@@ -169,10 +184,12 @@ layer7_render_styles();
 						<?php foreach ($top_sources as $rank => $entry) {
 							$src_ip = isset($entry["ip"]) ? $entry["ip"] : "?";
 							$src_count = isset($entry["count"]) ? (int)$entry["count"] : 0;
+							$dev_lbl = isset($dev_by_ip[$src_ip]) ? $dev_by_ip[$src_ip] : "";
 						?>
 							<tr>
 								<td><?= $rank + 1; ?></td>
 								<td><code><?= htmlspecialchars($src_ip); ?></code></td>
+								<td><?= $dev_lbl !== "" ? htmlspecialchars($dev_lbl) : '<span class="text-muted">-</span>'; ?></td>
 								<td><?= number_format($src_count); ?></td>
 							</tr>
 						<?php } ?>

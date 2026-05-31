@@ -1312,6 +1312,48 @@ function layer7_load_profiles()
 }
 
 /**
+ * Caminho A / A4 — hits por perfil a partir das stats do daemon.
+ *
+ * Soma os `count` das apps nDPI bloqueadas (`top_apps_blocked`) que pertencem
+ * a cada perfil (match por nome, case-insensitive). Devolve map
+ * id_perfil => total de bloqueios observados. Sem stats -> tudo 0.
+ */
+function layer7_profile_hit_counts($profiles, $stats)
+{
+	$out = array();
+	if (!is_array($profiles)) {
+		return $out;
+	}
+	$apphits = array();
+	if (is_array($stats) && isset($stats["top_apps_blocked"]) &&
+	    is_array($stats["top_apps_blocked"])) {
+		foreach ($stats["top_apps_blocked"] as $e) {
+			$a = strtolower(trim((string)($e["app"] ?? "")));
+			if ($a !== "") {
+				$apphits[$a] = (int)($e["count"] ?? 0);
+			}
+		}
+	}
+	foreach ($profiles as $p) {
+		$id = (string)($p["id"] ?? "");
+		if ($id === "") {
+			continue;
+		}
+		$sum = 0;
+		$apps = (isset($p["ndpi_apps"]) && is_array($p["ndpi_apps"]))
+		    ? $p["ndpi_apps"] : array();
+		foreach ($apps as $app) {
+			$k = strtolower(trim((string)$app));
+			if ($k !== "" && isset($apphits[$k])) {
+				$sum += $apphits[$k];
+			}
+		}
+		$out[$id] = $sum;
+	}
+	return $out;
+}
+
+/**
  * Parse schedule fields from POST into a schedule array for the policy JSON.
  * Returns the schedule array or null if no schedule configured.
  */
