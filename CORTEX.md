@@ -25,19 +25,45 @@ Se houver conflito entre documentos, a ordem de prevalencia e:
 **Produto:** Layer7 para pfSense CE
 **Empresa:** Systemup Solucao em Tecnologia
 **Estado funcional conhecido:** V1 Comercial concluida e publicada;
-**Fase 1 de estabilizacao da V1 publicada** como `1.8.11_18`. Esta Fase 1
-corrige a causa-raiz de "bloqueia bancos em modo monitor" e adiciona a
-allowlist de destinos. **Build + validacao reais concluidos** em `2026-05-30`:
-build no builder FreeBSD (`192.168.100.12`), validado no appliance pfSense
-Plus 26.03 (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh` (exit 0),
-matriz monitor/enforce/transicao/CLI-licenca toda PASS.
-**Ultima versao do pacote publicada em release:** `1.8.11_18` (referencia de
+**Fase 1 de estabilizacao** (`1.8.11_18`) e **Caminho A completo (A0-A5)**
+publicado como **`1.8.11_23`**. A Fase 1 corrigiu a causa-raiz de "bloqueia
+bancos em modo monitor" e adicionou a allowlist de destinos; o Caminho A
+aproxima a UX e a eficacia de um UDM Pro (inventario e politicas por
+dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
+**sem MITM** e mantendo o monitor passivo. **Build + validacao reais** em
+`2026-05-30`: build no builder FreeBSD (`192.168.100.12`), validado no
+appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
+(ambos exit 0).
+**Ultima versao do pacote publicada em release:** `1.8.11_23` (referencia de
 instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
-`pablomichelin/Layer7`, tag `v1.8.11_18`,
-`SHA256=98374806be31094a3835bcae0c96164369860aef82db3bfb4255f44c9d60b876`).
-Fase 1 de estabilizacao (monitor passivo, allowlist de destinos, flush
-fiavel, CLI `--license-status`). A versao anterior `1.8.11_17` foi hotfix de
-GUI (`layer7_removal.php`).
+`pablomichelin/Layer7`, tag `v1.8.11_23`,
+`SHA256=3c9e488d48c441a9859a1d953b603e9cecb242fc9d2e93ce144e05cdacb8d7d4`).
+Caminho A (A0-A5) sobre a base estavel da Fase 1.
+
+### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
+
+Artefacto `pfSense-pkg-layer7-1.8.11_23.pkg`
+(`SHA256=3c9e488d48c441a9859a1d953b603e9cecb242fc9d2e93ce144e05cdacb8d7d4`),
+build no builder FreeBSD e validado no appliance. Consolida o Caminho A sobre
+a Fase 1 (detalhes em `docs/changelog/CHANGELOG.md > [1.8.11_23]`; backlog
+BG-039..BG-044 todos `Concluido`):
+
+- **A0 (BG-039) higiene:** perfil `github`, limite de hosts GUI/daemon alinhado
+  a 64, docs clarificam `block`=destino. ADR n/a.
+- **A1 (BG-040) inventario de dispositivos:** pagina `Dispositivos` read-only
+  (DHCP leases + ARP + OUI + alias). ADR-0011.
+- **A2 (BG-041) politicas por dispositivo:** grupo aceita `device_macs`, pacote
+  resolve MAC->IP (`device_ips`), daemon le como src hosts. ADR-0012.
+- **A3 (BG-042) SNI/Host via nDPI:** toggle `sni_inspection` opt-in OFF; usa o
+  SNI/Host ja extraido pelo nDPI (sem parser proprio, sem MITM); por destino.
+  ADR-0013. Limite: TLS 1.3 ECH.
+- **A4 (BG-043) UX tipo UDM:** toggle on/off directo por perfil + estado visual
+  + hit counters por perfil; nome de dispositivo no top clientes.
+- **A5 (BG-044) F5 alargada:** `test_config_parse.c` (run-local) +
+  `smoke-caminho-a.sh` (appliance), cobrindo A0-A4 e a regressao do parse SNI.
+
+`PORTVERSION=1.8.11`, `PORTREVISION=23`. Monitor continua passivo (gate da Fase
+1 intacto); enforce ao vivo exige licenca valida no appliance.
 
 ### Release `1.8.11_18` — Fase 1 de estabilizacao (publicada `2026-05-30`)
 
@@ -91,8 +117,8 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_18` (`PORTVERSION=1.8.11`, `PORTREVISION=18`),
-alinhada a **release publica** `v1.8.11_18` (Fase 1 de estabilizacao,
++ `PORTREVISION`):** `1.8.11_23` (`PORTVERSION=1.8.11`, `PORTREVISION=23`),
+alinhada a **release publica** `v1.8.11_23` (Caminho A completo A0-A5,
 validada no appliance).
 **Data-base deste checkpoint:** `2026-04-27`
 

@@ -2,9 +2,21 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [Unreleased]
+## [1.8.11_23] - 2026-05-30 — Caminho A completo (A0–A5)
 
-### Caminho A / A4 + A5 — UX tipo UDM e F5 alargada (em curso, `PORTREVISION=23`)
+Release publica que consolida todo o **Caminho A** (UX e eficacia tipo UDM Pro)
+sobre a base estavel da Fase 1 (`1.8.11_18`): perfil GitHub e alinhamento de
+limites (A0), inventario de dispositivos (A1), politicas por dispositivo
+MAC->IP (A2), bloqueio por SNI/Host via nDPI opt-in (A3), UX de perfis com
+toggle on/off e contadores (A4) e suite de regressao do Caminho A (A5).
+Artefacto `pfSense-pkg-layer7-1.8.11_23.pkg`
+(`SHA256=3c9e488d48c441a9859a1d953b603e9cecb242fc9d2e93ce144e05cdacb8d7d4`).
+Validado no appliance: `smoke-monitor-mode.sh` e `smoke-caminho-a.sh` exit 0;
+toggle de perfil cria/remove politica que o daemon carrega; SNI a alimentar
+`flow_decide`. Sem MITM; monitor continua passivo (gate da Fase 1 intacto);
+limitacao honesta: TLS 1.3 ECH cifra o SNI.
+
+### Caminho A / A4 + A5 — UX tipo UDM e F5 alargada (`PORTREVISION=23`)
 
 UX de perfis com toggle directo e contadores (BG-043) + suite de regressao do
 Caminho A (BG-044).
