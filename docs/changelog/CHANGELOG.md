@@ -27,6 +27,20 @@ Eficacia tipo UDM contra CDNs e DNS cifrado/cache (BG-042). Decisao em
   (`layer7_block_dst`). Limitacao honesta: TLS 1.3 **ECH** cifra o SNI. Default
   inalterado (opt-in) para previsibilidade.
 
+#### Fixed
+
+- Parsing de `sni_inspection` no daemon nao podia depender do gate
+  `< "policies"` (a GUI grava a chave depois de `policies` no JSON). Removido o
+  gate; bug apanhado em validacao no appliance.
+
+#### Validacao no appliance (`1.8.11_22`, `SHA256=4f0d42b5f8f9b3ddcda297477149b58b4d18e0d29673b0671c27bec6d6b1302c`)
+
+- `capture: opened vmx0 (nDPI active, sni_inspection=1)` (flag aplicado);
+- debug de `flow_decide` mostrou host extraido em uso, ex.:
+  `host=pfs-monitor.systemup.inf.br ... reason=policy_match` (SNI/Host via nDPI
+  a alimentar o motor de politicas);
+- `smoke-monitor-mode.sh` exit 0 (gate de monitor intacto); default `sni=off`.
+
 ### Caminho A / A2 — politicas por dispositivo (em curso, `PORTREVISION=21`)
 
 Regras por dispositivo estilo UDM "client rules" (BG-041). Decisao em
