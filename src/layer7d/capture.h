@@ -62,6 +62,15 @@ struct layer7_capture *layer7_capture_open(const char *ifname, int snaplen,
     const char *protos_file, char *errbuf, int errbuflen);
 
 /*
+ * Caminho A / A3: liga/desliga o uso do SNI (TLS) / Host (HTTP) extraido pelo
+ * nDPI como hint de host para matching de politicas. OFF por defeito.
+ * Quando ON, o host do ClientHello (ex.: "rrX.googlevideo.com") e preferido
+ * sobre a heuristica de DNS reverso, melhorando bloqueio em CDNs e quando o
+ * DNS do cliente esta em cache ou cifrado.
+ */
+void layer7_capture_set_sni(struct layer7_capture *cap, int on);
+
+/*
  * Processa até batch_size pacotes (non-blocking se timeout_ms <= 0).
  * Retorno: número de pacotes processados, ou -1 em erro.
  */

@@ -693,6 +693,7 @@ function layer7_bare_config()
 			"block_quic" => false,
 			"block_quic_interfaces" => array(),
 			"block_dot_doq" => false,
+			"sni_inspection" => false,
 			"interfaces" => array("lan"),
 			"groups" => array(),
 			"policies" => array(),

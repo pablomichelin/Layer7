@@ -57,6 +57,16 @@ Com **interfaces seleccionadas** na GUI (bloquear QUIC só nesses segmentos),
 função **`layer7_pf_ifname_for_rules()`** que o trilho **DNS forcado** / `rdr`
 (refactor DRY; sem mudança de comportamento face a `_11`).
 
+## Inspecao por SNI (Caminho A / A3)
+
+Toggle `layer7.sni_inspection` (opt-in, OFF por defeito). Quando ON, o daemon
+usa o **SNI (TLS)** / **Host (HTTP)** que o nDPI ja extrai
+(`flow->host_server_name`) como host para matching de politicas, preferido
+sobre o DNS reverso. Melhora bloqueio em CDNs (IPs partilhados) e quando o DNS
+do cliente esta em cache ou cifrado. Continua passivo e por destino (o IP de
+destino entra em `layer7_block_dst`); sem MITM. Limitacao: TLS 1.3 **ECH**
+cifra o SNI. Decisao: `docs/03-adr/ADR-0013-bloqueio-por-sni-via-ndpi.md`.
+
 ## Politicas por dispositivo (Caminho A / A2)
 
 Um **grupo** pode conter `device_macs` (dispositivos por MAC). O pacote resolve

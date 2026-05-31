@@ -320,6 +320,14 @@ if ($_POST["save"] ?? false) {
 	    ? isset($_POST["block_dot_doq"])
 	    : !empty($current_l7["block_dot_doq"]);
 
+	/* sni_inspection: toggle do A3 (Caminho A). Quando ligado, o daemon usa
+	 * o SNI (TLS) / Host (HTTP) extraido pelo nDPI como host para matching de
+	 * politicas — melhora bloqueio em CDNs e quando o DNS esta cifrado/cache.
+	 * Defeito false (opt-in). Nao afecta regras PF; aplica-se no reload. */
+	$sni_inspection = $is_general_save
+	    ? isset($_POST["sni_inspection"])
+	    : !empty($current_l7["sni_inspection"]);
+
 	$rpt_enabled = !empty($current_reports["enabled"]);
 	$rpt_retention = (int)($current_reports["retention_days"] ?? 30);
 	$rpt_interval = (int)($current_reports["collect_interval"] ?? 5);
@@ -393,6 +401,7 @@ if ($_POST["save"] ?? false) {
 		$data["layer7"]["block_quic"] = false;
 		$data["layer7"]["block_quic_interfaces"] = $block_quic_ifaces;
 		$data["layer7"]["block_dot_doq"] = $block_dot_doq;
+		$data["layer7"]["sni_inspection"] = $sni_inspection;
 
 		$data["layer7"]["reports"] = array(
 			"enabled" => $rpt_enabled,
@@ -443,6 +452,7 @@ if ($dbgm < 0 || $dbgm > 720) {
 $block_quic_ifaces = isset($L["block_quic_interfaces"]) && is_array($L["block_quic_interfaces"])
     ? $L["block_quic_interfaces"] : array();
 $block_dot_doq = !empty($L["block_dot_doq"]);
+$sni_inspection = !empty($L["sni_inspection"]);
 $cur_lang = isset($L["language"]) ? $L["language"] : "pt";
 if (!in_array($cur_lang, array("pt", "en"), true)) {
 	$cur_lang = "pt";
@@ -541,6 +551,17 @@ layer7_render_styles();
 								<?= l7_t("Bloquear DNS-over-TLS / DNS-over-QUIC (TCP/UDP 853) para destinos externos"); ?>
 							</label>
 							<p class="help-block"><?= l7_t("Desligado por defeito. Activar reforca o anti-bypass DNS, mas pode quebrar 'DNS privado' em Android e algumas apps moveis (incluindo bancos) que dependem de DoT. So activar apos confirmar em laboratorio."); ?></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Inspecao por SNI (TLS)"); ?></label>
+						<div class="col-sm-9">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="sni_inspection" value="1" <?= $sni_inspection ? 'checked="checked"' : ""; ?> />
+								<?= l7_t("Usar o SNI (nome do servidor no TLS) e o Host (HTTP) para casar politicas por site"); ?>
+							</label>
+							<p class="help-block"><?= l7_t("Desligado por defeito. Quando ligado, o motor usa o hostname pedido em cada ligacao (extraido pelo nDPI) em vez de depender so de DNS reverso. Melhora bloqueio em CDNs (ex.: googlevideo) e quando o DNS do cliente esta em cache ou cifrado. Nao usa MITM e nao decifra trafego; nao funciona se o SNI estiver cifrado (TLS 1.3 ECH)."); ?></p>
 						</div>
 					</div>
 

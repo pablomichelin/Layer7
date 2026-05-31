@@ -187,6 +187,18 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 	}
 
 	{
+		const char *si = strstr(layer, "\"sni_inspection\"");
+		if (si && (!pol || si < pol)) {
+			const char *q = strchr(si + 16, ':');
+			if (q && q < end) {
+				q++;
+				if (parse_bool_after_colon(q, &out->sni_inspection) == 0)
+					out->has_sni_inspection = 1;
+			}
+		}
+	}
+
+	{
 		const char *pf = strstr(layer, "\"protos_file\"");
 		if (pf && (!pol || pf < pol)) {
 			const char *q = strchr(pf + 13, ':');

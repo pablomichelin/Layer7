@@ -71,6 +71,7 @@ struct layer7_capture {
 	time_t                               last_expire;
 	int                                  datalink;
 	int                                  protos_loaded;
+	int                                  use_sni; /* A3: usar SNI/Host do nDPI */
 };
 
 struct l7c_dns_hint {
@@ -300,6 +301,34 @@ observe_dns_query(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 	cap->dns_query_cb(cap->ifname, src_ip_str, resolver_ip_str, qname);
 }
 
+/*
+ * Caminho A / A3: valida um host (SNI/Host) antes de o usar para matching.
+ * Aceita apenas hostnames plausiveis (tem ponto, caracteres de dominio),
+ * evitando lixo de parsing. Nao aceita literais IP nem strings vazias.
+ */
+static int
+sni_host_plausible(const char *h)
+{
+	size_t i, len, dots = 0;
+
+	if (!h || h[0] == '\0')
+		return 0;
+	len = strlen(h);
+	if (len < 4 || len >= 80)
+		return 0;
+	for (i = 0; i < len; i++) {
+		char c = h[i];
+		if (c == '.') {
+			dots++;
+			continue;
+		}
+		if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+		    (c >= '0' && c <= '9') || c == '-' || c == '_'))
+			return 0;
+	}
+	return dots >= 1;
+}
+
 static uint32_t
 flow_hash(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp, uint8_t p)
 {
@@ -462,9 +491,17 @@ layer7_capture_open(const char *ifname, int snaplen, layer7_flow_cb cb,
 	cap->cb = cb;
 	cap->dns_cb = dns_cb;
 	cap->dns_query_cb = dns_query_cb;
+	cap->use_sni = 0;
 	snprintf(cap->ifname, sizeof(cap->ifname), "%s", ifname);
 	cap->last_expire = time(NULL);
 	return cap;
+}
+
+void
+layer7_capture_set_sni(struct layer7_capture *cap, int on)
+{
+	if (cap)
+		cap->use_sni = on ? 1 : 0;
 }
 
 static void
@@ -596,6 +633,20 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		addr.s_addr = htonl(log_dst);
 		inet_ntop(AF_INET, &addr, dst_ip_str, sizeof(dst_ip_str));
 		host_hint = dns_hint_lookup(log_dst, now);
+
+		/*
+		 * Caminho A / A3: prefere o SNI (TLS) / Host (HTTP) extraido
+		 * pelo nDPI sobre o hint de DNS reverso. E o host que o cliente
+		 * pediu nesta ligacao — mais preciso para CDNs e robusto quando
+		 * o DNS do cliente esta em cache ou cifrado. Tambem alimenta a
+		 * cache de hints para futuras ligacoes ao mesmo IP de destino.
+		 */
+		if (cap->use_sni && f->ndpi_flow &&
+		    f->ndpi_flow->host_server_name[0] != '\0' &&
+		    sni_host_plausible(f->ndpi_flow->host_server_name)) {
+			host_hint = f->ndpi_flow->host_server_name;
+			dns_hint_store(log_dst, host_hint, now);
+		}
 
 		cap->stat_flows_classified++;
 		cap->cb(cap->ifname, src_ip_str, dst_ip_str,

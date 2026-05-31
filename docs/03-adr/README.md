@@ -33,6 +33,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0010](ADR-0010-integridade-transacional-e-validacao-crud-license-server.md) | Integridade transacional e validacao do CRUD do license server | Aceito | define validacao de payload, transacoes, delete seguro e falha fechada no CRUD/activate |
 | [ADR-0011](ADR-0011-fonte-de-identidade-de-dispositivo.md) | Fonte de identidade de dispositivo (Caminho A / A1) | Aceito | define DHCP leases + ARP como fonte de inventario, vendor OUI best-effort, alias em `device_aliases` e limites honestos (L2, MAC aleatorizado) |
 | [ADR-0012](ADR-0012-politicas-por-dispositivo-mac-para-ip.md) | Politicas por dispositivo: resolucao MAC -> IP (Caminho A / A2) | Aceito | grupo aceita `device_macs`, pacote resolve para `device_ips` (DHCP/ARP), daemon le `device_ips` como src hosts; imposicao por IP; resync + static mapping; limite 64 |
+| [ADR-0013](ADR-0013-bloqueio-por-sni-via-ndpi.md) | Bloqueio por SNI/Host via nDPI (Caminho A / A3) | Aceito | usa SNI/Host ja extraido pelo nDPI (sem parser proprio, sem MITM); toggle `sni_inspection` opt-in OFF; bloqueio por destino; limitacao ECH |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

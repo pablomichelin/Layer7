@@ -4,6 +4,29 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Caminho A / A3 — bloqueio por SNI/Host via nDPI (em curso, `PORTREVISION=22`)
+
+Eficacia tipo UDM contra CDNs e DNS cifrado/cache (BG-042). Decisao em
+`docs/03-adr/ADR-0013-bloqueio-por-sni-via-ndpi.md`.
+
+#### Added
+
+- Toggle **`sni_inspection`** (opt-in, OFF por defeito) em Definicoes. Quando
+  ligado, o daemon usa o **SNI (TLS)** / **Host (HTTP)** que o nDPI ja extrai
+  (`flow->host_server_name`) como host para matching de politicas, preferido
+  sobre o DNS reverso, e alimenta a cache de hints por IP de destino.
+- `capture.c/.h`: `layer7_capture_set_sni()` + validacao `sni_host_plausible()`.
+- `config_parse.c/.h`: parsing de `sni_inspection`. `main.c` aplica o flag a
+  cada captura (e no reload SIGHUP, que reabre capturas).
+- `layer7.inc` (bare_config) + `layer7_settings.php`: toggle e persistencia.
+
+#### Notes
+
+- `PORTREVISION` -> `22`. **Sem parser TLS proprio** (reutiliza o do nDPI) e
+  **sem MITM/decifragem**. Continua passivo e por destino
+  (`layer7_block_dst`). Limitacao honesta: TLS 1.3 **ECH** cifra o SNI. Default
+  inalterado (opt-in) para previsibilidade.
+
 ### Caminho A / A2 — politicas por dispositivo (em curso, `PORTREVISION=21`)
 
 Regras por dispositivo estilo UDM "client rules" (BG-041). Decisao em

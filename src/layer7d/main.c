@@ -1763,9 +1763,10 @@ open_captures(void)
 				    s_parsed.interfaces[i], errbuf);
 				continue;
 			}
+			layer7_capture_set_sni(c, s_parsed.sni_inspection);
 			s_captures[s_n_captures++] = c;
-			L7_NOTE("capture: opened %s (nDPI active)",
-			    s_parsed.interfaces[i]);
+			L7_NOTE("capture: opened %s (nDPI active, sni_inspection=%d)",
+			    s_parsed.interfaces[i], s_parsed.sni_inspection);
 		}
 	}
 	if (s_n_captures == 0)
