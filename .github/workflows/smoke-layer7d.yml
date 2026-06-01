@@ -1,6 +1,10 @@
-# Compila layer7d (Linux) e corre scripts/package/smoke-layer7d.sh.
-# Não substitui validação do port `.pkg` no FreeBSD / pfSense nem os roteiros F4
-# no appliance (docs/04-package/validacao-lab.md: 10a / 10b / 11).
+# CI do layer7d (Linux). Cobre:
+#   - smoke do daemon (scripts/package/smoke-layer7d.sh)
+#   - sintaxe shell (shebang-aware)
+#   - testes funcionais + lint PHP/sh (tests/run-local.sh)
+#   - analise estatica C (cppcheck) e shell (shellcheck, severity=error)
+# Nao substitui a validacao do port `.pkg` no FreeBSD / pfSense nem os roteiros
+# F4 no appliance (docs/04-package/validacao-lab.md: 10a / 10b / 11).
 name: smoke layer7d
 
 on:
@@ -14,7 +18,7 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: pkg-plist vs files/
         run: sh scripts/package/check-port-files.sh
       - name: Toolchain + smoke
@@ -36,3 +40,21 @@ jobs:
             fi
           done < <(find scripts package/pfSense-pkg-layer7/files -type f \( -name '*.sh' -o -name 'pkg-*' -o -name 'layer7-pfctl' -o -path '*/rc.d/*' \) -print0)
           exit $fail
+      - name: Unit tests + lint (run-local)
+        run: |
+          # Compila e corre os testes funcionais (allowlist / config_parse) e
+          # faz lint de PHP da GUI e dos scripts sh do pacote.
+          sudo apt-get install -y --no-install-recommends php-cli
+          sh tests/run-local.sh
+      - name: Static analysis (cppcheck + shellcheck)
+        run: |
+          sudo apt-get install -y --no-install-recommends cppcheck shellcheck
+          # C: falha em error/warning reais (style nao quebra o build).
+          cppcheck --enable=warning --error-exitcode=2 --quiet \
+            --std=c11 -I src/layer7d -I src/common src/layer7d
+          # Shell: severity=error evita falsos-positivos (ex.: idioma CDPATH= ,
+          # heuristica SC2115). Pega erros reais de sintaxe/semantica.
+          find scripts tests package -type f \
+            \( -name '*.sh' -o -name 'layer7d' -o -name 'layer7-pfctl' \
+               -o -name 'layer7-unbound-anti-doh' \) -print0 \
+            | xargs -0 shellcheck -S error
