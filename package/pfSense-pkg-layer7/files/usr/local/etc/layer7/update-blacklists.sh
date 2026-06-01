@@ -429,6 +429,14 @@ update_lkg() {
 }
 
 promote_candidate() {
+	# Guarda de seguranca: CANDIDATE_SNAPSHOT_ID vem do manifesto via
+	# manifest_value e e inicializado vazio. Se chegar vazio aqui, o
+	# `rm -rf "$CACHE_DIR/$CANDIDATE_SNAPSHOT_ID"` abaixo apagaria o cache
+	# inteiro ("$CACHE_DIR/"). Aborta antes de tocar em qualquer arquivo.
+	if [ -z "${CANDIDATE_SNAPSHOT_ID:-}" ]; then
+		log "ERROR: promote_candidate abortado: snapshot_id vazio (manifesto invalido)"
+		exit 1
+	fi
 	_discovered_tmp="$TMP/discovered.json"
 	_state_tmp="$TMP/active-snapshot.state"
 	_cache_stage="$CACHE_DIR/.incoming-$CANDIDATE_SNAPSHOT_ID.$$"
