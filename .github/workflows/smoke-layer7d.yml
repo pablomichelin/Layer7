@@ -24,5 +24,15 @@ jobs:
           sh scripts/package/smoke-layer7d.sh
       - name: Shell syntax
         run: |
-          find scripts package/pfSense-pkg-layer7/files -type f \( -name '*.sh' -o -name 'pkg-*' -o -name 'layer7-pfctl' -o -path '*/rc.d/*' \) -print0 |
-            xargs -0 -n1 sh -n
+          # Valida sintaxe respeitando o shebang: scripts bash com `bash -n`,
+          # demais com `sh -n` (POSIX). Antes usava `sh -n` para tudo, o que
+          # acusava bash-isms (here-strings, subshells) em scripts #!/bin/bash.
+          fail=0
+          while IFS= read -r -d '' f; do
+            if head -1 "$f" | grep -Eq '(^#!.*\bbash\b)'; then
+              bash -n "$f" || { echo "bash -n falhou: $f"; fail=1; }
+            else
+              sh -n "$f" || { echo "sh -n falhou: $f"; fail=1; }
+            fi
+          done < <(find scripts package/pfSense-pkg-layer7/files -type f \( -name '*.sh' -o -name 'pkg-*' -o -name 'layer7-pfctl' -o -path '*/rc.d/*' \) -print0)
+          exit $fail

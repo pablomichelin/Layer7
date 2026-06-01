@@ -82,7 +82,7 @@ STUB
 	LDFLAGS_CRYPTO=""
 fi
 
-SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC blacklist.c bl_config.c"
+SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC blacklist.c bl_config.c allowlist.c"
 CFLAGS_NDPI="-DHAVE_NDPI=0"
 LDFLAGS_NDPI=""
 if [ -f /usr/local/include/ndpi/ndpi_api.h ] && [ -f /usr/local/lib/libndpi.a ]; then
