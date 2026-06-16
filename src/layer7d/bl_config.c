@@ -470,3 +470,68 @@ l7_bl_config_load(const char *path, struct l7_bl_config *cfg)
 	free(buf);
 	return 0;
 }
+
+static int
+bl_ip_in_cidr(const char *src_ip, const char *cidr_str)
+{
+	char addr_buf[48];
+	char *slash;
+	int prefix;
+	uint32_t src, net, mask;
+	unsigned int a, b, c, d;
+
+	if (!src_ip || !cidr_str || !*src_ip || !*cidr_str)
+		return 0;
+
+	strncpy(addr_buf, cidr_str, sizeof(addr_buf) - 1);
+	addr_buf[sizeof(addr_buf) - 1] = '\0';
+
+	slash = strchr(addr_buf, '/');
+	if (slash) {
+		*slash = '\0';
+		prefix = atoi(slash + 1);
+		if (prefix < 0 || prefix > 32)
+			return 0;
+	} else {
+		prefix = 32;
+	}
+
+	if (sscanf(src_ip, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+		return 0;
+	if (a > 255 || b > 255 || c > 255 || d > 255)
+		return 0;
+	src = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+
+	if (sscanf(addr_buf, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+		return 0;
+	if (a > 255 || b > 255 || c > 255 || d > 255)
+		return 0;
+	net = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+
+	if (prefix == 0)
+		return 1;
+	if (prefix >= 32)
+		return src == net;
+	mask = (uint32_t)(0xffffffffU << (unsigned)(32 - prefix));
+	return (src & mask) == (net & mask);
+}
+
+int
+l7_bl_rule_matches_src(const struct l7_bl_rule *rule, const char *src_ip)
+{
+	int i;
+
+	if (!rule || !src_ip || !*src_ip)
+		return 0;
+	for (i = 0; i < rule->n_except_ips; i++) {
+		if (strcmp(rule->except_ips[i], src_ip) == 0)
+			return 0;
+	}
+	if (rule->n_src_cidrs == 0)
+		return 1;
+	for (i = 0; i < rule->n_src_cidrs; i++) {
+		if (bl_ip_in_cidr(src_ip, rule->src_cidrs[i]))
+			return 1;
+	}
+	return 0;
+}

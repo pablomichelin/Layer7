@@ -69,7 +69,7 @@ if ($_POST["add_group"] ?? false) {
 		}
 		$groups[] = $group;
 		if (layer7_save_json($data)) {
-			layer7_signal_reload();
+			layer7_pf_config_resync();
 			$n_ips = isset($group["device_ips"]) ? count($group["device_ips"]) : 0;
 			$savemsg = empty($dev_macs)
 				? l7_t("Grupo adicionado.")
@@ -106,7 +106,7 @@ if ($_POST["delete_group"] ?? false) {
 		} else {
 			array_splice($groups, $idx, 1);
 			if (layer7_save_json($data)) {
-				layer7_signal_reload();
+				layer7_pf_config_resync();
 				$savemsg = l7_t("Grupo removido.");
 			}
 		}
@@ -163,7 +163,7 @@ if ($_POST["save_group_edit"] ?? false) {
 			}
 			$groups[$idx] = $group;
 			if (layer7_save_json($data)) {
-				layer7_signal_reload();
+				layer7_pf_config_resync();
 				header("Location: layer7_groups.php");
 				exit;
 			}

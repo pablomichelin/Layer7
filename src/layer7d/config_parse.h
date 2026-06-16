@@ -29,6 +29,10 @@ struct layer7_parsed {
 	int has_sni_inspection;
 	int sni_inspection; /* Caminho A / A3: usar SNI (TLS) extraido pelo nDPI
 	                     * como host para matching de politicas. Default off. */
+	int has_enforcement_model;
+	char enforcement_model[32]; /* Caminho B / E0: "legacy_global" (default)
+	                             * ou "scoped_hybrid". So parse em E0; runtime
+	                             * escopado activo a partir de E2/E3. */
 	int n_interfaces;
 	char interfaces[L7_MAX_INTERFACES][L7_IFACE_NAME_LEN];
 	int has_protos_file;

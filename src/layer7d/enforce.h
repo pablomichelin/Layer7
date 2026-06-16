@@ -9,6 +9,8 @@
 
 struct layer7_decision;
 
+enum layer7_enforce_kind;
+
 /* Tabela PF para block (admin cria em ruleset antes de enforce real) */
 #define L7_PF_TABLE_BLOCK "layer7_block"
 #define L7_PF_TABLE_BLOCK_DST "layer7_block_dst"
@@ -38,11 +40,28 @@ int layer7_pf_snprint_add(char *buf, size_t buflen, const char *table,
 int layer7_pf_exec_table_add(const char *table, const char *ip);
 int layer7_pf_exec_table_delete(const char *table, const char *ip);
 
+/* Caminho B / E3 — nome da tabela PF escopada por politica. */
+int layer7_pf_policy_table_name(enum layer7_enforce_kind kind, int idx,
+    char *buf, size_t buflen);
+
+const char *layer7_enforce_kind_str(enum layer7_enforce_kind kind);
+
 /*
- * Se dec->would_enforce_block_or_tag e IP válido: pfctl -T add.
- * Retorno: 0 = sem add (monitor/allow ou IP inválido); 1 = add OK; -1 = pfctl falhou.
+ * Resolve tabela e IP para block em runtime (scoped_hybrid ou legacy_global).
+ * Retorno: 1 = deve fazer add; 0 = sem add; -1 = erro de validacao.
+ * out_ip aponta para src_ip, dst_ip ou dec->enforce_dst_ip (nao copiar).
+ */
+int layer7_pf_resolve_block_target(const struct layer7_decision *dec,
+    const char *src_ip, const char *dst_ip, int scoped_hybrid,
+    char *out_table, size_t tbl_len, const char **out_ip);
+
+/*
+ * Se dec exige block/tag e IP valido: pfctl -T add.
+ * scoped_hybrid: block usa layer7_pdst_N / layer7_psrc_N; tag inalterado.
+ * Retorno: 0 = sem add; 1 = add OK; -1 = pfctl falhou.
  */
 int layer7_pf_enforce_decision(const struct layer7_decision *dec,
-    const char *src_ipv4, int dry_run);
+    const char *src_ipv4, const char *dst_ipv4, int scoped_hybrid,
+    int dry_run);
 
 #endif

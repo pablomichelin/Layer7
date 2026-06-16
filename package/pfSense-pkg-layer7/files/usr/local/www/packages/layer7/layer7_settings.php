@@ -328,6 +328,22 @@ if ($_POST["save"] ?? false) {
 	    ? isset($_POST["sni_inspection"])
 	    : !empty($current_l7["sni_inspection"]);
 
+	/* enforcement_model: Caminho B / E0. legacy_global = comportamento actual
+	 * (layer7_block_dst global). scoped_hybrid = PF escopado (E2+); so activar
+	 * apos validacao lab. Defeito legacy_global. */
+	$enforcement_model = "legacy_global";
+	if ($is_general_save) {
+		$em_post = trim((string)($_POST["enforcement_model"] ?? "legacy_global"));
+		if ($em_post === "scoped_hybrid") {
+			$enforcement_model = "scoped_hybrid";
+		}
+	} else {
+		$em_cur = isset($current_l7["enforcement_model"])
+		    ? (string)$current_l7["enforcement_model"] : "legacy_global";
+		$enforcement_model = ($em_cur === "scoped_hybrid")
+		    ? "scoped_hybrid" : "legacy_global";
+	}
+
 	$rpt_enabled = !empty($current_reports["enabled"]);
 	$rpt_retention = (int)($current_reports["retention_days"] ?? 30);
 	$rpt_interval = (int)($current_reports["collect_interval"] ?? 5);
@@ -402,6 +418,7 @@ if ($_POST["save"] ?? false) {
 		$data["layer7"]["block_quic_interfaces"] = $block_quic_ifaces;
 		$data["layer7"]["block_dot_doq"] = $block_dot_doq;
 		$data["layer7"]["sni_inspection"] = $sni_inspection;
+		$data["layer7"]["enforcement_model"] = $enforcement_model;
 
 		$data["layer7"]["reports"] = array(
 			"enabled" => $rpt_enabled,
@@ -413,6 +430,10 @@ if ($_POST["save"] ?? false) {
 		);
 
 		if (layer7_save_json($data)) {
+			$old_em = (isset($current_l7["enforcement_model"]) &&
+			    (string)$current_l7["enforcement_model"] === "scoped_hybrid")
+			    ? "scoped_hybrid" : "legacy_global";
+			$em_changed = ($old_em !== $enforcement_model);
 			layer7_signal_reload();
 			$old_mode = isset($current_l7["mode"]) ? (string)$current_l7["mode"] : "monitor";
 			$old_enabled = !empty($current_l7["enabled"]);
@@ -421,9 +442,13 @@ if ($_POST["save"] ?? false) {
 			    $old_quic_ifaces !== $data["layer7"]["block_quic_interfaces"] ||
 			    $old_mode !== $data["layer7"]["mode"] ||
 			    $old_enabled !== (bool)$data["layer7"]["enabled"] ||
-			    $old_dot_doq !== (bool)$data["layer7"]["block_dot_doq"]
+			    $old_dot_doq !== (bool)$data["layer7"]["block_dot_doq"] ||
+			    $em_changed
 			);
 			if ($pf_relevant_changed) {
+				if ($em_changed) {
+					layer7_flush_dynamic_tables();
+				}
 				if (function_exists("filter_configure")) {
 					filter_configure();
 				}
@@ -453,6 +478,9 @@ $block_quic_ifaces = isset($L["block_quic_interfaces"]) && is_array($L["block_qu
     ? $L["block_quic_interfaces"] : array();
 $block_dot_doq = !empty($L["block_dot_doq"]);
 $sni_inspection = !empty($L["sni_inspection"]);
+$enforcement_model = (isset($L["enforcement_model"]) &&
+    (string)$L["enforcement_model"] === "scoped_hybrid")
+    ? "scoped_hybrid" : "legacy_global";
 $cur_lang = isset($L["language"]) ? $L["language"] : "pt";
 if (!in_array($cur_lang, array("pt", "en"), true)) {
 	$cur_lang = "pt";
@@ -562,6 +590,17 @@ layer7_render_styles();
 								<?= l7_t("Usar o SNI (nome do servidor no TLS) e o Host (HTTP) para casar politicas por site"); ?>
 							</label>
 							<p class="help-block"><?= l7_t("Desligado por defeito. Quando ligado, o motor usa o hostname pedido em cada ligacao (extraido pelo nDPI) em vez de depender so de DNS reverso. Melhora bloqueio em CDNs (ex.: googlevideo) e quando o DNS do cliente esta em cache ou cifrado. Nao usa MITM e nao decifra trafego; nao funciona se o SNI estiver cifrado (TLS 1.3 ECH)."); ?></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Modelo de enforcement PF"); ?></label>
+						<div class="col-sm-9">
+							<select name="enforcement_model" class="form-control" style="max-width: 420px;">
+								<option value="legacy_global" <?= $enforcement_model === "legacy_global" ? 'selected="selected"' : ""; ?>><?= l7_t("Legacy global (actual — tabela layer7_block_dst partilhada)"); ?></option>
+								<option value="scoped_hybrid" <?= $enforcement_model === "scoped_hybrid" ? 'selected="selected"' : ""; ?>><?= l7_t("Escopado hibrido (experimental — Caminho B; requer blocos E2+)"); ?></option>
+							</select>
+							<p class="help-block"><?= l7_t("Por defeito: legacy global (recomendado). O modo escopado hibrido e experimental: bloqueia por politica e origem via tabelas layer7_pdst_* / layer7_psrc_*. So IPv4; DoH/DoT/QUIC podem contornar DNS/SNI; politicas app-only exigem flag quarantine_origin para quarentenar origem. Validar em laboratorio antes de produzao."); ?></p>
 						</div>
 					</div>
 

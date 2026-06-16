@@ -403,6 +403,8 @@ static unsigned long long s_cap_flows_expired;
 
 static char *read_file(const char *path, size_t *out_len);
 static int cfg_disabled(const struct layer7_parsed *p);
+static int run_shell_cmd_ok(const char *cmd);
+static void enforcement_flush_all_tables(void);
 
 static int
 effective_ll(void)
@@ -573,175 +575,292 @@ on_usr1(int sig)
 }
 
 #define L7_DST_CACHE_MAX 2048
-#define L7_DST_TTL_MIN   300
+#define L7_DST_TTL_MIN   60
+#define L7_DST_TTL_MAX   3600
+#define L7_DST_TTL_DEF   300
 #define L7_DST_SWEEP_SEC  60
 
-struct l7_dst_entry {
+struct l7_allow_cache_entry {
 	char     ip[48];
 	time_t   expires;
 };
-static struct l7_dst_entry s_dst_cache[L7_DST_CACHE_MAX];
-static int s_n_dst;
-static time_t s_last_dst_sweep;
+static struct l7_allow_cache_entry s_allow_cache[L7_DST_CACHE_MAX];
+static int s_n_allow_cache;
+
+struct l7_enforce_cache_entry {
+	char     table[64];
+	char     ip[48];
+	time_t   expires;
+};
+static struct l7_enforce_cache_entry s_enforce_cache[L7_DST_CACHE_MAX];
+static int s_n_enforce_cache;
+static time_t s_last_enforce_cache_sweep;
 
 static void
-dst_cache_add(const char *ip, uint32_t ttl)
+pf_table_flush_logged(const char *table, const char *ctx)
 {
-	int i;
-	time_t expires;
-	uint32_t eff_ttl = ttl < L7_DST_TTL_MIN ? L7_DST_TTL_MIN : ttl;
+	char cmd[128];
 
-	if (!ip || ip[0] == '\0')
+	if (!layer7_pf_table_name_ok(table))
 		return;
-
-	expires = time(NULL) + (time_t)eff_ttl;
-
-	for (i = 0; i < s_n_dst; i++) {
-		if (strcmp(s_dst_cache[i].ip, ip) == 0) {
-			if (expires > s_dst_cache[i].expires)
-				s_dst_cache[i].expires = expires;
-			return;
-		}
-	}
-	if (s_n_dst >= L7_DST_CACHE_MAX) {
-		time_t now = time(NULL);
-		int oldest = 0;
-		for (i = 1; i < s_n_dst; i++) {
-			if (s_dst_cache[i].expires < s_dst_cache[oldest].expires)
-				oldest = i;
-		}
-		if (s_dst_cache[oldest].expires > now)
-			return;
-		layer7_pf_exec_table_delete(L7_PF_TABLE_BLOCK_DST,
-		    s_dst_cache[oldest].ip);
-		s_dst_cache[oldest] = s_dst_cache[--s_n_dst];
-	}
-	snprintf(s_dst_cache[s_n_dst].ip, sizeof(s_dst_cache[0].ip), "%s", ip);
-	s_dst_cache[s_n_dst].expires = expires;
-	s_n_dst++;
+	snprintf(cmd, sizeof(cmd),
+	    "/sbin/pfctl -t %s -T flush 2>/dev/null", table);
+	if (!run_shell_cmd_ok(cmd))
+		L7_WARN("pfctl flush failed table=%s ctx=%s",
+		    table, ctx ? ctx : "-");
 }
 
 static void
-dst_cache_sweep(void)
+enforce_ge_downgrade(int prev_ge, const char *reason)
+{
+	if (prev_ge && !s_ge) {
+		L7_WARN("%s: license/config invalid — enforce disabled, "
+		    "flushing PF dynamic tables",
+		    reason ? reason : "enforce_downgrade");
+		enforcement_flush_all_tables();
+	}
+}
+
+static void
+allow_cache_add(const char *ip, uint32_t ttl)
+{
+	int i;
+	time_t expires;
+	uint32_t eff_ttl = ttl;
+
+	if (!ip || !layer7_pf_ipv4_host_ok(ip))
+		return;
+	if (eff_ttl < L7_DST_TTL_MIN)
+		eff_ttl = L7_DST_TTL_MIN;
+	if (eff_ttl > L7_DST_TTL_MAX)
+		eff_ttl = L7_DST_TTL_MAX;
+	expires = time(NULL) + (time_t)eff_ttl;
+
+	for (i = 0; i < s_n_allow_cache; i++) {
+		if (strcmp(s_allow_cache[i].ip, ip) == 0) {
+			if (expires > s_allow_cache[i].expires)
+				s_allow_cache[i].expires = expires;
+			return;
+		}
+	}
+	if (s_n_allow_cache >= L7_DST_CACHE_MAX) {
+		L7_WARN("allow_cache full (%d) — evicting oldest entry ip=%s",
+		    L7_DST_CACHE_MAX, s_allow_cache[0].ip);
+		layer7_pf_exec_table_delete(L7_PF_TABLE_ALLOW_DST,
+		    s_allow_cache[0].ip);
+		memmove(&s_allow_cache[0], &s_allow_cache[1],
+		    (size_t)(s_n_allow_cache - 1) * sizeof(s_allow_cache[0]));
+		s_n_allow_cache--;
+	}
+	snprintf(s_allow_cache[s_n_allow_cache].ip,
+	    sizeof(s_allow_cache[0].ip), "%s", ip);
+	s_allow_cache[s_n_allow_cache].expires = expires;
+	s_n_allow_cache++;
+}
+
+static void
+allow_cache_sweep(void)
 {
 	time_t now = time(NULL);
 	int i;
 
-	if (now - s_last_dst_sweep < L7_DST_SWEEP_SEC)
-		return;
-	s_last_dst_sweep = now;
-
-	for (i = 0; i < s_n_dst; ) {
-		if (s_dst_cache[i].expires < now) {
-			layer7_pf_exec_table_delete(L7_PF_TABLE_BLOCK_DST,
-			    s_dst_cache[i].ip);
-			s_dst_cache[i] = s_dst_cache[--s_n_dst];
+	for (i = 0; i < s_n_allow_cache; ) {
+		if (s_allow_cache[i].expires < now) {
+			layer7_pf_exec_table_delete(L7_PF_TABLE_ALLOW_DST,
+			    s_allow_cache[i].ip);
+			s_allow_cache[i] =
+			    s_allow_cache[--s_n_allow_cache];
 		} else
 			i++;
 	}
 }
 
 static void
-dst_cache_flush(void)
+enforce_cache_add(const char *table, const char *ip, uint32_t ttl)
+{
+	int i;
+	time_t expires;
+	uint32_t eff_ttl = ttl;
+
+	if (!table || !table[0] || !ip || ip[0] == '\0')
+		return;
+	if (!layer7_pf_table_name_ok(table) || !layer7_pf_ipv4_host_ok(ip))
+		return;
+
+	if (eff_ttl < L7_DST_TTL_MIN)
+		eff_ttl = L7_DST_TTL_MIN;
+	if (eff_ttl > L7_DST_TTL_MAX)
+		eff_ttl = L7_DST_TTL_MAX;
+	if (eff_ttl == 0)
+		eff_ttl = L7_DST_TTL_DEF;
+	expires = time(NULL) + (time_t)eff_ttl;
+
+	for (i = 0; i < s_n_enforce_cache; i++) {
+		if (strcmp(s_enforce_cache[i].table, table) == 0 &&
+		    strcmp(s_enforce_cache[i].ip, ip) == 0) {
+			if (expires > s_enforce_cache[i].expires)
+				s_enforce_cache[i].expires = expires;
+			return;
+		}
+	}
+	if (s_n_enforce_cache >= L7_DST_CACHE_MAX) {
+		time_t now = time(NULL);
+		int oldest = 0;
+		int swept = 0;
+
+		for (i = 0; i < s_n_enforce_cache; ) {
+			if (s_enforce_cache[i].expires < now) {
+				layer7_pf_exec_table_delete(
+				    s_enforce_cache[i].table,
+				    s_enforce_cache[i].ip);
+				s_enforce_cache[i] =
+				    s_enforce_cache[--s_n_enforce_cache];
+				swept++;
+			} else
+				i++;
+		}
+		if (swept > 0)
+			L7_WARN("enforce_cache full — swept %d expired entries",
+			    swept);
+		if (s_n_enforce_cache >= L7_DST_CACHE_MAX) {
+			for (i = 1; i < s_n_enforce_cache; i++) {
+				if (s_enforce_cache[i].expires <
+				    s_enforce_cache[oldest].expires)
+					oldest = i;
+			}
+			L7_WARN("enforce_cache full — evicting oldest "
+			    "table=%s ip=%s",
+			    s_enforce_cache[oldest].table,
+			    s_enforce_cache[oldest].ip);
+			layer7_pf_exec_table_delete(
+			    s_enforce_cache[oldest].table,
+			    s_enforce_cache[oldest].ip);
+			s_enforce_cache[oldest] =
+			    s_enforce_cache[--s_n_enforce_cache];
+		}
+		if (s_n_enforce_cache >= L7_DST_CACHE_MAX) {
+			L7_WARN("enforce_cache still full after eviction — "
+			    "skip add table=%s ip=%s", table, ip);
+			return;
+		}
+	}
+	snprintf(s_enforce_cache[s_n_enforce_cache].table,
+	    sizeof(s_enforce_cache[0].table), "%s", table);
+	snprintf(s_enforce_cache[s_n_enforce_cache].ip,
+	    sizeof(s_enforce_cache[0].ip), "%s", ip);
+	s_enforce_cache[s_n_enforce_cache].expires = expires;
+	s_n_enforce_cache++;
+}
+
+static void
+enforce_cache_sweep(void)
+{
+	time_t now = time(NULL);
+	int i;
+
+	if (now - s_last_enforce_cache_sweep < L7_DST_SWEEP_SEC)
+		return;
+	s_last_enforce_cache_sweep = now;
+
+	for (i = 0; i < s_n_enforce_cache; ) {
+		if (s_enforce_cache[i].expires < now) {
+			layer7_pf_exec_table_delete(s_enforce_cache[i].table,
+			    s_enforce_cache[i].ip);
+			s_enforce_cache[i] =
+			    s_enforce_cache[--s_n_enforce_cache];
+		} else
+			i++;
+	}
+	allow_cache_sweep();
+}
+
+static void
+enforce_cache_flush(void)
 {
 	int i;
 
-	for (i = 0; i < s_n_dst; i++) {
-		layer7_pf_exec_table_delete(L7_PF_TABLE_BLOCK_DST,
-		    s_dst_cache[i].ip);
+	for (i = 0; i < s_n_enforce_cache; i++) {
+		layer7_pf_exec_table_delete(s_enforce_cache[i].table,
+		    s_enforce_cache[i].ip);
 	}
-	s_n_dst = 0;
-	/* Bloco 5: garantir que a tabela fica vazia mesmo se houverem
-	 * entradas residuais nao reflectidas no cache (ex.: enforce anterior
-	 * num pid antigo). Defensivo: nao depende de pidfile/conhecimento. */
-	{
-		char cmd[160];
-		snprintf(cmd, sizeof(cmd),
-		    "/sbin/pfctl -t %s -T flush 2>/dev/null",
-		    L7_PF_TABLE_BLOCK_DST);
-		(void)system(cmd);
-	}
+	s_n_enforce_cache = 0;
+	pf_table_flush_logged(L7_PF_TABLE_BLOCK_DST, "enforce_cache_flush");
 }
 
 /*
  * Esvazia todas as tabelas PF dinamicas controladas pelo Layer7
- * (Bloco 5): `layer7_block_dst`, `layer7_block`, e qualquer `layer7_bld_N`.
- * Usada nas transicoes enforce -> passivo e no shutdown limpo do daemon.
- * Mantem `layer7_allow_dst` intacta (e estatica + alimentada por DNS).
+ * (Bloco 5): `layer7_block_dst`, `layer7_block`, `layer7_bld_*`,
+ * `layer7_pdst_*`, `layer7_psrc_*` e entradas DNS em `layer7_allow_dst`.
+ * Entradas estaticas IPv4/CIDR da allowlist sao repovoadas pelo pacote via
+ * `layer7_dst_allowlist_apply_to_pf()` em filter reload / resync.
  */
 static void
 enforcement_flush_all_tables(void)
 {
-	char cmd[256];
 	int i;
 
-	snprintf(cmd, sizeof(cmd),
-	    "/sbin/pfctl -t %s -T flush 2>/dev/null",
-	    L7_PF_TABLE_BLOCK_DST);
-	(void)system(cmd);
+	pf_table_flush_logged(L7_PF_TABLE_BLOCK_DST, "flush_all");
+	pf_table_flush_logged(L7_PF_TABLE_BLOCK, "flush_all");
 
-	snprintf(cmd, sizeof(cmd),
-	    "/sbin/pfctl -t %s -T flush 2>/dev/null",
-	    L7_PF_TABLE_BLOCK);
-	(void)system(cmd);
+	for (i = 0; i < L7_BL_MAX_RULES; i++) {
+		char tbl[32];
 
-	for (i = 0; i < s_bl_n_rules; i++) {
-		snprintf(cmd, sizeof(cmd),
-		    "/sbin/pfctl -t layer7_bld_%d -T flush 2>/dev/null", i);
-		(void)system(cmd);
+		snprintf(tbl, sizeof(tbl), "layer7_bld_%d", i);
+		pf_table_flush_logged(tbl, "flush_all");
 	}
 
-	s_n_dst = 0;
+	for (i = 0; i < L7_MAX_POLICIES; i++) {
+		char tbl[32];
+
+		snprintf(tbl, sizeof(tbl), "layer7_pdst_%d", i);
+		pf_table_flush_logged(tbl, "flush_all");
+		snprintf(tbl, sizeof(tbl), "layer7_psrc_%d", i);
+		pf_table_flush_logged(tbl, "flush_all");
+	}
+
+	pf_table_flush_logged(L7_PF_TABLE_ALLOW_DST, "flush_all");
+	s_n_enforce_cache = 0;
+	s_n_allow_cache = 0;
 }
 
-/*
- * Verifica se src_ip (string "a.b.c.d") esta dentro de cidr_str
- * (string "a.b.c.d/prefix" ou "a.b.c.d"). Retorna 1 se sim, 0 se nao.
- * Falha graciosamente: retorna 0 se o parse falhar.
- */
-static int
-ip_in_cidr(const char *src_ip, const char *cidr_str)
+static int layer7_pf_add_with_selfheal(const char *table, const char *ip,
+    const char *reason);
+
+static void
+layer7_apply_block_enforcement(const struct layer7_decision *dec,
+    const char *src_ip, const char *dst_ip, uint32_t ttl,
+    int scoped_hybrid, const char *reason)
 {
-	char addr_buf[48];
-	char *slash;
-	int prefix;
-	uint32_t src, net, mask;
-	unsigned int a, b, c, d;
+	char tbl[64];
+	const char *ip;
+	int r;
 
-	if (!src_ip || !cidr_str || !*src_ip || !*cidr_str)
-		return 0;
+	if (!dec || !s_ge)
+		return;
 
-	strncpy(addr_buf, cidr_str, sizeof(addr_buf) - 1);
-	addr_buf[sizeof(addr_buf) - 1] = '\0';
+	r = layer7_pf_resolve_block_target(dec, src_ip, dst_ip, scoped_hybrid,
+	    tbl, sizeof(tbl), &ip);
+	if (r <= 0)
+		return;
 
-	slash = strchr(addr_buf, '/');
-	if (slash) {
-		*slash = '\0';
-		prefix = atoi(slash + 1);
-		if (prefix < 0 || prefix > 32)
-			return 0;
+	r = layer7_pf_add_with_selfheal(tbl, ip, reason);
+	if (r == 0) {
+		s_pf_dst_add_ok++;
+		enforce_cache_add(tbl, ip, ttl);
+		L7_INFO("enforce_block: kind=%s table=%s ip=%s policy=%s "
+		    "reason=%s",
+		    layer7_enforce_kind_str(dec->enforce_kind), tbl, ip,
+		    dec->matched_policy_id[0] ?
+		    dec->matched_policy_id : "-",
+		    reason ? reason : "-");
 	} else {
-		prefix = 32;
+		s_pf_dst_add_fail++;
+		L7_WARN("enforce_block: pfctl add failed kind=%s table=%s "
+		    "ip=%s policy=%s",
+		    layer7_enforce_kind_str(dec->enforce_kind), tbl, ip,
+		    dec->matched_policy_id[0] ?
+		    dec->matched_policy_id : "-");
 	}
-
-	if (sscanf(src_ip, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
-		return 0;
-	if (a > 255 || b > 255 || c > 255 || d > 255)
-		return 0;
-	src = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
-
-	if (sscanf(addr_buf, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
-		return 0;
-	if (a > 255 || b > 255 || c > 255 || d > 255)
-		return 0;
-	net = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
-
-	if (prefix == 0)
-		return 1;
-	if (prefix >= 32)
-		return src == net;
-	mask = (uint32_t)(0xffffffffU << (unsigned)(32 - prefix));
-	return (src & mask) == (net & mask);
 }
 
 static int
@@ -760,24 +879,12 @@ bl_rule_matches_domain(const struct l7_bl_rule *rule, const char *domain,
 }
 
 /*
- * Verifica se src_ip pertence a algum dos src_cidrs da regra.
- * Se a regra nao tem CIDRs de origem, aplica-se a todos (retorna 1).
- * Falha graciosamente: se ip_in_cidr falhar, nao bloqueia.
+ * Verifica se src_ip pertence a algum dos src_cidrs da regra blacklist.
  */
 static int
 bl_rule_matches_src(const struct l7_bl_rule *rule, const char *src_ip)
 {
-	int i;
-
-	if (!rule || !src_ip || !*src_ip)
-		return 0;
-	if (rule->n_src_cidrs == 0)
-		return 1;
-	for (i = 0; i < rule->n_src_cidrs; i++) {
-		if (ip_in_cidr(src_ip, rule->src_cidrs[i]))
-			return 1;
-	}
-	return 0;
+	return l7_bl_rule_matches_src(rule, src_ip);
 }
 
 static int
@@ -837,13 +944,7 @@ pf_table_add_entry(const char *table, const char *entry)
 static void
 pf_table_flush(const char *table)
 {
-	char cmd[96];
-
-	if (!layer7_pf_table_name_ok(table))
-		return;
-	snprintf(cmd, sizeof(cmd),
-	    "/sbin/pfctl -t %s -T flush 2>/dev/null", table);
-	(void)system(cmd);
+	pf_table_flush_logged(table, "pf_table_flush");
 }
 
 /*
@@ -946,23 +1047,31 @@ layer7_pf_add_with_selfheal(const char *table, const char *ip,
 static void
 bl_flush_rule_tables(void)
 {
-	char cmd[128];
+	char tbl[32];
 	int i;
+
 	for (i = 0; i < L7_BL_MAX_RULES; i++) {
-		snprintf(cmd, sizeof(cmd),
-		    "/sbin/pfctl -t layer7_bld_%d -T flush 2>/dev/null", i);
-		(void)system(cmd);
+		snprintf(tbl, sizeof(tbl), "layer7_bld_%d", i);
+		pf_table_flush_logged(tbl, "bl_reload");
 	}
+}
+
+static int
+enforcement_is_scoped_hybrid(void)
+{
+	return s_parsed.has_enforcement_model &&
+	    strcmp(s_parsed.enforcement_model, "scoped_hybrid") == 0;
 }
 
 static void
 layer7_on_dns_resolved(const char *iface, const char *client_ip,
     const char *domain, const char *resolved_ip, uint32_t ttl)
 {
-	int r;
+	struct layer7_decision dec;
+	int scoped;
 	int dom_allow, ip_allow;
 
-	if (!s_have_parse || !s_ge)
+	if (!s_have_parse || cfg_disabled(&s_parsed) || !s_ge)
 		return;
 
 	/* Allowlist gate (Bloco 3): se o dominio resolvido estiver na lista
@@ -973,9 +1082,12 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	ip_allow = (resolved_ip && *resolved_ip &&
 	    l7_allowlist_contains_ip(&s_allowlist, resolved_ip));
 	if (dom_allow || ip_allow) {
-		if (resolved_ip && *resolved_ip)
-			(void)pf_table_add_entry(L7_PF_TABLE_ALLOW_DST,
-			    resolved_ip);
+		if (resolved_ip && *resolved_ip &&
+		    layer7_pf_ipv4_host_ok(resolved_ip)) {
+			if (pf_table_add_entry(L7_PF_TABLE_ALLOW_DST,
+			    resolved_ip) == 0)
+				allow_cache_add(resolved_ip, ttl);
+		}
 		s_allow_hits++;
 		L7_INFO("allowlist_dns: iface=%s domain=%s ip=%s "
 		    "(%s) — pf_pass",
@@ -985,25 +1097,28 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 		return;
 	}
 
-	if (layer7_domain_is_blocked(s_rules, s_np, domain)) {
-		r = layer7_pf_add_with_selfheal(L7_PF_TABLE_BLOCK_DST,
-		    resolved_ip, "dns_block_dst");
-		if (r == 0) {
-			s_pf_dst_add_ok++;
-			dst_cache_add(resolved_ip, ttl);
-			L7_INFO("dns_block: iface=%s domain=%s ip=%s ttl=%u table=%s",
-			    iface ? iface : "-", domain, resolved_ip, ttl,
-			    L7_PF_TABLE_BLOCK_DST);
-		} else {
-			s_pf_dst_add_fail++;
-			L7_WARN("dns_block: pfctl add failed iface=%s domain=%s ip=%s",
-			    iface ? iface : "-", domain, resolved_ip);
-		}
+	scoped = enforcement_is_scoped_hybrid();
+	memset(&dec, 0, sizeof(dec));
+	(void)layer7_decide_for_client(s_exc, s_nx, s_rules, s_np, s_ge,
+	    iface, client_ip, domain, NULL, NULL, &dec);
+	if (resolved_ip && *resolved_ip) {
+		strncpy(dec.enforce_dst_ip, resolved_ip,
+		    sizeof(dec.enforce_dst_ip) - 1);
+		dec.enforce_dst_ip[sizeof(dec.enforce_dst_ip) - 1] = '\0';
+	}
+	if (dec.would_enforce_block_or_tag &&
+	    dec.action == LAYER7_ACTION_BLOCK &&
+	    resolved_ip && *resolved_ip &&
+	    layer7_pf_ipv4_host_ok(resolved_ip)) {
+		layer7_apply_block_enforcement(&dec, client_ip,
+		    resolved_ip, ttl, scoped, "dns_block");
 		return;
 	}
 
-	if (s_blacklist && s_bl_n_rules > 0) {
+	if (s_blacklist && s_bl_n_rules > 0 && resolved_ip &&
+	    layer7_pf_ipv4_host_ok(resolved_ip)) {
 		int ri;
+
 		s_bl_lookups++;
 		for (ri = 0; ri < s_bl_n_rules; ri++) {
 			char tbl[32];
@@ -1018,10 +1133,10 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 			s_bl_hits++;
 			s_bl_dns_hits++;
 			snprintf(tbl, sizeof(tbl), "layer7_bld_%d", ri);
-			r = layer7_pf_add_with_selfheal(tbl, resolved_ip,
-			    "dns_blacklist_rule");
-			if (r == 0) {
+			if (layer7_pf_add_with_selfheal(tbl, resolved_ip,
+			    "dns_blacklist_rule") == 0) {
 				s_pf_dst_add_ok++;
+				enforce_cache_add(tbl, resolved_ip, ttl);
 				L7_INFO("bl_block: iface=%s domain=%s "
 				    "cat=%s client=%s ip=%s rule=%d/%s "
 				    "table=%s", iface ? iface : "-",
@@ -1032,6 +1147,10 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 				s_pf_dst_add_fail++;
 			}
 		}
+	} else if (resolved_ip && *resolved_ip &&
+	    !layer7_pf_ipv4_host_ok(resolved_ip)) {
+		L7_WARN("dns_blacklist: skip invalid resolved ip=%s domain=%s",
+		    resolved_ip, domain ? domain : "-");
 	}
 }
 
@@ -1051,8 +1170,9 @@ layer7_on_dns_query(const char *iface, const char *src_ip,
 
 /*
  * Chamado pelo loop quando nDPI classificar um fluxo (origem + app/cat).
- * mode=enforce + decisão block → dst_ip em layer7_block_dst.
- * mode=enforce + decisão tag  → src_ip em layer7_tagged.
+ * mode=enforce + block scoped_hybrid → pdst (destino) ou psrc (origem).
+ * mode=enforce + block legacy_global → dst_ip em layer7_block_dst.
+ * mode=enforce + tag → src_ip em layer7_tagged.
  * mode=monitor → apenas loga a decisão, nunca chama pfctl.
  */
 static void
@@ -1106,42 +1226,48 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 	if (!s_ge)
 		return;
 
-	if (dec.action == LAYER7_ACTION_BLOCK && dst_ip &&
-	    layer7_pf_ipv4_host_ok(dst_ip)) {
-		/* Allowlist gate (Bloco 3): nunca bloquear destinos da lista
-		 * branca (dominios — via SNI/host — ou IPs/CIDRs). Adiciona
-		 * o IP a `layer7_allow_dst` se bateu por dominio, para o PF
-		 * continuar a passar nas proximas conexoes ao mesmo IP. */
-		int dom_allow = (host && *host &&
-		    l7_allowlist_contains_domain(&s_allowlist, host));
-		int ip_allow =
-		    l7_allowlist_contains_ip(&s_allowlist, dst_ip);
-		if (dom_allow || ip_allow) {
-			if (dom_allow)
-				(void)pf_table_add_entry(
-				    L7_PF_TABLE_ALLOW_DST, dst_ip);
-			s_allow_hits++;
-			L7_NOTE("allowlist_flow: iface=%s host=%s dst=%s "
-			    "(%s) — skip block policy=%s",
-			    iface ? iface : "-", host ? host : "-", dst_ip,
-			    dom_allow ? "domain" : "ip",
-			    dec.matched_policy_id[0] ?
-			    dec.matched_policy_id : "-");
-		} else {
-			r = layer7_pf_add_with_selfheal(L7_PF_TABLE_BLOCK_DST,
-			    dst_ip, "flow_block_dst");
-			if (r == 0) {
-				s_pf_dst_add_ok++;
-				dst_cache_add(dst_ip, L7_DST_TTL_MIN);
-				L7_INFO("enforce_block_dst: iface=%s dst=%s "
-				    "policy=%s",
-				    iface ? iface : "-", dst_ip,
+	if (dec.action == LAYER7_ACTION_BLOCK) {
+		/* App-only (src_scoped): quarentena origem so com flag
+		 * explicita quarantine_origin/quarantine. */
+		if (enforcement_is_scoped_hybrid() &&
+		    dec.enforce_kind == L7_ENFORCE_SRC_SCOPED) {
+			if (dec.quarantine_origin &&
+			    layer7_pf_ipv4_host_ok(src_ip)) {
+				layer7_apply_block_enforcement(&dec, src_ip,
+				    dst_ip, L7_DST_TTL_DEF, 1,
+				    "flow_block_psrc");
+			} else {
+				L7_NOTE("flow_block: app-only policy=%s sem "
+				    "quarantine_origin — skip psrc quarantine "
+				    "src=%s app=%s",
+				    dec.matched_policy_id[0] ?
+				    dec.matched_policy_id : "-",
+				    src_ip,
+				    ndpi_app ? ndpi_app : "-");
+			}
+		} else if (dst_ip && layer7_pf_ipv4_host_ok(dst_ip)) {
+			/* Allowlist gate (Bloco 3): nunca bloquear destinos
+			 * da lista branca (SNI/host ou IP/CIDR). */
+			int dom_allow = (host && *host &&
+			    l7_allowlist_contains_domain(&s_allowlist, host));
+			int ip_allow =
+			    l7_allowlist_contains_ip(&s_allowlist, dst_ip);
+
+			if (dom_allow || ip_allow) {
+				if (dom_allow)
+					(void)pf_table_add_entry(
+					    L7_PF_TABLE_ALLOW_DST, dst_ip);
+				s_allow_hits++;
+				L7_NOTE("allowlist_flow: iface=%s host=%s "
+				    "dst=%s (%s) — skip block policy=%s",
+				    iface ? iface : "-", host ? host : "-",
+				    dst_ip, dom_allow ? "domain" : "ip",
 				    dec.matched_policy_id[0] ?
 				    dec.matched_policy_id : "-");
-			} else if (r == -1) {
-				s_pf_dst_add_fail++;
-				L7_WARN("pfctl add failed table=%s ip=%s",
-				    L7_PF_TABLE_BLOCK_DST, dst_ip);
+			} else {
+				layer7_apply_block_enforcement(&dec, src_ip,
+				    dst_ip, L7_DST_TTL_DEF,
+				    enforcement_is_scoped_hybrid(), "flow_block");
 			}
 		}
 	}
@@ -1248,33 +1374,61 @@ run_enforce_once_cli(const char *path, const char *ip, const char *app,
 	layer7_policies_sort(rules, np);
 	layer7_exceptions_sort(exc, nx);
 	ge = p.has_mode && strcmp(p.mode, "enforce") == 0;
-	free(buf);
+	{
+		int scoped = p.has_enforcement_model &&
+		    strcmp(p.enforcement_model, "scoped_hybrid") == 0;
+		char tbl[64];
+		const char *enforce_ip;
 
-	layer7_flow_decide(exc, nx, rules, np, ge, NULL, ip, app, cat, NULL,
-	    &dec);
-	printf(
-	    "enforce-once: action=%s reason=%s would_enforce=%d table=%s\n",
-	    layer7_action_str(dec.action),
-	    layer7_decide_reason_str(dec.reason), dec.would_enforce_block_or_tag,
-	    dec.pf_table[0] ? dec.pf_table : "(none)");
+		free(buf);
 
-	r = layer7_pf_enforce_decision(&dec, ip, dry);
-	if (r == -1) {
-		fprintf(stderr, "layer7d: pfctl add failed (table=%s ip=%s)\n",
-		    dec.pf_table, ip);
-		return 1;
+		layer7_flow_decide(exc, nx, rules, np, ge, NULL, ip, app, cat,
+		    NULL, &dec);
+		printf(
+		    "enforce-once: action=%s reason=%s would_enforce=%d "
+		    "kind=%s idx=%d policy=%s\n",
+		    layer7_action_str(dec.action),
+		    layer7_decide_reason_str(dec.reason),
+		    dec.would_enforce_block_or_tag,
+		    layer7_enforce_kind_str(dec.enforce_kind),
+		    dec.policy_table_idx,
+		    dec.matched_policy_id[0] ? dec.matched_policy_id :
+		    "(none)");
+
+		r = layer7_pf_enforce_decision(&dec, ip, NULL, scoped, dry);
+		if (r == -1) {
+			fprintf(stderr,
+			    "layer7d: pfctl add failed (policy=%s ip=%s)\n",
+			    dec.matched_policy_id[0] ? dec.matched_policy_id :
+			    "-", ip);
+			return 1;
+		}
+		if (dec.action == LAYER7_ACTION_BLOCK &&
+		    layer7_pf_resolve_block_target(&dec, ip, NULL, scoped, tbl,
+		    sizeof(tbl), &enforce_ip) == 1) {
+			if (dry)
+				printf("dry-run: pfctl -t %s -T add %s\n", tbl,
+				    enforce_ip);
+			else if (r == 1)
+				printf("pfctl add ok: kind=%s table=%s ip=%s "
+				    "policy=%s\n",
+				    layer7_enforce_kind_str(dec.enforce_kind),
+				    tbl, enforce_ip,
+				    dec.matched_policy_id[0] ?
+				    dec.matched_policy_id : "-");
+		} else if (dec.action == LAYER7_ACTION_TAG &&
+		    dec.would_enforce_block_or_tag && dec.pf_table[0] &&
+		    layer7_pf_ipv4_host_ok(ip)) {
+			if (dry)
+				printf("dry-run: pfctl -t %s -T add %s\n",
+				    dec.pf_table, ip);
+			else if (r == 1)
+				printf("pfctl add ok: table=%s ip=%s\n",
+				    dec.pf_table, ip);
+		} else
+			printf("no pf table add (monitor/allow or mode!=enforce)\n");
+		return 0;
 	}
-	if (dec.would_enforce_block_or_tag && dec.pf_table[0] &&
-	    layer7_pf_ipv4_host_ok(ip)) {
-		if (dry)
-			printf("dry-run: pfctl -t %s -T add %s\n", dec.pf_table,
-			    ip);
-		else if (r == 1)
-			printf("pfctl add ok: table=%s ip=%s\n", dec.pf_table,
-			    ip);
-	} else
-		printf("no pf table add (monitor/allow or mode!=enforce)\n");
-	return 0;
 }
 
 static void
@@ -1990,6 +2144,7 @@ int main(int argc, char **argv)
 		L7_WARN("license: INVALID — %s", s_lic.error);
 		L7_WARN("license: enforce disabled, monitor-only mode");
 		s_ge = 0;
+		enforcement_flush_all_tables();
 	}
 
 	/* Load blacklists at startup (same logic as SIGHUP reload) */
@@ -2088,7 +2243,7 @@ int main(int argc, char **argv)
 			    (unsigned long long)s_pf_table_add_fail,
 			    (unsigned long long)s_pf_dst_add_ok,
 			    (unsigned long long)s_pf_dst_add_fail,
-			    s_n_dst,
+			    s_n_enforce_cache,
 			    (unsigned long long)s_cap_pkts,
 			    (unsigned long long)s_cap_flows_classified,
 			    (unsigned long long)s_cap_flows_expired,
@@ -2117,7 +2272,7 @@ int main(int argc, char **argv)
 			s_sighup_count++;
 			prev_ge = s_ge;
 			L7_NOTE("SIGHUP: reload config");
-			dst_cache_flush();
+			enforce_cache_flush();
 			close_captures();
 			if (stat(config_path, &st) == 0)
 				(void)apply_config(1);
@@ -2236,8 +2391,11 @@ int main(int argc, char **argv)
 			time_t tnow = time(NULL);
 			if (tnow - s_last_lic_check >= L7_LIC_CHECK_INTERVAL) {
 				struct l7_license_info li;
+				int prev_ge;
+
 				s_last_lic_check = tnow;
 				memset(&li, 0, sizeof(li));
+				prev_ge = s_ge;
 				if (layer7_license_check(&li) == 0) {
 					s_lic = li;
 					refresh_enforce_cfg();
@@ -2251,6 +2409,8 @@ int main(int argc, char **argv)
 					L7_WARN("license_recheck: enforce "
 					    "disabled, monitor-only");
 					s_ge = 0;
+					enforce_ge_downgrade(prev_ge,
+					    "license_recheck");
 				}
 			}
 		}
@@ -2270,7 +2430,7 @@ int main(int argc, char **argv)
 				if (r > 0)
 					total += r;
 			}
-			dst_cache_sweep();
+			enforce_cache_sweep();
 			if (total == 0)
 				usleep(10000);
 			if (tick % 600 == 0 && tick > 0) {

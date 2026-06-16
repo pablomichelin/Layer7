@@ -5,12 +5,15 @@ real de aplicacoes, sites, servicos e funcoes de produto no pfSense CE.
 
 ## Estado
 
-**Todas as fases concluidas na v1.0.0 (2026-03-23).**
+**Caminho A (A0–A5):** concluido em `1.8.11_23`.  
+**Caminho B (Enforcement 100%):** em execucao — ver plano abaixo.
 
 ## Documentos
 
-- [`blocking-master-plan.md`](blocking-master-plan.md) — plano mestre de
-  implementacao, riscos, fases, testes e rollout (todas as fases concluidas)
+- **[`plano-enforcement-100-porcento.md`](plano-enforcement-100-porcento.md)** — **SSOT Caminho B:** corrigir enforcement PF escopado por cliente (prioridade actual)
+- [`caminho-a-plano-de-implementacao.md`](caminho-a-plano-de-implementacao.md) — Caminho A (UX/dispositivos/SNI); concluido
+- [`blocking-master-plan.md`](blocking-master-plan.md) — plano mestre historico (v1.0.0, 2026-03-23)
+- [`revisao-codigo-pre-install-2026-06-15.md`](revisao-codigo-pre-install-2026-06-15.md) — revisao geral pre-instalação (50 achados REV-001..050)
 
 ## Funcionalidades de bloqueio na V1
 

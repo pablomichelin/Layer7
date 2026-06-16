@@ -82,8 +82,53 @@ DHCP static mapping para IP estavel. Limite: 64 hosts de origem por grupo.
 | Uso | Nome default | Config |
 |-----|--------------|--------|
 | Block (origem/quarentena) | `layer7_block` | Fixo no código (`enforce.h`) |
-| Block (destino/sites/apps) | `layer7_block_dst` | Fixo no código (`enforce.h`) |
+| Block (destino/sites/apps) | `layer7_block_dst` | Fixo no código (`enforce.h`); **legacy_global** |
+| Block destino escopado por politica | `layer7_pdst_N` | Caminho B / E2; indice N = ordem `layer7_policies_sort()` |
+| Quarentena origem escopada por politica | `layer7_psrc_N` | Caminho B / E2; app-only / misto |
 | Tag | `layer7_tagged` ou **`tag_table`** na política | Por política `action=tag` |
+
+### Caminho B / E2 — PF escopado no pacote (`scoped_hybrid`)
+
+Com `layer7.enforcement_model=scoped_hybrid` e `mode=enforce`, o pacote deixa de
+emitir `block drop … to <layer7_block_dst>` global e passa a gerar, por cada
+politica `enabled`+`block`:
+
+- `table <layer7_pdst_N> persist` + `block drop quick inet from {src} to <layer7_pdst_N>`
+  quando a politica tem hosts (sites/SNI);
+- `table <layer7_psrc_N> persist` + `block drop quick inet from <layer7_psrc_N> to !<localsubnets>`
+  quando tem `ndpi_app`/`ndpi_category` (app-only ou misto);
+- politica sem origem (`src_hosts`/`src_cidrs`/grupos): regra global **so** com
+  `scope_global: true` (checkbox na GUI Politicas).
+
+Funcao geradora: `layer7_policy_enforcement_rules_text()` em `layer7.inc`,
+invocada por `layer7_generate_rules("filter")`. Flush/resync: `layer7_resync()`,
+`layer7-pfctl flush-all`, `enforcement_flush_all_tables()` em `main.c` (0..23).
+
+**Nota:** com E3 (2026-06-15), em `scoped_hybrid` o daemon popula
+`layer7_pdst_N` / `layer7_psrc_N` conforme `enforce_kind`; `layer7_block_dst`
+so e usada em `legacy_global`. Default permanece `legacy_global` ate E8.
+
+### Caminho B / E3 — Runtime daemon escopado
+
+Com `enforcement_model=scoped_hybrid` e `mode=enforce`:
+
+| Decisao | Tabela PF populada | IP |
+|---------|-------------------|-----|
+| block + `dst_scoped` (DNS/SNI/host) | `layer7_pdst_{idx}` | destino resolvido |
+| block + `src_scoped` (app-only nDPI) | `layer7_psrc_{idx}` | origem do fluxo |
+| block + `legacy_global` | `layer7_block_dst` | destino |
+
+Funcoes: `layer7_pf_resolve_block_target()`, `layer7_apply_block_enforcement()`
+em `main.c`; cache TTL indexado por `(table_name, ip)`. Allowlist gate mantido
+antes de qualquer add a pdst/block_dst. Logs incluem `kind`, `table`, `policy`.
+
+CLI lab `-e` alinhado: `layer7_pf_enforce_decision(dec, src, dst, scoped, dry)`.
+
+**Gate appliance obrigatorio (two-client):** ver
+[`validacao-lab.md`](../04-package/validacao-lab.md) secao **12** — pendente
+ate execucao no appliance `192.168.100.254`.
+
+Plano: [`../09-blocking/plano-enforcement-100-porcento.md`](../09-blocking/plano-enforcement-100-porcento.md).
 
 ## Assets do pacote
 
@@ -198,7 +243,8 @@ O **`layer7d -t`** imprime `pfctl_suggest=...` no dry-run quando `mode=enforce` 
 |--------|---------|
 | `layer7_pf_exec_table_add(table, ip)` | `/sbin/pfctl -t TABLE -T add IP` |
 | `layer7_pf_exec_table_delete(table, ip)` | `/sbin/pfctl -t TABLE -T delete IP` |
-| `layer7_pf_enforce_decision(dec, ip, dry_run)` | Se `dec` exige block/tag e IP válido: add (ou só simula se `dry_run`) |
+| `layer7_pf_resolve_block_target(dec, src, dst, scoped, …)` | Resolve tabela/IP para block (pdst/psrc ou block_dst) |
+| `layer7_pf_enforce_decision(dec, src, dst, scoped, dry_run)` | Se `dec` exige block/tag: add (ou simula se `dry_run`) |
 
 Constantes de tabela em `enforce.h`:
 
@@ -219,7 +265,10 @@ layer7d -c /usr/local/etc/layer7.json -e 10.0.0.99 BitTorrent
 layer7d -n -c ... -e 10.0.0.99 BitTorrent   # dry: não chama pfctl
 ```
 
-Ordem típica: **`-c`**, **`-n`** (opcional), **`-e IP APP [categoria]`**. No runtime, **nDPI** deve chamar `layer7_on_classified_flow(src, app, cat)` (equivalente a decidir + `layer7_pf_enforce_decision(..., 0)`).
+Ordem típica: **`-c`**, **`-n`** (opcional), **`-e IP APP [categoria]`**. Com
+`enforcement_model=scoped_hybrid`, block app-only adiciona origem a
+`layer7_psrc_N`; legacy usa `layer7_block_dst`. No runtime, **nDPI** chama
+`layer7_on_classified_flow` (decidir + enforce escopado).
 
 ## Estado atual
 
@@ -380,3 +429,17 @@ do appliance. A regra usa `block drop quick`, o que garante match imediato, mas
 a posicao exata em `rules.debug` depende de onde `PFCONFIG_PACKAGE_FILTER` e
 inserido pelo pfSense. A confirmacao em `rules.debug` e `pfctl -sr` continua
 obrigatoria antes de fechar a fase.
+
+## Actualizacoes Caminho B / estabilizacao (2026-06-16)
+
+- **Licenca invalida:** recheck periodico faz flush de todas as tabelas PF
+  dinamicas — monitor-only real.
+- **Allowlist:** CIDR `0.0.0.0/0` rejeitado (daemon + GUI); apenas `/1`–`/32`.
+- **DNS callback:** respeita `layer7.enabled=false`; legacy e scoped usam
+  `layer7_decide_for_client()` (excepcoes antes de block).
+- **scoped_hybrid (experimental, nao default):** `quarantine_origin` obrigatorio
+  para quarentena app-only; politicas block vazias rejeitadas salvo
+  `scope_global`/`quarantine`.
+- **TTL dinamico:** cache enforcement/allowlist DNS expira (60s–3600s).
+- **Flush centralizado:** indices orfaos ate limites 24 (`pdst`/`psrc`) e 32
+  (`bld_*`).

@@ -75,7 +75,8 @@ classify(const char *s, struct l7_allowlist_entry *e)
 		if (parse_ipv4(ip_buf, &e->ip) != 0)
 			return -1;
 		prefix = atoi(slash + 1);
-		if (prefix < 0 || prefix > 32)
+		/* Rejeita 0.0.0.0/0 — allowlist aberta demais para PF. */
+		if (prefix < 1 || prefix > 32)
 			return -1;
 		e->prefix = prefix;
 		e->kind = L7_AL_IPV4_CIDR;
@@ -254,8 +255,8 @@ l7_allowlist_contains_ip(const struct l7_allowlist *al, const char *ip_str)
 				return 1;
 		} else if (e->kind == L7_AL_IPV4_CIDR) {
 			p = e->prefix;
-			if (p <= 0)
-				return 1;
+			if (p < 1 || p > 32)
+				continue;
 			if (p >= 32) {
 				if (ip == e->ip)
 					return 1;

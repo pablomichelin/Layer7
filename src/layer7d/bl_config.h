@@ -41,4 +41,10 @@ struct l7_bl_config {
  */
 int l7_bl_config_load(const char *path, struct l7_bl_config *cfg);
 
+/*
+ * Verifica se src_ip pertence ao escopo da regra (src_cidrs).
+ * except_ips exclui clientes explicitamente. Sem src_cidrs = global.
+ */
+int l7_bl_rule_matches_src(const struct l7_bl_rule *rule, const char *src_ip);
+
 #endif /* LAYER7_BL_CONFIG_H */

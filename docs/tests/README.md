@@ -13,6 +13,19 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 ## Local
 
 - `sh scripts/package/smoke-layer7d.sh` (requer `cc` + `make`).
+- `sh tests/run-local.sh` — suite F5 mínima (ver tabela abaixo) + lint PHP/sh
+  do pacote.
+
+### Testes em `tests/run-local.sh` (Caminho B / pós-revisão)
+
+| Ficheiro | Bloco | Cobertura |
+|----------|-------|-----------|
+| `tests/functional/test_allowlist.c` | Fase 1 | allowlist, rejeição `/0`, seed |
+| `tests/functional/test_config_parse.c` | A3 / E0 | parse JSON (`sni_inspection`, `enforcement_model`) |
+| `tests/functional/test_policy_decide.c` | E1 | `layer7_decide_for_client()`, `scope_global`, `quarantine_origin` |
+| `tests/functional/test_enforce_scoped.c` | E3 | runtime PF escopado (`pdst_N` / `psrc_N`), cache TTL |
+| `tests/functional/test_bl_src_match.c` | pós-REV-007 | `except_ips` em `l7_bl_rule_matches_src()` |
+| `tests/functional/test_scoped_pf_inc.php` | E2 | simulação regras PF `scoped_hybrid` em `layer7.inc` |
 - `make -C src/layer7d check` após `make` no mesmo diretório.
 - `cd license-server/backend && npm test` para smoke tests puros da trilha
   de sessao/Bearer do painel administrativo.

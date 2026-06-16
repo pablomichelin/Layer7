@@ -2,6 +2,66 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_24] - 2026-06-16 — Caminho B E0–E3 + estabilização pós-revisão (rascunho)
+
+Bloco técnico **não publicado** (`PORTREVISION=24` no repositório; sem `.pkg`
+nem actualização de `MANUAL-INSTALL.md` até gate e release). Consolida o
+**Caminho B E0–E3** (enforcement escopado por política) e correcções da revisão
+pré-instalação de 2026-06-15. Testes locais (`tests/run-local.sh`) PASS;
+**gate two-client no appliance** (`validacao-lab.md` sec. 12) continua
+**PENDENTE**.
+
+### Caminho B / E0–E3 — enforcement escopado (`PORTREVISION=24`)
+
+#### Added
+
+- **E0 (BG-045):** `layer7.enforcement_model` — `legacy_global` (default) |
+  `scoped_hybrid` (experimental); parse em `config_parse`; selector em Settings.
+- **E1 (BG-046):** `layer7_decide_for_client()` unifica decisão DNS/fluxo;
+  `struct layer7_decision` com `enforce_kind`, `policy_table_idx`,
+  `scope_global`, `quarantine_origin`; testes em `test_policy_decide.c`.
+- **E2 (BG-047):** regras PF escopadas em `layer7.inc` (`layer7_pdst_N` /
+  `layer7_psrc_N`); `scope_global` JSON+GUI; `test_scoped_pf_inc.php`.
+- **E3 (BG-048):** runtime daemon popula `pdst_N`/`psrc_N` (não
+  `layer7_block_dst` em scoped); cache TTL por `(table, ip)`;
+  `test_enforce_scoped.c`.
+
+#### Fixed (pós-revisão pré-instalação)
+
+- **REV-002:** licença inválida no recheck horário chama
+  `enforce_ge_downgrade()` → `enforcement_flush_all_tables()` (sem bloqueio PF
+  residual).
+- **REV-003:** allowlist rejeita CIDR `/0` (`prefix < 1`) em parse e em
+  `l7_allowlist_contains_ip()`.
+- **REV-015 (parcial):** mudança de `enforcement_model` incluída em
+  `pf_relevant_changed` → `filter_configure()` + flush dinâmico.
+- **REV-016 (parcial):** `layer7_pf_config_resync()` após saves de
+  políticas, grupos, excepções e dispositivos → `filter_configure()` + SIGHUP.
+- **Allowlist PF:** `layer7_dst_allowlist_apply_to_pf()` repovoa
+  `layer7_allow_dst` no resync quando enforce activo (flush + adds estáticos).
+- **DNS disabled:** `layer7_on_dns_resolved()` respeita `cfg_disabled()`
+  (`enabled=false`), alinhado a fluxos nDPI.
+- **`quarantine_origin`:** parse JSON/GUI + decisão app-only com quarentena de
+  origem (`psrc_N`) em scoped.
+- **`scope_global`:** parse no daemon; políticas block vazias exigem
+  `scope_global` ou `quarantine_origin` (rejeição/warning coerente PHP+daemon).
+- **`except_ips` (blacklists):** `l7_bl_rule_matches_src()` exclui IPs em
+  `except_ips`; teste `test_bl_src_match.c`.
+- **TTL blacklist:** adds DNS/SNI a `layer7_bld_N` passam por
+  `enforce_cache_add()` / sweep (TTL clamped ≥60s).
+
+#### Notes
+
+- `legacy_global` permanece **default** — imposição global por destino
+  (`layer7_block_dst`) é comportamento intencional até gate E8 (**REV-001 by
+  design**).
+- `scoped_hybrid` é **experimental**; não activar em produção sem gate
+  two-client (sec. 12) e validação lab.
+- E4–E8 (BG-049..BG-052) permanecem pendentes.
+- Sem artefacto publicado neste bloco; rollback = checkout/`PORTREVISION=23`.
+
+---
+
 ## [1.8.11_23] - 2026-05-30 — Caminho A completo (A0–A5)
 
 Release publica que consolida todo o **Caminho A** (UX e eficacia tipo UDM Pro)

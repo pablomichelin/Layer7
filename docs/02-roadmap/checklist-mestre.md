@@ -100,6 +100,10 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (secção **11**,
   incl. anti-QUIC opcional e cenário opcional multi-interface / VLAN no mesmo roteiro) e ao teste **6.7**
   de [`../tests/test-matrix.md`](../tests/test-matrix.md)
+- [ ] **Caminho B E3 (BG-048):** codigo E0–E3 concluido em repo (`1.8.11_24`);
+  gate **two-client** em [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
+  (secção **12**) continua **PENDENTE** — nao declarar E3 fechado nem publicar
+  `_24` sem evidencia no appliance
 
 ---
 

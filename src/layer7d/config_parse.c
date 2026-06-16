@@ -202,6 +202,27 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 	}
 
 	{
+		const char *em = strstr(layer, "\"enforcement_model\"");
+		if (em) {
+			const char *q = strchr(em + 19, ':');
+			if (q && q < end) {
+				q++;
+				skip_ws(&q);
+				if (parse_quoted_string(q, out->enforcement_model,
+				    sizeof(out->enforcement_model)) == 0) {
+					if (strcmp(out->enforcement_model,
+					    "legacy_global") == 0 ||
+					    strcmp(out->enforcement_model,
+					    "scoped_hybrid") == 0)
+						out->has_enforcement_model = 1;
+					else
+						out->enforcement_model[0] = '\0';
+				}
+			}
+		}
+	}
+
+	{
 		const char *pf = strstr(layer, "\"protos_file\"");
 		if (pf && (!pol || pf < pol)) {
 			const char *q = strchr(pf + 13, ':');

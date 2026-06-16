@@ -307,6 +307,249 @@ function layer7_pf_should_enforce($data = null)
 }
 
 /**
+ * Modelo de enforcement: legacy_global (default) ou scoped_hybrid (Caminho B).
+ */
+function layer7_enforcement_model_get($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (!is_array($data) || !isset($data["layer7"]) ||
+	    !is_array($data["layer7"])) {
+		return "legacy_global";
+	}
+	$em = isset($data["layer7"]["enforcement_model"])
+	    ? (string)$data["layer7"]["enforcement_model"] : "legacy_global";
+	return ($em === "scoped_hybrid") ? "scoped_hybrid" : "legacy_global";
+}
+
+function layer7_enforcement_is_scoped_hybrid($data = null)
+{
+	return layer7_enforcement_model_get($data) === "scoped_hybrid";
+}
+
+/**
+ * Ordena copia de politicas como layer7_policies_sort() (priority desc, id asc).
+ */
+function layer7_policies_sorted_copy($policies)
+{
+	if (!is_array($policies)) {
+		return array();
+	}
+	$sorted = array_values($policies);
+	usort($sorted, function ($a, $b) {
+		$pa = isset($a["priority"]) ? (int)$a["priority"] : 0;
+		$pb = isset($b["priority"]) ? (int)$b["priority"] : 0;
+		if ($pa !== $pb) {
+			return $pb - $pa;
+		}
+		$ida = isset($a["id"]) ? (string)$a["id"] : "";
+		$idb = isset($b["id"]) ? (string)$b["id"] : "";
+		return strcmp($ida, $idb);
+	});
+	return $sorted;
+}
+
+/**
+ * Expande grupos da politica em src_hosts/src_cidrs (alinhado a policy.c).
+ *
+ * @return array{hosts: string[], cidrs: string[]}
+ */
+function layer7_policy_expand_src_origins($policy, $groups)
+{
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	$hosts = (isset($match["src_hosts"]) && is_array($match["src_hosts"]))
+	    ? $match["src_hosts"] : array();
+	$cidrs = (isset($match["src_cidrs"]) && is_array($match["src_cidrs"]))
+	    ? $match["src_cidrs"] : array();
+
+	if (!empty($match["groups"]) && is_array($match["groups"]) &&
+	    is_array($groups)) {
+		foreach ($groups as $g) {
+			if (!is_array($g) || empty($g["id"]) ||
+			    !in_array((string)$g["id"], $match["groups"], true)) {
+				continue;
+			}
+			if (isset($g["cidrs"]) && is_array($g["cidrs"])) {
+				foreach ($g["cidrs"] as $c) {
+					$c = trim((string)$c);
+					if ($c !== "" &&
+					    (layer7_cidr_valid($c) || layer7_ipv4_valid($c))) {
+						$cidrs[] = $c;
+					}
+				}
+			}
+			foreach (array("hosts", "device_ips") as $gk) {
+				if (!isset($g[$gk]) || !is_array($g[$gk])) {
+					continue;
+				}
+				foreach ($g[$gk] as $h) {
+					$h = trim((string)$h);
+					if ($h !== "" && layer7_ipv4_valid($h)) {
+						$hosts[] = $h;
+					}
+				}
+			}
+		}
+	}
+
+	$hosts = array_values(array_unique($hosts));
+	$cidrs = array_values(array_unique($cidrs));
+	return array("hosts" => $hosts, "cidrs" => $cidrs);
+}
+
+/**
+ * Metadados de politicas block para PF escopado (indice = posicao ordenada).
+ *
+ * @return array<int, array{idx: int, policy: array, needs_pdst: bool,
+ *     needs_psrc: bool, src_hosts: string[], src_cidrs: string[],
+ *     scope_global: bool}>
+ */
+function layer7_policy_enforcement_meta($data)
+{
+	$out = array();
+	if (!is_array($data) || !isset($data["layer7"]) ||
+	    !is_array($data["layer7"])) {
+		return $out;
+	}
+	$l7 = $data["layer7"];
+	$policies = (isset($l7["policies"]) && is_array($l7["policies"]))
+	    ? $l7["policies"] : array();
+	$groups = (isset($l7["groups"]) && is_array($l7["groups"]))
+	    ? $l7["groups"] : array();
+	$sorted = layer7_policies_sorted_copy($policies);
+
+	foreach ($sorted as $idx => $policy) {
+		if (!is_array($policy) || empty($policy["enabled"])) {
+			continue;
+		}
+		if (!isset($policy["action"]) || (string)$policy["action"] !== "block") {
+			continue;
+		}
+		$match = (isset($policy["match"]) && is_array($policy["match"]))
+		    ? $policy["match"] : array();
+		$hosts = (isset($match["hosts"]) && is_array($match["hosts"]))
+		    ? $match["hosts"] : array();
+		$apps = (isset($match["ndpi_app"]) && is_array($match["ndpi_app"]))
+		    ? $match["ndpi_app"] : array();
+		$cats = (isset($match["ndpi_category"]) &&
+		    is_array($match["ndpi_category"])) ? $match["ndpi_category"] : array();
+
+		$needs_pdst = !empty($hosts);
+		$needs_psrc = !empty($apps) || !empty($cats);
+		if (!$needs_pdst && !$needs_psrc) {
+			if (!empty($policy["scope_global"]) ||
+			    !empty($policy["quarantine_origin"]) ||
+			    !empty($policy["quarantine"])) {
+				$needs_psrc = true;
+			} else {
+				continue;
+			}
+		}
+
+		$src = layer7_policy_expand_src_origins($policy, $groups);
+		$out[] = array(
+			"idx" => (int)$idx,
+			"policy" => $policy,
+			"needs_pdst" => $needs_pdst,
+			"needs_psrc" => $needs_psrc,
+			"src_hosts" => $src["hosts"],
+			"src_cidrs" => $src["cidrs"],
+			"scope_global" => !empty($policy["scope_global"])
+		);
+	}
+	return $out;
+}
+
+/**
+ * Nomes de tabelas layer7_pdst_* / layer7_psrc_* activas na config actual.
+ */
+function layer7_policy_enforcement_table_names($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$tables = array();
+	foreach (layer7_policy_enforcement_meta($data) as $m) {
+		$idx = (int)$m["idx"];
+		if (!empty($m["needs_pdst"])) {
+			$tables[] = "layer7_pdst_" . $idx;
+		}
+		if (!empty($m["needs_psrc"])) {
+			$tables[] = "layer7_psrc_" . $idx;
+		}
+	}
+	return array_values(array_unique($tables));
+}
+
+/**
+ * Regras e tabelas PF escopadas por politica (Caminho B / E2).
+ * So em scoped_hybrid + enforce; legacy_global permanece inalterado.
+ */
+function layer7_policy_enforcement_rules_text($data)
+{
+	if (!layer7_enforcement_is_scoped_hybrid($data) ||
+	    !layer7_pf_should_enforce($data)) {
+		return "";
+	}
+
+	$tables = "";
+	$rules = "";
+	foreach (layer7_policy_enforcement_meta($data) as $m) {
+		$idx = (int)$m["idx"];
+		$policy = $m["policy"];
+		$pid = isset($policy["id"])
+		    ? preg_replace('/[^a-zA-Z0-9_-]/', '', (string)$policy["id"])
+		    : "";
+		if ($pid === "") {
+			$pid = "p" . $idx;
+		}
+
+		$has_src = !empty($m["src_hosts"]) || !empty($m["src_cidrs"]);
+		$scope_global = !empty($m["scope_global"]);
+
+		if (!empty($m["needs_pdst"])) {
+			$tbl = "layer7_pdst_" . $idx;
+			$tables .= "table <{$tbl}> persist\n";
+			if ($has_src) {
+				foreach ($m["src_hosts"] as $sh) {
+					if (layer7_ipv4_valid($sh)) {
+						$rules .= "block drop quick inet from {$sh} " .
+						    "to <{$tbl}> label \"layer7:pdst:{$pid}\"\n";
+					}
+				}
+				foreach ($m["src_cidrs"] as $sc) {
+					if (layer7_cidr_valid($sc) || layer7_ipv4_valid($sc)) {
+						$rules .= "block drop quick inet from {$sc} " .
+						    "to <{$tbl}> label \"layer7:pdst:{$pid}\"\n";
+					}
+				}
+			} elseif ($scope_global) {
+				$rules .= "block drop quick inet to <{$tbl}> " .
+				    "label \"layer7:pdst:{$pid}:global\"\n";
+			}
+		}
+
+		if (!empty($m["needs_psrc"])) {
+			$tbl = "layer7_psrc_" . $idx;
+			$tables .= "table <{$tbl}> persist\n";
+			if ($has_src || $scope_global) {
+				$rules .= "block drop quick inet from <{$tbl}> " .
+				    "to !<localsubnets> label \"layer7:psrc:{$pid}\"\n";
+			}
+		}
+	}
+
+	if ($tables === "" && $rules === "") {
+		return "";
+	}
+
+	return "\n# Policy enforcement scoped (Caminho B / E2)\n" .
+	    $tables . "\n# Policy scoped rules\n" . $rules;
+}
+
+/**
  * Tabelas PF persist do Layer7. Sao sempre emitidas (mesmo em monitor) para
  * que `pfctl -t ... -T show` continue a funcionar e `layer7_pf_selfheal()` no
  * daemon nao falhe so por mudanca de modo.
@@ -326,9 +569,11 @@ function layer7_pf_tables_text()
 	)) . "\n";
 }
 
-function layer7_pf_default_rules_text()
+function layer7_pf_default_rules_text($data = null)
 {
-	$data = layer7_load_or_default();
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
 	$out = layer7_pf_tables_text();
 
 	if (!layer7_pf_should_enforce($data)) {
@@ -365,13 +610,20 @@ function layer7_pf_default_rules_text()
 		"# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.",
 		"block drop quick inet from <layer7_block> to !<localsubnets> label \"layer7:block:src\"",
 		"block drop quick inet6 from <layer7_block> to !<localsubnets> label \"layer7:block:src6\"",
-		"",
-		"# Bloqueio por destino (sites/apps bloqueados via policies).",
-		"block drop quick inet to <layer7_block_dst> label \"layer7:block:dst\"",
-		"block drop quick inet6 to <layer7_block_dst> label \"layer7:block:dst6\"",
-		"",
-		"# layer7_tagged permanece disponivel para regras manuais/encadeadas."
 	)) . "\n";
+
+	/* Caminho B / E2: em scoped_hybrid o destino global layer7_block_dst nao
+	 * e usado — cada politica block tem layer7_pdst_N / layer7_psrc_N. */
+	if (!layer7_enforcement_is_scoped_hybrid($data)) {
+		$out .= implode("\n", array(
+			"",
+			"# Bloqueio por destino (sites/apps bloqueados via policies).",
+			"block drop quick inet to <layer7_block_dst> label \"layer7:block:dst\"",
+			"block drop quick inet6 to <layer7_block_dst> label \"layer7:block:dst6\"",
+		)) . "\n";
+	}
+
+	$out .= "\n# layer7_tagged permanece disponivel para regras manuais/encadeadas.\n";
 
 	return $out;
 }
@@ -413,6 +665,8 @@ function layer7_ensure_pf_table($table)
 
 function layer7_resync()
 {
+	$data = layer7_load_or_default();
+
 	layer7_ensure_pf_table("layer7_block");
 	layer7_ensure_pf_table("layer7_block_dst");
 	layer7_ensure_pf_table("layer7_tagged");
@@ -425,10 +679,9 @@ function layer7_resync()
 		}
 	}
 
-	/* Bloco 3: popular `layer7_allow_dst` com IPs/CIDRs estaticos da
-	 * allowlist (JSON + seed). Dominios sao adicionados em runtime pelo
-	 * daemon, via DNS hint. */
-	layer7_dst_allowlist_apply_to_pf();
+	foreach (layer7_policy_enforcement_table_names($data) as $ptbl) {
+		layer7_ensure_pf_table($ptbl);
+	}
 
 	/* Gate Bloco 1: em modo passivo (monitor / disabled) nao injecta
 	 * regras rdr no anchor NAT — limpa-o para evitar forcing DNS residual,
@@ -439,6 +692,12 @@ function layer7_resync()
 	} else {
 		layer7_inject_nat_to_anchor();
 	}
+
+	/* Bloco 3: popular `layer7_allow_dst` com IPs/CIDRs estaticos da
+	 * allowlist (JSON + seed). Dominios sao adicionados em runtime pelo
+	 * daemon, via DNS hint. Executado apos flush dinamico para repor
+	 * entradas estaticas quando `layer7_allow_dst` foi esvaziada. */
+	layer7_dst_allowlist_apply_to_pf();
 	layer7_ensure_daemon_running();
 }
 
@@ -495,6 +754,42 @@ function layer7_dst_allowlist_merged()
 }
 
 /**
+ * Flush de uma tabela PF Layer7. Tabela ausente (pre-filter reload) e ignorada
+ * silenciosamente; falhas reais geram no maximo um WARN por tabela por pedido.
+ *
+ * @return bool true se flush OK ou tabela inexistente
+ */
+function layer7_pf_table_flush($table)
+{
+	static $warned = array();
+	$out = array();
+	$rc = 0;
+
+	if (!is_string($table) || $table === "" ||
+	    !preg_match('/^[A-Za-z0-9_]+$/', $table)) {
+		return false;
+	}
+
+	exec("/sbin/pfctl -t " . escapeshellarg($table) .
+	    " -T flush 2>/dev/null", $out, $rc);
+	if ($rc === 0) {
+		return true;
+	}
+
+	exec("/sbin/pfctl -t " . escapeshellarg($table) .
+	    " -T show 2>/dev/null", $out, $rc);
+	if ($rc !== 0) {
+		return false;
+	}
+
+	if (empty($warned[$table])) {
+		layer7_log_pkg_warn("Layer7: pfctl flush falhou tabela=" . $table);
+		$warned[$table] = true;
+	}
+	return false;
+}
+
+/**
  * Popula `layer7_allow_dst` com IPv4 hosts/CIDRs da allowlist combinada.
  * Faz `flush` antes para garantir coerencia com a config actual. Dominios
  * sao saltados (adicionados pelo daemon via DNS hint).
@@ -516,35 +811,73 @@ function layer7_dst_allowlist_apply_to_pf()
 	}
 	$ips = array_values(array_unique($ips));
 
-	@exec("/sbin/pfctl -t layer7_allow_dst -T flush 2>/dev/null");
+	layer7_pf_table_flush("layer7_allow_dst");
+	static $warned_add = false;
 	foreach ($ips as $ip) {
-		$cmd = "/sbin/pfctl -t layer7_allow_dst -T add " .
-		    escapeshellarg($ip) . " 2>/dev/null";
-		@exec($cmd);
+		$out = array();
+		$rc = 0;
+		exec("/sbin/pfctl -t layer7_allow_dst -T add " .
+		    escapeshellarg($ip) . " 2>/dev/null", $out, $rc);
+		if ($rc !== 0 && !$warned_add) {
+			layer7_log_pkg_warn(
+			    "Layer7: pfctl add falhou em layer7_allow_dst");
+			$warned_add = true;
+		}
 	}
 	return count($ips);
 }
 
 /**
- * Esvazia as tabelas PF dinamicas (`layer7_block`, `layer7_block_dst` e
- * `layer7_bld_N` de blacklists). Usado quando o modo passa para
- * monitor/disabled ou ao desinstalar — evita que IPs adicionados num enforce
- * anterior continuem a bloquear apos a mudanca (Bloco 5). Mantem as tabelas
- * `persist` na pf, apenas remove os enderecos.
+ * Esvazia as tabelas PF dinamicas (`layer7_block`, `layer7_block_dst`,
+ * `layer7_allow_dst`, `layer7_bld_N`, `layer7_pdst_N`, `layer7_psrc_N`).
+ * Usado quando o modo passa para monitor/disabled ou ao desinstalar — evita
+ * que IPs adicionados num enforce anterior continuem a bloquear apos a mudanca
+ * (Bloco 5). Entradas estaticas da allowlist sao repostas por
+ * `layer7_dst_allowlist_apply_to_pf()` apos flush quando enforce activo.
  */
 function layer7_flush_dynamic_tables()
 {
-	$tables = array("layer7_block", "layer7_block_dst", "layer7_tagged");
+	$tables = array(
+	    "layer7_block", "layer7_block_dst", "layer7_tagged",
+	    "layer7_allow_dst");
 	$bl_config = layer7_bl_config_load();
 	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
 		foreach (array_keys($bl_config["rules"]) as $idx) {
 			$tables[] = "layer7_bld_" . (int)$idx;
 		}
 	}
-	foreach ($tables as $t) {
-		@exec("/sbin/pfctl -t " . escapeshellarg($t) .
-		    " -T flush 2>/dev/null");
+	/* Indices orfaos apos reorder/delete — flush ate limites do projecto. */
+	for ($i = 0; $i < 32; $i++) {
+		$tables[] = "layer7_bld_" . $i;
 	}
+	for ($i = 0; $i < 24; $i++) {
+		$tables[] = "layer7_pdst_" . $i;
+		$tables[] = "layer7_psrc_" . $i;
+	}
+	foreach (layer7_policy_enforcement_table_names($data = layer7_load_or_default()) as $ptbl) {
+		$tables[] = $ptbl;
+	}
+	$tables = array_values(array_unique($tables));
+	foreach ($tables as $t) {
+		layer7_pf_table_flush($t);
+	}
+}
+
+/**
+ * Apos mudanca PF-relevante: flush opcional, filter_configure, SIGHUP.
+ */
+function layer7_pf_config_resync($flush_dynamic = false)
+{
+	if ($flush_dynamic) {
+		layer7_flush_dynamic_tables();
+	}
+	if (layer7_pf_should_enforce()) {
+		layer7_dst_allowlist_apply_to_pf();
+	}
+	if (function_exists("filter_configure")) {
+		filter_configure();
+	}
+	layer7_signal_reload();
 }
 
 /**
@@ -608,7 +941,7 @@ function layer7_generate_rules($type)
 	/* Enforce: construir a partir da fonte mode-aware (inclui allowlist
 	 * `pass quick`, toggle `block_dot_doq` e os blocks por src/dst), em vez
 	 * do `pf.conf` em disco, para garantir coerencia com a config actual. */
-	$rules = layer7_pf_default_rules_text();
+	$rules = layer7_pf_default_rules_text($data);
 
 	$quic_ifaces = isset($data["layer7"]["block_quic_interfaces"]) &&
 	    is_array($data["layer7"]["block_quic_interfaces"])
@@ -671,6 +1004,8 @@ function layer7_generate_rules($type)
 		}
 	}
 
+	$rules .= layer7_policy_enforcement_rules_text($data);
+
 	/* Injectar regras rdr no anchor NAT como efeito colateral.
 	 * pfSense CE nao processa nat_rules_needed; esta e a unica forma
 	 * de garantir que as rdr rules sao carregadas em todo reload PF. */
@@ -694,6 +1029,7 @@ function layer7_bare_config()
 			"block_quic_interfaces" => array(),
 			"block_dot_doq" => false,
 			"sni_inspection" => false,
+			"enforcement_model" => "legacy_global",
 			"interfaces" => array("lan"),
 			"groups" => array(),
 			"policies" => array(),
@@ -928,6 +1264,27 @@ function layer7_unbound_anti_doh_configured()
 	return false;
 }
 
+/**
+ * Valida politica block: exige criterios de match ou flags explicitas.
+ */
+function layer7_policy_block_valid($policy)
+{
+	if (!is_array($policy)) {
+		return false;
+	}
+	if (!isset($policy["action"]) || (string)$policy["action"] !== "block") {
+		return true;
+	}
+	if (!empty($policy["scope_global"]) || !empty($policy["quarantine_origin"]) ||
+	    !empty($policy["quarantine"])) {
+		return true;
+	}
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	return !empty($match["hosts"]) || !empty($match["ndpi_app"]) ||
+	    !empty($match["ndpi_category"]);
+}
+
 function layer7_signal_reload()
 {
 	$pidf = "/var/run/layer7d.pid";
@@ -1079,7 +1436,8 @@ function layer7_cidr_valid($s)
 		}
 	}
 	$n = (int)$m[5];
-	return $n >= 0 && $n <= 32;
+	/* Rejeita 0.0.0.0/0 — allowlist aberta demais para PF. */
+	return $n >= 1 && $n <= 32;
 }
 
 /**

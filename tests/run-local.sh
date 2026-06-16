@@ -3,8 +3,10 @@
 #
 # Faz:
 #   1. Compila e corre tests/functional/test_allowlist.c.
-#   2. Verifica sintaxe PHP dos ficheiros do pacote (php -l).
-#   3. Verifica sintaxe shell dos scripts do pacote (sh -n).
+#   2. Compila e corre tests/functional/test_config_parse.c.
+#   3. Compila e corre tests/functional/test_policy_decide.c (Caminho B / E1).
+#   4. Verifica sintaxe PHP dos ficheiros do pacote (php -l).
+#   5. Verifica sintaxe shell dos scripts do pacote (sh -n).
 #
 # Uso:  sh tests/run-local.sh
 
@@ -45,6 +47,63 @@ if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
 else
 	cat /tmp/test_config_parse.cc.err
 	fail "test_config_parse compile"
+fi
+
+step "Unit: policy_decide (Caminho B / E1)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_policy_decide \
+    tests/functional/test_policy_decide.c \
+    src/layer7d/policy.c src/layer7d/enforce.c 2>/tmp/test_policy_decide.cc.err; then
+	if /tmp/test_policy_decide; then
+		pass "test_policy_decide"
+	else
+		fail "test_policy_decide runtime"
+	fi
+else
+	cat /tmp/test_policy_decide.cc.err
+	fail "test_policy_decide compile"
+fi
+
+step "Unit: enforce_scoped (Caminho B / E3)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_enforce_scoped \
+    tests/functional/test_enforce_scoped.c src/layer7d/enforce.c \
+    2>/tmp/test_enforce_scoped.cc.err; then
+	if /tmp/test_enforce_scoped; then
+		pass "test_enforce_scoped"
+	else
+		fail "test_enforce_scoped runtime"
+	fi
+else
+	cat /tmp/test_enforce_scoped.cc.err
+	fail "test_enforce_scoped compile"
+fi
+
+step "Unit: bl_src_match (except_ips)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_bl_src_match \
+    tests/functional/test_bl_src_match.c src/layer7d/bl_config.c \
+    2>/tmp/test_bl_src_match.cc.err; then
+	if /tmp/test_bl_src_match; then
+		pass "test_bl_src_match"
+	else
+		fail "test_bl_src_match runtime"
+	fi
+else
+	cat /tmp/test_bl_src_match.cc.err
+	fail "test_bl_src_match compile"
+fi
+
+step "Simulacao: scoped_hybrid PF rules (Caminho B / E2)"
+PHP_BIN_E2=$(command -v php 2>/dev/null || true)
+if [ -z "$PHP_BIN_E2" ]; then
+	printf "SKIP: php nao instalado, saltando simulacao scoped PF\n"
+else
+	if "$PHP_BIN_E2" tests/functional/test_scoped_pf_inc.php; then
+		pass "test_scoped_pf_inc"
+	else
+		fail "test_scoped_pf_inc"
+	fi
 fi
 
 step "Lint: PHP do pacote (php -l)"

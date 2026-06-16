@@ -86,6 +86,49 @@ main(void)
 		check(p.has_mode && strcmp(p.mode, "enforce") == 0, "mode=enforce");
 	}
 
+	/* 6. enforcement_model ausente -> has=0 (default legacy_global). */
+	{
+		const char *json =
+		    "{\"layer7\":{\"enabled\":true,\"policies\":[]}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0, "parse ok (sem enforcement_model)");
+		check(p.has_enforcement_model == 0, "sem enforcement_model -> has=0");
+	}
+
+	/* 7. enforcement_model=legacy_global explicito. */
+	{
+		const char *json =
+		    "{\"layer7\":{\"enforcement_model\":\"legacy_global\","
+		    "\"policies\":[]}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0, "parse ok (legacy_global)");
+		check(p.has_enforcement_model == 1, "has_enforcement_model (legacy)");
+		check(strcmp(p.enforcement_model, "legacy_global") == 0,
+		    "enforcement_model=legacy_global");
+	}
+
+	/* 8. enforcement_model=scoped_hybrid depois de policies (GUI). */
+	{
+		const char *json =
+		    "{\"layer7\":{\"policies\":[],"
+		    "\"enforcement_model\":\"scoped_hybrid\"}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0, "parse ok (scoped_hybrid)");
+		check(p.has_enforcement_model == 1, "has_enforcement_model (scoped)");
+		check(strcmp(p.enforcement_model, "scoped_hybrid") == 0,
+		    "enforcement_model=scoped_hybrid");
+	}
+
+	/* 9. valor invalido -> has=0. */
+	{
+		const char *json =
+		    "{\"layer7\":{\"enforcement_model\":\"invalid\","
+		    "\"policies\":[]}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0, "parse ok (invalid model)");
+		check(p.has_enforcement_model == 0, "invalid enforcement_model -> has=0");
+	}
+
 	if (g_fail) {
 		printf("\nTEST CONFIG_PARSE: FAILED\n");
 		return 1;

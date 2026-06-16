@@ -792,3 +792,97 @@ existem por tras de cada segmento. Apos **Apply** / reload do filtro:
 
 **Registo sugerido no relatorio de campanha / evidencias:** data, versao do
 `.pkg` (`pkg info`), saida (redigida) de `pfctl -a natrules/layer7_nat -s nat`.
+
+---
+
+## 12. Roteiro Caminho B / E3 — enforcement escopado two-client (BG-048)
+
+**Objectivo:** validar que, com `enforcement_model=scoped_hybrid`, bloquear
+YouTube (ou equivalente) para o cliente **A** nao bloqueia o cliente **B** na
+mesma LAN. Este gate e **obrigatorio** antes de avancar para E4.
+
+**Estado:** **PENDENTE** (gate two-client nao executado; ver *Build E3* abaixo).
+
+**Onde:** appliance pfSense CE lab (`192.168.100.254` ou equivalente).
+
+### Build E3 (2026-06-16, builder `192.168.100.12`)
+
+| Item | Resultado |
+|------|-----------|
+| Sync | tar+SSH ficheiros E0–E3 do workspace local → `/root/pfsense-layer7` (sem commit) |
+| Compilacao | **OK** apos forward declaration de `layer7_pf_add_with_selfheal` em `main.c` |
+| Artefacto | `pfSense-pkg-layer7-1.8.11_23.pkg` (~2,3 MiB) em `package/pfSense-pkg-layer7/work/pkg/` no builder; copia local em `artifacts/pfSense-pkg-layer7-1.8.11_23.pkg` |
+| Instalacao appliance | **nao executada** |
+| Gate sec.12 | **PENDENTE** |
+
+**Bloqueios para instalacao/gate (2026-06-16):**
+
+1. **SSH a partir desta estacao de operacao:** `192.168.100.254:22` responde a
+   ICMP mas **timeout** em TCP/22 (firewall/rede); impede `pkg add` e passos do
+   roteiro a partir do Mac do operador.
+2. **SSH builder → appliance:** porta 22 alcancavel de `192.168.100.12`, mas
+   autenticacao falhou (`root`/`codex`/`admin` sem chave autorizada; builder
+   sem `sshpass`/`expect` para password interactiva).
+3. **Clientes A/B (`10.0.0.10`, `10.0.0.20`):** nao acessiveis deste ambiente
+   para `curl`/navegacao exigidos nos passos 4–5.
+
+**Proximo passo operacional:** instalar o `.pkg` no pfSense (GUI *System → Package Manager* ou
+`pkg add` via SSH a partir de rede com acesso) e executar o roteiro abaixo com
+evidencias; so entao marcar **PASS**.
+
+### Pre-requisitos
+
+| Item | Valor |
+|------|-------|
+| `enforcement_model` | `scoped_hybrid` |
+| `mode` | `enforce` |
+| `enabled` | `true` |
+| Licenca | valida (enforce ao vivo exige licenca) |
+| Politica P0 | `action=block`, hosts=`youtube.com`, `src_hosts=[10.0.0.10]` |
+| Cliente A | `10.0.0.10` |
+| Cliente B | `10.0.0.20` |
+
+Apos gravar politicas: **Filter reload** (ou Resync Layer7) para materializar
+regras `layer7_pdst_0` em `/tmp/rules.debug` / `pfctl -sr`.
+
+### Passos
+
+1. De **A** (`10.0.0.10`): `nslookup youtube.com` ou navegar para YouTube.
+2. No pfSense:
+   ```sh
+   pfctl -t layer7_pdst_0 -T show
+   ```
+   Deve conter IP(s) do YouTube.
+3. Verificar que a tabela global legacy esta vazia:
+   ```sh
+   pfctl -t layer7_block_dst -T show
+   ```
+   Deve estar **VAZIA** em modo scoped.
+4. De **A**: `curl -m 5 https://www.youtube.com` — esperado **timeout/falha**.
+5. De **B** (`10.0.0.20`): `curl -m 5 https://www.youtube.com` — esperado
+   **SUCESSO** (HTTP 200 ou redirect).
+6. (Opcional) Repetir com trafego nDPI classificado como YouTube se o lab
+   permitir.
+
+### Evidencias minimas (PASS)
+
+- Screenshot ou log de `layer7d` com linha `enforce_block: kind=dst_scoped
+  table=layer7_pdst_0 … policy=…`
+- Saida de `pfctl -t layer7_pdst_0 -T show` com IP YouTube
+- Saida de `pfctl -t layer7_block_dst -T show` vazia
+- Prova de curl OK de B e falha de A
+
+### Criterio FAIL
+
+- IP YouTube em `layer7_block_dst` com `scoped_hybrid` activo
+- B bloqueado quando A acede YouTube
+- Regras `layer7_pdst_*` ausentes do ruleset apos reload
+
+### Rollback
+
+- Settings → `enforcement_model=legacy_global` → Save → Resync
+- `layer7-pfctl flush-all` ou restart `layer7d`
+
+**Plano SSOT:** [`../09-blocking/plano-enforcement-100-porcento.md`](../09-blocking/plano-enforcement-100-porcento.md) (Bloco E3).
+
+**Nota:** nao marcar este gate como PASS sem execucao real no appliance.

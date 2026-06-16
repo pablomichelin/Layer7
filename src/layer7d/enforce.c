@@ -112,18 +112,107 @@ layer7_pf_exec_table_delete(const char *table, const char *ip)
 }
 
 int
-layer7_pf_enforce_decision(const struct layer7_decision *dec,
-    const char *src_ipv4, int dry_run)
+layer7_pf_policy_table_name(enum layer7_enforce_kind kind, int idx,
+    char *buf, size_t buflen)
 {
+	if (!buf || buflen < 16 || idx < 0 || idx >= L7_MAX_POLICIES)
+		return -1;
+	if (kind == L7_ENFORCE_DST_SCOPED)
+		return snprintf(buf, buflen, "layer7_pdst_%d", idx);
+	if (kind == L7_ENFORCE_SRC_SCOPED)
+		return snprintf(buf, buflen, "layer7_psrc_%d", idx);
+	return -1;
+}
+
+const char *
+layer7_enforce_kind_str(enum layer7_enforce_kind kind)
+{
+	switch (kind) {
+	case L7_ENFORCE_DST_SCOPED:
+		return "dst_scoped";
+	case L7_ENFORCE_SRC_SCOPED:
+		return "src_scoped";
+	default:
+		return "none";
+	}
+}
+
+int
+layer7_pf_resolve_block_target(const struct layer7_decision *dec,
+    const char *src_ip, const char *dst_ip, int scoped_hybrid,
+    char *out_table, size_t tbl_len, const char **out_ip)
+{
+	const char *ip;
+
+	if (!dec || !out_table || !out_ip)
+		return -1;
+	if (!dec->would_enforce_block_or_tag ||
+	    dec->action != LAYER7_ACTION_BLOCK)
+		return 0;
+
+	if (scoped_hybrid && dec->enforce_kind != L7_ENFORCE_NONE &&
+	    dec->policy_table_idx >= 0) {
+		if (layer7_pf_policy_table_name(dec->enforce_kind,
+		    dec->policy_table_idx, out_table, tbl_len) < 0)
+			return -1;
+		if (dec->enforce_kind == L7_ENFORCE_DST_SCOPED) {
+			ip = (dec->enforce_dst_ip[0] != '\0') ?
+			    dec->enforce_dst_ip : dst_ip;
+		} else
+			ip = src_ip;
+	} else {
+		if (tbl_len < sizeof(L7_PF_TABLE_BLOCK_DST))
+			return -1;
+		memcpy(out_table, L7_PF_TABLE_BLOCK_DST,
+		    sizeof(L7_PF_TABLE_BLOCK_DST));
+		ip = dst_ip;
+	}
+
+	if (!ip || !layer7_pf_ipv4_host_ok(ip))
+		return 0;
+	*out_ip = ip;
+	return 1;
+}
+
+int
+layer7_pf_enforce_decision(const struct layer7_decision *dec,
+    const char *src_ipv4, const char *dst_ipv4, int scoped_hybrid,
+    int dry_run)
+{
+	char tbl[64];
+	const char *ip;
+
 	if (!dec || !src_ipv4)
 		return 0;
-	if (!dec->would_enforce_block_or_tag || !dec->pf_table[0])
+
+	if (dec->action == LAYER7_ACTION_TAG) {
+		if (!dec->would_enforce_block_or_tag || !dec->pf_table[0])
+			return 0;
+		if (!layer7_pf_ipv4_host_ok(src_ipv4))
+			return 0;
+		if (dry_run)
+			return 1;
+		if (layer7_pf_exec_table_add(dec->pf_table, src_ipv4) == 0)
+			return 1;
+		return -1;
+	}
+
+	if (dec->action != LAYER7_ACTION_BLOCK)
 		return 0;
-	if (!layer7_pf_ipv4_host_ok(src_ipv4))
+
+	switch (layer7_pf_resolve_block_target(dec, src_ipv4, dst_ipv4,
+	    scoped_hybrid, tbl, sizeof(tbl), &ip)) {
+	case 0:
 		return 0;
+	case -1:
+		return -1;
+	default:
+		break;
+	}
+
 	if (dry_run)
 		return 1;
-	if (layer7_pf_exec_table_add(dec->pf_table, src_ipv4) == 0)
+	if (layer7_pf_exec_table_add(tbl, ip) == 0)
 		return 1;
 	return -1;
 }

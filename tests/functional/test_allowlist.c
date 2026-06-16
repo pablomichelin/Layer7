@@ -40,6 +40,7 @@ test_classification(void)
 	CHECK(l7_allowlist_add(&al, "bb.com.br") == 0, "add domain");
 	CHECK(l7_allowlist_add(&al, "8.8.8.8") == 0, "add ipv4");
 	CHECK(l7_allowlist_add(&al, "200.201.0.0/16") == 0, "add cidr");
+	CHECK(l7_allowlist_add(&al, "0.0.0.0/0") == -1, "reject cidr /0");
 	CHECK(l7_allowlist_add(&al, "") == -1, "reject empty");
 	CHECK(l7_allowlist_add(&al, "no-dot") == -1,
 	    "reject domain without dot");

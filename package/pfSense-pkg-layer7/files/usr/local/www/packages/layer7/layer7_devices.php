@@ -65,7 +65,7 @@ if ($_POST["assign_to_group"] ?? false) {
 		if (!$found) {
 			$input_errors[] = l7_t("Grupo de destino inexistente.");
 		} elseif (layer7_save_json($data)) {
-			layer7_signal_reload();
+			layer7_pf_config_resync();
 			$savemsg = sprintf(l7_t("%d dispositivos atribuidos ao grupo '%s' (%d IPs resolvidos)."), count($sel_macs), $gid, $n_ips);
 		}
 	}

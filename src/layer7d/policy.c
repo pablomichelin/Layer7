@@ -475,10 +475,19 @@ layer7_schedule_active(const struct l7_schedule *s)
 }
 
 static int
+policy_block_has_criteria(const struct layer7_policy_rule *r)
+{
+	if (!r)
+		return 0;
+	return r->n_hosts > 0 || r->n_ndpi_apps > 0 || r->n_ndpi_cats > 0;
+}
+
+static int
 parse_one_policy(const char *ob, const char *oe,
     struct layer7_policy_rule *r)
 {
 	char act[16];
+	int quarantine = 0;
 
 	memset(r, 0, sizeof(*r));
 	r->enabled = 1;
@@ -499,6 +508,13 @@ parse_one_policy(const char *ob, const char *oe,
 		r->tag_table[0] = '\0';
 	else if (!layer7_pf_table_name_ok(r->tag_table))
 		r->tag_table[0] = '\0';
+	(void)extract_bool_after_key(ob, oe, "scope_global", &r->scope_global);
+	if (extract_bool_after_key(ob, oe, "quarantine_origin",
+	    &r->quarantine_origin) != 0)
+		r->quarantine_origin = 0;
+	if (extract_bool_after_key(ob, oe, "quarantine", &quarantine) == 0 &&
+	    quarantine)
+		r->quarantine_origin = 1;
 	parse_schedule_in_policy(ob, oe, &r->schedule);
 	(void)parse_string_array_in_object(ob, oe, "interfaces",
 	    (char *)r->ifaces, L7_MAX_IFACES_PER_RULE,
@@ -507,6 +523,9 @@ parse_one_policy(const char *ob, const char *oe,
 		if (parse_match_subobject(ob, oe, r) != 0)
 			return -1;
 	}
+	if (r->action == LAYER7_ACTION_BLOCK && !policy_block_has_criteria(r) &&
+	    !r->quarantine_origin && !r->scope_global)
+		return -1;
 	return 0;
 }
 
@@ -984,6 +1003,51 @@ dec_clear_pf(struct layer7_decision *dec)
 }
 
 static void
+dec_clear_scoped(struct layer7_decision *dec)
+{
+	dec->enforce_kind = L7_ENFORCE_NONE;
+	dec->policy_table_idx = -1;
+	dec->scope_global = 0;
+	dec->quarantine_origin = 0;
+	dec->enforce_dst_ip[0] = '\0';
+}
+
+static enum layer7_enforce_kind
+policy_enforce_kind(const struct layer7_policy_rule *r)
+{
+	if (r->n_hosts > 0)
+		return L7_ENFORCE_DST_SCOPED;
+	if (r->n_ndpi_apps > 0 || r->n_ndpi_cats > 0)
+		return L7_ENFORCE_SRC_SCOPED;
+	if (r->quarantine_origin || r->scope_global)
+		return L7_ENFORCE_SRC_SCOPED;
+	return L7_ENFORCE_NONE;
+}
+
+static void
+dec_set_scoped_policy(const struct layer7_policy_rule *r,
+    const struct layer7_policy_rule *rules, int n_rules,
+    struct layer7_decision *dec)
+{
+	dec->policy_table_idx = layer7_policy_table_index(rules, n_rules, r->id);
+	dec->scope_global = r->scope_global;
+	dec->quarantine_origin = r->quarantine_origin;
+	dec->enforce_dst_ip[0] = '\0';
+	dec->enforce_kind = policy_enforce_kind(r);
+	if (r->action == LAYER7_ACTION_BLOCK &&
+	    dec->enforce_kind != L7_ENFORCE_NONE &&
+	    dec->policy_table_idx >= 0) {
+		char tbl[64];
+
+		if (layer7_pf_policy_table_name(dec->enforce_kind,
+		    dec->policy_table_idx, tbl, sizeof(tbl)) >= 0) {
+			strncpy(dec->pf_table, tbl, sizeof(dec->pf_table) - 1);
+			dec->pf_table[sizeof(dec->pf_table) - 1] = '\0';
+		}
+	}
+}
+
+static void
 dec_set_pf_block(struct layer7_decision *dec)
 {
 	strncpy(dec->pf_table, L7_PF_TABLE_BLOCK, sizeof(dec->pf_table) - 1);
@@ -1036,24 +1100,43 @@ fill_enforce_action(enum layer7_action act, int global_enforce,
 		dec->would_enforce_block_or_tag = 0;
 }
 
-void
-layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
+int
+layer7_policy_table_index(const struct layer7_policy_rule *rules, int n,
+    const char *policy_id)
+{
+	int i;
+
+	if (!rules || n <= 0 || !policy_id || !*policy_id)
+		return -1;
+	for (i = 0; i < n; i++) {
+		if (strcmp(rules[i].id, policy_id) == 0)
+			return i;
+	}
+	return -1;
+}
+
+int
+layer7_decide_for_client(const struct layer7_exception *exc, int n_exc,
     const struct layer7_policy_rule *rules, int n_rules, int global_enforce,
-    const char *iface, const char *src_ip,
-    const char *ndpi_app, const char *ndpi_category, const char *host,
+    const char *iface, const char *client_ip,
+    const char *domain_or_host, const char *ndpi_app, const char *ndpi_cat,
     struct layer7_decision *dec)
 {
 	int i;
+
+	if (!dec)
+		return -1;
 
 	memset(dec, 0, sizeof(*dec));
 	dec->matched_policy_id[0] = '\0';
 	dec->matched_exception_id[0] = '\0';
 	dec_clear_pf(dec);
+	dec_clear_scoped(dec);
 
 	for (i = 0; i < n_exc; i++) {
 		if (!exc[i].enabled)
 			continue;
-		if (!exception_matches_src(&exc[i], src_ip, iface))
+		if (!exception_matches_src(&exc[i], client_ip, iface))
 			continue;
 		dec->action = exc[i].action;
 		dec->reason = L7_DECIDE_EXCEPTION;
@@ -1062,7 +1145,7 @@ layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 		dec->matched_exception_id[sizeof(dec->matched_exception_id) - 1] =
 		    '\0';
 		fill_enforce_action(exc[i].action, global_enforce, dec);
-		return;
+		return 0;
 	}
 
 	for (i = 0; i < n_rules; i++) {
@@ -1070,7 +1153,8 @@ layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 
 		if (!r->enabled)
 			continue;
-		if (!rule_matches(r, iface, src_ip, ndpi_app, ndpi_category, host))
+		if (!rule_matches(r, iface, client_ip, ndpi_app, ndpi_cat,
+		    domain_or_host))
 			continue;
 		dec->action = r->action;
 		dec->reason = L7_DECIDE_POLICY_MATCH;
@@ -1079,7 +1163,8 @@ layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 		dec->matched_policy_id[sizeof(dec->matched_policy_id) - 1] =
 		    '\0';
 		fill_enforce(r, global_enforce, dec);
-		return;
+		dec_set_scoped_policy(r, rules, n_rules, dec);
+		return 0;
 	}
 
 	if (global_enforce) {
@@ -1090,6 +1175,18 @@ layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
 		dec->reason = L7_DECIDE_DEFAULT_MONITOR;
 	}
 	dec->would_enforce_block_or_tag = 0;
+	return 0;
+}
+
+void
+layer7_flow_decide(const struct layer7_exception *exc, int n_exc,
+    const struct layer7_policy_rule *rules, int n_rules, int global_enforce,
+    const char *iface, const char *src_ip,
+    const char *ndpi_app, const char *ndpi_category, const char *host,
+    struct layer7_decision *dec)
+{
+	(void)layer7_decide_for_client(exc, n_exc, rules, n_rules, global_enforce,
+	    iface, src_ip, host, ndpi_app, ndpi_category, dec);
 }
 
 const char *

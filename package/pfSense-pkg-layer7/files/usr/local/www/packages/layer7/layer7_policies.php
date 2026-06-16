@@ -99,7 +99,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 
 				$policies[] = $rule;
 				if (layer7_save_json($data)) {
-					layer7_signal_reload();
+					layer7_pf_config_resync(false);
 					$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
 
 					if (isset($profile["extra_action"]) && $profile["extra_action"] === "configure_unbound_anti_doh") {
@@ -162,7 +162,7 @@ if ($_POST["toggle_profile_on"] ?? false) {
 					if (!empty($hosts)) { $rule["match"]["hosts"] = array_slice($hosts, 0, 64); }
 					$policies[] = $rule;
 					if (layer7_save_json($data)) {
-						layer7_signal_reload();
+						layer7_pf_config_resync(false);
 						$savemsg = sprintf(l7_t("Perfil '%s' ligado (accao block; em modo monitor fica apenas observado)."), $profile["name"] ?? $profile_id);
 						if (($profile["extra_action"] ?? "") === "configure_unbound_anti_doh") {
 							$doh_result = layer7_configure_unbound_anti_doh();
@@ -192,7 +192,7 @@ if ($_POST["toggle_profile_off"] ?? false) {
 				));
 				if (count($data["layer7"]["policies"]) !== $before) {
 					if (layer7_save_json($data)) {
-						layer7_signal_reload();
+						layer7_pf_config_resync(false);
 						$savemsg = sprintf(l7_t("Perfil '%s' desligado."), $profile_id);
 					}
 				} else {
@@ -335,10 +335,22 @@ if ($_POST["add_policy"] ?? false) {
 			if ($sched !== null) {
 				$rule["schedule"] = $sched;
 			}
+			if (!empty($_POST["new_scope_global"])) {
+				$rule["scope_global"] = true;
+			}
+			if (!empty($_POST["new_quarantine_origin"])) {
+				$rule["quarantine_origin"] = true;
+			}
+			if ($act === "block" && !layer7_policy_block_valid($rule)) {
+				$input_errors[] = l7_t("Politica block sem criterios: indique hosts/app/categoria ou active quarentena/scope global.");
+				$ok = false;
+			}
+			if ($ok) {
 			$policies[] = $rule;
 			if (layer7_save_json($data)) {
-				layer7_signal_reload();
+				layer7_pf_config_resync(false);
 				$savemsg = l7_t("Politica adicionada.");
+			}
 			}
 		}
 		unset($policies);
@@ -356,7 +368,7 @@ if ($_POST["save_policies"] ?? false) {
 		}
 		unset($policies);
 		if (layer7_save_json($data)) {
-			layer7_signal_reload();
+			layer7_pf_config_resync(false);
 			$savemsg = l7_t("Politicas atualizadas.");
 		}
 }
@@ -374,7 +386,7 @@ if ($_POST["delete_policy"] ?? false) {
 		} else {
 			array_splice($policies, $idx, 1);
 			if (layer7_save_json($data)) {
-				layer7_signal_reload();
+				layer7_pf_config_resync(true);
 				$savemsg = l7_t("Politica removida.");
 			}
 		}
@@ -502,13 +514,25 @@ if ($_POST["save_policy_edit"] ?? false) {
 				if ($edit_sched !== null) {
 					$rule["schedule"] = $edit_sched;
 				}
+				if (!empty($_POST["edit_scope_global"])) {
+					$rule["scope_global"] = true;
+				}
+				if (!empty($_POST["edit_quarantine_origin"])) {
+					$rule["quarantine_origin"] = true;
+				}
+				if ($act === "block" && !layer7_policy_block_valid($rule)) {
+					$input_errors[] = l7_t("Politica block sem criterios: indique hosts/app/categoria ou active quarentena/scope global.");
+					$ok = false;
+				}
+				if ($ok) {
 				$policies[$idx] = $rule;
 				if (layer7_save_json($data)) {
-					layer7_signal_reload();
+					layer7_pf_config_resync(false);
 					header("Location: layer7_policies.php");
 					exit;
 				}
 				$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
+				}
 			}
 		}
 		unset($policies);
@@ -1131,6 +1155,29 @@ function layer7_policy_match_summary($policy) {
 				</div>
 
 				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Escopo global"); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="edit_scope_global" value="1" <?= !empty($edit_policy["scope_global"]) ? 'checked="checked"' : ''; ?> />
+							<?= l7_t("Aplicar a toda a rede (sem origem definida)"); ?>
+						</label>
+						<p class="help-block"><?= l7_t("So relevante com enforcement escopado (scoped_hybrid). Sem IPs/CIDRs/grupos de origem, a politica block so gera regra PF global se esta opcao estiver activa."); ?></p>
+						<p class="help-block text-warning"><strong><?= l7_t("Atencao:"); ?></strong> <?= l7_t("Com match vazio (sem hosts/apps/categorias) e esta opcao activa, qualquer IP adicionado a tabela PF escopada bloqueia saida externa de forma global — efeito amplo em toda a rede. Use apenas com criterios explicitos ou origens definidas."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Quarentena origem"); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="edit_quarantine_origin" value="1" <?= !empty($edit_policy["quarantine_origin"]) ? 'checked="checked"' : ''; ?> />
+							<?= l7_t("Bloquear toda a saida externa da origem (app-only sem destino)"); ?>
+						</label>
+						<p class="help-block"><?= l7_t("So relevante com enforcement escopado. Politicas block por app/categoria sem host exigem esta opcao para quarentenar a origem; caso contrario o bloqueio e ignorado com aviso no log."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
 					<div class="col-sm-offset-3 col-sm-9">
 						<button type="submit" name="save_policy_edit" value="1" class="btn btn-primary"><?= l7_t("Guardar alteracoes"); ?></button>
 					</div>
@@ -1322,6 +1369,29 @@ function layer7_policy_match_summary($policy) {
 							<input type="checkbox" name="new_enabled" value="1" checked="checked" />
 							<?= l7_t("Criar politica ja habilitada"); ?>
 						</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Escopo global"); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="new_scope_global" value="1" />
+							<?= l7_t("Aplicar a toda a rede (sem origem definida)"); ?>
+						</label>
+						<p class="help-block"><?= l7_t("So relevante com enforcement escopado (scoped_hybrid). Sem IPs/CIDRs/grupos de origem, a politica block so gera regra PF global se esta opcao estiver activa."); ?></p>
+						<p class="help-block text-warning"><strong><?= l7_t("Atencao:"); ?></strong> <?= l7_t("Com match vazio (sem hosts/apps/categorias) e esta opcao activa, qualquer IP adicionado a tabela PF escopada bloqueia saida externa de forma global — efeito amplo em toda a rede. Use apenas com criterios explicitos ou origens definidas."); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Quarentena origem"); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="new_quarantine_origin" value="1" />
+							<?= l7_t("Bloquear toda a saida externa da origem (app-only sem destino)"); ?>
+						</label>
+						<p class="help-block"><?= l7_t("So relevante com enforcement escopado. Politicas block por app/categoria sem host exigem esta opcao para quarentenar a origem; caso contrario o bloqueio e ignorado com aviso no log."); ?></p>
 					</div>
 				</div>
 

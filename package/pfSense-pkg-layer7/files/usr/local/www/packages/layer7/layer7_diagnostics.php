@@ -278,6 +278,22 @@ $L = isset($data["layer7"]) ? $data["layer7"] : array();
 $cfg_enabled = !empty($L["enabled"]);
 $cfg_mode = isset($L["mode"]) ? (string)$L["mode"] : "monitor";
 $cfg_ifaces = isset($L["interfaces"]) && is_array($L["interfaces"]) ? $L["interfaces"] : array();
+$cfg_enforcement_model = (isset($L["enforcement_model"]) &&
+    (string)$L["enforcement_model"] === "scoped_hybrid")
+    ? "scoped_hybrid" : "legacy_global";
+$pf_scoped_active = ($cfg_enforcement_model === "scoped_hybrid" &&
+    $cfg_enabled && $cfg_mode === "enforce");
+$pf_scoped_tables = array();
+$pf_scoped_rules_hits = array();
+if ($pf_scoped_active) {
+	foreach (layer7_policy_enforcement_table_names($data) as $stbl) {
+		$pf_scoped_tables[$stbl] = layer7_diag_table_ready($stbl, $pf_tables_map, $pf_active_rules_raw);
+	}
+	exec("/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep -E 'layer7:pdst:|layer7:psrc:' 2>/dev/null",
+	    $pf_scoped_rules_hits, $pf_scoped_rules_code);
+}
+$pf_scoped_ok = !$pf_scoped_active ||
+    (count($pf_scoped_rules_hits) > 0 && !in_array(false, $pf_scoped_tables, true));
 
 $protos_path = "/usr/local/etc/layer7-protos.txt";
 $protos_exists = file_exists($protos_path);
@@ -342,6 +358,21 @@ layer7_render_styles();
 						<span class="label label-danger"><?= l7_t("enforce"); ?></span>
 						<?php } else { ?>
 						<span class="label label-info"><?= l7_t("monitor"); ?></span>
+						<?php } ?>
+					</dd>
+
+					<dt><?= l7_t("Enforcement model"); ?></dt>
+					<dd>
+						<code><?= htmlspecialchars($cfg_enforcement_model); ?></code>
+						<?php if ($cfg_enforcement_model === "scoped_hybrid") { ?>
+						<span class="label label-warning"><?= l7_t("experimental"); ?></span>
+						<?php if ($pf_scoped_active) { ?>
+						<br><small class="<?= $pf_scoped_ok ? "text-success" : "text-danger"; ?>">
+							<?= $pf_scoped_ok
+							    ? l7_t("Scoped PF activo: regras pdst/psrc detectadas.")
+							    : l7_t("Scoped PF incompleto: verifique filter reload e tabelas pdst/psrc."); ?>
+						</small>
+						<?php } ?>
 						<?php } ?>
 					</dd>
 

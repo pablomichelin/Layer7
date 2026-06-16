@@ -83,7 +83,7 @@ if ($_POST["add_exception"] ?? false) {
 			}
 			$exceptions[] = $rule;
 			if (layer7_save_json($data)) {
-				layer7_signal_reload();
+				layer7_pf_config_resync();
 				$savemsg = l7_t("Excecao adicionada.");
 			}
 		}
@@ -102,7 +102,7 @@ if ($_POST["save_exceptions"] ?? false) {
 		}
 		unset($exceptions);
 		if (layer7_save_json($data)) {
-			layer7_signal_reload();
+			layer7_pf_config_resync();
 			$savemsg = l7_t("Excecoes atualizadas.");
 		}
 }
@@ -120,7 +120,7 @@ if ($_POST["delete_exception"] ?? false) {
 		} else {
 			array_splice($exceptions, $idx, 1);
 			if (layer7_save_json($data)) {
-				layer7_signal_reload();
+				layer7_pf_config_resync();
 				$savemsg = l7_t("Excecao removida.");
 			}
 		}
@@ -187,7 +187,7 @@ if ($_POST["save_exception_edit"] ?? false) {
 				}
 				$exceptions[$idx] = $rule;
 				if (layer7_save_json($data)) {
-					layer7_signal_reload();
+					layer7_pf_config_resync();
 					header("Location: layer7_exceptions.php");
 					exit;
 				}
