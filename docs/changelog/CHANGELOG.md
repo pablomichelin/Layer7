@@ -2,14 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [1.8.11_24] - 2026-06-16 — Caminho B E0–E3 + estabilização pós-revisão (rascunho)
+## [1.8.11_24] - 2026-06-16 — Caminho B E0–E3 + estabilização pós-revisão
 
-Bloco técnico **não publicado** (`PORTREVISION=24` no repositório; sem `.pkg`
-nem actualização de `MANUAL-INSTALL.md` até gate e release). Consolida o
-**Caminho B E0–E3** (enforcement escopado por política) e correcções da revisão
-pré-instalação de 2026-06-15. Testes locais (`tests/run-local.sh`) PASS;
-**gate two-client no appliance** (`validacao-lab.md` sec. 12) continua
-**PENDENTE**.
+Release publica. Artefacto `pfSense-pkg-layer7-1.8.11_24.pkg`
+(`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`),
+build no builder FreeBSD (`192.168.100.12`). Consolida o **Caminho B E0–E3**
+(enforcement escopado por política) e correcções da revisão pré-instalação de
+2026-06-15. Testes locais (`tests/run-local.sh`) PASS; **gate two-client no
+appliance** (`validacao-lab.md` sec. 12) continua **PENDENTE**.
 
 ### Caminho B / E0–E3 — enforcement escopado (`PORTREVISION=24`)
 
@@ -58,7 +58,7 @@ pré-instalação de 2026-06-15. Testes locais (`tests/run-local.sh`) PASS;
 - `scoped_hybrid` é **experimental**; não activar em produção sem gate
   two-client (sec. 12) e validação lab.
 - E4–E8 (BG-049..BG-052) permanecem pendentes.
-- Sem artefacto publicado neste bloco; rollback = checkout/`PORTREVISION=23`.
+- Rollback = `1.8.11_23` (`v1.8.11_23`).
 
 ---
 

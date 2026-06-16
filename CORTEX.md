@@ -34,11 +34,22 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 `2026-05-30`: build no builder FreeBSD (`192.168.100.12`), validado no
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
-**Ultima versao do pacote publicada em release:** `1.8.11_23` (referencia de
+**Ultima versao do pacote publicada em release:** `1.8.11_24` (referencia de
 instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
-`pablomichelin/Layer7`, tag `v1.8.11_23`,
-`SHA256=3c9e488d48c441a9859a1d953b603e9cecb242fc9d2e93ce144e05cdacb8d7d4`).
-Caminho A (A0-A5) sobre a base estavel da Fase 1.
+`pablomichelin/Layer7`, tag `v1.8.11_24`,
+`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`).
+Caminho B E0–E3 sobre Caminho A (`1.8.11_23`); gate two-client appliance
+**PENDENTE**.
+
+### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
+
+Artefacto `pfSense-pkg-layer7-1.8.11_24.pkg`
+(`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`),
+build no builder FreeBSD. Consolida enforcement escopado (E0–E3) e correcoes
+pos-revisao 2026-06-15 (detalhes em `CHANGELOG [1.8.11_24]`; BG-045..BG-048
+`Concluido`). `legacy_global` permanece default; `scoped_hybrid` experimental
+OFF por defeito. Gate two-client (validacao-lab sec. 12) **PENDENTE** — nao
+avancar E4 sem PASS no appliance.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
@@ -149,9 +160,9 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_23` (`PORTVERSION=1.8.11`, `PORTREVISION=23`),
-alinhada a **release publica** `v1.8.11_23` (Caminho A completo A0-A5,
-validada no appliance).
++ `PORTREVISION`):** `1.8.11_24` (`PORTVERSION=1.8.11`, `PORTREVISION=24`),
+alinhada a **release publica** `v1.8.11_24` (Caminho B E0–E3; gate two-client
+pendente).
 **Data-base deste checkpoint:** `2026-04-27`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
@@ -172,13 +183,14 @@ controladas, com governanca forte e zero regressao desnecessaria.
 - V1 Comercial ja foi concluida e publicada.
 - O pacote publico de referencia continua a ser o `.pkg` distribuido via
   GitHub Releases.
-- A ultima publicacao conhecida no canal publico e o pacote **`1.8.11_23`**
-  (GitHub `pablomichelin/Layer7`, tag `v1.8.11_23`). Trabalho em curso no
-  repositorio: **`1.8.11_24`** (`PORTREVISION=24`) — Caminho B E0–E3 +
-  correcções pos-revisao; **nao publicado** (gate two-client pendente). A linha
-  **`1.8.3`** permanece como referencia historica de V1 comercial estavel;
-  rollbacks adicionais: `1.8.11_18`, `1.8.11_17`, `1.8.11_16`, `1.8.11_14`,
-  `1.8.11_13`, `1.8.11_12`, `1.8.3`.
+- A ultima publicacao conhecida no canal publico e o pacote **`1.8.11_24`**
+  (GitHub `pablomichelin/Layer7`, tag `v1.8.11_24`,
+  `SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`).
+  Caminho B E0–E3 publicado; **gate two-client** (`validacao-lab.md` sec. 12)
+  **PENDENTE** — nao activar `scoped_hybrid` em producao sem gate PASS. Rollback
+  imediato: **`1.8.11_23`**. A linha **`1.8.3`** permanece como referencia
+  historica de V1 comercial estavel; rollbacks adicionais: `1.8.11_18`,
+  `1.8.11_17`, `1.8.11_16`, `1.8.11_14`, `1.8.11_13`, `1.8.11_12`, `1.8.3`.
 - Bloqueio QUIC configuravel por interface na GUI e restricao
   `to !<localsubnets>` em bloqueios permanecem como base funcional conhecida.
 - O license server existe e esta operacional como componente separado,
@@ -811,20 +823,19 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-06-16
 - Produto: Layer7 para pfSense CE
-- Ultima versao .pkg publicada (referencia operacional): 1.8.11_23
-  (SHA256 3c9e488d48c441a9859a1d953b603e9cecb242fc9d2e93ce144e05cdacb8d7d4;
-   Caminho A completo A0-A5; ver CHANGELOG [1.8.11_23];
+- Ultima versao .pkg publicada (referencia operacional): 1.8.11_24
+  (SHA256 1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818;
+   Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Trabalho em curso (nao publicado): 1.8.11_24 — Caminho B E0-E3 + pos-revisao;
-  PORTREVISION 24; gate two-client (validacao-lab sec. 12) PENDENTE
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 24 (rascunho tecnico)
-- Estado funcional: V1 + Caminho A publicados; Caminho B E0-E3 codigo no repo
+- Proximo gate: two-client appliance (validacao-lab sec. 12) antes de E4-E8
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 24 (release publica)
+- Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados
 - Estado documental: governanca F0 consolidada; revisao pre-install 2026-06-15
   parcialmente enderecada em _24 (ver docs/09-blocking/revisao-codigo-*)
 - Fase actual: pos-V1 — Caminho B (E4-E8 pendentes apos gate E3)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_23)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_24)
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canónica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canónica de gates: docs/02-roadmap/checklist-mestre.md
@@ -836,12 +847,12 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **instalacao publica** e o pacote **`1.8.11_23`**
-  publicado em 2026-05-30 em `pablomichelin/Layer7` tag `v1.8.11_23`
-  (`SHA256=3c9e488d48c441a9859a1d953b603e9cecb242fc9d2e93ce144e05cdacb8d7d4`).
-  Trabalho em curso no branch: `PORTVERSION=1.8.11`, `PORTREVISION=24`
-  (Caminho B E0–E3; **nao publicado**). Rollback publico:
-  `v1.8.11_18`, `v1.8.11_17`, `v1.8.11_16`, `v1.8.11_14`, `v1.8.11_13`,
+- A referencia de **instalacao publica** e o pacote **`1.8.11_24`**
+  publicado em 2026-06-16 em `pablomichelin/Layer7` tag `v1.8.11_24`
+  (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`).
+  Gate two-client **PENDENTE**. Rollback publico imediato: `v1.8.11_23`.
+  Rollback adicional: `v1.8.11_18`, `v1.8.11_17`, `v1.8.11_16`, `v1.8.11_14`,
+  `v1.8.11_13`,
   `v1.8.11_12`, `v1.8.3`, etc.
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`

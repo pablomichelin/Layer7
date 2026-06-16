@@ -1,11 +1,11 @@
-# Release Notes — `pfSense-pkg-layer7` `1.8.11_24` (RASCUNHO)
+# Release Notes — `pfSense-pkg-layer7` `1.8.11_24`
 
 - **Data:** 2026-06-16
-- **Estado:** rascunho técnico — **sem `.pkg` publicado**; `MANUAL-INSTALL.md`
-  inalterado até gate e release
-- **Tag GitHub prevista:** `v1.8.11_24` (após gate)
+- **Estado:** publicada
+- **Tag GitHub:** `v1.8.11_24`
+- **SHA256:** `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`
 - **Tipo:** Caminho B E0–E3 + estabilização pós-revisão pré-instalação
-- **Última release pública de referência:** `1.8.11_23`
+- **Última release pública de referência (rollback):** `1.8.11_23`
 
 ---
 
