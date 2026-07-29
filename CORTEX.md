@@ -174,8 +174,10 @@ Quando o limite de 48 pacotes era atingido, também faltava chamar
 
 BG-059 faz a decisão aguardar `NDPI_STATE_CLASSIFIED`; ao esgotar o orçamento,
 usa o fallback oficial do nDPI antes de emitir a única classificação do fluxo.
-Regressões locais: PASS. Build nDPI, pacote e gate passivo permanecem
-pendentes; produção não foi alterada.
+Suite C/PHP/shell, build nDPI e pacote extraído: PASS. Artefacto
+`pfSense-pkg-layer7-1.8.11_31.pkg`,
+`SHA256=dc5118dd01193a83a6c6d15cc3ae4ca300647294a5b188e1991a363b4c453e33`.
+Gate passivo permanece pendente; produção não foi alterada.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
@@ -961,7 +963,7 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: build/validar `_31`, instalar em passivo e validar ruleset +
+- Proximo gate: instalar `_31` em passivo e validar ruleset +
   logs/monitor/captura e só então testar o toggle anti-QUIC
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped

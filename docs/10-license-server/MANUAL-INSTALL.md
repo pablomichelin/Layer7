@@ -251,8 +251,11 @@ Corrige FP-020: o daemon não encerra mais DPI num resultado
 `NDPI_STATE_PARTIAL`; aguarda o estado final ou chama
 `ndpi_detection_giveup()` ao atingir 48 pacotes. Isso permite refinamento de
 TLS/QUIC genérico para aplicação/categoria/SNI antes da política. Regressões
-locais passaram; build/hash e validação passiva ainda são obrigatórios.
-`_30` fica apenas como rollback passivo pré-FP-020.
+locais/builder, build nDPI e pacote extraído passaram. Artefacto interno:
+`pfSense-pkg-layer7-1.8.11_31.pkg`,
+`SHA256=dc5118dd01193a83a6c6d15cc3ae4ca300647294a5b188e1991a363b4c453e33`.
+Validação passiva ainda é obrigatória. `_30` fica apenas como rollback
+passivo pré-FP-020.
 
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e

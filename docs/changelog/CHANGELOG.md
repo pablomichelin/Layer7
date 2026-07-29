@@ -17,7 +17,9 @@ Pacote candidato, não publicado e não aprovado para produção.
 
 - Impacto limitado ao momento de finalização da captura nDPI; política e PF
   não mudam.
-- Regressões locais: PASS. Builder nDPI, pacote e appliance: pendentes.
+- Suite local/builder, PHP/shell, build nDPI e pacote extraído: PASS
+  (`SHA256=dc5118dd01193a83a6c6d15cc3ae4ca300647294a5b188e1991a363b4c453e33`).
+- Appliance passivo: pendente.
 - Rollback: `_30` passivo; `_24` continua rollback público conhecido.
 
 ---

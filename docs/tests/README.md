@@ -63,11 +63,12 @@ GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3, estabilização `_25`, logs `_26`,
 correcções `_27`, allow PF seguro `_28`, parser anti-QUIC `_29` e captura
 resiliente `_30` e finalização nDPI `_31`).
-Estado actual antes do build `_31`: 98 OK e **22** pendentes. A sintaxe
+Estado actual após build `_31`: 99 OK e **21** pendentes. A sintaxe
 corrigida passa no parser PF read-only e o pacote extraído passou no builder
 FreeBSD 15 (`SHA256 bea385dd…01840`); as regressões FP-019 passam localmente,
-e o pacote `_30` passou no builder (`SHA256 3a54c667…e9b40`). Gates instalados
-continuam explicitamente pendentes; FP-020 já tem regressões locais.
+e o pacote `_30` passou no builder (`SHA256 3a54c667…e9b40`). FP-020 e o
+pacote `_31` passaram no builder (`SHA256 dc5118dd…453e33`). Gates instalados
+continuam explicitamente pendentes.
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):
 parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em

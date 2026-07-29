@@ -290,7 +290,7 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 |---|-------|------|--------|
 | 19.1 | Resultado parcial não finaliza o fluxo antes do refinamento | local C | OK (`test_capture_flow_key.c`) |
 | 19.2 | Estado final ou orçamento esgotado encerra a inspeção | local C | OK (`test_capture_flow_key.c`) |
-| 19.3 | Build nDPI comprova `NDPI_STATE_CLASSIFIED` e `ndpi_detection_giveup()` no binário `_31` | FreeBSD 15 | Pendente |
+| 19.3 | Build nDPI comprova `NDPI_STATE_CLASSIFIED` e `ndpi_detection_giveup()` no binário `_31` | FreeBSD 15 | OK (`SHA256=dc5118dd01193a83a6c6d15cc3ae4ca300647294a5b188e1991a363b4c453e33`; pacote extraído PASS) |
 | 19.4 | Tráfego real refina TLS/QUIC genérico para app/SNI e emite uma decisão | appliance | Pendente |
 
 ---
@@ -317,8 +317,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Allow PF seguro `_28` | 8 | 5 | 3 |
 | Parser anti-QUIC `_29` | 4 | 3 | 1 |
 | Captura resiliente `_30` | 4 | 3 | 1 |
-| Finalização nDPI `_31` | 4 | 2 | 2 |
-| **Total** | **120** | **98** | **22** |
+| Finalização nDPI `_31` | 4 | 3 | 1 |
+| **Total** | **120** | **99** | **21** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

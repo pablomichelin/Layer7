@@ -145,8 +145,9 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] **Candidato `_31` (BG-059 / FP-020):** resultado
   `NDPI_STATE_PARTIAL` não pode finalizar o fluxo; aguardar
   `NDPI_STATE_CLASSIFIED` ou chamar `ndpi_detection_giveup()` ao atingir 48
-  pacotes. Exigir build nDPI e tráfego real que refine TLS genérico para
-  aplicação/SNI antes do gate two-client.
+  pacotes. Build nDPI e pacote extraído passaram
+  (`SHA256 dc5118dd…453e33`). Exigir tráfego real que refine TLS genérico
+  para aplicação/SNI antes do gate two-client.
 
 ---
 

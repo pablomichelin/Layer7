@@ -1107,6 +1107,12 @@ parar o daemon, preservar JSON/logs e voltar a `_29`/`_24` passivo.
 
 ## 17. Roteiro BG-059 — refinamento nDPI (`1.8.11_31`)
 
+Build no FreeBSD 15, suite C/PHP/shell e validação do pacote extraído: PASS.
+Artefacto `pfSense-pkg-layer7-1.8.11_31.pkg`,
+`SHA256=dc5118dd01193a83a6c6d15cc3ae4ca300647294a5b188e1991a363b4c453e33`.
+O binário não-stripped contém `ndpi_detection_giveup`; versão, dependências,
+dois `-t`, dry-run e conteúdo do pacote passaram.
+
 Instalar somente em modo passivo. Gerar tráfego TLS/QUIC conhecido para uma
 aplicação presente numa política de teste, mantendo enforcement desligado.
 Correlacionar pcap e `flow_decide`: o daemon não pode encerrar no primeiro

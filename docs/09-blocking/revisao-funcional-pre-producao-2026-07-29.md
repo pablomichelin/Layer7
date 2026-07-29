@@ -82,8 +82,9 @@ Ao atingir 48 pacotes, também emitia o último resultado parcial sem o fallback
 
 O candidato `_31` só finaliza por `NDPI_STATE_CLASSIFIED`; no limite chama
 `ndpi_detection_giveup()` e então emite uma única decisão. Regressões locais
-cobrem parcial, estado final e orçamento. Builder e gate passivo permanecem
-pendentes.
+cobrem parcial, estado final e orçamento. Suite C/PHP/shell, build nDPI e
+pacote extraído passaram no FreeBSD 15 (`SHA256 dc5118dd…453e33`); gate
+passivo permanece pendente.
 
 | ID | Severidade | Limitação/risco | Próxima decisão |
 |----|------------|-----------------|-----------------|
@@ -94,11 +95,12 @@ pendentes.
 | FP-013 | Alta | DNS hint é global, limitado e associa um único hostname por IP compartilhado | Testar CDN multi-host; priorizar SNI quando disponível |
 | FP-014 | Alta | ECH, DoH hardcoded e QUIC podem ocultar host; bloqueio por IP pode atingir serviços compartilhados do mesmo cliente | UX de limitação, perfis de fallback e testes CDN |
 | FP-015 | Média | `config_parse.c` ainda usa busca textual sensível à estrutura/ordem do JSON | Migrar para parser JSON real em bloco separado |
-| FP-016 | Alta | Falta evidência física two-client, expiração, state kill, allow seguro e rollback | Builds `_29`/`_30` passaram; construir `_31` e executar roteiro começando passivo |
+| FP-016 | Alta | Falta evidência física two-client, expiração, state kill, allow seguro e rollback | Build `_31` passou; executar roteiro começando passivo |
 
 ## Critérios mínimos antes de activar
 
-1. Build `_31` com nDPI e PHP no builder FreeBSD — **PENDENTE**.
+1. Build `_31` com nDPI e PHP no builder FreeBSD — **PASS**,
+   SHA256 `dc5118dd…453e33`.
 2. Instalação no appliance com `enabled=false`, sem regras/tabelas populadas.
 3. Monitor com captura real: ida/volta classificadas e sem bloqueio.
 4. `scoped_hybrid` com dois clientes: A bloqueado, B permitido.
