@@ -3591,6 +3591,7 @@ function layer7_reports_ingest_path($db, $insert, $cfg, $log_path,
 
 	$ingested = 0;
 	$current_offset = 0;
+	$current_inode = $inode;
 	@$db->exec("BEGIN IMMEDIATE TRANSACTION");
 	foreach ($sources as $source) {
 		$fh = @fopen($source["path"], "r");
@@ -3601,6 +3602,12 @@ function layer7_reports_ingest_path($db, $insert, $cfg, $log_path,
 				    "reason" => "open_failed");
 			}
 			continue;
+		}
+		if (!empty($source["current"])) {
+			$fst = @fstat($fh);
+			if (is_array($fst) && isset($fst["ino"])) {
+				$current_inode = (string)$fst["ino"];
+			}
 		}
 		if ((int)$source["offset"] > 0) {
 			@fseek($fh, (int)$source["offset"]);
@@ -3621,7 +3628,7 @@ function layer7_reports_ingest_path($db, $insert, $cfg, $log_path,
 		return array("ok" => false, "ingested" => $ingested,
 		    "reason" => "commit_failed");
 	}
-	layer7_reports_cursor_save($cursor_path, $inode, $current_offset);
+	layer7_reports_cursor_save($cursor_path, $current_inode, $current_offset);
 	return array("ok" => true, "ingested" => $ingested, "reason" => "ok");
 }
 

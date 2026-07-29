@@ -124,7 +124,7 @@ remocao de registros.
 
 - `/usr/local/etc/layer7/reports/reports.db` — base SQLite
 - `/usr/local/etc/layer7/reports/ingest.cursor` — offset de ingestao
-- `/usr/local/etc/layer7/reports/events.cursor` — cursor do log de eventos
+- `/usr/local/etc/layer7/reports/ingest-events.cursor` — cursor do log de eventos
 - `/var/log/layer7d.log` — operação
 - `/var/log/layer7-events.log` — tráfego e auditoria
 - `/usr/local/etc/layer7/layer7-reports-collect.php` — colector incremental
@@ -140,6 +140,6 @@ Se houver qualquer problema no modulo executivo:
 3. Se necessario, remover apenas os artefactos de relatorio:
    - `rm -f /usr/local/etc/layer7/reports/reports.db`
    - `rm -f /usr/local/etc/layer7/reports/ingest.cursor`
-   - `rm -f /usr/local/etc/layer7/reports/events.cursor`
+   - `rm -f /usr/local/etc/layer7/reports/ingest-events.cursor`
 
 O motor de politicas e bloqueio continua funcional sem dependencia do modulo de relatorios.
