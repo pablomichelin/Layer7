@@ -20,8 +20,9 @@ Blacklists UT1 ja usam o modelo correcto: `from {cidr} to <layer7_bld_N>`.
 
 ## Problema
 
-Como evoluir para enforcement **escopado por politica** (site=destino por origem;
-app=quarentena de origem) sem regressao nas instalacoes existentes e sem MITM?
+Como evoluir para enforcement **escopado por politica** (destino por origem;
+quarentena apenas por opção explícita) sem regressao nas instalacoes existentes
+e sem MITM?
 
 ## Decisao
 
@@ -42,7 +43,8 @@ default para `scoped_hybrid`).
 | Tipo de match | Enforcement PF | Exemplo |
 |---------------|------------------|---------|
 | Site / host / SNI | `from {cliente} to <layer7_pdst_N>` | YouTube so para 10.0.0.10 |
-| App / categoria nDPI (sem host) | `from <layer7_psrc_N> to !<localsubnets>` | BitTorrent: quarentena do cliente |
+| App / categoria nDPI (normal) | `from {cliente} to <layer7_pdst_N>` | Bloqueia apenas o destino observado para o cliente |
+| App / categoria com `quarantine_origin=true` | `from <layer7_psrc_N> to !<localsubnets>` | Quarentena deliberada do cliente |
 | Politica sem origem | Global **so** com `scope_global: true` (E4) | Opt-in explicito |
 | Blacklists UT1 | Manter `layer7_bld_N` | Sem regressao |
 
@@ -88,6 +90,26 @@ Rejeitada: fora do escopo V1; Caminho B reutiliza PF passivo existente.
 - CDN, ECH, DoH hardcoded, IPv6 e delay nDPI continuam limites (E6/E8 doc);
 - licenca invalida continua a desactivar enforce ao vivo (nao e bug Caminho B);
 - `device_ips` stale exige resync operacional (documentado em E0).
+
+## Emenda de seguranca operacional — 2026-07-29 (`1.8.11_27`)
+
+A implementação E2/E3 original tratava todo match de aplicação/categoria como
+`psrc`, inclusive quando `quarantine_origin` estava desligado. Como uma regra
+`psrc` bloqueia **todo** o tráfego externo da origem, uma simples detecção de
+YouTube/BitTorrent podia cortar a Internet completa do cliente.
+
+A decisão foi refinada:
+
+- app/categoria normal adiciona o IP de destino observado a `pdst_N`;
+- `quarantine_origin=true` mantém `psrc_N` e encerra todos os estados da
+  origem;
+- política mista app+host sem quarentena usa `pdst_N` nos dois caminhos;
+- a quarentena passa a ser sempre opt-in explícito.
+
+O daemon também invalida estados PF após inserir o bloqueio, pois a decisão
+nDPI é reactiva e uma sessão já estabelecida não volta a atravessar as regras
+de filtro. Para `pdst`, o kill é limitado ao par cliente/destino; para `psrc`,
+à origem em quarentena; no modelo legado global, ao destino global.
 
 ## Referencias
 

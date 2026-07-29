@@ -14,6 +14,7 @@ real de aplicacoes, sites, servicos e funcoes de produto no pfSense CE.
 - [`caminho-a-plano-de-implementacao.md`](caminho-a-plano-de-implementacao.md) — Caminho A (UX/dispositivos/SNI); concluido
 - [`blocking-master-plan.md`](blocking-master-plan.md) — plano mestre historico (v1.0.0, 2026-03-23)
 - [`revisao-codigo-pre-install-2026-06-15.md`](revisao-codigo-pre-install-2026-06-15.md) — revisao geral pre-instalação (50 achados REV-001..050)
+- [`revisao-funcional-pre-producao-2026-07-29.md`](revisao-funcional-pre-producao-2026-07-29.md) — auditoria end-to-end actual, correcções `_27` e riscos que ainda impedem produção
 
 ## Funcionalidades de bloqueio na V1
 

@@ -15,6 +15,7 @@
  *  - Sem reassembly TCP
  */
 #include "capture.h"
+#include "capture_flow_key.h"
 
 #include <arpa/inet.h>
 #include <net/ethernet.h>
@@ -208,6 +209,7 @@ observe_dns_response(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 	size_t off;
 	uint16_t qd, an, i;
 	char qname[L7C_DNS_HOST_MAX];
+	char rrname[L7C_DNS_HOST_MAX];
 
 	(void)sa;
 	if (sp != 53 || dp == 53 || !payload || payload_len < 12)
@@ -229,7 +231,8 @@ observe_dns_response(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 		uint16_t type, class_, rdlen;
 		uint32_t ttl;
 
-		if (dns_read_name(payload, payload_len, &off, qname, sizeof(qname), 0) != 0)
+		if (dns_read_name(payload, payload_len, &off, rrname,
+		    sizeof(rrname), 0) != 0)
 			return;
 		if (off + 10 > payload_len)
 			return;
@@ -329,21 +332,12 @@ sni_host_plausible(const char *h)
 	return dots >= 1;
 }
 
-static uint32_t
-flow_hash(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp, uint8_t p)
-{
-	uint32_t h = sa ^ da ^ ((uint32_t)sp << 16 | dp) ^ p;
-	h ^= h >> 16;
-	h *= 0x45d9f3b;
-	h ^= h >> 16;
-	return h & L7C_FLOW_MASK;
-}
-
 static struct l7c_flow *
 flow_lookup(struct layer7_capture *cap, uint32_t sa, uint32_t da,
     uint16_t sp, uint16_t dp, uint8_t proto, int create)
 {
-	uint32_t idx = flow_hash(sa, da, sp, dp, proto);
+	uint32_t idx = layer7_capture_flow_hash(sa, da, sp, dp, proto,
+	    L7C_FLOW_MASK);
 	uint32_t i;
 
 	for (i = 0; i < 64; i++) {
@@ -592,6 +586,10 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		observe_dns_response(cap, sa, da, sp, dp, l4_data + 8,
 		    (uint16_t)(l4_len - 8), now);
 
+	/* Coleta tambem quando o fluxo ja foi classificado; sem isto entradas
+	 * antigas podiam permanecer ate surgir outro fluxo nao classificado. */
+	expire_idle(cap, now);
+
 	if (f->classified)
 		return;
 
@@ -654,7 +652,6 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		    cat_name ? cat_name : "Unspecified", host_hint);
 	}
 
-	expire_idle(cap, now);
 }
 
 int

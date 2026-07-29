@@ -43,9 +43,10 @@ $scoped = layer7_policy_enforcement_rules_text($data);
 if ($scoped === "" ||
     strpos($scoped, "layer7_pdst_0") === false ||
     strpos($scoped, "from 10.0.0.10 to <layer7_pdst_0>") === false ||
-    strpos($scoped, "layer7_psrc_1") === false ||
-    strpos($scoped, "from <layer7_psrc_1> to !<localsubnets>") === false) {
-	fwrite(STDERR, "FAIL: scoped PF rules missing expected pdst/psrc lines\n");
+    strpos($scoped, "layer7_pdst_1") === false ||
+    strpos($scoped, "to <layer7_pdst_1>") === false ||
+    strpos($scoped, "layer7_psrc_1") !== false) {
+	fwrite(STDERR, "FAIL: normal app policy must use pdst, not psrc quarantine\n");
 	fwrite(STDERR, $scoped);
 	exit(1);
 }

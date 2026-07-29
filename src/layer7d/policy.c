@@ -1036,8 +1036,17 @@ policy_enforce_kind(const struct layer7_policy_rule *r, int app_matched,
 	 * realmente casou, nao apenas a presenca de hosts na configuracao. */
 	if (host_matched)
 		return L7_ENFORCE_DST_SCOPED;
-	if (app_matched || cat_matched)
-		return L7_ENFORCE_SRC_SCOPED;
+	/*
+	 * O bloqueio normal de app/categoria deve atingir apenas o destino do
+	 * fluxo classificado. Colocar a origem em psrc corta todo o trafego
+	 * externo do cliente e fica reservado à quarentena explicitamente
+	 * solicitada pelo operador.
+	 */
+	if (app_matched || cat_matched) {
+		if (r->quarantine_origin)
+			return L7_ENFORCE_SRC_SCOPED;
+		return L7_ENFORCE_DST_SCOPED;
+	}
 	if (r->quarantine_origin || r->scope_global)
 		return L7_ENFORCE_SRC_SCOPED;
 	return L7_ENFORCE_NONE;
@@ -1135,6 +1144,15 @@ layer7_policy_table_index(const struct layer7_policy_rule *rules, int n,
 			return i;
 	}
 	return -1;
+}
+
+int
+layer7_decision_is_explicit_allow(const struct layer7_decision *dec)
+{
+	if (!dec || dec->action != LAYER7_ACTION_ALLOW)
+		return 0;
+	return dec->reason == L7_DECIDE_EXCEPTION ||
+	    dec->reason == L7_DECIDE_POLICY_MATCH;
 }
 
 int

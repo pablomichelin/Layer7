@@ -167,6 +167,22 @@ do `_26`; o artefacto interno validado tem
 mas a referência de instalação continua `_24`. Rollback: voltar a passivo,
 reinstalar `_24` e restaurar o JSON anterior.
 
+**Addendum do candidato `1.8.11_27` (não publicado):**
+Contém correcções críticas do pipeline de captura/enforcement: fluxo nDPI
+bidireccional, app normal por destino, state kill selectivo, precedência de
+allow, TTL SNI e self-heal scoped. Não instalar directamente em enforce.
+
+Procedimento obrigatório:
+
+1. instalar com `enabled=false`;
+2. validar ABI, serviço, captura e monitor passivo;
+3. executar gate two-client em `scoped_hybrid`;
+4. testar separadamente app normal e `quarantine_origin=true`;
+5. em falha, voltar a `_24` passivo, executar
+   `/usr/local/libexec/layer7-pfctl flush-all` e resync do filtro.
+
+O `.pkg`/SHA256 será preenchido somente após build e validação no builder.
+
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e
 **validada no appliance** (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh`

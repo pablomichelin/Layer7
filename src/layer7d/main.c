@@ -963,8 +963,30 @@ layer7_apply_block_enforcement(const struct layer7_decision *dec,
 
 	r = layer7_pf_add_with_selfheal(tbl, ip, reason);
 	if (r == 0) {
+		int kill_r = 0;
+
 		s_pf_dst_add_ok++;
 		enforce_cache_add(tbl, ip, ttl);
+		/*
+		 * A decisão ocorre depois de o PF criar estado. Remover somente
+		 * o estado afectado torna o bloqueio imediato sem reload global.
+		 * psrc é quarentena explícita; nesse caso encerra todos os
+		 * estados do host. legacy_global encerra estados para o destino.
+		 */
+		if (scoped_hybrid &&
+		    dec->enforce_kind == L7_ENFORCE_SRC_SCOPED)
+			kill_r = layer7_pf_exec_kill_states_host(src_ip);
+		else if (!scoped_hybrid)
+			kill_r = layer7_pf_exec_kill_states_to(dst_ip);
+		else
+			kill_r = layer7_pf_exec_kill_state_pair(src_ip, dst_ip);
+		if (kill_r != 0)
+			L7_WARN("enforce_block: state kill failed kind=%s "
+			    "src=%s dst=%s policy=%s",
+			    layer7_enforce_kind_str(dec->enforce_kind),
+			    src_ip ? src_ip : "-", dst_ip ? dst_ip : "-",
+			    dec->matched_policy_id[0] ?
+			    dec->matched_policy_id : "-");
 		L7_AUDIT_NOTE(NULL,
 		    "enforce_block: kind=%s table=%s src=%s dst=%s ip=%s "
 		    "policy=%s reason=%s",
@@ -1110,10 +1132,10 @@ pf_base_tables_ok(void)
 }
 
 static int
-layer7_pf_selfheal(const char *reason)
+layer7_pf_selfheal(const char *required_table, const char *reason)
 {
 	time_t now;
-	int have_base;
+	int ready;
 	int did_force = 0;
 
 	now = time(NULL);
@@ -1130,19 +1152,23 @@ layer7_pf_selfheal(const char *reason)
 		L7_WARN("pf_selfheal: helper ensure failed");
 	}
 
-	have_base = pf_base_tables_ok();
-	if (!have_base && access(L7_PF_RULES_DEBUG_PATH, R_OK) == 0) {
+	ready = required_table ? pf_table_exists(required_table) :
+	    pf_base_tables_ok();
+	if (!ready && access(L7_PF_RULES_DEBUG_PATH, R_OK) == 0) {
 		did_force = run_shell_cmd_ok(
 		    "/sbin/pfctl -f " L7_PF_RULES_DEBUG_PATH " >/dev/null 2>&1");
 	}
 
-	have_base = pf_base_tables_ok();
-	if (have_base) {
-		L7_NOTE("pf_selfheal: success reason=%s fallback=%d",
+	ready = required_table ? pf_table_exists(required_table) :
+	    pf_base_tables_ok();
+	if (ready) {
+		L7_NOTE("pf_selfheal: success table=%s reason=%s fallback=%d",
+		    required_table ? required_table : "base",
 		    reason ? reason : "-", did_force ? 1 : 0);
 		return 1;
 	}
-	L7_WARN("pf_selfheal: failed reason=%s fallback=%d",
+	L7_WARN("pf_selfheal: failed table=%s reason=%s fallback=%d",
+	    required_table ? required_table : "base",
 	    reason ? reason : "-", did_force ? 1 : 0);
 	return 0;
 }
@@ -1156,7 +1182,7 @@ layer7_pf_add_with_selfheal(const char *table, const char *ip,
 	r = layer7_pf_exec_table_add(table, ip);
 	if (r == 0)
 		return 0;
-	if (!layer7_pf_selfheal(reason))
+	if (!layer7_pf_selfheal(table, reason))
 		return -1;
 	r = layer7_pf_exec_table_add(table, ip);
 	if (r == 0)
@@ -1239,6 +1265,18 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 		return;
 	}
 
+	/* Allow explicita de politica/excepcao prevalece sobre a blacklist.
+	 * O default allow continua a consultar as categorias UT1. */
+	if (layer7_decision_is_explicit_allow(&dec)) {
+		L7_EVENT_DBG(iface,
+		    "blacklist_bypass: iface=%s domain=%s client=%s "
+		    "reason=%s",
+		    iface ? iface : "-", domain ? domain : "-",
+		    client_ip ? client_ip : "-",
+		    layer7_decide_reason_str(dec.reason));
+		return;
+	}
+
 	if (s_blacklist && s_bl_n_rules > 0 && resolved_ip &&
 	    layer7_pf_ipv4_host_ok(resolved_ip)) {
 		int ri;
@@ -1261,6 +1299,12 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 			    "dns_blacklist_rule") == 0) {
 				s_pf_dst_add_ok++;
 				enforce_cache_add(tbl, resolved_ip, ttl);
+				if (s_bl_rules[ri].n_src_cidrs > 0)
+					(void)layer7_pf_exec_kill_state_pair(
+					    client_ip, resolved_ip);
+				else
+					(void)layer7_pf_exec_kill_states_to(
+					    resolved_ip);
 				L7_AUDIT_NOTE(iface,
 				    "bl_block: iface=%s domain=%s "
 				    "cat=%s client=%s ip=%s rule=%d/%s "
@@ -1419,6 +1463,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		if (s_blacklist && s_bl_n_rules > 0 && host && *host &&
 		    dec.action != LAYER7_ACTION_BLOCK && dst_ip &&
 		    layer7_pf_ipv4_host_ok(dst_ip) &&
+		    !layer7_decision_is_explicit_allow(&dec) &&
 		    !l7_allowlist_contains_domain(&s_allowlist, host) &&
 		    !l7_allowlist_contains_ip(&s_allowlist, dst_ip)) {
 			int ri;
@@ -1441,6 +1486,14 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 				    "sni_blacklist");
 				if (r == 0) {
 					s_pf_dst_add_ok++;
+					enforce_cache_add(tbl, dst_ip,
+					    L7_DST_TTL_DEF);
+					if (s_bl_rules[ri].n_src_cidrs > 0)
+						(void)layer7_pf_exec_kill_state_pair(
+						    src_ip, dst_ip);
+					else
+						(void)layer7_pf_exec_kill_states_to(
+						    dst_ip);
 					L7_AUDIT_NOTE(iface,
 					    "sni_bl_block: iface=%s "
 					    "host=%s cat=%s src=%s dst=%s "
@@ -2436,7 +2489,7 @@ int main(int argc, char **argv)
 			}
 
 			if (!pf_base_tables_ok())
-				(void)layer7_pf_selfheal("sighup_reload");
+				(void)layer7_pf_selfheal(NULL, "sighup_reload");
 
 			/* Bloco 5: transicao enforce -> passivo (monitor /
 			 * disabled / license invalid). Flush forte de todas as

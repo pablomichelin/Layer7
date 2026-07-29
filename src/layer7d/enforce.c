@@ -111,6 +111,89 @@ layer7_pf_exec_table_delete(const char *table, const char *ip)
 	return pfctl_table_op(table, ip, "delete");
 }
 
+static int
+pfctl_kill_states(const char *first, const char *second)
+{
+	pid_t pid;
+	int st;
+	char first_buf[16], second_buf[16];
+	char *argv[7];
+	char path_pfctl[] = "/sbin/pfctl";
+
+	if (!layer7_pf_ipv4_host_ok(first))
+		return -1;
+	if (second && !layer7_pf_ipv4_host_ok(second))
+		return -1;
+	memcpy(first_buf, first, strlen(first) + 1);
+	if (second)
+		memcpy(second_buf, second, strlen(second) + 1);
+
+	argv[0] = path_pfctl;
+	argv[1] = "-k";
+	argv[2] = first_buf;
+	if (second) {
+		argv[3] = "-k";
+		argv[4] = second_buf;
+		argv[5] = NULL;
+	} else
+		argv[3] = NULL;
+
+	pid = fork();
+	if (pid == (pid_t)-1)
+		return -1;
+	if (pid == 0) {
+		execv(path_pfctl, argv);
+		_exit(127);
+	}
+	if (waitpid(pid, &st, 0) != pid)
+		return -1;
+	return (WIFEXITED(st) && WEXITSTATUS(st) == 0) ? 0 : -1;
+}
+
+int
+layer7_pf_exec_kill_state_pair(const char *src_ip, const char *dst_ip)
+{
+	return pfctl_kill_states(src_ip, dst_ip);
+}
+
+int
+layer7_pf_exec_kill_states_host(const char *ip)
+{
+	return pfctl_kill_states(ip, NULL);
+}
+
+int
+layer7_pf_exec_kill_states_to(const char *dst_ip)
+{
+	pid_t pid;
+	int st;
+	char dst_buf[16];
+	char *argv[7];
+	char path_pfctl[] = "/sbin/pfctl";
+	char any_ipv4[] = "0.0.0.0/0";
+
+	if (!layer7_pf_ipv4_host_ok(dst_ip))
+		return -1;
+	memcpy(dst_buf, dst_ip, strlen(dst_ip) + 1);
+	argv[0] = path_pfctl;
+	argv[1] = "-k";
+	argv[2] = any_ipv4;
+	argv[3] = "-k";
+	argv[4] = dst_buf;
+	argv[5] = NULL;
+
+	pid = fork();
+	if (pid == (pid_t)-1)
+		return -1;
+	if (pid == 0) {
+		execv(path_pfctl, argv);
+		_exit(127);
+	}
+	if (waitpid(pid, &st, 0) != pid)
+		return -1;
+	return (WIFEXITED(st) && WEXITSTATUS(st) == 0) ? 0 : -1;
+}
+
 int
 layer7_pf_policy_table_name(enum layer7_enforce_kind kind, int idx,
     char *buf, size_t buflen)

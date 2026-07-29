@@ -11,6 +11,19 @@ RULES_PATH="${RULES_DIR}/pf.conf"
 RULES_SAMPLE="${RULES_DIR}/pf.conf.sample"
 BL_CONFIG="/usr/local/etc/layer7/blacklists/config.json"
 
+scoped_enabled() {
+	if [ ! -f /usr/local/etc/layer7.json ]; then
+		echo 0
+		return
+	fi
+	/usr/local/bin/php -r '
+		$d = @json_decode(@file_get_contents("/usr/local/etc/layer7.json"), true);
+		$em = isset($d["layer7"]["enforcement_model"])
+		    ? (string)$d["layer7"]["enforcement_model"] : "legacy_global";
+		echo ($em === "scoped_hybrid") ? "1" : "0";
+	' 2>/dev/null || echo 0
+}
+
 table_referenced() {
 	_table="$1"
 	/sbin/pfctl -sr 2>/dev/null | /usr/bin/grep -Eq "<${_table}[:>]"
@@ -70,6 +83,18 @@ required_tables_ok() {
 			_idx=$((_idx + 1))
 		done
 	fi
+	if [ "$(scoped_enabled)" = "1" ]; then
+		_idx=0
+		while [ "$_idx" -lt 24 ]; do
+			for _t in "layer7_pdst_${_idx}" "layer7_psrc_${_idx}"; do
+				if ! table_ready "$_t"; then
+					echo "layer7-pfctl: missing scoped table ${_t}" >&2
+					return 1
+				fi
+			done
+			_idx=$((_idx + 1))
+		done
+	fi
 	return 0
 }
 
@@ -101,15 +126,7 @@ ensure_blacklist_tables() {
 
 write_rules() {
 	/bin/mkdir -p "${RULES_DIR}"
-	_scoped=0
-	if [ -f /usr/local/etc/layer7.json ]; then
-		_scoped=$(/usr/local/bin/php -r '
-			$d = @json_decode(@file_get_contents("/usr/local/etc/layer7.json"), true);
-			$em = isset($d["layer7"]["enforcement_model"])
-			    ? (string)$d["layer7"]["enforcement_model"] : "legacy_global";
-			echo ($em === "scoped_hybrid") ? "1" : "0";
-		' 2>/dev/null || echo 0)
-	fi
+	_scoped=$(scoped_enabled)
 	cat <<EOF > "${RULES_PATH}"
 # Layer7 PF snippet (package-managed). Layout actual com allowlist (Bloco 3).
 # Anti-bypass DoT/DoQ e anti-QUIC sao toggles na GUI; defeito OFF.
@@ -211,15 +228,7 @@ ensure)
 		ensure_table "${TABLE_BLOCK_DST}" || _rc=1
 		ensure_table "${TABLE_ALLOW_DST}" || _rc=1
 		ensure_blacklist_tables || _rc=1
-		_scoped=0
-		if [ -f /usr/local/etc/layer7.json ]; then
-			_scoped=$(/usr/local/bin/php -r '
-				$d = @json_decode(@file_get_contents("/usr/local/etc/layer7.json"), true);
-				$em = isset($d["layer7"]["enforcement_model"])
-				    ? (string)$d["layer7"]["enforcement_model"] : "legacy_global";
-				echo ($em === "scoped_hybrid") ? "1" : "0";
-			' 2>/dev/null || echo 0)
-		fi
+		_scoped=$(scoped_enabled)
 		if [ "${_scoped}" = "1" ]; then
 			_i=0
 			while [ "${_i}" -lt 24 ]; do

@@ -6,9 +6,9 @@ Ligar decisões **block** / **tag** a **tabelas PF** no pfSense, sem MITM.
 
 > **Semantica actual de `block`:** em `legacy_global`, o IP de destino entra
 > em `layer7_block_dst` e afecta todos os clientes. Em `scoped_hybrid`, match
-> por host/DNS/SNI usa `layer7_pdst_N`; match por app/categoria usa
-> `layer7_psrc_N`, limitado por origem estática, `scope_global` explícito ou
-> `quarantine_origin`. Em `mode=monitor`/`enabled=false` não há qualquer
+> por host/DNS/SNI ou app/categoria normal usa `layer7_pdst_N`; somente
+> quarentena explícita usa `layer7_psrc_N`. Em
+> `mode=monitor`/`enabled=false` não há qualquer
 > `block drop`.
 
 ## Estado atual
@@ -83,7 +83,7 @@ DHCP static mapping para IP estavel. Limite: 64 hosts de origem por grupo.
 | Block (origem/quarentena) | `layer7_block` | Fixo no código (`enforce.h`) |
 | Block (destino/sites/apps) | `layer7_block_dst` | Fixo no código (`enforce.h`); **legacy_global** |
 | Block destino escopado por politica | `layer7_pdst_N` | Caminho B / E2; indice N = ordem `layer7_policies_sort()` |
-| Quarentena origem escopada por politica | `layer7_psrc_N` | Caminho B / E2; app-only / misto |
+| Quarentena origem escopada por politica | `layer7_psrc_N` | Caminho B / E2; somente opt-in explícito |
 | Tag | `layer7_tagged` ou **`tag_table`** na política | Por política `action=tag` |
 
 ### Caminho B / E2 — PF escopado no pacote (`scoped_hybrid`)
@@ -93,9 +93,9 @@ emitir `block drop … to <layer7_block_dst>` global e passa a gerar, por cada
 politica `enabled`+`block`:
 
 - `table <layer7_pdst_N> persist` + `block drop quick inet from {src} to <layer7_pdst_N>`
-  quando a politica tem hosts (sites/SNI);
+  quando a politica tem hosts (sites/SNI) ou app/categoria normal;
 - `table <layer7_psrc_N> persist` + `block drop quick inet from <layer7_psrc_N> to !<localsubnets>`
-  quando tem `ndpi_app`/`ndpi_category` (app-only ou misto);
+  somente quando `quarantine_origin=true`;
 - politica sem origem (`src_hosts`/`src_cidrs`/grupos): regra global **so** com
   `scope_global: true` (checkbox na GUI Politicas); para app/categoria,
   `quarantine_origin: true` também cria regra `psrc` executável.
@@ -114,8 +114,8 @@ Com `enforcement_model=scoped_hybrid` e `mode=enforce`:
 
 | Decisao | Tabela PF populada | IP |
 |---------|-------------------|-----|
-| block + `dst_scoped` (match DNS/SNI/host) | `layer7_pdst_{idx}` | destino resolvido |
-| block + `src_scoped` (match app/categoria) | `layer7_psrc_{idx}` | origem do fluxo |
+| block + `dst_scoped` (DNS/SNI/host/app normal) | `layer7_pdst_{idx}` | destino resolvido/observado |
+| block + `src_scoped` (quarentena explícita) | `layer7_psrc_{idx}` | origem do fluxo |
 | block + `legacy_global` | `layer7_block_dst` | destino |
 
 Funcoes: `layer7_pf_resolve_block_target()`, `layer7_apply_block_enforcement()`
@@ -130,10 +130,8 @@ ate execucao no appliance `192.168.100.254`.
 
 ### Candidato `_25` — integração e pré-condições
 
-- política mista app+host segue o critério que casou: app/categoria=`psrc`,
-  host=`pdst`;
-- `psrc` só é populada se houver origem estática efectiva,
-  `scope_global` ou `quarantine_origin`;
+- política normal app/host usa `pdst`; `psrc` fica reservada à quarentena;
+- `quarantine_origin=true` é necessário para inclusão dinâmica em `psrc`;
 - a GUI recusa block scoped sem uma dessas três condições;
 - IDs `lan`/`optN` são migrados para interfaces reais antes de libpcap/PF;
 - default continua `legacy_global`; `_25` não está publicado e depende do
@@ -277,7 +275,8 @@ layer7d -n -c ... -e 10.0.0.99 BitTorrent   # dry: não chama pfctl
 ```
 
 Ordem típica: **`-c`**, **`-n`** (opcional), **`-e IP APP [categoria]`**. Com
-`enforcement_model=scoped_hybrid`, block app-only adiciona origem a
+`enforcement_model=scoped_hybrid`, block app-only normal adiciona o destino a
+`layer7_pdst_N`; com `quarantine_origin=true`, adiciona a origem a
 `layer7_psrc_N`; legacy usa `layer7_block_dst`. No runtime, **nDPI** chama
 `layer7_on_classified_flow` (decidir + enforce escopado).
 

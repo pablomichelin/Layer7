@@ -116,6 +116,10 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   idle/recheck/SIGUSR1 não inundam `info`, detalhe opt-in respeita interfaces,
   bloqueios continuam auditados e uso máximo corresponde aos limites.
   Limpar vista não pode apagar disco; limpar histórico deve preservar os logs.
+- [ ] **Estabilização funcional `_27` (BG-055 / ADR-0014 emendada):** exigir
+  build FreeBSD com nDPI, lint PHP, `pfctl -nf`, captura bidireccional,
+  confirmação de kill de estado selectivo e gate two-client. Política normal
+  de app deve bloquear só o destino; `psrc` exige quarentena explícita.
 
 ---
 

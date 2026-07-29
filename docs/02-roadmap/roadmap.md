@@ -532,6 +532,11 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   opt-in com bloqueios auditados, limitam SQLite e corrigem a semântica de
   limpeza na GUI. É F4.1 por reduzir risco operacional imediato; pesquisa,
   exclusão selectiva e analytics permanecem F7. Nenhuma instalação foi feita.
+- **Estabilização funcional (`2026-07-29`, candidato `1.8.11_27`):** BG-055
+  corrige o hash unidireccional que separava ida/volta para o nDPI, reserva
+  `psrc` à quarentena explícita, invalida estados PF após bloqueio reactivo,
+  restaura precedência de `allow`, aplica TTL ao caminho SNI e valida a tabela
+  escopada no self-heal. Produção permanece intocada; build/gate pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

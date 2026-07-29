@@ -2,6 +2,45 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_27] - Unreleased — estabilização funcional pré-produção
+
+Pacote candidato, **não publicado** e **não aprovado para produção**. Revisão
+end-to-end documentada em
+`docs/09-blocking/revisao-funcional-pre-producao-2026-07-29.md`.
+
+### Fixed
+
+- **Classificação bidireccional:** canonicaliza os endpoints antes do hash;
+  ida e volta da mesma conversa passam ao mesmo `ndpi_flow_struct`.
+- **App sem quarentena:** aplicação/categoria normal usa
+  `layer7_pdst_N` e bloqueia somente o destino observado.
+  `layer7_psrc_N` fica reservado a `quarantine_origin=true`.
+- **Bloqueio imediato:** após `pfctl -T add`, invalida o estado PF afectado;
+  par cliente/destino em `pdst`, host inteiro só na quarentena e destino
+  inteiro apenas no modelo legado global.
+- **Precedência:** política/excepção `allow` explícita não pode ser anulada
+  pela blacklist; default allow continua a avaliar blacklist.
+- **TTL SNI:** entradas de blacklist criadas pelo caminho SNI entram no cache
+  de expiração.
+- **Self-heal scoped:** a recuperação valida a tabela que falhou e o helper
+  não declara sucesso com `pdst/psrc` ausente.
+- **DNS CNAME:** preserva o QNAME original ao percorrer answer RRs.
+- **Expiração de fluxos:** sweep também ocorre em tráfego já classificado.
+
+### Added
+
+- `capture_flow_key.h` e `test_capture_flow_key.c`.
+- BG-055 e revisão funcional pré-produção de 2026-07-29.
+
+### Gates e rollback
+
+- Suite C local e shell lint: PASS; PHP local indisponível.
+- Build FreeBSD/nDPI, validação de pacote e gate appliance: pendentes.
+- Produção permanece intocada. Rollback operacional continua `_24` passivo +
+  `layer7-pfctl flush-all`; preservar evidência.
+
+---
+
 ## [1.8.11_26] - Unreleased — contenção L1 de logs
 
 Pacote candidato, **não publicado** e **não aprovado para produção**. O bloco

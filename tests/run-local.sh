@@ -50,6 +50,21 @@ else
 	fail "test_config_parse compile"
 fi
 
+step "Unit: capture flow key bidireccional"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_capture_flow_key \
+    tests/functional/test_capture_flow_key.c \
+    2>/tmp/test_capture_flow_key.cc.err; then
+	if /tmp/test_capture_flow_key; then
+		pass "test_capture_flow_key"
+	else
+		fail "test_capture_flow_key runtime"
+	fi
+else
+	cat /tmp/test_capture_flow_key.cc.err
+	fail "test_capture_flow_key compile"
+fi
+
 step "Unit: log_store (rotacao limitada)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_log_store \

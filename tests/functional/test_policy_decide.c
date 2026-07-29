@@ -82,6 +82,8 @@ test_block_youtube_other_client_default(void)
 	check(dec.action == LAYER7_ACTION_ALLOW, "2 action allow default");
 	check(dec.reason == L7_DECIDE_DEFAULT_ALLOW, "2 reason default allow");
 	check(dec.would_enforce_block_or_tag == 0, "2 no enforce");
+	check(!layer7_decision_is_explicit_allow(&dec),
+	    "2 default allow still evaluates blacklist");
 }
 
 static void
@@ -110,6 +112,8 @@ test_exception_allow_prevails(void)
 	check(dec.action == LAYER7_ACTION_ALLOW, "3 action allow");
 	check(dec.reason == L7_DECIDE_EXCEPTION, "3 reason exception");
 	check(dec.would_enforce_block_or_tag == 0, "3 no enforce");
+	check(layer7_decision_is_explicit_allow(&dec),
+	    "3 exception allow bypasses blacklist");
 }
 
 static void
@@ -131,6 +135,8 @@ test_allow_higher_priority_wins(void)
 	check(dec.reason == L7_DECIDE_POLICY_MATCH, "4 reason policy allow");
 	check(strcmp(dec.matched_policy_id, "p-allow") == 0, "4 allow policy");
 	check(dec.would_enforce_block_or_tag == 0, "4 no enforce");
+	check(layer7_decision_is_explicit_allow(&dec),
+	    "4 policy allow bypasses blacklist");
 }
 
 static void
@@ -296,7 +302,7 @@ test_app_only_quarantine_false_no_runtime_psrc(void)
 	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
 	    "10.0.0.5", NULL, "YouTube", "Streaming", &dec) == 0,
 	    "q0 decide ok");
-	check(dec.enforce_kind == L7_ENFORCE_SRC_SCOPED, "q0 src scoped kind");
+	check(dec.enforce_kind == L7_ENFORCE_DST_SCOPED, "q0 dst scoped kind");
 	check(dec.quarantine_origin == 0, "q0 dec quarantine_origin unset");
 	check(!dec_applies_psrc(&dec),
 	    "q0 runtime must not apply psrc quarantine");
@@ -357,12 +363,12 @@ test_app_only_no_quarantine_decision(void)
 	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
 	    "10.0.0.5", NULL, "YouTube", "Streaming", &dec) == 0,
 	    "app-only decide ok");
-	check(dec.enforce_kind == L7_ENFORCE_SRC_SCOPED, "app-only src scoped");
+	check(dec.enforce_kind == L7_ENFORCE_DST_SCOPED, "app-only dst scoped");
 	check(dec.quarantine_origin == 0, "dec quarantine_origin unset");
 }
 
 static void
-test_app_static_source_allows_psrc(void)
+test_app_static_source_uses_pdst(void)
 {
 	struct layer7_policy_rule rules[1];
 	struct layer7_decision dec;
@@ -381,11 +387,11 @@ test_app_static_source_allows_psrc(void)
 	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
 	    "10.0.0.5", NULL, "YouTube", "Streaming", &dec) == 0,
 	    "app-src decide ok");
-	check(dec.enforce_kind == L7_ENFORCE_SRC_SCOPED,
-	    "app-src chooses psrc");
+	check(dec.enforce_kind == L7_ENFORCE_DST_SCOPED,
+	    "app-src chooses pdst");
 	check(dec.source_scoped == 1, "app-src source scope propagated");
 	check(dec.quarantine_origin == 0, "app-src no explicit quarantine");
-	check(dec_applies_psrc(&dec), "app-src runtime may populate psrc");
+	check(!dec_applies_psrc(&dec), "app-src must not quarantine source");
 }
 
 static void
@@ -411,8 +417,8 @@ test_mixed_app_host_uses_matched_path(void)
 	    "10.0.0.5", "other.example", "YouTube", "Streaming",
 	    &dec_app) == 0, "mixed app path decide");
 	check(dec_app.action == LAYER7_ACTION_BLOCK, "mixed app path block");
-	check(dec_app.enforce_kind == L7_ENFORCE_SRC_SCOPED,
-	    "mixed app path chooses psrc");
+	check(dec_app.enforce_kind == L7_ENFORCE_DST_SCOPED,
+	    "mixed app path chooses pdst");
 
 	memset(&dec_host, 0, sizeof(dec_host));
 	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
@@ -439,7 +445,7 @@ main(void)
 	test_app_only_quarantine_false_no_runtime_psrc();
 	test_app_only_quarantine_true_allows_psrc();
 	test_app_only_no_quarantine_decision();
-	test_app_static_source_allows_psrc();
+	test_app_static_source_uses_pdst();
 	test_mixed_app_host_uses_matched_path();
 
 	if (g_fail) {

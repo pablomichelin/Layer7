@@ -184,6 +184,12 @@ int layer7_decide_for_client(const struct layer7_exception *exc, int n_exc,
 int layer7_policy_table_index(const struct layer7_policy_rule *rules, int n,
     const char *policy_id);
 
+/*
+ * Uma allow explicita (excepcao ou politica manual) tem precedencia sobre
+ * blacklist. Default allow nao conta: nesse caso a blacklist ainda avalia.
+ */
+int layer7_decision_is_explicit_allow(const struct layer7_decision *dec);
+
 const char *layer7_action_str(enum layer7_action a);
 const char *layer7_decide_reason_str(enum layer7_decide_reason r);
 

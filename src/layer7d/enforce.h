@@ -40,6 +40,14 @@ int layer7_pf_snprint_add(char *buf, size_t buflen, const char *table,
 int layer7_pf_exec_table_add(const char *table, const char *ip);
 int layer7_pf_exec_table_delete(const char *table, const char *ip);
 
+/*
+ * Invalida estados PF depois de inserir um bloqueio reactivo. Sem isto uma
+ * conexão já estabelecida continua a passar pela state table.
+ */
+int layer7_pf_exec_kill_state_pair(const char *src_ip, const char *dst_ip);
+int layer7_pf_exec_kill_states_host(const char *ip);
+int layer7_pf_exec_kill_states_to(const char *dst_ip);
+
 /* Caminho B / E3 — nome da tabela PF escopada por politica. */
 int layer7_pf_policy_table_name(enum layer7_enforce_kind kind, int idx,
     char *buf, size_t buflen);

@@ -61,8 +61,9 @@ era gravado onde libpcap exige `vmx0`; políticas scoped podiam gerar tabelas
 sem regra PF; e match app+host escolhia sempre `pdst`.
 
 O branch prepara `1.8.11_25` como **candidato interno** com correcções de
-ciclo de vida, migração para interface real, `psrc` executável e escolha
-app=`psrc`/host=`pdst`. Gates locais, PHP e build FreeBSD: PASS; artefacto
+ciclo de vida, migração para interface real e `psrc` executável. A escolha
+app=`psrc`/host=`pdst` deste candidato foi refinada no `_27`, reservando
+`psrc` à quarentena explícita. Gates locais, PHP e build FreeBSD: PASS; artefacto
 local `pfSense-pkg-layer7-1.8.11_25.pkg`,
 `SHA256=c4e9c197f79ad00d7ddb68f8ececcd391455e86011e558596102877c325d388d`.
 Instalação e gate two-client no appliance: **PENDENTES**. A release
@@ -87,6 +88,22 @@ Suite local, PHP/SQLite isolado e build FreeBSD: PASS. Artefacto local
 `pfSense-pkg-layer7-1.8.11_26.pkg`,
 `SHA256=c536cf879721d3bfad0097df9cf9f5ee45f217738c80ceaed9568acaf88b2f69`.
 Nenhuma alteração foi instalada no appliance; release pública permanece `_24`.
+
+### Candidato `1.8.11_27` — estabilização funcional pré-produção (não publicado)
+
+A revisão end-to-end de `2026-07-29` encontrou causas directas para os sintomas
+“não bloqueia” e “bloqueia tudo”: o hash separava ida/volta do mesmo fluxo nDPI;
+app/categoria normal usava quarentena `psrc`; e o PF mantinha estados já
+estabelecidos após a entrada na tabela.
+
+BG-055 corrige esses pontos e, no mesmo bloco de coerência do enforcement,
+restaura precedência de `allow` sobre blacklist, TTL no caminho SNI, self-heal
+da tabela scoped alvo, QNAME original em CNAME e sweep de fluxos classificados.
+A emenda da ADR-0014 reserva `psrc` a `quarantine_origin=true`; app normal usa
+`pdst` por cliente/destino. Suite C local e shell lint passam; PHP local,
+build FreeBSD/nDPI e gates no appliance ainda estão pendentes. Produção segue
+intocada. Auditoria:
+`docs/09-blocking/revisao-funcional-pre-producao-2026-07-29.md`.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
@@ -143,7 +160,8 @@ Plano SSOT: `docs/09-blocking/plano-enforcement-100-porcento.md`; ADR-0014.
   `test_enforce_scoped.c` (run-local). **Gate two-client appliance
   pendente** (nao avancar E4 sem gate).
 - **E4/E5/E7 (BG-049/BG-050/BG-052):** parcialmente endereçados no candidato
-  `_25` (validação de escopo GUI, caminho app=`psrc`/host=`pdst`, regressões);
+  `_25` (validação de escopo GUI e regressões; semântica app/host substituída
+  pela emenda `_27`);
   gate appliance, semântica completa, CDN/ECH e release continuam pendentes.
 
 O plano mestre historico `docs/09-blocking/blocking-master-plan.md` (fases A–F,
@@ -202,7 +220,7 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_26` (`PORTVERSION=1.8.11`, `PORTREVISION=26`),
++ `PORTREVISION`):** `1.8.11_27` (`PORTVERSION=1.8.11`, `PORTREVISION=27`),
 **candidato interno não publicado**. A release pública permanece
 `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
@@ -870,12 +888,13 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: validar build _26 e instalar em passivo + logs/monitor/captura
+- Proximo gate: validar build _27 e instalar em passivo + logs/monitor/captura
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 26 (candidato nao publicado)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 27 (candidato nao publicado)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
-  _25 + contenção L1 `_26` em curso, sem activacao no appliance
+  _25 + contenção L1 `_26` + correcções funcionais `_27` em curso, sem
+  activacao no appliance
 - Estado documental: governanca F0 consolidada; revisao pre-install 2026-06-15
   parcialmente enderecada em _24 (ver docs/09-blocking/revisao-codigo-*)
 - Fase actual: pos-V1 — Caminho B (E4/E5/E7 parciais; gates pendentes)

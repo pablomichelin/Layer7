@@ -529,12 +529,22 @@ function layer7_policy_enforcement_meta($data)
 		$cats = (isset($match["ndpi_category"]) &&
 		    is_array($match["ndpi_category"])) ? $match["ndpi_category"] : array();
 
-		$needs_pdst = !empty($hosts);
-		$needs_psrc = !empty($apps) || !empty($cats);
+		$has_app_match = !empty($apps) || !empty($cats);
+		$quarantine_origin =
+		    !empty($policy["quarantine_origin"]) ||
+		    !empty($policy["quarantine"]);
+		/*
+		 * App/categoria usa o destino observado por defeito. psrc corta
+		 * toda a Internet da origem e fica reservado à quarentena opt-in.
+		 * Uma politica mista com quarentena precisa das duas tabelas:
+		 * host -> pdst; app/categoria -> psrc.
+		 */
+		$needs_pdst = !empty($hosts) ||
+		    ($has_app_match && !$quarantine_origin);
+		$needs_psrc = $has_app_match && $quarantine_origin;
 		if (!$needs_pdst && !$needs_psrc) {
 			if (!empty($policy["scope_global"]) ||
-			    !empty($policy["quarantine_origin"]) ||
-			    !empty($policy["quarantine"])) {
+			    $quarantine_origin) {
 				$needs_psrc = true;
 			} else {
 				continue;
@@ -550,9 +560,7 @@ function layer7_policy_enforcement_meta($data)
 			"src_hosts" => $src["hosts"],
 			"src_cidrs" => $src["cidrs"],
 			"scope_global" => !empty($policy["scope_global"]),
-			"quarantine_origin" =>
-			    !empty($policy["quarantine_origin"]) ||
-			    !empty($policy["quarantine"])
+			"quarantine_origin" => $quarantine_origin
 		);
 	}
 	return $out;

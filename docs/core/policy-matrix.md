@@ -28,8 +28,9 @@ actual e não devem ser apresentados como critérios disponíveis.
 
 - interface/origem/schedule são condições obrigatórias;
 - quando `ndpi_app` e `hosts` coexistem, a relação actual é **OR**;
-- match por app/categoria usa `layer7_psrc_N`;
-- match por host usa `layer7_pdst_N`;
+- match por app/categoria ou host usa `layer7_pdst_N` por defeito;
+- `layer7_psrc_N` só é usado com `quarantine_origin=true` (corte total
+  deliberado da origem);
 - block em `scoped_hybrid` exige origem efectiva, `scope_global` explícito ou
   `quarantine_origin`; a GUI do candidato `_25` recusa a ausência de escopo;
 - `match_mode` configurável continua backlog E4 e `_25` não fecha E4.

@@ -358,14 +358,16 @@ Passos:
 | Match da politica | enforce_kind | Tabela |
 |-------------------|--------------|--------|
 | hosts / domain / SNI (com ou sem app) | `dst_scoped` | `layer7_pdst_N` |
-| so ndpi_app / ndpi_category | `src_scoped` | `layer7_psrc_N` |
+| so ndpi_app / ndpi_category | `dst_scoped` | `layer7_pdst_N` |
+| app/categoria + `quarantine_origin=true` | `src_scoped` | `layer7_psrc_N` |
 | misto com match_mode=or e ambos casam | preferir dst se host presente | pdst |
-| perfil composto (ex. youtube) | OR + dst para dominios + src se app-only path | ambas se necessario |
+| perfil composto (ex. youtube) | OR + destino por origem | pdst |
 
 **Entregas:**
 - [ ] Logica em `layer7_decide_for_client()` + E2 rules generation coerente
 - [ ] Perfis rapidos geram kind correcto ao toggle ON ([`layer7_policies.php`](../../package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_policies.php))
-- [ ] Lab: BitTorrent so quarentena cliente detectado
+- [ ] Lab: BitTorrent bloqueia somente o destino; quarentena apenas no caso
+      opt-in
 
 **Teste lab:** cenarios app vs site (validacao-lab sec. 12).
 
@@ -447,8 +449,9 @@ Marcar `[x]` ao concluir cada item.
 - [x] E3 codigo concluido (gate appliance two-client **pendente**)
 - [ ] E4 parcial (`_25`): GUI recusa block scoped sem
       origem/global/quarentena; `match_mode` completo continua pendente
-- [ ] E5 parcial (`_25`): match app/categoria escolhe `psrc`; host escolhe
-      `pdst`; gate appliance continua pendente
+- [ ] E5 parcial (`_27`): match app/categoria normal e host escolhem `pdst`;
+      `psrc` fica reservado a `quarantine_origin`; gate appliance continua
+      pendente
 - [ ] E6 concluido
 - [ ] E7 parcial (2026-07-29): regressões PID/interface/psrc/híbrido +
       `smoke-enforcement-scoped.sh` e diagnóstico; build/gate appliance
@@ -458,7 +461,8 @@ Marcar `[x]` ao concluir cada item.
 ### Definition of Done — 100%
 - [ ] 1. Two-client: block A nao block B (DNS + nDPI + SNI)
 - [ ] 2. Excepcoes e prioridade iguais em DNS e nDPI
-- [ ] 3. Apps (BitTorrent etc.) so quarentena origem scoped
+- [ ] 3. Apps (BitTorrent etc.) bloqueiam apenas destino por defeito;
+      quarentena da origem é opt-in
 - [ ] 4. Blacklists sem regressao
 - [ ] 5. Monitor mode passivo (smoke-monitor-mode.sh exit 0)
 - [ ] 6. Allowlist protege destinos criticos
@@ -510,7 +514,7 @@ Ver checkboxes acima. **Todos** devem estar `[x]` antes de declarar Caminho B co
 | BG-047 | Caminho B / E2 — PF escopado layer7_pdst/psrc no package | E2 | G |
 | BG-048 | Caminho B / E3 — daemon enforcement escopado | E3 | G |
 | BG-049 | Caminho B / E4 — semantica AND/OR + validacao GUI | E4 | M |
-| BG-050 | Caminho B / E5 — hibrido app=origem site=destino | E5 | M |
+| BG-050 | Caminho B / E5 — app/site por destino; quarentena opt-in | E5 | M |
 | BG-051 | Caminho B / E6 — SNI/CDN/anti-bypass | E6 | M |
 | BG-052 | Caminho B / E7/E8 — testes two-client + release default scoped | E7/E8 | G |
 | BG-053 | Estabilizacao `_25` — PID, interface real e integração scoped | E4/E5/E7 | M |

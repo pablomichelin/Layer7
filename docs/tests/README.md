@@ -22,8 +22,9 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 |----------|-------|-----------|
 | `tests/functional/test_allowlist.c` | Fase 1 | allowlist, rejeição `/0`, seed |
 | `tests/functional/test_config_parse.c` | A3 / E0 | parse JSON (`sni_inspection`, `enforcement_model`) |
+| `tests/functional/test_capture_flow_key.c` | BG-055 | hash bidireccional: ida/volta no mesmo fluxo nDPI |
 | `tests/functional/test_log_store.c` | BG-054 | rotação por tamanho e limite de cópias |
-| `tests/functional/test_policy_decide.c` | E1/E5 | decisão, escopo de origem, app=`psrc` / host=`pdst` |
+| `tests/functional/test_policy_decide.c` | E1/E5 | decisão, escopo de origem, app/host=`pdst`, quarentena=`psrc` |
 | `tests/functional/test_enforce_scoped.c` | E3 | runtime PF escopado (`pdst_N` / `psrc_N`), cache TTL |
 | `tests/functional/test_bl_src_match.c` | pós-REV-007 | `except_ips` em `l7_bl_rule_matches_src()` |
 | `tests/functional/test_scoped_pf_inc.php` | E2/E4 | regras PF scoped, quarentena executável e validação de escopo |
