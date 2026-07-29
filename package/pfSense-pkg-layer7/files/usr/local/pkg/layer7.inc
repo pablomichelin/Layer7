@@ -94,6 +94,99 @@ function layer7_pf_ifname_for_rules($s)
 }
 
 /**
+ * Converte o identificador amigavel do pfSense (lan, opt1, ...) no nome real
+ * que libpcap/PF recebem (vmx0, igb1, vmx0.10, ...). Nomes ja reais sao
+ * preservados. Nunca devolve texto fora do formato aceite para interfaces.
+ */
+function layer7_real_interface_name($ifname)
+{
+	$ifname = trim((string)$ifname);
+	if ($ifname === "" || strlen($ifname) > 32 ||
+	    preg_match('/^[a-zA-Z0-9_.]+$/', $ifname) !== 1) {
+		return "";
+	}
+
+	$real = null;
+	if (function_exists("get_real_interface")) {
+		$real = get_real_interface($ifname);
+	}
+	if ((!is_string($real) || $real === "") &&
+	    function_exists("convert_friendly_interface_to_real_interface_name")) {
+		$real = convert_friendly_interface_to_real_interface_name($ifname);
+	}
+	if (is_string($real)) {
+		$real = trim($real);
+		if ($real !== "" && strlen($real) <= 32 &&
+		    preg_match('/^[a-zA-Z0-9_.]+$/', $real) === 1) {
+			return $real;
+		}
+	}
+	return $ifname;
+}
+
+/**
+ * Normaliza e deduplica uma lista de interfaces para consumo runtime.
+ */
+function layer7_runtime_interfaces_normalize($ifaces, $max = 8)
+{
+	$out = array();
+	if (!is_array($ifaces)) {
+		return $out;
+	}
+	foreach ($ifaces as $ifname) {
+		$real = layer7_real_interface_name($ifname);
+		if ($real === "" || in_array($real, $out, true)) {
+			continue;
+		}
+		if (count($out) >= $max) {
+			break;
+		}
+		$out[] = $real;
+	}
+	return $out;
+}
+
+/**
+ * Migra todos os campos de interface que o daemon/PF consomem. A funcao e
+ * pura: devolve uma copia e permite teste sem gravar ficheiros.
+ */
+function layer7_config_interfaces_normalize($data)
+{
+	if (!is_array($data) || !isset($data["layer7"]) ||
+	    !is_array($data["layer7"])) {
+		return $data;
+	}
+	$l7 = &$data["layer7"];
+	if (isset($l7["interfaces"])) {
+		$l7["interfaces"] =
+		    layer7_runtime_interfaces_normalize($l7["interfaces"]);
+	}
+	if (isset($l7["block_quic_interfaces"])) {
+		$l7["block_quic_interfaces"] =
+		    layer7_runtime_interfaces_normalize($l7["block_quic_interfaces"]);
+	}
+	if (isset($l7["reports"]["event_interfaces"])) {
+		$l7["reports"]["event_interfaces"] =
+		    layer7_runtime_interfaces_normalize(
+		        $l7["reports"]["event_interfaces"]);
+	}
+	foreach (array("policies", "exceptions") as $section) {
+		if (!isset($l7[$section]) || !is_array($l7[$section])) {
+			continue;
+		}
+		foreach ($l7[$section] as &$rule) {
+			if (is_array($rule) && isset($rule["interfaces"])) {
+				$rule["interfaces"] =
+				    layer7_runtime_interfaces_normalize($rule["interfaces"]);
+			}
+		}
+		unset($rule);
+	}
+	unset($l7);
+	return $data;
+}
+
+/**
  * Registo minimo de aviso (pfSense `log_error` ou fallback `error_log`).
  */
 function layer7_log_pkg_warn($msg)
@@ -404,7 +497,7 @@ function layer7_policy_expand_src_origins($policy, $groups)
  *
  * @return array<int, array{idx: int, policy: array, needs_pdst: bool,
  *     needs_psrc: bool, src_hosts: string[], src_cidrs: string[],
- *     scope_global: bool}>
+ *     scope_global: bool, quarantine_origin: bool}>
  */
 function layer7_policy_enforcement_meta($data)
 {
@@ -456,7 +549,10 @@ function layer7_policy_enforcement_meta($data)
 			"needs_psrc" => $needs_psrc,
 			"src_hosts" => $src["hosts"],
 			"src_cidrs" => $src["cidrs"],
-			"scope_global" => !empty($policy["scope_global"])
+			"scope_global" => !empty($policy["scope_global"]),
+			"quarantine_origin" =>
+			    !empty($policy["quarantine_origin"]) ||
+			    !empty($policy["quarantine"])
 		);
 	}
 	return $out;
@@ -508,6 +604,7 @@ function layer7_policy_enforcement_rules_text($data)
 
 		$has_src = !empty($m["src_hosts"]) || !empty($m["src_cidrs"]);
 		$scope_global = !empty($m["scope_global"]);
+		$quarantine_origin = !empty($m["quarantine_origin"]);
 
 		if (!empty($m["needs_pdst"])) {
 			$tbl = "layer7_pdst_" . $idx;
@@ -534,7 +631,7 @@ function layer7_policy_enforcement_rules_text($data)
 		if (!empty($m["needs_psrc"])) {
 			$tbl = "layer7_psrc_" . $idx;
 			$tables .= "table <{$tbl}> persist\n";
-			if ($has_src || $scope_global) {
+			if ($has_src || $scope_global || $quarantine_origin) {
 				$rules .= "block drop quick inet from <{$tbl}> " .
 				    "to !<localsubnets> label \"layer7:psrc:{$pid}\"\n";
 			}
@@ -1067,6 +1164,7 @@ function layer7_save_json($data)
 	global $input_errors;
 
 	$cfgpath = layer7_cfg_path();
+	$data = layer7_config_interfaces_normalize($data);
 	$json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	if ($json === false) {
 		$input_errors[] = l7_t("Erro ao serializar JSON.");
@@ -1283,6 +1381,32 @@ function layer7_policy_block_valid($policy)
 	    ? $policy["match"] : array();
 	return !empty($match["hosts"]) || !empty($match["ndpi_app"]) ||
 	    !empty($match["ndpi_category"]);
+}
+
+/**
+ * Um block em scoped_hybrid precisa de um escopo PF executavel: origem
+ * estatica/grupo, scope_global explicito ou quarentena dinamica da origem.
+ * Interfaces limitam matching no daemon, mas nao substituem o escopo de
+ * origem nas regras PF.
+ */
+function layer7_policy_scoped_block_valid($policy, $data)
+{
+	if (!is_array($policy) ||
+	    (isset($policy["action"]) && (string)$policy["action"] !== "block")) {
+		return true;
+	}
+	if (!empty($policy["scope_global"]) ||
+	    !empty($policy["quarantine_origin"]) ||
+	    !empty($policy["quarantine"])) {
+		return true;
+	}
+	$groups = array();
+	if (is_array($data) && isset($data["layer7"]["groups"]) &&
+	    is_array($data["layer7"]["groups"])) {
+		$groups = $data["layer7"]["groups"];
+	}
+	$src = layer7_policy_expand_src_origins($policy, $groups);
+	return !empty($src["hosts"]) || !empty($src["cidrs"]);
 }
 
 function layer7_signal_reload()

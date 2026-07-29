@@ -79,6 +79,13 @@ else
 	fail "test_enforce_scoped compile"
 fi
 
+step "Unit: rc.d pidfile sem newline"
+if sh tests/unit/test_rc_pidfile.sh; then
+	pass "test_rc_pidfile"
+else
+	fail "test_rc_pidfile"
+fi
+
 step "Unit: bl_src_match (except_ips)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_bl_src_match \
@@ -103,6 +110,11 @@ else
 		pass "test_scoped_pf_inc"
 	else
 		fail "test_scoped_pf_inc"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_interface_normalization.php; then
+		pass "test_interface_normalization"
+	else
+		fail "test_interface_normalization"
 	fi
 fi
 
@@ -134,6 +146,7 @@ for f in package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d \
     package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-unbound-anti-doh \
     package/pfSense-pkg-layer7/files/usr/local/etc/layer7/*.sh \
     scripts/diagnose-layer7-appliance.sh \
+    tests/unit/test_rc_pidfile.sh \
     tests/lab/smoke-monitor-mode.sh \
     tests/lab/smoke-caminho-a.sh \
     tests/run-local.sh; do

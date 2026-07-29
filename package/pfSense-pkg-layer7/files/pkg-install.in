@@ -23,6 +23,15 @@ fi
 if [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ]; then
 	chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
 	chmod 0664 "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
+	# Migrar IDs amigaveis (lan/optN) gravados por versoes anteriores para
+	# nomes reais consumidos por libpcap/PF (vmx0, igb1, vmx0.10, ...).
+	"${PKG_ROOTDIR}/usr/local/bin/php" -r "
+	require_once('${PKG_ROOTDIR}/etc/inc/config.inc');
+	require_once('${PKG_ROOTDIR}/etc/inc/interfaces.inc');
+	require_once('${PKG_ROOTDIR}/usr/local/pkg/layer7.inc');
+	\$d = layer7_load_or_default();
+	layer7_save_json(\$d);
+	" >/dev/null 2>&1 || true
 fi
 
 /bin/mkdir -p "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists" \

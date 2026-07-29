@@ -1227,18 +1227,19 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		return;
 
 	if (dec.action == LAYER7_ACTION_BLOCK) {
-		/* App-only (src_scoped): quarentena origem so com flag
-		 * explicita quarantine_origin/quarantine. */
+		/* src_scoped e executavel quando a regra tem origem estatica,
+		 * scope_global explicito ou quarentena dinamica da origem. */
 		if (enforcement_is_scoped_hybrid() &&
 		    dec.enforce_kind == L7_ENFORCE_SRC_SCOPED) {
-			if (dec.quarantine_origin &&
+			if ((dec.quarantine_origin || dec.source_scoped ||
+			    dec.scope_global) &&
 			    layer7_pf_ipv4_host_ok(src_ip)) {
 				layer7_apply_block_enforcement(&dec, src_ip,
 				    dst_ip, L7_DST_TTL_DEF, 1,
 				    "flow_block_psrc");
 			} else {
-				L7_NOTE("flow_block: app-only policy=%s sem "
-				    "quarantine_origin — skip psrc quarantine "
+				L7_NOTE("flow_block: src-scoped policy=%s sem "
+				    "origem/scope_global/quarantine — skip psrc "
 				    "src=%s app=%s",
 				    dec.matched_policy_id[0] ?
 				    dec.matched_policy_id : "-",

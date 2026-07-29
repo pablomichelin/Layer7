@@ -939,10 +939,18 @@ host_matches_rule(const char *flow_host, const char *rule_host)
 static int
 rule_matches(const struct layer7_policy_rule *r, const char *iface,
     const char *src_ip, const char *ndpi_app, const char *ndpi_cat,
-    const char *host)
+    const char *host, int *app_match_out, int *cat_match_out,
+    int *host_match_out)
 {
 	int i;
-	int app_matched = 0, host_matched = 0;
+	int app_matched = 0, cat_matched = 0, host_matched = 0;
+
+	if (app_match_out)
+		*app_match_out = 0;
+	if (cat_match_out)
+		*cat_match_out = 0;
+	if (host_match_out)
+		*host_match_out = 0;
 
 	if (!layer7_schedule_active(&r->schedule))
 		return 0;
@@ -960,6 +968,7 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 		}
 		if (i >= r->n_ndpi_cats)
 			return 0;
+		cat_matched = 1;
 	}
 
 	if (r->n_ndpi_apps > 0 && ndpi_app) {
@@ -979,6 +988,12 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 			}
 		}
 	}
+	if (app_match_out)
+		*app_match_out = app_matched;
+	if (cat_match_out)
+		*cat_match_out = cat_matched;
+	if (host_match_out)
+		*host_match_out = host_matched;
 
 	/*
 	 * When BOTH apps AND hosts are configured: OR between them.
@@ -1009,15 +1024,19 @@ dec_clear_scoped(struct layer7_decision *dec)
 	dec->policy_table_idx = -1;
 	dec->scope_global = 0;
 	dec->quarantine_origin = 0;
+	dec->source_scoped = 0;
 	dec->enforce_dst_ip[0] = '\0';
 }
 
 static enum layer7_enforce_kind
-policy_enforce_kind(const struct layer7_policy_rule *r)
+policy_enforce_kind(const struct layer7_policy_rule *r, int app_matched,
+    int cat_matched, int host_matched)
 {
-	if (r->n_hosts > 0)
+	/* Uma politica app+host usa OR. O tipo PF deve seguir o criterio que
+	 * realmente casou, nao apenas a presenca de hosts na configuracao. */
+	if (host_matched)
 		return L7_ENFORCE_DST_SCOPED;
-	if (r->n_ndpi_apps > 0 || r->n_ndpi_cats > 0)
+	if (app_matched || cat_matched)
 		return L7_ENFORCE_SRC_SCOPED;
 	if (r->quarantine_origin || r->scope_global)
 		return L7_ENFORCE_SRC_SCOPED;
@@ -1027,13 +1046,16 @@ policy_enforce_kind(const struct layer7_policy_rule *r)
 static void
 dec_set_scoped_policy(const struct layer7_policy_rule *r,
     const struct layer7_policy_rule *rules, int n_rules,
+    int app_matched, int cat_matched, int host_matched,
     struct layer7_decision *dec)
 {
 	dec->policy_table_idx = layer7_policy_table_index(rules, n_rules, r->id);
 	dec->scope_global = r->scope_global;
 	dec->quarantine_origin = r->quarantine_origin;
+	dec->source_scoped = r->n_src_hosts > 0 || r->n_src_cidrs > 0;
 	dec->enforce_dst_ip[0] = '\0';
-	dec->enforce_kind = policy_enforce_kind(r);
+	dec->enforce_kind = policy_enforce_kind(r, app_matched, cat_matched,
+	    host_matched);
 	if (r->action == LAYER7_ACTION_BLOCK &&
 	    dec->enforce_kind != L7_ENFORCE_NONE &&
 	    dec->policy_table_idx >= 0) {
@@ -1150,11 +1172,12 @@ layer7_decide_for_client(const struct layer7_exception *exc, int n_exc,
 
 	for (i = 0; i < n_rules; i++) {
 		const struct layer7_policy_rule *r = &rules[i];
+		int app_matched, cat_matched, host_matched;
 
 		if (!r->enabled)
 			continue;
 		if (!rule_matches(r, iface, client_ip, ndpi_app, ndpi_cat,
-		    domain_or_host))
+		    domain_or_host, &app_matched, &cat_matched, &host_matched))
 			continue;
 		dec->action = r->action;
 		dec->reason = L7_DECIDE_POLICY_MATCH;
@@ -1163,7 +1186,8 @@ layer7_decide_for_client(const struct layer7_exception *exc, int n_exc,
 		dec->matched_policy_id[sizeof(dec->matched_policy_id) - 1] =
 		    '\0';
 		fill_enforce(r, global_enforce, dec);
-		dec_set_scoped_policy(r, rules, n_rules, dec);
+		dec_set_scoped_policy(r, rules, n_rules, app_matched,
+		    cat_matched, host_matched, dec);
 		return 0;
 	}
 

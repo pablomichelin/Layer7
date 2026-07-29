@@ -49,8 +49,10 @@ if ($_POST["add_exception"] ?? false) {
 		$new_exc_ifaces = array();
 		if (isset($_POST["new_exc_ifaces"]) && is_array($_POST["new_exc_ifaces"])) {
 			foreach ($_POST["new_exc_ifaces"] as $ifid) {
-				$real = convert_friendly_interface_to_real_interface_name($ifid);
-				$new_exc_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+				$real = layer7_real_interface_name($ifid);
+				if ($real !== "") {
+					$new_exc_ifaces[] = $real;
+				}
 			}
 		}
 
@@ -153,8 +155,10 @@ if ($_POST["save_exception_edit"] ?? false) {
 			$edit_exc_ifaces = array();
 			if (isset($_POST["edit_exc_ifaces"]) && is_array($_POST["edit_exc_ifaces"])) {
 				foreach ($_POST["edit_exc_ifaces"] as $ifid) {
-					$real = convert_friendly_interface_to_real_interface_name($ifid);
-					$edit_exc_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+					$real = layer7_real_interface_name($ifid);
+					if ($real !== "") {
+						$edit_exc_ifaces[] = $real;
+					}
 				}
 			}
 
@@ -386,7 +390,9 @@ function layer7_exc_target_summary($exception) {
 						</div>
 						<div id="edit_exc_ifaces_list">
 						<?php foreach ($ee_ifaces as $ifc) {
-							$chk = in_array($ifc["real"], $edit_ex_ifaces_arr, true) ? 'checked="checked"' : '';
+							$chk = (in_array($ifc["real"], $edit_ex_ifaces_arr, true) ||
+							    in_array($ifc["ifid"], $edit_ex_ifaces_arr, true))
+							    ? 'checked="checked"' : '';
 						?>
 						<label class="checkbox-inline">
 							<input type="checkbox" name="edit_exc_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" <?= $chk; ?> />

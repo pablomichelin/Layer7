@@ -136,6 +136,7 @@ struct layer7_decision {
 	int policy_table_idx; /* indice em rules ordenadas (layer7_pdst_N) */
 	int scope_global;     /* 1 = politica global explicita (E4) */
 	int quarantine_origin; /* 1 = app-only pode quarentenar origem (psrc) */
+	int source_scoped;    /* 1 = regra tem src_hosts/src_cidrs efectivos */
 	char enforce_dst_ip[48]; /* IP destino a impor; caller preenche em DNS */
 };
 

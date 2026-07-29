@@ -61,6 +61,7 @@ test_block_youtube_matching_client(void)
 	check(dec.reason == L7_DECIDE_POLICY_MATCH, "1 reason policy");
 	check(dec.would_enforce_block_or_tag == 1, "1 would enforce");
 	check(dec.enforce_kind == L7_ENFORCE_DST_SCOPED, "1 enforce dst");
+	check(dec.source_scoped == 1, "1 static source scope");
 	check(dec.policy_table_idx == 0, "1 table idx 0");
 	check(strcmp(dec.matched_policy_id, "p-yt") == 0, "1 policy id");
 }
@@ -267,11 +268,12 @@ test_scope_global_parse(void)
 }
 
 static int
-dec_applies_psrc_quarantine(const struct layer7_decision *dec)
+dec_applies_psrc(const struct layer7_decision *dec)
 {
 	return dec && dec->action == LAYER7_ACTION_BLOCK &&
 	    dec->enforce_kind == L7_ENFORCE_SRC_SCOPED &&
-	    dec->quarantine_origin;
+	    (dec->quarantine_origin || dec->source_scoped ||
+	    dec->scope_global);
 }
 
 static void
@@ -296,7 +298,7 @@ test_app_only_quarantine_false_no_runtime_psrc(void)
 	    "q0 decide ok");
 	check(dec.enforce_kind == L7_ENFORCE_SRC_SCOPED, "q0 src scoped kind");
 	check(dec.quarantine_origin == 0, "q0 dec quarantine_origin unset");
-	check(!dec_applies_psrc_quarantine(&dec),
+	check(!dec_applies_psrc(&dec),
 	    "q0 runtime must not apply psrc quarantine");
 }
 
@@ -326,7 +328,7 @@ test_app_only_quarantine_true_allows_psrc(void)
 	    "q1 decide ok");
 	check(dec.enforce_kind == L7_ENFORCE_SRC_SCOPED, "q1 src scoped kind");
 	check(dec.quarantine_origin == 1, "q1 dec quarantine_origin set");
-	check(dec_applies_psrc_quarantine(&dec),
+	check(dec_applies_psrc(&dec),
 	    "q1 runtime may apply psrc quarantine");
 	r = layer7_pf_resolve_block_target(&dec, "10.0.0.5", NULL, 1,
 	    tbl, sizeof(tbl), &ip);
@@ -359,6 +361,68 @@ test_app_only_no_quarantine_decision(void)
 	check(dec.quarantine_origin == 0, "dec quarantine_origin unset");
 }
 
+static void
+test_app_static_source_allows_psrc(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"app-src\","
+	    "\"action\":\"block\",\"enabled\":true,\"match\":{"
+	    "\"ndpi_app\":[\"YouTube\"],\"src_hosts\":[\"10.0.0.5\"]}}]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "app-src parse ok");
+	check(n == 1, "app-src policy loaded");
+	layer7_policies_sort(rules, 1);
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "10.0.0.5", NULL, "YouTube", "Streaming", &dec) == 0,
+	    "app-src decide ok");
+	check(dec.enforce_kind == L7_ENFORCE_SRC_SCOPED,
+	    "app-src chooses psrc");
+	check(dec.source_scoped == 1, "app-src source scope propagated");
+	check(dec.quarantine_origin == 0, "app-src no explicit quarantine");
+	check(dec_applies_psrc(&dec), "app-src runtime may populate psrc");
+}
+
+static void
+test_mixed_app_host_uses_matched_path(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec_app, dec_host;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"mixed\","
+	    "\"action\":\"block\",\"enabled\":true,\"match\":{"
+	    "\"ndpi_app\":[\"YouTube\"],\"hosts\":[\"youtube.com\"],"
+	    "\"src_hosts\":[\"10.0.0.5\"]}}]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "mixed parse ok");
+	check(n == 1, "mixed policy loaded");
+	layer7_policies_sort(rules, 1);
+
+	memset(&dec_app, 0, sizeof(dec_app));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "10.0.0.5", "other.example", "YouTube", "Streaming",
+	    &dec_app) == 0, "mixed app path decide");
+	check(dec_app.action == LAYER7_ACTION_BLOCK, "mixed app path block");
+	check(dec_app.enforce_kind == L7_ENFORCE_SRC_SCOPED,
+	    "mixed app path chooses psrc");
+
+	memset(&dec_host, 0, sizeof(dec_host));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "10.0.0.5", "www.youtube.com", "TLS", "Web",
+	    &dec_host) == 0, "mixed host path decide");
+	check(dec_host.action == LAYER7_ACTION_BLOCK, "mixed host path block");
+	check(dec_host.enforce_kind == L7_ENFORCE_DST_SCOPED,
+	    "mixed host path chooses pdst");
+}
+
 int
 main(void)
 {
@@ -375,6 +439,8 @@ main(void)
 	test_app_only_quarantine_false_no_runtime_psrc();
 	test_app_only_quarantine_true_allows_psrc();
 	test_app_only_no_quarantine_decision();
+	test_app_static_source_allows_psrc();
+	test_mixed_app_host_uses_matched_path();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");

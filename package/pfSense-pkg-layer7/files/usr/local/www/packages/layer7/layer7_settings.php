@@ -267,8 +267,10 @@ if ($_POST["save"] ?? false) {
 	if ($is_general_save && isset($_POST["iface_sel"]) && is_array($_POST["iface_sel"])) {
 		foreach ($_POST["iface_sel"] as $ifid) {
 			if (is_string($ifid) && preg_match('/^[a-zA-Z0-9_.]+$/', $ifid)) {
-				$real = convert_friendly_interface_to_real_interface_name($ifid);
-				$selected_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+				$real = layer7_real_interface_name($ifid);
+				if ($real !== "") {
+					$selected_ifaces[] = $real;
+				}
 			}
 		}
 	}
@@ -301,8 +303,10 @@ if ($_POST["save"] ?? false) {
 				if ($ifid === "" || !preg_match('/^[a-zA-Z0-9_.]+$/', $ifid)) {
 					continue;
 				}
-				$real = function_exists("get_real_interface") ? get_real_interface($ifid) : null;
-				$block_quic_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+				$real = layer7_real_interface_name($ifid);
+				if ($real !== "") {
+					$block_quic_ifaces[] = $real;
+				}
 			}
 		}
 		$block_quic_ifaces = array_values(array_unique($block_quic_ifaces));
@@ -388,8 +392,10 @@ if ($_POST["save"] ?? false) {
 		if (isset($_POST["reports_iface_sel"]) && is_array($_POST["reports_iface_sel"])) {
 			foreach ($_POST["reports_iface_sel"] as $ifid) {
 				if (is_string($ifid) && preg_match('/^[a-zA-Z0-9_.]+$/', $ifid)) {
-					$real = convert_friendly_interface_to_real_interface_name($ifid);
-					$rpt_event_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+					$real = layer7_real_interface_name($ifid);
+					if ($real !== "") {
+						$rpt_event_ifaces[] = $real;
+					}
 				}
 			}
 		}
@@ -497,7 +503,8 @@ if (isset($L["interfaces"]) && is_array($L["interfaces"])) {
 
 $pfsense_ifaces = array();
 foreach (layer7_get_pfsense_interfaces() as $ifc) {
-	$ifc["checked"] = in_array($ifc["real"], $configured_real, true);
+	$ifc["checked"] = in_array($ifc["real"], $configured_real, true) ||
+	    in_array($ifc["ifid"], $configured_real, true);
 	$pfsense_ifaces[] = $ifc;
 }
 

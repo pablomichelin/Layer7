@@ -72,5 +72,48 @@ if (strpos($default_scoped, "layer7:block:dst") !== false) {
 	exit(1);
 }
 
+$quarantine = array(
+	"layer7" => array(
+		"enabled" => true,
+		"mode" => "enforce",
+		"enforcement_model" => "scoped_hybrid",
+		"policies" => array(
+			array(
+				"id" => "vpn-quarantine",
+				"enabled" => true,
+				"action" => "block",
+				"quarantine_origin" => true,
+				"match" => array("ndpi_app" => array("OpenVPN"))
+			)
+		)
+	)
+);
+$quarantine_rules = layer7_policy_enforcement_rules_text($quarantine);
+if (strpos($quarantine_rules, "table <layer7_psrc_0> persist") === false ||
+    strpos($quarantine_rules, "from <layer7_psrc_0> to !<localsubnets>") === false) {
+	fwrite(STDERR, "FAIL: quarantine_origin must emit executable psrc rule\n");
+	fwrite(STDERR, $quarantine_rules);
+	exit(1);
+}
+
+$unscoped_policy = array(
+	"id" => "profile-youtube",
+	"enabled" => true,
+	"action" => "block",
+	"match" => array(
+		"ndpi_app" => array("YouTube"),
+		"hosts" => array("youtube.com")
+	)
+);
+if (layer7_policy_scoped_block_valid($unscoped_policy, $data)) {
+	fwrite(STDERR, "FAIL: scoped block without source/global/quarantine accepted\n");
+	exit(1);
+}
+$unscoped_policy["match"]["src_hosts"] = array("10.0.0.10");
+if (!layer7_policy_scoped_block_valid($unscoped_policy, $data)) {
+	fwrite(STDERR, "FAIL: scoped block with static source rejected\n");
+	exit(1);
+}
+
 echo "PASS: test_scoped_pf_inc\n";
 exit(0);

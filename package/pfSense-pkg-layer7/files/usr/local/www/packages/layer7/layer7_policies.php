@@ -59,8 +59,10 @@ if ($_POST["add_profile_policy"] ?? false) {
 					$prof_ifaces = array();
 					if (isset($_POST["profile_ifaces"]) && is_array($_POST["profile_ifaces"])) {
 						foreach ($_POST["profile_ifaces"] as $ifid) {
-							$real = convert_friendly_interface_to_real_interface_name($ifid);
-							$prof_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+							$real = layer7_real_interface_name($ifid);
+							if ($real !== "") {
+								$prof_ifaces[] = $real;
+							}
 						}
 					}
 					if (!empty($prof_ifaces)) {
@@ -97,18 +99,24 @@ if ($_POST["add_profile_policy"] ?? false) {
 						$rule["match"]["hosts"] = array_slice($hosts, 0, 64);
 					}
 
-				$policies[] = $rule;
-				if (layer7_save_json($data)) {
-					layer7_pf_config_resync(false);
-					$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
+					if ($prof_act === "block" &&
+					    layer7_enforcement_is_scoped_hybrid($data) &&
+					    !layer7_policy_scoped_block_valid($rule, $data)) {
+						$input_errors[] = l7_t("No modo scoped_hybrid, selecione ao menos um CIDR/grupo de origem para o perfil.");
+					} else {
+						$policies[] = $rule;
+						if (layer7_save_json($data)) {
+							layer7_pf_config_resync(false);
+							$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
 
-					if (isset($profile["extra_action"]) && $profile["extra_action"] === "configure_unbound_anti_doh") {
-						$doh_result = layer7_configure_unbound_anti_doh();
-						if ($doh_result["ok"]) {
-							$savemsg .= " " . l7_t("Unbound anti-DoH tambem configurado.");
+							if (isset($profile["extra_action"]) && $profile["extra_action"] === "configure_unbound_anti_doh") {
+								$doh_result = layer7_configure_unbound_anti_doh();
+								if ($doh_result["ok"]) {
+									$savemsg .= " " . l7_t("Unbound anti-DoH tambem configurado.");
+								}
+							}
 						}
 					}
-				}
 				}
 			}
 			unset($policies);
@@ -145,6 +153,8 @@ if ($_POST["toggle_profile_on"] ?? false) {
 					$savemsg = sprintf(l7_t("Perfil '%s' ja esta ligado."), $profile["name"] ?? $profile_id);
 				} elseif (count($policies) >= 24) {
 					$input_errors[] = l7_t("Limite de 24 politicas.");
+				} elseif (layer7_enforcement_is_scoped_hybrid($data)) {
+					$input_errors[] = l7_t("No modo scoped_hybrid, use Configurar e selecione um CIDR/grupo de origem. O botao de um clique nao cria escopo global implicito.");
 				} else {
 					$rule = array(
 						"id" => $pid,
@@ -279,8 +289,10 @@ if ($_POST["add_policy"] ?? false) {
 		$new_rule_ifaces = array();
 		if (isset($_POST["new_ifaces"]) && is_array($_POST["new_ifaces"])) {
 			foreach ($_POST["new_ifaces"] as $ifid) {
-				$real = convert_friendly_interface_to_real_interface_name($ifid);
-				$new_rule_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+				$real = layer7_real_interface_name($ifid);
+				if ($real !== "") {
+					$new_rule_ifaces[] = $real;
+				}
 			}
 		}
 		$new_src_hosts = layer7_parse_ip_textarea($_POST["new_src_hosts"] ?? "");
@@ -343,6 +355,12 @@ if ($_POST["add_policy"] ?? false) {
 			}
 			if ($act === "block" && !layer7_policy_block_valid($rule)) {
 				$input_errors[] = l7_t("Politica block sem criterios: indique hosts/app/categoria ou active quarentena/scope global.");
+				$ok = false;
+			}
+			if ($ok && $act === "block" &&
+			    layer7_enforcement_is_scoped_hybrid($data) &&
+			    !layer7_policy_scoped_block_valid($rule, $data)) {
+				$input_errors[] = l7_t("No modo scoped_hybrid, indique origem (IP/CIDR/grupo), active quarentena da origem ou confirme scope global.");
 				$ok = false;
 			}
 			if ($ok) {
@@ -458,8 +476,10 @@ if ($_POST["save_policy_edit"] ?? false) {
 			$edit_rule_ifaces = array();
 			if (isset($_POST["edit_ifaces"]) && is_array($_POST["edit_ifaces"])) {
 				foreach ($_POST["edit_ifaces"] as $ifid) {
-					$real = convert_friendly_interface_to_real_interface_name($ifid);
-					$edit_rule_ifaces[] = ($real && $real !== $ifid) ? $real : $ifid;
+					$real = layer7_real_interface_name($ifid);
+					if ($real !== "") {
+						$edit_rule_ifaces[] = $real;
+					}
 				}
 			}
 			$edit_src_hosts = layer7_parse_ip_textarea($_POST["edit_src_hosts"] ?? "");
@@ -522,6 +542,12 @@ if ($_POST["save_policy_edit"] ?? false) {
 				}
 				if ($act === "block" && !layer7_policy_block_valid($rule)) {
 					$input_errors[] = l7_t("Politica block sem criterios: indique hosts/app/categoria ou active quarentena/scope global.");
+					$ok = false;
+				}
+				if ($ok && $act === "block" &&
+				    layer7_enforcement_is_scoped_hybrid($data) &&
+				    !layer7_policy_scoped_block_valid($rule, $data)) {
+					$input_errors[] = l7_t("No modo scoped_hybrid, indique origem (IP/CIDR/grupo), active quarentena da origem ou confirme scope global.");
 					$ok = false;
 				}
 				if ($ok) {
@@ -1000,7 +1026,9 @@ function layer7_policy_match_summary($policy) {
 						</div>
 						<div id="edit_ifaces_list">
 						<?php foreach ($ep_ifaces as $ifc) {
-							$chk = in_array($ifc["real"], $edit_policy_ifaces, true) ? 'checked="checked"' : '';
+							$chk = (in_array($ifc["real"], $edit_policy_ifaces, true) ||
+							    in_array($ifc["ifid"], $edit_policy_ifaces, true))
+							    ? 'checked="checked"' : '';
 						?>
 						<label class="checkbox-inline">
 							<input type="checkbox" name="edit_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" <?= $chk; ?> />

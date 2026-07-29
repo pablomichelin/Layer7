@@ -36,7 +36,11 @@ layer7d_pid_from_file()
 {
 	_p=""
 	[ -f "${pidfile}" ] || return 1
-	if ! read -r _p <"${pidfile}" 2>/dev/null; then
+	# daemon(8) grava o PID sem newline final. Nesse caso read preenche _p,
+	# mas retorna 1 por encontrar EOF antes do delimitador. Aceitar o valor
+	# evita que status/reload tratem um daemon vivo como parado e que reload
+	# arranque uma segunda instancia.
+	if ! IFS= read -r _p <"${pidfile}" 2>/dev/null && [ -z "${_p}" ]; then
 		_p=""
 		return 1
 	fi
