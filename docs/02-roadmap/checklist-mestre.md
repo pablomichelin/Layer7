@@ -142,6 +142,11 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   pacote extraído passaram (`SHA256 3a54c667…e9b40`). Exigir JSON de stats
   válido, captura passiva real e pressão zero em tráfego normal antes do gate
   two-client.
+- [ ] **Candidato `_31` (BG-059 / FP-020):** resultado
+  `NDPI_STATE_PARTIAL` não pode finalizar o fluxo; aguardar
+  `NDPI_STATE_CLASSIFIED` ou chamar `ndpi_detection_giveup()` ao atingir 48
+  pacotes. Exigir build nDPI e tráfego real que refine TLS genérico para
+  aplicação/SNI antes do gate two-client.
 
 ---
 

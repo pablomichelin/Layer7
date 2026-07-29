@@ -21,6 +21,11 @@ O que existe **só em RAM** entre reloads (não persistido).
   - `policy_decision` (se já resolvido)
   - `packets_count`
 
+Uma classificação parcial do nDPI não encerra o fluxo. O daemon aguarda
+`NDPI_STATE_CLASSIFIED`; se o orçamento de 48 pacotes terminar antes, chama
+`ndpi_detection_giveup()` e só então emite a decisão. Isso evita congelar TLS
+genérico antes do refinamento para aplicação/categoria/SNI.
+
 **Evicção:** TTL por inatividade e limite máximo de entradas. O lookup examina
 toda a janela de colisão antes de reutilizar um slot expirado; se a janela
 estiver cheia, remove deterministicamente o fluxo menos recente para manter a

@@ -245,6 +245,15 @@ Artefacto interno:
 `SHA256=3a54c667a601e29995562714691f4ee3e9e8e78a02fcd3e600955ae90d2e9b40`.
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
+
+**Addendum do candidato `1.8.11_31` (não publicado):**
+Corrige FP-020: o daemon não encerra mais DPI num resultado
+`NDPI_STATE_PARTIAL`; aguarda o estado final ou chama
+`ndpi_detection_giveup()` ao atingir 48 pacotes. Isso permite refinamento de
+TLS/QUIC genérico para aplicação/categoria/SNI antes da política. Regressões
+locais passaram; build/hash e validação passiva ainda são obrigatórios.
+`_30` fica apenas como rollback passivo pré-FP-020.
+
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e
 **validada no appliance** (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh`

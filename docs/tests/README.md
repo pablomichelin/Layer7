@@ -24,7 +24,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 |----------|-------|-----------|
 | `tests/functional/test_allowlist.c` | Fase 1 | allowlist, rejeição `/0`, seed |
 | `tests/functional/test_config_parse.c` | A3 / E0 | parse JSON (`sni_inspection`, `enforcement_model`) |
-| `tests/functional/test_capture_flow_key.c` | BG-055 | hash bidireccional: ida/volta no mesmo fluxo nDPI |
+| `tests/functional/test_capture_flow_key.c` | BG-055/BG-058/BG-059 | hash bidireccional, probe sem duplicação e finalização nDPI sem aceitar parcial |
 | `tests/functional/test_log_store.c` | BG-054 | rotação por tamanho e limite de cópias |
 | `tests/functional/test_policy_decide.c` | E1/E5/BG-056 | decisão, escopo, app/host=`pdst`, quarentena=`psrc`, allow preserva índice |
 | `tests/functional/test_enforce_scoped.c` | E3/BG-056 | runtime PF (`pdst_N` / `psrc_N` / `pallow_N`), exception block e cache TTL |
@@ -56,18 +56,18 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 ## Matriz de testes
 
-[`test-matrix.md`](test-matrix.md) — 116 testes divididos por categoria
+[`test-matrix.md`](test-matrix.md) — 120 testes divididos por categoria
 (build, instalação, daemon, config, policy engine, enforcement **inclui F4.3
 `force_dns` / anchor NAT e anti-QUIC opcional (ponto 6.7 / sec. 11)**, **blacklists F4.2 (12.1–12.2)**,
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3, estabilização `_25`, logs `_26`,
 correcções `_27`, allow PF seguro `_28`, parser anti-QUIC `_29` e captura
-resiliente `_30`).
-Estado actual após build `_30`: 96 OK e **20** pendentes. A sintaxe
+resiliente `_30` e finalização nDPI `_31`).
+Estado actual antes do build `_31`: 98 OK e **22** pendentes. A sintaxe
 corrigida passa no parser PF read-only e o pacote extraído passou no builder
 FreeBSD 15 (`SHA256 bea385dd…01840`); as regressões FP-019 passam localmente,
 e o pacote `_30` passou no builder (`SHA256 3a54c667…e9b40`). Gates instalados
-continuam explicitamente pendentes.
+continuam explicitamente pendentes; FP-020 já tem regressões locais.
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):
 parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em

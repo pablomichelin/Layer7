@@ -560,6 +560,11 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   silenciosamente; pressão fica visível no JSON por `cap_evicted` e
   `cap_dropped`. Suite C/PHP/shell, build nDPI e pacote extraído passam no
   FreeBSD 15 (`SHA256 3a54c667…e9b40`); appliance pendente.
+- **Finalização nDPI determinística (`2026-07-29`, candidato
+  `1.8.11_31`):** BG-059/FP-020 deixam de encerrar DPI no primeiro protocolo
+  parcial. O fluxo aguarda `NDPI_STATE_CLASSIFIED` e, se atingir 48 pacotes,
+  usa `ndpi_detection_giveup()` antes da decisão. Regressões locais passam;
+  builder/appliance pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

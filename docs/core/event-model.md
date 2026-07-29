@@ -4,7 +4,9 @@
 
 ### 1. Classificação (`flow_classified`)
 
-Emitido quando um fluxo é classificado com confiança suficiente (alinhado ao PoC, com campos extras).
+Emitido uma vez quando o nDPI chega a `NDPI_STATE_CLASSIFIED` ou quando o
+orçamento de 48 pacotes se esgota e `ndpi_detection_giveup()` produz o
+resultado final disponível. Estados `NDPI_STATE_PARTIAL` não emitem decisão.
 
 | Campo | Tipo | Descrição |
 |-------|------|-----------|

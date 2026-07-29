@@ -70,6 +70,21 @@ locais cobrem buraco antes do match, primeiro livre, janela cheia e lookup
 sem criação. Suite C/PHP/shell, build nDPI e pacote extraído passaram no
 FreeBSD 15 (`SHA256 3a54c667…e9b40`); gate passivo continua pendente.
 
+### Achado FP-020 — corrigido no candidato `_31`
+
+A captura encerrava o DPI no primeiro
+`ndpi_is_protocol_detected() != 0`. No nDPI 5.x, um protocolo já detectado
+pode continuar em `NDPI_STATE_PARTIAL`: TLS/QUIC genérico, aplicação,
+categoria e SNI ainda podem mudar. O daemon congelava esse resultado e nunca
+alimentava os pacotes seguintes, produzindo falso allow dependente do timing.
+Ao atingir 48 pacotes, também emitia o último resultado parcial sem o fallback
+`ndpi_detection_giveup()`.
+
+O candidato `_31` só finaliza por `NDPI_STATE_CLASSIFIED`; no limite chama
+`ndpi_detection_giveup()` e então emite uma única decisão. Regressões locais
+cobrem parcial, estado final e orçamento. Builder e gate passivo permanecem
+pendentes.
+
 | ID | Severidade | Limitação/risco | Próxima decisão |
 |----|------------|-----------------|-----------------|
 | FP-009 | Crítica | `legacy_global` continua default e um destino pode afectar todos os clientes | Gate two-client e migração controlada para `scoped_hybrid` |
@@ -79,12 +94,11 @@ FreeBSD 15 (`SHA256 3a54c667…e9b40`); gate passivo continua pendente.
 | FP-013 | Alta | DNS hint é global, limitado e associa um único hostname por IP compartilhado | Testar CDN multi-host; priorizar SNI quando disponível |
 | FP-014 | Alta | ECH, DoH hardcoded e QUIC podem ocultar host; bloqueio por IP pode atingir serviços compartilhados do mesmo cliente | UX de limitação, perfis de fallback e testes CDN |
 | FP-015 | Média | `config_parse.c` ainda usa busca textual sensível à estrutura/ordem do JSON | Migrar para parser JSON real em bloco separado |
-| FP-016 | Alta | Falta evidência física two-client, expiração, state kill, allow seguro e rollback | Build `_29` passou; executar roteiro começando passivo |
+| FP-016 | Alta | Falta evidência física two-client, expiração, state kill, allow seguro e rollback | Builds `_29`/`_30` passaram; construir `_31` e executar roteiro começando passivo |
 
 ## Critérios mínimos antes de activar
 
-1. Build `_29` com nDPI e PHP no builder FreeBSD — **PASS**,
-   SHA256 `bea385dd…01840`.
+1. Build `_31` com nDPI e PHP no builder FreeBSD — **PENDENTE**.
 2. Instalação no appliance com `enabled=false`, sem regras/tabelas populadas.
 3. Monitor com captura real: ida/volta classificadas e sem bloqueio.
 4. `scoped_hybrid` com dois clientes: A bloqueado, B permitido.
@@ -97,7 +111,7 @@ FreeBSD 15 (`SHA256 3a54c667…e9b40`); gate passivo continua pendente.
 
 ## Rollback
 
-- não activar `_29` antes dos gates;
+- não activar `_31` antes dos gates;
 - se o gate falhar, voltar para `_24` em modo passivo;
 - executar `layer7-pfctl flush-all`, resync do filtro e confirmar tabelas vazias;
 - preservar logs e artefactos do teste para diagnóstico;

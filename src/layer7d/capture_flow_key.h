@@ -103,4 +103,18 @@ layer7_capture_flow_hash(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp,
 	return h & mask;
 }
 
+/*
+ * nDPI 5.x pode expor um protocolo parcial antes de concluir a
+ * classificação. Encerrar nesse ponto perde refinamentos posteriores
+ * (por exemplo TLS -> YouTube) e metadados como SNI.
+ */
+static inline int
+layer7_capture_should_finalize(int ndpi_classification_final,
+    uint32_t packet_count, uint32_t packet_budget)
+{
+	if (ndpi_classification_final)
+		return 1;
+	return packet_budget > 0 && packet_count >= packet_budget;
+}
+
 #endif /* LAYER7_CAPTURE_FLOW_KEY_H */

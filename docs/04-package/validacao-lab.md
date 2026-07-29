@@ -1104,3 +1104,16 @@ PASS mínimo: `captures > 0`, `cap_pkts` crescente, JSON válido,
 `cap_dropped=0`; `cap_evicted` deve permanecer zero em tráfego normal ou ter
 causa documentada em teste de pressão. Qualquer crescimento inesperado exige
 parar o daemon, preservar JSON/logs e voltar a `_29`/`_24` passivo.
+
+## 17. Roteiro BG-059 — refinamento nDPI (`1.8.11_31`)
+
+Instalar somente em modo passivo. Gerar tráfego TLS/QUIC conhecido para uma
+aplicação presente numa política de teste, mantendo enforcement desligado.
+Correlacionar pcap e `flow_decide`: o daemon não pode encerrar no primeiro
+TLS/QUIC parcial e deve emitir somente uma decisão com a melhor
+aplicação/categoria/SNI disponível.
+
+PASS mínimo: build nDPI contém referências a `NDPI_STATE_CLASSIFIED` e
+`ndpi_detection_giveup`; fluxo real recebe ida/volta, não duplica decisão e
+refina o protocolo quando o nDPI o fizer. Se ficar sempre genérico, preservar
+pcap/logs/stats e voltar a `_30`/`_24` passivo sem activar PF.

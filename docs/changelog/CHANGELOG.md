@@ -2,6 +2,26 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_31] - Unreleased — decisão somente após classificação nDPI final
+
+Pacote candidato, não publicado e não aprovado para produção.
+
+### Fixed
+
+- O primeiro protocolo parcial deixa de congelar app/categoria/SNI do fluxo.
+  A decisão aguarda `NDPI_STATE_CLASSIFIED`.
+- Ao atingir o orçamento de 48 pacotes sem estado final, a captura chama
+  `ndpi_detection_giveup()` antes de emitir o resultado.
+
+### Risco, teste e rollback
+
+- Impacto limitado ao momento de finalização da captura nDPI; política e PF
+  não mudam.
+- Regressões locais: PASS. Builder nDPI, pacote e appliance: pendentes.
+- Rollback: `_30` passivo; `_24` continua rollback público conhecido.
+
+---
+
 ## [1.8.11_30] - Unreleased — fluxo nDPI resiliente a colisões
 
 Pacote candidato, não publicado e não aprovado para produção.

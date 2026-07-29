@@ -162,6 +162,21 @@ PASS. Artefacto `pfSense-pkg-layer7-1.8.11_30.pkg`,
 `SHA256=3a54c667a601e29995562714691f4ee3e9e8e78a02fcd3e600955ae90d2e9b40`.
 Gate passivo permanece pendente; produção não foi alterada.
 
+### Candidato `1.8.11_31` — classificação nDPI até estado final (não publicado)
+
+A continuação da revisão encontrou FP-020: a captura marcava o fluxo como
+concluído no primeiro resultado não-Unknown de `ndpi_is_protocol_detected()`.
+No nDPI 5.x esse resultado pode estar em `NDPI_STATE_PARTIAL`; aplicação,
+categoria e SNI ainda podem ser refinados em pacotes seguintes. Isso explica
+políticas de aplicação que funcionavam em algumas sessões e falhavam noutras.
+Quando o limite de 48 pacotes era atingido, também faltava chamar
+`ndpi_detection_giveup()`.
+
+BG-059 faz a decisão aguardar `NDPI_STATE_CLASSIFIED`; ao esgotar o orçamento,
+usa o fallback oficial do nDPI antes de emitir a única classificação do fluxo.
+Regressões locais: PASS. Build nDPI, pacote e gate passivo permanecem
+pendentes; produção não foi alterada.
+
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
 Artefacto `pfSense-pkg-layer7-1.8.11_23.pkg`
@@ -278,7 +293,7 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_30` (`PORTVERSION=1.8.11`, `PORTREVISION=30`),
++ `PORTREVISION`):** `1.8.11_31` (`PORTVERSION=1.8.11`, `PORTREVISION=31`),
 **candidato interno não publicado**. A release pública permanece
 `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
@@ -946,11 +961,11 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: instalar `_30` em passivo e validar ruleset +
+- Proximo gate: build/validar `_31`, instalar em passivo e validar ruleset +
   logs/monitor/captura e só então testar o toggle anti-QUIC
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 30 (candidato nao publicado)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 31 (candidato nao publicado)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
   _25 + contenção L1 `_26` + correcções `_27`/`_28` em curso, sem activacao
   no appliance

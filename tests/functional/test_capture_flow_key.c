@@ -69,6 +69,13 @@ main(void)
 	check(slot == LAYER7_CAPTURE_NO_SLOT && found == 0 && evict == 0,
 	    "lookup sem create não remove fluxo sob pressão");
 
+	check(!layer7_capture_should_finalize(0, 3, 48),
+	    "classificação parcial não encerra DPI cedo");
+	check(layer7_capture_should_finalize(1, 3, 48),
+	    "estado nDPI final encerra DPI");
+	check(layer7_capture_should_finalize(0, 48, 48),
+	    "orçamento esgotado encerra DPI para giveup");
+
 	if (g_fail) {
 		printf("RESULT: FAIL\n");
 		return 1;

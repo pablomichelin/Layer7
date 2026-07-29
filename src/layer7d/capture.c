@@ -616,8 +616,16 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	detected = ndpi_detection_process_packet(cap->ndpi, f->ndpi_flow,
 	    ip_data, ip_len, time_ms, NULL);
 
-	if (ndpi_is_protocol_detected(detected) != 0 ||
-	    f->pkt_count >= L7C_MAX_PKTS_PER_FLOW) {
+	/*
+	 * `ndpi_is_protocol_detected()` também é true para resultado PARTIAL.
+	 * O app/SNI ainda pode melhorar em pacotes seguintes; o contrato de
+	 * conclusão no nDPI 5.x é o estado NDPI_STATE_CLASSIFIED.
+	 */
+	if (layer7_capture_should_finalize(
+	    detected.state == NDPI_STATE_CLASSIFIED,
+	    f->pkt_count, L7C_MAX_PKTS_PER_FLOW)) {
+		if (detected.state != NDPI_STATE_CLASSIFIED)
+			detected = ndpi_detection_giveup(cap->ndpi, f->ndpi_flow);
 
 		f->classified = 1;
 		f->detected = detected;
