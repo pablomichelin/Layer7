@@ -11,7 +11,7 @@
  * Edicao simples por textarea: 1 entrada por linha (dominio, IPv4 host ou CIDR).
  * A lista combinada (operador + seed embutido) e honrada:
  *   - pelo daemon (`l7_allowlist_*`) — antes de adicionar IPs a layer7_block_dst.
- *   - pelo PF do pacote — `pass quick to <layer7_allow_dst>` antes dos blocks.
+ *   - pelo PF do pacote — marca L7ALLOW; so os blocks Layer7 a ignoram.
  */
 
 require_once("guiconfig.inc");

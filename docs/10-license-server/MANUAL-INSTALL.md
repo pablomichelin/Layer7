@@ -188,6 +188,29 @@ Não é release pública e não deve ser instalado fora do gate controlado.
 BG-056/FP-017 continua aberto: allow/excepção ainda precisa de enforcement PF
 escopado contra destino previamente inserido por outro cliente/regra.
 
+**Addendum do candidato `1.8.11_28` (não publicado):**
+Implementa BG-056/ADR-0016. Políticas `allow` usam `layer7_pallow_N`;
+excepções usam tabela de origem própria. O PF aplica `match/tag L7ALLOW` e
+somente os blocks Layer7 ignoram a marca. Não existe `pass quick` de allow:
+regras normais do pfSense continuam a permitir ou negar o tráfego.
+
+Antes de qualquer enforce, validar:
+
+```sh
+pfctl -nf /tmp/rules.debug
+pfctl -sr | grep -E 'L7ALLOW|layer7:(allow|pallow|exc-allow|block|pdst|psrc|bl:)'
+```
+
+Critérios: linhas allow devem aparecer como `match ... tag L7ALLOW`; blocks
+Layer7 como `! tagged L7ALLOW`; nenhuma linha Layer7 de allow pode ser
+`pass quick`. O gate também deve criar uma regra nativa de block controlada e
+provar que a marca Layer7 não a ultrapassa. App-only pode precisar de DNS ou
+do primeiro fluxo classificável para aprender o destino; não usar allow
+global como workaround. Artefacto/SHA256 serão registados após build.
+
+Rollback: `enabled=false`, `layer7-pfctl flush-all`, reload do filtro,
+reinstalação `_24` em monitor e restauro do JSON exportado.
+
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e
 **validada no appliance** (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh`
@@ -207,9 +230,11 @@ levavam o produto a bloquear bancos/servicos em modo `monitor`:
   `Settings > Servico`, **OFF por defeito** (evita quebrar "DNS privado" Android
   e algumas apps de banco que precisam de DoT).
 - Nova **allowlist de destinos** (`layer7.dst_allowlist[]` + seed embutida) com
-  pagina propria (`Services > Layer 7 > Allowlist`) e regra PF
-  `pass quick inet to <layer7_allow_dst>`. Bancos BR, gov.br, push Apple/Google
+  pagina propria (`Services > Layer 7 > Allowlist`) e tabela PF
+  `layer7_allow_dst`. Bancos BR, gov.br, push Apple/Google
   e Microsoft 365 ja vem na seed (`/usr/local/etc/layer7/allowlist-seed.txt`).
+  No candidato `_28`, a regra histórica `pass quick` é substituída por
+  `match/tag L7ALLOW`, preservando as regras nativas do pfSense.
 - **Flush fiavel** das tabelas dinamicas (`layer7_block_dst`, `layer7_block`,
   `layer7_bld_*`) ao trocar de `enforce` para passivo, parar o daemon ou
   desinstalar — sem deixar IPs `stale` a bloquear.
@@ -221,7 +246,8 @@ levavam o produto a bloquear bancos/servicos em modo `monitor`:
 2. Instalacao no appliance via `IGNORE_OSVERSION=yes pkg add -f` — OK.
 3. `sh tests/lab/smoke-monitor-mode.sh` em monitor — **exit 0** (sem
    `block drop`, tabelas presentes, `layer7_block_dst` vazia, daemon vivo).
-4. Enforce: `pass quick to <layer7_allow_dst>` + 4 `block drop` presentes.
+4. Enforce da release `_23`: `pass quick to <layer7_allow_dst>` + 4
+   `block drop` presentes (histórico; `_28` migra para `match/tag` seguro).
 5. Transicao enforce->monitor: `layer7_block_dst` esvaziada (Bloco 5).
 6. `layer7d --license-status`: saida `chave=valor`, exit 1 sem `.lic`.
 

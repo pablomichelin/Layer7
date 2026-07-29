@@ -584,14 +584,242 @@ function layer7_policy_enforcement_table_names($data = null)
 			$tables[] = "layer7_psrc_" . $idx;
 		}
 	}
+	foreach (layer7_policy_allow_meta($data) as $m) {
+		$tables[] = "layer7_pallow_" . (int)$m["idx"];
+	}
 	return array_values(array_unique($tables));
+}
+
+/**
+ * Metadados das politicas allow. A tabela positiva e sempre por politica:
+ * o daemon so inclui o destino depois de a regra ter vencido no policy
+ * engine, preservando first-match sem abrir bypass para outros destinos.
+ */
+function layer7_policy_allow_meta($data)
+{
+	$out = array();
+	if (!is_array($data) || !isset($data["layer7"]) ||
+	    !is_array($data["layer7"])) {
+		return $out;
+	}
+	$l7 = $data["layer7"];
+	$policies = (isset($l7["policies"]) && is_array($l7["policies"]))
+	    ? $l7["policies"] : array();
+	$groups = (isset($l7["groups"]) && is_array($l7["groups"]))
+	    ? $l7["groups"] : array();
+
+	foreach (layer7_policies_sorted_copy($policies) as $idx => $policy) {
+		if (!is_array($policy) || empty($policy["enabled"]) ||
+		    (string)($policy["action"] ?? "") !== "allow") {
+			continue;
+		}
+		$src = layer7_policy_expand_src_origins($policy, $groups);
+		$ifaces = array();
+		$match = (isset($policy["match"]) && is_array($policy["match"]))
+		    ? $policy["match"] : array();
+		$raw_ifaces = (isset($match["interfaces"]) &&
+		    is_array($match["interfaces"])) ? $match["interfaces"] :
+		    ((isset($policy["interfaces"]) &&
+		    is_array($policy["interfaces"])) ? $policy["interfaces"] :
+		    array());
+		foreach ($raw_ifaces as $iface) {
+			$iface = trim((string)$iface);
+			if ($iface !== "" && layer7_pf_ifname_for_rules($iface)) {
+				$ifaces[] = $iface;
+			}
+		}
+		$out[] = array(
+			"idx" => (int)$idx,
+			"policy" => $policy,
+			"src_hosts" => $src["hosts"],
+			"src_cidrs" => $src["cidrs"],
+			"interfaces" => array_values(array_unique($ifaces))
+		);
+	}
+	return $out;
+}
+
+/**
+ * Excecoes allow sao bypass total do policy engine para uma origem. No PF,
+ * o bypass continua limitado aos destinos que o proprio Layer7 bloqueia.
+ */
+function layer7_exception_allow_meta($data)
+{
+	$out = array();
+	if (!is_array($data) || !isset($data["layer7"]) ||
+	    !is_array($data["layer7"])) {
+		return $out;
+	}
+	$exceptions = (isset($data["layer7"]["exceptions"]) &&
+	    is_array($data["layer7"]["exceptions"]))
+	    ? array_values($data["layer7"]["exceptions"]) : array();
+	usort($exceptions, function ($a, $b) {
+		$pa = isset($a["priority"]) ? (int)$a["priority"] : 0;
+		$pb = isset($b["priority"]) ? (int)$b["priority"] : 0;
+		if ($pa !== $pb) {
+			return $pb - $pa;
+		}
+		return strcmp((string)($a["id"] ?? ""),
+		    (string)($b["id"] ?? ""));
+	});
+
+	foreach ($exceptions as $idx => $exception) {
+		if (!is_array($exception) ||
+		    (array_key_exists("enabled", $exception) &&
+		    empty($exception["enabled"])) ||
+		    (string)($exception["action"] ?? "allow") !== "allow") {
+			continue;
+		}
+		$entries = array();
+		$hosts = (isset($exception["hosts"]) &&
+		    is_array($exception["hosts"])) ? $exception["hosts"] :
+		    (isset($exception["host"]) ? array($exception["host"]) :
+		    array());
+		$cidrs = (isset($exception["cidrs"]) &&
+		    is_array($exception["cidrs"])) ? $exception["cidrs"] :
+		    (isset($exception["cidr"]) ? array($exception["cidr"]) :
+		    array());
+		foreach ($hosts as $host) {
+			$host = trim((string)$host);
+			if (layer7_ipv4_valid($host)) {
+				$entries[] = $host;
+			}
+		}
+		foreach ($cidrs as $cidr) {
+			$cidr = trim((string)$cidr);
+			if (layer7_cidr_valid($cidr) || layer7_ipv4_valid($cidr)) {
+				$entries[] = $cidr;
+			}
+		}
+		if (empty($entries)) {
+			continue;
+		}
+		$ifaces = array();
+		if (!empty($exception["interfaces"]) &&
+		    is_array($exception["interfaces"])) {
+			foreach ($exception["interfaces"] as $iface) {
+				$iface = trim((string)$iface);
+				if ($iface !== "" &&
+				    layer7_pf_ifname_for_rules($iface)) {
+					$ifaces[] = $iface;
+				}
+			}
+		}
+		$out[] = array(
+			"idx" => (int)$idx,
+			"exception" => $exception,
+			"entries" => array_values(array_unique($entries)),
+			"interfaces" => array_values(array_unique($ifaces))
+		);
+	}
+	return $out;
+}
+
+/**
+ * Declaracoes dinamicas antes de qualquer regra que as referencie.
+ */
+function layer7_pf_managed_dynamic_tables_text($data, $bl_config = null)
+{
+	$lines = array();
+	foreach (layer7_policy_enforcement_meta($data) as $m) {
+		if (!empty($m["needs_pdst"])) {
+			$lines[] = "table <layer7_pdst_" . (int)$m["idx"] .
+			    "> persist";
+		}
+		if (!empty($m["needs_psrc"])) {
+			$lines[] = "table <layer7_psrc_" . (int)$m["idx"] .
+			    "> persist";
+		}
+	}
+	foreach (layer7_policy_allow_meta($data) as $m) {
+		$lines[] = "table <layer7_pallow_" . (int)$m["idx"] .
+		    "> persist";
+	}
+	foreach (layer7_exception_allow_meta($data) as $m) {
+		$lines[] = "table <layer7_exc_allow_" . (int)$m["idx"] .
+		    "> persist { " . implode(", ", $m["entries"]) . " }";
+	}
+	if ($bl_config === null) {
+		$bl_config = layer7_bl_config_load();
+	}
+	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
+		foreach ($bl_config["rules"] as $idx => $rule) {
+			$lines[] = "table <layer7_bld_" . (int)$idx .
+			    "> persist";
+		}
+	}
+	foreach (layer7_blacklist_source_scope_meta($bl_config) as $m) {
+		$lines[] = "table <" . $m["table"] . "> persist { " .
+		    implode(", ", $m["entries"]) . " }";
+	}
+	$lines = array_values(array_unique($lines));
+	if (empty($lines)) {
+		return "";
+	}
+	return "\n# Layer7 managed policy/blacklist tables\n" .
+	    implode("\n", $lines) . "\n";
+}
+
+function layer7_policy_allow_rules_text($data)
+{
+	if (!layer7_pf_should_enforce($data)) {
+		return "";
+	}
+	$rules = "";
+	foreach (layer7_policy_allow_meta($data) as $m) {
+		$idx = (int)$m["idx"];
+		$policy = $m["policy"];
+		$pid = preg_replace('/[^a-zA-Z0-9_-]/', '',
+		    (string)($policy["id"] ?? "p{$idx}"));
+		$pid = ($pid === "") ? "p{$idx}" : $pid;
+		$sources = array_merge($m["src_hosts"], $m["src_cidrs"]);
+		if (empty($sources)) {
+			$sources = array(null);
+		}
+		$ifaces = empty($m["interfaces"]) ? array(null) :
+		    $m["interfaces"];
+		foreach ($ifaces as $iface) {
+			$on = ($iface === null) ? "" : "on {$iface} ";
+			foreach ($sources as $source) {
+				$from = ($source === null) ? "" : "from {$source} ";
+				$rules .= "match {$on}inet {$from}" .
+				    "to <layer7_pallow_{$idx}> " .
+				    "tag L7ALLOW label \"layer7:pallow:{$pid}\"\n";
+			}
+		}
+	}
+	return $rules;
+}
+
+function layer7_exception_allow_rules_text($data, $bl_config = null)
+{
+	if (!layer7_pf_should_enforce($data)) {
+		return "";
+	}
+	$rules = "";
+	foreach (layer7_exception_allow_meta($data) as $m) {
+		$idx = (int)$m["idx"];
+		$exception = $m["exception"];
+		$eid = preg_replace('/[^a-zA-Z0-9_-]/', '',
+		    (string)($exception["id"] ?? "e{$idx}"));
+		$eid = ($eid === "") ? "e{$idx}" : $eid;
+		$ifaces = empty($m["interfaces"]) ? array(null) :
+		    $m["interfaces"];
+		foreach ($ifaces as $iface) {
+			$on = ($iface === null) ? "" : "on {$iface} ";
+			$rules .= "match {$on}inet " .
+			    "from <layer7_exc_allow_{$idx}> to !<localsubnets> " .
+			    "tag L7ALLOW label \"layer7:exc-allow:{$eid}\"\n";
+		}
+	}
+	return $rules;
 }
 
 /**
  * Regras e tabelas PF escopadas por politica (Caminho B / E2).
  * So em scoped_hybrid + enforce; legacy_global permanece inalterado.
  */
-function layer7_policy_enforcement_rules_text($data)
+function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 {
 	if (!layer7_enforcement_is_scoped_hybrid($data) ||
 	    !layer7_pf_should_enforce($data)) {
@@ -621,17 +849,20 @@ function layer7_policy_enforcement_rules_text($data)
 				foreach ($m["src_hosts"] as $sh) {
 					if (layer7_ipv4_valid($sh)) {
 						$rules .= "block drop quick inet from {$sh} " .
-						    "to <{$tbl}> label \"layer7:pdst:{$pid}\"\n";
+						    "to <{$tbl}> ! tagged L7ALLOW " .
+						    "label \"layer7:pdst:{$pid}\"\n";
 					}
 				}
 				foreach ($m["src_cidrs"] as $sc) {
 					if (layer7_cidr_valid($sc) || layer7_ipv4_valid($sc)) {
 						$rules .= "block drop quick inet from {$sc} " .
-						    "to <{$tbl}> label \"layer7:pdst:{$pid}\"\n";
+						    "to <{$tbl}> ! tagged L7ALLOW " .
+						    "label \"layer7:pdst:{$pid}\"\n";
 					}
 				}
 			} elseif ($scope_global) {
 				$rules .= "block drop quick inet to <{$tbl}> " .
+				    "! tagged L7ALLOW " .
 				    "label \"layer7:pdst:{$pid}:global\"\n";
 			}
 		}
@@ -641,7 +872,8 @@ function layer7_policy_enforcement_rules_text($data)
 			$tables .= "table <{$tbl}> persist\n";
 			if ($has_src || $scope_global || $quarantine_origin) {
 				$rules .= "block drop quick inet from <{$tbl}> " .
-				    "to !<localsubnets> label \"layer7:psrc:{$pid}\"\n";
+				    "to !<localsubnets> ! tagged L7ALLOW " .
+				    "label \"layer7:psrc:{$pid}\"\n";
 			}
 		}
 	}
@@ -651,7 +883,8 @@ function layer7_policy_enforcement_rules_text($data)
 	}
 
 	return "\n# Policy enforcement scoped (Caminho B / E2)\n" .
-	    $tables . "\n# Policy scoped rules\n" . $rules;
+	    ($include_tables ? $tables . "\n" : "") .
+	    "# Policy scoped rules\n" . $rules;
 }
 
 /**
@@ -689,32 +922,37 @@ function layer7_pf_default_rules_text($data = null)
 
 	$l7 = $data["layer7"];
 	$block_dot_doq = !empty($l7["block_dot_doq"]);
+	$bl_config = layer7_bl_config_load();
+	$out .= layer7_pf_managed_dynamic_tables_text($data, $bl_config);
 
-	/* Bloco 3: pass quick para destinos da allowlist — bancos/gov/push.
-	 * Tem de aparecer ANTES de qualquer `block drop quick` para que
-	 * destinos protegidos nunca sejam intercetados em enforce. */
+	/* A allowlist apenas marca o pacote. As regras Layer7 ignoram a marca,
+	 * mas as regras nativas do pfSense continuam a avaliar o trafego. */
 	$out .= implode("\n", array(
 		"",
 		"# Allowlist (Bloco 3) — destinos protegidos contra bloqueio.",
-		"pass quick inet to <layer7_allow_dst> label \"layer7:allow:dst\"",
+		"match inet to <layer7_allow_dst> tag L7ALLOW label \"layer7:allow:dst\"",
 	)) . "\n";
+	$out .= "\n# Explicit allow por politica (destino aprendido em runtime).\n";
+	$out .= layer7_policy_allow_rules_text($data);
+	$out .= "\n# Excecoes allow: somente destinos bloqueados pelo Layer7.\n";
+	$out .= layer7_exception_allow_rules_text($data, $bl_config);
 
 	if ($block_dot_doq) {
 		$out .= implode("\n", array(
 			"",
 			"# Anti-bypass DoT/DoQ (porta 853) — toggle explicito 'block_dot_doq'.",
-			"block drop quick inet proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot\"",
-			"block drop quick inet6 proto tcp to !<localsubnets> port 853 label \"layer7:anti-dot6\"",
-			"block drop quick inet proto udp to !<localsubnets> port 853 label \"layer7:anti-doq\"",
-			"block drop quick inet6 proto udp to !<localsubnets> port 853 label \"layer7:anti-doq6\""
+			"block drop quick inet proto tcp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-dot\"",
+			"block drop quick inet6 proto tcp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-dot6\"",
+			"block drop quick inet proto udp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-doq\"",
+			"block drop quick inet6 proto udp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-doq6\""
 		)) . "\n";
 	}
 
 	$out .= implode("\n", array(
 		"",
 		"# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.",
-		"block drop quick inet from <layer7_block> to !<localsubnets> label \"layer7:block:src\"",
-		"block drop quick inet6 from <layer7_block> to !<localsubnets> label \"layer7:block:src6\"",
+		"block drop quick inet from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label \"layer7:block:src\"",
+		"block drop quick inet6 from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label \"layer7:block:src6\"",
 	)) . "\n";
 
 	/* Caminho B / E2: em scoped_hybrid o destino global layer7_block_dst nao
@@ -723,8 +961,8 @@ function layer7_pf_default_rules_text($data = null)
 		$out .= implode("\n", array(
 			"",
 			"# Bloqueio por destino (sites/apps bloqueados via policies).",
-			"block drop quick inet to <layer7_block_dst> label \"layer7:block:dst\"",
-			"block drop quick inet6 to <layer7_block_dst> label \"layer7:block:dst6\"",
+			"block drop quick inet to <layer7_block_dst> ! tagged L7ALLOW label \"layer7:block:dst\"",
+			"block drop quick inet6 to <layer7_block_dst> ! tagged L7ALLOW label \"layer7:block:dst6\"",
 		)) . "\n";
 	}
 
@@ -934,7 +1172,8 @@ function layer7_dst_allowlist_apply_to_pf()
 
 /**
  * Esvazia as tabelas PF dinamicas (`layer7_block`, `layer7_block_dst`,
- * `layer7_allow_dst`, `layer7_bld_N`, `layer7_pdst_N`, `layer7_psrc_N`).
+ * `layer7_allow_dst`, `layer7_bld_N`, `layer7_blsrc_N`, `layer7_pdst_N`,
+ * `layer7_psrc_N`, `layer7_pallow_N`).
  * Usado quando o modo passa para monitor/disabled ou ao desinstalar — evita
  * que IPs adicionados num enforce anterior continuem a bloquear apos a mudanca
  * (Bloco 5). Entradas estaticas da allowlist sao repostas por
@@ -954,10 +1193,12 @@ function layer7_flush_dynamic_tables()
 	/* Indices orfaos apos reorder/delete — flush ate limites do projecto. */
 	for ($i = 0; $i < 32; $i++) {
 		$tables[] = "layer7_bld_" . $i;
+		$tables[] = "layer7_blsrc_" . $i;
 	}
 	for ($i = 0; $i < 24; $i++) {
 		$tables[] = "layer7_pdst_" . $i;
 		$tables[] = "layer7_psrc_" . $i;
+		$tables[] = "layer7_pallow_" . $i;
 	}
 	foreach (layer7_policy_enforcement_table_names($data = layer7_load_or_default()) as $ptbl) {
 		$tables[] = $ptbl;
@@ -1021,6 +1262,102 @@ function layer7_ensure_daemon_running()
 	}
 }
 
+/**
+ * Escopo efectivo de origem por regra de blacklist. Quando ha except_ips,
+ * uma tabela PF combina as origens positivas com entradas negadas. Assim a
+ * excepcao nao precisa de pass/tag e nao interfere noutra politica Layer7.
+ */
+function layer7_blacklist_source_scope_meta($bl_config)
+{
+	$out = array();
+	if (empty($bl_config["enabled"]) ||
+	    empty($bl_config["rules"]) ||
+	    !is_array($bl_config["rules"])) {
+		return $out;
+	}
+	foreach ($bl_config["rules"] as $idx => $brule) {
+		if (empty($brule["enabled"]) ||
+		    empty($brule["except_ips"]) ||
+		    !is_array($brule["except_ips"])) {
+			continue;
+		}
+		$entries = array();
+		if (!empty($brule["src_cidrs"]) &&
+		    is_array($brule["src_cidrs"])) {
+			foreach ($brule["src_cidrs"] as $cidr) {
+				$cidr = trim((string)$cidr);
+				if ($cidr !== "" &&
+				    (layer7_cidr_valid($cidr) ||
+				    layer7_ipv4_valid($cidr))) {
+					$entries[] = $cidr;
+				}
+			}
+		}
+		if (empty($entries)) {
+			$entries[] = "0.0.0.0/0";
+		}
+		$n_except = 0;
+		foreach ($brule["except_ips"] as $eip) {
+			$eip = trim((string)$eip);
+			if ($eip !== "" && layer7_ipv4_valid($eip)) {
+				$entries[] = "!" . $eip;
+				$n_except++;
+			}
+		}
+		if ($n_except > 0) {
+			$out[(int)$idx] = array(
+				"table" => "layer7_blsrc_" . (int)$idx,
+				"entries" => array_values(array_unique($entries))
+			);
+		}
+	}
+	return $out;
+}
+
+/**
+ * Regras de blacklist sem declaracoes de tabela (emitidas no cabecalho).
+ */
+function layer7_blacklist_filter_rules_text($bl_config)
+{
+	if (empty($bl_config["enabled"]) ||
+	    empty($bl_config["rules"]) ||
+	    !is_array($bl_config["rules"])) {
+		return "";
+	}
+	$scope_meta = layer7_blacklist_source_scope_meta($bl_config);
+	$rules = "\n# Blacklist rules (per-source/CIDR)\n";
+	foreach ($bl_config["rules"] as $idx => $brule) {
+		if (empty($brule["enabled"])) {
+			continue;
+		}
+		$table = "layer7_bld_" . (int)$idx;
+		$rname = preg_replace('/[^a-zA-Z0-9_-]/', '',
+		    $brule["name"] ?? "rule{$idx}");
+		if (isset($scope_meta[(int)$idx])) {
+			$src_table = $scope_meta[(int)$idx]["table"];
+			$rules .= "block drop quick inet from <{$src_table}> " .
+			    "to <{$table}> ! tagged L7ALLOW " .
+			    "label \"layer7:bl:{$rname}\"\n";
+		} elseif (!empty($brule["src_cidrs"])) {
+			foreach ($brule["src_cidrs"] as $cidr) {
+				$cidr = trim((string)$cidr);
+				if ($cidr !== "" &&
+				    (layer7_cidr_valid($cidr) ||
+				    layer7_ipv4_valid($cidr))) {
+					$rules .= "block drop quick inet from {$cidr} " .
+					    "to <{$table}> ! tagged L7ALLOW " .
+					    "label \"layer7:bl:{$rname}\"\n";
+				}
+			}
+		} else {
+			$rules .= "block drop quick inet to <{$table}> " .
+			    "! tagged L7ALLOW " .
+			    "label \"layer7:bl:{$rname}\"\n";
+		}
+	}
+	return $rules;
+}
+
 function layer7_generate_rules($type)
 {
 	$type = (string)$type;
@@ -1044,7 +1381,7 @@ function layer7_generate_rules($type)
 	}
 
 	/* Enforce: construir a partir da fonte mode-aware (inclui allowlist
-	 * `pass quick`, toggle `block_dot_doq` e os blocks por src/dst), em vez
+	 * por tag, toggle `block_dot_doq` e os blocks por src/dst), em vez
 	 * do `pf.conf` em disco, para garantir coerencia com a config actual. */
 	$rules = layer7_pf_default_rules_text($data);
 
@@ -1061,55 +1398,23 @@ function layer7_generate_rules($type)
 				continue;
 			}
 			$rules .= "block drop quick inet on {$qi} proto udp" .
-			    " to !<localsubnets> port 443 label \"layer7:anti-quic:{$qi}\"\n";
+			    " to !<localsubnets> port 443 ! tagged L7ALLOW" .
+			    " label \"layer7:anti-quic:{$qi}\"\n";
 			$rules .= "block drop quick inet6 on {$qi} proto udp" .
-			    " to !<localsubnets> port 443 label \"layer7:anti-quic6:{$qi}\"\n";
+			    " to !<localsubnets> port 443 ! tagged L7ALLOW" .
+			    " label \"layer7:anti-quic6:{$qi}\"\n";
 		}
 	} elseif (!empty($data["layer7"]["block_quic"])) {
 		/* Legado: block_quic:true sem interfaces definidas — comportamento global. */
 		$rules .= "\n# Anti-QUIC global (legado) — apenas destinos externos.\n";
-		$rules .= "block drop quick inet proto udp to !<localsubnets> port 443 label \"layer7:anti-quic\"\n";
-		$rules .= "block drop quick inet6 proto udp to !<localsubnets> port 443 label \"layer7:anti-quic6\"\n";
+		$rules .= "block drop quick inet proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label \"layer7:anti-quic\"\n";
+		$rules .= "block drop quick inet6 proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label \"layer7:anti-quic6\"\n";
 	}
 
 	$bl_config = layer7_bl_config_load();
-	if (!empty($bl_config["rules"])) {
-		$rules .= "\n# Blacklist tables (persist across filter reloads)\n";
-		foreach ($bl_config["rules"] as $idx => $brule) {
-			$table = "layer7_bld_" . (int)$idx;
-			$rules .= "table <{$table}> persist\n";
-		}
-		if (!empty($bl_config["enabled"])) {
-			$rules .= "\n# Blacklist rules (per-source/CIDR)\n";
-			foreach ($bl_config["rules"] as $idx => $brule) {
-				if (empty($brule["enabled"])) {
-					continue;
-				}
-				$table = "layer7_bld_" . (int)$idx;
-				$rname = preg_replace('/[^a-zA-Z0-9_-]/', '', $brule["name"] ?? "rule{$idx}");
-			if (!empty($brule["except_ips"])) {
-				foreach ($brule["except_ips"] as $eip) {
-					$eip = trim($eip);
-					if ($eip !== "" && layer7_ipv4_valid($eip)) {
-						$rules .= "pass quick inet from {$eip} to <{$table}> label \"layer7:bl:except:{$rname}\"\n";
-					}
-				}
-			}
-			if (!empty($brule["src_cidrs"])) {
-				foreach ($brule["src_cidrs"] as $cidr) {
-					$cidr = trim($cidr);
-					if ($cidr !== "" && (layer7_cidr_valid($cidr) || layer7_ipv4_valid($cidr))) {
-						$rules .= "block drop quick inet from {$cidr} to <{$table}> label \"layer7:bl:{$rname}\"\n";
-					}
-				}
-			} else {
-					$rules .= "block drop quick inet to <{$table}> label \"layer7:bl:{$rname}\"\n";
-				}
-			}
-		}
-	}
+	$rules .= layer7_blacklist_filter_rules_text($bl_config);
 
-	$rules .= layer7_policy_enforcement_rules_text($data);
+	$rules .= layer7_policy_enforcement_rules_text($data, false);
 
 	/* Injectar regras rdr no anchor NAT como efeito colateral.
 	 * pfSense CE nao processa nat_rules_needed; esta e a unica forma

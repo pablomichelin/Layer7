@@ -540,6 +540,12 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   (`SHA256 8eae978d…d5388`); produção permanece intocada e gate pendente.
   A revisão final abriu BG-056/FP-017: precedência allow precisa de enforcement
   PF próprio contra entradas já existentes antes de declarar produção pronta.
+- **Allow PF seguro (`2026-07-29`, candidato `1.8.11_28`):** BG-056 /
+  ADR-0016 introduzem `layer7_pallow_N` e excepções por origem com marca
+  `L7ALLOW`. Somente blocks Layer7 ignoram a marca; regras nativas do pfSense
+  continuam a avaliar o pacote. O `pass quick` histórico da allowlist e das
+  excepções UT1 é removido. Suite C/PHP/shell passa no builder; build do
+  pacote, `pfctl -nf` e gate two-client continuam pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

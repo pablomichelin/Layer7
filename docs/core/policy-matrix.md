@@ -4,7 +4,7 @@
 
 | Ação | Comportamento |
 |------|----------------|
-| `allow` | Fluxo permitido explicitamente (útil após regras genéricas `block`) |
+| `allow` | Ignora blocks geridos pelo Layer7, sem autorizar nem contornar regras nativas do pfSense |
 | `block` | Negar; enforcement via PF (table + regra de bloqueio) |
 | `monitor` | Apenas log/evento; sem alteração PF |
 | `tag` | Incluir endpoint em PF table (alias) para uso em regras manuais ou encadeadas |
@@ -29,6 +29,8 @@ actual e não devem ser apresentados como critérios disponíveis.
 - interface/origem/schedule são condições obrigatórias;
 - quando `ndpi_app` e `hosts` coexistem, a relação actual é **OR**;
 - match por app/categoria ou host usa `layer7_pdst_N` por defeito;
+- allow explícito aprende o destino em `layer7_pallow_N` e aplica
+  `match ... tag L7ALLOW` no mesmo escopo de origem/interface;
 - `layer7_psrc_N` só é usado com `quarantine_origin=true` (corte total
   deliberado da origem);
 - block em `scoped_hybrid` exige origem efectiva, `scope_global` explícito ou
@@ -48,5 +50,9 @@ actual e não devem ser apresentados como critérios disponíveis.
                     allow    block    monitor    tag
 Fluxo matching      sim      sim      sim        sim
 Em modo monitor     log      log      log        log (sem table)
-Em modo enforce     pass     drop     log        table
+Em modo enforce     tag      drop     log        table
 ```
+
+`tag` na coluna `allow` significa marca interna consumida exclusivamente
+pelos blocks Layer7 (`! tagged L7ALLOW`). A decisão final `pass`/`block`
+continua pertencendo ao ruleset completo do pfSense.

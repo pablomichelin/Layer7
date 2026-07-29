@@ -121,13 +121,13 @@ flowchart TD
     PDST["layer7_pdst_N from src to dst"]
     PSRC["layer7_psrc_N from src quarantine"]
     BL[layer7_bld_N existente]
-    ALLOW[layer7_allow_dst pass quick]
+    PALLOW["layer7_pallow_N match/tag L7ALLOW"]
   end
 
   DNS --> decide
   NDPI --> decide
   SNI --> decide
-  ALLOW --> enforce
+  PALLOW --> enforce
   decide -->|host site| PDST
   decide -->|app protocol| PSRC
   decide -->|blacklist| BL
@@ -381,7 +381,9 @@ Passos:
 - [ ] GUI: aviso se politica tem hosts e `sni_inspection=false`
 - [ ] Opcao politica `cdn_mode`: `permissive` | `strict` (strict exige SNI match para add a pdst)
 - [ ] Documentar limites: ECH, DoH hardcoded, IPv6, CDN partilhado
-- [ ] Revisar ordem PF: `pass quick to layer7_allow_dst` antes de blocks scoped
+- [x] `_28`: allow PF usa `match ... tag L7ALLOW`; apenas blocks geridos pelo
+      Layer7 usam `! tagged L7ALLOW`, sem encerrar a avaliação das regras
+      nativas do pfSense (ADR-0016)
 - [ ] Regra block_dst scoped usar `to !<localsubnets>` onde aplicavel (nao bloquear trafego interno acidental)
 
 **Teste:** lab CDN; smoke anti-bypass existente nao regressa.

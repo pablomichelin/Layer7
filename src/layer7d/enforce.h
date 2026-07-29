@@ -52,6 +52,9 @@ int layer7_pf_exec_kill_states_to(const char *dst_ip);
 int layer7_pf_policy_table_name(enum layer7_enforce_kind kind, int idx,
     char *buf, size_t buflen);
 
+/* BG-056: destino permitido explicitamente por uma politica. */
+int layer7_pf_policy_allow_table_name(int idx, char *buf, size_t buflen);
+
 const char *layer7_enforce_kind_str(enum layer7_enforce_kind kind);
 
 /*

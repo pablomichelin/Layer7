@@ -39,6 +39,15 @@
 > regra e a origem antes de popular `layer7_bld_N`; dominios em multiplas
 > categorias passam a casar com a categoria seleccionada pela regra.
 
+> **ADDENDUM NORMATIVO `_28` / ADR-0016 (2026-07-29)** — os exemplos
+> históricos abaixo que usam `pass quick` para `except_ips` não representam
+> mais o ruleset vigente. Cada regra com excepções usa
+> `layer7_blsrc_N`, combinando as origens válidas com entradas negadas para
+> `except_ips`; o block consulta essa origem efectiva. A excepção não
+> autoriza tráfego, não cria estado e não contorna regras nativas do pfSense.
+> Ver
+> [`ADR-0016`](../03-adr/ADR-0016-allow-pf-por-marcacao-interna.md).
+
 ---
 
 ## Estado actual da trilha F4

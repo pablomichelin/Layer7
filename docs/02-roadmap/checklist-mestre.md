@@ -125,6 +125,11 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] **Allow PF escopado (BG-056 / FP-017):** antes de produção, uma
   política/excepção allow do cliente A deve vencer destino já inserido por B,
   sem criar allow global e sem retirar o bloqueio de B.
+- [ ] **Candidato `_28` (BG-056 / ADR-0016):** confirmar no ruleset que
+  allowlist, política e excepção usam `match/tag L7ALLOW`, nunca `pass quick`;
+  todos os blocks Layer7 relevantes usam `! tagged L7ALLOW`; uma regra nativa
+  de bloqueio do pfSense continua a vencer. Exigir `pfctl -nf`, two-client,
+  app-only cold-start documentado e rollback passivo.
 
 ---
 

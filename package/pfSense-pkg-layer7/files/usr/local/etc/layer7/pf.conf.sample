@@ -9,17 +9,17 @@ table <layer7_tagged> persist
 table <layer7_block_dst> persist
 table <layer7_allow_dst> persist
 
-# Allowlist (Bloco 3): destinos protegidos contra bloqueio. SEMPRE antes
-# dos blocks para garantir pass-quick em bancos/gov/push mobile.
-pass quick inet to <layer7_allow_dst> label "layer7:allow:dst"
+# Allowlist (Bloco 3): marca interna antes dos blocks Layer7. Nao cria
+# autorizacao perante as regras nativas do pfSense.
+match inet to <layer7_allow_dst> tag L7ALLOW label "layer7:allow:dst"
 
 # Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.
-block drop quick inet from <layer7_block> to !<localsubnets> label "layer7:block:src"
-block drop quick inet6 from <layer7_block> to !<localsubnets> label "layer7:block:src6"
+block drop quick inet from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src"
+block drop quick inet6 from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src6"
 
 # Bloqueio por destino (sites/apps bloqueados via policies / blacklists).
-block drop quick inet to <layer7_block_dst> label "layer7:block:dst"
-block drop quick inet6 to <layer7_block_dst> label "layer7:block:dst6"
+block drop quick inet to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst"
+block drop quick inet6 to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst6"
 
 # Anti-bypass DoT/DoQ (porta 853) e anti-QUIC (UDP 443) sao opcionais e
 # controlados via GUI (Settings -> "Bloquear DoT / DoQ" e "Bloquear QUIC").

@@ -102,6 +102,12 @@ vence o canónico.
 | `docs/03-adr/ADR-0008-autenticacao-e-sessao-license-server.md` | autenticacao e sessao | ADR normativo da F2.2 para login, sessao e armazenamento do estado administrativo | Canónico | novo | manter vivo | F2+ |
 | `docs/03-adr/ADR-0009-protecao-superficie-administrativa-license-server.md` | superficie administrativa | ADR normativo da F2.3 para CORS, brute force e superfícies administrativas | Canónico | novo | manter vivo | F2+ |
 | `docs/03-adr/ADR-0010-integridade-transacional-e-validacao-crud-license-server.md` | CRUD e integridade | ADR normativo da F2.4 para validacao e transacoes do CRUD | Canónico | novo | manter vivo | F2+ |
+| `docs/03-adr/ADR-0011-fonte-de-identidade-de-dispositivo.md` | identidade de dispositivo | ADR normativo da fonte DHCP/ARP e limites de identidade por MAC/IP | Canónico | novo | manter vivo | F4+ |
+| `docs/03-adr/ADR-0012-politicas-por-dispositivo-mac-para-ip.md` | política por dispositivo | ADR normativo da resolução MAC para IP e enforcement por origem | Canónico | novo | manter vivo | F4+ |
+| `docs/03-adr/ADR-0013-bloqueio-por-sni-via-ndpi.md` | SNI/Host | ADR normativo da inspecção SNI/Host via nDPI sem MITM | Canónico | novo | manter vivo | F4+ |
+| `docs/03-adr/ADR-0014-enforcement-escopado-por-politica.md` | enforcement escopado | ADR normativo dos modelos `legacy_global` e `scoped_hybrid` | Canónico | novo | manter vivo | F4+ |
+| `docs/03-adr/ADR-0015-logging-local-limitado-e-separado.md` | logging local | ADR normativo da separação, rotação e retenção limitada dos logs | Canónico | novo | manter vivo | F4/F5 |
+| `docs/03-adr/ADR-0016-allow-pf-por-marcacao-interna.md` | allow PF seguro | ADR normativo de `pallow_N`, `L7ALLOW`, `blsrc_N` e ausência de bypass das regras pfSense | Canónico | novo | manter vivo; fechar gate no appliance antes de release | F4/F5 |
 | `docs/04-package/README.md` | package docs | indice local da area | Suplementar | complementar ao roadmap e `MANUAL-INSTALL.md` | manter leve | F4/F5 |
 | `docs/04-package/checklist-validacao-lab.md` | validacao rapida | checklist operacional de lab | Suplementar | complementar a `validacao-lab.md` | rever quando a F5 fechar a malha de testes | F5 |
 | `docs/04-package/deploy-github-lab.md` | deploy lab GitHub | cadeia builder → stage → release (`.pkg`, `install.sh`); suplementar ao `scripts/release/README` | Suplementar | complementa `MANUAL-INSTALL` e ADR-0003; nao substitui o README de release | manter alinhado a `deployz.sh` / publicacao | F4/F7 |

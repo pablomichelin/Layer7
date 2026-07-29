@@ -31,6 +31,10 @@ O que existe **só em RAM** entre reloads (não persistido).
 ### Enforcement
 
 - Handles para **PF tables** / nomes de alias gerados pelo pacote.
+- `layer7_pdst_N`: destinos bloqueados por política escopada.
+- `layer7_psrc_N`: origens em quarentena explícita.
+- `layer7_pallow_N`: destinos aprendidos por política allow explícita; os
+  pacotes recebem `L7ALLOW`, sem decisão `pass`.
 - Cache do último sync com PF (evitar `pfctl` excessivo).
 
 ### Contadores (expor status / GUI)
@@ -45,3 +49,5 @@ V1 assume **um processo**, possivelmente **uma thread** de captura + fila lock-f
 ## Sob reboot
 
 Estado zerado; config relida do XML ao subir.
+As tabelas dinâmicas `pdst`, `psrc` e `pallow` são recriadas vazias; o daemon
+volta a populá-las somente após nova decisão válida e dentro do TTL.

@@ -207,6 +207,14 @@ layer7_pf_policy_table_name(enum layer7_enforce_kind kind, int idx,
 	return -1;
 }
 
+int
+layer7_pf_policy_allow_table_name(int idx, char *buf, size_t buflen)
+{
+	if (!buf || buflen < 18 || idx < 0 || idx >= L7_MAX_POLICIES)
+		return -1;
+	return snprintf(buf, buflen, "layer7_pallow_%d", idx);
+}
+
 const char *
 layer7_enforce_kind_str(enum layer7_enforce_kind kind)
 {
@@ -233,7 +241,19 @@ layer7_pf_resolve_block_target(const struct layer7_decision *dec,
 	    dec->action != LAYER7_ACTION_BLOCK)
 		return 0;
 
-	if (scoped_hybrid && dec->enforce_kind != L7_ENFORCE_NONE &&
+	/*
+	 * Uma exception block casa somente pela origem. Trate-a como
+	 * quarentena na tabela base em ambos os modelos; resolver para
+	 * block_dst deixava o caminho sem destino (e inoperante no scoped).
+	 */
+	if (dec->reason == L7_DECIDE_EXCEPTION &&
+	    strcmp(dec->pf_table, L7_PF_TABLE_BLOCK) == 0) {
+		if (tbl_len < sizeof(L7_PF_TABLE_BLOCK))
+			return -1;
+		memcpy(out_table, L7_PF_TABLE_BLOCK,
+		    sizeof(L7_PF_TABLE_BLOCK));
+		ip = src_ip;
+	} else if (scoped_hybrid && dec->enforce_kind != L7_ENFORCE_NONE &&
 	    dec->policy_table_idx >= 0) {
 		if (layer7_pf_policy_table_name(dec->enforce_kind,
 		    dec->policy_table_idx, out_table, tbl_len) < 0)

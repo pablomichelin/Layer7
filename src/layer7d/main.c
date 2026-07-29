@@ -905,7 +905,8 @@ enforce_cache_flush(void)
 /*
  * Esvazia todas as tabelas PF dinamicas controladas pelo Layer7
  * (Bloco 5): `layer7_block_dst`, `layer7_block`, `layer7_bld_*`,
- * `layer7_pdst_*`, `layer7_psrc_*` e entradas DNS em `layer7_allow_dst`.
+ * `layer7_pdst_*`, `layer7_psrc_*`, `layer7_pallow_*` e entradas DNS em
+ * `layer7_allow_dst`.
  * Entradas estaticas IPv4/CIDR da allowlist sao repovoadas pelo pacote via
  * `layer7_dst_allowlist_apply_to_pf()` em filter reload / resync.
  */
@@ -931,6 +932,8 @@ enforcement_flush_all_tables(void)
 		unavailable += pf_table_flush_try(tbl) != 0;
 		snprintf(tbl, sizeof(tbl), "layer7_psrc_%d", i);
 		unavailable += pf_table_flush_try(tbl) != 0;
+		snprintf(tbl, sizeof(tbl), "layer7_pallow_%d", i);
+		unavailable += pf_table_flush_try(tbl) != 0;
 	}
 
 	unavailable += pf_table_flush_try(L7_PF_TABLE_ALLOW_DST) != 0;
@@ -943,6 +946,40 @@ enforcement_flush_all_tables(void)
 
 static int layer7_pf_add_with_selfheal(const char *table, const char *ip,
     const char *reason);
+
+static void
+layer7_apply_policy_allow_enforcement(const struct layer7_decision *dec,
+    const char *src_ip, const char *dst_ip, uint32_t ttl,
+    const char *reason)
+{
+	char tbl[64];
+	int r;
+
+	if (!dec || dec->action != LAYER7_ACTION_ALLOW ||
+	    dec->reason != L7_DECIDE_POLICY_MATCH ||
+	    dec->policy_table_idx < 0 ||
+	    !dst_ip || !layer7_pf_ipv4_host_ok(dst_ip))
+		return;
+	if (layer7_pf_policy_allow_table_name(dec->policy_table_idx, tbl,
+	    sizeof(tbl)) < 0)
+		return;
+
+	r = layer7_pf_add_with_selfheal(tbl, dst_ip, reason);
+	if (r == 0) {
+		enforce_cache_add(tbl, dst_ip, ttl);
+		L7_AUDIT_NOTE(NULL,
+		    "enforce_allow: table=%s src=%s dst=%s policy=%s reason=%s",
+		    tbl, src_ip ? src_ip : "-", dst_ip,
+		    dec->matched_policy_id[0] ?
+		    dec->matched_policy_id : "-",
+		    reason ? reason : "-");
+	} else {
+		L7_WARN("enforce_allow: pfctl add failed table=%s dst=%s "
+		    "policy=%s", tbl, dst_ip,
+		    dec->matched_policy_id[0] ?
+		    dec->matched_policy_id : "-");
+	}
+}
 
 static void
 layer7_apply_block_enforcement(const struct layer7_decision *dec,
@@ -973,7 +1010,10 @@ layer7_apply_block_enforcement(const struct layer7_decision *dec,
 		 * psrc é quarentena explícita; nesse caso encerra todos os
 		 * estados do host. legacy_global encerra estados para o destino.
 		 */
-		if (scoped_hybrid &&
+		if (dec->reason == L7_DECIDE_EXCEPTION &&
+		    strcmp(tbl, L7_PF_TABLE_BLOCK) == 0)
+			kill_r = layer7_pf_exec_kill_states_host(src_ip);
+		else if (scoped_hybrid &&
 		    dec->enforce_kind == L7_ENFORCE_SRC_SCOPED)
 			kill_r = layer7_pf_exec_kill_states_host(src_ip);
 		else if (!scoped_hybrid)
@@ -1268,6 +1308,8 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	/* Allow explicita de politica/excepcao prevalece sobre a blacklist.
 	 * O default allow continua a consultar as categorias UT1. */
 	if (layer7_decision_is_explicit_allow(&dec)) {
+		layer7_apply_policy_allow_enforcement(&dec, client_ip,
+		    resolved_ip, ttl, "dns_allow");
 		L7_EVENT_DBG(iface,
 		    "blacklist_bypass: iface=%s domain=%s client=%s "
 		    "reason=%s",
@@ -1410,6 +1452,12 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 
 	if (!s_ge)
 		return;
+
+	if (layer7_decision_is_explicit_allow(&dec) && dst_ip &&
+	    layer7_pf_ipv4_host_ok(dst_ip)) {
+		layer7_apply_policy_allow_enforcement(&dec, src_ip, dst_ip,
+		    L7_DST_TTL_DEF, "flow_allow");
+	}
 
 	if (dec.action == LAYER7_ACTION_BLOCK) {
 		/* src_scoped e executavel quando a regra tem origem estatica,

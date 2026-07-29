@@ -40,6 +40,11 @@ test_policy_table_name(void)
 	check(layer7_pf_policy_table_name(L7_ENFORCE_NONE, 0, buf,
 	    sizeof(buf)) < 0,
 	    "none kind rejects table name");
+	check(layer7_pf_policy_allow_table_name(4, buf, sizeof(buf)) > 0 &&
+	    strcmp(buf, "layer7_pallow_4") == 0,
+	    "policy allow table name idx 4");
+	check(layer7_pf_policy_allow_table_name(L7_MAX_POLICIES, buf,
+	    sizeof(buf)) < 0, "policy allow rejects out-of-range idx");
 }
 
 static void
@@ -124,6 +129,28 @@ test_resolve_monitor_skips(void)
 }
 
 static void
+test_exception_block_quarantines_source(void)
+{
+	struct layer7_decision dec;
+	char tbl[64];
+	const char *ip;
+	int r;
+
+	memset(&dec, 0, sizeof(dec));
+	dec.action = LAYER7_ACTION_BLOCK;
+	dec.reason = L7_DECIDE_EXCEPTION;
+	dec.would_enforce_block_or_tag = 1;
+	snprintf(dec.pf_table, sizeof(dec.pf_table), "%s",
+	    L7_PF_TABLE_BLOCK);
+
+	r = layer7_pf_resolve_block_target(&dec, "10.0.0.77",
+	    "1.2.3.4", 1, tbl, sizeof(tbl), &ip);
+	check(r == 1 && strcmp(tbl, L7_PF_TABLE_BLOCK) == 0 &&
+	    ip && strcmp(ip, "10.0.0.77") == 0,
+	    "exception block quarantines source in scoped mode");
+}
+
+static void
 test_enforce_kind_str(void)
 {
 	check(strcmp(layer7_enforce_kind_str(L7_ENFORCE_DST_SCOPED),
@@ -142,6 +169,7 @@ main(void)
 	test_resolve_src_scoped();
 	test_resolve_legacy_global();
 	test_resolve_monitor_skips();
+	test_exception_block_quarantines_source();
 	test_enforce_kind_str();
 
 	if (g_fail) {

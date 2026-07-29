@@ -137,6 +137,9 @@ test_allow_higher_priority_wins(void)
 	check(dec.would_enforce_block_or_tag == 0, "4 no enforce");
 	check(layer7_decision_is_explicit_allow(&dec),
 	    "4 policy allow bypasses blacklist");
+	check(dec.policy_table_idx == 0, "4 policy allow keeps table idx");
+	check(dec.enforce_kind == L7_ENFORCE_DST_SCOPED,
+	    "4 policy allow keeps matched destination kind");
 }
 
 static void

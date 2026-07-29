@@ -24,6 +24,12 @@
 > [`docs/tests/test-matrix.md`](../tests/test-matrix.md), sem declarar trilha
 > fechada só com build no builder.
 
+> **ADDENDUM NORMATIVO `_28` / ADR-0016 (2026-07-29)** — qualquer exemplo
+> histórico de `pass quick` para `except_ips` está superado. O padrão vigente
+> usa `layer7_blsrc_N` com as origens positivas e entradas `!IP` para as
+> excepções, isolado por regra de blacklist. Nunca usar uma excepção Layer7
+> para autorizar ou encerrar a avaliação das regras nativas do pfSense.
+
 ---
 
 ## Índice

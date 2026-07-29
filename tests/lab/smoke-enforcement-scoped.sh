@@ -55,6 +55,13 @@ run_static_checks() {
 	else
 		fail "estatico: layer7_policy_enforcement_rules_text em falta"
 	fi
+	if grep -q 'layer7_pallow_' "$INC" &&
+	    grep -q 'tag L7ALLOW' "$INC" &&
+	    ! grep -q 'pass quick inet to <layer7_allow_dst>' "$INC"; then
+		pass "estatico: allow usa tag interna, sem pass quick no pfSense"
+	else
+		fail "estatico: allow PF escopado/seguro ausente"
+	fi
 
 	MC="$REPO_ROOT/src/layer7d/main.c"
 	if [ -f "$MC" ] && grep -q 'layer7_decide_for_client' "$MC"; then
@@ -131,6 +138,21 @@ run_appliance_checks() {
 		pass "regras layer7_pdst presentes no ruleset"
 	else
 		fail "regras layer7_pdst ausentes — Filter reload / Resync Layer7?"
+	fi
+
+	L7_RULESET=$(pfctl -sr 2>/dev/null | grep 'layer7:' || true)
+	if echo "$L7_RULESET" | grep -q 'layer7:allow:dst' &&
+	    echo "$L7_RULESET" | grep 'layer7:allow:dst' | grep -q 'match' &&
+	    ! echo "$L7_RULESET" | grep 'layer7:allow:dst' | grep -q 'pass'; then
+		pass "allowlist marca L7ALLOW sem autorizar perante regras pfSense"
+	else
+		fail "allowlist deve usar match/tag, nunca pass quick"
+	fi
+	if echo "$L7_RULESET" | grep -E 'layer7:(block|pdst|psrc|bl:)' |
+	    grep -q 'tagged.*L7ALLOW'; then
+		pass "blocks Layer7 respeitam a marca interna L7ALLOW"
+	else
+		fail "blocks Layer7 sem exclusao tagged L7ALLOW"
 	fi
 
 	# Global legacy deve estar vazia em scoped activo (pos-trafego de teste pode ter entradas stale — aviso)

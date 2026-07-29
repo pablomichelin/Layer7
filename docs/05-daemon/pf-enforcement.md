@@ -84,6 +84,8 @@ DHCP static mapping para IP estavel. Limite: 64 hosts de origem por grupo.
 | Block (destino/sites/apps) | `layer7_block_dst` | Fixo no código (`enforce.h`); **legacy_global** |
 | Block destino escopado por politica | `layer7_pdst_N` | Caminho B / E2; indice N = ordem `layer7_policies_sort()` |
 | Quarentena origem escopada por politica | `layer7_psrc_N` | Caminho B / E2; somente opt-in explícito |
+| Allow destino por política | `layer7_pallow_N` | BG-056 / ADR-0016; destino aprendido com TTL |
+| Excepção allow por origem | `layer7_exc_allow_N` | BG-056 / ADR-0016; conteúdo estático do JSON |
 | Tag | `layer7_tagged` ou **`tag_table`** na política | Por política `action=tag` |
 
 ### Caminho B / E2 — PF escopado no pacote (`scoped_hybrid`)
@@ -127,6 +129,28 @@ CLI lab `-e` alinhado: `layer7_pf_enforce_decision(dec, src, dst, scoped, dry)`.
 **Gate appliance obrigatorio (two-client):** ver
 [`validacao-lab.md`](../04-package/validacao-lab.md) secao **12** — pendente
 ate execucao no appliance `192.168.100.254`.
+
+### BG-056 — allow por marca interna (`1.8.11_28`)
+
+Allow não é uma autorização de firewall. O pacote emite
+`match ... tag L7ALLOW`; os blocks geridos pelo Layer7 usam
+`! tagged L7ALLOW`. O PF continua a processar regras nativas do pfSense.
+
+- política allow: marca apenas origem/interface -> `<layer7_pallow_N>`;
+- excepção allow: marca tráfego externo da origem em
+  `<layer7_exc_allow_N>`;
+- allowlist global: marca destino em `<layer7_allow_dst>`;
+- `except_ips` UT1: usa `layer7_blsrc_N`, com origens positivas e entradas
+  negadas `!IP`; somente o block daquela regra consulta essa origem efectiva.
+
+O daemon popula `pallow_N` depois de uma vitória explícita da política e usa o
+cache TTL existente. `pallow_0..23` entra em flush, resync e self-heal.
+Mutation de política ou excepção limpa as tabelas antes de reordenar índices.
+Não existe `pass quick` de allow no ruleset actual.
+
+Limite: allow app-only precisa observar DNS ou um primeiro fluxo classificável
+para aprender o destino; o produto não cria um bypass global para mascarar
+essa limitação.
 
 ### Candidato `_25` — integração e pré-condições
 
@@ -223,10 +247,10 @@ Sem ele, `discover_pkg_rules` ignora o pacote durante o reload do filtro.
 As regras publicadas sao:
 
 ```text
-block drop quick inet from <layer7_block> to any label "layer7:block:src"
-block drop quick inet6 from <layer7_block> to any label "layer7:block:src6"
-block drop quick inet to <layer7_block_dst> label "layer7:block:dst"
-block drop quick inet6 to <layer7_block_dst> label "layer7:block:dst6"
+block drop quick inet from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src"
+block drop quick inet6 from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src6"
+block drop quick inet to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst"
+block drop quick inet6 to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst6"
 ```
 
 O helper continua responsavel por gerar o snippet materializado e garantir as

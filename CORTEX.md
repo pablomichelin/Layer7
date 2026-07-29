@@ -106,8 +106,21 @@ do pacote e smoke `layer7d -t` passaram no builder FreeBSD 15. Artefacto
 `SHA256=8eae978d8d3120f050be21d2fdf511aacbf03ba0ad2c9c350c15100818ed5388`.
 Gates no appliance ainda estão pendentes e produção segue intocada. Auditoria:
 `docs/09-blocking/revisao-funcional-pre-producao-2026-07-29.md`.
-Limitação crítica aberta: FP-017 — allow/excepção ainda não possui enforcement
-PF próprio contra destino já inserido por outro cliente/regra.
+FP-017 foi tratado no candidato `_28`; o gate físico continua pendente.
+
+### Candidato `1.8.11_28` — allow PF sem bypass do pfSense (não publicado)
+
+BG-056/ADR-0016 adicionam `layer7_pallow_N` por política e tabelas estáticas
+por excepção. O pacote usa `match ... tag L7ALLOW`: somente os blocks Layer7
+ignoram a marca, enquanto regras nativas do pfSense continuam a decidir.
+Também substitui o `pass quick` histórico da allowlist e das excepções UT1,
+fecha o caminho inoperante de exception `block` por origem e inclui
+`pallow_0..23` em self-heal/flush.
+
+Suite local e builder C/PHP/shell: PASS. A validação sintática final do PF,
+build nDPI/`.pkg`, instalação passiva e teste two-client ainda são gates.
+Produção permanece intocada. O limite app-only/cold-start e os riscos
+FP-009..FP-016 permanecem documentados.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
@@ -190,7 +203,8 @@ Caminho A`); detalhes completos em
 - **BG-036 (Bloco 3) — Allowlist de destinos:** novo modulo `allowlist.{c,h}`
   no daemon, pagina `Services > Layer 7 > Allowlist`, seed embutida
   (`allowlist-seed.txt`: bancos BR, gov, push Apple/Google, MS 365), tabela
-  PF `layer7_allow_dst` com `pass quick` antes dos blocks.
+  PF `layer7_allow_dst`; o candidato `_28` substitui o `pass quick` histórico
+  por marca interna `L7ALLOW`, sem autorizar perante regras nativas.
 - **BG-037 (Bloco 5) — Flush fiavel de tabelas:** `enforcement_flush_all_tables()`
   no daemon (transicao enforce->passivo + shutdown); `rc.d/layer7d stop`
   chama `layer7-pfctl flush-all` como defesa em profundidade.
@@ -224,7 +238,7 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_27` (`PORTVERSION=1.8.11`, `PORTREVISION=27`),
++ `PORTREVISION`):** `1.8.11_28` (`PORTVERSION=1.8.11`, `PORTREVISION=28`),
 **candidato interno não publicado**. A release pública permanece
 `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
@@ -892,13 +906,13 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: instalar _27 em passivo + logs/monitor/captura
+- Proximo gate: concluir build `_28`, instalar em passivo + logs/monitor/captura
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 27 (candidato nao publicado)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 28 (candidato nao publicado)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
-  _25 + contenção L1 `_26` + correcções funcionais `_27` em curso, sem
-  activacao no appliance
+  _25 + contenção L1 `_26` + correcções `_27`/`_28` em curso, sem activacao
+  no appliance
 - Estado documental: governanca F0 consolidada; revisao pre-install 2026-06-15
   parcialmente enderecada em _24 (ver docs/09-blocking/revisao-codigo-*)
 - Fase actual: pos-V1 — Caminho B (E4/E5/E7 parciais; gates pendentes)

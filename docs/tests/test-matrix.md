@@ -253,6 +253,19 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | 15.7 | Sessão já estabelecida é encerrada sem afectar cliente B | appliance | Pendente |
 | 15.8 | Two-client completo: app normal vs quarentena e rollback | appliance | Pendente |
 
+## 16. Candidato `1.8.11_28` — allow PF sem bypass
+
+| # | Teste | Onde | Status |
+|---|-------|------|--------|
+| 16.1 | Política allow preserva índice e nomeia `layer7_pallow_N` | local C | OK |
+| 16.2 | Exception block resolve origem para `layer7_block` | local C | OK |
+| 16.3 | PHP gera `match/tag L7ALLOW`, `blsrc_N` negativo, ordem correcta e nenhum `pass quick` | builder PHP | OK (`test_scoped_pf_inc.php`) |
+| 16.4 | Monitor/desactivado não emite regras allow/block; mutação de excepção exige flush | builder PHP/shell | OK |
+| 16.5 | Build nDPI e validação do `.pkg` `_28` | FreeBSD 15 | Pendente |
+| 16.6 | Ruleset completo passa `pfctl -nf` e é interpretado com tags | appliance | Pendente |
+| 16.7 | A permitido/B bloqueado no mesmo destino; block nativo do pfSense continua a vencer | appliance/two-client | Pendente |
+| 16.8 | App-only cold-start, TTL, reload e rollback não deixam `pallow` stale | appliance | Pendente |
+
 ---
 
 ## Resumo
@@ -274,7 +287,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Estabilização `_25` | 6 | 4 | 2 |
 | Contenção de logs `_26` | 4 | 3 | 1 |
 | Estabilização funcional `_27` | 8 | 4 | 4 |
-| **Total** | **100** | **85** | **15** |
+| Allow PF seguro `_28` | 8 | 4 | 4 |
+| **Total** | **108** | **89** | **19** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

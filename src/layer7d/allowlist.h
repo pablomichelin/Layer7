@@ -4,7 +4,7 @@
  * Bloco 3 da Fase 1: lista branca de destinos (dominios, IPs e CIDRs) que
  * NUNCA devem ser bloqueados pelo daemon. Honrada antes de qualquer
  * pfctl add em `layer7_block_dst` ou `layer7_bld_N`, e replicada como
- * `pass quick inet to <layer7_allow_dst>` no PF do pacote.
+ * marca `L7ALLOW` no PF; somente os blocks do Layer7 ignoram a marca.
  *
  * Entradas vem de duas fontes combinadas (uniao logica):
  *   1. JSON do `layer7.json` (campo `layer7.dst_allowlist[]`).

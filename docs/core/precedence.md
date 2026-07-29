@@ -23,6 +23,11 @@ Se nenhuma regra casar:
 
 Avaliadas **antes** da matriz principal (maior precedência), com ordem interna por `priority` ou ordem de lista.
 
+No enforcement PF, a precedência allow é materializada com a tag interna
+`L7ALLOW`: somente os blocks administrados pelo Layer7 ignoram pacotes
+marcados. A precedência do policy engine nunca substitui a política de
+segurança nativa do pfSense e não gera `pass quick`.
+
 ## Conflito
 
 Dois matches simultâneos não ocorrem com first-match. Se validação detectar regras idênticas de prioridade e overlap total, emitir aviso na GUI (backlog) ou `policy_conflict` em debug.

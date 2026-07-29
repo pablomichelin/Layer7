@@ -2,6 +2,44 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_28] - Unreleased — allow PF sem bypass do pfSense
+
+Pacote candidato, **não publicado** e **não aprovado para produção**.
+BG-056/FP-017 é corrigido em código sob a decisão ADR-0016; build do `.pkg` e
+gate no appliance ainda estão pendentes.
+
+### Added
+
+- Tabela dinâmica `layer7_pallow_N` por política `allow`, populada pelo
+  daemon somente quando essa política vence DNS/SNI/nDPI e expirada por TTL.
+- Tabela estática `layer7_exc_allow_N` por excepção `allow`.
+- Marca interna PF `L7ALLOW` e escopo negativo por regra de blacklist
+  `layer7_blsrc_N`.
+- Cobertura C/PHP e smoke de appliance para precedência, modo monitor,
+  ausência de `pass quick` e exception `block`.
+
+### Fixed
+
+- Allow explícito passa a vencer destino já presente numa tabela de block do
+  Layer7, sem retirar o block do outro cliente.
+- Allowlist, políticas e excepções deixam de usar `pass quick`: `match/tag`
+  não autoriza tráfego e mantém as regras nativas do pfSense efectivas.
+- `except_ips` de blacklist deixa de criar bypass geral e passa a ser
+  subtraído da origem efectiva da regra UT1 em `layer7_blsrc_N`.
+- Exception `block`, que casa pela origem, passa a usar `layer7_block` e kill
+  de estados do host; antes podia tentar um destino inexistente.
+- Flush/resync/self-heal incluem `layer7_pallow_0..23`; mutações de excepção
+  limpam tabelas dinâmicas antes de regenerar o filtro.
+
+### Gates e rollback
+
+- Suite local e builder C/PHP/shell: PASS.
+- `pfctl -nf`, build nDPI/`.pkg`, instalação passiva e two-client: pendentes.
+- Produção permanece intocada. Rollback: `_24` passivo +
+  `layer7-pfctl flush-all` + reload do filtro.
+
+---
+
 ## [1.8.11_27] - Unreleased — estabilização funcional pré-produção
 
 Pacote candidato, **não publicado** e **não aprovado para produção**. Revisão

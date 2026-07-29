@@ -991,3 +991,58 @@ du -h /usr/local/etc/layer7/reports/reports.db 2>/dev/null
 
 Voltar a detalhe OFF, `enabled=false`/`mode=monitor`, copiar evidência e
 reinstalar `_24`. Não apagar os ficheiros antes de concluir o diagnóstico.
+
+---
+
+## 14. Roteiro BG-056 — allow PF seguro (`1.8.11_28`)
+
+Este gate valida a correcção de FP-017 sem transformar uma decisão Layer7 em
+autorização de firewall. Em produção, executar apenas em janela aprovada,
+começando com `enabled=false`/`mode=monitor`, configuração exportada e acesso
+de recuperação confirmado.
+
+### Pré-gate read-only
+
+```sh
+pkg info pfSense-pkg-layer7
+service layer7d onestatus
+/usr/local/libexec/layer7-pfctl show
+pfctl -sr | grep -E 'L7ALLOW|layer7_blsrc|layer7_pallow|layer7_pdst|layer7_psrc'
+```
+
+Confirmar que não existe regra Layer7 `pass quick`, que as regras
+`match ... tag L7ALLOW` aparecem antes dos blocks Layer7 e que o ruleset
+completo continua carregado pelo pfSense.
+
+### Passos controlados
+
+1. Criar uma regra nativa pfSense temporária, escopada ao cliente A e a um
+   destino de teste, que bloqueie o tráfego mesmo quando uma política Layer7
+   allow casar.
+2. Criar política Layer7 block para A e B e uma política allow de prioridade
+   maior apenas para A, no mesmo destino controlado.
+3. Confirmar `layer7_pallow_N` populada somente após decisão allow válida e
+   `layer7_pdst_N`/`layer7_bld_N` ainda aplicável a B.
+4. Provar que A fica livre do block Layer7, mas continua bloqueado pela regra
+   nativa; remover a regra nativa e provar A permitido/B bloqueado.
+5. Aguardar o TTL ou provocar reload autorizado e confirmar que não ficam
+   entradas `pallow` herdadas por política reordenada.
+6. Repetir o save de uma excepção allow e confirmar flush/resync antes da
+   nova ordem de índices.
+
+### PASS
+
+- nenhuma regra Layer7 `pass quick`;
+- regra nativa pfSense continua a vencer;
+- allow A não libera B;
+- block B permanece efectivo no mesmo destino;
+- TTL, reload, disable e rollback não deixam `pallow` stale;
+- daemon, WebGUI e regras não afectadas permanecem funcionais.
+
+### Rollback
+
+Desactivar Layer7, executar `/usr/local/libexec/layer7-pfctl flush-all`,
+recarregar o filtro pelo mecanismo normal do pfSense, remover apenas a regra
+nativa temporária do teste e reinstalar `_24`/artefacto anterior aprovado.
+Restaurar a configuração exportada. Não apagar tabelas ou regras nativas
+manualmente fora desse escopo.
