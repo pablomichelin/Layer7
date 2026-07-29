@@ -116,7 +116,8 @@ ignoram a marca, enquanto regras nativas do pfSense continuam a decidir.
 Também substitui o `pass quick` histórico da allowlist e das excepções UT1,
 fecha o caminho inoperante de exception `block` por origem e inclui
 `pallow_0..23` em self-heal/flush. O gate `smoke-layer7d.sh` também volta a
-incluir `log_store.c`, eliminando a falha de link introduzida no `_26`.
+incluir `log_store.c`, eliminando a falha de link introduzida no `_26`, e
+`bl_config.c` deixa de depender de inclusão transitiva para `uint32_t`.
 
 Suite local, builder C/PHP/shell, smoke completo, build nDPI e validação do
 `.pkg`: PASS. Artefacto `pfSense-pkg-layer7-1.8.11_28.pkg`,

@@ -34,6 +34,8 @@ passou e o gate no appliance continua pendente.
   sem isso o gate oficial falhava no link desde a introdução do logging L1.
 - O diagnóstico `-e` aceita `-d DST` para validar o enforcement moderno por
   destino sem tocar no PF; o smoke usa um IPv4 de documentação.
+- `bl_config.c` inclui `<stdint.h>` explicitamente; antes dependia de header
+  transitivo no FreeBSD e quebrava o smoke Linux ao usar `uint32_t`.
 
 ### Gates e rollback
 
