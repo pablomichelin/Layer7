@@ -21,8 +21,9 @@ instalação; nenhuma regra ou configuração do appliance foi alterada.
 - `_24` instalado está passivo, íntegro e com ruleset actual válido.
 - Snippet autocontido com `L7ALLOW`, `pallow`, `blsrc`, anti-DoT e anti-QUIC
   corrigido: `pfctl -nf -` PASS no FreeBSD 16.
-- Suite/build/artefacto `_29`, ruleset completo instalado e two-client:
-  pendentes.
+- Suite C/PHP/shell, build nDPI e validação do pacote extraído no FreeBSD 15:
+  PASS (`SHA256=bea385ddb6f61bb6a9bffde0b781cea7a852b3956f620b8b004c914b0ab01840`).
+- Ruleset completo instalado, toggle anti-QUIC e two-client: pendentes.
 - `_28` está supersedido; rollback permanece `_24` passivo + flush + reload.
 
 ---

@@ -226,8 +226,13 @@ reinstalação `_24` em monitor e restauro do JSON exportado.
 **Addendum do candidato `1.8.11_29` (não publicado):**
 Corrige FP-018 na regra anti-QUIC por interface: `on <if>` passa a anteceder
 `inet`/`inet6`. A sintaxe corrigida passou em amostra autocontida com
-`pfctl -nf -` no pfSense Plus 26.03.1, sem carregar regras. Build e SHA256
-serão registados após o novo pacote; até lá, manter `_24` passivo.
+`pfctl -nf -` no pfSense Plus 26.03.1, sem carregar regras. Build nDPI,
+suite e validação do pacote extraído passaram no builder FreeBSD 15.
+Artefacto interno:
+`pfSense-pkg-layer7-1.8.11_29.pkg`,
+`SHA256=bea385ddb6f61bb6a9bffde0b781cea7a852b3956f620b8b004c914b0ab01840`.
+Ainda não instalar sem gate humano: manter `_24` passivo até autorizar
+upgrade passivo, backup e validação do ruleset completo.
 
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e

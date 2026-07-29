@@ -1071,3 +1071,16 @@ Pré-gate read-only executado no pfSense Plus 26.03.1 / FreeBSD 16:
 Após build `_29`, instalar somente passivo e validar o ruleset completo antes
 de tocar no toggle anti-QUIC. Se o parser falhar, não aplicar/recarregar,
 preservar `_24` e recolher a linha exacta da falha.
+
+Build `_29` concluído no builder FreeBSD 15 em `2026-07-29`:
+
+- `check-port-files`, smoke C, suite funcional, lint PHP/shell: PASS;
+- build nDPI e metadados `pkg info -F`: `1.8.11_29`,
+  `FreeBSD:15:amd64`;
+- pacote extraído: `-V`, dois `-t`, monitor `-e -n`, enforcement
+  `-d 203.0.113.10 -e ... -n`, conteúdo e `layer7.inc`: PASS;
+- artefacto: `pfSense-pkg-layer7-1.8.11_29.pkg`;
+- `SHA256=bea385ddb6f61bb6a9bffde0b781cea7a852b3956f620b8b004c914b0ab01840`.
+
+Isto fecha apenas o gate do builder. Instalação passiva, parser do ruleset
+completo instalado, toggle anti-QUIC e two-client continuam pendentes.

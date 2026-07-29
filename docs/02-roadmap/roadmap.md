@@ -550,7 +550,9 @@ blacklists, sem misturar ainda reorganizacao estrutural.
 - **Sintaxe anti-QUIC PF (`2026-07-29`, candidato `1.8.11_29`):** pré-gate
   read-only no pfSense Plus 26.03.1 encontrou `inet on <if>` rejeitado pelo
   parser. BG-057 muda para `on <if> inet`, forma validada com `pfctl -nf -`;
-  `_28` fica supersedido. Build `_29` e gates instalados permanecem pendentes.
+  `_28` fica supersedido. Suite C/PHP/shell, build nDPI e validação do pacote
+  extraído passam no builder FreeBSD 15 (`SHA256 bea385dd…01840`); instalação
+  passiva, ruleset completo e gate two-client permanecem pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

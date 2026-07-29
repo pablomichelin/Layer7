@@ -52,7 +52,9 @@ interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
 
 O pré-gate read-only provou que `block ... inet on <if>` é rejeitado pelo PF.
 O código passa a gerar `block ... on <if> inet`; a forma corrigida passou em
-`pfctl -nf -` no appliance sem carregar regras. `_28` fica supersedido.
+`pfctl -nf -` no appliance sem carregar regras. Suite, build nDPI e pacote
+extraído `_29` passaram no builder FreeBSD 15
+(`SHA256 bea385dd…01840`). `_28` fica supersedido.
 
 | ID | Severidade | Limitação/risco | Próxima decisão |
 |----|------------|-----------------|-----------------|
@@ -63,12 +65,12 @@ O código passa a gerar `block ... on <if> inet`; a forma corrigida passou em
 | FP-013 | Alta | DNS hint é global, limitado e associa um único hostname por IP compartilhado | Testar CDN multi-host; priorizar SNI quando disponível |
 | FP-014 | Alta | ECH, DoH hardcoded e QUIC podem ocultar host; bloqueio por IP pode atingir serviços compartilhados do mesmo cliente | UX de limitação, perfis de fallback e testes CDN |
 | FP-015 | Média | `config_parse.c` ainda usa busca textual sensível à estrutura/ordem do JSON | Migrar para parser JSON real em bloco separado |
-| FP-016 | Alta | Falta evidência física two-client, expiração, state kill, allow seguro e rollback | Build `_28` passou; executar roteiro começando passivo |
+| FP-016 | Alta | Falta evidência física two-client, expiração, state kill, allow seguro e rollback | Build `_29` passou; executar roteiro começando passivo |
 
 ## Critérios mínimos antes de activar
 
-1. Build `_28` com nDPI e PHP no builder FreeBSD — **PASS**,
-   SHA256 `62dd9ae5…9dc6`.
+1. Build `_29` com nDPI e PHP no builder FreeBSD — **PASS**,
+   SHA256 `bea385dd…01840`.
 2. Instalação no appliance com `enabled=false`, sem regras/tabelas populadas.
 3. Monitor com captura real: ida/volta classificadas e sem bloqueio.
 4. `scoped_hybrid` com dois clientes: A bloqueado, B permitido.
@@ -81,7 +83,7 @@ O código passa a gerar `block ... on <if> inet`; a forma corrigida passou em
 
 ## Rollback
 
-- não activar `_28` antes dos gates;
+- não activar `_29` antes dos gates;
 - se o gate falhar, voltar para `_24` em modo passivo;
 - executar `layer7-pfctl flush-all`, resync do filtro e confirmar tabelas vazias;
 - preservar logs e artefactos do teste para diagnóstico;

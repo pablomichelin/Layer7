@@ -62,9 +62,10 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3, estabilização `_25`, logs `_26`,
 correcções `_27`, allow PF seguro `_28` e parser anti-QUIC `_29`).
-Estado actual antes do build `_29`: 92 OK e **20** pendentes. A sintaxe
-corrigida já passa no parser PF read-only; build e gates instalados continuam
-explicitamente pendentes. `_28` está supersedido.
+Estado actual após build `_29`: 93 OK e **19** pendentes. A sintaxe
+corrigida passa no parser PF read-only e o pacote extraído passou no builder
+FreeBSD 15 (`SHA256 bea385dd…01840`); gates instalados continuam explicitamente
+pendentes. `_28` está supersedido.
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):
 parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em

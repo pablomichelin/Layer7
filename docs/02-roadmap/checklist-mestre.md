@@ -133,7 +133,8 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   passaram (`SHA256 62dd9ae5…9dc6`), mas `_28` foi supersedido por FP-018.
 - [ ] **Candidato `_29` (BG-057 / FP-018):** anti-QUIC por interface deve
   emitir `on <if> inet|inet6`; amostra autocontida já passou no parser PF do
-  appliance. Exigir build `_29`, `pfctl -nf` do ruleset completo após
+  appliance. Build nDPI, suite e pacote extraído `_29` passaram no builder
+  (`SHA256 bea385dd…01840`). Exigir `pfctl -nf` do ruleset completo após
   instalação passiva e regressão com toggle antes de qualquer enforce.
 
 ---

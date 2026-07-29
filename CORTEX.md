@@ -139,8 +139,11 @@ snippet. Nenhuma regra foi carregada e a produção permaneceu inalterada.
 
 BG-057 corrige a ordem em função pura testável e incrementa o port para
 `1.8.11_29`. `_28` fica supersedido e não deve ser instalado. Build/artefacto
-`_29`, parser do ruleset completo instalado e gate two-client continuam
-pendentes.
+`_29` e validação do pacote extraído passaram no builder FreeBSD 15:
+`pfSense-pkg-layer7-1.8.11_29.pkg`,
+`SHA256=bea385ddb6f61bb6a9bffde0b781cea7a852b3956f620b8b004c914b0ab01840`.
+O parser do ruleset completo instalado e o gate two-client continuam
+pendentes; produção permanece intocada.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
@@ -926,7 +929,8 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: build `_29`, validar ruleset e instalar em passivo + logs/monitor/captura
+- Proximo gate: instalar `_29` em passivo, validar o ruleset completo +
+  logs/monitor/captura e só então testar o toggle anti-QUIC
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
 - PORTVERSION no repositorio: 1.8.11, PORTREVISION 29 (candidato nao publicado)
