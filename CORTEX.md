@@ -115,7 +115,8 @@ por excepção. O pacote usa `match ... tag L7ALLOW`: somente os blocks Layer7
 ignoram a marca, enquanto regras nativas do pfSense continuam a decidir.
 Também substitui o `pass quick` histórico da allowlist e das excepções UT1,
 fecha o caminho inoperante de exception `block` por origem e inclui
-`pallow_0..23` em self-heal/flush.
+`pallow_0..23` em self-heal/flush. O gate `smoke-layer7d.sh` também volta a
+incluir `log_store.c`, eliminando a falha de link introduzida no `_26`.
 
 Suite local e builder C/PHP/shell: PASS. A validação sintática final do PF,
 build nDPI/`.pkg`, instalação passiva e teste two-client ainda são gates.

@@ -30,6 +30,8 @@ gate no appliance ainda estão pendentes.
   de estados do host; antes podia tentar um destino inexistente.
 - Flush/resync/self-heal incluem `layer7_pallow_0..23`; mutações de excepção
   limpam tabelas dinâmicas antes de regenerar o filtro.
+- `smoke-layer7d.sh` volta a espelhar o daemon real incluindo `log_store.c`;
+  sem isso o gate oficial falhava no link desde a introdução do logging L1.
 
 ### Gates e rollback
 
