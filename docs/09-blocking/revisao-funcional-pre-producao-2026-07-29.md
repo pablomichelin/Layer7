@@ -25,7 +25,7 @@ defeitos capazes de explicar os dois sintomas reportados:
 O primeiro bloco de correcção está no candidato `1.8.11_27`. Suite completa,
 build nDPI e validação do pacote passaram no builder FreeBSD 15; artefacto
 interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
-`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
+`SHA256=8eae978d8d3120f050be21d2fdf511aacbf03ba0ad2c9c350c15100818ed5388`.
 
 ## Achados corrigidos no `_27`
 

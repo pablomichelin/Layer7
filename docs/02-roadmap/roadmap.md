@@ -537,7 +537,7 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   `psrc` à quarentena explícita, invalida estados PF após bloqueio reactivo,
   restaura precedência de `allow`, aplica TTL ao caminho SNI e valida a tabela
   escopada no self-heal. Build FreeBSD/nDPI e suite C/PHP/shell passam
-  (`SHA256 8720a8de…b95c`); produção permanece intocada e gate pendente.
+  (`SHA256 8eae978d…d5388`); produção permanece intocada e gate pendente.
   A revisão final abriu BG-056/FP-017: precedência allow precisa de enforcement
   PF próprio contra entradas já existentes antes de declarar produção pronta.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;

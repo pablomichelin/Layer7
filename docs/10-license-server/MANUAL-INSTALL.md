@@ -183,8 +183,10 @@ Procedimento obrigatório:
 
 Artefacto interno validado no builder FreeBSD 15:
 `pfSense-pkg-layer7-1.8.11_27.pkg`,
-`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
+`SHA256=8eae978d8d3120f050be21d2fdf511aacbf03ba0ad2c9c350c15100818ed5388`.
 Não é release pública e não deve ser instalado fora do gate controlado.
+BG-056/FP-017 continua aberto: allow/excepção ainda precisa de enforcement PF
+escopado contra destino previamente inserido por outro cliente/regra.
 
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e

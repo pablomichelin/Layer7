@@ -103,7 +103,7 @@ A emenda da ADR-0014 reserva `psrc` a `quarantine_origin=true`; app normal usa
 `pdst` por cliente/destino. Suite completa C/PHP/shell, build nDPI, validação
 do pacote e smoke `layer7d -t` passaram no builder FreeBSD 15. Artefacto
 `pfSense-pkg-layer7-1.8.11_27.pkg`,
-`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
+`SHA256=8eae978d8d3120f050be21d2fdf511aacbf03ba0ad2c9c350c15100818ed5388`.
 Gates no appliance ainda estão pendentes e produção segue intocada. Auditoria:
 `docs/09-blocking/revisao-funcional-pre-producao-2026-07-29.md`.
 Limitação crítica aberta: FP-017 — allow/excepção ainda não possui enforcement
