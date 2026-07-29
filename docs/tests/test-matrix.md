@@ -245,11 +245,11 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | # | Teste | Onde | Status |
 |---|-------|------|--------|
 | 15.1 | Hash TCP/UDP idêntico nos dois sentidos | local C | OK (`test_capture_flow_key.c`) |
-| 15.2 | App normal resolve para `pdst`; quarentena explícita para `psrc` | local C / builder PHP | C OK; PHP pendente |
+| 15.2 | App normal resolve para `pdst`; quarentena explícita para `psrc` | local C / builder PHP | OK |
 | 15.3 | Allow de política/excepção vence blacklist; default allow não | local C | OK (`test_policy_decide.c`) |
 | 15.4 | SNI blacklist expira pelo cache TTL | appliance | Pendente |
 | 15.5 | Self-heal falha se a tabela scoped alvo continuar ausente | appliance | Pendente |
-| 15.6 | Build nDPI/PHP e validação do `.pkg` `_27` | FreeBSD 15 | Pendente |
+| 15.6 | Build nDPI/PHP e validação do `.pkg` `_27` | FreeBSD 15 | OK (`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`) |
 | 15.7 | Sessão já estabelecida é encerrada sem afectar cliente B | appliance | Pendente |
 | 15.8 | Two-client completo: app normal vs quarentena e rollback | appliance | Pendente |
 
@@ -273,8 +273,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Blacklists UT1 (F4.2) | 2 | 0 | 2 |
 | Estabilização `_25` | 6 | 4 | 2 |
 | Contenção de logs `_26` | 4 | 3 | 1 |
-| Estabilização funcional `_27` | 8 | 2 | 6 |
-| **Total** | **100** | **83** | **17** |
+| Estabilização funcional `_27` | 8 | 4 | 4 |
+| **Total** | **100** | **85** | **15** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

@@ -7,6 +7,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 Pacote candidato, **não publicado** e **não aprovado para produção**. Revisão
 end-to-end documentada em
 `docs/09-blocking/revisao-funcional-pre-producao-2026-07-29.md`.
+Build isolado no FreeBSD 15:
+`pfSense-pkg-layer7-1.8.11_27.pkg`,
+`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
 
 ### Fixed
 
@@ -34,8 +37,9 @@ end-to-end documentada em
 
 ### Gates e rollback
 
-- Suite C local e shell lint: PASS; PHP local indisponível.
-- Build FreeBSD/nDPI, validação de pacote e gate appliance: pendentes.
+- Suite local completa no builder (C, PHP e shell), build nDPI, `pkg info`,
+  conteúdo, versão e smoke `layer7d -t`: PASS.
+- Gate appliance: pendente.
 - Produção permanece intocada. Rollback operacional continua `_24` passivo +
   `layer7-pfctl flush-all`; preservar evidência.
 

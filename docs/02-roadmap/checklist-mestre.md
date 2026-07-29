@@ -120,6 +120,8 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   build FreeBSD com nDPI, lint PHP, `pfctl -nf`, captura bidireccional,
   confirmação de kill de estado selectivo e gate two-client. Política normal
   de app deve bloquear só o destino; `psrc` exige quarentena explícita.
+  Suite/build/artefacto passaram (`SHA256 8720a8de…b95c`); `pfctl -nf` e
+  gates no appliance continuam pendentes.
 
 ---
 

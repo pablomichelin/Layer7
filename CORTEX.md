@@ -100,9 +100,11 @@ BG-055 corrige esses pontos e, no mesmo bloco de coerência do enforcement,
 restaura precedência de `allow` sobre blacklist, TTL no caminho SNI, self-heal
 da tabela scoped alvo, QNAME original em CNAME e sweep de fluxos classificados.
 A emenda da ADR-0014 reserva `psrc` a `quarantine_origin=true`; app normal usa
-`pdst` por cliente/destino. Suite C local e shell lint passam; PHP local,
-build FreeBSD/nDPI e gates no appliance ainda estão pendentes. Produção segue
-intocada. Auditoria:
+`pdst` por cliente/destino. Suite completa C/PHP/shell, build nDPI, validação
+do pacote e smoke `layer7d -t` passaram no builder FreeBSD 15. Artefacto
+`pfSense-pkg-layer7-1.8.11_27.pkg`,
+`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
+Gates no appliance ainda estão pendentes e produção segue intocada. Auditoria:
 `docs/09-blocking/revisao-funcional-pre-producao-2026-07-29.md`.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
@@ -888,7 +890,7 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: validar build _27 e instalar em passivo + logs/monitor/captura
+- Proximo gate: instalar _27 em passivo + logs/monitor/captura
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
 - PORTVERSION no repositorio: 1.8.11, PORTREVISION 27 (candidato nao publicado)

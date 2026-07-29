@@ -5,6 +5,10 @@
 Candidato interno, não publicado e não aprovado para produção. O appliance
 `192.168.100.254` não foi alterado durante o desenvolvimento.
 
+Artefacto interno validado:
+`pfSense-pkg-layer7-1.8.11_27.pkg`,
+`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
+
 ## Objectivo
 
 Corrigir falhas no caminho captura -> nDPI -> decisão -> PF que explicam
@@ -23,8 +27,8 @@ bloqueio ausente, bloqueio tardio e quarentena acidental do cliente.
 
 ## Gates obrigatórios
 
-- suite local C/PHP/shell;
-- build FreeBSD com nDPI e validação do `.pkg`;
+- suite local C/PHP/shell: **PASS**;
+- build FreeBSD com nDPI e validação do `.pkg`: **PASS**;
 - instalação primeiro passiva;
 - monitor/captura em interface real;
 - gate two-client, app normal vs quarentena, state kill, TTL e rollback.

@@ -22,7 +22,10 @@ defeitos capazes de explicar os dois sintomas reportados:
 - **bloqueia tudo:** match normal de aplicação/categoria usava `psrc`, cuja
   regra corta todo o tráfego externo da origem, mesmo sem quarentena explícita.
 
-O primeiro bloco de correcção está no candidato `1.8.11_27`.
+O primeiro bloco de correcção está no candidato `1.8.11_27`. Suite completa,
+build nDPI e validação do pacote passaram no builder FreeBSD 15; artefacto
+interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
+`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
 
 ## Achados corrigidos no `_27`
 

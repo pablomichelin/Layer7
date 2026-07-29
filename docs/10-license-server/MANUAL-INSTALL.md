@@ -181,7 +181,10 @@ Procedimento obrigatório:
 5. em falha, voltar a `_24` passivo, executar
    `/usr/local/libexec/layer7-pfctl flush-all` e resync do filtro.
 
-O `.pkg`/SHA256 será preenchido somente após build e validação no builder.
+Artefacto interno validado no builder FreeBSD 15:
+`pfSense-pkg-layer7-1.8.11_27.pkg`,
+`SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
+Não é release pública e não deve ser instalado fora do gate controlado.
 
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e

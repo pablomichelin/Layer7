@@ -536,7 +536,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   corrige o hash unidireccional que separava ida/volta para o nDPI, reserva
   `psrc` à quarentena explícita, invalida estados PF após bloqueio reactivo,
   restaura precedência de `allow`, aplica TTL ao caminho SNI e valida a tabela
-  escopada no self-heal. Produção permanece intocada; build/gate pendentes.
+  escopada no self-heal. Build FreeBSD/nDPI e suite C/PHP/shell passam
+  (`SHA256 8720a8de…b95c`); produção permanece intocada e gate pendente.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /
