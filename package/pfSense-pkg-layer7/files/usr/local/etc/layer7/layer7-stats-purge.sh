@@ -20,7 +20,7 @@ fi
 if (file_exists("'"${COLLECT_LIB}"'")) {
 	require_once("'"${COLLECT_LIB}"'");
 	$cfg = layer7_reports_config();
-	$ret = isset($cfg["event_retention_days"]) ? (int)$cfg["event_retention_days"] : 15;
+	$ret = isset($cfg["event_retention_days"]) ? (int)$cfg["event_retention_days"] : 7;
 	$sum = isset($cfg["retention_days"]) ? (int)$cfg["retention_days"] : 30;
 	layer7_reports_purge_db($ret, $sum);
 }

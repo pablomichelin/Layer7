@@ -293,6 +293,24 @@ if ($_POST["save"] ?? false) {
 	if ($dbgm > 720) {
 		$dbgm = 720;
 	}
+	$log_file_max_mb = $is_general_save
+	    ? (int)($_POST["log_file_max_mb"] ?? 5)
+	    : (int)($current_l7["log_file_max_mb"] ?? 5);
+	if ($log_file_max_mb < 1) {
+		$log_file_max_mb = 1;
+	}
+	if ($log_file_max_mb > 100) {
+		$log_file_max_mb = 100;
+	}
+	$log_file_keep = $is_general_save
+	    ? (int)($_POST["log_file_keep"] ?? 3)
+	    : (int)($current_l7["log_file_keep"] ?? 3);
+	if ($log_file_keep < 1) {
+		$log_file_keep = 1;
+	}
+	if ($log_file_keep > 10) {
+		$log_file_keep = 10;
+	}
 
 	/* block_quic_interfaces: nova forma (array de interfaces reais). */
 	$block_quic_ifaces = array();
@@ -352,7 +370,8 @@ if ($_POST["save"] ?? false) {
 	$rpt_retention = (int)($current_reports["retention_days"] ?? 30);
 	$rpt_interval = (int)($current_reports["collect_interval"] ?? 5);
 	$rpt_event_enabled = !empty($current_reports["event_log_enabled"]);
-	$rpt_event_retention = (int)($current_reports["event_retention_days"] ?? 15);
+	$rpt_event_retention = (int)($current_reports["event_retention_days"] ?? 7);
+	$rpt_event_max_mb = (int)($current_reports["event_max_mb"] ?? 100);
 	$rpt_event_ifaces = layer7_reports_normalize_interfaces(
 	    $current_reports["event_interfaces"] ?? array());
 	if ($is_reports_save) {
@@ -387,6 +406,13 @@ if ($_POST["save"] ?? false) {
 		if ($rpt_event_retention > 365) {
 			$rpt_event_retention = 365;
 		}
+		$rpt_event_max_mb = (int)($_POST["reports_event_max_mb"] ?? 100);
+		if ($rpt_event_max_mb < 25) {
+			$rpt_event_max_mb = 25;
+		}
+		if ($rpt_event_max_mb > 1000) {
+			$rpt_event_max_mb = 1000;
+		}
 
 		$rpt_event_ifaces = array();
 		if (isset($_POST["reports_iface_sel"]) && is_array($_POST["reports_iface_sel"])) {
@@ -411,6 +437,8 @@ if ($_POST["save"] ?? false) {
 		$data["layer7"]["enabled"] = $enabled;
 		$data["layer7"]["mode"] = $mode;
 		$data["layer7"]["log_level"] = $log_level;
+		$data["layer7"]["log_file_max_mb"] = $log_file_max_mb;
+		$data["layer7"]["log_file_keep"] = $log_file_keep;
 		$data["layer7"]["syslog_remote"] = $syslog_remote;
 		$data["layer7"]["syslog_remote_host"] = $sr_host;
 		$data["layer7"]["syslog_remote_port"] = $sr_port;
@@ -432,6 +460,7 @@ if ($_POST["save"] ?? false) {
 			"collect_interval" => $rpt_interval,
 			"event_log_enabled" => $rpt_event_enabled,
 			"event_retention_days" => $rpt_event_retention,
+			"event_max_mb" => $rpt_event_max_mb,
 			"event_interfaces" => $rpt_event_ifaces
 		);
 
@@ -473,6 +502,8 @@ $ll = isset($L["log_level"]) ? $L["log_level"] : "info";
 $sr = !empty($L["syslog_remote"]);
 $sr_host = isset($L["syslog_remote_host"]) ? (string)$L["syslog_remote_host"] : "";
 $sr_port = isset($L["syslog_remote_port"]) ? (int)$L["syslog_remote_port"] : 514;
+$log_file_max_mb = isset($L["log_file_max_mb"]) ? (int)$L["log_file_max_mb"] : 5;
+$log_file_keep = isset($L["log_file_keep"]) ? (int)$L["log_file_keep"] : 3;
 if ($sr_port < 1 || $sr_port > 65535) {
 	$sr_port = 514;
 }
@@ -680,6 +711,27 @@ layer7_render_styles();
 								<p class="help-block"><?= l7_t("0 = normal. 1-720 para LOG_DEBUG temporario."); ?></p>
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Limite por arquivo de log"); ?></label>
+							<div class="col-sm-9">
+								<div style="display:flex; gap:8px; align-items:center;">
+									<input type="number" name="log_file_max_mb" class="form-control"
+										style="max-width:140px;" value="<?= (int)$log_file_max_mb; ?>" min="1" max="100" />
+									<span class="text-muted">MiB</span>
+								</div>
+								<p class="help-block"><?= l7_t("Aplica-se separadamente ao log operacional e ao arquivo temporario de eventos."); ?></p>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Copias rotacionadas"); ?></label>
+							<div class="col-sm-9">
+								<input type="number" name="log_file_keep" class="form-control"
+									style="max-width:140px;" value="<?= (int)$log_file_keep; ?>" min="1" max="10" />
+								<p class="help-block"><?= l7_t("Quantidade maxima de arquivos antigos mantidos por log."); ?></p>
+							</div>
+						</div>
 					</div>
 
 					<div style="margin-top:16px;">
@@ -719,7 +771,8 @@ layer7_render_styles();
 			$rpt_ret = (int)($rpt_cfg["retention_days"] ?? 30);
 			$rpt_int = (int)($rpt_cfg["collect_interval"] ?? 5);
 			$rpt_evt_en = !empty($rpt_cfg["event_log_enabled"]);
-			$rpt_evt_ret = (int)($rpt_cfg["event_retention_days"] ?? 15);
+			$rpt_evt_ret = (int)($rpt_cfg["event_retention_days"] ?? 7);
+			$rpt_evt_max_mb = (int)($rpt_cfg["event_max_mb"] ?? 100);
 			$rpt_evt_ifaces = layer7_reports_normalize_interfaces($rpt_cfg["event_interfaces"] ?? array());
 			$rpt_presets = array(7, 15, 30, 60, 90, 180, 365);
 			$rpt_selected_preset = in_array($rpt_ret, $rpt_presets, true) ? (string)$rpt_ret : "custom";
@@ -764,6 +817,7 @@ layer7_render_styles();
 									<input type="checkbox" name="reports_event_log_enabled" <?= $rpt_evt_en ? 'checked' : ''; ?>>
 									<?= l7_t("Activar"); ?>
 								</label>
+								<p class="help-block"><?= l7_t("Desligado por defeito. Bloqueios e erros continuam preservados como auditoria essencial."); ?></p>
 							</div>
 						</div>
 						<div class="form-group">
@@ -779,6 +833,18 @@ layer7_render_styles();
 									<input type="number" class="form-control" name="reports_event_retention" id="l7_evt_custom" value="<?= $rpt_evt_ret; ?>" min="1" max="365" style="width:110px;<?= $rpt_evt_selected_preset !== "custom" ? 'display:none;' : ''; ?>">
 								</div>
 								<p class="help-block"><?= l7_t("Recomendado: 7 a 15 dias. Bloco que mais cresce em disco."); ?></p>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= l7_t("Limite do banco detalhado"); ?></label>
+							<div class="col-sm-9">
+								<div style="display:flex; gap:8px; align-items:center;">
+									<input type="number" class="form-control" name="reports_event_max_mb"
+										value="<?= $rpt_evt_max_mb; ?>" min="25" max="1000" style="width:110px;">
+									<span class="text-muted">MiB</span>
+								</div>
+								<p class="help-block"><?= l7_t("O primeiro limite atingido, dias ou tamanho, dispara o expurgo dos eventos mais antigos."); ?></p>
 							</div>
 						</div>
 

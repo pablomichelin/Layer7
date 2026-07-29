@@ -109,6 +109,13 @@ rm -f /usr/local/share/pfSense-pkg-layer7/info.xml
 rmdir /usr/local/share/pfSense-pkg-layer7 2>/dev/null || true
 rm -f /var/run/layer7d.pid
 rm -f /var/log/layer7d.log
+rm -f /var/log/layer7-events.log
+_l7_log_idx=1
+while [ "$_l7_log_idx" -le 10 ]; do
+    rm -f "/var/log/layer7d.log.${_l7_log_idx}"
+    rm -f "/var/log/layer7-events.log.${_l7_log_idx}"
+    _l7_log_idx=$((_l7_log_idx + 1))
+done
 rm -f /var/log/layer7-bl-update.log
 rm -f /tmp/layer7-stats.json
 rm -f /usr/local/etc/layer7.json.sample

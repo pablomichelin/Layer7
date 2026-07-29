@@ -1118,6 +1118,8 @@ function layer7_bare_config()
 			"enabled" => false,
 			"mode" => "monitor",
 			"log_level" => "info",
+			"log_file_max_mb" => 5,
+			"log_file_keep" => 3,
 			"syslog_remote" => false,
 			"syslog_remote_host" => "",
 			"syslog_remote_port" => 514,
@@ -2811,9 +2813,10 @@ function layer7_reports_defaults()
 		"enabled" => true,
 		"retention_days" => 30,
 		"collect_interval" => 5,
-		"event_log_enabled" => true,
-		"event_retention_days" => 15,
-		"event_interfaces" => array()
+		"event_log_enabled" => false,
+		"event_retention_days" => 7,
+			"event_max_mb" => 100,
+			"event_interfaces" => array()
 	);
 }
 
@@ -2847,10 +2850,10 @@ function layer7_reports_config()
 
 		$cfg = array_merge($cfg, $stored);
 		if (!array_key_exists("event_log_enabled", $stored)) {
-			$cfg["event_log_enabled"] = true;
+			$cfg["event_log_enabled"] = false;
 		}
 		if (!array_key_exists("event_retention_days", $stored)) {
-			$cfg["event_retention_days"] = min(15,
+			$cfg["event_retention_days"] = min(7,
 			    max(1, (int)($cfg["retention_days"] ?? 30)));
 		}
 	}
@@ -2878,9 +2881,58 @@ function layer7_reports_config()
 		$cfg["event_retention_days"] = 365;
 	}
 
+	$cfg["event_max_mb"] = (int)($cfg["event_max_mb"] ?? 100);
+	if ($cfg["event_max_mb"] < 25) {
+		$cfg["event_max_mb"] = 25;
+	}
+	if ($cfg["event_max_mb"] > 1000) {
+		$cfg["event_max_mb"] = 1000;
+	}
+
 	$cfg["event_interfaces"] = layer7_reports_normalize_interfaces(
 	    $cfg["event_interfaces"] ?? array());
 	return $cfg;
+}
+
+function layer7_log_family_size($path, $keep)
+{
+	$total = 0;
+	$files = 0;
+	for ($i = 0; $i <= (int)$keep; $i++) {
+		$p = $i === 0 ? $path : ($path . "." . $i);
+		if (!is_file($p)) {
+			continue;
+		}
+		$size = @filesize($p);
+		if ($size !== false) {
+			$total += (int)$size;
+			$files++;
+		}
+	}
+	return array("bytes" => $total, "files" => $files);
+}
+
+function layer7_log_storage_status()
+{
+	$data = layer7_load_or_default();
+	$l7 = isset($data["layer7"]) && is_array($data["layer7"])
+	    ? $data["layer7"] : array();
+	$max_mb = max(1, min(100, (int)($l7["log_file_max_mb"] ?? 5)));
+	$keep = max(1, min(10, (int)($l7["log_file_keep"] ?? 3)));
+	$reports = layer7_reports_config();
+	$operational = layer7_log_family_size("/var/log/layer7d.log", $keep);
+	$events = layer7_log_family_size("/var/log/layer7-events.log", $keep);
+	$db_bytes = is_file(L7_REPORTS_DB) ? (int)@filesize(L7_REPORTS_DB) : 0;
+
+	return array(
+		"max_mb_per_file" => $max_mb,
+		"keep_files" => $keep,
+		"operational" => $operational,
+		"events" => $events,
+		"db_bytes" => $db_bytes,
+		"db_max_mb" => (int)($reports["event_max_mb"] ?? 100),
+		"event_log_enabled" => !empty($reports["event_log_enabled"])
+	);
 }
 
 function layer7_reports_filters_empty($filters)
@@ -3006,7 +3058,8 @@ function layer7_reports_aggregate_top($data, $field, $limit = 20)
 
 function layer7_reports_parse_log($from_ts, $to_ts, $filters = array())
 {
-	$log_path = "/var/log/layer7d.log";
+	$log_path = file_exists("/var/log/layer7-events.log")
+	    ? "/var/log/layer7-events.log" : "/var/log/layer7d.log";
 	$results = array();
 	if (!file_exists($log_path)) return $results;
 
@@ -3084,6 +3137,9 @@ function layer7_reports_granularity_for_range($from_ts, $to_ts)
 
 define('L7_REPORTS_DB', L7_REPORTS_DIR . '/reports.db');
 define('L7_REPORTS_CURSOR', L7_REPORTS_DIR . '/ingest.cursor');
+define('L7_REPORTS_EVENTS_CURSOR', L7_REPORTS_DIR . '/ingest-events.cursor');
+define('L7_OPERATIONAL_LOG', '/var/log/layer7d.log');
+define('L7_EVENTS_LOG', '/var/log/layer7-events.log');
 define('L7_REPORTS_COLLECT_PHP', '/usr/local/etc/layer7/layer7-reports-collect.php');
 
 function layer7_reports_db_available()
@@ -3308,7 +3364,8 @@ function layer7_reports_event_from_log_line($line)
 	$action = "";
 	if (strpos($rest, "flow_decide:") === 0) {
 		$type = "flow";
-	} elseif (strpos($rest, "bl_block:") === 0) {
+	} elseif (strpos($rest, "bl_block:") === 0 ||
+	    strpos($rest, "sni_bl_block:") === 0) {
 		$type = "blacklist";
 		$action = "block";
 	} elseif (strpos($rest, "dns_query:") === 0) {
@@ -3317,9 +3374,22 @@ function layer7_reports_event_from_log_line($line)
 	} elseif (strpos($rest, "dns_block:") === 0) {
 		$type = "dns_block";
 		$action = "block";
-	} elseif (strpos($rest, "enforce_block_dst:") === 0 || strpos($rest, "enforce_tag:") === 0) {
+	} elseif (strpos($rest, "enforce_block:") === 0 ||
+	    strpos($rest, "enforce_block_dst:") === 0) {
 		$type = "enforce";
-		$action = "block";
+		/*
+		 * O evento flow/blacklist ja contabiliza a decisao de bloqueio.
+		 * Este registo confirma a aplicacao no PF e nao deve duplicar o
+		 * KPI de bloqueios.
+		 */
+		$action = "enforced";
+	} elseif (strpos($rest, "enforce_tag:") === 0) {
+		$type = "enforce";
+		$action = "tag";
+	} elseif (strpos($rest, "allowlist_dns:") === 0 ||
+	    strpos($rest, "allowlist_flow:") === 0) {
+		$type = "allowlist";
+		$action = "allow";
 	} else {
 		return null;
 	}
@@ -3446,88 +3516,193 @@ function layer7_reports_refresh_daily_kpi($db, $day_keys)
 	}
 }
 
-function layer7_reports_ingest_log_incremental()
+function layer7_reports_insert_event($db, $insert, $cfg, $event, &$day_keys)
 {
-	$log_path = "/var/log/layer7d.log";
-	$cfg = layer7_reports_config();
-
-	if (empty($cfg["event_log_enabled"])) {
-		return array("ok" => true, "ingested" => 0, "reason" => "event_log_disabled");
+	if (!is_array($event) || !layer7_reports_event_iface_allowed($cfg, $event)) {
+		return 0;
 	}
+	$insert->reset();
+	$insert->bindValue(":ts", (int)$event["ts"], SQLITE3_INTEGER);
+	$insert->bindValue(":ts_text", (string)$event["ts_text"], SQLITE3_TEXT);
+	$insert->bindValue(":type", (string)$event["type"], SQLITE3_TEXT);
+	$insert->bindValue(":src_ip", (string)$event["src_ip"], SQLITE3_TEXT);
+	$insert->bindValue(":src_hostname", (string)$event["src_hostname"], SQLITE3_TEXT);
+	$insert->bindValue(":dst_ip", (string)$event["dst_ip"], SQLITE3_TEXT);
+	$insert->bindValue(":host", (string)$event["host"], SQLITE3_TEXT);
+	$insert->bindValue(":app", (string)$event["app"], SQLITE3_TEXT);
+	$insert->bindValue(":category", (string)$event["category"], SQLITE3_TEXT);
+	$insert->bindValue(":action", (string)$event["action"], SQLITE3_TEXT);
+	$insert->bindValue(":policy", (string)$event["policy"], SQLITE3_TEXT);
+	$insert->bindValue(":iface", (string)$event["iface"], SQLITE3_TEXT);
+	$insert->bindValue(":raw", (string)$event["raw"], SQLITE3_TEXT);
+	$res = @$insert->execute();
+	if ($res === false) {
+		return 0;
+	}
+	layer7_reports_update_identity_map($db, $event["src_ip"],
+	    $event["src_hostname"], $event["ts"]);
+	$day_keys[] = date("Y-m-d", (int)$event["ts"]);
+	return 1;
+}
+
+function layer7_reports_ingest_path($db, $insert, $cfg, $log_path,
+    $cursor_path, &$day_keys)
+{
 	if (!file_exists($log_path)) {
 		return array("ok" => true, "ingested" => 0, "reason" => "log_missing");
 	}
-	$db = layer7_reports_db_connect(false);
-	if (!$db) {
-		return array("ok" => false, "ingested" => 0, "reason" => "sqlite_unavailable");
-	}
-	if (!layer7_reports_init_schema($db)) {
-		return array("ok" => false, "ingested" => 0, "reason" => "schema_failed");
-	}
-
+	clearstatcache(true, $log_path);
 	$st = @stat($log_path);
+	if (!is_array($st)) {
+		return array("ok" => false, "ingested" => 0, "reason" => "stat_failed");
+	}
 	$inode = isset($st["ino"]) ? (string)$st["ino"] : "";
 	$size = isset($st["size"]) ? (int)$st["size"] : 0;
-	$cursor = layer7_reports_cursor_load(L7_REPORTS_CURSOR, $inode, 0);
-	$offset = (int)$cursor["offset"];
-	if ((string)$cursor["inode"] !== $inode || $offset > $size || $offset < 0) {
-		$offset = 0;
-	}
+	$cursor = layer7_reports_cursor_load($cursor_path, $inode, 0);
+	$cursor_inode = (string)$cursor["inode"];
+	$cursor_offset = max(0, (int)$cursor["offset"]);
+	$sources = array();
 
-	$fh = @fopen($log_path, "r");
-	if (!$fh) {
-		return array("ok" => false, "ingested" => 0, "reason" => "open_failed");
-	}
-	if ($offset > 0) {
-		@fseek($fh, $offset);
-	}
-
-	$insert = @$db->prepare("INSERT INTO events(ts, ts_text, type, src_ip, src_hostname, dst_ip, host, app, category, action, policy, iface, raw)
-		VALUES(:ts,:ts_text,:type,:src_ip,:src_hostname,:dst_ip,:host,:app,:category,:action,:policy,:iface,:raw)");
-	if (!$insert) {
-		@fclose($fh);
-		return array("ok" => false, "ingested" => 0, "reason" => "insert_prepare_failed");
+	if ($cursor_inode === $inode && $cursor_offset <= $size) {
+		$sources[] = array("path" => $log_path, "offset" => $cursor_offset,
+		    "current" => true);
+	} else {
+		$matched_rotation = 0;
+		for ($i = 1; $i <= 10; $i++) {
+			$rotated = $log_path . "." . $i;
+			$rst = @stat($rotated);
+			if (is_array($rst) && (string)($rst["ino"] ?? "") === $cursor_inode) {
+				$matched_rotation = $i;
+				break;
+			}
+		}
+		if ($matched_rotation > 0) {
+			for ($i = $matched_rotation; $i >= 1; $i--) {
+				$sources[] = array(
+					"path" => $log_path . "." . $i,
+					"offset" => ($i === $matched_rotation ? $cursor_offset : 0),
+					"current" => false
+				);
+			}
+		}
+		$sources[] = array("path" => $log_path, "offset" => 0,
+		    "current" => true);
 	}
 
 	$ingested = 0;
-	$day_keys = array();
+	$current_offset = 0;
 	@$db->exec("BEGIN IMMEDIATE TRANSACTION");
-	while (($line = fgets($fh)) !== false) {
-		$event = layer7_reports_event_from_log_line($line);
-		if (!is_array($event)) {
+	foreach ($sources as $source) {
+		$fh = @fopen($source["path"], "r");
+		if (!$fh) {
+			if (!empty($source["current"])) {
+				@$db->exec("ROLLBACK");
+				return array("ok" => false, "ingested" => $ingested,
+				    "reason" => "open_failed");
+			}
 			continue;
 		}
-		if (!layer7_reports_event_iface_allowed($cfg, $event)) {
-			continue;
+		if ((int)$source["offset"] > 0) {
+			@fseek($fh, (int)$source["offset"]);
 		}
-		$insert->reset();
-		$insert->bindValue(":ts", (int)$event["ts"], SQLITE3_INTEGER);
-		$insert->bindValue(":ts_text", (string)$event["ts_text"], SQLITE3_TEXT);
-		$insert->bindValue(":type", (string)$event["type"], SQLITE3_TEXT);
-		$insert->bindValue(":src_ip", (string)$event["src_ip"], SQLITE3_TEXT);
-		$insert->bindValue(":src_hostname", (string)$event["src_hostname"], SQLITE3_TEXT);
-		$insert->bindValue(":dst_ip", (string)$event["dst_ip"], SQLITE3_TEXT);
-		$insert->bindValue(":host", (string)$event["host"], SQLITE3_TEXT);
-		$insert->bindValue(":app", (string)$event["app"], SQLITE3_TEXT);
-		$insert->bindValue(":category", (string)$event["category"], SQLITE3_TEXT);
-		$insert->bindValue(":action", (string)$event["action"], SQLITE3_TEXT);
-		$insert->bindValue(":policy", (string)$event["policy"], SQLITE3_TEXT);
-		$insert->bindValue(":iface", (string)$event["iface"], SQLITE3_TEXT);
-		$insert->bindValue(":raw", (string)$event["raw"], SQLITE3_TEXT);
-		$res = @$insert->execute();
-		if ($res !== false) {
-			$ingested++;
-			layer7_reports_update_identity_map($db, $event["src_ip"], $event["src_hostname"], $event["ts"]);
-			$day_keys[] = date("Y-m-d", (int)$event["ts"]);
+		while (($line = fgets($fh)) !== false) {
+			$event = layer7_reports_event_from_log_line($line);
+			$ingested += layer7_reports_insert_event(
+			    $db, $insert, $cfg, $event, $day_keys);
 		}
+		if (!empty($source["current"])) {
+			$pos = @ftell($fh);
+			$current_offset = ($pos === false) ? 0 : (int)$pos;
+		}
+		@fclose($fh);
 	}
-	@$db->exec("COMMIT");
-	$new_offset = @ftell($fh);
-	@fclose($fh);
-	layer7_reports_cursor_save(L7_REPORTS_CURSOR, $inode, ($new_offset === false ? 0 : (int)$new_offset));
-	layer7_reports_refresh_daily_kpi($db, $day_keys);
-
+	if (@$db->exec("COMMIT") === false) {
+		@$db->exec("ROLLBACK");
+		return array("ok" => false, "ingested" => $ingested,
+		    "reason" => "commit_failed");
+	}
+	layer7_reports_cursor_save($cursor_path, $inode, $current_offset);
 	return array("ok" => true, "ingested" => $ingested, "reason" => "ok");
+}
+
+function layer7_reports_enforce_db_cap($db, $max_mb)
+{
+	$max_mb = max(25, min(1000, (int)$max_mb));
+	$max_bytes = $max_mb * 1024 * 1024;
+	clearstatcache(true, L7_REPORTS_DB);
+	$size = file_exists(L7_REPORTS_DB) ? (int)@filesize(L7_REPORTS_DB) : 0;
+	if ($size <= $max_bytes) {
+		return array("ok" => true, "deleted" => 0, "size" => $size);
+	}
+	$count = (int)@$db->querySingle("SELECT COUNT(*) FROM events");
+	if ($count <= 0) {
+		return array("ok" => true, "deleted" => 0, "size" => $size);
+	}
+	$target_bytes = (int)floor($max_bytes * 0.85);
+	$keep_ratio = max(0.05, min(0.95, $target_bytes / max(1, $size)));
+	$delete_count = max(1, (int)ceil($count * (1.0 - $keep_ratio)));
+	$sql = "DELETE FROM events WHERE id IN (
+		SELECT id FROM events ORDER BY ts ASC, id ASC LIMIT " .
+		(int)$delete_count . ")";
+	$before = (int)@$db->querySingle("SELECT COUNT(*) FROM events");
+	@$db->exec("BEGIN IMMEDIATE TRANSACTION");
+	@$db->exec($sql);
+	@$db->exec("COMMIT");
+	$after = (int)@$db->querySingle("SELECT COUNT(*) FROM events");
+	$deleted = max(0, $before - $after);
+	if ($deleted > 0) {
+		@$db->exec("VACUUM");
+	}
+	clearstatcache(true, L7_REPORTS_DB);
+	$size = file_exists(L7_REPORTS_DB) ? (int)@filesize(L7_REPORTS_DB) : 0;
+	return array("ok" => true, "deleted" => $deleted, "size" => $size);
+}
+
+function layer7_reports_ingest_log_incremental()
+{
+	$cfg = layer7_reports_config();
+	if (empty($cfg["event_log_enabled"])) {
+		return array("ok" => true, "ingested" => 0,
+		    "reason" => "event_log_disabled");
+	}
+	$db = layer7_reports_db_connect(false);
+	if (!$db) {
+		return array("ok" => false, "ingested" => 0,
+		    "reason" => "sqlite_unavailable");
+	}
+	if (!layer7_reports_init_schema($db)) {
+		return array("ok" => false, "ingested" => 0,
+		    "reason" => "schema_failed");
+	}
+	$insert = @$db->prepare("INSERT INTO events(ts, ts_text, type, src_ip, src_hostname, dst_ip, host, app, category, action, policy, iface, raw)
+		VALUES(:ts,:ts_text,:type,:src_ip,:src_hostname,:dst_ip,:host,:app,:category,:action,:policy,:iface,:raw)");
+	if (!$insert) {
+		return array("ok" => false, "ingested" => 0,
+		    "reason" => "insert_prepare_failed");
+	}
+
+	$day_keys = array();
+	$legacy = layer7_reports_ingest_path($db, $insert, $cfg,
+	    L7_OPERATIONAL_LOG, L7_REPORTS_CURSOR, $day_keys);
+	$events = layer7_reports_ingest_path($db, $insert, $cfg,
+	    L7_EVENTS_LOG, L7_REPORTS_EVENTS_CURSOR, $day_keys);
+	if (empty($legacy["ok"]) || empty($events["ok"])) {
+		return array("ok" => false,
+		    "ingested" => (int)($legacy["ingested"] ?? 0) +
+		        (int)($events["ingested"] ?? 0),
+		    "reason" => empty($legacy["ok"]) ?
+		        ($legacy["reason"] ?? "legacy_failed") :
+		        ($events["reason"] ?? "events_failed"));
+	}
+	layer7_reports_refresh_daily_kpi($db, $day_keys);
+	$cap = layer7_reports_enforce_db_cap($db,
+	    (int)($cfg["event_max_mb"] ?? 100));
+	return array(
+		"ok" => true,
+		"ingested" => (int)$legacy["ingested"] + (int)$events["ingested"],
+		"purged_by_size" => (int)($cap["deleted"] ?? 0),
+		"reason" => "ok"
+	);
 }
 
 function layer7_reports_purge_db($retention_days, $summary_retention_days = null)
@@ -3569,7 +3744,12 @@ function layer7_reports_purge_db($retention_days, $summary_retention_days = null
 	if ($deleted > 0) {
 		@$db->exec("VACUUM");
 	}
-	return array("ok" => true, "deleted" => $deleted, "reason" => "ok");
+	$cfg = layer7_reports_config();
+	$cap = layer7_reports_enforce_db_cap($db,
+	    (int)($cfg["event_max_mb"] ?? 100));
+	return array("ok" => true,
+	    "deleted" => $deleted + (int)($cap["deleted"] ?? 0),
+	    "reason" => "ok");
 }
 
 function layer7_reports_clear_all()
@@ -3587,14 +3767,20 @@ function layer7_reports_clear_all()
 	}
 	@unlink(L7_REPORTS_HISTORY);
 
-	$log_path = "/var/log/layer7d.log";
-	if (file_exists($log_path)) {
-		$st = @stat($log_path);
-		$inode = isset($st["ino"]) ? (string)$st["ino"] : "";
-		$size = isset($st["size"]) ? (int)$st["size"] : 0;
-		layer7_reports_cursor_save(L7_REPORTS_CURSOR, $inode, $size);
-	} else {
-		@unlink(L7_REPORTS_CURSOR);
+	foreach (array(
+	    array(L7_OPERATIONAL_LOG, L7_REPORTS_CURSOR),
+	    array(L7_EVENTS_LOG, L7_REPORTS_EVENTS_CURSOR)
+	) as $source) {
+		$log_path = $source[0];
+		$cursor_path = $source[1];
+		if (file_exists($log_path)) {
+			$st = @stat($log_path);
+			$inode = isset($st["ino"]) ? (string)$st["ino"] : "";
+			$size = isset($st["size"]) ? (int)$st["size"] : 0;
+			layer7_reports_cursor_save($cursor_path, $inode, $size);
+		} else {
+			@unlink($cursor_path);
+		}
 	}
 
 	return array("ok" => true, "deleted" => $deleted);

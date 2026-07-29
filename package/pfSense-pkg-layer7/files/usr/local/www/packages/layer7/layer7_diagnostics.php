@@ -323,7 +323,7 @@ layer7_render_styles();
 		<div class="layer7-content">
 
 		<?php if ($sigusr1_sent) { ?>
-		<div class="alert alert-success"><?= l7_t("SIGUSR1 enviado. As estatisticas aparecem nos logs abaixo."); ?></div>
+		<div class="alert alert-success"><?= l7_t("SIGUSR1 enviado. O snapshot de estatisticas foi actualizado sem gerar ruido no log normal."); ?></div>
 		<?php } ?>
 		<?php if ($sighup_sent) { ?>
 		<div class="alert alert-success"><?= l7_t("SIGHUP enviado. O daemon recarregou a configuracao."); ?></div>

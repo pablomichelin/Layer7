@@ -28,7 +28,8 @@ $clear_msg = "";
 if (isset($_POST["clear_all_reports"])) {
 	$result = layer7_reports_clear_all();
 	if ($result["ok"]) {
-		$clear_msg = l7_t("Todos os dados de relatorios foram apagados.") . " (" . number_format($result["deleted"]) . " " . l7_t("eventos removidos") . ")";
+		$clear_msg = l7_t("Banco detalhado e historico executivo foram apagados; os arquivos rotativos de log foram preservados.") .
+		    " (" . number_format($result["deleted"]) . " " . l7_t("eventos removidos") . ")";
 	}
 }
 
@@ -262,8 +263,8 @@ if (!empty($_rpt_notices)) { ?>
 	</div>
 	<form method="post" action="layer7_reports.php#l7-tools" style="display:inline;">
 		<button type="submit" name="clear_all_reports" value="1" class="btn btn-sm btn-danger"
-			onclick="return confirm(<?= json_encode(l7_t('Apagar TODOS os dados de relatorios? Esta accao nao pode ser desfeita.')) ?>);">
-			<i class="fa fa-trash"></i> <?= l7_t("Limpar todos os dados"); ?>
+			onclick="return confirm(<?= json_encode(l7_t('Apagar o banco detalhado e o historico executivo? Os arquivos rotativos permanecem.')) ?>);">
+			<i class="fa fa-trash"></i> <?= l7_t("Limpar dados de relatorios"); ?>
 		</button>
 	</form>
 </div>

@@ -5,8 +5,9 @@
 #   1. Compila e corre tests/functional/test_allowlist.c.
 #   2. Compila e corre tests/functional/test_config_parse.c.
 #   3. Compila e corre tests/functional/test_policy_decide.c (Caminho B / E1).
-#   4. Verifica sintaxe PHP dos ficheiros do pacote (php -l).
-#   5. Verifica sintaxe shell dos scripts do pacote (sh -n).
+#   4. Testa rotacao limitada e ingestao de relatorios atraves da rotacao.
+#   5. Verifica sintaxe PHP dos ficheiros do pacote (php -l).
+#   6. Verifica sintaxe shell dos scripts do pacote (sh -n).
 #
 # Uso:  sh tests/run-local.sh
 
@@ -47,6 +48,21 @@ if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
 else
 	cat /tmp/test_config_parse.cc.err
 	fail "test_config_parse compile"
+fi
+
+step "Unit: log_store (rotacao limitada)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_log_store \
+    tests/functional/test_log_store.c src/layer7d/log_store.c \
+    2>/tmp/test_log_store.cc.err; then
+	if /tmp/test_log_store; then
+		pass "test_log_store"
+	else
+		fail "test_log_store runtime"
+	fi
+else
+	cat /tmp/test_log_store.cc.err
+	fail "test_log_store compile"
 fi
 
 step "Unit: policy_decide (Caminho B / E1)"
@@ -116,6 +132,11 @@ else
 	else
 		fail "test_interface_normalization"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_logging_reports.php; then
+		pass "test_logging_reports"
+	else
+		fail "test_logging_reports"
+	fi
 fi
 
 step "Lint: PHP do pacote (php -l)"
@@ -146,6 +167,7 @@ for f in package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d \
     package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-unbound-anti-doh \
     package/pfSense-pkg-layer7/files/usr/local/etc/layer7/*.sh \
     scripts/diagnose-layer7-appliance.sh \
+    scripts/release/uninstall.sh \
     tests/unit/test_rc_pidfile.sh \
     tests/lab/smoke-monitor-mode.sh \
     tests/lab/smoke-caminho-a.sh \

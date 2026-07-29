@@ -3,11 +3,22 @@
     "enabled": false,
     "mode": "monitor",
     "log_level": "info",
+    "log_file_max_mb": 5,
+    "log_file_keep": 3,
     "syslog_remote": false,
     "syslog_remote_host": "",
     "syslog_remote_port": 514,
     "debug_minutes": 0,
     "interfaces": ["lan"],
+    "reports": {
+      "enabled": true,
+      "retention_days": 30,
+      "collect_interval": 5,
+      "event_log_enabled": false,
+      "event_retention_days": 7,
+      "event_max_mb": 100,
+      "event_interfaces": []
+    },
     "policies": [
       {
         "id": "p-mon-001",

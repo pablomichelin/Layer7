@@ -62,6 +62,13 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 	# Cache blacklists, relatorios, estado — alinhado a scripts/release/uninstall.sh
 	/bin/rm -rf /usr/local/etc/layer7 >/dev/null 2>&1 || true
 	/bin/rm -f /usr/local/etc/layer7-protos.txt >/dev/null 2>&1 || true
-	/bin/rm -f /var/log/layer7d.log /var/log/layer7-bl-update.log >/dev/null 2>&1 || true
+	/bin/rm -f /var/log/layer7d.log /var/log/layer7-events.log \
+		/var/log/layer7-bl-update.log >/dev/null 2>&1 || true
+	_i=1
+	while [ "${_i}" -le 10 ]; do
+		/bin/rm -f "/var/log/layer7d.log.${_i}" \
+			"/var/log/layer7-events.log.${_i}" >/dev/null 2>&1 || true
+		_i=$((_i + 1))
+	done
 	/bin/rm -f /tmp/layer7-stats.json /tmp/layer7_pkg_rm_started >/dev/null 2>&1 || true
 fi

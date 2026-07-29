@@ -9,15 +9,36 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
+function layer7_events_human_bytes($bytes)
+{
+	$bytes = max(0, (int)$bytes);
+	if ($bytes >= 1073741824) {
+		return number_format($bytes / 1073741824, 1) . " GiB";
+	}
+	if ($bytes >= 1048576) {
+		return number_format($bytes / 1048576, 1) . " MiB";
+	}
+	if ($bytes >= 1024) {
+		return number_format($bytes / 1024, 1) . " KiB";
+	}
+	return $bytes . " B";
+}
+
 $filter = isset($_GET["filter"]) ? trim($_GET["filter"]) : "";
+$source = isset($_GET["source"]) ? trim((string)$_GET["source"]) : "events";
+if (!in_array($source, array("events", "operational"), true)) {
+	$source = "events";
+}
 $max_lines = 300;
-$log_path = "/var/log/layer7d.log";
+$log_path = $source === "operational"
+	? "/var/log/layer7d.log" : "/var/log/layer7-events.log";
 $live_lines = 60;
+$storage = layer7_log_storage_status();
 
 $all_logs = array();
 if (file_exists($log_path)) {
 	exec("/usr/bin/tail -n " . (int)$max_lines . " " . escapeshellarg($log_path) . " 2>/dev/null", $all_logs);
-} elseif (file_exists("/var/log/system.log")) {
+} elseif ($source === "operational" && file_exists("/var/log/system.log")) {
 	exec("grep 'layer7d' /var/log/system.log | tail -" . $max_lines . " 2>/dev/null", $all_logs);
 }
 
@@ -60,13 +81,50 @@ layer7_render_styles();
 		<div class="layer7-content">
 
 		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Armazenamento de logs"); ?></div>
+			<div class="layer7-admin-block__body">
+				<div class="row">
+					<div class="col-sm-4">
+						<strong><?= l7_t("Operacional"); ?>:</strong>
+						<?= htmlspecialchars(layer7_events_human_bytes($storage["operational"]["bytes"])); ?>
+						<span class="text-muted">(<?= (int)$storage["operational"]["files"]; ?> <?= l7_t("arquivos"); ?>)</span>
+					</div>
+					<div class="col-sm-4">
+						<strong><?= l7_t("Eventos"); ?>:</strong>
+						<?= htmlspecialchars(layer7_events_human_bytes($storage["events"]["bytes"])); ?>
+						<span class="text-muted">(<?= (int)$storage["events"]["files"]; ?> <?= l7_t("arquivos"); ?>)</span>
+					</div>
+					<div class="col-sm-4">
+						<strong>SQLite:</strong>
+						<?= htmlspecialchars(layer7_events_human_bytes($storage["db_bytes"])); ?>
+						<span class="text-muted">/ <?= (int)$storage["db_max_mb"]; ?> MiB</span>
+					</div>
+				</div>
+				<p class="small text-muted" style="margin-top:8px; margin-bottom:0;">
+					<?= sprintf(l7_t("Rotacao automatica: %d MiB por arquivo, %d copias antigas."),
+					    (int)$storage["max_mb_per_file"], (int)$storage["keep_files"]); ?>
+					<?= !empty($storage["event_log_enabled"])
+					    ? l7_t("Log detalhado activo.")
+					    : l7_t("Log detalhado desactivado; bloqueios continuam auditados."); ?>
+				</p>
+			</div>
+		</div>
+
+		<div class="layer7-toolbar" style="margin-bottom:12px;">
+			<a class="btn btn-sm <?= $source === "events" ? "btn-primary" : "btn-default"; ?>"
+				href="layer7_events.php?source=events"><?= l7_t("Eventos de trafego"); ?></a>
+			<a class="btn btn-sm <?= $source === "operational" ? "btn-primary" : "btn-default"; ?>"
+				href="layer7_events.php?source=operational"><?= l7_t("Log operacional"); ?></a>
+		</div>
+
+		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Monitor ao vivo"); ?></div>
 			<div class="layer7-admin-block__body">
 				<p class="small text-muted"><?= l7_t("Atualiza automaticamente os ultimos eventos do daemon. Use o filtro abaixo para restringir o fluxo exibido."); ?></p>
 			<div class="layer7-toolbar">
 				<button type="button" class="btn btn-success btn-sm" id="l7-live-toggle"><?= l7_t("Pausar"); ?></button>
 				<button type="button" class="btn btn-default btn-sm" id="l7-live-refresh"><?= l7_t("Atualizar agora"); ?></button>
-				<button type="button" class="btn btn-danger btn-sm" id="l7-live-clear"><?= l7_t("Limpar"); ?></button>
+				<button type="button" class="btn btn-default btn-sm" id="l7-live-clear"><?= l7_t("Limpar visualizacao"); ?></button>
 				<span id="l7-live-count" class="text-muted" style="font-size:12px; margin-left:8px;"></span>
 			</div>
 				<pre id="l7-live-view" class="pre-scrollable" style="max-height: 320px; font-size: 12px; white-space: pre-wrap;">Carregando...</pre>
@@ -77,13 +135,14 @@ layer7_render_styles();
 			<div class="layer7-admin-block__header"><?= l7_t("Filtrar logs"); ?></div>
 			<div class="layer7-admin-block__body">
 				<form method="get" class="form-inline">
+					<input type="hidden" name="source" value="<?= htmlspecialchars($source); ?>">
 					<div class="form-group">
 						<input type="text" name="filter" class="form-control" style="width: 320px;" maxlength="100"
 							value="<?= htmlspecialchars($filter); ?>" placeholder="<?= l7_t("Ex: enforce, flow_decide, BitTorrent, SIGUSR1..."); ?>" />
 					</div>
 					<button type="submit" class="btn btn-primary"><?= l7_t("Filtrar"); ?></button>
 					<?php if ($filter !== "") { ?>
-					<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Limpar"); ?></a>
+					<a href="layer7_events.php?source=<?= urlencode($source); ?>" class="btn btn-default"><?= l7_t("Limpar filtro"); ?></a>
 					<?php } ?>
 				</form>
 			</div>
@@ -106,7 +165,7 @@ layer7_render_styles();
 					<?php if ($filter !== "") { ?>
 					<?= l7_t("Nenhum log correspondente ao filtro."); ?>
 					<?php } else { ?>
-					<?= l7_t("Nenhum log do layer7d encontrado em /var/log/layer7d.log."); ?>
+					<?= sprintf(l7_t("Nenhum evento encontrado em %s."), htmlspecialchars($log_path)); ?>
 					<?php } ?>
 				</div>
 				<?php } ?>
@@ -126,7 +185,7 @@ layer7_render_styles();
 	var paused    = false;
 	var timer     = null;
 	var refreshMs = 2000;
-	var ajaxUrl   = 'layer7_events.php?ajax=1&filter=<?= rawurlencode($filter); ?>';
+	var ajaxUrl   = 'layer7_events.php?ajax=1&source=<?= rawurlencode($source); ?>&filter=<?= rawurlencode($filter); ?>';
 
 	/* Buffer acumulado — novas linhas sao sempre adicionadas, nunca removidas */
 	var seenLines = [];

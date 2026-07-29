@@ -88,10 +88,31 @@ parse_debug_minutes_val(const char *p, int *out)
 	return 0;
 }
 
+static int
+parse_bounded_int(const char *p, int min, int max, int *out)
+{
+	int v = 0;
+
+	skip_ws(&p);
+	if (*p < '0' || *p > '9')
+		return -1;
+	while (*p >= '0' && *p <= '9') {
+		if (v > max)
+			return -1;
+		v = v * 10 + (*p - '0');
+		p++;
+	}
+	if (v < min || v > max)
+		return -1;
+	*out = v;
+	return 0;
+}
+
 int
 layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 {
 	const char *layer, *pol, *en, *mo, *ll, *sr, *srh, *srp, *dm, *end;
+	const char *lfm, *lfk, *evl, *evi;
 	size_t L;
 
 	memset(out, 0, sizeof(*out));
@@ -115,6 +136,10 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 	srh = strstr(layer, "\"syslog_remote_host\"");
 	srp = strstr(layer, "\"syslog_remote_port\"");
 	dm = strstr(layer, "\"debug_minutes\"");
+	lfm = strstr(layer, "\"log_file_max_mb\"");
+	lfk = strstr(layer, "\"log_file_keep\"");
+	evl = strstr(layer, "\"event_log_enabled\"");
+	evi = strstr(layer, "\"event_interfaces\"");
 
 	if (en) {
 		const char *q = strchr(en + 9, ':');
@@ -183,6 +208,62 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 			q++;
 			if (parse_debug_minutes_val(q, &out->debug_minutes) == 0)
 				out->has_debug_minutes = 1;
+		}
+	}
+
+	if (lfm) {
+		const char *q = strchr(lfm + 17, ':');
+		if (q && q < end) {
+			q++;
+			if (parse_bounded_int(q, 1, 100,
+			    &out->log_file_max_mb) == 0)
+				out->has_log_file_max_mb = 1;
+		}
+	}
+
+	if (lfk) {
+		const char *q = strchr(lfk + 15, ':');
+		if (q && q < end) {
+			q++;
+			if (parse_bounded_int(q, 1, 10,
+			    &out->log_file_keep) == 0)
+				out->has_log_file_keep = 1;
+		}
+	}
+
+	if (evl) {
+		const char *q = strchr(evl + 19, ':');
+		if (q && q < end) {
+			q++;
+			if (parse_bool_after_colon(q,
+			    &out->event_log_enabled) == 0)
+				out->has_event_log_enabled = 1;
+		}
+	}
+
+	if (evi) {
+		const char *arr = strchr(evi, '[');
+		if (arr && arr < end) {
+			const char *p = arr + 1;
+			while (p < end && *p != ']' &&
+			    out->n_event_interfaces < L7_MAX_INTERFACES) {
+				while (p < end && (*p == ' ' || *p == '\t' ||
+				    *p == '\n' || *p == '\r' || *p == ','))
+					p++;
+				if (*p == '"') {
+					if (parse_quoted_string(p,
+					    out->event_interfaces[
+					    out->n_event_interfaces],
+					    L7_IFACE_NAME_LEN) == 0)
+						out->n_event_interfaces++;
+					p++;
+					while (p < end && *p != '"')
+						p++;
+					if (*p == '"')
+						p++;
+				} else
+					break;
+			}
 		}
 	}
 

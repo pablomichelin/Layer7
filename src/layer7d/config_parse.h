@@ -26,6 +26,14 @@ struct layer7_parsed {
 	int syslog_remote_port; /* 1–65535; default 514 se remoto ativo */
 	int has_debug_minutes;
 	int debug_minutes; /* 0=cancela; 1–720 boost LOG_DEBUG até expirar */
+	int has_log_file_max_mb;
+	int log_file_max_mb; /* 1–100 MiB por ficheiro activo */
+	int has_log_file_keep;
+	int log_file_keep; /* 1–10 copias rotacionadas */
+	int has_event_log_enabled;
+	int event_log_enabled; /* eventos detalhados; bloqueios continuam auditados */
+	int n_event_interfaces;
+	char event_interfaces[L7_MAX_INTERFACES][L7_IFACE_NAME_LEN];
 	int has_sni_inspection;
 	int sni_inspection; /* Caminho A / A3: usar SNI (TLS) extraido pelo nDPI
 	                     * como host para matching de politicas. Default off. */

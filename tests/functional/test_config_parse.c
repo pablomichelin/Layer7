@@ -129,6 +129,46 @@ main(void)
 		check(p.has_enforcement_model == 0, "invalid enforcement_model -> has=0");
 	}
 
+	/* 10. limites locais e log detalhado chegam ao daemon. */
+	{
+		const char *json =
+		    "{\"layer7\":{\"log_file_max_mb\":10,\"log_file_keep\":4,"
+		    "\"reports\":{\"event_log_enabled\":true,"
+		    "\"event_interfaces\":[\"vmx0\",\"vmx0.10\"]},"
+		    "\"policies\":[]}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0,
+		    "parse ok (logging L1)");
+		check(p.has_log_file_max_mb && p.log_file_max_mb == 10,
+		    "log_file_max_mb=10");
+		check(p.has_log_file_keep && p.log_file_keep == 4,
+		    "log_file_keep=4");
+		check(p.has_event_log_enabled && p.event_log_enabled == 1,
+		    "event_log_enabled=1");
+		check(p.n_event_interfaces == 2,
+		    "duas interfaces de eventos");
+		check(strcmp(p.event_interfaces[0], "vmx0") == 0 &&
+		    strcmp(p.event_interfaces[1], "vmx0.10") == 0,
+		    "interfaces de eventos preservadas");
+	}
+
+	/* 11. limites fora da faixa falham fechado para defaults runtime. */
+	{
+		const char *json =
+		    "{\"layer7\":{\"log_file_max_mb\":0,\"log_file_keep\":99,"
+		    "\"reports\":{\"event_log_enabled\":false},"
+		    "\"policies\":[]}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0,
+		    "parse ok (logging invalido)");
+		check(p.has_log_file_max_mb == 0,
+		    "log_file_max_mb invalido ignorado");
+		check(p.has_log_file_keep == 0,
+		    "log_file_keep invalido ignorado");
+		check(p.has_event_log_enabled && p.event_log_enabled == 0,
+		    "event_log_enabled=false explicito");
+	}
+
 	if (g_fail) {
 		printf("\nTEST CONFIG_PARSE: FAILED\n");
 		return 1;

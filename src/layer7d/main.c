@@ -13,6 +13,7 @@
 #include "config_parse.h"
 #include "enforce.h"
 #include "license.h"
+#include "log_store.h"
 #include "policy.h"
 #include <arpa/inet.h>
 #include <errno.h>
@@ -35,6 +36,9 @@ static const char layer7d_version[] =
 
 #define DEFAULT_CONFIG "/usr/local/etc/layer7.json"
 #define LAYER7_LOG_PATH "/var/log/layer7d.log"
+#define LAYER7_EVENTS_LOG_PATH "/var/log/layer7-events.log"
+#define L7_LOG_MAX_MB_DEFAULT 5
+#define L7_LOG_KEEP_DEFAULT 3
 #define L7_PF_HELPER_PATH "/usr/local/libexec/layer7-pfctl"
 #define L7_PF_RULES_DEBUG_PATH "/tmp/rules.debug"
 #define L7_PF_SELFHEAL_MIN_SEC 10
@@ -42,6 +46,11 @@ static const char layer7d_version[] =
 
 /* 0=error 1=warn 2=info 3=debug — mensagens com nível <= s_ll */
 static int s_ll = 2;
+static int s_log_file_max_mb = L7_LOG_MAX_MB_DEFAULT;
+static int s_log_file_keep = L7_LOG_KEEP_DEFAULT;
+static int s_event_log_enabled;
+static int s_n_event_interfaces;
+static char s_event_interfaces[L7_MAX_INTERFACES][L7_IFACE_NAME_LEN];
 
 static volatile sig_atomic_t stop_req;
 static volatile sig_atomic_t reload_req;
@@ -72,9 +81,12 @@ static unsigned long long s_total_classified;
 static unsigned long long s_total_blocked;
 static unsigned long long s_total_allowed;
 static time_t s_boot_time;
+static time_t s_last_stats_write;
+static time_t s_last_periodic_log;
 
 static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
+static int s_license_state = -1; /* 0=invalid, 1=valid, 2=grace/dev */
 
 static struct l7_blacklist *s_blacklist;
 static struct l7_allowlist s_allowlist;
@@ -439,6 +451,50 @@ sync_remote_cfg(const struct layer7_parsed *p)
 }
 
 static void
+sync_local_log_cfg(const struct layer7_parsed *p)
+{
+	int i;
+
+	s_log_file_max_mb = L7_LOG_MAX_MB_DEFAULT;
+	s_log_file_keep = L7_LOG_KEEP_DEFAULT;
+	s_event_log_enabled = 0;
+	s_n_event_interfaces = 0;
+
+	if (!p)
+		return;
+	if (p->has_log_file_max_mb)
+		s_log_file_max_mb = p->log_file_max_mb;
+	if (p->has_log_file_keep)
+		s_log_file_keep = p->log_file_keep;
+	if (p->has_event_log_enabled)
+		s_event_log_enabled = p->event_log_enabled;
+	for (i = 0; i < p->n_event_interfaces &&
+	    i < L7_MAX_INTERFACES; i++) {
+		strncpy(s_event_interfaces[s_n_event_interfaces],
+		    p->event_interfaces[i], L7_IFACE_NAME_LEN - 1);
+		s_event_interfaces[s_n_event_interfaces][L7_IFACE_NAME_LEN - 1] =
+		    '\0';
+		s_n_event_interfaces++;
+	}
+}
+
+static int
+event_iface_allowed(const char *iface)
+{
+	int i;
+
+	if (s_n_event_interfaces == 0)
+		return 1;
+	if (!iface || iface[0] == '\0')
+		return 0;
+	for (i = 0; i < s_n_event_interfaces; i++) {
+		if (strcmp(s_event_interfaces[i], iface) == 0)
+			return 1;
+	}
+	return 0;
+}
+
+static void
 layer7_send_remote_syslog(int pri, const char *msg)
 {
 	static const char *const mon[] = { "Jan", "Feb", "Mar", "Apr", "May",
@@ -485,17 +541,17 @@ layer7_send_remote_syslog(int pri, const char *msg)
 	freeaddrinfo(res);
 }
 
-static void
-layer7_write_local_log(int pri, const char *msg)
+static int
+layer7_write_local_log(const char *path, int pri, const char *msg)
 {
-	FILE *f;
 	time_t now;
 	struct tm tm;
-	char ts[32];
+	char ts[32], line[1280];
 	const char *sev;
+	int n;
 
 	if (!msg || msg[0] == '\0')
-		return;
+		return 0;
 
 	switch (pri & LOG_PRIMASK) {
 	case LOG_ERR:
@@ -521,12 +577,12 @@ layer7_write_local_log(int pri, const char *msg)
 	now = time(NULL);
 	localtime_r(&now, &tm);
 	strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", &tm);
-
-	f = fopen(LAYER7_LOG_PATH, "a");
-	if (!f)
-		return;
-	fprintf(f, "%s [%s] %s\n", ts, sev, msg);
-	fclose(f);
+	n = snprintf(line, sizeof(line), "%s [%s] %s", ts, sev, msg);
+	if (n < 0 || (size_t)n >= sizeof(line))
+		return -1;
+	return layer7_log_store_append(path, line,
+	    (size_t)s_log_file_max_mb * 1024U * 1024U,
+	    (unsigned int)s_log_file_keep);
 }
 
 static void
@@ -538,8 +594,41 @@ l7_log(int pri, const char *fmt, ...)
 	va_start(ap, fmt);
 	vsnprintf(line, sizeof(line), fmt, ap);
 	va_end(ap);
-	layer7_write_local_log(pri, line);
+	(void)layer7_write_local_log(LAYER7_LOG_PATH, pri, line);
 	syslog(pri, "%s", line);
+	if (s_syslog_remote)
+		layer7_send_remote_syslog(pri, line);
+}
+
+static void
+l7_event_log(int force_audit, const char *iface, int pri, const char *fmt, ...)
+{
+	static time_t last_write_warn;
+	va_list ap;
+	char line[1024];
+	time_t now;
+
+	if (!force_audit &&
+	    (!s_event_log_enabled || !event_iface_allowed(iface)))
+		return;
+
+	va_start(ap, fmt);
+	vsnprintf(line, sizeof(line), fmt, ap);
+	va_end(ap);
+	if (layer7_write_local_log(LAYER7_EVENTS_LOG_PATH, pri, line) != 0) {
+		now = time(NULL);
+		if (now - last_write_warn >= 300) {
+			last_write_warn = now;
+			syslog(LOG_DAEMON | LOG_WARNING,
+			    "event_log_write_failed path=%s error=%s",
+			    LAYER7_EVENTS_LOG_PATH, strerror(errno));
+		}
+	}
+
+	/* Bloqueios sao auditoria essencial: ficam tambem no syslog local.
+	 * Eventos detalhados normais nao duplicam no system.log. */
+	if (force_audit)
+		syslog(pri, "%s", line);
 	if (s_syslog_remote)
 		layer7_send_remote_syslog(pri, line);
 }
@@ -566,6 +655,26 @@ l7_log(int pri, const char *fmt, ...)
 		if (effective_ll() >= 3)                                       \
 			l7_log(L7_PRI_FAC | LOG_DEBUG, __VA_ARGS__);           \
 	} while (0)
+#define L7_EVENT_INFO(iface, ...)                                              \
+	do {                                                                   \
+		if (effective_ll() >= 2)                                       \
+			l7_event_log(0, iface, L7_PRI_FAC | LOG_INFO,          \
+			    __VA_ARGS__);                                      \
+	} while (0)
+#define L7_EVENT_NOTE(iface, ...)                                              \
+	do {                                                                   \
+		if (effective_ll() >= 2)                                       \
+			l7_event_log(0, iface, L7_PRI_FAC | LOG_NOTICE,        \
+			    __VA_ARGS__);                                      \
+	} while (0)
+#define L7_EVENT_DBG(iface, ...)                                               \
+	do {                                                                   \
+		if (effective_ll() >= 3)                                       \
+			l7_event_log(0, iface, L7_PRI_FAC | LOG_DEBUG,         \
+			    __VA_ARGS__);                                      \
+	} while (0)
+#define L7_AUDIT_NOTE(iface, ...)                                              \
+	l7_event_log(1, iface, L7_PRI_FAC | LOG_NOTICE, __VA_ARGS__)
 
 static void
 on_usr1(int sig)
@@ -596,16 +705,22 @@ static struct l7_enforce_cache_entry s_enforce_cache[L7_DST_CACHE_MAX];
 static int s_n_enforce_cache;
 static time_t s_last_enforce_cache_sweep;
 
-static void
-pf_table_flush_logged(const char *table, const char *ctx)
+static int
+pf_table_flush_try(const char *table)
 {
 	char cmd[128];
 
 	if (!layer7_pf_table_name_ok(table))
-		return;
+		return -1;
 	snprintf(cmd, sizeof(cmd),
 	    "/sbin/pfctl -t %s -T flush 2>/dev/null", table);
-	if (!run_shell_cmd_ok(cmd))
+	return run_shell_cmd_ok(cmd) ? 0 : -1;
+}
+
+static void
+pf_table_flush_logged(const char *table, const char *ctx)
+{
+	if (pf_table_flush_try(table) != 0)
 		L7_WARN("pfctl flush failed table=%s ctx=%s",
 		    table, ctx ? ctx : "-");
 }
@@ -797,30 +912,33 @@ enforce_cache_flush(void)
 static void
 enforcement_flush_all_tables(void)
 {
-	int i;
+	int i, unavailable = 0;
 
-	pf_table_flush_logged(L7_PF_TABLE_BLOCK_DST, "flush_all");
-	pf_table_flush_logged(L7_PF_TABLE_BLOCK, "flush_all");
+	unavailable += pf_table_flush_try(L7_PF_TABLE_BLOCK_DST) != 0;
+	unavailable += pf_table_flush_try(L7_PF_TABLE_BLOCK) != 0;
 
 	for (i = 0; i < L7_BL_MAX_RULES; i++) {
 		char tbl[32];
 
 		snprintf(tbl, sizeof(tbl), "layer7_bld_%d", i);
-		pf_table_flush_logged(tbl, "flush_all");
+		unavailable += pf_table_flush_try(tbl) != 0;
 	}
 
 	for (i = 0; i < L7_MAX_POLICIES; i++) {
 		char tbl[32];
 
 		snprintf(tbl, sizeof(tbl), "layer7_pdst_%d", i);
-		pf_table_flush_logged(tbl, "flush_all");
+		unavailable += pf_table_flush_try(tbl) != 0;
 		snprintf(tbl, sizeof(tbl), "layer7_psrc_%d", i);
-		pf_table_flush_logged(tbl, "flush_all");
+		unavailable += pf_table_flush_try(tbl) != 0;
 	}
 
-	pf_table_flush_logged(L7_PF_TABLE_ALLOW_DST, "flush_all");
+	unavailable += pf_table_flush_try(L7_PF_TABLE_ALLOW_DST) != 0;
 	s_n_enforce_cache = 0;
 	s_n_allow_cache = 0;
+	if (unavailable > 0)
+		L7_DBG("flush_all: %d tabelas ausentes/indisponiveis",
+		    unavailable);
 }
 
 static int layer7_pf_add_with_selfheal(const char *table, const char *ip,
@@ -847,9 +965,11 @@ layer7_apply_block_enforcement(const struct layer7_decision *dec,
 	if (r == 0) {
 		s_pf_dst_add_ok++;
 		enforce_cache_add(tbl, ip, ttl);
-		L7_INFO("enforce_block: kind=%s table=%s ip=%s policy=%s "
-		    "reason=%s",
-		    layer7_enforce_kind_str(dec->enforce_kind), tbl, ip,
+		L7_AUDIT_NOTE(NULL,
+		    "enforce_block: kind=%s table=%s src=%s dst=%s ip=%s "
+		    "policy=%s reason=%s",
+		    layer7_enforce_kind_str(dec->enforce_kind), tbl,
+		    src_ip ? src_ip : "-", dst_ip ? dst_ip : "-", ip,
 		    dec->matched_policy_id[0] ?
 		    dec->matched_policy_id : "-",
 		    reason ? reason : "-");
@@ -1048,12 +1168,15 @@ static void
 bl_flush_rule_tables(void)
 {
 	char tbl[32];
-	int i;
+	int i, unavailable = 0;
 
 	for (i = 0; i < L7_BL_MAX_RULES; i++) {
 		snprintf(tbl, sizeof(tbl), "layer7_bld_%d", i);
-		pf_table_flush_logged(tbl, "bl_reload");
+		unavailable += pf_table_flush_try(tbl) != 0;
 	}
+	if (unavailable > 0)
+		L7_DBG("bl_reload: %d tabelas ausentes/indisponiveis",
+		    unavailable);
 }
 
 static int
@@ -1089,7 +1212,8 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 				allow_cache_add(resolved_ip, ttl);
 		}
 		s_allow_hits++;
-		L7_INFO("allowlist_dns: iface=%s domain=%s ip=%s "
+		L7_EVENT_INFO(iface,
+		    "allowlist_dns: iface=%s domain=%s ip=%s "
 		    "(%s) — pf_pass",
 		    iface ? iface : "-", domain ? domain : "-",
 		    resolved_ip ? resolved_ip : "-",
@@ -1137,7 +1261,8 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 			    "dns_blacklist_rule") == 0) {
 				s_pf_dst_add_ok++;
 				enforce_cache_add(tbl, resolved_ip, ttl);
-				L7_INFO("bl_block: iface=%s domain=%s "
+				L7_AUDIT_NOTE(iface,
+				    "bl_block: iface=%s domain=%s "
 				    "cat=%s client=%s ip=%s rule=%d/%s "
 				    "table=%s", iface ? iface : "-",
 				    domain, matched_cat ? matched_cat : "-",
@@ -1163,7 +1288,8 @@ layer7_on_dns_query(const char *iface, const char *src_ip,
 	if (strstr(qname, ".in-addr.arpa") || strstr(qname, ".ip6.arpa"))
 		return;
 
-	L7_INFO("dns_query: iface=%s src=%s resolver=%s qname=%s",
+	L7_EVENT_INFO(iface,
+	    "dns_query: iface=%s src=%s resolver=%s qname=%s",
 	    iface ? iface : "-", src_ip, resolver_ip ? resolver_ip : "-",
 	    qname);
 }
@@ -1201,18 +1327,33 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 
 	if (dec.action == LAYER7_ACTION_BLOCK ||
 	    dec.action == LAYER7_ACTION_TAG) {
-		L7_NOTE("flow_decide: iface=%s src=%s dst=%s host=%s app=%s cat=%s action=%s "
-		    "reason=%s policy=%s",
-		    iface ? iface : "-",
-		    src_ip, dst_ip ? dst_ip : "-",
-		    host ? host : "-",
-		    ndpi_app ? ndpi_app : "(null)",
-		    ndpi_cat ? ndpi_cat : "(null)",
-		    layer7_action_str(dec.action),
-		    layer7_decide_reason_str(dec.reason),
-		    dec.matched_policy_id[0] ? dec.matched_policy_id : "-");
+		if (dec.action == LAYER7_ACTION_BLOCK)
+			L7_AUDIT_NOTE(iface,
+			    "flow_decide: iface=%s src=%s dst=%s host=%s "
+			    "app=%s cat=%s action=%s reason=%s policy=%s",
+			    iface ? iface : "-", src_ip,
+			    dst_ip ? dst_ip : "-", host ? host : "-",
+			    ndpi_app ? ndpi_app : "(null)",
+			    ndpi_cat ? ndpi_cat : "(null)",
+			    layer7_action_str(dec.action),
+			    layer7_decide_reason_str(dec.reason),
+			    dec.matched_policy_id[0] ?
+			    dec.matched_policy_id : "-");
+		else
+			L7_EVENT_NOTE(iface,
+			    "flow_decide: iface=%s src=%s dst=%s host=%s "
+			    "app=%s cat=%s action=%s reason=%s policy=%s",
+			    iface ? iface : "-", src_ip,
+			    dst_ip ? dst_ip : "-", host ? host : "-",
+			    ndpi_app ? ndpi_app : "(null)",
+			    ndpi_cat ? ndpi_cat : "(null)",
+			    layer7_action_str(dec.action),
+			    layer7_decide_reason_str(dec.reason),
+			    dec.matched_policy_id[0] ?
+			    dec.matched_policy_id : "-");
 	} else {
-		L7_DBG("flow_decide: iface=%s src=%s dst=%s host=%s app=%s cat=%s action=%s "
+		L7_EVENT_DBG(iface,
+		    "flow_decide: iface=%s src=%s dst=%s host=%s app=%s cat=%s action=%s "
 		    "reason=%s",
 		    iface ? iface : "-",
 		    src_ip, dst_ip ? dst_ip : "-",
@@ -1259,7 +1400,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 					(void)pf_table_add_entry(
 					    L7_PF_TABLE_ALLOW_DST, dst_ip);
 				s_allow_hits++;
-				L7_NOTE("allowlist_flow: iface=%s host=%s "
+				L7_EVENT_NOTE(iface,
+				    "allowlist_flow: iface=%s host=%s "
 				    "dst=%s (%s) — skip block policy=%s",
 				    iface ? iface : "-", host ? host : "-",
 				    dst_ip, dom_allow ? "domain" : "ip",
@@ -1299,7 +1441,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 				    "sni_blacklist");
 				if (r == 0) {
 					s_pf_dst_add_ok++;
-					L7_INFO("sni_bl_block: iface=%s "
+					L7_AUDIT_NOTE(iface,
+					    "sni_bl_block: iface=%s "
 					    "host=%s cat=%s src=%s dst=%s "
 					    "rule=%d/%s table=%s",
 					    iface ? iface : "-", host,
@@ -1322,7 +1465,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		}
 		if (r == 1) {
 			s_pf_table_add_ok++;
-			L7_INFO("enforce_tag: iface=%s src=%s table=%s policy=%s",
+			L7_EVENT_INFO(iface,
+			    "enforce_tag: iface=%s src=%s table=%s policy=%s",
 			    iface ? iface : "-", src_ip, dec.pf_table,
 			    dec.matched_policy_id[0] ?
 			    dec.matched_policy_id : "-");
@@ -1561,6 +1705,7 @@ apply_config(int use_syslog)
 
 	memset(&p, 0, sizeof(p));
 	layer7_parse_json(buf, len, &p);
+	sync_local_log_cfg(&p);
 	sync_remote_cfg(&p);
 	if (use_syslog && p.has_syslog_remote && p.syslog_remote &&
 	    (!p.has_syslog_remote_host || p.syslog_remote_host[0] == '\0'))
@@ -1867,6 +2012,10 @@ apply_config(int use_syslog)
 			    "policies/exceptions parse falhou — snapshot runtime "
 			    "inalterado (%s)",
 			    config_path);
+		L7_NOTE("logging: detailed=%d event_ifaces=%d max_mb=%d "
+		    "rotated=%d",
+		    s_event_log_enabled, s_n_event_interfaces,
+		    s_log_file_max_mb, s_log_file_keep);
 	}
 	return 0;
 }
@@ -2104,6 +2253,8 @@ int main(int argc, char **argv)
 	sigaction(SIGUSR1, &sa, NULL);
 
 	s_boot_time = time(NULL);
+	s_last_stats_write = s_boot_time;
+	s_last_periodic_log = s_boot_time;
 
 	openlog("layer7d", LOG_PID | LOG_CONS, LOG_DAEMON);
 	syslog(LOG_NOTICE, "daemon_start version=%s", layer7d_version);
@@ -2130,6 +2281,7 @@ int main(int argc, char **argv)
 	memset(&s_lic, 0, sizeof(s_lic));
 	s_last_lic_check = time(NULL);
 	if (layer7_license_check(&s_lic) == 0) {
+		s_license_state = (s_lic.grace || s_lic.dev_mode) ? 2 : 1;
 		if (s_lic.dev_mode)
 			L7_WARN("license: DEV MODE — no production key "
 			    "embedded; enforce allowed");
@@ -2142,6 +2294,7 @@ int main(int argc, char **argv)
 			    s_lic.features, s_lic.days_left);
 		refresh_enforce_cfg();
 	} else {
+		s_license_state = 0;
 		L7_WARN("license: INVALID — %s", s_lic.error);
 		L7_WARN("license: enforce disabled, monitor-only mode");
 		s_ge = 0;
@@ -2225,7 +2378,7 @@ int main(int argc, char **argv)
 			aggregate_capture_stats();
 			write_stats_json();
 #if HAVE_NDPI
-			L7_NOTE(
+			L7_DBG(
 			    "SIGUSR1 stats: ver=%s reload_ok=%llu snapshot_fail=%llu "
 			    "sighup=%llu usr1=%llu loop_ticks=%llu "
 			    "policies=%d exceptions=%d enforce_cfg=%d "
@@ -2250,7 +2403,7 @@ int main(int argc, char **argv)
 			    (unsigned long long)s_cap_flows_expired,
 			    s_n_captures);
 #else
-			L7_NOTE(
+			L7_DBG(
 			    "SIGUSR1 stats: ver=%s reload_ok=%llu snapshot_fail=%llu "
 			    "sighup=%llu usr1=%llu loop_ticks=%llu "
 			    "policies=%d exceptions=%d enforce_cfg=%d "
@@ -2392,40 +2545,58 @@ int main(int argc, char **argv)
 			time_t tnow = time(NULL);
 			if (tnow - s_last_lic_check >= L7_LIC_CHECK_INTERVAL) {
 				struct l7_license_info li;
-				int prev_ge;
+				int prev_ge, new_state;
 
 				s_last_lic_check = tnow;
 				memset(&li, 0, sizeof(li));
 				prev_ge = s_ge;
 				if (layer7_license_check(&li) == 0) {
+					new_state = (li.grace || li.dev_mode) ? 2 : 1;
 					s_lic = li;
 					refresh_enforce_cfg();
-					if (li.grace)
+					if (new_state != s_license_state &&
+					    li.grace)
 						L7_WARN("license_recheck: %s",
 						    li.error);
+					else if (new_state != s_license_state)
+						L7_NOTE("license_recheck: valid "
+						    "customer=%s days_left=%d",
+						    li.customer, li.days_left);
+					else
+						L7_DBG("license_recheck: unchanged "
+						    "state=%s",
+						    new_state == 2 ?
+						    "grace/dev" : "valid");
 				} else {
+					new_state = 0;
 					s_lic = li;
-					L7_WARN("license_recheck: INVALID — "
-					    "%s", li.error);
-					L7_WARN("license_recheck: enforce "
-					    "disabled, monitor-only");
+					if (new_state != s_license_state) {
+						L7_WARN("license_recheck: INVALID — "
+						    "%s", li.error);
+						L7_WARN("license_recheck: enforce "
+						    "disabled, monitor-only");
+					} else
+						L7_DBG("license_recheck: unchanged "
+						    "state=invalid");
 					s_ge = 0;
 					enforce_ge_downgrade(prev_ge,
 					    "license_recheck");
 				}
+				s_license_state = new_state;
 			}
 		}
 
 		s_loop_ticks++;
 		tick++;
 		if (s_have_parse && cfg_disabled(&s_parsed)) {
-			if (tick % 20 == 0)
-				L7_INFO("layer7.enabled=false — still idle");
+			if (tick % 360 == 0)
+				L7_DBG("layer7.enabled=false — still idle");
 			sleep(60);
 		}
 #if HAVE_NDPI
 		else if (s_n_captures > 0) {
 			int j, total = 0;
+			time_t loop_now;
 			for (j = 0; j < s_n_captures; j++) {
 				int r = layer7_capture_poll(s_captures[j], 64);
 				if (r > 0)
@@ -2434,9 +2605,14 @@ int main(int argc, char **argv)
 			enforce_cache_sweep();
 			if (total == 0)
 				usleep(10000);
-			if (tick % 600 == 0 && tick > 0) {
+			loop_now = time(NULL);
+			if (loop_now - s_last_stats_write >= 60) {
 				aggregate_capture_stats();
 				write_stats_json();
+				s_last_stats_write = loop_now;
+			}
+			if (loop_now - s_last_periodic_log >= 3600) {
+				s_last_periodic_log = loop_now;
 				L7_INFO(
 				    "periodic: reload_ok=%llu policies=%d "
 				    "exceptions=%d enforce=%d "
@@ -2452,7 +2628,9 @@ int main(int argc, char **argv)
 		}
 #endif
 		else {
-			if (tick % 120 == 0 && tick > 0)
+			time_t loop_now = time(NULL);
+			if (loop_now - s_last_periodic_log >= 3600) {
+				s_last_periodic_log = loop_now;
 				L7_INFO(
 				    "periodic_state: reload_ok=%llu "
 				    "snapshot_fail=%llu policies=%d "
@@ -2461,6 +2639,7 @@ int main(int argc, char **argv)
 				    (unsigned long long)s_reload_ok,
 				    (unsigned long long)s_snapshot_fail, s_np,
 				    s_nx, s_ge);
+			}
 			sleep(30);
 		}
 	}

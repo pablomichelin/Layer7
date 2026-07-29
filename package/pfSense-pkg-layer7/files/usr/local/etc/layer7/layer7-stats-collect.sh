@@ -25,9 +25,9 @@ if [ ! -f "${PIDFILE}" ]; then
 fi
 
 _pid=""
-if ! read -r _pid <"${PIDFILE}" 2>/dev/null; then
+read -r _pid <"${PIDFILE}" 2>/dev/null || [ -n "${_pid}" ] || {
 	exit 0
-fi
+}
 _pid=$(printf '%s' "$_pid" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 if [ -z "${_pid}" ]; then
 	exit 0
