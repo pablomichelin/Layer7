@@ -40,9 +40,11 @@ Entregar: resumo, ficheiros, implementacao, teste minimo, risco, rollback, docs 
 
 O Layer7 **classifica e decide** politicas por cliente/grupo/interface/prioridade, mas **impoe bloqueio de forma global** via tabela PF unica `layer7_block_dst`. Por isso:
 
-- Bloquear YouTube para o filho pode bloquear YouTube para toda a LAN.
-- A GUI promete politicas por dispositivo/grupo; o PF nao cumpre.
-- O atalho DNS (`layer7_domain_is_blocked`) ignora origem, excepcoes, allow e prioridade.
+- Bloquear YouTube para o filho pode bloquear YouTube para toda a LAN (**com `legacy_global`**, default).
+- A GUI promete politicas por dispositivo/grupo; com **`legacy_global`** o PF nao cumpre per-client.
+- **Pos-E1/E3 (codigo actual):** DNS e nDPI usam `layer7_decide_for_client()` em ambos os modos;
+  a limitacao legacy e **runtime PF** (`layer7_block_dst` global), nao o atalho
+  `layer7_domain_is_blocked()` (deprecado em runtime).
 
 O **Caminho A** (inventario, MAC→IP, SNI opt-in, UX perfis) esta concluido em `1.8.11_23`, mas **nao corrigiu enforcement**. Este **Caminho B** corrige a camada PF e unifica decisao.
 
@@ -73,12 +75,12 @@ Captura (DNS / nDPI / SNI)
 
 ### Evidencia no codigo
 
-| Problema | Ficheiro | Linhas / funcao |
-|----------|----------|-----------------|
-| DNS ignora cliente na politica manual | `src/layer7d/main.c` | `layer7_on_dns_resolved` → `layer7_domain_is_blocked` sem `client_ip` |
-| Atalho DNS incompleto | `src/layer7d/policy.c` | `layer7_domain_is_blocked()` — so block+schedule+host |
-| nDPI decide certo, aplica global | `src/layer7d/main.c` | `layer7_on_classified_flow` → `L7_PF_TABLE_BLOCK_DST` |
-| PF global sem `from` | `package/.../layer7.inc` | `block drop quick inet to <layer7_block_dst>` |
+| Problema (pre-E1) | Ficheiro | Estado pos-E1/E3 |
+|----------|----------|------------------|
+| DNS ignorava cliente na imposicao PF global | `main.c` `layer7_on_dns_resolved` | **Corrigido em decisao** via `layer7_decide_for_client(client_ip)`; legacy ainda popula `layer7_block_dst` |
+| Atalho DNS incompleto (`layer7_domain_is_blocked`) | `policy.c` | **Nao usado em runtime** desde E1; funcao mantida para compat/tests |
+| nDPI decide certo, aplica global | `main.c` `layer7_on_classified_flow` | **Scoped:** `layer7_pdst_N`/`layer7_psrc_N`; **legacy:** `layer7_block_dst` |
+| PF global sem `from` | `layer7.inc` | Inalterado em `legacy_global`; E2 gera regras `from … to <layer7_pdst_N>` em `scoped_hybrid` |
 | App+host = OR (alarga bloqueio) | `src/layer7d/policy.c` | `rule_matches()` |
 | Blacklists escopadas (modelo certo) | `package/.../layer7.inc` | `from {cidr} to <layer7_bld_N>` |
 | CLI `-e` vs runtime divergem | `src/layer7d/enforce.c` vs `main.c` | CLI sugere `layer7_block`; runtime usa `block_dst` |
@@ -162,7 +164,7 @@ int layer7_decide_for_client(
     struct layer7_decision *dec);
 ```
 
-`layer7_domain_is_blocked()` → **deprecar**; manter so em `legacy_global`.
+`layer7_domain_is_blocked()` → **deprecado em runtime**; mantido no codigo para compatibilidade/tests.
 
 ---
 
@@ -223,7 +225,7 @@ sh tests/run-local.sh          # exit 0
 **Entregas:**
 - [x] Implementar `layer7_decide_for_client()` em [`policy.c`](../../src/layer7d/policy.c) / [`policy.h`](../../src/layer7d/policy.h)
 - [x] Estender `struct layer7_decision` (enforce_kind, policy_table_idx, etc.)
-- [x] [`layer7_on_dns_resolved`](../../src/layer7d/main.c): passar `client_ip`; se `scoped_hybrid` → decisao unificada; se `legacy_global` → manter atalho actual
+- [x] [`layer7_on_dns_resolved`](../../src/layer7d/main.c): passar `client_ip`; **ambos** os modos usam `layer7_decide_for_client()`; scoped → `layer7_pdst_N`; legacy → `layer7_block_dst`
 - [x] Resolver indice estavel de politica: funcao `layer7_policy_table_index(rules, n, policy_id)` — mesma ordem que `layer7_policies_sort()`
 - [x] Garantir: excepcoes → politicas (priority desc) → default allow/monitor
 - [x] Novo [`tests/functional/test_policy_decide.c`](../../tests/functional/test_policy_decide.c)
@@ -241,7 +243,7 @@ sh tests/run-local.sh          # exit 0
 | 6 | Politica disabled | no block |
 | 7 | Grupo expandido (src_cidrs de group) | block so dentro do grupo |
 
-**Rollback:** `enforcement_model=legacy_global` usa `layer7_domain_is_blocked`.
+**Rollback:** `enforcement_model=legacy_global` repoe imposicao via `layer7_block_dst` (decisao continua unificada).
 
 **Risco:** medio (logica core; coberto por testes unitarios).
 
@@ -394,9 +396,10 @@ Passos:
 - [ ] [`tests/functional/test_policy_decide.c`](../../tests/functional/test_policy_decide.c) — completo
 - [ ] Novo [`tests/lab/smoke-enforcement-scoped.sh`](../../tests/lab/smoke-enforcement-scoped.sh):
   ```bash
-  # Verifica: layer7d activo, enforcement_model=scoped_hybrid,
-  # regras layer7_pdst no pfctl -sr, two-client (manual ou scripted se lab tiver 2 VMs)
+  # Modo estatico (workspace): verifica testes E1/E2/E3 e layer7.inc
+  # Modo appliance: enforcement_model=scoped_hybrid, regras layer7_pdst, two-client (L7_CLIENT_A/B)
   ```
+- [x] Script diagnostico [`scripts/diagnose-layer7-appliance.sh`](../../scripts/diagnose-layer7-appliance.sh) — versao, licenca, mode, tabelas PF, logs
 - [ ] Actualizar [`docs/tests/test-matrix.md`](../tests/test-matrix.md) — pontos 13.x enforcement scoped
 - [ ] Actualizar [`docs/04-package/validacao-lab.md`](../04-package/validacao-lab.md) — **seccao 12**
 - [ ] [`layer7_diagnostics.php`](../../package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_diagnostics.php): mostrar enforcement_model, tabelas pdst/psrc por politica
@@ -442,10 +445,14 @@ Marcar `[x]` ao concluir cada item.
 - [x] E1 concluido
 - [x] E2 concluido
 - [x] E3 codigo concluido (gate appliance two-client **pendente**)
-- [ ] E4 concluido
-- [ ] E5 concluido
+- [ ] E4 parcial (`_25`): GUI recusa block scoped sem
+      origem/global/quarentena; `match_mode` completo continua pendente
+- [ ] E5 parcial (`_25`): match app/categoria escolhe `psrc`; host escolhe
+      `pdst`; gate appliance continua pendente
 - [ ] E6 concluido
-- [ ] E7 concluido
+- [ ] E7 parcial (2026-07-29): regressões PID/interface/psrc/híbrido +
+      `smoke-enforcement-scoped.sh` e diagnóstico; build/gate appliance
+      **pendentes**
 - [ ] E8 concluido
 
 ### Definition of Done — 100%
@@ -473,12 +480,12 @@ Ver checkboxes acima. **Todos** devem estar `[x]` antes de declarar Caminho B co
 | # | Achado | Bloco | Estado |
 |---|--------|-------|--------|
 | 1 | layer7_block_dst global | E2, E3, E8 | E2 PF gerado; E3 runtime concluido (gate appliance pendente) |
-| 2 | layer7_domain_is_blocked ignora origem | E1 | concluido (E1) |
+| 2 | layer7_domain_is_blocked atalho legacy | E1 | runtime removido; decisao unificada em ambos modos |
 | 3 | nDPI decide certo, aplica errado | E3 | codigo concluido; gate appliance pendente |
 | 4 | App+host OR | E4 | pendente |
 | 5 | Blacklists como modelo | E2 | concluido (E2) |
 | 6 | CLI vs runtime inconsistente | E3 | codigo concluido (E3) |
-| 7 | Sem testes policy | E7 | pendente |
+| 7 | Sem testes policy / smoke scoped | E7 | parcial — smoke estatico + diagnose; gate appliance pendente |
 | 8 | IPv4 only | E8 | pendente |
 | 9 | sni_inspection OFF default | E6 | pendente |
 | 10 | Catch-all match vazio | E4 | pendente |
@@ -506,6 +513,7 @@ Ver checkboxes acima. **Todos** devem estar `[x]` antes de declarar Caminho B co
 | BG-050 | Caminho B / E5 — hibrido app=origem site=destino | E5 | M |
 | BG-051 | Caminho B / E6 — SNI/CDN/anti-bypass | E6 | M |
 | BG-052 | Caminho B / E7/E8 — testes two-client + release default scoped | E7/E8 | G |
+| BG-053 | Estabilizacao `_25` — PID, interface real e integração scoped | E4/E5/E7 | M |
 
 ---
 
@@ -585,4 +593,5 @@ E0 ──→ E1 ──→ E2 ──→ E3 ──→ E4 ──→ E5 ──→ E6
 | 2026-06-15 | **E0 concluido:** ADR-0014, flag enforcement_model, parse, GUI, backlog BG-045..052 |
 | 2026-06-15 | **E1 concluido:** `layer7_decide_for_client()`, struct decision estendida, DNS scoped vs legacy, test_policy_decide.c (7 cenarios) |
 | 2026-06-16 | **Build E3:** `pfSense-pkg-layer7-1.8.11_23.pkg` no builder apos sync local; gate two-client **PENDENTE** (SSH/instalacao/clientes) |
-| 2026-06-15 | **E3 codigo concluido:** runtime daemon popula pdst/psrc; cache (table,ip); enforce.c/CLI -e; test_enforce_scoped.c. Gate two-client appliance pendente |
+| 2026-07-29 | **E7 parcial:** `smoke-enforcement-scoped.sh`, `diagnose-layer7-appliance.sh` ampliado; docs F0 actualizados; artefacto `_24` em `artifacts/`; gate two-client continua **PENDENTE** |
+| 2026-07-29 | **Diagnóstico + candidato `_25`:** appliance `_24` passivo, pfSense Plus 26.03.1/FreeBSD 16; reproduzidos PID sem newline, `lan` sem captura, regra scoped ausente e caminho híbrido errado; código/testes/build FreeBSD PASS (`SHA256=c4e9c…388d`); instalação e gate continuam **PENDENTES** |

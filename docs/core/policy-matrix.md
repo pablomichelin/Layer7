@@ -9,19 +9,30 @@
 | `monitor` | Apenas log/evento; sem alteração PF |
 | `tag` | Incluir endpoint em PF table (alias) para uso em regras manuais ou encadeadas |
 
-## Objeto `match`
+## Objeto de política actual
 
-Todos os campos são **opcionais**; ausência = “qualquer”. Pelo menos um critério deve existir (validação GUI).
+| Campo | Tipo | Semântica implementada |
+|-------|------|------------------------|
+| `interfaces` | string[] (top-level) | nomes reais de captura/PF; `lan`/`optN` são migrados |
+| `match.src_hosts` | IPv4[] | origem exacta |
+| `match.src_cidrs` | CIDR[] | origem na rede |
+| `match.groups` | id[] | expande hosts/CIDRs/dispositivos do grupo |
+| `match.hosts` | domínio[] | exacto ou subdomínio; DNS/SNI/HTTP Host |
+| `match.ndpi_category` | string[] | match exacto; quando presente funciona como condição obrigatória |
+| `match.ndpi_app` | string[] | match exacto |
 
-| Campo | Tipo | Exemplo |
-|-------|------|---------|
-| `interfaces` | string[] | `["lan"]` |
-| `src_net` | CIDR[] | `["10.0.0.0/24"]` |
-| `dst_net` | CIDR[] | |
-| `ndpi_category` | string[] | nDPI category name (**match exato** no daemon V1) |
-| `ndpi_app` | string[] | app protocol name (**match exato** no `layer7d` V1; substring = backlog) |
-| `ndpi_master` | string[] | master protocol |
-| `dst_port` | int / range | opcional |
+`ndpi_master`, `dst_net` e `dst_port` **não estão implementados** no motor
+actual e não devem ser apresentados como critérios disponíveis.
+
+### AND/OR e enforcement scoped
+
+- interface/origem/schedule são condições obrigatórias;
+- quando `ndpi_app` e `hosts` coexistem, a relação actual é **OR**;
+- match por app/categoria usa `layer7_psrc_N`;
+- match por host usa `layer7_pdst_N`;
+- block em `scoped_hybrid` exige origem efectiva, `scope_global` explícito ou
+  `quarantine_origin`; a GUI do candidato `_25` recusa a ausência de escopo;
+- `match_mode` configurável continua backlog E4 e `_25` não fecha E4.
 
 ## Modo global `monitor` vs `enforce`
 

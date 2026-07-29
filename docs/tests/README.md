@@ -22,10 +22,12 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 |----------|-------|-----------|
 | `tests/functional/test_allowlist.c` | Fase 1 | allowlist, rejeição `/0`, seed |
 | `tests/functional/test_config_parse.c` | A3 / E0 | parse JSON (`sni_inspection`, `enforcement_model`) |
-| `tests/functional/test_policy_decide.c` | E1 | `layer7_decide_for_client()`, `scope_global`, `quarantine_origin` |
+| `tests/functional/test_policy_decide.c` | E1/E5 | decisão, escopo de origem, app=`psrc` / host=`pdst` |
 | `tests/functional/test_enforce_scoped.c` | E3 | runtime PF escopado (`pdst_N` / `psrc_N`), cache TTL |
 | `tests/functional/test_bl_src_match.c` | pós-REV-007 | `except_ips` em `l7_bl_rule_matches_src()` |
-| `tests/functional/test_scoped_pf_inc.php` | E2 | simulação regras PF `scoped_hybrid` em `layer7.inc` |
+| `tests/functional/test_scoped_pf_inc.php` | E2/E4 | regras PF scoped, quarentena executável e validação de escopo |
+| `tests/functional/test_interface_normalization.php` | BG-053 | `lan`/`optN` → interface real em todos os consumidores |
+| `tests/unit/test_rc_pidfile.sh` | BG-053 | pidfile `daemon(8)` sem newline |
 - `make -C src/layer7d check` após `make` no mesmo diretório.
 - `cd license-server/backend && npm test` para smoke tests puros da trilha
   de sessao/Bearer do painel administrativo.
@@ -49,12 +51,12 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 ## Matriz de testes
 
-[`test-matrix.md`](test-matrix.md) — 82 testes divididos por categoria
+[`test-matrix.md`](test-matrix.md) — 88 testes divididos por categoria
 (build, instalação, daemon, config, policy engine, enforcement **inclui F4.3
 `force_dns` / anchor NAT e anti-QUIC opcional (ponto 6.7 / sec. 11)**, **blacklists F4.2 (12.1–12.2)**,
 GUI, observabilidade, rollback e
-addendum de licenciamento/activação da F3). Estado actual: 74 OK e **8**
-pendentes (1 em daemon F4.1 ponto 3.8; 2 em blacklists F4.2; 1 em enforcement F4.3; 4 no addendum F3.6).
+addendum de licenciamento/activação da F3 e estabilização `_25`). Estado
+actual: 78 OK e **10** pendentes (inclui build/appliance `_25` e two-client).
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):
 parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em

@@ -522,6 +522,11 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   3.8), **F4.2** / BG-010 (10b, 12.1–12.2), **F4.3** / BG-011 (11, 6.7) antes
   de declarar cada trilha fechada em relatório.
 - **Port no branch (`2026-04-24`):** `1.8.11_12` (`package/pfSense-pkg-layer7/Makefile`) — consolida entregas cumulativas F4.1–F4.3; F4.2 `PORTREVISION` `7` (reload seguro de blacklists, etc.); F4.3 `PORTREVISION` `8`–`12` — `force_dns` deduplica pares (interface, CIDR), ordena interfaces e CIDRs por regra no anchor NAT; `_11`–`_12`: validação de nomes PF via `layer7_pf_ifname_for_rules` em `force_dns` e anti-QUIC (DRY; ver `f4-plano-de-implementacao.md`).
+- **Estabilização pré-gate (`2026-07-29`, candidato `1.8.11_25`):**
+  diagnóstico no pfSense Plus real abriu BG-053. Código/testes corrigem
+  leitura do pidfile sem newline, migração `lan/optN` para interface real,
+  execução `psrc` e caminho híbrido app/host. Release pública permanece
+  `_24`; build, captura real, monitor passivo e two-client ainda são gates.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

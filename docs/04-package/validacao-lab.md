@@ -801,9 +801,14 @@ existem por tras de cada segmento. Apos **Apply** / reload do filtro:
 YouTube (ou equivalente) para o cliente **A** nao bloqueia o cliente **B** na
 mesma LAN. Este gate e **obrigatorio** antes de avancar para E4.
 
-**Estado:** **PENDENTE** (gate two-client nao executado; ver *Build E3* abaixo).
+**Estado:** **PENDENTE**. Em `2026-07-29`, o acesso SSH read-only ao appliance
+foi restabelecido e `_24` foi confirmado instalado, intencionalmente
+`enabled=false` / `mode=monitor`. O diagnóstico abriu o candidato `_25`; não
+houve activação nem alteração do pfSense.
 
-**Onde:** appliance pfSense CE lab (`192.168.100.254` ou equivalente).
+**Onde:** appliance `192.168.100.254` ou lab equivalente. O equipamento real
+observado é **pfSense Plus 26.03.1 / FreeBSD 16.0-CURRENT**, não pfSense CE;
+registar essa diferença como parte do gate de compatibilidade.
 
 ### Build E3 (2026-06-16, builder `192.168.100.12`)
 
@@ -811,11 +816,26 @@ mesma LAN. Este gate e **obrigatorio** antes de avancar para E4.
 |------|-----------|
 | Sync | tar+SSH ficheiros E0–E3 do workspace local → `/root/pfsense-layer7` (sem commit) |
 | Compilacao | **OK** apos forward declaration de `layer7_pf_add_with_selfheal` em `main.c` |
-| Artefacto | `pfSense-pkg-layer7-1.8.11_23.pkg` (~2,3 MiB) em `package/pfSense-pkg-layer7/work/pkg/` no builder; copia local em `artifacts/pfSense-pkg-layer7-1.8.11_23.pkg` |
+| Artefacto | `pfSense-pkg-layer7-1.8.11_24.pkg` (~2,3 MiB) — release publica GitHub `v1.8.11_24`; copia local opcional em `artifacts/` |
 | Instalacao appliance | **nao executada** |
 | Gate sec.12 | **PENDENTE** |
 
-**Bloqueios para instalacao/gate (2026-06-16):**
+### Pré-gate do candidato `_25` (obrigatório antes do two-client)
+
+Build FreeBSD concluído: `pfSense-pkg-layer7-1.8.11_25.pkg`,
+`SHA256=c4e9c197f79ad00d7ddb68f8ececcd391455e86011e558596102877c325d388d`.
+
+1. Verificar novamente esse SHA256 antes de qualquer instalação.
+2. Instalar com Layer7 desactivado/monitor e confirmar **uma única** árvore
+   `daemon(8) + layer7d`.
+3. `service layer7d onestatus` deve reconhecer o PID gravado sem newline.
+4. `layer7.json` deve conter interfaces reais (`vmx0`, `vmx0.10`, etc.), não
+   IDs amigáveis `lan`/`optN`.
+5. Em monitor: zero regras Layer7 `block drop` e tabelas dinâmicas vazias.
+6. Após activar apenas captura/monitor na interface do cliente de teste,
+   evidenciar `captures > 0` e `cap_pkts > 0` antes de usar enforce.
+
+**Bloqueios históricos para instalacao/gate (2026-06-16):**
 
 1. **SSH a partir desta estacao de operacao:** `192.168.100.254:22` responde a
    ICMP mas **timeout** em TCP/22 (firewall/rede); impede `pkg add` e passos do
@@ -826,9 +846,47 @@ mesma LAN. Este gate e **obrigatorio** antes de avancar para E4.
 3. **Clientes A/B (`10.0.0.10`, `10.0.0.20`):** nao acessiveis deste ambiente
    para `curl`/navegacao exigidos nos passos 4–5.
 
+Os itens 1–2 de acesso SSH foram superados em `2026-07-29` (login `admin`,
+menu opção 8). O item 3 e uma janela de teste controlada continuam pendentes.
+Não usar clientes reais de produção como A/B sem escolha humana explícita.
+
 **Proximo passo operacional:** instalar o `.pkg` no pfSense (GUI *System → Package Manager* ou
 `pkg add` via SSH a partir de rede com acesso) e executar o roteiro abaixo com
 evidencias; so entao marcar **PASS**.
+
+### Diagnostico e smoke (E7)
+
+Antes ou durante o gate, recolher estado com:
+
+```sh
+# Copiar e executar no pfSense; por defeito nao sinaliza nem reinicia o daemon
+scp scripts/diagnose-layer7-appliance.sh root@192.168.100.254:/tmp/
+ssh root@192.168.100.254 'sh /tmp/diagnose-layer7-appliance.sh' | tee evidence/l7-diag.txt
+```
+
+`L7_DIAG_REFRESH_STATS=1` envia `SIGUSR1` e fica reservado ao lab. Em
+produção, manter o default passivo.
+
+Smoke automatizado (modo **appliance** — correr **no** pfSense apos configurar scoped):
+
+```sh
+sh tests/lab/smoke-enforcement-scoped.sh
+# Two-client opcional (SSH batch dos clientes lab):
+L7_CLIENT_A=10.0.0.10 L7_CLIENT_B=10.0.0.20 sh tests/lab/smoke-enforcement-scoped.sh
+```
+
+Modo **estatico** (workspace Mac/CI, sem SSH ao appliance):
+
+```sh
+sh tests/lab/smoke-enforcement-scoped.sh   # verifica testes E1-E3 e layer7.inc; SKIP gate appliance
+```
+
+**Artefacto release:** `pfSense-pkg-layer7-1.8.11_24.pkg` — GitHub tag `v1.8.11_24` ou:
+
+```sh
+gh release download v1.8.11_24 --repo pablomichelin/Layer7 \
+  --pattern 'pfSense-pkg-layer7-1.8.11_24.pkg*' --dir artifacts/
+```
 
 ### Pre-requisitos
 

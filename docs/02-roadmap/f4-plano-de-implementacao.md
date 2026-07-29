@@ -92,6 +92,13 @@ PID numerico); `PORTREVISION` `4` (`1.8.11_4`).
 `layer7_ensure_daemon_running`, `layer7_restart_service`, `layer7_signal_reload`,
 `layer7_read_stats`, `layer7_status.php`, `layer7_diagnostics.php`;
 `PORTREVISION` `6` (`1.8.11_6`).
+**Bloco de regressão (`1.8.11_25`, candidato):** diagnóstico no appliance
+confirmou que `daemon(8)` grava o PID sem newline. `read` preenchia a variável,
+mas retornava erro; `status` falhava e `reload` podia duplicar o daemon.
+`layer7d_pid_from_file` passa a aceitar EOF com PID preenchido e
+`test_rc_pidfile.sh` cobre o formato real. O mesmo bloco migra IDs amigáveis
+de interface para nomes reais libpcap/PF; gates no appliance permanecem
+pendentes.
 
 **Liga a:** BG-009.
 

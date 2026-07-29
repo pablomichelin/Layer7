@@ -220,6 +220,19 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 
 ---
 
+## 13. Candidato `1.8.11_25` — estabilização pré-gate
+
+| # | Teste | Onde | Status |
+|---|-------|------|--------|
+| 13.1 | PID gerado por `daemon(8)` sem newline é aceite por `layer7d_pid_from_file` | local/builder | OK (`test_rc_pidfile.sh`) |
+| 13.2 | `lan`/`optN` migram para interface real em captura, política, excepção, anti-QUIC e relatório | builder PHP | OK (`test_interface_normalization.php`) |
+| 13.3 | `quarantine_origin` emite regra `psrc`; block scoped sem origem/global/quarentena é rejeitado | builder PHP | OK (`test_scoped_pf_inc.php`) |
+| 13.4 | política mista escolhe app/categoria=`psrc` e host=`pdst`; origem estática autoriza `psrc` | local C | OK (`test_policy_decide.c`) |
+| 13.5 | Após instalar `_25`: `onestatus` coerente, uma instância, JSON com interface real, monitor sem block e `cap_pkts > 0` | pfSense Plus 26.03.1 | Pendente |
+| 13.6 | Two-client A bloqueado/B permitido em DNS/SNI/nDPI | appliance/lab | Pendente (`validacao-lab` sec. 12) |
+
+---
+
 ## Resumo
 
 | Categoria | Total | OK | Pendente |
@@ -236,7 +249,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Rollback | 3 | 3 | 0 |
 | Licenciamento/activação | 20 | 16 | 4 |
 | Blacklists UT1 (F4.2) | 2 | 0 | 2 |
-| **Total** | **82** | **74** | **8** |
+| Estabilização `_25` | 6 | 4 | 2 |
+| **Total** | **88** | **78** | **10** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

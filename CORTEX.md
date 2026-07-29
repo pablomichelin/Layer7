@@ -51,6 +51,25 @@ pos-revisao 2026-06-15 (detalhes em `CHANGELOG [1.8.11_24]`; BG-045..BG-048
 OFF por defeito. Gate two-client (validacao-lab sec. 12) **PENDENTE** — nao
 avancar E4 sem PASS no appliance.
 
+### Candidato `1.8.11_25` — estabilização pré-gate (não publicado)
+
+Diagnóstico read-only no appliance em `2026-07-29` confirmou `_24` instalado
+e intencionalmente passivo (`enabled=false`, `mode=monitor`), licença válida,
+zero regras PF Layer7 de block e zero capturas. Foram reproduzidas quatro
+falhas no código publicado: PID sem newline quebrava `status`/`reload`; `lan`
+era gravado onde libpcap exige `vmx0`; políticas scoped podiam gerar tabelas
+sem regra PF; e match app+host escolhia sempre `pdst`.
+
+O branch prepara `1.8.11_25` como **candidato interno** com correcções de
+ciclo de vida, migração para interface real, `psrc` executável e escolha
+app=`psrc`/host=`pdst`. Gates locais, PHP e build FreeBSD: PASS; artefacto
+local `pfSense-pkg-layer7-1.8.11_25.pkg`,
+`SHA256=c4e9c197f79ad00d7ddb68f8ececcd391455e86011e558596102877c325d388d`.
+Instalação e gate two-client no appliance: **PENDENTES**. A release
+pública continua `_24`; não activar nem publicar `_25` antes desses gates.
+O appliance observado é pfSense Plus `26.03.1` / FreeBSD `16.0-CURRENT`, não
+pfSense CE; essa compatibilidade real deve ser validada explicitamente.
+
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
 Artefacto `pfSense-pkg-layer7-1.8.11_23.pkg`
@@ -87,8 +106,11 @@ Plano SSOT: `docs/09-blocking/plano-enforcement-100-porcento.md`; ADR-0014.
   `config_parse`; selector em Settings; **sem alteracao de runtime PF** ate E2.
 - **E1 (BG-046) decisao unificada:** `layer7_decide_for_client()` em
   `policy.c`; `struct layer7_decision` estendida (`enforce_kind`,
-  `policy_table_idx`); DNS em `scoped_hybrid` usa cadeia completa (excepcoes
-  → politicas → default); `legacy_global` mantem `layer7_domain_is_blocked`;
+  `policy_table_idx`); DNS e nDPI usam a mesma cadeia (excepcoes → politicas
+  → default) em **ambos** os modos; a diferenca e runtime PF: `legacy_global`
+  popula `layer7_block_dst` (global por destino); `scoped_hybrid` popula
+  `layer7_pdst_N` / `layer7_psrc_N`; `layer7_domain_is_blocked()` permanece
+  no codigo mas **nao** e chamado em runtime desde E1/E3;
   7 testes em `test_policy_decide.c` (run-local).
 - **E2 (BG-047) PF escopado no pacote:** `layer7_policy_enforcement_rules_text()`
   em `layer7.inc` (so `scoped_hybrid`+enforce); tabelas `layer7_pdst_N` /
@@ -102,7 +124,9 @@ Plano SSOT: `docs/09-blocking/plano-enforcement-100-porcento.md`; ADR-0014.
   cache TTL por `(table, ip)`; `enforce.c` + CLI `-e` alinhados;
   `test_enforce_scoped.c` (run-local). **Gate two-client appliance
   pendente** (nao avancar E4 sem gate).
-- **E4–E8 (BG-049..BG-052):** pendentes — semantica match, testes lab, release.
+- **E4/E5/E7 (BG-049/BG-050/BG-052):** parcialmente endereçados no candidato
+  `_25` (validação de escopo GUI, caminho app=`psrc`/host=`pdst`, regressões);
+  gate appliance, semântica completa, CDN/ECH e release continuam pendentes.
 
 O plano mestre historico `docs/09-blocking/blocking-master-plan.md` (fases A–F,
 v1.0.0) esta **concluido**; a trilha activa pos-V1 e Caminho B sobre
@@ -160,9 +184,9 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_24` (`PORTVERSION=1.8.11`, `PORTREVISION=24`),
-alinhada a **release publica** `v1.8.11_24` (Caminho B E0–E3; gate two-client
-pendente).
++ `PORTREVISION`):** `1.8.11_25` (`PORTVERSION=1.8.11`, `PORTREVISION=25`),
+**candidato interno não publicado**. A release pública permanece
+`v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
@@ -821,19 +845,21 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-06-16
+- Data base: 2026-07-29
 - Produto: Layer7 para pfSense CE
 - Ultima versao .pkg publicada (referencia operacional): 1.8.11_24
   (SHA256 1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818;
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: two-client appliance (validacao-lab sec. 12) antes de E4-E8
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 24 (release publica)
-- Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados
+- Proximo gate: instalar _25 em passivo + monitor/captura + two-client appliance
+  (validacao-lab sec. 12) antes de release/default scoped
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 25 (candidato nao publicado)
+- Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
+  _25 em curso, sem activacao no appliance
 - Estado documental: governanca F0 consolidada; revisao pre-install 2026-06-15
   parcialmente enderecada em _24 (ver docs/09-blocking/revisao-codigo-*)
-- Fase actual: pos-V1 — Caminho B (E4-E8 pendentes apos gate E3)
+- Fase actual: pos-V1 — Caminho B (E4/E5/E7 parciais; gates pendentes)
 - Reorganizacao fisica autorizada: nao (F6)
 - Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_24)
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md

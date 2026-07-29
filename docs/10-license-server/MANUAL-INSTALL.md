@@ -125,6 +125,23 @@ resync PF, `except_ips`, TTL em blacklists, etc.). Testes locais PASS;
 **gate two-client no appliance** (`validacao-lab.md` sec. 12) permanece
 **PENDENTE** — não activar `scoped_hybrid` em produção sem gate PASS.
 
+**Addendum do candidato `1.8.11_25` (não publicado):**
+O branch contém correcções de PID sem newline, migração automática de IDs
+`lan`/`optN` para nomes reais libpcap/PF e integração `psrc`/`pdst` scoped.
+Não existe URL pública nem SHA256 até build e aprovação. Durante o upgrade, o
+`pkg-install` normaliza interfaces existentes antes do restart final; por isso
+é obrigatório exportar a configuração Layer7 e registar os nomes antes/depois.
+O appliance alvo observado é pfSense Plus 26.03.1 / FreeBSD 16, enquanto o
+builder é FreeBSD 15; `IGNORE_OSVERSION=yes` sozinho não prova compatibilidade.
+Build interno concluído:
+`SHA256=c4e9c197f79ad00d7ddb68f8ececcd391455e86011e558596102877c325d388d`;
+o hash identifica apenas o candidato local, não uma release pública.
+
+Sequência de teste segura: instalar com `enabled=false`/`mode=monitor`,
+confirmar `service layer7d onestatus`, uma única instância, interfaces reais,
+ausência de regras block e captura em monitor. Só depois executar o gate
+two-client. Rollback: voltar a passivo e reinstalar a release pública `_24`.
+
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e
 **validada no appliance** (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh`

@@ -4,13 +4,12 @@
 
 Ligar decisões **block** / **tag** a **tabelas PF** no pfSense, sem MITM.
 
-> **Semantica de `block` (importante, esclarecido no Caminho A / A0):** em
-> runtime nDPI/DNS, `action=block` bloqueia o **DESTINO** (IP de destino entra
-> em `layer7_block_dst`), **nao** quarentena o IP de origem do cliente. A
-> quarentena por origem (`layer7_block`) e usada por `action=tag` e pelo
-> caminho de laboratorio `layer7d -e`. Ver "Modelo de bloqueio por destino"
-> mais abaixo. Em `mode=monitor`/`enabled=false` nao ha qualquer `block drop`
-> (gate da Fase 1, release `v1.8.11_18`).
+> **Semantica actual de `block`:** em `legacy_global`, o IP de destino entra
+> em `layer7_block_dst` e afecta todos os clientes. Em `scoped_hybrid`, match
+> por host/DNS/SNI usa `layer7_pdst_N`; match por app/categoria usa
+> `layer7_psrc_N`, limitado por origem estática, `scope_global` explícito ou
+> `quarantine_origin`. Em `mode=monitor`/`enabled=false` não há qualquer
+> `block drop`.
 
 ## Estado atual
 
@@ -98,7 +97,8 @@ politica `enabled`+`block`:
 - `table <layer7_psrc_N> persist` + `block drop quick inet from <layer7_psrc_N> to !<localsubnets>`
   quando tem `ndpi_app`/`ndpi_category` (app-only ou misto);
 - politica sem origem (`src_hosts`/`src_cidrs`/grupos): regra global **so** com
-  `scope_global: true` (checkbox na GUI Politicas).
+  `scope_global: true` (checkbox na GUI Politicas); para app/categoria,
+  `quarantine_origin: true` também cria regra `psrc` executável.
 
 Funcao geradora: `layer7_policy_enforcement_rules_text()` em `layer7.inc`,
 invocada por `layer7_generate_rules("filter")`. Flush/resync: `layer7_resync()`,
@@ -114,8 +114,8 @@ Com `enforcement_model=scoped_hybrid` e `mode=enforce`:
 
 | Decisao | Tabela PF populada | IP |
 |---------|-------------------|-----|
-| block + `dst_scoped` (DNS/SNI/host) | `layer7_pdst_{idx}` | destino resolvido |
-| block + `src_scoped` (app-only nDPI) | `layer7_psrc_{idx}` | origem do fluxo |
+| block + `dst_scoped` (match DNS/SNI/host) | `layer7_pdst_{idx}` | destino resolvido |
+| block + `src_scoped` (match app/categoria) | `layer7_psrc_{idx}` | origem do fluxo |
 | block + `legacy_global` | `layer7_block_dst` | destino |
 
 Funcoes: `layer7_pf_resolve_block_target()`, `layer7_apply_block_enforcement()`
@@ -127,6 +127,17 @@ CLI lab `-e` alinhado: `layer7_pf_enforce_decision(dec, src, dst, scoped, dry)`.
 **Gate appliance obrigatorio (two-client):** ver
 [`validacao-lab.md`](../04-package/validacao-lab.md) secao **12** — pendente
 ate execucao no appliance `192.168.100.254`.
+
+### Candidato `_25` — integração e pré-condições
+
+- política mista app+host segue o critério que casou: app/categoria=`psrc`,
+  host=`pdst`;
+- `psrc` só é populada se houver origem estática efectiva,
+  `scope_global` ou `quarantine_origin`;
+- a GUI recusa block scoped sem uma dessas três condições;
+- IDs `lan`/`optN` são migrados para interfaces reais antes de libpcap/PF;
+- default continua `legacy_global`; `_25` não está publicado e depende do
+  gate two-client.
 
 Plano: [`../09-blocking/plano-enforcement-100-porcento.md`](../09-blocking/plano-enforcement-100-porcento.md).
 

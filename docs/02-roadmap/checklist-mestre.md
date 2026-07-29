@@ -102,8 +102,15 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   de [`../tests/test-matrix.md`](../tests/test-matrix.md)
 - [ ] **Caminho B E3 (BG-048):** codigo E0–E3 concluido em repo (`1.8.11_24`);
   gate **two-client** em [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md)
-  (secção **12**) continua **PENDENTE** — nao declarar E3 fechado nem publicar
-  `_24` sem evidencia no appliance
+  (secção **12**) continua **PENDENTE** — nao declarar E3 fechado nem avancar E4
+  sem evidencia no appliance; scripts preparados:
+  [`../../tests/lab/smoke-enforcement-scoped.sh`](../../tests/lab/smoke-enforcement-scoped.sh),
+  [`../../scripts/diagnose-layer7-appliance.sh`](../../scripts/diagnose-layer7-appliance.sh)
+- [ ] **Estabilização `_25` (BG-053):** código/testes corrigem PID sem newline,
+  interface real de captura, regra `psrc` e caminho app/host; antes de fechar,
+  exigir build FreeBSD, `service layer7d onestatus` coerente, `captures > 0`
+  numa interface real, monitor passivo e gate two-client no pfSense Plus
+  `26.03.1`. `_25` continua candidato não publicado.
 
 ---
 

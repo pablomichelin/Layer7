@@ -2,6 +2,49 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_25] - Unreleased — candidato de estabilização antes do gate
+
+Pacote candidato, **não publicado** e ainda **não aprovado para produção**.
+Build isolado no FreeBSD 15 concluído com
+`SHA256=c4e9c197f79ad00d7ddb68f8ececcd391455e86011e558596102877c325d388d`.
+Nasce do diagnóstico read-only feito em `2026-07-29` no appliance
+`192.168.100.254`, onde `_24` estava instalado, mas intencionalmente
+`enabled=false`, `mode=monitor`.
+
+### Fixed
+
+- **rc.d / PID sem newline:** `daemon(8)` grava `/var/run/layer7d.pid` sem
+  newline; `read` preenchia o PID mas retornava erro. `status` dizia
+  indevidamente “not running” e `reload` podia iniciar outra instância.
+- **Interface real de captura:** IDs amigáveis (`lan`, `optN`) passam por
+  `get_real_interface()` antes de chegar a libpcap/PF. Upgrade migra também
+  interfaces de políticas, excepções, anti-QUIC e relatórios.
+- **Scoped `psrc`:** origem estática, `scope_global` ou
+  `quarantine_origin` autorizam a inclusão dinâmica da origem em
+  `layer7_psrc_N`; quarentena explícita agora emite regra PF executável.
+- **App+host híbrido:** o tipo de enforcement segue o critério que realmente
+  casou: app/categoria usa `psrc`; host/SNI/DNS usa `pdst`.
+- **Validação GUI:** em `scoped_hybrid`, políticas block sem origem,
+  `scope_global` ou quarentena são recusadas. O toggle de perfil em um clique
+  não cria escopo global implícito.
+
+### Added
+
+- Regressões `test_rc_pidfile.sh`, `test_interface_normalization.php` e casos
+  adicionais em `test_policy_decide.c` / `test_scoped_pf_inc.php`.
+
+### Gates e rollback
+
+- Gates locais/PHP e build do pacote no builder FreeBSD: PASS.
+- Instalação e gate appliance two-client: **PENDENTES**.
+- O appliance de destino é pfSense Plus `26.03.1` / FreeBSD `16.0-CURRENT`,
+  enquanto o builder gera ABI FreeBSD 15; compatibilidade real faz parte do
+  gate e continua sem declaração de suporte geral.
+- Rollback do candidato: reinstalar a release pública `_24`, manter
+  `enabled=false`/`mode=monitor` e confirmar tabelas dinâmicas vazias.
+
+---
+
 ## [1.8.11_24] - 2026-06-16 — Caminho B E0–E3 + estabilização pós-revisão
 
 Release publica. Artefacto `pfSense-pkg-layer7-1.8.11_24.pkg`
