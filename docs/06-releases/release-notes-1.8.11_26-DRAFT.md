@@ -2,6 +2,10 @@
 
 **Estado:** candidato interno, não publicado, não aprovado para produção.
 
+**Build interno:** PASS no FreeBSD 15; artefacto local
+`pfSense-pkg-layer7-1.8.11_26.pkg`,
+`SHA256=c536cf879721d3bfad0097df9cf9f5ee45f217738c80ceaed9568acaf88b2f69`.
+
 ## Objectivo
 
 Conter o crescimento de logs e tornar o comportamento previsível antes de
@@ -22,9 +26,10 @@ selectiva ou compressão. Esses itens ficam para L2/L3 em F7.
 
 ## Gates
 
-1. `sh tests/run-local.sh`;
-2. lint PHP e `test_logging_reports.php` no FreeBSD;
-3. `make package` no builder FreeBSD 15;
+1. `sh tests/run-local.sh` — **PASS**;
+2. lint PHP (21 ficheiros) e `test_logging_reports.php` com SQLite isolado no
+   FreeBSD — **PASS**;
+3. `make package` no builder FreeBSD 15 — **PASS**;
 4. instalar primeiro com `enabled=false` e `mode=monitor`;
 5. observar ausência de idle/recheck repetitivo em `info`;
 6. activar detalhe por pouco tempo numa interface e confirmar fonte/eventos;

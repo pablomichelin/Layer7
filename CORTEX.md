@@ -83,8 +83,10 @@ limitada, perfil de detalhe opt-in, auditoria de bloqueios sempre activa,
 redução de ruído e limite do SQLite. O colector atravessa rotações por inode e
 a GUI diferencia limpar vista, histórico e expiração dos logs. Este é um
 bloco F4.1 de contenção; filtros/exclusão selectiva L2/L3 permanecem F7.
-Nenhuma alteração foi instalada no appliance. Build FreeBSD e gates devem ser
-registados antes de qualquer instalação; release pública permanece `_24`.
+Suite local, PHP/SQLite isolado e build FreeBSD: PASS. Artefacto local
+`pfSense-pkg-layer7-1.8.11_26.pkg`,
+`SHA256=c536cf879721d3bfad0097df9cf9f5ee45f217738c80ceaed9568acaf88b2f69`.
+Nenhuma alteração foi instalada no appliance; release pública permanece `_24`.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 

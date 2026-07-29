@@ -58,7 +58,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 `force_dns` / anchor NAT e anti-QUIC opcional (ponto 6.7 / sec. 11)**, **blacklists F4.2 (12.1–12.2)**,
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3, estabilização `_25` e logs `_26`).
-O estado deve ser actualizado após os gates FreeBSD do `_26`.
+Estado actual: 81 OK e **11** pendentes; no `_26`, código/SQLite/build estão
+PASS e falta o gate no appliance.
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):
 parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em

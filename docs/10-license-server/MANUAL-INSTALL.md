@@ -162,8 +162,10 @@ du -h /usr/local/etc/layer7/reports/reports.db 2>/dev/null
 Os botões da GUI não apagam os ficheiros rotativos: **Limpar visualização**
 limpa apenas o browser; **Limpar histórico** limpa SQLite e avança cursores.
 Desinstalação remove os dois destinos e cópias `.1`–`.10`. Não há URL pública
-do `_26`; a referência de instalação continua `_24`. Rollback: voltar a
-passivo, reinstalar `_24` e restaurar o JSON anterior.
+do `_26`; o artefacto interno validado tem
+`SHA256=c536cf879721d3bfad0097df9cf9f5ee45f217738c80ceaed9568acaf88b2f69`,
+mas a referência de instalação continua `_24`. Rollback: voltar a passivo,
+reinstalar `_24` e restaurar o JSON anterior.
 
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e

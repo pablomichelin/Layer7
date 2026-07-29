@@ -6,7 +6,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 Pacote candidato, **não publicado** e **não aprovado para produção**. O bloco
 BG-054 corrige crescimento ilimitado e ruído observados no appliance sem
-alterar a lógica de decisão ou regras PF.
+alterar a lógica de decisão ou regras PF. Build isolado no FreeBSD 15:
+`pfSense-pkg-layer7-1.8.11_26.pkg`,
+`SHA256=c536cf879721d3bfad0097df9cf9f5ee45f217738c80ceaed9568acaf88b2f69`.
 
 ### Added
 
@@ -35,8 +37,7 @@ alterar a lógica de decisão ou regras PF.
 
 ### Gates e rollback
 
-- Suite local, lint, PHP/SQLite no FreeBSD e build `.pkg`: pendentes neste
-  checkpoint documental.
+- Suite local, lint, PHP/SQLite isolado e build `.pkg`: **PASS**.
 - Instalação e observação no appliance: pendentes; nenhuma mudança foi
   aplicada ao pfSense de produção.
 - Rollback: reinstalar `_24` em modo passivo e restaurar o JSON anterior; não
