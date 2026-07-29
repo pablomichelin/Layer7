@@ -944,3 +944,50 @@ regras `layer7_pdst_0` em `/tmp/rules.debug` / `pfctl -sr`.
 **Plano SSOT:** [`../09-blocking/plano-enforcement-100-porcento.md`](../09-blocking/plano-enforcement-100-porcento.md) (Bloco E3).
 
 **Nota:** nao marcar este gate como PASS sem execucao real no appliance.
+
+---
+
+## 13. Roteiro BG-054 — contenção L1 de logs (`1.8.11_26`)
+
+Executar somente depois do build e com o Layer7 primeiro
+`enabled=false`/`mode=monitor`. Não gerar tráfego sintético pesado nem apagar
+logs no appliance de produção sem janela e validação humana.
+
+### Pré-gate read-only
+
+```sh
+service layer7d onestatus
+grep -E '"enabled"|"mode"|"event_log_enabled"|"log_file_' \
+  /usr/local/etc/layer7.json
+ls -lh /var/log/layer7d.log* /var/log/layer7-events.log* 2>/dev/null
+du -h /usr/local/etc/layer7/reports/reports.db 2>/dev/null
+```
+
+### Passos controlados
+
+1. Com detalhe desligado, aguardar pelo menos 30 minutos e confirmar que não
+   surgem mensagens periódicas `still idle`, `license_recheck` sem transição
+   ou `SIGUSR1 stats` em nível normal.
+2. Confirmar na GUI os limites de ficheiro/cópias e do SQLite.
+3. Ligar detalhe apenas numa interface de lab, gerar poucas consultas e
+   confirmar eventos nessa interface em `/var/log/layer7-events.log`.
+4. Desligar detalhe e confirmar que novas consultas deixam de ser gravadas.
+5. Em gate de enforce já autorizado, confirmar que um bloqueio continua
+   registado como auditoria mesmo com detalhe desligado.
+6. Confirmar que **Limpar visualização** não altera os tamanhos no disco.
+7. Se o histórico for limpo por decisão humana, confirmar SQLite vazio,
+   cursores avançados e logs rotativos preservados.
+
+### PASS
+
+- nenhum crescimento repetitivo conhecido em `info`;
+- eventos detalhados obedecem toggle/interface;
+- bloqueio auditado com detalhe OFF;
+- tamanho máximo nominal visível e coerente;
+- rotação não interrompe a ingestão;
+- nenhuma alteração de enforcement fora do gate two-client.
+
+### Rollback
+
+Voltar a detalhe OFF, `enabled=false`/`mode=monitor`, copiar evidência e
+reinstalar `_24`. Não apagar os ficheiros antes de concluir o diagnóstico.

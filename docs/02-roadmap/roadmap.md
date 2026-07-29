@@ -527,6 +527,11 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   leitura do pidfile sem newline, migração `lan/optN` para interface real,
   execução `psrc` e caminho híbrido app/host. Release pública permanece
   `_24`; build, captura real, monitor passivo e two-client ainda são gates.
+- **Contenção L1 de logs (`2026-07-29`, candidato `1.8.11_26`):** BG-054 /
+  ADR-0015 separam operação/tráfego, aplicam rotação limitada, tornam detalhe
+  opt-in com bloqueios auditados, limitam SQLite e corrigem a semântica de
+  limpeza na GUI. É F4.1 por reduzir risco operacional imediato; pesquisa,
+  exclusão selectiva e analytics permanecem F7. Nenhuma instalação foi feita.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

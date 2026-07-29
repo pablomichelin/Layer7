@@ -15,11 +15,25 @@ Descrever o que a **GUI** persiste e o **`layer7d`** lê após reload. No pfSens
 | `enabled` | bool | `false` | Serviço ativo |
 | `mode` | enum | `monitor` | `monitor` \| `enforce` |
 | `log_level` | enum | `info` | `error` \| `warn` \| `info` \| `debug` |
+| `log_file_max_mb` | int | `5` | MiB por ficheiro activo de log local (`1–100`) |
+| `log_file_keep` | int | `3` | Número de cópias rotacionadas por destino (`1–10`) |
 | `syslog_remote` | bool | `false` | Duplicar logs do daemon por UDP para servidor syslog |
 | `syslog_remote_host` | string | `""` | Hostname ou IPv4 do coletor (obrigatório se `syslog_remote`) |
 | `syslog_remote_port` | int | `514` | Porta UDP |
 | `debug_minutes` | int | `0` | `0` = normal; `1–720` = forçar LOG_DEBUG no daemon durante N min após cada **reload** (SIGHUP) |
 | `interfaces` | lista iface | `[]` | Interfaces alvo (nomes pfSense: `lan`, `opt1`…). **GUI:** **Settings** (CSV, até 8). Consumo pelo nDPI = backlog técnico. |
+
+## Relatórios e eventos detalhados (`reports`)
+
+| Campo | Tipo | Default | Descrição |
+|-------|------|---------|-----------|
+| `enabled` | bool | `true` | Mantém histórico executivo |
+| `retention_days` | int | `30` | Janela dos resumos |
+| `collect_interval` | int | `5` | Recolha em minutos (`5,10,15,30,60`) |
+| `event_log_enabled` | bool | `false` | Guarda detalhe de tráfego; bloqueios continuam auditados |
+| `event_retention_days` | int | `7` | Janela dos eventos no SQLite |
+| `event_max_mb` | int | `100` | Limite do SQLite (`25–1000` MiB) |
+| `event_interfaces` | lista iface | `[]` | Interfaces guardadas; vazio = todas |
 
 ## Políticas (`policies[]`)
 

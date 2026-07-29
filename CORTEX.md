@@ -70,6 +70,22 @@ pública continua `_24`; não activar nem publicar `_25` antes desses gates.
 O appliance observado é pfSense Plus `26.03.1` / FreeBSD `16.0-CURRENT`, não
 pfSense CE; essa compatibilidade real deve ser validada explicitamente.
 
+### Candidato `1.8.11_26` — contenção L1 de logs (não publicado)
+
+A inspeção read-only de `2026-07-29` encontrou
+`/var/log/layer7d.log` sem rotação, com 4.663 linhas; 2.490 eram idle
+repetitivo e 1.656 rechecks de licença sem transição. Com detalhe ligado,
+cada consulta DNS entrava no mesmo ficheiro em `info`. A base SQLite tinha
+retenção, mas o texto bruto não tinha limite.
+
+BG-054/ADR-0015 introduzem separação entre operação e tráfego, rotação interna
+limitada, perfil de detalhe opt-in, auditoria de bloqueios sempre activa,
+redução de ruído e limite do SQLite. O colector atravessa rotações por inode e
+a GUI diferencia limpar vista, histórico e expiração dos logs. Este é um
+bloco F4.1 de contenção; filtros/exclusão selectiva L2/L3 permanecem F7.
+Nenhuma alteração foi instalada no appliance. Build FreeBSD e gates devem ser
+registados antes de qualquer instalação; release pública permanece `_24`.
+
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
 Artefacto `pfSense-pkg-layer7-1.8.11_23.pkg`
@@ -184,7 +200,7 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_25` (`PORTVERSION=1.8.11`, `PORTREVISION=25`),
++ `PORTREVISION`):** `1.8.11_26` (`PORTVERSION=1.8.11`, `PORTREVISION=26`),
 **candidato interno não publicado**. A release pública permanece
 `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
@@ -852,11 +868,12 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: instalar _25 em passivo + monitor/captura + two-client appliance
+- Proximo gate: validar build _26 e instalar em passivo + logs/monitor/captura
+  + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 25 (candidato nao publicado)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 26 (candidato nao publicado)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
-  _25 em curso, sem activacao no appliance
+  _25 + contenção L1 `_26` em curso, sem activacao no appliance
 - Estado documental: governanca F0 consolidada; revisao pre-install 2026-06-15
   parcialmente enderecada em _24 (ver docs/09-blocking/revisao-codigo-*)
 - Fase actual: pos-V1 — Caminho B (E4/E5/E7 parciais; gates pendentes)

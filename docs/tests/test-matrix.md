@@ -231,6 +231,15 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | 13.5 | Após instalar `_25`: `onestatus` coerente, uma instância, JSON com interface real, monitor sem block e `cap_pkts > 0` | pfSense Plus 26.03.1 | Pendente |
 | 13.6 | Two-client A bloqueado/B permitido em DNS/SNI/nDPI | appliance/lab | Pendente (`validacao-lab` sec. 12) |
 
+## 14. Candidato `1.8.11_26` — contenção L1 de logs
+
+| # | Teste | Onde | Status |
+|---|-------|------|--------|
+| 14.1 | Rotação por tamanho preserva `.1`–`.3` e nunca cria `.4` | local/builder | Pendente (`test_log_store.c`) |
+| 14.2 | Parser não duplica KPI de bloqueio e ingestão atravessa rotação por inode | builder PHP/SQLite | Pendente (`test_logging_reports.php`) |
+| 14.3 | Lint completo e build do pacote `1.8.11_26` | FreeBSD 15 | Pendente |
+| 14.4 | Em passivo: sem idle/recheck repetitivo em info; detalhe opt-in/interface; limites e bloqueio auditado | pfSense Plus 26.03.1 | Pendente (`validacao-lab` sec. 13) |
+
 ---
 
 ## Resumo
@@ -250,7 +259,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Licenciamento/activação | 20 | 16 | 4 |
 | Blacklists UT1 (F4.2) | 2 | 0 | 2 |
 | Estabilização `_25` | 6 | 4 | 2 |
-| **Total** | **88** | **78** | **10** |
+| Contenção de logs `_26` | 4 | 0 | 4 |
+| **Total** | **92** | **78** | **14** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

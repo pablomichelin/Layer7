@@ -9,6 +9,17 @@
 Este manual descreve o uso do novo modulo de relatorios executivos do Layer7,
 orientado a publico nao tecnico (diretoria e gestao).
 
+## Contenção L1 no candidato 1.8.11_26
+
+- eventos detalhados passam para `/var/log/layer7-events.log`;
+- detalhe ausente na configuração migra para **desligado**; bloqueios
+  continuam auditados;
+- retenção detalhada default passa a 7 dias;
+- `event_max_mb` limita `reports.db` a 100 MiB por default;
+- o colector atravessa uma rotação por inode sem perder a cauda anterior;
+- a GUI mostra separadamente uso operacional, eventos e SQLite;
+- limpar histórico elimina SQLite/cursores, não os ficheiros rotativos.
+
 ## O que mudou na v1.4.3
 
 - Base de dados local SQLite para historico detalhado de eventos.
@@ -99,8 +110,9 @@ Recomendacao inicial:
   - ambientes medios: 7 a 15 dias
   - ambientes com alto volume: 3 a 7 dias
 
-**Importante:** no appliance local, o consumo de disco vem principalmente do
-log detalhado em SQLite. O historico executivo tende a ser muito mais leve.
+**Importante:** o consumo total inclui SQLite e os dois conjuntos de logs de
+texto. Cada conjunto é limitado por tamanho e cópias; o SQLite tem limite
+próprio.
 
 Para periodos como **30d, 90d ou 180d**, mantenha o **historico executivo**
 activo. O log detalhado deve ser tratado como janela curta para investigacao.
@@ -112,6 +124,9 @@ remocao de registros.
 
 - `/usr/local/etc/layer7/reports/reports.db` — base SQLite
 - `/usr/local/etc/layer7/reports/ingest.cursor` — offset de ingestao
+- `/usr/local/etc/layer7/reports/events.cursor` — cursor do log de eventos
+- `/var/log/layer7d.log` — operação
+- `/var/log/layer7-events.log` — tráfego e auditoria
 - `/usr/local/etc/layer7/layer7-reports-collect.php` — colector incremental
 - `/usr/local/etc/layer7/layer7-stats-collect.sh` — cron de recolha
 - `/usr/local/etc/layer7/layer7-stats-purge.sh` — cron de limpeza
@@ -125,5 +140,6 @@ Se houver qualquer problema no modulo executivo:
 3. Se necessario, remover apenas os artefactos de relatorio:
    - `rm -f /usr/local/etc/layer7/reports/reports.db`
    - `rm -f /usr/local/etc/layer7/reports/ingest.cursor`
+   - `rm -f /usr/local/etc/layer7/reports/events.cursor`
 
 O motor de politicas e bloqueio continua funcional sem dependencia do modulo de relatorios.

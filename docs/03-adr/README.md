@@ -35,6 +35,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0012](ADR-0012-politicas-por-dispositivo-mac-para-ip.md) | Politicas por dispositivo: resolucao MAC -> IP (Caminho A / A2) | Aceito | grupo aceita `device_macs`, pacote resolve para `device_ips` (DHCP/ARP), daemon le `device_ips` como src hosts; imposicao por IP; resync + static mapping; limite 64 |
 | [ADR-0013](ADR-0013-bloqueio-por-sni-via-ndpi.md) | Bloqueio por SNI/Host via nDPI (Caminho A / A3) | Aceito | usa SNI/Host ja extraido pelo nDPI (sem parser proprio, sem MITM); toggle `sni_inspection` opt-in OFF; bloqueio por destino; limitacao ECH |
 | [ADR-0014](ADR-0014-enforcement-escopado-por-politica.md) | Enforcement escopado por politica (Caminho B / E0) | Aceito | flag `enforcement_model`: `legacy_global` (default) vs `scoped_hybrid`; PF escopado por politica (E2–E8); Caminho A nao alterou enforcement global |
+| [ADR-0015](ADR-0015-logging-local-limitado-e-separado.md) | Logging local limitado e separado | Aceito | separa operação/tráfego, fixa limites de rotação e SQLite e mantém detalhe opt-in com bloqueios auditados |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

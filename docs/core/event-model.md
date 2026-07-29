@@ -41,10 +41,18 @@ Emitido quando um fluxo é classificado com confiança suficiente (alinhado ao P
 | `classifier_inconclusive` | Poucos pacotes / cifrado |
 | `policy_conflict` | Duas regras mesmo peso (não deveria após precedence) |
 
-## Transporte
+## Transporte implementado
 
-- **Local:** arquivo rotativo ou memória para GUI.
-- **Syslog:** linha JSON (facilita SIEM) quando `syslog_remote=true`.
+- **Operacional:** `/var/log/layer7d.log`, texto timestampado.
+- **Eventos:** `/var/log/layer7-events.log`, pares `key=value`.
+- **Histórico:** SQLite derivado em
+  `/usr/local/etc/layer7/reports/reports.db`.
+- **Syslog:** mensagens operacionais e auditoria local; duplicação UDP RFC
+  3164 quando `syslog_remote=true`.
+
+`flow_decide`/blacklist representa a decisão e alimenta o KPI de bloqueio.
+`enforce_block` representa a aplicação no PF com acção interna `enforced`, de
+modo a não contar a mesma decisão duas vezes.
 
 ## Compatibilidade com PoC
 

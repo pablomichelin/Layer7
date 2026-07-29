@@ -99,8 +99,14 @@ mas retornava erro; `status` falhava e `reload` podia duplicar o daemon.
 `test_rc_pidfile.sh` cobre o formato real. O mesmo bloco migra IDs amigáveis
 de interface para nomes reais libpcap/PF; gates no appliance permanecem
 pendentes.
+**Bloco de contenção L1 (`1.8.11_26`, candidato):** BG-054 / ADR-0015
+separam logs operacional e de eventos, limitam rotação e SQLite, reduzem
+mensagens repetitivas e tornam o detalhe opt-in sem perder auditoria de
+bloqueios. Incluído em F4.1 por ser correcção de confiabilidade/disco; filtros
+avançados, exclusão selectiva, compressão e analytics continuam excluídos e
+pertencem a F7.
 
-**Liga a:** BG-009.
+**Liga a:** BG-009 e BG-054.
 
 **Exclusões:** mudança estrutural de directórios; observabilidade pesada
 (F7).

@@ -246,6 +246,7 @@ reavaliacao formal.
 | BG-051 | Caminho B / E6 — SNI/CDN/anti-bypass | Media | daemon/docs | Caminho B (E6) | falsos positivos CDN; limites nao expostos na GUI | M | Medio | Planeado | cdn_mode; avisos sni_inspection |
 | BG-052 | Caminho B / E7/E8 — testes two-client + release default scoped | Alta | testes/release | Caminho B (E7/E8) | sem rede de seguranca scoped; default legacy permanente | G | Alto | Em curso (E7 parcial) | regressões `_25` para PID/interface/psrc/híbrido; `smoke-enforcement-scoped.sh`; build e gate appliance two-client pendentes; default scoped_hybrid so em E8 |
 | BG-053 | Estabilizacao `_25` — ciclo de vida, captura real e integração scoped | Critica | package/daemon/gui | Caminho B pre-gate | reload pode duplicar daemon; interface amigavel produz `captures=0`; scoped pode criar tabela sem regra | M | Alto | Em execucao (`2026-07-29`) | codigo + testes direcionados PASS; build FreeBSD, monitor/captura e two-client no pfSense Plus pendentes; rollback `_24` passivo |
+| BG-054 | Contenção L1 de logs — separar operação/tráfego, limitar rotação/SQLite e reduzir ruído | Alta | daemon/package/gui/docs | F4.1 (contenção; L2/L3 em F7) | logs ilimitados ocuparem disco e interface não distinguir vista, histórico e ficheiros | M | Alto | Em execução (`1.8.11_26`) | ADR-0015; detalhe opt-in, bloqueios auditados, 5 MiB × 4 por destino e SQLite 100 MiB por default; testes/build e gate appliance exigidos |
 
 ---
 

@@ -1,65 +1,93 @@
-# Logging Layer7 (V1)
+# Logging Layer7
 
-## Objetivo
+## Objectivo
 
-Documentar o **formato e destino** dos logs do `layer7d` e a relação com `log_level` e (futuro) syslog remoto.
+Manter observabilidade útil sem permitir crescimento ilimitado no appliance.
+A decisão canónica está no
+[ADR-0015](../03-adr/ADR-0015-logging-local-limitado-e-separado.md).
 
-## Destino atual
+## Destinos locais
 
-- **Facilidade:** syslog **LOG_DAEMON**
-- **Ident:** `layer7d` (com `LOG_PID` no arranque)
-- **Onde aparece:** conforme a configuração do syslog do sistema (ex.: pfSense → `/var/log/system.log`, `clog` para leitura). Não há ficheiro dedicado do pacote.
+| Destino | Conteúdo | Default |
+|---------|----------|---------|
+| `/var/log/layer7d.log` | ciclo de vida, configuração, licença, captura, erros e avisos | sempre activo |
+| `/var/log/layer7-events.log` | tráfego detalhado e auditoria de bloqueios | detalhe OFF; bloqueios sempre auditados |
+| `/usr/local/etc/layer7/reports/reports.db` | histórico pesquisável derivado dos eventos | máximo 100 MiB |
 
-## Níveis (log_level)
+Os dois logs de texto são gravados directamente pelo daemon, modo `0600`.
+Cada ficheiro activo tem, por defeito, 5 MiB e três cópias numeradas
+(`.1` a `.3`). Portanto, o limite nominal combinado é 40 MiB:
+`2 destinos × 5 MiB × (1 activo + 3 cópias)`.
 
-O daemon filtra mensagens conforme `layer7.log_level` no JSON:
+Os campos `layer7.log_file_max_mb` (`1–100`) e `layer7.log_file_keep`
+(`1–10`) alteram estes limites. A rotação é interna, determinística e não
+depende de `newsyslog`.
 
-| Valor JSON | Nível interno | O que passa |
-|------------|----------------|-------------|
-| `error`    | 0 | Apenas LOG_ERR (erros graves) |
-| `warn`     | 1 | error + LOG_WARNING |
-| `info`     | 2 (default) | error + warn + LOG_NOTICE + LOG_INFO |
-| `debug`    | 3 | Tudo acima + LOG_DEBUG |
+## Perfil leve por defeito
 
-## Mensagens atuais (texto livre)
+- `reports.event_log_enabled=false`: não grava cada consulta/fluxo.
+- bloqueios efectivos continuam em `layer7-events.log` e no syslog local;
+- mensagens repetitivas de idle, recheck de licença sem mudança e stats
+  periódicas ficam em `debug`;
+- stats JSON são actualizadas a cada minuto, mas o resumo operacional normal
+  aparece no máximo uma vez por hora;
+- falhas esperadas ao limpar tabelas PF opcionais são agregadas em `debug`.
 
-Exemplos do que o daemon envia hoje (formato livre, uma linha por evento):
+Ao activar o detalhe, `reports.event_interfaces` limita as interfaces
+guardadas; lista vazia significa todas. O detalhe pode crescer rapidamente e
+deve ser usado com janela curta.
 
-| Situação | Exemplo de linha |
-|----------|-------------------|
-| Arranque | `daemon_start version=…` (versão do binário) |
-| Paragem | `daemon_stop` |
-| Config presente | `config file present: /usr/local/etc/layer7.json (1234 bytes)` |
-| Config ausente | `config absent: ... — copy layer7.json.sample` |
-| Reload OK | `config: policies=N exceptions=M enforce_cfg=K reload#X (...)` |
-| Parse falhou | `policies[] parse failed (...)` / `exceptions[] parse failed (...)` |
-| Degraded | `degraded: políticas/exceções inválidas — snapshot não carregado (...)` |
-| SIGHUP | `SIGHUP: reload config` / `SIGHUP: missing ...` |
-| SIGUSR1 | `SIGUSR1 stats: ver=… reload_ok=... snapshot_fail=...` (resto igual) |
-| Idle | `layer7.enabled=false — still idle` / `periodic_state: ...` (a cada ~1 h se ativo) |
-| PF falhou | `pfctl add failed table=TAB ip=IP` |
+## Níveis operacionais
 
-Não há formato estruturado (JSON/key=value) nas linhas atuais; são mensagens legíveis para operador.
+| Valor | O que passa em `/var/log/layer7d.log` |
+|-------|----------------------------------------|
+| `error` | erros graves |
+| `warn` | erros e avisos |
+| `info` | acima + mudanças de estado e resumos horários |
+| `debug` | diagnóstico repetitivo |
 
-## Syslog remoto (implementado)
+`debug_minutes` força `debug` temporariamente após reload. Não altera os
+limites físicos.
 
-- **Config:** `syslog_remote` (bool), `syslog_remote_host` (string), `syslog_remote_port` (int, default 514).
-- **Comportamento:** cada mensagem que o daemon envia ao syslog local (via `l7_log`) é **também** enviada por **UDP** ao `host:porta`, formato **RFC 3164** (`<PRI>timestamp hostname layer7d: mensagem`).
-- **Requisito:** com `syslog_remote=true`, **host** não vazio; caso contrário o daemon regista aviso e não envia remoto.
-- **Firewall:** o pfSense deve permitir UDP de saída para o coletor.
-- **Eventos JSON futuros** (pós-nDPI): podem acrescentar linhas dedicadas; ver [`../core/event-model.md`](../core/event-model.md).
+## Relatórios, retenção e limpeza
 
-## Eventos futuros (pós-nDPI)
+O colector lê primeiro a cauda legada de `layer7d.log` e depois
+`layer7-events.log`. Se ocorrer rotação entre recolhas, localiza o inode nas
+cópias `.1` a `.10`, consome o restante e termina no ficheiro activo.
 
-Para tipos de evento quando houver classificação (flow, policy match, enforce), ver **[modelo de evento](../core/event-model.md)**. Os logs de aplicação (block/tag) poderão então incluir `flow_id`, `policy_id`, `action`, etc., em formato a definir (JSON por linha ou key=value).
+- retenção por idade: default de 7 dias para eventos detalhados;
+- limite físico do SQLite: `reports.event_max_mb`, default 100 MiB,
+  intervalo `25–1000`;
+- **Limpar histórico** remove eventos do SQLite e avança os cursores;
+- **Limpar visualização** na página Eventos só limpa o buffer do browser;
+- logs de texto não são apagados pela GUI; expiram pela rotação limitada.
 
-## Resumo
+## Syslog
 
-| Aspeto | Estado V1 |
-|--------|-----------|
-| Destino | Syslog local (LOG_DAEMON) |
-| Formato | Texto livre, uma linha por mensagem |
-| log_level | Respeitado (error / warn / info / debug) |
-| debug_minutes | `1–720`: após reload, equivale a **debug** até expirar; `0` desliga |
-| syslog_remote | UDP para `syslog_remote_host` (Settings) |
-| Eventos estruturados | Planeados em event-model.md |
+Mensagens operacionais continuam no `LOG_DAEMON`. Bloqueios auditáveis também
+vão ao syslog local. Com `syslog_remote=true`, mensagens operacionais e
+eventos guardados são enviados por UDP RFC 3164 ao colector configurado.
+O transporte remoto é best-effort e não substitui uma trilha SIEM confiável.
+
+## Operação segura
+
+```sh
+ls -lh /var/log/layer7d.log* /var/log/layer7-events.log* 2>/dev/null
+du -h /usr/local/etc/layer7/reports/reports.db 2>/dev/null
+tail -n 100 /var/log/layer7d.log
+tail -n 100 /var/log/layer7-events.log
+```
+
+Não usar `rm` nos logs durante operação normal. Para reduzir volume:
+
+1. desligar **Log detalhado** em Settings > Relatórios;
+2. restringir interfaces;
+3. reduzir MiB/cópias e janela do SQLite;
+4. guardar e confirmar reload do daemon.
+
+## Limites conhecidos e evolução
+
+O bloco `_26` é contenção L1: separação, menos ruído, rotação, limite do
+SQLite e transparência de uso. Filtros combinados avançados, exclusão
+selectiva, pesquisa além da cauda e exportação de auditoria pertencem ao
+bloco L2/L3 futuro (F7) e não são declarados concluídos aqui.

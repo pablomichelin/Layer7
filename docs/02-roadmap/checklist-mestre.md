@@ -111,6 +111,11 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   exigir build FreeBSD, `service layer7d onestatus` coerente, `captures > 0`
   numa interface real, monitor passivo e gate two-client no pfSense Plus
   `26.03.1`. `_25` continua candidato não publicado.
+- [ ] **Contenção L1 `_26` (BG-054 / ADR-0015):** exigir suite local,
+  PHP/SQLite e build FreeBSD; no appliance primeiro passivo, confirmar que
+  idle/recheck/SIGUSR1 não inundam `info`, detalhe opt-in respeita interfaces,
+  bloqueios continuam auditados e uso máximo corresponde aos limites.
+  Limpar vista não pode apagar disco; limpar histórico deve preservar os logs.
 
 ---
 
@@ -119,6 +124,7 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] rollback e explicitamente descrito
 - [ ] rollback nao depende de memoria oral
 - [ ] rollback preserva a ultima versao segura conhecida
+- [ ] rollback de `_26` aponta para `_24` passivo e preserva evidência de logs
 - [ ] impacto do rollback sobre docs e artefactos foi considerado
 - [ ] para reorganizacao estrutural futura, rollback de links e caminhos foi previsto
 

@@ -142,6 +142,29 @@ confirmar `service layer7d onestatus`, uma única instância, interfaces reais,
 ausência de regras block e captura em monitor. Só depois executar o gate
 two-client. Rollback: voltar a passivo e reinstalar a release pública `_24`.
 
+**Addendum do candidato `1.8.11_26` (não publicado):**
+Acrescenta contenção L1 de logs sobre `_25`. O daemon separa
+`/var/log/layer7d.log` (operacional) de `/var/log/layer7-events.log`
+(tráfego/auditoria), limita ambos por rotação interna e limita também
+`reports.db`. Defaults: 5 MiB por ficheiro, três cópias por destino, detalhe
+OFF, sete dias de eventos SQLite e 100 MiB de base. Bloqueios permanecem
+auditados com o detalhe desligado.
+
+Antes de instalar, exportar o JSON e copiar logs necessários para evidência.
+Instalar somente em janela controlada, primeiro com
+`enabled=false`/`mode=monitor`. Verificar tamanhos com:
+
+```sh
+ls -lh /var/log/layer7d.log* /var/log/layer7-events.log* 2>/dev/null
+du -h /usr/local/etc/layer7/reports/reports.db 2>/dev/null
+```
+
+Os botões da GUI não apagam os ficheiros rotativos: **Limpar visualização**
+limpa apenas o browser; **Limpar histórico** limpa SQLite e avança cursores.
+Desinstalação remove os dois destinos e cópias `.1`–`.10`. Não há URL pública
+do `_26`; a referência de instalação continua `_24`. Rollback: voltar a
+passivo, reinstalar `_24` e restaurar o JSON anterior.
+
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e
 **validada no appliance** (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh`

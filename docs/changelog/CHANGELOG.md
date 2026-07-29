@@ -2,6 +2,48 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_26] - Unreleased — contenção L1 de logs
+
+Pacote candidato, **não publicado** e **não aprovado para produção**. O bloco
+BG-054 corrige crescimento ilimitado e ruído observados no appliance sem
+alterar a lógica de decisão ou regras PF.
+
+### Added
+
+- `/var/log/layer7-events.log` separado do operacional
+  `/var/log/layer7d.log`.
+- Rotação interna limitada para ambos: 5 MiB e três cópias por default,
+  configuráveis na GUI.
+- Limite do SQLite de relatórios: 100 MiB por default.
+- Painel de consumo dos três armazenamentos e fontes separadas na página
+  Eventos.
+- Testes `test_log_store.c` e `test_logging_reports.php`.
+
+### Changed
+
+- Detalhe de tráfego passa a opt-in (`event_log_enabled=false` quando ausente);
+  bloqueios continuam auditados mesmo com o detalhe desligado.
+- Idle, recheck de licença sem transição, SIGUSR1 e falhas esperadas ao limpar
+  tabelas opcionais deixam de poluir `info`.
+- Stats continuam actualizadas a cada minuto; resumo operacional no máximo
+  uma vez por hora.
+- Colector atravessa ficheiros rotacionados por inode antes de continuar no
+  activo; retenção detalhada default passa a 7 dias.
+- `enforce_block` confirma aplicação PF sem duplicar o KPI de bloqueio.
+- “Limpar visualização” não afirma apagar disco; “Limpar histórico” informa
+  que limpa SQLite/cursores e preserva os logs rotativos.
+
+### Gates e rollback
+
+- Suite local, lint, PHP/SQLite no FreeBSD e build `.pkg`: pendentes neste
+  checkpoint documental.
+- Instalação e observação no appliance: pendentes; nenhuma mudança foi
+  aplicada ao pfSense de produção.
+- Rollback: reinstalar `_24` em modo passivo e restaurar o JSON anterior; não
+  apagar evidência de logs antes da recolha.
+
+---
+
 ## [1.8.11_25] - Unreleased — candidato de estabilização antes do gate
 
 Pacote candidato, **não publicado** e ainda **não aprovado para produção**.
