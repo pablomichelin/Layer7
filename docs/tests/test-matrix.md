@@ -261,7 +261,7 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | 16.2 | Exception block resolve origem para `layer7_block` | local C | OK |
 | 16.3 | PHP gera `match/tag L7ALLOW`, `blsrc_N` negativo, ordem correcta e nenhum `pass quick` | builder PHP | OK (`test_scoped_pf_inc.php`) |
 | 16.4 | Monitor/desactivado não emite regras allow/block; mutação de excepção exige flush | builder PHP/shell | OK |
-| 16.5 | Build nDPI e validação do `.pkg` `_28` | FreeBSD 15 | Pendente |
+| 16.5 | Build nDPI e validação do `.pkg` `_28` | FreeBSD 15 | OK (`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`) |
 | 16.6 | Ruleset completo passa `pfctl -nf` e é interpretado com tags | appliance | Pendente |
 | 16.7 | A permitido/B bloqueado no mesmo destino; block nativo do pfSense continua a vencer | appliance/two-client | Pendente |
 | 16.8 | App-only cold-start, TTL, reload e rollback não deixam `pallow` stale | appliance | Pendente |
@@ -287,8 +287,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Estabilização `_25` | 6 | 4 | 2 |
 | Contenção de logs `_26` | 4 | 3 | 1 |
 | Estabilização funcional `_27` | 8 | 4 | 4 |
-| Allow PF seguro `_28` | 8 | 4 | 4 |
-| **Total** | **108** | **89** | **19** |
+| Allow PF seguro `_28` | 8 | 5 | 3 |
+| **Total** | **108** | **90** | **18** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

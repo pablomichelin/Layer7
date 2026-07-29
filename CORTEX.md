@@ -118,8 +118,11 @@ fecha o caminho inoperante de exception `block` por origem e inclui
 `pallow_0..23` em self-heal/flush. O gate `smoke-layer7d.sh` também volta a
 incluir `log_store.c`, eliminando a falha de link introduzida no `_26`.
 
-Suite local e builder C/PHP/shell: PASS. A validação sintática final do PF,
-build nDPI/`.pkg`, instalação passiva e teste two-client ainda são gates.
+Suite local, builder C/PHP/shell, smoke completo, build nDPI e validação do
+`.pkg`: PASS. Artefacto `pfSense-pkg-layer7-1.8.11_28.pkg`,
+`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`.
+A validação sintática final do PF, instalação passiva e teste two-client ainda
+são gates.
 Produção permanece intocada. O limite app-only/cold-start e os riscos
 FP-009..FP-016 permanecem documentados.
 
@@ -907,7 +910,7 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: concluir build `_28`, instalar em passivo + logs/monitor/captura
+- Proximo gate: validar ruleset e instalar `_28` em passivo + logs/monitor/captura
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
 - PORTVERSION no repositorio: 1.8.11, PORTREVISION 28 (candidato nao publicado)

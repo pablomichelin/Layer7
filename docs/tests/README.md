@@ -62,8 +62,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3, estabilização `_25`, logs `_26`,
 correcções `_27` e allow PF seguro `_28`).
-Estado actual antes do build final `_28`: 89 OK e **19** pendentes. Os testes
-C/PHP/shell do `_28` estão PASS; build, parser PF e gates no appliance
+Estado actual: 90 OK e **18** pendentes. Testes C/PHP/shell, smoke e build do
+`_28` estão PASS (`SHA256 a717b85b…eb90`); parser PF e gates no appliance
 continuam explicitamente pendentes.
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):

@@ -5,8 +5,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [1.8.11_28] - Unreleased — allow PF sem bypass do pfSense
 
 Pacote candidato, **não publicado** e **não aprovado para produção**.
-BG-056/FP-017 é corrigido em código sob a decisão ADR-0016; build do `.pkg` e
-gate no appliance ainda estão pendentes.
+BG-056/FP-017 é corrigido em código sob a decisão ADR-0016; build do `.pkg`
+passou e o gate no appliance continua pendente.
 
 ### Added
 
@@ -37,8 +37,9 @@ gate no appliance ainda estão pendentes.
 
 ### Gates e rollback
 
-- Suite local e builder C/PHP/shell: PASS.
-- `pfctl -nf`, build nDPI/`.pkg`, instalação passiva e two-client: pendentes.
+- Suite local, builder C/PHP/shell, smoke, build nDPI e `.pkg`: PASS
+  (`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`).
+- `pfctl -nf`, instalação passiva e two-client: pendentes.
 - Produção permanece intocada. Rollback: `_24` passivo +
   `layer7-pfctl flush-all` + reload do filtro.
 

@@ -206,7 +206,13 @@ Layer7 como `! tagged L7ALLOW`; nenhuma linha Layer7 de allow pode ser
 `pass quick`. O gate também deve criar uma regra nativa de block controlada e
 provar que a marca Layer7 não a ultrapassa. App-only pode precisar de DNS ou
 do primeiro fluxo classificável para aprender o destino; não usar allow
-global como workaround. Artefacto/SHA256 serão registados após build.
+global como workaround.
+
+Artefacto interno validado no builder FreeBSD 15:
+`pfSense-pkg-layer7-1.8.11_28.pkg`,
+`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`.
+Não é release pública e não deve ser instalado em clientes antes do gate
+controlado no appliance.
 
 Diagnóstico offline do caminho por destino (não altera PF com `-n`):
 

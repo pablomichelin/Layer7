@@ -544,8 +544,9 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   ADR-0016 introduzem `layer7_pallow_N` e excepções por origem com marca
   `L7ALLOW`. Somente blocks Layer7 ignoram a marca; regras nativas do pfSense
   continuam a avaliar o pacote. O `pass quick` histórico da allowlist e das
-  excepções UT1 é removido. Suite C/PHP/shell passa no builder; build do
-  pacote, `pfctl -nf` e gate two-client continuam pendentes.
+  excepções UT1 é removido. Suite C/PHP/shell, smoke, build nDPI e pacote
+  passam no builder (`SHA256 a717b85b…eb90`); `pfctl -nf` e gate two-client
+  continuam pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /
