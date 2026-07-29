@@ -130,7 +130,7 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   todos os blocks Layer7 relevantes usam `! tagged L7ALLOW`; uma regra nativa
   de bloqueio do pfSense continua a vencer. Exigir `pfctl -nf`, two-client,
   app-only cold-start documentado e rollback passivo. Suite/smoke/build
-  passaram (`SHA256 a717b85b…eb90`); item permanece aberto pelo gate físico.
+  passaram (`SHA256 62dd9ae5…9dc6`); item permanece aberto pelo gate físico.
 
 ---
 

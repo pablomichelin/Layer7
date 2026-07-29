@@ -261,7 +261,7 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | 16.2 | Exception block resolve origem para `layer7_block` | local C | OK |
 | 16.3 | PHP gera `match/tag L7ALLOW`, `blsrc_N` negativo, ordem correcta e nenhum `pass quick` | builder PHP | OK (`test_scoped_pf_inc.php`) |
 | 16.4 | Monitor/desactivado não emite regras allow/block; mutação de excepção exige flush | builder PHP/shell | OK |
-| 16.5 | Build nDPI e validação do `.pkg` `_28` | FreeBSD 15 | OK (`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`) |
+| 16.5 | Build nDPI e validação do `.pkg` `_28` | FreeBSD 15 | OK (`SHA256=62dd9ae5923ade45b0bb484dca4e835b29b139f7a2aaa0a3624272ba07e59dc6`) |
 | 16.6 | Ruleset completo passa `pfctl -nf` e é interpretado com tags | appliance | Pendente |
 | 16.7 | A permitido/B bloqueado no mesmo destino; block nativo do pfSense continua a vencer | appliance/two-client | Pendente |
 | 16.8 | App-only cold-start, TTL, reload e rollback não deixam `pallow` stale | appliance | Pendente |

@@ -44,7 +44,7 @@ interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
 
 | ID | Severidade | Defeito | Correcção | Teste/gate |
 |----|------------|---------|-----------|------------|
-| FP-017 | Crítica | Allow/excepção não vencia entrada PF prévia; a solução óbvia com `pass quick` poderia furar regras nativas do pfSense | `pallow_N` + tabelas de excepção e `match/tag L7ALLOW`; somente blocks Layer7 ignoram a marca; `except_ips` UT1 usa origem negativa `blsrc_N` | C/PHP/shell/smoke/build PASS (`a717b85b…eb90`); `pfctl -nf`, regra nativa negativa e two-client pendentes |
+| FP-017 | Crítica | Allow/excepção não vencia entrada PF prévia; a solução óbvia com `pass quick` poderia furar regras nativas do pfSense | `pallow_N` + tabelas de excepção e `match/tag L7ALLOW`; somente blocks Layer7 ignoram a marca; `except_ips` UT1 usa origem negativa `blsrc_N` | C/PHP/shell/smoke/build PASS (`62dd9ae5…9dc6`); `pfctl -nf`, regra nativa negativa e two-client pendentes |
 
 ## Riscos ainda abertos — não declarar produção pronta
 
@@ -62,7 +62,7 @@ interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
 ## Critérios mínimos antes de activar
 
 1. Build `_28` com nDPI e PHP no builder FreeBSD — **PASS**,
-   SHA256 `a717b85b…eb90`.
+   SHA256 `62dd9ae5…9dc6`.
 2. Instalação no appliance com `enabled=false`, sem regras/tabelas populadas.
 3. Monitor com captura real: ida/volta classificadas e sem bloqueio.
 4. `scoped_hybrid` com dois clientes: A bloqueado, B permitido.

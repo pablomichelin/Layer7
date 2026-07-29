@@ -40,7 +40,7 @@ passou e o gate no appliance continua pendente.
 ### Gates e rollback
 
 - Suite local, builder C/PHP/shell, smoke, build nDPI e `.pkg`: PASS
-  (`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`).
+  (`SHA256=62dd9ae5923ade45b0bb484dca4e835b29b139f7a2aaa0a3624272ba07e59dc6`).
 - `pfctl -nf`, instalação passiva e two-client: pendentes.
 - Produção permanece intocada. Rollback: `_24` passivo +
   `layer7-pfctl flush-all` + reload do filtro.

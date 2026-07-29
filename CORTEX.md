@@ -121,7 +121,7 @@ incluir `log_store.c`, eliminando a falha de link introduzida no `_26`, e
 
 Suite local, builder C/PHP/shell, smoke completo, build nDPI e validação do
 `.pkg`: PASS. Artefacto `pfSense-pkg-layer7-1.8.11_28.pkg`,
-`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`.
+`SHA256=62dd9ae5923ade45b0bb484dca4e835b29b139f7a2aaa0a3624272ba07e59dc6`.
 A validação sintática final do PF, instalação passiva e teste two-client ainda
 são gates.
 Produção permanece intocada. O limite app-only/cold-start e os riscos

@@ -63,7 +63,7 @@ GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3, estabilização `_25`, logs `_26`,
 correcções `_27` e allow PF seguro `_28`).
 Estado actual: 90 OK e **18** pendentes. Testes C/PHP/shell, smoke e build do
-`_28` estão PASS (`SHA256 a717b85b…eb90`); parser PF e gates no appliance
+`_28` estão PASS (`SHA256 62dd9ae5…9dc6`); parser PF e gates no appliance
 continuam explicitamente pendentes.
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):

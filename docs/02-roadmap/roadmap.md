@@ -545,7 +545,7 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   `L7ALLOW`. Somente blocks Layer7 ignoram a marca; regras nativas do pfSense
   continuam a avaliar o pacote. O `pass quick` histórico da allowlist e das
   excepções UT1 é removido. Suite C/PHP/shell, smoke, build nDPI e pacote
-  passam no builder (`SHA256 a717b85b…eb90`); `pfctl -nf` e gate two-client
+  passam no builder (`SHA256 62dd9ae5…9dc6`); `pfctl -nf` e gate two-client
   continuam pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em

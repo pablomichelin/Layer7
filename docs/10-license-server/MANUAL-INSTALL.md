@@ -210,7 +210,7 @@ global como workaround.
 
 Artefacto interno validado no builder FreeBSD 15:
 `pfSense-pkg-layer7-1.8.11_28.pkg`,
-`SHA256=a717b85b609ac198b6544362bdb239be69d209023b7fed427d2ef9eb8f90eb90`.
+`SHA256=62dd9ae5923ade45b0bb484dca4e835b29b139f7a2aaa0a3624272ba07e59dc6`.
 Não é release pública e não deve ser instalado em clientes antes do gate
 controlado no appliance.
 
