@@ -157,8 +157,10 @@ BG-058 passa a exigir probe completo antes de inserir, reutilização do slot
 livre somente após a busca e evicção determinística do fluxo menos recente sob
 pressão. `cap_active`, `cap_evicted`, `cap_dropped`, `cap_pkts`,
 `cap_classified`, `cap_expired` e `captures` passam ao JSON de status.
-Regressões locais: PASS. Build FreeBSD, pacote e gate passivo permanecem
-pendentes; produção não foi alterada.
+Regressões locais/builder, suite C/PHP/shell, build nDPI e pacote extraído:
+PASS. Artefacto `pfSense-pkg-layer7-1.8.11_30.pkg`,
+`SHA256=3a54c667a601e29995562714691f4ee3e9e8e78a02fcd3e600955ae90d2e9b40`.
+Gate passivo permanece pendente; produção não foi alterada.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
@@ -944,7 +946,7 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: build/validar `_30`, instalar em passivo e validar ruleset +
+- Proximo gate: instalar `_30` em passivo e validar ruleset +
   logs/monitor/captura e só então testar o toggle anti-QUIC
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped

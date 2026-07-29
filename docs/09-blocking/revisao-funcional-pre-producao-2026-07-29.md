@@ -67,7 +67,8 @@ explicar a perda.
 O candidato `_30` faz a busca completa, só insere depois, escolhe o fluxo
 menos recente quando precisa evictar e publica métricas de pressão. Regressões
 locais cobrem buraco antes do match, primeiro livre, janela cheia e lookup
-sem criação. Builder e gate passivo continuam pendentes.
+sem criação. Suite C/PHP/shell, build nDPI e pacote extraído passaram no
+FreeBSD 15 (`SHA256 3a54c667…e9b40`); gate passivo continua pendente.
 
 | ID | Severidade | Limitação/risco | Próxima decisão |
 |----|------------|-----------------|-----------------|

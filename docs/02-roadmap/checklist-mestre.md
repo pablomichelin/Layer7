@@ -138,9 +138,10 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   instalação passiva e regressão com toggle antes de qualquer enforce.
 - [ ] **Candidato `_30` (BG-058 / FP-019):** lookup deve procurar toda a
   janela antes de reutilizar slot expirado; janela cheia deve evictar o fluxo
-  menos recente e contabilizar `cap_evicted`/`cap_dropped`. Exigir build nDPI,
-  JSON de stats válido, captura passiva real e pressão zero em tráfego normal
-  antes do gate two-client.
+  menos recente e contabilizar `cap_evicted`/`cap_dropped`. Build nDPI e
+  pacote extraído passaram (`SHA256 3a54c667…e9b40`). Exigir JSON de stats
+  válido, captura passiva real e pressão zero em tráfego normal antes do gate
+  two-client.
 
 ---
 

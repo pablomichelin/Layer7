@@ -23,7 +23,9 @@ Pacote candidato, não publicado e não aprovado para produção.
 ### Risco, teste e rollback
 
 - Impacto limitado ao subsistema de captura nDPI; sem mudança de política/PF.
-- Suite local: PASS. Builder nDPI, pacote e appliance passivo: pendentes.
+- Suite local/builder, PHP/shell, build nDPI e pacote extraído: PASS
+  (`SHA256=3a54c667a601e29995562714691f4ee3e9e8e78a02fcd3e600955ae90d2e9b40`).
+- Appliance passivo: pendente.
 - Rollback: `_29` passivo; `_24` continua rollback público conhecido.
 
 ---

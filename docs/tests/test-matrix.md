@@ -281,7 +281,7 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 |---|-------|------|--------|
 | 18.1 | Buraco expirado antes do match não cria outro estado para o mesmo fluxo | local C | OK (`test_capture_flow_key.c`) |
 | 18.2 | Janela cheia selecciona o fluxo menos recente; lookup sem criação não evicta | local C | OK (`test_capture_flow_key.c`) |
-| 18.3 | Build nDPI e validação do `.pkg` `_30`, incluindo campos de pressão no binário | FreeBSD 15 | Pendente |
+| 18.3 | Build nDPI e validação do `.pkg` `_30`, incluindo campos de pressão no binário | FreeBSD 15 | OK (`SHA256=3a54c667a601e29995562714691f4ee3e9e8e78a02fcd3e600955ae90d2e9b40`; pacote extraído PASS) |
 | 18.4 | Captura passiva real mantém `cap_dropped=0` e pressão explicável | appliance | Pendente |
 
 ---
@@ -307,8 +307,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Estabilização funcional `_27` | 8 | 4 | 4 |
 | Allow PF seguro `_28` | 8 | 5 | 3 |
 | Parser anti-QUIC `_29` | 4 | 3 | 1 |
-| Captura resiliente `_30` | 4 | 2 | 2 |
-| **Total** | **116** | **95** | **21** |
+| Captura resiliente `_30` | 4 | 3 | 1 |
+| **Total** | **116** | **96** | **20** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

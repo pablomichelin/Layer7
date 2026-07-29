@@ -558,7 +558,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   antes de procurar o fluxo no restante da janela. Janela cheia passa a
   evictar deterministicamente o fluxo menos recente, em vez de descartar
   silenciosamente; pressão fica visível no JSON por `cap_evicted` e
-  `cap_dropped`. Regressões locais passam; builder/appliance pendentes.
+  `cap_dropped`. Suite C/PHP/shell, build nDPI e pacote extraído passam no
+  FreeBSD 15 (`SHA256 3a54c667…e9b40`); appliance pendente.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

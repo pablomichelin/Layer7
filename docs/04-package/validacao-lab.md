@@ -1087,6 +1087,10 @@ completo instalado, toggle anti-QUIC e two-client continuam pendentes.
 
 ## 16. Roteiro BG-058 — pressão da tabela de fluxos (`1.8.11_30`)
 
+Build no FreeBSD 15, suite C/PHP/shell e validação do pacote extraído: PASS.
+Artefacto `pfSense-pkg-layer7-1.8.11_30.pkg`,
+`SHA256=3a54c667a601e29995562714691f4ee3e9e8e78a02fcd3e600955ae90d2e9b40`.
+
 Instalar somente com `enabled=false`; confirmar versão, bibliotecas e config
 antes de iniciar captura. Em monitor passivo, solicitar stats e verificar:
 
