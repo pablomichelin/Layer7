@@ -116,5 +116,14 @@ if (!layer7_policy_scoped_block_valid($unscoped_policy, $data)) {
 	exit(1);
 }
 
+$policies_ui = file_get_contents(
+    $root . "/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_policies.php"
+);
+if (!is_string($policies_ui) ||
+    strpos($policies_ui, "layer7_pf_config_resync(false)") !== false) {
+	fwrite(STDERR, "FAIL: policy mutation without dynamic table flush\n");
+	exit(1);
+}
+
 echo "PASS: test_scoped_pf_inc\n";
 exit(0);

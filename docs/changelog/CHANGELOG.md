@@ -21,14 +21,18 @@ Build isolado no FreeBSD 15:
 - **Bloqueio imediato:** após `pfctl -T add`, invalida o estado PF afectado;
   par cliente/destino em `pdst`, host inteiro só na quarentena e destino
   inteiro apenas no modelo legado global.
-- **Precedência:** política/excepção `allow` explícita não pode ser anulada
-  pela blacklist; default allow continua a avaliar blacklist.
+- **Precedência no callback:** política/excepção `allow` explícita impede nova
+  inserção pela blacklist; default allow continua a avaliar blacklist.
+  Precedência sobre entradas PF já existentes permanece gate/FP-017.
 - **TTL SNI:** entradas de blacklist criadas pelo caminho SNI entram no cache
   de expiração.
 - **Self-heal scoped:** a recuperação valida a tabela que falhou e o helper
   não declara sucesso com `pdst/psrc` ausente.
 - **DNS CNAME:** preserva o QNAME original ao percorrer answer RRs.
 - **Expiração de fluxos:** sweep também ocorre em tráfego já classificado.
+- **Mutação de políticas:** add/edit/toggle/enable passa a limpar tabelas
+  dinâmicas antes de regenerar regras, evitando destinos herdados por outro
+  índice, origem ou acção.
 
 ### Added
 

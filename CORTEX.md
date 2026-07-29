@@ -97,7 +97,7 @@ app/categoria normal usava quarentena `psrc`; e o PF mantinha estados já
 estabelecidos após a entrada na tabela.
 
 BG-055 corrige esses pontos e, no mesmo bloco de coerência do enforcement,
-restaura precedência de `allow` sobre blacklist, TTL no caminho SNI, self-heal
+restaura precedência de `allow` no callback de blacklist, TTL no caminho SNI, self-heal
 da tabela scoped alvo, QNAME original em CNAME e sweep de fluxos classificados.
 A emenda da ADR-0014 reserva `psrc` a `quarantine_origin=true`; app normal usa
 `pdst` por cliente/destino. Suite completa C/PHP/shell, build nDPI, validação
@@ -106,6 +106,8 @@ do pacote e smoke `layer7d -t` passaram no builder FreeBSD 15. Artefacto
 `SHA256=8720a8deb23ead3fdf102a1901eded29aa0cf16795d26189ce37e0bdf6e1b95c`.
 Gates no appliance ainda estão pendentes e produção segue intocada. Auditoria:
 `docs/09-blocking/revisao-funcional-pre-producao-2026-07-29.md`.
+Limitação crítica aberta: FP-017 — allow/excepção ainda não possui enforcement
+PF próprio contra destino já inserido por outro cliente/regra.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 

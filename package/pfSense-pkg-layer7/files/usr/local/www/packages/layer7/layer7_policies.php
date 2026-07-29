@@ -106,7 +106,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 					} else {
 						$policies[] = $rule;
 						if (layer7_save_json($data)) {
-							layer7_pf_config_resync(false);
+							layer7_pf_config_resync(true);
 							$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
 
 							if (isset($profile["extra_action"]) && $profile["extra_action"] === "configure_unbound_anti_doh") {
@@ -172,7 +172,7 @@ if ($_POST["toggle_profile_on"] ?? false) {
 					if (!empty($hosts)) { $rule["match"]["hosts"] = array_slice($hosts, 0, 64); }
 					$policies[] = $rule;
 					if (layer7_save_json($data)) {
-						layer7_pf_config_resync(false);
+						layer7_pf_config_resync(true);
 						$savemsg = sprintf(l7_t("Perfil '%s' ligado (accao block; em modo monitor fica apenas observado)."), $profile["name"] ?? $profile_id);
 						if (($profile["extra_action"] ?? "") === "configure_unbound_anti_doh") {
 							$doh_result = layer7_configure_unbound_anti_doh();
@@ -202,7 +202,7 @@ if ($_POST["toggle_profile_off"] ?? false) {
 				));
 				if (count($data["layer7"]["policies"]) !== $before) {
 					if (layer7_save_json($data)) {
-						layer7_pf_config_resync(false);
+						layer7_pf_config_resync(true);
 						$savemsg = sprintf(l7_t("Perfil '%s' desligado."), $profile_id);
 					}
 				} else {
@@ -366,7 +366,7 @@ if ($_POST["add_policy"] ?? false) {
 			if ($ok) {
 			$policies[] = $rule;
 			if (layer7_save_json($data)) {
-				layer7_pf_config_resync(false);
+				layer7_pf_config_resync(true);
 				$savemsg = l7_t("Politica adicionada.");
 			}
 			}
@@ -386,7 +386,7 @@ if ($_POST["save_policies"] ?? false) {
 		}
 		unset($policies);
 		if (layer7_save_json($data)) {
-			layer7_pf_config_resync(false);
+			layer7_pf_config_resync(true);
 			$savemsg = l7_t("Politicas atualizadas.");
 		}
 }
@@ -553,7 +553,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 				if ($ok) {
 				$policies[$idx] = $rule;
 				if (layer7_save_json($data)) {
-					layer7_pf_config_resync(false);
+					layer7_pf_config_resync(true);
 					header("Location: layer7_policies.php");
 					exit;
 				}

@@ -34,7 +34,7 @@ interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
 | FP-001 | Crítica | Hash de fluxo não era bidireccional; reverse tuple normalmente caía em outro bucket | Canonicalização `(IP,porta)` antes do hash | `test_capture_flow_key.c`; build nDPI |
 | FP-002 | Crítica | App/categoria normal colocava cliente em `layer7_psrc_N`, cortando toda a Internet | App normal usa destino em `layer7_pdst_N`; `psrc` só com `quarantine_origin=true` | C/PHP + two-client |
 | FP-003 | Crítica | Inserir IP em tabela não invalidava estado PF já estabelecido | Kill selectivo: par cliente/destino; host inteiro apenas em quarentena; destino inteiro no legado global | appliance, sessão persistente |
-| FP-004 | Alta | `allow` manual/excepção era avaliado, mas blacklist podia bloquear em seguida | Allow explícito encerra a cadeia; default allow ainda consulta blacklist | `test_policy_decide.c` |
+| FP-004 | Alta | `allow` manual/excepção era ignorado pelo callback e blacklist podia inserir novo destino | Callback agora respeita allow explícito; garantia contra entradas já existentes continua em FP-017 | `test_policy_decide.c` |
 | FP-005 | Alta | SNI blacklist adicionava IP sem registar TTL no cache | `enforce_cache_add()` também no caminho SNI | appliance + expiração |
 | FP-006 | Alta | Self-heal aceitava tabelas globais prontas mesmo se a tabela `pdst/psrc` que falhou continuasse ausente | Verificação da tabela solicitada; helper valida todas as tabelas scoped quando o modelo está activo | shell lint + falha induzida no lab |
 | FP-007 | Média | Parser DNS sobrescrevia o QNAME original com o nome do RR/CNAME | QNAME original preservado para política, blacklist e hint | resposta DNS com CNAME no lab |
@@ -52,6 +52,7 @@ interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
 | FP-014 | Alta | ECH, DoH hardcoded e QUIC podem ocultar host; bloqueio por IP pode atingir serviços compartilhados do mesmo cliente | UX de limitação, perfis de fallback e testes CDN |
 | FP-015 | Média | `config_parse.c` ainda usa busca textual sensível à estrutura/ordem do JSON | Migrar para parser JSON real em bloco separado |
 | FP-016 | Alta | Falta evidência física two-client, expiração, state kill e rollback | Executar roteiro somente após build `_27`, começando passivo |
+| FP-017 | Crítica | Allow/excepção não tem regra/tabela PF própria; um destino já inserido por outro cliente/regra pode continuar a bloquear apesar da decisão allow | Desenhar enforcement PF de allow escopado e adicionar caso two-client negativo antes de produção |
 
 ## Critérios mínimos antes de activar
 

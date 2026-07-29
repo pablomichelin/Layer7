@@ -19,11 +19,13 @@ bloqueio ausente, bloqueio tardio e quarentena acidental do cliente.
 - hash bidireccional entrega ida e volta ao mesmo fluxo nDPI;
 - app/categoria normal usa `pdst`; `psrc` exige quarentena explícita;
 - estado PF já estabelecido é encerrado de forma selectiva após o block;
-- allow manual/excepção prevalece sobre blacklist;
+- allow manual/excepção impede nova inserção pela blacklist; precedência sobre
+  entradas PF já existentes continua pendente (FP-017);
 - SNI blacklist recebe TTL;
 - self-heal exige a tabela scoped alvo;
 - QNAME DNS original é preservado em respostas com CNAME;
 - fluxo classificado não impede o sweep de expiração.
+- mudança de política limpa tabelas dinâmicas antes do resync.
 
 ## Gates obrigatórios
 

@@ -538,6 +538,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   restaura precedência de `allow`, aplica TTL ao caminho SNI e valida a tabela
   escopada no self-heal. Build FreeBSD/nDPI e suite C/PHP/shell passam
   (`SHA256 8720a8de…b95c`); produção permanece intocada e gate pendente.
+  A revisão final abriu BG-056/FP-017: precedência allow precisa de enforcement
+  PF próprio contra entradas já existentes antes de declarar produção pronta.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

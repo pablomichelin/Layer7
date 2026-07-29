@@ -122,6 +122,9 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   de app deve bloquear só o destino; `psrc` exige quarentena explícita.
   Suite/build/artefacto passaram (`SHA256 8720a8de…b95c`); `pfctl -nf` e
   gates no appliance continuam pendentes.
+- [ ] **Allow PF escopado (BG-056 / FP-017):** antes de produção, uma
+  política/excepção allow do cliente A deve vencer destino já inserido por B,
+  sem criar allow global e sem retirar o bloqueio de B.
 
 ---
 
