@@ -736,10 +736,12 @@ pfctl -a natrules/layer7_nat -s nat
 pfctl -s rules | grep -F layer7:anti-quic
 ```
 
-Esperam-se linhas `block drop quick ... label "layer7:anti-quic:<if>"` (e
+Esperam-se linhas `block drop quick on <if> inet ... label "layer7:anti-quic:<if>"` (e
 variante IPv6 `layer7:anti-quic6:`) para cada interface PF válida; desde
 **`1.8.11_12`**, nomes de interface inválidos são omitidos antes de gerar a
 linha (mesmo critério DRY que `force_dns` — `layer7_pf_ifname_for_rules`).
+Não usar `_28`: a ordem antiga `inet on <if>` falha no parser; `_29` corrige
+FP-018.
 
 Com `force_dns` activo e CIDRs validos, esperam-se linhas contendo
 `rdr` para UDP/TCP porta 53 com destino `127.0.0.1`. Se desactivar
@@ -1051,3 +1053,21 @@ recarregar o filtro pelo mecanismo normal do pfSense, remover apenas a regra
 nativa temporária do teste e reinstalar `_24`/artefacto anterior aprovado.
 Restaurar a configuração exportada. Não apagar tabelas ou regras nativas
 manualmente fora desse escopo.
+
+---
+
+## 15. Roteiro BG-057 — parser PF anti-QUIC (`1.8.11_29`)
+
+Pré-gate read-only executado no pfSense Plus 26.03.1 / FreeBSD 16:
+
+- `_24`, `enabled=false`, `mode=monitor`, daemon parado e pacote íntegro;
+- regras actuais e `/tmp/rules.debug`: `pfctl -nf` PASS;
+- tabelas `layer7_block`, `block_dst` e `tagged`: vazias;
+- snippet `_28`: FAIL na linha `inet on <if>`;
+- mesmo snippet com `on <if> inet`: PASS, incluindo `L7ALLOW`, `pallow`,
+  `blsrc`, anti-DoT e anti-QUIC;
+- nenhuma regra foi carregada (`-n`) e nenhuma configuração foi alterada.
+
+Após build `_29`, instalar somente passivo e validar o ruleset completo antes
+de tocar no toggle anti-QUIC. Se o parser falhar, não aplicar/recarregar,
+preservar `_24` e recolher a linha exacta da falha.

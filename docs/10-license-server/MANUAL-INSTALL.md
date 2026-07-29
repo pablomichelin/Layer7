@@ -211,8 +211,7 @@ global como workaround.
 Artefacto interno validado no builder FreeBSD 15:
 `pfSense-pkg-layer7-1.8.11_28.pkg`,
 `SHA256=62dd9ae5923ade45b0bb484dca4e835b29b139f7a2aaa0a3624272ba07e59dc6`.
-Não é release pública e não deve ser instalado em clientes antes do gate
-controlado no appliance.
+Este artefacto foi supersedido por `_29` após FP-018; **não instalar**.
 
 Diagnóstico offline do caminho por destino (não altera PF com `-n`):
 
@@ -223,6 +222,12 @@ Diagnóstico offline do caminho por destino (não altera PF com `-n`):
 
 Rollback: `enabled=false`, `layer7-pfctl flush-all`, reload do filtro,
 reinstalação `_24` em monitor e restauro do JSON exportado.
+
+**Addendum do candidato `1.8.11_29` (não publicado):**
+Corrige FP-018 na regra anti-QUIC por interface: `on <if>` passa a anteceder
+`inet`/`inet6`. A sintaxe corrigida passou em amostra autocontida com
+`pfctl -nf -` no pfSense Plus 26.03.1, sem carregar regras. Build e SHA256
+serão registados após o novo pacote; até lá, manter `_24` passivo.
 
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e

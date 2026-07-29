@@ -2,9 +2,36 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [1.8.11_28] - Unreleased — allow PF sem bypass do pfSense
+## [1.8.11_29] - Unreleased — sintaxe anti-QUIC aceita pelo PF
 
 Pacote candidato, **não publicado** e **não aprovado para produção**.
+O pré-gate read-only no pfSense Plus 26.03.1 encontrou FP-018 antes da
+instalação; nenhuma regra ou configuração do appliance foi alterada.
+
+### Fixed
+
+- Anti-QUIC por interface passa de `block ... inet on <if>` para
+  `block ... on <if> inet` (e equivalente `inet6`), ordem aceite pelo parser
+  PF do appliance.
+- Geração anti-QUIC foi isolada em função pura e ganhou regressão PHP para
+  rejeitar a ordem inválida e nomes de interface não sanitizados.
+
+### Gates e rollback
+
+- `_24` instalado está passivo, íntegro e com ruleset actual válido.
+- Snippet autocontido com `L7ALLOW`, `pallow`, `blsrc`, anti-DoT e anti-QUIC
+  corrigido: `pfctl -nf -` PASS no FreeBSD 16.
+- Suite/build/artefacto `_29`, ruleset completo instalado e two-client:
+  pendentes.
+- `_28` está supersedido; rollback permanece `_24` passivo + flush + reload.
+
+---
+
+## [1.8.11_28] - Unreleased — allow PF sem bypass do pfSense
+
+Pacote candidato **supersedido por `_29`**, não publicado e não aprovado para
+produção. Não instalar: FP-018 invalida o ruleset se anti-QUIC por interface
+estiver activo.
 BG-056/FP-017 é corrigido em código sob a decisão ADR-0016; build do `.pkg`
 passou e o gate no appliance continua pendente.
 

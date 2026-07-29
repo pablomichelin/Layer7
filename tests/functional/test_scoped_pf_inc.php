@@ -222,6 +222,22 @@ if (strpos($allow_tables,
 	exit(1);
 }
 
+$quic_data = array(
+	"layer7" => array(
+		"block_quic_interfaces" => array("vmx0", "bad iface")
+	)
+);
+$quic_rules = layer7_anti_quic_filter_rules_text($quic_data);
+if (strpos($quic_rules,
+    "block drop quick on vmx0 inet proto udp") === false ||
+    strpos($quic_rules,
+    "block drop quick on vmx0 inet6 proto udp") === false ||
+    strpos($quic_rules, "inet on vmx0") !== false ||
+    strpos($quic_rules, "bad iface") !== false) {
+	fwrite(STDERR, "FAIL: anti-QUIC interface PF syntax is invalid\n");
+	exit(1);
+}
+
 $monitor_allow = $allow_data;
 $monitor_allow["layer7"]["mode"] = "monitor";
 if (layer7_policy_allow_rules_text($monitor_allow) !== "" ||

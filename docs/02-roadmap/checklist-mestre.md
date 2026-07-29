@@ -130,7 +130,11 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   todos os blocks Layer7 relevantes usam `! tagged L7ALLOW`; uma regra nativa
   de bloqueio do pfSense continua a vencer. Exigir `pfctl -nf`, two-client,
   app-only cold-start documentado e rollback passivo. Suite/smoke/build
-  passaram (`SHA256 62dd9ae5…9dc6`); item permanece aberto pelo gate físico.
+  passaram (`SHA256 62dd9ae5…9dc6`), mas `_28` foi supersedido por FP-018.
+- [ ] **Candidato `_29` (BG-057 / FP-018):** anti-QUIC por interface deve
+  emitir `on <if> inet|inet6`; amostra autocontida já passou no parser PF do
+  appliance. Exigir build `_29`, `pfctl -nf` do ruleset completo após
+  instalação passiva e regressão com toggle antes de qualquer enforce.
 
 ---
 

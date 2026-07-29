@@ -127,6 +127,21 @@ são gates.
 Produção permanece intocada. O limite app-only/cold-start e os riscos
 FP-009..FP-016 permanecem documentados.
 
+### Candidato `1.8.11_29` — sintaxe anti-QUIC validada no PF (não publicado)
+
+O pré-gate read-only no pfSense Plus 26.03.1 / FreeBSD 16 confirmou `_24`
+instalado, `enabled=false`, `mode=monitor`, daemon parado, pacote íntegro,
+ruleset actual válido e tabelas de block vazias. Uma amostra `_28` submetida
+a `pfctl -nf -` revelou FP-018: anti-QUIC por interface era emitido como
+`inet on <if>`, ordem rejeitada pelo parser. A forma `on <if> inet` passou
+com as regras `L7ALLOW`, `pallow`, `blsrc`, anti-DoT e anti-QUIC no mesmo
+snippet. Nenhuma regra foi carregada e a produção permaneceu inalterada.
+
+BG-057 corrige a ordem em função pura testável e incrementa o port para
+`1.8.11_29`. `_28` fica supersedido e não deve ser instalado. Build/artefacto
+`_29`, parser do ruleset completo instalado e gate two-client continuam
+pendentes.
+
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
 Artefacto `pfSense-pkg-layer7-1.8.11_23.pkg`
@@ -243,7 +258,7 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_28` (`PORTVERSION=1.8.11`, `PORTREVISION=28`),
++ `PORTREVISION`):** `1.8.11_29` (`PORTVERSION=1.8.11`, `PORTREVISION=29`),
 **candidato interno não publicado**. A release pública permanece
 `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
@@ -911,10 +926,10 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: validar ruleset e instalar `_28` em passivo + logs/monitor/captura
+- Proximo gate: build `_29`, validar ruleset e instalar em passivo + logs/monitor/captura
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 28 (candidato nao publicado)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 29 (candidato nao publicado)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
   _25 + contenção L1 `_26` + correcções `_27`/`_28` em curso, sem activacao
   no appliance

@@ -48,6 +48,12 @@ interno `pfSense-pkg-layer7-1.8.11_27.pkg`,
 
 ## Riscos ainda abertos — não declarar produção pronta
 
+### Achado FP-018 — corrigido no candidato `_29`
+
+O pré-gate read-only provou que `block ... inet on <if>` é rejeitado pelo PF.
+O código passa a gerar `block ... on <if> inet`; a forma corrigida passou em
+`pfctl -nf -` no appliance sem carregar regras. `_28` fica supersedido.
+
 | ID | Severidade | Limitação/risco | Próxima decisão |
 |----|------------|-----------------|-----------------|
 | FP-009 | Crítica | `legacy_global` continua default e um destino pode afectar todos os clientes | Gate two-client e migração controlada para `scoped_hybrid` |

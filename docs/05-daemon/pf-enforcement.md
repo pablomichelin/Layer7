@@ -51,10 +51,12 @@ multi-interface / VLAN); matriz:
 ## Anti-QUIC por interface (`layer7.inc`)
 
 Com **interfaces seleccionadas** na GUI (bloquear QUIC só nesses segmentos),
-`layer7_generate_rules()` em `layer7.inc` emite linhas `block drop quick … on
-<interface>`. Desde **`1.8.11_12`**, a validação do nome PF reutiliza a mesma
+`layer7_generate_rules()` em `layer7.inc` emite linhas
+`block drop quick on <interface> inet|inet6 …`. Desde **`1.8.11_12`**, a
+validação do nome PF reutiliza a mesma
 função **`layer7_pf_ifname_for_rules()`** que o trilho **DNS forcado** / `rdr`
-(refactor DRY; sem mudança de comportamento face a `_11`).
+(refactor DRY). Em `_29`, FP-018 corrige a ordem anterior `inet on <if>`,
+rejeitada pelo parser PF quando o toggle estava activo.
 
 ## Inspecao por SNI (Caminho A / A3)
 

@@ -266,6 +266,15 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | 16.7 | A permitido/B bloqueado no mesmo destino; block nativo do pfSense continua a vencer | appliance/two-client | Pendente |
 | 16.8 | App-only cold-start, TTL, reload e rollback não deixam `pallow` stale | appliance | Pendente |
 
+## 17. Candidato `1.8.11_29` — parser PF anti-QUIC
+
+| # | Teste | Onde | Status |
+|---|-------|------|--------|
+| 17.1 | Gerador emite `on <if> inet|inet6`, nunca `inet|inet6 on <if>` | builder PHP | OK (`test_scoped_pf_inc.php`) |
+| 17.2 | Snippet com allow/tags/blsrc/anti-DoT/anti-QUIC corrigido passa `pfctl -nf -` | pfSense Plus 26.03.1 | OK (read-only, nenhuma regra carregada) |
+| 17.3 | Build nDPI e validação do `.pkg` `_29` | FreeBSD 15 | Pendente |
+| 17.4 | Instalação passiva, ruleset completo e toggle anti-QUIC sem falha | appliance | Pendente |
+
 ---
 
 ## Resumo
@@ -288,7 +297,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Contenção de logs `_26` | 4 | 3 | 1 |
 | Estabilização funcional `_27` | 8 | 4 | 4 |
 | Allow PF seguro `_28` | 8 | 5 | 3 |
-| **Total** | **108** | **90** | **18** |
+| Parser anti-QUIC `_29` | 4 | 2 | 2 |
+| **Total** | **112** | **92** | **20** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

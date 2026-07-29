@@ -547,6 +547,10 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   excepções UT1 é removido. Suite C/PHP/shell, smoke, build nDPI e pacote
   passam no builder (`SHA256 62dd9ae5…9dc6`); `pfctl -nf` e gate two-client
   continuam pendentes.
+- **Sintaxe anti-QUIC PF (`2026-07-29`, candidato `1.8.11_29`):** pré-gate
+  read-only no pfSense Plus 26.03.1 encontrou `inet on <if>` rejeitado pelo
+  parser. BG-057 muda para `on <if> inet`, forma validada com `pfctl -nf -`;
+  `_28` fica supersedido. Build `_29` e gates instalados permanecem pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /
