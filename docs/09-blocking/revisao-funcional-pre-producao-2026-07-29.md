@@ -56,12 +56,25 @@ O código passa a gerar `block ... on <if> inet`; a forma corrigida passou em
 extraído `_29` passaram no builder FreeBSD 15
 (`SHA256 bea385dd…01840`). `_28` fica supersedido.
 
+### Achado FP-019 — corrigido no candidato `_30`
+
+O lookup de fluxo criava a entrada no primeiro slot vazio sem terminar a
+busca. Como a expiração cria buracos numa janela com colisões, o fluxo
+original podia continuar depois do buraco e a nova inserção dividia novamente
+o estado nDPI. Janela com 64 slots ocupados também retornava `NULL` sem
+explicar a perda.
+
+O candidato `_30` faz a busca completa, só insere depois, escolhe o fluxo
+menos recente quando precisa evictar e publica métricas de pressão. Regressões
+locais cobrem buraco antes do match, primeiro livre, janela cheia e lookup
+sem criação. Builder e gate passivo continuam pendentes.
+
 | ID | Severidade | Limitação/risco | Próxima decisão |
 |----|------------|-----------------|-----------------|
 | FP-009 | Crítica | `legacy_global` continua default e um destino pode afectar todos os clientes | Gate two-client e migração controlada para `scoped_hybrid` |
 | FP-010 | Alta | Pipeline de captura/enforcement é IPv4-only | Definir suporte IPv6 ou bloquear rollout em redes dual-stack |
 | FP-011 | Alta | Builder FreeBSD 15 e appliance observado pfSense Plus/FreeBSD 16 têm ABI diferentes | Instalar primeiro passivo e validar binário/bibliotecas |
-| FP-012 | Alta | Tabela de fluxos tenta só 64 posições e rejeita colisão sem contador visível | Adicionar métrica de drops/pressão e estratégia de eviction |
+| FP-012 | Alta | Capacidade/pressão real da tabela ainda precisa de evidência em tráfego do appliance | `_30` adiciona evicção e métricas; validar `cap_evicted/cap_dropped` no gate passivo |
 | FP-013 | Alta | DNS hint é global, limitado e associa um único hostname por IP compartilhado | Testar CDN multi-host; priorizar SNI quando disponível |
 | FP-014 | Alta | ECH, DoH hardcoded e QUIC podem ocultar host; bloqueio por IP pode atingir serviços compartilhados do mesmo cliente | UX de limitação, perfis de fallback e testes CDN |
 | FP-015 | Média | `config_parse.c` ainda usa busca textual sensível à estrutura/ordem do JSON | Migrar para parser JSON real em bloco separado |

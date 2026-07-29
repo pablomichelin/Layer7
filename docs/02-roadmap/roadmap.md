@@ -553,6 +553,12 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   `_28` fica supersedido. Suite C/PHP/shell, build nDPI e validação do pacote
   extraído passam no builder FreeBSD 15 (`SHA256 bea385dd…01840`); instalação
   passiva, ruleset completo e gate two-client permanecem pendentes.
+- **Continuidade de fluxo sob colisão (`2026-07-29`, candidato
+  `1.8.11_30`):** BG-058/FP-019 corrigem inserção prematura num slot expirado
+  antes de procurar o fluxo no restante da janela. Janela cheia passa a
+  evictar deterministicamente o fluxo menos recente, em vez de descartar
+  silenciosamente; pressão fica visível no JSON por `cap_evicted` e
+  `cap_dropped`. Regressões locais passam; builder/appliance pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

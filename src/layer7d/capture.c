@@ -39,6 +39,7 @@
 #define L7C_SNAP_DEFAULT 1536
 #define L7C_EXPIRE_INTERVAL 10
 #define L7C_MAX_PKTS_PER_FLOW 48
+#define L7C_FLOW_PROBE_SLOTS 64
 #define L7C_DNS_HINTS       1024
 #define L7C_DNS_HOST_MAX    256
 
@@ -69,6 +70,8 @@ struct layer7_capture {
 	unsigned long long                   stat_flows_classified;
 	unsigned long long                   stat_flows_expired;
 	unsigned long long                   stat_flows_active;
+	unsigned long long                   stat_flows_evicted;
+	unsigned long long                   stat_flows_dropped;
 	time_t                               last_expire;
 	int                                  datalink;
 	int                                  protos_loaded;
@@ -332,6 +335,8 @@ sni_host_plausible(const char *h)
 	return dots >= 1;
 }
 
+static void flow_free(struct layer7_capture *cap, struct l7c_flow *f);
+
 static struct l7c_flow *
 flow_lookup(struct layer7_capture *cap, uint32_t sa, uint32_t da,
     uint16_t sp, uint16_t dp, uint8_t proto, int create)
@@ -339,43 +344,55 @@ flow_lookup(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 	uint32_t idx = layer7_capture_flow_hash(sa, da, sp, dp, proto,
 	    L7C_FLOW_MASK);
 	uint32_t i;
+	uint32_t selected;
+	struct layer7_capture_probe probe;
+	struct l7c_flow *f;
+	int found, evict;
 
-	for (i = 0; i < 64; i++) {
+	layer7_capture_probe_init(&probe);
+	for (i = 0; i < L7C_FLOW_PROBE_SLOTS; i++) {
 		uint32_t slot = (idx + i) & L7C_FLOW_MASK;
-		struct l7c_flow *f = &cap->flows[slot];
+		int matches;
 
-		if (f->in_use &&
-		    f->src_ip == sa && f->dst_ip == da &&
-		    f->src_port == sp && f->dst_port == dp &&
-		    f->proto == proto)
-			return f;
-
-		if (f->in_use &&
-		    f->src_ip == da && f->dst_ip == sa &&
-		    f->src_port == dp && f->dst_port == sp &&
-		    f->proto == proto)
-			return f;
-
-		if (!f->in_use && create) {
-			memset(f, 0, sizeof(*f));
-			f->src_ip = sa;
-			f->dst_ip = da;
-			f->src_port = sp;
-			f->dst_port = dp;
-			f->proto = proto;
-			f->in_use = 1;
-			f->ndpi_flow = (struct ndpi_flow_struct *)
-			    ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
-			if (!f->ndpi_flow) {
-				memset(f, 0, sizeof(*f));
-				return NULL;
-			}
-			memset(f->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
-			cap->stat_flows_active++;
-			return f;
-		}
+		f = &cap->flows[slot];
+		matches = f->in_use && f->proto == proto &&
+		    ((f->src_ip == sa && f->dst_ip == da &&
+		    f->src_port == sp && f->dst_port == dp) ||
+		    (f->src_ip == da && f->dst_ip == sa &&
+		    f->src_port == dp && f->dst_port == sp));
+		layer7_capture_probe_observe(&probe, slot, f->in_use, matches,
+		    f->last_seen > 0 ? (uint64_t)f->last_seen : 0);
 	}
-	return NULL;
+
+	selected = layer7_capture_probe_select(&probe, create, &found, &evict);
+	if (selected == LAYER7_CAPTURE_NO_SLOT)
+		return NULL;
+	f = &cap->flows[selected];
+	if (found)
+		return f;
+
+	if (evict) {
+		flow_free(cap, f);
+		cap->stat_flows_evicted++;
+	}
+
+	memset(f, 0, sizeof(*f));
+	f->src_ip = sa;
+	f->dst_ip = da;
+	f->src_port = sp;
+	f->dst_port = dp;
+	f->proto = proto;
+	f->in_use = 1;
+	f->ndpi_flow = (struct ndpi_flow_struct *)
+	    ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
+	if (!f->ndpi_flow) {
+		memset(f, 0, sizeof(*f));
+		cap->stat_flows_dropped++;
+		return NULL;
+	}
+	memset(f->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
+	cap->stat_flows_active++;
+	return f;
 }
 
 static void
@@ -683,7 +700,8 @@ layer7_capture_poll(struct layer7_capture *cap, int batch_size)
 void
 layer7_capture_stats(const struct layer7_capture *cap,
     unsigned long long *pkts_total, unsigned long long *flows_active,
-    unsigned long long *flows_classified, unsigned long long *flows_expired)
+    unsigned long long *flows_classified, unsigned long long *flows_expired,
+    unsigned long long *flows_evicted, unsigned long long *flows_dropped)
 {
 	if (!cap)
 		return;
@@ -695,6 +713,10 @@ layer7_capture_stats(const struct layer7_capture *cap,
 		*flows_classified = cap->stat_flows_classified;
 	if (flows_expired)
 		*flows_expired = cap->stat_flows_expired;
+	if (flows_evicted)
+		*flows_evicted = cap->stat_flows_evicted;
+	if (flows_dropped)
+		*flows_dropped = cap->stat_flows_dropped;
 }
 
 void

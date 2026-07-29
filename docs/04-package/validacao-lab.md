@@ -1084,3 +1084,19 @@ Build `_29` concluído no builder FreeBSD 15 em `2026-07-29`:
 
 Isto fecha apenas o gate do builder. Instalação passiva, parser do ruleset
 completo instalado, toggle anti-QUIC e two-client continuam pendentes.
+
+## 16. Roteiro BG-058 — pressão da tabela de fluxos (`1.8.11_30`)
+
+Instalar somente com `enabled=false`; confirmar versão, bibliotecas e config
+antes de iniciar captura. Em monitor passivo, solicitar stats e verificar:
+
+```sh
+kill -USR1 "$(tr -d '[:space:]' </var/run/layer7d.pid)"
+sleep 1
+cat /tmp/layer7-stats.json
+```
+
+PASS mínimo: `captures > 0`, `cap_pkts` crescente, JSON válido,
+`cap_dropped=0`; `cap_evicted` deve permanecer zero em tráfego normal ou ter
+causa documentada em teste de pressão. Qualquer crescimento inesperado exige
+parar o daemon, preservar JSON/logs e voltar a `_29`/`_24` passivo.

@@ -84,6 +84,15 @@ static time_t s_boot_time;
 static time_t s_last_stats_write;
 static time_t s_last_periodic_log;
 
+/* Agregados das capturas nDPI; ficam zero em builds sem nDPI. */
+static unsigned long long s_cap_pkts;
+static unsigned long long s_cap_flows_active;
+static unsigned long long s_cap_flows_classified;
+static unsigned long long s_cap_flows_expired;
+static unsigned long long s_cap_flows_evicted;
+static unsigned long long s_cap_flows_dropped;
+static int s_cap_interfaces;
+
 static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
 static int s_license_state = -1; /* 0=invalid, 1=valid, 2=grace/dev */
@@ -180,6 +189,19 @@ write_stats_json(void)
 	    (unsigned long long)s_pf_dst_add_ok);
 	fprintf(f, "  \"dst_add_fail\": %llu,\n",
 	    (unsigned long long)s_pf_dst_add_fail);
+	fprintf(f, "  \"cap_pkts\": %llu,\n",
+	    (unsigned long long)s_cap_pkts);
+	fprintf(f, "  \"cap_active\": %llu,\n",
+	    (unsigned long long)s_cap_flows_active);
+	fprintf(f, "  \"cap_classified\": %llu,\n",
+	    (unsigned long long)s_cap_flows_classified);
+	fprintf(f, "  \"cap_expired\": %llu,\n",
+	    (unsigned long long)s_cap_flows_expired);
+	fprintf(f, "  \"cap_evicted\": %llu,\n",
+	    (unsigned long long)s_cap_flows_evicted);
+	fprintf(f, "  \"cap_dropped\": %llu,\n",
+	    (unsigned long long)s_cap_flows_dropped);
+	fprintf(f, "  \"captures\": %d,\n", s_cap_interfaces);
 
 	qsort(s_app_blocks, s_n_app_blocks, sizeof(s_app_blocks[0]),
 	    counter_cmp_desc);
@@ -408,9 +430,6 @@ list_ndpi_protos(void)
 #define L7_MAX_IFACES 8
 static struct layer7_capture *s_captures[L7_MAX_IFACES];
 static int s_n_captures;
-static unsigned long long s_cap_pkts;
-static unsigned long long s_cap_flows_classified;
-static unsigned long long s_cap_flows_expired;
 #endif
 
 static char *read_file(const char *path, size_t *out_len);
@@ -2183,19 +2202,26 @@ static void
 aggregate_capture_stats(void)
 {
 	int i;
-	unsigned long long pkts = 0, cl = 0, ex = 0;
+	unsigned long long pkts = 0, active = 0, cl = 0, ex = 0;
+	unsigned long long evicted = 0, dropped = 0;
 
 	for (i = 0; i < s_n_captures; i++) {
-		unsigned long long p, a, c, e;
-		layer7_capture_stats(s_captures[i], &p, &a, &c, &e);
+		unsigned long long p, a, c, e, v, d;
+		layer7_capture_stats(s_captures[i], &p, &a, &c, &e, &v, &d);
 		pkts += p;
+		active += a;
 		cl += c;
 		ex += e;
-		(void)a;
+		evicted += v;
+		dropped += d;
 	}
 	s_cap_pkts = pkts;
+	s_cap_flows_active = active;
 	s_cap_flows_classified = cl;
 	s_cap_flows_expired = ex;
+	s_cap_flows_evicted = evicted;
+	s_cap_flows_dropped = dropped;
+	s_cap_interfaces = s_n_captures;
 }
 #else
 static void close_captures(void) {}
@@ -2498,7 +2524,8 @@ int main(int argc, char **argv)
 			    "policies=%d exceptions=%d enforce_cfg=%d "
 			    "have_parse=%d pf_add_ok=%llu pf_add_fail=%llu "
 			    "dst_add_ok=%llu dst_add_fail=%llu dst_cache=%d "
-			    "cap_pkts=%llu cap_classified=%llu cap_expired=%llu "
+			    "cap_pkts=%llu cap_active=%llu cap_classified=%llu "
+			    "cap_expired=%llu cap_evicted=%llu cap_dropped=%llu "
 			    "captures=%d",
 			    layer7d_version,
 			    (unsigned long long)s_reload_ok,
@@ -2513,8 +2540,11 @@ int main(int argc, char **argv)
 			    (unsigned long long)s_pf_dst_add_fail,
 			    s_n_enforce_cache,
 			    (unsigned long long)s_cap_pkts,
+			    (unsigned long long)s_cap_flows_active,
 			    (unsigned long long)s_cap_flows_classified,
 			    (unsigned long long)s_cap_flows_expired,
+			    (unsigned long long)s_cap_flows_evicted,
+			    (unsigned long long)s_cap_flows_dropped,
 			    s_n_captures);
 #else
 			L7_DBG(
@@ -2730,12 +2760,16 @@ int main(int argc, char **argv)
 				L7_INFO(
 				    "periodic: reload_ok=%llu policies=%d "
 				    "exceptions=%d enforce=%d "
-				    "pkts=%llu classified=%llu "
+				    "pkts=%llu active=%llu classified=%llu "
+				    "evicted=%llu dropped=%llu "
 				    "blocked=%llu allowed=%llu",
 				    (unsigned long long)s_reload_ok, s_np,
 				    s_nx, s_ge,
 				    (unsigned long long)s_cap_pkts,
+				    (unsigned long long)s_cap_flows_active,
 				    (unsigned long long)s_cap_flows_classified,
+				    (unsigned long long)s_cap_flows_evicted,
+				    (unsigned long long)s_cap_flows_dropped,
 				    (unsigned long long)s_total_blocked,
 				    (unsigned long long)s_total_allowed);
 			}

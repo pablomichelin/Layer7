@@ -81,7 +81,8 @@ int layer7_capture_poll(struct layer7_capture *cap, int batch_size);
  */
 void layer7_capture_stats(const struct layer7_capture *cap,
     unsigned long long *pkts_total, unsigned long long *flows_active,
-    unsigned long long *flows_classified, unsigned long long *flows_expired);
+    unsigned long long *flows_classified, unsigned long long *flows_expired,
+    unsigned long long *flows_evicted, unsigned long long *flows_dropped);
 
 /*
  * Libera recursos (pcap_close + ndpi_exit).

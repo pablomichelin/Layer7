@@ -56,16 +56,17 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 ## Matriz de testes
 
-[`test-matrix.md`](test-matrix.md) — 112 testes divididos por categoria
+[`test-matrix.md`](test-matrix.md) — 116 testes divididos por categoria
 (build, instalação, daemon, config, policy engine, enforcement **inclui F4.3
 `force_dns` / anchor NAT e anti-QUIC opcional (ponto 6.7 / sec. 11)**, **blacklists F4.2 (12.1–12.2)**,
 GUI, observabilidade, rollback e
 addendum de licenciamento/activação da F3, estabilização `_25`, logs `_26`,
-correcções `_27`, allow PF seguro `_28` e parser anti-QUIC `_29`).
-Estado actual após build `_29`: 93 OK e **19** pendentes. A sintaxe
+correcções `_27`, allow PF seguro `_28`, parser anti-QUIC `_29` e captura
+resiliente `_30`).
+Estado actual antes do build `_30`: 95 OK e **21** pendentes. A sintaxe
 corrigida passa no parser PF read-only e o pacote extraído passou no builder
-FreeBSD 15 (`SHA256 bea385dd…01840`); gates instalados continuam explicitamente
-pendentes. `_28` está supersedido.
+FreeBSD 15 (`SHA256 bea385dd…01840`); as regressões FP-019 passam localmente,
+mas build `_30` e gates instalados continuam explicitamente pendentes.
 Roteiros de evidência **F4** no appliance (10a / 10b / 11 ↔ matriz; **6.7** com
 anti-QUIC opcional e cenário multi-interface / VLAN na secção **11**):
 parágrafo *Gates oficiais F4* e tabela *Índice dos roteiros F4* em

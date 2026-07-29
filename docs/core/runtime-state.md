@@ -21,7 +21,11 @@ O que existe **só em RAM** entre reloads (não persistido).
   - `policy_decision` (se já resolvido)
   - `packets_count`
 
-**Evicção:** TTL por inatividade (ex.: 5 min TCP idle, 60 s UDP) + limite máximo de entradas (proteção memória).
+**Evicção:** TTL por inatividade e limite máximo de entradas. O lookup examina
+toda a janela de colisão antes de reutilizar um slot expirado; se a janela
+estiver cheia, remove deterministicamente o fluxo menos recente para manter a
+captura disponível. `cap_evicted` mede pressão/evicção e `cap_dropped` mede
+falha de alocação.
 
 ### Índice de políticas
 
@@ -39,7 +43,8 @@ O que existe **só em RAM** entre reloads (não persistido).
 
 ### Contadores (expor status / GUI)
 
-- `flows_active`, `flows_classified`, `packets_processed`
+- `cap_active`, `cap_classified`, `cap_expired`, `cap_evicted`,
+  `cap_dropped`, `cap_pkts`, `captures`
 - `blocks_applied`, `tags_applied`, `monitor_events`
 
 ## Concorrência

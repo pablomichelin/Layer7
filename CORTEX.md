@@ -145,6 +145,21 @@ BG-057 corrige a ordem em função pura testável e incrementa o port para
 O parser do ruleset completo instalado e o gate two-client continuam
 pendentes; produção permanece intocada.
 
+### Candidato `1.8.11_30` — continuidade do fluxo sob colisão (não publicado)
+
+A revisão seguinte encontrou FP-019 no lookup open-addressing da captura:
+depois da expiração de uma entrada, um slot livre podia ser reutilizado antes
+de procurar o mesmo fluxo no restante da janela. Isso criava outro estado
+nDPI para a mesma conversa e tornava a classificação intermitente. Se os 64
+slots da janela estivessem ocupados, o novo fluxo era descartado sem métrica.
+
+BG-058 passa a exigir probe completo antes de inserir, reutilização do slot
+livre somente após a busca e evicção determinística do fluxo menos recente sob
+pressão. `cap_active`, `cap_evicted`, `cap_dropped`, `cap_pkts`,
+`cap_classified`, `cap_expired` e `captures` passam ao JSON de status.
+Regressões locais: PASS. Build FreeBSD, pacote e gate passivo permanecem
+pendentes; produção não foi alterada.
+
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
 Artefacto `pfSense-pkg-layer7-1.8.11_23.pkg`
@@ -261,7 +276,7 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_29` (`PORTVERSION=1.8.11`, `PORTREVISION=29`),
++ `PORTREVISION`):** `1.8.11_30` (`PORTVERSION=1.8.11`, `PORTREVISION=30`),
 **candidato interno não publicado**. A release pública permanece
 `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
@@ -929,11 +944,11 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: instalar `_29` em passivo, validar o ruleset completo +
+- Proximo gate: build/validar `_30`, instalar em passivo e validar ruleset +
   logs/monitor/captura e só então testar o toggle anti-QUIC
   + two-client appliance
   (validacao-lab sec. 12) antes de release/default scoped
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 29 (candidato nao publicado)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 30 (candidato nao publicado)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
   _25 + contenção L1 `_26` + correcções `_27`/`_28` em curso, sem activacao
   no appliance

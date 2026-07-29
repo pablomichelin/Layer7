@@ -275,6 +275,15 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | 17.3 | Build nDPI e validação do `.pkg` `_29` | FreeBSD 15 | OK (`SHA256=bea385ddb6f61bb6a9bffde0b781cea7a852b3956f620b8b004c914b0ab01840`; pacote extraído PASS) |
 | 17.4 | Instalação passiva, ruleset completo e toggle anti-QUIC sem falha | appliance | Pendente |
 
+## 18. Candidato `1.8.11_30` — continuidade da tabela de fluxos
+
+| # | Teste | Onde | Status |
+|---|-------|------|--------|
+| 18.1 | Buraco expirado antes do match não cria outro estado para o mesmo fluxo | local C | OK (`test_capture_flow_key.c`) |
+| 18.2 | Janela cheia selecciona o fluxo menos recente; lookup sem criação não evicta | local C | OK (`test_capture_flow_key.c`) |
+| 18.3 | Build nDPI e validação do `.pkg` `_30`, incluindo campos de pressão no binário | FreeBSD 15 | Pendente |
+| 18.4 | Captura passiva real mantém `cap_dropped=0` e pressão explicável | appliance | Pendente |
+
 ---
 
 ## Resumo
@@ -298,7 +307,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | Estabilização funcional `_27` | 8 | 4 | 4 |
 | Allow PF seguro `_28` | 8 | 5 | 3 |
 | Parser anti-QUIC `_29` | 4 | 3 | 1 |
-| **Total** | **112** | **93** | **19** |
+| Captura resiliente `_30` | 4 | 2 | 2 |
+| **Total** | **116** | **95** | **21** |
 
 A base V1 continua com 58 testes OK. O addendum da F3 acrescenta 20 cenarios
 de licenciamento/activacao: 16 ficam fechados por revisao de codigo,

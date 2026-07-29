@@ -2,6 +2,32 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_30] - Unreleased — fluxo nDPI resiliente a colisões
+
+Pacote candidato, não publicado e não aprovado para produção.
+
+### Fixed
+
+- O lookup percorre toda a janela antes de reutilizar um slot expirado,
+  impedindo dois estados nDPI para a mesma conversa após colisão/expiração.
+- Janela cheia deixa de descartar silenciosamente o fluxo e passa a evictar
+  deterministicamente o menos recente.
+
+### Added
+
+- JSON de status recebe `cap_pkts`, `cap_active`, `cap_classified`,
+  `cap_expired`, `cap_evicted`, `cap_dropped` e `captures`.
+- Regressões cobrem buraco antes do match, primeiro livre, janela cheia e
+  lookup read-only sob pressão.
+
+### Risco, teste e rollback
+
+- Impacto limitado ao subsistema de captura nDPI; sem mudança de política/PF.
+- Suite local: PASS. Builder nDPI, pacote e appliance passivo: pendentes.
+- Rollback: `_29` passivo; `_24` continua rollback público conhecido.
+
+---
+
 ## [1.8.11_29] - Unreleased — sintaxe anti-QUIC aceita pelo PF
 
 Pacote candidato, **não publicado** e **não aprovado para produção**.

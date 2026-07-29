@@ -234,6 +234,13 @@ Artefacto interno:
 Ainda não instalar sem gate humano: manter `_24` passivo até autorizar
 upgrade passivo, backup e validação do ruleset completo.
 
+**Addendum do candidato `1.8.11_30` (não publicado):**
+Corrige FP-019 na tabela de fluxos nDPI. Um slot expirado deixa de provocar
+uma segunda entrada para a mesma conversa; sob janela cheia, o fluxo menos
+recente é evictado e a pressão fica disponível em `/tmp/layer7-stats.json`
+como `cap_active`, `cap_evicted` e `cap_dropped`. Regressões locais passaram;
+build/hash e validação passiva ainda são obrigatórios. `_29` fica como
+artefacto de rollback pré-FP-019 e não deve ser promovido.
 **Addendum da release `1.8.11_23` (Caminho A completo A0-A5):**
 Publicada em `2026-05-30`. Build no builder FreeBSD (`192.168.100.12`) e
 **validada no appliance** (`192.168.100.254`) com `tests/lab/smoke-monitor-mode.sh`
