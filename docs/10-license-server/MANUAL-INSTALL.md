@@ -208,6 +208,13 @@ provar que a marca Layer7 não a ultrapassa. App-only pode precisar de DNS ou
 do primeiro fluxo classificável para aprender o destino; não usar allow
 global como workaround. Artefacto/SHA256 serão registados após build.
 
+Diagnóstico offline do caminho por destino (não altera PF com `-n`):
+
+```sh
+/usr/local/sbin/layer7d -n -c /usr/local/etc/layer7.json \
+  -d 203.0.113.10 -e 192.0.2.10 BitTorrent
+```
+
 Rollback: `enabled=false`, `layer7-pfctl flush-all`, reload do filtro,
 reinstalação `_24` em monitor e restauro do JSON exportado.
 

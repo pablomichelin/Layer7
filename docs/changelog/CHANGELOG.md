@@ -32,6 +32,8 @@ gate no appliance ainda estão pendentes.
   limpam tabelas dinâmicas antes de regenerar o filtro.
 - `smoke-layer7d.sh` volta a espelhar o daemon real incluindo `log_store.c`;
   sem isso o gate oficial falhava no link desde a introdução do logging L1.
+- O diagnóstico `-e` aceita `-d DST` para validar o enforcement moderno por
+  destino sem tocar no PF; o smoke usa um IPv4 de documentação.
 
 ### Gates e rollback
 

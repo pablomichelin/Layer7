@@ -1580,8 +1580,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 }
 
 static int
-run_enforce_once_cli(const char *path, const char *ip, const char *app,
-    const char *cat, int dry)
+run_enforce_once_cli(const char *path, const char *ip, const char *dst_ip,
+    const char *app, const char *cat, int dry)
 {
 	struct layer7_parsed p;
 	struct layer7_policy_rule rules[L7_MAX_POLICIES];
@@ -1641,7 +1641,7 @@ run_enforce_once_cli(const char *path, const char *ip, const char *app,
 		    dec.matched_policy_id[0] ? dec.matched_policy_id :
 		    "(none)");
 
-		r = layer7_pf_enforce_decision(&dec, ip, NULL, scoped, dry);
+		r = layer7_pf_enforce_decision(&dec, ip, dst_ip, scoped, dry);
 		if (r == -1) {
 			fprintf(stderr,
 			    "layer7d: pfctl add failed (policy=%s ip=%s)\n",
@@ -1650,7 +1650,7 @@ run_enforce_once_cli(const char *path, const char *ip, const char *app,
 			return 1;
 		}
 		if (dec.action == LAYER7_ACTION_BLOCK &&
-		    layer7_pf_resolve_block_target(&dec, ip, NULL, scoped, tbl,
+		    layer7_pf_resolve_block_target(&dec, ip, dst_ip, scoped, tbl,
 		    sizeof(tbl), &enforce_ip) == 1) {
 			if (dry)
 				printf("dry-run: pfctl -t %s -T add %s\n", tbl,
@@ -1711,12 +1711,13 @@ static void on_hup(int sig)
 static void usage(void)
 {
 	fprintf(stderr,
-	    "usage: layer7d [-V] [-t] [-c path] [-e IP APP [CAT]] [-n] "
+	    "usage: layer7d [-V] [-t] [-c path] [-d DST] [-e IP APP [CAT]] [-n] "
 	    "[--list-protos]\n"
 	    "               [--fingerprint] [--activate KEY [URL]]\n"
 	    "  -V               versão do binário\n"
 	    "  -t               testa JSON (stdout)\n"
 	    "  -c path          caminho (omissão: %s)\n"
+	    "  -d DST           destino IPv4 para o diagnóstico -e\n"
 	    "  -e IP APP [CAT]  uma decisão + opcional pfctl add\n"
 	    "  -n               com -e: não executar pfctl (dry)\n"
 	    "  --list-protos    lista protocolos e categorias nDPI em JSON\n"
@@ -2209,6 +2210,7 @@ int main(int argc, char **argv)
 	int i;
 	int tick = 0;
 	int vi;
+	const char *enforce_dst = NULL;
 
 	for (vi = 1; vi < argc; vi++) {
 		if (strcmp(argv[vi], "-V") == 0) {
@@ -2294,6 +2296,17 @@ int main(int argc, char **argv)
 			i += 2;
 			continue;
 		}
+		if (strcmp(argv[i], "-d") == 0) {
+			if (i + 1 >= argc ||
+			    !layer7_pf_ipv4_host_ok(argv[i + 1])) {
+				fprintf(stderr,
+				    "layer7d: -d requer destino IPv4 válido\n");
+				return 1;
+			}
+			enforce_dst = argv[i + 1];
+			i += 2;
+			continue;
+		}
 		if (strcmp(argv[i], "-e") == 0) {
 			const char *ip, *app, *cat = NULL;
 
@@ -2320,8 +2333,8 @@ int main(int argc, char **argv)
 				    argv[i]);
 				return 1;
 			}
-			return run_enforce_once_cli(config_path, ip, app, cat,
-			    enforce_dry_run);
+			return run_enforce_once_cli(config_path, ip, enforce_dst,
+			    app, cat, enforce_dry_run);
 		}
 		if (strcmp(argv[i], "-h") == 0 ||
 		    strcmp(argv[i], "--help") == 0) {

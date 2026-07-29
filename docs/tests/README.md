@@ -13,7 +13,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 ## Local
 
 - `sh scripts/package/smoke-layer7d.sh` (requer `cc`; compila também
-  `log_store.c`, como o port real).
+  `log_store.c`, como o port real, e usa `-d` para cobrir enforcement por
+  destino).
 - `sh tests/run-local.sh` — suite F5 mínima (ver tabela abaixo) + lint PHP/sh
   do pacote.
 

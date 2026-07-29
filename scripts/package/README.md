@@ -17,7 +17,9 @@ preservado apenas como legado ate F6; nao e fluxo vigente do projecto.
 
 ## `smoke-layer7d.sh`
 
-Valida **compilação** (`smoke`), **`-V`**, **`-t`** nos dois JSONs, **`-e -n`** em **monitor** (sem PF) e em **enforce** (linha `dry-run: pfctl`).
+Valida **compilação** (`smoke`), **`-V`**, **`-t`** nos dois JSONs, **`-e -n`**
+em **monitor** (sem PF) e em **enforce** com destino explícito
+(`-d 203.0.113.10`, linha `dry-run: pfctl`).
 
 ```sh
 sh scripts/package/smoke-layer7d.sh

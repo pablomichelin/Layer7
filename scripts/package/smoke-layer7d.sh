@@ -100,7 +100,8 @@ cc -Wall -Wextra -O2 -I"$SMOKE_VER" -I. -I../common $CFLAGS_NDPI \
 	echo "smoke-layer7d: esperado 'no pf table add' (modo monitor / sem enforce)"
 	exit 1
 }
-./layer7d-smoke -n -c "$ROOT/samples/config/layer7-enforce-smoke.json" -e 10.0.0.100 BitTorrent 2>&1 |
+./layer7d-smoke -n -c "$ROOT/samples/config/layer7-enforce-smoke.json" \
+	-d 203.0.113.10 -e 10.0.0.100 BitTorrent 2>&1 |
 	grep -q "dry-run: pfctl" || {
 	echo "smoke-layer7d: esperado dry-run pfctl (enforce-smoke + BitTorrent)"
 	exit 1
