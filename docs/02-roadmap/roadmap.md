@@ -575,6 +575,12 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   de BG-009/010 quando a matriz de saida F4 tiver evidencia minima; em
   paralelo, **DR-05** no appliance `192.168.100.254` para fechar a F3 sob
   gate F3.8.
+- **Isencoes VIP e UX GUI (`2026-07-30`):** plano SSOT
+  [`plano-isencao-vip-e-ux-gui.md`](plano-isencao-vip-e-ux-gui.md) e modelo
+  conceptual [`modelo-conceptual-gui.md`](../00-overview/modelo-conceptual-gui.md)
+  registados; backlog **BG-064** (isenção VIP modal, `_48`), **BG-065** (UX +
+  verificador, `_49`), **BG-066** (exclusão por política + ADR-0019, `_50`).
+  Ordem de execucao A→E; NO-GO producao inalterado.
 
 ### Criterios de entrada
 

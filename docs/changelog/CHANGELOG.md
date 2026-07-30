@@ -2,6 +2,44 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_49] - 2026-07-30 — UX modal Perfis rapidos + verificador (BG-065)
+
+### Added
+
+- Progressive disclosure no modal: essencial (Accao, Aplicar a, Isentos) vs
+  **Avancado** recolhido (CIDRs manuais).
+- Atalho **Criar grupo (ex.: Gestores)** quando nao existem grupos.
+- Link **Verificador de politica efectiva** para `layer7_test.php`.
+- Veredicto destacado no teste: PERMITIDO / BLOQUEADO / MONITORIZADO com
+  motivo legivel (ex.: `PERMITIDO — excepcao vip-isentos`).
+
+### Changed
+
+- Excepcoes ordenadas por prioridade na simulacao; grupos incluem
+  `device_ips` no match de origem.
+
+## [1.8.11_48] - 2026-07-30 — Isencao VIP nos Perfis rapidos (BG-064)
+
+### Added
+
+- Modal **Opções** dos Perfis rapidos: secção **Isentos (nunca bloqueados)**
+  que cria/actualiza a excepcao canonica `vip-isentos` (allow global,
+  prioridade alta). Suporta grupos (expandidos para IPs/CIDRs na gravacao),
+  IPs e CIDRs manuais.
+- Badge **Perfis rapidos** em `layer7_exceptions.php` para a excepcao gerida.
+- Funcoes `layer7_upsert_vip_exception()` e helpers em `layer7.inc`.
+- Teste funcional `tests/functional/test_vip_exception.php`.
+
+### Changed
+
+- `toggle_profile_off` documentado: desligar perfil **nao** remove a
+  excepcao VIP partilhada.
+
+### Docs
+
+- Plano SSOT `docs/02-roadmap/plano-isencao-vip-e-ux-gui.md`, modelo
+  conceptual GUI, backlog BG-064/065/066.
+
 ## [1.8.11_47] - 2026-07-30 — HTTPS ao portal com erro imediato (UX block page)
 
 ### Added

@@ -284,7 +284,11 @@ function layer7_exc_target_summary($exception) {
 							<tr>
 								<td><input type="checkbox" name="eon[<?= (int)$i; ?>]" value="1" <?= $enabled ? 'checked="checked"' : ''; ?> /></td>
 								<td><?= htmlspecialchars((string)$priority); ?></td>
-								<td><span class="label label-default"><?= htmlspecialchars($action); ?></span></td>
+								<td><span class="label label-default"><?= htmlspecialchars($action); ?></span>
+								<?php if (layer7_is_managed_vip_exception($exception)) { ?>
+									<span class="label label-info" title="<?= l7_t("Gerida pelos Perfis rapidos"); ?>"><?= l7_t("Perfis rapidos"); ?></span>
+								<?php } ?>
+								</td>
 								<td><code><?= htmlspecialchars($eid); ?></code></td>
 								<td class="small"><?= htmlspecialchars($target); ?></td>
 								<td class="layer7-table-actions">

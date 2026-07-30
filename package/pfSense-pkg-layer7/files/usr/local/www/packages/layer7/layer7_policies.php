@@ -105,9 +105,39 @@ if ($_POST["add_profile_policy"] ?? false) {
 						$input_errors[] = l7_t("No modo scoped_hybrid, selecione ao menos um CIDR/grupo de origem para o perfil.");
 					} else {
 						$policies[] = $rule;
-						if (layer7_save_json($data)) {
+
+						$vip_groups_post = array();
+						if (isset($_POST["profile_vip_groups"]) &&
+						    is_array($_POST["profile_vip_groups"])) {
+							foreach ($_POST["profile_vip_groups"] as $vg) {
+								$vg = trim((string)$vg);
+								if ($vg !== "" && layer7_group_id_valid($vg)) {
+									$vip_groups_post[] = $vg;
+								}
+							}
+							$vip_groups_post = array_values(array_unique($vip_groups_post));
+						}
+						$vip_hosts_post = (string)($_POST["profile_vip_hosts"] ?? "");
+						$vip_cidrs_post = (string)($_POST["profile_vip_cidrs"] ?? "");
+						$has_vip = !empty($vip_groups_post) ||
+						    trim($vip_hosts_post) !== "" ||
+						    trim($vip_cidrs_post) !== "";
+						if ($has_vip) {
+							$vip_res = layer7_upsert_vip_exception(
+								$data, $vip_groups_post,
+								$vip_hosts_post, $vip_cidrs_post);
+							if (!$vip_res["ok"]) {
+								array_pop($policies);
+								$input_errors[] = $vip_res["error"];
+							}
+						}
+
+						if (empty($input_errors) && layer7_save_json($data)) {
 							layer7_pf_config_resync(true);
 							$savemsg = sprintf(l7_t("Politica '%s' criada a partir do perfil '%s'."), $pid, $profile["name"] ?? $profile_id);
+							if ($has_vip && !empty($vip_res["updated"])) {
+								$savemsg .= " " . l7_t("Excepcao VIP isentos actualizada.");
+							}
 
 							if (isset($profile["extra_action"]) && $profile["extra_action"] === "configure_unbound_anti_doh") {
 								$doh_result = layer7_configure_unbound_anti_doh();
@@ -594,6 +624,22 @@ if (isset($_GET["view"]) && ctype_digit((string)$_GET["view"])) {
 
 $l7_groups = layer7_load_groups();
 
+$l7_vip_exc = layer7_find_vip_exception($data);
+$l7_vip_hosts_val = "";
+$l7_vip_cidrs_val = "";
+$l7_vip_groups_sel = array();
+if (is_array($l7_vip_exc)) {
+	if (!empty($l7_vip_exc["hosts"]) && is_array($l7_vip_exc["hosts"])) {
+		$l7_vip_hosts_val = implode("\n", $l7_vip_exc["hosts"]);
+	}
+	if (!empty($l7_vip_exc["cidrs"]) && is_array($l7_vip_exc["cidrs"])) {
+		$l7_vip_cidrs_val = implode("\n", $l7_vip_exc["cidrs"]);
+	}
+	if (!empty($l7_vip_exc["source_groups"]) && is_array($l7_vip_exc["source_groups"])) {
+		$l7_vip_groups_sel = $l7_vip_exc["source_groups"];
+	}
+}
+
 $ndpi_list = layer7_ndpi_list();
 $ndpi_protos = isset($ndpi_list["protocols"]) ? $ndpi_list["protocols"] : array();
 $ndpi_cats = isset($ndpi_list["categories"]) ? $ndpi_list["categories"] : array();
@@ -727,7 +773,7 @@ function layer7_policy_match_summary($policy) {
 				<div class="l7-profile-desc"><?= $prof_desc; ?></div>
 				<div class="l7-profile-meta"><?= $prof_apps_count; ?> apps &middot; <?= $prof_hosts_count; ?> hosts<?php if ($prof_exists && $prof_hit > 0) { ?> &middot; <span class="l7-profile-hits" title="<?= l7_t("Bloqueios observados pelo daemon"); ?>"><?= $prof_hit; ?> <?= l7_t("hits"); ?></span><?php } ?></div>
 				<?php if ($prof_exists) { ?>
-				<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;" onsubmit='return confirm(<?= htmlspecialchars(json_encode(l7_t("Desligar este perfil (remove a politica)?")), ENT_QUOTES); ?>);'>
+				<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;" onsubmit='return confirm(<?= htmlspecialchars(json_encode(l7_t("Desligar este perfil (remove a politica)? A excepcao VIP isentos, se existir, permanece activa.")), ENT_QUOTES); ?>);'>
 					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
 					<button type="submit" name="toggle_profile_off" value="1" class="btn btn-sm btn-danger"><i class="fa fa-power-off"></i> <?= l7_t("Desligar"); ?></button>
 				</form>
@@ -764,8 +810,9 @@ function layer7_policy_match_summary($policy) {
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= l7_t("Interfaces"); ?></label>
+						<label class="col-sm-4 control-label"><?= l7_t("Aplicar a"); ?></label>
 						<div class="col-sm-8">
+							<p class="text-muted small"><strong><?= l7_t("Interfaces"); ?></strong></p>
 						<?php foreach ($prof_ifaces as $ifc) { ?>
 							<label class="checkbox-inline">
 								<input type="checkbox" name="profile_ifaces[]" value="<?= htmlspecialchars($ifc["ifid"]); ?>" />
@@ -773,21 +820,13 @@ function layer7_policy_match_summary($policy) {
 							</label>
 						<?php } ?>
 							<p class="help-block"><?= l7_t("Nenhuma = todas."); ?></p>
-						</div>
-					</div>
 
-					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= l7_t("CIDRs de origem"); ?></label>
-						<div class="col-sm-8">
-							<textarea name="profile_src_cidrs" class="form-control" rows="2" placeholder="192.168.10.0/24"></textarea>
-							<p class="help-block"><?= l7_t("Vazio = qualquer sub-rede."); ?></p>
-						</div>
-					</div>
-
-					<?php if (!empty($l7_groups)) { ?>
-					<div class="form-group">
-						<label class="col-sm-4 control-label"><?= l7_t("Grupos"); ?></label>
-						<div class="col-sm-8">
+							<p class="text-muted small" style="margin-top:10px;"><strong><?= l7_t("Grupos"); ?></strong></p>
+						<?php if (empty($l7_groups)) { ?>
+							<p class="help-block">
+								<a href="layer7_groups.php" class="btn btn-xs btn-default"><?= l7_t("Criar grupo (ex.: Gestores)"); ?></a>
+							</p>
+						<?php } else { ?>
 						<?php foreach ($l7_groups as $grp) {
 							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
 							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
@@ -797,10 +836,60 @@ function layer7_policy_match_summary($policy) {
 								<?= $gname; ?>
 							</label>
 						<?php } ?>
-							<p class="help-block"><?= l7_t("Alternativa a CIDRs manuais."); ?></p>
+							<p class="help-block"><?= l7_t("Preferivel a CIDRs manuais."); ?></p>
+						<?php } ?>
 						</div>
 					</div>
-					<?php } ?>
+
+					<div class="form-group l7-modal-section-vip">
+						<label class="col-sm-4 control-label"><?= l7_t("Isentos (nunca bloqueados)"); ?></label>
+						<div class="col-sm-8">
+							<p class="help-block"><?= l7_t("Isencao global: estes IPs/dispositivos nunca sao bloqueados por nenhum perfil Layer7. Gere a excepcao partilhada vip-isentos."); ?></p>
+							<?php if (!empty($l7_groups)) { ?>
+							<p class="text-muted small"><strong><?= l7_t("Grupos isentos"); ?></strong></p>
+							<?php foreach ($l7_groups as $grp) {
+								$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
+								$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
+								$gchk = in_array($grp["id"] ?? "", $l7_vip_groups_sel, true) ? ' checked="checked"' : "";
+							?>
+							<label class="checkbox-inline">
+								<input type="checkbox" name="profile_vip_groups[]" value="<?= $gid; ?>"<?= $gchk; ?> />
+								<?= $gname; ?>
+							</label>
+							<?php } ?>
+							<?php } ?>
+							<label class="control-label small" style="margin-top:8px;"><?= l7_t("IPs isentos"); ?></label>
+							<textarea name="profile_vip_hosts" class="form-control" rows="2" placeholder="192.168.1.50"><?= htmlspecialchars($l7_vip_hosts_val); ?></textarea>
+							<label class="control-label small" style="margin-top:8px;"><?= l7_t("CIDRs isentos"); ?></label>
+							<textarea name="profile_vip_cidrs" class="form-control" rows="2" placeholder="192.168.1.0/24"><?= htmlspecialchars($l7_vip_cidrs_val); ?></textarea>
+							<p class="help-block"><?= l7_t("Desligar um perfil nao remove a excepcao VIP — continua editavel em Excepcoes."); ?></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-offset-4 col-sm-8">
+							<a data-toggle="collapse" href="#l7ProfileModalAdvanced" style="cursor:pointer;">
+								<i class="fa fa-cog"></i> <?= l7_t("Avancado"); ?>
+							</a>
+						</div>
+					</div>
+					<div id="l7ProfileModalAdvanced" class="collapse">
+					<div class="form-group">
+						<label class="col-sm-4 control-label"><?= l7_t("CIDRs de origem"); ?></label>
+						<div class="col-sm-8">
+							<textarea name="profile_src_cidrs" class="form-control" rows="2" placeholder="192.168.10.0/24"></textarea>
+							<p class="help-block"><?= l7_t("Vazio = qualquer sub-rede. Use apenas se grupos nao forem suficientes."); ?></p>
+						</div>
+					</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-offset-4 col-sm-8">
+							<a href="layer7_test.php" class="btn btn-link btn-sm" style="padding-left:0;">
+								<i class="fa fa-search"></i> <?= l7_t("Verificador de politica efectiva"); ?>
+							</a>
+						</div>
+					</div>
 
 					<div class="form-group">
 						<div class="col-sm-offset-4 col-sm-8">

@@ -239,6 +239,38 @@ appliance, salvo se o proprio pedido disser o contrario.
 
 ---
 
+## Gates BG-064 / BG-065 / BG-066 (isencoes VIP e UX GUI)
+
+Plano SSOT: [`plano-isencao-vip-e-ux-gui.md`](plano-isencao-vip-e-ux-gui.md).
+Modelo conceptual: [`modelo-conceptual-gui.md`](../00-overview/modelo-conceptual-gui.md).
+
+### BG-064 — Isencao VIP modal (`_48`)
+
+- [ ] Secção "Isentos" no modal Perfis rapidos gere excepcao `vip-isentos`
+- [ ] Grupos expandem para hosts/cidrs na gravacao
+- [ ] Badge em `layer7_exceptions.php`; `toggle_profile_off` nao remove excepcao
+- [ ] `php -l` + teste funcional PHP PASS
+- [ ] Changelog, CORTEX, backlog actualizados
+
+### BG-065 — UX modal + verificador (`_49`)
+
+- [ ] Progressive disclosure (essencial vs Avancado)
+- [ ] Atalho criar grupo quando lista vazia
+- [ ] `layer7_test.php` com veredicto e motivo legivel
+- [ ] Paridade simulacao com cadeia real documentada/testada
+
+### BG-066 — Exclusao por politica (`_50`)
+
+- [ ] ADR-0019 aprovado
+- [ ] Daemon + PF (`layer7_pexc_N`) + flush/self-heal completos
+- [ ] Testes C/PHP/shell PASS
+- [ ] Cenario "gestor isento" em `validacao-lab.md` (Bloco E)
+
+**Nota:** estes blocos nao alteram o veredicto NO-GO para enforce em producao
+(gates G2–G7 permanecem pendentes).
+
+---
+
 ## Condicoes para pedir validacao humana
 
 - [ ] existe duvida sobre compatibilidade com pfSense CE

@@ -1166,3 +1166,39 @@ e paragem de `layer7-blockpage`.
 
 PASS minimo: passos 18.1 + 18.2 (HTTP) OK; HTTPS documentado como limitacao.
 Teste automatizado local: `sh tests/test_blockpage_config.sh`.
+
+## 19. Roteiro BG-064/065 — gestor isento (VIP + verificador, `1.8.11_48`+)
+
+Pre-requisitos: pacote `>= 1.8.11_48`, grupo **Gestores** com IP do gestor
+(dispositivo ou CIDR), snapshot/rollback documentado (padrao BG-060).
+
+### 19.1 Isencao VIP global (`vip-isentos`)
+
+1. **Politicas > Perfis rapidos > Opcoes (YouTube):** accao `block`; em
+   **Isentos**, seleccionar grupo Gestores (ou IP manual); criar politica.
+2. **Excepcoes:** confirmar entrada `vip-isentos` com badge **Perfis rapidos**.
+3. **Teste / verificador:** IP do gestor + dominio `youtube.com` → veredicto
+   **PERMITIDO — excepcao `vip-isentos`**.
+4. IP de outro cliente na mesma LAN → **BLOQUEADO — politica `profile-youtube`**
+   (em `mode=enforce`).
+
+### 19.2 Desligar perfil nao remove VIP
+
+1. Desligar perfil YouTube (botao **Desligar**).
+2. Confirmar politica `profile-youtube` removida; excepcao `vip-isentos`
+   **permanece**.
+3. Gestor continua PERMITIDO no verificador.
+
+### 19.3 Exclusao por politica (BG-066, `>= 1.8.11_50`, scoped)
+
+Quando BG-066 estiver instalado: em **Avancado** do modal, **Excluir origens**
+so deste perfil; repetir teste two-client — gestor isento deste perfil mas
+sujeito a outros; validar tabela PF `layer7_pexc_N` em `scoped_hybrid`.
+
+### 19.4 Rollback
+
+Reinstalar `_47` remove secao Isentos da GUI; excepcao `vip-isentos` no JSON
+permanece valida para versoes anteriores (allow global inalterado).
+
+PASS minimo: 19.1 + 19.2 no verificador; enforce real (two-client) continua
+sujeito a gates G2–G7 — **NO-GO producao inalterado**.

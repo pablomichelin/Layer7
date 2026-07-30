@@ -176,6 +176,15 @@ Publicado em `pablomichelin/Layer7` (`v1.8.11_32`) para download e botao
 **Verificar actualizacao**. Gate B1 passivo pendente; produção não alterada.
 `_31` supersedido — não instalar `_31` se `_32` disponível.
 
+### Plano isencoes VIP e UX GUI (`2026-07-30`, documental)
+
+Plano SSOT [`docs/02-roadmap/plano-isencao-vip-e-ux-gui.md`](docs/02-roadmap/plano-isencao-vip-e-ux-gui.md)
+e modelo conceptual [`docs/00-overview/modelo-conceptual-gui.md`](docs/00-overview/modelo-conceptual-gui.md)
+registados. Backlog **BG-064** (isenção VIP nos Perfis rápidos, candidato
+`_48`), **BG-065** (UX modal + verificador, `_49`), **BG-066** (exclusão por
+política + ADR-0019, `_50`). Regra de ouro: campos GUI são atalhos, não
+armazenamentos paralelos. Execução em blocos A→E; NO-GO produção inalterado.
+
 ### Release `1.8.11_47` — HTTPS ao portal com erro imediato (publicada `2026-07-30`)
 
 UX da block page: HTTPS a dominio bloqueado (sinkhole → portal) deixava o
@@ -191,6 +200,24 @@ venciam pela ordem. Validado no appliance: HTTPS falha <1s, HTTP devolve a
 pagina, GUI :9999 intacta. Artefacto
 `SHA256=878f8d54b828f3d57236b565b6c55fcfae9eb3e6965e1eafadab42792801195b`,
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
+
+`_47`.
+
+### Candidato `1.8.11_49` — UX modal + verificador (BG-065)
+
+Progressive disclosure no modal Perfis rapidos; grupos-first com atalho criar
+grupo; verificador em `layer7_test.php` com veredicto PERMITIDO/BLOQUEADO e
+motivo legivel. So PHP/GUI. Build/release **pendentes**.
+
+### Candidato `1.8.11_48` — isencao VIP nos Perfis rapidos (BG-064)
+
+Modal **Opções** dos Perfis rapidos passa a gerir a excepcao canonica
+`vip-isentos` (allow global): grupos expandem para IPs/CIDRs na gravacao;
+badge em Excecoes; `toggle_profile_off` nao remove a excepcao partilhada.
+So PHP/GUI — sem alteracao ao daemon. Teste funcional
+`tests/functional/test_vip_exception.php`. Build no builder e release
+GitHub **pendentes** (nao solicitados neste bloco). Rollback: reinstalar
+`_47`.
 
 ### Release `1.8.11_45` — rdr da block page e DNS forcado agora efectivos (publicada `2026-07-30`)
 
@@ -736,6 +763,12 @@ validacao fora da operacao real.
   **BG-011** (sec. **11** com `force_dns` e, onde aplicável, anti-QUIC opcional;
   **6.7**) antes de declarar fechadas as trilhas
   respectivas em relatorio.
+11. **Isencoes VIP / UX GUI:** seguir
+  [`docs/02-roadmap/plano-isencao-vip-e-ux-gui.md`](docs/02-roadmap/plano-isencao-vip-e-ux-gui.md)
+  em ordem A→E; gates **BG-064**/`_48`, **BG-065**/`_49`, **BG-066**/`_50` no
+  checklist mestre; modelo conceptual em
+  [`docs/00-overview/modelo-conceptual-gui.md`](docs/00-overview/modelo-conceptual-gui.md)
+  como gate de revisão para mudanças de GUI.
 
 ---
 
@@ -913,6 +946,8 @@ validacao fora da operacao real.
 ### Documentos canónicos por area
 
 - Produto/escopo: [`docs/00-overview/product-charter.md`](docs/00-overview/product-charter.md)
+- Modelo conceptual GUI: [`docs/00-overview/modelo-conceptual-gui.md`](docs/00-overview/modelo-conceptual-gui.md)
+- Plano isencoes VIP/UX: [`docs/02-roadmap/plano-isencao-vip-e-ux-gui.md`](docs/02-roadmap/plano-isencao-vip-e-ux-gui.md)
 - Arquitectura alvo: [`docs/01-architecture/target-architecture.md`](docs/01-architecture/target-architecture.md)
 - Arquitectura de confianca F1: [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
 - Arquitectura de seguranca F2 do license server: [`docs/01-architecture/f2-arquitetura-license-server.md`](docs/01-architecture/f2-arquitetura-license-server.md)

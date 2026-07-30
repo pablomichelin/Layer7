@@ -2847,6 +2847,162 @@ function layer7_load_groups()
 	return array();
 }
 
+/** ID canonico da excepcao VIP partilhada (gerida pelo modal Perfis rapidos). */
+function layer7_vip_exception_id()
+{
+	return "vip-isentos";
+}
+
+function layer7_is_managed_vip_exception($exception)
+{
+	return is_array($exception) &&
+	    isset($exception["id"]) &&
+	    (string)$exception["id"] === layer7_vip_exception_id();
+}
+
+/**
+ * Devolve a excepcao VIP gerida ou null.
+ *
+ * @param array $data Configuracao layer7 (layer7_load_or_default).
+ * @return array|null
+ */
+function layer7_find_vip_exception($data)
+{
+	if (!is_array($data) || !isset($data["layer7"]["exceptions"]) ||
+	    !is_array($data["layer7"]["exceptions"])) {
+		return null;
+	}
+	foreach ($data["layer7"]["exceptions"] as $exc) {
+		if (layer7_is_managed_vip_exception($exc)) {
+			return $exc;
+		}
+	}
+	return null;
+}
+
+/**
+ * Indice da excepcao VIP em layer7.exceptions ou -1.
+ */
+function layer7_find_vip_exception_index($data)
+{
+	if (!is_array($data) || !isset($data["layer7"]["exceptions"]) ||
+	    !is_array($data["layer7"]["exceptions"])) {
+		return -1;
+	}
+	foreach ($data["layer7"]["exceptions"] as $i => $exc) {
+		if (layer7_is_managed_vip_exception($exc)) {
+			return (int)$i;
+		}
+	}
+	return -1;
+}
+
+/**
+ * Expande IDs de grupo em hosts/cidrs (schema de excepcao).
+ *
+ * @param string[] $group_ids
+ * @param array[] $groups
+ * @return array{hosts: string[], cidrs: string[]}
+ */
+function layer7_expand_groups_for_exception($group_ids, $groups)
+{
+	$fake = array("match" => array("groups" => array_values($group_ids)));
+	return layer7_policy_expand_src_origins($fake, $groups);
+}
+
+/**
+ * Cria ou actualiza a excepcao canonica vip-isentos (allow global).
+ *
+ * @param array $data Referencia a configuracao completa (mutavel).
+ * @param string[] $group_ids Grupos seleccionados (metadata source_groups).
+ * @param string $hosts_text Textarea IPv4 (um por linha).
+ * @param string $cidrs_text Textarea CIDR (um por linha).
+ * @return array{ok: bool, error: string, updated: bool}
+ */
+function layer7_upsert_vip_exception(&$data, $group_ids, $hosts_text, $cidrs_text)
+{
+	$out = array("ok" => true, "error" => "", "updated" => false);
+
+	$valid_groups = array();
+	if (is_array($group_ids)) {
+		foreach ($group_ids as $gid) {
+			$gid = trim((string)$gid);
+			if ($gid !== "" && layer7_group_id_valid($gid)) {
+				$valid_groups[] = $gid;
+			}
+		}
+		$valid_groups = array_values(array_unique($valid_groups));
+	}
+
+	$hosts = layer7_parse_ip_textarea($hosts_text);
+	$cidrs = layer7_parse_cidr_textarea($cidrs_text);
+
+	$all_groups = (isset($data["layer7"]["groups"]) &&
+	    is_array($data["layer7"]["groups"])) ? $data["layer7"]["groups"] : array();
+	/* Resolver device_macs -> device_ips nos grupos seleccionados. */
+	foreach ($all_groups as $gi => $g) {
+		if (!is_array($g) || empty($g["id"]) ||
+		    !in_array((string)$g["id"], $valid_groups, true)) {
+			continue;
+		}
+		$macs = (isset($g["device_macs"]) && is_array($g["device_macs"]))
+		    ? $g["device_macs"] : array();
+		if (!empty($macs)) {
+			$data["layer7"]["groups"][$gi]["device_ips"] =
+			    layer7_resolve_macs_to_ips($macs);
+		}
+	}
+
+	$expanded = layer7_expand_groups_for_exception($valid_groups, $all_groups);
+	$hosts = array_values(array_unique(array_merge($hosts, $expanded["hosts"])));
+	$cidrs = array_values(array_unique(array_merge($cidrs, $expanded["cidrs"])));
+
+	if (empty($hosts) && empty($cidrs)) {
+		return $out;
+	}
+
+	if (!isset($data["layer7"]["exceptions"]) ||
+	    !is_array($data["layer7"]["exceptions"])) {
+		$data["layer7"]["exceptions"] = array();
+	}
+	$exceptions = &$data["layer7"]["exceptions"];
+	$idx = layer7_find_vip_exception_index($data);
+
+	if ($idx < 0 && count($exceptions) >= 16) {
+		$out["ok"] = false;
+		$out["error"] = l7_t("Limite de 16 excecoes.");
+		unset($exceptions);
+		return $out;
+	}
+
+	$rule = array(
+		"id" => layer7_vip_exception_id(),
+		"name" => l7_t("Isentos (Perfis rapidos)"),
+		"enabled" => true,
+		"priority" => 9000,
+		"action" => "allow",
+		"managed_by" => "profiles"
+	);
+	if (!empty($hosts)) {
+		$rule["hosts"] = array_slice($hosts, 0, 64);
+	}
+	if (!empty($cidrs)) {
+		$rule["cidrs"] = array_slice($cidrs, 0, 32);
+	}
+	if (!empty($valid_groups)) {
+		$rule["source_groups"] = $valid_groups;
+	}
+
+	if ($idx >= 0) {
+		$exceptions[$idx] = $rule;
+	} else {
+		$exceptions[] = $rule;
+	}
+	$out["updated"] = true;
+	unset($exceptions);
+	return $out;
+}
+
 function layer7_lic_path()
 {
 	return "/usr/local/etc/layer7.lic";

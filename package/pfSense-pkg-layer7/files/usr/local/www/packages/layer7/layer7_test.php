@@ -97,6 +97,9 @@ function l7_test_src_matches($policy, $src_ip, $groups)
 				if (isset($grp["hosts"]) && is_array($grp["hosts"])) {
 					$src_hosts = array_merge($src_hosts, $grp["hosts"]);
 				}
+				if (isset($grp["device_ips"]) && is_array($grp["device_ips"])) {
+					$src_hosts = array_merge($src_hosts, $grp["device_ips"]);
+				}
 			}
 		}
 	}
@@ -142,6 +145,12 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 		}
 	}
 
+	usort($exceptions, function ($a, $b) {
+		$pa = isset($a["priority"]) ? (int)$a["priority"] : 500;
+		$pb = isset($b["priority"]) ? (int)$b["priority"] : 500;
+		return $pb - $pa;
+	});
+
 	foreach ($exceptions as $exc) {
 		if (empty($exc["enabled"])) {
 			continue;
@@ -173,6 +182,8 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 
 		if ($matches) {
 			$action = isset($exc["action"]) ? $exc["action"] : "allow";
+			$verdict_label = l7_test_verdict_label($action);
+			$verdict_reason = l7_test_verdict_reason_exception($exc_id, $reason, $action);
 			$results[] = array(
 				"type" => "exception",
 				"id" => $exc_id,
@@ -185,7 +196,9 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 			$results[] = array(
 				"type" => "verdict",
 				"action" => $action,
-				"reason" => "Excepcao '" . $exc_id . "' casou: " . $reason,
+				"label" => $verdict_label,
+				"reason" => $verdict_reason,
+				"detail" => "Excepcao '" . $exc_id . "' casou: " . $reason,
 				"enforce" => $enforce
 			);
 			return array("results" => $results, "resolved_ips" => $resolved_ips, "mode" => $mode);
@@ -307,7 +320,9 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 		$results[] = array(
 			"type" => "verdict",
 			"action" => $paction,
-			"reason" => "Politica '" . $pid . "' casou: " . implode(", ", $match_reasons),
+			"label" => l7_test_verdict_label($paction),
+			"reason" => l7_test_verdict_reason_policy($pid, $paction),
+			"detail" => "Politica '" . $pid . "' casou: " . implode(", ", $match_reasons),
 			"enforce" => $enforce
 		);
 		break;
@@ -319,12 +334,59 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 		$results[] = array(
 			"type" => "verdict",
 			"action" => $default_action,
-			"reason" => "Nenhuma politica casou — " . $default_reason,
+			"label" => l7_test_verdict_label($default_action),
+			"reason" => l7_test_verdict_reason_default($default_action),
+			"detail" => "Nenhuma politica casou — " . $default_reason,
 			"enforce" => $enforce
 		);
 	}
 
 	return array("results" => $results, "resolved_ips" => $resolved_ips, "mode" => $mode);
+}
+
+function l7_test_verdict_label($action)
+{
+	switch ($action) {
+	case "block":
+		return l7_t("BLOQUEADO");
+	case "allow":
+		return l7_t("PERMITIDO");
+	case "monitor":
+		return l7_t("MONITORIZADO");
+	default:
+		return strtoupper((string)$action);
+	}
+}
+
+function l7_test_verdict_reason_exception($exc_id, $match_reason, $action = "allow")
+{
+	$detail = $match_reason !== "" ? $match_reason : l7_t("origem");
+	if ($action === "block") {
+		return sprintf(l7_t("BLOQUEADO — excepcao `%s` (%s)"), $exc_id, $detail);
+	}
+	if ($action === "monitor") {
+		return sprintf(l7_t("MONITORIZADO — excepcao `%s` (%s)"), $exc_id, $detail);
+	}
+	return sprintf(l7_t("PERMITIDO — excepcao `%s` (%s)"), $exc_id, $detail);
+}
+
+function l7_test_verdict_reason_policy($pid, $action)
+{
+	if ($action === "block") {
+		return sprintf(l7_t("BLOQUEADO — politica `%s`"), $pid);
+	}
+	if ($action === "allow") {
+		return sprintf(l7_t("PERMITIDO — politica `%s`"), $pid);
+	}
+	return sprintf(l7_t("MONITORIZADO — politica `%s`"), $pid);
+}
+
+function l7_test_verdict_reason_default($action)
+{
+	if ($action === "allow") {
+		return l7_t("PERMITIDO — nenhuma regra aplicavel (default allow)");
+	}
+	return l7_t("MONITORIZADO — nenhuma regra aplicavel (modo monitor)");
 }
 
 if ($_POST["run_test"] ?? false) {
@@ -463,12 +525,12 @@ layer7_render_styles();
 					$vclass = "alert-info";
 				}
 			?>
-			<div class="alert <?= $vclass; ?>" style="font-size:15px;">
-				<strong><?= l7_t("Veredicto:"); ?></strong>
-				<span class="label label-<?= $verdict["action"] === "block" ? "danger" : ($verdict["action"] === "allow" ? "success" : "default"); ?>">
-					<?= htmlspecialchars($verdict["action"]); ?>
-				</span>
-				&mdash; <?= htmlspecialchars($verdict["reason"]); ?>
+			<div class="alert <?= $vclass; ?>" style="font-size:16px;">
+				<strong style="font-size:18px;"><?= htmlspecialchars($verdict["label"] ?? l7_test_verdict_label($verdict["action"])); ?></strong>
+				<br /><span style="margin-top:6px;display:inline-block;"><?= htmlspecialchars($verdict["reason"]); ?></span>
+				<?php if (!empty($verdict["detail"]) && ($verdict["detail"] ?? "") !== ($verdict["reason"] ?? "")) { ?>
+				<br /><small class="text-muted"><?= htmlspecialchars($verdict["detail"]); ?></small>
+				<?php } ?>
 				<?php if ($verdict["enforce"]) { ?>
 				<br /><small class="text-muted"><?= l7_t("Modo enforce activo: esta accao seria aplicada em producao."); ?></small>
 				<?php } else { ?>
