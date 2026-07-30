@@ -148,6 +148,19 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
   pacotes. Build nDPI e pacote extraído passaram
   (`SHA256 dc5118dd…453e33`). Exigir tráfego real que refine TLS genérico
   para aplicação/SNI antes do gate two-client.
+- [ ] **Auditoria E2E Etapa 1 + multitask (BG-060):** inventário e consolidação
+  concluídos em
+  [`../09-blocking/auditoria-end-to-end-2026-07-29.md`](../09-blocking/auditoria-end-to-end-2026-07-29.md)
+  e [`../09-blocking/diagnostico-multitask-2026-07-30.md`](../09-blocking/diagnostico-multitask-2026-07-30.md);
+  ledger [`matriz-unificada-rev-fp-aud.md`](../09-blocking/matriz-unificada-rev-fp-aud.md);
+  veredicto **NO-GO** para publicar `_31` ou activar enforce; **AUD-001..015**.
+  **Bloco B1** (install passivo `_31`): snapshot VM, G2.1–G2.5 (ABI FB16),
+  G3 (`pfctl -nf` ruleset completo), G4 (captura/métricas) — **parar** se
+  G2.5 falhar; G5 two-client só após G2–G4 PASS com `run_id`.
+- [ ] **Flush lifecycle local (BG-061):** R-21 `test_flush_coverage.sh` PASS;
+  correcções em working tree (exc_allow, `layer7_bl_apply`, pkg-deinstall);
+  **rebuild `_31` no builder** antes de instalar no appliance; gate uninstall
+  Package Manager no lab.
 
 ---
 

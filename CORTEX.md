@@ -162,6 +162,18 @@ PASS. Artefacto `pfSense-pkg-layer7-1.8.11_30.pkg`,
 `SHA256=3a54c667a601e29995562714691f4ee3e9e8e78a02fcd3e600955ae90d2e9b40`.
 Gate passivo permanece pendente; produção não foi alterada.
 
+### Candidato `1.8.11_32` — flush PF lifecycle pós-auditoria (não publicado)
+
+Rodada multitask (`2026-07-30`) consolidou ledger REV/FP/AUD
+(`docs/09-blocking/diagnostico-multitask-2026-07-30.md`) com veredicto
+**NO-GO** mantido para enforce/publicação. **BG-061** fecha B-002/B-003/B-004:
+flush `layer7_exc_allow_*`, flush em `layer7_bl_apply()` e `pkg-deinstall`
+alinhado a `layer7-pfctl flush-all`. Testes R-21 e contrato FP-015 em
+`test_config_parse.c`. Suite local C/shell: PASS. Build e SHA256: registar
+após build no builder. Gate B1 passivo pendente; produção não alterada.
+`_31` supersedido para testes de lifecycle — não instalar `_31` se `_32`
+disponível.
+
 ### Candidato `1.8.11_31` — classificação nDPI até estado final (não publicado)
 
 A continuação da revisão encontrou FP-020: a captura marcava o fluxo como
@@ -177,7 +189,8 @@ usa o fallback oficial do nDPI antes de emitir a única classificação do fluxo
 Suite C/PHP/shell, build nDPI e pacote extraído: PASS. Artefacto
 `pfSense-pkg-layer7-1.8.11_31.pkg`,
 `SHA256=dc5118dd01193a83a6c6d15cc3ae4ca300647294a5b188e1991a363b4c453e33`.
-Gate passivo permanece pendente; produção não foi alterada.
+Gate passivo permanece pendente; produção não foi alterada. Supersedido por `_32`
+para testes de flush/lifecycle.
 
 ### Release `1.8.11_23` — Caminho A completo A0-A5 (publicada `2026-05-30`)
 
@@ -295,7 +308,7 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_31` (`PORTVERSION=1.8.11`, `PORTREVISION=31`),
++ `PORTREVISION`):** `1.8.11_32` (`PORTVERSION=1.8.11`, `PORTREVISION=32`),
 **candidato interno não publicado**. A release pública permanece
 `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-04-27`
@@ -963,17 +976,19 @@ CHECKPOINT CANONICO
    Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
    trust chain F1.2 do pacote ainda nao activado; ver BG-028;
    trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Proximo gate: instalar `_31` em passivo e validar ruleset +
-  logs/monitor/captura e só então testar o toggle anti-QUIC
-  + two-client appliance
-  (validacao-lab sec. 12) antes de release/default scoped
+- Auditoria E2E Etapa 1: concluida (local read-only); veredicto NO-GO para
+  publicar _31 ou activar enforce; SSOT docs/09-blocking/auditoria-end-to-end-2026-07-29.md;
+  registo AUD-001..015; gates G0-G7 em plano-gates-producao.md; BG-060
+- Proximo gate autorizado: Bloco B1 — install passivo _31 no appliance
+  (G2-G4: ABI FB16, pfctl -nf ruleset completo, captura/metricas); G5 two-client
+  (validacao-lab sec. 12) so apos G2-G4 PASS; nenhuma correcao de codigo ate
+  causa-raiz comprovada no appliance
 - PORTVERSION no repositorio: 1.8.11, PORTREVISION 31 (candidato nao publicado)
-- Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; estabilizacao
-  _25 + contenção L1 `_26` + correcções `_27`/`_28` em curso, sem activacao
-  no appliance
-- Estado documental: governanca F0 consolidada; revisao pre-install 2026-06-15
-  parcialmente enderecada em _24 (ver docs/09-blocking/revisao-codigo-*)
-- Fase actual: pos-V1 — Caminho B (E4/E5/E7 parciais; gates pendentes)
+- Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
+  corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
+  EM VALIDACAO
+- Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking
+- Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060)
 - Reorganizacao fisica autorizada: nao (F6)
 - Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_24)
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md

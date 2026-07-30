@@ -224,9 +224,19 @@ flush_tables_allow_dst() {
 	/sbin/pfctl -t "${TABLE_ALLOW_DST}" -T flush >/dev/null 2>&1 || true
 }
 
+# Excepcoes allow por origem (estaticas no ruleset; flush evita indices orfaos).
+flush_tables_exception_allow() {
+	_i=0
+	while [ "${_i}" -lt 16 ]; do
+		/sbin/pfctl -t "layer7_exc_allow_${_i}" -T flush >/dev/null 2>&1 || true
+		_i=$((_i + 1))
+	done
+}
+
 flush_tables_all() {
 	flush_tables
 	flush_tables_blacklist
+	flush_tables_exception_allow
 	flush_tables_policy_scoped
 	flush_tables_allow_dst
 }

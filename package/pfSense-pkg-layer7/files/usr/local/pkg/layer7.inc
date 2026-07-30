@@ -1172,8 +1172,8 @@ function layer7_dst_allowlist_apply_to_pf()
 
 /**
  * Esvazia as tabelas PF dinamicas (`layer7_block`, `layer7_block_dst`,
- * `layer7_allow_dst`, `layer7_bld_N`, `layer7_blsrc_N`, `layer7_pdst_N`,
- * `layer7_psrc_N`, `layer7_pallow_N`).
+ * `layer7_allow_dst`, `layer7_bld_N`, `layer7_blsrc_N`, `layer7_exc_allow_N`,
+ * `layer7_pdst_N`, `layer7_psrc_N`, `layer7_pallow_N`).
  * Usado quando o modo passa para monitor/disabled ou ao desinstalar — evita
  * que IPs adicionados num enforce anterior continuem a bloquear apos a mudanca
  * (Bloco 5). Entradas estaticas da allowlist sao repostas por
@@ -1194,6 +1194,9 @@ function layer7_flush_dynamic_tables()
 	for ($i = 0; $i < 32; $i++) {
 		$tables[] = "layer7_bld_" . $i;
 		$tables[] = "layer7_blsrc_" . $i;
+	}
+	for ($i = 0; $i < 16; $i++) {
+		$tables[] = "layer7_exc_allow_" . $i;
 	}
 	for ($i = 0; $i < 24; $i++) {
 		$tables[] = "layer7_pdst_" . $i;
@@ -2936,6 +2939,9 @@ function layer7_bl_apply()
 	if (!layer7_bl_sync_custom_category_files()) {
 		return false;
 	}
+
+	/* Evita IPs stale em layer7_bld_* apos reorder/delete de regras. */
+	layer7_flush_dynamic_tables();
 
 	$helper = layer7_pf_helper_path();
 	$ensure_ok = true;

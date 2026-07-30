@@ -2,6 +2,34 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_32] - Unreleased — flush PF lifecycle e auditoria pré-gate
+
+Pacote candidato, não publicado e não aprovado para produção.
+
+### Fixed
+
+- Flush de `layer7_exc_allow_*` em `layer7_flush_dynamic_tables()` e
+  `layer7-pfctl flush-all` (B-002).
+- `layer7_bl_apply()` passa a flushar tabelas dinâmicas antes de
+  `filter_configure()` (B-003).
+- `pkg-deinstall`: `flush-all` em PRE-DEINSTALL; fallback POST alinhado com
+  helper (B-004).
+
+### Added
+
+- Testes R-21 (`test_flush_coverage.sh`) e contrato FP-015 em
+  `test_config_parse.c`.
+- Documentação auditoria multitask e matriz unificada REV/FP/AUD.
+
+### Risco, teste e rollback
+
+- Breve gap de bloqueio durante flush em mutação de blacklist.
+- Suite local C/shell: PASS; PHP SKIP macOS.
+- Appliance Gate B1: pendente.
+- Rollback: `_24` passivo + `layer7-pfctl flush-all`.
+
+---
+
 ## [1.8.11_31] - Unreleased — decisão somente após classificação nDPI final
 
 Pacote candidato, não publicado e não aprovado para produção.

@@ -117,6 +117,13 @@ else
 	fail "test_rc_pidfile"
 fi
 
+step "Unit: flush PF coverage (lifecycle)"
+if sh tests/unit/test_flush_coverage.sh; then
+	pass "test_flush_coverage"
+else
+	fail "test_flush_coverage"
+fi
+
 step "Unit: bl_src_match (except_ips)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_bl_src_match \
@@ -184,6 +191,7 @@ for f in package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d \
     scripts/diagnose-layer7-appliance.sh \
     scripts/release/uninstall.sh \
     tests/unit/test_rc_pidfile.sh \
+    tests/unit/test_flush_coverage.sh \
     tests/lab/smoke-monitor-mode.sh \
     tests/lab/smoke-caminho-a.sh \
     tests/run-local.sh; do

@@ -169,6 +169,50 @@ main(void)
 		    "event_log_enabled=false explicito");
 	}
 
+	/* 12. JSON sem objeto layer7 -> falha fechada. */
+	{
+		const char *json = "{\"foo\":1}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) != 0,
+		    "parse falha sem layer7");
+		check(p.has_layer7 == 0, "sem layer7 -> has_layer7=0");
+	}
+
+	/* 13. JSON truncado apos layer7 -> falha ou parse parcial documentado. */
+	{
+		const char *json = "{\"layer7\":{\"enabled\":true";
+		memset(&p, 0, sizeof(p));
+		(void)layer7_parse_json(json, 0, &p);
+		/* FP-015: parser heurístico pode aceitar truncado se a chave
+		 * aparecer — este teste documenta o comportamento actual. */
+		check(p.has_layer7 == 1, "truncado: layer7 detectado");
+	}
+
+	/* 14. Campos desconhecidos no topo nao impedem enabled/mode. */
+	{
+		const char *json =
+		    "{\"layer7\":{\"unknown_field\":123,\"enabled\":true,"
+		    "\"mode\":\"monitor\",\"policies\":[]}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0,
+		    "parse ok com campo desconhecido");
+		check(p.has_enabled && p.enabled == 1,
+		    "enabled preservado com unknown_field");
+	}
+
+	/* 15. FP-015 — enabled dentro de policies confunde parser (fragilidade). */
+	{
+		const char *json =
+		    "{\"layer7\":{\"policies\":[{\"id\":\"p1\","
+		    "\"enabled\":false}],\"enabled\":true,\"mode\":\"enforce\"}}";
+		memset(&p, 0, sizeof(p));
+		check(layer7_parse_json(json, 0, &p) == 0,
+		    "parse ok (FP-015 cenario)");
+		/* Comportamento actual: primeiro \"enabled\" e o da policy. */
+		check(p.has_enabled == 1 && p.enabled == 0,
+		    "FP-015: enabled de policy vence (fragil)");
+	}
+
 	if (g_fail) {
 		printf("\nTEST CONFIG_PARSE: FAILED\n");
 		return 1;

@@ -8,7 +8,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 - instala toolchain no **Ubuntu**;
 - executa **`scripts/package/smoke-layer7d.sh`** (compilação + `-t` + cenários **`-e -n`**).
 
-**Limitações:** não compila o **port** `.pkg`, não corre no **pfSense**, não executa **pfctl**, não cobre os roteiros **10a** / **10b** / **11** no appliance. Gate de pacote: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md) (início: *Gates oficiais F4*; indice em [`../04-package/README.md`](../04-package/README.md); contexto de lab em [`../08-lab/README.md`](../08-lab/README.md)).
+**Limitações:** não compila o **port** `.pkg`, não corre no **pfSense**, não executa **pfctl**, não cobre os roteiros **10a** / **10b** / **11** no appliance. Gate de pacote: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md). Matriz de regressão: [`layer7-regression-matrix.md`](layer7-regression-matrix.md) (R-01..R-21; gates G0–G7 em [`../09-blocking/plano-gates-producao.md`](../09-blocking/plano-gates-producao.md)).
 
 ## Local
 
@@ -23,7 +23,9 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 | Ficheiro | Bloco | Cobertura |
 |----------|-------|-----------|
 | `tests/functional/test_allowlist.c` | Fase 1 | allowlist, rejeição `/0`, seed |
-| `tests/functional/test_config_parse.c` | A3 / E0 | parse JSON (`sni_inspection`, `enforcement_model`) |
+| `tests/functional/test_config_parse.c` | A3 / E0 / FP-015 | parse JSON; fragilidade `enabled` em policies (#12–15) |
+| `tests/unit/test_flush_coverage.sh` | BG-061 | contract flush exc_allow, bl_apply, pkg-deinstall |
+| `tests/unit/test_rc_pidfile.sh` | BG-053 | pidfile `daemon(8)` sem newline |
 | `tests/functional/test_capture_flow_key.c` | BG-055/BG-058/BG-059 | hash bidireccional, probe sem duplicação e finalização nDPI sem aceitar parcial |
 | `tests/functional/test_log_store.c` | BG-054 | rotação por tamanho e limite de cópias |
 | `tests/functional/test_policy_decide.c` | E1/E5/BG-056 | decisão, escopo, app/host=`pdst`, quarentena=`psrc`, allow preserva índice |
@@ -32,7 +34,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 | `tests/functional/test_scoped_pf_inc.php` | E2/E4/BG-056 | regras PF scoped, quarentena, allow por tag sem `pass quick` e flush |
 | `tests/functional/test_interface_normalization.php` | BG-053 | `lan`/`optN` → interface real em todos os consumidores |
 | `tests/functional/test_logging_reports.php` | BG-054 | parser de auditoria, sem dupla contagem e cursor através da rotação |
-| `tests/unit/test_rc_pidfile.sh` | BG-053 | pidfile `daemon(8)` sem newline |
+
 - `make -C src/layer7d check` após `make` no mesmo diretório.
 - `cd license-server/backend && npm test` para smoke tests puros da trilha
   de sessao/Bearer do painel administrativo.
