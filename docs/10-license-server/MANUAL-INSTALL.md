@@ -249,6 +249,15 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.8.11_49` (VIP isentos + UX modal, `2026-07-30`):**
+Perfis rapidos: excepcao canonica `vip-isentos` (allow global, prioridade alta),
+modal com progressive disclosure, verificador de politica efectiva em
+`layer7_test.php` e teste funcional `test_vip_exception.php`. Bloco D
+(`src_exclude_*`) continua pendente no roadmap.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_49`
+- **SHA256 esperado:** `293cc8540ff4d0b58cd1962dfd0a84429b6d83c73aa2f44b57951c96d5d30996`
+
 **Addendum da release `1.8.11_47` (UX HTTPS block page, `2026-07-30`):**
 rdr TCP 443 → servico local da pagina: HTTPS a dominio bloqueado devolve
 erro imediato no browser em vez de pendurar ate ao timeout
@@ -404,12 +413,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_47`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_49`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_47`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_47/pfSense-pkg-layer7-1.8.11_47.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_47/pfSense-pkg-layer7-1.8.11_47.pkg.sha256`
-- **SHA256 esperado:** `878f8d54b828f3d57236b565b6c55fcfae9eb3e6965e1eafadab42792801195b`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_49`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_49/pfSense-pkg-layer7-1.8.11_49.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_49/pfSense-pkg-layer7-1.8.11_49.pkg.sha256`
+- **SHA256 esperado:** `293cc8540ff4d0b58cd1962dfd0a84429b6d83c73aa2f44b57951c96d5d30996`
 
 > **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
 > sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.
