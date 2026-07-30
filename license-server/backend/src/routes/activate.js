@@ -59,7 +59,7 @@ router.post('/activate', activateLimiter, async (req, res) => {
           WHERE l.license_key = $1
             AND l.archived_at IS NULL
             AND (c.id IS NULL OR c.archived_at IS NULL)
-          FOR UPDATE`,
+          FOR UPDATE OF l`,
         [key]
       );
 
