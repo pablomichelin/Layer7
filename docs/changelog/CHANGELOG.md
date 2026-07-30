@@ -5,6 +5,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [1.8.11_33] - 2026-07-30 — GUI blacklists: progresso de download visível
 
 Publicada em `pablomichelin/Layer7` (candidato interno).
+Artefacto `pfSense-pkg-layer7-1.8.11_33.pkg`
+(`SHA256=b55f0c310ff70012862a6f717a89542289a406c54eea6c004648ca88bb37032e`).
+Release: `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_33`
 
 ### Fixed
 
