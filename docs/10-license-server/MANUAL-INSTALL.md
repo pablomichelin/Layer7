@@ -65,12 +65,15 @@ versao actual** abaixo.
 
 **Addendum operacional da F4.3 (BG-011, `force_dns` / DNS forcado):** nas
 regras de **blacklist** com opcao *Forcar DNS local* (`force_dns`), o
-pfSense **nao** aplica `rdr` pelo fluxo `nat_rules_needed` do XML; o pacote
-injecta regras no sub-anchor NAT `natrules/layer7_nat` (via
-`layer7_inject_nat_to_anchor` em todo reload de filtro coerente com a GUI).
-**Se** existem regras activas, verifique-as com
-`pfctl -a natrules/layer7_nat -s nat` (isto nao e o mesmo que o ficheiro
-`/usr/local/etc/layer7/pf.conf` das tabelas de bloqueio). Cada
+pfSense **nao** aplica `rdr` pelo fluxo `nat_rules_needed` do XML. Desde
+`1.8.11_45`, o pacote devolve as regras `rdr` ao pfSense via
+`layer7_generate_rules("nat")` (hook `filter_rule_function`), que as insere
+no **ruleset principal** em cada filter reload. **Se** existem regras
+activas, verifique-as com `pfctl -s nat` (isto nao e o mesmo que o ficheiro
+`/usr/local/etc/layer7/pf.conf` das tabelas de bloqueio). Ate a `_44` as
+regras eram carregadas no sub-anchor `natrules/layer7_nat`, que o PF nunca
+avaliava para `rdr` (so existe `nat-anchor "natrules/*"`) — a
+verificacao antiga `pfctl -a natrules/layer7_nat -s nat` e obsoleta. Cada
 origem em **CIDRs** deve ser **IPv4** valido (CIDR ou host); valores que
 nao passam a validacao sao **ignorados** na geracao, para o `pfctl` nao
 rejeitar o anchor. A lista de interfaces do Layer7 fica **deduplicada** ao
@@ -246,6 +249,15 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.8.11_45` (rdr efectivo, `2026-07-30`):** o redirect
+HTTP :80 para a pagina de bloqueio e o DNS forcado :53 nunca tinham sido
+aplicados pelo PF — as regras `rdr` viviam num anchor (`natrules/layer7_nat`)
+sem ponto `rdr-anchor` no ruleset principal. Desde `_45` entram no ruleset
+principal via hook `filter_rule_function`; verificar com `pfctl -s nat`.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_45`
+- **SHA256 esperado:** `a76cfb9b5fa352ce3989fd073801fcddcba098640933c96b68be76144d04531a`
+
 **Addendum das releases `1.8.11_35`–`_44` (block page + fix critico, `2026-07-30`):**
 Cadeia BG-062/BG-063 (ADR-0017 pagina de bloqueio DNS sinkhole; ADR-0018
 precedencia block > allowlist + DNS forcado opt-in). Detalhe por versao no
@@ -382,12 +394,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_44`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_45`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_44`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_44/pfSense-pkg-layer7-1.8.11_44.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_44/pfSense-pkg-layer7-1.8.11_44.pkg.sha256`
-- **SHA256 esperado:** `efa4f0d5f8e55cae319ecc27343c83604947e85f13062f1512c8f77d90789df2`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_45`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_45/pfSense-pkg-layer7-1.8.11_45.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_45/pfSense-pkg-layer7-1.8.11_45.pkg.sha256`
+- **SHA256 esperado:** `a76cfb9b5fa352ce3989fd073801fcddcba098640933c96b68be76144d04531a`
 
 > **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
 > sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.

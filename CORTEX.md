@@ -176,6 +176,26 @@ Publicado em `pablomichelin/Layer7` (`v1.8.11_32`) para download e botao
 **Verificar actualizacao**. Gate B1 passivo pendente; produção não alterada.
 `_31` supersedido — não instalar `_31` se `_32` disponível.
 
+### Release `1.8.11_45` — rdr da block page e DNS forcado agora efectivos (publicada `2026-07-30`)
+
+Descoberto em lab que o redirect HTTP :80 para a pagina de bloqueio e o DNS
+forcado :53 **nunca funcionaram**: as regras `rdr` eram carregadas no anchor
+`natrules/layer7_nat`, mas o ruleset principal do pfSense so declara
+`nat-anchor "natrules/*"` (sem `rdr-anchor`) e, em PF, regras `rdr` num
+anchor sem ponto `rdr-anchor` nao sao avaliadas — quem respondia no :80 era
+o nginx do webConfigurator (301). Fix: `layer7_generate_rules("nat")`
+devolve o snippet rdr ao `discover_pkg_rules` do pfSense (hook
+`filter_rule_function`, mesmo mecanismo do Squid transparente) e as regras
+entram no **ruleset principal** em cada filter reload;
+`layer7_inject_nat_to_anchor()` removido e anchor legado flushado.
+Validado no appliance: `http://youtube.com` de cliente LAN devolve
+`<title>Acesso bloqueado</title>`; `drill youtube.com @8.8.8.8` e
+interceptado e respondido pelo sinkhole local. HTTPS continua a mostrar erro
+TLS (sem MITM, ADR-0017). Verificacao operacional passa a ser `pfctl -s nat`
+(comando antigo com anchor e obsoleto). Artefacto
+`SHA256=a76cfb9b5fa352ce3989fd073801fcddcba098640933c96b68be76144d04531a`,
+tag `v1.8.11_45` em `pablomichelin/Layer7`.
+
 ### Release `1.8.11_44` — CRITICO: daemon nunca bloqueia IPs do firewall (publicada `2026-07-30`)
 
 Bug de desenho descoberto em lab: o sinkhole da block page resolve dominios

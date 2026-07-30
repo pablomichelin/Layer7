@@ -704,10 +704,17 @@ redigido de `fallback.state`.
 
 ---
 
-## 11. Roteiro F4.3 — DNS forcado (`natrules/layer7_nat`) e anti-QUIC (opcional)
+## 11. Roteiro F4.3 — DNS forcado (rdr no ruleset principal) e anti-QUIC (opcional)
+
+> **Actualizacao `1.8.11_45`:** as regras `rdr` entram no **ruleset
+> principal** via `layer7_generate_rules("nat")` (hook `filter_rule_function`).
+> O anchor `natrules/layer7_nat` usado ate a `_44` **nunca era avaliado**
+> para `rdr` (so existe `nat-anchor "natrules/*"` no pfSense) — comandos
+> `pfctl -a natrules/layer7_nat ...` neste roteiro sao obsoletos; usar
+> `pfctl -s nat` em seu lugar.
 
 **Objectivo:** recolher evidencia de que as regras `rdr` de **Forcar DNS local**
-(`force_dns` nas blacklists) carregam sem rejeitar o `pfctl` e que o anchor
+(`force_dns` nas blacklists) carregam sem rejeitar o `pfctl` e que o ruleset
 pode ser inspeccionado; e, **opcionalmente no mesmo roteiro**, que regras
 **anti-QUIC** por interface (GUI) aparecem no ruleset com labels coerentes
 (`layer7:anti-quic:*`), alinhado a [`../05-daemon/pf-enforcement.md`](../05-daemon/pf-enforcement.md).
@@ -723,10 +730,10 @@ pfSense, na raiz do clone correr `sh scripts/package/check-port-files.sh` e
 `make package` quando o bloco exigir artefacto com o código F4.3 de
 `layer7.inc`. Isto não substitui a evidência no appliance (`pfctl` no anchor).
 
-**Comandos (SSH no pfSense, como root):**
+**Comandos (SSH no pfSense, como root; `>= 1.8.11_45`):**
 
 ```sh
-pfctl -a natrules/layer7_nat -s nat
+pfctl -s nat | grep -E "port = domain|8099"
 ```
 
 **Opcional (anti-QUIC):** com bloqueio QUIC por interface activo na GUI e
@@ -753,7 +760,7 @@ alteracao, execute **Apply** / reload de filtro na GUI e volte a verificar.
 - Nenhum aviso recorrente no log do sistema do tipo
   `Layer7: pfctl nat load` com configuracao intencionalmente valida
   (falha pontual de `tempnam` ou ruleset nao e objectivo deste teste)
-- Saida de `pfctl -a natrules/layer7_nat -s nat` coerente com a configuracao
+- Saida de `pfctl -s nat` coerente com a configuracao
   (regras presentes ou ausentes de forma explicavel)
 
 **Nota (pacote >= `1.8.11_8`):** se varias regras de blacklist com `force_dns`
@@ -780,7 +787,7 @@ opt/VLAN com nomes do tipo `em0` e `em0.20`). Usar uma ou mais regras de
 blacklist com `force_dns` e `src_cidrs` apenas com sub-redes IPv4 validas que
 existem por tras de cada segmento. Apos **Apply** / reload do filtro:
 
-1. `pfctl -a natrules/layer7_nat -s nat` deve listar `rdr` **inet** UDP e TCP
+1. `pfctl -s nat` deve listar `rdr` **inet** UDP e TCP
    porta 53 para cada par **(interface real, CIDR)** esperado, sem linhas
    duplicadas quando o dedupe (>= `1.8.11_8`) se aplica.
 2. Opcional: trafego de teste a partir de um host em cada sub-rede para
@@ -793,7 +800,7 @@ existem por tras de cada segmento. Apos **Apply** / reload do filtro:
 `rdr` IPv6. Ver addendum F4.3 em `docs/10-license-server/MANUAL-INSTALL.md`.
 
 **Registo sugerido no relatorio de campanha / evidencias:** data, versao do
-`.pkg` (`pkg info`), saida (redigida) de `pfctl -a natrules/layer7_nat -s nat`.
+`.pkg` (`pkg info`), saida (redigida) de `pfctl -s nat`.
 
 ---
 

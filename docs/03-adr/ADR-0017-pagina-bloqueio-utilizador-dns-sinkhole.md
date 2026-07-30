@@ -57,7 +57,10 @@ Não se gera CA nem se intercepta TLS. Comportamento documentado:
 
 Desactivar toggle nas Definições ou reinstalar versão anterior (`_34` ou
 anterior). Remove overrides Unbound (marcador dedicado), para o serviço
-HTTP e limpa `rdr` do anchor `natrules/layer7_nat`.
+HTTP e remove as `rdr` do ruleset no filter reload seguinte. (Desde
+`1.8.11_45` as `rdr` vivem no ruleset principal via
+`layer7_generate_rules("nat")`; o anchor `natrules/layer7_nat` da
+implementacao original nunca era avaliado para `rdr` e foi descontinuado.)
 
 ## Alternativas consideradas
 

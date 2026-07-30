@@ -60,7 +60,9 @@ página de bloqueio em execução (enforce + toggle):
 - **NAT rdr** em cada interface de captura: todo o tráfego UDP/TCP porta 53
   para destinos externos é redireccionado para o Unbound local (`127.0.0.1`).
   Clientes com `8.8.8.8`/`1.1.1.1` hardcoded passam a receber as respostas do
-  sinkhole. Reutiliza o anchor `natrules/layer7_nat` existente.
+  sinkhole. Desde `_45` as regras entram no ruleset principal via
+  `layer7_generate_rules("nat")` (o anchor `natrules/layer7_nat` usado ate a
+  `_44` nunca era avaliado para `rdr` — so existe `nat-anchor "natrules/*"`).
 - **Anti-DoH automático**: aplica os overrides Unbound já existentes
   (NXDOMAIN para resolvers DoH conhecidos + canário `use-application-dns.net`
   que desactiva DoH no Firefox), se ainda não configurados.
@@ -114,10 +116,11 @@ redes (incidente de lab: `192.168.100.254` inacessível a partir da VLAN 95).
    devolver o IP portal (rdr a funcionar).
 3. `http://youtube.com` → página de bloqueio; vídeos não carregam de forma
    sustentada (>10 min).
-4. `pfctl -a natrules/layer7_nat -s nat` mostra as regras rdr :53.
+4. `pfctl -s nat` mostra as regras rdr :53 e :80→8099 (desde `_45`; até à
+   `_44` estavam num anchor nunca avaliado).
 5. Desligar toggle → regras removidas no próximo filter reload.
 
 ## Rollback
 
-Desligar `force_dns` e/ou página de bloqueio na GUI; `pfctl -a
-natrules/layer7_nat -F Nat` em emergência; downgrade para `_38` se necessário.
+Desligar `force_dns` e/ou página de bloqueio na GUI (as regras rdr saem do
+ruleset no filter reload seguinte); downgrade para `_38` se necessário.

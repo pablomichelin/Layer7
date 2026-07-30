@@ -38,8 +38,13 @@ Plano mestre desta trilha:
 ## DNS forcado (`force_dns`, F4.3 / BG-011)
 
 Para regras de **blacklist** com *Forçar DNS local*, o pacote gera `rdr` **inet**
-(UDP/TCP porta 53) e injecta-as no sub-anchor NAT **`natrules/layer7_nat`**
-via `layer7_inject_nat_to_anchor()` em `layer7.inc` — caminho **distinto** do
+(UDP/TCP porta 53). Desde **`1.8.11_45`**, as regras rdr entram no **ruleset
+principal** do pfSense via `layer7_generate_rules("nat")` (hook
+`filter_rule_function` / `discover_pkg_rules`, mesmo mecanismo do Squid
+transparente) — verificar com `pfctl -s nat`. O sub-anchor
+`natrules/layer7_nat` usado até à `_44` é **legado**: o ruleset principal só
+declara `nat-anchor "natrules/*"` (sem `rdr-anchor`) e as regras `rdr` lá
+dentro nunca eram avaliadas pelo PF. Caminho **distinto** do
 snippet em `/usr/local/etc/layer7/pf.conf` usado para tabelas de bloqueio.
 Isto alinha anti-bypass DNS ao enforcement sem MITM. Detalhe operacional:
 [`../10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md)
@@ -196,8 +201,9 @@ Rollback: desactivar toggle ou reinstalar versao anterior. ADR:
 Opt-in adicional na mesma seccao da GUI. Com block page activa:
 
 - rdr UDP/TCP porta 53 em cada interface de captura → Unbound local
-  (`127.0.0.1`), no anchor `natrules/layer7_nat` — clientes com DNS externo
-  hardcoded recebem as respostas do sinkhole;
+  (`127.0.0.1`), no ruleset principal desde `_45` (verificar com
+  `pfctl -s nat`) — clientes com DNS externo hardcoded recebem as respostas
+  do sinkhole;
 - anti-DoH Unbound aplicado automaticamente se ainda nao configurado
   (NXDOMAIN para resolvers DoH conhecidos + canario `use-application-dns.net`);
 - desactivar `force_dns` nao remove anti-DoH (remocao explicita em
