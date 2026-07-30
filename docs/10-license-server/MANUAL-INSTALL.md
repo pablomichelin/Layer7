@@ -258,7 +258,7 @@ antes de receber a tag). O match passa a preceder os blocks;
 `src_exclude_*` em `scoped_hybrid` devem actualizar de `_50` para `_51`.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_51`
-- **SHA256 esperado:** ver ficheiro `.sha256` anexado a release
+- **SHA256 esperado:** `9ef8e7f1006f093d6c1c37281c1231ca030f5be879d986055d1b300cc30b7f18`
 
 **Addendum da release `1.8.11_50` (exclusao por politica, `2026-07-30`):**
 Campos `match.src_exclude_cidrs` / `match.src_exclude_groups` (ADR-0019):
@@ -433,12 +433,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_50`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_51`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_50`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_50/pfSense-pkg-layer7-1.8.11_50.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_50/pfSense-pkg-layer7-1.8.11_50.pkg.sha256`
-- **SHA256 esperado:** `e2e388b33fdd63b4439e7ca7c9a8e101aa41b87848fd06c41e02edb1211abfea`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_51`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_51/pfSense-pkg-layer7-1.8.11_51.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_51/pfSense-pkg-layer7-1.8.11_51.pkg.sha256`
+- **SHA256 esperado:** `9ef8e7f1006f093d6c1c37281c1231ca030f5be879d986055d1b300cc30b7f18`
 
 > **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
 > sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.

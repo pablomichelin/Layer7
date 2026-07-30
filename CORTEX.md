@@ -214,7 +214,10 @@ de receber a tag e a exclusão PF era inoperante quando o destino entrara em
 padrão do allowlist/pallow) e `test_scoped_pf_inc.php` ganha asserção de
 **ordem** (o teste do `_50` só validava presença). Só `layer7.inc` + teste;
 daemon inalterado. `_50` fica supersedido para a feature de exclusão em
-scoped. Gate appliance §19.3 pendente.
+scoped. Testes PHP no builder: PASS; pacote extraído validado (match precede
+blocks). Release publicada `v1.8.11_51`
+(`SHA256=9ef8e7f1006f093d6c1c37281c1231ca030f5be879d986055d1b300cc30b7f18`),
+`releases/latest` confirmado. Gate appliance §19.3 pendente.
 
 ### Candidato `1.8.11_49` — UX modal + verificador (BG-065)
 
