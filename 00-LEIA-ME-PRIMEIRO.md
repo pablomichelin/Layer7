@@ -1,186 +1,110 @@
-# Layer7 para pfSense CE - Leitura Inicial
+# Layer7 para pfSense CE — Leitura inicial
 
-## Objetivo deste pacote documental
-
-Este conjunto de arquivos foi criado para servir como **planejamento mestre**, **SSOT operacional** e **guia de execução por fases** para o desenvolvimento de um **pacote Layer 7 open source** para **pfSense CE**, pensado para ser desenvolvido no **Cursor**, versionado no **GitHub** e distribuído inicialmente como **artefato de pacote** instalável no firewall.
-
-A ideia central é:
-
-- construir um produto de forma incremental;
-- evitar saltos de escopo;
-- reduzir risco de regressão;
-- manter documentação viva desde o primeiro commit;
-- separar claramente:
-  - o que entra na V1;
-  - o que fica para V2;
-  - o que é limitação natural da internet moderna;
-  - o que é limitação específica do pfSense/FreeBSD.
+> **Este ficheiro e um ponto de entrada rapido.** A fonte de verdade operacional
+> e **`CORTEX.md`** + **`docs/`**. Documentos `00-`…`16-` na raiz sao **legado
+> preservado** — consultar [`docs/00-overview/document-equivalence-map.md`](docs/00-overview/document-equivalence-map.md)
+> antes de os tratar como normativos.
 
 ---
 
-## Leitura recomendada em ordem
+## Estado actual (checkpoint)
 
-1. **[`docs/tutorial/guia-completo-layer7.md`](docs/tutorial/guia-completo-layer7.md)** — **tutorial completo** (começo rápido)
-2. `CORTEX.md` — estado actual e decisões
-3. `AGENTS.md` — regras para agentes IA
-4. `03-ROADMAP-E-FASES.md` *(V1: fases 0–11; transição 12; **V2+ nas fases 13–22**)*
-5. `14-CHECKLIST-MESTRE.md` — progresso detalhado
-6. `07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md`
+| Item | Valor |
+|------|-------|
+| **Versao publicada** | `1.8.11_24` (`PORTVERSION=1.8.11`, `PORTREVISION=24`) |
+| **Release GitHub** | `pablomichelin/Layer7`, tag `v1.8.11_24` |
+| **SHA256** | `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818` |
+| **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
+| **Trilha activa** | **Caminho B** — Enforcement escopado (E0–E3 no codigo; E4–E8 planeados) |
+| **Gate pendente** | **two-client** no appliance (`validacao-lab.md` sec. 12) — **nao avancar E4** sem PASS |
 
-**Planeamento mestre detalhado** (referência):
-`01-`…`16-` na raiz do repositório.
-
----
-
-## Resultado esperado deste projeto
-
-Ao final da trilha V1, o projeto deve entregar:
-
-- um **pacote próprio para pfSense CE**; ✅
-- um **daemon Layer 7** com classificação de tráfego via nDPI; ✅
-- políticas de **monitoramento**, **tag**, **allow** e **block**; ✅
-- **políticas por interface** com listas de IPs/CIDRs; ✅
-- enforcement por **PF tables** (`pfctl`); ✅
-- GUI completa no padrão do ecossistema pfSense (6 páginas); ✅
-- logs locais mínimos + exportação para syslog remoto; ✅
-- selecção de ~350 apps/categorias nDPI na GUI; ✅
-- gestão de frota para múltiplos firewalls; ✅
-- documentação completa de utilização; ✅
-- base sólida para evoluir em V2.
+Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 
 ---
 
-## O que este pacote documental NÃO promete
+## Leitura obrigatoria (ordem)
 
-Este projeto não promete, na V1:
+1. [`CORTEX.md`](CORTEX.md) — SSOT operacional, fase, gates, checkpoint
+2. [`AGENTS.md`](AGENTS.md) — regras para agentes e mantenedores
+3. [`docs/README.md`](docs/README.md) — indice documental canónico
+4. [`docs/02-roadmap/backlog.md`](docs/02-roadmap/backlog.md) — prioridades
+5. [`docs/02-roadmap/checklist-mestre.md`](docs/02-roadmap/checklist-mestre.md) — gates
+6. Area em causa (ex.: enforcement → [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-blocking/plano-enforcement-100-porcento.md))
 
-- inspeção perfeita de toda a internet moderna;
-- equivalência direta com Palo Alto / Fortinet / Check Point;
-- MITM universal de TLS;
-- console central multi-firewall;
-- engine proprietária autoral com cobertura comparável aos grandes vendors;
-- atualização automática de assinaturas de terceiros sem infraestrutura própria.
-
----
-
-## Regras operacionais recomendadas
-
-1. **Uma etapa por vez.**
-2. **Uma mudança testada por vez.**
-3. **Sem pular da PoC direto para GUI bonita.**
-4. **Sem distribuir via repositório não suportado na fase inicial.**
-5. **Sem esconder limitações técnicas no marketing do produto.**
-6. **Sem deixar documentação para o final.**
-7. **Sem merge em `main` sem documentação, teste e rollback definidos.**
-8. **Não instalar no pfSense antes do pacote estar totalmente completo** — o pacote só será colocado no firewall quando estiver totalmente desenvolvido.
+**Handoff chat longo:** [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md)
 
 ---
 
-## Estratégia de execução
+## O que o produto faz hoje
 
-A execução ideal deste projeto no Cursor deve seguir este ciclo:
-
-1. Ler `CORTEX.md`
-2. Ler `AGENTS.md`
-3. Escolher 1 bloco da fase atual
-4. Implementar apenas o bloco
-5. Rodar testes mínimos
-6. Atualizar docs
-7. Commitar
-8. Criar release notes internas
-9. Só então avançar
+- Pacote pfSense com daemon `layer7d`, GUI integrada, classificacao **nDPI**
+- Politicas por interface, IP/CIDR, grupo, horario, host, app e categoria
+- **Monitor** (passivo), **enforce** (bloqueio PF), allowlist, blacklists UT1
+- Licenciamento via ficheiro `.lic` Ed25519; **enforce ao vivo exige licenca valida**
+- Caminho A concluido (`1.8.11_23`): inventario dispositivos, MAC→IP, SNI opt-in, UX perfis
+- Caminho B E0–E3 (`1.8.11_24`): fundacao `enforcement_model`, decisao unificada, PF escopado
 
 ---
 
-## Artefatos centrais ao longo do projeto
+## Enforcement: monitor vs enforce vs licenca vs modelo
 
-Durante a execução, você deve manter sempre atualizados:
+### Modos de servico (`layer7.mode`)
 
-- `CORTEX.md`
-- `AGENTS.md`
-- `docs/changelog/`
-- `docs/adr/`
-- `docs/releases/`
-- `docs/tests/`
-- `docs/runbooks/`
+| Modo | Comportamento |
+|------|----------------|
+| `monitor` | Classifica e regista; **sem** `block drop` PF injectado pelo pacote |
+| `enforce` | Aplica bloqueios PF quando licenca valida e `enabled=true` |
 
----
+### Licenca
 
-## Ponto de verdade sobre distribuição
+- Sem `.lic` valida (ou fora de grace): o daemon **nao impoe** bloqueios — comportamento equivalente a monitor para enforcement.
+- Auditoria: `layer7d --license-status` (formato `chave=valor`).
 
-O GitHub deve ser tratado como:
+### Modelo de enforcement (`layer7.enforcement_model`)
 
-- fonte do código;
-- fonte da documentação;
-- local das releases;
-- local dos artefatos de build;
+| Valor | Default | Comportamento |
+|-------|---------|---------------|
+| `legacy_global` | **Sim** | Decisao considera cliente na policy engine, mas bloqueio PF vai para **`layer7_block_dst`** — **efeito global por destino** (qualquer cliente afectado pelo IP bloqueado). Este e o comportamento historico V1 / REV-001 by design. |
+| `scoped_hybrid` | Nao (experimental) | Bloqueio escopado: `layer7_pdst_N` / `layer7_psrc_N` por politica; **per-client real**. Requer activacao manual + **gate two-client PASS** antes de producao. |
 
-Mas **a instalação no pfSense não deve ser pensada como “instalar do GitHub diretamente”**.  
-O fluxo mais seguro para a V1 é:
+**Importante:** bloqueio “so para o filho” **nao funciona** com o default `legacy_global`. Para per-client, activar `scoped_hybrid` **e** passar o gate do appliance (sec. 12).
 
-1. desenvolver no Cursor;
-2. versionar no GitHub;
-3. gerar artefato `.txz`;
-4. instalar o artefato no pfSense em ambiente controlado;
-5. evoluir só depois para estratégia mais sofisticada de distribuição.
-
-Isso reduz risco de colisão com upgrades do pfSense e mantém o projeto mais previsível.
+Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-blocking/plano-enforcement-100-porcento.md).
 
 ---
 
-## Como usar estes arquivos no dia a dia
+## Proximos passos operacionais
 
-### Se estiver começando do zero
-Leia tudo na ordem proposta.
-
-### Se estiver retomando depois de alguns dias
-Leia:
-- `CORTEX.md`
-- `14-CHECKLIST-MESTRE.md`
-- `03-ROADMAP-E-FASES.md`
-
-### Se estiver trabalhando com IA no Cursor
-Comece por:
-- `AGENTS.md`
-- `15-PROMPT-MESTRE-CURSOR.md`
-
-### Se estiver preparando instalação real
-Leia:
-- `09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md`
-- `10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md`
+1. **Gate two-client** no appliance lab (`192.168.100.254` ou equivalente):
+   - Instalar `1.8.11_24` se ainda nao instalado
+   - Configurar `enforcement_model=scoped_hybrid`, politica block YouTube so para cliente A
+   - Executar roteiro [`validacao-lab.md` sec. 12](docs/04-package/validacao-lab.md)
+   - Smoke: `tests/lab/smoke-enforcement-scoped.sh`
+2. Diagnostico rapido no pfSense: [`scripts/diagnose-layer7-appliance.sh`](scripts/diagnose-layer7-appliance.sh)
+3. Testes locais antes de build: `./tests/run-local.sh` (unitarios — nao substituem appliance)
+4. Apos gate PASS: avancar E4–E8 conforme plano Caminho B (**nao activar `scoped_hybrid` como default** ate E8)
 
 ---
 
-## Status do projeto
+## Distribuicao e artefactos
 
-- **Versão actual:** 0.2.0 (motor multi-interface)
-- Fases completas: **0–10** (58/58 testes OK + nDPI + enforce real validado)
-- Fase 11: **release V1 publicada (0.1.0)**
-- Motor multi-interface: **v0.2.0 implementado**
-- Escopo ativo: **teste em pfSense real de produção**
-- Objetivo imediato: **validar v0.2.0 em ambiente real**
-- Objetivo proibido neste momento: **feature creep, Fase 13+ antes do teste real**
-
-**Motor Multi-Interface v0.2.0 (2026-03-18):** Políticas por interface (LAN, WIFI, ADMIN), listas de IPs/CIDRs granulares, ~350 apps nDPI seleccionáveis na GUI com pesquisa, excepções multi-host/CIDR, daemon `--list-protos`.
-
-**Validação lab (2026-03-23):** Enforce end-to-end funcional. Pipeline nDPI → policy engine → pfctl comprovado: `pf_add_ok=7`, 6 IPs adicionados à tabela PF, excepções respeitadas, block/tag decisions logadas a NOTICE.
-
-**Documentação:** Guia Completo disponível em [`docs/tutorial/guia-completo-layer7.md`](docs/tutorial/guia-completo-layer7.md) com 18 secções.
-
-O ponto de verdade operacional está em **`CORTEX.md`**.
+- Canal publico: **`.pkg` via GitHub Releases** (nao instalar directamente do GitHub clone)
+- Obter pacote:
+  ```sh
+  gh release download v1.8.11_24 --repo pablomichelin/Layer7 \
+    --pattern 'pfSense-pkg-layer7-1.8.11_24.pkg*' --dir artifacts/
+  ```
+- Build: builder FreeBSD `192.168.100.12` — ver [`docs/08-lab/builder-freebsd.md`](docs/08-lab/builder-freebsd.md)
+- macOS: workspace de edicao/git/docs apenas; validacao tecnica no builder + appliance
 
 ---
 
-## Entrega ideal da V1
+## Historico deste ficheiro
 
-Considere a V1 pronta apenas quando:
+Este documento na raiz foi criado na fase inicial do projecto (planeamento V1,
+referencias a v0.2.0 e `.txz`). Foi **actualizado em 2026-07-29** para reflectir
+a V1 comercial publicada, governanca F0 e Caminho B. Para historico de fases
+0–11 e motor multi-interface v0.2.0, ver [`docs/changelog/CHANGELOG.md`](docs/changelog/CHANGELOG.md)
+e documentos `03-ROADMAP-E-FASES.md` / `14-CHECKLIST-MESTRE.md` na raiz (legado).
 
-- instalar em pfSense CE limpo;
-- manter configuração após reboot;
-- detectar aplicações/protocolos úteis;
-- aplicar políticas previsíveis;
-- permitir rollback simples;
-- exportar logs;
-- possuir documentação de operação;
-- ter trilha de build repetível.
-
+**Ponto de verdade operacional:** sempre **`CORTEX.md`**.

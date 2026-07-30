@@ -37,6 +37,8 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0014](ADR-0014-enforcement-escopado-por-politica.md) | Enforcement escopado por politica (Caminho B / E0) | Aceito; emenda `_27` | flag `enforcement_model`: `legacy_global` vs `scoped_hybrid`; app normal usa `pdst`, `psrc` somente em quarentena explícita |
 | [ADR-0015](ADR-0015-logging-local-limitado-e-separado.md) | Logging local limitado e separado | Aceito | separa operação/tráfego, fixa limites de rotação e SQLite e mantém detalhe opt-in com bloqueios auditados |
 | [ADR-0016](ADR-0016-allow-pf-por-marcacao-interna.md) | Allow PF por marcação interna, sem bypass do pfSense | Aceito; candidato `_28` | `pallow_N` + tag `L7ALLOW`; allow vence somente blocks Layer7 e nunca cria `pass quick` perante regras nativas |
+| [ADR-0017](ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) | Página de bloqueio utilizador final (DNS sinkhole + HTTP local) | Aceito; `_35` | Unbound local-data + serviço `layer7-blockpage` + NAT rdr :80; opt-in OFF; sem MITM |
+| [ADR-0018](ADR-0018-plano-dns-forcado-e-precedencia-bloqueio.md) | Plano DNS forçado (anti-bypass) e precedência de bloqueio sobre allowlist | Aceito; `_39`/`_40` | política manual prevalece sobre allowlist-seed; `block_page.force_dns` (rdr :53 global + anti-DoH); trade-off CDN declarado |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

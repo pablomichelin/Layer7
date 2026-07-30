@@ -17,6 +17,7 @@
 #include "policy.h"
 #include <arpa/inet.h>
 #include <errno.h>
+#include <ifaddrs.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <signal.h>
@@ -809,6 +810,75 @@ allow_cache_sweep(void)
 	}
 }
 
+/*
+ * IPs locais das interfaces do firewall. O daemon NUNCA pode adicionar um
+ * IP local a uma tabela block: o sinkhole da block page resolve dominios
+ * bloqueados para o IP portal (uma interface do firewall) e a resposta DNS
+ * voltava a entrar no enforcement — bloqueando a GUI/SSH do proprio pfSense
+ * para todas as redes (bug observado em lab com 192.168.100.254).
+ */
+#define L7_LOCAL_ADDR_MAX 64
+static char s_local_addrs[L7_LOCAL_ADDR_MAX][INET_ADDRSTRLEN];
+static int s_n_local_addrs;
+static time_t s_local_addrs_ts;
+
+static int
+ip_is_local_iface_addr(const char *ip)
+{
+	time_t now = time(NULL);
+	int i;
+
+	if (!ip || ip[0] == '\0')
+		return 0;
+	if (s_local_addrs_ts == 0 || now - s_local_addrs_ts > 60) {
+		struct ifaddrs *ifap = NULL, *ifa;
+
+		s_n_local_addrs = 0;
+		s_local_addrs_ts = now;
+		if (getifaddrs(&ifap) == 0) {
+			for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
+				struct sockaddr_in *sin;
+
+				if (!ifa->ifa_addr ||
+				    ifa->ifa_addr->sa_family != AF_INET)
+					continue;
+				if (s_n_local_addrs >= L7_LOCAL_ADDR_MAX)
+					break;
+				sin = (struct sockaddr_in *)(void *)ifa->ifa_addr;
+				if (!inet_ntop(AF_INET, &sin->sin_addr,
+				    s_local_addrs[s_n_local_addrs],
+				    INET_ADDRSTRLEN))
+					continue;
+				s_n_local_addrs++;
+			}
+			freeifaddrs(ifap);
+		}
+	}
+	for (i = 0; i < s_n_local_addrs; i++) {
+		if (strcmp(s_local_addrs[i], ip) == 0)
+			return 1;
+	}
+	return 0;
+}
+
+/* Politica block prevalece sobre allowlist dinamica (IPs partilhados CDN). */
+static void
+allow_cache_revoke_ip(const char *ip)
+{
+	int i;
+
+	if (!ip || ip[0] == '\0')
+		return;
+	(void)layer7_pf_exec_table_delete(L7_PF_TABLE_ALLOW_DST, ip);
+	for (i = 0; i < s_n_allow_cache; ) {
+		if (strcmp(s_allow_cache[i].ip, ip) == 0) {
+			s_allow_cache[i] =
+			    s_allow_cache[--s_n_allow_cache];
+		} else
+			i++;
+	}
+}
+
 static void
 enforce_cache_add(const char *table, const char *ip, uint32_t ttl)
 {
@@ -1017,11 +1087,20 @@ layer7_apply_block_enforcement(const struct layer7_decision *dec,
 	if (r <= 0)
 		return;
 
+	if (ip_is_local_iface_addr(ip)) {
+		L7_NOTE("enforce_block: skip IP local do firewall "
+		    "(sinkhole/portal) ip=%s policy=%s reason=%s", ip,
+		    dec->matched_policy_id[0] ? dec->matched_policy_id : "-",
+		    reason ? reason : "-");
+		return;
+	}
+
 	r = layer7_pf_add_with_selfheal(tbl, ip, reason);
 	if (r == 0) {
 		int kill_r = 0;
 
 		s_pf_dst_add_ok++;
+		allow_cache_revoke_ip(ip);
 		enforce_cache_add(tbl, ip, ttl);
 		/*
 		 * A decisão ocorre depois de o PF criar estado. Remover somente
@@ -1282,9 +1361,26 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	if (!s_have_parse || cfg_disabled(&s_parsed) || !s_ge)
 		return;
 
-	/* Allowlist gate (Bloco 3): se o dominio resolvido estiver na lista
-	 * branca, popular layer7_allow_dst para o PF passar este IP, e SKIP
-	 * todas as decisoes de bloqueio (politica e blacklist). */
+	scoped = enforcement_is_scoped_hybrid();
+	memset(&dec, 0, sizeof(dec));
+	(void)layer7_decide_for_client(s_exc, s_nx, s_rules, s_np, s_ge,
+	    iface, client_ip, domain, NULL, NULL, &dec);
+	if (resolved_ip && *resolved_ip) {
+		strncpy(dec.enforce_dst_ip, resolved_ip,
+		    sizeof(dec.enforce_dst_ip) - 1);
+		dec.enforce_dst_ip[sizeof(dec.enforce_dst_ip) - 1] = '\0';
+	}
+	/* Politica block prevalece sobre allowlist (ex.: youtube.com na seed). */
+	if (dec.would_enforce_block_or_tag &&
+	    dec.action == LAYER7_ACTION_BLOCK &&
+	    resolved_ip && *resolved_ip &&
+	    layer7_pf_ipv4_host_ok(resolved_ip)) {
+		layer7_apply_block_enforcement(&dec, client_ip,
+		    resolved_ip, ttl, scoped, "dns_block");
+		return;
+	}
+
+	/* Allowlist gate (Bloco 3): dominio/IP na lista branca → layer7_allow_dst. */
 	dom_allow = (domain && *domain &&
 	    l7_allowlist_contains_domain(&s_allowlist, domain));
 	ip_allow = (resolved_ip && *resolved_ip &&
@@ -1306,24 +1402,6 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 		return;
 	}
 
-	scoped = enforcement_is_scoped_hybrid();
-	memset(&dec, 0, sizeof(dec));
-	(void)layer7_decide_for_client(s_exc, s_nx, s_rules, s_np, s_ge,
-	    iface, client_ip, domain, NULL, NULL, &dec);
-	if (resolved_ip && *resolved_ip) {
-		strncpy(dec.enforce_dst_ip, resolved_ip,
-		    sizeof(dec.enforce_dst_ip) - 1);
-		dec.enforce_dst_ip[sizeof(dec.enforce_dst_ip) - 1] = '\0';
-	}
-	if (dec.would_enforce_block_or_tag &&
-	    dec.action == LAYER7_ACTION_BLOCK &&
-	    resolved_ip && *resolved_ip &&
-	    layer7_pf_ipv4_host_ok(resolved_ip)) {
-		layer7_apply_block_enforcement(&dec, client_ip,
-		    resolved_ip, ttl, scoped, "dns_block");
-		return;
-	}
-
 	/* Allow explicita de politica/excepcao prevalece sobre a blacklist.
 	 * O default allow continua a consultar as categorias UT1. */
 	if (layer7_decision_is_explicit_allow(&dec)) {
@@ -1339,7 +1417,8 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	}
 
 	if (s_blacklist && s_bl_n_rules > 0 && resolved_ip &&
-	    layer7_pf_ipv4_host_ok(resolved_ip)) {
+	    layer7_pf_ipv4_host_ok(resolved_ip) &&
+	    !ip_is_local_iface_addr(resolved_ip)) {
 		int ri;
 
 		s_bl_lookups++;
@@ -1500,13 +1579,15 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 			}
 		} else if (dst_ip && layer7_pf_ipv4_host_ok(dst_ip)) {
 			/* Allowlist gate (Bloco 3): nunca bloquear destinos
-			 * da lista branca (SNI/host ou IP/CIDR). */
+			 * da lista branca (SNI/host ou IP/CIDR), excepto quando
+			 * a politica manual impoe block (prevalece). */
+			int policy_block = (dec.reason == L7_DECIDE_POLICY_MATCH);
 			int dom_allow = (host && *host &&
 			    l7_allowlist_contains_domain(&s_allowlist, host));
 			int ip_allow =
 			    l7_allowlist_contains_ip(&s_allowlist, dst_ip);
 
-			if (dom_allow || ip_allow) {
+			if (!policy_block && (dom_allow || ip_allow)) {
 				if (dom_allow)
 					(void)pf_table_add_entry(
 					    L7_PF_TABLE_ALLOW_DST, dst_ip);
@@ -1530,6 +1611,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		if (s_blacklist && s_bl_n_rules > 0 && host && *host &&
 		    dec.action != LAYER7_ACTION_BLOCK && dst_ip &&
 		    layer7_pf_ipv4_host_ok(dst_ip) &&
+		    !ip_is_local_iface_addr(dst_ip) &&
 		    !layer7_decision_is_explicit_allow(&dec) &&
 		    !l7_allowlist_contains_domain(&s_allowlist, host) &&
 		    !l7_allowlist_contains_ip(&s_allowlist, dst_ip)) {

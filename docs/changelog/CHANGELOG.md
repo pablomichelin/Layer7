@@ -2,6 +2,130 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_44] - 2026-07-30 — CRITICO: daemon nunca bloqueia IPs do firewall
+
+### Fixed
+
+- O sinkhole da block page resolve dominios bloqueados para o IP portal
+  (interface do firewall); o daemon via a resposta DNS e adicionava o
+  **proprio IP do pfSense** a `layer7_block_dst` — cortando GUI/SSH de
+  todas as redes para esse IP (observado em lab: 192.168.100.254
+  inacessivel a partir da VLAN 95). Novo guard `ip_is_local_iface_addr()`
+  (getifaddrs, cache 60s) em todos os caminhos de insercao block
+  (politica DNS/fluxo + blacklist DNS/SNI).
+
+## [1.8.11_43] - 2026-07-30 — rc.d block page: dedup por porta e status robusto
+
+### Fixed
+
+- `layer7-blockpage` rc.d: segundo arranque com porta ocupada fazia o
+  daemon(8) sair e apagar o pidfile da instancia activa (status errado e
+  risco de duplicados). Start deduplica pela porta 8099; status tem
+  fallback via sockstat.
+
+## [1.8.11_42] - 2026-07-30 — Fix rdr block page (label) e arranque do servico
+
+### Fixed
+
+- pf rejeita `label` em regras rdr: o rdr :80 da block page nunca carregava
+  no anchor (syntax error silencioso desde `_35`). Labels removidos.
+- `layer7-blockpage` helper saia de imediato sob daemon(8): o pidfile do
+  supervisor ja existia e o self-check interpretava-o como instancia activa.
+  Check removido do helper (deduplicacao fica no rc.d).
+
+## [1.8.11_41] - 2026-07-30 — Fix IP portal com interfaces por nome real
+
+### Fixed
+
+- `layer7_blockpage_portal_ip()`: quando `layer7.interfaces` guarda nomes
+  reais (`vmx0`, `vmx0.95`), o portal nao era detectado (config.xml indexa
+  por lan/optN). Novo mapeamento inverso pelo campo `if`. Sem portal, o
+  sinkhole e o rdr da block page nunca eram gerados.
+
+## [1.8.11_40] - 2026-07-30 — DNS forcado global (anti-bypass sinkhole)
+
+### Added
+
+- `block_page.force_dns` (opt-in, GUI Definições): rdr UDP/TCP :53 de todas as
+  interfaces de captura para o Unbound local — clientes com DNS hardcoded
+  (8.8.8.8/1.1.1.1) deixam de contornar o sinkhole. Activa anti-DoH
+  automaticamente (NXDOMAIN resolvers DoH + canario Firefox). ADR-0018.
+
+## [1.8.11_39] - 2026-07-30 — Fix bloqueio YouTube vs allowlist
+
+### Fixed
+
+- Removido `youtube.com` da allowlist-seed (conflitava com politicas block).
+- `layer7d`: politica block prevalece sobre allowlist (DNS + fluxo nDPI).
+- Ao aplicar block PF, revoga IP em `layer7_allow_dst` (CDN Google partilhado).
+
+## [1.8.11_38] - 2026-07-30 — Updater AJAX em ficheiro externo (CSP pfSense Plus)
+
+### Fixed
+
+- «Verificar actualizacao» movido para `layer7_settings_update.js` (externo).
+  pfSense Plus bloqueia scripts inline e `onclick`; POST continuava a
+  funcionar. Config via `data-l7-update-cfg` no bloco `#l7_pkg_update`.
+
+## [1.8.11_37] - 2026-07-30 — Fix updater: bind apos DOM pronto
+
+Publicada em `pablomichelin/Layer7`.
+Artefacto `pfSense-pkg-layer7-1.8.11_37.pkg`
+(`SHA256=58e0b4a1ee58df70e9755e40cf6a3f6d26a623e354dcf521dff3c707f0df4a4a`).
+
+### Fixed
+
+- «Verificar actualizacao» nao respondia: script no fim da pagina corria
+  depois de `DOMContentLoaded`; `l7BindCheckUpdateButton()` nunca era
+  chamado. Agora executa imediatamente se `document.readyState !== "loading"`.
+
+## [1.8.11_36] - 2026-07-30 — Fix updater GUI (Verificar actualizacao)
+
+Publicada em `pablomichelin/Layer7` (candidato interno).
+Artefacto `pfSense-pkg-layer7-1.8.11_36.pkg`
+(`SHA256=227d8058b28ba030789b197b7cb118d444860c1890ce1311507ddfa398f1fce3`).
+
+### Fixed
+
+- Botao «Verificar actualizacao» deixou de depender de `onclick` inline (CSP
+  pfSense Plus); usa `addEventListener` + re-bind apos render AJAX.
+- Link «Modo compatibilidade» (POST) quando JavaScript falhar.
+- `fetch` ao GitHub API com `--user-agent` explicito.
+
+### Risco e rollback
+
+- Alteracao PHP/JS da GUI; rollback: `_34` ou `_35`.
+
+## [1.8.11_35] - 2026-07-30 — Pagina de bloqueio utilizador final (DNS sinkhole)
+
+Publicada em `pablomichelin/Layer7` (candidato interno).
+Artefacto `pfSense-pkg-layer7-1.8.11_35.pkg`
+(`SHA256=86d0939d9fa81f4f3aa4fdf967fa06647e02e94b3afba73447c19cfb98c764a4`).
+Release: `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_35`
+
+### Added
+
+- **Pagina de bloqueio** (ADR-0017 / BG-058): toggle opt-in nas Definições;
+  mensagem/titulo/contacto customizaveis; IP portal auto ou manual.
+- **DNS sinkhole Unbound** para dominios de politicas `block` activas (+ blacklists
+  UT1 opcional, limite configuravel).
+- Servico `layer7-blockpage` (PHP built-in em `127.0.0.1:8099`) + NAT `rdr`
+  HTTP porta 80 no IP portal.
+- Teste shell `tests/test_blockpage_config.sh`.
+
+### Documentacao
+
+- `docs/03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md`
+- `docs/05-daemon/pf-enforcement.md` — secao pagina de bloqueio
+- `docs/04-package/validacao-lab.md` — secao **14**
+
+### Risco, teste e rollback
+
+- **HTTP:** pagina visivel quando dominio esta no sinkhole.
+- **HTTPS:** erro TLS (sem MITM) — documentado no UI e ADR.
+- Enforcement PF inalterado com toggle OFF.
+- Rollback: desactivar pagina ou reinstalar `_34`.
+
 ## [1.8.11_34] - 2026-07-30 — GUI updater sem reload da pagina
 
 Publicada em `pablomichelin/Layer7` (candidato interno).

@@ -108,7 +108,8 @@ gmail.com
 googlemail.com
 classroom.google.com
 meet.google.com
-youtube.com
+# youtube.com — NAO incluir: conflita com politicas de bloqueio YouTube
+# (allowlist prevalecia sobre profile-youtube; ver _39).
 
 # --- Apple essenciais (iCloud, App Store) ---
 apple.com

@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+# PROVIDES: layer7_blockpage
+# REQUIRE: NETWORKING
+# KEYWORD: shutdown
+
+. /etc/rc.subr
+
+name="layer7_blockpage"
+rcvar="${name}_enable"
+load_rc_config "${name}"
+
+: "${layer7_blockpage_enable:=NO}"
+
+pidfile="/var/run/layer7-blockpage.pid"
+helper="/usr/local/libexec/layer7-blockpage"
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+status_cmd="${name}_status"
+
+blockpage_port_listening()
+{
+	/usr/bin/sockstat -4 -l 2>/dev/null |
+	    /usr/bin/grep -q "127\.0\.0\.1:8099"
+}
+
+layer7_blockpage_start()
+{
+	if [ ! -x "${helper}" ]; then
+		echo "${name}: helper not found" >&2
+		return 1
+	fi
+	if [ -f "${pidfile}" ]; then
+		read -r _p < "${pidfile}" 2>/dev/null || _p=""
+		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
+			return 0
+		fi
+		/bin/rm -f "${pidfile}"
+	fi
+	# Dedup pela porta: um segundo daemon(8) com bind falhado sairia e
+	# apagaria o pidfile da instancia boa.
+	if blockpage_port_listening; then
+		return 0
+	fi
+	/usr/sbin/daemon -f -p "${pidfile}" "${helper}" start
+	/bin/chmod 0644 "${pidfile}" 2>/dev/null || true
+}
+
+layer7_blockpage_stop()
+{
+	if [ -x "${helper}" ]; then
+		"${helper}" stop >/dev/null 2>&1 || true
+	fi
+	/bin/rm -f "${pidfile}"
+}
+
+layer7_blockpage_status()
+{
+	if [ -f "${pidfile}" ]; then
+		read -r _p < "${pidfile}" 2>/dev/null || _p=""
+		if [ -n "${_p}" ] && /bin/kill -0 "${_p}" 2>/dev/null; then
+			echo "${name} is running as pid ${_p}."
+			return 0
+		fi
+	fi
+	if blockpage_port_listening; then
+		echo "${name} is running (listener em 127.0.0.1:8099, pidfile ausente)."
+		return 0
+	fi
+	echo "${name} is not running."
+	return 1
+}
+
+run_rc_command "$1"

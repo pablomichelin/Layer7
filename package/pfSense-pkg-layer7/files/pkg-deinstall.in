@@ -29,6 +29,14 @@ if (function_exists('layer7_reports_setup_cron')) {
 
 # Parar o daemon enquanto o rc.d ainda existe (POST-DEINSTALL corre depois da remocao).
 if [ "${2}" = "PRE-DEINSTALL" ]; then
+	/usr/sbin/service layer7-blockpage onestop >/dev/null 2>&1 || true
+	/usr/local/bin/php -r "
+require_once('/etc/inc/config.inc');
+require_once('/usr/local/pkg/layer7.inc');
+if (function_exists('layer7_remove_unbound_blockpage')) {
+	layer7_remove_unbound_blockpage();
+}
+" >/dev/null 2>&1 || true
 	/usr/sbin/service layer7d onestop >/dev/null 2>&1 || true
 	layer7_remove_crontabs
 	if [ -x /usr/local/libexec/layer7-pfctl ]; then

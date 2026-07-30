@@ -1123,3 +1123,39 @@ PASS mínimo: build nDPI contém referências a `NDPI_STATE_CLASSIFIED` e
 `ndpi_detection_giveup`; fluxo real recebe ida/volta, não duplica decisão e
 refina o protocolo quando o nDPI o fizer. Se ficar sempre genérico, preservar
 pcap/logs/stats e voltar a `_30`/`_24` passivo sem activar PF.
+
+## 18. Roteiro BG-062 — pagina de bloqueio utilizador final (`1.8.11_35`)
+
+Pre-requisitos: `mode=enforce`, servico Layer7 activo, Unbound activo no pfSense,
+cliente LAN a usar DNS do pfSense.
+
+### 18.1 Activar pagina de bloqueio
+
+1. **Definições > Pagina de bloqueio:** activar toggle; confirmar IP portal
+   (auto ou manual); gravar.
+2. Verificar servico: `service layer7-blockpage status` → running.
+3. Verificar Unbound: `grep -A2 'Layer7 block-page' /var/unbound/unbound.conf`
+   ou custom_options no config.xml — deve conter `local-data` para dominios
+   das politicas block activas.
+4. Verificar NAT: `pfctl -a natrules/layer7_nat -s nat | grep blockpage`
+
+### 18.2 Teste YouTube (HTTP)
+
+1. Activar perfil **YouTube** (Politicas > Ligar) com politica `block`.
+2. No cliente LAN: `drill youtube.com @<IP_pfsense>` → deve resolver para IP portal.
+3. Abrir `http://youtube.com` no browser → pagina «Acesso bloqueado» Layer7
+   (nao timeout infinito).
+4. Abrir `https://youtube.com` → documentar: erro TLS esperado (sem MITM).
+
+### 18.3 Blacklist (opcional)
+
+Com blacklist UT1 activa e «Incluir dominios blacklist» ON: confirmar que pelo
+menos um dominio de categoria activa aparece no sinkhole (respeitando limite).
+
+### 18.4 Rollback
+
+Desactivar toggle ou `pkg install ..._34`; confirmar remocao de overrides Unbound
+e paragem de `layer7-blockpage`.
+
+PASS minimo: passos 18.1 + 18.2 (HTTP) OK; HTTPS documentado como limitacao.
+Teste automatizado local: `sh tests/test_blockpage_config.sh`.

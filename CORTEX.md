@@ -176,6 +176,56 @@ Publicado em `pablomichelin/Layer7` (`v1.8.11_32`) para download e botao
 **Verificar actualizacao**. Gate B1 passivo pendente; produção não alterada.
 `_31` supersedido — não instalar `_31` se `_32` disponível.
 
+### Releases `1.8.11_36`–`_43` — updater CSP, precedência de bloqueio e plano DNS (publicadas `2026-07-30`)
+
+**Updater GUI (`_36`–`_38`):** «Verificar actualizacao» AJAX corrigido para o
+CSP do pfSense Plus — JS movido para ficheiro externo
+`layer7_settings_update.js` + config via `data-l7-update-cfg`. Validado no
+appliance (`_38`).
+
+**BG-063 / ADR-0018 (`_39`–`_43`):** teste YouTube em lab revelou que a
+allowlist-seed continha `youtube.com` e anulava a política block do admin;
+IPs de CDN Google partilhados em `layer7_allow_dst` furavam o PF. Correcções:
+
+- `_39` (daemon): política manual block **prevalece** sobre allowlist-seed
+  (DNS + fluxo nDPI); `allow_cache_revoke_ip` remove o IP de
+  `layer7_allow_dst` ao aplicar block; `youtube.com` removido da seed.
+- `_40`: `block_page.force_dns` opt-in — rdr global UDP/TCP :53 → Unbound
+  local (anti-bypass sinkhole) + anti-DoH automático (NXDOMAIN + canário).
+- `_41`: fix detecção IP portal quando `layer7.interfaces` usa nomes reais
+  (`vmx0`, `vmx0.95`) — sem portal, sinkhole e rdr nunca eram gerados.
+- `_42`: pf rejeita `label` em regras rdr — o rdr :80 da block page nunca
+  carregava desde `_35` (erro silencioso); helper `layer7-blockpage` saía de
+  imediato sob daemon(8) (self-check de pidfile).
+- `_43`: rc.d deduplica pela porta 8099 e status com fallback sockstat.
+
+Cadeia completa validada no appliance `192.168.100.254` (`_43`): anchor
+`natrules/layer7_nat` com 6 rdr, sinkhole `youtube.com`→portal, página
+«Acesso bloqueado» servida em `127.0.0.1:8099`. Artefacto `_43`
+`SHA256=65264b6411dc4be06be5c887bc821904892b6f7cba68228ed09ce1a4dc9a0efc`.
+Todas as tags em `pablomichelin/Layer7`. Produção enforce de referência
+permanece `_24` até gates G2–G7.
+
+### Release `1.8.11_35` — pagina de bloqueio utilizador final (publicada `2026-07-30`)
+
+**BG-062 / ADR-0017:** pagina informativa para o utilizador final via DNS
+sinkhole (Unbound) + servico HTTP local `layer7-blockpage` + NAT rdr :80.
+Toggle opt-in OFF nas Definições; mensagem/titulo/contacto customizaveis.
+Enforcement PF inalterado com feature desactivada. HTTP: pagina visivel;
+HTTPS: erro TLS (sem MITM) — documentado. Teste:
+`tests/test_blockpage_config.sh`; roteiro `validacao-lab` sec. **18**.
+Artefacto `pfSense-pkg-layer7-1.8.11_35.pkg` (SHA256
+`86d0939d9fa81f4f3aa4fdf967fa06647e02e94b3afba73447c19cfb98c764a4`).
+Canal: `pablomichelin/Layer7` tag `v1.8.11_35`. Produção enforce de
+referência permanece `_24` ate gates G2–G7.
+
+### Candidatos `1.8.11_33` / `1.8.11_34` — GUI (publicados `2026-07-30`)
+
+`_33`: progresso de download blacklists visivel na GUI.
+`_34`: botao «Verificar actualizacao» via AJAX sem reload.
+Ambos publicados em `pablomichelin/Layer7`; `_34` = `releases/latest` antes
+de `_35`.
+
 ### Candidato `1.8.11_31` — classificação nDPI até estado final (não publicado)
 
 A continuação da revisão encontrou FP-020: a captura marcava o fluxo como

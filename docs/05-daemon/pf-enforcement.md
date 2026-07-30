@@ -165,6 +165,50 @@ essa limitação.
 
 Plano: [`../09-blocking/plano-enforcement-100-porcento.md`](../09-blocking/plano-enforcement-100-porcento.md).
 
+## Pagina de bloqueio utilizador final (`block_page`, ADR-0017 / BG-062)
+
+Toggle opt-in `layer7.block_page.enabled` (Definições). Quando activo com
+`mode=enforce`:
+
+1. **Unbound sinkhole:** dominios de politicas `block` activas (+ blacklists UT1
+   opcional, limite configuravel) resolvem para o **IP portal** (auto ou manual).
+2. **NAT rdr:** TCP porta 80 no IP portal → `127.0.0.1:8099`.
+3. **Servico `layer7-blockpage`:** PHP built-in server serve HTML informativo;
+   header `Host:` identifica o site bloqueado.
+
+Enforcement PF (`layer7_block_dst`, blacklists, scoped) **nao e substituido**.
+Com toggle OFF, comportamento identico ao anterior (drop silencioso).
+
+### Limitacoes honestas
+
+| Cenario | Comportamento |
+|---------|---------------|
+| HTTP | Pagina «Acesso bloqueado» visivel |
+| HTTPS | Erro TLS / certificado (sem MITM) |
+| CDN / IP directo | PF drop se IP nao sinkhole |
+| QUIC / DoH | Anti-bypass existente; pagina nao garantida |
+
+Rollback: desactivar toggle ou reinstalar versao anterior. ADR:
+[`ADR-0017`](../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md).
+
+### DNS forcado global (`block_page.force_dns`, ADR-0018 / BG-063, `_40`)
+
+Opt-in adicional na mesma seccao da GUI. Com block page activa:
+
+- rdr UDP/TCP porta 53 em cada interface de captura → Unbound local
+  (`127.0.0.1`), no anchor `natrules/layer7_nat` — clientes com DNS externo
+  hardcoded recebem as respostas do sinkhole;
+- anti-DoH Unbound aplicado automaticamente se ainda nao configurado
+  (NXDOMAIN para resolvers DoH conhecidos + canario `use-application-dns.net`);
+- desactivar `force_dns` nao remove anti-DoH (remocao explicita em
+  Diagnostics).
+
+Recomendado combinar com `block_dot_doq` (porta 853) e anti-QUIC por
+interface. Precedencia do daemon desde `_39`: politica manual block prevalece
+sobre a allowlist-seed e revoga o IP de `layer7_allow_dst` ao aplicar block
+(`allow_cache_revoke_ip`). ADR:
+[`ADR-0018`](../03-adr/ADR-0018-plano-dns-forcado-e-precedencia-bloqueio.md).
+
 ## Assets do pacote
 
 O pacote passa a concentrar o bootstrap PF em:

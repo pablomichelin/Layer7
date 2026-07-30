@@ -1,0 +1,43 @@
+#!/bin/sh
+# Layer7 block page — servidor HTTP leve (PHP built-in) em localhost.
+# O trafego chega via NAT rdr (porta 80 no IP portal -> 127.0.0.1:8099).
+
+set -eu
+
+PORT=8099
+DOCROOT="/usr/local/www/layer7-blockpage"
+PHP="/usr/local/bin/php"
+PIDFILE="/var/run/layer7-blockpage.pid"
+ROUTER="${DOCROOT}/router.php"
+
+if [ ! -x "${PHP}" ]; then
+	echo "layer7-blockpage: ${PHP} nao encontrado" >&2
+	exit 1
+fi
+if [ ! -f "${ROUTER}" ]; then
+	echo "layer7-blockpage: router ausente (${ROUTER})" >&2
+	exit 1
+fi
+
+case "${1:-start}" in
+start)
+	# Sem verificacao de pidfile aqui: quando lancado via daemon(8) o
+	# pidfile ja existe com o pid do supervisor e o check anterior fazia
+	# o helper sair de imediato (servico nunca subia). A deduplicacao e
+	# feita no rc.d; se a porta estiver ocupada o bind do PHP falha.
+	exec "${PHP}" -S "127.0.0.1:${PORT}" -t "${DOCROOT}" "${ROUTER}"
+	;;
+stop)
+	if [ -f "${PIDFILE}" ]; then
+		_p=$(cat "${PIDFILE}" 2>/dev/null || true)
+		[ -n "${_p}" ] && kill -TERM "${_p}" 2>/dev/null || true
+		rm -f "${PIDFILE}"
+	fi
+	pkill -TERM -f "php -S 127.0.0.1:${PORT}" 2>/dev/null || true
+	exit 0
+	;;
+*)
+	echo "Uso: $0 start|stop" >&2
+	exit 1
+	;;
+esac

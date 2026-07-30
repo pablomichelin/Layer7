@@ -3,7 +3,7 @@
 
 PORTNAME=	pfSense-pkg-layer7
 PORTVERSION=	1.8.11
-PORTREVISION=	34
+PORTREVISION=	44
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -104,6 +104,8 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_settings_ajax.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_settings_update.js \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_allowlist.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_devices.php \
@@ -120,6 +122,15 @@ do-install:
 		${STAGEDIR}${PREFIX}/libexec
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-unbound-anti-doh \
 		${STAGEDIR}${PREFIX}/libexec
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-blockpage \
+		${STAGEDIR}${PREFIX}/libexec
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7-blockpage \
+		${STAGEDIR}${PREFIX}/etc/rc.d
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/layer7-blockpage
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/layer7-blockpage/router.php \
+		${STAGEDIR}${PREFIX}/www/layer7-blockpage
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/layer7-blockpage/index.php \
+		${STAGEDIR}${PREFIX}/www/layer7-blockpage
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/pf.conf.sample \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/profiles.json \

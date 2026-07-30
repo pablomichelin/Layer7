@@ -337,7 +337,7 @@ function layer7_generate_rdr_rules_snippet()
 function layer7_inject_nat_to_anchor()
 {
 	$anchor = "natrules/layer7_nat";
-	$snippet = layer7_generate_rdr_rules_snippet();
+	$snippet = layer7_generate_nat_anchor_snippet();
 	if ($snippet === "") {
 		/* Best-effort: anchor pode ainda nao existir; evitar ruido no log. */
 		@exec("/sbin/pfctl -a " . escapeshellarg($anchor) . " -F Nat 2>/dev/null");
@@ -372,7 +372,27 @@ function layer7_inject_nat_to_anchor()
  */
 function layer7_generate_nat_rules()
 {
-	return layer7_generate_rdr_rules_snippet();
+	return layer7_generate_nat_anchor_snippet();
+}
+
+/**
+ * Snippet NAT completo para o anchor layer7_nat (force_dns + pagina de bloqueio).
+ */
+function layer7_generate_nat_anchor_snippet()
+{
+	$parts = array();
+	$dns = layer7_generate_rdr_rules_snippet();
+	if ($dns !== "") {
+		$parts[] = trim($dns);
+	}
+	$bp = layer7_generate_blockpage_rdr_snippet();
+	if ($bp !== "") {
+		$parts[] = trim($bp);
+	}
+	if (empty($parts)) {
+		return "";
+	}
+	return implode("\n", $parts) . "\n";
 }
 
 /**
@@ -1041,6 +1061,7 @@ function layer7_resync()
 	 * daemon, via DNS hint. Executado apos flush dinamico para repor
 	 * entradas estaticas quando `layer7_allow_dst` foi esvaziada. */
 	layer7_dst_allowlist_apply_to_pf();
+	layer7_blockpage_sync($data);
 	layer7_ensure_daemon_running();
 }
 
@@ -1223,6 +1244,7 @@ function layer7_pf_config_resync($flush_dynamic = false)
 	if (layer7_pf_should_enforce()) {
 		layer7_dst_allowlist_apply_to_pf();
 	}
+	layer7_blockpage_sync();
 	if (function_exists("filter_configure")) {
 		filter_configure();
 	}
@@ -1456,6 +1478,18 @@ function layer7_bare_config()
 			"block_dot_doq" => false,
 			"sni_inspection" => false,
 			"enforcement_model" => "legacy_global",
+			"block_page" => array(
+				"enabled" => false,
+				"portal_ip" => "",
+				"title" => "Acesso bloqueado",
+				"message" => "Este site ou servico foi bloqueado pela politica de rede do seu administrador.",
+				"contact" => "",
+				"show_host" => true,
+				"show_policy" => false,
+				"sinkhole_blacklists" => true,
+				"blacklist_domain_limit" => 256,
+				"force_dns" => false
+			),
 			"interfaces" => array("lan"),
 			"groups" => array(),
 			"policies" => array(),
@@ -1691,6 +1725,457 @@ function layer7_unbound_anti_doh_configured()
 	return false;
 }
 
+define('L7_BLOCKPAGE_PORT', 8099);
+define('L7_BLOCKPAGE_MARKER_START', '# --- Layer7 block-page START ---');
+define('L7_BLOCKPAGE_MARKER_END', '# --- Layer7 block-page END ---');
+
+/**
+ * Configuracao normalizada da pagina de bloqueio (defaults seguros).
+ */
+function layer7_blockpage_config_get($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$raw = array();
+	if (is_array($data) && isset($data["layer7"]["block_page"]) &&
+	    is_array($data["layer7"]["block_page"])) {
+		$raw = $data["layer7"]["block_page"];
+	}
+	$def_title = "Acesso bloqueado";
+	$def_msg = "Este site ou servico foi bloqueado pela politica de rede do seu administrador.";
+	return array(
+		"enabled" => !empty($raw["enabled"]),
+		"portal_ip" => isset($raw["portal_ip"]) ? trim((string)$raw["portal_ip"]) : "",
+		"title" => isset($raw["title"]) && trim((string)$raw["title"]) !== ""
+		    ? trim((string)$raw["title"]) : $def_title,
+		"message" => isset($raw["message"]) && trim((string)$raw["message"]) !== ""
+		    ? trim((string)$raw["message"]) : $def_msg,
+		"contact" => isset($raw["contact"]) ? trim((string)$raw["contact"]) : "",
+		"show_host" => !isset($raw["show_host"]) || !empty($raw["show_host"]),
+		"show_policy" => !empty($raw["show_policy"]),
+		"sinkhole_blacklists" => !isset($raw["sinkhole_blacklists"]) ||
+		    !empty($raw["sinkhole_blacklists"]),
+		"blacklist_domain_limit" => isset($raw["blacklist_domain_limit"])
+		    ? (int)$raw["blacklist_domain_limit"] : 256,
+		"force_dns" => !empty($raw["force_dns"])
+	);
+}
+
+/**
+ * Pagina de bloqueio so corre com enforce activo e toggle ON.
+ */
+function layer7_blockpage_should_run($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (!layer7_pf_should_enforce($data)) {
+		return false;
+	}
+	$bp = layer7_blockpage_config_get($data);
+	return !empty($bp["enabled"]);
+}
+
+/**
+ * IP portal: custom IPv4 ou auto (primeira interface Layer7 com IPv4).
+ */
+function layer7_blockpage_portal_ip($data = null)
+{
+	global $config;
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$bp = layer7_blockpage_config_get($data);
+	if ($bp["portal_ip"] !== "" && layer7_ipv4_valid($bp["portal_ip"])) {
+		return $bp["portal_ip"];
+	}
+	$iface_ids = isset($data["layer7"]["interfaces"]) &&
+	    is_array($data["layer7"]["interfaces"])
+	    ? $data["layer7"]["interfaces"] : array("lan");
+	foreach ($iface_ids as $ifid) {
+		$ifid = trim((string)$ifid);
+		if ($ifid === "") {
+			continue;
+		}
+		$keys = array($ifid);
+		$real = layer7_real_interface_name($ifid);
+		if ($real !== "" && $real !== $ifid) {
+			$keys[] = $real;
+		}
+		foreach (array_unique($keys) as $key) {
+			if (!isset($config["interfaces"][$key]) ||
+			    !is_array($config["interfaces"][$key])) {
+				continue;
+			}
+			$ip = isset($config["interfaces"][$key]["ipaddr"])
+			    ? trim((string)$config["interfaces"][$key]["ipaddr"]) : "";
+			if ($ip !== "" && layer7_ipv4_valid($ip)) {
+				return $ip;
+			}
+		}
+		/* layer7.json pode guardar nomes reais (vmx0, vmx0.95) em vez de
+		 * lan/optN: mapear pelo campo `if` do config.xml. */
+		if (isset($config["interfaces"]) &&
+		    is_array($config["interfaces"])) {
+			foreach ($config["interfaces"] as $cfg_if) {
+				if (!is_array($cfg_if) ||
+				    !isset($cfg_if["if"]) ||
+				    (string)$cfg_if["if"] !== $ifid) {
+					continue;
+				}
+				$ip = isset($cfg_if["ipaddr"])
+				    ? trim((string)$cfg_if["ipaddr"]) : "";
+				if ($ip !== "" && layer7_ipv4_valid($ip)) {
+					return $ip;
+				}
+			}
+		}
+	}
+	return null;
+}
+
+/**
+ * Domínios a sinkhole: politicas block activas + blacklists (limitadas).
+ * @return array{domains: string[], truncated: bool, policy_map: array<string,string>}
+ */
+function layer7_blockpage_collect_domains($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$bp = layer7_blockpage_config_get($data);
+	$domains = array();
+	$policy_map = array();
+	$policies = isset($data["layer7"]["policies"]) &&
+	    is_array($data["layer7"]["policies"])
+	    ? $data["layer7"]["policies"] : array();
+	foreach ($policies as $pol) {
+		if (!is_array($pol) || empty($pol["enabled"])) {
+			continue;
+		}
+		if (!isset($pol["action"]) || (string)$pol["action"] !== "block") {
+			continue;
+		}
+		$pname = isset($pol["name"]) ? (string)$pol["name"] : "";
+		$match = isset($pol["match"]) && is_array($pol["match"])
+		    ? $pol["match"] : array();
+		$hosts = isset($match["hosts"]) && is_array($match["hosts"])
+		    ? $match["hosts"] : array();
+		foreach ($hosts as $h) {
+			$h = strtolower(trim((string)$h));
+			if ($h === "" || !layer7_policy_host_valid($h)) {
+				continue;
+			}
+			$domains[] = $h;
+			if ($pname !== "" && !isset($policy_map[$h])) {
+				$policy_map[$h] = $pname;
+			}
+		}
+	}
+	$domains = array_values(array_unique($domains));
+	$bl_limit = (int)$bp["blacklist_domain_limit"];
+	if ($bl_limit < 1) {
+		$bl_limit = 256;
+	}
+	if ($bl_limit > 4096) {
+		$bl_limit = 4096;
+	}
+	$truncated = false;
+	if (!empty($bp["sinkhole_blacklists"])) {
+		$bl_cfg = layer7_bl_config_load();
+		if (!empty($bl_cfg["enabled"]) && !empty($bl_cfg["rules"]) &&
+		    is_array($bl_cfg["rules"])) {
+			$bl_domains = array();
+			foreach ($bl_cfg["rules"] as $rule) {
+				if (!is_array($rule) || empty($rule["enabled"])) {
+					continue;
+				}
+				$cats = isset($rule["categories"]) && is_array($rule["categories"])
+				    ? $rule["categories"] : array();
+				foreach ($cats as $cat) {
+					$cat = strtolower(trim((string)$cat));
+					if (!layer7_bl_category_id_valid($cat)) {
+						continue;
+					}
+					foreach (array(
+					    L7_BL_DIR . '/' . $cat . '/domains',
+					    L7_BL_DIR . '/_custom/' . $cat . '.domains'
+					) as $path) {
+						if (!is_readable($path)) {
+							continue;
+						}
+						$raw = @file_get_contents($path);
+						if (!is_string($raw) || $raw === "") {
+							continue;
+						}
+						foreach (layer7_bl_domains_normalize($raw) as $d) {
+							$bl_domains[] = $d;
+							if (count($bl_domains) >= $bl_limit) {
+								break 3;
+							}
+						}
+					}
+				}
+			}
+			$before = count($domains);
+			$domains = array_values(array_unique(array_merge($domains, $bl_domains)));
+			if (count($bl_domains) >= $bl_limit) {
+				$truncated = true;
+			}
+			if (count($domains) > $before + $bl_limit) {
+				$truncated = true;
+			}
+		}
+	}
+	sort($domains, SORT_STRING);
+	return array(
+		"domains" => $domains,
+		"truncated" => $truncated,
+		"policy_map" => $policy_map
+	);
+}
+
+/**
+ * Nome de politica associado a um host (para template HTML).
+ */
+function layer7_blockpage_policy_for_host($host, $data = null)
+{
+	$host = strtolower(trim((string)$host));
+	if ($host === "") {
+		return "";
+	}
+	$collected = layer7_blockpage_collect_domains($data);
+	$map = isset($collected["policy_map"]) ? $collected["policy_map"] : array();
+	if (isset($map[$host])) {
+		return (string)$map[$host];
+	}
+	foreach ($map as $rule_host => $pname) {
+		$rl = strlen($rule_host);
+		if ($rl > 0 && strlen($host) > $rl &&
+		    substr($host, -($rl + 1)) === "." . $rule_host) {
+			return (string)$pname;
+		}
+	}
+	return "";
+}
+
+/**
+ * Bloco Unbound local-zone/local-data para sinkhole DNS.
+ */
+function layer7_blockpage_unbound_block($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$portal = layer7_blockpage_portal_ip($data);
+	if ($portal === null) {
+		return "";
+	}
+	$collected = layer7_blockpage_collect_domains($data);
+	$domains = isset($collected["domains"]) ? $collected["domains"] : array();
+	if (empty($domains)) {
+		return "";
+	}
+	$lines = array();
+	$lines[] = L7_BLOCKPAGE_MARKER_START;
+	$lines[] = "# Layer7 block-page: sinkhole DNS -> {$portal}";
+	foreach ($domains as $d) {
+		$lines[] = "server:";
+		$lines[] = "    local-zone: \"{$d}.\" redirect";
+		$lines[] = "    local-data: \"{$d}. 60 IN A {$portal}\"";
+	}
+	if (!empty($collected["truncated"])) {
+		$lines[] = "# AVISO: lista de blacklist truncada (limite configurado)";
+	}
+	$lines[] = L7_BLOCKPAGE_MARKER_END;
+	return implode("\n", $lines) . "\n";
+}
+
+/**
+ * Remove apenas o bloco block-page do custom_options Unbound.
+ */
+function layer7_unbound_blockpage_strip($text)
+{
+	$pos_start = strpos($text, L7_BLOCKPAGE_MARKER_START);
+	if ($pos_start === false) {
+		return $text;
+	}
+	$pos_end = strpos($text, L7_BLOCKPAGE_MARKER_END, $pos_start);
+	if ($pos_end === false) {
+		return substr($text, 0, $pos_start);
+	}
+	$pos_end += strlen(L7_BLOCKPAGE_MARKER_END);
+	while ($pos_end < strlen($text) &&
+	    ($text[$pos_end] === "\n" || $text[$pos_end] === "\r")) {
+		$pos_end++;
+	}
+	return rtrim(substr($text, 0, $pos_start)) .
+	    (strlen($text) > $pos_end ? substr($text, $pos_end) : "");
+}
+
+/**
+ * Aplica ou remove overrides Unbound da pagina de bloqueio.
+ */
+function layer7_configure_unbound_blockpage($data = null)
+{
+	global $config;
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (!function_exists("write_config")) {
+		return array("ok" => false, "msg" => l7_t("Funcao write_config nao disponivel."));
+	}
+	if (!isset($config["unbound"])) {
+		return array("ok" => false, "msg" => l7_t("Seccao Unbound nao encontrada no config.xml."));
+	}
+	$existing = layer7_unbound_custom_options_read();
+	$existing = layer7_unbound_blockpage_strip($existing);
+	$block = layer7_blockpage_unbound_block($data);
+	if ($block === "") {
+		layer7_unbound_custom_options_write(trim($existing));
+		write_config("Layer7: block-page Unbound removed");
+		if (function_exists("services_unbound_configure")) {
+			services_unbound_configure();
+		}
+		return array("ok" => true, "msg" => l7_t("Pagina de bloqueio: overrides DNS removidos."));
+	}
+	$new_content = "";
+	if ($existing !== "") {
+		$new_content = rtrim($existing) . "\n\n";
+	}
+	$new_content .= $block;
+	layer7_unbound_custom_options_write($new_content);
+	write_config("Layer7: block-page DNS sinkhole");
+	if (function_exists("services_unbound_configure")) {
+		services_unbound_configure();
+	}
+	$nd = count(layer7_blockpage_collect_domains($data)["domains"]);
+	return array(
+		"ok" => true,
+		"msg" => sprintf(l7_t("Pagina de bloqueio: %d dominio(s) sinkhole configurados."), $nd)
+	);
+}
+
+function layer7_remove_unbound_blockpage()
+{
+	global $config;
+	if (!function_exists("write_config") || !isset($config["unbound"])) {
+		return array("ok" => false, "msg" => l7_t("Config nao acessivel."));
+	}
+	$existing = layer7_unbound_custom_options_read();
+	if (strpos($existing, L7_BLOCKPAGE_MARKER_START) === false) {
+		return array("ok" => true, "msg" => l7_t("Overrides block-page nao encontrados."));
+	}
+	$existing = layer7_unbound_blockpage_strip($existing);
+	layer7_unbound_custom_options_write(trim($existing));
+	write_config("Layer7: block-page overrides removed");
+	if (function_exists("services_unbound_configure")) {
+		services_unbound_configure();
+	}
+	return array("ok" => true, "msg" => l7_t("Overrides block-page removidos do Unbound."));
+}
+
+/**
+ * Regras rdr TCP/80 -> servico local da pagina de bloqueio.
+ */
+function layer7_generate_blockpage_rdr_snippet($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (!layer7_blockpage_should_run($data)) {
+		return "";
+	}
+	$portal = layer7_blockpage_portal_ip($data);
+	if ($portal === null) {
+		return "";
+	}
+	$iface_ids = isset($data["layer7"]["interfaces"]) &&
+	    is_array($data["layer7"]["interfaces"])
+	    ? $data["layer7"]["interfaces"] : array("lan");
+	$real_ifaces = array();
+	foreach ($iface_ids as $ifid) {
+		if (function_exists("get_real_interface")) {
+			$real = get_real_interface($ifid);
+		} else {
+			$real = null;
+		}
+		if ($real) {
+			$real_ifaces[] = $real;
+		} elseif (layer7_pf_ifname_for_rules($ifid)) {
+			$real_ifaces[] = $ifid;
+		}
+	}
+	$real_ifaces = array_values(array_filter(
+	    array_unique($real_ifaces),
+	    "layer7_pf_ifname_for_rules"
+	));
+	sort($real_ifaces, SORT_STRING);
+	if (empty($real_ifaces)) {
+		return "";
+	}
+	$port = (int)L7_BLOCKPAGE_PORT;
+	$lines = array();
+	$lines[] = "# Pagina de bloqueio Layer7 (HTTP -> localhost:{$port})";
+	/* Nota: pf rejeita `label` em regras rdr (syntax error) — nao usar. */
+	foreach ($real_ifaces as $iface) {
+		$lines[] = "rdr on {$iface} inet proto tcp from any to {$portal} port 80" .
+		    " -> 127.0.0.1 port {$port}";
+	}
+	$bp = layer7_blockpage_config_get($data);
+	if (!empty($bp["force_dns"])) {
+		$lines[] = "# DNS forcado global (anti-bypass sinkhole) — block_page.force_dns";
+		foreach ($real_ifaces as $iface) {
+			$lines[] = "rdr on {$iface} inet proto udp" .
+			    " from any to !127.0.0.1 port 53 -> 127.0.0.1";
+			$lines[] = "rdr on {$iface} inet proto tcp" .
+			    " from any to !127.0.0.1 port 53 -> 127.0.0.1";
+		}
+	}
+	return implode("\n", $lines) . "\n";
+}
+
+/**
+ * Arranca ou para o servico layer7-blockpage.
+ */
+function layer7_ensure_blockpage_service($run)
+{
+	if ($run) {
+		@exec("/usr/sbin/sysrc layer7_blockpage_enable=YES 2>/dev/null");
+		@exec("/usr/sbin/service layer7-blockpage onestart 2>/dev/null");
+		return;
+	}
+	@exec("/usr/sbin/service layer7-blockpage onestop 2>/dev/null");
+	@exec("/usr/sbin/sysrc layer7_blockpage_enable=NO 2>/dev/null");
+}
+
+/**
+ * Sincroniza Unbound, servico HTTP e depende de filter reload para NAT rdr.
+ */
+function layer7_blockpage_sync($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (layer7_blockpage_should_run($data)) {
+		layer7_configure_unbound_blockpage($data);
+		layer7_ensure_blockpage_service(true);
+		/* force_dns implica anti-DoH (NXDOMAIN para resolvers DoH +
+		 * canario use-application-dns.net que desliga DoH no Firefox).
+		 * Desactivar force_dns nao remove anti-DoH: gerido tambem em
+		 * Diagnostics, remover so por accao explicita do admin. */
+		$bp = layer7_blockpage_config_get($data);
+		if (!empty($bp["force_dns"]) &&
+		    !layer7_unbound_anti_doh_configured()) {
+			layer7_configure_unbound_anti_doh();
+		}
+		return;
+	}
+	layer7_remove_unbound_blockpage();
+	layer7_ensure_blockpage_service(false);
+}
+
 /**
  * Valida politica block: exige criterios de match ou flags explicitas.
  */
@@ -1848,7 +2333,10 @@ function layer7_check_for_update($owner = "pablomichelin", $repo = "Layer7")
 	$gh_api = "https://api.github.com/repos/" . $owner . "/" . $repo . "/releases/latest";
 	$tmp_json = "/tmp/layer7-gh-latest.json";
 	@unlink($tmp_json);
-	exec("/usr/bin/fetch -qo " . escapeshellarg($tmp_json) . " " . escapeshellarg($gh_api) . " 2>&1", $fetch_out, $fetch_rc);
+	$fetch_cmd = "/usr/bin/fetch -qo " . escapeshellarg($tmp_json)
+	    . " --user-agent=Layer7-pfSense-pkg/" . escapeshellarg($current_ver)
+	    . " " . escapeshellarg($gh_api);
+	exec($fetch_cmd . " 2>&1", $fetch_out, $fetch_rc);
 	if ($fetch_rc !== 0 || !file_exists($tmp_json)) {
 		$result["error"] = l7_t("Nao foi possivel contactar o GitHub. Verifique a ligacao a Internet.");
 		return $result;

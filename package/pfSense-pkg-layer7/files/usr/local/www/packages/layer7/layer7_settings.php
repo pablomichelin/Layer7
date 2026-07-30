@@ -323,6 +323,53 @@ if ($_POST["save"] ?? false) {
 		    ? "scoped_hybrid" : "legacy_global";
 	}
 
+	/* Pagina de bloqueio (ADR-0017): opt-in, requer mode=enforce. */
+	$bp_cfg = layer7_blockpage_config_get($current_data);
+	if ($is_general_save) {
+		$bp_enabled = isset($_POST["block_page_enabled"]);
+		$bp_portal = trim((string)($_POST["block_page_portal_ip"] ?? ""));
+		$bp_title = trim((string)($_POST["block_page_title"] ?? ""));
+		$bp_message = trim((string)($_POST["block_page_message"] ?? ""));
+		$bp_contact = trim((string)($_POST["block_page_contact"] ?? ""));
+		$bp_show_host = isset($_POST["block_page_show_host"]);
+		$bp_show_policy = isset($_POST["block_page_show_policy"]);
+		$bp_sinkhole_bl = isset($_POST["block_page_sinkhole_blacklists"]);
+		$bp_bl_limit = (int)($_POST["block_page_blacklist_limit"] ?? 256);
+		$bp_force_dns = isset($_POST["block_page_force_dns"]);
+	} else {
+		$bp_enabled = !empty($bp_cfg["enabled"]);
+		$bp_portal = $bp_cfg["portal_ip"];
+		$bp_title = $bp_cfg["title"];
+		$bp_message = $bp_cfg["message"];
+		$bp_contact = $bp_cfg["contact"];
+		$bp_show_host = !empty($bp_cfg["show_host"]);
+		$bp_show_policy = !empty($bp_cfg["show_policy"]);
+		$bp_sinkhole_bl = !empty($bp_cfg["sinkhole_blacklists"]);
+		$bp_bl_limit = (int)$bp_cfg["blacklist_domain_limit"];
+		$bp_force_dns = !empty($bp_cfg["force_dns"]);
+	}
+	if ($bp_portal !== "" && !layer7_ipv4_valid($bp_portal)) {
+		$input_errors[] = l7_t("IP portal da pagina de bloqueio invalido.");
+	}
+	if ($bp_title === "") {
+		$bp_title = "Acesso bloqueado";
+	}
+	if (strlen($bp_title) > 120) {
+		$bp_title = substr($bp_title, 0, 120);
+	}
+	if (strlen($bp_message) > 2000) {
+		$bp_message = substr($bp_message, 0, 2000);
+	}
+	if (strlen($bp_contact) > 500) {
+		$bp_contact = substr($bp_contact, 0, 500);
+	}
+	if ($bp_bl_limit < 1) {
+		$bp_bl_limit = 256;
+	}
+	if ($bp_bl_limit > 4096) {
+		$bp_bl_limit = 4096;
+	}
+
 	$rpt_enabled = !empty($current_reports["enabled"]);
 	$rpt_retention = (int)($current_reports["retention_days"] ?? 30);
 	$rpt_interval = (int)($current_reports["collect_interval"] ?? 5);
@@ -410,6 +457,18 @@ if ($_POST["save"] ?? false) {
 		$data["layer7"]["block_dot_doq"] = $block_dot_doq;
 		$data["layer7"]["sni_inspection"] = $sni_inspection;
 		$data["layer7"]["enforcement_model"] = $enforcement_model;
+		$data["layer7"]["block_page"] = array(
+			"enabled" => $bp_enabled,
+			"portal_ip" => $bp_portal,
+			"title" => $bp_title,
+			"message" => $bp_message,
+			"contact" => $bp_contact,
+			"show_host" => $bp_show_host,
+			"show_policy" => $bp_show_policy,
+			"sinkhole_blacklists" => $bp_sinkhole_bl,
+			"blacklist_domain_limit" => $bp_bl_limit,
+			"force_dns" => $bp_force_dns
+		);
 
 		$data["layer7"]["reports"] = array(
 			"enabled" => $rpt_enabled,
@@ -430,12 +489,26 @@ if ($_POST["save"] ?? false) {
 			$old_mode = isset($current_l7["mode"]) ? (string)$current_l7["mode"] : "monitor";
 			$old_enabled = !empty($current_l7["enabled"]);
 			$old_dot_doq = !empty($current_l7["block_dot_doq"]);
+			$old_bp = layer7_blockpage_config_get($current_data);
+			$bp_changed = (
+			    !empty($old_bp["enabled"]) !== (bool)$bp_enabled ||
+			    (string)$old_bp["portal_ip"] !== (string)$bp_portal ||
+			    (string)$old_bp["title"] !== (string)$bp_title ||
+			    (string)$old_bp["message"] !== (string)$bp_message ||
+			    (string)$old_bp["contact"] !== (string)$bp_contact ||
+			    !empty($old_bp["show_host"]) !== (bool)$bp_show_host ||
+			    !empty($old_bp["show_policy"]) !== (bool)$bp_show_policy ||
+			    !empty($old_bp["sinkhole_blacklists"]) !== (bool)$bp_sinkhole_bl ||
+			    (int)$old_bp["blacklist_domain_limit"] !== (int)$bp_bl_limit ||
+			    !empty($old_bp["force_dns"]) !== (bool)$bp_force_dns
+			);
 			$pf_relevant_changed = (
 			    $old_quic_ifaces !== $data["layer7"]["block_quic_interfaces"] ||
 			    $old_mode !== $data["layer7"]["mode"] ||
 			    $old_enabled !== (bool)$data["layer7"]["enabled"] ||
 			    $old_dot_doq !== (bool)$data["layer7"]["block_dot_doq"] ||
-			    $em_changed
+			    $em_changed ||
+			    $bp_changed
 			);
 			if ($pf_relevant_changed) {
 				if ($em_changed) {
@@ -444,6 +517,8 @@ if ($_POST["save"] ?? false) {
 				if (function_exists("filter_configure")) {
 					filter_configure();
 				}
+			} elseif ($bp_changed) {
+				layer7_blockpage_sync($data);
 			}
 			layer7_reports_setup_cron(($rpt_enabled || $rpt_event_enabled), $rpt_interval);
 			$savemsg = l7_t("Configuracao gravada. SIGHUP enviado ao layer7d se o servico estiver em execucao.");
@@ -475,6 +550,9 @@ $sni_inspection = !empty($L["sni_inspection"]);
 $enforcement_model = (isset($L["enforcement_model"]) &&
     (string)$L["enforcement_model"] === "scoped_hybrid")
     ? "scoped_hybrid" : "legacy_global";
+$bp_cfg = layer7_blockpage_config_get($data);
+$bp_portal_detected = layer7_blockpage_portal_ip($data);
+$bp_domain_info = layer7_blockpage_collect_domains($data);
 $cur_lang = isset($L["language"]) ? $L["language"] : "pt";
 if (!in_array($cur_lang, array("pt", "en"), true)) {
 	$cur_lang = "pt";
@@ -596,6 +674,108 @@ layer7_render_styles();
 								<option value="scoped_hybrid" <?= $enforcement_model === "scoped_hybrid" ? 'selected="selected"' : ""; ?>><?= l7_t("Escopado hibrido (experimental — Caminho B; requer blocos E2+)"); ?></option>
 							</select>
 							<p class="help-block"><?= l7_t("Por defeito: legacy global (recomendado). O modo escopado hibrido e experimental: bloqueia por politica e origem via tabelas layer7_pdst_* / layer7_psrc_*. So IPv4; DoH/DoT/QUIC podem contornar DNS/SNI; politicas app-only exigem flag quarantine_origin para quarentenar origem. Validar em laboratorio antes de produzao."); ?></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Pagina de bloqueio"); ?></label>
+						<div class="col-sm-9">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="block_page_enabled" value="1"
+									<?= !empty($bp_cfg["enabled"]) ? 'checked="checked"' : ""; ?> />
+								<?= l7_t("Mostrar pagina informativa ao utilizador (requer mode=enforce)"); ?>
+							</label>
+							<p class="help-block"><?= l7_t("DNS sinkhole via Unbound + pagina HTTP no IP portal. Funciona em HTTP; HTTPS mostra erro de certificado (sem MITM). CDN/QUIC/DoH podem contornar. Desligado por defeito."); ?></p>
+							<?php if (!empty($bp_cfg["enabled"]) && $mode !== "enforce") { ?>
+							<p class="text-warning"><i class="fa fa-warning"></i> <?= l7_t("A pagina so e activa com Servico ligado e modo enforce."); ?></p>
+							<?php } ?>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("IP portal"); ?></label>
+						<div class="col-sm-9">
+							<input type="text" name="block_page_portal_ip" class="form-control" style="max-width: 220px;"
+								value="<?= htmlspecialchars($bp_cfg["portal_ip"]); ?>"
+								placeholder="<?= $bp_portal_detected ? htmlspecialchars($bp_portal_detected) : '192.168.1.1'; ?>" />
+							<p class="help-block"><?= l7_t("Vazio = auto (primeira interface de captura). Detectado agora:"); ?>
+								<code><?= $bp_portal_detected ? htmlspecialchars($bp_portal_detected) : l7_t("indisponivel"); ?></code>
+							</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Titulo da pagina"); ?></label>
+						<div class="col-sm-9">
+							<input type="text" name="block_page_title" class="form-control" style="max-width: 420px;"
+								maxlength="120" value="<?= htmlspecialchars($bp_cfg["title"]); ?>" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Mensagem"); ?></label>
+						<div class="col-sm-9">
+							<textarea name="block_page_message" class="form-control" rows="3" style="max-width: 520px;"
+								maxlength="2000"><?= htmlspecialchars($bp_cfg["message"]); ?></textarea>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Contacto admin"); ?></label>
+						<div class="col-sm-9">
+							<input type="text" name="block_page_contact" class="form-control" style="max-width: 420px;"
+								maxlength="500" value="<?= htmlspecialchars($bp_cfg["contact"]); ?>"
+								placeholder="suporte@empresa.pt" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Detalhes na pagina"); ?></label>
+						<div class="col-sm-9">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="block_page_show_host" value="1"
+									<?= !empty($bp_cfg["show_host"]) ? 'checked="checked"' : ""; ?> />
+								<?= l7_t("Mostrar dominio bloqueado"); ?>
+							</label>
+							<label class="checkbox-inline" style="margin-left:12px;">
+								<input type="checkbox" name="block_page_show_policy" value="1"
+									<?= !empty($bp_cfg["show_policy"]) ? 'checked="checked"' : ""; ?> />
+								<?= l7_t("Mostrar nome da politica"); ?>
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("DNS forcado (anti-bypass)"); ?></label>
+						<div class="col-sm-9">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="block_page_force_dns" value="1"
+									<?= !empty($bp_cfg["force_dns"]) ? 'checked="checked"' : ""; ?> />
+								<?= l7_t("Redireccionar todo o DNS (porta 53) dos clientes para o resolver local"); ?>
+							</label>
+							<p class="help-block"><?= l7_t("Impede que clientes contornem o sinkhole usando DNS externo (8.8.8.8, 1.1.1.1). Activa tambem anti-DoH no Unbound (NXDOMAIN para resolvers DoH conhecidos + canario Firefox). Recomendado combinar com bloqueio DoT/DoQ (porta 853) e anti-QUIC nas interfaces LAN."); ?></p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Blacklists UT1"); ?></label>
+						<div class="col-sm-9">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="block_page_sinkhole_blacklists" value="1"
+									<?= !empty($bp_cfg["sinkhole_blacklists"]) ? 'checked="checked"' : ""; ?> />
+								<?= l7_t("Incluir dominios de categorias activas no sinkhole"); ?>
+							</label>
+							<div style="margin-top:8px;">
+								<label><?= l7_t("Limite de dominios blacklist"); ?></label>
+								<input type="number" name="block_page_blacklist_limit" class="form-control"
+									style="max-width:120px; display:inline-block;" min="1" max="4096"
+									value="<?= (int)$bp_cfg["blacklist_domain_limit"]; ?>" />
+							</div>
+							<p class="help-block"><?= l7_t("Politicas activas:"); ?>
+								<strong><?= count($bp_domain_info["domains"]); ?></strong>
+								<?= l7_t("dominio(s) sinkhole"); ?>
+								<?= !empty($bp_domain_info["truncated"]) ? ' — <span class="text-warning">' . l7_t("lista blacklist truncada") . '</span>' : ''; ?>
+							</p>
 						</div>
 					</div>
 
@@ -914,7 +1094,30 @@ layer7_render_styles();
 
 				<hr>
 
-				<div id="l7_pkg_update">
+				<?php
+				$l7_update_js_cfg = array(
+					"ajaxUrl" => "/packages/layer7/layer7_settings_ajax.php?action=check_update",
+					"checking" => l7_t("A verificar actualizacao..."),
+					"httpErr" => l7_t("Erro ao verificar actualizacao (HTTP %d)."),
+					"parseErr" => l7_t("Resposta invalida ao verificar actualizacao."),
+					"installed" => l7_t("Versao instalada"),
+					"latest" => l7_t("Mais recente"),
+					"upToDate" => l7_t("Ja esta na versao mais recente."),
+					"noPkg" => l7_t("Release encontrado mas sem artefacto .pkg."),
+					"updateBtn" => l7_t("Actualizar para "),
+					"checkBtn" => l7_t("Verificar actualizacao"),
+					"compatBtn" => l7_t("Modo compatibilidade"),
+				);
+				$l7_update_scroll = ($update_msg !== "" || $update_err !== "" ||
+				    isset($_POST["do_update"]) || isset($_POST["check_update"])) ? "1" : "0";
+				$l7_update_cfg_json = json_encode($l7_update_js_cfg,
+				    JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+				if (!is_string($l7_update_cfg_json)) {
+					$l7_update_cfg_json = "{}";
+				}
+				?>
+				<div id="l7_pkg_update" data-l7-scroll="<?= $l7_update_scroll ?>"
+					data-l7-update-cfg="<?= htmlspecialchars($l7_update_cfg_json, ENT_QUOTES, 'UTF-8') ?>">
 				<h4><?= l7_t("Actualizacao"); ?></h4>
 				<div id="l7_update_status">
 				<?php if ($update_msg !== "") { ?>
@@ -950,8 +1153,7 @@ layer7_render_styles();
 					<?php if (version_compare($update_info["latest"], $update_info["current"], ">") && $update_info["pkg_url"] !== "") { ?>
 					<form method="post" action="layer7_settings.php#l7_pkg_update" style="display:inline;">
 						<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
-						<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success"
-							onclick="return confirm(<?= json_encode(l7_t('Actualizar o pacote Layer7? O daemon sera reiniciado.')) ?>);">
+						<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success">
 							<i class="fa fa-download"></i>
 							<?= l7_t("Actualizar para ") . htmlspecialchars($update_info["latest"]); ?>
 						</button>
@@ -962,10 +1164,21 @@ layer7_render_styles();
 					<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Ja esta na versao mais recente."); ?></span>
 					<?php } ?>
 				<?php } ?>
-				<button type="button" id="l7_btn_check_update" class="btn btn-sm btn-info" style="margin-left:8px;"
-					onclick="l7CheckUpdate();">
+				<button type="button" id="l7_btn_check_update" class="btn btn-sm btn-info" style="margin-left:8px;">
 					<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
 				</button>
+				<noscript>
+				<form method="post" action="layer7_settings.php#l7_pkg_update" style="display:inline;">
+					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-default" style="margin-left:4px;">
+						<?= l7_t("Verificar (POST)"); ?>
+					</button>
+				</form>
+				</noscript>
+				<form method="post" action="layer7_settings.php#l7_pkg_update" id="l7_check_update_post" style="display:inline;">
+					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-link" style="margin-left:4px; padding:0 4px;">
+						<?= l7_t("Modo compatibilidade"); ?>
+					</button>
+				</form>
 				</div>
 				</div>
 
@@ -975,107 +1188,5 @@ layer7_render_styles();
 	</div>
 </div>
 <?php layer7_render_footer(); ?>
-<script>
-var L7_UPDATE_CHECKING = <?= json_encode(l7_t("A verificar actualizacao...")) ?>;
-var L7_UPDATE_HTTP_ERR = <?= json_encode(l7_t("Erro ao verificar actualizacao (HTTP %d).")) ?>;
-var L7_UPDATE_PARSE_ERR = <?= json_encode(l7_t("Resposta invalida ao verificar actualizacao.")) ?>;
-var L7_UPDATE_INSTALLED = <?= json_encode(l7_t("Versao instalada")) ?>;
-var L7_UPDATE_LATEST = <?= json_encode(l7_t("Mais recente")) ?>;
-var L7_UPDATE_UP_TO_DATE = <?= json_encode(l7_t("Ja esta na versao mais recente.")) ?>;
-var L7_UPDATE_NO_PKG = <?= json_encode(l7_t("Release encontrado mas sem artefacto .pkg.")) ?>;
-var L7_UPDATE_BTN = <?= json_encode(l7_t("Actualizar para ")) ?>;
-var L7_UPDATE_CONFIRM = <?= json_encode(l7_t("Actualizar o pacote Layer7? O daemon sera reiniciado.")) ?>;
-var L7_UPDATE_CHECK_BTN = <?= json_encode(l7_t("Verificar actualizacao")) ?>;
-
-function l7EscapeHtml(text) {
-	var el = document.createElement("div");
-	el.textContent = text == null ? "" : String(text);
-	return el.innerHTML;
-}
-
-function l7RenderUpdateResult(data) {
-	var status = document.getElementById("l7_update_status");
-	var versions = document.getElementById("l7_update_versions");
-	var actions = document.getElementById("l7_update_actions");
-	if (!status || !versions || !actions) {
-		return;
-	}
-
-	if (!data || !data.ok) {
-		status.innerHTML = '<div class="alert alert-danger">' + l7EscapeHtml(data && data.error ? data.error : L7_UPDATE_PARSE_ERR) + '</div>';
-		return;
-	}
-
-	status.innerHTML = "";
-	versions.innerHTML = L7_UPDATE_INSTALLED + ': <code>' + l7EscapeHtml(data.current) + '</code>'
-		+ ' &nbsp;|&nbsp; ' + L7_UPDATE_LATEST + ': <code>' + l7EscapeHtml(data.latest) + '</code>';
-
-	var html = "";
-	if (data.has_update && data.pkg_url) {
-		html += '<form method="post" action="layer7_settings.php#l7_pkg_update" style="display:inline;">'
-			+ '<input type="hidden" name="pkg_url" value="' + l7EscapeHtml(data.pkg_url) + '" />'
-			+ '<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success"'
-			+ ' onclick="return confirm(' + JSON.stringify(L7_UPDATE_CONFIRM) + ');">'
-			+ '<i class="fa fa-download"></i> ' + l7EscapeHtml(L7_UPDATE_BTN + data.latest)
-			+ '</button></form>';
-	} else if (data.no_pkg_asset) {
-		html += '<div class="alert alert-warning">' + l7EscapeHtml(L7_UPDATE_NO_PKG) + '</div>';
-	} else if (data.up_to_date) {
-		html += '<span class="text-success"><i class="fa fa-check-circle"></i> ' + l7EscapeHtml(L7_UPDATE_UP_TO_DATE) + '</span>';
-	}
-
-	html += '<button type="button" id="l7_btn_check_update" class="btn btn-sm btn-info" style="margin-left:8px;" onclick="l7CheckUpdate();">'
-		+ '<i class="fa fa-refresh"></i> ' + l7EscapeHtml(L7_UPDATE_CHECK_BTN)
-		+ '</button>';
-	actions.innerHTML = html;
-}
-
-function l7CheckUpdate() {
-	var btn = document.getElementById("l7_btn_check_update");
-	var status = document.getElementById("l7_update_status");
-	if (btn) {
-		btn.disabled = true;
-	}
-	if (status) {
-		status.innerHTML = '<div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> ' + l7EscapeHtml(L7_UPDATE_CHECKING) + '</div>';
-	}
-
-	var xhr = new XMLHttpRequest();
-	xhr.open("GET", "/packages/layer7/layer7_settings_ajax.php?action=check_update&_=" + Date.now(), true);
-	xhr.onreadystatechange = function() {
-		if (xhr.readyState !== 4) {
-			return;
-		}
-		if (btn) {
-			btn.disabled = false;
-		}
-		if (xhr.status !== 200) {
-			if (status) {
-				status.innerHTML = '<div class="alert alert-danger">' + l7EscapeHtml(L7_UPDATE_HTTP_ERR.replace("%d", xhr.status)) + '</div>';
-			}
-			return;
-		}
-		var data;
-		try {
-			data = JSON.parse(xhr.responseText);
-		} catch (e) {
-			if (status) {
-				status.innerHTML = '<div class="alert alert-danger">' + l7EscapeHtml(L7_UPDATE_PARSE_ERR) + '</div>';
-			}
-			return;
-		}
-		l7RenderUpdateResult(data);
-	};
-	xhr.send();
-}
-
-<?php if ($update_msg !== "" || $update_err !== "" || isset($_POST["do_update"])): ?>
-document.addEventListener("DOMContentLoaded", function() {
-	var el = document.getElementById("l7_pkg_update");
-	if (el) {
-		el.scrollIntoView({ behavior: "smooth", block: "start" });
-	}
-});
-<?php endif; ?>
-</script>
+<script src="/packages/layer7/layer7_settings_update.js?v=<?= htmlspecialchars(layer7_pkg_version() !== "" ? layer7_pkg_version() : "1", ENT_QUOTES, 'UTF-8') ?>"></script>
 <?php require_once("foot.inc"); ?>
