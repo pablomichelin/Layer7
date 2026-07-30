@@ -1440,6 +1440,10 @@ function layer7_generate_rules($type)
 
 	$rules .= layer7_policy_enforcement_rules_text($data, false);
 
+	/* Block page activa: recusa imediata de HTTPS/QUIC ao IP portal para o
+	 * browser mostrar erro em vez de pendurar ate ao timeout. */
+	$rules .= layer7_blockpage_reject_https_rules_text($data);
+
 	return $rules;
 }
 
@@ -2060,19 +2064,17 @@ function layer7_remove_unbound_blockpage()
 }
 
 /**
- * Regras rdr TCP/80 -> servico local da pagina de bloqueio.
+ * Par (IP portal, interfaces PF reais) usado pelas regras da block page.
+ * Devolve null quando a block page nao deve correr ou falta portal/iface.
  */
-function layer7_generate_blockpage_rdr_snippet($data = null)
+function layer7_blockpage_portal_and_ifaces($data)
 {
-	if ($data === null) {
-		$data = layer7_load_or_default();
-	}
 	if (!layer7_blockpage_should_run($data)) {
-		return "";
+		return null;
 	}
 	$portal = layer7_blockpage_portal_ip($data);
 	if ($portal === null) {
-		return "";
+		return null;
 	}
 	$iface_ids = isset($data["layer7"]["interfaces"]) &&
 	    is_array($data["layer7"]["interfaces"])
@@ -2096,8 +2098,57 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
 	));
 	sort($real_ifaces, SORT_STRING);
 	if (empty($real_ifaces)) {
+		return null;
+	}
+	return array("portal" => $portal, "ifaces" => $real_ifaces);
+}
+
+/**
+ * Recusa activa de HTTPS/QUIC destinados ao IP portal enquanto a block page
+ * esta activa. Sem isto, o SYN TCP 443 ao portal (nada escuta nessa porta) e
+ * dropado em silencio pelo default deny e o browser fica "a carregar" ate ao
+ * timeout. Com `block return-rst` (TCP) e `block return` (UDP/QUIC) o
+ * cliente recebe recusa imediata e o browser mostra logo o erro de ligacao.
+ * Nota: regra so existe com block page activa; se um servico legitimo
+ * passar a escutar em <portal>:443, desactivar a block page primeiro.
+ */
+function layer7_blockpage_reject_https_rules_text($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$ctx = layer7_blockpage_portal_and_ifaces($data);
+	if ($ctx === null) {
 		return "";
 	}
+	$portal = $ctx["portal"];
+	$lines = array();
+	$lines[] = "# Pagina de bloqueio Layer7: recusa imediata HTTPS/QUIC ao portal";
+	foreach ($ctx["ifaces"] as $iface) {
+		$lines[] = "block return-rst in quick on {$iface} inet proto tcp" .
+		    " from any to {$portal} port 443" .
+		    " label \"layer7:blockpage:rst443\"";
+		$lines[] = "block return in quick on {$iface} inet proto udp" .
+		    " from any to {$portal} port 443" .
+		    " label \"layer7:blockpage:rej443\"";
+	}
+	return implode("\n", $lines) . "\n";
+}
+
+/**
+ * Regras rdr TCP/80 -> servico local da pagina de bloqueio.
+ */
+function layer7_generate_blockpage_rdr_snippet($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$ctx = layer7_blockpage_portal_and_ifaces($data);
+	if ($ctx === null) {
+		return "";
+	}
+	$portal = $ctx["portal"];
+	$real_ifaces = $ctx["ifaces"];
 	$port = (int)L7_BLOCKPAGE_PORT;
 	$lines = array();
 	$lines[] = "# Pagina de bloqueio Layer7 (HTTP -> localhost:{$port})";

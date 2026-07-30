@@ -2,6 +2,20 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_46] - 2026-07-30 — recusa imediata HTTPS/QUIC ao portal (UX block page)
+
+### Added
+
+- Com a block page activa, HTTPS/QUIC destinados ao IP portal eram
+  dropados em silencio (nada escuta em <portal>:443) e o browser ficava
+  "a carregar" ate ao timeout, sem erro visivel. Novas regras
+  `block return-rst` (TCP 443) e `block return` (UDP 443/QUIC) nas
+  interfaces de captura: o cliente recebe recusa imediata e o browser
+  mostra logo o erro de ligacao (mesmo UX de HTTPS bloqueado do UniFi).
+  Labels `layer7:blockpage:rst443` / `layer7:blockpage:rej443`.
+  Refactor: `layer7_blockpage_portal_and_ifaces()` partilhado entre o
+  snippet rdr e o novo snippet filter.
+
 ## [1.8.11_45] - 2026-07-30 — rdr da block page e DNS forcado agora efectivos
 
 ### Fixed
