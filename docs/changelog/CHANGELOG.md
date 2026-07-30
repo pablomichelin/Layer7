@@ -5,6 +5,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ## [1.8.11_34] - 2026-07-30 — GUI updater sem reload da pagina
 
 Publicada em `pablomichelin/Layer7` (candidato interno).
+Artefacto `pfSense-pkg-layer7-1.8.11_34.pkg`
+(`SHA256=1401ce8f74a40b72c53fdf0414a92f523447ef3eb6d611c0036e16be136ca232`).
+Release: `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_34`
 
 ### Changed
 
