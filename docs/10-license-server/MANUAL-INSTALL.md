@@ -249,11 +249,20 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.8.11_50` (exclusao por politica, `2026-07-30`):**
+Campos `match.src_exclude_cidrs` / `match.src_exclude_groups` (ADR-0019):
+origem isenta **so desta** politica no daemon; em `scoped_hybrid`, tabela PF
+`layer7_pexc_N` + `match from pexc to pdst tag L7ALLOW`. GUI: **Excluir
+origens (so este perfil)** na secao Avancado. Validacao: origem nao pode estar
+simultaneamente incluida e excluida.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_50`
+- **SHA256 esperado:** `e2e388b33fdd63b4439e7ca7c9a8e101aa41b87848fd06c41e02edb1211abfea`
+
 **Addendum da release `1.8.11_49` (VIP isentos + UX modal, `2026-07-30`):**
 Perfis rapidos: excepcao canonica `vip-isentos` (allow global, prioridade alta),
 modal com progressive disclosure, verificador de politica efectiva em
-`layer7_test.php` e teste funcional `test_vip_exception.php`. Bloco D
-(`src_exclude_*`) continua pendente no roadmap.
+`layer7_test.php` e teste funcional `test_vip_exception.php`.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_49`
 - **SHA256 esperado:** `293cc8540ff4d0b58cd1962dfd0a84429b6d83c73aa2f44b57951c96d5d30996`
@@ -413,12 +422,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_49`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_50`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_49`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_49/pfSense-pkg-layer7-1.8.11_49.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_49/pfSense-pkg-layer7-1.8.11_49.pkg.sha256`
-- **SHA256 esperado:** `293cc8540ff4d0b58cd1962dfd0a84429b6d83c73aa2f44b57951c96d5d30996`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_50`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_50/pfSense-pkg-layer7-1.8.11_50.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_50/pfSense-pkg-layer7-1.8.11_50.pkg.sha256`
+- **SHA256 esperado:** `e2e388b33fdd63b4439e7ca7c9a8e101aa41b87848fd06c41e02edb1211abfea`
 
 > **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
 > sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.

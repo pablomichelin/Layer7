@@ -213,7 +213,9 @@ motivo legivel. So PHP/GUI. Release publicada.
 
 Campos `match.src_exclude_*` no daemon e PF (`layer7_pexc_N` + `L7ALLOW` em
 scoped). GUI Avançado + validação conflito include/exclude. Testes C/PHP/shell
-locais: PASS. Build no builder e release GitHub **pendentes** neste bloco.
+locais e builder: PASS. Release publicada `v1.8.11_50`
+(`SHA256=e2e388b33fdd63b4439e7ca7c9a8e101aa41b87848fd06c41e02edb1211abfea`).
+Gate appliance §19.3 pendente.
 
 ### Candidato `1.8.11_48` — isencao VIP nos Perfis rapidos (BG-064)
 
