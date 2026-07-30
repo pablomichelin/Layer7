@@ -169,10 +169,11 @@ Rodada multitask (`2026-07-30`) consolidou ledger REV/FP/AUD
 **NO-GO** mantido para enforce/publicação. **BG-061** fecha B-002/B-003/B-004:
 flush `layer7_exc_allow_*`, flush em `layer7_bl_apply()` e `pkg-deinstall`
 alinhado a `layer7-pfctl flush-all`. Testes R-21 e contrato FP-015 em
-`test_config_parse.c`. Suite local C/shell: PASS. Build e SHA256: registar
-após build no builder. Gate B1 passivo pendente; produção não alterada.
-`_31` supersedido para testes de lifecycle — não instalar `_31` se `_32`
-disponível.
+`test_config_parse.c`. Suite local/builder C/PHP/shell e smoke: PASS. Artefacto
+`pfSense-pkg-layer7-1.8.11_32.pkg`,
+`SHA256=c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`.
+Gate B1 passivo pendente; produção não alterada. `_31` supersedido — não
+instalar `_31` se `_32` disponível.
 
 ### Candidato `1.8.11_31` — classificação nDPI até estado final (não publicado)
 

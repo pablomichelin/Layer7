@@ -24,7 +24,8 @@ Pacote candidato, não publicado e não aprovado para produção.
 ### Risco, teste e rollback
 
 - Breve gap de bloqueio durante flush em mutação de blacklist.
-- Suite local C/shell: PASS; PHP SKIP macOS.
+- Suite local/builder C/shell e smoke `layer7d`: PASS
+  (`SHA256=c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`).
 - Appliance Gate B1: pendente.
 - Rollback: `_24` passivo + `layer7-pfctl flush-all`.
 
