@@ -2,6 +2,22 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_45] - 2026-07-30 — rdr da block page e DNS forcado agora efectivos
+
+### Fixed
+
+- As regras rdr (block page :80 e DNS forcado :53) eram carregadas no
+  anchor `natrules/layer7_nat`, mas o ruleset principal do pfSense so
+  declara `nat-anchor "natrules/*"` (sem `rdr-anchor`) — em PF, regras
+  `rdr` num anchor sem ponto `rdr-anchor` **nunca sao avaliadas**. Na
+  pratica o redirect HTTP para a pagina de bloqueio e o anti-bypass DNS
+  estavam mortos: quem respondia no :80 era o nginx do webConfigurator
+  (301). Correccao: as regras rdr passam a ser devolvidas por
+  `layer7_generate_rules("nat")` (hook `filter_rule_function` /
+  `discover_pkg_rules` — mesmo mecanismo do proxy transparente do Squid)
+  e entram no ruleset principal em cada filter reload. O anchor legado e
+  flushado; `layer7_inject_nat_to_anchor()` removido.
+
 ## [1.8.11_44] - 2026-07-30 — CRITICO: daemon nunca bloqueia IPs do firewall
 
 ### Fixed

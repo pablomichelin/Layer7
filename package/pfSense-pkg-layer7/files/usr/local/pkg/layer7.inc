@@ -327,48 +327,23 @@ function layer7_generate_rdr_rules_snippet()
 }
 
 /**
- * Injeta regras rdr de DNS forcado no sub-anchor natrules/layer7_nat via
- * pfctl directo. Necessario porque pfSense CE nao processa nat_rules_needed
- * do XML do package — apenas filter_rules_needed e suportado.
- * pfSense usa "pfctl -f" sem "-F", pelo que o sub-anchor nao e limpo no
- * reload do firewall. Chamado em layer7_generate_rules() (filter_rule_function,
- * invocado em todo reload) e em layer7_resync() (save de configuracao).
+ * Limpa o sub-anchor legado natrules/layer7_nat. Ate a 1.8.11_44 as regras
+ * rdr eram carregadas neste anchor via pfctl, mas o ruleset principal do
+ * pfSense so declara `nat-anchor "natrules/*"` (sem `rdr-anchor`), pelo que
+ * as regras rdr nunca eram avaliadas pelo PF — o rdr :80 da block page e o
+ * DNS forcado :53 ficavam mortos. A partir da _45 as regras rdr entram no
+ * ruleset principal via layer7_generate_rules("nat") (hook
+ * filter_rule_function / discover_pkg_rules — mesmo mecanismo do proxy
+ * transparente do Squid). Este flush remove residuos do modelo antigo.
  */
-function layer7_inject_nat_to_anchor()
+function layer7_flush_legacy_nat_anchor()
 {
-	$anchor = "natrules/layer7_nat";
-	$snippet = layer7_generate_nat_anchor_snippet();
-	if ($snippet === "") {
-		/* Best-effort: anchor pode ainda nao existir; evitar ruido no log. */
-		@exec("/sbin/pfctl -a " . escapeshellarg($anchor) . " -F Nat 2>/dev/null");
-		return;
-	}
-	$tmp = @tempnam("/tmp", "l7nat_");
-	if ($tmp === false) {
-		layer7_log_pkg_warn("Layer7: tempnam falhou ao injectar regras NAT em {$anchor}");
-		return;
-	}
-	if (@file_put_contents($tmp, $snippet) === false) {
-		layer7_log_pkg_warn("Layer7: nao foi possivel escrever ficheiro temporario NAT ({$tmp})");
-		@unlink($tmp);
-		return;
-	}
-	exec(
-	    "/sbin/pfctl -a " . escapeshellarg($anchor) . " -N -f " . escapeshellarg($tmp) . " 2>&1",
-	    $out,
-	    $rc
-	);
-	@unlink($tmp);
-	if ($rc !== 0) {
-		layer7_log_pkg_warn("Layer7: pfctl nat load rc={$rc} anchor={$anchor} " .
-		    trim(implode(" ", (array) $out)));
-	}
+	@exec("/sbin/pfctl -a natrules/layer7_nat -F Nat 2>/dev/null");
 }
 
 /**
  * Mantido por retrocompatibilidade com layer7.xml (nat_rules_needed).
- * Em pfSense CE, nat_rules_needed nao e processado — usar
- * layer7_inject_nat_to_anchor() que injecta directamente via pfctl.
+ * As regras rdr sao entregues por layer7_generate_rules("nat").
  */
 function layer7_generate_nat_rules()
 {
@@ -376,7 +351,8 @@ function layer7_generate_nat_rules()
 }
 
 /**
- * Snippet NAT completo para o anchor layer7_nat (force_dns + pagina de bloqueio).
+ * Snippet NAT completo (force_dns + pagina de bloqueio) para o ruleset
+ * principal do pfSense, via discover_pkg_rules("nat").
  */
 function layer7_generate_nat_anchor_snippet()
 {
@@ -1046,14 +1022,13 @@ function layer7_resync()
 		layer7_ensure_pf_table($ptbl);
 	}
 
-	/* Gate Bloco 1: em modo passivo (monitor / disabled) nao injecta
-	 * regras rdr no anchor NAT — limpa-o para evitar forcing DNS residual,
-	 * e flusha as tabelas dinamicas (Bloco 5: evitar IPs `stale`). */
+	/* As regras rdr (block page + DNS forcado) sao entregues ao pfSense
+	 * por layer7_generate_rules("nat") no filter reload; aqui apenas se
+	 * limpa o anchor legado. Gate Bloco 1: em modo passivo flusha as
+	 * tabelas dinamicas (Bloco 5: evitar IPs `stale`). */
+	layer7_flush_legacy_nat_anchor();
 	if (!layer7_pf_should_enforce()) {
-		@exec("/sbin/pfctl -a natrules/layer7_nat -F Nat 2>/dev/null");
 		layer7_flush_dynamic_tables();
-	} else {
-		layer7_inject_nat_to_anchor();
 	}
 
 	/* Bloco 3: popular `layer7_allow_dst` com IPs/CIDRs estaticos da
@@ -1421,6 +1396,19 @@ function layer7_anti_quic_filter_rules_text($data)
 function layer7_generate_rules($type)
 {
 	$type = (string)$type;
+
+	/* Tipo "nat": o pfSense pede as regras de traducao do package em
+	 * filter_nat_rules_generate() (discover_pkg_rules). E aqui que o rdr
+	 * :80 da block page e o DNS forcado :53 entram no ruleset principal —
+	 * o anchor natrules/* NAO serve para rdr (so ha nat-anchor). */
+	if ($type === "nat") {
+		$data = layer7_load_or_default();
+		if (!layer7_pf_should_enforce($data)) {
+			return "";
+		}
+		return layer7_generate_nat_anchor_snippet();
+	}
+
 	if ($type !== "filter" && $type !== "rule") {
 		return "";
 	}
@@ -1436,7 +1424,7 @@ function layer7_generate_rules($type)
 	 * tabelas `persist` (mode-aware via `layer7_pf_tables_text()`), limpamos
 	 * o anchor NAT e nao deixamos regras de bloqueio. */
 	if (!layer7_pf_should_enforce($data)) {
-		@exec("/sbin/pfctl -a natrules/layer7_nat -F Nat 2>/dev/null");
+		layer7_flush_legacy_nat_anchor();
 		return layer7_pf_tables_text();
 	}
 
@@ -1451,11 +1439,6 @@ function layer7_generate_rules($type)
 	$rules .= layer7_blacklist_filter_rules_text($bl_config);
 
 	$rules .= layer7_policy_enforcement_rules_text($data, false);
-
-	/* Injectar regras rdr no anchor NAT como efeito colateral.
-	 * pfSense CE nao processa nat_rules_needed; esta e a unica forma
-	 * de garantir que as rdr rules sao carregadas em todo reload PF. */
-	layer7_inject_nat_to_anchor();
 
 	return $rules;
 }
