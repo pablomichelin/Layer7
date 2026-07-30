@@ -2,6 +2,23 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_50] - 2026-07-30 — Exclusao por politica `src_exclude_*` (BG-066)
+
+### Added
+
+- ADR-0019: campos `match.src_exclude_cidrs` e `match.src_exclude_groups`.
+- Daemon: parse, expansao de grupos excluidos e nao-match em `src_matches_rule`.
+- PF scoped: tabela `layer7_pexc_N` + regra `match from pexc to pdst tag L7ALLOW`.
+- GUI: **Excluir origens (so este perfil)** no modal Avancado e formulario manual;
+  validacao include/exclude conflituoso.
+- Flush/self-heal/deinstall incluem `layer7_pexc_0..23`.
+- Testes: `test_policy_decide.c`, `test_config_parse.c`, `test_scoped_pf_inc.php`,
+  `test_flush_coverage.sh`.
+
+### Docs
+
+- `docs/core/policy-matrix.md`, `precedence.md`, `pf-enforcement.md`, CORTEX, backlog.
+
 ## [1.8.11_49] - 2026-07-30 — UX modal Perfis rapidos + verificador (BG-065)
 
 ### Added

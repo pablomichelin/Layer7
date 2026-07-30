@@ -163,6 +163,7 @@ SCOPED
 		while [ "${_i}" -lt 24 ]; do
 			echo "table <layer7_pdst_${_i}> persist" >> "${RULES_PATH}"
 			echo "table <layer7_psrc_${_i}> persist" >> "${RULES_PATH}"
+			echo "table <layer7_pexc_${_i}> persist" >> "${RULES_PATH}"
 			_i=$((_i + 1))
 		done
 	fi
@@ -217,6 +218,7 @@ flush_tables_policy_scoped() {
 		/sbin/pfctl -t "layer7_pdst_${_i}" -T flush >/dev/null 2>&1 || true
 		/sbin/pfctl -t "layer7_psrc_${_i}" -T flush >/dev/null 2>&1 || true
 		/sbin/pfctl -t "layer7_pallow_${_i}" -T flush >/dev/null 2>&1 || true
+		/sbin/pfctl -t "layer7_pexc_${_i}" -T flush >/dev/null 2>&1 || true
 		_i=$((_i + 1))
 	done
 }
@@ -269,6 +271,7 @@ ensure)
 			while [ "${_i}" -lt 24 ]; do
 				ensure_table "layer7_pdst_${_i}" || _rc=1
 				ensure_table "layer7_psrc_${_i}" || _rc=1
+				ensure_table "layer7_pexc_${_i}" || _rc=1
 				_i=$((_i + 1))
 			done
 		fi

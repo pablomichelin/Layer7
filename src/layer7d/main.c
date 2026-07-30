@@ -994,7 +994,7 @@ enforce_cache_flush(void)
 /*
  * Esvazia todas as tabelas PF dinamicas controladas pelo Layer7
  * (Bloco 5): `layer7_block_dst`, `layer7_block`, `layer7_bld_*`,
- * `layer7_pdst_*`, `layer7_psrc_*`, `layer7_pallow_*` e entradas DNS em
+ * `layer7_pdst_*`, `layer7_psrc_*`, `layer7_pallow_*`, `layer7_pexc_*` e
  * `layer7_allow_dst`.
  * Entradas estaticas IPv4/CIDR da allowlist sao repovoadas pelo pacote via
  * `layer7_dst_allowlist_apply_to_pf()` em filter reload / resync.
@@ -1022,6 +1022,8 @@ enforcement_flush_all_tables(void)
 		snprintf(tbl, sizeof(tbl), "layer7_psrc_%d", i);
 		unavailable += pf_table_flush_try(tbl) != 0;
 		snprintf(tbl, sizeof(tbl), "layer7_pallow_%d", i);
+		unavailable += pf_table_flush_try(tbl) != 0;
+		snprintf(tbl, sizeof(tbl), "layer7_pexc_%d", i);
 		unavailable += pf_table_flush_try(tbl) != 0;
 	}
 
@@ -1717,6 +1719,7 @@ run_enforce_once_cli(const char *path, const char *ip, const char *dst_ip,
 		int ng = 0;
 		(void)layer7_groups_parse(buf, len, grps, &ng, L7_MAX_GROUPS);
 		layer7_policies_expand_groups(rules, np, grps, ng);
+		layer7_policies_expand_exclude_groups(rules, np, grps, ng);
 	}
 	layer7_policies_sort(rules, np);
 	layer7_exceptions_sort(exc, nx);
@@ -1947,6 +1950,7 @@ apply_config(int use_syslog)
 			(void)layer7_groups_parse(buf, len, grps, &ng,
 			    L7_MAX_GROUPS);
 			layer7_policies_expand_groups(rules, np, grps, ng);
+			layer7_policies_expand_exclude_groups(rules, np, grps, ng);
 		}
 		layer7_policies_sort(rules, np);
 		layer7_exceptions_sort(exc, nx);
@@ -2154,6 +2158,8 @@ apply_config(int use_syslog)
 				(void)layer7_groups_parse(buf, len, grps,
 				    &ng, L7_MAX_GROUPS);
 				layer7_policies_expand_groups(tmp_r, tn,
+				    grps, ng);
+				layer7_policies_expand_exclude_groups(tmp_r, tn,
 				    grps, ng);
 			}
 			memcpy(s_rules, tmp_r, (size_t)tn * sizeof(s_rules[0]));

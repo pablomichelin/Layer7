@@ -7,9 +7,11 @@
  *
  * Compila standalone (config_parse.c nao tem dependencias externas):
  *   cc -Wall -Wextra -O2 -I src/layer7d -o /tmp/t \
- *      tests/functional/test_config_parse.c src/layer7d/config_parse.c
+ *      tests/functional/test_config_parse.c src/layer7d/config_parse.c \
+ *      src/layer7d/policy.c src/layer7d/enforce.c
  */
 #include "config_parse.h"
+#include "policy.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -211,6 +213,27 @@ main(void)
 		/* Comportamento actual: primeiro \"enabled\" e o da policy. */
 		check(p.has_enabled == 1 && p.enabled == 0,
 		    "FP-015: enabled de policy vence (fragil)");
+	}
+
+	/* 16. BG-066 — parse src_exclude_* (ADR-0019). */
+	{
+		struct layer7_policy_rule rules[2];
+		int n = 0;
+		const char *json =
+		    "{\"layer7\":{\"policies\":[{\"id\":\"p-exc\","
+		    "\"action\":\"block\",\"enabled\":true,\"match\":{"
+		    "\"src_exclude_cidrs\":[\"10.0.0.50/32\"],"
+		    "\"src_exclude_groups\":[\"gestores\"],"
+		    "\"hosts\":[\"example.com\"]}]}}";
+
+		memset(rules, 0, sizeof(rules));
+		check(layer7_policies_parse(json, strlen(json), rules, &n, 2) == 0,
+		    "parse ok (src_exclude fields)");
+		check(n == 1, "policy with src_exclude loaded");
+		check(rules[0].n_src_exclude_cidrs == 1,
+		    "src_exclude_cidrs parsed");
+		check(rules[0].n_src_exclude_groups == 1,
+		    "src_exclude_groups parsed");
 	}
 
 	if (g_fail) {

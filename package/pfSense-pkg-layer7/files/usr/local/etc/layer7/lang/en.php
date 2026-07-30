@@ -797,4 +797,12 @@ $L7_STRINGS = array(
     "PERMITIDO — nenhuma regra aplicavel (default allow)" => "ALLOWED — no applicable rule (default allow)",
     "MONITORIZADO — nenhuma regra aplicavel (modo monitor)" => "MONITORED — no applicable rule (monitor mode)",
     "origem" => "source",
+    "Excluir origens (so este perfil)" => "Exclude sources (this profile only)",
+    "IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis." => "IPs/CIDRs/groups exempt from this policy only; still subject to other profiles.",
+    "Grupos excluidos" => "Excluded groups",
+    "CIDRs excluidos" => "Excluded CIDRs",
+    "CIDRs excluidos (um por linha)." => "Excluded CIDRs (one per line).",
+    "Excl. CIDRs" => "Excl. CIDRs",
+    "Excl. grupos" => "Excl. groups",
+    "Origem nao pode estar simultaneamente incluida e excluida nesta politica." => "Source cannot be both included and excluded in the same policy.",
 );

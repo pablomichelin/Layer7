@@ -261,10 +261,11 @@ Modelo conceptual: [`modelo-conceptual-gui.md`](../00-overview/modelo-conceptual
 
 ### BG-066 — Exclusao por politica (`_50`)
 
-- [ ] ADR-0019 aprovado
-- [ ] Daemon + PF (`layer7_pexc_N`) + flush/self-heal completos
-- [ ] Testes C/PHP/shell PASS
-- [ ] Cenario "gestor isento" em `validacao-lab.md` (Bloco E)
+- [x] ADR-0019 aprovado
+- [x] Daemon + PF (`layer7_pexc_N`) + flush/self-heal completos
+- [x] Testes C/PHP/shell PASS (local; PHP no builder)
+- [x] Cenario "gestor isento" em `validacao-lab.md` (Bloco E)
+- [ ] Build `_50` + release GitHub + gate appliance §19.3
 
 **Nota:** estes blocos nao alteram o veredicto NO-GO para enforce em producao
 (gates G2–G7 permanecem pendentes).

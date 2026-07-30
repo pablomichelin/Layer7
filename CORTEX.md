@@ -207,7 +207,13 @@ tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 Progressive disclosure no modal Perfis rapidos; grupos-first com atalho criar
 grupo; verificador em `layer7_test.php` com veredicto PERMITIDO/BLOQUEADO e
-motivo legivel. So PHP/GUI. Build/release **pendentes**.
+motivo legivel. So PHP/GUI. Release publicada.
+
+### Candidato `1.8.11_50` — exclusão por política (BG-066 / ADR-0019)
+
+Campos `match.src_exclude_*` no daemon e PF (`layer7_pexc_N` + `L7ALLOW` em
+scoped). GUI Avançado + validação conflito include/exclude. Testes C/PHP/shell
+locais: PASS. Build no builder e release GitHub **pendentes** neste bloco.
 
 ### Candidato `1.8.11_48` — isencao VIP nos Perfis rapidos (BG-064)
 

@@ -267,8 +267,40 @@ $pfctl_helper = file_get_contents(
 );
 if (!is_string($pfctl_helper) ||
     strpos($pfctl_helper, '"layer7_pallow_${_i}" -T flush') === false ||
+    strpos($pfctl_helper, '"layer7_pexc_${_i}" -T flush') === false ||
     strpos($pfctl_helper, '"layer7_blsrc_${_i}" -T flush') === false) {
 	fwrite(STDERR, "FAIL: helper does not flush allow/source-scope tables\n");
+	exit(1);
+}
+
+$pexc_data = array(
+	"layer7" => array(
+		"enabled" => true,
+		"mode" => "enforce",
+		"enforcement_model" => "scoped_hybrid",
+		"policies" => array(
+			array(
+				"id" => "yt-with-exc",
+				"enabled" => true,
+				"action" => "block",
+				"priority" => 100,
+				"match" => array(
+					"hosts" => array("youtube.com"),
+					"src_cidrs" => array("10.0.0.0/24"),
+					"src_exclude_cidrs" => array("10.0.0.50/32")
+				)
+			)
+		),
+		"groups" => array()
+	)
+);
+$pexc_tables = layer7_pf_managed_dynamic_tables_text($pexc_data);
+$pexc_rules = layer7_policy_enforcement_rules_text($pexc_data, false);
+if (strpos($pexc_tables, "table <layer7_pexc_0> persist { 10.0.0.50/32 }") === false ||
+    strpos($pexc_rules, "from <layer7_pexc_0> to <layer7_pdst_0> tag L7ALLOW") === false ||
+    strpos($pexc_rules, "layer7:pexc:yt-with-exc") === false) {
+	fwrite(STDERR, "FAIL: scoped src_exclude must emit pexc table and L7ALLOW rule\n");
+	fwrite(STDERR, $pexc_tables . $pexc_rules);
 	exit(1);
 }
 

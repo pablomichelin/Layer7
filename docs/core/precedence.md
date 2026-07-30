@@ -31,3 +31,14 @@ segurança nativa do pfSense e não gera `pass quick`.
 ## Conflito
 
 Dois matches simultâneos não ocorrem com first-match. Se validação detectar regras idênticas de prioridade e overlap total, emitir aviso na GUI (backlog) ou `policy_conflict` em debug.
+
+## Exclusão por política (`src_exclude_*`, BG-066 / ADR-0019)
+
+Campos `match.src_exclude_cidrs` e `match.src_exclude_groups` fazem com que a
+origem **não case** na política (first-match continua para políticas seguintes).
+Isto é distinto da excepção global `vip-isentos`: a isenção é **só desta**
+política. A GUI rejeita origem simultaneamente incluída e excluída.
+
+Em `scoped_hybrid`, o PF usa `layer7_pexc_N` + `match from pexc to pdst tag
+L7ALLOW`. Em `legacy_global`, a exclusão actua só no daemon (trade-off: destino
+já em `layer7_block_dst` por outro cliente permanece bloqueado).

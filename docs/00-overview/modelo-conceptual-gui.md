@@ -69,7 +69,7 @@ flowchart TB
 
 - **Positivo (incluir):** interfaces, grupos, `src_cidrs` numa política.
 - **Negativo global (isentar):** excepção `allow` — o IP/dispositivo fica fora de *todas* as políticas Layer7.
-- **Negativo por política (futuro, BG-066):** `src_exclude_*` — isento *desta* política, sujeito às restantes.
+- **Negativo por política (BG-066):** `src_exclude_*` — isento *desta* política, sujeito às restantes.
 
 ### O QUÊ (alvo)
 

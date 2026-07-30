@@ -92,6 +92,7 @@ DHCP static mapping para IP estavel. Limite: 64 hosts de origem por grupo.
 | Block destino escopado por politica | `layer7_pdst_N` | Caminho B / E2; indice N = ordem `layer7_policies_sort()` |
 | Quarentena origem escopada por politica | `layer7_psrc_N` | Caminho B / E2; somente opt-in explícito |
 | Allow destino por política | `layer7_pallow_N` | BG-056 / ADR-0016; destino aprendido com TTL |
+| Exclusão origem por política | `layer7_pexc_N` | BG-066 / ADR-0019; estático; `match` → `pdst` com `L7ALLOW` |
 | Excepção allow por origem | `layer7_exc_allow_N` | BG-056 / ADR-0016; conteúdo estático do JSON |
 | Tag | `layer7_tagged` ou **`tag_table`** na política | Por política `action=tag` |
 
@@ -103,6 +104,9 @@ politica `enabled`+`block`:
 
 - `table <layer7_pdst_N> persist` + `block drop quick inet from {src} to <layer7_pdst_N>`
   quando a politica tem hosts (sites/SNI) ou app/categoria normal;
+- `table <layer7_pexc_N> persist { … }` + `match inet from <layer7_pexc_N> to
+  <layer7_pdst_N> tag L7ALLOW` quando `src_exclude_*` está configurado
+  (BG-066);
 - `table <layer7_psrc_N> persist` + `block drop quick inet from <layer7_psrc_N> to !<localsubnets>`
   somente quando `quarantine_origin=true`;
 - politica sem origem (`src_hosts`/`src_cidrs`/grupos): regra global **so** com

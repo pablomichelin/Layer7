@@ -49,6 +49,12 @@ assert_grep "pkg-deinstall POST fallback inclui exc_allow" \
     'layer7_exc_allow_' "$DEINSTALL"
 assert_grep "pkg-deinstall POST fallback inclui pallow" \
     'layer7_pallow_' "$DEINSTALL"
+assert_grep "pkg-deinstall POST fallback inclui pexc" \
+    'layer7_pexc_' "$DEINSTALL"
+assert_grep "layer7.inc flush inclui layer7_pexc_*" \
+    'layer7_pexc_' "$INC"
+assert_grep "layer7-pfctl flush-all inclui pexc" \
+    'layer7_pexc_' "$PFCTL"
 assert_grep "pkg-deinstall POST fallback inclui allow_dst" \
     'layer7_allow_dst' "$DEINSTALL"
 

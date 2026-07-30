@@ -17,6 +17,8 @@
 | `match.src_hosts` | IPv4[] | origem exacta |
 | `match.src_cidrs` | CIDR[] | origem na rede |
 | `match.groups` | id[] | expande hosts/CIDRs/dispositivos do grupo |
+| `match.src_exclude_cidrs` | CIDR[] | origem isenta **desta** política (BG-066) |
+| `match.src_exclude_groups` | id[] | grupos isentos desta política (expandidos) |
 | `match.hosts` | domínio[] | exacto ou subdomínio; DNS/SNI/HTTP Host |
 | `match.ndpi_category` | string[] | match exacto; quando presente funciona como condição obrigatória |
 | `match.ndpi_app` | string[] | match exacto |
@@ -31,6 +33,9 @@ actual e não devem ser apresentados como critérios disponíveis.
 - match por app/categoria ou host usa `layer7_pdst_N` por defeito;
 - allow explícito aprende o destino em `layer7_pallow_N` e aplica
   `match ... tag L7ALLOW` no mesmo escopo de origem/interface;
+- exclusão por política (`src_exclude_*`): origem não casa no daemon;
+  em `scoped_hybrid`, `layer7_pexc_N` + `match from pexc to pdst tag L7ALLOW`
+  (ADR-0019);
 - `layer7_psrc_N` só é usado com `quarantine_origin=true` (corte total
   deliberado da origem);
 - block em `scoped_hybrid` exige origem efectiva, `scope_global` explícito ou

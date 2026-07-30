@@ -73,6 +73,7 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 		/sbin/pfctl -t "layer7_pdst_${_i}" -T flush >/dev/null 2>&1 || true
 		/sbin/pfctl -t "layer7_psrc_${_i}" -T flush >/dev/null 2>&1 || true
 		/sbin/pfctl -t "layer7_pallow_${_i}" -T flush >/dev/null 2>&1 || true
+		/sbin/pfctl -t "layer7_pexc_${_i}" -T flush >/dev/null 2>&1 || true
 		_i=$((_i + 1))
 	done
 	# Ficheiros de configuracao nao listados no plist (ou gerados em runtime)

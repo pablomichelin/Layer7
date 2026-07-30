@@ -432,6 +432,72 @@ test_mixed_app_host_uses_matched_path(void)
 	    "mixed host path chooses pdst");
 }
 
+static void
+test_src_exclude_cidr_no_match(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec_in, dec_out;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"yt-exc\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":10,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"src_cidrs\":[\"10.0.0.0/24\"],"
+	    "\"src_exclude_cidrs\":[\"10.0.0.50/32\"]}}]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "exclude parse ok");
+	check(n == 1, "exclude policy loaded");
+	check(rules[0].n_src_exclude_cidrs == 1, "exclude cidr count");
+	layer7_policies_sort(rules, 1);
+
+	memset(&dec_in, 0, sizeof(dec_in));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "10.0.0.10", "www.youtube.com", NULL, NULL, &dec_in) == 0,
+	    "exclude in-subnet decide");
+	check(dec_in.action == LAYER7_ACTION_BLOCK, "exclude in-subnet block");
+
+	memset(&dec_out, 0, sizeof(dec_out));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "10.0.0.50", "www.youtube.com", NULL, NULL, &dec_out) == 0,
+	    "exclude host decide");
+	check(dec_out.action == LAYER7_ACTION_ALLOW, "exclude host allow");
+	check(dec_out.reason == L7_DECIDE_DEFAULT_ALLOW,
+	    "exclude host default allow");
+}
+
+static void
+test_src_exclude_group_expanded(void)
+{
+	struct layer7_group groups[1];
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"grp-exc\","
+	    "\"action\":\"block\",\"enabled\":true,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"src_cidrs\":[\"10.0.0.0/24\"],"
+	    "\"src_exclude_groups\":[\"vip\"]}],"
+	    "\"groups\":[{\"id\":\"vip\",\"hosts\":[\"10.0.0.99\"]}]}}";
+	int n = 0, ng = 0;
+
+	memset(groups, 0, sizeof(groups));
+	memset(rules, 0, sizeof(rules));
+	check(layer7_groups_parse(json, strlen(json), groups, &ng, 1) == 0,
+	    "exclude group parse");
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "exclude policy parse");
+	layer7_policies_expand_exclude_groups(rules, n, groups, ng);
+	layer7_policies_sort(rules, 1);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "10.0.0.99", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "exclude expanded group decide");
+	check(dec.action == LAYER7_ACTION_ALLOW, "exclude expanded allow");
+}
+
 int
 main(void)
 {
@@ -450,6 +516,8 @@ main(void)
 	test_app_only_no_quarantine_decision();
 	test_app_static_source_uses_pdst();
 	test_mixed_app_host_uses_matched_path();
+	test_src_exclude_cidr_no_match();
+	test_src_exclude_group_expanded();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");

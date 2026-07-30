@@ -489,6 +489,106 @@ function layer7_policy_expand_src_origins($policy, $groups)
 }
 
 /**
+ * Expande src_exclude_groups em hosts/cidrs (alinhado a policy.c / ADR-0019).
+ *
+ * @return array{hosts: string[], cidrs: string[]}
+ */
+function layer7_policy_expand_src_excludes($policy, $groups)
+{
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	$hosts = array();
+	$cidrs = (isset($match["src_exclude_cidrs"]) &&
+	    is_array($match["src_exclude_cidrs"])) ? $match["src_exclude_cidrs"] :
+	    array();
+
+	if (!empty($match["src_exclude_groups"]) &&
+	    is_array($match["src_exclude_groups"]) && is_array($groups)) {
+		foreach ($groups as $g) {
+			if (!is_array($g) || empty($g["id"]) ||
+			    !in_array((string)$g["id"],
+			    $match["src_exclude_groups"], true)) {
+				continue;
+			}
+			if (isset($g["cidrs"]) && is_array($g["cidrs"])) {
+				foreach ($g["cidrs"] as $c) {
+					$c = trim((string)$c);
+					if ($c !== "" &&
+					    (layer7_cidr_valid($c) ||
+					    layer7_ipv4_valid($c))) {
+						$cidrs[] = $c;
+					}
+				}
+			}
+			foreach (array("hosts", "device_ips") as $gk) {
+				if (!isset($g[$gk]) || !is_array($g[$gk])) {
+					continue;
+				}
+				foreach ($g[$gk] as $h) {
+					$h = trim((string)$h);
+					if ($h !== "" && layer7_ipv4_valid($h)) {
+						$hosts[] = $h;
+					}
+				}
+			}
+		}
+	}
+
+	$hosts = array_values(array_unique($hosts));
+	$cidrs = array_values(array_unique($cidrs));
+	return array("hosts" => $hosts, "cidrs" => $cidrs);
+}
+
+/**
+ * Detecta conflito include/exclude na mesma origem (GUI BG-066).
+ */
+function layer7_policy_src_include_exclude_conflict($policy, $groups)
+{
+	$inc = layer7_policy_expand_src_origins($policy, $groups);
+	$exc = layer7_policy_expand_src_excludes($policy, $groups);
+	if (empty($inc["hosts"]) && empty($inc["cidrs"])) {
+		return false;
+	}
+	foreach ($exc["hosts"] as $h) {
+		if (in_array($h, $inc["hosts"], true)) {
+			return true;
+		}
+	}
+	foreach ($exc["cidrs"] as $ec) {
+		foreach ($inc["cidrs"] as $ic) {
+			if ($ec === $ic) {
+				return true;
+			}
+		}
+		foreach ($inc["hosts"] as $ih) {
+			if (layer7_ipv4_in_cidr($ih, $ec)) {
+				return true;
+			}
+		}
+	}
+	foreach ($exc["hosts"] as $eh) {
+		foreach ($inc["cidrs"] as $ic) {
+			if (layer7_ipv4_in_cidr($eh, $ic)) {
+				return true;
+			}
+		}
+	}
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	$ig = (isset($match["groups"]) && is_array($match["groups"]))
+	    ? $match["groups"] : array();
+	$eg = (isset($match["src_exclude_groups"]) &&
+	    is_array($match["src_exclude_groups"]))
+	    ? $match["src_exclude_groups"] : array();
+	foreach ($ig as $gid) {
+		if (in_array($gid, $eg, true)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Metadados de politicas block para PF escopado (indice = posicao ordenada).
  *
  * @return array<int, array{idx: int, policy: array, needs_pdst: bool,
@@ -548,6 +648,7 @@ function layer7_policy_enforcement_meta($data)
 		}
 
 		$src = layer7_policy_expand_src_origins($policy, $groups);
+		$exc = layer7_policy_expand_src_excludes($policy, $groups);
 		$out[] = array(
 			"idx" => (int)$idx,
 			"policy" => $policy,
@@ -555,6 +656,8 @@ function layer7_policy_enforcement_meta($data)
 			"needs_psrc" => $needs_psrc,
 			"src_hosts" => $src["hosts"],
 			"src_cidrs" => $src["cidrs"],
+			"exclude_hosts" => $exc["hosts"],
+			"exclude_cidrs" => $exc["cidrs"],
 			"scope_global" => !empty($policy["scope_global"]),
 			"quarantine_origin" => $quarantine_origin
 		);
@@ -578,6 +681,10 @@ function layer7_policy_enforcement_table_names($data = null)
 		}
 		if (!empty($m["needs_psrc"])) {
 			$tables[] = "layer7_psrc_" . $idx;
+		}
+		if (!empty($m["needs_pdst"]) &&
+		    (!empty($m["exclude_hosts"]) || !empty($m["exclude_cidrs"]))) {
+			$tables[] = "layer7_pexc_" . $idx;
 		}
 	}
 	foreach (layer7_policy_allow_meta($data) as $m) {
@@ -731,6 +838,27 @@ function layer7_pf_managed_dynamic_tables_text($data, $bl_config = null)
 		$lines[] = "table <layer7_pallow_" . (int)$m["idx"] .
 		    "> persist";
 	}
+	foreach (layer7_policy_enforcement_meta($data) as $m) {
+		if (empty($m["needs_pdst"])) {
+			continue;
+		}
+		$entries = array();
+		foreach ($m["exclude_hosts"] as $h) {
+			if (layer7_ipv4_valid($h)) {
+				$entries[] = $h;
+			}
+		}
+		foreach ($m["exclude_cidrs"] as $c) {
+			if (layer7_cidr_valid($c) || layer7_ipv4_valid($c)) {
+				$entries[] = $c;
+			}
+		}
+		if (empty($entries)) {
+			continue;
+		}
+		$lines[] = "table <layer7_pexc_" . (int)$m["idx"] .
+		    "> persist { " . implode(", ", array_unique($entries)) . " }";
+	}
 	foreach (layer7_exception_allow_meta($data) as $m) {
 		$lines[] = "table <layer7_exc_allow_" . (int)$m["idx"] .
 		    "> persist { " . implode(", ", $m["entries"]) . " }";
@@ -860,6 +988,12 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 				$rules .= "block drop quick inet to <{$tbl}> " .
 				    "! tagged L7ALLOW " .
 				    "label \"layer7:pdst:{$pid}:global\"\n";
+			}
+			if (!empty($m["exclude_hosts"]) ||
+			    !empty($m["exclude_cidrs"])) {
+				$rules .= "match inet from <layer7_pexc_{$idx}> " .
+				    "to <layer7_pdst_{$idx}> tag L7ALLOW " .
+				    "label \"layer7:pexc:{$pid}\"\n";
 			}
 		}
 
@@ -1169,7 +1303,7 @@ function layer7_dst_allowlist_apply_to_pf()
 /**
  * Esvazia as tabelas PF dinamicas (`layer7_block`, `layer7_block_dst`,
  * `layer7_allow_dst`, `layer7_bld_N`, `layer7_blsrc_N`, `layer7_exc_allow_N`,
- * `layer7_pdst_N`, `layer7_psrc_N`, `layer7_pallow_N`).
+ * `layer7_pdst_N`, `layer7_psrc_N`, `layer7_pallow_N`, `layer7_pexc_N`).
  * Usado quando o modo passa para monitor/disabled ou ao desinstalar — evita
  * que IPs adicionados num enforce anterior continuem a bloquear apos a mudanca
  * (Bloco 5). Entradas estaticas da allowlist sao repostas por
@@ -1198,6 +1332,7 @@ function layer7_flush_dynamic_tables()
 		$tables[] = "layer7_pdst_" . $i;
 		$tables[] = "layer7_psrc_" . $i;
 		$tables[] = "layer7_pallow_" . $i;
+		$tables[] = "layer7_pexc_" . $i;
 	}
 	foreach (layer7_policy_enforcement_table_names($data = layer7_load_or_default()) as $ptbl) {
 		$tables[] = $ptbl;
@@ -2509,6 +2644,36 @@ function layer7_cidr_valid($s)
 	$n = (int)$m[5];
 	/* Rejeita 0.0.0.0/0 — allowlist aberta demais para PF. */
 	return $n >= 1 && $n <= 32;
+}
+
+/** IPv4 pertence a CIDR ou coincide com host unico. */
+function layer7_ipv4_in_cidr($ip, $cidr)
+{
+	if (!layer7_ipv4_valid($ip)) {
+		return false;
+	}
+	$cidr = trim((string)$cidr);
+	if ($cidr === "") {
+		return false;
+	}
+	if (strpos($cidr, '/') === false) {
+		return layer7_ipv4_valid($cidr) && $ip === $cidr;
+	}
+	if (!layer7_cidr_valid($cidr)) {
+		return false;
+	}
+	list($net, $prefix) = explode('/', $cidr, 2);
+	$prefix = (int)$prefix;
+	$ip_long = ip2long($ip);
+	$net_long = ip2long($net);
+	if ($ip_long === false || $net_long === false) {
+		return false;
+	}
+	if ($prefix === 0) {
+		return true;
+	}
+	$mask = -1 << (32 - $prefix);
+	return ($ip_long & $mask) === ($net_long & $mask);
 }
 
 /**

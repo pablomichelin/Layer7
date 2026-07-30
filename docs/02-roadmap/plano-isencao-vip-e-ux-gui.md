@@ -128,5 +128,5 @@ Para o caso fino "isento só deste perfil" (o IP continua sujeito aos outros), e
 | A | Governança documental | — | Concluído (`2026-07-30`) |
 | B | Isenção VIP modal | `_48` | Concluído código (`2026-07-30`); build/release pendente |
 | C | UX modal + verificador | `_49` | Concluído código (`2026-07-30`); build/release pendente |
-| D | Exclusão por política | `_50` | Pendente (BG-066; requer ADR-0019 + daemon) |
+| D | Exclusão por política | `_50` | Concluído código (`2026-07-30`); build/release pendente |
 | E | Validação lab | — | Concluído documental (`validacao-lab` sec. 19) |

@@ -84,25 +84,23 @@ function l7_test_schedule_active($schedule)
 
 function l7_test_src_matches($policy, $src_ip, $groups)
 {
-	$src_hosts = isset($policy["match"]["src_hosts"]) && is_array($policy["match"]["src_hosts"]) ? $policy["match"]["src_hosts"] : array();
-	$src_cidrs = isset($policy["match"]["src_cidrs"]) && is_array($policy["match"]["src_cidrs"]) ? $policy["match"]["src_cidrs"] : array();
-	$pol_groups = isset($policy["match"]["groups"]) && is_array($policy["match"]["groups"]) ? $policy["match"]["groups"] : array();
-
-	foreach ($pol_groups as $gid) {
-		foreach ($groups as $grp) {
-			if (isset($grp["id"]) && $grp["id"] === $gid) {
-				if (isset($grp["cidrs"]) && is_array($grp["cidrs"])) {
-					$src_cidrs = array_merge($src_cidrs, $grp["cidrs"]);
-				}
-				if (isset($grp["hosts"]) && is_array($grp["hosts"])) {
-					$src_hosts = array_merge($src_hosts, $grp["hosts"]);
-				}
-				if (isset($grp["device_ips"]) && is_array($grp["device_ips"])) {
-					$src_hosts = array_merge($src_hosts, $grp["device_ips"]);
-				}
+	$exc = layer7_policy_expand_src_excludes($policy, $groups);
+	if ($src_ip !== "") {
+		foreach ($exc["hosts"] as $h) {
+			if ($h === $src_ip) {
+				return false;
+			}
+		}
+		foreach ($exc["cidrs"] as $c) {
+			if (layer7_ipv4_in_cidr($src_ip, $c)) {
+				return false;
 			}
 		}
 	}
+
+	$inc = layer7_policy_expand_src_origins($policy, $groups);
+	$src_hosts = $inc["hosts"];
+	$src_cidrs = $inc["cidrs"];
 
 	if (empty($src_hosts) && empty($src_cidrs)) {
 		return true;

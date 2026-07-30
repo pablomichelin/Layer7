@@ -352,6 +352,14 @@ parse_match_subobject(const char *obj, const char *obj_end,
 	if (parse_cidr_array_in_object(ob, oe + 1, "src_cidrs",
 		r->src_cidrs, L7_MAX_SRC_CIDRS, &r->n_src_cidrs) != 0)
 		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "src_exclude_groups",
+		(char *)r->src_exclude_groups, L7_MAX_GROUPS_PER_POLICY,
+		L7_GROUP_ID_LEN, &r->n_src_exclude_groups) != 0)
+		return -1;
+	if (parse_cidr_array_in_object(ob, oe + 1, "src_exclude_cidrs",
+		r->src_exclude_cidrs, L7_MAX_SRC_CIDRS,
+		&r->n_src_exclude_cidrs) != 0)
+		return -1;
 	if (parse_string_array_in_object(ob, oe + 1, "groups",
 		(char *)r->groups, L7_MAX_GROUPS_PER_POLICY,
 		L7_GROUP_ID_LEN, &r->n_groups) != 0)
@@ -825,6 +833,44 @@ layer7_policies_expand_groups(struct layer7_policy_rule *rules,
 	}
 }
 
+void
+layer7_policies_expand_exclude_groups(struct layer7_policy_rule *rules,
+    int n_rules, const struct layer7_group *groups, int n_groups)
+{
+	int i, j, k;
+
+	for (i = 0; i < n_rules; i++) {
+		struct layer7_policy_rule *r = &rules[i];
+		if (r->n_src_exclude_groups == 0)
+			continue;
+		for (j = 0; j < r->n_src_exclude_groups; j++) {
+			const struct layer7_group *g = NULL;
+			for (k = 0; k < n_groups; k++) {
+				if (strcmp(groups[k].id,
+				    r->src_exclude_groups[j]) == 0) {
+					g = &groups[k];
+					break;
+				}
+			}
+			if (!g)
+				continue;
+			for (k = 0; k < g->n_cidrs &&
+			    r->n_src_exclude_cidrs < L7_MAX_SRC_CIDRS; k++) {
+				r->src_exclude_cidrs[r->n_src_exclude_cidrs] =
+				    g->cidrs[k];
+				r->n_src_exclude_cidrs++;
+			}
+			for (k = 0; k < g->n_hosts &&
+			    r->n_src_exclude_hosts < L7_MAX_SRC_HOSTS; k++) {
+				snprintf(r->src_exclude_hosts[
+				    r->n_src_exclude_hosts],
+				    L7_EXC_HOST_LEN, "%s", g->hosts[k]);
+				r->n_src_exclude_hosts++;
+			}
+		}
+	}
+}
+
 static int
 ipv4_parse(const char *s, uint32_t *out)
 {
@@ -895,11 +941,37 @@ exception_matches_src(const struct layer7_exception *e, const char *src_ip,
 }
 
 static int
+src_excluded_from_rule(const struct layer7_policy_rule *r, const char *src_ip)
+{
+	int i;
+	uint32_t ip;
+
+	if (r->n_src_exclude_hosts == 0 && r->n_src_exclude_cidrs == 0)
+		return 0;
+	if (!src_ip || !*src_ip)
+		return 0;
+	for (i = 0; i < r->n_src_exclude_hosts; i++) {
+		if (strcmp(src_ip, r->src_exclude_hosts[i]) == 0)
+			return 1;
+	}
+	if (r->n_src_exclude_cidrs > 0 && ipv4_parse(src_ip, &ip) == 0) {
+		for (i = 0; i < r->n_src_exclude_cidrs; i++) {
+			if (cidr_u32_match(ip, r->src_exclude_cidrs[i].net,
+			    r->src_exclude_cidrs[i].prefix))
+				return 1;
+		}
+	}
+	return 0;
+}
+
+static int
 src_matches_rule(const struct layer7_policy_rule *r, const char *src_ip)
 {
 	int i;
 	uint32_t ip;
 
+	if (src_excluded_from_rule(r, src_ip))
+		return 0;
 	if (r->n_src_hosts == 0 && r->n_src_cidrs == 0)
 		return 1;
 	if (!src_ip || !*src_ip)

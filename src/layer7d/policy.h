@@ -79,6 +79,13 @@ struct layer7_policy_rule {
 	struct l7_cidr src_cidrs[L7_MAX_SRC_CIDRS];
 	int n_groups;
 	char groups[L7_MAX_GROUPS_PER_POLICY][L7_GROUP_ID_LEN];
+	/* BG-066 / ADR-0019: exclusao de origem desta politica (nao-match). */
+	int n_src_exclude_hosts;
+	char src_exclude_hosts[L7_MAX_SRC_HOSTS][L7_EXC_HOST_LEN];
+	int n_src_exclude_cidrs;
+	struct l7_cidr src_exclude_cidrs[L7_MAX_SRC_CIDRS];
+	int n_src_exclude_groups;
+	char src_exclude_groups[L7_MAX_GROUPS_PER_POLICY][L7_GROUP_ID_LEN];
 	int scope_global;       /* 1 = regra PF global explicita (E4) */
 	int quarantine_origin;  /* 1 = app-only block pode quarentenar origem */
 };
@@ -147,6 +154,8 @@ void layer7_policies_sort(struct layer7_policy_rule *rules, int n);
 int layer7_groups_parse(const char *json, size_t len,
     struct layer7_group *out, int *n_out, int max_out);
 void layer7_policies_expand_groups(struct layer7_policy_rule *rules,
+    int n_rules, const struct layer7_group *groups, int n_groups);
+void layer7_policies_expand_exclude_groups(struct layer7_policy_rule *rules,
     int n_rules, const struct layer7_group *groups, int n_groups);
 
 int layer7_exceptions_parse(const char *json, size_t len,

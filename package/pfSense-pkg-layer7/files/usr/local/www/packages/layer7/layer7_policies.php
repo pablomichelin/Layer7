@@ -85,6 +85,25 @@ if ($_POST["add_profile_policy"] ?? false) {
 					if (!empty($prof_groups_sel)) {
 						$rule["match"]["groups"] = $prof_groups_sel;
 					}
+					$prof_exc_cidrs = layer7_parse_cidr_textarea(
+					    $_POST["profile_src_exclude_cidrs"] ?? "");
+					if (!empty($prof_exc_cidrs)) {
+						$rule["match"]["src_exclude_cidrs"] = $prof_exc_cidrs;
+					}
+					$prof_exc_groups = array();
+					if (isset($_POST["profile_src_exclude_groups"]) &&
+					    is_array($_POST["profile_src_exclude_groups"])) {
+						foreach ($_POST["profile_src_exclude_groups"] as $gv) {
+							$gv = trim($gv);
+							if ($gv !== "" && layer7_group_id_valid($gv)) {
+								$prof_exc_groups[] = $gv;
+							}
+						}
+						$prof_exc_groups = array_values(array_unique($prof_exc_groups));
+					}
+					if (!empty($prof_exc_groups)) {
+						$rule["match"]["src_exclude_groups"] = $prof_exc_groups;
+					}
 
 					$apps = isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]) ? $profile["ndpi_apps"] : array();
 					$hosts = isset($profile["hosts"]) && is_array($profile["hosts"]) ? $profile["hosts"] : array();
@@ -103,6 +122,9 @@ if ($_POST["add_profile_policy"] ?? false) {
 					    layer7_enforcement_is_scoped_hybrid($data) &&
 					    !layer7_policy_scoped_block_valid($rule, $data)) {
 						$input_errors[] = l7_t("No modo scoped_hybrid, selecione ao menos um CIDR/grupo de origem para o perfil.");
+					} elseif (layer7_policy_src_include_exclude_conflict($rule,
+					    isset($data["layer7"]["groups"]) ? $data["layer7"]["groups"] : array())) {
+						$input_errors[] = l7_t("Origem nao pode estar simultaneamente incluida e excluida nesta politica.");
 					} else {
 						$policies[] = $rule;
 
@@ -370,6 +392,25 @@ if ($_POST["add_policy"] ?? false) {
 			if (!empty($new_groups_sel)) {
 				$rule["match"]["groups"] = $new_groups_sel;
 			}
+			$new_exc_cidrs = layer7_parse_cidr_textarea(
+			    $_POST["new_src_exclude_cidrs"] ?? "");
+			if (!empty($new_exc_cidrs)) {
+				$rule["match"]["src_exclude_cidrs"] = $new_exc_cidrs;
+			}
+			$new_exc_groups = array();
+			if (isset($_POST["new_src_exclude_groups"]) &&
+			    is_array($_POST["new_src_exclude_groups"])) {
+				foreach ($_POST["new_src_exclude_groups"] as $gv) {
+					$gv = trim($gv);
+					if ($gv !== "" && layer7_group_id_valid($gv)) {
+						$new_exc_groups[] = $gv;
+					}
+				}
+				$new_exc_groups = array_values(array_unique($new_exc_groups));
+			}
+			if (!empty($new_exc_groups)) {
+				$rule["match"]["src_exclude_groups"] = $new_exc_groups;
+			}
 			if ($act === "tag") {
 				$rule["tag_table"] = $tag_table;
 			}
@@ -391,6 +432,11 @@ if ($_POST["add_policy"] ?? false) {
 			    layer7_enforcement_is_scoped_hybrid($data) &&
 			    !layer7_policy_scoped_block_valid($rule, $data)) {
 				$input_errors[] = l7_t("No modo scoped_hybrid, indique origem (IP/CIDR/grupo), active quarentena da origem ou confirme scope global.");
+				$ok = false;
+			}
+			if ($ok && layer7_policy_src_include_exclude_conflict($rule,
+			    isset($data["layer7"]["groups"]) ? $data["layer7"]["groups"] : array())) {
+				$input_errors[] = l7_t("Origem nao pode estar simultaneamente incluida e excluida nesta politica.");
 				$ok = false;
 			}
 			if ($ok) {
@@ -557,6 +603,25 @@ if ($_POST["save_policy_edit"] ?? false) {
 				if (!empty($edit_groups_sel)) {
 					$rule["match"]["groups"] = $edit_groups_sel;
 				}
+				$edit_exc_cidrs = layer7_parse_cidr_textarea(
+				    $_POST["edit_src_exclude_cidrs"] ?? "");
+				if (!empty($edit_exc_cidrs)) {
+					$rule["match"]["src_exclude_cidrs"] = $edit_exc_cidrs;
+				}
+				$edit_exc_groups = array();
+				if (isset($_POST["edit_src_exclude_groups"]) &&
+				    is_array($_POST["edit_src_exclude_groups"])) {
+					foreach ($_POST["edit_src_exclude_groups"] as $gv) {
+						$gv = trim($gv);
+						if ($gv !== "" && layer7_group_id_valid($gv)) {
+							$edit_exc_groups[] = $gv;
+						}
+					}
+					$edit_exc_groups = array_values(array_unique($edit_exc_groups));
+				}
+				if (!empty($edit_exc_groups)) {
+					$rule["match"]["src_exclude_groups"] = $edit_exc_groups;
+				}
 				if ($act === "tag") {
 					$rule["tag_table"] = $tag_table;
 				}
@@ -578,6 +643,11 @@ if ($_POST["save_policy_edit"] ?? false) {
 				    layer7_enforcement_is_scoped_hybrid($data) &&
 				    !layer7_policy_scoped_block_valid($rule, $data)) {
 					$input_errors[] = l7_t("No modo scoped_hybrid, indique origem (IP/CIDR/grupo), active quarentena da origem ou confirme scope global.");
+					$ok = false;
+				}
+				if ($ok && layer7_policy_src_include_exclude_conflict($rule,
+				    isset($data["layer7"]["groups"]) ? $data["layer7"]["groups"] : array())) {
+					$input_errors[] = l7_t("Origem nao pode estar simultaneamente incluida e excluida nesta politica.");
 					$ok = false;
 				}
 				if ($ok) {
@@ -672,6 +742,12 @@ function layer7_policy_match_summary($policy) {
 	}
 	if (!empty($policy["match"]["groups"]) && is_array($policy["match"]["groups"])) {
 		$matches[] = l7_t("Grupos") . ": " . implode(", ", $policy["match"]["groups"]);
+	}
+	if (!empty($policy["match"]["src_exclude_cidrs"]) && is_array($policy["match"]["src_exclude_cidrs"])) {
+		$matches[] = l7_t("Excl. CIDRs") . ": " . implode(", ", $policy["match"]["src_exclude_cidrs"]);
+	}
+	if (!empty($policy["match"]["src_exclude_groups"]) && is_array($policy["match"]["src_exclude_groups"])) {
+		$matches[] = l7_t("Excl. grupos") . ": " . implode(", ", $policy["match"]["src_exclude_groups"]);
 	}
 	if (!empty($policy["tag_table"]) && (($policy["action"] ?? "") === "tag")) {
 		$matches[] = l7_t("Tabela PF") . ": " . $policy["tag_table"];
@@ -879,6 +955,26 @@ function layer7_policy_match_summary($policy) {
 						<div class="col-sm-8">
 							<textarea name="profile_src_cidrs" class="form-control" rows="2" placeholder="192.168.10.0/24"></textarea>
 							<p class="help-block"><?= l7_t("Vazio = qualquer sub-rede. Use apenas se grupos nao forem suficientes."); ?></p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-4 control-label"><?= l7_t("Excluir origens (so este perfil)"); ?></label>
+						<div class="col-sm-8">
+							<p class="help-block"><?= l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis."); ?></p>
+						<?php if (!empty($l7_groups)) { ?>
+							<p class="text-muted small"><strong><?= l7_t("Grupos excluidos"); ?></strong></p>
+						<?php foreach ($l7_groups as $grp) {
+							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
+							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
+						?>
+							<label class="checkbox-inline">
+								<input type="checkbox" name="profile_src_exclude_groups[]" value="<?= $gid; ?>" />
+								<?= $gname; ?>
+							</label>
+						<?php } ?>
+						<?php } ?>
+							<label class="control-label small" style="margin-top:8px;"><?= l7_t("CIDRs excluidos"); ?></label>
+							<textarea name="profile_src_exclude_cidrs" class="form-control" rows="2" placeholder="192.168.1.50"></textarea>
 						</div>
 					</div>
 					</div>
@@ -1168,6 +1264,39 @@ function layer7_policy_match_summary($policy) {
 				</div>
 				<?php } ?>
 
+				<?php
+				$edit_exc_cidrs_val = "";
+				if (isset($edit_policy["match"]["src_exclude_cidrs"]) &&
+				    is_array($edit_policy["match"]["src_exclude_cidrs"])) {
+					$edit_exc_cidrs_val = implode("\n",
+					    $edit_policy["match"]["src_exclude_cidrs"]);
+				}
+				$edit_exc_grps_arr = array();
+				if (isset($edit_policy["match"]["src_exclude_groups"]) &&
+				    is_array($edit_policy["match"]["src_exclude_groups"])) {
+					$edit_exc_grps_arr = $edit_policy["match"]["src_exclude_groups"];
+				}
+				?>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Excluir origens (so este perfil)"); ?></label>
+					<div class="col-sm-9">
+						<p class="help-block"><?= l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis."); ?></p>
+					<?php if (!empty($l7_groups)) { ?>
+						<div class="l7-multiselect-wrap" id="edit_exc_groups_list" style="max-width:400px;max-height:120px;">
+						<?php foreach ($l7_groups as $grp) {
+							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
+							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
+							$gchk = in_array($grp["id"] ?? "", $edit_exc_grps_arr, true) ? 'checked="checked"' : '';
+						?>
+							<label><input type="checkbox" name="edit_src_exclude_groups[]" value="<?= $gid; ?>" <?= $gchk; ?> /> <?= $gname; ?></label>
+						<?php } ?>
+						</div>
+					<?php } ?>
+						<textarea name="edit_src_exclude_cidrs" class="form-control" rows="2" style="max-width:400px;margin-top:8px;" placeholder="192.168.1.50"><?= htmlspecialchars($edit_exc_cidrs_val); ?></textarea>
+						<p class="help-block"><?= l7_t("CIDRs excluidos (um por linha)."); ?></p>
+					</div>
+				</div>
+
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
 					<div class="col-sm-9">
@@ -1399,6 +1528,25 @@ function layer7_policy_match_summary($policy) {
 					</div>
 				</div>
 				<?php } ?>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Excluir origens (so este perfil)"); ?></label>
+					<div class="col-sm-9">
+						<p class="help-block"><?= l7_t("IPs/CIDRs/grupos isentos desta politica; continuam sujeitos aos restantes perfis."); ?></p>
+					<?php if (!empty($l7_groups)) { ?>
+						<div class="l7-multiselect-wrap" id="new_exc_groups_list" style="max-width:400px;max-height:120px;">
+						<?php foreach ($l7_groups as $grp) {
+							$gid = isset($grp["id"]) ? htmlspecialchars($grp["id"]) : "";
+							$gname = isset($grp["name"]) ? htmlspecialchars($grp["name"]) : $gid;
+						?>
+							<label><input type="checkbox" name="new_src_exclude_groups[]" value="<?= $gid; ?>" /> <?= $gname; ?></label>
+						<?php } ?>
+						</div>
+					<?php } ?>
+						<textarea name="new_src_exclude_cidrs" class="form-control" rows="2" style="max-width:400px;margin-top:8px;" placeholder="192.168.1.50"></textarea>
+						<p class="help-block"><?= l7_t("CIDRs excluidos (um por linha)."); ?></p>
+					</div>
+				</div>
 
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= l7_t("Sites/hosts"); ?></label>
