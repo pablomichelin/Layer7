@@ -176,6 +176,22 @@ Publicado em `pablomichelin/Layer7` (`v1.8.11_32`) para download e botao
 **Verificar actualizacao**. Gate B1 passivo pendente; produção não alterada.
 `_31` supersedido — não instalar `_31` se `_32` disponível.
 
+### Release `1.8.11_47` — HTTPS ao portal com erro imediato (publicada `2026-07-30`)
+
+UX da block page: HTTPS a dominio bloqueado (sinkhole → portal) deixava o
+browser "a carregar" ate ao timeout sem pagina de erro — o SYN a portal:443
+era aceite por regras `pass` anteriores (anti-lockout / allow LAN) e o
+`net.inet.tcp.blackhole=2` do pfSense dropava em silencio a porta fechada.
+Fix: rdr TCP 443 → servico local da pagina (rdr precede o filtro, mesmo
+caminho do :80); o cliente TLS recebe resposta HTTP invalida e o browser
+mostra o erro de ligacao de imediato. Salvaguarda `layer7_webgui_port()`: a
+porta efectiva do webConfigurator nunca e redireccionada. Candidato `_46`
+(`block return-rst`, nunca publicado) supersedido — as `pass` anteriores
+venciam pela ordem. Validado no appliance: HTTPS falha <1s, HTTP devolve a
+pagina, GUI :9999 intacta. Artefacto
+`SHA256=878f8d54b828f3d57236b565b6c55fcfae9eb3e6965e1eafadab42792801195b`,
+tag `v1.8.11_47` em `pablomichelin/Layer7`.
+
 ### Release `1.8.11_45` — rdr da block page e DNS forcado agora efectivos (publicada `2026-07-30`)
 
 Descoberto em lab que o redirect HTTP :80 para a pagina de bloqueio e o DNS

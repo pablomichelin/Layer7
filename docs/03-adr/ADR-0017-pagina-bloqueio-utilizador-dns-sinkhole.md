@@ -29,7 +29,10 @@ Adoptar **DNS sinkhole via Unbound** + **servidor HTTP leve local**:
 1. Domínios de políticas `block` activas (e opcionalmente blacklists UT1,
    com limite configurável) resolvem para o **IP portal** (IP LAN do pfSense
    ou IPv4 customizável nas Definições).
-2. Regras NAT `rdr` redireccionam TCP **porta 80** destinada ao IP portal
+2. Regras NAT `rdr` redireccionam TCP **porta 80** (e, desde `1.8.11_47`,
+   tambem **porta 443** — para o browser receber erro de ligacao imediato em
+   vez de timeout silencioso via `tcp.blackhole`; a porta efectiva do
+   webConfigurator nunca e redireccionada) destinada ao IP portal
    para `127.0.0.1:8099`.
 3. Serviço `layer7-blockpage` (PHP built-in server, router dedicado) serve
    HTML informativo; o header `Host:` identifica o site bloqueado.

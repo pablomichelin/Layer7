@@ -249,6 +249,16 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.8.11_47` (UX HTTPS block page, `2026-07-30`):**
+rdr TCP 443 → servico local da pagina: HTTPS a dominio bloqueado devolve
+erro imediato no browser em vez de pendurar ate ao timeout
+(`tcp.blackhole=2` + `pass` anti-lockout engoliam o SYN em silencio). A
+porta efectiva do webConfigurator nunca e redireccionada. `_46` interno
+nunca publicado (supersedido).
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_47`
+- **SHA256 esperado:** `878f8d54b828f3d57236b565b6c55fcfae9eb3e6965e1eafadab42792801195b`
+
 **Addendum da release `1.8.11_45` (rdr efectivo, `2026-07-30`):** o redirect
 HTTP :80 para a pagina de bloqueio e o DNS forcado :53 nunca tinham sido
 aplicados pelo PF — as regras `rdr` viviam num anchor (`natrules/layer7_nat`)
@@ -394,12 +404,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_45`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_47`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_45`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_45/pfSense-pkg-layer7-1.8.11_45.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_45/pfSense-pkg-layer7-1.8.11_45.pkg.sha256`
-- **SHA256 esperado:** `a76cfb9b5fa352ce3989fd073801fcddcba098640933c96b68be76144d04531a`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_47`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_47/pfSense-pkg-layer7-1.8.11_47.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_47/pfSense-pkg-layer7-1.8.11_47.pkg.sha256`
+- **SHA256 esperado:** `878f8d54b828f3d57236b565b6c55fcfae9eb3e6965e1eafadab42792801195b`
 
 > **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
 > sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.
