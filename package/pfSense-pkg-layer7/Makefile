@@ -3,7 +3,7 @@
 
 PORTNAME=	pfSense-pkg-layer7
 PORTVERSION=	1.8.11
-PORTREVISION=	33
+PORTREVISION=	34
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -101,6 +101,8 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_blacklists.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_bl_ajax.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_settings_ajax.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_allowlist.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7

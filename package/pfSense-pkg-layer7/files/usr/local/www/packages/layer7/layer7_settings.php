@@ -92,60 +92,17 @@ if ($_POST["import_config"] ?? false) {
 }
 
 if ($_POST["check_update"] ?? false) {
-	/*
-	 * Fonte canonica de "versao instalada" e o pkg manager (PORTVERSION +
-	 * PORTREVISION, ex. "1.8.11_14"); fallback para layer7d -V (cosmetico).
-	 */
-	$current_ver = layer7_pkg_version();
-	if ($current_ver === "") {
-		$current_ver = layer7_daemon_version();
-	}
-	if ($current_ver === "") {
-		$current_ver = "desconhecida";
-	}
-	$gh_api = "https://api.github.com/repos/" . $layer7_release_owner . "/" . $layer7_release_repo . "/releases/latest";
-	$tmp_json = "/tmp/layer7-gh-latest.json";
-	@unlink($tmp_json);
-	exec("/usr/bin/fetch -qo " . escapeshellarg($tmp_json) . " " . escapeshellarg($gh_api) . " 2>&1", $fetch_out, $fetch_rc);
-	if ($fetch_rc !== 0 || !file_exists($tmp_json)) {
-		$update_err = l7_t("Nao foi possivel contactar o GitHub. Verifique a ligacao a Internet.");
+	$check = layer7_check_for_update($layer7_release_owner, $layer7_release_repo);
+	if (!$check["ok"]) {
+		$update_err = $check["error"];
 	} else {
-		$gh_raw = @file_get_contents($tmp_json);
-		$gh = is_string($gh_raw) ? @json_decode($gh_raw, true) : null;
-		@unlink($tmp_json);
-		if (!is_array($gh) || !isset($gh["tag_name"])) {
-			$update_err = l7_t("Resposta do GitHub invalida ou repositorio sem releases.");
-		} else {
-			$latest_tag = $gh["tag_name"];
-			/*
-			 * Defesa em profundidade (BG-030): so considera releases cujo
-			 * tag respeita o padrao de versao do pacote
-			 * (v<MAJOR>.<MINOR>[.<PATCH>][_<REVISION>]). Tags como
-			 * "blacklists-ut1-current" sao ignoradas mesmo que ganhem o
-			 * latest do GitHub por engano.
-			 */
-			if (preg_match('/^v?\d+\.\d+/', $latest_tag) !== 1) {
-				$update_err = l7_t("Release mais recente nao e uma versao do pacote (tag ignorada): ") . $latest_tag;
-			} else {
-				$latest_ver = ltrim($latest_tag, "vV");
-				$pkg_url = "";
-				if (isset($gh["assets"]) && is_array($gh["assets"])) {
-					foreach ($gh["assets"] as $asset) {
-						if (isset($asset["browser_download_url"]) && strpos($asset["browser_download_url"], ".pkg") !== false) {
-							$pkg_url = $asset["browser_download_url"];
-							break;
-						}
-					}
-				}
-				$update_info = array(
-					"current" => $current_ver,
-					"latest" => $latest_ver,
-					"tag" => $latest_tag,
-					"pkg_url" => $pkg_url,
-					"name" => isset($gh["name"]) ? $gh["name"] : $latest_tag
-				);
-			}
-		}
+		$update_info = array(
+			"current" => $check["current"],
+			"latest" => $check["latest"],
+			"tag" => $check["tag"],
+			"pkg_url" => $check["pkg_url"],
+			"name" => $check["name"]
+		);
 	}
 }
 
@@ -957,13 +914,16 @@ layer7_render_styles();
 
 				<hr>
 
+				<div id="l7_pkg_update">
 				<h4><?= l7_t("Actualizacao"); ?></h4>
+				<div id="l7_update_status">
 				<?php if ($update_msg !== "") { ?>
 				<div class="alert alert-success"><?= htmlspecialchars($update_msg); ?></div>
 				<?php } ?>
 				<?php if ($update_err !== "") { ?>
 				<div class="alert alert-danger"><?= htmlspecialchars($update_err); ?></div>
 				<?php } ?>
+				</div>
 
 				<?php
 				$disp_pkg = layer7_pkg_version();
@@ -976,7 +936,7 @@ layer7_render_styles();
 					$disp_ver = $disp_daemon;
 				}
 				?>
-				<p><?= l7_t("Versao instalada"); ?>: <code><?= htmlspecialchars($disp_ver); ?></code>
+				<p id="l7_update_versions"><?= l7_t("Versao instalada"); ?>: <code><?= htmlspecialchars($disp_ver); ?></code>
 				<?php if ($disp_pkg !== "" && $disp_daemon !== "" && $disp_pkg !== $disp_daemon) { ?>
 				&nbsp;<small class="text-muted">(<?= l7_t("daemon"); ?>: <code><?= htmlspecialchars($disp_daemon); ?></code>)</small>
 				<?php } ?>
@@ -985,9 +945,10 @@ layer7_render_styles();
 				<?php } ?>
 				</p>
 
+				<div id="l7_update_actions">
 				<?php if ($update_info !== null) { ?>
 					<?php if (version_compare($update_info["latest"], $update_info["current"], ">") && $update_info["pkg_url"] !== "") { ?>
-					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
+					<form method="post" action="layer7_settings.php#l7_pkg_update" style="display:inline;">
 						<input type="hidden" name="pkg_url" value="<?= htmlspecialchars($update_info["pkg_url"]); ?>" />
 						<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success"
 							onclick="return confirm(<?= json_encode(l7_t('Actualizar o pacote Layer7? O daemon sera reiniciado.')) ?>);">
@@ -1001,11 +962,12 @@ layer7_render_styles();
 					<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Ja esta na versao mais recente."); ?></span>
 					<?php } ?>
 				<?php } ?>
-				<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline; margin-left:8px;">
-					<button type="submit" name="check_update" value="1" class="btn btn-sm btn-info">
-						<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
-					</button>
-				</form>
+				<button type="button" id="l7_btn_check_update" class="btn btn-sm btn-info" style="margin-left:8px;"
+					onclick="l7CheckUpdate();">
+					<i class="fa fa-refresh"></i> <?= l7_t("Verificar actualizacao"); ?>
+				</button>
+				</div>
+				</div>
 
 				</div>
 			</div>
@@ -1013,4 +975,107 @@ layer7_render_styles();
 	</div>
 </div>
 <?php layer7_render_footer(); ?>
+<script>
+var L7_UPDATE_CHECKING = <?= json_encode(l7_t("A verificar actualizacao...")) ?>;
+var L7_UPDATE_HTTP_ERR = <?= json_encode(l7_t("Erro ao verificar actualizacao (HTTP %d).")) ?>;
+var L7_UPDATE_PARSE_ERR = <?= json_encode(l7_t("Resposta invalida ao verificar actualizacao.")) ?>;
+var L7_UPDATE_INSTALLED = <?= json_encode(l7_t("Versao instalada")) ?>;
+var L7_UPDATE_LATEST = <?= json_encode(l7_t("Mais recente")) ?>;
+var L7_UPDATE_UP_TO_DATE = <?= json_encode(l7_t("Ja esta na versao mais recente.")) ?>;
+var L7_UPDATE_NO_PKG = <?= json_encode(l7_t("Release encontrado mas sem artefacto .pkg.")) ?>;
+var L7_UPDATE_BTN = <?= json_encode(l7_t("Actualizar para ")) ?>;
+var L7_UPDATE_CONFIRM = <?= json_encode(l7_t("Actualizar o pacote Layer7? O daemon sera reiniciado.")) ?>;
+var L7_UPDATE_CHECK_BTN = <?= json_encode(l7_t("Verificar actualizacao")) ?>;
+
+function l7EscapeHtml(text) {
+	var el = document.createElement("div");
+	el.textContent = text == null ? "" : String(text);
+	return el.innerHTML;
+}
+
+function l7RenderUpdateResult(data) {
+	var status = document.getElementById("l7_update_status");
+	var versions = document.getElementById("l7_update_versions");
+	var actions = document.getElementById("l7_update_actions");
+	if (!status || !versions || !actions) {
+		return;
+	}
+
+	if (!data || !data.ok) {
+		status.innerHTML = '<div class="alert alert-danger">' + l7EscapeHtml(data && data.error ? data.error : L7_UPDATE_PARSE_ERR) + '</div>';
+		return;
+	}
+
+	status.innerHTML = "";
+	versions.innerHTML = L7_UPDATE_INSTALLED + ': <code>' + l7EscapeHtml(data.current) + '</code>'
+		+ ' &nbsp;|&nbsp; ' + L7_UPDATE_LATEST + ': <code>' + l7EscapeHtml(data.latest) + '</code>';
+
+	var html = "";
+	if (data.has_update && data.pkg_url) {
+		html += '<form method="post" action="layer7_settings.php#l7_pkg_update" style="display:inline;">'
+			+ '<input type="hidden" name="pkg_url" value="' + l7EscapeHtml(data.pkg_url) + '" />'
+			+ '<button type="submit" name="do_update" value="1" class="btn btn-sm btn-success"'
+			+ ' onclick="return confirm(' + JSON.stringify(L7_UPDATE_CONFIRM) + ');">'
+			+ '<i class="fa fa-download"></i> ' + l7EscapeHtml(L7_UPDATE_BTN + data.latest)
+			+ '</button></form>';
+	} else if (data.no_pkg_asset) {
+		html += '<div class="alert alert-warning">' + l7EscapeHtml(L7_UPDATE_NO_PKG) + '</div>';
+	} else if (data.up_to_date) {
+		html += '<span class="text-success"><i class="fa fa-check-circle"></i> ' + l7EscapeHtml(L7_UPDATE_UP_TO_DATE) + '</span>';
+	}
+
+	html += '<button type="button" id="l7_btn_check_update" class="btn btn-sm btn-info" style="margin-left:8px;" onclick="l7CheckUpdate();">'
+		+ '<i class="fa fa-refresh"></i> ' + l7EscapeHtml(L7_UPDATE_CHECK_BTN)
+		+ '</button>';
+	actions.innerHTML = html;
+}
+
+function l7CheckUpdate() {
+	var btn = document.getElementById("l7_btn_check_update");
+	var status = document.getElementById("l7_update_status");
+	if (btn) {
+		btn.disabled = true;
+	}
+	if (status) {
+		status.innerHTML = '<div class="alert alert-info"><i class="fa fa-spinner fa-spin"></i> ' + l7EscapeHtml(L7_UPDATE_CHECKING) + '</div>';
+	}
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "/packages/layer7/layer7_settings_ajax.php?action=check_update&_=" + Date.now(), true);
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState !== 4) {
+			return;
+		}
+		if (btn) {
+			btn.disabled = false;
+		}
+		if (xhr.status !== 200) {
+			if (status) {
+				status.innerHTML = '<div class="alert alert-danger">' + l7EscapeHtml(L7_UPDATE_HTTP_ERR.replace("%d", xhr.status)) + '</div>';
+			}
+			return;
+		}
+		var data;
+		try {
+			data = JSON.parse(xhr.responseText);
+		} catch (e) {
+			if (status) {
+				status.innerHTML = '<div class="alert alert-danger">' + l7EscapeHtml(L7_UPDATE_PARSE_ERR) + '</div>';
+			}
+			return;
+		}
+		l7RenderUpdateResult(data);
+	};
+	xhr.send();
+}
+
+<?php if ($update_msg !== "" || $update_err !== "" || isset($_POST["do_update"])): ?>
+document.addEventListener("DOMContentLoaded", function() {
+	var el = document.getElementById("l7_pkg_update");
+	if (el) {
+		el.scrollIntoView({ behavior: "smooth", block: "start" });
+	}
+});
+<?php endif; ?>
+</script>
 <?php require_once("foot.inc"); ?>

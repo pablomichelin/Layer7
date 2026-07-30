@@ -1815,6 +1815,91 @@ function layer7_pkg_version()
 	return ($rc === 0 && !empty($out[0])) ? trim($out[0]) : "";
 }
 
+/**
+ * Consulta GitHub Releases/latest e compara com a versao instalada do pacote.
+ * Usado pelo updater da GUI (POST legado e AJAX).
+ *
+ * @return array{ok:bool,error:string,current:string,latest:string,tag:string,pkg_url:string,name:string,has_update:bool,up_to_date:bool,no_pkg_asset:bool}
+ */
+function layer7_check_for_update($owner = "pablomichelin", $repo = "Layer7")
+{
+	$result = array(
+		"ok" => false,
+		"error" => "",
+		"current" => "",
+		"latest" => "",
+		"tag" => "",
+		"pkg_url" => "",
+		"name" => "",
+		"has_update" => false,
+		"up_to_date" => false,
+		"no_pkg_asset" => false,
+	);
+
+	$current_ver = layer7_pkg_version();
+	if ($current_ver === "") {
+		$current_ver = layer7_daemon_version();
+	}
+	if ($current_ver === "") {
+		$current_ver = l7_t("desconhecida");
+	}
+	$result["current"] = $current_ver;
+
+	$gh_api = "https://api.github.com/repos/" . $owner . "/" . $repo . "/releases/latest";
+	$tmp_json = "/tmp/layer7-gh-latest.json";
+	@unlink($tmp_json);
+	exec("/usr/bin/fetch -qo " . escapeshellarg($tmp_json) . " " . escapeshellarg($gh_api) . " 2>&1", $fetch_out, $fetch_rc);
+	if ($fetch_rc !== 0 || !file_exists($tmp_json)) {
+		$result["error"] = l7_t("Nao foi possivel contactar o GitHub. Verifique a ligacao a Internet.");
+		return $result;
+	}
+
+	$gh_raw = @file_get_contents($tmp_json);
+	$gh = is_string($gh_raw) ? @json_decode($gh_raw, true) : null;
+	@unlink($tmp_json);
+	if (!is_array($gh) || !isset($gh["tag_name"])) {
+		$result["error"] = l7_t("Resposta do GitHub invalida ou repositorio sem releases.");
+		return $result;
+	}
+
+	$latest_tag = $gh["tag_name"];
+	if (preg_match('/^v?\d+\.\d+/', $latest_tag) !== 1) {
+		$result["error"] = l7_t("Release mais recente nao e uma versao do pacote (tag ignorada): ") . $latest_tag;
+		return $result;
+	}
+
+	$latest_ver = ltrim($latest_tag, "vV");
+	$pkg_url = "";
+	if (isset($gh["assets"]) && is_array($gh["assets"])) {
+		foreach ($gh["assets"] as $asset) {
+			if (!isset($asset["browser_download_url"])) {
+				continue;
+			}
+			$url = (string)$asset["browser_download_url"];
+			if (strpos($url, ".pkg") !== false && substr($url, -7) !== ".sha256") {
+				$pkg_url = $url;
+				break;
+			}
+		}
+	}
+
+	$result["ok"] = true;
+	$result["latest"] = $latest_ver;
+	$result["tag"] = $latest_tag;
+	$result["pkg_url"] = $pkg_url;
+	$result["name"] = isset($gh["name"]) ? (string)$gh["name"] : $latest_tag;
+
+	if ($pkg_url === "") {
+		$result["no_pkg_asset"] = true;
+	} elseif (version_compare($latest_ver, $current_ver, ">")) {
+		$result["has_update"] = true;
+	} else {
+		$result["up_to_date"] = true;
+	}
+
+	return $result;
+}
+
 /* id de politica: [A-Za-z0-9_-], 1-80 */
 function layer7_policy_id_valid($id)
 {

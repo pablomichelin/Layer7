@@ -2,6 +2,24 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_34] - 2026-07-30 — GUI updater sem reload da pagina
+
+Publicada em `pablomichelin/Layer7` (candidato interno).
+
+### Changed
+
+- Botao «Verificar actualizacao» passa a usar AJAX: resultado aparece no
+  proprio bloco de actualizacao sem recarregar a pagina nem perder a posicao
+  de scroll.
+- Instalacao do pacote (`Actualizar para X`) mantem POST; apos concluir,
+  auto-scroll para a secao de actualizacao.
+- Logica de consulta ao GitHub consolidada em `layer7_check_for_update()`.
+
+### Risco, teste e rollback
+
+- Alteracao apenas PHP/JS da GUI; sem impacto em enforcement.
+- Rollback: reinstalar `1.8.11_33` ou anterior.
+
 ## [1.8.11_33] - 2026-07-30 — GUI blacklists: progresso de download visível
 
 Publicada em `pablomichelin/Layer7` (candidato interno).
