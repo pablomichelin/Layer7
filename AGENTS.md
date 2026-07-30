@@ -177,9 +177,16 @@ como um unico bloco governado por checklist.
 4. Fazer commit local.
 5. Fazer build no builder FreeBSD.
 6. Validar o pacote/artefacto.
-7. Fazer push para o GitHub.
-8. Publicar release quando fizer parte do bloco aprovado.
-9. Confirmar disponibilidade do pacote quando houver release.
+7. Fazer push para o GitHub (`pfsense-layer7`).
+8. **Obrigatorio:** publicar GitHub Release em **`pablomichelin/Layer7`**
+   (canal publico ADR-0003) com `.pkg` + `.sha256` — o botao **Verificar
+   actualizacao** da GUI consulta apenas
+   `api.github.com/repos/pablomichelin/Layer7/releases/latest`. Sem este passo
+   a versao **nao existe** para clientes/lab, mesmo com build no builder.
+   Candidatos internos (NO-GO enforce) **tambem** devem ser publicados aqui;
+   veredicto de producao e distinto de disponibilidade para download.
+9. Confirmar que `/releases/latest` aponta para a tag correcta e que o asset
+   `.pkg` esta anexado.
 
 ---
 
@@ -218,6 +225,7 @@ como um unico bloco governado por checklist.
 | mudanca funcional | changelog, docs da area, `CORTEX.md`, backlog |
 | instalacao/upgrade/uninstall/rollback/caminhos/comandos | `docs/10-license-server/MANUAL-INSTALL.md`, runbooks afectados |
 | release publicada | changelog, release docs, `MANUAL-INSTALL.md`, `CORTEX.md` |
+| build candidato (novo PORTREVISION) | **obrigatório** publicar em `pablomichelin/Layer7` + `MANUAL-INSTALL.md` links |
 | reorganizacao estrutural | classificacao documental, equivalencia documental, roadmap, checklist |
 
 **Regra especial:** `docs/10-license-server/MANUAL-INSTALL.md` deve ser

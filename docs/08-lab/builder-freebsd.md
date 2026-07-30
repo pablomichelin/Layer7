@@ -82,6 +82,23 @@ subfases **F4**: roteiros **10a**, **10b** e **11** em
 [`checklist-mestre.md`](../02-roadmap/checklist-mestre.md) quando o projecto
 exigir esse gate.
 
+### Publicar no canal publico (obrigatorio apos cada build de pacote)
+
+O botao **Verificar actualizacao** da GUI so le
+`pablomichelin/Layer7/releases/latest`. Apos `make package` e validacao:
+
+```sh
+# No Mac (com gh autenticado) ou no builder com token
+gh release create "v1.8.11_XX" \
+  pfSense-pkg-layer7-1.8.11_XX.pkg \
+  pfSense-pkg-layer7-1.8.11_XX.pkg.sha256 \
+  --repo pablomichelin/Layer7 \
+  --title "Layer7 v1.8.11_XX" \
+  --notes "Ver CHANGELOG no repo pfsense-layer7"
+```
+
+Confirmar: `curl -s https://api.github.com/repos/pablomichelin/Layer7/releases/latest | grep tag_name`
+
 ## Acesso SSH (automacao e scripts)
 
 Sessoes nao interactivas e ferramentas com `BatchMode` necessitam de

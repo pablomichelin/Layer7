@@ -6,6 +6,11 @@
 > não substituam por caminhos do repositório de desenvolvimento salvo
 > referência operacional explícita.
 
+**Regra obrigatória:** após cada build com novo `PORTREVISION`, publicar
+`.pkg` + `.sha256` em **`pablomichelin/Layer7`** (GitHub Release, tag
+`v<versao>`). O botão **Verificar actualização** da GUI só consulta esse
+repositório — ver `MANUAL-INSTALL.md` §11b.1 e `AGENTS.md`.
+
 ## Instalação em 1 pfSense (um comando)
 
 No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:

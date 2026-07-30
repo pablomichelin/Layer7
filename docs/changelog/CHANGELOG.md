@@ -2,9 +2,12 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [1.8.11_32] - Unreleased — flush PF lifecycle e auditoria pré-gate
+## [1.8.11_32] - 2026-07-30 — flush PF lifecycle e auditoria pré-gate
 
-Pacote candidato, não publicado e não aprovado para produção.
+Publicada em `pablomichelin/Layer7` (candidato interno; Gate B1 pendente).
+Artefacto `pfSense-pkg-layer7-1.8.11_32.pkg`
+(`SHA256=c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`).
+Release: `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_32`
 
 ### Fixed
 

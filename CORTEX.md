@@ -172,8 +172,9 @@ alinhado a `layer7-pfctl flush-all`. Testes R-21 e contrato FP-015 em
 `test_config_parse.c`. Suite local/builder C/PHP/shell e smoke: PASS. Artefacto
 `pfSense-pkg-layer7-1.8.11_32.pkg`,
 `SHA256=c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`.
-Gate B1 passivo pendente; produção não alterada. `_31` supersedido — não
-instalar `_31` se `_32` disponível.
+Publicado em `pablomichelin/Layer7` (`v1.8.11_32`) para download e botao
+**Verificar actualizacao**. Gate B1 passivo pendente; produção não alterada.
+`_31` supersedido — não instalar `_31` se `_32` disponível.
 
 ### Candidato `1.8.11_31` — classificação nDPI até estado final (não publicado)
 

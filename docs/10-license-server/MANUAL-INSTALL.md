@@ -246,7 +246,18 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
-**Addendum do candidato `1.8.11_31` (não publicado):**
+**Addendum do candidato `1.8.11_32` (publicado no canal de download):**
+Publicado em `2026-07-30` em **`pablomichelin/Layer7`** (candidato interno;
+**nao** promover enforce sem gates G2–G7). BG-061: flush lifecycle PF.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_32`
+- **Pacote:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_32/pfSense-pkg-layer7-1.8.11_32.pkg`
+- **SHA256 esperado:** `c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`
+
+O botao **Verificar actualizacao** oferece `_32`. Referencia producao enforce:
+continua `_24` ate veredicto humano.
+
+**Addendum do candidato `1.8.11_31` (supersedido por `_32`):**
 Corrige FP-020: o daemon não encerra mais DPI num resultado
 `NDPI_STATE_PARTIAL`; aguarda o estado final ou chama
 `ndpi_detection_giveup()` ao atingir 48 pacotes. Isso permite refinamento de
@@ -356,11 +367,20 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
-**Versao actual:** `1.8.11_24`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_32`
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_32`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_32/pfSense-pkg-layer7-1.8.11_32.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_32/pfSense-pkg-layer7-1.8.11_32.pkg.sha256`
+- **SHA256 esperado:** `c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`
+
+> **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
+> sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.
+
+**Versao de referencia producao (enforce bloqueado ate gate):** `1.8.11_24`
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_24`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_24/pfSense-pkg-layer7-1.8.11_24.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_24/pfSense-pkg-layer7-1.8.11_24.pkg.sha256`
 - **SHA256 esperado (`pfSense-pkg-layer7-1.8.11_24.pkg`):** `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`
 
 > **Versao anterior (rollback):** `1.8.11_23` em
@@ -1045,6 +1065,13 @@ Blacklists**); restauro explicito da last-known-good fica em:
 ```
 
 ### 11b.1 Convencao de releases no GitHub (botao "Verificar actualizacao" no GUI)
+
+**Regra operacional obrigatoria:** sempre que existir um novo
+`PORTREVISION` (build validado no builder), **deve** ser publicada uma
+GitHub Release em **`pablomichelin/Layer7`** com o `.pkg` e o `.sha256`.
+O repositorio privado `pfsense-layer7` **nao alimenta** o updater. Sem
+publicacao no canal publico, o botao mostra a ultima versao antiga mesmo
+que o codigo ja esteja no repo de desenvolvimento.
 
 A pagina **Services > Layer 7 > Definicoes > Sistema > Actualizacao** chama
 `https://api.github.com/repos/pablomichelin/Layer7/releases/latest` para
