@@ -58,9 +58,11 @@ if (isset($_POST["do_download"])) {
 		$input_errors[] = l7_t("Nao foi possivel guardar a configuracao de blacklists.");
 	} else {
 		layer7_bl_download_start();
-		$savemsg = l7_t("Download iniciado. Acompanhe o progresso abaixo.");
+		$savemsg = l7_t("Download iniciado. Acompanhe o progresso na secao «Log de download».");
 	}
 }
+
+$bl_download_poll = isset($_POST["do_download"]) || layer7_bl_download_in_progress();
 
 /* POST: Save rule */
 if (isset($_POST["save_rule"])) {
@@ -316,6 +318,18 @@ htmlspecialchars(implode("\n", layer7_bl_official_mirror_urls()))?></textarea>
 </form>
 </div>
 
+<div class="layer7-readonly-block" id="download_progress_wrap" style="margin-top:14px;">
+	<label><?=l7_t("Log de download")?></label>
+	<p id="download_progress_status" class="help-block" style="margin:6px 0 8px;"></p>
+	<textarea id="download_log" class="form-control" rows="8" readonly
+		placeholder="<?=htmlspecialchars(l7_t("Aguardando inicio do script..."))?>"
+		style="font-family:monospace; font-size:12px; background:#f8f8f8;"><?=htmlspecialchars(layer7_bl_download_status())?></textarea>
+	<button type="button" class="btn btn-default btn-xs" style="margin-top:6px;"
+		onclick="pollDownloadLog();">
+		<i class="fa fa-refresh"></i> <?=l7_t("Actualizar log")?>
+	</button>
+</div>
+
 <div class="layer7-readonly-block" style="margin-top:14px;">
 	<label><?=l7_t("Estado da trust chain")?></label>
 	<dl class="dl-horizontal" style="margin-bottom:0;">
@@ -343,16 +357,6 @@ htmlspecialchars(implode("\n", layer7_bl_official_mirror_urls()))?></textarea>
 		<dd><?=htmlspecialchars($fallback_state["operator_action"] ?? "-")?></dd>
 	</dl>
 	<p class="help-block" style="margin-top:10px;"><?=l7_t("Falha nova nao vira sucesso silencioso: a pagina mostra explicitamente se a trilha ficou healthy, degraded ou fail-closed e qual estado seguro foi preservado.")?></p>
-</div>
-
-<div class="layer7-readonly-block" style="margin-top:14px;">
-	<label><?=l7_t("Log de download")?></label>
-	<textarea id="download_log" class="form-control" rows="6" readonly
-		style="font-family:monospace; font-size:12px; background:#f8f8f8;"><?=htmlspecialchars(layer7_bl_download_status())?></textarea>
-	<button type="button" class="btn btn-default btn-xs" style="margin-top:6px;"
-		onclick="pollDownloadLog();">
-		<i class="fa fa-refresh"></i> <?=l7_t("Actualizar log")?>
-	</button>
 </div>
 </div>
 </div>
@@ -746,17 +750,63 @@ $cat_form_sites = $_cat_editing && isset($custom_map[$cat_edit]) ? implode("\n",
 </div><!-- layer7-page -->
 
 <script>
+var _pollTimer = null;
+var L7_POLL_WAIT = <?=json_encode(l7_t("Aguardando inicio do script..."))?>;
+var L7_POLL_RUNNING = <?=json_encode(l7_t("Download em curso..."))?>;
+var L7_POLL_DONE = <?=json_encode(l7_t("Download concluido."))?>;
+var L7_POLL_ERR = <?=json_encode(l7_t("Erro ao obter progresso (HTTP %d)."))?>;
+
+function l7SetDownloadStatus(html) {
+	var el = document.getElementById('download_progress_status');
+	if (el) {
+		el.innerHTML = html || '';
+	}
+}
+
 function pollDownloadLog() {
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', '/packages/layer7/layer7_bl_ajax.php?action=progress&_=' + Date.now(), true);
 	xhr.onreadystatechange = function() {
-		if (xhr.readyState == 4 && xhr.status == 200) {
-			var ta = document.getElementById('download_log');
+		if (xhr.readyState !== 4) {
+			return;
+		}
+		var ta = document.getElementById('download_log');
+		if (!ta) {
+			return;
+		}
+		if (xhr.status === 200) {
 			ta.value = xhr.responseText;
 			ta.scrollTop = ta.scrollHeight;
+			if (xhr.responseText.indexOf('INFO: update complete') !== -1) {
+				l7SetDownloadStatus('<i class="fa fa-check text-success"></i> ' + L7_POLL_DONE);
+			} else if (xhr.responseText.trim() === '') {
+				l7SetDownloadStatus('<i class="fa fa-spinner fa-spin"></i> ' + L7_POLL_WAIT);
+			} else {
+				l7SetDownloadStatus('<i class="fa fa-spinner fa-spin"></i> ' + L7_POLL_RUNNING);
+			}
+		} else {
+			l7SetDownloadStatus('<span class="text-danger">' + L7_POLL_ERR.replace('%d', xhr.status) + '</span>');
 		}
 	};
 	xhr.send();
+}
+
+function startDownloadPolling() {
+	if (_pollTimer) {
+		clearInterval(_pollTimer);
+	}
+	pollDownloadLog();
+	_pollTimer = setInterval(pollDownloadLog, 2000);
+	setTimeout(function() {
+		if (_pollTimer) {
+			clearInterval(_pollTimer);
+			_pollTimer = null;
+		}
+	}, 300000);
+	var wrap = document.getElementById('download_progress_wrap');
+	if (wrap) {
+		wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}
 }
 
 function filterRuleCats() {
@@ -778,9 +828,8 @@ function toggleAllRuleCats(state) {
 	}
 }
 
-<?php if (isset($_POST["do_download"])): ?>
-var _pollTimer = setInterval(function() { pollDownloadLog(); }, 2000);
-setTimeout(function() { clearInterval(_pollTimer); }, 300000);
+<?php if ($bl_download_poll): ?>
+startDownloadPolling();
 <?php endif; ?>
 </script>
 

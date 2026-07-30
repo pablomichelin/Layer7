@@ -2,6 +2,25 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_33] - 2026-07-30 — GUI blacklists: progresso de download visível
+
+Publicada em `pablomichelin/Layer7` (candidato interno).
+
+### Fixed
+
+- Log de download de blacklists movido para imediatamente abaixo do botão
+  «Download snapshot assinada» (deixava de ser visível após a secção trust chain).
+- Linha de progresso inicial escrita em PHP ao disparar o download; detecção
+  de lock activo; invocação do script via `/bin/sh` para maior robustez no
+  `mwexec_bg`.
+- Polling AJAX do log continua após refresh enquanto download em curso; indicador
+  visual (spinner / concluído / erro HTTP) e auto-scroll para a secção de log.
+
+### Risco, teste e rollback
+
+- Alteração apenas em PHP da GUI e helpers; sem impacto em enforcement PF.
+- Rollback: reinstalar `1.8.11_32` ou anterior via GUI/pkg.
+
 ## [1.8.11_32] - 2026-07-30 — flush PF lifecycle e auditoria pré-gate
 
 Publicada em `pablomichelin/Layer7` (candidato interno; Gate B1 pendente).

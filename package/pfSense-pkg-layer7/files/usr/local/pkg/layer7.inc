@@ -2738,6 +2738,7 @@ define('L7_BL_DIR', '/usr/local/etc/layer7/blacklists');
 define('L7_BL_CONFIG', L7_BL_DIR . '/config.json');
 define('L7_BL_DISCOVERED', L7_BL_DIR . '/discovered.json');
 define('L7_BL_PROGRESS', '/tmp/layer7-bl-progress.txt');
+define('L7_BL_LOCK', '/tmp/layer7-bl-update.lock');
 define('L7_BL_SCRIPT', '/usr/local/etc/layer7/update-blacklists.sh');
 define('L7_BL_STATE_DIR', L7_BL_DIR . '/.state');
 define('L7_BL_ACTIVE_STATE', L7_BL_STATE_DIR . '/active-snapshot.state');
@@ -2918,7 +2919,25 @@ function layer7_bl_download_start()
 	@chown(L7_BL_DIR, "www");
 	@chgrp(L7_BL_DIR, "wheel");
 	@chmod(L7_BL_DIR, 0775);
-	$cmd = L7_BL_SCRIPT . " --download";
+
+	if (is_dir(L7_BL_LOCK)) {
+		$stamp = date('Y-m-d H:i:s');
+		@file_put_contents(
+			L7_BL_PROGRESS,
+			$stamp . " ERROR: download ja em curso (lock activo em " . L7_BL_LOCK . ")\n",
+			LOCK_EX
+		);
+		return;
+	}
+
+	$stamp = date('Y-m-d H:i:s');
+	@file_put_contents(
+		L7_BL_PROGRESS,
+		$stamp . " INFO: a iniciar download em background...\n",
+		LOCK_EX
+	);
+
+	$cmd = "/bin/sh " . escapeshellarg(L7_BL_SCRIPT) . " --download";
 	if (function_exists("mwexec_bg")) {
 		mwexec_bg($cmd);
 	} else {
@@ -2932,6 +2951,28 @@ function layer7_bl_download_status()
 		return @file_get_contents(L7_BL_PROGRESS);
 	}
 	return "";
+}
+
+function layer7_bl_download_in_progress()
+{
+	if (is_dir(L7_BL_LOCK)) {
+		return true;
+	}
+	if (!file_exists(L7_BL_PROGRESS)) {
+		return false;
+	}
+	$mtime = @filemtime(L7_BL_PROGRESS);
+	if ($mtime === false || (time() - $mtime) > 600) {
+		return false;
+	}
+	$content = (string)@file_get_contents(L7_BL_PROGRESS);
+	if (strpos($content, 'INFO: update complete') !== false) {
+		return false;
+	}
+	if (preg_match('/\bERROR:/', $content) && (time() - $mtime) > 30) {
+		return false;
+	}
+	return true;
 }
 
 function layer7_bl_apply()
