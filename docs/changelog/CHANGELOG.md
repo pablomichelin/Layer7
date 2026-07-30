@@ -2,19 +2,23 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [1.8.11_46] - 2026-07-30 — recusa imediata HTTPS/QUIC ao portal (UX block page)
+## [1.8.11_47] - 2026-07-30 — HTTPS ao portal com erro imediato (UX block page)
 
 ### Added
 
-- Com a block page activa, HTTPS/QUIC destinados ao IP portal eram
-  dropados em silencio (nada escuta em <portal>:443) e o browser ficava
-  "a carregar" ate ao timeout, sem erro visivel. Novas regras
-  `block return-rst` (TCP 443) e `block return` (UDP 443/QUIC) nas
-  interfaces de captura: o cliente recebe recusa imediata e o browser
-  mostra logo o erro de ligacao (mesmo UX de HTTPS bloqueado do UniFi).
-  Labels `layer7:blockpage:rst443` / `layer7:blockpage:rej443`.
-  Refactor: `layer7_blockpage_portal_and_ifaces()` partilhado entre o
-  snippet rdr e o novo snippet filter.
+- Com a block page activa, HTTPS ao IP portal ficava "a carregar" ate ao
+  timeout sem erro visivel: o SYN a <portal>:443 era aceite por regras
+  `pass` anteriores (anti-lockout / allow LAN) e o
+  `net.inet.tcp.blackhole=2` do pfSense dropava em silencio a porta
+  fechada. Correccao: rdr tambem para TCP 443 -> servico local da pagina
+  (rdr precede o filtro, mesmo caminho do :80 que ja funciona); o cliente
+  TLS recebe resposta HTTP invalida e o browser mostra o erro de ligacao
+  de imediato. Salvaguarda: a porta efectiva do webConfigurator
+  (`layer7_webgui_port()`) nunca e redireccionada. Refactor:
+  `layer7_blockpage_portal_and_ifaces()` partilhado.
+- Nota: `_46` (candidato interno, nunca publicado) tentava resolver com
+  `block return-rst`; nao funcionava porque as regras `pass` anteriores
+  venciam pela ordem — supersedido por `_47`.
 
 ## [1.8.11_45] - 2026-07-30 — rdr da block page e DNS forcado agora efectivos
 

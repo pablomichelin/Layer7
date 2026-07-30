@@ -1440,10 +1440,6 @@ function layer7_generate_rules($type)
 
 	$rules .= layer7_policy_enforcement_rules_text($data, false);
 
-	/* Block page activa: recusa imediata de HTTPS/QUIC ao IP portal para o
-	 * browser mostrar erro em vez de pendurar ate ao timeout. */
-	$rules .= layer7_blockpage_reject_https_rules_text($data);
-
 	return $rules;
 }
 
@@ -2104,40 +2100,44 @@ function layer7_blockpage_portal_and_ifaces($data)
 }
 
 /**
- * Recusa activa de HTTPS/QUIC destinados ao IP portal enquanto a block page
- * esta activa. Sem isto, o SYN TCP 443 ao portal (nada escuta nessa porta) e
- * dropado em silencio pelo default deny e o browser fica "a carregar" ate ao
- * timeout. Com `block return-rst` (TCP) e `block return` (UDP/QUIC) o
- * cliente recebe recusa imediata e o browser mostra logo o erro de ligacao.
- * Nota: regra so existe com block page activa; se um servico legitimo
- * passar a escutar em <portal>:443, desactivar a block page primeiro.
+ * Regras rdr TCP/80 e TCP/443 -> servico local da pagina de bloqueio.
+ *
+ * O 443 tambem e redireccionado: sem rdr, o SYN ao portal:443 era aceite
+ * por regras `pass` anteriores (anti-lockout / allow LAN) e o
+ * `net.inet.tcp.blackhole=2` do pfSense dropava em silencio a porta
+ * fechada — o browser ficava "a carregar" ate ao timeout, sem erro
+ * visivel. Com o rdr, o cliente TLS recebe resposta HTTP invalida do
+ * servico da pagina e o browser mostra de imediato o erro de ligacao
+ * (sem MITM: a pagina so e visivel em HTTP, ADR-0017).
+ *
+ * Salvaguarda: a porta efectiva do webConfigurator nunca e redireccionada
+ * (GUI em 80/443 e comum; sequestra-la trancava o admin fora da GUI).
  */
-function layer7_blockpage_reject_https_rules_text($data = null)
-{
-	if ($data === null) {
-		$data = layer7_load_or_default();
-	}
-	$ctx = layer7_blockpage_portal_and_ifaces($data);
-	if ($ctx === null) {
-		return "";
-	}
-	$portal = $ctx["portal"];
-	$lines = array();
-	$lines[] = "# Pagina de bloqueio Layer7: recusa imediata HTTPS/QUIC ao portal";
-	foreach ($ctx["ifaces"] as $iface) {
-		$lines[] = "block return-rst in quick on {$iface} inet proto tcp" .
-		    " from any to {$portal} port 443" .
-		    " label \"layer7:blockpage:rst443\"";
-		$lines[] = "block return in quick on {$iface} inet proto udp" .
-		    " from any to {$portal} port 443" .
-		    " label \"layer7:blockpage:rej443\"";
-	}
-	return implode("\n", $lines) . "\n";
-}
 
 /**
- * Regras rdr TCP/80 -> servico local da pagina de bloqueio.
+ * Porta efectiva do webConfigurator (protocol http=80 / https=443 quando
+ * `port` nao esta definido em system.webgui).
  */
+function layer7_webgui_port()
+{
+	global $config;
+	$proto = "https";
+	$port = 0;
+	if (isset($config["system"]["webgui"]) &&
+	    is_array($config["system"]["webgui"])) {
+		$wg = $config["system"]["webgui"];
+		if (!empty($wg["protocol"])) {
+			$proto = (string)$wg["protocol"];
+		}
+		if (!empty($wg["port"])) {
+			$port = (int)$wg["port"];
+		}
+	}
+	if ($port > 0) {
+		return $port;
+	}
+	return ($proto === "http") ? 80 : 443;
+}
 function layer7_generate_blockpage_rdr_snippet($data = null)
 {
 	if ($data === null) {
@@ -2150,12 +2150,23 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
 	$portal = $ctx["portal"];
 	$real_ifaces = $ctx["ifaces"];
 	$port = (int)L7_BLOCKPAGE_PORT;
+	$webgui_port = layer7_webgui_port();
+	$rdr_ports = array();
+	foreach (array(80, 443) as $p) {
+		if ($p !== $webgui_port) {
+			$rdr_ports[] = $p;
+		}
+	}
 	$lines = array();
-	$lines[] = "# Pagina de bloqueio Layer7 (HTTP -> localhost:{$port})";
+	$lines[] = "# Pagina de bloqueio Layer7 (HTTP/HTTPS -> localhost:{$port};" .
+	    " porta webgui {$webgui_port} preservada)";
 	/* Nota: pf rejeita `label` em regras rdr (syntax error) — nao usar. */
 	foreach ($real_ifaces as $iface) {
-		$lines[] = "rdr on {$iface} inet proto tcp from any to {$portal} port 80" .
-		    " -> 127.0.0.1 port {$port}";
+		foreach ($rdr_ports as $p) {
+			$lines[] = "rdr on {$iface} inet proto tcp" .
+			    " from any to {$portal} port {$p}" .
+			    " -> 127.0.0.1 port {$port}";
+		}
 	}
 	$bp = layer7_blockpage_config_get($data);
 	if (!empty($bp["force_dns"])) {
