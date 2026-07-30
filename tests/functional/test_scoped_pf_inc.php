@@ -303,6 +303,18 @@ if (strpos($pexc_tables, "table <layer7_pexc_0> persist { 10.0.0.50/32 }") === f
 	fwrite(STDERR, $pexc_tables . $pexc_rules);
 	exit(1);
 }
+/* Ordem PF: o match pexc (tag L7ALLOW) tem de preceder o primeiro block
+ * `quick` da politica, senao o pacote e dropado antes de ser marcado e a
+ * exclusao vira codigo morto (regressao do candidato _50; ADR-0019). */
+$pexc_match_pos = strpos($pexc_rules,
+    "match inet from <layer7_pexc_0> to <layer7_pdst_0> tag L7ALLOW");
+$pexc_block_pos = strpos($pexc_rules, "block drop quick inet");
+if ($pexc_match_pos === false || $pexc_block_pos === false ||
+    $pexc_match_pos > $pexc_block_pos) {
+	fwrite(STDERR, "FAIL: pexc match rule must precede quick block rules\n");
+	fwrite(STDERR, $pexc_rules);
+	exit(1);
+}
 
 echo "PASS: test_scoped_pf_inc\n";
 exit(0);

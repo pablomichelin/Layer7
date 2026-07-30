@@ -203,6 +203,19 @@ tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
 
+### Candidato `1.8.11_51` — fix ordem PF da exclusão por política (BG-066)
+
+Auditoria pós-execução (`2026-07-30`) encontrou defeito no `_50`: em
+`layer7_policy_enforcement_rules_text()`, o `match from <layer7_pexc_N> to
+<layer7_pdst_N> tag L7ALLOW` era emitido **depois** dos `block drop quick` da
+mesma política. Como `quick` é terminal, a origem excluída era dropada antes
+de receber a tag e a exclusão PF era inoperante quando o destino entrara em
+`pdst_N` por outro cliente. `_51` move o match para antes dos blocks (mesmo
+padrão do allowlist/pallow) e `test_scoped_pf_inc.php` ganha asserção de
+**ordem** (o teste do `_50` só validava presença). Só `layer7.inc` + teste;
+daemon inalterado. `_50` fica supersedido para a feature de exclusão em
+scoped. Gate appliance §19.3 pendente.
+
 ### Candidato `1.8.11_49` — UX modal + verificador (BG-065)
 
 Progressive disclosure no modal Perfis rapidos; grupos-first com atalho criar
@@ -215,6 +228,8 @@ Campos `match.src_exclude_*` no daemon e PF (`layer7_pexc_N` + `L7ALLOW` em
 scoped). GUI Avançado + validação conflito include/exclude. Testes C/PHP/shell
 locais e builder: PASS. Release publicada `v1.8.11_50`
 (`SHA256=e2e388b33fdd63b4439e7ca7c9a8e101aa41b87848fd06c41e02edb1211abfea`).
+**Defeito conhecido:** a regra PF `match pexc` era emitida depois dos blocks
+`quick` — exclusão inoperante na camada PF; corrigido no `_51`.
 Gate appliance §19.3 pendente.
 
 ### Candidato `1.8.11_48` — isencao VIP nos Perfis rapidos (BG-064)
@@ -223,9 +238,10 @@ Modal **Opções** dos Perfis rapidos passa a gerir a excepcao canonica
 `vip-isentos` (allow global): grupos expandem para IPs/CIDRs na gravacao;
 badge em Excecoes; `toggle_profile_off` nao remove a excepcao partilhada.
 So PHP/GUI — sem alteracao ao daemon. Teste funcional
-`tests/functional/test_vip_exception.php`. Build no builder e release
-GitHub **pendentes** (nao solicitados neste bloco). Rollback: reinstalar
-`_47`.
+`tests/functional/test_vip_exception.php`. `_48` **nunca teve build/release
+proprio** — o codigo foi consolidado e distribuido no pacote `1.8.11_49`
+(tag `v1.8.11_49`); nao existe artefacto nem tag `v1.8.11_48`. Rollback:
+reinstalar `_47`.
 
 ### Release `1.8.11_45` — rdr da block page e DNS forcado agora efectivos (publicada `2026-07-30`)
 

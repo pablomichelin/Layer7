@@ -2,6 +2,24 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_51] - 2026-07-30 — Fix: ordem PF da exclusao por politica (BG-066)
+
+### Fixed
+
+- **PF scoped (`scoped_hybrid`):** a regra `match from <layer7_pexc_N> to
+  <layer7_pdst_N> tag L7ALLOW` era emitida **depois** dos `block drop quick`
+  da mesma politica em `layer7_policy_enforcement_rules_text()`. Como `quick`
+  e terminal, o pacote da origem excluida era dropado antes de receber a tag
+  `L7ALLOW` e a exclusao do `_50` era inoperante sempre que o destino tinha
+  entrado em `layer7_pdst_N` por trafego de outro cliente. O match passa a
+  preceder os blocks da politica (mesma semantica do allowlist/pallow).
+
+### Tests
+
+- `test_scoped_pf_inc.php`: nova assercao de **ordem** — o match `pexc` tem
+  de vir antes do primeiro `block drop quick` (o teste do `_50` so validava
+  presenca, por isso nao apanhou a regressao).
+
 ## [1.8.11_50] - 2026-07-30 — Exclusao por politica `src_exclude_*` (BG-066)
 
 ### Added
@@ -36,6 +54,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `device_ips` no match de origem.
 
 ## [1.8.11_48] - 2026-07-30 — Isencao VIP nos Perfis rapidos (BG-064)
+
+> **Nota:** `_48` nunca foi construido nem publicado como artefacto proprio —
+> o codigo deste bloco foi consolidado e distribuido no pacote `1.8.11_49`
+> (tag `v1.8.11_49`). Nao existe `.pkg` nem tag `v1.8.11_48`.
 
 ### Added
 

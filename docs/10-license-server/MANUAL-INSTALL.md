@@ -249,6 +249,17 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.8.11_51` (fix ordem PF da exclusao, `2026-07-30`):**
+Corrige defeito do `_50`: a regra `match from <layer7_pexc_N> tag L7ALLOW`
+era emitida **depois** dos `block drop quick` da mesma politica, tornando a
+exclusao por politica inoperante na camada PF (a origem excluida era dropada
+antes de receber a tag). O match passa a preceder os blocks;
+`test_scoped_pf_inc.php` ganha assercao de ordem. Instalacoes que usem
+`src_exclude_*` em `scoped_hybrid` devem actualizar de `_50` para `_51`.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_51`
+- **SHA256 esperado:** ver ficheiro `.sha256` anexado a release
+
 **Addendum da release `1.8.11_50` (exclusao por politica, `2026-07-30`):**
 Campos `match.src_exclude_cidrs` / `match.src_exclude_groups` (ADR-0019):
 origem isenta **so desta** politica no daemon; em `scoped_hybrid`, tabela PF

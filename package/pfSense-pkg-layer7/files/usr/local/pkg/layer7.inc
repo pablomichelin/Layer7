@@ -969,6 +969,15 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 		if (!empty($m["needs_pdst"])) {
 			$tbl = "layer7_pdst_" . $idx;
 			$tables .= "table <{$tbl}> persist\n";
+			/* O match pexc tem de preceder os blocks `quick` da mesma
+			 * politica: a tag L7ALLOW so protege se ja estiver aplicada
+			 * quando o pacote chega ao block (ADR-0019). */
+			if (!empty($m["exclude_hosts"]) ||
+			    !empty($m["exclude_cidrs"])) {
+				$rules .= "match inet from <layer7_pexc_{$idx}> " .
+				    "to <layer7_pdst_{$idx}> tag L7ALLOW " .
+				    "label \"layer7:pexc:{$pid}\"\n";
+			}
 			if ($has_src) {
 				foreach ($m["src_hosts"] as $sh) {
 					if (layer7_ipv4_valid($sh)) {
@@ -988,12 +997,6 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 				$rules .= "block drop quick inet to <{$tbl}> " .
 				    "! tagged L7ALLOW " .
 				    "label \"layer7:pdst:{$pid}:global\"\n";
-			}
-			if (!empty($m["exclude_hosts"]) ||
-			    !empty($m["exclude_cidrs"])) {
-				$rules .= "match inet from <layer7_pexc_{$idx}> " .
-				    "to <layer7_pdst_{$idx}> tag L7ALLOW " .
-				    "label \"layer7:pexc:{$pid}\"\n";
 			}
 		}
 
