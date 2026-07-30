@@ -100,6 +100,13 @@ a granularidade é por domínio e não por IP.
 - ECH e VPNs de cliente continuam fora do alcance (limitação declarada da
   categoria de produto, incl. UniFi).
 
+**Invariante adicionado na `1.8.11_44`:** o daemon nunca adiciona IPs locais
+das interfaces do firewall a tabelas block (`ip_is_local_iface_addr`,
+getifaddrs, cache 60s). Sem este guard, a resposta sinkhole
+`domínio-bloqueado → IP portal` reentrava no enforcement e o daemon bloqueava
+o próprio IP do pfSense em `layer7_block_dst`, cortando GUI/SSH de todas as
+redes (incidente de lab: `192.168.100.254` inacessível a partir da VLAN 95).
+
 ## Teste mínimo
 
 1. Enforce + política block YouTube + block page ON + `force_dns` ON.

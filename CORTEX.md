@@ -176,6 +176,22 @@ Publicado em `pablomichelin/Layer7` (`v1.8.11_32`) para download e botao
 **Verificar actualizacao**. Gate B1 passivo pendente; produção não alterada.
 `_31` supersedido — não instalar `_31` se `_32` disponível.
 
+### Release `1.8.11_44` — CRITICO: daemon nunca bloqueia IPs do firewall (publicada `2026-07-30`)
+
+Bug de desenho descoberto em lab: o sinkhole da block page resolve dominios
+bloqueados para o IP portal (interface do firewall). O daemon via essa
+resposta DNS/fluxo e adicionava o **proprio IP do pfSense** a
+`layer7_block_dst` — a regra `block drop quick from any to <layer7_block_dst>`
+cortava GUI/SSH a `192.168.100.254` a partir de **todas** as redes (sintoma
+reportado: VLAN 95 sem acesso ao firewall pelo IP LAN). Fix: guard
+`ip_is_local_iface_addr()` (getifaddrs, cache 60s) em todos os caminhos de
+insercao block do daemon (politica DNS/fluxo + blacklist DNS/SNI). Validado
+no appliance: consulta sinkhole `youtube.com`→portal a partir da LAN deixa a
+tabela vazia e o log regista `enforce_block: skip IP local do firewall`.
+`_44` e **obrigatoria** onde a block page esteja activa. Artefacto
+`SHA256=efa4f0d5f8e55cae319ecc27343c83604947e85f13062f1512c8f77d90789df2`,
+tag `v1.8.11_44` em `pablomichelin/Layer7`.
+
 ### Releases `1.8.11_36`–`_43` — updater CSP, precedência de bloqueio e plano DNS (publicadas `2026-07-30`)
 
 **Updater GUI (`_36`–`_38`):** «Verificar actualizacao» AJAX corrigido para o

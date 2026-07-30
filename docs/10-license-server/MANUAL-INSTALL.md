@@ -246,6 +246,21 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum das releases `1.8.11_35`–`_44` (block page + fix critico, `2026-07-30`):**
+Cadeia BG-062/BG-063 (ADR-0017 pagina de bloqueio DNS sinkhole; ADR-0018
+precedencia block > allowlist + DNS forcado opt-in). Detalhe por versao no
+`CHANGELOG` e no `CORTEX.md`. **`_44` e obrigatoria** para qualquer instalacao
+com block page activa: corrige bug critico em que o daemon adicionava o
+**IP do proprio firewall** (portal do sinkhole) a `layer7_block_dst`,
+cortando GUI/SSH a partir de todas as redes.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_44`
+- **Pacote:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_44/pfSense-pkg-layer7-1.8.11_44.pkg`
+- **SHA256 esperado:** `efa4f0d5f8e55cae319ecc27343c83604947e85f13062f1512c8f77d90789df2`
+- **Remediacao imediata sem upgrade:** `pfctl -t layer7_block_dst -T delete <IP-do-firewall>`
+
+Referencia producao enforce: continua `_24` ate gates G2–G7.
+
 **Addendum do candidato `1.8.11_32` (publicado no canal de download):**
 Publicado em `2026-07-30` em **`pablomichelin/Layer7`** (candidato interno;
 **nao** promover enforce sem gates G2–G7). BG-061: flush lifecycle PF.
@@ -367,12 +382,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_32`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_44`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_32`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_32/pfSense-pkg-layer7-1.8.11_32.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_32/pfSense-pkg-layer7-1.8.11_32.pkg.sha256`
-- **SHA256 esperado:** `c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_44`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_44/pfSense-pkg-layer7-1.8.11_44.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_44/pfSense-pkg-layer7-1.8.11_44.pkg.sha256`
+- **SHA256 esperado:** `efa4f0d5f8e55cae319ecc27343c83604947e85f13062f1512c8f77d90789df2`
 
 > **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
 > sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.
