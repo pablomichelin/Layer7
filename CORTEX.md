@@ -34,10 +34,13 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 `2026-05-30`: build no builder FreeBSD (`192.168.100.12`), validado no
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
-**Ultima versao do pacote publicada em release:** `1.8.11_24` (referencia de
-instalacao em `docs/10-license-server/MANUAL-INSTALL.md` e GitHub Releases
-`pablomichelin/Layer7`, tag `v1.8.11_24`,
-`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`).
+**Ultima versao do pacote publicada em release (canal publico/updater):**
+`1.8.11_51` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_51`,
+`SHA256=9ef8e7f1006f093d6c1c37281c1231ca030f5be879d986055d1b300cc30b7f18`;
+comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
+**Referencia de producao enforce:** continua `1.8.11_24`
+(`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
+ate os gates G2–G7; candidatos posteriores sao canal de teste/lab.
 Caminho B E0–E3 sobre Caminho A (`1.8.11_23`); gate two-client appliance
 **PENDENTE**.
 
@@ -1124,7 +1127,7 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 | fase actual, gate ou sequencia aprovada | `CORTEX.md`, `docs/02-roadmap/roadmap.md`, `docs/02-roadmap/backlog.md`, `docs/02-roadmap/checklist-mestre.md` |
 | decisao arquitectural, de seguranca ou de distribuicao | `docs/03-adr/README.md`, ADR novo/actualizado, `CORTEX.md` |
 | cadeia de confianca, distribuicao, blacklists ou fallback seguro | `docs/01-architecture/f1-arquitetura-de-confianca.md`, `docs/02-roadmap/f1-plano-de-implementacao.md`, backlog, ADR index |
-| instalacao, upgrade, uninstall, rollback, caminhos, comandos ou versao publicada | `docs/10-license-server/MANUAL-INSTALL.md`, runbooks afectados, changelog, release docs |
+| instalacao, upgrade, uninstall, rollback, caminhos, comandos ou versao publicada | `docs/10-license-server/MANUAL-INSTALL.md` (addendum, Links da versao actual **e todos os comandos operacionais** — ver Nota de manutencao no manual e Regra especial no `AGENTS.md`), runbooks afectados, changelog, release docs |
 | mudanca funcional relevante | changelog, docs da area, `CORTEX.md`, backlog/status da fase |
 | reorganizacao estrutural | mapa de equivalencia, classificacao documental, roadmap/checklist da F6 |
 | release publicada | changelog, release notes, `MANUAL-INSTALL.md`, `CORTEX.md` |
@@ -1156,7 +1159,7 @@ CHECKPOINT CANONICO
 - Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_24)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_51; producao enforce de referencia: 1.8.11_24)
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canónica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canónica de gates: docs/02-roadmap/checklist-mestre.md

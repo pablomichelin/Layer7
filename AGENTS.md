@@ -225,13 +225,32 @@ como um unico bloco governado por checklist.
 | mudanca funcional | changelog, docs da area, `CORTEX.md`, backlog |
 | instalacao/upgrade/uninstall/rollback/caminhos/comandos | `docs/10-license-server/MANUAL-INSTALL.md`, runbooks afectados |
 | release publicada | changelog, release docs, `MANUAL-INSTALL.md`, `CORTEX.md` |
-| build candidato (novo PORTREVISION) | **obrigatório** publicar em `pablomichelin/Layer7` + `MANUAL-INSTALL.md` links |
+| build candidato (novo PORTREVISION) | **obrigatório** publicar em `pablomichelin/Layer7` + `MANUAL-INSTALL.md` (links **e comandos operacionais** — ver Regra especial) |
 | reorganizacao estrutural | classificacao documental, equivalencia documental, roadmap, checklist |
 
 **Regra especial:** `docs/10-license-server/MANUAL-INSTALL.md` deve ser
 sempre actualizado quando houver mudanca de versao publicada ou qualquer
 impacto em comandos, caminhos, procedimentos operacionais, instalacao,
 upgrade, reinstall, uninstall ou rollback do pacote.
+
+Actualizar o manual **nao e so** acrescentar o addendum e a seccao
+**Links da versao actual** — inclui obrigatoriamente **todos os comandos
+operacionais** que embutem versao/URL do pacote:
+
+1. **Comandos rapidos de teste** (fetch + sha256 esperado);
+2. seccao **1. Instalar** (nota "Nesta release" + comandos fetch/pkg add);
+3. seccao **4. Actualizar** (nota + comandos);
+4. seccao **5. Reinstalar** (comandos);
+5. seccao **6. Desinstalar** (nota "Nesta release") e **Apos desinstalar**
+   (comando de reinstalacao).
+
+Gate de verificacao antes do commit de release:
+`grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md` —
+fora dos addenda historicos e da referencia de producao (`_24` ate gates
+G2–G7, que e intencional), **nenhum** comando pode apontar para versao
+anterior a da release publicada. A checklist completa esta na
+**Nota de manutencao** no topo da seccao *Links da versao actual* do proprio
+manual.
 
 ---
 
