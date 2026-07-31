@@ -951,11 +951,11 @@ apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
 ### Apos desinstalar
 
 O pfSense volta ao funcionamento normal imediatamente.
-Para reinstalar a versao actual (`1.8.11_62`), usar o **comando unico manual**
+Para reinstalar a versao actual (`1.8.11_63`), usar o **comando unico manual**
 da seccao **1**:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_62.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_62/pfSense-pkg-layer7-1.8.11_62.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_62.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_63.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_63/pfSense-pkg-layer7-1.8.11_63.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_63.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 ---
