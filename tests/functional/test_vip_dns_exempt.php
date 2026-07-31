@@ -54,7 +54,7 @@ if (strpos($block, L7_VIP_DNS_MARKER_START) === false ||
     strpos($block, L7_VIP_DNS_MARKER_END) === false ||
     strpos($block, 'name: "' . L7_VIP_DNS_VIEW_NAME . '"') === false ||
     strpos($block, "access-control-view: 192.168.1.50/32") === false ||
-    strpos($block, "view-first") !== false) {
+    preg_match('/^\s*view-first\s*:/m', $block)) {
 	fwrite(STDERR, "FAIL: unbound view block malformed\n");
 	fwrite(STDERR, $block);
 	exit(1);
