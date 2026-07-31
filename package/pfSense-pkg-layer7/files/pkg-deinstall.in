@@ -76,6 +76,18 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 		/sbin/pfctl -t "layer7_pexc_${_i}" -T flush >/dev/null 2>&1 || true
 		_i=$((_i + 1))
 	done
+
+	_profiles_custom_bak="/tmp/layer7-profiles-custom.json.bak"
+	_keep_profiles_custom=0
+	if [ -f /var/run/layer7-uninstall-keep-config ]; then
+		_keep_profiles_custom=1
+	elif [ "${PKG_UPGRADE:-}" = "YES" ] || [ "${PKG_UPGRADE:-}" = "yes" ]; then
+		_keep_profiles_custom=1
+	fi
+	if [ -f /usr/local/etc/layer7/profiles-custom.json ]; then
+		/bin/cp -f /usr/local/etc/layer7/profiles-custom.json "${_profiles_custom_bak}" 2>/dev/null || true
+	fi
+
 	# Ficheiros de configuracao nao listados no plist (ou gerados em runtime)
 	if [ -f /var/run/layer7-uninstall-keep-config ]; then
 		/bin/rm -f /var/run/layer7-uninstall-keep-config
@@ -87,6 +99,16 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 	fi
 	# Cache blacklists, relatorios, estado — alinhado a scripts/release/uninstall.sh
 	/bin/rm -rf /usr/local/etc/layer7 >/dev/null 2>&1 || true
+
+	if [ "${_keep_profiles_custom}" -eq 1 ] && [ -f "${_profiles_custom_bak}" ]; then
+		/bin/mkdir -p /usr/local/etc/layer7
+		/bin/mv -f "${_profiles_custom_bak}" /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
+		chown www:wheel /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
+		chmod 0664 /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
+	elif [ -f "${_profiles_custom_bak}" ]; then
+		/bin/rm -f "${_profiles_custom_bak}" >/dev/null 2>&1 || true
+	fi
+
 	/bin/rm -f /usr/local/etc/layer7-protos.txt >/dev/null 2>&1 || true
 	/bin/rm -f /var/log/layer7d.log /var/log/layer7-events.log \
 		/var/log/layer7-bl-update.log >/dev/null 2>&1 || true

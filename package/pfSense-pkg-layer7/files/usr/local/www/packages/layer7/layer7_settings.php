@@ -22,12 +22,14 @@ if ($_POST["export_config"] ?? false) {
 	$export = isset($data["layer7"]) ? $data["layer7"] : array();
 	unset($export["protos_file"]);
 	$bl_export = layer7_bl_config_load();
+	$profiles_custom_export = layer7_profiles_custom_load();
 	$payload = array(
 		"layer7_backup" => true,
 		"version" => layer7_daemon_version(),
 		"timestamp" => date("c"),
 		"layer7" => $export,
-		"blacklists" => $bl_export
+		"blacklists" => $bl_export,
+		"profiles_custom" => $profiles_custom_export
 	);
 	$json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	header("Content-Type: application/json");
@@ -71,11 +73,15 @@ if ($_POST["import_config"] ?? false) {
 					if (!isset($data["layer7"]["exceptions"]) || !is_array($data["layer7"]["exceptions"])) {
 						$data["layer7"]["exceptions"] = array();
 					}
-						$save_ok = layer7_save_json($data);
-						if ($save_ok && isset($imported["blacklists"]) && is_array($imported["blacklists"])) {
-							$save_ok = layer7_bl_config_save($imported["blacklists"]) &&
-								layer7_bl_sync_custom_category_files($imported["blacklists"]);
-						}
+					$save_ok = layer7_save_json($data);
+					if ($save_ok && isset($imported["blacklists"]) && is_array($imported["blacklists"])) {
+						$save_ok = layer7_bl_config_save($imported["blacklists"]) &&
+							layer7_bl_sync_custom_category_files($imported["blacklists"]);
+					}
+					if ($save_ok && isset($imported["profiles_custom"]) &&
+					    is_array($imported["profiles_custom"])) {
+						$save_ok = layer7_profiles_custom_save($imported["profiles_custom"]);
+					}
 					if ($save_ok) {
 						layer7_signal_reload();
 						if (function_exists("filter_configure")) {

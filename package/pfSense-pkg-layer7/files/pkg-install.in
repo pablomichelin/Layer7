@@ -34,6 +34,20 @@ if [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ]; then
 	" >/dev/null 2>&1 || true
 fi
 
+if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7/profiles-custom.json" ]; then
+	_profiles_bak="/tmp/layer7-profiles-custom.json.bak"
+	if [ -f "${_profiles_bak}" ]; then
+		/bin/mkdir -p "${PKG_ROOTDIR}/usr/local/etc/layer7"
+		/bin/mv -f "${_profiles_bak}" "${PKG_ROOTDIR}/usr/local/etc/layer7/profiles-custom.json" 2>/dev/null || true
+	else
+		/bin/mkdir -p "${PKG_ROOTDIR}/usr/local/etc/layer7"
+		printf '%s\n' '{"version":1,"overrides":{},"custom_profiles":[]}' \
+			> "${PKG_ROOTDIR}/usr/local/etc/layer7/profiles-custom.json"
+	fi
+	chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7/profiles-custom.json" 2>/dev/null || true
+	chmod 0664 "${PKG_ROOTDIR}/usr/local/etc/layer7/profiles-custom.json" 2>/dev/null || true
+fi
+
 /bin/mkdir -p "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists" \
 	"${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists/_custom"
 chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists" \

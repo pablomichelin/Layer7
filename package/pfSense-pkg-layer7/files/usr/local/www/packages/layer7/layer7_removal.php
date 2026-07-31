@@ -109,7 +109,7 @@ layer7_render_styles();
 					<div class="checkbox">
 						<label>
 							<input type="checkbox" name="keep_config" value="1" />
-							<?= l7_t("Manter layer7.json e layer7.lic (remove cache blacklists em /usr/local/etc/layer7/)"); ?>
+							<?= l7_t("Manter layer7.json, layer7.lic e profiles-custom.json (remove cache blacklists em /usr/local/etc/layer7/)"); ?>
 						</label>
 					</div>
 					<p class="help-block"><?= l7_t("Se marcar ambos, prevalece \"manter configuracao\" (ambos os ficheiros)."); ?></p>

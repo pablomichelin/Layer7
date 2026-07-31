@@ -2846,6 +2846,28 @@ function layer7_parse_host_textarea($text, $max = 16)
 	return array_values(array_unique($out));
 }
 
+function layer7_profile_parse_hosts_textarea($text, $max = 64)
+{
+	$out = array();
+	$lines = preg_split("/[\r\n,]+/", trim((string)$text));
+	foreach ($lines as $line) {
+		$line = strtolower(trim($line));
+		if ($line === "" || $line[0] === "#") {
+			continue;
+		}
+		if ($line[0] === ".") {
+			$line = substr($line, 1);
+		}
+		if (!layer7_profile_host_valid($line)) {
+			return null;
+		}
+		if (count($out) < $max) {
+			$out[] = $line;
+		}
+	}
+	return array_values(array_unique($out));
+}
+
 function layer7_stats_path()
 {
 	return "/tmp/layer7-stats.json";
@@ -2884,14 +2906,61 @@ function layer7_read_stats()
 
 function layer7_profiles_path()
 {
+	$test = getenv("LAYER7_PROFILES_TEST_DIR");
+	if (is_string($test) && $test !== "") {
+		return rtrim($test, "/") . "/profiles.json";
+	}
 	return "/usr/local/etc/layer7/profiles.json";
 }
 
+function layer7_profiles_custom_path()
+{
+	$test = getenv("LAYER7_PROFILES_TEST_DIR");
+	if (is_string($test) && $test !== "") {
+		return rtrim($test, "/") . "/profiles-custom.json";
+	}
+	return "/usr/local/etc/layer7/profiles-custom.json";
+}
+
+/** @return array skeleton profiles-custom.json */
+function layer7_profiles_custom_defaults()
+{
+	return array(
+		"version" => 1,
+		"overrides" => array(),
+		"custom_profiles" => array(),
+	);
+}
+
+function layer7_profile_id_valid($id)
+{
+	return is_string($id) && preg_match("/^[a-z0-9-]{1,64}$/", $id) === 1;
+}
+
+function layer7_profile_custom_id_valid($id)
+{
+	return is_string($id) && preg_match("/^c-[a-z0-9-]{1,62}$/", $id) === 1;
+}
+
+function layer7_profile_host_valid($host)
+{
+	return is_string($host) && preg_match(
+	    "/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$/i",
+	    $host
+	) === 1;
+}
+
+function layer7_profile_icon_valid($icon)
+{
+	return is_string($icon) && ($icon === "" ||
+	    preg_match("/^fa-[a-z0-9-]{1,40}$/", $icon) === 1);
+}
+
 /**
- * Load service profiles from profiles.json.
- * @return array of profile arrays, empty array on failure
+ * Load factory catalog only (profiles.json shipped with package).
+ * @return array
  */
-function layer7_load_profiles()
+function layer7_profiles_factory_load()
 {
 	$path = layer7_profiles_path();
 	if (!file_exists($path)) {
@@ -2906,6 +2975,472 @@ function layer7_load_profiles()
 		return array();
 	}
 	return $j["profiles"];
+}
+
+/**
+ * Apps/categories known from factory profiles (selection catalog for custom/override).
+ * @return array{apps: string[], categories: string[], apps_set: array, cats_set: array}
+ */
+function layer7_profiles_catalog()
+{
+	static $cache = null;
+	if ($cache !== null) {
+		return $cache;
+	}
+	$apps = array();
+	$cats = array();
+	foreach (layer7_profiles_factory_load() as $p) {
+		if (!is_array($p)) {
+			continue;
+		}
+		if (isset($p["ndpi_apps"]) && is_array($p["ndpi_apps"])) {
+			foreach ($p["ndpi_apps"] as $a) {
+				$a = trim((string)$a);
+				if ($a !== "") {
+					$apps[$a] = true;
+				}
+			}
+		}
+		if (isset($p["ndpi_categories"]) && is_array($p["ndpi_categories"])) {
+			foreach ($p["ndpi_categories"] as $c) {
+				$c = trim((string)$c);
+				if ($c !== "") {
+					$cats[$c] = true;
+				}
+			}
+		}
+	}
+	$app_list = array_keys($apps);
+	$cat_list = array_keys($cats);
+	sort($app_list);
+	sort($cat_list);
+	$cache = array(
+		"apps" => $app_list,
+		"categories" => $cat_list,
+		"apps_set" => $apps,
+		"cats_set" => $cats,
+	);
+	return $cache;
+}
+
+/**
+ * Load and validate profiles-custom.json (overlay; never in pkg-plist).
+ * @return array
+ */
+function layer7_profiles_custom_load()
+{
+	$path = layer7_profiles_custom_path();
+	if (!file_exists($path)) {
+		return layer7_profiles_custom_defaults();
+	}
+	$raw = @file_get_contents($path);
+	if (!is_string($raw) || $raw === "") {
+		return layer7_profiles_custom_defaults();
+	}
+	$j = json_decode($raw, true);
+	if (!is_array($j)) {
+		return layer7_profiles_custom_defaults();
+	}
+	$defaults = layer7_profiles_custom_defaults();
+	$out = $defaults;
+	if (isset($j["version"]) && is_int($j["version"])) {
+		$out["version"] = $j["version"];
+	}
+	if (isset($j["overrides"]) && is_array($j["overrides"])) {
+		$out["overrides"] = $j["overrides"];
+	}
+	if (isset($j["custom_profiles"]) && is_array($j["custom_profiles"])) {
+		$out["custom_profiles"] = $j["custom_profiles"];
+	}
+	return $out;
+}
+
+/**
+ * Persist profiles-custom.json (atomic write, www:wheel).
+ * @param array $data
+ * @return bool
+ */
+function layer7_profiles_custom_save($data)
+{
+	global $input_errors;
+
+	if (!is_array($data)) {
+		return false;
+	}
+	$dir = dirname(layer7_profiles_custom_path());
+	if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+		if (isset($input_errors)) {
+			$input_errors[] = l7_t("Nao foi possivel criar ") . $dir;
+		}
+		return false;
+	}
+	@chown($dir, "www");
+	@chgrp($dir, "wheel");
+	@chmod($dir, 0775);
+
+	$payload = layer7_profiles_custom_defaults();
+	$payload["version"] = 1;
+	if (isset($data["overrides"]) && is_array($data["overrides"])) {
+		$payload["overrides"] = $data["overrides"];
+	}
+	if (isset($data["custom_profiles"]) && is_array($data["custom_profiles"])) {
+		$payload["custom_profiles"] = $data["custom_profiles"];
+	}
+
+	$json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	if (!is_string($json)) {
+		if (isset($input_errors)) {
+			$input_errors[] = l7_t("Erro ao serializar perfis personalizados.");
+		}
+		return false;
+	}
+	$path = layer7_profiles_custom_path();
+	if (@file_put_contents($path, $json . "\n", LOCK_EX) === false) {
+		if (isset($input_errors)) {
+			$input_errors[] = l7_t("Nao foi possivel gravar ") . $path;
+		}
+		return false;
+	}
+	@chown($path, "www");
+	@chgrp($path, "wheel");
+	@chmod($path, 0664);
+	return true;
+}
+
+/**
+ * Sanitize string list from POST (trim, dedupe, max items).
+ * @param mixed $raw
+ * @param int $max
+ * @return string[]
+ */
+function layer7_profile_sanitize_string_list($raw, $max)
+{
+	if (!is_array($raw)) {
+		return array();
+	}
+	$out = array();
+	foreach ($raw as $v) {
+		$v = trim((string)$v);
+		if ($v === "") {
+			continue;
+		}
+		$out[$v] = true;
+		if (count($out) >= $max) {
+			break;
+		}
+	}
+	return array_keys($out);
+}
+
+/**
+ * Validate merged profile limits (64 apps / 8 cats / 64 hosts).
+ * @param array $profile
+ * @return string|null error message or null if OK
+ */
+function layer7_profile_validate_limits($profile)
+{
+	if (!is_array($profile)) {
+		return l7_t("Perfil invalido.");
+	}
+	$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]))
+	    ? $profile["ndpi_apps"] : array();
+	$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]))
+	    ? $profile["ndpi_categories"] : array();
+	$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"])) ? $profile["hosts"] : array();
+	if (count($apps) > 64) {
+		return l7_t("Limite de 64 apps por perfil.");
+	}
+	if (count($cats) > 8) {
+		return l7_t("Limite de 8 categorias por perfil.");
+	}
+	if (count($hosts) > 64) {
+		return l7_t("Limite de 64 hosts por perfil.");
+	}
+	return null;
+}
+
+/**
+ * Apply factory override onto a catalog profile.
+ * @param array $profile factory profile
+ * @param array $override hosts/apps add/remove, hidden
+ * @param array|null $catalog from layer7_profiles_catalog()
+ * @return array|null merged profile or null on failure
+ */
+function layer7_profile_apply_override($profile, $override, $catalog = null)
+{
+	if (!is_array($profile) || !is_array($override)) {
+		return $profile;
+	}
+	if ($catalog === null) {
+		$catalog = layer7_profiles_catalog();
+	}
+	$apps_set = isset($catalog["apps_set"]) ? $catalog["apps_set"] : array();
+	$cats_set = isset($catalog["cats_set"]) ? $catalog["cats_set"] : array();
+
+	$base_apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]))
+	    ? $profile["ndpi_apps"] : array();
+	$remove_apps = layer7_profile_sanitize_string_list($override["apps_remove"] ?? array(), 64);
+	$add_apps = layer7_profile_sanitize_string_list($override["apps_add"] ?? array(), 64);
+	$apps = array();
+	foreach ($base_apps as $a) {
+		$a = trim((string)$a);
+		if ($a === "" || in_array($a, $remove_apps, true)) {
+			continue;
+		}
+		if (!empty($apps_set) && !isset($apps_set[$a])) {
+			continue;
+		}
+		$apps[$a] = true;
+	}
+	foreach ($add_apps as $a) {
+		if (!empty($apps_set) && !isset($apps_set[$a])) {
+			continue;
+		}
+		$apps[$a] = true;
+	}
+
+	$base_hosts = (isset($profile["hosts"]) && is_array($profile["hosts"]))
+	    ? $profile["hosts"] : array();
+	$remove_hosts = layer7_profile_sanitize_string_list($override["hosts_remove"] ?? array(), 64);
+	$add_hosts = layer7_profile_sanitize_string_list($override["hosts_add"] ?? array(), 64);
+	$hosts = array();
+	foreach ($base_hosts as $h) {
+		$h = strtolower(trim((string)$h));
+		if ($h === "" || in_array($h, $remove_hosts, true)) {
+			continue;
+		}
+		if (!layer7_profile_host_valid($h)) {
+			continue;
+		}
+		$hosts[$h] = true;
+	}
+	foreach ($add_hosts as $h) {
+		$h = strtolower(trim((string)$h));
+		if (!layer7_profile_host_valid($h)) {
+			continue;
+		}
+		$hosts[$h] = true;
+	}
+
+	$merged = $profile;
+	$merged["ndpi_apps"] = array_values(array_keys($apps));
+	$merged["hosts"] = array_values(array_keys($hosts));
+	$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]))
+	    ? $profile["ndpi_categories"] : array();
+	$clean_cats = array();
+	foreach ($cats as $c) {
+		$c = trim((string)$c);
+		if ($c === "") {
+			continue;
+		}
+		if (!empty($cats_set) && !isset($cats_set[$c])) {
+			continue;
+		}
+		$clean_cats[$c] = true;
+	}
+	$merged["ndpi_categories"] = array_values(array_keys($clean_cats));
+
+	if (layer7_profile_validate_limits($merged) !== null) {
+		return null;
+	}
+	return $merged;
+}
+
+/**
+ * Compute override diff from factory baseline vs desired merged state.
+ * @return array|null override array or null if no changes
+ */
+function layer7_profile_compute_override($factory, $desired_apps, $desired_hosts, $hidden)
+{
+	if (!is_array($factory)) {
+		return null;
+	}
+	$f_apps = (isset($factory["ndpi_apps"]) && is_array($factory["ndpi_apps"]))
+	    ? $factory["ndpi_apps"] : array();
+	$f_hosts = (isset($factory["hosts"]) && is_array($factory["hosts"]))
+	    ? array_map("strtolower", $factory["hosts"]) : array();
+	$desired_apps = layer7_profile_sanitize_string_list($desired_apps, 64);
+	$desired_hosts_clean = array();
+	foreach (layer7_profile_sanitize_string_list($desired_hosts, 64) as $h) {
+		$h = strtolower(trim((string)$h));
+		if (!layer7_profile_host_valid($h)) {
+			return false;
+		}
+		$desired_hosts_clean[$h] = true;
+	}
+	$desired_hosts = array_keys($desired_hosts_clean);
+
+	$apps_add = array_values(array_diff($desired_apps, $f_apps));
+	$apps_remove = array_values(array_diff($f_apps, $desired_apps));
+	$hosts_add = array_values(array_diff($desired_hosts, $f_hosts));
+	$hosts_remove = array_values(array_diff($f_hosts, $desired_hosts));
+
+	if (empty($apps_add) && empty($apps_remove) && empty($hosts_add) &&
+	    empty($hosts_remove) && !$hidden) {
+		return null;
+	}
+	return array(
+		"apps_add" => $apps_add,
+		"apps_remove" => $apps_remove,
+		"hosts_add" => $hosts_add,
+		"hosts_remove" => $hosts_remove,
+		"hidden" => (bool)$hidden,
+	);
+}
+
+/**
+ * Whether a factory profile has a non-empty override entry.
+ */
+function layer7_profile_has_override($profile_id, $custom = null)
+{
+	if (!layer7_profile_id_valid($profile_id)) {
+		return false;
+	}
+	if ($custom === null) {
+		$custom = layer7_profiles_custom_load();
+	}
+	if (!isset($custom["overrides"][$profile_id]) ||
+	    !is_array($custom["overrides"][$profile_id])) {
+		return false;
+	}
+	$ov = $custom["overrides"][$profile_id];
+	foreach (array("apps_add", "apps_remove", "hosts_add", "hosts_remove") as $k) {
+		if (!empty($ov[$k]) && is_array($ov[$k])) {
+			return true;
+		}
+	}
+	return !empty($ov["hidden"]);
+}
+
+/**
+ * Find merged profile by id (factory + overlay).
+ */
+function layer7_profile_get_by_id($profile_id)
+{
+	foreach (layer7_load_profiles(true) as $p) {
+		if (($p["id"] ?? "") === $profile_id) {
+			return $p;
+		}
+	}
+	return null;
+}
+
+/**
+ * Regenerate policy snapshot match from merged profile (keeps scope/VIP fields).
+ * @return bool true if a connected policy was updated
+ */
+function layer7_profile_reconnect_policy(&$data, $profile)
+{
+	if (!is_array($profile) || !is_array($data)) {
+		return false;
+	}
+	$profile_id = (string)($profile["id"] ?? "");
+	if ($profile_id === "") {
+		return false;
+	}
+	$pid = "profile-" . $profile_id;
+	if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
+		return false;
+	}
+	$updated = false;
+	foreach ($data["layer7"]["policies"] as &$pol) {
+		if (($pol["id"] ?? "") !== $pid) {
+			continue;
+		}
+		if (!isset($pol["match"]) || !is_array($pol["match"])) {
+			$pol["match"] = array();
+		}
+		$keep = array();
+		foreach (array("src_cidrs", "groups", "src_exclude_cidrs", "src_exclude_groups",
+		    "src_hosts") as $mk) {
+			if (isset($pol["match"][$mk])) {
+				$keep[$mk] = $pol["match"][$mk];
+			}
+		}
+		$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]))
+		    ? $profile["ndpi_apps"] : array();
+		$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"]))
+		    ? $profile["hosts"] : array();
+		$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]))
+		    ? $profile["ndpi_categories"] : array();
+		$pol["match"] = $keep;
+		if (!empty($apps)) {
+			$pol["match"]["ndpi_app"] = array_slice($apps, 0, 64);
+		}
+		if (!empty($cats)) {
+			$pol["match"]["ndpi_category"] = array_slice($cats, 0, 8);
+		}
+		if (!empty($hosts)) {
+			$pol["match"]["hosts"] = array_slice($hosts, 0, 64);
+		}
+		if (isset($profile["name"]) && is_string($profile["name"]) &&
+		    trim($profile["name"]) !== "") {
+			$pol["name"] = trim($profile["name"]);
+		}
+		$updated = true;
+		break;
+	}
+	unset($pol);
+	return $updated;
+}
+
+/**
+ * Load service profiles: factory → overrides → custom_profiles.
+ * @param bool $include_hidden include profiles marked hidden (GUI uses false)
+ * @return array of profile arrays
+ */
+function layer7_load_profiles($include_hidden = false)
+{
+	$factory = layer7_profiles_factory_load();
+	$custom = layer7_profiles_custom_load();
+	$overrides = (isset($custom["overrides"]) && is_array($custom["overrides"]))
+	    ? $custom["overrides"] : array();
+	$catalog = layer7_profiles_catalog();
+	$result = array();
+	$seen = array();
+
+	foreach ($factory as $p) {
+		if (!is_array($p)) {
+			continue;
+		}
+		$id = (string)($p["id"] ?? "");
+		if ($id === "" || !layer7_profile_id_valid($id)) {
+			continue;
+		}
+		$ov = (isset($overrides[$id]) && is_array($overrides[$id])) ? $overrides[$id] : array();
+		if (!empty($ov["hidden"]) && !$include_hidden) {
+			continue;
+		}
+		$merged = layer7_profile_apply_override($p, $ov, $catalog);
+		if ($merged === null) {
+			$merged = $p;
+		}
+		$result[] = $merged;
+		$seen[$id] = true;
+	}
+
+	$custom_list = (isset($custom["custom_profiles"]) && is_array($custom["custom_profiles"]))
+	    ? $custom["custom_profiles"] : array();
+	foreach ($custom_list as $cp) {
+		if (!is_array($cp)) {
+			continue;
+		}
+		$id = (string)($cp["id"] ?? "");
+		if ($id === "" || !layer7_profile_custom_id_valid($id) || isset($seen[$id])) {
+			continue;
+		}
+		if (!empty($cp["hidden"]) && !$include_hidden) {
+			continue;
+		}
+		if (layer7_profile_validate_limits($cp) !== null) {
+			continue;
+		}
+		$cp["group"] = "Personalizados";
+		$result[] = $cp;
+		$seen[$id] = true;
+	}
+
+	return $result;
 }
 
 /**

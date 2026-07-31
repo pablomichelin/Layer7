@@ -130,4 +130,14 @@ if (!empty($valid_protos)) {
 ' || { fail "validacao detalhada profiles.json"; exit 1; }
 
 pass "profiles.json estrutura, limites e nDPI"
+
+# BG-070 — merge profiles-custom.json (overlay)
+if [ -f "$ROOT/tests/functional/test_profiles_custom_merge.php" ]; then
+	if "$PHP_BIN" "$ROOT/tests/functional/test_profiles_custom_merge.php"; then
+		pass "profiles-custom merge overlay"
+	else
+		fail "profiles-custom merge overlay"
+	fi
+fi
+
 exit "$RC"
