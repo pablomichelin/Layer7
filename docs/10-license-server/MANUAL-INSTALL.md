@@ -249,6 +249,20 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.8.11_54` (correccao visual grelha Perfis rapidos, `2026-07-31`):**
+correccao apenas de GUI (BG-069): cabecalhos de grupo passam a seccoes
+full-width proprias (antes flutuavam inline por `grid-column` num container
+flex), todos os 72 perfis mostram icone FontAwesome 4.7 do `profiles.json`
+com cor de marca/grupo (antes 55 caiam num fallback de letra) e os cartoes
+tem altura uniforme com descricao truncada. `ai-tools` troca `fa-robot`
+(inexistente no FA 4.7) por `fa-magic`. Sem mudanca funcional: toggle,
+modal Opcoes, hits e VIP isentos intactos; daemon inalterado. Instalar,
+actualizar, reinstalar e desinstalar seguem os comandos desta versao nas
+seccoes operacionais. Rollback: reinstalar `1.8.11_53`.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_54`
+- **SHA256 esperado:** `36317498e5d2671a2c0a1d42825169a5b7f709e6fa89e27a3660acf8672e87f4`
+
 **Addendum da release `1.8.11_53` (expansao Perfis rapidos Bloco 2, `2026-07-31`):**
 Expansao `profiles.json` de 38 para **72 perfis** com grupos novos (Comunicacao e
 reunioes, Presets), videoconferencia, redes alternativas, anonymizers, presets
@@ -467,12 +481,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > A referencia de **producao enforce** (`_24` ate gates G2–G7) e intencional
 > e nao acompanha o canal publico.
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_53`
+**Versao mais recente no canal publico (updater / download):** `1.8.11_54`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_53`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg.sha256`
-- **SHA256 esperado:** `3ea425b8f8e9564c52eb8e30190a9c77b7772d2b319dd2da8280753a76384bbe`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_54`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg.sha256`
+- **SHA256 esperado:** `36317498e5d2671a2c0a1d42825169a5b7f709e6fa89e27a3660acf8672e87f4`
 
 > **Candidato interno** — Gate B1 pendente. **Nao** activar enforce em producao
 > sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.
@@ -511,20 +525,20 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 **Comandos rapidos de teste:**
 
-Baixar o `.pkg` directo da versao `1.8.11_53`:
+Baixar o `.pkg` directo da versao `1.8.11_54`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg
 ```
 
 Validar checksum:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg.sha256 https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg.sha256 && sha256 -q /tmp/pfSense-pkg-layer7-1.8.11_53.pkg | tee /tmp/l7-actual.sha256 && cat /tmp/pfSense-pkg-layer7-1.8.11_53.pkg.sha256
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg.sha256 https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg.sha256 && sha256 -q /tmp/pfSense-pkg-layer7-1.8.11_54.pkg | tee /tmp/l7-actual.sha256 && cat /tmp/pfSense-pkg-layer7-1.8.11_54.pkg.sha256
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`9ef8e7f1006f093d6c1c37281c1231ca030f5be879d986055d1b300cc30b7f18`.
+`36317498e5d2671a2c0a1d42825169a5b7f709e6fa89e27a3660acf8672e87f4`.
 
 ---
 
@@ -552,7 +566,7 @@ Cada seccao abaixo inclui:
 
 ## 1. Instalar (primeira vez)
 
-> **Nesta release (`1.8.11_53`)** o caminho oficial e o **comando unico manual**
+> **Nesta release (`1.8.11_54`)** o caminho oficial e o **comando unico manual**
 > abaixo. O `install.sh` automatico (carimbado/assinado F1.2) nao e publicado
 > nesta release: ver nota em **Links da versao actual** e **BG-028** no
 > backlog. Para producao com enforce, a referencia continua `1.8.11_24`
@@ -561,17 +575,17 @@ Cada seccao abaixo inclui:
 **Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_54.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_54.pkg
 ```
 
 ```sh
@@ -648,14 +662,14 @@ layer7d --license-status
 
 ## 4. Actualizar (upgrade)
 
-> **Nesta release (`1.8.11_53`)** o caminho oficial e o **comando unico manual**
+> **Nesta release (`1.8.11_54`)** o caminho oficial e o **comando unico manual**
 > abaixo (sem `install.sh`). Ver nota em **Links da versao actual** e
 > **BG-028**.
 
 **Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_54.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -665,11 +679,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_54.pkg
 ```
 
 ```sh
@@ -702,7 +716,7 @@ pfctl -sr | grep -i layer7
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_54.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -716,11 +730,11 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_54.pkg
 ```
 
 ```sh
@@ -735,7 +749,7 @@ service layer7d onestart
 
 ## 6. Desinstalar
 
-> **Nesta release (`1.8.11_53`)** o `uninstall.sh` automatico nao e publicado
+> **Nesta release (`1.8.11_54`)** o `uninstall.sh` automatico nao e publicado
 > como asset (depende do trust chain F1.2 — ver **BG-028**). Use a
 > **desinstalacao manual** abaixo, que executa as mesmas etapas: stop do
 > servico, `pkg delete`, limpeza de ficheiros residuais, flush das tabelas PF
@@ -840,11 +854,11 @@ apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
 ### Apos desinstalar
 
 O pfSense volta ao funcionamento normal imediatamente.
-Para reinstalar a versao actual (`1.8.11_53`), usar o **comando unico manual**
+Para reinstalar a versao actual (`1.8.11_54`), usar o **comando unico manual**
 da seccao **1**:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_54.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_54/pfSense-pkg-layer7-1.8.11_54.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_54.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 ---
@@ -1223,12 +1237,12 @@ release — ver nota em **Links da versao actual** e **BG-028**):
 service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
-Para reinstalar uma versao anterior conhecida (ex.: `1.8.11_52`, a versao
+Para reinstalar uma versao anterior conhecida (ex.: `1.8.11_53`, a versao
 imediatamente anterior no canal publico; para producao enforce a referencia
 e `1.8.11_24`):
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_52.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_52/pfSense-pkg-layer7-1.8.11_52.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_52.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_53.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_53/pfSense-pkg-layer7-1.8.11_53.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_53.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 A configuracao (`/usr/local/etc/layer7.json`, `/usr/local/etc/layer7.lic`) e

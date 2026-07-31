@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_53` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_53`,
-`SHA256=3ea425b8f8e9564c52eb8e30190a9c77b7772d2b319dd2da8280753a76384bbe`;
+`1.8.11_54` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_54`,
+`SHA256=36317498e5d2671a2c0a1d42825169a5b7f709e6fa89e27a3660acf8672e87f4`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** continua `1.8.11_24`
 (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
@@ -205,6 +205,28 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Candidato `1.8.11_54` — correcção visual grelha Perfis rápidos (BG-069)
+
+Correcção só de GUI sobre o catálogo de 72 perfis do `_53`. Três defeitos
+visuais corrigidos em `layer7_policies.php`: cabeçalhos de grupo "flutuavam"
+inline no meio dos cartões (usavam `grid-column:1/-1` dentro de um container
+`display:flex` — propriedade de CSS grid ignorada em flex); 55 dos 72 perfis
+mostravam letra em quadrado cinzento porque a GUI ignorava o campo `icon` do
+`profiles.json` e usava um mapa SVG hardcoded de 17 ids; cartões com alturas
+irregulares. Agora cada grupo é secção própria (cabeçalho full-width com
+contador + grelha), todos os cartões renderizam o ícone FontAwesome 4.7 do
+`profiles.json` (cor por marca ~55 ids ou por grupo) e têm altura uniforme
+(descrição truncada a 3 linhas, botões ancorados ao fundo). `profiles.json`:
+`ai-tools` troca `fa-robot` (só FA5) por `fa-magic` — único ícone fora do
+FA 4.7. Fixture `tests/fixtures/fa47-icon-names.txt` (782 nomes oficiais) e
+validação no `test_profiles_json.sh`. Zero mudança funcional (toggle, modal
+Opções, hits, VIP isentos intactos); daemon inalterado. Suite local/builder e
+`php -l` PASS; pacote extraído validado. Artefacto
+`pfSense-pkg-layer7-1.8.11_54.pkg`,
+`SHA256=36317498e5d2671a2c0a1d42825169a5b7f709e6fa89e27a3660acf8672e87f4`.
+Release publicada `v1.8.11_54`. Gate appliance pendente;
+produção enforce continua `_24`.
 
 ### Candidato `1.8.11_53` — expansão catálogo Perfis rápidos Bloco 2 (BG-068)
 
@@ -498,10 +520,10 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_53` (`PORTVERSION=1.8.11`, `PORTREVISION=53`),
-publicada no canal de teste/lab (`v1.8.11_53`). A referencia de producao
++ `PORTREVISION`):** `1.8.11_54` (`PORTVERSION=1.8.11`, `PORTREVISION=54`),
+publicada no canal de teste/lab (`v1.8.11_54`). A referencia de producao
 enforce permanece `v1.8.11_24`; gate two-client pendente.
-**Data-base deste checkpoint:** `2026-07-30`
+**Data-base deste checkpoint:** `2026-07-31`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
 GUI integrada, classificacao Layer 7 via nDPI, politicas granulares,
@@ -1181,15 +1203,15 @@ CHECKPOINT CANONICO
   (G2-G4: ABI FB16, pfctl -nf ruleset completo, captura/metricas); G5 two-client
   (validacao-lab sec. 12) so apos G2-G4 PASS; nenhuma correcao de codigo ate
   causa-raiz comprovada no appliance
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 53 (publicado no canal
-  de teste/lab como v1.8.11_53; gate appliance pendente)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 54 (publicado no canal
+  de teste/lab como v1.8.11_54; gate appliance pendente)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
   corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
   EM VALIDACAO
 - Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_53; producao enforce de referencia: 1.8.11_24)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_54; producao enforce de referencia: 1.8.11_24)
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canónica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canónica de gates: docs/02-roadmap/checklist-mestre.md
