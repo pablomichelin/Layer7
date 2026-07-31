@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_56` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_56`;
-SHA256=TBD após build;
+`1.8.11_56` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_56`,
+`SHA256=8641c3c8dae6a46148c934f138f64be1121064ee676907955c60379699147357`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56`.
@@ -216,7 +216,10 @@ completo de BG-070 — faltavam GUI (`l7showProfileEditModal`), export/import
 `_56` entrega BG-070 integral mais: secção **Perfis ocultos** na GUI (reverter
 ocultar); fix `PKG_UPGRADE` em `pkg-deinstall.in` (`true` vs `YES`);
 validação FA 4.7 em `layer7_profile_icon_valid()`. **`_55` nao instalar.**
-Testes builder + validação artefacto (4 checks) PASS. Gate appliance pendente;
+Testes builder + validação artefacto (4 checks) PASS. Artefacto
+`pfSense-pkg-layer7-1.8.11_56.pkg`,
+`SHA256=8641c3c8dae6a46148c934f138f64be1121064ee676907955c60379699147357`.
+Release publicada `v1.8.11_56`. Gate appliance pendente;
 producao enforce continua `_24`.
 
 ### Candidato `1.8.11_55` — perfis editáveis e personalizados (BG-070) — **DEFEITUOSO**
