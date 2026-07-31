@@ -1,6 +1,6 @@
 <?php
 /*
- * BG-064 — excepcao VIP vip-isentos (modal Perfis rapidos).
+ * BG-064 / BG-071 — excepcao VIP vip-isentos e Lista VIP global.
  * Uso: php tests/functional/test_vip_exception.php
  */
 $root = dirname(__DIR__, 2);
@@ -71,6 +71,76 @@ $hosts2 = isset($vip2["hosts"]) && is_array($vip2["hosts"]) ? $vip2["hosts"] : a
 if (count($hosts2) !== 1 || $hosts2[0] !== "10.0.0.5") {
 	fwrite(STDERR, "FAIL: VIP update should replace hosts\n");
 	fwrite(STDERR, json_encode($hosts2));
+	exit(1);
+}
+
+/* BG-071: labels save/cleanup */
+$data["layer7"]["vip_meta"]["labels"] = array(
+	"10.0.0.5" => "Director",
+	"orphan" => "Stale"
+);
+layer7_vip_labels_cleanup($data, $hosts2, array());
+$labels = layer7_vip_get_labels($data);
+if (($labels["10.0.0.5"] ?? "") !== "Director") {
+	fwrite(STDERR, "FAIL: label for 10.0.0.5 missing\n");
+	exit(1);
+}
+if (isset($labels["orphan"])) {
+	fwrite(STDERR, "FAIL: orphan label not cleaned up\n");
+	exit(1);
+}
+
+/* BG-071: add entry with label */
+$res3 = layer7_vip_add_entry($data, "Financeiro", "192.168.2.10");
+if (!$res3["ok"]) {
+	fwrite(STDERR, "FAIL: add VIP entry failed: " . $res3["error"] . "\n");
+	exit(1);
+}
+$labels2 = layer7_vip_get_labels($data);
+if (($labels2["192.168.2.10"] ?? "") !== "Financeiro") {
+	fwrite(STDERR, "FAIL: label not saved on add\n");
+	exit(1);
+}
+
+/* BG-071: limit validation (8 hosts) */
+$bulk_hosts = array();
+for ($i = 1; $i <= LAYER7_VIP_MAX_HOSTS; $i++) {
+	$bulk_hosts[] = "10.1.0." . $i;
+}
+$err = layer7_vip_validate_limits($bulk_hosts, array());
+if ($err !== "") {
+	fwrite(STDERR, "FAIL: exactly 8 hosts should pass validation\n");
+	exit(1);
+}
+$bulk_hosts[] = "10.1.0.99";
+$err2 = layer7_vip_validate_limits($bulk_hosts, array());
+if ($err2 === "") {
+	fwrite(STDERR, "FAIL: 9 hosts should fail validation\n");
+	exit(1);
+}
+
+/* BG-071: export/import round-trip */
+$export = layer7_vip_export_payload($data);
+if (empty($export["layer7_vip_list"]) || !is_array($export["entries"])) {
+	fwrite(STDERR, "FAIL: export payload invalid\n");
+	exit(1);
+}
+
+$fresh = array("layer7" => array("enabled" => true, "exceptions" => array()));
+$imp = layer7_vip_import_apply($fresh, $export);
+if (!$imp["ok"]) {
+	fwrite(STDERR, "FAIL: import failed: " . $imp["error"] . "\n");
+	exit(1);
+}
+$imported_rows = layer7_vip_list_entries($fresh);
+if (count($imported_rows) < 2) {
+	fwrite(STDERR, "FAIL: import should restore entries\n");
+	fwrite(STDERR, json_encode($imported_rows));
+	exit(1);
+}
+$imp_labels = layer7_vip_get_labels($fresh);
+if (($imp_labels["192.168.2.10"] ?? "") !== "Financeiro") {
+	fwrite(STDERR, "FAIL: import lost label\n");
 	exit(1);
 }
 

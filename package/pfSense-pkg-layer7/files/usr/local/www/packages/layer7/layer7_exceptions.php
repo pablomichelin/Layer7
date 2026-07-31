@@ -11,6 +11,71 @@ require_once("/usr/local/pkg/layer7.inc");
 
 $layer7_exception_edit_retry = null;
 
+if ($_POST["export_vip_list"] ?? false) {
+	$data = layer7_load_or_default();
+	$payload = layer7_vip_export_payload($data);
+	$json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	header("Content-Type: application/json");
+	header("Content-Disposition: attachment; filename=\"layer7-vip-list-" . date("Ymd-His") . ".json\"");
+	echo $json;
+	exit;
+}
+
+if ($_POST["import_vip_list"] ?? false) {
+	if (!isset($_FILES["vip_import_file"]) ||
+	    $_FILES["vip_import_file"]["error"] !== UPLOAD_ERR_OK) {
+		$input_errors[] = l7_t("Nenhum ficheiro enviado ou erro no upload.");
+	} else {
+		$raw = @file_get_contents($_FILES["vip_import_file"]["tmp_name"]);
+		if (!is_string($raw) || $raw === "") {
+			$input_errors[] = l7_t("Ficheiro vazio.");
+		} else {
+			$imported = @json_decode($raw, true);
+			$data = layer7_load_or_default();
+			$res = layer7_vip_import_apply($data, $imported);
+			if (!$res["ok"]) {
+				$input_errors[] = $res["error"];
+			} elseif (layer7_save_json($data)) {
+				layer7_pf_config_resync(true);
+				$savemsg = l7_t("Lista VIP importada com sucesso.");
+			} else {
+				$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
+			}
+		}
+	}
+}
+
+if ($_POST["add_vip_entry"] ?? false) {
+	$data = layer7_load_or_default();
+	$res = layer7_vip_add_entry(
+		$data,
+		$_POST["vip_description"] ?? "",
+		$_POST["vip_target"] ?? ""
+	);
+	if (!$res["ok"]) {
+		$input_errors[] = $res["error"];
+	} elseif (layer7_save_json($data)) {
+		layer7_pf_config_resync(true);
+		$savemsg = l7_t("Isento adicionado a Lista VIP.");
+	} else {
+		$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
+	}
+}
+
+if ($_POST["remove_vip_entry"] ?? false) {
+	$data = layer7_load_or_default();
+	$target = trim((string)($_POST["vip_remove_target"] ?? ""));
+	$res = layer7_vip_remove_entry($data, $target);
+	if (!$res["ok"]) {
+		$input_errors[] = $res["error"];
+	} elseif (layer7_save_json($data)) {
+		layer7_pf_config_resync(true);
+		$savemsg = l7_t("Isento removido da Lista VIP.");
+	} else {
+		$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
+	}
+}
+
 if ($_POST["add_exception"] ?? false) {
 		$data = layer7_load_or_default();
 		if (!isset($data["layer7"]["exceptions"]) || !is_array($data["layer7"]["exceptions"])) {
@@ -205,6 +270,16 @@ $data = layer7_load_or_default();
 $exceptions = isset($data["layer7"]["exceptions"]) && is_array($data["layer7"]["exceptions"])
 	? $data["layer7"]["exceptions"] : array();
 $exc_limit = count($exceptions) >= 16;
+$vip_entries = layer7_vip_list_entries($data);
+$vip_groups = layer7_vip_source_groups($data);
+$vip_host_count = count(array_filter($vip_entries, function ($r) {
+	return ($r["kind"] ?? "") === "host";
+}));
+$vip_cidr_count = count(array_filter($vip_entries, function ($r) {
+	return ($r["kind"] ?? "") === "cidr";
+}));
+$vip_at_host_limit = $vip_host_count >= LAYER7_VIP_MAX_HOSTS;
+$vip_at_cidr_limit = $vip_cidr_count >= LAYER7_VIP_MAX_CIDRS;
 
 $edit_ex_idx = null;
 $edit_ex = null;
@@ -250,6 +325,104 @@ function layer7_exc_target_summary($exception) {
 		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
+
+			<div class="layer7-section" id="l7-vip-list">
+			<h3 class="layer7-section-title"><?= l7_t("Lista VIP (isencao total)"); ?></h3>
+			<p class="layer7-lead"><?= l7_t("Origens isentas de todos os bloqueios Layer7 (PF e daemon). Gere a excepcao canonica vip-isentos com descricao por entrada."); ?></p>
+			<div class="alert alert-warning">
+				<strong><?= l7_t("Aviso DNS"); ?>:</strong>
+				<?= l7_t("Isencao total de bloqueios Layer7; sinkhole DNS so coberto apos Bloco D (ADR-0020)."); ?>
+			</div>
+			<p class="help-block"><?= l7_t("Para dispositivos identificados por MAC, use Grupos com DHCP static mapping — IPs resolvidos podem ficar desactualizados se o lease mudar."); ?></p>
+			<?php if (!empty($vip_groups)) { ?>
+			<p class="help-block"><strong><?= l7_t("Grupos isentos (via Perfis rapidos)"); ?>:</strong>
+				<?= htmlspecialchars(implode(", ", $vip_groups)); ?>
+			</p>
+			<?php } ?>
+
+			<?php if (count($vip_entries) === 0) { ?>
+			<div class="alert alert-info"><?= l7_t("Nenhum isento directo na Lista VIP."); ?></div>
+			<?php } else { ?>
+			<div class="layer7-form-card">
+				<div class="table-responsive">
+					<table class="table table-striped table-hover">
+						<thead>
+							<tr>
+								<th><?= l7_t("Descricao"); ?></th>
+								<th><?= l7_t("IP/CIDR"); ?></th>
+								<th><?= l7_t("Acoes"); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php foreach ($vip_entries as $ventry) {
+							$vtarget = (string)($ventry["target"] ?? "");
+							$vdesc = (string)($ventry["description"] ?? "");
+						?>
+							<tr>
+								<td><?= htmlspecialchars($vdesc !== "" ? $vdesc : "—"); ?></td>
+								<td><code><?= htmlspecialchars($vtarget); ?></code></td>
+								<td class="layer7-table-actions">
+									<form method="post" action="layer7_exceptions.php#l7-vip-list" style="display:inline;"
+										onsubmit='return confirm(<?= json_encode(l7_t("Remover este isento da Lista VIP?")); ?>);'>
+										<input type="hidden" name="vip_remove_target" value="<?= htmlspecialchars($vtarget); ?>" />
+										<button type="submit" name="remove_vip_entry" value="1" class="btn btn-xs btn-danger"><?= l7_t("Remover"); ?></button>
+									</form>
+								</td>
+							</tr>
+						<?php } ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<?php } ?>
+
+			<p class="help-block small"><?= sprintf(l7_t("Limites actuais: %d IPs + %d CIDRs (daemon)."), LAYER7_VIP_MAX_HOSTS, LAYER7_VIP_MAX_CIDRS); ?></p>
+
+			<div class="layer7-form-card" style="margin-top:16px;">
+				<h4 class="layer7-section-title"><?= l7_t("Adicionar isento"); ?></h4>
+				<?php if ($vip_at_host_limit && $vip_at_cidr_limit) { ?>
+				<div class="alert alert-warning"><?= l7_t("Limites da Lista VIP atingidos."); ?></div>
+				<?php } else { ?>
+				<form method="post" action="layer7_exceptions.php#l7-vip-list" class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("Descricao"); ?></label>
+						<div class="col-sm-6">
+							<input type="text" name="vip_description" class="form-control" maxlength="64" required="required"
+								placeholder="<?= l7_t("ex.: Director"); ?>" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label"><?= l7_t("IP ou CIDR"); ?></label>
+						<div class="col-sm-6">
+							<input type="text" name="vip_target" class="form-control" required="required"
+								placeholder="192.168.1.50 / 192.168.10.0/24" />
+							<p class="help-block"><?= l7_t("Um IPv4 ou CIDR por entrada."); ?></p>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-9">
+							<button type="submit" name="add_vip_entry" value="1" class="btn btn-success"><?= l7_t("Adicionar isento"); ?></button>
+						</div>
+					</div>
+				</form>
+				<?php } ?>
+			</div>
+
+			<div class="layer7-toolbar" style="margin-top:16px;">
+				<form method="post" action="layer7_exceptions.php#l7-vip-list" style="display:inline;">
+					<button type="submit" name="export_vip_list" value="1" class="btn btn-sm btn-info">
+						<i class="fa fa-download"></i> <?= l7_t("Exportar Lista VIP"); ?>
+					</button>
+				</form>
+				<form method="post" action="layer7_exceptions.php#l7-vip-list" enctype="multipart/form-data" class="form-inline" style="display:inline; margin-left:8px;">
+					<input type="file" name="vip_import_file" accept=".json" style="display:inline-block; width:auto;" />
+					<button type="submit" name="import_vip_list" value="1" class="btn btn-sm btn-warning"
+						onclick="return confirm(<?= json_encode(l7_t("Importar substitui entradas directas da Lista VIP (grupos isentos sao limpos). Continuar?")); ?>);">
+						<i class="fa fa-upload"></i> <?= l7_t("Importar Lista VIP"); ?>
+					</button>
+				</form>
+			</div>
+			</div>
 
 			<p class="layer7-lead"><?= l7_t("Excecoes sao avaliadas antes das politicas e ajudam a preservar trafego de gestao, redes internas e casos especiais durante os testes."); ?></p>
 

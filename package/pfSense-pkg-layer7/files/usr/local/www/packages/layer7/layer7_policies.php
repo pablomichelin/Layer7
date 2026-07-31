@@ -1386,6 +1386,12 @@ function layer7_policy_match_summary($policy) {
 						<label class="col-sm-4 control-label"><?= l7_t("Isentos (nunca bloqueados)"); ?></label>
 						<div class="col-sm-8">
 							<p class="help-block"><?= l7_t("Isencao global: estes IPs/dispositivos nunca sao bloqueados por nenhum perfil Layer7. Gere a excepcao partilhada vip-isentos."); ?></p>
+							<p class="help-block">
+								<a href="layer7_exceptions.php#l7-vip-list" class="btn btn-xs btn-default">
+									<i class="fa fa-list"></i> <?= l7_t("Gerir Lista VIP"); ?>
+								</a>
+							</p>
+							<p class="help-block text-warning small"><?= l7_t("Isencao total de bloqueios Layer7; sinkhole DNS so coberto apos Bloco D."); ?></p>
 							<?php if (!empty($l7_groups)) { ?>
 							<p class="text-muted small"><strong><?= l7_t("Grupos isentos"); ?></strong></p>
 							<?php foreach ($l7_groups as $grp) {

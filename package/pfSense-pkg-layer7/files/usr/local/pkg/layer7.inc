@@ -3573,6 +3573,10 @@ function layer7_load_groups()
 	return array();
 }
 
+/** Limites actuais do daemon (policy.h L7_EXC_MAX_*); Bloco C alarga depois. */
+define("LAYER7_VIP_MAX_HOSTS", 8);
+define("LAYER7_VIP_MAX_CIDRS", 8);
+
 /** ID canonico da excepcao VIP partilhada (gerida pelo modal Perfis rapidos). */
 function layer7_vip_exception_id()
 {
@@ -3687,6 +3691,13 @@ function layer7_upsert_vip_exception(&$data, $group_ids, $hosts_text, $cidrs_tex
 		return $out;
 	}
 
+	$limit_err = layer7_vip_validate_limits($hosts, $cidrs);
+	if ($limit_err !== "") {
+		$out["ok"] = false;
+		$out["error"] = $limit_err;
+		return $out;
+	}
+
 	if (!isset($data["layer7"]["exceptions"]) ||
 	    !is_array($data["layer7"]["exceptions"])) {
 		$data["layer7"]["exceptions"] = array();
@@ -3710,10 +3721,10 @@ function layer7_upsert_vip_exception(&$data, $group_ids, $hosts_text, $cidrs_tex
 		"managed_by" => "profiles"
 	);
 	if (!empty($hosts)) {
-		$rule["hosts"] = array_slice($hosts, 0, 64);
+		$rule["hosts"] = array_values($hosts);
 	}
 	if (!empty($cidrs)) {
-		$rule["cidrs"] = array_slice($cidrs, 0, 32);
+		$rule["cidrs"] = array_values($cidrs);
 	}
 	if (!empty($valid_groups)) {
 		$rule["source_groups"] = $valid_groups;
@@ -3724,9 +3735,340 @@ function layer7_upsert_vip_exception(&$data, $group_ids, $hosts_text, $cidrs_tex
 	} else {
 		$exceptions[] = $rule;
 	}
+	layer7_vip_labels_cleanup($data, $hosts, $cidrs);
 	$out["updated"] = true;
 	unset($exceptions);
 	return $out;
+}
+
+/**
+ * Sanitiza descricao de entrada VIP (max 64; sem aspas ou barra invertida).
+ */
+function layer7_vip_sanitize_label($text)
+{
+	$text = trim((string)$text);
+	$text = str_replace(array('"', "\\"), "", $text);
+	if (strlen($text) > 64) {
+		$text = substr($text, 0, 64);
+	}
+	return $text;
+}
+
+/**
+ * @return array<string, string> mapa IP/CIDR -> descricao
+ */
+function layer7_vip_get_labels(&$data)
+{
+	if (!isset($data["layer7"]["vip_meta"]["labels"]) ||
+	    !is_array($data["layer7"]["vip_meta"]["labels"])) {
+		$data["layer7"]["vip_meta"]["labels"] = array();
+	}
+	return $data["layer7"]["vip_meta"]["labels"];
+}
+
+/**
+ * Remove labels orfas (alvos ja nao presentes na excepcao VIP).
+ *
+ * @param string[] $hosts
+ * @param string[] $cidrs
+ */
+function layer7_vip_labels_cleanup(&$data, $hosts, $cidrs)
+{
+	$labels = layer7_vip_get_labels($data);
+	$valid = array();
+	foreach ($hosts as $h) {
+		$valid[(string)$h] = true;
+	}
+	foreach ($cidrs as $c) {
+		$valid[(string)$c] = true;
+	}
+	foreach (array_keys($labels) as $key) {
+		if (!isset($valid[$key])) {
+			unset($data["layer7"]["vip_meta"]["labels"][$key]);
+		}
+	}
+}
+
+/**
+ * Valida limites VIP face ao daemon actual (8 hosts + 8 CIDRs).
+ *
+ * @param string[] $hosts
+ * @param string[] $cidrs
+ * @return string mensagem de erro ou vazio se OK
+ */
+function layer7_vip_validate_limits($hosts, $cidrs)
+{
+	if (count($hosts) > LAYER7_VIP_MAX_HOSTS) {
+		return sprintf(l7_t("Limite de %d IPs isentos (daemon actual)."),
+		    LAYER7_VIP_MAX_HOSTS);
+	}
+	if (count($cidrs) > LAYER7_VIP_MAX_CIDRS) {
+		return sprintf(l7_t("Limite de %d CIDRs isentos (daemon actual)."),
+		    LAYER7_VIP_MAX_CIDRS);
+	}
+	return "";
+}
+
+/**
+ * Extrai hosts/cidrs directos da excepcao VIP (sem grupos).
+ *
+ * @return array{hosts: string[], cidrs: string[]}
+ */
+function layer7_vip_direct_targets($data)
+{
+	$vip = layer7_find_vip_exception($data);
+	$hosts = array();
+	$cidrs = array();
+	if ($vip !== null) {
+		if (!empty($vip["hosts"]) && is_array($vip["hosts"])) {
+			$hosts = array_values($vip["hosts"]);
+		}
+		if (!empty($vip["cidrs"]) && is_array($vip["cidrs"])) {
+			$cidrs = array_values($vip["cidrs"]);
+		}
+	}
+	return array("hosts" => $hosts, "cidrs" => $cidrs);
+}
+
+/**
+ * Linhas da Lista VIP para a GUI (descricao + alvo).
+ *
+ * @return array<int, array{target: string, description: string, kind: string}>
+ */
+function layer7_vip_list_entries($data)
+{
+	$targets = layer7_vip_direct_targets($data);
+	$labels = layer7_vip_get_labels($data);
+	$rows = array();
+	foreach ($targets["hosts"] as $h) {
+		$desc = isset($labels[$h]) ? (string)$labels[$h] : "";
+		$rows[] = array(
+			"target" => $h,
+			"description" => $desc,
+			"kind" => "host"
+		);
+	}
+	foreach ($targets["cidrs"] as $c) {
+		$desc = isset($labels[$c]) ? (string)$labels[$c] : "";
+		$rows[] = array(
+			"target" => $c,
+			"description" => $desc,
+			"kind" => "cidr"
+		);
+	}
+	return $rows;
+}
+
+/**
+ * Grupos associados a excepcao VIP (metadata source_groups).
+ *
+ * @return string[]
+ */
+function layer7_vip_source_groups($data)
+{
+	$vip = layer7_find_vip_exception($data);
+	if ($vip === null || empty($vip["source_groups"]) ||
+	    !is_array($vip["source_groups"])) {
+		return array();
+	}
+	return array_values($vip["source_groups"]);
+}
+
+/**
+ * Sincroniza excepcao vip-isentos a partir de listas directas (preserva source_groups).
+ *
+ * @param string[] $hosts
+ * @param string[] $cidrs
+ * @param string[]|null $source_groups null = manter existentes
+ * @return array{ok: bool, error: string, updated: bool}
+ */
+function layer7_vip_sync_direct_targets(&$data, $hosts, $cidrs, $source_groups = null)
+{
+	$hosts = array_values(array_unique($hosts));
+	$cidrs = array_values(array_unique($cidrs));
+	$groups = ($source_groups === null)
+	    ? layer7_vip_source_groups($data)
+	    : array_values(array_unique($source_groups));
+
+	if (empty($hosts) && empty($cidrs) && empty($groups)) {
+		$idx = layer7_find_vip_exception_index($data);
+		if ($idx >= 0 && isset($data["layer7"]["exceptions"][$idx])) {
+			array_splice($data["layer7"]["exceptions"], $idx, 1);
+			layer7_vip_labels_cleanup($data, array(), array());
+			return array("ok" => true, "error" => "", "updated" => true);
+		}
+		layer7_vip_labels_cleanup($data, array(), array());
+		return array("ok" => true, "error" => "", "updated" => false);
+	}
+
+	$hosts_text = implode("\n", $hosts);
+	$cidrs_text = implode("\n", $cidrs);
+	return layer7_upsert_vip_exception($data, $groups, $hosts_text, $cidrs_text);
+}
+
+/**
+ * Adiciona entrada directa a Lista VIP (descricao + IP ou CIDR).
+ *
+ * @return array{ok: bool, error: string, updated: bool}
+ */
+function layer7_vip_add_entry(&$data, $description, $target)
+{
+	$description = layer7_vip_sanitize_label($description);
+	$target = trim((string)$target);
+	if ($target === "") {
+		return array("ok" => false, "error" => l7_t("Indique um IPv4 ou CIDR."), "updated" => false);
+	}
+	if ($description === "") {
+		return array("ok" => false, "error" => l7_t("Indique uma descricao."), "updated" => false);
+	}
+
+	$is_host = layer7_ipv4_valid($target);
+	$is_cidr = layer7_cidr_valid($target);
+	if (!$is_host && !$is_cidr) {
+		return array("ok" => false, "error" => l7_t("IPv4 ou CIDR invalido."), "updated" => false);
+	}
+
+	$current = layer7_vip_direct_targets($data);
+	$hosts = $current["hosts"];
+	$cidrs = $current["cidrs"];
+
+	if ($is_host) {
+		if (in_array($target, $hosts, true)) {
+			return array("ok" => false, "error" => l7_t("Este IP ja esta na Lista VIP."), "updated" => false);
+		}
+		$hosts[] = $target;
+	} else {
+		if (in_array($target, $cidrs, true)) {
+			return array("ok" => false, "error" => l7_t("Este CIDR ja esta na Lista VIP."), "updated" => false);
+		}
+		$cidrs[] = $target;
+	}
+
+	$limit_err = layer7_vip_validate_limits($hosts, $cidrs);
+	if ($limit_err !== "") {
+		return array("ok" => false, "error" => $limit_err, "updated" => false);
+	}
+
+	$res = layer7_vip_sync_direct_targets($data, $hosts, $cidrs);
+	if (!$res["ok"]) {
+		return $res;
+	}
+	$labels = layer7_vip_get_labels($data);
+	$labels[$target] = $description;
+	return array("ok" => true, "error" => "", "updated" => true);
+}
+
+/**
+ * Remove entrada directa da Lista VIP.
+ *
+ * @return array{ok: bool, error: string, updated: bool}
+ */
+function layer7_vip_remove_entry(&$data, $target)
+{
+	$target = trim((string)$target);
+	if ($target === "") {
+		return array("ok" => false, "error" => l7_t("Alvo invalido."), "updated" => false);
+	}
+
+	$current = layer7_vip_direct_targets($data);
+	$hosts = array_values(array_filter($current["hosts"],
+	    function ($h) use ($target) { return $h !== $target; }));
+	$cidrs = array_values(array_filter($current["cidrs"],
+	    function ($c) use ($target) { return $c !== $target; }));
+
+	if (count($hosts) === count($current["hosts"]) &&
+	    count($cidrs) === count($current["cidrs"])) {
+		return array("ok" => false, "error" => l7_t("Entrada nao encontrada."), "updated" => false);
+	}
+
+	if (isset($data["layer7"]["vip_meta"]["labels"][$target])) {
+		unset($data["layer7"]["vip_meta"]["labels"][$target]);
+	}
+
+	return layer7_vip_sync_direct_targets($data, $hosts, $cidrs);
+}
+
+/**
+ * Payload JSON para export da Lista VIP (padrao BG-070).
+ *
+ * @return array<string, mixed>
+ */
+function layer7_vip_export_payload($data)
+{
+	$entries = array();
+	foreach (layer7_vip_list_entries($data) as $row) {
+		$entries[] = array(
+			"description" => $row["description"],
+			"target" => $row["target"]
+		);
+	}
+	return array(
+		"layer7_vip_list" => true,
+		"version" => layer7_daemon_version(),
+		"timestamp" => date("c"),
+		"entries" => $entries
+	);
+}
+
+/**
+ * Importa Lista VIP a partir de JSON exportado.
+ *
+ * @return array{ok: bool, error: string, updated: bool}
+ */
+function layer7_vip_import_apply(&$data, $imported)
+{
+	if (!is_array($imported)) {
+		return array("ok" => false, "error" => l7_t("JSON invalido."), "updated" => false);
+	}
+	$entries = null;
+	if (!empty($imported["layer7_vip_list"]) &&
+	    isset($imported["entries"]) && is_array($imported["entries"])) {
+		$entries = $imported["entries"];
+	} elseif (isset($imported["entries"]) && is_array($imported["entries"])) {
+		$entries = $imported["entries"];
+	}
+	if ($entries === null) {
+		return array("ok" => false,
+		    "error" => l7_t("Ficheiro nao contem Lista VIP valida."), "updated" => false);
+	}
+
+	$hosts = array();
+	$cidrs = array();
+	$labels = array();
+	foreach ($entries as $entry) {
+		if (!is_array($entry)) {
+			continue;
+		}
+		$target = trim((string)($entry["target"] ?? ""));
+		$desc = layer7_vip_sanitize_label($entry["description"] ?? "");
+		if ($target === "" || $desc === "") {
+			continue;
+		}
+		if (layer7_ipv4_valid($target)) {
+			if (!in_array($target, $hosts, true)) {
+				$hosts[] = $target;
+				$labels[$target] = $desc;
+			}
+		} elseif (layer7_cidr_valid($target)) {
+			if (!in_array($target, $cidrs, true)) {
+				$cidrs[] = $target;
+				$labels[$target] = $desc;
+			}
+		}
+	}
+
+	$limit_err = layer7_vip_validate_limits($hosts, $cidrs);
+	if ($limit_err !== "") {
+		return array("ok" => false, "error" => $limit_err, "updated" => false);
+	}
+
+	$res = layer7_vip_sync_direct_targets($data, $hosts, $cidrs, array());
+	if (!$res["ok"]) {
+		return $res;
+	}
+	$data["layer7"]["vip_meta"]["labels"] = $labels;
+	layer7_vip_labels_cleanup($data, $hosts, $cidrs);
+	return array("ok" => true, "error" => "", "updated" => true);
 }
 
 function layer7_lic_path()
