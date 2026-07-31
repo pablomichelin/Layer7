@@ -2673,9 +2673,8 @@ function layer7_blockpage_sync($data = null)
 		    !layer7_unbound_anti_doh_configured()) {
 			layer7_configure_unbound_anti_doh();
 		}
-		return;
-	}
-	layer7_remove_unbound_blockpage();
+	} else {
+		layer7_remove_unbound_blockpage();
 		layer7_ensure_blockpage_service(false);
 	}
 	layer7_vip_dns_sync($data);
