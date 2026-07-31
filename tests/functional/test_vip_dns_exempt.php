@@ -13,7 +13,8 @@ $data = array(
 		"interfaces" => array("lan"),
 		"block_page" => array(
 			"enabled" => true,
-			"force_dns" => true
+			"force_dns" => true,
+			"portal_ip" => "192.168.1.1"
 		),
 		"exceptions" => array(
 			array(
