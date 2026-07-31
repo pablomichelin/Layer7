@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_52` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_52`;
-SHA256=TBD apos build;
+`1.8.11_52` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_52`,
+`SHA256=5a3ee6fa1f8a0cf486feb896464401629aeafac394089929a5634200c76278b7`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** continua `1.8.11_24`
 (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
@@ -212,7 +212,10 @@ Reforma do catálogo `profiles.json` de 18 para **38 perfis** com grupos na GUI,
 correcções de hosts/apps desactualizados, primeiro uso de `ndpi_categories`,
 modal Opções corrigido (slice apps 12→64) e validação nDPI no builder FreeBSD 15.
 Só `profiles.json` + PHP/GUI; daemon inalterado. Teste
-`tests/unit/test_profiles_json.sh` + suite local PASS. Gate appliance pendente;
+`tests/unit/test_profiles_json.sh` + suite local/builder PASS. Artefacto
+`pfSense-pkg-layer7-1.8.11_52.pkg`,
+`SHA256=5a3ee6fa1f8a0cf486feb896464401629aeafac394089929a5634200c76278b7`.
+Release publicada `v1.8.11_52`. Gate appliance pendente;
 produção enforce continua `_24`.
 
 ### Candidato `1.8.11_51` — fix ordem PF da exclusão por política (BG-066)
