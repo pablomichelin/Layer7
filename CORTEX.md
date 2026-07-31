@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_59` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_59`;
-SHA256 a confirmar pos-build — ver `MANUAL-INSTALL.md`;
+`1.8.11_59` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_59`,
+`SHA256=579114d8583e8ca01d3888d0cd308121640d8cee2e8f88a4c250c0b2a35de004`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
@@ -230,7 +230,9 @@ tag `v1.8.11_47` em `pablomichelin/Layer7`.
 `access-control-view` para IPs/CIDRs de `vip-isentos`; markers idempotentes;
 `unbound-checkconf` antes de gravar. **Fallback (b):** rdr `:53`
 `from !<layer7_exc_allow_N>` se a view falhar. Sinkhole bypass **completo** com
-(a); parcial com (b). GUI Lista VIP reflecte modo efectivo. Rollback: `_58`.
+(a); parcial com (b). GUI Lista VIP reflecte modo efectivo. Artefacto
+`SHA256=579114d8583e8ca01d3888d0cd308121640d8cee2e8f88a4c250c0b2a35de004`,
+tag `v1.8.11_59` em `pablomichelin/Layer7`. Rollback: `_58`.
 
 ### Release `1.8.11_58` — BG-072 limites daemon Lista VIP (publicado `2026-07-31`)
 

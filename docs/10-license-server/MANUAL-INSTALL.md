@@ -257,7 +257,7 @@ view falhar — sinkhole local pode persistir (aviso na GUI). Regeneracao em
 `layer7_vip_dns_sync()` / resync PF. Rollback: `_58`.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_59`
-- **SHA256 esperado:** _(preencher pos-build)_
+- **SHA256 esperado:** `579114d8583e8ca01d3888d0cd308121640d8cee2e8f88a4c250c0b2a35de004`
 
 **Addendum da release `1.8.11_58` (BG-072 limites daemon Lista VIP, `2026-07-31`):**
 Alarga `L7_EXC_MAX_HOSTS` 8→32 e `L7_EXC_MAX_CIDRS` 8→16 em `policy.h`;
@@ -535,7 +535,7 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_59`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_59/pfSense-pkg-layer7-1.8.11_59.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_59/pfSense-pkg-layer7-1.8.11_59.pkg.sha256`
-- **SHA256 esperado:** _(preencher pos-build — ver release `v1.8.11_59`)_
+- **SHA256 esperado:** `579114d8583e8ca01d3888d0cd308121640d8cee2e8f88a4c250c0b2a35de004`
 
 > **Nota:** `profiles-custom.json` (`/usr/local/etc/layer7/`) **nao** e
 > substituido nos upgrades; o backup XML do pfSense **nao** o inclui — use
