@@ -2219,7 +2219,7 @@ function layer7_vip_dns_should_apply($data = null)
  */
 function layer7_vip_dns_rdr_from_any($data = null)
 {
-	if (!layer7_vip_dns_rdr_fallback_enabled()) {
+	if (!layer7_vip_dns_rdr_fallback_enabled($data)) {
 		return "from any ";
 	}
 	$m = layer7_vip_exc_allow_meta($data);
@@ -2236,7 +2236,7 @@ function layer7_vip_dns_rdr_from_any($data = null)
 function layer7_vip_dns_rdr_from_cidr($data, $cidr)
 {
 	$cidr = trim((string)$cidr);
-	if (!layer7_vip_dns_rdr_fallback_enabled()) {
+	if (!layer7_vip_dns_rdr_fallback_enabled($data)) {
 		return "from {$cidr} ";
 	}
 	$m = layer7_vip_exc_allow_meta($data);
@@ -2452,9 +2452,6 @@ function layer7_vip_dns_mode_get($data = null)
 	$opts = layer7_unbound_custom_options_read();
 	if (strpos($opts, L7_VIP_DNS_MARKER_START) !== false) {
 		return "unbound_view";
-	}
-	if (layer7_vip_dns_rdr_fallback_enabled()) {
-		return "rdr_fallback";
 	}
 	return "rdr_fallback";
 }

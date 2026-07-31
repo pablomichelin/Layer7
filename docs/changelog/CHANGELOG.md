@@ -2,6 +2,25 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_61] - 2026-07-31 — Performance VIP DNS fallback (BG-073)
+
+### Changed
+
+- **Performance (sem alteração funcional):** `layer7_vip_dns_rdr_from_any()` e
+  `layer7_vip_dns_rdr_from_cidr()` passam `$data` a
+  `layer7_vip_dns_rdr_fallback_enabled()`, evitando releituras redundantes de
+  `layer7.json` em cada `filter_configure` (interface × CIDR).
+- **Cosmético:** ramo redundante removido em `layer7_vip_dns_mode_get()`.
+
+### Tests
+
+- `./tests/run-local.sh` PASS; builder FreeBSD 15: `php -l layer7.inc`, suite
+  completa incl. `test_vip_dns_exempt.php` e `test_vip_exception.php` PASS.
+
+### Docs
+
+- CORTEX, MANUAL-INSTALL (_61; rollback sec. 12 → `_60`), backlog BG-073.
+
 ## [1.8.11_60] - 2026-07-31 — Pós-auditoria Lista VIP (BG-073 fix)
 
 ### Fixed

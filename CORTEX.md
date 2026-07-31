@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_60` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_60`,
-`SHA256=19ddb638d3449d26fab5188d4472cc9427af99832eb96c3bd8cbf9a740d09fb8`;
+`1.8.11_61` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_61`,
+`SHA256=a5feacb90eda8d6f07920a8e104fe4d66f65dc672c59a22458ad2ff6ec5345e5`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
@@ -225,6 +225,16 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Release `1.8.11_61` — Performance VIP DNS fallback / BG-073 (publicado `2026-07-31`)
+
+Micro-release de qualidade/performance: `layer7_vip_dns_rdr_from_any()` e
+`layer7_vip_dns_rdr_from_cidr()` passam `$data` a
+`layer7_vip_dns_rdr_fallback_enabled()` (evita releituras de `layer7.json` em
+cada interface×CIDR no `filter_configure`). Ramo redundante removido em
+`layer7_vip_dns_mode_get()`. **Zero alteração funcional observável.**
+Artefacto `SHA256=a5feacb90eda8d6f07920a8e104fe4d66f65dc672c59a22458ad2ff6ec5345e5`,
+tag `v1.8.11_61` em `pablomichelin/Layer7`. Rollback: `_60`.
 
 ### Release `1.8.11_60` — Pós-auditoria Lista VIP / BG-073 fix (publicado `2026-07-31`)
 
@@ -1307,7 +1317,7 @@ CHECKPOINT CANONICO
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060;
   Lista VIP global A–E concluida; execucao lab sec. 20 pendente)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_60; producao enforce de referencia: 1.8.11_24)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_61; producao enforce de referencia: 1.8.11_24)
 - Fonte canonica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canonica de gates: docs/02-roadmap/checklist-mestre.md
