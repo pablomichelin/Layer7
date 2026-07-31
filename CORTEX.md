@@ -36,7 +36,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.8.11_58` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_58`,
-`SHA256` ver addendum `_58` em `docs/10-license-server/MANUAL-INSTALL.md`;
+`SHA256=b5bc99db8ac8bf3b4aca871c3f56b6a5e9029109773791a08081ac16917a2b84`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
@@ -229,8 +229,8 @@ Alarga `L7_EXC_MAX_HOSTS` 8→32 e `L7_EXC_MAX_CIDRS` 8→16; validacao PHP
 `LAYER7_VIP_MAX_*` alinhada (32+16). Memoria estatica maxima excepcoes:
 16 × `struct layer7_exception` ≈ +19 KiB vs limites 8+8 (arrays hosts/cidrs
 +1216 B/excepcao). Parser ingenuo inalterado; isencao DNS permanece Bloco D.
-Artefacto `SHA256` ver MANUAL-INSTALL addendum `_58`, tag `v1.8.11_58` em
-`pablomichelin/Layer7`. Rollback: `_57`.
+Artefacto `SHA256=b5bc99db8ac8bf3b4aca871c3f56b6a5e9029109773791a08081ac16917a2b84`,
+tag `v1.8.11_58` em `pablomichelin/Layer7`. Rollback: `_57`.
 
 ### Candidato `1.8.11_57` — BG-071 Lista VIP global (publicado `2026-07-31`)
 
