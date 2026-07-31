@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_52` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_52`,
-`SHA256=5a3ee6fa1f8a0cf486feb896464401629aeafac394089929a5634200c76278b7`;
+`1.8.11_53` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_53`,
+`SHA256=3ea425b8f8e9564c52eb8e30190a9c77b7772d2b319dd2da8280753a76384bbe`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** continua `1.8.11_24`
 (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
@@ -205,6 +205,23 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Candidato `1.8.11_53` — expansão catálogo Perfis rápidos Bloco 2 (BG-068)
+
+Expansão de **38 para 72 perfis**: videoconferência (Zoom, Teams, Meet, Webex,
+TeamSpeak), redes alternativas (Threads, Bluesky, Kick, Rumble), streaming
+(Deezer, SoundCloud, DAZN, Paramount+, Hulu, futebol pirata), jogos (Roblox,
+Free Fire, Cloud Gaming), produtividade (empregos, notícias, desporto, viagens,
+speedtest), segurança (anonymizers, publicidade, malware, mining) e 3 presets
+(distrações, proteção infantil, higiene de rede). Grupos GUI novos:
+**Comunicação e reuniões** e **Presets**. Reforço de vpn-proxy (Psiphon,
+UltraSurf, CloudflareWarp, iCloudPrivateRelay) e agregados social/gaming/cripto.
+Só `profiles.json` + `layer7_policies.php`; daemon inalterado. Teste
+`test_profiles_json.sh` (72 perfis, 202 refs nDPI) + suite local/builder PASS.
+Artefacto `pfSense-pkg-layer7-1.8.11_53.pkg`,
+`SHA256=3ea425b8f8e9564c52eb8e30190a9c77b7772d2b319dd2da8280753a76384bbe`.
+Release publicada `v1.8.11_53`. Gate appliance pendente;
+produção enforce continua `_24`.
 
 ### Candidato `1.8.11_52` — catálogo Perfis rápidos nível UniFi/UDM (BG-067)
 
@@ -481,8 +498,8 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_52` (`PORTVERSION=1.8.11`, `PORTREVISION=52`),
-publicada no canal de teste/lab (`v1.8.11_52`). A referencia de producao
++ `PORTREVISION`):** `1.8.11_53` (`PORTVERSION=1.8.11`, `PORTREVISION=53`),
+publicada no canal de teste/lab (`v1.8.11_53`). A referencia de producao
 enforce permanece `v1.8.11_24`; gate two-client pendente.
 **Data-base deste checkpoint:** `2026-07-30`
 
@@ -1164,15 +1181,15 @@ CHECKPOINT CANONICO
   (G2-G4: ABI FB16, pfctl -nf ruleset completo, captura/metricas); G5 two-client
   (validacao-lab sec. 12) so apos G2-G4 PASS; nenhuma correcao de codigo ate
   causa-raiz comprovada no appliance
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 52 (publicado no canal
-  de teste/lab como v1.8.11_52; gate appliance pendente)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 53 (publicado no canal
+  de teste/lab como v1.8.11_53; gate appliance pendente)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
   corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
   EM VALIDACAO
 - Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_52; producao enforce de referencia: 1.8.11_24)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_53; producao enforce de referencia: 1.8.11_24)
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canónica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canónica de gates: docs/02-roadmap/checklist-mestre.md
