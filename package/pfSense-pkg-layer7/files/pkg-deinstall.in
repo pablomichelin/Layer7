@@ -81,7 +81,7 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 	_keep_profiles_custom=0
 	if [ -f /var/run/layer7-uninstall-keep-config ]; then
 		_keep_profiles_custom=1
-	elif [ "${PKG_UPGRADE:-}" = "YES" ] || [ "${PKG_UPGRADE:-}" = "yes" ]; then
+	elif [ -n "${PKG_UPGRADE:-}" ]; then
 		_keep_profiles_custom=1
 	fi
 	if [ -f /usr/local/etc/layer7/profiles-custom.json ]; then

@@ -2,7 +2,46 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [1.8.11_55] - 2026-07-31 — Perfis editáveis e personalizados (BG-070)
+## [1.8.11_56] - 2026-07-31 — BG-070 integral + correcções pós-_55 defeituoso
+
+### Fixed
+
+- **Rebuild obrigatório:** `1.8.11_55` foi compilada no builder **antes** do
+  commit completo de BG-070 — o `.pkg` publicado continha apenas o merge em
+  `layer7.inc`/`Makefile`, **sem** GUI de edição (`l7showProfileEditModal`),
+  export/import `profiles_custom`, nem scripts `+INSTALL`/`+DEINSTALL` para
+  `profiles-custom.json`. **`1.8.11_55` não deve ser instalada**; usar `_56`.
+- **`pkg-deinstall.in`:** condição `PKG_UPGRADE` corrigida — `pkg(8)` define
+  `"true"`, não `"YES"`; upgrades passam a preservar `profiles-custom.json`.
+- **Perfis ocultos:** secção discreta **Perfis ocultos** no fim da grelha com
+  botões **Mostrar** e **Editar** (antes o cartão desaparecia sem forma de
+  reverter).
+- **`layer7_profile_icon_valid()`:** validação contra lista FontAwesome 4.7
+  embebida (`layer7-fa47-icons.inc`); ícones fora da lista rejeitados (fallback
+  `fa-cube` na gravação).
+
+### Added
+
+- Artefacto integral BG-070: GUI editar/criar perfis, `profiles_custom` em
+  export/import, skeleton/preservação em install/deinstall.
+
+### Tests
+
+- `tests/functional/test_profile_icon_valid.php` + extensão de
+  `test_profiles_json.sh`.
+- Builder FreeBSD 15: suite local, validação do `.pkg` extraído (4 checks
+  BG-070), simulação upgrade — PASS.
+
+### Docs
+
+- CORTEX, backlog BG-070, MANUAL-INSTALL (_56; _55 marcada defeituosa;
+  rollback → `_54`, **não** `_55`), guia 7.3.2 secção Perfis ocultos.
+
+## [1.8.11_55] - 2026-07-31 — Perfis editáveis e personalizados (BG-070) — **DEFEITUOSO, NÃO INSTALAR**
+
+> **Atenção:** esta release foi publicada com artefacto incompleto (build no
+> builder desalinhado do repositório). **Não instalar.** Substituída por
+> `1.8.11_56`.
 
 ### Added
 

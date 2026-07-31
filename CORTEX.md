@@ -35,9 +35,11 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_55` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_55`,
-`SHA256=616e72b104a69e9721203f897acfa3e3f8176191c8b8f7dc73b93cfe8d3c7b8f`;
+`1.8.11_56` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_56`;
+SHA256=TBD após build;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
+**Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
+**nao instalar**; usar `_56`.
 **Referencia de producao enforce:** continua `1.8.11_24`
 (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
 ate os gates G2–G7; candidatos posteriores sao canal de teste/lab.
@@ -206,7 +208,18 @@ tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
 
-### Candidato `1.8.11_55` — perfis editáveis e personalizados (BG-070)
+### Candidato `1.8.11_56` — BG-070 integral + correcções pós-_55 defeituoso
+
+Rebuild obrigatório: `1.8.11_55` foi compilada no builder antes do commit
+completo de BG-070 — faltavam GUI (`l7showProfileEditModal`), export/import
+`profiles_custom` e scripts install/deinstall para `profiles-custom.json`.
+`_56` entrega BG-070 integral mais: secção **Perfis ocultos** na GUI (reverter
+ocultar); fix `PKG_UPGRADE` em `pkg-deinstall.in` (`true` vs `YES`);
+validação FA 4.7 em `layer7_profile_icon_valid()`. **`_55` nao instalar.**
+Testes builder + validação artefacto (4 checks) PASS. Gate appliance pendente;
+producao enforce continua `_24`.
+
+### Candidato `1.8.11_55` — perfis editáveis e personalizados (BG-070) — **DEFEITUOSO**
 
 Overlay cliente em `/usr/local/etc/layer7/profiles-custom.json` (**nunca** no
 `pkg-plist`): overrides de fábrica (apps/hosts add/remove, ocultar cartão) e
@@ -215,11 +228,10 @@ merge fábrica → overrides → custom; GUI com criar/editar/apagar, badges
 `personalizado`/`editado`, reconnect automático de política ligada; export/import
 e preservação em upgrade/uninstall (keep-config). Apps restritos ao catálogo
 nDPI dos 72 perfis de fábrica; hosts texto livre validado. Daemon inalterado.
-Testes `test_profiles_custom_merge.php` + builder/simulação upgrade PASS.
-Artefacto `pfSense-pkg-layer7-1.8.11_55.pkg`,
-`SHA256=616e72b104a69e9721203f897acfa3e3f8176191c8b8f7dc73b93cfe8d3c7b8f`.
-Release publicada `v1.8.11_55`. Gate appliance pendente; produção enforce
-continua `_24`.
+**Artefacto publicado incompleto** (só merge em `layer7.inc`; GUI/scripts em
+falta). **`NAO INSTALAR`** — usar `_56`. SHA256 publicado
+`616e72b104a69e9721203f897acfa3e3f8176191c8b8f7dc73b93cfe8d3c7b8f`.
+Gate appliance pendente; produção enforce continua `_24`.
 
 ### Candidato `1.8.11_54` — correcção visual grelha Perfis rápidos (BG-069)
 
@@ -535,9 +547,10 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_54` (`PORTVERSION=1.8.11`, `PORTREVISION=54`),
-publicada no canal de teste/lab (`v1.8.11_54`). A referencia de producao
-enforce permanece `v1.8.11_24`; gate two-client pendente.
++ `PORTREVISION`):** `1.8.11_56` (`PORTVERSION=1.8.11`, `PORTREVISION=56`),
+publicada no canal de teste/lab (`v1.8.11_56`). **`1.8.11_55` defeituosa — nao
+instalar.** A referencia de producao enforce permanece `v1.8.11_24`; gate
+two-client pendente.
 **Data-base deste checkpoint:** `2026-07-31`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
@@ -1204,7 +1217,7 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-07-29
+- Data base: 2026-07-31
 - Produto: Layer7 para pfSense CE
 - Ultima versao .pkg publicada (referencia operacional): 1.8.11_24
   (SHA256 1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818;
@@ -1218,18 +1231,18 @@ CHECKPOINT CANONICO
   (G2-G4: ABI FB16, pfctl -nf ruleset completo, captura/metricas); G5 two-client
   (validacao-lab sec. 12) so apos G2-G4 PASS; nenhuma correcao de codigo ate
   causa-raiz comprovada no appliance
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 54 (publicado no canal
-  de teste/lab como v1.8.11_54; gate appliance pendente)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 56 (publicado no canal
+  de teste/lab como v1.8.11_56; _55 defeituosa — nao instalar; gate appliance pendente)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
   corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
   EM VALIDACAO
 - Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_54; producao enforce de referencia: 1.8.11_24)
-- Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
-- Fonte canónica de prioridade: docs/02-roadmap/backlog.md
-- Fonte canónica de gates: docs/02-roadmap/checklist-mestre.md
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_56; producao enforce de referencia: 1.8.11_24)
+- Fonte canonica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
+- Fonte canonica de prioridade: docs/02-roadmap/backlog.md
+- Fonte canonica de gates: docs/02-roadmap/checklist-mestre.md
 ```
 
 ---

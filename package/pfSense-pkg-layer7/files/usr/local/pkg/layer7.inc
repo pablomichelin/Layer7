@@ -7,6 +7,8 @@ if (defined("LAYER7_INC_LOADED")) {
 }
 define("LAYER7_INC_LOADED", true);
 
+require_once(__DIR__ . "/layer7-fa47-icons.inc");
+
 /**
  * Translation helper. Returns the translated string for the current language.
  * Keys are the original Portuguese strings. When lang=pt, returns the key as-is.
@@ -2950,10 +2952,31 @@ function layer7_profile_host_valid($host)
 	) === 1;
 }
 
+function layer7_fa47_icon_set()
+{
+	static $set = null;
+	if ($set !== null) {
+		return $set;
+	}
+	$set = array("fa-cube" => true);
+	foreach (explode("\n", layer7_fa47_icon_names_raw()) as $name) {
+		$name = trim($name);
+		if ($name !== "") {
+			$set[$name] = true;
+		}
+	}
+	return $set;
+}
+
 function layer7_profile_icon_valid($icon)
 {
-	return is_string($icon) && ($icon === "" ||
-	    preg_match("/^fa-[a-z0-9-]{1,40}$/", $icon) === 1);
+	if (!is_string($icon) || $icon === "") {
+		return $icon === "";
+	}
+	if (preg_match("/^fa-[a-z0-9-]{1,40}$/", $icon) !== 1) {
+		return false;
+	}
+	return isset(layer7_fa47_icon_set()[$icon]);
 }
 
 /**

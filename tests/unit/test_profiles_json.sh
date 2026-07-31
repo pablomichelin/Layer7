@@ -140,4 +140,13 @@ if [ -f "$ROOT/tests/functional/test_profiles_custom_merge.php" ]; then
 	fi
 fi
 
+# BG-070 — layer7_profile_icon_valid() vs FA 4.7 embebido
+if [ -f "$ROOT/tests/functional/test_profile_icon_valid.php" ]; then
+	if "$PHP_BIN" "$ROOT/tests/functional/test_profile_icon_valid.php"; then
+		pass "profile icon FA47 validation"
+	else
+		fail "profile icon FA47 validation"
+	fi
+fi
+
 exit "$RC"

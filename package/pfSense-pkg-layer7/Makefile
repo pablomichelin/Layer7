@@ -3,7 +3,7 @@
 
 PORTNAME=	pfSense-pkg-layer7
 PORTVERSION=	1.8.11
-PORTREVISION=	55
+PORTREVISION=	56
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -77,6 +77,8 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7.xml \
 		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7.inc \
+		${STAGEDIR}${PREFIX}/pkg
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7-fa47-icons.inc \
 		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/priv/layer7.priv.inc \
 		${STAGEDIR}/etc/inc/priv/layer7.priv.inc

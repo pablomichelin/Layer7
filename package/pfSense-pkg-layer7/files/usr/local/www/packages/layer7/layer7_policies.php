@@ -264,6 +264,46 @@ if ($_POST["toggle_profile_off"] ?? false) {
 		}
 }
 
+/* BG-070 — tornar perfil oculto visivel novamente (sem alterar politica ligada). */
+if ($_POST["unhide_profile"] ?? false) {
+	$profile_id = trim((string)($_POST["profile_id"] ?? ""));
+	if (!layer7_profile_id_valid($profile_id) &&
+	    !layer7_profile_custom_id_valid($profile_id)) {
+		$input_errors[] = l7_t("Perfil invalido.");
+	} else {
+		$custom = layer7_profiles_custom_load();
+		if (layer7_profile_custom_id_valid($profile_id)) {
+			$list = (isset($custom["custom_profiles"]) &&
+			    is_array($custom["custom_profiles"]))
+			    ? $custom["custom_profiles"] : array();
+			foreach ($list as $i => $cp) {
+				if (is_array($cp) && ($cp["id"] ?? "") === $profile_id) {
+					unset($list[$i]["hidden"]);
+					break;
+				}
+			}
+			$custom["custom_profiles"] = array_values($list);
+		} elseif (isset($custom["overrides"][$profile_id]) &&
+		    is_array($custom["overrides"][$profile_id])) {
+			unset($custom["overrides"][$profile_id]["hidden"]);
+			$ov = $custom["overrides"][$profile_id];
+			$ov_empty = true;
+			foreach (array("apps_add", "apps_remove", "hosts_add", "hosts_remove") as $k) {
+				if (!empty($ov[$k]) && is_array($ov[$k])) {
+					$ov_empty = false;
+					break;
+				}
+			}
+			if ($ov_empty) {
+				unset($custom["overrides"][$profile_id]);
+			}
+		}
+		if (empty($input_errors) && layer7_profiles_custom_save($custom)) {
+			$savemsg = l7_t("Perfil visivel novamente.");
+		}
+	}
+}
+
 /* BG-070 — guardar edicao de perfil (override fabrica ou perfil personalizado). */
 if ($_POST["save_profile_edit"] ?? false) {
 	$profile_id = trim((string)($_POST["edit_profile_id"] ?? ""));
@@ -1225,6 +1265,68 @@ function layer7_policy_match_summary($policy) {
 				continue;
 			}
 			$l7_render_profile_group($l7_gname, $l7_gprofs);
+		}
+		$l7_visible_ids = array();
+		foreach ($l7_profiles as $vp) {
+			$vid = (string)($vp["id"] ?? "");
+			if ($vid !== "") {
+				$l7_visible_ids[$vid] = true;
+			}
+		}
+		$l7_hidden_profiles = array();
+		foreach (layer7_load_profiles(true) as $hp) {
+			$hid = (string)($hp["id"] ?? "");
+			if ($hid !== "" && !isset($l7_visible_ids[$hid])) {
+				$l7_hidden_profiles[] = $hp;
+			}
+		}
+		if (!empty($l7_hidden_profiles)) {
+		?>
+			<div class="l7-profile-group l7-profile-group-hidden" style="margin-top:20px;opacity:0.92;">
+				<div class="l7-profile-group-header">
+					<span class="l7-profile-group-title"><?= l7_t("Perfis ocultos"); ?></span>
+					<span class="l7-profile-group-count"><?= count($l7_hidden_profiles); ?></span>
+				</div>
+				<p class="help-block" style="margin:0 0 10px 0;"><?= l7_t("Estes perfis nao aparecem na grelha principal. A politica ligada permanece activa."); ?></p>
+				<div class="l7-profiles-grid">
+				<?php foreach ($l7_hidden_profiles as $hprof) {
+					$h_id_raw = (string)($hprof["id"] ?? "");
+					$h_id = htmlspecialchars($h_id_raw);
+					$h_name = isset($hprof["name"]) ? htmlspecialchars(l7_t($hprof["name"])) : $h_id;
+					$h_desc = isset($hprof["description"]) ? htmlspecialchars(l7_t($hprof["description"])) : "";
+					$h_icon = "fa-cube";
+					if (isset($hprof["icon"]) && is_string($hprof["icon"]) &&
+					    preg_match('/^fa-[a-z0-9-]{1,40}$/', $hprof["icon"])) {
+						$h_icon = $hprof["icon"];
+					}
+					$h_pid = "profile-" . $h_id_raw;
+					$h_connected = false;
+					foreach ($policies as $existing) {
+						if (isset($existing["id"]) && (string)$existing["id"] === $h_pid) {
+							$h_connected = true;
+							break;
+						}
+					}
+				?>
+					<div class="l7-profile-card l7-profile-card-hidden<?= $h_connected ? ' l7-profile-on' : ''; ?>">
+						<div class="l7-profile-state"><?php if ($h_connected) { ?><span class="l7-dot l7-dot-on" title="<?= l7_t("Ligado"); ?>"></span><?php } else { ?><span class="l7-dot l7-dot-off" title="<?= l7_t("Desligado"); ?>"></span><?php } ?></div>
+						<div class="l7-profile-icon-ios" style="background:#66748A;color:#fff;">
+							<i class="fa <?= htmlspecialchars($h_icon); ?>" aria-hidden="true"></i>
+						</div>
+						<div class="l7-profile-name"><?= $h_name; ?></div>
+						<div class="l7-profile-desc" title="<?= $h_desc; ?>"><?= $h_desc; ?></div>
+						<div class="l7-profile-cta">
+							<button type="button" class="btn btn-xs btn-default l7-profile-edit-btn" title="<?= l7_t("Editar perfil"); ?>" onclick="l7showProfileEditModal(<?= htmlspecialchars(json_encode($h_id_raw), ENT_QUOTES) ?>, false);"><i class="fa fa-pencil"></i> <?= l7_t("Editar"); ?></button>
+							<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;display:inline-block;">
+								<input type="hidden" name="profile_id" value="<?= $h_id; ?>" />
+								<button type="submit" name="unhide_profile" value="1" class="btn btn-xs btn-success"><i class="fa fa-eye"></i> <?= l7_t("Mostrar"); ?></button>
+							</form>
+						</div>
+					</div>
+				<?php } ?>
+				</div>
+			</div>
+		<?php
 		}
 		?>
 		</div>
