@@ -481,10 +481,10 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_32` (`PORTVERSION=1.8.11`, `PORTREVISION=32`),
-**candidato interno não publicado**. A release pública permanece
-`v1.8.11_24`; gate two-client pendente.
-**Data-base deste checkpoint:** `2026-04-27`
++ `PORTREVISION`):** `1.8.11_52` (`PORTVERSION=1.8.11`, `PORTREVISION=52`),
+publicada no canal de teste/lab (`v1.8.11_52`). A referencia de producao
+enforce permanece `v1.8.11_24`; gate two-client pendente.
+**Data-base deste checkpoint:** `2026-07-30`
 
 O Layer7 e um pacote proprietario para pfSense CE com daemon `layer7d`,
 GUI integrada, classificacao Layer 7 via nDPI, politicas granulares,
@@ -1164,14 +1164,15 @@ CHECKPOINT CANONICO
   (G2-G4: ABI FB16, pfctl -nf ruleset completo, captura/metricas); G5 two-client
   (validacao-lab sec. 12) so apos G2-G4 PASS; nenhuma correcao de codigo ate
   causa-raiz comprovada no appliance
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 31 (candidato nao publicado)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 52 (publicado no canal
+  de teste/lab como v1.8.11_52; gate appliance pendente)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
   corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
   EM VALIDACAO
 - Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_51; producao enforce de referencia: 1.8.11_24)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_52; producao enforce de referencia: 1.8.11_24)
 - Fonte canónica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canónica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canónica de gates: docs/02-roadmap/checklist-mestre.md

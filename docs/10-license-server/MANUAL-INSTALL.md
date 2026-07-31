@@ -1215,12 +1215,12 @@ release — ver nota em **Links da versao actual** e **BG-028**):
 service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
-Para reinstalar uma versao anterior conhecida (ex.: `1.8.11_50`, a versao
+Para reinstalar uma versao anterior conhecida (ex.: `1.8.11_51`, a versao
 imediatamente anterior no canal publico; para producao enforce a referencia
 e `1.8.11_24`):
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_50.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_50/pfSense-pkg-layer7-1.8.11_50.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_50.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_51.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_51/pfSense-pkg-layer7-1.8.11_51.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_51.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 A configuracao (`/usr/local/etc/layer7.json`, `/usr/local/etc/layer7.lic`) e
