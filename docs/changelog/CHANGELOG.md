@@ -2,6 +2,40 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_63] - 2026-07-31 — Redesign compacto grelha Perfis rápidos (BG-074)
+
+### Changed
+
+- **UX (apenas apresentação):** grelha **Perfis rápidos** compacta estilo
+  UniFi/UDM — cartões horizontais (~64px), ícone 36px, meta
+  apps/hosts/hits, descrição em tooltip no cartão inteiro.
+- **Toggle CSS:** switches estilo iOS/UniFi (verde quando ligado) substituem
+  botões Ligar/Desligar; ícones `fa-cog` / `fa-pencil` para Opções/Editar.
+- **Grupos accordion:** cabeçalho colapsável com contador e badge «N ligados»;
+  estado inicial aberto quando o grupo tem perfis activos; persistência
+  `localStorage`.
+- **Pesquisa:** barra «Pesquisar perfil…» + filtro «Só ligados»; auto-expande
+  grupos com resultados; secção **Perfis ocultos** adaptada e colapsada por
+  defeito.
+- **Badges:** «personalizado»/«editado» como pontos coloridos com tooltip.
+- **Presets:** fundo ligeiramente tintado no grupo.
+
+### Unchanged
+
+- Handlers POST intactos (`toggle_profile_on/off`, modais, ocultos, VIP,
+  export/import). Zero alteração funcional ou no daemon.
+
+### Tests
+
+- `./tests/run-local.sh local` PASS (macOS, PHP SKIP); builder FreeBSD 15:
+  `php -l layer7_policies.php`, suite completa PASS. `.pkg` extraído validado
+  (`layer7_policies.php` idêntico ao repo; `+MANIFEST` = `1.8.11_63`).
+
+### Docs
+
+- CORTEX, MANUAL-INSTALL (_63; rollback sec. 12 → `_62`), backlog BG-074,
+  guia-completo 7.3.1.
+
 ## [1.8.11_62] - 2026-07-31 — Fix `$data` indefinido no rdr CIDR (BG-073)
 
 ### Fixed

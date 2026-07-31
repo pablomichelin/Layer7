@@ -288,7 +288,7 @@ preservado nos upgrades.
 | **Criar perfil** | Novo id `c-*` no grupo **Personalizados** (apps só do catálogo nDPI agregado dos perfis de fábrica; hosts texto livre). |
 | **Política ligada** | Ao guardar, a política `profile-<id>` é actualizada automaticamente (aviso na GUI). |
 | **Ocultar** | Remove o cartão da grelha principal; se o perfil estiver ligado, a política **permanece** activa. |
-| **Perfis ocultos** | Secção discreta no fim da grelha lista perfis ocultos com botões **Mostrar** (volta à grelha) e **Editar**. |
+| **Perfis ocultos** | Secção accordion no fim da grelha (colapsada por defeito); cartões compactos com **Mostrar** (olho) e **Editar**. |
 | **Backup pfSense XML** | **Não** inclui `profiles-custom.json` — use Export em Definições Layer7. |
 
 Limites pós-merge: 64 apps / 8 categorias / 64 hosts por perfil; 24 políticas no
@@ -297,15 +297,16 @@ toggle.
 > **Nota:** a release `1.8.11_55` foi publicada com artefacto incompleto (BG-070
 > a meio). **Não instalar** — usar `1.8.11_56`.
 
-### 7.3.1 Perfis rapidos (catalogo `1.8.11_53`; visual `1.8.11_54`)
+### 7.3.1 Perfis rapidos (catalogo `1.8.11_53`; visual compacto `1.8.11_63`)
 
 A pagina **Politicas > Perfis rapidos** expoe atalhos pre-configurados. Cada perfil
 pode combinar apps nDPI, categorias nDPI e hosts (limites: 64 apps / 8 categorias /
-64 hosts por politica). Grupos visuais organizam o catalogo estilo UniFi/UDM Pro:
-cada grupo tem cabecalho proprio em linha completa (titulo + contador de perfis),
-os cartoes tem altura uniforme (descricao truncada a 3 linhas; texto completo no
-tooltip) e todos os perfis mostram o icone FontAwesome 4.7 declarado em
-`profiles.json`, com cor da marca quando conhecida ou cor do grupo.
+64 hosts por politica). A grelha compacta (`1.8.11_63`, BG-074) organiza o catalogo
+estilo UniFi/UDM Pro em cartoes horizontais (~64px): icone 36px, nome, meta
+apps/hosts/hits, descricao no tooltip do cartao, switch verde para ligar/desligar,
+icones Opções/Editar, grupos accordion (badge «N ligados», estado em localStorage),
+barra **Pesquisar perfil...** e filtro **So ligados**. Badges personalizado/editado
+sao pontos coloridos. O grupo **Presets** tem fundo ligeiramente tintado.
 
 Exemplos de perfis individuais: Zoom, Teams, Threads, Bluesky, Deezer, DAZN,
 Anonymizers, Roblox, Free Fire. Agregados: Videoconferencia, Musica, Redes
