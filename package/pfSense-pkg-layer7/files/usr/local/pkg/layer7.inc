@@ -313,7 +313,7 @@ function layer7_generate_rdr_rules_snippet()
 				}
 				$seen_rdr[$key] = true;
 				$has_rules = true;
-			$from = layer7_vip_dns_rdr_from_cidr($data, $cidr);
+			$from = layer7_vip_dns_rdr_from_cidr($l7config, $cidr);
 			$lines[] = "rdr on {$iface} inet proto udp" .
 			    " {$from}to !127.0.0.1 port 53" .
 			    " -> 127.0.0.1";
