@@ -1202,3 +1202,181 @@ permanece valida para versoes anteriores (allow global inalterado).
 
 PASS minimo: 19.1 + 19.2 no verificador; enforce real (two-client) continua
 sujeito a gates G2–G7 — **NO-GO producao inalterado**.
+
+---
+
+## 20. Roteiro BG-071/072/073 — director isento de tudo (`1.8.11_59`+)
+
+**Objectivo:** validar ponta a ponta a feature **Lista VIP global** (Blocos A–D):
+origem na excepção canónica `vip-isentos` isenta de perfis block, blacklists UT1,
+anti-bypass DNS **e** sinkhole Unbound da pagina de bloqueio — o «director isento
+de tudo», incluindo dominios sinkhole. Complementa a secção **19** (verificador
+e modal); aqui o foco e enforce real + block page + caminho DNS (**ADR-0020**).
+
+**Impacto:** confirma ou refuta a opção (a) view Unbound `layer7-vip-exempt` no
+appliance; documenta trade-offs de host overrides nativos e modo fallback (b).
+Não altera o veredicto NO-GO de producao (`1.8.11_24` até gates G2–G7).
+
+**Risco:** medio — activa enforce, sinkhole global, NAT rdr :53 e view Unbound
+em lab; erro de isenção DNS expoe VIP a pagina de bloqueio ou libera cliente
+não-VIP. Mitigação: snapshot/rollback (padrao BG-060), two-client controlado,
+paragem obrigatoria para validacao humana antes de qualquer mudanca de enforce
+em producao.
+
+**Gate humano:** este roteiro **nao** fecha producao nem promove `_59` como
+referencia enforce. Registar evidencias (screenshots, saidas `drill`/`dig`,
+`pfctl`, trecho Unbound) e obter OK explicito antes de activar enforce fora do
+lab. **NO-GO producao inalterado** — referencia enforce continua `1.8.11_24`.
+
+### Pre-requisitos
+
+| Item | Valor |
+|------|-------|
+| Pacote | `>= 1.8.11_59` (`BG-073`; `_57`/`_58` so parciais) |
+| `mode` | `enforce` |
+| `enabled` | `true` |
+| Licenca | valida (enforce ao vivo exige licenca) |
+| Unbound | activo; clientes LAN usam DNS do pfSense |
+| Snapshot | config export + nota da versao instalada (BG-060) |
+| Cliente VIP (director) | IP estavel — ver **20.1** |
+| Cliente não-VIP | outro host na mesma LAN (ex.: `192.168.1.20`) |
+| Dominio de teste | dominio sinkhole conhecido (ex.: `youtube.com` via perfil block **ou** dominio de blacklist UT1 activa) |
+
+**Recomendacao DHCP static mapping (directores):** registar o dispositivo do
+director em **Services > DHCP Server > Static Mappings** (IP fixo ligado ao MAC).
+Adicionar esse IP (ou CIDR da sala de direcção) na **Lista VIP** em
+**Excepções > Lista VIP (isencao total)** com descricao legivel (ex. «Director
+— notebook»). Evitar depender de lease dinamico — drift de IP quebra isenção PF,
+view Unbound e verificador. Para varios directores, preferir grupo **Grupos**
+resolvido para IPs estaveis + entradas manuais na Lista VIP conforme necessario.
+
+### 20.1 Setup — perfil block + blacklist UT1 + block page
+
+1. **Excepções > Lista VIP:** adicionar IP do director (descricao + IP/CIDR);
+   confirmar excepção `vip-isentos` actualizada (SSOT inalterado; labels em
+   `vip_meta.labels` apenas GUI).
+2. **Definições > Pagina de bloqueio:** activar toggle; **Forcar DNS local**
+   ON se disponivel; gravar e confirmar `service layer7-blockpage status` →
+   running.
+3. **Politicas > Perfis rapidos:** activar perfil **YouTube** (ou outro block)
+   com acção `block` — **nao** duplicar o director em Isentos do modal se ja
+   estiver na Lista VIP (mesmo SSOT `vip-isentos`).
+4. **Blacklists UT1:** activar feed com pelo menos uma categoria; confirmar regra
+   UT1 com acção block e «Incluir dominios blacklist» ON na block page (sec.
+   **18.3**).
+5. **Filter reload** / Resync Layer7; confirmar servico `layer7d` activo.
+6. Escolher dominio **A** sinkhole pelo perfil (ex. `youtube.com`) e dominio
+   **B** sinkhole pela blacklist UT1 (anotar qual categoria/domínio).
+
+Verificacao read-only pos-setup:
+
+```sh
+grep -A6 'Layer7 VIP DNS exempt' /var/unbound/unbound.conf
+# ou custom_options no config.xml — markers START/END e view layer7-vip-exempt
+
+grep -A2 'Layer7 block-page' /var/unbound/unbound.conf
+pfctl -a natrules/layer7_nat -s nat | grep -E 'blockpage|:53'
+pfctl -t layer7_exc_allow_0 -T show 2>/dev/null || pfctl -t layer7_exc_allow_1 -T show
+```
+
+### 20.2 Modo DNS efectivo — opção (a) vs fallback (b)
+
+Na GUI **Lista VIP**, ler o alerta no topo da seccao:
+
+| Modo GUI | Significado | O que verificar no appliance |
+|----------|-------------|------------------------------|
+| **Isencao DNS** (info, azul) | Opção **(a)** activa — view `layer7-vip-exempt` | Markers `# --- Layer7 VIP DNS exempt START ---` em `custom_options`; bloco `view: name: "layer7-vip-exempt"` e `access-control-view: <IP/CIDR> layer7-vip-exempt` para cada origem VIP; **sem** `view-first` no snippet Layer7 |
+| **Aviso DNS (fallback)** (warning) | Opção **(b)** — rdr `:53` exclui VIP, sinkhole local permanece | Markers VIP ausentes ou stripados; regras NAT `:53` com `from !<layer7_exc_allow_N>` (nao `from any` puro para origens nao isentas); GUI declara limitacao sinkhole |
+
+Comandos adicionais:
+
+```sh
+# Confirmar unbound-checkconf passou na ultima gravacao (log system ou mensagem GUI)
+/usr/local/sbin/unbound-checkconf /var/unbound/unbound.conf
+
+# Modo rdr fallback: inspeccionar NAT DNS forcado
+pfctl -a natrules/layer7_nat -s nat -v | grep -E '53|layer7_exc_allow'
+```
+
+**Resultado esperado (a):** director resolve dominio sinkhole para IP real
+(nao IP portal); navega HTTP/HTTPS sem pagina «Acesso bloqueado».
+
+**Resultado esperado (b):** director **nao** redireccionado na porta 53 se usar
+DNS externo; se usar Unbound local, **continua** sujeito a sinkhole — documentar
+como limitacao honesta (ADR-0020 §3).
+
+### 20.3 Two-client — VIP isento vs não-VIP bloqueado
+
+Executar de **dois** clientes distintos (nao misturar origem na mesma sessao).
+
+**Cliente VIP (director):**
+
+1. `drill <dominio_A> @<IP_pfsense>` — **nao** deve devolver IP portal (modo a);
+   anotar IP real ou NXDOMAIN legitimo.
+2. `http://<dominio_A>/` — pagina real ou erro de origem, **nao** block page Layer7.
+3. Repetir para **dominio_B** (blacklist UT1 sinkhole).
+4. **Teste / verificador** (`layer7_test.php`): IP director + dominio →
+   **PERMITIDO — excepcao `vip-isentos`**.
+
+**Cliente não-VIP:**
+
+1. `drill <dominio_A> @<IP_pfsense>` → IP portal (sinkhole).
+2. `http://<dominio_A>/` → pagina «Acesso bloqueado» Layer7.
+3. Verificador: **BLOQUEADO** (politica ou blacklist conforme dominio).
+
+**Evidencias minimas (PASS):**
+
+- Modo DNS documentado (a ou b) coerente com GUI e Unbound/NAT.
+- VIP: DNS + HTTP livres em dominios sinkhole (a) ou limitacao (b) explicita.
+- Não-VIP: sinkhole + block page em ambos dominios A e B.
+- `pfctl -t layer7_exc_allow_*` contem IP do director.
+
+### 20.4 Host overrides nativos Unbound (ADR-0020)
+
+Trade-off da view dedicada: IPs VIP podem **nao** herdar host overrides nativos
+do pfSense definidos na view global.
+
+1. Em **Services > DNS Resolver > Host Overrides**, criar entrada de teste
+   (ex.: `lab-vip-test.example.com` → `203.0.113.50`).
+2. Do **cliente VIP**: `drill lab-vip-test.example.com @<IP_pfsense>` — registar
+   se resolve para `203.0.113.50` ou comportamento diferente.
+3. Do **cliente não-VIP**: repetir — deve reflectir override global habitual.
+4. Documentar veredicto: **aceitavel** (override VIP funciona ou falha prevista
+   e aceite para directores) vs **bloqueante** (falha impede producao da opção a)
+   → nesse caso activar-se-ia fallback (b) no codigo; nao improvisar no appliance.
+
+Remover override de teste apos o gate.
+
+### 20.5 Modos de falha (FAIL)
+
+| Sintoma | Causa provavel |
+|---------|----------------|
+| VIP recebe IP portal no `drill` | View Unbound inactiva; fallback (b) com DNS local; IP errado na Lista VIP |
+| VIP ve block page HTTP | Isenção PF/daemon OK mas DNS nao; rever `layer7_vip_dns_sync` e markers |
+| Não-VIP navega livremente | Enforce off; VIP CIDR demasiado largo; politica nao activa |
+| `unbound-checkconf` FAIL apos gravar | Snippet VIP invalido — sistema deve cair para (b); confirmar alerta GUI |
+| Host override VIP inaceitavel | Trade-off ADR-0020; escalar decisao humana antes de enforce prod |
+| Verificador PERMITIDO mas browser bloqueado | Cache DNS no cliente; repetir com flush ou `drill` directo ao pfSense |
+
+Qualquer FAIL: preservar config export, logs Unbound/system, parar teste; **nao**
+promover versao nem alterar referencia `_24`.
+
+### 20.6 Rollback
+
+1. Desactivar perfis block e blacklists de teste; desactivar block page na GUI.
+2. Remover entradas de teste da Lista VIP (ou reinstalar snapshot exportado).
+3. `pkg install ..._58` (ou `_56`) se regressao de pacote necessaria — perde
+   isenção DNS completa mas mantem Lista VIP GUI parcial.
+4. Confirmar remocao markers VIP e block page em Unbound; `service layer7-blockpage
+   stop`; Filter reload.
+5. Producao: manter **`1.8.11_24`** passivo até gates G2–G7.
+
+**Teste automatizado local (builder, nao substitui appliance):**
+`php tests/functional/test_vip_dns_exempt.php` + `sh tests/test_blockpage_config.sh`.
+
+PASS minimo no appliance: **20.1** + **20.3** (two-client, dominios A e B) +
+modo DNS documentado em **20.2**; **20.4** executado ou explicitamente dispensado
+com decisao humana registada. **NO-GO producao inalterado.**
+
+**Plano SSOT:** [`../02-roadmap/plano-isencao-vip-e-ux-gui.md`](../02-roadmap/plano-isencao-vip-e-ux-gui.md) (Bloco E);
+[`../03-adr/ADR-0020-isencao-vip-dns.md`](../03-adr/ADR-0020-isencao-vip-dns.md).

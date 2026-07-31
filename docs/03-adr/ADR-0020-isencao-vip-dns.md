@@ -94,7 +94,7 @@ isenção **parcial** e **honesta**:
 2. **Fallback automático:** se (a) falhar validação → opção (b) rdr
    `from !<layer7_exc_allow_N>` (global `force_dns` e blacklist por CIDR);
    GUI Lista VIP avisa limitação sinkhole.
-3. Gate lab Bloco E: cenário «director isento de tudo» (`validacao-lab`).
+3. Gate lab Bloco E: cenário «director isento de tudo» (`validacao-lab` sec. **20**).
 
 ### 5. O que este ADR não resolve
 
@@ -126,7 +126,7 @@ isenção **parcial** e **honesta**:
 
 - Lab Bloco E: enforce + perfil block + blacklist UT1 + block page ON +
   `force_dns` ON; IP VIP navega domínios sinkhole; cliente não-VIP bloqueado
-  com página.
+  com página. Roteiro: `validacao-lab.md` sec. **20**.
 - (a): `unbound-checkconf`; consulta DNS de IP VIP vs não-VIP para domínio
   sinkhole; verificar host override nativo.
 - (b): `pfctl -nf -` com snippet rdr `from !<layer7_exc_allow_N>`; cliente

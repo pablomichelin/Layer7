@@ -50,6 +50,10 @@ Referência rápida do que o PHP valida antes de gravar `layer7.json`.
 | SSOT | Excepção canónica `vip-isentos` (sem chaves novas dentro do objecto) |
 | Isenção DNS (BG-073) | `layer7_vip_dns_sync()` em resync; view Unbound ou fallback rdr; modo visível via `layer7_vip_dns_mode_get()` |
 
+**Validação lab (Bloco E):** cenário «director isento de tudo» — sec. **20** em
+[`validacao-lab.md`](../04-package/validacao-lab.md) (enforce + block page +
+blacklist UT1 + two-client + ADR-0020).
+
 Helpers em **`/usr/local/pkg/layer7.inc`**.
 
 ## Leitura só (`layer7_status.php`)
