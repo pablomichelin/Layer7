@@ -272,6 +272,45 @@ Modelo conceptual: [`modelo-conceptual-gui.md`](../00-overview/modelo-conceptual
 
 ---
 
+## Gates BG-071 / BG-072 / BG-073 (Lista VIP global)
+
+Feature «Lista VIP global»: isenção total com nome por entrada, limites daemon
+coerentes e isenção no caminho DNS. Ordem de execução **A → B → C → D → E**.
+ADR-0020 (Bloco A). SSOT da isenção: excepção `vip-isentos` (D1); labels em
+`layer7["vip_meta"]["labels"]` (D2). Produção enforce continua `_24`.
+
+### Bloco A — Governança documental
+
+- [x] ADR-0020 aprovado (`docs/03-adr/ADR-0020-isencao-vip-dns.md`)
+- [x] BG-071, BG-072, BG-073 registados no backlog
+- [x] CORTEX, roadmap e checklist actualizados
+
+### Bloco B — GUI Lista VIP (`_57`, BG-071)
+
+- [ ] Secção «Lista VIP (isencão total)» em `layer7_exceptions.php`
+- [ ] Labels em `vip_meta.labels`; validação de limites (8+8 até Bloco C)
+- [ ] Export/import da lista; link «Gerir Lista VIP» no modal Perfis rápidos
+- [ ] Aviso DHCP static mapping; aviso sinkhole DNS até Bloco D
+- [ ] `php -l` + teste funcional PHP PASS
+
+### Bloco C — Limites daemon (`_58`, BG-072)
+
+- [ ] `L7_EXC_MAX_HOSTS=32`, `L7_EXC_MAX_CIDRS=16` em `policy.h`
+- [ ] Validação PHP/upsert alinhada; testes C parse/decisão PASS
+
+### Bloco D — Isenção DNS (`_59`, BG-073)
+
+- [ ] ADR-0020 implementado: opção (a) view Unbound ou fallback (b)
+- [ ] `unbound-checkconf` / `pfctl -nf` conforme opção escolhida
+- [ ] Limitação sinkhole documentada na GUI se apenas (b)
+
+### Bloco E — Validação lab
+
+- [ ] Cenário «director isento de tudo» em `validacao-lab.md`
+- [ ] Gate humano; NO-GO produção inalterado
+
+---
+
 ## Condicoes para pedir validacao humana
 
 - [ ] existe duvida sobre compatibilidade com pfSense CE

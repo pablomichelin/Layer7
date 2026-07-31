@@ -40,6 +40,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0017](ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) | Página de bloqueio utilizador final (DNS sinkhole + HTTP local) | Aceito; `_35` | Unbound local-data + serviço `layer7-blockpage` + NAT rdr :80; opt-in OFF; sem MITM |
 | [ADR-0018](ADR-0018-plano-dns-forcado-e-precedencia-bloqueio.md) | Plano DNS forçado (anti-bypass) e precedência de bloqueio sobre allowlist | Aceito; `_39`/`_40` | política manual prevalece sobre allowlist-seed; `block_page.force_dns` (rdr :53 global + anti-DoH); trade-off CDN declarado |
 | [ADR-0019](ADR-0019-src-exclude-por-politica.md) | Exclusão de origem por política (`src_exclude_*`) | Aceito; `_50` | `layer7_pexc_N` + `L7ALLOW` em scoped; daemon não-match; trade-off legacy_global documentado |
+| [ADR-0020](ADR-0020-isencao-vip-dns.md) | Isenção VIP no caminho DNS (sinkhole + DNS forçado) | Aceito; `_59` | view Unbound preferida para VIPs; fallback rdr `from !<layer7_exc_allow_N>`; SSOT `vip-isentos` inalterado |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

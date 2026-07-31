@@ -581,6 +581,11 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   registados; backlog **BG-064** (isenção VIP modal, `_48`), **BG-065** (UX +
   verificador, `_49`), **BG-066** (exclusão por política + ADR-0019, `_50`).
   Ordem de execucao A→E; NO-GO producao inalterado.
+- **Lista VIP global (`2026-07-31`, documental Bloco A):** extensão da isenção
+  VIP para GUI de primeira classe, limites daemon e caminho DNS. Backlog
+  **BG-071** (GUI Lista VIP, `_57`), **BG-072** (limites `L7_EXC_MAX_*`,
+  `_58`), **BG-073** (isenção DNS + **ADR-0020**, `_59`). SSOT `vip-isentos`
+  inalterado; labels em `vip_meta.labels`. Ordem A→E; NO-GO producao inalterado.
 
 ### Criterios de entrada
 

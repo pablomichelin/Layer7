@@ -190,6 +190,20 @@ registados. Backlog **BG-064** (isenção VIP nos Perfis rápidos, candidato
 política + ADR-0019, `_50`). Regra de ouro: campos GUI são atalhos, não
 armazenamentos paralelos. Execução em blocos A→E; NO-GO produção inalterado.
 
+### Lista VIP global — Bloco A governança (`2026-07-31`, documental)
+
+Extensão da isenção VIP para «director isento de tudo»: GUI de primeira
+classe com descrição por entrada, limites daemon coerentes e isenção no
+caminho DNS (sinkhole Unbound + `force_dns`). **ADR-0020** registado.
+Backlog **BG-071** (GUI Lista VIP, candidato `_57`), **BG-072** (limites
+`L7_EXC_MAX_HOSTS` 32 / `L7_EXC_MAX_CIDRS` 16, `_58`), **BG-073** (isenção
+DNS, `_59`). Decisões fechadas: **D1** `vip-isentos` permanece SSOT (sem
+mecanismo paralelo); **D2** labels em `layer7["vip_meta"]["labels"]` (daemon
+nunca lê); **D4** isenção DNS — opção (a) view Unbound preferida, fallback
+(b) rdr `from !<layer7_exc_allow_N>` com limitação sinkhole honesta. Ordem
+A→B→C→D→E; Bloco A concluído; blocos B–E pendentes. NO-GO produção inalterado
+(referência enforce `1.8.11_24` até G2–G7).
+
 ### Release `1.8.11_47` — HTTPS ao portal com erro imediato (publicada `2026-07-30`)
 
 UX da block page: HTTPS a dominio bloqueado (sinkhole → portal) deixava o
@@ -881,6 +895,10 @@ validacao fora da operacao real.
   checklist mestre; modelo conceptual em
   [`docs/00-overview/modelo-conceptual-gui.md`](docs/00-overview/modelo-conceptual-gui.md)
   como gate de revisão para mudanças de GUI.
+12. **Lista VIP global:** Bloco A concluído (`2026-07-31`); executar B→E em
+  ordem estrita — **BG-071**/`_57` (GUI), **BG-072**/`_58` (limites daemon),
+  **BG-073**/`_59` (isenção DNS, **ADR-0020**); gates no checklist mestre
+  secção BG-071/072/073; SSOT `vip-isentos` inalterado.
 
 ---
 
@@ -1239,8 +1257,10 @@ CHECKPOINT CANONICO
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
   corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
   EM VALIDACAO
-- Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking
-- Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060)
+- Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking;
+  Lista VIP global Bloco A concluido (ADR-0020; BG-071..073)
+- Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060;
+  Lista VIP global Bloco B autorizado apos Bloco A)
 - Reorganizacao fisica autorizada: nao (F6)
 - Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_56; producao enforce de referencia: 1.8.11_24)
 - Fonte canonica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
