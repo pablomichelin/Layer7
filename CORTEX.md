@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_54` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_54`,
-`SHA256=36317498e5d2671a2c0a1d42825169a5b7f709e6fa89e27a3660acf8672e87f4`;
+`1.8.11_55` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_55`,
+`SHA256=616e72b104a69e9721203f897acfa3e3f8176191c8b8f7dc73b93cfe8d3c7b8f`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** continua `1.8.11_24`
 (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
@@ -205,6 +205,21 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Candidato `1.8.11_55` — perfis editáveis e personalizados (BG-070)
+
+Overlay cliente em `/usr/local/etc/layer7/profiles-custom.json` (**nunca** no
+`pkg-plist`): overrides de fábrica (apps/hosts add/remove, ocultar cartão) e
+perfis novos (`c-*`) no grupo **Personalizados**. `layer7_load_profiles()` faz
+merge fábrica → overrides → custom; GUI com criar/editar/apagar, badges
+`personalizado`/`editado`, reconnect automático de política ligada; export/import
+e preservação em upgrade/uninstall (keep-config). Apps restritos ao catálogo
+nDPI dos 72 perfis de fábrica; hosts texto livre validado. Daemon inalterado.
+Testes `test_profiles_custom_merge.php` + builder/simulação upgrade PASS.
+Artefacto `pfSense-pkg-layer7-1.8.11_55.pkg`,
+`SHA256=616e72b104a69e9721203f897acfa3e3f8176191c8b8f7dc73b93cfe8d3c7b8f`.
+Release publicada `v1.8.11_55`. Gate appliance pendente; produção enforce
+continua `_24`.
 
 ### Candidato `1.8.11_54` — correcção visual grelha Perfis rápidos (BG-069)
 

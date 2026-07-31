@@ -275,6 +275,24 @@ Esse plano cobre os proximos blocos para:
   Jogos, Produtividade, Segurança e bypass, Presets; toggle directo + modal
   Opções com ate 64 apps).
 
+### 7.3.2 Perfis personalizados e editáveis (`1.8.11_55`)
+
+Além dos 72 perfis de fábrica em `profiles.json` (substituído em cada upgrade do
+pacote), o Layer7 grava customizações do cliente em
+**`/usr/local/etc/layer7/profiles-custom.json`** — ficheiro **fora** do pacote,
+preservado nos upgrades.
+
+| Acção | Comportamento |
+|-------|----------------|
+| **Editar perfil de fábrica** | Grava um *override* (apps/hosts a acrescentar ou remover, ocultar cartão). O catálogo de fábrica permanece intacto. |
+| **Criar perfil** | Novo id `c-*` no grupo **Personalizados** (apps só do catálogo nDPI agregado dos perfis de fábrica; hosts texto livre). |
+| **Política ligada** | Ao guardar, a política `profile-<id>` é actualizada automaticamente (aviso na GUI). |
+| **Ocultar** | Remove o cartão da grelha; se o perfil estiver ligado, a política **permanece** activa. |
+| **Backup pfSense XML** | **Não** inclui `profiles-custom.json` — use Export em Definições Layer7. |
+
+Limites pós-merge: 64 apps / 8 categorias / 64 hosts por perfil; 24 políticas no
+toggle.
+
 ### 7.3.1 Perfis rapidos (catalogo `1.8.11_53`; visual `1.8.11_54`)
 
 A pagina **Politicas > Perfis rapidos** expoe atalhos pre-configurados. Cada perfil

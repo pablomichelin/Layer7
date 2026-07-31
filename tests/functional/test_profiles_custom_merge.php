@@ -43,7 +43,7 @@ $custom = array(
 			"description" => "Perfil de teste",
 			"icon" => "fa-flask",
 			"group" => "Personalizados",
-			"ndpi_apps" => array("HTTP"),
+			"ndpi_apps" => array("YouTube"),
 			"ndpi_categories" => array(),
 			"hosts" => array("lab.example.com"),
 		),
@@ -103,8 +103,8 @@ if (!$fb_in_all) {
 }
 
 $catalog = layer7_profiles_catalog();
-if (empty($catalog["apps"]) || !isset($catalog["apps_set"]["HTTP"])) {
-	fwrite(STDERR, "FAIL: catalogo de apps vazio ou sem HTTP\n");
+if (empty($catalog["apps"]) || !isset($catalog["apps_set"]["YouTube"])) {
+	fwrite(STDERR, "FAIL: catalogo de apps vazio ou sem YouTube\n");
 	exit(1);
 }
 

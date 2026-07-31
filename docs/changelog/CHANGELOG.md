@@ -2,6 +2,40 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_55] - 2026-07-31 — Perfis editáveis e personalizados (BG-070)
+
+### Added
+
+- **`/usr/local/etc/layer7/profiles-custom.json`** (overlay cliente; **fora** do
+  `pkg-plist` / Makefile): `overrides` para perfis de fábrica
+  (`hosts_add/remove`, `apps_add/remove`, `hidden`) e `custom_profiles` com ids
+  prefixo `c-`.
+- **`layer7_load_profiles()`** passa a fazer merge: fábrica → overrides →
+  personalizados; grupo GUI **Personalizados** no fim da grelha.
+- GUI **Politicas > Perfis rápidos**: botão **Criar perfil**, **Editar** por
+  cartão, badges `personalizado` / `editado`, modal de edição (apps só do
+  catálogo de fábrica; hosts texto livre validado), auto-reconnect da política
+  ligada com aviso.
+- Export/Import em **Definições** inclui `profiles_custom`.
+- `pkg-install.in` cria skeleton vazio na 1.ª instalação; upgrade preserva
+  `profiles-custom.json` (padrão UT1/blacklists).
+
+### Changed
+
+- `pkg-deinstall.in` / remoção GUI: opção **Manter configuração** preserva
+  também `profiles-custom.json`.
+
+### Tests
+
+- `tests/functional/test_profiles_custom_merge.php` + extensão de
+  `test_profiles_json.sh` (merge overlay).
+- Builder FreeBSD 15: `php -l`, suite local, pacote sem `profiles-custom.json`
+  no `.pkg`, simulação upgrade com ficheiro intacto e merge activo — PASS.
+
+### Docs
+
+- CORTEX, backlog BG-070, guia completo 7.3.2, MANUAL-INSTALL (rollback → `_54`).
+
 ## [1.8.11_54] - 2026-07-31 — Correcção visual da grelha Perfis rápidos (BG-069)
 
 ### Fixed
