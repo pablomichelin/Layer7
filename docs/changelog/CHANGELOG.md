@@ -2,6 +2,38 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_59] - 2026-07-31 — BG-073 isenção VIP caminho DNS (Bloco D)
+
+### Added
+
+- **ADR-0020 opção (a):** view Unbound `layer7-vip-exempt` (sem `view-first`) via
+  `access-control-view` para IPs/CIDRs de `vip-isentos`; markers
+  `L7_VIP_DNS_MARKER_*` idempotentes em `custom_options`.
+- Regeneração em `layer7_vip_dns_sync()` / `layer7_blockpage_sync()` /
+  `layer7_pf_config_resync()`; validação `unbound-checkconf` antes de gravar.
+- **Fallback opção (b):** se a view falhar validação, rdr `:53` global e por
+  blacklist passam a `from !<layer7_exc_allow_N>` (e `from {cidr} !<table>`);
+  limitação sinkhole documentada na GUI.
+- `layer7_remove_unbound_vip_dns()` em `pkg-deinstall`; testes
+  `test_vip_dns_exempt.php`.
+
+### Notes
+
+- SSOT `vip-isentos` inalterado; sem chaves novas no objecto excepção.
+- Sinkhole bypass **completo** com opção (a); parcial (só rdr) com fallback (b).
+- Host overrides nativos para VIPs: trade-off documentado (gate Bloco E).
+
+### Tests
+
+- `test_vip_dns_exempt.php`: snippet Unbound, strip, fallback rdr, `pfctl -nf`
+  quando disponível.
+- `php -l` nos PHP tocados; suite local/builder.
+
+### Docs
+
+- CORTEX, backlog BG-073, checklist Bloco D, ADR-0020, MANUAL-INSTALL (_59),
+  `gui-validation.md`.
+
 ## [1.8.11_58] - 2026-07-31 — BG-072 limites daemon Lista VIP
 
 ### Changed

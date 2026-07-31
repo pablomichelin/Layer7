@@ -36,6 +36,9 @@ require_once('/usr/local/pkg/layer7.inc');
 if (function_exists('layer7_remove_unbound_blockpage')) {
 	layer7_remove_unbound_blockpage();
 }
+if (function_exists('layer7_remove_unbound_vip_dns')) {
+	layer7_remove_unbound_vip_dns();
+}
 " >/dev/null 2>&1 || true
 	/usr/sbin/service layer7d onestop >/dev/null 2>&1 || true
 	layer7_remove_crontabs

@@ -1,6 +1,6 @@
 # ADR-0020 — Isenção VIP no caminho DNS (sinkhole e DNS forçado)
 
-- **Estado:** Aceito; candidato `_59` (Bloco D Lista VIP global)
+- **Estado:** Implementado; release `1.8.11_59` (Bloco D Lista VIP global)
 - **Data:** 2026-07-31
 - **Fase:** Caminho B / F4.3 (Lista VIP global)
 - **Backlog:** BG-073
@@ -88,13 +88,13 @@ isenção **parcial** e **honesta**:
 
 ### 4. Ordem de implementação
 
-1. Tentar (a) no lab com cenário «director isento de tudo» (`validacao-lab`,
-   secção prevista no Bloco E).
-2. Se (a) = FAIL ou regressão inaceitável em host overrides → implementar (b)
-   e actualizar GUI/help-block (modal Perfis rápidos, Lista VIP) com aviso
-   sobre sinkhole local.
-3. Qualquer tabela PF nova ou alteração de rdr entra em flush, self-heal e
-   `layer7-pfctl flush-all` desde o primeiro commit (lição BG-061).
+1. **Implementado em `_59`:** opção (a) — view Unbound `layer7-vip-exempt` sem
+   `view-first`, `access-control-view` derivado de `vip-isentos`,
+   `unbound-checkconf` antes de gravar.
+2. **Fallback automático:** se (a) falhar validação → opção (b) rdr
+   `from !<layer7_exc_allow_N>` (global `force_dns` e blacklist por CIDR);
+   GUI Lista VIP avisa limitação sinkhole.
+3. Gate lab Bloco E: cenário «director isento de tudo» (`validacao-lab`).
 
 ### 5. O que este ADR não resolve
 

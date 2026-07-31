@@ -302,9 +302,11 @@ ADR-0020 (Bloco A). SSOT da isenção: excepção `vip-isentos` (D1); labels em
 
 ### Bloco D — Isenção DNS (`_59`, BG-073)
 
-- [ ] ADR-0020 implementado: opção (a) view Unbound ou fallback (b)
-- [ ] `unbound-checkconf` / `pfctl -nf` conforme opção escolhida
-- [ ] Limitação sinkhole documentada na GUI se apenas (b)
+- [x] ADR-0020 implementado: opção (a) view Unbound `layer7-vip-exempt`
+- [x] `unbound-checkconf` antes de gravar; fallback (b) rdr `from !<layer7_exc_allow_N>`
+- [x] GUI Lista VIP: aviso conforme modo (`unbound_view` vs `rdr_fallback`)
+- [x] `test_vip_dns_exempt.php` + `php -l` PASS (builder)
+- [x] Release `1.8.11_59` publicada em `pablomichelin/Layer7`
 
 ### Bloco E — Validação lab
 

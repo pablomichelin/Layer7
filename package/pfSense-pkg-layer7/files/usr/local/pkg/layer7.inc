@@ -313,11 +313,12 @@ function layer7_generate_rdr_rules_snippet()
 				}
 				$seen_rdr[$key] = true;
 				$has_rules = true;
+			$from = layer7_vip_dns_rdr_from_cidr($data, $cidr);
 			$lines[] = "rdr on {$iface} inet proto udp" .
-			    " from {$cidr} to !127.0.0.1 port 53" .
+			    " {$from}to !127.0.0.1 port 53" .
 			    " -> 127.0.0.1";
 			$lines[] = "rdr on {$iface} inet proto tcp" .
-			    " from {$cidr} to !127.0.0.1 port 53" .
+			    " {$from}to !127.0.0.1 port 53" .
 			    " -> 127.0.0.1";
 			}
 		}
@@ -1851,6 +1852,9 @@ function layer7_unbound_anti_doh_configured()
 define('L7_BLOCKPAGE_PORT', 8099);
 define('L7_BLOCKPAGE_MARKER_START', '# --- Layer7 block-page START ---');
 define('L7_BLOCKPAGE_MARKER_END', '# --- Layer7 block-page END ---');
+define('L7_VIP_DNS_MARKER_START', '# --- Layer7 VIP DNS exempt START ---');
+define('L7_VIP_DNS_MARKER_END', '# --- Layer7 VIP DNS exempt END ---');
+define('L7_VIP_DNS_VIEW_NAME', 'layer7-vip-exempt');
 
 /**
  * Configuracao normalizada da pagina de bloqueio (defaults seguros).
@@ -2138,6 +2142,319 @@ function layer7_unbound_blockpage_strip($text)
 }
 
 /**
+ * Meta da excepcao allow vip-isentos (SSOT isencao VIP / ADR-0020).
+ *
+ * @return array|null entrada de layer7_exception_allow_meta ou null
+ */
+function layer7_vip_exc_allow_meta($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	foreach (layer7_exception_allow_meta($data) as $m) {
+		if (layer7_is_managed_vip_exception($m["exception"])) {
+			return $m;
+		}
+	}
+	return null;
+}
+
+/**
+ * Redes access-control-view para vip-isentos (hosts /32 + CIDRs).
+ *
+ * @return string[]
+ */
+function layer7_vip_dns_acl_netblocks($data = null)
+{
+	$m = layer7_vip_exc_allow_meta($data);
+	if ($m === null || empty($m["entries"])) {
+		return array();
+	}
+	$nets = array();
+	foreach ($m["entries"] as $entry) {
+		$entry = trim((string)$entry);
+		if ($entry === "") {
+			continue;
+		}
+		if (layer7_ipv4_valid($entry)) {
+			$nets[] = $entry . "/32";
+		} elseif (layer7_cidr_valid($entry)) {
+			$nets[] = $entry;
+		}
+	}
+	sort($nets, SORT_STRING);
+	return array_values(array_unique($nets));
+}
+
+function layer7_vip_dns_rdr_fallback_set($enabled)
+{
+	$GLOBALS["layer7_vip_dns_rdr_fallback"] = !empty($enabled);
+}
+
+function layer7_vip_dns_rdr_fallback_enabled()
+{
+	return !empty($GLOBALS["layer7_vip_dns_rdr_fallback"]);
+}
+
+/**
+ * Aplica isencao VIP no caminho DNS quando enforce + vip-isentos activo.
+ */
+function layer7_vip_dns_should_apply($data = null)
+{
+	if (!layer7_pf_should_enforce($data)) {
+		return false;
+	}
+	return layer7_vip_exc_allow_meta($data) !== null;
+}
+
+/**
+ * Clausula PF `from` para rdr DNS global (fallback ADR-0020 opcao b).
+ */
+function layer7_vip_dns_rdr_from_any($data = null)
+{
+	if (!layer7_vip_dns_rdr_fallback_enabled()) {
+		return "from any ";
+	}
+	$m = layer7_vip_exc_allow_meta($data);
+	if ($m === null) {
+		return "from any ";
+	}
+	$idx = (int)$m["idx"];
+	return "from !<layer7_exc_allow_{$idx}> ";
+}
+
+/**
+ * Clausula PF `from` para rdr DNS por CIDR blacklist (fallback opcao b).
+ */
+function layer7_vip_dns_rdr_from_cidr($data, $cidr)
+{
+	$cidr = trim((string)$cidr);
+	if (!layer7_vip_dns_rdr_fallback_enabled()) {
+		return "from {$cidr} ";
+	}
+	$m = layer7_vip_exc_allow_meta($data);
+	if ($m === null) {
+		return "from {$cidr} ";
+	}
+	$idx = (int)$m["idx"];
+	return "from {$cidr} !<layer7_exc_allow_{$idx}> ";
+}
+
+/**
+ * Bloco Unbound view + access-control-view (ADR-0020 opcao a; sem view-first).
+ */
+function layer7_vip_unbound_view_block($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$nets = layer7_vip_dns_acl_netblocks($data);
+	if (empty($nets)) {
+		return "";
+	}
+	$view = L7_VIP_DNS_VIEW_NAME;
+	$lines = array();
+	$lines[] = L7_VIP_DNS_MARKER_START;
+	$lines[] = "# Layer7 VIP DNS: view {$view} (ADR-0020 / vip-isentos; sem view-first)";
+	$lines[] = "view:";
+	$lines[] = "    name: \"{$view}\"";
+	$lines[] = "server:";
+	foreach ($nets as $net) {
+		$lines[] = "    access-control-view: {$net} {$view}";
+	}
+	$lines[] = L7_VIP_DNS_MARKER_END;
+	return implode("\n", $lines) . "\n";
+}
+
+function layer7_unbound_vip_dns_strip($text)
+{
+	$pos_start = strpos($text, L7_VIP_DNS_MARKER_START);
+	if ($pos_start === false) {
+		return $text;
+	}
+	$pos_end = strpos($text, L7_VIP_DNS_MARKER_END, $pos_start);
+	if ($pos_end === false) {
+		return substr($text, 0, $pos_start);
+	}
+	$pos_end += strlen(L7_VIP_DNS_MARKER_END);
+	while ($pos_end < strlen($text) &&
+	    ($text[$pos_end] === "\n" || $text[$pos_end] === "\r")) {
+		$pos_end++;
+	}
+	return rtrim(substr($text, 0, $pos_start)) .
+	    (strlen($text) > $pos_end ? substr($text, $pos_end) : "");
+}
+
+/**
+ * Valida snippet Unbound com unbound-checkconf (quando disponivel).
+ *
+ * @return array{ok: bool, skipped: bool, msg: string}
+ */
+function layer7_unbound_checkconf_snippet($snippet)
+{
+	$checkconf = "/usr/local/sbin/unbound-checkconf";
+	if (!is_executable($checkconf)) {
+		return array("ok" => true, "skipped" => true, "msg" => "");
+	}
+	$snippet = trim((string)$snippet);
+	if ($snippet === "") {
+		return array("ok" => true, "skipped" => false, "msg" => "");
+	}
+	$tmpdir = sys_get_temp_dir();
+	$base = @tempnam($tmpdir, "l7ubc");
+	if ($base === false) {
+		return array("ok" => false, "skipped" => false,
+		    "msg" => "tempnam failed");
+	}
+	$inc = $base . ".inc";
+	@unlink($base);
+	if (@file_put_contents($inc, $snippet . "\n") === false) {
+		return array("ok" => false, "skipped" => false,
+		    "msg" => "write snippet failed");
+	}
+	$conf = "server:\n    verbosity: 0\n    include: \"" . $inc . "\"\n";
+	if (@file_put_contents($base, $conf) === false) {
+		@unlink($inc);
+		return array("ok" => false, "skipped" => false,
+		    "msg" => "write conf failed");
+	}
+	$out = array();
+	$code = 0;
+	exec($checkconf . " " . escapeshellarg($base) . " 2>&1", $out, $code);
+	@unlink($base);
+	@unlink($inc);
+	if ($code !== 0) {
+		return array(
+		    "ok" => false,
+		    "skipped" => false,
+		    "msg" => implode("\n", $out)
+		);
+	}
+	return array("ok" => true, "skipped" => false, "msg" => "");
+}
+
+/**
+ * Aplica ou remove view Unbound VIP (validacao unbound-checkconf antes de gravar).
+ *
+ * @return array{ok: bool, msg: string}
+ */
+function layer7_configure_unbound_vip_dns($data = null)
+{
+	global $config;
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (!function_exists("write_config")) {
+		return array("ok" => false,
+		    "msg" => l7_t("Funcao write_config nao disponivel."));
+	}
+	if (!isset($config["unbound"])) {
+		return array("ok" => false,
+		    "msg" => l7_t("Seccao Unbound nao encontrada no config.xml."));
+	}
+	$existing = layer7_unbound_custom_options_read();
+	$existing = layer7_unbound_vip_dns_strip($existing);
+	$block = layer7_vip_unbound_view_block($data);
+	if ($block === "") {
+		layer7_unbound_custom_options_write(trim($existing));
+		write_config("Layer7: VIP DNS exempt removed");
+		if (function_exists("services_unbound_configure")) {
+			services_unbound_configure();
+		}
+		return array("ok" => true,
+		    "msg" => l7_t("Isencao VIP DNS Unbound removida."));
+	}
+	$check = layer7_unbound_checkconf_snippet($block);
+	if (!$check["ok"]) {
+		return array(
+		    "ok" => false,
+		    "msg" => l7_t("Snippet VIP DNS rejeitado pelo unbound-checkconf.")
+		);
+	}
+	$new_content = "";
+	if ($existing !== "") {
+		$new_content = rtrim($existing) . "\n\n";
+	}
+	$new_content .= $block;
+	layer7_unbound_custom_options_write($new_content);
+	write_config("Layer7: VIP DNS exempt view (ADR-0020)");
+	if (function_exists("services_unbound_configure")) {
+		services_unbound_configure();
+	}
+	$n = count(layer7_vip_dns_acl_netblocks($data));
+	return array(
+	    "ok" => true,
+	    "msg" => sprintf(
+	        l7_t("Isencao VIP DNS: view Unbound para %d rede(s)."), $n)
+	);
+}
+
+function layer7_remove_unbound_vip_dns()
+{
+	global $config;
+	if (!function_exists("write_config") || !isset($config["unbound"])) {
+		return array("ok" => false, "msg" => l7_t("Config nao acessivel."));
+	}
+	$existing = layer7_unbound_custom_options_read();
+	if (strpos($existing, L7_VIP_DNS_MARKER_START) === false) {
+		return array("ok" => true,
+		    "msg" => l7_t("Overrides VIP DNS nao encontrados."));
+	}
+	$existing = layer7_unbound_vip_dns_strip($existing);
+	layer7_unbound_custom_options_write(trim($existing));
+	write_config("Layer7: VIP DNS overrides removed");
+	if (function_exists("services_unbound_configure")) {
+		services_unbound_configure();
+	}
+	return array("ok" => true,
+	    "msg" => l7_t("Overrides VIP DNS removidos do Unbound."));
+}
+
+/**
+ * Sincroniza isencao VIP DNS: opcao (a) view Unbound; fallback (b) rdr exc_allow.
+ */
+function layer7_vip_dns_sync($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	layer7_vip_dns_rdr_fallback_set(false);
+	if (!layer7_vip_dns_should_apply($data)) {
+		layer7_remove_unbound_vip_dns();
+		return;
+	}
+	$res = layer7_configure_unbound_vip_dns($data);
+	if (!$res["ok"]) {
+		layer7_vip_dns_rdr_fallback_set(true);
+		layer7_remove_unbound_vip_dns();
+		layer7_log_pkg_warn(
+		    "Layer7: VIP DNS view Unbound falhou; fallback rdr " .
+		    "from !<layer7_exc_allow_N> (ADR-0020 opcao b). " .
+		    $res["msg"]);
+	}
+}
+
+/**
+ * Modo efectivo da isencao VIP DNS para a GUI (apos ultimo sync).
+ *
+ * @return string none|unbound_view|rdr_fallback
+ */
+function layer7_vip_dns_mode_get($data = null)
+{
+	if (!layer7_vip_dns_should_apply($data)) {
+		return "none";
+	}
+	$opts = layer7_unbound_custom_options_read();
+	if (strpos($opts, L7_VIP_DNS_MARKER_START) !== false) {
+		return "unbound_view";
+	}
+	if (layer7_vip_dns_rdr_fallback_enabled()) {
+		return "rdr_fallback";
+	}
+	return "rdr_fallback";
+}
+
+/**
  * Aplica ou remove overrides Unbound da pagina de bloqueio.
  */
 function layer7_configure_unbound_blockpage($data = null)
@@ -2311,11 +2628,12 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
 	$bp = layer7_blockpage_config_get($data);
 	if (!empty($bp["force_dns"])) {
 		$lines[] = "# DNS forcado global (anti-bypass sinkhole) — block_page.force_dns";
+		$from = layer7_vip_dns_rdr_from_any($data);
 		foreach ($real_ifaces as $iface) {
 			$lines[] = "rdr on {$iface} inet proto udp" .
-			    " from any to !127.0.0.1 port 53 -> 127.0.0.1";
+			    " {$from}to !127.0.0.1 port 53 -> 127.0.0.1";
 			$lines[] = "rdr on {$iface} inet proto tcp" .
-			    " from any to !127.0.0.1 port 53 -> 127.0.0.1";
+			    " {$from}to !127.0.0.1 port 53 -> 127.0.0.1";
 		}
 	}
 	return implode("\n", $lines) . "\n";
@@ -2358,7 +2676,9 @@ function layer7_blockpage_sync($data = null)
 		return;
 	}
 	layer7_remove_unbound_blockpage();
-	layer7_ensure_blockpage_service(false);
+		layer7_ensure_blockpage_service(false);
+	}
+	layer7_vip_dns_sync($data);
 }
 
 /**

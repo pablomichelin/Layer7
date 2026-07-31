@@ -280,6 +280,7 @@ $vip_cidr_count = count(array_filter($vip_entries, function ($r) {
 }));
 $vip_at_host_limit = $vip_host_count >= LAYER7_VIP_MAX_HOSTS;
 $vip_at_cidr_limit = $vip_cidr_count >= LAYER7_VIP_MAX_CIDRS;
+$vip_dns_mode = layer7_vip_dns_mode_get($data);
 
 $edit_ex_idx = null;
 $edit_ex = null;
@@ -328,11 +329,18 @@ function layer7_exc_target_summary($exception) {
 
 			<div class="layer7-section" id="l7-vip-list">
 			<h3 class="layer7-section-title"><?= l7_t("Lista VIP (isencao total)"); ?></h3>
-			<p class="layer7-lead"><?= l7_t("Origens isentas de todos os bloqueios Layer7 (PF e daemon). Gere a excepcao canonica vip-isentos com descricao por entrada."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Origens isentas de todos os bloqueios Layer7 (PF, daemon e sinkhole DNS quando enforce activo). Gere a excepcao canonica vip-isentos com descricao por entrada."); ?></p>
+			<?php if ($vip_dns_mode === "rdr_fallback") { ?>
 			<div class="alert alert-warning">
-				<strong><?= l7_t("Aviso DNS"); ?>:</strong>
-				<?= l7_t("Isencao total de bloqueios Layer7; sinkhole DNS so coberto apos Bloco D (ADR-0020)."); ?>
+				<strong><?= l7_t("Aviso DNS (fallback)"); ?>:</strong>
+				<?= l7_t("A view Unbound VIP falhou validacao; isencao DNS usa apenas exclusao do rdr :53. Clientes VIP que usem o resolver local Unbound podem continuar sujeitos ao sinkhole — ver ADR-0020."); ?>
 			</div>
+			<?php } elseif ($vip_dns_mode === "unbound_view") { ?>
+			<div class="alert alert-info">
+				<strong><?= l7_t("Isencao DNS"); ?>:</strong>
+				<?= l7_t("View Unbound dedicada activa: origens VIP nao recebem sinkhole da pagina de bloqueio. Host overrides nativos podem diferir — validar no lab (Bloco E)."); ?>
+			</div>
+			<?php } ?>
 			<p class="help-block"><?= l7_t("Para dispositivos identificados por MAC, use Grupos com DHCP static mapping — IPs resolvidos podem ficar desactualizados se o lease mudar."); ?></p>
 			<?php if (!empty($vip_groups)) { ?>
 			<p class="help-block"><strong><?= l7_t("Grupos isentos (via Perfis rapidos)"); ?>:</strong>

@@ -48,6 +48,7 @@ Referência rápida do que o PHP valida antes de gravar `layer7.json`.
 | Labels | `layer7.vip_meta.labels` mapa alvo → descrição; cleanup de órfãos no save |
 | Export/import | JSON `layer7_vip_list` com array `entries` |
 | SSOT | Excepção canónica `vip-isentos` (sem chaves novas dentro do objecto) |
+| Isenção DNS (BG-073) | `layer7_vip_dns_sync()` em resync; view Unbound ou fallback rdr; modo visível via `layer7_vip_dns_mode_get()` |
 
 Helpers em **`/usr/local/pkg/layer7.inc`**.
 

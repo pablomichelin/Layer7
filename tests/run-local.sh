@@ -167,6 +167,16 @@ else
 	else
 		fail "test_logging_reports"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_vip_exception.php; then
+		pass "test_vip_exception"
+	else
+		fail "test_vip_exception"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_vip_dns_exempt.php; then
+		pass "test_vip_dns_exempt"
+	else
+		fail "test_vip_dns_exempt"
+	fi
 fi
 
 step "Lint: PHP do pacote (php -l)"

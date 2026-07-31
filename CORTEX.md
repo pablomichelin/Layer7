@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_58` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_58`,
-`SHA256=b5bc99db8ac8bf3b4aca871c3f56b6a5e9029109773791a08081ac16917a2b84`;
+`1.8.11_59` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_59`;
+SHA256 a confirmar pos-build — ver `MANUAL-INSTALL.md`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
@@ -202,7 +202,8 @@ mecanismo paralelo); **D2** labels em `layer7["vip_meta"]["labels"]` (daemon
 nunca lê); **D4** isenção DNS — opção (a) view Unbound preferida, fallback
 (b) rdr `from !<layer7_exc_allow_N>` com limitação sinkhole honesta. Ordem
 A→B→C→D→E; Bloco A concluído; **Bloco B concluído** (`1.8.11_57` publicado);
-**Bloco C concluído** (`1.8.11_58` publicado); Blocos D–E pendentes. NO-GO produção inalterado
+**Bloco C concluído** (`1.8.11_58` publicado); **Bloco D concluído**
+(`1.8.11_59` publicado); Bloco E pendente. NO-GO produção inalterado
 (referência enforce `1.8.11_24` até G2–G7).
 
 ### Release `1.8.11_47` — HTTPS ao portal com erro imediato (publicada `2026-07-30`)
@@ -222,6 +223,14 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Release `1.8.11_59` — BG-073 isenção VIP caminho DNS (publicado `2026-07-31`)
+
+**ADR-0020 opção (a):** view Unbound `layer7-vip-exempt` (sem `view-first`) via
+`access-control-view` para IPs/CIDRs de `vip-isentos`; markers idempotentes;
+`unbound-checkconf` antes de gravar. **Fallback (b):** rdr `:53`
+`from !<layer7_exc_allow_N>` se a view falhar. Sinkhole bypass **completo** com
+(a); parcial com (b). GUI Lista VIP reflecte modo efectivo. Rollback: `_58`.
 
 ### Release `1.8.11_58` — BG-072 limites daemon Lista VIP (publicado `2026-07-31`)
 
