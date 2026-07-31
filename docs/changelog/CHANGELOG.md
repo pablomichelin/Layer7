@@ -2,6 +2,43 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_54] - 2026-07-31 — Correcção visual da grelha Perfis rápidos (BG-069)
+
+### Fixed
+
+- **Cabeçalhos de grupo quebrados:** os títulos de grupo eram emitidos com
+  `grid-column:1/-1` dentro de um container `display:flex` — propriedade de CSS
+  grid ignorada em flex, o que deixava o cabeçalho "flutuando" inline no meio
+  dos cartões. Cada grupo passa a ser uma secção própria (`.l7-profile-group`)
+  com cabeçalho full-width (título + contador de perfis, linha separadora) e a
+  sua própria grelha de cartões.
+- **Ícones em falta (55 de 72 perfis):** a GUI ignorava o campo `icon` do
+  `profiles.json` e usava um mapa SVG hardcoded com apenas 17 ids antigos; os
+  restantes caíam no fallback de letra em quadrado cinzento. O cartão passa a
+  renderizar o ícone FontAwesome 4.7 (incluído no pfSense) declarado em
+  `profiles.json`, sanitizado (`^fa-[a-z0-9-]{1,40}$`), com cor de fundo por
+  marca (`$l7_brand_colors`, ~55 marcas) ou por grupo (`$l7_group_colors`).
+  O mapa SVG inline foi removido (~15 KB de HTML a menos por página).
+- **Cartões desalinhados:** cartões passam a flex column com `min-height`
+  uniforme, descrição truncada a 3 linhas (`-webkit-line-clamp` + `max-height`
+  fallback, texto completo no `title`) e botões Ligar/Desligar/Opções ancorados
+  ao fundo do cartão (`.l7-profile-cta { margin-top:auto }`).
+
+### Changed
+
+- `profiles.json`: `ai-tools` passa de `fa-robot` (inexistente no FA 4.7) para
+  `fa-magic` — único dos 72 ícones fora da lista oficial FA 4.7.
+
+### Tests
+
+- `tests/fixtures/fa47-icon-names.txt`: lista oficial dos 782 nomes (com
+  aliases) do FontAwesome 4.7; `test_profiles_json.sh` passa a falhar se algum
+  `icon` do `profiles.json` não existir no FA 4.7.
+
+### Docs
+
+- CORTEX, backlog BG-069, guia completo 7.3.1, MANUAL-INSTALL (rollback → `_53`).
+
 ## [1.8.11_53] - 2026-07-31 — Expansão catálogo Perfis rápidos Bloco 2 (BG-068)
 
 ### Added

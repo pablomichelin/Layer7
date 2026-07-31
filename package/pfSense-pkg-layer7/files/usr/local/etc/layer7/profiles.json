@@ -542,7 +542,7 @@
       "id": "ai-tools",
       "name": "AI Tools",
       "group": "Produtividade",
-      "icon": "fa-robot",
+      "icon": "fa-magic",
       "description": "Bloqueia ferramentas de IA (ChatGPT, Claude, Gemini, Copilot, DeepSeek, Grok, etc.).",
       "ndpi_apps": ["GithubCopilot"],
       "ndpi_categories": ["ArtifIntelligence"],

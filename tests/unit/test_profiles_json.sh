@@ -6,6 +6,7 @@ ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 PROFILES="$ROOT/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/profiles.json"
 NDPI_PROTOS="$ROOT/tests/fixtures/ndpi-protocol-names-builder.txt"
 NDPI_CATS="$ROOT/tests/fixtures/ndpi-category-names-builder.txt"
+FA47_ICONS="$ROOT/tests/fixtures/fa47-icon-names.txt"
 
 pass() { printf "PASS: %s\n" "$1"; }
 fail() { printf "FAIL: %s\n" "$1"; RC=1; }
@@ -34,6 +35,7 @@ fi
 $path = "'"$PROFILES"'";
 $proto_file = "'"$NDPI_PROTOS"'";
 $cat_file = "'"$NDPI_CATS"'";
+$fa_file = "'"$FA47_ICONS"'";
 $raw = file_get_contents($path);
 $j = json_decode($raw, true);
 if (!is_array($j) || !isset($j["profiles"]) || !is_array($j["profiles"])) {
@@ -50,6 +52,12 @@ $valid_cats = array();
 if (is_readable($cat_file)) {
 	foreach (file($cat_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $ln) {
 		$valid_cats[trim($ln)] = true;
+	}
+}
+$valid_fa = array();
+if (is_readable($fa_file)) {
+	foreach (file($fa_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $ln) {
+		$valid_fa[trim($ln)] = true;
 	}
 }
 $ids = array();
@@ -76,6 +84,10 @@ foreach ($j["profiles"] as $i => $p) {
 	$ids[$p["id"]] = true;
 	if (isset($p["icon"]) && $p["icon"] !== "" && !preg_match($fa_re, $p["icon"])) {
 		fwrite(STDERR, "FAIL: icon invalido em {$p["id"]}: {$p["icon"]}\n");
+		exit(1);
+	}
+	if (isset($p["icon"]) && $p["icon"] !== "" && !empty($valid_fa) && !isset($valid_fa[$p["icon"]])) {
+		fwrite(STDERR, "FAIL: icon fora do FontAwesome 4.7 em {$p["id"]}: {$p["icon"]}\n");
 		exit(1);
 	}
 	$apps = (isset($p["ndpi_apps"]) && is_array($p["ndpi_apps"])) ? $p["ndpi_apps"] : array();

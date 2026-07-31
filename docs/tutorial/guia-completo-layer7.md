@@ -275,11 +275,15 @@ Esse plano cobre os proximos blocos para:
   Jogos, Produtividade, Segurança e bypass, Presets; toggle directo + modal
   Opções com ate 64 apps).
 
-### 7.3.1 Perfis rapidos (catalogo `1.8.11_53`)
+### 7.3.1 Perfis rapidos (catalogo `1.8.11_53`; visual `1.8.11_54`)
 
 A pagina **Politicas > Perfis rapidos** expoe atalhos pre-configurados. Cada perfil
 pode combinar apps nDPI, categorias nDPI e hosts (limites: 64 apps / 8 categorias /
-64 hosts por politica). Grupos visuais organizam o catalogo estilo UniFi/UDM Pro.
+64 hosts por politica). Grupos visuais organizam o catalogo estilo UniFi/UDM Pro:
+cada grupo tem cabecalho proprio em linha completa (titulo + contador de perfis),
+os cartoes tem altura uniforme (descricao truncada a 3 linhas; texto completo no
+tooltip) e todos os perfis mostram o icone FontAwesome 4.7 declarado em
+`profiles.json`, com cor da marca quando conhecida ou cor do grupo.
 
 Exemplos de perfis individuais: Zoom, Teams, Threads, Bluesky, Deezer, DAZN,
 Anonymizers, Roblox, Free Fire. Agregados: Videoconferencia, Musica, Redes
