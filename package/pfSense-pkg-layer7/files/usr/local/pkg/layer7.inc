@@ -3953,8 +3953,11 @@ function layer7_vip_add_entry(&$data, $description, $target)
 	if (!$res["ok"]) {
 		return $res;
 	}
-	$labels = layer7_vip_get_labels($data);
-	$labels[$target] = $description;
+	if (!isset($data["layer7"]["vip_meta"]["labels"]) ||
+	    !is_array($data["layer7"]["vip_meta"]["labels"])) {
+		$data["layer7"]["vip_meta"]["labels"] = array();
+	}
+	$data["layer7"]["vip_meta"]["labels"][$target] = $description;
 	return array("ok" => true, "error" => "", "updated" => true);
 }
 
