@@ -822,10 +822,12 @@ function layer7_policy_match_summary($policy) {
 		$l7_group_order = array(
 			l7_t("Redes sociais"),
 			l7_t("Mensageria"),
+			l7_t("Comunicação e reuniões"),
 			l7_t("Streaming"),
 			l7_t("Jogos"),
 			l7_t("Produtividade"),
 			l7_t("Segurança e bypass"),
+			l7_t("Presets"),
 		);
 		$l7_profiles_by_group = array();
 		foreach ($l7_profiles as $prof) {

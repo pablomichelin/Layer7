@@ -2,6 +2,30 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_53] - 2026-07-31 — Expansão catálogo Perfis rápidos Bloco 2 (BG-068)
+
+### Added
+
+- **34 novos perfis** (38 → **72**): videoconferência (Zoom, Teams, Meet, Webex,
+  TeamSpeak, agregado), redes alternativas (Threads, Bluesky, Kick, Rumble,
+  Mastodon/Tumblr/VK/Weibo), streaming (Deezer, SoundCloud, DAZN, Paramount+,
+  Hulu, Vimeo/Dailymotion, futebol pirata), jogos (Roblox, Free Fire, Cloud
+  Gaming), produtividade (empregos, notícias, desporto, viagens, speedtest),
+  segurança (anonymizers, publicidade, malware, mining) e **3 presets**
+  (distrações, proteção infantil, higiene de rede).
+- Grupos GUI novos: **Comunicação e reuniões** e **Presets**.
+
+### Changed
+
+- Agregados **Redes Sociais**, **Jogos**, **VPN/Proxy** e **Criptomoedas**
+  reforçados (Threads/Bluesky, NetEaseGames/Garena, Psiphon/UltraSurf/Warp/Relay,
+  categoria Mining).
+- `$l7_group_order` em `layer7_policies.php` actualizado com os 2 grupos novos.
+
+### Docs
+
+- CORTEX, backlog BG-068, guia completo 7.3.1, MANUAL-INSTALL (rollback → `_52`).
+
 ## [1.8.11_52] - 2026-07-30 — Catálogo Perfis rápidos nível UniFi/UDM (BG-067)
 
 ### Added

@@ -95,8 +95,8 @@
       "name": "Redes Sociais",
       "group": "Redes sociais",
       "icon": "fa-users",
-      "description": "Agrega Facebook, Instagram, TikTok, Twitter/X, LinkedIn, Reddit, Kwai, Snapchat e Pinterest.",
-      "ndpi_apps": ["Facebook", "FacebookMessenger", "Instagram", "TikTok", "Twitter", "LinkedIn", "Snapchat", "Pinterest", "Reddit", "Likee"],
+      "description": "Agrega Facebook, Instagram, TikTok, Twitter/X, LinkedIn, Reddit, Kwai, Threads, Bluesky, Snapchat e Pinterest.",
+      "ndpi_apps": ["Facebook", "FacebookMessenger", "Instagram", "TikTok", "Twitter", "LinkedIn", "Snapchat", "Pinterest", "Reddit", "Likee", "Threads", "Bluesky"],
       "ndpi_categories": [],
       "hosts": [
         "facebook.com", "fbcdn.net", "fb.com", "fbsbx.com",
@@ -107,7 +107,9 @@
         "snapchat.com", "sc-cdn.net",
         "pinterest.com", "pinimg.com",
         "reddit.com", "redditstatic.com", "redd.it",
-        "kwai.com", "kwai-pro.com", "likee.com", "likeevideo.com"
+        "kwai.com", "kwai-pro.com", "likee.com", "likeevideo.com",
+        "threads.net", "threads.com",
+        "bsky.app", "bsky.social", "bsky.network"
       ]
     },
     {
@@ -158,6 +160,122 @@
         "snapchat.com", "sc-cdn.net",
         "messenger.com"
       ]
+    },
+    {
+      "id": "zoom",
+      "name": "Zoom",
+      "group": "Comunicação e reuniões",
+      "icon": "fa-video-camera",
+      "description": "Bloqueia Zoom (videoconferencia).",
+      "ndpi_apps": ["Zoom"],
+      "ndpi_categories": [],
+      "hosts": ["zoom.us", "zoom.com", "zoomgov.com", "zoomcdn.com"]
+    },
+    {
+      "id": "ms-teams",
+      "name": "Microsoft Teams",
+      "group": "Comunicação e reuniões",
+      "icon": "fa-windows",
+      "description": "Bloqueia Microsoft Teams (chat e chamadas).",
+      "ndpi_apps": ["Teams", "TeamsCall"],
+      "ndpi_categories": [],
+      "hosts": ["teams.microsoft.com", "teams.live.com", "teams.cdn.office.net"]
+    },
+    {
+      "id": "google-meet",
+      "name": "Google Meet",
+      "group": "Comunicação e reuniões",
+      "icon": "fa-video-camera",
+      "description": "Bloqueia Google Meet.",
+      "ndpi_apps": ["GoogleMeet"],
+      "ndpi_categories": [],
+      "hosts": ["meet.google.com"]
+    },
+    {
+      "id": "webex",
+      "name": "Webex",
+      "group": "Comunicação e reuniões",
+      "icon": "fa-video-camera",
+      "description": "Bloqueia Cisco Webex.",
+      "ndpi_apps": ["Webex"],
+      "ndpi_categories": [],
+      "hosts": ["webex.com", "ciscospark.com", "wbx2.com"]
+    },
+    {
+      "id": "teamspeak",
+      "name": "TeamSpeak",
+      "group": "Comunicação e reuniões",
+      "icon": "fa-microphone",
+      "description": "Bloqueia TeamSpeak (VoIP).",
+      "ndpi_apps": ["TeamSpeak"],
+      "ndpi_categories": [],
+      "hosts": ["teamspeak.com"]
+    },
+    {
+      "id": "videoconferencia",
+      "name": "Videoconferencia",
+      "group": "Comunicação e reuniões",
+      "icon": "fa-users",
+      "description": "Agrega Zoom, Teams, Google Meet, Webex e TeamSpeak (apps VoIP + hosts).",
+      "ndpi_apps": ["Zoom", "Teams", "TeamsCall", "GoogleMeet", "Webex"],
+      "ndpi_categories": ["VoIP"],
+      "hosts": [
+        "zoom.us", "zoom.com", "zoomgov.com", "zoomcdn.com",
+        "teams.microsoft.com", "teams.live.com", "teams.cdn.office.net",
+        "meet.google.com",
+        "webex.com", "ciscospark.com", "wbx2.com",
+        "teamspeak.com"
+      ]
+    },
+    {
+      "id": "threads",
+      "name": "Threads",
+      "group": "Redes sociais",
+      "icon": "fa-at",
+      "description": "Bloqueia Threads (Meta).",
+      "ndpi_apps": ["Threads"],
+      "ndpi_categories": [],
+      "hosts": ["threads.net", "threads.com"]
+    },
+    {
+      "id": "bluesky",
+      "name": "Bluesky",
+      "group": "Redes sociais",
+      "icon": "fa-cloud",
+      "description": "Bloqueia Bluesky.",
+      "ndpi_apps": ["Bluesky"],
+      "ndpi_categories": [],
+      "hosts": ["bsky.app", "bsky.social", "bsky.network"]
+    },
+    {
+      "id": "kick",
+      "name": "Kick",
+      "group": "Redes sociais",
+      "icon": "fa-video-camera",
+      "description": "Bloqueia Kick (lives e streaming).",
+      "ndpi_apps": ["Kick"],
+      "ndpi_categories": [],
+      "hosts": ["kick.com"]
+    },
+    {
+      "id": "rumble",
+      "name": "Rumble",
+      "group": "Redes sociais",
+      "icon": "fa-play",
+      "description": "Bloqueia Rumble.",
+      "ndpi_apps": ["Rumble"],
+      "ndpi_categories": [],
+      "hosts": ["rumble.com", "rmbl.ws"]
+    },
+    {
+      "id": "redes-alternativas",
+      "name": "Redes alternativas",
+      "group": "Redes sociais",
+      "icon": "fa-globe",
+      "description": "Agrega Mastodon, Tumblr, VK e SinaWeibo.",
+      "ndpi_apps": ["Mastodon", "Tumblr", "VK", "SinaWeibo"],
+      "ndpi_categories": [],
+      "hosts": ["mastodon.social", "tumblr.com", "vk.com", "weibo.com"]
     },
     {
       "id": "youtube",
@@ -272,12 +390,96 @@
       ]
     },
     {
+      "id": "deezer",
+      "name": "Deezer",
+      "group": "Streaming",
+      "icon": "fa-music",
+      "description": "Bloqueia Deezer.",
+      "ndpi_apps": ["Deezer"],
+      "ndpi_categories": [],
+      "hosts": ["deezer.com", "dzcdn.net"]
+    },
+    {
+      "id": "soundcloud",
+      "name": "SoundCloud",
+      "group": "Streaming",
+      "icon": "fa-soundcloud",
+      "description": "Bloqueia SoundCloud.",
+      "ndpi_apps": ["SoundCloud"],
+      "ndpi_categories": [],
+      "hosts": ["soundcloud.com", "sndcdn.com"]
+    },
+    {
+      "id": "musica",
+      "name": "Musica",
+      "group": "Streaming",
+      "icon": "fa-headphones",
+      "description": "Agrega Spotify, Deezer, SoundCloud, Tidal, IHeartRadio e TuneIn (categoria Music).",
+      "ndpi_apps": ["Spotify", "Deezer", "SoundCloud", "Tidal", "IHeartRadio", "TuneIn"],
+      "ndpi_categories": ["Music"],
+      "hosts": ["spotify.com", "scdn.co", "deezer.com", "dzcdn.net", "soundcloud.com", "sndcdn.com", "tidal.com", "tunein.com"]
+    },
+    {
+      "id": "dazn",
+      "name": "DAZN",
+      "group": "Streaming",
+      "icon": "fa-futbol-o",
+      "description": "Bloqueia DAZN (desporto ao vivo).",
+      "ndpi_apps": ["Dazn"],
+      "ndpi_categories": [],
+      "hosts": ["dazn.com", "dazndn.com"]
+    },
+    {
+      "id": "paramount",
+      "name": "Paramount+",
+      "group": "Streaming",
+      "icon": "fa-star",
+      "description": "Bloqueia Paramount+.",
+      "ndpi_apps": ["ParamountPlus"],
+      "ndpi_categories": [],
+      "hosts": ["paramountplus.com", "pplusstatic.com"]
+    },
+    {
+      "id": "hulu",
+      "name": "Hulu",
+      "group": "Streaming",
+      "icon": "fa-television",
+      "description": "Bloqueia Hulu.",
+      "ndpi_apps": ["Hulu"],
+      "ndpi_categories": [],
+      "hosts": ["hulu.com", "hulustream.com"]
+    },
+    {
+      "id": "vimeo-dailymotion",
+      "name": "Vimeo/Dailymotion",
+      "group": "Streaming",
+      "icon": "fa-play-circle-o",
+      "description": "Bloqueia Vimeo e Dailymotion.",
+      "ndpi_apps": ["Vimeo", "Dailymotion"],
+      "ndpi_categories": [],
+      "hosts": ["vimeo.com", "vimeocdn.com", "dailymotion.com", "dmcdn.net"]
+    },
+    {
+      "id": "futebol-pirata",
+      "name": "Futebol pirata",
+      "group": "Streaming",
+      "icon": "fa-ban",
+      "description": "Bloqueia sites de futebol/streaming pirata (BR). Dominios mudam frequentemente — complementar com blacklists UT1.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "futemax.app", "futemax.to", "futebolplayhd.com", "multicanais.com",
+        "redecanais.gs", "superflix.pro", "topflix.tv", "overflix.tv",
+        "embedcanaistv.com", "assistir.biz", "futebolaovivo.net"
+      ]
+    },
+    {
       "id": "gaming",
       "name": "Jogos",
       "group": "Jogos",
       "icon": "fa-gamepad",
-      "description": "Bloqueia plataformas de jogos (Steam, Xbox, PlayStation, Epic, Blizzard, Nintendo, Riot, Roblox).",
-      "ndpi_apps": ["Steam", "Xbox", "Playstation", "EpicGames", "Blizzard", "Nintendo", "RiotGames", "Roblox"],
+      "description": "Bloqueia plataformas de jogos (Steam, Xbox, PlayStation, Epic, Blizzard, Nintendo, Riot, Roblox, NetEase).",
+      "ndpi_apps": ["Steam", "Xbox", "Playstation", "EpicGames", "Blizzard", "Nintendo", "RiotGames", "Roblox", "NetEaseGames"],
       "ndpi_categories": ["Game"],
       "hosts": [
         "store.steampowered.com", "steamcommunity.com", "steampowered.com", "steamcdn-a.akamaihd.net",
@@ -288,8 +490,39 @@
         "nintendo.com", "nintendo.net",
         "riotgames.com", "leagueoflegends.com", "valorant.com",
         "roblox.com", "robloxcdn.com",
-        "ea.com", "origin.com", "ubisoft.com", "gog.com", "rockstargames.com"
+        "ea.com", "origin.com", "ubisoft.com", "gog.com", "rockstargames.com",
+        "garena.com", "freefiremobile.com"
       ]
+    },
+    {
+      "id": "roblox",
+      "name": "Roblox",
+      "group": "Jogos",
+      "icon": "fa-cube",
+      "description": "Bloqueia Roblox.",
+      "ndpi_apps": ["Roblox"],
+      "ndpi_categories": [],
+      "hosts": ["roblox.com", "rbxcdn.com", "rbx.com"]
+    },
+    {
+      "id": "free-fire",
+      "name": "Free Fire",
+      "group": "Jogos",
+      "icon": "fa-fire",
+      "description": "Bloqueia Free Fire / Garena (dominios de jogo mobile).",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": ["garena.com", "ff.garena.com", "freefiremobile.com", "garenanow.com", "ggwpid.com"]
+    },
+    {
+      "id": "cloud-gaming",
+      "name": "Cloud Gaming",
+      "group": "Jogos",
+      "icon": "fa-cloud",
+      "description": "Bloqueia cloud gaming (GeForce Now, Xbox Cloud, Luna).",
+      "ndpi_apps": ["GeForceNow"],
+      "ndpi_categories": [],
+      "hosts": ["geforcenow.com", "nvidiagrid.net", "xboxlive.com", "gssv-play-prod.xboxlive.com", "luna.amazon.com"]
     },
     {
       "id": "github",
@@ -373,12 +606,62 @@
       ]
     },
     {
+      "id": "empregos",
+      "name": "Sites de emprego",
+      "group": "Produtividade",
+      "icon": "fa-briefcase",
+      "description": "Bloqueia sites de emprego (categoria Employment + principais portais BR).",
+      "ndpi_apps": [],
+      "ndpi_categories": ["Employment"],
+      "hosts": ["catho.com.br", "vagas.com.br", "gupy.io", "infojobs.com.br", "indeed.com", "glassdoor.com", "99jobs.com", "solides.jobs"]
+    },
+    {
+      "id": "noticias",
+      "name": "Noticias",
+      "group": "Produtividade",
+      "icon": "fa-newspaper-o",
+      "description": "Bloqueia noticias (categoria News + principais portais BR).",
+      "ndpi_apps": [],
+      "ndpi_categories": ["News"],
+      "hosts": ["g1.globo.com", "uol.com.br", "r7.com", "folha.uol.com.br", "estadao.com.br", "metropoles.com", "terra.com.br", "cnnbrasil.com.br"]
+    },
+    {
+      "id": "desporto",
+      "name": "Desporto",
+      "group": "Produtividade",
+      "icon": "fa-futbol-o",
+      "description": "Bloqueia desporto (categoria Sport + principais sites).",
+      "ndpi_apps": [],
+      "ndpi_categories": ["Sport"],
+      "hosts": ["ge.globo.com", "espn.com.br", "espn.com", "lance.com.br", "sofascore.com", "365scores.com"]
+    },
+    {
+      "id": "viagens",
+      "name": "Viagens",
+      "group": "Produtividade",
+      "icon": "fa-plane",
+      "description": "Bloqueia viagens (categoria Travel + principais sites BR).",
+      "ndpi_apps": [],
+      "ndpi_categories": ["Travel"],
+      "hosts": ["decolar.com", "booking.com", "airbnb.com.br", "airbnb.com", "trivago.com.br", "kayak.com.br", "skyscanner.com.br", "latamairlines.com", "voegol.com.br", "voeazul.com.br"]
+    },
+    {
+      "id": "speedtest",
+      "name": "Speedtest",
+      "group": "Produtividade",
+      "icon": "fa-tachometer",
+      "description": "Bloqueia testes de velocidade (Ookla, fast.com, nPerf).",
+      "ndpi_apps": ["Ookla"],
+      "ndpi_categories": [],
+      "hosts": ["speedtest.net", "ooklaserver.net", "fast.com", "nperf.com"]
+    },
+    {
       "id": "vpn-proxy",
       "name": "VPN/Proxy",
       "group": "Segurança e bypass",
       "icon": "fa-shield",
-      "description": "Detecta VPN e proxies via nDPI (sem dominios — deteccao por protocolo).",
-      "ndpi_apps": ["OpenVPN", "WireGuard", "Tor", "IPSec"],
+      "description": "Detecta VPN, proxies e anonymizers via nDPI (OpenVPN, WireGuard, Tor, Psiphon, UltraSurf, Cloudflare Warp, iCloud Private Relay).",
+      "ndpi_apps": ["OpenVPN", "WireGuard", "Tor", "IPSec", "Psiphon", "UltraSurf", "CloudflareWarp", "iCloudPrivateRelay"],
       "ndpi_categories": ["VPN"],
       "hosts": []
     },
@@ -449,7 +732,7 @@
       "icon": "fa-bitcoin",
       "description": "Bloqueia exchanges e trafego de criptomoedas.",
       "ndpi_apps": ["BITCOIN", "ETHEREUM", "Monero"],
-      "ndpi_categories": ["Blockchain_Crypto", "Crypto_Currency"],
+      "ndpi_categories": ["Blockchain_Crypto", "Crypto_Currency", "Mining"],
       "hosts": [
         "coinbase.com", "binance.com", "kraken.com", "blockchain.com",
         "crypto.com", "bybit.com", "kucoin.com", "bitfinex.com"
@@ -482,6 +765,91 @@
         "stripchat.com", "livejasmin.com", "spankbang.com", "brazzers.com",
         "eporner.com", "rule34.xxx", "xvideos2.com"
       ]
+    },
+    {
+      "id": "anonymizers",
+      "name": "Anonymizers",
+      "group": "Segurança e bypass",
+      "icon": "fa-user-secret",
+      "description": "Bloqueia ferramentas anti-censura (Psiphon, UltraSurf, Cloudflare Warp, iCloud Private Relay) e proxies web.",
+      "ndpi_apps": ["Psiphon", "UltraSurf", "CloudflareWarp", "iCloudPrivateRelay"],
+      "ndpi_categories": [],
+      "hosts": ["psiphon.ca", "psiphon3.com", "ultrasurf.us", "hide.me", "croxyproxy.com", "proxysite.com", "4everproxy.com", "hidester.com", "kproxy.com"]
+    },
+    {
+      "id": "publicidade",
+      "name": "Publicidade",
+      "group": "Segurança e bypass",
+      "icon": "fa-bullhorn",
+      "description": "Bloqueia publicidade e trackers (categoria Advertisement + principais redes).",
+      "ndpi_apps": [],
+      "ndpi_categories": ["Advertisement"],
+      "hosts": ["doubleclick.net", "googlesyndication.com", "googleadservices.com", "adnxs.com", "criteo.com", "taboola.com", "outbrain.com"]
+    },
+    {
+      "id": "malware",
+      "name": "Malware",
+      "group": "Segurança e bypass",
+      "icon": "fa-bug",
+      "description": "Bloqueia trafego de malware e cybersecurity via categorias nDPI.",
+      "ndpi_apps": [],
+      "ndpi_categories": ["Malware", "Cybersecurity"],
+      "hosts": []
+    },
+    {
+      "id": "mining",
+      "name": "Mining",
+      "group": "Segurança e bypass",
+      "icon": "fa-cogs",
+      "description": "Bloqueia mining de criptomoedas (categoria Mining + pools conhecidos).",
+      "ndpi_apps": [],
+      "ndpi_categories": ["Mining"],
+      "hosts": ["coinhive.com", "minergate.com", "nicehash.com"]
+    },
+    {
+      "id": "preset-distracoes",
+      "name": "Distraccoes no trabalho",
+      "group": "Presets",
+      "icon": "fa-coffee",
+      "description": "Preset: bloqueia distraccoes comuns (redes sociais, streaming, jogos, apostas, namoro).",
+      "ndpi_apps": ["Facebook", "Instagram", "TikTok", "Twitter", "YouTube", "NetFlix", "Spotify", "Twitch", "Telegram", "Discord", "Steam", "Roblox", "Kick", "Threads", "Likee", "Reddit", "Pinterest", "Snapchat"],
+      "ndpi_categories": ["SocialNetwork", "Streaming", "Game", "Gambling", "Dating", "Video", "Music"],
+      "hosts": [
+        "youtube.com", "googlevideo.com", "facebook.com", "fbcdn.net",
+        "instagram.com", "cdninstagram.com", "tiktok.com", "tiktokcdn.com",
+        "twitter.com", "x.com", "netflix.com", "nflxvideo.net",
+        "twitch.tv", "spotify.com", "discord.com", "telegram.org", "t.me",
+        "kwai.com", "bet365.com", "betano.com", "blaze.com",
+        "reddit.com", "pinterest.com", "snapchat.com", "roblox.com",
+        "kick.com", "threads.net"
+      ]
+    },
+    {
+      "id": "preset-protecao-infantil",
+      "name": "Protecao infantil",
+      "group": "Presets",
+      "icon": "fa-child",
+      "description": "Preset escolas: adulto, apostas, namoro e bypass. Para cobertura adulto completa, activar blacklist UT1.",
+      "ndpi_apps": ["Psiphon", "UltraSurf", "CloudflareWarp", "Tor", "Badoo"],
+      "ndpi_categories": ["AdultContent", "Gambling", "Dating"],
+      "hosts": [
+        "pornhub.com", "xvideos.com", "xhamster.com", "redtube.com", "youporn.com",
+        "xnxx.com", "onlyfans.com", "chaturbate.com", "stripchat.com", "livejasmin.com",
+        "spankbang.com", "brazzers.com", "eporner.com", "rule34.xxx", "xvideos2.com",
+        "tinder.com", "bumble.com", "grindr.com",
+        "bet365.com", "betano.com", "blaze.com",
+        "croxyproxy.com", "hide.me", "proxysite.com"
+      ]
+    },
+    {
+      "id": "preset-higiene",
+      "name": "Higiene de rede",
+      "group": "Presets",
+      "icon": "fa-shield",
+      "description": "Recomendado sempre activo: malware, mining, anonymizers e bypass DNS.",
+      "ndpi_apps": ["Psiphon", "UltraSurf", "Tor", "DoH_DoT"],
+      "ndpi_categories": ["Malware", "Cybersecurity", "Mining"],
+      "hosts": []
     }
   ]
 }

@@ -270,20 +270,22 @@ Esse plano cobre os proximos blocos para:
 - enforcement PF automatico do pacote;
 - bloqueio real por app/categoria;
 - bloqueio real por dominio/site;
-- perfis compostos de servico/funcao (catalogo **38 perfis** em `profiles.json`,
-  agrupados na GUI: Redes sociais, Mensageria, Streaming, Jogos, Produtividade,
-  Segurança e bypass; toggle directo + modal Opções com ate 64 apps).
+- perfis compostos de servico/funcao (catalogo **72 perfis** em `profiles.json`,
+  agrupados na GUI: Redes sociais, Mensageria, Comunicação e reuniões, Streaming,
+  Jogos, Produtividade, Segurança e bypass, Presets; toggle directo + modal
+  Opções com ate 64 apps).
 
-### 7.3.1 Perfis rapidos (catalogo `1.8.11_52`)
+### 7.3.1 Perfis rapidos (catalogo `1.8.11_53`)
 
 A pagina **Politicas > Perfis rapidos** expoe atalhos pre-configurados. Cada perfil
 pode combinar apps nDPI, categorias nDPI e hosts (limites: 64 apps / 8 categorias /
 64 hosts por politica). Grupos visuais organizam o catalogo estilo UniFi/UDM Pro.
 
-Exemplos de perfis individuais: Telegram, Discord, Prime Video, Globoplay,
-Apostas, Torrent/P2P, AI Tools, Cloud Storage. Agregados: Redes Sociais,
-Mensageria, Streaming, Jogos. O atalho **Conteudo adulto** e leve — para
-cobertura completa use blacklists UT1.
+Exemplos de perfis individuais: Zoom, Teams, Threads, Bluesky, Deezer, DAZN,
+Anonymizers, Roblox, Free Fire. Agregados: Videoconferencia, Musica, Redes
+alternativas. **Presets:** Distraccoes no trabalho, Protecao infantil, Higiene
+de rede. O atalho **Conteudo adulto** e leve — para cobertura completa use
+blacklists UT1.
 
 ### 7.3 Acoes disponiveis
 
