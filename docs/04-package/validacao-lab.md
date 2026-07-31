@@ -1205,7 +1205,7 @@ sujeito a gates G2–G7 — **NO-GO producao inalterado**.
 
 ---
 
-## 20. Roteiro BG-071/072/073 — director isento de tudo (`1.8.11_59`+)
+## 20. Roteiro BG-071/072/073 — director isento de tudo (`1.8.11_61`+ recomendado; `_60` minimo fix P1)
 
 **Objectivo:** validar ponta a ponta a feature **Lista VIP global** (Blocos A–D):
 origem na excepção canónica `vip-isentos` isenta de perfis block, blacklists UT1,
@@ -1223,7 +1223,7 @@ não-VIP. Mitigação: snapshot/rollback (padrao BG-060), two-client controlado,
 paragem obrigatoria para validacao humana antes de qualquer mudanca de enforce
 em producao.
 
-**Gate humano:** este roteiro **nao** fecha producao nem promove `_59` como
+**Gate humano:** este roteiro **nao** fecha producao nem promove `_61`/`_60` como
 referencia enforce. Registar evidencias (screenshots, saidas `drill`/`dig`,
 `pfctl`, trecho Unbound) e obter OK explicito antes de activar enforce fora do
 lab. **NO-GO producao inalterado** — referencia enforce continua `1.8.11_24`.
@@ -1232,7 +1232,7 @@ lab. **NO-GO producao inalterado** — referencia enforce continua `1.8.11_24`.
 
 | Item | Valor |
 |------|-------|
-| Pacote | `>= 1.8.11_59` (`BG-073`; `_57`/`_58` so parciais) |
+| Pacote | `>= 1.8.11_60` (fix P1 `filter_configure`; **recomendado `>= 1.8.11_61`** — linha Lista VIP completa); `_59` parcial; `_57`/`_58` so parciais |
 | `mode` | `enforce` |
 | `enabled` | `true` |
 | Licenca | valida (enforce ao vivo exige licenca) |
@@ -1331,7 +1331,44 @@ Executar de **dois** clientes distintos (nao misturar origem na mesma sessao).
 - Não-VIP: sinkhole + block page em ambos dominios A e B.
 - `pfctl -t layer7_exc_allow_*` contem IP do director.
 
-### 20.4 Host overrides nativos Unbound (ADR-0020)
+### 20.4 Persistencia apos `filter_configure` externo (`>= 1.8.11_60`)
+
+**Objectivo:** validar que `layer7_vip_dns_rdr_fallback_enabled()` deriva estado
+persistente (mesmos criterios que `layer7_vip_dns_mode_get`) e sobrevive a reloads
+PF desencadeados **fora** do Resync Layer7 — correcao `_60`; `_61` nao altera
+comportamento observavel mas e a linha recomendada para lab (performance em
+`filter_configure`).
+
+**Pre-condicao:** **20.3** PASS; em modo fallback **(b)** este passo e
+**obrigatorio**; em modo **(a)** registar **N/A** com justificacao (teste
+aplica-se sobretudo ao rdr `:53`).
+
+1. Com VIP isento e nao-VIP bloqueado confirmados (**20.3**), gravar uma regra
+   pfSense **nao relacionada** com Layer7 (ex.: regra temporaria em
+   **Firewall > Rules** numa interface LAN) **ou** accionar evento equivalente
+   que force `filter_configure` (ex.: pequeno toggle numa interface) — **sem**
+   abrir Resync Layer7.
+2. Confirmar reload PF (log system / timestamp de regras NAT).
+3. Inspeccionar NAT DNS (modo **b**):
+
+```sh
+pfctl -a natrules/layer7_nat -s nat -v | grep -E '53|layer7_exc_allow'
+```
+
+   — regras `:53` devem manter `from !<layer7_exc_allow_N>`, **nao** `from any`
+   puro.
+4. Repetir testes **20.3** (two-client, dominios A e B):
+   - **Cliente VIP:** `drill` + HTTP — continua isento do sinkhole.
+   - **Cliente nao-VIP:** continua bloqueado (sinkhole + block page).
+5. Remover regra temporaria pfSense; Filter reload se necessario.
+
+**Evidencias minimas (PASS):**
+
+- Modo **(b):** apos `filter_configure` externo, NAT `:53` preserva exclusao VIP;
+  two-client inalterado (VIP livre, nao-VIP bloqueado).
+- Modo **(a):** N/A documentado ou view Unbound intacta pos-reload.
+
+### 20.5 Host overrides nativos Unbound (ADR-0020)
 
 Trade-off da view dedicada: IPs VIP podem **nao** herdar host overrides nativos
 do pfSense definidos na view global.
@@ -1347,7 +1384,7 @@ do pfSense definidos na view global.
 
 Remover override de teste apos o gate.
 
-### 20.5 Modos de falha (FAIL)
+### 20.6 Modos de falha (FAIL)
 
 | Sintoma | Causa provavel |
 |---------|----------------|
@@ -1357,16 +1394,20 @@ Remover override de teste apos o gate.
 | `unbound-checkconf` FAIL apos gravar | Snippet VIP invalido — sistema deve cair para (b); confirmar alerta GUI |
 | Host override VIP inaceitavel | Trade-off ADR-0020; escalar decisao humana antes de enforce prod |
 | Verificador PERMITIDO mas browser bloqueado | Cache DNS no cliente; repetir com flush ou `drill` directo ao pfSense |
+| VIP bloqueado apos gravar regra pfSense | Regressao `_59` ou anterior: `filter_configure` externo repoe rdr `:53` `from any`; actualizar para `>= _60` |
+| NAT `:53` volta a `from any` pos-reload PF | `layer7_vip_dns_rdr_fallback_enabled()` sem estado persistente — confirmar versao `_60`+ |
 
 Qualquer FAIL: preservar config export, logs Unbound/system, parar teste; **nao**
 promover versao nem alterar referencia `_24`.
 
-### 20.6 Rollback
+### 20.7 Rollback
 
 1. Desactivar perfis block e blacklists de teste; desactivar block page na GUI.
 2. Remover entradas de teste da Lista VIP (ou reinstalar snapshot exportado).
-3. `pkg install ..._58` (ou `_56`) se regressao de pacote necessaria — perde
-   isenção DNS completa mas mantem Lista VIP GUI parcial.
+3. Regressao de pacote no lab:
+   - problemas com `_61` → reinstalar **`1.8.11_60`** (fix P1 mantido);
+   - problemas com `_60` ou isencao DNS incompleta → `_59` (parcial) ou `_58`/`_56`
+     (perde isencao DNS completa mas mantem Lista VIP GUI parcial).
 4. Confirmar remocao markers VIP e block page em Unbound; `service layer7-blockpage
    stop`; Filter reload.
 5. Producao: manter **`1.8.11_24`** passivo até gates G2–G7.
@@ -1375,8 +1416,10 @@ promover versao nem alterar referencia `_24`.
 `php tests/functional/test_vip_dns_exempt.php` + `sh tests/test_blockpage_config.sh`.
 
 PASS minimo no appliance: **20.1** + **20.3** (two-client, dominios A e B) +
-modo DNS documentado em **20.2**; **20.4** executado ou explicitamente dispensado
-com decisao humana registada. **NO-GO producao inalterado.**
+modo DNS documentado em **20.2**; **20.4** executado em modo **(b)** ou N/A
+documentado em **(a)** (pacote `>= _60`); **20.5** executado ou explicitamente
+dispensado com decisao humana registada. Pacote lab recomendado: **`>= 1.8.11_61`**.
+**NO-GO producao inalterado.**
 
 **Plano SSOT:** [`../02-roadmap/plano-isencao-vip-e-ux-gui.md`](../02-roadmap/plano-isencao-vip-e-ux-gui.md) (Bloco E);
 [`../03-adr/ADR-0020-isencao-vip-dns.md`](../03-adr/ADR-0020-isencao-vip-dns.md).

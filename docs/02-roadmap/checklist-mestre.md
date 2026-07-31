@@ -310,9 +310,13 @@ ADR-0020 (Bloco A). SSOT da isenção: excepção `vip-isentos` (D1); labels em
 
 ### Bloco E — Validação lab
 
-- [x] Cenário «director isento de tudo» em `validacao-lab.md` (sec. **20**)
+- [x] Cenário «director isento de tudo» em `validacao-lab.md` (sec. **20**;
+  pacote lab **`>= 1.8.11_61`** recomendado; **`>= 1.8.11_60`** minimo fix P1
+  `filter_configure`)
+- [x] Gate **20.4** persistencia `filter_configure` documentado (pos **20.3** two-client)
 - [x] Gate humano documentado; NO-GO produção inalterado (`_24` até G2–G7)
-- [ ] Execução física no appliance (evidência sec. 20) — pendente validação humana
+- [ ] Execução física no appliance (evidência sec. **20**, incl. **20.4** em modo
+  fallback **(b)**) — pendente validação humana
 
 ---
 

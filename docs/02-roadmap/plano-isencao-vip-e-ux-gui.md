@@ -110,8 +110,9 @@ Para o caso fino "isento só deste perfil" (o IP continua sujeito aos outros), e
 1. Nova secção no roteiro `docs/04-package/validacao-lab.md`: cenário **«director
    isento de tudo»** (sec. **20**) — perfil block + blacklist UT1 + block page ON;
    VIP na `vip-isentos` navega livremente incluindo domínios sinkhole; cliente
-   não-VIP bloqueado; verificação modo DNS (a)/(b); host overrides nativos
-   (ADR-0020). Complementa sec. **19** (gestor isento / verificador).
+   não-VIP bloqueado; verificação modo DNS (a)/(b); gate **20.4** persistencia
+   `filter_configure` (pacote **`>= 1.8.11_60`**; lab recomendado **`>= 1.8.11_61`**);
+   host overrides nativos (ADR-0020). Complementa sec. **19** (gestor isento / verificador).
 2. Smoke no appliance com snapshot/rollback (padrão BG-060); paragem obrigatória para validação humana antes de qualquer activação de enforce em produção — o NO-GO vigente (gates G2–G7) não é alterado por este plano.
 
 ---
@@ -133,4 +134,4 @@ Para o caso fino "isento só deste perfil" (o IP continua sujeito aos outros), e
 | B | Isenção VIP modal | `_48` | Concluído código (`2026-07-30`); build/release pendente |
 | C | UX modal + verificador | `_49` | Concluído código (`2026-07-30`); build/release pendente |
 | D | Exclusão por política | `_50` | Concluído código (`2026-07-30`); build/release pendente |
-| E | Validação lab | — | Concluído documental (`validacao-lab` sec. **20**); execução appliance pendente |
+| E | Validação lab | — | Concluído documental (`validacao-lab` sec. **20**, `_61`+ gate **20.4**); execução appliance pendente |
