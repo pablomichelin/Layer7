@@ -44,7 +44,7 @@ Referência rápida do que o PHP valida antes de gravar `layer7.json`.
 |-------|--------|
 | Descrição | `layer7_vip_sanitize_label` (max 64; sem `"` ou `\`) |
 | IP ou CIDR | `layer7_ipv4_valid` ou `layer7_cidr_valid`; único na lista |
-| Limites | `LAYER7_VIP_MAX_HOSTS` (8) + `LAYER7_VIP_MAX_CIDRS` (8) — rejeição visível |
+| Limites | `LAYER7_VIP_MAX_HOSTS` (32) + `LAYER7_VIP_MAX_CIDRS` (16) — rejeição visível |
 | Labels | `layer7.vip_meta.labels` mapa alvo → descrição; cleanup de órfãos no save |
 | Export/import | JSON `layer7_vip_list` com array `entries` |
 | SSOT | Excepção canónica `vip-isentos` (sem chaves novas dentro do objecto) |

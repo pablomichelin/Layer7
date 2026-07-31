@@ -3573,9 +3573,9 @@ function layer7_load_groups()
 	return array();
 }
 
-/** Limites actuais do daemon (policy.h L7_EXC_MAX_*); Bloco C alarga depois. */
-define("LAYER7_VIP_MAX_HOSTS", 8);
-define("LAYER7_VIP_MAX_CIDRS", 8);
+/** Limites alinhados com policy.h L7_EXC_MAX_* (BG-072 / Bloco C). */
+define("LAYER7_VIP_MAX_HOSTS", 32);
+define("LAYER7_VIP_MAX_CIDRS", 16);
 
 /** ID canonico da excepcao VIP partilhada (gerida pelo modal Perfis rapidos). */
 function layer7_vip_exception_id()

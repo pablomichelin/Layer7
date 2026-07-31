@@ -468,6 +468,49 @@ test_src_exclude_cidr_no_match(void)
 }
 
 static void
+test_vip_exception_host_beyond_eight_allowed(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_exception exc[1];
+	struct layer7_decision dec;
+	char json[4096];
+	char *p;
+	int n_exc = 0;
+	int i;
+
+	init_youtube_block_policy(&rules[0], "p-yt", 10, NULL);
+	layer7_policies_sort(rules, 1);
+
+	p = json + snprintf(json, sizeof(json),
+	    "{\"layer7\":{\"exceptions\":[{\"id\":\"vip-isentos\","
+	    "\"action\":\"allow\",\"enabled\":true,\"priority\":9000,"
+	    "\"hosts\":[");
+	for (i = 1; i <= 10; i++) {
+		if (i > 1)
+			p += snprintf(p, sizeof(json) - (size_t)(p - json), ",");
+		p += snprintf(p, sizeof(json) - (size_t)(p - json),
+		    "\"10.9.0.%d\"", i);
+	}
+	snprintf(p, sizeof(json) - (size_t)(p - json), "]}]}}");
+
+	memset(exc, 0, sizeof(exc));
+	check(layer7_exceptions_parse(json, strlen(json), exc, &n_exc, 1) == 0,
+	    "vip parse ok (10 hosts)");
+	check(n_exc == 1, "vip exception loaded");
+	check(exc[0].n_hosts == 10, "10 vip hosts parsed (not truncated at 8)");
+	layer7_exceptions_sort(exc, 1);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(exc, 1, rules, 1, 1, NULL,
+	    "10.9.0.10", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "vip host 10 decide ok");
+	check(dec.action == LAYER7_ACTION_ALLOW, "vip host 10 allow");
+	check(dec.reason == L7_DECIDE_EXCEPTION, "vip host 10 exception reason");
+	check(layer7_decision_is_explicit_allow(&dec),
+	    "vip host 10 explicit allow");
+}
+
+static void
 test_src_exclude_group_expanded(void)
 {
 	struct layer7_group groups[1];
@@ -517,6 +560,7 @@ main(void)
 	test_app_static_source_uses_pdst();
 	test_mixed_app_host_uses_matched_path();
 	test_src_exclude_cidr_no_match();
+	test_vip_exception_host_beyond_eight_allowed();
 	test_src_exclude_group_expanded();
 
 	if (g_fail) {

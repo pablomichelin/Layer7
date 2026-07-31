@@ -101,8 +101,11 @@ struct layer7_group {
 
 int layer7_schedule_active(const struct l7_schedule *s);
 
-#define L7_EXC_MAX_HOSTS 8
-#define L7_EXC_MAX_CIDRS 8
+/* BG-072 / Bloco C: alinhado com GUI Lista VIP (32 IPs + 16 CIDRs).
+ * Memoria estatica maxima: L7_MAX_EXCEPTIONS (16) x sizeof(layer7_exception)
+ * ~19 KiB adicionais vs limites 8+8 (arrays hosts/cidrs +1216 B/excepcao). */
+#define L7_EXC_MAX_HOSTS 32
+#define L7_EXC_MAX_CIDRS 16
 
 struct layer7_exception {
 	char id[L7_POLICY_ID_LEN];

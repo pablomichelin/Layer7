@@ -35,11 +35,11 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_56` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_56`,
-`SHA256=8641c3c8dae6a46148c934f138f64be1121064ee676907955c60379699147357`;
+`1.8.11_58` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_58`,
+`SHA256` ver addendum `_58` em `docs/10-license-server/MANUAL-INSTALL.md`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
-**nao instalar**; usar `_56`.
+**nao instalar**; usar `_56` ou superior.
 **Referencia de producao enforce:** continua `1.8.11_24`
 (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
 ate os gates G2–G7; candidatos posteriores sao canal de teste/lab.
@@ -202,7 +202,7 @@ mecanismo paralelo); **D2** labels em `layer7["vip_meta"]["labels"]` (daemon
 nunca lê); **D4** isenção DNS — opção (a) view Unbound preferida, fallback
 (b) rdr `from !<layer7_exc_allow_N>` com limitação sinkhole honesta. Ordem
 A→B→C→D→E; Bloco A concluído; **Bloco B concluído** (`1.8.11_57` publicado);
-Blocos C–E pendentes. NO-GO produção inalterado
+**Bloco C concluído** (`1.8.11_58` publicado); Blocos D–E pendentes. NO-GO produção inalterado
 (referência enforce `1.8.11_24` até G2–G7).
 
 ### Release `1.8.11_47` — HTTPS ao portal com erro imediato (publicada `2026-07-30`)
@@ -222,6 +222,15 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Release `1.8.11_58` — BG-072 limites daemon Lista VIP (publicado `2026-07-31`)
+
+Alarga `L7_EXC_MAX_HOSTS` 8→32 e `L7_EXC_MAX_CIDRS` 8→16; validacao PHP
+`LAYER7_VIP_MAX_*` alinhada (32+16). Memoria estatica maxima excepcoes:
+16 × `struct layer7_exception` ≈ +19 KiB vs limites 8+8 (arrays hosts/cidrs
++1216 B/excepcao). Parser ingenuo inalterado; isencao DNS permanece Bloco D.
+Artefacto `SHA256` ver MANUAL-INSTALL addendum `_58`, tag `v1.8.11_58` em
+`pablomichelin/Layer7`. Rollback: `_57`.
 
 ### Candidato `1.8.11_57` — BG-071 Lista VIP global (publicado `2026-07-31`)
 

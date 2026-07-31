@@ -102,20 +102,20 @@ if (($labels2["192.168.2.10"] ?? "") !== "Financeiro") {
 	exit(1);
 }
 
-/* BG-071: limit validation (8 hosts) */
+/* BG-072: limit validation (LAYER7_VIP_MAX_HOSTS hosts) */
 $bulk_hosts = array();
 for ($i = 1; $i <= LAYER7_VIP_MAX_HOSTS; $i++) {
 	$bulk_hosts[] = "10.1.0." . $i;
 }
 $err = layer7_vip_validate_limits($bulk_hosts, array());
 if ($err !== "") {
-	fwrite(STDERR, "FAIL: exactly 8 hosts should pass validation\n");
+	fwrite(STDERR, "FAIL: max hosts should pass validation\n");
 	exit(1);
 }
 $bulk_hosts[] = "10.1.0.99";
 $err2 = layer7_vip_validate_limits($bulk_hosts, array());
 if ($err2 === "") {
-	fwrite(STDERR, "FAIL: 9 hosts should fail validation\n");
+	fwrite(STDERR, "FAIL: max+1 hosts should fail validation\n");
 	exit(1);
 }
 

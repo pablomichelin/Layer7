@@ -236,6 +236,38 @@ main(void)
 		    "src_exclude_groups parsed");
 	}
 
+	/* 17. BG-072 — excepcao VIP com 32 hosts (limite daemon). */
+	{
+		struct layer7_exception exc[1];
+		char json[8192];
+		char *p;
+		int n = 0;
+		int i;
+
+		p = json + snprintf(json, sizeof(json),
+		    "{\"layer7\":{\"exceptions\":[{\"id\":\"vip-isentos\","
+		    "\"action\":\"allow\",\"enabled\":true,\"priority\":9000,"
+		    "\"hosts\":[");
+		for (i = 1; i <= L7_EXC_MAX_HOSTS; i++) {
+			if (i > 1)
+				p += snprintf(p, sizeof(json) - (size_t)(p - json), ",");
+			p += snprintf(p, sizeof(json) - (size_t)(p - json),
+			    "\"10.2.0.%d\"", i);
+		}
+		snprintf(p, sizeof(json) - (size_t)(p - json), "]}]}}");
+
+		memset(exc, 0, sizeof(exc));
+		check(layer7_exceptions_parse(json, strlen(json), exc, &n, 1) == 0,
+		    "parse ok (32 exc hosts)");
+		check(n == 1, "vip exception loaded");
+		check(exc[0].n_hosts == L7_EXC_MAX_HOSTS,
+		    "32 exception hosts parsed");
+		check(strcmp(exc[0].hosts[0], "10.2.0.1") == 0,
+		    "first exc host preserved");
+		check(strcmp(exc[0].hosts[L7_EXC_MAX_HOSTS - 1], "10.2.0.32") == 0,
+		    "last exc host preserved");
+	}
+
 	if (g_fail) {
 		printf("\nTEST CONFIG_PARSE: FAILED\n");
 		return 1;

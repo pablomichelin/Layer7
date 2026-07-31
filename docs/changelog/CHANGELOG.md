@@ -2,6 +2,33 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_58] - 2026-07-31 — BG-072 limites daemon Lista VIP
+
+### Changed
+
+- `L7_EXC_MAX_HOSTS` 8→32 e `L7_EXC_MAX_CIDRS` 8→16 em `policy.h` (unica
+  alteracao C do Bloco C).
+- Constantes PHP `LAYER7_VIP_MAX_HOSTS` / `LAYER7_VIP_MAX_CIDRS` alinhadas
+  (32 / 16); validacao e upsert VIP coerentes com o daemon.
+
+### Notes
+
+- Memoria estatica maxima excepcoes: 16 × `struct layer7_exception` ≈ +19 KiB
+  vs limites 8+8 (+1216 B por excepcao nos arrays hosts/cidrs).
+- Parser ingenuo inalterado; isencao DNS permanece Bloco D (BG-073).
+
+### Tests
+
+- `test_config_parse.c`: 32 hosts em excepcao VIP parseados.
+- `test_policy_decide.c`: host 10 em excepcao VIP obtem allow (nao truncado).
+- `test_vip_exception.php`: limites 32/16.
+- Builder FreeBSD 15: suite C, `php -l`, smoke — PASS.
+
+### Docs
+
+- CORTEX, backlog BG-072, checklist Bloco C, MANUAL-INSTALL (_58),
+  `gui-validation.md`.
+
 ## [1.8.11_57] - 2026-07-31 — BG-071 Lista VIP global
 
 ### Added
