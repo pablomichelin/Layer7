@@ -111,6 +111,13 @@ else
 	fail "test_enforce_scoped compile"
 fi
 
+step "Unit: profiles.json catalogo"
+if sh tests/unit/test_profiles_json.sh; then
+	pass "test_profiles_json"
+else
+	fail "test_profiles_json"
+fi
+
 step "Unit: rc.d pidfile sem newline"
 if sh tests/unit/test_rc_pidfile.sh; then
 	pass "test_rc_pidfile"

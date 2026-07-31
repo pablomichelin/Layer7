@@ -109,7 +109,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 					$hosts = isset($profile["hosts"]) && is_array($profile["hosts"]) ? $profile["hosts"] : array();
 					$cats = isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]) ? $profile["ndpi_categories"] : array();
 					if (!empty($apps)) {
-						$rule["match"]["ndpi_app"] = array_slice($apps, 0, 12);
+						$rule["match"]["ndpi_app"] = array_slice($apps, 0, 64);
 					}
 					if (!empty($cats)) {
 						$rule["match"]["ndpi_category"] = array_slice($cats, 0, 8);
@@ -818,7 +818,26 @@ function layer7_policy_match_summary($policy) {
 		);
 		?>
 		<div class="l7-profiles-grid">
-		<?php foreach ($l7_profiles as $prof) {
+		<?php
+		$l7_group_order = array(
+			l7_t("Redes sociais"),
+			l7_t("Mensageria"),
+			l7_t("Streaming"),
+			l7_t("Jogos"),
+			l7_t("Produtividade"),
+			l7_t("Segurança e bypass"),
+		);
+		$l7_profiles_by_group = array();
+		foreach ($l7_profiles as $prof) {
+			$gk = isset($prof["group"]) && is_string($prof["group"]) && trim($prof["group"]) !== ""
+			    ? l7_t(trim($prof["group"])) : l7_t("Outros");
+			if (!isset($l7_profiles_by_group[$gk])) {
+				$l7_profiles_by_group[$gk] = array();
+			}
+			$l7_profiles_by_group[$gk][] = $prof;
+		}
+		$l7_groups_rendered = array();
+		$l7_render_profile_card = function ($prof) use ($policies, $l7_app_icons, $l7_prof_hits) {
 			$prof_id = isset($prof["id"]) ? htmlspecialchars($prof["id"]) : "";
 			$prof_name = isset($prof["name"]) ? htmlspecialchars(l7_t($prof["name"])) : $prof_id;
 			$prof_desc = isset($prof["description"]) ? htmlspecialchars(l7_t($prof["description"])) : "";
@@ -838,8 +857,8 @@ function layer7_policy_match_summary($policy) {
 				$icon_color = $l7_app_icons[$prof["id"]][0];
 				$icon_svg = $l7_app_icons[$prof["id"]][1];
 			}
+			$prof_hit = isset($l7_prof_hits[$prof["id"] ?? ""]) ? (int)$l7_prof_hits[$prof["id"] ?? ""] : 0;
 		?>
-			<?php $prof_hit = isset($l7_prof_hits[$prof["id"] ?? ""]) ? (int)$l7_prof_hits[$prof["id"] ?? ""] : 0; ?>
 			<div class="l7-profile-card<?= $prof_exists ? ' l7-profile-on' : ''; ?>">
 				<div class="l7-profile-state"><?php if ($prof_exists) { ?><span class="l7-dot l7-dot-on" title="<?= l7_t("Ligado"); ?>"></span><?php } else { ?><span class="l7-dot l7-dot-off" title="<?= l7_t("Desligado"); ?>"></span><?php } ?></div>
 				<div class="l7-profile-icon-ios" style="background:<?= $icon_color; ?>;">
@@ -863,7 +882,32 @@ function layer7_policy_match_summary($policy) {
 				</div>
 				<?php } ?>
 			</div>
-		<?php } ?>
+		<?php
+		};
+		foreach ($l7_group_order as $l7_gname) {
+			if (empty($l7_profiles_by_group[$l7_gname])) {
+				continue;
+			}
+			$l7_groups_rendered[$l7_gname] = true;
+		?>
+			<div class="l7-profile-group-header" style="grid-column:1/-1;font-weight:600;font-size:15px;margin:12px 0 4px;padding-bottom:4px;border-bottom:1px solid #ddd;"><?= htmlspecialchars($l7_gname); ?></div>
+		<?php
+			foreach ($l7_profiles_by_group[$l7_gname] as $prof) {
+				$l7_render_profile_card($prof);
+			}
+		}
+		foreach ($l7_profiles_by_group as $l7_gname => $l7_gprofs) {
+			if (!empty($l7_groups_rendered[$l7_gname])) {
+				continue;
+			}
+		?>
+			<div class="l7-profile-group-header" style="grid-column:1/-1;font-weight:600;font-size:15px;margin:12px 0 4px;padding-bottom:4px;border-bottom:1px solid #ddd;"><?= htmlspecialchars($l7_gname); ?></div>
+		<?php
+			foreach ($l7_gprofs as $prof) {
+				$l7_render_profile_card($prof);
+			}
+		}
+		?>
 		</div>
 		</div>
 

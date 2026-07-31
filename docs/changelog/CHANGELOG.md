@@ -2,6 +2,32 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_52] - 2026-07-30 — Catálogo Perfis rápidos nível UniFi/UDM (BG-067)
+
+### Added
+
+- **38 perfis rápidos** (antes 18): novos perfis Telegram, Discord, Kwai, Mensageria,
+  Marketplaces, Torrent/P2P, Apostas, Prime Video, Disney+, Max, Globoplay,
+  Crunchyroll, Cloud Storage, Webmail pessoal, Reddit, Pinterest, Snapchat,
+  Criptomoedas, Namoro e atalho Conteúdo adulto.
+- Campo opcional `group` em `profiles.json` com cabeçalhos na GUI (Redes sociais,
+  Mensageria, Streaming, Jogos, Produtividade, Segurança e bypass).
+- Primeiro uso de `ndpi_categories` nos perfis (Gambling, Chat, Shopping, FileSharing,
+  Game, Dating, AdultContent, etc.).
+- Teste `tests/unit/test_profiles_json.sh` + fixtures nDPI validadas no builder FreeBSD 15.
+
+### Changed
+
+- Correcções de hosts desactualizados (ai-tools, netflix, tiktok, gaming).
+- Nomes nDPI alinhados ao builder (`NetFlix`, `Github`, `Playstation`, `IPSec`, …).
+- Agregados **Redes Sociais** e **Streaming** actualizados.
+- Perfil **Jogos** reforçado (Steam, Xbox, PlayStation, Epic, Blizzard, Nintendo, Riot, Roblox).
+- Modal Opções: slice de apps corrigido de 12 para **64** (igual ao toggle directo).
+
+### Docs
+
+- CORTEX, backlog BG-067, guia completo, MANUAL-INSTALL.
+
 ## [1.8.11_51] - 2026-07-30 — Fix: ordem PF da exclusao por politica (BG-066)
 
 ### Fixed
