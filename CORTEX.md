@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_61` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_61`,
-`SHA256=a5feacb90eda8d6f07920a8e104fe4d66f65dc672c59a22458ad2ff6ec5345e5`;
+`1.8.11_62` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_62`,
+`SHA256=162598edcc10e84a2648d7c7bbfb797edcdb41ae7a3eca8718c2bb0c78997cc9`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
@@ -226,6 +226,20 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Release `1.8.11_62` — Fix `$data` indefinido no rdr CIDR / BG-073 (publicado `2026-07-31`)
+
+Correcção pontual encontrada em auditoria da `_61`:
+`layer7_generate_rdr_rules_snippet()` chamava
+`layer7_vip_dns_rdr_from_cidr($data, $cidr)` com `$data` inexistente na função
+(bug pré-existente da `_60`); passa agora `$l7config` já carregado. Elimina o
+warning PHP 8 «Undefined variable $data» em cada `filter_configure` com regras
+`force_dns` por CIDR e concretiza o ganho de performance da `_61` no caminho
+CIDR (sem releitura de `layer7.json` por linha rdr). **Zero alteração
+funcional** — o fallback `null` recarregava a mesma config; regras rdr
+idênticas. Artefacto
+`SHA256=162598edcc10e84a2648d7c7bbfb797edcdb41ae7a3eca8718c2bb0c78997cc9`,
+tag `v1.8.11_62` em `pablomichelin/Layer7`. Rollback: `_61`.
 
 ### Release `1.8.11_61` — Performance VIP DNS fallback / BG-073 (publicado `2026-07-31`)
 
@@ -618,8 +632,8 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_56` (`PORTVERSION=1.8.11`, `PORTREVISION=56`),
-publicada no canal de teste/lab (`v1.8.11_56`). **`1.8.11_55` defeituosa — nao
++ `PORTREVISION`):** `1.8.11_62` (`PORTVERSION=1.8.11`, `PORTREVISION=62`),
+publicada no canal de teste/lab (`v1.8.11_62`). **`1.8.11_55` defeituosa — nao
 instalar.** A referencia de producao enforce permanece `v1.8.11_24`; gate
 two-client pendente.
 **Data-base deste checkpoint:** `2026-07-31`
@@ -1308,8 +1322,8 @@ CHECKPOINT CANONICO
   (G2-G4: ABI FB16, pfctl -nf ruleset completo, captura/metricas); G5 two-client
   (validacao-lab sec. 12) so apos G2-G4 PASS; nenhuma correcao de codigo ate
   causa-raiz comprovada no appliance
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 56 (publicado no canal
-  de teste/lab como v1.8.11_56; _55 defeituosa — nao instalar; gate appliance pendente)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 62 (publicado no canal
+  de teste/lab como v1.8.11_62; _55 defeituosa — nao instalar; gate appliance pendente)
 - Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
   corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
   EM VALIDACAO
@@ -1319,7 +1333,7 @@ CHECKPOINT CANONICO
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060;
   Lista VIP global A–E concluida; execucao lab sec. 20 pendente)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_61; producao enforce de referencia: 1.8.11_24)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_62; producao enforce de referencia: 1.8.11_24)
 - Fonte canonica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canonica de gates: docs/02-roadmap/checklist-mestre.md

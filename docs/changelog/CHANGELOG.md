@@ -2,6 +2,31 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_62] - 2026-07-31 — Fix `$data` indefinido no rdr CIDR (BG-073)
+
+### Fixed
+
+- **Correcção pontual (zero mudança funcional):**
+  `layer7_generate_rdr_rules_snippet()` chamava
+  `layer7_vip_dns_rdr_from_cidr($data, $cidr)` com `$data` inexistente na
+  função (bug pré-existente da `_60`); passa agora `$l7config` já carregado.
+  Elimina o warning PHP 8 «Undefined variable $data» a cada
+  `filter_configure` com regras `force_dns` por CIDR e concretiza o ganho de
+  performance da `_61` no caminho CIDR (sem releitura de `layer7.json` por
+  linha rdr). O fallback `null` recarregava a mesma config; as regras rdr
+  geradas são idênticas.
+
+### Tests
+
+- `./tests/run-local.sh` PASS (macOS, PHP SKIP); builder FreeBSD 15:
+  `php -l layer7.inc`, `test_vip_dns_exempt.php`, `test_vip_exception.php` e
+  suite completa PASS. `.pkg` extraído validado (`layer7.inc` idêntico ao
+  repo; `+MANIFEST` = `1.8.11_62`).
+
+### Docs
+
+- CORTEX, MANUAL-INSTALL (_62; rollback sec. 12 → `_61`), backlog BG-073.
+
 ## [1.8.11_61] - 2026-07-31 — Performance VIP DNS fallback (BG-073)
 
 ### Changed
