@@ -287,11 +287,12 @@ ADR-0020 (Bloco A). SSOT da isenção: excepção `vip-isentos` (D1); labels em
 
 ### Bloco B — GUI Lista VIP (`_57`, BG-071)
 
-- [ ] Secção «Lista VIP (isencão total)» em `layer7_exceptions.php`
-- [ ] Labels em `vip_meta.labels`; validação de limites (8+8 até Bloco C)
-- [ ] Export/import da lista; link «Gerir Lista VIP» no modal Perfis rápidos
-- [ ] Aviso DHCP static mapping; aviso sinkhole DNS até Bloco D
-- [ ] `php -l` + teste funcional PHP PASS
+- [x] Secção «Lista VIP (isencão total)» em `layer7_exceptions.php`
+- [x] Labels em `vip_meta.labels`; validação de limites (8+8 até Bloco C)
+- [x] Export/import da lista; link «Gerir Lista VIP» no modal Perfis rápidos
+- [x] Aviso DHCP static mapping; aviso sinkhole DNS até Bloco D
+- [x] `php -l` + teste funcional PHP PASS
+- [x] Release `1.8.11_57` publicada em `pablomichelin/Layer7`
 
 ### Bloco C — Limites daemon (`_58`, BG-072)
 

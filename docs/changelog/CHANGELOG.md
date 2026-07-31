@@ -2,6 +2,30 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_57] - 2026-07-31 — BG-071 Lista VIP global
+
+### Added
+
+- Secção **Lista VIP (isencão total)** em `layer7_exceptions.php`: tabela
+  Descrição | IP/CIDR | acções, formulário **Adicionar isento**.
+- Labels em `layer7.vip_meta.labels` (mapa IP/CIDR → descrição; daemon nunca lê).
+- Export/import JSON da Lista VIP (padrão BG-070).
+- Link **Gerir Lista VIP** no modal Perfis rápidos.
+- Constantes PHP `LAYER7_VIP_MAX_HOSTS` / `LAYER7_VIP_MAX_CIDRS` (=8) com
+  rejeição visível (sem truncamento silencioso).
+- Avisos DHCP static mapping e sinkhole DNS (Bloco D / ADR-0020).
+
+### Tests
+
+- `tests/functional/test_vip_exception.php` estendido: labels, limites,
+  export/import round-trip.
+- Builder FreeBSD 15: `php -l`, teste funcional PASS.
+
+### Docs
+
+- CORTEX, backlog BG-071, checklist Bloco B, MANUAL-INSTALL (_57),
+  `gui-validation.md`.
+
 ## [1.8.11_56] - 2026-07-31 — BG-070 integral + correcções pós-_55 defeituoso
 
 ### Fixed

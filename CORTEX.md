@@ -201,7 +201,8 @@ DNS, `_59`). Decisões fechadas: **D1** `vip-isentos` permanece SSOT (sem
 mecanismo paralelo); **D2** labels em `layer7["vip_meta"]["labels"]` (daemon
 nunca lê); **D4** isenção DNS — opção (a) view Unbound preferida, fallback
 (b) rdr `from !<layer7_exc_allow_N>` com limitação sinkhole honesta. Ordem
-A→B→C→D→E; Bloco A concluído; blocos B–E pendentes. NO-GO produção inalterado
+A→B→C→D→E; Bloco A concluído; **Bloco B concluído** (`1.8.11_57` publicado);
+Blocos C–E pendentes. NO-GO produção inalterado
 (referência enforce `1.8.11_24` até G2–G7).
 
 ### Release `1.8.11_47` — HTTPS ao portal com erro imediato (publicada `2026-07-30`)
@@ -221,6 +222,15 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Candidato `1.8.11_57` — BG-071 Lista VIP global (publicado `2026-07-31`)
+
+Secção **Lista VIP (isencão total)** em Excepções: descricao por entrada
+(`layer7.vip_meta.labels`), validacao 8+8, export/import JSON, link no modal
+Perfis rapidos. SSOT `vip-isentos` inalterado; daemon inalterado (Bloco C
+alarga limites). Aviso sinkhole DNS honesto (Bloco D / ADR-0020).
+Artefacto `SHA256=0018de424180f8fb2ec845f6e885dcd7aa0c898d20d0a7b14f5f2883a6ac45b9`,
+tag `v1.8.11_57` em `pablomichelin/Layer7`. Rollback: `_56`.
 
 ### Candidato `1.8.11_56` — BG-070 integral + correcções pós-_55 defeituoso
 

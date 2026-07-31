@@ -585,7 +585,8 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   VIP para GUI de primeira classe, limites daemon e caminho DNS. Backlog
   **BG-071** (GUI Lista VIP, `_57`), **BG-072** (limites `L7_EXC_MAX_*`,
   `_58`), **BG-073** (isenção DNS + **ADR-0020**, `_59`). SSOT `vip-isentos`
-  inalterado; labels em `vip_meta.labels`. Ordem A→E; NO-GO producao inalterado.
+  inalterado; labels em `vip_meta.labels`. Ordem A→E; **Bloco B concluído**
+  (`1.8.11_57`); Blocos C–E pendentes. NO-GO producao inalterado.
 
 ### Criterios de entrada
 
