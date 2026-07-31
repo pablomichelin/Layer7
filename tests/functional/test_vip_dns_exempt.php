@@ -75,7 +75,27 @@ if (!$check["ok"]) {
 	exit(1);
 }
 
-/* Opcao (a): rdr global mantem from any */
+/* Estado persistente: should_apply + marker ausente => fallback activo */
+unset($GLOBALS["layer7_vip_dns_rdr_fallback"]);
+global $config;
+$saved_unbound = isset($config["unbound"]) ? $config["unbound"] : null;
+$config["unbound"] = array("custom_options" => "");
+if (!layer7_vip_dns_rdr_fallback_enabled($data)) {
+	fwrite(STDERR, "FAIL: persistent fallback expected true (no marker)\n");
+	exit(1);
+}
+$config["unbound"]["custom_options"] = base64_encode($block);
+if (layer7_vip_dns_rdr_fallback_enabled($data)) {
+	fwrite(STDERR, "FAIL: persistent fallback expected false (marker present)\n");
+	exit(1);
+}
+if ($saved_unbound !== null) {
+	$config["unbound"] = $saved_unbound;
+} else {
+	unset($config["unbound"]);
+}
+
+/* Opcao (a): rdr global mantem from any (override de teste) */
 layer7_vip_dns_rdr_fallback_set(false);
 $rdr = layer7_generate_blockpage_rdr_snippet($data);
 if ($rdr === "" || strpos($rdr, "from any to !127.0.0.1 port 53") === false) {
@@ -122,7 +142,7 @@ if (is_executable($pfctl)) {
 	}
 }
 
-layer7_vip_dns_rdr_fallback_set(false);
+unset($GLOBALS["layer7_vip_dns_rdr_fallback"]);
 $monitor = $data;
 $monitor["layer7"]["mode"] = "monitor";
 if (layer7_vip_dns_should_apply($monitor)) {

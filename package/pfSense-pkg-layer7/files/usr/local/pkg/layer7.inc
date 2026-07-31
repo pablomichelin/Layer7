@@ -2191,9 +2191,16 @@ function layer7_vip_dns_rdr_fallback_set($enabled)
 	$GLOBALS["layer7_vip_dns_rdr_fallback"] = !empty($enabled);
 }
 
-function layer7_vip_dns_rdr_fallback_enabled()
+function layer7_vip_dns_rdr_fallback_enabled($data = null)
 {
-	return !empty($GLOBALS["layer7_vip_dns_rdr_fallback"]);
+	if (array_key_exists("layer7_vip_dns_rdr_fallback", $GLOBALS)) {
+		return !empty($GLOBALS["layer7_vip_dns_rdr_fallback"]);
+	}
+	if (!layer7_vip_dns_should_apply($data)) {
+		return false;
+	}
+	$opts = layer7_unbound_custom_options_read();
+	return strpos($opts, L7_VIP_DNS_MARKER_START) === false;
 }
 
 /**
@@ -2418,14 +2425,12 @@ function layer7_vip_dns_sync($data = null)
 	if ($data === null) {
 		$data = layer7_load_or_default();
 	}
-	layer7_vip_dns_rdr_fallback_set(false);
 	if (!layer7_vip_dns_should_apply($data)) {
 		layer7_remove_unbound_vip_dns();
 		return;
 	}
 	$res = layer7_configure_unbound_vip_dns($data);
 	if (!$res["ok"]) {
-		layer7_vip_dns_rdr_fallback_set(true);
 		layer7_remove_unbound_vip_dns();
 		layer7_log_pkg_warn(
 		    "Layer7: VIP DNS view Unbound falhou; fallback rdr " .
@@ -4109,7 +4114,8 @@ function layer7_vip_labels_cleanup(&$data, $hosts, $cidrs)
 }
 
 /**
- * Valida limites VIP face ao daemon actual (8 hosts + 8 CIDRs).
+ * Valida limites VIP face ao daemon actual (LAYER7_VIP_MAX_HOSTS +
+ * LAYER7_VIP_MAX_CIDRS; 32+16).
  *
  * @param string[] $hosts
  * @param string[] $cidrs

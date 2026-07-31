@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_59` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_59`,
-`SHA256=579114d8583e8ca01d3888d0cd308121640d8cee2e8f88a4c250c0b2a35de004`;
+`1.8.11_60` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_60`,
+`SHA256=19ddb638d3449d26fab5188d4472cc9427af99832eb96c3bd8cbf9a740d09fb8`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
@@ -202,8 +202,8 @@ mecanismo paralelo); **D2** labels em `layer7["vip_meta"]["labels"]` (daemon
 nunca lê); **D4** isenção DNS — opção (a) view Unbound preferida, fallback
 (b) rdr `from !<layer7_exc_allow_N>` com limitação sinkhole honesta. Ordem
 A→B→C→D→E; Bloco A concluído; **Bloco B concluído** (`1.8.11_57` publicado);
-**Bloco C concluído** (`1.8.11_58` publicado); **Bloco D concluído**
-(`1.8.11_59` publicado); **Bloco E concluído documental** (roteiro lab sec.
+**Bloco C concluído** (`1.8.11_58` publicado); **Bloco D concluído** (`1.8.11_59` publicado; pós-auditoria `_60`);
+**Bloco E concluído documental** (roteiro lab sec.
 **20** em `validacao-lab.md`). Feature Lista VIP global **A–E** fechada em
 codigo + documentacao; **gate appliance** (execucao sec. 20) pendente validacao
 humana. NO-GO produção inalterado (referência enforce `1.8.11_24` até G2–G7).
@@ -225,6 +225,17 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Release `1.8.11_60` — Pós-auditoria Lista VIP / BG-073 fix (publicado `2026-07-31`)
+
+Corrige regressão em que `layer7_vip_dns_rdr_fallback_enabled()` dependia de
+`$GLOBALS` definido apenas em `layer7_vip_dns_sync()` — em qualquer
+`filter_configure` externo o rdr `:53` voltava a `from any` e VIPs em fallback
+eram silenciosamente enviados ao sinkhole. Passa a derivar do estado
+persistente (mesmos critérios que `layer7_vip_dns_mode_get`: `should_apply` +
+marker Unbound ausente). Docblock limites VIP (32+16). Artefacto
+`SHA256=19ddb638d3449d26fab5188d4472cc9427af99832eb96c3bd8cbf9a740d09fb8`,
+tag `v1.8.11_60` em `pablomichelin/Layer7`. Rollback: `_59`.
 
 ### Release `1.8.11_59` — BG-073 isenção VIP caminho DNS (publicado `2026-07-31`)
 
@@ -927,9 +938,9 @@ validacao fora da operacao real.
   checklist mestre; modelo conceptual em
   [`docs/00-overview/modelo-conceptual-gui.md`](docs/00-overview/modelo-conceptual-gui.md)
   como gate de revisão para mudanças de GUI.
-12. **Lista VIP global:** Blocos A–E concluídos (`2026-07-31`); releases `_57`–`_59`;
+12. **Lista VIP global:** Blocos A–E concluídos (`2026-07-31`); releases `_57`–`_60`;
   roteiro lab sec. **20** (`validacao-lab.md`); **execução física no appliance**
-  pendente validação humana — **BG-071**/`_57`, **BG-072**/`_58`, **BG-073**/`_59`
+  pendente validação humana — **BG-071**/`_57`, **BG-072**/`_58`, **BG-073**/`_59`–`_60`
   (**ADR-0020**); gates no checklist mestre secção BG-071/072/073; SSOT
   `vip-isentos` inalterado; NO-GO produção `_24` inalterado.
 
@@ -1296,7 +1307,7 @@ CHECKPOINT CANONICO
 - Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060;
   Lista VIP global A–E concluida; execucao lab sec. 20 pendente)
 - Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_59; producao enforce de referencia: 1.8.11_24)
+- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_60; producao enforce de referencia: 1.8.11_24)
 - Fonte canonica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica de prioridade: docs/02-roadmap/backlog.md
 - Fonte canonica de gates: docs/02-roadmap/checklist-mestre.md

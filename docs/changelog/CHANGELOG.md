@@ -2,6 +2,33 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_60] - 2026-07-31 — Pós-auditoria Lista VIP (BG-073 fix)
+
+### Fixed
+
+- **P1:** `layer7_vip_dns_rdr_fallback_enabled()` passa a derivar do estado
+  persistente (`layer7_vip_dns_should_apply` + ausência de `L7_VIP_DNS_MARKER_*`
+  em Unbound `custom_options`), em vez de `$GLOBALS` só definido em
+  `layer7_vip_dns_sync()`. Corrige regeneração silenciosa de rdr `:53`
+  `from any` em `filter_configure` (save regra, boot, evento interface) que
+  reintroduzia sinkhole para VIPs em modo fallback.
+- **P3:** docblock `layer7_vip_validate_limits` alinhado com
+  `LAYER7_VIP_MAX_HOSTS` / `LAYER7_VIP_MAX_CIDRS` (32+16).
+
+### Changed
+
+- `layer7_vip_dns_rdr_fallback_set()` mantido apenas como override em testes;
+  removidas chamadas redundantes em `layer7_vip_dns_sync()`.
+
+### Tests
+
+- `test_vip_dns_exempt.php`: estado persistente (marker presente/ausente) +
+  overrides de teste; builder FreeBSD 15 PASS.
+
+### Docs
+
+- CORTEX, MANUAL-INSTALL (_60; rollback sec. 12 → `_59`), backlog.
+
 ## [1.8.11_59] - 2026-07-31 — BG-073 isenção VIP caminho DNS (Bloco D)
 
 ### Added
