@@ -25,8 +25,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Tests
 
 - Extensão `tests/functional/test_profile_icon_valid.php` (render FA6).
-- Suite/build no builder FreeBSD 15 + artefacto `.pkg` (SHA256 na secção
-  Links de `MANUAL-INSTALL.md`).
+- Suite/build no builder FreeBSD 15 + artefacto `.pkg`
+  (`SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e`).
 
 ### Docs
 

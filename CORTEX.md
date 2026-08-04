@@ -35,8 +35,9 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_65` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_65`;
-SHA256 e comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
+`1.8.11_65` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_65`,
+`SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e`;
+comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 **Referencia de producao enforce:** continua `1.8.11_24`
@@ -231,7 +232,7 @@ tag `v1.8.11_47` em `pablomichelin/Layer7`.
 Apenas apresentação: dicionário EN completo para `l7_t()`/catálogo de
 perfis; render de ícones compatível com Font Awesome 6 do pfSense (`fab` +
 aliases FA4); label PT «Mensageria» → «Mensagens» (id `mensageria`
-preservado). Daemon/enforcement inalterados. Artefacto SHA256 e tag
+preservado). Daemon/enforcement inalterados. Artefacto `SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e`, tag
 `v1.8.11_65` em `pablomichelin/Layer7` (ver `MANUAL-INSTALL.md`).
 Rollback: `_64`. Produção enforce continua `_24`.
 
