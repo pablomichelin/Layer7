@@ -1,36 +1,3 @@
-# Editor / OS
 .DS_Store
-Thumbs.db
-Desktop.ini
 *.swp
-*.swo
-.vscode/
-.idea/
-
-# Cursor / local
-.cursor/
-
-# Artefactos locais de diagnostico/release/validacao (podem conter IPs/dados
-# do appliance e .pkg) — nunca commitar
-.local/
-
-# Inventário do lab preenchido localmente (não commitar IPs/senhas)
-docs/08-lab/lab-inventory.md
-
-# Scripts de lab com credenciais (não commitar)
-scripts/lab/
-
-# Build artifacts (futuro) — só na raiz (não ignorar scripts/build/)
-*.txz
-*.pkg
-/dist/
-/build/
-/release/
-/releases/
-
-# Tools locais
-/tools/
-
-# Binários locais (make / smoke em src/layer7d)
-src/layer7d/layer7d
-src/layer7d/layer7d-smoke
+*~
