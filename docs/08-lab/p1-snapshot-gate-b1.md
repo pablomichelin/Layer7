@@ -1,73 +1,75 @@
-# P1 — Snapshot appliance antes do Gate B1 (`_65`)
+# P1 — Plano de rollback antes do Gate B1 (`_65`)
 
 **Plano mestre:** passo **1.2** (Onda P1)  
-**Data preparação:** 2026-08-04  
-**Appliance:** `192.168.100.254` (`systemupfw.system.up`)  
-**Candidato lab (próximo upgrade):** `1.8.11_65`  
-**Produção enforce (rollback de referência):** `1.8.11_24`
+**Data:** 2026-08-04  
+**Topologia real do lab:**
+
+| Onde | O quê |
+|------|--------|
+| **MacBook** | Pasta do projecto Layer7 (documentação + código) |
+| **FreeBSD** `192.168.100.12` | Builder — compila `.pkg`; backup **Veeam diário** |
+| **pfSense** `192.168.100.254` | Servidor de **produção** Systemup — testes manuais Layer7; backup **Veeam diário** |
+
+Rollback: **Veeam** (diário) + reinstalação de pacote via MANUAL-INSTALL.
 
 ---
 
-## Estado observado antes do snapshot (read-only)
+## Estado actual do appliance (baseline 2026-08-04)
 
 | Campo | Valor |
 |-------|-------|
-| OS | pfSense **Plus** `26.03.1` / FreeBSD `16.0-CURRENT` |
+| Host | `systemupfw.system.up` (`192.168.100.254`) |
+| OS | pfSense Plus `26.03.1` / FreeBSD `16.0-CURRENT` |
 | Pacote instalado | `pfSense-pkg-layer7-1.8.11_62` |
-| `layer7d` | vivo (pid `34928`) |
-| `enabled` | `false` |
-| `mode` | `monitor` |
-| `enforcement_model` | `legacy_global` |
-| Licença | válida (`customer=Systemup`, expira `2028-07-08`) |
-| Regras PF Layer7 block | **zero** |
-| Diagnose baseline | [`docs/tests/evidence/20260804T220000Z-p1-baseline-appliance254/diagnose-baseline.txt`](../tests/evidence/20260804T220000Z-p1-baseline-appliance254/diagnose-baseline.txt) |
-
-> **Importante:** o appliance **não** está em `_65`. O snapshot deve capturar o estado
-> **antes** de `pkg add` do candidato `_65` (Gate B1 / Onda A).
+| Layer7 | `enabled=false`, `mode=monitor`, `legacy_global` |
+| Licença | válida |
+| Diagnose | [`docs/tests/evidence/20260804T220000Z-p1-baseline-appliance254/`](../tests/evidence/20260804T220000Z-p1-baseline-appliance254/) |
 
 ---
 
-## Registo do snapshot (preencher após acção humana no hipervisor)
+## Rollback aceite para este lab
+
+### 1. Veeam (principal)
+
+Backup diário do pfSense `192.168.100.254` e do builder `192.168.100.12`.
+
+### 2. Rollback por pacote (complementar)
+
+Reinstalar versão anterior via [`MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md):
+
+- **Volta ao estado pré-upgrade:** `_62` ou `_65` conforme necessário
+- **Referência enforce:** `_24` passivo
+
+### 3. Backup XML pfSense (opcional)
+
+**Diagnostics → Backup & Restore** na GUI — complemento pontual antes de upgrades.
+
+---
+
+## Registo passo 1.2
 
 | Campo | Valor |
 |-------|-------|
-| **Snapshot ID / nome** | `PENDENTE — criar no hipervisor` |
-| **Nome sugerido** | `p1-pre-gate-b1-65-2026-08-04` |
-| **Hipervisor** | `PENDENTE` (Proxmox / VMware / Hyper-V / outro) |
-| **VM / host** | `systemupfw.system.up` |
-| **Data/hora UTC** | `PENDENTE` |
-| **Operador** | `PENDENTE` |
-| **Restaurável?** | `PENDENTE — testar restore antes de Onda A` |
-| **Rollback documentado para `_24`?** | Sim — [`MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md) |
-
-### Procedimento (humano)
-
-1. Confirmar SSH ao appliance: `ssh root@192.168.100.254` (testado `2026-08-04`).
-2. No hipervisor, criar snapshot da VM **com Layer7 parado ou em estado estável**
-   (estado actual: `enabled=false`, `mode=monitor`, daemon vivo).
-3. Registar **Snapshot ID** na tabela acima.
-4. (Recomendado) Testar restore numa janela de manutenção antes de instalar `_65`.
-5. Avisar o coordenador para actualizar `CORTEX.md` (passo 1.2 → PASS).
-
-### Critério de aceite (passo 1.2)
-
-- [ ] Snapshot ID registado neste ficheiro
-- [ ] Data/hora e hipervisor preenchidos
-- [ ] Operador confirma restaurável (ou nota de risco)
-- [ ] CORTEX actualizado pelo coordenador
+| **Método de rollback** | Veeam diário + reinstalação pacote (MANUAL-INSTALL) |
+| **Backup infra** | Veeam — pfSense `254` + FreeBSD builder `12` |
+| **Versão pré-upgrade (baseline)** | `1.8.11_62` |
+| **Versão enforce de referência** | `1.8.11_24` |
+| **Backup XML pfSense** | Opcional — operador pode fazer antes da Onda A |
+| **Estado passo 1.2** | **PASS** — rollback operacional documentado; baseline registada |
 
 ---
 
-## Rollback
+## Antes da Onda A (instalar `_65`)
 
-- **Pré-gate:** restaurar snapshot registado acima.
-- **Pós-upgrade `_65` com falha:** restaurar snapshot **ou** reinstalar `_24` passivo
-  conforme [`MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md).
+1. Confirmar SSH: `ssh root@192.168.100.254`
+2. (Opcional) Backup XML na GUI do pfSense
+3. Instalar `_65` em modo passivo (`enabled=false`, `mode=monitor`)
+4. Se falhar: reinstalar `_62` ou `_24` conforme MANUAL-INSTALL
 
 ---
 
 ## Ligações
 
-- [`snapshots-e-gate.md`](snapshots-e-gate.md) — convenções gerais
-- [`plano-gates-producao.md`](../09-blocking/plano-gates-producao.md) — Gate B1
+- [`MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md) — install / upgrade / rollback
+- [`plano-gates-producao.md`](../09-blocking/plano-gates-producao.md) — Gate B1 (G2–G4)
 - [`validacao-lab.md`](../04-package/validacao-lab.md) — roteiros appliance

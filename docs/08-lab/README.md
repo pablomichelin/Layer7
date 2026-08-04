@@ -20,7 +20,7 @@ Windows como gate (ver [guia-windows.md](guia-windows.md) legado).
 | [quick-start-lab.md](quick-start-lab.md) | Fluxo encadeado: builder → pfSense → validação; passo **6** (F4) |
 | [syslog-remote.md](syslog-remote.md) | Logs remotos no lab |
 | [snapshots-e-gate.md](snapshots-e-gate.md) | Snapshots + checklist gate (contexto legado) |
-| [p1-snapshot-gate-b1.md](p1-snapshot-gate-b1.md) | **P1 passo 1.2** — snapshot antes do Gate B1 (`_65`) |
+| [p1-snapshot-gate-b1.md](p1-snapshot-gate-b1.md) | **P1 passo 1.2** — plano de rollback antes do Gate B1 (`_65`) |
 | [lab-inventory.template.md](lab-inventory.template.md) | Template de IPs/versões (cópia local) |
 | [../04-package/validacao-lab.md](../04-package/validacao-lab.md) | Início: *Gates oficiais F4*; build `.pkg`, `pkg add`, serviço, GUI, roteiros F4 (10a, 10b, 11 + anti-QUIC opcional + VLAN opcional na 11), §6c CLI |
 | [../poc/README.md](../poc/README.md) | PoC nDPI e registro de resultados |

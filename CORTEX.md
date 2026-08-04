@@ -1221,13 +1221,14 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: 1.2
-- Onda: P1
+- Passo actual: 2.2
+- Onda: A (Gate B1 — PF parser G3)
 - Candidato lab: 1.8.11_65 (confirmado passo 1.1 — 2026-08-04)
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_65
-- G0-G1: PASS (builder _65 publicado; passos 1.0–1.1)
-- G2-G4: PENDENTE
+- G0-G1: PASS
+- G2: PASS (install passivo `_65` em `254`, 2026-08-04)
+- G3-G4: PENDENTE
 - G5: PENDENTE
 - G6-G7: PENDENTE
 - F3: ABERTA
@@ -1240,12 +1241,12 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 - F6: NÃO INICIADA
 - F7/BG-028: PENDENTE
 - R1-R12: 0/12
-- Passo 1.1: PASS (SHA256 verificado vs GitHub `latest` + `PORTREVISION=65`)
-- Passo 1.3: PASS (diagnose baseline `20260804T220000Z-p1-baseline-appliance254`)
-- Passo 1.2: BLOQUEADO — snapshot ID pendente no hipervisor (ver `docs/08-lab/p1-snapshot-gate-b1.md`)
-- Appliance lab: `192.168.100.254` acessível; instalado `_62` (não `_65`); monitor passivo
-- Próximo passo autorizado: 1.2 (humano — criar snapshot e registar ID)
-- Multitarefa: 1.3 concluído em paralelo; Onda A bloqueada até 1.2 PASS
+- P1: CONCLUÍDA (1.1–1.3 PASS)
+- Passo 2.1: PASS (evidência `20260804T221500Z-ondaA-g2-install-65`)
+- Topologia: Mac=repo; builder=12 (Veeam); appliance=254 produção (Veeam)
+- Appliance: `_65` instalado; `enabled=false`; `mode=monitor`
+- Próximo passo autorizado: 2.2 (G3 — PF parser)
+- Modo: agente único
 ```
 
 ---

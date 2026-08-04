@@ -1,0 +1,391 @@
+scrub from any to <vpn_networks> max-mss 1360 fragment no reassemble
+scrub from <vpn_networks> to any max-mss 1360 fragment no reassemble
+scrub on pppoe0 inet all fragment reassemble
+scrub on pppoe0 inet6 all fragment reassemble
+scrub on vmx0 inet all fragment reassemble
+scrub on vmx0 inet6 all fragment reassemble
+scrub on pppoe1 inet all fragment reassemble
+scrub on pppoe1 inet6 all fragment reassemble
+scrub on vmx0.10 inet all fragment reassemble
+scrub on vmx0.10 inet6 all fragment reassemble
+scrub on vmx0.50 inet all fragment reassemble
+scrub on vmx0.50 inet6 all fragment reassemble
+scrub on vmx0.95 inet all fragment reassemble
+scrub on vmx0.95 inet6 all fragment reassemble
+scrub on vmx0.52 inet all fragment reassemble
+scrub on vmx0.52 inet6 all fragment reassemble
+anchor "openvpn/*" all
+anchor "ipsec/*" all
+block drop in log quick inet6 from any to <_nat64reserved_> label "descr=Block NAT64 for non-global IPv4" ridentifier 1000000001
+block drop out log quick inet6 from any to <_nat64reserved_> label "descr=Block NAT64 for non-global IPv4" ridentifier 1000000002
+block drop in log quick inet from 169.254.0.0/16 to any label "descr=Block IPv4 link-local" ridentifier 1000000101
+block drop in log quick inet from any to 169.254.0.0/16 label "descr=Block IPv4 link-local" ridentifier 1000000102
+block drop in log inet all label "descr=Default deny rule IPv4" label "tags=ruleset:d18622cbe64a64ff" ridentifier 1000000103
+block drop out log inet all label "descr=Default deny rule IPv4" label "tags=ruleset:d18622cbe64a64ff" ridentifier 1000000104
+block drop in log inet6 all label "descr=Default deny rule IPv6" label "tags=ruleset:d18622cbe64a64ff" ridentifier 1000000105
+block drop out log inet6 all label "descr=Default deny rule IPv6" label "tags=ruleset:d18622cbe64a64ff" ridentifier 1000000106
+pass quick inet6 proto ipv6-icmp all icmp6-type unreach keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000107
+pass quick inet6 proto ipv6-icmp all icmp6-type toobig keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000107
+pass quick inet6 proto ipv6-icmp all icmp6-type neighbrsol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000107
+pass quick inet6 proto ipv6-icmp all icmp6-type neighbradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000107
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type echorep keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000108
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type routersol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000108
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type routeradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000108
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type neighbrsol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000108
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type neighbradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000108
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type echorep keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000109
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type routersol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000109
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type routeradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000109
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type neighbrsol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000109
+pass out quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type neighbradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000109
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type echoreq keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000110
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type routersol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000110
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type routeradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000110
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type neighbrsol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000110
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to fe80::/10 icmp6-type neighbradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000110
+pass in quick inet6 proto ipv6-icmp from ff02::/16 to fe80::/10 icmp6-type echoreq keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000111
+pass in quick inet6 proto ipv6-icmp from ff02::/16 to fe80::/10 icmp6-type routersol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000111
+pass in quick inet6 proto ipv6-icmp from ff02::/16 to fe80::/10 icmp6-type routeradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000111
+pass in quick inet6 proto ipv6-icmp from ff02::/16 to fe80::/10 icmp6-type neighbrsol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000111
+pass in quick inet6 proto ipv6-icmp from ff02::/16 to fe80::/10 icmp6-type neighbradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000111
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type echoreq keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000112
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type routersol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000112
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type routeradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000112
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type neighbrsol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000112
+pass in quick inet6 proto ipv6-icmp from fe80::/10 to ff02::/16 icmp6-type neighbradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000112
+pass in quick inet6 proto ipv6-icmp from :: to ff02::/16 icmp6-type echoreq keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000113
+pass in quick inet6 proto ipv6-icmp from :: to ff02::/16 icmp6-type routersol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000113
+pass in quick inet6 proto ipv6-icmp from :: to ff02::/16 icmp6-type routeradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000113
+pass in quick inet6 proto ipv6-icmp from :: to ff02::/16 icmp6-type neighbrsol keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000113
+pass in quick inet6 proto ipv6-icmp from :: to ff02::/16 icmp6-type neighbradv keep state (if-bound) label "descr=ICMPv6 operation" ridentifier 1000000113
+block drop log quick inet proto tcp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000114
+block drop log quick inet proto udp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000114
+block drop log quick inet proto tcp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000115
+block drop log quick inet proto udp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000115
+block drop log quick inet6 proto tcp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000116
+block drop log quick inet6 proto udp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000116
+block drop log quick inet6 proto tcp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000117
+block drop log quick inet6 proto udp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000117
+block drop log quick from <snort2c> to any label "descr=Block snort2c hosts" ridentifier 1000000118
+block drop log quick from any to <snort2c> label "descr=Block snort2c hosts" ridentifier 1000000119
+block drop in log quick proto tcp from <sshguard> to (self) port = ssh label "descr=sshguard" ridentifier 1000000301
+block drop in log quick proto tcp from <sshguard> to (self) port = 9999 label "descr=GUI Lockout" ridentifier 1000000351
+block drop in log quick from <virusprot> to any label "descr=virusprot overload table" ridentifier 1000000400
+block drop out quick proto udp from any port = bootps to any port = bootpc label "descr=Prevent routing dhcp responses" ridentifier 1000000451 tagged dhcpin
+pass in quick on pppoe0 inet6 proto udp from fe80::/10 port = dhcpv6-client to fe80::/10 port = dhcpv6-client keep state (if-bound) label "descr=allow dhcpv6 client in P4NET" ridentifier 1000000461
+pass in quick on pppoe0 proto udp from any port = dhcpv6-server to any port = dhcpv6-client keep state (if-bound) label "descr=allow dhcpv6 client in P4NET" ridentifier 1000000462
+pass out quick on pppoe0 proto udp from any port = dhcpv6-client to any port = dhcpv6-server keep state (if-bound) label "descr=allow dhcpv6 client out P4NET" ridentifier 1000000463
+block drop in log on ! pppoe0 inet from 177.38.10.224 to any label "descr=antispoof protection" ridentifier 1000001471
+block drop in log on ! pppoe0 inet6 from 2804:6c4:200:0:250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000001471
+block drop in log on pppoe0 inet6 from fe80::250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000001471
+block drop in log inet from 177.38.10.224 to any label "descr=antispoof protection" ridentifier 1000001471
+block drop in log inet6 from 2804:6c4:200:0:250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000001471
+block drop in log on ! vmx0 inet from 192.168.100.0/24 to any label "descr=antispoof protection" ridentifier 1000002521
+block drop in log on ! vmx0 inet6 from 2804:6c4:11d:cc00::/64 to any label "descr=antispoof protection" ridentifier 1000002521
+block drop in log on vmx0 inet6 from fe80::250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000002521
+block drop in log inet from 192.168.100.254 to any label "descr=antispoof protection" ridentifier 1000002521
+block drop in log inet6 from 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000002521
+pass in quick on vmx0 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002541
+pass in quick on vmx0 inet proto udp from any port = bootpc to 192.168.100.254 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002542
+pass out quick on vmx0 inet proto udp from 192.168.100.254 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002543
+pass in quick on pppoe1 inet6 proto udp from fe80::/10 port = dhcpv6-client to fe80::/10 port = dhcpv6-client keep state (if-bound) label "descr=allow dhcpv6 client in MHNET" ridentifier 1000002561
+pass in quick on pppoe1 proto udp from any port = dhcpv6-server to any port = dhcpv6-client keep state (if-bound) label "descr=allow dhcpv6 client in MHNET" ridentifier 1000002562
+pass out quick on pppoe1 proto udp from any port = dhcpv6-client to any port = dhcpv6-server keep state (if-bound) label "descr=allow dhcpv6 client out MHNET" ridentifier 1000002563
+block drop in log on ! pppoe1 inet from 45.238.165.154 to any label "descr=antispoof protection" ridentifier 1000003571
+block drop in log on ! pppoe1 inet6 from 2804:108c:db00::/64 to any label "descr=antispoof protection" ridentifier 1000003571
+block drop in log inet from 45.238.165.154 to any label "descr=antispoof protection" ridentifier 1000003571
+block drop in log on pppoe1 inet6 from fe80::250:56ff:fe88:e133 to any label "descr=antispoof protection" ridentifier 1000003571
+block drop in log on pppoe1 inet6 from fe80::50:56c9:88:e133 to any label "descr=antispoof protection" ridentifier 1000003571
+block drop in log inet6 from 2804:108c:db00:0:250:56ff:fe88:e133 to any label "descr=antispoof protection" ridentifier 1000003571
+block drop in log on ! vmx0.10 inet from 10.0.85.0/24 to any label "descr=antispoof protection" ridentifier 1000004621
+block drop in log on vmx0.10 inet6 from fe80::250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000004621
+block drop in log inet from 10.0.85.1 to any label "descr=antispoof protection" ridentifier 1000004621
+pass in quick on vmx0.10 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004641
+pass in quick on vmx0.10 inet proto udp from any port = bootpc to 10.0.85.1 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004642
+pass out quick on vmx0.10 inet proto udp from 10.0.85.1 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004643
+block drop in log on ! vmx0.50 inet from 172.18.25.0/24 to any label "descr=antispoof protection" ridentifier 1000005671
+block drop in log on vmx0.50 inet6 from fe80::250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000005671
+block drop in log inet from 172.18.25.1 to any label "descr=antispoof protection" ridentifier 1000005671
+block drop in log on ! vmx0.95 inet from 192.168.95.0/24 to any label "descr=antispoof protection" ridentifier 1000006721
+block drop in log on vmx0.95 inet6 from fe80::250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000006721
+block drop in log inet from 192.168.95.254 to any label "descr=antispoof protection" ridentifier 1000006721
+pass in quick on vmx0.95 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006741
+pass in quick on vmx0.95 inet proto udp from any port = bootpc to 192.168.95.254 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006742
+pass out quick on vmx0.95 inet proto udp from 192.168.95.254 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006743
+block drop in log on ! vmx0.52 inet from 192.168.52.0/28 to any label "descr=antispoof protection" ridentifier 1000007771
+block drop in log on vmx0.52 inet6 from fe80::250:56ff:fe88:a4f7 to any label "descr=antispoof protection" ridentifier 1000007771
+block drop in log inet from 192.168.52.1 to any label "descr=antispoof protection" ridentifier 1000007771
+pass in quick on vmx0.52 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007791
+pass in quick on vmx0.52 inet proto udp from any port = bootpc to 192.168.52.1 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007792
+pass out quick on vmx0.52 inet proto udp from 192.168.52.1 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007793
+pass in on lo0 inet all flags S/SA keep state (if-bound) label "descr=pass IPv4 loopback" ridentifier 1000009911
+pass out on lo0 inet all flags S/SA keep state (if-bound) label "descr=pass IPv4 loopback" ridentifier 1000009912
+pass in on lo0 inet6 all flags S/SA keep state (if-bound) label "descr=pass IPv6 loopback" ridentifier 1000009913
+pass out on lo0 inet6 all flags S/SA keep state (if-bound) label "descr=pass IPv6 loopback" ridentifier 1000009914
+pass out inet all flags S/SA keep state (if-bound) allow-opts label "descr=let out anything IPv4 from firewall host itself" ridentifier 1000009915
+pass out inet6 all flags S/SA keep state (if-bound) allow-opts label "descr=let out anything IPv6 from firewall host itself" ridentifier 1000009916
+pass out route-to (pppoe0 10.99.99.35) inet from 177.38.10.224 to ! 177.38.10.224 flags S/SA keep state (if-bound) allow-opts label "descr=let out anything from firewall host itself" ridentifier 1000010011
+pass out route-to (pppoe0 fe80::4a2c:d0ff:fe2c:4fc9) inet6 from 2804:6c4:200:0:250:56ff:fe88:a4f7 to ! 2804:6c4:200::/56 flags S/SA keep state (if-bound) allow-opts label "descr=let out anything from firewall host itself" ridentifier 1000010012
+pass out route-to (pppoe1 179.127.141.233) inet from 45.238.165.154 to ! 45.238.165.154 flags S/SA keep state (if-bound) allow-opts label "descr=let out anything from firewall host itself" ridentifier 1000010013
+pass out route-to (pppoe1 fe80::fa95:22ff:fef4:605b) inet6 from 2804:108c:db00:0:250:56ff:fe88:e133 to ! 2804:108c:db00::/56 flags S/SA keep state (if-bound) allow-opts label "descr=let out anything from firewall host itself" ridentifier 1000010014
+pass out on enc0 all flags S/SA keep state (if-bound) label "descr=IPsec internal host to host" ridentifier 1000010312
+pass in quick on vmx0 proto tcp from any to (vmx0) port = 9999 flags S/SA keep state (if-bound) label "descr=anti-lockout rule" ridentifier 10001
+pass in quick on vmx0 proto tcp from any to (vmx0) port = http flags S/SA keep state (if-bound) label "descr=anti-lockout rule" ridentifier 10001
+pass in quick on vmx0 proto tcp from any to (vmx0) port = ssh flags S/SA keep state (if-bound) label "descr=anti-lockout rule" ridentifier 10001
+pass in inet all flags S/SA keep state (if-bound) label "descr=NAT REFLECT: Allow traffic to localhost" ridentifier 1000010331 tagged PFREFLECT
+pass in quick on vmx0.10 proto tcp from any to <cpzoneid_2_cpips> port = 8002 flags S/SA keep state (if-bound, sloppy) label "descr=Captive Portal operation" ridentifier 13001
+pass out quick on vmx0.10 inet proto tcp from 10.0.85.1 port = 8002 to any flags any keep state (if-bound, sloppy) label "descr=Captive Portal operation" ridentifier 13002
+block drop in quick on vmx0.10 from any to ! <cpzoneid_2_cpips> label "descr=Captive Portal operation" ridentifier 13003 ! tagged cpzoneid_2_auth
+anchor "userrules/*" all
+pass in quick on enc0 inet all flags S/SA keep state (if-bound) label "id=1680094185" label "tags=user_rule" ridentifier 1680094185
+pass in quick on openvpn inet all flags S/SA keep state (if-bound) label "id=1675714827" label "tags=user_rule" label "descr=OpenVPN  wizard" ridentifier 1675714827
+pass in quick on openvpn inet all flags S/SA keep state (if-bound) label "id=1772483084" label "tags=user_rule" label "descr=OpenVPN Quality wizard" ridentifier 1772483084
+pass in log quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet all flags S/SA keep state (if-bound) label "id=1679355310" label "tags=user_rule" ridentifier 1679355310
+pass in log quick on pppoe0 reply-to (pppoe0 fe80::4a2c:d0ff:fe2c:4fc9) inet6 all flags S/SA keep state (if-bound) label "id=1679355310" label "tags=user_rule" ridentifier 1679355310
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.254 port = 9999 flags S/SA keep state (if-bound) label "id=1592242767" label "tags=user_rule" label "descr=NAT Acesso Externo" ridentifier 1592242767
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = zabbix-agent flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = zabbix-trapper flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10052 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10054 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10055 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10056 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10057 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.252 port = 7989 flags S/SA keep state (if-bound) label "id=1598870767" label "tags=user_rule" label "descr=NAT" ridentifier 1598870767
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 45.238.165.154 port = openvpn keep state (if-bound) label "id=1734229064" label "tags=user_rule" label "descr=Allow OpenVPN on MHNET Interface" ridentifier 1734229064
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.227 port = 5678 flags S/SA keep state (if-bound) label "id=1727188162" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188162
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.227 port = 5678 keep state (if-bound) label "id=1727188162" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188162
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = http flags S/SA keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = https flags S/SA keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = http keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = https keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 30000 flags S/SA keep state (if-bound) label "id=1741714485" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1741714485
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = snmp flags S/SA keep state (if-bound) label "id=1743450285" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450285
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.244 port = snmp keep state (if-bound) label "id=1743450285" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450285
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = snmptrap flags S/SA keep state (if-bound) label "id=1743450321" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450321
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.244 port = snmptrap keep state (if-bound) label "id=1743450321" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450321
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.247 port = 62354 flags S/SA keep state (if-bound) label "id=1747867144" label "tags=user_rule" label "descr=NAT" ridentifier 1747867144
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.247 port = 62354 keep state (if-bound) label "id=1747867144" label "tags=user_rule" label "descr=NAT" ridentifier 1747867144
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.228 port = 62354 flags S/SA keep state (if-bound) label "id=1751027756" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027756
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.228 port = 62354 keep state (if-bound) label "id=1751027756" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027756
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.228 port = 8081 flags S/SA keep state (if-bound) label "id=1751027973" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027973
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.228 port = 8081 keep state (if-bound) label "id=1751027973" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027973
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = http-alt flags S/SA keep state (if-bound) label "id=1759858602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = http-alt keep state (if-bound) label "id=1759858602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 177.38.10.224 port = rsf-1 keep state (if-bound) label "id=1772483083" label "tags=user_rule" label "descr=OpenVPN Quality wizard" ridentifier 1772483083
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from 177.38.15.220 to 192.168.100.112 port = 8123 flags S/SA keep state (if-bound) label "id=1778602413" label "tags=user_rule" label "descr=NAT NeuralHouse_Osmarildo" ridentifier 1778602413
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.220 to 192.168.100.112 port = 8123 keep state (if-bound) label "id=1778602413" label "tags=user_rule" label "descr=NAT NeuralHouse_Osmarildo" ridentifier 1778602413
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from 177.38.15.220 to 192.168.100.112 port = 4357 flags S/SA keep state (if-bound) label "id=1778603107" label "tags=user_rule" label "descr=NAT NeuralHouse_Osmarildo" ridentifier 1778603107
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.220 to 192.168.100.112 port = 4357 keep state (if-bound) label "id=1778603107" label "tags=user_rule" label "descr=NAT NeuralHouse_Osmarildo" ridentifier 1778603107
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 6638 flags S/SA keep state (if-bound) label "id=1779150151" label "tags=user_rule" label "descr=NAT" ridentifier 1779150151
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 6638 keep state (if-bound) label "id=1779150151" label "tags=user_rule" label "descr=NAT" ridentifier 1779150151
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 6638 flags S/SA keep state (if-bound) label "id=1779150153" label "tags=user_rule" label "descr=NAT" ridentifier 1779150153
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 6638 keep state (if-bound) label "id=1779150153" label "tags=user_rule" label "descr=NAT" ridentifier 1779150153
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 51820 flags S/SA keep state (if-bound) label "id=1780355374" label "tags=user_rule" label "descr=NAT" ridentifier 1780355374
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 51820 keep state (if-bound) label "id=1780355374" label "tags=user_rule" label "descr=NAT" ridentifier 1780355374
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = smtp flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = smtps flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = submission flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = imaps flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = sieve flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = smtp keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = smtps keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = submission keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = imaps keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = sieve keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = ftp flags S/SA keep state (if-bound) label "id=1784901254" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901254
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = ftp keep state (if-bound) label "id=1784901254" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901254
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port 40109 >< 40211 flags S/SA keep state (if-bound) label "id=1784901607" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901607
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port 40109 >< 40211 keep state (if-bound) label "id=1784901607" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901607
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet proto tcp from 192.168.100.244 port = 10058 to 177.38.10.224 port = 10058 flags S/SA keep state (if-bound) label "id=1759256664" label "tags=user_rule" label "descr=Saida Direcionada Storage Gentil" ridentifier 1759256664
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet proto udp from 192.168.100.244 port = 10058 to 177.38.10.224 port = 10058 keep state (if-bound) label "id=1759256664" label "tags=user_rule" label "descr=Saida Direcionada Storage Gentil" ridentifier 1759256664
+pass in quick on vmx0 inet from 192.168.100.244 to <OPT5__NETWORK> flags S/SA keep state (if-bound) label "id=1757099860" label "tags=user_rule" label "descr=Zabbix" ridentifier 1757099860
+pass in quick on vmx0 inet from 192.168.100.253 to <OPT5__NETWORK> flags S/SA keep state (if-bound) label "id=1757382700" label "tags=user_rule" label "descr=Servidor Web" ridentifier 1757382700
+pass in quick on vmx0 inet from 192.168.100.112 to <OPT5__NETWORK> flags S/SA keep state (if-bound) label "id=1757632417" label "tags=user_rule" label "descr=Servidor Web" ridentifier 1757632417
+block drop in quick on vmx0 inet from <LAN__NETWORK> to <OPT5__NETWORK> label "id=1757097084" label "tags=user_rule" ridentifier 1757097084
+block drop in quick on vmx0 inet from <LAN__NETWORK> to <OPT2__NETWORK> label "id=1757097285" label "tags=user_rule" ridentifier 1757097285
+pass in quick on vmx0 inet all flags S/SA keep state (if-bound) label "id=1624548664" label "tags=user_rule" ridentifier 1624548664
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet from any to 191.5.179.29 flags S/SA keep state (if-bound) label "id=1741637243" label "tags=user_rule" ridentifier 1741637243
+pass in log quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet all flags S/SA keep state (if-bound) label "id=1599072446" label "tags=user_rule" ridentifier 1599072446
+pass in log quick on pppoe1 reply-to (pppoe1 fe80::fa95:22ff:fef4:605b) inet6 all flags S/SA keep state (if-bound) label "id=1599072446" label "tags=user_rule" ridentifier 1599072446
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.254 port = 9999 flags S/SA keep state (if-bound) label "id=1734504431" label "tags=user_rule" label "descr=NAT" ridentifier 1734504431
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = zabbix-agent flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = zabbix-trapper flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10052 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10054 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10055 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10056 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10057 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.252 port = 7989 flags S/SA keep state (if-bound) label "id=1704385249" label "tags=user_rule" label "descr=NAT" ridentifier 1704385249
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 45.238.165.154 port = openvpn keep state (if-bound) label "id=1734215950" label "tags=user_rule" label "descr=Allow OpenVPN on MHNET Interface" ridentifier 1734215950
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.227 port = 5678 flags S/SA keep state (if-bound) label "id=1727188175" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188175
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.227 port = 5678 keep state (if-bound) label "id=1727188175" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188175
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = http flags S/SA keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = https flags S/SA keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = http keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = https keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = snmptrap flags S/SA keep state (if-bound) label "id=1743592897" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743592897
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.244 port = snmptrap keep state (if-bound) label "id=1743592897" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743592897
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.247 port = 62354 flags S/SA keep state (if-bound) label "id=1747867161" label "tags=user_rule" label "descr=NAT" ridentifier 1747867161
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.247 port = 62354 keep state (if-bound) label "id=1747867161" label "tags=user_rule" label "descr=NAT" ridentifier 1747867161
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = snmp flags S/SA keep state (if-bound) label "id=1751027636" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1751027636
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.244 port = snmp keep state (if-bound) label "id=1751027636" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1751027636
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.228 port = 62354 flags S/SA keep state (if-bound) label "id=1751027745" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027745
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.228 port = 62354 keep state (if-bound) label "id=1751027745" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027745
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.228 port = 8081 flags S/SA keep state (if-bound) label "id=1751027983" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027983
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.228 port = 8081 keep state (if-bound) label "id=1751027983" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027983
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = http-alt flags S/SA keep state (if-bound) label "id=1759858581" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858581
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = http-alt keep state (if-bound) label "id=1759858581" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858581
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = smtp flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = smtps flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = submission flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = imaps flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = sieve flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = smtp keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = smtps keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = submission keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = imaps keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = sieve keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = ftp flags S/SA keep state (if-bound) label "id=1784901243" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901243
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = ftp keep state (if-bound) label "id=1784901243" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901243
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port 40109 >< 40211 flags S/SA keep state (if-bound) label "id=1784901588" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901588
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port 40109 >< 40211 keep state (if-bound) label "id=1784901588" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901588
+block drop in quick on vmx0.10 inet from <OPT2__NETWORK> to <OPT3__NETWORK> label "id=1754942078" label "tags=user_rule" ridentifier 1754942078
+block drop in quick on vmx0.10 inet from <OPT2__NETWORK> to <OPT4__NETWORK> label "id=1754942084" label "tags=user_rule" ridentifier 1754942084
+block drop in quick on vmx0.10 inet from <OPT2__NETWORK> to <LAN__NETWORK> label "id=1754942092" label "tags=user_rule" ridentifier 1754942092
+block drop in quick on vmx0.10 inet from <OPT2__NETWORK> to <OPT5__NETWORK> label "id=1757097316" label "tags=user_rule" ridentifier 1757097316
+pass in quick on vmx0.10 inet all flags S/SA keep state (if-bound) label "id=1736172652" label "tags=user_rule" ridentifier 1736172652
+pass in quick on vmx0.50 inet all flags S/SA keep state (if-bound) label "id=1747232380" label "tags=user_rule" ridentifier 1747232380
+pass in quick on vmx0.95 inet from <IPS_CEO_SYSTEM> to <OPT5__NETWORK> flags S/SA keep state (if-bound) label "id=1757096891" label "tags=user_rule" ridentifier 1757096891
+pass in quick on vmx0.95 inet from <IPS_CEO_SYSTEM> to <LAN__NETWORK> flags S/SA keep state (if-bound) label "id=1778755605" label "tags=user_rule" ridentifier 1778755605
+pass in quick on vmx0.95 inet from <OPT4__NETWORK> to 192.168.100.244 flags S/SA keep state (if-bound) label "id=1779102770" label "tags=user_rule" label "descr=Grafana" ridentifier 1779102770
+pass in quick on vmx0.95 inet from <OPT4__NETWORK> to 192.168.100.141 flags S/SA keep state (if-bound) label "id=1778756394" label "tags=user_rule" label "descr=Dados" ridentifier 1778756394
+pass in quick on vmx0.95 inet from <OPT4__NETWORK> to 192.168.100.245 flags S/SA keep state (if-bound) label "id=1780428661" label "tags=user_rule" ridentifier 1780428661
+block drop in quick on vmx0.95 inet from <OPT4__NETWORK> to <LAN__NETWORK> label "id=1778756353" label "tags=user_rule" ridentifier 1778756353
+block drop in quick on vmx0.95 inet6 from <OPT4__NETWORK> to <LAN__NETWORK> label "id=1778756353" label "tags=user_rule" ridentifier 1778756353
+block drop in quick on vmx0.95 inet from <OPT4__NETWORK> to <OPT5__NETWORK> label "id=1757096843" label "tags=user_rule" ridentifier 1757096843
+block drop in quick on vmx0.95 inet6 from <OPT4__NETWORK> to <OPT5__NETWORK> label "id=1757096843" label "tags=user_rule" ridentifier 1757096843
+pass in quick on vmx0.95 inet proto tcp from <OPT4__NETWORK> to 192.168.95.254 port = domain-s flags S/SA keep state (if-bound) label "id=1755203703" label "tags=user_rule" ridentifier 1755203703
+pass in quick on vmx0.95 inet proto udp from <OPT4__NETWORK> to 192.168.95.254 port = domain-s keep state (if-bound) label "id=1755203703" label "tags=user_rule" ridentifier 1755203703
+pass in quick on vmx0.95 inet proto tcp from <OPT4__NETWORK> to 192.168.95.254 port = domain flags S/SA keep state (if-bound) label "id=1755203713" label "tags=user_rule" ridentifier 1755203713
+pass in quick on vmx0.95 inet proto udp from <OPT4__NETWORK> to 192.168.95.254 port = domain keep state (if-bound) label "id=1755203713" label "tags=user_rule" ridentifier 1755203713
+pass in quick on vmx0.95 inet all flags S/SA keep state (if-bound) label "id=1725990001" label "tags=user_rule" ridentifier 1725990001
+pass in quick on vmx0.52 inet from <Servidores_ADM> to 192.168.100.244 flags S/SA keep state (if-bound) label "id=1757097622" label "tags=user_rule" label "descr=Zabbix" ridentifier 1757097622
+pass in quick on vmx0.52 inet from 192.168.52.3 to 192.168.100.253 flags S/SA keep state (if-bound) label "id=1757383185" label "tags=user_rule" label "descr=Servidor Web" ridentifier 1757383185
+pass in quick on vmx0.52 inet from 192.168.52.2 to 192.168.100.254 flags S/SA keep state (if-bound) label "id=1772483863" label "tags=user_rule" label "descr=Servidor Web" ridentifier 1772483863
+block drop in quick on vmx0.52 inet from <OPT5__NETWORK> to <LAN__NETWORK> label "id=1757097784" label "tags=user_rule" label "descr=Zabbix" ridentifier 1757097784
+block drop in log quick on vmx0.52 inet from <OPT5__NETWORK> to <OPT2__NETWORK> label "id=1757096619" label "tags=user_rule" ridentifier 1757096619
+block drop in log quick on vmx0.52 inet from <OPT5__NETWORK> to <OPT3__NETWORK> label "id=1757096634" label "tags=user_rule" ridentifier 1757096634
+block drop in log quick on vmx0.52 inet from <OPT5__NETWORK> to <OPT4__NETWORK> label "id=1757096643" label "tags=user_rule" ridentifier 1757096643
+pass in quick on vmx0.52 inet all flags S/SA keep state (if-bound) label "id=1756927739" label "tags=user_rule" ridentifier 1756927739
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.124 port = isakmp keep state (if-bound) label "descr=IPsec: Lat. Oliveira - outbound isakmp" ridentifier 1000110451
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.124 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Lat. Oliveira - inbound isakmp" ridentifier 1000110452
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.124 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Lat. Oliveira - outbound nat-t" ridentifier 1000110453
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.124 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Lat. Oliveira - inbound nat-t" ridentifier 1000110454
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.15.124 keep state (if-bound) label "descr=IPsec: Lat. Oliveira - outbound esp proto" ridentifier 1000110455
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.15.124 to (self) keep state (if-bound) label "descr=IPsec: Lat. Oliveira - inbound esp proto" ridentifier 1000110456
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.13.195 port = isakmp keep state (if-bound) label "descr=IPsec: Acrel - outbound isakmp" ridentifier 1000110467
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.13.195 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Acrel - inbound isakmp" ridentifier 1000110468
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.13.195 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Acrel - outbound nat-t" ridentifier 1000110469
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.13.195 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Acrel - inbound nat-t" ridentifier 1000110470
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.13.195 keep state (if-bound) label "descr=IPsec: Acrel - outbound esp proto" ridentifier 1000110471
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.13.195 to (self) keep state (if-bound) label "descr=IPsec: Acrel - inbound esp proto" ridentifier 1000110472
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.110 port = isakmp keep state (if-bound) label "descr=IPsec: Voltaic  - outbound isakmp" ridentifier 1000110483
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.110 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Voltaic  - inbound isakmp" ridentifier 1000110484
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.110 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Voltaic  - outbound nat-t" ridentifier 1000110485
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.110 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Voltaic  - inbound nat-t" ridentifier 1000110486
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.15.110 keep state (if-bound) label "descr=IPsec: Voltaic  - outbound esp proto" ridentifier 1000110487
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.15.110 to (self) keep state (if-bound) label "descr=IPsec: Voltaic  - inbound esp proto" ridentifier 1000110488
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.189 port = isakmp keep state (if-bound) label "descr=IPsec: Ronnau - outbound isakmp" ridentifier 1000110499
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.189 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Ronnau - inbound isakmp" ridentifier 1000110500
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.189 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Ronnau - outbound nat-t" ridentifier 1000110501
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.189 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Ronnau - inbound nat-t" ridentifier 1000110502
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.15.189 keep state (if-bound) label "descr=IPsec: Ronnau - outbound esp proto" ridentifier 1000110503
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.15.189 to (self) keep state (if-bound) label "descr=IPsec: Ronnau - inbound esp proto" ridentifier 1000110504
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.13.172 port = isakmp keep state (if-bound) label "descr=IPsec: Enerview - outbound isakmp" ridentifier 1000110515
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.13.172 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Enerview - inbound isakmp" ridentifier 1000110516
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.13.172 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Enerview - outbound nat-t" ridentifier 1000110517
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.13.172 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Enerview - inbound nat-t" ridentifier 1000110518
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.13.172 keep state (if-bound) label "descr=IPsec: Enerview - outbound esp proto" ridentifier 1000110519
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.13.172 to (self) keep state (if-bound) label "descr=IPsec: Enerview - inbound esp proto" ridentifier 1000110520
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.90 port = isakmp keep state (if-bound) label "descr=IPsec: CB-Hidro - outbound isakmp" ridentifier 1000110531
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.90 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: CB-Hidro - inbound isakmp" ridentifier 1000110532
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.90 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: CB-Hidro - outbound nat-t" ridentifier 1000110533
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.90 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: CB-Hidro - inbound nat-t" ridentifier 1000110534
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.15.90 keep state (if-bound) label "descr=IPsec: CB-Hidro - outbound esp proto" ridentifier 1000110535
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.15.90 to (self) keep state (if-bound) label "descr=IPsec: CB-Hidro - inbound esp proto" ridentifier 1000110536
+pass out route-to (pppoe1 179.127.141.233) inet proto udp from (self) to 177.38.10.204 port = isakmp keep state (if-bound) label "descr=IPsec: Incubatorio - outbound isakmp" ridentifier 1000110547
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from 177.38.10.204 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Incubatorio - inbound isakmp" ridentifier 1000110548
+pass out route-to (pppoe1 179.127.141.233) inet proto udp from (self) to 177.38.10.204 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Incubatorio - outbound nat-t" ridentifier 1000110549
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from 177.38.10.204 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Incubatorio - inbound nat-t" ridentifier 1000110550
+pass out route-to (pppoe1 179.127.141.233) inet proto esp from (self) to 177.38.10.204 keep state (if-bound) label "descr=IPsec: Incubatorio - outbound esp proto" ridentifier 1000110551
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto esp from 177.38.10.204 to (self) keep state (if-bound) label "descr=IPsec: Incubatorio - inbound esp proto" ridentifier 1000110552
+pass out route-to (pppoe1 179.127.141.233) inet proto udp from (self) to 177.38.10.153 port = isakmp keep state (if-bound) label "descr=IPsec: C-Nivel - outbound isakmp" ridentifier 1000110563
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from 177.38.10.153 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: C-Nivel - inbound isakmp" ridentifier 1000110564
+pass out route-to (pppoe1 179.127.141.233) inet proto udp from (self) to 177.38.10.153 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: C-Nivel - outbound nat-t" ridentifier 1000110565
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from 177.38.10.153 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: C-Nivel - inbound nat-t" ridentifier 1000110566
+pass out route-to (pppoe1 179.127.141.233) inet proto esp from (self) to 177.38.10.153 keep state (if-bound) label "descr=IPsec: C-Nivel - outbound esp proto" ridentifier 1000110567
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto esp from 177.38.10.153 to (self) keep state (if-bound) label "descr=IPsec: C-Nivel - inbound esp proto" ridentifier 1000110568
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.9.50 port = isakmp keep state (if-bound) label "descr=IPsec: Hacker - outbound isakmp" ridentifier 1000110579
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.9.50 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Hacker - inbound isakmp" ridentifier 1000110580
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.9.50 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Hacker - outbound nat-t" ridentifier 1000110581
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.9.50 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Hacker - inbound nat-t" ridentifier 1000110582
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.9.50 keep state (if-bound) label "descr=IPsec: Hacker - outbound esp proto" ridentifier 1000110583
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.9.50 to (self) keep state (if-bound) label "descr=IPsec: Hacker - inbound esp proto" ridentifier 1000110584
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.131.118.143 port = isakmp keep state (if-bound) label "descr=IPsec: Amazon Chapeco - outbound isakmp" ridentifier 1000110595
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.131.118.143 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Amazon Chapeco - inbound isakmp" ridentifier 1000110596
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.131.118.143 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Amazon Chapeco - outbound nat-t" ridentifier 1000110597
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.131.118.143 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Amazon Chapeco - inbound nat-t" ridentifier 1000110598
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.131.118.143 keep state (if-bound) label "descr=IPsec: Amazon Chapeco - outbound esp proto" ridentifier 1000110599
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.131.118.143 to (self) keep state (if-bound) label "descr=IPsec: Amazon Chapeco - inbound esp proto" ridentifier 1000110600
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.32 port = isakmp keep state (if-bound) label "descr=IPsec: Amazon Matriz - outbound isakmp" ridentifier 1000110611
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.32 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Amazon Matriz - inbound isakmp" ridentifier 1000110612
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.32 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Amazon Matriz - outbound nat-t" ridentifier 1000110613
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.32 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Amazon Matriz - inbound nat-t" ridentifier 1000110614
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.15.32 keep state (if-bound) label "descr=IPsec: Amazon Matriz - outbound esp proto" ridentifier 1000110615
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.15.32 to (self) keep state (if-bound) label "descr=IPsec: Amazon Matriz - inbound esp proto" ridentifier 1000110616
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.10.143 port = isakmp keep state (if-bound) label "descr=IPsec: Compasi - outbound isakmp" ridentifier 1000110627
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.10.143 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Compasi - inbound isakmp" ridentifier 1000110628
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.10.143 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Compasi - outbound nat-t" ridentifier 1000110629
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.10.143 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Compasi - inbound nat-t" ridentifier 1000110630
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.10.143 keep state (if-bound) label "descr=IPsec: Compasi - outbound esp proto" ridentifier 1000110631
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.10.143 to (self) keep state (if-bound) label "descr=IPsec: Compasi - inbound esp proto" ridentifier 1000110632
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 143.0.197.58 port = isakmp keep state (if-bound) label "descr=IPsec: Compasi Poli - outbound isakmp" ridentifier 1000110643
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 143.0.197.58 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Compasi Poli - inbound isakmp" ridentifier 1000110644
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 143.0.197.58 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Compasi Poli - outbound nat-t" ridentifier 1000110645
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 143.0.197.58 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Compasi Poli - inbound nat-t" ridentifier 1000110646
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 143.0.197.58 keep state (if-bound) label "descr=IPsec: Compasi Poli - outbound esp proto" ridentifier 1000110647
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 143.0.197.58 to (self) keep state (if-bound) label "descr=IPsec: Compasi Poli - inbound esp proto" ridentifier 1000110648
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Quality - inbound isakmp" ridentifier 1000110659
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Quality - inbound nat-t" ridentifier 1000110660
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto esp from any to (self) keep state (if-bound) label "descr=IPsec: Quality - inbound esp proto" ridentifier 1000110661
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 167.86.97.215 port = isakmp keep state (if-bound) label "descr=IPsec: Crescimentum VPS - outbound isakmp" ridentifier 1000110672
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 167.86.97.215 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Crescimentum VPS - inbound isakmp" ridentifier 1000110673
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 167.86.97.215 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Crescimentum VPS - outbound nat-t" ridentifier 1000110674
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 167.86.97.215 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Crescimentum VPS - inbound nat-t" ridentifier 1000110675
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 167.86.97.215 keep state (if-bound) label "descr=IPsec: Crescimentum VPS - outbound esp proto" ridentifier 1000110676
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 167.86.97.215 to (self) keep state (if-bound) label "descr=IPsec: Crescimentum VPS - inbound esp proto" ridentifier 1000110677
+pass out route-to (pppoe1 179.127.141.233) inet proto udp from (self) to 187.45.103.48 port = isakmp keep state (if-bound) label "descr=IPsec: Horus - outbound isakmp" ridentifier 1000110688
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from 187.45.103.48 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Horus - inbound isakmp" ridentifier 1000110689
+pass out route-to (pppoe1 179.127.141.233) inet proto udp from (self) to 187.45.103.48 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Horus - outbound nat-t" ridentifier 1000110690
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from 187.45.103.48 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Horus - inbound nat-t" ridentifier 1000110691
+pass out route-to (pppoe1 179.127.141.233) inet proto esp from (self) to 187.45.103.48 keep state (if-bound) label "descr=IPsec: Horus - outbound esp proto" ridentifier 1000110692
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto esp from 187.45.103.48 to (self) keep state (if-bound) label "descr=IPsec: Horus - inbound esp proto" ridentifier 1000110693
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.220 port = isakmp keep state (if-bound) label "descr=IPsec: NeuralHome - outbound isakmp" ridentifier 1000110704
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.220 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: NeuralHome - inbound isakmp" ridentifier 1000110705
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.220 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: NeuralHome - outbound nat-t" ridentifier 1000110706
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 177.38.15.220 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: NeuralHome - inbound nat-t" ridentifier 1000110707
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 177.38.15.220 keep state (if-bound) label "descr=IPsec: NeuralHome - outbound esp proto" ridentifier 1000110708
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 177.38.15.220 to (self) keep state (if-bound) label "descr=IPsec: NeuralHome - inbound esp proto" ridentifier 1000110709
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 168.0.92.207 port = isakmp keep state (if-bound) label "descr=IPsec: Quadros - outbound isakmp" ridentifier 1000110720
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 168.0.92.207 to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Quadros - inbound isakmp" ridentifier 1000110721
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 168.0.92.207 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Quadros - outbound nat-t" ridentifier 1000110722
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from 168.0.92.207 to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Quadros - inbound nat-t" ridentifier 1000110723
+pass out route-to (pppoe0 10.99.99.35) inet proto esp from (self) to 168.0.92.207 keep state (if-bound) label "descr=IPsec: Quadros - outbound esp proto" ridentifier 1000110724
+pass in on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto esp from 168.0.92.207 to (self) keep state (if-bound) label "descr=IPsec: Quadros - inbound esp proto" ridentifier 1000110725
+anchor "tftp-proxy/*" all
+---
+1.8.11_65
+pfSense-pkg-layer7-1.8.11_65
+layer7d is running as pid 38695.

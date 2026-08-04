@@ -88,7 +88,7 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 **Trilha activa:** plano mestre de fecho — [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md).
 
-1. **Passo actual:** P1 passo 1.2 — snapshot appliance lab (`192.168.100.254`); ver `CORTEX.md`.
+1. **Passo actual:** Onda A passo 2.1 — install passivo `_65` no appliance `192.168.100.254`; ver `CORTEX.md`.
 2. **Gate B1 (Onda A):** install passivo `_65` no appliance lab (`192.168.100.254`):
    - `enabled=false`, `mode=monitor`
    - Roteiro: [`plano-gates-producao.md`](docs/09-blocking/plano-gates-producao.md) G2–G4

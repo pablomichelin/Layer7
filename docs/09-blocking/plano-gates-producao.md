@@ -58,11 +58,11 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G2.1 | Instalar `_65` sem activar | `pkg add` + `enabled=false` | **PENDENTE** |
-| G2.2 | Daemon arranca, PID legível | `service layer7d status` | **PENDENTE** |
-| G2.3 | Zero regras block Layer7 | `pfctl -sr` grep layer7 | **PENDENTE** |
-| G2.4 | Tabelas dinâmicas vazias | `layer7-pfctl` / pfctl -T show | **PENDENTE** |
-| G2.5 | Binário executável no OS do appliance | `layer7d -V`, `ldd` | **PENDENTE** (FP-011; lab FB16) |
+| G2.1 | Instalar `_65` sem activar | `pkg add` + `enabled=false` | **PASS** (`2026-08-04`, appliance `254`) |
+| G2.2 | Daemon arranca, PID legível | `service layer7d status` | **PASS** (pid `38695`) |
+| G2.3 | Zero regras block Layer7 | `pfctl -sr` grep layer7 | **PASS** (zero regras) |
+| G2.4 | Tabelas dinâmicas vazias | `layer7-pfctl` / pfctl -T show | **PASS** |
+| G2.5 | Binário executável no OS do appliance | `layer7d -V`, `ldd` | **PASS** (FB16; pkg FB15 com `IGNORE_OSVERSION`) |
 
 ### G3 — Parser PF completo
 
