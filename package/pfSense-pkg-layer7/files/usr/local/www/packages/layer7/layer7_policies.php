@@ -1109,7 +1109,8 @@ function layer7_policy_match_summary($policy) {
 		);
 		$l7_group_colors = array(
 			"Redes sociais" => "#4267B2",
-			"Mensageria" => "#00A884",
+			"Mensagens" => "#00A884",
+			"Mensageria" => "#00A884", /* legado overlay/custom */
 			"Comunicação e reuniões" => "#2D8CFF",
 			"Streaming" => "#FF6D00",
 			"Jogos" => "#7B2FBE",
@@ -1123,7 +1124,7 @@ function layer7_policy_match_summary($policy) {
 		<?php
 		$l7_group_order = array(
 			l7_t("Redes sociais"),
-			l7_t("Mensageria"),
+			l7_t("Mensagens"),
 			l7_t("Comunicação e reuniões"),
 			l7_t("Streaming"),
 			l7_t("Jogos"),
@@ -1135,8 +1136,13 @@ function layer7_policy_match_summary($policy) {
 		$l7_profiles_by_group = array();
 		$l7_profile_edit_data = array();
 		foreach ($l7_profiles as $prof) {
-			$gk = isset($prof["group"]) && is_string($prof["group"]) && trim($prof["group"]) !== ""
-			    ? l7_t(trim($prof["group"])) : l7_t("Outros");
+			$gk_raw = isset($prof["group"]) && is_string($prof["group"]) && trim($prof["group"]) !== ""
+			    ? trim($prof["group"]) : "Outros";
+			/* Label PT renomeado; ID interno mensageria e overlays legados preservados. */
+			if ($gk_raw === "Mensageria") {
+				$gk_raw = "Mensagens";
+			}
+			$gk = l7_t($gk_raw);
 			if (!isset($l7_profiles_by_group[$gk])) {
 				$l7_profiles_by_group[$gk] = array();
 			}
@@ -1191,9 +1197,9 @@ function layer7_policy_match_summary($policy) {
 					break;
 				}
 			}
-			$icon_fa = "fa-cube";
+			$icon_raw = "fa-cube";
 			if (isset($prof["icon"]) && is_string($prof["icon"]) && preg_match('/^fa-[a-z0-9-]{1,40}$/', $prof["icon"])) {
-				$icon_fa = $prof["icon"];
+				$icon_raw = $prof["icon"];
 			}
 			$icon_bg = "#66748A";
 			$icon_fg = "#fff";
@@ -1235,7 +1241,7 @@ function layer7_policy_match_summary($policy) {
 				data-profile-active="<?= $prof_exists ? "1" : "0"; ?>"
 				data-profile-search="<?= htmlspecialchars(strtolower($prof_name . " " . $search_hosts), ENT_QUOTES); ?>">
 				<div class="l7-profile-icon-ios" style="background:<?= $icon_bg; ?>;color:<?= $icon_fg; ?>;">
-					<i class="fa <?= htmlspecialchars($icon_fa); ?>" aria-hidden="true"></i>
+					<?= layer7_profile_icon_html($icon_raw); ?>
 				</div>
 				<div class="l7-profile-body">
 					<div class="l7-profile-name-row">
@@ -2302,7 +2308,10 @@ function layer7_policy_match_summary($policy) {
 .l7-profile-card.l7-profile-on { border-left: 3px solid #5cb85c; padding-left: 10px; }
 .l7-profile-card.l7-profile-card-hidden { opacity: 0.92; }
 .l7-profile-icon-ios { width: 36px; height: 36px; border-radius: 8px; margin: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.14); flex-shrink: 0; }
-.l7-profile-icon-ios .fa { font-size: 17px; line-height: 1; }
+.l7-profile-icon-ios .fa,
+.l7-profile-icon-ios .fab,
+.l7-profile-icon-ios .fas,
+.l7-profile-icon-ios .far { font-size: 17px; line-height: 1; }
 .l7-profile-body { flex: 1 1 auto; min-width: 0; text-align: left; overflow: hidden; }
 .l7-profile-name-row { display: flex; align-items: center; gap: 6px; min-width: 0; }
 .l7-profile-name { font-weight: 600; font-size: 13px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

@@ -3436,6 +3436,107 @@ function layer7_profile_icon_valid($icon)
 }
 
 /**
+ * pfSense CE/Plus recentes usam Font Awesome 6: icones de marca exigem
+ * prefixo `fab`, e varios nomes FA 4.7 (-o, youtube-play, etc.) deixaram
+ * de existir. O catalogo continua a guardar nomes FA 4.7 (validacao
+ * inalterada); este helper so traduz na renderizacao visual.
+ *
+ * @return array{name:string,prefix:string}
+ */
+function layer7_profile_icon_render_spec($icon)
+{
+	static $brands = null;
+	static $aliases = null;
+
+	if ($brands === null) {
+		$brands = array(
+			"fa-amazon" => true,
+			"fa-android" => true,
+			"fa-apple" => true,
+			"fa-bitcoin" => true,
+			"fa-dropbox" => true,
+			"fa-facebook" => true,
+			"fa-facebook-f" => true,
+			"fa-facebook-official" => true,
+			"fa-facebook-square" => true,
+			"fa-git" => true,
+			"fa-github" => true,
+			"fa-google" => true,
+			"fa-instagram" => true,
+			"fa-linkedin" => true,
+			"fa-linkedin-square" => true,
+			"fa-paypal" => true,
+			"fa-pinterest" => true,
+			"fa-pinterest-p" => true,
+			"fa-pinterest-square" => true,
+			"fa-reddit" => true,
+			"fa-reddit-alien" => true,
+			"fa-reddit-square" => true,
+			"fa-skype" => true,
+			"fa-snapchat" => true,
+			"fa-snapchat-ghost" => true,
+			"fa-snapchat-square" => true,
+			"fa-soundcloud" => true,
+			"fa-spotify" => true,
+			"fa-steam" => true,
+			"fa-telegram" => true,
+			"fa-twitch" => true,
+			"fa-twitter" => true,
+			"fa-vimeo" => true,
+			"fa-whatsapp" => true,
+			"fa-windows" => true,
+			"fa-wordpress" => true,
+			"fa-youtube" => true,
+			"fa-youtube-play" => true,
+			"fa-youtube-square" => true,
+		);
+		/* FA 4.7 -> nome FA 6 (ou sinonimo com shim) para glifo visivel. */
+		$aliases = array(
+			"fa-youtube-play" => "fa-youtube",
+			"fa-comments-o" => "fa-comments",
+			"fa-video-camera" => "fa-video",
+			"fa-futbol-o" => "fa-futbol",
+			"fa-play-circle-o" => "fa-play-circle",
+			"fa-newspaper-o" => "fa-newspaper",
+			"fa-envelope-o" => "fa-envelope",
+			"fa-heart-o" => "fa-heart",
+			"fa-star-o" => "fa-star",
+			"fa-user-o" => "fa-user",
+			"fa-file-o" => "fa-file",
+			"fa-clock-o" => "fa-clock",
+			"fa-trash-o" => "fa-trash",
+			"fa-tachometer" => "fa-gauge",
+			"fa-exchange" => "fa-right-left",
+			"fa-bar-chart" => "fa-chart-bar",
+		);
+	}
+
+	if (!is_string($icon) || $icon === "" ||
+	    preg_match("/^fa-[a-z0-9-]{1,40}$/", $icon) !== 1) {
+		return array("name" => "fa-cube", "prefix" => "fa");
+	}
+
+	$stored = $icon;
+	$name = isset($aliases[$stored]) ? $aliases[$stored] : $stored;
+	$is_brand = isset($brands[$stored]) || isset($brands[$name]);
+	return array(
+		"name" => $name,
+		"prefix" => $is_brand ? "fab" : "fa",
+	);
+}
+
+/**
+ * Markup HTML do icone de perfil (apresentacao). Sem efeito em policy IDs.
+ */
+function layer7_profile_icon_html($icon)
+{
+	$spec = layer7_profile_icon_render_spec($icon);
+	$classes = trim($spec["prefix"] . " " . $spec["name"]);
+	return '<i class="' . htmlspecialchars($classes, ENT_QUOTES) .
+	    '" aria-hidden="true"></i>';
+}
+
+/**
  * Load factory catalog only (profiles.json shipped with package).
  * @return array
  */

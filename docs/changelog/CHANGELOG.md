@@ -2,6 +2,36 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_65] - 2026-08-04 — GUI i18n EN/PT + ícones FA6 + Mensagens (BG-076)
+
+### Changed
+
+- **i18n EN completo para strings `l7_t()` da GUI e catálogo de perfis:**
+  dicionário `lang/en.php` passa a cobrir chaves usadas nas páginas do pacote
+  (Estado, Dispositivos, Políticas, Blacklists, Allowlist, Eventos, Relatórios,
+  Definições, Diagnósticos, Remoção, Excepções, Grupos, Categorias, Teste) e
+  nomes/descrições/grupos de `profiles.json` — elimina labels PT residuais com
+  `language=en`.
+- **Ícones Perfis rápidos em pfSense FA6:** marcas (Facebook, LinkedIn, Reddit,
+  Pinterest, Snapchat, Telegram, WhatsApp, YouTube, etc.) passam a renderizar
+  com prefixo `fab`; aliases FA4 (`fa-comments-o`, `fa-youtube-play`,
+  `fa-video-camera`, …) mapeados na apresentação via
+  `layer7_profile_icon_render_spec()` / `layer7_profile_icon_html()`. IDs de
+  política e nomes FA4 guardados no JSON permanecem válidos.
+- **Label PT «Mensageria» → «Mensagens»** (grupo e tile agregado); id interno
+  `mensageria` preservado; EN «Messages»; overlays legados com grupo
+  «Mensageria» continuam a agrupar correctamente.
+
+### Tests
+
+- Extensão `tests/functional/test_profile_icon_valid.php` (render FA6).
+- Suite/build no builder FreeBSD 15 + artefacto `.pkg` (SHA256 na secção
+  Links de `MANUAL-INSTALL.md`).
+
+### Docs
+
+- CORTEX, MANUAL-INSTALL (`_65`; rollback → `_64`), backlog BG-076.
+
 ## [1.8.11_64] - 2026-08-04 — Materializar tabelas VIP/excepções no PF live (BG-075)
 
 ### Fixed

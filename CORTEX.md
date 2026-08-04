@@ -35,9 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_64` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_64`,
-`SHA256=79d348c26b20080520121cb32e521a89cdc4639dcb7b2787e46a26f0dd48fa76`;
-comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
+`1.8.11_65` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_65`;
+SHA256 e comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 **Referencia de producao enforce:** continua `1.8.11_24`
@@ -226,6 +225,15 @@ pagina, GUI :9999 intacta. Artefacto
 tag `v1.8.11_47` em `pablomichelin/Layer7`.
 
 `_47`.
+
+### Release `1.8.11_65` — GUI i18n + ícones FA6 + Mensagens / BG-076 (publicado `2026-08-04`)
+
+Apenas apresentação: dicionário EN completo para `l7_t()`/catálogo de
+perfis; render de ícones compatível com Font Awesome 6 do pfSense (`fab` +
+aliases FA4); label PT «Mensageria» → «Mensagens» (id `mensageria`
+preservado). Daemon/enforcement inalterados. Artefacto SHA256 e tag
+`v1.8.11_65` em `pablomichelin/Layer7` (ver `MANUAL-INSTALL.md`).
+Rollback: `_64`. Produção enforce continua `_24`.
 
 ### Release `1.8.11_64` — Materializar VIP/excepções PF live / BG-075 (publicado `2026-08-04`)
 
@@ -655,8 +663,8 @@ snapshot publica `pablomichelin/Layer7 / blacklists-ut1-current`
 A chave **privada** correspondente fica em custodia humana, fora do
 builder e fora do repositorio.
 **Versao do port no branch actual (`package/pfSense-pkg-layer7` / `PORTVERSION`
-+ `PORTREVISION`):** `1.8.11_64` (`PORTVERSION=1.8.11`, `PORTREVISION=64`),
-publicada no canal de teste/lab (`v1.8.11_64`). **`1.8.11_55` defeituosa — nao
++ `PORTREVISION`):** `1.8.11_65` (`PORTVERSION=1.8.11`, `PORTREVISION=65`),
+publicada no canal de teste/lab (`v1.8.11_65`). **`1.8.11_55` defeituosa — nao
 instalar.** A referencia de producao enforce permanece `v1.8.11_24`; gate
 two-client pendente.
 **Data-base deste checkpoint:** `2026-08-04`
