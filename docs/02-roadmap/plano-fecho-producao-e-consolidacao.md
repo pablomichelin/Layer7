@@ -504,3 +504,5 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-04e | Passo 2.1 PASS: G2 install passivo `_65` no appliance `254` |
 | 2026-08-04f | Onda A PASS: G3–G4 (passos 2.2–2.4); próximo 3.1 G5 two-client |
 | 2026-08-04g | Onda B G5 FAIL: clientes 234/235; LAN pass any antes regras Layer7; rollback aplicado |
+| 2026-08-04h | Fix `_66` pfnearly; G5.1–G5.2 PASS (reteste); G5.3–G5.7 pendentes; próximo 3.2 ou Onda C |
+| 2026-08-04i | Onda B PASS: G5.1–G5.7 no appliance 254 (`_66`); próximo 4.1 Onda C (F3 DR-05) |

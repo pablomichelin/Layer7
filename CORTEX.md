@@ -1221,23 +1221,22 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: 3.1 — G5 PASS (reteste `_66`)
-- Onda: B (Gate G5 — PASS; Onda C pendente)
+- Passo actual: 4.1 (Onda C — F3 DR-05)
+- Onda: B — **PASS** (G5.1–G5.7); C autorizada
 - Candidato lab: 1.8.11_66 (publicado)
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_66
 - G0-G1: PASS
 - G2-G4: PASS (Onda A)
-- G5: PASS (2026-08-04 — pfnearly `_66`; evidência reteste)
+- G5: PASS (G5.1–G5.7 — `20260804T232800Z-ondaB-g5-full-PASS`)
 - G6-G7: PENDENTE
-- F3: ABERTA
+- F3: ABERTA (Onda C)
 - F4: ABERTA
 - Onda A: A-PASS
-- Onda B: B-PASS (G5.1–G5.2)
-- Appliance 254: rollback OK — `enabled=true`, `mode=monitor`, `legacy_global`
-- Clientes G5: A=192.168.100.234, B=192.168.100.235
-- Evidência G5 PASS: `docs/tests/evidence/20260804T224500Z-ondaB-g5-two-client-PASS/`
-- Próximo passo autorizado: Onda C (F3) — passo 4.x do plano
+- Onda B: B-PASS
+- Appliance 254: rollback OK — `enabled=true`, `mode=monitor`
+- Evidência G5 completo: `docs/tests/evidence/20260804T232800Z-ondaB-g5-full-PASS/`
+- Próximo passo autorizado: Onda C passo 4.1 (DR-05 campanha F3)
 - Modo: agente único
 ```
 

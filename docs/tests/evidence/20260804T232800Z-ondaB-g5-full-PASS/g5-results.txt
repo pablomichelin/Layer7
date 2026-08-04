@@ -1,0 +1,9 @@
+G5.3 client A: yt:000 google:200
+G5.3 psrc_0: empty
+G5.3 block_dst: empty
+G5.4 rules: layer7:pdst:g5-yt-block-a + layer7:psrc:g5-quarantine-a
+G5.2 A=000 B=200 YT_IP=142.251.155.4 PF_packets=4
+G5.5 pfctl -k states_before=17 after=0
+G5.6 bl: block drop quick inet from <layer7_blsrc_0> to <layer7_bld_0> ! tagged L7ALLOW
+G5.6 order: allow:dst@379 pdst@390 (before LAN pass)
+G5.7 smoke: ALL PASSED (two-client SKIP on appliance; validated from Mac)

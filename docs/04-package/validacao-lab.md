@@ -810,10 +810,9 @@ existem por tras de cada segmento. Apos **Apply** / reload do filtro:
 YouTube (ou equivalente) para o cliente **A** nao bloqueia o cliente **B** na
 mesma LAN. Este gate e **obrigatorio** antes de avancar para E4.
 
-**Estado:** **PENDENTE**. Em `2026-07-29`, o acesso SSH read-only ao appliance
-foi restabelecido e `_24` foi confirmado instalado, intencionalmente
-`enabled=false` / `mode=monitor`. O diagnóstico abriu o candidato `_25`; não
-houve activação nem alteração do pfSense.
+**Estado:** **PASS** (`2026-08-04`, pacote `1.8.11_66`, appliance `192.168.100.254`).
+Evidência: `docs/tests/evidence/20260804T232800Z-ondaB-g5-full-PASS/`.
+Orquestrador: `tests/lab/run-g5-ondaB-coordinator.sh` (Mac → appliance + clientes).
 
 **Onde:** appliance `192.168.100.254` ou lab equivalente. O equipamento real
 observado é **pfSense Plus 26.03.1 / FreeBSD 16.0-CURRENT**, não pfSense CE;

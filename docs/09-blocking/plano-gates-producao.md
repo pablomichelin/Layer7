@@ -86,13 +86,13 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G5.1 | `scoped_hybrid` ON + enforce | duas estações | **FAIL** (`2026-08-04` — regra LAN `pass any` antes do Layer7; ver evidência) |
-| G5.2 | Cliente A block, B allow mesmo destino | curl/browser | **FAIL** (A não bloqueado; PF pdst 0 packets) |
-| G5.3 | App policy não quarentena total A | FP-002 | **PENDENTE** |
-| G5.4 | Quarentena explícita só A | `quarantine_origin` | **PENDENTE** |
-| G5.5 | State kill sessão existente | FP-003 | **PENDENTE** |
-| G5.6 | Allow vence blacklist sem bypass nativo | FP-017 | **PENDENTE** |
-| G5.7 | Smoke `smoke-enforcement-scoped.sh` | lab script | **FAIL** (não executado — rollback antes) |
+| G5.1 | `scoped_hybrid` ON + enforce | duas estações | **PASS** (`2026-08-04` — `_66` pfnearly; regra pdst linha ~388 antes pass LAN ~633) |
+| G5.2 | Cliente A block, B allow mesmo destino | curl/browser | **PASS** (A `000` com IP em `layer7_pdst_0`; B HTTP 200; 12 packets PF) |
+| G5.3 | App policy não quarentena total A | FP-002 | **PASS** (`psrc_0` vazia; google HTTP 200) |
+| G5.4 | Quarentena explícita só A | `quarantine_origin` | **PASS** (`layer7:psrc:g5-quarantine-a` no ruleset) |
+| G5.5 | State kill sessão existente | FP-003 | **PASS** (`pfctl -k` → estados 0) |
+| G5.6 | Allow vence blacklist sem bypass nativo | FP-017 | **PASS** (`blsrc` + `L7ALLOW`; sem `pass quick`) |
+| G5.7 | Smoke `smoke-enforcement-scoped.sh` | lab script | **PASS** (ALL PASSED + two-client Mac) |
 
 ### G6 — Licenciamento fail-safe
 

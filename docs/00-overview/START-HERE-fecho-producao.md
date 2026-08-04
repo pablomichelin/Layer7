@@ -11,9 +11,9 @@ plano mestre. O plano completo está em:
 
 | Campo | Valor esperado (`2026-08-04`) |
 |-------|-------------------------------|
-| Passo actual | `3.1` (Onda B — G5 two-client) após Onda A PASS |
-| Candidato lab (gates) | **`1.8.11_65`** |
-| Canal `latest` | `1.8.11_65` |
+| Passo actual | `4.1` (Onda C — F3 DR-05) após Onda B PASS |
+| Candidato lab (gates) | **`1.8.11_66`** |
+| Canal `latest` | `1.8.11_66` |
 | Produção enforce | `1.8.11_24` (até GO Onda F) |
 | Appliance lab | `192.168.100.254` (Plus/FB16 — CE na Onda E) |
 | Builder | `192.168.100.12` |
