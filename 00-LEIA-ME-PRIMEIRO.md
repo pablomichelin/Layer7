@@ -15,7 +15,7 @@
 | **SHA256 (`latest`)** | `e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e` |
 | **Produção enforce (referência)** | `1.8.11_24` — **até gates G2–G7 + GO humano** (Onda F do plano mestre) |
 | **SHA256 (enforce ref)** | `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818` |
-| **Candidato lab (gates)** | `1.8.11_65` (fixado no plano — ver passo 1.1) |
+| **Candidato lab (gates)** | `1.8.11_65` (confirmado passo 1.1 — 2026-08-04) |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
 | **Fase roadmap** | F4 aberta; F3 aberta; plano de fecho **ACTIVO** |
 | **Trilha activa** | **Caminho B** — Enforcement escopado (E0–E3 no codigo; E4–E8 planeados) |
@@ -88,7 +88,7 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 **Trilha activa:** plano mestre de fecho — [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md).
 
-1. **Passo actual:** P1 — confirmar candidato `1.8.11_65` + snapshot appliance (ver `CORTEX.md`).
+1. **Passo actual:** P1 passo 1.2 — snapshot appliance lab (`192.168.100.254`); ver `CORTEX.md`.
 2. **Gate B1 (Onda A):** install passivo `_65` no appliance lab (`192.168.100.254`):
    - `enabled=false`, `mode=monitor`
    - Roteiro: [`plano-gates-producao.md`](docs/09-blocking/plano-gates-producao.md) G2–G4

@@ -1221,12 +1221,12 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: 1.1
+- Passo actual: 1.2
 - Onda: P1
-- Candidato lab: 1.8.11_65 (fixado)
+- Candidato lab: 1.8.11_65 (confirmado passo 1.1 — 2026-08-04)
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_65
-- G0-G1: PASS (builder _65 publicado; revalidar no passo 1.0)
+- G0-G1: PASS (builder _65 publicado; passos 1.0–1.1)
 - G2-G4: PENDENTE
 - G5: PENDENTE
 - G6-G7: PENDENTE
@@ -1240,8 +1240,9 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 - F6: NÃO INICIADA
 - F7/BG-028: PENDENTE
 - R1-R12: 0/12
-- Próximo passo autorizado: 1.1 (confirmar candidato + sincronizar gates)
-- Multitarefa activa: P1 — coordenador + worker diagnose (ver plano 3.6)
+- Passo 1.1: PASS (SHA256 verificado vs GitHub `latest` + `PORTREVISION=65`)
+- Próximo passo autorizado: 1.2 (snapshot appliance — requer humano)
+- Multitarefa activa: P1 — worker diagnose (1.3) pode correr em paralelo após 1.2 iniciado
 ```
 
 ---
@@ -1402,7 +1403,9 @@ CHECKPOINT CANONICO
 - Producao enforce (referencia ate GO): 1.8.11_24
   (SHA256 1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818;
    Caminho B E0-E3; gate two-client PENDENTE; trust chain pacote BG-028 pendente)
-- Candidato lab gates: 1.8.11_65 (fixado plano mestre passo 1.1)
+- Candidato lab gates: 1.8.11_65 (confirmado passo 1.1 — 2026-08-04;
+  SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e;
+  GitHub `latest`=v1.8.11_65; PORTREVISION=65)
 - Auditoria E2E Etapa 1: concluida (local read-only); NO-GO enforce;
   SSOT docs/09-blocking/auditoria-end-to-end-2026-07-29.md; AUD-001..015
 - Proximo gate autorizado: Bloco B1 — install passivo _65 no appliance

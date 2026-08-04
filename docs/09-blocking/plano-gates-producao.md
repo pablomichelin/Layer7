@@ -22,6 +22,17 @@
 5. Produção enforce intocada até veredicto humano explícito (Onda F do plano mestre).
 6. Candidato lab fixado: `1.8.11_65` (`SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e`).
 
+### Confirmação passo 1.1 (P1 — 2026-08-04)
+
+| Campo | Valor verificado |
+|-------|------------------|
+| Versão candidata | `1.8.11_65` (`PORTVERSION=1.8.11`, `PORTREVISION=65`) |
+| SHA256 artefacto | `e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e` |
+| GitHub `latest` | `v1.8.11_65` — `pablomichelin/Layer7` |
+| Dual-canal | `latest` (`_65`) ≠ produção enforce (`_24`) |
+| Daemon vs GUI | `_65` altera só GUI (BG-076); daemon = `_64` |
+| Veredicto | **CANDIDATO CONFIRMADO** — prosseguir passo 1.2 (snapshot) |
+
 ---
 
 ## 2. Gates obrigatórios (sequência)
