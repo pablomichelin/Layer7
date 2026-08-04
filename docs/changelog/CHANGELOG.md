@@ -28,7 +28,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - `tests/unit/test_flush_coverage.sh` PASS (contrato ensure/apply/flush).
 - Extensão `tests/functional/test_vip_exception.php` (meta + helper apply).
-- Suite completa no builder FreeBSD 15 + artefacto `.pkg` (ver SHA256 abaixo).
+- Suite completa no builder FreeBSD 15 + artefacto `.pkg`
+  (`SHA256=79d348c26b20080520121cb32e521a89cdc4639dcb7b2787e46a26f0dd48fa76`).
 
 ### Docs
 
