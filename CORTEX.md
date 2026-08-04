@@ -36,7 +36,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.8.11_64` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_64`,
-`SHA256=PLACEHOLDER_SHA256_64`;
+`SHA256=79d348c26b20080520121cb32e521a89cdc4639dcb7b2787e46a26f0dd48fa76`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
@@ -234,7 +234,7 @@ Corrige VIP isento no JSON/rules.debug mas **ausente** no PF live
 cliente VIP caía no block global `layer7_block_dst`. Causa: materialização
 `persist` incompleta — `layer7_resync` omitia `exc_allow`/`pexc`/`blsrc`.
 Fix: `layer7_static_origin_tables_apply_to_pf()` + ensure no helper.
-Artefacto `SHA256=PLACEHOLDER_SHA256_64`, tag `v1.8.11_64` em
+Artefacto `SHA256=79d348c26b20080520121cb32e521a89cdc4639dcb7b2787e46a26f0dd48fa76`, tag `v1.8.11_64` em
 `pablomichelin/Layer7`. Rollback: `_63`. Produção enforce continua `_24`.
 
 ### Release `1.8.11_63` — Redesign compacto grelha Perfis rápidos / BG-074 (publicado `2026-07-31`)

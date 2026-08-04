@@ -258,7 +258,7 @@ VIP caia no `block drop` global `layer7_block_dst`. Causa: `layer7_resync` /
 Apos upgrade, validar `pfctl -t layer7_exc_allow_0 -T show`. Rollback: `_63`.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_64`
-- **SHA256 esperado:** `PLACEHOLDER_SHA256_64`
+- **SHA256 esperado:** `79d348c26b20080520121cb32e521a89cdc4639dcb7b2787e46a26f0dd48fa76`
 
 **Addendum da release `1.8.11_63` (redesign compacto grelha Perfis rapidos / BG-074, `2026-07-31`):**
 Redesign **apenas de apresentacao** em `layer7_policies.php`: cartoes horizontais
@@ -589,7 +589,7 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_64`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_64/pfSense-pkg-layer7-1.8.11_64.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_64/pfSense-pkg-layer7-1.8.11_64.pkg.sha256`
-- **SHA256 esperado:** `PLACEHOLDER_SHA256_64`
+- **SHA256 esperado:** `79d348c26b20080520121cb32e521a89cdc4639dcb7b2787e46a26f0dd48fa76`
 
 > **Nota:** `profiles-custom.json` (`/usr/local/etc/layer7/`) **nao** e
 > substituido nos upgrades; o backup XML do pfSense **nao** o inclui — use
