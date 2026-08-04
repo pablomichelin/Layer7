@@ -1142,6 +1142,123 @@ function layer7_ensure_pf_table($table)
 	return true;
 }
 
+/**
+ * Substitui o conteudo live de uma tabela PF Layer7.
+ *
+ * Necessario porque, no FreeBSD/pfSense, `table <name> persist { ... }` no
+ * ruleset (rules.debug) nao garante materializacao acessivel via
+ * `pfctl -t … -T show`, e tabelas `persist` ja existentes nao recebem os
+ * membros iniciais em reloads seguintes. O padrao 1.5.3 (ensure + add)
+ * materializa; este helper tambem repoe o conteudo estatico (VIP/excepcoes).
+ *
+ * @param string $table
+ * @param array $entries IPv4, CIDR ou "!IPv4"/"!CIDR" (blsrc)
+ * @return int numero de entradas tentadas
+ */
+function layer7_pf_table_replace_entries($table, $entries)
+{
+	if (!is_string($table) || $table === "" ||
+	    !preg_match('/^[A-Za-z0-9_]+$/', $table)) {
+		return 0;
+	}
+	if (!is_array($entries)) {
+		return 0;
+	}
+
+	$tokens = array();
+	foreach ($entries as $raw) {
+		$e = trim((string)$raw);
+		if ($e === "") {
+			continue;
+		}
+		$neg = false;
+		if ($e[0] === "!") {
+			$neg = true;
+			$e = substr($e, 1);
+		}
+		if (!layer7_ipv4_valid($e) && !layer7_cidr_valid($e)) {
+			continue;
+		}
+		$tokens[] = $neg ? ("!" . $e) : $e;
+	}
+	$tokens = array_values(array_unique($tokens));
+
+	layer7_ensure_pf_table($table);
+	layer7_pf_table_flush($table);
+
+	static $warned_add = array();
+	foreach ($tokens as $token) {
+		$out = array();
+		$rc = 0;
+		exec("/sbin/pfctl -t " . escapeshellarg($table) . " -T add " .
+		    escapeshellarg($token) . " 2>/dev/null", $out, $rc);
+		if ($rc !== 0 && empty($warned_add[$table])) {
+			layer7_log_pkg_warn(
+			    "Layer7: pfctl add falhou em " . $table);
+			$warned_add[$table] = true;
+		}
+	}
+	return count($tokens);
+}
+
+/**
+ * Materializa e popula tabelas de origem estaticas no PF live:
+ * `layer7_exc_allow_*` (VIP/excepcoes allow), `layer7_pexc_*` (src_exclude)
+ * e `layer7_blsrc_*` (except_ips de blacklist).
+ *
+ * Sem este passo, o rules.debug pode declarar a tabela com membros enquanto
+ * `pfctl -t layer7_exc_allow_N -T show` responde "Table does not exist" —
+ * o match L7ALLOW nunca marca o VIP e o trafego cai no block global.
+ *
+ * @return int total de entradas aplicadas
+ */
+function layer7_static_origin_tables_apply_to_pf($data = null, $bl_config = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if ($bl_config === null) {
+		$bl_config = layer7_bl_config_load();
+	}
+
+	$n = 0;
+	foreach (layer7_exception_allow_meta($data) as $m) {
+		$n += layer7_pf_table_replace_entries(
+		    "layer7_exc_allow_" . (int)$m["idx"],
+		    $m["entries"]);
+	}
+
+	foreach (layer7_policy_enforcement_meta($data) as $m) {
+		if (empty($m["needs_pdst"])) {
+			continue;
+		}
+		$entries = array();
+		foreach ($m["exclude_hosts"] as $h) {
+			if (layer7_ipv4_valid($h)) {
+				$entries[] = $h;
+			}
+		}
+		foreach ($m["exclude_cidrs"] as $c) {
+			if (layer7_cidr_valid($c) || layer7_ipv4_valid($c)) {
+				$entries[] = $c;
+			}
+		}
+		if (empty($entries)) {
+			continue;
+		}
+		$n += layer7_pf_table_replace_entries(
+		    "layer7_pexc_" . (int)$m["idx"],
+		    array_values(array_unique($entries)));
+	}
+
+	foreach (layer7_blacklist_source_scope_meta($bl_config) as $m) {
+		$n += layer7_pf_table_replace_entries(
+		    $m["table"], $m["entries"]);
+	}
+
+	return $n;
+}
+
 function layer7_resync()
 {
 	$data = layer7_load_or_default();
@@ -1161,6 +1278,12 @@ function layer7_resync()
 	foreach (layer7_policy_enforcement_table_names($data) as $ptbl) {
 		layer7_ensure_pf_table($ptbl);
 	}
+	foreach (layer7_exception_allow_meta($data) as $m) {
+		layer7_ensure_pf_table("layer7_exc_allow_" . (int)$m["idx"]);
+	}
+	foreach (layer7_blacklist_source_scope_meta($bl_config) as $m) {
+		layer7_ensure_pf_table($m["table"]);
+	}
 
 	/* As regras rdr (block page + DNS forcado) sao entregues ao pfSense
 	 * por layer7_generate_rules("nat") no filter reload; aqui apenas se
@@ -1169,6 +1292,10 @@ function layer7_resync()
 	layer7_flush_legacy_nat_anchor();
 	if (!layer7_pf_should_enforce()) {
 		layer7_flush_dynamic_tables();
+	} else {
+		/* BG-075: materializar VIP/excepcoes/pexc/blsrc no PF live.
+		 * Declaracoes no rules.debug nao bastam (FreeBSD persist quirk). */
+		layer7_static_origin_tables_apply_to_pf($data, $bl_config);
 	}
 
 	/* Bloco 3: popular `layer7_allow_dst` com IPs/CIDRs estaticos da
@@ -1313,7 +1440,8 @@ function layer7_dst_allowlist_apply_to_pf()
  * Usado quando o modo passa para monitor/disabled ou ao desinstalar — evita
  * que IPs adicionados num enforce anterior continuem a bloquear apos a mudanca
  * (Bloco 5). Entradas estaticas da allowlist sao repostas por
- * `layer7_dst_allowlist_apply_to_pf()` apos flush quando enforce activo.
+ * `layer7_dst_allowlist_apply_to_pf()`; VIP/excepcoes/pexc/blsrc por
+ * `layer7_static_origin_tables_apply_to_pf()` apos flush quando enforce activo.
  */
 function layer7_flush_dynamic_tables()
 {
@@ -1363,6 +1491,13 @@ function layer7_pf_config_resync($flush_dynamic = false)
 	layer7_blockpage_sync();
 	if (function_exists("filter_configure")) {
 		filter_configure();
+	}
+	/* filter_configure chama layer7_resync() (custom_php_resync), que ja
+	 * materializa exc_allow/pexc/blsrc. Reaplicar aqui cobre caminhos que
+	 * chamam este helper sem passar pelo hook de package resync. */
+	if (layer7_pf_should_enforce()) {
+		layer7_static_origin_tables_apply_to_pf();
+		layer7_dst_allowlist_apply_to_pf();
 	}
 	layer7_signal_reload();
 }

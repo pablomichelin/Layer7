@@ -153,5 +153,24 @@ if (strpos($pf_exc, "layer7_exc_allow_0") === false ||
 	exit(1);
 }
 
+/* BG-075: meta VIP expoe entradas para materializacao PF live */
+$meta = layer7_exception_allow_meta($data);
+if (empty($meta) || empty($meta[0]["entries"]) ||
+    !in_array("10.0.0.5", $meta[0]["entries"], true)) {
+	fwrite(STDERR, "FAIL: exception_allow_meta must expose VIP hosts\n");
+	exit(1);
+}
+if (!function_exists("layer7_static_origin_tables_apply_to_pf") ||
+    !function_exists("layer7_pf_table_replace_entries")) {
+	fwrite(STDERR, "FAIL: static origin PF apply helpers missing\n");
+	exit(1);
+}
+/* Em lab sem pfctl real, o helper ainda conta entradas validas. */
+$n_apply = layer7_static_origin_tables_apply_to_pf($data, array("enabled" => false));
+if ($n_apply < 1) {
+	fwrite(STDERR, "FAIL: static origin apply should count VIP entries\n");
+	exit(1);
+}
+
 echo "PASS: test_vip_exception.php\n";
 exit(0);

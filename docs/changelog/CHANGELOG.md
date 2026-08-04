@@ -2,6 +2,39 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_64] - 2026-08-04 — Materializar tabelas VIP/excepções no PF live (BG-075)
+
+### Fixed
+
+- **VIP/`L7ALLOW` inoperante no PF live:** `table <layer7_exc_allow_N> persist
+  { … }` aparecia em `/tmp/rules.debug` e no match `exc-allow`, mas
+  `pfctl -t layer7_exc_allow_N -T show` respondia **Table does not exist**.
+  Sem a marca `L7ALLOW`, o VIP caía no `block drop` global `layer7_block_dst`
+  (enforcement `legacy_global`) — sintoma típico: Facebook “sem CSS” com
+  DNS sinkhole VIP OK.
+- **Causa raiz:** no FreeBSD/pfSense, declarações `persist` no ruleset (e
+  membros iniciais em reloads) **não garantem** materialização acessível via
+  `pfctl -t`; `layer7_resync()` / `layer7-pfctl ensure` materializavam
+  `layer7_block*`, `allow_dst`, `pdst`/`psrc`/`pallow`, mas **omitiam**
+  `layer7_exc_allow_*` (e o mesmo padrão afectava `pexc`/`blsrc` estáticos).
+  Após flush lifecycle, nada repunha os IPs VIP no PF live.
+- **Correcção:** `layer7_pf_table_replace_entries()` +
+  `layer7_static_origin_tables_apply_to_pf()` — ensure + flush + add dos
+  membros estáticos de `exc_allow` / `pexc` / `blsrc`; chamado em
+  `layer7_resync()` (enforce) e em `layer7_pf_config_resync()`; helper
+  `layer7-pfctl ensure` passa a cobrir `layer7_exc_allow_0..15`.
+
+### Tests
+
+- `tests/unit/test_flush_coverage.sh` PASS (contrato ensure/apply/flush).
+- Extensão `tests/functional/test_vip_exception.php` (meta + helper apply).
+- Suite completa no builder FreeBSD 15 + artefacto `.pkg` (ver SHA256 abaixo).
+
+### Docs
+
+- CORTEX, MANUAL-INSTALL (`_64`; rollback → `_63`), backlog BG-075,
+  `docs/05-daemon/pf-enforcement.md`.
+
 ## [1.8.11_63] - 2026-07-31 — Redesign compacto grelha Perfis rápidos (BG-074)
 
 ### Changed

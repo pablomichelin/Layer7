@@ -93,8 +93,14 @@ DHCP static mapping para IP estavel. Limite: 64 hosts de origem por grupo.
 | Quarentena origem escopada por politica | `layer7_psrc_N` | Caminho B / E2; somente opt-in explícito |
 | Allow destino por política | `layer7_pallow_N` | BG-056 / ADR-0016; destino aprendido com TTL |
 | Exclusão origem por política | `layer7_pexc_N` | BG-066 / ADR-0019; estático; `match` → `pdst` com `L7ALLOW` |
-| Excepção allow por origem | `layer7_exc_allow_N` | BG-056 / ADR-0016; conteúdo estático do JSON |
+| Excepção allow por origem | `layer7_exc_allow_N` | BG-056 / ADR-0016; conteúdo estático do JSON; **BG-075:** materializado no PF live por `layer7_static_origin_tables_apply_to_pf()` após filter reload (rules.debug sozinho não basta) |
 | Tag | `layer7_tagged` ou **`tag_table`** na política | Por política `action=tag` |
+
+**Materialização live (BG-075 / padrao 1.5.3):** tabelas com membros
+estáticos (`exc_allow`, `pexc`, `blsrc`) devem ser criadas/populadas via
+`pfctl -t … -T add` em `layer7_resync()` quando `mode=enforce`. Confirmar
+com `pfctl -t layer7_exc_allow_0 -T show` após Apply/upgrade — se a tabela
+não listar os IPs VIP, o match `L7ALLOW` não protege o cliente.
 
 ### Caminho B / E2 — PF escopado no pacote (`scoped_hybrid`)
 

@@ -33,6 +33,19 @@ else
 	fail=1
 fi
 
+assert_grep "layer7.inc materializa tabelas estaticas (BG-075)" \
+    'layer7_static_origin_tables_apply_to_pf' "$INC"
+assert_grep "layer7.inc resync chama apply estatico" \
+    'layer7_static_origin_tables_apply_to_pf($data, $bl_config)' "$INC"
+assert_grep "layer7-pfctl ensure cobre layer7_exc_allow_*" \
+    'layer7_exc_allow_' "$PFCTL"
+if awk '/^ensure\)/,/^flush\)/' "$PFCTL" | grep -q 'layer7_exc_allow_'; then
+	printf "PASS: layer7-pfctl ensure inclui exc_allow\n"
+else
+	printf "FAIL: layer7-pfctl ensure inclui exc_allow\n"
+	fail=1
+fi
+
 assert_grep "layer7-pfctl define flush_tables_exception_allow" \
     'flush_tables_exception_allow' "$PFCTL"
 
