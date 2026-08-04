@@ -1,0 +1,22 @@
+# G5 reteste 1.8.11_66 — 2026-08-04
+
+## rules.debug ordem (após rc.filter_configure)
+layer7:pdst:g5-yt-block @ linha 388
+pass in quick on $LAN inet from any to any @ linha 633
+
+## pfnearly vs filter (PHP no appliance)
+pfnearly_has_block=yes
+filter_has_block=no
+
+## pfctl -t layer7_pdst_0 -T show
+142.251.150.4
+142.251.152.4
+142.251.154.4
+142.251.155.4
+
+## curl (cliente A=234, B=235)
+A --resolve www.youtube.com:443:142.251.155.4 → 000 (bloqueado)
+B --resolve www.youtube.com:443:142.251.155.4 → 200 (permitido)
+
+## pfctl counter layer7:pdst:g5-yt-block
+Evaluations: 9230  Packets: 12  Bytes: 720
