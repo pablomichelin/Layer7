@@ -207,6 +207,11 @@ Divergem deliberadamente hoje:
 - o servidor persiste revogacao;
 - o daemon nao conhece revogacao offline.
 
+**Lacuna comercial registada (BG-077 / ADR-0021 Proposto):** revogacao no
+servidor nao corta enforce remoto. Plano de check-in online em
+`f3-plano-check-in-online-revogacao-remota.md` — defaults: verificacao a cada
+7 dias, max 14 dias offline sem servidor, revogacao efectiva no proximo check-in.
+
 Leitura oficial da F3.3:
 
 - isto nao e bug escondido; e a semantica real actual do produto;

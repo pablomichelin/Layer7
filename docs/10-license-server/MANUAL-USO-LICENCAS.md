@@ -377,6 +377,10 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
   - mismatch de `hardware_id`
   - expiracao + fim do grace
 
+**Planeado (BG-077 / ADR-0021):** check-in online periodico
+(`POST /api/license/check-in`) para reflectir revogacao e cancelamento comercial
+no appliance. Ver `docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md`.
+
 ### 5.6 Politica conservadora oficial sobre rebind
 
 - nao existe rebind administrativo oficial nesta fase

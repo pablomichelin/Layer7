@@ -41,6 +41,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0018](ADR-0018-plano-dns-forcado-e-precedencia-bloqueio.md) | Plano DNS forçado (anti-bypass) e precedência de bloqueio sobre allowlist | Aceito; `_39`/`_40` | política manual prevalece sobre allowlist-seed; `block_page.force_dns` (rdr :53 global + anti-DoH); trade-off CDN declarado |
 | [ADR-0019](ADR-0019-src-exclude-por-politica.md) | Exclusão de origem por política (`src_exclude_*`) | Aceito; `_50` | `layer7_pexc_N` + `L7ALLOW` em scoped; daemon não-match; trade-off legacy_global documentado |
 | [ADR-0020](ADR-0020-isencao-vip-dns.md) | Isenção VIP no caminho DNS (sinkhole + DNS forçado) | Implementado; `_59` opção (a) | view Unbound `layer7-vip-exempt`; fallback rdr `from !<layer7_exc_allow_N>`; SSOT `vip-isentos` inalterado |
+| [ADR-0021](ADR-0021-check-in-online-e-revogacao-remota.md) | Check-in online e revogação remota de licença | **Proposto** | BG-077; cancelamento comercial exige verificação periódica com o servidor; ver `f3-plano-check-in-online-revogacao-remota.md` |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

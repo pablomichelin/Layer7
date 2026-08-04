@@ -203,7 +203,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | S06 | Tentativa de mudar `customer_id` em licenca bindada | Obrigatorio | HTTP `409`, estado persistido inalterado, `license_update_denied` |
 | S07 | Licenca expirada no backend sem `.lic` local | Obrigatorio | activacao falha fechada, ausencia de `.lic` novo, estado efectivo `expired` |
 | S08 | Licenca expirada no backend com `.lic` local ainda dentro da grace | Obrigatorio | backend `expired`, stats locais com `license_valid=true` e `license_grace=true` |
-| S09 | Licenca revogada no backend com `.lic` antigo offline | Obrigatorio | revogacao no backend, activacao/download negados, appliance ainda valido localmente |
+| S09 | Licenca revogada no backend com `.lic` antigo offline | Obrigatorio | revogacao no backend, activacao/download negados; **sem BG-077:** appliance ainda valido localmente; **com BG-077:** ver S14 |
+| S14 | Revogacao remota via check-in online (BG-077) | Obrigatorio (apos BG-077) | revogar no servidor + check-in dentro do intervalo → `license_valid=false`, enforce OFF, `.lic` removido |
 | S10 | Multiplos downloads/reemissoes da mesma licenca | Desejavel | dois actos auditados; ficheiros podem ser identicos no mesmo dia |
 | S11 | Coexistencia de artefacto antigo e artefacto novo | Obrigatorio | dois `.lic` guardados, stats do appliance com cada artefacto, trilha de auditoria |
 | S12 | Appliance offline antes e depois do grace | Obrigatorio | stats locais antes/dentro/depois da grace, transicao para monitor-only apos `14` dias |

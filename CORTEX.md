@@ -1227,7 +1227,7 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_66
 - G0-G1: PASS | G2-G4: PASS | G5: PASS | G6-G7: PENDENTE
-- F3: ABERTA — S07 desbloqueado (`20260804T234000Z-ondaC-s07-retest`); fecho global pendente S09/S13
+- F3: ABERTA — S07 PASS; **BG-077** check-in/revogação remota planeada (ADR-0021)
 - License server: fix `isLicenseExpired` deployado em `244` (`2026-08-04`)
 - Evidência S07 reteste: `docs/tests/evidence/20260804T234000Z-ondaC-s07-retest/`
 - Próximo: S09/S13 completar **ou** Onda D 5.1
