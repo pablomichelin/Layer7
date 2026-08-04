@@ -86,13 +86,13 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G5.1 | `scoped_hybrid` ON + enforce | duas estações | **PENDENTE** |
-| G5.2 | Cliente A block, B allow mesmo destino | curl/browser | **PENDENTE** |
+| G5.1 | `scoped_hybrid` ON + enforce | duas estações | **FAIL** (`2026-08-04` — regra LAN `pass any` antes do Layer7; ver evidência) |
+| G5.2 | Cliente A block, B allow mesmo destino | curl/browser | **FAIL** (A não bloqueado; PF pdst 0 packets) |
 | G5.3 | App policy não quarentena total A | FP-002 | **PENDENTE** |
 | G5.4 | Quarentena explícita só A | `quarantine_origin` | **PENDENTE** |
 | G5.5 | State kill sessão existente | FP-003 | **PENDENTE** |
 | G5.6 | Allow vence blacklist sem bypass nativo | FP-017 | **PENDENTE** |
-| G5.7 | Smoke `smoke-enforcement-scoped.sh` | lab script | **PENDENTE** |
+| G5.7 | Smoke `smoke-enforcement-scoped.sh` | lab script | **FAIL** (não executado — rollback antes) |
 
 ### G6 — Licenciamento fail-safe
 

@@ -503,3 +503,4 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-04d | Passo 1.3 PASS: diagnose baseline; passo 1.2 PASS (Veeam + MANUAL-INSTALL) |
 | 2026-08-04e | Passo 2.1 PASS: G2 install passivo `_65` no appliance `254` |
 | 2026-08-04f | Onda A PASS: G3–G4 (passos 2.2–2.4); próximo 3.1 G5 two-client |
+| 2026-08-04g | Onda B G5 FAIL: clientes 234/235; LAN pass any antes regras Layer7; rollback aplicado |

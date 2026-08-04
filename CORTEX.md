@@ -1222,27 +1222,22 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
 - Passo actual: 3.1
-- Onda: B (Gate two-client G5)
+- Onda: B (Gate G5 — BLOQUEADA)
 - Candidato lab: 1.8.11_65 (confirmado)
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_65
 - G0-G1: PASS
-- G2: PASS (2026-08-04)
-- G3: PASS (2026-08-04, dry-run enforce snippet)
-- G4: PASS (2026-08-04, monitor activo)
-- G5: PENDENTE (requer dois clientes LAN)
+- G2-G4: PASS (Onda A)
+- G5: FAIL (2026-08-04 — ordem regras PF LAN pass any antes Layer7)
 - G6-G7: PENDENTE
 - F3: ABERTA
 - F4: ABERTA
-- VIP §20: PENDENTE
-- CE: PENDENTE
-- GO humano (Onda F): NÃO
-- Produto pronto (Onda J): NÃO
-- Onda A: **A-PASS** (G2–G4, passos 2.1–2.4)
-- P1: CONCLUÍDA
-- Appliance 254: `_65`, `enabled=true`, `mode=monitor` (captura activa)
-- Rollback: Veeam diário + MANUAL-INSTALL
-- Próximo passo autorizado: 3.1 (G5 two-client — requer 2 clientes LAN)
+- Onda A: A-PASS
+- Onda B: B-FAIL (G5.1–G5.2)
+- Appliance 254: rollback OK — `enabled=true`, `mode=monitor`, `legacy_global`
+- Clientes G5: A=192.168.100.234, B=192.168.100.235
+- Evidência G5: `docs/tests/evidence/20260804T223500Z-ondaB-g5-two-client-FAIL/`
+- Próximo passo autorizado: correcção ordem PF / backlog — depois repetir 3.1
 - Modo: agente único
 ```
 
