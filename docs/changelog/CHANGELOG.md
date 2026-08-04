@@ -2,6 +2,28 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.8.11_66] - 2026-08-04 — Fix: precedência PF Layer7 vs pass LAN (G5 / pfnearly)
+
+### Fixed
+
+- **Blocks Layer7 ignorados em enforce:** regras do pacote eram injectadas via
+  `discover_pkg_rules("filter")` no fim de `rules.debug`, depois do
+  `pass in quick on $LAN inet from any to any` default do pfSense — contadores
+  `layer7:pdst:*` ficavam a zero e clientes bloqueados continuavam com HTTP 200
+  (G5 two-client FAIL, lab 2026-08-04).
+- **Hook `pfearly`:** `layer7_generate_rules("pfearly")` passa a emitir match +
+  block (core, anti-QUIC, blacklist, scoped); `layer7_generate_rules("filter")`
+  em enforce devolve apenas schema de tabelas (`layer7_pf_schema_rules_text`),
+  evitando duplicar regras no fim do ruleset.
+
+### Tests
+
+- `tests/functional/test_scoped_pf_inc.php` — asserções pfnearly vs filter.
+
+### Docs
+
+- `docs/05-daemon/pf-enforcement.md` — secção precedência pfnearly/filter.
+
 ## [1.8.11_65] - 2026-08-04 — GUI i18n EN/PT + ícones FA6 + Mensagens (BG-076)
 
 ### Changed

@@ -1043,27 +1043,53 @@ function layer7_pf_tables_text()
 	)) . "\n";
 }
 
-function layer7_pf_default_rules_text($data = null)
+/**
+ * Declaracoes de tabelas PF (core + dinamicas por politica/blacklist).
+ * Sem regras match/block — usado no hook `filter` e em `pf.conf` materializado.
+ */
+function layer7_pf_schema_rules_text($data = null, $bl_config = null)
 {
 	if ($data === null) {
 		$data = layer7_load_or_default();
 	}
-	$out = layer7_pf_tables_text();
+	if ($bl_config === null) {
+		$bl_config = layer7_bl_config_load();
+	}
 
+	$out = layer7_pf_tables_text();
 	if (!layer7_pf_should_enforce($data)) {
 		$out .= "# Layer7 passivo (enabled=false ou mode!=enforce):" .
 		    " sem regras de bloqueio do core.\n";
 		return $out;
 	}
 
+	$out .= layer7_pf_managed_dynamic_tables_text($data, $bl_config);
+	return $out;
+}
+
+/**
+ * Regras match/block do enforcement core (allowlist, excepcoes, blocks globais).
+ * Devem ser avaliadas antes do `pass any` das interfaces LAN — ver
+ * `layer7_pf_early_enforcement_rules_text()` / hook pfnearly do pfSense.
+ */
+function layer7_pf_action_rules_text($data = null, $bl_config = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if ($bl_config === null) {
+		$bl_config = layer7_bl_config_load();
+	}
+	if (!layer7_pf_should_enforce($data)) {
+		return "";
+	}
+
 	$l7 = $data["layer7"];
 	$block_dot_doq = !empty($l7["block_dot_doq"]);
-	$bl_config = layer7_bl_config_load();
-	$out .= layer7_pf_managed_dynamic_tables_text($data, $bl_config);
 
 	/* A allowlist apenas marca o pacote. As regras Layer7 ignoram a marca,
 	 * mas as regras nativas do pfSense continuam a avaliar o trafego. */
-	$out .= implode("\n", array(
+	$out = implode("\n", array(
 		"",
 		"# Allowlist (Bloco 3) — destinos protegidos contra bloqueio.",
 		"match inet to <layer7_allow_dst> tag L7ALLOW label \"layer7:allow:dst\"",
@@ -1105,6 +1131,38 @@ function layer7_pf_default_rules_text($data = null)
 	$out .= "\n# layer7_tagged permanece disponivel para regras manuais/encadeadas.\n";
 
 	return $out;
+}
+
+/**
+ * Enforcement completo para discover_pkg_rules("pfearly"): match/block antes
+ * das regras de interface do pfSense (corrige G5 — pass LAN a ganhar quick).
+ */
+function layer7_pf_early_enforcement_rules_text($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	if (!layer7_pf_should_enforce($data)) {
+		return "";
+	}
+
+	$bl_config = layer7_bl_config_load();
+	$rules = "\n# Layer7 enforcement (pfearly — precede regras de interface pfSense)\n";
+	$rules .= layer7_pf_action_rules_text($data, $bl_config);
+	$rules .= layer7_anti_quic_filter_rules_text($data);
+	$rules .= layer7_blacklist_filter_rules_text($bl_config);
+	$rules .= layer7_policy_enforcement_rules_text($data, false);
+	return $rules;
+}
+
+function layer7_pf_default_rules_text($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$bl_config = layer7_bl_config_load();
+	return layer7_pf_schema_rules_text($data, $bl_config) .
+	    layer7_pf_action_rules_text($data, $bl_config);
 }
 
 function layer7_pf_rules_text()
@@ -1685,6 +1743,13 @@ function layer7_generate_rules($type)
 		return layer7_generate_nat_anchor_snippet();
 	}
 
+	/* pfnearly: injectado por filter_rules_generate() ANTES das regras de
+	 * interface (pass LAN quick). Sem isto, blocks Layer7 no fim do ruleset
+	 * nunca sao avaliados (G5 two-client FAIL em lab 2026-08-04). */
+	if ($type === "pfearly") {
+		return layer7_pf_early_enforcement_rules_text();
+	}
+
 	if ($type !== "filter" && $type !== "rule") {
 		return "";
 	}
@@ -1704,19 +1769,9 @@ function layer7_generate_rules($type)
 		return layer7_pf_tables_text();
 	}
 
-	/* Enforce: construir a partir da fonte mode-aware (inclui allowlist
-	 * por tag, toggle `block_dot_doq` e os blocks por src/dst), em vez
-	 * do `pf.conf` em disco, para garantir coerencia com a config actual. */
-	$rules = layer7_pf_default_rules_text($data);
-
-	$rules .= layer7_anti_quic_filter_rules_text($data);
-
-	$bl_config = layer7_bl_config_load();
-	$rules .= layer7_blacklist_filter_rules_text($bl_config);
-
-	$rules .= layer7_policy_enforcement_rules_text($data, false);
-
-	return $rules;
+	/* Enforce: match/block vao em pfnearly; filter devolve so schema de
+	 * tabelas (evita duplicar regras depois do pass LAN). */
+	return layer7_pf_schema_rules_text($data);
 }
 
 function layer7_bare_config()

@@ -284,9 +284,27 @@ Criterio objetivo de estado saudavel (apos v1.4.16):
 Com isso, o foco do diagnostico volta para falha real de enforcement, e nao
 para estado cosmetico/transitorio de materializacao de tabela.
 
-O pacote expoe a regra minima via `layer7_generate_rules("filter")`, no padrao
+O pacote expoe a regra minima via `layer7_generate_rules()`, no padrao
 que o pfSense usa em `discover_pkg_rules()` para montar regras de pacotes
 durante o `filter reload`.
+
+### Precedencia no ruleset pfSense (G5 / `1.8.11_66`)
+
+O pfSense CE chama `discover_pkg_rules()` em **dois** pontos do ciclo:
+
+| Tipo | Onde entra em `rules.debug` | Uso Layer7 |
+|------|-----------------------------|------------|
+| `pfearly` | Inicio de `filter_rules_generate()` — **antes** das regras de interface | match + block (core, anti-QUIC, blacklist, scoped) |
+| `filter` | Fim de `filter_configure()` — depois de `$pfrules` | apenas declaracao de tabelas `persist` em enforce |
+
+Sem o hook `pfearly`, as regras `block drop quick` do pacote ficavam apos o
+`pass in quick on $LAN inet from any to any` default do pfSense; com `quick`,
+o trafego LAN era aceite antes de chegar aos blocks Layer7 (G5 two-client FAIL,
+lab 2026-08-04).
+
+`layer7_generate_rules("pfearly")` devolve `layer7_pf_early_enforcement_rules_text()`;
+`layer7_generate_rules("filter")` em enforce devolve so
+`layer7_pf_schema_rules_text()` (tabelas, sem duplicar blocks).
 
 ### Como funciona o ciclo do pfSense
 
@@ -520,11 +538,11 @@ Nao e configurado automaticamente pelo pacote porque envolve NAT.
 
 ## Risco aberto
 
-A maior incerteza restante e a ordem/precedencia real da regra no ruleset final
-do appliance. A regra usa `block drop quick`, o que garante match imediato, mas
-a posicao exata em `rules.debug` depende de onde `PFCONFIG_PACKAGE_FILTER` e
-inserido pelo pfSense. A confirmacao em `rules.debug` e `pfctl -sr` continua
-obrigatoria antes de fechar a fase.
+A ordem interna entre match `L7ALLOW`, blocks scoped e blocks globais continua
+coberta por testes (`test_scoped_pf_inc.php`) e ADR-0019. A precedencia face ao
+`pass any` das interfaces LAN ficou resolvida no `1.8.11_66` via hook
+`discover_pkg_rules("pfearly")`. A confirmacao em `rules.debug` e `pfctl -sr`
+continua obrigatoria antes de fechar o gate G5 no appliance.
 
 ## Actualizacoes Caminho B / estabilizacao (2026-06-16)
 

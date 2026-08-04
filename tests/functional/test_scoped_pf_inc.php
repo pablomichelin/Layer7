@@ -316,5 +316,30 @@ if ($pexc_match_pos === false || $pexc_block_pos === false ||
 	exit(1);
 }
 
+/* pfnearly vs filter: blocks em enforce devem ir para pfnearly, nao filter */
+$early_rules = layer7_pf_early_enforcement_rules_text($data);
+$schema_only = layer7_pf_schema_rules_text($data);
+if (strpos($early_rules, "block drop quick inet from 10.0.0.10") === false ||
+    strpos($early_rules, "pfearly") === false ||
+    strpos($schema_only, "block drop quick") !== false ||
+    strpos($schema_only, "table <layer7_pdst_") === false) {
+	fwrite(STDERR, "FAIL: enforce blocks must be pfnearly, filter schema-only\n");
+	fwrite(STDERR, "early:\n" . $early_rules . "\nschema:\n" . $schema_only);
+	exit(1);
+}
+$monitor_early = layer7_pf_early_enforcement_rules_text($monitor_allow);
+if ($monitor_early !== "") {
+	fwrite(STDERR, "FAIL: monitor mode must not emit pfnearly enforcement\n");
+	exit(1);
+}
+$layer7_inc = file_get_contents(
+    $root . "/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc"
+);
+if (!is_string($layer7_inc) ||
+    strpos($layer7_inc, 'if ($type === "pfearly")') === false) {
+	fwrite(STDERR, "FAIL: layer7_generate_rules must handle pfnearly hook\n");
+	exit(1);
+}
+
 echo "PASS: test_scoped_pf_inc\n";
 exit(0);
