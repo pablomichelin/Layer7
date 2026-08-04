@@ -21,10 +21,9 @@ MITM**.
 |--|--|
 | **Vendor** | Systemup Solução em Tecnologia |
 | **Product** | Layer7 for pfSense CE |
-| **License server** | [license.systemup.inf.br](https://license.systemup.inf.br) |
 | **Public downloads** | [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) |
 | **Monitor mode** | Free (observation only, no blocking) |
-| **Enforce mode** | Valid annual license required |
+| **Enforce mode** | Commercial license from Systemup (contact sales) |
 
 Layer7 is **not** affiliated with Netgate or the pfSense project. pfSense® is a
 registered trademark of Electric Sheep Fencing LLC d/b/a Netgate.
@@ -76,17 +75,17 @@ Contact Systemup for pfSense Plus compatibility in your environment.
 
 ---
 
-## 5. Licensing model
+## 5. Licensing (summary)
 
 | Mode | Blocking | License |
 |------|----------|---------|
 | **Monitor** | No | Not required (free) |
-| **Enforce** | Yes | Annual license per firewall (hardware-bound) |
+| **Enforce** | Yes | Commercial license from Systemup |
 
-- Activation via `license.systemup.inf.br`
-- Offline validation with Ed25519-signed `.lic` file
-- **14-day grace** after expiration for an already-issued license
-- Without a valid license: system stays in **monitor-only** mode
+Activation, renewal, and trials are handled directly by **Systemup** — not via
+public documentation. Contact Systemup for a quote or evaluation license.
+
+Without a valid commercial license, the product remains in **monitor-only** mode.
 
 ---
 
@@ -118,7 +117,7 @@ Prices are indicative. Contact Systemup for MSP volume quotes and formal proposa
 ## 7. Installation (overview)
 
 Installation uses a signed `.pkg` from GitHub Releases and a one-line installer script.
-Full operational steps: [MANUAL-INSTALL.md](../10-license-server/MANUAL-INSTALL.md).
+Full steps: [Installation Guide](LAYER7-INSTALL-GUIDE-EN.md).
 
 ```bash
 # On pfSense (SSH as root) — replace VERSION with the latest release tag:
@@ -157,11 +156,11 @@ pfSense, not replacing full network forensics platforms.
 | 3 | Request **30-day enforce trial** if blocking tests are needed |
 | 4 | Optional: security/architecture review under NDA |
 
-**What we share without NDA:** product capabilities, compatibility, installation,
-licensing model, pricing.
+**What we share without NDA:** product capabilities, compatibility, installation
+overview, pricing.
 
-**What requires NDA or scoped engagement:** internal architecture, enforcement
-internals, license-server implementation details.
+**What requires direct contact with Systemup:** license activation, enforcement
+setup, architecture or security deep-dives (NDA may apply).
 
 ---
 
@@ -170,7 +169,6 @@ internals, license-server implementation details.
 | | |
 |--|--|
 | **Website** | [www.systemup.inf.br](https://www.systemup.inf.br) |
-| **Licensing** | [license.systemup.inf.br](https://license.systemup.inf.br) |
 | **Downloads** | [github.com/pablomichelin/Layer7/releases](https://github.com/pablomichelin/Layer7/releases) |
 
 For evaluation licenses, proposals, or MSP partnerships, contact Systemup through

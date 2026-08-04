@@ -106,7 +106,6 @@ Control panel with complete visibility of what's happening on the network:
 - **Top 10 blocked applications** — which apps are being blocked the most
 - **Top 10 clients** — which devices trigger the most blocking rules
 - **Service status** — version, mode, uptime
-- **Licence status** — client, validity, hardware ID
 
 ### 7. Reports module with history
 
@@ -194,12 +193,13 @@ For organisations with multiple branches/locations:
 - Support for **parallel updates** (e.g., 4 firewalls at once)
 - **Dry-run** to preview before executing
 
-### 18. Secure licensing
+### 18. Commercial licensing
 
-- Licence bound to the firewall's **specific hardware**
-- **Ed25519** cryptographic verification offline (no "phone home")
-- **14-day** grace period after expiration
-- Without a valid licence: operates in **monitoring mode** (no blocking)
+- **Monitor mode** — free, observation only (no blocking)
+- **Enforce mode** — requires a commercial license from Systemup
+- License activation and renewal handled directly by Systemup (contact sales)
+
+Contact Systemup for trials, quotes, and MSP volume pricing.
 
 ---
 
@@ -220,7 +220,6 @@ Layer7 integrates natively into pfSense, accessible under **Services > Layer 7**
 | **Reports** | Historical charts, top apps/clients/domains, export |
 | **Events** | Live event monitor |
 | **Diagnostics** | Diagnostic tools, table status, anti-DoH |
-| **Licence** | Licence status, hardware ID, activation |
 
 ---
 

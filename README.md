@@ -2,26 +2,25 @@
 
 > **Systemup Solução em Tecnologia** · [www.systemup.inf.br](https://www.systemup.inf.br)
 
-Public repository for **signed releases and customer-facing documentation only**.
-Source code and internal engineering docs live in the **private** development
-repository (`pfsense-layer7`).
+Public repository for **signed releases and product documentation only**.
+Source code and internal engineering docs are not published here.
 
 ---
 
-## What this repository contains
+## Documentation
 
-| Content | Purpose |
-|---------|---------|
-| [Evaluation Pack (EN)](docs/commercial/LAYER7-EVALUATION-PACK-EN.md) | Product evaluation for prospects |
+| Document | Description |
+|----------|-------------|
+| [Evaluation Pack (EN)](docs/commercial/LAYER7-EVALUATION-PACK-EN.md) | Start here for product evaluation |
 | [Evaluation Pack (PT)](docs/commercial/LAYER7-EVALUATION-PACK-PT.md) | Avaliação do produto |
-| [Product Overview (EN)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md) | Feature list and use cases |
-| [Product Overview (PT)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-PT.md) | Funcionalidades e casos de uso |
-| [Installation manual](docs/10-license-server/MANUAL-INSTALL.md) | Install, upgrade, rollback |
-| [Changelog](docs/changelog/CHANGELOG.md) | Version history |
-| [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) | `.pkg`, `install.sh`, checksums, signatures |
+| [Product Overview (EN)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md) | Features and use cases |
+| [Product Overview (PT)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-PT.md) | Funcionalidades |
+| [Installation Guide (EN)](docs/commercial/LAYER7-INSTALL-GUIDE-EN.md) | Install, upgrade, uninstall |
+| [Installation Guide (PT)](docs/commercial/LAYER7-INSTALL-GUIDE-PT.md) | Instalação |
+| [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) | `.pkg`, installers, checksums, release notes |
 
-**This repository does not contain** source code, ADRs, internal roadmaps, license
-server implementation, or enforcement internals.
+**Licensing and activation** are not documented publicly. Contact Systemup for
+commercial licenses, trials, and enforce mode.
 
 ---
 
@@ -36,44 +35,24 @@ fetch -o /tmp/install.sh \
 
 Then open **Services → Layer 7** in the pfSense web UI.
 
-See [MANUAL-INSTALL.md](docs/10-license-server/MANUAL-INSTALL.md) for full procedures.
-
 ---
 
-## Licensing
+## Modes
 
 | Mode | Description |
 |------|-------------|
 | **Monitor** | Free — observe traffic, no blocking |
-| **Enforce** | Requires annual license per firewall |
-
-Activate at **[license.systemup.inf.br](https://license.systemup.inf.br)**.
-
-For evaluation: start with monitor mode, or request a **30-day enforce trial**
-from Systemup.
-
----
-
-## Documentation for evaluators
-
-1. [Evaluation Pack (EN)](docs/commercial/LAYER7-EVALUATION-PACK-EN.md) — start here
-2. [Product Overview](docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md)
-3. [Installation manual](docs/10-license-server/MANUAL-INSTALL.md)
-
-Architecture and security deep-dives are available under NDA on request.
-
----
-
-## Legal
-
-Layer7 for pfSense CE is **not** affiliated with Netgate or the pfSense project.
-pfSense® is a registered trademark of Electric Sheep Fencing LLC d/b/a Netgate.
-
-License: see [LICENSE](LICENSE).
+| **Enforce** | Commercial license from Systemup (contact sales) |
 
 ---
 
 ## Contact
 
 - **Website:** [www.systemup.inf.br](https://www.systemup.inf.br)
-- **Licensing:** [license.systemup.inf.br](https://license.systemup.inf.br)
+
+For evaluation, pricing, licensing, and MSP partnerships — contact Systemup.
+
+---
+
+Layer7 is not affiliated with Netgate or the pfSense project.  
+pfSense® is a registered trademark of Electric Sheep Fencing LLC d/b/a Netgate.

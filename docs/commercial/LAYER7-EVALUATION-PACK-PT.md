@@ -20,10 +20,9 @@ horário — integrado na GUI do pfSense, **sem MITM**.
 |--|--|
 | **Empresa** | Systemup Solução em Tecnologia |
 | **Produto** | Layer7 para pfSense CE |
-| **Servidor de licenças** | [license.systemup.inf.br](https://license.systemup.inf.br) |
 | **Downloads públicos** | [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) |
 | **Modo monitor** | Gratuito (só observação, sem bloqueio) |
-| **Modo enforce** | Licença anual válida obrigatória |
+| **Modo enforce** | Licença comercial Systemup (contactar vendas) |
 
 O Layer7 **não** é afiliado à Netgate nem ao projecto pfSense. pfSense® é marca
 registada da Electric Sheep Fencing LLC d/b/a Netgate.
@@ -75,17 +74,18 @@ Contactar a Systemup para compatibilidade pfSense Plus no vosso ambiente.
 
 ---
 
-## 5. Modelo de licenciamento
+## 5. Licenciamento (resumo)
 
 | Modo | Bloqueio | Licença |
 |------|----------|---------|
 | **Monitor** | Não | Não obrigatória (grátis) |
-| **Enforce** | Sim | Licença anual por firewall (vinculada ao hardware) |
+| **Enforce** | Sim | Licença comercial Systemup |
 
-- Activação via `license.systemup.inf.br`
-- Validação offline com ficheiro `.lic` assinado Ed25519
-- **14 dias de grace** após expiração para licença já emitida
-- Sem licença válida: sistema permanece em **modo só monitor**
+Activação, renovação e trials são tratados directamente pela **Systemup** — não
+nesta documentação pública. Contactar a Systemup para orçamento ou licença de
+avaliação.
+
+Sem licença comercial válida, o produto permanece em **modo só monitor**.
 
 ---
 
@@ -117,7 +117,7 @@ Preços indicativos. Contactar Systemup para volume MSP e propostas formais.
 ## 7. Instalação (visão geral)
 
 A instalação usa `.pkg` assinado das GitHub Releases e script de uma linha.
-Passos operacionais completos: [MANUAL-INSTALL.md](../10-license-server/MANUAL-INSTALL.md).
+Passos completos: [Guia de Instalação](LAYER7-INSTALL-GUIDE-PT.md).
 
 ```bash
 # No pfSense (SSH root) — substituir VERSION pela tag da release mais recente:
@@ -156,10 +156,12 @@ políticas** no pfSense, não para substituir plataformas forenses completas.
 | 3 | Pedir **trial enforce 30 dias** se precisarem testar bloqueio |
 | 4 | Opcional: revisão segurança/arquitectura com NDA |
 
-**O que partilhamos sem NDA:** capacidades, compatibilidade, instalação, licenciamento, preços.
+**O que partilhamos sem NDA:** capacidades, compatibilidade, visão geral de
+instalação, preços.
 
-**O que requer NDA ou âmbito fechado:** arquitectura interna, detalhes de enforcement,
-implementação do license server.
+**O que requer contacto directo com a Systemup:** activação de licença,
+configuração de enforce, arquitectura ou segurança em profundidade (NDA pode
+aplicar-se).
 
 ---
 
@@ -168,7 +170,6 @@ implementação do license server.
 | | |
 |--|--|
 | **Website** | [www.systemup.inf.br](https://www.systemup.inf.br) |
-| **Licenciamento** | [license.systemup.inf.br](https://license.systemup.inf.br) |
 | **Downloads** | [github.com/pablomichelin/Layer7/releases](https://github.com/pablomichelin/Layer7/releases) |
 
 Para licenças de avaliação, propostas ou parceria MSP, contactar a Systemup pelo
