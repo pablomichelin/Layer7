@@ -604,9 +604,10 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > substituido nos upgrades; o backup XML do pfSense **nao** o inclui — use
 > Export/Import em Definicoes Layer7. **`1.8.11_55` e defeituosa — nao instalar.**
 >
-> **Candidato interno** — Gate B1 pendente.
-> Rollback desta versao: reinstalar `1.8.11_64` (**nao** `_55`). **Nao** activar enforce em producao
-> sem gates G2–G7. Para rollback de referencia em producao passiva: `_24`.
+> **Candidato lab (Gate B1):** `1.8.11_65` — ver
+> [`plano-gates-producao.md`](../09-blocking/plano-gates-producao.md).
+> Rollback desta versao: `_64` (**nao** `_55`). **Nao** activar enforce em producao
+> sem gates G2–G7 + GO humano. Para rollback de referencia enforce: `_24`.
 
 **Versao de referencia producao (enforce bloqueado ate gate):** `1.8.11_24`
 

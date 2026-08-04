@@ -1199,6 +1199,53 @@ validacao fora da operacao real.
 
 ---
 
+## Plano mestre de fecho / consolidacao (2026-08-04)
+
+Trilha operacional unica para fechar pontas soltas (software + documentacao +
+versionamento) ate o produto estar pronto para utilizacao com enforce:
+
+- **Plano (inicio/meio/fim, gates, multitarefa, R1–R12):**
+  [`docs/02-roadmap/plano-fecho-producao-e-consolidacao.md`](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md)
+- **Arranque de chat (prompt para colar):**
+  [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
+
+**Modo preferido:** coordenador + workers em P0/P1/H; agente unico em ondas
+com appliance (A–G) e GO/release (F, I–J). Ver grafo de dependencias no plano
+(sec. 3.3).
+
+**Nao** iniciar F6 (mover pastas em `docs/`) antes da Onda H do plano.
+**Nao** promover `latest` (`1.8.11_65`) a producao enforce sem GO humano
+(Onda F) apos G2–G7 + Ondas C–E PASS.
+**Congelamento P0.2:** sem novo polish GUI (i18n, redesign, icones) ate Onda A
+PASS — apenas fixes bloqueantes descobertos em gate.
+
+```text
+PLANO FECHO/CONSOLIDAÇÃO — progresso
+- Passo actual: 1.1
+- Onda: P1
+- Candidato lab: 1.8.11_65 (fixado)
+- Produção enforce: 1.8.11_24 (até GO Onda F)
+- Canal latest: 1.8.11_65
+- G0-G1: PASS (builder _65 publicado; revalidar no passo 1.0)
+- G2-G4: PENDENTE
+- G5: PENDENTE
+- G6-G7: PENDENTE
+- F3: ABERTA
+- F4: ABERTA
+- VIP §20: PENDENTE (execução appliance)
+- CE: PENDENTE
+- GO humano (Onda F): NÃO
+- Produto pronto (Onda J): NÃO
+- F5 mínima: PENDENTE
+- F6: NÃO INICIADA
+- F7/BG-028: PENDENTE
+- R1-R12: 0/12
+- Próximo passo autorizado: 1.1 (confirmar candidato + sincronizar gates)
+- Multitarefa activa: P1 — coordenador + worker diagnose (ver plano 3.6)
+```
+
+---
+
 ## Ordem de leitura obrigatoria
 
 ### Para qualquer novo chat ou agente
@@ -1213,6 +1260,13 @@ validacao fora da operacao real.
 8. [`docs/03-adr/README.md`](docs/03-adr/README.md)
 9. [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
 10. [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md)
+
+### Para a trilha de fecho / consolidacao
+
+1. `CORTEX.md` (inclui passo actual do plano mestre)
+2. [`docs/02-roadmap/plano-fecho-producao-e-consolidacao.md`](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md)
+3. [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
+4. SSOT da onda em causa (gates, validacao-lab, F3 start-here, etc.)
 
 ### Para trabalho tecnico numa area especifica
 
@@ -1340,35 +1394,29 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-07-31
+- Data base: 2026-08-04
 - Produto: Layer7 para pfSense CE
-- Ultima versao .pkg publicada (referencia operacional): 1.8.11_24
+- Canal publico latest: 1.8.11_65
+  (SHA256 e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e;
+   GUI i18n BG-076; daemon inalterado vs _64)
+- Producao enforce (referencia ate GO): 1.8.11_24
   (SHA256 1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818;
-   Caminho B E0-E3; ver CHANGELOG [1.8.11_24]; gate two-client PENDENTE;
-   trust chain F1.2 do pacote ainda nao activado; ver BG-028;
-   trust chain F1.3 de blacklists activa desde 1.8.11_13, mesma chave embutida)
-- Auditoria E2E Etapa 1: concluida (local read-only); veredicto NO-GO para
-  publicar _31 ou activar enforce; SSOT docs/09-blocking/auditoria-end-to-end-2026-07-29.md;
-  registo AUD-001..015; gates G0-G7 em plano-gates-producao.md; BG-060
-- Proximo gate autorizado: Bloco B1 — install passivo _31 no appliance
-  (G2-G4: ABI FB16, pfctl -nf ruleset completo, captura/metricas); G5 two-client
-  (validacao-lab sec. 12) so apos G2-G4 PASS; nenhuma correcao de codigo ate
-  causa-raiz comprovada no appliance
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 64 (publicado no canal
-  de teste/lab como v1.8.11_64; _55 defeituosa — nao instalar; gate appliance pendente)
-- Estado funcional: V1 + Caminho A + Caminho B E0-E3 publicados; _25-_31
-  corrigem codigo (BG-053..059) mas zero evidencia fisica; CANDIDATO INTERNO
-  EM VALIDACAO
-- Estado documental: governanca F0 consolidada; auditoria E2E + matrizes blocking;
-  Lista VIP global Blocos A–E concluidos (ADR-0020; BG-071..073; roteiro lab
-  sec. 20 actualizado `_61`+ gate **20.4** `filter_configure`); execucao appliance pendente
-- Fase actual: pos-V1 — Caminho B (gates appliance pendentes; BG-060;
-  Lista VIP global A–E concluida; execucao lab sec. 20 pendente)
-- Reorganizacao fisica autorizada: nao (F6)
-- Artefacto publico actual: .pkg via GitHub Releases (ultimo: 1.8.11_64; producao enforce de referencia: 1.8.11_24)
-- Fonte canonica de instalacao: docs/10-license-server/MANUAL-INSTALL.md
-- Fonte canonica de prioridade: docs/02-roadmap/backlog.md
-- Fonte canonica de gates: docs/02-roadmap/checklist-mestre.md
+   Caminho B E0-E3; gate two-client PENDENTE; trust chain pacote BG-028 pendente)
+- Candidato lab gates: 1.8.11_65 (fixado plano mestre passo 1.1)
+- Auditoria E2E Etapa 1: concluida (local read-only); NO-GO enforce;
+  SSOT docs/09-blocking/auditoria-end-to-end-2026-07-29.md; AUD-001..015
+- Proximo gate autorizado: Bloco B1 — install passivo _65 no appliance
+  (G2-G4); G5 two-client apos G2-G4 PASS; plano-fecho-producao passo 2.x
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 65
+- Estado funcional: V1 + Caminho A + Caminho B E0-E3; _25-_65 corrigem codigo
+  mas zero evidencia fisica G2-G7 no candidato actual
+- Estado documental: governanca F0 consolidada; plano fecho ACTIVO (rev 2026-08-04b);
+  Lista VIP A-E codigo+docs; execucao lab sec. 20 pendente
+- Fase actual: F4 aberta; plano de fecho P1 (candidato + snapshot)
+- Reorganizacao fisica autorizada: nao (F6 / Onda H)
+- Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
+- Fonte canonica prioridade: docs/02-roadmap/backlog.md
+- Fonte canonica gates: docs/09-blocking/plano-gates-producao.md
 ```
 
 ---

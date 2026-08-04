@@ -23,6 +23,14 @@ com hardening tecnico ou com release engineering.
 | F6 | Reorganizacao estrutural controlada | planeada | reorganizacao fisica acontece com mapa, links e rollback |
 | F7 | Observabilidade e release engineering | planeada | release e operacao passam a ter governanca forte e verificavel |
 
+**Orquestracao ponta a ponta (fecho producao + consolidacao docs):** ver
+[`plano-fecho-producao-e-consolidacao.md`](plano-fecho-producao-e-consolidacao.md)
+e arranque [`../00-overview/START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
+Esse plano **nao substitui** as fases F0–F7; ordena gates de appliance, fecho
+F3/F4, GO humano, F5, F6 (arvore `docs/`) e F7 numa unica fila executavel.
+**Modo preferido:** multitarefa com coordenador em P0/P1/H; agente unico em
+ondas com appliance. Candidato lab fixado: `1.8.11_65`.
+
 ---
 
 ## F0 — Governanca documental
