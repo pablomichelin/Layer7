@@ -1,0 +1,9 @@
+layer7d: activating...
+  server:       https://license.systemup.inf.br/api/activate
+  hardware_id:  e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+  key:          9896cadb...
+layer7d: activation failed — could not reach license server at https://license.systemup.inf.br/api/activate
+  The activation client requires curl for POST.
+  Ensure the server is running and reachable.
+  Alternatively, place a valid .lic file at /usr/local/etc/layer7.lic
+activate_exit=255

@@ -376,13 +376,40 @@ function assertEmptyBody(body) {
   rejectUnexpectedFields(payload, []);
 }
 
+function normalizeExpiryDate(expiry) {
+  if (!expiry) {
+    return null;
+  }
+
+  if (expiry instanceof Date) {
+    if (Number.isNaN(expiry.getTime())) {
+      return null;
+    }
+
+    return expiry.toISOString().slice(0, 10);
+  }
+
+  if (typeof expiry === 'string') {
+    const trimmed = expiry.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+    return match ? match[1] : null;
+  }
+
+  return null;
+}
+
 function isLicenseExpired(license) {
-  if (!license?.expiry) {
+  const expiry = normalizeExpiryDate(license?.expiry);
+  if (!expiry) {
     return false;
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  return license.expiry < today;
+  return expiry < today;
 }
 
 module.exports = {

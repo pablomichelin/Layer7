@@ -1,0 +1,5 @@
+run_id=20260804T232600Z-ondaC-dr05
+scenario_code=S07
+license_id=5
+license_key_prefix=9896cadb...
+generated_at_utc=2026-08-04T23:26:57Z

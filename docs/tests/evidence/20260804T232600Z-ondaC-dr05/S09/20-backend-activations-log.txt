@@ -1,0 +1,17 @@
+time="2026-08-04T20:27:26-03:00" level=warning msg="/opt/layer7-license/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+-[ RECORD 1 ]-+---------------------------
+id            | 20
+created_at    | 2026-04-03 04:12:53.981704
+result        | success
+error_message | 
+-[ RECORD 2 ]-+---------------------------
+id            | 14
+created_at    | 2026-04-02 13:03:23.352458
+result        | fail
+error_message | Hardware ID mismatch
+-[ RECORD 3 ]-+---------------------------
+id            | 13
+created_at    | 2026-04-02 13:03:20.978193
+result        | success
+error_message | 
+

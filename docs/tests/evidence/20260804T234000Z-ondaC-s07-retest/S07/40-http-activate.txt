@@ -1,0 +1,23 @@
+HTTP/2 409 
+date: Tue, 04 Aug 2026 23:41:54 GMT
+content-type: application/json; charset=utf-8
+content-length: 29
+server: cloudflare
+x-powered-by: Express
+ratelimit-policy: 10;w=60
+ratelimit-limit: 10
+ratelimit-remaining: 8
+ratelimit-reset: 60
+etag: W/"1d-HVmAO8ckVHh/xe4eRbBYOK3C9fA"
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-frame-options: DENY
+referrer-policy: same-origin
+content-security-policy: default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self' data:
+cf-cache-status: DYNAMIC
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=42xU%2FsV3KDn823mJ3BfPfeZpW4f2blBWlK9phaapz3wFrKD0E1wLbtNWguxrBjKNzpGNRcd%2Bj5cZ%2BBW9QDfiXdM%2B0FxmjmXwVKRJksprKjP5UQmfJ6LxGQmst%2FtuS84C0AZTL8XqfEBg5Q%3D%3D"}]}
+cf-ray: a2616a60ef9eade5-GRU
+alt-svc: h3=":443"; ma=86400
+
+{"error":"Licenca expirada."}

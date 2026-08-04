@@ -1,0 +1,3 @@
+  "license_valid": true,
+  "license_customer": "Systemup",
+  "license_expiry": "2028-07-08",

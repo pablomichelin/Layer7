@@ -1,0 +1,10 @@
+time="2026-08-04T20:27:24-03:00" level=warning msg="/opt/layer7-license/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+-[ RECORD 1 ]-----------------------------------------------------------------
+id          | 7
+name        | Systemup
+key_prefix  | 8f289cd0
+status      | revoked
+expiry      | 2033-10-24
+revoked_at  | 2026-07-29 17:00:53.05964
+hardware_id | e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+

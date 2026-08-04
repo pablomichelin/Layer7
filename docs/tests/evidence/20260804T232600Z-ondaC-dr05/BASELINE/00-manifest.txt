@@ -1,0 +1,10 @@
+run_id=20260804T232600Z-ondaC-dr05
+scenario_code=BASELINE
+generated_at_utc=2026-08-04T23:26:48Z
+ssh_target=root@192.168.100.254
+ssh_port=22
+license_path=/usr/local/etc/layer7.lic
+stats_path=/tmp/layer7-stats.json
+layer7d_bin=/usr/local/sbin/layer7d
+pidfile=/var/run/layer7d.pid
+output_root=docs/tests/evidence

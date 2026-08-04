@@ -2,6 +2,34 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Unreleased] — License server + daemon (S07 / F3)
+
+### Fixed
+
+- **License server — activação de licença expirada (S07):** `isLicenseExpired()`
+  em `license-server/backend/src/crud-validation.js` normaliza `expiry` quando o
+  PostgreSQL devolve `Date` (comparação `Date < string` falhava silenciosamente
+  e `POST /api/activate` aceitava licenças expiradas com `HTTP 200`). Deploy
+  em `192.168.100.244` / `license.systemup.inf.br` (`2026-08-04`); reteste S07
+  **PASS** (`20260804T234000Z-ondaC-s07-retest`).
+- **Daemon — activate com resposta HTTP do servidor:** `layer7d --activate` deixa
+  de usar `curl -f` cego; distingue falha de rede de rejeição HTTP (`409 Licenca
+  expirada.`, etc.), não grava `.lic` em rejeição e remove o ficheiro se a
+  verificação local falhar após download.
+
+### Tests
+
+- `license-server/backend/src/crud-validation.test.js` — `Date` PostgreSQL.
+- `license-server/backend/src/license-state.test.js` — estado efectivo expirado.
+
+## [1.8.11_67] - 2026-08-04 — Fix: mensagens activate + defesa .lic inválido (S07 daemon)
+
+### Fixed
+
+- **`layer7d --activate`:** mensagem clara quando o servidor responde HTTP 4xx/5xx
+  (ex.: `activation rejected by license server (HTTP 409): Licenca expirada.`);
+  ficheiro temporário + promoção só em `2xx`; `unlink` se verificação local falhar.
+
 ## [1.8.11_66] - 2026-08-04 — Fix: precedência PF Layer7 vs pass LAN (G5 / pfnearly)
 
 ### Fixed

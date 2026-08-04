@@ -46,6 +46,18 @@ test('getEffectiveLicenseState treats active licenses past expiry as expired', (
   assert.equal(state.normalizedHardwareId, HARDWARE_ID);
 });
 
+test('getEffectiveLicenseState treats PostgreSQL Date expiry as expired', () => {
+  const state = getEffectiveLicenseState({
+    status: 'active',
+    expiry: new Date('2026-03-31T00:00:00.000Z'),
+    hardware_id: HARDWARE_ID,
+  });
+
+  assert.equal(state.effectiveStatus, 'expired');
+  assert.equal(state.expiredByDate, true);
+  assert.equal(state.active, false);
+});
+
 test('getEffectiveLicenseState preserves persisted expired state before date expiry', () => {
   const state = getEffectiveLicenseState({
     status: 'expired',

@@ -18,5 +18,5 @@
 
 ## Notas
 
-- Snapshot hypervisor (passo 1.2): **PENDENTE** — ver [`docs/08-lab/p1-snapshot-gate-b1.md`](../../../08-lab/p1-snapshot-gate-b1.md).
+- Snapshot hypervisor (passo 1.2): **PASS** — Veeam diário em `254`, `12` e `244` (confirmado `2026-08-04`; ver [`p1-snapshot-gate-b1.md`](../../../08-lab/p1-snapshot-gate-b1.md)).
 - Não substitui gates G2–G4 no candidato `_65`.

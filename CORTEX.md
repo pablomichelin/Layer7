@@ -1221,22 +1221,16 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: 4.1 (Onda C — F3 DR-05)
-- Onda: B — **PASS** (G5.1–G5.7); C autorizada
+- Passo actual: 4.2 (Onda C — F3) / depois 5.1 (Onda D)
+- Onda: C — **PARCIAL** (S07 **PASS** reteste; S09/S13 PARTIAL)
 - Candidato lab: 1.8.11_66 (publicado)
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_66
-- G0-G1: PASS
-- G2-G4: PASS (Onda A)
-- G5: PASS (G5.1–G5.7 — `20260804T232800Z-ondaB-g5-full-PASS`)
-- G6-G7: PENDENTE
-- F3: ABERTA (Onda C)
-- F4: ABERTA
-- Onda A: A-PASS
-- Onda B: B-PASS
-- Appliance 254: rollback OK — `enabled=true`, `mode=monitor`
-- Evidência G5 completo: `docs/tests/evidence/20260804T232800Z-ondaB-g5-full-PASS/`
-- Próximo passo autorizado: Onda C passo 4.1 (DR-05 campanha F3)
+- G0-G1: PASS | G2-G4: PASS | G5: PASS | G6-G7: PENDENTE
+- F3: ABERTA — S07 desbloqueado (`20260804T234000Z-ondaC-s07-retest`); fecho global pendente S09/S13
+- License server: fix `isLicenseExpired` deployado em `244` (`2026-08-04`)
+- Evidência S07 reteste: `docs/tests/evidence/20260804T234000Z-ondaC-s07-retest/`
+- Próximo: S09/S13 completar **ou** Onda D 5.1
 - Modo: agente único
 ```
 

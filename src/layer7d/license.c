@@ -431,13 +431,79 @@ shell_safe_url(const char *s)
 	return 1;
 }
 
+#define L7_ACTIVATE_BODY_TMP "/tmp/layer7-activate.body"
+#define L7_ACTIVATE_HTTP_TMP "/tmp/layer7-activate.http"
+
+static void
+activation_cleanup_temp(void)
+{
+	(void)unlink(L7_ACTIVATE_BODY_TMP);
+	(void)unlink(L7_ACTIVATE_HTTP_TMP);
+}
+
+static int
+read_text_file_trim(const char *path, char *buf, size_t bufsz)
+{
+	FILE *f;
+	size_t n;
+
+	if (!buf || bufsz == 0)
+		return -1;
+
+	f = fopen(path, "r");
+	if (!f)
+		return -1;
+
+	n = fread(buf, 1, bufsz - 1, f);
+	buf[n] = '\0';
+	fclose(f);
+
+	while (n > 0 && (buf[n - 1] == '\n' || buf[n - 1] == '\r' ||
+	    buf[n - 1] == ' ' || buf[n - 1] == '\t'))
+		buf[--n] = '\0';
+
+	return 0;
+}
+
+static int
+promote_activate_body(void)
+{
+	char *raw;
+	size_t len;
+	FILE *out;
+
+	raw = read_file_alloc(L7_ACTIVATE_BODY_TMP, &len);
+	if (!raw)
+		return -1;
+
+	out = fopen(L7_LIC_PATH, "w");
+	if (!out) {
+		free(raw);
+		return -1;
+	}
+
+	if (fwrite(raw, 1, len, out) != len) {
+		fclose(out);
+		free(raw);
+		(void)unlink(L7_LIC_PATH);
+		return -1;
+	}
+
+	fclose(out);
+	free(raw);
+	return 0;
+}
+
 int
 layer7_activate(const char *key, const char *url)
 {
 	char hw_id[L7_HW_ID_LEN];
-	char cmd[1024];
+	char cmd[1536];
 	char body[512];
-	int rc;
+	char http_code[8];
+	char response_body[1024];
+	char server_error[256];
+	int rc, status;
 
 	if (!key || key[0] == '\0') {
 		fprintf(stderr, "layer7d: activation key is required\n");
@@ -470,43 +536,82 @@ layer7_activate(const char *key, const char *url)
 	fprintf(stderr, "  hardware_id:  %s\n", hw_id);
 	fprintf(stderr, "  key:          %.8s...\n", key);
 
+	activation_cleanup_temp();
+
 	snprintf(body, sizeof(body),
 	    "{\"key\":\"%s\",\"hardware_id\":\"%s\"}", key, hw_id);
 
 	snprintf(cmd, sizeof(cmd),
-	    "curl -sf -o %s -X POST "
+	    "curl -sS -o %s -w '%%{http_code}' -X POST "
 	    "-H 'Content-Type: application/json' "
-	    "-d '%s' '%s' 2>/dev/null",
-	    L7_LIC_PATH, body, url);
+	    "-d '%s' '%s' > %s 2>/dev/null",
+	    L7_ACTIVATE_BODY_TMP, body, url, L7_ACTIVATE_HTTP_TMP);
 
 	rc = system(cmd);
-	if (rc != 0) {
+	if (rc != 0 || read_text_file_trim(L7_ACTIVATE_HTTP_TMP, http_code,
+	    sizeof(http_code)) != 0) {
+		activation_cleanup_temp();
 		fprintf(stderr,
 		    "layer7d: activation failed — could not reach "
 		    "license server at %s\n"
-		    "  The activation client requires curl for POST.\n"
-		    "  Ensure the server is running and reachable.\n"
+		    "  Check network connectivity and that curl is installed.\n"
 		    "  Alternatively, place a valid .lic file at %s\n",
 		    url, L7_LIC_PATH);
 		return -1;
 	}
 
+	status = atoi(http_code);
+	if (status < 200 || status > 299) {
+		server_error[0] = '\0';
+		if (read_text_file_trim(L7_ACTIVATE_BODY_TMP, response_body,
+		    sizeof(response_body)) == 0)
+			(void)json_find_string(response_body, "error",
+			    server_error, sizeof(server_error));
+
+		activation_cleanup_temp();
+
+		if (server_error[0] != '\0') {
+			fprintf(stderr,
+			    "layer7d: activation rejected by license server "
+			    "(HTTP %d): %s\n",
+			    status, server_error);
+		} else {
+			fprintf(stderr,
+			    "layer7d: activation rejected by license server "
+			    "(HTTP %d)\n",
+			    status);
+		}
+		return -1;
+	}
+
+	if (promote_activate_body() != 0) {
+		activation_cleanup_temp();
+		fprintf(stderr,
+		    "layer7d: activation failed — could not save license to "
+		    "%s\n", L7_LIC_PATH);
+		return -1;
+	}
+
+	activation_cleanup_temp();
+
 	fprintf(stderr, "layer7d: license saved to %s\n", L7_LIC_PATH);
 
 	{
 		struct l7_license_info li;
+
 		if (layer7_license_check(&li) == 0) {
 			fprintf(stderr,
 			    "layer7d: license valid — customer=%s "
 			    "expiry=%s features=%s\n",
 			    li.customer, li.expiry, li.features);
 			return 0;
-		} else {
-			fprintf(stderr,
-			    "layer7d: warning — downloaded license did not "
-			    "pass verification: %s\n",
-			    li.error);
-			return -1;
 		}
+
+		(void)unlink(L7_LIC_PATH);
+		fprintf(stderr,
+		    "layer7d: activation rejected — downloaded license did not "
+		    "pass verification: %s\n",
+		    li.error);
+		return -1;
 	}
 }

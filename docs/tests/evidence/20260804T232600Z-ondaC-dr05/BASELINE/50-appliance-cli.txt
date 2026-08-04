@@ -1,0 +1,208 @@
+# appliance-baseline
+utc_now=2026-08-04T23:26:48Z
+systemupfw.system.up
+
+# effective-user
+uid=0(root) gid=0(wheel) groups=0(wheel),5(operator),1999(admins)
+
+# file-permissions
+drwxr-xr-x  33 root wheel 92 Aug  4 19:45 /usr/local/etc
+ls: /var/db/layer7/layer7-stats.json: No such file or directory
+-rw-r--r--  1 root wheel 1054 Aug  4 20:26 /tmp/layer7-stats.json
+-rw-r--r--  1 root wheel  334 Jul 29 14:08 /usr/local/etc/layer7.lic
+-rw-r--r--  1 root wheel    4 Aug  4 20:23 /var/run/layer7d.pid
+
+# write-permissions
+license_writable=yes
+usr_local_etc_writable=yes
+
+# daemon-status
+layer7d is running as pid 7002.
+
+# daemon-process
+6794 daemon: /usr/local/sbin/layer7d[7002]
+7002 /usr/local/sbin/layer7d
+
+# kern.hostuuid
+f44d4d56-4a12-95c7-1099-1ebd8b33f579
+
+# ifconfig -a
+em0: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	options=48120b8<VLAN_MTU,VLAN_HWTAGGING,JUMBO_MTU,VLAN_HWCSUM,WOL_MAGIC,VLAN_HWFILTER,HWSTATS,MEXTPG>
+	ether 00:50:56:88:e1:33
+	inet6 fe80::250:56ff:fe88:e133%em0 prefixlen 64 scopeid 0x1
+	media: Ethernet autoselect (1000baseT <full-duplex>)
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+em1: flags=1008802<BROADCAST,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	options=4e524bb<RXCSUM,TXCSUM,VLAN_MTU,VLAN_HWTAGGING,JUMBO_MTU,VLAN_HWCSUM,LRO,WOL_MAGIC,VLAN_HWFILTER,VLAN_HWTSO,RXCSUM_IPV6,TXCSUM_IPV6,HWSTATS,MEXTPG>
+	ether 00:50:56:88:8b:3c
+	media: Ethernet autoselect (1000baseT <full-duplex>)
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+vmx0: flags=1008943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: LAN
+	options=48100b8<VLAN_MTU,VLAN_HWTAGGING,JUMBO_MTU,VLAN_HWCSUM,VLAN_HWFILTER,HWSTATS,MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet 192.168.100.254 netmask 0xffffff00 broadcast 192.168.100.255
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0 prefixlen 64 scopeid 0x3
+	inet6 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 prefixlen 64
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+em2: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	options=48120b8<VLAN_MTU,VLAN_HWTAGGING,JUMBO_MTU,VLAN_HWCSUM,WOL_MAGIC,VLAN_HWFILTER,HWSTATS,MEXTPG>
+	ether 00:50:56:88:43:05
+	inet6 fe80::250:56ff:fe88:4305%em2 prefixlen 64 scopeid 0x4
+	media: Ethernet autoselect (1000baseT <full-duplex>)
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+enc0: flags=1000041<UP,RUNNING,LOWER_UP> metric 0 mtu 1536
+	options=0
+	groups: enc
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+lo0: flags=1008049<UP,LOOPBACK,RUNNING,MULTICAST,LOWER_UP> metric 0 mtu 16384
+	options=680003<RXCSUM,TXCSUM,LINKSTATE,RXCSUM_IPV6,TXCSUM_IPV6>
+	inet 127.0.0.1 netmask 0x0
+	inet6 ::1 prefixlen 128
+	inet6 fe80::1%lo0 prefixlen 64 scopeid 0x6
+	groups: lo
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+pflog0: flags=100<PROMISC> metric 0 mtu 33152
+	options=0
+	groups: pflog
+pfsync0: flags=0 metric 0 mtu 1500
+	options=0
+	maxupd: 128 defer: off version: 1500
+	syncok: 1
+	groups: pfsync
+vmx0.95: flags=1008943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: Assistencia
+	options=4000000<MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet 192.168.95.254 netmask 0xffffff00 broadcast 192.168.95.255
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0.95 prefixlen 64 scopeid 0x9
+	groups: vlan
+	vlan: 95 vlanproto: 802.1q vlanpcp: 0 parent interface: vmx0
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+vmx0.10: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: Wifi_Clientes
+	options=4000000<MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet 10.0.85.1 netmask 0xffffff00 broadcast 10.0.85.255
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0.10 prefixlen 64 scopeid 0xa
+	groups: vlan
+	vlan: 10 vlanproto: 802.1q vlanpcp: 0 parent interface: vmx0
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+vmx0.50: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: Gerencia_SRV
+	options=4000000<MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet 172.18.25.1 netmask 0xffffff00 broadcast 172.18.25.255
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0.50 prefixlen 64 scopeid 0xb
+	groups: vlan
+	vlan: 50 vlanproto: 802.1q vlanpcp: 0 parent interface: vmx0
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+vmx0.52: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: ADMSistemas
+	options=4000000<MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet 192.168.52.1 netmask 0xfffffff0 broadcast 192.168.52.15
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0.52 prefixlen 64 scopeid 0xc
+	groups: vlan
+	vlan: 52 vlanproto: 802.1q vlanpcp: 0 parent interface: vmx0
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+vmx0.60: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	options=4000000<MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0.60 prefixlen 64 scopeid 0xd
+	groups: vlan
+	vlan: 60 vlanproto: 802.1q vlanpcp: 0 parent interface: vmx0
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+pppoe1: flags=10088d1<UP,POINTOPOINT,RUNNING,NOARP,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1492
+	description: MhNet
+	options=0
+	inet 45.238.165.154 --> 179.127.141.233 netmask 0xffffffff
+	inet6 fe80::250:56ff:fe88:e133%pppoe1 prefixlen 64 scopeid 0xe
+	inet6 fe80::50:56c9:88:e133%pppoe1 prefixlen 64 scopeid 0xe
+	inet6 2804:108c:db00:0:250:56ff:fe88:e133 prefixlen 64 autoconf pltime 21600 vltime 43200
+	nd6 options=23<PERFORMNUD,ACCEPT_RTADV,AUTO_LINKLOCAL>
+pppoe0: flags=10088d1<UP,POINTOPOINT,RUNNING,NOARP,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1492
+	description: P4Net
+	options=0
+	inet 177.38.10.224 --> 10.99.99.35 netmask 0xffffffff
+	inet6 fe80::250:56ff:fe88:a4f7%pppoe0 prefixlen 64 scopeid 0xf
+	inet6 2804:6c4:200:0:250:56ff:fe88:a4f7 prefixlen 128 pltime 172800 vltime 259200
+	nd6 options=23<PERFORMNUD,ACCEPT_RTADV,AUTO_LINKLOCAL>
+ovpns1: flags=1008043<UP,BROADCAST,RUNNING,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	options=4080000<LINKSTATE,MEXTPG>
+	inet 172.16.100.1 netmask 0xffffffc0 broadcast 172.16.100.63
+	inet6 fe80::250:56ff:fe88:e133%ovpns1 prefixlen 64 scopeid 0x10
+	groups: tun openvpn
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+	Opened by PID 28367
+ovpns3: flags=1008043<UP,BROADCAST,RUNNING,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	options=4080000<LINKSTATE,MEXTPG>
+	inet 172.254.254.1 netmask 0xfffffff8 broadcast 172.254.254.7
+	inet6 fe80::250:56ff:fe88:e133%ovpns3 prefixlen 64 scopeid 0x11
+	groups: tun openvpn
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+	Opened by PID 93071
+
+# fingerprint
+e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+
+# stats-json
+{
+  "version": "1.8.11_66",
+  "boot_time": 1785885783,
+  "uptime_seconds": 225,
+  "timestamp": 1785886008,
+  "total_classified": 6944,
+  "total_blocked": 0,
+  "total_allowed": 6944,
+  "policies_active": 2,
+  "exceptions": 0,
+  "enforce_mode": 0,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 0,
+  "dst_add_fail": 0,
+  "cap_pkts": 180713,
+  "cap_active": 4221,
+  "cap_classified": 6944,
+  "cap_expired": 4135,
+  "cap_evicted": 0,
+  "cap_dropped": 0,
+  "captures": 2,
+  "top_apps_blocked": [],
+  "top_sources_blocked": [],
+  "license_valid": true,
+  "license_expired": false,
+  "license_grace": false,
+  "license_dev_mode": false,
+  "license_days_left": 703,
+  "license_customer": "Systemup",
+  "license_expiry": "2028-07-08",
+  "license_hardware_id": "e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826",
+  "license_error": "",
+  "bl_enabled": false,
+  "bl_domains_loaded": 0,
+  "bl_categories_active": 0,
+  "bl_lookups": 0,
+  "bl_hits": 0,
+  "bl_dns_hits": 0,
+  "bl_sni_hits": 0,
+  "bl_rules_active": 0,
+  "bl_top_categories": []
+}

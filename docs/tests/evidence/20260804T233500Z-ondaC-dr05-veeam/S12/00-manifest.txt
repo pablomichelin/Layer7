@@ -1,0 +1,6 @@
+run_id=20260804T233500Z-ondaC-dr05-veeam
+scenario_code=S12
+license_id=5
+phases=before_expiry:2026-03-25,within_grace:2026-04-05,after_grace:2026-04-20
+veeam_backup=confirmado_operador_2026-08-04
+real_date_before=202608042331.38

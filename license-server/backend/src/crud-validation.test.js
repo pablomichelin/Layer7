@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
+  isLicenseExpired,
   normalizeStoredHardwareId,
   parseActivatePayload,
 } = require('./crud-validation');
@@ -69,4 +70,16 @@ test('normalizeStoredHardwareId returns null for unusable values', () => {
   assert.equal(normalizeStoredHardwareId(null), null);
   assert.equal(normalizeStoredHardwareId(''), null);
   assert.equal(normalizeStoredHardwareId('not-hardware'), null);
+});
+
+test('isLicenseExpired treats PostgreSQL Date expiry values as expired', () => {
+  assert.equal(
+    isLicenseExpired({ expiry: new Date('2026-03-31T00:00:00.000Z') }),
+    true
+  );
+});
+
+test('isLicenseExpired treats YYYY-MM-DD strings as expired', () => {
+  assert.equal(isLicenseExpired({ expiry: '2000-01-01' }), true);
+  assert.equal(isLicenseExpired({ expiry: '2999-12-31' }), false);
 });

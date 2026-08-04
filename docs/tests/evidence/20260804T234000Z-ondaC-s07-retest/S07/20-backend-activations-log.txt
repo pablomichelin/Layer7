@@ -1,0 +1,17 @@
+time="2026-08-04T20:41:55-03:00" level=warning msg="/opt/layer7-license/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+-[ RECORD 1 ]-+---------------------------
+id            | 37
+created_at    | 2026-08-04 23:41:54.775123
+result        | fail
+error_message | Licenca expirada.
+-[ RECORD 2 ]-+---------------------------
+id            | 36
+created_at    | 2026-08-04 23:41:54.395805
+result        | fail
+error_message | Licenca expirada.
+-[ RECORD 3 ]-+---------------------------
+id            | 35
+created_at    | 2026-08-04 23:37:00.499105
+result        | fail
+error_message | Licenca expirada.
+

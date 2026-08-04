@@ -9,6 +9,7 @@
 | **MacBook** | Pasta do projecto Layer7 (documentação + código) |
 | **FreeBSD** `192.168.100.12` | Builder — compila `.pkg`; backup **Veeam diário** |
 | **pfSense** `192.168.100.254` | Servidor de **produção** Systemup — testes manuais Layer7; backup **Veeam diário** |
+| **License server** `192.168.100.244` | Stack live PostgreSQL/Docker; backup **Veeam diário** |
 
 Rollback: **Veeam** (diário) + reinstalação de pacote via MANUAL-INSTALL.
 
@@ -31,7 +32,8 @@ Rollback: **Veeam** (diário) + reinstalação de pacote via MANUAL-INSTALL.
 
 ### 1. Veeam (principal)
 
-Backup diário do pfSense `192.168.100.254` e do builder `192.168.100.12`.
+Backup diário do pfSense `192.168.100.254`, do builder `192.168.100.12` e do
+license server `192.168.100.244` (confirmado operador `2026-08-04`).
 
 ### 2. Rollback por pacote (complementar)
 
@@ -51,7 +53,7 @@ Reinstalar versão anterior via [`MANUAL-INSTALL.md`](../10-license-server/MANUA
 | Campo | Valor |
 |-------|-------|
 | **Método de rollback** | Veeam diário + reinstalação pacote (MANUAL-INSTALL) |
-| **Backup infra** | Veeam — pfSense `254` + FreeBSD builder `12` |
+| **Backup infra** | Veeam — pfSense `254` + builder `12` + license server `244` |
 | **Versão pré-upgrade (baseline)** | `1.8.11_62` |
 | **Versão enforce de referência** | `1.8.11_24` |
 | **Backup XML pfSense** | Opcional — operador pode fazer antes da Onda A |

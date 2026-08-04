@@ -1,0 +1,26 @@
+time="2026-08-04T20:26:59-03:00" level=warning msg="/opt/layer7-license/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+-[ RECORD 1 ]-+-----------------------------------------------------------------
+id            | 27
+created_at    | 2026-08-04 23:26:58.997091
+result        | success
+hardware_id   | e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+error_message | 
+-[ RECORD 2 ]-+-----------------------------------------------------------------
+id            | 19
+created_at    | 2026-04-03 04:12:49.018421
+result        | fail
+hardware_id   | e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+error_message | License expired
+-[ RECORD 3 ]-+-----------------------------------------------------------------
+id            | 15
+created_at    | 2026-04-02 13:03:26.247898
+result        | fail
+hardware_id   | e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+error_message | License expired
+-[ RECORD 4 ]-+-----------------------------------------------------------------
+id            | 6
+created_at    | 2026-03-24 01:42:30.923261
+result        | success
+hardware_id   | e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+error_message | 
+

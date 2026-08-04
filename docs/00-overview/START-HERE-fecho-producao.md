@@ -11,7 +11,7 @@ plano mestre. O plano completo está em:
 
 | Campo | Valor esperado (`2026-08-04`) |
 |-------|-------------------------------|
-| Passo actual | `4.1` (Onda C — F3 DR-05) após Onda B PASS |
+| Passo actual | `4.2` / `5.1` — Onda C parcial (S07 FAIL; S08/S12 PASS); Veeam OK em `254`+`12`+`244` |
 | Candidato lab (gates) | **`1.8.11_66`** |
 | Canal `latest` | `1.8.11_66` |
 | Produção enforce | `1.8.11_24` (até GO Onda F) |

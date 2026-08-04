@@ -28,7 +28,7 @@ Pagina executiva de estado da F3.11 — responde se a campanha pode avancar.
 | acesso ao host `192.168.100.244` | `disponivel` — SSH confirmado, stack observada | nao |
 | PostgreSQL live | `disponivel` — schema de licenciamento e tabelas admin presentes no ambiente activo | nao |
 | credencial admin | `disponivel` — superficie admin alinhada; bootstrap e sessao observados no live | nao |
-| appliance pfSense `192.168.100.254` | `parcial` — SSH funcional, baseline exportado, daemon vivo confirmado por processo/stats, mas cenarios mutaveis ainda pendentes | sim (DR-05) |
+| appliance pfSense `192.168.100.254` | `parcial` — DR-05: S07 FAIL; S08/S12 PASS; S09/S13 PARTIAL (Veeam OK) | sim (S07 backend) |
 | inventario de licencas | `disponivel` — 4 licencas reais obtidas do live em 2026-04-03 | nao |
 
 ---
@@ -37,8 +37,8 @@ Pagina executiva de estado da F3.11 — responde se a campanha pode avancar.
 
 | Slot | ID | Cliente | Status | Expiry | Cenario |
 |------|----|---------|--------|--------|---------|
-| LIC-A | 8 | Compasi | `active` | 2026-12-31 | activacao valida em producao |
-| LIC-B | 7 | Systemup | `active` | 2033-10-24 | activacao longo prazo, mesmo hw que LIC-D |
+| LIC-A | 8 | Compasi | `revoked` | 2026-12-31 | revogada (live `2026-08-04`) |
+| LIC-B | 7 | Systemup | `revoked` | 2033-10-24 | activacao longo prazo; revogada `2026-07-29` |
 | LIC-C | 6 | Lasalle Agro | `revoked` | 2026-04-30 | revogacao real |
 | LIC-D | 5 | Lasalle | `active` (expirada por data) | 2026-03-31 | expiracao por data vs status |
 
@@ -92,6 +92,30 @@ Leitura operacional actual: o proximo passo sensato para destravar o
 helper `run-pfsense-gui-license-flow.sh`, inclusive no modo
 `--ssh-target <utilizador@host>` + `--gui-base https://127.0.0.1:9999`,
 sempre com `PHPSESSID` + `__csrf_magic` da mesma sessao viva.
+
+### Evidencia DR-05 campanha (`20260804T232600Z-ondaC-dr05`)
+
+- campanha executada com SSH `root@192.168.100.254` e backend live
+  `192.168.100.244`;
+- **S07 FAIL:** licenca ID 5 (expirada por data) activada com `HTTP 200` na
+  API publica; `layer7d` grava `.lic` apesar de verificacao local negativa;
+- **S09 PARTIAL:** backend ID 7 `revoked`; appliance offline mantem
+  `license_valid=true` com `.lic` local `2028-07-08`;
+- **S08/S12/S13 BLOCKED:** sem snapshot Veeam nem controlo de relogio nesta
+  janela;
+- veredicto: **F3 nao pode fechar** — ver
+  `docs/tests/evidence/20260804T232600Z-ondaC-dr05/`;
+- licenca de producao restaurada de `/root/layer7.lic.ondaC-backup`.
+
+### Evidencia DR-05 continuacao Veeam (`20260804T233500Z-ondaC-dr05-veeam`)
+
+- backup Veeam confirmado pelo operador para `254`, `12` e `244`;
+- **S08 PASS:** relogio `2026-04-10` com licenca ID 5 em grace
+  (`license_valid=true`, `license_grace=true`);
+- **S12 PASS:** tres fases (antes expiry, dentro grace, apos grace);
+- **S13 PARTIAL:** baseline `kern.hostuuid` + fingerprint; drift NIC/UUID
+  pendente janela dedicada;
+- rollback: relogio real + `.lic` Systemup restaurados.
 
 ### Evidencia DR-02 (obtida em 2026-04-03)
 
