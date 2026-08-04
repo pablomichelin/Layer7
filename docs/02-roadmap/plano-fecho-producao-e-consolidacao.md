@@ -500,3 +500,4 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-04 | Criação do plano mestre + START-HERE após análise híbrida read-only |
 | 2026-08-04b | Rev. alinhamento: candidato lab fixado `_65`; dual-canal; multitarefa com grafo de dependências; G0/G1 no passo 1.0; GO exige C–E PASS; docs gates/checklist/00-LEIA-ME sincronizados |
 | 2026-08-04c | Passo 1.1 PASS: candidato `_65` confirmado (SHA256 + GitHub `latest` + PORTREVISION=65); CORTEX avança para passo 1.2 |
+| 2026-08-04d | Passo 1.3 PASS: diagnose baseline appliance `_62`; passo 1.2 BLOQUEADO (snapshot ID hipervisor pendente) |

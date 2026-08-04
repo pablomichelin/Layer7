@@ -1,0 +1,109 @@
+========== l7-diag: host / OS ==========
+systemupfw.system.up
+FreeBSD systemupfw.system.up 16.0-CURRENT FreeBSD 16.0-CURRENT #12 plus-RELENG_26_03_1-n256546-1d1bfd578383: Wed May 20 15:20:10 UTC 2026     root@pfsense-build-release-amd64-2.eng.atx.netgate.com:/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/obj/amd64/fvF1vE9r/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/sources/FreeBSD-src-plus-RELENG_26_03_1/amd64.amd64/sys/pfSense amd64
+Tue Aug  4 19:10:24 -03 2026
+
+========== l7-diag: pacote / binario ==========
+pfSense-pkg-layer7-1.8.11_62
+--- layer7d -V ---
+1.8.11_62
+
+========== l7-diag: licenca (--license-status) ==========
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=703
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2028-07-08
+features=full
+ficheiro .lic: existe
+-rw-r--r--  1 root wheel 334 Jul 29 14:08 /usr/local/etc/layer7.lic
+
+========== l7-diag: layer7.json (mode / enabled / enforcement_model) ==========
+        "enabled": false,
+        "mode": "monitor",
+                "enabled": true,
+                "enabled": true,
+        "enforcement_model": "legacy_global",
+            "enabled": true,
+            "enabled": true,
+parsed: mode=monitor enabled=false enforcement_model=legacy_global
+
+========== l7-diag: layer7d (pid / stats) ==========
+pidfile: 34928
+processo: vivo
+stats: leitura passiva (sem sinal; use L7_DIAG_REFRESH_STATS=1 apenas em lab)
+--- stats JSON (inicio) ---
+{
+  "version": "1.8.11_62",
+  "boot_time": 1785507403,
+  "uptime_seconds": 373997,
+  "timestamp": 1785881400,
+  "total_classified": 0,
+  "total_blocked": 0,
+  "total_allowed": 0,
+  "policies_active": 2,
+  "exceptions": 0,
+  "enforce_mode": 0,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 0,
+  "dst_add_fail": 0,
+  "cap_pkts": 0,
+  "cap_active": 0,
+  "cap_classified": 0,
+  "cap_expired": 0,
+  "cap_evicted": 0,
+  "cap_dropped": 0,
+  "captures": 0,
+  "top_apps_blocked": [],
+  "top_sources_blocked": [],
+  "license_valid": true,
+  "license_expired": false,
+  "license_grace": false,
+  "license_dev_mode": false,
+  "license_days_left": 703,
+  "license_customer": "Systemup",
+  "license_expiry": "2028-07-08",
+  "license_hardware_id": "e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826",
+  "license_error": "",
+  "bl_enabled": false,
+  "bl_domains_loaded": 0,
+  "bl_categories_active": 0,
+  "bl_lookups": 0,
+  "bl_hits": 0,
+  "bl_dns_hits": 0,
+  "bl_sni_hits": 0,
+  "bl_rules_active": 0,
+  "bl_top_categories": []
+}
+
+
+========== l7-diag: pf regras (layer7) ==========
+
+========== l7-diag: tabelas PF ==========
+--- layer7_block ---
+
+--- layer7_block_dst ---
+
+--- layer7_tagged ---
+
+--- layer7_allow_dst ---
+   1.0.0.1
+   1.1.1.1
+   8.8.4.4
+   8.8.8.8
+
+--- layer7_pdst_* / layer7_psrc_* (scoped) ---
+=== layer7_pdst_1 ===
+
+--- layer7_bld_* (blacklists) ---
+
+========== l7-diag: logs layer7d (flow_decide / dns_block / enforce_block) ==========
+
+========== l7-diag: servico rc ==========
+layer7d is running as pid 34928.
+
+========== l7-diag: fim ==========

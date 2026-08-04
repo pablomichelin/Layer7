@@ -1241,8 +1241,11 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 - F7/BG-028: PENDENTE
 - R1-R12: 0/12
 - Passo 1.1: PASS (SHA256 verificado vs GitHub `latest` + `PORTREVISION=65`)
-- Próximo passo autorizado: 1.2 (snapshot appliance — requer humano)
-- Multitarefa activa: P1 — worker diagnose (1.3) pode correr em paralelo após 1.2 iniciado
+- Passo 1.3: PASS (diagnose baseline `20260804T220000Z-p1-baseline-appliance254`)
+- Passo 1.2: BLOQUEADO — snapshot ID pendente no hipervisor (ver `docs/08-lab/p1-snapshot-gate-b1.md`)
+- Appliance lab: `192.168.100.254` acessível; instalado `_62` (não `_65`); monitor passivo
+- Próximo passo autorizado: 1.2 (humano — criar snapshot e registar ID)
+- Multitarefa: 1.3 concluído em paralelo; Onda A bloqueada até 1.2 PASS
 ```
 
 ---
