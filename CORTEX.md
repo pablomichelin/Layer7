@@ -1221,31 +1221,28 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: 2.2
-- Onda: A (Gate B1 — PF parser G3)
-- Candidato lab: 1.8.11_65 (confirmado passo 1.1 — 2026-08-04)
+- Passo actual: 3.1
+- Onda: B (Gate two-client G5)
+- Candidato lab: 1.8.11_65 (confirmado)
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_65
 - G0-G1: PASS
-- G2: PASS (install passivo `_65` em `254`, 2026-08-04)
-- G3-G4: PENDENTE
-- G5: PENDENTE
+- G2: PASS (2026-08-04)
+- G3: PASS (2026-08-04, dry-run enforce snippet)
+- G4: PASS (2026-08-04, monitor activo)
+- G5: PENDENTE (requer dois clientes LAN)
 - G6-G7: PENDENTE
 - F3: ABERTA
 - F4: ABERTA
-- VIP §20: PENDENTE (execução appliance)
+- VIP §20: PENDENTE
 - CE: PENDENTE
 - GO humano (Onda F): NÃO
 - Produto pronto (Onda J): NÃO
-- F5 mínima: PENDENTE
-- F6: NÃO INICIADA
-- F7/BG-028: PENDENTE
-- R1-R12: 0/12
-- P1: CONCLUÍDA (1.1–1.3 PASS)
-- Passo 2.1: PASS (evidência `20260804T221500Z-ondaA-g2-install-65`)
-- Topologia: Mac=repo; builder=12 (Veeam); appliance=254 produção (Veeam)
-- Appliance: `_65` instalado; `enabled=false`; `mode=monitor`
-- Próximo passo autorizado: 2.2 (G3 — PF parser)
+- Onda A: **A-PASS** (G2–G4, passos 2.1–2.4)
+- P1: CONCLUÍDA
+- Appliance 254: `_65`, `enabled=true`, `mode=monitor` (captura activa)
+- Rollback: Veeam diário + MANUAL-INSTALL
+- Próximo passo autorizado: 3.1 (G5 two-client — requer 2 clientes LAN)
 - Modo: agente único
 ```
 

@@ -1,0 +1,77 @@
+# Layer7 PF snippet (package-managed): tables
+table <layer7_block> persist
+table <layer7_tagged> persist
+table <layer7_block_dst> persist
+table <layer7_allow_dst> persist
+
+
+# Layer7 managed policy/blacklist tables
+table <layer7_pdst_1> persist
+
+# Allowlist (Bloco 3) — destinos protegidos contra bloqueio.
+match inet to <layer7_allow_dst> tag L7ALLOW label "layer7:allow:dst"
+
+# Explicit allow por politica (destino aprendido em runtime).
+
+# Excecoes allow: somente destinos bloqueados pelo Layer7.
+
+# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.
+block drop quick inet from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src"
+block drop quick inet6 from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src6"
+
+# Bloqueio por destino (sites/apps bloqueados via policies).
+block drop quick inet to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst"
+block drop quick inet6 to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst6"
+
+# layer7_tagged permanece disponivel para regras manuais/encadeadas.
+
+# Anti-QUIC por interface — apenas destinos externos.
+block drop quick on vmx0 inet proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic:vmx0"
+block drop quick on vmx0 inet6 proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic6:vmx0"
+block drop quick on vmx0.95 inet proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic:vmx0.95"
+block drop quick on vmx0.95 inet6 proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic6:vmx0.95"
+---
+---
+{
+  "version": "1.8.11_65",
+  "boot_time": 1785882156,
+  "uptime_seconds": 28,
+  "timestamp": 1785882184,
+  "total_classified": 708,
+  "total_blocked": 0,
+  "total_allowed": 708,
+  "policies_active": 2,
+  "exceptions": 0,
+  "enforce_mode": 0,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 0,
+  "dst_add_fail": 0,
+  "cap_pkts": 25728,
+  "cap_active": 851,
+  "cap_classified": 708,
+  "cap_expired": 0,
+  "cap_evicted": 0,
+  "cap_dropped": 0,
+  "captures": 2,
+  "top_apps_blocked": [],
+  "top_sources_blocked": [],
+  "license_valid": true,
+  "license_expired": false,
+  "license_grace": false,
+  "license_dev_mode": false,
+  "license_days_left": 703,
+  "license_customer": "Systemup",
+  "license_expiry": "2028-07-08",
+  "license_hardware_id": "e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826",
+  "license_error": "",
+  "bl_enabled": false,
+  "bl_domains_loaded": 0,
+  "bl_categories_active": 0,
+  "bl_lookups": 0,
+  "bl_hits": 0,
+  "bl_dns_hits": 0,
+  "bl_sni_hits": 0,
+  "bl_rules_active": 0,
+  "bl_top_categories": []
+}

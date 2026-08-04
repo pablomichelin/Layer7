@@ -1,0 +1,32 @@
+# Layer7 PF snippet (package-managed): tables
+table <layer7_block> persist
+table <layer7_tagged> persist
+table <layer7_block_dst> persist
+table <layer7_allow_dst> persist
+
+
+# Layer7 managed policy/blacklist tables
+table <layer7_pdst_1> persist
+
+# Allowlist (Bloco 3) — destinos protegidos contra bloqueio.
+match inet to <layer7_allow_dst> tag L7ALLOW label "layer7:allow:dst"
+
+# Explicit allow por politica (destino aprendido em runtime).
+
+# Excecoes allow: somente destinos bloqueados pelo Layer7.
+
+# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.
+block drop quick inet from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src"
+block drop quick inet6 from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src6"
+
+# Bloqueio por destino (sites/apps bloqueados via policies).
+block drop quick inet to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst"
+block drop quick inet6 to <layer7_block_dst> ! tagged L7ALLOW label "layer7:block:dst6"
+
+# layer7_tagged permanece disponivel para regras manuais/encadeadas.
+
+# Anti-QUIC por interface — apenas destinos externos.
+block drop quick on vmx0 inet proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic:vmx0"
+block drop quick on vmx0 inet6 proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic6:vmx0"
+block drop quick on vmx0.95 inet proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic:vmx0.95"
+block drop quick on vmx0.95 inet6 proto udp to !<localsubnets> port 443 ! tagged L7ALLOW label "layer7:anti-quic6:vmx0.95"

@@ -1,0 +1,9 @@
+INFO: mode=monitor enabled=1
+PASS: PF sem block drop layer7 em modo monitor
+PASS: tabela layer7_block presente
+PASS: tabela layer7_block_dst presente
+PASS: tabela layer7_tagged presente
+PASS: tabela layer7_allow_dst presente
+PASS: layer7_block_dst vazia em monitor
+PASS: layer7d vivo pid=53628
+PASS: layer7-pfctl ensure ok em monitor

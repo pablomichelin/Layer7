@@ -11,7 +11,7 @@ plano mestre. O plano completo está em:
 
 | Campo | Valor esperado (`2026-08-04`) |
 |-------|-------------------------------|
-| Passo actual | `2.2` (Onda A — G3 PF parser) após passo 2.1 PASS |
+| Passo actual | `3.1` (Onda B — G5 two-client) após Onda A PASS |
 | Candidato lab (gates) | **`1.8.11_65`** |
 | Canal `latest` | `1.8.11_65` |
 | Produção enforce | `1.8.11_24` (até GO Onda F) |

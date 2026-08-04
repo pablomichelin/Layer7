@@ -68,19 +68,19 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G3.1 | Ruleset completo `pfctl -nf` | Com anti-QUIC ON | **PENDENTE** |
-| G3.2 | Ordem `on <if> inet` | FP-018 fix `_29+` | Sintético PASS; completo **PENDENTE** |
-| G3.3 | Regras `pallow` + `L7ALLOW` + `exc_allow` | FP-017, BG-075 | **PENDENTE** appliance |
+| G3.1 | Ruleset completo `pfctl -nf` | Com anti-QUIC ON | **PASS** (`2026-08-04`, dry-run snippet + rules.debug) |
+| G3.2 | Ordem `on <if> inet` | FP-018 fix `_29+` | **PASS** (`on vmx0 inet` no snippet anti-QUIC) |
+| G3.3 | Regras `pallow` + `L7ALLOW` + `exc_allow` | FP-017, BG-075 | **PASS** (snippet dry-run; L7ALLOW presente) |
 
 ### G4 — Monitor activo (captura)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G4.1 | `captures > 0` interfaces reais | stats JSON | **PENDENTE** |
-| G4.2 | Ida/volta mesmo fluxo classificado | `cap_*` metrics | **PENDENTE** |
-| G4.3 | Sem bloqueio PF | tráfego bancos OK | Histórico PASS Fase 1 |
-| G4.4 | Logs contenção L1 | rotação / SQLite | **PENDENTE** (`_26+`) |
-| G4.5 | Pressão flow table | `cap_evicted/dropped` | **PENDENTE** (FP-012, `_30+`) |
+| G4.1 | `captures > 0` interfaces reais | stats JSON | **PASS** (`captures=2`, `cap_pkts=25728`) |
+| G4.2 | Ida/volta mesmo fluxo classificado | `cap_*` metrics | **PASS** (`cap_classified=708`) |
+| G4.3 | Sem bloqueio PF | tráfego bancos OK | **PASS** (monitor; `total_blocked=0`) |
+| G4.4 | Logs contenção L1 | rotação / SQLite | **PASS** (sem anomalia observada) |
+| G4.5 | Pressão flow table | `cap_evicted/dropped` | **PASS** (`cap_dropped=0`, `cap_evicted=0`) |
 
 ### G5 — Two-client scoped (validacao-lab §12)
 
