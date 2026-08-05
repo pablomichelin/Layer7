@@ -327,7 +327,7 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-097 | curl activate/check-in sem timeout | Media | daemon/license | F4 | hang indefinido | P | Medio | **Concluido (`1.9.9`)** | `--connect-timeout 10 --max-time 30` |
 | BG-098 | `waitpid` sem retry EINTR em enforce | Media | daemon | F4 | falsos fails / zombies | P | Medio | **Concluido (`1.9.9`)** | `waitpid_retry` |
 | BG-099 | Update GUI: URL só prefixo `https://github.com/` | Media | GUI/release | F7 | admin instala `.pkg` de outro repo | P | Medio | **Concluido (`1.9.9`)** | restringir a `pablomichelin/Layer7/` |
-| BG-100 | Teto blacklist 8M entradas (OOM) | Media | daemon/blacklists | F4 | OOM com feed externo grande | M | Medio | Planeado | reduzir teto ou hard-cap com métrica; não mexer em `1.9.9` |
+| BG-100 | Teto blacklist 8M entradas (OOM) | Media | daemon/blacklists | F4 | OOM com feed externo grande | M | Medio | **Concluido (`1.9.12`)** | hard-cap 5M + `mem_percent` 5–50% de `hw.physmem` (clamp 128–1536 MB) + GUI; truncagem com WARN |
 | BG-101 | Revogação remota fail-open até offline max (~14d) | Baixa | licenciamento | F3 | design ADR-0021; janela longa se rede cortada | — | — | Documentado | não é bug; rever só com GO comercial |
 | BG-102 | Allowlist PF sem `match inet6` (L7ALLOW só inet) | Alta | package/PF | F4/hardening | IPs v6 na tabela allow_dst sem tag; block inet6 ignora allowlist | P | Alto | **Concluido (`1.9.10`)** | `layer7_pf_inet46_rules` + helper; smoke `pfctl -sr` PASS |
 | BG-103 | TOCTOU `pfctl -f /tmp/rules.debug` (check≠use) | Alta | daemon/package/PF | F4/hardening | ruleset arbitrário entre `stat` e `pfctl -f` | M | Alto | **Concluido (`1.9.11`)** | open+O_NOFOLLOW+fstat → `pfctl -f -` (stdin); PHP+helper+daemon |

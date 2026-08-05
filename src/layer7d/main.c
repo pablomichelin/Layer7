@@ -2828,9 +2828,14 @@ int main(int argc, char **argv)
 			s_bl_n_rules = bl_cfg.n_rules;
 
 			if (all_n > 0) {
+				struct l7_bl_limits lim;
+
+				memset(&lim, 0, sizeof(lim));
+				lim.max_entries = bl_cfg.max_entries;
+				lim.mem_percent = bl_cfg.mem_percent;
 				s_blacklist = l7_blacklist_load(
 				    L7_BL_DIR_DEFAULT, all_cats, all_n,
-				    bwl, bl_cfg.n_whitelist);
+				    bwl, bl_cfg.n_whitelist, &lim);
 			}
 			L7_NOTE("blacklists_startup: %d domains in "
 			    "%d categories, %d rules",
@@ -2980,10 +2985,18 @@ int main(int argc, char **argv)
 						bwl[ai] = bl_cfg.whitelist[ai];
 
 					if (all_n > 0) {
+						struct l7_bl_limits lim;
+
+						memset(&lim, 0, sizeof(lim));
+						lim.max_entries =
+						    bl_cfg.max_entries;
+						lim.mem_percent =
+						    bl_cfg.mem_percent;
 						new_bl = l7_blacklist_load(
 						    L7_BL_DIR_DEFAULT,
 						    all_cats, all_n,
-						    bwl, bl_cfg.n_whitelist);
+						    bwl, bl_cfg.n_whitelist,
+						    &lim);
 					}
 
 					if (new_bl || all_n == 0) {

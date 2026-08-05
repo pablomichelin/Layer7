@@ -32,6 +32,9 @@ struct l7_bl_config {
 	int n_whitelist;
 	struct l7_bl_rule rules[L7_BL_MAX_RULES];
 	int n_rules;
+	/* BG-100: limites de load (0 = default no daemon). */
+	int max_entries;
+	int mem_percent;
 };
 
 /*

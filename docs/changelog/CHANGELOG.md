@@ -2,6 +2,24 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.9.12] — 2026-08-05
+
+### Changed
+
+- **BG-100:** teto de blacklists `L7_BL_MAX_TOTAL` **5 000 000** (hard-cap);
+  orçamento de memória configurável por **% da RAM do appliance**
+  (`hw.physmem`, GUI 5–50%, default **25%**, clamp 128–1536 MB). O load para
+  no primeiro limite (contagem ou bytes) com WARN claro e continua a correr.
+  Campos em `blacklists/config.json`: `max_entries`, `mem_percent`. Aviso na
+  GUI se a soma das categorias activas exceder o teto.
+
+### Notes
+
+- Canal `latest`: **`1.9.12`** (SHA após build). Produção enforce permanece
+  **`1.9.8`** até GO.
+- Rollback lab: `1.9.11`.
+- Em appliances ≤4 GB RAM, preferir poucas categorias; `adult` sozinha ~4.6 M.
+
 ## [1.9.11] — 2026-08-05
 
 ### Security

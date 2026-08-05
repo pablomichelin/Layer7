@@ -241,10 +241,14 @@ if (isset($_POST["save_settings"])) {
 	if ($hours < 1) $hours = 1;
 	if ($hours > 168) $hours = 168;
 	$bl_config["update_interval_hours"] = $hours;
+	$bl_config["max_entries"] = (int)($_POST["max_entries"] ?? 5000000);
+	$bl_config["mem_percent"] = (int)($_POST["mem_percent"] ?? 25);
+	$bl_config = layer7_bl_normalize_resource_limits($bl_config);
 	if (!layer7_bl_config_save($bl_config)) {
 		$input_errors[] = l7_t("Nao foi possivel guardar as definicoes.");
 	} else {
 		layer7_bl_setup_cron($bl_config["auto_update"], $hours);
+		layer7_bl_apply();
 		$savemsg = l7_t("Definicoes guardadas.");
 	}
 }
@@ -260,6 +264,26 @@ $runtime_state = layer7_bl_runtime_state_load();
 $fallback_state = layer7_bl_fallback_state_load();
 $lkg_state = layer7_bl_lkg_state_load();
 $rules = isset($bl_config["rules"]) && is_array($bl_config["rules"]) ? $bl_config["rules"] : array();
+$bl_config = layer7_bl_normalize_resource_limits($bl_config);
+$bl_phys = layer7_bl_physmem_bytes();
+$bl_budget = layer7_bl_mem_budget_bytes((int)$bl_config["mem_percent"]);
+$bl_max_entries = (int)$bl_config["max_entries"];
+/* Contagem única aproximada: categorias activas em qualquer regra (sem dup). */
+$bl_union_cats = array();
+foreach ($rules as $_r) {
+	if (empty($_r["enabled"]) || empty($_r["categories"]) || !is_array($_r["categories"])) {
+		continue;
+	}
+	foreach ($_r["categories"] as $_cid) {
+		$bl_union_cats[strtolower((string)$_cid)] = true;
+	}
+}
+$bl_union_domains = 0;
+foreach ($merged_categories as $_cat) {
+	if (isset($bl_union_cats[$_cat["id"]])) {
+		$bl_union_domains += (int)$_cat["domains_count"];
+	}
+}
 
 $edit_idx = -1;
 if (isset($_GET["edit"])) {
@@ -690,6 +714,49 @@ $cat_form_sites = $_cat_editing && isset($custom_map[$cat_edit]) ? implode("\n",
 	<input type="number" class="form-control" name="update_interval_hours"
 		value="<?=(int)($bl_config["update_interval_hours"] ?? 24)?>"
 		min="1" max="168" style="width:100px;">
+</div>
+<hr>
+<h4><?=l7_t("Recursos (memoria / teto de dominios)")?></h4>
+<?php if ($bl_union_domains > $bl_max_entries): ?>
+<div class="alert alert-warning">
+	<i class="fa fa-exclamation-triangle"></i>
+	<?=l7_t("As categorias activas somam aproximadamente")?>
+	<strong><?=number_format($bl_union_domains, 0, ',', '.')?></strong>
+	<?=l7_t("dominios, acima do teto configurado")?>
+	(<strong><?=number_format($bl_max_entries, 0, ',', '.')?></strong>).
+	<?=l7_t("O load pode truncar; preferir so as categorias necessarias, sobretudo em appliances com pouca RAM.")?>
+</div>
+<?php elseif ($bl_union_domains > 3000000): ?>
+<div class="alert alert-info">
+	<i class="fa fa-info-circle"></i>
+	<?=l7_t("Categorias activas ~")?>
+	<?=number_format($bl_union_domains, 0, ',', '.')?>
+	<?=l7_t("dominios. Em appliances ≤4 GB RAM, active apenas o necessario (ex.: adult sozinha ja e pesada).")?>
+</div>
+<?php endif; ?>
+<div class="form-group">
+	<label><?=l7_t("Teto maximo de dominios em memoria")?></label>
+	<input type="number" class="form-control" name="max_entries"
+		value="<?=(int)$bl_max_entries?>"
+		min="1000000" max="5000000" step="100000" style="width:160px;">
+	<p class="help-block">
+		<?=l7_t("Hard-cap do produto: 5 000 000. Default 5 000 000 (cabe UT1 adult ~4,6M). O daemon trunca com WARN ao atingir o teto.")?>
+	</p>
+</div>
+<div class="form-group">
+	<label><?=l7_t("Limite de memoria da blacklist (% da RAM do appliance)")?></label>
+	<input type="number" class="form-control" name="mem_percent"
+		value="<?=(int)($bl_config["mem_percent"] ?? 25)?>"
+		min="5" max="50" style="width:100px;">
+	<p class="help-block">
+		<?=l7_t("Percentagem de hw.physmem reservavel ao load (5–50%, default 25%). Clamp interno: minimo 128 MB, maximo 1536 MB. O load para no primeiro limite (contagem ou bytes).")?>
+		<?php if ($bl_phys > 0): ?>
+		<br><?=l7_t("RAM detectada")?>:
+		<strong><?=number_format($bl_phys / (1024*1024), 0, ',', '.')?> MB</strong>
+		— <?=l7_t("orcamento estimado")?>:
+		<strong><?=number_format($bl_budget / (1024*1024), 0, ',', '.')?> MB</strong>
+		<?php endif; ?>
+	</p>
 </div>
 <div class="layer7-form-card__actions">
 	<button type="submit" name="save_settings" class="btn btn-primary">

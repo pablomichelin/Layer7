@@ -96,6 +96,21 @@ else
 	fail "test_dns_corr compile"
 fi
 
+step "Unit: BL limits / truncate (BG-100)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_bl_limits \
+    tests/functional/test_bl_limits.c src/layer7d/blacklist.c \
+    2>/tmp/test_bl_limits.cc.err; then
+	if /tmp/test_bl_limits; then
+		pass "test_bl_limits"
+	else
+		fail "test_bl_limits runtime"
+	fi
+else
+	cat /tmp/test_bl_limits.cc.err
+	fail "test_bl_limits compile"
+fi
+
 step "Unit: log_store (rotacao limitada)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_log_store \

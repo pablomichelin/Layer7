@@ -5963,8 +5963,86 @@ function layer7_bl_config_defaults()
 		"update_interval_hours" => 24,
 		"whitelist" => array(),
 		"rules" => array(),
-		"category_custom" => array()
+		"category_custom" => array(),
+		/* BG-100: limites de load (daemon). */
+		"max_entries" => 5000000,
+		"mem_percent" => 25
 	);
+}
+
+/**
+ * RAM física do appliance (hw.physmem). 0 se indisponível.
+ */
+function layer7_bl_physmem_bytes()
+{
+	$out = array();
+	$rc = 1;
+	@exec("/sbin/sysctl -n hw.physmem 2>/dev/null", $out, $rc);
+	if ($rc !== 0 || empty($out[0]) || !ctype_digit(trim($out[0]))) {
+		return 0;
+	}
+	return (int)trim($out[0]);
+}
+
+/**
+ * Clamp GUI/daemon: max_entries 1M–5M, mem_percent 5–50.
+ */
+function layer7_bl_normalize_resource_limits($config)
+{
+	if (!is_array($config)) {
+		$config = array();
+	}
+	$max = isset($config["max_entries"]) ? (int)$config["max_entries"] : 5000000;
+	if ($max <= 0) {
+		$max = 5000000;
+	}
+	if ($max < 1000000) {
+		$max = 1000000;
+	}
+	if ($max > 5000000) {
+		$max = 5000000;
+	}
+	$pct = isset($config["mem_percent"]) ? (int)$config["mem_percent"] : 25;
+	if ($pct <= 0) {
+		$pct = 25;
+	}
+	if ($pct < 5) {
+		$pct = 5;
+	}
+	if ($pct > 50) {
+		$pct = 50;
+	}
+	$config["max_entries"] = $max;
+	$config["mem_percent"] = $pct;
+	return $config;
+}
+
+/**
+ * Orçamento de bytes BL (mesmo clamp do daemon: min 128MB, max 1536MB).
+ */
+function layer7_bl_mem_budget_bytes($mem_percent)
+{
+	$pct = (int)$mem_percent;
+	if ($pct < 5) {
+		$pct = 5;
+	}
+	if ($pct > 50) {
+		$pct = 50;
+	}
+	$phys = layer7_bl_physmem_bytes();
+	$min_b = 128 * 1024 * 1024;
+	$max_b = 1536 * 1024 * 1024;
+	if ($phys <= 0) {
+		return $max_b;
+	}
+	$budget = (int)(($phys * $pct) / 100);
+	if ($budget < $min_b) {
+		$budget = $min_b;
+	}
+	if ($budget > $max_b) {
+		$budget = $max_b;
+	}
+	return $budget;
 }
 
 function layer7_bl_config_load()
@@ -5989,7 +6067,7 @@ function layer7_bl_config_load()
 	}
 	$data["source_url"] = layer7_bl_normalize_source_url($data["source_url"] ?? "");
 	$data["mirror_urls"] = layer7_bl_official_mirror_urls();
-	return $data;
+	return layer7_bl_normalize_resource_limits($data);
 }
 
 function layer7_bl_config_save($config)
@@ -6000,6 +6078,7 @@ function layer7_bl_config_save($config)
 	@chown(L7_BL_DIR, "www");
 	@chgrp(L7_BL_DIR, "wheel");
 	@chmod(L7_BL_DIR, 0775);
+	$config = layer7_bl_normalize_resource_limits($config);
 	$config["source_url"] = layer7_bl_normalize_source_url($config["source_url"] ?? "");
 	$config["mirror_urls"] = layer7_bl_official_mirror_urls();
 	$json = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);

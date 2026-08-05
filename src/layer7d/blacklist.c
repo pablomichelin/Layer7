@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
 
 /* Logging — reutiliza as macros do daemon se disponíveis, senão syslog */
 #ifndef L7_NOTE
@@ -43,6 +45,11 @@ struct l7_blacklist {
 	unsigned long long cat_hits[L7_BL_MAX_CATS];
 	int n_whitelist;
 	char **whitelist;
+	int max_entries;
+	size_t bytes_used;
+	size_t bytes_budget;
+	int truncated;
+	char truncate_reason[64];
 };
 
 /* --- FNV-1a hash ----------------------------------------------------- */
@@ -96,6 +103,84 @@ domain_valid(const char *d)
 			has_dot = 1;
 	}
 	return has_dot;
+}
+
+/* --- Limits / memory budget (BG-100) --------------------------------- */
+
+int
+l7_bl_clamp_max_entries(int v)
+{
+	if (v <= 0)
+		return L7_BL_MAX_TOTAL_DEFAULT;
+	if (v < 1)
+		return 1; /* piso técnico mínimo (GUI recomenda ≥1M) */
+	if (v > L7_BL_MAX_TOTAL_HARD)
+		return L7_BL_MAX_TOTAL_HARD;
+	return v;
+}
+
+int
+l7_bl_clamp_mem_percent(int v)
+{
+	if (v <= 0)
+		return L7_BL_MEM_PERCENT_DEFAULT;
+	if (v < L7_BL_MEM_PERCENT_MIN)
+		return L7_BL_MEM_PERCENT_MIN;
+	if (v > L7_BL_MEM_PERCENT_MAX)
+		return L7_BL_MEM_PERCENT_MAX;
+	return v;
+}
+
+size_t
+l7_bl_compute_mem_budget(int mem_percent)
+{
+	unsigned long long phys = 0;
+	size_t len = sizeof(phys);
+	size_t budget;
+	size_t min_b = (size_t)L7_BL_MEM_BUDGET_MIN_MB * 1024ULL * 1024ULL;
+	size_t max_b = (size_t)L7_BL_MEM_BUDGET_MAX_MB * 1024ULL * 1024ULL;
+
+	mem_percent = l7_bl_clamp_mem_percent(mem_percent);
+	if (sysctlbyname("hw.physmem", &phys, &len, NULL, 0) != 0 ||
+	    phys == 0) {
+		/* Fallback conservador: usar o teto MB max como base. */
+		phys = (unsigned long long)L7_BL_MEM_BUDGET_MAX_MB *
+		    1024ULL * 1024ULL * 100ULL / (unsigned long long)mem_percent;
+	}
+	budget = (size_t)((phys * (unsigned long long)mem_percent) / 100ULL);
+	if (budget < min_b)
+		budget = min_b;
+	if (budget > max_b)
+		budget = max_b;
+	return budget;
+}
+
+static int
+bl_at_limit(const struct l7_blacklist *bl)
+{
+	if (!bl)
+		return 1;
+	if (bl->n_entries >= bl->max_entries)
+		return 1;
+	if (bl->bytes_budget > 0 && bl->bytes_used >= bl->bytes_budget)
+		return 1;
+	return 0;
+}
+
+static void
+bl_mark_truncated(struct l7_blacklist *bl, const char *reason,
+    const char *detail)
+{
+	if (!bl || bl->truncated)
+		return;
+	bl->truncated = 1;
+	snprintf(bl->truncate_reason, sizeof(bl->truncate_reason), "%s",
+	    reason ? reason : "limit");
+	L7_WARN("bl_load: truncating at entries=%d bytes=%zu/%zu reason=%s%s%s",
+	    bl->n_entries, bl->bytes_used, bl->bytes_budget,
+	    bl->truncate_reason,
+	    detail && *detail ? " detail=" : "",
+	    detail ? detail : "");
 }
 
 /* --- Count labels in a domain ---------------------------------------- */
@@ -155,8 +240,9 @@ insert_domain(struct l7_blacklist *bl, const char *raw_domain, uint8_t cat_idx)
 	struct l7_bl_entry *e;
 	size_t dlen;
 	uint64_t cat_bit;
+	size_t need;
 
-	if (bl->n_entries >= L7_BL_MAX_TOTAL)
+	if (bl_at_limit(bl))
 		return -1;
 	if (cat_idx >= L7_BL_MAX_CATS)
 		return -1;
@@ -182,9 +268,21 @@ insert_domain(struct l7_blacklist *bl, const char *raw_domain, uint8_t cat_idx)
 	}
 
 	dlen = strlen(norm);
-	e = malloc(sizeof(*e) + dlen + 1);
+	need = sizeof(*e) + dlen + 1;
+	if (bl->bytes_budget > 0 &&
+	    bl->bytes_used + need > bl->bytes_budget) {
+		bl_mark_truncated(bl, "mem_budget", NULL);
+		return -1;
+	}
+	if (bl->n_entries >= bl->max_entries) {
+		bl_mark_truncated(bl, "max_entries", NULL);
+		return -1;
+	}
+
+	e = malloc(need);
 	if (!e) {
 		L7_ERROR("bl_insert: out of memory");
+		bl_mark_truncated(bl, "oom", NULL);
 		return -1;
 	}
 	e->domain = (char *)(e + 1);
@@ -193,6 +291,7 @@ insert_domain(struct l7_blacklist *bl, const char *raw_domain, uint8_t cat_idx)
 	e->next = bl->buckets[bucket];
 	bl->buckets[bucket] = e;
 	bl->n_entries++;
+	bl->bytes_used += need;
 	return 0;
 }
 
@@ -221,9 +320,10 @@ load_domains_file(struct l7_blacklist *bl, const char *path, uint8_t cat_idx)
 		if (line[0] == '\0' || line[0] == '#')
 			continue;
 
-		if (bl->n_entries >= L7_BL_MAX_TOTAL) {
-			L7_WARN("bl_load: max entries reached (%d), "
-			    "skipping rest of %s", L7_BL_MAX_TOTAL, path);
+		if (bl_at_limit(bl)) {
+			bl_mark_truncated(bl,
+			    bl->n_entries >= bl->max_entries ?
+			    "max_entries" : "mem_budget", path);
 			break;
 		}
 
@@ -295,17 +395,23 @@ is_whitelisted(const struct l7_blacklist *bl, const char *domain)
 
 struct l7_blacklist *
 l7_blacklist_load(const char *dir, const char **cats, int n_cats,
-    const char **whitelist, int n_whitelist)
+    const char **whitelist, int n_whitelist,
+    const struct l7_bl_limits *limits)
 {
 	struct l7_blacklist *bl;
 	int i, loaded;
 	char path[512];
 	char custom_path[512];
+	int max_entries;
+	int mem_percent;
 
 	if (!dir || !cats || n_cats <= 0)
 		return NULL;
 	if (n_cats > L7_BL_MAX_CATS)
 		n_cats = L7_BL_MAX_CATS;
+
+	max_entries = l7_bl_clamp_max_entries(limits ? limits->max_entries : 0);
+	mem_percent = l7_bl_clamp_mem_percent(limits ? limits->mem_percent : 0);
 
 	bl = calloc(1, sizeof(*bl));
 	if (!bl) {
@@ -313,12 +419,20 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 		return NULL;
 	}
 
+	bl->max_entries = max_entries;
+	bl->bytes_budget = l7_bl_compute_mem_budget(mem_percent);
+
 	bl->buckets = calloc(L7_BL_HASH_SIZE, sizeof(struct l7_bl_entry *));
 	if (!bl->buckets) {
 		L7_ERROR("bl_load: out of memory (buckets)");
 		free(bl);
 		return NULL;
 	}
+	bl->bytes_used = (size_t)L7_BL_HASH_SIZE * sizeof(struct l7_bl_entry *);
+
+	L7_NOTE("bl_load: limits max_entries=%d mem_percent=%d "
+	    "budget_bytes=%zu (hash_table=%zu)",
+	    bl->max_entries, mem_percent, bl->bytes_budget, bl->bytes_used);
 
 	setup_whitelist(bl, whitelist, n_whitelist);
 
@@ -328,6 +442,17 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 			L7_WARN("bl_load: skipping invalid category '%s'",
 			    cats[i] ? cats[i] : "(null)");
 			continue;
+		}
+
+		if (bl_at_limit(bl)) {
+			bl_mark_truncated(bl,
+			    bl->n_entries >= bl->max_entries ?
+			    "max_entries" : "mem_budget",
+			    cats[i]);
+			L7_WARN("bl_load: skipping remaining categories "
+			    "after '%s' (entries=%d cats_loaded=%d)",
+			    cats[i], bl->n_entries, bl->n_cats);
+			break;
 		}
 
 		snprintf(path, sizeof(path), "%s/%s/domains", dir, cats[i]);
@@ -365,9 +490,11 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 		    cats[i], loaded);
 		bl->n_cats++;
 
-		if (bl->n_entries >= L7_BL_MAX_TOTAL) {
-			L7_WARN("bl_load: max total entries reached (%d)",
-			    L7_BL_MAX_TOTAL);
+		if (bl_at_limit(bl)) {
+			bl_mark_truncated(bl,
+			    bl->n_entries >= bl->max_entries ?
+			    "max_entries" : "mem_budget",
+			    cats[i]);
 			break;
 		}
 	}
@@ -377,6 +504,15 @@ l7_blacklist_load(const char *dir, const char **cats, int n_cats,
 		    bl->n_cats, bl->n_entries);
 		l7_blacklist_free(bl);
 		return NULL;
+	}
+
+	if (bl->truncated) {
+		L7_WARN("bl_load: finished truncated entries=%d/%d "
+		    "bytes=%zu/%zu cats=%d reason=%s — prefer fewer "
+		    "active categories on low-RAM appliances",
+		    bl->n_entries, bl->max_entries,
+		    bl->bytes_used, bl->bytes_budget, bl->n_cats,
+		    bl->truncate_reason);
 	}
 
 	return bl;
@@ -531,6 +667,24 @@ l7_blacklist_cat_count(const struct l7_blacklist *bl)
 	if (!bl)
 		return 0;
 	return bl->n_cats;
+}
+
+int
+l7_blacklist_was_truncated(const struct l7_blacklist *bl)
+{
+	return (bl && bl->truncated) ? 1 : 0;
+}
+
+size_t
+l7_blacklist_bytes_used(const struct l7_blacklist *bl)
+{
+	return bl ? bl->bytes_used : 0;
+}
+
+size_t
+l7_blacklist_bytes_budget(const struct l7_blacklist *bl)
+{
+	return bl ? bl->bytes_budget : 0;
 }
 
 const char *

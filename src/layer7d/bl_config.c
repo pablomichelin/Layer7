@@ -114,6 +114,28 @@ parse_string(const char **p, char *dst, size_t dstsize)
 }
 
 static int
+parse_int_val(const char **p, int *out)
+{
+	int v = 0;
+	int digits = 0;
+
+	skip_ws(p);
+	if (**p < '0' || **p > '9')
+		return -1;
+	while (**p >= '0' && **p <= '9') {
+		if (v > 200000000)
+			return -1;
+		v = v * 10 + (**p - '0');
+		(*p)++;
+		digits = 1;
+	}
+	if (!digits)
+		return -1;
+	*out = v;
+	return 0;
+}
+
+static int
 parse_string_array(const char **p, char arr[][L7_BL_DOMAIN_MAX],
     int max, int item_max)
 {
@@ -440,6 +462,10 @@ l7_bl_config_load(const char *path, struct l7_bl_config *cfg)
 		} else if (match_key(&p, "except_ips")) {
 			old_n_except = parse_ip_array(&p,
 			    old_except, 64);
+		} else if (match_key(&p, "max_entries")) {
+			(void)parse_int_val(&p, &cfg->max_entries);
+		} else if (match_key(&p, "mem_percent")) {
+			(void)parse_int_val(&p, &cfg->mem_percent);
 		} else {
 			skip_unknown_kv(&p);
 		}

@@ -35,20 +35,19 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.11` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.11`,
-`SHA256=dde1e17b00820d56bbee231087f92a4552da73dc00ea18820d17750ad35cd1be`;
-BG-103 TOCTOU `rules.debug` + BG-104 DNS corr/allowlist; comandos em
+`1.9.12` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.12`;
+BG-100 teto 5M + orçamento % RAM; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
 ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
-Rollback lab a partir de `1.9.11`: **`1.9.10`**. Historico: `_69`, `_24`.
+Rollback lab a partir de `1.9.12`: **`1.9.11`**. Historico: `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
 Trilha IPv6: **FECHADA** (V0–V6; GV7.4 PASS).
 **Congelamento documental das filas:** 
 [`docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
-**Hardening:** `1.9.9`…`1.9.11` (BG-093…104); **não** misturar com Identity+MITM.
+**Hardening:** `1.9.9`…`1.9.12` (BG-093…104 + BG-100); **não** misturar com Identity+MITM.
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1490,15 +1489,15 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.11** (SHA256 dde1e17b…; BG-103/104)
+- Canal publico latest: **1.9.12** (BG-100 teto 5M + % RAM)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo 20.2/IM0 (ADRs Aceito + T1/T2); arranque docs/00-overview/START-HERE-identity-mitm.md
-- Hardening: **1.9.9**…**1.9.11** publicados; não misturar com IM1
+- Hardening: **1.9.9**…**1.9.12** publicados; não misturar com IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: GO promoção enforce 1.9.11 **ou** Identity+MITM 20.2; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: GO promoção enforce 1.9.12 **ou** Identity+MITM 20.2; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
