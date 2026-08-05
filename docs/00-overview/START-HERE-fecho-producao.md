@@ -21,15 +21,15 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Campo | Valor |
 |-------|-------|
 | **Trilha activa** | **IPv6** — Ondas V0–V6 |
-| **Passo autorizado** | Smoke appliance `layer7_localnets` em **1.9.4**; depois GO `pass inet6` LAN (GV4) ou V5 |
-| **BG activo** | BG-083 **adiado temporário**; GV1.6 fechado em **1.9.4** |
+| **Passo autorizado** | FIX aprendizagem IPv6→`pdst` **ou** retomar **12.10/V5** com GO |
+| **BG activo** | BG-083 adiado; gap A3 (AAAA/SNI→pdst) |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
 | Candidato lab / `latest` | **`1.9.4`** (GV1.6 `layer7_localnets`; SHA256 `43f75461…`) |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 — **V5 Opção B temporária** (`2026-08-05`); retomar Opção A depois |
 | Ressalva V5 | DNS/block page/VIP DNS v6 **ainda não**; **voltar a fazer bem** (12.10–12.11) |
-| Última evidência GV | `20260805T110000Z-gv-ipv6-1.9.3` — GV1.3/GV3 PASS; GV1.6 fechado em `1.9.4` |
-| Próximo gate | Smoke GV1.6 appliance + **GV4.1** (após allow IPv6 LAN) |
+| Última evidência GV | `20260805T113500Z-gv4-ipv6-1.9.4` — PF scoped v6 PASS; auto-pdst gap |
+| Próximo gate | Fechar GV4.1 automático **ou** V5 |
 | F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
 
 ### Desambiguação obrigatória — «12.x»
