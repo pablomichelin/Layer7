@@ -36,7 +36,7 @@ test('buildLicenseFormState uses safe defaults for optional license fields', () 
     {
       customer_id: '',
       expiry: '',
-      features: 'full',
+      features: 'base',
       notes: '',
     }
   );
@@ -47,13 +47,13 @@ test('buildLicenseSavePayload preserves the API payload expected by the backend'
     buildLicenseSavePayload({
       customer_id: '11',
       expiry: '2033-10-24',
-      features: 'full',
+      features: 'base,identity',
       notes: '',
     }),
     {
       customer_id: 11,
       expiry: '2033-10-24',
-      features: 'full',
+      features: 'base,identity',
       notes: '',
     }
   );

@@ -543,7 +543,7 @@ router.get('/:id/download', async (req, res) => {
       hardware_id: effectiveHardwareId,
       expiry: new Date(license.expiry).toISOString().slice(0, 10),
       customer: license.customer_name || 'Unknown',
-      features: license.features || 'full',
+      features: license.features || 'base',
     });
 
     res.setHeader('Content-Type', 'application/json');

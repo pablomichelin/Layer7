@@ -19,7 +19,7 @@ test('listChangedLicenseFields detects changed mutable fields', () => {
     {
       customerId: 2,
       expiry: '2034-01-01',
-      features: 'reports',
+      features: 'base,identity',
       notes: 'new',
     }
   );
@@ -27,7 +27,7 @@ test('listChangedLicenseFields detects changed mutable fields', () => {
   assert.deepEqual(changedFields, ['customer_id', 'expiry', 'features', 'notes']);
 });
 
-test('listChangedLicenseFields treats missing features as full', () => {
+test('listChangedLicenseFields treats missing features as base', () => {
   const changedFields = listChangedLicenseFields(
     {
       customer_id: 1,
@@ -36,7 +36,7 @@ test('listChangedLicenseFields treats missing features as full', () => {
       notes: null,
     },
     {
-      features: 'full',
+      features: 'base',
     }
   );
 

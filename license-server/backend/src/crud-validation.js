@@ -6,6 +6,11 @@ const LICENSE_KEY_PATTERN = /^[a-f0-9]{32}$/i;
 const HARDWARE_ID_PATTERN = /^[a-f0-9]{64}$/i;
 const FEATURE_TOKEN_PATTERN = /^[a-z0-9][a-z0-9_-]{0,31}$/i;
 const LICENSE_STATUSES = new Set(['active', 'expired', 'revoked']);
+/** ADR-0025 P1: CSV features ≤ 63 bytes úteis (buffer daemon 64 com NUL). */
+const FEATURES_MAX_BYTES = 63;
+/** Tokens emitíveis (SKU X/Y + legado full). */
+const KNOWN_FEATURE_TOKENS = new Set(['base', 'identity', 'mitm', 'full']);
+const FEATURE_CANONICAL_ORDER = ['base', 'identity', 'mitm'];
 
 function ensureObject(payload, message = 'Payload invalido.') {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
@@ -166,13 +171,19 @@ function parseIsoDate(value, fieldName) {
   return normalized;
 }
 
-function normalizeFeatures(value, { defaultValue = 'full' } = {}) {
-  const rawValue = value === undefined || value === null || value === '' ? defaultValue : value;
+function normalizeFeatures(value, { defaultValue = 'base' } = {}) {
+  const rawValue = value === undefined || value === null || value === ''
+    ? defaultValue
+    : value;
   let tokens = [];
 
   if (Array.isArray(rawValue)) {
     tokens = rawValue;
   } else if (typeof rawValue === 'string') {
+    if (Buffer.byteLength(rawValue, 'utf8') > FEATURES_MAX_BYTES) {
+      throw createHttpError(400,
+        `Features excedem ${FEATURES_MAX_BYTES} bytes (ADR-0025 P1).`);
+    }
     tokens = rawValue.split(',').map((token) => token.trim()).filter(Boolean);
   } else {
     throw createHttpError(400, 'Features invalidas.');
@@ -182,7 +193,7 @@ function normalizeFeatures(value, { defaultValue = 'full' } = {}) {
     throw createHttpError(400, 'Features invalidas.');
   }
 
-  const normalizedTokens = [];
+  const seen = new Set();
   for (const token of tokens) {
     if (typeof token !== 'string') {
       throw createHttpError(400, 'Features invalidas.');
@@ -192,13 +203,40 @@ function normalizeFeatures(value, { defaultValue = 'full' } = {}) {
     if (!FEATURE_TOKEN_PATTERN.test(normalizedToken)) {
       throw createHttpError(400, 'Features invalidas.');
     }
+    if (!KNOWN_FEATURE_TOKENS.has(normalizedToken)) {
+      throw createHttpError(400,
+        `Features invalidas: token desconhecido "${normalizedToken}". `
+        + 'Permitidos: base, identity, mitm (legado: full).');
+    }
+    seen.add(normalizedToken);
+  }
 
-    if (!normalizedTokens.includes(normalizedToken)) {
-      normalizedTokens.push(normalizedToken);
+  /*
+   * T1 / emissão: "full" é alias de base. Se há identity/mitm explícitos,
+   * normalizar para CSV canónico sem "full". Se só full → "base".
+   */
+  const hasAddon = seen.has('identity') || seen.has('mitm');
+  const ordered = [];
+
+  if (hasAddon || seen.has('base') || seen.has('full') || seen.size === 0) {
+    ordered.push('base');
+  }
+  for (const token of FEATURE_CANONICAL_ORDER) {
+    if (token === 'base') {
+      continue;
+    }
+    if (seen.has(token)) {
+      ordered.push(token);
     }
   }
 
-  return normalizedTokens.join(',');
+  const normalized = ordered.join(',');
+  if (Buffer.byteLength(normalized, 'utf8') > FEATURES_MAX_BYTES) {
+    throw createHttpError(400,
+      `Features excedem ${FEATURES_MAX_BYTES} bytes (ADR-0025 P1).`);
+  }
+
+  return normalized;
 }
 
 function parsePaginationQuery(query, allowedFields) {
@@ -336,7 +374,7 @@ function parseLicenseUpdatePayload(body) {
     normalized.expiry = parseIsoDate(payload.expiry, 'Data de expiracao');
   }
   if (Object.prototype.hasOwnProperty.call(payload, 'features')) {
-    normalized.features = normalizeFeatures(payload.features, { defaultValue: 'full' });
+    normalized.features = normalizeFeatures(payload.features, { defaultValue: 'base' });
   }
   if (Object.prototype.hasOwnProperty.call(payload, 'notes')) {
     normalized.notes = normalizeOptionalText(payload.notes, 'Notas', 2000);
@@ -414,7 +452,9 @@ function isLicenseExpired(license) {
 
 module.exports = {
   assertEmptyBody,
+  FEATURES_MAX_BYTES,
   isLicenseExpired,
+  normalizeFeatures,
   normalizeStoredHardwareId,
   parseActivatePayload,
   parseCustomerCreatePayload,

@@ -13,7 +13,7 @@ function listChangedLicenseFields(existingLicense, payload) {
     changedFields.push('expiry');
   }
   if (Object.prototype.hasOwnProperty.call(payload, 'features')
-    && payload.features !== (existingLicense.features || 'full')) {
+    && payload.features !== (existingLicense.features || 'base')) {
     changedFields.push('features');
   }
   if (Object.prototype.hasOwnProperty.call(payload, 'notes')

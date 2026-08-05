@@ -40,7 +40,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | ID | Componente | Onda | Estado | Acção | Notas |
 |----|------------|------|--------|-------|-------|
 | M-01 | Contrato `features` CSV | IM1 | **20.3 PASS** | LIC/DMN | ADR-0025; `features.c` |
-| M-02 | License-server emissão SKU | IM1 | Planeado | LIC | + check-in entitlements |
+| M-02 | License-server emissão SKU | IM1 | **20.4 PASS** | LIC | P1 + T1 + UI presets |
 | M-03 | Gate daemon entitlements | IM1 | Planeado | DMN | autoridade |
 | M-04 | Gate GUI upsell | IM1 | Planeado | GUI | |
 | M-05 | CA store + geração/import | IM2 | Condicional | PKG/OPS | só se spike GO |
@@ -140,3 +140,4 @@ Policy ad_* → IPs do mapa → enforce PF
 | 2026-08-05 | rev. `b` — spike MITM; mapa daemon; RADIUS receiver; agente DC; fail-mode; M-19 corrigido |
 | 2026-08-05 | rev. `c` — M-24/M-25 (concorrência ADR-0028 + baseline perf); contrato `features` na área Licença; regra “sem IO bloqueante no hot path” |
 | 2026-08-05 | **20.3** — M-01 PASS (`features.c` P1–P6 + T1; testes C) |
+| 2026-08-05 | **20.4** — M-02 PASS (license-server normalizeFeatures + UI SKU) |

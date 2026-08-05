@@ -3,8 +3,11 @@ const assert = require('node:assert/strict');
 
 const {
   isLicenseExpired,
+  normalizeFeatures,
   normalizeStoredHardwareId,
   parseActivatePayload,
+  parseLicenseCreatePayload,
+  FEATURES_MAX_BYTES,
 } = require('./crud-validation');
 
 const LICENSE_KEY = 'ABCDEF0123456789ABCDEF0123456789';
@@ -82,4 +85,37 @@ test('isLicenseExpired treats PostgreSQL Date expiry values as expired', () => {
 test('isLicenseExpired treats YYYY-MM-DD strings as expired', () => {
   assert.equal(isLicenseExpired({ expiry: '2000-01-01' }), true);
   assert.equal(isLicenseExpired({ expiry: '2999-12-31' }), false);
+});
+
+test('normalizeFeatures defaults to base and applies T1 full→base', () => {
+  assert.equal(normalizeFeatures(undefined), 'base');
+  assert.equal(normalizeFeatures(''), 'base');
+  assert.equal(normalizeFeatures('full'), 'base');
+  assert.equal(normalizeFeatures('FULL'), 'base');
+  assert.equal(normalizeFeatures('base,identity'), 'base,identity');
+  assert.equal(normalizeFeatures(' identity , MITM , base '), 'base,identity,mitm');
+  assert.equal(normalizeFeatures('full,identity'), 'base,identity');
+});
+
+test('normalizeFeatures rejects unknown tokens and oversized CSV (P1)', () => {
+  assertHttpError(
+    () => normalizeFeatures('base,reports'),
+    400,
+    'Features invalidas: token desconhecido "reports". Permitidos: base, identity, mitm (legado: full).'
+  );
+  assert.equal(FEATURES_MAX_BYTES, 63);
+  assertHttpError(
+    () => normalizeFeatures('x'.repeat(FEATURES_MAX_BYTES + 1)),
+    400,
+    `Features excedem ${FEATURES_MAX_BYTES} bytes (ADR-0025 P1).`
+  );
+});
+
+test('parseLicenseCreatePayload normalizes features SKU', () => {
+  const payload = parseLicenseCreatePayload({
+    customer_id: 1,
+    expiry: '2030-12-31',
+    features: 'full',
+  });
+  assert.equal(payload.features, 'base');
 });

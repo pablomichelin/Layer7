@@ -35,9 +35,9 @@ Congelamento: [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overv
 Arranque manutenção: [`../00-overview/START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
 (Não confundir passos 12.x IPv6 com `test-matrix` §12 blacklists.)
 
-**Trilha Identity + MITM Add-on:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) — **ABERTA** (IM1 / 20.4).
+**Trilha Identity + MITM Add-on:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) — **ABERTA** (IM1 / 20.5).
 Arranque: [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md).
-ADRs Aceito (`2026-08-05`, T1): 0025 / 0026 / 0027 / 0028. Backlog BG-085…BG-092. GI0 PASS; 20.3 PASS.
+ADRs Aceito (`2026-08-05`, T1): 0025 / 0026 / 0027 / 0028. Backlog BG-085…BG-092. GI0 PASS; 20.3–20.4 PASS.
 
 ---
 

@@ -3,6 +3,11 @@
 > Documento operacional para gerar, gerir, instalar e manter licencas
 > do produto Layer7 para pfSense CE.
 
+> **Features / SKU (ADR-0025, 2026-08-05):** tokens emitíveis `base`,
+> `identity`, `mitm` (CSV ≤ 63 bytes). Default de emissão: `base`.
+> Legado `full` normaliza para `base` (T1). Identity/MITM exigem
+> reemissão explícita. A GUI admin usa presets SKU.
+
 > Estado oficial apos a F2.5: o unico canal publico permitido para painel
 > administrativo e activacao online passa a ser
 > `https://license.systemup.inf.br`. O origin `8445/TCP` passa a ser privado

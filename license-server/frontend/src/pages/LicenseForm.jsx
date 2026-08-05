@@ -4,7 +4,10 @@ import { get, post, put } from '../api';
 import {
   buildLicenseFormState,
   buildLicenseSavePayload,
+  isKnownLicenseFeaturePreset,
   isLicenseCustomerChangeBlocked,
+  LICENSE_FEATURE_PRESETS,
+  LICENSE_FEATURES_DEFAULT,
 } from '../license-form-state.js';
 import {
   ADMIN_LICENSES_ROUTE,
@@ -19,7 +22,7 @@ export default function LicenseForm() {
   const [form, setForm] = useState({
     customer_id: '',
     expiry: '',
-    features: 'full',
+    features: LICENSE_FEATURES_DEFAULT,
     notes: '',
   });
   const [licenseState, setLicenseState] = useState(null);
@@ -144,8 +147,26 @@ export default function LicenseForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Features</label>
-            <input type="text" name="features" value={form.features} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Features (SKU)</label>
+            <select
+              name="features"
+              value={form.features}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+            >
+              {LICENSE_FEATURE_PRESETS.map((preset) => (
+                <option key={preset.value} value={preset.value}>{preset.label}</option>
+              ))}
+              {!isKnownLicenseFeaturePreset(form.features) && form.features ? (
+                <option value={form.features}>
+                  Legado / actual: {form.features}
+                </option>
+              ) : null}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              ADR-0025: CSV ≤ 63 bytes. Legado <code>full</code> normaliza para <code>base</code> (T1).
+              Identity/MITM exigem reemissão explícita.
+            </p>
           </div>
 
           <div>

@@ -30,7 +30,7 @@ function buildLicenseArtifactAuditMetadata({
     expiry: artifactPayload.expiry || null,
     issued_on: artifactPayload.issued || null,
     customer_name: artifactPayload.customer || customerName || null,
-    features: artifactPayload.features || license.features || 'full',
+    features: artifactPayload.features || license.features || 'base',
     artifact_payload_sha256: sha256Hex(signedLicense.data),
     artifact_sig_sha256: sha256Hex(signedLicense.sig),
     artifact_envelope_sha256: sha256Hex(JSON.stringify(signedLicense)),
