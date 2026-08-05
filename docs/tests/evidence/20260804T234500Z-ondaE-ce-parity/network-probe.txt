@@ -1,0 +1,28 @@
+# Onda E — sonda de disponibilidade VM pfSense CE
+# run_id: 20260804T234500Z-ondaE-ce-parity
+# data: 2026-08-04T23:45Z (operador UTC-3)
+
+## Malha 192.168.100.0/24 (lab actual)
+
+| IP | ICMP | SSH | Observação |
+|----|------|-----|------------|
+| 192.168.100.12 | PASS | PASS | Builder FreeBSD 15 — sem imagem/VM CE |
+| 192.168.100.244 | (não testado ICMP) | — | License server |
+| 192.168.100.254 | PASS | PASS | **pfSense Plus 26.03.1** / FB16 — único firewall Layer7 |
+| 192.168.100.250–253,255 | FAIL | — | Sem resposta |
+
+## Lab histórico (documentação validacao-lab.md)
+
+| IP | ICMP | Nota |
+|----|------|------|
+| 192.168.0.195 | FAIL | pfSense CE 2.8.1 — rede inacessível desta estação |
+| 192.168.0.129 | FAIL | Builder histórico — inacessível |
+
+## Builder — virtualização
+
+- `bhyvectl` presente; `vmm` não carregado; sem ISO/qcow2 pfSense CE em `/root` ou `/zroot`
+- Provisionar VM CE exigiria bloco humano (imagem, bridge, IP dedicado) — fora do passo 6.1 sem GO explícito
+
+## Conclusão operacional
+
+**Não existe VM pfSense CE dedicada** na malha actual para executar install passivo + smoke monitor do candidato `1.8.11_69` em plataforma CE real.

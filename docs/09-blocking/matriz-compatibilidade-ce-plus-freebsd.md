@@ -1,7 +1,7 @@
 # Matriz — compatibilidade pfSense CE / Plus / FreeBSD
 
-**Data:** 2026-07-29  
-**Estado:** CANDIDATO INTERNO EM VALIDAÇÃO — evidência física limitada a observação read-only documentada.
+**Data:** 2026-08-04 (actualização Onda E)  
+**Estado:** **LIMITAÇÃO CE** — Plus/FB16 validado (`1.8.11_69`, Ondas A–D); pfSense CE físico **PENDENTE** (Onda E passo 6.1, `20260804T234500Z-ondaE-ce-parity`; ADR-0022).
 
 ---
 
@@ -9,8 +9,8 @@
 
 | Dimensão | Documentação / decisão congelada | Observação real (2026-07-29) | Gap |
 |----------|----------------------------------|------------------------------|-----|
-| Alvo comercial | **pfSense CE** exclusivo | Appliance lab: **pfSense Plus 26.03.1** | Validar CE antes de claim CE-only |
-| FreeBSD base | Builder: **15.0-RELEASE** | Appliance: **16.0-CURRENT** | ABI/linkagem não provada em FB16 |
+| Alvo comercial | **pfSense CE** exclusivo | Appliance lab: **pfSense Plus 26.03.1** | **LIMITAÇÃO** — CE VM indisponível (`2026-08-04`) |
+| FreeBSD base | Builder: **15.0-RELEASE** | Appliance: **16.0-CURRENT** | ABI `_69` **PASS** em FB16 com `IGNORE_OSVERSION` (Onda A G2.5) |
 | nDPI | 5.x vendorizado estático (`libndpi.a`) | Build `_31` OK no builder FB15 | Versão exacta depende do builder |
 | PHP GUI | pfSense 2.x package API | Plus 26.03 — compatível em smoke histórico | Regressão GUI não auditada nesta rodada |
 
@@ -20,10 +20,10 @@
 
 | Componente | pfSense CE (alvo) | pfSense Plus 26.x (observado) | FreeBSD 15 (builder) | FreeBSD 16 (appliance) | macOS (dev) |
 |------------|-------------------|-------------------------------|----------------------|------------------------|-------------|
-| Pacote `.pkg` | **Claim** SSOT | Instalado `_24` read-only OK | Build PASS `_31` | **Não instalado `_31`** | N/A |
-| `layer7d` binário | Esperado | `_24` parado/passivo | Compilado + link nDPI | **PENDENTE** | N/A |
-| libpcap capture | `DLT_EN10MB`/`DLT_RAW` | Observado captures=0 (passivo) | PASS smoke | **PENDENTE** | N/A |
-| PF rules inject | `layer7.inc` hooks | Ruleset válido `_24` | `pfctl -nf` sintético `_29` | Parser completo **PENDENTE** | N/A |
+| Pacote `.pkg` | **Claim** SSOT | `_69` instalado (Ondas A–D) | Build PASS `_69` | **PASS** G2.5 (`IGNORE_OSVERSION`) | N/A |
+| `layer7d` binário | Esperado | `_69` activo | Compilado + link nDPI | **PASS** `ldd` + `-V` | N/A |
+| libpcap capture | `DLT_EN10MB`/`DLT_RAW` | `captures>0` (Onda A G4) | PASS smoke | **PASS** G4 | N/A |
+| PF rules inject | `layer7.inc` hooks | G3 PASS `_69` | `pfctl -nf` sintético | **PASS** G3 rules.debug | N/A |
 | NAT anchor DNS | `natrules/layer7_nat` | Não activado (passivo) | Lint shell PASS | **PENDENTE** | N/A |
 | Unbound anti-DoH | Hook `config.xml` | N/A nesta rodada | PHP lint SKIP macOS | **PENDENTE** | N/A |
 | License `.lic` | Ed25519 OpenSSL | Válida no appliance | N/A | N/A | N/A |
@@ -78,10 +78,15 @@ layer7d ← main.c, config_parse.c, policy.c, enforce.c, license.c,
 
 ## 6. Recomendações de gate por plataforma
 
-1. **Primeiro:** pfSense Plus 26.03.1 (lab existente) — instalação passiva `_31`, `pfctl -nf`, captura monitor.
-2. **Segundo:** pfSense CE referência (VM dedicada) — repetir two-client e smoke Caminho A/B.
-3. **Terceiro:** Confirmar binário FB16 (`ldd /usr/local/sbin/layer7d`, smoke `layer7d -t`).
-4. **Não fazer:** activar enforce em produção até matriz two-client PASS em ambas plataformas alvo.
+1. ~~**Primeiro:** pfSense Plus 26.03.1~~ — **CONCLUÍDO** (`1.8.11_69`, Ondas A–D PASS em `192.168.100.254`).
+2. **Segundo (BLOQUEANTE GO):** pfSense CE referência (VM dedicada na malha lab) — install passivo `_69` + `smoke-monitor-mode.sh`; depois two-client se exigido comercialmente.
+3. ~~**Terceiro:** binário FB16~~ — **PASS** (G2.5 Onda A).
+4. **Não fazer:** activar enforce em produção (Onda F) sem CE PASS ou aceite humano ADR-0022.
+
+### Evidência Onda E (`20260804T234500Z-ondaE-ce-parity`)
+
+- VM CE: **indisponível** (`network-probe.txt`)
+- Veredicto: **LIMITAÇÃO** — ver `ONDA-E-LIMITACAO.md` e ADR-0022
 
 ---
 

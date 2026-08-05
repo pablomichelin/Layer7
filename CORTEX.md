@@ -1221,16 +1221,16 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: **Onda E** (CE) / prep **Onda F** | Ondas A–D **PASS** | G6–G7 **PASS**
-- Onda: C — **PASS**; D — **PASS** (10a/10b/11 + G6/G7)
+- Passo actual: **Onda F prep** (GO humano bloqueado por CE) | Ondas A–E **concluídas** (E=LIMITAÇÃO)
+- Onda: E — **LIMITAÇÃO** (CE VM indisponível; ADR-0022); D — **PASS**
 - Candidato lab: 1.8.11_69
-- Produção enforce: 1.8.11_24 (até GO Onda F)
+- Produção enforce: 1.8.11_24 (até GO Onda F + CE ou aceite ADR-0022)
 - Canal latest: 1.8.11_69
 - G0-G1: PASS | G2-G4: PASS | G5: PASS | G6-G7: **PASS**
-- F3: **FECHADA** (`2026-08-04`) — `F3 pode fechar`; S13 `20260804T212000Z-ondaC-s13-drift-PASS`
-- Evidência F3: `docs/tests/evidence/20260804T211500Z-ondaC-f3-report/F3-PODE-FECHAR.md`
-- Evidência Onda D: `20260804T211600Z-ondaD-f4-10a-PASS`, `20260804T212200Z-ondaD-f4-10b-PASS`, `20260804T212300Z-ondaD-f4-11-PASS`
-- Próximo: **Onda E** (CE) ou fecho Onda D no plano; **GO enforce Onda F** (humano)
+- F3: **FECHADA** | F4: **FECHADA** (Onda D)
+- CE: **LIMITAÇÃO** (`20260804T234500Z-ondaE-ce-parity`) — não CE PASS
+- Evidência Onda E: `docs/tests/evidence/20260804T234500Z-ondaE-ce-parity/`
+- Próximo: **Onda F prep** (humano: VM CE ou aceite ADR-0022) ou **Onda G** (F5)
 - Modo: agente único
 ```
 

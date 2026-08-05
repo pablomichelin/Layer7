@@ -6,6 +6,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Onda E (passo 6.1):** evidência `20260804T234500Z-ondaE-ce-parity` — veredicto
+  **LIMITAÇÃO CE** (VM CE indisponível); ADR-0022; script
+  `tests/lab/run-ondaE-ce-parity-appliance.sh`; matriz compatibilidade actualizada.
 - **BG-077 — check-in online (Bloco 1):** `POST /api/license/check-in` no
   license-server (`check-in.js`, `check_ins_log`); deploy em `192.168.100.244`.
 - **BG-077 — check-in online (Bloco 2):** `layer7d` com `--check-in`,

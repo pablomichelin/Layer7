@@ -1,0 +1,27 @@
+=== ONDA E — inventário plataforma ===
+20260805T004116Z
+FreeBSD systemupfw.system.up 16.0-CURRENT FreeBSD 16.0-CURRENT #12 plus-RELENG_26_03_1-n256546-1d1bfd578383: Wed May 20 15:20:10 UTC 2026     root@pfsense-build-release-amd64-2.eng.atx.netgate.com:/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/obj/amd64/fvF1vE9r/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/sources/FreeBSD-src-plus-RELENG_26_03_1/amd64.amd64/sys/pfSense amd64
+26.03.1-RELEASE
+pfSense-pkg-layer7-1.8.11_69
+--- layer7d ABI ---
+1.8.11_69
+/usr/local/sbin/layer7d:
+	libpcap.so.8 => /lib/libpcap.so.8 (0x34e922e56000)
+	libm.so.5 => /lib/libm.so.5 (0x34e923e57000)
+	libthr.so.3 => /lib/libthr.so.3 (0x34e924935000)
+	libc.so.7 => /lib/libc.so.7 (0x34e9256fb000)
+	libibverbs.so.1 => /lib/libibverbs.so.1 (0x34e927068000)
+	libbnxtre.so.1 => /lib/libbnxtre.so.1 (0x34e92760c000)
+	libmlx5.so.1 => /lib/libmlx5.so.1 (0x34e9261b7000)
+	libsys.so.7 => /lib/libsys.so.7 (0x34e928b99000)
+	[vdso] (0x34e921f72000)
+--- config mode ---
+mode=enforce enabled=true enforcement=legacy_global
+--- G2 passive checks ---
+5
+--- G3 pfctl dry-run ---
+--- stats JSON ---
+
+--- smoke monitor ---
+INFO: mode=enforce enabled=1
+FAIL: pre-condicao: pacote tem de estar enabled=true e mode=monitor

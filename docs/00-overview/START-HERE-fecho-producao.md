@@ -11,15 +11,15 @@ plano mestre. O plano completo está em:
 
 | Campo | Valor esperado (`2026-08-04`) |
 |-------|-------------------------------|
-| Passo actual | **Onda E** (CE) ou **Onda F** prep — Ondas A–D **PASS**; G6–G7 **PASS** |
-| Ondas concluídas | A **PASS**, B **PASS**, C **PASS** |
+| Passo actual | **Onda F prep** — Ondas A–E concluídas (E=**LIMITAÇÃO**); G6–G7 **PASS** |
+| Ondas concluídas | A **PASS**, B **PASS**, C **PASS**, D **PASS**, E **LIMITAÇÃO** |
 | Onda D | **PASS** — 10a/10b/11 + G6/G7 |
 | Gates G6–G7 | **PASS** (`20260804T212800Z` / `212900Z`) |
 | Trilha BG-077 | **fechada** (S14 + S09 reteste PASS) |
 | Candidato lab (gates) | **`1.8.11_69`** |
 | Canal `latest` | `1.8.11_69` |
 | Produção enforce | `1.8.11_24` (até GO Onda F) |
-| Appliance lab | `192.168.100.254` (Plus/FB16 — CE na Onda E) |
+| Appliance lab | `192.168.100.254` (Plus/FB16 — **CE VM indisponível**; ADR-0022) |
 | Builder | `192.168.100.12` |
 | Veeam lab | **PASS** — `254`+`12`+`244` (`20260804T211800Z-veeam-prerequisite-PASS`) |
 
