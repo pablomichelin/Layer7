@@ -1,0 +1,58 @@
+=== precond ===
+1.9.7
+pfSense-pkg-layer7-1.9.7
+=== sha ===
+expected=229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec
+actual=229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec
+=== install ===
+Installing pfSense-pkg-layer7-1.9.8...
+package pfSense-pkg-layer7 is already installed, forced install
+Extracting pfSense-pkg-layer7-1.9.8: ......... done
+Saving updated package information...
+overwrite!
+Loading package configuration... done.
+Configuring package components...
+Loading package instructions...
+Custom commands...
+Executing custom_php_resync_config_command()...done.
+Menu items... done.
+Services... done.
+Writing configuration... done.
+
+=== Layer7 instalado com sucesso ===
+  Versão:  1.9.8
+  Config:  /usr/local/etc/layer7.json
+  GUI:     Services > Layer 7
+
+  O pacote inicia em modo MONITOR (seguro).
+  Acesse a GUI para configurar interfaces e políticas.
+
+1.9.8
+resync_ok
+=== listeners ===
+root    php        45510  8 tcp4  127.0.0.1:8099        *:*                  
+root    php        44964  8 tcp6  [::1]:8099            *:*                  
+=== portal6 helper ===
+portal6=2804:6c4:11d:cc00:250:56ff:fe88:a4f7
+portal4=192.168.100.254
+=== pf nat http inet6 ===
+rdr on vmx0 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = http -> ::1 port 8099
+rdr on vmx0 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = https -> ::1 port 8099
+rdr on vmx0.95 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = http -> ::1 port 8099
+rdr on vmx0.95 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = https -> ::1 port 8099
+rdr on vmx0 inet6 proto tcp from any to ! ::1 port = domain -> ::1
+rdr on vmx0.95 inet6 proto tcp from any to ! ::1 port = domain -> ::1
+=== pf nat dns inet6 (regress) ===
+0
+0
+=== ndp ===
+      65
+PING(56=40+8+8 bytes) fe80::250:56ff:fe88:a4f7%vmx0 --> fe80::1%vmx0
+
+--- fe80::1%vmx0 ping statistics ---
+2 packets transmitted, 0 packets received, 100.0% packet loss
+=== config mode ===
+enabled=1
+mode=enforce
+force_dns=1
+=== DONE ===

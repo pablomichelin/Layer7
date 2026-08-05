@@ -2,7 +2,7 @@
 
 **Estado:** Aceito (publicado; implementação por ondas; GV0 fecha disclosure V0)  
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-05h (GO Opção A / 12.10 DNS `rdr inet6`)  
+**Rev.:** 2026-08-05i (12.11 CONCLUÍDO — Opção A V5 completa / `1.9.8`)  
 **Decisores:** Operador + agente (governança pós-fecho plano mestre)
 
 ---
@@ -113,6 +113,18 @@ existir portal IPv6), com salvaguardas NDP/ICMPv6 e AF-split nos CIDRs.
 4. Produção enforce permanece **`1.9.0`** (GV7.4 PENDENTE).
 5. Não afirmar «block page IPv6» / «VIP DNS IPv6» / «IPv6 completo comercial»
    até 12.11.
+
+#### Emenda (`2026-08-05`) — 12.11 CONCLUÍDO / V5 Opção A completa
+
+**Operador:** Systemup / Pablo Michelin.  
+**Estado:** passo **12.11** implementado e publicado como candidato lab
+**`1.9.8`**: HTTP/HTTPS `rdr inet6` portal → `[::1]:8099`, blockpage
+dual-listen, VIP Unbound ACL IPv6, portal6 via `get_interface_ipv6`.
+
+1. I7 / BG-083 **fechados** (Opção A completa 12.10+12.11).
+2. Dual-stack comercial **no âmbito V0–V5** no lab; **não** promove produção
+   enforce (permanece **`1.9.0`** — GV7.4 PENDENTE).
+3. Salvaguarda ADR-0017: porta webgui continua excluída do rdr.
 
 ### V6 — Fecho
 

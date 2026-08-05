@@ -2503,6 +2503,20 @@ function layer7_blockpage_portal_ipv6($data = null)
 		if ($ifid === "") {
 			continue;
 		}
+		/* pfSense: endereço efectivo (SLAAC/track6/static). */
+		if (function_exists("get_interface_ipv6")) {
+			$ip = trim((string)get_interface_ipv6($ifid));
+			if ($ip !== "" && layer7_ipv6_valid($ip)) {
+				return $ip;
+			}
+			$real = layer7_real_interface_name($ifid);
+			if ($real !== "" && $real !== $ifid) {
+				$ip = trim((string)get_interface_ipv6($real));
+				if ($ip !== "" && layer7_ipv6_valid($ip)) {
+					return $ip;
+				}
+			}
+		}
 		$keys = array($ifid);
 		$real = layer7_real_interface_name($ifid);
 		if ($real !== "" && $real !== $ifid) {
@@ -2779,6 +2793,10 @@ function layer7_vip_dns_acl_netblocks($data = null)
 		if (layer7_ipv4_valid($entry)) {
 			$nets[] = $entry . "/32";
 		} elseif (layer7_cidr_valid($entry)) {
+			$nets[] = $entry;
+		} elseif (layer7_ipv6_valid($entry)) {
+			$nets[] = $entry . "/128";
+		} elseif (layer7_cidr6_valid($entry)) {
 			$nets[] = $entry;
 		}
 	}
@@ -3131,6 +3149,7 @@ function layer7_blockpage_portal_and_ifaces($data)
 	if ($portal === null) {
 		return null;
 	}
+	$portal6 = layer7_blockpage_portal_ipv6($data);
 	$iface_ids = isset($data["layer7"]["interfaces"]) &&
 	    is_array($data["layer7"]["interfaces"])
 	    ? $data["layer7"]["interfaces"] : array("lan");
@@ -3155,7 +3174,11 @@ function layer7_blockpage_portal_and_ifaces($data)
 	if (empty($real_ifaces)) {
 		return null;
 	}
-	return array("portal" => $portal, "ifaces" => $real_ifaces);
+	return array(
+		"portal" => $portal,
+		"portal6" => $portal6,
+		"ifaces" => $real_ifaces
+	);
 }
 
 /**
@@ -3207,6 +3230,7 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
 		return "";
 	}
 	$portal = $ctx["portal"];
+	$portal6 = isset($ctx["portal6"]) ? $ctx["portal6"] : null;
 	$real_ifaces = $ctx["ifaces"];
 	$port = (int)L7_BLOCKPAGE_PORT;
 	$webgui_port = layer7_webgui_port();
@@ -3218,13 +3242,22 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
 	}
 	$lines = array();
 	$lines[] = "# Pagina de bloqueio Layer7 (HTTP/HTTPS -> localhost:{$port};" .
-	    " porta webgui {$webgui_port} preservada)";
+	    " porta webgui {$webgui_port} preservada; inet+inet6 se portal6)";
 	/* Nota: pf rejeita `label` em regras rdr (syntax error) — nao usar. */
 	foreach ($real_ifaces as $iface) {
 		foreach ($rdr_ports as $p) {
 			$lines[] = "rdr on {$iface} inet proto tcp" .
 			    " from any to {$portal} port {$p}" .
 			    " -> 127.0.0.1 port {$port}";
+		}
+	}
+	if ($portal6 !== null && $portal6 !== "") {
+		foreach ($real_ifaces as $iface) {
+			foreach ($rdr_ports as $p) {
+				$lines[] = "rdr on {$iface} inet6 proto tcp" .
+				    " from any to {$portal6} port {$p}" .
+				    " -> ::1 port {$port}";
+			}
 		}
 	}
 	$bp = layer7_blockpage_config_get($data);

@@ -380,8 +380,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 - [x] Decisão humana V5 — ADR-0024 **GO Opção A** 12.10 (`2026-08-05`)
 - [x] 12.10 DNS `rdr inet6` + AF-split + Unbound AAAA (`1.9.7`; `test_dns_force_inet6`)
-- [ ] 12.11 HTTP/HTTPS `rdr inet6` portal + VIP Unbound ACL v6
-- [ ] GV5 completo (após 12.11 + smoke lab)
+- [x] 12.11 HTTP/HTTPS `rdr inet6` portal + VIP Unbound ACL v6 (`1.9.8`)
+- [x] GV5 completo (após 12.11 + smoke lab)
 
 ### V6 — Fecho (12.12–12.13, BG-084)
 

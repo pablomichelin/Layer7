@@ -335,7 +335,7 @@ layer7_render_styles();
 		<div class="alert alert-warning" id="l7-ipv6-limit" role="status">
 			<i class="fa fa-exclamation-triangle"></i>
 			<strong><?= l7_t("Limitacao IPv6:"); ?></strong>
-			<?= l7_t("Captura nDPI, politicas, PF scoped, allowlist e DNS forcado (rdr inet6 + sinkhole AAAA) ja suportam IPv6 (trilha ADR-0024 / 12.10). Ainda IPv4-only: pagina de bloqueio HTTP/HTTPS e isencao VIP no DNS Unbound (passo 12.11). Nao afirmar dual-stack comercial completo ate fecho 12.11."); ?>
+			<?= l7_t("Suporte IPv6 (ADR-0024): captura nDPI, politicas, PF scoped, allowlist, DNS forcado (rdr inet6 + AAAA), pagina de bloqueio HTTP/HTTPS (rdr inet6) e VIP Unbound ACL v6 (12.11). Confirmar portal_ipv6 / GUA da iface para AAAA+HTTP v6. Nao promover enforce sem GO (GV7.4)."); ?>
 		</div>
 
 		<div class="layer7-admin-block">

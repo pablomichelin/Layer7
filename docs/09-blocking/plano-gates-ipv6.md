@@ -90,12 +90,10 @@
 |---|----------|--------|--------|
 | GV5.1 | Decisão humana registada (implementar vs ADIAR) | ADR-0024 emenda | **PASS** — Opção B temp. depois **GO Opção A** 12.10 (`2026-08-05`) |
 | GV5.2 | Se implementado: `rdr inet6` :53 sinkhole funcional | `nslookup -6` / snippet | **PASS** appliance `1.9.7` (`20260805T140400Z-gv5-12.10-smoke-1.9.7`; 4× inet + 4× inet6 domain) |
-| GV5.3 | Se implementado: block page acessível em v6 | HTTP v6 portal | **PENDENTE** (passo **12.11**) |
-| GV5.4 | Se ADIADO: limite explícito em MANUAL + GUI | Doc review | N/A (Opção A activa para DNS; HTTP ainda limitado até 12.11) |
+| GV5.3 | Se implementado: block page acessível em v6 | HTTP v6 portal | **PASS** código `1.9.8` + smoke 12.11 (rdr inet6 HTTP + listen `[::1]:8099`) |
+| GV5.4 | Se ADIADO: limite explícito em MANUAL + GUI | Doc review | N/A (Opção A completa 12.10+12.11) |
 
-**GV5 onda:** **PARCIAL** — DNS `:53` inet6 **PASS** appliance `1.9.7`
-(`20260805T140400Z-gv5-12.10-smoke-1.9.7`; NDP OK; AAAA half-open sem
-`portal_ipv6`); HTTP portal + VIP ACL v6 = 12.11.
+**GV5 onda:** **PASS** — DNS `:53` + HTTP/HTTPS portal + VIP ACL v6 (`1.9.8` / 12.11).
 
 ### GV6 — Campanha dual-stack (Onda V6)
 

@@ -45,6 +45,25 @@ if (count($nets) !== 3 ||
 	exit(1);
 }
 
+/* 12.11: VIP ACL IPv6 */
+$data_v6 = $data;
+$data_v6["layer7"]["exceptions"][0]["hosts"][] = "2001:db8::50";
+$data_v6["layer7"]["exceptions"][0]["cidrs"][] = "2001:db8:a::/64";
+$nets6 = layer7_vip_dns_acl_netblocks($data_v6);
+if (!in_array("2001:db8::50/128", $nets6, true) ||
+    !in_array("2001:db8:a::/64", $nets6, true)) {
+	fwrite(STDERR, "FAIL: acl netblocks v6 missing\n");
+	fwrite(STDERR, json_encode($nets6));
+	exit(1);
+}
+$block6 = layer7_vip_unbound_view_block($data_v6);
+if (strpos($block6, "access-control-view: 2001:db8::50/128") === false ||
+    strpos($block6, "access-control-view: 2001:db8:a::/64") === false) {
+	fwrite(STDERR, "FAIL: unbound view missing v6 ACL\n");
+	fwrite(STDERR, $block6);
+	exit(1);
+}
+
 if (!layer7_vip_dns_should_apply($data)) {
 	fwrite(STDERR, "FAIL: should_apply expected true\n");
 	exit(1);

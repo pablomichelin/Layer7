@@ -1,6 +1,6 @@
 #!/bin/sh
 # Layer7 block page — servidor HTTP leve (PHP built-in) em localhost.
-# O trafego chega via NAT rdr (porta 80 no IP portal -> 127.0.0.1:8099).
+# Trafego via NAT rdr: portal:80/443 -> 127.0.0.1:8099 e [::1]:8099 (12.11).
 
 set -eu
 
@@ -8,6 +8,7 @@ PORT=8099
 DOCROOT="/usr/local/www/layer7-blockpage"
 PHP="/usr/local/bin/php"
 PIDFILE="/var/run/layer7-blockpage.pid"
+PIDFILE_V4="/var/run/layer7-blockpage-v4.pid"
 ROUTER="${DOCROOT}/router.php"
 
 if [ ! -x "${PHP}" ]; then
@@ -23,9 +24,11 @@ case "${1:-start}" in
 start)
 	# Sem verificacao de pidfile aqui: quando lancado via daemon(8) o
 	# pidfile ja existe com o pid do supervisor e o check anterior fazia
-	# o helper sair de imediato (servico nunca subia). A deduplicacao e
-	# feita no rc.d; se a porta estiver ocupada o bind do PHP falha.
-	exec "${PHP}" -S "127.0.0.1:${PORT}" -t "${DOCROOT}" "${ROUTER}"
+	# o helper sair de imediato. Deduplicacao no rc.d.
+	# IPv4 em background; IPv6 em foreground (pid capturado pelo daemon).
+	"${PHP}" -S "127.0.0.1:${PORT}" -t "${DOCROOT}" "${ROUTER}" &
+	echo $! > "${PIDFILE_V4}"
+	exec "${PHP}" -S "[::1]:${PORT}" -t "${DOCROOT}" "${ROUTER}"
 	;;
 stop)
 	if [ -f "${PIDFILE}" ]; then
@@ -33,7 +36,13 @@ stop)
 		[ -n "${_p}" ] && kill -TERM "${_p}" 2>/dev/null || true
 		rm -f "${PIDFILE}"
 	fi
+	if [ -f "${PIDFILE_V4}" ]; then
+		_p4=$(cat "${PIDFILE_V4}" 2>/dev/null || true)
+		[ -n "${_p4}" ] && kill -TERM "${_p4}" 2>/dev/null || true
+		rm -f "${PIDFILE_V4}"
+	fi
 	pkill -TERM -f "php -S 127.0.0.1:${PORT}" 2>/dev/null || true
+	pkill -TERM -f "php -S \[::1\]:${PORT}" 2>/dev/null || true
 	exit 0
 	;;
 *)

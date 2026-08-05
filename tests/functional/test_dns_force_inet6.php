@@ -72,15 +72,29 @@ check(strpos($ub2, "IN A 192.168.1.1") !== false, "unbound A sem portal6");
 check(strpos($ub2, "IN AAAA") === false, "unbound sem AAAA sem portal6");
 
 layer7_vip_dns_rdr_fallback_set(false);
-$rdr = layer7_generate_blockpage_rdr_snippet($data);
+$data_no_http6 = $data;
+$data_no_http6["layer7"]["block_page"]["portal_ipv6"] = "";
+$rdr = layer7_generate_blockpage_rdr_snippet($data_no_http6);
 check(strpos($rdr, "inet proto udp") !== false &&
     strpos($rdr, "to !127.0.0.1 port 53") !== false, "blockpage rdr inet :53");
 check(strpos($rdr, "inet6 proto udp") !== false &&
     strpos($rdr, "to !::1 port 53") !== false, "blockpage rdr inet6 :53");
 check(strpos($rdr, "inet proto tcp") !== false &&
     strpos($rdr, "to 192.168.1.1 port 80") !== false, "blockpage http ainda inet");
-check(!preg_match('/inet6 proto tcp[^\n]*port 80/', $rdr),
-    "blockpage http sem rdr inet6 (12.11)");
+check(!preg_match('/inet6 proto tcp[^\n]*to 2001:db8::1 port 80/', $rdr),
+    "sem portal6 nao emite http inet6");
+
+$rdr6 = layer7_generate_blockpage_rdr_snippet($data);
+check(preg_match('/inet6 proto tcp[^\n]*to 2001:db8::1 port 80[^\n]*-> ::1/', $rdr6) === 1,
+    "com portal6 emite http inet6");
+/* Porta 443 omitida se webgui=443 (salvaguarda ADR-0017). */
+if (layer7_webgui_port() !== 443) {
+	check(preg_match('/inet6 proto tcp[^\n]*to 2001:db8::1 port 443[^\n]*-> ::1/', $rdr6) === 1,
+	    "com portal6 emite https inet6");
+} else {
+	check(!preg_match('/inet6 proto tcp[^\n]*port 443/', $rdr6),
+	    "webgui 443 nao sequestrada em inet6");
+}
 
 $bl = array(
 	"rules" => array(

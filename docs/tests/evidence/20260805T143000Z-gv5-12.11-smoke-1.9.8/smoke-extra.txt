@@ -1,0 +1,32 @@
+=== dns domain counts ===
+inet6 domain: 4
+inet domain: 4
+inet6 http: 4
+inet http: 55
+=== unbound AAAA sample ===
+    local-data: "bet365.com. 60 IN A 192.168.100.254"
+    local-data: "bet365.com. 60 IN AAAA 2804:6c4:11d:cc00:250:56ff:fe88:a4f7"
+    local-data: "betano.com. 60 IN A 192.168.100.254"
+    local-data: "betano.com. 60 IN AAAA 2804:6c4:11d:cc00:250:56ff:fe88:a4f7"
+    local-data: "blaze.com. 60 IN A 192.168.100.254"
+    local-data: "blaze.com. 60 IN AAAA 2804:6c4:11d:cc00:250:56ff:fe88:a4f7"
+    local-data: "brazzers.com. 60 IN A 192.168.100.254"
+    local-data: "brazzers.com. 60 IN AAAA 2804:6c4:11d:cc00:250:56ff:fe88:a4f7"
+=== ping6 self GUA ===
+PING(56=40+8+8 bytes) 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 --> 2804:6c4:11d:cc00:250:56ff:fe88:a4f7
+
+--- 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 ping statistics ---
+2 packets transmitted, 2 packets received, 0.0% packet loss, 2 packets out of wait time
+round-trip min/avg/max/stddev = 2.950/3.000/3.049/0.049 ms
+=== ping6 LL self ===
+16 bytes from fe80::250:56ff:fe88:a4f7%vmx0, icmp_seq=0 hlim=64 time=0.251 ms
+16 bytes from fe80::250:56ff:fe88:a4f7%vmx0, icmp_seq=1 hlim=64 time=1.347 ms
+
+--- fe80::250:56ff:fe88:a4f7%vmx0 ping statistics ---
+2 packets transmitted, 2 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 0.251/0.799/1.347/0.548 ms
+=== webgui port ===
+443
+=== sockstat 8099 ===
+root    php        45510  8 tcp4  127.0.0.1:8099        *:*                  
+root    php        44964  8 tcp6  [::1]:8099            *:*                  
