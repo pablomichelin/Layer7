@@ -1,7 +1,8 @@
 # ADR-0027 — Identity User-ID multi-fonte (sem captive portal)
 
-**Estado:** Proposto (rev. `c` — canal agente DC, conflito NAT, cold start, escala)  
+**Estado:** Aceito (rev. `c` — canal agente DC, conflito NAT, cold start, escala)  
 **Data:** 2026-08-05  
+**Aceite:** `2026-08-05` — passo **20.2** / GI0  
 **Decisores:** Operador (GO aceitação no passo 20.2)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
 **Relação:** evolui além de ADR-0011/0012 (dispositivo MAC→IP)

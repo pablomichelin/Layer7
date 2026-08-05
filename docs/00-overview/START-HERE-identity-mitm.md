@@ -13,7 +13,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **SSOT de execução** (ondas IM0–IM9, passos 20.x) |
 | [`identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md) | Mapa código / superfícies / não-regressão |
 | [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) | Gates GI0–GI9 |
-| ADR-0025 / 0026 / 0027 / 0028 | Decisões (estado **Proposto** até GO de aceitação) |
+| ADR-0025 / 0026 / 0027 / 0028 | Decisões — **Aceito** (`2026-08-05`, T1) |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** do produto |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Filas **fecho + IPv6** (não reabrir) |
 
@@ -29,12 +29,12 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Plano | **ABERTO** — Identity + MITM Add-on |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM0 / 20.2** — aceitar ADR-0025/0026/0027/0028 + GO T1/T2 |
-| Código do produto nesta trilha | **ainda não iniciado** (docs + ADRs Proposto rev. `c`) |
-| Rev. do plano | **`2026-08-05c`** (contratos técnicos fechados: concorrência daemon, parse `features`, check-in, precedência, spike mensurável, canal DC, NAT multi-user) |
-| Entitlement comercial | Modelo **X = base** / **Y = add-on** (ADR-0025; T1 recomendado) |
-| MITM | Opt-in; **spike 20.7 GO/NO-GO**; pode **DEFER** sem bloquear Identity (ADR-0026) |
-| Identity (User-ID) | Mapa no **daemon**; RADIUS receiver + **agente no DC**; sem captive (ADR-0027) |
+| Passo actual | **IM1 / 20.3** — parse `features` no daemon (ADR-0025 P1–P6) + testes C |
+| Código do produto nesta trilha | **ainda não iniciado** (IM0 fechado; IM1 abre código mínimo de parse) |
+| Rev. do plano | **`2026-08-05c`** (contratos técnicos fechados; 20.2 PASS) |
+| Entitlement comercial | Modelo **X = base** / **Y = add-on**; legado **T1** (`full`→`base`) — ADR-0025 Aceito |
+| MITM | Opt-in; **spike 20.7 GO/NO-GO**; pode **DEFER** sem bloquear Identity (ADR-0026 Aceito) |
+| Identity (User-ID) | Mapa no **daemon**; RADIUS receiver + **agente no DC**; sem captive (ADR-0027 Aceito) |
 | Exactidão MVP | User-ID de **rede** (não GlobalProtect) até IM7/IM8 |
 | Captive portal pfSense | **FORA DE ESCOPO** |
 | Não-regressão | Obrigatória — plano §1 e mapa §0 |
@@ -86,7 +86,7 @@ Ordem **estrita** — não improvisar:
 4. [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) — **passo actual** + princípios
 5. [`identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)
 6. [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)
-7. ADRs da trilha (Proposto/Aceito conforme índice)
+7. ADRs da trilha (**Aceito** — 0025 T1, 0026, 0027, 0028)
 8. Área do passo (ex.: license → `docs/10-license-server/`; enforce → `docs/05-daemon/pf-enforcement.md`; limites TLS → `docs/09-blocking/matriz-limitacoes-dpi.md` + ADR-0017)
 
 Baseline produto (não reabrir):
@@ -104,7 +104,7 @@ Arranque: docs/00-overview/START-HERE-identity-mitm.md
 Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 não reabrir fecho/IPv6; captive portal fora de escopo.
-Tarefa: continuar no passo actual (ver START-HERE / plano).
+Tarefa: continuar no passo actual (IM1 / 20.3 — parse features daemon).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -122,10 +122,11 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM0 / 20.2 (aceitar ADRs 0025–0028 + GO T1/T2)
-- IM0: 20.1 PASS; rev.b PASS; rev.c contratos técnicos PASS; 20.2 PENDENTE
-- IM1–IM9: PENDENTE
-- Código produto: NÃO iniciado
+- Passo actual: IM1 / 20.3 (parse features daemon P1–P6 + testes C)
+- IM0: 20.1 PASS; rev.b PASS; rev.c PASS; **20.2 PASS** (ADRs 0025–0028 Aceito; T1)
+- IM1: 20.3 PENDENTE; 20.4–20.6 PENDENTE
+- IM2–IM9: PENDENTE
+- Código produto: NÃO iniciado (abre em 20.3)
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
 ```

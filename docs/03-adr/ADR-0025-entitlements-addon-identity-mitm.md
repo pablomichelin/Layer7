@@ -1,8 +1,10 @@
 # ADR-0025 — Entitlements de add-on: Identity + MITM (SKU X/Y)
 
-**Estado:** Proposto (rev. `c` — contrato técnico de parse + precedência check-in)  
+**Estado:** Aceito (rev. `c` — contrato técnico de parse + precedência check-in)  
 **Data:** 2026-08-05  
+**Aceite:** `2026-08-05` — passo **20.2** / GI0  
 **Decisores:** Operador (GO aceitação no passo 20.2)  
+**Transição legado:** **T1** (`full` / vazio / desconhecido antigo → `base` apenas)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 
@@ -26,9 +28,9 @@
 5. Combinações válidas: `base`, `base,identity`, `base,mitm`, `base,identity,mitm`.
 6. **Autoridade:** o **daemon** recusa activar módulos sem token; a GUI apenas reflecte.
 7. **Um pacote:** código pode estar presente; runtime gated.
-8. **Transição de legado** — escolher no GO 20.2:
+8. **Transição de legado** — **GO 20.2: T1 aceite** (`2026-08-05`).
 
-### Opção T1 (recomendada)
+### Opção T1 (ACEITE — canónica)
 
 | Valor legado | Interpretação |
 |--------------|---------------|
@@ -37,14 +39,14 @@
 
 Upsell claro; clientes Identity/MITM precisam reemissão.
 
-### Opção T2 (generosa)
+### Opção T2 (rejeitada no GO 20.2)
 
 | Valor legado | Interpretação |
 |--------------|---------------|
 | `full` | `base,identity,mitm` |
 | Outros | conforme CSV |
 
-**Default de proposta até GO:** **T1**.
+T2 permanece documentada só como alternativa histórica; **não** implementar.
 
 ### Contrato técnico de parse (rev. `c` — obrigatório em 20.3 / GI1)
 

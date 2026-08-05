@@ -1,7 +1,8 @@
 # ADR-0026 — MITM TLS inspection opt-in (certificado / CA)
 
-**Estado:** Proposto (rev. `c` — critérios GO/NO-GO mensuráveis)  
+**Estado:** Aceito (rev. `c` — critérios GO/NO-GO mensuráveis; implementação condicionada ao spike 20.7)  
 **Data:** 2026-08-05  
+**Aceite:** `2026-08-05` — passo **20.2** / GI0  
 **Decisores:** Operador (GO aceitação no passo 20.2)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
 **Relação:** emenda controlada a [`ADR-0017`](ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) (válida com MITM OFF)

@@ -1,13 +1,13 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-05c` — contratos técnicos fechados; **código ainda não iniciado**)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-05c` — contratos técnicos fechados; **IM0 fechado**; código abre em IM1/20.3)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT de estado vivo do produto:** [`../../CORTEX.md`](../../CORTEX.md)  
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
-**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
+**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) — **Aceito** (`2026-08-05`; transição legado **T1**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Commits:** `trilha-identity-mitm/20.x: …`  
 **Nota:** rev. `b` incorpora reparos da revisão arquitectónica (spike MITM, mapa Identity no daemon, fontes canónicas, fail-mode, precedência). Rev. `c` fecha os **contratos técnicos** que faltavam para iniciar código sem ambiguidade: concorrência do daemon (ADR-0028), contrato `features` (buffer 64B, fail-closed do gate), precedência check-in vs `.lic`, reconciliação §3.1 com o modelo first-match, critérios mensuráveis do spike MITM, canal do agente DC, conflito NAT multi-user, cold start e limites de escala.
@@ -18,16 +18,17 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.2** (IM0 — aceitar ADRs 0025/0026/0027/0028 + GO T1/T2) |
-| Código | Não iniciado |
-| ADRs | Proposto ×4 (aceitação = passo 20.2; ADR-0028 pode aceitar-se até 20.11a) |
-| Próximo após IM0 | IM1 — contrato `features` / entitlement |
+| Passo actual | **20.3** (IM1 — parse `features` daemon ADR-0025 P1–P6 + testes C) |
+| Código | Ainda não iniciado (abre em 20.3) |
+| ADRs | **Aceito** ×4 (`2026-08-05`); transição legado **T1** |
+| Próximo após 20.3 | 20.4 — license-server emissão SKU / UI features |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.2 / IM0
-- IM0: 20.1 PASS (docs); rev.b PASS; rev.c contratos técnicos PASS; 20.2 PENDENTE (ADRs Aceito + T1/T2)
-- IM1–IM9: PENDENTE — código NÃO iniciado
+- Passo actual: 20.3 / IM1
+- IM0: 20.1 PASS; rev.b PASS; rev.c PASS; **20.2 PASS** (ADRs 0025–0028 Aceito; T1)
+- IM1: 20.3 PENDENTE; 20.4–20.6 PENDENTE
+- IM2–IM9: PENDENTE — código NÃO iniciado (abre em 20.3)
 - Baseline: 1.9.8
 ```
 
@@ -134,13 +135,10 @@ Congelamento das filas fechadas:
 | **MITM only (opcional)** | `base,mitm` | MITM sem Identity (se venda fizer sentido) |
 | **Legado** | `full` ou vazio parseado como hoje | **Compat:** equivale a `base` + todas features **já** existentes; **não** auto-concede `identity`/`mitm` após ADR-0025 Aceito (ver regra de transição no ADR) |
 
-**Regra de transição (obrigatória no ADR-0025):**  
-Na aceitação do ADR, decidir explicitamente:
+**Regra de transição (ADR-0025 — GO 20.2):**  
 
-- **Opção T1 (recomendada):** `full` → `base` apenas; Identity/MITM exigem reemissão com flags novas (mais seguro comercialmente).  
-- **Opção T2:** `full` → `base,identity,mitm` (mais generoso a clientes antigos; menos upsell).
-
-**GO humano obrigatório** na escolha T1/T2 no passo 20.2.
+- **T1 (ACEITE `2026-08-05`):** `full` → `base` apenas; Identity/MITM exigem reemissão com flags novas.  
+- **T2:** rejeitada no GO 20.2 (documentada só como alternativa histórica).
 
 Preços X/Y são decisão comercial externa ao repo; o plano só materializa o **gate técnico**.
 
@@ -477,6 +475,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-05 | 20.1 documental PASS; passo actual → 20.2 |
 | 2026-08-05 | **rev. `b`** — reparos arquitectónicos (spike MITM, mapa daemon, fontes canónicas, fail-mode, precedência, riscos R11–R16); código ainda não iniciado |
 | 2026-08-05 | **rev. `c`** — contratos técnicos fechados: ADR-0028 (concorrência daemon) criado; contrato `features` P1–P6; precedência check-in vs `.lic` (interseção); §3.1 reconciliado com first-match; critérios S1–S8 do spike MITM; canal agente DC A1–A7; conflito NAT `multi-user`; cold start; limites de escala; passo 20.11a; riscos R17–R20; código ainda não iniciado |
+| 2026-08-05 | **20.2 PASS** — ADRs 0025/0026/0027/0028 Aceito; transição legado **T1**; GI0 PASS; passo actual → **20.3** (IM1) |
 
 ---
 

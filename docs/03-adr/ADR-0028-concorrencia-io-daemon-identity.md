@@ -1,10 +1,11 @@
 # ADR-0028 — Modelo de concorrência e IO do daemon para Identity (trilha IM)
 
-**Estado:** Proposto (aceitação junto com ADR-0025/0026/0027 no passo 20.2, ou no início de IM3 — passo 20.11a)  
+**Estado:** Aceito  
 **Data:** 2026-08-05  
+**Aceite:** `2026-08-05` — passo **20.2** / GI0 (não adiado para 20.11a)  
 **Decisores:** Operador (GO humano)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
-**Relação:** pré-requisito técnico de IM3–IM5 (mapa daemon, LDAP, RADIUS receiver, agente DC)
+**Relação:** pré-requisito técnico de IM3–IM5 (mapa daemon, LDAP, RADIUS receiver, agente DC); baseline de perf mensurável continua obrigatória no **20.11a**
 
 ---
 

@@ -297,16 +297,16 @@ reavaliacao formal.
 
 - Arranque: [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 - Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md)
-- Passo actual: **20.1 / IM0** (governança); código produto ainda não iniciado
-- ADRs **Proposto:** 0025 (SKU), 0026 (MITM), 0027 (Identity); aceitação = passo 20.2
+- Passo actual: **20.3 / IM1** (parse `features` daemon); IM0 fechado
+- ADRs **Aceito** (`2026-08-05`): 0025 (SKU; **T1**), 0026 (MITM), 0027 (Identity), 0028 (concorrência)
 - Baseline produção: **`1.9.8`**. Captive portal: **fora de escopo**.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
-| BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs Proposto | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **20.1 + rev.b + rev.c PASS**; falta 20.2 ADR Aceito (0025–0028) | código não iniciado; rev.c fecha contratos técnicos (ADR-0028, features P1–P6, spike S1–S8) |
-| BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | Planeado | ADR-0025; GI1 |
-| BG-087 | MITM TLS opt-in + CA (IM2) — **após spike 20.7 GO**; DEFER permitido | Critica | daemon/package/PKI | IM2 | UX HTTPS / risco estabilidade; segundo produto | G | Alto | Planeado | ADR-0026 rev.b; não bloqueia Identity |
-| BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | Planeado | ADR-0027; não usar PHP device_ips SSOT |
+| BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **Concluido (20.2 PASS / GI0)** | ADRs 0025–0028 Aceito; T1; código abre em 20.3 |
+| BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Em curso (20.3)** | ADR-0025 Aceito; GI1 |
+| BG-087 | MITM TLS opt-in + CA (IM2) — **após spike 20.7 GO**; DEFER permitido | Critica | daemon/package/PKI | IM2 | UX HTTPS / risco estabilidade; segundo produto | G | Alto | Planeado | ADR-0026 Aceito; não bloqueia Identity |
+| BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | Planeado | ADR-0027 Aceito; não usar PHP device_ips SSOT |
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | Planeado | WinRM outbound não canónico |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Planeado | GI7; não-regressão IP/MAC |
 | BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | Planeado / adiável | GI8 ou ADR exclusão |

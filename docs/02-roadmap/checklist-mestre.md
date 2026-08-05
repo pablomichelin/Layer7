@@ -401,12 +401,12 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] 20.1 START-HERE + plano + mapa + gates + ADRs Proposto + índices
 - [x] rev. `b` reparos arquitectónicos (spike MITM, mapa daemon, fontes, fail-mode) — **sem código**
 - [x] rev. `c` contratos técnicos (ADR-0028 concorrência; contrato `features` P1–P6; check-in ∩ `.lic`; §3.1 first-match; spike S1–S8; canal DC A1–A7; NAT multi-user; passo 20.11a) — **sem código**
-- [ ] 20.2 Aceitar ADR-0025/0026/0027/0028 + GO transição T1/T2
-- [ ] GI0 completo
+- [x] 20.2 Aceitar ADR-0025/0026/0027/0028 + GO transição **T1** (`2026-08-05`)
+- [x] GI0 completo
 
 ### IM1–IM9
 
-- [ ] IM1 Entitlements (GI1) — BG-086
+- [ ] IM1 Entitlements (GI1) — BG-086 — **passo actual 20.3**
 - [ ] IM2 MITM + CA (GI2–GI3) — BG-087
 - [ ] IM3–IM4 Map + LDAP (GI4–GI5) — BG-088
 - [ ] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089

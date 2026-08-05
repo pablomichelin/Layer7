@@ -64,10 +64,10 @@ vence o canónico.
 | `docs/02-roadmap/plano-identity-mitm-addon.md` | plano Identity+MITM | SSOT execução 20.x | Canónico | — | actualizar a cada passo | novo plano |
 | `docs/01-architecture/identity-mitm-mapa-rastreabilidade.md` | mapa Identity+MITM | NR-* + M-xx | Canónico | — | actualizar com código | novo plano |
 | `docs/09-blocking/plano-gates-identity-mitm.md` | gates GI0–GI9 | gates da trilha | Canónico | — | marcar PASS | novo plano |
-| `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Proposto até 20.2 | Canónico (Proposto) | — | Aceito no 20.2 | novo plano |
-| `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | Proposto até 20.2 | Canónico (Proposto) | emenda ADR-0017 quando ON | Aceito no 20.2 | novo plano |
-| `docs/03-adr/ADR-0027-identity-userid-multi-fonte.md` | ADR User-ID | Proposto até 20.2 | Canónico (Proposto) | evolui ADR-0011/0012 | Aceito no 20.2 | novo plano |
-| `docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md` | ADR concorrência/IO daemon | Proposto até 20.2 (ou 20.11a) | Canónico (Proposto) | pré-requisito IM3–IM5; rev.c do plano | Aceito no 20.2/20.11a | novo plano |
+| `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Aceito (T1) | Canónico | — | manter vivo com IM1 | novo plano |
+| `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | Aceito (impl. via spike 20.7) | Canónico | emenda ADR-0017 quando ON | spike 20.7 | novo plano |
+| `docs/03-adr/ADR-0027-identity-userid-multi-fonte.md` | ADR User-ID | Aceito | Canónico | evolui ADR-0011/0012 | IM3–IM6 | novo plano |
+| `docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md` | ADR concorrência/IO daemon | Aceito | Canónico | pré-requisito IM3–IM5; baseline perf 20.11a | IM3 | novo plano |
 | `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir | F6 H5 |
 | `docs/02-roadmap/plano-ipv6-completo.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir sem GO | F6 H5 |
 | `docs/archive/planos-fechados/*` | planos P0–J + IPv6 | histórico de filas fechadas | Historico (arquivo) | banners 【ARQUIVO · PLANO FECHADO】 | preservar | F6 H5 |

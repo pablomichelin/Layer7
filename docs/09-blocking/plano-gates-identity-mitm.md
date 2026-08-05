@@ -15,8 +15,8 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` quando houver lab.
 |---|----------|--------|
 | GI0.1 | START-HERE + plano + mapa + este ficheiro existem | **PASS** (`2026-08-05`) |
 | GI0.2 | CORTEX / README / backlog / classification apontam a trilha | **PASS** (`2026-08-05`) |
-| GI0.3 | ADR-0025/0026/0027 Aceito (ou emenda registada) + GO T1/T2 | **PENDENTE** (20.2) |
-| GI0.4 | ADR-0028 (concorrência/IO daemon) Aceito — o mais tardar no 20.11a, antes de qualquer código IM3 | **PENDENTE** |
+| GI0.3 | ADR-0025/0026/0027 Aceito (ou emenda registada) + GO T1/T2 | **PASS** (`2026-08-05` — Aceito; **T1**) |
+| GI0.4 | ADR-0028 (concorrência/IO daemon) Aceito — o mais tardar no 20.11a, antes de qualquer código IM3 | **PASS** (`2026-08-05` — Aceito no 20.2; baseline perf permanece no 20.11a) |
 
 **Saída:** agente continua sem ambiguidade comercial/técnica.
 
@@ -139,7 +139,7 @@ Se DEFER: marcar GI2/GI3 `DEFERRED` e avançar Identity.
 
 | Gate | Onda | Estado |
 |------|------|--------|
-| GI0 | IM0 | **Parcial** — docs+índices PASS; ADR Aceito pendente (20.2) |
+| GI0 | IM0 | **PASS** (`2026-08-05` — ADRs Aceito; T1) |
 | GI1 | IM1 | PENDENTE |
 | GI2 | IM2 | PENDENTE |
 | GI3 | IM2 | PENDENTE |
@@ -159,3 +159,4 @@ Se DEFER: marcar GI2/GI3 `DEFERRED` e avançar Identity.
 | 2026-08-05 | Criação GI0–GI9 |
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
+| 2026-08-05 | **GI0 PASS** — 20.2: ADRs 0025–0028 Aceito; transição legado T1 |

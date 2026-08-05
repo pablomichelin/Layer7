@@ -1288,8 +1288,8 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção / `latest`: **`1.9.8`**. Código de produto **ainda não**
-iniciado nesta trilha (IM0 documental).
+Baseline produção / `latest`: **`1.9.8`**. **IM0 fechado** (`2026-08-05`);
+código de produto abre em **IM1 / 20.3** (parse `features`).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1299,27 +1299,28 @@ iniciado nesta trilha (IM0 documental).
   [`docs/01-architecture/identity-mitm-mapa-rastreabilidade.md`](docs/01-architecture/identity-mitm-mapa-rastreabilidade.md)
 - **Gates GI0–GI9:**
   [`docs/09-blocking/plano-gates-identity-mitm.md`](docs/09-blocking/plano-gates-identity-mitm.md)
-- **ADRs Proposto:** [0025](docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md)
-  (SKU X/Y), [0026](docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (MITM
-  opt-in), [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md)
+- **ADRs Aceito (`2026-08-05`, T1):** [0025](docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md)
+  (SKU X/Y; legado `full`→`base`), [0026](docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (MITM
+  opt-in; spike 20.7), [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md)
   (User-ID multi-fonte; **sem** captive),
   [0028](docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md)
-  (concorrência/IO daemon — pré-requisito IM3–IM5)
+  (concorrência/IO daemon — pré-requisito IM3–IM5; baseline perf no 20.11a)
 - **Backlog:** BG-085…BG-092
 - **Ordem:** IM0 → IM1 → spike MITM (GO/DEFER) → IM3–IM6 Identity (mapa
   daemon; pode avançar se MITM DEFER) → IM7–IM8 → IM9
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-05c` (contratos técnicos fechados; código não iniciado)
+- **Rev. plano:** `2026-08-05c` (contratos técnicos fechados; 20.2 PASS)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.2 / IM0** (aceitar ADR-0025/0026/0027/0028 + GO T1/T2)
-- IM0: 20.1 PASS; rev.b PASS; **rev.c contratos técnicos PASS**; 20.2 PENDENTE
-- IM1–IM9: PENDENTE
-- Código produto: **NÃO iniciado**
-- Plano rev.: 2026-08-05c (ADR-0028 concorrência; contrato features P1–P6; check-in ∩ .lic; §3.1 first-match; spike S1–S8; canal DC A1–A7; NAT multi-user; passo 20.11a)
+- Passo actual: **20.3 / IM1** (parse features daemon P1–P6 + testes C)
+- IM0: 20.1 PASS; rev.b PASS; rev.c PASS; **20.2 PASS** (ADRs 0025–0028 Aceito; T1; GI0 PASS)
+- IM1: 20.3 PENDENTE; 20.4–20.6 PENDENTE
+- IM2–IM9: PENDENTE
+- Código produto: **NÃO iniciado** (abre em 20.3)
+- Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
-- Próximo quando iniciar: GO humano T1 vs T2 + marcar ADRs Aceito (ainda sem código)
+- Próximo: 20.3 — parse `features` no daemon (ADR-0025 P1–P6) + testes C
 ```
 
 ---
@@ -1345,7 +1346,7 @@ TRILHA IDENTITY + MITM — progresso
 2. `AGENTS.md`
 3. `CORTEX.md` (secção *Trilha Identity + MITM*)
 4. [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
-5. Mapa + gates + ADRs 0025–0027
+5. Mapa + gates + ADRs 0025–0028 (Aceito; T1)
 
 ### Para a trilha de fecho / consolidacao / IPv6 (manutenção)
 
@@ -1494,12 +1495,12 @@ CHECKPOINT CANONICO
 - Canal publico latest: **1.9.13** (guia Acesso Remoto)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo 20.2/IM0 (ADRs Aceito + T1/T2); arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo 20.3/IM1 (parse features); GI0 PASS; arranque docs/00-overview/START-HERE-identity-mitm.md
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; não misturar com IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: GO promoção enforce 1.9.13 **ou** Identity+MITM 20.2; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: Identity+MITM **20.3** (parse features) **ou** GO promoção enforce 1.9.13; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
