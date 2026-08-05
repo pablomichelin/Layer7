@@ -9,19 +9,15 @@ plano mestre. O plano completo está em:
 
 ## Estado actual (checkpoint — verificar no CORTEX antes de executar)
 
-| Campo | Valor esperado (`2026-08-04`) |
+| Campo | Valor esperado (`2026-08-05`) |
 |-------|-------------------------------|
-| Passo actual | **Onda F prep** ou **9.0** (mapa F6) — Onda G **PASS** |
-| Ondas concluídas | A–D **PASS**, E **LIMITAÇÃO**, G **PASS** (8.1+8.2) |
-| Onda D | **PASS** — 10a/10b/11 + G6/G7 |
-| Gates G6–G7 | **PASS** (`20260804T212800Z` / `212900Z`) |
-| Trilha BG-077 | **fechada** (S14 + S09 reteste PASS) |
-| Candidato lab (gates) | **`1.8.11_69`** |
-| Canal `latest` | `1.8.11_69` |
-| Produção enforce | `1.8.11_24` (até GO Onda F) |
-| Appliance lab | `192.168.100.254` (Plus/FB16 — **CE VM indisponível**; ADR-0022) |
-| Builder | `192.168.100.12` |
-| Veeam lab | **PASS** — `254`+`12`+`244` (`20260804T211800Z-veeam-prerequisite-PASS`) |
+| Passo actual | **Onda H prep** (9.0 mapa F6) ou **Onda I** (BG-028) |
+| Ondas concluídas | A–D **PASS**, E **LIMITAÇÃO** (ADR-0022 aceite), F **PASS**, G **PASS** |
+| Onda F | **PASS** — GO enforce `1.8.11_69` (`20260805T010100Z`) |
+| Gates G6–G7 | **PASS** |
+| Candidato / produção enforce | **`1.8.11_69`** |
+| Canal `latest` | `1.8.11_69` (alinhado) |
+| CE | **LIMITAÇÃO** — ADR-0022 aceite (VM CE indisponível) |
 
 ### Continuidade — o plano geral **não foi substituído**
 
@@ -45,7 +41,7 @@ evidências em `docs/tests/evidence/`. Para BG-077:
 ## Antes de colar no chat
 
 1. `git status` limpo ou mudanças conscientes commitadas.
-2. Confirmar dual-canal: **`latest` (`_68`) ≠ produção enforce (`_24`)**.
+2. Confirmar alinhamento pós-GO: **`latest` (`_69`) = produção enforce (`_69`)**.
 3. Escolher modo conforme a **onda** (secção 3.5 do plano):
    - **Multitarefa (preferido em P0, P1, H):** 1 coordenador + workers com ficheiros **disjuntos** e **sem dependência de estado** entre si.
    - **Agente único (obrigatório em A–G appliance, F, I–J):** qualquer passo que mexe no appliance, ficheiros quentes ou GO.

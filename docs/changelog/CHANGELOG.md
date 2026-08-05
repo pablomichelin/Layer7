@@ -16,6 +16,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Onda G (8.2):** checklist `docs/tests/f5-smoke-checklist.md` +
   `tests/lab/run-f5-smoke-checklist.sh`; evidência PASS
   `20260805T005650Z-ondaG-f5-smoke-82`.
+- **Onda F (7.1–7.2):** GO enforce documental `1.8.11_69` (`2026-08-05`);
+  evidência `20260805T010100Z-ondaF-go-enforce`; ADR-0022 aceite.
 - **BG-077 — check-in online (Bloco 1):** `POST /api/license/check-in` no
   license-server (`check-in.js`, `check_ins_log`); deploy em `192.168.100.244`.
 - **BG-077 — check-in online (Bloco 2):** `layer7d` com `--check-in`,

@@ -1,6 +1,6 @@
 # Plano mestre — Fecho de produção e consolidação Layer7
 
-**Estado do plano:** `ACTIVO` (rev. `2026-08-04b` — alinhamento versões + multitarefa)  
+**Estado do plano:** `ACTIVO` (rev. `2026-08-05c` — GO Onda F `_69`)  
 **Tipo:** execução governada (software + documentação + versionamento)  
 **SSOT deste plano:** este ficheiro  
 **SSOT de estado do projecto:** `CORTEX.md`  
@@ -10,11 +10,11 @@
 
 ## 0. Snapshot do projecto (leitura rápida — actualizar só no CORTEX)
 
-| Campo | Valor actual (`2026-08-04`) |
+| Campo | Valor actual (`2026-08-05`) |
 |-------|-----------------------------|
 | **Fase roadmap** | F4 aberta (F3 **fechada** `2026-08-04`); F0–F2 concluídas |
 | **Canal público `latest`** | `1.8.11_69` |
-| **Produção enforce (referência)** | `1.8.11_24` — `SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818` |
+| **Produção enforce (referência)** | **`1.8.11_69`** — GO Onda F (`2026-08-05`) |
 | **Candidato lab para gates** | **`1.8.11_69`** |
 | **`PORTVERSION` / `PORTREVISION` no repo** | `1.8.11` / `69` |
 | **Appliance lab observado** | `192.168.100.254` — pfSense **Plus** `26.03.1` / FreeBSD `16` (validar CE na Onda E) |
@@ -23,7 +23,7 @@
 | **F3** | **Fechada** (`2026-08-04`) — `F3 pode fechar`; evidência Onda C |
 | **Passo actual do plano** | Ver checklist em `CORTEX.md` (secção *Plano mestre*) |
 
-**Regra dual-canal:** `latest` ≠ GO enforce. Instalar `latest` em lab é permitido; tratar como **candidato** até G2–G7 + veredicto humano.
+**Regra pós-GO:** `latest` = produção enforce (`_69`). Rollback imediato: `_68`.
 
 **Dois marcos distintos (não confundir):**
 
@@ -77,7 +77,7 @@ quando **todas** as condições abaixo forem verdadeiras ao mesmo tempo:
    - mudança de código/produto → commit + (se `.pkg`) `PORTREVISION` + release GitHub quando o passo exigir artefacto;
    - mudança só documental → commit documental (build pode omitir);
    - nunca deixar working tree “meio feito” sem checkpoint no CORTEX.
-6. **Produção enforce intocada** até veredicto GO humano (referência actual: `1.8.11_24`).
+6. **GO Onda F (`2026-08-05`):** produção enforce = `1.8.11_69` (decisão humana registada).
 7. **Não mover/renomear/apagar** ficheiros existentes antes da **Onda H (F6)**.
 8. **macOS ≠ gate de produto.** Gates reais: builder FreeBSD + appliance pfSense.
 
@@ -306,7 +306,7 @@ Paralelo PROIBIDO:
 | **Objectivo** | Uma versão deixa de ser “candidato” e passa a **referência enforce** |
 | **Pré-condições obrigatórias** | Ondas **A–B PASS**; Ondas **C–D–E PASS**; G6–G7 documentados; relatório `run_id` único |
 | **Pré-condições para R1–R12 completo** | Ondas G, H, I também PASS (fecho na Onda J) |
-| **Acções** | Veredicto humano GO; actualizar CORTEX (`produção enforce = 1.8.11_65` ou versão acordada); MANUAL-INSTALL comandos **todos** na versão GO; changelog; opcional E8 só se DoD Caminho B completo |
+| **Acções** | Veredicto humano GO; actualizar CORTEX (`produção enforce = 1.8.11_69`); MANUAL-INSTALL comandos **todos** na versão GO; changelog; ADR-0022 aceite (CE LIMITAÇÃO) |
 | **Versionamento** | Tag GitHub = GO; releases posteriores ao GO como **prerelease** até Onda J |
 | **Saída** | R1 + R6 satisfeitos (GO); R3–R5 já satisfeitos pelas ondas C–D |
 
@@ -401,7 +401,7 @@ Usar esta lista como **fila única**. Marcar no CORTEX o passo actual.
 | 5.1 | D | Lab 10a/10b/11 | F4 evidência | Agente único | Commit docs |
 | 5.2 | D | Lab VIP §20 | VIP live OK | Agente único | Commit docs |
 | 6.1 | E | CE passivo | Matriz CE | Agente único | Commit docs |
-| 7.1 | F | GO humano | Produção = `1.8.11_65` | Agente único | Release + MANUAL + CORTEX |
+| 7.1 | F | GO humano | Produção = `1.8.11_69` | Agente único | Release + MANUAL + CORTEX |
 | 7.2 | F | Alinhar latest | latest = GO | Agente único | GitHub |
 | 8.1 | G | Mapa testes F5 | BG-012 avançado | Agente único | Commit |
 | 8.2 | G | Smoke repetível | Checklist único | Agente único | Commit |
@@ -485,9 +485,9 @@ Este plano **orquestra** a ordem; não substitui os SSOT de área.
 PLANO FECHO/CONSOLIDAÇÃO — progresso
 - Passo actual: <id>
 - Onda: <P0|P1|A…J>
-- Candidato lab: 1.8.11_65 (fixado)
-- Produção enforce: 1.8.11_24 (até GO Onda F)
-- Canal latest: 1.8.11_65
+- Candidato lab: 1.8.11_69
+- Produção enforce: 1.8.11_69 (GO Onda F 2026-08-05)
+- Canal latest: 1.8.11_69
 - G0-G1: <PENDENTE|PASS>
 - G2-G4: <PENDENTE|PASS|FAIL>
 - G5: <PENDENTE|PASS|FAIL>
@@ -496,7 +496,7 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 - F4: <ABERTA|FECHADA>
 - VIP §20: <PENDENTE|PASS>
 - CE: <PENDENTE|PASS|LIMITAÇÃO>
-- GO humano (Onda F): <NÃO|SIM data>
+- GO humano (Onda F): SIM 2026-08-05
 - Produto pronto (Onda J): <NÃO|SIM>
 - F5 mínima: <PENDENTE|PASS>
 - F6: <NÃO INICIADA|H.0|H1…|FECHADA>
@@ -524,3 +524,4 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-04j | Onda E LIMITAÇÃO: passo 6.1 — sem VM CE na malha lab; ADR-0022; proxy Plus `_69` parcial; próximo Onda F prep (humano) ou Onda G |
 | 2026-08-05a | Pós-Veeam: cleanup `g5-test-bl`; reteste paridade CE; Onda G 8.1 mapa F5; próximo 8.2 |
 | 2026-08-05b | Onda G PASS: passo 8.2 checklist smoke (`20260805T005650Z`); próximo Onda F prep ou 9.0 H.0 |
+| 2026-08-05c | **Onda F PASS:** GO enforce `1.8.11_69` (`20260805T010100Z`); ADR-0022 aceite; `latest` alinhado; próximo 9.0 H.0 ou Onda I |

@@ -11,18 +11,17 @@
 
 | Item | Valor |
 |------|-------|
-| **Canal público `latest`** | `1.8.11_65` — tag `v1.8.11_65` em `pablomichelin/Layer7` |
-| **SHA256 (`latest`)** | `e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e` |
-| **Produção enforce (referência)** | `1.8.11_24` — **até gates G2–G7 + GO humano** (Onda F do plano mestre) |
-| **SHA256 (enforce ref)** | `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818` |
-| **Candidato lab (gates)** | `1.8.11_65` (confirmado passo 1.1 — 2026-08-04) |
+| **Canal público `latest`** | `1.8.11_69` — tag `v1.8.11_69` em `pablomichelin/Layer7` |
+| **SHA256 (`latest`)** | `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764` |
+| **Produção enforce (referência)** | **`1.8.11_69`** — GO Onda F (`2026-08-05`) |
+| **Rollback imediato** | `1.8.11_68` |
+| **Candidato lab (gates)** | `1.8.11_69` (G2–G7 PASS) |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
 | **Fase roadmap** | F4 aberta; F3 aberta; plano de fecho **ACTIVO** |
 | **Trilha activa** | **Caminho B** — Enforcement escopado (E0–E3 no codigo; E4–E8 planeados) |
-| **Gate pendente** | **G2–G7** no appliance (`plano-gates-producao.md`) — **nao avancar E4** sem G5 PASS |
+| **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 
-> **`latest` ≠ produção enforce.** O botao *Verificar actualizacao* aponta para `_65`;
-> a referencia enforce continua `_24` ate veredicto GO.
+> **GO Onda F (`2026-08-05`):** `latest` e produção enforce alinhados em `_69`.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 

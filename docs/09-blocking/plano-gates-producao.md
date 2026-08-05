@@ -1,15 +1,14 @@
 # Plano — gates de produção Layer7
 
-**Data:** 2026-08-04 (rev. alinhamento candidato lab)  
-**Versão alvo candidata (gates):** `1.8.11_65`  
-**Canal público `latest`:** `1.8.11_65`  
-**Produção enforce (referência):** `1.8.11_24`  
-**Veredicto actual:** **NO-GO** para activação enforce / promoção GO  
-**Estado:** CANDIDATO LAB EM VALIDAÇÃO (Gate B1 pendente no appliance)
+**Data:** 2026-08-05 (rev. GO Onda F)  
+**Versão alvo / produção enforce:** `1.8.11_69`  
+**Canal público `latest`:** `1.8.11_69` (alinhado)  
+**Veredicto actual:** **GO** — promoção enforce documental (`2026-08-05`)  
+**Estado:** G2–G7 **PASS** no candidato `_69`; CE **LIMITAÇÃO** (ADR-0022 aceite)
 
-> **Nota:** `_31` foi superseded por `_32`…`_65`. O histórico de fixes por
+> **Nota:** `_31` foi superseded por `_32`…`_69`. O histórico de fixes por
 > versão mantém-se no `CHANGELOG` e no `CORTEX`; os gates físicos executam-se
-> **uma vez** no candidato actual (`_65`), não por cada PORTREVISION intermédio.
+> **uma vez** no candidato actual (`_69`), não por cada PORTREVISION intermédio.
 
 ---
 
@@ -17,21 +16,20 @@
 
 1. Nenhum gate físico substituído por testes macOS/builder isolados.
 2. Ordem: **passivo → monitor → enforce scoped → enforce legacy** (se algum dia).
-3. Rollback sempre para `_24` passivo documentado.
+3. Rollback imediato documentado: `_68`; rollback histórico enforce: `_24`.
 4. `scoped_hybrid` permanece experimental até E8 + two-client PASS.
-5. Produção enforce intocada até veredicto humano explícito (Onda F do plano mestre).
-6. Candidato lab fixado: `1.8.11_65` (`SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e`).
+5. **GO Onda F (`2026-08-05`):** produção enforce = `1.8.11_69` (decisão humana).
+6. CE físico no build `_69` pendente — ADR-0022 aceite como ressalva.
 
-### Confirmação passo 1.1 (P1 — 2026-08-04)
+### Confirmação passo 1.1 (P1 — 2026-08-04, confirmado GO)
 
 | Campo | Valor verificado |
 |-------|------------------|
-| Versão candidata | `1.8.11_65` (`PORTVERSION=1.8.11`, `PORTREVISION=65`) |
-| SHA256 artefacto | `e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e` |
-| GitHub `latest` | `v1.8.11_65` — `pablomichelin/Layer7` |
-| Dual-canal | `latest` (`_65`) ≠ produção enforce (`_24`) |
-| Daemon vs GUI | `_65` altera só GUI (BG-076); daemon = `_64` |
-| Veredicto | **CANDIDATO CONFIRMADO** — prosseguir passo 1.2 (snapshot) |
+| Versão candidata / GO | `1.8.11_69` (`PORTVERSION=1.8.11`, `PORTREVISION=69`) |
+| SHA256 artefacto | `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764` |
+| GitHub `releases/latest` | `v1.8.11_69` |
+| Evidência GO | `docs/tests/evidence/20260805T010100Z-ondaF-go-enforce/` |
+| Veredicto | **GO ENFORCE** — produção = `_69`; CE LIMITAÇÃO aceite |
 
 ---
 
@@ -41,7 +39,7 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G0.1 | `tests/run-local.sh` PASS | macOS / CI | **PASS** (revalidar no passo 1.0) |
+| G0.1 | `tests/run-local.sh` PASS | macOS / CI | **PASS** |
 | G0.2 | Lint shell pacote | `sh -n` | **PASS** |
 | G0.3 | Working tree limpo para release | `git status` | Revalidar antes de cada bloco |
 
@@ -49,71 +47,72 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G1.1 | Build nDPI + pacote `_65` | Makefile port | **PASS** (publicado `2026-08-04`) |
-| G1.2 | SHA256 artefacto | `sha256` `.pkg` | `e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e` |
-| G1.3 | Smoke `layer7d -t` | builder | **PASS** (documentado CORTEX) |
-| G1.4 | PHP lint no builder | `php -l` | **PASS** (documentado) |
+| G1.1 | Build nDPI + pacote `_69` | Makefile port | **PASS** |
+| G1.2 | SHA256 artefacto | `sha256` `.pkg` | `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764` |
+| G1.3 | Smoke `layer7d -t` | builder | **PASS** |
+| G1.4 | PHP lint no builder | `php -l` | **PASS** |
 
 ### G2 — Instalação passiva (appliance)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G2.1 | Instalar `_65` sem activar | `pkg add` + `enabled=false` | **PASS** (`2026-08-04`, appliance `254`) |
-| G2.2 | Daemon arranca, PID legível | `service layer7d status` | **PASS** (pid `38695`) |
-| G2.3 | Zero regras block Layer7 | `pfctl -sr` grep layer7 | **PASS** (zero regras) |
+| G2.1 | Instalar `_69` sem activar | `pkg add` + `enabled=false` | **PASS** |
+| G2.2 | Daemon arranca, PID legível | `service layer7d status` | **PASS** |
+| G2.3 | Zero regras block Layer7 | `pfctl -sr` grep layer7 | **PASS** |
 | G2.4 | Tabelas dinâmicas vazias | `layer7-pfctl` / pfctl -T show | **PASS** |
-| G2.5 | Binário executável no OS do appliance | `layer7d -V`, `ldd` | **PASS** (FB16; pkg FB15 com `IGNORE_OSVERSION`) |
+| G2.5 | Binário executável no OS do appliance | `layer7d -V`, `ldd` | **PASS** |
 
 ### G3 — Parser PF completo
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G3.1 | Ruleset completo `pfctl -nf` | Com anti-QUIC ON | **PASS** (`2026-08-04`, dry-run snippet + rules.debug) |
-| G3.2 | Ordem `on <if> inet` | FP-018 fix `_29+` | **PASS** (`on vmx0 inet` no snippet anti-QUIC) |
-| G3.3 | Regras `pallow` + `L7ALLOW` + `exc_allow` | FP-017, BG-075 | **PASS** (snippet dry-run; L7ALLOW presente) |
+| G3.1 | Ruleset completo `pfctl -nf` | Com anti-QUIC ON | **PASS** |
+| G3.2 | Ordem `on <if> inet` | FP-018 fix `_29+` | **PASS** |
+| G3.3 | Regras `pallow` + `L7ALLOW` + `exc_allow` | FP-017, BG-075 | **PASS** |
 
 ### G4 — Monitor activo (captura)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G4.1 | `captures > 0` interfaces reais | stats JSON | **PASS** (`captures=2`, `cap_pkts=25728`) |
-| G4.2 | Ida/volta mesmo fluxo classificado | `cap_*` metrics | **PASS** (`cap_classified=708`) |
-| G4.3 | Sem bloqueio PF | tráfego bancos OK | **PASS** (monitor; `total_blocked=0`) |
-| G4.4 | Logs contenção L1 | rotação / SQLite | **PASS** (sem anomalia observada) |
-| G4.5 | Pressão flow table | `cap_evicted/dropped` | **PASS** (`cap_dropped=0`, `cap_evicted=0`) |
+| G4.1 | `captures > 0` interfaces reais | stats JSON | **PASS** |
+| G4.2 | Ida/volta mesmo fluxo classificado | `cap_*` metrics | **PASS** |
+| G4.3 | Sem bloqueio PF | tráfego bancos OK | **PASS** |
+| G4.4 | Logs contenção L1 | rotação / SQLite | **PASS** |
+| G4.5 | Pressão flow table | `cap_evicted/dropped` | **PASS** |
 
 ### G5 — Two-client scoped (validacao-lab §12)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G5.1 | `scoped_hybrid` ON + enforce | duas estações | **PASS** (`2026-08-04` — `_66` pfnearly; regra pdst linha ~388 antes pass LAN ~633) |
-| G5.2 | Cliente A block, B allow mesmo destino | curl/browser | **PASS** (A `000` com IP em `layer7_pdst_0`; B HTTP 200; 12 packets PF) |
-| G5.3 | App policy não quarentena total A | FP-002 | **PASS** (`psrc_0` vazia; google HTTP 200) |
-| G5.4 | Quarentena explícita só A | `quarantine_origin` | **PASS** (`layer7:psrc:g5-quarantine-a` no ruleset) |
-| G5.5 | State kill sessão existente | FP-003 | **PASS** (`pfctl -k` → estados 0) |
-| G5.6 | Allow vence blacklist sem bypass nativo | FP-017 | **PASS** (`blsrc` + `L7ALLOW`; sem `pass quick`) |
-| G5.7 | Smoke `smoke-enforcement-scoped.sh` | lab script | **PASS** (ALL PASSED + two-client Mac) |
+| G5.1 | `scoped_hybrid` ON + enforce | duas estações | **PASS** (`_66` pfnearly) |
+| G5.2 | Cliente A block, B allow mesmo destino | curl/browser | **PASS** |
+| G5.3 | App policy não quarentena total A | FP-002 | **PASS** |
+| G5.4 | Quarentena explícita só A | `quarantine_origin` | **PASS** |
+| G5.5 | State kill sessão existente | FP-003 | **PASS** |
+| G5.6 | Allow vence blacklist sem bypass nativo | FP-017 | **PASS** |
+| G5.7 | Smoke `smoke-enforcement-scoped.sh` | lab script | **PASS** |
 
 ### G6 — Licenciamento fail-safe
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G6.1 | Licença inválida → flush PF | restart sem `.lic` / DR-05 | **PASS** (`20260804T212800Z-ondaD-g6-PASS`) |
-| G6.2 | Grace 14d offline | daemon + Onda C S08/S12 | **PASS** (`20260804T233500Z-ondaC-dr05-veeam`) |
-| G6.3 | Stop serviço → tabelas vazias | rc.d | **PASS** (`20260804T212800Z-ondaD-g6-PASS`) |
+| G6.1 | Licença inválida → flush PF | restart sem `.lic` / DR-05 | **PASS** |
+| G6.2 | Grace 14d offline | daemon + Onda C S08/S12 | **PASS** |
+| G6.3 | Stop serviço → tabelas vazias | rc.d | **PASS** |
 
 ### G7 — Release pública GO (humano)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G7.1 | G0–G6 PASS documentados | relatório run_id | **PASS** (`20260804T212900Z-ondaD-g7-PASS`) |
+| G7.1 | G0–G6 PASS documentados | relatório run_id | **PASS** |
 | G7.2 | CHANGELOG + MANUAL-INSTALL | docs | **PASS** (`1.8.11_69`) |
 | G7.3 | Trust chain F1.2 pacote (BG-028) | manifesto assinado | **Não activo** (Onda I) |
-| G7.4 | Tag GitHub GO | release | **PASS** candidato lab — `v1.8.11_69` (`2026-08-04`) |
+| G7.4 | Tag GitHub GO | release | **PASS** — `v1.8.11_69` |
+| G7.5 | Onda F GO humano | evidência | **PASS** (`20260805T010100Z-ondaF-go-enforce`) |
 
 ---
 
-## 3. O que o candidato `_65` inclui (resumo)
+## 3. O que o candidato `_69` inclui (resumo)
 
 | Área | Versão mínima no código | Nota |
 |------|-------------------------|------|
@@ -125,30 +124,21 @@
 | Flow table | `_30`+ | BG-058 |
 | nDPI finalização | `_31`+ | BG-059 |
 | VIP PF live | `_64`+ | BG-075 |
-| GUI i18n | `_65` | BG-076 — não afecta daemon |
+| GUI i18n | `_65`+ | BG-076 |
+| pfnearly G5 | `_66`+ | BG-077 base |
+| Check-in online | `_68`+ | BG-077 |
+| SIGHUP blacklists | `_69` | F4.2 |
 
 ---
 
-## 4. Primeiro bloco recomendado (Gate B1 — Onda A do plano mestre)
-
-**Bloco B1 — Gate passivo `1.8.11_65` no appliance**
-
-1. Snapshot VM + rollback `_24` documentado.
-2. `pkg add pfSense-pkg-layer7-1.8.11_65.pkg` com `enabled=false`, `mode=monitor`.
-3. Executar G2 + G3 + G4 (sem enforce).
-4. Recolher `run_id`, stats JSON, `pfctl -sr`, logs em `docs/tests/evidence/`.
-5. **Parar** se G2.5 falhar (ABI/OS) — não avançar para G5.
-6. Só após G2–G4 PASS: Onda B (G5 two-client).
-
----
-
-## 5. Rollback por gate
+## 4. Rollback por gate
 
 | Falha em | Acção |
 |----------|-------|
-| G2 | `pkg delete` + reinstall `_24`; confirmar passivo |
+| Pós-GO imediato | Reinstall `_68` |
+| G2 | `pkg delete` + reinstall `_68` ou `_24` histórico |
 | G3 | Desactivar anti-QUIC; flush; escalar FP-018 se persistir |
-| G5 | Reverter `scoped_hybrid`; flush-all; manter `_24` enforce ref |
+| G5 | Reverter `scoped_hybrid`; flush-all |
 | G6 | Restaurar `.lic`; `enforce_ge_downgrade` manual via stop/start |
 | Qualquer | `layer7-pfctl flush-all` + `filter_configure` |
 

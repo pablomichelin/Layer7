@@ -1,7 +1,7 @@
 # ADR-0022 — Compatibilidade pfSense CE: escopo e limitação (Onda E)
 
-**Estado:** Aceito (limitação operacional)  
-**Data:** 2026-08-04  
+**Estado:** Aceito (limitação operacional) — **GO humano Onda F** (`2026-08-05`)  
+**Data:** 2026-08-04 (emenda GO: 2026-08-05)  
 **Contexto:** Onda E do plano mestre de fecho (`passo 6.1`); candidato lab `1.8.11_69`
 
 ---
@@ -34,10 +34,23 @@ A Onda E (`20260804T234500Z-ondaE-ce-parity`) confirmou:
    versões antigas do port; **não** estende automaticamente o veredicto a `_69`.
 4. **GO enforce (Onda F)** exige CE PASS **ou** aceite humano explícito desta
    ADR com ressalva comercial documentada no CORTEX.
-5. **Comunicação externa:** até CE PASS, materiais comerciais devem manter
-   «compatível com pfSense CE 2.7.x/2.8.x» como *claim de desenho*, com nota
-   de que validação física CE do build actual está **pendente** (Plus validado
-   em lab).
+5. **Comunicação externa:** materiais comerciais mantêm «compatível com pfSense
+   CE 2.7.x/2.8.x» como *claim de desenho*, com nota de que validação física CE
+   do build `_69` está **pendente** (Plus/FB16 validado em lab; ADR aceite em
+   `20260805T010100Z-ondaF-go-enforce`).
+
+---
+
+## Emenda — aceite humano Onda F (`2026-08-05`)
+
+O operador autorizou explicitamente:
+
+1. Aceitar **ADR-0022** como ressalva CE para promoção GO.
+2. Promover **`1.8.11_69`** a referência de **produção enforce** no CORTEX e
+   `MANUAL-INSTALL.md` (passos 7.1–7.2 do plano mestre).
+
+**Consequência:** Onda F documental **PASS**; claim CE-only físico no `_69`
+permanece pendente até VM CE ou revalidação futura.
 
 ---
 

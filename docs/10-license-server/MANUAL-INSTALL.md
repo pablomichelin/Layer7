@@ -253,7 +253,8 @@ pré-FP-019 e não deve ser promovido.
 `update-blacklists.sh --apply` deixava de enviar SIGHUP quando o pidfile
 `/var/run/layer7d.pid` nao tinha newline final (`daemon(8)`): `read` preenchia
 o PID mas devolvia rc≠0. Alinhado a `rc.d/layer7d` e `layer7-stats-collect.sh`.
-Onda D sec. **10b** PASS. Rollback: `_68`.
+Onda D sec. **10b** PASS. **GO Onda F (`2026-08-05`):** referencia producao
+enforce. Rollback imediato: `_68`.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_69`
 - **SHA256 esperado:** `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764`
@@ -617,30 +618,39 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > 7. seccao **6. Desinstalar** (nota "Nesta release") e **Apos desinstalar**
 >    (comando de reinstalacao).
 >
-> Verificacao rapida (deve devolver apenas referencias historicas/producao):
+> Verificacao rapida (deve devolver apenas referencias historicas):
 > `grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md`.
-> A referencia de **producao enforce** (`_24` ate gates G2–G7) e intencional
-> e nao acompanha o canal publico.
+> Apos GO Onda F (`2026-08-05`), producao enforce e canal publico estao alinhados
+> em `_69`; `_24` permanece apenas como rollback historico.
 
-**Versao mais recente no canal publico (updater / download):** `1.8.11_69`
+> **GO enforce (Onda F — 2026-08-05):** referencia de **producao enforce** e canal
+> publico `latest` alinhados em **`1.8.11_69`**. Rollback imediato: `_68`.
+> Rollback historico enforce: `_24`. CE: validacao fisica pendente — **ADR-0022**
+> aceite humano (`docs/tests/evidence/20260805T010100Z-ondaF-go-enforce/`).
+
+**Versao de referencia producao enforce e canal publico:** `1.8.11_69`
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_69`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_69/pfSense-pkg-layer7-1.8.11_69.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_69/pfSense-pkg-layer7-1.8.11_69.pkg.sha256`
-- **SHA256 esperado:** `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764` (`/usr/local/etc/layer7/`) **nao** e
-> substituido nos upgrades; o backup XML do pfSense **nao** o inclui — use
-> Export/Import em Definicoes Layer7. **`1.8.11_55` e defeituosa — nao instalar.**
->
-> **Candidato lab (Gate B1):** `1.8.11_69` — ver
-> [`plano-gates-producao.md`](../09-blocking/plano-gates-producao.md).
-> Rollback desta versao: `_68` (**nao** `_55`). **Nao** activar enforce em producao
-> sem gates G2–G7 + GO humano. Para rollback de referencia enforce: `_24`.
+- **SHA256 esperado:** `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764`
+- **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
-**Versao de referencia producao (enforce bloqueado ate gate):** `1.8.11_24`
+**Versao anterior (rollback imediato):** `1.8.11_68`
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_68`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_68/pfSense-pkg-layer7-1.8.11_68.pkg`
+- **SHA256 esperado:** `8bf3f1b6fa0cffe48417f4b6bc55b19da06ded750f96a3191913342a4dd7fa05`
+
+**Versao historica (rollback enforce legado):** `1.8.11_24`
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_24`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_24/pfSense-pkg-layer7-1.8.11_24.pkg`
-- **SHA256 esperado (`pfSense-pkg-layer7-1.8.11_24.pkg`):** `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`
+- **SHA256 esperado:** `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`
+
+> **Nota:** o ficheiro `/usr/local/etc/layer7/` **nao** e substituido nos upgrades;
+> o backup XML do pfSense **nao** o inclui — use Export/Import em Definicoes
+> Layer7. **`1.8.11_55` e defeituosa — nao instalar.**
 
 > **Versao anterior (rollback):** `1.8.11_23` em
 > `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_23`
@@ -683,7 +693,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.8.11_69.pkg.sha256 https://github.com/pablomi
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`8bf3f1b6fa0cffe48417f4b6bc55b19da06ded750f96a3191913342a4dd7fa05`.
+`b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764`.
 
 ---
 
@@ -714,8 +724,7 @@ Cada seccao abaixo inclui:
 > **Nesta release (`1.8.11_69`)** o caminho oficial e o **comando unico manual**
 > abaixo. O `install.sh` automatico (carimbado/assinado F1.2) nao e publicado
 > nesta release: ver nota em **Links da versao actual** e **BG-028** no
-> backlog. Para producao com enforce, a referencia continua `1.8.11_24`
-> ate os gates G2–G7 (ver **Links da versao actual**).
+> backlog. **Producao enforce (GO Onda F):** referencia **`1.8.11_69`**.
 
 **Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
@@ -1382,12 +1391,12 @@ release — ver nota em **Links da versao actual** e **BG-028**):
 service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
-Para reinstalar uma versao anterior conhecida (ex.: `1.8.11_63`, imediatamente
-anterior **valida** no canal publico — **nao** usar `1.8.11_55`, defeituosa;
-para producao enforce a referencia e `1.8.11_24`):
+Para reinstalar uma versao anterior conhecida (rollback imediato pos-GO:
+`1.8.11_68`; rollback historico enforce: `1.8.11_24`; **nao** usar `1.8.11_55`,
+defeituosa):
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_63.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_63/pfSense-pkg-layer7-1.8.11_63.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_63.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.8.11_68.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_68/pfSense-pkg-layer7-1.8.11_68.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_68.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 A configuracao (`/usr/local/etc/layer7.json`, `/usr/local/etc/layer7.lic`) e

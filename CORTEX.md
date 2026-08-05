@@ -35,16 +35,14 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.8.11_65` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_65`,
-`SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e`;
+`1.8.11_69` (GitHub Releases `pablomichelin/Layer7`, tag `v1.8.11_69`,
+`SHA256=b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
-**Referencia de producao enforce:** continua `1.8.11_24`
-(`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`)
-ate os gates G2–G7; candidatos posteriores sao canal de teste/lab.
-Caminho B E0–E3 sobre Caminho A (`1.8.11_23`); gate two-client appliance
-**PENDENTE**.
+**Referencia de producao enforce:** **`1.8.11_69`** (GO Onda F `2026-08-05`;
+rollback imediato `_68`; historico `_24`). CE fisico pendente — ADR-0022 aceite.
+Caminho B E0–E3; gates G2–G7 **PASS** no candidato `_69`.
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1214,22 +1212,22 @@ com appliance (A–G) e GO/release (F, I–J). Ver grafo de dependencias no plan
 (sec. 3.3).
 
 **Nao** iniciar F6 (mover pastas em `docs/`) antes da Onda H do plano.
-**Nao** promover `latest` (`1.8.11_65`) a producao enforce sem GO humano
-(Onda F) apos G2–G7 + Ondas C–E PASS.
+**Onda F (GO enforce):** **PASS** (`2026-08-05`) — producao enforce = `1.8.11_69`
+(ADR-0022 aceite; CE fisico pendente).
 **Congelamento P0.2:** sem novo polish GUI (i18n, redesign, icones) ate Onda A
 PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: **Onda F prep** (GO bloqueado por CE) ou **Onda H prep** (9.0)
-- Onda: G — **PASS** (8.1+8.2); E — **LIMITAÇÃO** (ADR-0022)
+- Passo actual: **Onda H prep** (9.0 mapa F6) ou **Onda I** (BG-028)
+- Onda: F — **PASS** (7.1+7.2 GO `2026-08-05`); G — **PASS** (8.1+8.2); E — **LIMITAÇÃO** (ADR-0022 aceite)
 - Candidato lab: 1.8.11_69
-- Produção enforce: 1.8.11_24 (até GO Onda F + CE ou aceite ADR-0022)
-- Canal latest: 1.8.11_69
+- Produção enforce: 1.8.11_69 (GO Onda F)
+- Canal latest: 1.8.11_69 (alinhado)
 - F5 mínima: **PASS** (`20260805T005650Z-ondaG-f5-smoke-82`)
-- CE: LIMITAÇÃO
-- Evidência Onda G: `docs/tests/evidence/20260805T005650Z-ondaG-f5-smoke-82/`
-- Próximo: **Onda F prep** (humano: VM CE ou ADR-0022) ou **9.0** mapa F6 (sem mover ficheiros)
+- CE: LIMITAÇÃO (aceite ADR-0022)
+- Evidência Onda F: `docs/tests/evidence/20260805T010100Z-ondaF-go-enforce/`
+- Próximo: **9.0** mapa F6 (sem mover ficheiros) ou Onda I
 - Modo: agente único
 ```
 
@@ -1383,27 +1381,20 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-04
+- Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE
-- Canal publico latest: 1.8.11_65
-  (SHA256 e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e;
-   GUI i18n BG-076; daemon inalterado vs _64)
-- Producao enforce (referencia ate GO): 1.8.11_24
-  (SHA256 1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818;
-   Caminho B E0-E3; gate two-client PENDENTE; trust chain pacote BG-028 pendente)
-- Candidato lab gates: 1.8.11_65 (confirmado passo 1.1 — 2026-08-04;
-  SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e;
-  GitHub `latest`=v1.8.11_65; PORTREVISION=65)
-- Auditoria E2E Etapa 1: concluida (local read-only); NO-GO enforce;
-  SSOT docs/09-blocking/auditoria-end-to-end-2026-07-29.md; AUD-001..015
-- Proximo gate autorizado: Bloco B1 — install passivo _65 no appliance
-  (G2-G4); G5 two-client apos G2-G4 PASS; plano-fecho-producao passo 2.x
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 65
-- Estado funcional: V1 + Caminho A + Caminho B E0-E3; _25-_65 corrigem codigo
-  mas zero evidencia fisica G2-G7 no candidato actual
-- Estado documental: governanca F0 consolidada; plano fecho ACTIVO (rev 2026-08-04b);
-  Lista VIP A-E codigo+docs; execucao lab sec. 20 pendente
-- Fase actual: F4 aberta; plano de fecho P1 (candidato + snapshot)
+- Canal publico latest: 1.8.11_69
+  (SHA256 b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764)
+- Producao enforce (referencia GO Onda F): 1.8.11_69
+  (rollback imediato _68; historico _24; CE fisico pendente ADR-0022 aceite)
+- Candidato lab gates: 1.8.11_69 (G2-G7 PASS; GitHub latest=v1.8.11_69)
+- F5 minima: PASS (20260805T005650Z-ondaG-f5-smoke-82)
+- Onda F GO: PASS (20260805T010100Z-ondaF-go-enforce)
+- Proximo gate autorizado: Onda H prep (9.0) ou Onda I (BG-028)
+- PORTVERSION no repositorio: 1.8.11, PORTREVISION 69
+- Estado funcional: V1 + Caminho A + Caminho B E0-E3; enforce GO _69
+- Estado documental: governanca F0 consolidada; plano fecho ACTIVO
+- Fase actual: F4 aberta; plano de fecho pos-GO Onda F
 - Reorganizacao fisica autorizada: nao (F6 / Onda H)
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica prioridade: docs/02-roadmap/backlog.md
@@ -1416,13 +1407,12 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **instalacao publica** e o pacote **`1.8.11_24`**
-  publicado em 2026-06-16 em `pablomichelin/Layer7` tag `v1.8.11_24`
-  (`SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`).
-  Gate two-client **PENDENTE**. Rollback publico imediato: `v1.8.11_23`.
-  Rollback adicional: `v1.8.11_18`, `v1.8.11_17`, `v1.8.11_16`, `v1.8.11_14`,
-  `v1.8.11_13`,
-  `v1.8.11_12`, `v1.8.3`, etc.
+- A referencia de **instalacao publica** e o pacote **`1.8.11_69`**
+  publicado em `pablomichelin/Layer7` tag `v1.8.11_69`
+  (`SHA256=b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764`).
+  **GO Onda F (`2026-08-05`):** producao enforce alinhada com `latest`.
+  Rollback imediato: `v1.8.11_68`. Rollback historico enforce: `v1.8.11_24`.
+  CE fisico pendente (ADR-0022 aceite).
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
   (`snapshot_id=ut1-2026-04-25`,
