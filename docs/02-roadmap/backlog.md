@@ -320,13 +320,13 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
-| BG-093 | Self-heal `pfctl -f /tmp/rules.debug` sem confiança (owner/symlink) | Alta | daemon/package/PF | F4/hardening | ruleset PF arbitrário se `/tmp` comprometido | M | Alto | **Codigo `1.9.9` — aguarda build/smoke** | gate: regular file, uid 0, !world-writable; helper + PHP + daemon |
-| BG-094 | Escrita estado root em `/tmp` (symlink race: stats/update/activate) | Alta | daemon/GUI | F4/hardening | sobrescrita de ficheiros do sistema | M | Alto | **Codigo `1.9.9` — aguarda build/smoke** | stats/activate/checkin/update → `/var/db/layer7` + `O_EXCL\|O_NOFOLLOW` |
-| BG-095 | DNS observe envenenável (só `sp==53`, sem QR/correlação) | Alta | daemon/capture | F4/hardening | DoS/bypass via UDP spoof LAN | G | Alto | **Codigo `1.9.9` — aguarda build/smoke** | QR obrigatório + pendência query↔txid/cliente (TTL 10s); residual: sniffer+spoof ID |
-| BG-096 | Allowlist IPv6 ineficaz (`pf_entry_strict_ok` rejeita `:`) | Alta | daemon/allowlist | F4/hardening | destinos v6 legítimos bloqueados (lacuna pós BG-081) | P | Alto | **Codigo `1.9.9` — aguarda build/smoke** | `layer7_pf_table_entry_ok` + `execv` add_entry |
-| BG-097 | curl activate/check-in sem timeout | Media | daemon/license | F4 | hang indefinido | P | Medio | **Codigo `1.9.9` — aguarda build/smoke** | `--connect-timeout 10 --max-time 30` |
-| BG-098 | `waitpid` sem retry EINTR em enforce | Media | daemon | F4 | falsos fails / zombies | P | Medio | **Codigo `1.9.9` — aguarda build/smoke** | `waitpid_retry` |
-| BG-099 | Update GUI: URL só prefixo `https://github.com/` | Media | GUI/release | F7 | admin instala `.pkg` de outro repo | P | Medio | **Codigo `1.9.9` — aguarda build/smoke** | restringir a `pablomichelin/Layer7/` |
+| BG-093 | Self-heal `pfctl -f /tmp/rules.debug` sem confiança (owner/symlink) | Alta | daemon/package/PF | F4/hardening | ruleset PF arbitrário se `/tmp` comprometido | M | Alto | **Concluido (`1.9.9`)** | gate: regular file, uid 0, !world-writable; helper + PHP + daemon |
+| BG-094 | Escrita estado root em `/tmp` (symlink race: stats/update/activate) | Alta | daemon/GUI | F4/hardening | sobrescrita de ficheiros do sistema | M | Alto | **Concluido (`1.9.9`)** | stats/activate/checkin/update → `/var/db/layer7` + `O_EXCL\|O_NOFOLLOW` |
+| BG-095 | DNS observe envenenável (só `sp==53`, sem QR/correlação) | Alta | daemon/capture | F4/hardening | DoS/bypass via UDP spoof LAN | G | Alto | **Concluido (`1.9.9`)** | QR obrigatório + pendência query↔txid/cliente (TTL 10s); residual: sniffer+spoof ID |
+| BG-096 | Allowlist IPv6 ineficaz (`pf_entry_strict_ok` rejeita `:`) | Alta | daemon/allowlist | F4/hardening | destinos v6 legítimos bloqueados (lacuna pós BG-081) | P | Alto | **Concluido (`1.9.9`)** | `layer7_pf_table_entry_ok` + `execv` add_entry |
+| BG-097 | curl activate/check-in sem timeout | Media | daemon/license | F4 | hang indefinido | P | Medio | **Concluido (`1.9.9`)** | `--connect-timeout 10 --max-time 30` |
+| BG-098 | `waitpid` sem retry EINTR em enforce | Media | daemon | F4 | falsos fails / zombies | P | Medio | **Concluido (`1.9.9`)** | `waitpid_retry` |
+| BG-099 | Update GUI: URL só prefixo `https://github.com/` | Media | GUI/release | F7 | admin instala `.pkg` de outro repo | P | Medio | **Concluido (`1.9.9`)** | restringir a `pablomichelin/Layer7/` |
 | BG-100 | Teto blacklist 8M entradas (OOM) | Media | daemon/blacklists | F4 | OOM com feed externo grande | M | Medio | Planeado | reduzir teto ou hard-cap com métrica; não mexer em `1.9.9` |
 | BG-101 | Revogação remota fail-open até offline max (~14d) | Baixa | licenciamento | F3 | design ADR-0021; janela longa se rede cortada | — | — | Documentado | não é bug; rever só com GO comercial |
 

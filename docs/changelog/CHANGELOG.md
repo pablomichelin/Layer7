@@ -2,7 +2,7 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [Unreleased] — Hardening pós-auditoria `1.9.8` (candidato `1.9.9`)
+## [1.9.9] — 2026-08-05
 
 ### Security
 
@@ -24,12 +24,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Candidato interno `1.9.9` — **não publicar** sem build FreeBSD + smoke lab.
-- Produção / `latest` continua **`1.9.8`** até release governada.
-- Residual DNS: atacante que veja o query ID ainda pode spoofar; allowlist de
-  resolver fica para bloco futuro.
+- Canal `latest`: **`1.9.9`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `8ad13256a9b1c4b976e1ecb69bce90d779f212911649ae004daaf033f51219ae`.
+- Rollback lab: `1.9.8`. Residual DNS: spoof com query ID observado.
 - BG-100 (teto 8M blacklist) e BG-101 (janela offline ADR-0021) documentados
   sem mudança de código neste bloco.
+- Build FreeBSD + smoke appliance (`192.168.100.254`) PASS `2026-08-05`.
 
 ## [Unreleased] — License server + daemon (S07 / F3)
 
