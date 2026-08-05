@@ -335,8 +335,8 @@ Inventariar e decidir destino de cada sobreposição (já parcialmente no mapa d
 |----------------------------|----------|---------------------------|
 | `docs/04-tests/` vs `docs/tests/` | Duplicado | Manter `docs/tests/`; arquivar `04-tests` |
 | `docs/package/` vs `docs/04-package/` | Duplicado | Manter `04-package/`; fundir ou arquivar `package/` |
-| `docs/05-daemon/` e `docs/05-runbooks/` | Mesmo prefixo numérico | Renumerar runbooks → `13-runbooks` **ou** fundir índice (decisão no mapa H.0) |
-| `docs/10-license-server/` e `docs/10-logging/` | Mesmo prefixo | Renumerar logging → `14-logging` (proposta) |
+| `docs/05-daemon/` e `docs/13-runbooks/` | Mesmo prefixo numérico | Renumerar runbooks → `13-runbooks` **ou** fundir índice (decisão no mapa H.0) |
+| `docs/10-license-server/` e `docs/14-logging/` | Mesmo prefixo | Renumerar logging → `14-logging` (proposta) |
 | `docs/core/`, `changelog/`, `commercial/`, `poc/`, `tutorial/` | Sem número | Manter; indexar claramente no `docs/README.md` |
 | Raiz `00-`…`16-` | Legado | Preservar ou `docs/archive/raiz-legado/` conforme mapa |
 
@@ -524,4 +524,7 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-04j | Onda E LIMITAÇÃO: passo 6.1 — sem VM CE na malha lab; ADR-0022; proxy Plus `_69` parcial; próximo Onda F prep (humano) ou Onda G |
 | 2026-08-05a | Pós-Veeam: cleanup `g5-test-bl`; reteste paridade CE; Onda G 8.1 mapa F5; próximo 8.2 |
 | 2026-08-05b | Onda G PASS: passo 8.2 checklist smoke (`20260805T005650Z`); próximo Onda F prep ou 9.0 H.0 |
-| 2026-08-05c | **Onda F PASS:** GO enforce `1.8.11_69` (`20260805T010100Z`); ADR-0022 aceite; `latest` alinhado; próximo 9.0 H.0 ou Onda I |
+| 2026-08-05c | **Onda F PASS:** GO enforce `1.8.11_69` (`20260805T010100Z`); ADR-0022 aceite; `latest` alinhado |
+| 2026-08-05d | **Onda H PASS:** F6 H0+H1–H4; H5 raiz diferido |
+| 2026-08-05e | **Onda I PASS:** RELEASE-CHECKLIST + ADR-0023 (BG-028 fase 0) |
+| 2026-08-05f | **Onda J PASS:** R1–R12 audit; plano mestre **FECHADO** |

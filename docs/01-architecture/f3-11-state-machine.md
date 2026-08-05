@@ -39,7 +39,7 @@ Leitura complementar obrigatoria:
 - [`f3-11-readiness-scorecard.md`](f3-11-readiness-scorecard.md)
 - [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md)
 - [`../00-overview/f3-11-start-here.md`](../00-overview/f3-11-start-here.md)
-- [`../05-runbooks/f3-11-cycle-closure-criteria.md`](../05-runbooks/f3-11-cycle-closure-criteria.md)
+- [`../13-runbooks/f3-11-cycle-closure-criteria.md`](../13-runbooks/f3-11-cycle-closure-criteria.md)
 
 ---
 

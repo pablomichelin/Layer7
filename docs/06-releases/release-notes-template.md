@@ -65,7 +65,7 @@ pkg delete pfSense-pkg-layer7
 
 Para reinstalar versão anterior, usar `install.sh` versionado do release desejado.
 
-Ver [`docs/05-runbooks/rollback.md`](../05-runbooks/rollback.md).
+Ver [`docs/13-runbooks/rollback.md`](../13-runbooks/rollback.md).
 
 ---
 

@@ -44,5 +44,5 @@ Esta pasta concentra a governanca documental de release.
 - [`RELEASE-SIGNING.md`](RELEASE-SIGNING.md)
 - [`release-notes-v0.1.0.md`](release-notes-v0.1.0.md) — historico
 - [`../04-package/deploy-github-lab.md`](../04-package/deploy-github-lab.md) — cadeia builder → stage → GitHub (suplementar; ver tambem [`../scripts/release/README.md`](../../scripts/release/README.md) na raiz do repo)
-- [`../05-runbooks/rollback.md`](../05-runbooks/rollback.md)
+- [`../13-runbooks/rollback.md`](../13-runbooks/rollback.md)
 - [`../10-license-server/MANUAL-INSTALL.md`](../10-license-server/MANUAL-INSTALL.md)

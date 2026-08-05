@@ -16,8 +16,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Onda G (8.2):** checklist `docs/tests/f5-smoke-checklist.md` +
   `tests/lab/run-f5-smoke-checklist.sh`; evidência PASS
   `20260805T005650Z-ondaG-f5-smoke-82`.
-- **Onda F (7.1–7.2):** GO enforce documental `1.8.11_69` (`2026-08-05`);
-  evidência `20260805T010100Z-ondaF-go-enforce`; ADR-0022 aceite.
+- **Onda J (11.1):** auditoria R1–R12 PASS com excepções ADR-0022/0023;
+  evidência `20260805T012500Z-ondaJ-r1-r12-audit`; plano mestre fechado.
+- **Onda I (10.1–10.2):** `RELEASE-CHECKLIST.md` + ADR-0023 (BG-028 fase 0).
+- **Onda H (9.0–9.4):** F6 mapa + lotes H1–H4; evidências `20260805T011500Z` / `011800Z`.
 - **BG-077 — check-in online (Bloco 1):** `POST /api/license/check-in` no
   license-server (`check-in.js`, `check_ins_log`); deploy em `192.168.100.244`.
 - **BG-077 — check-in online (Bloco 2):** `layer7d` com `--check-in`,
@@ -1662,7 +1664,7 @@ instalada" e comparava-o contra a tag GitHub `v1.8.11_13`.
 
 - **`docs/tests/test-matrix.md`** — parágrafo intro: sec. **11** com anti-QUIC.
 - **`docs/tests/README.md`** — roteiros F4 / **6.7**: anti-QUIC na **11**.
-- **`docs/05-runbooks/README.md`**, **`docs/04-package/deploy-github-lab.md`** —
+- **`docs/13-runbooks/README.md`**, **`docs/04-package/deploy-github-lab.md`** —
   remissão ao `validacao-lab`.
 - **`docs/00-overview/handoff-chat-novo.md`** — prompt F4.
 - **`docs/08-lab/README.md`**, **`docs/08-lab/quick-start-lab.md`** — lab e
@@ -1734,7 +1736,7 @@ instalada" e comparava-o contra a tag GitHub `v1.8.11_13`.
   **`docs/00-overview/document-classification.md`**,
   **`docs/02-roadmap/roadmap.md`** — remissões / checkpoint F4.3 ao cenário
   opcional multi-interface / VLAN na secção **11** / teste **6.7**.
-- **`docs/05-runbooks/README.md`**, **`docs/02-roadmap/checklist-mestre.md`**,
+- **`docs/13-runbooks/README.md`**, **`docs/02-roadmap/checklist-mestre.md`**,
   **`docs/02-roadmap/f5-preparacao-malha.md`** — gates F4 / preparação F5 com a
   mesma pista (sec. **11** / VLAN opcional); **`validacao-lab.md`** checklist
   #**13** qualificado.
@@ -1804,7 +1806,7 @@ instalada" e comparava-o contra a tag GitHub `v1.8.11_13`.
 
 ### Documentation — runbooks e handoff (F4 / `validacao-lab`)
 
-- **`05-runbooks/README.md`** — validacao em lab: *Gates oficiais F4* no
+- **`13-runbooks/README.md`** — validacao em lab: *Gates oficiais F4* no
   inicio de `validacao-lab`.
 - **`00-overview/handoff-chat-novo.md`** — prompt de continuacao: pista F4
   (gates + 10a/10b/11, `checklist-mestre`, `test-matrix`).
@@ -1853,9 +1855,9 @@ instalada" e comparava-o contra a tag GitHub `v1.8.11_13`.
 - **`docs/04-package/checklist-validacao-lab.md`** — nota no topo com roteiros
   F4 (10a/10b/11), `test-matrix` e ligação ao `checklist-mestre`.
 
-### Documentation — `05-runbooks/README` (validação F4 no lab)
+### Documentation — `13-runbooks/README` (validação F4 no lab)
 
-- **`docs/05-runbooks/README.md`** — descrição da ligação a `validacao-lab`
+- **`docs/13-runbooks/README.md`** — descrição da ligação a `validacao-lab`
   explicita roteiros **F4** no appliance (secções **10a** / **10b** / **11**).
 
 ### Documentation — `docs/tests/README` (gate pacote / lab)
@@ -3321,7 +3323,7 @@ funcionalidades planeadas para a V1 comercial.
 - **Daemon: safeguard monitor mode** — `layer7_on_classified_flow` verifica modo global antes de chamar `pfctl`; em modo monitor, decisão logada mas nunca executada.
 - **Scripts lab** — `sync-to-builder.py` (SFTP sync), `transfer-and-install.py` (builder→pfSense), scripts de teste enforce
 - **Deploy lab via GitHub Releases** — `scripts/release/deployz.sh` (build + publish), `scripts/release/install-lab.sh.template` (instalação no pfSense com `fetch + sh`), `scripts/release/README.md`, `docs/04-package/deploy-github-lab.md`.
-- **Rollback doc** — `docs/05-runbooks/rollback.md` (procedimento completo com limpeza manual).
+- **Rollback doc** — `docs/13-runbooks/rollback.md` (procedimento completo com limpeza manual).
 - **Release notes template** — `docs/06-releases/release-notes-template.md`.
 - **Checklist mestre alinhado** — `14-CHECKLIST-MESTRE.md` atualizado para refletir o estado real do projeto: fases 0, 3, 5, 7, 8 marcadas como completas.
 - **Matriz de testes** — `docs/tests/test-matrix.md` com 58 testes em 10 categorias (47 OK, 11 pendentes no appliance).
@@ -3372,7 +3374,7 @@ funcionalidades planeadas para a V1 comercial.
 - **main.c** — comentário TODO(Fase 13) no loop indicando ponto de integração nDPI→`layer7_on_classified_flow`.
 - **BUILDER.md** — port pronto para `make package`; referências validacao-lab e quick-start.
 - **CI** — job `check-windows` em `smoke-layer7d.yml` (PowerShell `check-port-files.ps1`).
-- **docs/05-runbooks/README.md** — links para validacao-lab e quick-start-lab.
+- **docs/13-runbooks/README.md** — links para validacao-lab e quick-start-lab.
 - **docs/README.md** — entrada `04-package` no índice.
 - **Decisão documentada:** instalação no pfSense apenas quando o pacote estiver totalmente completo (`00-LEIA-ME-PRIMEIRO.md` regra 8, `CORTEX.md` decisões congeladas).
 - **README** — estado e estrutura atualizados (daemon, pacote, GUI, CI; lab pendente).
@@ -3386,7 +3388,7 @@ funcionalidades planeadas para a V1 comercial.
 - **0.0.30:** **Settings** — bloco **Interfaces (só leitura)** (`interfaces[]` do JSON); nota nDPI; **PORTVERSION 0.0.30**.
 - **0.0.29:** **`layer7_daemon_version()`** em `layer7.inc`; página **Estado** mostra `layer7d -V`; Diagnostics reutiliza o helper.
 - **0.0.28:** **`layer7d -V`** e **`version.str`** (build port = PORTVERSION); **`layer7d -t`** imprime `layer7d_version`; syslog **`daemon_start version=…`** e SIGUSR1 com **`ver=`**; Diagnostics mostra `layer7d -V`; smoke com include temporário; **PORTVERSION 0.0.28**.
-- **0.0.27:** Validação **syslog remoto**: host = IPv4 ou hostname seguro (`layer7_syslog_remote_host_valid` em `layer7.inc`); doc **`docs/package/gui-validation.md`**.
+- **0.0.27:** Validação **syslog remoto**: host = IPv4 ou hostname seguro (`layer7_syslog_remote_host_valid` em `layer7.inc`); doc **`docs/04-package/gui-validation.md`**.
 - **0.0.26:** **Exceptions — editar** na GUI (`?edit=N`): host **ou** CIDR, prioridade, ação, ativa; **id** só via JSON; redirect após gravar.
 - **0.0.25:** **Policies — editar** na GUI (`?edit=N`): nome, prioridade, ação, apps/cat CSV, `tag_table`, ativa; **id** só via JSON; após gravar redireciona à lista.
 - **0.0.24:** **Exceptions — remover** na GUI (dropdown + confirmação, CSRF, SIGHUP).
@@ -3394,9 +3396,9 @@ funcionalidades planeadas para a V1 comercial.
 - **0.0.22:** GUI **Events** em `layer7.xml` (tab), **`pkg-plist`**, página `layer7_events.php` (já no repo); README do port.
 - **0.0.21:** **`layer7_pf_enforce_decision(dec, ip, dry_run)`**; **`layer7d -e IP APP [CAT]`** (lab) e **`-n`** (dry sem pfctl); **`layer7_on_classified_flow`** para integração nDPI; smoke **`layer7-enforce-smoke.json`**; docs `pf-enforcement` + `layer7d/README`.
 - **0.0.20:** **`debug_minutes`** (0–720): após SIGHUP/reload, daemon usa **LOG_DEBUG** durante N minutos; `effective_ll()`; campo em **Settings**; parser `config_parse`.
-- **0.0.19:** **Syslog remoto:** `layer7d` duplica logs por UDP (RFC 3164) para `syslog_remote_host`:`syslog_remote_port`; parser JSON; **Settings** (checkbox + host + porta); `layer7d -t` mostra campos; `config-model` + `docs/10-logging` atualizados.
+- **0.0.19:** **Syslog remoto:** `layer7d` duplica logs por UDP (RFC 3164) para `syslog_remote_host`:`syslog_remote_port`; parser JSON; **Settings** (checkbox + host + porta); `layer7d -t` mostra campos; `config-model` + `docs/14-logging` atualizados.
 - **0.0.18:** Página GUI **Diagnostics** (`layer7_diagnostics.php`): estado do serviço (PID), comandos SIGHUP/SIGUSR1, onde ver logs, comandos úteis (service, sysrc); tab + links nas outras páginas.
-- **0.0.17:** **docs/10-logging/README.md** — formato de logs (destino syslog, log_level, mensagens atuais, syslog remoto planeado, ligação a event-model).
+- **0.0.17:** **docs/14-logging/README.md** — formato de logs (destino syslog, log_level, mensagens atuais, syslog remoto planeado, ligação a event-model).
 - **0.0.16:** GUI **adicionar exceção** (`layer7_exceptions.php`): id, host (IPv4) ou CIDR, prioridade, ação, ativa; limite 16; helpers `layer7_ipv4_valid` / `layer7_cidr_valid` em `layer7.inc`.
 - **0.0.15:** **`runtime_pf_add(table, ip)`** em `main.c` — chama `layer7_pf_exec_table_add`, incrementa `pf_add_ok`/`pf_add_fail`, loga falha; ponto de chamada único para o fluxo pós-nDPI (ainda não invocada).
 - **0.0.14:** **Adicionar política** na GUI (`layer7_policies.php`): id, nome, prioridade, ação (monitor/allow/block/tag), apps/categorias nDPI (CSV), `tag_table` se tag; limites alinhados ao daemon (24 regras, etc.). Helpers em `layer7.inc`.

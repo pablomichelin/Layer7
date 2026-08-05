@@ -43,7 +43,7 @@ Leitura complementar obrigatoria:
 - [`f3-matriz-drift-operacional.md`](f3-matriz-drift-operacional.md)
 - [`f3-11-readiness-check.md`](f3-11-readiness-check.md)
 - [`f3-11-readiness-saneamento.md`](f3-11-readiness-saneamento.md)
-- [`../05-runbooks/f3-11-live-access-checklist.md`](../05-runbooks/f3-11-live-access-checklist.md)
+- [`../13-runbooks/f3-11-live-access-checklist.md`](../13-runbooks/f3-11-live-access-checklist.md)
 - [`f3-11-drift-registry.md`](f3-11-drift-registry.md)
 
 ---

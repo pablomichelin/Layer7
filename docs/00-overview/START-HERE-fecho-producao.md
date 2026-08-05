@@ -11,13 +11,12 @@ plano mestre. O plano completo está em:
 
 | Campo | Valor esperado (`2026-08-05`) |
 |-------|-------------------------------|
-| Passo actual | **Onda H prep** (9.0 mapa F6) ou **Onda I** (BG-028) |
-| Ondas concluídas | A–D **PASS**, E **LIMITAÇÃO** (ADR-0022 aceite), F **PASS**, G **PASS** |
-| Onda F | **PASS** — GO enforce `1.8.11_69` (`20260805T010100Z`) |
-| Gates G6–G7 | **PASS** |
-| Candidato / produção enforce | **`1.8.11_69`** |
-| Canal `latest` | `1.8.11_69` (alinhado) |
-| CE | **LIMITAÇÃO** — ADR-0022 aceite (VM CE indisponível) |
+| Passo actual | **Plano fechado** — manutenção backlog |
+| Ondas concluídas | A–J (**H/I/J** incluídas) |
+| Produção enforce | **`1.8.11_69`** |
+| F6 | **FECHADA** (H5 raiz diferido) |
+| F7 | Checklist + ADR-0023 fase 0 |
+| Produto pronto | **SIM** (excepções ADR-0022/0023) |
 
 ### Continuidade — o plano geral **não foi substituído**
 
@@ -135,9 +134,9 @@ Leitura obrigatória (nesta ordem):
 Regras absolutas:
 - Seguir APENAS o passo autorizado do plano (nunca vontade do agente).
 - Não mover/renomear/apagar ficheiros até Onda H (F6).
-- Não activar scoped_hybrid/enforce em produção sem gates PASS + GO humano.
-- Produção enforce permanece 1.8.11_24 até Onda F (GO).
-- Candidato lab para gates: 1.8.11_68 (não substituir sem decisão no CORTEX).
+- Não activar scoped_hybrid/enforce em produção sem gates PASS + GO humano (já dado — `_69`).
+- Produção enforce: **`1.8.11_69`** (GO Onda F).
+- Candidato lab: `1.8.11_69`.
 - Versionar: commit a cada bloco; PORTREVISION+release GitHub só quando o passo exigir .pkg.
 - Actualizar docs no mesmo bloco (CORTEX, changelog, MANUAL-INSTALL se operacional).
 - Multitarefa PROIBIDA nesta onda (appliance / ficheiros quentes).

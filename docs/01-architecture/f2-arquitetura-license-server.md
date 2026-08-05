@@ -69,7 +69,7 @@ Documentos normativos desta arquitetura:
 
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md` passa a usar
   `https://license.systemup.inf.br` como caminho normativo
-- `docs/05-runbooks/license-server-publicacao-segura.md` passa a concentrar
+- `docs/13-runbooks/license-server-publicacao-segura.md` passa a concentrar
   certificado, edge proxy, ACL do origin e validacoes minimas da F2.1
 
 ## 1.2 Estado materializado apos a F2.2
@@ -104,7 +104,7 @@ Documentos normativos desta arquitetura:
 
 ### Operacao
 
-- `docs/05-runbooks/license-server-auth-sessao.md` passa a concentrar o
+- `docs/13-runbooks/license-server-auth-sessao.md` passa a concentrar o
   contrato operativo da F2.2
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md` passa a usar `cookie jar`
   e `GET /api/auth/session` como referencia operacional de auth/sessao
@@ -189,9 +189,9 @@ Documentos normativos desta arquitetura:
   PostgreSQL com `pg_dump --clean --if-exists`
 - `license-server/restore-postgres.sh` passa a exigir confirmacao explicita
   `--yes` para aplicar restore sobre o `POSTGRES_DB`
-- `docs/05-runbooks/license-server-segredos-bootstrap.md` passa a concentrar
+- `docs/13-runbooks/license-server-segredos-bootstrap.md` passa a concentrar
   ownership operacional, custodia minima e recuperacao da password admin
-- `docs/05-runbooks/license-server-backup-restore.md` passa a concentrar o
+- `docs/13-runbooks/license-server-backup-restore.md` passa a concentrar o
   procedimento minimo de dump, restore e recomposicao do stack
 
 ---

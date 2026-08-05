@@ -42,7 +42,8 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0019](ADR-0019-src-exclude-por-politica.md) | Exclusão de origem por política (`src_exclude_*`) | Aceito; `_50` | `layer7_pexc_N` + `L7ALLOW` em scoped; daemon não-match; trade-off legacy_global documentado |
 | [ADR-0020](ADR-0020-isencao-vip-dns.md) | Isenção VIP no caminho DNS (sinkhole + DNS forçado) | Implementado; `_59` opção (a) | view Unbound `layer7-vip-exempt`; fallback rdr `from !<layer7_exc_allow_N>`; SSOT `vip-isentos` inalterado |
 | [ADR-0021](ADR-0021-check-in-online-e-revogacao-remota.md) | Check-in online e revogação remota de licença | Aceito | BG-077; `POST /api/license/check-in` + daemon; S14 PASS (`2026-08-04`) |
-| [ADR-0022](ADR-0022-compatibilidade-pfsense-ce-escopo-e-limitacao.md) | Compatibilidade pfSense CE — escopo e limitação (Onda E) | Aceito + **GO Onda F** (`2026-08-05`) | CE físico pendente; produção enforce = `_69`; aceite humano registado |
+| [ADR-0022](ADR-0022-compatibilidade-pfsense-ce-escopo-e-limitacao.md) | Compatibilidade pfSense CE — escopo e limitação (Onda E) | Aceito + GO Onda F | CE físico pendente; produção enforce = `_69` |
+| [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (fase 0) | Fase 1 pendente custódia chaves Ed25519 |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

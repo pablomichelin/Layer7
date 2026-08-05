@@ -102,7 +102,7 @@ env | rg '^(ADMIN_|LICENSE_|PF_SSH|COOKIE_JAR|L7_BASE_URL|L7_SERVER_DIR)='
 rg -n "<PFSENSE_IP>|LICENSE_ID='<LICENSE_ID>'|LICENSE_KEY='<LICENSE_KEY_32_HEX>'|ALT_CUSTOMER_ID='<OUTRO_CUSTOMER_ID>'" docs scripts -S
 find docs/08-lab -maxdepth 1 -type f \( -name 'lab-inventory.md' -o -name 'lab-inventory.local.md' \) -print
 find . -type f \( -name '*f3*report*.md' -o -name '*preflight*' -o -name '*campaign-manifest*' \) | sort
-rg -n "admin_sessions|admin_audit_log|admin_login_guards|bootstrap-admin.js|/opt/layer7-license|docker-compose.yml" license-server/backend/migrations license-server/backend/src docs/05-runbooks/license-server-segredos-bootstrap.md docs/05-runbooks/license-server-publicacao-segura.md docs/01-architecture/f3-validacao-manual-evidencias.md -S
+rg -n "admin_sessions|admin_audit_log|admin_login_guards|bootstrap-admin.js|/opt/layer7-license|docker-compose.yml" license-server/backend/migrations license-server/backend/src docs/13-runbooks/license-server-segredos-bootstrap.md docs/13-runbooks/license-server-publicacao-segura.md docs/01-architecture/f3-validacao-manual-evidencias.md -S
 ```
 
 Resultados objectivos:

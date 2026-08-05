@@ -52,4 +52,4 @@ Comandos de verificação e critérios de aceite: **`docs/04-package/validacao-l
 anterior. Menções a `.txz` nesta área devem ser tratadas como legado.
 
 Documentação geral: [`../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md`](../../09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md).  
-Validação GUI: [`../../docs/package/gui-validation.md`](../../docs/package/gui-validation.md).
+Validação GUI: [`../../docs/04-package/gui-validation.md`](../../docs/04-package/gui-validation.md).

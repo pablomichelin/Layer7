@@ -40,7 +40,7 @@ Ele existe para evitar tres erros comuns:
 | `07-PLANO-DE-IMPLEMENTACAO-PASSO-A-PASSO.md` | `docs/02-roadmap/roadmap.md` + `docs/02-roadmap/backlog.md` | roadmap/backlog canónicos | Sobreposicao | a raiz descreve a trilha V1; o novo roadmap rege a continuidade pos-F0 | preservar |
 | `08-PLANO-DE-TESTES-E-HOMOLOGACAO.md` | `docs/tests/README.md` + `docs/tests/test-matrix.md` | `docs/tests/*` | Equivalencia | o plano antigo continua util como detalhe expandido | preservar |
 | `09-EMPACOTAMENTO-PFSENSE-E-DISTRIBUICAO.md` | `docs/10-license-server/MANUAL-INSTALL.md` + `docs/06-releases/README.md` | `MANUAL-INSTALL.md` / releases README | Sobreposicao | o texto da raiz traz contexto antigo de artefacto e fluxo | preservar |
-| `10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md` | `docs/05-runbooks/README.md` + `docs/05-runbooks/rollback.md` + `MANUAL-INSTALL.md` | `MANUAL-INSTALL.md` para operacao base; runbooks para detalhe | Equivalencia | runbook expandido da raiz permanece util como contexto | preservar |
+| `10-RUNBOOK-OPERACIONAL-E-ROLLBACK.md` | `docs/13-runbooks/README.md` + `docs/13-runbooks/rollback.md` + `MANUAL-INSTALL.md` | `MANUAL-INSTALL.md` para operacao base; runbooks para detalhe | Equivalencia | runbook expandido da raiz permanece util como contexto | preservar |
 | `11-RISCOS-LIMITACOES-E-DECISOES.md` | `CORTEX.md` + `docs/02-roadmap/backlog.md` + ADR index | `CORTEX.md` / backlog | Sobreposicao | os riscos activos migraram para a governanca viva | preservar |
 | `12-PLANO-DE-DOCUMENTACAO-E-GITHUB.md` | `docs/README.md` + roadmap + checklist + classificacao | docs F0 | Equivalencia | o plano antigo inspirou a F0, mas ja nao e SSOT | preservar |
 | `13-MODELOS-DE-ISSUES-E-PRS.md` | `.github/pull_request_template.md` + `docs/03-adr/README.md` | template de PR / ADR index | Complementaridade | o documento da raiz e uma biblioteca de modelos | manter como apoio |
@@ -80,7 +80,14 @@ Ele existe para evitar tres erros comuns:
 
 ---
 
-## Regra de uso antes da F6
+## Regra de uso após F6 (Onda H — 2026-08-05)
+
+- `docs/04-tests/` → stub; arquivo em `docs/archive/pre-f6/04-tests/`.
+- `docs/package/` → stub; `gui-validation.md` em `docs/04-package/`.
+- `docs/13-runbooks/` (ex-`05-runbooks`), `docs/14-logging/` (ex-`10-logging`).
+- Mapa completo: [`f6-mapa-consolidacao-H0.md`](f6-mapa-consolidacao-H0.md).
+
+## Regra de uso antes da F6 (histórico)
 
 Enquanto a reorganizacao fisica nao acontecer:
 

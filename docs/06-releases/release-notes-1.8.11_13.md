@@ -107,7 +107,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.8.11_12.pkg https://github.com/pablomichelin/
 > (fail-closed F1.4 — comportamento correcto). Para manter blacklists
 > activas após rollback, é preciso re-instalar `1.8.11_13`.
 
-Ver também [`docs/05-runbooks/rollback.md`](../05-runbooks/rollback.md).
+Ver também [`docs/13-runbooks/rollback.md`](../13-runbooks/rollback.md).
 
 ---
 

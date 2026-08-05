@@ -749,7 +749,7 @@ priorizando:
 
 ## Fase actual
 
-**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/05-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/05-runbooks/f3-11-evidence-intake-template.md`, `docs/05-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-execution-master-register.md`, `docs/01-architecture/f3-11-operational-decisions-ledger.md`, `docs/01-architecture/f3-11-readiness-scorecard.md`, `docs/05-runbooks/f3-11-cycle-report-template.md` e `docs/00-overview/f3-11-document-traceability-map.md` para converter o kit da F3.11 num cockpit canónico unico de acompanhamento, decisao, score, rastreabilidade e execucao operacional ponta a ponta, sem codigo, sem push, sem campanha e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-state-machine.md`, `docs/01-architecture/f3-11-document-sync-protocol.md`, `docs/00-overview/f3-11-start-here.md`, `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e `docs/05-runbooks/f3-11-cycle-closure-criteria.md` para transformar o cockpit da F3.11 num sistema canonico completo de estados, sincronizacao, entrada unica, responsabilidades e fecho de ciclo, mantendo explicitamente `F3 aberta`, `F3.11 bloqueada`, `readiness = NO-GO`, `campanha = NO-GO`, sem codigo, sem push e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/00-overview/f3-organizacao-local-e-fecho.md` e `docs/01-architecture/f3-fecho-operacional-restante.md`, e corrigiu o `start-here`, o mapa de rastreabilidade, o registro mestre, o scorecard e o drift registry para o estado real observado da fase: license-server live alinhado, auth administrativa alinhada, inventario real obtido, DR-01/DR-03/DR-04/DR-06 resolvidos, DR-02 reclassificado como cosmetico nao bloqueante e DR-05 mantido como unico blocker real para fechar a F3; em 2026-04-14, os commits locais foram publicados no `origin/main`, a trilha DR-05 ganhou helpers executaveis para preflight/appliance/GUI, o helper GUI foi exercitado em `probe` com resultado `BLOCKED` esperado sem credencial valida, e o branch passou a cobrir por teste o contrato `409` do `POST /api/activate` para licenca revogada, expirada e hardware divergente.
+**Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/13-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/13-runbooks/f3-11-evidence-intake-template.md`, `docs/13-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-execution-master-register.md`, `docs/01-architecture/f3-11-operational-decisions-ledger.md`, `docs/01-architecture/f3-11-readiness-scorecard.md`, `docs/13-runbooks/f3-11-cycle-report-template.md` e `docs/00-overview/f3-11-document-traceability-map.md` para converter o kit da F3.11 num cockpit canónico unico de acompanhamento, decisao, score, rastreabilidade e execucao operacional ponta a ponta, sem codigo, sem push, sem campanha e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-state-machine.md`, `docs/01-architecture/f3-11-document-sync-protocol.md`, `docs/00-overview/f3-11-start-here.md`, `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e `docs/13-runbooks/f3-11-cycle-closure-criteria.md` para transformar o cockpit da F3.11 num sistema canonico completo de estados, sincronizacao, entrada unica, responsabilidades e fecho de ciclo, mantendo explicitamente `F3 aberta`, `F3.11 bloqueada`, `readiness = NO-GO`, `campanha = NO-GO`, sem codigo, sem push e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/00-overview/f3-organizacao-local-e-fecho.md` e `docs/01-architecture/f3-fecho-operacional-restante.md`, e corrigiu o `start-here`, o mapa de rastreabilidade, o registro mestre, o scorecard e o drift registry para o estado real observado da fase: license-server live alinhado, auth administrativa alinhada, inventario real obtido, DR-01/DR-03/DR-04/DR-06 resolvidos, DR-02 reclassificado como cosmetico nao bloqueante e DR-05 mantido como unico blocker real para fechar a F3; em 2026-04-14, os commits locais foram publicados no `origin/main`, a trilha DR-05 ganhou helpers executaveis para preflight/appliance/GUI, o helper GUI foi exercitado em `probe` com resultado `BLOCKED` esperado sem credencial valida, e o branch passou a cobrir por teste o contrato `409` do `POST /api/activate` para licenca revogada, expirada e hardware divergente.
 
 **Resultado actual conhecido da F1:** a F1.1 fechou o contrato oficial de
 distribuicao sobre `.pkg`, URLs versionadas de release e scripts oficiais de
@@ -946,10 +946,10 @@ validacao fora da operacao real.
 4. So reexecutar o readiness check da F3.11 depois de os pre-requisitos
    pendentes estarem realmente disponiveis e o
    `docs/00-overview/f3-11-document-traceability-map.md`,
-   `docs/05-runbooks/f3-11-input-triage-runbook.md`,
-   `docs/05-runbooks/f3-11-evidence-intake-template.md` e
-   `docs/05-runbooks/f3-11-cycle-report-template.md` e
-   `docs/05-runbooks/f3-11-live-access-checklist.md` poderem ser usados sem
+   `docs/13-runbooks/f3-11-input-triage-runbook.md`,
+   `docs/13-runbooks/f3-11-evidence-intake-template.md` e
+   `docs/13-runbooks/f3-11-cycle-report-template.md` e
+   `docs/13-runbooks/f3-11-live-access-checklist.md` poderem ser usados sem
    placeholders e sem saltar registos; sem isso, nao abrir campanha.
 5. Reexecutar a campanha real da F3 em novo bloco proprio, usando
    `docs/01-architecture/f3-validacao-manual-evidencias.md` como matriz
@@ -958,7 +958,7 @@ validacao fora da operacao real.
    `docs/01-architecture/f3-gate-fechamento-validacao.md` como gate oficial
    de saida, e
    `docs/01-architecture/f3-runbook-proxima-campanha-real.md` e
-   `docs/05-runbooks/f3-11-live-access-checklist.md` como ordem sequencial
+   `docs/13-runbooks/f3-11-live-access-checklist.md` como ordem sequencial
    minima da F3.11.
 6. So declarar a F3 fechada se o relatorio final de campanha indicar
    explicitamente `F3 pode fechar`, com todos os cenarios obrigatorios da
@@ -1219,16 +1219,19 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: **Onda H prep** (9.0 mapa F6) ou **Onda I** (BG-028)
-- Onda: F — **PASS** (7.1+7.2 GO `2026-08-05`); G — **PASS** (8.1+8.2); E — **LIMITAÇÃO** (ADR-0022 aceite)
+- Passo actual: **PLANO FECHADO** — manutenção via backlog normal
+- Onda: H **PASS** (F6 H1–H4); I **PASS**; J **PASS** (R1–R12 com excepções ADR-0022/0023)
 - Candidato lab: 1.8.11_69
 - Produção enforce: 1.8.11_69 (GO Onda F)
 - Canal latest: 1.8.11_69 (alinhado)
-- F5 mínima: **PASS** (`20260805T005650Z-ondaG-f5-smoke-82`)
-- CE: LIMITAÇÃO (aceite ADR-0022)
-- Evidência Onda F: `docs/tests/evidence/20260805T010100Z-ondaF-go-enforce/`
-- Próximo: **9.0** mapa F6 (sem mover ficheiros) ou Onda I
-- Modo: agente único
+- F5 mínima: **PASS**
+- F6: **FECHADA** (H5 raiz legado diferido)
+- F7/BG-028: **Fase 0** (ADR-0023); BG-017 checklist PASS
+- R1-R12: **11/12 verdes + 2 excepções assinadas** (R7, CE)
+- CE: LIMITAÇÃO (ADR-0022 aceite)
+- Evidência Onda J: `docs/tests/evidence/20260805T012500Z-ondaJ-r1-r12-audit/`
+- Produto pronto enforce: **SIM** (com ressalvas documentadas)
+- Modo: manutenção contínua
 ```
 
 ---
@@ -1382,23 +1385,15 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 ```text
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
-- Produto: Layer7 para pfSense CE
+- Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
 - Canal publico latest: 1.8.11_69
-  (SHA256 b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764)
-- Producao enforce (referencia GO Onda F): 1.8.11_69
-  (rollback imediato _68; historico _24; CE fisico pendente ADR-0022 aceite)
-- Candidato lab gates: 1.8.11_69 (G2-G7 PASS; GitHub latest=v1.8.11_69)
-- F5 minima: PASS (20260805T005650Z-ondaG-f5-smoke-82)
-- Onda F GO: PASS (20260805T010100Z-ondaF-go-enforce)
-- Proximo gate autorizado: Onda H prep (9.0) ou Onda I (BG-028)
-- PORTVERSION no repositorio: 1.8.11, PORTREVISION 69
-- Estado funcional: V1 + Caminho A + Caminho B E0-E3; enforce GO _69
-- Estado documental: governanca F0 consolidada; plano fecho ACTIVO
-- Fase actual: F4 aberta; plano de fecho pos-GO Onda F
-- Reorganizacao fisica autorizada: nao (F6 / Onda H)
+- Producao enforce: 1.8.11_69 (GO Onda F)
+- Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
+- F6: H1–H4 PASS; H5 raiz legado diferido
+- F7: RELEASE-CHECKLIST.md + ADR-0023
+- Proximo trabalho: backlog normal (BG-028 fase 1 quando chaves humanas; VM CE opcional; H5 se aprovado)
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
-- Fonte canonica prioridade: docs/02-roadmap/backlog.md
-- Fonte canonica gates: docs/09-blocking/plano-gates-producao.md
+- Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
 
 ---

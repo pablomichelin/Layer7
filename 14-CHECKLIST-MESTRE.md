@@ -59,7 +59,7 @@
 - [x] status *(página de estado)*
 
 ## Fase 8 - Observabilidade
-- [x] logs locais mínimos *(formato documentado em docs/10-logging)*
+- [x] logs locais mínimos *(formato documentado em docs/14-logging)*
 - [x] syslog remoto *(código + GUI; validação lab)*
 - [x] modo debug *(debug_minutes 1-720 após reload)*
 - [x] diagnostics úteis *(página Diagnostics)*
@@ -85,7 +85,7 @@
 - [x] `.pkg` *(v0.2.0 compilado)*
 - [x] checksum *(sha256)*
 - [x] install doc *(docs/tutorial/guia-completo-layer7.md)*
-- [x] rollback doc *(docs/05-runbooks/)*
+- [x] rollback doc *(docs/13-runbooks/)*
 
 ## Fase 12 - Pós-release / trilha V2
 - [ ] backlog V2 priorizado

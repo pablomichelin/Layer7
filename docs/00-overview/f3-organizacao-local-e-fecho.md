@@ -55,7 +55,7 @@ Para fechar a F3, os documentos que importam estao sobretudo em:
 
 - `docs/00-overview/`
 - `docs/01-architecture/`
-- `docs/05-runbooks/`
+- `docs/13-runbooks/`
 - `docs/tests/`
 - `docs/10-license-server/`
 
@@ -119,7 +119,7 @@ Regra:
 5. `docs/01-architecture/f3-11-drift-registry.md`
 6. `docs/01-architecture/f3-runbook-proxima-campanha-real.md`
 7. `docs/01-architecture/f3-gate-fechamento-validacao.md`
-8. `docs/05-runbooks/f3-11-live-access-checklist.md`
+8. `docs/13-runbooks/f3-11-live-access-checklist.md`
 
 ### 3.3 Quando abrir o codigo
 

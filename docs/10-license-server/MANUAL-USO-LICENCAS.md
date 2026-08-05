@@ -178,7 +178,7 @@ O sistema de licencas Layer7 funciona com dois componentes:
 - **Auditoria minima:** auth/sessao e mutacoes administrativas ficam em
   `admin_audit_log`; guardas de login/lockout ficam em `admin_login_guards`
 - **Bootstrap e recuperacao de password:** ver
-  `docs/05-runbooks/license-server-segredos-bootstrap.md`
+  `docs/13-runbooks/license-server-segredos-bootstrap.md`
 
 ### 2.3 Paginas do painel
 
@@ -807,9 +807,9 @@ grep license /var/log/layer7d.log  # qual o erro?
 - a custodia operacional de `POSTGRES_PASSWORD`,
   `ED25519_PRIVATE_KEY`/`ED25519_PRIVATE_KEY_FILE` e
   `ADMIN_BOOTSTRAP_PASSWORD` passa a ser regida por
-  `docs/05-runbooks/license-server-segredos-bootstrap.md`
+  `docs/13-runbooks/license-server-segredos-bootstrap.md`
 - o backup/restore minimo do banco passa a ser regido por
-  `docs/05-runbooks/license-server-backup-restore.md`
+  `docs/13-runbooks/license-server-backup-restore.md`
 - se a `ED25519_PRIVATE_KEY` for perdida, as licencas ja emitidas continuam
   validas offline, mas novas emissoes e re-activacoes ficam bloqueadas ate
   procedimento formal de rotacao

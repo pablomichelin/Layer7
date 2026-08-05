@@ -9,7 +9,7 @@ Referencias normativas:
 
 - `docs/01-architecture/f2-arquitetura-license-server.md`
 - `docs/02-roadmap/f2-plano-de-implementacao.md`
-- `docs/05-runbooks/license-server-segredos-bootstrap.md`
+- `docs/13-runbooks/license-server-segredos-bootstrap.md`
 - `docs/10-license-server/MANUAL-USO-LICENCAS.md`
 
 ---

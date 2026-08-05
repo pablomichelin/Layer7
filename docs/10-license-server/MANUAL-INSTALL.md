@@ -111,8 +111,8 @@ fechamento F4.2/F4.3.
 runbooks canónicos especificos para segredos/bootstrap administrativo e
 backup/restore do PostgreSQL:
 
-- `docs/05-runbooks/license-server-segredos-bootstrap.md`
-- `docs/05-runbooks/license-server-backup-restore.md`
+- `docs/13-runbooks/license-server-segredos-bootstrap.md`
+- `docs/13-runbooks/license-server-backup-restore.md`
 
 **Addendum da release `1.8.11_24` (Caminho B E0–E3 + estabilização pós-revisão):**
 Publicada em `2026-06-16`. Build no builder FreeBSD (`192.168.100.12`);

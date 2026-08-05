@@ -62,7 +62,7 @@ Se a resposta for `nao`, a F3 permanece aberta.
 Antes de repetir a readiness, devem existir e estar preenchidos:
 
 1. pelo menos um registo de intake por insumo em
-   [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md)
+   [`../13-runbooks/f3-11-evidence-intake-template.md`](../13-runbooks/f3-11-evidence-intake-template.md)
    ou copia operacional derivada dele;
 2. classificacao actualizada de cada insumo na
    [`f3-11-input-acceptance-matrix.md`](f3-11-input-acceptance-matrix.md);

@@ -222,11 +222,11 @@ permanece `HTTPS/TLS` na borda.
 Os pontos abaixo passam a ter runbook proprio:
 
 - ownership e custodia minima de segredos:
-  `docs/05-runbooks/license-server-segredos-bootstrap.md`
+  `docs/13-runbooks/license-server-segredos-bootstrap.md`
 - bootstrap administrativo e recuperacao de password:
-  `docs/05-runbooks/license-server-segredos-bootstrap.md`
+  `docs/13-runbooks/license-server-segredos-bootstrap.md`
 - backup/restore e recuperacao operacional do PostgreSQL:
-  `docs/05-runbooks/license-server-backup-restore.md`
+  `docs/13-runbooks/license-server-backup-restore.md`
 
 ---
 

@@ -188,7 +188,7 @@ Permitir operação pela GUI.
 - [x] criar Exceptions *(GUI: lista + toggle + adicionar + **editar** + remover; **id** só JSON)*
 - [x] criar Events *(página events básica — aponta para syslog; eventos estruturados pós-nDPI)*
 - [x] criar Diagnostics *(página: estado serviço, logs, comandos)*
-- [x] validação de input *(Settings syslog host; restante já em policies/exceptions; ver `docs/package/gui-validation.md`)*
+- [x] validação de input *(Settings syslog host; restante já em policies/exceptions; ver `docs/04-package/gui-validation.md`)*
 
 ### Saída
 Pacote operável sem shell na maioria dos casos.
@@ -201,7 +201,7 @@ Pacote operável sem shell na maioria dos casos.
 Consolidar observabilidade.
 
 ### Tarefas
-- [x] definir formato de logs *(docs/10-logging/README.md — atual + planeado)*
+- [x] definir formato de logs *(docs/14-logging/README.md — atual + planeado)*
 - [x] implementar syslog remoto *(UDP; `config_parse` + GUI Settings + `layer7d`)*
 - [x] adicionar diagnostics *(GUI layer7_diagnostics.php)*
 - [x] counters básicos *(SIGUSR1 no daemon)*

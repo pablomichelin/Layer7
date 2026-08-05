@@ -42,9 +42,9 @@ Leitura complementar obrigatoria:
 - [`f3-11-access-enablement-package.md`](f3-11-access-enablement-package.md)
 - [`f3-11-input-acceptance-matrix.md`](f3-11-input-acceptance-matrix.md)
 - [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md)
-- [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md)
-- [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md)
-- [`../05-runbooks/f3-11-live-access-checklist.md`](../05-runbooks/f3-11-live-access-checklist.md)
+- [`../13-runbooks/f3-11-input-triage-runbook.md`](../13-runbooks/f3-11-input-triage-runbook.md)
+- [`../13-runbooks/f3-11-evidence-intake-template.md`](../13-runbooks/f3-11-evidence-intake-template.md)
+- [`../13-runbooks/f3-11-live-access-checklist.md`](../13-runbooks/f3-11-live-access-checklist.md)
 
 ---
 

@@ -10,7 +10,7 @@ Serviço gerido pelo pfSense com config completa, counters, nDPI.
 - **Parser/motor:** globais; **`exceptions[]`** (host, CIDR); **`policies[]`** (`ndpi_app`, `ndpi_category`). **Runtime:** loop ainda sem nDPI — só config/reload/idle.
 - **`-t`:** globais, exceções, políticas, dry-run com IP origem + app + categoria; **`pfctl_suggest`** em enforce+block/tag.
 - **Enforcement:** [`pf-enforcement.md`](pf-enforcement.md) — **`layer7_on_classified_flow(src_ip, ndpi_app, ndpi_cat)`** em `main.c` (decisão + `layer7_pf_enforce_decision` + contadores); hoje só **CLI `-e`** / **`-e -n`**; o loop nDPI chamará a mesma função. O mesmo ficheiro inclui **DNS forcado** (`force_dns`, anchor NAT `natrules/layer7_nat`, F4.3 / **BG-011**) e **anti-QUIC por interface** (`layer7_generate_rules`, validação `layer7_pf_ifname_for_rules` desde `1.8.11_12`).
-- **Sinais:** **SIGHUP** reload; **SIGUSR1** stats. **Syslog remoto:** UDP para `syslog_remote_host` (ver Settings / `docs/10-logging`).
+- **Sinais:** **SIGHUP** reload; **SIGUSR1** stats. **Syslog remoto:** UDP para `syslog_remote_host` (ver Settings / `docs/14-logging`).
 - **Daemon:** syslog no arranque; aviso **degraded** se ficheiro existe mas policies/exceptions falham no parse; **SIGHUP** re-lê ficheiro; **~1 h** `periodic_state` (info) quando não idle; SIGTERM/SIGINT — `daemon_stop`.
 
 ## Pidfile (`/var/run/layer7d.pid`)
@@ -36,7 +36,7 @@ ver changelog e `f4-plano-de-implementacao.md` (F4.1 / F4.2).
 
 ## Logging
 
-Formato e níveis: [`../10-logging/README.md`](../10-logging/README.md).
+Formato e níveis: [`../14-logging/README.md`](../14-logging/README.md).
 
 ## Validação
 

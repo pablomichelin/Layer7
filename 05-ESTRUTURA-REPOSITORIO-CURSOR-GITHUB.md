@@ -26,7 +26,7 @@ layer7-pfsense/
 │  ├─ 02-roadmap/
 │  ├─ 03-adr/
 │  ├─ 04-tests/
-│  ├─ 05-runbooks/
+│  ├─ 13-runbooks/
 │  ├─ 06-releases/
 │  ├─ 07-prompts/
 │  └─ 08-lab/
@@ -182,7 +182,7 @@ docs/
 │  ├─ test-plan.md
 │  ├─ traffic-matrix.md
 │  └─ release-checklist.md
-├─ 05-runbooks/
+├─ 13-runbooks/
 │  ├─ install.md
 │  ├─ rollback.md
 │  └─ diagnostics.md

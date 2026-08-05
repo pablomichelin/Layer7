@@ -41,7 +41,7 @@ Leitura complementar obrigatoria:
 - [`f3-11-operational-decisions-ledger.md`](f3-11-operational-decisions-ledger.md)
 - [`f3-11-readiness-scorecard.md`](f3-11-readiness-scorecard.md)
 - [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md)
-- [`../05-runbooks/f3-11-cycle-closure-criteria.md`](../05-runbooks/f3-11-cycle-closure-criteria.md)
+- [`../13-runbooks/f3-11-cycle-closure-criteria.md`](../13-runbooks/f3-11-cycle-closure-criteria.md)
 
 ---
 
@@ -78,9 +78,9 @@ Leitura complementar obrigatoria:
 
 1. abrir o ciclo operacional da rodada;
 2. registar **primeiro** a entrega num intake derivado de
-   [`../05-runbooks/f3-11-evidence-intake-template.md`](../05-runbooks/f3-11-evidence-intake-template.md);
+   [`../13-runbooks/f3-11-evidence-intake-template.md`](../13-runbooks/f3-11-evidence-intake-template.md);
 3. executar a triagem com
-   [`../05-runbooks/f3-11-input-triage-runbook.md`](../05-runbooks/f3-11-input-triage-runbook.md);
+   [`../13-runbooks/f3-11-input-triage-runbook.md`](../13-runbooks/f3-11-input-triage-runbook.md);
 4. classificar objectivamente o resultado com base na
    [`f3-11-input-acceptance-matrix.md`](f3-11-input-acceptance-matrix.md);
 5. consolidar a decisao no
@@ -93,7 +93,7 @@ Leitura complementar obrigatoria:
 9. reavaliar o [`f3-11-readiness-reopen-gate.md`](f3-11-readiness-reopen-gate.md)
    **apenas** se o scorecard e o registro mestre estiverem sincronizados;
 10. fechar o ciclo com
-    [`../05-runbooks/f3-11-cycle-report-template.md`](../05-runbooks/f3-11-cycle-report-template.md).
+    [`../13-runbooks/f3-11-cycle-report-template.md`](../13-runbooks/f3-11-cycle-report-template.md).
 
 ### 2.3 Quando a readiness ou o DR-05 puderem avancar
 

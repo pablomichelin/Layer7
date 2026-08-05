@@ -87,7 +87,7 @@ estável no padrão `.pkg + .sha256`):
 fetch -o /tmp/pfSense-pkg-layer7-1.8.3.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/pfSense-pkg-layer7-1.8.3.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.3.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
-Ver também [`docs/05-runbooks/rollback.md`](../05-runbooks/rollback.md).
+Ver também [`docs/13-runbooks/rollback.md`](../13-runbooks/rollback.md).
 
 ---
 

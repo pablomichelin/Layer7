@@ -20,8 +20,9 @@
 | **Fase roadmap** | F4 aberta; F3 aberta; plano de fecho **ACTIVO** |
 | **Trilha activa** | **Caminho B** — Enforcement escopado (E0–E3 no codigo; E4–E8 planeados) |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
+| **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
 
-> **GO Onda F (`2026-08-05`):** `latest` e produção enforce alinhados em `_69`.
+> **Produto pronto para enforce** (`1.8.11_69`). Manutenção via backlog normal.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 
