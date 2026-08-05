@@ -10,7 +10,7 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Trilha | Estado | SSOT de execução |
 |--------|--------|------------------|
 | Fecho produção P0–J | **FECHADO** (`1.9.0`, `2026-08-05`) | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) (histórico) |
-| **IPv6 completo V0–V6** | **ABERTA** — passo **12.9** (V4) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
+| **IPv6 completo V0–V6** | **ABERTA** — passo **12.10** (V5) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
 
 **Não criar** outros ficheiros `START-HERE-*.md` para esta fila — este é o único.
 
@@ -21,8 +21,8 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Campo | Valor |
 |-------|-------|
 | **Trilha activa** | **IPv6** — Ondas V0–V6 |
-| **Passo autorizado** | **12.9** (Onda V4 — GUI validação IPv6) |
-| **BG activo** | BG-082 (V4; Onda V3 concluída — 12.6–12.8) |
+| **Passo autorizado** | **12.10** (Onda V5 — DNS `rdr inet6` / BG-083) |
+| **BG activo** | BG-083 (V5; Onda V4 concluída — 12.9) |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
 | Candidato lab / `latest` | **`1.9.1`** (publicado; 12.1–12.5) |
 | Plano fecho P0–J | **FECHADO** |
@@ -45,7 +45,8 @@ mestre após 11.1).
 | Passo **12.6** | `policy.c` CIDR IPv6 — **concluído** (V3) |
 | Passo **12.7** | `enforce.c`/`main.c` PF tabelas + kill states v6 — **concluído** (V3) |
 | Passo **12.8** | Allowlist IPv6 host/CIDR — **concluído** (V3) |
-| Passo **12.9** (autorizado) | GUI + validação IPv6 — **V4** |
+| Passo **12.9** | GUI + validação IPv6 — **concluído** (V4) |
+| Passo **12.10** (autorizado) | DNS `rdr inet6` / decisão humana — **V5** |
 | test-matrix **12.1 / 12.2** | Blacklists UT1 (F4.2) — **outra coisa** |
 
 Mensagens de commit da trilha: `trilha-ipv6/12.x: …`
@@ -108,7 +109,7 @@ Leitura obrigatória (nesta ordem):
 7. docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md
 
 Regras absolutas:
-- Executar SOMENTE o passo 12.x autorizado no CORTEX (agora: 12.9).
+- Executar SOMENTE o passo 12.x autorizado no CORTEX (agora: 12.10).
 - Não confundir passo 12.x da trilha IPv6 com test-matrix §12 (blacklists F4.2).
 - Não reabrir Ondas P0–J do fecho; produção enforce permanece 1.9.0 até GV7.
 - Não regressão IPv4: run-local.sh (+ smoke IPv4) quando houver código.
@@ -121,10 +122,10 @@ Regras absolutas:
 
 Estado (confirmar no repo):
 - Branch: main
-- Passo actual: 12.9
-- Onda: V4
-- BG: BG-082
-- Candidato lab: 1.9.1 (código 12.6–12.8 na árvore; próximo .pkg: 1.9.2)
+- Passo actual: 12.10
+- Onda: V5
+- BG: BG-083
+- Candidato lab: 1.9.1 (código 12.6–12.9 na árvore; próximo .pkg: 1.9.2)
 - Produção enforce: 1.9.0
 - Rollback imediato: 1.8.11_69
 
@@ -198,8 +199,9 @@ Responde em português.
 | **12.6** | V3 | `policy.c` CIDR IPv6 — **CONCLUÍDO** |
 | **12.7** | V3 | `enforce.c`/`main.c` PF tabelas + kill states v6 — **CONCLUÍDO** |
 | **12.8** | V3 | Allowlist v6 — **CONCLUÍDO** |
-| **12.9** | V4 | GUI + validação IPv6 — **actual** |
-| 12.10–12.11 | V5 | DNS/NAT/block page v6 **ou** exclusão ADR |
+| **12.9** | V4 | GUI + validação IPv6 — **CONCLUÍDO** |
+| **12.10** | V5 | DNS/NAT/block page v6 **ou** exclusão ADR — **actual** |
+| 12.11 | V5 | Block page + VIP isenção v6 (se V5 activo) |
 | 12.12–12.13 | V6 | Gates lab + release (série `1.9.n`) |
 
 Detalhe, versionamento e STOP: [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md).

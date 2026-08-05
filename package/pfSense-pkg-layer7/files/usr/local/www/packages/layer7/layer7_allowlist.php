@@ -8,7 +8,7 @@
 
 /*
  * Layer7 — allowlist de destinos (Bloco 3 da Fase 1).
- * Edicao simples por textarea: 1 entrada por linha (dominio, IPv4 host ou CIDR).
+ * Edicao simples por textarea: 1 entrada por linha (dominio, IP/CIDR IPv4 ou IPv6).
  * A lista combinada (operador + seed embutido) e honrada:
  *   - pelo daemon (`l7_allowlist_*`) — antes de adicionar IPs a layer7_block_dst.
  *   - pelo PF do pacote — marca L7ALLOW; so os blocks Layer7 a ignoram.
@@ -26,7 +26,8 @@ function l7_allow_normalize_input($raw)
 		if ($s === "" || $s[0] === "#") {
 			continue;
 		}
-		if (preg_match('/^[A-Za-z0-9._\-\/]+$/', $s)) {
+		/* Dominios + IPv4 + IPv6 (':' permitido) — passo 12.9. */
+		if (preg_match('/^[A-Za-z0-9._\-\/:]+$/', $s)) {
 			$out[] = $s;
 		}
 	}
@@ -39,10 +40,19 @@ function l7_allow_classify($s)
 		return "invalid";
 	}
 	if (strpos($s, "/") !== false) {
-		return layer7_cidr_valid($s) ? "cidr" : "invalid";
+		if (layer7_cidr_valid($s)) {
+			return "cidr";
+		}
+		if (layer7_cidr6_valid($s)) {
+			return "cidr6";
+		}
+		return "invalid";
 	}
-	if (preg_match('/^[0-9]{1,3}(\.[0-9]{1,3}){3}$/', $s)) {
-		return layer7_ipv4_valid($s) ? "ipv4" : "invalid";
+	if (layer7_ipv4_valid($s)) {
+		return "ipv4";
+	}
+	if (layer7_ipv6_valid($s)) {
+		return "ipv6";
 	}
 	if (preg_match('/^[A-Za-z0-9._\-]+$/', $s) && strpos($s, ".") !== false) {
 		return "domain";
@@ -106,7 +116,7 @@ layer7_render_styles();
 			<?php layer7_render_messages(); ?>
 
 			<p class="layer7-lead">
-				<?= l7_t("Destinos que NUNCA devem ser bloqueados pelo Layer7, mesmo em enforce. Aceita dominios (cobrem subdominios por sufixo), IPv4 host e CIDRs IPv4. A lista do operador e somada a uma lista-semente embutida (bancos BR, gov, push mobile)."); ?>
+				<?= l7_t("Destinos que NUNCA devem ser bloqueados pelo Layer7, mesmo em enforce. Aceita dominios (cobrem subdominios por sufixo), IPv4/IPv6 host e CIDRs IPv4/IPv6. A lista do operador e somada a uma lista-semente embutida (bancos BR, gov, push mobile)."); ?>
 			</p>
 
 			<form method="post" action="layer7_allowlist.php" class="form-horizontal">
@@ -115,7 +125,7 @@ layer7_render_styles();
 				<div class="layer7-admin-block">
 					<div class="layer7-admin-block__header"><?= l7_t("Entradas do operador"); ?></div>
 					<div class="layer7-admin-block__body">
-						<p class="text-muted"><?= l7_t("1 entrada por linha. Linhas vazias e linhas que comecem por '#' sao ignoradas. Exemplos validos: bb.com.br, 8.8.8.8, 200.201.0.0/16."); ?></p>
+						<p class="text-muted"><?= l7_t("1 entrada por linha. Linhas vazias e linhas que comecem por '#' sao ignoradas. Exemplos validos: bb.com.br, 8.8.8.8, 200.201.0.0/16, 2001:db8::1, 2001:db8::/32."); ?></p>
 						<textarea name="entries" rows="14" class="form-control" style="font-family:monospace;"><?= htmlspecialchars(implode("\n", $user_entries)); ?></textarea>
 						<div style="margin-top:12px;">
 							<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <?= l7_t("Gravar allowlist"); ?></button>

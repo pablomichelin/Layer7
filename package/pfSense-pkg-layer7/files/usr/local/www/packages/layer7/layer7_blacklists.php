@@ -83,7 +83,7 @@ if (isset($_POST["save_rule"])) {
 		foreach (preg_split('/[\r\n]+/', $rcidrs_raw) as $line) {
 			$line = trim($line);
 			if ($line === "" || $line[0] === '#') continue;
-			if (layer7_ipv4_valid($line) || layer7_cidr_valid($line)) {
+			if (layer7_ip_or_cidr_valid($line)) {
 				$rcidrs[] = $line;
 			} else {
 				$input_errors[] = l7_t("IP/CIDR invalido: ") . htmlspecialchars($line);
@@ -96,7 +96,7 @@ if (isset($_POST["save_rule"])) {
 		foreach (preg_split('/[\r\n]+/', $rexcept_raw) as $line) {
 			$line = trim($line);
 			if ($line === "" || $line[0] === '#') continue;
-			if (layer7_ipv4_valid($line) || layer7_cidr_valid($line)) {
+			if (layer7_ip_or_cidr_valid($line)) {
 				$rexcept[] = $line;
 			} else {
 				$input_errors[] = l7_t("IP/CIDR de excepcao invalido: ") . htmlspecialchars($line);

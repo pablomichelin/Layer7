@@ -1238,7 +1238,7 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 
 ---
 
-## Trilha IPv6 completo (pós-fecho — 2026-08-04, rev. b)
+## Trilha IPv6 completo (pós-fecho — 2026-08-04, rev. c)
 
 Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera produção
 `1.9.0` até GV7 + GO humano.
@@ -1252,12 +1252,13 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera pro
 > Passos **12.x** da trilha IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
 > Não existe outro ficheiro START-HERE para esta fila.
 
-**Gap actual:** FP-010 / REV-018 — captura e scoped PF são IPv4-centric; anti-DoT/QUIC
-`inet6` já existem sem DPI v6.
+**Gap actual:** DNS forçado / block page / VIP isenção permanecem **IPv4-only** (V5 /
+BG-083); banner Diagnostics mantém disclosure IPv4-only até fecho dual-stack
+(honestidade). Captura, policy, enforce, allowlist e validação GUI aceitam v6.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.9 (Onda V4 — GUI validação IPv6)
+- Passo actual: 12.10 (Onda V5 — DNS `rdr inet6` / decisão humana BG-083)
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
@@ -1267,20 +1268,21 @@ TRILHA IPv6 — progresso
 - Passo 12.6: CONCLUÍDO (2026-08-04) — `policy.c` CIDR IPv6 dual-stack (`l7_cidr` family + union v4/v6; `parse_cidr_str` v4 `/0–32` + v6 `/0–128`; match `src_cidrs`/`src_exclude_cidrs`/exception `cidrs`; `ip_host_equal` v4/v6); `test_policy_decide.c` PASS local + builder; sem bump `1.9.2`
 - Passo 12.7: CONCLUÍDO (2026-08-04) — `enforce.c`/`enforce.h`/`main.c` PF tabelas + kill states v6: `layer7_pf_host_ok`/`layer7_pf_host_enforce_ok` (S-03 rejeita `::1`, `fe80::/10`, `ff00::/8`); `pfctl -T add/delete` e kill states aceitam IPv6; `kill_states_to` usa `::/0` para destino v6; gates PF em `main.c` usam `host_enforce_ok`; `ip_is_local_iface_addr` lista IPv6 das ifaces; `test_enforce_scoped.c` + `run-local.sh` PASS local + builder; sem bump `1.9.2`
 - Passo 12.8: CONCLUÍDO (2026-08-05) — `allowlist.c`/`allowlist.h` IPv6 host/CIDR: kinds `L7_AL_IPV6_HOST`/`L7_AL_IPV6_CIDR`; parse/match dual-stack; rejeita `/0`, `::1`, `fe80::/10`, `ff00::/8`, prefixo <10; `test_allowlist.c` + `run-local.sh` PASS local + builder; **Onda V3 completa**; sem bump `1.9.2`
-- Candidato lab: **1.9.1** (publicado; trilha 12.1–12.5; código 12.6–12.8 na árvore)
+- Passo 12.9: CONCLUÍDO (2026-08-05) — GUI + validação IPv6 (`layer7.inc` + páginas): helpers `layer7_ip_valid`, `layer7_cidr_any_valid`, `layer7_ip_or_cidr_valid`, `layer7_ip_in_cidr`; `layer7_cidr6_valid` prefixo mínimo 10 (S-03); `layer7_parse_ip_textarea`/`layer7_parse_cidr_textarea` dual-stack (limites 64/16); allowlist GUI + apply PF, VIP add/import, políticas/grupos/excepções via parse, blacklists, `layer7_test.php`; `tests/functional/test_ipv6_gui_inc.php` + `run-local.sh` PASS; portal/block page IPv4 permanece (V5); banner Diagnostics IPv4-only mantido; **Onda V4 completa**; sem bump `1.9.2`
+- Candidato lab: **1.9.1** (publicado; trilha 12.1–12.5; código 12.6–12.9 na árvore)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - Versionamento: série patch `1.9.0` → `1.9.1` → `1.9.2` … (`PORTREVISION=0`)
 - Appliance smoke (`192.168.100.254`, `1.9.1`): `layer7d -V` 1.9.1; `legacy_global`; banner IPv6 (GV0.3); `pfctl -nf /tmp/rules.debug` rc=0; `cap_pkts_v6`/`cap_active_v6`/`cap_classified_v6` > 0; cliente `192.168.100.244` IPv6 global `2804:6c4:11d:cc00::…`
 - GV0: PASS
 - GV1: parcial (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2: parcial (builder PASS 12.4–12.8; policy + enforce + allowlist tests PASS)
+- GV2: parcial (builder PASS 12.4–12.9; policy + enforce + allowlist + GUI `test_ipv6_gui_inc` PASS)
 - GV3: parcial (captura v6 appliance `1.9.1` evidenciada; GV3.3–GV3.5 PENDENTE)
 - GV4: parcial (código daemon v6 12.6–12.8 PASS builder; GV4.1–GV4.4 appliance PENDENTE; GV4.5 S-03 unit PASS)
 - GV5–GV7: PENDENTE
-- I1–I8: I1 PASS; I2 parcial; I3 parcial (captura+métricas v6 appliance); I4 parcial (policy+enforce+allowlist v6 código 12.6–12.8; GUI I6 = 12.9)
+- I1–I8: I1 PASS; I2 parcial; I3 parcial (captura+métricas v6 appliance); I4 parcial (policy+enforce+allowlist+GUI v6 código 12.6–12.9; appliance GV4 PENDENTE); I6 PASS (validação GUI 12.9); I7 PENDENTE (V5)
 - I5: parcial (pfctl/kill states v6 código 12.7; appliance GV4 PENDENTE)
-- BG: BG-078/079/080/081 done (Onda V3); BG-082 em curso (12.9 GUI); BG-083..084
-- Próximo passo autorizado: 12.9
+- BG: BG-078..082 done (Onda V4); BG-083..084 planeados (V5–V6)
+- Próximo passo autorizado: 12.10 (V5 — gate humano BG-083) ou registo ADIADO se impasse
 ```
 
 ---
@@ -1444,13 +1446,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: 1.9.1 (lab IPv6 12.1–12.5; código 12.6–12.8 na árvore)
+- Canal publico latest: 1.9.1 (lab IPv6 12.1–12.5; código 12.6–12.9 na árvore)
 - Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1 ate GV7)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
-- Trilha IPv6: ABERTA — passo 12.9 autorizado a seguir (Onda V3 CONCLUÍDA; 12.8 CONCLUÍDO)
+- Trilha IPv6: ABERTA — passo 12.10 autorizado (Onda V4 CONCLUÍDA; 12.9 CONCLUÍDO)
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: trilha IPv6 12.9 (GUI validação IPv6 / BG-082); BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: trilha IPv6 12.10 (DNS `rdr inet6` / BG-083 — gate humano V5); BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -1464,7 +1466,7 @@ CHECKPOINT CANONICO
 - A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.1`**
   publicado em `pablomichelin/Layer7` tag `v1.9.1`
   (`SHA256=c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd`).
-  Trilha IPv6 passos 12.1–12.5 publicados; código 12.6–12.8 (policy CIDR + enforce PF v6 + allowlist v6) na árvore.
+  Trilha IPv6 passos 12.1–12.5 publicados; código 12.6–12.9 (policy CIDR + enforce PF v6 + allowlist v6 + GUI validação v6) na árvore.
   Appliance `254` com `1.9.1` — captura v6 evidenciada. Rollback imediato: `v1.9.0`.
 - A referencia de **producao enforce** permanece **`1.9.0`**
   (`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`)

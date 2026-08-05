@@ -6,6 +6,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Trilha IPv6 / passo 12.9 (V4):** GUI + validação IPv6 — helpers
+  `layer7_ip_valid`, `layer7_cidr_any_valid`, `layer7_ip_or_cidr_valid`,
+  `layer7_ip_in_cidr`; `layer7_cidr6_valid` prefixo mínimo 10 (S-03 alinhado);
+  `layer7_parse_ip_textarea`/`layer7_parse_cidr_textarea` dual-stack (limites
+  64/16); allowlist GUI + apply PF, VIP add/import, políticas/grupos/excepções
+  via parse, blacklists, `layer7_test.php`; `tests/functional/test_ipv6_gui_inc.php`
+  + `run-local.sh` PASS. Portal/block page IPv4 permanece (V5); banner Diagnostics
+  IPv4-only mantido (honestidade). **Onda V4 completa**. Sem bump `1.9.2` nesta
+  entrega. Produção enforce `1.9.0` inalterada. Próximo: **12.10** (V5 — DNS
+  `rdr inet6` / gate humano BG-083).
+
 - **Trilha IPv6 / passo 12.8 (V3):** `allowlist.c`/`allowlist.h` IPv6 host/CIDR —
   kinds `L7_AL_IPV6_HOST`/`L7_AL_IPV6_CIDR`; parse/match dual-stack; rejeita `/0`,
   `::1`, `fe80::/10`, `ff00::/8`, prefixo <10. `test_allowlist.c` + `run-local.sh`

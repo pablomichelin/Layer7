@@ -370,7 +370,11 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ### V4 — GUI/config (12.9, BG-082)
 
-- [ ] Validação IPv6 sem truncamento silencioso
+- [x] 12.9 helpers + validação IPv6 (`layer7_ip_valid`, `layer7_cidr_any_valid`, `layer7_ip_or_cidr_valid`, `layer7_ip_in_cidr`; `cidr6_valid` prefixo mín. 10 S-03)
+- [x] 12.9 `parse_ip_textarea` / `parse_cidr_textarea` dual-stack (limites 64/16)
+- [x] 12.9 GUI allowlist, VIP add/import, políticas/grupos/excepções, blacklists, `layer7_test.php`
+- [x] `tests/functional/test_ipv6_gui_inc.php` + `run-local.sh` PASS
+- [x] **Onda V4 completa** — portal/block page IPv4 permanece (V5); banner Diagnostics IPv4-only mantido
 
 ### V5 — NAT/DNS v6 (12.10–12.11, BG-083)
 

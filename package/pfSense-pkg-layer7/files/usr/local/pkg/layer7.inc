@@ -295,7 +295,7 @@ function layer7_generate_rdr_rules_snippet()
 			if ($cidr === "") {
 				continue;
 			}
-			if (!layer7_cidr_valid($cidr) && !layer7_ipv4_valid($cidr)) {
+			if (!layer7_ip_or_cidr_valid($cidr)) {
 				continue;
 			}
 			$cidrs_ok[] = $cidr;
@@ -467,7 +467,7 @@ function layer7_policy_expand_src_origins($policy, $groups)
 				foreach ($g["cidrs"] as $c) {
 					$c = trim((string)$c);
 					if ($c !== "" &&
-					    (layer7_cidr_valid($c) || layer7_ipv4_valid($c))) {
+					    layer7_ip_or_cidr_valid($c)) {
 						$cidrs[] = $c;
 					}
 				}
@@ -478,7 +478,7 @@ function layer7_policy_expand_src_origins($policy, $groups)
 				}
 				foreach ($g[$gk] as $h) {
 					$h = trim((string)$h);
-					if ($h !== "" && layer7_ipv4_valid($h)) {
+					if ($h !== "" && layer7_ip_valid($h)) {
 						$hosts[] = $h;
 					}
 				}
@@ -517,8 +517,7 @@ function layer7_policy_expand_src_excludes($policy, $groups)
 				foreach ($g["cidrs"] as $c) {
 					$c = trim((string)$c);
 					if ($c !== "" &&
-					    (layer7_cidr_valid($c) ||
-					    layer7_ipv4_valid($c))) {
+					    (layer7_ip_or_cidr_valid($c))) {
 						$cidrs[] = $c;
 					}
 				}
@@ -529,7 +528,7 @@ function layer7_policy_expand_src_excludes($policy, $groups)
 				}
 				foreach ($g[$gk] as $h) {
 					$h = trim((string)$h);
-					if ($h !== "" && layer7_ipv4_valid($h)) {
+					if ($h !== "" && layer7_ip_valid($h)) {
 						$hosts[] = $h;
 					}
 				}
@@ -564,14 +563,14 @@ function layer7_policy_src_include_exclude_conflict($policy, $groups)
 			}
 		}
 		foreach ($inc["hosts"] as $ih) {
-			if (layer7_ipv4_in_cidr($ih, $ec)) {
+			if (layer7_ip_in_cidr($ih, $ec)) {
 				return true;
 			}
 		}
 	}
 	foreach ($exc["hosts"] as $eh) {
 		foreach ($inc["cidrs"] as $ic) {
-			if (layer7_ipv4_in_cidr($eh, $ic)) {
+			if (layer7_ip_in_cidr($eh, $ic)) {
 				return true;
 			}
 		}
@@ -787,13 +786,13 @@ function layer7_exception_allow_meta($data)
 		    array());
 		foreach ($hosts as $host) {
 			$host = trim((string)$host);
-			if (layer7_ipv4_valid($host)) {
+			if (layer7_ip_valid($host)) {
 				$entries[] = $host;
 			}
 		}
 		foreach ($cidrs as $cidr) {
 			$cidr = trim((string)$cidr);
-			if (layer7_cidr_valid($cidr) || layer7_ipv4_valid($cidr)) {
+			if (layer7_ip_or_cidr_valid($cidr)) {
 				$entries[] = $cidr;
 			}
 		}
@@ -847,12 +846,12 @@ function layer7_pf_managed_dynamic_tables_text($data, $bl_config = null)
 		}
 		$entries = array();
 		foreach ($m["exclude_hosts"] as $h) {
-			if (layer7_ipv4_valid($h)) {
+			if (layer7_ip_valid($h)) {
 				$entries[] = $h;
 			}
 		}
 		foreach ($m["exclude_cidrs"] as $c) {
-			if (layer7_cidr_valid($c) || layer7_ipv4_valid($c)) {
+			if (layer7_ip_or_cidr_valid($c)) {
 				$entries[] = $c;
 			}
 		}
@@ -1313,7 +1312,7 @@ function layer7_pf_table_replace_entries($table, $entries)
 			$neg = true;
 			$e = substr($e, 1);
 		}
-		if (!layer7_ipv4_valid($e) && !layer7_cidr_valid($e)) {
+		if (!layer7_ip_or_cidr_valid($e)) {
 			continue;
 		}
 		$tokens[] = $neg ? ("!" . $e) : $e;
@@ -1371,12 +1370,12 @@ function layer7_static_origin_tables_apply_to_pf($data = null, $bl_config = null
 		}
 		$entries = array();
 		foreach ($m["exclude_hosts"] as $h) {
-			if (layer7_ipv4_valid($h)) {
+			if (layer7_ip_valid($h)) {
 				$entries[] = $h;
 			}
 		}
 		foreach ($m["exclude_cidrs"] as $c) {
-			if (layer7_cidr_valid($c) || layer7_ipv4_valid($c)) {
+			if (layer7_ip_or_cidr_valid($c)) {
 				$entries[] = $c;
 			}
 		}
@@ -1533,7 +1532,7 @@ function layer7_pf_table_flush($table)
 }
 
 /**
- * Popula `layer7_allow_dst` com IPv4 hosts/CIDRs da allowlist combinada.
+ * Popula `layer7_allow_dst` com hosts/CIDRs IPv4+IPv6 da allowlist combinada.
  * Faz `flush` antes para garantir coerencia com a config actual. Dominios
  * sao saltados (adicionados pelo daemon via DNS hint).
  */
@@ -1542,14 +1541,12 @@ function layer7_dst_allowlist_apply_to_pf()
 	$entries = layer7_dst_allowlist_merged();
 	$ips = array();
 	foreach ($entries as $e) {
-		if (preg_match('/^[0-9]{1,3}(\.[0-9]{1,3}){3}$/', $e)) {
-			if (layer7_ipv4_valid($e)) {
-				$ips[] = $e;
-			}
-		} elseif (strpos($e, "/") !== false) {
-			if (layer7_cidr_valid($e)) {
-				$ips[] = $e;
-			}
+		$e = trim((string)$e);
+		if ($e === "") {
+			continue;
+		}
+		if (layer7_ip_or_cidr_valid($e)) {
+			$ips[] = $e;
 		}
 	}
 	$ips = array_values(array_unique($ips));
@@ -1700,8 +1697,7 @@ function layer7_blacklist_source_scope_meta($bl_config)
 			foreach ($brule["src_cidrs"] as $cidr) {
 				$cidr = trim((string)$cidr);
 				if ($cidr !== "" &&
-				    (layer7_cidr_valid($cidr) ||
-				    layer7_ipv4_valid($cidr))) {
+				    layer7_ip_or_cidr_valid($cidr)) {
 					$entries[] = $cidr;
 				}
 			}
@@ -1712,7 +1708,7 @@ function layer7_blacklist_source_scope_meta($bl_config)
 		$n_except = 0;
 		foreach ($brule["except_ips"] as $eip) {
 			$eip = trim((string)$eip);
-			if ($eip !== "" && layer7_ipv4_valid($eip)) {
+			if ($eip !== "" && layer7_ip_valid($eip)) {
 				$entries[] = "!" . $eip;
 				$n_except++;
 			}
@@ -1755,11 +1751,16 @@ function layer7_blacklist_filter_rules_text($bl_config)
 			foreach ($brule["src_cidrs"] as $cidr) {
 				$cidr = trim((string)$cidr);
 				if ($cidr !== "" &&
-				    (layer7_cidr_valid($cidr) ||
-				    layer7_ipv4_valid($cidr))) {
-					$rules .= "block drop quick inet from {$cidr} " .
-					    "to <{$table}> ! tagged L7ALLOW " .
-					    "label \"layer7:bl:{$rname}\"\n";
+				    layer7_ip_or_cidr_valid($cidr)) {
+					$af = layer7_pf_addr_family($cidr);
+					if ($af === null) {
+						continue;
+					}
+					$rules .= layer7_pf_family_rule(
+					    "block drop quick",
+					    "from {$cidr} to <{$table}> ! tagged L7ALLOW " .
+					    "label \"layer7:bl:{$rname}\"",
+					    $af, null);
 				}
 			}
 		} else {
@@ -3276,7 +3277,8 @@ function layer7_cidr_valid($s)
 }
 
 /**
- * CIDR IPv6 addr/prefix (1–128). Rejeita ::/0 e prefixos especiais S-03.
+ * CIDR IPv6 addr/prefix (10–128). Rejeita ::/0, prefixos <10 e S-03.
+ * Alinhado a allowlist daemon (passo 12.8/12.9).
  */
 function layer7_cidr6_valid($s)
 {
@@ -3293,10 +3295,28 @@ function layer7_cidr6_valid($s)
 		return false;
 	}
 	$n = (int)$pfx;
-	if ($n < 1 || $n > 128) {
+	if ($n < 10 || $n > 128) {
 		return false;
 	}
 	return layer7_ipv6_valid($addr);
+}
+
+/** Host IPv4 ou IPv6 (S-03 para v6). */
+function layer7_ip_valid($s)
+{
+	return layer7_ipv4_valid($s) || layer7_ipv6_valid($s);
+}
+
+/** CIDR IPv4 (/1–32) ou IPv6 (/10–128). */
+function layer7_cidr_any_valid($s)
+{
+	return layer7_cidr_valid($s) || layer7_cidr6_valid($s);
+}
+
+/** Host ou CIDR IPv4/IPv6. */
+function layer7_ip_or_cidr_valid($s)
+{
+	return layer7_ip_valid($s) || layer7_cidr_any_valid($s);
 }
 
 /** IPv4 pertence a CIDR ou coincide com host unico. */
@@ -3327,6 +3347,53 @@ function layer7_ipv4_in_cidr($ip, $cidr)
 	}
 	$mask = -1 << (32 - $prefix);
 	return ($ip_long & $mask) === ($net_long & $mask);
+}
+
+/** IP (v4/v6) pertence a host ou CIDR da mesma família. */
+function layer7_ip_in_cidr($ip, $cidr)
+{
+	$ip = trim((string)$ip);
+	$cidr = trim((string)$cidr);
+	if ($ip === "" || $cidr === "") {
+		return false;
+	}
+	if (layer7_ipv4_valid($ip)) {
+		return layer7_ipv4_in_cidr($ip, $cidr);
+	}
+	if (!layer7_ipv6_valid($ip)) {
+		return false;
+	}
+	if (strpos($cidr, "/") === false) {
+		if (!layer7_ipv6_valid($cidr)) {
+			return false;
+		}
+		$a = @inet_pton($ip);
+		$b = @inet_pton($cidr);
+		return ($a !== false && $b !== false && $a === $b);
+	}
+	if (!layer7_cidr6_valid($cidr)) {
+		return false;
+	}
+	$pos = strrpos($cidr, "/");
+	$net = substr($cidr, 0, $pos);
+	$prefix = (int)substr($cidr, $pos + 1);
+	$ipb = @inet_pton($ip);
+	$netb = @inet_pton($net);
+	if ($ipb === false || $netb === false) {
+		return false;
+	}
+	$full = intdiv($prefix, 8);
+	$rem = $prefix % 8;
+	for ($i = 0; $i < $full; $i++) {
+		if ($ipb[$i] !== $netb[$i]) {
+			return false;
+		}
+	}
+	if ($rem === 0) {
+		return true;
+	}
+	$mask = 0xff << (8 - $rem) & 0xff;
+	return ((ord($ipb[$full]) & $mask) === (ord($netb[$full]) & $mask));
 }
 
 /**
@@ -3442,7 +3509,8 @@ function layer7_get_pfsense_interfaces()
 }
 
 /**
- * Parse textarea with one IPv4 per line. Returns array of valid IPs (max 16).
+ * Parse textarea with one IPv4/IPv6 host per line (passo 12.9).
+ * Returns array of valid IPs (max 64 — alinhado a L7_MAX_SRC_HOSTS).
  */
 function layer7_parse_ip_textarea($text)
 {
@@ -3452,7 +3520,7 @@ function layer7_parse_ip_textarea($text)
 		$line = trim($line);
 		if ($line === "" || $line[0] === '#')
 			continue;
-		if (layer7_ipv4_valid($line) && count($out) < 16) {
+		if (layer7_ip_valid($line) && count($out) < 64) {
 			$out[] = $line;
 		}
 	}
@@ -3460,7 +3528,8 @@ function layer7_parse_ip_textarea($text)
 }
 
 /**
- * Parse textarea with one CIDR per line. Returns array of valid CIDRs (max 8).
+ * Parse textarea with one CIDR (v4 ou v6) per line (passo 12.9).
+ * Returns array of valid CIDRs (max 16 — alinhado a L7_MAX_SRC_CIDRS).
  */
 function layer7_parse_cidr_textarea($text)
 {
@@ -3470,7 +3539,7 @@ function layer7_parse_cidr_textarea($text)
 		$line = trim($line);
 		if ($line === "" || $line[0] === '#')
 			continue;
-		if (layer7_cidr_valid($line) && count($out) < 8) {
+		if (layer7_cidr_any_valid($line) && count($out) < 16) {
 			$out[] = $line;
 		}
 	}
@@ -4666,16 +4735,16 @@ function layer7_vip_add_entry(&$data, $description, $target)
 	$description = layer7_vip_sanitize_label($description);
 	$target = trim((string)$target);
 	if ($target === "") {
-		return array("ok" => false, "error" => l7_t("Indique um IPv4 ou CIDR."), "updated" => false);
+		return array("ok" => false, "error" => l7_t("Indique um IP ou CIDR."), "updated" => false);
 	}
 	if ($description === "") {
 		return array("ok" => false, "error" => l7_t("Indique uma descricao."), "updated" => false);
 	}
 
-	$is_host = layer7_ipv4_valid($target);
-	$is_cidr = layer7_cidr_valid($target);
+	$is_host = layer7_ip_valid($target);
+	$is_cidr = layer7_cidr_any_valid($target);
 	if (!$is_host && !$is_cidr) {
-		return array("ok" => false, "error" => l7_t("IPv4 ou CIDR invalido."), "updated" => false);
+		return array("ok" => false, "error" => l7_t("IP ou CIDR invalido (IPv4/IPv6)."), "updated" => false);
 	}
 
 	$current = layer7_vip_direct_targets($data);
@@ -4797,12 +4866,12 @@ function layer7_vip_import_apply(&$data, $imported)
 		if ($target === "" || $desc === "") {
 			continue;
 		}
-		if (layer7_ipv4_valid($target)) {
+		if (layer7_ip_valid($target)) {
 			if (!in_array($target, $hosts, true)) {
 				$hosts[] = $target;
 				$labels[$target] = $desc;
 			}
-		} elseif (layer7_cidr_valid($target)) {
+		} elseif (layer7_cidr_any_valid($target)) {
 			if (!in_array($target, $cidrs, true)) {
 				$cidrs[] = $target;
 				$labels[$target] = $desc;

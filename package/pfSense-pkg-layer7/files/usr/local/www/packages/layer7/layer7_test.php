@@ -38,21 +38,7 @@ function l7_test_host_matches($flow_host, $rule_host)
 
 function l7_test_ip_in_cidr($ip, $cidr)
 {
-	if (strpos($cidr, '/') === false) {
-		return false;
-	}
-	list($net, $prefix) = explode('/', $cidr, 2);
-	$prefix = (int)$prefix;
-	$ip_long = ip2long($ip);
-	$net_long = ip2long($net);
-	if ($ip_long === false || $net_long === false) {
-		return false;
-	}
-	if ($prefix === 0) {
-		return true;
-	}
-	$mask = -1 << (32 - $prefix);
-	return ($ip_long & $mask) === ($net_long & $mask);
+	return layer7_ip_in_cidr($ip, $cidr);
 }
 
 function l7_test_schedule_active($schedule)
@@ -92,7 +78,7 @@ function l7_test_src_matches($policy, $src_ip, $groups)
 			}
 		}
 		foreach ($exc["cidrs"] as $c) {
-			if (layer7_ipv4_in_cidr($src_ip, $c)) {
+			if (layer7_ip_in_cidr($src_ip, $c)) {
 				return false;
 			}
 		}
@@ -395,7 +381,7 @@ if ($_POST["run_test"] ?? false) {
 	if ($test_domain === "" && $test_ndpi_app === "") {
 		$input_errors[] = l7_t("Indique pelo menos um dominio/IP ou app nDPI para testar.");
 	} else {
-		if ($test_src_ip !== "" && !layer7_ipv4_valid($test_src_ip)) {
+		if ($test_src_ip !== "" && !layer7_ip_valid($test_src_ip)) {
 			$input_errors[] = l7_t("IP de origem invalido.");
 		}
 	}
