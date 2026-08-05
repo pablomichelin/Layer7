@@ -1,6 +1,6 @@
 # Plano extensão — IPv6 completo (pós-fecho produção)
 
-**Estado do plano:** `FECHADO` (rev. `2026-08-05g` — GV7 fecho núcleo dual-stack; V5 Opção B a retomar; produção `1.9.0`)  
+**Estado do plano:** `ABERTO (residual V5)` (rev. `2026-08-05h` — 12.10 CONCLUÍDO; 12.11 pendente; núcleo GV7 FECHADO; produção `1.9.0`)
 **Tipo:** extensão pós-Onda J do plano mestre de fecho  
 **SSOT deste plano:** este ficheiro  
 **SSOT de estado:** `CORTEX.md` (secção *Trilha IPv6*)  
@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **FECHADO (núcleo)** — GV7.1–GV7.3 PASS; V5 **ADIADA (B temp.)** a retomar; GV7.4 promoção PENDENTE |
+| IPv6 completo | **V0–V6** | Núcleo **FECHADO**; **12.10 CONCLUÍDO**; **12.11** pendente; GV7.4 promoção PENDENTE |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -224,14 +224,13 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **12.13 CONCLUÍDO** — GV7 fecho documental (`20260805T133000Z-gv7-fecho`)
-- Trilha: **FECHADA (núcleo dual-stack)** — não «completa comercial» até V5 Opção A
-- Onda: V0–V4 CONCLUÍDAS; V5 ADIADA (retomar); V6 12.12+12.13 CONCLUÍDOS
-- Candidato lab / latest: **1.9.6**
-- Produção enforce: **1.9.0** (inalterada; GV7.4 promoção PENDENTE)
-- GV0–GV4: PASS; GV5 ADIADO temp.; GV6 PASS; GV7.1–GV7.3 PASS; GV7.4 PENDENTE
-- I1–I6+I8 PASS; I7 exclusão temp. (ADR-0024 Opção B)
-- Trabalho residual autorizado: **12.10/V5** com GO **ou** promoção enforce (`1.9.6`) com GO
+- Passo actual: **12.10 CONCLUÍDO** (`1.9.7`); próximo **12.11** com GO
+- Trilha: núcleo FECHADO; V5 parcial (12.10 done; 12.11 pendente)
+- Candidato lab / latest: **1.9.7**
+- Produção enforce: **1.9.0** (GV7.4 PENDENTE)
+- GV0–GV4/GV6/GV7.1–GV7.3: PASS; GV5 PARCIAL (DNS inet6); GV7.4 PENDENTE
+- I1–I6+I8 PASS; I7 parcial (DNS force v6; HTTP/VIP = 12.11)
+- Trabalho residual autorizado: **12.11** com GO **ou** promoção enforce com GO
 ```
 
 ---
@@ -251,6 +250,7 @@ TRILHA IPv6 — progresso
 
 ## 10. Histórico
 
+| 2026-08-05 | **12.10 CONCLUÍDO** (GO Opção A): `rdr inet6` DNS force (blacklist + block_page); AF-split CIDR; `portal_ipv6` + Unbound `IN AAAA`; banner Diagnostics; `test_dns_force_inet6.php`; candidato **1.9.7**; HTTP/VIP = 12.11; produção `1.9.0` |
 | 2026-08-05 | **12.13 / GV7 PASS (fecho documental):** trilha **FECHADA (núcleo dual-stack)**; evidência `20260805T133000Z-gv7-fecho`; I1–I6+I8 PASS; I7 exclusão temp.; release `1.9.6` já publicada; **sem** promoção enforce (GV7.4 PENDENTE); residual = 12.10/V5 ou GO promoção |
 | 2026-08-05 | **GV6 PASS** (`1.9.6`): `validacao-lab` §21 + `tests/lab/run-ipv6-dualstack.sh`; evidência `20260805T130620Z-gv6-dualstack`; A/B dual-stack; pdst A+AAAA; V5 continua Opção B; próximo GV7 ou 12.10 com GO |
 | 2026-08-05 | **V5 Opção B temporária** registada (ADR-0024): adiar DNS/block/VIP DNS v6 agora; **retomar obrigatório** após 1.9.2 + gates + GO; banner Diagnostics actualizado |

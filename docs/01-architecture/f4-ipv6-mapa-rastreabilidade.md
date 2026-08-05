@@ -1,8 +1,8 @@
 # Mapa de rastreabilidade — IPv6 (lógica e código)
 
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-05e  
-**Estado:** SSOT da trilha IPv6 — **núcleo FECHADO** (GV7); gap residual = V5 (M-13/M-14)  
+**Rev.:** 2026-08-05f  
+**Estado:** SSOT da trilha IPv6 — núcleo FECHADO; **12.10 DNS force dual-stack**; gap residual = 12.11 (HTTP/VIP)  
 **Plano:** [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)  
 **ADR:** [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md)  
 **Arranque:** [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)
@@ -20,10 +20,10 @@
 | PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas v4+v6 via `pfctl -T` (12.7) | — | V2–V3 |
 | PF scoped (`pdst`/`psrc`/…) | Completo | `inet`+`inet6` (REV-018 fechado 12.3) | — | V1 |
 | Allowlist | IPv4+CIDR | IPv4+IPv6 host/CIDR (12.8) + GUI persistência (12.9) | — | V3–V4 |
-| DNS forçado / sinkhole | `rdr inet` | **Não** | ADR-0018 | V5 |
-| Block page NAT | `rdr inet` | **Não** | ADR-0017 | V5 |
-| VIP isenção DNS | IPv4 rdr/view | **Não** | ADR-0020 | V5 |
-| GUI / validação JSON | IPv4 | Dual-stack host/CIDR (12.9); portal/block page IPv4-only (V5) | NAT/DNS v6 | V4–V5 |
+| DNS forçado / sinkhole | `rdr inet` + A | `rdr inet6` + AAAA (12.10) | HTTP portal v6 | V5 |
+| Block page NAT | `rdr inet` | **Não** (12.11) | ADR-0017 | V5 |
+| VIP isenção DNS | IPv4 rdr/view | **Não** (ACL Unbound; 12.11) | ADR-0020 | V5 |
+| GUI / validação JSON | Dual-stack host/CIDR | DNS force v6 OK; portal HTTP IPv4 | NAT HTTP/VIP v6 | V4–V5 |
 | Anti-DoT/QUIC PF | inet+inet6 | **Sim** | — | — |
 | Docs / GUI disclosure | Parcial | Incompleto | plano-enforcement §429 | V0 |
 
@@ -43,13 +43,13 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-06 | `src/layer7d/enforce.c` | `pfctl -T add/del`, kill states | IPv4+IPv6 (12.7): `pfctl` addr v6; kill states v6; `kill_states_to` `::/0`; S-03 via `layer7_pf_host_enforce_ok` | — | V3 | BG-081 | ENF |
 | M-07 | `src/layer7d/enforce.h` | API enforce | `layer7_pf_host_ok`/`layer7_pf_host_enforce_ok` (12.7); rejeita `::1`/`fe80::/10`/`ff00::/8` | — | V3 | BG-081 | ENF |
 | M-08 | `src/layer7d/allowlist.c` + `.h` | Allowlist destinos | `L7_AL_IPV4_*` + `L7_AL_IPV6_HOST`/`L7_AL_IPV6_CIDR` (12.8): parse/match dual-stack; rejeita `/0`, `::1`, `fe80::/10`, `ff00::/8`, prefixo <10 | GUI persistência (12.9) | V3 | BG-081 | POL |
-| M-09 | `src/layer7d/blacklist.c` | Sinkhole / bl tables | Orientado A records | AAAA: tabelas v6 em V3; `rdr`/sinkhole só V5 ou limite ADR | V3–V5 | BG-081/083 | ENF |
+| M-09 | `src/layer7d/blacklist.c` + Unbound | Sinkhole / bl tables | A+AAAA Unbound (12.10); tabelas v6 V3 | HTTP portal v6 = 12.11 | V3–V5 | BG-081/083 | ENF |
 
 | M-10 | `src/layer7d/config_parse.c` | JSON runtime | Aceita hosts v6 via JSON manual; GUI valida v6 (12.9) | Parse daemon sem tipo IP explícito (baixo risco) | V4 | BG-082 | CFG |
 | M-11 | `package/.../layer7.inc` | Geração regras PF | Scoped `inet`+`inet6` (12.3) | GV1.3 appliance | V1 | BG-079 | PF |
 | M-12 | `package/.../layer7.inc` | validadores IP/CIDR | Dual-stack: `ipv4`/`ipv6`/`cidr`/`cidr6` + `layer7_ip_valid`, `layer7_cidr_any_valid`, `layer7_ip_or_cidr_valid`, `layer7_ip_in_cidr`, textareas parse (12.3+12.9) | — | V1/V4 | BG-079/082 | CFG |
-| M-13 | `package/.../layer7.inc` | `layer7_generate_rdr_rules_*` | `rdr ... inet` L317+ | `inet6` ou ADR exclusão | V5 | BG-083 | NAT |
-| M-14 | `package/.../layer7.inc` | VIP DNS / Unbound view | IPv4 | DHCPv6/VIP v6 | V5 | BG-083 | NAT |
+| M-13 | `package/.../layer7.inc` | `layer7_generate_rdr_rules_*` | `rdr inet` + **`inet6` :53** (12.10); AF-split | HTTP `rdr inet6` = 12.11 | V5 | BG-083 | NAT |
+| M-14 | `package/.../layer7.inc` | VIP DNS / Unbound view | IPv4 ACL | VIP ACL v6 = 12.11 | V5 | BG-083 | NAT |
 | M-15 | `package/.../layer7-pfctl` | Snippet PF helper | `inet6` block global | Alinhar com V1 scoped | V1 | BG-079 | PF |
 | M-16 | `package/.../pf.conf.sample` | Amostra operador | Parcial `inet6` block | Documentar scoped | V0 | BG-078 | DOC |
 | M-17 | `package/.../layer7_policies.php` (+ GUI) | CRUD políticas | Hosts/CIDR v4+v6 via parse (12.9) | — | V4 | BG-082 | CFG |
@@ -149,7 +149,7 @@ GV1.5–GV1.7, GV3.5, GV4.5.
 | S-04 | Distinguir ULA (`fc00::/7`) vs GUA em docs/lab; não assumir só GUA | V0 docs / V3 | |
 | S-05 | Privacy Extensions: allowlist por IP único é frágil — preferir CIDR; MAC→IPv6 **fora** de I1–I8 | V3/V4 | Já diferido no plano |
 | S-06 | Captura: tratar **extension headers** e fragmentação IPv6, não só EtherType `0x86DD` | V2 | |
-| S-07 | M-09 AAAA sem V5 `rdr`: documentar half-fix; não claim «DNS forçado v6» | V3/V5 | ADR Opção B se adiar |
+| S-07 | M-09: 12.10 AAAA + `rdr inet6` :53; sem portal v6 omite AAAA; HTTP portal = 12.11 | V5 | Disclosure Diagnostics |
 | S-08 | V1 com tabelas vazias + regras `inet6` é seguro (sem block v6 até daemon); smoke monitor obrigatório | V1 | |
 
 **STOP:** se GV3.5 (NDP) falhar → rollback candidato; não avançar GV4.

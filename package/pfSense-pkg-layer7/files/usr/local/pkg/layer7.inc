@@ -239,14 +239,62 @@ function layer7_daemon_pid_from_file($pidf = null)
  * e validados uma vez por regra antes de cruzar com as interfaces.
  * Retorna string vazia se nao houver regras rdr activas.
  */
-function layer7_generate_rdr_rules_snippet()
+/**
+ * Família PF de um host/CIDR (passo 12.10 — AF-split no DNS forçado).
+ * @return string|null "inet", "inet6" ou null se inválido
+ */
+function layer7_ip_or_cidr_family($s)
 {
-	$bl_config = layer7_bl_config_load();
+	$s = trim((string)$s);
+	if ($s === "") {
+		return null;
+	}
+	if (strpos($s, ":") !== false) {
+		if (strpos($s, "/") !== false) {
+			return layer7_cidr6_valid($s) ? "inet6" : null;
+		}
+		return layer7_ipv6_valid($s) ? "inet6" : null;
+	}
+	if (strpos($s, "/") !== false) {
+		return layer7_cidr_valid($s) ? "inet" : null;
+	}
+	return layer7_ipv4_valid($s) ? "inet" : null;
+}
+
+/**
+ * Par de regras rdr DNS :53 (UDP+TCP) para uma família.
+ * inet → 127.0.0.1; inet6 → ::1. $from já inclui espaço final (ex. "from any ").
+ */
+function layer7_dns_force_rdr_pair($iface, $from, $family)
+{
+	$iface = trim((string)$iface);
+	$from = (string)$from;
+	$family = ($family === "inet6") ? "inet6" : "inet";
+	$loop = ($family === "inet6") ? "::1" : "127.0.0.1";
+	return array(
+		"rdr on {$iface} {$family} proto udp" .
+		    " {$from}to !{$loop} port 53" .
+		    " -> {$loop}",
+		"rdr on {$iface} {$family} proto tcp" .
+		    " {$from}to !{$loop} port 53" .
+		    " -> {$loop}"
+	);
+}
+
+function layer7_generate_rdr_rules_snippet($bl_config = null, $data = null)
+{
+	if ($bl_config === null) {
+		$bl_config = layer7_bl_config_load();
+	}
 	if (empty($bl_config["rules"]) || !is_array($bl_config["rules"])) {
 		return "";
 	}
 
-	$l7config = layer7_load_or_default();
+	if ($data === null) {
+		$l7config = layer7_load_or_default();
+	} else {
+		$l7config = $data;
+	}
 	$iface_ids = isset($l7config["layer7"]["interfaces"]) &&
 	    is_array($l7config["layer7"]["interfaces"])
 	    ? $l7config["layer7"]["interfaces"]
@@ -276,7 +324,7 @@ function layer7_generate_rdr_rules_snippet()
 
 	$lines = array();
 	$lines[] = "";
-	$lines[] = "# DNS forcado para CIDRs com blacklist (force_dns).";
+	$lines[] = "# DNS forcado para CIDRs com blacklist (force_dns; inet+inet6).";
 	$has_rules = false;
 	$seen_rdr = array();
 	foreach ($bl_config["rules"] as $rule) {
@@ -295,31 +343,38 @@ function layer7_generate_rdr_rules_snippet()
 			if ($cidr === "") {
 				continue;
 			}
-			if (!layer7_ip_or_cidr_valid($cidr)) {
+			$fam = layer7_ip_or_cidr_family($cidr);
+			if ($fam === null) {
 				continue;
 			}
-			$cidrs_ok[] = $cidr;
+			$cidrs_ok[] = array("cidr" => $cidr, "family" => $fam);
 		}
-		$cidrs_ok = array_values(array_unique($cidrs_ok));
-		sort($cidrs_ok, SORT_STRING);
+		/* Dedup por CIDR string */
+		$uniq = array();
+		foreach ($cidrs_ok as $row) {
+			$uniq[$row["cidr"]] = $row;
+		}
+		$cidrs_ok = array_values($uniq);
+		usort($cidrs_ok, function ($a, $b) {
+			return strcmp($a["cidr"], $b["cidr"]);
+		});
 		if (empty($cidrs_ok)) {
 			continue;
 		}
 		foreach ($real_ifaces as $iface) {
-			foreach ($cidrs_ok as $cidr) {
-				$key = $iface . "\0" . $cidr;
+			foreach ($cidrs_ok as $row) {
+				$cidr = $row["cidr"];
+				$family = $row["family"];
+				$key = $iface . "\0" . $family . "\0" . $cidr;
 				if (isset($seen_rdr[$key])) {
 					continue;
 				}
 				$seen_rdr[$key] = true;
 				$has_rules = true;
-			$from = layer7_vip_dns_rdr_from_cidr($l7config, $cidr);
-			$lines[] = "rdr on {$iface} inet proto udp" .
-			    " {$from}to !127.0.0.1 port 53" .
-			    " -> 127.0.0.1";
-			$lines[] = "rdr on {$iface} inet proto tcp" .
-			    " {$from}to !127.0.0.1 port 53" .
-			    " -> 127.0.0.1";
+				$from = layer7_vip_dns_rdr_from_cidr($l7config, $cidr);
+				foreach (layer7_dns_force_rdr_pair($iface, $from, $family) as $ln) {
+					$lines[] = $ln;
+				}
 			}
 		}
 	}
@@ -2065,6 +2120,7 @@ function layer7_bare_config()
 			"block_page" => array(
 				"enabled" => false,
 				"portal_ip" => "",
+				"portal_ipv6" => "",
 				"title" => "Acesso bloqueado",
 				"message" => "Este site ou servico foi bloqueado pela politica de rede do seu administrador.",
 				"contact" => "",
@@ -2334,6 +2390,8 @@ function layer7_blockpage_config_get($data = null)
 	return array(
 		"enabled" => !empty($raw["enabled"]),
 		"portal_ip" => isset($raw["portal_ip"]) ? trim((string)$raw["portal_ip"]) : "",
+		"portal_ipv6" => isset($raw["portal_ipv6"])
+		    ? trim((string)$raw["portal_ipv6"]) : "",
 		"title" => isset($raw["title"]) && trim((string)$raw["title"]) !== ""
 		    ? trim((string)$raw["title"]) : $def_title,
 		"message" => isset($raw["message"]) && trim((string)$raw["message"]) !== ""
@@ -2414,6 +2472,64 @@ function layer7_blockpage_portal_ip($data = null)
 				$ip = isset($cfg_if["ipaddr"])
 				    ? trim((string)$cfg_if["ipaddr"]) : "";
 				if ($ip !== "" && layer7_ipv4_valid($ip)) {
+					return $ip;
+				}
+			}
+		}
+	}
+	return null;
+}
+
+/**
+ * Portal IPv6 da block page (passo 12.10 — sinkhole AAAA).
+ * Custom `portal_ipv6` se válido; senão primeiro `ipaddrv6` das ifaces Layer7.
+ * Não inventa endereço; sem portal v6 o sinkhole omite AAAA (half-open).
+ */
+function layer7_blockpage_portal_ipv6($data = null)
+{
+	global $config;
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$bp = layer7_blockpage_config_get($data);
+	if ($bp["portal_ipv6"] !== "" && layer7_ipv6_valid($bp["portal_ipv6"])) {
+		return $bp["portal_ipv6"];
+	}
+	$iface_ids = isset($data["layer7"]["interfaces"]) &&
+	    is_array($data["layer7"]["interfaces"])
+	    ? $data["layer7"]["interfaces"] : array("lan");
+	foreach ($iface_ids as $ifid) {
+		$ifid = trim((string)$ifid);
+		if ($ifid === "") {
+			continue;
+		}
+		$keys = array($ifid);
+		$real = layer7_real_interface_name($ifid);
+		if ($real !== "" && $real !== $ifid) {
+			$keys[] = $real;
+		}
+		foreach (array_unique($keys) as $key) {
+			if (!isset($config["interfaces"][$key]) ||
+			    !is_array($config["interfaces"][$key])) {
+				continue;
+			}
+			$ip = isset($config["interfaces"][$key]["ipaddrv6"])
+			    ? trim((string)$config["interfaces"][$key]["ipaddrv6"]) : "";
+			if ($ip !== "" && layer7_ipv6_valid($ip)) {
+				return $ip;
+			}
+		}
+		if (isset($config["interfaces"]) &&
+		    is_array($config["interfaces"])) {
+			foreach ($config["interfaces"] as $cfg_if) {
+				if (!is_array($cfg_if) ||
+				    !isset($cfg_if["if"]) ||
+				    (string)$cfg_if["if"] !== $ifid) {
+					continue;
+				}
+				$ip = isset($cfg_if["ipaddrv6"])
+				    ? trim((string)$cfg_if["ipaddrv6"]) : "";
+				if ($ip !== "" && layer7_ipv6_valid($ip)) {
 					return $ip;
 				}
 			}
@@ -2578,6 +2694,7 @@ function layer7_blockpage_unbound_block($data = null)
 	if ($portal === null) {
 		return "";
 	}
+	$portal6 = layer7_blockpage_portal_ipv6($data);
 	$collected = layer7_blockpage_collect_domains($data);
 	$domains = isset($collected["domains"]) ? $collected["domains"] : array();
 	if (empty($domains)) {
@@ -2585,11 +2702,15 @@ function layer7_blockpage_unbound_block($data = null)
 	}
 	$lines = array();
 	$lines[] = L7_BLOCKPAGE_MARKER_START;
-	$lines[] = "# Layer7 block-page: sinkhole DNS -> {$portal}";
+	$aaaa_note = ($portal6 !== null) ? " + AAAA {$portal6}" : " (sem portal IPv6 — sem AAAA)";
+	$lines[] = "# Layer7 block-page: sinkhole DNS -> {$portal}{$aaaa_note}";
 	foreach ($domains as $d) {
 		$lines[] = "server:";
 		$lines[] = "    local-zone: \"{$d}.\" redirect";
 		$lines[] = "    local-data: \"{$d}. 60 IN A {$portal}\"";
+		if ($portal6 !== null) {
+			$lines[] = "    local-data: \"{$d}. 60 IN AAAA {$portal6}\"";
+		}
 	}
 	if (!empty($collected["truncated"])) {
 		$lines[] = "# AVISO: lista de blacklist truncada (limite configurado)";
@@ -3108,13 +3229,15 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
 	}
 	$bp = layer7_blockpage_config_get($data);
 	if (!empty($bp["force_dns"])) {
-		$lines[] = "# DNS forcado global (anti-bypass sinkhole) — block_page.force_dns";
+		$lines[] = "# DNS forcado global (anti-bypass sinkhole) — block_page.force_dns (inet+inet6)";
 		$from = layer7_vip_dns_rdr_from_any($data);
 		foreach ($real_ifaces as $iface) {
-			$lines[] = "rdr on {$iface} inet proto udp" .
-			    " {$from}to !127.0.0.1 port 53 -> 127.0.0.1";
-			$lines[] = "rdr on {$iface} inet proto tcp" .
-			    " {$from}to !127.0.0.1 port 53 -> 127.0.0.1";
+			foreach (layer7_dns_force_rdr_pair($iface, $from, "inet") as $ln) {
+				$lines[] = $ln;
+			}
+			foreach (layer7_dns_force_rdr_pair($iface, $from, "inet6") as $ln) {
+				$lines[] = $ln;
+			}
 		}
 	}
 	return implode("\n", $lines) . "\n";

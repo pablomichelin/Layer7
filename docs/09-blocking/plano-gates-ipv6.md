@@ -84,14 +84,16 @@
 | GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PASS** appliance (`fe80` só em `layer7_localnets`) |
 
 **GV4 onda:** **PASS** (`1.9.6`, evidência `20260805T125500Z-gv4-closed-1.9.6`).
-### GV5 — DNS / NAT / block page IPv6 (Onda V5 — opcional)
+### GV5 — DNS / NAT / block page IPv6 (Onda V5)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV5.1 | Decisão humana registada (implementar vs ADIAR) | ADR-0024 emenda | **PASS** (`2026-08-05` — Opção B **temporária**; retomar Opção A) |
-| GV5.2 | Se implementado: `rdr inet6` :53 sinkhole funcional | `nslookup -6` | **N/A** até retoma 12.10 |
-| GV5.3 | Se implementado: block page acessível em v6 | HTTP v6 portal | **N/A** até retoma 12.11 |
-| GV5.4 | Se ADIADO: limite explícito em MANUAL + GUI (incl. AAAA/M-09) | Doc review | **PARCIAL** — GUI Diagnostics actualizado; MANUAL na release `1.9.2` |
+| GV5.1 | Decisão humana registada (implementar vs ADIAR) | ADR-0024 emenda | **PASS** — Opção B temp. depois **GO Opção A** 12.10 (`2026-08-05`) |
+| GV5.2 | Se implementado: `rdr inet6` :53 sinkhole funcional | `nslookup -6` / snippet | **PASS código** (`1.9.7` — blacklist + `block_page.force_dns`; smoke appliance pendente) |
+| GV5.3 | Se implementado: block page acessível em v6 | HTTP v6 portal | **PENDENTE** (passo **12.11**) |
+| GV5.4 | Se ADIADO: limite explícito em MANUAL + GUI | Doc review | N/A (Opção A activa para DNS; HTTP ainda limitado até 12.11) |
+
+**GV5 onda:** **PARCIAL** — DNS `:53` inet6/AAAA em `1.9.7`; HTTP portal + VIP ACL v6 = 12.11.
 
 ### GV6 — Campanha dual-stack (Onda V6)
 

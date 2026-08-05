@@ -378,9 +378,10 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ### V5 — NAT/DNS v6 (12.10–12.11, BG-083)
 
-- [x] Decisão humana V5 registada — ADR-0024 **Opção B temporária** (`2026-08-05`)
-- [x] GV5 **ADIADO** com I7 documentado (retomar Opção A com GO)
-- [ ] 12.10–12.11 implementação Opção A (residual)
+- [x] Decisão humana V5 — ADR-0024 **GO Opção A** 12.10 (`2026-08-05`)
+- [x] 12.10 DNS `rdr inet6` + AF-split + Unbound AAAA (`1.9.7`; `test_dns_force_inet6`)
+- [ ] 12.11 HTTP/HTTPS `rdr inet6` portal + VIP Unbound ACL v6
+- [ ] GV5 completo (após 12.11 + smoke lab)
 
 ### V6 — Fecho (12.12–12.13, BG-084)
 

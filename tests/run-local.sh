@@ -202,6 +202,11 @@ else
 	else
 		fail "test_vip_dns_exempt"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_dns_force_inet6.php; then
+		pass "test_dns_force_inet6"
+	else
+		fail "test_dns_force_inet6"
+	fi
 fi
 
 step "Lint: PHP do pacote (php -l)"

@@ -11,17 +11,17 @@
 
 | Item | Valor |
 |------|-------|
-| **Canal público `latest`** | `1.9.6` — tag `v1.9.6` em `pablomichelin/Layer7` (lab IPv6) |
-| **SHA256 (`latest`)** | `fc2d7fce624f8ac0afaf68ee9b2c0850b1e956767baeb16dfc11498517e3c6e4` |
+| **Canal público `latest`** | `1.9.7` — tag `v1.9.6` em `pablomichelin/Layer7` (lab IPv6) |
+| **SHA256 (`latest`)** | `4a00b40226fb0d92d974c3156d0c6881aa07fde2fe96e8d1821548157cd4fb50` |
 | **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`); promoção `1.9.6` = GV7.4 PENDENTE |
-| **Rollback imediato (a partir de `1.9.6`)** | `1.9.5` |
+| **Rollback imediato (a partir de `1.9.7`)** | `1.9.6` |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
 | **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
-| **Trilha IPv6** | **FECHADA (núcleo)** — V5 residual com GO; [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
+| **Trilha IPv6** | Núcleo FECHADO; **12.10 CONCLUÍDO**; 12.11 residual; [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
-> **Versão actual (`latest`):** `1.9.6`. **Enforce:** `1.9.0`. Núcleo dual-stack fechado (GV7); V5 DNS/portal v6 **adiado** (ADR-0024) — **voltar a fazer bem**.
+> **Versão actual (`latest`):** `1.9.7`. **Enforce:** `1.9.0`. DNS force dual-stack (12.10); block page/VIP HTTP ainda IPv4-only (12.11).
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 
@@ -84,12 +84,12 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 ## Proximos passos operacionais
 
-**Trilha IPv6:** **FECHADA (núcleo)** — residual V5 (12.10 / BG-083) ou promoção
+**Trilha IPv6:** núcleo FECHADO; **12.10 CONCLUÍDO**; residual **12.11** ou promoção
 enforce (`1.9.6`) com GO —
 [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md).
 
 1. **Chat limpo:** colar só o caminho do START-HERE-fecho-producao.md.
-2. Residual: **12.10/V5** com GO Opção A **ou** **promoção enforce** com GO; ver `CORTEX.md`.
+2. Residual: **12.11** com GO **ou** **promoção enforce** com GO; ver `CORTEX.md`.
 3. Produção enforce permanece **`1.9.0`** até GO de promoção (GV7.4).
 4. Diagnostico rapido: [`scripts/diagnose-layer7-appliance.sh`](scripts/diagnose-layer7-appliance.sh)
 5. Testes locais: `./tests/run-local.sh` (nao substituem appliance; obrigatorio em ondas com codigo)

@@ -2,7 +2,7 @@
 
 **Estado:** Aceito (publicado; implementação por ondas; GV0 fecha disclosure V0)  
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-04c (um só START-HERE; salvaguardas)  
+**Rev.:** 2026-08-05h (GO Opção A / 12.10 DNS `rdr inet6`)  
 **Decisores:** Operador + agente (governança pós-fecho plano mestre)
 
 ---
@@ -94,6 +94,25 @@ futura declarar adiamento permanente (não é o caso agora).
 (I1–I6+I8; GV7.1–GV7.3). Esta Opção B **permanece temporária**. Produção
 enforce **não** promovida (GV7.4 PENDENTE). Residual: retomar 12.10 com GO
 Opção A, ou GO de promoção `1.9.6` separado.
+
+#### Emenda (`2026-08-05`) — GO Opção A / reabrir 12.10
+
+**Operador:** Systemup / Pablo Michelin.  
+**Escolha:** **Opção A** para o passo **12.10** — implementar DNS forçado
+dual-stack (`rdr inet6` :53 → `::1` + sinkhole Unbound `IN AAAA` quando
+existir portal IPv6), com salvaguardas NDP/ICMPv6 e AF-split nos CIDRs.
+
+**Âmbito deste GO:**
+
+1. **Inclui (12.10):** `rdr inet6` para blacklist `force_dns` e
+   `block_page.force_dns`; portal IPv6 helper; `IN AAAA` no sinkhole.
+2. **Exclui (fica 12.11):** HTTP/HTTPS `rdr inet6` à página de bloqueio;
+   VIP Unbound ACL/`access-control-view` IPv6.
+3. Opção B deixa de ser o estado activo da trilha residual; I7 fecha-se
+   de forma definitiva só após **12.11** PASS (ou emenda permanente).
+4. Produção enforce permanece **`1.9.0`** (GV7.4 PENDENTE).
+5. Não afirmar «block page IPv6» / «VIP DNS IPv6» / «IPv6 completo comercial»
+   até 12.11.
 
 ### V6 — Fecho
 

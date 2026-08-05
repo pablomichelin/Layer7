@@ -8,11 +8,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
-- **trilha-ipv6/12.13 (GV7):** trilha IPv6 **FECHADA (núcleo dual-stack)** —
-  auditoria I1–I8 (`20260805T133000Z-gv7-fecho`); I7 exclusão temp. ADR-0024
-  Opção B; release de referência `1.9.6` (já publicada); **sem** novo `.pkg`;
-  **sem** promoção de produção enforce (GV7.4 PENDENTE). Residual autorizado:
-  12.10/V5 com GO ou promoção `1.9.6` com GO.
+## [1.9.7] — 2026-08-05
+
+### Added
+
+- **trilha-ipv6/12.10 (V5 Opção A):** DNS forçado dual-stack —
+  `rdr inet6` :53 → `::1` (blacklist `force_dns` + `block_page.force_dns`);
+  AF-split CIDR v4/v6; `layer7_blockpage_portal_ipv6` + Unbound `IN AAAA`;
+  banner Diagnostics actualizado; `test_dns_force_inet6.php`.
+
+### Notes
+
+- HTTP/HTTPS portal `rdr inet6` e VIP Unbound ACL v6 ficam no passo **12.11**.
+- Candidato lab; produção enforce permanece `1.9.0` (GV7.4 PENDENTE).
+- SHA256: `4a00b40226fb0d92d974c3156d0c6881aa07fde2fe96e8d1821548157cd4fb50`.
+- Rollback lab: `1.9.6`.
+- ADR-0024 emenda GO Opção A `2026-08-05`.
 
 ## [1.9.6] — 2026-08-05
 
