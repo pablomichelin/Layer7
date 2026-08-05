@@ -11,18 +11,17 @@
 
 | Item | Valor |
 |------|-------|
-| **Canal público `latest`** | `1.8.11_69` — tag `v1.8.11_69` em `pablomichelin/Layer7` |
-| **SHA256 (`latest`)** | `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764` |
-| **Produção enforce (referência)** | **`1.8.11_69`** — GO Onda F (`2026-08-05`) |
-| **Rollback imediato** | `1.8.11_68` |
-| **Candidato lab (gates)** | `1.8.11_69` (G2–G7 PASS) |
+| **Canal público `latest`** | `1.9.0` — tag `v1.9.0` em `pablomichelin/Layer7` |
+| **SHA256 (`latest`)** | `cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f` |
+| **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`) |
+| **Rollback imediato** | `1.8.11_69` |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
 | **Fase roadmap** | F4 aberta; F3 aberta; plano de fecho **ACTIVO** |
 | **Trilha activa** | **Caminho B** — Enforcement escopado (E0–E3 no codigo; E4–E8 planeados) |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
 
-> **Produto pronto para enforce** (`1.8.11_69`). Manutenção via backlog normal.
+> **Versão actual:** `1.9.0` — fecho do plano mestre (equivalente a `1.8.11_69`).
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 

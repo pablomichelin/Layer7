@@ -13,7 +13,7 @@ plano mestre. O plano completo está em:
 |-------|-------------------------------|
 | Passo actual | **Plano fechado** — manutenção backlog |
 | Ondas concluídas | A–J (**H/I/J** incluídas) |
-| Produção enforce | **`1.8.11_69`** |
+| Produção enforce | **`1.9.0`** |
 | F6 | **FECHADA** (H5 raiz diferido) |
 | F7 | Checklist + ADR-0023 fase 0 |
 | Produto pronto | **SIM** (excepções ADR-0022/0023) |
@@ -40,7 +40,7 @@ evidências em `docs/tests/evidence/`. Para BG-077:
 ## Antes de colar no chat
 
 1. `git status` limpo ou mudanças conscientes commitadas.
-2. Confirmar alinhamento pós-GO: **`latest` (`_69`) = produção enforce (`_69`)**.
+2. Confirmar alinhamento: **`latest` (`1.9.0`) = produção enforce (`1.9.0`)**.
 3. Escolher modo conforme a **onda** (secção 3.5 do plano):
    - **Multitarefa (preferido em P0, P1, H):** 1 coordenador + workers com ficheiros **disjuntos** e **sem dependência de estado** entre si.
    - **Agente único (obrigatório em A–G appliance, F, I–J):** qualquer passo que mexe no appliance, ficheiros quentes ou GO.
@@ -134,9 +134,9 @@ Leitura obrigatória (nesta ordem):
 Regras absolutas:
 - Seguir APENAS o passo autorizado do plano (nunca vontade do agente).
 - Não mover/renomear/apagar ficheiros até Onda H (F6).
-- Não activar scoped_hybrid/enforce em produção sem gates PASS + GO humano (já dado — `_69`).
-- Produção enforce: **`1.8.11_69`** (GO Onda F).
-- Candidato lab: `1.8.11_69`.
+- Não activar scoped_hybrid/enforce em produção sem gates PASS + GO humano (já dado — `1.9.0`).
+- Produção enforce: **`1.9.0`** (fecho plano; GO Onda F em `_69`).
+- Candidato lab: `1.9.0`.
 - Versionar: commit a cada bloco; PORTREVISION+release GitHub só quando o passo exigir .pkg.
 - Actualizar docs no mesmo bloco (CORTEX, changelog, MANUAL-INSTALL se operacional).
 - Multitarefa PROIBIDA nesta onda (appliance / ficheiros quentes).
@@ -145,11 +145,12 @@ Regras absolutas:
 
 Estado que assumo até verificares no repo:
 - Branch: main
-- Passo actual: <ex.: 2.1>
-- Onda: <A|B|C|D|E|F|G|I|J>
-- Candidato lab: 1.8.11_68
-- Produção enforce: 1.8.11_24
-- Pendências humanas: <ex.: snapshot appliance / dois clientes LAN / SSH>
+- Passo actual: plano fechado — manutenção backlog
+- Onda: concluída (A–J)
+- Candidato lab: 1.9.0
+- Produção enforce: 1.9.0
+- Rollback imediato: 1.8.11_69
+- Pendências humanas: CE físico (ADR-0022); BG-028 fase 1 (ADR-0023)
 
 Tarefa deste chat:
 Executa SOMENTE o passo <id> do plano.
@@ -182,7 +183,7 @@ Abrir **chat novo por onda** (ou quando o contexto ficar longo). Ver também
 - Publicar GO de produção sem G2–G7 **e** Ondas C–E PASS.
 - Multitarefa sem lista de ficheiros disjuntos **e** sem coordenador.
 - Paralelizar B e C no mesmo appliance.
-- Tratar `latest` (`_68`) como produção enforce antes da Onda F.
+- Tratar `latest` como produção enforce antes da Onda F (já resolvido — `1.9.0`).
 
 ---
 
@@ -194,7 +195,7 @@ Abrir **chat novo por onda** (ou quando o contexto ficar longo). Ver também
 | [f3-plano-check-in-online-revogacao-remota.md](../01-architecture/f3-plano-check-in-online-revogacao-remota.md) | BG-077 — blocos 1–4 |
 | [ADR-0021](../03-adr/ADR-0021-check-in-online-e-revogacao-remota.md) | Contrato API check-in |
 | [CORTEX.md](../../CORTEX.md) | Estado real + checklist progresso |
-| [plano-gates-producao.md](../09-blocking/plano-gates-producao.md) | G0–G7 (candidato `_68`) |
+| [plano-gates-producao.md](../09-blocking/plano-gates-producao.md) | G0–G7 (candidato `1.9.0`) |
 | [validacao-lab.md](../04-package/validacao-lab.md) | Roteiros lab |
 | [checklist-mestre.md](../02-roadmap/checklist-mestre.md) | Gates por fase |
 | [document-equivalence-map.md](document-equivalence-map.md) | Duplicados docs (preparar F6) |

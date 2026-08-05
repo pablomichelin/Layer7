@@ -10,7 +10,7 @@
 
 - [ ] Backup/snapshot appliance (Veeam ou hypervisor) — **obrigatório** antes da fase **A3**
 - [ ] SSH ao builder `192.168.100.12` e appliance `192.168.100.254`
-- [ ] Candidato lab conhecido (ex.: `1.8.11_69`) — ver `CORTEX.md`
+- [ ] Candidato lab conhecido (ex.: `1.9.0`) — ver `CORTEX.md`
 - [ ] Working tree limpo ou mudanças conscientes (`git status`)
 
 ---
@@ -37,7 +37,7 @@
 # Na raiz do repo (macOS com SSH ao lab):
 export L7_BUILDER=root@192.168.100.12
 export L7_APPLIANCE=root@192.168.100.254
-export L7_CANDIDATE=1.8.11_69
+export L7_CANDIDATE=1.9.0
 export L7_RUN_A3_MONITOR=1   # 0 para saltar toggle monitor em produção
 
 sh tests/lab/run-f5-smoke-checklist.sh

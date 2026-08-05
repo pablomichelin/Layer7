@@ -44,6 +44,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - `license-server/backend/src/crud-validation.test.js` — `Date` PostgreSQL.
 - `license-server/backend/src/license-state.test.js` — estado efectivo expirado.
 
+## [1.9.0] - 2026-08-05 — fecho plano mestre (semver limpa)
+
+### Added
+
+- Release **`1.9.0`**: marca de fecho das Ondas A–J do plano mestre. **Sem alteração
+  funcional** face a `1.8.11_69` (mesmo binário; `PORTVERSION` limpo).
+
+### Changed
+
+- `PORTVERSION` `1.8.11`/`PORTREVISION` `69` → **`1.9.0`** / `0`.
+- Referência de produção enforce e canal `latest` actualizados para `1.9.0`.
+- Rollback imediato documentado: `1.8.11_69`.
+
 ## [1.8.11_69] - 2026-08-04 — fix SIGHUP updater blacklists (F4.2)
 
 ### Fixed

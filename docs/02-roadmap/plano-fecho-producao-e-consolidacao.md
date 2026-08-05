@@ -1,6 +1,6 @@
 # Plano mestre — Fecho de produção e consolidação Layer7
 
-**Estado do plano:** `ACTIVO` (rev. `2026-08-05c` — GO Onda F `_69`)  
+**Estado do plano:** `FECHADO` (rev. `2026-08-05d` — promoção semver **`1.9.0`**)  
 **Tipo:** execução governada (software + documentação + versionamento)  
 **SSOT deste plano:** este ficheiro  
 **SSOT de estado do projecto:** `CORTEX.md`  
@@ -13,17 +13,17 @@
 | Campo | Valor actual (`2026-08-05`) |
 |-------|-----------------------------|
 | **Fase roadmap** | F4 aberta (F3 **fechada** `2026-08-04`); F0–F2 concluídas |
-| **Canal público `latest`** | `1.8.11_69` |
-| **Produção enforce (referência)** | **`1.8.11_69`** — GO Onda F (`2026-08-05`) |
-| **Candidato lab para gates** | **`1.8.11_69`** |
-| **`PORTVERSION` / `PORTREVISION` no repo** | `1.8.11` / `69` |
+| **Canal público `latest`** | **`1.9.0`** |
+| **Produção enforce (referência)** | **`1.9.0`** — fecho plano (`2026-08-05`) |
+| **Candidato lab para gates** | **`1.9.0`** (equivalente a `1.8.11_69`) |
+| **`PORTVERSION` / `PORTREVISION` no repo** | `1.9.0` / `0` |
 | **Appliance lab observado** | `192.168.100.254` — pfSense **Plus** `26.03.1` / FreeBSD `16` (validar CE na Onda E) |
 | **Builder** | `192.168.100.12` — FreeBSD `15.0-RELEASE` |
 | **Gates G2–G7** | **PASS** no appliance (`plano-gates-producao.md`) |
 | **F3** | **Fechada** (`2026-08-04`) — `F3 pode fechar`; evidência Onda C |
 | **Passo actual do plano** | Ver checklist em `CORTEX.md` (secção *Plano mestre*) |
 
-**Regra pós-GO:** `latest` = produção enforce (`_69`). Rollback imediato: `_68`.
+**Regra pós-GO:** `latest` = produção enforce (`1.9.0`). Rollback imediato: `1.8.11_69`.
 
 **Dois marcos distintos (não confundir):**
 
@@ -77,7 +77,7 @@ quando **todas** as condições abaixo forem verdadeiras ao mesmo tempo:
    - mudança de código/produto → commit + (se `.pkg`) `PORTREVISION` + release GitHub quando o passo exigir artefacto;
    - mudança só documental → commit documental (build pode omitir);
    - nunca deixar working tree “meio feito” sem checkpoint no CORTEX.
-6. **GO Onda F (`2026-08-05`):** produção enforce = `1.8.11_69` (decisão humana registada).
+6. **GO Onda F (`2026-08-05`):** produção enforce promovida; marca semver **`1.9.0`** (`2026-08-05d`).
 7. **Não mover/renomear/apagar** ficheiros existentes antes da **Onda H (F6)**.
 8. **macOS ≠ gate de produto.** Gates reais: builder FreeBSD + appliance pfSense.
 
@@ -485,9 +485,9 @@ Este plano **orquestra** a ordem; não substitui os SSOT de área.
 PLANO FECHO/CONSOLIDAÇÃO — progresso
 - Passo actual: <id>
 - Onda: <P0|P1|A…J>
-- Candidato lab: 1.8.11_69
-- Produção enforce: 1.8.11_69 (GO Onda F 2026-08-05)
-- Canal latest: 1.8.11_69
+- Candidato lab: 1.9.0
+- Produção enforce: 1.9.0 (fecho plano 2026-08-05)
+- Canal latest: 1.9.0
 - G0-G1: <PENDENTE|PASS>
 - G2-G4: <PENDENTE|PASS|FAIL>
 - G5: <PENDENTE|PASS|FAIL>
@@ -528,3 +528,4 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-05d | **Onda H PASS:** F6 H0+H1–H4; H5 raiz diferido |
 | 2026-08-05e | **Onda I PASS:** RELEASE-CHECKLIST + ADR-0023 (BG-028 fase 0) |
 | 2026-08-05f | **Onda J PASS:** R1–R12 audit; plano mestre **FECHADO** |
+| 2026-08-05g | **Promoção semver `1.9.0`:** fecho plano; `latest` = `1.9.0`; rollback imediato `_69` |

@@ -2,7 +2,7 @@
 
 **Versão:** `1.0` (`2026-08-05`)  
 **SSOT operacional:** este ficheiro + [`RELEASE-SIGNING.md`](RELEASE-SIGNING.md) + [`../../scripts/release/README.md`](../../scripts/release/README.md)  
-**Produção enforce actual:** `1.8.11_69`
+**Produção enforce actual:** `1.9.0`
 
 > Usar **antes** de cada GitHub Release em `pablomichelin/Layer7`. Sem checklist
 > completo, a release **não existe** para clientes (updater GUI).

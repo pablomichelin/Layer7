@@ -1,8 +1,8 @@
 # Plano — gates de produção Layer7
 
 **Data:** 2026-08-05 (rev. GO Onda F)  
-**Versão alvo / produção enforce:** `1.8.11_69`  
-**Canal público `latest`:** `1.8.11_69` (alinhado)  
+**Versão alvo / produção enforce:** `1.9.0`  
+**Canal público `latest`:** `1.9.0` (alinhado)  
 **Veredicto actual:** **GO** — promoção enforce documental (`2026-08-05`)  
 **Estado:** G2–G7 **PASS** no candidato `_69`; CE **LIMITAÇÃO** (ADR-0022 aceite)
 
@@ -16,20 +16,20 @@
 
 1. Nenhum gate físico substituído por testes macOS/builder isolados.
 2. Ordem: **passivo → monitor → enforce scoped → enforce legacy** (se algum dia).
-3. Rollback imediato documentado: `_68`; rollback histórico enforce: `_24`.
+3. Rollback imediato documentado: `1.8.11_69`; rollback histórico enforce: `_24`.
 4. `scoped_hybrid` permanece experimental até E8 + two-client PASS.
-5. **GO Onda F (`2026-08-05`):** produção enforce = `1.8.11_69` (decisão humana).
+5. **GO Onda F (`2026-08-05`):** produção enforce = **`1.9.0`** (promoção semver; gates validados em `1.8.11_69`).
 6. CE físico no build `_69` pendente — ADR-0022 aceite como ressalva.
 
 ### Confirmação passo 1.1 (P1 — 2026-08-04, confirmado GO)
 
 | Campo | Valor verificado |
 |-------|------------------|
-| Versão candidata / GO | `1.8.11_69` (`PORTVERSION=1.8.11`, `PORTREVISION=69`) |
-| SHA256 artefacto | `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764` |
-| GitHub `releases/latest` | `v1.8.11_69` |
+| Versão candidata / GO | `1.9.0` (`PORTVERSION=1.9.0`, `PORTREVISION=0`) |
+| SHA256 artefacto | `cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f` |
+| GitHub `releases/latest` | `v1.9.0` |
 | Evidência GO | `docs/tests/evidence/20260805T010100Z-ondaF-go-enforce/` |
-| Veredicto | **GO ENFORCE** — produção = `_69`; CE LIMITAÇÃO aceite |
+| Veredicto | **GO ENFORCE** — produção = **`1.9.0`**; CE LIMITAÇÃO aceite |
 
 ---
 
