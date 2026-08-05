@@ -253,7 +253,11 @@ pré-FP-019 e não deve ser promovido.
 Candidato lab: observa DNS A+AAAA independente da hash de fluxos; parser
 `dns_observe.h`; aprendizagem AAAA validada em tráfego real. Respostas do
 unbound local podem ser intermitentes no pcap (limitação de plataforma).
-**Não** é promoção de produção enforce (permanece **`1.9.0`**). Rollback: `1.9.5`.
+**Não** é promoção de produção enforce (permanece **`1.9.0`** — GV7.4 PENDENTE).
+Rollback: `1.9.5`.
+**Trilha IPv6 (12.13 / GV7, `2026-08-05`):** núcleo dual-stack **fechado**
+(I1–I6+I8); DNS forçado / block page / VIP DNS v6 continuam **IPv4-only**
+até retoma V5 (12.10) com GO — não afirmar «IPv6 completo comercial».
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.6`
 - **SHA256 esperado:** `fc2d7fce624f8ac0afaf68ee9b2c0850b1e956767baeb16dfc11498517e3c6e4`

@@ -1,8 +1,8 @@
 # Mapa de rastreabilidade — IPv6 (lógica e código)
 
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-05d  
-**Estado:** SSOT da trilha IPv6 (componentes × gaps × ondas)  
+**Rev.:** 2026-08-05e  
+**Estado:** SSOT da trilha IPv6 — **núcleo FECHADO** (GV7); gap residual = V5 (M-13/M-14)  
 **Plano:** [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)  
 **ADR:** [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md)  
 **Arranque:** [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)
@@ -18,7 +18,7 @@
 | Captura / nDPI | Completo | Parser+flujo+nDPI v6 (12.4); métricas AF; **DNS A+AAAA hint (`1.9.5`/`1.9.6`)** | — (unbound local OK no pcap) | V2–V3 |
 | Decisão política (daemon) | Completo | CIDR/enforce/allowlist v6 + **dns_cb AAAA→pdst** | **scoped_hybrid** obrigatório para `pdst_N`; `src_hosts` IPv6 = GUA+SLAAC | V3–V4 |
 | PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas v4+v6 via `pfctl -T` (12.7) | — | V2–V3 |
-| PF scoped (`pdst`/`psrc`/…) | Completo | **Só `inet`** | REV-018 | V1 |
+| PF scoped (`pdst`/`psrc`/…) | Completo | `inet`+`inet6` (REV-018 fechado 12.3) | — | V1 |
 | Allowlist | IPv4+CIDR | IPv4+IPv6 host/CIDR (12.8) + GUI persistência (12.9) | — | V3–V4 |
 | DNS forçado / sinkhole | `rdr inet` | **Não** | ADR-0018 | V5 |
 | Block page NAT | `rdr inet` | **Não** | ADR-0017 | V5 |

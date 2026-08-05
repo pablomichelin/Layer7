@@ -43,8 +43,9 @@ Candidato lab: DNS AAAA hint endurecido. Rollback imediato: `1.9.5`.
 **nao instalar**; usar `_56` ou superior.
 **Referencia de producao enforce:** **`1.9.0`** (fecho plano mestre `2026-08-05`;
 equivalente funcional a `1.8.11_69`; rollback imediato `_69`; historico `_24`).
-**Nao** promover `1.9.1`…`1.9.6` a enforce ate GV7 + GO humano. CE fisico pendente —
-ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
+**Nao** promover `1.9.1`…`1.9.6` a enforce ate **GO humano de promocao** (GV7.4).
+CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
+Trilha IPv6 nucleo **FECHADA** (GV7.1–GV7.3); V5 residual com GO.
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1238,61 +1239,43 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 
 ---
 
-## Trilha IPv6 completo (pós-fecho — 2026-08-04, rev. c)
+## Trilha IPv6 completo (pós-fecho — 2026-08-05, rev. d — FECHADA núcleo)
 
-Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera produção
-`1.9.0` até GV7 + GO humano.
+Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J.
+Produção enforce permanece **`1.9.0`** até **GO humano de promoção** (GV7.4).
 
-- **Plano:** [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
+- **Plano:** [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md) — **FECHADO (núcleo)**
 - **Arranque chat (único):** [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
 - **Mapa lógica/código:** [`docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md`](docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md) (§8 salvaguardas)
 - **Gates:** [`docs/09-blocking/plano-gates-ipv6.md`](docs/09-blocking/plano-gates-ipv6.md)
 - **ADR:** [`docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md`](docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md)
+- **Evidência fecho:** [`docs/tests/evidence/20260805T133000Z-gv7-fecho/00-SUMMARY.md`](docs/tests/evidence/20260805T133000Z-gv7-fecho/00-SUMMARY.md)
 
 > Passos **12.x** da trilha IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
 > Não existe outro ficheiro START-HERE para esta fila.
 
-**Gap actual:** DNS forçado / block page / VIP DNS permanecem **IPv4-only** —
-**V5 Opção B temporária** (ADR-0024, `2026-08-05`): adiado agora; **retomar
-obrigatório** (12.10–12.11 / BG-083) após gates appliance + GO.
-Banner Diagnostics actualizado à limitação residual (honestidade). Captura,
-policy, enforce, allowlist e validação GUI aceitam v6.
+**Estado:** trilha **FECHADA (núcleo dual-stack)** — I1–I6+I8 PASS; **não**
+afirmar «IPv6 completo comercial» enquanto V5 estiver adiada.
+
+**Gap residual:** DNS forçado / block page / VIP DNS permanecem **IPv4-only** —
+**V5 Opção B temporária** (ADR-0024): **retomar obrigatório** (12.10–12.11 /
+BG-083) com GO humano Opção A.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **GV6 PASS** (`1.9.6`); V5 ADIADA (Opção B); próximo 12.10/V5 com GO **ou** GV7 com GO
-- Trilha: ABERTA
-- Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
-- Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
-- Passo 12.3: CONCLUÍDO — REV-018 PF inet6 scoped
-- Passo 12.4: CONCLUÍDO (2026-08-04) — captura IPv6 + flow key v6; unit+layer7d -t PASS
-- Passo 12.5: CONCLUÍDO (2026-08-04) — métricas AF `cap_*` v4/v6 em capture + JSON stats; GV2 builder PASS
-- Passo 12.6: CONCLUÍDO (2026-08-04) — `policy.c` CIDR IPv6 dual-stack; publicado em `1.9.2`
-- Passo 12.7: CONCLUÍDO (2026-08-04) — `enforce.c`/`main.c` PF tabelas + kill states v6; publicado em `1.9.2`
-- Passo 12.8: CONCLUÍDO (2026-08-05) — allowlist IPv6; **Onda V3 completa**; publicado em `1.9.2`
-- Passo 12.9: CONCLUÍDO (2026-08-05) — GUI validação dual-stack; **Onda V4 completa**; publicado em `1.9.2`
-- Release lab **1.9.2**: CONCLUÍDA (2026-08-05) — 12.6–12.9 + banner V5 Opção B
-- FIX AAAA hint: CONCLUÍDO em código (`1.9.5`/`1.9.6`) — `dns_observe.h` A+AAAA; observe independente de flow hash
+- Passo actual: **12.13 CONCLUÍDO** — GV7 fecho documental (`20260805T133000Z-gv7-fecho`)
+- Trilha: **FECHADA (núcleo dual-stack)**
+- Passo 12.1–12.9: CONCLUÍDOS (V0–V4)
+- Passo 12.10–12.11: ADIADOS (V5 Opção B — retomar com GO)
+- Passo 12.12: CONCLUÍDO — GV6 PASS (`20260805T130620Z-gv6-dualstack`)
+- Passo 12.13: CONCLUÍDO — GV7.1–GV7.3 PASS; GV7.4 promoção PENDENTE
 - Candidato lab / `latest`: **1.9.6** (publicado; SHA256 `fc2d7fce…`)
-- Produção enforce: 1.9.0 (inalterada até GV7)
+- Produção enforce: **1.9.0** (inalterada — GV7.4 PENDENTE)
 - Versionamento: série patch `1.9.0` → … → `1.9.6` (`PORTREVISION=0`)
-- Appliance (`192.168.100.254`): alvo **1.9.6**; regra lab **pass inet6 LAN** (tracker `1785929863`)
-- GV0: PASS
-- GV1: 1.3/1.5/1.6 PASS (`1.9.4`)
-- GV2: parcial (builder PASS; dns_aaaa_wire PASS)
-- GV3: **PASS**
-- GV4: **PASS** (`20260805T125500Z-gv4-closed-1.9.6`) — scoped_hybrid + DNS A/AAAA→`pdst_N`; A block / B free (v4+v6); exige `src_hosts` com GUA+SLAAC; `filter_configure` após mudar JSON
-- GV5: ADIADO temporário (Opção B; retomar)
-- GV6: **PASS** (`20260805T130620Z-gv6-dualstack`) — `validacao-lab` §21 + `run-ipv6-dualstack.sh`; A/B dual-stack; pdst A+AAAA
-- GV7: PENDENTE (fecho trilha + GO promoção)
-- I1–I8: I1–I6 PASS; I7 exclusão temp. (V5); I8 PASS (GV6)
-- BG: BG-078..082 done; BG-083 **adiado temporário (retomar)**; BG-084 **GV6 PASS** (12.12); 12.13/GV7 pendente
-- V5 / BG-083: **ADIADO temporário** — DNS/portal/VIP DNS v6
-- I7: exclusão temporária DNS/block page/VIP DNS v6 (disclosure GUI)
-- QA IPv4 `1.9.3`: D1–D6 **PASS**
-- Gates IPv6: `…1.9.3` + `…1.9.4` + `…1.9.6` AAAA + **`20260805T125500Z-gv4-closed-1.9.6`**
-- Próximo passo autorizado: **12.10/V5** com GO **ou** **GV7/12.13** com GO; produção enforce permanece 1.9.0
-- Nota: «pcap unbound intermitente» foi **falso positivo** — gap era modelo scoped vs legacy + resync PF
+- GV0–GV4: PASS; GV5 ADIADO temp.; GV6 PASS; GV7.1–GV7.3 PASS; GV7.4 PENDENTE
+- I1–I6+I8 PASS; I7 exclusão temp. (ADR-0024 Opção B)
+- BG: BG-078..082 + BG-084 done; BG-083 **adiado temporário (retomar)**
+- Trabalho residual autorizado: **12.10/V5** com GO **ou** promoção enforce (`1.9.6`) com GO
 ```
 
 ---
@@ -1457,12 +1440,12 @@ CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
 - Canal publico latest: 1.9.6 (DNS AAAA hint endurecido; SHA256 fc2d7fce…)
-- Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1..1.9.6 ate GV7)
+- Producao enforce: 1.9.0 (fecho plano; rollback _69; GV7.4 promoção 1.9.6 PENDENTE)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
-- Trilha IPv6: ABERTA — **GV6 PASS**; V5 Opção B; falta GV7
+- Trilha IPv6: **FECHADA (núcleo dual-stack)** — GV7.1–GV7.3 PASS; V5 Opção B a retomar; GV7.4 PENDENTE
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: **12.10/V5** com GO **ou** **GV7** com GO; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: **12.10/V5** com GO **ou** promoção enforce (`1.9.6`) com GO; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -1479,7 +1462,10 @@ CHECKPOINT CANONICO
   DNS AAAA hint endurecido. Rollback imediato: `v1.9.5`.
 - A referencia de **producao enforce** permanece **`1.9.0`**
   (`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`)
-  ate GV7 + GO humano (nao promover `1.9.1`…`1.9.6`). Rollback a partir de `1.9.0`: `v1.8.11_69`.
+  ate **GO humano de promocao** (GV7.4) — nao promover `1.9.1`…`1.9.6` sem esse GO.
+  Rollback a partir de `1.9.0`: `v1.8.11_69`.
+  Trilha IPv6: **FECHADA (nucleo dual-stack)** em `2026-08-05` (GV7.1–GV7.3);
+  residual V5 (12.10) e promocao enforce exigem GO separado.
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
   (`snapshot_id=ut1-2026-04-25`,

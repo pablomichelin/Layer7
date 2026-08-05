@@ -355,7 +355,7 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 - [x] REV-018 fechado no mapa (código + docs)
 - [x] `test_scoped_pf_inc.php` PASS (inet6 pdst/psrc/pallow/pexc/exc_allow)
-- [ ] GV1 completo (`pfctl -nf` + localsubnets IPv6 no appliance)
+- [x] GV1 completo (`pfctl -nf` + `layer7_localnets` IPv6 no appliance — `1.9.4`+)
 
 ### V2–V3 — Daemon (12.4–12.8, BG-080–081)
 
@@ -364,9 +364,9 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] 12.6 `policy.c` CIDR IPv6 (`test_policy_decide` PASS local + builder)
 - [x] 12.7 `enforce.c`/`main.c` PF tabelas + kill states v6 (`test_enforce_scoped` + `run-local.sh` PASS local + builder)
 - [x] 12.8 `allowlist` IPv6 host/CIDR (`test_allowlist.c` + `run-local.sh` PASS local + builder) — **Onda V3 completa**
-- [ ] GV3 captura v6 appliance (+ NDP intacto) — parcial (`1.9.1` em `254`; `cap_*_v6` > 0)
-- [ ] GV4 enforce v6 scoped — parcial (código 12.6–12.8 PASS builder; appliance PENDENTE)
-- [ ] Regressão IPv4 confirmada
+- [x] GV3 captura v6 appliance (+ NDP intacto) — PASS (`1.9.3`+)
+- [x] GV4 enforce v6 scoped — PASS (`20260805T125500Z-gv4-closed-1.9.6`)
+- [x] Regressão IPv4 confirmada (QA D1–D6 `1.9.3`; GV3.3/GV6)
 
 ### V4 — GUI/config (12.9, BG-082)
 
@@ -378,11 +378,13 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ### V5 — NAT/DNS v6 (12.10–12.11, BG-083)
 
-- [ ] Decisão humana V5 registada
-- [ ] GV5 PASS ou ADIADO com I7 documentado
+- [x] Decisão humana V5 registada — ADR-0024 **Opção B temporária** (`2026-08-05`)
+- [x] GV5 **ADIADO** com I7 documentado (retomar Opção A com GO)
+- [ ] 12.10–12.11 implementação Opção A (residual)
 
 ### V6 — Fecho (12.12–12.13, BG-084)
 
-- [ ] GV6 campanha dual-stack
-- [ ] GV7 auditoria I1–I8 + release
-- [ ] Trilha IPv6 **FECHADA** no CORTEX
+- [x] GV6 campanha dual-stack — PASS (`20260805T130620Z-gv6-dualstack`)
+- [x] GV7.1–GV7.3 auditoria I1–I8 + release `1.9.6` — PASS (`20260805T133000Z-gv7-fecho`)
+- [x] Trilha IPv6 **FECHADA (núcleo dual-stack)** no CORTEX
+- [ ] GV7.4 GO promoção enforce (`1.9.6`) — **PENDENTE** (produção permanece `1.9.0`)

@@ -90,6 +90,11 @@ VIP DNS em IPv6 (`rdr inet6`) **agora**.
 forma definitiva quando 12.10–12.11 (Opção A) PASS ou quando uma emenda
 futura declarar adiamento permanente (não é o caso agora).
 
+**Status trilha (`2026-08-05`, 12.13/GV7):** núcleo dual-stack **FECHADO**
+(I1–I6+I8; GV7.1–GV7.3). Esta Opção B **permanece temporária**. Produção
+enforce **não** promovida (GV7.4 PENDENTE). Residual: retomar 12.10 com GO
+Opção A, ou GO de promoção `1.9.6` separado.
+
 ### V6 — Fecho
 
 - Campanha lab dual-stack; release; promoção na série patch `1.9.n`

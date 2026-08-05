@@ -30,8 +30,10 @@ Esse plano **nao substitui** as fases F0–F7; ordena gates de appliance, fecho
 F3/F4, GO humano, F5, F6 (arvore `docs/`) e F7 numa unica fila executavel.
 **Estado:** plano fecho **FECHADO** (`2026-08-05`); produção enforce `1.9.0`.
 
-**Trilha seguinte (IPv6 completo):** [`plano-ipv6-completo.md`](plano-ipv6-completo.md)
-(Ondas V0–V6, passos 12.1–12.13) — arranque **único**
+**Trilha IPv6 (núcleo dual-stack):** [`plano-ipv6-completo.md`](plano-ipv6-completo.md)
+(Ondas V0–V6, passos 12.1–12.13) — **FECHADA (núcleo)** `2026-08-05` (GV7.1–GV7.3);
+V5/DNS v6 residual com GO; promoção enforce (`1.9.6`) = GV7.4 PENDENTE.
+Arranque **único**
 [`../00-overview/START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
 Não reabre o fecho; ADR-0024; backlog BG-078..084.
 (Não confundir passos 12.x IPv6 com `test-matrix` §12 blacklists.)

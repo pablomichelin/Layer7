@@ -6,6 +6,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+### Changed
+
+- **trilha-ipv6/12.13 (GV7):** trilha IPv6 **FECHADA (núcleo dual-stack)** —
+  auditoria I1–I8 (`20260805T133000Z-gv7-fecho`); I7 exclusão temp. ADR-0024
+  Opção B; release de referência `1.9.6` (já publicada); **sem** novo `.pkg`;
+  **sem** promoção de produção enforce (GV7.4 PENDENTE). Residual autorizado:
+  12.10/V5 com GO ou promoção `1.9.6` com GO.
+
 ## [1.9.6] — 2026-08-05
 
 ### Fixed

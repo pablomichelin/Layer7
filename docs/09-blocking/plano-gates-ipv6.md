@@ -6,6 +6,7 @@
 **Versão alvo fecho:** patch `1.9.n` da mesma série (passo 12.13; sem salto a `1.10.0`)  
 **Produção enforce actual:** `1.9.0` (inalterada até GV7 + GO humano)  
 **Última campanha appliance:** `20260805T130620Z-gv6-dualstack` (`1.9.6` — GV6 PASS)  
+**Fecho trilha:** `20260805T133000Z-gv7-fecho` (`1.9.6` — GV7.1–GV7.3 PASS; GV7.4 promoção PENDENTE)  
 **SSOT trilha:** [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)  
 **Arranque:** [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)
 
@@ -106,10 +107,12 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV7.1 | I1–I8 verdes ou excepções ADR assinadas | Auditoria tipo Onda J | **PENDENTE** |
-| GV7.2 | Release publicada + MANUAL actualizado se operacional | GitHub Releases | **PENDENTE** |
-| GV7.3 | CORTEX: trilha IPv6 **FECHADA** | Checkpoint humano | **PENDENTE** |
-| GV7.4 | GO humano promoção patch estável (ex. `1.9.n`) | Operador | **PENDENTE** |
+| GV7.1 | I1–I8 verdes ou excepções ADR assinadas | Auditoria tipo Onda J | **PASS** (`20260805T133000Z-gv7-fecho`; I7 exclusão temp. ADR-0024 Opção B) |
+| GV7.2 | Release publicada + MANUAL actualizado se operacional | GitHub Releases | **PASS** (`v1.9.6` = `latest`; MANUAL comandos em `1.9.6`; sem novo `.pkg`) |
+| GV7.3 | CORTEX: trilha IPv6 **FECHADA** | Checkpoint humano | **PASS** — **FECHADA (núcleo dual-stack)**; ressalva V5/BG-083 a retomar |
+| GV7.4 | GO humano promoção patch estável (ex. `1.9.n`) | Operador | **PENDENTE** — produção enforce permanece `1.9.0` até GO explícito |
+
+**GV7 onda (fecho documental):** **PASS com ressalva** (`2026-08-05`). Núcleo I1–I6+I8 fechado; I7 exclusão temporária; promoção enforce (GV7.4) e V5 Opção A fora deste bloco.
 
 ---
 
