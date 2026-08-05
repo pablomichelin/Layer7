@@ -72,9 +72,15 @@ struct layer7_capture {
 	layer7_dns_query_cb                  dns_query_cb;
 	char                                 ifname[32];
 	unsigned long long                   stat_pkts;
+	unsigned long long                   stat_pkts_v4;
+	unsigned long long                   stat_pkts_v6;
 	unsigned long long                   stat_flows_classified;
+	unsigned long long                   stat_flows_classified_v4;
+	unsigned long long                   stat_flows_classified_v6;
 	unsigned long long                   stat_flows_expired;
 	unsigned long long                   stat_flows_active;
+	unsigned long long                   stat_flows_active_v4;
+	unsigned long long                   stat_flows_active_v6;
 	unsigned long long                   stat_flows_evicted;
 	unsigned long long                   stat_flows_dropped;
 	time_t                               last_expire;
@@ -246,6 +252,7 @@ flow_lookup_v4(struct layer7_capture *cap, uint32_t sa, uint32_t da,
 	}
 	memset(f->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
 	cap->stat_flows_active++;
+	cap->stat_flows_active_v4++;
 	return f;
 }
 
@@ -310,6 +317,7 @@ flow_lookup_v6(struct layer7_capture *cap, const uint8_t sa[16],
 	}
 	memset(f->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
 	cap->stat_flows_active++;
+	cap->stat_flows_active_v6++;
 	return f;
 }
 
@@ -559,6 +567,12 @@ flow_free(struct layer7_capture *cap, struct l7c_flow *f)
 		ndpi_flow_free(f->ndpi_flow);
 		f->ndpi_flow = NULL;
 	}
+	if (f->ip_ver == 6) {
+		if (cap->stat_flows_active_v6 > 0)
+			cap->stat_flows_active_v6--;
+	} else if (cap->stat_flows_active_v4 > 0) {
+		cap->stat_flows_active_v4--;
+	}
 	f->in_use = 0;
 	if (cap->stat_flows_active > 0)
 		cap->stat_flows_active--;
@@ -789,6 +803,10 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	}
 
 	(void)l3_hdr_len;
+	if (ip_ver == 6)
+		cap->stat_pkts_v6++;
+	else
+		cap->stat_pkts_v4++;
 	if (!f)
 		return;
 
@@ -886,6 +904,10 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		}
 
 		cap->stat_flows_classified++;
+		if (f->ip_ver == 6)
+			cap->stat_flows_classified_v6++;
+		else
+			cap->stat_flows_classified_v4++;
 		cap->cb(cap->ifname, src_ip_str, dst_ip_str,
 		    app_name ? app_name : "Unknown",
 		    cat_name ? cat_name : "Unspecified", host_hint);
@@ -938,6 +960,28 @@ layer7_capture_stats(const struct layer7_capture *cap,
 		*flows_evicted = cap->stat_flows_evicted;
 	if (flows_dropped)
 		*flows_dropped = cap->stat_flows_dropped;
+}
+
+void
+layer7_capture_stats_af(const struct layer7_capture *cap,
+    unsigned long long *pkts_v4, unsigned long long *pkts_v6,
+    unsigned long long *active_v4, unsigned long long *active_v6,
+    unsigned long long *classified_v4, unsigned long long *classified_v6)
+{
+	if (!cap)
+		return;
+	if (pkts_v4)
+		*pkts_v4 = cap->stat_pkts_v4;
+	if (pkts_v6)
+		*pkts_v6 = cap->stat_pkts_v6;
+	if (active_v4)
+		*active_v4 = cap->stat_flows_active_v4;
+	if (active_v6)
+		*active_v6 = cap->stat_flows_active_v6;
+	if (classified_v4)
+		*classified_v4 = cap->stat_flows_classified_v4;
+	if (classified_v6)
+		*classified_v6 = cap->stat_flows_classified_v6;
 }
 
 void

@@ -52,10 +52,12 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV2.1 | `tests/run-local.sh` PASS (incl. novos testes v6) | macOS/CI | **PENDENTE** |
-| GV2.2 | Build pacote no builder FreeBSD | Makefile | **PENDENTE** |
-| GV2.3 | `php -l` + testes funcionais PHP PASS | builder | **PENDENTE** |
-| GV2.4 | `layer7d -t` smoke PASS | builder | **PENDENTE** |
+| GV2.1 | `tests/run-local.sh` PASS (incl. novos testes v6) | macOS/CI | **PASS** (builder `2026-08-04`; 12.4–12.5) |
+| GV2.2 | Build pacote no builder FreeBSD | Makefile | **PASS** (builder `2026-08-04`; 12.4–12.5) |
+| GV2.3 | `php -l` + testes funcionais PHP PASS | builder | **PASS** (builder; sem alteração 12.5) |
+| GV2.4 | `layer7d -t` smoke PASS | builder | **PASS** (builder `2026-08-04`; 12.4–12.5) |
+
+**GV2 onda V2 (captura/métricas):** **PARCIAL** — builder PASS (passos 12.4–12.5); confirmação appliance = **GV3**.
 
 ### GV3 — Captura IPv6 no appliance (Onda V2–V3)
 

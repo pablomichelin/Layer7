@@ -15,11 +15,11 @@
 /*
  * Callback invocado quando nDPI classifica um fluxo.
  *   iface:    nome da interface de captura (e.g. "em0")
- *   src_ip:   IPv4 dotted-quad da origem escolhida para logging
- *   dst_ip:   IPv4 dotted-quad do destino escolhido para logging
+ *   src_ip:   endereço origem (IPv4 ou IPv6 textual)
+ *   dst_ip:   endereço destino (IPv4 ou IPv6 textual)
  *   app:      nome do protocolo detectado (e.g. "BitTorrent")
  *   category: categoria nDPI (e.g. "Download-FileTransfer-FileSharing")
- *   host:     hint opcional de hostname obtido por correlação DNS (ou NULL)
+ *   host:     hint opcional de hostname obtido por correlação DNS/SNI (ou NULL)
  */
 typedef void (*layer7_flow_cb)(const char *iface, const char *src_ip,
     const char *dst_ip, const char *app, const char *category,
@@ -77,12 +77,20 @@ void layer7_capture_set_sni(struct layer7_capture *cap, int on);
 int layer7_capture_poll(struct layer7_capture *cap, int batch_size);
 
 /*
- * Estatísticas de captura.
+ * Estatísticas de captura (totais).
  */
 void layer7_capture_stats(const struct layer7_capture *cap,
     unsigned long long *pkts_total, unsigned long long *flows_active,
     unsigned long long *flows_classified, unsigned long long *flows_expired,
     unsigned long long *flows_evicted, unsigned long long *flows_dropped);
+
+/*
+ * Estatísticas por família IP (passo 12.5). Ponteiros NULL são ignorados.
+ */
+void layer7_capture_stats_af(const struct layer7_capture *cap,
+    unsigned long long *pkts_v4, unsigned long long *pkts_v6,
+    unsigned long long *active_v4, unsigned long long *active_v6,
+    unsigned long long *classified_v4, unsigned long long *classified_v6);
 
 /*
  * Libera recursos (pcap_close + ndpi_exit).

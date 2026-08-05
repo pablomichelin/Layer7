@@ -1255,22 +1255,23 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera pro
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.5 (Onda V2 — nDPI/métricas IPv6)
+- Passo actual: 12.6 (Onda V3 — policy.c CIDR IPv6)
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
 - Passo 12.3: CONCLUÍDO — REV-018 PF inet6 scoped
 - Passo 12.4: CONCLUÍDO (2026-08-04) — captura IPv6 + flow key v6; unit+layer7d -t PASS
+- Passo 12.5: CONCLUÍDO (2026-08-04) — métricas AF `cap_*` v4/v6 em capture + JSON stats; GV2 builder PASS
 - Candidato lab: 1.9.0 (código na árvore; próximo `.pkg` = **1.9.1**)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - Versionamento: série patch `1.9.0` → `1.9.1` → `1.9.2` … (`PORTREVISION=0`)
 - GV0: PASS
 - GV1: parcial (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2: parcial (builder compile/unit PASS; suite completa / métricas = 12.5)
+- GV2: parcial (builder PASS 12.4–12.5; appliance GV3 PENDENTE)
 - GV3–GV7: PENDENTE
-- I1–I8: I1 PASS; I2 parcial; captura v6 em código
-- BG: BG-078/079 done; BG-080 em curso (12.5); BG-081..084
-- Próximo passo autorizado: 12.5
+- I1–I8: I1 PASS; I2 parcial; I3 parcial (captura+métricas v6 em código)
+- BG: BG-078/079/080 done; BG-081 em curso (12.6); BG-082..084
+- Próximo passo autorizado: 12.6
 ```
 
 ---

@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.5** (V2) |
+| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.6** (V3) |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -223,20 +223,20 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.5
-- Onda: V2
+- Passo actual: 12.6
+- Onda: V3
 - Candidato lab: 1.9.0 (próximo .pkg: 1.9.1)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - GV0 (docs): PASS (12.1–12.2)
 - GV1 (PF scoped inet6): PARCIAL (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2 (builder): PARCIAL (12.4 PASS; 12.5 métricas)
+- GV2 (builder): PARCIAL (12.4–12.5 PASS builder; appliance GV3 PENDENTE)
 - GV3 (captura v6 appliance): PENDENTE
 - GV4 (enforce v6): PENDENTE
 - GV5 (DNS/NAT v6): PENDENTE | ADIADO
 - GV6 (dual-stack lab): PENDENTE
 - GV7 (fecho trilha): PENDENTE
-- I1–I8: I1 PASS; I2 parcial
-- Próximo passo autorizado: 12.5
+- I1–I8: I1 PASS; I2 parcial; I3 parcial (captura+métricas v6 em código)
+- Próximo passo autorizado: 12.6
 ```
 
 ---
@@ -258,6 +258,7 @@ TRILHA IPv6 — progresso
 
 | Data | Evento |
 |------|--------|
+| 2026-08-04 | Passo **12.5** concluído: métricas AF `cap_pkts_v4/v6`, `cap_active_v4/v6`, `cap_classified_v4/v6` em capture + JSON stats; GV2 builder PASS |
 | 2026-08-04 | Passo **12.4** concluído: captura IPv6 + flow key; unit + `layer7d` build/`-t` PASS |
 | 2026-08-04 | Passo **12.3** concluído: REV-018 `inet`+`inet6` scoped; `test_scoped_pf_inc` PASS; `1.9.0` |
 | 2026-08-04 | Passo **12.2** concluído: banner Diagnostics + `pf-enforcement.md`; **GV0 PASS** |

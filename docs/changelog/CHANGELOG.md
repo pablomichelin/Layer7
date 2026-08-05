@@ -6,6 +6,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Trilha IPv6 / passo 12.5 (V2):** métricas AF `cap_pkts_v4/v6`,
+  `cap_active_v4/v6`, `cap_classified_v4/v6` em `capture.c` + JSON stats;
+  nDPI sobre IPv6 já entregue em 12.4; 12.5 fecha contadores por família de
+  endereço. GV2 builder PASS. Sem bump `1.9.1` (só na release). Produção
+  `1.9.0` inalterada.
 - **Trilha IPv6 / passo 12.4 (V2):** parser EtherType `0x86DD`, extension
   headers (S-06), flow key/hash IPv6, tabela de fluxos dual-stack, nDPI sobre
   pacotes v6; `test_capture_flow_key` + `layer7d` build/`-t` PASS no builder.

@@ -87,8 +87,14 @@ static time_t s_last_periodic_log;
 
 /* Agregados das capturas nDPI; ficam zero em builds sem nDPI. */
 static unsigned long long s_cap_pkts;
+static unsigned long long s_cap_pkts_v4;
+static unsigned long long s_cap_pkts_v6;
 static unsigned long long s_cap_flows_active;
+static unsigned long long s_cap_flows_active_v4;
+static unsigned long long s_cap_flows_active_v6;
 static unsigned long long s_cap_flows_classified;
+static unsigned long long s_cap_flows_classified_v4;
+static unsigned long long s_cap_flows_classified_v6;
 static unsigned long long s_cap_flows_expired;
 static unsigned long long s_cap_flows_evicted;
 static unsigned long long s_cap_flows_dropped;
@@ -193,10 +199,22 @@ write_stats_json(void)
 	    (unsigned long long)s_pf_dst_add_fail);
 	fprintf(f, "  \"cap_pkts\": %llu,\n",
 	    (unsigned long long)s_cap_pkts);
+	fprintf(f, "  \"cap_pkts_v4\": %llu,\n",
+	    (unsigned long long)s_cap_pkts_v4);
+	fprintf(f, "  \"cap_pkts_v6\": %llu,\n",
+	    (unsigned long long)s_cap_pkts_v6);
 	fprintf(f, "  \"cap_active\": %llu,\n",
 	    (unsigned long long)s_cap_flows_active);
+	fprintf(f, "  \"cap_active_v4\": %llu,\n",
+	    (unsigned long long)s_cap_flows_active_v4);
+	fprintf(f, "  \"cap_active_v6\": %llu,\n",
+	    (unsigned long long)s_cap_flows_active_v6);
 	fprintf(f, "  \"cap_classified\": %llu,\n",
 	    (unsigned long long)s_cap_flows_classified);
+	fprintf(f, "  \"cap_classified_v4\": %llu,\n",
+	    (unsigned long long)s_cap_flows_classified_v4);
+	fprintf(f, "  \"cap_classified_v6\": %llu,\n",
+	    (unsigned long long)s_cap_flows_classified_v6);
 	fprintf(f, "  \"cap_expired\": %llu,\n",
 	    (unsigned long long)s_cap_flows_expired);
 	fprintf(f, "  \"cap_evicted\": %llu,\n",
@@ -2371,20 +2389,38 @@ aggregate_capture_stats(void)
 	int i;
 	unsigned long long pkts = 0, active = 0, cl = 0, ex = 0;
 	unsigned long long evicted = 0, dropped = 0;
+	unsigned long long pkts4 = 0, pkts6 = 0, act4 = 0, act6 = 0;
+	unsigned long long cl4 = 0, cl6 = 0;
 
 	for (i = 0; i < s_n_captures; i++) {
 		unsigned long long p, a, c, e, v, d;
+		unsigned long long p4, p6, a4, a6, c4, c6;
+
 		layer7_capture_stats(s_captures[i], &p, &a, &c, &e, &v, &d);
+		layer7_capture_stats_af(s_captures[i], &p4, &p6, &a4, &a6,
+		    &c4, &c6);
 		pkts += p;
 		active += a;
 		cl += c;
 		ex += e;
 		evicted += v;
 		dropped += d;
+		pkts4 += p4;
+		pkts6 += p6;
+		act4 += a4;
+		act6 += a6;
+		cl4 += c4;
+		cl6 += c6;
 	}
 	s_cap_pkts = pkts;
+	s_cap_pkts_v4 = pkts4;
+	s_cap_pkts_v6 = pkts6;
 	s_cap_flows_active = active;
+	s_cap_flows_active_v4 = act4;
+	s_cap_flows_active_v6 = act6;
 	s_cap_flows_classified = cl;
+	s_cap_flows_classified_v4 = cl4;
+	s_cap_flows_classified_v6 = cl6;
 	s_cap_flows_expired = ex;
 	s_cap_flows_evicted = evicted;
 	s_cap_flows_dropped = dropped;
