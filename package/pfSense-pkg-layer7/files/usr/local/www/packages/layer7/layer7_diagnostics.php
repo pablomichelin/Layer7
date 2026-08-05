@@ -151,12 +151,8 @@ if (isset($_POST["repair_pf_tables"])) {
 		$rules_raw = array();
 		exec("/sbin/pfctl -sr 2>/dev/null", $rules_raw);
 		$required_ok = layer7_diag_pf_required_tables_ready($tables_map, $bl_config_diag, $rules_raw);
-		if (($ensure_rc !== 0 || !$required_ok) && layer7_rules_debug_trusted("/tmp/rules.debug")) {
-			if (function_exists("mwexec")) {
-				mwexec("/sbin/pfctl -f /tmp/rules.debug");
-			} else {
-				@shell_exec("/sbin/pfctl -f /tmp/rules.debug 2>/dev/null");
-			}
+		if (($ensure_rc !== 0 || !$required_ok)) {
+			layer7_pf_load_trusted_rules_debug("/tmp/rules.debug");
 			usleep(300000);
 		}
 		layer7_signal_reload();

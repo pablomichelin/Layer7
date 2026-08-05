@@ -71,6 +71,15 @@ struct layer7_capture *layer7_capture_open(const char *ifname, int snaplen,
 void layer7_capture_set_sni(struct layer7_capture *cap, int on);
 
 /*
+ * BG-104: allowlist de resolvers para DNS observe.
+ * Lista vazia = fail-open no gate de allowlist (correlação client+txid+
+ * resolver+qname continua obrigatória).
+ */
+void layer7_capture_dns_resolvers_reset(void);
+int layer7_capture_dns_resolvers_add(const char *ip);
+void layer7_capture_dns_resolvers_seed_iface(const char *ifname);
+
+/*
  * Processa até batch_size pacotes (non-blocking se timeout_ms <= 0).
  * Retorno: número de pacotes processados, ou -1 em erro.
  */

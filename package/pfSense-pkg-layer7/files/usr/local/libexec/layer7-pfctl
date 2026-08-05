@@ -108,29 +108,15 @@ required_tables_ok() {
 }
 
 force_reload_rules_debug() {
-	_f=/tmp/rules.debug
-	if [ ! -f "$_f" ]; then
-		echo "layer7-pfctl: /tmp/rules.debug not found for fallback reload" >&2
-		return 1
+	# BG-103: open+fstat+pfctl -f - (sem TOCTOU de path).
+	if /usr/local/bin/php -r '
+		require_once("/usr/local/pkg/layer7.inc");
+		exit(layer7_pf_load_trusted_rules_debug("/tmp/rules.debug") ? 0 : 1);
+	' 2>/dev/null; then
+		return 0
 	fi
-	# Recusar symlink / dono != root / world-writable (auditoria 1.9.9).
-	if [ -L "$_f" ]; then
-		echo "layer7-pfctl: refusing symlink /tmp/rules.debug" >&2
-		return 1
-	fi
-	_uid=$(/usr/bin/stat -f %u "$_f" 2>/dev/null) || _uid=""
-	if [ "$_uid" != "0" ]; then
-		echo "layer7-pfctl: refusing untrusted owner on /tmp/rules.debug" >&2
-		return 1
-	fi
-	_mode=$(/usr/bin/stat -f %OLp "$_f" 2>/dev/null) || _mode=""
-	_other=$(( ${_mode:-0} % 10 ))
-	if [ $((_other & 2)) -ne 0 ]; then
-		echo "layer7-pfctl: refusing world-writable /tmp/rules.debug" >&2
-		return 1
-	fi
-	/sbin/pfctl -f "$_f" 2>/dev/null || \
-		echo "layer7-pfctl: failed to reload /tmp/rules.debug" >&2
+	echo "layer7-pfctl: trusted rules.debug load failed" >&2
+	return 1
 }
 
 ensure_blacklist_tables() {

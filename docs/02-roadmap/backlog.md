@@ -322,7 +322,7 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
 | BG-093 | Self-heal `pfctl -f /tmp/rules.debug` sem confiança (owner/symlink) | Alta | daemon/package/PF | F4/hardening | ruleset PF arbitrário se `/tmp` comprometido | M | Alto | **Concluido (`1.9.9`)** | gate: regular file, uid 0, !world-writable; helper + PHP + daemon |
 | BG-094 | Escrita estado root em `/tmp` (symlink race: stats/update/activate) | Alta | daemon/GUI | F4/hardening | sobrescrita de ficheiros do sistema | M | Alto | **Concluido (`1.9.9`)** | stats/activate/checkin/update → `/var/db/layer7` + `O_EXCL\|O_NOFOLLOW` |
-| BG-095 | DNS observe envenenável (só `sp==53`, sem QR/correlação) | Alta | daemon/capture | F4/hardening | DoS/bypass via UDP spoof LAN | G | Alto | **Concluido (`1.9.9`)** | QR obrigatório + pendência query↔txid/cliente (TTL 10s); residual: sniffer+spoof ID |
+| BG-095 | DNS observe envenenável (só `sp==53`, sem QR/correlação) | Alta | daemon/capture | F4/hardening | DoS/bypass via UDP spoof LAN | G | Alto | **Concluido (`1.9.9`)** | QR + pendência; residual fechado em **BG-104** (`1.9.11`) |
 | BG-096 | Allowlist IPv6 ineficaz (`pf_entry_strict_ok` rejeita `:`) | Alta | daemon/allowlist | F4/hardening | destinos v6 legítimos bloqueados (lacuna pós BG-081) | P | Alto | **Concluido (`1.9.9`)** | `layer7_pf_table_entry_ok` + `execv` add_entry |
 | BG-097 | curl activate/check-in sem timeout | Media | daemon/license | F4 | hang indefinido | P | Medio | **Concluido (`1.9.9`)** | `--connect-timeout 10 --max-time 30` |
 | BG-098 | `waitpid` sem retry EINTR em enforce | Media | daemon | F4 | falsos fails / zombies | P | Medio | **Concluido (`1.9.9`)** | `waitpid_retry` |
@@ -330,6 +330,8 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-100 | Teto blacklist 8M entradas (OOM) | Media | daemon/blacklists | F4 | OOM com feed externo grande | M | Medio | Planeado | reduzir teto ou hard-cap com métrica; não mexer em `1.9.9` |
 | BG-101 | Revogação remota fail-open até offline max (~14d) | Baixa | licenciamento | F3 | design ADR-0021; janela longa se rede cortada | — | — | Documentado | não é bug; rever só com GO comercial |
 | BG-102 | Allowlist PF sem `match inet6` (L7ALLOW só inet) | Alta | package/PF | F4/hardening | IPs v6 na tabela allow_dst sem tag; block inet6 ignora allowlist | P | Alto | **Concluido (`1.9.10`)** | `layer7_pf_inet46_rules` + helper; smoke `pfctl -sr` PASS |
+| BG-103 | TOCTOU `pfctl -f /tmp/rules.debug` (check≠use) | Alta | daemon/package/PF | F4/hardening | ruleset arbitrário entre `stat` e `pfctl -f` | M | Alto | **Concluido (`1.9.11`)** | open+O_NOFOLLOW+fstat → `pfctl -f -` (stdin); PHP+helper+daemon |
+| BG-104 | DNS observe residual (spoof com txid+client) | Alta | daemon/capture | F4/hardening | sniffer LAN spoofa resposta com ID visto | M | Alto | **Concluido (`1.9.11`)** | pend client+txid+resolver+qname; allowlist auto-seed+`dns_observe_resolvers[]`; limite: spoof-as-resolver L2 |
 
 ---
 

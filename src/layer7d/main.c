@@ -28,6 +28,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 #include <syslog.h>
 #include <time.h>
 #include <unistd.h>
@@ -1403,20 +1404,71 @@ pf_base_tables_ok(void)
 	return 1;
 }
 
+/*
+ * BG-103: carregar rules.debug sem TOCTOU — open+O_NOFOLLOW+fstat,
+ * depois pfctl -f - no mesmo fd (stdin).
+ */
 static int
-pf_rules_debug_trusted(const char *path)
+pf_load_rules_debug_trusted(const char *path)
 {
+	int fd = -1;
+	int flags;
+	int status;
+	int dn;
 	struct stat st;
+	pid_t pid;
 
-	if (!path || lstat(path, &st) != 0)
+	if (!path || !*path)
 		return 0;
-	if (!S_ISREG(st.st_mode))
+	flags = O_RDONLY | O_CLOEXEC;
+#ifdef O_NOFOLLOW
+	flags |= O_NOFOLLOW;
+#endif
+	fd = open(path, flags);
+	if (fd < 0) {
+		if (errno == ELOOP || errno == EMLINK)
+			L7_WARN("pf_selfheal: refusing symlink %s", path);
 		return 0;
-	if (st.st_uid != 0)
+	}
+	if (fstat(fd, &st) != 0) {
+		close(fd);
 		return 0;
-	if ((st.st_mode & S_IWOTH) != 0)
+	}
+	if (!S_ISREG(st.st_mode) || st.st_uid != 0 ||
+	    (st.st_mode & (S_IWGRP | S_IWOTH)) != 0) {
+		L7_WARN("pf_selfheal: refusing untrusted %s", path);
+		close(fd);
 		return 0;
-	return 1;
+	}
+
+	pid = fork();
+	if (pid < 0) {
+		close(fd);
+		return 0;
+	}
+	if (pid == 0) {
+		if (dup2(fd, STDIN_FILENO) < 0)
+			_exit(127);
+		if (fd > STDERR_FILENO)
+			close(fd);
+		dn = open("/dev/null", O_WRONLY | O_CLOEXEC);
+		if (dn >= 0) {
+			(void)dup2(dn, STDOUT_FILENO);
+			(void)dup2(dn, STDERR_FILENO);
+			if (dn > STDERR_FILENO)
+				close(dn);
+		}
+		execl("/sbin/pfctl", "pfctl", "-f", "-", (char *)NULL);
+		_exit(127);
+	}
+	close(fd);
+	for (;;) {
+		if (waitpid(pid, &status, 0) >= 0)
+			break;
+		if (errno != EINTR)
+			return 0;
+	}
+	return (WIFEXITED(status) && WEXITSTATUS(status) == 0) ? 1 : 0;
 }
 
 static int
@@ -1442,12 +1494,12 @@ layer7_pf_selfheal(const char *required_table, const char *reason)
 
 	ready = required_table ? pf_table_exists(required_table) :
 	    pf_base_tables_ok();
-	if (!ready && pf_rules_debug_trusted(L7_PF_RULES_DEBUG_PATH)) {
-		did_force = run_shell_cmd_ok(
-		    "/sbin/pfctl -f " L7_PF_RULES_DEBUG_PATH " >/dev/null 2>&1");
-	} else if (!ready && access(L7_PF_RULES_DEBUG_PATH, R_OK) == 0) {
-		L7_WARN("pf_selfheal: refusing untrusted %s",
-		    L7_PF_RULES_DEBUG_PATH);
+	if (!ready) {
+		did_force = pf_load_rules_debug_trusted(L7_PF_RULES_DEBUG_PATH);
+		if (!did_force && access(L7_PF_RULES_DEBUG_PATH, R_OK) == 0) {
+			L7_WARN("pf_selfheal: refusing untrusted %s",
+			    L7_PF_RULES_DEBUG_PATH);
+		}
 	}
 
 	ready = required_table ? pf_table_exists(required_table) :
@@ -2420,6 +2472,14 @@ open_captures(void)
 		    s_parsed.protos_file : NULL;
 		if (pf && pf[0])
 			L7_NOTE("capture: protos_file=%s", pf);
+		/* BG-104: seed allowlist de resolvers (local + config). */
+		layer7_capture_dns_resolvers_reset();
+		for (i = 0; i < s_parsed.n_interfaces; i++)
+			layer7_capture_dns_resolvers_seed_iface(
+			    s_parsed.interfaces[i]);
+		for (i = 0; i < s_parsed.n_dns_observe_resolvers; i++)
+			(void)layer7_capture_dns_resolvers_add(
+			    s_parsed.dns_observe_resolvers[i]);
 		for (i = 0; i < s_parsed.n_interfaces &&
 		    s_n_captures < L7_MAX_IFACES; i++) {
 			struct layer7_capture *c;

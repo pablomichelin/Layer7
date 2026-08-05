@@ -346,5 +346,36 @@ layer7_parse_json(const char *json, size_t len, struct layer7_parsed *out)
 		}
 	}
 
+	{
+		const char *dor = strstr(layer, "\"dns_observe_resolvers\"");
+		if (dor) {
+			const char *arr = strchr(dor, '[');
+			if (arr && arr < end) {
+				const char *p = arr + 1;
+				while (p < end && *p != ']' &&
+				    out->n_dns_observe_resolvers <
+				    L7_MAX_DNS_OBSERVE_RESOLVERS) {
+					while (p < end && (*p == ' ' ||
+					    *p == '\t' || *p == '\n' ||
+					    *p == '\r' || *p == ','))
+						p++;
+					if (*p == '"') {
+						if (parse_quoted_string(p,
+						    out->dns_observe_resolvers[
+						    out->n_dns_observe_resolvers],
+						    L7_DNS_RESOLVER_LEN) == 0)
+							out->n_dns_observe_resolvers++;
+						p++;
+						while (p < end && *p != '"')
+							p++;
+						if (*p == '"')
+							p++;
+					} else
+						break;
+				}
+			}
+		}
+	}
+
 	return 0;
 }

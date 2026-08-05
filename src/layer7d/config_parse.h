@@ -9,6 +9,8 @@
 
 #define L7_MAX_INTERFACES 8
 #define L7_IFACE_NAME_LEN 32
+#define L7_MAX_DNS_OBSERVE_RESOLVERS 16
+#define L7_DNS_RESOLVER_LEN 64
 
 struct layer7_parsed {
 	int has_layer7;   /* 1 se encontrou chave "layer7" */
@@ -45,6 +47,9 @@ struct layer7_parsed {
 	char interfaces[L7_MAX_INTERFACES][L7_IFACE_NAME_LEN];
 	int has_protos_file;
 	char protos_file[256];
+	/* BG-104: resolvers extra para DNS observe (além do auto-seed local). */
+	int n_dns_observe_resolvers;
+	char dns_observe_resolvers[L7_MAX_DNS_OBSERVE_RESOLVERS][L7_DNS_RESOLVER_LEN];
 };
 
 /* json: conteúdo UTF-8; len: tamanho ou strlen se null-terminated com len=0 */

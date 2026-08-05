@@ -2,6 +2,25 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.9.11] — 2026-08-05
+
+### Security
+
+- **BG-103:** self-heal `rules.debug` sem TOCTOU — `open(O_NOFOLLOW)` +
+  `fstat` (regular, uid 0, sem write group/other) e `pfctl -f -` via stdin
+  (daemon, `layer7.inc`, diagnostics, `layer7-pfctl`).
+- **BG-104:** DNS observe exige correlação
+  `(client, txid, resolver, qname)` + allowlist de resolvers (auto-seed dos
+  IPs das ifaces de captura + `dns_observe_resolvers[]` opcional; fail-open
+  se lista vazia). Residual prático de BG-095 fechado; spoof-as-resolver na
+  mesma L2 permanece fora do âmbito observe passivo.
+
+### Notes
+
+- Canal `latest`: **`1.9.11`** (SHA após build). Produção enforce permanece
+  **`1.9.8`** até GO.
+- Rollback lab: `1.9.10`.
+
 ## [1.9.10] — 2026-08-05
 
 ### Fixed

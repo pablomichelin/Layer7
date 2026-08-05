@@ -3970,8 +3970,8 @@ function layer7_var_db_dir()
 }
 
 /**
- * True se /tmp/rules.debug e ficheiro regular root-owned sem world-write.
- * Usado antes de `pfctl -f` no self-heal (auditoria 1.9.9).
+ * True se path e ficheiro regular root-owned sem write group/other.
+ * Preferir layer7_pf_load_trusted_rules_debug() para carregar (BG-103).
  */
 function layer7_rules_debug_trusted($path = "/tmp/rules.debug")
 {
@@ -3981,17 +3981,75 @@ function layer7_rules_debug_trusted($path = "/tmp/rules.debug")
 	if (!file_exists($path) || is_link($path) || !is_file($path)) {
 		return false;
 	}
-	$st = @stat($path);
+	$fh = @fopen($path, "rb");
+	if ($fh === false) {
+		return false;
+	}
+	$st = @fstat($fh);
+	fclose($fh);
 	if (!is_array($st)) {
+		return false;
+	}
+	if (((int)$st["mode"] & 0170000) !== 0100000) {
 		return false;
 	}
 	if ((int)$st["uid"] !== 0) {
 		return false;
 	}
-	if (((int)$st["mode"] & 0002) !== 0) {
+	if (((int)$st["mode"] & 0022) !== 0) {
 		return false;
 	}
 	return true;
+}
+
+/**
+ * BG-103: carregar rules.debug sem TOCTOU — fstat no handle aberto,
+ * depois pfctl -f - com o mesmo conteudo (stdin).
+ *
+ * @param string $path
+ * @return bool true se pfctl saiu 0
+ */
+function layer7_pf_load_trusted_rules_debug($path = "/tmp/rules.debug")
+{
+	if (!is_string($path) || $path === "") {
+		return false;
+	}
+	if (is_link($path)) {
+		return false;
+	}
+	$fh = @fopen($path, "rb");
+	if ($fh === false) {
+		return false;
+	}
+	$st = @fstat($fh);
+	if (!is_array($st) ||
+	    (((int)$st["mode"] & 0170000) !== 0100000) ||
+	    ((int)$st["uid"] !== 0) ||
+	    (((int)$st["mode"] & 0022) !== 0)) {
+		fclose($fh);
+		return false;
+	}
+	$data = stream_get_contents($fh);
+	fclose($fh);
+	if ($data === false || $data === "") {
+		return false;
+	}
+	$descriptors = array(
+		0 => array("pipe", "r"),
+		1 => array("file", "/dev/null", "w"),
+		2 => array("file", "/dev/null", "w"),
+	);
+	$cmd = array("/sbin/pfctl", "-f", "-");
+	$pipes = array();
+	$proc = @proc_open($cmd, $descriptors, $pipes, null, null,
+	    array("bypass_shell" => true));
+	if (!is_resource($proc) && !is_object($proc)) {
+		return false;
+	}
+	fwrite($pipes[0], $data);
+	fclose($pipes[0]);
+	$rc = proc_close($proc);
+	return ($rc === 0);
 }
 
 /**
@@ -6079,12 +6137,8 @@ function layer7_bl_apply()
 		}
 	}
 	$tables_ok = isset($tables["layer7_block"]) && isset($tables["layer7_block_dst"]);
-	if ((!$ensure_ok || !$tables_ok) && layer7_rules_debug_trusted("/tmp/rules.debug")) {
-		if (function_exists("mwexec")) {
-			mwexec("/sbin/pfctl -f /tmp/rules.debug");
-		} else {
-			@shell_exec("/sbin/pfctl -f /tmp/rules.debug 2>/dev/null");
-		}
+	if ((!$ensure_ok || !$tables_ok)) {
+		layer7_pf_load_trusted_rules_debug("/tmp/rules.debug");
 	}
 	layer7_signal_reload();
 	return true;

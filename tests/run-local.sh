@@ -81,6 +81,21 @@ else
 	fail "test_dns_aaaa_wire compile"
 fi
 
+step "Unit: DNS corr / allowlist (BG-104)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_dns_corr \
+    tests/functional/test_dns_corr.c \
+    2>/tmp/test_dns_corr.cc.err; then
+	if /tmp/test_dns_corr; then
+		pass "test_dns_corr"
+	else
+		fail "test_dns_corr runtime"
+	fi
+else
+	cat /tmp/test_dns_corr.cc.err
+	fail "test_dns_corr compile"
+fi
+
 step "Unit: log_store (rotacao limitada)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_log_store \

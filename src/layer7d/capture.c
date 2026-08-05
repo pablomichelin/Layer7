@@ -17,15 +17,18 @@
  */
 #include "capture.h"
 #include "capture_flow_key.h"
+#include "dns_corr.h"
 #include "dns_observe.h"
 
 #include <arpa/inet.h>
+#include <ifaddrs.h>
 #include <net/ethernet.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+#include <netinet6/in6.h>
 #include <pcap/pcap.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,8 +48,6 @@
 #define L7C_FLOW_PROBE_SLOTS 64
 #define L7C_DNS_HINTS       1024
 #define L7C_DNS_HOST_MAX    256
-#define L7C_DNS_PEND        256
-#define L7C_DNS_PEND_TTL_SEC 10
 #define L7C_IPV6_EXTHDR_MAX 8
 
 struct l7c_flow {
@@ -107,63 +108,7 @@ struct l7c_dns_hint6 {
 
 static struct l7c_dns_hint s_dns_hints[L7C_DNS_HINTS];
 static struct l7c_dns_hint6 s_dns_hints6[L7C_DNS_HINTS];
-
-/* Correlação query→resposta (anti-spoof LAN): txid + cliente. */
-struct l7c_dns_pend {
-	uint8_t  in_use;
-	uint16_t id;
-	time_t   expires;
-	char     client[INET6_ADDRSTRLEN];
-};
-
-static struct l7c_dns_pend s_dns_pend[L7C_DNS_PEND];
-static unsigned int s_dns_pend_next;
-
-static void
-dns_pend_remember(const char *client_ip, uint16_t id, time_t now)
-{
-	struct l7c_dns_pend *p;
-	unsigned int i;
-
-	if (!client_ip || !*client_ip)
-		return;
-	for (i = 0; i < L7C_DNS_PEND; i++) {
-		p = &s_dns_pend[i];
-		if (p->in_use && p->id == id &&
-		    strcmp(p->client, client_ip) == 0) {
-			p->expires = now + L7C_DNS_PEND_TTL_SEC;
-			return;
-		}
-	}
-	p = &s_dns_pend[s_dns_pend_next++ % L7C_DNS_PEND];
-	p->in_use = 1;
-	p->id = id;
-	p->expires = now + L7C_DNS_PEND_TTL_SEC;
-	snprintf(p->client, sizeof(p->client), "%s", client_ip);
-}
-
-static int
-dns_pend_consume(const char *client_ip, uint16_t id, time_t now)
-{
-	unsigned int i;
-
-	if (!client_ip || !*client_ip)
-		return 0;
-	for (i = 0; i < L7C_DNS_PEND; i++) {
-		struct l7c_dns_pend *p = &s_dns_pend[i];
-		if (!p->in_use)
-			continue;
-		if (p->expires < now) {
-			p->in_use = 0;
-			continue;
-		}
-		if (p->id == id && strcmp(p->client, client_ip) == 0) {
-			p->in_use = 0;
-			return 1;
-		}
-	}
-	return 0;
-}
+static struct layer7_dns_corr s_dns_corr;
 
 static uint32_t
 ip6_hint_hash(const uint8_t ip6[16])
@@ -545,19 +490,25 @@ dns_obs_rr_cb(int af, const uint8_t *addr, uint32_t ttl, const char *qname,
 
 static void
 observe_dns_response(struct layer7_capture *cap, const char *client_ip,
-    uint16_t sp, uint16_t dp, const uint8_t *payload, uint16_t payload_len,
-    time_t now)
+    const char *resolver_ip, uint16_t sp, uint16_t dp,
+    const uint8_t *payload, uint16_t payload_len, time_t now)
 {
 	struct l7c_dns_obs_ctx ctx;
 	uint16_t dns_id;
+	char qname[L7C_DNS_HOST_MAX];
 
-	if (sp != 53 || dp == 53 || !payload || payload_len < 12 || !client_ip)
+	if (sp != 53 || dp == 53 || !payload || payload_len < 12 || !client_ip ||
+	    !resolver_ip)
 		return;
 	/* QR deve ser 1 (resposta). */
 	if ((payload[2] & 0x80U) == 0)
 		return;
 	dns_id = (uint16_t)((payload[0] << 8) | payload[1]);
-	if (!dns_pend_consume(client_ip, dns_id, now))
+	if (layer7_dns_extract_qname(payload, payload_len, qname,
+	    sizeof(qname)) != 0)
+		qname[0] = '\0';
+	if (!layer7_dns_pend_consume(&s_dns_corr, client_ip, resolver_ip,
+	    dns_id, qname, now))
 		return;
 
 	ctx.cap = cap;
@@ -582,22 +533,24 @@ observe_dns_query(struct layer7_capture *cap, const char *src_ip,
 	/* QR deve ser 0 (query). */
 	if ((payload[2] & 0x80U) != 0)
 		return;
-	if (!src_ip)
+	if (!src_ip || !resolver_ip)
 		return;
 
 	dns_id = (uint16_t)((payload[0] << 8) | payload[1]);
-	dns_pend_remember(src_ip, dns_id, now);
+	qname[0] = '\0';
+	qd = (uint16_t)((payload[4] << 8) | payload[5]);
+	if (qd != 0) {
+		off = 12;
+		if (layer7_dns_read_name(payload, payload_len, &off, qname,
+		    sizeof(qname), 0) != 0)
+			qname[0] = '\0';
+	}
+	layer7_dns_pend_remember(&s_dns_corr, src_ip, resolver_ip, dns_id,
+	    qname, now);
 
 	if (!cap || !cap->dns_query_cb)
 		return;
-
-	qd = (uint16_t)((payload[4] << 8) | payload[5]);
 	if (qd == 0)
-		return;
-
-	off = 12;
-	if (layer7_dns_read_name(payload, payload_len, &off, qname,
-	    sizeof(qname), 0) != 0)
 		return;
 	if (qname[0] == '\0' || strcmp(qname, ".") == 0)
 		return;
@@ -760,6 +713,54 @@ layer7_capture_set_sni(struct layer7_capture *cap, int on)
 		cap->use_sni = on ? 1 : 0;
 }
 
+void
+layer7_capture_dns_resolvers_reset(void)
+{
+	layer7_dns_corr_resolvers_reset(&s_dns_corr);
+}
+
+int
+layer7_capture_dns_resolvers_add(const char *ip)
+{
+	return layer7_dns_corr_resolver_add(&s_dns_corr, ip);
+}
+
+void
+layer7_capture_dns_resolvers_seed_iface(const char *ifname)
+{
+	struct ifaddrs *ifap = NULL, *ifa;
+	char buf[INET6_ADDRSTRLEN];
+
+	if (!ifname || !*ifname)
+		return;
+	if (getifaddrs(&ifap) != 0)
+		return;
+	for (ifa = ifap; ifa != NULL; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_name || strcmp(ifa->ifa_name, ifname) != 0)
+			continue;
+		if (!ifa->ifa_addr)
+			continue;
+		if (ifa->ifa_addr->sa_family == AF_INET) {
+			const struct sockaddr_in *sin =
+			    (const struct sockaddr_in *)ifa->ifa_addr;
+			if (!inet_ntop(AF_INET, &sin->sin_addr, buf,
+			    sizeof(buf)))
+				continue;
+			(void)layer7_dns_corr_resolver_add(&s_dns_corr, buf);
+		} else if (ifa->ifa_addr->sa_family == AF_INET6) {
+			const struct sockaddr_in6 *sin6 =
+			    (const struct sockaddr_in6 *)ifa->ifa_addr;
+			if (IN6_IS_ADDR_LINKLOCAL(&sin6->sin6_addr))
+				continue;
+			if (!inet_ntop(AF_INET6, &sin6->sin6_addr, buf,
+			    sizeof(buf)))
+				continue;
+			(void)layer7_dns_corr_resolver_add(&s_dns_corr, buf);
+		}
+	}
+	freeifaddrs(ifap);
+}
+
 static void
 on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
     const u_char *pkt)
@@ -909,7 +910,7 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 			inet_ntop(AF_INET6, da6, dst_str, sizeof(dst_str));
 			observe_dns_query(cap, src_str, dst_str, sp, dp,
 			    l4_data + 8, (uint16_t)(l4_len - 8), now);
-			observe_dns_response(cap, client_str, sp, dp,
+			observe_dns_response(cap, client_str, src_str, sp, dp,
 			    l4_data + 8, (uint16_t)(l4_len - 8), now);
 		} else if (sa4 || da4) {
 			struct in_addr addr;
@@ -922,7 +923,7 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 			inet_ntop(AF_INET, &addr, dst_str, sizeof(dst_str));
 			observe_dns_query(cap, src_str, dst_str, sp, dp,
 			    l4_data + 8, (uint16_t)(l4_len - 8), now);
-			observe_dns_response(cap, client_str, sp, dp,
+			observe_dns_response(cap, client_str, src_str, sp, dp,
 			    l4_data + 8, (uint16_t)(l4_len - 8), now);
 		}
 	}
