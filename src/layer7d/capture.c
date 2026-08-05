@@ -28,7 +28,6 @@
 #include <netinet/ip6.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
-#include <netinet6/in6.h>
 #include <pcap/pcap.h>
 #include <stdio.h>
 #include <stdlib.h>
