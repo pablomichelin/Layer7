@@ -1,5 +1,5 @@
 run_id=20260804T233500Z-ondaC-dr05-veeam
 scenario_code=S13
 phase=baseline_only
-note=drift NIC/UUID nao aplicado — requer janela dedicada com restore Veeam apos mudanca
-veeam_backup=confirmado_operador_2026-08-04
+note=baseline_capturado; drift NIC/UUID pendente
+veeam_prerequisite=PASS (20260804T211800Z-veeam-prerequisite-PASS)

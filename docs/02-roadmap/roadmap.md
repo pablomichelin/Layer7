@@ -17,8 +17,8 @@ com hardening tecnico ou com release engineering.
 | F0 | Governanca documental | consolidada | novo agente consegue retomar o projecto sem drift critico |
 | F1 | Cadeia de confianca e seguranca critica | concluida | confianca entre distribuicao, builder, artefactos, blacklists e fallback fica auditavel |
 | F2 | Hardening do license server | concluida em `2026-04-01` | stack de licencas opera com segredos, bootstrap, backup e fronteiras sob controlo |
-| F3 | Robustez de licenciamento/activacao | aberta em `2026-04-01` | activacao, revogacao e offline deixam de depender de suposicoes |
-| F4 | Confiabilidade package/daemon/blacklists | **F4.0 aberta** em `2026-04-24` (plano: [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md); F3 pode permanecer aberta com DR-05 em paralelo) | runtime e operacao ficam mais previsiveis |
+| F3 | Robustez de licenciamento/activacao | **concluida** em `2026-08-04` (Onda C — veredito `F3 pode fechar`) | activacao, revogacao e offline deixam de depender de suposicoes |
+| F4 | Confiabilidade package/daemon/blacklists | **F4.0 aberta** em `2026-04-24` (plano: [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md); F3 fechada) | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | preparacao em [`f5-preparacao-malha.md`](f5-preparacao-malha.md); execucao plena apos saida F4 | gates de nao regressao ficam executaveis e repetiveis |
 | F6 | Reorganizacao estrutural controlada | planeada | reorganizacao fisica acontece com mapa, links e rollback |
 | F7 | Observabilidade e release engineering | planeada | release e operacao passam a ter governanca forte e verificavel |
@@ -423,6 +423,10 @@ falha.
   publicado `1.8.3` vs `PORTVERSION` de trabalho `1.8.11`; download
   administrativo do `.lic` concentra-se em `license-download-policy.js` com
   teste e rota a reusar a politica.
+- **F3 fechada em `2026-08-04` (Onda C — campanha DR-05):** relatório
+  `docs/tests/evidence/20260804T211500Z-ondaC-f3-report/F3-PODE-FECHAR.md`;
+  cenarios S07–S09, S12–S14 e **S13** em `PASS`; BG-077 implementado em
+  `1.8.11_68`. Veredito: **`F3 pode fechar`**.
 
 ### Criterios de saida
 

@@ -1,0 +1,21 @@
+# S14 — BG-077 remote revocation via check-in (2026-08-04)
+
+## Activate test license (id=11)
+layer7d: license valid — customer=Contacenter expiry=2027-12-31 features=full
+valid=1
+
+## Revoke on server
+UPDATE licenses SET status='revoked' WHERE id=11;  -- OK
+
+## Forced check-in
+layer7d: check-in denied — Licenca revogada.
+exit=1
+
+## Post-conditions
+valid=0
+error=license file not found: /usr/local/etc/layer7.lic
+ls: /usr/local/etc/layer7.lic: No such file or directory
+
+## Restore production
+layer7d: license valid — customer=Systemup expiry=2028-07-08 features=full
+valid=1

@@ -649,6 +649,11 @@ ao `layer7d` quando o PID do pidfile é válido e o processo responde a
 `kill -0` (alinhado a `send_sighup` e ao passo 12 do
 `PLANO-BLACKLISTS-UT1.md`).
 
+**Nota técnica (`>= 1.8.11_69`):** `daemon(8)` grava o pidfile **sem newline
+final**; `read` pode devolver rc≠0 com o PID já preenchido — o script deve
+aceitar esse caso (igual a `rc.d/layer7d` e `layer7-stats-collect.sh`), senão
+aparece falso `WARN: cannot read /var/run/layer7d.pid` com daemon vivo.
+
 **Onde:** appliance com pacote F4.x; rede com acesso à origem oficial de
 manifesto/snapshot ou cenário de falha controlada (ver critérios abaixo).
 

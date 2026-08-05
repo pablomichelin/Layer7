@@ -11,19 +11,40 @@ plano mestre. O plano completo está em:
 
 | Campo | Valor esperado (`2026-08-04`) |
 |-------|-------------------------------|
-| Passo actual | `4.2` / `5.1` — Onda C parcial (S07 FAIL; S08/S12 PASS); Veeam OK em `254`+`12`+`244` |
-| Candidato lab (gates) | **`1.8.11_66`** |
-| Canal `latest` | `1.8.11_66` |
+| Passo actual | **5.1** (Onda D) — Ondas A, B, C **PASS**; F3 **FECHADA** |
+| Ondas concluídas | A **PASS**, B **PASS**, C **PASS** |
+| Onda D | **em curso** — 10a PASS, **10b PASS**, **11 PASS** (`_69` fix SIGHUP) |
+| Trilha BG-077 | **fechada** (S14 + S09 reteste PASS) |
+| Candidato lab (gates) | **`1.8.11_69`** |
+| Canal `latest` | `1.8.11_69` |
 | Produção enforce | `1.8.11_24` (até GO Onda F) |
 | Appliance lab | `192.168.100.254` (Plus/FB16 — CE na Onda E) |
 | Builder | `192.168.100.12` |
+| Veeam lab | **PASS** — `254`+`12`+`244` (`20260804T211800Z-veeam-prerequisite-PASS`) |
+
+### Continuidade — o plano geral **não foi substituído**
+
+O fecho de produção (`plano-fecho-producao-e-consolidacao.md`) continua a ser a
+**fila única** Ondas P0 → J. O **BG-077** é um **bloco adicional** na trilha F3
+(Onda C), documentado no plano como passo **4.3**, no backlog e no ADR-0021.
+
+| Depois de BG-077 | Continua no plano |
+|------------------|-------------------|
+| Bloco 1 (API check-in) | 4.2 relatório F3; 5.1 Onda D; G6–G7; Ondas E–J |
+| Blocos 2–4 (daemon, S14, docs) | Mesma ordem; **bloqueante comercial** antes do GO (Onda F) |
+
+**Handoff sem reexplicar:** ler nesta ordem — este ficheiro → `CORTEX.md` → passo
+actual na secção 7 do plano mestre. Para F3/DR-05: `f3-11-start-here.md` +
+evidências em `docs/tests/evidence/`. Para BG-077:
+`docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md` +
+`docs/03-adr/ADR-0021-check-in-online-e-revogacao-remota.md`.
 
 ---
 
 ## Antes de colar no chat
 
 1. `git status` limpo ou mudanças conscientes commitadas.
-2. Confirmar dual-canal: **`latest` (`_65`) ≠ produção enforce (`_24`)**.
+2. Confirmar dual-canal: **`latest` (`_68`) ≠ produção enforce (`_24`)**.
 3. Escolher modo conforme a **onda** (secção 3.5 do plano):
    - **Multitarefa (preferido em P0, P1, H):** 1 coordenador + workers com ficheiros **disjuntos** e **sem dependência de estado** entre si.
    - **Agente único (obrigatório em A–G appliance, F, I–J):** qualquer passo que mexe no appliance, ficheiros quentes ou GO.
@@ -69,9 +90,9 @@ Estado (confirmar no repo):
 - Branch: main
 - Passo actual: <1.1>
 - Onda: P1
-- Candidato lab: 1.8.11_65
+- Candidato lab: 1.8.11_68
 - Produção enforce: 1.8.11_24
-- Latest: 1.8.11_65
+- Latest: 1.8.11_68
 
 Tarefa deste chat:
 Orquestrar o passo <id> do plano. Se multitarefa autorizada, define workers
@@ -119,7 +140,7 @@ Regras absolutas:
 - Não mover/renomear/apagar ficheiros até Onda H (F6).
 - Não activar scoped_hybrid/enforce em produção sem gates PASS + GO humano.
 - Produção enforce permanece 1.8.11_24 até Onda F (GO).
-- Candidato lab para gates: 1.8.11_65 (não substituir sem decisão no CORTEX).
+- Candidato lab para gates: 1.8.11_68 (não substituir sem decisão no CORTEX).
 - Versionar: commit a cada bloco; PORTREVISION+release GitHub só quando o passo exigir .pkg.
 - Actualizar docs no mesmo bloco (CORTEX, changelog, MANUAL-INSTALL se operacional).
 - Multitarefa PROIBIDA nesta onda (appliance / ficheiros quentes).
@@ -130,7 +151,7 @@ Estado que assumo até verificares no repo:
 - Branch: main
 - Passo actual: <ex.: 2.1>
 - Onda: <A|B|C|D|E|F|G|I|J>
-- Candidato lab: 1.8.11_65
+- Candidato lab: 1.8.11_68
 - Produção enforce: 1.8.11_24
 - Pendências humanas: <ex.: snapshot appliance / dois clientes LAN / SSH>
 
@@ -165,7 +186,7 @@ Abrir **chat novo por onda** (ou quando o contexto ficar longo). Ver também
 - Publicar GO de produção sem G2–G7 **e** Ondas C–E PASS.
 - Multitarefa sem lista de ficheiros disjuntos **e** sem coordenador.
 - Paralelizar B e C no mesmo appliance.
-- Tratar `latest` (`_65`) como produção enforce antes da Onda F.
+- Tratar `latest` (`_68`) como produção enforce antes da Onda F.
 
 ---
 
@@ -174,8 +195,10 @@ Abrir **chat novo por onda** (ou quando o contexto ficar longo). Ver também
 | Documento | Papel |
 |-----------|--------|
 | [plano-fecho-producao-e-consolidacao.md](../02-roadmap/plano-fecho-producao-e-consolidacao.md) | Guia completo início/meio/fim |
+| [f3-plano-check-in-online-revogacao-remota.md](../01-architecture/f3-plano-check-in-online-revogacao-remota.md) | BG-077 — blocos 1–4 |
+| [ADR-0021](../03-adr/ADR-0021-check-in-online-e-revogacao-remota.md) | Contrato API check-in |
 | [CORTEX.md](../../CORTEX.md) | Estado real + checklist progresso |
-| [plano-gates-producao.md](../09-blocking/plano-gates-producao.md) | G0–G7 (candidato `_65`) |
+| [plano-gates-producao.md](../09-blocking/plano-gates-producao.md) | G0–G7 (candidato `_68`) |
 | [validacao-lab.md](../04-package/validacao-lab.md) | Roteiros lab |
 | [checklist-mestre.md](../02-roadmap/checklist-mestre.md) | Gates por fase |
 | [document-equivalence-map.md](document-equivalence-map.md) | Duplicados docs (preparar F6) |

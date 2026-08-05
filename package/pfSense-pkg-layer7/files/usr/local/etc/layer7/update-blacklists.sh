@@ -108,7 +108,10 @@ send_sighup() {
 		return
 	fi
 	_pid=""
-	if ! read -r _pid <"$PID_FILE" 2>/dev/null; then
+	# daemon(8) grava o PID sem newline final. Nesse caso read preenche _pid,
+	# mas retorna 1 por encontrar EOF antes do delimitador. Aceitar o valor
+	# evita falso "cannot read" com pidfile valido (alinhado a rc.d/layer7d).
+	if ! IFS= read -r _pid <"$PID_FILE" 2>/dev/null && [ -z "$_pid" ]; then
 		log "WARN: cannot read $PID_FILE, skipping SIGHUP"
 		return
 	fi

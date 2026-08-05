@@ -1,0 +1,6 @@
+layer7d: activating...
+  server:       https://license.systemup.inf.br/api/activate
+  hardware_id:  082fba6d116ad43cd08034a43bf022683fc396fbe8efabc4af9a36939565312c
+  key:          a414be71...
+layer7d: activation rejected by license server (HTTP 409): Hardware ID nao corresponde.
+activate_exit=255

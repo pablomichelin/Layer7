@@ -79,9 +79,9 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] nenhum “OK” foi marcado sem prova minima
 - [ ] na F3.6, cada cenario obrigatorio tem comando objectivo, expectativa e evidencia minima declarados
 - [ ] na F3.7, cada execucao manual obrigatoria tem directoria por `run_id`, ficheiros de evidencia com nome padronizado e decisao final `PASS` / `FAIL` / `INCONCLUSIVE` / `BLOCKED`
-- [ ] na F3.8, cada cenario obrigatorio so fecha a F3 se estiver em `PASS` com evidencia real; `FAIL`, `INCONCLUSIVE` ou `BLOCKED` obrigatorio mantem a fase aberta
-- [ ] na F3.8, existe relatorio final unico de campanha com contagem de resultados e conclusao explicita `F3 pode fechar` / `F3 nao pode fechar`
-- [ ] na F4 com F3 ainda aberta, blocos tecnicos respeitam o paralelismo do
+- [x] na F3.8, cada cenario obrigatorio so fecha a F3 se estiver em `PASS` com evidencia real; `FAIL`, `INCONCLUSIVE` ou `BLOCKED` obrigatorio mantem a fase aberta
+- [x] na F3.8, existe relatorio final unico de campanha com contagem de resultados e conclusao explicita `F3 pode fechar` / `F3 nao pode fechar`
+- [x] na F4 com F3 ainda aberta, blocos tecnicos respeitam o paralelismo do
   [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md) (secção 0) —
   nao alterar o contrato de licenciamento salvo decisao e documentacao no
   mesmo bloco

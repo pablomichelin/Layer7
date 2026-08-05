@@ -1,0 +1,18 @@
+# S13 drift MAC em0 — 2026-08-04
+
+## Drift aplicado
+ifconfig em0 ether 02:11:22:33:44:55
+
+## Pós-drift
+fingerprint=082fba6d116ad43cd08034a43bf022683fc396fbe8efabc4af9a36939565312c
+valid=0
+error=hardware mismatch: license=e31560f5 local=082fba6d
+
+## Activate (hardware drift)
+layer7d: activation rejected by license server (HTTP 409): Hardware ID nao corresponde.
+
+## Restore MAC original 00:50:56:88:e1:33
+fingerprint=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+valid=1
+customer=Systemup
+expiry=2028-07-08

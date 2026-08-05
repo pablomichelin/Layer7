@@ -1,0 +1,10 @@
+fallback.state:
+status=healthy
+component=blacklists-update
+active_snapshot_id=ut1-2026-04-25
+
+apply:
+WARN: cannot read /var/run/layer7d.pid, skipping SIGHUP
+INFO: apply complete
+
+service layer7d status: running as pid 50017

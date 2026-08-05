@@ -1,0 +1,19 @@
+# S09 retest 2026-08-04 (license id=12)
+
+## Activate
+layer7d: license valid — customer=Contacenter expiry=2027-12-31
+
+## After revoke (offline, no check-in yet)
+valid=1
+lic_present=yes
+
+## check-in
+layer7d: check-in denied — Licenca revogada.
+exit=1
+
+## After check-in
+valid=0
+lic_present=no
+
+## Restore Systemup
+valid=1

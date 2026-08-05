@@ -1,57 +1,38 @@
 # F3.11 - Start Here
 
-## Estado actual (actualizado em 2026-04-14)
+## Estado actual (actualizado em 2026-08-04)
 
-- `F3 continua aberta`
-- `F3.11 alinhada no license-server live`
-- Inventario real obtido (4 licencas)
-- Sessao stateful + Bearer bridge funcionam no live
-- Same-origin administrativo voltou a falhar fechado no live
-- DR-02 resolvido (drift cosmetico 403 vs 409, logica correcta)
-- Blocker F3 restante: DR-05 (cenarios do appliance)
-- Baseline read-only mais recente do appliance:
-  `20260414T123526Z-appliance254-permissions`
-- Run canónico mais recente do appliance:
-  `20260414T000000Z-appliance254-continue`
+- **`F3 FECHADA`** — veredito `F3 pode fechar` (Onda C)
+- Campanha DR-05 concluída: S07–S09, S12–S14 e **S13** em `PASS`
+- BG-077 (check-in online / revogação remota): **implementado** (`1.8.11_68`; S14 PASS)
+- Relatório final: `docs/tests/evidence/20260804T211500Z-ondaC-f3-report/F3-PODE-FECHAR.md`
+- Evidência S13 (drift NIC reversível): `20260804T212000Z-ondaC-s13-drift-PASS`
+- Pré-requisito Veeam: **PASS** (`20260804T211800Z-veeam-prerequisite-PASS`)
 
 ---
 
-## O que ja foi provado
+## O que foi provado (campanha 2026-08-04)
 
-1. Login no live funciona (`pablo@systemup.inf.br`)
-2. `/api/auth/session` funciona e a bridge Bearer administrativa tambem
-   funciona para endpoints autenticados
-3. Inventario real: 4 licencas (IDs 5, 6, 7, 8)
-4. Appliance existe e funciona (192.168.100.254), com daemon vivo confirmado
-   por processo/stats apesar de falso negativo em `service layer7d status`
-5. Host live acessivel (192.168.100.244)
-6. PostgreSQL live com `admin_sessions`, `admin_audit_log` e
-   `admin_login_guards`
-7. `POST /api/activate` no live rejeita hw diferente, revogada e expirada
-   (com 403 em vez de 409 do repo — drift cosmetico, logica correcta);
-   aceita reactivacao legitima com 200
-8. `POST` e `OPTIONS` em `/api/auth/login` com `Origin` externo agora
-   respondem `403` fail-closed
-
----
-
-## O que falta para fechar a F3
-
-1. **Fechar DR-05**: executar cenarios do appliance (snapshot/restore,
-   offline/online, NIC/UUID) — roteiro completo e comandos em
-   [`../01-architecture/f3-runbook-proxima-campanha-real.md`](../01-architecture/f3-runbook-proxima-campanha-real.md)
-   (secao `8. Roteiro operacional do DR-05 no appliance`, incluindo a
-   trilha GUI autenticada, a sequencia `curl` e o helper
-   `run-pfsense-gui-license-flow.sh`, inclusive no modo
-   `--ssh-target <utilizador@host>` + `--gui-base https://127.0.0.1:9999`) e em
-   [`../01-architecture/f3-fecho-operacional-restante.md`](../01-architecture/f3-fecho-operacional-restante.md)
-2. Consolidar evidencias e decidir fecho da F3
+1. Login e sessão administrativa no live (`192.168.100.244`)
+2. `POST /api/activate` rejeita hw divergente, revogada e expirada
+3. Appliance `192.168.100.254`: activação, offline, revogação (S08/S09/S12)
+4. Check-in online e revogação remota (S14 — BG-077)
+5. Drift de hardware NIC reversível com bloqueio e restauro (S13)
+6. Reteste S07/S09 pós-BG-077: **PASS**
 
 ---
 
 ## Documentos de referencia
 
-- [`../01-architecture/f3-fecho-operacional-restante.md`](../01-architecture/f3-fecho-operacional-restante.md)
-- [`../01-architecture/f3-11-readiness-scorecard.md`](../01-architecture/f3-11-readiness-scorecard.md)
-- [`../01-architecture/f3-11-drift-registry.md`](../01-architecture/f3-11-drift-registry.md)
-- [`../01-architecture/f3-11-execution-master-register.md`](../01-architecture/f3-11-execution-master-register.md)
+- [`../tests/evidence/20260804T211500Z-ondaC-f3-report/F3-PODE-FECHAR.md`](../tests/evidence/20260804T211500Z-ondaC-f3-report/F3-PODE-FECHAR.md)
+- [`../tests/evidence/20260804T211500Z-ondaC-f3-report/F3-VALIDATION-CAMPAIGN-REPORT.md`](../tests/evidence/20260804T211500Z-ondaC-f3-report/F3-VALIDATION-CAMPAIGN-REPORT.md)
+- [`../01-architecture/f3-fecho-operacional-restante.md`](../01-architecture/f3-fecho-operacional-restante.md) (histórico)
+- [`../01-architecture/f3-gate-fechamento-validacao.md`](../01-architecture/f3-gate-fechamento-validacao.md)
+- [`../03-adr/ADR-0021-check-in-online-e-revogacao-remota.md`](../03-adr/ADR-0021-check-in-online-e-revogacao-remota.md)
+
+---
+
+## Próximo passo (pós-F3)
+
+Continuar **Onda D** (passo 5.1 — F4 lab) no plano mestre de fecho de produção.
+Ver [`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md).

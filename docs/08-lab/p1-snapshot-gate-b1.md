@@ -21,7 +21,7 @@ Rollback: **Veeam** (diário) + reinstalação de pacote via MANUAL-INSTALL.
 |-------|-------|
 | Host | `systemupfw.system.up` (`192.168.100.254`) |
 | OS | pfSense Plus `26.03.1` / FreeBSD `16.0-CURRENT` |
-| Pacote instalado | `pfSense-pkg-layer7-1.8.11_62` |
+| Pacote instalado | `pfSense-pkg-layer7-1.8.11_68` (candidato lab `2026-08-04`) |
 | Layer7 | `enabled=false`, `mode=monitor`, `legacy_global` |
 | Licença | válida |
 | Diagnose | [`docs/tests/evidence/20260804T220000Z-p1-baseline-appliance254/`](../tests/evidence/20260804T220000Z-p1-baseline-appliance254/) |
@@ -33,7 +33,10 @@ Rollback: **Veeam** (diário) + reinstalação de pacote via MANUAL-INSTALL.
 ### 1. Veeam (principal)
 
 Backup diário do pfSense `192.168.100.254`, do builder `192.168.100.12` e do
-license server `192.168.100.244` (confirmado operador `2026-08-04`).
+license server `192.168.100.244`.
+
+**Estado:** **PASS** — confirmado operador `2026-08-04`; reconfirmado
+`2026-08-04` (evidência `20260804T211800Z-veeam-prerequisite-PASS`).
 
 ### 2. Rollback por pacote (complementar)
 
@@ -57,7 +60,7 @@ Reinstalar versão anterior via [`MANUAL-INSTALL.md`](../10-license-server/MANUA
 | **Versão pré-upgrade (baseline)** | `1.8.11_62` |
 | **Versão enforce de referência** | `1.8.11_24` |
 | **Backup XML pfSense** | Opcional — operador pode fazer antes da Onda A |
-| **Estado passo 1.2** | **PASS** — rollback operacional documentado; baseline registada |
+| **Estado passo 1.2** | **PASS** — Veeam OK (`254`+`12`+`244`); evidência `211800Z-veeam-prerequisite-PASS` |
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-**Proposto** (`2026-08-04`) — aguarda implementação (BG-077).
+**Implementado** (`2026-08-04`) — API em `244`, daemon `1.8.11_68`, S14 PASS.
 
 ## Contexto
 

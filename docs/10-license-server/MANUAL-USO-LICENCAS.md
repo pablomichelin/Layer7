@@ -370,16 +370,17 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
 - `POST /api/licenses/:id/revoke` muda o estado da licenca para `revoked`
 - qualquer activacao futura dessa chave passa a falhar com `409`
 - qualquer download administrativo futuro do `.lic` passa a falhar com `409`
-- o daemon nao consulta o servidor para rever revogacao de um `.lic` ja
-  instalado
-- por isso, um `.lic` ja emitido continua localmente valido ate falhar por:
+- o daemon **passa a consultar** o servidor periodicamente quando
+  `check_in_enabled=true` em `layer7.json` (BG-077 / ADR-0021)
+- `POST /api/license/check-in` com a mesma chave da activação; resposta
+  `409` revoked/expired remove o `.lic` local e desliga enforce
+- sem check-in activo, o comportamento offline permanece:
   - assinatura
   - mismatch de `hardware_id`
   - expiracao + fim do grace
 
-**Planeado (BG-077 / ADR-0021):** check-in online periodico
-(`POST /api/license/check-in`) para reflectir revogacao e cancelamento comercial
-no appliance. Ver `docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md`.
+Ver `docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md` e
+`layer7d --check-in` (forçar verificação imediata em suporte).
 
 ### 5.6 Politica conservadora oficial sobre rebind
 

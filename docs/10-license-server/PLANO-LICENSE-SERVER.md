@@ -312,8 +312,9 @@ CREATE INDEX idx_activations_created ON activations_log(created_at);
 | Metodo | Rota            | Body                        | Resposta                    |
 |--------|-----------------|-----------------------------|-----------------------------|
 | POST   | /api/activate   | `{key, hardware_id}`        | Ficheiro `.lic` (JSON assinado) |
+| POST   | /api/license/check-in | `{key, hardware_id}`  | `200` active + intervalos; `409` revoked/expired |
 
-**Rate limit**: 10 requisicoes por minuto por IP.
+**Rate limit**: 10 requisicoes por minuto por IP (activate e check-in).
 
 **Logica do activate**:
 1. Buscar licenca por `license_key = key`

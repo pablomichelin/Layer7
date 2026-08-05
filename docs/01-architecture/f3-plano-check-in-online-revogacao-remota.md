@@ -71,32 +71,31 @@ Persistência local proposta: `/var/db/layer7-checkin.json` (ou campo em
 
 ### Bloco 1 — License server (prioridade)
 
-- [ ] Rota `POST /api/license/check-in`
-- [ ] Reutilizar `getEffectiveLicenseState`, `createHardwareBindingError`
-- [ ] Tabela ou extensão `check_ins_log` (license_id, hw, result, ip, ts)
-- [ ] Testes unitários + integração (active, revoked, expired, wrong hw)
-- [ ] Deploy em `192.168.100.244`
+- [x] Rota `POST /api/license/check-in` (`license-server/backend/src/routes/check-in.js`)
+- [x] Reutilizar `getEffectiveLicenseState`, `createHardwareBindingError`
+- [x] Tabela `check_ins_log` (`check-in-schema.js`)
+- [x] Testes unitários (`check-in-policy.test.js`)
+- [x] Deploy em `192.168.100.244` (`2026-08-04`)
 
 ### Bloco 2 — Daemon
 
-- [ ] `layer7_check_in()` em `license.c`
-- [ ] Scheduler no loop principal (`main.c`)
-- [ ] Invalidação: `unlink(.lic)` + `s_license_state=0` + downgrade enforce
-- [ ] Stats JSON: `license_check_in_ok`, `license_last_check_in`, `license_next_check_in`
-- [ ] `PORTREVISION` novo + build builder
+- [x] `layer7_check_in()` em `license.c`
+- [x] Scheduler no loop principal (`main.c`)
+- [x] Invalidação: `unlink(.lic)` + `s_license_state=0` + downgrade enforce
+- [x] Stats JSON: `license_check_in_ok`, `license_last_check_in`, `license_next_check_in`
+- [x] `PORTREVISION` `68` + build builder + appliance `254`
 
 ### Bloco 3 — Validação F3
 
-- [ ] Cenário **S14** (novo): revogar → forçar check-in (ou esperar intervalo
-  reduzido em lab) → `license_valid=false`
-- [ ] Actualizar S09: pós-BG-077, veredicto esperado muda para **revogação remota**
-- [ ] Evidência em `docs/tests/evidence/`
+- [x] Cenário **S14**: revogar → `layer7d --check-in` → `license_valid=false`
+- [x] Actualizar S09: pós-BG-077 com `--check-in` (`20260804T211300Z-ondaC-s09-retest-PASS`)
+- [x] Evidência: `docs/tests/evidence/20260804T210500Z-ondaC-s14-checkin-PASS/`
 
 ### Bloco 4 — Documentação e operação
 
-- [ ] `MANUAL-USO-LICENCAS.md` — secção cancelamento comercial
-- [ ] `PLANO-LICENSE-SERVER.md` — endpoint
-- [ ] Runbook: "cliente cancelou — o que esperar e quando"
+- [x] `MANUAL-USO-LICENCAS.md` — secção cancelamento comercial (§5.5)
+- [x] `PLANO-LICENSE-SERVER.md` — endpoint check-in
+- [x] `MANUAL-INSTALL.md` — release `1.8.11_68`
 
 ---
 

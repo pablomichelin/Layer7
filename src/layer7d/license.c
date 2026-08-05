@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -600,6 +601,8 @@ layer7_activate(const char *key, const char *url)
 		struct l7_license_info li;
 
 		if (layer7_license_check(&li) == 0) {
+			(void)layer7_checkin_store_key(key);
+			layer7_checkin_mark_ok_from_activate();
 			fprintf(stderr,
 			    "layer7d: license valid — customer=%s "
 			    "expiry=%s features=%s\n",
@@ -614,4 +617,450 @@ layer7_activate(const char *key, const char *url)
 		    li.error);
 		return -1;
 	}
+}
+
+/* --- BG-077: online check-in / remote revocation --- */
+
+#define L7_CHECKIN_BODY_TMP "/tmp/layer7-checkin.body"
+#define L7_CHECKIN_HTTP_TMP "/tmp/layer7-checkin.http"
+#define L7_CHECKIN_DEFAULT_URL \
+	"https://license.systemup.inf.br/api/license/check-in"
+
+struct l7_checkin_state {
+	char license_key[65];
+	time_t last_check_in_ok;
+	time_t last_check_in_attempt;
+	int check_in_interval_hours;
+	int max_offline_hours;
+	char last_error[256];
+};
+
+static void
+checkin_cleanup_temp(void)
+{
+	(void)unlink(L7_CHECKIN_BODY_TMP);
+	(void)unlink(L7_CHECKIN_HTTP_TMP);
+}
+
+static int
+parse_bool_json_value(const char *p)
+{
+	if (!p)
+		return 0;
+	while (*p && *p != ':')
+		p++;
+	if (*p != ':')
+		return 0;
+	p++;
+	while (*p == ' ' || *p == '\t')
+		p++;
+	if (strncmp(p, "true", 4) == 0)
+		return 1;
+	return 0;
+}
+
+static int parse_int_json_field(const char *json, const char *key, int *out)
+{
+	char needle[128];
+	const char *p;
+	int value;
+
+	snprintf(needle, sizeof(needle), "\"%s\"", key);
+	p = strstr(json, needle);
+	if (!p)
+		return -1;
+	p += strlen(needle);
+	while (*p && (*p == ' ' || *p == '\t' || *p == ':'))
+		p++;
+	value = (int)strtol(p, NULL, 10);
+	if (value <= 0)
+		return -1;
+	*out = value;
+	return 0;
+}
+
+static int
+parse_time_json_field(const char *json, const char *key, time_t *out)
+{
+	char needle[128];
+	const char *p;
+	long value;
+
+	snprintf(needle, sizeof(needle), "\"%s\"", key);
+	p = strstr(json, needle);
+	if (!p)
+		return -1;
+	p += strlen(needle);
+	while (*p && (*p == ' ' || *p == '\t' || *p == ':'))
+		p++;
+	value = strtol(p, NULL, 10);
+	if (value < 0)
+		return -1;
+	*out = (time_t)value;
+	return 0;
+}
+
+static void
+checkin_state_defaults(struct l7_checkin_state *st)
+{
+	memset(st, 0, sizeof(*st));
+	st->check_in_interval_hours = L7_CHECKIN_DEFAULT_INTERVAL_HOURS;
+	st->max_offline_hours = L7_CHECKIN_DEFAULT_MAX_OFFLINE_HOURS;
+}
+
+static int
+checkin_load_state(struct l7_checkin_state *st)
+{
+	char *raw;
+	size_t len;
+
+	checkin_state_defaults(st);
+	raw = read_file_alloc(L7_CHECKIN_STATE_PATH, &len);
+	if (!raw)
+		return 0;
+
+	(void)json_find_string(raw, "license_key", st->license_key,
+	    sizeof(st->license_key));
+	(void)parse_time_json_field(raw, "last_check_in_ok",
+	    &st->last_check_in_ok);
+	(void)parse_time_json_field(raw, "last_check_in_attempt",
+	    &st->last_check_in_attempt);
+	(void)parse_int_json_field(raw, "check_in_interval_hours",
+	    &st->check_in_interval_hours);
+	(void)parse_int_json_field(raw, "max_offline_hours",
+	    &st->max_offline_hours);
+	(void)json_find_string(raw, "last_error", st->last_error,
+	    sizeof(st->last_error));
+
+	free(raw);
+	return st->license_key[0] != '\0' ? 1 : 0;
+}
+
+static int
+checkin_save_state(const struct l7_checkin_state *st)
+{
+	FILE *f;
+
+	f = fopen(L7_CHECKIN_STATE_PATH, "w");
+	if (!f)
+		return -1;
+
+	fprintf(f,
+	    "{\n"
+	    "  \"license_key\": \"%s\",\n"
+	    "  \"last_check_in_ok\": %lld,\n"
+	    "  \"last_check_in_attempt\": %lld,\n"
+	    "  \"check_in_interval_hours\": %d,\n"
+	    "  \"max_offline_hours\": %d,\n"
+	    "  \"last_error\": \"%s\"\n"
+	    "}\n",
+	    st->license_key,
+	    (long long)st->last_check_in_ok,
+	    (long long)st->last_check_in_attempt,
+	    st->check_in_interval_hours,
+	    st->max_offline_hours,
+	    st->last_error);
+
+	fclose(f);
+	(void)chmod(L7_CHECKIN_STATE_PATH, 0600);
+	return 0;
+}
+
+static int
+checkin_interval_seconds(const struct l7_checkin_state *st)
+{
+	const char *env;
+	long override;
+
+	env = getenv("L7_CHECK_IN_INTERVAL_SEC");
+	if (env && env[0] != '\0') {
+		override = strtol(env, NULL, 10);
+		if (override > 0)
+			return (int)override;
+	}
+
+	if (st->check_in_interval_hours > 0)
+		return st->check_in_interval_hours * 3600;
+	return L7_CHECKIN_DEFAULT_INTERVAL_HOURS * 3600;
+}
+
+static void
+checkin_invalidate_local(struct l7_checkin_state *st, const char *reason)
+{
+	(void)unlink(L7_LIC_PATH);
+	if (reason && reason[0] != '\0') {
+		snprintf(st->last_error, sizeof(st->last_error), "%s", reason);
+	} else {
+		st->last_error[0] = '\0';
+	}
+}
+
+int
+layer7_checkin_store_key(const char *key)
+{
+	struct l7_checkin_state st;
+
+	if (!key || key[0] == '\0' || !json_safe_string(key))
+		return -1;
+
+	checkin_state_defaults(&st);
+	if (checkin_load_state(&st))
+		; /* keep intervals if file existed */
+	snprintf(st.license_key, sizeof(st.license_key), "%s", key);
+	return checkin_save_state(&st);
+}
+
+void
+layer7_checkin_mark_ok_from_activate(void)
+{
+	struct l7_checkin_state st;
+	time_t now = time(NULL);
+
+	if (!checkin_load_state(&st))
+		return;
+	st.last_check_in_ok = now;
+	st.last_check_in_attempt = now;
+	st.last_error[0] = '\0';
+	(void)checkin_save_state(&st);
+}
+
+int
+layer7_checkin_config_enabled(const char *config_path)
+{
+	char *json;
+	const char *p;
+	int enabled = 0;
+
+	if (getenv("L7_CHECK_IN_FORCE") != NULL)
+		return 1;
+
+	if (!config_path)
+		config_path = "/usr/local/etc/layer7.json";
+
+	json = read_file_alloc(config_path, NULL);
+	if (!json)
+		return 0;
+
+	p = strstr(json, "\"check_in_enabled\"");
+	if (p)
+		enabled = parse_bool_json_value(p);
+
+	free(json);
+	return enabled;
+}
+
+int
+layer7_checkin_due(time_t now)
+{
+	struct l7_checkin_state st;
+	int interval_sec;
+
+	if (!checkin_load_state(&st) || !st.license_key[0])
+		return 0;
+
+	interval_sec = checkin_interval_seconds(&st);
+	if (st.last_check_in_ok > 0)
+		return (now - st.last_check_in_ok) >= interval_sec;
+
+	if (st.last_check_in_attempt == 0)
+		return 1;
+	return (now - st.last_check_in_attempt) >= 3600;
+}
+
+int
+layer7_checkin_offline_expired(time_t now)
+{
+	struct l7_checkin_state st;
+	time_t anchor;
+	long max_offline_sec;
+
+	if (!checkin_load_state(&st) || !st.license_key[0])
+		return 0;
+
+	max_offline_sec = (long)st.max_offline_hours * 3600L;
+	if (max_offline_sec <= 0)
+		max_offline_sec = (long)L7_CHECKIN_DEFAULT_MAX_OFFLINE_HOURS * 3600L;
+
+	anchor = st.last_check_in_ok;
+	if (anchor <= 0)
+		anchor = st.last_check_in_attempt;
+	if (anchor <= 0)
+		return 0;
+
+	return (now - anchor) >= max_offline_sec;
+}
+
+int
+layer7_check_in(const char *url)
+{
+	struct l7_checkin_state st;
+	char hw_id[L7_HW_ID_LEN];
+	char cmd[2048];
+	char body[512];
+	char http_code[8];
+	char response_body[2048];
+	char status[32];
+	char server_error[256];
+	int rc, http_status;
+
+	if (is_dev_key())
+		return L7_CHECKIN_SKIP;
+
+	if (!checkin_load_state(&st) || !st.license_key[0]) {
+		fprintf(stderr,
+		    "layer7d: check-in skipped — no stored license key "
+		    "(activate first)\n");
+		return L7_CHECKIN_SKIP;
+	}
+
+	if (layer7_hw_fingerprint(hw_id, sizeof(hw_id)) != 0) {
+		fprintf(stderr,
+		    "layer7d: check-in failed — hardware fingerprint error\n");
+		return L7_CHECKIN_NETWORK;
+	}
+
+	if (!url || url[0] == '\0') {
+		url = getenv("L7_CHECK_IN_URL");
+		if (!url || url[0] == '\0')
+			url = L7_CHECKIN_DEFAULT_URL;
+	}
+	if (!shell_safe_url(url)) {
+		fprintf(stderr, "layer7d: check-in URL must be https and shell-safe\n");
+		return L7_CHECKIN_NETWORK;
+	}
+
+	st.last_check_in_attempt = time(NULL);
+	checkin_cleanup_temp();
+
+	snprintf(body, sizeof(body),
+	    "{\"key\":\"%s\",\"hardware_id\":\"%s\"}",
+	    st.license_key, hw_id);
+
+	snprintf(cmd, sizeof(cmd),
+	    "curl -sS -o %s -w '%%{http_code}' -X POST "
+	    "-H 'Content-Type: application/json' "
+	    "-d '%s' '%s' > %s 2>/dev/null",
+	    L7_CHECKIN_BODY_TMP, body, url, L7_CHECKIN_HTTP_TMP);
+
+	rc = system(cmd);
+	if (rc != 0 || read_text_file_trim(L7_CHECKIN_HTTP_TMP, http_code,
+	    sizeof(http_code)) != 0) {
+		snprintf(st.last_error, sizeof(st.last_error),
+		    "license server unreachable");
+		(void)checkin_save_state(&st);
+		checkin_cleanup_temp();
+		fprintf(stderr,
+		    "layer7d: check-in failed — could not reach license server "
+		    "at %s\n", url);
+		return L7_CHECKIN_NETWORK;
+	}
+
+	http_status = atoi(http_code);
+	if (read_text_file_trim(L7_CHECKIN_BODY_TMP, response_body,
+	    sizeof(response_body)) != 0)
+		response_body[0] = '\0';
+
+	if (http_status >= 200 && http_status <= 299) {
+		if (!json_find_string(response_body, "status", status,
+		    sizeof(status)) || strcmp(status, "active") != 0) {
+			snprintf(st.last_error, sizeof(st.last_error),
+			    "unexpected check-in status");
+			(void)checkin_save_state(&st);
+			checkin_cleanup_temp();
+			return L7_CHECKIN_NETWORK;
+		}
+
+		{
+			int interval = st.check_in_interval_hours;
+			int max_offline = st.max_offline_hours;
+
+			if (parse_int_json_field(response_body,
+			    "check_in_interval_hours", &interval) == 0)
+				st.check_in_interval_hours = interval;
+			if (parse_int_json_field(response_body,
+			    "max_offline_hours", &max_offline) == 0)
+				st.max_offline_hours = max_offline;
+		}
+
+		st.last_check_in_ok = time(NULL);
+		st.last_error[0] = '\0';
+		(void)checkin_save_state(&st);
+		checkin_cleanup_temp();
+		fprintf(stderr, "layer7d: check-in OK — license active\n");
+		return L7_CHECKIN_OK;
+	}
+
+	server_error[0] = '\0';
+	status[0] = '\0';
+	(void)json_find_string(response_body, "status", status, sizeof(status));
+	(void)json_find_string(response_body, "error", server_error,
+	    sizeof(server_error));
+
+	if (http_status == 409 &&
+	    (strcmp(status, "revoked") == 0 ||
+	     strcmp(status, "expired") == 0 ||
+	     server_error[0] != '\0')) {
+		if (server_error[0] != '\0')
+			snprintf(st.last_error, sizeof(st.last_error), "%s",
+			    server_error);
+		else if (strcmp(status, "expired") == 0)
+			snprintf(st.last_error, sizeof(st.last_error),
+			    "Licenca expirada.");
+		else
+			snprintf(st.last_error, sizeof(st.last_error),
+			    "Licenca revogada.");
+
+		checkin_invalidate_local(&st, st.last_error);
+		(void)checkin_save_state(&st);
+		checkin_cleanup_temp();
+		fprintf(stderr, "layer7d: check-in denied — %s\n",
+		    st.last_error);
+		return L7_CHECKIN_DENIED;
+	}
+
+	if (server_error[0] != '\0')
+		snprintf(st.last_error, sizeof(st.last_error), "%s", server_error);
+	else
+		snprintf(st.last_error, sizeof(st.last_error),
+		    "check-in rejected (HTTP %d)", http_status);
+	(void)checkin_save_state(&st);
+	checkin_cleanup_temp();
+	fprintf(stderr, "layer7d: check-in failed — %s\n", st.last_error);
+	return L7_CHECKIN_NETWORK;
+}
+
+int
+layer7_checkin_get_status(struct l7_checkin_status *st)
+{
+	struct l7_checkin_state state;
+	time_t now;
+
+	if (!st)
+		return -1;
+
+	memset(st, 0, sizeof(*st));
+	st->interval_hours = L7_CHECKIN_DEFAULT_INTERVAL_HOURS;
+	st->max_offline_hours = L7_CHECKIN_DEFAULT_MAX_OFFLINE_HOURS;
+
+	if (!checkin_load_state(&state))
+		return 0;
+
+	st->last_ok = state.last_check_in_ok;
+	st->last_attempt = state.last_check_in_attempt;
+	st->interval_hours = state.check_in_interval_hours;
+	st->max_offline_hours = state.max_offline_hours;
+	snprintf(st->last_error, sizeof(st->last_error), "%s",
+	    state.last_error);
+
+	now = time(NULL);
+	if (state.last_check_in_ok > 0) {
+		st->ok = 1;
+		st->next_due = state.last_check_in_ok +
+		    (time_t)checkin_interval_seconds(&state);
+	} else if (state.last_check_in_attempt > 0) {
+		st->next_due = state.last_check_in_attempt + 3600;
+	} else {
+		st->next_due = now;
+	}
+	return 0;
 }

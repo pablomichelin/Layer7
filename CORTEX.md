@@ -1221,16 +1221,16 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: 4.2 (Onda C — F3) / depois 5.1 (Onda D)
-- Onda: C — **PARCIAL** (S07 **PASS** reteste; S09/S13 PARTIAL)
-- Candidato lab: 1.8.11_66 (publicado)
+- Passo actual: **5.1** (Onda D — F4 lab) | Onda C **PASS** | F3 **FECHADA**
+- Onda: C — **PASS**; D — **em curso** (10a/10b/11 PASS; build `_69` pendente)
+- Candidato lab: 1.8.11_69
 - Produção enforce: 1.8.11_24 (até GO Onda F)
-- Canal latest: 1.8.11_66
+- Canal latest: 1.8.11_69
 - G0-G1: PASS | G2-G4: PASS | G5: PASS | G6-G7: PENDENTE
-- F3: ABERTA — S07 PASS; **BG-077** check-in/revogação remota planeada (ADR-0021)
-- License server: fix `isLicenseExpired` deployado em `244` (`2026-08-04`)
-- Evidência S07 reteste: `docs/tests/evidence/20260804T234000Z-ondaC-s07-retest/`
-- Próximo: S09/S13 completar **ou** Onda D 5.1
+- F3: **FECHADA** (`2026-08-04`) — `F3 pode fechar`; S13 `20260804T212000Z-ondaC-s13-drift-PASS`
+- Evidência F3: `docs/tests/evidence/20260804T211500Z-ondaC-f3-report/F3-PODE-FECHAR.md`
+- Evidência Onda D: `20260804T211600Z-ondaD-f4-10a-PASS`, `20260804T212200Z-ondaD-f4-10b-PASS`, `20260804T212300Z-ondaD-f4-11-PASS`
+- Próximo: build/release `1.8.11_69`; G6–G7
 - Modo: agente único
 ```
 

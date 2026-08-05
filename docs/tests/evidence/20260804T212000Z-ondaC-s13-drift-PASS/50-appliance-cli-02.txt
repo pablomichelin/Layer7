@@ -1,0 +1,10 @@
+phase=post-drift
+drift_method=ifconfig_em0_ether
+drift_detail=em0 MAC 00:50:56:88:e1:33 -> 02:11:22:33:44:55
+kern.hostuuid=f44d4d56-4a12-95c7-1099-1ebd8b33f579
+---
+em0 ether 02:11:22:33:44:55
+---
+fingerprint=082fba6d116ad43cd08034a43bf022683fc396fbe8efabc4af9a36939565312c
+valid=0
+error=hardware mismatch: license=e31560f5 local=082fba6d

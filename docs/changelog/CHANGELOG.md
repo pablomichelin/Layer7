@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased] — License server + daemon (S07 / F3)
 
+### Added
+
+- **BG-077 — check-in online (Bloco 1):** `POST /api/license/check-in` no
+  license-server (`check-in.js`, `check_ins_log`); deploy em `192.168.100.244`.
+- **BG-077 — check-in online (Bloco 2):** `layer7d` com `--check-in`,
+  scheduler periódico, persistência `/var/db/layer7-checkin.json`, flag
+  `check_in_enabled` em `layer7.json`, stats JSON (`license_check_in_*`).
+
 ### Fixed
 
 - **License server — activação de licença expirada (S07):** `isLicenseExpired()`
@@ -21,6 +29,30 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - `license-server/backend/src/crud-validation.test.js` — `Date` PostgreSQL.
 - `license-server/backend/src/license-state.test.js` — estado efectivo expirado.
+
+## [1.8.11_69] - 2026-08-04 — fix SIGHUP updater blacklists (F4.2)
+
+### Fixed
+
+- **`update-blacklists.sh` — `send_sighup` com pidfile sem newline:** `daemon(8)`
+  grava `/var/run/layer7d.pid` sem `\n` final; `read` preenchia o PID mas
+  devolvia rc≠0, gerando falso `WARN: cannot read pidfile`. Alinhado a
+  `rc.d/layer7d` e `layer7-stats-collect.sh`. Onda D sec. **10b** PASS.
+
+### Tests
+
+- Evidência lab: `docs/tests/evidence/20260804T212200Z-ondaD-f4-10b-PASS/`
+
+## [1.8.11_68] - 2026-08-04 — BG-077: check-in online e revogação remota (daemon)
+
+### Added
+
+- **`layer7d --check-in`:** consulta `POST /api/license/check-in`; revogação/
+  expiração remota remove `.lic` e desliga enforce.
+- **Scheduler:** quando `check_in_enabled=true` em `layer7.json`; estado em
+  `/var/db/layer7-checkin.json`; chave guardada na activação.
+- **Stats:** `license_check_in_enabled`, `license_check_in_ok`,
+  `license_last_check_in`, `license_next_check_in`, `license_check_in_error`.
 
 ## [1.8.11_67] - 2026-08-04 — Fix: mensagens activate + defesa .lic inválido (S07 daemon)
 

@@ -12,15 +12,15 @@
 
 | Campo | Valor actual (`2026-08-04`) |
 |-------|-----------------------------|
-| **Fase roadmap** | F4 aberta (F3 aberta); F0–F2 concluídas |
-| **Canal público `latest`** | `1.8.11_65` — `SHA256=e7c8ca44f34e19da3a2958eacfd09fce5c77c77d5acd6d8633e9ca9d42cdd48e` |
+| **Fase roadmap** | F4 aberta (F3 **fechada** `2026-08-04`); F0–F2 concluídas |
+| **Canal público `latest`** | `1.8.11_69` |
 | **Produção enforce (referência)** | `1.8.11_24` — `SHA256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818` |
-| **Candidato lab para gates** | **`1.8.11_65`** (fixado no passo 1.1; inclui BG-075 VIP PF + daemon `_64`; `_65` = só GUI) |
-| **`PORTVERSION` / `PORTREVISION` no repo** | `1.8.11` / `65` |
+| **Candidato lab para gates** | **`1.8.11_69`** |
+| **`PORTVERSION` / `PORTREVISION` no repo** | `1.8.11` / `69` |
 | **Appliance lab observado** | `192.168.100.254` — pfSense **Plus** `26.03.1` / FreeBSD `16` (validar CE na Onda E) |
 | **Builder** | `192.168.100.12` — FreeBSD `15.0-RELEASE` |
 | **Gates G2–G7** | **PENDENTES** no appliance (`plano-gates-producao.md`) |
-| **F3** | Aberta — campanha F3.9 concluiu «F3 não pode fechar» |
+| **F3** | **Fechada** (`2026-08-04`) — `F3 pode fechar`; evidência Onda C |
 | **Passo actual do plano** | Ver checklist em `CORTEX.md` (secção *Plano mestre*) |
 
 **Regra dual-canal:** `latest` ≠ GO enforce. Instalar `latest` em lab é permitido; tratar como **candidato** até G2–G7 + veredicto humano.
@@ -268,6 +268,18 @@ Paralelo PROIBIDO:
 | **Multitarefa** | **Não** paralelo com Onda B no **mesmo** appliance se ambos mudam estado; OK sequencial ou appliance dedicado |
 | **Saída** | F3 fechada no CORTEX/roadmap |
 
+#### Trilha paralela F3 — BG-077 (check-in online / revogação remota)
+
+| Campo | Conteúdo |
+|-------|----------|
+| **Objectivo** | Cancelamento comercial corta enforce no appliance sem acesso físico |
+| **SSOT** | `docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md`; ADR-0021 |
+| **Backlog** | BG-077 |
+| **Relação com Onda C** | Complementa DR-05 (S09/S14); **não substitui** passos 4.1–4.2 |
+| **Multitarefa** | Bloco 1 (license-server) **pode** correr em paralelo com docs/evidência 4.2; Blocos 2–3 exigem build `.pkg` e appliance |
+| **Gate comercial** | Desejável **antes** do GO Onda F (revogação remota) |
+| **Saída** | API `POST /api/license/check-in` + daemon + cenário S14 PASS |
+
 ### Onda D — VIP + F4 evidência
 
 | Campo | Conteúdo |
@@ -383,6 +395,9 @@ Usar esta lista como **fila única**. Marcar no CORTEX o passo actual.
 | 3.2 | B | Smoke scoped | script exit 0 | Agente único | Commit se fix |
 | 4.1 | C | DR-05 campanha | Evidências S* | Agente único | Pack F3 |
 | 4.2 | C | Relatório F3 | `F3 pode fechar` | Agente único | Commit docs |
+| 4.3 | C / F3 | BG-077 Bloco 1 — API check-in | `POST /api/license/check-in` + testes | Agente único | Commit backend |
+| 4.4 | C / F3 | BG-077 Blocos 2–3 | daemon + S14 PASS | Agente único | PORTREVISION + evidência |
+| 4.5 | C / F3 | BG-077 Bloco 4 | runbook cancelamento | Agente único | Commit docs |
 | 5.1 | D | Lab 10a/10b/11 | F4 evidência | Agente único | Commit docs |
 | 5.2 | D | Lab VIP §20 | VIP live OK | Agente único | Commit docs |
 | 6.1 | E | CE passivo | Matriz CE | Agente único | Commit docs |

@@ -1,0 +1,18 @@
+pkg: pfSense-pkg-layer7-1.8.11_68
+
+layer7.json: mode=enforce, interfaces=["vmx0","vmx0.95"]
+blacklist rule g5-test-bl: force_dns=true, src_cidrs=["192.168.100.0/24"]
+
+pfctl -s nat | grep -E "port = domain|127.0.0.1":
+rdr on vmx0 inet proto udp from 192.168.100.0/24 to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto tcp from 192.168.100.0/24 to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto udp from 192.168.100.0/24 to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto tcp from 192.168.100.0/24 to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+
+(4 linhas CIDR blacklist + 4 linhas block_page force_dns global — comportamento esperado)
+
+nat load warnings: none in system.log tail

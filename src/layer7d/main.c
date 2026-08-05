@@ -96,6 +96,7 @@ static int s_cap_interfaces;
 
 static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
+static time_t s_last_checkin_tick;
 static int s_license_state = -1; /* 0=invalid, 1=valid, 2=grace/dev */
 
 static struct l7_blacklist *s_blacklist;
@@ -249,6 +250,24 @@ write_stats_json(void)
 	fprintf(f, "  \"license_error\": \"");
 	json_escape_fprint(f, s_lic.error);
 	fprintf(f, "\",\n");
+
+	{
+		struct l7_checkin_status ci;
+
+		memset(&ci, 0, sizeof(ci));
+		(void)layer7_checkin_get_status(&ci);
+		fprintf(f, "  \"license_check_in_enabled\": %s,\n",
+		    layer7_checkin_config_enabled(config_path) ? "true" : "false");
+		fprintf(f, "  \"license_check_in_ok\": %s,\n",
+		    ci.ok ? "true" : "false");
+		fprintf(f, "  \"license_last_check_in\": %lld,\n",
+		    (long long)ci.last_ok);
+		fprintf(f, "  \"license_next_check_in\": %lld,\n",
+		    (long long)ci.next_due);
+		fprintf(f, "  \"license_check_in_error\": \"");
+		json_escape_fprint(f, ci.last_error);
+		fprintf(f, "\",\n");
+	}
 
 	fprintf(f, "  \"bl_enabled\": %s,\n",
 	    s_bl_n_rules > 0 ? "true" : "false");
@@ -745,6 +764,8 @@ pf_table_flush_logged(const char *table, const char *ctx)
 		    table, ctx ? ctx : "-");
 }
 
+static void refresh_enforce_cfg(void);
+
 static void
 enforce_ge_downgrade(int prev_ge, const char *reason)
 {
@@ -753,6 +774,62 @@ enforce_ge_downgrade(int prev_ge, const char *reason)
 		    "flushing PF dynamic tables",
 		    reason ? reason : "enforce_downgrade");
 		enforcement_flush_all_tables();
+	}
+}
+
+static void
+license_apply_invalidation(const char *reason)
+{
+	struct l7_license_info li;
+	int prev_ge = s_ge;
+
+	memset(&li, 0, sizeof(li));
+	(void)layer7_license_check(&li);
+	s_lic = li;
+	s_license_state = 0;
+	s_ge = 0;
+	refresh_enforce_cfg();
+	enforce_ge_downgrade(prev_ge, reason);
+}
+
+static void
+license_checkin_tick(void)
+{
+	time_t tnow = time(NULL);
+	int result;
+
+	if (!layer7_checkin_config_enabled(config_path))
+		return;
+
+	if (layer7_checkin_offline_expired(tnow)) {
+		(void)unlink(L7_LIC_PATH);
+		L7_WARN("license_checkin: max offline exceeded — "
+		    "invalidating local license");
+		license_apply_invalidation("license_checkin_offline");
+		return;
+	}
+
+	if (!layer7_checkin_due(tnow))
+		return;
+	if (s_last_checkin_tick != 0 &&
+	    tnow - s_last_checkin_tick < 60)
+		return;
+
+	s_last_checkin_tick = tnow;
+	result = layer7_check_in(NULL);
+	if (result == L7_CHECKIN_DENIED ||
+	    result == L7_CHECKIN_OFFLINE_MAX) {
+		L7_WARN("license_checkin: remote denial — enforce disabled");
+		license_apply_invalidation("license_checkin");
+	} else if (result == L7_CHECKIN_OK) {
+		struct l7_license_info li;
+
+		memset(&li, 0, sizeof(li));
+		if (layer7_license_check(&li) == 0) {
+			s_lic = li;
+			s_license_state = (li.grace || li.dev_mode) ? 2 : 1;
+			refresh_enforce_cfg();
+		}
 	}
 }
 
@@ -1818,6 +1895,7 @@ static void usage(void)
 	    "usage: layer7d [-V] [-t] [-c path] [-d DST] [-e IP APP [CAT]] [-n] "
 	    "[--list-protos]\n"
 	    "               [--fingerprint] [--activate KEY [URL]]\n"
+	    "               [--check-in [URL]] [--license-status]\n"
 	    "  -V               versão do binário\n"
 	    "  -t               testa JSON (stdout)\n"
 	    "  -c path          caminho (omissão: %s)\n"
@@ -1827,6 +1905,7 @@ static void usage(void)
 	    "  --list-protos    lista protocolos e categorias nDPI em JSON\n"
 	    "  --fingerprint    mostra o hardware ID desta máquina\n"
 	    "  --activate KEY   activa licença online (KEY + URL opcional)\n"
+	    "  --check-in [URL] força check-in online (BG-077)\n"
 	    "  --license-status estado da licença em chave=valor (exit 0 se válida)\n"
 	    "  runtime: SIGHUP reload; SIGUSR1 stats; nDPI→pf via policy\n",
 	    DEFAULT_CONFIG);
@@ -2360,6 +2439,19 @@ int main(int argc, char **argv)
 				url = argv[vi + 2];
 			return layer7_activate(key, url);
 		}
+		if (strcmp(argv[vi], "--check-in") == 0) {
+			const char *url = NULL;
+			int result;
+
+			if (vi + 1 < argc && argv[vi + 1][0] != '-')
+				url = argv[vi + 1];
+			result = layer7_check_in(url);
+			if (result == L7_CHECKIN_OK)
+				return 0;
+			if (result == L7_CHECKIN_SKIP)
+				return 2;
+			return 1;
+		}
 		/*
 		 * BG-032 (Bloco 6): CLI `--license-status` para inspeccao
 		 * sem precisar de syslog. Imprime estado da licenca actual
@@ -2817,6 +2909,8 @@ int main(int argc, char **argv)
 				s_license_state = new_state;
 			}
 		}
+
+		license_checkin_tick();
 
 		s_loop_ticks++;
 		tick++;

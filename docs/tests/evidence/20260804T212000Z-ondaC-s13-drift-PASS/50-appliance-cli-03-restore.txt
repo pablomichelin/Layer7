@@ -1,0 +1,6 @@
+phase=post-restore
+fingerprint=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+valid=1
+customer=Systemup
+expiry=2028-07-08
+features=full

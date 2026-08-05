@@ -11,6 +11,8 @@ const {
 } = require('./admin-surface');
 const authRoutes = require('./routes/auth');
 const activateRoutes = require('./routes/activate');
+const checkInRoutes = require('./routes/check-in');
+const { ensureCheckInSchema } = require('./check-in-schema');
 const licensesRoutes = require('./routes/licenses');
 const customersRoutes = require('./routes/customers');
 const dashboardRoutes = require('./routes/dashboard');
@@ -31,6 +33,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api', activateRoutes);
+app.use('/api', checkInRoutes);
 app.use('/api/licenses', licensesRoutes);
 app.use('/api/customers', customersRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -62,6 +65,7 @@ async function startServer() {
     await ensureSessionSchema();
     await ensureAdminSurfaceSchema();
     await ensureCrudIntegritySchema();
+    await ensureCheckInSchema();
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`[API] Layer7 License Server running on port ${PORT}`);
     });
