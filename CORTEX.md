@@ -1256,7 +1256,10 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J.
 - **Campanha two-client:** [`docs/tests/evidence/20260805T162500Z-prod-align-two-client-1.9.8/`](docs/tests/evidence/20260805T162500Z-prod-align-two-client-1.9.8/)
 
 > Passos **12.x** da trilha IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
-> Não existe outro ficheiro START-HERE para esta fila.
+> Não existe outro ficheiro START-HERE **para a fila IPv6** (usar
+> `START-HERE-fecho-producao.md` para manutenção). A trilha Identity+MITM tem
+> arranque próprio: `START-HERE-identity-mitm.md`.
+
 
 **Estado:** trilha IPv6 **FECHADA** (V0–V6). Dual-stack comercial no âmbito
 documentado; `latest` e produção enforce **alinhados** em **`1.9.8`**.
@@ -1279,6 +1282,45 @@ TRILHA IPv6 — progresso
 
 ---
 
+## Trilha Identity + MITM Add-on (aberta 2026-08-05)
+
+Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
+Baseline produção / `latest`: **`1.9.8`**. Código de produto **ainda não**
+iniciado nesta trilha (IM0 documental).
+
+- **Arranque (único desta trilha):**
+  [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
+- **Plano SSOT:**
+  [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
+- **Mapa:**
+  [`docs/01-architecture/identity-mitm-mapa-rastreabilidade.md`](docs/01-architecture/identity-mitm-mapa-rastreabilidade.md)
+- **Gates GI0–GI9:**
+  [`docs/09-blocking/plano-gates-identity-mitm.md`](docs/09-blocking/plano-gates-identity-mitm.md)
+- **ADRs Proposto:** [0025](docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md)
+  (SKU X/Y), [0026](docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (MITM
+  opt-in), [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md)
+  (User-ID multi-fonte; **sem** captive),
+  [0028](docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md)
+  (concorrência/IO daemon — pré-requisito IM3–IM5)
+- **Backlog:** BG-085…BG-092
+- **Ordem:** IM0 → IM1 → spike MITM (GO/DEFER) → IM3–IM6 Identity (mapa
+  daemon; pode avançar se MITM DEFER) → IM7–IM8 → IM9
+- **Não-regressão:** módulos default OFF; daemon autoridade do gate
+- **Rev. plano:** `2026-08-05c` (contratos técnicos fechados; código não iniciado)
+
+```text
+TRILHA IDENTITY + MITM — progresso
+- Passo actual: **20.2 / IM0** (aceitar ADR-0025/0026/0027/0028 + GO T1/T2)
+- IM0: 20.1 PASS; rev.b PASS; **rev.c contratos técnicos PASS**; 20.2 PENDENTE
+- IM1–IM9: PENDENTE
+- Código produto: **NÃO iniciado**
+- Plano rev.: 2026-08-05c (ADR-0028 concorrência; contrato features P1–P6; check-in ∩ .lic; §3.1 first-match; spike S1–S8; canal DC A1–A7; NAT multi-user; passo 20.11a)
+- Baseline enforce: 1.9.8
+- Próximo quando iniciar: GO humano T1 vs T2 + marcar ADRs Aceito (ainda sem código)
+```
+
+---
+
 ## Ordem de leitura obrigatoria
 
 ### Para qualquer novo chat ou agente
@@ -1294,7 +1336,15 @@ TRILHA IPv6 — progresso
 9. [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
 10. [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md)
 
-### Para a trilha de fecho / consolidacao / IPv6 (arranque único)
+### Para a trilha Identity + MITM Add-on
+
+1. [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
+2. `AGENTS.md`
+3. `CORTEX.md` (secção *Trilha Identity + MITM*)
+4. [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
+5. Mapa + gates + ADRs 0025–0027
+
+### Para a trilha de fecho / consolidacao / IPv6 (manutenção)
 
 1. `CORTEX.md` (inclui passo actual — secção Trilha IPv6)
 2. [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
@@ -1440,13 +1490,15 @@ CHECKPOINT CANONICO
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
 - Canal publico latest / producao enforce: **1.9.8** (alinhados; SHA256 22963924…; rollback 1.9.0)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
+- Trilha Identity + MITM: **ABERTA** — passo 20.2/IM0 (ADRs Aceito + T1/T2); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: manutenção / **novos planos com GO** (ESTADO-PRODUTO §6); BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: **Identity+MITM 20.2** (aceitar ADR-0025/0026/0027/0028 + GO T1/T2); depois IM1 entitlements; manutenção; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
-- Arranque chat: docs/00-overview/START-HERE-fecho-producao.md
+- Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
+- Arranque Identity+MITM: docs/00-overview/START-HERE-identity-mitm.md
 ```
 
 ---

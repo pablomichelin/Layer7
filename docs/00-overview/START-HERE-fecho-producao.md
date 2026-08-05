@@ -3,20 +3,28 @@
 > **Visual:** as filas P0–J e IPv6 V0–V6 estão **FECHADAS**.  
 > Este ficheiro é o **arranque de manutenção** — não um plano aberto.
 
-**Único ficheiro de arranque** para retomar o projecto após o fecho das filas
-produção + IPv6. Colar só este caminho num chat limpo:
+**Arranque de manutenção** após o fecho das filas produção + IPv6. Colar só este
+caminho num chat limpo **se o trabalho for manutenção / não Identity+MITM**:
 
 ```text
 docs/00-overview/START-HERE-fecho-producao.md
 ```
 
+**Trilha activa Identity + MITM Add-on** — arranque dedicado (não misturar):
+
+```text
+docs/00-overview/START-HERE-identity-mitm.md
+```
+
 | Documento | Papel |
 |-----------|--------|
-| **Este ficheiro** | Arranque de chat |
+| **Este ficheiro** | Arranque de chat (**manutenção** pós-fecho) |
+| [`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md) | Arranque da trilha **Identity + MITM** (ACTIVA) |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | **Congelamento** das filas + mapa + como abrir planos novos |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** |
 
-**Não criar** outro `START-HERE-*.md` sem GO e registo no CORTEX/`docs/README.md`.
+**Não criar** outro `START-HERE-*.md` sem GO e registo no CORTEX/`docs/README.md`
+(excepção registada: Identity+MITM).
 
 ---
 

@@ -59,7 +59,15 @@ vence o canónico.
 | `docs/00-overview/document-equivalence-map.md` | equivalencia | mapa raiz <-> docs | Canónico | novo | manter vivo ate a F6 | F0-F6 |
 | `docs/00-overview/handoff-chat-novo.md` | handoff de chat Cursor | quando/como abrir chat novo, prompt de continuacao, verificacao opcional pos-clone (`check-port-files`, `smoke-layer7d` por SO) e ligacao a F3/F4 no lab | Canónico | concretiza a politica de continuidade do `CORTEX.md` para contexto longo | manter alinhado ao `CORTEX` e a `docs/README.md` | F0+ |
 | `docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | fecho consolidado filas | congelamento P0–J + IPv6 + mapa navegação + porta planos novos | Canónico | complementa CORTEX (vivo) e START-HERE | actualizar só se reabrir fila ou mudar veredicto | F0+ |
-| `docs/00-overview/START-HERE-fecho-producao.md` | arranque unico chat | ponto unico de entrada pós-fecho (manutenção / novos planos) | Canónico | unico START-HERE; aponta a ESTADO-PRODUTO | manter vivo com CORTEX | F0+ |
+| `docs/00-overview/START-HERE-fecho-producao.md` | arranque manutencao pós-fecho | ponto de entrada manutenção / filas fechadas | Canónico | Identity/MITM tem START-HERE próprio | manter vivo com CORTEX | F0+ |
+| `docs/00-overview/START-HERE-identity-mitm.md` | arranque Identity+MITM | **único** arranque da trilha IM0–IM9 | Canónico | plano `plano-identity-mitm-addon.md` | manter com passo actual | novo plano |
+| `docs/02-roadmap/plano-identity-mitm-addon.md` | plano Identity+MITM | SSOT execução 20.x | Canónico | — | actualizar a cada passo | novo plano |
+| `docs/01-architecture/identity-mitm-mapa-rastreabilidade.md` | mapa Identity+MITM | NR-* + M-xx | Canónico | — | actualizar com código | novo plano |
+| `docs/09-blocking/plano-gates-identity-mitm.md` | gates GI0–GI9 | gates da trilha | Canónico | — | marcar PASS | novo plano |
+| `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Proposto até 20.2 | Canónico (Proposto) | — | Aceito no 20.2 | novo plano |
+| `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | Proposto até 20.2 | Canónico (Proposto) | emenda ADR-0017 quando ON | Aceito no 20.2 | novo plano |
+| `docs/03-adr/ADR-0027-identity-userid-multi-fonte.md` | ADR User-ID | Proposto até 20.2 | Canónico (Proposto) | evolui ADR-0011/0012 | Aceito no 20.2 | novo plano |
+| `docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md` | ADR concorrência/IO daemon | Proposto até 20.2 (ou 20.11a) | Canónico (Proposto) | pré-requisito IM3–IM5; rev.c do plano | Aceito no 20.2/20.11a | novo plano |
 | `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir | F6 H5 |
 | `docs/02-roadmap/plano-ipv6-completo.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir sem GO | F6 H5 |
 | `docs/archive/planos-fechados/*` | planos P0–J + IPv6 | histórico de filas fechadas | Historico (arquivo) | banners 【ARQUIVO · PLANO FECHADO】 | preservar | F6 H5 |

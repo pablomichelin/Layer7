@@ -44,7 +44,11 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0021](ADR-0021-check-in-online-e-revogacao-remota.md) | Check-in online e revogação remota de licença | Aceito | BG-077; `POST /api/license/check-in` + daemon; S14 PASS (`2026-08-04`) |
 | [ADR-0022](ADR-0022-compatibilidade-pfsense-ce-escopo-e-limitacao.md) | Compatibilidade pfSense CE — escopo e limitação (Onda E) | Aceito + GO Onda F | CE físico pendente; produção enforce = `_69` |
 | [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (fase 0) | Fase 1 pendente custódia chaves Ed25519 |
-| [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | V0–V2 (12.5) PASS builder; passo **12.6**; próximo `.pkg` `1.9.1` |
+| [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | Trilha IPv6 **FECHADA**; produção `1.9.8` |
+| [ADR-0025](ADR-0025-entitlements-addon-identity-mitm.md) | Entitlements add-on Identity + MITM (SKU X/Y) | **Proposto** (rev.c) | `features` CSV (contrato P1–P6, buffer 64B); gate daemon; T1/T2; check-in ∩ `.lic` |
+| [ADR-0026](ADR-0026-mitm-tls-inspection-opt-in.md) | MITM TLS inspection opt-in (CA/certificado) | **Proposto** (rev.c) | Spike 20.7 GO/NO-GO/DEFER com critérios S1–S8; não bloqueia Identity |
+| [ADR-0027](ADR-0027-identity-userid-multi-fonte.md) | Identity User-ID multi-fonte (sem captive) | **Proposto** (rev.c) | Mapa no daemon; RADIUS receiver; agente DC (canal A1–A7); fail-mode; NAT `multi-user`; cold start; escala |
+| [ADR-0028](ADR-0028-concorrencia-io-daemon-identity.md) | Concorrência e IO do daemon para Identity | **Proposto** | Sem IO bloqueante no hot path; threads + rwlock; baseline de perf; pré-requisito IM3–IM5 |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

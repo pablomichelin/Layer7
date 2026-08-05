@@ -129,7 +129,7 @@ stubs na raiz do repo. Ver equivalência. Onboarding:
 | F6 H5 (raiz legado + planos fechados) | **EXECUTADA** `2026-08-05` | `docs/archive/raiz-legado/` + `planos-fechados/` + stubs |
 | `scoped_hybrid` default produção | Não | Validado; lab usa `legacy_global` |
 | Analytics / SIEM pesado | Fora de fila | Só telemetria mínima F7 (BG-018) se GO |
-| MITM / página HTTPS “bonita” | Fora de fila | ADR-0017: HTML só HTTP |
+| MITM / Identity add-on | **Novo plano ABERTO** | [`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md); ADR-0017 mantém-se com MITM OFF |
 | Console multi-firewall | Fora de fila | — |
 | Rebind automático de licença | Fora de fila | — |
 
@@ -177,4 +177,5 @@ Responder em português.
 | Data | Evento |
 |------|--------|
 | 2026-08-05 | Criação — consolidação pós GV7.4 + campanha two-client `1.9.8` |
+| 2026-08-05 | Nota: aberto plano **Identity + MITM Add-on** (não reabre P0–J/IPv6); arranque `START-HERE-identity-mitm.md` |
 | 2026-08-05 | F6 H5 — arquivo físico raiz `00-`…`16-` + planos fecho/IPv6 |

@@ -389,3 +389,27 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] GV7.1–GV7.3 auditoria I1–I8 + release `1.9.6` — PASS (`20260805T133000Z-gv7-fecho`)
 - [x] Trilha IPv6 **FECHADA (núcleo dual-stack)** no CORTEX
 - [x] GV7.4 GO promoção enforce (`1.9.8`) — **PASS** (`20260805T150500Z-gv7.4-promocao-1.9.8`)
+
+## Trilha Identity + MITM Add-on (IM0–IM9 / passos 20.x)
+
+**Arranque:** [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
+**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md)
+**Gates:** [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)
+
+### IM0 — Governança
+
+- [x] 20.1 START-HERE + plano + mapa + gates + ADRs Proposto + índices
+- [x] rev. `b` reparos arquitectónicos (spike MITM, mapa daemon, fontes, fail-mode) — **sem código**
+- [x] rev. `c` contratos técnicos (ADR-0028 concorrência; contrato `features` P1–P6; check-in ∩ `.lic`; §3.1 first-match; spike S1–S8; canal DC A1–A7; NAT multi-user; passo 20.11a) — **sem código**
+- [ ] 20.2 Aceitar ADR-0025/0026/0027/0028 + GO transição T1/T2
+- [ ] GI0 completo
+
+### IM1–IM9
+
+- [ ] IM1 Entitlements (GI1) — BG-086
+- [ ] IM2 MITM + CA (GI2–GI3) — BG-087
+- [ ] IM3–IM4 Map + LDAP (GI4–GI5) — BG-088
+- [ ] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089
+- [ ] IM6 Políticas user/grupo (GI7) — BG-090
+- [ ] IM7–IM8 Agente/TS ou exclusão ADR (GI8) — BG-091
+- [ ] IM9 Fecho/release (GI9) — BG-092

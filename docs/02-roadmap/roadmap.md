@@ -32,8 +32,12 @@ F3/F4, GO humano, F5, F6 (arvore `docs/`) e F7 numa unica fila executavel.
 
 **Trilha IPv6:** [`plano-ipv6-completo.md`](plano-ipv6-completo.md) — **FECHADA**.
 Congelamento: [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
-Arranque: [`../00-overview/START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
+Arranque manutenção: [`../00-overview/START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
 (Não confundir passos 12.x IPv6 com `test-matrix` §12 blacklists.)
+
+**Trilha Identity + MITM Add-on:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) — **ABERTA** (IM0 / 20.1).
+Arranque: [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md).
+ADRs Proposto: 0025 / 0026 / 0027. Backlog BG-085…BG-092.
 
 ---
 

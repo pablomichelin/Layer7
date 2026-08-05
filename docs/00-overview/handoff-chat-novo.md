@@ -38,8 +38,9 @@ estado actual deixa de ser suficiente para agir sem reler o repo; o
    [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)
    se o trabalho tocou filas de fecho/IPv6.
 2. Abrir **novo chat** no mesmo workspace (Layer7).
-3. **Colar** na primeira mensagem **apenas**:
-   `docs/00-overview/START-HERE-fecho-producao.md`
+3. **Colar** na primeira mensagem **apenas** o START-HERE da trilha:
+   - manutenção pós-fecho: `docs/00-overview/START-HERE-fecho-producao.md`
+   - Identity + MITM: `docs/00-overview/START-HERE-identity-mitm.md`
    (ou o [Prompt de continuação](#prompt-de-continuacao-copiar-e-colar) se for outro tema).
 4. Opcional: anexar ou mencionar ficheiros abertos relevantes.
 5. No chat antigo, **nao** apagar; serve de arquivo informal.
@@ -58,9 +59,11 @@ estado actual deixa de ser suficiente para agir sem reler o repo; o
 
 ## Prompt de continuação (copiar e colar)
 
-**Trilha activa (IPv6 / fecho):** preferir colar só o caminho de
-[`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md) e o prompt
-desse ficheiro — é o arranque único.
+**Trilha Identity + MITM (activa):** colar
+[`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md).
+
+**Manutenção pós-fecho / IPv6 fechada:** colar
+[`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md).
 
 Para handoff genérico (fora da trilha), substitui apenas o que estiver entre
 `<>`; remove as linhas de instrução se preferires uma mensagem mais curta.
