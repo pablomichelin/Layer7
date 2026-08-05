@@ -28,11 +28,11 @@ O enforcement atual do produto já faz:
 
 ### IPv6 / dual-stack (honestidade — ADR-0024)
 
-**Estado em `1.9.0` / candidato `1.9.0_1`:** a captura nDPI continua
-**IPv4-only** (FP-010 → V2–V3). Em **`scoped_hybrid`**, as regras PF scoped
-(`pdst` / `psrc` / `pallow` / `pexc` / `exc_allow`) emitem pares
-**`inet` + `inet6`** desde o passo **12.3** (REV-018). Hosts/CIDRs IPv4 na
-regra ficam só em `inet`; IPv6 válidos só em `inet6`.
+**Estado em `1.9.0`:** a captura nDPI continua **IPv4-only** (FP-010 → V2–V3).
+Em **`scoped_hybrid`**, as regras PF scoped (`pdst` / `psrc` / `pallow` /
+`pexc` / `exc_allow`) emitem pares **`inet` + `inet6`** desde o passo **12.3**
+(REV-018). Hosts/CIDRs IPv4 na regra ficam só em `inet`; IPv6 válidos só em
+`inet6`.
 
 **Salvaguardas V1 (mapa §8):** regras `to !<localsubnets>` dependem da tabela
 `localsubnets` do pfSense incluir prefixos IPv6 locais (S-02). Não se emite
@@ -43,7 +43,7 @@ com estes endereços continua proibido no daemon (V3).
 | Camada | IPv4 | IPv6 hoje |
 |--------|------|-----------|
 | Captura / nDPI | Sim | Não (`ip_v != 4`) — V2–V3 |
-| PF scoped (`pdst`/`psrc`/…) | `inet` | **`inet`+`inet6`** (12.3 / `1.9.0_1`) |
+| PF scoped (`pdst`/`psrc`/…) | `inet` | **`inet`+`inet6`** (12.3) |
 | PF global `layer7_block*` | Sim | Regras `inet6` existem; tabelas só recebem v4 até V3 |
 | Anti-DoT / anti-QUIC | `inet`+`inet6` | Sim (PF) |
 | DNS forçado / block page (`rdr`) | `inet` | Não (onda V5 / gate humano) |

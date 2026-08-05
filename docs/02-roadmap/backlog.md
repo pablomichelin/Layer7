@@ -283,7 +283,7 @@ reavaliacao formal.
   [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md);
   ADR-0024.
 - Passos **12.1–12.2** (V0) + **12.3** (V1 código / REV-018) concluídos.
-- Candidato lab **`1.9.0_1`** (build/release pendente); GV1.3 appliance aberto.
+- Candidato lab **`1.9.0`** (build/release pendente); GV1.3 appliance aberto.
 - Passos **12.x** IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
 - Produção enforce **`1.9.0`** inalterada até **GV7** + GO humano.
 - Mapa código (+ salvaguardas §8):
@@ -292,7 +292,7 @@ reavaliacao formal.
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
 | BG-078 | Governança IPv6 V0: ADR-0024, matriz limitações, banner GUI, índices, mapa M-xx | Alta | documentacao/governanca | F4+ | claim dual-stack falso; operador desinformado | P | Alto | **Concluido (12.1–12.2)** | GV0 PASS; banner em Diagnostics |
-| BG-079 | Paridade PF scoped `inet6` (REV-018): pdst/psrc/pallow/pexc/exc_allow | Alta | package/PF | F4 | bypass IPv6 em scoped_hybrid | M | Alto | **Concluido codigo (12.3)** — GV1.3 appliance pendente | `1.9.0_1`; `test_scoped_pf_inc` PASS |
+| BG-079 | Paridade PF scoped `inet6` (REV-018): pdst/psrc/pallow/pexc/exc_allow | Alta | package/PF | F4 | bypass IPv6 em scoped_hybrid | M | Alto | **Concluido codigo (12.3)** — GV1.3 appliance pendente | `1.9.0`; `test_scoped_pf_inc` PASS |
 | BG-080 | Daemon captura + fluxos + nDPI IPv6 (`capture.c`, flow key) | Critica | daemon | F4 | FP-010 core; sem classificação v6 | G | Alto | **Em execucao (12.4)** | GV2–GV3 |
 | BG-081 | Policy/enforce/allowlist IPv6 (`policy.c`, `enforce.c`, `allowlist`) | Critica | daemon | F4 | decisão runtime v6 ausente | G | Alto | Planeado (12.6–12.8) | GV3–GV4 |
 | BG-082 | GUI + validação JSON IPv6 (`layer7.inc`, páginas GUI) | Alta | package/GUI | F4 | truncamento/validação silenciosa | M | Alto | Planeado (12.9) | GV2 |

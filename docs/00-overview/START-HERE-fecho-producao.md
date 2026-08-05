@@ -24,7 +24,7 @@ docs/00-overview/START-HERE-fecho-producao.md
 | **Passo autorizado** | **12.4** (Onda V2 — captura IPv6 / `capture.c`) |
 | **BG activo** | BG-080 (V2); BG-079 V1 código concluído |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
-| Candidato lab | **`1.9.0_1`** (build/release pendente) |
+| Candidato lab | **`1.9.0`** (build/release pendente) |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 **publicado e aceite** (implementação por ondas) |
 | Próximo gate | **GV1.3** appliance + **GV2** captura |
@@ -120,7 +120,7 @@ Estado (confirmar no repo):
 - Passo actual: 12.4
 - Onda: V2
 - BG: BG-080
-- Candidato lab: 1.9.0_1
+- Candidato lab: 1.9.0
 - Produção enforce: 1.9.0
 - Rollback imediato: 1.8.11_69
 

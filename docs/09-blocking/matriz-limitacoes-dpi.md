@@ -42,7 +42,7 @@
 | QUIC | Detectável | Payload cifrado; anti-QUIC PF separado | Limitação + toggle |
 | DoH/DoT | Toggle anti-bypass | DoH hardcoded / DoT externo | FP-014 |
 | IPv6 captura / nDPI | **Não** (até V2–V3) | EtherType / `ip_v != 4` → tráfego v6 ignorado | FP-010 / AUD-007 |
-| IPv6 PF scoped | **Sim** (`inet`+`inet6`, 12.3 / `1.9.0_1`) | Tabelas ainda só populadas com v4 até V3; captura v6 ausente | REV-018 fechado |
+| IPv6 PF scoped | **Sim** (`inet`+`inet6`, passo 12.3) | Tabelas ainda só populadas com v4 até V3; captura v6 ausente | REV-018 fechado |
 | IPv6 dual-stack produto | **Não** (até GV7) | Trilha V0–V6 aberta; produção `1.9.0` inalterada | ADR-0024 |
 | VLAN 802.1Q | Sim (parse Ethernet) | Interfaces `.10` dependem nome real | Teste PHP |
 | CDN multi-host | Parcial | DNS hint 1 hostname/IP, TTL 600 s | FP-013 |

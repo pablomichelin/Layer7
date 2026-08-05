@@ -44,7 +44,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0021](ADR-0021-check-in-online-e-revogacao-remota.md) | Check-in online e revogação remota de licença | Aceito | BG-077; `POST /api/license/check-in` + daemon; S14 PASS (`2026-08-04`) |
 | [ADR-0022](ADR-0022-compatibilidade-pfsense-ce-escopo-e-limitacao.md) | Compatibilidade pfSense CE — escopo e limitação (Onda E) | Aceito + GO Onda F | CE físico pendente; produção enforce = `_69` |
 | [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (fase 0) | Fase 1 pendente custódia chaves Ed25519 |
-| [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | V0/GV0 PASS; V1 código 12.3 (`1.9.0_1`); passo **12.4** |
+| [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | V0/GV0 PASS; V1 código 12.3 (`1.9.0`); passo **12.4** |
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa

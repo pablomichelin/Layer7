@@ -69,7 +69,9 @@ dual-stack contornam enforcement scoped e classificação nDPI em IPv6.
 2. **Não regressão IPv4.** Todo gate inclui smoke IPv4 existente (`run-local.sh`, F5 mínima).
 3. **Ordem segura:** V0 → V1 → … → V6. **Não** saltar para daemon (V2) antes de PF parity (V1) sem ADR.
 4. **Documentação no mesmo bloco** que código (CORTEX, changelog, mapa rastreabilidade, testes).
-5. **Versionamento:** commit por bloco; `PORTREVISION` + release GitHub quando o passo exigir `.pkg` ou mudança operacional no appliance.
+5. **Versionamento:** commit por bloco; **semver** (`PORTVERSION`, ex. `1.9.1` /
+   `1.10.0`) + release GitHub quando o passo exigir `.pkg`. **Não** usar
+   `PORTREVISION` / sufixo `_N` após `1.9.0` (preferência de produto).
 6. **Produção enforce** permanece `1.9.0` até GV7 + GO humano da trilha IPv6 (promoção semver separada).
 7. **Appliance:** agente único em passos com install/enforce; multitarefa só em V0 (docs) com ficheiros disjuntos.
 8. **macOS ≠ gate.** Builder FreeBSD + appliance obrigatórios para GV3+.
@@ -145,13 +147,13 @@ Marcar no `CORTEX.md` o passo actual (`12.x`).
 |-------|------|-----------|----------------------|------------|
 | 12.1 | V0 | ADR-0024 + actualizar matriz limitações + índices | ADR aceite; FP-010 ligado ao plano; desambiguação 12.x | Commit docs |
 | 12.2 | V0 | Banner/limitação na GUI Diagnostics + `pf-enforcement.md` | Operador vê aviso IPv4-only até I3; **GV0 completo** | Commit docs+GUI copy |
-| 12.3 | V1 | Emitir `inet6` em scoped/pallow/pexc/exc_allow **com salvaguardas §8** | REV-018 fechado; GV1 PASS (incl. NDP/localsubnets) | Commit + PORTREVISION se `.pkg` |
+| 12.3 | V1 | Emitir `inet6` em scoped/pallow/pexc/exc_allow **com salvaguardas §8** | REV-018 fechado; GV1 PASS (incl. NDP/localsubnets) | Commit + semver se `.pkg` |
 | 12.4 | V2 | Parser L2/L3 IPv6 em `capture.c` + chave de fluxo v6 | Unit tests C PASS; sem regressão v4 | Commit |
-| 12.5 | V2 | nDPI sobre fluxos IPv6; métricas `cap_*` v6 | GV2 PASS builder | Commit + PORTREVISION |
+| 12.5 | V2 | nDPI sobre fluxos IPv6; métricas `cap_*` v6 | GV2 PASS builder | Commit + semver se `.pkg` |
 | 12.6 | V3 | `policy.c` CIDR IPv6 `/0–128` | testes parse/match PASS | Commit |
-| 12.7 | V3 | `enforce.c`/`main.c` tabelas PF e kill states v6 | GV3 smoke monitor v6 | Commit + PORTREVISION |
+| 12.7 | V3 | `enforce.c`/`main.c` tabelas PF e kill states v6 | GV3 smoke monitor v6 | Commit + semver se `.pkg` |
 | 12.8 | V3 | `allowlist` IPv6 host/CIDR | testes allowlist PASS | Commit |
-| 12.9 | V4 | `layer7.inc` + GUI validação IPv6 | GV2 PHP PASS | Commit + PORTREVISION |
+| 12.9 | V4 | `layer7.inc` + GUI validação IPv6 | GV2 PHP PASS | Commit + semver se `.pkg` |
 | 12.10 | V5 | Design + implementação ou exclusão formal DNS `rdr inet6` | ADR emenda ou código; gate humano | Commit |
 | 12.11 | V5 | Block page + VIP isenção v6 (se V5 activo) | smoke NAT v6 ou limite doc | Commit |
 | 12.12 | V6 | Campanha lab dual-stack (`plano-gates-ipv6.md`) | GV6–GV7 PASS; evidência `run_id` | Commit docs evidência |
@@ -170,12 +172,16 @@ no lab usam **config JSON manual** / appliance até 12.9 — documentar no run_i
 
 ## 5. Versionamento
 
-| Tipo | Git | PORTREVISION | Docs |
-|------|-----|--------------|------|
+**Política pós-`1.9.0`:** não usar `PORTREVISION` (evita nomes `1.9.0_1`,
+`1.9.0_2`, …). Cada pacote publicado sobe **`PORTVERSION`** em semver
+(`1.9.1`, `1.10.0`, …) com `PORTREVISION=0`.
+
+| Tipo | Git | PORTVERSION | Docs |
+|------|-----|-------------|------|
 | Só docs (V0) | commit `trilha-ipv6/12.x:` | — | CORTEX, mapa, ADR |
-| Código sem release | commit + testes | opcional interno | changelog Unreleased |
-| Mudança appliance | commit + builder + GV | **obrigatório** | MANUAL se comandos mudarem |
-| Fecho V6 | tag + GitHub Release | semver minor sugerido (`1.10.0`) | CORTEX, changelog, MANUAL |
+| Código sem release | commit + testes | inalterado até release | changelog Unreleased |
+| Mudança appliance | commit + builder + GV | **bump semver** (ex. `1.9.1`) | MANUAL se comandos mudarem |
+| Fecho V6 | tag + GitHub Release | minor sugerido (`1.10.0`) | CORTEX, changelog, MANUAL |
 
 Mensagem de commit: `trilha-ipv6/12.3: paridade PF inet6 scoped (BG-079)`.
 
@@ -209,7 +215,7 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 TRILHA IPv6 — progresso
 - Passo actual: 12.4
 - Onda: V2
-- Candidato lab: 1.9.0_1
+- Candidato lab: 1.9.0
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - GV0 (docs): PASS (12.1–12.2)
 - GV1 (PF scoped inet6): PARCIAL (código PASS; appliance 1.3/1.6 PENDENTE)
@@ -242,7 +248,7 @@ TRILHA IPv6 — progresso
 
 | Data | Evento |
 |------|--------|
-| 2026-08-04 | Passo **12.3** concluído: REV-018 `inet`+`inet6` scoped; `test_scoped_pf_inc` PASS; `1.9.0_1` |
+| 2026-08-04 | Passo **12.3** concluído: REV-018 `inet`+`inet6` scoped; `test_scoped_pf_inc` PASS; `1.9.0` |
 | 2026-08-04 | Passo **12.2** concluído: banner Diagnostics + `pf-enforcement.md`; **GV0 PASS** |
 | 2026-08-04 | Passo **12.1** concluído: ADR-0024, índices, mapa, matriz GV0.4 PASS |
 | 2026-08-04 | Criação da trilha IPv6 (governança durante fecho); passo 12.1; BG-078..084 |

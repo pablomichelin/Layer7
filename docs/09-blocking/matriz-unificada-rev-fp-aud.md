@@ -93,7 +93,7 @@ Legenda de **evidência:** OBS | REP | LOCAL | BUILDER | APPLIANCE | N/C
 | REV-003 | CIDR `/0` allowlist | closed | — |
 | REV-021 | parser JSON | open | FP-015 |
 | REV-038 | IPv4-only captura | open | FP-010 |
-| REV-018 | scoped PF só `inet` (bypass v6) | **closed** 12.3 / `1.9.0_1` | FP-010 / V1 |
+| REV-018 | scoped PF só `inet` (bypass v6) | **closed** 12.3 | FP-010 / V1 |
 | REV-042 | CNAME QNAME | code_fixed | FP-007 |
 | REV-050 | lacunas integração | parcial | FP-016 |
 

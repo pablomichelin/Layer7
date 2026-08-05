@@ -86,7 +86,7 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 **Trilha activa:** IPv6 (passo **12.4**, Onda V2 — captura) —
 [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
-(arranque único; V0/GV0 PASS; V1 código REV-018 PASS; candidato `1.9.0_1`).
+(arranque único; V0/GV0 PASS; V1 código REV-018 PASS; candidato `1.9.0`).
 
 1. **Chat limpo:** colar só o caminho do START-HERE-fecho-producao.md.
 2. Executar passo **12.4** (parser IPv6 em `capture.c`); ver `CORTEX.md` secção Trilha IPv6.
