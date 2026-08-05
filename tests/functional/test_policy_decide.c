@@ -228,6 +228,48 @@ test_group_expanded_src_cidr(void)
 }
 
 static void
+test_catch_all_monitor_does_not_shadow_specific_block(void)
+{
+	struct layer7_policy_rule rules[2];
+	struct layer7_decision dec;
+
+	memset(rules, 0, sizeof(rules));
+	/* Catch-all monitor com priority MAIOR — bug QA D2 se sombrear. */
+	snprintf(rules[0].id, sizeof(rules[0].id), "p-mon-001");
+	rules[0].enabled = 1;
+	rules[0].action = LAYER7_ACTION_MONITOR;
+	rules[0].priority = 10;
+	snprintf(rules[1].id, sizeof(rules[1].id), "qa-yt-block-a");
+	rules[1].enabled = 1;
+	rules[1].action = LAYER7_ACTION_BLOCK;
+	rules[1].priority = 5;
+	snprintf(rules[1].hosts[0], sizeof(rules[1].hosts[0]), "youtube.com");
+	rules[1].n_hosts = 1;
+	snprintf(rules[1].src_hosts[0], sizeof(rules[1].src_hosts[0]),
+	    "192.168.100.234");
+	rules[1].n_src_hosts = 1;
+	layer7_policies_sort(rules, 2);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 2, 1, "vmx0",
+	    "192.168.100.234", "www.youtube.com", "TLS", "Web", &dec) == 0,
+	    "catch-all decide ok");
+	check(dec.action == LAYER7_ACTION_BLOCK,
+	    "catch-all: specific block wins over higher-pri monitor");
+	check(strcmp(dec.matched_policy_id, "qa-yt-block-a") == 0,
+	    "catch-all: matched youtube policy");
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 2, 1, "vmx0",
+	    "192.168.100.235", "www.youtube.com", "TLS", "Web", &dec) == 0,
+	    "catch-all other client decide ok");
+	check(dec.action == LAYER7_ACTION_MONITOR,
+	    "catch-all: other client falls to monitor");
+	check(strcmp(dec.matched_policy_id, "p-mon-001") == 0,
+	    "catch-all: other client matched monitor");
+}
+
+static void
 test_policy_table_index_sorted(void)
 {
 	struct layer7_policy_rule rules[3];
@@ -664,6 +706,7 @@ main(void)
 	test_schedule_inactive_no_block();
 	test_disabled_policy_no_block();
 	test_group_expanded_src_cidr();
+	test_catch_all_monitor_does_not_shadow_specific_block();
 	test_policy_table_index_sorted();
 	test_empty_block_rejected();
 	test_scope_global_parse();

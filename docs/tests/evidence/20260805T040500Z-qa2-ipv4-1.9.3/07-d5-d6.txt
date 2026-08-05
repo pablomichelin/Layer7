@@ -1,0 +1,11 @@
+===D5===
+       0
+===D6===
+bl_config_written
+bl_enabled=1
+bl_domains_loaded=3015
+bl_categories_active=1
+bl_rules_active=1
+2026-08-05 01:15:53 [notice] blacklists: loaded 3015 domains in 1 categories, 1 rules
+doh_dns_google:doh_https=000
+doh_https=ERR

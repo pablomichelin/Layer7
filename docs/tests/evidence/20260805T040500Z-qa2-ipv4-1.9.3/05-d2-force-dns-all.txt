@@ -1,0 +1,63 @@
+resolved: 172.217.30.110 142.251.150.4 142.251.156.4 142.251.157.4 142.251.152.4 142.251.155.4 142.251.154.4 142.251.153.4 142.251.151.4
+curl_172.217.30.110=200
+curl_142.251.150.4=200
+curl_142.251.156.4=200
+curl_142.251.157.4=200
+curl_142.251.152.4=200
+curl_142.251.155.4=200
+curl_142.251.154.4=200
+curl_142.251.153.4=200
+curl_142.251.151.4=000ERR
+
+gen_1=000
+gen_1=ERR
+gen_2=000
+gen_2=ERR
+gen_3=000
+gen_3=ERR
+gen_4=000
+gen_4=ERR
+gen_5=000
+gen_5=ERR
+gen_6=000
+gen_6=ERR
+gen_7=000
+gen_7=ERR
+gen_8=000
+gen_8=ERR
+gen_9=000
+gen_9=ERR
+gen_10=000
+gen_10=ERR
+B_yt_1=200
+B_yt_2=200
+B_yt_3=200
+PDST2:
+   142.251.150.4
+   142.251.151.4
+   142.251.152.4
+   142.251.153.4
+   142.251.154.4
+   142.251.155.4
+   142.251.156.4
+   142.251.157.4
+   172.217.30.110
+STATS:
+blocked=5 dst_add=12
+2026-08-05 01:14:06 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=142.251.151.4 host=www.youtube.com app=YouTube cat=Media action=block reason=policy_match policy=qa-yt-block-a
+2026-08-05 01:14:06 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.151.4 ip=142.251.151.4 policy=qa-yt-block-a reason=flow_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=172.217.30.110 ip=172.217.30.110 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=youtube.com app=DNS cat=Network action=block reason=policy_match policy=qa-yt-block-a
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.150.4 ip=142.251.150.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.156.4 ip=142.251.156.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.157.4 ip=142.251.157.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.152.4 ip=142.251.152.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.155.4 ip=142.251.155.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.154.4 ip=142.251.154.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.153.4 ip=142.251.153.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.151.4 ip=142.251.151.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=www.youtube.com app=DNS cat=Network action=block reason=policy_match policy=qa-yt-block-a
+2026-08-05 01:14:39 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=172.217.30.110 host=www.youtube.com app=YouTube cat=Media action=block reason=policy_match policy=qa-yt-block-a
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=172.217.30.110 ip=172.217.30.110 policy=qa-yt-block-a reason=flow_block
+2026-08-05 01:14:40 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=142.251.155.4 host=www.youtube.com app=YouTube cat=Media action=block reason=policy_match policy=qa-yt-block-a
+2026-08-05 01:14:40 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.155.4 ip=142.251.155.4 policy=qa-yt-block-a reason=flow_block

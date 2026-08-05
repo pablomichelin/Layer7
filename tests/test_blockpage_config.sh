@@ -43,6 +43,28 @@ if (!in_array("googlevideo.com", $domains, true)) {
 	exit(1);
 }
 
+/* D1: politica scoped (src_hosts) NAO entra no sinkhole Unbound global. */
+$data_scoped = $data;
+$data_scoped["layer7"]["policies"][] = array(
+	"id" => "p-yt-scoped",
+	"name" => "YouTube scoped",
+	"enabled" => true,
+	"action" => "block",
+	"match" => array(
+		"hosts" => array("youtube-nocookie.com"),
+		"src_hosts" => array("192.168.100.234")
+	)
+);
+$col2 = layer7_blockpage_collect_domains($data_scoped);
+if (in_array("youtube-nocookie.com", $col2["domains"], true)) {
+	fwrite(STDERR, "FAIL: dominio scoped nao deve ir ao Unbound global\n");
+	exit(1);
+}
+if (!in_array("youtube.com", $col2["domains"], true)) {
+	fwrite(STDERR, "FAIL: dominio global ainda deve estar presente\n");
+	exit(1);
+}
+
 $block = layer7_blockpage_unbound_block($data);
 if (strpos($block, "local-data:") === false) {
 	fwrite(STDERR, "FAIL: bloco Unbound vazio\n");

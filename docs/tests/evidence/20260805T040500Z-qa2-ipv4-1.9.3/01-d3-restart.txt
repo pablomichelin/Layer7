@@ -1,0 +1,8 @@
+2026-08-05 00:43:39 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:47 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:47 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+2026-08-05 01:12:51 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:54 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:54 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+2026-08-05 01:13:13 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 01:13:13 [notice] enforce_ready: enforce_cfg=1 mode=enforce

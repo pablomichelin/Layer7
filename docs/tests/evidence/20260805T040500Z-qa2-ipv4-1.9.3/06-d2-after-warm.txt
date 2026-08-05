@@ -1,0 +1,10 @@
+A_yt_1=000
+A_yt_1=ERR
+A_yt_2=000
+A_yt_2=ERR
+A_yt_3=000
+A_yt_3=ERR
+A_google=200
+B_yt_1=200
+B_yt_2=200
+B_yt_3=200

@@ -6,6 +6,27 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+## [1.9.3] — 2026-08-05
+
+### Fixed
+
+- **QA D1:** politicas `block` com `src_hosts`/`src_cidrs` deixam de alimentar o
+  sinkhole Unbound global — isolamento two-client via PF (`pdst`/`psrc`).
+- **QA D2:** politicas catch-all (ex. «Monitor geral») ja nao sombreiam
+  bloqueios especificos com priority menor; regras PF `pdst` para politicas
+  so com hosts (sem `src_*`) passam a ser emitidas em `scoped_hybrid`.
+- **QA D3:** licenca validada antes do primeiro `apply_config` — `enforce_cfg=1`
+  no arranque sem depender de SIGHUP.
+- **QA D4/D5:** `layer7-pfctl ensure` apos resync; flush da ancora orfa
+  `layer7_g5_test` em `flush-all` / resync.
+- **QA D6:** `blacklists/config.json.sample` + criacao de `config.json` na
+  primeira instalacao (feature activavel via GUI/config).
+
+### Notes
+
+- Candidato lab; producao enforce permanece `1.9.0` ate GO.
+- HTTPS na pagina de bloqueio (sem MITM) continua limitacao conhecida (D7).
+
 ## [1.9.2] — 2026-08-05
 
 ### Added

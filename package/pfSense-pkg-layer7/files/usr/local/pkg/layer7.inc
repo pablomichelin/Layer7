@@ -1029,7 +1029,6 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 		}
 
 		$has_src = !empty($m["src_hosts"]) || !empty($m["src_cidrs"]);
-		$scope_global = !empty($m["scope_global"]);
 		$quarantine_origin = !empty($m["quarantine_origin"]);
 
 		if (!empty($m["needs_pdst"])) {
@@ -1069,11 +1068,17 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 						"label \"layer7:pdst:{$pid}\"",
 					    $af);
 				}
-			} elseif ($scope_global) {
+			} else {
+				/*
+				 * Hosts/apps sem src_*: tabela pdst aplica-se a
+				 * qualquer origem (equivalente a scope global de
+				 * destino). Antes so scope_global emitia regra —
+				 * politicas so com hosts ficavam sem PF (D2).
+				 */
 				$rules .= layer7_pf_inet46_rules(
 				    "block drop quick",
 				    "to <{$tbl}> ! tagged L7ALLOW " .
-					"label \"layer7:pdst:{$pid}:global\"");
+					"label \"layer7:pdst:{$pid}\"");
 			}
 		}
 
@@ -1619,6 +1624,9 @@ function layer7_pf_config_resync($flush_dynamic = false)
 	if ($flush_dynamic) {
 		layer7_flush_dynamic_tables();
 	}
+	/* QA D5: remover ancora de teste G5 orfa se existir. */
+	exec("/sbin/pfctl -a layer7_g5_test -F all >/dev/null 2>&1", $g5o, $g5c);
+	unset($g5o, $g5c);
 	if (layer7_pf_should_enforce()) {
 		layer7_dst_allowlist_apply_to_pf();
 	}
@@ -1632,6 +1640,12 @@ function layer7_pf_config_resync($flush_dynamic = false)
 	if (layer7_pf_should_enforce()) {
 		layer7_static_origin_tables_apply_to_pf();
 		layer7_dst_allowlist_apply_to_pf();
+	}
+	/* Garantir tabelas base apos reload (reduz D4 "tables missing"). */
+	if (is_executable("/usr/local/libexec/layer7-pfctl")) {
+		exec("/usr/local/libexec/layer7-pfctl ensure >/dev/null 2>&1",
+		    $ens_out, $ens_rc);
+		unset($ens_out, $ens_rc);
 	}
 	layer7_signal_reload();
 }
@@ -2257,6 +2271,19 @@ function layer7_blockpage_collect_domains($data = null)
 		$pname = isset($pol["name"]) ? (string)$pol["name"] : "";
 		$match = isset($pol["match"]) && is_array($pol["match"])
 		    ? $pol["match"] : array();
+		/*
+		 * D1 / two-client: Unbound local-data e global. Politicas com
+		 * src_hosts/src_cidrs (scoped) NAO entram no sinkhole DNS —
+		 * o isolamento por cliente fica no PF (pdst/psrc). Incluir
+		 * estes hosts no Unbound bloqueava toda a LAN.
+		 */
+		$src_hosts = isset($match["src_hosts"]) && is_array($match["src_hosts"])
+		    ? $match["src_hosts"] : array();
+		$src_cidrs = isset($match["src_cidrs"]) && is_array($match["src_cidrs"])
+		    ? $match["src_cidrs"] : array();
+		if (!empty($src_hosts) || !empty($src_cidrs)) {
+			continue;
+		}
 		$hosts = isset($match["hosts"]) && is_array($match["hosts"])
 		    ? $match["hosts"] : array();
 		foreach ($hosts as $h) {
@@ -2286,6 +2313,12 @@ function layer7_blockpage_collect_domains($data = null)
 			$bl_domains = array();
 			foreach ($bl_cfg["rules"] as $rule) {
 				if (!is_array($rule) || empty($rule["enabled"])) {
+					continue;
+				}
+				/* Regras BL com origem scoped: so PF, nao Unbound global. */
+				$bl_src = isset($rule["src_cidrs"]) && is_array($rule["src_cidrs"])
+				    ? $rule["src_cidrs"] : array();
+				if (!empty($bl_src)) {
 					continue;
 				}
 				$cats = isset($rule["categories"]) && is_array($rule["categories"])

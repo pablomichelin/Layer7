@@ -1,0 +1,15 @@
+{
+  "enabled": false,
+  "update_url": "https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-ut1.tar.gz",
+  "update_cron": "0 6 * * *",
+  "rules": [
+    {
+      "name": "doh-example",
+      "enabled": false,
+      "categories": ["doh"],
+      "src_cidrs": [],
+      "except_ips": []
+    }
+  ],
+  "whitelist": []
+}

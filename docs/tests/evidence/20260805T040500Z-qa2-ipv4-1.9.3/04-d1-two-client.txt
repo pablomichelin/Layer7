@@ -1,0 +1,75 @@
+=== D1 TWO-CLIENT DNS (scoped must NOT sinkhole B) ===
+--- A ---
+dns_yt: 172.217.30.110 
+dns_ph: 192.168.100.254 
+yt_1=200
+yt_2=200
+yt_3=200
+yt_4=200
+yt_5=200
+yt_6=200
+yt_7=200
+yt_8=200
+google=200
+--- B ---
+dns_yt: 172.217.30.110 
+dns_ph: 192.168.100.254 
+yt_1=200
+yt_2=200
+yt_3=200
+yt_4=200
+yt_5=200
+yt_6=200
+yt_7=200
+yt_8=200
+google=200
+===PDST===
+layer7_pdst_2=1
+   142.251.151.4
+===STATS===
+total_blocked=1
+pf_add_ok=0
+dst_add_ok=1
+cap_classified_v4=1294
+enforce_mode=1
+===LOG===
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:34 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:40 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:43 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:46 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:46 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:46 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-preset-protecao-infantil reason=flow_block
+2026-07-30 18:12:06 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=172.217.30.150 ip=172.217.30.150 policy=profile-youtube reason=flow_block
+2026-07-30 18:12:09 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:13 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:14 [notice] flow_decide: iface=vmx0.95 src=192.168.95.147 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=Instagram cat=SocialNetwork action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:15 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:16 [notice] flow_decide: iface=vmx0.95 src=192.168.95.147 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=Instagram cat=SocialNetwork action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:17 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:17 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=177.38.8.76 host=rr1---sn-24v0gcg-m52e.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:17 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=177.38.8.76 ip=177.38.8.76 policy=profile-youtube reason=flow_block
+2026-07-30 18:12:19 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=177.38.8.76 host=rr1---sn-24v0gcg-m52e.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:19 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=177.38.8.76 ip=177.38.8.76 policy=profile-youtube reason=flow_block
+2026-07-30 18:12:20 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=142.251.151.4 host=www.youtube.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:20 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=142.251.151.4 ip=142.251.151.4 policy=profile-youtube reason=flow_block
+2026-08-05 01:14:06 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=142.251.151.4 host=www.youtube.com app=YouTube cat=Media action=block reason=policy_match policy=qa-yt-block-a
+2026-08-05 01:14:06 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.151.4 ip=142.251.151.4 policy=qa-yt-block-a reason=flow_block

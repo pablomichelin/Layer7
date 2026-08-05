@@ -2631,6 +2631,31 @@ int main(int argc, char **argv)
 	openlog("layer7d", LOG_PID | LOG_CONS, LOG_DAEMON);
 	syslog(LOG_NOTICE, "daemon_start version=%s", layer7d_version);
 
+	/*
+	 * Licenca ANTES do primeiro apply_config (QA D3): refresh_enforce_cfg()
+	 * exige s_lic.valid; se a licenca viesse depois, o log inicial ficava
+	 * enforce_cfg=0 e havia janela teorica sem enforce ate ao SIGHUP.
+	 */
+	memset(&s_lic, 0, sizeof(s_lic));
+	s_last_lic_check = time(NULL);
+	if (layer7_license_check(&s_lic) == 0) {
+		s_license_state = (s_lic.grace || s_lic.dev_mode) ? 2 : 1;
+		if (s_lic.dev_mode)
+			L7_WARN("license: DEV MODE — no production key "
+			    "embedded; enforce allowed");
+		else if (s_lic.grace)
+			L7_WARN("license: %s", s_lic.error);
+		else
+			L7_NOTE("license: valid customer=%s expiry=%s "
+			    "features=%s days_left=%d",
+			    s_lic.customer, s_lic.expiry,
+			    s_lic.features, s_lic.days_left);
+	} else {
+		s_license_state = 0;
+		L7_WARN("license: INVALID — %s", s_lic.error);
+		L7_WARN("license: enforce disabled, monitor-only mode");
+	}
+
 	if (stat(config_path, &st) == 0) {
 		L7_NOTE("config file present: %s (%lld bytes)", config_path,
 		    (long long)st.st_size);
@@ -2649,28 +2674,14 @@ int main(int argc, char **argv)
 		    "carregado (%s)",
 		    config_path);
 
-	/* License check at startup */
-	memset(&s_lic, 0, sizeof(s_lic));
-	s_last_lic_check = time(NULL);
-	if (layer7_license_check(&s_lic) == 0) {
-		s_license_state = (s_lic.grace || s_lic.dev_mode) ? 2 : 1;
-		if (s_lic.dev_mode)
-			L7_WARN("license: DEV MODE — no production key "
-			    "embedded; enforce allowed");
-		else if (s_lic.grace)
-			L7_WARN("license: %s", s_lic.error);
-		else
-			L7_NOTE("license: valid customer=%s expiry=%s "
-			    "features=%s days_left=%d",
-			    s_lic.customer, s_lic.expiry,
-			    s_lic.features, s_lic.days_left);
-		refresh_enforce_cfg();
-	} else {
-		s_license_state = 0;
-		L7_WARN("license: INVALID — %s", s_lic.error);
-		L7_WARN("license: enforce disabled, monitor-only mode");
+	if (s_license_state == 0) {
 		s_ge = 0;
 		enforcement_flush_all_tables();
+	} else {
+		refresh_enforce_cfg();
+		if (s_have_parse && !cfg_disabled(&s_parsed))
+			L7_NOTE("enforce_ready: enforce_cfg=%d mode=%s", s_ge,
+			    s_parsed.has_mode ? s_parsed.mode : "?");
 	}
 
 	/* Load blacklists at startup (same logic as SIGHUP reload) */

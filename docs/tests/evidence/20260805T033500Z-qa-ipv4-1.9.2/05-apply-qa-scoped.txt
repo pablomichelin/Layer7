@@ -1,0 +1,22 @@
+===GUI===
+http80_status:301
+https9999_status:200
+https9999_settings:200
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Acesso bl
+===APPLY_QA_POLICY===
+SAVE_OK
+layer7d is running as pid 93624.
+mode=enforce model=scoped_hybrid policies=6
+QA: qa-yt-block-a action=block
+QA: qa-allow-example action=allow
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+match inet from 192.168.100.234 to <layer7_pallow_4> label "layer7:pallow:qa-allow-example" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <localsubnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <localsubnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from 192.168.100.234 to <layer7_pdst_3> label "layer7:pdst:qa-yt-block-a" ! tagged L7ALLOW

@@ -1,0 +1,25 @@
+===CURRENT_CFG===
+enabled=1 mode=enforce model=scoped_hybrid sni=1
+===RESTART_THEN_STATUS===
+2026-08-05 00:26:29 [notice] config: policies=4 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:38:00 [notice] config: policies=6 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:38:17 [notice] config: policies=6 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:39:02 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:39:21 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:08 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:11 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:58 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:41:16 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:02 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+enforce_mode_stat=1
+===SIGHUP_RESYNC===
+resync_done
+2026-08-05 00:39:02 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:39:21 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:08 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:11 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:58 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:41:16 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:02 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:08 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+enforce_mode_after_resync=1

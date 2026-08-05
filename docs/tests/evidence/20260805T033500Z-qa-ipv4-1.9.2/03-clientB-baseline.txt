@@ -1,0 +1,38 @@
+===B===
+zpro-aimirim
+    inet 127.0.0.1/8 scope host lo
+    inet 192.168.100.235/24 brd 192.168.100.255 scope global ens160
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+default via 192.168.100.254 dev ens160 proto static 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 
+192.168.100.0/24 dev ens160 proto kernel scope link src 192.168.100.235 
+Global
+       Protocols: -LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+resolv.conf mode: stub
+
+Link 2 (ens160)
+    Current Scopes: DNS
+         Protocols: +DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+Current DNS Server: 192.168.100.254
+       DNS Servers: 192.168.100.254 8.8.8.8 2001:4860:4860::8888
+                    2001:4860:4860::8844
+        DNS Domain: system.up
+
+Link 3 (docker0)
+Current Scopes: none
+     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+
+Link 5 (veth53bac28)
+Current Scopes: none
+     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+
+Link 9 (veth4535be2)
+Current Scopes: none
+     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+
+Link 11 (vethef99d14)
+Current Scopes: none
+     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+google:200
+youtube:200
+192.168.100.254

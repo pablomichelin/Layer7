@@ -1,0 +1,78 @@
+=== SNI TWO-CLIENT ===
+--- A ---
+yt_1=200
+yt_2=200
+yt_3=200
+yt_4=200
+yt_5=200
+yt_6=200
+yt_7=200
+yt_8=200
+google=200
+--- B ---
+yt_1=200
+yt_2=200
+yt_3=200
+yt_4=200
+yt_5=200
+yt_6=200
+yt_7=200
+yt_8=200
+google=200
+TABLES:
+ALL_PDST_NONEMPTY:
+total_blocked=0
+pf_add_ok=0
+dst_add_ok=0
+cap_classified_v4=432
+LOG:
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:26 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:26 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:26 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:28 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:28 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:29 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:29 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:29 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:34 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:40 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:43 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:46 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:46 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:46 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-preset-protecao-infantil reason=flow_block
+2026-08-05 00:38:00 [notice] capture: opened vmx0 (nDPI active, sni_inspection=0)
+2026-08-05 00:38:00 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=0)
+2026-08-05 00:38:17 [notice] capture: opened vmx0 (nDPI active, sni_inspection=0)
+2026-08-05 00:38:17 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=0)
+2026-08-05 00:39:03 [notice] capture: opened vmx0 (nDPI active, sni_inspection=0)
+2026-08-05 00:39:04 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=0)
+2026-08-05 00:39:21 [notice] capture: opened vmx0 (nDPI active, sni_inspection=0)
+2026-08-05 00:39:22 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=0)
+2026-08-05 00:40:09 [notice] capture: opened vmx0 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:09 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:11 [notice] capture: opened vmx0 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:11 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=1)

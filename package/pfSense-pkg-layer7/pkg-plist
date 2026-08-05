@@ -26,6 +26,7 @@
 /usr/local/etc/layer7/pf.conf.sample
 /usr/local/etc/layer7/profiles.json
 /usr/local/etc/layer7/allowlist-seed.txt
+/usr/local/etc/layer7/blacklists/config.json.sample
 /usr/local/etc/rc.d/layer7d
 /usr/local/libexec/layer7-pfctl
 /usr/local/libexec/layer7-unbound-anti-doh

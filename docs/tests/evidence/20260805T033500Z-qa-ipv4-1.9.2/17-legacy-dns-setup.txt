@@ -1,0 +1,18 @@
+===REPORTS===
+total 59
+drwxr-xr-x  2 root wheel      5 Jul 30 09:40 .
+drwxr-xr-x  5 root wheel     14 Aug  4 23:45 ..
+-rw-r--r--  1 root wheel     33 Jul 30 09:35 ingest.cursor
+-rw-r--r--  1 root wheel  57344 Jul 29 13:59 reports.db
+-rw-r--r--  1 root wheel 500194 Aug  5 00:40 stats-history.jsonl
+/var/db/pkg/local.sqlite
+/var/db/pkg/repo-pfSense-core.sqlite
+/var/db/pkg/repo-pfSense.sqlite
+/var/db/pkg/repo-pfSense-core.sqlite-journal
+/var/db/pkg/repo-pfSense.sqlite-journal
+-rw-r--r--  1 root wheel    9962 Aug  4 21:21 /var/log/layer7-bl-update.log
+-rw-------  1 root wheel 1428735 Aug  5 00:36 /var/log/layer7-events.log
+-rw-------  1 root wheel 1143607 Aug  5 00:42 /var/log/layer7d.log
+LEGACY_DNS_OK
+dig_yt:
+192.168.100.254

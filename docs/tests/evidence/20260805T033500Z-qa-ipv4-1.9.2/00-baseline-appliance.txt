@@ -1,0 +1,109 @@
+em0 em1 vmx0 em2 enc0 lo0 pflog0 pfsync0 vmx0.95 vmx0.10 vmx0.50 vmx0.52 vmx0.60 pppoe1 pppoe0 ovpns1 ovpns3
+===
+vmx0: flags=1008943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: LAN
+	options=48100b8<VLAN_MTU,VLAN_HWTAGGING,JUMBO_MTU,VLAN_HWCSUM,VLAN_HWFILTER,HWSTATS,MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet 192.168.100.254 netmask 0xffffff00 broadcast 192.168.100.255
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0 prefixlen 64 scopeid 0x3
+	inet6 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 prefixlen 64
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+===
+vmx0.95: flags=1008943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: Assistencia
+	options=4000000<MEXTPG>
+	ether 00:50:56:88:a4:f7
+	inet 192.168.95.254 netmask 0xffffff00 broadcast 192.168.95.255
+	inet6 fe80::250:56ff:fe88:a4f7%vmx0.95 prefixlen 64 scopeid 0x9
+	groups: vlan
+	vlan: 95 vlanproto: 802.1q vlanpcp: 0 parent interface: vmx0
+	media: Ethernet autoselect
+	status: active
+	nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+===STATS===
+===BLOCK_DST===
+===BLOCK===
+===RDR_DNS===
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <localsubnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <localsubnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+pass quick on vmx0 inet6 proto udp from fe80::/10 to ff02::/16 port = dhcpv6-server keep state (if-bound) label "descr=allow access to DHCPv6 server" ridentifier 1000002553
+pass in log quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet all flags S/SA keep state (if-bound) label "id=1679355310" label "tags=user_rule" ridentifier 1679355310
+pass in log quick on pppoe0 reply-to (pppoe0 fe80::4a2c:d0ff:fe2c:4fc9) inet6 all flags S/SA keep state (if-bound) label "id=1679355310" label "tags=user_rule" ridentifier 1679355310
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = http flags S/SA keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = https flags S/SA keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = http keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = https keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = http-alt flags S/SA keep state (if-bound) label "id=1759858602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = http-alt keep state (if-bound) label "id=1759858602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 6638 flags S/SA keep state (if-bound) label "id=1779150153" label "tags=user_rule" label "descr=NAT" ridentifier 1779150153
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 6638 keep state (if-bound) label "id=1779150153" label "tags=user_rule" label "descr=NAT" ridentifier 1779150153
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 51820 flags S/SA keep state (if-bound) label "id=1780355374" label "tags=user_rule" label "descr=NAT" ridentifier 1780355374
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 51820 keep state (if-bound) label "id=1780355374" label "tags=user_rule" label "descr=NAT" ridentifier 1780355374
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = ftp flags S/SA keep state (if-bound) label "id=1784901254" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901254
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = ftp keep state (if-bound) label "id=1784901254" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901254
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port 40109 >< 40211 flags S/SA keep state (if-bound) label "id=1784901607" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901607
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port 40109 >< 40211 keep state (if-bound) label "id=1784901607" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901607
+pass in quick on vmx0 inet from 192.168.100.253 to <OPT5__NETWORK> flags S/SA keep state (if-bound) label "id=1757382700" label "tags=user_rule" label "descr=Servidor Web" ridentifier 1757382700
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = http flags S/SA keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = https flags S/SA keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = http keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = https keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = http-alt flags S/SA keep state (if-bound) label "id=1759858581" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858581
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = http-alt keep state (if-bound) label "id=1759858581" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858581
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = ftp flags S/SA keep state (if-bound) label "id=1784901243" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901243
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = ftp keep state (if-bound) label "id=1784901243" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901243
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port 40109 >< 40211 flags S/SA keep state (if-bound) label "id=1784901588" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901588
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port 40109 >< 40211 keep state (if-bound) label "id=1784901588" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901588
+block drop in quick on vmx0.95 inet from <OPT4__NETWORK> to <LAN__NETWORK> label "id=1778756353" label "tags=user_rule" ridentifier 1778756353
+block drop in quick on vmx0.95 inet6 from <OPT4__NETWORK> to <LAN__NETWORK> label "id=1778756353" label "tags=user_rule" ridentifier 1778756353
+pass in quick on vmx0.52 inet from 192.168.52.3 to 192.168.100.253 flags S/SA keep state (if-bound) label "id=1757383185" label "tags=user_rule" label "descr=Servidor Web" ridentifier 1757383185
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.124 port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Lat. Oliveira - outbound nat-t" ridentifier 1000110453
+pass out route-to (pppoe0 10.99.99.35) inet proto udp from (self) to 177.38.15.90 port = isakmp keep state (if-bound) label "descr=IPsec: CB-Hidro - outbound isakmp" ridentifier 1000110531
+===LOG===
+2026-08-05 00:36:23 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:23 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:23 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:24 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:24 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:25 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:26 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:26 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:26 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:28 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:28 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:29 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:29 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:29 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:32 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:33 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:34 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:36 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:40 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:43 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:44 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block
+2026-08-05 00:36:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=flow_block

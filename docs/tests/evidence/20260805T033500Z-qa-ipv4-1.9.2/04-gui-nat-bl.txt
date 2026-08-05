@@ -1,0 +1,91 @@
+===NAT_LAYER7===
+rdr on vmx0 inet proto tcp from any to 192.168.100.254 port = http -> 127.0.0.1 port 8099
+rdr on vmx0.95 inet proto tcp from any to 192.168.100.254 port = http -> 127.0.0.1 port 8099
+rdr on vmx0 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+===G5_LEFTOVER===
+block drop in quick on vmx0 inet from 192.168.100.234 to 142.251.156.4
+===SINKHOLE_FILE===
+total 9
+drwxr-xr-x  2 unbound unbound  2 Dec  6  2023 .
+drwxr-xr-x  4 unbound unbound 31 Jul 28 18:36 ..
+/usr/local/etc/layer7/blacklists/malware/domains:bot.layer7.top
+/usr/local/etc/layer7/blacklists/malware/domains:frpornhub.fr
+/usr/local/etc/layer7/blacklists/malware/domains:pornhub-free.org
+/usr/local/etc/layer7/blacklists/malware/domains:pornhub-premium.xyz
+/usr/local/etc/layer7/blacklists/malware/domains:pornhub.pm
+/usr/local/etc/layer7/blacklists/malware/domains:pornhub.re
+/usr/local/etc/layer7/blacklists/malware/domains:pornhub.tf
+/usr/local/etc/layer7/blacklists/malware/domains:pornhub.wf
+/usr/local/etc/layer7/blacklists/malware/domains:pornhub.yt
+/usr/local/etc/layer7/blacklists/malware/domains:pornhubfr.fr
+/usr/local/etc/layer7/blacklists/malware/domains:pornhubpremiuma.com
+/usr/local/etc/layer7/blacklists/malware/domains:pornhubs.fr
+/usr/local/etc/layer7/blacklists/jobsearch/domains:frpornhub.fr
+/usr/local/etc/layer7/blacklists/.last-known-good/layer7-blacklists-manifest.v1.txt:snapshot_asset=layer7-blacklists-ut1.tar.gz
+/usr/local/etc/layer7/blacklists/.last-known-good/discovered.json:{"source":"https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt","snapshot_id":"ut1-2026-04-25","discovered_at":"2026-08-04T06:00:04Z","categories":[{"id":"ads","domains_count":4344},{"id":"adult","domains_count":4599279},{"id":"aggressive","domains_count":360},{"id":"agressif","domains_count":360},{"id":"ai","domains_count":75},{"id":"arjel","domains_count":69},{"id":"associations_religieuses","domains_count":1},{"id":"astrology","domains_count":28},{"id":"audio-video","domains_count":3710},{"id":"bank","domains_count":6646},{"id":"bitcoin","domains_count":1419},{"id":"blog","domains_count":1497},{"id":"celebrity","domains_count":635},{"id":"chat","domains_count":268},{"id":"child","domains_count":75},{"id":"cleaning","domains_count":174},{"id":"cooking","domains_count":37},{"id":"cryptojacking","domains_count":16288},{"id":"dangerous_material","domains_count":35},{"id":"dating","domains_count":6504},{"id":"ddos","domains_count":421},{"id":"dialer","domains_count":4},{"id":"doh","domains_count":3015},{"id":"download","domains_count":4020},{"id":"drogue","domains_count":603},{"id":"drugs","domains_count":603},{"id":"dynamic-dns","domains_count":2076},{"id":"educational_games","domains_count":8},{"id":"examen_pix","domains_count":347},{"id":"exceptions_liste_bu","domains_count":1},{"id":"fakenews","domains_count":1094},{"id":"filehosting","domains_count":940},{"id":"financial","domains_count":472},{"id":"forums","domains_count":205},{"id":"gambling","domains_count":32242},{"id":"games","domains_count":33742},{"id":"hacking","domains_count":274},{"id":"jobsearch","domains_count":60740},{"id":"lingerie","domains_count":193},{"id":"liste_blanche","domains_count":268},{"id":"liste_bu","domains_count":2824},{"id":"mail","domains_count":205},{"id":"malware","domains_count":690906},{"id":"manga","domains_count":652},{"id":"marketingware","domains_count":77},{"id":"mixed_adult","domains_count":149},{"id":"mobile-phone","domains_count":50},{"id":"phishing","domains_count":690198},{"id":"porn","domains_count":4599279},{"id":"press","domains_count":4644},{"id":"proxy","domains_count":132323},{"id":"publicite","domains_count":4344},{"id":"radio","domains_count":567},{"id":"reaffected","domains_count":7},{"id":"redirector","domains_count":132323},{"id":"remote-control","domains_count":170},{"id":"residential-proxies","domains_count":138},{"id":"sect","domains_count":144},{"id":"sexual_education","domains_count":15},{"id":"shopping","domains_count":36968},{"id":"shortener","domains_count":4548},{"id":"social_networks","domains_count":715},{"id":"special","domains_count":1},{"id":"sports","domains_count":2362},{"id":"stalkerware","domains_count":525},{"id":"strict_redirector","domains_count":132323},{"id":"strong_redirector","domains_count":132323},{"id":"translation","domains_count":175},{"id":"tricheur","domains_count":53},{"id":"tricheur_pix","domains_count":55},{"id":"update","domains_count":30},{"id":"violence","domains_count":360},{"id":"vpn","domains_count":6039},{"id":"warez","domains_count":1546},{"id":"webhosting","domains_count":29},{"id":"webmail","domains_count":404}]}
+/usr/local/etc/layer7/blacklists/.last-known-good/snapshot.state:manifest_url=https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt
+/usr/local/etc/layer7/blacklists/.last-known-good/snapshot.state:snapshot_url=https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-ut1.tar.gz
+/usr/local/etc/layer7/blacklists/.last-known-good/snapshot.state:cache_dir=/usr/local/etc/layer7/blacklists/.cache/ut1-2026-04-25
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/download/domains:zoopornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:123pornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:365pornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:4k-pornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:4pornhubs.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:99pornhubmovies.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:adultpornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:africanpornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:ai-pornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:aipornhub.net
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:akpornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:allpornhub.net
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:allpornhub.pro
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:allpornhubs.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:amateurpornhub.eu
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:amateurpornhub.net
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:amateurpornhub.org
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:amateurpornhub.tumblr.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:amateurpornhub.xyz
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:amateurspornhub.com
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:analpornhub.eu
+/usr/local/etc/layer7/blacklists/.last-known-good/blacklists/adult/domains:analpornhub.org
+allowlist-seed.txt
+blacklists
+lang
+layer7-reports-collect.php
+layer7-stats-collect.sh
+layer7-stats-purge.sh
+pf.conf
+pf.conf.sample
+profiles-custom.json
+profiles.json
+reports
+update-blacklists.sh
+===GUI_LISTEN===
+root    php-fpm    99057  4 udp4  *:*                   *:*                  
+root    php        16000  6 udp4  *:*                   *:*                  
+root    php        16000 11 tcp4  127.0.0.1:8099        *:*                  
+root    php-fpm    69727  4 udp4  *:*                   *:*                  
+root    php-fpm     3994  4 udp4  *:*                   *:*                  
+root    php-fpm    22191  4 udp4  *:*                   *:*                  
+root    php-fpm    13994  4 udp4  *:*                   *:*                  
+root    php-fpm    75625  4 udp4  *:*                   *:*                  
+root    php-fpm    42816  4 udp4  *:*                   *:*                  
+root    nginx      10868  5 tcp4  *:8002                *:*                  
+root    nginx      10599  5 tcp4  *:8002                *:*                  
+root    nginx      10491  5 tcp4  *:8002                *:*                  
+root    nginx      10380  5 tcp4  *:8002                *:*                  
+root    nginx      10268  5 tcp4  *:8002                *:*                  
+root    nginx       9961  5 tcp4  *:8002                *:*                  
+root    nginx       9679  5 tcp4  *:8002                *:*                  
+root    nginx       8972  5 tcp4  *:9999                *:*                  
+root    nginx       8972  7 tcp4  *:80                  *:*                  
+root    nginx       8830  5 tcp4  *:9999                *:*                  
+root    nginx       8830  7 tcp4  *:80                  *:*                  
+status:000
+settings:000
+
+===BL===
+null

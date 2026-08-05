@@ -1,0 +1,7 @@
+QA2_SETUP_OK
+unbound_has_youtube=no unbound_has_pornhub=yes
+block drop quick inet from any to <layer7_pdst_0> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_0> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+block drop quick inet from 192.168.100.234 to <layer7_pdst_2> label "layer7:pdst:qa-yt-block-a" ! tagged L7ALLOW
+172.217.30.110
+192.168.100.254

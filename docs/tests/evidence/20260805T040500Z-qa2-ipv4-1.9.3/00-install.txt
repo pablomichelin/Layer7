@@ -1,0 +1,44 @@
+INSTALLING
+Extracting pfSense-pkg-layer7-1.9.3: ......... done
+Saving updated package information...
+overwrite!
+Loading package configuration... done.
+Configuring package components...
+Loading package instructions...
+Custom commands...
+Executing custom_php_resync_config_command()...done.
+Menu items... done.
+Services... done.
+Writing configuration... done.
+
+=== Layer7 instalado com sucesso ===
+  Versão:  1.9.3
+  Config:  /usr/local/etc/layer7.json
+  GUI:     Services > Layer 7
+
+  O pacote inicia em modo MONITOR (seguro).
+  Acesse a GUI para configurar interfaces e políticas.
+
+1.9.3
+pfSense-pkg-layer7-1.9.3
+Name           : pfSense-pkg-layer7
+Version        : 1.9.3
+Installed on   : Wed Aug  5 01:12:42 2026 -03
+Origin         : sysutils/pfSense-pkg-layer7
+resync_ok
+layer7d is running as pid 86070.
+2026-08-05 00:42:54 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:43:15 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:43:15 [notice] license: valid customer=Systemup expiry=2028-07-08 features=full days_left=702
+2026-08-05 00:43:18 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:43:23 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#3 (/usr/local/etc/layer7.json)
+2026-08-05 00:43:31 [notice] config: policies=4 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:43:31 [notice] license: valid customer=Systemup expiry=2028-07-08 features=full days_left=702
+2026-08-05 00:43:39 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:47 [notice] license: valid customer=Systemup expiry=2028-07-08 features=full days_left=702
+2026-08-05 01:12:47 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:47 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+2026-08-05 01:12:51 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:54 [notice] license: valid customer=Systemup expiry=2028-07-08 features=full days_left=702
+2026-08-05 01:12:54 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 01:12:54 [notice] enforce_ready: enforce_cfg=1 mode=enforce

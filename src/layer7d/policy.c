@@ -1301,6 +1301,45 @@ layer7_decision_is_explicit_allow(const struct layer7_decision *dec)
 	    dec->reason == L7_DECIDE_POLICY_MATCH;
 }
 
+/*
+ * Politica sem criterio positivo (hosts/apps/cats/ifaces/src) — tipicamente
+ * "Monitor geral". Tem de ser fallback: se competir por priority com regras
+ * especificas, sombreava bloqueios (QA D2: monitor pri=10 > youtube pri=5).
+ */
+static int
+rule_is_catch_all(const struct layer7_policy_rule *r)
+{
+	if (!r)
+		return 1;
+	return r->n_ndpi_apps == 0 && r->n_ndpi_cats == 0 && r->n_hosts == 0 &&
+	    r->n_ifaces == 0 && r->n_src_hosts == 0 && r->n_src_cidrs == 0;
+}
+
+static int
+decide_try_policy_slot(const struct layer7_policy_rule *rules, int n_rules,
+    int i, int global_enforce, const char *iface, const char *client_ip,
+    const char *domain_or_host, const char *ndpi_app, const char *ndpi_cat,
+    struct layer7_decision *dec)
+{
+	const struct layer7_policy_rule *r = &rules[i];
+	int app_matched, cat_matched, host_matched;
+
+	if (!r->enabled)
+		return 0;
+	if (!rule_matches(r, iface, client_ip, ndpi_app, ndpi_cat,
+	    domain_or_host, &app_matched, &cat_matched, &host_matched))
+		return 0;
+	dec->action = r->action;
+	dec->reason = L7_DECIDE_POLICY_MATCH;
+	strncpy(dec->matched_policy_id, r->id,
+	    sizeof(dec->matched_policy_id) - 1);
+	dec->matched_policy_id[sizeof(dec->matched_policy_id) - 1] = '\0';
+	fill_enforce(r, global_enforce, dec);
+	dec_set_scoped_policy(r, rules, n_rules, app_matched, cat_matched,
+	    host_matched, dec);
+	return 1;
+}
+
 int
 layer7_decide_for_client(const struct layer7_exception *exc, int n_exc,
     const struct layer7_policy_rule *rules, int n_rules, int global_enforce,
@@ -1334,25 +1373,21 @@ layer7_decide_for_client(const struct layer7_exception *exc, int n_exc,
 		return 0;
 	}
 
+	/* Passagem 1: politicas especificas (ja ordenadas por priority desc). */
 	for (i = 0; i < n_rules; i++) {
-		const struct layer7_policy_rule *r = &rules[i];
-		int app_matched, cat_matched, host_matched;
-
-		if (!r->enabled)
+		if (rule_is_catch_all(&rules[i]))
 			continue;
-		if (!rule_matches(r, iface, client_ip, ndpi_app, ndpi_cat,
-		    domain_or_host, &app_matched, &cat_matched, &host_matched))
+		if (decide_try_policy_slot(rules, n_rules, i, global_enforce,
+		    iface, client_ip, domain_or_host, ndpi_app, ndpi_cat, dec))
+			return 0;
+	}
+	/* Passagem 2: catch-all (ex.: Monitor geral). */
+	for (i = 0; i < n_rules; i++) {
+		if (!rule_is_catch_all(&rules[i]))
 			continue;
-		dec->action = r->action;
-		dec->reason = L7_DECIDE_POLICY_MATCH;
-		strncpy(dec->matched_policy_id, r->id,
-		    sizeof(dec->matched_policy_id) - 1);
-		dec->matched_policy_id[sizeof(dec->matched_policy_id) - 1] =
-		    '\0';
-		fill_enforce(r, global_enforce, dec);
-		dec_set_scoped_policy(r, rules, n_rules, app_matched,
-		    cat_matched, host_matched, dec);
-		return 0;
+		if (decide_try_policy_slot(rules, n_rules, i, global_enforce,
+		    iface, client_ip, domain_or_host, ndpi_app, ndpi_cat, dec))
+			return 0;
 	}
 
 	if (global_enforce) {

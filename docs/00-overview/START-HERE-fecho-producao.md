@@ -20,11 +20,11 @@ docs/00-overview/START-HERE-fecho-producao.md
 
 | Campo | Valor |
 |-------|-------|
-| **Trilha activa** | **IPv6** — Ondas V0–V6 |
-| **Passo autorizado** | **Gates appliance** em `1.9.2` (GV1/GV3/GV4); V5 adiada (retomar 12.10) |
+| **Trilha activa** | **IPv6** — Ondas V0–V6 (pausa QA IPv4 concluída em `1.9.3`) |
+| **Passo autorizado** | **Gates appliance** GV1/GV3/GV4; V5 adiada (retomar 12.10) |
 | **BG activo** | BG-083 **adiado temporário** (retomar); gates em curso |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
-| Candidato lab / `latest` | **`1.9.2`** (publicado; 12.1–12.9 + banner V5) |
+| Candidato lab / `latest` | **`1.9.3`** (QA IPv4 D1–D6 + base IPv6 12.1–12.9) |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 — **V5 Opção B temporária** (`2026-08-05`); retomar Opção A depois |
 | Ressalva V5 | DNS/block page/VIP DNS v6 **ainda não**; **voltar a fazer bem** (12.10–12.11) |
@@ -126,13 +126,13 @@ Estado (confirmar no repo):
 - Passo actual: 12.10
 - Onda: V5
 - BG: BG-083
-- Candidato lab / latest: 1.9.2
+- Candidato lab / latest: 1.9.3
 - Produção enforce: 1.9.0
-- Rollback lab: 1.9.1 (produção: 1.8.11_69 a partir de 1.9.0)
+- Rollback lab: 1.9.2 (produção: 1.8.11_69 a partir de 1.9.0)
 
 Tarefa deste chat:
 Executa SOMENTE o passo <12.x> do plano-ipv6-completo.md.
-(Ou gates appliance GV* se CORTEX indicar gates pós-1.9.2.)
+(Ou gates appliance GV* se CORTEX indicar gates pós-1.9.3.)
 No fim: (1) o que fizeste, (2) evidência/teste/gate, (3) mapa M-xx se aplicável,
 (4) CORTEX actualizado, (5) próximo passo autorizado.
 Não avances automaticamente para o passo seguinte sem eu pedir.

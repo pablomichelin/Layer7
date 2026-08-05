@@ -1,0 +1,61 @@
+===PDST===
+===STATS===
+Array
+(
+    [total_classified] => 341
+    [total_blocked] => 0
+    [pf_add_ok] => 0
+    [dst_add_ok] => 0
+    [cap_classified_v4] => 340
+)
+===RECENT_LOG===
+2026-08-05 00:39:02 [notice] SIGHUP: reload config
+2026-08-05 00:39:02 [notice] allowlist: seed=94 json=0 total=94 pf_add_ok=4
+2026-08-05 00:39:02 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:39:02 [notice] logging: detailed=0 event_ifaces=1 max_mb=5 rotated=3
+2026-08-05 00:39:02 [warn] pf_selfheal: start reason=sighup_reload
+2026-08-05 00:39:03 [warn] pf_selfheal: failed table=base reason=sighup_reload fallback=0
+2026-08-05 00:39:03 [notice] capture: protos_file=/usr/local/etc/layer7-protos.txt
+2026-08-05 00:39:03 [notice] capture: opened vmx0 (nDPI active, sni_inspection=0)
+2026-08-05 00:39:04 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=0)
+2026-08-05 00:39:05 [notice] daemon_stop
+2026-08-05 00:39:21 [notice] config file present: /usr/local/etc/layer7.json (2324 bytes)
+2026-08-05 00:39:21 [warn] pfctl flush failed table=layer7_allow_dst ctx=pf_table_flush
+2026-08-05 00:39:21 [notice] allowlist: seed=94 json=0 total=94 pf_add_ok=4
+2026-08-05 00:39:21 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:39:21 [notice] logging: detailed=0 event_ifaces=1 max_mb=5 rotated=3
+2026-08-05 00:39:21 [notice] capture: protos_file=/usr/local/etc/layer7-protos.txt
+2026-08-05 00:39:21 [notice] capture: opened vmx0 (nDPI active, sni_inspection=0)
+2026-08-05 00:39:22 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=0)
+2026-08-05 00:40:08 [notice] SIGHUP: reload config
+2026-08-05 00:40:08 [notice] allowlist: seed=94 json=0 total=94 pf_add_ok=4
+2026-08-05 00:40:08 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:08 [notice] logging: detailed=0 event_ifaces=1 max_mb=5 rotated=3
+2026-08-05 00:40:08 [warn] pf_selfheal: start reason=sighup_reload
+2026-08-05 00:40:09 [notice] pf_selfheal: success table=base reason=sighup_reload fallback=1
+2026-08-05 00:40:09 [notice] capture: protos_file=/usr/local/etc/layer7-protos.txt
+2026-08-05 00:40:09 [notice] capture: opened vmx0 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:09 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:10 [notice] daemon_stop
+2026-08-05 00:40:11 [notice] config file present: /usr/local/etc/layer7.json (2313 bytes)
+2026-08-05 00:40:11 [notice] allowlist: seed=94 json=0 total=94 pf_add_ok=4
+2026-08-05 00:40:11 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:11 [notice] logging: detailed=0 event_ifaces=1 max_mb=5 rotated=3
+2026-08-05 00:40:11 [notice] capture: protos_file=/usr/local/etc/layer7-protos.txt
+2026-08-05 00:40:11 [notice] capture: opened vmx0 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:11 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:58 [notice] SIGHUP: reload config
+2026-08-05 00:40:58 [notice] allowlist: seed=94 json=0 total=94 pf_add_ok=4
+2026-08-05 00:40:58 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:40:58 [notice] logging: detailed=0 event_ifaces=1 max_mb=5 rotated=3
+2026-08-05 00:40:58 [notice] capture: protos_file=/usr/local/etc/layer7-protos.txt
+2026-08-05 00:40:58 [notice] capture: opened vmx0 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:58 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=1)
+2026-08-05 00:40:59 [notice] daemon_stop
+2026-08-05 00:41:16 [notice] config file present: /usr/local/etc/layer7.json (2476 bytes)
+2026-08-05 00:41:16 [notice] allowlist: seed=94 json=0 total=94 pf_add_ok=4
+2026-08-05 00:41:16 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:41:16 [notice] logging: detailed=0 event_ifaces=1 max_mb=5 rotated=3
+2026-08-05 00:41:16 [notice] capture: protos_file=/usr/local/etc/layer7-protos.txt
+2026-08-05 00:41:16 [notice] capture: opened vmx0 (nDPI active, sni_inspection=1)
+2026-08-05 00:41:16 [notice] capture: opened vmx0.95 (nDPI active, sni_inspection=1)

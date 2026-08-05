@@ -242,6 +242,9 @@ flush_tables_all() {
 	flush_tables_exception_allow
 	flush_tables_policy_scoped
 	flush_tables_allow_dst
+	# Residuos de lab (QA D5): ancora de teste G5 nao faz parte do ciclo
+	# de vida do pacote — limpar se existir.
+	/sbin/pfctl -a layer7_g5_test -F all >/dev/null 2>&1 || true
 }
 
 show_status() {

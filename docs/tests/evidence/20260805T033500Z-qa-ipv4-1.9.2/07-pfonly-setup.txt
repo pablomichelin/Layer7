@@ -1,0 +1,3 @@
+PFONLY_OK
+unbound_yt_check: 172.217.30.110
+block drop quick inet from 192.168.100.234 to <layer7_pdst_1> label "layer7:pdst:qa-yt-block-a" ! tagged L7ALLOW

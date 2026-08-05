@@ -1,0 +1,132 @@
+===STATS_PATHS===
+-rw-r--r--  1 root wheel   585 Aug  4 21:47 /tmp/layer7-bl-pre-cleanup.json
+-rw-r--r--  1 root wheel  1220 Aug  4 21:21 /tmp/layer7-bl-progress.txt
+-rw-r--r--  1 root wheel 11438 Aug  4 23:57 /tmp/layer7-ndpi-protos.json
+-rw-r--r--  1 root wheel  2270 Aug  4 21:42 /tmp/layer7-ondaE-passive.json
+-rw-r--r--  1 root wheel  2270 Aug  4 21:56 /tmp/layer7-ondaE-restore.json
+-rw-r--r--  1 root wheel  1714 Aug  5 00:36 /tmp/layer7-stats.json
+-rw-rw-r--  1 www  wheel  2271 Aug  4 19:18 /tmp/layer7.json.pre-g3-g4
+-rw-rw-r--  1 www  wheel  2269 Aug  4 19:22 /tmp/layer7.json.pre-g5
+-rw-r--r--  1 root wheel  2270 Aug  4 20:22 /tmp/layer7.json.pre-g5-full
+-rw-r--r--  1 root wheel  2270 Aug  4 19:45 /tmp/layer7.json.pre-g5-retest
+-rw-r--r--  1 root wheel  4915 Aug  5 00:36 /tmp/layer7.json.pre-qa-ipv4-192
+-rw-r--r--  1 root wheel  2270 Aug  4 20:09 /tmp/layer7.json.verify-resync
+-rw-r--r--  1 root wheel   334 Jul 29 14:08 /tmp/layer7.lic.pre-s14
+-rw-------  1 root wheel   211 Aug  4 21:13 /var/db/layer7-checkin.json
+-rw-r--r--  1 root wheel     5 Aug  5 00:26 /var/run/layer7d.pid
+/tmp/layer7-stats.json
+/usr/local/etc/layer7/layer7-stats-collect.sh
+/usr/local/etc/layer7/layer7-stats-purge.sh
+===SIGNAL_STATS===
+-rw-------  1 root wheel 211 Aug  4 21:13 /var/db/layer7-checkin.json
+
+{
+  "version": "1.9.2",
+  "boot_time": 1785900389,
+  "uptime_seconds": 642,
+  "timestamp": 1785901031,
+  "total_classified": 36769,
+  "total_blocked": 81,
+  "total_allowed": 36688,
+  "policies_active": 4,
+  "exceptions": 0,
+  "enforce_mode": 1,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 0,
+  "dst_add_fail": 0,
+  "cap_pkts": 1407616,
+  "cap_pkts_v4": 1406243,
+  "cap_pkts_v6": 618,
+  "cap_active": 10167,
+  "cap_active_v4": 10090,
+  "cap_active_v6": 77,
+  "cap_classified": 36769,
+  "cap_===UNBOUND_OVERRIDES===
+access_lists.conf
+conf.d
+dhcpleases_entries.conf
+domainoverrides.conf
+host_entries.conf
+leases
+remotecontrol.conf
+root.key
+unbound.conf
+unbound.conf.layer7-bak.20260323183054
+/var/unbound/unbound.conf
+/var/unbound/dhcpleases_entries.conf:3:local-data: "DESKTOP-49CKHEM.system.up IN A 192.168.95.182"
+/var/unbound/dhcpleases_entries.conf:4:local-data-ptr: "192.168.95.182 DESKTOP-49CKHEM.system.up"
+/var/unbound/dhcpleases_entries.conf:5:local-data: "SZK.system.up IN A 192.168.95.27"
+/var/unbound/dhcpleases_entries.conf:6:local-data-ptr: "192.168.95.27 SZK.system.up"
+/var/unbound/dhcpleases_entries.conf:7:local-data: "SEP1CE85D06DD90.system.up IN A 192.168.100.33"
+/var/unbound/dhcpleases_entries.conf:8:local-data-ptr: "192.168.100.33 SEP1CE85D06DD90.system.up"
+/var/unbound/dhcpleases_entries.conf:9:local-data: "DESKTOP-JGI7R2F.system.up IN A 192.168.100.32"
+/var/unbound/dhcpleases_entries.conf:10:local-data-ptr: "192.168.100.32 DESKTOP-JGI7R2F.system.up"
+/var/unbound/dhcpleases_entries.conf:11:local-data: "Steam-Assetto.system.up IN A 192.168.100.24"
+/var/unbound/dhcpleases_entries.conf:12:local-data-ptr: "192.168.100.24 Steam-Assetto.system.up"
+/var/unbound/dhcpleases_entries.conf:13:local-data: "freebsd.system.up IN A 192.168.100.12"
+/var/unbound/dhcpleases_entries.conf:14:local-data-ptr: "192.168.100.12 freebsd.system.up"
+/var/unbound/dhcpleases_entries.conf:15:local-data: "idrac-HSG3CP2.system.up IN A 192.168.100.14"
+/var/unbound/dhcpleases_entries.conf:16:local-data-ptr: "192.168.100.14 idrac-HSG3CP2.system.up"
+/var/unbound/dhcpleases_entries.conf:17:local-data: "airport-time-capsule.system.up IN A 192.168.95.38"
+/var/unbound/dhcpleases_entries.conf:18:local-data-ptr: "192.168.95.38 airport-time-capsule.system.up"
+/var/unbound/dhcpleases_entries.conf:19:local-data: "MBP-de-Andre.system.up IN A 192.168.95.134"
+/var/unbound/dhcpleases_entries.conf:20:local-data-ptr: "192.168.95.134 MBP-de-Andre.system.up"
+/var/unbound/dhcpleases_entries.conf:21:local-data: "Assistencia.system.up IN A 192.168.95.71"
+/var/unbound/dhcpleases_entries.conf:22:local-data-ptr: "192.168.95.71 Assistencia.system.up"
+/var/unbound/dhcpleases_entries.conf:23:local-data: "S23-FE-de-Romoaldo.system.up IN A 192.168.95.33"
+/var/unbound/dhcpleases_entries.conf:24:local-data-ptr: "192.168.95.33 S23-FE-de-Romoaldo.system.up"
+/var/unbound/dhcpleases_entries.conf:25:local-data: "DESKTOP-GLJNIOU.system.up IN A 192.168.95.79"
+/var/unbound/dhcpleases_entries.conf:26:local-data-ptr: "192.168.95.79 DESKTOP-GLJNIOU.system.up"
+/var/unbound/dhcpleases_entries.conf:27:local-data: "DESKTOP-G0Q80U0.system.up IN A 192.168.95.182"
+/var/unbound/dhcpleases_entries.conf:28:local-data-ptr: "192.168.95.182 DESKTOP-G0Q80U0.system.up"
+/var/unbound/dhcpleases_entries.conf:29:local-data: "S10-de-Vendas.system.up IN A 192.168.95.53"
+/var/unbound/dhcpleases_entries.conf:30:local-data-ptr: "192.168.95.53 S10-de-Vendas.system.up"
+/var/unbound/dhcpleases_entries.conf:31:local-data: "A52s-de-Keli.system.up IN A 192.168.95.45"
+/var/unbound/dhcpleases_entries.conf:32:local-data-ptr: "192.168.95.45 A52s-de-Keli.system.up"
+===ANCHORS===
+  ipsec
+  layer7_g5_test
+  natearly
+  natrules
+  natrules/layer7_nat
+  openvpn
+  tftp-proxy
+  userrules
+  cpzoneid_2_allowedhosts
+  cpzoneid_2_auth
+  cpzoneid_2_passthrumac
+===NAT_RDR===
+nat on pppoe0 inet from <tonatsubnets> to any -> 177.38.10.224 port 1024:65535
+nat on pppoe0 inet6 from <tonatsubnets> to any -> 2804:6c4:200:0:250:56ff:fe88:a4f7 port 1024:65535
+nat on pppoe1 inet from <tonatsubnets> to any -> 45.238.165.154 port 1024:65535
+nat on pppoe1 inet6 from <tonatsubnets> to any -> 2804:108c:db00:0:250:56ff:fe88:e133 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.247 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.247 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.247 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.247 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.228 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.228 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.228 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.228 port = 62354 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.228 port = 8081 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.228 port = 8081 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.228 port = 8081 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.228 port = 8081 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.254 port = 9999 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.254 port = 9999 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.252 port = 7989 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.252 port = 7989 -> 192.168.100.254 port 1024:65535
+no nat on vmx0 inet proto tcp from (vmx0) to 192.168.100.253
+no nat on vmx0 inet proto udp from (vmx0) to 192.168.100.253
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.253 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.253 -> 192.168.100.254 port 1024:65535
+no nat on vmx0 inet proto tcp from (vmx0) to 192.168.100.253
+no nat on vmx0 inet proto udp from (vmx0) to 192.168.100.253
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.253 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.253 -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.253 port = ftp -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.253 port = ftp -> 192.168.100.254 port 1024:65535
+===GUI_CURL_LOCAL===
+000
+000

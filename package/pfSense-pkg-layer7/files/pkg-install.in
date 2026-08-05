@@ -20,6 +20,17 @@ if [ ! -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ] && [ -f "${PKG_ROOTDIR}/u
 	cp "${PKG_ROOTDIR}/usr/local/etc/layer7.json.sample" "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
 fi
 
+# Blacklists: sample → config.json na primeira instalacao (D6).
+_bl_dir="${PKG_ROOTDIR}/usr/local/etc/layer7/blacklists"
+_bl_cfg="${_bl_dir}/config.json"
+_bl_sample="${_bl_dir}/config.json.sample"
+if [ ! -f "${_bl_cfg}" ] && [ -f "${_bl_sample}" ]; then
+	/bin/mkdir -p "${_bl_dir}"
+	cp "${_bl_sample}" "${_bl_cfg}"
+	chown www:wheel "${_bl_cfg}" 2>/dev/null || true
+	chmod 0664 "${_bl_cfg}" 2>/dev/null || true
+fi
+
 if [ -f "${PKG_ROOTDIR}/usr/local/etc/layer7.json" ]; then
 	chown www:wheel "${PKG_ROOTDIR}/usr/local/etc/layer7.json"
 	chmod 0664 "${PKG_ROOTDIR}/usr/local/etc/layer7.json"

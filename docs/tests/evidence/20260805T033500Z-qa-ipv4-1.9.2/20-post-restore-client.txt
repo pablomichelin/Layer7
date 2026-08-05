@@ -1,0 +1,9 @@
+pornhub:192.168.100.254
+youtube:172.217.30.110
+yt=200
+google=200
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="widt

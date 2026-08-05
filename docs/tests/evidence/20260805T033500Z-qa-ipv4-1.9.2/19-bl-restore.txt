@@ -1,0 +1,67 @@
+===BL_DISK===
+233M	/usr/local/etc/layer7/blacklists
+.cache
+.last-known-good
+.state
+_custom
+ads
+adult
+aggressive
+agressif
+ai
+arjel
+===BL_RUNTIME===
+bl_enabled=
+bl_domains_loaded=0
+bl_categories_active=0
+bl_lookups=0
+bl_hits=0
+bl_rules_active=0
+===EVENTS_SAMPLE===
+2026-08-05 00:36:45 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 00:36:45 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=192.168.100.254 host=mask.icloud.com app=SSH cat=RemoteAccess action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 00:36:46 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=mask.icloud.com app=HTTP cat=Web action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 00:36:46 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=mask.icloud.com app=HTTP cat=AdultContent action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 00:36:46 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=pornhub.com app=TLS cat=AdultContent action=block reason=policy_match policy=profile-preset-protecao-infantil
+2026-07-30 18:12:14 [notice] flow_decide: iface=vmx0.95 src=192.168.95.147 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=Instagram cat=SocialNetwork action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:15 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:16 [notice] flow_decide: iface=vmx0.95 src=192.168.95.147 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=Instagram cat=SocialNetwork action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:17 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=rr1---sn-bg0e6nee.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:17 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=177.38.8.76 host=rr1---sn-24v0gcg-m52e.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:17 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=177.38.8.76 ip=177.38.8.76 policy=profile-youtube reason=flow_block
+2026-07-30 18:12:19 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=177.38.8.76 host=rr1---sn-24v0gcg-m52e.googlevideo.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:19 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=177.38.8.76 ip=177.38.8.76 policy=profile-youtube reason=flow_block
+2026-07-30 18:12:20 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=142.251.151.4 host=www.youtube.com app=YouTube cat=Media action=block reason=policy_match policy=profile-youtube
+2026-07-30 18:12:20 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=142.251.151.4 ip=142.251.151.4 policy=profile-youtube reason=flow_block
+===RELOAD_CYCLE===
+layer7d is running as pid 7148.
+layer7d is running as pid 43763.
+2026-08-05 00:41:16 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:00 [notice] daemon_stop
+2026-08-05 00:42:02 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:08 [notice] SIGHUP: reload config
+2026-08-05 00:42:08 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:38 [notice] SIGHUP: reload config
+2026-08-05 00:42:38 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#3 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:39 [notice] daemon_stop
+2026-08-05 00:42:46 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:42:53 [notice] SIGHUP: reload config
+2026-08-05 00:42:54 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 00:43:14 [notice] daemon_stop
+2026-08-05 00:43:15 [notice] config: policies=2 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 00:43:18 [notice] SIGHUP: reload config
+2026-08-05 00:43:18 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+===RESTORE===
+restored_mode=enforce model=legacy_global policies=4 force_dns=1
+FINAL enabled=1 mode=enforce model=legacy_global pols=4 force_dns=1
+ - p-mon-001
+ - anti-bypass-dns
+ - profile-preset-protecao-infantil
+ - profile-anti-bypass-dns
+layer7d is running as pid 9319.
+dig_pornhub:
+192.168.100.254
+dig_youtube:
+172.217.30.110
+G5_LEFTOVER:
+block drop in quick on vmx0 inet from 192.168.100.234 to 142.251.156.4
