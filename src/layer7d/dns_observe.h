@@ -86,7 +86,7 @@ layer7_dns_read_name(const uint8_t *msg, size_t msg_len, size_t *off,
 }
 
 /*
- * Percorre answers de uma resposta DNS (QR=1 implícito pelo caller).
+ * Percorre answers de uma resposta DNS (exige QR=1 no header).
  * Invoca cb para cada RR A (af=4) ou AAAA (af=6).
  * Retorna o número de RRs A/AAAA entregues, ou -1 se o cabeçalho/QNAME falhar.
  */
@@ -101,6 +101,10 @@ layer7_dns_foreach_a_aaaa(const uint8_t *payload, size_t payload_len,
 	int delivered = 0;
 
 	if (!payload || payload_len < 12 || !cb)
+		return -1;
+
+	/* QR=1 obrigatório — caller pode mentir; não tratar query como answer. */
+	if ((payload[2] & 0x80U) == 0)
 		return -1;
 
 	qd = (uint16_t)((payload[4] << 8) | payload[5]);

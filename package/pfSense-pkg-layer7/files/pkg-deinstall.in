@@ -121,5 +121,6 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 			"/var/log/layer7-events.log.${_i}" >/dev/null 2>&1 || true
 		_i=$((_i + 1))
 	done
-	/bin/rm -f /tmp/layer7-stats.json /tmp/layer7_pkg_rm_started >/dev/null 2>&1 || true
+	/bin/rm -f /tmp/layer7-stats.json /var/db/layer7/layer7-stats.json \
+		/var/db/layer7/layer7-stats.json.tmp /tmp/layer7_pkg_rm_started >/dev/null 2>&1 || true
 fi

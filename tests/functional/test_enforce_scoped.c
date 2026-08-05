@@ -177,6 +177,15 @@ test_host_ok_dualstack(void)
 	    "S-03 reject multicast");
 	check(layer7_pf_host_enforce_ok("192.168.1.1") == 1,
 	    "enforce_ok v4 still");
+	check(layer7_pf_table_entry_ok("10.0.0.0/8") == 1, "entry CIDR v4");
+	check(layer7_pf_table_entry_ok("2001:db8::/32") == 1, "entry CIDR v6");
+	check(layer7_pf_table_entry_ok("2001:db8::1") == 1, "entry host v6");
+	check(layer7_pf_table_entry_ok("::1") == 0, "entry reject loopback");
+	check(layer7_pf_table_entry_ok("fe80::/10") == 0,
+	    "entry reject link-local net");
+	check(layer7_pf_table_entry_ok("2001:db8::/999") == 0,
+	    "entry reject bad prefix");
+	check(layer7_pf_table_entry_ok("evil;rm") == 0, "entry reject junk");
 }
 
 static void

@@ -250,6 +250,10 @@ layer7_license_check(struct l7_license_info *info)
 	int verify_ok = 0;
 
 	memset(info, 0, sizeof(*info));
+	memset(lic_hwid, 0, sizeof(lic_hwid));
+	memset(expiry, 0, sizeof(expiry));
+	memset(customer, 0, sizeof(customer));
+	memset(features, 0, sizeof(features));
 
 	if (is_dev_key()) {
 		info->dev_mode = 1;
@@ -432,8 +436,24 @@ shell_safe_url(const char *s)
 	return 1;
 }
 
-#define L7_ACTIVATE_BODY_TMP "/tmp/layer7-activate.body"
-#define L7_ACTIVATE_HTTP_TMP "/tmp/layer7-activate.http"
+#define L7_ACTIVATE_BODY_TMP "/var/db/layer7/activate.body"
+#define L7_ACTIVATE_HTTP_TMP "/var/db/layer7/activate.http"
+#define L7_VAR_DB_DIR "/var/db/layer7"
+
+static int
+ensure_layer7_var_db(void)
+{
+	struct stat st;
+
+	if (stat(L7_VAR_DB_DIR, &st) == 0) {
+		if (!S_ISDIR(st.st_mode))
+			return -1;
+		return 0;
+	}
+	if (mkdir(L7_VAR_DB_DIR, 0755) != 0 && errno != EEXIST)
+		return -1;
+	return 0;
+}
 
 static void
 activation_cleanup_temp(void)
@@ -537,13 +557,20 @@ layer7_activate(const char *key, const char *url)
 	fprintf(stderr, "  hardware_id:  %s\n", hw_id);
 	fprintf(stderr, "  key:          %.8s...\n", key);
 
+	if (ensure_layer7_var_db() != 0) {
+		fprintf(stderr,
+		    "layer7d: activation failed — cannot create %s\n",
+		    L7_VAR_DB_DIR);
+		return -1;
+	}
 	activation_cleanup_temp();
 
 	snprintf(body, sizeof(body),
 	    "{\"key\":\"%s\",\"hardware_id\":\"%s\"}", key, hw_id);
 
 	snprintf(cmd, sizeof(cmd),
-	    "curl -sS -o %s -w '%%{http_code}' -X POST "
+	    "curl -sS --connect-timeout 10 --max-time 30 "
+	    "-o %s -w '%%{http_code}' -X POST "
 	    "-H 'Content-Type: application/json' "
 	    "-d '%s' '%s' > %s 2>/dev/null",
 	    L7_ACTIVATE_BODY_TMP, body, url, L7_ACTIVATE_HTTP_TMP);
@@ -621,8 +648,8 @@ layer7_activate(const char *key, const char *url)
 
 /* --- BG-077: online check-in / remote revocation --- */
 
-#define L7_CHECKIN_BODY_TMP "/tmp/layer7-checkin.body"
-#define L7_CHECKIN_HTTP_TMP "/tmp/layer7-checkin.http"
+#define L7_CHECKIN_BODY_TMP "/var/db/layer7/checkin.body"
+#define L7_CHECKIN_HTTP_TMP "/var/db/layer7/checkin.http"
 #define L7_CHECKIN_DEFAULT_URL \
 	"https://license.systemup.inf.br/api/license/check-in"
 
@@ -930,6 +957,12 @@ layer7_check_in(const char *url)
 	}
 
 	st.last_check_in_attempt = time(NULL);
+	if (ensure_layer7_var_db() != 0) {
+		snprintf(st.last_error, sizeof(st.last_error),
+		    "cannot create %s", L7_VAR_DB_DIR);
+		(void)checkin_save_state(&st);
+		return L7_CHECKIN_NETWORK;
+	}
 	checkin_cleanup_temp();
 
 	snprintf(body, sizeof(body),
@@ -937,7 +970,8 @@ layer7_check_in(const char *url)
 	    st.license_key, hw_id);
 
 	snprintf(cmd, sizeof(cmd),
-	    "curl -sS -o %s -w '%%{http_code}' -X POST "
+	    "curl -sS --connect-timeout 10 --max-time 30 "
+	    "-o %s -w '%%{http_code}' -X POST "
 	    "-H 'Content-Type: application/json' "
 	    "-d '%s' '%s' > %s 2>/dev/null",
 	    L7_CHECKIN_BODY_TMP, body, url, L7_CHECKIN_HTTP_TMP);

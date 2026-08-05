@@ -2,6 +2,35 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Unreleased] — Hardening pós-auditoria `1.9.8` (candidato `1.9.9`)
+
+### Security
+
+- **BG-093:** self-heal/`pfctl -f /tmp/rules.debug` só se ficheiro regular,
+  uid 0 e sem world-write (daemon, `layer7-pfctl`, `layer7.inc`, diagnostics).
+- **BG-094:** stats JSON, activate/check-in tmp e update `.pkg` saem de `/tmp`
+  para `/var/db/layer7/` (stats com `O_EXCL|O_NOFOLLOW`).
+- **BG-095:** DNS observe exige QR=1 e correlação query↔resposta (txid+cliente,
+  TTL 10s); parser rejeita QR=0.
+- **BG-096:** allowlist PF aceita IPv6 host/CIDR via `layer7_pf_table_entry_ok`
+  + `layer7_pf_exec_table_add_entry` (fecha lacuna pós-trilha IPv6).
+- **BG-097:** curl activate/check-in com `--connect-timeout 10 --max-time 30`.
+- **BG-098:** `waitpid` com retry em `EINTR` no caminho `pfctl`.
+- **BG-099:** updater GUI restringe URL a `https://github.com/pablomichelin/Layer7/`.
+
+### Fixed
+
+- Buffers `customer`/`features` da licença inicializados (evita lixo em logs).
+
+### Notes
+
+- Candidato interno `1.9.9` — **não publicar** sem build FreeBSD + smoke lab.
+- Produção / `latest` continua **`1.9.8`** até release governada.
+- Residual DNS: atacante que veja o query ID ainda pode spoofar; allowlist de
+  resolver fica para bloco futuro.
+- BG-100 (teto 8M blacklist) e BG-101 (janela offline ADR-0021) documentados
+  sem mudança de código neste bloco.
+
 ## [Unreleased] — License server + daemon (S07 / F3)
 
 ### Added

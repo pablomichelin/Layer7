@@ -280,7 +280,9 @@ ausente:
 
 1. tenta `layer7-pfctl ensure`;
 2. valida as tabelas base;
-3. se necessario, aplica fallback com `pfctl -f /tmp/rules.debug`;
+3. se necessario, aplica fallback com `pfctl -f /tmp/rules.debug`
+   **apenas se o ficheiro for regular, uid 0 e sem world-write** (BG-093;
+   symlink ou dono nao-root → recusa);
 4. repete o `add` uma unica vez.
 
 No ciclo de `SIGHUP`, o daemon tambem valida tabelas base apos reload e tenta

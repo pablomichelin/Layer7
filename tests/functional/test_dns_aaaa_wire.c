@@ -148,6 +148,24 @@ main(void)
 			return fail("AAAA-only address");
 	}
 
+	/* Query com QR=0 deve ser rejeitada pelo parser de answers */
+	{
+		uint8_t query_pkt[] = {
+			0x12, 0x34, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00,
+			0x03, 'w', 'w', 'w',
+			0x07, 'e', 'x', 'a', 'm', 'p', 'l', 'e',
+			0x03, 'c', 'o', 'm',
+			0x00,
+			0x00, 0x01, 0x00, 0x01
+		};
+		memset(&bag, 0, sizeof(bag));
+		n = layer7_dns_foreach_a_aaaa(query_pkt, sizeof(query_pkt),
+		    on_rr, &bag);
+		if (n != -1 || bag.n != 0)
+			return fail("QR=0 must be rejected");
+	}
+
 	printf("PASS test_dns_aaaa_wire\n");
 	return 0;
 }

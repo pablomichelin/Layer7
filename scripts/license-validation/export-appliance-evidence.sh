@@ -35,7 +35,7 @@ RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
 OUTPUT_ROOT="${TMPDIR:-/tmp}/layer7-f3-evidence"
 UPDATE_ROOT_PREFLIGHT=0
 LICENSE_PATH="/usr/local/etc/layer7.lic"
-STATS_PATH="/tmp/layer7-stats.json"
+STATS_PATH="/var/db/layer7/layer7-stats.json"
 LAYER7D_BIN="/usr/local/sbin/layer7d"
 PIDFILE="/var/run/layer7d.pid"
 

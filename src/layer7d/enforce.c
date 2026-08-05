@@ -2,15 +2,32 @@
 #include "policy.h"
 #include <arpa/inet.h>
 #include <ctype.h>
+#include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-/* Textual IP buffer for argv (v4 or v6; INET6_ADDRSTRLEN=46). */
+/* Textual IP/CIDR buffer for argv (v6 + /128). */
 #define L7_PF_IP_BUF 64
+
+static int
+waitpid_retry(pid_t pid, int *st)
+{
+	pid_t r;
+
+	for (;;) {
+		r = waitpid(pid, st, 0);
+		if (r == pid)
+			return 0;
+		if (r == (pid_t)-1 && errno == EINTR)
+			continue;
+		return -1;
+	}
+}
 
 int
 layer7_pf_table_name_ok(const char *name)
@@ -128,6 +145,56 @@ layer7_pf_host_enforce_ok(const char *ip)
 }
 
 int
+layer7_pf_table_entry_ok(const char *entry)
+{
+	char host[L7_PF_IP_BUF];
+	const char *slash;
+	char *end = NULL;
+	long prefix;
+	struct in_addr a4;
+	struct in6_addr a6;
+	size_t hlen;
+	int is6;
+
+	if (!entry || !*entry)
+		return 0;
+	slash = strchr(entry, '/');
+	if (!slash)
+		return layer7_pf_host_enforce_ok(entry);
+
+	hlen = (size_t)(slash - entry);
+	if (hlen == 0 || hlen >= sizeof(host))
+		return 0;
+	memcpy(host, entry, hlen);
+	host[hlen] = '\0';
+	if (strchr(host, '%') != NULL)
+		return 0;
+
+	if (inet_pton(AF_INET, host, &a4) == 1) {
+		is6 = 0;
+	} else if (inet_pton(AF_INET6, host, &a6) == 1) {
+		is6 = 1;
+		if (IN6_IS_ADDR_LOOPBACK(&a6) ||
+		    IN6_IS_ADDR_LINKLOCAL(&a6) ||
+		    IN6_IS_ADDR_MULTICAST(&a6))
+			return 0;
+	} else {
+		return 0;
+	}
+
+	if (slash[1] == '\0')
+		return 0;
+	prefix = strtol(slash + 1, &end, 10);
+	if (end == slash + 1 || *end != '\0' || prefix < 0)
+		return 0;
+	if (!is6 && prefix > 32)
+		return 0;
+	if (is6 && prefix > 128)
+		return 0;
+	return 1;
+}
+
+int
 layer7_pf_snprint_add(char *buf, size_t buflen, const char *table,
     const char *ip)
 {
@@ -139,7 +206,8 @@ layer7_pf_snprint_add(char *buf, size_t buflen, const char *table,
 }
 
 static int
-pfctl_table_op(const char *table, const char *ip, const char *op)
+pfctl_table_op(const char *table, const char *entry, const char *op,
+    int allow_cidr)
 {
 	pid_t pid;
 	int st;
@@ -149,12 +217,18 @@ pfctl_table_op(const char *table, const char *ip, const char *op)
 
 	if (strcmp(op, "add") != 0 && strcmp(op, "delete") != 0)
 		return -1;
-	if (!layer7_pf_table_name_ok(table) || !layer7_pf_host_enforce_ok(ip))
+	if (!layer7_pf_table_name_ok(table))
 		return -1;
-	if (strlen(table) >= sizeof(tb) || strlen(ip) >= sizeof(ipb))
+	if (allow_cidr) {
+		if (!layer7_pf_table_entry_ok(entry))
+			return -1;
+	} else if (!layer7_pf_host_enforce_ok(entry)) {
+		return -1;
+	}
+	if (strlen(table) >= sizeof(tb) || strlen(entry) >= sizeof(ipb))
 		return -1;
 	memcpy(tb, table, strlen(table) + 1);
-	memcpy(ipb, ip, strlen(ip) + 1);
+	memcpy(ipb, entry, strlen(entry) + 1);
 
 	argv[0] = path_pfctl;
 	argv[1] = "-t";
@@ -171,7 +245,7 @@ pfctl_table_op(const char *table, const char *ip, const char *op)
 		execv(path_pfctl, argv);
 		_exit(127);
 	}
-	if (waitpid(pid, &st, 0) != pid)
+	if (waitpid_retry(pid, &st) != 0)
 		return -1;
 	if (WIFEXITED(st) && WEXITSTATUS(st) == 0)
 		return 0;
@@ -181,13 +255,19 @@ pfctl_table_op(const char *table, const char *ip, const char *op)
 int
 layer7_pf_exec_table_add(const char *table, const char *ip)
 {
-	return pfctl_table_op(table, ip, "add");
+	return pfctl_table_op(table, ip, "add", 0);
 }
 
 int
 layer7_pf_exec_table_delete(const char *table, const char *ip)
 {
-	return pfctl_table_op(table, ip, "delete");
+	return pfctl_table_op(table, ip, "delete", 0);
+}
+
+int
+layer7_pf_exec_table_add_entry(const char *table, const char *entry)
+{
+	return pfctl_table_op(table, entry, "add", 1);
 }
 
 static int
@@ -228,7 +308,7 @@ pfctl_kill_states(const char *first, const char *second)
 		execv(path_pfctl, argv);
 		_exit(127);
 	}
-	if (waitpid(pid, &st, 0) != pid)
+	if (waitpid_retry(pid, &st) != 0)
 		return -1;
 	return (WIFEXITED(st) && WEXITSTATUS(st) == 0) ? 0 : -1;
 }
@@ -278,7 +358,7 @@ layer7_pf_exec_kill_states_to(const char *dst_ip)
 		execv(path_pfctl, argv);
 		_exit(127);
 	}
-	if (waitpid(pid, &st, 0) != pid)
+	if (waitpid_retry(pid, &st) != 0)
 		return -1;
 	return (WIFEXITED(st) && WEXITSTATUS(st) == 0) ? 0 : -1;
 }

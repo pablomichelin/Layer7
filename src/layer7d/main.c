@@ -17,6 +17,7 @@
 #include "policy.h"
 #include <arpa/inet.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <ifaddrs.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -159,20 +160,49 @@ counter_cmp_desc(const void *a, const void *b)
 	return 0;
 }
 
-#define L7_STATS_JSON_PATH "/tmp/layer7-stats.json"
+#define L7_STATS_DIR "/var/db/layer7"
+#define L7_STATS_JSON_PATH L7_STATS_DIR "/layer7-stats.json"
 
 static void json_escape_fprint(FILE *f, const char *s);
+
+static int
+ensure_layer7_db_dir(void)
+{
+	struct stat st;
+
+	if (stat(L7_STATS_DIR, &st) == 0) {
+		if (!S_ISDIR(st.st_mode))
+			return -1;
+		return 0;
+	}
+	if (mkdir(L7_STATS_DIR, 0755) != 0 && errno != EEXIST)
+		return -1;
+	return 0;
+}
 
 static void
 write_stats_json(void)
 {
 	FILE *f;
+	int fd;
 	int i, limit;
 	time_t now = time(NULL);
+	char tmp_path[sizeof(L7_STATS_JSON_PATH) + 8];
 
-	f = fopen(L7_STATS_JSON_PATH ".tmp", "w");
-	if (!f)
+	if (ensure_layer7_db_dir() != 0)
 		return;
+
+	snprintf(tmp_path, sizeof(tmp_path), "%s.tmp", L7_STATS_JSON_PATH);
+	(void)unlink(tmp_path);
+	fd = open(tmp_path, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW, 0644);
+	if (fd < 0)
+		return;
+	f = fdopen(fd, "w");
+	if (!f) {
+		close(fd);
+		(void)unlink(tmp_path);
+		return;
+	}
 
 	fprintf(f, "{\n");
 	fprintf(f, "  \"version\": \"%s\",\n", layer7d_version);
@@ -326,10 +356,15 @@ write_stats_json(void)
 	}
 
 	fprintf(f, "}\n");
-	fclose(f);
-	if (rename(L7_STATS_JSON_PATH ".tmp", L7_STATS_JSON_PATH) != 0)
+	if (fclose(f) != 0) {
+		(void)unlink(tmp_path);
+		return;
+	}
+	if (rename(tmp_path, L7_STATS_JSON_PATH) != 0) {
 		syslog(LOG_WARNING, "stats: rename tmp failed: %s",
 		    strerror(errno));
+		(void)unlink(tmp_path);
+	}
 }
 
 static char s_remote_host[256];
@@ -1304,34 +1339,20 @@ pf_table_exists(const char *table)
 	return run_shell_cmd_ok(cmd);
 }
 
-/* Aceita IPv4 host (`a.b.c.d`) ou CIDR (`a.b.c.d/n`) — usado para popular
- * `layer7_allow_dst` a partir da allowlist (Bloco 3). Conservador: rejeita
- * tudo o que nao seja digito/ponto/barra para evitar shell injection mesmo
- * que a fonte ja tenha validado. */
+/* Aceita IPv4/IPv6 host ou CIDR — usado para popular `layer7_allow_dst`.
+ * Delegado a layer7_pf_table_entry_ok (inet_pton + S-03). */
 static int
 pf_entry_strict_ok(const char *entry)
 {
-	const char *p;
-
-	if (!entry || !*entry)
-		return 0;
-	for (p = entry; *p; p++) {
-		if (!((*p >= '0' && *p <= '9') || *p == '.' || *p == '/'))
-			return 0;
-	}
-	return 1;
+	return layer7_pf_table_entry_ok(entry);
 }
 
 static int
 pf_table_add_entry(const char *table, const char *entry)
 {
-	char cmd[128];
-
 	if (!layer7_pf_table_name_ok(table) || !pf_entry_strict_ok(entry))
 		return -1;
-	snprintf(cmd, sizeof(cmd),
-	    "/sbin/pfctl -t %s -T add %s 2>/dev/null", table, entry);
-	return run_shell_cmd_ok(cmd) ? 0 : -1;
+	return layer7_pf_exec_table_add_entry(table, entry);
 }
 
 static void
@@ -1345,7 +1366,7 @@ pf_table_flush(const char *table)
  *   1. reset estrutura
  *   2. carrega seed embutido (`/usr/local/etc/layer7/allowlist-seed.txt`)
  *   3. acrescenta entradas do JSON activo (`layer7.dst_allowlist`)
- *   4. popula a tabela PF `layer7_allow_dst` com IPv4 host/CIDR estaticos
+ *   4. popula a tabela PF `layer7_allow_dst` com host/CIDR IPv4+IPv6
  *      (entradas de dominio sao adicionadas em runtime quando o cliente
  *      resolver o dominio via DNS).
  */
@@ -1383,6 +1404,22 @@ pf_base_tables_ok(void)
 }
 
 static int
+pf_rules_debug_trusted(const char *path)
+{
+	struct stat st;
+
+	if (!path || lstat(path, &st) != 0)
+		return 0;
+	if (!S_ISREG(st.st_mode))
+		return 0;
+	if (st.st_uid != 0)
+		return 0;
+	if ((st.st_mode & S_IWOTH) != 0)
+		return 0;
+	return 1;
+}
+
+static int
 layer7_pf_selfheal(const char *required_table, const char *reason)
 {
 	time_t now;
@@ -1405,9 +1442,12 @@ layer7_pf_selfheal(const char *required_table, const char *reason)
 
 	ready = required_table ? pf_table_exists(required_table) :
 	    pf_base_tables_ok();
-	if (!ready && access(L7_PF_RULES_DEBUG_PATH, R_OK) == 0) {
+	if (!ready && pf_rules_debug_trusted(L7_PF_RULES_DEBUG_PATH)) {
 		did_force = run_shell_cmd_ok(
 		    "/sbin/pfctl -f " L7_PF_RULES_DEBUG_PATH " >/dev/null 2>&1");
+	} else if (!ready && access(L7_PF_RULES_DEBUG_PATH, R_OK) == 0) {
+		L7_WARN("pf_selfheal: refusing untrusted %s",
+		    L7_PF_RULES_DEBUG_PATH);
 	}
 
 	ready = required_table ? pf_table_exists(required_table) :

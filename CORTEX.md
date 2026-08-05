@@ -47,6 +47,9 @@ CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
 Trilha IPv6: **FECHADA** (V0–V6; GV7.4 PASS).
 **Congelamento documental das filas:** 
 [`docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
+**Hardening pós-auditoria `1.9.8`:** candidato interno **`1.9.9`** (BG-093…099
+em curso no código; **não** publicado; **não** misturar com Identity+MITM).
+Produção / `latest` permanece **`1.9.8`** até build+smoke+release.
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1491,10 +1494,11 @@ CHECKPOINT CANONICO
 - Canal publico latest / producao enforce: **1.9.8** (alinhados; SHA256 22963924…; rollback 1.9.0)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo 20.2/IM0 (ADRs Aceito + T1/T2); arranque docs/00-overview/START-HERE-identity-mitm.md
+- Hardening auditoria 1.9.8: candidato **1.9.9** (BG-093…099) — código em curso; **não** publicado; prioridade operacional antes de IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **Identity+MITM 20.2** (aceitar ADR-0025/0026/0027/0028 + GO T1/T2); depois IM1 entitlements; manutenção; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: **fechar 1.9.9** (build FreeBSD + smoke + release) **ou** Identity+MITM 20.2; não misturar frentes; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

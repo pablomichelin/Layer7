@@ -35,6 +35,12 @@ int layer7_pf_host_ok(const char *ip);
 int layer7_pf_host_enforce_ok(const char *ip);
 
 /*
+ * Host ou CIDR (IPv4/IPv6) seguro para `pfctl -T add` (allowlist estática).
+ * Rejeita zona (%iface) e prefixos fora de 0..32 / 0..128.
+ */
+int layer7_pf_table_entry_ok(const char *entry);
+
+/*
  * Escreve em buf: pfctl -t <table> -T add <ip>
  * Retorna bytes escritos ou -1 se inválido.
  */
@@ -48,6 +54,9 @@ int layer7_pf_snprint_add(char *buf, size_t buflen, const char *table,
  */
 int layer7_pf_exec_table_add(const char *table, const char *ip);
 int layer7_pf_exec_table_delete(const char *table, const char *ip);
+
+/* Igual a add, mas aceita CIDR validado por layer7_pf_table_entry_ok. */
+int layer7_pf_exec_table_add_entry(const char *table, const char *entry);
 
 /*
  * Invalida estados PF depois de inserir um bloqueio reactivo. Sem isto uma

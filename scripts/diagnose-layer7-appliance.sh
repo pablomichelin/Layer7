@@ -83,12 +83,16 @@ else
 fi
 
 echo "--- stats JSON (inicio) ---"
-if [ -f /tmp/layer7-stats.json ]; then
+if [ -f /var/db/layer7/layer7-stats.json ]; then
+	head -c 4000 /var/db/layer7/layer7-stats.json 2>/dev/null
+	echo
+	[ "$(wc -c < /var/db/layer7/layer7-stats.json)" -gt 4000 ] && echo "... (JSON truncado)"
+elif [ -f /tmp/layer7-stats.json ]; then
 	head -c 4000 /tmp/layer7-stats.json 2>/dev/null
 	echo
-	[ "$(wc -c < /tmp/layer7-stats.json)" -gt 4000 ] && echo "... (JSON truncado)"
+	[ "$(wc -c < /tmp/layer7-stats.json)" -gt 4000 ] && echo "... (JSON truncado, legado /tmp)"
 else
-	echo "sem /tmp/layer7-stats.json (SIGHUP/USR1 no daemon?)"
+	echo "sem layer7-stats.json (SIGHUP/USR1 no daemon?)"
 fi
 
 echo

@@ -6,7 +6,8 @@
 
 set -eu
 
-STATS_JSON="/tmp/layer7-stats.json"
+STATS_JSON="/var/db/layer7/layer7-stats.json"
+LEGACY_STATS_JSON="/tmp/layer7-stats.json"
 REPORTS_DIR="/usr/local/etc/layer7/reports"
 HISTORY_FILE="${REPORTS_DIR}/stats-history.jsonl"
 PIDFILE="/var/run/layer7d.pid"
@@ -44,7 +45,11 @@ kill -USR1 "${_pid}" 2>/dev/null || true
 sleep 1
 
 if [ ! -f "${STATS_JSON}" ]; then
-	exit 0
+	if [ -f "${LEGACY_STATS_JSON}" ]; then
+		STATS_JSON="${LEGACY_STATS_JSON}"
+	else
+		exit 0
+	fi
 fi
 
 if [ ! -x "${PHP}" ]; then
@@ -60,7 +65,7 @@ if (file_exists("'"${COLLECT_LIB}"'")) {
 }
 if (!$history_enabled) exit(0);
 
-$raw = @file_get_contents("/tmp/layer7-stats.json");
+$raw = @file_get_contents("'"${STATS_JSON}"'");
 if (!$raw) exit(0);
 $s = @json_decode($raw, true);
 if (!is_array($s)) exit(0);

@@ -3954,7 +3954,32 @@ function layer7_profile_parse_hosts_textarea($text, $max = 64)
 
 function layer7_stats_path()
 {
-	return "/tmp/layer7-stats.json";
+	return "/var/db/layer7/layer7-stats.json";
+}
+
+/**
+ * True se /tmp/rules.debug e ficheiro regular root-owned sem world-write.
+ * Usado antes de `pfctl -f` no self-heal (auditoria 1.9.9).
+ */
+function layer7_rules_debug_trusted($path = "/tmp/rules.debug")
+{
+	if (!is_string($path) || $path === "") {
+		return false;
+	}
+	if (!file_exists($path) || is_link($path) || !is_file($path)) {
+		return false;
+	}
+	$st = @stat($path);
+	if (!is_array($st)) {
+		return false;
+	}
+	if ((int)$st["uid"] !== 0) {
+		return false;
+	}
+	if (((int)$st["mode"] & 0002) !== 0) {
+		return false;
+	}
+	return true;
 }
 
 /**
@@ -3978,7 +4003,13 @@ function layer7_read_stats()
 	}
 	$path = layer7_stats_path();
 	if (!file_exists($path)) {
-		return null;
+		/* Compat upgrade: daemon antigo escrevia em /tmp. */
+		$legacy = "/tmp/layer7-stats.json";
+		if (file_exists($legacy)) {
+			$path = $legacy;
+		} else {
+			return null;
+		}
 	}
 	$raw = @file_get_contents($path);
 	if (!is_string($raw) || $raw === "") {
@@ -6035,7 +6066,7 @@ function layer7_bl_apply()
 		}
 	}
 	$tables_ok = isset($tables["layer7_block"]) && isset($tables["layer7_block_dst"]);
-	if ((!$ensure_ok || !$tables_ok) && file_exists("/tmp/rules.debug")) {
+	if ((!$ensure_ok || !$tables_ok) && layer7_rules_debug_trusted("/tmp/rules.debug")) {
 		if (function_exists("mwexec")) {
 			mwexec("/sbin/pfctl -f /tmp/rules.debug");
 		} else {

@@ -49,7 +49,7 @@ SSH_PORT=22
 SSH_KEY=""
 SSH_OPTIONS=()
 LICENSE_PATH="/usr/local/etc/layer7.lic"
-STATS_PATH="/tmp/layer7-stats.json"
+STATS_PATH="/var/db/layer7/layer7-stats.json"
 LAYER7D_BIN="/usr/local/sbin/layer7d"
 PIDFILE="/var/run/layer7d.pid"
 

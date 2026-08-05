@@ -117,7 +117,8 @@ while [ "$_l7_log_idx" -le 10 ]; do
     _l7_log_idx=$((_l7_log_idx + 1))
 done
 rm -f /var/log/layer7-bl-update.log
-rm -f /tmp/layer7-stats.json
+rm -f /tmp/layer7-stats.json /var/db/layer7/layer7-stats.json \
+	/var/db/layer7/layer7-stats.json.tmp
 rm -f /usr/local/etc/layer7.json.sample
 rm -f /usr/local/etc/layer7-protos.txt.sample
 rm -f /usr/local/etc/layer7-protos.txt

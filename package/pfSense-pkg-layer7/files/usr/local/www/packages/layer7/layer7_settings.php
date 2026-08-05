@@ -114,10 +114,12 @@ if ($_POST["check_update"] ?? false) {
 
 if ($_POST["do_update"] ?? false) {
 	$pkg_url = isset($_POST["pkg_url"]) ? trim($_POST["pkg_url"]) : "";
-	if ($pkg_url === "" || strpos($pkg_url, "https://github.com/") !== 0) {
+	if ($pkg_url === "" ||
+	    strpos($pkg_url, "https://github.com/pablomichelin/Layer7/") !== 0) {
 		$update_err = l7_t("URL do pacote invalida.");
 	} else {
-		$pkg_file = "/tmp/layer7-update.pkg";
+		@mkdir("/var/db/layer7", 0755, true);
+		$pkg_file = "/var/db/layer7/layer7-update.pkg";
 		@unlink($pkg_file);
 
 		exec("service layer7d onestop 2>&1", $stop_out, $stop_rc);
