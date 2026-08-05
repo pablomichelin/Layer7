@@ -30,11 +30,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Plano | **ABERTO** — Identity + MITM Add-on |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM2 / 20.7** — spike MITM: desenho pronto; **PoC lab PENDENTE** |
+| Passo actual | **IM2 / 20.7** — Squid **REJEITADO**; aguarda GO **DEFER 20.7a** ou desenho ferramenta própria (E) |
 | Código do produto nesta trilha | **IM1 fechado** (GI1 PASS); MITM/Identity runtime ainda não |
 | Rev. do plano | **`2026-08-05c`** (contratos técnicos fechados; 20.2 PASS) |
 | Entitlement comercial | Modelo **X = base** / **Y = add-on**; legado **T1** (`full`→`base`) — ADR-0025 Aceito |
-| MITM | Opt-in; **spike 20.7 GO/NO-GO**; pode **DEFER** sem bloquear Identity (ADR-0026 Aceito) |
+| MITM | Opt-in; spike 20.7: **sem Squid**; candidatos DEFER ou `layer7-tlsproxy` (E); Identity não bloqueia |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS receiver + **agente no DC**; sem captive (ADR-0027 Aceito) |
 | Exactidão MVP | User-ID de **rede** (não GlobalProtect) até IM7/IM8 |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -123,10 +123,10 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM2 / 20.7 (desenho PASS; PoC lab PENDENTE)
+- Passo actual: IM2 / 20.7 — Squid REJEITADO; GO humano: DEFER 20.7a (rec.) ou opção E
 - IM0+IM1: PASS (GI0+GI1)
-- IM2: spike doc criado; veredicto GO/DEFER/NO-GO pendente lab
-- IM3–IM9: PENDENTE (Identity pode avançar se DEFER)
+- IM2: sem PoC Squid; Identity pode avançar com DEFER
+- IM3–IM9: PENDENTE
 - Código: entitlements OK; sem MITM/Identity runtime
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8

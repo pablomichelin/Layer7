@@ -1312,12 +1312,12 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**; pa
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.7 / IM2** (desenho PASS; PoC lab PENDENTE)
+- Passo actual: **20.7 / IM2** — Squid REJEITADO; aguarda GO DEFER 20.7a (rec.) ou ferramenta própria (E)
 - IM0+IM1: PASS (GI0+GI1)
-- IM2: docs/09-blocking/spike-mitm-20.7.md; veredicto pendente lab
+- IM2: spike-mitm-20.7.md actualizado; sem Squid
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
-- Próximo: PoC lab S1–S8 **ou** DEFER 20.7a → IM3
+- Próximo: GO DEFER → IM3 **ou** desenho layer7-tlsproxy
 ```
 
 ---
@@ -1497,7 +1497,7 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **20.7** (spike MITM) **ou** GO promoção enforce 1.9.13; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: Identity+MITM **GO DEFER 20.7a → IM3** (rec.) **ou** desenho MITM próprio; GO promoção enforce 1.9.13; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

@@ -25,9 +25,9 @@
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.7 / IM2 (desenho doc; PoC lab pendente)
+- Passo actual: 20.7 / IM2 — Squid REJEITADO; GO DEFER 20.7a (rec.) ou opção E
 - IM0+IM1: PASS (GI0+GI1)
-- IM2: spike-mitm-20.7.md criado; veredicto pendente
+- IM2: sem Squid; veredicto pendente GO humano
 - Baseline: 1.9.8
 ```
 
