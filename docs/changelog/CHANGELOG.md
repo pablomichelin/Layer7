@@ -6,11 +6,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Versionamento pós-1.9.0:** série patch `1.9.0` → `1.9.1` → `1.9.2` → …;
+  `PORTREVISION=0` sempre (sem sufixo `_N`). Próximo `.pkg` da trilha IPv6:
+  **`1.9.1`**. Produção enforce permanece `1.9.0` até GV7.
 - **Trilha IPv6 / passo 12.3 (V1):** paridade PF scoped `inet`+`inet6` (REV-018);
-  validadores IPv6 (S-03); `test_scoped_pf_inc` PASS no builder. Sem
-  `PORTREVISION` / sufixo `_N` — versão permanece `1.9.0` até bump semver
-  explícito. GV1.3/`pfctl -nf` appliance pendente. Próximo: **12.4** (captura).
-  Produção `1.9.0` inalterada.
+  validadores IPv6 (S-03); `test_scoped_pf_inc` PASS no builder. Código na
+  árvore sob `1.9.0` até release `1.9.1`. GV1.3/`pfctl -nf` appliance pendente.
+  Próximo: **12.4** (captura).
 - **Trilha IPv6 / passo 12.2 (V0):** banner IPv4-only em Diagnostics + secção
   dual-stack em `pf-enforcement.md`; i18n EN; **GV0 PASS** / BG-078 concluído.
   Próximo: **12.3** (PF `inet6` scoped — início do controlo). Produção `1.9.0`
