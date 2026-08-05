@@ -62,7 +62,8 @@ Ele existe para evitar tres erros comuns:
 | release/distribuicao | ADR-0002 `.txz` (historico) vs ADR-0003 **`.pkg`** (canonico) | `docs/03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md` + `CORTEX.md` + `docs/06-releases/README.md` + `MANUAL-INSTALL.md` | ADR-0002 preservado; confusao resolvida na hierarquia oficial |
 | prompts/continuidade | `docs/07-prompts/next-chat-phase-a-option1.md` vs checkpoint do `CORTEX.md` | `CORTEX.md` | prompt antigo fica historico |
 | continuidade (chat longo, handoff) | `docs/00-overview/handoff-chat-novo.md` (procedimento, prompt, pos-clone) vs `CORTEX.md` (Politica de continuidade entre chats) | `CORTEX.md` para estado e prioridade; `handoff-chat-novo.md` para o *como* sem contrariar o SSOT | o handoff expande; nunca substitui fase, backlog ou checkpoint do CORTEX |
-| IPv6 / dual-stack | notas antigas «planeado V2» vs limitação FP-010 | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) + [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md) + ADR-0024; arranque [`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md) | trilha pós-fecho; não reabre plano P0–J; sem segundo START-HERE |
+| IPv6 / dual-stack | notas antigas «planeado V2» vs limitação FP-010 | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) + [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md) + ADR-0024; arranque [`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md); **congelamento** [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | trilha **FECHADA**; não reabre P0–J; sem segundo START-HERE; novos planos = ESTADO-PRODUTO §6 |
+| Fecho vs estado vivo | plano P0–J / plano IPv6 vs CORTEX | CORTEX = vivo; ESTADO-PRODUTO = veredicto congelado das filas; planos 02-roadmap = histórico de execução | em conflito de “está aberto?”, vence ESTADO-PRODUTO + CORTEX checkpoint |
 
 ---
 

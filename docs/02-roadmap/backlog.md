@@ -275,17 +275,13 @@ reavaliacao formal.
 | BG-076 | GUI i18n EN/PT completo + icones FA6 Perfis rapidos + renome Mensagens | Media | package/GUI | Caminho A / UX F4.3 | opcoes novas so em PT; marcas FA4 mostram X branco no FA6 do pfSense; label Mensageria | M | Medio | Concluido codigo (`1.8.11_65`); gate appliance pendente | so apresentacao: `en.php`, `layer7_profile_icon_*`, `profiles.json` labels; id `mensageria` intacto; zero mudanca daemon/enforcement; producao enforce continua `_24` |
 | BG-077 | Check-in online periodico e revogacao remota de licenca (cancelamento comercial) | **Critica** | license-server/daemon/licenciamento | **F3+** (bloqueante comercial recomendado antes GO enforce) | revogacao no servidor nao corta appliance; cliente cancelado continua em enforce ate expiry+grace offline | G | **Alto** | **Implementado** (`2026-08-04`) | API `244` + daemon `1.8.11_68`; S14 PASS; flag `check_in_enabled` default OFF; ADR-0021; plano `f3-plano-check-in-online-revogacao-remota.md` |
 
-## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-05, rev. k)
+## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-05, rev. L)
 
-- Trilha IPv6 **FECHADA** (V0–V6); **GV7.4 PASS** — produção enforce **`1.9.8`**.
-  SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md);
-  arranque **único**
-  [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md);
-  ADR-0024; evidência
-  [`20260805T150500Z-gv7.4-promocao-1.9.8`](../tests/evidence/20260805T150500Z-gv7.4-promocao-1.9.8/).
-- Canal `latest` / produção enforce: **`1.9.8`** (alinhados).
-- Rollback enforce: **`1.9.0`**.
-- Mapa: [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md).
+- Trilha IPv6 **FECHADA**; veredicto consolidado em
+  [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
+  Arranque: [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
+- Produção / `latest`: **`1.9.8`**. Rollback: **`1.9.0`**.
+- Novos planos: backlog + GO (não reabrir BG-078…084 sem GO).
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|

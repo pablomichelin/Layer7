@@ -1,75 +1,82 @@
-# START HERE — Arranque único (fecho + trilha IPv6)
+# START HERE — Arranque único (pós-fecho)
 
-**Este é o único ficheiro de arranque de chat** para o plano mestre e para a
-trilha IPv6. Colar apenas o caminho deste ficheiro num chat limpo.
+**Único ficheiro de arranque** para retomar o projecto após o fecho das filas
+produção + IPv6. Colar só este caminho num chat limpo:
 
 ```text
 docs/00-overview/START-HERE-fecho-producao.md
 ```
 
-| Trilha | Estado | SSOT de execução |
-|--------|--------|------------------|
-| Fecho produção P0–J | **FECHADO** (`1.9.0`, `2026-08-05`) | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) (histórico) |
-| **IPv6 completo V0–V6** | **FECHADA** (`1.9.8`, GV7.4 PASS) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
+| Documento | Papel |
+|-----------|--------|
+| **Este ficheiro** | Arranque de chat |
+| [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | **Congelamento** das filas + mapa + como abrir planos novos |
+| [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** |
 
-**Não criar** outros ficheiros `START-HERE-*.md` para esta fila — este é o único.
+**Não criar** outro `START-HERE-*.md` sem GO e registo no CORTEX/`docs/README.md`.
 
 ---
 
-## Estado actual (verificar no CORTEX antes de executar)
+## Estado actual
 
 | Campo | Valor |
 |-------|-------|
-| **Trilha IPv6** | **FECHADA** (V0–V6; 12.1–12.13 + GV7.4) |
-| **Passo residual autorizado** | Nenhum nesta fila — manutenção contínua |
-| **BG residual IPv6** | BG-078…BG-084 **concluídos** |
-| Produção enforce | **`1.9.8`** (GV7.4 PASS `2026-08-05`) |
-| Canal `latest` | **`1.9.8`** — alinhado; SHA256 `22963924…` |
+| Filas fecho P0–J + IPv6 V0–V6 | **FECHADAS** (`2026-08-05`) |
+| Produção enforce / `latest` | **`1.9.8`** (alinhados) |
+| SHA256 | `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec` |
 | Rollback enforce | **`1.9.0`** |
-| Plano fecho P0–J | **FECHADO** |
-| ADR IPv6 | ADR-0024 — Opção A completa; GV7.4 promovido |
-| Ressalva | CE físico ADR-0022; BG-028 fase 0 |
-| Última evidência | `20260805T150500Z-gv7.4-promocao-1.9.8` — **GV7.4 PASS** |
-| F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
+| Passo residual nestas filas | **Nenhum** |
+| Modo | Manutenção contínua / **novos planos com GO** |
+| Ressalvas | CE ADR-0022; BG-028 fase 0; H5 diferido |
+| Última campanha lab | `20260805T162500Z-prod-align-two-client-1.9.8` **PASS** |
 
 ### Desambiguação — «12.x»
 
 | Referência | Significado |
 |------------|-------------|
-| Passos **12.1–12.13** | Trilha IPv6 — **concluídos** (inclui GV7.4) |
+| Passos **12.1–12.13** | Trilha IPv6 — **fechada** |
 | test-matrix **12.1 / 12.2** | Blacklists UT1 — **outra coisa** |
-
-### Continuidade
-
-1. Este ficheiro → `CORTEX.md` → manutenção / backlog geral
-2. Histórico IPv6: [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)
-3. Gates: [`plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md)
-4. ADR: [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md)
 
 ---
 
-## Prompt — manutenção (pós-fecho)
+## Leitura obrigatória (chat novo)
+
+1. [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)  
+2. [`CORTEX.md`](../../CORTEX.md)  
+3. [`AGENTS.md`](../../AGENTS.md)  
+4. [`backlog.md`](../02-roadmap/backlog.md)  
+5. Área do pedido (ver mapa no ESTADO-PRODUTO)
+
+---
+
+## Prompt — manutenção
 
 ```text
-Contexto: trilha IPv6 FECHADA; produção enforce 1.9.8. Arranque:
-docs/00-overview/START-HERE-fecho-producao.md
+Contexto: fecho+IPv6 FECHADOS; produção 1.9.8.
+Arranque: docs/00-overview/START-HERE-fecho-producao.md
+Ler: ESTADO-PRODUTO-E-PLANOS-FECHADOS.md, CORTEX, AGENTS, backlog.
+Regras: não reabrir filas fechadas sem GO; responder em português.
+Tarefa: <manutenção>.
+```
 
-Leitura: START-HERE, CORTEX, AGENTS, backlog.
+## Prompt — novo plano / integração
 
-Regras:
-- Não reabrir P0–J nem V0–V6 sem GO.
-- Trabalho novo só via backlog / GO explícito.
-- Responder em português.
-
-Tarefa: <descrever pedido de manutenção>.
+```text
+Contexto: filas fecho+IPv6 FECHADAS (1.9.8).
+Ler: docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md §6, CORTEX, AGENTS, backlog.
+Proposta de novo plano: <nome>
+Objectivo / impacto / risco / teste / rollback:
+...
+Não executar até GO e item de backlog. Responder em português.
 ```
 
 ---
 
 ## O que este arranque NÃO autoriza
 
-- Criar outro `START-HERE-*.md`.
-- Reabrir P0–J ou trilha IPv6 sem GO.
+- Reabrir P0–J ou IPv6 V0–V6 sem GO.  
+- Tratar Analytics/SIEM pesado ou MITM HTTPS como “em falta” no fecho.  
+- Mover/renomear árvore documental (F6 H5 diferido).  
 - Confundir 12.x IPv6 com test-matrix §12.
 
 ---
@@ -78,8 +85,8 @@ Tarefa: <descrever pedido de manutenção>.
 
 | Documento | Papel |
 |-----------|--------|
-| **Este ficheiro** | **Único arranque de chat** |
-| [plano-ipv6-completo.md](../02-roadmap/plano-ipv6-completo.md) | Histórico fila 12.x |
-| [CORTEX.md](../../CORTEX.md) | SSOT estado |
-| [ADR-0024](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) | Decisão faseada |
+| [ESTADO-PRODUTO…](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Fecho consolidado |
+| [plano-ipv6-completo.md](../02-roadmap/plano-ipv6-completo.md) | Histórico IPv6 |
+| [plano-fecho…](../02-roadmap/plano-fecho-producao-e-consolidacao.md) | Histórico P0–J |
+| [MANUAL-INSTALL.md](../10-license-server/MANUAL-INSTALL.md) | Instalação |
 | [handoff-chat-novo.md](handoff-chat-novo.md) | Chat esgotado |

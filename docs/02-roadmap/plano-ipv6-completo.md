@@ -1,8 +1,9 @@
 # Plano extensão — IPv6 completo (pós-fecho produção)
 
-**Estado do plano:** `FECHADO` (rev. `2026-08-05j` — GV7.4 PASS; produção enforce **`1.9.8`**)
+**Estado do plano:** `FECHADO` (rev. `2026-08-05k` — consolidação documental; produção **`1.9.8`**)
 **Tipo:** extensão pós-Onda J do plano mestre de fecho  
-**SSOT deste plano:** este ficheiro  
+**SSOT deste plano:** este ficheiro (histórico da fila)  
+**Congelamento / veredicto:** [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)  
 **SSOT de estado:** `CORTEX.md` (secção *Trilha IPv6*)  
 **Arranque de chat (único):** [`../00-overview/START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)  
 **Mapa de lógica/código:** [`../01-architecture/f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md)  
@@ -250,6 +251,7 @@ TRILHA IPv6 — progresso
 
 ## 10. Histórico
 
+| 2026-08-05 | **Consolidação documental:** `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`; filas P0–J + IPv6 fechadas; two-client PASS; porta para planos novos §6 |
 | 2026-08-05 | **GV7.4 PASS** — GO promoção produção enforce `1.9.0` → **`1.9.8`**; evidência `20260805T150500Z-gv7.4-promocao-1.9.8`; `latest` alinhado; trilha IPv6 **FECHADA** |
 | 2026-08-05 | **12.11 CONCLUÍDO** (`1.9.8`): HTTP/HTTPS `rdr inet6` portal → `[::1]:8099`; blockpage dual-listen; VIP Unbound ACL v6; portal6 via `get_interface_ipv6`; BG-083 fechado; GV5 completo; produção enforce `1.9.0` |
 | 2026-08-05 | **Smoke 12.10 appliance PASS** (`1.9.7`): `20260805T140400Z-gv5-12.10-smoke-1.9.7`; `rdr inet6` domain ao vivo (4+4); NDP OK; AAAA half-open sem portal_ipv6; produção enforce `1.9.0` |

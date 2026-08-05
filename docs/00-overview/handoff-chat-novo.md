@@ -34,9 +34,13 @@ estado actual deixa de ser suficiente para agir sem reler o repo; o
 ## O que fazer (passos)
 
 1. Garantir que o **último estado importante** esta no Git ou em `CORTEX` /
-   backlog / changelog (commit ou decisão documental).
+   backlog / changelog (commit ou decisão documental). Preferir também
+   [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)
+   se o trabalho tocou filas de fecho/IPv6.
 2. Abrir **novo chat** no mesmo workspace (Layer7).
-3. **Colar** na primeira mensagem o bloco [Prompt de continuação](#prompt-de-continuacao-copiar-e-colar), preenchendo os campos entre `<>`.
+3. **Colar** na primeira mensagem **apenas**:
+   `docs/00-overview/START-HERE-fecho-producao.md`
+   (ou o [Prompt de continuação](#prompt-de-continuacao-copiar-e-colar) se for outro tema).
 4. Opcional: anexar ou mencionar ficheiros abertos relevantes.
 5. No chat antigo, **nao** apagar; serve de arquivo informal.
 6. Opcional: na **raiz do clone**, `sh scripts/package/check-port-files.sh` — confirma

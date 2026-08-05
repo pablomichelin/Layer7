@@ -19,9 +19,11 @@
 | **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
-| **Trilha IPv6** | **FECHADA** (V0–V6); [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
+| **Trilha IPv6** | **FECHADA** (V0–V6) |
+| **Congelamento** | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) |
+| **Arranque chat** | [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
-> **Versão actual (`latest` = enforce):** `1.9.8`. Dual-stack V0–V5 completo no âmbito documentado.
+> **Versão actual (`latest` = enforce):** `1.9.8`. Filas fecho+IPv6 **fechadas**. Novos planos: ESTADO-PRODUTO §6.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 
@@ -38,9 +40,10 @@ Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](doc
 
 **Handoff chat longo:** [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md)
 
-**Arranque único (fecho P0–J + trilha IPv6 FECHADOS):**
+**Arranque único (pós-fecho):**
 [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
-→ plano: [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
+→ consolidação: [`docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)
+→ histórico IPv6: [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
 
 ---
 
@@ -84,14 +87,14 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 ## Proximos passos operacionais
 
-**Trilha IPv6:** **FECHADA** (V0–V6; GV7.4 PASS) —
-[`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md).
+**Filas fecho + IPv6:** **FECHADAS** — ver
+[`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
 
-1. **Chat limpo:** colar só o caminho do START-HERE-fecho-producao.md.
-2. Manutenção contínua / backlog geral; ver `CORTEX.md`.
-3. Produção enforce = **`1.9.8`** (alinhada com `latest`); rollback **`1.9.0`**.
+1. **Chat limpo:** colar só `docs/00-overview/START-HERE-fecho-producao.md`.
+2. Manutenção contínua ou **novo plano com GO** (ESTADO-PRODUTO §6).
+3. Produção enforce = **`1.9.8`**; rollback **`1.9.0`**.
 4. Diagnostico rapido: [`scripts/diagnose-layer7-appliance.sh`](scripts/diagnose-layer7-appliance.sh)
-5. Testes locais: `./tests/run-local.sh` (nao substituem appliance; obrigatorio em ondas com codigo)
+5. Testes locais: `./tests/run-local.sh` (nao substituem appliance)
 
 ---
 
