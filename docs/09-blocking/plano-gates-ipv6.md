@@ -1,11 +1,11 @@
 # Plano — gates IPv6 (trilha V0–V6)
 
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-05g  
+**Rev.:** 2026-08-05h  
 **Versão alvo inicial / série:** `1.9.0` → `1.9.1` → `1.9.2` → … (`PORTREVISION=0`)  
 **Versão alvo fecho:** patch `1.9.n` da mesma série (passo 12.13; sem salto a `1.10.0`)  
 **Produção enforce actual:** `1.9.0` (inalterada até GV7 + GO humano)  
-**Última campanha appliance:** `20260805T110000Z-gv-ipv6-1.9.3` (`1.9.3`)  
+**Última campanha appliance:** `20260805T130620Z-gv6-dualstack` (`1.9.6` — GV6 PASS)  
 **SSOT trilha:** [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)  
 **Arranque:** [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)
 
@@ -76,14 +76,13 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV4.1 | Política block app em cliente só-v6 ou dual-stack v6 | curl/trace v6 | **PARCIAL** (`1.9.4` + pass inet6 LAN): PF bloqueia com IPv6 em `pdst`; aprendizagem automática daemon **não** populou `pdst` (ver evidência) |
-| GV4.2 | `pfctl -t layer7_pdst_N -T show` contém endereço IPv6 | Appliance | **PASS** (`20260805T113500Z-gv4-ipv6-1.9.4`) |
-| GV4.3 | Segundo cliente não afectado (paridade G5 em v6) | Two-client v6 | **PASS** (A bloqueado / B livre / Google A OK — com `pdst` manual) |
-| GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PASS** restore `layer7.json` produção; regra LAN inet6 lab mantida (GO) |
+| GV4.1 | Política block app em cliente só-v6 ou dual-stack v6 | curl/trace v6 | **PASS** (`1.9.6` GV4 closed + GV6) |
+| GV4.2 | `pfctl -t layer7_pdst_N -T show` contém endereço IPv6 | Appliance | **PASS** (`20260805T125500Z-gv4-closed-1.9.6`) |
+| GV4.3 | Segundo cliente não afectado (paridade G5 em v6) | Two-client v6 | **PASS** (A bloqueado / B livre) |
+| GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PASS** restore `layer7.json`; regra LAN inet6 lab mantida |
 | GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PASS** appliance (`fe80` só em `layer7_localnets`) |
 
-**GV4 onda:** **PARCIAL→quase PASS** — caminho PF scoped inet6 validado no appliance `1.9.4` com `pass inet6` LAN. Gap residual: popular `pdst` automaticamente com AAAA/SNI v6 (ligado a V5 / inspeção DNS v6).
-
+**GV4 onda:** **PASS** (`1.9.6`, evidência `20260805T125500Z-gv4-closed-1.9.6`).
 ### GV5 — DNS / NAT / block page IPv6 (Onda V5 — opcional)
 
 | # | Critério | Método | Estado |
@@ -97,9 +96,11 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV6.1 | Roteiro `validacao-lab.md` §21 executado | Checklist assinado | **PENDENTE** |
-| GV6.2 | Cliente dual-stack: v4 e v6 bloqueados conforme política | Evidência | **PENDENTE** |
-| GV6.3 | F5 smoke IPv6 script PASS | `run-ipv6-dualstack.sh` | **PENDENTE** |
+| GV6.1 | Roteiro `validacao-lab.md` §21 executado | Checklist assinado | **PASS** (`20260805T130620Z-gv6-dualstack`) |
+| GV6.2 | Cliente dual-stack: v4 e v6 bloqueados conforme política | Evidência | **PASS** (A yt4/yt6=000; B=200) |
+| GV6.3 | F5 smoke IPv6 script PASS | `run-ipv6-dualstack.sh` | **PASS** (exit 0) |
+
+**GV6 onda:** **PASS** (`1.9.6`). V5 continua adiada (Opção B).
 
 ### GV7 — Fecho trilha IPv6 (Onda V6)
 
@@ -127,5 +128,5 @@ GV0 → GV1 → GV2 → GV3 → GV4 → [GV5 ou ADIADO] → GV6 → GV7
 - [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)
 - [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md)
 - [`plano-gates-producao.md`](plano-gates-producao.md) (G0–G7 IPv4 baseline)
-- [`validacao-lab.md`](../04-package/validacao-lab.md) (§21 a criar na V6)
+- [`validacao-lab.md`](../04-package/validacao-lab.md) (§21 dual-stack — GV6)
 - [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)

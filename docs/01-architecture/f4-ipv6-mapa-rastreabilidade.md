@@ -57,10 +57,10 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-19 | `package/.../layer7_diagnostics.php` | Status / avisos | Banner I1 (12.2) | Manter alinhado a ondas | V0 | BG-078 | DOC |
 | M-20 | `tests/functional/test_scoped_pf_inc.php` | Regressão PF scoped | Assert scoped `inet6` (12.3 PASS) | Manter | V1 | BG-079 | TST |
 | M-21 | `tests/run-local.sh` + unit C | Regressão local | + `test_dns_aaaa_wire` (`1.9.5`+); enforce/allowlist/policy/capture/GUI v6 | — | V2–V4 | BG-080–082 | TST |
-| M-22 | `tests/lab/run-f5-smoke-checklist.sh` | Smoke appliance | IPv4 | `run-ipv6-dualstack.sh` (novo) | V6 | BG-084 | TST |
+| M-22 | `tests/lab/run-ipv6-dualstack.sh` | Smoke dual-stack | **PASS** GV6 (`20260805T130620Z`) | — | V6 | BG-084 | TST |
 | M-23 | `docs/09-blocking/matriz-limitacoes-dpi.md` | Limitações DPI | FP-010 disclosed (12.1) | Actualizar por onda | V0–V6 | BG-078 | DOC |
 | M-24 | `docs/05-daemon/pf-enforcement.md` | SSOT enforcement | Dual-stack + V1 (12.2–12.3) | Actualizar com V2+ | V0–V1 | BG-078/079 | DOC |
-| M-25 | `docs/04-package/validacao-lab.md` | Roteiro lab | Sem secção v6 | Nova secção §21 dual-stack | V6 | BG-084 | DOC |
+| M-25 | `docs/04-package/validacao-lab.md` | Roteiro lab | §21 dual-stack **PASS** GV6 | — | V6 | BG-084 | DOC |
 
 ---
 

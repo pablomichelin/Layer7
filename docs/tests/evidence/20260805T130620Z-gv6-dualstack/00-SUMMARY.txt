@@ -1,0 +1,4 @@
+run_id=20260805T130620Z-gv6-dualstack
+verdict=PASS
+A yt4=000 yt6=000 g4=200 g6=200
+B yt4=200 yt6=200 g4=200 g6=200

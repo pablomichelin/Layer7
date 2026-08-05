@@ -1260,7 +1260,7 @@ policy, enforce, allowlist e validação GUI aceitam v6.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **GV4 PASS** (`1.9.6`); V5 ADIADA (Opção B); próximo 12.10 com GO
+- Passo actual: **GV6 PASS** (`1.9.6`); V5 ADIADA (Opção B); próximo 12.10/V5 com GO **ou** GV7 com GO
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
@@ -1282,14 +1282,16 @@ TRILHA IPv6 — progresso
 - GV2: parcial (builder PASS; dns_aaaa_wire PASS)
 - GV3: **PASS**
 - GV4: **PASS** (`20260805T125500Z-gv4-closed-1.9.6`) — scoped_hybrid + DNS A/AAAA→`pdst_N`; A block / B free (v4+v6); exige `src_hosts` com GUA+SLAAC; `filter_configure` após mudar JSON
-- GV5: ADIADO temporário (Opção B; retomar); GV6–GV7: PENDENTE
-- I1–I8: I1–I6 PASS; I7 PENDENTE (V5)
-- BG: BG-078..082 done; BG-083 **adiado temporário (retomar)**; BG-084 planeado
+- GV5: ADIADO temporário (Opção B; retomar)
+- GV6: **PASS** (`20260805T130620Z-gv6-dualstack`) — `validacao-lab` §21 + `run-ipv6-dualstack.sh`; A/B dual-stack; pdst A+AAAA
+- GV7: PENDENTE (fecho trilha + GO promoção)
+- I1–I8: I1–I6 PASS; I7 exclusão temp. (V5); I8 PASS (GV6)
+- BG: BG-078..082 done; BG-083 **adiado temporário (retomar)**; BG-084 **GV6 PASS** (12.12); 12.13/GV7 pendente
 - V5 / BG-083: **ADIADO temporário** — DNS/portal/VIP DNS v6
 - I7: exclusão temporária DNS/block page/VIP DNS v6 (disclosure GUI)
 - QA IPv4 `1.9.3`: D1–D6 **PASS**
 - Gates IPv6: `…1.9.3` + `…1.9.4` + `…1.9.6` AAAA + **`20260805T125500Z-gv4-closed-1.9.6`**
-- Próximo passo autorizado: **12.10/V5** com GO humano; produção enforce permanece 1.9.0
+- Próximo passo autorizado: **12.10/V5** com GO **ou** **GV7/12.13** com GO; produção enforce permanece 1.9.0
 - Nota: «pcap unbound intermitente» foi **falso positivo** — gap era modelo scoped vs legacy + resync PF
 ```
 
@@ -1457,10 +1459,10 @@ CHECKPOINT CANONICO
 - Canal publico latest: 1.9.6 (DNS AAAA hint endurecido; SHA256 fc2d7fce…)
 - Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1..1.9.6 ate GV7)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
-- Trilha IPv6: ABERTA — **GV4 PASS**; V5 Opção B
+- Trilha IPv6: ABERTA — **GV6 PASS**; V5 Opção B; falta GV7
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: **12.10/V5** com GO; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: **12.10/V5** com GO **ou** **GV7** com GO; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```

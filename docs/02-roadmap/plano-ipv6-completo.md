@@ -1,6 +1,6 @@
 # Plano extensão — IPv6 completo (pós-fecho produção)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-05e` — V5 Opção B temporária; próximo 1.9.2)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-05f` — GV6 PASS; V5 Opção B; falta GV7)  
 **Tipo:** extensão pós-Onda J do plano mestre de fecho  
 **SSOT deste plano:** este ficheiro  
 **SSOT de estado:** `CORTEX.md` (secção *Trilha IPv6*)  
@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **ABERTO** — V5 **ADIADA (B temp.)**; próximo **1.9.2** + gates |
+| IPv6 completo | **V0–V6** | **ABERTO** — GV6 PASS; V5 **ADIADA (B temp.)**; próximo GV7 ou 12.10 com GO |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -224,16 +224,17 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **GV4 PASS** (`1.9.6`); V5 **Opção B temporária**
-- Onda: V4 CONCLUÍDA; V5 ADIADA (retomar); V6 pendente
+- Passo actual: **GV6 PASS** (`1.9.6`); V5 **Opção B temporária**; próximo GV7 ou 12.10 com GO
+- Onda: V4 CONCLUÍDA; V5 ADIADA (retomar); V6 **GV6 PASS** (12.12); 12.13/GV7 pendente
 - Candidato lab / latest: **1.9.6**
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - GV0–GV3: PASS / parcial builder conforme CORTEX
 - GV4 (enforce v6): **PASS** — scoped_hybrid; DNS A/AAAA→pdst; two-client A/B
 - GV5 (DNS/NAT v6): **ADIADO temporário** (ADR-0024 Opção B) — **retomar** 12.10–12.11
-- GV6–GV7: PENDENTE
-- I1–I6: PASS; I7 exclusão temp. (V5)
-- Próximo passo autorizado: **12.10/V5** com GO
+- GV6: **PASS** (`20260805T130620Z-gv6-dualstack`)
+- GV7: PENDENTE
+- I1–I6: PASS; I7 exclusão temp. (V5); I8 PASS (GV6)
+- Próximo passo autorizado: **12.10/V5** com GO **ou** **GV7/12.13** com GO
 ```
 
 ---
@@ -253,6 +254,7 @@ TRILHA IPv6 — progresso
 
 ## 10. Histórico
 
+| 2026-08-05 | **GV6 PASS** (`1.9.6`): `validacao-lab` §21 + `tests/lab/run-ipv6-dualstack.sh`; evidência `20260805T130620Z-gv6-dualstack`; A/B dual-stack; pdst A+AAAA; V5 continua Opção B; próximo GV7 ou 12.10 com GO |
 | 2026-08-05 | **V5 Opção B temporária** registada (ADR-0024): adiar DNS/block/VIP DNS v6 agora; **retomar obrigatório** após 1.9.2 + gates + GO; banner Diagnostics actualizado |
 | Data | Evento |
 |------|--------|

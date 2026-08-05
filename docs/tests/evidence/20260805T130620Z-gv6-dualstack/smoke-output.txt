@@ -1,0 +1,127 @@
+
+=== run-ipv6-dualstack ===
+
+=== GV6 static checks ===
+PASS: artefacto: docs/04-package/validacao-lab.md
+PASS: artefacto: docs/09-blocking/plano-gates-ipv6.md
+PASS: artefacto: docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md
+PASS: artefacto: tests/lab/run-ipv6-dualstack.sh
+PASS: validacao-lab.md §21 presente
+PASS: mapa M-22 referencia run-ipv6-dualstack
+PASS: layer7.inc emite inet6
+
+=== GV6 lab dual-stack — 20260805T130620Z-gv6-dualstack ===
+appliance=root@192.168.100.254 A=192.168.100.234 B=192.168.100.235 block=www.youtube.com ok=www.google.com
+
+=== 21.0 pré-condições ===
+pfSense-pkg-layer7-1.9.6
+en=1 mode=enforce model=legacy_global
+1
+layer7d is running as pid 94399.
+PASS: pkg layer7 instalado
+PASS: pass inet6 LAN lab presente (1)
+A_v6=2804:6c4:11d:cc00::100b 2804:6c4:11d:cc00:250:56ff:fe9d:252c 
+B_v6=2804:6c4:11d:cc00::100a 2804:6c4:11d:cc00:250:56ff:fe88:ad64 
+PASS: cliente A tem GUA (2804:6c4:11d:cc00::100b)
+PASS: cliente B tem GUA (2804:6c4:11d:cc00::100a)
+
+=== 21.1 apply scoped_hybrid (YouTube → A only) ===
+APPLIED src=192.168.100.234,2804:6c4:11d:cc00::100b,2804:6c4:11d:cc00:250:56ff:fe9d:252c
+PASS: scoped_hybrid aplicado + filter_configure
+layer7d is running as pid 64998.
+
+=== 21.2 DNS A/AAAA → pdst ===
+142.251.153.4
+142.251.152.4
+142.251.150.4
+142.251.151.4
+142.251.156.4
+142.251.157.4
+142.251.154.4
+142.251.155.4
+2001:4860:4828:400::
+2001:4860:482d:400::
+2001:4860:4827:400::
+2001:4860:482a:400::
+2001:4860:482b:400::
+2001:4860:4829:400::
+2001:4860:4826:400::
+2001:4860:482c:400::
+--- pdst attempt 1 ---
+pdst_0 count=8
+   142.251.150.4
+   142.251.151.4
+   142.251.152.4
+   142.251.153.4
+   142.251.154.4
+   142.251.155.4
+   142.251.156.4
+   142.251.157.4
+--- pdst attempt 2 ---
+pdst_0 count=8
+   142.251.150.4
+   142.251.151.4
+   142.251.152.4
+   142.251.153.4
+   142.251.154.4
+   142.251.155.4
+   142.251.156.4
+   142.251.157.4
+--- pdst attempt 3 ---
+pdst_0 count=8
+   142.251.150.4
+   142.251.151.4
+   142.251.152.4
+   142.251.153.4
+   142.251.154.4
+   142.251.155.4
+   142.251.156.4
+   142.251.157.4
+--- pdst attempt 4 ---
+pdst_0 count=16
+   142.251.150.4
+   142.251.151.4
+   142.251.152.4
+   142.251.153.4
+   142.251.154.4
+   142.251.155.4
+   142.251.156.4
+   142.251.157.4
+   2001:4860:4826:400::
+   2001:4860:4827:400::
+   2001:4860:4828:400::
+   2001:4860:4829:400::
+   2001:4860:482a:400::
+   2001:4860:482b:400::
+   2001:4860:482c:400::
+   2001:4860:482d:400::
+PASS: pdst populado com A e AAAA
+
+=== 21.3 two-client curl v4/v6 ===
+A yt4=000 yt6=000 g4=200 g6=200
+B yt4=200 yt6=200 g4=200 g6=200
+PASS: A yt4 bloqueado (000)
+PASS: A yt6 bloqueado (000)
+PASS: A google4 OK (200)
+PASS: A google6 OK (200)
+PASS: B yt4 livre (200)
+PASS: B yt6 livre (200)
+
+=== 21.4 regressão IPv4 leve ===
+PASS: B google4 OK (200)
+
+=== 21.5 NDP / reachability ===
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+fe80::250:56ff:fe88:a4f7 dev ens160 lladdr 00:50:56:88:a4:f7 router REACHABLE
+fe80::1 dev ens160  INCOMPLETE
+2804:6c4:11d:cc00:250:56ff:fe88:a4f7 dev ens160 lladdr 00:50:56:88:a4:f7 router DELAY
+PASS: NDP sample capturado (manual review se FAIL alhures)
+
+=== 21.6 rollback config ===
+RESTORED
+model=legacy_global pols=4
+PASS: config restaurada + filter_configure
+
+=== resultado ===
+PASS: run-ipv6-dualstack overall

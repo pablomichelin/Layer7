@@ -1427,3 +1427,72 @@ dispensado com decisao humana registada. Pacote lab recomendado: **`>= 1.8.11_61
 
 **Plano SSOT:** [`../02-roadmap/plano-isencao-vip-e-ux-gui.md`](../02-roadmap/plano-isencao-vip-e-ux-gui.md) (Bloco E);
 [`../03-adr/ADR-0020-isencao-vip-dns.md`](../03-adr/ADR-0020-isencao-vip-dns.md).
+
+---
+
+## 21. Roteiro GV6 — campanha dual-stack IPv6 (passo 12.12 / BG-084)
+
+**Objectivo:** repetir o gate two-client em IPv4 **e** IPv6 com aprendizagem DNS
+automática (`A`+`AAAA` → `layer7_pdst_N`), sem tocar em DNS forçado /
+`rdr inet6` / block page v6 (**V5 Opção B** — ADR-0024).
+
+**Pacote lab mínimo:** `>= 1.9.6` (AAAA hint + GV4 PASS).  
+**Produção enforce:** permanece **`1.9.0`** até GV7 + GO.  
+**SSOT gates:** [`../09-blocking/plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md) GV6.  
+**Script:** `tests/lab/run-ipv6-dualstack.sh` (`L7_RUN_LAB=1`).
+
+### 21.0 Pré-condições lab
+
+| # | Item | OK |
+|---|------|----|
+| 1 | Appliance com `pfSense-pkg-layer7` ≥ `1.9.6`, `layer7d` a correr, licença válida | [ ] |
+| 2 | Regra pfSense LAN **`pass inet6`** (lab; tracker/descr *Layer7 lab GV4 allow IPv6 LAN*) | [ ] |
+| 3 | Cliente A dual-stack (v4 + GUA; se houver SLAAC, **ambos** nos `src_hosts`) | [ ] |
+| 4 | Cliente B dual-stack distinto (não partilhar `/64` inteiro nos `src_hosts`) | [ ] |
+| 5 | Backup: `cp /usr/local/etc/layer7.json /tmp/layer7.json.pre-gv6` | [ ] |
+
+**Não usar** `legacy_global` com `src_hosts` — o daemon escreve `block_dst` e as
+regras scoped usam `pdst_N`. **Exigir** `enforcement_model=scoped_hybrid` +
+`layer7_pf_config_resync` + `filter_configure()`.
+
+### 21.1 Apply política YouTube → só cliente A
+
+1. `enabled=true`, `mode=enforce`, `enforcement_model=scoped_hybrid`.
+2. Uma política `block` com `match.hosts` YouTube e `match.src_hosts` =
+   IPv4(A) + GUA(A) + SLAAC(A) se existir.
+3. Resync PF + restart `layer7d`.
+
+### 21.2 DNS → `pdst`
+
+No cliente A: `dig @<fw> A www.youtube.com` e `AAAA`.  
+Confirmar `pfctl -t layer7_pdst_N -T show` com destinos v4 e v6.
+
+### 21.3 Two-client (PASS mínimo)
+
+| Cliente | YouTube v4/v6 | Google v4/v6 |
+|---------|---------------|--------------|
+| A | bloqueado (`000` / timeout) | `2xx` |
+| B | `2xx` | `2xx` |
+
+Critérios GV6.1 (roteiro) + GV6.2 (evidência) + GV6.3 (script exit 0).
+
+### 21.4 Regressão IPv4 leve + NDP
+
+Google/IPv4 no cliente B OK; sample NDP/neigh no A (sem partir RA/SLAAC).
+
+### 21.5 Rollback
+
+Restaurar `/tmp/layer7.json.pre-gv6` (ou `pre-gv-ipv6`), `layer7_pf_config_resync` +
+`filter_configure`, restart `layer7d`. **Manter** a regra lab `pass inet6` LAN.
+
+### 21.6 Fora de âmbito (V5)
+
+Não validar aqui: `rdr inet6` :53, block page IPv6, VIP DNS IPv6.
+
+**Automatização:**
+
+```sh
+L7_RUN_LAB=1 sh tests/lab/run-ipv6-dualstack.sh
+```
+
+Evidência em `docs/tests/evidence/<run_id>-gv6-dualstack/`.

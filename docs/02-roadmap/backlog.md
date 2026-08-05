@@ -297,7 +297,7 @@ reavaliacao formal.
 | BG-081 | Policy/enforce/allowlist IPv6 (`policy.c`, `enforce.c`, `allowlist`) | Critica | daemon | F4 | decisão runtime v6 ausente | G | Alto | **Concluido (12.6–12.8)** — Onda V3 completa | GV3–GV4 |
 | BG-082 | GUI + validação JSON IPv6 (`layer7.inc`, páginas GUI) | Alta | package/GUI | F4 | truncamento/validação silenciosa | M | Alto | **Concluido (12.9)** — Onda V4 completa | `test_ipv6_gui_inc` + `run-local.sh` PASS; portal/block page IPv4 = V5 |
 | BG-083 | DNS forçado / block page / VIP isenção IPv6 (NAT `rdr inet6`) | Alta | package/PF/Unbound | F4 | bypass DNS em v6 | G | Medio | **Adiado temporário** (Opção B `2026-08-05`) — **retomar** 12.10–12.11 após 1.9.2+gates+GO | GV5; I7 exclusão temp. |
-| BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | Planeado (12.12–12.13) | `validacao-lab` §21; série `1.9.n` |
+| BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | **Parcial (12.12/GV6 PASS)** | `validacao-lab` §21; `run-ipv6-dualstack.sh`; falta 12.13/GV7 |
 
 ---
 

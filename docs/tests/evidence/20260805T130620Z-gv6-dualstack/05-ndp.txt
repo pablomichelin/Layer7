@@ -1,0 +1,5 @@
+1 packets transmitted, 0 received, 100% packet loss, time 0ms
+
+fe80::250:56ff:fe88:a4f7 dev ens160 lladdr 00:50:56:88:a4:f7 router REACHABLE
+fe80::1 dev ens160  INCOMPLETE
+2804:6c4:11d:cc00:250:56ff:fe88:a4f7 dev ens160 lladdr 00:50:56:88:a4:f7 router DELAY
