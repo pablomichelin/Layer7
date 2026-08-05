@@ -1,9 +1,9 @@
 # Plano — gates IPv6 (trilha V0–V6)
 
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-04c  
-**Versão alvo inicial:** `1.9.0` + PORTREVISION incremental por onda  
-**Versão alvo fecho:** semver minor sugerido `1.10.0` (passo 12.13)  
+**Rev.:** 2026-08-04d  
+**Versão alvo inicial / série:** `1.9.0` → `1.9.1` → `1.9.2` → … (`PORTREVISION=0`)  
+**Versão alvo fecho:** patch `1.9.n` da mesma série (passo 12.13; sem salto a `1.10.0`)  
 **Produção enforce actual:** `1.9.0` (inalterada até GV7 + GO humano)  
 **SSOT trilha:** [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)  
 **Arranque:** [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)
@@ -101,7 +101,7 @@
 | GV7.1 | I1–I8 verdes ou excepções ADR assinadas | Auditoria tipo Onda J | **PENDENTE** |
 | GV7.2 | Release publicada + MANUAL actualizado se operacional | GitHub Releases | **PENDENTE** |
 | GV7.3 | CORTEX: trilha IPv6 **FECHADA** | Checkpoint humano | **PENDENTE** |
-| GV7.4 | GO humano promoção semver (ex. `1.10.0`) | Operador | **PENDENTE** |
+| GV7.4 | GO humano promoção patch estável (ex. `1.9.n`) | Operador | **PENDENTE** |
 
 ---
 

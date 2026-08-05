@@ -1260,8 +1260,9 @@ TRILHA IPv6 — progresso
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
 - Passo 12.3: CONCLUÍDO (2026-08-04) — REV-018 PF inet6 scoped (sem sufixo `_N`)
-- Candidato lab: 1.9.0 (código 12.3 na árvore; build/release sob semver a decidir)
+- Candidato lab: 1.9.0 (código na árvore; próximo `.pkg` = **1.9.1**)
 - Produção enforce: 1.9.0 (inalterada até GV7)
+- Versionamento: série patch `1.9.0` → `1.9.1` → `1.9.2` … (`PORTREVISION=0`)
 - GV0: PASS
 - GV1: parcial (1.1/1.2/1.4/1.7 PASS local; 1.3 pfctl-nf + 1.5/1.6 appliance PENDENTE)
 - GV2–GV7: PENDENTE

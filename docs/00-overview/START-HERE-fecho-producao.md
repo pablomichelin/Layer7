@@ -24,7 +24,7 @@ docs/00-overview/START-HERE-fecho-producao.md
 | **Passo autorizado** | **12.4** (Onda V2 — captura IPv6 / `capture.c`) |
 | **BG activo** | BG-080 (V2); BG-079 V1 código concluído |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
-| Candidato lab | **`1.9.0`** (build/release pendente) |
+| Candidato lab | **`1.9.0`** na árvore; próximo `.pkg` = **`1.9.1`** |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 **publicado e aceite** (implementação por ondas) |
 | Próximo gate | **GV1.3** appliance + **GV2** captura |
@@ -109,7 +109,7 @@ Regras absolutas:
 - Não reabrir Ondas P0–J do fecho; produção enforce permanece 1.9.0 até GV7.
 - Não regressão IPv4: run-local.sh (+ smoke IPv4) quando houver código.
 - Actualizar mapa M-xx + CORTEX + changelog no mesmo bloco.
-- PORTREVISION + release GitHub só se o passo exigir .pkg no appliance.
+- PORTVERSION patch (`1.9.1`, `1.9.2`, …) + release GitHub só se o passo exigir `.pkg`; `PORTREVISION=0` sempre.
 - Multitarefa só em V0 com ficheiros disjuntos; V1–V6 agente único.
 - V1+ exige salvaguardas NDP/ICMPv6/localsubnets/endereços especiais (mapa §8).
 - V5 (NAT/DNS v6) proibido sem decisão humana na ADR-0024.
@@ -194,7 +194,7 @@ Responde em português.
 | 12.6–12.8 | V3 | Policy / enforce / allowlist v6 |
 | 12.9 | V4 | GUI + validação IPv6 |
 | 12.10–12.11 | V5 | DNS/NAT/block page v6 **ou** exclusão ADR |
-| 12.12–12.13 | V6 | Gates lab + release (sugestão `1.10.0`) |
+| 12.12–12.13 | V6 | Gates lab + release (série `1.9.n`) |
 
 Detalhe, versionamento e STOP: [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md).
 

@@ -69,7 +69,9 @@ numerados **12.1–12.13**, sem reabrir o veredicto do plano de fecho (`1.9.0` p
 
 ### V6 — Fecho
 
-- Campanha lab dual-stack; release; promoção semver (sugestão `1.10.0`) só após **GV7**.
+- Campanha lab dual-stack; release; promoção na série patch `1.9.n`
+  (`1.9.1`, `1.9.2`, …) só após **GV7**. Sem `PORTREVISION`/`_N`; sem salto
+  automático a `1.10.0`.
 
 ---
 

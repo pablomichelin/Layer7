@@ -69,10 +69,11 @@ dual-stack contornam enforcement scoped e classificação nDPI em IPv6.
 2. **Não regressão IPv4.** Todo gate inclui smoke IPv4 existente (`run-local.sh`, F5 mínima).
 3. **Ordem segura:** V0 → V1 → … → V6. **Não** saltar para daemon (V2) antes de PF parity (V1) sem ADR.
 4. **Documentação no mesmo bloco** que código (CORTEX, changelog, mapa rastreabilidade, testes).
-5. **Versionamento:** commit por bloco; **semver** (`PORTVERSION`, ex. `1.9.1` /
-   `1.10.0`) + release GitHub quando o passo exigir `.pkg`. **Não** usar
-   `PORTREVISION` / sufixo `_N` após `1.9.0` (preferência de produto).
-6. **Produção enforce** permanece `1.9.0` até GV7 + GO humano da trilha IPv6 (promoção semver separada).
+5. **Versionamento:** commit por bloco; quando o passo exigir `.pkg`, subir
+   **`PORTVERSION` em patch** na linha `1.9.x` (`1.9.1`, `1.9.2`, …) com
+   `PORTREVISION=0`. **Proibido** sufixo `_N` / `PORTREVISION` após `1.9.0`.
+6. **Produção enforce** permanece `1.9.0` até GV7 + GO humano da trilha IPv6
+   (promoção para o patch lab então estável, ex. `1.9.n`).
 7. **Appliance:** agente único em passos com install/enforce; multitarefa só em V0 (docs) com ficheiros disjuntos.
 8. **macOS ≠ gate.** Builder FreeBSD + appliance obrigatórios para GV3+.
 9. **Salvaguardas IPv6 (obrigatórias a partir de V1):** ver mapa §8 — NDP/ICMPv6,
@@ -157,7 +158,7 @@ Marcar no `CORTEX.md` o passo actual (`12.x`).
 | 12.10 | V5 | Design + implementação ou exclusão formal DNS `rdr inet6` | ADR emenda ou código; gate humano | Commit |
 | 12.11 | V5 | Block page + VIP isenção v6 (se V5 activo) | smoke NAT v6 ou limite doc | Commit |
 | 12.12 | V6 | Campanha lab dual-stack (`plano-gates-ipv6.md`) | GV6–GV7 PASS; evidência `run_id` | Commit docs evidência |
-| 12.13 | V6 | Release + CORTEX fecho trilha IPv6 | Tag semver; MANUAL se operacional | Release GitHub |
+| 12.13 | V6 | Release + CORTEX fecho trilha IPv6 | Tag `1.9.n`; MANUAL se operacional | Release GitHub |
 
 **Correcção em gate:** bloco `FIX-ipv6-n` → repetir gate falhado → nunca saltar onda.
 
@@ -172,18 +173,27 @@ no lab usam **config JSON manual** / appliance até 12.9 — documentar no run_i
 
 ## 5. Versionamento
 
-**Política pós-`1.9.0`:** não usar `PORTREVISION` (evita nomes `1.9.0_1`,
-`1.9.0_2`, …). Cada pacote publicado sobe **`PORTVERSION`** em semver
-(`1.9.1`, `1.10.0`, …) com `PORTREVISION=0`.
+**Política oficial pós-`1.9.0` (decisão operador):**
+
+```text
+1.9.0 → 1.9.1 → 1.9.2 → … → 1.9.n
+```
+
+- Cada pacote publicado = bump de **`PORTVERSION`** no patch (`x` em `1.9.x`).
+- **`PORTREVISION` permanece sempre `0`** — nunca gerar `1.9.0_1`, `1.9.1_2`, etc.
+- Código na árvore sem release: manter `PORTVERSION` actual até o bloco pedir `.pkg`.
+- Produção enforce fica em **`1.9.0`** até GV7 + GO; lab usa o patch mais recente publicado.
+- **Não** saltar para `1.10.0` nesta trilha salvo nova decisão humana.
 
 | Tipo | Git | PORTVERSION | Docs |
 |------|-----|-------------|------|
-| Só docs (V0) | commit `trilha-ipv6/12.x:` | — | CORTEX, mapa, ADR |
-| Código sem release | commit + testes | inalterado até release | changelog Unreleased |
-| Mudança appliance | commit + builder + GV | **bump semver** (ex. `1.9.1`) | MANUAL se comandos mudarem |
-| Fecho V6 | tag + GitHub Release | minor sugerido (`1.10.0`) | CORTEX, changelog, MANUAL |
+| Só docs | commit `trilha-ipv6/12.x:` | — | CORTEX, mapa, ADR |
+| Código sem release | commit + testes | inalterado | changelog Unreleased |
+| Mudança appliance | commit + builder + GV | próximo patch (`1.9.1`, `1.9.2`, …) | MANUAL se comandos mudarem |
+| Fecho V6 | tag + GitHub Release | patch da série `1.9.n` então estável | CORTEX, changelog, MANUAL |
 
 Mensagem de commit: `trilha-ipv6/12.3: paridade PF inet6 scoped (BG-079)`.
+Próximo `.pkg` IPv6 (quando houver release): **`1.9.1`**.
 
 ---
 
