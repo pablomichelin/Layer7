@@ -6,6 +6,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+## [1.9.5] — 2026-08-05
+
+### Fixed
+
+- **GV4 / A3:** DNS hint passa a processar RRs **AAAA** (além de A) no
+  caminho de captura (`dns_observe.h` + `capture.c`), incluindo transporte
+  DNS sobre IPv6. O `dns_cb` alimenta `pdst`/enforce com destinos IPv6 sem
+  `pfctl -T add` manual. Hint cache IPv6 para correlação fluxo↔hostname.
+
+### Notes
+
+- Candidato lab; producao enforce permanece `1.9.0` ate GO.
+- SHA256: `9278d5d61b55aad1a4b158cf8fa49b39ed6b4d4c7ab7be36f663e2547386da6f`.
+- Rollback lab: `1.9.4`.
+- Teste local: `test_dns_aaaa_wire` + `tests/run-local.sh`.
+- Revalidar GV4 two-client IPv6 **sem** `pfctl -T add` manual.
+
 ## [1.9.4] — 2026-08-05
 
 ### Fixed

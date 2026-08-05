@@ -1,7 +1,7 @@
 # Mapa de rastreabilidade — IPv6 (lógica e código)
 
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-05c  
+**Rev.:** 2026-08-05d  
 **Estado:** SSOT da trilha IPv6 (componentes × gaps × ondas)  
 **Plano:** [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)  
 **ADR:** [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md)  
@@ -15,8 +15,8 @@
 
 | Camada | IPv4 hoje | IPv6 hoje | Gap | Onda |
 |--------|-----------|-----------|-----|------|
-| Captura / nDPI | Completo | Parser+fluxo+nDPI v6 (12.4); métricas AF v4/v6 (12.5) | DNS AAAA hint pendente | V2–V3 |
-| Decisão política (daemon) | Completo | CIDR v6 + enforce pfctl v6 + allowlist v6 (12.6–12.8) | DNS AAAA hint pendente | V3–V4 |
+| Captura / nDPI | Completo | Parser+fluxo+nDPI v6 (12.4); métricas AF; **DNS A+AAAA hint (`1.9.5`)** | — | V2–V3 |
+| Decisão política (daemon) | Completo | CIDR/enforce/allowlist v6 + **dns_cb AAAA→pdst (`1.9.5`)** | — | V3–V4 |
 | PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas v4+v6 via `pfctl -T` (12.7) | — | V2–V3 |
 | PF scoped (`pdst`/`psrc`/…) | Completo | **Só `inet`** | REV-018 | V1 |
 | Allowlist | IPv4+CIDR | IPv4+IPv6 host/CIDR (12.8) + GUI persistência (12.9) | — | V3–V4 |
@@ -35,9 +35,9 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 
 | ID | Ficheiro | Função | Estado IPv6 | Gap / notas | Onda | BG | Acção |
 |----|----------|--------|-------------|-------------|------|-----|-------|
-| M-01 | `src/layer7d/capture.c` | libpcap → parse IP → nDPI | IPv4+IPv6 L3 + métricas AF (12.4–12.5) | DNS AAAA hint pendente | V2 | BG-080 | CAP |
+| M-01 | `src/layer7d/capture.c` + `dns_observe.h` | libpcap → parse IP → nDPI | IPv4+IPv6 L3 + métricas AF; **A+AAAA hint (`1.9.5`)** | — | V2 | BG-080 | CAP |
 | M-02 | `src/layer7d/capture_flow_key.h` | Hash fluxo bidireccional | v4+v6 hash (12.4) | — | V2 | BG-080 | CAP |
-| M-03 | `src/layer7d/main.c` | flow_decide, DNS hint, PF add | Gates PF `host_enforce_ok` (12.7); `ip_is_local_iface_addr` IPv6 ifaces (12.7) | DNS AAAA hint pendente | V3 | BG-081 | ENF |
+| M-03 | `src/layer7d/main.c` | flow_decide, DNS hint, PF add | Gates PF `host_enforce_ok` (12.7); dns_cb A/AAAA→enforce | — | V3 | BG-081 | ENF |
 | M-04 | `src/layer7d/policy.c` | Parse/match políticas | CIDR v4/v6 dual-stack (12.6): `l7_cidr` family + union; `parse_cidr_str` `/0–32`/`/0–128`; match src/exception CIDRs; `ip_host_equal` | — | V3 | BG-081 | POL |
 | M-05 | `src/layer7d/policy.h` | Structs decisão | `l7_cidr` family AF_INET/AF_INET6 + union v4/v6 (12.6) | — | V3 | BG-081 | POL |
 | M-06 | `src/layer7d/enforce.c` | `pfctl -T add/del`, kill states | IPv4+IPv6 (12.7): `pfctl` addr v6; kill states v6; `kill_states_to` `::/0`; S-03 via `layer7_pf_host_enforce_ok` | — | V3 | BG-081 | ENF |
@@ -56,7 +56,7 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-18 | `package/.../layer7_exceptions.php` | VIP / excepções | IPv4+IPv6 host/CIDR (12.9) | — | V4 | BG-082 | CFG |
 | M-19 | `package/.../layer7_diagnostics.php` | Status / avisos | Banner I1 (12.2) | Manter alinhado a ondas | V0 | BG-078 | DOC |
 | M-20 | `tests/functional/test_scoped_pf_inc.php` | Regressão PF scoped | Assert scoped `inet6` (12.3 PASS) | Manter | V1 | BG-079 | TST |
-| M-21 | `tests/run-local.sh` + unit C | Regressão local | `test_enforce_scoped` v6 (12.7 PASS); `test_allowlist` v6 (12.8 PASS); policy/capture v6; `test_ipv6_gui_inc` (12.9 PASS) | — | V2–V4 | BG-080–082 | TST |
+| M-21 | `tests/run-local.sh` + unit C | Regressão local | + `test_dns_aaaa_wire` (`1.9.5`); enforce/allowlist/policy/capture/GUI v6 | — | V2–V4 | BG-080–082 | TST |
 | M-22 | `tests/lab/run-f5-smoke-checklist.sh` | Smoke appliance | IPv4 | `run-ipv6-dualstack.sh` (novo) | V6 | BG-084 | TST |
 | M-23 | `docs/09-blocking/matriz-limitacoes-dpi.md` | Limitações DPI | FP-010 disclosed (12.1) | Actualizar por onda | V0–V6 | BG-078 | DOC |
 | M-24 | `docs/05-daemon/pf-enforcement.md` | SSOT enforcement | Dual-stack + V1 (12.2–12.3) | Actualizar com V2+ | V0–V1 | BG-078/079 | DOC |

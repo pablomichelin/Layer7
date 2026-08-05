@@ -66,6 +66,21 @@ else
 	fail "test_capture_flow_key compile"
 fi
 
+step "Unit: DNS A/AAAA wire (dns_observe)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_dns_aaaa_wire \
+    tests/functional/test_dns_aaaa_wire.c \
+    2>/tmp/test_dns_aaaa_wire.cc.err; then
+	if /tmp/test_dns_aaaa_wire; then
+		pass "test_dns_aaaa_wire"
+	else
+		fail "test_dns_aaaa_wire runtime"
+	fi
+else
+	cat /tmp/test_dns_aaaa_wire.cc.err
+	fail "test_dns_aaaa_wire compile"
+fi
+
 step "Unit: log_store (rotacao limitada)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_log_store \
