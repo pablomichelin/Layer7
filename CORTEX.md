@@ -1206,8 +1206,9 @@ validacao fora da operacao real.
 Trilha operacional unica para fechar pontas soltas (software + documentacao +
 versionamento) ate o produto estar pronto para utilizacao com enforce:
 
-- **Plano (inicio/meio/fim, gates, multitarefa, R1–R12):**
-  [`docs/02-roadmap/plano-fecho-producao-e-consolidacao.md`](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md)
+- **Plano (arquivo 【FECHADO】 P0–J):**
+  [`docs/archive/planos-fechados/plano-fecho-producao-e-consolidacao.md`](docs/archive/planos-fechados/plano-fecho-producao-e-consolidacao.md)
+  ([stub](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md))
 - **Arranque de chat (prompt para colar):**
   [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
 
@@ -1215,7 +1216,7 @@ versionamento) ate o produto estar pronto para utilizacao com enforce:
 com appliance (A–G) e GO/release (F, I–J). Ver grafo de dependencias no plano
 (sec. 3.3).
 
-**Nao** iniciar F6 (mover pastas em `docs/`) antes da Onda H do plano.
+**F6:** H1–H5 **PASS** (`2026-08-05`) — legado e planos fechados em `docs/archive/`.
 **Onda F (GO enforce):** **PASS** (`2026-08-05`) — promovido a **`1.9.0`** (fecho plano)
 (ADR-0022 aceite; CE fisico pendente).
 **Congelamento P0.2:** sem novo polish GUI (i18n, redesign, icones) ate Onda A
@@ -1224,12 +1225,12 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
 - Passo actual: **PLANO FECHADO** — manutenção via backlog normal
-- Onda: H **PASS** (F6 H1–H4); I **PASS**; J **PASS** (R1–R12 com excepções ADR-0022/0023)
+- Onda: H **PASS** (F6 H1–H5); I **PASS**; J **PASS** (R1–R12 com excepções ADR-0022/0023)
 - Candidato lab: 1.9.0
 - Produção enforce: 1.9.0
 - Canal latest: 1.9.0 (alinhado)
 - F5 mínima: **PASS**
-- F6: **FECHADA** (H5 raiz legado diferido)
+- F6: **FECHADA** (H1–H5; raiz legado + planos fechados em `docs/archive/`)
 - F7/BG-028: **Fase 0** (ADR-0023); BG-017 checklist PASS
 - R1-R12: **11/12 verdes + 2 excepções assinadas** (R7, CE)
 - CE: LIMITAÇÃO (ADR-0022 aceite)
@@ -1246,7 +1247,7 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J.
 **Produção enforce = `1.9.8`** (GV7.4 PASS — GO humano `2026-08-05`).
 
 - **Congelamento (filas fechadas + mapa):** [`docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)
-- **Plano:** [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md) — **FECHADO**
+- **Plano (arquivo 【FECHADO】):** [`docs/archive/planos-fechados/plano-ipv6-completo.md`](docs/archive/planos-fechados/plano-ipv6-completo.md) ([stub](docs/02-roadmap/plano-ipv6-completo.md))
 - **Arranque chat (único):** [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
 - **Mapa lógica/código:** [`docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md`](docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md) (§8 salvaguardas)
 - **Gates:** [`docs/09-blocking/plano-gates-ipv6.md`](docs/09-blocking/plano-gates-ipv6.md)
@@ -1298,14 +1299,14 @@ TRILHA IPv6 — progresso
 1. `CORTEX.md` (inclui passo actual — secção Trilha IPv6)
 2. [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
 3. [`docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) (congelamento)
-4. Se histórico IPv6: [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
-5. Se histórico fecho: [`docs/02-roadmap/plano-fecho-producao-e-consolidacao.md`](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md)
+4. Se histórico IPv6: [`docs/archive/planos-fechados/plano-ipv6-completo.md`](docs/archive/planos-fechados/plano-ipv6-completo.md)
+5. Se histórico fecho: [`docs/archive/planos-fechados/plano-fecho-producao-e-consolidacao.md`](docs/archive/planos-fechados/plano-fecho-producao-e-consolidacao.md)
 
 ### Para a trilha IPv6 (detalhe técnico)
 
 1. `CORTEX.md` (secção Trilha IPv6)
 2. [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
-3. [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
+3. [`docs/archive/planos-fechados/plano-ipv6-completo.md`](docs/archive/planos-fechados/plano-ipv6-completo.md)
 4. [`docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md`](docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md)
 5. [`docs/09-blocking/plano-gates-ipv6.md`](docs/09-blocking/plano-gates-ipv6.md)
 
@@ -1440,7 +1441,7 @@ CHECKPOINT CANONICO
 - Canal publico latest / producao enforce: **1.9.8** (alinhados; SHA256 22963924…; rollback 1.9.0)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
-- F6: H1–H4 PASS; H5 raiz legado diferido (sem mover ficheiros)
+- F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
 - Proximo trabalho: manutenção / **novos planos com GO** (ESTADO-PRODUTO §6); BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md

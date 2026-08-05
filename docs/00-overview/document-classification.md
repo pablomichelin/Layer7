@@ -26,7 +26,7 @@ vence o canónico.
 | `CORTEX.md` | estado global | SSOT operacional e checkpoint | Canónico | substitui status disperso da raiz e resumos antigos | manter vivo a cada fase | F0+ |
 | `AGENTS.md` | execucao por agentes | regra de actuacao do agente | Canónico | substitui prompt operativo disperso | manter vivo a cada fase | F0+ |
 | `README.md` | visao publica do repo | porta de entrada publica do projecto | Preservado por compatibilidade | complementar a `docs/README.md` | rever apenas quando o posicionamento publico mudar | F7 |
-| `00-LEIA-ME-PRIMEIRO.md` | onboarding original | contexto historico do arranque do projecto | Historico | substituido por `CORTEX.md` + `docs/README.md` | preservar; nao usar como SSOT | F6 |
+| `00-LEIA-ME-PRIMEIRO.md` | onboarding (stub H5) | redirect → arquivo + CORTEX | Historico / stub | texto em `docs/archive/raiz-legado/` | nao usar como SSOT | F6 H5 |
 | `01-VISAO-GERAL-E-ESCOPO.md` | escopo V1 detalhado | base expandida do charter | Historico | complementar a `docs/00-overview/product-charter.md` | preservar e referenciar so quando precisar de contexto longo | F6 |
 | `02-ARQUITETURA-ALVO.md` | arquitectura detalhada | contexto expandido da arquitectura | Historico | complementar a `docs/01-architecture/target-architecture.md` + `docs/core/` | preservar | F6 |
 | `03-ROADMAP-E-FASES.md` | roadmap V1-V2 original | referencia historica do plano antigo | Historico | substituido por `docs/02-roadmap/roadmap.md` | preservar | F6 |
@@ -60,8 +60,11 @@ vence o canónico.
 | `docs/00-overview/handoff-chat-novo.md` | handoff de chat Cursor | quando/como abrir chat novo, prompt de continuacao, verificacao opcional pos-clone (`check-port-files`, `smoke-layer7d` por SO) e ligacao a F3/F4 no lab | Canónico | concretiza a politica de continuidade do `CORTEX.md` para contexto longo | manter alinhado ao `CORTEX` e a `docs/README.md` | F0+ |
 | `docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | fecho consolidado filas | congelamento P0–J + IPv6 + mapa navegação + porta planos novos | Canónico | complementa CORTEX (vivo) e START-HERE | actualizar só se reabrir fila ou mudar veredicto | F0+ |
 | `docs/00-overview/START-HERE-fecho-producao.md` | arranque unico chat | ponto unico de entrada pós-fecho (manutenção / novos planos) | Canónico | unico START-HERE; aponta a ESTADO-PRODUTO | manter vivo com CORTEX | F0+ |
-| `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | plano fecho P0–J | SSOT historico do fecho producao — FECHADO | Canónico (histórico de fila) | — | preservar; nao reabrir | F0+ |
-| `docs/02-roadmap/plano-ipv6-completo.md` | trilha IPv6 V0–V6 | SSOT da fila 12.x — **FECHADA** | Canónico (histórico de fila) | veredicto em ESTADO-PRODUTO | preservar; nao reabrir sem GO | F4+ |
+| `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir | F6 H5 |
+| `docs/02-roadmap/plano-ipv6-completo.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir sem GO | F6 H5 |
+| `docs/archive/planos-fechados/*` | planos P0–J + IPv6 | histórico de filas fechadas | Historico (arquivo) | banners 【ARQUIVO · PLANO FECHADO】 | preservar | F6 H5 |
+| `docs/archive/raiz-legado/*` | raiz `00-`…`16-` | legado pré-canónico | Historico (arquivo) | banners 【ARQUIVO · LEGADO】 | preservar | F6 H5 |
+| `docs/02-roadmap/README.md` | índice roadmap | activo vs FECHADO | Canónico (índice) | — | manter | F6 H5 |
 | `docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md` | mapa codigo IPv6 | SSOT tecnico M-xx + salvaguardas §8 | Canónico | — | actualizar se novo gap IPv6 | F4+ |
 | `docs/09-blocking/plano-gates-ipv6.md` | gates GV0–GV7 | gates da trilha IPv6 — PASS | Canónico | — | preservar | F4+ |
 | `docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md` | ADR IPv6 | decisao faseada V0–V6 | Canónico | — | emendar só com GO | F4+ |

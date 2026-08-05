@@ -1,4 +1,4 @@
-# Estado do produto e planos fechados — consolidação `2026-08-05`
+# 【FILAS FECHADAS】 Estado do produto e planos fechados — consolidação `2026-08-05`
 
 **Classificação:** Canónico (fecho de filas + mapa de navegação)  
 **SSOT de estado vivo:** [`CORTEX.md`](../../CORTEX.md)  
@@ -9,9 +9,9 @@ define como navegar a documentação **sem** reabrir planos fechados. Não
 substitui o `CORTEX.md` (que continua a mudar em manutenção); fixa o
 **veredicto de fecho** e o inventário de provas.
 
-> **Regra F6:** este documento **não move nem renomeia** ficheiros. A
-> organização é por **índice e classificação**, não por reestruturação física
-> (H5 raiz legado permanece diferido).
+> **F6 H5 (`2026-08-05`):** raiz `00-`…`16-` → [`docs/archive/raiz-legado/`](../archive/raiz-legado/);
+> planos fecho+IPv6 → [`docs/archive/planos-fechados/`](../archive/planos-fechados/).
+> Stubs nos caminhos antigos; banners `【ARQUIVO】` / `【FECHADO】`.
 
 ---
 
@@ -34,8 +34,8 @@ substitui o `CORTEX.md` (que continua a mudar em manutenção); fixa o
 
 | Fila | SSOT de execução | Estado | Evidência-chave |
 |------|------------------|--------|-----------------|
-| Fecho produção P0–J | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) | **FECHADO** (`1.9.0` → promoção IPv6 a `1.9.8`) | Onda J + GV7.4 |
-| IPv6 V0–V6 (passos 12.1–12.13) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) | **FECHADA** | GV0–GV7 PASS |
+| Fecho produção P0–J | [`【FECHADO】 arquivo`](../archive/planos-fechados/plano-fecho-producao-e-consolidacao.md) ([stub](../02-roadmap/plano-fecho-producao-e-consolidacao.md)) | **FECHADO** (`1.9.0` → `1.9.8`) | Onda J + GV7.4 |
+| IPv6 V0–V6 (passos 12.1–12.13) | [`【FECHADO】 arquivo`](../archive/planos-fechados/plano-ipv6-completo.md) ([stub](../02-roadmap/plano-ipv6-completo.md)) | **FECHADA** | GV0–GV7 PASS |
 | DNS force dual-stack (12.10) | ADR-0024 Opção A | **CONCLUÍDO** (`1.9.7`) | `20260805T140400Z-gv5-12.10-smoke-1.9.7` |
 | HTTP/VIP dual-stack (12.11) | ADR-0024 / BG-083 | **CONCLUÍDO** (`1.9.8`) | `20260805T143000Z-gv5-12.11-smoke-1.9.8` |
 | Promoção enforce (GV7.4) | gates IPv6 + CORTEX | **PASS** | `20260805T150500Z-gv7.4-promocao-1.9.8` |
@@ -105,17 +105,18 @@ Pasta de evidências: [`docs/tests/evidence/`](../tests/evidence/).
 | Backlog | [`backlog.md`](../02-roadmap/backlog.md) |
 | Checklist gates | [`checklist-mestre.md`](../02-roadmap/checklist-mestre.md) |
 | ADRs | [`03-adr/README.md`](../03-adr/README.md) |
-| IPv6 (histórico da fila) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md), [`plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md), [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md), [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) |
-| Fecho P0–J (histórico) | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) |
+| IPv6 (histórico da fila) | [`【FECHADO】 plano-ipv6`](../archive/planos-fechados/plano-ipv6-completo.md), [`plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md), [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md), [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) |
+| Fecho P0–J (histórico) | [`【FECHADO】 plano-fecho`](../archive/planos-fechados/plano-fecho-producao-e-consolidacao.md) |
 | Classificação / equivalência | [`document-classification.md`](document-classification.md), [`document-equivalence-map.md`](document-equivalence-map.md) |
 | Limitações DPI / MITM | [`matriz-limitacoes-dpi.md`](../09-blocking/matriz-limitacoes-dpi.md), [`ADR-0017`](../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) |
 | Lab | [`08-lab/README.md`](../08-lab/README.md) |
 | Testes | [`tests/README.md`](../tests/README.md) |
 
-### 4.3 Raiz `00-`…`16-`
+### 4.3 Raiz `00-`…`16-` (arquivada H5)
 
-**Legado preservado** — não SSOT. Ver equivalência. Onboarding rápido:
-[`00-LEIA-ME-PRIMEIRO.md`](../../00-LEIA-ME-PRIMEIRO.md) (apontador; vence CORTEX).
+**【ARQUIVO · LEGADO】** — texto em [`docs/archive/raiz-legado/`](../archive/raiz-legado/);
+stubs na raiz do repo. Ver equivalência. Onboarding:
+[`00-LEIA-ME-PRIMEIRO.md`](../../00-LEIA-ME-PRIMEIRO.md) (stub; vence CORTEX).
 
 ---
 
@@ -125,7 +126,7 @@ Pasta de evidências: [`docs/tests/evidence/`](../tests/evidence/).
 |------|--------|------|
 | CE físico pfSense CE | LIMITAÇÃO ADR-0022 | Lab = Plus/FB16 |
 | Trust chain pacote (BG-028) | Fase 0 ADR-0023 | Caminho manual vigente |
-| F6 H5 (mover raiz legado) | Diferido | Sem reorganização física |
+| F6 H5 (raiz legado + planos fechados) | **EXECUTADA** `2026-08-05` | `docs/archive/raiz-legado/` + `planos-fechados/` + stubs |
 | `scoped_hybrid` default produção | Não | Validado; lab usa `legacy_global` |
 | Analytics / SIEM pesado | Fora de fila | Só telemetria mínima F7 (BG-018) se GO |
 | MITM / página HTTPS “bonita” | Fora de fila | ADR-0017: HTML só HTTP |
@@ -167,7 +168,7 @@ Responder em português.
 - [x] Evidências do dia indexadas
 - [x] Exclusões (SIEM, MITM, CE) declaradas
 - [x] Porta de entrada para novos planos definida
-- [x] Sem mover/renomear ficheiros (F6 H5)
+- [x] F6 H5: raiz legado + planos fechados arquivados com stubs e banners
 
 ---
 
@@ -176,3 +177,4 @@ Responder em português.
 | Data | Evento |
 |------|--------|
 | 2026-08-05 | Criação — consolidação pós GV7.4 + campanha two-client `1.9.8` |
+| 2026-08-05 | F6 H5 — arquivo físico raiz `00-`…`16-` + planos fecho/IPv6 |

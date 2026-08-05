@@ -12,6 +12,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Changed
 
 - START-HERE / CORTEX / README / classificação alinhados ao pós-fecho `1.9.8`.
+- **F6 H5:** raiz `00-`…`16-` → `docs/archive/raiz-legado/`; planos
+  fecho+IPv6 → `docs/archive/planos-fechados/`; stubs + banners
+  `【ARQUIVO】` / `【FECHADO】`; índice `docs/02-roadmap/README.md`.
 
 ## [1.9.8] — 2026-08-05
 

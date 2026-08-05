@@ -1,24 +1,7 @@
-# Referências Oficiais
+# 【ARQUIVO · LEGADO】 Referências oficiais (legado)
 
-Este arquivo registra as referências externas que sustentam as premissas do planejamento.
+> **Não é SSOT.** Movido na F6 H5 (`2026-08-05`).
 
-## pfSense
-- documentação oficial de desenvolvimento de pacotes
-- estrutura de diretórios de pacotes
-- lista de portas/pacotes do ecossistema
-- release notes do pfSense CE 2.8.0
-- logging remoto por syslog
-- autenticação por LDAP/RADIUS
-- aliases
-- DNS Resolver / Unbound
-- aviso sobre repositórios de terceiros
-- aviso sobre depreciação de Squid/SquidGuard/Lightsquid
+Texto completo: [`docs/archive/raiz-legado/16-REFERENCIAS-OFICIAIS.md`](docs/archive/raiz-legado/16-REFERENCIAS-OFICIAIS.md)
 
-## nDPI
-- repositório oficial
-- licença LGPL-3.0
-
-## Observação
-Este documento é intencionalmente curto.  
-As URLs e citações detalhadas podem ser mantidas no README do repositório ou nas ADRs específicas.
-
+Canónico: [`CORTEX.md`](CORTEX.md) · [`docs/README.md`](docs/README.md) · [equivalência](docs/00-overview/document-equivalence-map.md)

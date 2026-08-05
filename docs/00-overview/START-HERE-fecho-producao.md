@@ -1,4 +1,7 @@
-# START HERE — Arranque único (pós-fecho)
+# 【FILAS FECHADAS】 START HERE — Arranque único (pós-fecho)
+
+> **Visual:** as filas P0–J e IPv6 V0–V6 estão **FECHADAS**.  
+> Este ficheiro é o **arranque de manutenção** — não um plano aberto.
 
 **Único ficheiro de arranque** para retomar o projecto após o fecho das filas
 produção + IPv6. Colar só este caminho num chat limpo:
@@ -27,7 +30,8 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Rollback enforce | **`1.9.0`** |
 | Passo residual nestas filas | **Nenhum** |
 | Modo | Manutenção contínua / **novos planos com GO** |
-| Ressalvas | CE ADR-0022; BG-028 fase 0; H5 diferido |
+| Organização docs (F6 H5) | **EXECUTADA** — legado em `docs/archive/` |
+| Ressalvas | CE ADR-0022; BG-028 fase 0 |
 | Última campanha lab | `20260805T162500Z-prod-align-two-client-1.9.8` **PASS** |
 
 ### Desambiguação — «12.x»
@@ -76,7 +80,7 @@ Não executar até GO e item de backlog. Responder em português.
 
 - Reabrir P0–J ou IPv6 V0–V6 sem GO.  
 - Tratar Analytics/SIEM pesado ou MITM HTTPS como “em falta” no fecho.  
-- Mover/renomear árvore documental (F6 H5 diferido).  
+- Confundir stubs/arquivo com planos activos (ver `docs/02-roadmap/README.md`).  
 - Confundir 12.x IPv6 com test-matrix §12.
 
 ---
@@ -86,7 +90,8 @@ Não executar até GO e item de backlog. Responder em português.
 | Documento | Papel |
 |-----------|--------|
 | [ESTADO-PRODUTO…](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Fecho consolidado |
-| [plano-ipv6-completo.md](../02-roadmap/plano-ipv6-completo.md) | Histórico IPv6 |
-| [plano-fecho…](../02-roadmap/plano-fecho-producao-e-consolidacao.md) | Histórico P0–J |
+| [【FECHADO】 plano-ipv6](../archive/planos-fechados/plano-ipv6-completo.md) | Histórico IPv6 (arquivo) |
+| [【FECHADO】 plano-fecho](../archive/planos-fechados/plano-fecho-producao-e-consolidacao.md) | Histórico P0–J (arquivo) |
+| [Raiz legado](../archive/raiz-legado/README.md) | `00-`…`16-` arquivados |
 | [MANUAL-INSTALL.md](../10-license-server/MANUAL-INSTALL.md) | Instalação |
 | [handoff-chat-novo.md](handoff-chat-novo.md) | Chat esgotado |
