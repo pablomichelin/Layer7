@@ -76,13 +76,13 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV4.1 | Política block app em cliente só-v6 ou dual-stack v6 | curl/trace v6 | **BLOQUEADO lab** — sem `pass inet6` na LAN; clientes sem internet v6 |
-| GV4.2 | `pfctl -t layer7_pdst_N -T show` contém endereço IPv6 | Appliance | **PASS sintaxe** (regra `inet6 from src_v6 to pdst`; `pfctl -T add` v6 OK) |
-| GV4.3 | Segundo cliente não afectado (paridade G5 em v6) | Two-client v6 | **BLOQUEADO lab** (depende GV4.1) |
-| GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PASS** restore config (JSON+resync) após cada bloco; rollback `.pkg` N/A nesta campanha |
-| GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PARCIAL** (S-03 unit PASS; `pfctl` manual aceita especiais — esperado; daemon path não exercitado sem egress) |
+| GV4.1 | Política block app em cliente só-v6 ou dual-stack v6 | curl/trace v6 | **PARCIAL** (`1.9.4` + pass inet6 LAN): PF bloqueia com IPv6 em `pdst`; aprendizagem automática daemon **não** populou `pdst` (ver evidência) |
+| GV4.2 | `pfctl -t layer7_pdst_N -T show` contém endereço IPv6 | Appliance | **PASS** (`20260805T113500Z-gv4-ipv6-1.9.4`) |
+| GV4.3 | Segundo cliente não afectado (paridade G5 em v6) | Two-client v6 | **PASS** (A bloqueado / B livre / Google A OK — com `pdst` manual) |
+| GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PASS** restore `layer7.json` produção; regra LAN inet6 lab mantida (GO) |
+| GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PASS** appliance (`fe80` só em `layer7_localnets`) |
 
-**GV4 onda:** **PARCIAL** — sintaxe/tabelas OK em `1.9.3`; enforce real GV4.1/4.3 exige allow IPv6 LAN (GO humano). GV1.6 fechado em código `1.9.4`.
+**GV4 onda:** **PARCIAL→quase PASS** — caminho PF scoped inet6 validado no appliance `1.9.4` com `pass inet6` LAN. Gap residual: popular `pdst` automaticamente com AAAA/SNI v6 (ligado a V5 / inspeção DNS v6).
 
 ### GV5 — DNS / NAT / block page IPv6 (Onda V5 — opcional)
 

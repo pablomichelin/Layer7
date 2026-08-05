@@ -1,0 +1,15 @@
+===A===
+64 bytes from 2001:4860:4860::8888: icmp_seq=2 ttl=118 time=14.9 ms
+
+--- 2001:4860:4860::8888 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 14.917/15.220/15.523/0.303 ms
+google6=200
+google4=200
+===B===
+64 bytes from 2001:4860:4860::8888: icmp_seq=2 ttl=118 time=15.3 ms
+
+--- 2001:4860:4860::8888 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 15.286/15.288/15.290/0.002 ms
+google6=200

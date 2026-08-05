@@ -1260,7 +1260,7 @@ policy, enforce, allowlist e validação GUI aceitam v6.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **1.9.4** publicado (GV1.6); smoke appliance + GV4 lab / V5 ADIADA (Opção B)
+- Passo actual: **1.9.4** + GV4 lab (pass inet6 LAN); gap aprendizagem AAAA→pdst; V5 ADIADA (Opção B)
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
@@ -1275,21 +1275,20 @@ TRILHA IPv6 — progresso
 - Candidato lab / `latest`: **1.9.4** (publicado; SHA256 `43f75461…`; GV1.6 layer7_localnets)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - Versionamento: série patch `1.9.0` → … → `1.9.4` (`PORTREVISION=0`)
-- Appliance smoke (`192.168.100.254`): campanha GV em `1.9.3` (`20260805T110000Z-gv-ipv6-1.9.3`); instalar `1.9.4` para fechar GV1.6 appliance
+- Appliance (`192.168.100.254`): **1.9.4**; regra lab **pass inet6 LAN** activa (tracker `1785929863`); evidência GV4 `20260805T113500Z-gv4-ipv6-1.9.4`
 - GV0: PASS
-- GV1: 1.3/1.5 PASS; **1.6 PASS código + release `1.9.4`** (smoke tabela no appliance recomendado)
-- GV2: parcial (builder PASS 12.4–12.9; policy + enforce + allowlist + GUI PASS; localnets tests PASS)
-- GV3: **PASS com ressalva lab** (3.2–3.5 em 1.9.3; egress v6 clientes bloqueado por pfSense sem pass inet6)
-- GV4: parcial — sintaxe/pdst v6 PASS; **4.1/4.3 BLOQUEADOS lab** (sem pass inet6 LAN)
+- GV1: 1.3/1.5/1.6 PASS (`1.9.4`)
+- GV2: parcial (builder PASS 12.4–12.9; localnets tests PASS)
+- GV3: **PASS** (egress v6 clientes OK após pass inet6 LAN)
+- GV4: **PARCIAL** — PF scoped v6 two-client PASS com `pdst` manual; aprendizagem automática AAAA/SNI→pdst **gap** (A3)
 - GV5: ADIADO temporário (Opção B; retomar); GV6–GV7: PENDENTE
-- I1–I8: I1 PASS; I2 fechado em código/release 1.9.4; I3 PASS ressalva; I4 parcial; I6 PASS; I7 PENDENTE (V5)
-- I5: parcial (pfctl v6 OK; enforce real GV4.1 pendente lab)
+- I1–I8: I1 PASS; I2 PASS; I3 PASS; I4/I5 parcial (PF OK; auto-populate pendente); I6 PASS; I7 PENDENTE (V5)
 - BG: BG-078..082 done; BG-083 **adiado temporário (retomar)**; BG-084 planeado
-- V5 / BG-083: **ADIADO temporário** (ADR-0024 Opção B, 2026-08-05) — **não abandonar**; retomar Opção A após gates + GO
+- V5 / BG-083: **ADIADO temporário** — retomar ajuda também o gap A3 (DNS/AAAA→pdst)
 - I7: exclusão temporária DNS/block page/VIP DNS v6 (disclosure GUI)
-- QA IPv4 `1.9.3`: D1–D6 **PASS** (evidência `20260805T040500Z-qa2-ipv4-1.9.3`)
-- Gates IPv6 `1.9.3`: evidência `20260805T110000Z-gv-ipv6-1.9.3`
-- Próximo passo autorizado: smoke appliance `layer7_localnets` em **1.9.4**; GO `pass inet6` LAN (GV4) ou 12.10; produção enforce permanece 1.9.0
+- QA IPv4 `1.9.3`: D1–D6 **PASS**
+- Gates IPv6: `20260805T110000Z-gv-ipv6-1.9.3` + `20260805T113500Z-gv4-ipv6-1.9.4`
+- Próximo passo autorizado: **FIX aprendizagem IPv6→pdst** (código) **ou** retomar **12.10/V5** com GO; produção enforce permanece 1.9.0
 ```
 
 ---

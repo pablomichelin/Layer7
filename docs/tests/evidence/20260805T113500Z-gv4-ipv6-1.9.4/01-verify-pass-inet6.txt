@@ -1,0 +1,14 @@
+===RULE===
+pass in quick on vmx0 inet6 all flags S/SA keep state (if-bound) label "id=1785929863" label "tags=user_rule" label "descr=Layer7 lab GV4 allow IPv6 LAN" ridentifier 1785929863
+scrub on pppoe0 inet6 all fragment reassemble
+scrub on vmx0 inet6 all fragment reassemble
+scrub on pppoe1 inet6 all fragment reassemble
+scrub on vmx0.10 inet6 all fragment reassemble
+scrub on vmx0.50 inet6 all fragment reassemble
+scrub on vmx0.95 inet6 all fragment reassemble
+scrub on vmx0.52 inet6 all fragment reassemble
+block drop in log inet6 all label "descr=Default deny rule IPv6" label "tags=ruleset:2b76e15e76558a71" ridentifier 1000000105
+block drop out log inet6 all label "descr=Default deny rule IPv6" label "tags=ruleset:2b76e15e76558a71" ridentifier 1000000106
+pass in on lo0 inet6 all flags S/SA keep state (if-bound) label "descr=pass IPv6 loopback" ridentifier 1000009913
+===LOCALNETS===
+pfctl: Table does not exist.

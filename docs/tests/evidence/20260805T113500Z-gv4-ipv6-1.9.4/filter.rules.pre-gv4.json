@@ -1,0 +1,2629 @@
+[
+    {
+        "id": "",
+        "tracker": "1680094185",
+        "type": "pass",
+        "interface": "enc0",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1680094185",
+            "username": "admin@192.168.100.14 (Local Database)"
+        },
+        "updated": {
+            "time": "1734149177",
+            "username": "admin@179.127.134.21 (Local Database)"
+        }
+    },
+    {
+        "descr": "OpenVPN  wizard",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "interface": "openvpn",
+        "type": "pass",
+        "enabled": "on",
+        "tracker": "1675714827",
+        "created": {
+            "time": "1675714826",
+            "username": "OpenVPN Wizard"
+        }
+    },
+    {
+        "descr": "OpenVPN Quality wizard",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "interface": "openvpn",
+        "type": "pass",
+        "enabled": "on",
+        "tracker": "1772483084",
+        "created": {
+            "time": "1772483083",
+            "username": "OpenVPN Wizard"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1679355310",
+        "type": "pass",
+        "interface": "wan",
+        "ipprotocol": "inet46",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "log": "",
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1679355310",
+            "username": "admin@192.168.100.37 (Local Database)"
+        },
+        "updated": {
+            "time": "1734504729",
+            "username": "admin@179.127.134.21 (Local Database)"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.254",
+            "port": "9999"
+        },
+        "descr": "NAT Acesso Externo",
+        "associated-rule-id": "nat_5ee7b24f9b12a1.63620581",
+        "tracker": "1592242767",
+        "created": {
+            "time": "1592242767",
+            "username": "NAT Port Forward"
+        },
+        "ipprotocol": "inet"
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "zabbix_ports"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_5f15d7059af573.42914634",
+        "tracker": "1595266821",
+        "created": {
+            "time": "1595266821",
+            "username": "NAT Port Forward"
+        },
+        "ipprotocol": "inet"
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.252",
+            "port": "7989"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_5f4cd4efe5afd5.94016735",
+        "tracker": "1598870767",
+        "created": {
+            "time": "1598870767",
+            "username": "NAT Port Forward"
+        },
+        "ipprotocol": "inet"
+    },
+    {
+        "id": "",
+        "tracker": "1734229064",
+        "type": "pass",
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "network": "opt1ip",
+            "port": "1194"
+        },
+        "descr": "Allow OpenVPN on MHNET Interface",
+        "bridgeto": "",
+        "updated": {
+            "time": "1734229064",
+            "username": "admin@179.127.134.21 (Local Database)"
+        },
+        "created": {
+            "time": "1734229064",
+            "username": "admin@179.127.134.21 (Local Database)"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "10080"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_649c6b2e21a933.07361178",
+        "tracker": "1687972654",
+        "created": {
+            "time": "1687972654",
+            "username": "NAT Port Forward"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "10050-10500"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_64a2d129a20713.02741985",
+        "tracker": "1688391977",
+        "created": {
+            "time": "1688391977",
+            "username": "NAT Port Forward"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.227",
+            "port": "5678"
+        },
+        "descr": "NAT N8n",
+        "associated-rule-id": "nat_66f2ccc2b0ad38.66941334",
+        "tracker": "1727188162",
+        "created": {
+            "time": "1727188162",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1727402602",
+        "type": "pass",
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "http_https"
+        },
+        "descr": "NAT Servidor Web",
+        "bridgeto": "",
+        "associated-rule-id": "nat_66f6126a8e7c45.93511410",
+        "created": {
+            "time": "1727402602",
+            "username": "NAT Port Forward"
+        },
+        "updated": {
+            "time": "1734229099",
+            "username": "admin@179.127.134.21 (Local Database)"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.254",
+            "port": "22"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_67786b57cd2f46.96956789",
+        "tracker": "1735945047",
+        "created": {
+            "time": "1735945047",
+            "username": "NAT Port Forward"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "30000"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_67d074357ae380.82206043",
+        "tracker": "1741714485",
+        "created": {
+            "time": "1741714485",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.248",
+            "port": "5060"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_67db24f3c426e8.51897929",
+        "tracker": "1742415091",
+        "created": {
+            "time": "1742415091",
+            "username": "NAT Port Forward"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.248",
+            "port": "10000-20000"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_67db25079b7ed1.59405668",
+        "tracker": "1742415111",
+        "created": {
+            "time": "1742415111",
+            "username": "NAT Port Forward"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "161"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_67eaf0ad6640b9.10665655",
+        "tracker": "1743450285",
+        "created": {
+            "time": "1743450285",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "162"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_67eaf0d1dec4e5.43415329",
+        "tracker": "1743450321",
+        "created": {
+            "time": "1743450321",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.247",
+            "port": "62354"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_682e56080d8ed9.62100550",
+        "tracker": "1747867144",
+        "created": {
+            "time": "1747867144",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.228",
+            "port": "62354"
+        },
+        "descr": "NAT GLPI CBHIDRO",
+        "associated-rule-id": "nat_685e902c180ec7.58813911",
+        "tracker": "1751027756",
+        "created": {
+            "time": "1751027756",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.228",
+            "port": "8081"
+        },
+        "descr": "NAT GLPI CBHIDRO",
+        "associated-rule-id": "nat_685e9105c66082.56330499",
+        "tracker": "1751027973",
+        "created": {
+            "time": "1751027973",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.52.2",
+            "port": "3389"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_68dc1f55036df0.63167505",
+        "tracker": "1759256405",
+        "created": {
+            "time": "1759256405",
+            "username": "NAT Port Forward"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "8080"
+        },
+        "descr": "NAT Servidor Web",
+        "associated-rule-id": "nat_68e54faa3eb4e6.22249365",
+        "tracker": "1759858602",
+        "created": {
+            "time": "1759858602",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "descr": "OpenVPN Quality wizard",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "network": "wanip",
+            "port": "1195"
+        },
+        "interface": "wan",
+        "protocol": "udp",
+        "type": "pass",
+        "enabled": "on",
+        "tracker": "1772483083",
+        "created": {
+            "time": "1772483083",
+            "username": "OpenVPN Wizard"
+        }
+    },
+    {
+        "source": {
+            "address": "177.38.15.220"
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.112",
+            "port": "8123"
+        },
+        "descr": "NAT NeuralHouse_Osmarildo",
+        "associated-rule-id": "nat_6a0351ad290c50.97635052",
+        "tracker": "1778602413",
+        "created": {
+            "time": "1778602413",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "address": "177.38.15.220"
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.112",
+            "port": "4357"
+        },
+        "descr": "NAT NeuralHouse_Osmarildo",
+        "associated-rule-id": "nat_6a035463e998f7.88566085",
+        "tracker": "1778603107",
+        "created": {
+            "time": "1778603107",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.112",
+            "port": "6638"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_6a0bad4783bc72.55429906",
+        "tracker": "1779150151",
+        "created": {
+            "time": "1779150151",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.112",
+            "port": "6638"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_6a0bad49cd98a8.67896291",
+        "tracker": "1779150153",
+        "created": {
+            "time": "1779150153",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.112",
+            "port": "51820"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_6a1e112ec20a05.64993060",
+        "tracker": "1780355374",
+        "created": {
+            "time": "1780355374",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "address": "177.38.15.220"
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "udp",
+        "destination": {
+            "address": "192.168.100.112",
+            "port": "51820"
+        },
+        "descr": "NAT NeuralHouse_Osmarildo",
+        "associated-rule-id": "nat_6a289437813213.42286314",
+        "tracker": "1781044279",
+        "created": {
+            "time": "1781044279",
+            "username": "NAT Port Forward"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.224",
+            "port": "portas_mailserver"
+        },
+        "descr": "NAT Servidor Mailcow",
+        "associated-rule-id": "nat_6a497481c576e4.91105406",
+        "tracker": "1783198849",
+        "created": {
+            "time": "1783198849",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "21"
+        },
+        "descr": "NAT Servidor Web",
+        "associated-rule-id": "nat_6a636e862739f5.70677268",
+        "tracker": "1784901254",
+        "created": {
+            "time": "1784901254",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "wan",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "40110-40210"
+        },
+        "descr": "NAT Servidor Web",
+        "associated-rule-id": "nat_6a636fe7845a39.73935815",
+        "tracker": "1784901607",
+        "created": {
+            "time": "1784901607",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1759256664",
+        "type": "pass",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "192.168.100.244",
+            "port": "10058"
+        },
+        "destination": {
+            "address": "177.38.10.224",
+            "port": "10058"
+        },
+        "descr": "Saida Direcionada Storage Gentil",
+        "gateway": "P4NET_PPPOE",
+        "bridgeto": "",
+        "updated": {
+            "time": "1759256664",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "created": {
+            "time": "1759256664",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757099860",
+        "type": "pass",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "192.168.100.244"
+        },
+        "destination": {
+            "network": "opt5"
+        },
+        "descr": "Zabbix",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757099860",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "created": {
+            "time": "1757099860",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757382700",
+        "type": "pass",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "192.168.100.253"
+        },
+        "destination": {
+            "network": "opt5"
+        },
+        "descr": "Servidor Web",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757382700",
+            "username": "admin@172.16.100.3 (Local Database)"
+        },
+        "created": {
+            "time": "1757382700",
+            "username": "admin@172.16.100.3 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757632417",
+        "type": "pass",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "192.168.100.112"
+        },
+        "destination": {
+            "network": "opt5"
+        },
+        "descr": "Servidor Web",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757632417",
+            "username": "admin@172.16.100.3 (Local Database)"
+        },
+        "created": {
+            "time": "1757632417",
+            "username": "admin@172.16.100.3 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757097084",
+        "type": "block",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "lan"
+        },
+        "destination": {
+            "network": "opt5"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757097084",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "created": {
+            "time": "1757097084",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757097285",
+        "type": "block",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "lan"
+        },
+        "destination": {
+            "network": "opt2"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757097285",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "created": {
+            "time": "1757097285",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1624548664",
+        "type": "pass",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statetype": "keep state",
+        "os": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "descr": "",
+        "updated": {
+            "time": "1624548664",
+            "username": "admin@192.168.100.11 (Local Database)"
+        },
+        "created": {
+            "time": "1624548664",
+            "username": "admin@192.168.100.11 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1741637243",
+        "type": "pass",
+        "interface": "lan",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "address": "191.5.179.29"
+        },
+        "descr": "",
+        "gateway": "P4NET_PPPOE",
+        "bridgeto": "",
+        "updated": {
+            "time": "1741637243",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1741637243",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1599072446",
+        "type": "pass",
+        "interface": "opt1",
+        "ipprotocol": "inet46",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "log": "",
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1599072446",
+            "username": "admin@192.168.100.11 (Local Database)"
+        },
+        "updated": {
+            "time": "1734504744",
+            "username": "admin@179.127.134.21 (Local Database)"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.254",
+            "port": "9999"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_67626fef635963.54444677",
+        "tracker": "1734504431",
+        "created": {
+            "time": "1734504431",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "zabbix_ports"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_63d017adc2b1e7.20744593",
+        "tracker": "1674581933",
+        "created": {
+            "time": "1674581933",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp",
+        "destination": {
+            "address": "192.168.100.252",
+            "port": "7989"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_6596dae1bcbbd5.97762014",
+        "tracker": "1704385249",
+        "created": {
+            "time": "1704385249",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1734215950",
+        "type": "pass",
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "network": "opt1ip",
+            "port": "1194"
+        },
+        "descr": "Allow OpenVPN on MHNET Interface",
+        "bridgeto": "",
+        "updated": {
+            "time": "1734215950",
+            "username": "admin@68.250.43.222 (Local Database)"
+        },
+        "created": {
+            "time": "1734215950",
+            "username": "admin@68.250.43.222 (Local Database)"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.227",
+            "port": "5678"
+        },
+        "descr": "NAT N8n",
+        "associated-rule-id": "nat_66f2cccf6bde11.60175818",
+        "tracker": "1727188175",
+        "created": {
+            "time": "1727188175",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "http_https"
+        },
+        "descr": "NAT Servidor Web",
+        "associated-rule-id": "nat_67626699e5c6f2.54971770",
+        "tracker": "1734502041",
+        "created": {
+            "time": "1734502041",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "162"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_67ed1dc16fec04.20681888",
+        "tracker": "1743592897",
+        "created": {
+            "time": "1743592897",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.247",
+            "port": "62354"
+        },
+        "descr": "NAT ",
+        "associated-rule-id": "nat_682e56192b3e84.25142211",
+        "tracker": "1747867161",
+        "created": {
+            "time": "1747867161",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.244",
+            "port": "161"
+        },
+        "descr": "NAT Zabbix Server",
+        "associated-rule-id": "nat_685e8fb4d58e37.53292759",
+        "tracker": "1751027636",
+        "created": {
+            "time": "1751027636",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.228",
+            "port": "62354"
+        },
+        "descr": "NAT GLPI CBHIDRO",
+        "associated-rule-id": "nat_685e90212a6826.00199470",
+        "tracker": "1751027745",
+        "created": {
+            "time": "1751027745",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.228",
+            "port": "8081"
+        },
+        "descr": "NAT GLPI CBHIDRO",
+        "associated-rule-id": "nat_685e910f61fe41.14871735",
+        "tracker": "1751027983",
+        "created": {
+            "time": "1751027983",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757082128",
+        "type": "pass",
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "address": "192.168.52.2",
+            "port": "3389"
+        },
+        "log": "",
+        "descr": "NAT",
+        "bridgeto": "",
+        "associated-rule-id": "nat_68baf210a007f1.77505570",
+        "created": {
+            "time": "1757082128",
+            "username": "NAT Port Forward"
+        },
+        "updated": {
+            "time": "1758028377",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "8080"
+        },
+        "descr": "NAT Servidor Web",
+        "associated-rule-id": "nat_68e54f950c09a1.36964668",
+        "tracker": "1759858581",
+        "created": {
+            "time": "1759858581",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.224",
+            "port": "portas_mailserver"
+        },
+        "descr": "NAT Servidor Mailcow",
+        "associated-rule-id": "nat_6a49749f341ca2.06888337",
+        "tracker": "1783198879",
+        "created": {
+            "time": "1783198879",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "21"
+        },
+        "descr": "NAT Servidor Web",
+        "associated-rule-id": "nat_6a636e7b678dd1.80943204",
+        "tracker": "1784901243",
+        "created": {
+            "time": "1784901243",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "source": {
+            "any": ""
+        },
+        "interface": "opt1",
+        "ipprotocol": "inet",
+        "protocol": "tcp\/udp",
+        "destination": {
+            "address": "192.168.100.253",
+            "port": "40110-40210"
+        },
+        "descr": "NAT Servidor Web",
+        "associated-rule-id": "nat_6a636fd4d57420.23266363",
+        "tracker": "1784901588",
+        "created": {
+            "time": "1784901588",
+            "username": "NAT Port Forward"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1755088716",
+        "type": "pass",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "address": "10.0.85.1",
+            "port": "53"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1755088716",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1755088716",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1755201080",
+        "type": "pass",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "address": "10.0.85.1",
+            "port": "853"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1755201080",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1755201080",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1755088656",
+        "type": "block",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "any": "",
+            "port": "53"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1755088656",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1755088656",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1755201089",
+        "type": "block",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "any": "",
+            "port": "853"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1755201089",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1755201089",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1754942078",
+        "type": "block",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "network": "opt3"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1754942078",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "updated": {
+            "time": "1754942155",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1754942084",
+        "type": "block",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "network": "opt4"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1754942084",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "updated": {
+            "time": "1754942108",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1754942092",
+        "type": "block",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "network": "lan"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1754942092",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1754942092",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757097316",
+        "type": "block",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt2"
+        },
+        "destination": {
+            "network": "opt5"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757097316",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "created": {
+            "time": "1757097316",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1736172652",
+        "type": "pass",
+        "interface": "opt2",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1736172652",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "updated": {
+            "time": "1777286792",
+            "username": "admin@192.168.95.54 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1747232380",
+        "type": "pass",
+        "interface": "opt3",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1747232380",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1747232380",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757096891",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "IPS_CEO_SYSTEM"
+        },
+        "destination": {
+            "network": "opt5"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1757096891",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "updated": {
+            "time": "1757097456",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1778755605",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "IPS_CEO_SYSTEM"
+        },
+        "destination": {
+            "network": "lan"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1778755605",
+            "username": "admin@192.168.95.54 (Local Database)"
+        },
+        "created": {
+            "time": "1778755605",
+            "username": "admin@192.168.95.54 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1779102770",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "address": "192.168.100.244"
+        },
+        "descr": "Grafana",
+        "bridgeto": "",
+        "updated": {
+            "time": "1779102770",
+            "username": "admin@192.168.95.7 (Local Database)"
+        },
+        "created": {
+            "time": "1779102770",
+            "username": "admin@192.168.95.7 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1778756394",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "address": "192.168.100.141"
+        },
+        "descr": "Dados",
+        "bridgeto": "",
+        "created": {
+            "time": "1778756394",
+            "username": "admin@192.168.95.54 (Local Database)"
+        },
+        "updated": {
+            "time": "1779102239",
+            "username": "admin@192.168.95.7 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1780428661",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "address": "192.168.100.245"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1780428661",
+            "username": "admin@192.168.95.7 (Local Database)"
+        },
+        "created": {
+            "time": "1780428661",
+            "username": "admin@192.168.95.7 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1778756353",
+        "type": "block",
+        "interface": "opt4",
+        "ipprotocol": "inet46",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "network": "lan"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1778756353",
+            "username": "admin@192.168.95.54 (Local Database)"
+        },
+        "created": {
+            "time": "1778756353",
+            "username": "admin@192.168.95.54 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757096843",
+        "type": "block",
+        "interface": "opt4",
+        "ipprotocol": "inet46",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "network": "opt5"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757096843",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "created": {
+            "time": "1757096843",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1755203703",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "address": "192.168.95.254",
+            "port": "853"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1755203703",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1755203703",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1755203713",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "address": "192.168.95.254",
+            "port": "53"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1755203713",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1755203713",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1755203645",
+        "type": "block",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "any": "",
+            "port": "53"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "created": {
+            "time": "1755203645",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "updated": {
+            "time": "1755203654",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1755203661",
+        "type": "block",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "protocol": "tcp\/udp",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4"
+        },
+        "destination": {
+            "any": "",
+            "port": "853"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1755203661",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1755203661",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1747232652",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "192.168.95.32"
+        },
+        "destination": {
+            "address": "172.18.25.0\/24"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1747232652",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1747232652",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1726486746",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt4ip"
+        },
+        "destination": {
+            "network": "lanip"
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1726486746",
+            "username": "admin@192.168.95.20 (Local Database)"
+        },
+        "created": {
+            "time": "1726486746",
+            "username": "admin@192.168.95.20 (Local Database)"
+        },
+        "disabled": ""
+    },
+    {
+        "id": "",
+        "tracker": "1725990001",
+        "type": "pass",
+        "interface": "opt4",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1725990001",
+            "username": "admin@192.168.100.10 (Local Database)"
+        },
+        "created": {
+            "time": "1725990001",
+            "username": "admin@192.168.100.10 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757097622",
+        "type": "pass",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "Servidores_ADM"
+        },
+        "destination": {
+            "address": "192.168.100.244"
+        },
+        "descr": "Zabbix",
+        "bridgeto": "",
+        "created": {
+            "time": "1757097622",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "updated": {
+            "time": "1757100640",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757383185",
+        "type": "pass",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "192.168.52.3"
+        },
+        "destination": {
+            "address": "192.168.100.253"
+        },
+        "descr": "Servidor Web",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757383185",
+            "username": "admin@172.16.100.3 (Local Database)"
+        },
+        "created": {
+            "time": "1757383185",
+            "username": "admin@172.16.100.3 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1772483863",
+        "type": "pass",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "address": "192.168.52.2"
+        },
+        "destination": {
+            "address": "192.168.100.254"
+        },
+        "descr": "Servidor Web",
+        "bridgeto": "",
+        "updated": {
+            "time": "1772483863",
+            "username": "admin@192.168.95.220 (Local Database)"
+        },
+        "created": {
+            "time": "1772483863",
+            "username": "admin@192.168.95.220 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757097784",
+        "type": "block",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt5"
+        },
+        "destination": {
+            "network": "lan"
+        },
+        "descr": "Zabbix",
+        "bridgeto": "",
+        "created": {
+            "time": "1757097784",
+            "username": "admin@192.168.95.149 (Local Database)"
+        },
+        "updated": {
+            "time": "1757097816",
+            "username": "admin@192.168.95.149 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757096619",
+        "type": "block",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt5"
+        },
+        "destination": {
+            "network": "opt2"
+        },
+        "log": "",
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757096619",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1757096619",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757096634",
+        "type": "block",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt5"
+        },
+        "destination": {
+            "network": "opt3"
+        },
+        "log": "",
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757096634",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1757096634",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1757096643",
+        "type": "block",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "network": "opt5"
+        },
+        "destination": {
+            "network": "opt4"
+        },
+        "log": "",
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1757096643",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1757096643",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1756927739",
+        "type": "pass",
+        "interface": "opt5",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "descr": "",
+        "bridgeto": "",
+        "updated": {
+            "time": "1756927739",
+            "username": "admin@192.168.95.32 (Local Database)"
+        },
+        "created": {
+            "time": "1756927739",
+            "username": "admin@192.168.95.32 (Local Database)"
+        }
+    },
+    {
+        "id": "",
+        "tracker": "1715875275",
+        "type": "pass",
+        "interface": "WireGuard",
+        "ipprotocol": "inet",
+        "tag": "",
+        "tagged": "",
+        "max": "",
+        "max-src-nodes": "",
+        "max-src-conn": "",
+        "max-src-states": "",
+        "statetimeout": "",
+        "statepolicy": "",
+        "statetype": "keep state",
+        "pflow": "",
+        "os": "",
+        "srcmac": "",
+        "dstmac": "",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "any": ""
+        },
+        "descr": "Allow Pass WireGuard",
+        "bridgeto": "",
+        "updated": {
+            "time": "1715875275",
+            "username": "admin@192.168.100.23 (Local Database)"
+        },
+        "created": {
+            "time": "1715875275",
+            "username": "admin@192.168.100.23 (Local Database)"
+        }
+    },
+    {
+        "descr": "OpenVPN MIkrotik_VPN wizard",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "network": "open_VPNip",
+            "port": "1204"
+        },
+        "interface": "open_VPN",
+        "protocol": "tcp",
+        "type": "pass",
+        "enabled": "on",
+        "tracker": "1690814521",
+        "created": {
+            "time": "1690814521",
+            "username": "OpenVPN Wizard"
+        }
+    },
+    {
+        "descr": "OpenVPN Laticinio_Oliveira wizard",
+        "source": {
+            "any": ""
+        },
+        "destination": {
+            "network": "open_VPNip",
+            "port": "1195"
+        },
+        "interface": "open_VPN",
+        "protocol": "udp",
+        "type": "pass",
+        "enabled": "on",
+        "tracker": "1728299751",
+        "created": {
+            "time": "1728299751",
+            "username": "OpenVPN Wizard"
+        }
+    }
+]

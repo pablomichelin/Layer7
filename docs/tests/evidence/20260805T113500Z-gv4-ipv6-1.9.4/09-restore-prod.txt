@@ -1,0 +1,10 @@
+RESTORED model=legacy_global mode=enforce policies=4
+ - p-mon-001
+ - anti-bypass-dns
+ - profile-preset-protecao-infantil
+ - profile-anti-bypass-dns
+===INET6_LAN===
+pass in quick on vmx0 inet6 all flags S/SA keep state (if-bound) label "id=1785929863" label "tags=user_rule" label "descr=Layer7 lab GV4 allow IPv6 LAN" ridentifier 1785929863
+===LOCALNETS===
+pfctl: Table does not exist.
+confirm model=legacy_global mode=enforce

@@ -1,0 +1,37 @@
+===PDST===
+===SPECIALS===
+HIT layer7_localnets:    fe80::/10
+(specials audit done)
+===STATS===
+total_blocked=0
+dst_add_ok=0
+pf_add_ok=0
+cap_classified_v4=723
+cap_classified_v6=18
+cap_pkts_v6=474
+===LOG===
+2026-08-05 08:36:07 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:36:27 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:36:27 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:02 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:02 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:08 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:08 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:09 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:09 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:22 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:22 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:23 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:23 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:27 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:28 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:28 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:28 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:28 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:31 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:43 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:43 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:46 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:37:46 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.68 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:38:38 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-05 08:38:38 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block

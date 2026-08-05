@@ -1,0 +1,53 @@
+===DAEMON===
+layer7d is running as pid 91290.
+2026-08-05 08:01:45 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 08:01:45 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+2026-08-05 08:02:40 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 08:02:55 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#3 (/usr/local/etc/layer7.json)
+2026-08-05 08:02:59 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 08:02:59 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+2026-08-05 08:28:13 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 08:28:13 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+2026-08-05 08:28:19 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 08:28:23 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 08:28:23 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+2026-08-05 08:38:19 [notice] config: policies=4 exceptions=0 enforce_cfg=1 reload#2 (/usr/local/etc/layer7.json)
+2026-08-05 08:38:41 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#3 (/usr/local/etc/layer7.json)
+2026-08-05 08:38:54 [notice] config: policies=2 exceptions=0 enforce_cfg=1 reload#1 (/usr/local/etc/layer7.json)
+2026-08-05 08:38:54 [notice] enforce_ready: enforce_cfg=1 mode=enforce
+===CFG===
+model=scoped_hybrid mode=enforce sni=1
+Array
+(
+    [0] => 192.168.100.234
+    [1] => 2804:6c4:11d:cc00::100b
+    [2] => 2804:6c4:11d:cc00:250:56ff:fe9d:252c
+)
+===CAPTURE_IF===
+Array
+(
+    [0] => vmx0
+    [1] => vmx0.95
+)
+===STATS_FULL===
+total_classified=1163
+total_blocked=0
+total_allowed=1163
+enforce_mode=1
+pf_add_ok=0
+pf_add_fail=0
+dst_add_ok=0
+dst_add_fail=0
+cap_pkts=478080
+cap_pkts_v4=477511
+cap_pkts_v6=518
+cap_active=2159
+cap_active_v4=2126
+cap_active_v6=33
+cap_classified=1163
+cap_classified_v4=1141
+cap_classified_v6=22
+cap_expired=0
+cap_evicted=0
+cap_dropped=0
+bl_dns_hits=0
