@@ -299,6 +299,13 @@ write_stats_json(void)
 	fprintf(f, "  \"license_error\": \"");
 	json_escape_fprint(f, s_lic.error);
 	fprintf(f, "\",\n");
+	fprintf(f, "  \"license_features\": \"");
+	json_escape_fprint(f, s_lic.features);
+	fprintf(f, "\",\n");
+	fprintf(f, "  \"license_features_flags\": %u,\n",
+	    s_lic.features_flags ? s_lic.features_flags : 0);
+	fprintf(f, "  \"license_features_truncated\": %s,\n",
+	    s_lic.features_truncated ? "true" : "false");
 
 	{
 		struct l7_checkin_status ci;

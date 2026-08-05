@@ -1288,7 +1288,7 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção / `latest`: **`1.9.8`**. **IM0 fechado**; **20.3–20.4 PASS**; passo actual **20.5**.
+Baseline produção / `latest`: **`1.9.8`**. **IM0 fechado**; **20.3–20.5 PASS**; passo actual **20.6**.
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1312,14 +1312,14 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0 fechado**; **20.3–20.4 PASS
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.5 / IM1** (GUI upsell Identity/MITM)
+- Passo actual: **20.6 / IM1** (compat + check-in ∩ .lic + GI1)
 - IM0: 20.1–20.2 PASS
-- IM1: 20.3 PASS; **20.4 PASS**; 20.5–20.6 PENDENTE
+- IM1: 20.3–20.5 PASS; 20.6 PENDENTE
 - IM2–IM9: PENDENTE
-- Código: features.c + LS SKU; sem Identity/MITM activo
+- Código: features + LS SKU + GUI upsell; sem Identity/MITM runtime
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
-- Próximo: 20.5 — GUI upsell
+- Próximo: 20.6 — GI1
 ```
 
 ---
@@ -1494,12 +1494,12 @@ CHECKPOINT CANONICO
 - Canal publico latest: **1.9.13** (guia Acesso Remoto)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo 20.5/IM1 (GUI upsell); 20.4 PASS; arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo 20.6/IM1 (GI1); 20.5 PASS; arranque docs/00-overview/START-HERE-identity-mitm.md
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; não misturar com IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **20.5** (GUI upsell) **ou** GO promoção enforce 1.9.13; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: Identity+MITM **20.6** (GI1) **ou** GO promoção enforce 1.9.13; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

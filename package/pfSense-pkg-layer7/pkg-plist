@@ -6,6 +6,8 @@
 /usr/local/www/packages/layer7/layer7_settings.php
 /usr/local/www/packages/layer7/layer7_policies.php
 /usr/local/www/packages/layer7/layer7_remote_access.php
+/usr/local/www/packages/layer7/layer7_identity.php
+/usr/local/www/packages/layer7/layer7_mitm.php
 /usr/local/www/packages/layer7/layer7_groups.php
 /usr/local/www/packages/layer7/layer7_categories.php
 /usr/local/www/packages/layer7/layer7_exceptions.php

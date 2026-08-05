@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-05c`; **IM0 fechado**; **20.3–20.4 PASS**; passo actual **20.5**)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-05c`; **IM0 fechado**; **20.3–20.5 PASS**; passo actual **20.6**)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
@@ -18,16 +18,16 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.5** (IM1 — GUI upsell Identity/MITM sem entitlement) |
-| Código | 20.3–20.4 PASS; sem módulos Identity/MITM activos |
+| Passo actual | **20.6** (IM1 — compat + check-in ∩ `.lic` + GI1) |
+| Código | 20.3–20.5 PASS; sem runtime Identity/MITM |
 | ADRs | **Aceito** ×4 (`2026-08-05`); transição legado **T1** |
-| Próximo após 20.5 | 20.6 — compat + check-in ∩ `.lic` + GI1 |
+| Próximo após 20.6 / GI1 | IM2 spike 20.7 **ou** caminho Identity IM3 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.5 / IM1
+- Passo actual: 20.6 / IM1
 - IM0: 20.1–20.2 PASS
-- IM1: 20.3 PASS; **20.4 PASS**; 20.5–20.6 PENDENTE
+- IM1: 20.3–20.5 PASS; 20.6 PENDENTE
 - IM2–IM9: PENDENTE
 - Baseline: 1.9.8
 ```

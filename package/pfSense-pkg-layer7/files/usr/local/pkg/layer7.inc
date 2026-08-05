@@ -5382,7 +5382,11 @@ function layer7_read_license_status()
 			"customer" => isset($stats["license_customer"]) ? $stats["license_customer"] : "",
 			"expiry" => isset($stats["license_expiry"]) ? $stats["license_expiry"] : "",
 			"hardware_id" => isset($stats["license_hardware_id"]) ? $stats["license_hardware_id"] : "",
-			"error" => isset($stats["license_error"]) ? $stats["license_error"] : ""
+			"error" => isset($stats["license_error"]) ? $stats["license_error"] : "",
+			"features" => isset($stats["license_features"]) ? (string)$stats["license_features"] : "",
+			"features_flags" => isset($stats["license_features_flags"])
+			    ? (int)$stats["license_features_flags"] : 0,
+			"features_truncated" => !empty($stats["license_features_truncated"])
 		);
 	}
 	$hw = "";
@@ -5405,8 +5409,127 @@ function layer7_read_license_status()
 		"expiry" => "",
 		"hardware_id" => $hw,
 		"error" => $has_lic ? "daemon not running — cannot verify" : "no license file",
-		"has_file" => $has_lic
+		"has_file" => $has_lic,
+		"features" => "",
+		"features_flags" => 0,
+		"features_truncated" => false
 	);
+}
+
+/**
+ * ADR-0025 / passo 20.5 — entitlements para UX (upsell).
+ * Espelha a semântica T1 do daemon (features.c): full/vazio → base;
+ * identity/mitm só com token explícito. A autoridade de gate continua no daemon.
+ */
+define("L7_FEAT_BASE", 1);
+define("L7_FEAT_IDENTITY", 2);
+define("L7_FEAT_MITM", 4);
+
+function layer7_features_parse_php($raw)
+{
+	$flags = L7_FEAT_BASE;
+	$truncated = false;
+	$s = is_string($raw) ? $raw : "";
+	if (strlen($s) > 63) {
+		$s = substr($s, 0, 63);
+		$truncated = true;
+	}
+	$s = trim($s);
+	if ($s === "") {
+		return array("flags" => $flags, "truncated" => $truncated, "normalized" => "base");
+	}
+	$parts = preg_split('/\s*,\s*/', strtolower($s));
+	if (!is_array($parts)) {
+		$parts = array();
+	}
+	foreach ($parts as $tok) {
+		$tok = trim($tok);
+		if ($tok === "" || $tok === "full" || $tok === "base") {
+			continue;
+		}
+		if ($tok === "identity") {
+			$flags |= L7_FEAT_IDENTITY;
+		} elseif ($tok === "mitm") {
+			$flags |= L7_FEAT_MITM;
+		}
+	}
+	$norm = "base";
+	if ($flags & L7_FEAT_IDENTITY) {
+		$norm .= ",identity";
+	}
+	if ($flags & L7_FEAT_MITM) {
+		$norm .= ",mitm";
+	}
+	return array("flags" => $flags, "truncated" => $truncated, "normalized" => $norm);
+}
+
+function layer7_features_from_lic_file()
+{
+	$path = layer7_lic_path();
+	if (!is_readable($path)) {
+		return "";
+	}
+	$raw = @file_get_contents($path);
+	if ($raw === false || $raw === "") {
+		return "";
+	}
+	$env = json_decode($raw, true);
+	if (!is_array($env) || empty($env["data"]) || !is_string($env["data"])) {
+		return "";
+	}
+	$data = json_decode($env["data"], true);
+	if (is_array($data) && isset($data["features"])) {
+		return (string)$data["features"];
+	}
+	if (preg_match('/"features"\s*:\s*"([^"]*)"/', $env["data"], $m)) {
+		return $m[1];
+	}
+	return "";
+}
+
+function layer7_entitlements()
+{
+	$status = layer7_read_license_status();
+	$raw = "";
+	$flags = 0;
+	if (!empty($status["features_flags"])) {
+		$flags = (int)$status["features_flags"];
+		$raw = isset($status["features"]) ? (string)$status["features"] : "";
+	} elseif (!empty($status["features"])) {
+		$raw = (string)$status["features"];
+		$parsed = layer7_features_parse_php($raw);
+		$flags = $parsed["flags"];
+	} else {
+		$raw = layer7_features_from_lic_file();
+		$parsed = layer7_features_parse_php($raw);
+		$flags = $parsed["flags"];
+	}
+	/* Sempre garantir BASE para UX do produto. */
+	$flags |= L7_FEAT_BASE;
+	return array(
+		"raw" => $raw,
+		"flags" => $flags,
+		"has_identity" => ($flags & L7_FEAT_IDENTITY) !== 0,
+		"has_mitm" => ($flags & L7_FEAT_MITM) !== 0,
+		"license_valid" => !empty($status["valid"]),
+		"dev_mode" => !empty($status["dev_mode"])
+	);
+}
+
+function layer7_has_entitlement($token)
+{
+	$e = layer7_entitlements();
+	$token = strtolower(trim((string)$token));
+	if ($token === "base") {
+		return true;
+	}
+	if ($token === "identity") {
+		return !empty($e["has_identity"]);
+	}
+	if ($token === "mitm") {
+		return !empty($e["has_mitm"]);
+	}
+	return false;
 }
 
 /* ============================================================
@@ -6034,6 +6157,8 @@ function layer7_nav_items()
 		"devices" => array("label" => l7_t("Dispositivos"), "href" => "layer7_devices.php"),
 		"policies" => array("label" => l7_t("Politicas"), "href" => "layer7_policies.php"),
 		"remote_access" => array("label" => l7_t("Acesso Remoto"), "href" => "layer7_remote_access.php"),
+		"identity" => array("label" => l7_t("Identity"), "href" => "layer7_identity.php"),
+		"mitm" => array("label" => l7_t("MITM"), "href" => "layer7_mitm.php"),
 		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php"),
 		"allowlist" => array("label" => l7_t("Allowlist"), "href" => "layer7_allowlist.php"),
 		"eventos" => array("label" => l7_t("Eventos"), "href" => "layer7_events.php"),
