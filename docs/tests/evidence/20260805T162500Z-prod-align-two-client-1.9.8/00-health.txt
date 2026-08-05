@@ -1,0 +1,40 @@
+=== PHASE 0: health appliance ===
+hostname=systemupfw.system.up
+version=1.9.8
+layer7d is running as pid 8989.
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=702
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2028-07-08
+features=full
+pfSense-pkg-layer7-1.9.8
+enabled=1
+mode=enforce
+model=legacy_global
+ifaces=vmx0,vmx0.95
+force_dns=1
+policies=4
+pid=
+block_dst_n=
+listeners_8099:
+root    php        45510  8 tcp4  127.0.0.1:8099        *:*                  
+root    php        44964  8 tcp6  [::1]:8099            *:*                  
+nat_inet6_http=
+nat_inet6_dns=
+nat_inet_dns=
+
+=== PHASE 0b: client identity ===
+A: server
+lo 127.0.0.1/8
+ens160 192.168.100.234/24
+docker0 172.17.0.1/16
+B: zpro-aimirim
+lo 127.0.0.1/8
+ens160 192.168.100.235/24
+docker0 172.17.0.1/16
+A gw/dns: default via 192.168.100.254 dev ens160 proto static 
+B gw/dns: default via 192.168.100.254 dev ens160 proto static 

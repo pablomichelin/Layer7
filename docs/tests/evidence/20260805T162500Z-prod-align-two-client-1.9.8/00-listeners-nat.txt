@@ -1,0 +1,32 @@
+root    php        45510  8 tcp4  127.0.0.1:8099        *:*                  
+root    php        44964  8 tcp6  [::1]:8099            *:*                  
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.253 port = http-alt -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.253 port = http-alt -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto tcp from 192.168.100.0/24 to 192.168.100.253 port = http-alt -> 192.168.100.254 port 1024:65535
+nat on vmx0 inet proto udp from 192.168.100.0/24 to 192.168.100.253 port = http-alt -> 192.168.100.254 port 1024:65535
+rdr on vmx0.10 inet proto tcp from any to ! <cpzoneid_2_cpips> port = http tagged cpzoneid_2_rdr -> 10.0.85.1 port 8002
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253

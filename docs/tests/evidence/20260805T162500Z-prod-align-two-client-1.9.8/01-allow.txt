@@ -1,0 +1,2 @@
+A allow example.com code=200
+B allow example.com code=200

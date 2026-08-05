@@ -1,0 +1,35 @@
+block_dst:
+   17.250.105.4
+   17.250.105.11
+   104.16.248.249
+---
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:42 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:43 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:43 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:44 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:48 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:48 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:52 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:56 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:56 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:56 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:56 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:57 [notice] flow_decide: iface=vmx0 src=192.168.100.244 dst=192.168.100.254 host=mask.icloud.com app=Zabbix cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:58 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=mask.icloud.com app=SSH cat=RemoteAccess action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:58 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=mask.icloud.com app=SSH cat=RemoteAccess action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:58 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=mask.icloud.com app=SSH cat=RemoteAccess action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:59 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:59 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:25:59 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:26:00 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:26:00 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:26:00 [notice] flow_decide: iface=vmx0 src=192.168.100.32 dst=192.168.100.254 host=mask.icloud.com app=DNS cat=Network action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:26:04 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=192.168.100.254 host=mask.icloud.com app=SSH cat=RemoteAccess action=block reason=policy_match policy=profile-anti-bypass-dns
+2026-08-05 13:26:04 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=192.168.100.254 host=mask.icloud.com app=SSH cat=RemoteAccess action=block reason=policy_match policy=profile-anti-bypass-dns

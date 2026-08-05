@@ -1,0 +1,38 @@
+1.9.8
+layer7d is running as pid 8989.
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=702
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2028-07-08
+features=full
+pfSense-pkg-layer7-1.9.8
+Name           : pfSense-pkg-layer7
+Version        : 1.9.8
+Installed on   : Wed Aug  5 11:52:53 2026 -03
+Origin         : sysutils/pfSense-pkg-layer7
+Architecture   : FreeBSD:15:amd64
+Prefix         : /usr/local
+Categories     : sysutils
+Licenses       : EULA
+Maintainer     : contato@systemup.inf.br
+WWW            : https://github.com/pablomichelin/pfsense-layer7
+Comment        : Layer 7 for pfSense CE by Systemup (www.systemup.inf.br)
+Shared Libs required:
+	libc.so.7
+	libm.so.5
+	libpcap.so.8
+	libthr.so.3
+Annotations    :
+	FreeBSD_version: 1500068
+Flat size      : 7.62MiB
+Description    :
+Layer 7 traffic classification and policy package for pfSense CE.
+
+WIP: port builds layer7d (C) from src; XML/PHP/rc.d in repo. Lab validation
+required before claiming install/GUI/service OK — see repo docs/04-package/.
+
+WWW: https://github.com/pablomichelin/pfsense-layer7

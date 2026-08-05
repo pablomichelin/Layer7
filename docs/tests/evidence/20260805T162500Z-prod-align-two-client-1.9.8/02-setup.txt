@@ -1,0 +1,2 @@
+SETUP_SCOPED_OK
+model=scoped_hybrid

@@ -1,0 +1,54 @@
+===== A =====
+HTTP/1.1 200 OK
+Host: bet365.com
+Date: Wed, 05 Aug 2026 16:26:03 GMT
+Connection: close
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+
+BODY:
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Acesso bloqueado</title>
+	<style>
+		:root {
+			--bg: #0f172a;
+			--card: #1e293b;
+			--accent: #3b82f6;
+			--text: #f1f5f9;
+			--muted: #94a3b8;
+			--border: #334155;
+		}
+		* { box-sizing: border-box; margin: 
+===== B =====
+HTTP/1.1 200 OK
+Host: bet365.com
+Date: Wed, 05 Aug 2026 16:26:03 GMT
+Connection: close
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+
+BODY:
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Acesso bloqueado</title>
+	<style>
+		:root {
+			--bg: #0f172a;
+			--card: #1e293b;
+			--accent: #3b82f6;
+			--text: #f1f5f9;
+			--muted: #94a3b8;
+			--border: #334155;
+		}
+		* { box-sizing: border-box; margin: 

@@ -1,0 +1,1 @@
+block drop quick inet from 192.168.100.234 to <layer7_pdst_0> label "layer7:pdst:prod-align-yt-a" ! tagged L7ALLOW

@@ -1,0 +1,16 @@
+rdr on vmx0 inet proto tcp from any to 192.168.100.254 port = http -> 127.0.0.1 port 8099
+rdr on vmx0 inet proto tcp from any to 192.168.100.254 port = https -> 127.0.0.1 port 8099
+rdr on vmx0.95 inet proto tcp from any to 192.168.100.254 port = http -> 127.0.0.1 port 8099
+rdr on vmx0.95 inet proto tcp from any to 192.168.100.254 port = https -> 127.0.0.1 port 8099
+rdr on vmx0 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = http -> ::1 port 8099
+rdr on vmx0 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = https -> ::1 port 8099
+rdr on vmx0.95 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = http -> ::1 port 8099
+rdr on vmx0.95 inet6 proto tcp from any to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = https -> ::1 port 8099
+rdr on vmx0 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet6 proto udp from any to ! ::1 port = domain -> ::1
+rdr on vmx0 inet6 proto tcp from any to ! ::1 port = domain -> ::1
+rdr on vmx0.95 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet6 proto udp from any to ! ::1 port = domain -> ::1
+rdr on vmx0.95 inet6 proto tcp from any to ! ::1 port = domain -> ::1

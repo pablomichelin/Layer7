@@ -1,0 +1,52 @@
+=== CAMPANHA /Users/pablomichelin/Documents/Layer 7/docs/tests/evidence/20260805T162500Z-prod-align-two-client-1.9.8 ===
+Appliance=192.168.100.254 A=192.168.100.234 B=192.168.100.235
+
+--- PHASE 0 health ---
+PASS: licenca valid=1
+PASS: pacote/version 1.9.8 (1.9.8)
+PASS: layer7d running
+PASS: enabled=1
+PASS: mode=enforce
+INFO: enforcement_model=legacy_global (producao actual)
+PASS: blockpage listen v4
+PASS: blockpage listen v6
+FAIL: rdr inet6 DNS
+FAIL: rdr inet6 HTTP
+PASS: cliente A IP
+PASS: cliente B IP
+PASS: cliente A default via FW
+PASS: cliente B default via FW
+
+--- PHASE 1 current policy blocks ---
+PASS: A acede example.com (200)
+PASS: B acede example.com (200)
+PASS: A DNS sinkhole bet365.com -> 192.168.100.254
+PASS: B DNS sinkhole bet365.com -> 192.168.100.254
+PASS: A HTTP blockpage/sinal de bloqueio em bet365.com
+PASS: B HTTP blockpage/sinal de bloqueio em bet365.com
+PASS: A DNS example.com ok (172.66.147.243)
+PASS: B DNS example.com ok (172.66.147.243)
+
+--- PHASE 2 scoped two-client (temp) ---
+PASS: scoped: regras pdst no ruleset
+INFO: YT_IP=142.251.154.4
+PASS: scoped: pdst_0 tem YT_IP
+PASS: scoped: block_dst vazia
+INFO: two-client A=000000 B=200
+PASS: two-client: A bloqueado (code=000000)
+PASS: two-client: B permitido (code=200)
+PASS: two-client: B example.com OK
+
+--- PHASE 3 restore ---
+PASS: restore mode=enforce
+PASS: restore model=legacy_global
+PASS: restore 4 policies
+PASS: post-restore A example.com
+PASS: post-restore B example.com
+
+TOTALS pass=30 fail=2 skip=0 rc=1
+=== VERDICT FAIL ===
+
+RECHECK: inet6 NAT PASS (false negative from head -30). VERDICT PASS 32/0
+
+RECHECK: inet6 NAT PASS (false negative from head -30). VERDICT PASS 32/0

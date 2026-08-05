@@ -1,0 +1,5 @@
+enabled=1
+mode=enforce
+model=legacy_global
+force_dns=1
+policies=4
