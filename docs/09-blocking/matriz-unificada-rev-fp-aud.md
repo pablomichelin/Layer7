@@ -23,7 +23,7 @@ Legenda de **evidência:** OBS | REP | LOCAL | BUILDER | APPLIANCE | N/C
 | FP-007 | REV-042 | DEFECT | Média | `_27` | code_fixed | — | BUILDER | N/C | G5 |
 | FP-008 | — | DEFECT | Média | `_27` | code_fixed | LOCAL | BUILDER | N/C | G4.2 |
 | FP-009 | REV-001, AUD-005 | LIMITATION | Crítica | — | by_design | OBS | — | N/C | G5+ADR |
-| FP-010 | REV-038, AUD-007 | LIMITATION | Alta | — | open | OBS | — | N/A | V2 |
+| FP-010 | REV-038, AUD-007, REV-018 (PF) | LIMITATION | Alta | — | open | OBS | — | N/A | Trilha IPv6: V1=REV-018; V2–V3+GV3–GV4=captura; ADR-0024 |
 | FP-011 | AUD-004 | RISK | Alta | — | open | — | BUILDER | N/C | G2.5 |
 | FP-012 | AUD-012 | RISK | Alta | `_30` | code_fixed | LOCAL | BUILDER | N/C | G4.5 |
 | FP-013 | — | LIMITATION | Média | — | open | OBS | — | N/C | lab DNS |
@@ -49,7 +49,7 @@ Legenda de **evidência:** OBS | REP | LOCAL | BUILDER | APPLIANCE | N/C
 | AUD-004 | FP-011 | RISK | Alta | open | ABI FB15 vs FB16 |
 | AUD-005 | FP-009 | CLAIM | Crítica | by_design | legacy_global default |
 | AUD-006 | FP-015 | DEFECT | Média | open | Parser JSON frágil |
-| AUD-007 | FP-010 | LIMITATION | Alta | open | IPv4-only |
+| AUD-007 | FP-010 | LIMITATION | Alta | open | IPv4-only captura; trilha IPv6 ADR-0024 (passo 12.x) |
 | AUD-008 | — | DEFECT | Alta | open | Interface lógica no JSON |
 | AUD-009 | BG-028 | DOC-DRIFT | Alta | open | Trust chain inactiva |
 | AUD-010 | FP-018 | DEFECT | Crítica* | code_fixed | Fix `_29+` |
@@ -92,7 +92,8 @@ Legenda de **evidência:** OBS | REP | LOCAL | BUILDER | APPLIANCE | N/C
 | REV-002 | flush licença inválida | closed `_24+` | — |
 | REV-003 | CIDR `/0` allowlist | closed | — |
 | REV-021 | parser JSON | open | FP-015 |
-| REV-038 | IPv4-only | open | FP-010 |
+| REV-038 | IPv4-only captura | open | FP-010 |
+| REV-018 | scoped PF só `inet` (bypass v6) | open | FP-010 / V1 (12.3) |
 | REV-042 | CNAME QNAME | code_fixed | FP-007 |
 | REV-050 | lacunas integração | parcial | FP-016 |
 
@@ -118,3 +119,6 @@ Legenda de **evidência:** OBS | REP | LOCAL | BUILDER | APPLIANCE | N/C
 - `revisao-codigo-pre-install-2026-06-15.md` — SSOT REV
 - `auditoria-end-to-end-2026-07-29.md` — SSOT AUD
 - `diagnostico-multitask-2026-07-30.md` — relatório desta rodada
+- [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) — FP-010 / REV-018 (trilha IPv6)
+- [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)
+- [`matriz-limitacoes-dpi.md`](matriz-limitacoes-dpi.md) — alinhamento GV0.4 (passo 12.1)

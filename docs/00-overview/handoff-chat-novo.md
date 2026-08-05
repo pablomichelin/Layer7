@@ -54,8 +54,12 @@ estado actual deixa de ser suficiente para agir sem reler o repo; o
 
 ## Prompt de continuação (copiar e colar)
 
-Substitui apenas o que estiver entre `<>`; remove as linhas de instrução se
-preferires uma mensagem mais curta.
+**Trilha activa (IPv6 / fecho):** preferir colar só o caminho de
+[`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md) e o prompt
+desse ficheiro — é o arranque único.
+
+Para handoff genérico (fora da trilha), substitui apenas o que estiver entre
+`<>`; remove as linhas de instrução se preferires uma mensagem mais curta.
 
 ```text
 Contexto: continuo o desenvolvimento do Layer7 (pfSense CE) no repo local.

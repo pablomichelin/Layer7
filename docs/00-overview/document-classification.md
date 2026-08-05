@@ -58,7 +58,13 @@ vence o canónico.
 | `docs/00-overview/document-classification.md` | classificacao | matriz de estatuto dos docs | Canónico | novo | manter vivo quando surgirem conflitos | F0+ |
 | `docs/00-overview/document-equivalence-map.md` | equivalencia | mapa raiz <-> docs | Canónico | novo | manter vivo ate a F6 | F0-F6 |
 | `docs/00-overview/handoff-chat-novo.md` | handoff de chat Cursor | quando/como abrir chat novo, prompt de continuacao, verificacao opcional pos-clone (`check-port-files`, `smoke-layer7d` por SO) e ligacao a F3/F4 no lab | Canónico | concretiza a politica de continuidade do `CORTEX.md` para contexto longo | manter alinhado ao `CORTEX` e a `docs/README.md` | F0+ |
-| `docs/00-overview/f3-11-start-here.md` | entrada unica F3.11 | ponto unico de entrada operacional da trilha F3.11 | Canónico | novo | manter vivo enquanto a F3.11 estiver aberta e bloqueada | F3 |
+| `docs/00-overview/START-HERE-fecho-producao.md` | arranque unico chat | ponto unico de entrada (fecho P0–J historico + trilha IPv6 activa) | Canónico | unico START-HERE da fila fecho/IPv6 | manter vivo com passo CORTEX | F0+ |
+| `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | plano fecho P0–J | SSOT historico do fecho producao — FECHADO | Canónico | — | preservar; nao reabrir | F0+ |
+| `docs/02-roadmap/plano-ipv6-completo.md` | trilha IPv6 V0–V6 | SSOT da fila passos 12.x pos-fecho | Canónico | — | manter vivo ate GV7 | F4+ |
+| `docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md` | mapa codigo IPv6 | SSOT tecnico M-xx + salvaguardas §8 | Canónico | — | actualizar a cada 12.x | F4+ |
+| `docs/09-blocking/plano-gates-ipv6.md` | gates GV0–GV7 | gates da trilha IPv6 | Canónico | — | manter vivo ate GV7 | F4+ |
+| `docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md` | ADR IPv6 | decisao faseada V0–V6 | Canónico | — | emendar se V5 Opcao B | F4+ |
+| `docs/00-overview/f3-11-start-here.md` | arquivo F3.11 | entrada historica da trilha F3.11 (fechada); **nao** e arranque da fila actual | Historico | apontar para START-HERE-fecho-producao.md | preservar; nao usar como chat limpo | F3 |
 | `docs/00-overview/f3-organizacao-local-e-fecho.md` | organizacao local e fecho F3 | mapa canónico da pasta local e do caminho estrito para concluir a F3 sem misturar alvos | Canónico | novo | manter vivo enquanto a F3 estiver aberta; remover ou absorver apos o fecho real da F3 | F3 |
 | `docs/00-overview/f3-11-document-traceability-map.md` | rastreabilidade F3.11 | mapa canónico de navegacao e de registo entre os artefactos da trilha F3.11 | Canónico | novo | manter vivo enquanto a F3.11 depender de multiplos artefactos coordenados | F3 |
 | `docs/01-architecture/target-architecture.md` | arquitectura | resumo canónico da arquitectura | Canónico | resume `02-ARQUITETURA-ALVO.md` | manter vivo | F0+ |

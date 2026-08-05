@@ -1,4 +1,8 @@
-# F3.11 - Start Here
+# F3.11 - Start Here (arquivo histórico)
+
+> **Não é o arranque de chat da fila actual.** Para fecho / IPv6 usar só
+> [`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md).
+> Este ficheiro documenta a trilha F3.11 já **fechada**.
 
 ## Estado actual (actualizado em 2026-08-04)
 
@@ -34,5 +38,5 @@
 
 ## Próximo passo (pós-F3)
 
-Continuar **Onda D** (passo 5.1 — F4 lab) no plano mestre de fecho de produção.
-Ver [`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md).
+Plano mestre de fecho **FECHADO** (`1.9.0`). Trilha activa: **IPv6** (passo 12.1).
+Arranque único: [`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md).

@@ -275,6 +275,29 @@ reavaliacao formal.
 | BG-076 | GUI i18n EN/PT completo + icones FA6 Perfis rapidos + renome Mensagens | Media | package/GUI | Caminho A / UX F4.3 | opcoes novas so em PT; marcas FA4 mostram X branco no FA6 do pfSense; label Mensageria | M | Medio | Concluido codigo (`1.8.11_65`); gate appliance pendente | so apresentacao: `en.php`, `layer7_profile_icon_*`, `profiles.json` labels; id `mensageria` intacto; zero mudanca daemon/enforcement; producao enforce continua `_24` |
 | BG-077 | Check-in online periodico e revogacao remota de licenca (cancelamento comercial) | **Critica** | license-server/daemon/licenciamento | **F3+** (bloqueante comercial recomendado antes GO enforce) | revogacao no servidor nao corta appliance; cliente cancelado continua em enforce ate expiry+grace offline | G | **Alto** | **Implementado** (`2026-08-04`) | API `244` + daemon `1.8.11_68`; S14 PASS; flag `check_in_enabled` default OFF; ADR-0021; plano `f3-plano-check-in-online-revogacao-remota.md` |
 
+## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-04, rev. c)
+
+- Trilha **ABERTA** — passo **12.2** (Onda V0). SSOT:
+  [`plano-ipv6-completo.md`](plano-ipv6-completo.md);
+  arranque **único**
+  [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md);
+  ADR-0024.
+- Passo **12.1** concluído (ADR + índices + mapa + matriz GV0.4).
+- Passos **12.x** IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
+- Produção enforce **`1.9.0`** inalterada até **GV7** + GO humano.
+- Mapa código (+ salvaguardas §8):
+  [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md).
+
+| ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
+|----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
+| BG-078 | Governança IPv6 V0: ADR-0024, matriz limitações, banner GUI, índices, mapa M-xx | Alta | documentacao/governanca | F4+ | claim dual-stack falso; operador desinformado | P | Alto | **Em execucao (12.2)** — 12.1 done | GV0; sem código produto |
+| BG-079 | Paridade PF scoped `inet6` (REV-018): pdst/psrc/pallow/pexc/exc_allow | Alta | package/PF | F4 | bypass IPv6 em scoped_hybrid | M | Alto | Planeado (12.3) | GV1; `layer7.inc` |
+| BG-080 | Daemon captura + fluxos + nDPI IPv6 (`capture.c`, flow key) | Critica | daemon | F4 | FP-010 core; sem classificação v6 | G | Alto | Planeado (12.4–12.5) | GV2–GV3 |
+| BG-081 | Policy/enforce/allowlist IPv6 (`policy.c`, `enforce.c`, `allowlist`) | Critica | daemon | F4 | decisão runtime v6 ausente | G | Alto | Planeado (12.6–12.8) | GV3–GV4 |
+| BG-082 | GUI + validação JSON IPv6 (`layer7.inc`, páginas GUI) | Alta | package/GUI | F4 | truncamento/validação silenciosa | M | Alto | Planeado (12.9) | GV2 |
+| BG-083 | DNS forçado / block page / VIP isenção IPv6 (NAT `rdr inet6`) | Alta | package/PF/Unbound | F4 | bypass DNS em v6 | G | Medio | Planeado (12.10–12.11) | GV5; **gate humano** V5 |
+| BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | Planeado (12.12–12.13) | `validacao-lab` §21; semver `1.10.0` sugerido |
+
 ---
 
 ## Itens explicitamente fora da fila imediata

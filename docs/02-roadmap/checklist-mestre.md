@@ -328,3 +328,52 @@ ADR-0020 (Bloco A). SSOT da isenção: excepção `vip-isentos` (D1); labels em
 - [ ] a decisao e arquitecturalmente grande
 - [ ] ha necessidade de fallback sem resposta fechada
 - [ ] ha necessidade de mover estrutura antes da F6
+
+---
+
+## Trilha IPv6 (pós-fecho plano mestre — Ondas V0–V6)
+
+SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
+[`plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md), mapa
+[`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md)
+(§8 salvaguardas).
+**Arranque único:** [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
+
+**Regra:** não iniciar V2 (daemon) antes de V1 (PF scoped) sem ADR emenda.
+**Desambiguação:** passos 12.x desta trilha ≠ `test-matrix` §12 (blacklists).
+
+### V0 — Governança (passos 12.1–12.2, BG-078)
+
+- [x] ADR-0024 aceite e indexado
+- [x] Mapa M-01..M-25 (+ §8) publicado
+- [x] Matriz limitações alinhada (GV0.4) — passo 12.1
+- [ ] Banner GUI Diagnostics + `pf-enforcement.md` (GV0.3) — passo 12.2
+- [ ] GV0 completo (requer GV0.3)
+- [x] CORTEX checklist trilha IPv6 + arranque único
+
+### V1 — PF scoped inet6 (12.3, BG-079)
+
+- [ ] REV-018 fechado no mapa
+- [ ] GV1 PASS (`test_scoped_pf_inc.php` + `pfctl -nf` + salvaguardas NDP/localsubnets)
+
+### V2–V3 — Daemon (12.4–12.8, BG-080–081)
+
+- [ ] GV2 PASS builder
+- [ ] GV3 captura v6 appliance (+ NDP intacto)
+- [ ] GV4 enforce v6 scoped
+- [ ] Regressão IPv4 confirmada
+
+### V4 — GUI/config (12.9, BG-082)
+
+- [ ] Validação IPv6 sem truncamento silencioso
+
+### V5 — NAT/DNS v6 (12.10–12.11, BG-083)
+
+- [ ] Decisão humana V5 registada
+- [ ] GV5 PASS ou ADIADO com I7 documentado
+
+### V6 — Fecho (12.12–12.13, BG-084)
+
+- [ ] GV6 campanha dual-stack
+- [ ] GV7 auditoria I1–I8 + release
+- [ ] Trilha IPv6 **FECHADA** no CORTEX

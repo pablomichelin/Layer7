@@ -16,10 +16,10 @@
 | **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`) |
 | **Rollback imediato** | `1.8.11_69` |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
-| **Fase roadmap** | F4 aberta; F3 aberta; plano de fecho **ACTIVO** |
-| **Trilha activa** | **Caminho B** — Enforcement escopado (E0–E3 no codigo; E4–E8 planeados) |
+| **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
+| **Trilha activa** | **IPv6** — passo **12.2** (Onda V0); arranque único [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
 > **Versão actual:** `1.9.0` — fecho do plano mestre (equivalente a `1.8.11_69`).
 
@@ -38,10 +38,9 @@ Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](doc
 
 **Handoff chat longo:** [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md)
 
-**Plano fecho producao + consolidacao (colar no chat novo):**
+**Arranque único (fecho FECHADO + trilha IPv6 activa, passo 12.2):**
 [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
-→ plano completo:
-[`docs/02-roadmap/plano-fecho-producao-e-consolidacao.md`](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md)
+→ plano: [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
 
 ---
 
@@ -85,16 +84,15 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 ## Proximos passos operacionais
 
-**Trilha activa:** plano mestre de fecho — [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md).
+**Trilha activa:** IPv6 (passo **12.2**, Onda V0) —
+[`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
+(arranque único; plano fecho P0–J **FECHADO**).
 
-1. **Passo actual:** Onda B passo 3.1 — G5 two-client (requer 2 clientes LAN); ver `CORTEX.md`.
-2. **Gate B1 (Onda A):** install passivo `_65` no appliance lab (`192.168.100.254`):
-   - `enabled=false`, `mode=monitor`
-   - Roteiro: [`plano-gates-producao.md`](docs/09-blocking/plano-gates-producao.md) G2–G4
-3. **Gate two-client (Onda B):** só após G2–G4 PASS — [`validacao-lab.md` sec. 12](docs/04-package/validacao-lab.md)
+1. **Chat limpo:** colar só o caminho do START-HERE-fecho-producao.md.
+2. Executar passo **12.2** (banner GUI + `pf-enforcement.md`); ver `CORTEX.md` secção Trilha IPv6.
+3. Produção enforce permanece **`1.9.0`** até GV7.
 4. Diagnostico rapido: [`scripts/diagnose-layer7-appliance.sh`](scripts/diagnose-layer7-appliance.sh)
-5. Testes locais: `./tests/run-local.sh` (nao substituem appliance)
-6. Apos GO (Onda F): avancar E4–E8 conforme Caminho B
+5. Testes locais: `./tests/run-local.sh` (nao substituem appliance; obrigatorio em ondas com codigo)
 
 ---
 

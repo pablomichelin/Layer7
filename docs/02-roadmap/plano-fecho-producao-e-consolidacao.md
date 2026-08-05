@@ -529,3 +529,25 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-05e | **Onda I PASS:** RELEASE-CHECKLIST + ADR-0023 (BG-028 fase 0) |
 | 2026-08-05f | **Onda J PASS:** R1–R12 audit; plano mestre **FECHADO** |
 | 2026-08-05g | **Promoção semver `1.9.0`:** fecho plano; `latest` = `1.9.0`; rollback imediato `_69` |
+
+---
+
+## 13. Extensões pós-fecho (plano fechado — trilhas novas)
+
+O plano P0–J permanece **FECHADO**. Trabalho posterior entra em trilhas
+separadas com passos **12.x+**, sem alterar o veredicto Onda J.
+
+| Trilha | Documento | Estado | Passo actual |
+|--------|-----------|--------|--------------|
+| **IPv6 completo** | [`plano-ipv6-completo.md`](plano-ipv6-completo.md) | **ABERTO** | **12.1** (V0) |
+| Arranque chat | [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md) | **único** (fecho + IPv6) | — |
+| Mapa lógica | [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md) | — | — |
+| Gates | [`plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md) | GV0–GV7 PENDENTE | — |
+| ADR | [ADR-0024](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) | Aceito | — |
+| Backlog | BG-078 … BG-084 | Ver `backlog.md` | — |
+
+**Histórico extensões:**
+
+| Data | Evento |
+|------|--------|
+| 2026-08-04 | Abertura trilha IPv6; ADR-0024; passo 12.1 autorizado |

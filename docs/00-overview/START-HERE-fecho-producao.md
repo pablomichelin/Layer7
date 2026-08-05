@@ -1,189 +1,213 @@
-# START HERE — Fecho de produção e consolidação
+# START HERE — Arranque único (fecho + trilha activa)
 
-**Usar este ficheiro** para abrir um chat novo (ou Multitarefa) que execute o
-plano mestre. O plano completo está em:
+**Este é o único ficheiro de arranque de chat** para o plano mestre e para a
+trilha activa. Colar apenas o caminho deste ficheiro num chat limpo.
 
-[`../02-roadmap/plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md)
+```text
+docs/00-overview/START-HERE-fecho-producao.md
+```
+
+| Trilha | Estado | SSOT de execução |
+|--------|--------|------------------|
+| Fecho produção P0–J | **FECHADO** (`1.9.0`, `2026-08-05`) | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) (histórico) |
+| **IPv6 completo V0–V6** | **ABERTA** — passo **12.2** (V0) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
+
+**Não criar** outros ficheiros `START-HERE-*.md` para esta fila — este é o único.
 
 ---
 
-## Estado actual (checkpoint — verificar no CORTEX antes de executar)
+## Estado actual (verificar no CORTEX antes de executar)
 
-| Campo | Valor esperado (`2026-08-05`) |
-|-------|-------------------------------|
-| Passo actual | **Plano fechado** — manutenção backlog |
-| Ondas concluídas | A–J (**H/I/J** incluídas) |
-| Produção enforce | **`1.9.0`** |
-| F6 | **FECHADA** (H5 raiz diferido) |
-| F7 | Checklist + ADR-0023 fase 0 |
-| Produto pronto | **SIM** (excepções ADR-0022/0023) |
+| Campo | Valor |
+|-------|-------|
+| **Trilha activa** | **IPv6** — Ondas V0–V6 |
+| **Passo autorizado** | **12.2** (Onda V0 — banner GUI + `pf-enforcement.md`) |
+| **BG activo** | BG-078 (em execução; 12.1 concluído) |
+| Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
+| Candidato lab | `1.9.0` (+ PORTREVISION por onda) |
+| Plano fecho P0–J | **FECHADO** |
+| ADR IPv6 | ADR-0024 **publicado e aceite** (implementação por ondas) |
+| Próximo gate | **GV0.3** (banner GUI) → **GV0 completo** |
+| F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
 
-### Continuidade — o plano geral **não foi substituído**
+### Desambiguação obrigatória — «12.x»
 
-O fecho de produção (`plano-fecho-producao-e-consolidacao.md`) continua a ser a
-**fila única** Ondas P0 → J. O **BG-077** é um **bloco adicional** na trilha F3
-(Onda C), documentado no plano como passo **4.3**, no backlog e no ADR-0021.
+Os passos da trilha IPv6 chamam-se **12.1 … 12.13** (continuação do plano
+mestre após 11.1).
 
-| Depois de BG-077 | Continua no plano |
-|------------------|-------------------|
-| Bloco 1 (API check-in) | 4.2 relatório F3; 5.1 Onda D; G6–G7; Ondas E–J |
-| Blocos 2–4 (daemon, S14, docs) | Mesma ordem; **bloqueante comercial** antes do GO (Onda F) |
+**Não confundir** com `docs/tests/test-matrix.md` secção **§12** (testes
+**12.1 / 12.2** de blacklists F4.2 — já PASS na Onda D).
 
-**Handoff sem reexplicar:** ler nesta ordem — este ficheiro → `CORTEX.md` → passo
-actual na secção 7 do plano mestre. Para F3/DR-05: `f3-11-start-here.md` +
-evidências em `docs/tests/evidence/`. Para BG-077:
-`docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md` +
-`docs/03-adr/ADR-0021-check-in-online-e-revogacao-remota.md`.
+| Referência | Significado |
+|------------|-------------|
+| Passo **12.1** (este START-HERE / CORTEX) | Trilha IPv6, Onda V0 — **concluído** |
+| Passo **12.2** (autorizado) | Banner GUI Diagnostics + `pf-enforcement.md` |
+| test-matrix **12.1 / 12.2** | Blacklists UT1 (F4.2) — **outra coisa** |
+
+Mensagens de commit da trilha: `trilha-ipv6/12.x: …`
+
+### Continuidade
+
+1. Ler **este ficheiro** → `CORTEX.md` (secção *Trilha IPv6*) → passo actual em
+   [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) secção 4.
+2. Mapa código: [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md)
+3. Gates: [`plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md)
+4. Decisão: [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md)
+
+O fecho P0–J **não foi reaberto**. Produção `1.9.0` mantém-se até GV7.
 
 ---
 
 ## Antes de colar no chat
 
 1. `git status` limpo ou mudanças conscientes commitadas.
-2. Confirmar alinhamento: **`latest` (`1.9.0`) = produção enforce (`1.9.0`)**.
-3. Escolher modo conforme a **onda** (secção 3.5 do plano):
-   - **Multitarefa (preferido em P0, P1, H):** 1 coordenador + workers com ficheiros **disjuntos** e **sem dependência de estado** entre si.
-   - **Agente único (obrigatório em A–G appliance, F, I–J):** qualquer passo que mexe no appliance, ficheiros quentes ou GO.
-4. Nunca pedir “melhora o que puderes”: pedir **o passo actual do plano**.
-5. **Nunca paralelizar** duas ondas que mudam o mesmo appliance (ex.: B ∥ C).
+2. Confirmar passo no **CORTEX** (não assumir memória de chat anterior).
+3. **Não regressão IPv4:** cada bloco com código exige `tests/run-local.sh` PASS.
+4. Modo por onda (secção abaixo): V0 pode coordenador+workers; V1–V6 agente único.
+5. Pedir **só o passo 12.x autorizado** — nunca «implementa IPv6 tudo».
+6. **Antes de V1 (código PF):** salvaguardas IPv6 do mapa (NDP/ICMPv6,
+   `localsubnets`, exclusões `fe80::/10`, etc.) têm de estar no desenho.
 
 ---
 
-## Modo recomendado por onda
+## Modo por onda (trilha IPv6)
 
-| Onda | Modo | Chats |
-|------|------|-------|
-| P0, P1 | **Coordenador + workers** | 1 coordenador + até 2 workers |
-| A–E (lab) | **Agente único** + humano | 1 chat por onda |
-| F–G, I–J | **Agente único** | 1 chat por onda |
-| H (F6) | **Coordenador + Docs-A/B/C** | 1 coordenador + workers por lote |
+| Onda | Passos | Modo | Multitarefa |
+|------|--------|------|-------------|
+| V0 | 12.1–12.2 | Coordenador + workers docs | Sim (ficheiros disjuntos) |
+| V1 | 12.3 | Agente único | Não (`layer7.inc`) |
+| V2–V3 | 12.4–12.8 | Agente único | Não (`src/layer7d/*`) |
+| V4 | 12.9 | Agente único | Não |
+| V5 | 12.10–12.11 | Agente único + **gate humano** | Não |
+| V6 | 12.12–12.13 | Agente único + release | Não |
 
-Receitas detalhadas: plano secção **3.6**.
+Receitas detalhadas: [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) §3.
 
 ---
 
-## Prompt — COORDENADOR (P0, P1, H — modo preferido)
+## Prompt — chat limpo (trilha activa IPv6)
 
-Copia na **primeira mensagem** do chat coordenador. Ajusta só `<passo>` se necessário.
+Copia na **primeira mensagem** do chat novo. Ajusta só `<12.x>` se o CORTEX
+já tiver avançado.
 
 ```text
-Contexto: sou o COORDENADOR do PLANO MESTRE de fecho de produção Layer7.
+Contexto: executo a trilha activa do Layer7. Arranque único:
+docs/00-overview/START-HERE-fecho-producao.md
 
-Leitura obrigatória:
-1. CORTEX.md (checklist plano na secção Plano mestre)
-2. AGENTS.md
-3. docs/02-roadmap/plano-fecho-producao-e-consolidacao.md (secções 3 e 7)
-4. docs/00-overview/START-HERE-fecho-producao.md
+Leitura obrigatória (nesta ordem):
+1. docs/00-overview/START-HERE-fecho-producao.md
+2. CORTEX.md (secção Trilha IPv6)
+3. AGENTS.md
+4. docs/02-roadmap/plano-ipv6-completo.md
+5. docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md
+6. docs/09-blocking/plano-gates-ipv6.md
+7. docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md
 
-Regras do coordenador:
-- ÚNICO agente que edita: CORTEX.md, backlog.md, CHANGELOG.md, MANUAL-INSTALL.md, Makefile.
-- Autorizo workers APENAS com ficheiros disjuntos da secção 3.6 do plano.
-- Se worker precisar de ficheiro quente ou de resultado de outro worker ainda pendente: PARAR.
-- Não avançar passo sem eu pedir. Integrar entregas → um commit de fecho da onda.
-- Responder em português.
+Regras absolutas:
+- Executar SOMENTE o passo 12.x autorizado no CORTEX (agora: 12.2).
+- Não confundir passo 12.x da trilha IPv6 com test-matrix §12 (blacklists F4.2).
+- Não reabrir Ondas P0–J do fecho; produção enforce permanece 1.9.0 até GV7.
+- Não regressão IPv4: run-local.sh (+ smoke IPv4) quando houver código.
+- Actualizar mapa M-xx + CORTEX + changelog no mesmo bloco.
+- PORTREVISION + release GitHub só se o passo exigir .pkg no appliance.
+- Multitarefa só em V0 com ficheiros disjuntos; V1–V6 agente único.
+- V1+ exige salvaguardas NDP/ICMPv6/localsubnets/endereços especiais (mapa §8).
+- V5 (NAT/DNS v6) proibido sem decisão humana na ADR-0024.
+- Responder em português. Objectivo, impacto, risco, teste, rollback em cada entrega.
 
 Estado (confirmar no repo):
 - Branch: main
-- Passo actual: <1.1>
-- Onda: P1
-- Candidato lab: 1.8.11_68
-- Produção enforce: 1.8.11_24
-- Latest: 1.8.11_68
-
-Tarefa deste chat:
-Orquestrar o passo <id> do plano. Se multitarefa autorizada, define workers
-(ficheiros permitidos) e só integra quando todas as entregas estiverem completas.
-No fim: (1) resumo integrado, (2) commits, (3) checklist CORTEX actualizado,
-(4) próximo passo autorizado.
-```
-
----
-
-## Prompt — WORKER (só quando o coordenador autorizar)
-
-```text
-És WORKER do plano docs/02-roadmap/plano-fecho-producao-e-consolidacao.md.
-Onda: <X>. Trilha: <nome definido pelo coordenador>.
-Ficheiros que PODES editar: <lista explícita do coordenador>.
-Ficheiros PROIBIDOS: CORTEX.md, backlog.md, CHANGELOG.md, MANUAL-INSTALL.md,
-Makefile, layer7.inc, src/layer7d/* (salvo inclusão explícita na lista).
-Não cries passos novos. Não toques no appliance sem autorização explícita.
-Entrega: diff resumido + teste + texto para o coordenador gravar no CORTEX.
-Se precisares de ficheiro proibido ou de output de outro worker: PARA e reporta.
-Responde em português.
-```
-
----
-
-## Prompt — AGENTE ÚNICO (Ondas A–G, F, I–J)
-
-Copia na **primeira mensagem** do chat novo.
-
-```text
-Contexto: executo o PLANO MESTRE de fecho de produção e consolidação do Layer7.
-
-Leitura obrigatória (nesta ordem):
-1. CORTEX.md
-2. AGENTS.md
-3. docs/02-roadmap/plano-fecho-producao-e-consolidacao.md
-4. docs/09-blocking/plano-gates-producao.md (se onda A–B)
-5. docs/04-package/validacao-lab.md (se onda A–D)
-6. docs/02-roadmap/roadmap.md
-7. docs/02-roadmap/backlog.md
-
-Regras absolutas:
-- Seguir APENAS o passo autorizado do plano (nunca vontade do agente).
-- Não mover/renomear/apagar ficheiros até Onda H (F6).
-- Não activar scoped_hybrid/enforce em produção sem gates PASS + GO humano (já dado — `1.9.0`).
-- Produção enforce: **`1.9.0`** (fecho plano; GO Onda F em `_69`).
-- Candidato lab: `1.9.0`.
-- Versionar: commit a cada bloco; PORTREVISION+release GitHub só quando o passo exigir .pkg.
-- Actualizar docs no mesmo bloco (CORTEX, changelog, MANUAL-INSTALL se operacional).
-- Multitarefa PROIBIDA nesta onda (appliance / ficheiros quentes).
-- Objectivo, impacto, risco, teste e rollback em cada entrega.
-- Responder em português.
-
-Estado que assumo até verificares no repo:
-- Branch: main
-- Passo actual: plano fechado — manutenção backlog
-- Onda: concluída (A–J)
+- Passo actual: 12.2
+- Onda: V0
+- BG: BG-078
 - Candidato lab: 1.9.0
 - Produção enforce: 1.9.0
 - Rollback imediato: 1.8.11_69
-- Pendências humanas: CE físico (ADR-0022); BG-028 fase 1 (ADR-0023)
 
 Tarefa deste chat:
-Executa SOMENTE o passo <id> do plano.
-No fim: (1) o que fizeste, (2) evidência/teste, (3) commits/tags se houver,
-(4) próximo passo autorizado pelo plano, (5) actualiza checklist no CORTEX.
+Executa SOMENTE o passo <12.x> do plano-ipv6-completo.md.
+No fim: (1) o que fizeste, (2) evidência/teste/gate, (3) mapa M-xx se aplicável,
+(4) CORTEX actualizado, (5) próximo passo autorizado.
 Não avances automaticamente para o passo seguinte sem eu pedir.
 ```
 
 ---
 
-## Sequência sugerida dos primeiros chats
+## Prompt — COORDENADOR (só Onda V0, se multitarefa)
 
-| Chat | Passo | Modo | Pré-requisito humano |
-|------|-------|------|----------------------|
-| 1 | 0.1 + 0.2 (P0) | Coordenador + workers | — |
-| 2 | 1.0–1.3 (P1) | Coordenador + worker diagnose | Snapshot VM |
-| 3 | 2.1–2.4 (Onda A) | Agente único | SSH appliance; rollback `_24` pronto |
-| 4 | 3.1–3.2 (Onda B) | Agente único | **Dois clientes** LAN |
-| 5+ | 4.x–11.1 | Conforme secção 3.5 do plano | Ver plano |
+```text
+Contexto: COORDENADOR da trilha IPv6 (Onda V0). Arranque:
+docs/00-overview/START-HERE-fecho-producao.md
 
-Abrir **chat novo por onda** (ou quando o contexto ficar longo). Ver também
-[`handoff-chat-novo.md`](handoff-chat-novo.md).
+Leitura: START-HERE-fecho-producao.md, CORTEX, AGENTS, plano-ipv6-completo.md,
+ADR-0024, f4-ipv6-mapa-rastreabilidade.md.
+
+Regras:
+- Único agente que edita: CORTEX.md, backlog.md, CHANGELOG.md, índice ADR.
+- Workers só com ficheiros disjuntos (ex.: mapa ∥ GUI strings ∥ matriz-limitacoes).
+- Integrar num commit de fecho do passo; marcar GV0 no CORTEX quando V0 completa.
+- Não avançar para V1 sem eu pedir.
+- Responder em português.
+
+Tarefa: orquestrar passo <12.1|12.2>.
+```
+
+---
+
+## Prompt — WORKER (só se o coordenador autorizar)
+
+```text
+És WORKER da trilha IPv6 (arranque START-HERE-fecho-producao.md).
+Onda: V0. Passo: <12.x>.
+Ficheiros que PODES editar: <lista explícita do coordenador>.
+Ficheiros PROIBIDOS: CORTEX.md, backlog.md, CHANGELOG.md, MANUAL-INSTALL.md,
+Makefile, layer7.inc, src/layer7d/* (salvo inclusão explícita).
+Não cries passos novos. Não toques no appliance.
+Entrega: diff resumido + texto para o coordenador gravar no CORTEX.
+Responde em português.
+```
 
 ---
 
 ## O que este arranque NÃO autoriza
 
-- Reescrever a árvore `docs/` agora (isso é Onda H / F6).
-- “Consolidar tudo de uma vez” num único PR gigante.
-- Publicar GO de produção sem G2–G7 **e** Ondas C–E PASS.
-- Multitarefa sem lista de ficheiros disjuntos **e** sem coordenador.
-- Paralelizar B e C no mesmo appliance.
-- Tratar `latest` como produção enforce antes da Onda F (já resolvido — `1.9.0`).
+- Criar outro `START-HERE-*.md` para IPv6 ou fecho (usar **só este**).
+- Reabrir Ondas P0–J do plano de fecho.
+- Promover produção enforce sem GV7 + GO humano.
+- Implementar V2 (daemon) antes de V1 (PF scoped) sem emenda ADR-0024.
+- V5 (NAT/DNS v6) sem decisão humana explícita.
+- Paralelizar `layer7.inc` e `src/layer7d/*`.
+- Confundir passos 12.x IPv6 com test-matrix §12 (blacklists).
+- «Consolidar / implementar IPv6 tudo» num único PR.
+
+---
+
+## Sequência da trilha activa (resumo)
+
+| Passo | Onda | Objectivo |
+|-------|------|-----------|
+| **12.1** | V0 | ADR/índices/matriz/mapa vivo — **CONCLUÍDO** |
+| **12.2** | V0 | Banner GUI Diagnostics + `pf-enforcement.md` — **actual** |
+| 12.3 | V1 | Paridade PF `inet6` scoped (REV-018) |
+| 12.4–12.5 | V2 | Captura + nDPI IPv6 |
+| 12.6–12.8 | V3 | Policy / enforce / allowlist v6 |
+| 12.9 | V4 | GUI + validação IPv6 |
+| 12.10–12.11 | V5 | DNS/NAT/block page v6 **ou** exclusão ADR |
+| 12.12–12.13 | V6 | Gates lab + release (sugestão `1.10.0`) |
+
+Detalhe, versionamento e STOP: [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md).
+
+---
+
+## Histórico — fecho produção (referência)
+
+O plano P0–J fechou em `2026-08-05` com produção **`1.9.0`**. A trilha IPv6
+foi aberta em governança em `2026-08-04` (durante o fecho documental) e
+**activada como fila seguinte** após Onda J — não altera o veredicto do fecho.
+
+Prompts antigos de coordenador/workers das Ondas P0–H do fecho ficam no
+[`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md)
+§3.6 — **não usar** enquanto a trilha activa for IPv6.
 
 ---
 
@@ -191,11 +215,11 @@ Abrir **chat novo por onda** (ou quando o contexto ficar longo). Ver também
 
 | Documento | Papel |
 |-----------|--------|
-| [plano-fecho-producao-e-consolidacao.md](../02-roadmap/plano-fecho-producao-e-consolidacao.md) | Guia completo início/meio/fim |
-| [f3-plano-check-in-online-revogacao-remota.md](../01-architecture/f3-plano-check-in-online-revogacao-remota.md) | BG-077 — blocos 1–4 |
-| [ADR-0021](../03-adr/ADR-0021-check-in-online-e-revogacao-remota.md) | Contrato API check-in |
-| [CORTEX.md](../../CORTEX.md) | Estado real + checklist progresso |
-| [plano-gates-producao.md](../09-blocking/plano-gates-producao.md) | G0–G7 (candidato `1.9.0`) |
-| [validacao-lab.md](../04-package/validacao-lab.md) | Roteiros lab |
-| [checklist-mestre.md](../02-roadmap/checklist-mestre.md) | Gates por fase |
-| [document-equivalence-map.md](document-equivalence-map.md) | Duplicados docs (preparar F6) |
+| **Este ficheiro** | **Único arranque de chat** |
+| [plano-ipv6-completo.md](../02-roadmap/plano-ipv6-completo.md) | Fila passos 12.x / ondas V0–V6 |
+| [f4-ipv6-mapa-rastreabilidade.md](../01-architecture/f4-ipv6-mapa-rastreabilidade.md) | Matriz código × gap + salvaguardas |
+| [plano-gates-ipv6.md](../09-blocking/plano-gates-ipv6.md) | GV0–GV7 |
+| [ADR-0024](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) | Decisão faseada |
+| [CORTEX.md](../../CORTEX.md) | SSOT estado + passo 12.x |
+| [plano-fecho-producao-e-consolidacao.md](../02-roadmap/plano-fecho-producao-e-consolidacao.md) | Fecho P0–J (histórico, FECHADO) |
+| [handoff-chat-novo.md](handoff-chat-novo.md) | Quando o contexto do chat esgotar |

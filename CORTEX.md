@@ -1236,6 +1236,39 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 
 ---
 
+## Trilha IPv6 completo (pós-fecho — 2026-08-04, rev. b)
+
+Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera produção
+`1.9.0` até GV7 + GO humano.
+
+- **Plano:** [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
+- **Arranque chat (único):** [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
+- **Mapa lógica/código:** [`docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md`](docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md) (§8 salvaguardas)
+- **Gates:** [`docs/09-blocking/plano-gates-ipv6.md`](docs/09-blocking/plano-gates-ipv6.md)
+- **ADR:** [`docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md`](docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md)
+
+> Passos **12.x** da trilha IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
+> Não existe outro ficheiro START-HERE para esta fila.
+
+**Gap actual:** FP-010 / REV-018 — captura e scoped PF são IPv4-centric; anti-DoT/QUIC
+`inet6` já existem sem DPI v6.
+
+```text
+TRILHA IPv6 — progresso
+- Passo actual: 12.2 (Onda V0 — banner GUI Diagnostics + pf-enforcement.md)
+- Trilha: ABERTA
+- Passo 12.1: CONCLUÍDO (2026-08-04) — ADR-0024, índices, mapa, matriz GV0.4
+- Candidato lab: 1.9.0 (+ PORTREVISION por onda)
+- Produção enforce: 1.9.0 (inalterada até GV7)
+- GV0: parcial (GV0.1/0.2/0.4/0.5 PASS; GV0.3 banner = 12.2)
+- GV1–GV7: PENDENTE
+- I1–I8: 0/8 (I1 disclosure docs parcial; banner GUI em 12.2)
+- BG activos: BG-078..084
+- Próximo passo autorizado: 12.2
+```
+
+---
+
 ## Ordem de leitura obrigatoria
 
 ### Para qualquer novo chat ou agente
@@ -1251,12 +1284,21 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 9. [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md)
 10. [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md)
 
-### Para a trilha de fecho / consolidacao
+### Para a trilha de fecho / consolidacao / IPv6 (arranque único)
 
-1. `CORTEX.md` (inclui passo actual do plano mestre)
-2. [`docs/02-roadmap/plano-fecho-producao-e-consolidacao.md`](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md)
-3. [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
-4. SSOT da onda em causa (gates, validacao-lab, F3 start-here, etc.)
+1. `CORTEX.md` (inclui passo actual — secção Trilha IPv6 se activa)
+2. [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
+3. Se trilha IPv6: [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
+4. Se histórico fecho: [`docs/02-roadmap/plano-fecho-producao-e-consolidacao.md`](docs/02-roadmap/plano-fecho-producao-e-consolidacao.md)
+5. SSOT da onda em causa (gates, mapa, ADR)
+
+### Para a trilha IPv6 (detalhe técnico)
+
+1. `CORTEX.md` (secção Trilha IPv6)
+2. [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
+3. [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
+4. [`docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md`](docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md)
+5. [`docs/09-blocking/plano-gates-ipv6.md`](docs/09-blocking/plano-gates-ipv6.md)
 
 ### Para trabalho tecnico numa area especifica
 

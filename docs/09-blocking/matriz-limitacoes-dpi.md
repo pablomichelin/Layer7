@@ -1,9 +1,16 @@
 # Matriz — limitações DPI (nDPI / captura passiva)
 
 **Data:** 2026-07-29  
+**Rev. alinhamento IPv6:** 2026-08-04 (passo **12.1** / GV0.4)  
 **Engine:** nDPI 5.x (estático, `HAVE_NDPI=1`)  
 **Modo V1:** monitor passivo — sem MITM TLS universal  
-**Estado:** CANDIDATO INTERNO EM VALIDAÇÃO
+**Estado:** Produção enforce `1.9.0` (IPv4); trilha IPv6 **ABERTA** (sem claim dual-stack)
+
+> **IPv6 (honestidade):** captura e decisão DPI são **IPv4-only** até ondas V2–V3.
+> PF scoped é só `inet` (REV-018 → V1). Não afirmar dual-stack completo até GV7.
+> SSOT: [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) ·
+> [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) ·
+> arranque [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
 
 ---
 
@@ -13,10 +20,10 @@
 |-----------|-------|----------|
 | Método | libpcap promisc, snaplen 1536 | `capture.c:452-468` |
 | Datalinks | `DLT_EN10MB`, `DLT_RAW` | `capture.c:465` |
-| Protocolo L3 | **IPv4 only** | `capture.c:562-563` |
+| Protocolo L3 | **IPv4 only** (`ip_v != 4` descartado) | `capture.c:562-563` |
 | Interfaces | Nomes **reais** (`vmx0`, não `lan`) | `layer7.inc` normalização |
 | Fluxos máx. | 65536 slots | `capture.c:36` |
-| Pacotes/fluxo | 48 (`L7C_MAX_PKTS_PER_FLOW`) | `capture.c` |
+| Pacotes/flujo | 48 (`L7C_MAX_PKTS_PER_FLOW`) | `capture.c` |
 | Idle fluxo | 120 s | `capture.c` |
 | Estado nDPI final | `NDPI_STATE_CLASSIFIED` (`_31`) | `capture.c:624-628` |
 | Fallback orçamento | `ndpi_detection_giveup()` | `capture.c:628` |
@@ -33,7 +40,9 @@
 | Host HTTP | Sim (nDPI) | HTTPS sem SNI visível → só IP | Limitação |
 | QUIC | Detectável | Payload cifrado; anti-QUIC PF separado | Limitação + toggle |
 | DoH/DoT | Toggle anti-bypass | DoH hardcoded / DoT externo | FP-014 |
-| IPv6 | **Não** | Tráfego IPv6 ignorado na captura | FP-010 |
+| IPv6 captura / nDPI | **Não** (até V2–V3) | EtherType / `ip_v != 4` → tráfego v6 ignorado | FP-010 / AUD-007 |
+| IPv6 PF scoped | **Não** (até V1) | Regras `pdst`/`psrc`/… só `inet` | REV-018 |
+| IPv6 dual-stack produto | **Não** (até GV7) | Trilha V0–V6 aberta; produção `1.9.0` inalterada | ADR-0024 |
 | VLAN 802.1Q | Sim (parse Ethernet) | Interfaces `.10` dependem nome real | Teste PHP |
 | CDN multi-host | Parcial | DNS hint 1 hostname/IP, TTL 600 s | FP-013 |
 | App-only cold start | Parcial | Primeiros pacotes Unknown até classificar | Comportamento nDPI |
@@ -82,12 +91,16 @@
 | "Bloqueio por aplicação como UDM" | Funciona após classificação final; falha intermitente em `_24` | Claim parcial |
 | "SNI real sem MITM" | Verdadeiro com limite ECH | Limitação documentada ADR-0013 |
 | "Anti-bypass DNS completo" | NAT anchor + blacklists; não cobre DoH hardcoded | Limitação |
-| "Suporte dual-stack" | **Falso** — IPv4-only | Claim incorreto se não disclosed |
+| "Suporte dual-stack IPv6" / produto IPv6-completo | **Falso** em `1.9.0` — disclosure V0; implementação por ondas ADR-0024 | Claim incorreto se não disclosed (I1) |
 
 ---
 
 ## Referências
 
-- `docs/03-adr/ADR-0013-bloqueio-por-sni-via-ndpi.md`
+- [`ADR-0013`](../03-adr/ADR-0013-bloqueio-por-sni-via-ndpi.md) — SNI via nDPI
+- [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) — IPv6 faseado V0–V6
+- [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) · [`plano-gates-ipv6.md`](plano-gates-ipv6.md)
+- [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md) (M-01, M-23)
+- [`matriz-unificada-rev-fp-aud.md`](matriz-unificada-rev-fp-aud.md) — FP-010, REV-018, AUD-007
 - FP-010, FP-013, FP-014, FP-020
 - `src/layer7d/capture.c`, `capture_flow_key.h`
