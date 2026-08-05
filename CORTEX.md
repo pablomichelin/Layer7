@@ -1221,16 +1221,16 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: **5.1** (Onda D — F4 lab) | Onda C **PASS** | F3 **FECHADA**
-- Onda: C — **PASS**; D — **em curso** (10a/10b/11 PASS; build `_69` pendente)
+- Passo actual: **Onda E** (CE) / prep **Onda F** | Ondas A–D **PASS** | G6–G7 **PASS**
+- Onda: C — **PASS**; D — **PASS** (10a/10b/11 + G6/G7)
 - Candidato lab: 1.8.11_69
 - Produção enforce: 1.8.11_24 (até GO Onda F)
 - Canal latest: 1.8.11_69
-- G0-G1: PASS | G2-G4: PASS | G5: PASS | G6-G7: PENDENTE
+- G0-G1: PASS | G2-G4: PASS | G5: PASS | G6-G7: **PASS**
 - F3: **FECHADA** (`2026-08-04`) — `F3 pode fechar`; S13 `20260804T212000Z-ondaC-s13-drift-PASS`
 - Evidência F3: `docs/tests/evidence/20260804T211500Z-ondaC-f3-report/F3-PODE-FECHAR.md`
 - Evidência Onda D: `20260804T211600Z-ondaD-f4-10a-PASS`, `20260804T212200Z-ondaD-f4-10b-PASS`, `20260804T212300Z-ondaD-f4-11-PASS`
-- Próximo: build/release `1.8.11_69`; G6–G7
+- Próximo: **Onda E** (CE) ou fecho Onda D no plano; **GO enforce Onda F** (humano)
 - Modo: agente único
 ```
 

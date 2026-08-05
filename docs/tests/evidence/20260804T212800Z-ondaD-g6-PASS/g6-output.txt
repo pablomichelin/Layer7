@@ -1,0 +1,16 @@
+G6.1 — invalid license flush (restart sem layer7.lic)
+PRE: pfctl -t layer7_block -T show → 127.0.0.253
+POST restart: layer7d --license-status → valid=0 error=license file not found
+POST tables: layer7_block empty (no 127.0.0.253)
+RESTORE: valid=1
+
+G6.3 — stop service
+POST onestop: layer7_block, layer7_block_dst, layer7_tagged → EMPTY
+
+G6.2 — cross-ref Onda C
+S08 PASS grace active (2026-04-10 simulated clock)
+S12 PASS before/within/after grace phases
+
+10b post-_69:
+INFO: sent SIGHUP to daemon (pid ...)
+INFO: apply complete

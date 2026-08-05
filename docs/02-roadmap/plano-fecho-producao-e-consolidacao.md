@@ -19,7 +19,7 @@
 | **`PORTVERSION` / `PORTREVISION` no repo** | `1.8.11` / `69` |
 | **Appliance lab observado** | `192.168.100.254` — pfSense **Plus** `26.03.1` / FreeBSD `16` (validar CE na Onda E) |
 | **Builder** | `192.168.100.12` — FreeBSD `15.0-RELEASE` |
-| **Gates G2–G7** | **PENDENTES** no appliance (`plano-gates-producao.md`) |
+| **Gates G2–G7** | **PASS** no appliance (`plano-gates-producao.md`) |
 | **F3** | **Fechada** (`2026-08-04`) — `F3 pode fechar`; evidência Onda C |
 | **Passo actual do plano** | Ver checklist em `CORTEX.md` (secção *Plano mestre*) |
 

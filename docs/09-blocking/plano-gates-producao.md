@@ -98,18 +98,18 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G6.1 | Licença inválida → flush PF | DR-05 / F3 (Onda C) | **PENDENTE** appliance mutável |
-| G6.2 | Grace 14d offline | daemon | **PENDENTE** |
-| G6.3 | Stop serviço → tabelas vazias | rc.d | Parcial documentado |
+| G6.1 | Licença inválida → flush PF | restart sem `.lic` / DR-05 | **PASS** (`20260804T212800Z-ondaD-g6-PASS`) |
+| G6.2 | Grace 14d offline | daemon + Onda C S08/S12 | **PASS** (`20260804T233500Z-ondaC-dr05-veeam`) |
+| G6.3 | Stop serviço → tabelas vazias | rc.d | **PASS** (`20260804T212800Z-ondaD-g6-PASS`) |
 
 ### G7 — Release pública GO (humano)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| G7.1 | G0–G6 PASS documentados | relatório run_id | **NO-GO** |
-| G7.2 | CHANGELOG + MANUAL-INSTALL | docs | **PENDENTE** (GO na Onda F) |
+| G7.1 | G0–G6 PASS documentados | relatório run_id | **PASS** (`20260804T212900Z-ondaD-g7-PASS`) |
+| G7.2 | CHANGELOG + MANUAL-INSTALL | docs | **PASS** (`1.8.11_69`) |
 | G7.3 | Trust chain F1.2 pacote (BG-028) | manifesto assinado | **Não activo** (Onda I) |
-| G7.4 | Tag GitHub GO | release | **PENDENTE** — candidato `v1.8.11_65` |
+| G7.4 | Tag GitHub GO | release | **PASS** candidato lab — `v1.8.11_69` (`2026-08-04`) |
 
 ---
 
