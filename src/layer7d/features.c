@@ -155,3 +155,25 @@ layer7_features_has(const struct l7_features *f, unsigned flag)
 		return 0;
 	return (f->flags & flag) != 0 ? 1 : 0;
 }
+
+unsigned
+layer7_features_intersect(unsigned lic_flags, unsigned checkin_flags)
+{
+	unsigned out;
+
+	/* BASE sempre; add-ons = interseção. */
+	out = (lic_flags & checkin_flags) | L7_FEAT_BASE;
+	return out;
+}
+
+int
+layer7_features_allows_identity(unsigned flags)
+{
+	return (flags & L7_FEAT_IDENTITY) != 0 ? 1 : 0;
+}
+
+int
+layer7_features_allows_mitm(unsigned flags)
+{
+	return (flags & L7_FEAT_MITM) != 0 ? 1 : 0;
+}

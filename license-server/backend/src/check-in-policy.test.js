@@ -25,9 +25,26 @@ test('buildActiveCheckInResponse returns ADR-0021 active payload', () => {
     status: 'active',
     expiry: '2027-12-31',
     customer: 'Cliente Teste',
+    features: 'base',
     check_in_interval_hours: 168,
     max_offline_hours: 336,
   });
+});
+
+test('buildActiveCheckInResponse includes normalized SKU features', () => {
+  const response = buildActiveCheckInResponse(
+    {
+      expiry: '2027-12-31',
+      customer_name: 'Cliente Y',
+      features: 'full,identity',
+    },
+    {
+      checkInIntervalHours: 24,
+      maxOfflineHours: 48,
+    }
+  );
+
+  assert.equal(response.features, 'base,identity');
 });
 
 test('buildDeniedCheckInResponse returns revoked payload', () => {

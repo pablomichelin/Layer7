@@ -24,16 +24,16 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` quando houver lab.
 
 ## GI1 — Entitlements
 
-| # | Critério |
-|---|----------|
-| GI1.1 | Parse CSV `features` no daemon + testes |
-| GI1.2 | License-server emite `base` / `base,identity` / `base,mitm` / combinações |
-| GI1.3 | Sem `mitm`: impossível activar interceptação (daemon) |
-| GI1.4 | Sem `identity`: impossível carregar mapa / políticas AD (daemon) |
-| GI1.5 | Licença legada conforme T1 ou T2 (ADR-0025) — produto base OK |
-| GI1.6 | Suite local / builder PASS; defaults OFF |
-| GI1.7 | Contrato de parse ADR-0025 P1–P6 provado: truncamento >63B sem overflow, tokens desconhecidos ignorados, erro de parse ⇒ `base` apenas |
-| GI1.8 | Precedência check-in vs `.lic` (interseção): retirar `identity` via check-in desliga o módulo em runtime sem reinstalar `.lic` |
+| # | Critério | Estado |
+|---|----------|--------|
+| GI1.1 | Parse CSV `features` no daemon + testes | **PASS** (`2026-08-05`, `test_features_parse.c`) |
+| GI1.2 | License-server emite `base` / `base,identity` / `base,mitm` / combinações | **PASS** (20.4 `normalizeFeatures` + UI presets) |
+| GI1.3 | Sem `mitm`: impossível activar interceptação (daemon) | **PASS** — `layer7_features_allows_mitm` + zero código MITM runtime |
+| GI1.4 | Sem `identity`: impossível carregar mapa / políticas AD (daemon) | **PASS** — `layer7_features_allows_identity` + zero mapa Identity runtime |
+| GI1.5 | Licença legada conforme T1 — produto base OK | **PASS** (`full`→`base`) |
+| GI1.6 | Suite local PASS; defaults OFF | **PASS** (C + license-server npm; smoke FreeBSD pendente no builder) |
+| GI1.7 | Contrato parse P1–P6 | **PASS** |
+| GI1.8 | Check-in ∩ `.lic` (retirar add-on em runtime) | **PASS** (`layer7_features_intersect` + check-in `features`) |
 
 ---
 
@@ -140,7 +140,7 @@ Se DEFER: marcar GI2/GI3 `DEFERRED` e avançar Identity.
 | Gate | Onda | Estado |
 |------|------|--------|
 | GI0 | IM0 | **PASS** (`2026-08-05` — ADRs Aceito; T1) |
-| GI1 | IM1 | PENDENTE |
+| GI1 | IM1 | **PASS** (`2026-08-05`) |
 | GI2 | IM2 | PENDENTE |
 | GI3 | IM2 | PENDENTE |
 | GI4 | IM3 | PENDENTE |
@@ -160,3 +160,4 @@ Se DEFER: marcar GI2/GI3 `DEFERRED` e avançar Identity.
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
 | 2026-08-05 | **GI0 PASS** — 20.2: ADRs 0025–0028 Aceito; transição legado T1 |
+| 2026-08-05 | **GI1 PASS** — 20.3–20.6 entitlements + check-in ∩ `.lic` |

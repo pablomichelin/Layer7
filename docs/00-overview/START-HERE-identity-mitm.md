@@ -29,8 +29,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Plano | **ABERTO** — Identity + MITM Add-on |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM1 / 20.6** — compat licenças + check-in ∩ `.lic` + GI1 |
-| Código do produto nesta trilha | **iniciado** (20.3–20.5: parse, LS SKU, GUI upsell) |
+| Passo actual | **IM2 / 20.7** — spike MITM GO/NO-GO (critérios S1–S8 ADR-0026) |
+| Código do produto nesta trilha | **IM1 fechado** (GI1 PASS); MITM/Identity runtime ainda não |
 | Rev. do plano | **`2026-08-05c`** (contratos técnicos fechados; 20.2 PASS) |
 | Entitlement comercial | Modelo **X = base** / **Y = add-on**; legado **T1** (`full`→`base`) — ADR-0025 Aceito |
 | MITM | Opt-in; **spike 20.7 GO/NO-GO**; pode **DEFER** sem bloquear Identity (ADR-0026 Aceito) |
@@ -104,7 +104,7 @@ Arranque: docs/00-overview/START-HERE-identity-mitm.md
 Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 não reabrir fecho/IPv6; captive portal fora de escopo.
-Tarefa: continuar no passo actual (IM1 / 20.6 — compat + check-in + GI1).
+Tarefa: continuar no passo actual (IM2 / 20.7 — spike MITM).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -122,11 +122,10 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM1 / 20.6 (compat + check-in ∩ .lic + GI1)
-- IM0: 20.1–20.2 PASS
-- IM1: 20.3–20.5 PASS; 20.6 PENDENTE
-- IM2–IM9: PENDENTE
-- Código: features + LS SKU + GUI upsell; sem Identity/MITM runtime
+- Passo actual: IM2 / 20.7 (spike MITM S1–S8)
+- IM0: PASS; IM1: **20.3–20.6 PASS / GI1 PASS**
+- IM2: 20.7 PENDENTE; IM3–IM9 PENDENTE
+- Código: entitlements OK; sem MITM/Identity runtime
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
 ```

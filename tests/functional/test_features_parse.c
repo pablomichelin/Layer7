@@ -124,6 +124,28 @@ main(void)
 	    L7_FEAT_BASE | L7_FEAT_IDENTITY, "base,identity",
 	    "full+identity explicito");
 
+	/* Interseção check-in (P / GI1.8) */
+	{
+		unsigned lic = L7_FEAT_BASE | L7_FEAT_IDENTITY | L7_FEAT_MITM;
+		unsigned ci = L7_FEAT_BASE | L7_FEAT_IDENTITY;
+		unsigned eff = layer7_features_intersect(lic, ci);
+
+		check(eff == (L7_FEAT_BASE | L7_FEAT_IDENTITY),
+		    "intersect remove mitm");
+		check(layer7_features_allows_identity(eff) == 1,
+		    "allows identity apos intersect");
+		check(layer7_features_allows_mitm(eff) == 0,
+		    "bloqueia mitm apos intersect");
+		check(layer7_features_allows_mitm(L7_FEAT_BASE) == 0,
+		    "sem mitm entitlement");
+		check(layer7_features_allows_identity(L7_FEAT_BASE) == 0,
+		    "sem identity entitlement");
+		/* check-in nao pode acrescentar alem do .lic */
+		eff = layer7_features_intersect(L7_FEAT_BASE,
+		    L7_FEAT_BASE | L7_FEAT_IDENTITY | L7_FEAT_MITM);
+		check(eff == L7_FEAT_BASE, "intersect nao acrescenta");
+	}
+
 	if (g_fail) {
 		printf("RESULT: FAIL\n");
 		return 1;

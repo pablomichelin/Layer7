@@ -30,4 +30,13 @@ int layer7_features_parse(const char *raw, struct l7_features *out);
 /* 1 se o bit está activo. */
 int layer7_features_has(const struct l7_features *f, unsigned flag);
 
+/*
+ * Interseção ADR-0025: check-in só pode retirar add-ons (nunca acrescentar).
+ * Resultado inclui sempre L7_FEAT_BASE.
+ */
+unsigned layer7_features_intersect(unsigned lic_flags, unsigned checkin_flags);
+
+int layer7_features_allows_identity(unsigned flags);
+int layer7_features_allows_mitm(unsigned flags);
+
 #endif /* LAYER7_FEATURES_H */

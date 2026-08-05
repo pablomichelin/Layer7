@@ -40,11 +40,21 @@ function formatExpiryDate(expiry) {
   return String(expiry).slice(0, 10);
 }
 
+const { normalizeFeatures } = require('./crud-validation');
+
 function buildActiveCheckInResponse(license, policy = getCheckInPolicy()) {
+  let features = 'base';
+  try {
+    features = normalizeFeatures(license.features || 'base');
+  } catch (_err) {
+    features = 'base';
+  }
+
   return {
     status: 'active',
     expiry: formatExpiryDate(license.expiry),
     customer: license.customer_name || 'Unknown',
+    features,
     check_in_interval_hours: policy.checkInIntervalHours,
     max_offline_hours: policy.maxOfflineHours,
   };

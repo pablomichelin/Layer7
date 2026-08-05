@@ -24,6 +24,8 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
+static unsigned checkin_effective_features(unsigned lic_flags);
+
 /*
  * Ed25519 public key (32 bytes). Replace with real key before production.
  * All-zeros = development mode (license verification skipped).
@@ -390,8 +392,9 @@ layer7_license_check(struct l7_license_info *info)
 			    L7_FEATURES_MAX);
 		}
 		memcpy(info->features, feat.raw, sizeof(info->features));
-		info->features_flags = feat.flags;
 		info->features_truncated = feat.truncated;
+		/* Efectivos = .lic ∩ check-in (check-in só retira). */
+		info->features_flags = checkin_effective_features(feat.flags);
 	}
 	info->days_left = (int)diff_days;
 
@@ -674,6 +677,8 @@ struct l7_checkin_state {
 	int check_in_interval_hours;
 	int max_offline_hours;
 	char last_error[256];
+	char features[64]; /* último CSV do check-in; vazio = sem redução */
+	int features_set;  /* 1 se o servidor enviou o campo features */
 };
 
 static void
@@ -741,6 +746,21 @@ parse_time_json_field(const char *json, const char *key, time_t *out)
 	return 0;
 }
 
+static int checkin_load_state(struct l7_checkin_state *st);
+
+static unsigned
+checkin_effective_features(unsigned lic_flags)
+{
+	struct l7_checkin_state st;
+	struct l7_features feat;
+
+	if (!checkin_load_state(&st) || !st.features_set)
+		return lic_flags | L7_FEAT_BASE;
+
+	(void)layer7_features_parse(st.features, &feat);
+	return layer7_features_intersect(lic_flags, feat.flags);
+}
+
 static void
 checkin_state_defaults(struct l7_checkin_state *st)
 {
@@ -772,6 +792,10 @@ checkin_load_state(struct l7_checkin_state *st)
 	    &st->max_offline_hours);
 	(void)json_find_string(raw, "last_error", st->last_error,
 	    sizeof(st->last_error));
+	if (json_find_string(raw, "features", st->features,
+	    sizeof(st->features))) {
+		st->features_set = 1;
+	}
 
 	free(raw);
 	return st->license_key[0] != '\0' ? 1 : 0;
@@ -793,14 +817,19 @@ checkin_save_state(const struct l7_checkin_state *st)
 	    "  \"last_check_in_attempt\": %lld,\n"
 	    "  \"check_in_interval_hours\": %d,\n"
 	    "  \"max_offline_hours\": %d,\n"
-	    "  \"last_error\": \"%s\"\n"
+	    "  \"last_error\": \"%s\",\n"
+	    "  \"features\": \"%s\",\n"
+	    "  \"features_set\": %s\n"
 	    "}\n",
 	    st->license_key,
 	    (long long)st->last_check_in_ok,
 	    (long long)st->last_check_in_attempt,
 	    st->check_in_interval_hours,
 	    st->max_offline_hours,
-	    st->last_error);
+	    st->last_error,
+	    st->features,
+	    st->features_set ? "true" : "false");
+
 
 	fclose(f);
 	(void)chmod(L7_CHECKIN_STATE_PATH, 0600);
@@ -1021,6 +1050,7 @@ layer7_check_in(const char *url)
 		{
 			int interval = st.check_in_interval_hours;
 			int max_offline = st.max_offline_hours;
+			char feat_raw[256];
 
 			if (parse_int_json_field(response_body,
 			    "check_in_interval_hours", &interval) == 0)
@@ -1028,6 +1058,17 @@ layer7_check_in(const char *url)
 			if (parse_int_json_field(response_body,
 			    "max_offline_hours", &max_offline) == 0)
 				st.max_offline_hours = max_offline;
+
+			memset(feat_raw, 0, sizeof(feat_raw));
+			if (json_find_string(response_body, "features",
+			    feat_raw, sizeof(feat_raw))) {
+				struct l7_features feat;
+
+				(void)layer7_features_parse(feat_raw, &feat);
+				memcpy(st.features, feat.normalized,
+				    sizeof(st.features));
+				st.features_set = 1;
+			}
 		}
 
 		st.last_check_in_ok = time(NULL);
