@@ -34,11 +34,13 @@ Em **`scoped_hybrid`**, as regras PF scoped (`pdst` / `psrc` / `pallow` /
 (REV-018). Hosts/CIDRs IPv4 na regra ficam só em `inet`; IPv6 válidos só em
 `inet6`.
 
-**Salvaguardas V1 (mapa §8):** regras `to !<localsubnets>` dependem da tabela
-`localsubnets` do pfSense incluir prefixos IPv6 locais (S-02). Não se emite
-`block` genérico a ICMPv6/NDP (S-01). `::1` / `fe80::/10` / `ff00::/8` são
-rejeitados pelos validadores de endereço de política (S-03); popular tabelas
-com estes endereços continua proibido no daemon (V3).
+**Salvaguardas V1 (mapa §8):** desde **`1.9.4`** as regras usam
+`to !<layer7_localnets>` — tabela **gerida pelo pacote** com prefixos das
+interfaces (v4/v6) + `fe80::/10` (S-02 / GV1.6). Não depende do alias nativo
+`localsubnets` (ausente no pfSense Plus). Não se emite `block` genérico a
+ICMPv6/NDP (S-01). `::1` / `fe80::/10` / `ff00::/8` são rejeitados pelos
+validadores de endereço de política (S-03); popular tabelas com estes
+endereços continua proibido no daemon (V3).
 
 | Camada | IPv4 | IPv6 hoje |
 |--------|------|-----------|

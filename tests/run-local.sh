@@ -157,6 +157,11 @@ else
 	else
 		fail "test_scoped_pf_inc"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_localnets_inc.php; then
+		pass "test_localnets_inc"
+	else
+		fail "test_localnets_inc"
+	fi
 	if "$PHP_BIN_E2" tests/functional/test_ipv6_gui_inc.php; then
 		pass "test_ipv6_gui_inc"
 	else

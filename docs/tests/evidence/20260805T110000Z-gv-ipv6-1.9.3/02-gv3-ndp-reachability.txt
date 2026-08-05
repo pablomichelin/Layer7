@@ -1,0 +1,38 @@
+=== A IPv6 addrs ===
+    inet6 2804:6c4:11d:cc00::100b/128 scope global dynamic noprefixroute 
+    inet6 2804:6c4:11d:cc00:250:56ff:fe9d:252c/64 scope global dynamic mngtmpaddr noprefixroute 
+    inet6 fe80::250:56ff:fe9d:252c/64 scope link 
+=== A ping6 LL gateway ===
+gw=fe80::250:56ff:fe88:a4f7
+PING fe80::250:56ff:fe88:a4f7(fe80::250:56ff:fe88:a4f7) 56 data bytes
+
+--- fe80::250:56ff:fe88:a4f7 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1031ms
+
+---
+PING 2001:4860:4860::8888(2001:4860:4860::8888) 56 data bytes
+
+--- 2001:4860:4860::8888 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1004ms
+
+---
+google6=000
+google6=ERR
+google4=200
+=== B IPv6 ===
+gw=fe80::250:56ff:fe88:a4f7
+PING fe80::250:56ff:fe88:a4f7(fe80::250:56ff:fe88:a4f7) 56 data bytes
+
+--- fe80::250:56ff:fe88:a4f7 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1012ms
+
+google6=000
+google6=ERR
+google4=200
+=== Appliance NDP after ===
+fe80::250:56ff:fe9d:252c%vmx0        00:50:56:9d:25:2c   vmx0 20s       R 
+2804:6c4:11d:cc00::100a              00:50:56:88:ad:64   vmx0 23h59m19s S 
+2804:6c4:11d:cc00::100b              00:50:56:9d:25:2c   vmx0 23h59m14s S 
+fe80::250:56ff:fe88:ad64%vmx0        00:50:56:88:ad:64   vmx0 23h44m41s S 
+---
+      47

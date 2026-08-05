@@ -1,0 +1,15 @@
+OLD_MODEL=legacy_global OLD_MODE=enforce
+===SCOPED_SNIPPET_INET6===
+table <layer7_pdst_0> persist
+table <layer7_pdst_1> persist
+table <layer7_pdst_3> persist
+block drop quick inet to <layer7_pdst_0> ! tagged L7ALLOW label "layer7:pdst:profile-anti-bypass-dns"
+block drop quick inet6 to <layer7_pdst_0> ! tagged L7ALLOW label "layer7:pdst:profile-anti-bypass-dns"
+block drop quick inet to <layer7_pdst_1> ! tagged L7ALLOW label "layer7:pdst:profile-preset-protecao-infantil"
+block drop quick inet6 to <layer7_pdst_1> ! tagged L7ALLOW label "layer7:pdst:profile-preset-protecao-infantil"
+block drop quick inet to <layer7_pdst_3> ! tagged L7ALLOW label "layer7:pdst:anti-bypass-dns"
+block drop quick inet6 to <layer7_pdst_3> ! tagged L7ALLOW label "layer7:pdst:anti-bypass-dns"
+===DEFAULT_INET6===
+block drop quick inet from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src"
+block drop quick inet6 from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src6"
+SNIPPET_BYTES=1725

@@ -1,0 +1,6 @@
+model=legacy_global mode=enforce enabled=1 policies=4
+layer7d is running as pid 52952.
+cap_classified_v4=227748
+cap_classified_v6=762
+cap_pkts_v4=29298903
+cap_pkts_v6=3378

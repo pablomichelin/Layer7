@@ -144,7 +144,7 @@ GV1.5–GV1.7, GV3.5, GV4.5.
 | ID | Regra | Onda mínima | Nota |
 |----|-------|-------------|------|
 | S-01 | Não quebrar **NDP** (Neighbor Solicitation/Advertisement) nem ICMPv6 essencial à LAN | V1 | Evitar `block` genérico a `inet6 proto ipv6-icmp` sem excepções |
-| S-02 | Regras `to !<localsubnets>` (e equivalentes) devem considerar prefixos **IPv6** locais do pfSense | V1 | Validar no appliance dual-stack |
+| S-02 | Regras `to !<layer7_localnets>` (substitui `localsubnets` CE ausente no Plus) com prefixos **IPv4+IPv6** + `fe80::/10` | V1 / FIX `1.9.4` | **PASS código** GV1.6; tabela gerida pelo pacote |
 | S-03 | **Nunca** adicionar a tabelas de block: `::1`, `fe80::/10` (link-local), `ff00::/8` (multicast) | V1/V3 | Validação em `enforce.c` / helpers |
 | S-04 | Distinguir ULA (`fc00::/7`) vs GUA em docs/lab; não assumir só GUA | V0 docs / V3 | |
 | S-05 | Privacy Extensions: allowlist por IP único é frágil — preferir CIDR; MAC→IPv6 **fora** de I1–I8 | V3/V4 | Já diferido no plano |

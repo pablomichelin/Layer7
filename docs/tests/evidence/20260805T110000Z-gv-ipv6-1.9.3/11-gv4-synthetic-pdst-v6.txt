@@ -1,0 +1,22 @@
+GV4_SYN_APPLIED
+block drop quick inet6 from 2804:6c4:11d:cc00::100b to <layer7_pdst_1> label "layer7:pdst:gv4-syn-v6" ! tagged L7ALLOW
+1 table created.
+1/1 addresses added.
+1/1 addresses added.
+1/1 addresses added.
+1/1 addresses added.
+1/1 addresses added.
+===PDST0_SHOW===
+   ::1
+   2001:db8::1
+   2804:6c4:11d:cc00::abcd
+   fe80::1
+   ff02::1
+===AUDIT_SPECIALS_IN_ANY_LAYER7===
+layer7_pdst_0:    ::1
+   2001:db8::1
+   fe80::1
+   ff02::1
+(end audit)
+RESTORED
+confirm model=legacy_global mode=enforce policies=4

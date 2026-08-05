@@ -1,0 +1,8 @@
+MONITOR_APPLIED
+===LAYER7_RULES_IN_MONITOR===
+(none)
+===BLOCK_TABLES===
+layer7_block count=0
+layer7_block_dst count=0
+RESTORED mode=enforce model=legacy_global
+confirm mode=enforce model=legacy_global

@@ -104,15 +104,15 @@ $quarantine = array(
 );
 $quarantine_rules = layer7_policy_enforcement_rules_text($quarantine);
 if (strpos($quarantine_rules, "table <layer7_psrc_0> persist") === false ||
-    strpos($quarantine_rules, "from <layer7_psrc_0> to !<localsubnets>") === false) {
+    strpos($quarantine_rules, "from <layer7_psrc_0> to !<layer7_localnets>") === false) {
 	fwrite(STDERR, "FAIL: quarantine_origin must emit executable psrc rule\n");
 	fwrite(STDERR, $quarantine_rules);
 	exit(1);
 }
 if (strpos($quarantine_rules,
-	"block drop quick inet from <layer7_psrc_0> to !<localsubnets>") === false ||
+	"block drop quick inet from <layer7_psrc_0> to !<layer7_localnets>") === false ||
     strpos($quarantine_rules,
-	"block drop quick inet6 from <layer7_psrc_0> to !<localsubnets>") === false) {
+	"block drop quick inet6 from <layer7_psrc_0> to !<layer7_localnets>") === false) {
 	fwrite(STDERR, "FAIL: psrc quarantine must emit inet and inet6 (REV-018)\n");
 	fwrite(STDERR, $quarantine_rules);
 	exit(1);
@@ -196,7 +196,7 @@ if (strpos($allow_tables, "table <layer7_pallow_0> persist") === false ||
     strpos($allow_rules,
         "from 10.0.0.10 to <layer7_pallow_0>") === false ||
     strpos($exception_rules,
-        "from <layer7_exc_allow_0> to !<localsubnets>") === false ||
+        "from <layer7_exc_allow_0> to !<layer7_localnets>") === false ||
     strpos($allow_rules, "tag L7ALLOW") === false ||
     strpos($exception_rules, "tag L7ALLOW") === false ||
     strpos($allow_rules . $exception_rules, "pass quick") !== false ||
@@ -208,9 +208,9 @@ if (strpos($allow_tables, "table <layer7_pallow_0> persist") === false ||
 	exit(1);
 }
 if (strpos($exception_rules,
-	"match inet from <layer7_exc_allow_0> to !<localsubnets>") === false ||
+	"match inet from <layer7_exc_allow_0> to !<layer7_localnets>") === false ||
     strpos($exception_rules,
-	"match inet6 from <layer7_exc_allow_0> to !<localsubnets>") === false) {
+	"match inet6 from <layer7_exc_allow_0> to !<layer7_localnets>") === false) {
 	fwrite(STDERR, "FAIL: exc_allow must emit inet and inet6 (REV-018)\n");
 	fwrite(STDERR, $exception_rules);
 	exit(1);
@@ -221,7 +221,7 @@ $legacy_allow["layer7"]["enforcement_model"] = "legacy_global";
 $legacy_exc_rules = layer7_exception_allow_rules_text(
     $legacy_allow, $bl_cfg);
 if (strpos($legacy_exc_rules,
-    "from <layer7_exc_allow_0> to !<localsubnets>") === false ||
+    "from <layer7_exc_allow_0> to !<layer7_localnets>") === false ||
     strpos($legacy_exc_rules, "tag L7ALLOW") === false ||
     strpos($legacy_exc_rules, "pass quick") !== false) {
 	fwrite(STDERR, "FAIL: legacy exception allow is not Layer7-scoped\n");

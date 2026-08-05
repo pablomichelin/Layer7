@@ -1,0 +1,42 @@
+SCOPED_APPLIED
+===PFCTL_NF===
+pfctl_nf_rc=0
+===INET6_PDST_RULES===
+block drop quick inet from <layer7_block> to ! <localsubnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <localsubnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_0> label "layer7:pdst:profile-anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_0> label "layer7:pdst:profile-anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_1> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_1> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_3> label "layer7:pdst:anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_3> label "layer7:pdst:anti-bypass-dns" ! tagged L7ALLOW
+===TABLES_PDST===
+layer7_pdst_0
+layer7_pdst_1
+layer7_pdst_10
+layer7_pdst_11
+layer7_pdst_12
+layer7_pdst_13
+layer7_pdst_14
+layer7_pdst_15
+layer7_pdst_16
+layer7_pdst_17
+layer7_pdst_18
+layer7_pdst_19
+layer7_pdst_2
+layer7_pdst_20
+layer7_pdst_21
+layer7_pdst_22
+layer7_pdst_23
+layer7_pdst_3
+layer7_pdst_4
+layer7_pdst_5
+layer7_pdst_6
+layer7_pdst_7
+layer7_pdst_8
+layer7_pdst_9
+===LOCALSUBNETS_AFTER===
+pfctl: Table does not exist.
+===LAN_NETWORK===
+   192.168.100.0/24
+   2804:6c4:11d:cc00::/64

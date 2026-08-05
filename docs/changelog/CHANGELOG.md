@@ -6,6 +6,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+## [1.9.4] — 2026-08-05
+
+### Fixed
+
+- **GV1.6 / S-02:** deixar de depender do alias nativo `<localsubnets>`
+  (ausente no pfSense Plus). O pacote emite e popula `<layer7_localnets>`
+  com redes das interfaces (IPv4+IPv6) + `fe80::/10`, e todas as regras de
+  quarentena / anti-DoT / anti-QUIC / `exc_allow` / `psrc` usam
+  `to !<layer7_localnets>`.
+- Corrigido uso de `$scope_global` indefinido no emissor `psrc` (passa a
+  `!empty($m["scope_global"])`).
+
+### Notes
+
+- Candidato lab; producao enforce permanece `1.9.0` ate GO.
+- SHA256: `43f754613da16ab377f2b4258b3d5a924ef20d9171cab9ed78ca1995d6cee816`.
+- Rollback lab: `1.9.3`.
+- Confirmar no appliance: `pfctl -t layer7_localnets -T show` apos install.
+
 ## [1.9.3] — 2026-08-05
 
 ### Fixed

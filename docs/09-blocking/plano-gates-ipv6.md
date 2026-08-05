@@ -1,10 +1,11 @@
 # Plano — gates IPv6 (trilha V0–V6)
 
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-05f  
+**Rev.:** 2026-08-05g  
 **Versão alvo inicial / série:** `1.9.0` → `1.9.1` → `1.9.2` → … (`PORTREVISION=0`)  
 **Versão alvo fecho:** patch `1.9.n` da mesma série (passo 12.13; sem salto a `1.10.0`)  
 **Produção enforce actual:** `1.9.0` (inalterada até GV7 + GO humano)  
+**Última campanha appliance:** `20260805T110000Z-gv-ipv6-1.9.3` (`1.9.3`)  
 **SSOT trilha:** [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md)  
 **Arranque:** [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md)
 
@@ -42,10 +43,10 @@
 |---|----------|--------|--------|
 | GV1.1 | `layer7_policy_enforcement_rules_text` emite `inet6` para pdst/psrc | Diff + `test_scoped_pf_inc.php` | **PASS** (builder `2026-08-04`) |
 | GV1.2 | `pallow` / `pexc` / `exc_allow` com `inet6` | Teste PHP | **PASS** (builder) |
-| GV1.3 | `pfctl -nf` PASS com enforce scoped ON | Appliance rules.debug | **PENDENTE** (candidato `1.9.0`) |
+| GV1.3 | `pfctl -nf` PASS com enforce scoped ON | Appliance rules.debug | **PASS** (`1.9.3`, `20260805T110000Z-gv-ipv6-1.9.3`; inet6 pdst emitido) |
 | GV1.4 | REV-018 marcado fechado no mapa | Commit docs | **PASS** (12.3) |
-| GV1.5 | Desenho NDP/ICMPv6: LAN v6 não parte (sem block indevido a NDP) | Review + smoke | **PASS desenho** (sem block icmp6 genérico); smoke appliance PENDENTE |
-| GV1.6 | `localsubnets` (ou equivalente) cobre prefixos locais IPv6 | Review ruleset | **PENDENTE** appliance dual-stack |
+| GV1.5 | Desenho NDP/ICMPv6: LAN v6 não parte (sem block indevido a NDP) | Review + smoke | **PASS** (desenho + NDP vizinhos A/B no appliance `1.9.3`) |
+| GV1.6 | `localsubnets` (ou equivalente) cobre prefixos locais IPv6 | Review ruleset | **PASS código `1.9.4`** — tabela própria `<layer7_localnets>` (v4/v6 + `fe80::/10`); confirmação appliance após install |
 | GV1.7 | Política de exclusão: não adicionar `fe80::/10`, `ff00::/8`, `::1` a tabelas block | Código/teste | **PASS** validadores `layer7_ipv6_valid` / `cidr6` (S-03); populate daemon = V3 |
 
 ### GV2 — Builder e testes locais (Ondas V2–V4)
@@ -63,25 +64,25 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV3.1 | Instalar candidato com `mode=monitor` | `pkg add` | **PASS** (`1.9.1` em `192.168.100.254`; `layer7d -V` 1.9.1; `legacy_global`) |
-| GV3.2 | Tráfego IPv6 na LAN gera `captures` / fluxos v6 nas stats | JSON stats / syslog | **PASS** (`cap_pkts_v6`/`cap_active_v6`/`cap_classified_v6` > 0; cliente `192.168.100.244` IPv6 `2804:6c4:11d:cc00::…`) |
-| GV3.3 | Tráfego IPv4 continua classificado (não regressão) | Comparar baseline | **PENDENTE** |
-| GV3.4 | Zero block PF Layer7 em monitor | `pfctl -sr` | **PENDENTE** |
-| GV3.5 | NDP/RA na LAN continua funcional após candidato | ping6 / neighbor | **PENDENTE** |
+| GV3.1 | Instalar candidato com `mode=monitor` | `pkg add` | **PASS** (`1.9.3` em `192.168.100.254`; revalidado na campanha GV) |
+| GV3.2 | Tráfego IPv6 na LAN gera `captures` / fluxos v6 nas stats | JSON stats / syslog | **PASS** (`1.9.3`: `cap_pkts_v6`/`cap_classified_v6` > 0; A=`::100b` B=`::100a`) |
+| GV3.3 | Tráfego IPv4 continua classificado (não regressão) | Comparar baseline | **PASS** (`cap_classified_v4`↑; google4/yt4=200 pós-gates) |
+| GV3.4 | Zero block PF Layer7 em monitor | `pfctl -sr` | **PASS** (0 regras Layer7; tabelas block 0; restore enforce) |
+| GV3.5 | NDP/RA na LAN continua funcional após candidato | ping6 / neighbor | **PASS** (SLAAC/DHCPv6 + NDP entries); egress v6 clientes **bloqueado por lab** (sem `pass inet6` LAN — não Layer7) |
 
-**GV3 onda:** **PARCIAL** — captura v6 evidenciada no appliance `1.9.1`; GV3.3–GV3.5 PENDENTE. Banner IPv6 (GV0.3) visível; `pfctl -nf /tmp/rules.debug` rc=0.
+**GV3 onda:** **PASS com ressalva lab** (`1.9.3`, `20260805T110000Z-gv-ipv6-1.9.3`). Egress IPv6 clientes ausente por regra pfSense (`pass inet` only) — WAN do FW OK.
 
 ### GV4 — Enforcement IPv6 (Onda V3–V4)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV4.1 | Política block app em cliente só-v6 ou dual-stack v6 | curl/trace v6 | **PENDENTE** |
-| GV4.2 | `pfctl -t layer7_pdst_N -T show` contém endereço IPv6 | Appliance | **PENDENTE** |
-| GV4.3 | Segundo cliente não afectado (paridade G5 em v6) | Two-client v6 | **PENDENTE** |
-| GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PENDENTE** |
-| GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PARCIAL** (S-03 `layer7_pf_host_enforce_ok` + `test_enforce_scoped.c` PASS builder; appliance PENDENTE) |
+| GV4.1 | Política block app em cliente só-v6 ou dual-stack v6 | curl/trace v6 | **BLOQUEADO lab** — sem `pass inet6` na LAN; clientes sem internet v6 |
+| GV4.2 | `pfctl -t layer7_pdst_N -T show` contém endereço IPv6 | Appliance | **PASS sintaxe** (regra `inet6 from src_v6 to pdst`; `pfctl -T add` v6 OK) |
+| GV4.3 | Segundo cliente não afectado (paridade G5 em v6) | Two-client v6 | **BLOQUEADO lab** (depende GV4.1) |
+| GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PASS** restore config (JSON+resync) após cada bloco; rollback `.pkg` N/A nesta campanha |
+| GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PARCIAL** (S-03 unit PASS; `pfctl` manual aceita especiais — esperado; daemon path não exercitado sem egress) |
 
-**GV4 onda:** **PARCIAL** — código daemon v6 (12.6–12.8) PASS builder; GV4.1–GV4.4 appliance PENDENTE.
+**GV4 onda:** **PARCIAL** — sintaxe/tabelas OK em `1.9.3`; enforce real GV4.1/4.3 exige allow IPv6 LAN (GO humano). GV1.6 fechado em código `1.9.4`.
 
 ### GV5 — DNS / NAT / block page IPv6 (Onda V5 — opcional)
 

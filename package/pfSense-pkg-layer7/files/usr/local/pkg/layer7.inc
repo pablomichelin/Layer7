@@ -995,7 +995,8 @@ function layer7_exception_allow_rules_text($data, $bl_config = null)
 			/* Tabela pode receber v4 e v6 (V3+); paridade agora. */
 			$rules .= layer7_pf_inet46_rules(
 			    "match",
-			    "from <layer7_exc_allow_{$idx}> to !<localsubnets> " .
+			    "from <layer7_exc_allow_{$idx}> " .
+				layer7_pf_not_localnets_clause() . " " .
 				"tag L7ALLOW {$label}",
 			    $iface);
 		}
@@ -1085,13 +1086,16 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 		if (!empty($m["needs_psrc"])) {
 			$tbl = "layer7_psrc_" . $idx;
 			$tables .= "table <{$tbl}> persist\n";
-			if ($has_src || $scope_global || $quarantine_origin) {
-				/* !<localsubnets> cobre prefixos locais v4/v6 do
-				 * pfSense (S-02). Nao bloqueia ICMPv6 NDP (S-01):
+			if ($has_src || !empty($m["scope_global"]) ||
+			    $quarantine_origin) {
+				/* !<layer7_localnets> cobre prefixos locais v4/v6
+				 * (S-02 / GV1.6). Nao bloqueia ICMPv6 NDP (S-01):
 				 * so trafego from tabela de quarentena. */
 				$rules .= layer7_pf_inet46_rules(
 				    "block drop quick",
-				    "from <{$tbl}> to !<localsubnets> ! tagged L7ALLOW " .
+				    "from <{$tbl}> " .
+					layer7_pf_not_localnets_clause() .
+					" ! tagged L7ALLOW " .
 					"label \"layer7:psrc:{$pid}\"");
 			}
 		}
@@ -1107,12 +1111,180 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 }
 
 /**
+ * Nome da tabela PF de redes locais gerida pelo Layer7 (S-02 / GV1.6).
+ * Nao depende do alias nativo `localsubnets` do pfSense CE — ausente no Plus.
+ */
+function layer7_pf_localnets_table_name()
+{
+	return "layer7_localnets";
+}
+
+/**
+ * Clausula PF "destino nao local" usada em quarentena/anti-DoT/anti-QUIC.
+ * @return string ex. "to !<layer7_localnets>"
+ */
+function layer7_pf_not_localnets_clause()
+{
+	return "to !<" . layer7_pf_localnets_table_name() . ">";
+}
+
+/**
+ * Rede IPv4 a partir de host+prefixo (sem depender de gen_subnet do pfSense).
+ * @return string|null CIDR ou null
+ */
+function layer7_ipv4_network_cidr($ip, $prefix)
+{
+	$prefix = (int)$prefix;
+	if ($prefix < 0 || $prefix > 32 || !layer7_ipv4_valid($ip)) {
+		return null;
+	}
+	$long = ip2long($ip);
+	if ($long === false) {
+		return null;
+	}
+	$mask = ($prefix === 0) ? 0 : (0xFFFFFFFF << (32 - $prefix)) & 0xFFFFFFFF;
+	$net = $long & $mask;
+	/* ip2long pode devolver signed; long2ip espera o valor correcto. */
+	if (PHP_INT_SIZE > 4 && $net > 0x7FFFFFFF) {
+		$net = $net - 0x100000000;
+	}
+	return long2ip($net) . "/" . $prefix;
+}
+
+/**
+ * Rede IPv6 a partir de host+prefixo (sem depender de gen_subnetv6).
+ * @return string|null CIDR ou null
+ */
+function layer7_ipv6_network_cidr($ip, $prefix)
+{
+	$prefix = (int)$prefix;
+	if ($prefix < 0 || $prefix > 128 || !layer7_ipv6_valid($ip)) {
+		return null;
+	}
+	$bin = @inet_pton($ip);
+	if ($bin === false || strlen($bin) !== 16) {
+		return null;
+	}
+	$bytes = intdiv($prefix, 8);
+	$bits = $prefix % 8;
+	$out = str_repeat("\0", 16);
+	if ($bytes > 0) {
+		$out = substr($bin, 0, $bytes) . str_repeat("\0", 16 - $bytes);
+	}
+	if ($bits > 0 && $bytes < 16) {
+		$mask = 0xFF << (8 - $bits) & 0xFF;
+		$out[$bytes] = chr(ord($bin[$bytes]) & $mask);
+	}
+	$canon = @inet_ntop($out);
+	if ($canon === false) {
+		return null;
+	}
+	return strtolower($canon) . "/" . $prefix;
+}
+
+/**
+ * Lista de CIDRs locais (v4/v6) para !<layer7_localnets>.
+ * Sempre inclui fe80::/10 (salvaguarda NDP / S-01).
+ * No appliance: interfaces configuradas (+ helpers pfSense se existirem).
+ *
+ * @return string[]
+ */
+function layer7_pf_collect_local_networks()
+{
+	global $config;
+
+	$nets = array("fe80::/10");
+
+	$add = function ($cidr) use (&$nets) {
+		$cidr = trim((string)$cidr);
+		if ($cidr === "" || !layer7_cidr_any_valid($cidr)) {
+			return;
+		}
+		$nets[] = $cidr;
+	};
+
+	/* Preferir helpers runtime do pfSense (DHCP/PPP/VIP actualizados). */
+	if (function_exists("get_configured_interface_list")) {
+		$list = get_configured_interface_list(true);
+		if (is_array($list)) {
+			foreach (array_keys($list) as $ifid) {
+				if (function_exists("get_interface_ip") &&
+				    function_exists("get_interface_subnet")) {
+					$ip = get_interface_ip($ifid);
+					$sn = get_interface_subnet($ifid);
+					if (is_string($ip) && $ip !== "" &&
+					    $sn !== null && $sn !== false && $sn !== "") {
+						$c = layer7_ipv4_network_cidr($ip, (int)$sn);
+						if ($c !== null) {
+							$add($c);
+						}
+					}
+				}
+				if (function_exists("get_interface_ipv6") &&
+				    function_exists("get_interface_subnetv6")) {
+					$ip6 = get_interface_ipv6($ifid);
+					$sn6 = get_interface_subnetv6($ifid);
+					if (is_string($ip6) && $ip6 !== "" &&
+					    $sn6 !== null && $sn6 !== false && $sn6 !== "") {
+						$c = layer7_ipv6_network_cidr($ip6, (int)$sn6);
+						if ($c !== null) {
+							$add($c);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/* Fallback / complemento: config.xml estatico. */
+	if (isset($config["interfaces"]) && is_array($config["interfaces"])) {
+		foreach ($config["interfaces"] as $ifcfg) {
+			if (!is_array($ifcfg)) {
+				continue;
+			}
+			if (!empty($ifcfg["ipaddr"]) && isset($ifcfg["subnet"]) &&
+			    is_numeric($ifcfg["subnet"])) {
+				$c = layer7_ipv4_network_cidr(
+				    $ifcfg["ipaddr"], (int)$ifcfg["subnet"]);
+				if ($c !== null) {
+					$add($c);
+				}
+			}
+			if (!empty($ifcfg["ipaddrv6"]) && isset($ifcfg["subnetv6"]) &&
+			    is_numeric($ifcfg["subnetv6"])) {
+				$c = layer7_ipv6_network_cidr(
+				    $ifcfg["ipaddrv6"], (int)$ifcfg["subnetv6"]);
+				if ($c !== null) {
+					$add($c);
+				}
+			}
+		}
+	}
+
+	return array_values(array_unique($nets));
+}
+
+/**
+ * Declaracao PF da tabela layer7_localnets (sempre emitida).
+ * @return string
+ */
+function layer7_pf_localnets_table_text()
+{
+	$name = layer7_pf_localnets_table_name();
+	$nets = layer7_pf_collect_local_networks();
+	$body = implode(" ", $nets);
+	return "# Redes locais Layer7 (S-02): tabela propria; nao usar alias localsubnets CE/Plus\n" .
+	    "table <{$name}> persist { {$body} }\n";
+}
+
+/**
  * Tabelas PF persist do Layer7. Sao sempre emitidas (mesmo em monitor) para
  * que `pfctl -t ... -T show` continue a funcionar e `layer7_pf_selfheal()` no
  * daemon nao falhe so por mudanca de modo.
  *
  * `layer7_allow_dst` (Bloco 3) e populada pelo daemon (via DNS hint) e pelo
  * pacote (com IPs/CIDRs estaticos da allowlist).
+ * `layer7_localnets` (GV1.6) isola destinos locais em quarentena/anti-bypass.
  */
 function layer7_pf_tables_text()
 {
@@ -1123,7 +1295,7 @@ function layer7_pf_tables_text()
 		"table <layer7_block_dst> persist",
 		"table <layer7_allow_dst> persist",
 		""
-	)) . "\n";
+	)) . "\n" . layer7_pf_localnets_table_text();
 }
 
 /**
@@ -1183,21 +1355,23 @@ function layer7_pf_action_rules_text($data = null, $bl_config = null)
 	$out .= layer7_exception_allow_rules_text($data, $bl_config);
 
 	if ($block_dot_doq) {
+		$nl = layer7_pf_not_localnets_clause();
 		$out .= implode("\n", array(
 			"",
 			"# Anti-bypass DoT/DoQ (porta 853) — toggle explicito 'block_dot_doq'.",
-			"block drop quick inet proto tcp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-dot\"",
-			"block drop quick inet6 proto tcp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-dot6\"",
-			"block drop quick inet proto udp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-doq\"",
-			"block drop quick inet6 proto udp to !<localsubnets> port 853 ! tagged L7ALLOW label \"layer7:anti-doq6\""
+			"block drop quick inet proto tcp {$nl} port 853 ! tagged L7ALLOW label \"layer7:anti-dot\"",
+			"block drop quick inet6 proto tcp {$nl} port 853 ! tagged L7ALLOW label \"layer7:anti-dot6\"",
+			"block drop quick inet proto udp {$nl} port 853 ! tagged L7ALLOW label \"layer7:anti-doq\"",
+			"block drop quick inet6 proto udp {$nl} port 853 ! tagged L7ALLOW label \"layer7:anti-doq6\""
 		)) . "\n";
 	}
 
+	$nl = layer7_pf_not_localnets_clause();
 	$out .= implode("\n", array(
 		"",
 		"# Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.",
-		"block drop quick inet from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label \"layer7:block:src\"",
-		"block drop quick inet6 from <layer7_block> to !<localsubnets> ! tagged L7ALLOW label \"layer7:block:src6\"",
+		"block drop quick inet from <layer7_block> {$nl} ! tagged L7ALLOW label \"layer7:block:src\"",
+		"block drop quick inet6 from <layer7_block> {$nl} ! tagged L7ALLOW label \"layer7:block:src6\"",
 	)) . "\n";
 
 	/* Caminho B / E2: em scoped_hybrid o destino global layer7_block_dst nao
@@ -1799,23 +1973,25 @@ function layer7_anti_quic_filter_rules_text($data)
 	    : array();
 	if (!empty($quic_ifaces)) {
 		$rules .= "\n# Anti-QUIC por interface — apenas destinos externos.\n";
+		$nl = layer7_pf_not_localnets_clause();
 		foreach ($quic_ifaces as $qi) {
 			$qi = trim((string)$qi);
 			if ($qi === "" || !layer7_pf_ifname_for_rules($qi)) {
 				continue;
 			}
 			$rules .= "block drop quick on {$qi} inet proto udp" .
-			    " to !<localsubnets> port 443 ! tagged L7ALLOW" .
+			    " {$nl} port 443 ! tagged L7ALLOW" .
 			    " label \"layer7:anti-quic:{$qi}\"\n";
 			$rules .= "block drop quick on {$qi} inet6 proto udp" .
-			    " to !<localsubnets> port 443 ! tagged L7ALLOW" .
+			    " {$nl} port 443 ! tagged L7ALLOW" .
 			    " label \"layer7:anti-quic6:{$qi}\"\n";
 		}
 	} elseif (!empty($data["layer7"]["block_quic"])) {
+		$nl = layer7_pf_not_localnets_clause();
 		$rules .= "\n# Anti-QUIC global (legado) — apenas destinos externos.\n";
-		$rules .= "block drop quick inet proto udp to !<localsubnets> " .
+		$rules .= "block drop quick inet proto udp {$nl} " .
 		    "port 443 ! tagged L7ALLOW label \"layer7:anti-quic\"\n";
-		$rules .= "block drop quick inet6 proto udp to !<localsubnets> " .
+		$rules .= "block drop quick inet6 proto udp {$nl} " .
 		    "port 443 ! tagged L7ALLOW label \"layer7:anti-quic6\"\n";
 	}
 	return $rules;

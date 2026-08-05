@@ -20,15 +20,16 @@ docs/00-overview/START-HERE-fecho-producao.md
 
 | Campo | Valor |
 |-------|-------|
-| **Trilha activa** | **IPv6** — Ondas V0–V6 (pausa QA IPv4 concluída em `1.9.3`) |
-| **Passo autorizado** | **Gates appliance** GV1/GV3/GV4; V5 adiada (retomar 12.10) |
-| **BG activo** | BG-083 **adiado temporário** (retomar); gates em curso |
+| **Trilha activa** | **IPv6** — Ondas V0–V6 |
+| **Passo autorizado** | Smoke appliance `layer7_localnets` em **1.9.4**; depois GO `pass inet6` LAN (GV4) ou V5 |
+| **BG activo** | BG-083 **adiado temporário**; GV1.6 fechado em **1.9.4** |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
-| Candidato lab / `latest` | **`1.9.3`** (QA IPv4 D1–D6 + base IPv6 12.1–12.9) |
+| Candidato lab / `latest` | **`1.9.4`** (GV1.6 `layer7_localnets`; SHA256 `43f75461…`) |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 — **V5 Opção B temporária** (`2026-08-05`); retomar Opção A depois |
 | Ressalva V5 | DNS/block page/VIP DNS v6 **ainda não**; **voltar a fazer bem** (12.10–12.11) |
-| Próximo gate | **GV1.3** appliance + **GV2** captura |
+| Última evidência GV | `20260805T110000Z-gv-ipv6-1.9.3` — GV1.3/GV3 PASS; GV1.6 fechado em `1.9.4` |
+| Próximo gate | Smoke GV1.6 appliance + **GV4.1** (após allow IPv6 LAN) |
 | F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
 
 ### Desambiguação obrigatória — «12.x»

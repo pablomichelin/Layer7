@@ -1,0 +1,49 @@
+===LAN_PASS_V6===
+pass in quick on vmx0 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002541
+pass in quick on vmx0 inet proto udp from any port = bootpc to 192.168.100.254 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002542
+pass out quick on vmx0 inet proto udp from 192.168.100.254 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002543
+pass quick on vmx0 inet6 proto udp from fe80::/10 to fe80::/10 port = dhcpv6-client keep state (if-bound) label "descr=allow access to DHCPv6 server" ridentifier 1000002551
+pass quick on vmx0 inet6 proto udp from fe80::/10 to ff02::/16 port = dhcpv6-client keep state (if-bound) label "descr=allow access to DHCPv6 server" ridentifier 1000002552
+pass quick on vmx0 inet6 proto udp from fe80::/10 to ff02::/16 port = dhcpv6-server keep state (if-bound) label "descr=allow access to DHCPv6 server" ridentifier 1000002553
+pass quick on vmx0 inet6 proto udp from ff02::/16 to fe80::/10 port = dhcpv6-server keep state (if-bound) label "descr=allow access to DHCPv6 server" ridentifier 1000002554
+pass in quick on vmx0 inet6 proto udp from fe80::/10 to 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = dhcpv6-client keep state (if-bound) label "descr=allow access to DHCPv6 server" ridentifier 1000002555
+pass out quick on vmx0 inet6 proto udp from 2804:6c4:11d:cc00:250:56ff:fe88:a4f7 port = dhcpv6-server to fe80::/10 keep state (if-bound) label "descr=allow access to DHCPv6 server" ridentifier 1000002556
+pass in quick on vmx0.10 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004641
+pass in quick on vmx0.10 inet proto udp from any port = bootpc to 10.0.85.1 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004642
+pass out quick on vmx0.10 inet proto udp from 10.0.85.1 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004643
+pass in quick on vmx0.95 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006741
+pass in quick on vmx0.95 inet proto udp from any port = bootpc to 192.168.95.254 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006742
+pass out quick on vmx0.95 inet proto udp from 192.168.95.254 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006743
+pass in quick on vmx0.52 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007791
+pass in quick on vmx0.52 inet proto udp from any port = bootpc to 192.168.52.1 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007792
+pass out quick on vmx0.52 inet proto udp from 192.168.52.1 port = bootps to any port = bootpc keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007793
+pass in quick on vmx0 inet all flags S/SA keep state (if-bound) label "id=1624548664" label "tags=user_rule" ridentifier 1624548664
+pass in quick on vmx0.10 inet all flags S/SA keep state (if-bound) label "id=1736172652" label "tags=user_rule" ridentifier 1736172652
+pass in quick on vmx0.50 inet all flags S/SA keep state (if-bound) label "id=1747232380" label "tags=user_rule" ridentifier 1747232380
+pass in quick on vmx0.95 inet all flags S/SA keep state (if-bound) label "id=1725990001" label "tags=user_rule" ridentifier 1725990001
+pass in quick on vmx0.52 inet all flags S/SA keep state (if-bound) label "id=1756927739" label "tags=user_rule" ridentifier 1756927739
+===ANTI===
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <localsubnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <localsubnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+===BLOCK_COUNTERS===
+@1 block drop quick inet from <layer7_block:*> to ! <localsubnets:*> label "layer7:block:src" ! tagged L7ALLOW
+  [ Evaluations: 5964868   Packets: 0         Bytes: 0           States: 0     ]
+  [ Source Nodes: 0      Limit: 0      NAT/RDR: 0      Route: 0      ]
+--
+@2 block drop quick inet6 from <layer7_block:*> to ! <localsubnets:*> label "layer7:block:src6" ! tagged L7ALLOW
+  [ Evaluations: 69591     Packets: 0         Bytes: 0           States: 0     ]
+  [ Source Nodes: 0      Limit: 0      NAT/RDR: 0      Route: 0      ]
+--
+@3 block drop quick inet from any to <layer7_block_dst:2> label "layer7:block:dst" ! tagged L7ALLOW
+  [ Evaluations: 3230957   Packets: 22876     Bytes: 14650794    States: 0     ]
+  [ Source Nodes: 0      Limit: 0      NAT/RDR: 0      Route: 0      ]
+--
+@4 block drop quick inet6 from any to <layer7_block_dst:2> label "layer7:block:dst6" ! tagged L7ALLOW
+  [ Evaluations: 36778     Packets: 0         Bytes: 0           States: 0     ]
+  [ Source Nodes: 0      Limit: 0      NAT/RDR: 0      Route: 0      ]
+===STATES_V6_CLIENT===
+   id: 100a6e8900000000 creatorid: c2d69afe
+   id: 100b6e8900000000 creatorid: c2d69afe

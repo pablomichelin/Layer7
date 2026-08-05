@@ -1,0 +1,17 @@
+663629705a9bfa6da4fea76a593332153433e656c89a5871dcdab0686b8e9acb
+pfSense-pkg-layer7-1.9.3
+1.9.3
+enabled=1 mode=enforce model=legacy_global policies=4
+cap_pkts=24826411
+cap_pkts_v4=24816671
+cap_pkts_v6=3147
+cap_active=8022
+cap_active_v4=7989
+cap_active_v6=33
+cap_classified=221992
+cap_classified_v4=221282
+cap_classified_v6=710
+cap_expired=266614
+total_blocked=2097
+pf_add_ok=0
+dst_add_ok=838
