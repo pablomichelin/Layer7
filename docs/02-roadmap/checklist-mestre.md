@@ -361,7 +361,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 - [x] 12.4 captura IPv6 + flow key (`test_capture_flow_key` + build layer7d PASS)
 - [x] 12.5 métricas / nDPI v6 fechado no builder (GV2)
-- [ ] GV3 captura v6 appliance (+ NDP intacto)
+- [x] 12.6 `policy.c` CIDR IPv6 (`test_policy_decide` PASS local + builder)
+- [ ] GV3 captura v6 appliance (+ NDP intacto) — parcial (`1.9.1` em `254`; `cap_*_v6` > 0)
 - [ ] GV4 enforce v6 scoped
 - [ ] Regressão IPv4 confirmada
 

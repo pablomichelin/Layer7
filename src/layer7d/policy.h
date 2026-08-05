@@ -40,9 +40,14 @@
 #define L7_MAX_GROUP_HOSTS 64
 #define L7_MAX_GROUPS_PER_POLICY 8
 
+/* CIDR IPv4 ou IPv6 (passo 12.6 / BG-081). family: AF_INET ou AF_INET6. */
 struct l7_cidr {
-	uint32_t net;
+	int family;
 	int prefix;
+	union {
+		uint32_t v4; /* host byte order (compat V1) */
+		unsigned char v6[16];
+	} addr;
 };
 
 /*

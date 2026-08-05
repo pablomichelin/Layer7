@@ -6,6 +6,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Trilha IPv6 / passo 12.6 (V3):** `policy.c` CIDR IPv6 dual-stack — `struct l7_cidr`
+  com `family` (AF_INET/AF_INET6) + union `addr.v4`/`addr.v6`; `parse_cidr_str`
+  aceita IPv4 `/0–32` e IPv6 `/0–128`; match dual-stack em `src_cidrs`,
+  `src_exclude_cidrs` e exception `cidrs`; `ip_host_equal` para hosts v4/v6
+  equivalentes. Testes novos em `test_policy_decide.c` PASS (local + builder).
+  Sem bump `1.9.2` nesta entrega. Produção enforce `1.9.0` inalterada.
+  Appliance `192.168.100.254` com `1.9.1`: captura v6 evidenciada
+  (`cap_pkts_v6`/`cap_active_v6`/`cap_classified_v6` > 0). Próximo: **12.7**
+  (`enforce.c`/`main.c` PF tabelas + kill states v6).
+
 ## [1.9.1] — 2026-08-05
 
 ### Added
@@ -19,8 +29,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Próximo passo de código: **12.6** (`policy.c` CIDR IPv6). Sem promoção
-  enforce neste patch.
+- Próximo passo de código: **12.7** (`enforce.c`/`main.c` PF tabelas + kill states v6).
+  Passo **12.6** (policy CIDR v6) concluído na árvore sem bump nesta entrega.
 
 ## [Unreleased notes moved — historical trail entries]
 

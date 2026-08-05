@@ -1,10 +1,13 @@
 #include "policy.h"
 #include <strings.h>
 #include "enforce.h"
+#include <arpa/inet.h>
 #include <ctype.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <time.h>
 
 static void
@@ -280,23 +283,41 @@ parse_cidr_str(const char *s, struct l7_cidr *out)
 {
 	unsigned a, b, c, d;
 	int pref;
-	char buf[48];
+	char buf[64];
 	char *slash;
+	struct in6_addr a6;
 
+	if (!s || !out || !*s)
+		return -1;
 	snprintf(buf, sizeof(buf), "%s", s);
 	slash = strchr(buf, '/');
 	if (!slash)
 		return -1;
 	*slash = '\0';
 	pref = atoi(slash + 1);
-	if (pref < 0 || pref > 32)
+	if (pref < 0)
 		return -1;
-	if (sscanf(buf, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
+
+	/* IPv4 dotted (preferido quando o formato casa) */
+	if (sscanf(buf, "%u.%u.%u.%u", &a, &b, &c, &d) == 4) {
+		if (pref > 32 || a > 255 || b > 255 || c > 255 || d > 255)
+			return -1;
+		memset(out, 0, sizeof(*out));
+		out->family = AF_INET;
+		out->prefix = pref;
+		out->addr.v4 = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+		return 0;
+	}
+
+	/* IPv6 textual /0–128 */
+	if (pref > 128)
 		return -1;
-	if (a > 255 || b > 255 || c > 255 || d > 255)
+	if (inet_pton(AF_INET6, buf, &a6) != 1)
 		return -1;
-	out->net = (uint32_t)((a << 24) | (b << 16) | (c << 8) | d);
+	memset(out, 0, sizeof(*out));
+	out->family = AF_INET6;
 	out->prefix = pref;
+	memcpy(out->addr.v6, &a6, 16);
 	return 0;
 }
 
@@ -900,6 +921,71 @@ cidr_u32_match(uint32_t ip, uint32_t net, int prefix)
 }
 
 static int
+cidr_v6_match(const unsigned char ip[16], const unsigned char net[16],
+    int prefix)
+{
+	int full, rem, i;
+	unsigned char mask;
+
+	if (prefix <= 0)
+		return 1;
+	if (prefix > 128)
+		prefix = 128;
+	full = prefix / 8;
+	rem = prefix % 8;
+	for (i = 0; i < full; i++) {
+		if (ip[i] != net[i])
+			return 0;
+	}
+	if (rem == 0)
+		return 1;
+	mask = (unsigned char)(0xffu << (unsigned)(8 - rem));
+	return ((ip[full] & mask) == (net[full] & mask));
+}
+
+/* Compara host string com CIDR (v4 ou v6). Retorna 1 se casa. */
+static int
+cidr_matches_ip_str(const struct l7_cidr *c, const char *ip_str)
+{
+	uint32_t v4;
+	struct in6_addr a6;
+
+	if (!c || !ip_str || !*ip_str)
+		return 0;
+	if (c->family == AF_INET) {
+		if (ipv4_parse(ip_str, &v4) != 0)
+			return 0;
+		return cidr_u32_match(v4, c->addr.v4, c->prefix);
+	}
+	if (c->family == AF_INET6) {
+		if (inet_pton(AF_INET6, ip_str, &a6) != 1)
+			return 0;
+		return cidr_v6_match((const unsigned char *)&a6, c->addr.v6,
+		    c->prefix);
+	}
+	return 0;
+}
+
+/* Igualdade de host IPv4/IPv6 (formas textuais equivalentes via inet_pton). */
+static int
+ip_host_equal(const char *a, const char *b)
+{
+	uint32_t a4, b4;
+	struct in6_addr a6, b6;
+
+	if (!a || !b)
+		return 0;
+	if (strcmp(a, b) == 0)
+		return 1;
+	if (ipv4_parse(a, &a4) == 0 && ipv4_parse(b, &b4) == 0)
+		return a4 == b4;
+	if (inet_pton(AF_INET6, a, &a6) == 1 &&
+	    inet_pton(AF_INET6, b, &b6) == 1)
+		return memcmp(&a6, &b6, 16) == 0;
+	return 0;
+}
+
+static int
 iface_list_matches(const char ifaces[][L7_IFACE_NAME_LEN], int n,
     const char *iface)
 {
@@ -919,7 +1005,6 @@ static int
 exception_matches_src(const struct layer7_exception *e, const char *src_ip,
     const char *iface)
 {
-	uint32_t ip;
 	int i;
 
 	if (!iface_list_matches(e->ifaces, e->n_ifaces, iface))
@@ -927,15 +1012,12 @@ exception_matches_src(const struct layer7_exception *e, const char *src_ip,
 	if (!src_ip || !*src_ip)
 		return 0;
 	for (i = 0; i < e->n_hosts; i++) {
-		if (strcmp(src_ip, e->hosts[i]) == 0)
+		if (ip_host_equal(src_ip, e->hosts[i]))
 			return 1;
 	}
-	if (e->n_cidrs > 0 && ipv4_parse(src_ip, &ip) == 0) {
-		for (i = 0; i < e->n_cidrs; i++) {
-			if (cidr_u32_match(ip, e->cidrs[i].net,
-			    e->cidrs[i].prefix))
-				return 1;
-		}
+	for (i = 0; i < e->n_cidrs; i++) {
+		if (cidr_matches_ip_str(&e->cidrs[i], src_ip))
+			return 1;
 	}
 	return 0;
 }
@@ -944,22 +1026,18 @@ static int
 src_excluded_from_rule(const struct layer7_policy_rule *r, const char *src_ip)
 {
 	int i;
-	uint32_t ip;
 
 	if (r->n_src_exclude_hosts == 0 && r->n_src_exclude_cidrs == 0)
 		return 0;
 	if (!src_ip || !*src_ip)
 		return 0;
 	for (i = 0; i < r->n_src_exclude_hosts; i++) {
-		if (strcmp(src_ip, r->src_exclude_hosts[i]) == 0)
+		if (ip_host_equal(src_ip, r->src_exclude_hosts[i]))
 			return 1;
 	}
-	if (r->n_src_exclude_cidrs > 0 && ipv4_parse(src_ip, &ip) == 0) {
-		for (i = 0; i < r->n_src_exclude_cidrs; i++) {
-			if (cidr_u32_match(ip, r->src_exclude_cidrs[i].net,
-			    r->src_exclude_cidrs[i].prefix))
-				return 1;
-		}
+	for (i = 0; i < r->n_src_exclude_cidrs; i++) {
+		if (cidr_matches_ip_str(&r->src_exclude_cidrs[i], src_ip))
+			return 1;
 	}
 	return 0;
 }
@@ -968,7 +1046,6 @@ static int
 src_matches_rule(const struct layer7_policy_rule *r, const char *src_ip)
 {
 	int i;
-	uint32_t ip;
 
 	if (src_excluded_from_rule(r, src_ip))
 		return 0;
@@ -977,15 +1054,12 @@ src_matches_rule(const struct layer7_policy_rule *r, const char *src_ip)
 	if (!src_ip || !*src_ip)
 		return 0;
 	for (i = 0; i < r->n_src_hosts; i++) {
-		if (strcmp(src_ip, r->src_hosts[i]) == 0)
+		if (ip_host_equal(src_ip, r->src_hosts[i]))
 			return 1;
 	}
-	if (r->n_src_cidrs > 0 && ipv4_parse(src_ip, &ip) == 0) {
-		for (i = 0; i < r->n_src_cidrs; i++) {
-			if (cidr_u32_match(ip, r->src_cidrs[i].net,
-			    r->src_cidrs[i].prefix))
-				return 1;
-		}
+	for (i = 0; i < r->n_src_cidrs; i++) {
+		if (cidr_matches_ip_str(&r->src_cidrs[i], src_ip))
+			return 1;
 	}
 	return 0;
 }

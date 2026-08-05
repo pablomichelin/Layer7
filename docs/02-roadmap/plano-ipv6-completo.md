@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.6** (V3) |
+| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.7** (V3) |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -223,20 +223,20 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.6
+- Passo actual: 12.7
 - Onda: V3
-- Candidato lab: 1.9.0 (próximo .pkg: 1.9.1)
+- Candidato lab: 1.9.1 (código 12.6 na árvore; próximo .pkg: 1.9.2)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - GV0 (docs): PASS (12.1–12.2)
 - GV1 (PF scoped inet6): PARCIAL (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2 (builder): PARCIAL (12.4–12.5 PASS builder; appliance GV3 PENDENTE)
-- GV3 (captura v6 appliance): PENDENTE
+- GV2 (builder): PARCIAL (12.4–12.6 PASS builder; policy tests PASS)
+- GV3 (captura v6 appliance): PARCIAL (`1.9.1` em `254`; cap_*_v6 > 0; GV3.3–GV3.5 PENDENTE)
 - GV4 (enforce v6): PENDENTE
 - GV5 (DNS/NAT v6): PENDENTE | ADIADO
 - GV6 (dual-stack lab): PENDENTE
 - GV7 (fecho trilha): PENDENTE
-- I1–I8: I1 PASS; I2 parcial; I3 parcial (captura+métricas v6 em código)
-- Próximo passo autorizado: 12.6
+- I1–I8: I1 PASS; I2 parcial; I3 parcial (appliance); I4 parcial (policy CIDR 12.6)
+- Próximo passo autorizado: 12.7
 ```
 
 ---
@@ -258,6 +258,7 @@ TRILHA IPv6 — progresso
 
 | Data | Evento |
 |------|--------|
+| 2026-08-04 | Passo **12.6** concluído: `policy.c` CIDR IPv6 dual-stack (`l7_cidr` family + union; `parse_cidr_str` v4/v6; match src/exception CIDRs; `ip_host_equal`); `test_policy_decide.c` PASS local + builder; sem bump `1.9.2`; appliance `254` `1.9.1` cap_*_v6 > 0 |
 | 2026-08-04 | Passo **12.5** concluído: métricas AF `cap_pkts_v4/v6`, `cap_active_v4/v6`, `cap_classified_v4/v6` em capture + JSON stats; GV2 builder PASS |
 | 2026-08-04 | Passo **12.4** concluído: captura IPv6 + flow key; unit + `layer7d` build/`-t` PASS |
 | 2026-08-04 | Passo **12.3** concluído: REV-018 `inet`+`inet6` scoped; `test_scoped_pf_inc` PASS; `1.9.0` |

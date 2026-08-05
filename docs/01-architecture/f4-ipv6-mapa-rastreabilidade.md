@@ -16,7 +16,7 @@
 | Camada | IPv4 hoje | IPv6 hoje | Gap | Onda |
 |--------|-----------|-----------|-----|------|
 | Captura / nDPI | Completo | Parser+fluxo+nDPI v6 (12.4); métricas AF v4/v6 (12.5) | DNS AAAA hint pendente | V2–V3 |
-| Decisão política (daemon) | Completo | **Não** | FP-010 | V3 |
+| Decisão política (daemon) | Completo | CIDR v6 parse/match (12.6); enforce runtime v6 pendente | FP-010 parcial | V3 |
 | PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas só v4 | Parcial | V2–V3 |
 | PF scoped (`pdst`/`psrc`/…) | Completo | **Só `inet`** | REV-018 | V1 |
 | Allowlist | IPv4+CIDR | **Não** | allowlist.h | V3 |
@@ -38,8 +38,8 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-01 | `src/layer7d/capture.c` | libpcap → parse IP → nDPI | IPv4+IPv6 L3 + métricas AF (12.4–12.5) | DNS AAAA hint pendente | V2 | BG-080 | CAP |
 | M-02 | `src/layer7d/capture_flow_key.h` | Hash fluxo bidireccional | v4+v6 hash (12.4) | — | V2 | BG-080 | CAP |
 | M-03 | `src/layer7d/main.c` | flow_decide, DNS hint, PF add | `AF_INET` only ~L920 | Endereços v6 em decisões | V3 | BG-081 | ENF |
-| M-04 | `src/layer7d/policy.c` | Parse/match políticas | CIDR `/32` max L292 | `parse_cidr_str` v6 | V3 | BG-081 | POL |
-| M-05 | `src/layer7d/policy.h` | Structs decisão | IPs como string v4 | Campos ou tipo unificado | V3 | BG-081 | POL |
+| M-04 | `src/layer7d/policy.c` | Parse/match políticas | CIDR v4/v6 dual-stack (12.6): `l7_cidr` family + union; `parse_cidr_str` `/0–32`/`/0–128`; match src/exception CIDRs; `ip_host_equal` | enforce runtime v6 = 12.7 | V3 | BG-081 | POL |
+| M-05 | `src/layer7d/policy.h` | Structs decisão | `l7_cidr` family AF_INET/AF_INET6 + union v4/v6 (12.6) | enforce path 12.7 | V3 | BG-081 | POL |
 | M-06 | `src/layer7d/enforce.c` | `pfctl -T add/del`, kill states | IPv4 strings | `pfctl` com addr v6 | V3 | BG-081 | ENF |
 | M-07 | `src/layer7d/enforce.h` | API enforce | `src_ipv4`/`dst_ipv4` | Renomear/generalizar | V3 | BG-081 | ENF |
 | M-08 | `src/layer7d/allowlist.c` + `.h` | Allowlist destinos | `L7_AL_IPV4_*` only L19–20 | Host/CIDR v6 | V3 | BG-081 | POL |

@@ -9,8 +9,10 @@
 #include "policy.h"
 #include "enforce.h"
 
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/socket.h>
 
 static int g_fail;
 
@@ -192,7 +194,9 @@ test_group_expanded_src_cidr(void)
 
 	memset(groups, 0, sizeof(groups));
 	snprintf(groups[0].id, sizeof(groups[0].id), "g-lan");
-	groups[0].cidrs[0].net = (10U << 24) | (0U << 16) | (0U << 8) | 0U;
+	groups[0].cidrs[0].family = AF_INET;
+	groups[0].cidrs[0].addr.v4 =
+	    (10U << 24) | (0U << 16) | (0U << 8) | 0U;
 	groups[0].cidrs[0].prefix = 24;
 	groups[0].n_cidrs = 1;
 
@@ -541,6 +545,115 @@ test_src_exclude_group_expanded(void)
 	check(dec.action == LAYER7_ACTION_ALLOW, "exclude expanded allow");
 }
 
+/* Passo 12.6 — CIDR IPv6 parse + match (BG-081). */
+static void
+test_ipv6_src_cidr_match(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec_in, dec_out, dec_v4;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"v6-lan\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":10,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"src_cidrs\":[\"2804:6c4:11d:cc00::/64\"]}}]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "v6 cidr parse ok");
+	check(n == 1, "v6 policy loaded");
+	check(rules[0].n_src_cidrs == 1, "v6 cidr count");
+	check(rules[0].src_cidrs[0].family == AF_INET6, "v6 family");
+	check(rules[0].src_cidrs[0].prefix == 64, "v6 prefix 64");
+	layer7_policies_sort(rules, 1);
+
+	memset(&dec_in, 0, sizeof(dec_in));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "2804:6c4:11d:cc00:250:56ff:feb8:f83a", "www.youtube.com",
+	    NULL, NULL, &dec_in) == 0, "v6 in-prefix decide");
+	check(dec_in.action == LAYER7_ACTION_BLOCK, "v6 in-prefix block");
+
+	memset(&dec_out, 0, sizeof(dec_out));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "2804:6c4:11d:dd00::1", "www.youtube.com", NULL, NULL,
+	    &dec_out) == 0, "v6 out-prefix decide");
+	check(dec_out.action == LAYER7_ACTION_ALLOW, "v6 out-prefix allow");
+
+	/* Cliente IPv4 nao casa CIDR v6 */
+	memset(&dec_v4, 0, sizeof(dec_v4));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "192.168.100.244", "www.youtube.com", NULL, NULL, &dec_v4) == 0,
+	    "v4 vs v6 cidr decide");
+	check(dec_v4.action == LAYER7_ACTION_ALLOW, "v4 vs v6 cidr allow");
+}
+
+static void
+test_ipv6_src_exclude_and_host_equal(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec_ex, dec_ok;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"v6-ex\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":10,"
+	    "\"match\":{\"hosts\":[\"example.com\"],"
+	    "\"src_cidrs\":[\"2001:db8:1::/48\"],"
+	    "\"src_exclude_cidrs\":[\"2001:db8:1:2::/64\"],"
+	    "\"src_hosts\":[]}}]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "v6 exclude parse");
+	layer7_policies_sort(rules, 1);
+
+	memset(&dec_ex, 0, sizeof(dec_ex));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "2001:db8:1:2::99", "www.example.com", NULL, NULL, &dec_ex) == 0,
+	    "v6 excluded decide");
+	check(dec_ex.action == LAYER7_ACTION_ALLOW, "v6 excluded allow");
+
+	memset(&dec_ok, 0, sizeof(dec_ok));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "2001:db8:1:3::1", "www.example.com", NULL, NULL, &dec_ok) == 0,
+	    "v6 not-excluded decide");
+	check(dec_ok.action == LAYER7_ACTION_BLOCK, "v6 not-excluded block");
+}
+
+static void
+test_ipv6_exception_cidr(void)
+{
+	struct layer7_exception exc[1];
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	const char *json =
+	    "{\"layer7\":{"
+	    "\"exceptions\":[{\"id\":\"vip6\",\"enabled\":true,"
+	    "\"action\":\"allow\",\"priority\":100,"
+	    "\"cidrs\":[\"2804:6c4:11d:cc00::1009/128\"]}],"
+	    "\"policies\":[{\"id\":\"block-all-yt\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":10,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"]}}]}}";
+	int n = 0, ne = 0;
+
+	memset(exc, 0, sizeof(exc));
+	memset(rules, 0, sizeof(rules));
+	check(layer7_exceptions_parse(json, strlen(json), exc, &ne, 1) == 0,
+	    "v6 exception parse");
+	check(ne == 1 && exc[0].n_cidrs == 1, "v6 exception cidr");
+	check(exc[0].cidrs[0].family == AF_INET6, "v6 exception family");
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "v6 exception policy parse");
+	layer7_exceptions_sort(exc, ne);
+	layer7_policies_sort(rules, n);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(exc, ne, rules, n, 1, NULL,
+	    "2804:6c4:11d:cc00::1009", "www.youtube.com", NULL, NULL,
+	    &dec) == 0, "v6 exception decide");
+	check(dec.action == LAYER7_ACTION_ALLOW, "v6 exception allow");
+	check(dec.reason == L7_DECIDE_EXCEPTION, "v6 exception reason");
+}
+
 int
 main(void)
 {
@@ -562,6 +675,9 @@ main(void)
 	test_src_exclude_cidr_no_match();
 	test_vip_exception_host_beyond_eight_allowed();
 	test_src_exclude_group_expanded();
+	test_ipv6_src_cidr_match();
+	test_ipv6_src_exclude_and_host_equal();
+	test_ipv6_exception_cidr();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");

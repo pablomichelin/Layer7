@@ -52,22 +52,24 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV2.1 | `tests/run-local.sh` PASS (incl. novos testes v6) | macOS/CI | **PASS** (builder `2026-08-04`; 12.4–12.5) |
+| GV2.1 | `tests/run-local.sh` PASS (incl. novos testes v6) | macOS/CI | **PASS** (builder `2026-08-04`; 12.4–12.6; incl. `test_policy_decide`) |
 | GV2.2 | Build pacote no builder FreeBSD | Makefile | **PASS** (builder `2026-08-04`; 12.4–12.5) |
 | GV2.3 | `php -l` + testes funcionais PHP PASS | builder | **PASS** (builder; sem alteração 12.5) |
 | GV2.4 | `layer7d -t` smoke PASS | builder | **PASS** (builder `2026-08-04`; 12.4–12.5) |
 
-**GV2 onda V2 (captura/métricas):** **PARCIAL** — builder PASS (passos 12.4–12.5); confirmação appliance = **GV3**.
+**GV2 onda V2–V3 (captura/métricas/policy):** **PARCIAL** — builder PASS (passos 12.4–12.6); confirmação appliance captura = **GV3**.
 
 ### GV3 — Captura IPv6 no appliance (Onda V2–V3)
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV3.1 | Instalar candidato com `mode=monitor` | `pkg add` | **PENDENTE** |
-| GV3.2 | Tráfego IPv6 na LAN gera `captures` / fluxos v6 nas stats | JSON stats / syslog | **PENDENTE** |
+| GV3.1 | Instalar candidato com `mode=monitor` | `pkg add` | **PASS** (`1.9.1` em `192.168.100.254`; `layer7d -V` 1.9.1; `legacy_global`) |
+| GV3.2 | Tráfego IPv6 na LAN gera `captures` / fluxos v6 nas stats | JSON stats / syslog | **PASS** (`cap_pkts_v6`/`cap_active_v6`/`cap_classified_v6` > 0; cliente `192.168.100.244` IPv6 `2804:6c4:11d:cc00::…`) |
 | GV3.3 | Tráfego IPv4 continua classificado (não regressão) | Comparar baseline | **PENDENTE** |
 | GV3.4 | Zero block PF Layer7 em monitor | `pfctl -sr` | **PENDENTE** |
 | GV3.5 | NDP/RA na LAN continua funcional após candidato | ping6 / neighbor | **PENDENTE** |
+
+**GV3 onda:** **PARCIAL** — captura v6 evidenciada no appliance `1.9.1`; GV3.3–GV3.5 PENDENTE. Banner IPv6 (GV0.3) visível; `pfctl -nf /tmp/rules.debug` rc=0.
 
 ### GV4 — Enforcement IPv6 (Onda V3–V4)
 
