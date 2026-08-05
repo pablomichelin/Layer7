@@ -6,44 +6,32 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- **Trilha IPv6 / V5 Opção B temporária (`2026-08-05`):** decisão humana em
-  ADR-0024 — adiar DNS forçado / block page / VIP DNS em IPv6 **agora**;
-  **retomar obrigatório** (12.10–12.11 / BG-083 Opção A) após release lab
-  `1.9.2`, gates appliance e novo GO. I7 por exclusão temporária. Banner
-  Diagnostics actualizado (núcleo v6 OK; residual = DNS/portal). Não é
-  abandono de V5.
-- **Trilha IPv6 / passo 12.9 (V4):** GUI + validação IPv6 — helpers
-  `layer7_ip_valid`, `layer7_cidr_any_valid`, `layer7_ip_or_cidr_valid`,
-  `layer7_ip_in_cidr`; `layer7_cidr6_valid` prefixo mínimo 10 (S-03 alinhado);
-  `layer7_parse_ip_textarea`/`layer7_parse_cidr_textarea` dual-stack (limites
-  64/16); allowlist GUI + apply PF, VIP add/import, políticas/grupos/excepções
-  via parse, blacklists, `layer7_test.php`; `tests/functional/test_ipv6_gui_inc.php`
-  + `run-local.sh` PASS. **Onda V4 completa**. Sem bump `1.9.2` nesta
-  entrega (banner V5 entra no próximo `.pkg`). Produção enforce `1.9.0`
-  inalterada.
+## [1.9.2] — 2026-08-05
 
-- **Trilha IPv6 / passo 12.8 (V3):** `allowlist.c`/`allowlist.h` IPv6 host/CIDR —
-  kinds `L7_AL_IPV6_HOST`/`L7_AL_IPV6_CIDR`; parse/match dual-stack; rejeita `/0`,
-  `::1`, `fe80::/10`, `ff00::/8`, prefixo <10. `test_allowlist.c` + `run-local.sh`
-  PASS (local + builder). **Onda V3 completa** (12.6–12.8). Sem bump `1.9.2` nesta
-  entrega. Produção enforce `1.9.0` inalterada. Próximo: **12.9** (GUI validação IPv6).
+### Added
 
-- **Trilha IPv6 / passo 12.7 (V3):** `enforce.c`/`enforce.h`/`main.c` PF tabelas +
-  kill states IPv6 — `layer7_pf_host_ok`/`layer7_pf_host_enforce_ok` (S-03:
-  rejeita `::1`, `fe80::/10`, `ff00::/8`); `pfctl -T add/delete` e kill states
-  aceitam IPv6; `kill_states_to` usa `::/0` para destino v6; gates PF em
-  `main.c` usam `host_enforce_ok`; `ip_is_local_iface_addr` lista IPv6 das
-  ifaces. `test_enforce_scoped.c` + `run-local.sh` PASS (local + builder).
-  Sem bump `1.9.2` nesta entrega. Produção enforce `1.9.0` inalterada.
+- **Release lab IPv6 (passos 12.6–12.9 + banner V5):** policy CIDR IPv6,
+  PF tabelas/kill states v6 (S-03), allowlist host/CIDR v6, validação GUI
+  dual-stack (`layer7.inc` + páginas), banner Diagnostics (núcleo v6 OK;
+  DNS forçado / block page / VIP DNS ainda IPv4 — V5 Opção B temporária,
+  ADR-0024). Canal `latest` = `1.9.2`.
+  **Produção enforce permanece `1.9.0`** até GV7 + GO humano.
+  SHA256: `a3bda092f35b63f7559f1cee95e6abfd50a4338f6591a6c2b7f478722c9e0d34`.
+  Rollback imediato: `1.9.1`.
 
-- **Trilha IPv6 / passo 12.6 (V3):** `policy.c` CIDR IPv6 dual-stack — `struct l7_cidr`
-  com `family` (AF_INET/AF_INET6) + union `addr.v4`/`addr.v6`; `parse_cidr_str`
-  aceita IPv4 `/0–32` e IPv6 `/0–128`; match dual-stack em `src_cidrs`,
-  `src_exclude_cidrs` e exception `cidrs`; `ip_host_equal` para hosts v4/v6
-  equivalentes. Testes novos em `test_policy_decide.c` PASS (local + builder).
-  Sem bump `1.9.2` nesta entrega. Produção enforce `1.9.0` inalterada.
-  Appliance `192.168.100.254` com `1.9.1`: captura v6 evidenciada
-  (`cap_pkts_v6`/`cap_active_v6`/`cap_classified_v6` > 0).
+### Notes
+
+- Próximo: gates appliance (GV1/GV3/GV4) em `1.9.2`; retomar **12.10** (V5
+  Opção A) só com GO humano após gates.
+
+### Included (já na árvore pré-release; agora no `.pkg`)
+
+- **V5 Opção B temporária (`2026-08-05`):** adiar DNS/portal/VIP DNS v6 agora;
+  retomar obrigatório após gates + GO. Não é abandono de V5.
+- **12.9 (V4):** GUI + validação IPv6 — helpers dual-stack; `test_ipv6_gui_inc.php` PASS.
+- **12.8 (V3):** allowlist IPv6 host/CIDR; Onda V3 completa.
+- **12.7 (V3):** enforce/main PF tabelas + kill states v6.
+- **12.6 (V3):** policy CIDR IPv6 dual-stack.
 
 ## [1.9.1] — 2026-08-05
 

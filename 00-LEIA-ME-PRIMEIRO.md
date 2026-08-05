@@ -11,17 +11,17 @@
 
 | Item | Valor |
 |------|-------|
-| **Canal público `latest`** | `1.9.1` — tag `v1.9.1` em `pablomichelin/Layer7` (lab IPv6) |
-| **SHA256 (`latest`)** | `c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd` |
-| **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`); não promover `1.9.1` até GV7 |
-| **Rollback imediato (a partir de `1.9.1`)** | `1.9.0` |
+| **Canal público `latest`** | `1.9.2` — tag `v1.9.2` em `pablomichelin/Layer7` (lab IPv6) |
+| **SHA256 (`latest`)** | `a3bda092f35b63f7559f1cee95e6abfd50a4338f6591a6c2b7f478722c9e0d34` |
+| **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`); não promover `1.9.1`/`1.9.2` até GV7 |
+| **Rollback imediato (a partir de `1.9.2`)** | `1.9.1` |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
 | **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
-| **Trilha activa** | **IPv6** — V5 **Opção B temporária** (retomar); próximo **1.9.2** + gates; [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
+| **Trilha activa** | **IPv6** — V5 **Opção B temporária** (retomar); `1.9.2` + gates; [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
-> **Versão actual (`latest`):** `1.9.1` — lab IPv6. Código 12.6–12.9 (+ banner V5) na árvore → próximo `.pkg` **1.9.2**. **Enforce:** `1.9.0`. V5 DNS/portal v6 **adiado temporariamente** (ADR-0024) — **voltar a fazer bem**.
+> **Versão actual (`latest`):** `1.9.2` — lab IPv6 (12.1–12.9 + banner V5). **Enforce:** `1.9.0`. V5 DNS/portal v6 **adiado temporariamente** (ADR-0024) — **voltar a fazer bem**.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 
@@ -84,12 +84,12 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 ## Proximos passos operacionais
 
-**Trilha activa:** IPv6 (passo **12.10**, Onda V5 — DNS `rdr inet6` / BG-083; **gate humano**) —
+**Trilha activa:** IPv6 — gates appliance em **`1.9.2`**; V5 (12.10 / BG-083) **adiada temporariamente** —
 [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
-(arranque único; Onda V4 concluída 12.9; candidato lab `1.9.1`; próximo `.pkg` = `1.9.2`).
+(arranque único; Ondas V3–V4 concluídas; lab `1.9.2` publicado).
 
 1. **Chat limpo:** colar só o caminho do START-HERE-fecho-producao.md.
-2. Executar passo **12.10** (ou registar ADIADO se impasse V5); ver `CORTEX.md` secção Trilha IPv6.
+2. Executar **gates appliance** (GV1/GV3/GV4); retomar **12.10** só com GO; ver `CORTEX.md` secção Trilha IPv6.
 3. Produção enforce permanece **`1.9.0`** até GV7.
 4. Diagnostico rapido: [`scripts/diagnose-layer7-appliance.sh`](scripts/diagnose-layer7-appliance.sh)
 5. Testes locais: `./tests/run-local.sh` (nao substituem appliance; obrigatorio em ondas com codigo)

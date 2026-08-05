@@ -35,15 +35,15 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.1` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.1`,
-`SHA256=c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd`;
+`1.9.2` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.2`,
+`SHA256=a3bda092f35b63f7559f1cee95e6abfd50a4338f6591a6c2b7f478722c9e0d34`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
-Candidato lab trilha IPv6 (12.1–12.5). Rollback imediato: `1.9.0`.
+Candidato lab trilha IPv6 (12.1–12.9 + banner V5). Rollback imediato: `1.9.1`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 **Referencia de producao enforce:** **`1.9.0`** (fecho plano mestre `2026-08-05`;
 equivalente funcional a `1.8.11_69`; rollback imediato `_69`; historico `_24`).
-**Nao** promover `1.9.1` a enforce ate GV7 + GO humano. CE fisico pendente —
+**Nao** promover `1.9.1`/`1.9.2` a enforce ate GV7 + GO humano. CE fisico pendente —
 ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
@@ -1254,38 +1254,40 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera pro
 
 **Gap actual:** DNS forçado / block page / VIP DNS permanecem **IPv4-only** —
 **V5 Opção B temporária** (ADR-0024, `2026-08-05`): adiado agora; **retomar
-obrigatório** (12.10–12.11 / BG-083) após lab `1.9.2` + gates appliance + GO.
-Banner Diagnostics actualizado à limitação residual.(honestidade). Captura, policy, enforce, allowlist e validação GUI aceitam v6.
+obrigatório** (12.10–12.11 / BG-083) após gates appliance em `1.9.2` + GO.
+Banner Diagnostics actualizado à limitação residual (honestidade). Captura,
+policy, enforce, allowlist e validação GUI aceitam v6.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: release lab **1.9.2** + gates appliance (GV1/GV3/GV4); V5 **ADIADA (Opção B temporária)** — retomar 12.10 depois
+- Passo actual: gates appliance em **1.9.2** (GV1/GV3/GV4); V5 **ADIADA (Opção B temporária)** — retomar 12.10 depois
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
 - Passo 12.3: CONCLUÍDO — REV-018 PF inet6 scoped
 - Passo 12.4: CONCLUÍDO (2026-08-04) — captura IPv6 + flow key v6; unit+layer7d -t PASS
 - Passo 12.5: CONCLUÍDO (2026-08-04) — métricas AF `cap_*` v4/v6 em capture + JSON stats; GV2 builder PASS
-- Passo 12.6: CONCLUÍDO (2026-08-04) — `policy.c` CIDR IPv6 dual-stack (`l7_cidr` family + union v4/v6; `parse_cidr_str` v4 `/0–32` + v6 `/0–128`; match `src_cidrs`/`src_exclude_cidrs`/exception `cidrs`; `ip_host_equal` v4/v6); `test_policy_decide.c` PASS local + builder; sem bump `1.9.2`
-- Passo 12.7: CONCLUÍDO (2026-08-04) — `enforce.c`/`enforce.h`/`main.c` PF tabelas + kill states v6: `layer7_pf_host_ok`/`layer7_pf_host_enforce_ok` (S-03 rejeita `::1`, `fe80::/10`, `ff00::/8`); `pfctl -T add/delete` e kill states aceitam IPv6; `kill_states_to` usa `::/0` para destino v6; gates PF em `main.c` usam `host_enforce_ok`; `ip_is_local_iface_addr` lista IPv6 das ifaces; `test_enforce_scoped.c` + `run-local.sh` PASS local + builder; sem bump `1.9.2`
-- Passo 12.8: CONCLUÍDO (2026-08-05) — `allowlist.c`/`allowlist.h` IPv6 host/CIDR: kinds `L7_AL_IPV6_HOST`/`L7_AL_IPV6_CIDR`; parse/match dual-stack; rejeita `/0`, `::1`, `fe80::/10`, `ff00::/8`, prefixo <10; `test_allowlist.c` + `run-local.sh` PASS local + builder; **Onda V3 completa**; sem bump `1.9.2`
-- Passo 12.9: CONCLUÍDO (2026-08-05) — GUI + validação IPv6 (`layer7.inc` + páginas): helpers `layer7_ip_valid`, `layer7_cidr_any_valid`, `layer7_ip_or_cidr_valid`, `layer7_ip_in_cidr`; `layer7_cidr6_valid` prefixo mínimo 10 (S-03); `layer7_parse_ip_textarea`/`layer7_parse_cidr_textarea` dual-stack (limites 64/16); allowlist GUI + apply PF, VIP add/import, políticas/grupos/excepções via parse, blacklists, `layer7_test.php`; `tests/functional/test_ipv6_gui_inc.php` + `run-local.sh` PASS; portal/block page IPv4 permanece (V5); banner Diagnostics IPv4-only mantido; **Onda V4 completa**; sem bump `1.9.2`
-- Candidato lab: **1.9.1** (publicado; trilha 12.1–12.5; código 12.6–12.9 na árvore)
+- Passo 12.6: CONCLUÍDO (2026-08-04) — `policy.c` CIDR IPv6 dual-stack; publicado em `1.9.2`
+- Passo 12.7: CONCLUÍDO (2026-08-04) — `enforce.c`/`main.c` PF tabelas + kill states v6; publicado em `1.9.2`
+- Passo 12.8: CONCLUÍDO (2026-08-05) — allowlist IPv6; **Onda V3 completa**; publicado em `1.9.2`
+- Passo 12.9: CONCLUÍDO (2026-08-05) — GUI validação dual-stack; **Onda V4 completa**; publicado em `1.9.2`
+- Release lab **1.9.2**: CONCLUÍDA (2026-08-05) — 12.6–12.9 + banner V5 Opção B
+- Candidato lab / `latest`: **1.9.2** (publicado; SHA256 `a3bda092…`)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - Versionamento: série patch `1.9.0` → `1.9.1` → `1.9.2` … (`PORTREVISION=0`)
-- Appliance smoke (`192.168.100.254`, `1.9.1`): `layer7d -V` 1.9.1; `legacy_global`; banner IPv6 (GV0.3); `pfctl -nf /tmp/rules.debug` rc=0; `cap_pkts_v6`/`cap_active_v6`/`cap_classified_v6` > 0; cliente `192.168.100.244` IPv6 global `2804:6c4:11d:cc00::…`
+- Appliance smoke (`192.168.100.254`): upgrade para `1.9.2` + gates GV1/GV3/GV4 PENDENTE pós-release
 - GV0: PASS
-- GV1: parcial (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2: parcial (builder PASS 12.4–12.9; policy + enforce + allowlist + GUI `test_ipv6_gui_inc` PASS)
-- GV3: parcial (captura v6 appliance `1.9.1` evidenciada; GV3.3–GV3.5 PENDENTE)
-- GV4: parcial (código daemon v6 12.6–12.8 PASS builder; GV4.1–GV4.4 appliance PENDENTE; GV4.5 S-03 unit PASS)
+- GV1: parcial (código PASS; appliance 1.3/1.6 PENDENTE em 1.9.2)
+- GV2: parcial (builder PASS 12.4–12.9; policy + enforce + allowlist + GUI PASS)
+- GV3: parcial (captura v6 evidenciada em 1.9.1; revalidar em 1.9.2; GV3.3–GV3.5 PENDENTE)
+- GV4: parcial (código daemon v6 12.6–12.8 PASS; GV4.1–GV4.4 appliance PENDENTE; GV4.5 S-03 unit PASS)
 - GV5: ADIADO temporário (Opção B; retomar); GV6–GV7: PENDENTE
-- I1–I8: I1 PASS; I2 parcial; I3 parcial (captura+métricas v6 appliance); I4 parcial (policy+enforce+allowlist+GUI v6 código 12.6–12.9; appliance GV4 PENDENTE); I6 PASS (validação GUI 12.9); I7 PENDENTE (V5)
+- I1–I8: I1 PASS; I2 parcial; I3 parcial; I4 parcial (código 12.6–12.9; appliance GV4 PENDENTE); I6 PASS; I7 PENDENTE (V5)
 - I5: parcial (pfctl/kill states v6 código 12.7; appliance GV4 PENDENTE)
 - BG: BG-078..082 done; BG-083 **adiado temporário (retomar)**; BG-084 planeado
-- V5 / BG-083: **ADIADO temporário** (ADR-0024 Opção B, 2026-08-05) — **não abandonar**; retomar Opção A após 1.9.2 + gates + GO
+- V5 / BG-083: **ADIADO temporário** (ADR-0024 Opção B, 2026-08-05) — **não abandonar**; retomar Opção A após gates 1.9.2 + GO
 - I7: exclusão temporária DNS/block page/VIP DNS v6 (disclosure GUI)
-- Próximo passo autorizado: **release 1.9.2** (código 12.6–12.9 + banner) → gates appliance; depois reabrir **12.10**
+- Próximo passo autorizado: **gates appliance** (GV1/GV3/GV4 em 1.9.2); depois reabrir **12.10** com GO
 ```
 
 ---
@@ -1449,13 +1451,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: 1.9.1 (lab IPv6 12.1–12.5; código 12.6–12.9 na árvore)
-- Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1 ate GV7)
+- Canal publico latest: 1.9.2 (lab IPv6 12.1–12.9 + banner V5; SHA256 a3bda092…)
+- Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1/1.9.2 ate GV7)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
-- Trilha IPv6: ABERTA — V4 CONCLUÍDA; V5 Opção B temporária; próximo lab 1.9.2 + gates
+- Trilha IPv6: ABERTA — V4 CONCLUÍDA; V5 Opção B temporária; próximo = gates appliance 1.9.2
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: release 1.9.2 + gates appliance; retomar V5/12.10 depois (ADR-0024); BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: gates appliance (GV1/GV3/GV4); retomar V5/12.10 depois (ADR-0024); BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -1466,11 +1468,10 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.1`**
-  publicado em `pablomichelin/Layer7` tag `v1.9.1`
-  (`SHA256=c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd`).
-  Trilha IPv6 passos 12.1–12.5 publicados; código 12.6–12.9 (policy CIDR + enforce PF v6 + allowlist v6 + GUI validação v6) na árvore.
-  Appliance `254` com `1.9.1` — captura v6 evidenciada. Rollback imediato: `v1.9.0`.
+- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.2`**
+  publicado em `pablomichelin/Layer7` tag `v1.9.2`
+  (`SHA256=a3bda092f35b63f7559f1cee95e6abfd50a4338f6591a6c2b7f478722c9e0d34`).
+  Trilha IPv6 passos 12.1–12.9 + banner V5 Opção B. Rollback imediato: `v1.9.1`.
 - A referencia de **producao enforce** permanece **`1.9.0`**
   (`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`)
   ate GV7 + GO humano. Rollback a partir de `1.9.0`: `v1.8.11_69`.
