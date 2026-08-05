@@ -1,0 +1,6 @@
+CLIENT A (192.168.100.234 / ::100b + SLAAC):
+  yt4=000 yt6=000 g4=200 g6=200
+CLIENT B (192.168.100.235 / ::100a):
+  yt4=200 yt6=200 g6=200
+
+Verdict: GV4 PASS (scoped_hybrid + DNS A/AAAA auto → layer7_pdst_N)

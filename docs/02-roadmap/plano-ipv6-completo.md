@@ -224,20 +224,16 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **1.9.6** DNS AAAA hint endurecido; GV4 parcial; V5 **Opção B temporária**
+- Passo actual: **GV4 PASS** (`1.9.6`); V5 **Opção B temporária**
 - Onda: V4 CONCLUÍDA; V5 ADIADA (retomar); V6 pendente
-- Candidato lab / latest: **1.9.6** (AAAA hint; SHA256 fc2d7fce…)
+- Candidato lab / latest: **1.9.6**
 - Produção enforce: 1.9.0 (inalterada até GV7)
-- GV0 (docs): PASS
-- GV1 (PF scoped inet6): 1.3/1.5/1.6 PASS (`1.9.4`)
-- GV2 (builder): parcial (12.4–12.9 + dns_aaaa_wire PASS)
-- GV3 (captura v6): PASS (egress v6 + cap_*_v6)
-- GV4 (enforce v6): PARCIAL — A/AAAA→pdst quando pcap vê resposta; unbound local intermitente
+- GV0–GV3: PASS / parcial builder conforme CORTEX
+- GV4 (enforce v6): **PASS** — scoped_hybrid; DNS A/AAAA→pdst; two-client A/B
 - GV5 (DNS/NAT v6): **ADIADO temporário** (ADR-0024 Opção B) — **retomar** 12.10–12.11
-- GV6 (dual-stack lab): PENDENTE
-- GV7 (fecho trilha): PENDENTE
-- I1–I8: I1–I3 PASS; I4/I5 OK c/ ressalva pcap; I6 PASS; I7 exclusão temp. (V5)
-- Próximo passo autorizado: captura DNS local estável **ou** 12.10/V5 com GO
+- GV6–GV7: PENDENTE
+- I1–I6: PASS; I7 exclusão temp. (V5)
+- Próximo passo autorizado: **12.10/V5** com GO
 ```
 
 ---

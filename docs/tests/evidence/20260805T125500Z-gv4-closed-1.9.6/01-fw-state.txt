@@ -1,0 +1,22 @@
+version=1.9.6
+model=scoped_hybrid
+block drop quick inet from 192.168.100.234 to <layer7_pdst_3> label "layer7:pdst:gv4-yt-block-a" ! tagged L7ALLOW
+block drop quick inet6 from 2804:6c4:11d:cc00::100b to <layer7_pdst_3> label "layer7:pdst:gv4-yt-block-a" ! tagged L7ALLOW
+block drop quick inet6 from 2804:6c4:11d:cc00:250:56ff:fe9d:252c to <layer7_pdst_3> label "layer7:pdst:gv4-yt-block-a" ! tagged L7ALLOW
+===pdst3===
+   142.251.150.4
+   142.251.151.4
+   142.251.152.4
+   142.251.153.4
+   142.251.154.4
+   142.251.155.4
+   142.251.156.4
+   142.251.157.4
+   2001:4860:4826:400::
+   2001:4860:4827:400::
+   2001:4860:4828:400::
+   2001:4860:4829:400::
+   2001:4860:482a:400::
+   2001:4860:482b:400::
+   2001:4860:482c:400::
+   2001:4860:482d:400::

@@ -15,8 +15,8 @@
 
 | Camada | IPv4 hoje | IPv6 hoje | Gap | Onda |
 |--------|-----------|-----------|-----|------|
-| Captura / nDPI | Completo | Parser+fluxo+nDPI v6 (12.4); métricas AF; **DNS A+AAAA hint (`1.9.5`/`1.9.6`)** | pcap unbound local intermitente (lab Plus) | V2–V3 |
-| Decisão política (daemon) | Completo | CIDR/enforce/allowlist v6 + **dns_cb AAAA→pdst (`1.9.5`/`1.9.6`)** | aprendizagem depende de pcap ver a resposta | V3–V4 |
+| Captura / nDPI | Completo | Parser+flujo+nDPI v6 (12.4); métricas AF; **DNS A+AAAA hint (`1.9.5`/`1.9.6`)** | — (unbound local OK no pcap) | V2–V3 |
+| Decisão política (daemon) | Completo | CIDR/enforce/allowlist v6 + **dns_cb AAAA→pdst** | **scoped_hybrid** obrigatório para `pdst_N`; `src_hosts` IPv6 = GUA+SLAAC | V3–V4 |
 | PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas v4+v6 via `pfctl -T` (12.7) | — | V2–V3 |
 | PF scoped (`pdst`/`psrc`/…) | Completo | **Só `inet`** | REV-018 | V1 |
 | Allowlist | IPv4+CIDR | IPv4+IPv6 host/CIDR (12.8) + GUI persistência (12.9) | — | V3–V4 |
