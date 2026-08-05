@@ -87,10 +87,10 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV5.1 | Decisão humana registada (implementar vs ADIAR) | ADR-0024 emenda | **PENDENTE** |
-| GV5.2 | Se implementado: `rdr inet6` :53 sinkhole funcional | `nslookup -6` | **PENDENTE** |
-| GV5.3 | Se implementado: block page acessível em v6 | HTTP v6 portal | **PENDENTE** |
-| GV5.4 | Se ADIADO: limite explícito em MANUAL + GUI (incl. AAAA/M-09) | Doc review | **PENDENTE** |
+| GV5.1 | Decisão humana registada (implementar vs ADIAR) | ADR-0024 emenda | **PASS** (`2026-08-05` — Opção B **temporária**; retomar Opção A) |
+| GV5.2 | Se implementado: `rdr inet6` :53 sinkhole funcional | `nslookup -6` | **N/A** até retoma 12.10 |
+| GV5.3 | Se implementado: block page acessível em v6 | HTTP v6 portal | **N/A** até retoma 12.11 |
+| GV5.4 | Se ADIADO: limite explícito em MANUAL + GUI (incl. AAAA/M-09) | Doc review | **PARCIAL** — GUI Diagnostics actualizado; MANUAL na release `1.9.2` |
 
 ### GV6 — Campanha dual-stack (Onda V6)
 

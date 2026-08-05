@@ -1252,13 +1252,14 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera pro
 > Passos **12.x** da trilha IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
 > Não existe outro ficheiro START-HERE para esta fila.
 
-**Gap actual:** DNS forçado / block page / VIP isenção permanecem **IPv4-only** (V5 /
-BG-083); banner Diagnostics mantém disclosure IPv4-only até fecho dual-stack
-(honestidade). Captura, policy, enforce, allowlist e validação GUI aceitam v6.
+**Gap actual:** DNS forçado / block page / VIP DNS permanecem **IPv4-only** —
+**V5 Opção B temporária** (ADR-0024, `2026-08-05`): adiado agora; **retomar
+obrigatório** (12.10–12.11 / BG-083) após lab `1.9.2` + gates appliance + GO.
+Banner Diagnostics actualizado à limitação residual.(honestidade). Captura, policy, enforce, allowlist e validação GUI aceitam v6.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.10 (Onda V5 — DNS `rdr inet6` / decisão humana BG-083)
+- Passo actual: release lab **1.9.2** + gates appliance (GV1/GV3/GV4); V5 **ADIADA (Opção B temporária)** — retomar 12.10 depois
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
@@ -1278,11 +1279,13 @@ TRILHA IPv6 — progresso
 - GV2: parcial (builder PASS 12.4–12.9; policy + enforce + allowlist + GUI `test_ipv6_gui_inc` PASS)
 - GV3: parcial (captura v6 appliance `1.9.1` evidenciada; GV3.3–GV3.5 PENDENTE)
 - GV4: parcial (código daemon v6 12.6–12.8 PASS builder; GV4.1–GV4.4 appliance PENDENTE; GV4.5 S-03 unit PASS)
-- GV5–GV7: PENDENTE
+- GV5: ADIADO temporário (Opção B; retomar); GV6–GV7: PENDENTE
 - I1–I8: I1 PASS; I2 parcial; I3 parcial (captura+métricas v6 appliance); I4 parcial (policy+enforce+allowlist+GUI v6 código 12.6–12.9; appliance GV4 PENDENTE); I6 PASS (validação GUI 12.9); I7 PENDENTE (V5)
 - I5: parcial (pfctl/kill states v6 código 12.7; appliance GV4 PENDENTE)
-- BG: BG-078..082 done (Onda V4); BG-083..084 planeados (V5–V6)
-- Próximo passo autorizado: 12.10 (V5 — gate humano BG-083) ou registo ADIADO se impasse
+- BG: BG-078..082 done; BG-083 **adiado temporário (retomar)**; BG-084 planeado
+- V5 / BG-083: **ADIADO temporário** (ADR-0024 Opção B, 2026-08-05) — **não abandonar**; retomar Opção A após 1.9.2 + gates + GO
+- I7: exclusão temporária DNS/block page/VIP DNS v6 (disclosure GUI)
+- Próximo passo autorizado: **release 1.9.2** (código 12.6–12.9 + banner) → gates appliance; depois reabrir **12.10**
 ```
 
 ---
@@ -1449,10 +1452,10 @@ CHECKPOINT CANONICO
 - Canal publico latest: 1.9.1 (lab IPv6 12.1–12.5; código 12.6–12.9 na árvore)
 - Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1 ate GV7)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
-- Trilha IPv6: ABERTA — passo 12.10 autorizado (Onda V4 CONCLUÍDA; 12.9 CONCLUÍDO)
+- Trilha IPv6: ABERTA — V4 CONCLUÍDA; V5 Opção B temporária; próximo lab 1.9.2 + gates
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: trilha IPv6 12.10 (DNS `rdr inet6` / BG-083 — gate humano V5); BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: release 1.9.2 + gates appliance; retomar V5/12.10 depois (ADR-0024); BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```

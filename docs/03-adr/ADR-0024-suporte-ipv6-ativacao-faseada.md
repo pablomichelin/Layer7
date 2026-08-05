@@ -67,11 +67,37 @@ numerados **12.1–12.13**, sem reabrir o veredicto do plano de fecho (`1.9.0` p
 - **Opção B:** **ADIAR** com limite explícito em MANUAL/GUI (**I7** satisfeito por exclusão).
 - Requer decisão humana registada antes do passo 12.10.
 
+#### Decisão registada (`2026-08-05`) — Opção B **temporária** (não permanente)
+
+**Operador:** Systemup / Pablo Michelin.  
+**Escolha:** **Opção B** — adiar implementação de DNS forçado / block page /
+VIP DNS em IPv6 (`rdr inet6`) **agora**.
+
+**Ressalva obrigatória (não é abandono):**
+
+1. V5 **não** fica cancelada. Os passos **12.10–12.11** e **BG-083**
+   permanecem no plano como trabalho **a retomar**.
+2. Retomar **da maneira certa** (Opção A completa, com salvaguardas NDP/ICMPv6
+   e smoke lab) **depois** de: release lab com código 12.6–12.9 (`1.9.2`),
+   gates appliance GV1/GV3/GV4 PASS (ou veredicto limitado documentado), e
+   novo GO humano explícito para abrir 12.10.
+3. Até lá: **não** afirmar «DNS forçado IPv6» / «block page IPv6» / «VIP DNS
+   IPv6»; disclosure na GUI (Diagnostics) e docs (I7 por exclusão temporária).
+4. Controlo L7 em IPv6 (captura, política, PF, allowlist, GUI host/CIDR)
+   **já entregue** em 12.3–12.9 — a exclusão aplica-se **só** a NAT/DNS/portal.
+
+**I7:** satisfeito **temporariamente** por esta exclusão formal; fecha-se de
+forma definitiva quando 12.10–12.11 (Opção A) PASS ou quando uma emenda
+futura declarar adiamento permanente (não é o caso agora).
+
 ### V6 — Fecho
 
 - Campanha lab dual-stack; release; promoção na série patch `1.9.n`
   (`1.9.1`, `1.9.2`, …) só após **GV7**. Sem `PORTREVISION`/`_N`; sem salto
   automático a `1.10.0`.
+- V6 pode avançar em paralelo com V5 **adiado** para fechar gates do núcleo
+  dual-stack; **não** marcar trilha IPv6 “completa comercial” sem retomar V5
+  ou emenda permanente.
 
 ---
 
@@ -104,7 +130,9 @@ numerados **12.1–12.13**, sem reabrir o veredicto do plano de fecho (`1.9.0` p
 
 ## Critérios de revisão desta ADR
 
-- Emenda obrigatória se V5 adoptar Opção B (adiamento permanente de DNS v6).
+- Emenda obrigatória se V5 adoptar Opção B **permanente** de DNS v6 (não é o
+  caso da decisão `2026-08-05` — essa é adiamento **temporário** com retoma).
+- Emenda ao reabrir 12.10 (GO humano Opção A) ou se mudar a ressalva.
 - Emenda se mudar ordem V1↔V2 (não recomendado).
 - Emenda se inventário DHCPv6/MAC→IPv6 entrar no escopo I1–I8.
 

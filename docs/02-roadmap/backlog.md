@@ -277,7 +277,7 @@ reavaliacao formal.
 
 ## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-05, rev. g)
 
-- Trilha **ABERTA** — passo **12.10** (Onda V5 — DNS `rdr inet6` / BG-083; **gate humano**). SSOT:
+- Trilha **ABERTA** — V5 **Opção B temporária** (ADR-0024); próximo **1.9.2** + gates; **retomar 12.10**. SSOT:
   [`plano-ipv6-completo.md`](plano-ipv6-completo.md);
   arranque **único**
   [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md);
@@ -296,7 +296,7 @@ reavaliacao formal.
 | BG-080 | Daemon captura + fluxos + nDPI IPv6 (`capture.c`, flow key) | Critica | daemon | F4 | FP-010 core; sem classificação v6 | G | Alto | **Concluido (12.4–12.5)** | GV2 builder PASS; GV3 appliance pendente |
 | BG-081 | Policy/enforce/allowlist IPv6 (`policy.c`, `enforce.c`, `allowlist`) | Critica | daemon | F4 | decisão runtime v6 ausente | G | Alto | **Concluido (12.6–12.8)** — Onda V3 completa | GV3–GV4 |
 | BG-082 | GUI + validação JSON IPv6 (`layer7.inc`, páginas GUI) | Alta | package/GUI | F4 | truncamento/validação silenciosa | M | Alto | **Concluido (12.9)** — Onda V4 completa | `test_ipv6_gui_inc` + `run-local.sh` PASS; portal/block page IPv4 = V5 |
-| BG-083 | DNS forçado / block page / VIP isenção IPv6 (NAT `rdr inet6`) | Alta | package/PF/Unbound | F4 | bypass DNS em v6 | G | Medio | Planeado (12.10–12.11) | GV5; **gate humano** V5 |
+| BG-083 | DNS forçado / block page / VIP isenção IPv6 (NAT `rdr inet6`) | Alta | package/PF/Unbound | F4 | bypass DNS em v6 | G | Medio | **Adiado temporário** (Opção B `2026-08-05`) — **retomar** 12.10–12.11 após 1.9.2+gates+GO | GV5; I7 exclusão temp. |
 | BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | Planeado (12.12–12.13) | `validacao-lab` §21; série `1.9.n` |
 
 ---

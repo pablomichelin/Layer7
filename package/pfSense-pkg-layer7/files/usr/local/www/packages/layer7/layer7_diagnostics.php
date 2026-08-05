@@ -335,7 +335,7 @@ layer7_render_styles();
 		<div class="alert alert-warning" id="l7-ipv6-limit" role="status">
 			<i class="fa fa-exclamation-triangle"></i>
 			<strong><?= l7_t("Limitacao IPv6:"); ?></strong>
-			<?= l7_t("A captura nDPI, politicas e enforcement escopado do Layer7 sao IPv4-only nesta versao. Trafego IPv6 nao e classificado nem bloqueado por politica scoped (FP-010 / REV-018). Redes dual-stack podem contornar o controlo via IPv6. Trilha de activacao faseada em curso (ADR-0024); nao afirmar suporte dual-stack completo."); ?>
+			<?= l7_t("Captura nDPI, politicas, PF scoped e allowlist ja suportam IPv6 (trilha ADR-0024). Ainda IPv4-only: DNS forcado, pagina de bloqueio e isencao VIP no DNS (V5 adiada temporariamente — sera retomada). Nao afirmar dual-stack completo ate fecho V5/GV7."); ?>
 		</div>
 
 		<div class="layer7-admin-block">

@@ -19,9 +19,9 @@
 | **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
-| **Trilha activa** | **IPv6** — passo **12.10** (Onda V5); arranque único [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
+| **Trilha activa** | **IPv6** — V5 **Opção B temporária** (retomar); próximo **1.9.2** + gates; [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
-> **Versão actual (`latest`):** `1.9.1` — lab IPv6 (12.1–12.5 publicado; código 12.6–12.9 na árvore). **Enforce:** `1.9.0`.
+> **Versão actual (`latest`):** `1.9.1` — lab IPv6. Código 12.6–12.9 (+ banner V5) na árvore → próximo `.pkg` **1.9.2**. **Enforce:** `1.9.0`. V5 DNS/portal v6 **adiado temporariamente** (ADR-0024) — **voltar a fazer bem**.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 

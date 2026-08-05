@@ -10,7 +10,7 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Trilha | Estado | SSOT de execução |
 |--------|--------|------------------|
 | Fecho produção P0–J | **FECHADO** (`1.9.0`, `2026-08-05`) | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) (histórico) |
-| **IPv6 completo V0–V6** | **ABERTA** — passo **12.10** (V5) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
+| **IPv6 completo V0–V6** | **ABERTA** — V5 **ADIADA (B temp.)**; próximo **1.9.2** + gates | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
 
 **Não criar** outros ficheiros `START-HERE-*.md` para esta fila — este é o único.
 
@@ -21,12 +21,13 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Campo | Valor |
 |-------|-------|
 | **Trilha activa** | **IPv6** — Ondas V0–V6 |
-| **Passo autorizado** | **12.10** (Onda V5 — DNS `rdr inet6` / BG-083) |
-| **BG activo** | BG-083 (V5; Onda V4 concluída — 12.9) |
+| **Passo autorizado** | **Release 1.9.2** + gates appliance; V5 adiada (retomar 12.10) |
+| **BG activo** | BG-083 **adiado temporário** (retomar); lab/gates em curso |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
 | Candidato lab / `latest` | **`1.9.1`** (publicado; 12.1–12.5) |
 | Plano fecho P0–J | **FECHADO** |
-| ADR IPv6 | ADR-0024 **publicado e aceite** (implementação por ondas) |
+| ADR IPv6 | ADR-0024 — **V5 Opção B temporária** (`2026-08-05`); retomar Opção A depois |
+| Ressalva V5 | DNS/block page/VIP DNS v6 **ainda não**; **voltar a fazer bem** (12.10–12.11) |
 | Próximo gate | **GV1.3** appliance + **GV2** captura |
 | F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
 

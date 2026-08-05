@@ -1,6 +1,6 @@
 # Plano extensão — IPv6 completo (pós-fecho produção)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-05d` — passo 12.10 V5)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-05e` — V5 Opção B temporária; próximo 1.9.2)  
 **Tipo:** extensão pós-Onda J do plano mestre de fecho  
 **SSOT deste plano:** este ficheiro  
 **SSOT de estado:** `CORTEX.md` (secção *Trilha IPv6*)  
@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.10** (V5) |
+| IPv6 completo | **V0–V6** | **ABERTO** — V5 **ADIADA (B temp.)**; próximo **1.9.2** + gates |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -224,20 +224,20 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.10
-- Onda: V5
-- Candidato lab: 1.9.1 (código 12.6–12.9 na árvore; próximo .pkg: 1.9.2)
+- Passo actual: release **1.9.2** + gates appliance; V5 **Opção B temporária**
+- Onda: V4 CONCLUÍDA; V5 ADIADA (retomar); V6 pendente
+- Candidato lab: 1.9.1 (código 12.6–12.9 + banner V5 na árvore; próximo .pkg: **1.9.2**)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - GV0 (docs): PASS (12.1–12.2)
 - GV1 (PF scoped inet6): PARCIAL (código PASS; appliance 1.3/1.6 PENDENTE)
 - GV2 (builder): PARCIAL (12.4–12.9 PASS builder; policy + enforce + allowlist + GUI `test_ipv6_gui_inc` PASS)
 - GV3 (captura v6 appliance): PARCIAL (`1.9.1` em `254`; cap_*_v6 > 0; GV3.3–GV3.5 PENDENTE)
 - GV4 (enforce v6): PARCIAL (código daemon+GUI 12.6–12.9 PASS builder; appliance PENDENTE; GV4.5 S-03 unit PASS)
-- GV5 (DNS/NAT v6): PENDENTE | ADIADO — **gate humano** (12.10)
+- GV5 (DNS/NAT v6): **ADIADO temporário** (ADR-0024 Opção B `2026-08-05`) — **retomar** 12.10–12.11
 - GV6 (dual-stack lab): PENDENTE
 - GV7 (fecho trilha): PENDENTE
-- I1–I8: I1 PASS; I2 parcial; I3 parcial (appliance); I4 parcial (código 12.6–12.9; appliance GV4 PENDENTE); I6 PASS (GUI 12.9); I7 PENDENTE (V5)
-- Próximo passo autorizado: 12.10 (V5 — gate humano BG-083)
+- I1–I8: I1–I6 núcleo OK/parcial; **I7 exclusão temporária** (DNS/block/VIP DNS v6); retomar
+- Próximo passo autorizado: **1.9.2** + gates; depois reabrir **12.10** (Opção A)
 ```
 
 ---
@@ -257,6 +257,7 @@ TRILHA IPv6 — progresso
 
 ## 10. Histórico
 
+| 2026-08-05 | **V5 Opção B temporária** registada (ADR-0024): adiar DNS/block/VIP DNS v6 agora; **retomar obrigatório** após 1.9.2 + gates + GO; banner Diagnostics actualizado |
 | Data | Evento |
 |------|--------|
 | 2026-08-05 | Passo **12.9** concluído: GUI + validação IPv6 — helpers `layer7_ip_valid`/`layer7_cidr_any_valid`/`layer7_ip_or_cidr_valid`/`layer7_ip_in_cidr`; `layer7_cidr6_valid` prefixo mín. 10 (S-03); `parse_ip_textarea`/`parse_cidr_textarea` dual-stack (64/16); allowlist GUI + PF, VIP add/import, políticas/grupos/excepções, blacklists, `layer7_test.php`; `test_ipv6_gui_inc.php` + `run-local.sh` PASS; portal/block page IPv4 permanece (V5); banner Diagnostics IPv4-only mantido; **Onda V4 completa**; sem bump `1.9.2`; próximo **12.10** (gate humano BG-083) |
