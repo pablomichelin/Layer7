@@ -17,9 +17,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Canal `latest`: **`1.9.11`** (SHA após build). Produção enforce permanece
-  **`1.9.8`** até GO.
-- Rollback lab: `1.9.10`.
+- Canal `latest`: **`1.9.11`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `dde1e17b00820d56bbee231087f92a4552da73dc00ea18820d17750ad35cd1be`.
+- Rollback lab: `1.9.10`. Smoke appliance: pkg `1.9.11`, daemon up, DNS local OK,
+  `layer7_rules_debug_trusted` PASS.
 
 ## [1.9.10] — 2026-08-05
 

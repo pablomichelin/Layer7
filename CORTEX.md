@@ -35,7 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.11` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.11`;
+`1.9.11` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.11`,
+`SHA256=dde1e17b00820d56bbee231087f92a4552da73dc00ea18820d17750ad35cd1be`;
 BG-103 TOCTOU `rules.debug` + BG-104 DNS corr/allowlist; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
@@ -1489,7 +1490,7 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.11** (BG-103 TOCTOU rules.debug + BG-104 DNS corr)
+- Canal publico latest: **1.9.11** (SHA256 dde1e17b…; BG-103/104)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo 20.2/IM0 (ADRs Aceito + T1/T2); arranque docs/00-overview/START-HERE-identity-mitm.md
