@@ -332,6 +332,12 @@ layer7_render_styles();
 		<div class="alert alert-<?= $anti_doh_result["ok"] ? "success" : "danger"; ?>"><?= htmlspecialchars($anti_doh_result["msg"]); ?></div>
 		<?php } ?>
 
+		<div class="alert alert-warning" id="l7-ipv6-limit" role="status">
+			<i class="fa fa-exclamation-triangle"></i>
+			<strong><?= l7_t("Limitacao IPv6:"); ?></strong>
+			<?= l7_t("A captura nDPI, politicas e enforcement escopado do Layer7 sao IPv4-only nesta versao. Trafego IPv6 nao e classificado nem bloqueado por politica scoped (FP-010 / REV-018). Redes dual-stack podem contornar o controlo via IPv6. Trilha de activacao faseada em curso (ADR-0024); nao afirmar suporte dual-stack completo."); ?>
+		</div>
+
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Resumo operacional"); ?></div>
 			<div class="layer7-admin-block__body">

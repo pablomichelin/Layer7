@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.2** (V0) |
+| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.3** (V1) |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -207,11 +207,11 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.2
-- Onda: V0
+- Passo actual: 12.3
+- Onda: V1
 - Candidato lab: 1.9.0 (baseline até novo PORTREVISION)
 - Produção enforce: 1.9.0 (inalterada até GV7)
-- GV0 (docs): PARCIAL (0.1/0.2/0.4/0.5 PASS; 0.3 = 12.2)
+- GV0 (docs): PASS (12.1–12.2)
 - GV1 (PF scoped inet6): PENDENTE
 - GV2 (builder): PENDENTE
 - GV3 (captura v6 appliance): PENDENTE
@@ -219,8 +219,8 @@ TRILHA IPv6 — progresso
 - GV5 (DNS/NAT v6): PENDENTE | ADIADO
 - GV6 (dual-stack lab): PENDENTE
 - GV7 (fecho trilha): PENDENTE
-- I1–I8: 0/8
-- Próximo passo autorizado: 12.2
+- I1–I8: I1 PASS (docs+GUI source); resto PENDENTE
+- Próximo passo autorizado: 12.3
 ```
 
 ---
@@ -242,6 +242,7 @@ TRILHA IPv6 — progresso
 
 | Data | Evento |
 |------|--------|
+| 2026-08-04 | Passo **12.2** concluído: banner Diagnostics + `pf-enforcement.md`; **GV0 PASS** |
 | 2026-08-04 | Passo **12.1** concluído: ADR-0024, índices, mapa, matriz GV0.4 PASS |
 | 2026-08-04 | Criação da trilha IPv6 (governança durante fecho); passo 12.1; BG-078..084 |
 | 2026-08-04b | Arranque único em START-HERE-fecho; salvaguardas NDP; desambiguação 12.x vs test-matrix |

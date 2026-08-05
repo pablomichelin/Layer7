@@ -1255,16 +1255,17 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera pro
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.2 (Onda V0 — banner GUI Diagnostics + pf-enforcement.md)
+- Passo actual: 12.3 (Onda V1 — paridade PF inet6 scoped / REV-018)
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO (2026-08-04) — ADR-0024, índices, mapa, matriz GV0.4
-- Candidato lab: 1.9.0 (+ PORTREVISION por onda)
+- Passo 12.2: CONCLUÍDO (2026-08-04) — banner Diagnostics + pf-enforcement.md; GV0 PASS
+- Candidato lab: 1.9.0 (+ PORTREVISION na onda V1 se .pkg)
 - Produção enforce: 1.9.0 (inalterada até GV7)
-- GV0: parcial (GV0.1/0.2/0.4/0.5 PASS; GV0.3 banner = 12.2)
+- GV0: PASS (12.1–12.2; confirmação visual appliance no próximo .pkg com GUI)
 - GV1–GV7: PENDENTE
-- I1–I8: 0/8 (I1 disclosure docs parcial; banner GUI em 12.2)
-- BG activos: BG-078..084
-- Próximo passo autorizado: 12.2
+- I1–I8: I1 disclosure docs+GUI source PASS; resto 0/7
+- BG activos: BG-078 CONCLUÍDO (V0); BG-079..084
+- Próximo passo autorizado: 12.3
 ```
 
 ---

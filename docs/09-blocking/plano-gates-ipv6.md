@@ -30,11 +30,11 @@
 |---|----------|--------|--------|
 | GV0.1 | ADR-0024 **publicado e Aceito** (este gate = revisão do pacote V0, não recriar ADR) | Revisão doc | **PASS** (`2026-08-04`; rev. b) |
 | GV0.2 | Mapa rastreabilidade publicado (M-01..M-25 + §8 salvaguardas) | Mapa | **PASS** (publicado; manter vivo) |
-| GV0.3 | Banner/limitação visível na GUI | Diagnostics ou Status | **PENDENTE** (passo 12.2) |
+| GV0.3 | Banner/limitação visível na GUI | Diagnostics ou Status | **PASS** (passo 12.2 — `layer7_diagnostics.php`; visível no appliance após próximo `.pkg` que inclua o ficheiro) |
 | GV0.4 | `matriz-limitacoes-dpi.md` alinhada | Sem claim dual-stack falso | **PASS** (passo 12.1, `2026-08-04`) |
 | GV0.5 | CORTEX checklist trilha IPv6 + arranque único START-HERE-fecho | Secção dedicada | **PASS** (rev. b) |
 
-**GV0 onda completa:** só após 12.2 (GV0.3 banner GUI). GV0.1/0.2/0.4/0.5 **PASS** (12.1).
+**GV0 onda completa:** **PASS** (`2026-08-04`, passos 12.1–12.2). Confirmação visual no appliance depende do próximo pacote com a GUI.
 
 ### GV1 — Paridade PF scoped (Onda V1)
 

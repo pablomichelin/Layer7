@@ -347,8 +347,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] ADR-0024 aceite e indexado
 - [x] Mapa M-01..M-25 (+ §8) publicado
 - [x] Matriz limitações alinhada (GV0.4) — passo 12.1
-- [ ] Banner GUI Diagnostics + `pf-enforcement.md` (GV0.3) — passo 12.2
-- [ ] GV0 completo (requer GV0.3)
+- [x] Banner GUI Diagnostics + `pf-enforcement.md` (GV0.3) — passo 12.2
+- [x] GV0 completo
 - [x] CORTEX checklist trilha IPv6 + arranque único
 
 ### V1 — PF scoped inet6 (12.3, BG-079)

@@ -6,6 +6,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Trilha IPv6 / passo 12.2 (V0):** banner IPv4-only em Diagnostics + secção
+  dual-stack em `pf-enforcement.md`; i18n EN; **GV0 PASS** / BG-078 concluído.
+  Próximo: **12.3** (PF `inet6` scoped — início do controlo). Produção `1.9.0`
+  inalterada.
 - **Trilha IPv6 / passo 12.1 (V0):** ADR-0024 aceite; mapa M-xx + §8; índices;
   `matriz-limitacoes-dpi.md` + unificada (FP-010/REV-018) alinhadas — **GV0.4 PASS**.
   Sem código produto. Próximo: **12.2** (banner GUI). Produção `1.9.0` inalterada.
@@ -13,7 +17,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   ADR-0024; mapa (+ salvaguardas §8); gates GV0–GV7; arranque **único**
   `START-HERE-fecho-producao.md` (sem segundo START-HERE);
   desambiguação vs `test-matrix` §12; backlog BG-078..084.
-  Passo actual: **12.2** (V0). Produção `1.9.0` inalterada até GV7.
+  Passo actual: **12.3** (V1). Produção `1.9.0` inalterada até GV7.
 - **Onda E (passo 6.1):** evidência `20260804T234500Z-ondaE-ce-parity` — veredicto
   **LIMITAÇÃO CE** (VM CE indisponível); ADR-0022; script
   `tests/lab/run-ondaE-ce-parity-appliance.sh`; matriz compatibilidade actualizada.

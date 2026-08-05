@@ -54,12 +54,12 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-16 | `package/.../pf.conf.sample` | Amostra operador | Parcial `inet6` block | Documentar scoped | V0 | BG-078 | DOC |
 | M-17 | `package/.../layer7_policies.php` (+ GUI) | CRUD políticas | Hosts/CIDR v4 | Campos + validação v6 | V4 | BG-082 | CFG |
 | M-18 | `package/.../layer7_exceptions.php` | VIP / excepções | IPv4 | CIDR/host v6 | V4 | BG-082 | CFG |
-| M-19 | `package/.../layer7_diagnostics.php` | Status / avisos | Sem banner v6 | Banner I1 | V0 | BG-078 | DOC |
+| M-19 | `package/.../layer7_diagnostics.php` | Status / avisos | Banner I1 (12.2) | Manter alinhado a ondas | V0 | BG-078 | DOC |
 | M-20 | `tests/functional/test_scoped_pf_inc.php` | Regressão PF scoped | Assert `inet6` anti-quic L234 | Assert scoped `inet6` | V1 | BG-079 | TST |
 | M-21 | `tests/run-local.sh` + unit C | Regressão local | Sem testes v6 | Novos testes V2–V3 | V2–V3 | BG-080–081 | TST |
 | M-22 | `tests/lab/run-f5-smoke-checklist.sh` | Smoke appliance | IPv4 | `run-ipv6-dualstack.sh` (novo) | V6 | BG-084 | TST |
 | M-23 | `docs/09-blocking/matriz-limitacoes-dpi.md` | Limitações DPI | FP-010 disclosed (12.1) | Actualizar por onda | V0–V6 | BG-078 | DOC |
-| M-24 | `docs/05-daemon/pf-enforcement.md` | SSOT enforcement | Menciona v4 | Secção dual-stack honesta | V0 | BG-078 | DOC |
+| M-24 | `docs/05-daemon/pf-enforcement.md` | SSOT enforcement | Secção dual-stack (12.2) | Actualizar com V1+ | V0 | BG-078 | DOC |
 | M-25 | `docs/04-package/validacao-lab.md` | Roteiro lab | Sem secção v6 | Nova secção §21 dual-stack | V6 | BG-084 | DOC |
 
 ---

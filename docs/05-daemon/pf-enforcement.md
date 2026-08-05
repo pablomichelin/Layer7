@@ -26,6 +26,28 @@ O enforcement atual do produto já faz:
   geradora de regras no ciclo oficial do filtro do pfSense;
 - reload do filtro oficial no install/deinstall do pacote.
 
+### IPv6 / dual-stack (honestidade — ADR-0024)
+
+**Estado em `1.9.0`:** o pipeline de classificação (captura nDPI) e a
+decisão/enforcement **scoped** são **IPv4-only** (FP-010 / AUD-007 /
+REV-018). Tráfego IPv6 **não** é classificado pelo daemon e **não** entra
+nas tabelas `layer7_pdst_*` / `layer7_psrc_*` / allowlist.
+
+| Camada | IPv4 | IPv6 hoje |
+|--------|------|-----------|
+| Captura / nDPI | Sim | Não (`ip_v != 4`) |
+| PF scoped (`pdst`/`psrc`/…) | `inet` | Só `inet` — bypass v6 em `scoped_hybrid` |
+| PF global `layer7_block*` | Sim | Regras `inet6` existem; tabelas só recebem v4 |
+| Anti-DoT / anti-QUIC | `inet`+`inet6` | Sim (PF) |
+| DNS forçado / block page (`rdr`) | `inet` | Não (onda V5 / gate humano) |
+
+**Não afirmar** «dual-stack completo» até **GV7**. Banner de disclosure na
+GUI Diagnostics (passo 12.2 / I1). Trilha de activação:
+[`../02-roadmap/plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md);
+mapa código:
+[`../01-architecture/f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md);
+ADR-0024.
+
 O enforcement total do produto ainda está em evolução para entregar, de forma
 automática e fechada:
 
