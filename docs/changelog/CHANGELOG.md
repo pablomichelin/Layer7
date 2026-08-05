@@ -2,7 +2,7 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
-## [Unreleased] — Allowlist inet6 + residual /tmp (`1.9.10`)
+## [1.9.10] — 2026-08-05
 
 ### Fixed
 
@@ -14,8 +14,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Candidato até build FreeBSD + smoke + release `v1.9.10`.
-- Produção enforce permanece `1.9.8` até GO; `latest` avançará para `1.9.10`.
+- Canal `latest`: **`1.9.10`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `323e3a74dd41eaa31210de47ef94b13e9d5c1ca9c1b5b54b04d2353cf527f2f2`.
+- Rollback lab: `1.9.9`. Smoke appliance: `match inet6` confirmado em `pfctl -sr`.
 
 ## [1.9.9] — 2026-08-05
 

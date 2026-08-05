@@ -35,21 +35,21 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.9` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.9`,
-`SHA256=8ad13256a9b1c4b976e1ecb69bce90d779f212911649ae004daaf033f51219ae`;
-hardening BG-093…099; comandos em
+`1.9.10` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.10`,
+`SHA256=323e3a74dd41eaa31210de47ef94b13e9d5c1ca9c1b5b54b04d2353cf527f2f2`;
+allowlist `match inet6` + residual `/tmp`; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
-ainda nao promovida a `1.9.9` — aguarda GO). Rollback enforce: **`1.9.0`**.
-Rollback lab a partir de `1.9.9`: **`1.9.8`**. Historico: `_69`, `_24`.
+ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
+Rollback lab a partir de `1.9.10`: **`1.9.9`**. Historico: `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
 Trilha IPv6: **FECHADA** (V0–V6; GV7.4 PASS).
 **Congelamento documental das filas:** 
 [`docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
-**Hardening pós-auditoria:** **`1.9.9` publicado** (BG-093…099); smoke lab
-PASS; **não** misturar com Identity+MITM.
+**Hardening:** `1.9.9` (BG-093…099) + `1.9.10` (BG-102 allowlist inet6);
+**não** misturar com Identity+MITM.
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1491,15 +1491,15 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.9** (SHA256 8ad13256…; hardening BG-093…099)
-- Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção a 1.9.9 **PENDENTE GO**
+- Canal publico latest: **1.9.10** (SHA256 323e3a74…; BG-102 allowlist inet6)
+- Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo 20.2/IM0 (ADRs Aceito + T1/T2); arranque docs/00-overview/START-HERE-identity-mitm.md
-- Hardening auditoria: **1.9.9 publicado** (build+smoke PASS); não misturar com IM1
+- Hardening: **1.9.9** + **1.9.10** publicados; não misturar com IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: GO promoção enforce 1.9.9 **ou** Identity+MITM 20.2; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: GO promoção enforce 1.9.10 **ou** Identity+MITM 20.2; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
@@ -1512,11 +1512,11 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.9`**
-  publicado em `pablomichelin/Layer7` tag `v1.9.9`
-  (`SHA256=8ad13256a9b1c4b976e1ecb69bce90d779f212911649ae004daaf033f51219ae`).
+- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.10`**
+  publicado em `pablomichelin/Layer7` tag `v1.9.10`
+  (`SHA256=323e3a74dd41eaa31210de47ef94b13e9d5c1ca9c1b5b54b04d2353cf527f2f2`).
 - A referencia de **producao enforce** e **`1.9.8`** (GV7.4 PASS `2026-08-05`;
-  evidência `20260805T150500Z-gv7.4-promocao-1.9.8`). Promoção a `1.9.9`
+  evidência `20260805T150500Z-gv7.4-promocao-1.9.8`). Promoção a `1.9.10`
   **PENDENTE** GO humano.
   Rollback imediato: **`v1.9.0`**. Historico: `v1.8.11_69`, `v1.8.11_24`.
   Trilha IPv6: **FECHADA (V0–V6)** — dual-stack comercial no âmbito documentado.
