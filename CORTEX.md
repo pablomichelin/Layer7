@@ -1266,13 +1266,16 @@ TRILHA IPv6 — progresso
 - Passo actual: **12.10 CONCLUÍDO** — DNS force dual-stack (`rdr inet6` + AAAA); candidato **1.9.7**
 - Trilha: núcleo FECHADO; V5 parcial (12.10 done; 12.11 pendente)
 - Passo 12.1–12.9: CONCLUÍDOS (V0–V4)
-- Passo 12.10: CONCLUÍDO — GO Opção A ADR-0024; AF-split; portal_ipv6; Unbound AAAA
+- Passo 12.10: CONCLUÍDO — GO Opção A ADR-0024; AF-split; portal_ipv6; Unbound AAAA;
+  smoke appliance **PASS** (`20260805T140400Z-gv5-12.10-smoke-1.9.7`; inet6 rdr ao vivo; NDP OK;
+  AAAA half-open sem portal_ipv6)
 - Passo 12.11: PENDENTE — HTTP/HTTPS rdr inet6 + VIP ACL v6
 - Passo 12.12–12.13: CONCLUÍDOS (GV6/GV7 documental)
+- Appliance (`192.168.100.254`): **1.9.7** instalado (lab); enforce/`force_dns` preservados
 - Candidato lab / `latest`: **1.9.7**
 - Produção enforce: **1.9.0** (inalterada — GV7.4 PENDENTE)
 - Versionamento: série patch `1.9.0` → … → `1.9.7` (`PORTREVISION=0`)
-- GV5: **PARCIAL** (DNS :53 inet6 PASS código; HTTP/VIP = 12.11)
+- GV5: **PARCIAL** (DNS :53 inet6 **PASS appliance** `1.9.7`; HTTP/VIP = 12.11)
 - I7: parcial (DNS force v6 feito; block page/VIP HTTP ainda exclusão até 12.11)
 - BG-083: **parcial** (12.10 done; 12.11 pendente)
 - Trabalho residual autorizado: **12.11** com GO **ou** promoção enforce com GO

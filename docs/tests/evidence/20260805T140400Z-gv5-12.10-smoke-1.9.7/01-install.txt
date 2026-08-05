@@ -1,0 +1,56 @@
+=== install 1.9.7 ===
+pfSense-pkg-layer7-1.9.7.pkg                          2391 kB   11 MBps    01s
+pfSense-pkg-layer7-1.9.7.pkg.sha256                     65  B  466 kBps    00s
+actual=4a00b40226fb0d92d974c3156d0c6881aa07fde2fe96e8d1821548157cd4fb50
+expect=4a00b40226fb0d92d974c3156d0c6881aa07fde2fe96e8d1821548157cd4fb50
+Installing pfSense-pkg-layer7-1.9.7...
+pkg: wrong architecture: FreeBSD:15:amd64 instead of FreeBSD:16:amd64
+package pfSense-pkg-layer7 is already installed, forced install
+Extracting pfSense-pkg-layer7-1.9.7: ......... done
+Saving updated package information...
+overwrite!
+Loading package configuration... done.
+Configuring package components...
+Loading package instructions...
+Custom commands...
+Executing custom_php_resync_config_command()...done.
+Menu items... done.
+Services... done.
+Writing configuration... done.
+
+=== Layer7 instalado com sucesso ===
+  Versão:  1.9.7
+  Config:  /usr/local/etc/layer7.json
+  GUI:     Services > Layer 7
+
+  O pacote inicia em modo MONITOR (seguro).
+  Acesse a GUI para configurar interfaces e políticas.
+
+1.9.7
+pfSense-pkg-layer7-1.9.7
+Name           : pfSense-pkg-layer7
+Version        : 1.9.7
+Installed on   : Wed Aug  5 11:04:24 2026 -03
+Origin         : sysutils/pfSense-pkg-layer7
+Architecture   : FreeBSD:15:amd64
+Prefix         : /usr/local
+Categories     : sysutils
+Licenses       : EULA
+Maintainer     : contato@systemup.inf.br
+WWW            : https://github.com/pablomichelin/pfsense-layer7
+Comment        : Layer 7 for pfSense CE by Systemup (www.systemup.inf.br)
+Shared Libs required:
+	libc.so.7
+	libm.so.5
+	libpcap.so.8
+	libthr.so.3
+Annotations    :
+	FreeBSD_version: 1500068
+Flat size      : 7.62MiB
+Description    :
+Layer 7 traffic classification and policy package for pfSense CE.
+
+WIP: port builds layer7d (C) from src; XML/PHP/rc.d in repo. Lab validation
+required before claiming install/GUI/service OK — see repo docs/04-package/.
+
+WWW: https://github.com/pablomichelin/pfsense-layer7

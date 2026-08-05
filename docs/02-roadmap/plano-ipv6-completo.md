@@ -250,6 +250,7 @@ TRILHA IPv6 — progresso
 
 ## 10. Histórico
 
+| 2026-08-05 | **Smoke 12.10 appliance PASS** (`1.9.7`): `20260805T140400Z-gv5-12.10-smoke-1.9.7`; `rdr inet6` domain ao vivo (4+4); NDP OK; AAAA half-open sem portal_ipv6; produção enforce `1.9.0` |
 | 2026-08-05 | **12.10 CONCLUÍDO** (GO Opção A): `rdr inet6` DNS force (blacklist + block_page); AF-split CIDR; `portal_ipv6` + Unbound `IN AAAA`; banner Diagnostics; `test_dns_force_inet6.php`; candidato **1.9.7**; HTTP/VIP = 12.11; produção `1.9.0` |
 | 2026-08-05 | **12.13 / GV7 PASS (fecho documental):** trilha **FECHADA (núcleo dual-stack)**; evidência `20260805T133000Z-gv7-fecho`; I1–I6+I8 PASS; I7 exclusão temp.; release `1.9.6` já publicada; **sem** promoção enforce (GV7.4 PENDENTE); residual = 12.10/V5 ou GO promoção |
 | 2026-08-05 | **GV6 PASS** (`1.9.6`): `validacao-lab` §21 + `tests/lab/run-ipv6-dualstack.sh`; evidência `20260805T130620Z-gv6-dualstack`; A/B dual-stack; pdst A+AAAA; V5 continua Opção B; próximo GV7 ou 12.10 com GO |

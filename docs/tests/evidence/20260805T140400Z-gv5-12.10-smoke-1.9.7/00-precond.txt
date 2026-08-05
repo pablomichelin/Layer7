@@ -1,0 +1,39 @@
+=== 00-precond ===
+20260805T140420Z
+pfSense-pkg-layer7-1.9.6
+Name           : pfSense-pkg-layer7
+Version        : 1.9.6
+Installed on   : Wed Aug  5 09:20:34 2026 -03
+Origin         : sysutils/pfSense-pkg-layer7
+Architecture   : FreeBSD:15:amd64
+Prefix         : /usr/local
+Categories     : sysutils
+Licenses       : EULA
+Maintainer     : contato@systemup.inf.br
+WWW            : https://github.com/pablomichelin/pfsense-layer7
+Comment        : Layer 7 for pfSense CE by Systemup (www.systemup.inf.br)
+Shared Libs required:
+	libc.so.7
+	libm.so.5
+	libpcap.so.8
+	libthr.so.3
+Annotations    :
+	FreeBSD_version: 1500068
+Flat size      : 7.61MiB
+Description    :
+Layer 7 traffic classification and policy package for pfSense CE.
+
+WIP: port builds layer7d (C) from src; XML/PHP/rc.d in repo. Lab validation
+required before claiming install/GUI/service OK — see repo docs/04-package/.
+
+WWW: https://github.com/pablomichelin/pfsense-layer7
+1.9.6
+enabled=1 mode=enforce
+bp=1 force_dns=1
+--- NAT before ---
+rdr on vmx0 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+--- NDP count before ---
+      64

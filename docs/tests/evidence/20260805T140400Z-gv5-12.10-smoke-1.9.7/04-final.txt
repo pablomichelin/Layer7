@@ -1,0 +1,15 @@
+20260805T140609Z
+1.9.7
+rdr on vmx0 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet6 proto udp from any to ! ::1 port = domain -> ::1
+rdr on vmx0 inet6 proto tcp from any to ! ::1 port = domain -> ::1
+rdr on vmx0.95 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet6 proto udp from any to ! ::1 port = domain -> ::1
+rdr on vmx0.95 inet6 proto tcp from any to ! ::1 port = domain -> ::1
+inet=4
+inet6=4
+1 packets transmitted, 1 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 4.145/4.145/4.145/0.000 ms
+ndp=64

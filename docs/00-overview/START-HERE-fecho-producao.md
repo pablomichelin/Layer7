@@ -24,11 +24,11 @@ docs/00-overview/START-HERE-fecho-producao.md
 | **Passo residual autorizado** | **12.11** com GO **ou** promoção enforce com GO |
 | **BG residual** | BG-083 parcial (12.11); BG-084 concluído |
 | Produção enforce | **`1.9.0`** (inalterada — GV7.4 PENDENTE) |
-| Candidato lab / `latest` | **`1.9.7`** (DNS `rdr inet6` / AAAA) |
+| Candidato lab / `latest` | **`1.9.7`** no appliance (smoke PASS); SHA256 `4a00b402…` |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 — **GO Opção A** 12.10; 12.11 pendente |
-| Ressalva | Block page HTTP + VIP Unbound ACL ainda IPv4-only (12.11) |
-| Última evidência GV | GV7 fecho; 12.10 código em `1.9.7` |
+| Ressalva | Block page HTTP + VIP Unbound ACL ainda IPv4-only (12.11); AAAA half-open sem portal_ipv6 |
+| Última evidência GV | `20260805T140400Z-gv5-12.10-smoke-1.9.7` — **GV5.2 PASS** |
 | F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
 
 ### Desambiguação — «12.x»
