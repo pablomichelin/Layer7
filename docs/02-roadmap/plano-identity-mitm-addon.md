@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-05c`; **IM0 fechado**; **20.3–20.5 PASS**; passo actual **20.6**)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-05c`; **IM0+IM1 fechados / GI1 PASS**; passo actual **20.7**)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
@@ -18,17 +18,16 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.6** (IM1 — compat + check-in ∩ `.lic` + GI1) |
-| Código | 20.3–20.5 PASS; sem runtime Identity/MITM |
-| ADRs | **Aceito** ×4 (`2026-08-05`); transição legado **T1** |
-| Próximo após 20.6 / GI1 | IM2 spike 20.7 **ou** caminho Identity IM3 |
+| Passo actual | **20.7** (IM2 — spike MITM GO/NO-GO S1–S8) |
+| Código | IM1 completo (entitlements); sem MITM/Identity runtime |
+| ADRs | **Aceito** ×4; T1 |
+| Próximo | 20.7a DEFER **ou** 20.8+ se GO; Identity IM3 pode avançar se DEFER |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.6 / IM1
-- IM0: 20.1–20.2 PASS
-- IM1: 20.3–20.5 PASS; 20.6 PENDENTE
-- IM2–IM9: PENDENTE
+- Passo actual: 20.7 / IM2
+- IM0+IM1: PASS (GI0+GI1)
+- IM2: 20.7 PENDENTE
 - Baseline: 1.9.8
 ```
 
@@ -477,6 +476,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-05 | **rev. `c`** — contratos técnicos fechados: ADR-0028 (concorrência daemon) criado; contrato `features` P1–P6; precedência check-in vs `.lic` (interseção); §3.1 reconciliado com first-match; critérios S1–S8 do spike MITM; canal agente DC A1–A7; conflito NAT `multi-user`; cold start; limites de escala; passo 20.11a; riscos R17–R20; código ainda não iniciado |
 | 2026-08-05 | **20.2 PASS** — ADRs 0025/0026/0027/0028 Aceito; transição legado **T1**; GI0 PASS; passo actual → **20.3** (IM1) |
 | 2026-08-05 | **20.3 PASS** — `features.c`/`features.h` (ADR-0025 P1–P6 + T1); integração em `license_check`; `test_features_parse.c` PASS; passo actual → **20.4** |
+| 2026-08-05 | **20.4–20.6 PASS / GI1 PASS** — LS SKU, GUI upsell, check-in ∩ features; passo actual → **20.7** |
 
 ---
 

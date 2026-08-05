@@ -41,7 +41,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 |----|------------|------|--------|-------|-------|
 | M-01 | Contrato `features` CSV | IM1 | **20.3 PASS** | LIC/DMN | ADR-0025; `features.c` |
 | M-02 | License-server emissão SKU | IM1 | **20.4 PASS** | LIC | P1 + T1 + UI presets |
-| M-03 | Gate daemon entitlements | IM1 | Planeado | DMN | autoridade |
+| M-03 | Gate daemon entitlements | IM1 | **20.6 PASS** | DMN | intersect + allows_* |
 | M-04 | Gate GUI upsell | IM1 | **20.5 PASS** | GUI | páginas Identity/MITM |
 | M-05 | CA store + geração/import | IM2 | Condicional | PKG/OPS | só se spike GO |
 | M-06 | Export trust (PEM) para GPO | IM2 | Condicional | GUI/OPS | |
@@ -142,3 +142,4 @@ Policy ad_* → IPs do mapa → enforce PF
 | 2026-08-05 | **20.3** — M-01 PASS (`features.c` P1–P6 + T1; testes C) |
 | 2026-08-05 | **20.4** — M-02 PASS (license-server normalizeFeatures + UI SKU) |
 | 2026-08-05 | **20.5** — M-04 PASS (GUI upsell Identity/MITM) |
+| 2026-08-05 | **20.6** — M-03 PASS + GI1 (check-in ∩ features) |

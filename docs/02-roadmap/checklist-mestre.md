@@ -406,8 +406,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ### IM1–IM9
 
-- [ ] IM1 Entitlements (GI1) — BG-086 — **20.3–20.5 PASS**; passo actual **20.6**
-- [ ] IM2 MITM + CA (GI2–GI3) — BG-087
+- [x] IM1 Entitlements (GI1) — BG-086 — **20.3–20.6 PASS**
+- [ ] IM2 spike MITM (20.7) + CA (GI2–GI3) — BG-087 — **passo actual**
 - [ ] IM3–IM4 Map + LDAP (GI4–GI5) — BG-088
 - [ ] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089
 - [ ] IM6 Políticas user/grupo (GI7) — BG-090
