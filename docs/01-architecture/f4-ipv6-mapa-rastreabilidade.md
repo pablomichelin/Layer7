@@ -46,8 +46,8 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-09 | `src/layer7d/blacklist.c` | Sinkhole / bl tables | Orientado A records | AAAA: tabelas v6 em V3; `rdr`/sinkhole só V5 ou limite ADR | V3–V5 | BG-081/083 | ENF |
 
 | M-10 | `src/layer7d/config_parse.c` | JSON runtime | Sem tipo IP explícito | Validar hosts v6 no parse | V4 | BG-082 | CFG |
-| M-11 | `package/.../layer7.inc` | Geração regras PF | Global `inet6` OK; scoped `inet` only L987+ | REV-018 | V1 | BG-079 | PF |
-| M-12 | `package/.../layer7.inc` | `layer7_ipv4_valid`, `layer7_cidr_valid` | IPv4 only L3130+ | `layer7_ipv6_valid`, CIDR v6 | V4 | BG-082 | CFG |
+| M-11 | `package/.../layer7.inc` | Geração regras PF | Scoped `inet`+`inet6` (12.3) | GV1.3 appliance | V1 | BG-079 | PF |
+| M-12 | `package/.../layer7.inc` | validadores IP/CIDR | + `ipv6_valid` / `cidr6_valid` (12.3) | GUI completa = V4 | V1/V4 | BG-079/082 | CFG |
 | M-13 | `package/.../layer7.inc` | `layer7_generate_rdr_rules_*` | `rdr ... inet` L317+ | `inet6` ou ADR exclusão | V5 | BG-083 | NAT |
 | M-14 | `package/.../layer7.inc` | VIP DNS / Unbound view | IPv4 | DHCPv6/VIP v6 | V5 | BG-083 | NAT |
 | M-15 | `package/.../layer7-pfctl` | Snippet PF helper | `inet6` block global | Alinhar com V1 scoped | V1 | BG-079 | PF |
@@ -55,11 +55,11 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-17 | `package/.../layer7_policies.php` (+ GUI) | CRUD políticas | Hosts/CIDR v4 | Campos + validação v6 | V4 | BG-082 | CFG |
 | M-18 | `package/.../layer7_exceptions.php` | VIP / excepções | IPv4 | CIDR/host v6 | V4 | BG-082 | CFG |
 | M-19 | `package/.../layer7_diagnostics.php` | Status / avisos | Banner I1 (12.2) | Manter alinhado a ondas | V0 | BG-078 | DOC |
-| M-20 | `tests/functional/test_scoped_pf_inc.php` | Regressão PF scoped | Assert `inet6` anti-quic L234 | Assert scoped `inet6` | V1 | BG-079 | TST |
+| M-20 | `tests/functional/test_scoped_pf_inc.php` | Regressão PF scoped | Assert scoped `inet6` (12.3 PASS) | Manter | V1 | BG-079 | TST |
 | M-21 | `tests/run-local.sh` + unit C | Regressão local | Sem testes v6 | Novos testes V2–V3 | V2–V3 | BG-080–081 | TST |
 | M-22 | `tests/lab/run-f5-smoke-checklist.sh` | Smoke appliance | IPv4 | `run-ipv6-dualstack.sh` (novo) | V6 | BG-084 | TST |
 | M-23 | `docs/09-blocking/matriz-limitacoes-dpi.md` | Limitações DPI | FP-010 disclosed (12.1) | Actualizar por onda | V0–V6 | BG-078 | DOC |
-| M-24 | `docs/05-daemon/pf-enforcement.md` | SSOT enforcement | Secção dual-stack (12.2) | Actualizar com V1+ | V0 | BG-078 | DOC |
+| M-24 | `docs/05-daemon/pf-enforcement.md` | SSOT enforcement | Dual-stack + V1 (12.2–12.3) | Actualizar com V2+ | V0–V1 | BG-078/079 | DOC |
 | M-25 | `docs/04-package/validacao-lab.md` | Roteiro lab | Sem secção v6 | Nova secção §21 dual-stack | V6 | BG-084 | DOC |
 
 ---
@@ -94,7 +94,7 @@ Cliente ──IPv4──► Layer7 OK
 | Ref | Severidade | Descrição | Fecho |
 |-----|------------|-----------|-------|
 | FP-010 | Alta | Pipeline capture/enforce IPv4-only | **V2–V3 + GV3–GV4** (não só V2) |
-| REV-018 | Alta | Scoped PF só `inet` | V1 + GV1 |
+| REV-018 | Alta | Scoped PF só `inet` | **FECHADO** V1 / 12.3 (`inet`+`inet6`) |
 | AUD-007 | Alta | Limitação arquitectural captura | V2 |
 | matriz-limitacoes §6 | Claim | “Dual-stack” seria falso | V0 I1 |
 

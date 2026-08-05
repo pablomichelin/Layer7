@@ -887,6 +887,52 @@ function layer7_pf_managed_dynamic_tables_text($data, $bl_config = null)
 	    implode("\n", $lines) . "\n";
 }
 
+/**
+ * Emite uma regra PF para inet e inet6 (paridade REV-018 / passo 12.3).
+ * Ordem: <action> [on <if>] <family> <body> — alinhado a FP-018.
+ *
+ * @param string $action Ex.: "block drop quick" ou "match"
+ * @param string $body Corpo após a família
+ * @param string|null $iface Nome PF da interface ou null
+ * @return string
+ */
+function layer7_pf_inet46_rules($action, $body, $iface = null)
+{
+	$out = "";
+	foreach (array("inet", "inet6") as $af) {
+		$out .= layer7_pf_family_rule($action, $body, $af, $iface);
+	}
+	return $out;
+}
+
+/**
+ * @param string $action
+ * @param string $body
+ * @param string $af "inet" ou "inet6"
+ * @param string|null $iface
+ * @return string
+ */
+function layer7_pf_family_rule($action, $body, $af, $iface = null)
+{
+	$on = ($iface === null || $iface === "") ? "" : "on {$iface} ";
+	return trim($action) . " " . $on . $af . " " . trim($body) . "\n";
+}
+
+/**
+ * Família PF para um endereço ou CIDR (host/prefix).
+ * @return string|null "inet", "inet6" ou null se inválido
+ */
+function layer7_pf_addr_family($s)
+{
+	if (layer7_ipv4_valid($s) || layer7_cidr_valid($s)) {
+		return "inet";
+	}
+	if (layer7_ipv6_valid($s) || layer7_cidr6_valid($s)) {
+		return "inet6";
+	}
+	return null;
+}
+
 function layer7_policy_allow_rules_text($data)
 {
 	if (!layer7_pf_should_enforce($data)) {
@@ -905,13 +951,26 @@ function layer7_policy_allow_rules_text($data)
 		}
 		$ifaces = empty($m["interfaces"]) ? array(null) :
 		    $m["interfaces"];
+		$label = "label \"layer7:pallow:{$pid}\"";
 		foreach ($ifaces as $iface) {
-			$on = ($iface === null) ? "" : "on {$iface} ";
 			foreach ($sources as $source) {
-				$from = ($source === null) ? "" : "from {$source} ";
-				$rules .= "match {$on}inet {$from}" .
-				    "to <layer7_pallow_{$idx}> " .
-				    "tag L7ALLOW label \"layer7:pallow:{$pid}\"\n";
+				if ($source === null) {
+					$rules .= layer7_pf_inet46_rules(
+					    "match",
+					    "to <layer7_pallow_{$idx}> tag L7ALLOW {$label}",
+					    $iface);
+					continue;
+				}
+				$af = layer7_pf_addr_family($source);
+				if ($af === null) {
+					continue;
+				}
+				$rules .= layer7_pf_family_rule(
+				    "match",
+				    "from {$source} to <layer7_pallow_{$idx}> " .
+					"tag L7ALLOW {$label}",
+				    $af,
+				    $iface);
 			}
 		}
 	}
@@ -932,11 +991,14 @@ function layer7_exception_allow_rules_text($data, $bl_config = null)
 		$eid = ($eid === "") ? "e{$idx}" : $eid;
 		$ifaces = empty($m["interfaces"]) ? array(null) :
 		    $m["interfaces"];
+		$label = "label \"layer7:exc-allow:{$eid}\"";
 		foreach ($ifaces as $iface) {
-			$on = ($iface === null) ? "" : "on {$iface} ";
-			$rules .= "match {$on}inet " .
+			/* Tabela pode receber v4 e v6 (V3+); paridade agora. */
+			$rules .= layer7_pf_inet46_rules(
+			    "match",
 			    "from <layer7_exc_allow_{$idx}> to !<localsubnets> " .
-			    "tag L7ALLOW label \"layer7:exc-allow:{$eid}\"\n";
+				"tag L7ALLOW {$label}",
+			    $iface);
 		}
 	}
 	return $rules;
@@ -945,6 +1007,8 @@ function layer7_exception_allow_rules_text($data, $bl_config = null)
 /**
  * Regras e tabelas PF escopadas por politica (Caminho B / E2).
  * So em scoped_hybrid + enforce; legacy_global permanece inalterado.
+ * Passo 12.3 / REV-018: pares inet/inet6 nas regras sem endereço L3 fixo;
+ * hosts/CIDRs IPv4 ficam só em inet; IPv6 (quando validos) só em inet6.
  */
 function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 {
@@ -977,29 +1041,40 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 			 * quando o pacote chega ao block (ADR-0019). */
 			if (!empty($m["exclude_hosts"]) ||
 			    !empty($m["exclude_cidrs"])) {
-				$rules .= "match inet from <layer7_pexc_{$idx}> " .
-				    "to <layer7_pdst_{$idx}> tag L7ALLOW " .
-				    "label \"layer7:pexc:{$pid}\"\n";
+				$rules .= layer7_pf_inet46_rules(
+				    "match",
+				    "from <layer7_pexc_{$idx}> " .
+					"to <layer7_pdst_{$idx}> tag L7ALLOW " .
+					"label \"layer7:pexc:{$pid}\"");
 			}
 			if ($has_src) {
 				foreach ($m["src_hosts"] as $sh) {
-					if (layer7_ipv4_valid($sh)) {
-						$rules .= "block drop quick inet from {$sh} " .
-						    "to <{$tbl}> ! tagged L7ALLOW " .
-						    "label \"layer7:pdst:{$pid}\"\n";
+					$af = layer7_pf_addr_family($sh);
+					if ($af === null) {
+						continue;
 					}
+					$rules .= layer7_pf_family_rule(
+					    "block drop quick",
+					    "from {$sh} to <{$tbl}> ! tagged L7ALLOW " .
+						"label \"layer7:pdst:{$pid}\"",
+					    $af);
 				}
 				foreach ($m["src_cidrs"] as $sc) {
-					if (layer7_cidr_valid($sc) || layer7_ipv4_valid($sc)) {
-						$rules .= "block drop quick inet from {$sc} " .
-						    "to <{$tbl}> ! tagged L7ALLOW " .
-						    "label \"layer7:pdst:{$pid}\"\n";
+					$af = layer7_pf_addr_family($sc);
+					if ($af === null) {
+						continue;
 					}
+					$rules .= layer7_pf_family_rule(
+					    "block drop quick",
+					    "from {$sc} to <{$tbl}> ! tagged L7ALLOW " .
+						"label \"layer7:pdst:{$pid}\"",
+					    $af);
 				}
 			} elseif ($scope_global) {
-				$rules .= "block drop quick inet to <{$tbl}> " .
-				    "! tagged L7ALLOW " .
-				    "label \"layer7:pdst:{$pid}:global\"\n";
+				$rules .= layer7_pf_inet46_rules(
+				    "block drop quick",
+				    "to <{$tbl}> ! tagged L7ALLOW " .
+					"label \"layer7:pdst:{$pid}:global\"");
 			}
 		}
 
@@ -1007,9 +1082,13 @@ function layer7_policy_enforcement_rules_text($data, $include_tables = true)
 			$tbl = "layer7_psrc_" . $idx;
 			$tables .= "table <{$tbl}> persist\n";
 			if ($has_src || $scope_global || $quarantine_origin) {
-				$rules .= "block drop quick inet from <{$tbl}> " .
-				    "to !<localsubnets> ! tagged L7ALLOW " .
-				    "label \"layer7:psrc:{$pid}\"\n";
+				/* !<localsubnets> cobre prefixos locais v4/v6 do
+				 * pfSense (S-02). Nao bloqueia ICMPv6 NDP (S-01):
+				 * so trafego from tabela de quarentena. */
+				$rules .= layer7_pf_inet46_rules(
+				    "block drop quick",
+				    "from <{$tbl}> to !<localsubnets> ! tagged L7ALLOW " .
+					"label \"layer7:psrc:{$pid}\"");
 			}
 		}
 	}
@@ -3143,6 +3222,40 @@ function layer7_ipv4_valid($s)
 	return true;
 }
 
+/**
+ * IPv6 unicast utilizável em regras/tabelas de política (passo 12.3+).
+ * Rejeita ::1, link-local fe80::/10 e multicast ff00::/8 (S-03).
+ * Usa inet_pton (sem filter_var — nem todos os PHP do lab têm ext/filter).
+ */
+function layer7_ipv6_valid($s)
+{
+	if (!is_string($s) || $s === "" || strlen($s) > 64) {
+		return false;
+	}
+	/* Rejeitar IPv4-mapped e lixo com ponto. */
+	if (strpos($s, ".") !== false) {
+		return false;
+	}
+	$packed = @inet_pton($s);
+	if ($packed === false || strlen($packed) !== 16) {
+		return false;
+	}
+	/* ::1 */
+	if ($packed === str_repeat("\0", 15) . "\1") {
+		return false;
+	}
+	$b0 = ord($packed[0]);
+	/* fe80::/10 */
+	if ($b0 === 0xfe && (ord($packed[1]) & 0xc0) === 0x80) {
+		return false;
+	}
+	/* ff00::/8 */
+	if ($b0 === 0xff) {
+		return false;
+	}
+	return true;
+}
+
 /* CIDR a.b.c.d/n (n 0-32, octetos 0-255) */
 function layer7_cidr_valid($s)
 {
@@ -3160,6 +3273,30 @@ function layer7_cidr_valid($s)
 	$n = (int)$m[5];
 	/* Rejeita 0.0.0.0/0 — allowlist aberta demais para PF. */
 	return $n >= 1 && $n <= 32;
+}
+
+/**
+ * CIDR IPv6 addr/prefix (1–128). Rejeita ::/0 e prefixos especiais S-03.
+ */
+function layer7_cidr6_valid($s)
+{
+	if (!is_string($s) || $s === "" || strlen($s) > 80) {
+		return false;
+	}
+	$pos = strrpos($s, "/");
+	if ($pos === false) {
+		return false;
+	}
+	$addr = substr($s, 0, $pos);
+	$pfx = substr($s, $pos + 1);
+	if (!preg_match('/^\d+$/', $pfx)) {
+		return false;
+	}
+	$n = (int)$pfx;
+	if ($n < 1 || $n > 128) {
+		return false;
+	}
+	return layer7_ipv6_valid($addr);
 }
 
 /** IPv4 pertence a CIDR ou coincide com host unico. */

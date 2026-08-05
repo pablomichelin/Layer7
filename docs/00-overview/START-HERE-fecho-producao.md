@@ -10,7 +10,7 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Trilha | Estado | SSOT de execução |
 |--------|--------|------------------|
 | Fecho produção P0–J | **FECHADO** (`1.9.0`, `2026-08-05`) | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) (histórico) |
-| **IPv6 completo V0–V6** | **ABERTA** — passo **12.3** (V1) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
+| **IPv6 completo V0–V6** | **ABERTA** — passo **12.4** (V2) | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
 
 **Não criar** outros ficheiros `START-HERE-*.md` para esta fila — este é o único.
 
@@ -21,13 +21,13 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Campo | Valor |
 |-------|-------|
 | **Trilha activa** | **IPv6** — Ondas V0–V6 |
-| **Passo autorizado** | **12.3** (Onda V1 — PF `inet6` scoped / REV-018) |
-| **BG activo** | BG-079 (V1); BG-078 V0 concluído |
+| **Passo autorizado** | **12.4** (Onda V2 — captura IPv6 / `capture.c`) |
+| **BG activo** | BG-080 (V2); BG-079 V1 código concluído |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
-| Candidato lab | `1.9.0` (+ PORTREVISION por onda) |
+| Candidato lab | **`1.9.0_1`** (build/release pendente) |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 **publicado e aceite** (implementação por ondas) |
-| Próximo gate | **GV1** (paridade PF scoped `inet6` + salvaguardas NDP) |
+| Próximo gate | **GV1.3** appliance + **GV2** captura |
 | F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
 
 ### Desambiguação obrigatória — «12.x»
@@ -40,9 +40,8 @@ mestre após 11.1).
 
 | Referência | Significado |
 |------------|-------------|
-| Passo **12.1** | Trilha IPv6 V0 — **concluído** |
-| Passo **12.2** | Banner GUI + `pf-enforcement.md` — **concluído** (GV0) |
-| Passo **12.3** (autorizado) | Paridade PF `inet6` scoped (REV-018) — **V1 / controlo** |
+| Passo **12.3** | PF `inet6` scoped (REV-018) — **concluído** (código; GV1 appliance parcial) |
+| Passo **12.4** (autorizado) | Captura IPv6 (`capture.c` + flow key) — **V2** |
 | test-matrix **12.1 / 12.2** | Blacklists UT1 (F4.2) — **outra coisa** |
 
 Mensagens de commit da trilha: `trilha-ipv6/12.x: …`
@@ -105,7 +104,7 @@ Leitura obrigatória (nesta ordem):
 7. docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md
 
 Regras absolutas:
-- Executar SOMENTE o passo 12.x autorizado no CORTEX (agora: 12.3).
+- Executar SOMENTE o passo 12.x autorizado no CORTEX (agora: 12.4).
 - Não confundir passo 12.x da trilha IPv6 com test-matrix §12 (blacklists F4.2).
 - Não reabrir Ondas P0–J do fecho; produção enforce permanece 1.9.0 até GV7.
 - Não regressão IPv4: run-local.sh (+ smoke IPv4) quando houver código.
@@ -118,10 +117,10 @@ Regras absolutas:
 
 Estado (confirmar no repo):
 - Branch: main
-- Passo actual: 12.3
-- Onda: V1
-- BG: BG-079
-- Candidato lab: 1.9.0
+- Passo actual: 12.4
+- Onda: V2
+- BG: BG-080
+- Candidato lab: 1.9.0_1
 - Produção enforce: 1.9.0
 - Rollback imediato: 1.8.11_69
 
@@ -189,7 +188,8 @@ Responde em português.
 |-------|------|-----------|
 | **12.1** | V0 | ADR/índices/matriz/mapa vivo — **CONCLUÍDO** |
 | **12.2** | V0 | Banner GUI Diagnostics + `pf-enforcement.md` — **CONCLUÍDO** (GV0) |
-| **12.3** | V1 | Paridade PF `inet6` scoped (REV-018) — **actual** |
+| **12.3** | V1 | Paridade PF `inet6` scoped (REV-018) — **CONCLUÍDO** (código) |
+| **12.4** | V2 | Captura IPv6 (`capture.c`) — **actual** |
 | 12.4–12.5 | V2 | Captura + nDPI IPv6 |
 | 12.6–12.8 | V3 | Policy / enforce / allowlist v6 |
 | 12.9 | V4 | GUI + validação IPv6 |

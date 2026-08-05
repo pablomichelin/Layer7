@@ -1255,17 +1255,19 @@ Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J nem altera pro
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.3 (Onda V1 — paridade PF inet6 scoped / REV-018)
+- Passo actual: 12.4 (Onda V2 — captura IPv6 / capture.c)
 - Trilha: ABERTA
-- Passo 12.1: CONCLUÍDO (2026-08-04) — ADR-0024, índices, mapa, matriz GV0.4
-- Passo 12.2: CONCLUÍDO (2026-08-04) — banner Diagnostics + pf-enforcement.md; GV0 PASS
-- Candidato lab: 1.9.0 (+ PORTREVISION na onda V1 se .pkg)
+- Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
+- Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
+- Passo 12.3: CONCLUÍDO (2026-08-04) — REV-018 PF inet6 scoped; candidato 1.9.0_1
+- Candidato lab: 1.9.0_1 (PORTREVISION=1; build/release pendente)
 - Produção enforce: 1.9.0 (inalterada até GV7)
-- GV0: PASS (12.1–12.2; confirmação visual appliance no próximo .pkg com GUI)
-- GV1–GV7: PENDENTE
-- I1–I8: I1 disclosure docs+GUI source PASS; resto 0/7
-- BG activos: BG-078 CONCLUÍDO (V0); BG-079..084
-- Próximo passo autorizado: 12.3
+- GV0: PASS
+- GV1: parcial (1.1/1.2/1.4/1.7 PASS local; 1.3 pfctl-nf + 1.5/1.6 appliance PENDENTE)
+- GV2–GV7: PENDENTE
+- I1–I8: I1 PASS; I2 parcial (PF emitido; gate appliance aberto)
+- BG: BG-078/079 done (código); BG-080..084
+- Próximo passo autorizado: 12.4
 ```
 
 ---

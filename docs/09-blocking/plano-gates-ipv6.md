@@ -40,13 +40,13 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV1.1 | `layer7_policy_enforcement_rules_text` emite `inet6` para pdst/psrc | Diff + `test_scoped_pf_inc.php` | **PENDENTE** |
-| GV1.2 | `pallow` / `pexc` / `exc_allow` com `inet6` | Teste PHP | **PENDENTE** |
-| GV1.3 | `pfctl -nf` PASS com enforce scoped ON | Appliance rules.debug | **PENDENTE** |
-| GV1.4 | REV-018 marcado fechado no mapa | Commit docs | **PENDENTE** |
-| GV1.5 | Desenho NDP/ICMPv6: LAN v6 não parte (sem block indevido a NDP) | Review + smoke | **PENDENTE** |
-| GV1.6 | `localsubnets` (ou equivalente) cobre prefixos locais IPv6 | Review ruleset | **PENDENTE** |
-| GV1.7 | Política de exclusão: não adicionar `fe80::/10`, `ff00::/8`, `::1` a tabelas block | Código/teste | **PENDENTE** |
+| GV1.1 | `layer7_policy_enforcement_rules_text` emite `inet6` para pdst/psrc | Diff + `test_scoped_pf_inc.php` | **PASS** (builder `2026-08-04`) |
+| GV1.2 | `pallow` / `pexc` / `exc_allow` com `inet6` | Teste PHP | **PASS** (builder) |
+| GV1.3 | `pfctl -nf` PASS com enforce scoped ON | Appliance rules.debug | **PENDENTE** (candidato `1.9.0_1`) |
+| GV1.4 | REV-018 marcado fechado no mapa | Commit docs | **PASS** (12.3) |
+| GV1.5 | Desenho NDP/ICMPv6: LAN v6 não parte (sem block indevido a NDP) | Review + smoke | **PASS desenho** (sem block icmp6 genérico); smoke appliance PENDENTE |
+| GV1.6 | `localsubnets` (ou equivalente) cobre prefixos locais IPv6 | Review ruleset | **PENDENTE** appliance dual-stack |
+| GV1.7 | Política de exclusão: não adicionar `fe80::/10`, `ff00::/8`, `::1` a tabelas block | Código/teste | **PASS** validadores `layer7_ipv6_valid` / `cidr6` (S-03); populate daemon = V3 |
 
 ### GV2 — Builder e testes locais (Ondas V2–V4)
 

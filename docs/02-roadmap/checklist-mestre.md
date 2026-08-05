@@ -353,8 +353,9 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ### V1 — PF scoped inet6 (12.3, BG-079)
 
-- [ ] REV-018 fechado no mapa
-- [ ] GV1 PASS (`test_scoped_pf_inc.php` + `pfctl -nf` + salvaguardas NDP/localsubnets)
+- [x] REV-018 fechado no mapa (código + docs)
+- [x] `test_scoped_pf_inc.php` PASS (inet6 pdst/psrc/pallow/pexc/exc_allow)
+- [ ] GV1 completo (`pfctl -nf` + localsubnets IPv6 no appliance)
 
 ### V2–V3 — Daemon (12.4–12.8, BG-080–081)
 

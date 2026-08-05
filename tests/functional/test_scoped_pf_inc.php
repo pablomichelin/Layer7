@@ -50,6 +50,19 @@ if ($scoped === "" ||
 	fwrite(STDERR, $scoped);
 	exit(1);
 }
+/* REV-018 / 12.3: pdst global e tabelas sem host L3 fixo emitem inet+inet6 */
+if (strpos($scoped, "block drop quick inet to <layer7_pdst_1>") === false ||
+    strpos($scoped, "block drop quick inet6 to <layer7_pdst_1>") === false) {
+	fwrite(STDERR, "FAIL: scoped global pdst must emit inet and inet6\n");
+	fwrite(STDERR, $scoped);
+	exit(1);
+}
+/* Host IPv4 na regra: só inet (nao inet6 from 10.0.0.10) */
+if (strpos($scoped, "inet6 from 10.0.0.10") !== false) {
+	fwrite(STDERR, "FAIL: IPv4 source must not appear in inet6 rule\n");
+	fwrite(STDERR, $scoped);
+	exit(1);
+}
 
 $legacy = array(
 	"layer7" => array(
@@ -93,6 +106,14 @@ $quarantine_rules = layer7_policy_enforcement_rules_text($quarantine);
 if (strpos($quarantine_rules, "table <layer7_psrc_0> persist") === false ||
     strpos($quarantine_rules, "from <layer7_psrc_0> to !<localsubnets>") === false) {
 	fwrite(STDERR, "FAIL: quarantine_origin must emit executable psrc rule\n");
+	fwrite(STDERR, $quarantine_rules);
+	exit(1);
+}
+if (strpos($quarantine_rules,
+	"block drop quick inet from <layer7_psrc_0> to !<localsubnets>") === false ||
+    strpos($quarantine_rules,
+	"block drop quick inet6 from <layer7_psrc_0> to !<localsubnets>") === false) {
+	fwrite(STDERR, "FAIL: psrc quarantine must emit inet and inet6 (REV-018)\n");
 	fwrite(STDERR, $quarantine_rules);
 	exit(1);
 }
@@ -184,6 +205,14 @@ if (strpos($allow_tables, "table <layer7_pallow_0> persist") === false ||
         strpos($combined, "layer7:pdst:block-youtube-b")) {
 	fwrite(STDERR, "FAIL: scoped allow/exception PF precedence is unsafe\n");
 	fwrite(STDERR, $combined);
+	exit(1);
+}
+if (strpos($exception_rules,
+	"match inet from <layer7_exc_allow_0> to !<localsubnets>") === false ||
+    strpos($exception_rules,
+	"match inet6 from <layer7_exc_allow_0> to !<localsubnets>") === false) {
+	fwrite(STDERR, "FAIL: exc_allow must emit inet and inet6 (REV-018)\n");
+	fwrite(STDERR, $exception_rules);
 	exit(1);
 }
 
@@ -308,11 +337,47 @@ if (strpos($pexc_tables, "table <layer7_pexc_0> persist { 10.0.0.50/32 }") === f
  * exclusao vira codigo morto (regressao do candidato _50; ADR-0019). */
 $pexc_match_pos = strpos($pexc_rules,
     "match inet from <layer7_pexc_0> to <layer7_pdst_0> tag L7ALLOW");
+$pexc_match6_pos = strpos($pexc_rules,
+    "match inet6 from <layer7_pexc_0> to <layer7_pdst_0> tag L7ALLOW");
 $pexc_block_pos = strpos($pexc_rules, "block drop quick inet");
-if ($pexc_match_pos === false || $pexc_block_pos === false ||
-    $pexc_match_pos > $pexc_block_pos) {
+if ($pexc_match_pos === false || $pexc_match6_pos === false ||
+    $pexc_block_pos === false ||
+    $pexc_match_pos > $pexc_block_pos ||
+    $pexc_match6_pos > $pexc_block_pos) {
 	fwrite(STDERR, "FAIL: pexc match rule must precede quick block rules\n");
 	fwrite(STDERR, $pexc_rules);
+	exit(1);
+}
+
+/* Host IPv6 na origem scoped → só inet6 */
+$v6_data = array(
+	"layer7" => array(
+		"enabled" => true,
+		"mode" => "enforce",
+		"enforcement_model" => "scoped_hybrid",
+		"policies" => array(
+			array(
+				"id" => "yt-v6",
+				"enabled" => true,
+				"action" => "block",
+				"match" => array(
+					"hosts" => array("youtube.com"),
+					"src_hosts" => array("2001:db8::10")
+				)
+			)
+		),
+		"groups" => array()
+	)
+);
+$v6_rules = layer7_policy_enforcement_rules_text($v6_data, false);
+if (strpos($v6_rules,
+	"block drop quick inet6 from 2001:db8::10 to <layer7_pdst_0>") === false ||
+    strpos($v6_rules, "inet from 2001:db8::10") !== false ||
+    layer7_ipv6_valid("fe80::1") ||
+    layer7_ipv6_valid("::1") ||
+    layer7_cidr6_valid("ff00::/8")) {
+	fwrite(STDERR, "FAIL: IPv6 src host / S-03 validators\n");
+	fwrite(STDERR, $v6_rules);
 	exit(1);
 }
 

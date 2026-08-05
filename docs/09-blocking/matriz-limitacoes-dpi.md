@@ -7,7 +7,8 @@
 **Estado:** Produção enforce `1.9.0` (IPv4); trilha IPv6 **ABERTA** (sem claim dual-stack)
 
 > **IPv6 (honestidade):** captura e decisão DPI são **IPv4-only** até ondas V2–V3.
-> PF scoped é só `inet` (REV-018 → V1). Não afirmar dual-stack completo até GV7.
+> PF scoped emite `inet`+`inet6` desde 12.3 (REV-018 fechado); sem IPs v6 nas
+> tabelas até o daemon V3. Não afirmar dual-stack completo até GV7.
 > SSOT: [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) ·
 > [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) ·
 > arranque [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md).
@@ -41,7 +42,7 @@
 | QUIC | Detectável | Payload cifrado; anti-QUIC PF separado | Limitação + toggle |
 | DoH/DoT | Toggle anti-bypass | DoH hardcoded / DoT externo | FP-014 |
 | IPv6 captura / nDPI | **Não** (até V2–V3) | EtherType / `ip_v != 4` → tráfego v6 ignorado | FP-010 / AUD-007 |
-| IPv6 PF scoped | **Não** (até V1) | Regras `pdst`/`psrc`/… só `inet` | REV-018 |
+| IPv6 PF scoped | **Sim** (`inet`+`inet6`, 12.3 / `1.9.0_1`) | Tabelas ainda só populadas com v4 até V3; captura v6 ausente | REV-018 fechado |
 | IPv6 dual-stack produto | **Não** (até GV7) | Trilha V0–V6 aberta; produção `1.9.0` inalterada | ADR-0024 |
 | VLAN 802.1Q | Sim (parse Ethernet) | Interfaces `.10` dependem nome real | Teste PHP |
 | CDN multi-host | Parcial | DNS hint 1 hostname/IP, TTL 600 s | FP-013 |
