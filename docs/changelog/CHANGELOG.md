@@ -15,9 +15,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Canal `latest`: **`1.9.12`** (SHA após build). Produção enforce permanece
-  **`1.9.8`** até GO.
-- Rollback lab: `1.9.11`.
+- Canal `latest`: **`1.9.12`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `f9742b27d87d0bd8f9d4c450ac82bd555a299e650e9aebab176ca5ad8e4b6278`.
+- Rollback lab: `1.9.11`. Smoke appliance: pkg `1.9.12`, daemon up, GUI recursos
+  e budget clamp PASS (16 GB → orçamento 1536 MB).
 - Em appliances ≤4 GB RAM, preferir poucas categorias; `adult` sozinha ~4.6 M.
 
 ## [1.9.11] — 2026-08-05
