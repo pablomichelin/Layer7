@@ -30,7 +30,7 @@ Quando houver conflito, seguir esta ordem:
 | Priorizacao | [`02-roadmap/backlog.md`](02-roadmap/backlog.md) | backlog unico priorizado |
 | Gates e disciplina de execucao | [`02-roadmap/checklist-mestre.md`](02-roadmap/checklist-mestre.md) | checklist de entrada, execucao e saida |
 | Fecho producao + consolidacao | [`02-roadmap/plano-fecho-producao-e-consolidacao.md`](02-roadmap/plano-fecho-producao-e-consolidacao.md) | plano mestre inicio/meio/fim (software + docs + versionamento) — **FECHADO** |
-| Trilha IPv6 (pos-fecho) | [`02-roadmap/plano-ipv6-completo.md`](02-roadmap/plano-ipv6-completo.md) | Ondas V0–V6, passos 12.x, BG-078..084 — **FECHADO (núcleo)**; V5 residual |
+| Trilha IPv6 (pos-fecho) | [`02-roadmap/plano-ipv6-completo.md`](02-roadmap/plano-ipv6-completo.md) | Ondas V0–V6; núcleo FECHADO; **12.10 CONCLUÍDO**; 12.11 residual |
 | Arranque chat (unico) | [`00-overview/START-HERE-fecho-producao.md`](00-overview/START-HERE-fecho-producao.md) | unico ponto de entrada (fecho historico + trilha IPv6 nucleo fechado; residual V5/promocao) |
 | Mapa F6 (consolidação docs) | [`00-overview/f6-mapa-consolidacao-H0.md`](00-overview/f6-mapa-consolidacao-H0.md) | decisões H1–H4 executadas; H5 diferido |
 | Classificacao dos documentos | [`00-overview/document-classification.md`](00-overview/document-classification.md) | diz o que e canónico, historico, placeholder ou preservado |
