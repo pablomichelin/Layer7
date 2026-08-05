@@ -1,0 +1,4 @@
+=== cleanup G5 g5-test-bl ===
+20260805T004728Z
+blacklist rules: 1 -> 0
+/tmp/cleanup-g5-residue-appliance.sh: /usr/local/sbin/filter_configure: not found

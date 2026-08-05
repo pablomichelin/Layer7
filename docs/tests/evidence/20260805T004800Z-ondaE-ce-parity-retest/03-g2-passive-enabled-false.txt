@@ -1,0 +1,2 @@
+G2.3 PASS: zero block drop layer7
+restored enforce

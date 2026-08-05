@@ -9,6 +9,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Onda E (passo 6.1):** evidência `20260804T234500Z-ondaE-ce-parity` — veredicto
   **LIMITAÇÃO CE** (VM CE indisponível); ADR-0022; script
   `tests/lab/run-ondaE-ce-parity-appliance.sh`; matriz compatibilidade actualizada.
+- **Pós-Veeam:** removido `g5-test-bl` do appliance `254`; reteste paridade
+  `20260805T004800Z-ondaE-ce-parity-retest` (G2.3 PASS em monitor).
+- **Onda G (8.1):** mapa backlog ↔ testes em
+  `docs/tests/evidence/20260805T005000Z-ondaG-f5-mapa/`; `test-matrix.md` actualizada.
 - **BG-077 — check-in online (Bloco 1):** `POST /api/license/check-in` no
   license-server (`check-in.js`, `check_ins_log`); deploy em `192.168.100.244`.
 - **BG-077 — check-in online (Bloco 2):** `layer7d` com `--check-in`,

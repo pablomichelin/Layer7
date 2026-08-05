@@ -35,7 +35,7 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 3.5 | Daemon sobe após reboot (`sysrc layer7d_enable=YES`) | appliance | OK |
 | 3.6 | SIGHUP reload sem crash | appliance | OK |
 | 3.7 | SIGUSR1 mostra stats | appliance | OK (2026-03-22) |
-| 3.8 | `service layer7d status`, pidfile 0644, leitura coerente (trim/PID numérico; sem falso negativo de permissão); GUI Layer 7 alinhada (`layer7_daemon_pid_from_file` em pacote ≥ `1.8.11_6`) | appliance | Pendente (F4.1; `validacao-lab` sec. 10a) |
+| 3.8 | `service layer7d status`, pidfile 0644, leitura coerente (trim/PID numérico; sem falso negativo de permissão); GUI Layer 7 alinhada (`layer7_daemon_pid_from_file` em pacote ≥ `1.8.11_6`) | appliance | OK (Onda D 10a; `20260804T211600Z-ondaD-f4-10a-PASS`; `_68`/`_69`) |
 
 ## 4. Configuração e persistência
 
@@ -69,7 +69,7 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 6.4 | `pfctl -t layer7_block -T show` confirma IP | appliance | OK (2026-03-22) |
 | 6.5 | `pfctl -t layer7_block -T delete` remove IP | appliance | OK (2026-03-22) |
 | 6.6 | Block com tabela PF real bloqueia tráfego | appliance | OK (2026-03-22, cli -e) |
-| 6.7 | DNS forcado (`force_dns`): `pfctl -a natrules/layer7_nat -s nat` mostra `rdr` coerente após reload PF; em pacote >= `1.8.11_8`, pares (interface, CIDR) repetidos entre regras não duplicam `rdr`; em >= `1.8.11_9`, interfaces por ordem alfabética; em >= `1.8.11_10`, CIDRs válidos por regra únicos e ordenados alfabeticamente; **opcional no mesmo roteiro:** anti-QUIC por interface — `pfctl -s rules` com labels `layer7:anti-quic:*` coerentes; em >= `1.8.11_12`, validação DRY de nome PF (`layer7_pf_ifname_for_rules`) também no loop anti-QUIC; cenário sugerido **multi-interface / VLAN** na secção 11 | appliance | Pendente (F4.3; `validacao-lab` sec. 11) |
+| 6.7 | DNS forcado (`force_dns`): `pfctl -a natrules/layer7_nat -s nat` mostra `rdr` coerente após reload PF; em pacote >= `1.8.11_8`, pares (interface, CIDR) repetidos entre regras não duplicam `rdr`; em >= `1.8.11_9`, interfaces por ordem alfabética; em >= `1.8.11_10`, CIDRs válidos por regra únicos e ordenados alfabeticamente; **opcional no mesmo roteiro:** anti-QUIC por interface — `pfctl -s rules` com labels `layer7:anti-quic:*` coerentes; em >= `1.8.11_12`, validação DRY de nome PF (`layer7_pf_ifname_for_rules`) também no loop anti-QUIC; cenário sugerido **multi-interface / VLAN** na secção 11 | appliance | OK (Onda D §11; `20260804T212300Z-ondaD-f4-11-PASS`; VLAN opcional pendente) |
 
 ## 7. Whitelist e fallback
 
@@ -122,10 +122,10 @@ Fase 9 do roadmap. Cada teste indica se pode ser executado no **CI** (GitHub Act
 | 11.1 | Primeira activação válida fixa `hardware_id` uma única vez e grava `activated_at` | revisão de código/backend | OK (2026-04-01) |
 | 11.2 | Re-activação do mesmo hardware não rebinda a licença e preserva o primeiro `activated_at` | revisão de código/backend | OK (2026-04-01) |
 | 11.3 | Corrida de primeira activação com `hardware_id` diferente mantém bind único e rejeita o segundo com `409` | revisão de código/backend | OK (2026-04-01) |
-| 11.4 | Grace local de `14` dias continua funcional no daemon com `.lic` expirado já emitido | appliance | Pendente (F3.6; ver matriz detalhada) |
-| 11.5 | Activação online de licença expirada continua a falhar fechado sem quebrar a licença local já emitida | appliance | Pendente (F3.6; ver matriz detalhada) |
-| 11.6 | Fingerprint mantém previsibilidade documentada em reinstall, troca de NIC, clone de VM, restore, migracao de hypervisor e appliance com multiplas NICs | appliance/lab | Pendente (F3.6; ver matriz detalhada) |
-| 11.7 | Renovação + re-activação reemite `.lic` actualizado sem quebrar o bind existente | appliance | Pendente (F3.6; ver matriz detalhada) |
+| 11.4 | Grace local de `14` dias continua funcional no daemon com `.lic` expirado já emitido | appliance | OK (Onda C S08/S12; `20260804T233500Z-ondaC-dr05-veeam`) |
+| 11.5 | Activação online de licença expirada continua a falhar fechado sem quebrar a licença local já emitida | appliance | OK (Onda C S07; `20260804T234000Z-ondaC-s07-retest`) |
+| 11.6 | Fingerprint mantém previsibilidade documentada em reinstall, troca de NIC, clone de VM, restore, migracao de hypervisor e appliance com multiplas NICs | appliance/lab | OK (Onda C S13; `20260804T212000Z-ondaC-s13-drift-PASS`) |
+| 11.7 | Renovação + re-activação reemite `.lic` actualizado sem quebrar o bind existente | appliance | OK (Onda C campanha DR-05) |
 | 11.8 | Estado efectivo (`active` / `expired` / `revoked`) permanece coerente entre `activate`, `licenses`, `customers` e `dashboard` | revisão de código/backend | OK (2026-04-01) |
 | 11.9 | Download administrativo de licença efectivamente expirada falha fechado | revisão de código/backend | OK (2026-04-01) |
 | 11.10 | Download administrativo de licença revogada falha fechado | revisão de código/backend | OK (2026-04-01) |
@@ -216,8 +216,8 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 
 | # | Teste | Onde | Status |
 |---|-------|------|--------|
-| 12.1 | `update-blacklists.sh --apply` (ou ciclo `--download`): log coerente; `send_sighup` só com PID vivo; sem falha indevida do updater; reload falhado preserva blacklist/tabelas anteriores em pacote >= `1.8.11_7` | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
-| 12.2 | `blacklists/.state/fallback.state` reflecte `healthy` após promoção válida; `degraded`/`fail-closed` em cenário de falha controlada (F1.4); GUI reporta erro de gravação em `config.json`/`_custom` | appliance | Pendente (F4.2; `validacao-lab` sec. 10b) |
+| 12.1 | `update-blacklists.sh --apply` (ou ciclo `--download`): log coerente; `send_sighup` só com PID vivo; sem falha indevida do updater; reload falhado preserva blacklist/tabelas anteriores em pacote >= `1.8.11_7` | appliance | OK (Onda D 10b; `20260804T212200Z-ondaD-f4-10b-PASS`; fix em `_69`) |
+| 12.2 | `blacklists/.state/fallback.state` reflecte `healthy` após promoção válida; `degraded`/`fail-closed` em cenário de falha controlada (F1.4); GUI reporta erro de gravação em `config.json`/`_custom` | appliance | OK (Onda D 10b — `healthy`; cenário fail-closed não reexecutado) |
 
 ---
 
@@ -230,7 +230,7 @@ Gate oficial de fechamento e relatorio final unico de campanha:
 | 13.3 | `quarantine_origin` emite regra `psrc`; block scoped sem origem/global/quarentena é rejeitado | builder PHP | OK (`test_scoped_pf_inc.php`) |
 | 13.4 | política normal app/categoria/host usa `pdst`; `psrc` só com quarentena explícita | local C/PHP | OK (`test_policy_decide.c`, `test_scoped_pf_inc.php`) |
 | 13.5 | Após instalar `_25`: `onestatus` coerente, uma instância, JSON com interface real, monitor sem block e `cap_pkts > 0` | pfSense Plus 26.03.1 | Pendente |
-| 13.6 | Two-client A bloqueado/B permitido em DNS/SNI/nDPI | appliance/lab | Pendente (`validacao-lab` sec. 12) |
+| 13.6 | Two-client A bloqueado/B permitido em DNS/SNI/nDPI | appliance/lab | OK (Onda B G5; `20260804T232800Z-ondaB-g5-full-PASS`) |
 
 ## 14. Candidato `1.8.11_26` — contenção L1 de logs
 

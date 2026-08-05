@@ -64,8 +64,8 @@ else
 fi
 sleep 2
 # Recarregar PF para reflectir mode=monitor (sem blocks Layer7)
-if [ -x /usr/local/sbin/filter_configure ]; then
-	/usr/local/sbin/filter_configure >/dev/null 2>&1 || true
+if [ -x /etc/rc.filter_configure ]; then
+	/etc/rc.filter_configure >/dev/null 2>&1 || true
 	sleep 3
 fi
 

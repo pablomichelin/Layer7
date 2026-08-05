@@ -1221,16 +1221,15 @@ PASS — apenas fixes bloqueantes descobertos em gate.
 
 ```text
 PLANO FECHO/CONSOLIDAÇÃO — progresso
-- Passo actual: **Onda F prep** (GO humano bloqueado por CE) | Ondas A–E **concluídas** (E=LIMITAÇÃO)
-- Onda: E — **LIMITAÇÃO** (CE VM indisponível; ADR-0022); D — **PASS**
+- Passo actual: **8.2** (Onda G — smoke repetível) | Ondas A–E concluídas (E=LIMITAÇÃO)
+- Onda: G — **8.1 PASS** (mapa F5); E — **LIMITAÇÃO** (ADR-0022)
 - Candidato lab: 1.8.11_69
 - Produção enforce: 1.8.11_24 (até GO Onda F + CE ou aceite ADR-0022)
 - Canal latest: 1.8.11_69
-- G0-G1: PASS | G2-G4: PASS | G5: PASS | G6-G7: **PASS**
-- F3: **FECHADA** | F4: **FECHADA** (Onda D)
-- CE: **LIMITAÇÃO** (`20260804T234500Z-ondaE-ce-parity`) — não CE PASS
-- Evidência Onda E: `docs/tests/evidence/20260804T234500Z-ondaE-ce-parity/`
-- Próximo: **Onda F prep** (humano: VM CE ou aceite ADR-0022) ou **Onda G** (F5)
+- G0-G7: PASS | F3/F4: FECHADAS
+- CE: LIMITAÇÃO — proxy Plus melhorado (`20260805T004800Z-ondaE-ce-parity-retest`; g5-test-bl removido)
+- Evidência Onda G: `docs/tests/evidence/20260805T005000Z-ondaG-f5-mapa/`
+- Próximo: **8.2** checklist smoke único; depois Onda F prep (humano) ou Onda H/I
 - Modo: agente único
 ```
 

@@ -522,3 +522,4 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 | 2026-08-04h | Fix `_66` pfnearly; G5.1–G5.2 PASS (reteste); G5.3–G5.7 pendentes; próximo 3.2 ou Onda C |
 | 2026-08-04i | Onda B PASS: G5.1–G5.7 no appliance 254 (`_66`); próximo 4.1 Onda C (F3 DR-05) |
 | 2026-08-04j | Onda E LIMITAÇÃO: passo 6.1 — sem VM CE na malha lab; ADR-0022; proxy Plus `_69` parcial; próximo Onda F prep (humano) ou Onda G |
+| 2026-08-05a | Pós-Veeam: cleanup `g5-test-bl`; reteste paridade CE; Onda G 8.1 mapa F5; próximo 8.2 |

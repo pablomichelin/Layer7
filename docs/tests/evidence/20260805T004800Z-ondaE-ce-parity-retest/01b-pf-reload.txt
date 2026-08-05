@@ -1,0 +1,8 @@
+=== PF layer7 após reload ===
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <localsubnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <localsubnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+g5 rules: 0
+mode=enforce enabled=true
