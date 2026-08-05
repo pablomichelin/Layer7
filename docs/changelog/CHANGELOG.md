@@ -13,9 +13,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Canal `latest`: **`1.9.13`** (SHA após build). Produção enforce permanece
-  **`1.9.8`** até GO.
-- Rollback lab: `1.9.12`.
+- Canal `latest`: **`1.9.13`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `69ac0f2799a80a4dcea447b71321fabd115a2bc34c1c693c9a9e79ef16996a3d`.
+- Rollback lab: `1.9.12`. Smoke: catalog 32 itens; apply AnyDesk/TeamViewer/RDP.
 - Menu: Services → Layer 7 → **Acesso Remoto**.
 
 ## [1.9.12] — 2026-08-05

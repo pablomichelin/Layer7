@@ -36,6 +36,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.13` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.13`;
+`SHA256=69ac0f2799a80a4dcea447b71321fabd115a2bc34c1c693c9a9e79ef16996a3d`;
 guia Acesso Remoto na GUI; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
