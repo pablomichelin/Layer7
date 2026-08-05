@@ -1397,13 +1397,12 @@ function layer7_pf_action_rules_text($data = null, $bl_config = null)
 	$l7 = $data["layer7"];
 	$block_dot_doq = !empty($l7["block_dot_doq"]);
 
-	/* A allowlist apenas marca o pacote. As regras Layer7 ignoram a marca,
-	 * mas as regras nativas do pfSense continuam a avaliar o trafego. */
-	$out = implode("\n", array(
-		"",
-		"# Allowlist (Bloco 3) — destinos protegidos contra bloqueio.",
-		"match inet to <layer7_allow_dst> tag L7ALLOW label \"layer7:allow:dst\"",
-	)) . "\n";
+	/* A allowlist apenas marca o pacote (inet + inet6). As regras Layer7
+	 * honram L7ALLOW; as regras nativas do pfSense continuam a avaliar. */
+	$out = "\n# Allowlist (Bloco 3) — destinos protegidos contra bloqueio.\n";
+	$out .= layer7_pf_inet46_rules(
+	    "match",
+	    "to <layer7_allow_dst> tag L7ALLOW label \"layer7:allow:dst\"");
 	$out .= "\n# Explicit allow por politica (destino aprendido em runtime).\n";
 	$out .= layer7_policy_allow_rules_text($data);
 	$out .= "\n# Excecoes allow: somente destinos bloqueados pelo Layer7.\n";
@@ -3472,7 +3471,7 @@ function layer7_check_for_update($owner = "pablomichelin", $repo = "Layer7")
 	$result["current"] = $current_ver;
 
 	$gh_api = "https://api.github.com/repos/" . $owner . "/" . $repo . "/releases/latest";
-	$tmp_json = "/tmp/layer7-gh-latest.json";
+	$tmp_json = layer7_var_db_dir() . "/gh-latest.json";
 	@unlink($tmp_json);
 	$fetch_cmd = "/usr/bin/fetch -qo " . escapeshellarg($tmp_json)
 	    . " --user-agent=Layer7-pfSense-pkg/" . escapeshellarg($current_ver)
@@ -3811,12 +3810,12 @@ function layer7_policy_host_valid($s)
 
 /**
  * Load nDPI protocol and category lists from layer7d --list-protos.
- * Caches result in /tmp for 1 hour.
+ * Caches result em /var/db/layer7 por 1 hora.
  * @return array("protocols" => [...], "categories" => [...]) or empty arrays
  */
 function layer7_ndpi_list()
 {
-	$cache = "/tmp/layer7-ndpi-protos.json";
+	$cache = layer7_var_db_dir() . "/ndpi-protos.json";
 	$bin = "/usr/local/sbin/layer7d";
 	if (file_exists($cache) && (time() - filemtime($cache)) < 3600) {
 		$j = json_decode(file_get_contents($cache), true);
@@ -3955,6 +3954,19 @@ function layer7_profile_parse_hosts_textarea($text, $max = 64)
 function layer7_stats_path()
 {
 	return "/var/db/layer7/layer7-stats.json";
+}
+
+/**
+ * Directório de estado runtime (stats, caches, locks) — fora de /tmp.
+ * @return string
+ */
+function layer7_var_db_dir()
+{
+	$dir = "/var/db/layer7";
+	if (!is_dir($dir)) {
+		@mkdir($dir, 0755, true);
+	}
+	return $dir;
 }
 
 /**
@@ -5797,8 +5809,8 @@ function layer7_render_footer()
 define('L7_BL_DIR', '/usr/local/etc/layer7/blacklists');
 define('L7_BL_CONFIG', L7_BL_DIR . '/config.json');
 define('L7_BL_DISCOVERED', L7_BL_DIR . '/discovered.json');
-define('L7_BL_PROGRESS', '/tmp/layer7-bl-progress.txt');
-define('L7_BL_LOCK', '/tmp/layer7-bl-update.lock');
+define('L7_BL_PROGRESS', '/var/db/layer7/bl-progress.txt');
+define('L7_BL_LOCK', '/var/db/layer7/bl-update.lock');
 define('L7_BL_SCRIPT', '/usr/local/etc/layer7/update-blacklists.sh');
 define('L7_BL_STATE_DIR', L7_BL_DIR . '/.state');
 define('L7_BL_ACTIVE_STATE', L7_BL_STATE_DIR . '/active-snapshot.state');
@@ -5979,6 +5991,7 @@ function layer7_bl_download_start()
 	@chown(L7_BL_DIR, "www");
 	@chgrp(L7_BL_DIR, "wheel");
 	@chmod(L7_BL_DIR, 0775);
+	layer7_var_db_dir();
 
 	if (is_dir(L7_BL_LOCK)) {
 		$stamp = date('Y-m-d H:i:s');

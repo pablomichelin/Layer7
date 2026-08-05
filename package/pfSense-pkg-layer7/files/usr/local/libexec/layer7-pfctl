@@ -186,8 +186,9 @@ SCOPED
 	fi
 	cat <<EOF >> "${RULES_PATH}"
 
-# Allowlist: marca interna; nao autoriza trafego perante regras do pfSense.
+# Allowlist: marca interna (inet + inet6); nao autoriza trafego perante pfSense.
 match inet to <${TABLE_ALLOW_DST}> tag L7ALLOW label "layer7:allow:dst"
+match inet6 to <${TABLE_ALLOW_DST}> tag L7ALLOW label "layer7:allow:dst"
 
 # Bloqueio por origem do cliente (quarentena/tag) — apenas destinos externos.
 block drop quick inet from <${TABLE_BLOCK}> to !<localsubnets> ! tagged L7ALLOW label "layer7:block:src"

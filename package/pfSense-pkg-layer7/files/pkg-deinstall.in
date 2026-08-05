@@ -122,5 +122,12 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 		_i=$((_i + 1))
 	done
 	/bin/rm -f /tmp/layer7-stats.json /var/db/layer7/layer7-stats.json \
-		/var/db/layer7/layer7-stats.json.tmp /tmp/layer7_pkg_rm_started >/dev/null 2>&1 || true
+		/var/db/layer7/layer7-stats.json.tmp \
+		/var/db/layer7/bl-progress.txt \
+		/tmp/layer7-bl-progress.txt /tmp/layer7-bl-update.lock \
+		/tmp/layer7-gh-latest.json /tmp/layer7-ndpi-protos.json \
+		/var/db/layer7/gh-latest.json /var/db/layer7/ndpi-protos.json \
+		/tmp/layer7_pkg_rm_started >/dev/null 2>&1 || true
+	/bin/rmdir /var/db/layer7/bl-update.lock /tmp/layer7-bl-update.lock \
+		>/dev/null 2>&1 || true
 fi

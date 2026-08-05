@@ -2,6 +2,21 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Unreleased] — Allowlist inet6 + residual /tmp (`1.9.10`)
+
+### Fixed
+
+- **BG-102:** `match inet6 to <layer7_allow_dst> tag L7ALLOW` em
+  `layer7_pf_default_rules_text()` e `layer7-pfctl` (fecho allowlist dual-stack
+  no plano PF; daemon já populava v6 desde `1.9.9`).
+- **BG-094 residual:** progress/lock blacklists, cache GitHub releases e
+  nDPI protos passam a `/var/db/layer7/` (fora de `/tmp`).
+
+### Notes
+
+- Candidato até build FreeBSD + smoke + release `v1.9.10`.
+- Produção enforce permanece `1.9.8` até GO; `latest` avançará para `1.9.10`.
+
 ## [1.9.9] — 2026-08-05
 
 ### Security

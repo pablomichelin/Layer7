@@ -13,9 +13,10 @@ set -eu
 BL_DIR="/usr/local/etc/layer7/blacklists"
 CONFIG="$BL_DIR/config.json"
 DISCOVERED="$BL_DIR/discovered.json"
-PROGRESS="/tmp/layer7-bl-progress.txt"
-TMP="/tmp/layer7-bl-update.$$"
-LOCK="/tmp/layer7-bl-update.lock"
+L7_VAR_DB="/var/db/layer7"
+PROGRESS="$L7_VAR_DB/bl-progress.txt"
+TMP="$L7_VAR_DB/bl-update.$$"
+LOCK="$L7_VAR_DB/bl-update.lock"
 LOG="/var/log/layer7-bl-update.log"
 PID_FILE="/var/run/layer7d.pid"
 STATE_DIR="$BL_DIR/.state"
@@ -35,6 +36,9 @@ SIG_NAME="${MANIFEST_NAME}.sig"
 PUBKEY_ASSET="blacklists-signing-public-key.pem"
 SNAPSHOT_ASSET="layer7-blacklists-ut1.tar.gz"
 MIN_SIZE=1000000
+
+# Estado runtime fora de /tmp (auditoria 1.9.10).
+mkdir -p "$L7_VAR_DB"
 
 LOCK_HELD="0"
 PROMOTION_ACTIVE="0"

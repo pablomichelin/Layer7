@@ -231,10 +231,13 @@ if (strpos($legacy_exc_rules,
 $default_tagged = layer7_pf_default_rules_text($legacy_allow);
 if (strpos($default_tagged,
     "match inet to <layer7_allow_dst> tag L7ALLOW") === false ||
+    strpos($default_tagged,
+    "match inet6 to <layer7_allow_dst> tag L7ALLOW") === false ||
     strpos($default_tagged, "pass quick inet to <layer7_allow_dst>") !== false ||
+    strpos($default_tagged, "pass quick inet6 to <layer7_allow_dst>") !== false ||
     strpos($default_tagged,
     "to <layer7_block_dst> ! tagged L7ALLOW") === false) {
-	fwrite(STDERR, "FAIL: allowlist may bypass native pfSense rules\n");
+	fwrite(STDERR, "FAIL: allowlist may bypass native pfSense rules or miss inet6\n");
 	exit(1);
 }
 
