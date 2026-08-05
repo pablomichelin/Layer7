@@ -15,7 +15,7 @@
 
 | Camada | IPv4 hoje | IPv6 hoje | Gap | Onda |
 |--------|-----------|-----------|-----|------|
-| Captura / nDPI | Completo | **Ignorado** (`ip_v != 4`) | FP-010 | V2 |
+| Captura / nDPI | Completo | Parser+fluxo+nDPI v6 (12.4); métricas/AAAA hint pendentes | FP-010 parcial | V2–V3 |
 | Decisão política (daemon) | Completo | **Não** | FP-010 | V3 |
 | PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas só v4 | Parcial | V2–V3 |
 | PF scoped (`pdst`/`psrc`/…) | Completo | **Só `inet`** | REV-018 | V1 |
@@ -35,8 +35,8 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 
 | ID | Ficheiro | Função | Estado IPv6 | Gap / notas | Onda | BG | Acção |
 |----|----------|--------|-------------|-------------|------|-----|-------|
-| M-01 | `src/layer7d/capture.c` | libpcap → parse IP → nDPI | v4 only L551–563 | EtherType `0x0800` only | V2 | BG-080 | CAP |
-| M-02 | `src/layer7d/capture_flow_key.h` | Hash fluxo bidireccional | `uint32` IPv4 | Redesenhar chave v6 | V2 | BG-080 | CAP |
+| M-01 | `src/layer7d/capture.c` | libpcap → parse IP → nDPI | IPv4+IPv6 L3 (12.4) | DNS AAAA hint; métricas v6 = 12.5 | V2 | BG-080 | CAP |
+| M-02 | `src/layer7d/capture_flow_key.h` | Hash fluxo bidireccional | v4+v6 hash (12.4) | — | V2 | BG-080 | CAP |
 | M-03 | `src/layer7d/main.c` | flow_decide, DNS hint, PF add | `AF_INET` only ~L920 | Endereços v6 em decisões | V3 | BG-081 | ENF |
 | M-04 | `src/layer7d/policy.c` | Parse/match políticas | CIDR `/32` max L292 | `parse_cidr_str` v6 | V3 | BG-081 | POL |
 | M-05 | `src/layer7d/policy.h` | Structs decisão | IPs como string v4 | Campos ou tipo unificado | V3 | BG-081 | POL |

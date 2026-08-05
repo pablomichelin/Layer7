@@ -6,6 +6,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Trilha IPv6 / passo 12.4 (V2):** parser EtherType `0x86DD`, extension
+  headers (S-06), flow key/hash IPv6, tabela de fluxos dual-stack, nDPI sobre
+  pacotes v6; `test_capture_flow_key` + `layer7d` build/`-t` PASS no builder.
+  DNS hint AAAA e métricas `cap_*` v6 ficam para **12.5**. Sem bump `1.9.1`
+  (só na release). Produção `1.9.0` inalterada.
 - **Versionamento pós-1.9.0:** série patch `1.9.0` → `1.9.1` → `1.9.2` → …;
   `PORTREVISION=0` sempre (sem sufixo `_N`). Próximo `.pkg` da trilha IPv6:
   **`1.9.1`**. Produção enforce permanece `1.9.0` até GV7.

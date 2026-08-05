@@ -359,7 +359,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ### V2–V3 — Daemon (12.4–12.8, BG-080–081)
 
-- [ ] GV2 PASS builder
+- [x] 12.4 captura IPv6 + flow key (`test_capture_flow_key` + build layer7d PASS)
+- [ ] 12.5 métricas / nDPI v6 fechado no builder (GV2)
 - [ ] GV3 captura v6 appliance (+ NDP intacto)
 - [ ] GV4 enforce v6 scoped
 - [ ] Regressão IPv4 confirmada

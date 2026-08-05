@@ -1,5 +1,5 @@
 /*
- * Chave/hash bidireccional de fluxo IPv4.
+ * Chave/hash bidireccional de fluxo IPv4 e IPv6.
  *
  * Os dois sentidos da mesma conversa precisam cair no mesmo bucket para que
  * o nDPI receba ida e volta no mesmo ndpi_flow_struct.
@@ -97,6 +97,46 @@ layer7_capture_flow_hash(uint32_t sa, uint32_t da, uint16_t sp, uint16_t dp,
 	}
 
 	h = sa ^ da ^ ((uint32_t)sp << 16 | dp) ^ proto;
+	h ^= h >> 16;
+	h *= 0x45d9f3bU;
+	h ^= h >> 16;
+	return h & mask;
+}
+
+/*
+ * Hash bidireccional IPv6 (passo 12.4). Canonicaliza por memcmp dos 16 bytes
+ * e portas, para ida/volta cair no mesmo bucket.
+ */
+static inline uint32_t
+layer7_capture_flow_hash_v6(const uint8_t sa[16], const uint8_t da[16],
+    uint16_t sp, uint16_t dp, uint8_t proto, uint32_t mask)
+{
+	const uint8_t *a = sa;
+	const uint8_t *b = da;
+	uint16_t spa = sp, dpa = dp;
+	uint32_t h = 0;
+	int i, cmp;
+
+	cmp = 0;
+	for (i = 0; i < 16; i++) {
+		if (sa[i] != da[i]) {
+			cmp = (sa[i] > da[i]) ? 1 : -1;
+			break;
+		}
+	}
+	if (cmp > 0 || (cmp == 0 && sp > dp)) {
+		a = da;
+		b = sa;
+		spa = dp;
+		dpa = sp;
+	}
+
+	for (i = 0; i < 16; i++) {
+		h ^= ((uint32_t)a[i]) << ((i & 3) * 8);
+		h ^= ((uint32_t)b[i]) << (((i + 1) & 3) * 8);
+	}
+	h ^= ((uint32_t)spa << 16) | dpa;
+	h ^= proto;
 	h ^= h >> 16;
 	h *= 0x45d9f3bU;
 	h ^= h >> 16;

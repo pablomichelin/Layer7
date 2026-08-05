@@ -1,16 +1,17 @@
 /*
  * capture.c — pcap live capture + nDPI flow classification.
  *
- * Fluxo V1:
+ * Fluxo:
  *  1. pcap_open_live na interface
- *  2. Para cada pacote: extrair 5-tuple IPv4
+ *  2. Para cada pacote: extrair 5-tuple IPv4 ou IPv6 (passo 12.4)
  *  3. Procurar/criar fluxo na hash table (linear probing)
  *  4. Alimentar ndpi_detection_process_packet
  *  5. Quando classificado → invocar callback com (src_ip, app, cat)
  *  6. Expirar fluxos inativos periodicamente
  *
- * Limitações V1:
- *  - Apenas IPv4
+ * Limitações:
+ *  - IPv6: extension headers tratados de forma conservadora (S-06);
+ *    DNS hint cache ainda IPv4-only (AAAA / V3+)
  *  - Tabela de fluxos com tamanho fixo (hash open-addressing)
  *  - Sem reassembly TCP
  */
@@ -21,6 +22,7 @@
 #include <net/ethernet.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
+#include <netinet/ip6.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
 #include <pcap/pcap.h>
@@ -42,16 +44,19 @@
 #define L7C_FLOW_PROBE_SLOTS 64
 #define L7C_DNS_HINTS       1024
 #define L7C_DNS_HOST_MAX    256
+#define L7C_IPV6_EXTHDR_MAX 8
 
 struct l7c_flow {
-	uint32_t src_ip;
-	uint32_t dst_ip;
-	uint16_t src_port;
-	uint16_t dst_port;
-	uint8_t  proto;
+	uint8_t  ip_ver; /* 4 ou 6 */
 	uint8_t  classified;
 	uint8_t  in_use;
-	uint8_t  _pad;
+	uint8_t  proto;
+	uint16_t src_port;
+	uint16_t dst_port;
+	uint32_t src_ip; /* host order se ip_ver==4 */
+	uint32_t dst_ip;
+	uint8_t  src_ip6[16]; /* network order se ip_ver==6 */
+	uint8_t  dst_ip6[16];
 	time_t   last_seen;
 	uint32_t pkt_count;
 	struct ndpi_flow_struct *ndpi_flow;
@@ -96,6 +101,216 @@ ip_is_private(uint32_t ip)
 	if ((ip & 0xffff0000U) == 0xc0a80000U)
 		return 1;
 	return 0;
+}
+
+/* ULA fc00::/7 — heurística de “cliente local” para orientação do log. */
+static int
+ip6_is_ula(const uint8_t a[16])
+{
+	return (a[0] & 0xfe) == 0xfc;
+}
+
+/*
+ * Avança past extension headers IPv6 até TCP/UDP/ICMPv6 ou fim.
+ * Fragmentos não-iniciais (offset != 0) são rejeitados para DPI (S-06).
+ * Retorna 0 em sucesso; -1 se o pacote deve ser ignorado.
+ */
+static int
+ipv6_l4_offset(const u_char *ip_data, uint16_t ip_len, uint8_t *proto_out,
+    uint16_t *l4_off_out)
+{
+	const struct ip6_hdr *ip6h;
+	uint8_t nh;
+	uint16_t off;
+	int guard;
+
+	if (ip_len < sizeof(struct ip6_hdr))
+		return -1;
+	ip6h = (const struct ip6_hdr *)ip_data;
+	if (((ip_data[0] >> 4) & 0x0f) != 6)
+		return -1;
+
+	nh = ip6h->ip6_nxt;
+	off = (uint16_t)sizeof(struct ip6_hdr);
+
+	for (guard = 0; guard < L7C_IPV6_EXTHDR_MAX; guard++) {
+		uint16_t hdrlen;
+
+		if (nh == IPPROTO_TCP || nh == IPPROTO_UDP ||
+		    nh == IPPROTO_ICMPV6 || nh == IPPROTO_NONE) {
+			*proto_out = nh;
+			*l4_off_out = off;
+			return 0;
+		}
+
+		if (off + 2 > ip_len)
+			return -1;
+
+		if (nh == IPPROTO_FRAGMENT) {
+			uint16_t frag_off;
+
+			if (off + 8 > ip_len)
+				return -1;
+			frag_off = (uint16_t)((ip_data[off + 2] << 8) |
+			    ip_data[off + 3]);
+			/* offset em unidades de 8 octetos; bits 0-2 = flags */
+			if ((frag_off & 0xfff8U) != 0)
+				return -1; /* não-inicial: sem L4 completo */
+			nh = ip_data[off];
+			off = (uint16_t)(off + 8);
+			continue;
+		}
+
+		if (nh == IPPROTO_AH) {
+			/* AH: comprimento em unidades de 4 octetos - 2 */
+			hdrlen = (uint16_t)((ip_data[off + 1] + 2) * 4);
+			if (hdrlen < 8 || off + hdrlen > ip_len)
+				return -1;
+			nh = ip_data[off];
+			off = (uint16_t)(off + hdrlen);
+			continue;
+		}
+
+		if (nh == IPPROTO_HOPOPTS || nh == IPPROTO_ROUTING ||
+		    nh == IPPROTO_DSTOPTS) {
+			/* hdrlen em unidades de 8 octetos, exclui os primeiros 8 */
+			hdrlen = (uint16_t)((ip_data[off + 1] + 1) * 8);
+			if (hdrlen < 8 || off + hdrlen > ip_len)
+				return -1;
+			nh = ip_data[off];
+			off = (uint16_t)(off + hdrlen);
+			continue;
+		}
+
+		/* ESP / desconhecido: não avançar para L4 genérico */
+		return -1;
+	}
+	return -1;
+}
+
+static void flow_free(struct layer7_capture *cap, struct l7c_flow *f);
+
+static struct l7c_flow *
+flow_lookup_v4(struct layer7_capture *cap, uint32_t sa, uint32_t da,
+    uint16_t sp, uint16_t dp, uint8_t proto, int create)
+{
+	uint32_t idx = layer7_capture_flow_hash(sa, da, sp, dp, proto,
+	    L7C_FLOW_MASK);
+	uint32_t i;
+	uint32_t selected;
+	struct layer7_capture_probe probe;
+	struct l7c_flow *f;
+	int found, evict;
+
+	layer7_capture_probe_init(&probe);
+	for (i = 0; i < L7C_FLOW_PROBE_SLOTS; i++) {
+		uint32_t slot = (idx + i) & L7C_FLOW_MASK;
+		int matches;
+
+		f = &cap->flows[slot];
+		matches = f->in_use && f->ip_ver == 4 && f->proto == proto &&
+		    ((f->src_ip == sa && f->dst_ip == da &&
+		    f->src_port == sp && f->dst_port == dp) ||
+		    (f->src_ip == da && f->dst_ip == sa &&
+		    f->src_port == dp && f->dst_port == sp));
+		layer7_capture_probe_observe(&probe, slot, f->in_use, matches,
+		    f->last_seen > 0 ? (uint64_t)f->last_seen : 0);
+	}
+
+	selected = layer7_capture_probe_select(&probe, create, &found, &evict);
+	if (selected == LAYER7_CAPTURE_NO_SLOT)
+		return NULL;
+	f = &cap->flows[selected];
+	if (found)
+		return f;
+
+	if (evict) {
+		flow_free(cap, f);
+		cap->stat_flows_evicted++;
+	}
+
+	memset(f, 0, sizeof(*f));
+	f->ip_ver = 4;
+	f->src_ip = sa;
+	f->dst_ip = da;
+	f->src_port = sp;
+	f->dst_port = dp;
+	f->proto = proto;
+	f->in_use = 1;
+	f->ndpi_flow = (struct ndpi_flow_struct *)
+	    ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
+	if (!f->ndpi_flow) {
+		memset(f, 0, sizeof(*f));
+		cap->stat_flows_dropped++;
+		return NULL;
+	}
+	memset(f->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
+	cap->stat_flows_active++;
+	return f;
+}
+
+static struct l7c_flow *
+flow_lookup_v6(struct layer7_capture *cap, const uint8_t sa[16],
+    const uint8_t da[16], uint16_t sp, uint16_t dp, uint8_t proto, int create)
+{
+	uint32_t idx = layer7_capture_flow_hash_v6(sa, da, sp, dp, proto,
+	    L7C_FLOW_MASK);
+	uint32_t i;
+	uint32_t selected;
+	struct layer7_capture_probe probe;
+	struct l7c_flow *f;
+	int found, evict;
+
+	layer7_capture_probe_init(&probe);
+	for (i = 0; i < L7C_FLOW_PROBE_SLOTS; i++) {
+		uint32_t slot = (idx + i) & L7C_FLOW_MASK;
+		int matches;
+
+		f = &cap->flows[slot];
+		matches = 0;
+		if (f->in_use && f->ip_ver == 6 && f->proto == proto) {
+			if ((memcmp(f->src_ip6, sa, 16) == 0 &&
+			    memcmp(f->dst_ip6, da, 16) == 0 &&
+			    f->src_port == sp && f->dst_port == dp) ||
+			    (memcmp(f->src_ip6, da, 16) == 0 &&
+			    memcmp(f->dst_ip6, sa, 16) == 0 &&
+			    f->src_port == dp && f->dst_port == sp))
+				matches = 1;
+		}
+		layer7_capture_probe_observe(&probe, slot, f->in_use, matches,
+		    f->last_seen > 0 ? (uint64_t)f->last_seen : 0);
+	}
+
+	selected = layer7_capture_probe_select(&probe, create, &found, &evict);
+	if (selected == LAYER7_CAPTURE_NO_SLOT)
+		return NULL;
+	f = &cap->flows[selected];
+	if (found)
+		return f;
+
+	if (evict) {
+		flow_free(cap, f);
+		cap->stat_flows_evicted++;
+	}
+
+	memset(f, 0, sizeof(*f));
+	f->ip_ver = 6;
+	memcpy(f->src_ip6, sa, 16);
+	memcpy(f->dst_ip6, da, 16);
+	f->src_port = sp;
+	f->dst_port = dp;
+	f->proto = proto;
+	f->in_use = 1;
+	f->ndpi_flow = (struct ndpi_flow_struct *)
+	    ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
+	if (!f->ndpi_flow) {
+		memset(f, 0, sizeof(*f));
+		cap->stat_flows_dropped++;
+		return NULL;
+	}
+	memset(f->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
+	cap->stat_flows_active++;
+	return f;
 }
 
 static int
@@ -335,66 +550,6 @@ sni_host_plausible(const char *h)
 	return dots >= 1;
 }
 
-static void flow_free(struct layer7_capture *cap, struct l7c_flow *f);
-
-static struct l7c_flow *
-flow_lookup(struct layer7_capture *cap, uint32_t sa, uint32_t da,
-    uint16_t sp, uint16_t dp, uint8_t proto, int create)
-{
-	uint32_t idx = layer7_capture_flow_hash(sa, da, sp, dp, proto,
-	    L7C_FLOW_MASK);
-	uint32_t i;
-	uint32_t selected;
-	struct layer7_capture_probe probe;
-	struct l7c_flow *f;
-	int found, evict;
-
-	layer7_capture_probe_init(&probe);
-	for (i = 0; i < L7C_FLOW_PROBE_SLOTS; i++) {
-		uint32_t slot = (idx + i) & L7C_FLOW_MASK;
-		int matches;
-
-		f = &cap->flows[slot];
-		matches = f->in_use && f->proto == proto &&
-		    ((f->src_ip == sa && f->dst_ip == da &&
-		    f->src_port == sp && f->dst_port == dp) ||
-		    (f->src_ip == da && f->dst_ip == sa &&
-		    f->src_port == dp && f->dst_port == sp));
-		layer7_capture_probe_observe(&probe, slot, f->in_use, matches,
-		    f->last_seen > 0 ? (uint64_t)f->last_seen : 0);
-	}
-
-	selected = layer7_capture_probe_select(&probe, create, &found, &evict);
-	if (selected == LAYER7_CAPTURE_NO_SLOT)
-		return NULL;
-	f = &cap->flows[selected];
-	if (found)
-		return f;
-
-	if (evict) {
-		flow_free(cap, f);
-		cap->stat_flows_evicted++;
-	}
-
-	memset(f, 0, sizeof(*f));
-	f->src_ip = sa;
-	f->dst_ip = da;
-	f->src_port = sp;
-	f->dst_port = dp;
-	f->proto = proto;
-	f->in_use = 1;
-	f->ndpi_flow = (struct ndpi_flow_struct *)
-	    ndpi_flow_malloc(SIZEOF_FLOW_STRUCT);
-	if (!f->ndpi_flow) {
-		memset(f, 0, sizeof(*f));
-		cap->stat_flows_dropped++;
-		return NULL;
-	}
-	memset(f->ndpi_flow, 0, SIZEOF_FLOW_STRUCT);
-	cap->stat_flows_active++;
-	return f;
-}
-
 static void
 flow_free(struct layer7_capture *cap, struct l7c_flow *f)
 {
@@ -521,11 +676,13 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 {
 	const u_char *ip_data;
 	uint16_t ip_len;
-	const struct ip *iph;
-	uint32_t sa, da;
+	uint16_t etype = 0;
+	uint8_t ip_ver;
+	uint32_t sa4 = 0, da4 = 0;
+	uint8_t sa6[16], da6[16];
 	uint16_t sp = 0, dp = 0;
-	uint8_t proto;
-	int ip_hdr_len;
+	uint8_t proto = 0;
+	uint16_t l3_hdr_len = 0;
 	struct l7c_flow *f;
 	time_t now;
 	ndpi_protocol detected;
@@ -533,11 +690,13 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	uint16_t l4_len = 0;
 
 	cap->stat_pkts++;
+	memset(sa6, 0, sizeof(sa6));
+	memset(da6, 0, sizeof(da6));
 
 	if (cap->datalink == DLT_EN10MB) {
 		if (hdr->caplen < 14)
 			return;
-		uint16_t etype = ntohs(*(const uint16_t *)(pkt + 12));
+		etype = ntohs(*(const uint16_t *)(pkt + 12));
 		if (etype == 0x8100) {
 			if (hdr->caplen < 18)
 				return;
@@ -548,46 +707,88 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 			ip_data = pkt + 14;
 			ip_len = (uint16_t)(hdr->caplen - 14);
 		}
-		if (etype != 0x0800)
+		if (etype != 0x0800 && etype != 0x86DD)
 			return;
 	} else {
 		ip_data = pkt;
 		ip_len = (uint16_t)hdr->caplen;
+		if (ip_len < 1)
+			return;
+		etype = (((ip_data[0] >> 4) & 0x0f) == 6) ? 0x86DD : 0x0800;
 	}
 
-	if (ip_len < 20)
-		return;
+	if (etype == 0x86DD ||
+	    (cap->datalink != DLT_EN10MB &&
+	    ip_len >= 1 && ((ip_data[0] >> 4) & 0x0f) == 6)) {
+		const struct ip6_hdr *ip6h;
+		uint16_t l4_off = 0;
 
-	iph = (const struct ip *)ip_data;
-	if (iph->ip_v != 4)
-		return;
+		ip_ver = 6;
+		if (ipv6_l4_offset(ip_data, ip_len, &proto, &l4_off) != 0)
+			return;
+		ip6h = (const struct ip6_hdr *)ip_data;
+		memcpy(sa6, &ip6h->ip6_src, 16);
+		memcpy(da6, &ip6h->ip6_dst, 16);
+		l3_hdr_len = l4_off;
 
-	ip_hdr_len = iph->ip_hl * 4;
-	if (ip_hdr_len < 20 || ip_len < (uint16_t)ip_hdr_len)
-		return;
+		if (proto == IPPROTO_TCP && ip_len >= (uint16_t)(l4_off + 4)) {
+			const struct tcphdr *th =
+			    (const struct tcphdr *)(ip_data + l4_off);
+			sp = ntohs(th->th_sport);
+			dp = ntohs(th->th_dport);
+			l4_data = ip_data + l4_off;
+			l4_len = (uint16_t)(ip_len - l4_off);
+		} else if (proto == IPPROTO_UDP &&
+		    ip_len >= (uint16_t)(l4_off + 4)) {
+			const struct udphdr *uh =
+			    (const struct udphdr *)(ip_data + l4_off);
+			sp = ntohs(uh->uh_sport);
+			dp = ntohs(uh->uh_dport);
+			l4_data = ip_data + l4_off;
+			l4_len = (uint16_t)(ip_len - l4_off);
+		}
 
-	sa = ntohl(iph->ip_src.s_addr);
-	da = ntohl(iph->ip_dst.s_addr);
-	proto = iph->ip_p;
+		f = flow_lookup_v6(cap, sa6, da6, sp, dp, proto, 1);
+	} else {
+		const struct ip *iph;
+		int ip_hdr_len;
 
-	if (proto == IPPROTO_TCP && ip_len >= (uint16_t)(ip_hdr_len + 4)) {
-		const struct tcphdr *th =
-		    (const struct tcphdr *)(ip_data + ip_hdr_len);
-		sp = ntohs(th->th_sport);
-		dp = ntohs(th->th_dport);
-		l4_data = ip_data + ip_hdr_len;
-		l4_len = (uint16_t)(ip_len - ip_hdr_len);
-	} else if (proto == IPPROTO_UDP &&
-	    ip_len >= (uint16_t)(ip_hdr_len + 4)) {
-		const struct udphdr *uh =
-		    (const struct udphdr *)(ip_data + ip_hdr_len);
-		sp = ntohs(uh->uh_sport);
-		dp = ntohs(uh->uh_dport);
-		l4_data = ip_data + ip_hdr_len;
-		l4_len = (uint16_t)(ip_len - ip_hdr_len);
+		ip_ver = 4;
+		if (ip_len < 20)
+			return;
+		iph = (const struct ip *)ip_data;
+		if (iph->ip_v != 4)
+			return;
+		ip_hdr_len = iph->ip_hl * 4;
+		if (ip_hdr_len < 20 || ip_len < (uint16_t)ip_hdr_len)
+			return;
+		sa4 = ntohl(iph->ip_src.s_addr);
+		da4 = ntohl(iph->ip_dst.s_addr);
+		proto = iph->ip_p;
+		l3_hdr_len = (uint16_t)ip_hdr_len;
+
+		if (proto == IPPROTO_TCP &&
+		    ip_len >= (uint16_t)(ip_hdr_len + 4)) {
+			const struct tcphdr *th =
+			    (const struct tcphdr *)(ip_data + ip_hdr_len);
+			sp = ntohs(th->th_sport);
+			dp = ntohs(th->th_dport);
+			l4_data = ip_data + ip_hdr_len;
+			l4_len = (uint16_t)(ip_len - ip_hdr_len);
+		} else if (proto == IPPROTO_UDP &&
+		    ip_len >= (uint16_t)(ip_hdr_len + 4)) {
+			const struct udphdr *uh =
+			    (const struct udphdr *)(ip_data + ip_hdr_len);
+			sp = ntohs(uh->uh_sport);
+			dp = ntohs(uh->uh_dport);
+			l4_data = ip_data + ip_hdr_len;
+			l4_len = (uint16_t)(ip_len - ip_hdr_len);
+		}
+
+		f = flow_lookup_v4(cap, sa4, da4, sp, dp, proto, 1);
 	}
 
-	f = flow_lookup(cap, sa, da, sp, dp, proto, 1);
+	(void)l3_hdr_len;
 	if (!f)
 		return;
 
@@ -595,80 +796,93 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 	f->last_seen = now;
 	f->pkt_count++;
 
-	if (proto == IPPROTO_UDP && l4_data && l4_len >= 12 + 8)
-		observe_dns_query(cap, sa, da, sp, dp, l4_data + 8,
+	/* DNS hint ainda IPv4-only (AAAA em ondas seguintes). */
+	if (ip_ver == 4 && proto == IPPROTO_UDP && l4_data &&
+	    l4_len >= 12 + 8) {
+		observe_dns_query(cap, sa4, da4, sp, dp, l4_data + 8,
 		    (uint16_t)(l4_len - 8));
-
-	if (proto == IPPROTO_UDP && l4_data && l4_len >= 12 + 8)
-		observe_dns_response(cap, sa, da, sp, dp, l4_data + 8,
+		observe_dns_response(cap, sa4, da4, sp, dp, l4_data + 8,
 		    (uint16_t)(l4_len - 8), now);
+	}
 
-	/* Coleta tambem quando o fluxo ja foi classificado; sem isto entradas
-	 * antigas podiam permanecer ate surgir outro fluxo nao classificado. */
 	expire_idle(cap, now);
 
 	if (f->classified)
 		return;
 
-	uint64_t time_ms = (uint64_t)hdr->ts.tv_sec * 1000 +
-	    (uint64_t)hdr->ts.tv_usec / 1000;
+	{
+		uint64_t time_ms = (uint64_t)hdr->ts.tv_sec * 1000 +
+		    (uint64_t)hdr->ts.tv_usec / 1000;
 
-	detected = ndpi_detection_process_packet(cap->ndpi, f->ndpi_flow,
-	    ip_data, ip_len, time_ms, NULL);
+		detected = ndpi_detection_process_packet(cap->ndpi, f->ndpi_flow,
+		    ip_data, ip_len, time_ms, NULL);
+	}
 
-	/*
-	 * `ndpi_is_protocol_detected()` também é true para resultado PARTIAL.
-	 * O app/SNI ainda pode melhorar em pacotes seguintes; o contrato de
-	 * conclusão no nDPI 5.x é o estado NDPI_STATE_CLASSIFIED.
-	 */
 	if (layer7_capture_should_finalize(
 	    detected.state == NDPI_STATE_CLASSIFIED,
 	    f->pkt_count, L7C_MAX_PKTS_PER_FLOW)) {
+		char src_ip_str[INET6_ADDRSTRLEN];
+		char dst_ip_str[INET6_ADDRSTRLEN];
+		const char *host_hint = NULL;
+		char *app_name;
+		const char *cat_name;
+
 		if (detected.state != NDPI_STATE_CLASSIFIED)
 			detected = ndpi_detection_giveup(cap->ndpi, f->ndpi_flow);
 
 		f->classified = 1;
 		f->detected = detected;
 
-		char *app_name = ndpi_get_proto_name(cap->ndpi,
+		app_name = ndpi_get_proto_name(cap->ndpi,
 		    detected.proto.app_protocol != NDPI_PROTOCOL_UNKNOWN ?
 		    detected.proto.app_protocol :
 		    detected.proto.master_protocol);
+		cat_name = ndpi_category_get_name(cap->ndpi, detected.category);
 
-		const char *cat_name = ndpi_category_get_name(cap->ndpi,
-		    detected.category);
+		if (f->ip_ver == 6) {
+			uint8_t log_src[16], log_dst[16];
 
-		char src_ip_str[INET_ADDRSTRLEN];
-		char dst_ip_str[INET_ADDRSTRLEN];
-		struct in_addr addr;
-		uint32_t log_src = f->src_ip;
-		uint32_t log_dst = f->dst_ip;
-		const char *host_hint;
+			memcpy(log_src, f->src_ip6, 16);
+			memcpy(log_dst, f->dst_ip6, 16);
+			if (!ip6_is_ula(log_src) && ip6_is_ula(log_dst)) {
+				uint8_t tmp[16];
 
-		if (!ip_is_private(log_src) && ip_is_private(log_dst)) {
-			uint32_t tmp = log_src;
-			log_src = log_dst;
-			log_dst = tmp;
-		}
+				memcpy(tmp, log_src, 16);
+				memcpy(log_src, log_dst, 16);
+				memcpy(log_dst, tmp, 16);
+			}
+			inet_ntop(AF_INET6, log_src, src_ip_str,
+			    sizeof(src_ip_str));
+			inet_ntop(AF_INET6, log_dst, dst_ip_str,
+			    sizeof(dst_ip_str));
+			/* Sem dns_hint IPv6 ainda — SNI cobre TLS. */
+			host_hint = NULL;
+			if (cap->use_sni && f->ndpi_flow &&
+			    f->ndpi_flow->host_server_name[0] != '\0' &&
+			    sni_host_plausible(f->ndpi_flow->host_server_name))
+				host_hint = f->ndpi_flow->host_server_name;
+		} else {
+			struct in_addr addr;
+			uint32_t log_src = f->src_ip;
+			uint32_t log_dst = f->dst_ip;
 
-		addr.s_addr = htonl(log_src);
-		inet_ntop(AF_INET, &addr, src_ip_str, sizeof(src_ip_str));
-		addr.s_addr = htonl(log_dst);
-		inet_ntop(AF_INET, &addr, dst_ip_str, sizeof(dst_ip_str));
-		host_hint = dns_hint_lookup(log_dst, now);
+			if (!ip_is_private(log_src) && ip_is_private(log_dst)) {
+				uint32_t tmp = log_src;
 
-		/*
-		 * Caminho A / A3: prefere o SNI (TLS) / Host (HTTP) extraido
-		 * pelo nDPI sobre o hint de DNS reverso. E o host que o cliente
-		 * pediu nesta ligacao — mais preciso para CDNs e robusto quando
-		 * o DNS do cliente esta em cache ou cifrado. Tambem alimenta a
-		 * cache de hints para futuras ligacoes ao mesmo IP de destino.
-		 */
-		if (cap->use_sni && f->ndpi_flow &&
-		    f->ndpi_flow->host_server_name[0] != '\0' &&
-		    sni_host_plausible(f->ndpi_flow->host_server_name)) {
-			host_hint = f->ndpi_flow->host_server_name;
-			dns_hint_store(log_dst, host_hint, now);
+				log_src = log_dst;
+				log_dst = tmp;
+			}
+			addr.s_addr = htonl(log_src);
+			inet_ntop(AF_INET, &addr, src_ip_str, sizeof(src_ip_str));
+			addr.s_addr = htonl(log_dst);
+			inet_ntop(AF_INET, &addr, dst_ip_str, sizeof(dst_ip_str));
+			host_hint = dns_hint_lookup(log_dst, now);
+			if (cap->use_sni && f->ndpi_flow &&
+			    f->ndpi_flow->host_server_name[0] != '\0' &&
+			    sni_host_plausible(f->ndpi_flow->host_server_name)) {
+				host_hint = f->ndpi_flow->host_server_name;
+				dns_hint_store(log_dst, host_hint, now);
+			}
 		}
 
 		cap->stat_flows_classified++;
@@ -676,7 +890,6 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		    app_name ? app_name : "Unknown",
 		    cat_name ? cat_name : "Unspecified", host_hint);
 	}
-
 }
 
 int

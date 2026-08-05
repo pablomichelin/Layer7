@@ -39,6 +39,33 @@ main(void)
 	    layer7_capture_flow_hash(b, a, 53, 53000, 17, FLOW_MASK),
 	    "UDP ida/volta usa o mesmo bucket");
 
+	/* IPv6 — passo 12.4 */
+	{
+		uint8_t s6[16] = {
+			0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0x0a
+		};
+		uint8_t d6[16] = {
+			0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0x01
+		};
+		uint32_t f6, r6, o6;
+
+		f6 = layer7_capture_flow_hash_v6(s6, d6, 53124, 443, 6,
+		    FLOW_MASK);
+		r6 = layer7_capture_flow_hash_v6(d6, s6, 443, 53124, 6,
+		    FLOW_MASK);
+		o6 = layer7_capture_flow_hash_v6(s6, d6, 53125, 443, 6,
+		    FLOW_MASK);
+		check(f6 == r6, "IPv6 TCP ida/volta usa o mesmo bucket");
+		check(f6 != o6, "IPv6 porta diferente altera a chave");
+		check(layer7_capture_flow_hash_v6(s6, d6, 53000, 53, 17,
+		    FLOW_MASK) ==
+		    layer7_capture_flow_hash_v6(d6, s6, 53, 53000, 17,
+		    FLOW_MASK),
+		    "IPv6 UDP ida/volta usa o mesmo bucket");
+	}
+
 	/*
 	 * Um slot expirado antes do match não pode provocar uma segunda
 	 * alocação para o mesmo fluxo.
