@@ -1,9 +1,10 @@
 # Spike MITM 20.7 — desenho e critérios (IM2)
 
-**Estado:** `EM CURSO` (`2026-08-05`) — desenho documental; **PoC lab PENDENTE**  
+**Estado:** `EM CURSO` (`2026-08-05`) — desenho + **preflight appliance**; PoC intercept **PENDENTE** (GO humano)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) passo **20.7**  
 **ADR:** [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md)  
-**Baseline:** produção enforce `1.9.8`  
+**Baseline enforce doc:** `1.9.8` · **Appliance observado:** `1.9.13` passivo em `192.168.100.254`  
+**Evidência preflight:** [`../tests/evidence/20260805T205900Z-appliance254-mitm-preflight/`](../tests/evidence/20260805T205900Z-appliance254-mitm-preflight/)  
 **Regra:** Identity (IM3+) **não** bloqueia se este spike for DEFER/NO-GO.
 
 ---
@@ -23,8 +24,25 @@ Veredicto possível: **GO** | **DEFER** | **NO-GO**.
 |-------|------------|
 | `layer7d` = pcap + nDPI + PF | Não termina TLS hoje |
 | Block page = DNS sinkhole + HTTP (ADR-0017) | MITM OFF deve permanecer byte-a-byte |
-| Entitlement `mitm` já gated (GI1) | Código MITM pode existir morto sem token |
-| pfSense CE vs lab Plus | Prova CE exigida para GO produção (ADR-0022) |
+| Entitlement `mitm` já gated (GI1 no git) | Código MITM pode existir morto sem token |
+| pfSense CE vs lab Plus | Appliance actual = **Plus 26.03.1**; prova CE exigida para GO produção (ADR-0022) |
+| Appliance `192.168.100.254` (preflight) | Pacote **1.9.13**; `enabled=false` / `monitor`; **sem `.lic`**; **sem squid** instalado; **nginx** presente; idle CPU ~97%; IM1 GUI/binário **ainda não instalados** |
+
+---
+
+## 2.1 Preflight appliance `2026-08-05` (só-leitura)
+
+| Check | Resultado |
+|-------|-----------|
+| SSH `root@192.168.100.254` | OK |
+| Pacote | `pfSense-pkg-layer7-1.9.13` |
+| Layer7 | passivo (`enabled=false`, `mode=monitor`) |
+| Licença `.lic` | ausente |
+| `pfSense-pkg-squid` / `squid-7.4` | **disponível no repo**, não instalado |
+| `nginx` | instalado (`1.28.0`) |
+| Páginas `layer7_identity.php` / `layer7_mitm.php` | ausentes (IM1 não empacotado nesta release) |
+| Baseline CPU (vmstat) | idle ~97% — headroom para S1 se PoC avançar |
+| Alterações nesta sessão | **nenhuma** (sem install squid / sem mudar enforce) |
 
 ---
 
@@ -77,10 +95,12 @@ se inviável em CE, **D (DEFER)**.
 
 | Campo | Valor |
 |-------|-------|
-| Data | _pendente lab_ |
-| Resultado | **PENDENTE** (desenho pronto; PoC não corrida) |
-| Opção preferida para PoC | A — squid sslbump |
-| Fallback se PoC bloqueada | **DEFER** (20.7a) → avançar IM3 Identity |
+| Data | 2026-08-05 (preflight) |
+| Resultado | **PENDENTE PoC** — preflight PASS; intercept não iniciado |
+| Opção preferida para PoC | A — `pfSense-pkg-squid` / squid sslbump (disponível no repo) |
+| Nota nginx | B fica como alternativa (nginx já instalado) |
+| Fallback | **DEFER** (20.7a) → avançar IM3 Identity |
+| Bloqueio | GO humano para instalar squid neste host (documentado como produção Systemup) |
 
 ---
 
@@ -89,3 +109,4 @@ se inviável em CE, **D (DEFER)**.
 | Data | Evento |
 |------|--------|
 | 2026-08-05 | Criação do spike doc (passo 20.7 iniciado pós-GI1) |
+| 2026-08-05 | Preflight só-leitura em `192.168.100.254` — evidência `20260805T205900Z-appliance254-mitm-preflight` |

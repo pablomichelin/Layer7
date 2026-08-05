@@ -1,0 +1,16 @@
+pfSense-pkg-layer7-1.9.13
+1.9.13
+ 6:00PM  up 32 days,  2:33, 1 user, load averages: 0.71, 0.93, 0.87
+48
+pfSense-pkg-squid-0.5.11
+pfSense-pkg-squidGuard-1.16.29
+nginx-1.28.0_10,3
+Name           : nginx
+Version        : 1.28.0_10,3
+lic=no
+im1_gui=no
+ procs    memory    page                      disks       faults       cpu
+ r  b  w  avm  fre  flt  re  pi  po   fr   sr  da0  cd0   in   sy   cs us sy id
+ 0  0  0 4418537885696 2605350912 7944   0   0  21 9081   76    0    0 12504 32572 54509  0  2 97
+ 0  0  0 4418537885696 2605342720  202   0   0   0  243  210    0    0 21145  672 61497  0  2 97
+ 0  0  0 4418537885696 2605346816  195   0   0   0  244  210    0    0 23382  594 85692  0  3 96
