@@ -886,7 +886,8 @@ Cada seccao abaixo inclui:
 > **Nesta release (`1.9.9`)** o caminho oficial e o **comando unico manual**
 > abaixo. O `install.sh` automatico (carimbado/assinado F1.2) nao e publicado
 > nesta release: ver nota em **Links da versao actual** e **BG-028** no
-> backlog. **Producao enforce:** canal **`1.9.9`**; producao enforce permanece **`1.9.8`** (GV7.4) ate GO.
+> backlog. **Canal lab/`latest`:** **`1.9.9`**. **Producao enforce:**
+> permanece **`1.9.8`** (GV7.4) ate GO de promocao.
 
 **Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
