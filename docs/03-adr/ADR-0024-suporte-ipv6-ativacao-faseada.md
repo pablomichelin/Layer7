@@ -2,7 +2,7 @@
 
 **Estado:** Aceito (publicado; implementação por ondas; GV0 fecha disclosure V0)  
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-05i (12.11 CONCLUÍDO — Opção A V5 completa / `1.9.8`)  
+**Rev.:** 2026-08-05j (GV7.4 PASS — produção enforce `1.9.8`)  
 **Decisores:** Operador + agente (governança pós-fecho plano mestre)
 
 ---
@@ -125,6 +125,14 @@ dual-listen, VIP Unbound ACL IPv6, portal6 via `get_interface_ipv6`.
 2. Dual-stack comercial **no âmbito V0–V5** no lab; **não** promove produção
    enforce (permanece **`1.9.0`** — GV7.4 PENDENTE).
 3. Salvaguarda ADR-0017: porta webgui continua excluída do rdr.
+
+#### Emenda (`2026-08-05`) — GV7.4 PASS / produção enforce `1.9.8`
+
+**Operador:** Systemup / Pablo Michelin (GO explícito: «autorizado, pode fazer»).  
+**Decisão:** promover produção enforce **`1.9.0` → `1.9.8`**. Canal `latest`
+já `1.9.8` — alinhado. Sem novo `.pkg`. Rollback enforce: **`1.9.0`**.
+Evidência: `docs/tests/evidence/20260805T150500Z-gv7.4-promocao-1.9.8/`.
+Trilha IPv6 V0–V6 **FECHADA**.
 
 ### V6 — Fecho
 

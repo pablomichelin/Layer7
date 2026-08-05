@@ -11,17 +11,17 @@
 
 | Item | Valor |
 |------|-------|
-| **Canal público `latest`** | `1.9.7` — tag `v1.9.6` em `pablomichelin/Layer7` (lab IPv6) |
-| **SHA256 (`latest`)** | `4a00b40226fb0d92d974c3156d0c6881aa07fde2fe96e8d1821548157cd4fb50` |
-| **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`); promoção `1.9.6` = GV7.4 PENDENTE |
-| **Rollback imediato (a partir de `1.9.7`)** | `1.9.6` |
+| **Canal público `latest`** | **`1.9.8`** — tag `v1.9.8` em `pablomichelin/Layer7` |
+| **SHA256 (`latest`)** | `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec` |
+| **Produção enforce (referência)** | **`1.9.8`** — GV7.4 PASS (`2026-08-05`); alinhada com `latest` |
+| **Rollback enforce** | **`1.9.0`** |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
 | **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
-| **Trilha IPv6** | Núcleo FECHADO; **12.10 CONCLUÍDO**; 12.11 residual; [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
+| **Trilha IPv6** | **FECHADA** (V0–V6); [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
-> **Versão actual (`latest`):** `1.9.7`. **Enforce:** `1.9.0`. DNS force dual-stack (12.10); block page/VIP HTTP ainda IPv4-only (12.11).
+> **Versão actual (`latest` = enforce):** `1.9.8`. Dual-stack V0–V5 completo no âmbito documentado.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 
@@ -38,7 +38,7 @@ Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](doc
 
 **Handoff chat longo:** [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md)
 
-**Arranque único (fecho P0–J FECHADO + trilha IPv6 núcleo FECHADO; residual V5/promoção):**
+**Arranque único (fecho P0–J + trilha IPv6 FECHADOS):**
 [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
 → plano: [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
 
@@ -84,13 +84,12 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 ## Proximos passos operacionais
 
-**Trilha IPv6:** núcleo FECHADO; **12.10 CONCLUÍDO**; residual **12.11** ou promoção
-enforce (`1.9.6`) com GO —
+**Trilha IPv6:** **FECHADA** (V0–V6; GV7.4 PASS) —
 [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md).
 
 1. **Chat limpo:** colar só o caminho do START-HERE-fecho-producao.md.
-2. Residual: **12.11** com GO **ou** **promoção enforce** com GO; ver `CORTEX.md`.
-3. Produção enforce permanece **`1.9.0`** até GO de promoção (GV7.4).
+2. Manutenção contínua / backlog geral; ver `CORTEX.md`.
+3. Produção enforce = **`1.9.8`** (alinhada com `latest`); rollback **`1.9.0`**.
 4. Diagnostico rapido: [`scripts/diagnose-layer7-appliance.sh`](scripts/diagnose-layer7-appliance.sh)
 5. Testes locais: `./tests/run-local.sh` (nao substituem appliance; obrigatorio em ondas com codigo)
 
@@ -99,15 +98,15 @@ enforce (`1.9.6`) com GO —
 ## Distribuicao e artefactos
 
 - Canal publico: **`.pkg` via GitHub Releases** (nao instalar directamente do GitHub clone)
-- Obter pacote lab (`latest`):
+- Obter pacote `latest` / producao enforce (`1.9.8`):
   ```sh
-  gh release download v1.8.11_65 --repo pablomichelin/Layer7 \
-    --pattern 'pfSense-pkg-layer7-1.8.11_65.pkg*' --dir artifacts/
+  gh release download v1.9.8 --repo pablomichelin/Layer7 \
+    --pattern 'pfSense-pkg-layer7-1.9.8.pkg*' --dir artifacts/
   ```
-- Obter pacote producao enforce (referencia ate GO):
+- Rollback enforce (`1.9.0`):
   ```sh
-  gh release download v1.8.11_24 --repo pablomichelin/Layer7 \
-    --pattern 'pfSense-pkg-layer7-1.8.11_24.pkg*' --dir artifacts/
+  gh release download v1.9.0 --repo pablomichelin/Layer7 \
+    --pattern 'pfSense-pkg-layer7-1.9.0.pkg*' --dir artifacts/
   ```
 - Build: builder FreeBSD `192.168.100.12` — ver [`docs/08-lab/builder-freebsd.md`](docs/08-lab/builder-freebsd.md)
 - macOS: workspace de edicao/git/docs apenas; validacao tecnica no builder + appliance

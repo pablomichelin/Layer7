@@ -39,14 +39,12 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `SHA256=229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec`;
 HTTP/VIP `rdr inet6` / 12.11; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
-Candidato lab: V5 dual-stack completo. Rollback imediato: `1.9.7`.
+**Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
+alinhada com `latest`). Rollback imediato: **`1.9.0`**. Historico: `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
-**Referencia de producao enforce:** **`1.9.0`** (fecho plano mestre `2026-08-05`;
-equivalente funcional a `1.8.11_69`; rollback imediato `_69`; historico `_24`).
-**Nao** promover `1.9.1`…`1.9.8` a enforce ate **GO humano de promocao** (GV7.4).
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
-Trilha IPv6: nucleo + V5 **FECHADOS**; GV7.4 PENDENTE.
+Trilha IPv6: **FECHADA** (V0–V6; GV7.4 PASS).
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1240,42 +1238,37 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 
 ---
 
-## Trilha IPv6 completo (pós-fecho — 2026-08-05, rev. f — 12.11 / V5 fechada)
+## Trilha IPv6 completo (pós-fecho — 2026-08-05, rev. g — GV7.4 PASS)
 
 Extensão **pós-Onda J** do plano mestre. **Não** reabre P0–J.
-Produção enforce permanece **`1.9.0`** até **GO humano de promoção** (GV7.4).
+**Produção enforce = `1.9.8`** (GV7.4 PASS — GO humano `2026-08-05`).
 
-- **Plano:** [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md) — núcleo + V5 FECHADOS
+- **Plano:** [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md) — **FECHADO**
 - **Arranque chat (único):** [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
 - **Mapa lógica/código:** [`docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md`](docs/01-architecture/f4-ipv6-mapa-rastreabilidade.md) (§8 salvaguardas)
 - **Gates:** [`docs/09-blocking/plano-gates-ipv6.md`](docs/09-blocking/plano-gates-ipv6.md)
-- **ADR:** [`docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md`](docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) — Opção A **12.10+12.11**
+- **ADR:** [`docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md`](docs/03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) — Opção A completa + GV7.4
+- **Evidência promoção:** [`docs/tests/evidence/20260805T150500Z-gv7.4-promocao-1.9.8/`](docs/tests/evidence/20260805T150500Z-gv7.4-promocao-1.9.8/)
 
 > Passos **12.x** da trilha IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
 > Não existe outro ficheiro START-HERE para esta fila.
 
-**Estado:** núcleo dual-stack **FECHADO**; **12.10+12.11 CONCLUÍDOS** (V5 Opção A
-completa — DNS + HTTP/HTTPS portal + VIP ACL v6). Dual-stack comercial **no
-âmbito V0–V5**; produção enforce **não** promovida (GV7.4).
+**Estado:** trilha IPv6 **FECHADA** (V0–V6). Dual-stack comercial no âmbito
+documentado; `latest` e produção enforce **alinhados** em **`1.9.8`**.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **12.11 CONCLUÍDO** — HTTP/HTTPS rdr inet6 + VIP ACL v6; candidato **1.9.8**
-- Trilha: núcleo + V5 FECHADOS; residual = GV7.4 promoção
-- Passo 12.1–12.9: CONCLUÍDOS (V0–V4)
-- Passo 12.10: CONCLUÍDO — DNS force dual-stack (`1.9.7`; smoke GV5.2 PASS)
-- Passo 12.11: CONCLUÍDO — HTTP/HTTPS rdr inet6 + VIP ACL v6; blockpage dual-listen;
-  portal6 via get_interface_ipv6; candidato **1.9.8**; smoke
-  `20260805T143000Z-gv5-12.11-smoke-1.9.8` **PASS**
-- Passo 12.12–12.13: CONCLUÍDOS (GV6/GV7 documental; GV7.4 PENDENTE)
-- Appliance (`192.168.100.254`): **1.9.8** instalado (lab); enforce/`force_dns` preservados
-- Candidato lab / `latest`: **1.9.8**
-- Produção enforce: **1.9.0** (inalterada — GV7.4 PENDENTE)
+- Passo actual: **FECHADA** — GV7.4 PASS; produção enforce **1.9.8**
+- Passo 12.1–12.11: CONCLUÍDOS (V0–V5)
+- Passo 12.12–12.13: CONCLUÍDOS (GV6/GV7.1–GV7.3)
+- GV7.4: **PASS** — GO promoção `1.9.0` → `1.9.8` (`20260805T150500Z-gv7.4-promocao-1.9.8`)
+- Canal `latest` / produção enforce: **1.9.8** (alinhados)
+- Rollback enforce: **1.9.0**
+- Appliance (`192.168.100.254`): **1.9.8** (lab; já em enforce operacional)
 - Versionamento: série patch `1.9.0` → … → `1.9.8` (`PORTREVISION=0`)
-- GV5: **PASS** (DNS + HTTP portal + VIP ACL v6)
-- I7: **PASS** (Opção A completa)
-- BG-083: **concluído**
-- Trabalho residual autorizado: **promoção enforce** com GO (GV7.4)
+- GV0–GV7: **PASS**
+- I1–I8 / BG-078…BG-084: **concluídos**
+- Trabalho residual nesta fila: **nenhum**
 ```
 
 ---
@@ -1439,13 +1432,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: 1.9.8 (HTTP/VIP rdr inet6 / 12.11; SHA256 22963924…)
-- Producao enforce: 1.9.0 (fecho plano; rollback _69; GV7.4 promoção PENDENTE)
+- Canal publico latest: 1.9.8 (SHA256 22963924…)
+- Producao enforce: **1.9.8** (GV7.4 PASS; rollback 1.9.0)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
-- Trilha IPv6: núcleo + V5 FECHADOS; GV7.4 PENDENTE
+- Trilha IPv6: **FECHADA** (V0–V6; GV7.4 PASS)
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: **promoção enforce** com GO (GV7.4); BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: manutenção contínua; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -1459,13 +1452,10 @@ CHECKPOINT CANONICO
 - A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.8`**
   publicado em `pablomichelin/Layer7` tag `v1.9.8`
   (`SHA256=229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec`).
-  V5 completa (12.11). Rollback imediato: `v1.9.7`.
-- A referencia de **producao enforce** permanece **`1.9.0`**
-  (`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`)
-  ate **GO humano de promocao** (GV7.4) — nao promover `1.9.1`…`1.9.8` sem esse GO.
-  Rollback a partir de `1.9.0`: `v1.8.11_69`.
-  Trilha IPv6: **FECHADA (nucleo + V5)** em `2026-08-05`; residual = promocao
-  enforce (GV7.4) com GO separado.
+- A referencia de **producao enforce** e **`1.9.8`** (GV7.4 PASS `2026-08-05`;
+  evidência `20260805T150500Z-gv7.4-promocao-1.9.8`). Alinhada com `latest`.
+  Rollback imediato: **`v1.9.0`**. Historico: `v1.8.11_69`, `v1.8.11_24`.
+  Trilha IPv6: **FECHADA (V0–V6)** — dual-stack comercial no âmbito documentado.
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
   (`snapshot_id=ut1-2026-04-25`,

@@ -275,15 +275,16 @@ reavaliacao formal.
 | BG-076 | GUI i18n EN/PT completo + icones FA6 Perfis rapidos + renome Mensagens | Media | package/GUI | Caminho A / UX F4.3 | opcoes novas so em PT; marcas FA4 mostram X branco no FA6 do pfSense; label Mensageria | M | Medio | Concluido codigo (`1.8.11_65`); gate appliance pendente | so apresentacao: `en.php`, `layer7_profile_icon_*`, `profiles.json` labels; id `mensageria` intacto; zero mudanca daemon/enforcement; producao enforce continua `_24` |
 | BG-077 | Check-in online periodico e revogacao remota de licenca (cancelamento comercial) | **Critica** | license-server/daemon/licenciamento | **F3+** (bloqueante comercial recomendado antes GO enforce) | revogacao no servidor nao corta appliance; cliente cancelado continua em enforce ate expiry+grace offline | G | **Alto** | **Implementado** (`2026-08-04`) | API `244` + daemon `1.8.11_68`; S14 PASS; flag `check_in_enabled` default OFF; ADR-0021; plano `f3-plano-check-in-online-revogacao-remota.md` |
 
-## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-05, rev. j)
+## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-05, rev. k)
 
-- Núcleo + V5 **FECHADOS**; **12.10+12.11 CONCLUÍDOS** (Opção A completa).
+- Trilha IPv6 **FECHADA** (V0–V6); **GV7.4 PASS** — produção enforce **`1.9.8`**.
   SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md);
   arranque **único**
   [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md);
-  ADR-0024.
-- Candidato lab / `latest`: **`1.9.8`**.
-- Produção enforce **`1.9.0`** — **GV7.4 promoção PENDENTE**.
+  ADR-0024; evidência
+  [`20260805T150500Z-gv7.4-promocao-1.9.8`](../tests/evidence/20260805T150500Z-gv7.4-promocao-1.9.8/).
+- Canal `latest` / produção enforce: **`1.9.8`** (alinhados).
+- Rollback enforce: **`1.9.0`**.
 - Mapa: [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md).
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
@@ -294,7 +295,7 @@ reavaliacao formal.
 | BG-081 | Policy/enforce/allowlist IPv6 (`policy.c`, `enforce.c`, `allowlist`) | Critica | daemon | F4 | decisão runtime v6 ausente | G | Alto | **Concluido (12.6–12.8 + GV4)** | GV4 closed `1.9.6` |
 | BG-082 | GUI + validação JSON IPv6 (`layer7.inc`, páginas GUI) | Alta | package/GUI | F4 | truncamento/validação silenciosa | M | Alto | **Concluido (12.9)** — Onda V4 completa | portal HTTP dual-stack em 12.11 |
 | BG-083 | DNS forçado / block page / VIP isenção IPv6 (NAT `rdr inet6`) | Alta | package/PF/Unbound | F4 | bypass DNS em v6 | G | Medio | **Concluido (12.10+12.11)** — `1.9.8` | DNS :53 + HTTP/HTTPS portal + VIP ACL v6 |
-| BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | **Concluido (12.12+12.13)** | GV7.4 promoção PENDENTE |
+| BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | **Concluido (12.12+12.13+GV7.4)** | produção enforce `1.9.8` |
 ---
 
 ## Itens explicitamente fora da fila imediata

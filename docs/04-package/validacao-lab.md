@@ -1437,7 +1437,7 @@ automática (`A`+`AAAA` → `layer7_pdst_N`), sem tocar em DNS forçado /
 `rdr inet6` / block page v6 (**V5 Opção B** — ADR-0024).
 
 **Pacote lab mínimo:** `>= 1.9.6` (AAAA hint + GV4 PASS).  
-**Produção enforce:** permanece **`1.9.0`** até GV7 + GO.  
+**Produção enforce:** **`1.9.8`** (GV7.4 PASS; alinhada com `latest`). Rollback: `1.9.0`.
 **SSOT gates:** [`../09-blocking/plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md) GV6.  
 **Script:** `tests/lab/run-ipv6-dualstack.sh` (`L7_RUN_LAB=1`).
 

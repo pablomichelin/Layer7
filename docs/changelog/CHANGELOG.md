@@ -21,9 +21,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Notes
 
 - Fecha residual V5 (BG-083); núcleo + V5 dual-stack **completos** no lab.
-- Candidato lab; produção enforce permanece `1.9.0` (GV7.4 PENDENTE).
+- **GV7.4 PASS (`2026-08-05`):** promovido a **produção enforce** (alinhado com
+  `latest`). Rollback enforce: `1.9.0`. Evidência
+  `20260805T150500Z-gv7.4-promocao-1.9.8`.
 - SHA256: `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec`.
-- Rollback lab: `1.9.7`.
+- Rollback lab intermédio: `1.9.7`.
 - Porta webgui (ex. 443) continua excluída do rdr (ADR-0017).
 
 ## [1.9.7] — 2026-08-05

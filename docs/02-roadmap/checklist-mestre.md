@@ -388,4 +388,4 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] GV6 campanha dual-stack — PASS (`20260805T130620Z-gv6-dualstack`)
 - [x] GV7.1–GV7.3 auditoria I1–I8 + release `1.9.6` — PASS (`20260805T133000Z-gv7-fecho`)
 - [x] Trilha IPv6 **FECHADA (núcleo dual-stack)** no CORTEX
-- [ ] GV7.4 GO promoção enforce (`1.9.6`) — **PENDENTE** (produção permanece `1.9.0`)
+- [x] GV7.4 GO promoção enforce (`1.9.8`) — **PASS** (`20260805T150500Z-gv7.4-promocao-1.9.8`)

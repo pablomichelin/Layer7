@@ -1,10 +1,10 @@
 # Plano — gates de produção Layer7
 
-**Data:** 2026-08-05 (rev. GO Onda F)  
-**Versão alvo / produção enforce:** `1.9.0`  
-**Canal público `latest`:** `1.9.0` (alinhado)  
-**Veredicto actual:** **GO** — promoção enforce documental (`2026-08-05`)  
-**Estado:** G2–G7 **PASS** no candidato `_69`; CE **LIMITAÇÃO** (ADR-0022 aceite)
+**Data:** 2026-08-05 (rev. GV7.4)  
+**Versão alvo / produção enforce:** `1.9.8`  
+**Canal público `latest`:** `1.9.8` (alinhado)  
+**Veredicto actual:** **GO** — produção enforce documental (Onda F `1.9.0` + **GV7.4** `1.9.8`)  
+**Estado:** G2–G7 **PASS** no candidato `_69`/série `1.9.x`; CE **LIMITAÇÃO** (ADR-0022 aceite)
 
 > **Nota:** `_31` foi superseded por `_32`…`_69`. O histórico de fixes por
 > versão mantém-se no `CHANGELOG` e no `CORTEX`; os gates físicos executam-se
@@ -19,7 +19,8 @@
 3. Rollback imediato documentado: `1.8.11_69`; rollback histórico enforce: `_24`.
 4. `scoped_hybrid` permanece experimental até E8 + two-client PASS.
 5. **GO Onda F (`2026-08-05`):** produção enforce = **`1.9.0`** (promoção semver; gates validados em `1.8.11_69`).
-6. CE físico no build `_69` pendente — ADR-0022 aceite como ressalva.
+6. **GV7.4 (`2026-08-05`):** produção enforce = **`1.9.8`** (trilha IPv6 completa; alinhada com `latest`).
+7. CE físico no build `_69` pendente — ADR-0022 aceite como ressalva.
 
 ### Confirmação passo 1.1 (P1 — 2026-08-04, confirmado GO)
 

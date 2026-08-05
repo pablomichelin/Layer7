@@ -249,12 +249,18 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum GV7.4 — promoção produção enforce `1.9.8` (`2026-08-05`):**
+GO humano explícito. Produção enforce: **`1.9.0` → `1.9.8`**. Canal `latest`
+já era `1.9.8` — **alinhado**. Sem novo `.pkg`. Rollback enforce: **`1.9.0`**.
+Evidência: `docs/tests/evidence/20260805T150500Z-gv7.4-promocao-1.9.8/`.
+Trilha IPv6 V0–V6 **FECHADA**.
+
 **Addendum da release `1.9.8` (HTTP/VIP rdr inet6 / 12.11 / lab, `2026-08-05`):**
 Candidato lab: fecha V5 — HTTP/HTTPS `rdr inet6` portal → `[::1]:8099`,
 blockpage dual-listen v4+v6, VIP Unbound ACL IPv6, portal6 via
 `get_interface_ipv6`/GUA. Fecha BG-083 / passo 12.11.
-**Não** é promoção de produção enforce (permanece **`1.9.0`** — GV7.4 PENDENTE).
-Rollback: `1.9.7`.
+**Promovido a produção enforce em GV7.4** (mesmo dia).
+Rollback lab pré-promoção: `1.9.7`.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.8`
 - **SHA256 esperado:** `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec`
@@ -712,12 +718,11 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > Apos GO Onda F (`2026-08-05`), producao enforce e canal publico estao alinhados
 > em `_69`; `_24` permanece apenas como rollback historico.
 
-> **Release `1.9.8` (HTTP/VIP rdr inet6 / 12.11 / lab — 2026-08-05):** canal publico
-> `latest` e comandos operacionais deste manual apontam para **`1.9.8`**.
-> **Producao enforce permanece `1.9.0`** (GV7.4 PENDENTE).
-> Rollback imediato a partir de `1.9.8`: **`1.9.7`**.
+> **Release `1.9.8` + GV7.4 (`2026-08-05`):** canal publico `latest` e
+> **produção enforce** apontam para **`1.9.8`** (alinhados).
+> Rollback enforce imediato: **`1.9.0`**. Rollback lab intermédio: **`1.9.7`**.
 
-**Versao canal publico / lab (`latest` e comandos abaixo):** `1.9.8`
+**Versao canal publico / lab / producao enforce (`latest` e comandos abaixo):** `1.9.8`
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.8`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.8/pfSense-pkg-layer7-1.9.8.pkg`
@@ -730,6 +735,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.7`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.7/pfSense-pkg-layer7-1.9.7.pkg`
 - **SHA256 esperado:** `4a00b40226fb0d92d974c3156d0c6881aa07fde2fe96e8d1821548157cd4fb50`
+
+**Versao de referencia producao enforce anterior (rollback a partir de `1.9.8`):** `1.9.0`
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.0`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.0/pfSense-pkg-layer7-1.9.0.pkg`
+- **SHA256 esperado:** `cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`
 
 **Versao lab antiga (rollback a partir de `1.9.7`):** `1.9.6`
 
@@ -760,12 +771,6 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.2`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.2/pfSense-pkg-layer7-1.9.2.pkg`
 - **SHA256 esperado:** `a3bda092f35b63f7559f1cee95e6abfd50a4338f6591a6c2b7f478722c9e0d34`
-
-**Versao de referencia producao enforce (inalterada):** `1.9.0`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.0`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.0/pfSense-pkg-layer7-1.9.0.pkg`
-- **SHA256 esperado:** `cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`
 
 **Versao anterior (rollback a partir de `1.9.0`):** `1.8.11_69`
 
@@ -861,7 +866,7 @@ Cada seccao abaixo inclui:
 > **Nesta release (`1.9.8`)** o caminho oficial e o **comando unico manual**
 > abaixo. O `install.sh` automatico (carimbado/assinado F1.2) nao e publicado
 > nesta release: ver nota em **Links da versao actual** e **BG-028** no
-> backlog. **Producao enforce:** referencia **`1.9.0`** (fecho plano mestre).
+> backlog. **Producao enforce:** referencia **`1.9.8`** (GV7.4 PASS; alinhada com `latest`).
 
 **Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
