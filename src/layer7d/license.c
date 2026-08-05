@@ -4,6 +4,7 @@
  */
 
 #include "license.h"
+#include "features.h"
 
 #include <ctype.h>
 #include <errno.h>
@@ -241,7 +242,7 @@ layer7_license_check(struct l7_license_info *info)
 	unsigned char sig_bin[64];
 	int sig_len;
 	char hw_id[L7_HW_ID_LEN];
-	char lic_hwid[L7_HW_ID_LEN], expiry[16], customer[256], features[64];
+	char lic_hwid[L7_HW_ID_LEN], expiry[16], customer[256], features[256];
 	struct tm exp_tm;
 	time_t exp_time, now;
 	double diff_days;
@@ -258,6 +259,8 @@ layer7_license_check(struct l7_license_info *info)
 	if (is_dev_key()) {
 		info->dev_mode = 1;
 		info->valid = 1;
+		info->features_flags = L7_FEAT_BASE;
+		snprintf(info->features, sizeof(info->features), "base");
 		snprintf(info->error, sizeof(info->error),
 		    "development key — license verification skipped");
 		if (layer7_hw_fingerprint(info->hardware_id,
@@ -378,7 +381,18 @@ layer7_license_check(struct l7_license_info *info)
 
 	strncpy(info->expiry, expiry, sizeof(info->expiry) - 1);
 	strncpy(info->customer, customer, sizeof(info->customer) - 1);
-	strncpy(info->features, features, sizeof(info->features) - 1);
+	{
+		struct l7_features feat;
+
+		if (layer7_features_parse(features, &feat)) {
+			fprintf(stderr,
+			    "license_features_truncated: features CSV exceeded %d bytes\n",
+			    L7_FEATURES_MAX);
+		}
+		memcpy(info->features, feat.raw, sizeof(info->features));
+		info->features_flags = feat.flags;
+		info->features_truncated = feat.truncated;
+	}
 	info->days_left = (int)diff_days;
 
 	if (diff_days >= 0) {

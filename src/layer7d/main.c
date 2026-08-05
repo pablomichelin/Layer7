@@ -2632,6 +2632,9 @@ int main(int argc, char **argv)
 			printf("expiry=%s\n", li.expiry[0] ? li.expiry : "");
 			printf("features=%s\n",
 			    li.features[0] ? li.features : "");
+			printf("features_flags=0x%x\n", li.features_flags);
+			printf("features_truncated=%d\n",
+			    li.features_truncated ? 1 : 0);
 			if (li.error[0])
 				printf("error=%s\n", li.error);
 			return li.valid ? 0 : 1;

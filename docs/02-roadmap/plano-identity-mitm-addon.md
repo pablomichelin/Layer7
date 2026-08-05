@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-05c` — contratos técnicos fechados; **IM0 fechado**; código abre em IM1/20.3)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-05c`; **IM0 fechado**; **20.3 PASS**; passo actual **20.4**)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
@@ -18,17 +18,17 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.3** (IM1 — parse `features` daemon ADR-0025 P1–P6 + testes C) |
-| Código | Ainda não iniciado (abre em 20.3) |
+| Passo actual | **20.4** (IM1 — license-server emissão SKU / UI features + validação P1) |
+| Código | **20.3 PASS** — `features.c` + testes; sem módulos Identity/MITM activos |
 | ADRs | **Aceito** ×4 (`2026-08-05`); transição legado **T1** |
-| Próximo após 20.3 | 20.4 — license-server emissão SKU / UI features |
+| Próximo após 20.4 | 20.5 — GUI secções Identity/MITM bloqueadas sem entitlement |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.3 / IM1
-- IM0: 20.1 PASS; rev.b PASS; rev.c PASS; **20.2 PASS** (ADRs 0025–0028 Aceito; T1)
-- IM1: 20.3 PENDENTE; 20.4–20.6 PENDENTE
-- IM2–IM9: PENDENTE — código NÃO iniciado (abre em 20.3)
+- Passo actual: 20.4 / IM1
+- IM0: 20.1–20.2 PASS (ADRs Aceito; T1; GI0)
+- IM1: **20.3 PASS**; 20.4–20.6 PENDENTE
+- IM2–IM9: PENDENTE
 - Baseline: 1.9.8
 ```
 
@@ -476,6 +476,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-05 | **rev. `b`** — reparos arquitectónicos (spike MITM, mapa daemon, fontes canónicas, fail-mode, precedência, riscos R11–R16); código ainda não iniciado |
 | 2026-08-05 | **rev. `c`** — contratos técnicos fechados: ADR-0028 (concorrência daemon) criado; contrato `features` P1–P6; precedência check-in vs `.lic` (interseção); §3.1 reconciliado com first-match; critérios S1–S8 do spike MITM; canal agente DC A1–A7; conflito NAT `multi-user`; cold start; limites de escala; passo 20.11a; riscos R17–R20; código ainda não iniciado |
 | 2026-08-05 | **20.2 PASS** — ADRs 0025/0026/0027/0028 Aceito; transição legado **T1**; GI0 PASS; passo actual → **20.3** (IM1) |
+| 2026-08-05 | **20.3 PASS** — `features.c`/`features.h` (ADR-0025 P1–P6 + T1); integração em `license_check`; `test_features_parse.c` PASS; passo actual → **20.4** |
 
 ---
 

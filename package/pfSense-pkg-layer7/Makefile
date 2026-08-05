@@ -20,8 +20,8 @@ LICENSE_FILE=	${.CURDIR}/../../LICENSE
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c)
-.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, blacklist.c, bl_config.c, allowlist.c, log_store.c)."
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, features.c, blacklist.c, bl_config.c, allowlist.c, log_store.c)."
 .endif
 
 NDPI_PREFIX=	/usr/local
@@ -55,6 +55,7 @@ do-build:
 		${LAYER7_NDPI_CFLAGS} -o ${WRKSRC}/layer7d \
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
 		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
+		${LAYER7D_DIR}/features.c \
 		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
 		${LAYER7D_DIR}/allowlist.c ${LAYER7D_DIR}/log_store.c \
 		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} /usr/lib/libcrypto.a

@@ -31,7 +31,9 @@ struct l7_license_info {
 	char  hardware_id[L7_HW_ID_LEN];
 	char  customer[256];
 	char  expiry[16];     /* YYYY-MM-DD */
-	char  features[64];
+	char  features[64];   /* raw CSV do .lic (truncado a 63; ADR-0025 P1) */
+	unsigned features_flags; /* L7_FEAT_* parseados (sempre inclui BASE) */
+	int   features_truncated; /* 1 se o CSV do .lic excedeu 63 bytes */
 	char  error[256];
 };
 

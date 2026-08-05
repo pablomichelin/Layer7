@@ -41,6 +41,7 @@ if [ "$SMOKE_OS" != "FreeBSD" ]; then
  * Não é instalado no pacote; nunca executa fora do CI/smoke.
  */
 #include "license.h"
+#include "features.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -62,6 +63,8 @@ layer7_license_check(struct l7_license_info *info)
 	memset(info, 0, sizeof(*info));
 	info->dev_mode = 1;
 	info->valid = 1;
+	info->features_flags = L7_FEAT_BASE;
+	snprintf(info->features, sizeof(info->features), "base");
 	(void)layer7_hw_fingerprint(info->hardware_id,
 	    sizeof(info->hardware_id));
 	snprintf(info->error, sizeof(info->error),
@@ -82,7 +85,7 @@ STUB
 	LDFLAGS_CRYPTO=""
 fi
 
-SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC blacklist.c bl_config.c allowlist.c log_store.c"
+SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC features.c blacklist.c bl_config.c allowlist.c log_store.c"
 CFLAGS_NDPI="-DHAVE_NDPI=0"
 LDFLAGS_NDPI=""
 if [ -f /usr/local/include/ndpi/ndpi_api.h ] && [ -f /usr/local/lib/libndpi.a ]; then

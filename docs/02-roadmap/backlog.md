@@ -297,14 +297,14 @@ reavaliacao formal.
 
 - Arranque: [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 - Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md)
-- Passo actual: **20.3 / IM1** (parse `features` daemon); IM0 fechado
+- Passo actual: **20.4 / IM1** (license-server features); **20.3 PASS**
 - ADRs **Aceito** (`2026-08-05`): 0025 (SKU; **T1**), 0026 (MITM), 0027 (Identity), 0028 (concorrência)
 - Baseline produção: **`1.9.8`**. Captive portal: **fora de escopo**.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
-| BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **Concluido (20.2 PASS / GI0)** | ADRs 0025–0028 Aceito; T1; código abre em 20.3 |
-| BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Em curso (20.3)** | ADR-0025 Aceito; GI1 |
+| BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **Concluido (20.2 PASS / GI0)** | ADRs 0025–0028 Aceito; T1 |
+| BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Em curso (20.3 PASS; 20.4 actual)** | `features.c` + testes; falta LS/GUI/GI1 |
 | BG-087 | MITM TLS opt-in + CA (IM2) — **após spike 20.7 GO**; DEFER permitido | Critica | daemon/package/PKI | IM2 | UX HTTPS / risco estabilidade; segundo produto | G | Alto | Planeado | ADR-0026 Aceito; não bloqueia Identity |
 | BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | Planeado | ADR-0027 Aceito; não usar PHP device_ips SSOT |
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | Planeado | WinRM outbound não canónico |

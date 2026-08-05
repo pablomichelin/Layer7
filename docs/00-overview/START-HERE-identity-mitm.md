@@ -29,8 +29,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Plano | **ABERTO** — Identity + MITM Add-on |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM1 / 20.3** — parse `features` no daemon (ADR-0025 P1–P6) + testes C |
-| Código do produto nesta trilha | **ainda não iniciado** (IM0 fechado; IM1 abre código mínimo de parse) |
+| Passo actual | **IM1 / 20.4** — license-server: emissão SKU / UI features + validação P1 |
+| Código do produto nesta trilha | **iniciado** (20.3: parse `features` + testes C PASS) |
 | Rev. do plano | **`2026-08-05c`** (contratos técnicos fechados; 20.2 PASS) |
 | Entitlement comercial | Modelo **X = base** / **Y = add-on**; legado **T1** (`full`→`base`) — ADR-0025 Aceito |
 | MITM | Opt-in; **spike 20.7 GO/NO-GO**; pode **DEFER** sem bloquear Identity (ADR-0026 Aceito) |
@@ -104,7 +104,7 @@ Arranque: docs/00-overview/START-HERE-identity-mitm.md
 Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 não reabrir fecho/IPv6; captive portal fora de escopo.
-Tarefa: continuar no passo actual (IM1 / 20.3 — parse features daemon).
+Tarefa: continuar no passo actual (IM1 / 20.4 — license-server features).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -122,11 +122,11 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM1 / 20.3 (parse features daemon P1–P6 + testes C)
-- IM0: 20.1 PASS; rev.b PASS; rev.c PASS; **20.2 PASS** (ADRs 0025–0028 Aceito; T1)
-- IM1: 20.3 PENDENTE; 20.4–20.6 PENDENTE
+- Passo actual: IM1 / 20.4 (license-server emissão SKU / UI features + P1)
+- IM0: 20.1–20.2 PASS (ADRs Aceito; T1; GI0)
+- IM1: **20.3 PASS** (parse features P1–P6 + testes C); 20.4–20.6 PENDENTE
 - IM2–IM9: PENDENTE
-- Código produto: NÃO iniciado (abre em 20.3)
+- Código produto: iniciado (features.c); sem gate MITM/Identity activo
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
 ```

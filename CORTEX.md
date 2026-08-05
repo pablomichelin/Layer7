@@ -1288,8 +1288,8 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção / `latest`: **`1.9.8`**. **IM0 fechado** (`2026-08-05`);
-código de produto abre em **IM1 / 20.3** (parse `features`).
+Baseline produção / `latest`: **`1.9.8`**. **IM0 fechado**; **20.3 PASS**
+(`features.c`); passo actual **20.4**.
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1313,14 +1313,14 @@ código de produto abre em **IM1 / 20.3** (parse `features`).
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.3 / IM1** (parse features daemon P1–P6 + testes C)
-- IM0: 20.1 PASS; rev.b PASS; rev.c PASS; **20.2 PASS** (ADRs 0025–0028 Aceito; T1; GI0 PASS)
-- IM1: 20.3 PENDENTE; 20.4–20.6 PENDENTE
+- Passo actual: **20.4 / IM1** (license-server emissão SKU / UI features + P1)
+- IM0: 20.1–20.2 PASS (ADRs Aceito; T1; GI0)
+- IM1: **20.3 PASS** (parse features P1–P6 + testes C); 20.4–20.6 PENDENTE
 - IM2–IM9: PENDENTE
-- Código produto: **NÃO iniciado** (abre em 20.3)
+- Código produto: iniciado (`features.c`); sem gate MITM/Identity activo
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
-- Próximo: 20.3 — parse `features` no daemon (ADR-0025 P1–P6) + testes C
+- Próximo: 20.4 — license-server features
 ```
 
 ---
@@ -1495,12 +1495,12 @@ CHECKPOINT CANONICO
 - Canal publico latest: **1.9.13** (guia Acesso Remoto)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo 20.3/IM1 (parse features); GI0 PASS; arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo 20.4/IM1 (license-server features); 20.3 PASS; arranque docs/00-overview/START-HERE-identity-mitm.md
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; não misturar com IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **20.3** (parse features) **ou** GO promoção enforce 1.9.13; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: Identity+MITM **20.4** (license-server features) **ou** GO promoção enforce 1.9.13; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
