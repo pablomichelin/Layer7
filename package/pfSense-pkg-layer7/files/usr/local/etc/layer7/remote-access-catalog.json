@@ -1,0 +1,298 @@
+{
+  "version": 1,
+  "profile_id": "remote-access",
+  "items": [
+    {
+      "id": "ndpi-remote-category",
+      "name": "Categoria nDPI RemoteAccess",
+      "group": "Cobertura ampla",
+      "icon": "fa-globe",
+      "detection": "ndpi-category",
+      "note": "Bloqueia tudo o que o nDPI classificar como RemoteAccess.",
+      "ndpi_categories": ["RemoteAccess"],
+      "ndpi_apps": [],
+      "hosts": []
+    },
+    {
+      "id": "teamviewer",
+      "name": "TeamViewer",
+      "group": "Consumidor / SMB",
+      "icon": "fa-desktop",
+      "detection": "ndpi+host",
+      "ndpi_apps": ["TeamViewer"],
+      "hosts": ["teamviewer.com"]
+    },
+    {
+      "id": "anydesk",
+      "name": "AnyDesk",
+      "group": "Consumidor / SMB",
+      "icon": "fa-laptop",
+      "detection": "ndpi+host",
+      "ndpi_apps": ["AnyDesk"],
+      "hosts": ["anydesk.com"]
+    },
+    {
+      "id": "rustdesk",
+      "name": "RustDesk",
+      "group": "Consumidor / SMB",
+      "icon": "fa-terminal",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["rustdesk.com", "rustdesk.net"]
+    },
+    {
+      "id": "chrome-remote",
+      "name": "Chrome Remote Desktop",
+      "group": "Consumidor / SMB",
+      "icon": "fa-chrome",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["remotedesktop.google.com"]
+    },
+    {
+      "id": "splashtop",
+      "name": "Splashtop",
+      "group": "Consumidor / SMB",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["splashtop.com"]
+    },
+    {
+      "id": "zoho-assist",
+      "name": "Zoho Assist",
+      "group": "Consumidor / SMB",
+      "icon": "fa-headphones",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["zohoassist.com"]
+    },
+    {
+      "id": "ultraviewer",
+      "name": "UltraViewer",
+      "group": "Consumidor / SMB",
+      "icon": "fa-eye",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["ultraviewer.net", "nanosystems.it"]
+    },
+    {
+      "id": "supremo",
+      "name": "Supremo",
+      "group": "Consumidor / SMB",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["supremocontrol.com"]
+    },
+    {
+      "id": "remotepc",
+      "name": "RemotePC",
+      "group": "Consumidor / SMB",
+      "icon": "fa-laptop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["remotepc.com"]
+    },
+    {
+      "id": "isl-online",
+      "name": "ISL Online",
+      "group": "Consumidor / SMB",
+      "icon": "fa-globe",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["islonline.com", "islonline.net"]
+    },
+    {
+      "id": "dwservice",
+      "name": "DWService",
+      "group": "Consumidor / SMB",
+      "icon": "fa-cloud",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["dwservice.net"]
+    },
+    {
+      "id": "getscreen",
+      "name": "GetScreen",
+      "group": "Consumidor / SMB",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["getscreen.me"]
+    },
+    {
+      "id": "helpwire",
+      "name": "HelpWire",
+      "group": "Consumidor / SMB",
+      "icon": "fa-life-ring",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["helpwire.com"]
+    },
+    {
+      "id": "aeroadmin",
+      "name": "AeroAdmin",
+      "group": "Consumidor / SMB",
+      "icon": "fa-plane",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["aeroadmin.com"]
+    },
+    {
+      "id": "iperius",
+      "name": "Iperius Remote",
+      "group": "Consumidor / SMB",
+      "icon": "fa-exchange",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["iperiusremote.com"]
+    },
+    {
+      "id": "rdp",
+      "name": "RDP (Microsoft Remote Desktop)",
+      "group": "Protocolos / SO",
+      "icon": "fa-windows",
+      "detection": "ndpi",
+      "ndpi_apps": ["RDP"],
+      "hosts": []
+    },
+    {
+      "id": "vnc",
+      "name": "VNC (genérico)",
+      "group": "Protocolos / SO",
+      "icon": "fa-th",
+      "detection": "ndpi",
+      "ndpi_apps": ["VNC"],
+      "hosts": []
+    },
+    {
+      "id": "realvnc",
+      "name": "RealVNC",
+      "group": "Protocolos / SO",
+      "icon": "fa-th-large",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["realvnc.com"]
+    },
+    {
+      "id": "nomachine",
+      "name": "NoMachine",
+      "group": "Protocolos / SO",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["nomachine.com"]
+    },
+    {
+      "id": "ssh",
+      "name": "SSH",
+      "group": "Protocolos / SO",
+      "icon": "fa-terminal",
+      "detection": "ndpi",
+      "note": "Atenção: pode afectar administração legítima.",
+      "ndpi_apps": ["SSH"],
+      "hosts": []
+    },
+    {
+      "id": "parsec",
+      "name": "Parsec",
+      "group": "Gaming / média",
+      "icon": "fa-gamepad",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["parsec.app"]
+    },
+    {
+      "id": "moonlight",
+      "name": "Moonlight / Sunshine",
+      "group": "Gaming / média",
+      "icon": "fa-moon-o",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["moonlight-stream.org"]
+    },
+    {
+      "id": "hoptodesk",
+      "name": "HopToDesk",
+      "group": "Gaming / média",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["hoptodesk.com"]
+    },
+    {
+      "id": "screenconnect",
+      "name": "ConnectWise ScreenConnect",
+      "group": "IT / MSP / RMM",
+      "icon": "fa-building",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["screenconnect.com", "connectwise.com"]
+    },
+    {
+      "id": "atera",
+      "name": "Atera",
+      "group": "IT / MSP / RMM",
+      "icon": "fa-cogs",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["atera.com"]
+    },
+    {
+      "id": "ninjaone",
+      "name": "NinjaOne",
+      "group": "IT / MSP / RMM",
+      "icon": "fa-shield",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["ninjaone.com", "ninjarmm.com"]
+    },
+    {
+      "id": "meshcentral",
+      "name": "MeshCentral",
+      "group": "IT / MSP / RMM",
+      "icon": "fa-sitemap",
+      "detection": "host",
+      "note": "Instâncias self-host podem escapar à lista de hosts.",
+      "ndpi_apps": [],
+      "hosts": ["meshcentral.com"]
+    },
+    {
+      "id": "datto-rmm",
+      "name": "Datto RMM",
+      "group": "IT / MSP / RMM",
+      "icon": "fa-server",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["datto.com"]
+    },
+    {
+      "id": "todesk",
+      "name": "ToDesk",
+      "group": "Regionais",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["todesk.com"]
+    },
+    {
+      "id": "sunlogin",
+      "name": "Sunlogin / Oray",
+      "group": "Regionais",
+      "icon": "fa-sun-o",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["oray.com", "sunlogin.oray.com"]
+    },
+    {
+      "id": "awesun",
+      "name": "AweSun",
+      "group": "Regionais",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": ["aweray.com"]
+    }
+  ]
+}

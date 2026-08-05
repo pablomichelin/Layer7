@@ -2,6 +2,22 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.9.13] — 2026-08-05
+
+### Added
+
+- **Guia Acesso Remoto:** página GUI com catálogo de softwares (ícone +
+  bloqueado/permitido), sincroniza o perfil `remote-access` e a política
+  `profile-remote-access`. Catálogo em `remote-access-catalog.json`
+  (consumidor, protocolos, gaming, RMM, regionais).
+
+### Notes
+
+- Canal `latest`: **`1.9.13`** (SHA após build). Produção enforce permanece
+  **`1.9.8`** até GO.
+- Rollback lab: `1.9.12`.
+- Menu: Services → Layer 7 → **Acesso Remoto**.
+
 ## [1.9.12] — 2026-08-05
 
 ### Changed

@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.12
+PORTVERSION=	1.9.13
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -88,6 +88,8 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_policies.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_remote_access.php \
+		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_groups.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_categories.php \
@@ -136,6 +138,8 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/pf.conf.sample \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/profiles.json \
+		${STAGEDIR}${PREFIX}/etc/layer7
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/remote-access-catalog.json \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/allowlist-seed.txt \
 		${STAGEDIR}${PREFIX}/etc/layer7

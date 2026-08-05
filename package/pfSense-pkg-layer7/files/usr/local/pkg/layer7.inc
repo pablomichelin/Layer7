@@ -5739,12 +5739,301 @@ function layer7_devices_resync()
 	return $total;
 }
 
+/**
+ * Caminho do catálogo estático da guia Acesso Remoto.
+ */
+function layer7_remote_access_catalog_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		$test = getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/remote-access-catalog.json";
+		if (file_exists($test)) {
+			return $test;
+		}
+	}
+	return "/usr/local/etc/layer7/remote-access-catalog.json";
+}
+
+function layer7_remote_access_state_path()
+{
+	return "/usr/local/etc/layer7/remote-access.json";
+}
+
+function layer7_remote_access_catalog_load()
+{
+	$path = layer7_remote_access_catalog_path();
+	if (!file_exists($path)) {
+		return array("version" => 1, "profile_id" => "remote-access", "items" => array());
+	}
+	$raw = @file_get_contents($path);
+	$data = @json_decode(is_string($raw) ? $raw : "", true);
+	if (!is_array($data) || !isset($data["items"]) || !is_array($data["items"])) {
+		return array("version" => 1, "profile_id" => "remote-access", "items" => array());
+	}
+	if (empty($data["profile_id"])) {
+		$data["profile_id"] = "remote-access";
+	}
+	return $data;
+}
+
+function layer7_remote_access_state_defaults()
+{
+	return array(
+		"blocked" => array()
+	);
+}
+
+function layer7_remote_access_state_load()
+{
+	$path = layer7_remote_access_state_path();
+	if (!file_exists($path)) {
+		return layer7_remote_access_state_defaults();
+	}
+	$raw = @file_get_contents($path);
+	$data = @json_decode(is_string($raw) ? $raw : "", true);
+	if (!is_array($data)) {
+		return layer7_remote_access_state_defaults();
+	}
+	if (!isset($data["blocked"]) || !is_array($data["blocked"])) {
+		$data["blocked"] = array();
+	}
+	$out = array();
+	foreach ($data["blocked"] as $id) {
+		$id = strtolower(trim((string)$id));
+		if ($id !== "" && preg_match('/^[a-z0-9_-]{1,64}$/', $id)) {
+			$out[$id] = true;
+		}
+	}
+	return array("blocked" => array_keys($out));
+}
+
+function layer7_remote_access_state_save($state)
+{
+	if (!is_array($state)) {
+		return false;
+	}
+	$dir = dirname(layer7_remote_access_state_path());
+	if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+		return false;
+	}
+	$clean = layer7_remote_access_state_defaults();
+	if (isset($state["blocked"]) && is_array($state["blocked"])) {
+		$ids = array();
+		foreach ($state["blocked"] as $id) {
+			$id = strtolower(trim((string)$id));
+			if ($id !== "" && preg_match('/^[a-z0-9_-]{1,64}$/', $id)) {
+				$ids[$id] = true;
+			}
+		}
+		$clean["blocked"] = array_keys($ids);
+	}
+	$json = json_encode($clean, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	if (!is_string($json)) {
+		return false;
+	}
+	if (@file_put_contents(layer7_remote_access_state_path(), $json . "\n", LOCK_EX) === false) {
+		return false;
+	}
+	@chmod(layer7_remote_access_state_path(), 0664);
+	return true;
+}
+
+/**
+ * Aplica selecção da guia ao perfil remote-access + política block.
+ * @return array{ok:bool,msg:string,hosts_truncated:bool}
+ */
+function layer7_remote_access_apply(array $blocked_ids)
+{
+	$catalog = layer7_remote_access_catalog_load();
+	$profile_id = (string)($catalog["profile_id"] ?? "remote-access");
+	$items_by_id = array();
+	foreach ($catalog["items"] as $it) {
+		if (!is_array($it)) {
+			continue;
+		}
+		$id = strtolower(trim((string)($it["id"] ?? "")));
+		if ($id !== "") {
+			$items_by_id[$id] = $it;
+		}
+	}
+
+	$selected = array();
+	foreach ($blocked_ids as $id) {
+		$id = strtolower(trim((string)$id));
+		if (isset($items_by_id[$id])) {
+			$selected[$id] = true;
+		}
+	}
+	$blocked_list = array_keys($selected);
+
+	if (!layer7_remote_access_state_save(array("blocked" => $blocked_list))) {
+		return array("ok" => false, "msg" => l7_t("Nao foi possivel gravar a selecao de Acesso Remoto."), "hosts_truncated" => false);
+	}
+
+	$desired_apps = array();
+	$desired_hosts = array();
+	$want_remote_cat = false;
+	foreach ($blocked_list as $id) {
+		$it = $items_by_id[$id];
+		if (!empty($it["ndpi_categories"]) && is_array($it["ndpi_categories"])) {
+			foreach ($it["ndpi_categories"] as $c) {
+				if (strtolower(trim((string)$c)) === "remoteaccess") {
+					$want_remote_cat = true;
+				}
+			}
+		}
+		if (!empty($it["ndpi_apps"]) && is_array($it["ndpi_apps"])) {
+			foreach ($it["ndpi_apps"] as $a) {
+				$a = trim((string)$a);
+				if ($a !== "") {
+					$desired_apps[$a] = true;
+				}
+			}
+		}
+		if (!empty($it["hosts"]) && is_array($it["hosts"])) {
+			foreach ($it["hosts"] as $h) {
+				$h = strtolower(trim((string)$h));
+				if ($h !== "" && layer7_profile_host_valid($h)) {
+					$desired_hosts[$h] = true;
+				}
+			}
+		}
+	}
+	$apps = array_keys($desired_apps);
+	$hosts = array_keys($desired_hosts);
+	$hosts_truncated = false;
+	if (count($hosts) > 64) {
+		$hosts = array_slice($hosts, 0, 64);
+		$hosts_truncated = true;
+	}
+	if (count($apps) > 64) {
+		$apps = array_slice($apps, 0, 64);
+	}
+
+	$factory_list = layer7_profiles_factory_load();
+	$factory = null;
+	foreach ($factory_list as $p) {
+		if (is_array($p) && ($p["id"] ?? "") === $profile_id) {
+			$factory = $p;
+			break;
+		}
+	}
+	if ($factory === null) {
+		return array("ok" => false, "msg" => l7_t("Perfil factory Acesso Remoto nao encontrado."), "hosts_truncated" => false);
+	}
+
+	$custom = layer7_profiles_custom_load();
+	if (!isset($custom["overrides"]) || !is_array($custom["overrides"])) {
+		$custom["overrides"] = array();
+	}
+	$ov = layer7_profile_compute_override($factory, $apps, $hosts, false);
+	if ($ov === false) {
+		return array("ok" => false, "msg" => l7_t("Hosts invalidos na selecao."), "hosts_truncated" => false);
+	}
+	if ($ov === null) {
+		unset($custom["overrides"][$profile_id]);
+	} else {
+		$custom["overrides"][$profile_id] = $ov;
+	}
+	if (!layer7_profiles_custom_save($custom)) {
+		return array("ok" => false, "msg" => l7_t("Nao foi possivel guardar o override do perfil."), "hosts_truncated" => false);
+	}
+
+	$merged = layer7_profile_get_by_id($profile_id);
+	if ($merged === null) {
+		$merged = $factory;
+		$merged["ndpi_apps"] = $apps;
+		$merged["hosts"] = $hosts;
+	}
+
+	$data = layer7_load_or_default();
+	if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
+		$data["layer7"]["policies"] = array();
+	}
+	$pid = "profile-" . $profile_id;
+	$idx = -1;
+	foreach ($data["layer7"]["policies"] as $i => $pol) {
+		if (($pol["id"] ?? "") === $pid) {
+			$idx = $i;
+			break;
+		}
+	}
+
+	$has_criteria = !empty($apps) || !empty($hosts) || $want_remote_cat;
+	if (!$has_criteria) {
+		if ($idx >= 0) {
+			array_splice($data["layer7"]["policies"], $idx, 1);
+			$data["layer7"]["policies"] = array_values($data["layer7"]["policies"]);
+		}
+		if (!layer7_save_json($data)) {
+			return array("ok" => false, "msg" => l7_t("Nao foi possivel actualizar politicas."), "hosts_truncated" => false);
+		}
+		layer7_pf_config_resync(true);
+		return array(
+			"ok" => true,
+			"msg" => l7_t("Nenhum software seleccionado — perfil Acesso Remoto desligado."),
+			"hosts_truncated" => false
+		);
+	}
+
+	if ($idx < 0) {
+		if (count($data["layer7"]["policies"]) >= 24) {
+			return array("ok" => false, "msg" => l7_t("Limite de 24 politicas."), "hosts_truncated" => false);
+		}
+		$rule = array(
+			"id" => $pid,
+			"name" => $merged["name"] ?? "Acesso Remoto",
+			"enabled" => true,
+			"action" => "block",
+			"priority" => 20,
+			"match" => array()
+		);
+		$data["layer7"]["policies"][] = $rule;
+		$idx = count($data["layer7"]["policies"]) - 1;
+	}
+
+	$pol = &$data["layer7"]["policies"][$idx];
+	$pol["enabled"] = true;
+	$pol["action"] = "block";
+	$pol["name"] = $merged["name"] ?? "Acesso Remoto";
+	if (!isset($pol["match"]) || !is_array($pol["match"])) {
+		$pol["match"] = array();
+	}
+	$keep = array();
+	foreach (array("src_cidrs", "groups", "src_exclude_cidrs", "src_exclude_groups", "src_hosts") as $mk) {
+		if (isset($pol["match"][$mk])) {
+			$keep[$mk] = $pol["match"][$mk];
+		}
+	}
+	$pol["match"] = $keep;
+	if (!empty($apps)) {
+		$pol["match"]["ndpi_app"] = array_slice($apps, 0, 64);
+	}
+	if ($want_remote_cat) {
+		$pol["match"]["ndpi_category"] = array("RemoteAccess");
+	}
+	if (!empty($hosts)) {
+		$pol["match"]["hosts"] = array_slice($hosts, 0, 64);
+	}
+	unset($pol);
+
+	if (!layer7_save_json($data)) {
+		return array("ok" => false, "msg" => l7_t("Nao foi possivel guardar politicas."), "hosts_truncated" => false);
+	}
+	layer7_pf_config_resync(true);
+	$msg = sprintf(l7_t("Acesso Remoto actualizado: %d software(s) bloqueado(s)."), count($blocked_list));
+	if ($hosts_truncated) {
+		$msg .= " " . l7_t("Aviso: lista de hosts truncada ao limite de 64 por politica.");
+	}
+	return array("ok" => true, "msg" => $msg, "hosts_truncated" => $hosts_truncated);
+}
+
 function layer7_nav_items()
 {
 	return array(
 		"status" => array("label" => l7_t("Estado"), "href" => "layer7_status.php"),
 		"devices" => array("label" => l7_t("Dispositivos"), "href" => "layer7_devices.php"),
 		"policies" => array("label" => l7_t("Politicas"), "href" => "layer7_policies.php"),
+		"remote_access" => array("label" => l7_t("Acesso Remoto"), "href" => "layer7_remote_access.php"),
 		"blacklists" => array("label" => l7_t("Blacklists"), "href" => "layer7_blacklists.php"),
 		"allowlist" => array("label" => l7_t("Allowlist"), "href" => "layer7_allowlist.php"),
 		"eventos" => array("label" => l7_t("Eventos"), "href" => "layer7_events.php"),

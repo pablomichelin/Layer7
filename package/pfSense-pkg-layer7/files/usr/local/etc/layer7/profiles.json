@@ -670,15 +670,22 @@
       "name": "Acesso Remoto",
       "group": "Segurança e bypass",
       "icon": "fa-desktop",
-      "description": "Bloqueia softwares de acesso remoto (TeamViewer, AnyDesk, RustDesk, etc.).",
-      "ndpi_apps": ["TeamViewer", "AnyDesk", "VNC", "RDP"],
-      "ndpi_categories": ["RemoteAccess"],
+      "description": "Bloqueia softwares de acesso remoto (TeamViewer, AnyDesk, RustDesk, RDP, VNC, RMM, etc.). Gerível em detalhe na guia Acesso Remoto.",
+      "ndpi_apps": ["TeamViewer", "AnyDesk", "VNC", "RDP", "SSH"],
+      "ndpi_categories": [],
       "hosts": [
         "teamviewer.com", "anydesk.com", "rustdesk.com", "rustdesk.net",
         "splashtop.com", "remotedesktop.google.com",
-        "zohoassist.com", "zoho.com", "screenconnect.com", "connectwise.com",
+        "zohoassist.com", "ultraviewer.net", "nanosystems.it",
+        "screenconnect.com", "connectwise.com",
         "supremocontrol.com", "realvnc.com", "remotepc.com",
-        "islonline.com", "islonline.net", "dwservice.net", "nanosystems.it"
+        "islonline.com", "islonline.net", "dwservice.net",
+        "getscreen.me", "helpwire.com", "aeroadmin.com",
+        "iperiusremote.com", "nomachine.com", "parsec.app",
+        "moonlight-stream.org", "hoptodesk.com",
+        "atera.com", "ninjaone.com", "ninjarmm.com",
+        "meshcentral.com", "datto.com",
+        "todesk.com", "oray.com", "sunlogin.oray.com", "aweray.com"
       ]
     },
     {

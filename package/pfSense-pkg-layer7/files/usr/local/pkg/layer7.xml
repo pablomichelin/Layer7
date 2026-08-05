@@ -17,6 +17,10 @@
 			<url>/packages/layer7/layer7_policies.php</url>
 		</tab>
 		<tab>
+			<text>Acesso Remoto</text>
+			<url>/packages/layer7/layer7_remote_access.php</url>
+		</tab>
+		<tab>
 			<text>Blacklists</text>
 			<url>/packages/layer7/layer7_blacklists.php</url>
 		</tab>
