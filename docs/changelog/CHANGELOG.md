@@ -6,10 +6,30 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+## [1.9.1] — 2026-08-05
+
+### Added
+
+- **Release lab IPv6 (passos 12.1–12.5):** PF scoped `inet`+`inet6` (REV-018),
+  captura EtherType `0x86DD` + extension headers, flow key dual-stack, nDPI
+  sobre IPv6, métricas AF `cap_pkts/active/classified` v4/v6 no JSON de stats,
+  banner Diagnostics IPv4-only, ADR-0024. Canal `latest` = `1.9.1`.
+  **Produção enforce permanece `1.9.0`** até GV7 + GO humano.
+  SHA256: `c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd`.
+
+### Notes
+
+- Próximo passo de código: **12.6** (`policy.c` CIDR IPv6). Sem promoção
+  enforce neste patch.
+
+## [Unreleased notes moved — historical trail entries]
+
+### Added (trilha, pré-release)
+
 - **Trilha IPv6 / passo 12.5 (V2):** métricas AF `cap_pkts_v4/v6`,
   `cap_active_v4/v6`, `cap_classified_v4/v6` em `capture.c` + JSON stats;
   nDPI sobre IPv6 já entregue em 12.4; 12.5 fecha contadores por família de
-  endereço. GV2 builder PASS. Sem bump `1.9.1` (só na release). Produção
+  endereço. GV2 builder PASS. Publicado em **`1.9.1`**. Produção
   `1.9.0` inalterada.
 - **Trilha IPv6 / passo 12.4 (V2):** parser EtherType `0x86DD`, extension
   headers (S-06), flow key/hash IPv6, tabela de fluxos dual-stack, nDPI sobre

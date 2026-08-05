@@ -35,14 +35,16 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.0` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.0`,
-`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`;
+`1.9.1` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.1`,
+`SHA256=c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
+Candidato lab trilha IPv6 (12.1–12.5). Rollback imediato: `1.9.0`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 **Referencia de producao enforce:** **`1.9.0`** (fecho plano mestre `2026-08-05`;
 equivalente funcional a `1.8.11_69`; rollback imediato `_69`; historico `_24`).
-CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS**.
+**Nao** promover `1.9.1` a enforce ate GV7 + GO humano. CE fisico pendente —
+ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1262,7 +1264,7 @@ TRILHA IPv6 — progresso
 - Passo 12.3: CONCLUÍDO — REV-018 PF inet6 scoped
 - Passo 12.4: CONCLUÍDO (2026-08-04) — captura IPv6 + flow key v6; unit+layer7d -t PASS
 - Passo 12.5: CONCLUÍDO (2026-08-04) — métricas AF `cap_*` v4/v6 em capture + JSON stats; GV2 builder PASS
-- Candidato lab: 1.9.0 (código na árvore; próximo `.pkg` = **1.9.1**)
+- Candidato lab: **1.9.1** (publicado; trilha 12.1–12.5)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - Versionamento: série patch `1.9.0` → `1.9.1` → `1.9.2` … (`PORTREVISION=0`)
 - GV0: PASS
@@ -1435,12 +1437,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: 1.9.0
-- Producao enforce: 1.9.0 (fecho plano; rollback _69)
+- Canal publico latest: 1.9.1 (lab IPv6 12.1–12.5)
+- Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1 ate GV7)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
+- Trilha IPv6: ABERTA — passo 12.6 autorizado a seguir
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: backlog normal (BG-028 fase 1 quando chaves humanas; VM CE opcional; H5 se aprovado)
+- Proximo trabalho: trilha IPv6 12.6 (policy CIDR v6); BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -1451,11 +1454,13 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **instalacao publica** e o pacote **`1.9.0`**
-  publicado em `pablomichelin/Layer7` tag `v1.9.0`
-  (`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`).
-  Fecho plano mestre (`2026-08-05`); equivalente funcional a `1.8.11_69`.
-  Rollback imediato: `v1.8.11_69`.
+- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.1`**
+  publicado em `pablomichelin/Layer7` tag `v1.9.1`
+  (`SHA256=c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd`).
+  Trilha IPv6 passos 12.1–12.5. Rollback imediato: `v1.9.0`.
+- A referencia de **producao enforce** permanece **`1.9.0`**
+  (`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`)
+  ate GV7 + GO humano. Rollback a partir de `1.9.0`: `v1.8.11_69`.
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
   (`snapshot_id=ut1-2026-04-25`,

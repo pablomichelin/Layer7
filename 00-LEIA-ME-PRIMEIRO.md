@@ -11,17 +11,17 @@
 
 | Item | Valor |
 |------|-------|
-| **Canal público `latest`** | `1.9.0` — tag `v1.9.0` em `pablomichelin/Layer7` |
-| **SHA256 (`latest`)** | `cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f` |
-| **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`) |
-| **Rollback imediato** | `1.8.11_69` |
+| **Canal público `latest`** | `1.9.1` — tag `v1.9.1` em `pablomichelin/Layer7` (lab IPv6) |
+| **SHA256 (`latest`)** | `c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd` |
+| **Produção enforce (referência)** | **`1.9.0`** — fecho plano mestre (`2026-08-05`); não promover `1.9.1` até GV7 |
+| **Rollback imediato (a partir de `1.9.1`)** | `1.9.0` |
 | **Produto** | Pacote proprietario Layer7 para **pfSense CE** (Systemup) |
 | **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
 | **Trilha activa** | **IPv6** — passo **12.6** (Onda V3); arranque único [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
-> **Versão actual:** `1.9.0` — fecho do plano mestre (equivalente a `1.8.11_69`).
+> **Versão actual (`latest`):** `1.9.1` — lab IPv6 (12.1–12.5). **Enforce:** `1.9.0`.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 

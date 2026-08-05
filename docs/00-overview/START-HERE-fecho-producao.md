@@ -24,7 +24,7 @@ docs/00-overview/START-HERE-fecho-producao.md
 | **Passo autorizado** | **12.6** (Onda V3 — `policy.c` CIDR IPv6) |
 | **BG activo** | BG-081 (V3; 12.5 métricas concluídas) |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
-| Candidato lab | **`1.9.0`** na árvore; próximo `.pkg` = **`1.9.1`** |
+| Candidato lab / `latest` | **`1.9.1`** (publicado; 12.1–12.5) |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 **publicado e aceite** (implementação por ondas) |
 | Próximo gate | **GV1.3** appliance + **GV2** captura |
