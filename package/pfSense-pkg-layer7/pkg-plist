@@ -5,6 +5,7 @@
 /usr/local/www/packages/layer7/layer7_status.php
 /usr/local/www/packages/layer7/layer7_settings.php
 /usr/local/www/packages/layer7/layer7_policies.php
+/usr/local/www/packages/layer7/layer7_remote_access.php
 /usr/local/www/packages/layer7/layer7_groups.php
 /usr/local/www/packages/layer7/layer7_categories.php
 /usr/local/www/packages/layer7/layer7_exceptions.php
@@ -25,6 +26,7 @@
 /usr/local/etc/layer7-protos.txt.sample
 /usr/local/etc/layer7/pf.conf.sample
 /usr/local/etc/layer7/profiles.json
+/usr/local/etc/layer7/remote-access-catalog.json
 /usr/local/etc/layer7/allowlist-seed.txt
 /usr/local/etc/layer7/blacklists/config.json.sample
 /usr/local/etc/rc.d/layer7d
