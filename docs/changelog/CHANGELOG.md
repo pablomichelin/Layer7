@@ -6,7 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **docs:** `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` — congelamento das filas
+  fecho P0–J + IPv6; mapa de navegação; porta para planos novos (§6).
+
 ### Changed
+
+- START-HERE / CORTEX / README / classificação alinhados ao pós-fecho `1.9.8`.
 
 ## [1.9.8] — 2026-08-05
 
