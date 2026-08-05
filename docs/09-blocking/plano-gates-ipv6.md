@@ -79,7 +79,9 @@
 | GV4.2 | `pfctl -t layer7_pdst_N -T show` contém endereço IPv6 | Appliance | **PENDENTE** |
 | GV4.3 | Segundo cliente não afectado (paridade G5 em v6) | Two-client v6 | **PENDENTE** |
 | GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PENDENTE** |
-| GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PENDENTE** |
+| GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PARCIAL** (S-03 `layer7_pf_host_enforce_ok` + `test_enforce_scoped.c` PASS builder; appliance PENDENTE) |
+
+**GV4 onda:** **PARCIAL** — código enforce v6 (12.7) PASS builder; GV4.1–GV4.4 appliance PENDENTE.
 
 ### GV5 — DNS / NAT / block page IPv6 (Onda V5 — opcional)
 

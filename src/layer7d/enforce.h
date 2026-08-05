@@ -22,8 +22,17 @@ enum layer7_enforce_kind;
 /* 1 se nome só [A-Za-z0-9_] */
 int layer7_pf_table_name_ok(const char *name);
 
-/* IPv4 dotted quad simples */
+/* IPv4 dotted quad simples (legado) */
 int layer7_pf_ipv4_host_ok(const char *ip);
+
+/* IPv4 ou IPv6 textual (sem zona); passo 12.7 */
+int layer7_pf_host_ok(const char *ip);
+
+/*
+ * Host permitido em tabelas PF / kill states (S-03):
+ * rejeita ::1, fe80::/10 e ff00::/8.
+ */
+int layer7_pf_host_enforce_ok(const char *ip);
 
 /*
  * Escreve em buf: pfctl -t <table> -T add <ip>
@@ -72,7 +81,7 @@ int layer7_pf_resolve_block_target(const struct layer7_decision *dec,
  * Retorno: 0 = sem add; 1 = add OK; -1 = pfctl falhou.
  */
 int layer7_pf_enforce_decision(const struct layer7_decision *dec,
-    const char *src_ipv4, const char *dst_ipv4, int scoped_hybrid,
+    const char *src_ip, const char *dst_ip, int scoped_hybrid,
     int dry_run);
 
 #endif

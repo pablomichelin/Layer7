@@ -858,7 +858,7 @@ allow_cache_add(const char *ip, uint32_t ttl)
 	time_t expires;
 	uint32_t eff_ttl = ttl;
 
-	if (!ip || !layer7_pf_ipv4_host_ok(ip))
+	if (!ip || !layer7_pf_host_enforce_ok(ip))
 		return;
 	if (eff_ttl < L7_DST_TTL_MIN)
 		eff_ttl = L7_DST_TTL_MIN;
@@ -913,7 +913,7 @@ allow_cache_sweep(void)
  * para todas as redes (bug observado em lab com 192.168.100.254).
  */
 #define L7_LOCAL_ADDR_MAX 64
-static char s_local_addrs[L7_LOCAL_ADDR_MAX][INET_ADDRSTRLEN];
+static char s_local_addrs[L7_LOCAL_ADDR_MAX][INET6_ADDRSTRLEN];
 static int s_n_local_addrs;
 static time_t s_local_addrs_ts;
 
@@ -932,19 +932,35 @@ ip_is_local_iface_addr(const char *ip)
 		s_local_addrs_ts = now;
 		if (getifaddrs(&ifap) == 0) {
 			for (ifa = ifap; ifa; ifa = ifa->ifa_next) {
-				struct sockaddr_in *sin;
-
-				if (!ifa->ifa_addr ||
-				    ifa->ifa_addr->sa_family != AF_INET)
+				if (!ifa->ifa_addr)
 					continue;
 				if (s_n_local_addrs >= L7_LOCAL_ADDR_MAX)
 					break;
-				sin = (struct sockaddr_in *)(void *)ifa->ifa_addr;
-				if (!inet_ntop(AF_INET, &sin->sin_addr,
-				    s_local_addrs[s_n_local_addrs],
-				    INET_ADDRSTRLEN))
-					continue;
-				s_n_local_addrs++;
+				if (ifa->ifa_addr->sa_family == AF_INET) {
+					struct sockaddr_in *sin =
+					    (struct sockaddr_in *)(void *)
+					    ifa->ifa_addr;
+
+					if (!inet_ntop(AF_INET, &sin->sin_addr,
+					    s_local_addrs[s_n_local_addrs],
+					    INET6_ADDRSTRLEN))
+						continue;
+					s_n_local_addrs++;
+				} else if (ifa->ifa_addr->sa_family ==
+				    AF_INET6) {
+					struct sockaddr_in6 *sin6 =
+					    (struct sockaddr_in6 *)(void *)
+					    ifa->ifa_addr;
+
+					/* S-03: link-local não entra em block;
+					 * ainda assim listar para self-protect */
+					if (!inet_ntop(AF_INET6,
+					    &sin6->sin6_addr,
+					    s_local_addrs[s_n_local_addrs],
+					    INET6_ADDRSTRLEN))
+						continue;
+					s_n_local_addrs++;
+				}
 			}
 			freeifaddrs(ifap);
 		}
@@ -983,7 +999,7 @@ enforce_cache_add(const char *table, const char *ip, uint32_t ttl)
 
 	if (!table || !table[0] || !ip || ip[0] == '\0')
 		return;
-	if (!layer7_pf_table_name_ok(table) || !layer7_pf_ipv4_host_ok(ip))
+	if (!layer7_pf_table_name_ok(table) || !layer7_pf_host_enforce_ok(ip))
 		return;
 
 	if (eff_ttl < L7_DST_TTL_MIN)
@@ -1144,7 +1160,7 @@ layer7_apply_policy_allow_enforcement(const struct layer7_decision *dec,
 	if (!dec || dec->action != LAYER7_ACTION_ALLOW ||
 	    dec->reason != L7_DECIDE_POLICY_MATCH ||
 	    dec->policy_table_idx < 0 ||
-	    !dst_ip || !layer7_pf_ipv4_host_ok(dst_ip))
+	    !dst_ip || !layer7_pf_host_enforce_ok(dst_ip))
 		return;
 	if (layer7_pf_policy_allow_table_name(dec->policy_table_idx, tbl,
 	    sizeof(tbl)) < 0)
@@ -1471,7 +1487,7 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	if (dec.would_enforce_block_or_tag &&
 	    dec.action == LAYER7_ACTION_BLOCK &&
 	    resolved_ip && *resolved_ip &&
-	    layer7_pf_ipv4_host_ok(resolved_ip)) {
+	    layer7_pf_host_enforce_ok(resolved_ip)) {
 		layer7_apply_block_enforcement(&dec, client_ip,
 		    resolved_ip, ttl, scoped, "dns_block");
 		return;
@@ -1484,7 +1500,7 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	    l7_allowlist_contains_ip(&s_allowlist, resolved_ip));
 	if (dom_allow || ip_allow) {
 		if (resolved_ip && *resolved_ip &&
-		    layer7_pf_ipv4_host_ok(resolved_ip)) {
+		    layer7_pf_host_enforce_ok(resolved_ip)) {
 			if (pf_table_add_entry(L7_PF_TABLE_ALLOW_DST,
 			    resolved_ip) == 0)
 				allow_cache_add(resolved_ip, ttl);
@@ -1514,7 +1530,7 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	}
 
 	if (s_blacklist && s_bl_n_rules > 0 && resolved_ip &&
-	    layer7_pf_ipv4_host_ok(resolved_ip) &&
+	    layer7_pf_host_enforce_ok(resolved_ip) &&
 	    !ip_is_local_iface_addr(resolved_ip)) {
 		int ri;
 
@@ -1554,7 +1570,7 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 			}
 		}
 	} else if (resolved_ip && *resolved_ip &&
-	    !layer7_pf_ipv4_host_ok(resolved_ip)) {
+	    !layer7_pf_host_enforce_ok(resolved_ip)) {
 		L7_WARN("dns_blacklist: skip invalid resolved ip=%s domain=%s",
 		    resolved_ip, domain ? domain : "-");
 	}
@@ -1649,7 +1665,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		return;
 
 	if (layer7_decision_is_explicit_allow(&dec) && dst_ip &&
-	    layer7_pf_ipv4_host_ok(dst_ip)) {
+	    layer7_pf_host_enforce_ok(dst_ip)) {
 		layer7_apply_policy_allow_enforcement(&dec, src_ip, dst_ip,
 		    L7_DST_TTL_DEF, "flow_allow");
 	}
@@ -1661,7 +1677,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		    dec.enforce_kind == L7_ENFORCE_SRC_SCOPED) {
 			if ((dec.quarantine_origin || dec.source_scoped ||
 			    dec.scope_global) &&
-			    layer7_pf_ipv4_host_ok(src_ip)) {
+			    layer7_pf_host_enforce_ok(src_ip)) {
 				layer7_apply_block_enforcement(&dec, src_ip,
 				    dst_ip, L7_DST_TTL_DEF, 1,
 				    "flow_block_psrc");
@@ -1674,7 +1690,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 				    src_ip,
 				    ndpi_app ? ndpi_app : "-");
 			}
-		} else if (dst_ip && layer7_pf_ipv4_host_ok(dst_ip)) {
+		} else if (dst_ip && layer7_pf_host_enforce_ok(dst_ip)) {
 			/* Allowlist gate (Bloco 3): nunca bloquear destinos
 			 * da lista branca (SNI/host ou IP/CIDR), excepto quando
 			 * a politica manual impoe block (prevalece). */
@@ -1707,7 +1723,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		/* SNI/host blacklist check (Melhoria B) — apos decisao de politica manual */
 		if (s_blacklist && s_bl_n_rules > 0 && host && *host &&
 		    dec.action != LAYER7_ACTION_BLOCK && dst_ip &&
-		    layer7_pf_ipv4_host_ok(dst_ip) &&
+		    layer7_pf_host_enforce_ok(dst_ip) &&
 		    !ip_is_local_iface_addr(dst_ip) &&
 		    !layer7_decision_is_explicit_allow(&dec) &&
 		    !l7_allowlist_contains_domain(&s_allowlist, host) &&
@@ -1757,7 +1773,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 	if (dec.action == LAYER7_ACTION_TAG) {
 		r = -1;
 		if (dec.would_enforce_block_or_tag && dec.pf_table[0] &&
-		    layer7_pf_ipv4_host_ok(src_ip)) {
+		    layer7_pf_host_enforce_ok(src_ip)) {
 			if (layer7_pf_add_with_selfheal(dec.pf_table, src_ip,
 			    "flow_tag_src") == 0)
 				r = 1;
@@ -1863,7 +1879,7 @@ run_enforce_once_cli(const char *path, const char *ip, const char *dst_ip,
 				    dec.matched_policy_id : "-");
 		} else if (dec.action == LAYER7_ACTION_TAG &&
 		    dec.would_enforce_block_or_tag && dec.pf_table[0] &&
-		    layer7_pf_ipv4_host_ok(ip)) {
+		    layer7_pf_host_enforce_ok(ip)) {
 			if (dry)
 				printf("dry-run: pfctl -t %s -T add %s\n",
 				    dec.pf_table, ip);
@@ -2222,7 +2238,7 @@ apply_config(int use_syslog)
 					    dec.would_enforce_block_or_tag);
 				if (dec.would_enforce_block_or_tag &&
 				    dec.pf_table[0] && srcs[a] &&
-				    layer7_pf_ipv4_host_ok(srcs[a])) {
+				    layer7_pf_host_enforce_ok(srcs[a])) {
 					char pfc[160];
 					if (layer7_pf_snprint_add(pfc,
 						sizeof(pfc), dec.pf_table,
@@ -2540,7 +2556,7 @@ int main(int argc, char **argv)
 		}
 		if (strcmp(argv[i], "-d") == 0) {
 			if (i + 1 >= argc ||
-			    !layer7_pf_ipv4_host_ok(argv[i + 1])) {
+			    !layer7_pf_host_enforce_ok(argv[i + 1])) {
 				fprintf(stderr,
 				    "layer7d: -d requer destino IPv4 válido\n");
 				return 1;

@@ -1,10 +1,16 @@
 #include "enforce.h"
 #include "policy.h"
+#include <arpa/inet.h>
 #include <ctype.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+/* Textual IP buffer for argv (v4 or v6; INET6_ADDRSTRLEN=46). */
+#define L7_PF_IP_BUF 64
 
 int
 layer7_pf_table_name_ok(const char *name)
@@ -49,12 +55,85 @@ layer7_pf_ipv4_host_ok(const char *ip)
 }
 
 int
+layer7_pf_host_ok(const char *ip)
+{
+	struct in_addr a4;
+	struct in6_addr a6;
+	char tmp[L7_PF_IP_BUF];
+	char *pct;
+	size_t n;
+
+	if (!ip || !*ip)
+		return 0;
+	if (layer7_pf_ipv4_host_ok(ip))
+		return 1;
+	/* Reject zone id in PF table members (fe80::1%em0). */
+	n = strlen(ip);
+	if (n >= sizeof(tmp))
+		return 0;
+	memcpy(tmp, ip, n + 1);
+	pct = strchr(tmp, '%');
+	if (pct)
+		*pct = '\0';
+	if (inet_pton(AF_INET6, tmp, &a6) == 1)
+		return 1;
+	if (inet_pton(AF_INET, tmp, &a4) == 1)
+		return 1;
+	return 0;
+}
+
+/*
+ * S-03: nunca adicionar ::1, fe80::/10 ou ff00::/8 a tabelas de block/enforce.
+ */
+int
+layer7_pf_host_enforce_ok(const char *ip)
+{
+	struct in6_addr a6;
+	char tmp[L7_PF_IP_BUF];
+	char *pct;
+	size_t n;
+	unsigned char b0;
+
+	if (!layer7_pf_host_ok(ip))
+		return 0;
+	if (layer7_pf_ipv4_host_ok(ip))
+		return 1;
+
+	n = strlen(ip);
+	if (n >= sizeof(tmp))
+		return 0;
+	memcpy(tmp, ip, n + 1);
+	pct = strchr(tmp, '%');
+	if (pct)
+		*pct = '\0';
+	if (inet_pton(AF_INET6, tmp, &a6) != 1)
+		return 0;
+
+	/* ::1 */
+	if (IN6_IS_ADDR_LOOPBACK(&a6))
+		return 0;
+	/* fe80::/10 link-local */
+	if (IN6_IS_ADDR_LINKLOCAL(&a6))
+		return 0;
+	/* ff00::/8 multicast */
+	if (IN6_IS_ADDR_MULTICAST(&a6))
+		return 0;
+	/* defesa extra se macros ausentes em algum SDK */
+	b0 = a6.s6_addr[0];
+	if (b0 == 0xff)
+		return 0;
+	if (b0 == 0xfe && (a6.s6_addr[1] & 0xc0) == 0x80)
+		return 0;
+	return 1;
+}
+
+int
 layer7_pf_snprint_add(char *buf, size_t buflen, const char *table,
     const char *ip)
 {
 	if (!buf || buflen < 16)
 		return -1;
-	if (!layer7_pf_table_name_ok(table) || !layer7_pf_ipv4_host_ok(ip))
+	if (!layer7_pf_table_name_ok(table) || !layer7_pf_host_enforce_ok(ip))
 		return -1;
 	return snprintf(buf, buflen, "pfctl -t %s -T add %s", table, ip);
 }
@@ -64,13 +143,13 @@ pfctl_table_op(const char *table, const char *ip, const char *op)
 {
 	pid_t pid;
 	int st;
-	char tb[64], ipb[16];
+	char tb[64], ipb[L7_PF_IP_BUF];
 	char *argv[8];
 	char path_pfctl[] = "/sbin/pfctl";
 
 	if (strcmp(op, "add") != 0 && strcmp(op, "delete") != 0)
 		return -1;
-	if (!layer7_pf_table_name_ok(table) || !layer7_pf_ipv4_host_ok(ip))
+	if (!layer7_pf_table_name_ok(table) || !layer7_pf_host_enforce_ok(ip))
 		return -1;
 	if (strlen(table) >= sizeof(tb) || strlen(ip) >= sizeof(ipb))
 		return -1;
@@ -116,13 +195,17 @@ pfctl_kill_states(const char *first, const char *second)
 {
 	pid_t pid;
 	int st;
-	char first_buf[16], second_buf[16];
+	char first_buf[L7_PF_IP_BUF], second_buf[L7_PF_IP_BUF];
 	char *argv[7];
 	char path_pfctl[] = "/sbin/pfctl";
 
-	if (!layer7_pf_ipv4_host_ok(first))
+	if (!layer7_pf_host_enforce_ok(first))
 		return -1;
-	if (second && !layer7_pf_ipv4_host_ok(second))
+	if (second && !layer7_pf_host_enforce_ok(second))
+		return -1;
+	if (strlen(first) >= sizeof(first_buf))
+		return -1;
+	if (second && strlen(second) >= sizeof(second_buf))
 		return -1;
 	memcpy(first_buf, first, strlen(first) + 1);
 	if (second)
@@ -167,17 +250,23 @@ layer7_pf_exec_kill_states_to(const char *dst_ip)
 {
 	pid_t pid;
 	int st;
-	char dst_buf[16];
+	char dst_buf[L7_PF_IP_BUF];
 	char *argv[7];
 	char path_pfctl[] = "/sbin/pfctl";
 	char any_ipv4[] = "0.0.0.0/0";
+	char any_ipv6[] = "::/0";
+	char *any;
 
-	if (!layer7_pf_ipv4_host_ok(dst_ip))
+	if (!layer7_pf_host_enforce_ok(dst_ip))
+		return -1;
+	if (strlen(dst_ip) >= sizeof(dst_buf))
 		return -1;
 	memcpy(dst_buf, dst_ip, strlen(dst_ip) + 1);
+	any = layer7_pf_ipv4_host_ok(dst_ip) ? any_ipv4 : any_ipv6;
+
 	argv[0] = path_pfctl;
 	argv[1] = "-k";
-	argv[2] = any_ipv4;
+	argv[2] = any;
 	argv[3] = "-k";
 	argv[4] = dst_buf;
 	argv[5] = NULL;
@@ -271,7 +360,7 @@ layer7_pf_resolve_block_target(const struct layer7_decision *dec,
 		ip = dst_ip;
 	}
 
-	if (!ip || !layer7_pf_ipv4_host_ok(ip))
+	if (!ip || !layer7_pf_host_enforce_ok(ip))
 		return 0;
 	*out_ip = ip;
 	return 1;
@@ -279,23 +368,23 @@ layer7_pf_resolve_block_target(const struct layer7_decision *dec,
 
 int
 layer7_pf_enforce_decision(const struct layer7_decision *dec,
-    const char *src_ipv4, const char *dst_ipv4, int scoped_hybrid,
+    const char *src_ip, const char *dst_ip, int scoped_hybrid,
     int dry_run)
 {
 	char tbl[64];
 	const char *ip;
 
-	if (!dec || !src_ipv4)
+	if (!dec || !src_ip)
 		return 0;
 
 	if (dec->action == LAYER7_ACTION_TAG) {
 		if (!dec->would_enforce_block_or_tag || !dec->pf_table[0])
 			return 0;
-		if (!layer7_pf_ipv4_host_ok(src_ipv4))
+		if (!layer7_pf_host_enforce_ok(src_ip))
 			return 0;
 		if (dry_run)
 			return 1;
-		if (layer7_pf_exec_table_add(dec->pf_table, src_ipv4) == 0)
+		if (layer7_pf_exec_table_add(dec->pf_table, src_ip) == 0)
 			return 1;
 		return -1;
 	}
@@ -303,7 +392,7 @@ layer7_pf_enforce_decision(const struct layer7_decision *dec,
 	if (dec->action != LAYER7_ACTION_BLOCK)
 		return 0;
 
-	switch (layer7_pf_resolve_block_target(dec, src_ipv4, dst_ipv4,
+	switch (layer7_pf_resolve_block_target(dec, src_ip, dst_ip,
 	    scoped_hybrid, tbl, sizeof(tbl), &ip)) {
 	case 0:
 		return 0;

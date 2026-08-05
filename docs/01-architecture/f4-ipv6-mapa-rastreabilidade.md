@@ -16,8 +16,8 @@
 | Camada | IPv4 hoje | IPv6 hoje | Gap | Onda |
 |--------|-----------|-----------|-----|------|
 | Captura / nDPI | Completo | Parser+fluxo+nDPI v6 (12.4); métricas AF v4/v6 (12.5) | DNS AAAA hint pendente | V2–V3 |
-| Decisão política (daemon) | Completo | CIDR v6 parse/match (12.6); enforce runtime v6 pendente | FP-010 parcial | V3 |
-| PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas só v4 | Parcial | V2–V3 |
+| Decisão política (daemon) | Completo | CIDR v6 parse/match (12.6); enforce pfctl v6 (12.7); allowlist v6 pendente (12.8) | FP-010 parcial | V3 |
+| PF global (`layer7_block*`) | Completo | Regras `inet6` existem; tabelas v4+v6 via `pfctl -T` (12.7) | allowlist v6 = 12.8 | V2–V3 |
 | PF scoped (`pdst`/`psrc`/…) | Completo | **Só `inet`** | REV-018 | V1 |
 | Allowlist | IPv4+CIDR | **Não** | allowlist.h | V3 |
 | DNS forçado / sinkhole | `rdr inet` | **Não** | ADR-0018 | V5 |
@@ -37,11 +37,11 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 |----|----------|--------|-------------|-------------|------|-----|-------|
 | M-01 | `src/layer7d/capture.c` | libpcap → parse IP → nDPI | IPv4+IPv6 L3 + métricas AF (12.4–12.5) | DNS AAAA hint pendente | V2 | BG-080 | CAP |
 | M-02 | `src/layer7d/capture_flow_key.h` | Hash fluxo bidireccional | v4+v6 hash (12.4) | — | V2 | BG-080 | CAP |
-| M-03 | `src/layer7d/main.c` | flow_decide, DNS hint, PF add | `AF_INET` only ~L920 | Endereços v6 em decisões | V3 | BG-081 | ENF |
-| M-04 | `src/layer7d/policy.c` | Parse/match políticas | CIDR v4/v6 dual-stack (12.6): `l7_cidr` family + union; `parse_cidr_str` `/0–32`/`/0–128`; match src/exception CIDRs; `ip_host_equal` | enforce runtime v6 = 12.7 | V3 | BG-081 | POL |
-| M-05 | `src/layer7d/policy.h` | Structs decisão | `l7_cidr` family AF_INET/AF_INET6 + union v4/v6 (12.6) | enforce path 12.7 | V3 | BG-081 | POL |
-| M-06 | `src/layer7d/enforce.c` | `pfctl -T add/del`, kill states | IPv4 strings | `pfctl` com addr v6 | V3 | BG-081 | ENF |
-| M-07 | `src/layer7d/enforce.h` | API enforce | `src_ipv4`/`dst_ipv4` | Renomear/generalizar | V3 | BG-081 | ENF |
+| M-03 | `src/layer7d/main.c` | flow_decide, DNS hint, PF add | Gates PF `host_enforce_ok` (12.7); `ip_is_local_iface_addr` IPv6 ifaces (12.7) | DNS AAAA hint pendente | V3 | BG-081 | ENF |
+| M-04 | `src/layer7d/policy.c` | Parse/match políticas | CIDR v4/v6 dual-stack (12.6): `l7_cidr` family + union; `parse_cidr_str` `/0–32`/`/0–128`; match src/exception CIDRs; `ip_host_equal` | allowlist v6 = 12.8 | V3 | BG-081 | POL |
+| M-05 | `src/layer7d/policy.h` | Structs decisão | `l7_cidr` family AF_INET/AF_INET6 + union v4/v6 (12.6) | allowlist v6 = 12.8 | V3 | BG-081 | POL |
+| M-06 | `src/layer7d/enforce.c` | `pfctl -T add/del`, kill states | IPv4+IPv6 (12.7): `pfctl` addr v6; kill states v6; `kill_states_to` `::/0`; S-03 via `layer7_pf_host_enforce_ok` | allowlist v6 = 12.8 | V3 | BG-081 | ENF |
+| M-07 | `src/layer7d/enforce.h` | API enforce | `layer7_pf_host_ok`/`layer7_pf_host_enforce_ok` (12.7); rejeita `::1`/`fe80::/10`/`ff00::/8` | — | V3 | BG-081 | ENF |
 | M-08 | `src/layer7d/allowlist.c` + `.h` | Allowlist destinos | `L7_AL_IPV4_*` only L19–20 | Host/CIDR v6 | V3 | BG-081 | POL |
 | M-09 | `src/layer7d/blacklist.c` | Sinkhole / bl tables | Orientado A records | AAAA: tabelas v6 em V3; `rdr`/sinkhole só V5 ou limite ADR | V3–V5 | BG-081/083 | ENF |
 
@@ -56,7 +56,7 @@ Legenda **Acção:** `DOC` documentar | `PF` regras PF | `CAP` captura | `POL` p
 | M-18 | `package/.../layer7_exceptions.php` | VIP / excepções | IPv4 | CIDR/host v6 | V4 | BG-082 | CFG |
 | M-19 | `package/.../layer7_diagnostics.php` | Status / avisos | Banner I1 (12.2) | Manter alinhado a ondas | V0 | BG-078 | DOC |
 | M-20 | `tests/functional/test_scoped_pf_inc.php` | Regressão PF scoped | Assert scoped `inet6` (12.3 PASS) | Manter | V1 | BG-079 | TST |
-| M-21 | `tests/run-local.sh` + unit C | Regressão local | Sem testes v6 | Novos testes V2–V3 | V2–V3 | BG-080–081 | TST |
+| M-21 | `tests/run-local.sh` + unit C | Regressão local | `test_enforce_scoped` v6 (12.7 PASS); policy/capture v6 | allowlist tests = 12.8 | V2–V3 | BG-080–081 | TST |
 | M-22 | `tests/lab/run-f5-smoke-checklist.sh` | Smoke appliance | IPv4 | `run-ipv6-dualstack.sh` (novo) | V6 | BG-084 | TST |
 | M-23 | `docs/09-blocking/matriz-limitacoes-dpi.md` | Limitações DPI | FP-010 disclosed (12.1) | Actualizar por onda | V0–V6 | BG-078 | DOC |
 | M-24 | `docs/05-daemon/pf-enforcement.md` | SSOT enforcement | Dual-stack + V1 (12.2–12.3) | Actualizar com V2+ | V0–V1 | BG-078/079 | DOC |
@@ -83,9 +83,12 @@ libpcap → Ethernet 0x86DD → IPv6 → flow_hash_v6(s,d) → nDPI → policy.c
 ### 3.3 Bypass actual (dual-stack)
 
 ```text
-Cliente ──IPv6──► Internet   (capture.c return early → sem decisão → sem PF add)
+Cliente ──IPv6──► Internet   (allowlist v6 ainda IPv4-only → bypass parcial até 12.8)
 Cliente ──IPv4──► Layer7 OK
 ```
+
+> **Nota 12.7:** captura, policy CIDR e `pfctl -T`/`kill states` v6 estão no código;
+> allowlist e gate appliance GV4 permanecem pendentes.
 
 ---
 

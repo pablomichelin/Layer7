@@ -277,13 +277,13 @@ reavaliacao formal.
 
 ## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-04, rev. f)
 
-- Trilha **ABERTA** — passo **12.7** (Onda V3 — `enforce.c`/`main.c` PF tabelas + kill states v6). SSOT:
+- Trilha **ABERTA** — passo **12.8** (Onda V3 — allowlist IPv6 host/CIDR). SSOT:
   [`plano-ipv6-completo.md`](plano-ipv6-completo.md);
   arranque **único**
   [`START-HERE-fecho-producao.md`](../00-overview/START-HERE-fecho-producao.md);
   ADR-0024.
-- Passos **12.1–12.6** concluídos (V0 + V1 PF + captura/nDPI/métricas v6 + policy CIDR v6).
-- Candidato lab **`1.9.1`** (publicado; código 12.6 na árvore; próximo `.pkg` = **`1.9.2`**).
+- Passos **12.1–12.7** concluídos (V0 + V1 PF + captura/nDPI/métricas v6 + policy CIDR v6 + enforce PF v6).
+- Candidato lab **`1.9.1`** (publicado; código 12.6–12.7 na árvore; próximo `.pkg` = **`1.9.2`**).
 - Passos **12.x** IPv6 ≠ `test-matrix` §12 (blacklists F4.2).
 - Produção enforce **`1.9.0`** inalterada até **GV7** + GO humano.
 - Mapa código (+ salvaguardas §8):
@@ -294,7 +294,7 @@ reavaliacao formal.
 | BG-078 | Governança IPv6 V0: ADR-0024, matriz limitações, banner GUI, índices, mapa M-xx | Alta | documentacao/governanca | F4+ | claim dual-stack falso; operador desinformado | P | Alto | **Concluido (12.1–12.2)** | GV0 PASS; banner em Diagnostics |
 | BG-079 | Paridade PF scoped `inet6` (REV-018): pdst/psrc/pallow/pexc/exc_allow | Alta | package/PF | F4 | bypass IPv6 em scoped_hybrid | M | Alto | **Concluido codigo (12.3)** — GV1.3 appliance pendente | `1.9.0`; `test_scoped_pf_inc` PASS |
 | BG-080 | Daemon captura + fluxos + nDPI IPv6 (`capture.c`, flow key) | Critica | daemon | F4 | FP-010 core; sem classificação v6 | G | Alto | **Concluido (12.4–12.5)** | GV2 builder PASS; GV3 appliance pendente |
-| BG-081 | Policy/enforce/allowlist IPv6 (`policy.c`, `enforce.c`, `allowlist`) | Critica | daemon | F4 | decisão runtime v6 ausente | G | Alto | **Em execucao (12.7–12.8)** — 12.6 policy CIDR done | GV3–GV4 |
+| BG-081 | Policy/enforce/allowlist IPv6 (`policy.c`, `enforce.c`, `allowlist`) | Critica | daemon | F4 | decisão runtime v6 ausente | G | Alto | **Em execucao (12.8)** — 12.6 policy + 12.7 enforce done | GV3–GV4 |
 | BG-082 | GUI + validação JSON IPv6 (`layer7.inc`, páginas GUI) | Alta | package/GUI | F4 | truncamento/validação silenciosa | M | Alto | Planeado (12.9) | GV2 |
 | BG-083 | DNS forçado / block page / VIP isenção IPv6 (NAT `rdr inet6`) | Alta | package/PF/Unbound | F4 | bypass DNS em v6 | G | Medio | Planeado (12.10–12.11) | GV5; **gate humano** V5 |
 | BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | Planeado (12.12–12.13) | `validacao-lab` §21; série `1.9.n` |

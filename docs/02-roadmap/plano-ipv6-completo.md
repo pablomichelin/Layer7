@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.7** (V3) |
+| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.8** (V3) |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -223,20 +223,20 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.7
+- Passo actual: 12.8
 - Onda: V3
-- Candidato lab: 1.9.1 (código 12.6 na árvore; próximo .pkg: 1.9.2)
+- Candidato lab: 1.9.1 (código 12.6–12.7 na árvore; próximo .pkg: 1.9.2)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - GV0 (docs): PASS (12.1–12.2)
 - GV1 (PF scoped inet6): PARCIAL (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2 (builder): PARCIAL (12.4–12.6 PASS builder; policy tests PASS)
+- GV2 (builder): PARCIAL (12.4–12.7 PASS builder; policy + enforce scoped tests PASS)
 - GV3 (captura v6 appliance): PARCIAL (`1.9.1` em `254`; cap_*_v6 > 0; GV3.3–GV3.5 PENDENTE)
-- GV4 (enforce v6): PENDENTE
+- GV4 (enforce v6): PARCIAL (código 12.7 PASS builder; appliance PENDENTE; GV4.5 S-03 unit PASS)
 - GV5 (DNS/NAT v6): PENDENTE | ADIADO
 - GV6 (dual-stack lab): PENDENTE
 - GV7 (fecho trilha): PENDENTE
-- I1–I8: I1 PASS; I2 parcial; I3 parcial (appliance); I4 parcial (policy CIDR 12.6)
-- Próximo passo autorizado: 12.7
+- I1–I8: I1 PASS; I2 parcial; I3 parcial (appliance); I4 parcial (policy 12.6 + enforce 12.7; allowlist 12.8)
+- Próximo passo autorizado: 12.8
 ```
 
 ---
@@ -258,6 +258,7 @@ TRILHA IPv6 — progresso
 
 | Data | Evento |
 |------|--------|
+| 2026-08-04 | Passo **12.7** concluído: `enforce.c`/`enforce.h`/`main.c` PF tabelas + kill states v6 — `layer7_pf_host_ok`/`layer7_pf_host_enforce_ok` (S-03: rejeita `::1`, `fe80::/10`, `ff00::/8`); `pfctl -T add/delete` e kill states IPv6; `kill_states_to` `::/0`; gates PF `host_enforce_ok`; `ip_is_local_iface_addr` IPv6; `test_enforce_scoped.c` + `run-local.sh` PASS local + builder; sem bump `1.9.2` |
 | 2026-08-04 | Passo **12.6** concluído: `policy.c` CIDR IPv6 dual-stack (`l7_cidr` family + union; `parse_cidr_str` v4/v6; match src/exception CIDRs; `ip_host_equal`); `test_policy_decide.c` PASS local + builder; sem bump `1.9.2`; appliance `254` `1.9.1` cap_*_v6 > 0 |
 | 2026-08-04 | Passo **12.5** concluído: métricas AF `cap_pkts_v4/v6`, `cap_active_v4/v6`, `cap_classified_v4/v6` em capture + JSON stats; GV2 builder PASS |
 | 2026-08-04 | Passo **12.4** concluído: captura IPv6 + flow key; unit + `layer7d` build/`-t` PASS |
