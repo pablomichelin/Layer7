@@ -1,0 +1,128 @@
+========== l7-diag: host / OS ==========
+systemupfw.system.up
+FreeBSD systemupfw.system.up 16.0-CURRENT FreeBSD 16.0-CURRENT #12 plus-RELENG_26_03_1-n256546-1d1bfd578383: Wed May 20 15:20:10 UTC 2026     root@pfsense-build-release-amd64-2.eng.atx.netgate.com:/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/obj/amd64/fvF1vE9r/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/sources/FreeBSD-src-plus-RELENG_26_03_1/amd64.amd64/sys/pfSense amd64
+Tue Aug  4 21:56:58 -03 2026
+
+========== l7-diag: pacote / binario ==========
+pfSense-pkg-layer7-1.8.11_69
+--- layer7d -V ---
+1.8.11_69
+
+========== l7-diag: licenca (--license-status) ==========
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=703
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2028-07-08
+features=full
+ficheiro .lic: existe
+-rw-r--r--  1 root wheel 334 Aug  4 21:28 /usr/local/etc/layer7.lic
+
+========== l7-diag: layer7.json (mode / enabled / enforcement_model) ==========
+        "enabled": true,
+        "mode": "enforce",
+                "enabled": true,
+                "enabled": true,
+        "enforcement_model": "legacy_global",
+            "enabled": true,
+            "enabled": true,
+parsed: mode=enforce enabled=true enforcement_model=legacy_global
+
+========== l7-diag: layer7d (pid / stats) ==========
+pidfile: 22140
+processo: vivo
+stats: leitura passiva (sem sinal; use L7_DIAG_REFRESH_STATS=1 apenas em lab)
+--- stats JSON (inicio) ---
+{
+  "version": "1.8.11_69",
+  "boot_time": 1785890913,
+  "uptime_seconds": 480,
+  "timestamp": 1785891393,
+  "total_classified": 1782,
+  "total_blocked": 0,
+  "total_allowed": 1782,
+  "policies_active": 2,
+  "exceptions": 0,
+  "enforce_mode": 1,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 0,
+  "dst_add_fail": 0,
+  "cap_pkts": 245829,
+  "cap_active": 618,
+  "cap_classified": 1782,
+  "cap_expired": 2039,
+  "cap_evicted": 0,
+  "cap_dropped": 0,
+  "captures": 2,
+  "top_apps_blocked": [],
+  "top_sources_blocked": [],
+  "license_valid": true,
+  "license_expired": false,
+  "license_grace": false,
+  "license_dev_mode": false,
+  "license_days_left": 703,
+  "license_customer": "Systemup",
+  "license_expiry": "2028-07-08",
+  "license_hardware_id": "e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826",
+  "license_error": "",
+  "bl_enabled": false,
+  "bl_domains_loaded": 0,
+  "bl_categories_active": 0,
+  "bl_lookups": 0,
+  "bl_hits": 0,
+  "bl_dns_hits": 0,
+  "bl_sni_hits": 0,
+  "bl_rules_active": 0,
+  "bl_top_categories": []
+}
+
+
+========== l7-diag: pf regras (layer7) ==========
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <localsubnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <localsubnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+
+========== l7-diag: tabelas PF ==========
+--- layer7_block ---
+pfctl: Table does not exist.
+
+--- layer7_block_dst ---
+pfctl: Table does not exist.
+
+--- layer7_tagged ---
+pfctl: Table does not exist.
+
+--- layer7_allow_dst ---
+   17.250.105.4
+   17.250.105.11
+   52.123.128.14
+   52.123.129.14
+   64.233.186.207
+   64.233.190.207
+   72.153.5.133
+   72.153.5.136
+   95.101.25.136
+   95.101.25.148
+   95.101.25.149
+   108.177.123.207
+   142.250.0.207
+   142.250.219.234
+   142.251.0.207
+... (+33 entradas)
+
+--- layer7_pdst_* / layer7_psrc_* (scoped) ---
+(nenhuma tabela layer7_pdst_* / layer7_psrc_* — legacy_global ou sem reload scoped?)
+--- layer7_bld_* (blacklists) ---
+
+========== l7-diag: logs layer7d (flow_decide / dns_block / enforce_block) ==========
+
+========== l7-diag: servico rc ==========
+layer7d is running as pid 22140.
+
+========== l7-diag: fim ==========

@@ -1,0 +1,25 @@
+=== ONDA E baseline ===
+20260805T005659Z
+FreeBSD systemupfw.system.up 16.0-CURRENT FreeBSD 16.0-CURRENT #12 plus-RELENG_26_03_1-n256546-1d1bfd578383: Wed May 20 15:20:10 UTC 2026     root@pfsense-build-release-amd64-2.eng.atx.netgate.com:/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/obj/amd64/fvF1vE9r/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/sources/FreeBSD-src-plus-RELENG_26_03_1/amd64.amd64/sys/pfSense amd64
+26.03.1-RELEASE
+pfSense-pkg-layer7-1.8.11_69
+1.8.11_69
+BEFORE: mode=enforce enabled=true enforcement=legacy_global
+=== G2 passive (monitor) ===
+G2.3 PASS: zero block drop layer7
+=== G3 pfctl -nf ===
+G3 PASS: rules.debug
+=== stats (monitor) ===
+=== smoke-monitor-mode ===
+INFO: mode=monitor enabled=1
+PASS: PF sem block drop layer7 em modo monitor
+FAIL: tabela layer7_block ausente
+FAIL: tabela layer7_block_dst ausente
+FAIL: tabela layer7_tagged ausente
+FAIL: tabela layer7_allow_dst ausente
+PASS: layer7_block_dst vazia em monitor
+PASS: layer7d vivo pid=93198
+PASS: layer7-pfctl ensure ok em monitor
+=== restore OK ===
+AFTER RESTORE: mode=enforce enabled=true enforcement=legacy_global
+post-A3: mode=enforce enabled=true

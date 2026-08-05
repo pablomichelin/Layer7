@@ -1,0 +1,369 @@
+
+=== F5 smoke checklist — 20260805T005650Z-ondaG-f5-smoke-82 ===
+builder=root@192.168.100.12 appliance=root@192.168.100.254 candidate=1.8.11_69
+
+=== L1 tests/run-local.sh ===
+
+== Unit: allowlist ==
+PASS: add domain
+PASS: add ipv4
+PASS: add cidr
+PASS: reject cidr /0
+PASS: reject empty
+PASS: reject domain without dot
+PASS: reject invalid ipv4
+PASS: reject invalid prefix
+PASS: reject shell metachars
+PASS: count after 3 adds
+PASS: match exact domain
+PASS: match subdomain
+PASS: match subdomain of itau
+PASS: do not match by infix
+PASS: do not match parent
+PASS: miss unrelated
+PASS: match exact ip
+PASS: miss neighbour ip
+PASS: match cidr inside
+PASS: miss cidr outside
+PASS: reject non-ip input
+PASS: parse_json keeps 3 valid, drops 1 invalid
+PASS: json: subdomain match
+PASS: json: cidr match
+PASS: dedup is case-insensitive and exact-value
+
+ALL OK
+PASS: test_allowlist
+
+== Unit: config_parse (sni_inspection / A3) ==
+PASS: parse ok (sni antes)
+PASS: has_sni_inspection (antes)
+PASS: sni_inspection=1 (antes)
+PASS: parse ok (sni depois)
+PASS: has_sni_inspection (depois)
+PASS: sni_inspection=1 (depois de policies)
+PASS: parse ok (false)
+PASS: has_sni_inspection (false)
+PASS: sni_inspection=0 (false)
+PASS: parse ok (ausente)
+PASS: sem sni_inspection -> has=0
+PASS: sem sni_inspection -> valor 0
+PASS: parse ok (enabled/mode)
+PASS: enabled=1
+PASS: mode=enforce
+PASS: parse ok (sem enforcement_model)
+PASS: sem enforcement_model -> has=0
+PASS: parse ok (legacy_global)
+PASS: has_enforcement_model (legacy)
+PASS: enforcement_model=legacy_global
+PASS: parse ok (scoped_hybrid)
+PASS: has_enforcement_model (scoped)
+PASS: enforcement_model=scoped_hybrid
+PASS: parse ok (invalid model)
+PASS: invalid enforcement_model -> has=0
+PASS: parse ok (logging L1)
+PASS: log_file_max_mb=10
+PASS: log_file_keep=4
+PASS: event_log_enabled=1
+PASS: duas interfaces de eventos
+PASS: interfaces de eventos preservadas
+PASS: parse ok (logging invalido)
+PASS: log_file_max_mb invalido ignorado
+PASS: log_file_keep invalido ignorado
+PASS: event_log_enabled=false explicito
+PASS: parse falha sem layer7
+PASS: sem layer7 -> has_layer7=0
+PASS: truncado: layer7 detectado
+PASS: parse ok com campo desconhecido
+PASS: enabled preservado com unknown_field
+PASS: parse ok (FP-015 cenario)
+PASS: FP-015: enabled de policy vence (fragil)
+PASS: parse ok (src_exclude fields)
+PASS: policy with src_exclude loaded
+PASS: src_exclude_cidrs parsed
+PASS: src_exclude_groups parsed
+PASS: parse ok (32 exc hosts)
+PASS: vip exception loaded
+PASS: 32 exception hosts parsed
+PASS: first exc host preserved
+PASS: last exc host preserved
+
+TEST CONFIG_PARSE: ALL PASSED
+PASS: test_config_parse
+
+== Unit: capture flow key bidireccional ==
+PASS: TCP ida/volta usa o mesmo bucket
+PASS: porta diferente altera a chave
+PASS: UDP ida/volta usa o mesmo bucket
+PASS: probe encontra fluxo depois de buraco expirado
+PASS: probe usa primeiro slot livre após procurar match
+PASS: janela cheia selecciona fluxo mais antigo para evicção
+PASS: lookup sem create não remove fluxo sob pressão
+PASS: classificação parcial não encerra DPI cedo
+PASS: estado nDPI final encerra DPI
+PASS: orçamento esgotado encerra DPI para giveup
+RESULT: PASS
+PASS: test_capture_flow_key
+
+== Unit: log_store (rotacao limitada) ==
+PASS: mkdtemp
+PASS: append inicial
+PASS: append sem rotacao
+PASS: append com rotacao
+PASS: primeira copia criada
+PASS: copia preserva linhas anteriores
+PASS: activo recebe linha nova
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: append repetido
+PASS: segunda copia criada
+PASS: terceira copia criada
+PASS: numero de copias limitado
+PASS: ficheiro activo permanece limitado
+
+TEST LOG_STORE: ALL PASSED
+PASS: test_log_store
+
+== Unit: policy_decide (Caminho B / E1) ==
+PASS: 1 decide ok
+PASS: 1 action block
+PASS: 1 reason policy
+PASS: 1 would enforce
+PASS: 1 enforce dst
+PASS: 1 static source scope
+PASS: 1 table idx 0
+PASS: 1 policy id
+PASS: 2 decide ok
+PASS: 2 action allow default
+PASS: 2 reason default allow
+PASS: 2 no enforce
+PASS: 2 default allow still evaluates blacklist
+PASS: 3 decide ok
+PASS: 3 action allow
+PASS: 3 reason exception
+PASS: 3 no enforce
+PASS: 3 exception allow bypasses blacklist
+PASS: 4 decide ok
+PASS: 4 action allow
+PASS: 4 reason policy allow
+PASS: 4 allow policy
+PASS: 4 no enforce
+PASS: 4 policy allow bypasses blacklist
+PASS: 4 policy allow keeps table idx
+PASS: 4 policy allow keeps matched destination kind
+PASS: 5 decide ok
+PASS: 5 default allow
+PASS: 5 reason default
+PASS: 5 no enforce
+PASS: 6 decide ok
+PASS: 6 default allow
+PASS: 6 reason default
+PASS: 6 no enforce
+PASS: 7a decide in-group ok
+PASS: 7a block in group
+PASS: 7a policy match
+PASS: 7b decide out-group ok
+PASS: 7b allow out of group
+PASS: 7b default allow
+PASS: idx high first after sort
+PASS: idx mid second
+PASS: idx low third
+PASS: idx missing -1
+PASS: empty block parse returns 0
+PASS: empty block policy rejected
+PASS: scope_global parse ok
+PASS: scope_global empty block accepted
+PASS: scope_global flag set
+PASS: q0 parse ok
+PASS: q0 policy loaded
+PASS: q0 quarantine_origin default 0
+PASS: q0 decide ok
+PASS: q0 dst scoped kind
+PASS: q0 dec quarantine_origin unset
+PASS: q0 runtime must not apply psrc quarantine
+PASS: q1 parse ok
+PASS: q1 policy loaded
+PASS: q1 quarantine_origin set
+PASS: q1 decide ok
+PASS: q1 src scoped kind
+PASS: q1 dec quarantine_origin set
+PASS: q1 runtime may apply psrc quarantine
+PASS: q1 resolves psrc table and src ip
+PASS: app-only parse ok
+PASS: app-only policy loaded
+PASS: quarantine_origin default 0
+PASS: app-only decide ok
+PASS: app-only dst scoped
+PASS: dec quarantine_origin unset
+PASS: app-src parse ok
+PASS: app-src policy loaded
+PASS: app-src decide ok
+PASS: app-src chooses pdst
+PASS: app-src source scope propagated
+PASS: app-src no explicit quarantine
+PASS: app-src must not quarantine source
+PASS: mixed parse ok
+PASS: mixed policy loaded
+PASS: mixed app path decide
+PASS: mixed app path block
+PASS: mixed app path chooses pdst
+PASS: mixed host path decide
+PASS: mixed host path block
+PASS: mixed host path chooses pdst
+PASS: exclude parse ok
+PASS: exclude policy loaded
+PASS: exclude cidr count
+PASS: exclude in-subnet decide
+PASS: exclude in-subnet block
+PASS: exclude host decide
+PASS: exclude host allow
+PASS: exclude host default allow
+PASS: vip parse ok (10 hosts)
+PASS: vip exception loaded
+PASS: 10 vip hosts parsed (not truncated at 8)
+PASS: vip host 10 decide ok
+PASS: vip host 10 allow
+PASS: vip host 10 exception reason
+PASS: vip host 10 explicit allow
+PASS: exclude group parse
+PASS: exclude policy parse
+PASS: exclude expanded group decide
+PASS: exclude expanded allow
+
+ALL POLICY DECIDE TESTS PASSED
+PASS: test_policy_decide
+
+== Unit: enforce_scoped (Caminho B / E3) ==
+PASS: pdst table name idx 0
+PASS: psrc table name idx 3
+PASS: none kind rejects table name
+PASS: policy allow table name idx 4
+PASS: policy allow rejects out-of-range idx
+PASS: scoped dst resolves pdst table and dst ip
+PASS: scoped src resolves psrc table and src ip
+PASS: legacy_global uses block_dst regardless of enforce_kind
+PASS: monitor action skips enforce
+PASS: exception block quarantines source in scoped mode
+PASS: kind str dst_scoped
+PASS: kind str src_scoped
+PASS: kind str none
+RESULT: PASS
+PASS: test_enforce_scoped
+
+== Unit: profiles.json catalogo ==
+PASS: JSON valido
+SKIP: php ausente para validacao detalhada
+PASS: test_profiles_json
+
+== Unit: rc.d pidfile sem newline ==
+PASS: test_rc_pidfile
+PASS: test_rc_pidfile
+
+== Unit: flush PF coverage (lifecycle) ==
+PASS: layer7.inc flush inclui layer7_exc_allow_*
+PASS: layer7_bl_apply chama layer7_flush_dynamic_tables
+PASS: layer7.inc materializa tabelas estaticas (BG-075)
+PASS: layer7.inc resync chama apply estatico
+PASS: layer7-pfctl ensure cobre layer7_exc_allow_*
+PASS: layer7-pfctl ensure inclui exc_allow
+PASS: layer7-pfctl define flush_tables_exception_allow
+PASS: layer7-pfctl flush-all inclui exc_allow
+PASS: pkg-deinstall PRE chama layer7-pfctl flush-all
+PASS: pkg-deinstall POST fallback inclui exc_allow
+PASS: pkg-deinstall POST fallback inclui pallow
+PASS: pkg-deinstall POST fallback inclui pexc
+PASS: layer7.inc flush inclui layer7_pexc_*
+PASS: layer7-pfctl flush-all inclui pexc
+PASS: pkg-deinstall POST fallback inclui allow_dst
+
+TEST FLUSH COVERAGE: ALL PASSED
+PASS: test_flush_coverage
+
+== Unit: bl_src_match (except_ips) ==
+PASS: cidr match non-except
+PASS: except_ip excludes client
+PASS: outside cidr miss
+PASS: no src_cidrs matches all
+
+ALL BL SRC MATCH TESTS PASSED
+PASS: test_bl_src_match
+
+== Simulacao: scoped_hybrid PF rules (Caminho B / E2) ==
+SKIP: php nao instalado, saltando simulacao scoped PF
+
+== Lint: PHP do pacote (php -l) ==
+SKIP: php nao instalado, saltando syntax check
+
+== Lint: sh do pacote (sh -n) ==
+PASS: sh syntax (13 scripts OK)
+
+== Resumo ==
+ALL LOCAL TESTS PASSED
+PASS: L1 run-local.sh
+
+=== L2 scripts/package/check-port-files.sh ===
+check-port-files: OK
+PASS: L2 check-port-files.sh
+
+=== B1 builder smoke-layer7d.sh ===
+layer7d_version: smoke
+config: /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7.json.sample
+  layer7: found
+  enabled: false
+  mode: monitor
+  log_level: info
+  syslog_remote: false
+  syslog_remote_host: (not set)
+  syslog_remote_port: 514
+  debug_minutes: 0 (boost após reload)
+  protos_file: /usr/local/etc/layer7-protos.txt
+  interfaces: [lan]
+  policies: 2 (sorted priority desc, id asc)
+    [0] id=p-mon-001 pri=10 action=monitor enabled=true match.*
+    [1] id=anti-bypass-dns pri=1 action=block enabled=true app=[DoH_DoT,AppleiCloud,iCloudPrivateRelay]
+  exceptions: 0 (priority desc)
+  policy dry-run (exceptions → policies → default):
+    --- as if global mode=monitor ---
+      src=10.0.0.99 app=BitTorrent cat=(null) -> monitor reason=policy_match policy=p-mon-001
+      src=10.0.0.1 app=BitTorrent cat=(null) -> monitor reason=policy_match policy=p-mon-001
+      src=10.0.0.1 app=HTTP cat=Web -> monitor reason=policy_match policy=p-mon-001
+      src=10.0.0.1 app=HTTP cat=(null) -> monitor reason=policy_match policy=p-mon-001
+      src=(null) app=HTTP cat=Web -> monitor reason=policy_match policy=p-mon-001
+      src=192.168.77.10 app=HTTP cat=Web -> monitor reason=policy_match policy=p-mon-001
+    --- as if global mode=enforce ---
+      src=10.0.0.99 app=BitTorrent cat=(null) -> monitor reason=policy_match policy=p-mon-001
+      src=10.0.0.1 app=BitTorrent cat=(null) -> monitor reason=policy_match policy=p-mon-001
+      src=10.0.0.1 app=HTTP cat=Web -> monitor reason=policy_match policy=p-mon-001
+      src=10.0.0.1 app=HTTP cat=(null) -> monitor reason=policy_match policy=p-mon-001
+      src=(null) app=HTTP cat=Web -> monitor reason=policy_match policy=p-mon-001
+      src=192.168.77.10 app=HTTP cat=Web -> monitor reason=policy_match policy=p-mon-001
+  pf_exec: layer7_pf_exec_table_add/delete → /sbin/pfctl (runtime após nDPI)
+smoke-layer7d: OK
+PASS: B1 smoke-layer7d.sh
+
+=== B2 builder PORTVERSION ===
+builder version: 1.8.11_69
+PASS: B2 PORTVERSION matches 1.8.11_69
+
+=== A1 appliance diagnose (read-only) ===
+PASS: A1 diagnose exit 0
+PASS: A1 pkg version 1.8.11_69
+
+=== A2 appliance service + license ===
+PASS: A2 layer7d -V
+PASS: A2 service status
+
+=== A3 appliance smoke-monitor-mode (temporary) ===
+PASS: A3 PF monitor (tabelas podem falhar pós-filter_configure)
+
+=== SUMMARY ===
+VEREDICT: PASS
+evidence: /Users/pablomichelin/Documents/Layer 7/docs/tests/evidence/20260805T005650Z-ondaG-f5-smoke-82

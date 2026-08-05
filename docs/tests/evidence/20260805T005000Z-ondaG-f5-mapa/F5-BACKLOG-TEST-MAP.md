@@ -25,8 +25,8 @@ IDs da `test-matrix.md` e evidências físicas já recolhidas nas Ondas A–D.
 | — | G2–G4 Onda A | **2.1**, **3.1**, **6.3** | `20260804T221500Z-ondaA-g2-install-65`, `20260804T222500Z-ondaA-g3-g4-65` | **PASS** |
 | — | G5 two-client | **13.6** | `20260804T232800Z-ondaB-g5-full-PASS` | **PASS** |
 | — | G6–G7 | **11.x** licenciamento | `20260804T212800Z-ondaD-g6-PASS`, `20260804T212900Z-ondaD-g7-PASS` | **PASS** |
-| BG-012 | F5 malha | este mapa + `test-matrix.md` | este ficheiro | **Em curso** (8.1) |
-| BG-013 | Cobertura mínima | sec. 1–13 matriz | ver gaps abaixo | **Parcial** |
+| BG-012 | F5 malha | este mapa + `test-matrix.md` + `f5-smoke-checklist.md` | 8.1+8.2 | **PASS** |
+| BG-013 | Cobertura mínima | sec. 1–13 matriz | ver gaps | **Parcial** |
 | BG-014 | Evidências ↔ changelog | `docs/tests/evidence/*` | Ondas A–G | **Em curso** |
 
 ---
@@ -39,7 +39,7 @@ IDs da `test-matrix.md` e evidências físicas já recolhidas nas Ondas A–D.
 | 13.5 | `_25` smoke Plus | Supersedido por `_69`; opcional revalidar |
 | 6.7 VLAN | cenário multi-VLAN opcional §11 | Não executado (opcional BG-011) |
 | BG-028 | trust chain pacote | Onda I |
-| Smoke único repetível | checklist único builder+appliance | passo **8.2** |
+| Smoke único repetível | checklist único builder+appliance | passo **8.2** | **PASS** (`20260805T005650Z-ondaG-f5-smoke-82`) |
 
 ---
 

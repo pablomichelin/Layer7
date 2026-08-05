@@ -11,8 +11,8 @@ plano mestre. O plano completo está em:
 
 | Campo | Valor esperado (`2026-08-04`) |
 |-------|-------------------------------|
-| Passo actual | **Onda G** passo **8.2** — Ondas A–E concluídas (E=**LIMITAÇÃO**) |
-| Ondas concluídas | A–D **PASS**, E **LIMITAÇÃO**, G **8.1 PASS** |
+| Passo actual | **Onda F prep** ou **9.0** (mapa F6) — Onda G **PASS** |
+| Ondas concluídas | A–D **PASS**, E **LIMITAÇÃO**, G **PASS** (8.1+8.2) |
 | Onda D | **PASS** — 10a/10b/11 + G6/G7 |
 | Gates G6–G7 | **PASS** (`20260804T212800Z` / `212900Z`) |
 | Trilha BG-077 | **fechada** (S14 + S09 reteste PASS) |

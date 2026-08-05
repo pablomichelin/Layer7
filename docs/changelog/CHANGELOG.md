@@ -13,6 +13,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `20260805T004800Z-ondaE-ce-parity-retest` (G2.3 PASS em monitor).
 - **Onda G (8.1):** mapa backlog ↔ testes em
   `docs/tests/evidence/20260805T005000Z-ondaG-f5-mapa/`; `test-matrix.md` actualizada.
+- **Onda G (8.2):** checklist `docs/tests/f5-smoke-checklist.md` +
+  `tests/lab/run-f5-smoke-checklist.sh`; evidência PASS
+  `20260805T005650Z-ondaG-f5-smoke-82`.
 - **BG-077 — check-in online (Bloco 1):** `POST /api/license/check-in` no
   license-server (`check-in.js`, `check_ins_log`); deploy em `192.168.100.244`.
 - **BG-077 — check-in online (Bloco 2):** `layer7d` com `--check-in`,

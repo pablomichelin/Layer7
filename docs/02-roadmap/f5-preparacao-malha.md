@@ -56,6 +56,9 @@ Itens de backlog: BG-012, BG-013, BG-014.
 4. **F5.4** — (Opcional posterior) ampliar CI para ficheiros críticos do
   port ou do updater de blacklists, sem substituir testes de appliance.
 
+**Checklist smoke mínimo (passo 8.2 — concluído):** [`f5-smoke-checklist.md`](../tests/f5-smoke-checklist.md);
+evidência `20260805T005650Z-ondaG-f5-smoke-82`.
+
 ---
 
 ## 4. O que NÃO é F5

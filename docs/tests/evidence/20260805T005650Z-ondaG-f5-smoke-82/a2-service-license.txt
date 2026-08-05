@@ -1,0 +1,7 @@
+1.8.11_69
+layer7d is running as pid 22140.
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=703
