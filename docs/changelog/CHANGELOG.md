@@ -6,6 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **Trilha IPv6 / passo 12.8 (V3):** `allowlist.c`/`allowlist.h` IPv6 host/CIDR —
+  kinds `L7_AL_IPV6_HOST`/`L7_AL_IPV6_CIDR`; parse/match dual-stack; rejeita `/0`,
+  `::1`, `fe80::/10`, `ff00::/8`, prefixo <10. `test_allowlist.c` + `run-local.sh`
+  PASS (local + builder). **Onda V3 completa** (12.6–12.8). Sem bump `1.9.2` nesta
+  entrega. Produção enforce `1.9.0` inalterada. Próximo: **12.9** (GUI validação IPv6).
+
 - **Trilha IPv6 / passo 12.7 (V3):** `enforce.c`/`enforce.h`/`main.c` PF tabelas +
   kill states IPv6 — `layer7_pf_host_ok`/`layer7_pf_host_enforce_ok` (S-03:
   rejeita `::1`, `fe80::/10`, `ff00::/8`); `pfctl -T add/delete` e kill states
@@ -13,7 +19,6 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `main.c` usam `host_enforce_ok`; `ip_is_local_iface_addr` lista IPv6 das
   ifaces. `test_enforce_scoped.c` + `run-local.sh` PASS (local + builder).
   Sem bump `1.9.2` nesta entrega. Produção enforce `1.9.0` inalterada.
-  Próximo: **12.8** (allowlist IPv6 host/CIDR).
 
 - **Trilha IPv6 / passo 12.6 (V3):** `policy.c` CIDR IPv6 dual-stack — `struct l7_cidr`
   com `family` (AF_INET/AF_INET6) + union `addr.v4`/`addr.v6`; `parse_cidr_str`

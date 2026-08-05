@@ -14,10 +14,11 @@
  * Tipos de entrada:
  *   - Dominio: ex.: `bb.com.br` — casa por sufixo (qualquer subdominio).
  *   - IPv4 host: ex.: `8.8.8.8`.
- *   - IPv4 CIDR: ex.: `200.201.0.0/16`.
+ *   - IPv4 CIDR: ex.: `200.201.0.0/16` (prefix 1..32; `/0` rejeitado).
+ *   - IPv6 host: ex.: `2001:db8::1` (passo 12.8).
+ *   - IPv6 CIDR: ex.: `2001:db8::/32` (prefix 1..128; `/0` rejeitado).
  *
- * V1: IPv6 nao suportado nesta estrutura. Para destinos IPv6 estaticos, o
- * operador pode adicionar regras `pass quick` manuais no pf.conf.sample.
+ * S-03: rejeita `::1`, `fe80::/10` e `ff00::/8` (host ou CIDR que case).
  */
 #ifndef LAYER7_ALLOWLIST_H
 #define LAYER7_ALLOWLIST_H
@@ -31,14 +32,17 @@
 enum l7_al_kind {
 	L7_AL_DOMAIN = 0,
 	L7_AL_IPV4_HOST = 1,
-	L7_AL_IPV4_CIDR = 2
+	L7_AL_IPV4_CIDR = 2,
+	L7_AL_IPV6_HOST = 3,
+	L7_AL_IPV6_CIDR = 4
 };
 
 struct l7_allowlist_entry {
 	char value[L7_AL_ENTRY_LEN];
 	enum l7_al_kind kind;
-	uint32_t ip;     /* host order, valido para IPV4_HOST/CIDR */
-	int prefix;      /* 0..32, valido para CIDR */
+	uint32_t ip;              /* host order — IPV4_HOST/CIDR */
+	unsigned char ip6[16];    /* IPV6_HOST/CIDR */
+	int prefix;               /* v4: 1..32; v6: 1..128; host = max */
 };
 
 struct l7_allowlist {
@@ -50,10 +54,7 @@ struct l7_allowlist {
 void l7_allowlist_reset(struct l7_allowlist *al);
 
 /*
- * Adiciona uma entrada bruta (texto). Determina automaticamente o kind:
- *   - Dominio: comeca por letra/_, contem ponto, sem `/` nem digito como primeiro char.
- *   - IPv4 host: 4 octetos sem `/`.
- *   - IPv4 CIDR: `a.b.c.d/n`.
+ * Adiciona uma entrada bruta (texto). Determina automaticamente o kind.
  * Devolve 0 se aceite, -1 se invalida ou se ja cheia.
  * Entradas duplicadas (por valor exacto) sao silenciosamente ignoradas.
  */
@@ -75,7 +76,7 @@ int l7_allowlist_load_seed_file(struct l7_allowlist *al, const char *path);
 int l7_allowlist_contains_domain(const struct l7_allowlist *al,
     const char *host);
 
-/* True se o IP (string `a.b.c.d`) cai em qualquer host/CIDR da allowlist. */
+/* True se o IP (IPv4 ou IPv6 textual) cai em qualquer host/CIDR da allowlist. */
 int l7_allowlist_contains_ip(const struct l7_allowlist *al,
     const char *ip_str);
 

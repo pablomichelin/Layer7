@@ -19,9 +19,9 @@
 | **Fase roadmap** | F4 aberta; F3 **fechada** |
 | **CE** | LIMITAÇÃO — ADR-0022 aceite; validação física CE pendente |
 | **Plano fecho** | **FECHADO** (Ondas A–J; excepções R7/CE documentadas) |
-| **Trilha activa** | **IPv6** — passo **12.8** (Onda V3); arranque único [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
+| **Trilha activa** | **IPv6** — passo **12.9** (Onda V4); arranque único [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md) |
 
-> **Versão actual (`latest`):** `1.9.1` — lab IPv6 (12.1–12.5 publicado; código 12.6–12.7 na árvore). **Enforce:** `1.9.0`.
+> **Versão actual (`latest`):** `1.9.1` — lab IPv6 (12.1–12.5 publicado; código 12.6–12.8 na árvore). **Enforce:** `1.9.0`.
 
 Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](docs/10-license-server/MANUAL-INSTALL.md).
 
@@ -38,7 +38,7 @@ Instalacao, upgrade e rollback: [`docs/10-license-server/MANUAL-INSTALL.md`](doc
 
 **Handoff chat longo:** [`docs/00-overview/handoff-chat-novo.md`](docs/00-overview/handoff-chat-novo.md)
 
-**Arranque único (fecho FECHADO + trilha IPv6 activa, passo 12.8):**
+**Arranque único (fecho FECHADO + trilha IPv6 activa, passo 12.9):**
 [`docs/00-overview/START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
 → plano: [`docs/02-roadmap/plano-ipv6-completo.md`](docs/02-roadmap/plano-ipv6-completo.md)
 
@@ -84,12 +84,12 @@ Plano SSOT: [`docs/09-blocking/plano-enforcement-100-porcento.md`](docs/09-block
 
 ## Proximos passos operacionais
 
-**Trilha activa:** IPv6 (passo **12.8**, Onda V3 — allowlist IPv6 host/CIDR) —
+**Trilha activa:** IPv6 (passo **12.9**, Onda V4 — GUI validação IPv6) —
 [`START-HERE-fecho-producao.md`](docs/00-overview/START-HERE-fecho-producao.md)
-(arranque único; 12.7 enforce PF v6 done; candidato lab `1.9.1`; próximo `.pkg` = `1.9.2`).
+(arranque único; Onda V3 concluída 12.6–12.8; candidato lab `1.9.1`; próximo `.pkg` = `1.9.2`).
 
 1. **Chat limpo:** colar só o caminho do START-HERE-fecho-producao.md.
-2. Executar passo **12.8**; ver `CORTEX.md` secção Trilha IPv6.
+2. Executar passo **12.9**; ver `CORTEX.md` secção Trilha IPv6.
 3. Produção enforce permanece **`1.9.0`** até GV7.
 4. Diagnostico rapido: [`scripts/diagnose-layer7-appliance.sh`](scripts/diagnose-layer7-appliance.sh)
 5. Testes locais: `./tests/run-local.sh` (nao substituem appliance; obrigatorio em ondas com codigo)

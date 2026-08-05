@@ -1,7 +1,7 @@
 # Plano — gates IPv6 (trilha V0–V6)
 
 **Data:** 2026-08-04  
-**Rev.:** 2026-08-04d  
+**Rev.:** 2026-08-05e  
 **Versão alvo inicial / série:** `1.9.0` → `1.9.1` → `1.9.2` → … (`PORTREVISION=0`)  
 **Versão alvo fecho:** patch `1.9.n` da mesma série (passo 12.13; sem salto a `1.10.0`)  
 **Produção enforce actual:** `1.9.0` (inalterada até GV7 + GO humano)  
@@ -52,12 +52,12 @@
 
 | # | Critério | Método | Estado |
 |---|----------|--------|--------|
-| GV2.1 | `tests/run-local.sh` PASS (incl. novos testes v6) | macOS/CI | **PASS** (builder `2026-08-04`; 12.4–12.6; incl. `test_policy_decide`) |
+| GV2.1 | `tests/run-local.sh` PASS (incl. novos testes v6) | macOS/CI | **PASS** (builder `2026-08-04`–`05`; 12.4–12.8; incl. `test_policy_decide`, `test_allowlist`) |
 | GV2.2 | Build pacote no builder FreeBSD | Makefile | **PASS** (builder `2026-08-04`; 12.4–12.5) |
 | GV2.3 | `php -l` + testes funcionais PHP PASS | builder | **PASS** (builder; sem alteração 12.5) |
 | GV2.4 | `layer7d -t` smoke PASS | builder | **PASS** (builder `2026-08-04`; 12.4–12.5) |
 
-**GV2 onda V2–V3 (captura/métricas/policy):** **PARCIAL** — builder PASS (passos 12.4–12.6); confirmação appliance captura = **GV3**.
+**GV2 onda V2–V3 (captura/métricas/policy/enforce/allowlist):** **PARCIAL** — builder PASS (passos 12.4–12.8); confirmação appliance captura = **GV3**.
 
 ### GV3 — Captura IPv6 no appliance (Onda V2–V3)
 
@@ -81,7 +81,7 @@
 | GV4.4 | Rollback para candidato anterior restaura tráfego v6 | `pkg` rollback | **PENDENTE** |
 | GV4.5 | Enforce não coloca link-local/multicast/`::1` nas tabelas | Auditoria tabelas | **PARCIAL** (S-03 `layer7_pf_host_enforce_ok` + `test_enforce_scoped.c` PASS builder; appliance PENDENTE) |
 
-**GV4 onda:** **PARCIAL** — código enforce v6 (12.7) PASS builder; GV4.1–GV4.4 appliance PENDENTE.
+**GV4 onda:** **PARCIAL** — código daemon v6 (12.6–12.8) PASS builder; GV4.1–GV4.4 appliance PENDENTE.
 
 ### GV5 — DNS / NAT / block page IPv6 (Onda V5 — opcional)
 

@@ -1,6 +1,6 @@
 # Plano extensão — IPv6 completo (pós-fecho produção)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-04c` — um só START-HERE; salvaguardas)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-05c` — passo 12.9 V4)  
 **Tipo:** extensão pós-Onda J do plano mestre de fecho  
 **SSOT deste plano:** este ficheiro  
 **SSOT de estado:** `CORTEX.md` (secção *Trilha IPv6*)  
@@ -26,7 +26,7 @@ intencional, não conflito de datas.
 | Plano | Ondas | Estado |
 |-------|-------|--------|
 | Fecho produção | P0–J | **FECHADO** |
-| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.8** (V3) |
+| IPv6 completo | **V0–V6** | **ABERTO** — passo actual: **12.9** (V4) |
 
 ### Desambiguação — passos 12.x vs test-matrix §12
 
@@ -223,20 +223,20 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: 12.8
-- Onda: V3
-- Candidato lab: 1.9.1 (código 12.6–12.7 na árvore; próximo .pkg: 1.9.2)
+- Passo actual: 12.9
+- Onda: V4
+- Candidato lab: 1.9.1 (código 12.6–12.8 na árvore; próximo .pkg: 1.9.2)
 - Produção enforce: 1.9.0 (inalterada até GV7)
 - GV0 (docs): PASS (12.1–12.2)
 - GV1 (PF scoped inet6): PARCIAL (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2 (builder): PARCIAL (12.4–12.7 PASS builder; policy + enforce scoped tests PASS)
+- GV2 (builder): PARCIAL (12.4–12.8 PASS builder; policy + enforce + allowlist tests PASS)
 - GV3 (captura v6 appliance): PARCIAL (`1.9.1` em `254`; cap_*_v6 > 0; GV3.3–GV3.5 PENDENTE)
-- GV4 (enforce v6): PARCIAL (código 12.7 PASS builder; appliance PENDENTE; GV4.5 S-03 unit PASS)
+- GV4 (enforce v6): PARCIAL (código daemon 12.6–12.8 PASS builder; appliance PENDENTE; GV4.5 S-03 unit PASS)
 - GV5 (DNS/NAT v6): PENDENTE | ADIADO
 - GV6 (dual-stack lab): PENDENTE
 - GV7 (fecho trilha): PENDENTE
-- I1–I8: I1 PASS; I2 parcial; I3 parcial (appliance); I4 parcial (policy 12.6 + enforce 12.7; allowlist 12.8)
-- Próximo passo autorizado: 12.8
+- I1–I8: I1 PASS; I2 parcial; I3 parcial (appliance); I4 parcial (policy+enforce+allowlist v6 código 12.6–12.8; GUI I6 = 12.9)
+- Próximo passo autorizado: 12.9
 ```
 
 ---

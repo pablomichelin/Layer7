@@ -1,16 +1,19 @@
 /*
- * allowlist.c — implementacao do Bloco 3 (Fase 1).
+ * allowlist.c — Bloco 3 (Fase 1) + passo 12.8 (IPv6 host/CIDR).
  *
  * Estrutura linear, comparacoes O(N) com N pequeno (<=256). Conservador por
  * defeito: entradas invalidas sao rejeitadas; nao toca em malloc dinamico.
  */
 #include "allowlist.h"
 
+#include <arpa/inet.h>
 #include <ctype.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/socket.h>
 
 void
 l7_allowlist_reset(struct l7_allowlist *al)
@@ -42,12 +45,71 @@ parse_ipv4(const char *s, uint32_t *out)
 }
 
 static int
+parse_ipv6(const char *s, unsigned char out[16])
+{
+	struct in6_addr a6;
+
+	if (!s || !*s || !out)
+		return -1;
+	if (inet_pton(AF_INET6, s, &a6) != 1)
+		return -1;
+	memcpy(out, &a6, 16);
+	return 0;
+}
+
+/* S-03: ::1, fe80::/10, ff00::/8 — nao entram na allowlist PF. */
+static int
+ipv6_forbidden(const unsigned char addr[16], int prefix)
+{
+	struct in6_addr a6;
+
+	memcpy(&a6, addr, 16);
+	if (IN6_IS_ADDR_LOOPBACK(&a6))
+		return 1;
+	if (IN6_IS_ADDR_LINKLOCAL(&a6))
+		return 1;
+	if (IN6_IS_ADDR_MULTICAST(&a6))
+		return 1;
+	/*
+	 * Prefixos demasiado curtos podem cobrir link-local/multicast
+	 * mesmo com network base "limpo" (ex. ::/1). Conservador: <10.
+	 */
+	if (prefix > 0 && prefix < 10)
+		return 1;
+	return 0;
+}
+
+static int
+cidr_v6_match(const unsigned char ip[16], const unsigned char net[16],
+    int prefix)
+{
+	int full, rem, i;
+	unsigned char mask;
+
+	if (prefix <= 0)
+		return 0;
+	if (prefix > 128)
+		prefix = 128;
+	full = prefix / 8;
+	rem = prefix % 8;
+	for (i = 0; i < full; i++) {
+		if (ip[i] != net[i])
+			return 0;
+	}
+	if (rem == 0)
+		return 1;
+	mask = (unsigned char)(0xffu << (unsigned)(8 - rem));
+	return ((ip[full] & mask) == (net[full] & mask));
+}
+
+static int
 classify(const char *s, struct l7_allowlist_entry *e)
 {
 	const char *slash;
 	size_t i, n;
-	char ip_buf[24];
+	char ip_buf[64];
 	int prefix;
+	unsigned char a6[16];
 
 	if (!s || !*s)
 		return -1;
@@ -72,20 +134,50 @@ classify(const char *s, struct l7_allowlist_entry *e)
 			return -1;
 		memcpy(ip_buf, s, len);
 		ip_buf[len] = '\0';
+		prefix = atoi(slash + 1);
+
+		if (strchr(ip_buf, ':') != NULL) {
+			if (parse_ipv6(ip_buf, a6) != 0)
+				return -1;
+			if (prefix < 1 || prefix > 128)
+				return -1;
+			if (ipv6_forbidden(a6, prefix))
+				return -1;
+			memcpy(e->ip6, a6, 16);
+			e->ip = 0;
+			e->prefix = prefix;
+			e->kind = L7_AL_IPV6_CIDR;
+			return 0;
+		}
+
 		if (parse_ipv4(ip_buf, &e->ip) != 0)
 			return -1;
-		prefix = atoi(slash + 1);
 		/* Rejeita 0.0.0.0/0 — allowlist aberta demais para PF. */
 		if (prefix < 1 || prefix > 32)
 			return -1;
+		memset(e->ip6, 0, sizeof(e->ip6));
 		e->prefix = prefix;
 		e->kind = L7_AL_IPV4_CIDR;
+		return 0;
+	}
+
+	/* IPv6 host (tem ':') */
+	if (strchr(s, ':') != NULL) {
+		if (parse_ipv6(s, a6) != 0)
+			return -1;
+		if (ipv6_forbidden(a6, 128))
+			return -1;
+		memcpy(e->ip6, a6, 16);
+		e->ip = 0;
+		e->prefix = 128;
+		e->kind = L7_AL_IPV6_HOST;
 		return 0;
 	}
 
 	if (s[0] >= '0' && s[0] <= '9') {
 		if (parse_ipv4(s, &e->ip) != 0)
 			return -1;
+		memset(e->ip6, 0, sizeof(e->ip6));
 		e->prefix = 32;
 		e->kind = L7_AL_IPV4_HOST;
 		return 0;
@@ -96,6 +188,7 @@ classify(const char *s, struct l7_allowlist_entry *e)
 	if (n > 253)
 		return -1;
 	e->ip = 0;
+	memset(e->ip6, 0, sizeof(e->ip6));
 	e->prefix = 0;
 	e->kind = L7_AL_DOMAIN;
 	return 0;
@@ -242,28 +335,48 @@ int
 l7_allowlist_contains_ip(const struct l7_allowlist *al, const char *ip_str)
 {
 	uint32_t ip, mask;
+	unsigned char a6[16];
 	int i, p;
+	int is_v6 = 0;
 
 	if (!al || !ip_str || !*ip_str)
 		return 0;
-	if (parse_ipv4(ip_str, &ip) != 0)
+	if (parse_ipv4(ip_str, &ip) == 0)
+		is_v6 = 0;
+	else if (parse_ipv6(ip_str, a6) == 0)
+		is_v6 = 1;
+	else
 		return 0;
+
 	for (i = 0; i < al->n; i++) {
 		const struct l7_allowlist_entry *e = &al->entries[i];
-		if (e->kind == L7_AL_IPV4_HOST) {
-			if (ip == e->ip)
-				return 1;
-		} else if (e->kind == L7_AL_IPV4_CIDR) {
-			p = e->prefix;
-			if (p < 1 || p > 32)
-				continue;
-			if (p >= 32) {
+
+		if (!is_v6) {
+			if (e->kind == L7_AL_IPV4_HOST) {
 				if (ip == e->ip)
 					return 1;
-				continue;
+			} else if (e->kind == L7_AL_IPV4_CIDR) {
+				p = e->prefix;
+				if (p < 1 || p > 32)
+					continue;
+				if (p >= 32) {
+					if (ip == e->ip)
+						return 1;
+					continue;
+				}
+				mask = (uint32_t)(0xffffffffU <<
+				    (unsigned)(32 - p));
+				if ((ip & mask) == (e->ip & mask))
+					return 1;
 			}
-			mask = (uint32_t)(0xffffffffU << (unsigned)(32 - p));
-			if ((ip & mask) == (e->ip & mask))
+			continue;
+		}
+
+		if (e->kind == L7_AL_IPV6_HOST) {
+			if (memcmp(a6, e->ip6, 16) == 0)
+				return 1;
+		} else if (e->kind == L7_AL_IPV6_CIDR) {
+			if (cidr_v6_match(a6, e->ip6, e->prefix))
 				return 1;
 		}
 	}

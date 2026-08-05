@@ -98,6 +98,36 @@ test_ip_match(void)
 }
 
 static void
+test_ipv6_match(void)
+{
+	struct l7_allowlist al;
+
+	l7_allowlist_reset(&al);
+	CHECK(l7_allowlist_add(&al, "2001:db8::1") == 0, "add ipv6 host");
+	CHECK(l7_allowlist_add(&al, "2001:db8:abcd::/48") == 0,
+	    "add ipv6 cidr");
+	CHECK(l7_allowlist_add(&al, "::/0") == -1, "reject ipv6 /0");
+	CHECK(l7_allowlist_add(&al, "::1") == -1, "reject loopback v6");
+	CHECK(l7_allowlist_add(&al, "fe80::1") == -1, "reject link-local");
+	CHECK(l7_allowlist_add(&al, "ff02::1") == -1, "reject multicast");
+	CHECK(l7_allowlist_add(&al, "2001:db8::/8") == -1,
+	    "reject too-short v6 prefix");
+
+	CHECK(l7_allowlist_contains_ip(&al, "2001:db8::1"),
+	    "match ipv6 host");
+	CHECK(l7_allowlist_contains_ip(&al, "2001:0db8:0000:0000:0000:0000:0000:0001"),
+	    "match ipv6 host expanded form");
+	CHECK(!l7_allowlist_contains_ip(&al, "2001:db8::2"),
+	    "miss neighbour ipv6 host");
+	CHECK(l7_allowlist_contains_ip(&al, "2001:db8:abcd::99"),
+	    "match ipv6 cidr inside");
+	CHECK(!l7_allowlist_contains_ip(&al, "2001:db8:abce::1"),
+	    "miss ipv6 cidr outside");
+	CHECK(!l7_allowlist_contains_ip(&al, "8.8.8.8"),
+	    "v4 does not match v6 entries");
+}
+
+static void
 test_json_parse(void)
 {
 	struct l7_allowlist al;
@@ -120,6 +150,28 @@ test_json_parse(void)
 }
 
 static void
+test_json_parse_v6(void)
+{
+	struct l7_allowlist al;
+	const char *json =
+	    "{ \"layer7\": { \"dst_allowlist\": ["
+	    "  \"2001:db8::53\","
+	    "  \"2804:6c4:11d:cc00::/64\","
+	    "  \"fe80::1\""
+	    "] } }";
+
+	l7_allowlist_reset(&al);
+	(void)l7_allowlist_parse_json(&al, json, strlen(json));
+	CHECK(l7_allowlist_count(&al) == 2,
+	    "json v6 keeps 2 valid, drops link-local");
+	CHECK(l7_allowlist_contains_ip(&al, "2001:db8::53"),
+	    "json: ipv6 host match");
+	CHECK(l7_allowlist_contains_ip(&al,
+	    "2804:6c4:11d:cc00:250:56ff:feb8:f83a"),
+	    "json: ipv6 cidr match lab prefix");
+}
+
+static void
 test_dedup(void)
 {
 	struct l7_allowlist al;
@@ -139,7 +191,9 @@ main(void)
 	test_classification();
 	test_domain_match();
 	test_ip_match();
+	test_ipv6_match();
 	test_json_parse();
+	test_json_parse_v6();
 	test_dedup();
 	if (g_fail) {
 		fprintf(stderr, "\n%d test(s) FAILED\n", g_fail);
