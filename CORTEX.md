@@ -1312,12 +1312,12 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**; pa
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.7 / IM2** (spike MITM S1–S8)
+- Passo actual: **20.7 / IM2** (desenho PASS; PoC lab PENDENTE)
 - IM0+IM1: PASS (GI0+GI1)
-- IM2: 20.7 PENDENTE; Identity IM3+ pode avançar se MITM DEFER
+- IM2: docs/09-blocking/spike-mitm-20.7.md; veredicto pendente lab
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8
-- Próximo: spike MITM 20.7
+- Próximo: PoC lab S1–S8 **ou** DEFER 20.7a → IM3
 ```
 
 ---

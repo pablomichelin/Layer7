@@ -13,6 +13,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **SSOT de execução** (ondas IM0–IM9, passos 20.x) |
 | [`identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md) | Mapa código / superfícies / não-regressão |
 | [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) | Gates GI0–GI9 |
+| [`spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) | Spike MITM 20.7 (desenho + S1–S8) |
 | ADR-0025 / 0026 / 0027 / 0028 | Decisões — **Aceito** (`2026-08-05`, T1) |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** do produto |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Filas **fecho + IPv6** (não reabrir) |
@@ -29,7 +30,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Plano | **ABERTO** — Identity + MITM Add-on |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM2 / 20.7** — spike MITM GO/NO-GO (critérios S1–S8 ADR-0026) |
+| Passo actual | **IM2 / 20.7** — spike MITM: desenho pronto; **PoC lab PENDENTE** |
 | Código do produto nesta trilha | **IM1 fechado** (GI1 PASS); MITM/Identity runtime ainda não |
 | Rev. do plano | **`2026-08-05c`** (contratos técnicos fechados; 20.2 PASS) |
 | Entitlement comercial | Modelo **X = base** / **Y = add-on**; legado **T1** (`full`→`base`) — ADR-0025 Aceito |
@@ -122,9 +123,10 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM2 / 20.7 (spike MITM S1–S8)
-- IM0: PASS; IM1: **20.3–20.6 PASS / GI1 PASS**
-- IM2: 20.7 PENDENTE; IM3–IM9 PENDENTE
+- Passo actual: IM2 / 20.7 (desenho PASS; PoC lab PENDENTE)
+- IM0+IM1: PASS (GI0+GI1)
+- IM2: spike doc criado; veredicto GO/DEFER/NO-GO pendente lab
+- IM3–IM9: PENDENTE (Identity pode avançar se DEFER)
 - Código: entitlements OK; sem MITM/Identity runtime
 - Plano rev.: 2026-08-05c
 - Baseline enforce: 1.9.8

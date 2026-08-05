@@ -25,9 +25,9 @@
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.7 / IM2
+- Passo actual: 20.7 / IM2 (desenho doc; PoC lab pendente)
 - IM0+IM1: PASS (GI0+GI1)
-- IM2: 20.7 PENDENTE
+- IM2: spike-mitm-20.7.md criado; veredicto pendente
 - Baseline: 1.9.8
 ```
 

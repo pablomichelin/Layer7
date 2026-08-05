@@ -63,6 +63,7 @@ vence o canónico.
 | `docs/00-overview/START-HERE-identity-mitm.md` | arranque Identity+MITM | **único** arranque da trilha IM0–IM9 | Canónico | plano `plano-identity-mitm-addon.md` | manter com passo actual | novo plano |
 | `docs/02-roadmap/plano-identity-mitm-addon.md` | plano Identity+MITM | SSOT execução 20.x | Canónico | — | actualizar a cada passo | novo plano |
 | `docs/01-architecture/identity-mitm-mapa-rastreabilidade.md` | mapa Identity+MITM | NR-* + M-xx | Canónico | — | actualizar com código | novo plano |
+| `docs/09-blocking/spike-mitm-20.7.md` | spike MITM 20.7 | desenho + S1–S8 | Canónico (em curso) | ADR-0026 | actualizar com veredicto lab | novo plano |
 | `docs/09-blocking/plano-gates-identity-mitm.md` | gates GI0–GI9 | gates da trilha | Canónico | — | marcar PASS | novo plano |
 | `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Aceito (T1) | Canónico | — | manter vivo com IM1 | novo plano |
 | `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | Aceito (impl. via spike 20.7) | Canónico | emenda ADR-0017 quando ON | spike 20.7 | novo plano |
