@@ -780,6 +780,14 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		da4 = ntohl(iph->ip_dst.s_addr);
 		proto = iph->ip_p;
 		l3_hdr_len = (uint16_t)ip_hdr_len;
+		{
+			uint16_t ip_total = ntohs(iph->ip_len);
+
+			/* Preferir comprimento do cabeçalho IP (ignora padding Ethernet). */
+			if (ip_total >= (uint16_t)ip_hdr_len &&
+			    ip_total <= ip_len)
+				ip_len = ip_total;
+		}
 
 		if (proto == IPPROTO_TCP &&
 		    ip_len >= (uint16_t)(ip_hdr_len + 4)) {
@@ -807,14 +815,13 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 		cap->stat_pkts_v6++;
 	else
 		cap->stat_pkts_v4++;
-	if (!f)
-		return;
 
 	now = hdr->ts.tv_sec;
-	f->last_seen = now;
-	f->pkt_count++;
 
-	/* DNS observe: A + AAAA (transporte IPv4 ou IPv6). */
+	/*
+	 * DNS observe independente do fluxo: sob pressão da hash table
+	 * flow_lookup pode falhar e não pode silenciar aprendizagem A/AAAA.
+	 */
 	if (proto == IPPROTO_UDP && l4_data && l4_len >= 12 + 8) {
 		char client_str[INET6_ADDRSTRLEN];
 		char src_str[INET6_ADDRSTRLEN];
@@ -826,10 +833,9 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 			inet_ntop(AF_INET6, da6, dst_str, sizeof(dst_str));
 			observe_dns_query(cap, src_str, dst_str, sp, dp,
 			    l4_data + 8, (uint16_t)(l4_len - 8));
-			/* Resposta: cliente = destino do pacote (da). */
 			observe_dns_response(cap, client_str, sp, dp,
 			    l4_data + 8, (uint16_t)(l4_len - 8), now);
-		} else {
+		} else if (sa4 || da4) {
 			struct in_addr addr;
 
 			addr.s_addr = htonl(da4);
@@ -844,6 +850,12 @@ on_packet(struct layer7_capture *cap, const struct pcap_pkthdr *hdr,
 			    l4_data + 8, (uint16_t)(l4_len - 8), now);
 		}
 	}
+
+	if (!f)
+		return;
+
+	f->last_seen = now;
+	f->pkt_count++;
 
 	expire_idle(cap, now);
 

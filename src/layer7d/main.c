@@ -1474,6 +1474,11 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	if (!s_have_parse || cfg_disabled(&s_parsed) || !s_ge)
 		return;
 
+	L7_EVENT_DBG(iface,
+	    "dns_resolved: iface=%s client=%s domain=%s ip=%s ttl=%u",
+	    iface ? iface : "-", client_ip ? client_ip : "-",
+	    domain ? domain : "-", resolved_ip ? resolved_ip : "-", ttl);
+
 	scoped = enforcement_is_scoped_hybrid();
 	memset(&dec, 0, sizeof(dec));
 	(void)layer7_decide_for_client(s_exc, s_nx, s_rules, s_np, s_ge,

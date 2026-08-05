@@ -224,20 +224,20 @@ Itens backlog: **BG-078** … **BG-084** (ver `backlog.md`).
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: release **1.9.2** + gates appliance; V5 **Opção B temporária**
+- Passo actual: **1.9.6** DNS AAAA hint endurecido; GV4 parcial; V5 **Opção B temporária**
 - Onda: V4 CONCLUÍDA; V5 ADIADA (retomar); V6 pendente
-- Candidato lab: 1.9.1 (código 12.6–12.9 + banner V5 na árvore; próximo .pkg: **1.9.2**)
+- Candidato lab / latest: **1.9.6** (AAAA hint; SHA256 fc2d7fce…)
 - Produção enforce: 1.9.0 (inalterada até GV7)
-- GV0 (docs): PASS (12.1–12.2)
-- GV1 (PF scoped inet6): PARCIAL (código PASS; appliance 1.3/1.6 PENDENTE)
-- GV2 (builder): PARCIAL (12.4–12.9 PASS builder; policy + enforce + allowlist + GUI `test_ipv6_gui_inc` PASS)
-- GV3 (captura v6 appliance): PARCIAL (`1.9.1` em `254`; cap_*_v6 > 0; GV3.3–GV3.5 PENDENTE)
-- GV4 (enforce v6): PARCIAL (código daemon+GUI 12.6–12.9 PASS builder; appliance PENDENTE; GV4.5 S-03 unit PASS)
-- GV5 (DNS/NAT v6): **ADIADO temporário** (ADR-0024 Opção B `2026-08-05`) — **retomar** 12.10–12.11
+- GV0 (docs): PASS
+- GV1 (PF scoped inet6): 1.3/1.5/1.6 PASS (`1.9.4`)
+- GV2 (builder): parcial (12.4–12.9 + dns_aaaa_wire PASS)
+- GV3 (captura v6): PASS (egress v6 + cap_*_v6)
+- GV4 (enforce v6): PARCIAL — A/AAAA→pdst quando pcap vê resposta; unbound local intermitente
+- GV5 (DNS/NAT v6): **ADIADO temporário** (ADR-0024 Opção B) — **retomar** 12.10–12.11
 - GV6 (dual-stack lab): PENDENTE
 - GV7 (fecho trilha): PENDENTE
-- I1–I8: I1–I6 núcleo OK/parcial; **I7 exclusão temporária** (DNS/block/VIP DNS v6); retomar
-- Próximo passo autorizado: **1.9.2** + gates; depois reabrir **12.10** (Opção A)
+- I1–I8: I1–I3 PASS; I4/I5 OK c/ ressalva pcap; I6 PASS; I7 exclusão temp. (V5)
+- Próximo passo autorizado: captura DNS local estável **ou** 12.10/V5 com GO
 ```
 
 ---

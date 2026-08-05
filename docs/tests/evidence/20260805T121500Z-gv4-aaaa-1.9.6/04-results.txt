@@ -1,0 +1,71 @@
+===PDST===
+layer7_pdst_0 count=0
+layer7_pdst_1 count=0
+layer7_pdst_10 count=0
+layer7_pdst_11 count=0
+layer7_pdst_12 count=0
+layer7_pdst_13 count=0
+layer7_pdst_14 count=0
+layer7_pdst_15 count=0
+layer7_pdst_16 count=0
+layer7_pdst_17 count=0
+layer7_pdst_18 count=0
+layer7_pdst_19 count=0
+layer7_pdst_2 count=0
+layer7_pdst_20 count=0
+layer7_pdst_21 count=0
+layer7_pdst_22 count=0
+layer7_pdst_23 count=0
+layer7_pdst_3 count=0
+layer7_pdst_4 count=0
+layer7_pdst_5 count=0
+layer7_pdst_6 count=0
+layer7_pdst_7 count=0
+layer7_pdst_8 count=0
+layer7_pdst_9 count=0
+===STATS===
+dst_add_ok=1
+total_blocked=1
+pf_add_ok=0
+cap_pkts=17152
+===EVENTS===
+2026-07-30 12:02:18 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.147 dst=142.251.152.4 ip=142.251.152.4 policy=profile-youtube reason=dns_block
+2026-07-30 12:02:18 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.147 dst=142.251.155.4 ip=142.251.155.4 policy=profile-youtube reason=dns_block
+2026-07-30 12:02:18 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.147 dst=142.251.156.4 ip=142.251.156.4 policy=profile-youtube reason=dns_block
+2026-07-30 12:02:18 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.147 dst=142.251.153.4 ip=142.251.153.4 policy=profile-youtube reason=dns_block
+2026-07-30 12:02:18 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.147 dst=142.251.157.4 ip=142.251.157.4 policy=profile-youtube reason=dns_block
+2026-07-30 12:02:18 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.147 dst=142.251.150.4 ip=142.251.150.4 policy=profile-youtube reason=dns_block
+2026-07-30 12:02:18 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.147 dst=142.251.154.4 ip=142.251.154.4 policy=profile-youtube reason=dns_block
+2026-07-30 12:58:33 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.15 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 12:58:34 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.15 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 12:59:38 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.17 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 12:59:54 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.17 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:27:11 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.150 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:27:11 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.150 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:28:35 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.38 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:36:09 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.41 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:51:07 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.173 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:51:20 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.173 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:51:22 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.223 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:57:49 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.19 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:00:01 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.38 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:00:06 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:01:45 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:03:00 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:04:15 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.38 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:04:19 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:10:32 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.36 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:10:33 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.36 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:10:33 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.36 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=172.217.30.110 ip=172.217.30.110 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.150.4 ip=142.251.150.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.156.4 ip=142.251.156.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.157.4 ip=142.251.157.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.152.4 ip=142.251.152.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.155.4 ip=142.251.155.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.154.4 ip=142.251.154.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.153.4 ip=142.251.153.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.151.4 ip=142.251.151.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 08:40:02 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=www.youtube.com app=DNS cat=Network action=block reason=policy_match policy=gv4-yt-block-a-v6
+2026-08-05 09:01:47 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_1 src=192.168.100.234 dst=2800:3f0:4001:839::200e ip=2800:3f0:4001:839::200e policy=gv4-yt-block-a reason=dns_block
+2026-08-05 09:01:47 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=youtube.com app=DNS cat=Network action=block reason=policy_match policy=gv4-yt-block-a

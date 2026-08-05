@@ -6,6 +6,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+## [1.9.6] — 2026-08-05
+
+### Fixed
+
+- **GV4 / A3 (endurecimento):** observação DNS A/AAAA independente da
+  disponibilidade da hash de fluxos (não silenciar aprendizagem sob pressão).
+- Parser A+AAAA (`dns_observe.h`) + hint cache IPv6; validado com RRs AAAA
+  em tráfego real (`dns_resolved`).
+
+### Notes
+
+- Candidato lab; producao enforce permanece `1.9.0` ate GO.
+- SHA256: `fc2d7fce624f8ac0afaf68ee9b2c0850b1e956767baeb16dfc11498517e3c6e4`.
+- Rollback lab: `1.9.5`.
+- Limitação: respostas DNS do unbound **local** podem ser intermitentes no
+  pcap (plataforma); aprendizagem OK quando a resposta é visível (LAN/WAN
+  forwarded ou captura outbound).
+
 ## [1.9.5] — 2026-08-05
 
 ### Fixed

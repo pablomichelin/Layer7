@@ -1,0 +1,46 @@
+===PDST1===
+===STATS===
+dst_add_ok=0
+total_blocked=0
+pf_add_ok=0
+===LOG===
+2026-07-30 13:28:35 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.38 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:36:09 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.41 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:51:07 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.173 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:51:20 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.173 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:51:22 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.223 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 13:57:49 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.19 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:00:01 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.38 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:00:06 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:01:45 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:03:00 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:04:15 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.38 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:04:19 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:10:32 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.36 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:10:33 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.36 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-07-30 14:10:33 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.36 dst=192.168.100.254 ip=192.168.100.254 policy=profile-youtube reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=172.217.30.110 ip=172.217.30.110 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.150.4 ip=142.251.150.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.156.4 ip=142.251.156.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.157.4 ip=142.251.157.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.152.4 ip=142.251.152.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.155.4 ip=142.251.155.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.154.4 ip=142.251.154.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.153.4 ip=142.251.153.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 01:14:39 [notice] enforce_block: kind=dst_scoped table=layer7_pdst_2 src=192.168.100.234 dst=142.251.151.4 ip=142.251.151.4 policy=qa-yt-block-a reason=dns_block
+2026-08-05 08:40:02 [notice] flow_decide: iface=vmx0 src=192.168.100.234 dst=192.168.100.254 host=www.youtube.com app=DNS cat=Network action=block reason=policy_match policy=gv4-yt-block-a-v6
+2026-08-05 05:34:06 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 06:20:39 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 07:34:06 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 07:46:31 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 07:50:19 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 07:53:51 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 07:54:35 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 07:54:45 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 07:55:11 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 08:04:17 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 08:04:58 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 08:05:55 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 08:10:43 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 08:28:15 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block
+2026-08-05 08:51:48 [notice] enforce_block: skip IP local do firewall (sinkhole/portal) ip=192.168.100.254 policy=profile-anti-bypass-dns reason=dns_block

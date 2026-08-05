@@ -10,7 +10,7 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Trilha | Estado | SSOT de execução |
 |--------|--------|------------------|
 | Fecho produção P0–J | **FECHADO** (`1.9.0`, `2026-08-05`) | [`plano-fecho-producao-e-consolidacao.md`](../02-roadmap/plano-fecho-producao-e-consolidacao.md) (histórico) |
-| **IPv6 completo V0–V6** | **ABERTA** — AAAA hint `1.9.5`; V5 **ADIADA (B temp.)**; revalidar GV4 | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
+| **IPv6 completo V0–V6** | **ABERTA** — AAAA `1.9.6`; GV4 parcial; V5 **ADIADA (B temp.)** | [`plano-ipv6-completo.md`](../02-roadmap/plano-ipv6-completo.md) |
 
 **Não criar** outros ficheiros `START-HERE-*.md` para esta fila — este é o único.
 
@@ -21,15 +21,15 @@ docs/00-overview/START-HERE-fecho-producao.md
 | Campo | Valor |
 |-------|-------|
 | **Trilha activa** | **IPv6** — Ondas V0–V6 |
-| **Passo autorizado** | Revalidar GV4 automático em **`1.9.5`** **ou** retomar **12.10/V5** com GO |
-| **BG activo** | BG-083 adiado; AAAA→pdst fechado em código (`1.9.5`) |
+| **Passo autorizado** | Endurecer captura DNS local **ou** retomar **12.10/V5** com GO |
+| **BG activo** | BG-083 adiado; AAAA código em `1.9.6` (GV4 parcial) |
 | Produção enforce | **`1.9.0`** (inalterada até GV7 + GO humano IPv6) |
-| Candidato lab / `latest` | **`1.9.5`** (DNS AAAA hint; SHA256 `9278d5d6…`) |
+| Candidato lab / `latest` | **`1.9.6`** (AAAA hint; SHA256 `fc2d7fce…`) |
 | Plano fecho P0–J | **FECHADO** |
 | ADR IPv6 | ADR-0024 — **V5 Opção B temporária** (`2026-08-05`); retomar Opção A depois |
 | Ressalva V5 | DNS/block page/VIP DNS v6 **ainda não**; **voltar a fazer bem** (12.10–12.11) |
-| Última evidência GV | `20260805T113500Z-gv4-ipv6-1.9.4` — PF scoped v6 PASS; auto-pdst gap → fix `1.9.5` |
-| Próximo gate | GV4.1 automático em `1.9.5` (sem `pfctl` manual) |
+| Última evidência GV | `20260805T121500Z-gv4-aaaa-1.9.6` — AAAA parse OK; pcap unbound local intermitente |
+| Próximo gate | Captura DNS local estável **ou** V5 |
 | F6 / F7 (fecho) | F6 fechada (H5 diferido); F7 checklist + ADR-0023 fase 0 |
 
 ### Desambiguação obrigatória — «12.x»

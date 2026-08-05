@@ -1,0 +1,30 @@
+OK
+RULES:
+block drop quick inet from 192.168.100.234 to <layer7_pdst_1> label "layer7:pdst:gv4-yt-block-a" ! tagged L7ALLOW
+block drop quick inet6 from 2804:6c4:11d:cc00::100b to <layer7_pdst_1> label "layer7:pdst:gv4-yt-block-a" ! tagged L7ALLOW
+TABLES:
+layer7_pdst_0
+layer7_pdst_1
+layer7_pdst_10
+layer7_pdst_11
+layer7_pdst_12
+layer7_pdst_13
+layer7_pdst_14
+layer7_pdst_15
+layer7_pdst_16
+layer7_pdst_17
+layer7_pdst_18
+layer7_pdst_19
+layer7_pdst_2
+layer7_pdst_20
+layer7_pdst_21
+layer7_pdst_22
+layer7_pdst_23
+layer7_pdst_3
+layer7_pdst_4
+layer7_pdst_5
+layer7_pdst_6
+layer7_pdst_7
+layer7_pdst_8
+layer7_pdst_9
+flushed

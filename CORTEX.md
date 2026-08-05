@@ -35,15 +35,15 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.5` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.5`,
-`SHA256=9278d5d61b55aad1a4b158cf8fa49b39ed6b4d4c7ab7be36f663e2547386da6f`;
+`1.9.6` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.6`,
+`SHA256=fc2d7fce624f8ac0afaf68ee9b2c0850b1e956767baeb16dfc11498517e3c6e4`;
 comandos e links em `docs/10-license-server/MANUAL-INSTALL.md`).
-Candidato lab: DNS AAAA hint → `pdst` (gap GV4 A3). Rollback imediato: `1.9.4`.
+Candidato lab: DNS AAAA hint endurecido. Rollback imediato: `1.9.5`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 **Referencia de producao enforce:** **`1.9.0`** (fecho plano mestre `2026-08-05`;
 equivalente funcional a `1.8.11_69`; rollback imediato `_69`; historico `_24`).
-**Nao** promover `1.9.1`/`1.9.2`/`1.9.3`/`1.9.4`/`1.9.5` a enforce ate GV7 + GO humano. CE fisico pendente —
+**Nao** promover `1.9.1`…`1.9.6` a enforce ate GV7 + GO humano. CE fisico pendente —
 ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
@@ -1260,7 +1260,7 @@ policy, enforce, allowlist e validação GUI aceitam v6.
 
 ```text
 TRILHA IPv6 — progresso
-- Passo actual: **1.9.5** DNS AAAA hint; revalidar GV4 automático; V5 ADIADA (Opção B)
+- Passo actual: **1.9.6** DNS AAAA hint endurecido; GV4 parcial (pcap local unbound); V5 ADIADA (Opção B)
 - Trilha: ABERTA
 - Passo 12.1: CONCLUÍDO — ADR-0024, índices, mapa, matriz GV0.4
 - Passo 12.2: CONCLUÍDO — banner Diagnostics + pf-enforcement; GV0 PASS
@@ -1272,24 +1272,24 @@ TRILHA IPv6 — progresso
 - Passo 12.8: CONCLUÍDO (2026-08-05) — allowlist IPv6; **Onda V3 completa**; publicado em `1.9.2`
 - Passo 12.9: CONCLUÍDO (2026-08-05) — GUI validação dual-stack; **Onda V4 completa**; publicado em `1.9.2`
 - Release lab **1.9.2**: CONCLUÍDA (2026-08-05) — 12.6–12.9 + banner V5 Opção B
-- FIX AAAA hint: CONCLUÍDO em código (`1.9.5`) — `dns_observe.h` A+AAAA → dns_cb/pdst
-- Candidato lab / `latest`: **1.9.5** (publicado; SHA256 `9278d5d6…`; DNS AAAA hint)
+- FIX AAAA hint: CONCLUÍDO em código (`1.9.5`/`1.9.6`) — `dns_observe.h` A+AAAA; observe independente de flow hash
+- Candidato lab / `latest`: **1.9.6** (publicado; SHA256 `fc2d7fce…`)
 - Produção enforce: 1.9.0 (inalterada até GV7)
-- Versionamento: série patch `1.9.0` → … → `1.9.5` (`PORTREVISION=0`)
-- Appliance (`192.168.100.254`): alvo **1.9.5**; regra lab **pass inet6 LAN** (tracker `1785929863`)
+- Versionamento: série patch `1.9.0` → … → `1.9.6` (`PORTREVISION=0`)
+- Appliance (`192.168.100.254`): alvo **1.9.6**; regra lab **pass inet6 LAN** (tracker `1785929863`)
 - GV0: PASS
 - GV1: 1.3/1.5/1.6 PASS (`1.9.4`)
-- GV2: parcial (builder PASS 12.4–12.9; localnets + dns_aaaa_wire PASS)
-- GV3: **PASS** (egress v6 clientes OK após pass inet6 LAN)
-- GV4: código AAAA→pdst em `1.9.5`; revalidação appliance automática **PENDENTE**
+- GV2: parcial (builder PASS; dns_aaaa_wire PASS)
+- GV3: **PASS**
+- GV4: **PARCIAL** — AAAA parse + dns_cb OK quando pcap vê a resposta; unbound local intermitente; A→pdst validado; AAAA→pdst validado pontualmente + RRs AAAA noutros hosts
 - GV5: ADIADO temporário (Opção B; retomar); GV6–GV7: PENDENTE
-- I1–I8: I1 PASS; I2 PASS; I3 PASS; I4/I5 código OK (`1.9.5`); I6 PASS; I7 PENDENTE (V5)
+- I1–I8: I1–I3 PASS; I4/I5 código OK com ressalva pcap; I6 PASS; I7 PENDENTE (V5)
 - BG: BG-078..082 done; BG-083 **adiado temporário (retomar)**; BG-084 planeado
-- V5 / BG-083: **ADIADO temporário** — DNS/portal/VIP DNS v6 (não confundir com AAAA hint)
+- V5 / BG-083: **ADIADO temporário** — DNS/portal/VIP DNS v6
 - I7: exclusão temporária DNS/block page/VIP DNS v6 (disclosure GUI)
 - QA IPv4 `1.9.3`: D1–D6 **PASS**
-- Gates IPv6: `20260805T110000Z-gv-ipv6-1.9.3` + `20260805T113500Z-gv4-ipv6-1.9.4`
-- Próximo passo autorizado: **revalidar GV4 automático em 1.9.5** **ou** retomar **12.10/V5** com GO; produção enforce permanece 1.9.0
+- Gates IPv6: `20260805T110000Z-gv-ipv6-1.9.3` + `20260805T113500Z-gv4-ipv6-1.9.4` + evidência AAAA `20260805T121500Z-gv4-aaaa-1.9.6`
+- Próximo passo autorizado: endurecer captura DNS local **ou** retomar **12.10/V5** com GO; produção enforce permanece 1.9.0
 ```
 
 ---
@@ -1453,13 +1453,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: 1.9.5 (DNS AAAA hint; SHA256 9278d5d6…)
-- Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1..1.9.5 ate GV7)
+- Canal publico latest: 1.9.6 (DNS AAAA hint endurecido; SHA256 fc2d7fce…)
+- Producao enforce: 1.9.0 (fecho plano; rollback _69; nao promover 1.9.1..1.9.6 ate GV7)
 - Plano fecho/consolidacao: **FECHADO** (Ondas A–J)
-- Trilha IPv6: ABERTA — AAAA→pdst em 1.9.5; revalidar GV4 auto; V5 Opção B
+- Trilha IPv6: ABERTA — AAAA código OK; GV4 parcial (pcap unbound local); V5 Opção B
 - F6: H1–H4 PASS; H5 raiz legado diferido
 - F7: RELEASE-CHECKLIST.md + ADR-0023
-- Proximo trabalho: instalar/revalidar GV4 auto em 1.9.5; V5/12.10 só com GO; BG-028 fase 1 quando chaves humanas
+- Proximo trabalho: captura DNS local estável **ou** V5/12.10 com GO; BG-028 fase 1 quando chaves humanas
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -1470,13 +1470,13 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.5`**
-  publicado em `pablomichelin/Layer7` tag `v1.9.5`
-  (`SHA256=9278d5d61b55aad1a4b158cf8fa49b39ed6b4d4c7ab7be36f663e2547386da6f`).
-  DNS AAAA hint → enforce/`pdst`. Rollback imediato: `v1.9.4`.
+- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.6`**
+  publicado em `pablomichelin/Layer7` tag `v1.9.6`
+  (`SHA256=fc2d7fce624f8ac0afaf68ee9b2c0850b1e956767baeb16dfc11498517e3c6e4`).
+  DNS AAAA hint endurecido. Rollback imediato: `v1.9.5`.
 - A referencia de **producao enforce** permanece **`1.9.0`**
   (`SHA256=cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`)
-  ate GV7 + GO humano (nao promover `1.9.1`/`1.9.2`/`1.9.3`/`1.9.4`/`1.9.5`). Rollback a partir de `1.9.0`: `v1.8.11_69`.
+  ate GV7 + GO humano (nao promover `1.9.1`…`1.9.6`). Rollback a partir de `1.9.0`: `v1.8.11_69`.
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
   (`snapshot_id=ut1-2026-04-25`,
