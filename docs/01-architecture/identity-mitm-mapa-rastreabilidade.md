@@ -1,14 +1,16 @@
 # Mapa de rastreabilidade — Identity + MITM Add-on
 
 **Classificação:** Canónico (trilha Identity + MITM)  
-**Rev.:** `2026-08-05c` (contratos técnicos: concorrência, parse features, canal DC)  
+**Rev.:** `2026-08-06d` (PME Identity-first; MITM DEFER 20.7a)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
+**Posicionamento:** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md)  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
 **Baseline:** produto `1.9.8` sem módulos activos  
 
 Actualizar este mapa **a cada passo 20.x** que toque código ou contratos.  
-**Código ainda não iniciado** nesta trilha.
+**Código Identity ainda não iniciado**; entitlements IM1 no git; **MITM runtime não iniciado (DEFER)**.
+
 
 ---
 
@@ -43,13 +45,13 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-02 | License-server emissão SKU | IM1 | **20.4 PASS** | LIC | P1 + T1 + UI presets |
 | M-03 | Gate daemon entitlements | IM1 | **20.6 PASS** | DMN | intersect + allows_* |
 | M-04 | Gate GUI upsell | IM1 | **20.5 PASS** | GUI | páginas Identity/MITM |
-| M-05 | CA store + geração/import | IM2 | Condicional | PKG/OPS | só se spike GO |
-| M-06 | Export trust (PEM) para GPO | IM2 | Condicional | GUI/OPS | |
-| M-07 | Toggle `mitm.enabled` | IM2 | Condicional | GUI/PKG | default false |
-| M-08 | Bypass MITM | IM2 | Condicional | GUI/DMN | |
-| M-09 | Caminho intercept TLS | IM2 | **Spike 20.7** | DOC→? | GO/NO-GO/DEFER |
-| M-10 | Block page HTTPS via MITM | IM2 | Condicional | PKG | |
-| M-11 | Session map user↔IP **no daemon** | IM3 | Planeado | DMN | SSOT; N IPs/user |
+| M-05 | CA store + geração/import | IM2 | **DEFERRED** | PKG/OPS | 20.7a; reabrir com novo GO |
+| M-06 | Export trust (PEM) para GPO | IM2 | **DEFERRED** | GUI/OPS | |
+| M-07 | Toggle `mitm.enabled` | IM2 | **DEFERRED** | GUI/PKG | default false quando existir |
+| M-08 | Bypass MITM | IM2 | **DEFERRED** | GUI/DMN | |
+| M-09 | Caminho intercept TLS | IM2 | **DEFER 20.7a** | DOC | Squid rejeitado; futuro = helper próprio |
+| M-10 | Block page HTTPS via MITM | IM2 | **DEFERRED** | PKG | ADR-0017 permanece |
+| M-11 | Session map user↔IP **no daemon** | IM3 | **Próximo (após 20.11a)** | DMN | SSOT; N IPs/user; barra UX PME |
 | M-12 | Diagnóstico Identity GUI | IM3 | Planeado | GUI | |
 | M-13 | LDAP/LDAPS client | IM4 | Planeado | DMN/PKG | limites escala |
 | M-14 | Group expansion cache + fail-mode | IM4 | Planeado | DMN | ADR-0027 |

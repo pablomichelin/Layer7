@@ -46,7 +46,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (fase 0) | Fase 1 pendente custódia chaves Ed25519 |
 | [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | Trilha IPv6 **FECHADA**; produção `1.9.8` |
 | [ADR-0025](ADR-0025-entitlements-addon-identity-mitm.md) | Entitlements add-on Identity + MITM (SKU X/Y) | **Aceito** (rev.c; T1) | `features` CSV (P1–P6); gate daemon; legado `full`→`base`; check-in ∩ `.lic` |
-| [ADR-0026](ADR-0026-mitm-tls-inspection-opt-in.md) | MITM TLS inspection opt-in (CA/certificado) | **Aceito** (rev.c; impl. via spike 20.7) | Spike GO/NO-GO/DEFER S1–S8; não bloqueia Identity |
+| [ADR-0026](ADR-0026-mitm-tls-inspection-opt-in.md) | MITM TLS inspection opt-in (CA/certificado) | **Aceito — implementação diferida** (rev.d; 20.7a) | Squid rejeitado; GI2/GI3 DEFERRED; Identity avança; reabrir com novo GO + S1–S8 |
 | [ADR-0027](ADR-0027-identity-userid-multi-fonte.md) | Identity User-ID multi-fonte (sem captive) | **Aceito** (rev.c) | Mapa no daemon; RADIUS; agente DC A1–A7; fail-mode; NAT `multi-user` |
 | [ADR-0028](ADR-0028-concorrencia-io-daemon-identity.md) | Concorrência e IO do daemon para Identity | **Aceito** | Sem IO bloqueante no hot path; threads + rwlock; baseline perf no 20.11a |
 

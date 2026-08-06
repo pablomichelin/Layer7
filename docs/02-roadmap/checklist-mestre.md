@@ -392,8 +392,9 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ## Trilha Identity + MITM Add-on (IM0–IM9 / passos 20.x)
 
-**Arranque:** [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
-**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md)
+**Arranque:** [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
+**Posicionamento PME:** [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — ACEITE  
+**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-06d`  
 **Gates:** [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)
 
 ### IM0 — Governança
@@ -403,13 +404,14 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] rev. `c` contratos técnicos (ADR-0028 concorrência; contrato `features` P1–P6; check-in ∩ `.lic`; §3.1 first-match; spike S1–S8; canal DC A1–A7; NAT multi-user; passo 20.11a) — **sem código**
 - [x] 20.2 Aceitar ADR-0025/0026/0027/0028 + GO transição **T1** (`2026-08-05`)
 - [x] GI0 completo
+- [x] rev. `d` posicionamento PME Identity-first + **20.7a DEFER MITM** (`2026-08-06`)
 
 ### IM1–IM9
 
 - [x] IM1 Entitlements (GI1) — BG-086 — **20.3–20.6 PASS**
-- [ ] IM2 spike MITM (20.7) + CA (GI2–GI3) — BG-087 — **passo actual**
-- [ ] IM3–IM4 Map + LDAP (GI4–GI5) — BG-088
+- [x] IM2 spike 20.7 + **20.7a DEFER** — BG-087 **Diferido** (GI2/GI3 DEFERRED; saltar 20.8–20.11)
+- [ ] IM3–IM4 Map + LDAP (GI4–GI5) — BG-088 — **passo actual 20.11a** (caminho de valor PME)
 - [ ] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089
 - [ ] IM6 Políticas user/grupo (GI7) — BG-090
 - [ ] IM7–IM8 Agente/TS ou exclusão ADR (GI8) — BG-091
-- [ ] IM9 Fecho/release (GI9) — BG-092
+- [ ] IM9 Fecho/release Identity (GI9) — BG-092

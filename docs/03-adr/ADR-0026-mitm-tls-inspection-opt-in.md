@@ -1,11 +1,14 @@
 # ADR-0026 — MITM TLS inspection opt-in (certificado / CA)
 
-**Estado:** Aceito (rev. `c` — critérios GO/NO-GO mensuráveis; implementação condicionada ao spike 20.7)  
+**Estado:** Aceito — **implementação diferida** (rev. `d` — DEFER formal 20.7a `2026-08-06`)  
 **Data:** 2026-08-05  
 **Aceite:** `2026-08-05` — passo **20.2** / GI0  
-**Decisores:** Operador (GO aceitação no passo 20.2)  
+**Deferral implementação:** `2026-08-06` — passo **20.7a** (GO operador: PME Identity-first)  
+**Decisores:** Operador  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
-**Relação:** emenda controlada a [`ADR-0017`](ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) (válida com MITM OFF)
+**Spike:** [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md)  
+**Posicionamento:** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md)  
+**Relação:** emenda controlada a [`ADR-0017`](ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) (válida com MITM OFF — estado actual)
 
 ---
 
@@ -14,22 +17,18 @@
 - ADR-0017 rejeitou MITM universal na V1: block page HTML só em HTTP.
 - O operador quer **opção** de MITM com CA no domínio (SKU + plano).
 - O runtime actual (`layer7d` = pcap + nDPI + PF) **não** termina TLS — MITM é arquitecturalmente um **segundo produto** (proxy/terminação), não uma extensão trivial.
-- Por isso este ADR congela a **política de produto**, não a viabilidade — a viabilidade decide-se no **spike 20.7**.
+- Spike 20.7: Squid **rejeitado** como caminho pfSense; PoC de intercept **não** iniciada; nicho PME prioriza Identity.
+- Por isso este ADR congela a **política de produto** (SKU `mitm` opt-in) e, desde `2026-08-06`, a **implementação fica diferida**.
 
 ---
 
-## Decisão (proposta)
+## Decisão
 
 1. Introduzir **MITM TLS opt-in** no modelo de produto/SKU (`mitm` em ADR-0025), default **`mitm.enabled = false`**.
 2. Requer entitlement `mitm`. Sem token: módulo inerte.
 3. Com MITM OFF: **ADR-0017 permanece a verdade**.
-4. **Spike obrigatório (passo 20.7)** antes de 20.8–20.11:
-   - Desenho concreto em pfSense (sslbump/proxy/outro) + PoC mínima.
-   - Limites: ECH, QUIC/HTTP3, pinning, CPU, caminhos de bypass.
-   - Privacidade: o que é logado do conteúdo desencriptado; retenção mínima; proibição de exfiltrar payload para fora do appliance por defeito.
-   - Resultado: **GO** | **NO-GO** | **DEFER** (registado no plano + CORTEX).
-   - **Critérios mensuráveis (rev. `c`)** — o veredicto não pode ser
-     subjectivo; GO exige **todos** os seguintes na PoC de lab:
+4. **Spike 20.7** obrigatório antes de 20.8–20.11 — **cumprido com veredicto DEFER** (ver spike).
+5. Critérios S1–S8 (rev. `c`) permanecem obrigatórios **se** a implementação for reaberta:
 
 | # | Critério de GO | Limiar |
 |---|----------------|--------|
@@ -42,29 +41,31 @@
 | S7 | Privacidade: nenhum payload desencriptado persiste em disco por defeito; logging só de metadados | Auditoria da PoC |
 | S8 | MITM OFF ≡ ADR-0017 byte-a-byte (sem regressão com módulo presente e OFF) | Smoke comparativo |
 
-     Falhar S1–S2 por margem pequena com caminho claro de optimização →
-     **DEFER** (não NO-GO). Falhar S7 ou S8 → **NO-GO** até redesenho.
-5. Se **NO-GO/DEFER:** este ADR fica **Aceito — implementação diferida**; Identity (IM3–IM6) **não** bloqueia; token `mitm` pode existir no SKU mas sem código activo em release.
-6. Se **GO:** implementar CA (gerar/importar/export GPO), intercept **selectivo**, bypass, página HTTPS legível nos fluxos interceptados; emenda explícita a ADR-0017.
-7. Segredos da CA **nunca** no git.
-8. MITM **não** é pré-requisito de Identity (ortogonal).
+6. **DEFER formal (`2026-08-06`):** este ADR fica **Aceito — implementação diferida**; Identity (IM3–IM6) **não** bloqueia; token `mitm` pode existir no SKU mas **sem código activo** em release; passos 20.8–20.11 saltados; GI2/GI3 `DEFERRED`.
+7. **Reabertura:** GO humano explícito + novo spike S1–S8. Candidata preferida: helper próprio (`layer7-tlsproxy` / opção E). **Squid rejeitado** permanentemente como caminho de produto neste ADR.
+8. Se **GO** futuro: implementar CA (gerar/importar/export GPO), intercept **selectivo** (não universal), bypass, página HTTPS legível; emenda explícita a ADR-0017; alinhamento ao posicionamento PME (sem overclaim NGFW).
+9. Segredos da CA **nunca** no git.
+10. MITM **não** é pré-requisito de Identity (ortogonal).
+11. **Fora do objectivo de deferral:** paridade de motor TLS com NGFW enterprise (Fortinet / Palo Alto / Check Point).
 
 ---
 
 ## O que isto NÃO decide
 
 - Activar MITM por defeito.
-- Qual biblioteca/proxy exacta (fica no spike).
+- Qual biblioteca/proxy exacta no futuro (excepto: **não** Squid).
 - Interceptar gestão do pfSense / VIP sem regra explícita.
 - Substituir Identity (ADR-0027).
+- Datas comerciais de reabertura.
 
 ---
 
 ## Consequências
 
-- Gates GI2–GI3 só após GO do spike; DEFER marca GI2/GI3 como `DEFERRED`.
-- Matriz DPI / MANUAL actualizados quando houver implementação ou deferral formal.
-- Superfície de ataque: código MITM no `.pkg` (se existir) deve permanecer morto sem entitlement.
+- Gates GI2–GI3 = **`DEFERRED`** até reabertura.  
+- Matriz DPI / MANUAL: sem mudanças de procedimento MITM enquanto diferido.  
+- GUI pode manter upsell MITM; daemon sem intercept.  
+- Investimento de engenharia imediato = **Identity IM3+**.
 
 ---
 
@@ -72,22 +73,34 @@
 
 | Alternativa | Motivo |
 |-------------|--------|
-| Manter forever só ADR-0017 | Rejeitado como *exclusão permanente* — MITM fica no SKU/plano |
+| Manter forever só ADR-0017 | Rejeitado como *exclusão permanente* — MITM fica no SKU/plano (implementação diferida) |
 | MITM sempre ON | Inaceitável |
-| Implementar MITM sem spike | Rejeitado (rev. `b`) — risco de caminho morto |
-| Bloquear Identity até MITM pronto | Rejeitado (rev. `b`) |
+| Implementar MITM sem spike | Rejeitado (rev. `b`) |
+| Bloquear Identity até MITM pronto | Rejeitado (rev. `b`); confirmado no defer |
+| Usar Squid / pfSense-pkg-squid | **Rejeitado** (`2026-08-05` / confirmado no defer) |
+| Implementar agora helper próprio | Adiado — custo/meses vs valor PME Identity-first |
 
 ---
 
 ## Rollback
 
-1. `mitm.enabled=false` + reload.  
+1. `mitm.enabled=false` + reload (quando existir código).  
 2. Remover entitlement `mitm`.  
-3. DEFER / não publicar código MITM.  
-4. Remover CA dos clientes via GPO (ops).
+3. **Estado actual:** DEFER / não publicar código MITM.  
+4. Remover CA dos clientes via GPO (ops) — só se alguma vez instalada.
+
+---
+
+## Histórico de revisões
+
+| Rev. | Data | Nota |
+|------|------|------|
+| a/b | 2026-08-05 | Política opt-in + spike obrigatório |
+| c | 2026-08-05 | Critérios S1–S8 mensuráveis |
+| **d** | **2026-08-06** | **Implementação diferida (20.7a)**; Squid rejeitado; Identity avança |
 
 ---
 
 ## Referências
 
-- ADR-0017, ADR-0013, plano §0.0 R-A/R-B, [`../09-blocking/matriz-limitacoes-dpi.md`](../09-blocking/matriz-limitacoes-dpi.md)
+- ADR-0017, ADR-0013, plano §0.0 R-A/R-B/R-T, posicionamento PME, [`../09-blocking/matriz-limitacoes-dpi.md`](../09-blocking/matriz-limitacoes-dpi.md)

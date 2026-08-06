@@ -1285,39 +1285,43 @@ TRILHA IPv6 — progresso
 
 ---
 
-## Trilha Identity + MITM Add-on (aberta 2026-08-05)
+## Trilha Identity + MITM Add-on (aberta 2026-08-05; rev. posicionamento 2026-08-06)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**; passo actual **20.7** (spike MITM).
+Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
+**IM2 DEFER 20.7a**; passo actual **20.11a / IM3** (baseline perf).
+**Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
+- **Posicionamento PME (ideia/objectivo/UX):**
+  [`docs/00-overview/posicionamento-pme-identity-first.md`](docs/00-overview/posicionamento-pme-identity-first.md)
 - **Plano SSOT:**
   [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
 - **Mapa:**
   [`docs/01-architecture/identity-mitm-mapa-rastreabilidade.md`](docs/01-architecture/identity-mitm-mapa-rastreabilidade.md)
 - **Gates GI0–GI9:**
   [`docs/09-blocking/plano-gates-identity-mitm.md`](docs/09-blocking/plano-gates-identity-mitm.md)
-- **ADRs Aceito (`2026-08-05`, T1):** [0025](docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md)
-  (SKU X/Y; legado `full`→`base`), [0026](docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (MITM
-  opt-in; spike 20.7), [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md)
-  (User-ID multi-fonte; **sem** captive),
+- **ADRs:** [0025](docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md)
+  (SKU; T1), [0026](docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md)
+  (**implementação diferida**), [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md),
   [0028](docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md)
-  (concorrência/IO daemon — pré-requisito IM3–IM5; baseline perf no 20.11a)
-- **Backlog:** BG-085…BG-092
-- **Ordem:** IM0 → IM1 → spike MITM (GO/DEFER) → IM3–IM6 Identity (mapa
-  daemon; pode avançar se MITM DEFER) → IM7–IM8 → IM9
+- **Spike MITM:** [`docs/09-blocking/spike-mitm-20.7.md`](docs/09-blocking/spike-mitm-20.7.md) — DEFER
+- **Backlog:** BG-085…BG-092 (BG-087 diferido)
+- **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM6 Identity** → IM7–IM8 → IM9
+  → (MITM só com novo GO)
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-05c` (contratos técnicos fechados; 20.2 PASS)
+- **Rev. plano:** `2026-08-06d`
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.7 / IM2** — Squid REJEITADO; aguarda GO DEFER 20.7a (rec.) ou ferramenta própria (E)
+- Passo actual: **20.11a / IM3** (baseline perf 1.9.8)
 - IM0+IM1: PASS (GI0+GI1)
-- IM2: spike-mitm-20.7.md actualizado; sem Squid
-- Plano rev.: 2026-08-05c
+- IM2: DEFER formal 20.7a (Squid REJEITADO; GI2/GI3 DEFERRED)
+- Posicionamento: PME Identity-first ACEITE
+- Plano rev.: 2026-08-06d
 - Baseline enforce: 1.9.8
-- Próximo: GO DEFER → IM3 **ou** desenho layer7-tlsproxy
+- Próximo: registar baseline perf → 20.12 mapa Identity
 ```
 
 ---
@@ -1340,10 +1344,11 @@ TRILHA IDENTITY + MITM — progresso
 ### Para a trilha Identity + MITM Add-on
 
 1. [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
-2. `AGENTS.md`
-3. `CORTEX.md` (secção *Trilha Identity + MITM*)
-4. [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
-5. Mapa + gates + ADRs 0025–0028 (Aceito; T1)
+2. [`docs/00-overview/posicionamento-pme-identity-first.md`](docs/00-overview/posicionamento-pme-identity-first.md)
+3. `AGENTS.md`
+4. `CORTEX.md` (secção *Trilha Identity + MITM*)
+5. [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
+6. Mapa + gates + ADRs 0025–0028 (0026 diferido; T1)
 
 ### Para a trilha de fecho / consolidacao / IPv6 (manutenção)
 
@@ -1492,12 +1497,12 @@ CHECKPOINT CANONICO
 - Canal publico latest: **1.9.13** (guia Acesso Remoto)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo 20.7/IM2 (spike MITM); GI1 PASS; arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo **20.11a/IM3** (PME Identity-first; MITM DEFER 20.7a); GI1 PASS; GI2/GI3 DEFERRED; arranque docs/00-overview/START-HERE-identity-mitm.md; posicionamento docs/00-overview/posicionamento-pme-identity-first.md
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; não misturar com IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **GO DEFER 20.7a → IM3** (rec.) **ou** desenho MITM próprio; GO promoção enforce 1.9.13; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **IM3 / 20.11a** (baseline perf → mapa daemon); MITM DEFER; GO promoção enforce 1.9.13; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

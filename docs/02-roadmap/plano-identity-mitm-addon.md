@@ -1,16 +1,17 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-05c`; **IM0+IM1 fechados / GI1 PASS**; passo actual **20.7**)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-06d`; **IM0+IM1 fechados / GI1 PASS**; **IM2 DEFER formal 20.7a**; passo actual **20.11a / IM3**)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
+**Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**  
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT de estado vivo do produto:** [`../../CORTEX.md`](../../CORTEX.md)  
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
-**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) — **Aceito** (`2026-08-05`; transição legado **T1**)  
+**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) — Aceito (`2026-08-05`; T1); MITM defer `2026-08-06`  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Commits:** `trilha-identity-mitm/20.x: …`  
-**Nota:** rev. `b` incorpora reparos da revisão arquitectónica (spike MITM, mapa Identity no daemon, fontes canónicas, fail-mode, precedência). Rev. `c` fecha os **contratos técnicos** que faltavam para iniciar código sem ambiguidade: concorrência do daemon (ADR-0028), contrato `features` (buffer 64B, fail-closed do gate), precedência check-in vs `.lic`, reconciliação §3.1 com o modelo first-match, critérios mensuráveis do spike MITM, canal do agente DC, conflito NAT multi-user, cold start e limites de escala.
+**Nota:** rev. `b` = reparos arquitectónicos. Rev. `c` = contratos técnicos. **Rev. `d` (`2026-08-06`)** = posicionamento **PME / Identity-first**; spike MITM **DEFER 20.7a** (Squid rejeitado; sem PoC runtime); caminho de valor **IM3–IM6** obrigatório; barra UX “perfeito para empresas”; GI2/GI3 `DEFERRED`.
 
 ---
 
@@ -18,17 +19,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.7** (IM2 — spike MITM GO/NO-GO S1–S8) |
+| Passo actual | **20.11a** (IM3 — pré-requisito: baseline perf `1.9.8` + confirmar ADR-0028) |
 | Código | IM1 completo (entitlements); sem MITM/Identity runtime |
-| ADRs | **Aceito** ×4; T1 |
-| Próximo | 20.7a DEFER **ou** 20.8+ se GO; Identity IM3 pode avançar se DEFER |
+| ADRs | **Aceito** ×4; T1; **0026 implementação diferida** |
+| MITM | **DEFER 20.7a** — saltar 20.8–20.11 até novo GO |
+| Próximo | IM3 Identity (mapa daemon) — caminho de valor PME |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.7 / IM2 — Squid REJEITADO; GO DEFER 20.7a (rec.) ou opção E
+- Passo actual: 20.11a / IM3 (pré-requisito baseline perf)
 - IM0+IM1: PASS (GI0+GI1)
-- IM2: sem Squid; veredicto pendente GO humano
+- IM2: DEFER formal 20.7a (Squid REJEITADO; GI2/GI3 DEFERRED)
+- Posicionamento: PME Identity-first (ACEITE 2026-08-06)
 - Baseline: 1.9.8
+- Próximo: 20.11a → 20.12+ mapa Identity
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -60,6 +64,16 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 | R-P | Spike MITM mensurável | GO exige S1–S8 do ADR-0026 (CPU ≤ +25%, latência p95 ≤ 150 ms, privacidade, OFF ≡ ADR-0017). Sem veredicto subjectivo. |
 | R-Q | Canal agente DC | Receiver no appliance = superfície nova: TLS mútuo/HMAC, bind só LAN, rate limit, privilégio mínimo no DC (ADR-0027 §2.1) — desenho fecha **antes** de código no 20.20. |
 
+### 0.0.2 Posicionamento e caminho de valor (rev. `d`)
+
+| # | Tema | Decisão canónica |
+|---|------|------------------|
+| R-R | Nicho PME / MSP | Produto do add-on = **controlo de internet por pessoa** para empresas **pequenas/médias** e canal MSP em pfSense. **Não** é paridade com NGFW enterprise. Detalhe: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md). |
+| R-S | Identity-first | Após IM1, o **caminho de valor obrigatório** é IM3→IM6. MITM **não** atrasa Identity. |
+| R-T | MITM DEFER 20.7a | Spike fechado como **DEFER** (`2026-08-06`): Squid **rejeitado**; PoC runtime não iniciada; GI2/GI3 `DEFERRED`; passos 20.8–20.11 **saltados** até novo GO + spike S1–S8 com helper próprio (opção E). Token `mitm` pode existir no SKU sem código activo. |
+| R-U | Barra UX PME | Cada passo Identity deve cumprir critérios U*/P*/H*/N* do posicionamento (§6) — “perfeito para empresas usarem”, não só “compila e passa gate”. |
+| R-V | Anti-overclaim | Materiais e GUI **proibidos** de prometer paridade Fortinet/Palo/Check Point, MITM universal, ou exactidão GlobalProtect sem agente. |
+
 ### 0.1 Relação com planos fechados
 
 | Plano | Estado | Relação |
@@ -71,14 +85,25 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 Congelamento das filas fechadas:
 [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
 
-### 0.2 Motivação (decisão de produto `2026-08-05`, emenda rev. `b`)
+### 0.2 Motivação e objectivo (decisão de produto)
+
+**Origem (`2026-08-05`, rev. `b`):**
 
 1. Clientes em domínio AD precisam de políticas por **utilizador/grupo**, não só IP/MAC/dispositivo.
 2. Controlo “exacto” no mercado NGFW = política por identidade + mapa **dinâmico** user→IP (não IP estático eterno).
 3. Add-on comercial: **licença X (base)** vs **licença Y (base + add-on)**.
-4. **Ressalva MITM:** opção de inspeção TLS com CA no SKU e no plano; **não** é dependência técnica de Identity. Calendário preferido “MITM cedo” **cede** a spike NO-GO — Identity MVP (IM3–IM6) avança.
-5. Captive portal do pfSense: **fora** — já existe nativo.
-6. MVP Identity **sem** agente endpoint = User-ID de rede (limites honestos); exactidão tipo agente = IM7+.
+4. MITM no SKU como opção; **não** dependência de Identity.
+5. Captive portal do pfSense: **fora**.
+6. MVP Identity **sem** agente endpoint = User-ID de rede; exactidão tipo agente = IM7+.
+
+**Emenda estratégica (`2026-08-06`, rev. `d`) — nicho PME:**
+
+7. **Mercado-alvo:** empresas **pequenas e médias** (+ MSP). Empresas grandes contratam NGFW caro — **fora** do objectivo de paridade.
+8. **Ideia:** não desistir porque “já existe NGFW”; criar o produto que o NGFW **não** empacota bem no pfSense/PME (Identity + DPI + um pacote + ops simples).
+9. **Objectivo mensurável:** “quem na rede pode o quê” por user/grupo, instalável e **utilizável** por TI PME/MSP (barra U*/P*/H* do posicionamento).
+10. **MITM:** diferido formalmente (R-T); futuro = helper próprio selectivo, **não** Squid, **não** paridade enterprise.
+11. Documento canónico da ideia/objectivo/nicho/UX:
+    [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md).
 
 ### 0.3 Definição de “completo” nesta trilha (critérios I–M)
 
@@ -86,8 +111,9 @@ Congelamento das filas fechadas:
 |---|----------|-------|
 | C1 | Entitlements no `.lic` com gate real (daemon + GUI) | GI1 |
 | C2 | Compat: `features=full` e licenças antigas não partem o produto base | GI1 |
-| C3 | MITM: spike 20.7 GO **ou** DEFER formal; se GO — opt-in OFF + lab GI2–GI3 | GI2–GI3 ou ADR defer |
-| C4 | Sem entitlement MITM: zero interceptação TLS (mesmo com código presente) | GI2 |
+| C3 | MITM: spike 20.7 GO **ou** DEFER formal; se GO — opt-in OFF + lab GI2–GI3 | **DEFER formal 20.7a** (`2026-08-06`) — GI2/GI3 `DEFERRED`; C3 **satisfeito por defer** |
+| C3b | Posicionamento PME documentado + caminho Identity-first | [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) **ACEITE** |
+| C4 | Sem entitlement MITM: zero interceptação TLS (mesmo com código presente) | GI1.3 + defer (sem runtime MITM) |
 | C5 | Mapa user→IP **no daemon** (TTL, refresh, logout/stale; N IPs/user) | GI4 |
 | C6 | LDAP/LDAPS para grupos | GI5 |
 | C7 | Fonte eventos AD (agente DC) **e/ou** RADIUS accounting receiver (MVP ≥1) | GI5–GI6 |
@@ -113,14 +139,15 @@ Congelamento das filas fechadas:
 4. **Um pacote.** Add-on = módulo no `pfSense-pkg-layer7` + entitlement; **não** segundo `.pkg` nesta trilha.
 5. **Daemon é autoridade do gate.** GUI pode esconder/upsell; bypass de UI não activa MITM/Identity.
 6. **Segredos fora do git.** CA privada, bind AD, passwords RADIUS — só no appliance / vault humano.
-7. **Ordem segura:** IM0 → IM1 **sempre primeiro**. Depois: **caminho de valor** IM3–IM6 (Identity) pode avançar se IM2 (MITM) estiver DEFER após spike. Não activar MITM sem entitlement + bypass + GO spike.
+7. **Ordem segura:** IM0 → IM1 **sempre primeiro**. Depois: **caminho de valor obrigatório** IM3–IM6 (Identity) com IM2 em **DEFER** (R-S/R-T). Não activar MITM sem entitlement + bypass + **novo GO** pós-defer.
 8. **IPv4 e IPv6.** Mapas e enforcement Identity dual-stack; IPv6 privacy (vários IPs/user).
-9. **Honestidade.** Limites (ECH, QUIC, NAT, VDI sem TS, stale, topologia IP≠AD) na GUI e docs.
+9. **Honestidade.** Limites (ECH, QUIC, NAT, VDI sem TS, stale, topologia IP≠AD) na GUI e docs; anti-overclaim NGFW (R-V).
 10. **Rollback.** Toggle OFF / `.lic` sem feature / reinstalar baseline.
 11. **Captive portal fora de escopo.** Não reimplementar o do pfSense.
 12. **Documentação no mesmo bloco** quando houver execução/release.
 13. **Mapa Identity no daemon** (R-C). Pacote configura; não é SSOT de sessão.
-14. **Spike MITM não é opcional** antes de investir IM2 completa (R-B).
+14. **Spike MITM** foi obrigatório antes de investir IM2 completa (R-B) — **cumprido com DEFER 20.7a**; reabrir 20.8+ só com novo GO.
+15. **Nicho PME / barra UX** (R-R, R-U): cada passo Identity revê posicionamento §6 (U*/P*/H*/N*).
 
 ---
 
@@ -129,9 +156,9 @@ Congelamento das filas fechadas:
 | SKU | Entitlements (exemplo canónico) | Inclui |
 |-----|----------------------------------|--------|
 | **Standard (X)** | `base` | Produto actual (`1.9.8` capabilities) |
-| **Identity Add-on (Y)** | `base,identity` | + User-ID multi-fonte + políticas user/grupo |
-| **Identity + MITM (Y+)** | `base,identity,mitm` | + inspeção TLS opt-in |
-| **MITM only (opcional)** | `base,mitm` | MITM sem Identity (se venda fizer sentido) |
+| **Identity Add-on (Y)** | `base,identity` | + User-ID multi-fonte + políticas user/grupo — **oferta principal PME** |
+| **Identity + MITM (Y+)** | `base,identity,mitm` | + inspeção TLS opt-in — **futuro** (MITM diferido; token pode existir sem runtime) |
+| **MITM only (opcional)** | `base,mitm` | MITM sem Identity — baixa prioridade vs Y até haver implementação |
 | **Legado** | `full` ou vazio parseado como hoje | **Compat:** equivale a `base` + todas features **já** existentes; **não** auto-concede `identity`/`mitm` após ADR-0025 Aceito (ver regra de transição no ADR) |
 
 **Regra de transição (ADR-0025 — GO 20.2):**  
@@ -140,6 +167,9 @@ Congelamento das filas fechadas:
 - **T2:** rejeitada no GO 20.2 (documentada só como alternativa histórica).
 
 Preços X/Y são decisão comercial externa ao repo; o plano só materializa o **gate técnico**.
+
+**Posicionamento comercial PME:** oferta âncora = **Y (Identity)**; ver
+[`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) §9.
 
 ---
 
@@ -234,32 +264,47 @@ Regras complementares:
 
 ---
 
-### IM2 — MITM TLS opt-in — **spike primeiro**; não bloqueia Identity
+### IM2 — MITM TLS opt-in — **DEFER formal (20.7a)** — não bloqueia Identity
 
-MITM no stack actual (pcap+nDPI+PF) é **quase um segundo produto** (terminação TLS). Por isso:
+MITM no stack actual (pcap+nDPI+PF) é **quase um segundo produto** (terminação TLS).
+Decisão de produto PME (`2026-08-06`): **não** investir agora em paridade NGFW TLS;
+Squid **rejeitado**; Identity-first.
 
-| Passo | Entrega | Gate |
-|-------|---------|------|
-| **20.7** | **SPIKE GO/NO-GO:** desenho em pfSense (proxy/sslbump/outro) + PoC mínima + veredicto pelos **critérios mensuráveis S1–S8 (ADR-0026)** — CPU, latência, QUIC/ECH, privacidade, OFF ≡ ADR-0017 | Decisão registada |
-| **20.7a** | Se **NO-GO** / defer: emenda ADR-0026 “implementação diferida”; **saltar** 20.8–20.11; avançar IM3+ | DEFER formal |
-| **20.8** | (só se GO) Gestão CA: gerar/importar, export trust, rotação, storage seguro | — |
-| **20.9** | (só se GO) Toggle `mitm.enabled` OFF + entitlement; bypass IP/CIDR/SNI/cat | — |
-| **20.10** | (só se GO) Intercept selectivo; block page HTTPS legível quando MITM ON | — |
-| **20.11** | (só se GO) Lab CA em cliente; smoke; MITM OFF ≡ ADR-0017 | **GI2–GI3** |
+| Passo | Entrega | Gate / estado |
+|-------|---------|---------------|
+| **20.7** | Spike: desenho + preflight appliance; Squid rejeitado; opções B/E/D | **PASS documental** (`spike-mitm-20.7.md`) |
+| **20.7a** | **DEFER formal:** emenda ADR-0026 “implementação diferida”; GI2/GI3 `DEFERRED`; **saltar** 20.8–20.11; posicionamento PME; avançar IM3+ | **PASS** (`2026-08-06`) |
+| **20.8** | (só após **novo GO** + spike S1–S8 com helper próprio) Gestão CA | BLOQUEADO até reabrir IM2 |
+| **20.9** | (idem) Toggle `mitm.enabled` + bypass | BLOQUEADO |
+| **20.10** | (idem) Intercept selectivo; block page HTTPS | BLOQUEADO |
+| **20.11** | (idem) Lab CA; GI2–GI3 | BLOQUEADO / gates `DEFERRED` |
 
-**Relação com ADR-0017:** MITM OFF → ADR-0017 intacto. MITM ON só após GO spike + entitlement.
+**Veredicto 20.7a:** **DEFER** — motivos registados no spike + posicionamento:
 
-**Riscos críticos IM2:** performance; pinning; GPO da CA; QUIC/ECH; privacidade de conteúdo desencriptado; superfície de ataque no `.pkg` mesmo OFF; lab Plus ≠ CE.
+1. Squid / `pfSense-pkg-squid` **não** é caminho de produto (operador).  
+2. Ferramenta própria ≈ segundo produto (meses); fora do valor imediato PME.  
+3. NGFW enterprise TLS **não** é o objectivo do nicho.  
+4. Identity entrega o valor “por pessoa” sem MITM.  
+5. ADR-0017 permanece verdade com MITM OFF (estado permanente até reabrir).
 
-**Rollback:** toggle OFF / remover entitlement / defer sem código MITM em releases se NO-GO cedo.
+**Relação com ADR-0017:** MITM OFF → ADR-0017 intacto (estado actual e diferido).
+
+**Reabrir IM2:** requer GO humano explícito + novo spike S1–S8 (candidata: helper
+`layer7-tlsproxy` / opção E — nunca Squid) + alinhamento ao posicionamento PME
+(MITM selectivo, opt-in, sem overclaim).
+
+**Rollback:** N/A runtime (sem código MITM); docs + ADR diferido.
 
 ---
 
-### IM3 — Núcleo Identity (mapa user↔IP **no daemon**)
+### IM3 — Núcleo Identity (mapa user↔IP **no daemon**) — **passo actual / caminho de valor PME**
+
+**Foco PME:** estruturas e diagnóstico devem nascer já com linguagem e estados
+úteis à empresa (posicionamento U2/U3/H1) — não só structs internas.
 
 | Passo | Entrega | Gate |
 |-------|---------|------|
-| **20.11a** | **Pré-requisito de código:** ADR-0028 **Aceito** (modelo de concorrência/IO) + **baseline de perf `1.9.8` registada** (CPU/throughput/latência, lab ou builder) | Sem isto, 20.12 não abre |
+| **20.11a** | **Pré-requisito de código:** ADR-0028 **Aceito** (já) + **baseline de perf `1.9.8` registada** (CPU/throughput/latência, lab ou builder) + checklist posicionamento §11 no commit | Sem isto, 20.12 não abre |
 | **20.12** | Estruturas no daemon: sessão (user, IPs v4/v6 **lista**, source, seen_at, ttl, groups cache); **limites de escala ADR-0027 §4.3**; rwlock conforme ADR-0028 | — |
 | **20.13** | API interna: add/refresh/expire; export para enforce/PF; dump diagnóstico GUI | — |
 | **20.14** | Persistência best-effort opcional + política stale + **cold start/SIGHUP conforme ADR-0027 §4.2**; **não** depender de resync PHP como SSOT | — |
@@ -340,27 +385,29 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
 ## 5. Ordem de implementação (resumo visual)
 
-**Caminho preferido de calendário (se spike MITM = GO):**
+**Caminho canónico actual (rev. `d` — PME Identity-first; MITM DEFER):**
 
 ```text
-IM0 → IM1 Entitlements
-  → IM2 spike 20.7
-       ├─ GO  → 20.8–20.11 MITM completo
-       └─ NO-GO/DEFER → saltar MITM implementação
-  → IM3–IM6 Identity MVP (mapa daemon + LDAP + fontes + políticas)
-  → IM7–IM8 agente/TS (adiável)
-  → IM9 Fecho
+IM0 → IM1 Entitlements          [FEITO]
+  → IM2 spike 20.7 + 20.7a DEFER [FEITO — saltar 20.8–20.11]
+  → IM3–IM6 Identity MVP         [EM CURSO — valor PME]
+       mapa daemon + LDAP + fontes + políticas ad_*
+  → IM7–IM8 agente/TS            [adiável]
+  → IM9 Fecho / release Identity
+  → (IM2 reopen: 20.8–20.11 só com novo GO + spike S1–S8 helper próprio)
 ```
 
-**Caminho de valor (recomendado se spike incerto / NO-GO):**
+**Caminho histórico (se spike tivesse sido GO) — arquivado como alternativa:**
 
 ```text
-IM0 → IM1 → IM3 → IM4 → IM5 → IM6 → (IM2 quando/se GO) → IM7–IM9
+IM0 → IM1 → IM2 GO → 20.8–20.11 MITM → IM3–IM6 → IM7–IM9
 ```
 
 **Proibido:** IM6 sem IM3 + IM1.  
-**Proibido:** MITM activo sem entitlement, bypass e **GO do spike 20.7**.  
-**Proibido:** tratar `device_ips` PHP como SSOT de Identity.
+**Proibido:** MITM activo sem entitlement, bypass e **novo GO** pós-defer.  
+**Proibido:** tratar `device_ips` PHP como SSOT de Identity.  
+**Proibido:** Squid como caminho de produto.  
+**Proibido:** overclaim de paridade NGFW (R-V).
 
 ---
 
@@ -387,7 +434,7 @@ Detalhe por superfície: mapa de rastreabilidade §0–§2.
 | ID | Risco | Severidade | Mitigação |
 |----|-------|------------|-----------|
 | R1 | Quebra enforcement base | Crítica | Opt-in; gates; feature flags; testes |
-| R2 | MITM inviável / CPU / segundo produto | Alta | Spike 20.7 GO/NO-GO; DEFER sem bloquear Identity |
+| R2 | MITM inviável / CPU / segundo produto | Alta | **Mitigado:** DEFER 20.7a; Identity avança; reabrir só com GO + helper próprio |
 | R3 | Pinning / apps quebradas | Alta | Bypass list; docs; default OFF |
 | R4 | Mapa stale / padrão device_ips lento | Alta | Mapa no daemon; TTL; refresh; logout |
 | R5 | Credenciais AD no disco | Alta | Permissões; não logar secrets; LDAPS |
@@ -406,6 +453,8 @@ Detalhe por superfície: mapa de rastreabilidade §0–§2.
 | R18 | Overflow/truncamento silencioso de `features[64]` | Alta | Contrato ADR-0025 P1–P6; validação na emissão; testes de truncamento |
 | R19 | Política aplicada ao user errado em IP partilhado (NAT/proxy) | Alta | Estado `multi-user` → não-match `ad_*` + audit (ADR-0027 §4.1) |
 | R20 | Janela pós-reboot com mapa vazio interpretada como bug/bypass | Média | Cold start documentado (ADR-0027 §4.2); persistência best-effort; GUI mostra estado do mapa |
+| R21 | Overclaim vs NGFW / expectativa MITM total na PME | Alta | Posicionamento PME + R-V; GUI honesta; MITM diferido |
+| R22 | Identity “técnicamente OK” mas inutilizável por TI PME | Alta | Barra U*/P*/H* (R-U); testes de ligação; estados visíveis |
 ---
 
 ## 8. Rollback global da trilha
@@ -425,7 +474,7 @@ Detalhe por superfície: mapa de rastreabilidade §0–§2.
 |----|------|------|
 | BG-085 | Governança Identity+MITM (IM0) | IM0 |
 | BG-086 | Entitlements `features` (IM1) | IM1 |
-| BG-087 | MITM TLS opt-in + CA (IM2) | IM2 |
+| BG-087 | MITM TLS opt-in + CA (IM2) — **DEFER 20.7a** | IM2 (diferido) |
 | BG-088 | Identity map + LDAP (IM3–IM4) | IM3–IM4 |
 | BG-089 | Fontes RADIUS + AD events (IM5) | IM5 |
 | BG-090 | Políticas user/grupo (IM6) | IM6 |
@@ -440,11 +489,11 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 
 | Tipo de passo | Obrigatório actualizar |
 |---------------|------------------------|
-| Governança | START-HERE, este plano, CORTEX, backlog, classification |
+| Governança | START-HERE, este plano, CORTEX, backlog, classification, **posicionamento PME** |
 | Entitlement | ADR-0025, MANUAL-USO-LICENCAS, license-server docs |
-| MITM | ADR-0026, mapa, matriz-limitacoes-dpi, emenda ADR-0017, MANUAL |
-| Identity | ADR-0027, mapa, core/precedence, pf-enforcement se PF mudar |
-| Release | CHANGELOG, MANUAL-INSTALL (comandos!), CORTEX, RELEASE-CHECKLIST |
+| MITM | ADR-0026, spike, mapa, matriz-limitacoes-dpi, emenda ADR-0017, MANUAL (quando reabrir) |
+| Identity | ADR-0027, mapa, core/precedence, pf-enforcement se PF mudar, **barra UX posicionamento §6** |
+| Release | CHANGELOG, MANUAL-INSTALL (comandos!), CORTEX, RELEASE-CHECKLIST, notas comerciais anti-overclaim |
 
 ---
 
@@ -477,6 +526,8 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-05 | **20.2 PASS** — ADRs 0025/0026/0027/0028 Aceito; transição legado **T1**; GI0 PASS; passo actual → **20.3** (IM1) |
 | 2026-08-05 | **20.3 PASS** — `features.c`/`features.h` (ADR-0025 P1–P6 + T1); integração em `license_check`; `test_features_parse.c` PASS; passo actual → **20.4** |
 | 2026-08-05 | **20.4–20.6 PASS / GI1 PASS** — LS SKU, GUI upsell, check-in ∩ features; passo actual → **20.7** |
+| 2026-08-05 | Spike 20.7: desenho + preflight appliance; Squid rejeitado pelo operador |
+| 2026-08-06 | **rev. `d` / 20.7a PASS** — posicionamento PME Identity-first ACEITE; ADR-0026 implementação diferida; GI2/GI3 DEFERRED; saltar 20.8–20.11; passo actual → **20.11a / IM3** |
 
 ---
 
@@ -484,6 +535,8 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 
 | Tema | Documento |
 |------|-----------|
+| Posicionamento PME / objectivo | [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) |
+| Spike MITM / DEFER | [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) |
 | Enforcement PF | [`../05-daemon/pf-enforcement.md`](../05-daemon/pf-enforcement.md) |
 | Policy matrix | [`../core/policy-matrix.md`](../core/policy-matrix.md) |
 | Precedence | [`../core/precedence.md`](../core/precedence.md) |

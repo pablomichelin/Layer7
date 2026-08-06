@@ -37,30 +37,22 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` quando houver lab.
 
 ---
 
-## GI2 — MITM segurança e default (só se spike GO; senão DEFERRED)
+## GI2 — MITM segurança e default — **DEFERRED** (`2026-08-06`, 20.7a)
 
-| # | Critério |
-|---|----------|
-| GI2.0 | Spike 20.7 registado como GO **ou** DEFER/NO-GO formal |
-| GI2.1 | (se GO) `mitm.enabled` default `false` |
-| GI2.2 | (se GO) MITM OFF ≡ ADR-0017 |
-| GI2.3 | Sem entitlement `mitm`: zero interceptação |
-| GI2.4 | (se GO) CA privada fora do repositório |
-| GI2.5 | (se GO) Bypass list funcional |
+| # | Critério | Estado |
+|---|----------|--------|
+| GI2.0 | Spike 20.7 registado como GO **ou** DEFER/NO-GO formal | **PASS (DEFER)** — ver `spike-mitm-20.7.md` + ADR-0026 rev. `d` |
+| GI2.1–GI2.5 | Critérios de implementação MITM | **DEFERRED** — reabrir só com novo GO + S1–S8 |
 
-Se DEFER: marcar GI2/GI3 `DEFERRED` e avançar Identity.
+Identity avança sem GI2/GI3.
 
 ---
 
-## GI3 — MITM funcional (lab)
+## GI3 — MITM funcional (lab) — **DEFERRED** (`2026-08-06`)
 
-| # | Critério |
-|---|----------|
-| GI3.1 | Cliente com CA instalada vê página/bloqueio HTTPS legível em destino de teste |
-| GI3.2 | Cliente **sem** CA: falha TLS esperada (documentada) |
-| GI3.3 | App com pinning em bypass **ou** limite documentado |
-| GI3.4 | Smoke IPv4 (+ IPv6 se no escopo do passo) sem regressão base |
-| GI3.5 | CPU/latência lab anotados (não GO produção cego) |
+| # | Critério | Estado |
+|---|----------|--------|
+| GI3.1–GI3.5 | Lab MITM | **DEFERRED** até reabertura IM2 |
 
 ---
 
@@ -141,8 +133,8 @@ Se DEFER: marcar GI2/GI3 `DEFERRED` e avançar Identity.
 |------|------|--------|
 | GI0 | IM0 | **PASS** (`2026-08-05` — ADRs Aceito; T1) |
 | GI1 | IM1 | **PASS** (`2026-08-05`) |
-| GI2 | IM2 | PENDENTE |
-| GI3 | IM2 | PENDENTE |
+| GI2 | IM2 | **DEFERRED** (`2026-08-06` — 20.7a; GI2.0 PASS via DEFER) |
+| GI3 | IM2 | **DEFERRED** (`2026-08-06`) |
 | GI4 | IM3 | PENDENTE |
 | GI5 | IM4–IM5 | PENDENTE |
 | GI6 | IM5 | PENDENTE |
@@ -161,3 +153,4 @@ Se DEFER: marcar GI2/GI3 `DEFERRED` e avançar Identity.
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
 | 2026-08-05 | **GI0 PASS** — 20.2: ADRs 0025–0028 Aceito; transição legado T1 |
 | 2026-08-05 | **GI1 PASS** — 20.3–20.6 entitlements + check-in ∩ `.lic` |
+| 2026-08-06 | **20.7a DEFER** — GI2/GI3 DEFERRED; ADR-0026 implementação diferida; posicionamento PME; passo → IM3/20.11a |

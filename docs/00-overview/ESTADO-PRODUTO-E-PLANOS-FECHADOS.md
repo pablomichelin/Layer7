@@ -129,7 +129,7 @@ stubs na raiz do repo. Ver equivalência. Onboarding:
 | F6 H5 (raiz legado + planos fechados) | **EXECUTADA** `2026-08-05` | `docs/archive/raiz-legado/` + `planos-fechados/` + stubs |
 | `scoped_hybrid` default produção | Não | Validado; lab usa `legacy_global` |
 | Analytics / SIEM pesado | Fora de fila | Só telemetria mínima F7 (BG-018) se GO |
-| MITM / Identity add-on | **Novo plano ABERTO** | [`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md); ADR-0017 mantém-se com MITM OFF |
+| MITM / Identity add-on | **Plano ABERTO** (PME Identity-first; MITM **DEFER** 20.7a) | [`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md) · [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md); ADR-0017 com MITM OFF; ADR-0026 diferido |
 | Console multi-firewall | Fora de fila | — |
 | Rebind automático de licença | Fora de fila | — |
 
@@ -178,4 +178,6 @@ Responder em português.
 |------|--------|
 | 2026-08-05 | Criação — consolidação pós GV7.4 + campanha two-client `1.9.8` |
 | 2026-08-05 | Nota: aberto plano **Identity + MITM Add-on** (não reabre P0–J/IPv6); arranque `START-HERE-identity-mitm.md` |
+| 2026-08-06 | Posicionamento PME Identity-first ACEITE; MITM DEFER 20.7a; passo → IM3 |
+
 | 2026-08-05 | F6 H5 — arquivo físico raiz `00-`…`16-` + planos fecho/IPv6 |

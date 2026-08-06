@@ -47,7 +47,7 @@
 | VLAN 802.1Q | Sim (parse Ethernet) | Interfaces `.10` dependem nome real | Teste PHP |
 | CDN multi-host | Parcial | DNS hint 1 hostname/IP, TTL 600 s | FP-013 |
 | App-only cold start | Parcial | Primeiros pacotes Unknown até classificar | Comportamento nDPI |
-| MITM TLS | **Não** (V1) | Sem inspecção ClientHello própria | Decisão congelada |
+| MITM TLS | **Não** (V1; add-on **diferido** 20.7a) | Sem inspecção ClientHello própria; ADR-0026 implementação diferida; Identity-first PME | Squid rejeitado; reabrir só com novo GO |
 
 ---
 
