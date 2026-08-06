@@ -85,16 +85,17 @@ STUB
 	LDFLAGS_CRYPTO=""
 fi
 
-SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC features.c blacklist.c bl_config.c allowlist.c log_store.c"
+SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC features.c blacklist.c bl_config.c allowlist.c log_store.c identity_map.c"
 CFLAGS_NDPI="-DHAVE_NDPI=0"
 LDFLAGS_NDPI=""
+LDFLAGS_PTHREAD="-lpthread"
 if [ -f /usr/local/include/ndpi/ndpi_api.h ] && [ -f /usr/local/lib/libndpi.a ]; then
 	SRCS="$SRCS capture.c"
 	CFLAGS_NDPI="-I/usr/local/include/ndpi -DHAVE_NDPI=1"
-	LDFLAGS_NDPI="/usr/local/lib/libndpi.a -lpcap -lm -lpthread"
+	LDFLAGS_NDPI="/usr/local/lib/libndpi.a -lpcap -lm"
 fi
 cc -Wall -Wextra -O2 -I"$SMOKE_VER" -I. -I../common $CFLAGS_NDPI \
-	-o layer7d-smoke $SRCS $LDFLAGS_NDPI $LDFLAGS_CRYPTO
+	-o layer7d-smoke $SRCS $LDFLAGS_NDPI $LDFLAGS_PTHREAD $LDFLAGS_CRYPTO
 ./layer7d-smoke -V | grep -q smoke || { echo "smoke-layer7d: -V falhou"; exit 1; }
 ./layer7d-smoke -t -c "$ROOT/samples/config/layer7-minimal.json" | grep -q layer7d_version || { echo "smoke-layer7d: falta layer7d_version no -t"; exit 1; }
 ./layer7d-smoke -t -c "$ROOT/package/pfSense-pkg-layer7/files/usr/local/etc/layer7.json.sample"

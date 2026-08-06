@@ -36,6 +36,21 @@ else
 	fail "test_allowlist compile"
 fi
 
+step "Unit: identity_map (20.12 / ADR-0027§4.3 + ADR-0028)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_identity_map \
+    tests/functional/test_identity_map.c src/layer7d/identity_map.c -lpthread \
+    2>/tmp/test_identity_map.cc.err; then
+	if /tmp/test_identity_map; then
+		pass "test_identity_map"
+	else
+		fail "test_identity_map runtime"
+	fi
+else
+	cat /tmp/test_identity_map.cc.err
+	fail "test_identity_map compile"
+fi
+
 step "Unit: config_parse (sni_inspection / A3)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_config_parse \

@@ -1,0 +1,15 @@
+MONITOR_ON
+enabled=1 mode=monitor
+pid=213
+PID %CPU   RSS ELAPSED COMMAND
+213  1.2 23824   00:04 /usr/local/sbin/layer7d
+2026-08-05 16:33:19 [warn] license: INVALID — license file not found: /usr/local/etc/layer7.lic
+2026-08-05 16:33:19 [warn] license: enforce disabled, monitor-only mode
+2026-08-05 16:33:20 [notice] config: layer7.enabled=false — idle (sem motor L7)
+2026-08-05 16:33:28 [notice] config: layer7.enabled=false — idle (sem motor L7)
+2026-08-06 03:00:06 [notice] config: layer7.enabled=false — idle (sem motor L7)
+2026-08-06 14:50:38 [warn] license: INVALID — license file not found: /usr/local/etc/layer7.lic
+2026-08-06 14:50:38 [warn] license: enforce disabled, monitor-only mode
+2026-08-06 14:50:38 [notice] config: policies=3 exceptions=0 enforce_cfg=0 reload#1 (/usr/local/etc/layer7.json)
+2026-08-06 14:50:38 [notice] capture: protos_file=/usr/local/etc/layer7-protos.txt
+2026-08-06 14:50:38 [notice] capture: opened vmx0 (nDPI active, sni_inspection=0)

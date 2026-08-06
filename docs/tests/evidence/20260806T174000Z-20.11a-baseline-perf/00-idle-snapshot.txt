@@ -1,0 +1,108 @@
+run_id=20260806T174000Z-20.11a-baseline-perf
+systemupfw.system.up
+Thu Aug  6 14:40:06 -03 2026
+FreeBSD systemupfw.system.up 16.0-CURRENT FreeBSD 16.0-CURRENT #12 plus-RELENG_26_03_1-n256546-1d1bfd578383: Wed May 20 15:20:10 UTC 2026     root@pfsense-build-release-amd64-2.eng.atx.netgate.com:/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/obj/amd64/fvF1vE9r/var/jenkins/workspace/pfSense-Plus-snapshots-26_03_1-main/sources/FreeBSD-src-plus-RELENG_26_03_1/amd64.amd64/sys/pfSense amd64
+Name           : pfSense-pkg-layer7
+Version        : 1.9.13
+Installed on   : Wed Aug  5 16:33:09 2026 -03
+1.9.13
+enabled=false mode=monitor model=legacy? ifaces=["vmx0"]
+===SYS===
+hw.ncpu: 48
+hw.physmem: 17116418048
+ 2:40PM  up 32 days, 23:13, 1 user, load averages: 0.48, 0.48, 0.55
+ procs    memory    page                      disks       faults       cpu
+ r  b  w  avm  fre  flt  re  pi  po   fr   sr  da0  cd0   in   sy   cs us sy id
+ 1  0  0 4418889089024 2381627392 7951   0   0  20 9094   76    0    0 12427 31907 54199  0  2 97
+ 1  0  0 4418893926400 2374455296 75098   0   0  17 63777   56    0    0 2539 7282 8824  0  1 98
+ 5  0  0 4418879012864 2380464128 22331   0   0  24 29950   46   43    0 2401 12443 8366  1  0 98
+ 0  0  0 4418815672320 2380705792  491   0   0   0 1591   40    0    0 2091 1652 7138  0  0 99
+ 0  0  0 4418815672320 2380713984  195   0   0   0  245   40    0    0 1975  682 6606  0  0 99
+===L7D===
+  PID %CPU %MEM  RSS   VSZ  ELAPSED    TIME COMMAND
+93915  0.0  0.0 7780 24520 22:06:51 0:00.31 /usr/local/sbin/layer7d
+  PID COMM             RESOURCE                          VALUE        
+93915 layer7d          user time                    00:00:00.076570   
+93915 layer7d          system time                  00:00:00.246632   
+93915 layer7d          maximum RSS                             7764 KB
+93915 layer7d          integral shared memory                103376 KB
+93915 layer7d          integral unshared data                 52936 KB
+93915 layer7d          integral unshared stack                19456 KB
+93915 layer7d          page reclaims                            836   
+93915 layer7d          page faults                               51   
+93915 layer7d          swaps                                      0   
+93915 layer7d          block reads                                0   
+93915 layer7d          block writes                             294   
+93915 layer7d          messages sent                             15   
+93915 layer7d          messages received                          0   
+93915 layer7d          signals received                         268   
+93915 layer7d          voluntary context switches              3043   
+93915 layer7d          involuntary context switches              21   
+  PID    TID COMM                TDNAME              CPU  PRI STATE   WCHAN    
+93915 104250 layer7d             -                    -1   56 sleep   nanslp    
+===STATS===
+{
+  "version": "1.9.13",
+  "boot_time": 1785958399,
+  "uptime_seconds": 79601,
+  "timestamp": 1786038000,
+  "total_classified": 0,
+  "total_blocked": 0,
+  "total_allowed": 0,
+  "policies_active": 3,
+  "exceptions": 0,
+  "enforce_mode": 0,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 0,
+  "dst_add_fail": 0,
+  "cap_pkts": 0,
+  "cap_pkts_v4": 0,
+  "cap_pkts_v6": 0,
+  "cap_active": 0,
+  "cap_active_v4": 0,
+  "cap_active_v6": 0,
+  "cap_classified": 0,
+  "cap_classified_v4": 0,
+  "cap_classified_v6": 0,
+  "cap_expired": 0,
+  "cap_evicted": 0,
+  "cap_dropped": 0,
+  "captures": 0,
+  "top_apps_blocked": [],
+  "top_sources_blocked": [],
+  "license_valid": false,
+  "license_expired": false,
+  "license_grace": false,
+  "license_dev_mode": false,
+  "license_days_left": 0,
+  "license_customer": "",
+  "license_expiry": "",
+  "license_hardware_id": "e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826",
+  "license_error": "license file not found: /usr/local/etc/layer7.lic",
+  "license_check_in_enabled": false,
+  "license_check_in_ok": true,
+  "license_last_check_in": 1785888833,
+  "license_next_check_in": 1786493633,
+  "license_check_in_error": "",
+  "bl_enabled": false,
+  "bl_domains_loaded": 0,
+  "bl_categories_active": 0,
+  "bl_lookups": 0,
+  "bl_hits": 0,
+  "bl_dns_hits": 0,
+  "bl_sni_hits": 0,
+  "bl_rules_active": 0,
+  "bl_top_categories": []
+}
+===LICENSE===
+valid=0
+expired=0
+grace=0
+dev_mode=0
+days_left=0
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=
+expiry=
+features=
+error=license file not found: /usr/local/etc/layer7.lic

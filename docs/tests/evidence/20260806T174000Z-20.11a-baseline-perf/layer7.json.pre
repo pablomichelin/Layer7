@@ -1,0 +1,72 @@
+{
+    "layer7": {
+        "enabled": false,
+        "mode": "monitor",
+        "log_level": "info",
+        "log_file_max_mb": 5,
+        "log_file_keep": 3,
+        "check_in_enabled": false,
+        "syslog_remote": false,
+        "syslog_remote_host": "",
+        "syslog_remote_port": 514,
+        "debug_minutes": 0,
+        "block_quic": false,
+        "protos_file": "/usr/local/etc/layer7-protos.txt",
+        "interfaces": [
+            "vmx0"
+        ],
+        "reports": {
+            "enabled": true,
+            "retention_days": 30,
+            "collect_interval": 5,
+            "event_log_enabled": false,
+            "event_retention_days": 7,
+            "event_max_mb": 100,
+            "event_interfaces": []
+        },
+        "groups": [],
+        "policies": [
+            {
+                "id": "p-mon-001",
+                "name": "Monitor geral",
+                "enabled": true,
+                "action": "monitor",
+                "priority": 10,
+                "match": []
+            },
+            {
+                "id": "anti-bypass-dns",
+                "name": "Anti-bypass DNS (DoH/DoT/Private Relay)",
+                "enabled": true,
+                "action": "block",
+                "priority": 1,
+                "match": {
+                    "ndpi_app": [
+                        "DoH_DoT",
+                        "AppleiCloud",
+                        "iCloudPrivateRelay"
+                    ]
+                }
+            },
+            {
+                "id": "profile-remote-access",
+                "name": "Acesso Remoto",
+                "enabled": true,
+                "action": "block",
+                "priority": 20,
+                "match": {
+                    "ndpi_app": [
+                        "AnyDesk",
+                        "TeamViewer",
+                        "RDP"
+                    ],
+                    "hosts": [
+                        "anydesk.com",
+                        "teamviewer.com"
+                    ]
+                }
+            }
+        ],
+        "exceptions": []
+    }
+}

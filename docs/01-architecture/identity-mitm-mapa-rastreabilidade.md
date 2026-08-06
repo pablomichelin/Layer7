@@ -51,8 +51,8 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-08 | Bypass MITM | IM2 | **DEFERRED** | GUI/DMN | |
 | M-09 | Caminho intercept TLS | IM2 | **DEFER 20.7a** | DOC | Squid rejeitado; futuro = helper próprio |
 | M-10 | Block page HTTPS via MITM | IM2 | **DEFERRED** | PKG | ADR-0017 permanece |
-| M-11 | Session map user↔IP **no daemon** | IM3 | **Próximo (após 20.11a)** | DMN | SSOT; N IPs/user; barra UX PME |
-| M-12 | Diagnóstico Identity GUI | IM3 | Planeado | GUI | |
+| M-11 | Session map user↔IP **no daemon** | IM3 | **20.12 PASS** (structs); API = 20.13 | DMN | `identity_map.h`/`.c`; N IPs/user; barra UX PME |
+| M-12 | Diagnóstico Identity GUI | IM3 | Planeado (20.13 dump) | GUI | |
 | M-13 | LDAP/LDAPS client | IM4 | Planeado | DMN/PKG | limites escala |
 | M-14 | Group expansion cache + fail-mode | IM4 | Planeado | DMN | ADR-0027 |
 | M-15 | RADIUS **accounting receiver** | IM5 | Planeado | DMN/PKG | canónico |
@@ -64,8 +64,8 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-21 | Endpoint agent | IM7 | Adiável | — | |
 | M-22 | TS/VDI agent | IM8 | Adiável | — | |
 | M-23 | Evidências + MANUAL | IM9 | Planeado | DOC/TST | |
-| M-24 | Modelo concorrência/IO daemon (threads + rwlock) | IM3 (20.11a) | Planeado | DMN | ADR-0028; pré-requisito IM3–IM5 |
-| M-25 | Baseline de perf `1.9.8` registada | IM3 (20.11a) | Planeado | TST | Referência para GI4–GI7 e spike MITM S1 |
+| M-24 | Modelo concorrência/IO daemon (threads + rwlock) | IM3 (20.11a/20.12) | **PASS** rwlock no mapa; threads = 20.15+ | DMN | ADR-0028; `pthread_rwlock` em `identity_map` |
+| M-25 | Baseline de perf registada | IM3 (20.11a) | **PASS** (`2026-08-06`) | TST | Evidência `20260806T174000Z-20.11a-baseline-perf`; pin doc `1.9.8` |
 
 ---
 
@@ -74,7 +74,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | Área | Ficheiros candidatos (baseline) | Como integrar sem partir |
 |------|----------------------------------|---------------------------|
 | Licença | `src/layer7d/license.c`, `license.h` | Extender parse (contrato ADR-0025 P1–P6; `features[64]`); não mudar valid/expiry |
-| Main / identity | novos módulos + hooks em `main.c` | Runtime OFF sem entitlement; **zero chamadas bloqueantes no loop `for(;;)` de captura** (ADR-0028); threads só com `identity` ON |
+| Main / identity | `identity_map.c` + hooks futuros em `main.c` | **20.12:** módulo linkado, **não** init sem entitlement (20.15); **zero threads**; sem IO bloqueante no hot path |
 | Policy / enforce | `policy.c`, `enforce.c` | Consultar mapa daemon só se identity ON |
 | Package | `layer7.inc`, GUI PHP | Config apenas; sem SSOT de sessão |
 | License-server | `license-server/backend/...` | Campo `features` já existe |
@@ -145,3 +145,5 @@ Policy ad_* → IPs do mapa → enforce PF
 | 2026-08-05 | **20.4** — M-02 PASS (license-server normalizeFeatures + UI SKU) |
 | 2026-08-05 | **20.5** — M-04 PASS (GUI upsell Identity/MITM) |
 | 2026-08-05 | **20.6** — M-03 PASS + GI1 (check-in ∩ features) |
+| 2026-08-06 | **20.11a** — M-25 PASS + M-24 confirmado (baseline perf; 1 thread) |
+| 2026-08-06 | **20.12** — M-11 structs PASS (`identity_map`); rwlock M-24 |

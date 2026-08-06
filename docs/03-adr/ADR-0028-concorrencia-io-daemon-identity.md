@@ -71,6 +71,11 @@ Antes do primeiro código IM3 (passo 20.11a), registar baseline mensurável da
 latência de bloqueio (tempo classificação→PF). Todo gate GI4–GI7 compara
 contra esta baseline (tolerância definida no plano §6).
 
+**Cumprido `2026-08-06`:** evidência
+[`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
+(pacote lab `1.9.13` pré-Identity; pin doc `1.9.8`; latência classify→PF live
+adiada sem `.lic` — proxy builder documentado).
+
 ---
 
 ## Alternativas rejeitadas

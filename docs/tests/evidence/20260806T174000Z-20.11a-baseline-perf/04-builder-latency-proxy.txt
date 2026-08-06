@@ -1,0 +1,2 @@
+n=20 ms_min=2.645 ms_p50=2.748 ms_p95=2.907 ms_max=3.015 ms_mean=2.787
+note=builder_synthetic_decision_dryrun_no_pfctl_no_pcap

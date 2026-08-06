@@ -8,7 +8,7 @@
 | [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md) | ACTIVO (área F4) | Blacklists / package |
 | [`f5-preparacao-malha.md`](f5-preparacao-malha.md) | ACTIVO (área F5) | Malha de testes |
 | [`plano-isencao-vip-e-ux-gui.md`](plano-isencao-vip-e-ux-gui.md) | Ver backlog | VIP / UX |
-| [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) | **ACTIVO** | Identity + MITM add-on (IM3 / 20.11a; PME Identity-first; MITM DEFER) |
+| [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) | **ACTIVO** | Identity + MITM add-on (IM3 / 20.13; 20.12 PASS; PME Identity-first; MITM DEFER) |
 | [`f1-plano-de-implementacao.md`](f1-plano-de-implementacao.md) | Histórico F1 | — |
 | [`f2-plano-de-implementacao.md`](f2-plano-de-implementacao.md) | Histórico F2 | — |
 

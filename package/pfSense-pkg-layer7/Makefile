@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.13
+PORTVERSION=	1.9.14
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -20,15 +20,15 @@ LICENSE_FILE=	${.CURDIR}/../../LICENSE
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c)
-.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, features.c, blacklist.c, bl_config.c, allowlist.c, log_store.c)."
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, features.c, blacklist.c, bl_config.c, allowlist.c, log_store.c, identity_map.c)."
 .endif
 
 NDPI_PREFIX=	/usr/local
 .if exists(${NDPI_PREFIX}/include/ndpi/ndpi_api.h)
 LAYER7_NDPI_CFLAGS=	-I${NDPI_PREFIX}/include/ndpi -DHAVE_NDPI=1
 .if exists(${NDPI_PREFIX}/lib/libndpi.a)
-LAYER7_NDPI_LDFLAGS=	${NDPI_PREFIX}/lib/libndpi.a -lpcap -lm -lpthread
+LAYER7_NDPI_LDFLAGS=	${NDPI_PREFIX}/lib/libndpi.a -lpcap -lm
 .else
 .error "layer7d: falta ${NDPI_PREFIX}/lib/libndpi.a. Reinstale/compile nDPI com biblioteca estática para gerar pacote autocontido."
 .endif
@@ -38,6 +38,8 @@ LAYER7_NDPI_CFLAGS=	-DHAVE_NDPI=0
 LAYER7_NDPI_LDFLAGS=
 LAYER7_NDPI_SRCS=
 .endif
+# identity_map (20.12 / ADR-0028) — pthread sempre
+LAYER7_PTHREAD_LDFLAGS=	-lpthread
 
 WRKSRC=		${WRKDIR}
 
@@ -58,7 +60,9 @@ do-build:
 		${LAYER7D_DIR}/features.c \
 		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
 		${LAYER7D_DIR}/allowlist.c ${LAYER7D_DIR}/log_store.c \
-		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} /usr/lib/libcrypto.a
+		${LAYER7D_DIR}/identity_map.c \
+		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} ${LAYER7_PTHREAD_LDFLAGS} \
+		/usr/lib/libcrypto.a
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg

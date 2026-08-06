@@ -1,0 +1,42 @@
+t_start=1786038643
+14:50:43
+213  1.0 25524   00:05
+14:50:48
+213  0.5 30636   00:10
+14:50:53
+213  0.2 32564   00:15
+14:50:58
+213  0.0 34076   00:20
+14:51:03
+213  0.0 35620   00:25
+14:51:08
+213  0.0 37332   00:30
+14:51:13
+213  0.0 39320   00:35
+14:51:18
+213  0.0 40824   00:40
+t_end=1786038683
+ procs    memory    page                      disks       faults       cpu
+ r  b  w  avm  fre  flt  re  pi  po   fr   sr  da0  cd0   in   sy   cs us sy id
+ 0  0  0 4418855489536 2329116672 7951   0   0  20 9095   76    0    0 12424 31901 54188  0  2 97
+ 0  0  0 4418855489536 2329116672   85   0   0   0    0   60   86    0 4830 1216 13005  0  0 99
+ 0  0  0 4418855489536 2329108480  314   0   0   0  247   60    0    0 3082 1175 9348  0  0 99
+  PID    TID COMM                TDNAME              CPU  PRI STATE   WCHAN    
+  213 101870 layer7d             -                    -1   56 sleep   bpf       
+  PID COMM             RESOURCE                          VALUE        
+  213 layer7d          user time                    00:00:00.359436   
+  213 layer7d          system time                  00:00:00.205392   
+  213 layer7d          maximum RSS                            43168 KB
+  213 layer7d          integral shared memory                306152 KB
+  213 layer7d          integral unshared data                156772 KB
+  213 layer7d          integral unshared stack                59008 KB
+  213 layer7d          page reclaims                           9078   
+  213 layer7d          page faults                               23   
+  213 layer7d          swaps                                      0   
+  213 layer7d          block reads                                0   
+  213 layer7d          block writes                             195   
+  213 layer7d          messages sent                             98   
+  213 layer7d          messages received                          0   
+  213 layer7d          signals received                           1   
+  213 layer7d          voluntary context switches               733   
+  213 layer7d          involuntary context switches              50   

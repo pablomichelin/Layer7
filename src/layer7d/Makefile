@@ -9,9 +9,12 @@
 # Smoke: make OUT=layer7d-smoke VSTR_DIR=/tmp/l7vers NDPI=0
 
 LAYER7_COMMON = ../common
-SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c features.c blacklist.c bl_config.c allowlist.c log_store.c
+SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c features.c \
+	blacklist.c bl_config.c allowlist.c log_store.c identity_map.c
 OUT ?= layer7d
 VSTR_DIR ?= .
+# identity_map (20.12) exige pthread mesmo sem nDPI
+PTHREAD_LDFLAGS = -lpthread
 
 # Auto-detect nDPI: se o header existe, ativa
 NDPI_DETECT != test -f /usr/local/include/ndpi/ndpi_api.h && echo 1 || echo 0
@@ -20,7 +23,7 @@ NDPI ?= $(NDPI_DETECT)
 .if $(NDPI) == 1
 SRCS = $(SRCS_BASE) capture.c
 NDPI_CFLAGS = -I/usr/local/include/ndpi -DHAVE_NDPI=1
-NDPI_LDFLAGS = /usr/local/lib/libndpi.a -lpcap -lm -lpthread
+NDPI_LDFLAGS = /usr/local/lib/libndpi.a -lpcap -lm
 .else
 SRCS = $(SRCS_BASE)
 NDPI_CFLAGS = -DHAVE_NDPI=0
@@ -38,7 +41,7 @@ $(OUT): $(SRCS)
 		echo "layer7d Makefile: falta /usr/local/lib/libndpi.a para gerar binário autocontido"; exit 1; \
 	fi
 	$(CC) $(CFLAGS) -Wall -Wextra -O2 -I$(VSTR_DIR) -I. -I$(LAYER7_COMMON) \
-		$(NDPI_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS) -lcrypto
+		$(NDPI_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS) $(PTHREAD_LDFLAGS) -lcrypto
 
 clean:
 	rm -f layer7d layer7d-smoke

@@ -19,6 +19,6 @@
 | Spike 20.7 / 20.7a | **DEFER formal** (`2026-08-06`) — **não** instalar Squid |
 | SSOT do veredicto | [`../../../09-blocking/spike-mitm-20.7.md`](../../../09-blocking/spike-mitm-20.7.md) |
 | ADR | [`../../../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../../../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) — implementação diferida |
-| Próximo da trilha | IM3 / 20.11a (Identity) — ver START-HERE |
+| Próximo da trilha | IM3 / 20.12 (mapa daemon) — ver START-HERE |
 
 **Não usar** esta evidência para justificar PoC Squid. O preflight ficou histórico; a decisão de produto é DEFER + Identity-first PME.

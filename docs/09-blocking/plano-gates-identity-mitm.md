@@ -16,7 +16,7 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` quando houver lab.
 | GI0.1 | START-HERE + plano + mapa + este ficheiro existem | **PASS** (`2026-08-05`) |
 | GI0.2 | CORTEX / README / backlog / classification apontam a trilha | **PASS** (`2026-08-05`) |
 | GI0.3 | ADR-0025/0026/0027 Aceito (ou emenda registada) + GO T1/T2 | **PASS** (`2026-08-05` — Aceito; **T1**) |
-| GI0.4 | ADR-0028 (concorrência/IO daemon) Aceito — o mais tardar no 20.11a, antes de qualquer código IM3 | **PASS** (`2026-08-05` — Aceito no 20.2; baseline perf permanece no 20.11a) |
+| GI0.4 | ADR-0028 (concorrência/IO daemon) Aceito — o mais tardar no 20.11a, antes de qualquer código IM3 | **PASS** (`2026-08-05` — Aceito no 20.2; baseline perf **PASS** no 20.11a `2026-08-06`) |
 
 **Saída:** agente continua sem ambiguidade comercial/técnica.
 
@@ -58,15 +58,15 @@ Identity avança sem GI2/GI3.
 
 ## GI4 — Mapa Identity (daemon)
 
-| # | Critério |
-|---|----------|
-| GI4.0 | Pré-requisito 20.11a cumprido: ADR-0028 Aceito + baseline de perf `1.9.8` registada |
-| GI4.1 | add/refresh/expire no **daemon** (lista de IPs v4/v6 por user; limites de escala ADR-0027 §4.3) |
-| GI4.2 | TTL remove stale; não depende de resync PHP como SSOT |
-| GI4.3 | Diagnóstico GUI sem secrets |
-| GI4.4 | Sem entitlement `identity`: módulo inerte + **zero threads novas** (ADR-0028 §4) |
-| GI4.5 | `SIGHUP` reload: mapa vivo sobrevive; cold start pós-reboot documentado (ADR-0027 §4.2) |
-| GI4.6 | Perf com módulo ON em lab dentro da tolerância vs baseline 20.11a; nenhum bloqueio do loop de captura observável |
+| # | Critério | Estado |
+|---|----------|--------|
+| GI4.0 | Pré-requisito 20.11a cumprido: ADR-0028 Aceito + baseline de perf registada | **PASS** (`2026-08-06`) — evidência `20260806T174000Z-20.11a-baseline-perf` |
+| GI4.1 | add/refresh/expire no **daemon** (lista de IPs v4/v6 por user; limites de escala ADR-0027 §4.3) | PENDENTE |
+| GI4.2 | TTL remove stale; não depende de resync PHP como SSOT | PENDENTE |
+| GI4.3 | Diagnóstico GUI sem secrets | PENDENTE |
+| GI4.4 | Sem entitlement `identity`: módulo inerte + **zero threads novas** (ADR-0028 §4) | PENDENTE |
+| GI4.5 | `SIGHUP` reload: mapa vivo sobrevive; cold start pós-reboot documentado (ADR-0027 §4.2) | PENDENTE |
+| GI4.6 | Perf com módulo ON em lab dentro da tolerância vs baseline 20.11a; nenhum bloqueio do loop de captura observável | PENDENTE |
 
 ---
 
@@ -135,7 +135,7 @@ Identity avança sem GI2/GI3.
 | GI1 | IM1 | **PASS** (`2026-08-05`) |
 | GI2 | IM2 | **DEFERRED** (`2026-08-06` — 20.7a; GI2.0 PASS via DEFER) |
 | GI3 | IM2 | **DEFERRED** (`2026-08-06`) |
-| GI4 | IM3 | PENDENTE |
+| GI4 | IM3 | **EM CURSO** (GI4.0 PASS `2026-08-06`; GI4.1–4.6 PENDENTE) |
 | GI5 | IM4–IM5 | PENDENTE |
 | GI6 | IM5 | PENDENTE |
 | GI7 | IM6 | PENDENTE |
@@ -154,3 +154,4 @@ Identity avança sem GI2/GI3.
 | 2026-08-05 | **GI0 PASS** — 20.2: ADRs 0025–0028 Aceito; transição legado T1 |
 | 2026-08-05 | **GI1 PASS** — 20.3–20.6 entitlements + check-in ∩ `.lic` |
 | 2026-08-06 | **20.7a DEFER** — GI2/GI3 DEFERRED; ADR-0026 implementação diferida; posicionamento PME; passo → IM3/20.11a |
+| 2026-08-06 | **20.11a / GI4.0 PASS** — baseline perf registada; passo → 20.12 |

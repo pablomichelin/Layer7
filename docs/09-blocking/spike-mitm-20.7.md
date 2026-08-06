@@ -112,7 +112,7 @@ Requisitos mínimos se reabrir:
 | PoC intercept | **Não iniciada** (intencional) |
 | GI2 / GI3 | **DEFERRED** |
 | Passos 20.8–20.11 | **Saltados** até novo GO |
-| Próximo plano | **20.11a / IM3** Identity |
+| Próximo plano | **20.12 / IM3** mapa daemon |
 | Reabertura | GO humano + spike S1–S8 (preferência: opção E) |
 
 ### Motivos do DEFER (completos)

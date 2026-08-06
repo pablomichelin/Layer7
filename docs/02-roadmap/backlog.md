@@ -298,7 +298,7 @@ reavaliacao formal.
 - Arranque: [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 - Posicionamento PME: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 - Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-06d`
-- Passo actual: **20.11a / IM3** (baseline perf); **IM1/GI1 PASS**; **IM2 DEFER 20.7a**
+- Passo actual: **20.13 / IM3** (API mapa); **20.12 PASS**; **20.11a PASS**; **IM1/GI1 PASS**; **IM2 DEFER 20.7a**
 - ADRs: 0025/0027/0028 Aceito; **0026 Aceito — implementação diferida**
 - Baseline produção: **`1.9.8`**. Captive portal: **fora de escopo**. Nicho: **PME Identity-first**.
 
@@ -307,7 +307,7 @@ reavaliacao formal.
 | BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **Concluido (20.2 PASS / GI0)** | ADRs 0025–0028 Aceito; T1 |
 | BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Concluido (20.6 / GI1 PASS)** | check-in ∩ .lic + gates |
 | BG-087 | MITM TLS opt-in + CA (IM2) | Critica | daemon/package/PKI | IM2 | UX HTTPS; segundo produto | G | Alto | **Diferido (20.7a)** | ADR-0026 rev. d; Squid rejeitado; GI2/GI3 DEFERRED; reabrir só com novo GO + helper próprio |
-| BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | Planeado / **próximo** | ADR-0027; barra UX posicionamento; 20.11a primeiro |
+| BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | Em curso / **passo 20.13** | ADR-0027; `identity_map` 20.12 PASS |
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | Planeado | WinRM outbound não canónico |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Planeado | GI7; não-regressão IP/MAC |
 | BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | Planeado / adiável | GI8 ou ADR exclusão |
