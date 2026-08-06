@@ -7,6 +7,14 @@
 docs/00-overview/START-HERE-identity-mitm.md
 ```
 
+### Continuidade em chat limpo (obrigatório)
+
+1. Colar **apenas** o caminho acima (ou o prompt da secção abaixo).  
+2. O agente **deve** seguir a *Leitura obrigatória* deste ficheiro **antes** de codificar.  
+3. O **passo actual** está na tabela *Estado actual* e no bloco *Progresso compacto* — deve coincidir com o plano §0 e o CORTEX (secção Identity).  
+4. **Não** usar `START-HERE-fecho-producao.md` nem evidências antigas de MITM para decidir Squid/PoC — MITM está **DEFER**.  
+5. Se CORTEX / plano / este ficheiro divergirem no passo actual → **parar** e declarar conflito (não improvisar).
+
 | Documento | Papel |
 |-----------|--------|
 | **Este ficheiro** | Arranque de chat + estado + prompt (ler primeiro) |

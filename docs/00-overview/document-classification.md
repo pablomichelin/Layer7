@@ -64,10 +64,10 @@ vence o canónico.
 | `docs/00-overview/posicionamento-pme-identity-first.md` | posicionamento PME Identity-first | ideia, objectivo, nicho, barra UX | Canónico | START-HERE + plano rev.d | manter com decisões de produto | novo plano |
 | `docs/02-roadmap/plano-identity-mitm-addon.md` | plano Identity+MITM | SSOT execução 20.x | Canónico | — | actualizar a cada passo | novo plano |
 | `docs/01-architecture/identity-mitm-mapa-rastreabilidade.md` | mapa Identity+MITM | NR-* + M-xx | Canónico | — | actualizar com código | novo plano |
-| `docs/09-blocking/spike-mitm-20.7.md` | spike MITM 20.7 | desenho + S1–S8 | Canónico (em curso) | ADR-0026 | actualizar com veredicto lab | novo plano |
+| `docs/09-blocking/spike-mitm-20.7.md` | spike MITM 20.7 | **DEFER formal 20.7a** | Canónico (fechado diferido) | ADR-0026 rev.d | só reabrir com novo GO | novo plano |
 | `docs/09-blocking/plano-gates-identity-mitm.md` | gates GI0–GI9 | gates da trilha | Canónico | — | marcar PASS | novo plano |
 | `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Aceito (T1) | Canónico | — | manter vivo com IM1 | novo plano |
-| `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | Aceito (impl. via spike 20.7) | Canónico | emenda ADR-0017 quando ON | spike 20.7 | novo plano |
+| `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | **Aceito — implementação diferida** (rev.d) | Canónico | ADR-0017 com MITM OFF | reabrir com GO + S1–S8 | novo plano |
 | `docs/03-adr/ADR-0027-identity-userid-multi-fonte.md` | ADR User-ID | Aceito | Canónico | evolui ADR-0011/0012 | IM3–IM6 | novo plano |
 | `docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md` | ADR concorrência/IO daemon | Aceito | Canónico | pré-requisito IM3–IM5; baseline perf 20.11a | IM3 | novo plano |
 | `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir | F6 H5 |

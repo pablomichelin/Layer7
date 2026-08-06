@@ -60,7 +60,9 @@ estado actual deixa de ser suficiente para agir sem reler o repo; o
 ## Prompt de continuação (copiar e colar)
 
 **Trilha Identity + MITM (activa):** colar
-[`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md).
+[`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md)
+(preferir o **Prompt — continuar a trilha** que está *dentro* desse ficheiro;
+já inclui PME Identity-first, MITM DEFER e passo actual).
 
 **Manutenção pós-fecho / IPv6 fechada:** colar
 [`START-HERE-fecho-producao.md`](START-HERE-fecho-producao.md).

@@ -42,7 +42,7 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 | # | Tema | Decisão canónica |
 |---|------|------------------|
 | R-A | MITM ≠ dependência de Identity | MITM e Identity são **ortogonais**. Preferência de produto “MITM cedo” **não** bloqueia Identity se o spike falhar. |
-| R-B | Spike MITM GO/NO-GO | Passo **20.7** é **spike** (desenho + PoC mínima). **NO-GO** ou custo inaceitável → MITM **DEFER** (ADR-0026) **sem** bloquear IM3–IM6. |
+| R-B | Spike MITM GO/NO-GO | Passo **20.7** é **spike** (desenho + decisão). **Cumprido:** veredicto **DEFER 20.7a** (`2026-08-06`) sem PoC de intercept (Squid rejeitado; Identity-first). Reabrir implementação exige novo GO + S1–S8. |
 | R-C | Mapa Identity no **daemon** | SSOT de sessão user↔IP vive no daemon (refresh contínuo → PF/tabelas). **Não** copiar o padrão PHP `device_ips` (resync lento demais para User-ID). |
 | R-D | Eventos AD canónicos | MVP = **agente leve no Domain Controller** → push seguro para o appliance. WinRM/WMI a partir do FreeBSD = **não** canónico. |
 | R-E | RADIUS canónico | MVP = Layer7 como **accounting receiver** (UDP, secret, ACL de NAS). Não confundir com captive portal. |
