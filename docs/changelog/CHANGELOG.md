@@ -8,6 +8,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - (vazio — próximo: agente Windows Event Log / fecho 20.20)
 
+## [1.9.19] — 2026-08-07
+
+### Fixed
+
+- **GUI MITM 50x:** variavel de entitlements colidia com head.inc
+  (foreach de interfaces); paginas MITM/Identity usam l7_ent / l7_feat_raw.
+- **Tabs GUI:** Diagnosticos / Remocao do pacote em linha secundaria propria
+  (deixam de parecer aninhadas sob Relatorios/Definicoes).
+
+### Notes
+
+- Canal `latest`: **`1.9.19`**. Produção enforce **`1.9.8`**.
+- SHA256: `19509802932a86d1d37ae65569bf75f55fc2c888fc68950ef9eab9d11ec97815`.
+- Rollback lab: `1.9.18`. MITM permanece DEFER (só gate comercial / placeholder).
+
 ## [1.9.18] — 2026-08-07
 
 ### Added

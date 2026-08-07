@@ -11,7 +11,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.18` (**publicado** lab/`latest`)
+**Candidato port:** `1.9.19` (**publicado** lab/`latest`)
 **Nota:** **Rev. `g` (`2026-08-07`)** = receiver `identity_dc` + GUI + script PS1; falta serviço Event Log no DC.
 
 ---
@@ -32,7 +32,7 @@ TRILHA IDENTITY + MITM — progresso
 - 20.20 receiver: PASS (identity_dc + GUI + PS1 lab)
 - 20.20 desenho: PASS
 - 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; candidato **1.9.18** (publicado)
+- Baseline: 1.9.8; candidato **1.9.19** (publicado)
 - Próximo: agente Win Event Log → GI6
 ```
 
