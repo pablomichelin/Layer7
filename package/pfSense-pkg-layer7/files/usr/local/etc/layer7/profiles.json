@@ -670,7 +670,7 @@
       "name": "Acesso Remoto",
       "group": "Segurança e bypass",
       "icon": "fa-desktop",
-      "description": "Bloqueia softwares de acesso remoto (TeamViewer, AnyDesk, RustDesk, RDP, VNC, RMM, etc.). Gerível em detalhe na guia Acesso Remoto.",
+      "description": "Bloqueia softwares de acesso remoto (TeamViewer, AnyDesk, RustDesk, RDP, VNC, RMM, etc.). Use o botao de detalhe no cartao para escolher softwares.",
       "ndpi_apps": ["TeamViewer", "AnyDesk", "VNC", "RDP", "SSH"],
       "ndpi_categories": [],
       "hosts": [

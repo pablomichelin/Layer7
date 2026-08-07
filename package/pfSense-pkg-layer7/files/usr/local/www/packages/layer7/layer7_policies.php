@@ -1268,6 +1268,9 @@ function layer7_policy_match_summary($policy) {
 				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Opcoes"); ?>" onclick="l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof_name), ENT_QUOTES) ?>);"><i class="fa fa-cog"></i></button>
 				<?php } ?>
 				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Editar perfil"); ?>" onclick="l7showProfileEditModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, false);"><i class="fa fa-pencil"></i></button>
+				<?php if ($prof_id_raw === "remote-access") { ?>
+				<a href="layer7_remote_access.php" class="l7-profile-icon-btn" title="<?= l7_t("Detalhe Acesso Remoto (softwares)"); ?>"><i class="fa fa-list"></i></a>
+				<?php } ?>
 				<?php if ($is_hidden) { ?>
 				<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;display:inline-block;">
 					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />

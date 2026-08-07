@@ -122,13 +122,14 @@ layer7_render_styles();
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
 		<h2 class="panel-title"><?= l7_t("Layer 7 - Acesso Remoto"); ?></h2>
-		<?php layer7_render_tabs("remote_access"); ?>
+		<?php layer7_render_tabs("policies"); ?>
 	</div>
 	<div class="panel-body">
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 			<p class="layer7-lead">
-				<?= l7_t("Seleccione os softwares de acesso remoto a bloquear. A selecao actualiza o perfil «Acesso Remoto» e cria/actualiza a politica correspondente (accao block). Em modo monitor o trafego continua apenas observado.") ?>
+				<?= l7_t("Detalhe do perfil rapido «Acesso Remoto» (Politicas). Seleccione softwares a bloquear; a selecao actualiza o perfil e a politica (accao block). Em modo monitor o trafego continua apenas observado.") ?>
+				<a href="layer7_policies.php#l7-policies"><?= l7_t("Voltar a Politicas / Perfis rapidos") ?></a>
 			</p>
 			<div class="alert alert-info">
 				<i class="fa fa-info-circle"></i>
