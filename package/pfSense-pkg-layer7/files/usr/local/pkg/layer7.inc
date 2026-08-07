@@ -6828,9 +6828,33 @@ function layer7_render_styles()
 	.layer7-page .layer7-lead { color: #666; line-height: 1.55; margin: 0 0 22px; max-width: 980px; }
 	.layer7-page .nav-tabs { margin: 0; padding: 10px 18px 0; border-bottom: 1px solid #e5e5e5; background: #fcfcfc; display: flex; flex-wrap: wrap; }
 	.layer7-page .nav-tabs > li { float: none; }
-	.layer7-page .nav-tabs > li > a { padding: 11px 14px; font-weight: 600; }
+	/* pfSense: .panel-heading a { color: white } — forcar contraste nas tabs Layer7 */
+	.layer7-page .panel-heading .nav-tabs > li > a,
+	.layer7-page .panel-heading .nav-tabs > li > a:link,
+	.layer7-page .panel-heading .nav-tabs > li > a:visited {
+		padding: 11px 14px; font-weight: 600; color: #ae0000 !important;
+		background: transparent; border: 1px solid transparent; margin-right: 2px;
+	}
+	.layer7-page .panel-heading .nav-tabs > li > a:hover,
+	.layer7-page .panel-heading .nav-tabs > li > a:focus {
+		color: #7a0000 !important; background: #f5f5f5; border-color: #eee #eee #e5e5e5;
+	}
+	.layer7-page .panel-heading .nav-tabs > li.active > a,
+	.layer7-page .panel-heading .nav-tabs > li.active > a:hover,
+	.layer7-page .panel-heading .nav-tabs > li.active > a:focus {
+		color: #333 !important; background: #fff; border: 1px solid #e5e5e5; border-bottom-color: transparent;
+	}
 	.layer7-page .nav-tabs.layer7-nav-secondary { padding-top: 0; border-bottom: 1px solid #e5e5e5; background: #f7f7f7; }
-	.layer7-page .nav-tabs.layer7-nav-secondary > li > a { padding: 8px 14px; font-weight: 500; font-size: 13px; color: #666; }
+	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li > a,
+	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li > a:link,
+	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li > a:visited {
+		padding: 8px 14px; font-weight: 500; font-size: 13px; color: #666 !important;
+	}
+	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li.active > a,
+	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li.active > a:hover,
+	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li.active > a:focus {
+		color: #333 !important; background: #fff; border: 1px solid #e5e5e5; border-bottom-color: transparent;
+	}
 	.layer7-page .form-horizontal .control-label { padding-top: 10px; }
 	.layer7-page .form-control-static { padding-top: 8px; }
 	.layer7-page .layer7-section { margin-top: 30px; }
