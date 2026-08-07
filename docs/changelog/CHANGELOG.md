@@ -8,6 +8,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - (vazio — próximo: agente Windows Event Log / fecho 20.20)
 
+## [1.9.21] — 2026-08-07
+
+### Changed
+
+- **Menu:** Acesso Remoto deixou de ser guia top-level — perfil em Politicas/Perfis
+  rapidos + botao de detalhe (lista de softwares).
+- **MITM:** movido para tabs secundarias (DEFER); pagina alinhada ao layout admin.
+
+### Fixed
+
+- Wrap de Definicoes / underline secundario no menu.
+
+### Notes
+
+- Canal `latest`: **`1.9.21`**. Produção enforce **`1.9.8`**.
+- SHA256: `763d60e4f1ac447818ea5fdbd595187aca5d4857e67d22e62e011a5c1a07d68c`.
+- Rollback lab: `1.9.20`.
+
 ## [1.9.20] — 2026-08-07
 
 ### Fixed
