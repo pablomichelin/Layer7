@@ -1,10 +1,11 @@
 # ADR-0027 — Identity User-ID multi-fonte (sem captive portal)
 
-**Estado:** Aceito (rev. `c` — canal agente DC, conflito NAT, cold start, escala)  
+**Estado:** Aceito (rev. `d` — canal agente DC A1–A7 fechados no desenho 20.20)  
 **Data:** 2026-08-05  
-**Aceite:** `2026-08-05` — passo **20.2** / GI0  
-**Decisores:** Operador (GO aceitação no passo 20.2)  
+**Aceite:** `2026-08-05` — passo **20.2** / GI0; desenho canal **20.20** `2026-08-07`  
+**Decisores:** Operador (GO aceitação no passo 20.2); detalhe A1–A7 no 20.20  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
+**Desenho canal DC:** [`../01-architecture/desenho-canal-agente-dc-20.20.md`](../01-architecture/desenho-canal-agente-dc-20.20.md)  
 **Relação:** evolui além de ADR-0011/0012 (dispositivo MAC→IP)
 
 ---
@@ -46,21 +47,22 @@ Módulo gated por entitlement `identity`:
 
 MVP fecho parcial: LDAP + **≥1** fonte {RADIUS, agente DC}. Ambas no plano completo.
 
-### 2.1 Canal do agente DC (rev. `c` — desenho de segurança obrigatório antes de 20.20)
+### 2.1 Canal do agente DC (rev. `d` — desenho 20.20 fechado)
 
-O receiver no appliance é uma **superfície de ataque nova** e tem requisitos
-mínimos fixados aqui (o detalhe fino fecha no desenho do passo 20.20, antes
-de qualquer código):
+O receiver no appliance é uma **superfície de ataque nova**. Requisitos
+mínimos A1–A7; **detalhe fino aceite** em
+[`../01-architecture/desenho-canal-agente-dc-20.20.md`](../01-architecture/desenho-canal-agente-dc-20.20.md)
+(`2026-08-07`). **Sem código** até esse desenho (cumprido).
 
-| # | Requisito |
-|---|-----------|
-| A1 | Transporte **TLS** com autenticação mútua: mTLS (preferido) **ou** token por appliance + HMAC do corpo — decidir no desenho 20.20; nunca push em claro |
-| A2 | Listener **bind só nas interfaces LAN configuradas** (nunca WAN por defeito); porta dedicada documentada |
-| A3 | Payload mínimo: `user`, `ip`, `event (logon/logoff)`, `timestamp` — sem passwords, sem SIDs desnecessários |
-| A4 | Rate limit + tamanho máximo de payload no receiver (protecção DoS) |
-| A5 | Credencial do agente revogável no appliance sem reinstalar o agente no DC |
-| A6 | Agente no DC corre com **privilégio mínimo** (leitura do event log; nunca domain admin) |
-| A7 | Relógio: eventos com skew > tolerância configurável são descartados com log |
+| # | Requisito | Decisão 20.20 (MVP) |
+|---|-----------|---------------------|
+| A1 | Transporte **TLS** com autenticação mútua: mTLS (preferido) **ou** token por appliance + HMAC do corpo — nunca push em claro | **MVP:** HTTPS + token por appliance + **HMAC-SHA256** do corpo. **mTLS = fase 2** (PME: secret partilhado alinhado a RADIUS) |
+| A2 | Listener **bind só nas interfaces LAN configuradas** (nunca WAN por defeito); porta dedicada documentada | Porto **8743/tcp**; bind só IPs LAN; ACL de IPs dos DCs obrigatória (vazia ⇒ não arranca) |
+| A3 | Payload mínimo: `user`, `ip`, `event (logon/logoff)`, `timestamp` — sem passwords, sem SIDs desnecessários | JSON `POST /v1/identity/events`; `event`: logon\|logoff\|heartbeat; `domain` opcional |
+| A4 | Rate limit + tamanho máximo de payload no receiver (protecção DoS) | Body ≤ 4096 B; 50 evt/s/peer; 200 evt/s global; HTTP 429 |
+| A5 | Credencial do agente revogável no appliance sem reinstalar o agente no DC | Secret 0600 `identity-dc.secret`; GUI gera/revoga; agente só actualiza ficheiro local |
+| A6 | Agente no DC corre com **privilégio mínimo** (leitura do event log; nunca domain admin) | Event Log Readers; eventos 4624/4634 (ou 4647); nunca Domain Admin |
+| A7 | Relógio: eventos com skew > tolerância configurável são descartados com log | Default **300 s** (60–900); log `identity_dc_skew` |
 
 O mesmo padrão A1–A5 aplica-se ao futuro agente endpoint (IM7).
 
@@ -168,4 +170,5 @@ Falha Identity **não** desliga enforcement base nem políticas IP/MAC.
 
 - ADR-0011, ADR-0012, ADR-0014, ADR-0028 (concorrência/IO daemon)  
 - Plano §0.0 R-C…R-Q, §3.1  
+- [`../01-architecture/desenho-canal-agente-dc-20.20.md`](../01-architecture/desenho-canal-agente-dc-20.20.md)  
 - [`../core/policy-matrix.md`](../core/policy-matrix.md), [`../core/precedence.md`](../core/precedence.md)

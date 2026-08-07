@@ -2,6 +2,14 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [Unreleased]
+
+### Added
+
+- **Identity / 20.20 desenho:** canal agente DC A1–A7 fechado —
+  [`desenho-canal-agente-dc-20.20.md`](../01-architecture/desenho-canal-agente-dc-20.20.md)
+  (TLS+HMAC MVP; porto 8743; ACL DC; sem código ainda). ADR-0027 rev. `d`.
+
 ## [1.9.17] — 2026-08-07
 
 ### Added

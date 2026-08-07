@@ -84,13 +84,13 @@ Identity avança sem GI2/GI3.
 
 ## GI6 — Segunda fonte + conflitos
 
-| # | Critério |
-|---|----------|
-| GI6.1 | Segunda fonte integrada (a que faltou no GI5) |
-| GI6.2 | Conflito mesmo IP: política determinada + audit |
-| GI6.3 | Logout/expiry limpa IP |
-| GI6.4 | Users concorrentes no mesmo IP → estado `multi-user` → `ad_*` não-match + evento `identity_ip_conflict` (nunca política do user errado) — ADR-0027 §4.1 |
-| GI6.5 | Canal agente DC conforme ADR-0027 §2.1: TLS mútuo/HMAC, bind só LAN, rate limit provados em lab |
+| # | Critério | Estado (2026-08-07) |
+|---|----------|---------------------|
+| GI6.1 | Segunda fonte integrada (a que faltou no GI5) | **PENDENTE** (código 20.20) |
+| GI6.2 | Conflito mesmo IP: política determinada + audit | PENDENTE (mapa já tem multi_user; 20.22) |
+| GI6.3 | Logout/expiry limpa IP | PENDENTE |
+| GI6.4 | Users concorrentes no mesmo IP → estado `multi-user` → `ad_*` não-match + evento `identity_ip_conflict` (nunca política do user errado) — ADR-0027 §4.1 | Parcial no mapa; gate lab PENDENTE |
+| GI6.5 | Canal agente DC conforme ADR-0027 §2.1: TLS/HMAC, bind só LAN, rate limit provados em lab | Desenho **PASS** 20.20; lab após código |
 
 ---
 
@@ -153,6 +153,7 @@ Identity avança sem GI2/GI3.
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
 | 2026-08-07 | **20.18** — Test LDAP GUI + `layer7d --ldap-test`; GI5.4 PASS (parcial GI5); passo → 20.19 |
 | 2026-08-07 | **20.19** — RADIUS accounting receiver; GI5.3 PASS (unitário); candidato `1.9.17`; passo → 20.20 |
+| 2026-08-07 | **20.20 desenho** — A1–A7 PASS (TLS+HMAC MVP); ADR-0027 rev. d; passo → 20.20 código |
 | 2026-08-05 | **GI1 PASS** — 20.3–20.6 entitlements + check-in ∩ `.lic` |
 | 2026-08-06 | **20.7a DEFER** — GI2/GI3 DEFERRED; ADR-0026 implementação diferida; posicionamento PME; passo → IM3/20.11a |
 | 2026-08-06 | **20.11a / GI4.0 PASS** — baseline perf registada; passo → 20.12 |

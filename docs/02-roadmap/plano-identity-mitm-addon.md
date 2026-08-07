@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-07e`; **20.19 PASS**; passo actual **20.20 / IM5**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-07f`; **20.20 desenho PASS**; passo actual **20.20 código / IM5**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -12,7 +12,7 @@
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
 **Candidato port:** `1.9.17` (**publicado** lab/`latest` `2026-08-07`)
-**Nota:** **Rev. `e` (`2026-08-07`)** = **20.19 PASS** (RADIUS accounting receiver; GI5.3 unitário); passo → **20.20**.
+**Nota:** **Rev. `f` (`2026-08-07`)** = **20.20 desenho PASS** (A1–A7; TLS+HMAC MVP); passo → **implementação 20.20** (receiver + agente).
 
 ---
 
@@ -20,22 +20,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.20** (IM5 — desenho canal agente DC A1–A7) |
-| Código | **20.19** RADIUS receiver; 20.18 Test LDAP; 20.17 OpenLDAP; GUI 20.16 |
-| ADRs | **Aceito** ×4; T1; **0026 diferida** |
+| Passo actual | **20.20 código** (IM5 — receiver HTTPS + agente DC MVP) |
+| Código | **20.19** RADIUS; desenho DC **ACEITE**; 20.18 Test LDAP; … |
+| ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** (A1–A7) |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.20 (desenho segurança agente DC) |
+| Próximo | Implementar canal DC conforme desenho → GI6 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.20 / IM5 (agente DC — desenho canal)
+- Passo actual: 20.20 código (receiver DC + agente)
+- 20.20 desenho: PASS (A1–A7; TLS+HMAC; porto 8743)
 - 20.19: PASS (RADIUS accounting; GI5.3)
 - 20.18: PASS (Test LDAP GUI; GI5.4)
-- 20.17: PASS (client+cache+fail-mode)
-- 20.16: PASS (config GUI)
 - IM3 / GI4: PASS
 - Baseline: 1.9.8; latest **1.9.17**
-- Próximo: 20.20 → GI5 residual / GI6
+- Próximo: implementação 20.20 → GI6
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -332,7 +331,7 @@ Squid **rejeitado**; Identity-first.
 | Passo | Fonte | Arquitectura canónica |
 |-------|-------|------------------------|
 | **20.19** | **RADIUS accounting receiver** | Daemon/pacote escuta accounting (User-Name + Framed-IP-Address / v6); secret + ACL NAS — **PASS** `2026-08-07` |
-| **20.20** | **Eventos de logon AD** | **Agente no DC** faz push autenticado para o appliance (não WinRM outbound do FreeBSD). **Desenho de segurança do canal (ADR-0027 §2.1 A1–A7) fecha antes de código**: mTLS/HMAC, bind só LAN, rate limit, privilégio mínimo |
+| **20.20** | **Eventos de logon AD** | Desenho A1–A7 **PASS** (`desenho-canal-agente-dc-20.20.md`); **próximo:** código receiver HTTPS + agente DC (TLS+HMAC MVP; porto 8743) |
 
 MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
@@ -540,6 +539,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `c` / 20.17 PASS** — `identity_ldap` worker+cache+fail-mode+OpenLDAP; `test_identity_ldap` PASS; candidato `1.9.15`; passo → **20.18** |
 | 2026-08-07 | **rev. `d` / 20.18 PASS** — Test LDAP GUI + `layer7d --ldap-test` (GI5.4); candidato `1.9.16`; passo → **20.19** |
 | 2026-08-07 | **rev. `e` / 20.19 PASS** — RADIUS accounting receiver (`identity_radius`); secret+ACL NAS; GI5.3 unitário; candidato `1.9.17`; passo → **20.20** |
+| 2026-08-07 | **rev. `f` / 20.20 desenho PASS** — A1–A7 fechados (TLS+HMAC MVP; porto 8743); ADR-0027 rev. d; passo → **20.20 código** |
 
 ---
 

@@ -37,13 +37,13 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-07e`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-07f`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM5 / 20.20** — desenho canal agente DC (A1–A7) |
-| Código do produto nesta trilha | **20.19 PASS** (RADIUS accounting); 20.18 Test LDAP; 20.17 client; GUI 20.16; mapa IM3; **sem** MITM |
-| Rev. do plano | **`2026-08-07e`** |
+| Passo actual | **IM5 / 20.20 código** — receiver HTTPS + agente DC (após desenho A1–A7) |
+| Código do produto nesta trilha | **20.19 PASS** (RADIUS); **20.20 desenho PASS**; 20.18 Test LDAP; …; **sem** MITM |
+| Rev. do plano | **`2026-08-07f`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -123,7 +123,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM5 / 20.20 — desenho canal agente DC A1–A7).
+Tarefa: continuar no passo actual (IM5 / 20.20 código — receiver HTTPS + agente DC conforme desenho A1–A7).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -142,7 +142,8 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM5 / 20.20 (agente DC — desenho canal)
+- Passo actual: IM5 / 20.20 código (receiver DC + agente)
+- 20.20 desenho: PASS (A1–A7; TLS+HMAC; porto 8743)
 - 20.19: PASS (RADIUS accounting; GI5.3)
 - 20.18: PASS (Test LDAP GUI + --ldap-test; GI5.4)
 - 20.17: PASS (LDAP client + cache + fail-mode)
@@ -151,7 +152,7 @@ TRILHA IDENTITY + MITM — progresso
 - IM3 / 20.11a–20.15: PASS (GI4)
 - Posicionamento PME Identity-first: ACEITE
 - Código: identity_map + ldap + radius; zero threads OFF
-- Plano rev.: 2026-08-07e
+- Plano rev.: 2026-08-07f
 - Baseline enforce: 1.9.8
 - Candidato / lab: **1.9.17** (publicado)
 ```
@@ -172,6 +173,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Features / SKU | [`../03-adr/ADR-0025-entitlements-addon-identity-mitm.md`](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) |
 | MITM (diferido) | [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) |
 | Identity multi-fonte | [`../03-adr/ADR-0027-identity-userid-multi-fonte.md`](../03-adr/ADR-0027-identity-userid-multi-fonte.md) |
+| Desenho canal agente DC | [`../01-architecture/desenho-canal-agente-dc-20.20.md`](../01-architecture/desenho-canal-agente-dc-20.20.md) |
 | Concorrência/IO daemon | [`../03-adr/ADR-0028-concorrencia-io-daemon-identity.md`](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) |
 | Block page actual (sem MITM) | [`../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md`](../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) |
 | Identidade dispositivo (MAC) | [`../03-adr/ADR-0011-fonte-de-identidade-de-dispositivo.md`](../03-adr/ADR-0011-fonte-de-identidade-de-dispositivo.md), [`ADR-0012`](../03-adr/ADR-0012-politicas-por-dispositivo-mac-para-ip.md) |

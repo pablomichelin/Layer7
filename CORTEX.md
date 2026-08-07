@@ -1291,8 +1291,8 @@ TRILHA IPv6 — progresso
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
 Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
-**20.18 PASS** (Test LDAP; GI5.4); **20.19 PASS** (RADIUS; GI5.3); passo actual
-**20.20 / IM5** (desenho agente DC).
+**20.18 PASS** (Test LDAP; GI5.4); **20.19 PASS** (RADIUS; GI5.3); **20.20
+desenho PASS** (A1–A7); passo actual **20.20 código / IM5** (receiver + agente DC).
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
 **Candidato port:** `1.9.17` (RADIUS 20.19; **publicado** lab/`latest`).
 
@@ -1315,22 +1315,24 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 - **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM6 Identity** → IM7–IM8 → IM9
   → (MITM só com novo GO)
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-07e`
+- **Rev. plano:** `2026-08-07f`
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
+- **Desenho DC:** [`docs/01-architecture/desenho-canal-agente-dc-20.20.md`](docs/01-architecture/desenho-canal-agente-dc-20.20.md)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.20 / IM5** (agente DC — desenho canal)
+- Passo actual: **20.20 código / IM5** (receiver DC + agente)
+- 20.20 desenho: PASS (A1–A7; TLS+HMAC; porto 8743)
 - 20.19: PASS (RADIUS accounting; GI5.3)
 - 20.18: PASS (Test LDAP GUI; GI5.4)
 - 20.17: PASS (LDAP worker + cache + fail-mode)
 - 20.16: PASS (GUI LDAP config)
 - IM3 / GI4: PASS (20.15 entitlement gate)
 - IM2: DEFER 20.7a
-- Plano rev.: 2026-08-07e
+- Plano rev.: 2026-08-07f
 - Baseline enforce: 1.9.8
 - Candidato / latest: **1.9.17** (publicado)
-- Próximo: 20.20
+- Próximo: implementação 20.20 → GI6
 ```
 
 
@@ -1507,14 +1509,14 @@ CHECKPOINT CANONICO
 - Canal publico latest: **1.9.17** (Identity RADIUS 20.19)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo **20.20/IM5** (desenho agente DC; 20.19 RADIUS PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo **20.20 código/IM5** (desenho A1–A7 PASS; 20.19 RADIUS PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
 - Pacote publicado: **1.9.17** (`SHA256=72d1a1717ac88cb68015d7912c8828099ff944e976f85f5901dfdb0471c7c49f`)
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.17**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **IM5 / 20.20** (desenho canal agente DC); MITM DEFER; GO promoção enforce; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **IM5 / 20.20 código** (receiver HTTPS + agente DC); MITM DEFER; GO promoção enforce; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
