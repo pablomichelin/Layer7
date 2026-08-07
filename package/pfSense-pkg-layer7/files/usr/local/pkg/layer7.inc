@@ -5541,6 +5541,7 @@ function layer7_has_entitlement($token)
  * directório: servidor, TLS, bind, filtros e limites ADR-0027 §4.3.
  * bind_password NUNCA em layer7.json — ficheiro 0600 separado.
  * Cliente LDAP C = 20.17; "Testar LDAP" GUI/CLI = 20.18.
+ * RADIUS accounting receiver = 20.19 (secret 0600 separado).
  * ============================================================ */
 
 function layer7_identity_secret_path()
@@ -5549,6 +5550,14 @@ function layer7_identity_secret_path()
 		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/identity-ldap.secret";
 	}
 	return "/usr/local/etc/layer7/identity-ldap.secret";
+}
+
+function layer7_identity_radius_secret_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/identity-radius.secret";
+	}
+	return "/usr/local/etc/layer7/identity-radius.secret";
 }
 
 function layer7_identity_defaults()
@@ -5566,13 +5575,19 @@ function layer7_identity_defaults()
 			"group_filter" => "(objectClass=group)",
 			"group_depth" => 5,
 			"max_members" => 4096
+		),
+		"radius" => array(
+			"enabled" => false,
+			"listen_port" => 1813,
+			"bind_address" => "0.0.0.0",
+			"nas_acl" => array()
 		)
 	);
 }
 
 /**
  * Normaliza bloco identity (defaults + clamps ADR-0027).
- * Remove bind_password se alguém o tiver colocado no JSON por engano.
+ * Remove bind_password / radius secret se alguém os tiver no JSON por engano.
  */
 function layer7_identity_normalize($identity)
 {
@@ -5633,6 +5648,48 @@ function layer7_identity_normalize($identity)
 	/* Nunca persistir password no JSON. */
 	unset($ldap["bind_password"]);
 	$out["ldap"] = $ldap;
+
+	/* RADIUS accounting (20.19) */
+	$rad_in = (isset($identity["radius"]) && is_array($identity["radius"])) ?
+	    $identity["radius"] : array();
+	$rad = $defaults["radius"];
+	$rad["enabled"] = !empty($rad_in["enabled"]);
+	$rport = isset($rad_in["listen_port"]) ? (int)$rad_in["listen_port"] : 1813;
+	if ($rport < 1 || $rport > 65535) {
+		$rport = 1813;
+	}
+	$rad["listen_port"] = $rport;
+	$bind = trim((string)($rad_in["bind_address"] ?? "0.0.0.0"));
+	if ($bind === "" || filter_var($bind, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+		$bind = "0.0.0.0";
+	}
+	$rad["bind_address"] = $bind;
+	$acl = array();
+	if (isset($rad_in["nas_acl"])) {
+		$raw_acl = $rad_in["nas_acl"];
+		if (is_string($raw_acl)) {
+			$parts = preg_split('/[\s,;]+/', $raw_acl);
+			$raw_acl = is_array($parts) ? $parts : array();
+		}
+		if (is_array($raw_acl)) {
+			foreach ($raw_acl as $ip) {
+				$ip = trim((string)$ip);
+				if ($ip === "") {
+					continue;
+				}
+				if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+					continue;
+				}
+				$acl[] = $ip;
+				if (count($acl) >= 32) {
+					break;
+				}
+			}
+		}
+	}
+	$rad["nas_acl"] = array_values(array_unique($acl));
+	unset($rad["secret"]);
+	$out["radius"] = $rad;
 	return $out;
 }
 
@@ -5714,7 +5771,7 @@ function layer7_identity_bind_password_clear()
 }
 
 /**
- * Valida identity+ldap para gravação GUI.
+ * Valida identity+ldap+radius para gravação GUI.
  * Devolve array de mensagens de erro (vazio = OK).
  */
 function layer7_identity_validate($identity)
@@ -5722,25 +5779,76 @@ function layer7_identity_validate($identity)
 	$errors = array();
 	$identity = layer7_identity_normalize($identity);
 	$ldap = $identity["ldap"];
-	if (empty($ldap["enabled"])) {
-		return $errors;
+	if (!empty($ldap["enabled"])) {
+		if ($ldap["server"] === "") {
+			$errors[] = l7_t("Servidor LDAP e obrigatorio quando o directorio esta activo.");
+		} elseif (!preg_match('/^[A-Za-z0-9._:-]+$/', $ldap["server"]) &&
+		    filter_var($ldap["server"], FILTER_VALIDATE_IP) === false) {
+			$errors[] = l7_t("Servidor LDAP invalido (use hostname ou IP).");
+		}
+		if ($ldap["base_dn"] === "") {
+			$errors[] = l7_t("Base DN e obrigatoria quando o directorio esta activo.");
+		}
+		if ($ldap["bind_dn"] === "") {
+			$errors[] = l7_t("Bind DN e obrigatorio quando o directorio esta activo.");
+		}
+		if ($ldap["port"] < 1 || $ldap["port"] > 65535) {
+			$errors[] = l7_t("Porto LDAP invalido.");
+		}
 	}
-	if ($ldap["server"] === "") {
-		$errors[] = l7_t("Servidor LDAP e obrigatorio quando o directorio esta activo.");
-	} elseif (!preg_match('/^[A-Za-z0-9._:-]+$/', $ldap["server"]) &&
-	    filter_var($ldap["server"], FILTER_VALIDATE_IP) === false) {
-		$errors[] = l7_t("Servidor LDAP invalido (use hostname ou IP).");
-	}
-	if ($ldap["base_dn"] === "") {
-		$errors[] = l7_t("Base DN e obrigatoria quando o directorio esta activo.");
-	}
-	if ($ldap["bind_dn"] === "") {
-		$errors[] = l7_t("Bind DN e obrigatorio quando o directorio esta activo.");
-	}
-	if ($ldap["port"] < 1 || $ldap["port"] > 65535) {
-		$errors[] = l7_t("Porto LDAP invalido.");
+
+	$rad = $identity["radius"];
+	if (!empty($rad["enabled"])) {
+		if ($rad["listen_port"] < 1 || $rad["listen_port"] > 65535) {
+			$errors[] = l7_t("Porto RADIUS invalido.");
+		}
+		if (empty($rad["nas_acl"]) || !is_array($rad["nas_acl"])) {
+			$errors[] = l7_t(
+			    "ACL NAS e obrigatoria quando o receiver RADIUS esta activo " .
+			    "(liste os IPs dos controladores Wi-Fi / NAS)."
+			);
+		}
 	}
 	return $errors;
+}
+
+function layer7_identity_radius_secret_is_set()
+{
+	$path = layer7_identity_radius_secret_path();
+	if (!file_exists($path) || !is_readable($path)) {
+		return false;
+	}
+	$raw = @file_get_contents($path);
+	return is_string($raw) && trim($raw) !== "";
+}
+
+function layer7_identity_radius_secret_save($secret)
+{
+	$path = layer7_identity_radius_secret_path();
+	$dir = dirname($path);
+	if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+		return false;
+	}
+	$secret = (string)$secret;
+	if (strlen($secret) > 256) {
+		$secret = substr($secret, 0, 256);
+	}
+	if (@file_put_contents($path, $secret, LOCK_EX) === false) {
+		return false;
+	}
+	@chmod($path, 0600);
+	@chown($path, "root");
+	@chgrp($path, "wheel");
+	return true;
+}
+
+function layer7_identity_radius_secret_clear()
+{
+	$path = layer7_identity_radius_secret_path();
+	if (!file_exists($path)) {
+		return true;
+	}
+	return @unlink($path);
 }
 
 /**

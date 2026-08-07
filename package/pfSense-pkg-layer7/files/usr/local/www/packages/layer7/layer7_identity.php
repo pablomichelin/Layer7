@@ -19,6 +19,7 @@ $ldap_test = null;
 $data = layer7_load_or_default();
 $identity = layer7_identity_from_config($data);
 $pwd_set = layer7_identity_bind_password_is_set();
+$radius_secret_set = layer7_identity_radius_secret_is_set();
 
 if ($unlocked && isset($_POST["test_ldap"])) {
 	/* Usa a config ja gravada + secret em disco (GI5.4: sem password no POST). */
@@ -32,6 +33,7 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 		    (string)($ldap_test["message"] ?? "");
 	}
 } elseif ($unlocked && isset($_POST["save_identity"])) {
+	$nas_raw = trim((string)($_POST["radius_nas_acl"] ?? ""));
 	$identity = array(
 		"enabled" => isset($_POST["identity_enabled"]),
 		"ldap" => array(
@@ -45,6 +47,12 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 			"group_filter" => trim((string)($_POST["ldap_group_filter"] ?? "")),
 			"group_depth" => (int)($_POST["ldap_group_depth"] ?? 5),
 			"max_members" => (int)($_POST["ldap_max_members"] ?? 4096)
+		),
+		"radius" => array(
+			"enabled" => isset($_POST["radius_enabled"]),
+			"listen_port" => (int)($_POST["radius_listen_port"] ?? 1813),
+			"bind_address" => trim((string)($_POST["radius_bind_address"] ?? "0.0.0.0")),
+			"nas_acl" => $nas_raw
 		)
 	);
 	$identity = layer7_identity_normalize($identity);
@@ -72,6 +80,29 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 		);
 	}
 
+	$new_rad_secret = (string)($_POST["radius_secret"] ?? "");
+	$clear_rad = isset($_POST["radius_clear_secret"]);
+	if ($clear_rad) {
+		if (!layer7_identity_radius_secret_clear()) {
+			$input_errors[] = l7_t("Nao foi possivel limpar o shared secret RADIUS.");
+		} else {
+			$radius_secret_set = false;
+		}
+	} elseif ($new_rad_secret !== "") {
+		if (!layer7_identity_radius_secret_save($new_rad_secret)) {
+			$input_errors[] = l7_t("Nao foi possivel gravar o shared secret RADIUS.");
+		} else {
+			$radius_secret_set = true;
+		}
+	}
+
+	if (!empty($identity["radius"]["enabled"]) && !$radius_secret_set &&
+	    empty($input_errors)) {
+		$input_errors[] = l7_t(
+		    "Shared secret RADIUS e obrigatorio quando o receiver esta activo."
+		);
+	}
+
 	if (empty($input_errors)) {
 		$data = layer7_identity_apply_to_config($data, $identity);
 		if (!layer7_save_json($data)) {
@@ -80,16 +111,21 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 			layer7_signal_reload();
 			$savemsg = l7_t(
 			    "Configuracao Identity guardada. " .
-			    "O daemon aplica LDAP (cache/fail-mode) no reload. " .
+			    "O daemon aplica LDAP e RADIUS accounting no reload. " .
 			    "Use «Testar ligacao LDAP» para validar bind + Base DN."
 			);
 			$identity = layer7_identity_from_config($data);
 			$pwd_set = layer7_identity_bind_password_is_set();
+			$radius_secret_set = layer7_identity_radius_secret_is_set();
 		}
 	}
 }
 
 $ldap = $identity["ldap"];
+$radius = isset($identity["radius"]) && is_array($identity["radius"]) ?
+    $identity["radius"] : layer7_identity_defaults()["radius"];
+$nas_acl_text = is_array($radius["nas_acl"] ?? null) ?
+    implode(", ", $radius["nas_acl"]) : "";
 if ($ldap_test === null) {
 	$ldap_test = layer7_identity_ldap_test_state_load();
 }
@@ -146,7 +182,8 @@ if ($savemsg !== "") {
 				<?= htmlspecialchars(l7_t(
 				    "Quando usar: ligue o directorio LDAP do Active Directory (ou LDAP " .
 				    "compativel) para expandir grupos. A sessao (quem esta em que IP) chega " .
-				    "depois via RADIUS accounting ou agente no DC — nao use captive portal do Layer7."
+				    "via RADIUS accounting (abaixo) ou, em passo seguinte, agente no DC — " .
+				    "nao use captive portal do Layer7."
 				)); ?>
 			</p>
 			<p class="help-block text-muted">
@@ -285,6 +322,89 @@ if ($savemsg !== "") {
 						<input type="text" name="ldap_group_filter" class="form-control" style="max-width: 520px;"
 							maxlength="512"
 							value="<?= htmlspecialchars($ldap["group_filter"]); ?>" />
+					</div>
+				</div>
+
+				<hr />
+				<h3><?= htmlspecialchars(l7_t("RADIUS accounting (fonte de sessao)")); ?></h3>
+				<p class="help-block">
+					<?= htmlspecialchars(l7_t(
+					    "O Layer7 escuta Accounting-Request (User-Name + Framed-IP) " .
+					    "do seu controlador Wi-Fi / NAS. Configure o NAS para enviar " .
+					    "accounting para este appliance (porto tipico 1813). " .
+					    "Default OFF. Secret e ACL NAS obrigatorios quando activo."
+					)); ?>
+				</p>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Receiver RADIUS")); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="radius_enabled" value="1"
+								<?= !empty($radius["enabled"]) ? 'checked="checked"' : ""; ?> />
+							<?= htmlspecialchars(l7_t("Aceitar accounting e popular o mapa user↔IP (default OFF)")); ?>
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Porto de escuta")); ?></label>
+					<div class="col-sm-9">
+						<input type="number" name="radius_listen_port" class="form-control" style="max-width: 120px;"
+							min="1" max="65535" value="<?= (int)$radius["listen_port"]; ?>" />
+						<p class="help-block"><?= htmlspecialchars(l7_t("1813 = accounting tipico (RFC 2866).")); ?></p>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Endereco de bind")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="radius_bind_address" class="form-control" style="max-width: 220px;"
+							maxlength="64"
+							value="<?= htmlspecialchars($radius["bind_address"]); ?>"
+							placeholder="0.0.0.0" />
+						<p class="help-block">
+							<?= htmlspecialchars(l7_t(
+							    "Prefira o IP da LAN. Nao exponha este porto na WAN. " .
+							    "A ACL NAS rejeita peers nao listados."
+							)); ?>
+						</p>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("ACL NAS (IPs)")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="radius_nas_acl" class="form-control" style="max-width: 520px;"
+							maxlength="512"
+							value="<?= htmlspecialchars($nas_acl_text); ?>"
+							placeholder="10.0.0.1, 10.0.0.2" />
+						<p class="help-block">
+							<?= htmlspecialchars(l7_t(
+							    "IPs dos NAS autorizados (separados por virgula). " .
+							    "Lista vazia = receiver nao arranca (seguro)."
+							)); ?>
+						</p>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Shared secret")); ?></label>
+					<div class="col-sm-9">
+						<input type="password" name="radius_secret" class="form-control" style="max-width: 320px;"
+							maxlength="256" value="" autocomplete="new-password"
+							placeholder="<?= $radius_secret_set
+							    ? htmlspecialchars(l7_t("(definido — deixe vazio para manter)"))
+							    : ""; ?>" />
+						<label class="checkbox-inline" style="margin-left: 12px;">
+							<input type="checkbox" name="radius_clear_secret" value="1" />
+							<?= htmlspecialchars(l7_t("Limpar secret guardado")); ?>
+						</label>
+						<p class="help-block">
+							<?= htmlspecialchars(l7_t(
+							    "Ficheiro privado no appliance (nao no JSON). Nunca aparece em logs."
+							)); ?>
+							<?php if ($radius_secret_set): ?>
+								— <span class="text-success"><?= htmlspecialchars(l7_t("secret definido")); ?></span>
+							<?php else: ?>
+								— <span class="text-muted"><?= htmlspecialchars(l7_t("ainda nao definido")); ?></span>
+							<?php endif; ?>
+						</p>
 					</div>
 				</div>
 

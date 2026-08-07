@@ -2,6 +2,25 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.9.17] — 2026-08-07
+
+### Added
+
+- **Identity RADIUS accounting receiver (IM5 / 20.19):** `identity_radius` no
+  daemon — thread UDP (ADR-0028), Accounting-Request (User-Name +
+  Framed-IP/v6), shared secret 0600, ACL NAS (vazia = rejeitar), Start/Interim
+  → mapa (`L7_ID_SRC_RADIUS`), Stop → remove user; Accounting-Response.
+- GUI Identity: secção RADIUS (porto 1813, bind, ACL NAS, secret).
+- Testes: `test_identity_radius.c`, `test_identity_radius_config.php`.
+
+### Notes
+
+- Canal `latest` após publish: **`1.9.17`**. Produção enforce permanece
+  **`1.9.8`** até GO.
+- Rollback lab: `1.9.16`. GI5.3 PASS (unitário); lab NAS físico residual.
+- Defaults RADIUS **OFF**; MITM permanece DEFER. Sem secret/ACL → worker
+  não arranca.
+
 ## [1.9.16] — 2026-08-07
 
 ### Added

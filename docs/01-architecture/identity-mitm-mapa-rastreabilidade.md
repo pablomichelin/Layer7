@@ -56,7 +56,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-13 | LDAP/LDAPS client | IM4 | **20.17 PASS** (OpenLDAP + worker) | DMN/PKG | LIB_DEPENDS openldap26-client |
 | M-14 | Group expansion cache + fail-mode | IM4 | **20.17 PASS** | DMN | ADR-0027; TTL 300s |
 | M-14a | Test connection LDAP (GUI/CLI) | IM4 | **20.18 PASS** | DMN/PKG | `--ldap-test` JSON; GI5.4; sem secrets |
-| M-15 | RADIUS **accounting receiver** | IM5 | Planeado | DMN/PKG | canónico |
+| M-15 | RADIUS **accounting receiver** | IM5 | **Feito** (20.19) | DMN/PKG | canónico |
 | M-16 | **Agente no DC** → push logons | IM5 | Planeado | OPS/DMN | canónico; não WinRM |
 | M-17 | Conflict policy same-IP | IM5 | Planeado | DMN | |
 | M-18 | Policy `ad_users`/`ad_groups` | IM6 | Planeado | GUI/PKG/DMN | |
@@ -151,3 +151,4 @@ Policy ad_* → IPs do mapa → enforce PF
 | 2026-08-06 | **20.13** — M-11 API + M-12 dump JSON PASS |
 | 2026-08-06 | **20.14** — persistência snap + stale skip PASS |
 | 2026-08-07 | **20.15 / GI4** — gate entitlement em main PASS |
+| 2026-08-07 | **20.19** — M-15 PASS (`identity_radius` accounting receiver; GI5.3) |

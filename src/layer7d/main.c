@@ -15,6 +15,7 @@
 #include "features.h"
 #include "identity_map.h"
 #include "identity_ldap.h"
+#include "identity_radius.h"
 #include "license.h"
 #include "log_store.h"
 #include "policy.h"
@@ -113,6 +114,7 @@ static time_t s_last_checkin_tick;
 static struct l7_id_map s_idmap;
 static int s_idmap_active;
 static struct l7_ldap_worker *s_ldap_worker;
+static struct l7_radius_worker *s_radius_worker;
 static int s_license_state = -1; /* 0=invalid, 1=valid, 2=grace/dev */
 
 static struct l7_blacklist *s_blacklist;
@@ -333,6 +335,21 @@ write_stats_json(void)
 		else if (st == L7_LDAP_STATUS_DOWN)
 			lst = "down";
 		fprintf(f, "  \"identity_ldap_status\": \"%s\",\n", lst);
+	}
+	{
+		const char *rst = "off";
+		enum l7_radius_status st = s_radius_worker ?
+		    layer7_radius_worker_status(s_radius_worker) :
+		    L7_RADIUS_STATUS_OFF;
+		if (st == L7_RADIUS_STATUS_LISTEN)
+			rst = "listen";
+		else if (st == L7_RADIUS_STATUS_ERROR)
+			rst = "error";
+		fprintf(f, "  \"identity_radius_status\": \"%s\",\n", rst);
+		fprintf(f, "  \"identity_radius_accepted\": %u,\n",
+		    layer7_radius_worker_accepted(s_radius_worker));
+		fprintf(f, "  \"identity_radius_rejected\": %u,\n",
+		    layer7_radius_worker_rejected(s_radius_worker));
 	}
 
 	{
@@ -886,8 +903,8 @@ license_apply_invalidation(const char *reason)
 }
 
 /*
- * ADR-0028 / 20.15–20.17: sem entitlement → zero threads / zero mapa.
- * SIGHUP: mapa sobrevive; worker LDAP relê config.
+ * ADR-0028 / 20.15–20.19: sem entitlement → zero threads / zero mapa.
+ * SIGHUP: mapa sobrevive; workers LDAP/RADIUS relêem config.
  */
 static void
 identity_ldap_sync_worker(const char *reason)
@@ -926,6 +943,43 @@ identity_ldap_sync_worker(const char *reason)
 }
 
 static void
+identity_radius_sync_worker(const char *reason)
+{
+	char *buf = NULL;
+	size_t len = 0;
+	struct l7_radius_cfg cfg;
+
+	layer7_radius_cfg_defaults(&cfg);
+	buf = read_file(config_path, &len);
+	if (buf != NULL) {
+		(void)layer7_radius_cfg_parse_json(buf, len, &cfg);
+		free(buf);
+	}
+	(void)layer7_radius_cfg_load_secret(&cfg, NULL);
+
+	if (cfg.radius_enabled) {
+		if (s_radius_worker == NULL) {
+			s_radius_worker = layer7_radius_worker_start(&s_idmap,
+			    &cfg);
+			if (s_radius_worker)
+				L7_NOTE("identity: radius worker ON (%s)",
+				    reason ? reason : "?");
+			else
+				L7_WARN("identity: radius worker start failed (%s)",
+				    reason ? reason : "?");
+		} else {
+			layer7_radius_worker_reload(s_radius_worker, &cfg);
+		}
+	} else if (s_radius_worker != NULL) {
+		layer7_radius_worker_stop(s_radius_worker);
+		s_radius_worker = NULL;
+		L7_NOTE("identity: radius worker OFF (%s)",
+		    reason ? reason : "?");
+	}
+	layer7_radius_cfg_wipe_secret(&cfg);
+}
+
+static void
 identity_module_sync(const char *reason)
 {
 	int want = layer7_features_allows_identity(s_lic.features_flags);
@@ -944,10 +998,15 @@ identity_module_sync(const char *reason)
 		L7_NOTE("identity: module ON (%s) sessions_loaded=%d",
 		    reason ? reason : "?", n < 0 ? 0 : n);
 		identity_ldap_sync_worker(reason);
+		identity_radius_sync_worker(reason);
 	} else if (!want && s_idmap_active) {
 		if (s_ldap_worker) {
 			layer7_ldap_worker_stop(s_ldap_worker);
 			s_ldap_worker = NULL;
+		}
+		if (s_radius_worker) {
+			layer7_radius_worker_stop(s_radius_worker);
+			s_radius_worker = NULL;
 		}
 		(void)layer7_idmap_save(&s_idmap, NULL);
 		layer7_idmap_fini(&s_idmap);
@@ -961,6 +1020,7 @@ identity_module_sync(const char *reason)
 			L7_NOTE("identity: expired %u stale (%s)", rem,
 			    reason ? reason : "?");
 		identity_ldap_sync_worker(reason);
+		identity_radius_sync_worker(reason);
 	}
 }
 
@@ -970,6 +1030,10 @@ identity_module_shutdown(void)
 	if (s_ldap_worker) {
 		layer7_ldap_worker_stop(s_ldap_worker);
 		s_ldap_worker = NULL;
+	}
+	if (s_radius_worker) {
+		layer7_radius_worker_stop(s_radius_worker);
+		s_radius_worker = NULL;
 	}
 	if (!s_idmap_active)
 		return;

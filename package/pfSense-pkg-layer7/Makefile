@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.16
+PORTVERSION=	1.9.17
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -22,8 +22,8 @@ LIB_DEPENDS=	libldap.so.2:net/openldap26-client
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c) || !exists(${LAYER7D_DIR}/identity_ldap.c)
-.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, features.c, blacklist.c, bl_config.c, allowlist.c, log_store.c, identity_map.c, identity_ldap.c)."
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c) || !exists(${LAYER7D_DIR}/identity_ldap.c) || !exists(${LAYER7D_DIR}/identity_radius.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, features.c, blacklist.c, bl_config.c, allowlist.c, log_store.c, identity_map.c, identity_ldap.c, identity_radius.c)."
 .endif
 
 NDPI_PREFIX=	/usr/local
@@ -40,7 +40,7 @@ LAYER7_NDPI_CFLAGS=	-DHAVE_NDPI=0
 LAYER7_NDPI_LDFLAGS=
 LAYER7_NDPI_SRCS=
 .endif
-# identity_map + ldap worker (20.12 / 20.17 / ADR-0028) — pthread + OpenLDAP
+# identity_map + ldap + radius (20.12 / 20.17 / 20.19 / ADR-0028) — pthread + OpenLDAP
 LAYER7_PTHREAD_LDFLAGS=	-lpthread
 LAYER7_LDAP_CFLAGS=	-DHAVE_OPENLDAP=1 -I/usr/local/include
 LAYER7_LDAP_LDFLAGS=	-L/usr/local/lib -lldap -llber
@@ -65,6 +65,7 @@ do-build:
 		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
 		${LAYER7D_DIR}/allowlist.c ${LAYER7D_DIR}/log_store.c \
 		${LAYER7D_DIR}/identity_map.c ${LAYER7D_DIR}/identity_ldap.c \
+		${LAYER7D_DIR}/identity_radius.c \
 		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} ${LAYER7_PTHREAD_LDFLAGS} \
 		${LAYER7_LDAP_LDFLAGS} \
 		/usr/lib/libcrypto.a

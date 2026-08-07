@@ -67,6 +67,35 @@ else
 	fail "test_identity_ldap compile"
 fi
 
+step "Unit: identity_radius accounting (20.19)"
+CRYPTO_FLAGS=""
+if [ -f /usr/local/opt/openssl/lib/libcrypto.dylib ] || [ -f /opt/homebrew/opt/openssl/lib/libcrypto.dylib ]; then
+	if [ -d /opt/homebrew/opt/openssl ]; then
+		CRYPTO_FLAGS="-I/opt/homebrew/opt/openssl/include -L/opt/homebrew/opt/openssl/lib -lcrypto"
+	else
+		CRYPTO_FLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib -lcrypto"
+	fi
+elif pkg-config --exists libcrypto 2>/dev/null; then
+	CRYPTO_FLAGS="$(pkg-config --cflags --libs libcrypto)"
+else
+	CRYPTO_FLAGS="-lcrypto"
+fi
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_identity_radius \
+    tests/functional/test_identity_radius.c \
+    src/layer7d/identity_radius.c src/layer7d/identity_map.c \
+    -lpthread $CRYPTO_FLAGS \
+    2>/tmp/test_identity_radius.cc.err; then
+	if /tmp/test_identity_radius; then
+		pass "test_identity_radius"
+	else
+		fail "test_identity_radius runtime"
+	fi
+else
+	cat /tmp/test_identity_radius.cc.err
+	fail "test_identity_radius compile"
+fi
+
 step "Unit: config_parse (sni_inspection / A3)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_config_parse \
@@ -252,6 +281,11 @@ else
 		pass "test_identity_ldap_config"
 	else
 		fail "test_identity_ldap_config"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_identity_radius_config.php; then
+		pass "test_identity_radius_config"
+	else
+		fail "test_identity_radius_config"
 	fi
 	if "$PHP_BIN_E2" tests/functional/test_logging_reports.php; then
 		pass "test_logging_reports"
