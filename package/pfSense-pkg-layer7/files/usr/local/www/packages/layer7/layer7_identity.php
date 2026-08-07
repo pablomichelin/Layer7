@@ -12,14 +12,87 @@ require_once("/usr/local/pkg/layer7.inc");
 $ent = layer7_entitlements();
 $unlocked = !empty($ent["has_identity"]);
 
+$input_errors = array();
+$savemsg = "";
+
+$data = layer7_load_or_default();
+$identity = layer7_identity_from_config($data);
+$pwd_set = layer7_identity_bind_password_is_set();
+
+if ($unlocked && isset($_POST["save_identity"])) {
+	$identity = array(
+		"enabled" => isset($_POST["identity_enabled"]),
+		"ldap" => array(
+			"enabled" => isset($_POST["ldap_enabled"]),
+			"server" => trim((string)($_POST["ldap_server"] ?? "")),
+			"port" => (int)($_POST["ldap_port"] ?? 636),
+			"use_tls" => isset($_POST["ldap_use_tls"]),
+			"bind_dn" => trim((string)($_POST["ldap_bind_dn"] ?? "")),
+			"base_dn" => trim((string)($_POST["ldap_base_dn"] ?? "")),
+			"user_filter" => trim((string)($_POST["ldap_user_filter"] ?? "")),
+			"group_filter" => trim((string)($_POST["ldap_group_filter"] ?? "")),
+			"group_depth" => (int)($_POST["ldap_group_depth"] ?? 5),
+			"max_members" => (int)($_POST["ldap_max_members"] ?? 4096)
+		)
+	);
+	$identity = layer7_identity_normalize($identity);
+	$input_errors = layer7_identity_validate($identity);
+
+	$new_pwd = (string)($_POST["ldap_bind_password"] ?? "");
+	$clear_pwd = isset($_POST["ldap_clear_password"]);
+	if ($clear_pwd) {
+		if (!layer7_identity_bind_password_clear()) {
+			$input_errors[] = l7_t("Nao foi possivel limpar a palavra-passe de bind.");
+		} else {
+			$pwd_set = false;
+		}
+	} elseif ($new_pwd !== "") {
+		if (!layer7_identity_bind_password_save($new_pwd)) {
+			$input_errors[] = l7_t("Nao foi possivel gravar a palavra-passe de bind.");
+		} else {
+			$pwd_set = true;
+		}
+	}
+
+	if (!empty($identity["ldap"]["enabled"]) && !$pwd_set && empty($input_errors)) {
+		$input_errors[] = l7_t(
+		    "Palavra-passe de bind e obrigatoria quando o directorio LDAP esta activo."
+		);
+	}
+
+	if (empty($input_errors)) {
+		$data = layer7_identity_apply_to_config($data, $identity);
+		if (!layer7_save_json($data)) {
+			$input_errors[] = l7_t("Nao foi possivel gravar a configuracao Identity.");
+		} else {
+			layer7_signal_reload();
+			$savemsg = l7_t(
+			    "Configuracao Identity guardada. " .
+			    "A expansao de grupos LDAP entra em passos seguintes; " .
+			    "o mapa de utilizadores no daemon ja esta activo com o entitlement."
+			);
+			$identity = layer7_identity_from_config($data);
+			$pwd_set = layer7_identity_bind_password_is_set();
+		}
+	}
+}
+
+$ldap = $identity["ldap"];
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Identity"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
 include("head.inc");
 layer7_render_styles();
+
+if (!empty($input_errors)) {
+	print_input_errors($input_errors);
+}
+if ($savemsg !== "") {
+	print_info_box($savemsg, "success");
+}
 ?>
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Layer 7 - Identity (User-ID)")); ?></h2>
+		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Layer 7 - Identity (mapa de utilizadores)")); ?></h2>
 		<?php layer7_render_tabs("identity"); ?>
 	</div>
 	<div class="panel-body">
@@ -42,16 +115,204 @@ layer7_render_styles();
 			</div>
 			<p class="layer7-lead">
 				<?= htmlspecialchars(l7_t(
-				    "Quando o entitlement estiver activo, esta pagina configurara fontes " .
-				    "(RADIUS accounting, agente no Domain Controller, LDAP) e o diagnostico do mapa no daemon."
+				    "Quando o entitlement estiver activo, esta pagina configura o directorio LDAP " .
+				    "e, em passos seguintes, as fontes de sessao (RADIUS, agente no Domain Controller)."
 				)); ?>
 			</p>
 <?php else: ?>
-			<div class="alert alert-success" role="alert">
+			<div class="alert alert-success" role="alert" style="margin-bottom: 16px;">
 				<?= htmlspecialchars(l7_t("Entitlement identity activo.")); ?>
-				<?= htmlspecialchars(l7_t("Configuracao Identity chega nas ondas IM3–IM6 — por agora so o gate comercial esta aberto.")); ?>
+				<?= htmlspecialchars(l7_t(
+				    "Isto e User-ID de rede (mapa utilizador↔IP), nao um agente em cada PC."
+				)); ?>
 			</div>
-			<p class="layer7-lead">
+
+			<p class="help-block" style="margin-top:0;">
+				<?= htmlspecialchars(l7_t(
+				    "Quando usar: ligue o directorio LDAP do Active Directory (ou LDAP " .
+				    "compativel) para expandir grupos. A sessao (quem esta em que IP) chega " .
+				    "depois via RADIUS accounting ou agente no DC — nao use captive portal do Layer7."
+				)); ?>
+			</p>
+			<p class="help-block text-muted">
+				<?= htmlspecialchars(l7_t(
+				    "Sem inspeccao TLS (MITM): bloqueio HTTPS continua alinhado a pagina HTTP/DNS. " .
+				    "Se o LDAP falhar depois de activo, politicas por grupo deixam de aplicar " .
+				    "(fail-mode seguro) — a LAN nao e fechada."
+				)); ?>
+			</p>
+
+			<form method="post" action="layer7_identity.php" class="form-horizontal">
+				<input type="hidden" name="save_identity" value="1" />
+
+				<h3 style="margin-top: 8px;"><?= htmlspecialchars(l7_t("Modulo Identity")); ?></h3>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Activar Identity")); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="identity_enabled" value="1"
+								<?= !empty($identity["enabled"]) ? 'checked="checked"' : ""; ?> />
+							<?= htmlspecialchars(l7_t("Intencao de usar o add-on neste appliance (default OFF)")); ?>
+						</label>
+						<p class="help-block">
+							<?= htmlspecialchars(l7_t(
+							    "O daemon so inicializa o mapa com entitlement. Este toggle prepara a config; " .
+							    "fontes de sessao e politicas por grupo entram em passos seguintes."
+							)); ?>
+						</p>
+					</div>
+				</div>
+
+				<hr />
+				<h3><?= htmlspecialchars(l7_t("Directorio LDAP / LDAPS")); ?></h3>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Usar directorio")); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="ldap_enabled" value="1"
+								<?= !empty($ldap["enabled"]) ? 'checked="checked"' : ""; ?> />
+							<?= htmlspecialchars(l7_t("Consultar LDAP para grupos (default OFF)")); ?>
+						</label>
+						<p class="help-block">
+							<?= htmlspecialchars(l7_t("Prefira LDAPS (TLS). Conta de servico com privilegio minimo.")); ?>
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Servidor")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="ldap_server" class="form-control" style="max-width: 420px;"
+							maxlength="253"
+							value="<?= htmlspecialchars($ldap["server"]); ?>"
+							placeholder="dc01.empresa.local" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Porto")); ?></label>
+					<div class="col-sm-9">
+						<input type="number" name="ldap_port" class="form-control" style="max-width: 120px;"
+							min="1" max="65535" value="<?= (int)$ldap["port"]; ?>" />
+						<p class="help-block"><?= htmlspecialchars(l7_t("636 = LDAPS tipico; 389 = LDAP (menos seguro).")); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("TLS / LDAPS")); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="ldap_use_tls" value="1"
+								<?= !empty($ldap["use_tls"]) ? 'checked="checked"' : ""; ?> />
+							<?= htmlspecialchars(l7_t("Usar ligacao cifrada (recomendado)")); ?>
+						</label>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Bind DN")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="ldap_bind_dn" class="form-control" style="max-width: 520px;"
+							maxlength="512"
+							value="<?= htmlspecialchars($ldap["bind_dn"]); ?>"
+							placeholder="CN=layer7,OU=Service,DC=empresa,DC=local" />
+						<p class="help-block"><?= htmlspecialchars(l7_t("Conta de servico que le o directorio.")); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Palavra-passe de bind")); ?></label>
+					<div class="col-sm-9">
+						<input type="password" name="ldap_bind_password" class="form-control" style="max-width: 320px;"
+							maxlength="256" value="" autocomplete="new-password"
+							placeholder="<?= $pwd_set
+							    ? htmlspecialchars(l7_t("(definida — deixe vazio para manter)"))
+							    : ""; ?>" />
+						<label class="checkbox-inline" style="margin-left: 12px;">
+							<input type="checkbox" name="ldap_clear_password" value="1" />
+							<?= htmlspecialchars(l7_t("Limpar palavra-passe guardada")); ?>
+						</label>
+						<p class="help-block">
+							<?= htmlspecialchars(l7_t(
+							    "Guardada num ficheiro privado no appliance (nao no JSON de config). " .
+							    "Nunca aparece em logs."
+							)); ?>
+							<?php if ($pwd_set): ?>
+								— <span class="text-success"><?= htmlspecialchars(l7_t("palavra-passe definida")); ?></span>
+							<?php else: ?>
+								— <span class="text-muted"><?= htmlspecialchars(l7_t("ainda nao definida")); ?></span>
+							<?php endif; ?>
+						</p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Base DN")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="ldap_base_dn" class="form-control" style="max-width: 520px;"
+							maxlength="512"
+							value="<?= htmlspecialchars($ldap["base_dn"]); ?>"
+							placeholder="DC=empresa,DC=local" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Filtro de utilizadores")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="ldap_user_filter" class="form-control" style="max-width: 520px;"
+							maxlength="512"
+							value="<?= htmlspecialchars($ldap["user_filter"]); ?>" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Filtro de grupos")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="ldap_group_filter" class="form-control" style="max-width: 520px;"
+							maxlength="512"
+							value="<?= htmlspecialchars($ldap["group_filter"]); ?>" />
+					</div>
+				</div>
+
+				<hr />
+				<h3><?= htmlspecialchars(l7_t("Limites de escala")); ?></h3>
+				<p class="help-block">
+					<?= htmlspecialchars(l7_t(
+					    "Limites para expansao de grupos aninhados (defaults ADR-0027). " .
+					    "Estouro = log previsivel, sem fechar a LAN."
+					)); ?>
+				</p>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Profundidade de grupos")); ?></label>
+					<div class="col-sm-9">
+						<input type="number" name="ldap_group_depth" class="form-control" style="max-width: 120px;"
+							min="1" max="10" value="<?= (int)$ldap["group_depth"]; ?>" />
+						<p class="help-block"><?= htmlspecialchars(l7_t("Default 5 (grupos aninhados).")); ?></p>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Max. membros por grupo")); ?></label>
+					<div class="col-sm-9">
+						<input type="number" name="ldap_max_members" class="form-control" style="max-width: 120px;"
+							min="1" max="16384" value="<?= (int)$ldap["max_members"]; ?>" />
+						<p class="help-block"><?= htmlspecialchars(l7_t("Default 4096.")); ?></p>
+					</div>
+				</div>
+
+				<div class="form-group" style="margin-top: 20px;">
+					<div class="col-sm-9 col-sm-offset-3">
+						<button type="submit" class="btn btn-primary">
+							<?= htmlspecialchars(l7_t("Guardar")); ?>
+						</button>
+						<span class="text-muted" style="margin-left: 12px; font-size: 12px;">
+							<?= htmlspecialchars(l7_t(
+							    "Testar ligacao LDAP chega no passo seguinte da trilha."
+							)); ?>
+						</span>
+					</div>
+				</div>
+			</form>
+			<p class="text-muted" style="margin-top: 24px; font-size: 12px;">
 				features=<?= htmlspecialchars($ent["raw"]); ?>
 			</p>
 <?php endif; ?>

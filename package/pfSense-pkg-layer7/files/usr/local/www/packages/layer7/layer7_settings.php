@@ -21,6 +21,10 @@ if ($_POST["export_config"] ?? false) {
 	$data = layer7_load_or_default();
 	$export = isset($data["layer7"]) ? $data["layer7"] : array();
 	unset($export["protos_file"]);
+	/* Nunca exportar segredos LDAP (ficheiro separado; limpar se legado). */
+	if (isset($export["identity"]["ldap"]["bind_password"])) {
+		unset($export["identity"]["ldap"]["bind_password"]);
+	}
 	$bl_export = layer7_bl_config_load();
 	$profiles_custom_export = layer7_profiles_custom_load();
 	$payload = array(

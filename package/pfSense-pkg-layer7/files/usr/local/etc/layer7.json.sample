@@ -43,6 +43,21 @@
         }
       }
     ],
-    "exceptions": []
+    "exceptions": [],
+    "identity": {
+      "enabled": false,
+      "ldap": {
+        "enabled": false,
+        "server": "",
+        "port": 636,
+        "use_tls": true,
+        "bind_dn": "",
+        "base_dn": "",
+        "user_filter": "(&(objectCategory=person)(objectClass=user))",
+        "group_filter": "(objectClass=group)",
+        "group_depth": 5,
+        "max_members": 4096
+      }
+    }
   }
 }

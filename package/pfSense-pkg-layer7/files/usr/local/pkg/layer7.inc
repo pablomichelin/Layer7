@@ -2134,7 +2134,9 @@ function layer7_bare_config()
 			"policies" => array(),
 			"exceptions" => array(),
 			"dst_allowlist" => array(),
-			"device_aliases" => array()
+			"device_aliases" => array(),
+			/* IM4 / 20.16 — Identity config (default OFF; sem secrets). */
+			"identity" => layer7_identity_defaults()
 		)
 	);
 }
@@ -5530,6 +5532,215 @@ function layer7_has_entitlement($token)
 		return !empty($e["has_mitm"]);
 	}
 	return false;
+}
+
+/* ============================================================
+ * IM4 / 20.16 — Identity / LDAP directory config (GUI).
+ *
+ * SSOT de sessão continua no daemon (mapa). Aqui só configuração de
+ * directório: servidor, TLS, bind, filtros e limites ADR-0027 §4.3.
+ * bind_password NUNCA em layer7.json — ficheiro 0600 separado.
+ * Cliente LDAP C = passo 20.17; "Testar LDAP" = 20.18.
+ * ============================================================ */
+
+function layer7_identity_secret_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/identity-ldap.secret";
+	}
+	return "/usr/local/etc/layer7/identity-ldap.secret";
+}
+
+function layer7_identity_defaults()
+{
+	return array(
+		"enabled" => false,
+		"ldap" => array(
+			"enabled" => false,
+			"server" => "",
+			"port" => 636,
+			"use_tls" => true,
+			"bind_dn" => "",
+			"base_dn" => "",
+			"user_filter" => "(&(objectCategory=person)(objectClass=user))",
+			"group_filter" => "(objectClass=group)",
+			"group_depth" => 5,
+			"max_members" => 4096
+		)
+	);
+}
+
+/**
+ * Normaliza bloco identity (defaults + clamps ADR-0027).
+ * Remove bind_password se alguém o tiver colocado no JSON por engano.
+ */
+function layer7_identity_normalize($identity)
+{
+	$defaults = layer7_identity_defaults();
+	if (!is_array($identity)) {
+		$identity = array();
+	}
+	$out = $defaults;
+	$out["enabled"] = !empty($identity["enabled"]);
+	$ldap_in = (isset($identity["ldap"]) && is_array($identity["ldap"])) ?
+	    $identity["ldap"] : array();
+	$ldap = $defaults["ldap"];
+	$ldap["enabled"] = !empty($ldap_in["enabled"]);
+	$ldap["server"] = trim((string)($ldap_in["server"] ?? ""));
+	if (strlen($ldap["server"]) > 253) {
+		$ldap["server"] = substr($ldap["server"], 0, 253);
+	}
+	$port = isset($ldap_in["port"]) ? (int)$ldap_in["port"] : 636;
+	if ($port < 1 || $port > 65535) {
+		$port = !empty($ldap_in["use_tls"]) || !isset($ldap_in["use_tls"]) ? 636 : 389;
+	}
+	$ldap["port"] = $port;
+	$ldap["use_tls"] = !isset($ldap_in["use_tls"]) ? true : !empty($ldap_in["use_tls"]);
+	$ldap["bind_dn"] = trim((string)($ldap_in["bind_dn"] ?? ""));
+	if (strlen($ldap["bind_dn"]) > 512) {
+		$ldap["bind_dn"] = substr($ldap["bind_dn"], 0, 512);
+	}
+	$ldap["base_dn"] = trim((string)($ldap_in["base_dn"] ?? ""));
+	if (strlen($ldap["base_dn"]) > 512) {
+		$ldap["base_dn"] = substr($ldap["base_dn"], 0, 512);
+	}
+	$uf = trim((string)($ldap_in["user_filter"] ?? ""));
+	$ldap["user_filter"] = ($uf !== "") ? $uf : $defaults["ldap"]["user_filter"];
+	if (strlen($ldap["user_filter"]) > 512) {
+		$ldap["user_filter"] = substr($ldap["user_filter"], 0, 512);
+	}
+	$gf = trim((string)($ldap_in["group_filter"] ?? ""));
+	$ldap["group_filter"] = ($gf !== "") ? $gf : $defaults["ldap"]["group_filter"];
+	if (strlen($ldap["group_filter"]) > 512) {
+		$ldap["group_filter"] = substr($ldap["group_filter"], 0, 512);
+	}
+	$depth = isset($ldap_in["group_depth"]) ? (int)$ldap_in["group_depth"] : 5;
+	if ($depth < 1) {
+		$depth = 1;
+	}
+	if ($depth > 10) {
+		$depth = 10;
+	}
+	$ldap["group_depth"] = $depth;
+	$mm = isset($ldap_in["max_members"]) ? (int)$ldap_in["max_members"] : 4096;
+	if ($mm < 1) {
+		$mm = 1;
+	}
+	if ($mm > 16384) {
+		$mm = 16384;
+	}
+	$ldap["max_members"] = $mm;
+	/* Nunca persistir password no JSON. */
+	unset($ldap["bind_password"]);
+	$out["ldap"] = $ldap;
+	return $out;
+}
+
+function layer7_identity_from_config($data)
+{
+	if (!is_array($data) || !isset($data["layer7"]) || !is_array($data["layer7"])) {
+		return layer7_identity_defaults();
+	}
+	$raw = isset($data["layer7"]["identity"]) ? $data["layer7"]["identity"] : null;
+	return layer7_identity_normalize($raw);
+}
+
+function layer7_identity_apply_to_config($data, $identity)
+{
+	if (!is_array($data)) {
+		$data = layer7_bare_config();
+	}
+	if (!isset($data["layer7"]) || !is_array($data["layer7"])) {
+		$data["layer7"] = layer7_bare_config()["layer7"];
+	}
+	$data["layer7"]["identity"] = layer7_identity_normalize($identity);
+	return $data;
+}
+
+function layer7_identity_bind_password_is_set()
+{
+	$path = layer7_identity_secret_path();
+	if (!file_exists($path) || !is_readable($path)) {
+		return false;
+	}
+	$raw = @file_get_contents($path);
+	return is_string($raw) && trim($raw) !== "";
+}
+
+/**
+ * Lê a palavra-passe de bind (só para uso runtime futuro / testes).
+ * Nunca logar o retorno.
+ */
+function layer7_identity_bind_password_load()
+{
+	$path = layer7_identity_secret_path();
+	if (!file_exists($path)) {
+		return "";
+	}
+	$raw = @file_get_contents($path);
+	if (!is_string($raw)) {
+		return "";
+	}
+	return rtrim($raw, "\r\n");
+}
+
+function layer7_identity_bind_password_save($password)
+{
+	$path = layer7_identity_secret_path();
+	$dir = dirname($path);
+	if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+		return false;
+	}
+	$password = (string)$password;
+	if (strlen($password) > 256) {
+		$password = substr($password, 0, 256);
+	}
+	if (@file_put_contents($path, $password, LOCK_EX) === false) {
+		return false;
+	}
+	@chmod($path, 0600);
+	@chown($path, "root");
+	@chgrp($path, "wheel");
+	return true;
+}
+
+function layer7_identity_bind_password_clear()
+{
+	$path = layer7_identity_secret_path();
+	if (!file_exists($path)) {
+		return true;
+	}
+	return @unlink($path);
+}
+
+/**
+ * Valida identity+ldap para gravação GUI.
+ * Devolve array de mensagens de erro (vazio = OK).
+ */
+function layer7_identity_validate($identity)
+{
+	$errors = array();
+	$identity = layer7_identity_normalize($identity);
+	$ldap = $identity["ldap"];
+	if (empty($ldap["enabled"])) {
+		return $errors;
+	}
+	if ($ldap["server"] === "") {
+		$errors[] = l7_t("Servidor LDAP e obrigatorio quando o directorio esta activo.");
+	} elseif (!preg_match('/^[A-Za-z0-9._:-]+$/', $ldap["server"]) &&
+	    filter_var($ldap["server"], FILTER_VALIDATE_IP) === false) {
+		$errors[] = l7_t("Servidor LDAP invalido (use hostname ou IP).");
+	}
+	if ($ldap["base_dn"] === "") {
+		$errors[] = l7_t("Base DN e obrigatoria quando o directorio esta activo.");
+	}
+	if ($ldap["bind_dn"] === "") {
+		$errors[] = l7_t("Bind DN e obrigatorio quando o directorio esta activo.");
+	}
+	if ($ldap["port"] < 1 || $ldap["port"] > 65535) {
+		$errors[] = l7_t("Porto LDAP invalido.");
+	}
+	return $errors;
 }
 
 /* ============================================================

@@ -307,7 +307,7 @@ reavaliacao formal.
 | BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **Concluido (20.2 PASS / GI0)** | ADRs 0025–0028 Aceito; T1 |
 | BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Concluido (20.6 / GI1 PASS)** | check-in ∩ .lic + gates |
 | BG-087 | MITM TLS opt-in + CA (IM2) | Critica | daemon/package/PKI | IM2 | UX HTTPS; segundo produto | G | Alto | **Diferido (20.7a)** | ADR-0026 rev. d; Squid rejeitado; GI2/GI3 DEFERRED; reabrir só com novo GO + helper próprio |
-| BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | Em curso / **passo 20.16** | IM3/GI4 PASS; LDAP a seguir |
+| BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | Em curso / **passo 20.17** | IM3/GI4 PASS; **20.16 GUI LDAP PASS**; cliente C a seguir |
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | Planeado | WinRM outbound não canónico |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Planeado | GI7; não-regressão IP/MAC |
 | BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | Planeado / adiável | GI8 ou ADR exclusão |

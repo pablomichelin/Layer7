@@ -232,6 +232,11 @@ else
 	else
 		fail "test_interface_normalization"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_identity_ldap_config.php; then
+		pass "test_identity_ldap_config"
+	else
+		fail "test_identity_ldap_config"
+	fi
 	if "$PHP_BIN_E2" tests/functional/test_logging_reports.php; then
 		pass "test_logging_reports"
 	else

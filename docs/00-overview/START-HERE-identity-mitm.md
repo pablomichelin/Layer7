@@ -36,13 +36,13 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-07a`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-07b`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM4 / 20.16** — GUI/config LDAP (directório) |
-| Código do produto nesta trilha | **IM3 fechado** (20.11a–20.15 / GI4); **sem** MITM; LDAP ainda não |
-| Rev. do plano | **`2026-08-07a`** |
+| Passo actual | **IM4 / 20.17** — LDAP resolve grupos + cache + fail-mode |
+| Código do produto nesta trilha | **20.16 PASS** (GUI LDAP); **IM3** mapa; **sem** MITM; cliente LDAP C ainda não |
+| Rev. do plano | **`2026-08-07b`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -122,7 +122,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM4 / 20.16 — LDAP config GUI).
+Tarefa: continuar no passo actual (IM4 / 20.17 — LDAP resolve grupos + cache).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -141,12 +141,13 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM4 / 20.16 (LDAP config GUI)
+- Passo actual: IM4 / 20.17 (LDAP resolve + cache)
+- 20.16: PASS (config GUI LDAP)
 - IM0+IM1: PASS; IM2 DEFER 20.7a
 - IM3 / 20.11a–20.15: PASS (GI4)
 - Posicionamento PME Identity-first: ACEITE
-- Código: identity_map gated por entitlement; zero threads OFF
-- Plano rev.: 2026-08-07a
+- Código: identity_map gated; GUI LDAP; zero threads OFF
+- Plano rev.: 2026-08-07b
 - Baseline enforce: 1.9.8
 - Candidato port: 1.9.14 (não publicado)
 ```
