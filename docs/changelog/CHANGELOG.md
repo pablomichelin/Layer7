@@ -8,6 +8,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - (vazio — próximo: agente Windows Event Log / fecho 20.20)
 
+## [1.9.20] — 2026-08-07
+
+### Fixed
+
+- **Tabs GUI contraste:** tema pfSense forca links brancos em panel-heading;
+  tabs Layer7 passam a vermelho/cinza explicitos (legiveis no fundo claro).
+
+### Notes
+
+- Canal `latest`: **`1.9.20`**. Produção enforce **`1.9.8`**.
+- SHA256: `a41e7287c257c6842adbda4f81b1e2b411dbc912cc2da8433bbcc62fc1d8f254`.
+- Rollback lab: `1.9.19`.
+
 ## [1.9.19] — 2026-08-07
 
 ### Fixed
