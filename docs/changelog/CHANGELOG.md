@@ -6,10 +6,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- **Identity / 20.20 código (parcial):** receiver HTTPS `identity_dc` no daemon
-  (token + HMAC-SHA256, ACL DC, skew, rate limit); GUI Identity secção agente DC;
+- (vazio — próximo: agente Windows Event Log / fecho 20.20)
+
+## [1.9.18] — 2026-08-07
+
+### Added
+
+- **Identity DC receiver (IM5 / 20.20 parcial):** `identity_dc` no daemon —
+  HTTPS (OpenSSL), token + HMAC-SHA256, ACL DC, skew, rate limit → mapa
+  (`L7_ID_SRC_DC_AGENT`); GUI Identity secção agente DC (gerar token, bind LAN);
   script lab `docs/samples/identity-dc-agent/Send-Layer7IdentityEvent.ps1`.
-  Servico Windows Event Log completo = passo seguinte. Candidato **1.9.18**.
+- Teste: `tests/functional/test_identity_dc.c`.
+
+### Notes
+
+- Canal `latest` após publish: **`1.9.18`**. Produção enforce permanece
+  **`1.9.8`** até GO.
+- SHA256: `cda98abcba72de8878dddc881412af0b64d833aa686637a361c57cb8cdfff834`.
+- Rollback lab: `1.9.17`. Serviço Windows Event Log completo = passo seguinte.
+- Defaults DC **OFF**; MITM permanece DEFER. RADIUS 20.19 mantém-se.
 
 ## [1.9.17] — 2026-08-07
 

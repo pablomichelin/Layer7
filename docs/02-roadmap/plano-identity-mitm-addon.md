@@ -11,7 +11,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.18` (**candidato** — build/publish pendente)
+**Candidato port:** `1.9.18` (**publicado** lab/`latest`)
 **Nota:** **Rev. `g` (`2026-08-07`)** = receiver `identity_dc` + GUI + script PS1; falta serviço Event Log no DC.
 
 ---
@@ -24,7 +24,7 @@
 | Código | **20.20 receiver PASS** (`identity_dc`); 20.19 RADIUS; desenho A1–A7 |
 | ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
 | MITM | **DEFER 20.7a** |
-| Próximo | Serviço Windows 4624/4634 → GI6; build `1.9.18` |
+| Próximo | Serviço Windows 4624/4634 → GI6 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
@@ -32,8 +32,8 @@ TRILHA IDENTITY + MITM — progresso
 - 20.20 receiver: PASS (identity_dc + GUI + PS1 lab)
 - 20.20 desenho: PASS
 - 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; candidato **1.9.18**
-- Próximo: agente Win + publish 1.9.18
+- Baseline: 1.9.8; candidato **1.9.18** (publicado)
+- Próximo: agente Win Event Log → GI6
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -539,6 +539,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `d` / 20.18 PASS** — Test LDAP GUI + `layer7d --ldap-test` (GI5.4); candidato `1.9.16`; passo → **20.19** |
 | 2026-08-07 | **rev. `e` / 20.19 PASS** — RADIUS accounting receiver (`identity_radius`); secret+ACL NAS; GI5.3 unitário; candidato `1.9.17`; passo → **20.20** |
 | 2026-08-07 | **rev. `f` / 20.20 desenho PASS** — A1–A7 fechados (TLS+HMAC MVP; porto 8743); ADR-0027 rev. d; passo → **20.20 código** |
+| 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
 
 ---
 
