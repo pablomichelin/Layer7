@@ -8,6 +8,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - (vazio — próximo: agente Windows Event Log / fecho 20.20)
 
+## [1.9.22] — 2026-08-07
+
+### Changed
+
+- **MITM:** removido do menu (DEFER 20.7a) — deixava a barra secundaria fora do padrao
+  em todas as telas; pagina permanece acessivel por URL.
+
+### Fixed
+
+- Tabs: remove overflow-x/flex que causava scrollbar no menu.
+
+### Notes
+
+- Canal `latest`: **`1.9.22`**. Produção enforce **`1.9.8`**.
+- SHA256: `79fb1ba64136b88781b123bfab8942b46f466f4185813d484c9bb08aa87e4fe2`. Rollback lab: `1.9.21`.
+
 ## [1.9.21] — 2026-08-07
 
 ### Changed

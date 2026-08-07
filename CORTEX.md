@@ -35,13 +35,13 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.21` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.21`;
-`SHA256=763d60e4f1ac447818ea5fdbd595187aca5d4857e67d22e62e011a5c1a07d68c`;
-menu UX + Identity DC 20.20; comandos em
+`1.9.22` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.22`;
+`SHA256=79fb1ba64136b88781b123bfab8942b46f466f4185813d484c9bb08aa87e4fe2`;
+MITM fora do menu + Identity DC 20.20; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
 ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
-Rollback lab a partir de `1.9.21`: **`1.9.20`**. Historico: `_69`, `_24`.
+Rollback lab a partir de `1.9.22`: **`1.9.21`**. Historico: `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
@@ -1294,7 +1294,7 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **20.18 PASS** (Test LDAP; GI5.4); **20.19 PASS** (RADIUS; GI5.3); **20.20
 desenho PASS** (A1–A7); **receiver HTTPS PASS**; passo actual **agente Windows / IM5**.
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Candidato port:** `1.9.21` (menu UX; **publicado** lab/`latest`).
+**Candidato port:** `1.9.22` (MITM fora do menu; **publicado** lab/`latest`).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1332,7 +1332,7 @@ TRILHA IDENTITY + MITM — progresso
 - IM2: DEFER 20.7a
 - Plano rev.: 2026-08-07g
 - Baseline enforce: 1.9.8
-- Candidato / latest: **1.9.21** (publicado)
+- Candidato / latest: **1.9.22** (publicado)
 - Próximo: agente Windows Event Log → GI6
 ```
 
@@ -1507,13 +1507,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.21** (menu UX + Identity DC 20.20)
+- Canal publico latest: **1.9.22** (MITM fora do menu + Identity DC 20.20)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo **agente Windows Event Log** (receiver 20.20 PASS; 20.19 RADIUS PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Pacote publicado: **1.9.21** (`SHA256=763d60e4f1ac447818ea5fdbd595187aca5d4857e67d22e62e011a5c1a07d68c`)
-- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.21**
+- Pacote publicado: **1.9.22** (`SHA256=79fb1ba64136b88781b123bfab8942b46f466f4185813d484c9bb08aa87e4fe2`)
+- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.22**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
