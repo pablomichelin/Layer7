@@ -1289,9 +1289,9 @@ TRILHA IPv6 — progresso
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
 Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
-**IM2 DEFER 20.7a**; **20.11a–20.13 PASS**; passo actual **20.14 / IM3** (persistência).
+**IM2 DEFER 20.7a**; **20.11a–20.14 PASS**; passo actual **20.15 / IM3** (entitlement gate).
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Candidato port (não publicado):** `1.9.14` (identity_map API).
+**Candidato port (não publicado):** `1.9.14` (identity_map + snap).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1312,20 +1312,18 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 - **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM6 Identity** → IM7–IM8 → IM9
   → (MITM só com novo GO)
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-06g`
+- **Rev. plano:** `2026-08-06h`
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.14 / IM3** (persistência + cold start)
-- IM0+IM1: PASS (GI0+GI1)
-- IM2: DEFER formal 20.7a
-- 20.11a–20.13: PASS (baseline + identity_map API)
-- Posicionamento: PME Identity-first ACEITE
-- Plano rev.: 2026-08-06g
+- Passo actual: **20.15 / IM3** (entitlement gate)
+- IM0+IM1: PASS; IM2 DEFER 20.7a
+- 20.11a–20.14: PASS
+- Plano rev.: 2026-08-06h
 - Baseline enforce: 1.9.8
 - Candidato: 1.9.14 (não publicado)
-- Próximo: 20.14 → 20.15 entitlement / GI4
+- Próximo: 20.15 → GI4 fecho / IM4 LDAP
 ```
 
 ---
@@ -1501,14 +1499,14 @@ CHECKPOINT CANONICO
 - Canal publico latest: **1.9.13** (guia Acesso Remoto)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo **20.14/IM3** (persistência; 20.13 API PASS; PME Identity-first; MITM DEFER 20.7a); GI1 PASS; GI2/GI3 DEFERRED; arranque docs/00-overview/START-HERE-identity-mitm.md; posicionamento docs/00-overview/posicionamento-pme-identity-first.md
+- Trilha Identity + MITM: **ABERTA** — passo **20.15/IM3** (entitlement gate; 20.14 snap PASS; PME Identity-first; MITM DEFER 20.7a); GI1 PASS; GI2/GI3 DEFERRED; arranque docs/00-overview/START-HERE-identity-mitm.md; posicionamento docs/00-overview/posicionamento-pme-identity-first.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
 - Candidato port: **1.9.14** (não publicado)
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; não misturar com IM1
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **IM3 / 20.14** (persistência/cold start); MITM DEFER; GO promoção enforce 1.9.13; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **IM3 / 20.15** (entitlement gate / GI4); MITM DEFER; GO promoção enforce 1.9.13; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

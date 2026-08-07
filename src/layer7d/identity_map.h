@@ -1,8 +1,10 @@
 /*
- * Identity session map — 20.12 structs + 20.13 API (add/refresh/expire,
- * lookup/export, dump JSON). Gate entitlement = 20.15.
+ * Identity session map — 20.12 structs + 20.13 API + 20.14 persistência.
+ * Gate entitlement / init em main = 20.15.
  *
  * Com identity OFF o daemon não chama init (zero threads, zero alocação).
+ * SIGHUP (ADR-0027 §4.2 / ADR-0028): o mapa vivo NÃO deve ser clear/fini —
+ * só config das fontes é relida; usar clear apenas em shutdown explícito.
  */
 #ifndef LAYER7_IDENTITY_MAP_H
 #define LAYER7_IDENTITY_MAP_H
@@ -21,6 +23,10 @@
 
 #define L7_IDMAP_USER_MAX          128
 #define L7_IDMAP_GROUP_MAX          64
+
+/* Snapshot best-effort (20.14); path default no appliance */
+#define L7_IDMAP_DEFAULT_SNAP_PATH "/var/db/layer7/identity-map.snap"
+#define L7_IDMAP_SNAP_VERSION        1
 
 /* Fontes de sessão (ADR-0027 §2) */
 enum l7_id_source {
@@ -81,6 +87,12 @@ int layer7_idmap_init(struct l7_id_map *m);
 /* Liberta tabela; safe se nunca init ou já fini. */
 void layer7_idmap_fini(struct l7_id_map *m);
 
+/*
+ * Esvazia o mapa sem destruir o rwlock (NÃO usar em SIGHUP — ADR-0027 §4.2).
+ * Reinício a frio sem snapshot = init + mapa vazio (ou load que falha).
+ */
+void layer7_idmap_clear(struct l7_id_map *m);
+
 unsigned layer7_idmap_count(const struct l7_id_map *m);
 unsigned layer7_idmap_capacity(const struct l7_id_map *m);
 
@@ -129,6 +141,24 @@ int layer7_idmap_export_user_ips(struct l7_id_map *m, const char *user,
  * Devolve bytes escritos (sem contar NUL) ou -1.
  */
 int layer7_idmap_dump_json(struct l7_id_map *m, char *buf, size_t bufsz);
+
+/* --- 20.14 persistência best-effort (ADR-0027 §4.2) --- */
+
+/*
+ * Grava snapshot atómico (tmp + rename). path NULL → L7_IDMAP_DEFAULT_SNAP_PATH.
+ * 0 OK, -1 erro. Não inclui secrets.
+ */
+int layer7_idmap_save(struct l7_id_map *m, const char *path);
+
+/*
+ * Carrega snapshot para mapa já init. Entradas expires_at <= now
+ * são ignoradas (nunca restauradas). path NULL → default.
+ * Valida header, faz clear, depois restaura só entradas válidas.
+ * Devolve n sessões carregadas, ou -1 se ficheiro ausente/inválido
+ * (mapa fica clear se o header era válido e o clear já correu —
+ * open fail = -1 sem alterar).
+ */
+int layer7_idmap_load(struct l7_id_map *m, const char *path, time_t now);
 
 /* Helpers de endereço (testes / fontes). */
 int layer7_idmap_addr_equal(const struct l7_id_addr *a,

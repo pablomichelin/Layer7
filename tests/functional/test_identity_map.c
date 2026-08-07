@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 static int g_fail;
 
@@ -111,6 +112,51 @@ main(void)
 	check(layer7_idmap_count(&map) == 0, "count 0 after remove");
 	check(layer7_idmap_lookup_ip(&map, &ip_a, userbuf, sizeof(userbuf),
 		NULL) == -1, "lookup miss after remove");
+
+	/* 20.14 persistência: save / load / skip expired / clear ≠ SIGHUP */
+	{
+		char snap[256];
+		struct l7_id_map map2;
+		const char *g[] = { "TI" };
+
+		snprintf(snap, sizeof(snap),
+		    "/tmp/l7-idmap-test-%d.snap", (int)getpid());
+		check(layer7_idmap_upsert(&map, "ana", &ip_a, L7_ID_SRC_RADIUS,
+			g, 1, t0) == 0, "upsert ana for snap");
+		/* sessão já expirada no momento do load */
+		check(layer7_idmap_upsert(&map, "velho", &ip_b, L7_ID_SRC_MANUAL,
+			NULL, 0, t0 - 7200) == 0, "upsert velho stale");
+		/* forçar expires no passado sob lock */
+		check(layer7_idmap_wrlock(&map) == 0, "wrlock stale");
+		{
+			unsigned i;
+			for (i = 0; i < map.capacity; i++) {
+				if (map.sessions[i].in_use &&
+				    strcmp(map.sessions[i].user, "velho") == 0)
+					map.sessions[i].expires_at = t0 - 1;
+			}
+		}
+		check(layer7_idmap_unlock(&map) == 0, "unlock stale");
+		check(layer7_idmap_save(&map, snap) == 0, "save snap");
+
+		check(layer7_idmap_init(&map2) == 0, "init map2");
+		n = layer7_idmap_load(&map2, snap, t0);
+		check(n == 1, "load only non-expired (ana)");
+		check(layer7_idmap_lookup_ip(&map2, &ip_a, userbuf,
+			sizeof(userbuf), &src) == 0, "load ana lookup");
+		check(strcmp(userbuf, "ana") == 0, "load ana name");
+		check(layer7_idmap_lookup_ip(&map2, &ip_b, userbuf,
+			sizeof(userbuf), NULL) == -1, "stale not restored");
+
+		/* clear esvazia; SIGHUP não deve chamar isto */
+		layer7_idmap_clear(&map2);
+		check(layer7_idmap_count(&map2) == 0, "clear empties");
+		check(map2.initialized == 1, "clear keeps initialized");
+
+		layer7_idmap_fini(&map2);
+		(void)unlink(snap);
+		(void)unlink("/tmp/l7-idmap-test-missing.snap"); /* ignore */
+	}
 
 	layer7_idmap_fini(&map);
 	check(1, "fini OK");

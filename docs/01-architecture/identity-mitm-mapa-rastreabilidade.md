@@ -51,7 +51,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-08 | Bypass MITM | IM2 | **DEFERRED** | GUI/DMN | |
 | M-09 | Caminho intercept TLS | IM2 | **DEFER 20.7a** | DOC | Squid rejeitado; futuro = helper próprio |
 | M-10 | Block page HTTPS via MITM | IM2 | **DEFERRED** | PKG | ADR-0017 permanece |
-| M-11 | Session map user↔IP **no daemon** | IM3 | **20.12+20.13 PASS** | DMN | API completa; init ainda não em `main` (20.15) |
+| M-11 | Session map user↔IP **no daemon** | IM3 | **20.12–20.14 PASS** | DMN | API + snap; init em main = 20.15 |
 | M-12 | Diagnóstico Identity GUI | IM3 | Dump JSON **PASS**; GUI page pendente | GUI/DMN | `layer7_idmap_dump_json` |
 | M-13 | LDAP/LDAPS client | IM4 | Planeado | DMN/PKG | limites escala |
 | M-14 | Group expansion cache + fail-mode | IM4 | Planeado | DMN | ADR-0027 |
@@ -148,3 +148,4 @@ Policy ad_* → IPs do mapa → enforce PF
 | 2026-08-06 | **20.11a** — M-25 PASS + M-24 confirmado (baseline perf; 1 thread) |
 | 2026-08-06 | **20.12** — M-11 structs PASS (`identity_map`); rwlock M-24 |
 | 2026-08-06 | **20.13** — M-11 API + M-12 dump JSON PASS |
+| 2026-08-06 | **20.14** — persistência snap + stale skip PASS |

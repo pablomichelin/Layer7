@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 void
 layer7_idmap_limits(struct l7_id_map_limits *out)
@@ -58,6 +59,21 @@ layer7_idmap_fini(struct l7_id_map *m)
 	(void)pthread_rwlock_destroy(&m->lock);
 	free(m->sessions);
 	memset(m, 0, sizeof(*m));
+}
+
+void
+layer7_idmap_clear(struct l7_id_map *m)
+{
+	unsigned i;
+
+	if (m == NULL || !m->initialized)
+		return;
+	if (layer7_idmap_wrlock(m) != 0)
+		return;
+	for (i = 0; i < m->capacity; i++)
+		memset(&m->sessions[i], 0, sizeof(m->sessions[i]));
+	m->count = 0;
+	(void)layer7_idmap_unlock(m);
 }
 
 unsigned
@@ -626,3 +642,223 @@ layer7_idmap_dump_json(struct l7_id_map *m, char *buf, size_t bufsz)
 	(void)layer7_idmap_unlock(m);
 	return (int)off;
 }
+
+/* --- 20.14 persistência --- */
+
+static const char *
+snap_path(const char *path)
+{
+	return (path != NULL && path[0] != '\0') ? path :
+	    L7_IDMAP_DEFAULT_SNAP_PATH;
+}
+
+static void
+write_hex_bytes(FILE *f, const uint8_t *b, unsigned n)
+{
+	unsigned i;
+
+	for (i = 0; i < n; i++)
+		fprintf(f, "%02x", b[i]);
+}
+
+static int
+parse_hex_bytes(const char *hex, uint8_t *out, unsigned n)
+{
+	unsigned i;
+	unsigned v;
+
+	if (hex == NULL || out == NULL || strlen(hex) < (size_t)n * 2)
+		return -1;
+	for (i = 0; i < n; i++) {
+		if (sscanf(hex + i * 2, "%2x", &v) != 1)
+			return -1;
+		out[i] = (uint8_t)v;
+	}
+	return 0;
+}
+
+int
+layer7_idmap_save(struct l7_id_map *m, const char *path)
+{
+	const char *p;
+	char tmp[512];
+	FILE *f;
+	unsigned i, j;
+	int n;
+
+	if (m == NULL || !m->initialized)
+		return -1;
+	p = snap_path(path);
+	n = snprintf(tmp, sizeof(tmp), "%s.tmp", p);
+	if (n < 0 || (size_t)n >= sizeof(tmp))
+		return -1;
+
+	if (layer7_idmap_rdlock(m) != 0)
+		return -1;
+	f = fopen(tmp, "w");
+	if (f == NULL) {
+		(void)layer7_idmap_unlock(m);
+		return -1;
+	}
+	fprintf(f, "L7IDMAP %d\n", L7_IDMAP_SNAP_VERSION);
+	for (i = 0; i < m->capacity; i++) {
+		const struct l7_id_session *s = &m->sessions[i];
+
+		if (!s->in_use)
+			continue;
+		fprintf(f, "S %s %d %lld %lld %d\n", s->user, (int)s->source,
+		    (long long)s->seen_at, (long long)s->expires_at,
+		    s->multi_user ? 1 : 0);
+		for (j = 0; j < s->n_ips; j++) {
+			unsigned nb = (s->ips[j].family == AF_INET) ? 4u : 16u;
+
+			fprintf(f, "I %u ", (unsigned)s->ips[j].family);
+			write_hex_bytes(f, s->ips[j].addr, nb);
+			fputc('\n', f);
+		}
+		for (j = 0; j < s->n_groups; j++)
+			fprintf(f, "G %s\n", s->groups[j]);
+		fputs("E\n", f);
+	}
+	if (fflush(f) != 0 || ferror(f)) {
+		fclose(f);
+		(void)unlink(tmp);
+		(void)layer7_idmap_unlock(m);
+		return -1;
+	}
+	fclose(f);
+	(void)layer7_idmap_unlock(m);
+	if (rename(tmp, p) != 0) {
+		(void)unlink(tmp);
+		return -1;
+	}
+	return 0;
+}
+
+int
+layer7_idmap_load(struct l7_id_map *m, const char *path, time_t now)
+{
+	const char *p;
+	FILE *f;
+	char line[512];
+	int ver = 0;
+	int loaded = 0;
+	struct l7_id_session cur;
+	int have = 0;
+	unsigned i;
+
+	if (m == NULL || !m->initialized)
+		return -1;
+	p = snap_path(path);
+	f = fopen(p, "r");
+	if (f == NULL)
+		return -1;
+
+	if (fgets(line, sizeof(line), f) == NULL ||
+	    sscanf(line, "L7IDMAP %d", &ver) != 1 ||
+	    ver != L7_IDMAP_SNAP_VERSION) {
+		fclose(f);
+		return -1;
+	}
+
+	/* Header OK → clear e restaurar só válidos */
+	layer7_idmap_clear(m);
+	memset(&cur, 0, sizeof(cur));
+
+	while (fgets(line, sizeof(line), f) != NULL) {
+		char *nl = strchr(line, '\n');
+		char user[L7_IDMAP_USER_MAX];
+		int source, multi;
+		long long seen, expires;
+		unsigned fam;
+		char hex[64];
+		char grp[L7_IDMAP_GROUP_MAX];
+
+		if (nl)
+			*nl = '\0';
+		if (line[0] == '\0' || line[0] == '#')
+			continue;
+
+		if (line[0] == 'S' && line[1] == ' ') {
+			memset(&cur, 0, sizeof(cur));
+			have = 0;
+			if (sscanf(line + 2, "%127s %d %lld %lld %d", user,
+				&source, &seen, &expires, &multi) != 5)
+				continue;
+			snprintf(cur.user, sizeof(cur.user), "%s", user);
+			cur.source = (enum l7_id_source)source;
+			cur.seen_at = (time_t)seen;
+			cur.expires_at = (time_t)expires;
+			cur.multi_user = multi ? 1 : 0;
+			cur.in_use = 1;
+			have = 1;
+		} else if (have && line[0] == 'I' && line[1] == ' ') {
+			struct l7_id_addr a;
+
+			memset(&a, 0, sizeof(a));
+			if (sscanf(line + 2, "%u %63s", &fam, hex) != 2)
+				continue;
+			a.family = (uint8_t)fam;
+			if (fam == AF_INET) {
+				if (parse_hex_bytes(hex, a.addr, 4) != 0)
+					continue;
+			} else if (fam == AF_INET6) {
+				if (parse_hex_bytes(hex, a.addr, 16) != 0)
+					continue;
+			} else
+				continue;
+			if (cur.n_ips < L7_IDMAP_MAX_IPS_PER_USER)
+				cur.ips[cur.n_ips++] = a;
+		} else if (have && line[0] == 'G' && line[1] == ' ') {
+			if (sscanf(line + 2, "%63s", grp) != 1)
+				continue;
+			if (cur.n_groups < L7_IDMAP_MAX_GROUPS_CACHE) {
+				snprintf(cur.groups[cur.n_groups],
+				    L7_IDMAP_GROUP_MAX, "%s", grp);
+				cur.n_groups++;
+			}
+		} else if (have && line[0] == 'E') {
+			if (cur.n_ips > 0 && cur.expires_at > now) {
+				for (i = 0; i < cur.n_ips; i++) {
+					const char *gptr[L7_IDMAP_MAX_GROUPS_CACHE];
+					unsigned gi;
+
+					for (gi = 0; gi < cur.n_groups; gi++)
+						gptr[gi] = cur.groups[gi];
+					(void)layer7_idmap_upsert(m, cur.user,
+					    &cur.ips[i], cur.source,
+					    cur.n_groups ? gptr : NULL,
+					    cur.n_groups, cur.seen_at);
+				}
+				if (layer7_idmap_wrlock(m) == 0) {
+					int idx = -1;
+
+					for (i = 0; i < m->capacity; i++) {
+						if (m->sessions[i].in_use &&
+						    strcmp(m->sessions[i].user,
+							cur.user) == 0) {
+							idx = (int)i;
+							break;
+						}
+					}
+					if (idx >= 0) {
+						m->sessions[idx].expires_at =
+						    cur.expires_at;
+						m->sessions[idx].seen_at =
+						    cur.seen_at;
+						m->sessions[idx].multi_user =
+						    cur.multi_user;
+						loaded++;
+					}
+					(void)layer7_idmap_unlock(m);
+				}
+			}
+			/* expired skipped — nunca restauradas */
+			memset(&cur, 0, sizeof(cur));
+			have = 0;
+		}
+	}
+	fclose(f);
+	return loaded;
+}
+
