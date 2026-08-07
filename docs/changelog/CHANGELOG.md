@@ -13,10 +13,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Canal `latest`: actualizar para **`1.9.16`** após GitHub Release.
-- Produção enforce permanece **`1.9.8`** até GO.
-- Rollback lab: `1.9.15`. SHA256: *(preencher no release)*.
-- GI5 **parcial** (LDAP test + GI5.4); GI5.3 = RADIUS/DC (20.19+).
+- Canal `latest`: **`1.9.16`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `dc061b5caa179731b9cf471d37868fb722a6d3701752b81f41668d079259ff3d`.
+- Rollback lab: `1.9.15`. GI5 **parcial** (GI5.3 = RADIUS/DC, 20.19+).
 - Defaults LDAP **OFF**; MITM permanece DEFER.
 
 ## [1.9.15] — 2026-08-07

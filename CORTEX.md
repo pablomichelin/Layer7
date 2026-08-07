@@ -35,13 +35,13 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.15` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.15`;
-`SHA256=6fc33b5e33446cd61e0b07820afb2e3237ecd91f7fcbb9189aae38ed976ae465`;
-Identity LDAP client 20.17 — OpenLDAP; comandos em
+`1.9.16` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.16`;
+`SHA256=dc061b5caa179731b9cf471d37868fb722a6d3701752b81f41668d079259ff3d`;
+Identity Test LDAP 20.18; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
 ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
-Rollback lab a partir de `1.9.15`: **`1.9.14`**. Historico: `_69`, `_24`.
+Rollback lab a partir de `1.9.16`: **`1.9.15`**. Historico: `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
@@ -1293,7 +1293,7 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
 **20.18 PASS** (Test LDAP GUI + `--ldap-test`; GI5.4); passo actual **20.19 / IM5**.
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Pacote lab/`latest`:** `1.9.15` até publicar `1.9.16` (candidato 20.18).
+**Pacote lab/`latest` publicado:** `1.9.16` (Test LDAP 20.18).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1327,7 +1327,7 @@ TRILHA IDENTITY + MITM — progresso
 - IM2: DEFER 20.7a
 - Plano rev.: 2026-08-07d
 - Baseline enforce: 1.9.8
-- Publicado lab/`latest`: **1.9.15** (candidato **1.9.16**)
+- Publicado lab/`latest`: **1.9.16**
 - Próximo: 20.19 / GI5.3
 ```
 
@@ -1502,13 +1502,13 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.15** (candidato **1.9.16** = Test LDAP 20.18)
+- Canal publico latest: **1.9.16** (Identity Test LDAP 20.18)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo **20.19/IM5** (RADIUS; 20.18 Test LDAP PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Pacote publicado: **1.9.15** (`SHA256=6fc33b5e33446cd61e0b07820afb2e3237ecd91f7fcbb9189aae38ed976ae465`); candidato **1.9.16**
-- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**+**1.9.15**
+- Pacote publicado: **1.9.16** (`SHA256=dc061b5caa179731b9cf471d37868fb722a6d3701752b81f41668d079259ff3d`)
+- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.16**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
