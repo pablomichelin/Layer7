@@ -17,6 +17,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - Canal `latest` após publish: **`1.9.17`**. Produção enforce permanece
   **`1.9.8`** até GO.
+- SHA256: `72d1a1717ac88cb68015d7912c8828099ff944e976f85f5901dfdb0471c7c49f`.
 - Rollback lab: `1.9.16`. GI5.3 PASS (unitário); lab NAS físico residual.
 - Defaults RADIUS **OFF**; MITM permanece DEFER. Sem secret/ACL → worker
   não arranca.

@@ -258,7 +258,7 @@ lab NAS físico residual). MITM permanece DEFER.
 **`1.9.8`** até GO. Rollback lab: **`1.9.16`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.17`
-- **SHA256 esperado:** `PENDING_BUILD`
+- **SHA256 esperado:** `72d1a1717ac88cb68015d7912c8828099ff944e976f85f5901dfdb0471c7c49f`
 
 **Addendum da release `1.9.16` (Identity IM4/20.18 Test LDAP, `2026-08-07`):**
 Botão «Testar ligação LDAP» na GUI; `layer7d --ldap-test` (JSON; GI5.4 sem
@@ -827,7 +827,7 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.17`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.17/pfSense-pkg-layer7-1.9.17.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.17/pfSense-pkg-layer7-1.9.17.pkg.sha256`
-- **SHA256 esperado:** `PENDING_BUILD`
+- **SHA256 esperado:** `72d1a1717ac88cb68015d7912c8828099ff944e976f85f5901dfdb0471c7c49f`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
 **Versao anterior lab (rollback a partir de `1.9.17`):** `1.9.16`
@@ -947,7 +947,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.17.pkg.sha256 https://github.com/pablomiche
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`PENDING_BUILD`.
+`72d1a1717ac88cb68015d7912c8828099ff944e976f85f5901dfdb0471c7c49f`.
 
 ---
 

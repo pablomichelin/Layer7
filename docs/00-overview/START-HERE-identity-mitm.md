@@ -153,7 +153,7 @@ TRILHA IDENTITY + MITM — progresso
 - Código: identity_map + ldap + radius; zero threads OFF
 - Plano rev.: 2026-08-07e
 - Baseline enforce: 1.9.8
-- Candidato: **1.9.17** (build/publish pendente)
+- Candidato / lab: **1.9.17** (publicado)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
