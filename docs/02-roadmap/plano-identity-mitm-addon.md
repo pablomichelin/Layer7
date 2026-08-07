@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-06f`; **IM0+IM1 fechados / GI1 PASS**; **IM2 DEFER formal 20.7a**; **20.11a+20.12 PASS**; passo actual **20.13 / IM3**)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-06g`; **IM0+IM1 / GI1 PASS**; **IM2 DEFER 20.7a**; **20.11a–20.13 PASS**; passo actual **20.14 / IM3**)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**  
 **SSOT de execução:** este ficheiro  
@@ -11,9 +11,9 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) — Aceito (`2026-08-05`; T1); MITM defer `2026-08-06`  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.14` (identity_map; **não publicado**)  
+**Candidato port:** `1.9.14` (identity_map API; **não publicado**)  
 **Commits:** `trilha-identity-mitm/20.x: …`  
-**Nota:** rev. `b` = reparos arquitectónicos. Rev. `c` = contratos técnicos. **Rev. `d` (`2026-08-06`)** = posicionamento **PME / Identity-first**; spike MITM **DEFER 20.7a**. **Rev. `e` (`2026-08-06`)** = **20.11a PASS**. **Rev. `f` (`2026-08-06`)** = **20.12 PASS** (`identity_map`); passo → **20.13**.
+**Nota:** rev. `d` = PME Identity-first + DEFER MITM. Rev. `e` = 20.11a. Rev. `f` = 20.12. **Rev. `g` (`2026-08-06`)** = **20.13 PASS** (API mapa); passo → **20.14**.
 
 ---
 
@@ -21,23 +21,19 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.13** (IM3 — API add/refresh/expire + dump diagnóstico) |
-| Código | IM1 + **20.12** `identity_map` (structs/rwlock/limites); sem API runtime; sem MITM |
+| Passo actual | **20.14** (IM3 — persistência best-effort + cold start/SIGHUP) |
+| Código | **20.13** API `identity_map` (upsert/expire/lookup/export/dump); sem init em `main` até 20.15 |
 | ADRs | **Aceito** ×4; T1; **0026 implementação diferida** |
-| MITM | **DEFER 20.7a** — saltar 20.8–20.11 até novo GO |
-| Próximo | 20.14 persistência/cold start → 20.15 entitlement gate / GI4 |
+| MITM | **DEFER 20.7a** |
+| Próximo | 20.15 entitlement gate / GI4 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.13 / IM3 (API mapa)
-- IM0+IM1: PASS (GI0+GI1)
-- IM2: DEFER formal 20.7a (Squid REJEITADO; GI2/GI3 DEFERRED)
-- 20.11a: PASS (baseline perf)
-- 20.12: PASS (identity_map.h/c + test_identity_map)
-- Posicionamento: PME Identity-first (ACEITE 2026-08-06)
-- Baseline: 1.9.8
-- Candidato: 1.9.14 (não publicado)
-- Próximo: 20.13 → 20.14–20.15 / GI4
+- Passo actual: 20.14 / IM3 (persistência)
+- IM0+IM1: PASS; IM2 DEFER 20.7a
+- 20.11a–20.13: PASS
+- Baseline: 1.9.8; candidato 1.9.14 (não publicado)
+- Próximo: 20.14 → 20.15 / GI4
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -311,7 +307,7 @@ Squid **rejeitado**; Identity-first.
 |-------|---------|------|
 | **20.11a** | **Pré-requisito de código:** ADR-0028 **Aceito** + **baseline de perf registada** (CPU/throughput; latência proxy builder; lab `1.9.13` pré-Identity) + checklist posicionamento §11 | **PASS** (`2026-08-06`) — evidência `20260806T174000Z-20.11a-baseline-perf` |
 | **20.12** | Estruturas no daemon: sessão (user, IPs v4/v6 **lista**, source, seen_at, ttl, groups cache); **limites de escala ADR-0027 §4.3**; rwlock conforme ADR-0028 | **PASS** (`2026-08-06`) — `identity_map.h`/`identity_map.c`; `test_identity_map`; port `1.9.14` candidato |
-| **20.13** | API interna: add/refresh/expire; export para enforce/PF; dump diagnóstico GUI | — |
+| **20.13** | API interna: add/refresh/expire; export para enforce/PF; dump diagnóstico GUI | **PASS** (`2026-08-06`) — upsert/refresh/expire/lookup/export/dump_json; multi_user ADR-0027 §4.1 |
 | **20.14** | Persistência best-effort opcional + política stale + **cold start/SIGHUP conforme ADR-0027 §4.2**; **não** depender de resync PHP como SSOT | — |
 | **20.15** | Entitlement `identity` gate; módulo inerte sem ele (**zero threads novas com OFF**, ADR-0028 §4) | **GI4** |
 
@@ -535,6 +531,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-06 | **rev. `d` / 20.7a PASS** — posicionamento PME Identity-first ACEITE; ADR-0026 implementação diferida; GI2/GI3 DEFERRED; saltar 20.8–20.11; passo actual → **20.11a / IM3** |
 | 2026-08-06 | **rev. `e` / 20.11a PASS** — baseline perf registada (appliance monitor + builder latency proxy); passo actual → **20.12** |
 | 2026-08-06 | **rev. `f` / 20.12 PASS** — `identity_map` (structs, limites §4.3, rwlock); smoke builder OK; passo → **20.13**; candidato `1.9.14` |
+| 2026-08-06 | **rev. `g` / 20.13 PASS** — API upsert/refresh/expire/lookup/export/dump; multi_user; passo → **20.14** |
 
 ---
 

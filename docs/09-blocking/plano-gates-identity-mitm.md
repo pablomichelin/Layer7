@@ -61,9 +61,9 @@ Identity avança sem GI2/GI3.
 | # | Critério | Estado |
 |---|----------|--------|
 | GI4.0 | Pré-requisito 20.11a cumprido: ADR-0028 Aceito + baseline de perf registada | **PASS** (`2026-08-06`) — evidência `20260806T174000Z-20.11a-baseline-perf` |
-| GI4.1 | add/refresh/expire no **daemon** (lista de IPs v4/v6 por user; limites de escala ADR-0027 §4.3) | PENDENTE |
-| GI4.2 | TTL remove stale; não depende de resync PHP como SSOT | PENDENTE |
-| GI4.3 | Diagnóstico GUI sem secrets | PENDENTE |
+| GI4.1 | add/refresh/expire no **daemon** (lista de IPs v4/v6 por user; limites de escala ADR-0027 §4.3) | **PASS** (`2026-08-06` — 20.13 API) |
+| GI4.2 | TTL remove stale; não depende de resync PHP como SSOT | **PASS** parcial (`expire`; persistência = 20.14) |
+| GI4.3 | Diagnóstico GUI sem secrets | **PASS** parcial (dump JSON daemon; página GUI = depois) |
 | GI4.4 | Sem entitlement `identity`: módulo inerte + **zero threads novas** (ADR-0028 §4) | PENDENTE |
 | GI4.5 | `SIGHUP` reload: mapa vivo sobrevive; cold start pós-reboot documentado (ADR-0027 §4.2) | PENDENTE |
 | GI4.6 | Perf com módulo ON em lab dentro da tolerância vs baseline 20.11a; nenhum bloqueio do loop de captura observável | PENDENTE |
@@ -155,3 +155,4 @@ Identity avança sem GI2/GI3.
 | 2026-08-05 | **GI1 PASS** — 20.3–20.6 entitlements + check-in ∩ `.lic` |
 | 2026-08-06 | **20.7a DEFER** — GI2/GI3 DEFERRED; ADR-0026 implementação diferida; posicionamento PME; passo → IM3/20.11a |
 | 2026-08-06 | **20.11a / GI4.0 PASS** — baseline perf registada; passo → 20.12 |
+| 2026-08-06 | **20.13** — GI4.1 PASS; GI4.2/4.3 parciais (expire + dump JSON) |

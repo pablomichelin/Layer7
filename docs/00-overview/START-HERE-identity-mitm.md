@@ -36,13 +36,13 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-06f`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-06g`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM3 / 20.13** — API interna mapa (add/refresh/expire + dump) |
-| Código do produto nesta trilha | **IM1** + **20.11a** + **20.12 PASS** (`identity_map`); sem API runtime; **sem** MITM |
-| Rev. do plano | **`2026-08-06f`** |
+| Passo actual | **IM3 / 20.14** — persistência best-effort + cold start/SIGHUP |
+| Código do produto nesta trilha | **20.12+20.13 PASS** (`identity_map` API); sem gate entitlement (20.15); **sem** MITM |
+| Rev. do plano | **`2026-08-06g`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -122,7 +122,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM3 / 20.13 — API mapa).
+Tarefa: continuar no passo actual (IM3 / 20.14 — persistência/cold start).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -141,15 +141,16 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM3 / 20.13 (API add/refresh/expire + dump)
+- Passo actual: IM3 / 20.14 (persistência + cold start/SIGHUP)
 - IM0+IM1: PASS (GI0+GI1)
 - IM2: DEFER formal 20.7a (Squid REJEITADO; GI2/GI3 DEFERRED)
 - 20.11a: PASS (baseline perf)
 - 20.12: PASS (identity_map structs + rwlock + limites)
+- 20.13: PASS (API upsert/refresh/expire/lookup/export/dump)
 - Posicionamento PME Identity-first: ACEITE
 - IM3–IM9: EM CURSO / PENDENTE
-- Código: entitlements + identity_map (sem API/enforce ainda); sem MITM
-- Plano rev.: 2026-08-06f
+- Código: entitlements + identity_map API (sem init em main; gate 20.15)
+- Plano rev.: 2026-08-06g
 - Baseline enforce: 1.9.8
 - Candidato port: 1.9.14 (não publicado)
 ```

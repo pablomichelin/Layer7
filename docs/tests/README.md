@@ -25,7 +25,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 | Ficheiro | Bloco | Cobertura |
 |----------|-------|-----------|
 | `tests/functional/test_allowlist.c` | Fase 1 | allowlist, rejeição `/0`, seed |
-| `tests/functional/test_identity_map.c` | IM3 / 20.12 | limites ADR-0027 §4.3, rwlock, init/fini mapa |
+| `tests/functional/test_identity_map.c` | IM3 / 20.12–20.13 | limites, rwlock, upsert/expire/lookup/export/dump, multi_user |
 | `tests/functional/test_config_parse.c` | A3 / E0 / FP-015 | parse JSON; fragilidade `enabled` em policies (#12–15) |
 | `tests/unit/test_flush_coverage.sh` | BG-061 | contract flush exc_allow, bl_apply, pkg-deinstall |
 | `tests/unit/test_rc_pidfile.sh` | BG-053 | pidfile `daemon(8)` sem newline |
