@@ -2,7 +2,7 @@
 ##|+PRIV
 ##|*IDENT=page-services-layer7-mitm
 ##|*NAME=Services: Layer 7 (MITM)
-##|*DESCR=MITM TLS inspection add-on (entitlement gated).
+##|*DESCR=MITM TLS inspection add-on (entitlement gated; DEFER — fora do menu).
 ##|*MATCH=layer7_mitm.php*
 ##|-PRIV
 
@@ -22,15 +22,17 @@ layer7_render_styles();
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
 		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Layer 7 - MITM / Inspecao TLS")); ?></h2>
-		<?php layer7_render_tabs("mitm"); ?>
+		<?php /* DEFER: nao ha tab MITM no menu; marcar Identity como contexto. */ ?>
+		<?php layer7_render_tabs("identity"); ?>
 	</div>
 	<div class="panel-body">
 		<div class="layer7-content">
 			<p class="layer7-lead">
 				<?= htmlspecialchars(l7_t(
-				    "Inspecao TLS (MITM) esta diferida (spike 20.7a). " .
+				    "Inspecao TLS (MITM) esta diferida (spike 20.7a) e fora do menu. " .
 				    "Esta pagina so mostra o gate comercial; nao activa decifragem."
 				)); ?>
+				<a href="layer7_identity.php"><?= htmlspecialchars(l7_t("Voltar a Identity")); ?></a>
 			</p>
 
 			<div class="layer7-admin-block">

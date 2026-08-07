@@ -6791,7 +6791,7 @@ function layer7_remote_access_apply(array $blocked_ids)
 
 function layer7_nav_items()
 {
-	/* Sem "Acesso Remoto" (perfil em Politicas) nem MITM (DEFER → secundaria). */
+	/* Acesso Remoto = perfil em Politicas. MITM = DEFER (fora do menu). */
 	return array(
 		"status" => array("label" => l7_t("Estado"), "href" => "layer7_status.php"),
 		"devices" => array("label" => l7_t("Dispositivos"), "href" => "layer7_devices.php"),
@@ -6808,7 +6808,6 @@ function layer7_nav_items()
 function layer7_nav_secondary_items()
 {
 	return array(
-		"mitm" => array("label" => l7_t("MITM"), "href" => "layer7_mitm.php"),
 		"diagnosticos" => array("label" => l7_t("Diagnosticos"), "href" => "layer7_diagnostics.php"),
 		"removal" => array("label" => l7_t("Remocao do pacote"), "href" => "layer7_removal.php")
 	);
@@ -6826,15 +6825,14 @@ function layer7_render_styles()
 	.layer7-page .panel-title { font-size: 20px; font-weight: 600; }
 	.layer7-page .layer7-content { padding: 24px 26px 26px; }
 	.layer7-page .layer7-lead { color: #666; line-height: 1.55; margin: 0 0 22px; max-width: 980px; }
-	.layer7-page .nav-tabs { margin: 0; padding: 8px 12px 0; border-bottom: 1px solid #e5e5e5; background: #fcfcfc; display: flex; flex-wrap: nowrap; align-items: flex-end; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-	.layer7-page .nav-tabs > li { float: none; flex: 0 0 auto; }
+	.layer7-page .nav-tabs { margin: 0; padding: 10px 18px 0; border-bottom: 1px solid #e5e5e5; background: #fcfcfc; }
+	.layer7-page .nav-tabs > li { float: left; }
 	/* pfSense: .panel-heading a { color: white } — forcar contraste nas tabs Layer7 */
 	.layer7-page .panel-heading .nav-tabs > li > a,
 	.layer7-page .panel-heading .nav-tabs > li > a:link,
 	.layer7-page .panel-heading .nav-tabs > li > a:visited {
-		padding: 10px 12px; font-weight: 600; color: #ae0000 !important;
-		background: transparent; border: 1px solid transparent; margin-right: 0;
-		white-space: nowrap;
+		padding: 11px 14px; font-weight: 600; color: #ae0000 !important;
+		background: transparent; border: 1px solid transparent; margin-right: 2px;
 	}
 	.layer7-page .panel-heading .nav-tabs > li > a:hover,
 	.layer7-page .panel-heading .nav-tabs > li > a:focus {
@@ -6845,17 +6843,18 @@ function layer7_render_styles()
 	.layer7-page .panel-heading .nav-tabs > li.active > a:focus {
 		color: #333 !important; background: #fff; border: 1px solid #e5e5e5; border-bottom-color: transparent;
 	}
-	.layer7-page .nav-tabs.layer7-nav-secondary { padding-top: 0; border-bottom: 1px solid #e5e5e5; background: #f7f7f7; flex-wrap: wrap; overflow-x: visible; }
+	.layer7-page .nav-tabs.layer7-nav-secondary { padding-top: 0; background: #f7f7f7; }
 	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li > a,
 	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li > a:link,
 	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li > a:visited {
-		padding: 8px 12px; font-weight: 500; font-size: 13px; color: #666 !important;
+		padding: 8px 14px; font-weight: 500; font-size: 13px; color: #666 !important;
 	}
 	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li.active > a,
 	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li.active > a:hover,
 	.layer7-page .panel-heading .nav-tabs.layer7-nav-secondary > li.active > a:focus {
 		color: #333 !important; background: #fff; border: 1px solid #e5e5e5; border-bottom-color: transparent;
 	}
+	.layer7-page .panel-heading::after { content: ""; display: table; clear: both; }
 	.layer7-page .form-horizontal .control-label { padding-top: 10px; }
 	.layer7-page .form-control-static { padding-top: 8px; }
 	.layer7-page .layer7-section { margin-top: 30px; }
