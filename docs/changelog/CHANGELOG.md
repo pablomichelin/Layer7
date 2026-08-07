@@ -2,6 +2,24 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.9.14] — 2026-08-07
+
+### Added
+
+- **Identity (IM3–IM4 / 20.11a–20.16):** mapa user↔IP no daemon (entitlement
+  `identity`, zero threads OFF); GUI LDAP/LDAPS em Services → Layer 7 →
+  Identity (servidor, porto, TLS, bind DN, base DN, filtros, limites
+  ADR-0027); palavra-passe de bind em ficheiro `0600` (não no JSON).
+- Teste `tests/functional/test_identity_ldap_config.php`.
+
+### Notes
+
+- Canal `latest`: **`1.9.14`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `e76ffae92edf1a7b9ade3239d3b8132939dc7716f5dcbf6e5d055658022e1403`.
+- Rollback lab: `1.9.13`. MITM permanece DEFER (20.7a). Cliente LDAP C /
+  “Testar LDAP” = 20.17–20.18 (ainda não neste pacote).
+- Defaults Identity/LDAP **OFF**; sem entitlement = upsell apenas.
+
 ## [1.9.13] — 2026-08-05
 
 ### Added

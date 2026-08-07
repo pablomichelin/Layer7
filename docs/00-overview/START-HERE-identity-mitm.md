@@ -149,7 +149,7 @@ TRILHA IDENTITY + MITM — progresso
 - Código: identity_map gated; GUI LDAP; zero threads OFF
 - Plano rev.: 2026-08-07b
 - Baseline enforce: 1.9.8
-- Candidato port: 1.9.14 (não publicado)
+- Publicado lab/`latest`: 1.9.14
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

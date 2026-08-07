@@ -35,13 +35,13 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.13` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.13`;
-`SHA256=69ac0f2799a80a4dcea447b71321fabd115a2bc34c1c693c9a9e79ef16996a3d`;
-guia Acesso Remoto na GUI; comandos em
+`1.9.14` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.14`;
+`SHA256=e76ffae92edf1a7b9ade3239d3b8132939dc7716f5dcbf6e5d055658022e1403`;
+Identity IM3–IM4/20.16 — mapa + GUI LDAP; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
 ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
-Rollback lab a partir de `1.9.13`: **`1.9.12`**. Historico: `_69`, `_24`.
+Rollback lab a partir de `1.9.14`: **`1.9.13`**. Historico: `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
@@ -49,7 +49,7 @@ Trilha IPv6: **FECHADA** (V0–V6; GV7.4 PASS).
 **Congelamento documental das filas:** 
 [`docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
 **Hardening:** `1.9.9`…`1.9.12` (BG-093…104 + BG-100); guia Acesso Remoto em
-`1.9.13`; **não** misturar com Identity+MITM.
+`1.9.13`; Identity em `1.9.14` — **não** misturar promoção enforce com MITM.
 
 ### Release `1.8.11_24` — Caminho B E0–E3 + pos-revisao (publicada `2026-06-16`)
 
@@ -1292,7 +1292,7 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
 passo actual **20.17 / IM4** (LDAP resolve + cache).
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Candidato port (não publicado):** `1.9.14` (identity gate + GUI LDAP em main).
+**Pacote lab/`latest` publicado:** `1.9.14` (identity gate + GUI LDAP).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1324,9 +1324,10 @@ TRILHA IDENTITY + MITM — progresso
 - IM2: DEFER 20.7a
 - Plano rev.: 2026-08-07b
 - Baseline enforce: 1.9.8
-- Candidato: 1.9.14 (não publicado)
+- Publicado lab/`latest`: **1.9.14**
 - Próximo: 20.17–20.18 / GI5 parcial
 ```
+
 
 ---
 
@@ -1498,17 +1499,17 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.13** (guia Acesso Remoto)
+- Canal publico latest: **1.9.14** (Identity IM3–IM4/20.16; GUI LDAP)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo **20.17/IM4** (LDAP resolve; 20.16 GUI PASS; IM3/GI4 PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Candidato port: **1.9.14** (não publicado)
-- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; não misturar com IM1
+- Pacote publicado: **1.9.14** (`SHA256=e76ffae92edf1a7b9ade3239d3b8132939dc7716f5dcbf6e5d055658022e1403`)
+- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity lab em **1.9.14**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **IM4 / 20.17** (LDAP client + cache); MITM DEFER; GO promoção enforce 1.9.13; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **IM4 / 20.17** (LDAP client + cache); MITM DEFER; GO promoção enforce 1.9.8→lab; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
