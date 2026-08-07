@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.14
+PORTVERSION=	1.9.15
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -17,11 +17,13 @@ LICENSE_NAME=	Layer7 End-User License Agreement
 LICENSE_PERMS=
 LICENSE_FILE=	${.CURDIR}/../../LICENSE
 
+LIB_DEPENDS=	libldap.so.2:net/openldap26-client
+
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c)
-.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, features.c, blacklist.c, bl_config.c, allowlist.c, log_store.c, identity_map.c)."
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c) || !exists(${LAYER7D_DIR}/identity_ldap.c)
+.error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c, config_parse.c, policy.c, enforce.c, license.c, features.c, blacklist.c, bl_config.c, allowlist.c, log_store.c, identity_map.c, identity_ldap.c)."
 .endif
 
 NDPI_PREFIX=	/usr/local
@@ -38,8 +40,10 @@ LAYER7_NDPI_CFLAGS=	-DHAVE_NDPI=0
 LAYER7_NDPI_LDFLAGS=
 LAYER7_NDPI_SRCS=
 .endif
-# identity_map (20.12 / ADR-0028) — pthread sempre
+# identity_map + ldap worker (20.12 / 20.17 / ADR-0028) — pthread + OpenLDAP
 LAYER7_PTHREAD_LDFLAGS=	-lpthread
+LAYER7_LDAP_CFLAGS=	-DHAVE_OPENLDAP=1 -I/usr/local/include
+LAYER7_LDAP_LDFLAGS=	-L/usr/local/lib -lldap -llber
 
 WRKSRC=		${WRKDIR}
 
@@ -54,14 +58,15 @@ do-extract:
 do-build:
 	@${ECHO_CMD} '"${PKGVERSION}"' > ${WRKSRC}/version.str
 	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} \
-		${LAYER7_NDPI_CFLAGS} -o ${WRKSRC}/layer7d \
+		${LAYER7_NDPI_CFLAGS} ${LAYER7_LDAP_CFLAGS} -o ${WRKSRC}/layer7d \
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
 		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
 		${LAYER7D_DIR}/features.c \
 		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
 		${LAYER7D_DIR}/allowlist.c ${LAYER7D_DIR}/log_store.c \
-		${LAYER7D_DIR}/identity_map.c \
+		${LAYER7D_DIR}/identity_map.c ${LAYER7D_DIR}/identity_ldap.c \
 		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} ${LAYER7_PTHREAD_LDFLAGS} \
+		${LAYER7_LDAP_LDFLAGS} \
 		/usr/lib/libcrypto.a
 
 do-install:

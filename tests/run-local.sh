@@ -51,6 +51,22 @@ else
 	fail "test_identity_map compile"
 fi
 
+step "Unit: identity_ldap cache/fail-mode (20.17)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d -DHAVE_OPENLDAP=0 \
+    -o /tmp/test_identity_ldap \
+    tests/functional/test_identity_ldap.c \
+    src/layer7d/identity_ldap.c src/layer7d/identity_map.c -lpthread \
+    2>/tmp/test_identity_ldap.cc.err; then
+	if /tmp/test_identity_ldap; then
+		pass "test_identity_ldap"
+	else
+		fail "test_identity_ldap runtime"
+	fi
+else
+	cat /tmp/test_identity_ldap.cc.err
+	fail "test_identity_ldap compile"
+fi
+
 step "Unit: config_parse (sni_inspection / A3)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_config_parse \

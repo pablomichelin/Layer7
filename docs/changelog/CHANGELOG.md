@@ -2,6 +2,23 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.9.15] — 2026-08-07
+
+### Added
+
+- **Identity LDAP client (IM4 / 20.17):** `identity_ldap` no daemon — worker
+  pthread (ADR-0028), cache TTL, fail-mode OK/DEGRADED/DOWN (ADR-0027),
+  expansão de grupos aninhados e `memberOf` via OpenLDAP.
+- `LIB_DEPENDS`: `openldap26-client`.
+- Teste `tests/functional/test_identity_ldap.c`.
+
+### Notes
+
+- Canal `latest`: **`1.9.15`**. Produção enforce permanece **`1.9.8`** até GO.
+- SHA256: `6fc33b5e33446cd61e0b07820afb2e3237ecd91f7fcbb9189aae38ed976ae465`.
+- Rollback lab: `1.9.14`. «Testar LDAP» na GUI = passo 20.18 (ainda não).
+- Defaults LDAP **OFF**; MITM permanece DEFER.
+
 ## [1.9.14] — 2026-08-07
 
 ### Added

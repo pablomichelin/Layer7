@@ -537,6 +537,50 @@ layer7_idmap_export_user_ips(struct l7_id_map *m, const char *user,
 	return (int)n;
 }
 
+int
+layer7_idmap_set_groups(struct l7_id_map *m, const char *user,
+    const char *const *groups, unsigned n_groups)
+{
+	int idx, trunc = 0;
+
+	if (m == NULL || !m->initialized || user == NULL || user[0] == '\0')
+		return -1;
+	if (layer7_idmap_wrlock(m) != 0)
+		return -1;
+	idx = find_user_idx(m, user);
+	if (idx < 0) {
+		(void)layer7_idmap_unlock(m);
+		return -1;
+	}
+	/* Sempre substitui; n_groups=0 limpa. */
+	m->sessions[idx].n_groups = 0;
+	if (groups != NULL && n_groups > 0)
+		apply_groups(&m->sessions[idx], groups, n_groups, &trunc);
+	(void)layer7_idmap_unlock(m);
+	return trunc ? 1 : 0;
+}
+
+unsigned
+layer7_idmap_list_users(struct l7_id_map *m,
+    char users[][L7_IDMAP_USER_MAX], unsigned max)
+{
+	unsigned i, n = 0;
+
+	if (m == NULL || !m->initialized || users == NULL || max == 0)
+		return 0;
+	if (layer7_idmap_rdlock(m) != 0)
+		return 0;
+	for (i = 0; i < m->capacity && n < max; i++) {
+		if (!m->sessions[i].in_use)
+			continue;
+		snprintf(users[n], L7_IDMAP_USER_MAX, "%s",
+		    m->sessions[i].user);
+		n++;
+	}
+	(void)layer7_idmap_unlock(m);
+	return n;
+}
+
 static const char *
 source_name(enum l7_id_source s)
 {

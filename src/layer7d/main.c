@@ -14,6 +14,7 @@
 #include "enforce.h"
 #include "features.h"
 #include "identity_map.h"
+#include "identity_ldap.h"
 #include "license.h"
 #include "log_store.h"
 #include "policy.h"
@@ -108,9 +109,10 @@ static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
 static time_t s_last_checkin_tick;
 
-/* Identity map (20.15): só activo com entitlement identity; zero threads OFF. */
+/* Identity map (20.15) + LDAP worker (20.17): só com entitlement; zero threads OFF. */
 static struct l7_id_map s_idmap;
 static int s_idmap_active;
+static struct l7_ldap_worker *s_ldap_worker;
 static int s_license_state = -1; /* 0=invalid, 1=valid, 2=grace/dev */
 
 static struct l7_blacklist *s_blacklist;
@@ -319,6 +321,19 @@ write_stats_json(void)
 	fprintf(f, "  \"identity_entitled\": %s,\n",
 	    layer7_features_allows_identity(s_lic.features_flags) ?
 	    "true" : "false");
+	{
+		const char *lst = "off";
+		enum l7_ldap_status st = s_ldap_worker ?
+		    layer7_ldap_worker_status(s_ldap_worker, time(NULL)) :
+		    L7_LDAP_STATUS_OFF;
+		if (st == L7_LDAP_STATUS_OK)
+			lst = "ok";
+		else if (st == L7_LDAP_STATUS_DEGRADED)
+			lst = "degraded";
+		else if (st == L7_LDAP_STATUS_DOWN)
+			lst = "down";
+		fprintf(f, "  \"identity_ldap_status\": \"%s\",\n", lst);
+	}
 
 	{
 		struct l7_checkin_status ci;
@@ -871,10 +886,45 @@ license_apply_invalidation(const char *reason)
 }
 
 /*
- * ADR-0028 / 20.15: com entitlement identity ausente o mapa não é inicializado
- * (zero threads, zero alocação). SIGHUP com módulo ON: mapa sobrevive
- * (só expire stale); não chamar clear/fini.
+ * ADR-0028 / 20.15–20.17: sem entitlement → zero threads / zero mapa.
+ * SIGHUP: mapa sobrevive; worker LDAP relê config.
  */
+static void
+identity_ldap_sync_worker(const char *reason)
+{
+	char *buf = NULL;
+	size_t len = 0;
+	struct l7_ldap_cfg cfg;
+
+	layer7_ldap_cfg_defaults(&cfg);
+	buf = read_file(config_path, &len);
+	if (buf != NULL) {
+		(void)layer7_ldap_cfg_parse_json(buf, len, &cfg);
+		free(buf);
+	}
+	(void)layer7_ldap_cfg_load_secret(&cfg, NULL);
+
+	if (cfg.ldap_enabled && cfg.server[0] != '\0') {
+		if (s_ldap_worker == NULL) {
+			s_ldap_worker = layer7_ldap_worker_start(&s_idmap, &cfg);
+			if (s_ldap_worker)
+				L7_NOTE("identity: ldap worker ON (%s)",
+				    reason ? reason : "?");
+			else
+				L7_WARN("identity: ldap worker start failed (%s)",
+				    reason ? reason : "?");
+		} else {
+			layer7_ldap_worker_reload(s_ldap_worker, &cfg);
+		}
+	} else if (s_ldap_worker != NULL) {
+		layer7_ldap_worker_stop(s_ldap_worker);
+		s_ldap_worker = NULL;
+		L7_NOTE("identity: ldap worker OFF (%s)",
+		    reason ? reason : "?");
+	}
+	layer7_ldap_cfg_wipe_secret(&cfg);
+}
+
 static void
 identity_module_sync(const char *reason)
 {
@@ -891,10 +941,14 @@ identity_module_sync(const char *reason)
 		}
 		n = layer7_idmap_load(&s_idmap, NULL, now);
 		s_idmap_active = 1;
-		L7_NOTE("identity: module ON (%s) sessions_loaded=%d "
-		    "threads=0",
+		L7_NOTE("identity: module ON (%s) sessions_loaded=%d",
 		    reason ? reason : "?", n < 0 ? 0 : n);
+		identity_ldap_sync_worker(reason);
 	} else if (!want && s_idmap_active) {
+		if (s_ldap_worker) {
+			layer7_ldap_worker_stop(s_ldap_worker);
+			s_ldap_worker = NULL;
+		}
 		(void)layer7_idmap_save(&s_idmap, NULL);
 		layer7_idmap_fini(&s_idmap);
 		s_idmap_active = 0;
@@ -906,12 +960,17 @@ identity_module_sync(const char *reason)
 		if (rem > 0)
 			L7_NOTE("identity: expired %u stale (%s)", rem,
 			    reason ? reason : "?");
+		identity_ldap_sync_worker(reason);
 	}
 }
 
 static void
 identity_module_shutdown(void)
 {
+	if (s_ldap_worker) {
+		layer7_ldap_worker_stop(s_ldap_worker);
+		s_ldap_worker = NULL;
+	}
 	if (!s_idmap_active)
 		return;
 	(void)layer7_idmap_save(&s_idmap, NULL);

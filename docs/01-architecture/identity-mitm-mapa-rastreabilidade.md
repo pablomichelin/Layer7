@@ -53,8 +53,8 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-10 | Block page HTTPS via MITM | IM2 | **DEFERRED** | PKG | ADR-0017 permanece |
 | M-11 | Session map user↔IP **no daemon** | IM3 | **PASS** (20.12–20.15) | DMN | Gated por entitlement |
 | M-12 | Diagnóstico Identity GUI | IM3 | Dump JSON **PASS**; GUI page pendente | GUI/DMN | `layer7_idmap_dump_json` |
-| M-13 | LDAP/LDAPS client | IM4 | **Config GUI 20.16 PASS**; cliente C = 20.17 | DMN/PKG | limites escala; secret bind 0600 |
-| M-14 | Group expansion cache + fail-mode | IM4 | Planeado (20.17) | DMN | ADR-0027 |
+| M-13 | LDAP/LDAPS client | IM4 | **20.17 PASS** (OpenLDAP + worker) | DMN/PKG | LIB_DEPENDS openldap26-client |
+| M-14 | Group expansion cache + fail-mode | IM4 | **20.17 PASS** | DMN | ADR-0027; TTL 300s |
 | M-15 | RADIUS **accounting receiver** | IM5 | Planeado | DMN/PKG | canónico |
 | M-16 | **Agente no DC** → push logons | IM5 | Planeado | OPS/DMN | canónico; não WinRM |
 | M-17 | Conflict policy same-IP | IM5 | Planeado | DMN | |

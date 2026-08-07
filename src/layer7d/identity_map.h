@@ -137,6 +137,19 @@ int layer7_idmap_export_user_ips(struct l7_id_map *m, const char *user,
     struct l7_id_addr *out, unsigned max_out);
 
 /*
+ * Substitui grupos do user (LDAP refresh). n_groups=0 limpa.
+ * 0 OK, -1 user ausente / erro.
+ */
+int layer7_idmap_set_groups(struct l7_id_map *m, const char *user,
+    const char *const *groups, unsigned n_groups);
+
+/*
+ * Lista até max users in_use (ordem de tabela). Devolve n copiados.
+ */
+unsigned layer7_idmap_list_users(struct l7_id_map *m,
+    char users[][L7_IDMAP_USER_MAX], unsigned max);
+
+/*
  * Dump JSON diagnóstico (sem secrets). Truncável.
  * Devolve bytes escritos (sem contar NUL) ou -1.
  */

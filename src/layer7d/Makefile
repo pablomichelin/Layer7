@@ -10,11 +10,20 @@
 
 LAYER7_COMMON = ../common
 SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c features.c \
-	blacklist.c bl_config.c allowlist.c log_store.c identity_map.c
+	blacklist.c bl_config.c allowlist.c log_store.c identity_map.c \
+	identity_ldap.c
 OUT ?= layer7d
 VSTR_DIR ?= .
-# identity_map (20.12) exige pthread mesmo sem nDPI
+# identity_map + ldap (20.12 / 20.17) — pthread; OpenLDAP se detectado
 PTHREAD_LDFLAGS = -lpthread
+LDAP_DETECT != test -f /usr/local/include/ldap.h && echo 1 || echo 0
+.if $(LDAP_DETECT) == 1
+LDAP_CFLAGS = -DHAVE_OPENLDAP=1 -I/usr/local/include
+LDAP_LDFLAGS = -L/usr/local/lib -lldap -llber
+.else
+LDAP_CFLAGS = -DHAVE_OPENLDAP=0
+LDAP_LDFLAGS =
+.endif
 
 # Auto-detect nDPI: se o header existe, ativa
 NDPI_DETECT != test -f /usr/local/include/ndpi/ndpi_api.h && echo 1 || echo 0
@@ -41,7 +50,8 @@ $(OUT): $(SRCS)
 		echo "layer7d Makefile: falta /usr/local/lib/libndpi.a para gerar binário autocontido"; exit 1; \
 	fi
 	$(CC) $(CFLAGS) -Wall -Wextra -O2 -I$(VSTR_DIR) -I. -I$(LAYER7_COMMON) \
-		$(NDPI_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS) $(PTHREAD_LDFLAGS) -lcrypto
+		$(NDPI_CFLAGS) $(LDAP_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS) \
+		$(PTHREAD_LDFLAGS) $(LDAP_LDFLAGS) -lcrypto
 
 clean:
 	rm -f layer7d layer7d-smoke
