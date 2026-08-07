@@ -154,4 +154,25 @@ enum l7_ldap_status layer7_ldap_worker_status(const struct l7_ldap_worker *w,
 /* Acesso ao cache do worker (diagnóstico / 20.18). NULL se parado. */
 struct l7_ldap_cache *layer7_ldap_worker_cache(struct l7_ldap_worker *w);
 
+/* --- 20.18: teste de ligacao (CLI/GUI); nunca inclui password --- */
+
+struct l7_ldap_test_result {
+	int      ok;
+	char     phase[32];   /* config|connect|bind|search|ok */
+	char     message[192];
+	char     server[L7_LDAP_HOST_MAX];
+	int      port;
+	int      use_tls;
+	int      base_ok;
+	unsigned ms;
+	int      ldap_rc;     /* 0 se N/A */
+};
+
+/*
+ * Bind + search base (sizeLimit 1). cfg deve ter password carregada.
+ * out->message nunca contém secrets. 0 = ok, -1 = falha (detalhe em out).
+ */
+int layer7_ldap_test_connection(const struct l7_ldap_cfg *cfg,
+    struct l7_ldap_test_result *out);
+
 #endif /* LAYER7_IDENTITY_LDAP_H */

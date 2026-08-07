@@ -2159,7 +2159,7 @@ static void usage(void)
 	    "usage: layer7d [-V] [-t] [-c path] [-d DST] [-e IP APP [CAT]] [-n] "
 	    "[--list-protos]\n"
 	    "               [--fingerprint] [--activate KEY [URL]]\n"
-	    "               [--check-in [URL]] [--license-status]\n"
+	    "               [--check-in [URL]] [--license-status] [--ldap-test]\n"
 	    "  -V               versão do binário\n"
 	    "  -t               testa JSON (stdout)\n"
 	    "  -c path          caminho (omissão: %s)\n"
@@ -2171,6 +2171,7 @@ static void usage(void)
 	    "  --activate KEY   activa licença online (KEY + URL opcional)\n"
 	    "  --check-in [URL] força check-in online (BG-077)\n"
 	    "  --license-status estado da licença em chave=valor (exit 0 se válida)\n"
+	    "  --ldap-test      testa bind+Base DN LDAP (JSON; sem passwords)\n"
 	    "  runtime: SIGHUP reload; SIGUSR1 stats; nDPI→pf via policy\n",
 	    DEFAULT_CONFIG);
 }
@@ -2771,6 +2772,72 @@ int main(int argc, char **argv)
 			if (li.error[0])
 				printf("error=%s\n", li.error);
 			return li.valid ? 0 : 1;
+		}
+		/*
+		 * 20.18: teste LDAP para GUI. JSON sem passwords/secrets.
+		 * Exit 0 se OK, 1 se falha, 2 se OpenLDAP ausente/config incompleta.
+		 */
+		if (strcmp(argv[vi], "--ldap-test") == 0) {
+			char *buf = NULL;
+			size_t len = 0;
+			struct l7_ldap_cfg cfg;
+			struct l7_ldap_test_result tr;
+			const char *cpath = DEFAULT_CONFIG;
+			int i2;
+
+			for (i2 = 1; i2 < argc; i2++) {
+				if (strcmp(argv[i2], "-c") == 0 &&
+				    i2 + 1 < argc) {
+					cpath = argv[i2 + 1];
+					break;
+				}
+			}
+			layer7_ldap_cfg_defaults(&cfg);
+			buf = read_file(cpath, &len);
+			if (buf != NULL) {
+				(void)layer7_ldap_cfg_parse_json(buf, len,
+				    &cfg);
+				free(buf);
+			}
+			(void)layer7_ldap_cfg_load_secret(&cfg, NULL);
+			memset(&tr, 0, sizeof(tr));
+			(void)layer7_ldap_test_connection(&cfg, &tr);
+			/* GI5.4: stderr sem secrets (servidor/porto/fase apenas). */
+			if (tr.ok)
+				fprintf(stderr,
+				    "identity: ldap-test OK server=%s port=%d "
+				    "tls=%d ms=%u\n",
+				    tr.server, tr.port, tr.use_tls, tr.ms);
+			else
+				fprintf(stderr,
+				    "identity: ldap-test FAIL phase=%s "
+				    "server=%s port=%d\n",
+				    tr.phase, tr.server[0] ? tr.server : "-",
+				    tr.port);
+			printf("{\"ok\":%s,\"phase\":\"%s\",\"server\":\"%s\","
+			    "\"port\":%d,\"tls\":%s,\"base_ok\":%s,\"ms\":%u,"
+			    "\"ldap_rc\":%d,\"message\":\"",
+			    tr.ok ? "true" : "false", tr.phase, tr.server,
+			    tr.port, tr.use_tls ? "true" : "false",
+			    tr.base_ok ? "true" : "false", tr.ms, tr.ldap_rc);
+			/* escape mínimo da mensagem */
+			{
+				const char *p;
+				for (p = tr.message; *p; p++) {
+					if (*p == '"' || *p == '\\')
+						putchar('\\');
+					if (*p == '\n' || *p == '\r')
+						continue;
+					putchar(*p);
+				}
+			}
+			printf("\"}\n");
+			layer7_ldap_cfg_wipe_secret(&cfg);
+			if (tr.ok)
+				return 0;
+			if (strcmp(tr.phase, "config") == 0)
+				return 2;
+			return 1;
 		}
 	}
 

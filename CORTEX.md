@@ -1291,9 +1291,9 @@ TRILHA IPv6 — progresso
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
 Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
-**20.17 PASS** (LDAP client+cache+fail-mode); passo actual **20.18 / IM4**.
+**20.18 PASS** (Test LDAP GUI + `--ldap-test`; GI5.4); passo actual **20.19 / IM5**.
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Pacote lab/`latest` publicado:** `1.9.15` (LDAP client 20.17 + OpenLDAP).
+**Pacote lab/`latest`:** `1.9.15` até publicar `1.9.16` (candidato 20.18).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1314,20 +1314,21 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 - **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM6 Identity** → IM7–IM8 → IM9
   → (MITM só com novo GO)
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-07b`
+- **Rev. plano:** `2026-08-07d`
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.18 / IM4** (Test LDAP GUI)
+- Passo actual: **20.19 / IM5** (RADIUS accounting)
+- 20.18: PASS (Test LDAP GUI; GI5.4 parcial)
 - 20.17: PASS (LDAP worker + cache + fail-mode)
 - 20.16: PASS (GUI LDAP config)
 - IM3 / GI4: PASS (20.15 entitlement gate)
 - IM2: DEFER 20.7a
-- Plano rev.: 2026-08-07c
+- Plano rev.: 2026-08-07d
 - Baseline enforce: 1.9.8
-- Publicado lab/`latest`: **1.9.15**
-- Próximo: 20.18 / GI5 parcial
+- Publicado lab/`latest`: **1.9.15** (candidato **1.9.16**)
+- Próximo: 20.19 / GI5.3
 ```
 
 
@@ -1501,17 +1502,17 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.15** (Identity LDAP client 20.17)
+- Canal publico latest: **1.9.15** (candidato **1.9.16** = Test LDAP 20.18)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo **20.18/IM4** (Test LDAP; 20.17 client PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo **20.19/IM5** (RADIUS; 20.18 Test LDAP PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Pacote publicado: **1.9.15** (`SHA256=6fc33b5e33446cd61e0b07820afb2e3237ecd91f7fcbb9189aae38ed976ae465`)
+- Pacote publicado: **1.9.15** (`SHA256=6fc33b5e33446cd61e0b07820afb2e3237ecd91f7fcbb9189aae38ed976ae465`); candidato **1.9.16**
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**+**1.9.15**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **IM4 / 20.18** (Test LDAP GUI); MITM DEFER; GO promoção enforce; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **IM5 / 20.19** (RADIUS accounting); MITM DEFER; GO promoção enforce; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

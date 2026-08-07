@@ -9,7 +9,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
+#include <sys/time.h>
 #include <unistd.h>
+
+#if !defined(__FreeBSD__) && !defined(__OpenBSD__) && !defined(__NetBSD__)
+/* macOS / outros: explicit_bzero pode faltar nos headers sem feature macros. */
+#ifndef explicit_bzero
+static void
+layer7_explicit_bzero(void *p, size_t n)
+{
+	volatile unsigned char *v = (volatile unsigned char *)p;
+	while (n-- > 0)
+		*v++ = 0;
+}
+#define explicit_bzero(p, n) layer7_explicit_bzero((p), (n))
+#endif
+#endif
 
 #ifndef HAVE_OPENLDAP
 #define HAVE_OPENLDAP 0
@@ -66,8 +82,13 @@ layer7_ldap_cfg_load_secret(struct l7_ldap_cfg *c, const char *path)
 	if (c == NULL)
 		return -1;
 	layer7_ldap_cfg_wipe_secret(c);
-	if (path == NULL)
-		path = L7_LDAP_SECRET_PATH;
+	if (path == NULL) {
+		const char *env = getenv("LAYER7_LDAP_SECRET");
+		if (env != NULL && env[0] != '\0')
+			path = env;
+		else
+			path = L7_LDAP_SECRET_PATH;
+	}
 	f = fopen(path, "r");
 	if (f == NULL)
 		return -1;
@@ -1060,3 +1081,99 @@ layer7_ldap_worker_cache(struct l7_ldap_worker *w)
 {
 	return w ? w->cache : NULL;
 }
+
+#if HAVE_OPENLDAP
+int
+layer7_ldap_test_connection(const struct l7_ldap_cfg *cfg,
+    struct l7_ldap_test_result *out)
+{
+	LDAP *ld = NULL;
+	LDAPMessage *res = NULL;
+	struct timeval t0, t1;
+	int rc;
+	char *attrs[] = { "namingContexts", "objectClass", NULL };
+
+	if (out == NULL)
+		return -1;
+	memset(out, 0, sizeof(*out));
+	out->ldap_rc = 0;
+	snprintf(out->phase, sizeof(out->phase), "%s", "config");
+
+	if (cfg == NULL || cfg->server[0] == '\0' || cfg->base_dn[0] == '\0' ||
+	    cfg->bind_dn[0] == '\0' || !cfg->password_loaded) {
+		snprintf(out->message, sizeof(out->message), "%s",
+		    "Config LDAP incompleta (servidor, Base DN, bind DN ou credenciais).");
+		return -1;
+	}
+	snprintf(out->server, sizeof(out->server), "%s", cfg->server);
+	out->port = cfg->port;
+	out->use_tls = cfg->use_tls ? 1 : 0;
+
+	gettimeofday(&t0, NULL);
+	snprintf(out->phase, sizeof(out->phase), "%s", "connect");
+	if (ldap_connect_bind(cfg, &ld) != 0) {
+		gettimeofday(&t1, NULL);
+		out->ms = (unsigned)((t1.tv_sec - t0.tv_sec) * 1000 +
+		    (t1.tv_usec - t0.tv_usec) / 1000);
+		snprintf(out->phase, sizeof(out->phase), "%s", "bind");
+		snprintf(out->message, sizeof(out->message), "%s",
+		    "Falha a ligar ou autenticar no servidor LDAP "
+		    "(rede, TLS, porto ou credenciais).");
+		/* Sem password / DN nos logs de mensagem. */
+		return -1;
+	}
+	snprintf(out->phase, sizeof(out->phase), "%s", "search");
+	rc = ldap_search_ext_s(ld, cfg->base_dn, LDAP_SCOPE_BASE,
+	    "(objectClass=*)", attrs, 0, NULL, NULL, NULL, 1, &res);
+	out->ldap_rc = rc;
+	if (rc != LDAP_SUCCESS) {
+		gettimeofday(&t1, NULL);
+		out->ms = (unsigned)((t1.tv_sec - t0.tv_sec) * 1000 +
+		    (t1.tv_usec - t0.tv_usec) / 1000);
+		ldap_unbind_ext_s(ld, NULL, NULL);
+		snprintf(out->message, sizeof(out->message),
+		    "Bind OK mas pesquisa na Base DN falhou (rc=%d).", rc);
+		return -1;
+	}
+	out->base_ok = (res != NULL && ldap_count_entries(ld, res) > 0) ? 1 : 0;
+	if (res)
+		ldap_msgfree(res);
+	ldap_unbind_ext_s(ld, NULL, NULL);
+	gettimeofday(&t1, NULL);
+	out->ms = (unsigned)((t1.tv_sec - t0.tv_sec) * 1000 +
+	    (t1.tv_usec - t0.tv_usec) / 1000);
+	out->ok = 1;
+	snprintf(out->phase, sizeof(out->phase), "%s", "ok");
+	snprintf(out->message, sizeof(out->message), "%s",
+	    "Ligacao LDAP OK (bind + Base DN).");
+	return 0;
+}
+#else /* !HAVE_OPENLDAP */
+int
+layer7_ldap_test_connection(const struct l7_ldap_cfg *cfg,
+    struct l7_ldap_test_result *out)
+{
+	if (out == NULL)
+		return -1;
+	memset(out, 0, sizeof(*out));
+	snprintf(out->phase, sizeof(out->phase), "%s", "config");
+	if (cfg == NULL || cfg->server[0] == '\0' || cfg->base_dn[0] == '\0' ||
+	    cfg->bind_dn[0] == '\0' || !cfg->password_loaded) {
+		snprintf(out->message, sizeof(out->message), "%s",
+		    "Config LDAP incompleta (servidor, Base DN, bind DN ou credenciais).");
+		if (cfg != NULL) {
+			snprintf(out->server, sizeof(out->server), "%s",
+			    cfg->server);
+			out->port = cfg->port;
+			out->use_tls = cfg->use_tls ? 1 : 0;
+		}
+		return -1;
+	}
+	snprintf(out->server, sizeof(out->server), "%s", cfg->server);
+	out->port = cfg->port;
+	out->use_tls = cfg->use_tls ? 1 : 0;
+	snprintf(out->message, sizeof(out->message), "%s",
+	    "Cliente OpenLDAP nao compilado neste binario.");
+	return -1;
+}
+#endif

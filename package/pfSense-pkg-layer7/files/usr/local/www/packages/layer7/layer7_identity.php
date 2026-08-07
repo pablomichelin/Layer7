@@ -14,12 +14,24 @@ $unlocked = !empty($ent["has_identity"]);
 
 $input_errors = array();
 $savemsg = "";
+$ldap_test = null;
 
 $data = layer7_load_or_default();
 $identity = layer7_identity_from_config($data);
 $pwd_set = layer7_identity_bind_password_is_set();
 
-if ($unlocked && isset($_POST["save_identity"])) {
+if ($unlocked && isset($_POST["test_ldap"])) {
+	/* Usa a config ja gravada + secret em disco (GI5.4: sem password no POST). */
+	$ldap_test = layer7_identity_ldap_test();
+	layer7_identity_ldap_test_state_save($ldap_test);
+	if (!empty($ldap_test["ok"])) {
+		$savemsg = l7_t("Teste LDAP: ligacao OK.") .
+		    " (" . (int)$ldap_test["ms"] . " ms)";
+	} else {
+		$input_errors[] = l7_t("Teste LDAP falhou:") . " " .
+		    (string)($ldap_test["message"] ?? "");
+	}
+} elseif ($unlocked && isset($_POST["save_identity"])) {
 	$identity = array(
 		"enabled" => isset($_POST["identity_enabled"]),
 		"ldap" => array(
@@ -68,8 +80,8 @@ if ($unlocked && isset($_POST["save_identity"])) {
 			layer7_signal_reload();
 			$savemsg = l7_t(
 			    "Configuracao Identity guardada. " .
-			    "A expansao de grupos LDAP entra em passos seguintes; " .
-			    "o mapa de utilizadores no daemon ja esta activo com o entitlement."
+			    "O daemon aplica LDAP (cache/fail-mode) no reload. " .
+			    "Use «Testar ligacao LDAP» para validar bind + Base DN."
 			);
 			$identity = layer7_identity_from_config($data);
 			$pwd_set = layer7_identity_bind_password_is_set();
@@ -78,6 +90,9 @@ if ($unlocked && isset($_POST["save_identity"])) {
 }
 
 $ldap = $identity["ldap"];
+if ($ldap_test === null) {
+	$ldap_test = layer7_identity_ldap_test_state_load();
+}
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Identity"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
 include("head.inc");
@@ -143,7 +158,6 @@ if ($savemsg !== "") {
 			</p>
 
 			<form method="post" action="layer7_identity.php" class="form-horizontal">
-				<input type="hidden" name="save_identity" value="1" />
 
 				<h3 style="margin-top: 8px;"><?= htmlspecialchars(l7_t("Modulo Identity")); ?></h3>
 				<div class="form-group">
@@ -301,17 +315,55 @@ if ($savemsg !== "") {
 
 				<div class="form-group" style="margin-top: 20px;">
 					<div class="col-sm-9 col-sm-offset-3">
-						<button type="submit" class="btn btn-primary">
+						<button type="submit" name="save_identity" value="1" class="btn btn-primary">
 							<?= htmlspecialchars(l7_t("Guardar")); ?>
 						</button>
-						<span class="text-muted" style="margin-left: 12px; font-size: 12px;">
+						<button type="submit" name="test_ldap" value="1" class="btn btn-default"
+							style="margin-left: 8px;"
+							<?= empty($ldap["enabled"]) ? 'disabled="disabled"' : ""; ?>>
+							<?= htmlspecialchars(l7_t("Testar ligacao LDAP")); ?>
+						</button>
+						<p class="help-block" style="margin-top: 10px;">
 							<?= htmlspecialchars(l7_t(
-							    "Testar ligacao LDAP chega no passo seguinte da trilha."
+							    "O teste usa a configuracao e a palavra-passe ja gravadas " .
+							    "(nao envia a password no pedido). Guarde antes de testar " .
+							    "alteracoes. Resultado e logs sem secrets (GI5.4)."
 							)); ?>
-						</span>
+						</p>
 					</div>
 				</div>
 			</form>
+<?php if (is_array($ldap_test)): ?>
+			<div class="panel panel-<?= !empty($ldap_test["ok"]) ? "success" : "warning"; ?>"
+				style="margin-top: 16px;">
+				<div class="panel-heading">
+					<h3 class="panel-title" style="font-size: 14px;">
+						<?= htmlspecialchars(l7_t("Ultimo teste LDAP")); ?>
+					</h3>
+				</div>
+				<div class="panel-body" style="font-size: 13px;">
+					<p style="margin: 0 0 6px;">
+						<strong><?= htmlspecialchars(l7_t("Resultado")); ?>:</strong>
+						<?= !empty($ldap_test["ok"])
+						    ? htmlspecialchars(l7_t("OK"))
+						    : htmlspecialchars(l7_t("Falha")); ?>
+						· <?= htmlspecialchars((string)($ldap_test["message"] ?? "")); ?>
+					</p>
+					<p style="margin: 0; color: #666;">
+						<?= htmlspecialchars(l7_t("Fase")); ?>:
+						<?= htmlspecialchars((string)($ldap_test["phase"] ?? "-")); ?>
+						· <?= htmlspecialchars((string)($ldap_test["server"] ?? "")); ?>
+						:<?= (int)($ldap_test["port"] ?? 0); ?>
+						· TLS=<?= !empty($ldap_test["tls"]) ? "yes" : "no"; ?>
+						· Base DN=<?= !empty($ldap_test["base_ok"]) ? "ok" : "-"; ?>
+						· <?= (int)($ldap_test["ms"] ?? 0); ?> ms
+<?php if (!empty($ldap_test["tested_at"])): ?>
+						· <?= htmlspecialchars((string)$ldap_test["tested_at"]); ?>
+<?php endif; ?>
+					</p>
+				</div>
+			</div>
+<?php endif; ?>
 			<p class="text-muted" style="margin-top: 24px; font-size: 12px;">
 				features=<?= htmlspecialchars($ent["raw"]); ?>
 			</p>

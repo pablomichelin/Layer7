@@ -72,13 +72,13 @@ Identity avança sem GI2/GI3.
 
 ## GI5 — LDAP + pelo menos uma fonte canónica
 
-| # | Critério |
-|---|----------|
-| GI5.1 | LDAPS bind + grupo em lab |
-| GI5.2 | Cache + fail-mode ADR-0027 |
-| GI5.3 | Fonte MVP: **RADIUS accounting receiver** **ou** **agente DC** popula mapa |
-| GI5.4 | Sem passwords/secrets em logs |
-| GI5.5 | WinRM outbound do appliance **não** usado como caminho canónico |
+| # | Critério | Estado (2026-08-07) |
+|---|----------|---------------------|
+| GI5.1 | LDAPS bind + grupo em lab | **PARCIAL** — bind/Base DN via Test LDAP (20.18); expand grupo em lab residual |
+| GI5.2 | Cache + fail-mode ADR-0027 | **PASS** (20.17) |
+| GI5.3 | Fonte MVP: **RADIUS accounting receiver** **ou** **agente DC** popula mapa | **PENDENTE** (20.19+) |
+| GI5.4 | Sem passwords/secrets em logs | **PASS** (20.18 — CLI/GUI/estado) |
+| GI5.5 | WinRM outbound do appliance **não** usado como caminho canónico | **PASS** (política ADR; sem WinRM) |
 
 ---
 
@@ -136,7 +136,7 @@ Identity avança sem GI2/GI3.
 | GI2 | IM2 | **DEFERRED** (`2026-08-06` — 20.7a; GI2.0 PASS via DEFER) |
 | GI3 | IM2 | **DEFERRED** (`2026-08-06`) |
 | GI4 | IM3 | **PASS** (`2026-08-07` — GI4.6 ON lab residual) |
-| GI5 | IM4–IM5 | PENDENTE |
+| GI5 | IM4–IM5 | **PARCIAL** (20.18: GI5.1 lab residual / GI5.4 PASS; GI5.3 → 20.19+) |
 | GI6 | IM5 | PENDENTE |
 | GI7 | IM6 | PENDENTE |
 | GI8 | IM7–IM8 | PENDENTE |
@@ -151,7 +151,7 @@ Identity avança sem GI2/GI3.
 | 2026-08-05 | Criação GI0–GI9 |
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
-| 2026-08-05 | **GI0 PASS** — 20.2: ADRs 0025–0028 Aceito; transição legado T1 |
+| 2026-08-07 | **20.18** — Test LDAP GUI + `layer7d --ldap-test`; GI5.4 PASS (parcial GI5); passo → 20.19 |
 | 2026-08-05 | **GI1 PASS** — 20.3–20.6 entitlements + check-in ∩ `.lic` |
 | 2026-08-06 | **20.7a DEFER** — GI2/GI3 DEFERRED; ADR-0026 implementação diferida; posicionamento PME; passo → IM3/20.11a |
 | 2026-08-06 | **20.11a / GI4.0 PASS** — baseline perf registada; passo → 20.12 |

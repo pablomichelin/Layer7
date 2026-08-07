@@ -32,18 +32,18 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 ---
 
-## Estado actual (actualizar a cada passo)+
+## Estado actual (actualizar a cada passo)
 
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-07c`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-07d`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM4 / 20.18** — Test connection LDAP na GUI + logs sem passwords |
-| Código do produto nesta trilha | **20.17 PASS** (LDAP client+cache+fail-mode); GUI 20.16; mapa IM3; **sem** MITM |
-| Rev. do plano | **`2026-08-07c`** |
+| Passo actual | **IM5 / 20.19** — RADIUS accounting receiver |
+| Código do produto nesta trilha | **20.18 PASS** (Test LDAP GUI + `--ldap-test`); 20.17 client; GUI 20.16; mapa IM3; **sem** MITM |
+| Rev. do plano | **`2026-08-07d`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -123,7 +123,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM4 / 20.18 — Testar LDAP na GUI).
+Tarefa: continuar no passo actual (IM5 / 20.19 — RADIUS accounting receiver).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -142,16 +142,17 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM4 / 20.18 (Test LDAP GUI)
+- Passo actual: IM5 / 20.19 (RADIUS accounting)
+- 20.18: PASS (Test LDAP GUI + --ldap-test; GI5.4)
 - 20.17: PASS (LDAP client + cache + fail-mode)
 - 20.16: PASS (config GUI LDAP)
 - IM0+IM1: PASS; IM2 DEFER 20.7a
 - IM3 / 20.11a–20.15: PASS (GI4)
 - Posicionamento PME Identity-first: ACEITE
-- Código: identity_map + ldap worker; GUI LDAP; zero threads OFF
-- Plano rev.: 2026-08-07c
+- Código: identity_map + ldap worker + test GUI; zero threads OFF
+- Plano rev.: 2026-08-07d
 - Baseline enforce: 1.9.8
-- Publicado lab/`latest`: 1.9.15
+- Candidato / lab: 1.9.16 (após release)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

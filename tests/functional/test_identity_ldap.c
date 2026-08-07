@@ -135,6 +135,36 @@ main(void)
 	layer7_ldap_cache_destroy(cache);
 	layer7_ldap_set_providers(NULL, NULL);
 
+	/* 20.18 — teste de ligacao: config incompleta, sem secrets na mensagem */
+	{
+		struct l7_ldap_test_result tr;
+		struct l7_ldap_cfg tcfg;
+
+		layer7_ldap_cfg_defaults(&tcfg);
+		memset(&tr, 0, sizeof(tr));
+		check(layer7_ldap_test_connection(&tcfg, &tr) != 0,
+		    "test incomplete fails");
+		check(tr.ok == 0, "test ok=0");
+		check(strcmp(tr.phase, "config") == 0, "test phase config");
+		check(strstr(tr.message, "password") == NULL, "no password word");
+		check(strstr(tr.message, "s3cret") == NULL, "no secret leak");
+		check(strstr(tr.message, "incompleta") != NULL, "incomplete msg");
+
+		snprintf(tcfg.server, sizeof(tcfg.server), "%s", "dc.ex");
+		snprintf(tcfg.bind_dn, sizeof(tcfg.bind_dn), "%s", "CN=svc,DC=ex");
+		snprintf(tcfg.base_dn, sizeof(tcfg.base_dn), "%s", "DC=ex");
+		tcfg.password_loaded = 1;
+		snprintf(tcfg.bind_password, sizeof(tcfg.bind_password), "%s",
+		    "s3cret-should-never-appear");
+		memset(&tr, 0, sizeof(tr));
+		check(layer7_ldap_test_connection(&tcfg, &tr) != 0,
+		    "test without openldap or real server fails");
+		check(strstr(tr.message, "s3cret") == NULL, "password never in msg");
+		check(strstr(tr.message, tcfg.bind_password) == NULL,
+		    "bind_password never in msg");
+		layer7_ldap_cfg_wipe_secret(&tcfg);
+	}
+
 	if (fails) {
 		fprintf(stderr, "%d checks failed\n", fails);
 		return 1;

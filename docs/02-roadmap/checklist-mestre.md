@@ -411,8 +411,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] IM1 Entitlements (GI1) — BG-086 — **20.3–20.6 PASS**
 - [x] IM2 spike 20.7 + **20.7a DEFER** — BG-087 **Diferido** (GI2/GI3 DEFERRED; saltar 20.8–20.11)
 - [x] IM3 Map daemon + gate (GI4) — 20.11a–20.15 PASS (`2026-08-07`)
-- [ ] IM3–IM4 Map + LDAP (GI4–GI5) — BG-088 — **passo actual 20.16** (LDAP)
-- [ ] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089
+- [x] IM3–IM4 Map + LDAP (GI4 + GI5 parcial) — BG-088 — **20.18 PASS**; GI5.3 → IM5
+- [ ] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089 — **passo actual 20.19**
 - [ ] IM6 Políticas user/grupo (GI7) — BG-090
 - [ ] IM7–IM8 Agente/TS ou exclusão ADR (GI8) — BG-091
 - [ ] IM9 Fecho/release Identity (GI9) — BG-092

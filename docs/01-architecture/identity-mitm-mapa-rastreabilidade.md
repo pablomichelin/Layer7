@@ -55,6 +55,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-12 | Diagnóstico Identity GUI | IM3 | Dump JSON **PASS**; GUI page pendente | GUI/DMN | `layer7_idmap_dump_json` |
 | M-13 | LDAP/LDAPS client | IM4 | **20.17 PASS** (OpenLDAP + worker) | DMN/PKG | LIB_DEPENDS openldap26-client |
 | M-14 | Group expansion cache + fail-mode | IM4 | **20.17 PASS** | DMN | ADR-0027; TTL 300s |
+| M-14a | Test connection LDAP (GUI/CLI) | IM4 | **20.18 PASS** | DMN/PKG | `--ldap-test` JSON; GI5.4; sem secrets |
 | M-15 | RADIUS **accounting receiver** | IM5 | Planeado | DMN/PKG | canónico |
 | M-16 | **Agente no DC** → push logons | IM5 | Planeado | OPS/DMN | canónico; não WinRM |
 | M-17 | Conflict policy same-IP | IM5 | Planeado | DMN | |
@@ -76,7 +77,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | Licença | `src/layer7d/license.c`, `license.h` | Extender parse (contrato ADR-0025 P1–P6; `features[64]`); não mudar valid/expiry |
 | Main / identity | `identity_map.c` + `identity_module_sync` em `main.c` | **20.15:** init só com `L7_FEAT_IDENTITY`; SIGHUP sem clear; zero threads OFF |
 | Policy / enforce | `policy.c`, `enforce.c` | Consultar mapa daemon só se identity ON |
-| Package | `layer7.inc`, `layer7_identity.php` | **20.16:** config LDAP em `layer7.json` + secret 0600; sem SSOT de sessão |
+| Package | `layer7.inc`, `layer7_identity.php` | **20.16–20.18:** config LDAP + Testar ligação; secret 0600; sem SSOT de sessão |
 | License-server | `license-server/backend/...` | Campo `features` já existe |
 | Precedence | `docs/core/precedence.md` | 20.25 |
 | Block page | `layer7-blockpage` | MITM ON (se GO) |

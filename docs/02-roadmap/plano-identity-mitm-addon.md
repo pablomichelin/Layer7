@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-07c`; **20.17 PASS**; passo actual **20.18 / IM4**)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-07d`; **20.18 PASS**; passo actual **20.19 / IM5**)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**  
 **SSOT de execução:** este ficheiro  
@@ -11,8 +11,8 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.15` (**publicado** lab/`latest` `2026-08-07`)  
-**Nota:** **Rev. `c` (`2026-08-07`)** = **20.17 PASS** (LDAP worker + cache TTL + fail-mode; OpenLDAP); passo → **20.18**.
+**Candidato port:** `1.9.16` (20.18; publicar após build) — `latest` ainda `1.9.15` até release  
+**Nota:** **Rev. `d` (`2026-08-07`)** = **20.18 PASS** (Test LDAP GUI + `layer7d --ldap-test`; GI5.4); passo → **20.19**.
 
 ---
 
@@ -20,20 +20,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.18** (IM4 — Test connection LDAP GUI; logs sem passwords) |
-| Código | **20.17** `identity_ldap.c` worker+cache+OpenLDAP; GUI 20.16 |
+| Passo actual | **20.19** (IM5 — RADIUS accounting receiver) |
+| Código | **20.18** Test LDAP GUI/`--ldap-test`; 20.17 OpenLDAP worker; GUI 20.16 |
 | ADRs | **Aceito** ×4; T1; **0026 diferida** |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.18 / GI5 parcial |
+| Próximo | 20.19 / GI5.3 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.18 / IM4 (Test LDAP)
+- Passo actual: 20.19 / IM5 (RADIUS accounting)
+- 20.18: PASS (Test LDAP GUI; GI5.4)
 - 20.17: PASS (client+cache+fail-mode)
 - 20.16: PASS (config GUI)
 - IM3 / GI4: PASS
-- Baseline: 1.9.8; latest **1.9.15**
-- Próximo: 20.18 → GI5 parcial
+- Baseline: 1.9.8; latest **1.9.15**; candidato **1.9.16**
+- Próximo: 20.19 → GI5.3
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -319,7 +320,7 @@ Squid **rejeitado**; Identity-first.
 |-------|---------|------|
 | **20.16** | Config GUI: servidor, porto, TLS, bind DN, base DN, filtros; limites de escala (depth grupos, máx. members) | **PASS** (`2026-08-07`) |
 | **20.17** | Resolve grupos → membros; cache TTL; fail-mode ADR-0027 | **PASS** (`2026-08-07`) |
-| **20.18** | Test connection na GUI; logs sem passwords | **GI5** (parcial LDAP) |
+| **20.18** | Test connection na GUI; logs sem passwords | **GI5** (parcial LDAP) — **PASS** `2026-08-07` |
 
 ---
 
@@ -536,6 +537,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `a` / 20.15 PASS / GI4** — gate entitlement em `main`; zero threads OFF; passo → **20.16** LDAP |
 | 2026-08-07 | **rev. `b` / 20.16 PASS** — GUI LDAP (`layer7_identity.php`); secret bind 0600; defaults OFF; `test_identity_ldap_config` PASS; passo → **20.17** |
 | 2026-08-07 | **rev. `c` / 20.17 PASS** — `identity_ldap` worker+cache+fail-mode+OpenLDAP; `test_identity_ldap` PASS; candidato `1.9.15`; passo → **20.18** |
+| 2026-08-07 | **rev. `d` / 20.18 PASS** — Test LDAP GUI + `layer7d --ldap-test` (GI5.4); candidato `1.9.16`; passo → **20.19** |
 
 ---
 

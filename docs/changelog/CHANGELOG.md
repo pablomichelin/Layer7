@@ -2,6 +2,23 @@
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.9.16] — 2026-08-07
+
+### Added
+
+- **Identity Test LDAP (IM4 / 20.18):** botão «Testar ligacao LDAP» na GUI;
+  `layer7d --ldap-test` (JSON stdout; stderr sem secrets — GI5.4);
+  estado em `/var/db/layer7/identity-ldap-test.json`.
+- Testes: extensão `test_identity_ldap.c` + `test_identity_ldap_test.php`.
+
+### Notes
+
+- Canal `latest`: actualizar para **`1.9.16`** após GitHub Release.
+- Produção enforce permanece **`1.9.8`** até GO.
+- Rollback lab: `1.9.15`. SHA256: *(preencher no release)*.
+- GI5 **parcial** (LDAP test + GI5.4); GI5.3 = RADIUS/DC (20.19+).
+- Defaults LDAP **OFF**; MITM permanece DEFER.
+
 ## [1.9.15] — 2026-08-07
 
 ### Added
@@ -16,7 +33,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - Canal `latest`: **`1.9.15`**. Produção enforce permanece **`1.9.8`** até GO.
 - SHA256: `6fc33b5e33446cd61e0b07820afb2e3237ecd91f7fcbb9189aae38ed976ae465`.
-- Rollback lab: `1.9.14`. «Testar LDAP» na GUI = passo 20.18 (ainda não).
+- Rollback lab: `1.9.14`. «Testar LDAP» na GUI = **20.18** (`1.9.16`).
 - Defaults LDAP **OFF**; MITM permanece DEFER.
 
 ## [1.9.14] — 2026-08-07

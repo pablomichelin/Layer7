@@ -5540,7 +5540,7 @@ function layer7_has_entitlement($token)
  * SSOT de sessão continua no daemon (mapa). Aqui só configuração de
  * directório: servidor, TLS, bind, filtros e limites ADR-0027 §4.3.
  * bind_password NUNCA em layer7.json — ficheiro 0600 separado.
- * Cliente LDAP C = passo 20.17; "Testar LDAP" = 20.18.
+ * Cliente LDAP C = 20.17; "Testar LDAP" GUI/CLI = 20.18.
  * ============================================================ */
 
 function layer7_identity_secret_path()
@@ -5741,6 +5741,133 @@ function layer7_identity_validate($identity)
 		$errors[] = l7_t("Porto LDAP invalido.");
 	}
 	return $errors;
+}
+
+/**
+ * 20.18 — Testa ligacao LDAP via layer7d --ldap-test (JSON, sem passwords).
+ * Devolve array: ok, phase, server, port, tls, base_ok, ms, message, raw.
+ */
+function layer7_identity_ldap_test()
+{
+	$bin = "/usr/local/sbin/layer7d";
+	$cfg = layer7_cfg_path();
+	$out = array(
+		"ok" => false,
+		"phase" => "config",
+		"server" => "",
+		"port" => 0,
+		"tls" => false,
+		"base_ok" => false,
+		"ms" => 0,
+		"message" => l7_t("Falha ao executar o teste LDAP."),
+		"raw" => ""
+	);
+	if (!file_exists($bin) || !is_executable($bin)) {
+		$out["message"] = l7_t("Binario layer7d nao encontrado.");
+		return $out;
+	}
+	$cmd = escapeshellarg($bin) . " --ldap-test -c " . escapeshellarg($cfg) .
+	    " 2>/dev/null";
+	$lines = array();
+	$rc = 1;
+	exec($cmd, $lines, $rc);
+	$raw = "";
+	foreach ($lines as $ln) {
+		$ln = trim($ln);
+		if ($ln !== "" && $ln[0] === '{') {
+			$raw = $ln;
+			break;
+		}
+	}
+	$out["raw"] = $raw;
+	if ($raw === "") {
+		$out["message"] = l7_t(
+		    "Sem resposta do teste LDAP. Guarde a configuracao e confirme " .
+		    "que o OpenLDAP client esta instalado."
+		);
+		return $out;
+	}
+	$j = json_decode($raw, true);
+	if (!is_array($j)) {
+		$out["message"] = l7_t("Resposta do teste LDAP invalida.");
+		return $out;
+	}
+	/* Nunca propagar campos inesperados que possam conter secrets. */
+	$out["ok"] = !empty($j["ok"]);
+	$out["phase"] = isset($j["phase"]) ? (string)$j["phase"] : "";
+	$out["server"] = isset($j["server"]) ? (string)$j["server"] : "";
+	$out["port"] = isset($j["port"]) ? (int)$j["port"] : 0;
+	$out["tls"] = !empty($j["tls"]);
+	$out["base_ok"] = !empty($j["base_ok"]);
+	$out["ms"] = isset($j["ms"]) ? (int)$j["ms"] : 0;
+	$out["message"] = isset($j["message"]) ? (string)$j["message"] :
+	    ($out["ok"] ? l7_t("Ligacao LDAP OK.") : l7_t("Falha no teste LDAP."));
+	/* Defesa GI5.4: nunca mostrar valor de secret (chave bind_password / password=...). */
+	$probe = $out["raw"] . "\n" . $out["message"];
+	if (preg_match('/bind_password|["\']password["\']\s*:|"password"\s*:/i', $probe) ||
+	    preg_match('/password\s*=\s*\S+/i', $probe)) {
+		$out["message"] = l7_t(
+		    "Falha no teste LDAP (detalhe omitido por seguranca)."
+		);
+		$out["raw"] = "";
+		$out["ok"] = false;
+	}
+	return $out;
+}
+
+/**
+ * Ultimo resultado de teste LDAP (sem secrets) — ficheiro diagnóstico.
+ */
+function layer7_identity_ldap_test_state_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") .
+		    "/var/db/layer7/identity-ldap-test.json";
+	}
+	return "/var/db/layer7/identity-ldap-test.json";
+}
+
+function layer7_identity_ldap_test_state_save($result)
+{
+	if (!is_array($result)) {
+		return false;
+	}
+	$dir = dirname(layer7_identity_ldap_test_state_path());
+	if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+		return false;
+	}
+	$safe = array(
+		"ok" => !empty($result["ok"]),
+		"phase" => (string)($result["phase"] ?? ""),
+		"server" => (string)($result["server"] ?? ""),
+		"port" => (int)($result["port"] ?? 0),
+		"tls" => !empty($result["tls"]),
+		"base_ok" => !empty($result["base_ok"]),
+		"ms" => (int)($result["ms"] ?? 0),
+		"message" => (string)($result["message"] ?? ""),
+		"tested_at" => date("c")
+	);
+	$json = json_encode($safe, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	if (!is_string($json)) {
+		return false;
+	}
+	$path = layer7_identity_ldap_test_state_path();
+	if (@file_put_contents($path, $json . "\n", LOCK_EX) === false) {
+		return false;
+	}
+	@chmod($path, 0640);
+	return true;
+}
+
+function layer7_identity_ldap_test_state_load()
+{
+	$path = layer7_identity_ldap_test_state_path();
+	if (!file_exists($path)) {
+		return null;
+	}
+	$raw = @file_get_contents($path);
+	$j = @json_decode(is_string($raw) ? $raw : "", true);
+	return is_array($j) ? $j : null;
 }
 
 /* ============================================================
