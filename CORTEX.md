@@ -1293,7 +1293,7 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
 **20.17 PASS** (LDAP client+cache+fail-mode); passo actual **20.18 / IM4**.
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Pacote lab/`latest`:** `1.9.14`. **Candidato:** `1.9.15` (não publicado).
+**Pacote lab/`latest` publicado:** `1.9.15` (LDAP client 20.17 + OpenLDAP).
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
