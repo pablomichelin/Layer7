@@ -6802,7 +6802,13 @@ function layer7_nav_items()
 		"allowlist" => array("label" => l7_t("Allowlist"), "href" => "layer7_allowlist.php"),
 		"eventos" => array("label" => l7_t("Eventos"), "href" => "layer7_events.php"),
 		"reports" => array("label" => l7_t("Relatorios"), "href" => "layer7_reports.php"),
-		"settings" => array("label" => l7_t("Definicoes"), "href" => "layer7_settings.php"),
+		"settings" => array("label" => l7_t("Definicoes"), "href" => "layer7_settings.php")
+	);
+}
+
+function layer7_nav_secondary_items()
+{
+	return array(
 		"diagnosticos" => array("label" => l7_t("Diagnosticos"), "href" => "layer7_diagnostics.php"),
 		"removal" => array("label" => l7_t("Remocao do pacote"), "href" => "layer7_removal.php")
 	);
@@ -6820,8 +6826,11 @@ function layer7_render_styles()
 	.layer7-page .panel-title { font-size: 20px; font-weight: 600; }
 	.layer7-page .layer7-content { padding: 24px 26px 26px; }
 	.layer7-page .layer7-lead { color: #666; line-height: 1.55; margin: 0 0 22px; max-width: 980px; }
-	.layer7-page .nav-tabs { margin: 0; padding: 10px 18px 0; border-bottom: 1px solid #e5e5e5; background: #fcfcfc; }
+	.layer7-page .nav-tabs { margin: 0; padding: 10px 18px 0; border-bottom: 1px solid #e5e5e5; background: #fcfcfc; display: flex; flex-wrap: wrap; }
+	.layer7-page .nav-tabs > li { float: none; }
 	.layer7-page .nav-tabs > li > a { padding: 11px 14px; font-weight: 600; }
+	.layer7-page .nav-tabs.layer7-nav-secondary { padding-top: 0; border-bottom: 1px solid #e5e5e5; background: #f7f7f7; }
+	.layer7-page .nav-tabs.layer7-nav-secondary > li > a { padding: 8px 14px; font-weight: 500; font-size: 13px; color: #666; }
 	.layer7-page .form-horizontal .control-label { padding-top: 10px; }
 	.layer7-page .form-control-static { padding-top: 8px; }
 	.layer7-page .layer7-section { margin-top: 30px; }
@@ -6885,9 +6894,17 @@ function layer7_render_styles()
 
 function layer7_render_tabs($active)
 {
-	$items = layer7_nav_items();
-	echo '<ul class="nav nav-tabs">';
-	foreach ($items as $key => $item) {
+	$primary = layer7_nav_items();
+	$secondary = layer7_nav_secondary_items();
+	echo '<ul class="nav nav-tabs layer7-nav-primary">';
+	foreach ($primary as $key => $item) {
+		$cls = ($key === $active) ? ' class="active"' : '';
+		echo '<li' . $cls . '><a href="' . htmlspecialchars($item["href"]) . '">' .
+		    htmlspecialchars($item["label"]) . '</a></li>';
+	}
+	echo '</ul>';
+	echo '<ul class="nav nav-tabs layer7-nav-secondary">';
+	foreach ($secondary as $key => $item) {
 		$cls = ($key === $active) ? ' class="active"' : '';
 		echo '<li' . $cls . '><a href="' . htmlspecialchars($item["href"]) . '">' .
 		    htmlspecialchars($item["label"]) . '</a></li>';

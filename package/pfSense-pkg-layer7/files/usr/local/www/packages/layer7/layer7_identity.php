@@ -9,8 +9,10 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
-$ent = layer7_entitlements();
-$unlocked = !empty($ent["has_identity"]);
+/* Nao usar $ent: head.inc faz foreach ($ifentries as $ent => ...) e sobrescreve. */
+$l7_ent = layer7_entitlements();
+$unlocked = !empty($l7_ent["has_identity"]);
+$l7_feat_raw = isset($l7_ent["raw"]) ? (string)$l7_ent["raw"] : "";
 
 $input_errors = array();
 $savemsg = "";
@@ -214,7 +216,7 @@ if ($savemsg !== "") {
 					)); ?>
 				</p>
 				<p style="margin: 10px 0 0; color: #666; font-size: 12px;">
-					features=<?= htmlspecialchars($ent["raw"] !== "" ? $ent["raw"] : "(base / legado)"); ?>
+					features=<?= htmlspecialchars($l7_feat_raw !== "" ? $l7_feat_raw : "(base / legado)"); ?>
 					· ADR-0025 / ADR-0027 · captive portal do pfSense permanece fora de escopo
 				</p>
 			</div>
@@ -623,7 +625,7 @@ if ($savemsg !== "") {
 			</div>
 <?php endif; ?>
 			<p class="text-muted" style="margin-top: 24px; font-size: 12px;">
-				features=<?= htmlspecialchars($ent["raw"]); ?>
+				features=<?= htmlspecialchars($l7_feat_raw); ?>
 			</p>
 <?php endif; ?>
 		</div>

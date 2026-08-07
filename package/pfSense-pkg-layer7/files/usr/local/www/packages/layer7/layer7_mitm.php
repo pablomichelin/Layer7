@@ -9,8 +9,10 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
-$ent = layer7_entitlements();
-$unlocked = !empty($ent["has_mitm"]);
+/* Nao usar $ent: head.inc faz foreach ($ifentries as $ent => ...) e sobrescreve. */
+$l7_ent = layer7_entitlements();
+$unlocked = !empty($l7_ent["has_mitm"]);
+$l7_feat_raw = isset($l7_ent["raw"]) ? (string)$l7_ent["raw"] : "";
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("MITM"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
@@ -36,7 +38,7 @@ layer7_render_styles();
 					)); ?>
 				</p>
 				<p style="margin: 10px 0 0; color: #666; font-size: 12px;">
-					features=<?= htmlspecialchars($ent["raw"] !== "" ? $ent["raw"] : "(base / legado)"); ?>
+					features=<?= htmlspecialchars($l7_feat_raw !== "" ? $l7_feat_raw : "(base / legado)"); ?>
 					· ADR-0025 / ADR-0026 · default OFF; spike 20.7 decide implementacao
 				</p>
 			</div>
@@ -52,7 +54,7 @@ layer7_render_styles();
 				<?= htmlspecialchars(l7_t("A implementacao MITM depende do spike 20.7 (GO/DEFER) — por agora so o gate comercial esta aberto.")); ?>
 			</div>
 			<p class="layer7-lead">
-				features=<?= htmlspecialchars($ent["raw"]); ?>
+				features=<?= htmlspecialchars($l7_feat_raw); ?>
 			</p>
 <?php endif; ?>
 		</div>
