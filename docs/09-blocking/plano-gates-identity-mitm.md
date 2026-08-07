@@ -64,9 +64,9 @@ Identity avança sem GI2/GI3.
 | GI4.1 | add/refresh/expire no **daemon** (lista de IPs v4/v6 por user; limites de escala ADR-0027 §4.3) | **PASS** (`2026-08-06` — 20.13 API) |
 | GI4.2 | TTL remove stale; não depende de resync PHP como SSOT | **PASS** (`2026-08-06` — expire + load skip expired) |
 | GI4.3 | Diagnóstico GUI sem secrets | **PASS** parcial (dump JSON daemon; página GUI = depois) |
-| GI4.4 | Sem entitlement `identity`: módulo inerte + **zero threads novas** (ADR-0028 §4) | PENDENTE (20.15) |
-| GI4.5 | `SIGHUP` reload: mapa vivo sobrevive; cold start pós-reboot documentado (ADR-0027 §4.2) | **PASS** parcial (API: clear ≠ SIGHUP; wiring main = 20.15) |
-| GI4.6 | Perf com módulo ON em lab dentro da tolerância vs baseline 20.11a; nenhum bloqueio do loop de captura observável | PENDENTE |
+| GI4.4 | Sem entitlement `identity`: módulo inerte + **zero threads novas** (ADR-0028 §4) | **PASS** (`2026-08-07` — sem init sem flag) |
+| GI4.5 | `SIGHUP` reload: mapa vivo sobrevive; cold start pós-reboot documentado (ADR-0027 §4.2) | **PASS** (`2026-08-07` — sync sem clear; load no cold start) |
+| GI4.6 | Perf com módulo ON em lab dentro da tolerância vs baseline 20.11a; nenhum bloqueio do loop de captura observável | **PASS** parcial — OFF = baseline (inerte); ON lab quando existir `.lic` identity |
 
 ---
 
@@ -135,7 +135,7 @@ Identity avança sem GI2/GI3.
 | GI1 | IM1 | **PASS** (`2026-08-05`) |
 | GI2 | IM2 | **DEFERRED** (`2026-08-06` — 20.7a; GI2.0 PASS via DEFER) |
 | GI3 | IM2 | **DEFERRED** (`2026-08-06`) |
-| GI4 | IM3 | **EM CURSO** (GI4.0 PASS `2026-08-06`; GI4.1–4.6 PENDENTE) |
+| GI4 | IM3 | **PASS** (`2026-08-07` — GI4.6 ON lab residual) |
 | GI5 | IM4–IM5 | PENDENTE |
 | GI6 | IM5 | PENDENTE |
 | GI7 | IM6 | PENDENTE |
@@ -157,3 +157,4 @@ Identity avança sem GI2/GI3.
 | 2026-08-06 | **20.11a / GI4.0 PASS** — baseline perf registada; passo → 20.12 |
 | 2026-08-06 | **20.13** — GI4.1 PASS; GI4.2/4.3 parciais (expire + dump JSON) |
 | 2026-08-06 | **20.14** — GI4.2 PASS; GI4.5 parcial (snap + política SIGHUP) |
+| 2026-08-07 | **20.15 / GI4 PASS** — entitlement gate; GI4.4/4.5 PASS |

@@ -12,6 +12,8 @@
 #include "bl_config.h"
 #include "config_parse.h"
 #include "enforce.h"
+#include "features.h"
+#include "identity_map.h"
 #include "license.h"
 #include "log_store.h"
 #include "policy.h"
@@ -105,6 +107,10 @@ static int s_cap_interfaces;
 static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
 static time_t s_last_checkin_tick;
+
+/* Identity map (20.15): só activo com entitlement identity; zero threads OFF. */
+static struct l7_id_map s_idmap;
+static int s_idmap_active;
 static int s_license_state = -1; /* 0=invalid, 1=valid, 2=grace/dev */
 
 static struct l7_blacklist *s_blacklist;
@@ -306,6 +312,13 @@ write_stats_json(void)
 	    s_lic.features_flags ? s_lic.features_flags : 0);
 	fprintf(f, "  \"license_features_truncated\": %s,\n",
 	    s_lic.features_truncated ? "true" : "false");
+	fprintf(f, "  \"identity_active\": %s,\n",
+	    s_idmap_active ? "true" : "false");
+	fprintf(f, "  \"identity_sessions\": %u,\n",
+	    s_idmap_active ? layer7_idmap_count(&s_idmap) : 0);
+	fprintf(f, "  \"identity_entitled\": %s,\n",
+	    layer7_features_allows_identity(s_lic.features_flags) ?
+	    "true" : "false");
 
 	{
 		struct l7_checkin_status ci;
@@ -838,6 +851,9 @@ enforce_ge_downgrade(int prev_ge, const char *reason)
 	}
 }
 
+static void identity_module_sync(const char *reason);
+static void identity_module_shutdown(void);
+
 static void
 license_apply_invalidation(const char *reason)
 {
@@ -851,6 +867,56 @@ license_apply_invalidation(const char *reason)
 	s_ge = 0;
 	refresh_enforce_cfg();
 	enforce_ge_downgrade(prev_ge, reason);
+	identity_module_sync(reason);
+}
+
+/*
+ * ADR-0028 / 20.15: com entitlement identity ausente o mapa não é inicializado
+ * (zero threads, zero alocação). SIGHUP com módulo ON: mapa sobrevive
+ * (só expire stale); não chamar clear/fini.
+ */
+static void
+identity_module_sync(const char *reason)
+{
+	int want = layer7_features_allows_identity(s_lic.features_flags);
+	time_t now = time(NULL);
+
+	if (want && !s_idmap_active) {
+		int n;
+
+		if (layer7_idmap_init(&s_idmap) != 0) {
+			L7_WARN("identity: init failed (%s)",
+			    reason ? reason : "?");
+			return;
+		}
+		n = layer7_idmap_load(&s_idmap, NULL, now);
+		s_idmap_active = 1;
+		L7_NOTE("identity: module ON (%s) sessions_loaded=%d "
+		    "threads=0",
+		    reason ? reason : "?", n < 0 ? 0 : n);
+	} else if (!want && s_idmap_active) {
+		(void)layer7_idmap_save(&s_idmap, NULL);
+		layer7_idmap_fini(&s_idmap);
+		s_idmap_active = 0;
+		L7_NOTE("identity: module OFF (%s) — map fini, zero threads",
+		    reason ? reason : "?");
+	} else if (want && s_idmap_active) {
+		unsigned rem = layer7_idmap_expire(&s_idmap, now);
+
+		if (rem > 0)
+			L7_NOTE("identity: expired %u stale (%s)", rem,
+			    reason ? reason : "?");
+	}
+}
+
+static void
+identity_module_shutdown(void)
+{
+	if (!s_idmap_active)
+		return;
+	(void)layer7_idmap_save(&s_idmap, NULL);
+	layer7_idmap_fini(&s_idmap);
+	s_idmap_active = 0;
 }
 
 static void
@@ -890,6 +956,7 @@ license_checkin_tick(void)
 			s_lic = li;
 			s_license_state = (li.grace || li.dev_mode) ? 2 : 1;
 			refresh_enforce_cfg();
+			identity_module_sync("license_checkin");
 		}
 	}
 }
@@ -2859,9 +2926,12 @@ int main(int argc, char **argv)
 
 	open_captures();
 
+	identity_module_sync("startup");
+
 	for (;;) {
 		if (stop_req) {
 			close_captures();
+			identity_module_shutdown();
 			/* Bloco 5: ao parar/desinstalar, garantir que nenhuma
 			 * tabela dinamica fica com IPs `stale` que continuariam
 			 * a ser bloqueados pelas regras PF que persistem ate
@@ -2955,6 +3025,9 @@ int main(int argc, char **argv)
 			}
 
 			open_captures();
+
+			/* Identity: SIGHUP não descarta o mapa (ADR-0027 §4.2) */
+			identity_module_sync("sighup");
 
 			/* Reload blacklists from separate config.json */
 			{
@@ -3098,6 +3171,7 @@ int main(int argc, char **argv)
 					    "license_recheck");
 				}
 				s_license_state = new_state;
+				identity_module_sync("license_recheck");
 			}
 		}
 

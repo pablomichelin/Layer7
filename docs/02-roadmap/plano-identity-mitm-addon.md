@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-06h`; **20.11a–20.14 PASS**; passo actual **20.15 / IM3** / GI4)  
+**Estado do plano:** `ABERTO` (rev. `2026-08-07a`; **IM3 / 20.11a–20.15 PASS / GI4**; passo actual **20.16 / IM4**)  
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6  
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**  
 **SSOT de execução:** este ficheiro  
@@ -8,11 +8,11 @@
 **SSOT de estado vivo do produto:** [`../../CORTEX.md`](../../CORTEX.md)  
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
-**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
+**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
 **Candidato port:** `1.9.14` (**não publicado**)  
-**Nota:** **Rev. `h` (`2026-08-06`)** = **20.14 PASS** (snap save/load; stale skip; clear ≠ SIGHUP); passo → **20.15**.
+**Nota:** **Rev. `a` (`2026-08-07`)** = **20.15 PASS / GI4** (entitlement gate em `main`; zero threads OFF); passo → **20.16** LDAP.
 
 ---
 
@@ -20,18 +20,18 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.15** (IM3 — entitlement `identity` gate; zero threads OFF; GI4) |
-| Código | **20.14** snap `/var/db/layer7/identity-map.snap`; API completa; sem init em `main` |
+| Passo actual | **20.16** (IM4 — config LDAP/LDAPS GUI) |
+| Código | **20.15** gate em `main` (`identity_module_sync`); OFF = sem init/threads |
 | ADRs | **Aceito** ×4; T1; **0026 diferida** |
 | MITM | **DEFER 20.7a** |
-| Próximo | GI4 fecho → IM4 LDAP |
+| Próximo | 20.17–20.18 LDAP / GI5 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.15 / IM3 (entitlement gate)
-- 20.11a–20.14: PASS
+- Passo actual: 20.16 / IM4 (LDAP)
+- IM3 / GI4: PASS
 - Baseline: 1.9.8; candidato 1.9.14 (não publicado)
-- Próximo: 20.15 / GI4 → IM4
+- Próximo: 20.16–20.18
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -307,7 +307,7 @@ Squid **rejeitado**; Identity-first.
 | **20.12** | Estruturas no daemon: sessão (user, IPs v4/v6 **lista**, source, seen_at, ttl, groups cache); **limites de escala ADR-0027 §4.3**; rwlock conforme ADR-0028 | **PASS** (`2026-08-06`) — `identity_map.h`/`identity_map.c`; `test_identity_map`; port `1.9.14` candidato |
 | **20.13** | API interna: add/refresh/expire; export para enforce/PF; dump diagnóstico GUI | **PASS** (`2026-08-06`) — upsert/refresh/expire/lookup/export/dump_json; multi_user ADR-0027 §4.1 |
 | **20.14** | Persistência best-effort opcional + política stale + **cold start/SIGHUP conforme ADR-0027 §4.2**; **não** depender de resync PHP como SSOT | **PASS** (`2026-08-06`) — save/load snap; expired skip; `clear` ≠ SIGHUP |
-| **20.15** | Entitlement `identity` gate; módulo inerte sem ele (**zero threads novas com OFF**, ADR-0028 §4) | **GI4** |
+| **20.15** | Entitlement `identity` gate; módulo inerte sem ele (**zero threads novas com OFF**, ADR-0028 §4) | **PASS / GI4** (`2026-08-07`) — `identity_module_sync` em startup/SIGHUP/license; stats `identity_*` |
 
 ---
 
@@ -531,6 +531,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-06 | **rev. `f` / 20.12 PASS** — `identity_map` (structs, limites §4.3, rwlock); smoke builder OK; passo → **20.13**; candidato `1.9.14` |
 | 2026-08-06 | **rev. `g` / 20.13 PASS** — API upsert/refresh/expire/lookup/export/dump; multi_user; passo → **20.14** |
 | 2026-08-06 | **rev. `h` / 20.14 PASS** — snap save/load; stale nunca restaurado; clear documentado ≠ SIGHUP; passo → **20.15** |
+| 2026-08-07 | **rev. `a` / 20.15 PASS / GI4** — gate entitlement em `main`; zero threads OFF; passo → **20.16** LDAP |
 
 ---
 
