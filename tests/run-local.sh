@@ -96,6 +96,33 @@ else
 	fail "test_identity_radius compile"
 fi
 
+step "Unit: identity_dc agent push (20.20)"
+CRYPTO_FLAGS=""
+if [ -d /opt/homebrew/opt/openssl ]; then
+	CRYPTO_FLAGS="-I/opt/homebrew/opt/openssl/include -L/opt/homebrew/opt/openssl/lib -lssl -lcrypto"
+elif [ -d /usr/local/opt/openssl ]; then
+	CRYPTO_FLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib -lssl -lcrypto"
+elif pkg-config --exists libssl 2>/dev/null; then
+	CRYPTO_FLAGS="$(pkg-config --cflags --libs libssl libcrypto)"
+else
+	CRYPTO_FLAGS="-lssl -lcrypto"
+fi
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_identity_dc \
+    tests/functional/test_identity_dc.c \
+    src/layer7d/identity_dc.c src/layer7d/identity_map.c \
+    -lpthread $CRYPTO_FLAGS \
+    2>/tmp/test_identity_dc.cc.err; then
+	if /tmp/test_identity_dc; then
+		pass "test_identity_dc"
+	else
+		fail "test_identity_dc runtime"
+	fi
+else
+	cat /tmp/test_identity_dc.cc.err
+	fail "test_identity_dc compile"
+fi
+
 step "Unit: config_parse (sni_inspection / A3)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_config_parse \

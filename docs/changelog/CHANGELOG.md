@@ -6,9 +6,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- **Identity / 20.20 desenho:** canal agente DC A1–A7 fechado —
-  [`desenho-canal-agente-dc-20.20.md`](../01-architecture/desenho-canal-agente-dc-20.20.md)
-  (TLS+HMAC MVP; porto 8743; ACL DC; sem código ainda). ADR-0027 rev. `d`.
+- **Identity / 20.20 código (parcial):** receiver HTTPS `identity_dc` no daemon
+  (token + HMAC-SHA256, ACL DC, skew, rate limit); GUI Identity secção agente DC;
+  script lab `docs/samples/identity-dc-agent/Send-Layer7IdentityEvent.ps1`.
+  Servico Windows Event Log completo = passo seguinte. Candidato **1.9.18**.
 
 ## [1.9.17] — 2026-08-07
 

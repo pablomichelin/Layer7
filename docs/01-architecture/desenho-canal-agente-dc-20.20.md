@@ -240,3 +240,4 @@ Agente **não** faz bind LDAP no DC para grupos (isso é o worker LDAP no applia
 |------|--------|
 | 2026-08-05 | ADR-0027 §2.1 A1–A7 (requisitos mínimos) |
 | 2026-08-07 | **20.20 desenho ACEITE** — TLS+HMAC MVP; porto 8743; payload; limites; privilégio mínimo |
+| 2026-08-07 | **20.20 receiver PASS** — `identity_dc` + GUI + script PS1 lab; candidato 1.9.18 |

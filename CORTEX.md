@@ -1321,7 +1321,7 @@ desenho PASS** (A1–A7); passo actual **20.20 código / IM5** (receiver + agent
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.20 código / IM5** (receiver DC + agente)
+- Passo actual: **agente Windows Event Log** (receiver 20.20 PASS)
 - 20.20 desenho: PASS (A1–A7; TLS+HMAC; porto 8743)
 - 20.19: PASS (RADIUS accounting; GI5.3)
 - 20.18: PASS (Test LDAP GUI; GI5.4)
@@ -1516,7 +1516,7 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **IM5 / 20.20 código** (receiver HTTPS + agente DC); MITM DEFER; GO promoção enforce; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **agente Windows Event Log** (fecho 20.20); build/publish 1.9.18; MITM DEFER; GO promoção enforce; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

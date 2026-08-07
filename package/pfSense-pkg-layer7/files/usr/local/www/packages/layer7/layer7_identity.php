@@ -20,6 +20,8 @@ $data = layer7_load_or_default();
 $identity = layer7_identity_from_config($data);
 $pwd_set = layer7_identity_bind_password_is_set();
 $radius_secret_set = layer7_identity_radius_secret_is_set();
+$dc_secret_set = layer7_identity_dc_secret_is_set();
+$dc_token_once = "";
 
 if ($unlocked && isset($_POST["test_ldap"])) {
 	/* Usa a config ja gravada + secret em disco (GI5.4: sem password no POST). */
@@ -32,8 +34,10 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 		$input_errors[] = l7_t("Teste LDAP falhou:") . " " .
 		    (string)($ldap_test["message"] ?? "");
 	}
-} elseif ($unlocked && isset($_POST["save_identity"])) {
+} elseif ($unlocked && (isset($_POST["save_identity"]) ||
+    isset($_POST["dc_generate_token"]))) {
 	$nas_raw = trim((string)($_POST["radius_nas_acl"] ?? ""));
+	$dc_acl_raw = trim((string)($_POST["dc_acl"] ?? ""));
 	$identity = array(
 		"enabled" => isset($_POST["identity_enabled"]),
 		"ldap" => array(
@@ -53,6 +57,13 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 			"listen_port" => (int)($_POST["radius_listen_port"] ?? 1813),
 			"bind_address" => trim((string)($_POST["radius_bind_address"] ?? "0.0.0.0")),
 			"nas_acl" => $nas_raw
+		),
+		"dc_agent" => array(
+			"enabled" => isset($_POST["dc_enabled"]),
+			"listen_port" => (int)($_POST["dc_listen_port"] ?? 8743),
+			"bind_address" => trim((string)($_POST["dc_bind_address"] ?? "127.0.0.1")),
+			"skew_sec" => (int)($_POST["dc_skew_sec"] ?? 300),
+			"dc_acl" => $dc_acl_raw
 		)
 	);
 	$identity = layer7_identity_normalize($identity);
@@ -103,6 +114,45 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 		);
 	}
 
+	if (isset($_POST["dc_generate_token"])) {
+		$tok = layer7_identity_dc_secret_generate();
+		if ($tok === false) {
+			$input_errors[] = l7_t("Nao foi possivel gerar o token do agente DC.");
+		} else {
+			$dc_secret_set = true;
+			$dc_token_once = $tok;
+		}
+	} elseif (isset($_POST["dc_clear_secret"])) {
+		if (!layer7_identity_dc_secret_clear()) {
+			$input_errors[] = l7_t("Nao foi possivel limpar o token do agente DC.");
+		} else {
+			$dc_secret_set = false;
+		}
+	} else {
+		$new_dc = (string)($_POST["dc_secret"] ?? "");
+		if ($new_dc !== "") {
+			if (!layer7_identity_dc_secret_save($new_dc)) {
+				$input_errors[] = l7_t("Nao foi possivel gravar o token do agente DC.");
+			} else {
+				$dc_secret_set = true;
+			}
+		}
+	}
+
+	if (!empty($identity["dc_agent"]["enabled"]) && !$dc_secret_set &&
+	    empty($input_errors)) {
+		$input_errors[] = l7_t(
+		    "Token do agente DC e obrigatorio quando o receiver esta activo."
+		);
+	}
+	if (!empty($identity["dc_agent"]["enabled"]) && empty($input_errors)) {
+		if (!layer7_identity_dc_ensure_tls_cert()) {
+			$input_errors[] = l7_t(
+			    "Nao foi possivel criar/validar o certificado TLS do receiver DC."
+			);
+		}
+	}
+
 	if (empty($input_errors)) {
 		$data = layer7_identity_apply_to_config($data, $identity);
 		if (!layer7_save_json($data)) {
@@ -111,12 +161,12 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 			layer7_signal_reload();
 			$savemsg = l7_t(
 			    "Configuracao Identity guardada. " .
-			    "O daemon aplica LDAP e RADIUS accounting no reload. " .
-			    "Use «Testar ligacao LDAP» para validar bind + Base DN."
+			    "O daemon aplica LDAP, RADIUS e agente DC no reload."
 			);
 			$identity = layer7_identity_from_config($data);
 			$pwd_set = layer7_identity_bind_password_is_set();
 			$radius_secret_set = layer7_identity_radius_secret_is_set();
+			$dc_secret_set = layer7_identity_dc_secret_is_set();
 		}
 	}
 }
@@ -124,8 +174,12 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 $ldap = $identity["ldap"];
 $radius = isset($identity["radius"]) && is_array($identity["radius"]) ?
     $identity["radius"] : layer7_identity_defaults()["radius"];
+$dc = isset($identity["dc_agent"]) && is_array($identity["dc_agent"]) ?
+    $identity["dc_agent"] : layer7_identity_defaults()["dc_agent"];
 $nas_acl_text = is_array($radius["nas_acl"] ?? null) ?
     implode(", ", $radius["nas_acl"]) : "";
+$dc_acl_text = is_array($dc["dc_acl"] ?? null) ?
+    implode(", ", $dc["dc_acl"]) : "";
 if ($ldap_test === null) {
 	$ldap_test = layer7_identity_ldap_test_state_load();
 }
@@ -403,6 +457,90 @@ if ($savemsg !== "") {
 								— <span class="text-success"><?= htmlspecialchars(l7_t("secret definido")); ?></span>
 							<?php else: ?>
 								— <span class="text-muted"><?= htmlspecialchars(l7_t("ainda nao definido")); ?></span>
+							<?php endif; ?>
+						</p>
+					</div>
+				</div>
+
+				<hr />
+				<h3><?= htmlspecialchars(l7_t("Agente DC (fonte de sessao)")); ?></h3>
+				<p class="help-block">
+					<?= htmlspecialchars(l7_t(
+					    "Receiver HTTPS no appliance (porto 8743) para o agente no Domain Controller. " .
+					    "Autenticacao: token + HMAC-SHA256. Bind so em IP LAN (nunca 0.0.0.0). " .
+					    "Default OFF. Isto e User-ID de rede — o IP reportado pelo AD pode diferir do IP visto no firewall."
+					)); ?>
+				</p>
+<?php if ($dc_token_once !== ""): ?>
+				<div class="alert alert-warning">
+					<?= htmlspecialchars(l7_t("Novo token (copie agora — nao sera mostrado outra vez):")); ?>
+					<code style="user-select: all;"><?= htmlspecialchars($dc_token_once); ?></code>
+				</div>
+<?php endif; ?>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Receiver agente DC")); ?></label>
+					<div class="col-sm-9">
+						<label class="checkbox-inline">
+							<input type="checkbox" name="dc_enabled" value="1"
+								<?= !empty($dc["enabled"]) ? 'checked="checked"' : ""; ?> />
+							<?= htmlspecialchars(l7_t("Aceitar push de logon/logoff (default OFF)")); ?>
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Porto")); ?></label>
+					<div class="col-sm-9">
+						<input type="number" name="dc_listen_port" class="form-control" style="max-width: 120px;"
+							min="1" max="65535" value="<?= (int)$dc["listen_port"]; ?>" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Bind LAN")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="dc_bind_address" class="form-control" style="max-width: 220px;"
+							maxlength="64"
+							value="<?= htmlspecialchars($dc["bind_address"]); ?>"
+							placeholder="192.168.1.1" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("ACL Domain Controllers")); ?></label>
+					<div class="col-sm-9">
+						<input type="text" name="dc_acl" class="form-control" style="max-width: 520px;"
+							maxlength="512"
+							value="<?= htmlspecialchars($dc_acl_text); ?>"
+							placeholder="10.0.0.10, 10.0.0.11" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Skew (segundos)")); ?></label>
+					<div class="col-sm-9">
+						<input type="number" name="dc_skew_sec" class="form-control" style="max-width: 120px;"
+							min="60" max="900" value="<?= (int)$dc["skew_sec"]; ?>" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Token agente")); ?></label>
+					<div class="col-sm-9">
+						<input type="password" name="dc_secret" class="form-control" style="max-width: 320px;"
+							maxlength="256" value="" autocomplete="new-password"
+							placeholder="<?= $dc_secret_set
+							    ? htmlspecialchars(l7_t("(definido — deixe vazio para manter)"))
+							    : ""; ?>" />
+						<label class="checkbox-inline" style="margin-left: 12px;">
+							<input type="checkbox" name="dc_clear_secret" value="1" />
+							<?= htmlspecialchars(l7_t("Limpar token")); ?>
+						</label>
+						<button type="submit" name="dc_generate_token" value="1" class="btn btn-default btn-sm"
+							style="margin-left: 12px;"
+							onclick="return confirm(<?= json_encode(l7_t('Gerar novo token? O anterior deixa de funcionar.')); ?>);">
+							<?= htmlspecialchars(l7_t("Gerar token")); ?>
+						</button>
+						<p class="help-block">
+							<?php if ($dc_secret_set): ?>
+								<span class="text-success"><?= htmlspecialchars(l7_t("token definido")); ?></span>
+							<?php else: ?>
+								<span class="text-muted"><?= htmlspecialchars(l7_t("ainda nao definido")); ?></span>
 							<?php endif; ?>
 						</p>
 					</div>

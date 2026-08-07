@@ -5581,6 +5581,13 @@ function layer7_identity_defaults()
 			"listen_port" => 1813,
 			"bind_address" => "0.0.0.0",
 			"nas_acl" => array()
+		),
+		"dc_agent" => array(
+			"enabled" => false,
+			"listen_port" => 8743,
+			"bind_address" => "127.0.0.1",
+			"skew_sec" => 300,
+			"dc_acl" => array()
 		)
 	);
 }
@@ -5690,6 +5697,53 @@ function layer7_identity_normalize($identity)
 	$rad["nas_acl"] = array_values(array_unique($acl));
 	unset($rad["secret"]);
 	$out["radius"] = $rad;
+
+	/* DC agent push (20.20) */
+	$dc_in = (isset($identity["dc_agent"]) && is_array($identity["dc_agent"])) ?
+	    $identity["dc_agent"] : array();
+	$dc = $defaults["dc_agent"];
+	$dc["enabled"] = !empty($dc_in["enabled"]);
+	$dport = isset($dc_in["listen_port"]) ? (int)$dc_in["listen_port"] : 8743;
+	if ($dport < 1 || $dport > 65535) {
+		$dport = 8743;
+	}
+	$dc["listen_port"] = $dport;
+	$dbind = trim((string)($dc_in["bind_address"] ?? "127.0.0.1"));
+	if ($dbind === "" || filter_var($dbind, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false) {
+		$dbind = "127.0.0.1";
+	}
+	$dc["bind_address"] = $dbind;
+	$skew = isset($dc_in["skew_sec"]) ? (int)$dc_in["skew_sec"] : 300;
+	if ($skew < 60) {
+		$skew = 60;
+	}
+	if ($skew > 900) {
+		$skew = 900;
+	}
+	$dc["skew_sec"] = $skew;
+	$dacl = array();
+	if (isset($dc_in["dc_acl"])) {
+		$raw = $dc_in["dc_acl"];
+		if (is_string($raw)) {
+			$parts = preg_split('/[\s,;]+/', $raw);
+			$raw = is_array($parts) ? $parts : array();
+		}
+		if (is_array($raw)) {
+			foreach ($raw as $ip) {
+				$ip = trim((string)$ip);
+				if ($ip === "" || filter_var($ip, FILTER_VALIDATE_IP) === false) {
+					continue;
+				}
+				$dacl[] = $ip;
+				if (count($dacl) >= 32) {
+					break;
+				}
+			}
+		}
+	}
+	$dc["dc_acl"] = array_values(array_unique($dacl));
+	unset($dc["secret"]);
+	$out["dc_agent"] = $dc;
 	return $out;
 }
 
@@ -5809,7 +5863,146 @@ function layer7_identity_validate($identity)
 			);
 		}
 	}
+
+	$dc = isset($identity["dc_agent"]) ? $identity["dc_agent"] : array();
+	if (!empty($dc["enabled"])) {
+		if ((int)($dc["listen_port"] ?? 0) < 1 || (int)$dc["listen_port"] > 65535) {
+			$errors[] = l7_t("Porto do agente DC invalido.");
+		}
+		if (empty($dc["dc_acl"]) || !is_array($dc["dc_acl"])) {
+			$errors[] = l7_t(
+			    "ACL de Domain Controllers e obrigatoria quando o receiver DC esta activo."
+			);
+		}
+		if (($dc["bind_address"] ?? "") === "0.0.0.0") {
+			$errors[] = l7_t(
+			    "Bind 0.0.0.0 nao e permitido para o agente DC (use um IP LAN)."
+			);
+		}
+	}
 	return $errors;
+}
+
+function layer7_identity_dc_secret_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/identity-dc.secret";
+	}
+	return "/usr/local/etc/layer7/identity-dc.secret";
+}
+
+function layer7_identity_dc_cert_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/identity-dc.crt";
+	}
+	return "/usr/local/etc/layer7/identity-dc.crt";
+}
+
+function layer7_identity_dc_key_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/identity-dc.key";
+	}
+	return "/usr/local/etc/layer7/identity-dc.key";
+}
+
+function layer7_identity_dc_secret_is_set()
+{
+	$path = layer7_identity_dc_secret_path();
+	if (!file_exists($path) || !is_readable($path)) {
+		return false;
+	}
+	$raw = @file_get_contents($path);
+	return is_string($raw) && trim($raw) !== "";
+}
+
+function layer7_identity_dc_secret_save($secret)
+{
+	$path = layer7_identity_dc_secret_path();
+	$dir = dirname($path);
+	if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+		return false;
+	}
+	$secret = (string)$secret;
+	if (strlen($secret) > 256) {
+		$secret = substr($secret, 0, 256);
+	}
+	if (@file_put_contents($path, $secret, LOCK_EX) === false) {
+		return false;
+	}
+	@chmod($path, 0600);
+	@chown($path, "root");
+	@chgrp($path, "wheel");
+	return true;
+}
+
+function layer7_identity_dc_secret_clear()
+{
+	$path = layer7_identity_dc_secret_path();
+	if (!file_exists($path)) {
+		return true;
+	}
+	return @unlink($path);
+}
+
+function layer7_identity_dc_secret_generate()
+{
+	$bytes = random_bytes(32);
+	$token = rtrim(strtr(base64_encode($bytes), "+/", "-_"), "=");
+	if (!layer7_identity_dc_secret_save($token)) {
+		return false;
+	}
+	return $token;
+}
+
+function layer7_identity_dc_ensure_tls_cert()
+{
+	$crt = layer7_identity_dc_cert_path();
+	$key = layer7_identity_dc_key_path();
+	if (file_exists($crt) && file_exists($key)) {
+		return true;
+	}
+	$dir = dirname($crt);
+	if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+		return false;
+	}
+	if (!function_exists("openssl_pkey_new")) {
+		return false;
+	}
+	$pkey = openssl_pkey_new(array(
+		"private_key_bits" => 2048,
+		"private_key_type" => OPENSSL_KEYTYPE_RSA
+	));
+	if ($pkey === false) {
+		return false;
+	}
+	$dn = array(
+		"countryName" => "BR",
+		"organizationName" => "Layer7",
+		"commonName" => "layer7-identity-dc"
+	);
+	$csr = openssl_csr_new($dn, $pkey, array("digest_alg" => "sha256"));
+	if ($csr === false) {
+		return false;
+	}
+	$x509 = openssl_csr_sign($csr, null, $pkey, 825, array("digest_alg" => "sha256"));
+	if ($x509 === false) {
+		return false;
+	}
+	$cert_out = "";
+	$key_out = "";
+	if (!openssl_x509_export($x509, $cert_out) ||
+	    !openssl_pkey_export($pkey, $key_out)) {
+		return false;
+	}
+	if (@file_put_contents($crt, $cert_out, LOCK_EX) === false ||
+	    @file_put_contents($key, $key_out, LOCK_EX) === false) {
+		return false;
+	}
+	@chmod($crt, 0644);
+	@chmod($key, 0600);
+	return true;
 }
 
 function layer7_identity_radius_secret_is_set()

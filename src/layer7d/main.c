@@ -16,6 +16,7 @@
 #include "identity_map.h"
 #include "identity_ldap.h"
 #include "identity_radius.h"
+#include "identity_dc.h"
 #include "license.h"
 #include "log_store.h"
 #include "policy.h"
@@ -115,6 +116,7 @@ static struct l7_id_map s_idmap;
 static int s_idmap_active;
 static struct l7_ldap_worker *s_ldap_worker;
 static struct l7_radius_worker *s_radius_worker;
+static struct l7_dc_worker *s_dc_worker;
 static int s_license_state = -1; /* 0=invalid, 1=valid, 2=grace/dev */
 
 static struct l7_blacklist *s_blacklist;
@@ -350,6 +352,20 @@ write_stats_json(void)
 		    layer7_radius_worker_accepted(s_radius_worker));
 		fprintf(f, "  \"identity_radius_rejected\": %u,\n",
 		    layer7_radius_worker_rejected(s_radius_worker));
+	}
+	{
+		const char *dst = "off";
+		enum l7_dc_status st = s_dc_worker ?
+		    layer7_dc_worker_status(s_dc_worker) : L7_DC_STATUS_OFF;
+		if (st == L7_DC_STATUS_LISTEN)
+			dst = "listen";
+		else if (st == L7_DC_STATUS_ERROR)
+			dst = "error";
+		fprintf(f, "  \"identity_dc_status\": \"%s\",\n", dst);
+		fprintf(f, "  \"identity_dc_accepted\": %u,\n",
+		    layer7_dc_worker_accepted(s_dc_worker));
+		fprintf(f, "  \"identity_dc_rejected\": %u,\n",
+		    layer7_dc_worker_rejected(s_dc_worker));
 	}
 
 	{
@@ -980,6 +996,42 @@ identity_radius_sync_worker(const char *reason)
 }
 
 static void
+identity_dc_sync_worker(const char *reason)
+{
+	char *buf = NULL;
+	size_t len = 0;
+	struct l7_dc_cfg cfg;
+
+	layer7_dc_cfg_defaults(&cfg);
+	buf = read_file(config_path, &len);
+	if (buf != NULL) {
+		(void)layer7_dc_cfg_parse_json(buf, len, &cfg);
+		free(buf);
+	}
+	(void)layer7_dc_cfg_load_secret(&cfg, NULL);
+
+	if (cfg.dc_enabled) {
+		if (s_dc_worker == NULL) {
+			s_dc_worker = layer7_dc_worker_start(&s_idmap, &cfg);
+			if (s_dc_worker)
+				L7_NOTE("identity: dc_agent worker ON (%s)",
+				    reason ? reason : "?");
+			else
+				L7_WARN("identity: dc_agent worker start failed (%s)",
+				    reason ? reason : "?");
+		} else {
+			layer7_dc_worker_reload(s_dc_worker, &cfg);
+		}
+	} else if (s_dc_worker != NULL) {
+		layer7_dc_worker_stop(s_dc_worker);
+		s_dc_worker = NULL;
+		L7_NOTE("identity: dc_agent worker OFF (%s)",
+		    reason ? reason : "?");
+	}
+	layer7_dc_cfg_wipe_secret(&cfg);
+}
+
+static void
 identity_module_sync(const char *reason)
 {
 	int want = layer7_features_allows_identity(s_lic.features_flags);
@@ -999,6 +1051,7 @@ identity_module_sync(const char *reason)
 		    reason ? reason : "?", n < 0 ? 0 : n);
 		identity_ldap_sync_worker(reason);
 		identity_radius_sync_worker(reason);
+		identity_dc_sync_worker(reason);
 	} else if (!want && s_idmap_active) {
 		if (s_ldap_worker) {
 			layer7_ldap_worker_stop(s_ldap_worker);
@@ -1007,6 +1060,10 @@ identity_module_sync(const char *reason)
 		if (s_radius_worker) {
 			layer7_radius_worker_stop(s_radius_worker);
 			s_radius_worker = NULL;
+		}
+		if (s_dc_worker) {
+			layer7_dc_worker_stop(s_dc_worker);
+			s_dc_worker = NULL;
 		}
 		(void)layer7_idmap_save(&s_idmap, NULL);
 		layer7_idmap_fini(&s_idmap);
@@ -1021,6 +1078,7 @@ identity_module_sync(const char *reason)
 			    reason ? reason : "?");
 		identity_ldap_sync_worker(reason);
 		identity_radius_sync_worker(reason);
+		identity_dc_sync_worker(reason);
 	}
 }
 
@@ -1034,6 +1092,10 @@ identity_module_shutdown(void)
 	if (s_radius_worker) {
 		layer7_radius_worker_stop(s_radius_worker);
 		s_radius_worker = NULL;
+	}
+	if (s_dc_worker) {
+		layer7_dc_worker_stop(s_dc_worker);
+		s_dc_worker = NULL;
 	}
 	if (!s_idmap_active)
 		return;

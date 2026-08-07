@@ -28,6 +28,9 @@ if ($_POST["export_config"] ?? false) {
 	if (isset($export["identity"]["radius"]["secret"])) {
 		unset($export["identity"]["radius"]["secret"]);
 	}
+	if (isset($export["identity"]["dc_agent"]["secret"])) {
+		unset($export["identity"]["dc_agent"]["secret"]);
+	}
 	$bl_export = layer7_bl_config_load();
 	$profiles_custom_export = layer7_profiles_custom_load();
 	$payload = array(

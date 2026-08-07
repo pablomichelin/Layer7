@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-07f`; **20.20 desenho PASS**; passo actual **20.20 código / IM5**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-07g`; **20.20 receiver PASS**; passo actual **agente Windows / IM5**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -11,8 +11,8 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.17` (**publicado** lab/`latest` `2026-08-07`)
-**Nota:** **Rev. `f` (`2026-08-07`)** = **20.20 desenho PASS** (A1–A7; TLS+HMAC MVP); passo → **implementação 20.20** (receiver + agente).
+**Candidato port:** `1.9.18` (**candidato** — build/publish pendente)
+**Nota:** **Rev. `g` (`2026-08-07`)** = receiver `identity_dc` + GUI + script PS1; falta serviço Event Log no DC.
 
 ---
 
@@ -20,21 +20,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.20 código** (IM5 — receiver HTTPS + agente DC MVP) |
-| Código | **20.19** RADIUS; desenho DC **ACEITE**; 20.18 Test LDAP; … |
-| ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** (A1–A7) |
+| Passo actual | **Agente Windows Event Log** (IM5 — fecho 20.20) |
+| Código | **20.20 receiver PASS** (`identity_dc`); 20.19 RADIUS; desenho A1–A7 |
+| ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
 | MITM | **DEFER 20.7a** |
-| Próximo | Implementar canal DC conforme desenho → GI6 |
+| Próximo | Serviço Windows 4624/4634 → GI6; build `1.9.18` |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.20 código (receiver DC + agente)
-- 20.20 desenho: PASS (A1–A7; TLS+HMAC; porto 8743)
-- 20.19: PASS (RADIUS accounting; GI5.3)
-- 20.18: PASS (Test LDAP GUI; GI5.4)
-- IM3 / GI4: PASS
-- Baseline: 1.9.8; latest **1.9.17**
-- Próximo: implementação 20.20 → GI6
+- Passo actual: agente Windows Event Log (fecho 20.20)
+- 20.20 receiver: PASS (identity_dc + GUI + PS1 lab)
+- 20.20 desenho: PASS
+- 20.19: PASS (RADIUS; GI5.3)
+- Baseline: 1.9.8; candidato **1.9.18**
+- Próximo: agente Win + publish 1.9.18
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
