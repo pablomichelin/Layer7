@@ -1,5 +1,5 @@
 /*
- * identity_dc.h — IM5 / 20.20
+ * identity_dc.h — IM5 / 20.20 (+ remove_ip em logoff, 20.21)
  * Receiver HTTPS do agente DC: token + HMAC-SHA256 → mapa (L7_ID_SRC_DC_AGENT).
  * Desenho: docs/01-architecture/desenho-canal-agente-dc-20.20.md
  * Nunca logar o token/secret.

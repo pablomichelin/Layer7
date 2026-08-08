@@ -37,13 +37,13 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08a`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08b`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM5 / 20.21** — normalização fontes → mapa (20.20 agente Win **PASS**) |
-| Código do produto nesta trilha | **20.20 PASS** (receiver + agente Win samples); 20.19 RADIUS; … |
-| Rev. do plano | **`2026-08-08a`** |
+| Passo actual | **IM5 / 20.22** — conflito mesmo IP + audit (20.21 normalização **PASS**) |
+| Código do produto nesta trilha | **20.21 PASS** (normalize + remove_ip); 20.20 agente Win; 20.19 RADIUS |
+| Rev. do plano | **`2026-08-08b`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -123,7 +123,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM5 / 20.21 — normalização fontes → mapa; 20.20 agente Win PASS).
+Tarefa: continuar no passo actual (IM5 / 20.22 — conflito mesmo IP + audit; 20.21 PASS).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -142,12 +142,13 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM5 / 20.21 (normalização fontes → mapa)
-- 20.20: PASS (receiver + agente Win Event Log samples)
+- Passo actual: IM5 / 20.22 (conflito mesmo IP + audit)
+- 20.21: PASS (normalize user + remove_ip)
+- 20.20: PASS (receiver + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
-- Plano rev.: 2026-08-08a
+- Plano rev.: 2026-08-08b
 - Baseline enforce: 1.9.8
-- Candidato: **1.9.24** (publicado lab/`latest`)
+- Candidato: **1.9.25** (publish pendente)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

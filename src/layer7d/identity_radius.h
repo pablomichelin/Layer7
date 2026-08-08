@@ -86,7 +86,8 @@ int layer7_radius_build_response(const uint8_t *req, size_t req_len,
     const char *secret, uint8_t *out, size_t out_cap);
 
 /*
- * Aplica evento ao mapa: Start/Interim → upsert; Stop → remove_user.
+ * Aplica evento ao mapa: Start/Interim → upsert; Stop → remove_ip (ou
+ * remove_user se sem Framed-IP). Usernames normalizados (20.21).
  * Retorna 0 OK, -1 erro / evento inválido.
  */
 int layer7_radius_apply_event(struct l7_id_map *map,

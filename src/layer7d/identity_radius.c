@@ -468,7 +468,10 @@ layer7_radius_apply_event(struct l7_id_map *map,
 	if (map == NULL || ev == NULL || !ev->valid || ev->user[0] == '\0')
 		return -1;
 	if (ev->status_type == L7_RADIUS_ACCT_STOP) {
-		(void)layer7_idmap_remove_user(map, ev->user);
+		if (ev->has_ip)
+			(void)layer7_idmap_remove_ip(map, ev->user, &ev->ip);
+		else
+			(void)layer7_idmap_remove_user(map, ev->user);
 		return 0;
 	}
 	if (!ev->has_ip)

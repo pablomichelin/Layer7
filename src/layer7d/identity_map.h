@@ -179,4 +179,24 @@ int layer7_idmap_addr_equal(const struct l7_id_addr *a,
 int layer7_idmap_addr_set_ipv4(struct l7_id_addr *a, uint32_t host_order);
 int layer7_idmap_addr_set_ipv6(struct l7_id_addr *a, const uint8_t in6[16]);
 
+/* --- 20.21 normalização (fontes → mesma chave no mapa) --- */
+
+/*
+ * Canonicaliza username de RADIUS/DC/LDAP para a chave do mapa:
+ *  - DOMAIN\user  → user
+ *  - user@domain  → user (UPN)
+ *  - lowercase ASCII
+ *  - rejeita contas máquina (*$) e strings vazias
+ * Retorna 0 OK, -1 inválido. out deve ter ≥ L7_IDMAP_USER_MAX.
+ */
+int layer7_idmap_normalize_user(const char *in, char *out, size_t out_sz);
+
+/*
+ * Remove um IP da sessão do user (logoff/Stop por endereço).
+ * Se o user ficar sem IPs, remove a sessão.
+ * 0 OK, -1 user/IP ausente ou erro.
+ */
+int layer7_idmap_remove_ip(struct l7_id_map *m, const char *user,
+    const struct l7_id_addr *ip);
+
 #endif /* LAYER7_IDENTITY_MAP_H */

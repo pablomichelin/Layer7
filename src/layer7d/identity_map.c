@@ -1,10 +1,11 @@
 /*
- * Identity session map — init/fini (20.12) + API (20.13).
+ * Identity session map — init/fini (20.12) + API (20.13) + normalize (20.21).
  * Sem IO de rede; sem threads produtoras (ADR-0028 §4 até 20.15).
  */
 #include "identity_map.h"
 
 #include <arpa/inet.h>
+#include <ctype.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -157,6 +158,56 @@ layer7_idmap_addr_set_ipv6(struct l7_id_addr *a, const uint8_t in6[16])
 	return 0;
 }
 
+int
+layer7_idmap_normalize_user(const char *in, char *out, size_t out_sz)
+{
+	const char *start;
+	const char *at;
+	const char *slash;
+	size_t n;
+	size_t i;
+
+	if (in == NULL || out == NULL || out_sz < 2)
+		return -1;
+	out[0] = '\0';
+
+	while (*in == ' ' || *in == '\t')
+		in++;
+	if (*in == '\0')
+		return -1;
+
+	start = in;
+	slash = strrchr(start, '\\');
+	if (slash != NULL && slash[1] != '\0')
+		start = slash + 1;
+
+	at = strchr(start, '@');
+	if (at != NULL) {
+		if (at == start)
+			return -1;
+		n = (size_t)(at - start);
+	} else {
+		n = strlen(start);
+	}
+
+	while (n > 0 && (start[n - 1] == ' ' || start[n - 1] == '\t'))
+		n--;
+	if (n == 0 || n >= out_sz || n >= L7_IDMAP_USER_MAX)
+		return -1;
+
+	for (i = 0; i < n; i++) {
+		unsigned char c = (unsigned char)start[i];
+		if (c < 0x20 || c == '/' || c == '\\')
+			return -1;
+		out[i] = (char)tolower(c);
+	}
+	out[n] = '\0';
+
+	if (out[n - 1] == '$')
+		return -1;
+	return 0;
+}
+
 static int
 user_eq(const char *a, const char *b)
 {
@@ -304,10 +355,14 @@ layer7_idmap_upsert(struct l7_id_map *m, const char *user,
 	int idx, ip_idx, other, free_i, trunc = 0, rc = 0;
 	unsigned i;
 	struct l7_id_session *s;
+	char norm[L7_IDMAP_USER_MAX];
 
-	if (m == NULL || !m->initialized || user == NULL || user[0] == '\0' ||
-	    ip == NULL || (ip->family != AF_INET && ip->family != AF_INET6))
+	if (m == NULL || !m->initialized || user == NULL || ip == NULL ||
+	    (ip->family != AF_INET && ip->family != AF_INET6))
 		return -1;
+	if (layer7_idmap_normalize_user(user, norm, sizeof(norm)) != 0)
+		return -1;
+	user = norm;
 	if (layer7_idmap_wrlock(m) != 0)
 		return -1;
 
@@ -404,12 +459,15 @@ int
 layer7_idmap_refresh(struct l7_id_map *m, const char *user, time_t now)
 {
 	int idx;
+	char norm[L7_IDMAP_USER_MAX];
 
 	if (m == NULL || !m->initialized || user == NULL)
 		return -1;
+	if (layer7_idmap_normalize_user(user, norm, sizeof(norm)) != 0)
+		return -1;
 	if (layer7_idmap_wrlock(m) != 0)
 		return -1;
-	idx = find_user_idx(m, user);
+	idx = find_user_idx(m, norm);
 	if (idx < 0) {
 		(void)layer7_idmap_unlock(m);
 		return -1;
@@ -447,12 +505,15 @@ int
 layer7_idmap_remove_user(struct l7_id_map *m, const char *user)
 {
 	int idx;
+	char norm[L7_IDMAP_USER_MAX];
 
 	if (m == NULL || !m->initialized || user == NULL)
 		return -1;
+	if (layer7_idmap_normalize_user(user, norm, sizeof(norm)) != 0)
+		return -1;
 	if (layer7_idmap_wrlock(m) != 0)
 		return -1;
-	idx = find_user_idx(m, user);
+	idx = find_user_idx(m, norm);
 	if (idx < 0) {
 		(void)layer7_idmap_unlock(m);
 		return -1;
@@ -460,6 +521,44 @@ layer7_idmap_remove_user(struct l7_id_map *m, const char *user)
 	clear_session(&m->sessions[idx]);
 	if (m->count > 0)
 		m->count--;
+	(void)layer7_idmap_unlock(m);
+	return 0;
+}
+
+int
+layer7_idmap_remove_ip(struct l7_id_map *m, const char *user,
+    const struct l7_id_addr *ip)
+{
+	int idx, ip_idx;
+	char norm[L7_IDMAP_USER_MAX];
+	struct l7_id_session *s;
+
+	if (m == NULL || !m->initialized || user == NULL || ip == NULL)
+		return -1;
+	if (layer7_idmap_normalize_user(user, norm, sizeof(norm)) != 0)
+		return -1;
+	if (layer7_idmap_wrlock(m) != 0)
+		return -1;
+	idx = find_user_idx(m, norm);
+	if (idx < 0) {
+		(void)layer7_idmap_unlock(m);
+		return -1;
+	}
+	s = &m->sessions[idx];
+	ip_idx = session_has_ip(s, ip);
+	if (ip_idx < 0) {
+		(void)layer7_idmap_unlock(m);
+		return -1;
+	}
+	session_remove_ip_at(s, (unsigned)ip_idx);
+	if (s->n_ips == 0) {
+		clear_session(s);
+		if (m->count > 0)
+			m->count--;
+	} else {
+		/* Pode sair de multi_user se já não partilha IPs */
+		s->multi_user = 0;
+	}
 	(void)layer7_idmap_unlock(m);
 	return 0;
 }
@@ -515,12 +614,15 @@ layer7_idmap_export_user_ips(struct l7_id_map *m, const char *user,
 {
 	int idx;
 	unsigned n, i;
+	char norm[L7_IDMAP_USER_MAX];
 
 	if (m == NULL || !m->initialized || user == NULL)
 		return -1;
+	if (layer7_idmap_normalize_user(user, norm, sizeof(norm)) != 0)
+		return -1;
 	if (layer7_idmap_rdlock(m) != 0)
 		return -1;
-	idx = find_user_idx(m, user);
+	idx = find_user_idx(m, norm);
 	if (idx < 0) {
 		(void)layer7_idmap_unlock(m);
 		return 0;
@@ -542,12 +644,15 @@ layer7_idmap_set_groups(struct l7_id_map *m, const char *user,
     const char *const *groups, unsigned n_groups)
 {
 	int idx, trunc = 0;
+	char norm[L7_IDMAP_USER_MAX];
 
-	if (m == NULL || !m->initialized || user == NULL || user[0] == '\0')
+	if (m == NULL || !m->initialized || user == NULL)
+		return -1;
+	if (layer7_idmap_normalize_user(user, norm, sizeof(norm)) != 0)
 		return -1;
 	if (layer7_idmap_wrlock(m) != 0)
 		return -1;
-	idx = find_user_idx(m, user);
+	idx = find_user_idx(m, norm);
 	if (idx < 0) {
 		(void)layer7_idmap_unlock(m);
 		return -1;

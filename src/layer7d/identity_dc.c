@@ -478,7 +478,10 @@ layer7_dc_apply_event(struct l7_id_map *map, const struct l7_dc_event *ev,
 	if (map == NULL || ev == NULL || !ev->valid || ev->user[0] == '\0')
 		return -1;
 	if (ev->type == L7_DC_EVT_LOGOFF) {
-		(void)layer7_idmap_remove_user(map, ev->user);
+		if (ev->has_ip)
+			(void)layer7_idmap_remove_ip(map, ev->user, &ev->ip);
+		else
+			(void)layer7_idmap_remove_user(map, ev->user);
 		return 0;
 	}
 	if (!ev->has_ip)

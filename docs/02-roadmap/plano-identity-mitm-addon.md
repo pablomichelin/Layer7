@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08a`; **20.20 PASS** receiver+agente Win; passo actual **20.21**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-08b`; **20.21 PASS**; passo actual **20.22**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -11,8 +11,8 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.24` (**publicado** lab/`latest`)
-**Nota:** **Rev. `a` (`2026-08-08`)** = agente Win Event Log samples; GI6 lab residual; release `1.9.24`.
+**Candidato port:** `1.9.25` (normalize+remove_ip; **publish pendente**)
+**Nota:** **Rev. `b` (`2026-08-08`)** = 20.21 normalização fontes → mapa.
 
 ---
 
@@ -20,19 +20,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.21** — normalização fontes → mapa (IM5) |
-| Código | **20.20 PASS** (receiver + agente Win); 20.19 RADIUS; desenho A1–A7 |
+| Passo actual | **20.22** — conflito mesmo IP + audit (IM5) |
+| Código | **20.21 PASS** (normalize + remove_ip); 20.20; 20.19 |
 | ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.21 → GI6 lab |
+| Próximo | 20.22 → GI6 lab |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.21 (normalização fontes → mapa)
+- Passo actual: 20.22 (conflito mesmo IP + audit)
+- 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; **1.9.24** (publicado lab/`latest`)
-- Próximo: 20.21 → GI6
+- Baseline: 1.9.8; candidato **1.9.25** (publish pendente)
+- Próximo: 20.22 → GI6
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -335,7 +336,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
 | Passo | Entrega | Gate |
 |-------|---------|------|
-| **20.21** | Normalização: fontes → mesmo mapa daemon | **GI5–GI6** |
+| **20.21** | Normalização: fontes → mesmo mapa daemon | **PASS** (`2026-08-08` — normalize + remove_ip) |
 | **20.22** | Conflito mesmo IP: last-writer + audit **+ estado `multi-user` → não-match `ad_*` (ADR-0027 §4.1)**; nota topologia (IP AD ≠ IP visto no firewall) | — |
 
 **Explicitamente fora:** captive portal Layer7; WinRM/WMI canónico a partir do pfSense.
@@ -540,6 +541,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `f` / 20.20 desenho PASS** — A1–A7 fechados (TLS+HMAC MVP; porto 8743); ADR-0027 rev. d; passo → **20.20 código** |
 | 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
 | 2026-08-08 | **rev. `a` / 20.20 agente Win PASS + 1.9.24** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; publicado lab/`latest`; passo → **20.21** |
+| 2026-08-08 | **rev. `b` / 20.21 PASS** — `normalize_user` + `remove_ip`; RADIUS/DC alinhados; candidato `1.9.25`; passo → **20.22** |
 
 ---
 

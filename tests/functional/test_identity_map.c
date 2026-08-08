@@ -113,6 +113,44 @@ main(void)
 	check(layer7_idmap_lookup_ip(&map, &ip_a, userbuf, sizeof(userbuf),
 		NULL) == -1, "lookup miss after remove");
 
+	/* 20.21 — normalização + remove_ip (fontes → mesma chave) */
+	{
+		char nbuf[L7_IDMAP_USER_MAX];
+
+		check(layer7_idmap_normalize_user("EMPRESA\\Joao.Silva", nbuf,
+			sizeof(nbuf)) == 0, "norm DOMAIN\\user");
+		check(strcmp(nbuf, "joao.silva") == 0, "norm DOMAIN value");
+		check(layer7_idmap_normalize_user("Joao.Silva@empresa.local",
+			nbuf, sizeof(nbuf)) == 0, "norm UPN");
+		check(strcmp(nbuf, "joao.silva") == 0, "norm UPN value");
+		check(layer7_idmap_normalize_user("HOST$", nbuf,
+			sizeof(nbuf)) == -1, "reject machine $");
+		check(layer7_idmap_normalize_user("", nbuf, sizeof(nbuf)) == -1,
+			"reject empty");
+
+		check(layer7_idmap_upsert(&map, "EMPRESA\\Alice", &ip_a,
+			L7_ID_SRC_RADIUS, NULL, 0, t0) == 0,
+			"upsert RADIUS DOMAIN\\Alice");
+		check(layer7_idmap_upsert(&map, "alice@empresa.local", &ip_b,
+			L7_ID_SRC_DC_AGENT, NULL, 0, t0 + 1) == 0,
+			"upsert DC UPN same user");
+		check(layer7_idmap_count(&map) == 1, "same user one session");
+		n = layer7_idmap_export_user_ips(&map, "Alice", out_ips, 8);
+		check(n == 2, "two IPs after cross-source");
+		check(layer7_idmap_lookup_ip(&map, &ip_a, userbuf,
+			sizeof(userbuf), &src) == 0, "lookup alice A");
+		check(strcmp(userbuf, "alice") == 0, "stored lowercase");
+		check(layer7_idmap_remove_ip(&map, "EMPRESA\\Alice", &ip_a) == 0,
+			"remove_ip A");
+		n = layer7_idmap_export_user_ips(&map, "alice", out_ips, 8);
+		check(n == 1, "one IP left after remove_ip");
+		check(layer7_idmap_lookup_ip(&map, &ip_a, userbuf,
+			sizeof(userbuf), NULL) == -1, "IP A gone");
+		check(layer7_idmap_remove_ip(&map, "alice", &ip_b) == 0,
+			"remove_ip last → drop session");
+		check(layer7_idmap_count(&map) == 0, "session gone");
+	}
+
 	/* 20.14 persistência: save / load / skip expired / clear ≠ SIGHUP */
 	{
 		char snap[256];

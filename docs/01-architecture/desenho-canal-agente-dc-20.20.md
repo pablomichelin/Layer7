@@ -129,7 +129,8 @@ Firewall: operador deve permitir DC→appliance:8743 na LAN; o pacote
 conteúdo de e-mail, lista completa de grupos (grupos vêm do LDAP).
 
 `logon` / `heartbeat` → `layer7_idmap_upsert(..., L7_ID_SRC_DC_AGENT)`.  
-`logoff` → `layer7_idmap_remove_user` (MVP; refinamento multi-IP em 20.21).
+`logoff` → `layer7_idmap_remove_ip` se IP conhecido (20.21); senão `remove_user`.
+Usernames normalizados (`DOMAIN\user` / UPN → sAMAccountName lowercase).
 
 ### A4 — Rate limit e tamanho
 
