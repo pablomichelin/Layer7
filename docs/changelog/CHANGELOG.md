@@ -6,8 +6,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- **Identity 20.25:** `docs/core/precedence.md` formaliza Identity `ad_*`
-  (R-M / GI7.4); teste `test_ad_priority_beats_static_ip`. Próximo: 20.26 GI7 lab.
+- **Identity 20.25–20.26 / GI7:** `core/precedence.md` + suite unit GI7.1–7.5
+  (`test_policy_decide`); checklist lab `tests/lab/run-gi7-identity-policies.sh`.
+  Lab AD/LDAP residual. Próximo: 20.27 IM7.
 
 ## [1.9.28] — 2026-08-08
 

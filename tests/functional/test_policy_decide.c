@@ -896,6 +896,158 @@ test_ad_priority_beats_static_ip(void)
 	layer7_idmap_fini(&map);
 }
 
+/* GI7.1: ad_groups só casa IPs de membros do grupo. */
+static void
+test_ad_group_only_members(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	struct l7_id_map map;
+	struct l7_id_addr ip_in, ip_out;
+	const char *grps_in[] = { "ti" };
+	const char *grps_out[] = { "vendas" };
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"p-g1\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":50,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"ad_groups\":[\"ti\"]}}]}}";
+	int n = 0;
+	time_t now = time(NULL);
+
+	memset(&map, 0, sizeof(map));
+	check(layer7_idmap_init(&map) == 0, "gi71 init");
+	check(layer7_idmap_addr_set_ipv4(&ip_in, 0x0a000032) == 0, "gi71 in");
+	check(layer7_idmap_addr_set_ipv4(&ip_out, 0x0a000033) == 0, "gi71 out");
+	check(layer7_idmap_upsert(&map, "membro", &ip_in, L7_ID_SRC_MANUAL,
+	    grps_in, 1, now) == 0, "gi71 upsert in");
+	check(layer7_idmap_upsert(&map, "outro", &ip_out, L7_ID_SRC_MANUAL,
+	    grps_out, 1, now) == 0, "gi71 upsert out");
+	layer7_policies_set_identity_map(&map);
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "gi71 parse");
+	layer7_policies_sort(rules, n);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.50", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "gi71 member decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "gi71 member block");
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.51", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "gi71 nonmember decide");
+	check(dec.action == LAYER7_ACTION_ALLOW, "gi71 nonmember allow");
+
+	layer7_policies_set_identity_map(NULL);
+	layer7_idmap_fini(&map);
+}
+
+/* GI7.2: troca de IP no mapa → política ad_users segue o user. */
+static void
+test_ad_user_ip_remap(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	struct l7_id_map map;
+	struct l7_id_addr ip_a, ip_c;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"p-remap\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":50,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"ad_users\":[\"joao\"]}}]}}";
+	int n = 0;
+	time_t now = time(NULL);
+
+	memset(&map, 0, sizeof(map));
+	check(layer7_idmap_init(&map) == 0, "gi72 init");
+	check(layer7_idmap_addr_set_ipv4(&ip_a, 0x0a00003c) == 0, "gi72 A");
+	check(layer7_idmap_addr_set_ipv4(&ip_c, 0x0a00003e) == 0, "gi72 C");
+	check(layer7_idmap_upsert(&map, "joao", &ip_a, L7_ID_SRC_RADIUS,
+	    NULL, 0, now) == 0, "gi72 upsert A");
+	layer7_policies_set_identity_map(&map);
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "gi72 parse");
+	layer7_policies_sort(rules, n);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.60", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "gi72 on A");
+	check(dec.action == LAYER7_ACTION_BLOCK, "gi72 block on A");
+
+	check(layer7_idmap_remove_ip(&map, "joao", &ip_a) == 0, "gi72 remove A");
+	check(layer7_idmap_upsert(&map, "joao", &ip_c, L7_ID_SRC_RADIUS,
+	    NULL, 0, now) == 0, "gi72 upsert C");
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.60", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "gi72 after on A");
+	check(dec.action == LAYER7_ACTION_ALLOW, "gi72 A no longer matches");
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.62", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "gi72 on C");
+	check(dec.action == LAYER7_ACTION_BLOCK, "gi72 block follows to C");
+
+	layer7_policies_set_identity_map(NULL);
+	layer7_idmap_fini(&map);
+}
+
+/* GI7.5 parcial: após expire/TTL a sessão some → ad_* não-match (base intacta). */
+static void
+test_ad_after_expire_no_match(void)
+{
+	struct layer7_policy_rule rules[2];
+	struct layer7_decision dec;
+	struct l7_id_map map;
+	struct l7_id_addr ip;
+	const char *json =
+	    "{\"layer7\":{\"policies\":["
+	    "{\"id\":\"p-ad\",\"action\":\"block\",\"enabled\":true,"
+	    "\"priority\":90,\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"ad_users\":[\"joao\"]}},"
+	    "{\"id\":\"p-ip\",\"action\":\"block\",\"enabled\":true,"
+	    "\"priority\":10,\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"src_hosts\":[\"10.0.0.70\"]}}"
+	    "]}}";
+	int n = 0;
+	time_t now = time(NULL);
+
+	memset(&map, 0, sizeof(map));
+	check(layer7_idmap_init(&map) == 0, "gi75 init");
+	check(layer7_idmap_addr_set_ipv4(&ip, 0x0a000046) == 0, "gi75 addr");
+	check(layer7_idmap_upsert(&map, "joao", &ip, L7_ID_SRC_RADIUS,
+	    NULL, 0, now) == 0, "gi75 upsert");
+	layer7_policies_set_identity_map(&map);
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 2) == 0,
+	    "gi75 parse");
+	layer7_policies_sort(rules, n);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.70", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "gi75 before expire");
+	check(strcmp(dec.matched_policy_id, "p-ad") == 0, "gi75 matched ad");
+
+	check(layer7_idmap_expire(&map, now + 86400 * 365) >= 1,
+	    "gi75 expire sessions");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.70", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "gi75 after expire");
+	check(strcmp(dec.matched_policy_id, "p-ip") == 0,
+	    "gi75 falls back to IP policy (base intacta)");
+
+	layer7_policies_set_identity_map(NULL);
+	layer7_idmap_fini(&map);
+}
+
 int
 main(void)
 {
@@ -926,6 +1078,9 @@ main(void)
 	test_ad_multi_user_no_match();
 	test_ad_off_no_match();
 	test_ad_priority_beats_static_ip();
+	test_ad_group_only_members();
+	test_ad_user_ip_remap();
+	test_ad_after_expire_no_match();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");

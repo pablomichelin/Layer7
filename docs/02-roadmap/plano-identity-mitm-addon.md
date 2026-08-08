@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08f`; **20.25 PASS**; passo actual **20.26 / IM6 / GI7**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-08g`; **20.26 / GI7 PASS unitário**; passo actual **20.27 / IM7**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -20,21 +20,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.26** — lab GI7 (user A/B, remap, fail-mode) |
+| Passo actual | **20.27** — especificação agente endpoint (IM7) |
 | Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
 | ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.26 GI7 → IM7 |
+| Próximo | 20.27 → 20.28 (ou ADIAR ADR) |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.26 (lab GI7)
+- Passo actual: 20.27 (especificação agente IM7)
 - 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
 - Baseline: 1.9.8; **1.9.28** (publicado lab/`latest`)
-- Próximo: 20.26 GI7 → IM7
+- Próximo: 20.27 → 20.28
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -342,7 +342,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 | **20.23** | Grupo/política aceita `ad_users` / `ad_groups` (além de hosts/MAC) | **PASS** (`1.9.27`) |
 | **20.24** | Match/enforce usa IPs do **mapa daemon** (não SSOT PHP tipo `device_ips`) | **PASS** (`1.9.28`) |
 | **20.25** | Precedência: promover esboço §3.1 → `docs/core/precedence.md` | **PASS** (doc + GI7.4 unit) |
-| **20.26** | Lab: user A vs B; troca de IP → remap daemon; LDAP down → fail-mode | **GI7** |
+| **20.26** | Lab: user A vs B; troca de IP → remap daemon; LDAP down → fail-mode | **PASS unitário** (lab AD residual) |
 
 **Não-regressão:** políticas só IP/MAC existentes inalteradas.
 
@@ -534,13 +534,17 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
 | 2026-08-08 | **rev. `a` / 20.20 agente Win PASS + 1.9.24** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; publicado lab/`latest`; passo → **20.21** |
 | 2026-08-08 | **rev. `b` / 20.21 PASS** — `normalize_user` + `remove_ip`; RADIUS/DC alinhados; candidato `1.9.25`; passo → **20.22** |
+| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
+| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |
+| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
+| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |

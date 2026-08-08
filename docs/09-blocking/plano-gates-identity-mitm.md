@@ -98,11 +98,11 @@ Identity avança sem GI2/GI3.
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GI7.1 | Política por grupo AD bloqueia só IPs do grupo | PENDENTE lab |
-| GI7.2 | Troca de IP → remap **daemon** → política segue o user | PENDENTE lab |
+| GI7.1 | Política por grupo AD bloqueia só IPs do grupo | **PASS unit** (`test_ad_group_only_members`) |
+| GI7.2 | Troca de IP → remap **daemon** → política segue o user | **PASS unit** (`test_ad_user_ip_remap`) |
 | GI7.3 | Políticas só IP/MAC antigas inalteradas | **PASS unit** (não-regressão `test_policy_decide`) |
 | GI7.4 | Precedência R-M: `ad_*` na mesma lista first-match; caso ad_group pri alta vs IP pri baixa documentado em `core/precedence.md` + `test_ad_priority_beats_static_ip` | **PASS unit** (20.25) |
-| GI7.5 | LDAP down → fail-mode (não-match `ad_*`; base intacta) | PENDENTE lab |
+| GI7.5 | LDAP down / TTL → fail-mode (não-match `ad_*`; base intacta) | **PASS unit** (`test_ad_after_expire_no_match`; lab LDAP residual) |
 
 ---
 
@@ -138,7 +138,7 @@ Identity avança sem GI2/GI3.
 | GI4 | IM3 | **PASS** (`2026-08-07` — GI4.6 ON lab residual) |
 | GI5 | IM4–IM5 | **PARCIAL** (GI5.3 PASS 20.19; GI5.4 PASS; GI5.1 lab residual) |
 | GI6 | IM5 | **PARCIAL** (código 20.20 PASS; lab DC residual) |
-| GI7 | IM6 | **PARCIAL** (7.3/7.4 unit 20.25; 7.1/7.2/7.5 = 20.26 lab) |
+| GI7 | IM6 | **PASS unitário** (20.26; lab AD/LDAP residual — checklist `tests/lab/run-gi7-identity-policies.sh`) |
 | GI8 | IM7–IM8 | PENDENTE |
 | GI9 | IM9 | PENDENTE |
 
@@ -152,6 +152,7 @@ Identity avança sem GI2/GI3.
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
 | 2026-08-07 | **20.18** — Test LDAP GUI + `layer7d --ldap-test`; GI5.4 PASS (parcial GI5); passo → 20.19 |
+| 2026-08-08 | **20.26 / GI7 PASS unitário** — GI7.1–7.5 unit; lab AD residual; passo → **20.27** (IM7) |
 | 2026-08-08 | **20.25 PASS** — `core/precedence.md` Identity; GI7.4 unit; GI7 PARCIAL; passo → 20.26 |
 | 2026-08-07 | **20.19** — RADIUS accounting receiver; GI5.3 PASS (unitário); candidato `1.9.17`; passo → 20.20 |
 | 2026-08-07 | **20.20 desenho** — A1–A7 PASS (TLS+HMAC MVP); ADR-0027 rev. d; passo → 20.20 código |
