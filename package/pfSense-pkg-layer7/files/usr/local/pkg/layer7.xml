@@ -21,6 +21,10 @@
 			<url>/packages/layer7/layer7_identity.php</url>
 		</tab>
 		<tab>
+			<text>MITM</text>
+			<url>/packages/layer7/layer7_mitm.php</url>
+		</tab>
+		<tab>
 			<text>Blacklists</text>
 			<url>/packages/layer7/layer7_blacklists.php</url>
 		</tab>

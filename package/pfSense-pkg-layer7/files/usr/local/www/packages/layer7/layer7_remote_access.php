@@ -122,9 +122,9 @@ layer7_render_styles();
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
 		<h2 class="panel-title"><?= l7_t("Layer 7 - Acesso Remoto"); ?></h2>
-		<?php layer7_render_tabs("policies"); ?>
 	</div>
 	<div class="panel-body">
+		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 			<p class="layer7-lead">

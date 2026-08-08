@@ -200,9 +200,9 @@ if ($savemsg !== "") {
 <div class="panel panel-default layer7-page">
 	<div class="panel-heading">
 		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Layer 7 - Identity (mapa de utilizadores)")); ?></h2>
-		<?php layer7_render_tabs("identity"); ?>
 	</div>
 	<div class="panel-body">
+		<?php layer7_render_tabs("identity"); ?>
 		<div class="layer7-content">
 <?php if (!$unlocked): ?>
 			<div class="alert alert-info" role="alert">
