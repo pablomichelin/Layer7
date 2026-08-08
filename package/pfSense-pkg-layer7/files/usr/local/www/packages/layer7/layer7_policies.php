@@ -1146,6 +1146,7 @@ function layer7_policy_match_summary($policy) {
 			"Mensagens" => "#00A884",
 			"Mensageria" => "#00A884", /* legado overlay/custom */
 			"Comunicação e reuniões" => "#2D8CFF",
+			"Acesso remoto" => "#C0392B",
 			"Streaming" => "#FF6D00",
 			"Jogos" => "#7B2FBE",
 			"Produtividade" => "#546E7A",
@@ -1160,6 +1161,7 @@ function layer7_policy_match_summary($policy) {
 			l7_t("Redes sociais"),
 			l7_t("Mensagens"),
 			l7_t("Comunicação e reuniões"),
+			l7_t("Acesso remoto"),
 			l7_t("Streaming"),
 			l7_t("Jogos"),
 			l7_t("Produtividade"),
@@ -1303,7 +1305,7 @@ function layer7_policy_match_summary($policy) {
 				<?php } ?>
 				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Editar perfil"); ?>" onclick="l7showProfileEditModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, false);"><i class="fa fa-pencil"></i></button>
 				<?php if ($prof_id_raw === "remote-access") { ?>
-				<a href="layer7_remote_access.php" class="l7-profile-icon-btn" title="<?= l7_t("Detalhe Acesso Remoto (softwares)"); ?>"><i class="fa fa-list"></i></a>
+				<a href="layer7_remote_access.php" class="l7-profile-icon-btn" title="<?= l7_t("Editor do pacote completo (alternativa aos cartoes individuais)"); ?>"><i class="fa fa-list"></i></a>
 				<?php } ?>
 				<?php if ($is_hidden) { ?>
 				<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;display:inline-block;">

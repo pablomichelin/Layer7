@@ -9,7 +9,9 @@
       "icon": "fa-globe",
       "detection": "ndpi-category",
       "note": "Bloqueia tudo o que o nDPI classificar como RemoteAccess.",
-      "ndpi_categories": ["RemoteAccess"],
+      "ndpi_categories": [
+        "RemoteAccess"
+      ],
       "ndpi_apps": [],
       "hosts": []
     },
@@ -19,8 +21,12 @@
       "group": "Consumidor / SMB",
       "icon": "fa-desktop",
       "detection": "ndpi+host",
-      "ndpi_apps": ["TeamViewer"],
-      "hosts": ["teamviewer.com"]
+      "ndpi_apps": [
+        "TeamViewer"
+      ],
+      "hosts": [
+        "teamviewer.com"
+      ]
     },
     {
       "id": "anydesk",
@@ -28,8 +34,12 @@
       "group": "Consumidor / SMB",
       "icon": "fa-laptop",
       "detection": "ndpi+host",
-      "ndpi_apps": ["AnyDesk"],
-      "hosts": ["anydesk.com"]
+      "ndpi_apps": [
+        "AnyDesk"
+      ],
+      "hosts": [
+        "anydesk.com"
+      ]
     },
     {
       "id": "rustdesk",
@@ -38,7 +48,10 @@
       "icon": "fa-terminal",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["rustdesk.com", "rustdesk.net"]
+      "hosts": [
+        "rustdesk.com",
+        "rustdesk.net"
+      ]
     },
     {
       "id": "chrome-remote",
@@ -47,7 +60,24 @@
       "icon": "fa-chrome",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["remotedesktop.google.com"]
+      "hosts": [
+        "remotedesktop.google.com"
+      ]
+    },
+    {
+      "id": "logmein",
+      "name": "LogMeIn / GoTo Resolve",
+      "group": "Consumidor / SMB",
+      "icon": "fa-desktop",
+      "detection": "host",
+      "ndpi_apps": [],
+      "hosts": [
+        "logmein.com",
+        "logmeinrescue.com",
+        "goto.com",
+        "getgo.com",
+        "gotomypc.com"
+      ]
     },
     {
       "id": "splashtop",
@@ -56,7 +86,9 @@
       "icon": "fa-desktop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["splashtop.com"]
+      "hosts": [
+        "splashtop.com"
+      ]
     },
     {
       "id": "zoho-assist",
@@ -65,7 +97,9 @@
       "icon": "fa-headphones",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["zohoassist.com"]
+      "hosts": [
+        "zohoassist.com"
+      ]
     },
     {
       "id": "ultraviewer",
@@ -74,7 +108,10 @@
       "icon": "fa-eye",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["ultraviewer.net", "nanosystems.it"]
+      "hosts": [
+        "ultraviewer.net",
+        "nanosystems.it"
+      ]
     },
     {
       "id": "supremo",
@@ -83,7 +120,9 @@
       "icon": "fa-desktop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["supremocontrol.com"]
+      "hosts": [
+        "supremocontrol.com"
+      ]
     },
     {
       "id": "remotepc",
@@ -92,7 +131,9 @@
       "icon": "fa-laptop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["remotepc.com"]
+      "hosts": [
+        "remotepc.com"
+      ]
     },
     {
       "id": "isl-online",
@@ -101,7 +142,10 @@
       "icon": "fa-globe",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["islonline.com", "islonline.net"]
+      "hosts": [
+        "islonline.com",
+        "islonline.net"
+      ]
     },
     {
       "id": "dwservice",
@@ -110,7 +154,9 @@
       "icon": "fa-cloud",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["dwservice.net"]
+      "hosts": [
+        "dwservice.net"
+      ]
     },
     {
       "id": "getscreen",
@@ -119,7 +165,9 @@
       "icon": "fa-desktop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["getscreen.me"]
+      "hosts": [
+        "getscreen.me"
+      ]
     },
     {
       "id": "helpwire",
@@ -128,7 +176,9 @@
       "icon": "fa-life-ring",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["helpwire.com"]
+      "hosts": [
+        "helpwire.com"
+      ]
     },
     {
       "id": "aeroadmin",
@@ -137,7 +187,9 @@
       "icon": "fa-plane",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["aeroadmin.com"]
+      "hosts": [
+        "aeroadmin.com"
+      ]
     },
     {
       "id": "iperius",
@@ -146,7 +198,9 @@
       "icon": "fa-exchange",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["iperiusremote.com"]
+      "hosts": [
+        "iperiusremote.com"
+      ]
     },
     {
       "id": "rdp",
@@ -154,7 +208,9 @@
       "group": "Protocolos / SO",
       "icon": "fa-windows",
       "detection": "ndpi",
-      "ndpi_apps": ["RDP"],
+      "ndpi_apps": [
+        "RDP"
+      ],
       "hosts": []
     },
     {
@@ -163,7 +219,9 @@
       "group": "Protocolos / SO",
       "icon": "fa-th",
       "detection": "ndpi",
-      "ndpi_apps": ["VNC"],
+      "ndpi_apps": [
+        "VNC"
+      ],
       "hosts": []
     },
     {
@@ -173,7 +231,9 @@
       "icon": "fa-th-large",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["realvnc.com"]
+      "hosts": [
+        "realvnc.com"
+      ]
     },
     {
       "id": "nomachine",
@@ -182,7 +242,9 @@
       "icon": "fa-desktop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["nomachine.com"]
+      "hosts": [
+        "nomachine.com"
+      ]
     },
     {
       "id": "ssh",
@@ -191,7 +253,9 @@
       "icon": "fa-terminal",
       "detection": "ndpi",
       "note": "Atenção: pode afectar administração legítima.",
-      "ndpi_apps": ["SSH"],
+      "ndpi_apps": [
+        "SSH"
+      ],
       "hosts": []
     },
     {
@@ -201,7 +265,9 @@
       "icon": "fa-gamepad",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["parsec.app"]
+      "hosts": [
+        "parsec.app"
+      ]
     },
     {
       "id": "moonlight",
@@ -210,7 +276,9 @@
       "icon": "fa-moon-o",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["moonlight-stream.org"]
+      "hosts": [
+        "moonlight-stream.org"
+      ]
     },
     {
       "id": "hoptodesk",
@@ -219,7 +287,9 @@
       "icon": "fa-desktop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["hoptodesk.com"]
+      "hosts": [
+        "hoptodesk.com"
+      ]
     },
     {
       "id": "screenconnect",
@@ -228,7 +298,10 @@
       "icon": "fa-building",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["screenconnect.com", "connectwise.com"]
+      "hosts": [
+        "screenconnect.com",
+        "connectwise.com"
+      ]
     },
     {
       "id": "atera",
@@ -237,7 +310,9 @@
       "icon": "fa-cogs",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["atera.com"]
+      "hosts": [
+        "atera.com"
+      ]
     },
     {
       "id": "ninjaone",
@@ -246,7 +321,10 @@
       "icon": "fa-shield",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["ninjaone.com", "ninjarmm.com"]
+      "hosts": [
+        "ninjaone.com",
+        "ninjarmm.com"
+      ]
     },
     {
       "id": "meshcentral",
@@ -256,7 +334,9 @@
       "detection": "host",
       "note": "Instâncias self-host podem escapar à lista de hosts.",
       "ndpi_apps": [],
-      "hosts": ["meshcentral.com"]
+      "hosts": [
+        "meshcentral.com"
+      ]
     },
     {
       "id": "datto-rmm",
@@ -265,7 +345,9 @@
       "icon": "fa-server",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["datto.com"]
+      "hosts": [
+        "datto.com"
+      ]
     },
     {
       "id": "todesk",
@@ -274,7 +356,9 @@
       "icon": "fa-desktop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["todesk.com"]
+      "hosts": [
+        "todesk.com"
+      ]
     },
     {
       "id": "sunlogin",
@@ -283,7 +367,10 @@
       "icon": "fa-sun-o",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["oray.com", "sunlogin.oray.com"]
+      "hosts": [
+        "oray.com",
+        "sunlogin.oray.com"
+      ]
     },
     {
       "id": "awesun",
@@ -292,7 +379,9 @@
       "icon": "fa-desktop",
       "detection": "host",
       "ndpi_apps": [],
-      "hosts": ["aweray.com"]
+      "hosts": [
+        "aweray.com"
+      ]
     }
   ]
 }

@@ -249,6 +249,11 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.9.30` (grupo Acesso remoto individual, `2026-08-08` — publish pendente):**
+Perfis rápidos: grupo **Acesso remoto** com um cartão por software + pacote
+«Acesso Remoto (todos)». **Comandos operacionais abaixo permanecem em `1.9.29`**
+até build + GitHub Release. Enforce **`1.9.8`**. Rollback lab previsto: **`1.9.29`**.
+
 **Addendum da release `1.9.29` (ADR-0029 / GI8 sequência segura, `2026-08-08`):**
 ADIAR agente endpoint; exclusão TS/VDI; GUI Identity H* (limite honesto).
 **Canal `latest`:** `1.9.29`. Enforce **`1.9.8`**. Rollback lab: **`1.9.28`**.

@@ -6,7 +6,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- (vazio — trilha Identity rede FECHADA 20.33; próximo = manutenção / reopen GO)
+- (vazio)
+
+## [1.9.30] — 2026-08-08
+
+### Added
+
+- **Perfis rápidos — grupo Acesso remoto:** cartões individuais (AnyDesk,
+  TeamViewer, RustDesk, RDP, VNC, LogMeIn, RMM, etc.) + pacote
+  «Acesso Remoto (todos)»; um toggle por software.
+- Catálogo `remote-access-catalog.json`: entrada **LogMeIn / GoTo Resolve**.
+
+### Notes
+
+- Canal `latest`: **`1.9.30`**. Produção enforce **`1.9.8`**.
+- Limite daemon/GUI de **24 políticas** activas mantém-se — usar cartões
+  selectivos ou o pacote agregado.
+- SHA256: `TBD`. Rollback lab: `1.9.29`.
 
 ## [1.9.29] — 2026-08-08
 

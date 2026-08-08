@@ -128,12 +128,12 @@ layer7_render_styles();
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
 			<p class="layer7-lead">
-				<?= l7_t("Detalhe do perfil rapido «Acesso Remoto» (Politicas). Seleccione softwares a bloquear; a selecao actualiza o perfil e a politica (accao block). Em modo monitor o trafego continua apenas observado.") ?>
+				<?= l7_t("Editor do pacote agregado «Acesso Remoto (todos)». Para bloquear so alguns softwares (ex.: AnyDesk sim, TeamViewer nao), use os cartoes individuais do grupo Acesso remoto em Politicas / Perfis rapidos — um toggle por software.") ?>
 				<a href="layer7_policies.php#l7-policies"><?= l7_t("Voltar a Politicas / Perfis rapidos") ?></a>
 			</p>
 			<div class="alert alert-info">
 				<i class="fa fa-info-circle"></i>
-				<?= l7_t("Deteccao: nDPI (assinatura), host/DNS/SNI, ou categoria RemoteAccess. Softwares self-host ou com CDN propria podem exigir hosts adicionais.") ?>
+				<?= l7_t("Esta pagina actualiza apenas a politica do pacote completo. Deteccao: nDPI, host/DNS/SNI, ou categoria RemoteAccess. Softwares self-host ou com CDN propria podem exigir hosts adicionais.") ?>
 			</div>
 
 			<form method="post" action="layer7_remote_access.php">
