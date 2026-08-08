@@ -6,14 +6,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- (vazio — próximo: 20.23 políticas ad_users/ad_groups)
+
+## [1.9.26] — 2026-08-08
+
+### Added
+
 - **Identity 20.22:** audit `identity_ip_conflict` / `identity_ip_last_writer`
   (syslog); contadores no mapa/status; recompute `multi_user`; nota UX
   topologia na GUI Identity.
 
 ### Notes
 
-- Candidato port: **`1.9.26`** (publish pendente). Enforce **`1.9.8`**.
-  Rollback lab previsto: `1.9.25`.
+- Canal `latest`: **`1.9.26`**. Produção enforce **`1.9.8`**.
+- SHA256: `d1399c711091a7c4b0bbccfef9f71c6016ef9f2423eca8deb190d3c8a79bd5db`. Rollback lab: `1.9.25`.
 
 ## [1.9.25] — 2026-08-08
 

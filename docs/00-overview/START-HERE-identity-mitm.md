@@ -149,7 +149,7 @@ TRILHA IDENTITY + MITM — progresso
 - 20.19: PASS (RADIUS; GI5.3)
 - Plano rev.: 2026-08-08c
 - Baseline enforce: 1.9.8
-- Candidato: **1.9.26** (publish pendente)
+- Candidato: **1.9.26** (publicado lab/`latest`)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
