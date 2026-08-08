@@ -1335,7 +1335,7 @@ TRILHA IDENTITY + MITM — progresso
 - IM2: DEFER 20.7a
 - Plano rev.: 2026-08-08b
 - Baseline enforce: 1.9.8
-- Latest publicado: **1.9.24**; **1.9.25** (publicado lab/`latest`)
+- Candidato / latest: **1.9.25** (publicado)
 - Próximo: 20.22 → GI6 lab
 ```
 
