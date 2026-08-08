@@ -6,6 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- (vazio — próximo: 20.21 normalização fontes → mapa)
+
+## [1.9.24] — 2026-08-08
+
+### Added
+
 - **Identity DC agent Windows (IM5 / fecho 20.20):** serviço leve no DC —
   `docs/samples/identity-dc-agent/Layer7IdentityDcAgent.ps1` (Event Log
   4624/4634/4647 → HTTPS+HMAC); `Install-`/`Uninstall-` Scheduled Task;
@@ -18,8 +24,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Candidato port: **`1.9.24`** (pendente build/publish). Produção enforce
-  **`1.9.8`**. Rollback lab previsto: `1.9.23`.
+- Canal `latest`: **`1.9.24`**. Produção enforce **`1.9.8`**.
+- SHA256: `7490a5950fd3bcb0bafaaeed01e88afda58db83f86dcaf215a6c74fff9c29bc1`. Rollback lab: `1.9.23`.
 - GI6 lab (DC físico) residual. MITM permanece DEFER.
 
 ## [1.9.23] — 2026-08-08

@@ -11,8 +11,8 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.24` (GUI help + agente DC docs; **publish pendente**)
-**Nota:** **Rev. `a` (`2026-08-08`)** = agente Win Event Log samples; GI6 lab residual.
+**Candidato port:** `1.9.24` (**publicado** lab/`latest`)
+**Nota:** **Rev. `a` (`2026-08-08`)** = agente Win Event Log samples; GI6 lab residual; release `1.9.24`.
 
 ---
 
@@ -31,7 +31,7 @@ TRILHA IDENTITY + MITM — progresso
 - Passo actual: 20.21 (normalização fontes → mapa)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; candidato **1.9.24** (publish pendente)
+- Baseline: 1.9.8; **1.9.24** (publicado lab/`latest`)
 - Próximo: 20.21 → GI6
 ```
 
@@ -539,7 +539,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `e` / 20.19 PASS** — RADIUS accounting receiver (`identity_radius`); secret+ACL NAS; GI5.3 unitário; candidato `1.9.17`; passo → **20.20** |
 | 2026-08-07 | **rev. `f` / 20.20 desenho PASS** — A1–A7 fechados (TLS+HMAC MVP; porto 8743); ADR-0027 rev. d; passo → **20.20 código** |
 | 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
-| 2026-08-08 | **rev. `a` / 20.20 agente Win PASS** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; candidato `1.9.24`; passo → **20.21** |
+| 2026-08-08 | **rev. `a` / 20.20 agente Win PASS + 1.9.24** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; publicado lab/`latest`; passo → **20.21** |
 
 ---
 
