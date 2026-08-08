@@ -216,13 +216,14 @@ Agente **não** faz bind LDAP no DC para grupos (isso é o worker LDAP no applia
 
 ---
 
-## 8. Ordem de implementação (próximo bloco)
+## 8. Ordem de implementação
 
-1. Config GUI + secret 0600 + parse JSON (`identity.dc_agent`).
-2. Receiver HTTPS na thread `identity_dc` → mapa.
-3. Agente Windows MVP (filtro 4624/4634 + POST).
-4. Testes unitários (HMAC, skew, rate limit, ACL) + lab GI6.
-5. Docs MANUAL + changelog + PORTVERSION quando houver código.
+1. Config GUI + secret 0600 + parse JSON (`identity.dc_agent`) — **PASS**.
+2. Receiver HTTPS na thread `identity_dc` → mapa — **PASS**.
+3. Agente Windows MVP (filtro 4624/4634 + POST) — **PASS**
+   (`docs/samples/identity-dc-agent/`; tarefa agendada; lab GI6 residual).
+4. Testes unitários receiver (HMAC, skew, rate limit, ACL) — **PASS**; lab GI6 residual.
+5. Docs + changelog no fecho do passo — **PASS** (agente = sample OPS; sem bump `.pkg`).
 
 ---
 
@@ -241,3 +242,4 @@ Agente **não** faz bind LDAP no DC para grupos (isso é o worker LDAP no applia
 | 2026-08-05 | ADR-0027 §2.1 A1–A7 (requisitos mínimos) |
 | 2026-08-07 | **20.20 desenho ACEITE** — TLS+HMAC MVP; porto 8743; payload; limites; privilégio mínimo |
 | 2026-08-07 | **20.20 receiver PASS** — `identity_dc` + GUI + script PS1 lab; candidato 1.9.18 |
+| 2026-08-08 | **20.20 agente Win PASS** — `Layer7IdentityDcAgent.ps1` + install/uninstall + README; GI6 lab residual |

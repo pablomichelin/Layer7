@@ -249,6 +249,12 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum candidato `1.9.24` (Identity IM5/20.20 agente Win, `2026-08-08` — publish pendente):**
+Agente Windows Event Log em `docs/samples/identity-dc-agent/` (Scheduled Task;
+4624/4634 → HTTPS+HMAC). Help GUI Identity aponta para essa pasta. **Comandos
+operacionais abaixo permanecem em `1.9.23`** até build + GitHub Release.
+Enforce **`1.9.8`**. Rollback lab previsto após publish: **`1.9.23`**.
+
 **Addendum da release `1.9.23` (MITM layout padrao, `2026-08-08`):**
 MITM de volta ao menu; tabs no panel-body (igual Eventos/Estado); Identity alinhado.
 **Canal `latest`:** `1.9.23`. Enforce **`1.9.8`**. Rollback lab: **`1.9.22`**.

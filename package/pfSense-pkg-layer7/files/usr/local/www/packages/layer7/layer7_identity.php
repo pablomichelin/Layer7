@@ -470,7 +470,8 @@ if ($savemsg !== "") {
 					<?= htmlspecialchars(l7_t(
 					    "Receiver HTTPS no appliance (porto 8743) para o agente no Domain Controller. " .
 					    "Autenticacao: token + HMAC-SHA256. Bind so em IP LAN (nunca 0.0.0.0). " .
-					    "Default OFF. Isto e User-ID de rede — o IP reportado pelo AD pode diferir do IP visto no firewall."
+					    "Default OFF. Agente Windows (Event Log 4624/4634): pasta identity-dc-agent no repositorio Layer7. " .
+					    "Isto e User-ID de rede — o IP reportado pelo AD pode diferir do IP visto no firewall."
 					)); ?>
 				</p>
 <?php if ($dc_token_once !== ""): ?>

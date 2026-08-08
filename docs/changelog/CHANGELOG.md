@@ -6,7 +6,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- (vazio — próximo: agente Windows Event Log / fecho 20.20)
+- **Identity DC agent Windows (IM5 / fecho 20.20):** serviço leve no DC —
+  `docs/samples/identity-dc-agent/Layer7IdentityDcAgent.ps1` (Event Log
+  4624/4634/4647 → HTTPS+HMAC); `Install-`/`Uninstall-` Scheduled Task;
+  `config.example.json` + README (PME). Cliente lab `Send-Layer7IdentityEvent.ps1`
+  mantém-se.
+
+### Changed
+
+- GUI Identity: help do receiver aponta para a pasta `identity-dc-agent`.
+
+### Notes
+
+- Candidato port: **`1.9.24`** (pendente build/publish). Produção enforce
+  **`1.9.8`**. Rollback lab previsto: `1.9.23`.
+- GI6 lab (DC físico) residual. MITM permanece DEFER.
 
 ## [1.9.23] — 2026-08-08
 

@@ -1,0 +1,11 @@
+{
+  "url": "https://192.168.1.1:8743/v1/identity/events",
+  "token": "COLE_O_TOKEN_DA_GUI_AQUI",
+  "domain": "EMPRESA",
+  "trust_all_certs": true,
+  "poll_seconds": 2,
+  "logon_types": [2, 3, 10, 11],
+  "skip_machine_accounts": true,
+  "state_path": "C:\\ProgramData\\Layer7\\identity-dc-agent\\state.json",
+  "log_path": "C:\\ProgramData\\Layer7\\identity-dc-agent\\agent.log"
+}

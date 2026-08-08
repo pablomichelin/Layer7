@@ -1,7 +1,7 @@
-# Layer7 Identity — agente DC (referencia MVP 20.20)
+# Layer7 Identity — cliente lab do canal agente DC (20.20)
 #
-# Envia um evento logon/logoff/heartbeat para o receiver HTTPS do appliance.
-# NAO e o servico Windows completo (Event Log 4624) — e um cliente de laboratorio.
+# Envia UM evento logon/logoff/heartbeat para o receiver HTTPS do appliance.
+# Para o servico Event Log (4624/4634) no DC, usar Layer7IdentityDcAgent.ps1.
 #
 # Uso (PowerShell 5+):
 #   $env:L7_DC_URL = "https://192.168.1.1:8743/v1/identity/events"

@@ -308,7 +308,7 @@ reavaliacao formal.
 | BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Concluido (20.6 / GI1 PASS)** | check-in ∩ .lic + gates |
 | BG-087 | MITM TLS opt-in + CA (IM2) | Critica | daemon/package/PKI | IM2 | UX HTTPS; segundo produto | G | Alto | **Diferido (20.7a)** | ADR-0026 rev. d; Squid rejeitado; GI2/GI3 DEFERRED; reabrir só com novo GO + helper próprio |
 | BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | **20.18 PASS** / fechar IM4 | Test LDAP GUI + GI5.4; GI5.3 = IM5 |
-| BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | Planeado | WinRM outbound não canónico |
+| BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | **20.20 PASS** / GI6 lab | WinRM outbound não canónico; agente em `docs/samples/identity-dc-agent/` |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Planeado | GI7; não-regressão IP/MAC |
 | BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | Planeado / adiável | GI8 ou ADR exclusão |
 | BG-092 | Fecho lab/release add-on (IM9) | Alta | testes/F7/docs | IM9 | feature sem MANUAL/release | M | Alto | Planeado | GI9; foco release Identity (MITM diferido) |
