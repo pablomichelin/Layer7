@@ -30,6 +30,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   foi observada porque o Unbound encerrou TLS antes de nDPI classificar,
   com SNI desativado. Não é release pública; rollback `1.9.30` foi validado
   antes do upgrade e mantido no appliance.
+- O install exigiu `pkg add -f`: o artefato vem de builder FreeBSD 15 e o
+  appliance é FreeBSD 16. `pkg check`, `ldd`, daemon e PF passaram, mas
+  **BG-106** bloqueia publicação até haver artefato nativo ou compatibilidade
+  formalmente fechada.
 
 ## [1.9.30] — 2026-08-08
 

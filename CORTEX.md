@@ -51,6 +51,11 @@ O callback DNS do daemon não foi exercitado nessa configuração (`sni_inspecti
 OFF; TLS termina no portal antes da classificação), portanto o evento
 `outcome=sinkhole` permanece validado por regressão/build, não por esta rodada
 física. Pacote ainda não publicado; rollback local/público: **`1.9.30`**.
+**Risco de release (BG-106):** o builder oficial é FreeBSD 15 e o appliance
+observado é FreeBSD 16; o `pkg` exigiu instalação forçada por arquitetura.
+Integridade, dependências e runtime passaram, mas não promover `1.9.31`
+publicamente antes de artefato nativo FreeBSD 16 ou validação formal de
+compatibilidade.
 **Referencia de producao enforce:** **`1.9.31`** (gate BG-105 parcial PASS
 `2026-08-08`; sem promoção pública). Rollback enforce: **`1.9.30`**.
 Historico: `_69`, `_24`.
