@@ -20,8 +20,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Candidato local: `1.9.31`. Suite local e validação de arquivos do port
-  passaram; build FreeBSD e gate controlado no appliance ainda são pendentes.
+- Candidato validado no builder: `1.9.31` (`SHA256
+  dcbad868b3e06c19214662dd4caf5ac82417c9af4cb17fddff8cbfc425ffcd15`).
+  Suite local, smoke FreeBSD, build e metadados do `.pkg` passaram; gate
+  controlado no appliance ainda é pendente.
 
 ## [1.9.30] — 2026-08-08
 

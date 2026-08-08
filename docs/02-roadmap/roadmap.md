@@ -591,8 +591,9 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   separa a decisão DNS de bloqueio do tráfego posterior para o IP local do
   firewall. O primeiro permanece no audit log como `outcome=sinkhole`; os
   fluxos locais seguintes são ignorados antes da decisão de políticas e só
-  têm diagnóstico debug. A regressão está integrada no gate local; build
-  FreeBSD e validação controlada no appliance permanecem pendentes.
+  têm diagnóstico debug. Regressão local, smoke e build FreeBSD PASS
+  (`SHA256 dcbad868…ffcd15`); validação controlada no appliance permanece
+  pendente.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

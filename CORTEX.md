@@ -42,8 +42,9 @@ comandos em
 **Candidato local em validação:** `1.9.31` / BG-105 — evita que o tráfego
 seguinte ao DNS sinkhole para o IP local do firewall seja reclassificado e
 gere log storm; a decisão DNS permanece auditada como `outcome=sinkhole`.
-Suite local e verificação do port PASS; build FreeBSD e gate controlado no
-appliance ainda pendentes. Não instalado em produção.
+Suite local, verificação do port e build FreeBSD PASS (SHA256
+`dcbad868b3e06c19214662dd4caf5ac82417c9af4cb17fddff8cbfc425ffcd15`);
+gate controlado no appliance pendente. Não instalado em produção.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
 ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
 Rollback lab a partir de `1.9.30`: **`1.9.29`**. Historico: `_69`, `_24`.
