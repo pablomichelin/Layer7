@@ -36,7 +36,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.30` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.30`;
-`SHA256=TBD` — grupo Acesso remoto com perfis individuais;
+`SHA256=40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`; grupo Acesso remoto individual;
 comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
@@ -1521,7 +1521,7 @@ CHECKPOINT CANONICO
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **FECHADA** (Identity rede 20.33/GI9 PASS; MITM DEFER 20.7a; ADR-0029); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Pacote publicado: **1.9.30** (`SHA256=TBD`)
+- Pacote publicado: **1.9.30** (`SHA256=40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`)
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.29**; RA individual **1.9.30**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)

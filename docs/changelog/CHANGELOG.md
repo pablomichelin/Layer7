@@ -22,7 +22,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - Canal `latest`: **`1.9.30`**. Produção enforce **`1.9.8`**.
 - Limite daemon/GUI de **24 políticas** activas mantém-se — usar cartões
   selectivos ou o pacote agregado.
-- SHA256: `TBD`. Rollback lab: `1.9.29`.
+- SHA256: `40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`. Rollback lab: `1.9.29`.
 
 ## [1.9.29] — 2026-08-08
 
