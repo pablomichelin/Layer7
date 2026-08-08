@@ -257,6 +257,13 @@ if ($savemsg !== "") {
 				    "nesse IP (fallback seguro) — evento identity_ip_conflict no log."
 				)); ?>
 			</p>
+			<p class="help-block text-muted">
+				<?= htmlspecialchars(l7_t(
+				    "Limite honesto (ADR-0029): nao ha agente endpoint em cada PC nesta release " .
+				    "(User-ID de rede via RADIUS/DC). Terminal Server / VDI com varios users no " .
+				    "mesmo IP nao e suportado para politicas ad_* — usa-se multi-user / nao-match."
+				)); ?>
+			</p>
 
 			<form method="post" action="layer7_identity.php" class="form-horizontal">
 

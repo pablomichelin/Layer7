@@ -214,10 +214,12 @@ junto com Identity já configurado.
 | **GO MVP** | Cliente PME precisa de exactidão no posto; MSP pede GPO; lab DC+RADIUS insuficiente | MSI/PS1 + receiver path + GUI + testes; GI8.1 |
 | **ADIAR (ADR)** | Valor Identity de rede (RADIUS+DC+LDAP+`ad_*`) basta para o nicho; custo de frota de agentes alto | ADR “IM7 diferido”; GUI H* “User-ID de rede; agente endpoint não incluído”; GI8.1 por exclusão honesta |
 
-**Recomendação de produto (2026-08-08):** com IM3–IM6 **PASS** e posicionamento
-PME Identity-first, o MVP Identity de **rede** já entrega O1. O agente
-endpoint é **melhoria de exactidão**, não bloqueio do fecho IM9 parcial.
-Preferir **ADIAR com ADR** no 20.28 **salvo** GO humano explícito para MSI.
+**Recomendação de produto (2026-08-08):** com IM3–IM6 PASS e posicionamento
+PME Identity-first, preferir **ADIAR com ADR**.
+
+**Decisão 20.28 (sequência segura):** **ADIAR** — ver
+[`ADR-0029`](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md).
+IM8 TS/VDI **excluído** no mesmo ADR. Esta especificação permanece para reopen.
 
 ---
 
@@ -227,7 +229,7 @@ Preferir **ADIAR com ADR** no 20.28 **salvo** GO humano explícito para MSI.
 - Agente macOS/Linux.  
 - mTLS obrigatório.  
 - Captive portal.  
-- Código no `layer7d` / package (só após GO 20.28).
+- Código no `layer7d` / package (só após **reopen GO** pós-ADR-0029).
 
 ---
 

@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08h`; **20.27 PASS**; passo actual **20.28 / IM7**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-08i`; **20.28–20.30 PASS** ADR-0029; passo actual **20.31 / IM9**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -8,11 +8,11 @@
 **SSOT de estado vivo do produto:** [`../../CORTEX.md`](../../CORTEX.md)  
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
-**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
+**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.28` (**publicado** lab/`latest`)
-**Nota:** **Rev. `c` (`2026-08-08`)** = 20.22 conflito IP + audit.
+**Candidato port:** `1.9.29` (ADR-0029 / GUI H*; **publish pendente**). Latest lab: `1.9.28`  
+**Nota:** **Rev. `i` (`2026-08-08`)** = 20.28–20.30 ADR-0029; GI8 PASS; passo **20.31**.
 
 ---
 
@@ -20,21 +20,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.28** — MVP agente Windows **ou** ADIAR com ADR (IM7/GI8.1) |
+| Passo actual | **20.31** — malha lab Identity + evidências (IM9) |
 | Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
-| ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
+| ADRs | **Aceito** ×5; T1; **0026 diferida**; **0027**; **0029** IM7/IM8 |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.28 GO MVP **ou** ADIAR ADR → IM8/IM9 |
+| Próximo | 20.31 → 20.32 → 20.33 GI9 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.28 (MVP agente ou ADIAR ADR)
+- Passo actual: 20.31 (malha lab / fecho IM9)
 - 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; **1.9.28** (publicado lab/`latest`)
-- Próximo: 20.28 → IM8/IM9
+- Baseline: 1.9.8; **1.9.28** latest; candidato **1.9.29** (publish pendente)
+- Próximo: 20.31 → 20.33 GI9
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -353,7 +353,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 | Passo | Entrega | Gate |
 |-------|---------|------|
 | **20.27** | Especificação agente (OS, canal, auth, heartbeat) | **PASS** (`especificacao-agente-endpoint-20.27.md`) |
-| **20.28** | MVP agente Windows (report user + IP) **ou** ADIAR com ADR | GI8 ou exclusão |
+| **20.28** | MVP agente Windows **ou** ADIAR com ADR | **PASS ADIAR** (`ADR-0029`) |
 
 ---
 
@@ -361,8 +361,8 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
 | Passo | Entrega | Gate |
 |-------|---------|------|
-| **20.29** | Desenho TS agent (user→porta) | Doc |
-| **20.30** | Implementação **ou** limite honesto “não suportado multi-user mesmo IP” | GI8 ou exclusão |
+| **20.29** | Desenho TS agent (user→porta) | **PASS exclusão** (`ADR-0029` / `desenho-ts-vdi-20.29-excluido.md`) |
+| **20.30** | Implementação **ou** limite honesto multi-user | **PASS exclusão** (`ADR-0029`) |
 
 ---
 
@@ -385,9 +385,9 @@ IM0 → IM1 Entitlements          [FEITO]
   → IM2 spike 20.7 + 20.7a DEFER [FEITO — saltar 20.8–20.11]
   → IM3–IM6 Identity MVP         [EM CURSO — valor PME]
        mapa daemon + LDAP + fontes + políticas ad_*
-  → IM7 espec 20.27 PASS; 20.28 GO/ADIAR; IM8 TS [adiável]
-  → IM9 Fecho / release Identity
-  → (IM2 reopen: 20.8–20.11 só com novo GO + spike S1–S8 helper próprio)
+  → IM7 ADIAR + IM8 exclusão (ADR-0029 / GI8 PASS)
+  → IM9 Fecho / release Identity de rede
+  → (IM2 reopen MITM / IM7 reopen endpoint só com novo GO)
 ```
 
 **Caminho histórico (se spike tivesse sido GO) — arquivado como alternativa:**
@@ -539,6 +539,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
+| 2026-08-08 | **rev. `i` / 20.28–20.30 PASS** — ADR-0029 ADIAR IM7 + exclusão IM8; GI8; passo → **20.31** |
 | 2026-08-08 | **rev. `h` / 20.27 PASS** — especificação agente endpoint; recomendação ADIAR salvo GO; passo → **20.28** |
 
 ---

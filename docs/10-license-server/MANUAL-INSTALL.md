@@ -249,6 +249,11 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum candidato `1.9.29` (ADR-0029 / GI8 sequência segura, `2026-08-08` — publish pendente):**
+ADIAR agente endpoint; exclusão TS/VDI; GUI Identity H* (limite honesto).
+**Comandos operacionais abaixo permanecem em `1.9.28`** até build + GitHub Release.
+Enforce **`1.9.8`**. Rollback lab previsto após publish: **`1.9.28`**.
+
 **Addendum da release `1.9.28` (Identity IM6/20.24 match ad_* via mapa, `2026-08-08`):**
 Match/enforce de políticas `ad_users`/`ad_groups` via mapa daemon (não PHP `device_ips`).
 `multi_user` → não-match `ad_*`. Identity OFF → `ad_*` não casam.

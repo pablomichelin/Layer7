@@ -24,7 +24,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`especificacao-agente-endpoint-20.27.md`](../01-architecture/especificacao-agente-endpoint-20.27.md) | Espec IM7 agente endpoint (20.27 PASS) |
 | [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) | Gates GI0–GI9 |
 | [`spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) | Spike MITM — **DEFER formal 20.7a** |
-| ADR-0025 / 0026 / 0027 / 0028 | Aceito; **0026 implementação diferida** |
+| ADR-0025 / 0026 / 0027 / 0028 / **0029** | Aceito; **0026** MITM diferido; **0029** IM7 diferido + IM8 excluído |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** do produto |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Filas **fecho + IPv6** (não reabrir) |
 
@@ -38,17 +38,17 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08h`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08i`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM7 / 20.28** — MVP agente Windows **ou** ADIAR ADR (20.27 espec **PASS**) |
+| Passo actual | **IM9 / 20.31** — malha lab / fecho (20.28–20.30 **ADR-0029**) |
 | Código do produto nesta trilha | **20.22 PASS** (audit conflict/last-writer); 20.21 normalize; … |
-| Rev. do plano | **`2026-08-08h`** |
+| Rev. do plano | **`2026-08-08i`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
-| Exactidão MVP | User-ID de **rede** (não GlobalProtect) até IM7/IM8 |
+| Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
 | Não-regressão | Obrigatória — plano §1 e mapa §0 |
 | Barra UX PME | Critérios U*/P*/H*/N* do posicionamento — obrigatórios na revisão de passo |
@@ -124,7 +124,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM7 / 20.28 — MVP agente Windows ou ADIAR com ADR; 20.27 espec PASS).
+Tarefa: continuar no passo actual (IM9 / 20.31 — malha lab Identity + evidências; ADR-0029 fechou IM7/IM8).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -143,14 +143,14 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM7 / 20.28 (MVP agente ou ADIAR ADR)
+- Passo actual: IM9 / 20.31 (malha lab / fecho)
 - 20.22: PASS (audit conflict + last_writer + GUI topologia)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (receiver + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
-- Plano rev.: 2026-08-08c
+- Plano rev.: 2026-08-08i
 - Baseline enforce: 1.9.8
-- Candidato: **1.9.28** (publicado lab/`latest`)
+- Candidato: **1.9.29** (ADR-0029 / GUI H*; publish pendente); latest **1.9.28**
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

@@ -63,8 +63,8 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-18 | Policy `ad_users`/`ad_groups` | IM6 | **Feito** (20.23+20.24) | GUI/PKG/DMN | `1.9.28` |
 | M-19 | Enforce ← mapa daemon | IM6 | Planeado | DMN | **não** PHP `device_ips` SSOT |
 | M-20 | Precedence (§3.1 → core) | IM6 | Planeado | DOC | |
-| M-21 | Endpoint agent | IM7 | **Espec PASS** (20.27); MVP/ADIAR = 20.28 | DOC | `especificacao-agente-endpoint-20.27.md` |
-| M-22 | TS/VDI agent | IM8 | Adiável | — | |
+| M-21 | Endpoint agent | IM7 | **ADIAR** (`ADR-0029`) | DOC | espec 20.27 + ADR-0029 |
+| M-22 | TS/VDI agent | IM8 | **EXCLUÍDO** (`ADR-0029`) | DOC | `desenho-ts-vdi-20.29-excluido.md` |
 | M-23 | Evidências + MANUAL | IM9 | Planeado | DOC/TST | |
 | M-24 | Modelo concorrência/IO daemon (threads + rwlock) | IM3 (20.11a/20.12) | **PASS** rwlock no mapa; threads = 20.15+ | DMN | ADR-0028; `pthread_rwlock` em `identity_map` |
 | M-25 | Baseline de perf registada | IM3 (20.11a) | **PASS** (`2026-08-06`) | TST | Evidência `20260806T174000Z-20.11a-baseline-perf`; pin doc `1.9.8` |

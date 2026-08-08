@@ -6,11 +6,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- **Identity 20.27:** especificação agente endpoint
-  (`docs/01-architecture/especificacao-agente-endpoint-20.27.md`) —
-  OS/canal/auth/heartbeat; recomendação ADIAR salvo GO humano no 20.28.
-- **Identity 20.25–20.26 / GI7:** `core/precedence.md` + suite unit GI7.1–7.5;
-  checklist lab residual.
+- **Identity 20.28–20.30 / GI8 / ADR-0029:** sequência segura — ADIAR agente
+  endpoint; exclusão TS/VDI; GUI H*; candidato **1.9.29**.
+- **Identity 20.27:** especificação agente endpoint (conservada para reopen).
+- **Identity 20.25–20.26 / GI7:** precedência + suite unit; lab residual.
+
+### Notes
+
+- Canal `latest`: **`1.9.28`** até publish; candidato **`1.9.29`**.
+- Produção enforce **`1.9.8`**. Rollback lab previsto: `1.9.28`.
 
 ## [1.9.28] — 2026-08-08
 

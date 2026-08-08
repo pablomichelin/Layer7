@@ -310,7 +310,7 @@ reavaliacao formal.
 | BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | **20.18 PASS** / fechar IM4 | Test LDAP GUI + GI5.4; GI5.3 = IM5 |
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | **20.20 PASS** / GI6 lab | WinRM outbound não canónico; agente em `docs/samples/identity-dc-agent/` |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Feito (20.24); GI7 lab residual | GI7; não-regressão IP/MAC |
-| BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | Espec 20.27 PASS; 20.28 GO/ADIAR | GI8 ou ADR exclusão |
+| BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | **Fechado** ADR-0029 (ADIAR+exclusão) | GI8 PASS |
 | BG-092 | Fecho lab/release add-on (IM9) | Alta | testes/F7/docs | IM9 | feature sem MANUAL/release | M | Alto | Planeado | GI9; foco release Identity (MITM diferido) |
 
 ## Checkpoint auditoria segurança `1.9.8` → candidato `1.9.9` (2026-08-05)
