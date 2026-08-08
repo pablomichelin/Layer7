@@ -7,6 +7,7 @@ import CopyButton from '../components/CopyButton';
 import { formatSkuLabel, isLicenseBound } from '../license-display.js';
 import {
   ADMIN_LICENSES_NEW_ROUTE,
+  buildAdminCustomerDetailRoute,
   buildAdminLicenseEditRoute,
   buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
@@ -92,7 +93,24 @@ export default function Licenses() {
         </div>
       ),
     },
-    { key: 'customer_name', label: 'Cliente', render: (r) => r.customer_name || '—' },
+    {
+      key: 'customer_name',
+      label: 'Cliente',
+      render: (r) => (
+        r.customer_id ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(buildAdminCustomerDetailRoute(r.customer_id));
+            }}
+            className="text-brand-700 hover:underline font-medium"
+          >
+            {r.customer_name || `Cliente #${r.customer_id}`}
+          </button>
+        ) : (r.customer_name || '—')
+      ),
+    },
     { key: 'features', label: 'SKU', render: (r) => formatSkuLabel(r.features) },
     {
       key: 'bound',
@@ -110,14 +128,14 @@ export default function Licenses() {
     { key: 'created_at', label: 'Criada', render: (r) => new Date(r.created_at).toLocaleDateString('pt-BR') },
     {
       key: 'actions', label: '', render: (r) => (
-        <div className="flex gap-2">
-          <button onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
-          <button onClick={() => navigate(buildAdminLicenseEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+          <button type="button" onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
+          <button type="button" onClick={() => navigate(buildAdminLicenseEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
           {r.status === 'active' && (
-            <button onClick={(e) => handleRevoke(r.id, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
+            <button type="button" onClick={(e) => handleRevoke(r.id, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
           )}
           {r.status !== 'active' && (
-            <button onClick={(e) => handleArchive(r.id, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
+            <button type="button" onClick={(e) => handleArchive(r.id, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
           )}
         </div>
       ),
@@ -187,7 +205,12 @@ export default function Licenses() {
 
       {loading ? <p className="text-gray-500">Carregando...</p> : (
         <>
-          <DataTable columns={columns} rows={licenses} emptyMessage="Nenhuma licença encontrada" />
+          <DataTable
+            columns={columns}
+            rows={licenses}
+            emptyMessage="Nenhuma licença encontrada"
+            onRowClick={(row) => navigate(buildAdminLicenseDetailRoute(row.id))}
+          />
           {pages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-4">
               <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border rounded disabled:opacity-30">Anterior</button>

@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — C0 Navegação `1.1.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `1.1.0` |
+| Objectivo | Descoberta Cliente↔Licença (clique + links) |
+| Impacto | UX frontend; sem mudança de API de negócio |
+| Risco | Baixo |
+| Teste | lista→ficha→licença→cliente; health; SPA v1.1.0 |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-DkPpXfUZ.js`; `.env` preservado |
+
+---
+
 ## 2026-08-08 — Abrir PORTAL-PLAN-002 (ficha cliente 360)
 
 | Campo | Valor |

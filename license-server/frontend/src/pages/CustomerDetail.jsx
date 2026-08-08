@@ -35,13 +35,41 @@ export default function CustomerDetail() {
   const { customer, licenses } = data;
 
   const columns = [
-    { key: 'license_key', label: 'Chave', render: (r) => <code className="text-xs">{r.license_key.slice(0, 16)}...</code> },
+    {
+      key: 'license_key',
+      label: 'Chave',
+      render: (r) => (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(buildAdminLicenseDetailRoute(r.id));
+          }}
+          className="text-left"
+        >
+          <code className="text-xs text-brand-700 hover:underline">{r.license_key.slice(0, 16)}…</code>
+        </button>
+      ),
+    },
     { key: 'expiry', label: 'Expira', render: (r) => new Date(r.expiry).toLocaleDateString('pt-BR') },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     { key: 'activated_at', label: 'Activada', render: (r) => r.activated_at ? new Date(r.activated_at).toLocaleDateString('pt-BR') : 'Nunca' },
-    { key: 'actions', label: '', render: (r) => (
-      <button onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
-    )},
+    {
+      key: 'actions',
+      label: '',
+      render: (r) => (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(buildAdminLicenseDetailRoute(r.id));
+          }}
+          className="text-xs text-brand-600 hover:underline"
+        >
+          Ver
+        </button>
+      ),
+    },
   ];
 
   return (
@@ -69,7 +97,12 @@ export default function CustomerDetail() {
       </div>
 
       <h3 className="text-lg font-semibold text-gray-700 mb-3">Licenças ({licenses.length})</h3>
-      <DataTable columns={columns} rows={licenses} emptyMessage="Nenhuma licença" />
+      <DataTable
+        columns={columns}
+        rows={licenses}
+        emptyMessage="Nenhuma licença"
+        onRowClick={(row) => navigate(buildAdminLicenseDetailRoute(row.id))}
+      />
     </div>
   );
 }

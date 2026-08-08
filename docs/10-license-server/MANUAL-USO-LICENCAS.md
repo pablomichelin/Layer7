@@ -192,7 +192,7 @@ O sistema de licencas Layer7 funciona com dois componentes:
 |--------|--------|
 | **Dashboard** | Resumo: licencas activas/expiradas/revogadas, total clientes, ultimas 10 activacoes |
 | **Licencas** | Lista paginada, filtro por status, criar/ver/editar/revogar/arquivar |
-| **Clientes** | Lista paginada, busca por nome/email, criar/editar/arquivar |
+| **Clientes** | Lista paginada (clique na linha → ficha); busca; criar/editar/arquivar; ficha com licenças do cliente |
 
 ### 2.4 Regras operacionais do CRUD apos a F2.4
 
@@ -220,6 +220,13 @@ Antes de gerar uma licenca, e necessario criar o cliente.
    - **Telefone** — ex: `11999998888`
    - **Notas** — informacoes internas
 4. Clicar em **Criar Cliente**
+
+### Ver cliente e as suas licenças (portal ≥ 1.1.0)
+
+1. Em **Clientes**, clicar na **linha** do cliente (ou no nome / **Ver**)
+2. A ficha mostra os dados e a tabela de licenças associadas
+3. Clicar numa licença abre o detalhe; no detalhe da licença, o **nome do
+   cliente** volta à ficha
 
 ### Via API (curl)
 

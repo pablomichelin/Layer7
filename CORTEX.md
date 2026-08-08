@@ -779,7 +779,7 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 | Campo | Valor |
 |-------|-------|
-| Versão visual actual | **`1.0.0`** (operador único, `2026-08-08`) |
+| Versão visual actual | **`1.1.0`** (C0 navegação, `2026-08-08`) |
 | Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
 | Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
 | Plano activo | [`docs/10-license-server/portal/planos/2026-08-08-ficha-cliente-360.md`](docs/10-license-server/portal/planos/2026-08-08-ficha-cliente-360.md) (`PORTAL-PLAN-002`) |
@@ -787,8 +787,8 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 | Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
-**Checkpoint `2026-08-08`:** portal **`1.0.0`** (`PORTAL-PLAN-001` CONCLUIDO).
-Novo plano **`PORTAL-PLAN-002`** (ficha cliente 360) — próximo **C0** com GO.
+**Checkpoint `2026-08-08`:** portal **`1.1.0`** — C0 navegação Cliente↔Licença
+(`PORTAL-PLAN-002`). Próximo na ordem: **C1 → 1.2.0**.
 Regra: não saltar blocos do plano portal.
 
 ---

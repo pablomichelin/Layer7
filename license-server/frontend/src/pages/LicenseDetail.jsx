@@ -7,6 +7,7 @@ import CopyButton from '../components/CopyButton';
 import { formatSkuLabel, isLicenseBound } from '../license-display.js';
 import {
   ADMIN_LICENSES_ROUTE,
+  buildAdminCustomerDetailRoute,
   buildAdminLicenseDetailRoute,
   buildAdminLicenseEditRoute,
 } from '../panel-routes.js';
@@ -267,7 +268,20 @@ export default function LicenseDetail() {
             <code className="ml-2 break-all">{license.license_key}</code>{' '}
             <CopyButton text={license.license_key} />
           </div>
-          <div><span className="text-gray-500">Cliente:</span> <span className="ml-2">{license.customer_name || '—'}</span></div>
+          <div>
+            <span className="text-gray-500">Cliente:</span>{' '}
+            {license.customer_id ? (
+              <button
+                type="button"
+                onClick={() => navigate(buildAdminCustomerDetailRoute(license.customer_id))}
+                className="ml-2 text-brand-700 hover:underline font-medium"
+              >
+                {license.customer_name || `Cliente #${license.customer_id}`}
+              </button>
+            ) : (
+              <span className="ml-2">{license.customer_name || '—'}</span>
+            )}
+          </div>
           <div><span className="text-gray-500">Expira:</span> <span className="ml-2">{new Date(license.expiry).toLocaleDateString('pt-BR')}</span></div>
           <div><span className="text-gray-500">SKU:</span> <span className="ml-2">{formatSkuLabel(license.features)}</span></div>
           <div><span className="text-gray-500">Hardware ID:</span> <code className="ml-2 text-xs break-all">{license.hardware_id || 'Não activada'}</code></div>

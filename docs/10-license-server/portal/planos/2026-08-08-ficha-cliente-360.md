@@ -3,7 +3,7 @@
 | Campo | Valor |
 |-------|-------|
 | **ID** | `PORTAL-PLAN-002` |
-| **Estado** | `ACTIVO` (aguarda GO do bloco C0) |
+| **Estado** | `ACTIVO` |
 | **Criado** | `2026-08-08` |
 | **Baseline** | portal visual **`1.0.0`** |
 | **Alvo** | portal visual **`1.2.0`** (guia) |
@@ -108,11 +108,11 @@ Imagens Docker anteriores; reverter commit do bloco.
 
 | Bloco | Estado | Versão | Data |
 |-------|--------|--------|------|
-| C0 | Pendente (GO) | → `1.1.0` | — |
+| C0 | **FEITO** (GO `2026-08-08`) | `1.1.0` | 2026-08-08 |
 | C1 | Pendente | → `1.2.0` | — |
 | C2 | Pendente | → `1.2.x` | — |
 
 ## 9. Próxima acção
 
-Com **GO explícito no chat**: executar **só C0** → bump `1.1.0` → deploy →
-push privado.
+**C1 → 1.2.0** — ficha 360 (licenças ricas + nova licença no contexto).
+Não saltar.

@@ -1,6 +1,6 @@
 # Estado Actual — Portal Admin
 
-> Snapshot: **2026-08-08** — versão visual **`1.0.0`**.
+> Snapshot: **2026-08-08** — versão visual **`1.1.0`**.
 
 ## Ambiente
 
@@ -8,20 +8,19 @@
 |------|-------|
 | Host | `192.168.100.244` |
 | URL | `https://license.systemup.inf.br` |
-| Versão visual | **`1.0.0`** |
-| SPA | `index-CzikQc2x.js` |
+| Versão visual | **`1.1.0`** |
+| SPA | `index-DkPpXfUZ.js` |
 | Health | OK |
-| Plano | `PORTAL-PLAN-001` **CONCLUIDO** |
+| Plano | `PORTAL-PLAN-002` **ACTIVO** (C0 FEITO) |
 
 ## Capacidade
 
 | Área | Estado |
 |------|--------|
-| P0 → P1e | OK — operador único completo |
-| Residual | só `IDEIAS.md` `FUTURA` (GO novo) |
+| Operador único `1.0.0` | OK |
+| Navegação Cliente↔Licença (C0) | OK |
+| Ficha 360 (C1) | Pendente |
 
 ## Próximo
 
-**PORTAL-PLAN-002** activo — ficha cliente 360°.  
-Próximo bloco: **C0 → 1.1.0** (navegação descoberta; requer GO).
-Sem bloco obrigatório residual do plano `1.0.0`.
+**C1 → 1.2.0** — ficha 360 (licenças ricas + nova licença no contexto).

@@ -4,25 +4,22 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `1.0.0` |
-| **Codinome** | Operador único completo |
+| **Versão** | `1.1.0` |
+| **Codinome** | Navegação Cliente↔Licença (C0) |
 | **Estado** | Entregue |
 | **Data** | `2026-08-08` |
 
-## Inclui (fecho P0→P1e)
+## Inclui
 
-- SPA alinhada à API; versão na sidebar
-- CRUD + chave copiável; filtros Bound/SKU/expiry
-- Dashboard a expirar 30d; renovação +30/90/365
-- Auditoria UI; check-ins no detalhe
-- Rebind governado; substituir pós-revogação (sem desrevogar)
-- Inventário SKU `base` (sem `full` órfão live)
-- Docs trilha portal + MANUAL-USO actualizados
+- Lista Clientes: clique na linha + nome → ficha
+- Lista Licenças: clique na linha → detalhe; Cliente → ficha
+- Detalhe Licença: nome do cliente → ficha
+- Ficha Cliente: clique na linha da licença → detalhe
 
-## Próxima
+## Próxima (ordem fixa)
 
-Residual só ideias `FUTURA` (MSP/self-service/billing) — requer GO novo.
-Novo plano se necessário; `PORTAL-PLAN-001` → `CONCLUIDO`.
+| Versão | Bloco |
+|--------|-------|
+| `1.2.0` | **C1** — ficha 360 (licenças ricas + nova licença no contexto) |
 
-Histórico: [`CHANGELOG.md`](CHANGELOG.md) ·
-[`historico/2026-08-08-fecho-1.0.0.md`](historico/2026-08-08-fecho-1.0.0.md).
+Histórico: [`CHANGELOG.md`](CHANGELOG.md).

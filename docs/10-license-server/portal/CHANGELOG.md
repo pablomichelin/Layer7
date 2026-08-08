@@ -11,6 +11,16 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [1.1.0] — 2026-08-08
+
+### Added
+
+- Navegação cruzada Cliente↔Licença (PORTAL-PLAN-002 / C0 / IDEA-015)
+- Clique na linha nas listas de clientes e licenças
+- Links: nome do cliente na lista/detalhe de licenças; licenças na ficha do cliente
+
+---
+
 ## [1.0.0] — 2026-08-08
 
 ### Added
