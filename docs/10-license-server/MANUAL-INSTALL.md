@@ -255,7 +255,7 @@ Match/enforce via mapa Identity fica no **20.24**.
 **Canal `latest`:** `1.9.27`. Enforce **`1.9.8`**. Rollback lab: **`1.9.26`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.27`
-- **SHA256 esperado:** `PLACEHOLDER`
+- **SHA256 esperado:** `ab92ad64f59a6acf87ed8c5a868c4fd79fa8c3d594100b09d60db68cad671a2b`
 
 **Addendum da release `1.9.26` (Identity IM5/20.22 conflict audit, `2026-08-08`):**
 Audit `identity_ip_conflict` / `identity_ip_last_writer`; contadores; nota topologia GUI.
@@ -906,7 +906,7 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.27`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.27/pfSense-pkg-layer7-1.9.27.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.27/pfSense-pkg-layer7-1.9.27.pkg.sha256`
-- **SHA256 esperado:** `PLACEHOLDER`
+- **SHA256 esperado:** `ab92ad64f59a6acf87ed8c5a868c4fd79fa8c3d594100b09d60db68cad671a2b`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
 **Versao anterior lab (rollback a partir de `1.9.27`):** `1.9.26`
@@ -1094,7 +1094,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.27.pkg.sha256 https://github.com/pablomiche
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`PLACEHOLDER`.
+`ab92ad64f59a6acf87ed8c5a868c4fd79fa8c3d594100b09d60db68cad671a2b`.
 
 ---
 

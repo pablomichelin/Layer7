@@ -20,7 +20,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Notes
 
 - Canal `latest`: **`1.9.27`**. Produção enforce **`1.9.8`**.
-- SHA256: `PLACEHOLDER`. Rollback lab: `1.9.26`.
+- SHA256: `ab92ad64f59a6acf87ed8c5a868c4fd79fa8c3d594100b09d60db68cad671a2b`. Rollback lab: `1.9.26`.
 
 ## [1.9.26] — 2026-08-08
 
