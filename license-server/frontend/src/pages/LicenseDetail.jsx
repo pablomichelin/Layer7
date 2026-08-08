@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { get, post, del, download } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
+import CopyButton from '../components/CopyButton';
+import { formatSkuLabel, isLicenseBound } from '../license-display.js';
 import {
   ADMIN_LICENSES_ROUTE,
   buildAdminLicenseEditRoute,
@@ -49,6 +51,7 @@ export default function LicenseDetail() {
   if (!data) return <p className="text-red-500">Licença não encontrada</p>;
 
   const { license, activations } = data;
+  const bound = isLicenseBound(license);
 
   const actColumns = [
     { key: 'created_at', label: 'Data', render: (r) => new Date(r.created_at).toLocaleString('pt-BR') },
@@ -65,15 +68,26 @@ export default function LicenseDetail() {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-800">Detalhes da Licença</h2>
-          <StatusBadge status={license.status} />
+          <div className="flex gap-2">
+            <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${
+              bound ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'
+            }`}>
+              {bound ? 'Bound' : 'Unbound'}
+            </span>
+            <StatusBadge status={license.status} />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div><span className="text-gray-500">Chave:</span> <code className="ml-2">{license.license_key}</code></div>
+          <div className="md:col-span-2">
+            <span className="text-gray-500">Chave:</span>{' '}
+            <code className="ml-2 break-all">{license.license_key}</code>{' '}
+            <CopyButton text={license.license_key} />
+          </div>
           <div><span className="text-gray-500">Cliente:</span> <span className="ml-2">{license.customer_name || '—'}</span></div>
           <div><span className="text-gray-500">Expira:</span> <span className="ml-2">{new Date(license.expiry).toLocaleDateString('pt-BR')}</span></div>
-          <div><span className="text-gray-500">Features:</span> <span className="ml-2">{license.features}</span></div>
-          <div><span className="text-gray-500">Hardware ID:</span> <code className="ml-2 text-xs">{license.hardware_id || 'Não activada'}</code></div>
+          <div><span className="text-gray-500">SKU:</span> <span className="ml-2">{formatSkuLabel(license.features)}</span></div>
+          <div><span className="text-gray-500">Hardware ID:</span> <code className="ml-2 text-xs break-all">{license.hardware_id || 'Não activada'}</code></div>
           <div><span className="text-gray-500">Activada em:</span> <span className="ml-2">{license.activated_at ? new Date(license.activated_at).toLocaleString('pt-BR') : 'Nunca'}</span></div>
           <div><span className="text-gray-500">Criada em:</span> <span className="ml-2">{new Date(license.created_at).toLocaleString('pt-BR')}</span></div>
           {license.revoked_at && <div><span className="text-gray-500">Revogada em:</span> <span className="ml-2">{new Date(license.revoked_at).toLocaleString('pt-BR')}</span></div>}

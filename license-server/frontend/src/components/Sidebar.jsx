@@ -6,6 +6,7 @@ import {
   ADMIN_LICENSES_ROUTE,
   ADMIN_LOGIN_ROUTE,
 } from '../panel-routes.js';
+import { PORTAL_VERSION } from '../portal-version.js';
 
 const links = [
   { to: ADMIN_DASHBOARD_ROUTE, label: 'Dashboard', icon: '📊' },
@@ -27,6 +28,7 @@ export default function Sidebar() {
       <div className="p-6 border-b border-brand-600">
         <h1 className="text-lg font-bold tracking-tight">Layer7 License Manager</h1>
         <p className="text-brand-200 text-xs mt-1">por Systemup</p>
+        <p className="text-brand-300 text-xs mt-1">v{PORTAL_VERSION}</p>
         {admin && <p className="text-brand-100 text-xs mt-3">{admin.email}</p>}
       </div>
 

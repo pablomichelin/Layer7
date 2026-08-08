@@ -5,6 +5,26 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — P0 Fundação `0.1.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `0.1.0` |
+| Objectivo | Fechar drift SPA/API, UX chave/filtros/dashboard expiry, normalizar SKU `full`→`base` |
+| Impacto | `license-server/` frontend+API; live `244`; inventário features |
+| Risco | Médio no deploy (mitigado backup); baixo na UX; `.lic` antigos com `full` podem coexistir até reemissão |
+| Teste | testes `crud-validation`; health; login; dashboard `expiring_30d`; lista filtros |
+| Rollback | imagens Docker anteriores + restore Postgres se necessário |
+| Resultado | **FEITO** — deploy live PASS; health OK; SPA nova; `full`→`base` (6 rows) |
+
+### Notas
+
+- Bloco P0 do `PORTAL-PLAN-001`
+- Sem escala/MSP
+
+---
+
 ## 2026-08-08 — Baseline documental `0.0.1`
 
 | Campo | Valor |

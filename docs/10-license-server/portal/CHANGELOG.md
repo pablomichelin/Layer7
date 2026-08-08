@@ -7,7 +7,25 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ## [Unreleased]
 
-- (vazio — alterações em curso registam-se aqui antes do bump)
+- (vazio)
+
+---
+
+## [0.1.0] — 2026-08-08
+
+### Added
+
+- Versão visual na sidebar (`v0.1.0`)
+- Ecrã pós-criação com chave completa + copiar + atalho ao detalhe
+- Lista: chave completa, badge Bound/Unbound, SKU legível
+- Filtros: cliente, bound, a expirar (30/60/90 dias); search inclui hardware_id
+- Dashboard: card “A expirar (30d)” + atalhos para listas filtradas
+- API: `bound`, `expiring_within_days` na listagem; `expiring_30d` no dashboard
+
+### Changed
+
+- Inventário live: `features=full` normalizado para `base` (ADR-0025 T1)
+- Redeploy SPA + API no host `244` (fecha drift de imagens)
 
 ---
 
@@ -38,4 +56,5 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 ---
 
 [Unreleased]: #unreleased
+[0.1.0]: #010---2026-08-08
 [0.0.1]: #001---2026-08-08

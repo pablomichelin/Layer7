@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { get, post, put } from '../api';
+import CopyButton from '../components/CopyButton';
 import {
   buildLicenseFormState,
   buildLicenseSavePayload,
@@ -26,6 +27,7 @@ export default function LicenseForm() {
     notes: '',
   });
   const [licenseState, setLicenseState] = useState(null);
+  const [createdLicense, setCreatedLicense] = useState(null);
   const [loadingInitialData, setLoadingInitialData] = useState(isEdit);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -90,8 +92,8 @@ export default function LicenseForm() {
         await put(`/licenses/${id}`, payload);
         navigate(buildAdminLicenseDetailRoute(id));
       } else {
-        await post('/licenses', payload);
-        navigate(ADMIN_LICENSES_ROUTE);
+        const created = await post('/licenses', payload);
+        setCreatedLicense(created);
       }
     } catch (err) {
       setError(err.message);
@@ -107,6 +109,43 @@ export default function LicenseForm() {
 
   if (loadingInitialData) {
     return <p className="text-gray-500">Carregando...</p>;
+  }
+
+  if (createdLicense) {
+    return (
+      <div>
+        <div className="bg-white rounded-lg shadow p-6 max-w-lg">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Licença criada</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Guarde a chave. O cliente activa com{' '}
+            <code className="text-xs bg-gray-100 px-1 rounded">layer7d --activate CHAVE</code>
+          </p>
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+            <p className="text-xs text-gray-500 mb-1">Chave completa</p>
+            <code className="text-sm break-all">{createdLicense.license_key}</code>
+            <div className="mt-2">
+              <CopyButton text={createdLicense.license_key} label="Copiar chave" className="font-medium" />
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(buildAdminLicenseDetailRoute(createdLicense.id))}
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg"
+            >
+              Ver detalhe
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(ADMIN_LICENSES_ROUTE)}
+              className="px-4 py-2 border border-gray-300 text-sm rounded-lg hover:bg-gray-50"
+            >
+              Lista de licenças
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

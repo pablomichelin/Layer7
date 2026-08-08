@@ -4,35 +4,27 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `0.0.1` |
-| **Codinome** | Baseline CRUD |
-| **Estado** | Baseline formalizada (pré-melhoria total) |
-| **Data de baseline** | `2026-08-08` |
+| **Versão** | `0.1.0` |
+| **Codinome** | Fundação P0 |
+| **Estado** | Entregue (P0 do plano de melhoria) |
+| **Data** | `2026-08-08` |
 | **Código (repo)** | `license-server/` |
 | **Deploy live** | `192.168.100.244:/opt/layer7-license` |
 
-## O que significa `0.0.1`
+## O que inclui `0.1.0`
 
-É a **primeira versão documentada** do portal como produto UI:
+- SPA alinhada ao backend (fim do drift Abril/Agosto na UI)
+- Versão visual na sidebar
+- Pós-criação com chave completa + copiar
+- Lista: chave completa, Bound/Unbound, SKU, filtros (status, cliente, bound, a expirar)
+- Pesquisa por hardware_id
+- Dashboard: a expirar 30d + atalhos
+- Inventário live `full` → `base` (T1)
 
-- painel com Dashboard / Licenças / Clientes
-- activação online e emissão `.lic` via API
-- auth administrativa F2 (sessão cookie)
-- hardening e contratos F3 no backend
-- **sem** completar o ciclo de vida operacional na UI (rebind, auditoria
-  visível, renovação rápida, etc.)
+## Próxima
 
-Não confundir com a versão do pacote pfSense (`1.9.x`).
+| Versão alvo | Conteúdo |
+|-------------|----------|
+| `0.2.0` | P1a — renovação rápida + ficha cliente leve |
 
-## Próxima versão planeada
-
-| Versão alvo | Conteúdo | Plano |
-|-------------|----------|-------|
-| `0.1.0` | Bloco P0 (deploy SPA alinhada + UX chave/filtros/dashboard expiry) | [`planos/2026-08-08-melhoria-total-portal.md`](planos/2026-08-08-melhoria-total-portal.md) |
-| `0.2.0` … | Blocos P1 (ciclo de vida) | mesmo plano |
-| `1.0.0` | Completo para operador único | critérios em `OBJECTIVOS.md` |
-
-## Política
-
-Ver [`GOVERNANCE.md`](GOVERNANCE.md) §2.  
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

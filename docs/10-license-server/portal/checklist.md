@@ -22,15 +22,15 @@ fechar uma versão (ou referenciar em `historico/`).
 
 ## Gates para `0.1.0` (P0)
 
-- [ ] Frontend rebuild + deploy; SPA alinhada à API
-- [ ] Versão visual visível na UI (`0.1.0`)
-- [ ] Modal/fluxo pós-criação com chave + copiar
-- [ ] Lista: copiar chave, Bound/Unbound, SKU, filtros expiry/cliente
-- [ ] Dashboard: a expirar 30d + expiradas efectivas
-- [ ] Política/procedimento `full` → `base` documentado e aplicado ou
+- [x] Frontend rebuild + deploy; SPA alinhada à API
+- [x] Versão visual visível na UI (`0.1.0`)
+- [x] Modal/fluxo pós-criação com chave + copiar
+- [x] Lista: copiar chave, Bound/Unbound, SKU, filtros expiry/cliente
+- [x] Dashboard: a expirar 30d + expiradas efectivas
+- [x] Política/procedimento `full` → `base` documentado e aplicado ou
       agendado com evidência
-- [ ] `VERSION.md` = `0.1.0` + entrada em `CHANGELOG.md`
-- [ ] `ESTADO.md` com datas de imagens pós-deploy
+- [x] `VERSION.md` = `0.1.0` + entrada em `CHANGELOG.md`
+- [x] `ESTADO.md` com datas de imagens pós-deploy
 
 ---
 

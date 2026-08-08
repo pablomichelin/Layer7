@@ -52,7 +52,16 @@ async function ensureVisibleCustomer(client, customerId) {
 
 router.get('/', async (req, res) => {
   try {
-    const { status, customerId, search, page, limit, offset } = parseLicensesListQuery(req.query);
+    const {
+      status,
+      customerId,
+      search,
+      page,
+      limit,
+      offset,
+      bound,
+      expiringWithinDays,
+    } = parseLicensesListQuery(req.query);
     const conditions = ['l.archived_at IS NULL', '(c.id IS NULL OR c.archived_at IS NULL)'];
     const params = [];
 
@@ -69,9 +78,24 @@ router.get('/', async (req, res) => {
       conditions.push(`l.customer_id = $${params.length}`);
     }
 
+    if (bound === true) {
+      conditions.push(`l.hardware_id IS NOT NULL AND btrim(l.hardware_id) <> ''`);
+    } else if (bound === false) {
+      conditions.push(`(l.hardware_id IS NULL OR btrim(l.hardware_id) = '')`);
+    }
+
+    if (expiringWithinDays !== undefined) {
+      params.push(expiringWithinDays);
+      conditions.push(
+        `${LICENSE_SQL_ACTIVE_CONDITION} AND l.expiry <= CURRENT_DATE + ($${params.length}::int * INTERVAL '1 day')`
+      );
+    }
+
     if (search) {
       params.push(`%${search}%`);
-      conditions.push(`(l.license_key ILIKE $${params.length} OR c.name ILIKE $${params.length})`);
+      conditions.push(
+        `(l.license_key ILIKE $${params.length} OR c.name ILIKE $${params.length} OR COALESCE(l.hardware_id, '') ILIKE $${params.length})`
+      );
     }
 
     const whereClause = `WHERE ${conditions.join(' AND ')}`;

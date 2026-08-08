@@ -1,7 +1,6 @@
 # Estado Actual — Portal Admin
 
-> Actualizar em todo deploy ou mudança relevante do live.  
-> Snapshot: **2026-08-08** (baseline `0.0.1`).
+> Snapshot: **2026-08-08** (versão visual **`0.1.0`**).
 
 ## Ambiente
 
@@ -13,55 +12,36 @@
 | Origin | porta host `8445` → nginx container |
 | Compose | `layer7-license-{web,api,db,nginx}` |
 | Rede Docker | `layer7-license-net` (isolada) |
+| Versão visual | **`0.1.0`** |
+| Backup pré-deploy | `/opt/layer7-license/backups/layer7-license-postgres-20260808T214134Z.sql` |
 
-## Imagens / idade observada (`2026-08-08`)
+## Imagens (pós-P0)
 
-| Contentor | Observação |
-|-----------|------------|
-| `layer7-license-web` | Criado **2026-04-14** — SPA antiga |
-| `layer7-license-api` | Criado **2026-08-04** — API recente (check-in, F3…) |
-| `layer7-license-db` | Postgres 17, dados persistentes |
-| `layer7-license-nginx` | Proxy interno |
+| Contentor | Created | Started |
+|-----------|---------|---------|
+| `layer7-license-web` | `2026-08-08T21:42:32Z` | `2026-08-08T21:42:42Z` |
+| `layer7-license-api` | `2026-08-08T21:42:32Z` | `2026-08-08T21:42:42Z` |
 
-**Drift:** frontend live ≠ backend live. Prioridade P0 do plano de melhoria.
+SPA asset público: `index-B540Roat.js` (substitui `index-DzAub8GA.js` de Abril).
 
-## Inventário de dados (live, `2026-08-08`)
+## Inventário live
 
 | Métrica | Valor |
 |---------|-------|
-| Clientes activos | 5 |
-| Licenças (não arquivadas) | 6 |
-| Bindadas | 6 |
-| Unbound | 0 |
-| Features | todas `full` (legado) |
-| Activations log | 38 |
-| Admin audit log | 56 |
-| Check-ins log | 4 |
-| Admins | 1 |
-| Expirando em 30d | 0 |
-| Expiradas efectivas (`active` + `expiry` passado) | 1 (cliente Lasalle) |
+| Features | `base` (6 licenças; 0 `full`) |
+| active / revoked | 3 / 3 |
 
-## Capacidade do painel (baseline `0.0.1`)
+## Capacidade (`0.1.0`)
 
 | Área | Estado |
 |------|--------|
-| Login sessão cookie | OK |
-| Dashboard contadores + últimas activações | OK (mínimo) |
-| CRUD clientes | OK |
-| CRUD licenças + revogar + arquivar | OK |
-| Download `.lic` (se bindada) | OK |
-| Presets SKU na UI live | Provável **ausente** (SPA Abril) |
-| UI auditoria | Ausente |
-| UI check-in | Ausente |
-| Rebind admin | Ausente (API também sem rota dedicada) |
-| Renovação rápida | Ausente |
-| Versão visual na UI | Ausente |
+| Health API | OK |
+| Versão visual na UI | OK |
+| Dashboard a expirar 30d | OK |
+| Filtros lista + copiar chave | OK |
+| SKU presets | OK |
+| Auditoria / check-in / rebind UI | Pendente P1 |
 
 ## Plano activo
 
-[`planos/2026-08-08-melhoria-total-portal.md`](planos/2026-08-08-melhoria-total-portal.md) — estado `ACTIVO`.
-
-## Próximo checkpoint esperado
-
-Após bloco P0 → bump para `0.1.0`, actualizar este ficheiro com datas de
-imagens Docker e confirmação de SPA alinhada.
+P0 **FEITO**. Próximo: **P1a** (renovação rápida).

@@ -7,6 +7,7 @@ const {
   normalizeStoredHardwareId,
   parseActivatePayload,
   parseLicenseCreatePayload,
+  parseLicensesListQuery,
   FEATURES_MAX_BYTES,
 } = require('./crud-validation');
 
@@ -118,4 +119,29 @@ test('parseLicenseCreatePayload normalizes features SKU', () => {
     features: 'full',
   });
   assert.equal(payload.features, 'base');
+});
+
+test('parseLicensesListQuery accepts bound and expiring_within_days filters', () => {
+  const query = parseLicensesListQuery({
+    page: '1',
+    limit: '20',
+    bound: 'yes',
+    expiring_within_days: '30',
+    status: 'active',
+  });
+
+  assert.equal(query.bound, true);
+  assert.equal(query.expiringWithinDays, 30);
+  assert.equal(query.status, 'active');
+});
+
+test('parseLicensesListQuery rejects invalid bound and oversized expiring window', () => {
+  assert.throws(
+    () => parseLicensesListQuery({ bound: 'maybe' }),
+    (error) => error.status === 400 && /bound invalido/.test(error.message)
+  );
+  assert.throws(
+    () => parseLicensesListQuery({ expiring_within_days: '400' }),
+    (error) => error.status === 400 && /expiring_within_days/.test(error.message)
+  );
 });

@@ -38,6 +38,14 @@ router.get('/', async (_req, res) => {
           AND (l.id IS NULL OR l.archived_at IS NULL)`
     );
 
+    const expiring30d = await pool.query(`
+      SELECT COUNT(*) AS total
+        FROM licenses
+       WHERE archived_at IS NULL
+         AND ${LICENSE_SQL_ACTIVE_CONDITION}
+         AND expiry <= CURRENT_DATE + INTERVAL '30 days'
+    `);
+
     const recentActivations = await pool.query(`
       SELECT al.created_at, al.result, al.ip_address, al.hardware_id,
              c.name AS customer_name, l.license_key
@@ -51,13 +59,14 @@ router.get('/', async (_req, res) => {
 
     res.json({
       licenses: {
-        active: parseInt(stats.rows[0].active),
-        expired: parseInt(stats.rows[0].expired),
-        revoked: parseInt(stats.rows[0].revoked),
-        total: parseInt(stats.rows[0].total),
+        active: parseInt(stats.rows[0].active, 10),
+        expired: parseInt(stats.rows[0].expired, 10),
+        revoked: parseInt(stats.rows[0].revoked, 10),
+        total: parseInt(stats.rows[0].total, 10),
+        expiring_30d: parseInt(expiring30d.rows[0].total, 10),
       },
       customers: parseInt(customers.rows[0].total, 10),
-      activations_24h: parseInt(activations24h.rows[0].count),
+      activations_24h: parseInt(activations24h.rows[0].count, 10),
       recent_activations: recentActivations.rows,
     });
   } catch (err) {

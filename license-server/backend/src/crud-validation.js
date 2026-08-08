@@ -276,8 +276,49 @@ function parseCustomersListQuery(query) {
   };
 }
 
+function parseBoundFilter(value) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value !== 'string') {
+    throw createHttpError(400, 'bound invalido.');
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'yes' || normalized === 'true' || normalized === '1') {
+    return true;
+  }
+  if (normalized === 'no' || normalized === 'false' || normalized === '0') {
+    return false;
+  }
+
+  throw createHttpError(400, 'bound invalido.');
+}
+
+function parseExpiringWithinDays(value) {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  const days = normalizePositiveInt(value, 'expiring_within_days');
+  if (days > 365) {
+    throw createHttpError(400, 'expiring_within_days excede o maximo permitido.');
+  }
+
+  return days;
+}
+
 function parseLicensesListQuery(query) {
-  const { page, limit, offset } = parsePaginationQuery(query, ['status', 'customer_id', 'search', 'page', 'limit']);
+  const { page, limit, offset } = parsePaginationQuery(query, [
+    'status',
+    'customer_id',
+    'search',
+    'page',
+    'limit',
+    'bound',
+    'expiring_within_days',
+  ]);
   let status;
   let customerId;
 
@@ -303,6 +344,8 @@ function parseLicensesListQuery(query) {
     search: parseSearch(query.search),
     status,
     customerId,
+    bound: parseBoundFilter(query.bound),
+    expiringWithinDays: parseExpiringWithinDays(query.expiring_within_days),
   };
 }
 
