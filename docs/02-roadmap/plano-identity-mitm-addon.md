@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08e`; **20.24 PASS**; passo actual **20.25 / IM6**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-08f`; **20.25 PASS**; passo actual **20.26 / IM6 / GI7**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -20,21 +20,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.25** — precedência formal → `core/precedence.md` (IM6) |
+| Passo actual | **20.26** — lab GI7 (user A/B, remap, fail-mode) |
 | Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
 | ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.25 → 20.26 GI7 |
+| Próximo | 20.26 GI7 → IM7 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.25 (precedência formal)
+- Passo actual: 20.26 (lab GI7)
 - 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
 - Baseline: 1.9.8; **1.9.28** (publicado lab/`latest`)
-- Próximo: 20.25 → 20.26 GI7
+- Próximo: 20.26 GI7 → IM7
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -207,34 +207,25 @@ Preços X/Y são decisão comercial externa ao repo; o plano só materializa o *
 
 Analogia pedagógica: ADR-0012 MAC→IP. **Diferença crítica:** Identity **não** usa o padrão PHP `device_ips` no resync como SSOT — o daemon mantém o mapa vivo.
 
-### 3.1 Precedência (rev. `c` — reconciliada com `core/precedence.md`; formalizar em 20.25)
+### 3.1 Precedência (SSOT: `docs/core/precedence.md` — formalizado em 20.25)
+
+O esboço desta secção foi **promovido** para
+[`docs/core/precedence.md`](../core/precedence.md) (secção *Identity:
+`ad_users` / `ad_groups`*). Resumo:
 
 **Decisão estrutural (R-M):** o motor V1 é **first-match por `priority`
-decrescente** (`docs/core/precedence.md`) e isso **não muda**. Políticas
-`ad_user`/`ad_group` **não** formam uma camada separada: entram na mesma
-lista ordenada, e no momento do match o alvo `ad_*` **resolve para o
-conjunto de IPs actual do mapa daemon**. Consequência prática: uma política
-`ad_group` com `priority` alta pode vencer uma política IP com `priority`
-baixa — comportamento coerente com o motor actual e previsível para o
-operador.
+decrescente** e isso **não muda**. Políticas `ad_*` **não** formam uma
+camada separada: entram na mesma lista; no match resolvem para IPs do
+**mapa daemon**.
 
-Regras complementares:
+Regras complementares (detalhe no SSOT):
 
-1. Excepções / VIP / allowlist nativas (ADR-0016/0019/0020) continuam a ser
-   avaliadas **antes** da matriz principal — **inalteradas**.
-2. Política `ad_*` cujo user **não está no mapa** (ou IP em estado
-   `multi-user`, ADR-0027 §4.1) = **não-match** → first-match continua para
-   as políticas seguintes (as políticas IP/MAC/CIDR base aplicam-se como em
-   `1.9.8`).
-3. Conflito de sessão no mesmo IP: `last-writer + audit` para troca normal;
-   users concorrentes → estado `multi-user` = não-match `ad_*` (fallback
-   seguro, ADR-0027 §4.1).
-4. LDAP/fonte indisponível: **fail-mode** ADR-0027 §4 (cache até TTL; depois
-   `ad_*` → não-match; base intacta; fail-closed total da LAN proibido).
-5. MITM (se ON): aplica-se ao **caminho TLS** seleccionado; não altera a
-   precedência allow/block — só visibilidade/UX HTTPS.
-6. Empates e default implícito: exactamente como `precedence.md` V1
-   (id lexicográfico; enforce default allow).
+1. Excepções / VIP / allowlist — antes da matriz; inalteradas.
+2. User ausente / `multi_user` → não-match `ad_*` → first-match continua.
+3. Conflito IP: last-writer + audit; concorrentes → `multi_user`.
+4. LDAP down: fail-mode ADR-0027 §4 (`ad_*` não-match; base intacta).
+5. MITM (se ON): não altera precedência allow/block.
+6. Empates / default: como V1.
 
 ---
 
@@ -350,7 +341,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 |-------|---------|------|
 | **20.23** | Grupo/política aceita `ad_users` / `ad_groups` (além de hosts/MAC) | **PASS** (`1.9.27`) |
 | **20.24** | Match/enforce usa IPs do **mapa daemon** (não SSOT PHP tipo `device_ips`) | **PASS** (`1.9.28`) |
-| **20.25** | Precedência: promover esboço §3.1 → `docs/core/precedence.md` | — |
+| **20.25** | Precedência: promover esboço §3.1 → `docs/core/precedence.md` | **PASS** (doc + GI7.4 unit) |
 | **20.26** | Lab: user A vs B; troca de IP → remap daemon; LDAP down → fail-mode | **GI7** |
 
 **Não-regressão:** políticas só IP/MAC existentes inalteradas.
@@ -543,10 +534,14 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
 | 2026-08-08 | **rev. `a` / 20.20 agente Win PASS + 1.9.24** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; publicado lab/`latest`; passo → **20.21** |
 | 2026-08-08 | **rev. `b` / 20.21 PASS** — `normalize_user` + `remove_ip`; RADIUS/DC alinhados; candidato `1.9.25`; passo → **20.22** |
+| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
+| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |
+| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
+| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |
 | 2026-08-08 | **rev. `c` / 20.22 PASS** — audit conflict/last_writer + GUI topologia; candidato `1.9.26`; passo → **20.23** |

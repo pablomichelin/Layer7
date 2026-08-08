@@ -37,13 +37,13 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08e`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08f`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM6 / 20.25** — precedência formal (20.24 match **PASS**) |
+| Passo actual | **IM6 / 20.26** — lab GI7 (20.25 precedência **PASS**) |
 | Código do produto nesta trilha | **20.22 PASS** (audit conflict/last-writer); 20.21 normalize; … |
-| Rev. do plano | **`2026-08-08e`** |
+| Rev. do plano | **`2026-08-08f`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -123,7 +123,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM6 / 20.25 — precedência formal; 20.24 PASS).
+Tarefa: continuar no passo actual (IM6 / 20.26 — lab GI7; 20.25 PASS).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -142,7 +142,7 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM6 / 20.25 (precedência formal)
+- Passo actual: IM6 / 20.26 (lab GI7)
 - 20.22: PASS (audit conflict + last_writer + GUI topologia)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (receiver + agente Win Event Log)

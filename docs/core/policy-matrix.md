@@ -17,6 +17,8 @@
 | `match.src_hosts` | IPv4[] | origem exacta |
 | `match.src_cidrs` | CIDR[] | origem na rede |
 | `match.groups` | id[] | expande hosts/CIDRs/dispositivos do grupo |
+| `match.ad_users` | string[] | origem via mapa Identity (user canónico) |
+| `match.ad_groups` | string[] | origem via grupos AD em cache na sessão |
 | `match.src_exclude_cidrs` | CIDR[] | origem isenta **desta** política (BG-066) |
 | `match.src_exclude_groups` | id[] | grupos isentos desta política (expandidos) |
 | `match.hosts` | domínio[] | exacto ou subdomínio; DNS/SNI/HTTP Host |
@@ -29,6 +31,8 @@ actual e não devem ser apresentados como critérios disponíveis.
 ### AND/OR e enforcement scoped
 
 - interface/origem/schedule são condições obrigatórias;
+- origem pode ser estática (`src_*` / `groups`) e/ou Identity (`ad_*`);
+  se ambos existem, a relação é **OR** (ver `precedence.md`);
 - quando `ndpi_app` e `hosts` coexistem, a relação actual é **OR**;
 - match por app/categoria ou host usa `layer7_pdst_N` por defeito;
 - allow explícito aprende o destino em `layer7_pallow_N` e aplica

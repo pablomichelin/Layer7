@@ -849,6 +849,53 @@ test_ad_off_no_match(void)
 	    "ad_off without map → no match");
 }
 
+/* GI7.4 / 20.25: ad_group priority alta vence src_hosts priority baixa. */
+static void
+test_ad_priority_beats_static_ip(void)
+{
+	struct layer7_policy_rule rules[2];
+	struct layer7_decision dec;
+	struct l7_id_map map;
+	struct l7_id_addr ip;
+	const char *grps[] = { "ti" };
+	const char *json =
+	    "{\"layer7\":{\"policies\":["
+	    "{\"id\":\"p-ip-low\",\"action\":\"allow\",\"enabled\":true,"
+	    "\"priority\":10,\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"src_hosts\":[\"10.0.0.40\"]}},"
+	    "{\"id\":\"p-ad-high\",\"action\":\"block\",\"enabled\":true,"
+	    "\"priority\":90,\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"ad_groups\":[\"ti\"]}}"
+	    "]}}";
+	int n = 0;
+
+	memset(&map, 0, sizeof(map));
+	check(layer7_idmap_init(&map) == 0, "ad_pri idmap init");
+	check(layer7_idmap_addr_set_ipv4(&ip, 0x0a000028) == 0,
+	    "ad_pri addr 10.0.0.40");
+	check(layer7_idmap_upsert(&map, "ana", &ip, L7_ID_SRC_DC_AGENT,
+	    grps, 1, time(NULL)) == 0, "ad_pri upsert");
+	layer7_policies_set_identity_map(&map);
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 2) == 0,
+	    "ad_pri parse");
+	check(n == 2, "ad_pri two policies");
+	layer7_policies_sort(rules, n);
+	check(strcmp(rules[0].id, "p-ad-high") == 0, "ad_pri sorted high first");
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.40", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "ad_pri decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "ad_pri high ad wins block");
+	check(strcmp(dec.matched_policy_id, "p-ad-high") == 0,
+	    "ad_pri matched ad policy");
+
+	layer7_policies_set_identity_map(NULL);
+	layer7_idmap_fini(&map);
+}
+
 int
 main(void)
 {
@@ -878,6 +925,7 @@ main(void)
 	test_ad_group_match_via_idmap();
 	test_ad_multi_user_no_match();
 	test_ad_off_no_match();
+	test_ad_priority_beats_static_ip();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");

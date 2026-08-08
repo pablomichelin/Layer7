@@ -6,7 +6,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- (vazio — próximo: 20.25 precedência formal; 20.26 GI7)
+- **Identity 20.25:** `docs/core/precedence.md` formaliza Identity `ad_*`
+  (R-M / GI7.4); teste `test_ad_priority_beats_static_ip`. Próximo: 20.26 GI7 lab.
 
 ## [1.9.28] — 2026-08-08
 
