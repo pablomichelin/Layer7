@@ -779,7 +779,7 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 | Campo | Valor |
 |-------|-------|
-| Versão visual actual | **`0.2.0`** (P1a renovação, `2026-08-08`) |
+| Versão visual actual | **`0.3.0`** (P1b auditoria, `2026-08-08`) |
 | Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
 | Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
 | Plano activo | [`docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md`](docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md) (`PORTAL-PLAN-001`) |
@@ -787,8 +787,8 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 | Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
-**Checkpoint `2026-08-08`:** `0.0.1` → **P0 `0.1.0`** → **P1a `0.2.0`**
-(renovação rápida + CNPJ/tags). Próximo = **P1b** (auditoria + check-ins UI).
+**Checkpoint `2026-08-08`:** `0.0.1` → `0.1.0` → `0.2.0` → **P1b `0.3.0`**
+(auditoria + check-ins). Próximo = **P1c rebind** (só com GO explícito).
 
 ---
 

@@ -4,6 +4,7 @@ import {
   ADMIN_CUSTOMERS_ROUTE,
   ADMIN_DASHBOARD_ROUTE,
   ADMIN_LICENSES_ROUTE,
+  ADMIN_AUDIT_ROUTE,
   ADMIN_LOGIN_ROUTE,
 } from '../panel-routes.js';
 import { PORTAL_VERSION } from '../portal-version.js';
@@ -12,6 +13,7 @@ const links = [
   { to: ADMIN_DASHBOARD_ROUTE, label: 'Dashboard', icon: '📊' },
   { to: ADMIN_LICENSES_ROUTE, label: 'Licenças', icon: '🔑' },
   { to: ADMIN_CUSTOMERS_ROUTE, label: 'Clientes', icon: '👥' },
+  { to: ADMIN_AUDIT_ROUTE, label: 'Auditoria', icon: '📋' },
 ];
 
 export default function Sidebar() {

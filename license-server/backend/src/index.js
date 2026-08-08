@@ -16,6 +16,7 @@ const { ensureCheckInSchema } = require('./check-in-schema');
 const licensesRoutes = require('./routes/licenses');
 const customersRoutes = require('./routes/customers');
 const dashboardRoutes = require('./routes/dashboard');
+const auditRoutes = require('./routes/audit');
 const { ensureCrudIntegritySchema } = require('./crud-integrity');
 const { ensureSessionSchema } = require('./session');
 
@@ -37,6 +38,7 @@ app.use('/api', checkInRoutes);
 app.use('/api/licenses', licensesRoutes);
 app.use('/api/customers', customersRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/audit', auditRoutes);
 
 app.use(async (err, req, res, _next) => {
   console.error('[API] Error:', err.message);

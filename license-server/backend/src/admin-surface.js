@@ -40,7 +40,8 @@ function isAdminApiPath(pathname = '') {
   return pathname.startsWith('/api/auth/')
     || pathname.startsWith('/api/dashboard')
     || pathname.startsWith('/api/licenses')
-    || pathname.startsWith('/api/customers');
+    || pathname.startsWith('/api/customers')
+    || pathname.startsWith('/api/audit');
 }
 
 function getAuditContext(req) {

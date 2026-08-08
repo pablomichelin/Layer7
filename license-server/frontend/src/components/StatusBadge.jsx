@@ -3,6 +3,8 @@ const styles = {
   success: 'bg-green-100 text-green-800',
   expired: 'bg-yellow-100 text-yellow-800',
   fail: 'bg-red-100 text-red-800',
+  denied: 'bg-red-100 text-red-800',
+  error: 'bg-red-100 text-red-800',
   revoked: 'bg-red-100 text-red-800',
 };
 
@@ -11,6 +13,8 @@ const labels = {
   success: 'Sucesso',
   expired: 'Expirada',
   fail: 'Falha',
+  denied: 'Negado',
+  error: 'Erro',
   revoked: 'Revogada',
 };
 

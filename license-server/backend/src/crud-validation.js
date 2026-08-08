@@ -309,6 +309,42 @@ function parseExpiringWithinDays(value) {
   return days;
 }
 
+function parseAuditListQuery(query) {
+  const { page, limit, offset } = parsePaginationQuery(query, [
+    'event_type',
+    'result',
+    'search',
+    'page',
+    'limit',
+  ]);
+
+  let eventType;
+  let result;
+
+  if (query.event_type !== undefined) {
+    eventType = normalizeOptionalText(query.event_type, 'event_type', 64);
+    if (!eventType) {
+      throw createHttpError(400, 'event_type invalido.');
+    }
+  }
+
+  if (query.result !== undefined) {
+    result = normalizeOptionalText(query.result, 'result', 32);
+    if (!result) {
+      throw createHttpError(400, 'result invalido.');
+    }
+  }
+
+  return {
+    page,
+    limit,
+    offset,
+    search: parseSearch(query.search),
+    eventType,
+    result,
+  };
+}
+
 function parseLicensesListQuery(query) {
   const { page, limit, offset } = parsePaginationQuery(query, [
     'status',
@@ -543,6 +579,7 @@ module.exports = {
   normalizeFeatures,
   normalizeStoredHardwareId,
   parseActivatePayload,
+  parseAuditListQuery,
   parseCustomerCreatePayload,
   parseCustomerUpdatePayload,
   parseCustomersListQuery,

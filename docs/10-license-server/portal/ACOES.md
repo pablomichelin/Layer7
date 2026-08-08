@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — P1b Auditoria `0.3.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `0.3.0` |
+| Objectivo | UI/API de auditoria e check-ins visíveis |
+| Impacto | nova rota admin `/api/audit`; detalhe licença |
+| Risco | Baixo (read-only) |
+| Teste | parseAuditListQuery; health; página /audit |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-haIeulBq.js`; `/audit` no ar |
+
+---
+
 ## 2026-08-08 — P1a Renovação `0.2.0`
 
 | Campo | Valor |

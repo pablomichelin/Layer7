@@ -77,14 +77,23 @@ export default function LicenseDetail() {
   if (loading) return <p className="text-gray-500">Carregando...</p>;
   if (!data) return <p className="text-red-500">Licença não encontrada</p>;
 
-  const { license, activations } = data;
+  const { license, activations, check_ins: checkIns = [] } = data;
   const bound = isLicenseBound(license);
   const canRenew = license.status !== 'revoked';
+  const lastCheckIn = checkIns[0] || null;
 
   const actColumns = [
     { key: 'created_at', label: 'Data', render: (r) => new Date(r.created_at).toLocaleString('pt-BR') },
     { key: 'result', label: 'Resultado', render: (r) => <StatusBadge status={r.result} /> },
     { key: 'ip_address', label: 'IP' },
+    { key: 'hardware_id', label: 'Hardware ID', render: (r) => r.hardware_id ? <code className="text-xs">{r.hardware_id.slice(0, 16)}...</code> : '—' },
+    { key: 'error_message', label: 'Erro', render: (r) => r.error_message || '—' },
+  ];
+
+  const checkInColumns = [
+    { key: 'created_at', label: 'Data', render: (r) => new Date(r.created_at).toLocaleString('pt-BR') },
+    { key: 'result', label: 'Resultado', render: (r) => <StatusBadge status={r.result} /> },
+    { key: 'ip_address', label: 'IP', render: (r) => r.ip_address || '—' },
     { key: 'hardware_id', label: 'Hardware ID', render: (r) => r.hardware_id ? <code className="text-xs">{r.hardware_id.slice(0, 16)}...</code> : '—' },
     { key: 'error_message', label: 'Erro', render: (r) => r.error_message || '—' },
   ];
@@ -139,6 +148,14 @@ export default function LicenseDetail() {
           <div><span className="text-gray-500">Hardware ID:</span> <code className="ml-2 text-xs break-all">{license.hardware_id || 'Não activada'}</code></div>
           <div><span className="text-gray-500">Activada em:</span> <span className="ml-2">{license.activated_at ? new Date(license.activated_at).toLocaleString('pt-BR') : 'Nunca'}</span></div>
           <div><span className="text-gray-500">Criada em:</span> <span className="ml-2">{new Date(license.created_at).toLocaleString('pt-BR')}</span></div>
+          <div>
+            <span className="text-gray-500">Último check-in:</span>{' '}
+            <span className="ml-2">
+              {lastCheckIn
+                ? `${new Date(lastCheckIn.created_at).toLocaleString('pt-BR')} (${lastCheckIn.result})`
+                : 'Nunca'}
+            </span>
+          </div>
           {license.revoked_at && <div><span className="text-gray-500">Revogada em:</span> <span className="ml-2">{new Date(license.revoked_at).toLocaleString('pt-BR')}</span></div>}
           {license.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{license.notes}</span></div>}
         </div>
@@ -181,6 +198,9 @@ export default function LicenseDetail() {
 
       <h3 className="text-lg font-semibold text-gray-700 mb-3">Histórico de activações</h3>
       <DataTable columns={actColumns} rows={activations} emptyMessage="Nenhuma activação" />
+
+      <h3 className="text-lg font-semibold text-gray-700 mb-3 mt-8">Check-ins online</h3>
+      <DataTable columns={checkInColumns} rows={checkIns} emptyMessage="Nenhum check-in registado" />
     </div>
   );
 }

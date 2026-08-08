@@ -8,6 +8,7 @@ const {
   parseActivatePayload,
   parseLicenseCreatePayload,
   parseLicensesListQuery,
+  parseAuditListQuery,
   FEATURES_MAX_BYTES,
 } = require('./crud-validation');
 
@@ -144,4 +145,17 @@ test('parseLicensesListQuery rejects invalid bound and oversized expiring window
     () => parseLicensesListQuery({ expiring_within_days: '400' }),
     (error) => error.status === 400 && /expiring_within_days/.test(error.message)
   );
+});
+
+test('parseAuditListQuery accepts filters', () => {
+  const query = parseAuditListQuery({
+    page: '1',
+    limit: '30',
+    event_type: 'license_renewed',
+    result: 'success',
+    search: 'admin@',
+  });
+  assert.equal(query.eventType, 'license_renewed');
+  assert.equal(query.result, 'success');
+  assert.equal(query.search, 'admin@');
 });

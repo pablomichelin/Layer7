@@ -11,6 +11,16 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [0.3.0] — 2026-08-08
+
+### Added
+
+- Página Auditoria com filtros (`event_type`, `result`, busca)
+- API `GET /api/audit`
+- Secção check-ins + último check-in no detalhe da licença
+
+---
+
 ## [0.2.0] — 2026-08-08
 
 ### Added

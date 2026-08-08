@@ -232,9 +232,19 @@ router.get('/:id', async (req, res) => {
       [licenseId]
     );
 
+    const checkInsResult = await pool.query(
+      `SELECT *
+         FROM check_ins_log
+        WHERE license_id = $1
+        ORDER BY created_at DESC
+        LIMIT 50`,
+      [licenseId]
+    );
+
     return res.json({
       license: applyEffectiveLicenseState(licenseResult.rows[0]),
       activations: activationsResult.rows,
+      check_ins: checkInsResult.rows,
     });
   } catch (error) {
     if (isHttpError(error)) {

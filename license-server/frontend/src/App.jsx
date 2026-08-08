@@ -15,6 +15,7 @@ import LicenseForm from './pages/LicenseForm';
 import Customers from './pages/Customers';
 import CustomerForm from './pages/CustomerForm';
 import CustomerDetail from './pages/CustomerDetail';
+import Audit from './pages/Audit';
 
 function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="customers/new" element={<CustomerForm />} />
         <Route path="customers/:id" element={<CustomerDetail />} />
         <Route path="customers/:id/edit" element={<CustomerForm />} />
+        <Route path="audit" element={<Audit />} />
       </Route>
       <Route path="*" element={<Navigate to={ADMIN_DASHBOARD_ROUTE} replace />} />
     </Routes>
