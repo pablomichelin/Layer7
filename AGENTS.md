@@ -42,8 +42,15 @@ Depois disso, ler apenas a documentacao da area em causa:
 - instalacao, upgrade, uninstall, rollback:
   `docs/10-license-server/MANUAL-INSTALL.md`
 - licenciamento e license server:
+  `docs/10-license-server/README.md`,
   `docs/10-license-server/PLANO-LICENSE-SERVER.md`
   e `docs/10-license-server/MANUAL-USO-LICENCAS.md`
+- **trilha portal admin de licenças (versão visual / UI):**
+  `docs/10-license-server/portal/README.md`
+  (ordem **dentro** desse ficheiro; governação, `VERSION.md`, plano activo
+  em `portal/planos/`; versão visual **independente** do `PORTVERSION`;
+  escopo actual = operador único — **não** abrir MSP/self-service/billing
+  sem GO; seguir `portal/GOVERNANCE.md` em todo bloco)
 - blacklists e F4 (package/daemon trilha consumo):
   `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md`
   e `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`
@@ -227,6 +234,7 @@ como um unico bloco governado por checklist.
 | mudanca de fase, gate ou prioridade | `CORTEX.md`, roadmap, backlog, checklist mestre |
 | decisao de arquitectura/seguranca/distribuicao | ADR index + ADR novo/actualizado + `CORTEX.md` |
 | mudanca funcional | changelog, docs da area, `CORTEX.md`, backlog |
+| portal admin licenças (`license-server/` UI/API admin) | `docs/10-license-server/portal/` (`ACOES`, `VERSION`/`CHANGELOG` se bump visual, `ESTADO` se deploy, plano activo); `CORTEX.md` checkpoint; manuais F2/F3 se contrato mudar |
 | instalacao/upgrade/uninstall/rollback/caminhos/comandos | `docs/10-license-server/MANUAL-INSTALL.md`, runbooks afectados |
 | release publicada | changelog, release docs, `MANUAL-INSTALL.md`, `CORTEX.md` |
 | build candidato (novo PORTREVISION) | **obrigatório** publicar em `pablomichelin/Layer7` + `MANUAL-INSTALL.md` (links **e comandos operacionais** — ver Regra especial) |

@@ -9,10 +9,13 @@
 | [`f5-preparacao-malha.md`](f5-preparacao-malha.md) | ACTIVO (área F5) | Malha de testes |
 | [`plano-isencao-vip-e-ux-gui.md`](plano-isencao-vip-e-ux-gui.md) | Ver backlog | VIP / UX |
 | [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) | **ACTIVO** | Identity + MITM add-on (IM4 / 20.16; IM3/GI4 PASS; PME Identity-first; MITM DEFER) |
+| [`../10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md`](../10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md) | **ACTIVO** (portal UI) | Melhoria total portal admin `0.0.1` → `1.0.0` (operador único; sem escala) |
 | [`f1-plano-de-implementacao.md`](f1-plano-de-implementacao.md) | Histórico F1 | — |
 | [`f2-plano-de-implementacao.md`](f2-plano-de-implementacao.md) | Histórico F2 | — |
 
 **Arranque trilha Identity+MITM:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
+
+**Arranque trilha portal admin licenças:** [`../10-license-server/portal/README.md`](../10-license-server/portal/README.md) (versão visual `0.0.1`)
 
 ## 【FECHADO】 — não reabrir sem GO
 

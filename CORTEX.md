@@ -772,6 +772,29 @@ priorizando:
 
 ---
 
+## Portal admin de licenças (versão visual)
+
+Trilha de **produto UI** do license server, com versionamento **próprio**
+(independente do `PORTVERSION` do pacote pfSense).
+
+| Campo | Valor |
+|-------|-------|
+| Versão visual actual | **`0.0.1`** (baseline CRUD, formalizada `2026-08-08`) |
+| Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
+| Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
+| Plano activo | [`docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md`](docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md) (`PORTAL-PLAN-001`) |
+| Alvo | `1.0.0` — completo para **operador único** |
+| Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
+| Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
+
+**Checkpoint `2026-08-08`:** criada organização documental da trilha
+portal; inventário live e drift SPA/API registados em
+[`docs/10-license-server/portal/ESTADO.md`](docs/10-license-server/portal/ESTADO.md);
+próximo bloco de código = **P0** do plano (→ `0.1.0`), só com autorização
+explícita.
+
+---
+
 ## Fase actual
 
 **Fase actual consolidada:** F3 aberta em 2026-04-01; F3.1, F3.2, F3.3, F3.4 e F3.5 executadas de forma conservadora em 2026-04-01; F3.6 formalizada documentalmente em 2026-04-01 com matriz canónica de validacao manual/evidencias; F3.7 formalizada de forma conservadora em 2026-04-02 com pack operacional, convencao de evidencias e helper shell barato; F3.8 formalizada de forma conservadora em 2026-04-02 com gate oficial de fechamento, matriz objectiva de decisao por cenario e relatorio final de campanha; F3.9 executada em 2026-04-02 como primeira campanha real controlada (run_id `20260402T130015Z-deploy244`), com evidencias reais de backend e conclusao formal `F3 nao pode fechar`; F3.10 concluida em 2026-04-02 como saneamento documental-operacional da validacao, com matriz de pre-requisitos, matriz de drift operacional e runbook da proxima campanha real; a verificacao de readiness da F3.11 foi executada em 2026-04-02 e resultou em `F3.11 bloqueada por pre-requisitos nao satisfeitos`; o saneamento minimo seguinte da readiness foi registado em `docs/01-architecture/f3-11-readiness-saneamento.md` e concluiu `readiness parcialmente saneada, mas ainda bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-access-enablement-package.md`, `docs/13-runbooks/f3-11-live-access-checklist.md` e `docs/01-architecture/f3-11-drift-registry.md` para transformar os blockers actuais em pacote canonico de desbloqueio, sem abrir campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-external-input-request-package.md`, `docs/01-architecture/f3-11-input-acceptance-matrix.md`, `docs/13-runbooks/f3-11-evidence-intake-template.md`, `docs/13-runbooks/f3-11-input-triage-runbook.md` e `docs/01-architecture/f3-11-readiness-reopen-gate.md` para transformar os cinco insumos externos em processo canonico de solicitacao, recepcao, validacao, aceite e `go/no-go`, sem reabrir decisoes, sem campanha e mantendo `F3.11 bloqueada`; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-execution-master-register.md`, `docs/01-architecture/f3-11-operational-decisions-ledger.md`, `docs/01-architecture/f3-11-readiness-scorecard.md`, `docs/13-runbooks/f3-11-cycle-report-template.md` e `docs/00-overview/f3-11-document-traceability-map.md` para converter o kit da F3.11 num cockpit canónico unico de acompanhamento, decisao, score, rastreabilidade e execucao operacional ponta a ponta, sem codigo, sem push, sem campanha e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/01-architecture/f3-11-state-machine.md`, `docs/01-architecture/f3-11-document-sync-protocol.md`, `docs/00-overview/f3-11-start-here.md`, `docs/01-architecture/f3-11-operational-responsibility-matrix.md` e `docs/13-runbooks/f3-11-cycle-closure-criteria.md` para transformar o cockpit da F3.11 num sistema canonico completo de estados, sincronizacao, entrada unica, responsabilidades e fecho de ciclo, mantendo explicitamente `F3 aberta`, `F3.11 bloqueada`, `readiness = NO-GO`, `campanha = NO-GO`, sem codigo, sem push e sem reabrir a readiness; a rodada documental-operacional seguinte materializou `docs/00-overview/f3-organizacao-local-e-fecho.md` e `docs/01-architecture/f3-fecho-operacional-restante.md`, e corrigiu o `start-here`, o mapa de rastreabilidade, o registro mestre, o scorecard e o drift registry para o estado real observado da fase: license-server live alinhado, auth administrativa alinhada, inventario real obtido, DR-01/DR-03/DR-04/DR-06 resolvidos, DR-02 reclassificado como cosmetico nao bloqueante e DR-05 mantido como unico blocker real para fechar a F3; em 2026-04-14, os commits locais foram publicados no `origin/main`, a trilha DR-05 ganhou helpers executaveis para preflight/appliance/GUI, o helper GUI foi exercitado em `probe` com resultado `BLOCKED` esperado sem credencial valida, e o branch passou a cobrir por teste o contrato `409` do `POST /api/activate` para licenca revogada, expirada e hardware divergente.
@@ -1389,6 +1412,19 @@ TRILHA IDENTITY + MITM — progresso
 5. [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
 6. Mapa + gates + ADRs 0025–0028 (0026 diferido; T1)
 
+### Para a trilha portal admin de licenças (UI / versão visual)
+
+1. `CORTEX.md` (secção *Portal admin de licenças*)
+2. [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md)
+3. [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md)
+4. [`docs/10-license-server/portal/VERSION.md`](docs/10-license-server/portal/VERSION.md)
+   + [`ESTADO.md`](docs/10-license-server/portal/ESTADO.md)
+5. Plano activo:
+   [`docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md`](docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md)
+6. Manuais:
+   [`docs/10-license-server/MANUAL-USO-LICENCAS.md`](docs/10-license-server/MANUAL-USO-LICENCAS.md)
+   e arquitectura F2/F3 conforme o bloco
+
 ### Para a trilha de fecho / consolidacao / IPv6 (manutenção)
 
 1. `CORTEX.md` (inclui passo actual — secção Trilha IPv6)
@@ -1413,9 +1449,12 @@ TRILHA IDENTITY + MITM — progresso
   [`docs/01-architecture/target-architecture.md`](docs/01-architecture/target-architecture.md)
   e [`docs/core/README.md`](docs/core/README.md)
 - License server e licenciamento:
+  [`docs/10-license-server/README.md`](docs/10-license-server/README.md),
   [`docs/10-license-server/PLANO-LICENSE-SERVER.md`](docs/10-license-server/PLANO-LICENSE-SERVER.md)
   e [`docs/10-license-server/MANUAL-USO-LICENCAS.md`](docs/10-license-server/MANUAL-USO-LICENCAS.md)
   e [`docs/01-architecture/f3-validacao-manual-evidencias.md`](docs/01-architecture/f3-validacao-manual-evidencias.md)
+- Portal admin (versão visual / melhoria UI):
+  [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md)
 - Distribuicao, builder, blacklists e fallback seguro:
   [`docs/01-architecture/f1-arquitetura-de-confianca.md`](docs/01-architecture/f1-arquitetura-de-confianca.md),
   [`docs/02-roadmap/f1-plano-de-implementacao.md`](docs/02-roadmap/f1-plano-de-implementacao.md),
@@ -1437,6 +1476,8 @@ TRILHA IDENTITY + MITM — progresso
 - `package/pfSense-pkg-layer7/` -> port e ficheiros do pacote pfSense
 - `webgui/` -> documentacao curta da GUI e referencias auxiliares
 - `license-server/` -> backend, frontend e nginx do servidor de licencas
+  (docs de produto UI: `docs/10-license-server/portal/`, versão visual
+  em `portal/VERSION.md`)
 - `scripts/` -> build, package, lab, diagnostico e release
 - `tests/` -> material de teste e fixtures
 - `samples/` -> amostras de configuracao e politicas

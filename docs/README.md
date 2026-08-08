@@ -40,6 +40,7 @@ Quando houver conflito, seguir esta ordem:
 | Equivalencia raiz <-> docs | [`00-overview/document-equivalence-map.md`](00-overview/document-equivalence-map.md) | resolve sobreposicoes e conflitos |
 | Decisoes formais | [`03-adr/README.md`](03-adr/README.md) | indice e politica de ADR |
 | Instalacao/upgrade/uninstall | [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md) | referencia operacional canónica |
+| Portal admin licenças (UI) | [`10-license-server/portal/README.md`](10-license-server/portal/README.md) | trilha activa: versão visual, governação, planos |
 | Linha temporal de releases | [`changelog/CHANGELOG.md`](changelog/CHANGELOG.md) | changelog oficial |
 
 ---
@@ -59,7 +60,7 @@ Quando houver conflito, seguir esta ordem:
 | Logging | [`14-logging/README.md`](14-logging/README.md) | suplementar |
 | Lab | [`08-lab/README.md`](08-lab/README.md) (indice), [`08-lab/quick-start-lab.md`](08-lab/quick-start-lab.md) (sequencia minima); [`08-lab/guia-windows.md`](08-lab/guia-windows.md) so **legado** (ver classificacao) | suplementar / legado |
 | Bloqueio | [`09-blocking/README.md`](09-blocking/README.md), [`09-blocking/plano-gates-ipv6.md`](09-blocking/plano-gates-ipv6.md), [`09-blocking/plano-gates-identity-mitm.md`](09-blocking/plano-gates-identity-mitm.md) (GI0–GI9), [`09-blocking/matriz-limitacoes-dpi.md`](09-blocking/matriz-limitacoes-dpi.md) | gates IPv6 + Identity/MITM; resto historico/preservado |
-| Licencas | [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md), [`10-license-server/MANUAL-USO-LICENCAS.md`](10-license-server/MANUAL-USO-LICENCAS.md) | canónico por area |
+| Licencas | [`10-license-server/README.md`](10-license-server/README.md) (índice), [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md), [`10-license-server/MANUAL-USO-LICENCAS.md`](10-license-server/MANUAL-USO-LICENCAS.md), **portal admin** [`10-license-server/portal/README.md`](10-license-server/portal/README.md) (versão visual `0.0.1` + plano melhoria) | canónico por area |
 | Blacklists UT1 | [`11-blacklists/PLANO-BLACKLISTS-UT1.md`](11-blacklists/PLANO-BLACKLISTS-UT1.md), [`11-blacklists/DIRETRIZES-IMPLEMENTACAO.md`](11-blacklists/DIRETRIZES-IMPLEMENTACAO.md) | canónico da trilha F4 |
 | Testes | [`tests/README.md`](tests/README.md), [`tests/test-matrix.md`](tests/test-matrix.md), [`tests/templates/f3-validation-campaign-report.md`](tests/templates/f3-validation-campaign-report.md) | canónico por area |
 | Tutorial longo | [`tutorial/guia-completo-layer7.md`](tutorial/guia-completo-layer7.md) | preservado por compatibilidade; nao e SSOT de instalacao |

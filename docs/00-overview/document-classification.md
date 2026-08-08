@@ -169,6 +169,19 @@ vence o canónico.
 | `docs/10-license-server/MANUAL-INSTALL.md` | instalacao/upgrade/uninstall | manual operacional principal do pacote | Canónico | substitui instrucoes operacionais dispersas | manter sempre sincronizado | F0+ |
 | `docs/10-license-server/MANUAL-USO-LICENCAS.md` | operacao de licencas | manual canónico do uso do sistema de licencas | Canónico | — | manter vivo quando F2/F3 mexerem em licenciamento | F2/F3 |
 | `docs/10-license-server/PLANO-LICENSE-SERVER.md` | plano completo server | base detalhada da trilha do servidor | Suplementar | complementar ao backlog/roadmap | manter como referencia da F2 | F2 |
+| `docs/10-license-server/README.md` | índice área license-server | porta de entrada da área + ligação ao portal | Canónico (índice) | — | manter com portal/manuais | F0+ |
+| `docs/10-license-server/portal/README.md` | arranque trilha portal UI | START-HERE do painel admin (versão visual) | Canónico (portal) | — | manter com VERSION/plano | portal |
+| `docs/10-license-server/portal/GOVERNANCE.md` | regras docs/versão portal | obrigatório antes de mexer no painel | Canónico (portal) | — | manter inviolável | portal |
+| `docs/10-license-server/portal/VERSION.md` | versão visual portal | SSOT do número UI (`0.0.1`…) | Canónico (portal) | independente de PORTVERSION | bump a cada release UI | portal |
+| `docs/10-license-server/portal/CHANGELOG.md` | changelog portal | histórico versões UI | Canónico (portal) | — | actualizar por versão | portal |
+| `docs/10-license-server/portal/ESTADO.md` | estado live portal | inventário/deploy/drift | Canónico (portal) | — | actualizar em deploy | portal |
+| `docs/10-license-server/portal/OBJECTIVOS.md` | objectivos portal | critérios `1.0.0` operador único | Canónico (portal) | — | manter com produto | portal |
+| `docs/10-license-server/portal/IDEIAS.md` | ideias aceites/futuras | registo formal de ideias | Canónico (portal) | — | actualizar antes de implementar | portal |
+| `docs/10-license-server/portal/ACOES.md` | diário de acções | rastreio de blocos | Canónico (portal) | — | entrada por bloco | portal |
+| `docs/10-license-server/portal/checklist.md` | gates por versão | checklist entrega portal | Canónico (portal) | — | marcar por bloco | portal |
+| `docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md` | plano melhoria total | SSOT execução P0→`1.0.0` | Canónico (portal, ACTIVO) | — | progresso na tabela §12 | portal |
+| `docs/10-license-server/portal/historico/*` | baselines/fechos | arquivo da trilha portal | Histórico (portal) | — | preservar | portal |
+| `license-server/README.md` | ponte código→docs | aponta para trilha portal | Suplementar | não é SSOT | manter links | portal |
 | `docs/14-logging/README.md` | logging | referencia de observabilidade minima | Suplementar | complementar ao changelog e runbooks | rever na F7 | F7 |
 | `docs/11-blacklists/PLANO-BLACKLISTS-UT1.md` | plano blacklists | documento canónico da trilha blacklists | Canónico | — | manter para F4 | F4 |
 | `docs/11-blacklists/DIRETRIZES-IMPLEMENTACAO.md` | regras blacklists | documento canónico de implementacao da trilha | Canónico | — | manter para F4 | F4 |
