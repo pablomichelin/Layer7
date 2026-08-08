@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08i`; **20.28–20.30 PASS** ADR-0029; passo actual **20.31 / IM9**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-08j`; **20.31 PASS** malha; passo actual **20.32 / IM9**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -13,7 +13,7 @@
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
 **Candidato port:** `1.9.29` (**publicado** lab/`latest`)  
 
-**Nota:** **Rev. `i` (`2026-08-08`)** = 20.28–20.30 ADR-0029; GI8 PASS; passo **20.31**.
+**Nota:** **Rev. `j` (`2026-08-08`)** = 20.31 malha Identity OFF + evidência run_id; passo **20.32**.
 
 ---
 
@@ -21,21 +21,22 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.31** — malha lab Identity + evidências (IM9) |
+| Passo actual | **20.32** — MANUAL / USO-LICENÇAS / notes comerciais (IM9) |
 | Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
 | ADRs | **Aceito** ×5; T1; **0026 diferida**; **0027**; **0029** IM7/IM8 |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.31 → 20.32 → 20.33 GI9 |
+| Próximo | 20.32 → 20.33 GI9 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.31 (malha lab / fecho IM9)
+- Passo actual: 20.32 (MANUAL / notes comerciais IM9)
+- 20.31: PASS (malha OFF + unit; `20260808T135500Z-im9-20.31-identity-mesh`)
 - 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
 - Baseline: 1.9.8; **1.9.29** (publicado lab/`latest`)
-- Próximo: 20.31 → 20.33 GI9
+- Próximo: 20.32 → 20.33 GI9
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -371,7 +372,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
 | Passo | Entrega | Gate |
 |-------|---------|------|
-| **20.31** | Malha lab Identity+MITM + evidências `run_id` | GI9 parcial |
+| **20.31** | Malha lab Identity+MITM + evidências `run_id` | **PASS** (`20260808T135500Z-im9-20.31-identity-mesh`; MITM SKIP/DEFER; lab AD residual) |
 | **20.32** | MANUAL-INSTALL + MANUAL-USO-LICENCAS + changelog + commercial notes | — |
 | **20.33** | Release candidata + GO produção add-on (pode ser prerelease) | **GI9** |
 
@@ -540,6 +541,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
+| 2026-08-08 | **rev. `j` / 20.31 PASS** — malha Identity OFF + `run-im9-20.31`; evidência indexada; GI9.1/9.4; passo → **20.32** |
 | 2026-08-08 | **rev. `i` / 20.28–20.30 PASS** — ADR-0029 ADIAR IM7 + exclusão IM8; GI8; passo → **20.31** |
 | 2026-08-08 | **rev. `h` / 20.27 PASS** — especificação agente endpoint; recomendação ADIAR salvo GO; passo → **20.28** |
 

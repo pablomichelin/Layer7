@@ -14,6 +14,10 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 - **Checklist F5 repetível (Onda G 8.2):** [`f5-smoke-checklist.md`](f5-smoke-checklist.md) —
   `sh tests/lab/run-f5-smoke-checklist.sh` (local + builder + appliance).
+- `sh tests/lab/run-im9-20.31-identity-mesh.sh` — malha IM9 / 20.31 (Identity
+  OFF + ADR-0029 GUI; não activa módulos). Evidência exemplo:
+  `docs/tests/evidence/20260808T135500Z-im9-20.31-identity-mesh/`.
+- `sh tests/lab/run-gi7-identity-policies.sh` — checklist lab GI7 (AD residual).
 - `sh scripts/package/smoke-layer7d.sh` (requer `cc`; compila também
   `log_store.c`, como o port real, e usa `-d` para cobrir enforcement por
   destino).

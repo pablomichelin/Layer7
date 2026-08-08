@@ -6,7 +6,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- (vazio — próximo: IM9 20.31 malha lab / evidências)
+- **Identity 20.31 / IM9:** malha lab Identity OFF + suite local; evidência
+  `docs/tests/evidence/20260808T135500Z-im9-20.31-identity-mesh/`;
+  script `tests/lab/run-im9-20.31-identity-mesh.sh`.
+- (próximo: 20.32 MANUAL / notes comerciais)
 
 ## [1.9.29] — 2026-08-08
 

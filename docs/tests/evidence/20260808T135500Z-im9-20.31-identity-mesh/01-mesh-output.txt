@@ -1,0 +1,29 @@
+=== Layer7 IM9 / 20.31 identity mesh ===
+host=systemupfw.system.up
+date_utc=2026-08-08T13:52:55Z
+
+INFO: layer7d=1.9.29 pkg=1.9.29
+PASS: versão daemon 1.9.29
+PASS: pkg 1.9.29
+enabled=false
+mode=monitor
+identity_key=absent
+identity_enabled=null
+PASS: Identity OFF ou ausente (inerte)
+PASS: sem layer7.lic (gate Identity inerte por desenho)
+PASS: layer7d running
+PASS: sem listener Identity 8743/1813 (OFF)
+PASS: GUI Identity contém ADR-0029 (H*)
+INFO: MITM page presente (UI); runtime DEFER — não activar
+SKIP: MITM intercept (DEFER 20.7a)
+PASS: PF sem block drop layer7 (estado actual)
+INFO: process_lines_around_pid≈2 (ADR-0028: sem threads Identity OFF)
+
+-- Residuais lab (humano / AD+DC+RADIUS) — não executados aqui --
+  GI5.1 expand grupo LDAP em lab
+  GI5.3 NAS físico RADIUS accounting
+  GI6.1–6.5 DC agent + conflito + logout em lab
+  GI7.1–7.5 checklist: tests/lab/run-gi7-identity-policies.sh
+  Unitário GI7: tests/run-local.sh (builder/dev)
+
+=== fim mesh; exit=0 ===
