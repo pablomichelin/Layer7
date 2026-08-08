@@ -108,10 +108,10 @@ Identity avança sem GI2/GI3.
 
 ## GI8 — Agente / TS (ou exclusão)
 
-| # | Critério |
-|---|----------|
-| GI8.1 | Agente MVP **ou** ADR de adiamento com limite honesto na GUI |
-| GI8.2 | TS/VDI MVP **ou** ADR de exclusão (“não suportado multi-user mesmo IP”) |
+| # | Critério | Estado |
+|---|----------|--------|
+| GI8.1 | Agente MVP **ou** ADR de adiamento com limite honesto na GUI | Espec **20.27 PASS**; decisão = **20.28** |
+| GI8.2 | TS/VDI MVP **ou** ADR de exclusão (“não suportado multi-user mesmo IP”) | PENDENTE (IM8) |
 
 ---
 
@@ -152,6 +152,7 @@ Identity avança sem GI2/GI3.
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
 | 2026-08-07 | **20.18** — Test LDAP GUI + `layer7d --ldap-test`; GI5.4 PASS (parcial GI5); passo → 20.19 |
+| 2026-08-08 | **20.27 PASS** — especificação agente endpoint; passo → **20.28** |
 | 2026-08-08 | **20.26 / GI7 PASS unitário** — GI7.1–7.5 unit; lab AD residual; passo → **20.27** (IM7) |
 | 2026-08-08 | **20.25 PASS** — `core/precedence.md` Identity; GI7.4 unit; GI7 PARCIAL; passo → 20.26 |
 | 2026-08-07 | **20.19** — RADIUS accounting receiver; GI5.3 PASS (unitário); candidato `1.9.17`; passo → 20.20 |

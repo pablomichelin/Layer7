@@ -21,6 +21,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) | **Ideia, objectivo, nicho PME, barra UX** — ACEITE |
 | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **SSOT de execução** (ondas IM0–IM9, passos 20.x) |
 | [`identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md) | Mapa código / superfícies / não-regressão |
+| [`especificacao-agente-endpoint-20.27.md`](../01-architecture/especificacao-agente-endpoint-20.27.md) | Espec IM7 agente endpoint (20.27 PASS) |
 | [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) | Gates GI0–GI9 |
 | [`spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) | Spike MITM — **DEFER formal 20.7a** |
 | ADR-0025 / 0026 / 0027 / 0028 | Aceito; **0026 implementação diferida** |
@@ -37,13 +38,13 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08g`) |
+| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08h`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM7 / 20.27** — especificação agente endpoint (20.26 GI7 **PASS unitário**) |
+| Passo actual | **IM7 / 20.28** — MVP agente Windows **ou** ADIAR ADR (20.27 espec **PASS**) |
 | Código do produto nesta trilha | **20.22 PASS** (audit conflict/last-writer); 20.21 normalize; … |
-| Rev. do plano | **`2026-08-08g`** |
+| Rev. do plano | **`2026-08-08h`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -123,7 +124,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM7 / 20.27 — especificação agente endpoint; 20.26 GI7 PASS unitário).
+Tarefa: continuar no passo actual (IM7 / 20.28 — MVP agente Windows ou ADIAR com ADR; 20.27 espec PASS).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -142,7 +143,7 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM7 / 20.27 (especificação agente)
+- Passo actual: IM7 / 20.28 (MVP agente ou ADIAR ADR)
 - 20.22: PASS (audit conflict + last_writer + GUI topologia)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (receiver + agente Win Event Log)

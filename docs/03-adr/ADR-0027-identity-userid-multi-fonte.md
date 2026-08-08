@@ -40,7 +40,7 @@ Módulo gated por entitlement `identity`:
 |-------|------------------------|------------|
 | RADIUS accounting | Layer7 = **accounting receiver** (UDP, secret, ACL NAS); User-Name + Framed-IP | IM5 MVP |
 | Eventos de logon AD | **Agente leve no Domain Controller** → push autenticado ao appliance | IM5 MVP |
-| Agente endpoint | Heartbeat user(+IP) | IM7 posterior |
+| Agente endpoint | Heartbeat user(+IP) | IM7 — especificação **20.27** [`especificacao-agente-endpoint-20.27.md`](../01-architecture/especificacao-agente-endpoint-20.27.md); MVP ou ADIAR em **20.28** |
 | TS/VDI agent | user→portas | IM8 posterior |
 | Captive Layer7 | — | **EXCLUÍDO** |
 | WinRM/WMI outbound do FreeBSD para DC | — | **Não canónico** |
@@ -64,7 +64,8 @@ mínimos A1–A7; **detalhe fino aceite** em
 | A6 | Agente no DC corre com **privilégio mínimo** (leitura do event log; nunca domain admin) | Event Log Readers; eventos 4624/4634 (ou 4647); nunca Domain Admin |
 | A7 | Relógio: eventos com skew > tolerância configurável são descartados com log | Default **300 s** (60–900); log `identity_dc_skew` |
 
-O mesmo padrão A1–A5 aplica-se ao futuro agente endpoint (IM7).
+O mesmo padrão A1–A5 aplica-se ao agente endpoint (IM7) — detalhe em
+[`especificacao-agente-endpoint-20.27.md`](../01-architecture/especificacao-agente-endpoint-20.27.md).
 
 ### 2.2 Concorrência no daemon
 

@@ -1293,7 +1293,7 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
 **20.18 PASS** (Test LDAP; GI5.4); **20.19 PASS** (RADIUS; GI5.3); **20.20
 PASS** (desenho A1–A7 + receiver HTTPS + agente Win Event Log samples);
-passo actual **20.27 / IM7** (especificação agente endpoint).
+passo actual **20.28 / IM7** (MVP agente Windows ou ADIAR com ADR).
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
 **Candidato port:** `1.9.28` (**publicado** lab/`latest`). Latest
 publicado permanece `1.9.25` até release.
@@ -1324,7 +1324,7 @@ publicado permanece `1.9.25` até release.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.27** (especificação agente IM7)
+- Passo actual: **20.28** (MVP agente ou ADIAR ADR)
 - 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (receiver + agente Win Event Log samples)
@@ -1338,7 +1338,7 @@ TRILHA IDENTITY + MITM — progresso
 - Plano rev.: 2026-08-08c
 - Baseline enforce: 1.9.8
 - Latest publicado: **1.9.27**; **1.9.28** (publicado lab/`latest`)
-- Próximo: 20.27 → 20.28
+- Próximo: 20.28 → IM8/IM9
 ```
 
 
@@ -1515,14 +1515,14 @@ CHECKPOINT CANONICO
 - Canal publico latest: **1.9.28** (Identity 20.24 match)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo **20.27** (20.26 GI7 PASS unitário; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo **20.28** (20.27 espec endpoint PASS; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
 - Pacote publicado: **1.9.28** (`SHA256=510c29c8c10ec48ebcac10056db980de0c379d8073a344548b2a2ca2eff76923`)
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.28**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **20.27** agente endpoint (ou ADIAR); GI6/GI7 lab residual; MITM DEFER; GO promoção enforce; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **20.28** GO MVP agente ou ADIAR ADR; GI6/GI7 lab residual; MITM DEFER; GO promoção enforce; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

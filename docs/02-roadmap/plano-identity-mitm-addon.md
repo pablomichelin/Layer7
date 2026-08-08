@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08g`; **20.26 / GI7 PASS unitário**; passo actual **20.27 / IM7**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-08h`; **20.27 PASS**; passo actual **20.28 / IM7**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -20,21 +20,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.27** — especificação agente endpoint (IM7) |
+| Passo actual | **20.28** — MVP agente Windows **ou** ADIAR com ADR (IM7/GI8.1) |
 | Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
 | ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.27 → 20.28 (ou ADIAR ADR) |
+| Próximo | 20.28 GO MVP **ou** ADIAR ADR → IM8/IM9 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.27 (especificação agente IM7)
+- Passo actual: 20.28 (MVP agente ou ADIAR ADR)
 - 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
 - Baseline: 1.9.8; **1.9.28** (publicado lab/`latest`)
-- Próximo: 20.27 → 20.28
+- Próximo: 20.28 → IM8/IM9
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -352,7 +352,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
 | Passo | Entrega | Gate |
 |-------|---------|------|
-| **20.27** | Especificação agente (OS, canal, auth, heartbeat) | Doc |
+| **20.27** | Especificação agente (OS, canal, auth, heartbeat) | **PASS** (`especificacao-agente-endpoint-20.27.md`) |
 | **20.28** | MVP agente Windows (report user + IP) **ou** ADIAR com ADR | GI8 ou exclusão |
 
 ---
@@ -385,7 +385,7 @@ IM0 → IM1 Entitlements          [FEITO]
   → IM2 spike 20.7 + 20.7a DEFER [FEITO — saltar 20.8–20.11]
   → IM3–IM6 Identity MVP         [EM CURSO — valor PME]
        mapa daemon + LDAP + fontes + políticas ad_*
-  → IM7–IM8 agente/TS            [adiável]
+  → IM7 espec 20.27 PASS; 20.28 GO/ADIAR; IM8 TS [adiável]
   → IM9 Fecho / release Identity
   → (IM2 reopen: 20.8–20.11 só com novo GO + spike S1–S8 helper próprio)
 ```
@@ -534,6 +534,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
 | 2026-08-08 | **rev. `a` / 20.20 agente Win PASS + 1.9.24** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; publicado lab/`latest`; passo → **20.21** |
 | 2026-08-08 | **rev. `b` / 20.21 PASS** — `normalize_user` + `remove_ip`; RADIUS/DC alinhados; candidato `1.9.25`; passo → **20.22** |
+| 2026-08-08 | **rev. `h` / 20.27 PASS** — especificação agente endpoint; recomendação ADIAR salvo GO; passo → **20.28** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |

@@ -6,9 +6,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- **Identity 20.25–20.26 / GI7:** `core/precedence.md` + suite unit GI7.1–7.5
-  (`test_policy_decide`); checklist lab `tests/lab/run-gi7-identity-policies.sh`.
-  Lab AD/LDAP residual. Próximo: 20.27 IM7.
+- **Identity 20.27:** especificação agente endpoint
+  (`docs/01-architecture/especificacao-agente-endpoint-20.27.md`) —
+  OS/canal/auth/heartbeat; recomendação ADIAR salvo GO humano no 20.28.
+- **Identity 20.25–20.26 / GI7:** `core/precedence.md` + suite unit GI7.1–7.5;
+  checklist lab residual.
 
 ## [1.9.28] — 2026-08-08
 
