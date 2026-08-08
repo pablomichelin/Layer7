@@ -58,7 +58,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-14a | Test connection LDAP (GUI/CLI) | IM4 | **20.18 PASS** | DMN/PKG | `--ldap-test` JSON; GI5.4; sem secrets |
 | M-15 | RADIUS **accounting receiver** | IM5 | **Feito** (20.19) | DMN/PKG | canónico |
 | M-16 | **Agente no DC** → push logons | IM5 | **PASS** (receiver + agente Win samples) | OPS/DMN | TLS+HMAC MVP; GI6 lab residual |
-| M-17 | Conflict policy same-IP | IM5 | **Parcial** (mapa multi_user; audit 20.22) | DMN | |
+| M-17 | Conflict policy same-IP | IM5 | **PASS** (20.22 audit + multi_user) | DMN | identity_ip_conflict |
 | M-17a | Normalização fontes → mapa | IM5 | **PASS** (20.21) | DMN | DOMAIN\\user / UPN; remove_ip |
 | M-18 | Policy `ad_users`/`ad_groups` | IM6 | Planeado | GUI/PKG/DMN | |
 | M-19 | Enforce ← mapa daemon | IM6 | Planeado | DMN | **não** PHP `device_ips` SSOT |

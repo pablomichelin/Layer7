@@ -1293,9 +1293,10 @@ Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
 **IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
 **20.18 PASS** (Test LDAP; GI5.4); **20.19 PASS** (RADIUS; GI5.3); **20.20
 PASS** (desenho A1–A7 + receiver HTTPS + agente Win Event Log samples);
-passo actual **20.22 / IM5** (conflito mesmo IP + audit).
+passo actual **20.23 / IM6** (políticas ad_users/ad_groups).
 **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Candidato port:** `1.9.25` (**publicado** lab/`latest`).
+**Candidato port:** `1.9.26` (20.22 audit; **publish pendente**). Latest
+publicado permanece `1.9.25` até release.
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1316,14 +1317,15 @@ passo actual **20.22 / IM5** (conflito mesmo IP + audit).
 - **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM6 Identity** → IM7–IM8 → IM9
   → (MITM só com novo GO)
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-08b`
+- **Rev. plano:** `2026-08-08c`
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 - **Desenho DC:** [`docs/01-architecture/desenho-canal-agente-dc-20.20.md`](docs/01-architecture/desenho-canal-agente-dc-20.20.md)
 - **Agente Win:** [`docs/samples/identity-dc-agent/`](docs/samples/identity-dc-agent/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.22** (conflito mesmo IP + audit)
+- Passo actual: **20.23** (políticas ad_users/ad_groups)
+- 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (receiver + agente Win Event Log samples)
 - 20.20 desenho: PASS (A1–A7; TLS+HMAC; porto 8743)
@@ -1333,10 +1335,10 @@ TRILHA IDENTITY + MITM — progresso
 - 20.16: PASS (GUI LDAP config)
 - IM3 / GI4: PASS (20.15 entitlement gate)
 - IM2: DEFER 20.7a
-- Plano rev.: 2026-08-08b
+- Plano rev.: 2026-08-08c
 - Baseline enforce: 1.9.8
-- Candidato / latest: **1.9.25** (publicado)
-- Próximo: 20.22 → GI6 lab
+- Latest publicado: **1.9.25**; candidato **1.9.26** (publish pendente)
+- Próximo: 20.23 → GI7
 ```
 
 
@@ -1510,17 +1512,17 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.25** (Identity 20.21 normalize)
+- Canal publico latest: **1.9.25** (candidato **1.9.26** publish pendente — 20.22 audit)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **ABERTA** — passo **20.22** (20.21 PASS normalize; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: **ABERTA** — passo **20.23** (20.22 PASS audit; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
 - Pacote publicado: **1.9.25** (`SHA256=967f059f90c09b388d93baa4bb4546a407fed5b2ed5c1f14193e5b54fb356006`)
-- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.25**
+- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.25** (+ candidato 1.9.26)
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: Identity+MITM **20.22** conflito IP/audit; GI6 lab; MITM DEFER; GO promoção enforce; BG-028 fase 1
+- Proximo trabalho: Identity+MITM **20.23** políticas ad_*; GI6 lab residual; MITM DEFER; GO promoção enforce; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

@@ -238,7 +238,7 @@ if ($savemsg !== "") {
 				<?= htmlspecialchars(l7_t(
 				    "Quando usar: ligue o directorio LDAP do Active Directory (ou LDAP " .
 				    "compativel) para expandir grupos. A sessao (quem esta em que IP) chega " .
-				    "via RADIUS accounting (abaixo) ou, em passo seguinte, agente no DC — " .
+				    "via RADIUS accounting ou agente no Domain Controller — " .
 				    "nao use captive portal do Layer7."
 				)); ?>
 			</p>
@@ -247,6 +247,14 @@ if ($savemsg !== "") {
 				    "Sem inspeccao TLS (MITM): bloqueio HTTPS continua alinhado a pagina HTTP/DNS. " .
 				    "Se o LDAP falhar depois de activo, politicas por grupo deixam de aplicar " .
 				    "(fail-mode seguro) — a LAN nao e fechada."
+				)); ?>
+			</p>
+			<p class="help-block text-muted">
+				<?= htmlspecialchars(l7_t(
+				    "Limite honesto (topologia): o IP reportado pelo AD/RADIUS pode diferir do IP " .
+				    "visto no firewall (NAT, Wi-Fi partilhado). Se dois utilizadores aparecerem no " .
+				    "mesmo IP ao mesmo tempo, o mapa marca multi-user e politicas ad_* nao aplicam " .
+				    "nesse IP (fallback seguro) — evento identity_ip_conflict no log."
 				)); ?>
 			</p>
 

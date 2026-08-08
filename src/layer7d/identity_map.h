@@ -69,6 +69,9 @@ struct l7_id_map {
 	unsigned             default_ttl_sec;
 	unsigned             conflict_window_sec;
 	int                  initialized;
+	/* 20.22 — auditoria ADR-0027 §4.1 (lifetime do processo) */
+	unsigned             audit_conflicts;     /* identity_ip_conflict */
+	unsigned             audit_last_writers;  /* identity_ip_last_writer */
 };
 
 struct l7_id_map_limits {
@@ -198,5 +201,11 @@ int layer7_idmap_normalize_user(const char *in, char *out, size_t out_sz);
  */
 int layer7_idmap_remove_ip(struct l7_id_map *m, const char *user,
     const struct l7_id_addr *ip);
+
+/* 20.22 — contadores de auditoria (ADR-0027 §4.1) */
+unsigned layer7_idmap_audit_conflicts(const struct l7_id_map *m);
+unsigned layer7_idmap_audit_last_writers(const struct l7_id_map *m);
+/* Sessões actualmente em estado multi_user */
+unsigned layer7_idmap_count_multi_user(const struct l7_id_map *m);
 
 #endif /* LAYER7_IDENTITY_MAP_H */

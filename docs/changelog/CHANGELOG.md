@@ -6,7 +6,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- (vazio — próximo: 20.22 conflito IP + audit)
+- **Identity 20.22:** audit `identity_ip_conflict` / `identity_ip_last_writer`
+  (syslog); contadores no mapa/status; recompute `multi_user`; nota UX
+  topologia na GUI Identity.
+
+### Notes
+
+- Candidato port: **`1.9.26`** (publish pendente). Enforce **`1.9.8`**.
+  Rollback lab previsto: `1.9.25`.
 
 ## [1.9.25] — 2026-08-08
 

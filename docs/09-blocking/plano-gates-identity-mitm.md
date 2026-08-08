@@ -87,9 +87,9 @@ Identity avança sem GI2/GI3.
 | # | Critério | Estado (2026-08-07) |
 |---|----------|---------------------|
 | GI6.1 | Segunda fonte integrada (a que faltou no GI5) | **PASS código** (20.20 agente Win); lab DC residual |
-| GI6.2 | Conflito mesmo IP: política determinada + audit | PENDENTE (mapa já tem multi_user; 20.22) |
-| GI6.3 | Logout/expiry limpa IP | **PARCIAL** (agente envia logoff; gate lab PENDENTE) |
-| GI6.4 | Users concorrentes no mesmo IP → estado `multi-user` → `ad_*` não-match + evento `identity_ip_conflict` (nunca política do user errado) — ADR-0027 §4.1 | Parcial no mapa; gate lab PENDENTE |
+| GI6.2 | Conflito mesmo IP: política determinada + audit | **PASS código** (20.22); lab residual |
+| GI6.3 | Logout/expiry limpa IP | **PARCIAL** (agente/RADIUS remove_ip; gate lab PENDENTE) |
+| GI6.4 | Users concorrentes no mesmo IP → estado `multi-user` → `ad_*` não-match + evento `identity_ip_conflict` (nunca política do user errado) — ADR-0027 §4.1 | **PASS código** (20.22); lab residual |
 | GI6.5 | Canal agente DC conforme ADR-0027 §2.1: TLS/HMAC, bind só LAN, rate limit provados em lab | Desenho+código **PASS**; lab DC residual |
 
 ---

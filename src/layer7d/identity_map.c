@@ -11,8 +11,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+#ifndef L7_IDMAP_AUDIT
+#define L7_IDMAP_AUDIT(fmt, ...) \
+	syslog(LOG_NOTICE, "identity: " fmt, ##__VA_ARGS__)
+#endif
+
+static void addr_to_str(const struct l7_id_addr *a, char *buf, size_t buflen);
+static const char *source_name(enum l7_id_source src);
 
 void
 layer7_idmap_limits(struct l7_id_map_limits *out)
@@ -347,6 +356,55 @@ count_users_with_ip(const struct l7_id_map *m, const struct l7_id_addr *ip)
 	return n;
 }
 
+/* Reavalia multi_user em todas as sessões (após remove_ip / last-writer). */
+static void
+recompute_all_multi_user(struct l7_id_map *m)
+{
+	unsigned i, j;
+
+	for (i = 0; i < m->capacity; i++) {
+		if (m->sessions[i].in_use)
+			m->sessions[i].multi_user = 0;
+	}
+	for (i = 0; i < m->capacity; i++) {
+		if (!m->sessions[i].in_use)
+			continue;
+		for (j = 0; j < m->sessions[i].n_ips; j++) {
+			if (count_users_with_ip(m, &m->sessions[i].ips[j]) > 1)
+				mark_multi_user_for_ip(m,
+				    &m->sessions[i].ips[j]);
+		}
+	}
+}
+
+static void
+audit_conflict(struct l7_id_map *m, const char *user_a, const char *user_b,
+    const struct l7_id_addr *ip, enum l7_id_source src)
+{
+	char ipbuf[64];
+
+	addr_to_str(ip, ipbuf, sizeof(ipbuf));
+	m->audit_conflicts++;
+	L7_IDMAP_AUDIT(
+	    "identity_ip_conflict user_a=%s user_b=%s ip=%s src=%s",
+	    user_a ? user_a : "?", user_b ? user_b : "?", ipbuf,
+	    source_name(src));
+}
+
+static void
+audit_last_writer(struct l7_id_map *m, const char *from_user,
+    const char *to_user, const struct l7_id_addr *ip, enum l7_id_source src)
+{
+	char ipbuf[64];
+
+	addr_to_str(ip, ipbuf, sizeof(ipbuf));
+	m->audit_last_writers++;
+	L7_IDMAP_AUDIT(
+	    "identity_ip_last_writer from=%s to=%s ip=%s src=%s",
+	    from_user ? from_user : "?", to_user ? to_user : "?", ipbuf,
+	    source_name(src));
+}
+
 int
 layer7_idmap_upsert(struct l7_id_map *m, const char *user,
     const struct l7_id_addr *ip, enum l7_id_source source,
@@ -356,6 +414,7 @@ layer7_idmap_upsert(struct l7_id_map *m, const char *user,
 	unsigned i;
 	struct l7_id_session *s;
 	char norm[L7_IDMAP_USER_MAX];
+	int saw_conflict = 0;
 
 	if (m == NULL || !m->initialized || user == NULL || ip == NULL ||
 	    (ip->family != AF_INET && ip->family != AF_INET6))
@@ -379,8 +438,13 @@ layer7_idmap_upsert(struct l7_id_map *m, const char *user,
 			(time_t)m->conflict_window_sec) {
 			/* Janela de conflito: manter ambos + multi_user */
 			m->sessions[other].multi_user = 1;
+			audit_conflict(m, m->sessions[other].user, user, ip,
+			    source);
+			saw_conflict = 1;
 		} else {
 			/* Last-writer: remove IP do outro */
+			audit_last_writer(m, m->sessions[other].user, user, ip,
+			    source);
 			session_remove_ip_at(&m->sessions[other],
 			    (unsigned)ip_idx);
 			if (m->sessions[other].n_ips == 0) {
@@ -427,27 +491,10 @@ layer7_idmap_upsert(struct l7_id_map *m, const char *user,
 		s->n_ips++;
 	}
 
-	if (count_users_with_ip(m, ip) > 1)
+	if (saw_conflict || count_users_with_ip(m, ip) > 1)
 		mark_multi_user_for_ip(m, ip);
-	else {
-		/* Único dono deste IP: limpa multi_user se o user já não
-		 * partilha nenhum IP com outros. */
-		int still = 0;
-		unsigned j;
-
-		idx = find_user_idx(m, user);
-		if (idx >= 0) {
-			s = &m->sessions[idx];
-			for (j = 0; j < s->n_ips; j++) {
-				if (count_users_with_ip(m, &s->ips[j]) > 1) {
-					still = 1;
-					break;
-				}
-			}
-			if (!still)
-				s->multi_user = 0;
-		}
-	}
+	else
+		recompute_all_multi_user(m);
 
 	(void)layer7_idmap_unlock(m);
 	if (trunc && rc == 0)
@@ -555,12 +602,48 @@ layer7_idmap_remove_ip(struct l7_id_map *m, const char *user,
 		clear_session(s);
 		if (m->count > 0)
 			m->count--;
-	} else {
-		/* Pode sair de multi_user se já não partilha IPs */
-		s->multi_user = 0;
 	}
+	recompute_all_multi_user(m);
 	(void)layer7_idmap_unlock(m);
 	return 0;
+}
+
+unsigned
+layer7_idmap_audit_conflicts(const struct l7_id_map *m)
+{
+	return (m != NULL && m->initialized) ? m->audit_conflicts : 0;
+}
+
+unsigned
+layer7_idmap_audit_last_writers(const struct l7_id_map *m)
+{
+	return (m != NULL && m->initialized) ? m->audit_last_writers : 0;
+}
+
+static unsigned
+count_multi_user_unlocked(const struct l7_id_map *m)
+{
+	unsigned i, n = 0;
+
+	for (i = 0; i < m->capacity; i++) {
+		if (m->sessions[i].in_use && m->sessions[i].multi_user)
+			n++;
+	}
+	return n;
+}
+
+unsigned
+layer7_idmap_count_multi_user(const struct l7_id_map *m)
+{
+	unsigned n;
+
+	if (m == NULL || !m->initialized)
+		return 0;
+	if (layer7_idmap_rdlock((struct l7_id_map *)m) != 0)
+		return 0;
+	n = count_multi_user_unlocked(m);
+	(void)layer7_idmap_unlock((struct l7_id_map *)m);
+	return n;
 }
 
 int
@@ -754,7 +837,10 @@ layer7_idmap_dump_json(struct l7_id_map *m, char *buf, size_t bufsz)
 		off += (size_t)n;                                           \
 	} while (0)
 
-	APPEND("{\"sessions\":[");
+	APPEND("{\"audit_conflicts\":%u,\"audit_last_writers\":%u,"
+	    "\"multi_user_sessions\":%u,\"sessions\":[",
+	    m->audit_conflicts, m->audit_last_writers,
+	    count_multi_user_unlocked(m));
 	k = 0;
 	for (i = 0; i < m->capacity; i++) {
 		char ipbuf[64];

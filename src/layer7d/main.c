@@ -322,6 +322,12 @@ write_stats_json(void)
 	    s_idmap_active ? "true" : "false");
 	fprintf(f, "  \"identity_sessions\": %u,\n",
 	    s_idmap_active ? layer7_idmap_count(&s_idmap) : 0);
+	fprintf(f, "  \"identity_multi_user_sessions\": %u,\n",
+	    s_idmap_active ? layer7_idmap_count_multi_user(&s_idmap) : 0);
+	fprintf(f, "  \"identity_audit_conflicts\": %u,\n",
+	    s_idmap_active ? layer7_idmap_audit_conflicts(&s_idmap) : 0);
+	fprintf(f, "  \"identity_audit_last_writers\": %u,\n",
+	    s_idmap_active ? layer7_idmap_audit_last_writers(&s_idmap) : 0);
 	fprintf(f, "  \"identity_entitled\": %s,\n",
 	    layer7_features_allows_identity(s_lic.features_flags) ?
 	    "true" : "false");

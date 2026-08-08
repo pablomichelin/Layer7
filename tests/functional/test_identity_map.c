@@ -90,6 +90,13 @@ main(void)
 		NULL, 0, t0 + 310) == 0, "maria same IP C conflict");
 	check(layer7_idmap_lookup_ip(&map, &ip_c, userbuf, sizeof(userbuf),
 		&src) == 1, "lookup multi_user");
+	check(layer7_idmap_audit_conflicts(&map) >= 1, "audit conflict count");
+	check(layer7_idmap_count_multi_user(&map) >= 1, "multi_user sessions");
+
+	/* last-writer fora da janela gera audit */
+	check(layer7_idmap_upsert(&map, "carlos", &ip_a, L7_ID_SRC_RADIUS,
+		NULL, 0, t0 + 500) == 0, "carlos last-writer IP A");
+	check(layer7_idmap_audit_last_writers(&map) >= 1, "audit last_writer");
 
 	/* dump JSON sem secrets */
 	n = layer7_idmap_dump_json(&map, dump, sizeof(dump));
@@ -97,6 +104,7 @@ main(void)
 	check(strstr(dump, "\"user\":\"joao.silva\"") != NULL, "dump has joao");
 	check(strstr(dump, "\"status\":\"multi_user\"") != NULL ||
 	    strstr(dump, "\"multi_user\":true") != NULL, "dump multi_user");
+	check(strstr(dump, "\"audit_conflicts\"") != NULL, "dump audit_conflicts");
 	check(strstr(dump, "password") == NULL, "dump no password key");
 
 	/* expire */
