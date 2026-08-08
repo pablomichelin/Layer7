@@ -36,7 +36,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.28` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.28`;
-`SHA256=PLACEHOLDER`;
+`SHA256=510c29c8c10ec48ebcac10056db980de0c379d8073a344548b2a2ca2eff76923`;
 MITM layout padrao + Identity DC 20.20; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
@@ -1517,7 +1517,7 @@ CHECKPOINT CANONICO
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: **ABERTA** — passo **20.25** (20.24 PASS match; PME Identity-first; MITM DEFER 20.7a); arranque docs/00-overview/START-HERE-identity-mitm.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Pacote publicado: **1.9.28** (`SHA256=PLACEHOLDER`)
+- Pacote publicado: **1.9.28** (`SHA256=510c29c8c10ec48ebcac10056db980de0c379d8073a344548b2a2ca2eff76923`)
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.28**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)

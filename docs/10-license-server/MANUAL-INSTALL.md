@@ -255,7 +255,7 @@ Match/enforce de políticas `ad_users`/`ad_groups` via mapa daemon (não PHP `de
 **Canal `latest`:** `1.9.28`. Enforce **`1.9.8`**. Rollback lab: **`1.9.27`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.28`
-- **SHA256 esperado:** `PLACEHOLDER`
+- **SHA256 esperado:** `510c29c8c10ec48ebcac10056db980de0c379d8073a344548b2a2ca2eff76923`
 
 **Addendum da release `1.9.27` (Identity IM6/20.23 políticas ad_*, `2026-08-08`):**
 Políticas aceitam `match.ad_users` / `match.ad_groups` (GUI + daemon parse).
@@ -914,7 +914,7 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.28`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.28/pfSense-pkg-layer7-1.9.28.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.28/pfSense-pkg-layer7-1.9.28.pkg.sha256`
-- **SHA256 esperado:** `PLACEHOLDER`
+- **SHA256 esperado:** `510c29c8c10ec48ebcac10056db980de0c379d8073a344548b2a2ca2eff76923`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
 **Versao anterior lab (rollback a partir de `1.9.28`):** `1.9.27`
@@ -1109,7 +1109,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.28.pkg.sha256 https://github.com/pablomiche
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`PLACEHOLDER`.
+`510c29c8c10ec48ebcac10056db980de0c379d8073a344548b2a2ca2eff76923`.
 
 ---
 
