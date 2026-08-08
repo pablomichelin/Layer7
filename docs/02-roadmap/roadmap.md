@@ -592,8 +592,10 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   firewall. O primeiro permanece no audit log como `outcome=sinkhole`; os
   fluxos locais seguintes são ignorados antes da decisão de políticas e só
   têm diagnóstico debug. Regressão local, smoke e build FreeBSD PASS
-  (`SHA256 dcbad868…ffcd15`); validação controlada no appliance permanece
-  pendente.
+  (`SHA256 dcbad868…ffcd15`). Instalação controlada no appliance e testes
+  nos dois clientes PASS: sinkhole e navegação normal preservados, sem nova
+  linha ruidosa. A observação física de `outcome=sinkhole` segue pendente,
+  pois o Unbound encerra TLS antes da classificação com SNI OFF.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

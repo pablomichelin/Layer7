@@ -43,11 +43,17 @@ comandos em
 seguinte ao DNS sinkhole para o IP local do firewall seja reclassificado e
 gere log storm; a decisão DNS permanece auditada como `outcome=sinkhole`.
 Suite local, verificação do port e build FreeBSD PASS (SHA256
-`dcbad868b3e06c19214662dd4caf5ac82417c9af4cb17fddff8cbfc425ffcd15`);
-gate controlado no appliance pendente. Não instalado em produção.
-**Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
-ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
-Rollback lab a partir de `1.9.30`: **`1.9.29`**. Historico: `_69`, `_24`.
+`dcbad868b3e06c19214662dd4caf5ac82417c9af4cb17fddff8cbfc425ffcd15`).
+Instalado de forma controlada no appliance `192.168.100.254` em `2026-08-08`:
+daemon, configuração e `pfctl -nf` PASS; bloqueio Unbound de DoH/iCloud nos
+dois clientes mantém-se e não houve nova linha `skip IP local do firewall`.
+O callback DNS do daemon não foi exercitado nessa configuração (`sni_inspection`
+OFF; TLS termina no portal antes da classificação), portanto o evento
+`outcome=sinkhole` permanece validado por regressão/build, não por esta rodada
+física. Pacote ainda não publicado; rollback local/público: **`1.9.30`**.
+**Referencia de producao enforce:** **`1.9.31`** (gate BG-105 parcial PASS
+`2026-08-08`; sem promoção pública). Rollback enforce: **`1.9.30`**.
+Historico: `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).

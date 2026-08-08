@@ -22,8 +22,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - Candidato validado no builder: `1.9.31` (`SHA256
   dcbad868b3e06c19214662dd4caf5ac82417c9af4cb17fddff8cbfc425ffcd15`).
-  Suite local, smoke FreeBSD, build e metadados do `.pkg` passaram; gate
-  controlado no appliance ainda é pendente.
+  Suite local, smoke FreeBSD, build e metadados do `.pkg` passaram.
+- Instalação controlada em `192.168.100.254`: daemon, configuração e PF
+  válidos; `dns.google` e `mask.icloud.com` permanecem bloqueados por
+  sinkhole nos clientes `.234`/`.235`, sem nova ocorrência do log storm;
+  navegação HTTPS normal passou. A auditoria do callback DNS do daemon não
+  foi observada porque o Unbound encerrou TLS antes de nDPI classificar,
+  com SNI desativado. Não é release pública; rollback `1.9.30` foi validado
+  antes do upgrade e mantido no appliance.
 
 ## [1.9.30] — 2026-08-08
 
