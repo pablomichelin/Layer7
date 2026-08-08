@@ -11,6 +11,21 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [1.0.0] — 2026-08-08
+
+### Added
+
+- Fecho do plano `PORTAL-PLAN-001` (operador único completo)
+- Critérios `OBJECTIVOS.md` § 1.0.0 todos satisfeitos
+- Entrada `historico/2026-08-08-fecho-1.0.0.md`
+
+### Notes
+
+- Sem features novas além do fecho documental/verificação P1e
+- Escala/MSP/billing permanece `FUTURA`
+
+---
+
 ## [0.5.0] — 2026-08-08
 
 ### Added

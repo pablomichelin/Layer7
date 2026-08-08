@@ -2,7 +2,7 @@
 
 | Documento | Estado | Notas |
 |-----------|--------|-------|
-| [`2026-08-08-melhoria-total-portal.md`](2026-08-08-melhoria-total-portal.md) | **ACTIVO** | Completude operador único → caminho a `1.0.0` |
+| [`2026-08-08-melhoria-total-portal.md`](2026-08-08-melhoria-total-portal.md) | **CONCLUIDO** | Fecho `1.0.0` (`2026-08-08`) |
 
 ## Regras
 

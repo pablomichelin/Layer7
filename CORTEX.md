@@ -779,7 +779,7 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 | Campo | Valor |
 |-------|-------|
-| Versão visual actual | **`0.5.0`** (P1d substituir, `2026-08-08`) |
+| Versão visual actual | **`1.0.0`** (operador único, `2026-08-08`) |
 | Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
 | Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
 | Plano activo | [`docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md`](docs/10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md) (`PORTAL-PLAN-001`) |
@@ -787,8 +787,8 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 | Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
-**Checkpoint `2026-08-08`:** … → **P1d `0.5.0`** (substituir pós-revogação;
-sem desrevogar). Próximo **obrigatório na ordem:** **P1e → 1.0.0**.
+**Checkpoint `2026-08-08`:** portal **`1.0.0`** — `PORTAL-PLAN-001`
+**CONCLUIDO** (P0→P1e). Residual só ideias `FUTURA` com GO novo.
 Regra: não saltar blocos do plano portal.
 
 ---

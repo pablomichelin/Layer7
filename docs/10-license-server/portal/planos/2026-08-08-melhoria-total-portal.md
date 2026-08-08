@@ -3,7 +3,7 @@
 | Campo | Valor |
 |-------|-------|
 | **ID** | `PORTAL-PLAN-001` |
-| **Estado** | `ACTIVO` |
+| **Estado** | `CONCLUIDO` |
 | **Criado** | `2026-08-08` |
 | **Baseline** | portal visual **`0.0.1`** |
 | **Alvo** | portal visual **`1.0.0`** (completo para operador único) |
@@ -202,14 +202,14 @@ Não misturar P1c com outras mutações perigosas no mesmo deploy.
 | P1b | **FEITO** | `0.3.0` | 2026-08-08 |
 | P1c | **FEITO** (GO `2026-08-08`) | `0.4.0` | 2026-08-08 |
 | P1d | **FEITO** (substituir, sem desrevogar) | `0.5.0` | 2026-08-08 |
-| P1e / `1.0.0` | Pendente | → `1.0.0` | — |
+| P1e / `1.0.0` | **FEITO** | `1.0.0` | 2026-08-08 |
 
 Actualizar esta tabela a cada fecho de bloco.
 
 ## 13. Próxima acção imediata
 
-**P1e → 1.0.0** — percorrer critérios `OBJECTIVOS.md`, inventário SKU,
-fechar plano. Seguir ordem; não saltar.
+Plano **CONCLUIDO**. Residual só `IDEIAS.md` `FUTURA` com GO novo.
+Ver `historico/2026-08-08-fecho-1.0.0.md`.
 3. Registar em `ACOES.md` + `ESTADO.md`.
 
 Até lá: este plano permanece a SSOT de execução da trilha portal.

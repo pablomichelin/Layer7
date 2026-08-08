@@ -5,7 +5,18 @@ Mais recente no topo.
 
 ---
 
-## 2026-08-08 — P1d Substituir `0.5.0`
+## 2026-08-08 — P1e Fecho `1.0.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | docs + bump visual + deploy |
+| Versão | `1.0.0` |
+| Objectivo | Fechar critérios operador único e `PORTAL-PLAN-001` |
+| Impacto | VERSION/CHANGELOG/historico; sidebar `v1.0.0`; plano CONCLUIDO |
+| Risco | Baixo (sem mutação de negócio nova) |
+| Teste | inventário SKU sem `full`; health; SPA 1.0.0 |
+| Rollback | imagens anteriores / VERSION 0.5.0 |
+| Resultado | **FEITO** — health OK; SPA `index-CzikQc2x.js`; inventário sem `full`; plano CONCLUIDO |
 
 | Campo | Valor |
 |-------|-------|

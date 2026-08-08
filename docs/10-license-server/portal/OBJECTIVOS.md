@@ -24,19 +24,21 @@ suporte a hardware e auditoria), via
 
 O portal só sobe a **1.0.0** quando **todos** forem verdade:
 
-- [ ] SPA e API live alinhadas (sem drift de meses)
-- [ ] Versão visual visível na UI e no `VERSION.md`
-- [ ] Criação de licença com chave copiável e instrução de activação
-- [ ] Lista com filtros: status, cliente, bound, a expirar, SKU
-- [ ] Dashboard com expiração efectiva e atalhos
-- [ ] Renovação rápida (+periodo) no detalhe
+- [x] SPA e API live alinhadas (sem drift de meses)
+- [x] Versão visual visível na UI e no `VERSION.md`
+- [x] Criação de licença com chave copiável e instrução de activação
+- [x] Lista com filtros: status, cliente, bound, a expirar, SKU
+- [x] Dashboard com expiração efectiva e atalhos
+- [x] Renovação rápida (+periodo) no detalhe
 - [x] Workflow de rebind governado (motivo + auditoria)
-- [ ] UI de auditoria administrativa (leitura)
-- [ ] Check-ins visíveis no detalhe da licença
+- [x] UI de auditoria administrativa (leitura)
+- [x] Check-ins visíveis no detalhe da licença
 - [x] Fluxo claro pós-revogação (**substituir** licença; sem desrevogar)
-- [ ] Inventário SKU coerente (`base` / `base,identity`; legado tratado)
-- [ ] Docs da trilha portal actualizados; plano de melhoria P0+P1 fechado
+- [x] Inventário SKU coerente (`base` / `base,identity`; legado tratado)
+- [x] Docs da trilha portal actualizados; plano de melhoria P0+P1 fechado
       ou residual só `FUTURA` com GO
+
+**Veredicto P1e (`2026-08-08`):** todos os critérios satisfeitos → `1.0.0`.
 
 ## Fora de objectivo até GO explícito
 
@@ -49,7 +51,6 @@ O portal só sobe a **1.0.0** quando **todos** forem verdade:
 
 ## Métricas de sucesso (qualitativas)
 
-- Renovar ou revogar uma licença sem SSH
-- Trocar hardware de um cliente com um fluxo documentado no painel
-- Responder “quem fez o quê?” sem consultar Postgres à mão
-- Emitir Identity (SKU Y) sem ambiguidade de `full` vs `base,identity`
+- Operador resolve renovação, rebind e pós-revogação sem SSH/SQL
+- Auditoria e check-ins consultáveis na UI após cada acção crítica
+- Documentação da trilha reflecte a versão live
