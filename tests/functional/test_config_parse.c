@@ -5,10 +5,11 @@
  * o caso em que a GUI grava a chave DEPOIS de "policies" no JSON — regressao
  * do bug corrigido em 1.8.11_22 (o gate `< policies` rejeitava a chave).
  *
- * Compila standalone (config_parse.c nao tem dependencias externas):
+ * Compila standalone:
  *   cc -Wall -Wextra -O2 -I src/layer7d -o /tmp/t \
  *      tests/functional/test_config_parse.c src/layer7d/config_parse.c \
- *      src/layer7d/policy.c src/layer7d/enforce.c
+ *      src/layer7d/policy.c src/layer7d/enforce.c src/layer7d/identity_map.c \
+ *      -lpthread
  */
 #include "config_parse.h"
 #include "policy.h"

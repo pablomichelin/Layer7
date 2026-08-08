@@ -1053,6 +1053,7 @@ identity_module_sync(const char *reason)
 		}
 		n = layer7_idmap_load(&s_idmap, NULL, now);
 		s_idmap_active = 1;
+		layer7_policies_set_identity_map(&s_idmap);
 		L7_NOTE("identity: module ON (%s) sessions_loaded=%d",
 		    reason ? reason : "?", n < 0 ? 0 : n);
 		identity_ldap_sync_worker(reason);
@@ -1071,6 +1072,7 @@ identity_module_sync(const char *reason)
 			layer7_dc_worker_stop(s_dc_worker);
 			s_dc_worker = NULL;
 		}
+		layer7_policies_set_identity_map(NULL);
 		(void)layer7_idmap_save(&s_idmap, NULL);
 		layer7_idmap_fini(&s_idmap);
 		s_idmap_active = 0;
@@ -1105,6 +1107,7 @@ identity_module_shutdown(void)
 	}
 	if (!s_idmap_active)
 		return;
+	layer7_policies_set_identity_map(NULL);
 	(void)layer7_idmap_save(&s_idmap, NULL);
 	layer7_idmap_fini(&s_idmap);
 	s_idmap_active = 0;

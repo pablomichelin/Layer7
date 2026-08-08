@@ -1,4 +1,5 @@
 #include "policy.h"
+#include "identity_map.h"
 #include <strings.h>
 #include "enforce.h"
 #include <arpa/inet.h>
@@ -9,6 +10,15 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <time.h>
+
+/* Mapa Identity para match ad_* (20.24). NULL = Identity OFF / testes sem mapa. */
+static struct l7_id_map *s_policy_idmap;
+
+void
+layer7_policies_set_identity_map(struct l7_id_map *m)
+{
+	s_policy_idmap = m;
+}
 
 static void
 skip_ws(const char **p)
@@ -1149,25 +1159,75 @@ src_excluded_from_rule(const struct layer7_policy_rule *r, const char *src_ip)
 }
 
 static int
+ad_targets_match_src(const struct layer7_policy_rule *r, const char *src_ip)
+{
+	struct l7_id_addr addr;
+	char user[L7_IDMAP_USER_MAX];
+	char groups[L7_IDMAP_MAX_GROUPS_CACHE][L7_IDMAP_GROUP_MAX];
+	unsigned n_groups = 0;
+	int rc, i, j;
+
+	if (r->n_ad_users == 0 && r->n_ad_groups == 0)
+		return 0;
+	if (s_policy_idmap == NULL || src_ip == NULL || !*src_ip)
+		return 0;
+	if (layer7_idmap_addr_from_str(src_ip, &addr) != 0)
+		return 0;
+	rc = layer7_idmap_lookup_ip_ex(s_policy_idmap, &addr, user, sizeof(user),
+	    groups, L7_IDMAP_MAX_GROUPS_CACHE, &n_groups, NULL);
+	if (rc != 0)
+		return 0; /* ausente ou multi_user → não-match ad_* */
+	for (i = 0; i < r->n_ad_users; i++) {
+		if (strcmp(user, r->ad_users[i]) == 0)
+			return 1;
+	}
+	for (i = 0; i < r->n_ad_groups; i++) {
+		for (j = 0; j < (int)n_groups; j++) {
+			if (strcasecmp(groups[j], r->ad_groups[i]) == 0)
+				return 1;
+		}
+	}
+	return 0;
+}
+
+static int
 src_matches_rule(const struct layer7_policy_rule *r, const char *src_ip)
 {
 	int i;
+	int has_static, has_ad, static_ok, ad_ok;
 
 	if (src_excluded_from_rule(r, src_ip))
 		return 0;
-	if (r->n_src_hosts == 0 && r->n_src_cidrs == 0)
+	has_static = r->n_src_hosts > 0 || r->n_src_cidrs > 0;
+	has_ad = r->n_ad_users > 0 || r->n_ad_groups > 0;
+	if (!has_static && !has_ad)
 		return 1;
-	if (!src_ip || !*src_ip)
-		return 0;
-	for (i = 0; i < r->n_src_hosts; i++) {
-		if (ip_host_equal(src_ip, r->src_hosts[i]))
-			return 1;
+
+	static_ok = 0;
+	if (has_static && src_ip && *src_ip) {
+		for (i = 0; i < r->n_src_hosts; i++) {
+			if (ip_host_equal(src_ip, r->src_hosts[i])) {
+				static_ok = 1;
+				break;
+			}
+		}
+		if (!static_ok) {
+			for (i = 0; i < r->n_src_cidrs; i++) {
+				if (cidr_matches_ip_str(&r->src_cidrs[i],
+				    src_ip)) {
+					static_ok = 1;
+					break;
+				}
+			}
+		}
 	}
-	for (i = 0; i < r->n_src_cidrs; i++) {
-		if (cidr_matches_ip_str(&r->src_cidrs[i], src_ip))
-			return 1;
-	}
-	return 0;
+	ad_ok = has_ad ? ad_targets_match_src(r, src_ip) : 0;
+
+	if (has_static && has_ad)
+		return static_ok || ad_ok;
+	if (has_static)
+		return static_ok;
+	return ad_ok;
 }
 
 static int
@@ -1313,7 +1373,8 @@ dec_set_scoped_policy(const struct layer7_policy_rule *r,
 	dec->policy_table_idx = layer7_policy_table_index(rules, n_rules, r->id);
 	dec->scope_global = r->scope_global;
 	dec->quarantine_origin = r->quarantine_origin;
-	dec->source_scoped = r->n_src_hosts > 0 || r->n_src_cidrs > 0;
+	dec->source_scoped = r->n_src_hosts > 0 || r->n_src_cidrs > 0 ||
+	    r->n_ad_users > 0 || r->n_ad_groups > 0;
 	dec->enforce_dst_ip[0] = '\0';
 	dec->enforce_kind = policy_enforce_kind(r, app_matched, cat_matched,
 	    host_matched);
@@ -1418,7 +1479,8 @@ rule_is_catch_all(const struct layer7_policy_rule *r)
 	if (!r)
 		return 1;
 	return r->n_ndpi_apps == 0 && r->n_ndpi_cats == 0 && r->n_hosts == 0 &&
-	    r->n_ifaces == 0 && r->n_src_hosts == 0 && r->n_src_cidrs == 0;
+	    r->n_ifaces == 0 && r->n_src_hosts == 0 && r->n_src_cidrs == 0 &&
+	    r->n_ad_users == 0 && r->n_ad_groups == 0;
 }
 
 static int

@@ -125,12 +125,21 @@ unsigned layer7_idmap_expire(struct l7_id_map *m, time_t now);
 int layer7_idmap_remove_user(struct l7_id_map *m, const char *user);
 
 /*
- * Lookup por IP (hot path futuro).
+ * Lookup por IP (hot path).
  * 0 = user único em out_user; 1 = multi_user (ad_* → não-match);
  * -1 = não encontrado / erro.
+ * Se groups != NULL, copia até max_groups (n_groups_out).
  */
 int layer7_idmap_lookup_ip(struct l7_id_map *m, const struct l7_id_addr *ip,
     char *out_user, size_t out_user_sz, enum l7_id_source *out_src);
+
+int layer7_idmap_lookup_ip_ex(struct l7_id_map *m, const struct l7_id_addr *ip,
+    char *out_user, size_t out_user_sz,
+    char groups[][L7_IDMAP_GROUP_MAX], unsigned max_groups,
+    unsigned *n_groups_out, enum l7_id_source *out_src);
+
+/* Parse "a.b.c.d" / IPv6 textual → l7_id_addr. 0 OK, -1 inválido. */
+int layer7_idmap_addr_from_str(const char *s, struct l7_id_addr *out);
 
 /*
  * Export IPs do user para buffer (enforce/PF futuro).

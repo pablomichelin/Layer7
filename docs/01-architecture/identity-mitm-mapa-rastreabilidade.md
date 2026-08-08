@@ -60,7 +60,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-16 | **Agente no DC** → push logons | IM5 | **PASS** (receiver + agente Win samples) | OPS/DMN | TLS+HMAC MVP; GI6 lab residual |
 | M-17 | Conflict policy same-IP | IM5 | **PASS** (20.22 audit + multi_user) | DMN | identity_ip_conflict |
 | M-17a | Normalização fontes → mapa | IM5 | **PASS** (20.21) | DMN | DOMAIN\\user / UPN; remove_ip |
-| M-18 | Policy `ad_users`/`ad_groups` | IM6 | **Em curso** (20.23 parse/GUI PASS; match 20.24) | GUI/PKG/DMN | `1.9.27` |
+| M-18 | Policy `ad_users`/`ad_groups` | IM6 | **Feito** (20.23+20.24) | GUI/PKG/DMN | `1.9.28` |
 | M-19 | Enforce ← mapa daemon | IM6 | Planeado | DMN | **não** PHP `device_ips` SSOT |
 | M-20 | Precedence (§3.1 → core) | IM6 | Planeado | DOC | |
 | M-21 | Endpoint agent | IM7 | Adiável | — | |

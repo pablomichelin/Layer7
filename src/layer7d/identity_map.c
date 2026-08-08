@@ -320,10 +320,19 @@ apply_groups(struct l7_id_session *s, const char *const *groups,
 	}
 	s->n_groups = 0;
 	for (i = 0; i < n; i++) {
+		size_t k, len;
+		char buf[L7_IDMAP_GROUP_MAX];
+
 		if (groups[i] == NULL || groups[i][0] == '\0')
 			continue;
+		len = strlen(groups[i]);
+		if (len >= L7_IDMAP_GROUP_MAX)
+			len = L7_IDMAP_GROUP_MAX - 1;
+		for (k = 0; k < len; k++)
+			buf[k] = (char)tolower((unsigned char)groups[i][k]);
+		buf[len] = '\0';
 		snprintf(s->groups[s->n_groups], L7_IDMAP_GROUP_MAX, "%s",
-		    groups[i]);
+		    buf);
 		s->n_groups++;
 	}
 }
@@ -647,14 +656,33 @@ layer7_idmap_count_multi_user(const struct l7_id_map *m)
 }
 
 int
-layer7_idmap_lookup_ip(struct l7_id_map *m, const struct l7_id_addr *ip,
-    char *out_user, size_t out_user_sz, enum l7_id_source *out_src)
+layer7_idmap_addr_from_str(const char *s, struct l7_id_addr *out)
 {
-	unsigned i;
+	struct in_addr a4;
+	struct in6_addr a6;
+
+	if (s == NULL || out == NULL || *s == '\0')
+		return -1;
+	if (inet_pton(AF_INET, s, &a4) == 1)
+		return layer7_idmap_addr_set_ipv4(out, ntohl(a4.s_addr));
+	if (inet_pton(AF_INET6, s, &a6) == 1)
+		return layer7_idmap_addr_set_ipv6(out, (const uint8_t *)&a6);
+	return -1;
+}
+
+int
+layer7_idmap_lookup_ip_ex(struct l7_id_map *m, const struct l7_id_addr *ip,
+    char *out_user, size_t out_user_sz,
+    char groups[][L7_IDMAP_GROUP_MAX], unsigned max_groups,
+    unsigned *n_groups_out, enum l7_id_source *out_src)
+{
+	unsigned i, g;
 	int found = -1;
 	int n_hit = 0;
 	int multi = 0;
 
+	if (n_groups_out)
+		*n_groups_out = 0;
 	if (m == NULL || !m->initialized || ip == NULL)
 		return -1;
 	if (layer7_idmap_rdlock(m) != 0)
@@ -687,8 +715,26 @@ layer7_idmap_lookup_ip(struct l7_id_map *m, const struct l7_id_addr *ip,
 		    m->sessions[found].user);
 	if (out_src)
 		*out_src = m->sessions[found].source;
+	if (groups != NULL && max_groups > 0 && n_groups_out != NULL) {
+		unsigned n = m->sessions[found].n_groups;
+
+		if (n > max_groups)
+			n = max_groups;
+		for (g = 0; g < n; g++)
+			snprintf(groups[g], L7_IDMAP_GROUP_MAX, "%s",
+			    m->sessions[found].groups[g]);
+		*n_groups_out = n;
+	}
 	(void)layer7_idmap_unlock(m);
 	return 0;
+}
+
+int
+layer7_idmap_lookup_ip(struct l7_id_map *m, const struct l7_id_addr *ip,
+    char *out_user, size_t out_user_sz, enum l7_id_source *out_src)
+{
+	return layer7_idmap_lookup_ip_ex(m, ip, out_user, out_user_sz,
+	    NULL, 0, NULL, out_src);
 }
 
 int

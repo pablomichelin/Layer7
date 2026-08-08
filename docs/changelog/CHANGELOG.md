@@ -6,7 +6,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- (vazio — próximo: 20.24 match/enforce ad_* via mapa Identity)
+- (vazio — próximo: 20.25 precedência formal; 20.26 GI7)
+
+## [1.9.28] — 2026-08-08
+
+### Added
+
+- **Identity 20.24 / IM6:** match de `ad_users`/`ad_groups` no motor de
+  decisão via mapa daemon (`lookup_ip_ex`); Identity OFF / multi_user /
+  user ausente → não-match `ad_*` (políticas IP/MAC intactas).
+  `layer7_policies_set_identity_map` no hot path.
+
+### Notes
+
+- Canal `latest`: **`1.9.28`**. Produção enforce **`1.9.8`**.
+- SHA256: `PLACEHOLDER`. Rollback lab: `1.9.27`.
 
 ## [1.9.27] — 2026-08-08
 

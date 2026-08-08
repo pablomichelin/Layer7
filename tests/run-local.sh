@@ -127,7 +127,8 @@ step "Unit: config_parse (sni_inspection / A3)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_config_parse \
     tests/functional/test_config_parse.c src/layer7d/config_parse.c \
-    src/layer7d/policy.c src/layer7d/enforce.c 2>/tmp/test_config_parse.cc.err; then
+    src/layer7d/policy.c src/layer7d/enforce.c src/layer7d/identity_map.c \
+    -lpthread 2>/tmp/test_config_parse.cc.err; then
 	if /tmp/test_config_parse; then
 		pass "test_config_parse"
 	else
@@ -217,7 +218,8 @@ step "Unit: policy_decide (Caminho B / E1)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_policy_decide \
     tests/functional/test_policy_decide.c \
-    src/layer7d/policy.c src/layer7d/enforce.c 2>/tmp/test_policy_decide.cc.err; then
+    src/layer7d/policy.c src/layer7d/enforce.c src/layer7d/identity_map.c \
+    -lpthread 2>/tmp/test_policy_decide.cc.err; then
 	if /tmp/test_policy_decide; then
 		pass "test_policy_decide"
 	else

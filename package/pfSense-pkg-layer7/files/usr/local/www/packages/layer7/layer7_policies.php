@@ -1901,7 +1901,7 @@ function layer7_policy_match_summary($policy) {
 					<label class="col-sm-3 control-label"><?= l7_t("Utilizadores AD"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="edit_ad_users" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_ad_users_val); ?></textarea>
-						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity no passo 20.24."); ?></p>
+						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity (activo)."); ?></p>
 					</div>
 				</div>
 				<div class="form-group">
@@ -2196,7 +2196,7 @@ function layer7_policy_match_summary($policy) {
 					<label class="col-sm-3 control-label"><?= l7_t("Utilizadores AD"); ?></label>
 					<div class="col-sm-9">
 						<textarea name="new_ad_users" class="form-control" rows="3" style="max-width:400px" placeholder="joao.silva&#10;DOMAIN\maria"></textarea>
-						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity no passo 20.24."); ?></p>
+						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity (activo)."); ?></p>
 					</div>
 				</div>
 				<div class="form-group">

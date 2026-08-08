@@ -163,9 +163,13 @@ struct layer7_decision {
 	int policy_table_idx; /* indice em rules ordenadas (layer7_pdst_N) */
 	int scope_global;     /* 1 = politica global explicita (E4) */
 	int quarantine_origin; /* 1 = app-only pode quarentenar origem (psrc) */
-	int source_scoped;    /* 1 = regra tem src_hosts/src_cidrs efectivos */
+	int source_scoped;    /* 1 = regra tem src_hosts/src_cidrs/ad_* efectivos */
 	char enforce_dst_ip[48]; /* IP destino a impor; caller preenche em DNS */
 };
+
+/* IM6 / 20.24: mapa Identity para match ad_users/ad_groups (NULL = OFF). */
+struct l7_id_map;
+void layer7_policies_set_identity_map(struct l7_id_map *m);
 
 int layer7_policies_parse(const char *json, size_t len,
     struct layer7_policy_rule *out, int *n_out, int max_out);

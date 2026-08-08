@@ -4,15 +4,18 @@
  * Compila standalone:
  *   cc -Wall -Wextra -O2 -I src/layer7d -o /tmp/test_policy_decide \
  *      tests/functional/test_policy_decide.c \
- *      src/layer7d/policy.c src/layer7d/enforce.c
+ *      src/layer7d/policy.c src/layer7d/enforce.c src/layer7d/identity_map.c \
+ *      -lpthread
  */
 #include "policy.h"
 #include "enforce.h"
+#include "identity_map.h"
 
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <time.h>
 
 static int g_fail;
 
@@ -696,6 +699,156 @@ test_ipv6_exception_cidr(void)
 	check(dec.reason == L7_DECIDE_EXCEPTION, "v6 exception reason");
 }
 
+static void
+test_ad_user_match_via_idmap(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	struct l7_id_map map;
+	struct l7_id_addr ip;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"p-ad-user\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":50,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"ad_users\":[\"joao.silva\"]}}]}}";
+	int n = 0;
+
+	memset(&map, 0, sizeof(map));
+	check(layer7_idmap_init(&map) == 0, "ad_user idmap init");
+	check(layer7_idmap_addr_set_ipv4(&ip, 0x0a00000a) == 0,
+	    "ad_user addr 10.0.0.10");
+	check(layer7_idmap_upsert(&map, "CORP\\Joao.Silva", &ip,
+	    L7_ID_SRC_DC_AGENT, NULL, 0, time(NULL)) == 0,
+	    "ad_user upsert");
+	layer7_policies_set_identity_map(&map);
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "ad_user parse");
+	layer7_policies_sort(rules, n);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.10", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "ad_user decide mapped");
+	check(dec.action == LAYER7_ACTION_BLOCK, "ad_user block mapped");
+	check(dec.source_scoped == 1, "ad_user source_scoped");
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.99", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "ad_user decide other");
+	check(dec.action == LAYER7_ACTION_ALLOW, "ad_user other default allow");
+
+	layer7_policies_set_identity_map(NULL);
+	layer7_idmap_fini(&map);
+}
+
+static void
+test_ad_group_match_via_idmap(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	struct l7_id_map map;
+	struct l7_id_addr ip;
+	const char *grps[] = { "TI", "VPN" };
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"p-ad-grp\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":50,"
+	    "\"match\":{\"hosts\":[\"facebook.com\"],"
+	    "\"ad_groups\":[\"ti\"]}}]}}";
+	int n = 0;
+
+	memset(&map, 0, sizeof(map));
+	check(layer7_idmap_init(&map) == 0, "ad_group idmap init");
+	check(layer7_idmap_addr_set_ipv4(&ip, 0x0a000014) == 0,
+	    "ad_group addr 10.0.0.20");
+	check(layer7_idmap_upsert(&map, "maria", &ip, L7_ID_SRC_RADIUS,
+	    grps, 2, time(NULL)) == 0, "ad_group upsert");
+	layer7_policies_set_identity_map(&map);
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "ad_group parse");
+	layer7_policies_sort(rules, n);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.20", "www.facebook.com", NULL, NULL, &dec) == 0,
+	    "ad_group decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "ad_group block");
+
+	layer7_policies_set_identity_map(NULL);
+	layer7_idmap_fini(&map);
+}
+
+static void
+test_ad_multi_user_no_match(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	struct l7_id_map map;
+	struct l7_id_addr ip;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"p-ad-mu\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":50,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"ad_users\":[\"alice\",\"bob\"]}}]}}";
+	int n = 0;
+	time_t now = time(NULL);
+
+	memset(&map, 0, sizeof(map));
+	check(layer7_idmap_init(&map) == 0, "ad_mu idmap init");
+	check(layer7_idmap_addr_set_ipv4(&ip, 0x0a00001e) == 0,
+	    "ad_mu addr");
+	/* Conflito na janela → multi_user */
+	check(layer7_idmap_upsert(&map, "alice", &ip, L7_ID_SRC_DC_AGENT,
+	    NULL, 0, now) == 0, "ad_mu upsert alice");
+	check(layer7_idmap_upsert(&map, "bob", &ip, L7_ID_SRC_DC_AGENT,
+	    NULL, 0, now) == 0, "ad_mu upsert bob");
+	layer7_policies_set_identity_map(&map);
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "ad_mu parse");
+	layer7_policies_sort(rules, n);
+
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.30", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "ad_mu decide");
+	check(dec.action == LAYER7_ACTION_ALLOW,
+	    "ad_mu multi_user → no ad match");
+
+	layer7_policies_set_identity_map(NULL);
+	layer7_idmap_fini(&map);
+}
+
+static void
+test_ad_off_no_match(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"p-ad-off\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":50,"
+	    "\"match\":{\"hosts\":[\"youtube.com\"],"
+	    "\"ad_users\":[\"joao\"]}}]}}";
+	int n = 0;
+
+	layer7_policies_set_identity_map(NULL);
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "ad_off parse");
+	layer7_policies_sort(rules, n);
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, n, 1, NULL,
+	    "10.0.0.10", "www.youtube.com", NULL, NULL, &dec) == 0,
+	    "ad_off decide");
+	check(dec.action == LAYER7_ACTION_ALLOW,
+	    "ad_off without map → no match");
+}
+
 int
 main(void)
 {
@@ -721,6 +874,10 @@ main(void)
 	test_ipv6_src_cidr_match();
 	test_ipv6_src_exclude_and_host_equal();
 	test_ipv6_exception_cidr();
+	test_ad_user_match_via_idmap();
+	test_ad_group_match_via_idmap();
+	test_ad_multi_user_no_match();
+	test_ad_off_no_match();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");
