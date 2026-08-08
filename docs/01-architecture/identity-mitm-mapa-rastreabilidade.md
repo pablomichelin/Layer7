@@ -65,7 +65,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-20 | Precedence (§3.1 → core) | IM6 | **Feito** (20.25) | DOC | `core/precedence.md` |
 | M-21 | Endpoint agent | IM7 | **ADIAR** (`ADR-0029`) | DOC | espec 20.27 + ADR-0029 |
 | M-22 | TS/VDI agent | IM8 | **EXCLUÍDO** (`ADR-0029`) | DOC | `desenho-ts-vdi-20.29-excluido.md` |
-| M-23 | Evidências + MANUAL | IM9 | **20.31 PASS** (evid.); MANUAL → 20.32 | DOC/TST | `20260808T135500Z-im9-20.31-identity-mesh` |
+| M-23 | Evidências + MANUAL | IM9 | **20.31–20.32 PASS**; 20.33 GO | DOC/TST | notes `docs/commercial/LAYER7-IDENTITY-ADDON-NOTES-PT.md` |
 | M-24 | Modelo concorrência/IO daemon (threads + rwlock) | IM3 (20.11a/20.12) | **PASS** rwlock no mapa; threads = 20.15+ | DMN | ADR-0028; `pthread_rwlock` em `identity_map` |
 | M-25 | Baseline de perf registada | IM3 (20.11a) | **PASS** (`2026-08-06`) | TST | Evidência `20260806T174000Z-20.11a-baseline-perf`; pin doc `1.9.8` |
 

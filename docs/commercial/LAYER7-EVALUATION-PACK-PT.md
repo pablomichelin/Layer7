@@ -14,7 +14,12 @@ O **Layer7** é um add-on comercial de controlo de aplicações para **pfSense C
 Identifica tráfego de rede pela aplicação real (YouTube, BitTorrent, TikTok, VPN,
 etc.) através de Deep Packet Inspection (nDPI) e permite **monitorizar**, **permitir**
 ou **bloquear** com políticas por interface, sub-rede, grupo de dispositivos e
-horário — integrado na GUI do pfSense, **sem MITM**.
+horário — integrado na GUI do pfSense, **sem MITM** no produto base.
+
+**Add-on Identity (SKU Y, opt-in):** User-ID de rede (RADIUS / agente DC / LDAP)
+e políticas por utilizador ou grupo AD. Exactidão de rede — **não** agente em
+cada PC nesta fase. Ver
+[`LAYER7-IDENTITY-ADDON-NOTES-PT.md`](LAYER7-IDENTITY-ADDON-NOTES-PT.md).
 
 | | |
 |--|--|

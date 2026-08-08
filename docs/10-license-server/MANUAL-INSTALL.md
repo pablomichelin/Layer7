@@ -892,6 +892,43 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ---
 
+---
+
+## Add-on Identity (operacional — SKU Y)
+
+> **Passo documental 20.32.** Detalhe de licenças:
+> [`MANUAL-USO-LICENCAS.md`](MANUAL-USO-LICENCAS.md) §14.
+> Notes comerciais: [`../commercial/LAYER7-IDENTITY-ADDON-NOTES-PT.md`](../commercial/LAYER7-IDENTITY-ADDON-NOTES-PT.md).
+
+### Defaults e não-regressão
+
+1. O pacote **`1.9.29`** (lab/`latest`) inclui código Identity; **default OFF**.
+2. Upgrade a partir de **`1.9.8`** **não** activa Identity nem MITM.
+3. Sem token `identity` no `.lic` (T1: `full` → `base`): módulo inerte; GUI em upsell.
+4. MITM: UI pode existir; **runtime DEFER** (20.7a) — não configurar intercept.
+
+### Activar (lab / cliente Y)
+
+1. Emitir `features=base,identity` e activar licença.
+2. GUI **Services > Layer 7 > Identity** → Activar Identity.
+3. Fontes (opt-in, uma ou mais): LDAP/LDAPS · RADIUS accounting · agente DC
+   (`docs/samples/identity-dc-agent/`).
+4. Políticas: `match.ad_users` / `match.ad_groups` (entitlement + Identity ON).
+5. Limites honestos (ADR-0029): User-ID de **rede**; sem agente por PC; TS/VDI
+   multi-user no mesmo IP → `multi_user` / não-match `ad_*`.
+
+### Desligar / rollback
+
+- Toggle Identity OFF, ou reemitir `.lic` sem `identity`, ou check-in a retirar
+  o token.
+- Rollback de pacote lab: ver **Links da versao actual** (ex.: `1.9.28`).
+
+### Dependência
+
+`openldap26-client` (`LIB_DEPENDS`) — necessário para LDAP no daemon.
+
+---
+
 ## Links da versao actual (para teste)
 
 > **Nota de manutencao (obrigatoria em cada release publicada):** ao publicar

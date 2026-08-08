@@ -106,6 +106,7 @@
 11. [Referencia da API](#11-referencia-da-api)
 12. [Troubleshooting](#12-troubleshooting)
 13. [Seguranca](#13-seguranca)
+14. [Add-on Identity (SKU Y)](#14-add-on-identity-sku-y)
 
 ---
 
@@ -249,7 +250,11 @@ curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/customers \
 3. Preencher:
    - **Cliente** — seleccionar da lista (dropdown)
    - **Data de expiracao** — ex: `2027-12-31`
-   - **Features** — normalmente `full` (default)
+   - **Features / SKU** — usar presets (ADR-0025):
+     - `base` — Standard (X); default de emissao
+     - `base,identity` — Identity Add-on (Y); oferta âncora PME
+     - `base,mitm` / `base,identity,mitm` — token MITM (runtime **DEFER**; nao vender como entregue)
+     - Legado `full` no painel antigo → normaliza para **`base` apenas** (T1)
    - **Notas** — informacoes internas
 4. Clicar em **Criar Licenca**
 5. O sistema gera automaticamente uma **chave de 32 hex** — ex: `a1b2c3d4e5f6789012345678abcdef01`
@@ -258,9 +263,15 @@ curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/customers \
 ### Via API (curl)
 
 ```bash
+# Standard (X)
 curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses \
   -H "Content-Type: application/json" \
-  -d '{"customer_id":1,"expiry":"2027-12-31","features":"full","notes":"Firewall principal"}'
+  -d '{"customer_id":1,"expiry":"2027-12-31","features":"base","notes":"Firewall principal"}'
+
+# Identity Add-on (Y) — PME
+curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses \
+  -H "Content-Type: application/json" \
+  -d '{"customer_id":1,"expiry":"2027-12-31","features":"base,identity","notes":"Identity User-ID rede"}'
 ```
 
 Resposta:
@@ -821,6 +832,50 @@ grep license /var/log/layer7d.log  # qual o erro?
 
 ---
 
+## 14. Add-on Identity (SKU Y)
+
+**SSOT técnico:** ADR-0025 · ADR-0027 · ADR-0029 ·
+[`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md).
+
+### O que vende / o que não vende
+
+| Inclui (com `features` contendo `identity`) | Não inclui nesta fase |
+|---------------------------------------------|------------------------|
+| User-ID de **rede**: mapa user↔IP no daemon | Agente endpoint em cada PC (ADIAR — ADR-0029) |
+| LDAP/LDAPS (grupos) + Test ligação | Terminal Server / VDI multi-user no mesmo IP |
+| RADIUS accounting receiver e/ou agente DC | Captive portal |
+| Políticas `ad_users` / `ad_groups` | MITM / inspeção TLS (token `mitm` ≠ runtime; DEFER) |
+
+Exactidão = **rede** (RADIUS/DC/LDAP), não paridade GlobalProtect.
+
+### Emissão
+
+1. Emitir `features=base,identity` (preset Y no painel).
+2. Activar no appliance (online ou offline) como qualquer `.lic`.
+3. Na GUI **Services > Layer 7 > Identity**: entitlement presente + toggle
+   **Activar Identity** (default **OFF**). Upgrade de pacote **não** liga o módulo.
+4. Configurar fontes (LDAP e/ou RADIUS e/ou agente DC) e políticas `ad_*`.
+
+### Retirada comercial
+
+- Check-in pode **retirar** `identity` (interseção `.lic` ∩ check-in; ADR-0025).
+- Reemissão sem token `identity` é o caminho permanente.
+- Sem entitlement: mapa inerte, sem listeners Identity, `ad_*` não casam.
+
+### Troubleshooting rápido
+
+| Sintoma | Verificar |
+|---------|-----------|
+| Página Identity em upsell | `.lic` sem `identity` (T1: `full` ≠ Identity) |
+| Fontes ON mas mapa vazio | entitlement + Identity enabled + ACL/secret/token |
+| Política `ad_*` não aplica | user no mapa? `multi_user`? Identity OFF? |
+| “Preciso de agente no PC” | ADR-0029 — fora do SKU Y actual; reopen com GO |
+
+Instalação de pacote / caminhos: [`MANUAL-INSTALL.md`](MANUAL-INSTALL.md)
+(secção *Add-on Identity*).
+
+---
+
 ## Exemplo completo: novo cliente do zero
 
 ```bash
@@ -839,21 +894,22 @@ curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/customers \
   -d '{"name":"Escola Municipal XYZ","email":"ti@escolaxyz.com.br","phone":"21988887777"}'
 # Resposta: {"id":2, ...}
 
-# 3. Criar licenca (1 ano)
+# 3. Criar licenca Standard (X) — 1 ano
 curl -s -b "$COOKIE_JAR" https://license.systemup.inf.br/api/licenses \
   -H "Content-Type: application/json" \
-  -d '{"customer_id":2,"expiry":"2027-03-24","features":"full","notes":"Contrato anual"}'
-# Resposta: {"license_key":"abcdef1234567890abcdef1234567890", ...}
+  -d '{"customer_id":2,"expiry":"2027-03-24","features":"base","notes":"Contrato anual base"}'
+# Para Identity (Y): "features":"base,identity"
 
-# 4. Enviar a chave ao cliente: abcdef1234567890abcdef1234567890
+# 4. Enviar a chave ao cliente
 
 # 5. No pfSense do cliente (via SSH):
-layer7d --activate abcdef1234567890abcdef1234567890 https://license.systemup.inf.br/api/activate
-# Saida: license valid — customer=Escola Municipal XYZ expiry=2027-03-24 features=full
+layer7d --activate <CHAVE> https://license.systemup.inf.br/api/activate
+# Saida tipica: license valid — … features=base  (ou base,identity)
 
 # 6. Verificar no dashboard do servidor — a activacao aparece na lista
 ```
 
 ---
 
-*Documento criado em 2026-03-24. Layer7 License Server v1.0 — Systemup Solucao em Tecnologia.*
+*Documento criado em 2026-03-24. Actualizado 2026-08-08 (20.32 SKU Identity).
+Layer7 License Server — Systemup Solucao em Tecnologia.*

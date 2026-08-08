@@ -15,7 +15,12 @@ identifies network traffic by real application (YouTube, BitTorrent, TikTok,
 VPN, etc.) using Deep Packet Inspection (nDPI), and lets administrators
 **monitor**, **allow**, or **block** traffic with policies by interface,
 subnet, device group, and schedule — integrated into the pfSense GUI, **without
-MITM**.
+MITM** on the base product.
+
+**Identity add-on (SKU Y, opt-in):** network User-ID (RADIUS / DC agent / LDAP)
+and policies by AD user or group. Network accuracy — **not** a per-PC agent in
+this phase. See
+[`LAYER7-IDENTITY-ADDON-NOTES-EN.md`](LAYER7-IDENTITY-ADDON-NOTES-EN.md).
 
 | | |
 |--|--|
