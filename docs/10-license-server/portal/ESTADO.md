@@ -22,4 +22,6 @@
 
 ## Próximo
 
-Sem bloco obrigatório na trilha portal. Novas ideias → `IDEIAS.md` + GO.
+**PORTAL-PLAN-002** activo — ficha cliente 360°.  
+Próximo bloco: **C0 → 1.1.0** (navegação descoberta; requer GO).
+Sem bloco obrigatório residual do plano `1.0.0`.

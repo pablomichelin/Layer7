@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — Abrir PORTAL-PLAN-002 (ficha cliente 360)
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | docs / governação |
+| Versão | `1.0.0` (sem bump — só plano) |
+| Objectivo | Registar IDEA-015/016 + plano ordenado C0→C1→C2 |
+| Impacto | Docs portal; nenhum código runtime |
+| Risco | Baixo |
+| Teste | Leitura cruzada plano/IDEIAS/planos README |
+| Rollback | Reverter commits docs |
+| Resultado | **FEITO** — plano ACTIVO; C0 aguarda GO |
+
+---
+
 ## 2026-08-08 — P1e Fecho `1.0.0`
 
 | Campo | Valor |

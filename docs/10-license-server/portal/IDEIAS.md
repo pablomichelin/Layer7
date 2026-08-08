@@ -26,6 +26,15 @@ Registar aqui **antes** de implementar. Ligar a plano/versão quando existir.
 
 ---
 
+## Aceites pós-`1.0.0` (plano `PORTAL-PLAN-002`)
+
+| ID | Ideia | Origem | Ligação |
+|----|-------|--------|---------|
+| IDEA-015 | Navegação Cliente↔Licença (clique linha, links cruzados) | Chat `2026-08-08` | Plano ficha 360 — **C0** |
+| IDEA-016 | Ficha cliente 360: licenças ricas + nova licença no contexto | Chat `2026-08-08` | Plano ficha 360 — **C1** |
+
+---
+
 ## Futuras (escala / vendas — **não** no plano actual)
 
 | ID | Ideia | Nota |
