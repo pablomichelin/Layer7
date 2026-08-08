@@ -35,6 +35,7 @@ resultado final disponível. Estados `NDPI_STATE_PARTIAL` não emitem decisão.
 | `policy_match` | Primeira ação aplicada a um fluxo (enforce) |
 | `enforce_block` | Bloqueio efetivo (PF) |
 | `enforce_tag` | Entrada em table |
+| `enforce_block outcome=sinkhole` | Domínio bloqueado entregue ao portal DNS local; auditoria da decisão sem tentar bloquear o IP do firewall |
 
 ### 3. Diagnóstico (opcional V1, `log_level=debug`)
 
@@ -55,6 +56,11 @@ resultado final disponível. Estados `NDPI_STATE_PARTIAL` não emitem decisão.
 `flow_decide`/blacklist representa a decisão e alimenta o KPI de bloqueio.
 `enforce_block` representa a aplicação no PF com acção interna `enforced`, de
 modo a não contar a mesma decisão duas vezes.
+
+Fluxos posteriores cujo destino seja uma interface local do firewall
+(sinkhole/portal) não entram novamente no motor de política: são tráfego de
+entrega local, não uma nova decisão Layer7. Isso preserva a auditoria DNS e
+evita classificações falsas de protocolo e ruído repetitivo.
 
 ## Compatibilidade com PoC
 

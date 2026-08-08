@@ -39,6 +39,11 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `SHA256=40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`; grupo Acesso remoto individual;
 comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
+**Candidato local em validação:** `1.9.31` / BG-105 — evita que o tráfego
+seguinte ao DNS sinkhole para o IP local do firewall seja reclassificado e
+gere log storm; a decisão DNS permanece auditada como `outcome=sinkhole`.
+Suite local e verificação do port PASS; build FreeBSD e gate controlado no
+appliance ainda pendentes. Não instalado em produção.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4 PASS `2026-08-05`;
 ainda nao promovida — aguarda GO). Rollback enforce: **`1.9.0`**.
 Rollback lab a partir de `1.9.30`: **`1.9.29`**. Historico: `_69`, `_24`.

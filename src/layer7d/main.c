@@ -1505,10 +1505,24 @@ layer7_apply_block_enforcement(const struct layer7_decision *dec,
 		return;
 
 	if (ip_is_local_iface_addr(ip)) {
-		L7_NOTE("enforce_block: skip IP local do firewall "
-		    "(sinkhole/portal) ip=%s policy=%s reason=%s", ip,
-		    dec->matched_policy_id[0] ? dec->matched_policy_id : "-",
-		    reason ? reason : "-");
+		/*
+		 * DNS sinkhole entrega o IP do portal/firewall ao cliente. Registe
+		 * a decisao DNS uma vez como auditoria; os fluxos seguintes para o
+		 * portal sao esperados e nao podem poluir o log operacional.
+		 */
+		if (reason && strcmp(reason, "dns_block") == 0) {
+			L7_AUDIT_NOTE(NULL,
+			    "enforce_block: outcome=sinkhole kind=%s table=%s "
+			    "src=%s dst=%s ip=%s policy=%s reason=dns_sinkhole",
+			    layer7_enforce_kind_str(dec->enforce_kind), tbl,
+			    src_ip ? src_ip : "-", dst_ip ? dst_ip : "-", ip,
+			    dec->matched_policy_id[0] ? dec->matched_policy_id : "-");
+		} else {
+			L7_DBG("enforce_block: skip local sinkhole/portal ip=%s "
+			    "policy=%s reason=%s", ip,
+			    dec->matched_policy_id[0] ? dec->matched_policy_id : "-",
+			    reason ? reason : "-");
+		}
 		return;
 	}
 
@@ -1973,6 +1987,19 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 
 	if (!s_have_parse || !src_ip || cfg_disabled(&s_parsed))
 		return;
+	/*
+	 * Nomes bloqueados por DNS sinkhole resolvem para o proprio firewall.
+	 * Esse trafego e destinado ao portal/GUI local, nunca deve voltar ao
+	 * motor de policy nem produzir uma classificacao enganosa (por exemplo,
+	 * host DoH + app SSH). A decisao DNS ja foi auditada no callback DNS.
+	 */
+	if (dst_ip && ip_is_local_iface_addr(dst_ip)) {
+		L7_DBG("flow_skip: local sinkhole/portal iface=%s src=%s dst=%s "
+		    "host=%s app=%s",
+		    iface ? iface : "-", src_ip, dst_ip,
+		    host ? host : "-", ndpi_app ? ndpi_app : "-");
+		return;
+	}
 	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, s_ge, iface, src_ip,
 	    ndpi_app, ndpi_cat, host, &dec);
 

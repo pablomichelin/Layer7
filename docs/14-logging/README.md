@@ -32,6 +32,11 @@ depende de `newsyslog`.
 - stats JSON são actualizadas a cada minuto, mas o resumo operacional normal
   aparece no máximo uma vez por hora;
 - falhas esperadas ao limpar tabelas PF opcionais são agregadas em `debug`.
+- quando um domínio é entregue pelo DNS sinkhole ao portal local, a decisão
+  DNS fica auditável como `enforce_block outcome=sinkhole`; os fluxos
+  seguintes para o IP local do firewall não voltam ao motor de política e só
+  aparecem em `debug`. Isto evita falso `flow_decide` (por exemplo, host DoH
+  com app SSH) e tempestade de logs.
 
 Ao activar o detalhe, `reports.event_interfaces` limita as interfaces
 guardadas; lista vazia significa todas. O detalhe pode crescer rapidamente e

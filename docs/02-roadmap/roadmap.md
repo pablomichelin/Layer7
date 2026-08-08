@@ -587,6 +587,12 @@ blacklists, sem misturar ainda reorganizacao estrutural.
   usa `ndpi_detection_giveup()` antes da decisão. Suite C/PHP/shell, build
   nDPI e pacote extraído passam no FreeBSD 15
   (`SHA256 dc5118dd…453e33`); appliance pendente.
+- **Sinkhole DNS/local portal (`2026-08-08`, candidato `1.9.31`):** BG-105
+  separa a decisão DNS de bloqueio do tráfego posterior para o IP local do
+  firewall. O primeiro permanece no audit log como `outcome=sinkhole`; os
+  fluxos locais seguintes são ignorados antes da decisão de políticas e só
+  têm diagnóstico debug. A regressão está integrada no gate local; build
+  FreeBSD e validação controlada no appliance permanecem pendentes.
 - **Seguinte:** evidencia em appliance/lab (BG-009: secção **10a**;
   BG-010: secção **10b** e testes **12.1–12.2** em
   [`validacao-lab.md`](../04-package/validacao-lab.md) /

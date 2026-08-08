@@ -259,6 +259,13 @@ else
 	fail "test_rc_pidfile"
 fi
 
+step "Unit: sinkhole local nao reclassifica portal"
+if sh tests/unit/test_sinkhole_local_guard.sh; then
+	pass "test_sinkhole_local_guard"
+else
+	fail "test_sinkhole_local_guard"
+fi
+
 step "Unit: flush PF coverage (lifecycle)"
 if sh tests/unit/test_flush_coverage.sh; then
 	pass "test_flush_coverage"

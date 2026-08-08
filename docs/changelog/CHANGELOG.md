@@ -4,9 +4,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Added
+### Fixed
 
-- (vazio)
+- **BG-105 — sinkhole DNS/local portal:** a decisão DNS bloqueada para o IP
+  local do firewall continua auditável como `outcome=sinkhole`, mas o fluxo
+  subsequente ao portal não volta a ser classificado nem avaliado por
+  políticas. Isso elimina o ciclo de eventos enganosos e o log storm
+  `enforce_block: skip IP local do firewall` observado no appliance.
+- Regressão dedicada em `tests/unit/test_sinkhole_local_guard.sh`, integrada
+  em `tests/run-local.sh`: confirma a guarda antes de `layer7_flow_decide()`,
+  auditoria do DNS e diagnóstico de repetição apenas em nível debug.
+
+### Notes
+
+- Candidato local: `1.9.31`. Suite local e validação de arquivos do port
+  passaram; build FreeBSD e gate controlado no appliance ainda são pendentes.
 
 ## [1.9.30] — 2026-08-08
 
