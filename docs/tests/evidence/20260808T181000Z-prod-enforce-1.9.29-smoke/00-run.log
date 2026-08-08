@@ -1,0 +1,12 @@
+=== prod enforce smoke 2026-08-08 ===
+PASS: pkg/daemon 1.9.29
+PASS: license valid Systemup
+PASS: enabled=1 mode=enforce legacy_global ifaces=vmx0,vmx0.95
+PASS: daemon running; capture vmx0+vmx0.95
+PASS: blockpage 8099; Identity ports closed; ADR-0029
+PASS: A/B example=200 google=200 youtube=200
+PASS: A/B bet365/pornhub/xvideos/dns.google -> sinkhole 254
+PASS: A/B google/cloudflare DNS publico
+PASS: A/B blockpage "Acesso bloqueado" Layer7
+PASS: PF allow_dst=60 block_dst=3
+=== VEREDICTO: PASS ===
