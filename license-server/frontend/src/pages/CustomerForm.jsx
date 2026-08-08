@@ -7,7 +7,14 @@ export default function CustomerForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
-  const [form, setForm] = useState({ name: '', email: '', phone: '', notes: '' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    cnpj: '',
+    tags: '',
+    notes: '',
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,7 +23,14 @@ export default function CustomerForm() {
       get(`/customers/${id}`)
         .then((d) => {
           const c = d.customer;
-          setForm({ name: c.name, email: c.email || '', phone: c.phone || '', notes: c.notes || '' });
+          setForm({
+            name: c.name,
+            email: c.email || '',
+            phone: c.phone || '',
+            cnpj: c.cnpj || '',
+            tags: c.tags || '',
+            notes: c.notes || '',
+          });
         })
         .catch(console.error);
     }
@@ -67,6 +81,17 @@ export default function CustomerForm() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
             <input type="text" name="phone" value={form.phone} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
+            <input type="text" name="cnpj" value={form.cnpj} onChange={handleChange} placeholder="00.000.000/0000-00" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+            <input type="text" name="tags" value={form.tags} onChange={handleChange} placeholder="lab, produção, parceiro" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+            <p className="text-xs text-gray-500 mt-1">Separar por vírgulas.</p>
           </div>
 
           <div>

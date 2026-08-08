@@ -1,47 +1,40 @@
 # Estado Actual — Portal Admin
 
-> Snapshot: **2026-08-08** (versão visual **`0.1.0`**).
+> Snapshot: **2026-08-08** — versão visual **`0.2.0`**.
 
 ## Ambiente
 
 | Item | Valor |
 |------|-------|
-| Host | `192.168.100.244` (Ubuntu) |
-| Directório | `/opt/layer7-license` |
-| URL pública | `https://license.systemup.inf.br` |
-| Origin | porta host `8445` → nginx container |
-| Compose | `layer7-license-{web,api,db,nginx}` |
-| Rede Docker | `layer7-license-net` (isolada) |
-| Versão visual | **`0.1.0`** |
-| Backup pré-deploy | `/opt/layer7-license/backups/layer7-license-postgres-20260808T214134Z.sql` |
+| Host | `192.168.100.244` |
+| Dir | `/opt/layer7-license` |
+| URL | `https://license.systemup.inf.br` |
+| Versão visual | **`0.2.0`** |
+| Backup P1a | `backups/layer7-license-postgres-20260808T215305Z.sql` |
 
-## Imagens (pós-P0)
+## Deploy
 
-| Contentor | Created | Started |
-|-----------|---------|---------|
-| `layer7-license-web` | `2026-08-08T21:42:32Z` | `2026-08-08T21:42:42Z` |
-| `layer7-license-api` | `2026-08-08T21:42:32Z` | `2026-08-08T21:42:42Z` |
+| Contentor | Nota |
+|-----------|------|
+| web/api | Rebuild `2026-08-08T21:53Z` |
+| nginx | **Reiniciado** após recreate (DNS interno) — obrigatório no checklist |
+| SPA | `index-XzglZKGO.js` |
+| Health | OK |
 
-SPA asset público: `index-B540Roat.js` (substitui `index-DzAub8GA.js` de Abril).
+## Schema
 
-## Inventário live
+`customers.cnpj`, `customers.tags` presentes.
 
-| Métrica | Valor |
-|---------|-------|
-| Features | `base` (6 licenças; 0 `full`) |
-| active / revoked | 3 / 3 |
-
-## Capacidade (`0.1.0`)
+## Capacidade
 
 | Área | Estado |
 |------|--------|
-| Health API | OK |
-| Versão visual na UI | OK |
-| Dashboard a expirar 30d | OK |
-| Filtros lista + copiar chave | OK |
-| SKU presets | OK |
-| Auditoria / check-in / rebind UI | Pendente P1 |
+| P0 fundação | OK |
+| Renovação +30/90/365 | OK |
+| Download .lic pós-renovação | OK (oferta na UI) |
+| CNPJ / tags cliente | OK |
+| Auditoria / check-in / rebind UI | Pendente P1b+ |
 
-## Plano activo
+## Próximo
 
-P0 **FEITO**. Próximo: **P1a** (renovação rápida).
+**P1b** → `0.3.0` (auditoria + check-ins).

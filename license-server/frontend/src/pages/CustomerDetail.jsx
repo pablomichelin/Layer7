@@ -53,6 +53,8 @@ export default function CustomerDetail() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div><span className="text-gray-500">Email:</span> <span className="ml-2">{customer.email || '—'}</span></div>
           <div><span className="text-gray-500">Telefone:</span> <span className="ml-2">{customer.phone || '—'}</span></div>
+          <div><span className="text-gray-500">CNPJ:</span> <span className="ml-2">{customer.cnpj || '—'}</span></div>
+          <div><span className="text-gray-500">Tags:</span> <span className="ml-2">{customer.tags || '—'}</span></div>
           <div><span className="text-gray-500">Criado em:</span> <span className="ml-2">{new Date(customer.created_at).toLocaleDateString('pt-BR')}</span></div>
           {customer.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{customer.notes}</span></div>}
         </div>

@@ -194,8 +194,8 @@ Não misturar P1c com outras mutações perigosas no mesmo deploy.
 | Bloco | Estado | Versão | Data |
 |-------|--------|--------|------|
 | Baseline docs | **FEITO** | `0.0.1` | 2026-08-08 |
-| P0 | **FEITO** (código; deploy nesta data) | `0.1.0` | 2026-08-08 |
-| P1a | Pendente | → `0.2.0` | — |
+| P0 | **FEITO** | `0.1.0` | 2026-08-08 |
+| P1a | **FEITO** | `0.2.0` | 2026-08-08 |
 | P1b | Pendente | → `0.3.0` | — |
 | P1c | Pendente (GO) | → `0.4.0` | — |
 | P1d | Pendente | → `0.5.0` | — |

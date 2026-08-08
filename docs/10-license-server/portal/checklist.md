@@ -46,6 +46,7 @@ Ver lista em [`OBJECTIVOS.md`](OBJECTIVOS.md) — critérios de `1.0.0`.
 - [ ] Pull/sync código autorizado
 - [ ] `docker compose build` dos serviços afectados
 - [ ] `docker compose up -d` sem afectar outras stacks
+- [ ] **`docker compose restart nginx`** (evita 502 por DNS stale dos upstreams)
 - [ ] Health `https://license.systemup.inf.br/api/health`
 - [ ] Login admin + smoke: listar licenças / criar em lab se aplicável
 - [ ] Actualizar `ESTADO.md`

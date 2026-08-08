@@ -10,11 +10,19 @@ import {
   buildAdminLicenseEditRoute,
 } from '../panel-routes.js';
 
+const RENEW_OPTIONS = [
+  { days: 30, label: '+30 dias' },
+  { days: 90, label: '+90 dias' },
+  { days: 365, label: '+1 ano' },
+];
+
 export default function LicenseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [renewing, setRenewing] = useState(false);
+  const [renewBanner, setRenewBanner] = useState(null);
 
   function load() {
     setLoading(true);
@@ -27,6 +35,7 @@ export default function LicenseDetail() {
     if (!confirm('Tem certeza que deseja revogar esta licença?')) return;
     try {
       await post(`/licenses/${id}/revoke`, {});
+      setRenewBanner(null);
       load();
     } catch (err) {
       alert(err.message);
@@ -47,11 +56,30 @@ export default function LicenseDetail() {
     }
   }
 
+  async function handleRenew(days) {
+    if (!confirm(`Renovar esta licença em ${days} dias?`)) return;
+    setRenewing(true);
+    try {
+      const renewed = await post(`/licenses/${id}/renew`, { days });
+      setRenewBanner({
+        days,
+        expiry: renewed.expiry,
+        bound: Boolean(renewed.hardware_id),
+      });
+      load();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setRenewing(false);
+    }
+  }
+
   if (loading) return <p className="text-gray-500">Carregando...</p>;
   if (!data) return <p className="text-red-500">Licença não encontrada</p>;
 
   const { license, activations } = data;
   const bound = isLicenseBound(license);
+  const canRenew = license.status !== 'revoked';
 
   const actColumns = [
     { key: 'created_at', label: 'Data', render: (r) => new Date(r.created_at).toLocaleString('pt-BR') },
@@ -64,6 +92,27 @@ export default function LicenseDetail() {
   return (
     <div>
       <button onClick={() => navigate(ADMIN_LICENSES_ROUTE)} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
+
+      {renewBanner && (
+        <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-3 text-sm mb-4">
+          Licença renovada (+{renewBanner.days} dias). Nova expiração:{' '}
+          <strong>{new Date(renewBanner.expiry).toLocaleDateString('pt-BR')}</strong>.
+          {renewBanner.bound ? (
+            <>
+              {' '}Appliance bindado: faça{' '}
+              <button type="button" onClick={handleDownload} className="underline font-medium">
+                download do .lic
+              </button>{' '}
+              actualizado e reinstale no pfSense se necessário.
+            </>
+          ) : (
+            <> Ainda unbound — a chave continua a mesma para activação.</>
+          )}
+          <button type="button" onClick={() => setRenewBanner(null)} className="ml-3 text-green-700 underline">
+            Fechar
+          </button>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
@@ -94,10 +143,21 @@ export default function LicenseDetail() {
           {license.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{license.notes}</span></div>}
         </div>
 
-        <div className="flex gap-3 mt-6">
+        <div className="flex flex-wrap gap-3 mt-6">
           <button onClick={() => navigate(buildAdminLicenseEditRoute(id))} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
             Editar
           </button>
+          {canRenew && RENEW_OPTIONS.map((option) => (
+            <button
+              key={option.days}
+              type="button"
+              disabled={renewing}
+              onClick={() => handleRenew(option.days)}
+              className="px-4 py-2 border border-brand-600 text-brand-700 hover:bg-brand-50 text-sm rounded-lg transition-colors disabled:opacity-50"
+            >
+              Renovar {option.label}
+            </button>
+          ))}
           {license.status === 'active' && (
             <button onClick={handleRevoke} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Revogar

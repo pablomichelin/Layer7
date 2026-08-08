@@ -11,6 +11,21 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [0.2.0] — 2026-08-08
+
+### Added
+
+- Renovação rápida no detalhe (+30 / +90 / +365 dias) via `POST /licenses/:id/renew`
+- Banner pós-renovação com oferta de download `.lic` se a licença estiver bound
+- Campos opcionais de cliente: CNPJ e tags
+
+### Notes
+
+- Licenças revogadas não renovam (409); usar fluxo P1d no futuro
+- Base da renovação: `max(hoje, expiry actual)`
+
+---
+
 ## [0.1.0] — 2026-08-08
 
 ### Added

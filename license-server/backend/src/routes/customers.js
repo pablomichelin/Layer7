@@ -78,10 +78,17 @@ router.post('/', async (req, res) => {
 
     const customer = await runInTransaction(async (client) => {
       const result = await client.query(
-        `INSERT INTO customers (name, email, phone, notes)
-         VALUES ($1, $2, $3, $4)
+        `INSERT INTO customers (name, email, phone, notes, cnpj, tags)
+         VALUES ($1, $2, $3, $4, $5, $6)
          RETURNING *`,
-        [payload.name, payload.email ?? null, payload.phone ?? null, payload.notes ?? null]
+        [
+          payload.name,
+          payload.email ?? null,
+          payload.phone ?? null,
+          payload.notes ?? null,
+          payload.cnpj ?? null,
+          payload.tags ?? null,
+        ]
       );
 
       await auditAdminEvent({
@@ -206,6 +213,14 @@ router.put('/:id', async (req, res) => {
       if (Object.prototype.hasOwnProperty.call(payload, 'notes')) {
         params.push(payload.notes);
         updates.push(`notes = $${params.length}`);
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'cnpj')) {
+        params.push(payload.cnpj);
+        updates.push(`cnpj = $${params.length}`);
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'tags')) {
+        params.push(payload.tags);
+        updates.push(`tags = $${params.length}`);
       }
 
       updates.push('updated_at = NOW()');

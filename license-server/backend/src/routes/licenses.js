@@ -18,6 +18,11 @@ const {
   getDownloadHardwareId,
 } = require('../license-download-policy');
 const {
+  computeRenewedExpiry,
+  createLicenseRenewGuardError,
+  parseRenewPayload,
+} = require('../license-renew-policy');
+const {
   assertEmptyBody,
   normalizeStoredHardwareId,
   parseIdParam,
@@ -430,6 +435,97 @@ router.post('/:id/revoke', async (req, res) => {
       req,
       result: 'error',
       reason: 'license_revoke_exception',
+      metadata: { license_id: Number.parseInt(req.params.id, 10) || null },
+    });
+    return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
+  }
+});
+
+router.post('/:id/renew', async (req, res) => {
+  try {
+    const licenseId = parseIdParam(req.params.id, 'license_id');
+    const { days } = parseRenewPayload(req.body);
+
+    const renewed = await runInTransaction(async (client) => {
+      const existingResult = await client.query(
+        `SELECT *
+           FROM licenses
+          WHERE id = $1
+            AND archived_at IS NULL
+          FOR UPDATE`,
+        [licenseId]
+      );
+
+      if (existingResult.rows.length === 0) {
+        throw createHttpError(404, 'Licenca nao encontrada.');
+      }
+
+      const existingLicense = existingResult.rows[0];
+      const renewGuard = createLicenseRenewGuardError(existingLicense);
+      if (renewGuard) {
+        throw renewGuard;
+      }
+
+      const previousExpiry = existingLicense.expiry;
+      const nextExpiry = computeRenewedExpiry(previousExpiry, days);
+
+      const result = await client.query(
+        `UPDATE licenses
+            SET expiry = $1,
+                status = CASE WHEN status = 'expired' THEN 'active' ELSE status END,
+                updated_at = NOW()
+          WHERE id = $2
+          RETURNING *`,
+        [nextExpiry, licenseId]
+      );
+
+      await auditAdminEvent({
+        component: 'licenses',
+        eventType: 'license_renewed',
+        adminId: req.admin.id,
+        actorIdentifier: req.admin.email,
+        req,
+        result: 'success',
+        reason: 'license_renewed',
+        metadata: {
+          license_id: licenseId,
+          days,
+          previous_expiry: previousExpiry,
+          new_expiry: nextExpiry,
+          bound: Boolean(existingLicense.hardware_id),
+        },
+        client,
+        strict: true,
+      });
+
+      return result.rows[0];
+    });
+
+    return res.json(applyEffectiveLicenseState(renewed));
+  } catch (error) {
+    if (isHttpError(error)) {
+      await auditAdminEvent({
+        component: 'licenses',
+        eventType: 'license_renew_denied',
+        adminId: req.admin?.id || null,
+        actorIdentifier: req.admin?.email || null,
+        req,
+        result: 'denied',
+        reason: error.status === 404 ? 'license_not_found' : 'license_renew_rejected',
+        metadata: { license_id: Number.parseInt(req.params.id, 10) || null, status: error.status, error: error.message },
+      });
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[LICENSES] Renew error:', error.message);
+    await auditAdminEvent({
+      component: 'licenses',
+      eventType: 'license_renew_error',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'error',
+      reason: 'license_renew_exception',
       metadata: { license_id: Number.parseInt(req.params.id, 10) || null },
     });
     return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });

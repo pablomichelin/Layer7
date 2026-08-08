@@ -4,27 +4,23 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `0.1.0` |
-| **Codinome** | Fundação P0 |
-| **Estado** | Entregue (P0 do plano de melhoria) |
+| **Versão** | `0.2.0` |
+| **Codinome** | Renovação P1a |
+| **Estado** | Entregue |
 | **Data** | `2026-08-08` |
-| **Código (repo)** | `license-server/` |
+| **Código** | `license-server/` |
 | **Deploy live** | `192.168.100.244:/opt/layer7-license` |
 
-## O que inclui `0.1.0`
+## Inclui
 
-- SPA alinhada ao backend (fim do drift Abril/Agosto na UI)
-- Versão visual na sidebar
-- Pós-criação com chave completa + copiar
-- Lista: chave completa, Bound/Unbound, SKU, filtros (status, cliente, bound, a expirar)
-- Pesquisa por hardware_id
-- Dashboard: a expirar 30d + atalhos
-- Inventário live `full` → `base` (T1)
+- `POST /api/licenses/:id/renew` (`days` 30/90/365)
+- Botões de renovação no detalhe + oferta de download `.lic` se bound
+- Cliente: campos opcionais `cnpj` e `tags`
 
 ## Próxima
 
-| Versão alvo | Conteúdo |
-|-------------|----------|
-| `0.2.0` | P1a — renovação rápida + ficha cliente leve |
+| Versão | Conteúdo |
+|--------|----------|
+| `0.3.0` | P1b — auditoria UI + check-ins |
 
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

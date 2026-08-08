@@ -29,6 +29,12 @@ async function ensureCrudIntegritySchema() {
   `);
 
   await pool.query(`
+    ALTER TABLE customers
+      ADD COLUMN IF NOT EXISTS cnpj VARCHAR(32),
+      ADD COLUMN IF NOT EXISTS tags VARCHAR(255)
+  `);
+
+  await pool.query(`
     ALTER TABLE licenses
       ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ,
       ADD COLUMN IF NOT EXISTS archived_by_admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL

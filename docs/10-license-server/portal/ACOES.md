@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — P1a Renovação `0.2.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `0.2.0` |
+| Objectivo | Renovação rápida + ficha cliente (CNPJ/tags) |
+| Impacto | API renew; UI detalhe; schema customers.cnpj/tags |
+| Risco | Baixo; `.lic` antigo pode coexistir até reemissão/download |
+| Teste | `license-renew-policy` + crud-validation; health pós-deploy |
+| Rollback | imagens anteriores; colunas novas são aditivas |
+| Resultado | **FEITO** — health OK após restart nginx; SPA `index-XzglZKGO.js`; colunas cnpj/tags OK |
+
+---
+
 ## 2026-08-08 — P0 Fundação `0.1.0`
 
 | Campo | Valor |

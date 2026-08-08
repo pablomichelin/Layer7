@@ -349,21 +349,57 @@ function parseLicensesListQuery(query) {
   };
 }
 
+function normalizeCnpj(value) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = normalizeOptionalText(value, 'CNPJ', 32);
+  if (normalized === null) {
+    return null;
+  }
+
+  if (!/^[0-9.\-\/\s]{11,32}$/.test(normalized)) {
+    throw createHttpError(400, 'CNPJ invalido.');
+  }
+
+  return normalized;
+}
+
+function normalizeTags(value) {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = normalizeOptionalText(value, 'Tags', 255);
+  if (normalized === null) {
+    return null;
+  }
+
+  return normalized
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+    .join(', ');
+}
+
 function parseCustomerCreatePayload(body) {
   const payload = ensureObject(body);
-  rejectUnexpectedFields(payload, ['name', 'email', 'phone', 'notes']);
+  rejectUnexpectedFields(payload, ['name', 'email', 'phone', 'notes', 'cnpj', 'tags']);
 
   return {
     name: normalizeRequiredText(payload.name, 'Nome', 255),
     email: normalizeEmail(payload.email),
     phone: normalizePhone(payload.phone),
     notes: normalizeOptionalText(payload.notes, 'Notas', 2000),
+    cnpj: normalizeCnpj(payload.cnpj),
+    tags: normalizeTags(payload.tags),
   };
 }
 
 function parseCustomerUpdatePayload(body) {
   const payload = ensureObject(body);
-  rejectUnexpectedFields(payload, ['name', 'email', 'phone', 'notes']);
+  rejectUnexpectedFields(payload, ['name', 'email', 'phone', 'notes', 'cnpj', 'tags']);
   assertNonEmptyPayload(payload);
 
   const normalized = {};
@@ -379,6 +415,12 @@ function parseCustomerUpdatePayload(body) {
   }
   if (Object.prototype.hasOwnProperty.call(payload, 'notes')) {
     normalized.notes = normalizeOptionalText(payload.notes, 'Notas', 2000);
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, 'cnpj')) {
+    normalized.cnpj = normalizeCnpj(payload.cnpj);
+  }
+  if (Object.prototype.hasOwnProperty.call(payload, 'tags')) {
+    normalized.tags = normalizeTags(payload.tags);
   }
 
   return normalized;
@@ -497,6 +539,7 @@ module.exports = {
   assertEmptyBody,
   FEATURES_MAX_BYTES,
   isLicenseExpired,
+  normalizeExpiryDate,
   normalizeFeatures,
   normalizeStoredHardwareId,
   parseActivatePayload,
