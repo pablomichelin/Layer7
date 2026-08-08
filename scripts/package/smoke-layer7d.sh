@@ -31,7 +31,8 @@ printf '"smoke"\n' > "$SMOKE_VER/version.str"
 rm -f layer7d-smoke
 
 LICENSE_SRC="license.c"
-LDFLAGS_CRYPTO="-lcrypto"
+# identity_radius usa EVP (crypto) e identity_dc usa o listener TLS (ssl).
+LDFLAGS_CRYPTO="-lssl -lcrypto"
 if [ "$SMOKE_OS" != "FreeBSD" ]; then
 	cat > "$SMOKE_VER/license_smoke_stub.c" <<'STUB'
 /* Stub de licenciamento — exclusivo para smoke em Linux/Darwin.
