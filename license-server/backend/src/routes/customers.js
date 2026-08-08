@@ -29,7 +29,12 @@ router.get('/', async (req, res) => {
 
     if (search) {
       params.push(`%${search}%`);
-      conditions.push(`(c.name ILIKE $${params.length} OR c.email ILIKE $${params.length})`);
+      conditions.push(
+        `(c.name ILIKE $${params.length}
+          OR c.email ILIKE $${params.length}
+          OR COALESCE(c.cnpj, '') ILIKE $${params.length}
+          OR COALESCE(c.tags, '') ILIKE $${params.length})`
+      );
     }
 
     const whereClause = `WHERE ${conditions.join(' AND ')}`;
@@ -47,7 +52,14 @@ router.get('/', async (req, res) => {
                   FROM licenses l
                  WHERE l.customer_id = c.id
                    AND l.archived_at IS NULL
-              ) AS license_count
+              ) AS license_count,
+              (
+                SELECT COUNT(*)
+                  FROM licenses l
+                 WHERE l.customer_id = c.id
+                   AND l.archived_at IS NULL
+                   AND ${LICENSE_SQL_ACTIVE_CONDITION}
+              ) AS license_active_count
          FROM customers c
          ${whereClause}
         ORDER BY c.created_at DESC
@@ -56,7 +68,11 @@ router.get('/', async (req, res) => {
     );
 
     return res.json({
-      customers: result.rows,
+      customers: result.rows.map((row) => ({
+        ...row,
+        license_count: Number.parseInt(row.license_count, 10) || 0,
+        license_active_count: Number.parseInt(row.license_active_count, 10) || 0,
+      })),
       total,
       page,
       limit,

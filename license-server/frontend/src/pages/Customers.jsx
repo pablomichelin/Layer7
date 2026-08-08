@@ -41,16 +41,67 @@ export default function Customers() {
   }
 
   const columns = [
-    { key: 'name', label: 'Nome' },
+    {
+      key: 'name',
+      label: 'Nome',
+      render: (r) => (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(buildAdminCustomerDetailRoute(r.id));
+          }}
+          className="text-left text-brand-700 hover:underline font-medium"
+        >
+          {r.name}
+        </button>
+      ),
+    },
     { key: 'email', label: 'Email', render: (r) => r.email || '—' },
-    { key: 'license_count', label: 'Licenças', render: (r) => r.license_count },
+    { key: 'cnpj', label: 'CNPJ', render: (r) => r.cnpj || '—' },
+    { key: 'tags', label: 'Tags', render: (r) => r.tags || '—' },
+    {
+      key: 'licenses',
+      label: 'Licenças',
+      render: (r) => {
+        const totalLicenses = Number(r.license_count) || 0;
+        const activeLicenses = Number(r.license_active_count) || 0;
+        return (
+          <span title="activas / total">
+            <span className="font-medium text-green-800">{activeLicenses}</span>
+            <span className="text-gray-400"> / </span>
+            <span className="text-gray-700">{totalLicenses}</span>
+          </span>
+        );
+      },
+    },
     { key: 'created_at', label: 'Criado em', render: (r) => new Date(r.created_at).toLocaleDateString('pt-BR') },
     {
-      key: 'actions', label: '', render: (r) => (
-        <div className="flex gap-2">
-          <button onClick={() => navigate(buildAdminCustomerDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
-          <button onClick={() => navigate(buildAdminCustomerEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
-          <button onClick={(e) => handleArchive(r.id, r.name, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
+      key: 'actions',
+      label: '',
+      render: (r) => (
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => navigate(buildAdminCustomerDetailRoute(r.id))}
+            className="text-xs text-brand-600 hover:underline"
+          >
+            Ver
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(buildAdminCustomerEditRoute(r.id))}
+            className="text-xs text-brand-600 hover:underline"
+          >
+            Editar
+          </button>
+          <button
+            type="button"
+            onClick={(e) => handleArchive(r.id, r.name, e)}
+            className="text-xs text-red-600 hover:underline"
+          >
+            Arquivar
+          </button>
         </div>
       ),
     },
@@ -71,16 +122,21 @@ export default function Customers() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Buscar por nome ou email..."
+          placeholder="Buscar nome, email, CNPJ ou tags..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-72 focus:ring-2 focus:ring-brand-500 outline-none"
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-80 focus:ring-2 focus:ring-brand-500 outline-none"
         />
       </div>
 
       {loading ? <p className="text-gray-500">Carregando...</p> : (
         <>
-          <DataTable columns={columns} rows={customers} emptyMessage="Nenhum cliente encontrado" />
+          <DataTable
+            columns={columns}
+            rows={customers}
+            emptyMessage="Nenhum cliente encontrado"
+            onRowClick={(row) => navigate(buildAdminCustomerDetailRoute(row.id))}
+          />
           {pages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-4">
               <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-3 py-1 text-sm border rounded disabled:opacity-30">Anterior</button>

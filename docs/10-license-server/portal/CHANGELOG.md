@@ -11,6 +11,20 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [1.3.0] — 2026-08-08
+
+### Added
+
+- Lista clientes operacional (PORTAL-PLAN-002 / C2)
+- Colunas CNPJ, tags, activas/total; busca alargada
+- Fecho de `PORTAL-PLAN-002`
+
+### Fixed
+
+- Lista Clientes: clique na linha / nome → ficha (navegação C0)
+
+---
+
 ## [1.2.0] — 2026-08-08
 
 ### Added

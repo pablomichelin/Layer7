@@ -30,7 +30,7 @@ gerir clientes, licenças, activações e artefactos `.lic`.
 | Campo | Valor |
 |-------|-------|
 | Produto UI | Layer7 License Manager |
-| Versão visual actual | **1.2.0** (C1 ficha cliente 360) |
+| Versão visual actual | **1.3.0** (`PORTAL-PLAN-002` CONCLUIDO) |
 | Código | `license-server/` |
 | Live | `192.168.100.244:/opt/layer7-license` |
 | URL | `https://license.systemup.inf.br` |

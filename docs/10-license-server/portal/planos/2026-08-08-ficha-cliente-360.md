@@ -3,10 +3,10 @@
 | Campo | Valor |
 |-------|-------|
 | **ID** | `PORTAL-PLAN-002` |
-| **Estado** | `ACTIVO` |
+| **Estado** | `CONCLUIDO` |
 | **Criado** | `2026-08-08` |
 | **Baseline** | portal visual **`1.0.0`** |
-| **Alvo** | portal visual **`1.2.0`** (guia) |
+| **Alvo** | portal visual **`1.3.0`** |
 | **Código** | `license-server/` |
 | **Live** | `192.168.100.244:/opt/layer7-license` |
 | **URL** | `https://license.systemup.inf.br` |
@@ -110,9 +110,9 @@ Imagens Docker anteriores; reverter commit do bloco.
 |-------|--------|--------|------|
 | C0 | **FEITO** (GO `2026-08-08`) | `1.1.0` | 2026-08-08 |
 | C1 | **FEITO** | `1.2.0` | 2026-08-08 |
-| C2 | Pendente (opcional) | → `1.2.x` | — |
+| C2 | **FEITO** | `1.3.0` | 2026-08-08 |
 
 ## 9. Próxima acção
 
-**C2** (opcional) — lista clientes com CNPJ/tags e activas vs total.
-Ou fechar plano se C2 for diferido com nota em `ACOES.md`.
+Plano **CONCLUIDO**. Ver `historico/2026-08-08-fecho-plan-002-1.3.0.md`.
+Novas ideias → `IDEIAS.md` + GO.

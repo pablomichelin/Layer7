@@ -1,6 +1,6 @@
 # Estado Actual — Portal Admin
 
-> Snapshot: **2026-08-08** — versão visual **`1.2.0`**.
+> Snapshot: **2026-08-08** — versão visual **`1.3.0`**.
 
 ## Ambiente
 
@@ -8,19 +8,18 @@
 |------|-------|
 | Host | `192.168.100.244` |
 | URL | `https://license.systemup.inf.br` |
-| Versão visual | **`1.2.0`** |
-| SPA | `index-BghDhRtJ.js` |
+| Versão visual | **`1.3.0`** |
+| SPA | `index-CvZ07LNK.js` |
 | Health | OK |
-| Plano | `PORTAL-PLAN-002` **ACTIVO** (C0+C1 FEITO) |
+| Plano | `PORTAL-PLAN-002` **CONCLUIDO** |
 
 ## Capacidade
 
 | Área | Estado |
 |------|--------|
-| Navegação Cliente↔Licença (C0) | OK |
-| Ficha 360 (C1) | OK |
-| Lista operacional (C2) | Pendente (opcional) |
+| C0–C2 ficha cliente 360 | OK |
+| Plano activo | nenhum |
 
 ## Próximo
 
-**C2** (opcional) — CNPJ/tags e activas na lista de clientes.
+Sem bloco obrigatório. Novas ideias → `IDEIAS.md` + GO.

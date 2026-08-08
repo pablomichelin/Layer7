@@ -5,7 +5,18 @@ Mais recente no topo.
 
 ---
 
-## 2026-08-08 — C1 Ficha 360 `1.2.0`
+## 2026-08-08 — C2 Lista operacional + fecho plano `1.3.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `1.3.0` |
+| Objectivo | Lista clientes com CNPJ/tags/activas; fechar PORTAL-PLAN-002 |
+| Impacto | API list customers; UI lista; plano CONCLUIDO |
+| Risco | Baixo |
+| Teste | health; lista com activas/total; clique → ficha |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-CvZ07LNK.js`; plano CONCLUIDO |
 
 | Campo | Valor |
 |-------|-------|

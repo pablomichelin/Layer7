@@ -779,16 +779,16 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 | Campo | Valor |
 |-------|-------|
-| Versão visual actual | **`1.2.0`** (C1 ficha 360, `2026-08-08`) |
+| Versão visual actual | **`1.3.0`** (C2 lista + plano 002 CONCLUIDO, `2026-08-08`) |
 | Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
 | Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
-| Plano activo | [`docs/10-license-server/portal/planos/2026-08-08-ficha-cliente-360.md`](docs/10-license-server/portal/planos/2026-08-08-ficha-cliente-360.md) (`PORTAL-PLAN-002`) |
+| Plano activo | *(nenhum — último: [`PORTAL-PLAN-002`](docs/10-license-server/portal/planos/2026-08-08-ficha-cliente-360.md) CONCLUIDO)* |
 | Alvo | `1.0.0` — completo para **operador único** |
 | Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
-**Checkpoint `2026-08-08`:** portal **`1.2.0`** — C1 ficha cliente 360
-(`PORTAL-PLAN-002`). Próximo opcional: **C2** (lista operacional).
+**Checkpoint `2026-08-08`:** portal **`1.3.0`** — `PORTAL-PLAN-002`
+**CONCLUIDO** (C0–C2). Sem plano portal activo; residual só `IDEIAS.md`+GO.
 Regra: não saltar blocos do plano portal.
 
 ---

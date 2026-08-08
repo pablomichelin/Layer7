@@ -237,6 +237,11 @@ Na ficha do cliente:
 - botão **Nova licença** abre o formulário com o cliente já seleccionado
 - após criar, pode **Voltar ao cliente**
 
+### Lista operacional (portal ≥ 1.3.0)
+
+Em **Clientes**: colunas CNPJ, tags e **activas / total** de licenças;
+busca por nome, email, CNPJ ou tags; clique na linha abre a ficha.
+
 ### Via API (curl)
 
 ```bash

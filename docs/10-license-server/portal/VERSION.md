@@ -4,22 +4,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `1.2.0` |
-| **Codinome** | Ficha cliente 360 (C1) |
+| **Versão** | `1.3.0` |
+| **Codinome** | Lista clientes operacional (C2) |
 | **Estado** | Entregue |
 | **Data** | `2026-08-08` |
 
 ## Inclui
 
-- Ficha cliente: contadores (total/activas/a expirar 30d/revogadas/bound)
-- Tabela de licenças: chave completa + copiar, SKU, Bound, status
-- CTA **Nova licença** com `customer_id` pré-seleccionado
-- Após criar: atalho **Voltar ao cliente**
+- Lista clientes: CNPJ, tags, activas/total
+- Busca por nome/email/CNPJ/tags
+- Clique na linha → ficha (restauração C0 na lista)
+- `PORTAL-PLAN-002` **CONCLUIDO**
 
-## Próxima (ordem fixa)
+## Próxima
 
-| Versão | Bloco |
-|--------|-------|
-| `1.2.1` / `1.3.0` | **C2** — lista clientes operacional (opcional) |
+Sem bloco residual neste plano. Novas ideias → `IDEIAS.md` + GO.
 
-Histórico: [`CHANGELOG.md`](CHANGELOG.md).
+Histórico: [`CHANGELOG.md`](CHANGELOG.md) ·
+[`historico/2026-08-08-fecho-plan-002-1.3.0.md`](historico/2026-08-08-fecho-plan-002-1.3.0.md).
