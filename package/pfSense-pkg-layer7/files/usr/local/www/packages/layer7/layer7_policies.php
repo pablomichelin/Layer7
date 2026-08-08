@@ -10,6 +10,8 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
 $layer7_policy_edit_retry = null;
+$l7_ent = layer7_entitlements();
+$l7_has_identity = !empty($l7_ent["has_identity"]);
 
 if ($_POST["add_profile_policy"] ?? false) {
 		$profile_id = trim($_POST["profile_id"] ?? "");
@@ -585,6 +587,12 @@ if ($_POST["add_policy"] ?? false) {
 		$new_src_hosts = layer7_parse_ip_textarea($_POST["new_src_hosts"] ?? "");
 		$new_src_cidrs = layer7_parse_cidr_textarea($_POST["new_src_cidrs"] ?? "");
 		$new_match_hosts = layer7_parse_host_textarea($_POST["new_match_hosts"] ?? "", 64);
+		$new_ad_users = $l7_has_identity
+		    ? layer7_parse_ad_users_textarea($_POST["new_ad_users"] ?? "")
+		    : array();
+		$new_ad_groups = $l7_has_identity
+		    ? layer7_parse_ad_groups_textarea($_POST["new_ad_groups"] ?? "")
+		    : array();
 
 		$new_groups_sel = array();
 		if (isset($_POST["new_groups"]) && is_array($_POST["new_groups"])) {
@@ -623,6 +631,12 @@ if ($_POST["add_policy"] ?? false) {
 			}
 			if (!empty($new_src_cidrs)) {
 				$rule["match"]["src_cidrs"] = $new_src_cidrs;
+			}
+			if (!empty($new_ad_users)) {
+				$rule["match"]["ad_users"] = $new_ad_users;
+			}
+			if (!empty($new_ad_groups)) {
+				$rule["match"]["ad_groups"] = $new_ad_groups;
 			}
 			if (!empty($new_groups_sel)) {
 				$rule["match"]["groups"] = $new_groups_sel;
@@ -796,6 +810,14 @@ if ($_POST["save_policy_edit"] ?? false) {
 			$edit_src_hosts = layer7_parse_ip_textarea($_POST["edit_src_hosts"] ?? "");
 			$edit_src_cidrs = layer7_parse_cidr_textarea($_POST["edit_src_cidrs"] ?? "");
 			$edit_match_hosts = layer7_parse_host_textarea($_POST["edit_match_hosts"] ?? "", 64);
+			$edit_ad_users = $l7_has_identity
+			    ? layer7_parse_ad_users_textarea($_POST["edit_ad_users"] ?? "")
+			    : ((isset($orig["match"]["ad_users"]) && is_array($orig["match"]["ad_users"]))
+				? $orig["match"]["ad_users"] : array());
+			$edit_ad_groups = $l7_has_identity
+			    ? layer7_parse_ad_groups_textarea($_POST["edit_ad_groups"] ?? "")
+			    : ((isset($orig["match"]["ad_groups"]) && is_array($orig["match"]["ad_groups"]))
+				? $orig["match"]["ad_groups"] : array());
 
 			$edit_groups_sel = array();
 			if (isset($_POST["edit_groups"]) && is_array($_POST["edit_groups"])) {
@@ -834,6 +856,12 @@ if ($_POST["save_policy_edit"] ?? false) {
 				}
 				if (!empty($edit_src_cidrs)) {
 					$rule["match"]["src_cidrs"] = $edit_src_cidrs;
+				}
+				if (!empty($edit_ad_users)) {
+					$rule["match"]["ad_users"] = $edit_ad_users;
+				}
+				if (!empty($edit_ad_groups)) {
+					$rule["match"]["ad_groups"] = $edit_ad_groups;
 				}
 				if (!empty($edit_groups_sel)) {
 					$rule["match"]["groups"] = $edit_groups_sel;
@@ -971,6 +999,12 @@ function layer7_policy_match_summary($policy) {
 	}
 	if (!empty($policy["match"]["src_hosts"]) && is_array($policy["match"]["src_hosts"])) {
 		$matches[] = l7_t("IPs") . ": " . implode(", ", $policy["match"]["src_hosts"]);
+	}
+	if (!empty($policy["match"]["ad_users"]) && is_array($policy["match"]["ad_users"])) {
+		$matches[] = l7_t("Utilizadores AD") . ": " . implode(", ", $policy["match"]["ad_users"]);
+	}
+	if (!empty($policy["match"]["ad_groups"]) && is_array($policy["match"]["ad_groups"])) {
+		$matches[] = l7_t("Grupos AD") . ": " . implode(", ", $policy["match"]["ad_groups"]);
 	}
 	if (!empty($policy["match"]["src_cidrs"]) && is_array($policy["match"]["src_cidrs"])) {
 		$matches[] = l7_t("CIDRs") . ": " . implode(", ", $policy["match"]["src_cidrs"]);
@@ -1712,6 +1746,10 @@ function layer7_policy_match_summary($policy) {
 				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_hosts"]) ? implode("\n", $view_policy["match"]["src_hosts"]) : l7_t("Qualquer IP")); ?></pre></dd>
 				<dt><?= l7_t("CIDRs de origem"); ?></dt>
 				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["src_cidrs"]) ? implode("\n", $view_policy["match"]["src_cidrs"]) : l7_t("Qualquer sub-rede")); ?></pre></dd>
+				<dt><?= l7_t("Utilizadores AD"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ad_users"]) ? implode("\n", $view_policy["match"]["ad_users"]) : l7_t("Nenhum")); ?></pre></dd>
+				<dt><?= l7_t("Grupos AD"); ?></dt>
+				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["ad_groups"]) ? implode("\n", $view_policy["match"]["ad_groups"]) : l7_t("Nenhum")); ?></pre></dd>
 				<dt><?= l7_t("Grupos"); ?></dt>
 				<dd><pre class="pre-scrollable"><?= htmlspecialchars(!empty($view_policy["match"]["groups"]) ? implode("\n", $view_policy["match"]["groups"]) : l7_t("Nenhum grupo")); ?></pre></dd>
 				<dt><?= l7_t("Horario"); ?></dt>
@@ -1809,6 +1847,14 @@ function layer7_policy_match_summary($policy) {
 				if (isset($edit_policy["match"]["src_cidrs"]) && is_array($edit_policy["match"]["src_cidrs"])) {
 					$edit_src_cidrs_val = implode("\n", $edit_policy["match"]["src_cidrs"]);
 				}
+				$edit_ad_users_val = "";
+				if (isset($edit_policy["match"]["ad_users"]) && is_array($edit_policy["match"]["ad_users"])) {
+					$edit_ad_users_val = implode("\n", $edit_policy["match"]["ad_users"]);
+				}
+				$edit_ad_groups_val = "";
+				if (isset($edit_policy["match"]["ad_groups"]) && is_array($edit_policy["match"]["ad_groups"])) {
+					$edit_ad_groups_val = implode("\n", $edit_policy["match"]["ad_groups"]);
+				}
 				$ep_ifaces = layer7_get_pfsense_interfaces();
 				?>
 				<div class="form-group">
@@ -1849,6 +1895,30 @@ function layer7_policy_match_summary($policy) {
 						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
 					</div>
 				</div>
+
+				<?php if ($l7_has_identity) { ?>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Utilizadores AD"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="edit_ad_users" class="form-control" rows="3" style="max-width:400px"><?= htmlspecialchars($edit_ad_users_val); ?></textarea>
+						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity no passo 20.24."); ?></p>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Grupos AD"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="edit_ad_groups" class="form-control" rows="2" style="max-width:400px"><?= htmlspecialchars($edit_ad_groups_val); ?></textarea>
+						<p class="help-block"><?= l7_t("Um grupo AD por linha (max. 16). Distinto dos grupos IP/MAC Layer7."); ?></p>
+					</div>
+				</div>
+				<?php } elseif ($edit_ad_users_val !== "" || $edit_ad_groups_val !== "") { ?>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Alvos Identity"); ?></label>
+					<div class="col-sm-9">
+						<p class="help-block text-warning"><?= l7_t("Esta politica tem ad_users/ad_groups gravados; o entitlement Identity esta bloqueado — os alvos AD sao preservados sem edicao."); ?></p>
+					</div>
+				</div>
+				<?php } ?>
 
 				<?php if (!empty($l7_groups)) {
 					$edit_grps_arr = array();
@@ -2120,6 +2190,23 @@ function layer7_policy_match_summary($policy) {
 						<p class="help-block"><?= l7_t("Um CIDR por linha (max. 8). Vazio = qualquer sub-rede."); ?></p>
 					</div>
 				</div>
+
+				<?php if ($l7_has_identity) { ?>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Utilizadores AD"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="new_ad_users" class="form-control" rows="3" style="max-width:400px" placeholder="joao.silva&#10;DOMAIN\maria"></textarea>
+						<p class="help-block"><?= l7_t("Um utilizador por linha (max. 16). Aceita DOMAIN\\user ou UPN; o daemon normaliza. Match por IP do mapa Identity no passo 20.24."); ?></p>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?= l7_t("Grupos AD"); ?></label>
+					<div class="col-sm-9">
+						<textarea name="new_ad_groups" class="form-control" rows="2" style="max-width:400px" placeholder="TI&#10;VPN"></textarea>
+						<p class="help-block"><?= l7_t("Um grupo AD por linha (max. 16). Distinto dos grupos IP/MAC Layer7."); ?></p>
+					</div>
+				</div>
+				<?php } ?>
 
 				<?php if (!empty($l7_groups)) { ?>
 				<div class="form-group">

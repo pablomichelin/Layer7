@@ -268,6 +268,33 @@ main(void)
 		    "last exc host preserved");
 	}
 
+	/* 18. IM6 / 20.23 — parse ad_users / ad_groups (+ normalização). */
+	{
+		struct layer7_policy_rule rules[2];
+		int n = 0;
+		const char *json =
+		    "{\"layer7\":{\"policies\":[{\"id\":\"p-ad\","
+		    "\"action\":\"block\",\"enabled\":true,\"match\":{"
+		    "\"hosts\":[\"youtube.com\"],"
+		    "\"ad_users\":[\"CORP\\\\Joao.Silva\",\"maria@corp.local\","
+		    "\"pc01$\"],"
+		    "\"ad_groups\":[\"TI\",\" Vpn \"]}}]}}";
+
+		memset(rules, 0, sizeof(rules));
+		check(layer7_policies_parse(json, strlen(json), rules, &n, 2) == 0,
+		    "parse ok (ad_users/ad_groups)");
+		check(n == 1, "policy with ad_* loaded");
+		check(rules[0].n_ad_users == 2, "ad_users: 2 valid (machine rejected)");
+		check(strcmp(rules[0].ad_users[0], "joao.silva") == 0,
+		    "DOMAIN\\\\user → joao.silva");
+		check(strcmp(rules[0].ad_users[1], "maria") == 0,
+		    "UPN → maria");
+		check(rules[0].n_ad_groups == 2, "ad_groups count");
+		check(strcmp(rules[0].ad_groups[0], "ti") == 0, "ad_group ti");
+		check(strcmp(rules[0].ad_groups[1], "vpn") == 0, "ad_group vpn");
+		check(rules[0].n_groups == 0, "ad_groups != Layer7 groups");
+	}
+
 	if (g_fail) {
 		printf("\nTEST CONFIG_PARSE: FAILED\n");
 		return 1;

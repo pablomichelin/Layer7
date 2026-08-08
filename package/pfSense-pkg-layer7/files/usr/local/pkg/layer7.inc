@@ -3362,7 +3362,13 @@ function layer7_policy_scoped_block_valid($policy, $data)
 		$groups = $data["layer7"]["groups"];
 	}
 	$src = layer7_policy_expand_src_origins($policy, $groups);
-	return !empty($src["hosts"]) || !empty($src["cidrs"]);
+	if (!empty($src["hosts"]) || !empty($src["cidrs"])) {
+		return true;
+	}
+	/* IM6 / 20.23: alvos AD contam como escopo de origem (IPs via mapa em 20.24). */
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	return !empty($match["ad_users"]) || !empty($match["ad_groups"]);
 }
 
 function layer7_signal_reload()
@@ -3929,6 +3935,82 @@ function layer7_parse_host_textarea($text, $max = 16)
 		}
 	}
 	return array_values(array_unique($out));
+}
+
+/**
+ * IM6 / 20.23: textarea de utilizadores AD (um por linha).
+ * Normaliza DOMAIN\user / UPN → parte local lowercase; rejeita contas *$ .
+ * Max 16 (L7_MAX_AD_USERS_PER_POLICY).
+ */
+function layer7_parse_ad_users_textarea($text, $max = 16)
+{
+	$out = array();
+	$lines = preg_split('/[\r\n,]+/', trim((string)$text));
+	foreach ($lines as $line) {
+		$line = trim((string)$line);
+		if ($line === "" || $line[0] === '#') {
+			continue;
+		}
+		$canon = layer7_normalize_ad_user($line);
+		if ($canon !== "" && count($out) < $max) {
+			$out[] = $canon;
+		}
+	}
+	return array_values(array_unique($out));
+}
+
+/**
+ * IM6 / 20.23: textarea de grupos AD (um por linha). Lowercase ASCII.
+ * Distinto dos grupos IP/MAC Layer7. Max 16.
+ */
+function layer7_parse_ad_groups_textarea($text, $max = 16)
+{
+	$out = array();
+	$lines = preg_split('/[\r\n,]+/', trim((string)$text));
+	foreach ($lines as $line) {
+		$line = strtolower(trim((string)$line));
+		if ($line === "" || $line[0] === '#') {
+			continue;
+		}
+		if (strlen($line) > 63) {
+			continue;
+		}
+		if (count($out) < $max) {
+			$out[] = $line;
+		}
+	}
+	return array_values(array_unique($out));
+}
+
+/** Alinhado a layer7_idmap_normalize_user no daemon. */
+function layer7_normalize_ad_user($in)
+{
+	$in = trim((string)$in);
+	if ($in === "") {
+		return "";
+	}
+	$bs = strrpos($in, "\\");
+	if ($bs !== false && $bs < strlen($in) - 1) {
+		$in = substr($in, $bs + 1);
+	}
+	$at = strpos($in, "@");
+	if ($at !== false) {
+		if ($at === 0) {
+			return "";
+		}
+		$in = substr($in, 0, $at);
+	}
+	$in = trim($in);
+	if ($in === "" || substr($in, -1) === "$") {
+		return "";
+	}
+	if (strlen($in) >= 128) {
+		return "";
+	}
+	if (preg_match('/[\x00-\x1f\/\\\\]/', $in)) {
+		return "";
+	}
+	return strtolower($in);
 }
 
 function layer7_profile_parse_hosts_textarea($text, $max = 64)

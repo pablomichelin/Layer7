@@ -6,7 +6,21 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- (vazio — próximo: 20.23 políticas ad_users/ad_groups)
+- (vazio — próximo: 20.24 match/enforce ad_* via mapa Identity)
+
+## [1.9.27] — 2026-08-08
+
+### Added
+
+- **Identity 20.23 / IM6:** políticas aceitam `match.ad_users` /
+  `match.ad_groups` (daemon parse + normalização; GUI Policies com
+  entitlement Identity). Distinto de `match.groups` (IP/MAC Layer7).
+  Match/enforce via mapa fica no **20.24**.
+
+### Notes
+
+- Canal `latest`: **`1.9.27`**. Produção enforce **`1.9.8`**.
+- SHA256: `PLACEHOLDER`. Rollback lab: `1.9.26`.
 
 ## [1.9.26] — 2026-08-08
 

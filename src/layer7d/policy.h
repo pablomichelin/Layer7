@@ -31,6 +31,12 @@
  * ex. uma turma. IPs de dispositivos resolvidos entram como src hosts. */
 #define L7_MAX_SRC_HOSTS 64
 #define L7_MAX_SRC_CIDRS 16
+/* IM6 / 20.23: alvos AD por política (além de src_hosts/CIDR/grupos IP).
+ * Match/enforce via mapa daemon fica no 20.24. */
+#define L7_MAX_AD_USERS_PER_POLICY 16
+#define L7_MAX_AD_GROUPS_PER_POLICY 16
+#define L7_AD_USER_LEN 128   /* alinhado a L7_IDMAP_USER_MAX */
+#define L7_AD_GROUP_LEN 64   /* alinhado a L7_IDMAP_GROUP_MAX */
 
 #define L7_MAX_GROUPS 16
 #define L7_GROUP_ID_LEN 80
@@ -91,6 +97,12 @@ struct layer7_policy_rule {
 	struct l7_cidr src_exclude_cidrs[L7_MAX_SRC_CIDRS];
 	int n_src_exclude_groups;
 	char src_exclude_groups[L7_MAX_GROUPS_PER_POLICY][L7_GROUP_ID_LEN];
+	/* IM6 / 20.23: alvos Identity (resolvem a IPs no mapa em 20.24).
+	 * Distinto de match.groups (grupos IP/MAC Layer7). */
+	int n_ad_users;
+	char ad_users[L7_MAX_AD_USERS_PER_POLICY][L7_AD_USER_LEN];
+	int n_ad_groups;
+	char ad_groups[L7_MAX_AD_GROUPS_PER_POLICY][L7_AD_GROUP_LEN];
 	int scope_global;       /* 1 = regra PF global explicita (E4) */
 	int quarantine_origin;  /* 1 = app-only block pode quarentenar origem */
 };

@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08c`; **20.22 PASS**; passo actual **20.23 / IM6**)
+**Estado do plano:** `ABERTO` (rev. `2026-08-08d`; **20.23 PASS**; passo actual **20.24 / IM6**)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -11,7 +11,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.26` (**publicado** lab/`latest`)
+**Candidato port:** `1.9.27` (**publicado** lab/`latest`)
 **Nota:** **Rev. `c` (`2026-08-08`)** = 20.22 conflito IP + audit.
 
 ---
@@ -20,21 +20,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.23** — políticas `ad_users`/`ad_groups` (IM6) |
+| Passo actual | **20.24** — match/enforce `ad_*` via mapa daemon (IM6) |
 | Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
 | ADRs | **Aceito** ×4; T1; **0026 diferida**; **0027 rev. d** |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.23 → GI7 |
+| Próximo | 20.24 → 20.25 → GI7 |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.23 (políticas ad_users/ad_groups)
+- Passo actual: 20.24 (match/enforce ad_* via mapa)
 - 20.22: PASS (audit conflict + last_writer)
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; **1.9.26** (publicado lab/`latest`)
-- Próximo: 20.23 → GI7
+- Baseline: 1.9.8; **1.9.27** (publicado lab/`latest`)
+- Próximo: 20.24 → 20.25 → GI7
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -348,7 +348,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
 | Passo | Entrega | Gate |
 |-------|---------|------|
-| **20.23** | Grupo/política aceita `ad_users` / `ad_groups` (além de hosts/MAC) | — |
+| **20.23** | Grupo/política aceita `ad_users` / `ad_groups` (além de hosts/MAC) | **PASS** (`1.9.27`) |
 | **20.24** | Match/enforce usa IPs do **mapa daemon** (não SSOT PHP tipo `device_ips`) | — |
 | **20.25** | Precedência: promover esboço §3.1 → `docs/core/precedence.md` | — |
 | **20.26** | Lab: user A vs B; troca de IP → remap daemon; LDAP down → fail-mode | **GI7** |
@@ -543,6 +543,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
 | 2026-08-08 | **rev. `a` / 20.20 agente Win PASS + 1.9.24** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; publicado lab/`latest`; passo → **20.21** |
 | 2026-08-08 | **rev. `b` / 20.21 PASS** — `normalize_user` + `remove_ip`; RADIUS/DC alinhados; candidato `1.9.25`; passo → **20.22** |
+| 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |
 | 2026-08-08 | **rev. `c` / 20.22 PASS** — audit conflict/last_writer + GUI topologia; candidato `1.9.26`; passo → **20.23** |
 
 ---

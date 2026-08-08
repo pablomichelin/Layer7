@@ -339,6 +339,103 @@ parse_cidr_array_in_object(const char *ob, const char *oe,
 	return 0;
 }
 
+/*
+ * Canonicaliza user AD na política (alinhado a layer7_idmap_normalize_user):
+ * DOMAIN\user / UPN → local lowercase; rejeita *$ e vazios.
+ * Sem dependência de identity_map.c (testes standalone do policy parser).
+ */
+static int
+ad_user_canon(const char *in, char *out, size_t out_sz)
+{
+	const char *start;
+	const char *at;
+	const char *slash;
+	size_t n, i;
+
+	if (in == NULL || out == NULL || out_sz < 2)
+		return -1;
+	out[0] = '\0';
+	while (*in == ' ' || *in == '\t')
+		in++;
+	if (*in == '\0')
+		return -1;
+	start = in;
+	slash = strrchr(start, '\\');
+	if (slash != NULL && slash[1] != '\0')
+		start = slash + 1;
+	at = strchr(start, '@');
+	if (at != NULL) {
+		if (at == start)
+			return -1;
+		n = (size_t)(at - start);
+	} else
+		n = strlen(start);
+	while (n > 0 && (start[n - 1] == ' ' || start[n - 1] == '\t'))
+		n--;
+	if (n == 0 || n >= out_sz || n >= L7_AD_USER_LEN)
+		return -1;
+	for (i = 0; i < n; i++) {
+		unsigned char c = (unsigned char)start[i];
+		if (c < 0x20 || c == '/' || c == '\\')
+			return -1;
+		out[i] = (char)tolower(c);
+	}
+	out[n] = '\0';
+	if (out[n - 1] == '$')
+		return -1;
+	return 0;
+}
+
+static int
+ad_group_canon(const char *in, char *out, size_t out_sz)
+{
+	size_t n, i;
+
+	if (in == NULL || out == NULL || out_sz < 2)
+		return -1;
+	while (*in == ' ' || *in == '\t')
+		in++;
+	n = strlen(in);
+	while (n > 0 && (in[n - 1] == ' ' || in[n - 1] == '\t'))
+		n--;
+	if (n == 0 || n >= out_sz || n >= L7_AD_GROUP_LEN)
+		return -1;
+	for (i = 0; i < n; i++) {
+		unsigned char c = (unsigned char)in[i];
+		if (c < 0x20)
+			return -1;
+		out[i] = (char)tolower(c);
+	}
+	out[n] = '\0';
+	return 0;
+}
+
+static void
+canonicalize_ad_targets(struct layer7_policy_rule *r)
+{
+	int i, w;
+	char utmp[L7_AD_USER_LEN];
+	char gtmp[L7_AD_GROUP_LEN];
+
+	w = 0;
+	for (i = 0; i < r->n_ad_users; i++) {
+		if (ad_user_canon(r->ad_users[i], utmp, sizeof(utmp)) != 0)
+			continue;
+		snprintf(r->ad_users[w], sizeof(r->ad_users[w]), "%s", utmp);
+		w++;
+	}
+	r->n_ad_users = w;
+
+	w = 0;
+	for (i = 0; i < r->n_ad_groups; i++) {
+		if (ad_group_canon(r->ad_groups[i], gtmp, sizeof(gtmp)) != 0)
+			continue;
+		snprintf(r->ad_groups[w], sizeof(r->ad_groups[w]), "%s", gtmp);
+		w++;
+	}
+	r->n_ad_groups = w;
+}
+
 static int
 parse_match_subobject(const char *obj, const char *obj_end,
     struct layer7_policy_rule *r)
@@ -385,6 +482,15 @@ parse_match_subobject(const char *obj, const char *obj_end,
 		(char *)r->groups, L7_MAX_GROUPS_PER_POLICY,
 		L7_GROUP_ID_LEN, &r->n_groups) != 0)
 		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "ad_users",
+		(char *)r->ad_users, L7_MAX_AD_USERS_PER_POLICY,
+		L7_AD_USER_LEN, &r->n_ad_users) != 0)
+		return -1;
+	if (parse_string_array_in_object(ob, oe + 1, "ad_groups",
+		(char *)r->ad_groups, L7_MAX_AD_GROUPS_PER_POLICY,
+		L7_AD_GROUP_LEN, &r->n_ad_groups) != 0)
+		return -1;
+	canonicalize_ad_targets(r);
 	return 0;
 }
 
