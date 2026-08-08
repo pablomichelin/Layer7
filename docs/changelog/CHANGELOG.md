@@ -8,6 +8,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - (vazio — próximo: agente Windows Event Log / fecho 20.20)
 
+## [1.9.23] — 2026-08-08
+
+### Fixed
+
+- **MITM:** de volta ao menu; layout igual a Eventos/Estado (tabs no `panel-body`,
+  nao no heading escuro). Identity e Acesso Remoto alinhados ao mesmo padrao.
+
+### Notes
+
+- Canal `latest`: **`1.9.23`**. Produção enforce **`1.9.8`**.
+- SHA256: `2e17628e092248da20fab70991e4d2199955585aa290f8edd40e86ff12384573`. Rollback lab: `1.9.22`.
+- MITM continua DEFER (placeholder); permanece visivel para nao se perder.
+
 ## [1.9.22] — 2026-08-07
 
 ### Changed
