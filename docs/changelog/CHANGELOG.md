@@ -14,6 +14,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - Regressão dedicada em `tests/unit/test_sinkhole_local_guard.sh`, integrada
   em `tests/run-local.sh`: confirma a guarda antes de `layer7_flow_decide()`,
   auditoria do DNS e diagnóstico de repetição apenas em nível debug.
+- **Gate de pacote:** `smoke-layer7d.sh` passa a compilar os três módulos
+  Identity referenciados por `main.c`, mantendo a lista de fontes alinhada ao
+  `Makefile` do port e evitando falso erro de linker no builder.
 
 ### Notes
 

@@ -85,7 +85,9 @@ STUB
 	LDFLAGS_CRYPTO=""
 fi
 
-SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC features.c blacklist.c bl_config.c allowlist.c log_store.c identity_map.c"
+# Manter a lista sincronizada com o Makefile do port: main.c referencia os
+# workers Identity mesmo com Identity desativado no JSON de smoke.
+SRCS="main.c config_parse.c policy.c enforce.c $LICENSE_SRC features.c blacklist.c bl_config.c allowlist.c log_store.c identity_map.c identity_ldap.c identity_radius.c identity_dc.c"
 CFLAGS_NDPI="-DHAVE_NDPI=0"
 LDFLAGS_NDPI=""
 LDFLAGS_PTHREAD="-lpthread"
