@@ -6,6 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- (vazio — próximo: 20.22 conflito IP + audit)
+
+## [1.9.25] — 2026-08-08
+
+### Added
+
 - **Identity 20.21:** normalização de username (`DOMAIN\user` / UPN → chave
   canónica lowercase) + `layer7_idmap_remove_ip` (logoff/Stop multi-IP);
   RADIUS e agente DC partilham a mesma chave no mapa.
@@ -13,8 +19,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Candidato port: **`1.9.25`** (publish pendente). Enforce **`1.9.8`**.
-  Rollback lab previsto: `1.9.24`.
+- Canal `latest`: **`1.9.25`**. Produção enforce **`1.9.8`**.
+- SHA256: `967f059f90c09b388d93baa4bb4546a407fed5b2ed5c1f14193e5b54fb356006`. Rollback lab: `1.9.24`.
 
 ## [1.9.24] — 2026-08-08
 
