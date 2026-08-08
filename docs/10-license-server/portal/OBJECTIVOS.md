@@ -30,7 +30,7 @@ O portal só sobe a **1.0.0** quando **todos** forem verdade:
 - [ ] Lista com filtros: status, cliente, bound, a expirar, SKU
 - [ ] Dashboard com expiração efectiva e atalhos
 - [ ] Renovação rápida (+periodo) no detalhe
-- [ ] Workflow de rebind governado (motivo + auditoria)
+- [x] Workflow de rebind governado (motivo + auditoria)
 - [ ] UI de auditoria administrativa (leitura)
 - [ ] Check-ins visíveis no detalhe da licença
 - [ ] Fluxo claro pós-revogação (desrevogar **ou** substituir licença)

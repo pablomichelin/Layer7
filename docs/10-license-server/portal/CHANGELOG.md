@@ -11,6 +11,21 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [0.4.0] — 2026-08-08
+
+### Added
+
+- Rebind governado: `POST /licenses/:id/rebind` (modos `unbind` / `set`)
+- UI no detalhe com motivo obrigatório e aviso sobre `.lic` antigo / grace
+- Evento de auditoria `license_rebound`
+
+### Changed
+
+- `MANUAL-USO-LICENCAS.md` §5.6 — política oficial de rebind
+- Governação: regra de executar blocos **em ordem** sem saltar funções
+
+---
+
 ## [0.3.0] — 2026-08-08
 
 ### Added

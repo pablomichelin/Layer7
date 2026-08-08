@@ -74,12 +74,14 @@ rodapé) a partir da primeira release pós-baseline que mexa no frontend
 ## 4. Fluxo de entrega de um bloco
 
 1. Declarar objectivo, impacto, risco, teste, rollback (padrão AGENTS).
-2. Trabalhar **um bloco pequeno** (preferir P0 → P1 do plano activo).
+2. Trabalhar **o próximo bloco na ordem do plano activo** (não saltar
+   funções; P0→P1a→P1b→P1c→P1d→P1e).
 3. Código em `license-server/` + docs desta pasta **no mesmo bloco**.
 4. Actualizar `ACOES.md` com data, versão-alvo, ficheiros, teste, resultado.
 5. Se subir versão: `VERSION.md` + `CHANGELOG.md` + versão na UI.
-6. Deploy em `244` só quando o bloco o exigir; actualizar `ESTADO.md`.
-7. Commit local quando o utilizador pedir; push/release conforme AGENTS.
+6. Deploy em `244` só quando o bloco o exigir; actualizar `ESTADO.md`
+   (inclui `restart nginx` após recreate web/api).
+7. Commit local quando o utilizador pedir; push para `origin` privado.
 
 **Proibido nesta trilha (até GO):**
 

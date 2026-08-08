@@ -34,12 +34,15 @@ Até GO separado (ideias `FUTURA` em `IDEIAS.md`):
 ## 3. Princípios de execução
 
 1. Seguir [`../GOVERNANCE.md`](../GOVERNANCE.md) em todo bloco.
-2. Um bloco pequeno por vez; docs + código no mesmo bloco.
-3. Não tocar Zabbix/Grafana/Apache/MySQL/outras stacks no `244`.
-4. Respeitar F2 (segurança) e F3 (guardrails; rebind **só** com workflow
-   dedicado — nunca CRUD silencioso de `hardware_id`).
-5. Versionamento visual: P0 → `0.1.0`; P1 por sub-blocos `0.2.0`…; fecho → `1.0.0`.
-6. Actualizar `ACOES.md` / `ESTADO.md` / `CHANGELOG.md` em cada entrega.
+2. **Ordem fixa do plano:** executar blocos na sequência
+   `P0 → P1a → P1b → P1c → P1d → P1e` sem saltar funções — evita esquecer
+   capacidades. Só pausar com GO explícito (ex.: risco de rebind).
+3. Um bloco pequeno por vez; docs + código no mesmo bloco.
+4. Não tocar Zabbix/Grafana/Apache/MySQL/outras stacks no `244`.
+5. Respeitar F2 (segurança) e F3 (guardrails; rebind **só** via workflow
+   dedicado `POST /rebind` — nunca CRUD silencioso de `hardware_id`).
+6. Versionamento visual: P0 → `0.1.0`; P1 por sub-blocos; fecho → `1.0.0`.
+7. Actualizar `ACOES.md` / `ESTADO.md` / `CHANGELOG.md` em cada entrega.
 
 ## 4. Situação de partida (`0.0.1`)
 
@@ -197,7 +200,7 @@ Não misturar P1c com outras mutações perigosas no mesmo deploy.
 | P0 | **FEITO** | `0.1.0` | 2026-08-08 |
 | P1a | **FEITO** | `0.2.0` | 2026-08-08 |
 | P1b | **FEITO** | `0.3.0` | 2026-08-08 |
-| P1c | Pendente (GO) | → `0.4.0` | — |
+| P1c | **FEITO** (GO `2026-08-08`) | `0.4.0` | 2026-08-08 |
 | P1d | Pendente | → `0.5.0` | — |
 | P1e / `1.0.0` | Pendente | → `1.0.0` | — |
 
@@ -205,10 +208,8 @@ Actualizar esta tabela a cada fecho de bloco.
 
 ## 13. Próxima acção imediata
 
-Quando o operador autorizar implementação:
-
-1. Executar **P0.1–P0.7** como primeiro bloco de código/deploy.
-2. Bump para **`0.1.0`**.
+**P1d → 0.5.0** — pós-revogação (preferência conservadora: substituir
+licença). Seguir ordem; não saltar para P1e antes de fechar P1d.
 3. Registar em `ACOES.md` + `ESTADO.md`.
 
 Até lá: este plano permanece a SSOT de execução da trilha portal.

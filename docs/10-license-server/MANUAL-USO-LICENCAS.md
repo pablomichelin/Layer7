@@ -398,14 +398,21 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
 Ver `docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md` e
 `layer7d --check-in` (forçar verificação imediata em suporte).
 
-### 5.6 Politica conservadora oficial sobre rebind
+### 5.6 Politica oficial de rebind administrativo (portal ≥ 0.4.0)
 
-- nao existe rebind administrativo oficial nesta fase
-- isso e deliberado: um eventual rebind para novo hardware deixaria o `.lic`
-  antigo ainda potencialmente valido offline no hardware antigo ate
-  `expiry + grace`
-- qualquer futura trilha de rebind fica bloqueada ate existir politica
-  explicita para esse risco
+- o CRUD normal **continua** sem editar `hardware_id` (F3.4)
+- existe workflow dedicado no painel: **Rebind hardware** no detalhe da
+  licença (`POST /api/licenses/:id/rebind`)
+- modos:
+  - `unbind` (preferido) — limpa `hardware_id` / `activated_at`; o cliente
+    corre `layer7d --activate CHAVE` no hardware novo
+  - `set` — fixa um `new_hardware_id` conhecido (64 hex) para download
+    imediato do `.lic`
+- `reason` obrigatório (≥ 10 caracteres); evento auditado `license_rebound`
+- **risco residual explícito:** o `.lic` antigo pode continuar válido
+  offline no hardware anterior até `expiry + grace` (14 dias)
+- licenças revogadas não rebindam — usar substituição (P1d)
+- não usar rebind para transferir ownership entre clientes
 
 ### 5.7 Politica conservadora de fingerprint e binding
 

@@ -1,6 +1,6 @@
 # Estado Actual — Portal Admin
 
-> Snapshot: **2026-08-08** — versão visual **`0.3.0`**.
+> Snapshot: **2026-08-08** — versão visual **`0.4.0`**.
 
 ## Ambiente
 
@@ -8,21 +8,20 @@
 |------|-------|
 | Host | `192.168.100.244` |
 | URL | `https://license.systemup.inf.br` |
-| Versão visual | **`0.3.0`** |
-| SPA | `index-haIeulBq.js` |
+| Versão visual | **`0.4.0`** |
+| SPA | `index-C1foUQne.js` |
 | Health | OK |
-| Backup P1b | `backups/layer7-license-postgres-20260808T215610Z.sql` |
+| Backup P1c | `backups/layer7-license-postgres-20260808T215919Z.sql` |
 
 ## Capacidade
 
 | Área | Estado |
 |------|--------|
-| P0 / P1a | OK |
-| Página Auditoria | OK |
-| Check-ins no detalhe | OK |
-| Rebind | Pendente P1c (GO) |
+| P0 / P1a / P1b | OK |
+| Rebind governado | OK (`POST /rebind` unbind|set) |
 | Pós-revogação | Pendente P1d |
+| Fecho 1.0.0 | Pendente P1e |
 
 ## Próximo
 
-**P1c → 0.4.0** — rebind governado (**requer GO explícito**).
+**P1d → 0.5.0** — pós-revogação (preferência: substituir licença).

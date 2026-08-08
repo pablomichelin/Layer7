@@ -23,6 +23,10 @@ const {
   parseRenewPayload,
 } = require('../license-renew-policy');
 const {
+  createLicenseRebindGuardError,
+  parseRebindPayload,
+} = require('../license-rebind-policy');
+const {
   assertEmptyBody,
   normalizeStoredHardwareId,
   parseIdParam,
@@ -536,6 +540,111 @@ router.post('/:id/renew', async (req, res) => {
       req,
       result: 'error',
       reason: 'license_renew_exception',
+      metadata: { license_id: Number.parseInt(req.params.id, 10) || null },
+    });
+    return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
+  }
+});
+
+router.post('/:id/rebind', async (req, res) => {
+  try {
+    const licenseId = parseIdParam(req.params.id, 'license_id');
+    const payload = parseRebindPayload(req.body);
+
+    const rebound = await runInTransaction(async (client) => {
+      const existingResult = await client.query(
+        `SELECT *
+           FROM licenses
+          WHERE id = $1
+            AND archived_at IS NULL
+          FOR UPDATE`,
+        [licenseId]
+      );
+
+      if (existingResult.rows.length === 0) {
+        throw createHttpError(404, 'Licenca nao encontrada.');
+      }
+
+      const existingLicense = existingResult.rows[0];
+      const rebindGuard = createLicenseRebindGuardError(existingLicense, payload);
+      if (rebindGuard) {
+        throw rebindGuard;
+      }
+
+      const previousHardwareId = normalizeStoredHardwareId(existingLicense.hardware_id)
+        || existingLicense.hardware_id
+        || null;
+
+      let result;
+      if (payload.mode === 'unbind') {
+        result = await client.query(
+          `UPDATE licenses
+              SET hardware_id = NULL,
+                  activated_at = NULL,
+                  updated_at = NOW()
+            WHERE id = $1
+            RETURNING *`,
+          [licenseId]
+        );
+      } else {
+        result = await client.query(
+          `UPDATE licenses
+              SET hardware_id = $1,
+                  activated_at = COALESCE(activated_at, NOW()),
+                  updated_at = NOW()
+            WHERE id = $2
+            RETURNING *`,
+          [payload.newHardwareId, licenseId]
+        );
+      }
+
+      await auditAdminEvent({
+        component: 'licenses',
+        eventType: 'license_rebound',
+        adminId: req.admin.id,
+        actorIdentifier: req.admin.email,
+        req,
+        result: 'success',
+        reason: 'license_rebound',
+        metadata: {
+          license_id: licenseId,
+          mode: payload.mode,
+          admin_reason: payload.reason,
+          previous_hardware_id: previousHardwareId,
+          new_hardware_id: payload.mode === 'set' ? payload.newHardwareId : null,
+        },
+        client,
+        strict: true,
+      });
+
+      return result.rows[0];
+    });
+
+    return res.json(applyEffectiveLicenseState(rebound));
+  } catch (error) {
+    if (isHttpError(error)) {
+      await auditAdminEvent({
+        component: 'licenses',
+        eventType: 'license_rebind_denied',
+        adminId: req.admin?.id || null,
+        actorIdentifier: req.admin?.email || null,
+        req,
+        result: 'denied',
+        reason: error.status === 404 ? 'license_not_found' : 'license_rebind_rejected',
+        metadata: { license_id: Number.parseInt(req.params.id, 10) || null, status: error.status, error: error.message },
+      });
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[LICENSES] Rebind error:', error.message);
+    await auditAdminEvent({
+      component: 'licenses',
+      eventType: 'license_rebind_error',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'error',
+      reason: 'license_rebind_exception',
       metadata: { license_id: Number.parseInt(req.params.id, 10) || null },
     });
     return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });

@@ -23,6 +23,12 @@ export default function LicenseDetail() {
   const [loading, setLoading] = useState(true);
   const [renewing, setRenewing] = useState(false);
   const [renewBanner, setRenewBanner] = useState(null);
+  const [showRebind, setShowRebind] = useState(false);
+  const [rebindMode, setRebindMode] = useState('unbind');
+  const [rebindReason, setRebindReason] = useState('');
+  const [rebindHardwareId, setRebindHardwareId] = useState('');
+  const [rebinding, setRebinding] = useState(false);
+  const [rebindBanner, setRebindBanner] = useState(null);
 
   function load() {
     setLoading(true);
@@ -36,6 +42,7 @@ export default function LicenseDetail() {
     try {
       await post(`/licenses/${id}/revoke`, {});
       setRenewBanner(null);
+      setRebindBanner(null);
       load();
     } catch (err) {
       alert(err.message);
@@ -74,12 +81,47 @@ export default function LicenseDetail() {
     }
   }
 
+  async function handleRebind(event) {
+    event.preventDefault();
+    const warning = [
+      'ATENÇÃO: o ficheiro .lic antigo pode continuar válido offline no hardware antigo até expiry + grace (14 dias).',
+      'Confirma o rebind administrativo?',
+    ].join('\n');
+    if (!confirm(warning)) return;
+
+    setRebinding(true);
+    try {
+      const payload = {
+        reason: rebindReason,
+        mode: rebindMode,
+      };
+      if (rebindMode === 'set') {
+        payload.new_hardware_id = rebindHardwareId.trim();
+      }
+      const rebound = await post(`/licenses/${id}/rebind`, payload);
+      setRebindBanner({
+        mode: rebindMode,
+        bound: Boolean(rebound.hardware_id),
+      });
+      setShowRebind(false);
+      setRebindReason('');
+      setRebindHardwareId('');
+      setRebindMode('unbind');
+      load();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setRebinding(false);
+    }
+  }
+
   if (loading) return <p className="text-gray-500">Carregando...</p>;
   if (!data) return <p className="text-red-500">Licença não encontrada</p>;
 
   const { license, activations, check_ins: checkIns = [] } = data;
   const bound = isLicenseBound(license);
   const canRenew = license.status !== 'revoked';
+  const canRebind = license.status !== 'revoked' && bound;
   const lastCheckIn = checkIns[0] || null;
 
   const actColumns = [
@@ -118,6 +160,25 @@ export default function LicenseDetail() {
             <> Ainda unbound — a chave continua a mesma para activação.</>
           )}
           <button type="button" onClick={() => setRenewBanner(null)} className="ml-3 text-green-700 underline">
+            Fechar
+          </button>
+        </div>
+      )}
+
+      {rebindBanner && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-4 py-3 text-sm mb-4">
+          Rebind ({rebindBanner.mode}) concluído e auditado.
+          {rebindBanner.mode === 'unbind' ? (
+            <> A licença está unbound — o cliente deve correr <code>layer7d --activate CHAVE</code> no novo hardware.</>
+          ) : (
+            <>
+              {' '}Novo hardware fixado — faça{' '}
+              <button type="button" onClick={handleDownload} className="underline font-medium">download do .lic</button>
+              {' '}e instale no appliance.
+            </>
+          )}
+          {' '}O .lic antigo pode continuar válido offline no hardware anterior até expiry+grace.
+          <button type="button" onClick={() => setRebindBanner(null)} className="ml-3 underline">
             Fechar
           </button>
         </div>
@@ -175,6 +236,15 @@ export default function LicenseDetail() {
               Renovar {option.label}
             </button>
           ))}
+          {canRebind && (
+            <button
+              type="button"
+              onClick={() => setShowRebind((current) => !current)}
+              className="px-4 py-2 border border-amber-600 text-amber-800 hover:bg-amber-50 text-sm rounded-lg transition-colors"
+            >
+              {showRebind ? 'Cancelar rebind' : 'Rebind hardware'}
+            </button>
+          )}
           {license.status === 'active' && (
             <button onClick={handleRevoke} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Revogar
@@ -194,6 +264,58 @@ export default function LicenseDetail() {
             </button>
           )}
         </div>
+
+        {showRebind && canRebind && (
+          <form onSubmit={handleRebind} className="mt-6 border border-amber-200 bg-amber-50 rounded-lg p-4 space-y-3">
+            <p className="text-sm text-amber-900">
+              Workflow governado (P1c). O .lic antigo no hardware anterior pode continuar
+              válido offline até <strong>expiry + grace (14 dias)</strong>. Preferir
+              <code className="mx-1">unbind</code> e nova activação no appliance.
+            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Modo</label>
+              <select
+                value={rebindMode}
+                onChange={(e) => setRebindMode(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              >
+                <option value="unbind">Unbind — limpar bind (cliente activa de novo)</option>
+                <option value="set">Set — fixar novo hardware_id conhecido</option>
+              </select>
+            </div>
+            {rebindMode === 'set' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Novo hardware_id (64 hex)</label>
+                <input
+                  type="text"
+                  value={rebindHardwareId}
+                  onChange={(e) => setRebindHardwareId(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
+                />
+              </div>
+            )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Motivo (obrigatório, ≥ 10 chars)</label>
+              <textarea
+                value={rebindReason}
+                onChange={(e) => setRebindReason(e.target.value)}
+                required
+                minLength={10}
+                rows={3}
+                placeholder="Ex: Troca de NIC no Contacenter após falha de hardware"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={rebinding}
+              className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white text-sm rounded-lg disabled:opacity-50"
+            >
+              {rebinding ? 'A rebindar...' : 'Confirmar rebind'}
+            </button>
+          </form>
+        )}
       </div>
 
       <h3 className="text-lg font-semibold text-gray-700 mb-3">Histórico de activações</h3>

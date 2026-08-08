@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — P1c Rebind `0.4.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `0.4.0` |
+| Objectivo | Workflow rebind com motivo + auditoria (GO humano) |
+| Impacto | API/UI rebind; MANUAL-USO §5.6; risco .lic antigo explícito |
+| Risco | Alto residual offline (grace); mitigado por aviso + audit |
+| Teste | license-rebind-policy; health; UI rebind |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-C1foUQne.js`; build web `0.4.0`; nginx restarted |
+
+---
+
 ## 2026-08-08 — P1b Auditoria `0.3.0`
 
 | Campo | Valor |
