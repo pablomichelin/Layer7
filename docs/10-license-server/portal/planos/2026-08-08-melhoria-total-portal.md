@@ -201,15 +201,15 @@ Não misturar P1c com outras mutações perigosas no mesmo deploy.
 | P1a | **FEITO** | `0.2.0` | 2026-08-08 |
 | P1b | **FEITO** | `0.3.0` | 2026-08-08 |
 | P1c | **FEITO** (GO `2026-08-08`) | `0.4.0` | 2026-08-08 |
-| P1d | Pendente | → `0.5.0` | — |
+| P1d | **FEITO** (substituir, sem desrevogar) | `0.5.0` | 2026-08-08 |
 | P1e / `1.0.0` | Pendente | → `1.0.0` | — |
 
 Actualizar esta tabela a cada fecho de bloco.
 
 ## 13. Próxima acção imediata
 
-**P1d → 0.5.0** — pós-revogação (preferência conservadora: substituir
-licença). Seguir ordem; não saltar para P1e antes de fechar P1d.
+**P1e → 1.0.0** — percorrer critérios `OBJECTIVOS.md`, inventário SKU,
+fechar plano. Seguir ordem; não saltar.
 3. Registar em `ACOES.md` + `ESTADO.md`.
 
 Até lá: este plano permanece a SSOT de execução da trilha portal.

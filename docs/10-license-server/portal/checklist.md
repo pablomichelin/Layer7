@@ -43,7 +43,7 @@ Ver lista em [`OBJECTIVOS.md`](OBJECTIVOS.md) — critérios de `1.0.0`.
 ## Checklist de deploy (`244`)
 
 - [ ] Backup Postgres (`backup-postgres.sh` / runbook)
-- [ ] Pull/sync código autorizado
+- [ ] Pull/sync código autorizado (**`--exclude .env`** — nunca sobrescrever segredos)
 - [ ] `docker compose build` dos serviços afectados
 - [ ] `docker compose up -d` sem afectar outras stacks
 - [ ] **`docker compose restart nginx`** (evita 502 por DNS stale dos upstreams)

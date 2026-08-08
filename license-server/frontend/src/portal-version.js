@@ -1,2 +1,2 @@
 /** Versão visual do portal — manter alinhada a docs/10-license-server/portal/VERSION.md */
-export const PORTAL_VERSION = '0.4.0';
+export const PORTAL_VERSION = '0.5.0';

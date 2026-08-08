@@ -33,7 +33,7 @@ O portal só sobe a **1.0.0** quando **todos** forem verdade:
 - [x] Workflow de rebind governado (motivo + auditoria)
 - [ ] UI de auditoria administrativa (leitura)
 - [ ] Check-ins visíveis no detalhe da licença
-- [ ] Fluxo claro pós-revogação (desrevogar **ou** substituir licença)
+- [x] Fluxo claro pós-revogação (**substituir** licença; sem desrevogar)
 - [ ] Inventário SKU coerente (`base` / `base,identity`; legado tratado)
 - [ ] Docs da trilha portal actualizados; plano de melhoria P0+P1 fechado
       ou residual só `FUTURA` com GO

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { get, post, del, download } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
@@ -7,6 +7,7 @@ import CopyButton from '../components/CopyButton';
 import { formatSkuLabel, isLicenseBound } from '../license-display.js';
 import {
   ADMIN_LICENSES_ROUTE,
+  buildAdminLicenseDetailRoute,
   buildAdminLicenseEditRoute,
 } from '../panel-routes.js';
 
@@ -19,6 +20,7 @@ const RENEW_OPTIONS = [
 export default function LicenseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [renewing, setRenewing] = useState(false);
@@ -29,6 +31,11 @@ export default function LicenseDetail() {
   const [rebindHardwareId, setRebindHardwareId] = useState('');
   const [rebinding, setRebinding] = useState(false);
   const [rebindBanner, setRebindBanner] = useState(null);
+  const [showReplace, setShowReplace] = useState(false);
+  const [replaceReason, setReplaceReason] = useState('');
+  const [replaceExpiry, setReplaceExpiry] = useState('');
+  const [replacing, setReplacing] = useState(false);
+  const [replaceBanner, setReplaceBanner] = useState(location.state?.replaceBanner || null);
 
   function load() {
     setLoading(true);
@@ -37,12 +44,20 @@ export default function LicenseDetail() {
 
   useEffect(() => { load(); }, [id]);
 
+  useEffect(() => {
+    if (location.state?.replaceBanner) {
+      setReplaceBanner(location.state.replaceBanner);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
+
   async function handleRevoke() {
     if (!confirm('Tem certeza que deseja revogar esta licença?')) return;
     try {
       await post(`/licenses/${id}/revoke`, {});
       setRenewBanner(null);
       setRebindBanner(null);
+      setReplaceBanner(null);
       load();
     } catch (err) {
       alert(err.message);
@@ -115,6 +130,39 @@ export default function LicenseDetail() {
     }
   }
 
+  async function handleReplace(event) {
+    event.preventDefault();
+    const warning = [
+      'Isto cria uma NOVA chave e arquiva a licença revogada.',
+      'Não desrevoga a chave antiga (política conservadora P1d).',
+      'O .lic antigo pode continuar válido offline até expiry+grace.',
+      'Confirma a substituição?',
+    ].join('\n');
+    if (!confirm(warning)) return;
+
+    setReplacing(true);
+    try {
+      const payload = { reason: replaceReason };
+      if (replaceExpiry.trim()) {
+        payload.expiry = replaceExpiry.trim();
+      }
+      const result = await post(`/licenses/${id}/replace`, payload);
+      navigate(buildAdminLicenseDetailRoute(result.license.id), {
+        replace: true,
+        state: {
+          replaceBanner: {
+            previousId: result.previous.id,
+            licenseKey: result.license.license_key,
+          },
+        },
+      });
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setReplacing(false);
+    }
+  }
+
   if (loading) return <p className="text-gray-500">Carregando...</p>;
   if (!data) return <p className="text-red-500">Licença não encontrada</p>;
 
@@ -122,6 +170,7 @@ export default function LicenseDetail() {
   const bound = isLicenseBound(license);
   const canRenew = license.status !== 'revoked';
   const canRebind = license.status !== 'revoked' && bound;
+  const canReplace = license.status === 'revoked';
   const lastCheckIn = checkIns[0] || null;
 
   const actColumns = [
@@ -179,6 +228,21 @@ export default function LicenseDetail() {
           )}
           {' '}O .lic antigo pode continuar válido offline no hardware anterior até expiry+grace.
           <button type="button" onClick={() => setRebindBanner(null)} className="ml-3 underline">
+            Fechar
+          </button>
+        </div>
+      )}
+
+      {replaceBanner && (
+        <div className="bg-green-50 border border-green-200 text-green-900 rounded-lg px-4 py-3 text-sm mb-4">
+          Substituição concluída. Licença #{replaceBanner.previousId} arquivada.
+          Nova chave:{' '}
+          <code className="break-all">{replaceBanner.licenseKey}</code>{' '}
+          <CopyButton text={replaceBanner.licenseKey} />
+          {' '}Entregar ao cliente e activar no pfSense. O .lic antigo pode
+          continuar válido offline até expiry+grace — remover no appliance se
+          precisar de efeito imediato.
+          <button type="button" onClick={() => setReplaceBanner(null)} className="ml-3 underline">
             Fechar
           </button>
         </div>
@@ -245,17 +309,34 @@ export default function LicenseDetail() {
               {showRebind ? 'Cancelar rebind' : 'Rebind hardware'}
             </button>
           )}
+          {canReplace && (
+            <button
+              type="button"
+              onClick={() => setShowReplace((current) => !current)}
+              className="px-4 py-2 border border-indigo-600 text-indigo-800 hover:bg-indigo-50 text-sm rounded-lg transition-colors"
+            >
+              {showReplace ? 'Cancelar substituição' : 'Substituir licença'}
+            </button>
+          )}
           {license.status === 'active' && (
             <button onClick={handleRevoke} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Revogar
             </button>
           )}
-          {license.status !== 'active' && (
+          {license.status !== 'active' && !canReplace && (
             <button onClick={async () => {
               if (!confirm('Arquivar esta licença?')) return;
               try { await del(`/licenses/${id}`); navigate(ADMIN_LICENSES_ROUTE); } catch (err) { alert(err.message); }
             }} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Arquivar Licença
+            </button>
+          )}
+          {canReplace && (
+            <button onClick={async () => {
+              if (!confirm('Arquivar esta licença revogada sem criar substituta?')) return;
+              try { await del(`/licenses/${id}`); navigate(ADMIN_LICENSES_ROUTE); } catch (err) { alert(err.message); }
+            }} className="px-4 py-2 border border-red-600 text-red-700 hover:bg-red-50 text-sm rounded-lg transition-colors">
+              Só arquivar
             </button>
           )}
           {license.hardware_id && (
@@ -313,6 +394,47 @@ export default function LicenseDetail() {
               className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white text-sm rounded-lg disabled:opacity-50"
             >
               {rebinding ? 'A rebindar...' : 'Confirmar rebind'}
+            </button>
+          </form>
+        )}
+
+        {showReplace && canReplace && (
+          <form onSubmit={handleReplace} className="mt-6 border border-indigo-200 bg-indigo-50 rounded-lg p-4 space-y-3">
+            <p className="text-sm text-indigo-950">
+              Política P1d: <strong>não desrevoga</strong>. Cria chave nova (mesmo
+              cliente/SKU), arquiva a revogada e audita. A chave antiga deixa de
+              aparecer na lista; o .lic offline antigo pode ainda funcionar até
+              expiry+grace.
+            </p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nova expiração (opcional; default = da licença antiga)
+              </label>
+              <input
+                type="date"
+                value={replaceExpiry}
+                onChange={(e) => setReplaceExpiry(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Motivo (obrigatório, ≥ 10 chars)</label>
+              <textarea
+                value={replaceReason}
+                onChange={(e) => setReplaceReason(e.target.value)}
+                required
+                minLength={10}
+                rows={3}
+                placeholder="Ex: Substituição após revogação por chave comprometida"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={replacing}
+              className="px-4 py-2 bg-indigo-700 hover:bg-indigo-800 text-white text-sm rounded-lg disabled:opacity-50"
+            >
+              {replacing ? 'A substituir...' : 'Criar substituta e arquivar'}
             </button>
           </form>
         )}

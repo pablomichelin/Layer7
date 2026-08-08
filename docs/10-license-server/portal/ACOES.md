@@ -5,6 +5,31 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — P1d Substituir `0.5.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `0.5.0` |
+| Objectivo | Pós-revogação via substituição (nova chave + arquivar) |
+| Impacto | API/UI replace; MANUAL-USO §7.1; decisão: sem desrevogar |
+| Risco | Médio (chave nova + .lic antigo offline); mitigado por aviso + audit |
+| Teste | license-replace-policy; health; UI substituir |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-_t9yOdDK.js`; build web `0.5.0`; `.env` restaurado pós-rsync |
+
+### Decisão
+
+- IDEA-012: escolhido fluxo **substituir** (não desrevogar).
+
+### Incidente
+
+- `rsync --delete` apagou `.env`; API em crash-loop; restore do backup
+  `20260414T105834Z` + cópia fresca `20260808T220404Z`. Dados Postgres OK
+  (volume). Regra: **sempre** `--exclude .env` no rsync.
+
+---
+
 ## 2026-08-08 — P1c Rebind `0.4.0`
 
 | Campo | Valor |

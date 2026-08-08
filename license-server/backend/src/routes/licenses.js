@@ -27,6 +27,12 @@ const {
   parseRebindPayload,
 } = require('../license-rebind-policy');
 const {
+  buildReplacementNotes,
+  createLicenseReplaceGuardError,
+  parseReplacePayload,
+  resolveReplacementExpiry,
+} = require('../license-replace-policy');
+const {
   assertEmptyBody,
   normalizeStoredHardwareId,
   parseIdParam,
@@ -645,6 +651,124 @@ router.post('/:id/rebind', async (req, res) => {
       req,
       result: 'error',
       reason: 'license_rebind_exception',
+      metadata: { license_id: Number.parseInt(req.params.id, 10) || null },
+    });
+    return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });
+  }
+});
+
+router.post('/:id/replace', async (req, res) => {
+  try {
+    const licenseId = parseIdParam(req.params.id, 'license_id');
+    const payload = parseReplacePayload(req.body);
+
+    const result = await runInTransaction(async (client) => {
+      const existingResult = await client.query(
+        `SELECT *
+           FROM licenses
+          WHERE id = $1
+            AND archived_at IS NULL
+          FOR UPDATE`,
+        [licenseId]
+      );
+
+      if (existingResult.rows.length === 0) {
+        throw createHttpError(404, 'Licenca nao encontrada.');
+      }
+
+      const previousLicense = existingResult.rows[0];
+      const replaceGuard = createLicenseReplaceGuardError(previousLicense);
+      if (replaceGuard) {
+        throw replaceGuard;
+      }
+
+      await ensureVisibleCustomer(client, previousLicense.customer_id);
+
+      const licenseKey = crypto.randomBytes(16).toString('hex');
+      const expiry = resolveReplacementExpiry(previousLicense, payload.expiry);
+      const notes = buildReplacementNotes(previousLicense, payload.reason);
+
+      const createdResult = await client.query(
+        `INSERT INTO licenses (customer_id, license_key, expiry, features, notes)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING *`,
+        [
+          previousLicense.customer_id,
+          licenseKey,
+          expiry,
+          previousLicense.features,
+          notes,
+        ]
+      );
+
+      const archivedResult = await client.query(
+        `UPDATE licenses
+            SET archived_at = NOW(),
+                archived_by_admin_id = $1,
+                updated_at = NOW()
+          WHERE id = $2
+          RETURNING id, license_key, status, revoked_at, archived_at`,
+        [req.admin.id, licenseId]
+      );
+
+      await auditAdminEvent({
+        component: 'licenses',
+        eventType: 'license_replaced',
+        adminId: req.admin.id,
+        actorIdentifier: req.admin.email,
+        req,
+        result: 'success',
+        reason: 'license_replaced',
+        metadata: {
+          previous_license_id: licenseId,
+          new_license_id: createdResult.rows[0].id,
+          reason: payload.reason,
+          previous_license_key_prefix: String(previousLicense.license_key || '').slice(0, 8),
+          new_license_key_prefix: String(createdResult.rows[0].license_key || '').slice(0, 8),
+        },
+        client,
+        strict: true,
+      });
+
+      return {
+        previous: archivedResult.rows[0],
+        license: createdResult.rows[0],
+      };
+    });
+
+    return res.status(201).json({
+      previous: result.previous,
+      license: applyEffectiveLicenseState(result.license),
+      message: 'Licenca substituida. A chave antiga ficou arquivada; use a nova chave.',
+    });
+  } catch (error) {
+    if (isHttpError(error)) {
+      await auditAdminEvent({
+        component: 'licenses',
+        eventType: 'license_replace_denied',
+        adminId: req.admin?.id || null,
+        actorIdentifier: req.admin?.email || null,
+        req,
+        result: 'denied',
+        reason: error.status === 404 ? 'license_not_found' : 'license_replace_rejected',
+        metadata: {
+          license_id: Number.parseInt(req.params.id, 10) || null,
+          status: error.status,
+          error: error.message,
+        },
+      });
+      return res.status(error.status).json({ error: error.message });
+    }
+
+    console.error('[LICENSES] Replace error:', error.message);
+    await auditAdminEvent({
+      component: 'licenses',
+      eventType: 'license_replace_error',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'error',
+      reason: 'license_replace_exception',
       metadata: { license_id: Number.parseInt(req.params.id, 10) || null },
     });
     return res.status(500).json({ error: ADMIN_INTERNAL_ERROR_MESSAGE });

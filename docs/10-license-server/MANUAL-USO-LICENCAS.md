@@ -411,7 +411,7 @@ Ver `docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md` e
 - `reason` obrigatório (≥ 10 caracteres); evento auditado `license_rebound`
 - **risco residual explícito:** o `.lic` antigo pode continuar válido
   offline no hardware anterior até `expiry + grace` (14 dias)
-- licenças revogadas não rebindam — usar substituição (P1d)
+- licenças revogadas não rebindam — usar substituição (§7.1 / P1d)
 - não usar rebind para transferir ownership entre clientes
 
 ### 5.7 Politica conservadora de fingerprint e binding
@@ -537,6 +537,41 @@ service layer7d restart
 
 - Qualquer tentativa futura de `--activate` com essa chave retornara
   erro 409 (`Licenca revogada`)
+
+### 7.1 Substituir licenca apos revogacao (portal ≥ 0.5.0)
+
+Politica oficial (P1d, preferencia conservadora): **nao desrevogar**.
+Criar chave nova e arquivar a revogada.
+
+#### Via painel
+
+1. Abrir detalhe de uma licenca com status `revoked`
+2. **Substituir licenca** → motivo (≥ 10 chars); expiracao opcional
+   (default = da licenca antiga)
+3. Confirmar — o painel abre a **nova** licenca com a chave copiavel
+4. Entregar a nova chave ao cliente e activar no pfSense
+5. Se precisar de efeito imediato no appliance antigo:
+   `rm /usr/local/etc/layer7.lic && service layer7d restart`
+
+#### Via API
+
+```bash
+curl -s -X POST -b "$COOKIE_JAR" \
+  -H 'Content-Type: application/json' \
+  -d '{"reason":"Substituicao apos chave comprometida"}' \
+  https://license.systemup.inf.br/api/licenses/3/replace
+```
+
+Resposta `201`: `{ previous, license, message }`. Auditoria:
+`license_replaced` (IDs antigo/novo + motivo).
+
+#### Regras
+
+- so licencas **revogadas** (nao activas/expiradas sem revogar)
+- nova licenca: mesmo cliente e SKU/`features`, **unbound**
+- licenca antiga: arquivada na mesma transacao (some da lista)
+- o `.lic` antigo pode continuar valido offline ate expiry+grace
+- renovar/rebind numa revogada continua bloqueado — use replace
 
 ---
 

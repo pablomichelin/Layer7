@@ -11,6 +11,24 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [0.5.0] — 2026-08-08
+
+### Added
+
+- Pós-revogação: `POST /licenses/:id/replace` (nova chave + arquiva a revogada)
+- UI **Substituir licença** no detalhe com motivo e aviso de .lic antigo
+- Evento de auditoria `license_replaced`
+
+### Decision
+
+- **Não** implementar desrevogar — fluxo conservador “substituir” (IDEA-012 / P1d)
+
+### Changed
+
+- `MANUAL-USO-LICENCAS.md` §7 — política oficial de substituição pós-revogação
+
+---
+
 ## [0.4.0] — 2026-08-08
 
 ### Added
