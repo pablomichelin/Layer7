@@ -1,5 +1,6 @@
 const { createHttpError } = require('./http-error');
 const { normalizeStoredHardwareId } = require('./crud-validation');
+const { getEffectiveLicenseState } = require('./license-state');
 
 function getDownloadHardwareId(license) {
   return normalizeStoredHardwareId(license.hardware_id) || license.hardware_id || null;
@@ -7,6 +8,7 @@ function getDownloadHardwareId(license) {
 
 function createLicenseDownloadGuardError(license) {
   const effectiveHardwareId = getDownloadHardwareId(license);
+  const effectiveStatus = getEffectiveLicenseState(license).effectiveStatus;
 
   if (!effectiveHardwareId) {
     return {
@@ -16,11 +18,11 @@ function createLicenseDownloadGuardError(license) {
     };
   }
 
-  if (license.status !== 'active') {
+  if (effectiveStatus !== 'active') {
     return {
       error: createHttpError(409, 'Licenca nao esta em estado valido para download.'),
       reason: 'license_state_invalid_for_download',
-      metadata: { license_id: license.id, status: license.status },
+      metadata: { license_id: license.id, status: effectiveStatus },
     };
   }
 

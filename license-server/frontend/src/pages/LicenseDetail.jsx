@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { get, post, del, download } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
 import CopyButton from '../components/CopyButton';
 import { formatSkuLabel, isLicenseBound } from '../license-display.js';
+import { formatCalendarDate, formatDateTime } from '../format-date.js';
 import {
   ADMIN_LICENSES_ROUTE,
   buildAdminCustomerDetailRoute,
@@ -22,6 +23,8 @@ export default function LicenseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const fromCustomerId = searchParams.get('from_customer') || '';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [renewing, setRenewing] = useState(false);
@@ -38,12 +41,27 @@ export default function LicenseDetail() {
   const [replacing, setReplacing] = useState(false);
   const [replaceBanner, setReplaceBanner] = useState(location.state?.replaceBanner || null);
 
-  function load() {
+  function load(signal) {
     setLoading(true);
-    get(`/licenses/${id}`).then(setData).catch(console.error).finally(() => setLoading(false));
+    get(`/licenses/${id}`, signal ? { signal } : {})
+      .then((payload) => {
+        if (signal?.aborted) return;
+        setData(payload);
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError' || signal?.aborted) return;
+        console.error(err);
+      })
+      .finally(() => {
+        if (!signal?.aborted) setLoading(false);
+      });
   }
 
-  useEffect(() => { load(); }, [id]);
+  useEffect(() => {
+    const controller = new AbortController();
+    load(controller.signal);
+    return () => controller.abort();
+  }, [id]);
 
   useEffect(() => {
     if (location.state?.replaceBanner) {
@@ -171,6 +189,7 @@ export default function LicenseDetail() {
   const bound = isLicenseBound(license);
   const canRenew = license.status !== 'revoked';
   const canRebind = license.status !== 'revoked' && bound;
+  const canDownload = license.status === 'active' && bound;
   const canReplace = license.status === 'revoked';
   const lastCheckIn = checkIns[0] || null;
 
@@ -192,13 +211,20 @@ export default function LicenseDetail() {
 
   return (
     <div>
-      <button onClick={() => navigate(ADMIN_LICENSES_ROUTE)} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
+      <button
+        onClick={() => navigate(
+          fromCustomerId
+            ? buildAdminCustomerDetailRoute(fromCustomerId)
+            : ADMIN_LICENSES_ROUTE
+        )}
+        className="text-sm text-brand-600 hover:underline mb-4 block"
+      >&larr; Voltar</button>
 
       {renewBanner && (
         <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-3 text-sm mb-4">
           Licença renovada (+{renewBanner.days} dias). Nova expiração:{' '}
-          <strong>{new Date(renewBanner.expiry).toLocaleDateString('pt-BR')}</strong>.
-          {renewBanner.bound ? (
+          <strong>{formatCalendarDate(renewBanner.expiry)}</strong>.
+          {renewBanner.bound && canDownload ? (
             <>
               {' '}Appliance bindado: faça{' '}
               <button type="button" onClick={handleDownload} className="underline font-medium">
@@ -206,6 +232,8 @@ export default function LicenseDetail() {
               </button>{' '}
               actualizado e reinstale no pfSense se necessário.
             </>
+          ) : renewBanner.bound ? (
+            <> Appliance bindado — reinstale .lic quando a licença estiver activa.</>
           ) : (
             <> Ainda unbound — a chave continua a mesma para activação.</>
           )}
@@ -222,9 +250,16 @@ export default function LicenseDetail() {
             <> A licença está unbound — o cliente deve correr <code>layer7d --activate CHAVE</code> no novo hardware.</>
           ) : (
             <>
-              {' '}Novo hardware fixado — faça{' '}
-              <button type="button" onClick={handleDownload} className="underline font-medium">download do .lic</button>
-              {' '}e instale no appliance.
+              {' '}Novo hardware fixado
+              {canDownload ? (
+                <>
+                  {' '}— faça{' '}
+                  <button type="button" onClick={handleDownload} className="underline font-medium">download do .lic</button>
+                  {' '}e instale no appliance.
+                </>
+              ) : (
+                <> — reinstale o .lic quando a licença estiver activa.</>
+              )}
             </>
           )}
           {' '}O .lic antigo pode continuar válido offline no hardware anterior até expiry+grace.
@@ -282,11 +317,11 @@ export default function LicenseDetail() {
               <span className="ml-2">{license.customer_name || '—'}</span>
             )}
           </div>
-          <div><span className="text-gray-500">Expira:</span> <span className="ml-2">{new Date(license.expiry).toLocaleDateString('pt-BR')}</span></div>
+          <div><span className="text-gray-500">Expira:</span> <span className="ml-2">{formatCalendarDate(license.expiry)}</span></div>
           <div><span className="text-gray-500">SKU:</span> <span className="ml-2">{formatSkuLabel(license.features)}</span></div>
           <div><span className="text-gray-500">Hardware ID:</span> <code className="ml-2 text-xs break-all">{license.hardware_id || 'Não activada'}</code></div>
-          <div><span className="text-gray-500">Activada em:</span> <span className="ml-2">{license.activated_at ? new Date(license.activated_at).toLocaleString('pt-BR') : 'Nunca'}</span></div>
-          <div><span className="text-gray-500">Criada em:</span> <span className="ml-2">{new Date(license.created_at).toLocaleString('pt-BR')}</span></div>
+          <div><span className="text-gray-500">Activada em:</span> <span className="ml-2">{license.activated_at ? formatDateTime(license.activated_at) : 'Nunca'}</span></div>
+          <div><span className="text-gray-500">Criada em:</span> <span className="ml-2">{formatDateTime(license.created_at)}</span></div>
           <div>
             <span className="text-gray-500">Último check-in:</span>{' '}
             <span className="ml-2">
@@ -295,14 +330,22 @@ export default function LicenseDetail() {
                 : 'Nunca'}
             </span>
           </div>
-          {license.revoked_at && <div><span className="text-gray-500">Revogada em:</span> <span className="ml-2">{new Date(license.revoked_at).toLocaleString('pt-BR')}</span></div>}
+          {license.revoked_at && <div><span className="text-gray-500">Revogada em:</span> <span className="ml-2">{formatDateTime(license.revoked_at)}</span></div>}
           {license.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{license.notes}</span></div>}
         </div>
 
+        {bound && license.status === 'active' && (
+          <p className="mt-4 text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+            Licença bound: após alterar SKU/expiry, faça download do .lic actualizado e reinstale no appliance.
+          </p>
+        )}
+
         <div className="flex flex-wrap gap-3 mt-6">
-          <button onClick={() => navigate(buildAdminLicenseEditRoute(id))} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
-            Editar
-          </button>
+          {license.status !== 'revoked' && (
+            <button onClick={() => navigate(buildAdminLicenseEditRoute(id, { fromCustomerId: fromCustomerId || undefined }))} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
+              Editar
+            </button>
+          )}
           {canRenew && RENEW_OPTIONS.map((option) => (
             <button
               key={option.days}
@@ -353,7 +396,7 @@ export default function LicenseDetail() {
               Só arquivar
             </button>
           )}
-          {license.hardware_id && (
+          {license.status === 'active' && bound && (
             <button onClick={handleDownload} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
               Download .lic
             </button>

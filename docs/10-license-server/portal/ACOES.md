@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — Hotfix revisão `1.3.1`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `1.3.1` |
+| Objectivo | Corrigir todos os achados da revisão defect-first |
+| Impacto | UI datas/download/busca/select; policies update/download |
+| Risco | Baixo–médio (mutações só bloqueio revoked) |
+| Teste | update/download/format-date/panel-routes; health SPA |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-B-Ms_YV_.js`; `TZ=UTC` api/db; residuals P2/P3 fechados; `.env` preservado |
+
+---
+
 ## 2026-08-08 — C2 Lista operacional + fecho plano `1.3.0`
 
 | Campo | Valor |

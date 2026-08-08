@@ -92,6 +92,38 @@ test('createLicenseUpdateGuardError allows customer changes on unbound licenses'
   assert.equal(error, null);
 });
 
+test('listChangedLicenseFields ignores Date vs YYYY-MM-DD for same calendar day', () => {
+  const changedFields = listChangedLicenseFields(
+    {
+      customer_id: 1,
+      expiry: new Date('2033-10-24T00:00:00.000Z'),
+      features: 'base',
+      notes: null,
+    },
+    {
+      expiry: '2033-10-24',
+    }
+  );
+
+  assert.deepEqual(changedFields, []);
+});
+
+test('createLicenseUpdateGuardError blocks any update on revoked licenses', () => {
+  const error = createLicenseUpdateGuardError(
+    {
+      id: 11,
+      status: 'revoked',
+      expiry: '2033-10-24',
+      hardware_id: null,
+      activated_at: null,
+    },
+    ['notes']
+  );
+
+  assert.equal(error.status, 409);
+  assert.match(error.message, /substituicao/i);
+});
+
 test('createLicenseUpdateGuardError allows non-customer changes on bound licenses', () => {
   const error = createLicenseUpdateGuardError(
     {

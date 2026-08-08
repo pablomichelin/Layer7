@@ -1,4 +1,5 @@
 const { createHttpError } = require('./http-error');
+const { normalizeExpiryDate } = require('./crud-validation');
 const { getEffectiveLicenseState } = require('./license-state');
 
 function listChangedLicenseFields(existingLicense, payload) {
@@ -8,9 +9,12 @@ function listChangedLicenseFields(existingLicense, payload) {
     && payload.customerId !== existingLicense.customer_id) {
     changedFields.push('customer_id');
   }
-  if (Object.prototype.hasOwnProperty.call(payload, 'expiry')
-    && payload.expiry !== existingLicense.expiry) {
-    changedFields.push('expiry');
+  if (Object.prototype.hasOwnProperty.call(payload, 'expiry')) {
+    const nextExpiry = normalizeExpiryDate(payload.expiry);
+    const currentExpiry = normalizeExpiryDate(existingLicense.expiry);
+    if (nextExpiry !== currentExpiry) {
+      changedFields.push('expiry');
+    }
   }
   if (Object.prototype.hasOwnProperty.call(payload, 'features')
     && payload.features !== (existingLicense.features || 'base')) {
@@ -26,6 +30,13 @@ function listChangedLicenseFields(existingLicense, payload) {
 
 function createLicenseUpdateGuardError(existingLicense, changedFields) {
   const existingState = getEffectiveLicenseState(existingLicense);
+
+  if (existingState.revoked) {
+    return createHttpError(
+      409,
+      'Licenca revogada nao pode ser editada. Use substituicao (replace).'
+    );
+  }
 
   if (changedFields.includes('customer_id')
     && (existingState.activated || Boolean(existingLicense.activated_at))) {

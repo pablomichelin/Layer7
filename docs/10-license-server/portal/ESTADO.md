@@ -1,6 +1,6 @@
 # Estado Actual — Portal Admin
 
-> Snapshot: **2026-08-08** — versão visual **`1.3.0`**.
+> Snapshot: **2026-08-08** — versão visual **`1.3.1`** (hotfix revisão).
 
 ## Ambiente
 
@@ -8,18 +8,19 @@
 |------|-------|
 | Host | `192.168.100.244` |
 | URL | `https://license.systemup.inf.br` |
-| Versão visual | **`1.3.0`** |
-| SPA | `index-CvZ07LNK.js` |
-| Health | OK |
-| Plano | `PORTAL-PLAN-002` **CONCLUIDO** |
+| Versão visual | **`1.3.1`** |
+| SPA | `assets/index-B-Ms_YV_.js` |
+| Health | `ok` (`timestamp` UTC) |
+| TZ contentores | `UTC` (`db` + `api`) |
+| Dados | volume Postgres intacto (ex.: 8 licenças) |
+| Plano | nenhum activo (`PORTAL-PLAN-002` CONCLUIDO) |
 
-## Capacidade
+## Notas operacionais
 
-| Área | Estado |
-|------|--------|
-| C0–C2 ficha cliente 360 | OK |
-| Plano activo | nenhum |
+- Rsync: **sempre** `--exclude .env`
+- Compose: `TZ=${TZ:-UTC}` em `db`/`api`; `.env` live tem `TZ=UTC`
+- Smoke BRT: criar/ver licença com expiry amanhã e confirmar data no ecrã
 
 ## Próximo
 
-Sem bloco obrigatório. Novas ideias → `IDEIAS.md` + GO.
+Só ideias com GO (`IDEIAS.md`).

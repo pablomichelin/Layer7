@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { get, post, put } from '../api';
 import CopyButton from '../components/CopyButton';
+import CustomerSelect from '../components/CustomerSelect.jsx';
 import {
   buildLicenseFormState,
   buildLicenseSavePayload,
@@ -22,7 +23,7 @@ export default function LicenseForm() {
   const [searchParams] = useSearchParams();
   const isEdit = Boolean(id);
   const presetCustomerId = searchParams.get('customer_id') || '';
-  const [customers, setCustomers] = useState([]);
+  const fromCustomerId = searchParams.get('from_customer') || '';
   const [form, setForm] = useState({
     customer_id: presetCustomerId,
     expiry: '',
@@ -36,49 +37,41 @@ export default function LicenseForm() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
     async function loadFormData() {
       try {
-        const [customersResponse, licenseResponse] = await Promise.all([
-          get('/customers?limit=200'),
-          isEdit ? get(`/licenses/${id}`) : Promise.resolve(null),
-        ]);
-
-        if (!active) {
+        if (!isEdit) {
+          if (presetCustomerId) {
+            setForm((current) => ({
+              ...current,
+              customer_id: presetCustomerId,
+            }));
+          }
+          setLoadingInitialData(false);
           return;
         }
 
-        setCustomers(customersResponse.customers);
-
-        if (licenseResponse) {
-          const { license } = licenseResponse;
-          setLicenseState(license);
-          setForm(buildLicenseFormState(license));
-        } else if (presetCustomerId) {
-          setForm((current) => ({
-            ...current,
-            customer_id: presetCustomerId,
-          }));
+        const licenseResponse = await get(`/licenses/${id}`, { signal: controller.signal });
+        if (controller.signal.aborted) return;
+        const { license } = licenseResponse;
+        if (license.status === 'revoked') {
+          setError('Licenca revogada nao pode ser editada. Use substituicao na ficha.');
         }
+        setLicenseState(license);
+        setForm(buildLicenseFormState(license));
       } catch (err) {
-        if (!active) {
-          return;
-        }
-
+        if (err?.name === 'AbortError' || controller.signal.aborted) return;
         setError(err.message);
       } finally {
-        if (active) {
+        if (!controller.signal.aborted) {
           setLoadingInitialData(false);
         }
       }
     }
 
     loadFormData();
-
-    return () => {
-      active = false;
-    };
+    return () => controller.abort();
   }, [id, isEdit, presetCustomerId]);
 
   function handleChange(event) {
@@ -94,11 +87,17 @@ export default function LicenseForm() {
     setLoading(true);
 
     try {
+      if (isEdit && licenseState?.status === 'revoked') {
+        setError('Licenca revogada nao pode ser editada. Use substituicao na ficha.');
+        setLoading(false);
+        return;
+      }
+
       const payload = buildLicenseSavePayload(form);
 
       if (isEdit) {
         await put(`/licenses/${id}`, payload);
-        navigate(buildAdminLicenseDetailRoute(id));
+        navigate(buildAdminLicenseDetailRoute(id, { fromCustomerId: fromCustomerId || undefined }));
       } else {
         const created = await post('/licenses', payload);
         setCreatedLicense(created);
@@ -114,9 +113,10 @@ export default function LicenseForm() {
     isEdit,
     license: licenseState,
   });
+  const editBlocked = isEdit && licenseState?.status === 'revoked';
 
   const backRoute = isEdit
-    ? buildAdminLicenseDetailRoute(id)
+    ? buildAdminLicenseDetailRoute(id, { fromCustomerId: fromCustomerId || undefined })
     : (presetCustomerId
       ? buildAdminCustomerDetailRoute(presetCustomerId)
       : ADMIN_LICENSES_ROUTE);
@@ -184,19 +184,13 @@ export default function LicenseForm() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
-            <select
+            <CustomerSelect
               name="customer_id"
               value={form.customer_id}
               onChange={handleChange}
               required
-              disabled={customerChangeBlocked}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none disabled:bg-gray-100 disabled:text-gray-500"
-            >
-              <option value="">Seleccionar cliente...</option>
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>{customer.name}</option>
-              ))}
-            </select>
+              disabled={customerChangeBlocked || editBlocked}
+            />
             {customerChangeBlocked && (
               <p className="text-xs text-gray-500 mt-1">
                 Licenças activadas/bindadas nao permitem trocar de cliente.
@@ -207,11 +201,16 @@ export default function LicenseForm() {
                 Cliente pré-seleccionado a partir da ficha.
               </p>
             ) : null}
+            {isEdit && licenseState?.hardware_id ? (
+              <p className="text-xs text-amber-700 mt-1">
+                Após mudar SKU/expiry em licença bound, faça download do .lic e reinstale no appliance.
+              </p>
+            ) : null}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Data de expiração</label>
-            <input type="date" name="expiry" value={form.expiry} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+            <input type="date" name="expiry" value={form.expiry} onChange={handleChange} required disabled={editBlocked} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none disabled:bg-gray-100" />
           </div>
 
           <div>
@@ -220,7 +219,8 @@ export default function LicenseForm() {
               name="features"
               value={form.features}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+              disabled={editBlocked}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none disabled:bg-gray-100"
             >
               {LICENSE_FEATURE_PRESETS.map((preset) => (
                 <option key={preset.value} value={preset.value}>{preset.label}</option>
@@ -239,10 +239,10 @@ export default function LicenseForm() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Notas</label>
-            <textarea name="notes" value={form.notes} onChange={handleChange} rows="3" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+            <textarea name="notes" value={form.notes} onChange={handleChange} rows="3" disabled={editBlocked} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none disabled:bg-gray-100" />
           </div>
 
-          <button type="submit" disabled={loading} className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50">
+          <button type="submit" disabled={loading || editBlocked} className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50">
             {loading ? 'Salvando...' : isEdit ? 'Salvar Alterações' : 'Criar Licença'}
           </button>
         </form>

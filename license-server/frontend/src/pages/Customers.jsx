@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get, del } from '../api';
 import DataTable from '../components/DataTable';
+import { formatCalendarDate, formatDateTime } from '../format-date.js';
+import { useDebouncedValue } from '../use-debounced-value.js';
 import {
   ADMIN_CUSTOMERS_NEW_ROUTE,
   buildAdminCustomerDetailRoute,
@@ -14,27 +16,40 @@ export default function Customers() {
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const [listEpoch, setListEpoch] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  function load() {
+  useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
     const params = new URLSearchParams({ page, limit: 20 });
-    if (search) params.set('search', search);
-    get(`/customers?${params}`)
-      .then((d) => { setCustomers(d.customers); setTotal(d.total); setPages(d.pages); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }
+    if (debouncedSearch) params.set('search', debouncedSearch);
 
-  useEffect(() => { load(); }, [page, search]);
+    get(`/customers?${params}`, { signal: controller.signal })
+      .then((d) => {
+        setCustomers(d.customers);
+        setTotal(d.total);
+        setPages(d.pages);
+      })
+      .catch((err) => {
+        if (err?.name !== 'AbortError') console.error(err);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [page, debouncedSearch, listEpoch]);
 
   async function handleArchive(id, name, e) {
     e.stopPropagation();
-    if (!confirm(`Arquivar cliente "${name}"?`)) return;
+    if (!confirm(`Arquivar cliente "${name}" e as licenças não activas associadas?`)) return;
     try {
       await del(`/customers/${id}`);
-      load();
+      setPage(1);
+      setListEpoch((current) => current + 1);
     } catch (err) {
       alert(err.message);
     }
@@ -75,33 +90,19 @@ export default function Customers() {
         );
       },
     },
-    { key: 'created_at', label: 'Criado em', render: (r) => new Date(r.created_at).toLocaleDateString('pt-BR') },
+    {
+      key: 'created_at',
+      label: 'Criado em',
+      render: (r) => formatDateTime(r.created_at).split(',')[0] || formatDateTime(r.created_at),
+    },
     {
       key: 'actions',
       label: '',
       render: (r) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-          <button
-            type="button"
-            onClick={() => navigate(buildAdminCustomerDetailRoute(r.id))}
-            className="text-xs text-brand-600 hover:underline"
-          >
-            Ver
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate(buildAdminCustomerEditRoute(r.id))}
-            className="text-xs text-brand-600 hover:underline"
-          >
-            Editar
-          </button>
-          <button
-            type="button"
-            onClick={(e) => handleArchive(r.id, r.name, e)}
-            className="text-xs text-red-600 hover:underline"
-          >
-            Arquivar
-          </button>
+          <button type="button" onClick={() => navigate(buildAdminCustomerDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
+          <button type="button" onClick={() => navigate(buildAdminCustomerEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
+          <button type="button" onClick={(e) => handleArchive(r.id, r.name, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
         </div>
       ),
     },

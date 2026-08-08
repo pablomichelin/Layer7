@@ -32,6 +32,7 @@ Registar aqui **antes** de implementar. Ligar a plano/versão quando existir.
 |----|-------|--------|---------|
 | IDEA-015 | Navegação Cliente↔Licença (clique linha, links cruzados) | Chat `2026-08-08` | Plano ficha 360 — **C0** |
 | IDEA-016 | Ficha cliente 360: licenças ricas + nova licença no contexto | Chat `2026-08-08` | Plano ficha 360 — **C1** |
+| IDEA-017 | Hotfix revisão defect-first (datas BRT, download, audit, busca) | Revisão `2026-08-08` | `1.3.1` |
 
 ---
 

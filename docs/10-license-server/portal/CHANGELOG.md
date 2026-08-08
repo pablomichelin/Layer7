@@ -11,6 +11,28 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [1.3.1] — 2026-08-08
+
+### Fixed
+
+- Off-by-one de datas de expiração em fuso BRT (`formatCalendarDate`)
+- Download `.lic` alinhado ao guard (só active+bound)
+- Auditoria de update: falso positivo em `expiry` (Date vs string)
+- PUT bloqueado em licença revogada
+- Race de busca (debounce + AbortController)
+- Truncamento do select de clientes (busca no servidor)
+- Texto de arquivar na lista alinhado à API
+- Voltar do detalhe com `from_customer`; hint SKU em bound
+
+### Changed
+
+- Compose: `TZ=${TZ:-UTC}` em `db` e `api` (alinha `CURRENT_DATE` SQL)
+- Checklist portal: nota `TZ=UTC` no compose
+- Ciclo Editar preserva `from_customer`; reload pós-mutação via epoch+abort
+- Banner rebind só oferece download se `canDownload`
+
+---
+
 ## [1.3.0] — 2026-08-08
 
 ### Added

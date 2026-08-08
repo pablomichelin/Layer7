@@ -4,7 +4,10 @@ import { get, post, del } from '../api';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import CopyButton from '../components/CopyButton';
+import CustomerSelect from '../components/CustomerSelect.jsx';
 import { formatSkuLabel, isLicenseBound } from '../license-display.js';
+import { formatCalendarDate } from '../format-date.js';
+import { useDebouncedValue } from '../use-debounced-value.js';
 import {
   ADMIN_LICENSES_NEW_ROUTE,
   buildAdminCustomerDetailRoute,
@@ -14,7 +17,6 @@ import {
 
 export default function Licenses() {
   const [licenses, setLicenses] = useState([]);
-  const [customers, setCustomers] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -23,6 +25,8 @@ export default function Licenses() {
   const [boundFilter, setBoundFilter] = useState('');
   const [expiringFilter, setExpiringFilter] = useState('');
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const [listEpoch, setListEpoch] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -39,33 +43,37 @@ export default function Licenses() {
   }, [searchParams]);
 
   useEffect(() => {
-    get('/customers?limit=200')
-      .then((d) => setCustomers(d.customers || []))
-      .catch(console.error);
-  }, []);
-
-  function load() {
+    const controller = new AbortController();
     setLoading(true);
     const params = new URLSearchParams({ page, limit: 20 });
     if (statusFilter) params.set('status', statusFilter);
     if (customerFilter) params.set('customer_id', customerFilter);
     if (boundFilter) params.set('bound', boundFilter);
     if (expiringFilter) params.set('expiring_within_days', expiringFilter);
-    if (search) params.set('search', search);
-    get(`/licenses?${params}`)
-      .then((d) => { setLicenses(d.licenses); setTotal(d.total); setPages(d.pages); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }
+    if (debouncedSearch) params.set('search', debouncedSearch);
 
-  useEffect(() => { load(); }, [page, statusFilter, customerFilter, boundFilter, expiringFilter, search]);
+    get(`/licenses?${params}`, { signal: controller.signal })
+      .then((d) => {
+        setLicenses(d.licenses);
+        setTotal(d.total);
+        setPages(d.pages);
+      })
+      .catch((err) => {
+        if (err?.name !== 'AbortError') console.error(err);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
 
-  async function handleRevoke(id, e) {
+    return () => controller.abort();
+  }, [page, statusFilter, customerFilter, boundFilter, expiringFilter, debouncedSearch, listEpoch]);
+
+  async function handleRevokeReload(id, e) {
     e.stopPropagation();
     if (!confirm('Tem certeza que deseja revogar esta licença?')) return;
     try {
       await post(`/licenses/${id}/revoke`, {});
-      load();
+      setListEpoch((current) => current + 1);
     } catch (err) {
       alert(err.message);
     }
@@ -76,7 +84,7 @@ export default function Licenses() {
     if (!confirm('Arquivar esta licença?')) return;
     try {
       await del(`/licenses/${id}`);
-      load();
+      setListEpoch((current) => current + 1);
     } catch (err) {
       alert(err.message);
     }
@@ -87,7 +95,7 @@ export default function Licenses() {
       key: 'license_key',
       label: 'Chave',
       render: (r) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
           <code className="text-xs break-all">{r.license_key}</code>
           <CopyButton text={r.license_key} />
         </div>
@@ -123,16 +131,24 @@ export default function Licenses() {
         </span>
       ),
     },
-    { key: 'expiry', label: 'Expira', render: (r) => new Date(r.expiry).toLocaleDateString('pt-BR') },
+    { key: 'expiry', label: 'Expira', render: (r) => formatCalendarDate(r.expiry) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-    { key: 'created_at', label: 'Criada', render: (r) => new Date(r.created_at).toLocaleDateString('pt-BR') },
     {
-      key: 'actions', label: '', render: (r) => (
+      key: 'created_at',
+      label: 'Criada',
+      render: (r) => (r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : '—'),
+    },
+    {
+      key: 'actions',
+      label: '',
+      render: (r) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button type="button" onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
-          <button type="button" onClick={() => navigate(buildAdminLicenseEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
+          {r.status !== 'revoked' && (
+            <button type="button" onClick={() => navigate(buildAdminLicenseEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
+          )}
           {r.status === 'active' && (
-            <button type="button" onClick={(e) => handleRevoke(r.id, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
+            <button type="button" onClick={(e) => handleRevokeReload(r.id, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
           )}
           {r.status !== 'active' && (
             <button type="button" onClick={(e) => handleArchive(r.id, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
@@ -154,7 +170,7 @@ export default function Licenses() {
         </button>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-3">
+      <div className="mb-4 flex flex-wrap gap-3 items-start">
         <input
           type="text"
           placeholder="Buscar chave, cliente ou hardware..."
@@ -172,16 +188,13 @@ export default function Licenses() {
           <option value="expired">Expiradas</option>
           <option value="revoked">Revogadas</option>
         </select>
-        <select
-          value={customerFilter}
-          onChange={(e) => { setCustomerFilter(e.target.value); setPage(1); }}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none"
-        >
-          <option value="">Todos os clientes</option>
-          {customers.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+        <div className="min-w-[16rem]">
+          <CustomerSelect
+            value={customerFilter}
+            onChange={(e) => { setCustomerFilter(e.target.value); setPage(1); }}
+            emptyLabel="Todos os clientes"
+          />
+        </div>
         <select
           value={boundFilter}
           onChange={(e) => { setBoundFilter(e.target.value); setPage(1); }}

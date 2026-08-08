@@ -25,7 +25,9 @@ test('panel routes expose the canonical navigation destinations', () => {
 
 test('panel routes build canonical detail and edit destinations', () => {
   assert.equal(buildAdminLicenseDetailRoute(42), '/licenses/42');
+  assert.equal(buildAdminLicenseDetailRoute(42, { fromCustomerId: 7 }), '/licenses/42?from_customer=7');
   assert.equal(buildAdminLicenseEditRoute(42), '/licenses/42/edit');
+  assert.equal(buildAdminLicenseEditRoute(42, { fromCustomerId: 7 }), '/licenses/42/edit?from_customer=7');
   assert.equal(buildAdminCustomerDetailRoute(7), '/customers/7');
   assert.equal(buildAdminCustomerEditRoute(7), '/customers/7/edit');
   assert.equal(buildAdminLicenseNewRoute(), '/licenses/new');

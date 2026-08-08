@@ -42,6 +42,8 @@ Ver lista em [`OBJECTIVOS.md`](OBJECTIVOS.md) — critérios de `1.0.0`.
 
 ## Checklist de deploy (`244`)
 
+- [x] **`TZ=UTC`** nos serviços Docker do license-server (evita drift
+      `CURRENT_DATE` SQL vs JS); confirmar no compose/env live
 - [ ] Backup Postgres (`backup-postgres.sh` / runbook)
 - [ ] Pull/sync código autorizado (**`--exclude .env`** — nunca sobrescrever segredos)
 - [ ] `docker compose build` dos serviços afectados

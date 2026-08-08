@@ -779,7 +779,7 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 | Campo | Valor |
 |-------|-------|
-| Versão visual actual | **`1.3.0`** (C2 lista + plano 002 CONCLUIDO, `2026-08-08`) |
+| Versão visual actual | **`1.3.1`** (hotfix revisão, `2026-08-08`) |
 | Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
 | Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
 | Plano activo | *(nenhum — último: [`PORTAL-PLAN-002`](docs/10-license-server/portal/planos/2026-08-08-ficha-cliente-360.md) CONCLUIDO)* |
@@ -787,8 +787,8 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 | Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
-**Checkpoint `2026-08-08`:** portal **`1.3.0`** — `PORTAL-PLAN-002`
-**CONCLUIDO** (C0–C2). Sem plano portal activo; residual só `IDEIAS.md`+GO.
+**Checkpoint `2026-08-08`:** portal **`1.3.1`** — hotfix da revisão
+defect-first (datas/download/auditoria/busca). Plano 002 CONCLUIDO.
 Regra: não saltar blocos do plano portal.
 
 ---

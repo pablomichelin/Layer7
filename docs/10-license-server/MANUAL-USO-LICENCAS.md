@@ -433,6 +433,9 @@ Ver `docs/01-architecture/f3-plano-check-in-online-revogacao-remota.md` e
 - **risco residual explícito:** o `.lic` antigo pode continuar válido
   offline no hardware anterior até `expiry + grace` (14 dias)
 - licenças revogadas não rebindam — usar substituição (§7.1 / P1d)
+- licenças **expiradas** bound podem rebindar (suporte a troca de hardware
+  antes da renovação); renovar continua bloqueado se revogada
+- licenças revogadas **não** editam via PUT — só replace
 - não usar rebind para transferir ownership entre clientes
 
 ### 5.7 Politica conservadora de fingerprint e binding

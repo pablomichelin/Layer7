@@ -6,12 +6,22 @@ export const ADMIN_AUDIT_ROUTE = '/audit';
 export const ADMIN_LICENSES_NEW_ROUTE = `${ADMIN_LICENSES_ROUTE}/new`;
 export const ADMIN_CUSTOMERS_NEW_ROUTE = `${ADMIN_CUSTOMERS_ROUTE}/new`;
 
-export function buildAdminLicenseDetailRoute(id) {
-  return `${ADMIN_LICENSES_ROUTE}/${id}`;
+export function buildAdminLicenseDetailRoute(id, { fromCustomerId } = {}) {
+  const base = `${ADMIN_LICENSES_ROUTE}/${id}`;
+  if (fromCustomerId === undefined || fromCustomerId === null || fromCustomerId === '') {
+    return base;
+  }
+  const params = new URLSearchParams({ from_customer: String(fromCustomerId) });
+  return `${base}?${params.toString()}`;
 }
 
-export function buildAdminLicenseEditRoute(id) {
-  return `${buildAdminLicenseDetailRoute(id)}/edit`;
+export function buildAdminLicenseEditRoute(id, { fromCustomerId } = {}) {
+  const base = `${ADMIN_LICENSES_ROUTE}/${id}/edit`;
+  if (fromCustomerId === undefined || fromCustomerId === null || fromCustomerId === '') {
+    return base;
+  }
+  const params = new URLSearchParams({ from_customer: String(fromCustomerId) });
+  return `${base}?${params.toString()}`;
 }
 
 export function buildAdminLicenseNewRoute({ customerId } = {}) {

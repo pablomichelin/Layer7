@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { get } from '../api';
+import { useDebouncedValue } from '../use-debounced-value.js';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 
@@ -11,25 +12,30 @@ export default function Audit() {
   const [eventType, setEventType] = useState('');
   const [resultFilter, setResultFilter] = useState('');
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 300);
   const [loading, setLoading] = useState(true);
 
-  function load() {
+  useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
     const params = new URLSearchParams({ page, limit: 30 });
     if (eventType) params.set('event_type', eventType);
     if (resultFilter) params.set('result', resultFilter);
-    if (search) params.set('search', search);
-    get(`/audit?${params}`)
+    if (debouncedSearch) params.set('search', debouncedSearch);
+    get(`/audit?${params}`, { signal: controller.signal })
       .then((d) => {
         setEvents(d.events || []);
         setTotal(d.total || 0);
         setPages(d.pages || 1);
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => { load(); }, [page, eventType, resultFilter, search]);
+      .catch((err) => {
+        if (err?.name !== 'AbortError') console.error(err);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [page, eventType, resultFilter, debouncedSearch]);
 
   const columns = [
     {

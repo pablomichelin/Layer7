@@ -5,6 +5,7 @@ import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import CopyButton from '../components/CopyButton';
 import { formatSkuLabel, isLicenseBound } from '../license-display.js';
+import { formatCalendarDate, formatDateTime } from '../format-date.js';
 import { summarizeCustomerLicenses } from '../customer-license-summary.js';
 import {
   ADMIN_CUSTOMERS_ROUTE,
@@ -20,7 +21,17 @@ export default function CustomerDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    get(`/customers/${id}`).then(setData).catch(console.error).finally(() => setLoading(false));
+    const controller = new AbortController();
+    setLoading(true);
+    get(`/customers/${id}`, { signal: controller.signal })
+      .then(setData)
+      .catch((err) => {
+        if (err?.name !== 'AbortError') console.error(err);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
   }, [id]);
 
   async function handleArchive() {
@@ -47,7 +58,7 @@ export default function CustomerDetail() {
         <div className="flex items-start gap-2 max-w-md" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
-            onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))}
+            onClick={() => navigate(buildAdminLicenseDetailRoute(r.id, { fromCustomerId: id }))}
             className="text-left"
           >
             <code className="text-xs text-brand-700 hover:underline break-all">{r.license_key}</code>
@@ -68,12 +79,12 @@ export default function CustomerDetail() {
         </span>
       ),
     },
-    { key: 'expiry', label: 'Expira', render: (r) => new Date(r.expiry).toLocaleDateString('pt-BR') },
+    { key: 'expiry', label: 'Expira', render: (r) => formatCalendarDate(r.expiry) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     {
       key: 'activated_at',
       label: 'Activada',
-      render: (r) => (r.activated_at ? new Date(r.activated_at).toLocaleDateString('pt-BR') : 'Nunca'),
+      render: (r) => (r.activated_at ? formatDateTime(r.activated_at).split(',')[0] : 'Nunca'),
     },
     {
       key: 'actions',
@@ -83,7 +94,7 @@ export default function CustomerDetail() {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            navigate(buildAdminLicenseDetailRoute(r.id));
+            navigate(buildAdminLicenseDetailRoute(r.id, { fromCustomerId: id }));
           }}
           className="text-xs text-brand-600 hover:underline"
         >
@@ -137,7 +148,7 @@ export default function CustomerDetail() {
           <div><span className="text-gray-500">Telefone:</span> <span className="ml-2">{customer.phone || '—'}</span></div>
           <div><span className="text-gray-500">CNPJ:</span> <span className="ml-2">{customer.cnpj || '—'}</span></div>
           <div><span className="text-gray-500">Tags:</span> <span className="ml-2">{customer.tags || '—'}</span></div>
-          <div><span className="text-gray-500">Criado em:</span> <span className="ml-2">{new Date(customer.created_at).toLocaleDateString('pt-BR')}</span></div>
+          <div><span className="text-gray-500">Criado em:</span> <span className="ml-2">{formatDateTime(customer.created_at)}</span></div>
           {customer.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{customer.notes}</span></div>}
         </div>
         <div className="flex gap-3 mt-6">
@@ -155,7 +166,7 @@ export default function CustomerDetail() {
         columns={columns}
         rows={licenses}
         emptyMessage="Nenhuma licença — use Nova licença para emitir a primeira chave."
-        onRowClick={(row) => navigate(buildAdminLicenseDetailRoute(row.id))}
+        onRowClick={(row) => navigate(buildAdminLicenseDetailRoute(row.id, { fromCustomerId: id }))}
       />
     </div>
   );
