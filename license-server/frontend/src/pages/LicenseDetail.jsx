@@ -4,7 +4,11 @@ import { get, post, del, download } from '../api';
 import StatusBadge from '../components/StatusBadge';
 import DataTable from '../components/DataTable';
 import CopyButton from '../components/CopyButton';
-import { formatSkuLabel, isLicenseBound } from '../license-display.js';
+import {
+  formatLicenseEquipmentLabel,
+  formatSkuLabel,
+  isLicenseBound,
+} from '../license-display.js';
 import { formatCalendarDate, formatDateTime } from '../format-date.js';
 import {
   ADMIN_LICENSES_ROUTE,
@@ -118,8 +122,8 @@ export default function LicenseDetail() {
   async function handleRebind(event) {
     event.preventDefault();
     const warning = [
-      'ATENÇÃO: o ficheiro .lic antigo pode continuar válido offline no hardware antigo até expiry + grace (14 dias).',
-      'Confirma o rebind administrativo?',
+      'ATENÇÃO: o ficheiro .lic antigo pode continuar válido offline no equipamento antigo até à data de expiração + 14 dias de graça.',
+      'Confirma a troca de equipamento?',
     ].join('\n');
     if (!confirm(warning)) return;
 
@@ -226,16 +230,16 @@ export default function LicenseDetail() {
           <strong>{formatCalendarDate(renewBanner.expiry)}</strong>.
           {renewBanner.bound && canDownload ? (
             <>
-              {' '}Appliance bindado: faça{' '}
+              {' '}Esta licença já está vinculada a um pfSense: faça{' '}
               <button type="button" onClick={handleDownload} className="underline font-medium">
                 download do .lic
               </button>{' '}
-              actualizado e reinstale no pfSense se necessário.
+              actualizado e reinstale no equipamento se necessário.
             </>
           ) : renewBanner.bound ? (
-            <> Appliance bindado — reinstale .lic quando a licença estiver activa.</>
+            <> Já está vinculada a um equipamento — reinstale o .lic quando a licença estiver activa.</>
           ) : (
-            <> Ainda unbound — a chave continua a mesma para activação.</>
+            <> Ainda por activar — a chave continua a mesma para o cliente activar no pfSense.</>
           )}
           <button type="button" onClick={() => setRenewBanner(null)} className="ml-3 text-green-700 underline">
             Fechar
@@ -245,24 +249,24 @@ export default function LicenseDetail() {
 
       {rebindBanner && (
         <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-4 py-3 text-sm mb-4">
-          Rebind ({rebindBanner.mode}) concluído e auditado.
+          Troca de equipamento concluída e auditada.
           {rebindBanner.mode === 'unbind' ? (
-            <> A licença está unbound — o cliente deve correr <code>layer7d --activate CHAVE</code> no novo hardware.</>
+            <> A licença ficou por activar — o cliente deve correr <code>layer7d --activate CHAVE</code> no novo pfSense.</>
           ) : (
             <>
-              {' '}Novo hardware fixado
+              {' '}Novo equipamento associado
               {canDownload ? (
                 <>
                   {' '}— faça{' '}
                   <button type="button" onClick={handleDownload} className="underline font-medium">download do .lic</button>
-                  {' '}e instale no appliance.
+                  {' '}e instale no pfSense.
                 </>
               ) : (
                 <> — reinstale o .lic quando a licença estiver activa.</>
               )}
             </>
           )}
-          {' '}O .lic antigo pode continuar válido offline no hardware anterior até expiry+grace.
+          {' '}O .lic antigo pode continuar válido offline no equipamento anterior até à expiração + 14 dias de graça.
           <button type="button" onClick={() => setRebindBanner(null)} className="ml-3 underline">
             Fechar
           </button>
@@ -291,7 +295,7 @@ export default function LicenseDetail() {
             <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${
               bound ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'
             }`}>
-              {bound ? 'Bound' : 'Unbound'}
+              {formatLicenseEquipmentLabel(bound)}
             </span>
             <StatusBadge status={license.status} />
           </div>
@@ -336,7 +340,7 @@ export default function LicenseDetail() {
 
         {bound && license.status === 'active' && (
           <p className="mt-4 text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
-            Licença bound: após alterar SKU/expiry, faça download do .lic actualizado e reinstale no appliance.
+            Licença já vinculada a um equipamento: após alterar SKU ou data de expiração, faça download do .lic actualizado e reinstale no pfSense.
           </p>
         )}
 
@@ -363,7 +367,7 @@ export default function LicenseDetail() {
               onClick={() => setShowRebind((current) => !current)}
               className="px-4 py-2 border border-amber-600 text-amber-800 hover:bg-amber-50 text-sm rounded-lg transition-colors"
             >
-              {showRebind ? 'Cancelar rebind' : 'Rebind hardware'}
+              {showRebind ? 'Cancelar troca' : 'Trocar equipamento'}
             </button>
           )}
           {canReplace && (
@@ -406,9 +410,9 @@ export default function LicenseDetail() {
         {showRebind && canRebind && (
           <form onSubmit={handleRebind} className="mt-6 border border-amber-200 bg-amber-50 rounded-lg p-4 space-y-3">
             <p className="text-sm text-amber-900">
-              Workflow governado (P1c). O .lic antigo no hardware anterior pode continuar
-              válido offline até <strong>expiry + grace (14 dias)</strong>. Preferir
-              <code className="mx-1">unbind</code> e nova activação no appliance.
+              Troca de equipamento (governada). O .lic antigo no pfSense anterior pode
+              continuar válido offline até à <strong>data de expiração + 14 dias de graça</strong>.
+              Preferir libertar o vínculo e deixar o cliente activar de novo no equipamento novo.
             </p>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Modo</label>
@@ -417,13 +421,13 @@ export default function LicenseDetail() {
                 onChange={(e) => setRebindMode(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               >
-                <option value="unbind">Unbind — limpar bind (cliente activa de novo)</option>
-                <option value="set">Set — fixar novo hardware_id conhecido</option>
+                <option value="unbind">Libertar — fica por activar (cliente activa de novo)</option>
+                <option value="set">Associar — fixar ID de equipamento já conhecido</option>
               </select>
             </div>
             {rebindMode === 'set' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Novo hardware_id (64 hex)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">ID do novo equipamento (64 hex)</label>
                 <input
                   type="text"
                   value={rebindHardwareId}
@@ -450,7 +454,7 @@ export default function LicenseDetail() {
               disabled={rebinding}
               className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white text-sm rounded-lg disabled:opacity-50"
             >
-              {rebinding ? 'A rebindar...' : 'Confirmar rebind'}
+              {rebinding ? 'A trocar...' : 'Confirmar troca de equipamento'}
             </button>
           </form>
         )}

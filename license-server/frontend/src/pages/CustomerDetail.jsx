@@ -4,7 +4,12 @@ import { get, del } from '../api';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import CopyButton from '../components/CopyButton';
-import { formatSkuLabel, isLicenseBound } from '../license-display.js';
+import {
+  formatLicenseEquipmentLabel,
+  formatSkuLabel,
+  isLicenseBound,
+  LICENSE_EQUIPMENT_COLUMN_LABEL,
+} from '../license-display.js';
 import { formatCalendarDate, formatDateTime } from '../format-date.js';
 import { summarizeCustomerLicenses } from '../customer-license-summary.js';
 import {
@@ -70,12 +75,12 @@ export default function CustomerDetail() {
     { key: 'features', label: 'SKU', render: (r) => formatSkuLabel(r.features) },
     {
       key: 'bound',
-      label: 'Bind',
+      label: LICENSE_EQUIPMENT_COLUMN_LABEL,
       render: (r) => (
         <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${
           isLicenseBound(r) ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'
         }`}>
-          {isLicenseBound(r) ? 'Bound' : 'Unbound'}
+          {formatLicenseEquipmentLabel(r)}
         </span>
       ),
     },
@@ -138,7 +143,7 @@ export default function CustomerDetail() {
             <p className="text-lg font-semibold text-red-800">{summary.revoked}</p>
           </div>
           <div className="rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
-            <p className="text-xs text-blue-700">Bound</p>
+            <p className="text-xs text-blue-700">Vinculadas</p>
             <p className="text-lg font-semibold text-blue-800">{summary.bound}</p>
           </div>
         </div>

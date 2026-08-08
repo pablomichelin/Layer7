@@ -11,6 +11,15 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [1.3.2] — 2026-08-08
+
+### Changed
+
+- Nomenclatura UI: Bound/Unbound → **Vinculada** / **Por activar** (coluna Equipamento)
+- Rebind → **Trocar equipamento**; mensagens sem jargão técnico
+
+---
+
 ## [1.3.1] — 2026-08-08
 
 ### Fixed

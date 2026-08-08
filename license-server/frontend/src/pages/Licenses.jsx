@@ -5,7 +5,12 @@ import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import CopyButton from '../components/CopyButton';
 import CustomerSelect from '../components/CustomerSelect.jsx';
-import { formatSkuLabel, isLicenseBound } from '../license-display.js';
+import {
+  formatLicenseEquipmentLabel,
+  formatSkuLabel,
+  isLicenseBound,
+  LICENSE_EQUIPMENT_COLUMN_LABEL,
+} from '../license-display.js';
 import { formatCalendarDate } from '../format-date.js';
 import { useDebouncedValue } from '../use-debounced-value.js';
 import {
@@ -122,12 +127,12 @@ export default function Licenses() {
     { key: 'features', label: 'SKU', render: (r) => formatSkuLabel(r.features) },
     {
       key: 'bound',
-      label: 'Bind',
+      label: LICENSE_EQUIPMENT_COLUMN_LABEL,
       render: (r) => (
         <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${
           isLicenseBound(r) ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'
         }`}>
-          {isLicenseBound(r) ? 'Bound' : 'Unbound'}
+          {formatLicenseEquipmentLabel(r)}
         </span>
       ),
     },
@@ -200,9 +205,9 @@ export default function Licenses() {
           onChange={(e) => { setBoundFilter(e.target.value); setPage(1); }}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none"
         >
-          <option value="">Bound / Unbound</option>
-          <option value="yes">Só Bound</option>
-          <option value="no">Só Unbound</option>
+          <option value="">Equipamento (todos)</option>
+          <option value="yes">Só vinculadas</option>
+          <option value="no">Só por activar</option>
         </select>
         <select
           value={expiringFilter}

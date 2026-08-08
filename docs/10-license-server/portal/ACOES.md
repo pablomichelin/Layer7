@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — Nomenclatura equipamento `1.3.2`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `1.3.2` |
+| Objectivo | Substituir Bound/Unbound/Rebind por termos claros em PT |
+| Impacto | Só labels UI; API `bound` inalterada |
+| Risco | Baixo |
+| Teste | license-display; health; SPA v1.3.2 |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-Jyz4bwKJ.js`; labels Vinculada/Por activar |
+
+---
+
 ## 2026-08-08 — Hotfix revisão `1.3.1`
 
 | Campo | Valor |

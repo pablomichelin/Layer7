@@ -4,22 +4,19 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `1.3.1` |
-| **Codinome** | Hotfix revisão defect-first |
+| **Versão** | `1.3.2` |
+| **Codinome** | Nomenclatura equipamento |
 | **Estado** | Entregue |
 | **Data** | `2026-08-08` |
 
 ## Inclui
 
-- Datas de calendário sem off-by-one BRT
-- Download `.lic` só se `active` + bound
-- Auditoria update: `expiry` normalizado; PUT bloqueado se revogada
-- Busca com debounce + abort; select de clientes com busca servidor
-- Voltar à ficha do cliente (`from_customer`); avisos SKU/archive
-- Checklist: `TZ=UTC` + `--exclude .env`
+- Labels UI: **Equipamento** → Vinculada / Por activar (sem Bound/Unbound)
+- Botão e fluxos: Trocar equipamento (em vez de Rebind)
+- Mantém API/query `bound` (só texto apresentado muda)
 
 ## Próxima
 
-Nova revisão pós-hotfix; residual só ideias com GO.
+Só ideias com GO.
 
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

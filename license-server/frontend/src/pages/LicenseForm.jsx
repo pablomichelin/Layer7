@@ -203,7 +203,7 @@ export default function LicenseForm() {
             ) : null}
             {isEdit && licenseState?.hardware_id ? (
               <p className="text-xs text-amber-700 mt-1">
-                Após mudar SKU/expiry em licença bound, faça download do .lic e reinstale no appliance.
+                Após mudar SKU ou data de expiração numa licença já vinculada a um equipamento, faça download do .lic e reinstale no pfSense.
               </p>
             ) : null}
           </div>
