@@ -11,7 +11,8 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.29` (ADR-0029 / GUI H*; **publish pendente**). Latest lab: `1.9.28`  
+**Candidato port:** `1.9.29` (**publicado** lab/`latest`)  
+
 **Nota:** **Rev. `i` (`2026-08-08`)** = 20.28–20.30 ADR-0029; GI8 PASS; passo **20.31**.
 
 ---
@@ -33,7 +34,7 @@ TRILHA IDENTITY + MITM — progresso
 - 20.21: PASS (normalize user + remove_ip)
 - 20.20: PASS (identity_dc + agente Win Event Log)
 - 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; **1.9.28** latest; candidato **1.9.29** (publish pendente)
+- Baseline: 1.9.8; **1.9.29** (publicado lab/`latest`)
 - Próximo: 20.31 → 20.33 GI9
 ```
 

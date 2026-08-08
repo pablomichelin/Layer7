@@ -6,15 +6,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- (vazio — próximo: IM9 20.31 malha lab / evidências)
+
+## [1.9.29] — 2026-08-08
+
+### Added
+
 - **Identity 20.28–20.30 / GI8 / ADR-0029:** sequência segura — ADIAR agente
-  endpoint; exclusão TS/VDI; GUI H*; candidato **1.9.29**.
+  endpoint; exclusão TS/VDI; GUI Identity H* (limite honesto).
 - **Identity 20.27:** especificação agente endpoint (conservada para reopen).
-- **Identity 20.25–20.26 / GI7:** precedência + suite unit; lab residual.
 
 ### Notes
 
-- Canal `latest`: **`1.9.28`** até publish; candidato **`1.9.29`**.
-- Produção enforce **`1.9.8`**. Rollback lab previsto: `1.9.28`.
+- Canal `latest`: **`1.9.29`**. Produção enforce **`1.9.8`**.
+- SHA256: `cab8d2d13e12e57f6078d1f3a4a15b90dcc6c19e953f6f79409f910502c45fec`. Rollback lab: `1.9.28`.
 
 ## [1.9.28] — 2026-08-08
 
