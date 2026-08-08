@@ -11,6 +11,7 @@ import {
   buildAdminCustomerEditRoute,
   buildAdminLicenseDetailRoute,
   buildAdminLicenseEditRoute,
+  buildAdminLicenseNewRoute,
 } from './panel-routes.js';
 
 test('panel routes expose the canonical navigation destinations', () => {
@@ -27,4 +28,6 @@ test('panel routes build canonical detail and edit destinations', () => {
   assert.equal(buildAdminLicenseEditRoute(42), '/licenses/42/edit');
   assert.equal(buildAdminCustomerDetailRoute(7), '/customers/7');
   assert.equal(buildAdminCustomerEditRoute(7), '/customers/7/edit');
+  assert.equal(buildAdminLicenseNewRoute(), '/licenses/new');
+  assert.equal(buildAdminLicenseNewRoute({ customerId: 9 }), '/licenses/new?customer_id=9');
 });

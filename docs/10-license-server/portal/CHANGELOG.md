@@ -11,6 +11,16 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [1.2.0] — 2026-08-08
+
+### Added
+
+- Ficha cliente 360 (PORTAL-PLAN-002 / C1 / IDEA-016)
+- Contadores na ficha; tabela rica (chave completa, SKU, Bound)
+- CTA Nova licença com `?customer_id=` pré-preenchido
+
+---
+
 ## [1.1.0] — 2026-08-08
 
 ### Added

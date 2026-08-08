@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { get, post, put } from '../api';
 import CopyButton from '../components/CopyButton';
 import {
@@ -12,16 +12,19 @@ import {
 } from '../license-form-state.js';
 import {
   ADMIN_LICENSES_ROUTE,
+  buildAdminCustomerDetailRoute,
   buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
 
 export default function LicenseForm() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const isEdit = Boolean(id);
+  const presetCustomerId = searchParams.get('customer_id') || '';
   const [customers, setCustomers] = useState([]);
   const [form, setForm] = useState({
-    customer_id: '',
+    customer_id: presetCustomerId,
     expiry: '',
     features: LICENSE_FEATURES_DEFAULT,
     notes: '',
@@ -52,6 +55,11 @@ export default function LicenseForm() {
           const { license } = licenseResponse;
           setLicenseState(license);
           setForm(buildLicenseFormState(license));
+        } else if (presetCustomerId) {
+          setForm((current) => ({
+            ...current,
+            customer_id: presetCustomerId,
+          }));
         }
       } catch (err) {
         if (!active) {
@@ -71,7 +79,7 @@ export default function LicenseForm() {
     return () => {
       active = false;
     };
-  }, [id, isEdit]);
+  }, [id, isEdit, presetCustomerId]);
 
   function handleChange(event) {
     setForm((currentForm) => ({
@@ -107,11 +115,18 @@ export default function LicenseForm() {
     license: licenseState,
   });
 
+  const backRoute = isEdit
+    ? buildAdminLicenseDetailRoute(id)
+    : (presetCustomerId
+      ? buildAdminCustomerDetailRoute(presetCustomerId)
+      : ADMIN_LICENSES_ROUTE);
+
   if (loadingInitialData) {
     return <p className="text-gray-500">Carregando...</p>;
   }
 
   if (createdLicense) {
+    const customerId = createdLicense.customer_id || presetCustomerId;
     return (
       <div>
         <div className="bg-white rounded-lg shadow p-6 max-w-lg">
@@ -127,7 +142,7 @@ export default function LicenseForm() {
               <CopyButton text={createdLicense.license_key} label="Copiar chave" className="font-medium" />
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => navigate(buildAdminLicenseDetailRoute(createdLicense.id))}
@@ -135,6 +150,15 @@ export default function LicenseForm() {
             >
               Ver detalhe
             </button>
+            {customerId ? (
+              <button
+                type="button"
+                onClick={() => navigate(buildAdminCustomerDetailRoute(customerId))}
+                className="px-4 py-2 border border-brand-600 text-brand-700 text-sm rounded-lg hover:bg-brand-50"
+              >
+                Voltar ao cliente
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={() => navigate(ADMIN_LICENSES_ROUTE)}
@@ -150,7 +174,7 @@ export default function LicenseForm() {
 
   return (
     <div>
-      <button onClick={() => navigate(isEdit ? buildAdminLicenseDetailRoute(id) : ADMIN_LICENSES_ROUTE)} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
+      <button onClick={() => navigate(backRoute)} className="text-sm text-brand-600 hover:underline mb-4 block">&larr; Voltar</button>
 
       <div className="bg-white rounded-lg shadow p-6 max-w-lg">
         <h2 className="text-xl font-bold text-gray-800 mb-6">{isEdit ? 'Editar Licença' : 'Nova Licença'}</h2>
@@ -178,6 +202,11 @@ export default function LicenseForm() {
                 Licenças activadas/bindadas nao permitem trocar de cliente.
               </p>
             )}
+            {!isEdit && presetCustomerId ? (
+              <p className="text-xs text-gray-500 mt-1">
+                Cliente pré-seleccionado a partir da ficha.
+              </p>
+            ) : null}
           </div>
 
           <div>

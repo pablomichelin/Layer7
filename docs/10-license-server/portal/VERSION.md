@@ -4,22 +4,22 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `1.1.0` |
-| **Codinome** | Navegação Cliente↔Licença (C0) |
+| **Versão** | `1.2.0` |
+| **Codinome** | Ficha cliente 360 (C1) |
 | **Estado** | Entregue |
 | **Data** | `2026-08-08` |
 
 ## Inclui
 
-- Lista Clientes: clique na linha + nome → ficha
-- Lista Licenças: clique na linha → detalhe; Cliente → ficha
-- Detalhe Licença: nome do cliente → ficha
-- Ficha Cliente: clique na linha da licença → detalhe
+- Ficha cliente: contadores (total/activas/a expirar 30d/revogadas/bound)
+- Tabela de licenças: chave completa + copiar, SKU, Bound, status
+- CTA **Nova licença** com `customer_id` pré-seleccionado
+- Após criar: atalho **Voltar ao cliente**
 
 ## Próxima (ordem fixa)
 
 | Versão | Bloco |
 |--------|-------|
-| `1.2.0` | **C1** — ficha 360 (licenças ricas + nova licença no contexto) |
+| `1.2.1` / `1.3.0` | **C2** — lista clientes operacional (opcional) |
 
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

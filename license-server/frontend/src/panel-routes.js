@@ -14,6 +14,14 @@ export function buildAdminLicenseEditRoute(id) {
   return `${buildAdminLicenseDetailRoute(id)}/edit`;
 }
 
+export function buildAdminLicenseNewRoute({ customerId } = {}) {
+  if (customerId === undefined || customerId === null || customerId === '') {
+    return ADMIN_LICENSES_NEW_ROUTE;
+  }
+  const params = new URLSearchParams({ customer_id: String(customerId) });
+  return `${ADMIN_LICENSES_NEW_ROUTE}?${params.toString()}`;
+}
+
 export function buildAdminCustomerDetailRoute(id) {
   return `${ADMIN_CUSTOMERS_ROUTE}/${id}`;
 }

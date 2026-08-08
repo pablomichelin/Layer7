@@ -5,7 +5,18 @@ Mais recente no topo.
 
 ---
 
-## 2026-08-08 — C0 Navegação `1.1.0`
+## 2026-08-08 — C1 Ficha 360 `1.2.0`
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `1.2.0` |
+| Objectivo | Ficha cliente útil: licenças ricas + nova licença no contexto |
+| Impacto | CustomerDetail + LicenseForm query; sem mutações de negócio novas |
+| Risco | Baixo |
+| Teste | customer-license-summary; panel-routes; health; SPA v1.2.0 |
+| Rollback | imagens anteriores |
+| Resultado | **FEITO** — health OK; SPA `index-BghDhRtJ.js`; testes summary/routes PASS |
 
 | Campo | Valor |
 |-------|-------|

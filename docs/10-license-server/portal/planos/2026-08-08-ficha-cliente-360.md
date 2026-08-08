@@ -109,10 +109,10 @@ Imagens Docker anteriores; reverter commit do bloco.
 | Bloco | Estado | Versão | Data |
 |-------|--------|--------|------|
 | C0 | **FEITO** (GO `2026-08-08`) | `1.1.0` | 2026-08-08 |
-| C1 | Pendente | → `1.2.0` | — |
-| C2 | Pendente | → `1.2.x` | — |
+| C1 | **FEITO** | `1.2.0` | 2026-08-08 |
+| C2 | Pendente (opcional) | → `1.2.x` | — |
 
 ## 9. Próxima acção
 
-**C1 → 1.2.0** — ficha 360 (licenças ricas + nova licença no contexto).
-Não saltar.
+**C2** (opcional) — lista clientes com CNPJ/tags e activas vs total.
+Ou fechar plano se C2 for diferido com nota em `ACOES.md`.

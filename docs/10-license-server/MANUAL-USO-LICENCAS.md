@@ -228,6 +228,15 @@ Antes de gerar uma licenca, e necessario criar o cliente.
 3. Clicar numa licença abre o detalhe; no detalhe da licença, o **nome do
    cliente** volta à ficha
 
+### Ficha 360 (portal ≥ 1.2.0)
+
+Na ficha do cliente:
+
+- contadores: total, activas, a expirar 30 dias, revogadas, bound
+- tabela com chave completa (copiar), SKU, Bound/Unbound e status
+- botão **Nova licença** abre o formulário com o cliente já seleccionado
+- após criar, pode **Voltar ao cliente**
+
 ### Via API (curl)
 
 ```bash
