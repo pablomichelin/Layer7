@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `ABERTO` (rev. `2026-08-08k`; **20.32 PASS** MANUAL/notes; passo actual **20.33 / IM9**)
+**Estado do plano:** `FECHADO` (rev. `2026-08-08m`; **20.33 / GI9 PASS**; Identity de rede; MITM permanece DEFER)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -13,7 +13,7 @@
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
 **Candidato port:** `1.9.29` (**publicado** lab/`latest`)  
 
-**Nota:** **Rev. `k` (`2026-08-08`)** = 20.32 MANUAL/USO-LICENÇAS/notes Identity; passo **20.33**.
+**Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; fila Identity rede **FECHADA** (MITM DEFER; lab AD residual).
 
 ---
 
@@ -21,23 +21,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.33** — release candidata Identity + GO (GI9) |
+| Passo actual | **FECHADO** — 20.33 / GI9 PASS (homolog `1.9.29`) |
 | Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
 | ADRs | **Aceito** ×5; T1; **0026 diferida**; **0027**; **0029** IM7/IM8 |
 | MITM | **DEFER 20.7a** |
-| Próximo | 20.33 GI9 (GO humano) |
+| Próximo | Manutenção; reopen MITM/endpoint só com GO; lab AD residual opcional |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: 20.33 (release candidata / GO GI9)
+- Passo actual: **FECHADO** (20.33 / GI9 PASS)
+- 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
 - 20.32: PASS (MANUAL + USO-LICENÇAS §14 + notes comerciais)
 - 20.31: PASS (malha OFF + unit; `20260808T135500Z-im9-20.31-identity-mesh`)
 - 20.22: PASS (audit conflict + last_writer)
-- 20.21: PASS (normalize user + remove_ip)
-- 20.20: PASS (identity_dc + agente Win Event Log)
-- 20.19: PASS (RADIUS; GI5.3)
-- Baseline: 1.9.8; **1.9.29** (publicado lab/`latest`)
-- Próximo: 20.33 GI9 (GO humano)
+- Baseline: 1.9.8 enforce pin; lab/`latest` **1.9.29**
+- MITM: DEFER 20.7a; IM7 ADIAR / IM8 EXCLUÍDO (ADR-0029)
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -375,7 +373,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 |-------|---------|------|
 | **20.31** | Malha lab Identity+MITM + evidências `run_id` | **PASS** (`20260808T135500Z-im9-20.31-identity-mesh`; MITM SKIP/DEFER; lab AD residual) |
 | **20.32** | MANUAL-INSTALL + MANUAL-USO-LICENCAS + changelog + commercial notes | **PASS** (`2026-08-08`) |
-| **20.33** | Release candidata + GO produção add-on (pode ser prerelease) | **GI9** |
+| **20.33** | Release candidata + GO produção add-on (pode ser prerelease) | **PASS** (`20260808T174100Z-im9-20.33-homolog-1.9.29`; GI9) |
 
 ---
 
@@ -542,6 +540,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
+| 2026-08-08 | **rev. `m` / 20.33 GI9 PASS** — homolog two-client real; licença Veeam; fila Identity rede **FECHADA** |
 | 2026-08-08 | **rev. `k` / 20.32 PASS** — MANUAL Identity + USO-LICENÇAS §14 + notes comerciais; GI9.2; passo → **20.33** |
 | 2026-08-08 | **rev. `j` / 20.31 PASS** — malha Identity OFF + `run-im9-20.31`; evidência indexada; GI9.1/9.4; passo → **20.32** |
 | 2026-08-08 | **rev. `i` / 20.28–20.30 PASS** — ADR-0029 ADIAR IM7 + exclusão IM8; GI8; passo → **20.31** |

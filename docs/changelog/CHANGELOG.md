@@ -6,10 +6,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
-- **Identity 20.32 / IM9:** MANUAL-INSTALL (secção Identity) +
-  MANUAL-USO-LICENCAS §14 SKU Y + notes comerciais
-  `docs/commercial/LAYER7-IDENTITY-ADDON-NOTES-{PT,EN}.md`.
-- (próximo: 20.33 GO GI9 / release candidata add-on)
+- (vazio — trilha Identity rede FECHADA 20.33; próximo = manutenção / reopen GO)
 
 ## [1.9.29] — 2026-08-08
 
@@ -18,6 +15,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - **Identity 20.28–20.30 / GI8 / ADR-0029:** sequência segura — ADIAR agente
   endpoint; exclusão TS/VDI; GUI Identity H* (limite honesto).
 - **Identity 20.27:** especificação agente endpoint (conservada para reopen).
+- **Identity 20.31–20.33 / IM9 / GI9:** malha OFF + MANUAL/notes + homologação
+  two-client real (`20260808T174100Z-im9-20.33-homolog-1.9.29`).
 
 ### Notes
 

@@ -1,0 +1,13 @@
+=== IM9 20.33 homolog 2026-08-08T17:41Z (Mac orchestrator) ===
+PASS: pkg 1.9.29
+PASS: licença válida (restaurada de layer7.lic.veeam-backup)
+PASS: sem listeners Identity 8743/1813
+PASS: GUI ADR-0029
+PASS: baseline A/B example.com=200 google=200
+PASS: setup scoped_hybrid YouTube só 192.168.100.234
+PASS: A YouTube=000 (bloqueado); B YouTube=200 (scoped)
+PASS: A/B google=200 example=200 (não quarentena total)
+PASS: pdst_0 populada (IPs YouTube via DPI)
+PASS: regra PF pdst scoped a .234
+PASS: restore enabled=0 mode=monitor; A/B youtube=200 novamente
+=== VEREDICTO: PASS ===

@@ -1,7 +1,8 @@
-# START HERE — Identity + MITM Add-on (trilha activa)
+# START HERE — Identity + MITM Add-on 【FILA FECHADA — Identity de rede】
 
-> **Visual:** fila **ABERTA** (`2026-08-06` — PME Identity-first; MITM DEFER).  
-> Este ficheiro é o **único arranque** desta trilha. Colar só este caminho num chat limpo.
+> **Visual:** fila **FECHADA** (`2026-08-08` — GI9 PASS; MITM permanece **DEFER**).  
+> Homologação: `20260808T174100Z-im9-20.33-homolog-1.9.29`.  
+> Este ficheiro permanece o arranque histórico; **não** reabrir MITM/endpoint sem GO.
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -38,13 +39,13 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | **ABERTO** — Identity + MITM Add-on (rev. `2026-08-08k`) |
+| Plano | **FECHADO** — Identity de rede (rev. `2026-08-08m`); MITM DEFER |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
-| Produção enforce / `latest` (baseline) | **`1.9.8`** (não alterar sem release governada) |
+| Produção enforce / `latest` (baseline) | **`1.9.8`** pin enforce; lab/`latest` **`1.9.29`** |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **IM9 / 20.33** — release candidata + GO (20.32 MANUAL **PASS**) |
-| Código do produto nesta trilha | **20.22 PASS** (audit conflict/last-writer); 20.21 normalize; … |
-| Rev. do plano | **`2026-08-08k`** |
+| Passo actual | **FECHADO** — 20.33 / GI9 PASS |
+| Código do produto nesta trilha | **20.22 PASS** (audit conflict/last-writer); …; homolog 20.33 |
+| Rev. do plano | **`2026-08-08m`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM futuro |
 | MITM | **DEFER 20.7a** — Squid rejeitado; GI2/GI3 DEFERRED; saltar 20.8–20.11 |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **caminho de valor** |
@@ -124,7 +125,7 @@ Ler na ordem do START-HERE; executar só o passo actual do plano.
 Regras: não-regressão; opt-in OFF; um passo 20.x por bloco; português;
 barra UX PME (U*/P*/H*/N*); sem overclaim NGFW; não reabrir fecho/IPv6;
 captive portal fora de escopo; não implementar MITM sem novo GO.
-Tarefa: continuar no passo actual (IM9 / 20.33 — release candidata Identity de rede + GO humano GI9; 20.32 MANUAL PASS).
+Tarefa: trilha Identity de rede **FECHADA** (20.33/GI9). Não reabrir MITM nem agente endpoint sem GO humano. Residuais opcionais: lab AD com `base,identity`. Manutenção: `START-HERE-fecho-producao.md` para produto base.
 ```
 
 ## Prompt — propor desvio / ADR
@@ -143,16 +144,14 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: IM9 / 20.33 (release candidata / GO GI9)
+- Passo actual: **FECHADO** (20.33 / GI9 PASS)
+- 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
 - 20.32: PASS (MANUAL + USO-LICENÇAS §14 + notes comerciais)
 - 20.31: PASS (malha OFF + unit; `20260808T135500Z-im9-20.31-identity-mesh`)
 - 20.22: PASS (audit conflict + last_writer + GUI topologia)
-- 20.21: PASS (normalize user + remove_ip)
-- 20.20: PASS (receiver + agente Win Event Log)
-- 20.19: PASS (RADIUS; GI5.3)
-- Plano rev.: 2026-08-08k
-- Baseline enforce: 1.9.8
-- Candidato: **1.9.29** (publicado lab/`latest`)
+- Plano rev.: 2026-08-08m
+- Baseline enforce: 1.9.8; lab/`latest`: **1.9.29**
+- Malha prod: 254 + clientes 234/235 (Veeam)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

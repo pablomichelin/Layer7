@@ -311,7 +311,7 @@ reavaliacao formal.
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | **20.20 PASS** / GI6 lab | WinRM outbound não canónico; agente em `docs/samples/identity-dc-agent/` |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Feito (20.24); GI7 lab residual | GI7; não-regressão IP/MAC |
 | BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | **Fechado** ADR-0029 (ADIAR+exclusão) | GI8 PASS |
-| BG-092 | Fecho lab/release add-on (IM9) | Alta | testes/F7/docs | IM9 | feature sem MANUAL/release | M | Alto | Em execucao (20.32 PASS) | GI9.1/9.2/9.4 PASS; 20.33 GO |
+| BG-092 | Fecho lab/release add-on (IM9) | Alta | testes/F7/docs | IM9 | feature sem MANUAL/release | M | Alto | **Concluido** (20.33/GI9) | homolog `1.9.29`; residuais AD opcionais |
 
 ## Checkpoint auditoria segurança `1.9.8` → candidato `1.9.9` (2026-08-05)
 

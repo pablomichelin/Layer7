@@ -1,0 +1,1 @@
+block drop quick inet from 192.168.100.234 to <layer7_pdst_0> label "layer7:pdst:h33-yt-block-a" ! tagged L7ALLOW

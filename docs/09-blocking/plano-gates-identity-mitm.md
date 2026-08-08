@@ -119,11 +119,11 @@ Identity avança sem GI2/GI3.
 
 | # | Critério |
 |---|----------|
-| GI9.1 | Evidências run_id indexadas | **PASS** (`20260808T135500Z-im9-20.31-identity-mesh`) |
+| GI9.1 | Evidências run_id indexadas | **PASS** (`20260808T135500Z-im9-20.31-identity-mesh` + `20260808T174100Z-im9-20.33-homolog-1.9.29`) |
 | GI9.2 | MANUAL-INSTALL / USO-LICENÇAS / CHANGELOG / CORTEX | **PASS** (20.32) |
-| GI9.3 | GO humano para publicar candidata add-on | PENDENTE (20.33) |
-| GI9.4 | Default OFF em upgrades a partir de `1.9.8` | **PASS** (mesh 20.31: Identity OFF; sem listeners) |
-| GI9.5 | START-HERE actualizado; plano pode fechar | PENDENTE (fecho 20.33) |
+| GI9.3 | GO humano para publicar candidata add-on | **PASS** (2026-08-08 — homologação real two-client autorizada; Veeam) |
+| GI9.4 | Default OFF em upgrades a partir de `1.9.8` | **PASS** (mesh + pós-restore enabled=0) |
+| GI9.5 | START-HERE actualizado; plano pode fechar | **PASS** (20.33) |
 
 ---
 
@@ -140,7 +140,7 @@ Identity avança sem GI2/GI3.
 | GI6 | IM5 | **PARCIAL** (código 20.20 PASS; lab DC residual) |
 | GI7 | IM6 | **PASS unitário** (20.26; lab AD/LDAP residual — checklist `tests/lab/run-gi7-identity-policies.sh`) |
 | GI8 | IM7–IM8 | **PASS** (`ADR-0029`, 2026-08-08) |
-| GI9 | IM9 | **PARCIAL** (20.31–20.32; falta 20.33 GO) |
+| GI9 | IM9 | **PASS** (20.33; residuais AD lab GI5–GI7 assinados) |
 
 ---
 
@@ -152,6 +152,7 @@ Identity avança sem GI2/GI3.
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |
 | 2026-08-07 | **20.18** — Test LDAP GUI + `layer7d --ldap-test`; GI5.4 PASS (parcial GI5); passo → 20.19 |
+| 2026-08-08 | **20.33 / GI9 PASS** — homolog two-client real `1.9.29` (`20260808T174100Z-im9-20.33-homolog-1.9.29`); trilha Identity rede fechável |
 | 2026-08-08 | **20.32 / GI9.2 PASS** — MANUAL Identity + notes comerciais; passo → **20.33** |
 | 2026-08-08 | **20.31 / GI9 parcial** — malha Identity OFF + unit local; evidência `20260808T135500Z-im9-20.31-identity-mesh`; passo → **20.32** |
 | 2026-08-08 | **20.28–20.30 / GI8 PASS** — ADR-0029 ADIAR IM7 + exclusão IM8; passo → **20.31** |

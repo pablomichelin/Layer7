@@ -65,7 +65,7 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-20 | Precedence (§3.1 → core) | IM6 | **Feito** (20.25) | DOC | `core/precedence.md` |
 | M-21 | Endpoint agent | IM7 | **ADIAR** (`ADR-0029`) | DOC | espec 20.27 + ADR-0029 |
 | M-22 | TS/VDI agent | IM8 | **EXCLUÍDO** (`ADR-0029`) | DOC | `desenho-ts-vdi-20.29-excluido.md` |
-| M-23 | Evidências + MANUAL | IM9 | **20.31–20.32 PASS**; 20.33 GO | DOC/TST | notes `docs/commercial/LAYER7-IDENTITY-ADDON-NOTES-PT.md` |
+| M-23 | Evidências + MANUAL | IM9 | **PASS** (20.31–20.33) | DOC/TST | homolog `20260808T174100Z-im9-20.33-homolog-1.9.29` |
 | M-24 | Modelo concorrência/IO daemon (threads + rwlock) | IM3 (20.11a/20.12) | **PASS** rwlock no mapa; threads = 20.15+ | DMN | ADR-0028; `pthread_rwlock` em `identity_map` |
 | M-25 | Baseline de perf registada | IM3 (20.11a) | **PASS** (`2026-08-06`) | TST | Evidência `20260806T174000Z-20.11a-baseline-perf`; pin doc `1.9.8` |
 
@@ -156,3 +156,4 @@ Policy ad_* → IPs do mapa → enforce PF
 | 2026-08-07 | **20.20 desenho** — M-16 desenho PASS (A1–A7; TLS+HMAC; porto 8743) |
 | 2026-08-08 | **20.20 agente** — M-16 PASS (Layer7IdentityDcAgent.ps1; GI6 lab residual) |
 | 2026-08-08 | **20.31** — M-23 evidências PASS (`20260808T135500Z-im9-20.31-identity-mesh`); M-19/M-20 alinhados Feito |
+| 2026-08-08 | **20.33 / GI9** — M-23 homolog two-client PASS; trilha Identity rede FECHADA |

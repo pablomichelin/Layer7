@@ -415,4 +415,4 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089 — **20.19–20.22 PASS**
 - [x] IM6 Políticas user/grupo (GI7) — BG-090 — **20.23–20.26 PASS unit**; lab residual
 - [x] IM7–IM8 Agente/TS ou exclusão ADR (GI8) — BG-091 — **PASS ADR-0029** (20.28–20.30)
-- [ ] IM9 Fecho/release Identity (GI9) — BG-092 — **20.32 PASS**; passo **20.33** (GO)
+- [x] IM9 Fecho/release Identity (GI9) — BG-092 — **20.33 PASS** (`20260808T174100Z-im9-20.33-homolog-1.9.29`)

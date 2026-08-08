@@ -1,5 +1,21 @@
 # Topologia de laboratório (referência)
 
+## Malha de produção Systemup (homologação)
+
+| Host | Papel | Notas |
+|------|--------|------|
+| `192.168.100.254` | pfSense (Plus) Layer7 | Backup Veeam; SSH `root` |
+| `192.168.100.234` | Ubuntu cliente A (`server`) | SSH `root` a partir do Mac/lab |
+| `192.168.100.235` | Ubuntu cliente B (`zpro-aimirim`) | SSH `root` a partir do Mac/lab |
+| `192.168.100.12` | Builder FreeBSD | Build `.pkg` |
+
+**Importante:** o appliance **não** tem chave SSH para `.234`/`.235` — orquestrar
+curls a partir do Mac (ver `tests/lab/run-im9-20.33-homolog-orchestrator.sh`).
+
+Evidência two-client recente: `docs/tests/evidence/20260808T174100Z-im9-20.33-homolog-1.9.29/`.
+
+---
+
 ## Objetivo
 
 Isolar tráfego de teste, permitir captura/classificação no pfSense e validar políticas sem afetar produção.
