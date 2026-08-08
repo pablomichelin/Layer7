@@ -316,10 +316,14 @@ function parseAuditListQuery(query) {
     'search',
     'page',
     'limit',
+    'customer_id',
+    'license_id',
   ]);
 
   let eventType;
   let result;
+  let customerId;
+  let licenseId;
 
   if (query.event_type !== undefined) {
     eventType = normalizeOptionalText(query.event_type, 'event_type', 64);
@@ -335,6 +339,14 @@ function parseAuditListQuery(query) {
     }
   }
 
+  if (query.customer_id !== undefined) {
+    customerId = normalizePositiveInt(query.customer_id, 'customer_id');
+  }
+
+  if (query.license_id !== undefined) {
+    licenseId = normalizePositiveInt(query.license_id, 'license_id');
+  }
+
   return {
     page,
     limit,
@@ -342,7 +354,22 @@ function parseAuditListQuery(query) {
     search: parseSearch(query.search),
     eventType,
     result,
+    customerId,
+    licenseId,
   };
+}
+
+function parseStaleCheckinDays(value) {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  const days = normalizePositiveInt(value, 'stale_checkin_days');
+  if (days > 365) {
+    throw createHttpError(400, 'stale_checkin_days excede o maximo permitido.');
+  }
+
+  return days;
 }
 
 function parseLicensesListQuery(query) {
@@ -354,6 +381,8 @@ function parseLicensesListQuery(query) {
     'limit',
     'bound',
     'expiring_within_days',
+    'stale_checkin_days',
+    'format',
   ]);
   let status;
   let customerId;
@@ -373,6 +402,14 @@ function parseLicensesListQuery(query) {
     customerId = normalizePositiveInt(query.customer_id, 'customer_id');
   }
 
+  let format;
+  if (query.format !== undefined) {
+    if (typeof query.format !== 'string' || !['json', 'csv'].includes(query.format.trim().toLowerCase())) {
+      throw createHttpError(400, 'format invalido.');
+    }
+    format = query.format.trim().toLowerCase();
+  }
+
   return {
     page,
     limit,
@@ -382,6 +419,8 @@ function parseLicensesListQuery(query) {
     customerId,
     bound: parseBoundFilter(query.bound),
     expiringWithinDays: parseExpiringWithinDays(query.expiring_within_days),
+    staleCheckinDays: parseStaleCheckinDays(query.stale_checkin_days),
+    format,
   };
 }
 

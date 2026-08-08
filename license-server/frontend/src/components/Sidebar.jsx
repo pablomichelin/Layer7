@@ -1,11 +1,18 @@
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { get } from '../api';
+import { useDebouncedValue } from '../use-debounced-value.js';
+import { listRecentCustomers } from '../recent-customers.js';
 import {
   ADMIN_CUSTOMERS_ROUTE,
   ADMIN_DASHBOARD_ROUTE,
   ADMIN_LICENSES_ROUTE,
   ADMIN_AUDIT_ROUTE,
+  ADMIN_SECURITY_ROUTE,
   ADMIN_LOGIN_ROUTE,
+  buildAdminCustomerDetailRoute,
+  buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
 import { PORTAL_VERSION } from '../portal-version.js';
 
@@ -14,11 +21,36 @@ const links = [
   { to: ADMIN_LICENSES_ROUTE, label: 'Licenças', icon: '🔑' },
   { to: ADMIN_CUSTOMERS_ROUTE, label: 'Clientes', icon: '👥' },
   { to: ADMIN_AUDIT_ROUTE, label: 'Auditoria', icon: '📋' },
+  { to: ADMIN_SECURITY_ROUTE, label: 'Segurança', icon: '🔒' },
 ];
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const { admin, logout } = useAuth();
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const [results, setResults] = useState(null);
+  const [recent, setRecent] = useState(() => listRecentCustomers());
+
+  useEffect(() => {
+    setRecent(listRecentCustomers());
+  }, []);
+
+  useEffect(() => {
+    if (!debouncedSearch || debouncedSearch.trim().length < 2) {
+      setResults(null);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    get(`/search?q=${encodeURIComponent(debouncedSearch.trim())}`, { signal: controller.signal })
+      .then(setResults)
+      .catch((err) => {
+        if (err?.name !== 'AbortError') console.error(err);
+      });
+
+    return () => controller.abort();
+  }, [debouncedSearch]);
 
   async function handleLogout() {
     await logout();
@@ -32,6 +64,51 @@ export default function Sidebar() {
         <p className="text-brand-200 text-xs mt-1">por Systemup</p>
         <p className="text-brand-300 text-xs mt-1">v{PORTAL_VERSION}</p>
         {admin && <p className="text-brand-100 text-xs mt-3">{admin.email}</p>}
+      </div>
+
+      <div className="px-4 py-3 border-b border-brand-600">
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Busca global..."
+          className="w-full px-3 py-2 rounded-lg text-sm text-gray-900 outline-none"
+        />
+        {results && (
+          <div className="mt-2 max-h-56 overflow-auto text-xs space-y-2">
+            {(results.customers || []).map((customer) => (
+              <button
+                key={`c-${customer.id}`}
+                type="button"
+                className="block w-full text-left text-brand-50 hover:underline"
+                onClick={() => {
+                  navigate(buildAdminCustomerDetailRoute(customer.id));
+                  setSearch('');
+                  setResults(null);
+                }}
+              >
+                Cliente: {customer.name}
+              </button>
+            ))}
+            {(results.licenses || []).map((license) => (
+              <button
+                key={`l-${license.id}`}
+                type="button"
+                className="block w-full text-left text-brand-50 hover:underline"
+                onClick={() => {
+                  navigate(buildAdminLicenseDetailRoute(license.id));
+                  setSearch('');
+                  setResults(null);
+                }}
+              >
+                Licença: {license.license_key?.slice(0, 12)}… ({license.customer_name || '—'})
+              </button>
+            ))}
+            {!results.customers?.length && !results.licenses?.length && (
+              <p className="text-brand-200">Sem resultados</p>
+            )}
+          </div>
+        )}
       </div>
 
       <nav className="flex-1 py-4">
@@ -51,6 +128,25 @@ export default function Sidebar() {
             {label}
           </NavLink>
         ))}
+
+        {recent.length > 0 && (
+          <div className="px-6 pt-4">
+            <p className="text-xs uppercase tracking-wide text-brand-300 mb-2">Recentes</p>
+            <ul className="space-y-1">
+              {recent.map((customer) => (
+                <li key={customer.id}>
+                  <button
+                    type="button"
+                    onClick={() => navigate(buildAdminCustomerDetailRoute(customer.id))}
+                    className="text-sm text-brand-100 hover:underline text-left"
+                  >
+                    {customer.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </nav>
 
       <button

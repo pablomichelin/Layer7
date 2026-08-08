@@ -11,10 +11,12 @@ import { ADMIN_DASHBOARD_ROUTE } from '../panel-routes.js';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [challengeToken, setChallengeToken] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated, loading: authLoading, login } = useAuth();
+  const { isAuthenticated, loading: authLoading, login, loginTotp } = useAuth();
   const gateState = getAuthGateState({
     loading: authLoading,
     isAuthenticated,
@@ -31,7 +33,16 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      if (challengeToken) {
+        await loginTotp(challengeToken, totpCode);
+      } else {
+        const result = await login(email, password);
+        if (result?.status === 'totp_required') {
+          setChallengeToken(result.challenge_token);
+          setLoading(false);
+          return;
+        }
+      }
       navigate(ADMIN_DASHBOARD_ROUTE, { replace: true });
     } catch (err) {
       setError(err.message || AUTH_LOGIN_ERROR_MESSAGE);
@@ -60,35 +71,68 @@ export default function Login() {
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
-              placeholder="admin@systemup.inf.br"
-            />
-          </div>
+          {!challengeToken ? (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+                  placeholder="admin@systemup.inf.br"
+                />
+              </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
-            />
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+                />
+              </div>
+            </>
+          ) : (
+            <div>
+              <p className="text-sm text-gray-600 mb-3">
+                Introduza o código da app autenticadora (2FA).
+              </p>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Código 2FA</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value)}
+                required
+                maxLength={6}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none tracking-widest"
+                placeholder="000000"
+              />
+              <button
+                type="button"
+                className="mt-2 text-xs text-brand-600 hover:underline"
+                onClick={() => {
+                  setChallengeToken('');
+                  setTotpCode('');
+                  setError('');
+                }}
+              >
+                Voltar ao login
+              </button>
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading || authLoading}
             className="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? 'A validar...' : (challengeToken ? 'Confirmar 2FA' : 'Entrar')}
           </button>
         </form>
 

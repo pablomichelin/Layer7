@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { get, post, del } from '../api';
+import { get, post, del, api } from '../api';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import CopyButton from '../components/CopyButton';
@@ -11,14 +11,21 @@ import {
   isLicenseBound,
   LICENSE_EQUIPMENT_COLUMN_LABEL,
 } from '../license-display.js';
-import { formatCalendarDate } from '../format-date.js';
+import { formatCalendarDate, formatDateTime } from '../format-date.js';
 import { useDebouncedValue } from '../use-debounced-value.js';
+import { buildLicenseActionConfirmMessage } from '../license-delivery-pack.js';
 import {
   ADMIN_LICENSES_NEW_ROUTE,
   buildAdminCustomerDetailRoute,
   buildAdminLicenseEditRoute,
   buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
+
+function truncateNotes(value, max = 40) {
+  if (!value) return '—';
+  const text = String(value);
+  return text.length > max ? `${text.slice(0, max)}…` : text;
+}
 
 export default function Licenses() {
   const [licenses, setLicenses] = useState([]);
@@ -29,6 +36,7 @@ export default function Licenses() {
   const [customerFilter, setCustomerFilter] = useState('');
   const [boundFilter, setBoundFilter] = useState('');
   const [expiringFilter, setExpiringFilter] = useState('');
+  const [staleFilter, setStaleFilter] = useState('');
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search, 300);
   const [listEpoch, setListEpoch] = useState(0);
@@ -41,21 +49,35 @@ export default function Licenses() {
     const expiring = searchParams.get('expiring_within_days') || '';
     const customerId = searchParams.get('customer_id') || '';
     const bound = searchParams.get('bound') || '';
+    const stale = searchParams.get('stale_checkin_days') || '';
     if (status) setStatusFilter(status);
     if (expiring) setExpiringFilter(expiring);
     if (customerId) setCustomerFilter(customerId);
     if (bound) setBoundFilter(bound);
+    if (stale) setStaleFilter(stale);
   }, [searchParams]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    const params = new URLSearchParams({ page, limit: 20 });
+  function buildListParams({ forCsv = false } = {}) {
+    const params = new URLSearchParams();
+    if (!forCsv) {
+      params.set('page', String(page));
+      params.set('limit', '20');
+    } else {
+      params.set('format', 'csv');
+    }
     if (statusFilter) params.set('status', statusFilter);
     if (customerFilter) params.set('customer_id', customerFilter);
     if (boundFilter) params.set('bound', boundFilter);
     if (expiringFilter) params.set('expiring_within_days', expiringFilter);
+    if (staleFilter) params.set('stale_checkin_days', staleFilter);
     if (debouncedSearch) params.set('search', debouncedSearch);
+    return params;
+  }
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    const params = buildListParams();
 
     get(`/licenses?${params}`, { signal: controller.signal })
       .then((d) => {
@@ -71,25 +93,41 @@ export default function Licenses() {
       });
 
     return () => controller.abort();
-  }, [page, statusFilter, customerFilter, boundFilter, expiringFilter, debouncedSearch, listEpoch]);
+  }, [page, statusFilter, customerFilter, boundFilter, expiringFilter, staleFilter, debouncedSearch, listEpoch]);
 
-  async function handleRevokeReload(id, e) {
+  async function handleRevokeReload(row, e) {
     e.stopPropagation();
-    if (!confirm('Tem certeza que deseja revogar esta licença?')) return;
+    if (!confirm(buildLicenseActionConfirmMessage('Revogar esta licença.', row))) return;
     try {
-      await post(`/licenses/${id}/revoke`, {});
+      await post(`/licenses/${row.id}/revoke`, {});
       setListEpoch((current) => current + 1);
     } catch (err) {
       alert(err.message);
     }
   }
 
-  async function handleArchive(id, e) {
+  async function handleArchive(row, e) {
     e.stopPropagation();
-    if (!confirm('Arquivar esta licença?')) return;
+    if (!confirm(buildLicenseActionConfirmMessage('Arquivar esta licença.', row))) return;
     try {
-      await del(`/licenses/${id}`);
+      await del(`/licenses/${row.id}`);
       setListEpoch((current) => current + 1);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function handleExportCsv() {
+    try {
+      const params = buildListParams({ forCsv: true });
+      const res = await api(`/licenses?${params}`, { method: 'GET', raw: true });
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'licenses.csv';
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
       alert(err.message);
     }
@@ -139,6 +177,20 @@ export default function Licenses() {
     { key: 'expiry', label: 'Expira', render: (r) => formatCalendarDate(r.expiry) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     {
+      key: 'last_check_in_at',
+      label: 'Último check-in',
+      render: (r) => formatDateTime(r.last_check_in_at),
+    },
+    {
+      key: 'notes',
+      label: 'Notas',
+      render: (r) => (
+        <span title={r.notes || ''} className="text-xs text-gray-600">
+          {truncateNotes(r.notes)}
+        </span>
+      ),
+    },
+    {
       key: 'created_at',
       label: 'Criada',
       render: (r) => (r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : '—'),
@@ -153,10 +205,10 @@ export default function Licenses() {
             <button type="button" onClick={() => navigate(buildAdminLicenseEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
           )}
           {r.status === 'active' && (
-            <button type="button" onClick={(e) => handleRevokeReload(r.id, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
+            <button type="button" onClick={(e) => handleRevokeReload(r, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
           )}
           {r.status !== 'active' && (
-            <button type="button" onClick={(e) => handleArchive(r.id, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
+            <button type="button" onClick={(e) => handleArchive(r, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
           )}
         </div>
       ),
@@ -167,18 +219,27 @@ export default function Licenses() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Licenças ({total})</h2>
-        <button
-          onClick={() => navigate(ADMIN_LICENSES_NEW_ROUTE)}
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          Nova Licença
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleExportCsv}
+            className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors"
+          >
+            Exportar CSV
+          </button>
+          <button
+            onClick={() => navigate(ADMIN_LICENSES_NEW_ROUTE)}
+            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Nova Licença
+          </button>
+        </div>
       </div>
 
       <div className="mb-4 flex flex-wrap gap-3 items-start">
         <input
           type="text"
-          placeholder="Buscar chave, cliente ou hardware..."
+          placeholder="Buscar chave, cliente, hardware ou notas..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="px-3 py-2 border border-gray-300 rounded-lg text-sm w-72 focus:ring-2 focus:ring-brand-500 outline-none"
@@ -218,6 +279,15 @@ export default function Licenses() {
           <option value="30">A expirar em 30 dias</option>
           <option value="60">A expirar em 60 dias</option>
           <option value="90">A expirar em 90 dias</option>
+        </select>
+        <select
+          value={staleFilter}
+          onChange={(e) => { setStaleFilter(e.target.value); setPage(1); }}
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+        >
+          <option value="">Check-in</option>
+          <option value="7">Sem check-in &gt; 7 dias</option>
+          <option value="14">Sem check-in &gt; 14 dias</option>
         </select>
       </div>
 

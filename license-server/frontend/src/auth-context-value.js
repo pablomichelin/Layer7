@@ -3,6 +3,7 @@ export function buildAuthContextValue({
   session,
   loading,
   login,
+  loginTotp,
   logout,
   refreshSession,
 }) {
@@ -12,6 +13,7 @@ export function buildAuthContextValue({
     loading,
     isAuthenticated: Boolean(admin && session),
     login,
+    loginTotp,
     logout,
     refreshSession,
   };

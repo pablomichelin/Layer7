@@ -5,6 +5,36 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — PORTAL-PLAN-003 fecho `1.9.0` (D0–D5)
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `1.9.0` |
+| Objectivo | Entregar plano 003 completo (fila/contexto/entrega/2FA) |
+| Impacto | UI+API admin; TOTP opcional até activar em Segurança |
+| Risco | Médio (auth 2FA); mutações de negócio inalteradas |
+| Teste | backend+frontend unit; health; SPA v1.9.0 |
+| Rollback | imagens anteriores; desactivar 2FA se necessário |
+| Resultado | **FEITO** — health OK; SPA `index-CUM8HiMh.js`; plano 003 CONCLUIDO |
+
+---
+
+## 2026-08-08 — Abrir PORTAL-PLAN-003 (fila/contexto/entrega)
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | docs / governação |
+| Versão | `1.3.2` (sem bump — só plano) |
+| Objectivo | Registar IDEA-040…051 + plano ordenado D0→D5 |
+| Impacto | Docs portal; nenhum código runtime nesta entrada |
+| Risco | Baixo |
+| Teste | Leitura cruzada plano/IDEIAS/planos README |
+| Rollback | Reverter commits docs |
+| Resultado | **FEITO** — plano ACTIVO; execução D0 em seguida |
+
+---
+
 ## 2026-08-08 — Nomenclatura equipamento `1.3.2`
 
 | Campo | Valor |

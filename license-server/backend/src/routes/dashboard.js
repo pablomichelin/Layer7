@@ -10,6 +10,8 @@ const {
 const router = Router();
 router.use(auth);
 
+const SAMPLE_LIMIT = 8;
+
 router.get('/', async (_req, res) => {
   try {
     const stats = await pool.query(`
@@ -46,6 +48,38 @@ router.get('/', async (_req, res) => {
          AND expiry <= CURRENT_DATE + INTERVAL '30 days'
     `);
 
+    const expiredBound = await pool.query(`
+      SELECT COUNT(*) AS total
+        FROM licenses
+       WHERE archived_at IS NULL
+         AND ${LICENSE_SQL_EXPIRED_CONDITION}
+         AND hardware_id IS NOT NULL
+         AND btrim(hardware_id) <> ''
+    `);
+
+    const unboundStale = await pool.query(`
+      SELECT COUNT(*) AS total
+        FROM licenses
+       WHERE archived_at IS NULL
+         AND ${LICENSE_SQL_ACTIVE_CONDITION}
+         AND (hardware_id IS NULL OR btrim(hardware_id) = '')
+         AND created_at < NOW() - INTERVAL '7 days'
+    `);
+
+    const staleCheckin = await pool.query(`
+      SELECT COUNT(*) AS total
+        FROM licenses l
+        LEFT JOIN LATERAL (
+          SELECT MAX(created_at) AS last_check_in_at
+            FROM check_ins_log
+           WHERE license_id = l.id
+        ) ci ON TRUE
+       WHERE l.archived_at IS NULL
+         AND l.hardware_id IS NOT NULL
+         AND btrim(l.hardware_id) <> ''
+         AND (ci.last_check_in_at IS NULL OR ci.last_check_in_at < NOW() - INTERVAL '7 days')
+    `);
+
     const recentActivations = await pool.query(`
       SELECT al.created_at, al.result, al.ip_address, al.hardware_id,
              c.name AS customer_name, l.license_key
@@ -57,6 +91,62 @@ router.get('/', async (_req, res) => {
       LIMIT 10
     `);
 
+    const sampleExpiring = await pool.query(`
+      SELECT l.id, l.license_key, l.expiry, c.name AS customer_name
+        FROM licenses l
+        LEFT JOIN customers c ON c.id = l.customer_id
+       WHERE l.archived_at IS NULL
+         AND ${LICENSE_SQL_ACTIVE_CONDITION}
+         AND l.expiry <= CURRENT_DATE + INTERVAL '30 days'
+         AND (c.id IS NULL OR c.archived_at IS NULL)
+       ORDER BY l.expiry ASC
+       LIMIT ${SAMPLE_LIMIT}
+    `);
+
+    const sampleExpiredBound = await pool.query(`
+      SELECT l.id, l.license_key, l.expiry, c.name AS customer_name
+        FROM licenses l
+        LEFT JOIN customers c ON c.id = l.customer_id
+       WHERE l.archived_at IS NULL
+         AND ${LICENSE_SQL_EXPIRED_CONDITION}
+         AND l.hardware_id IS NOT NULL
+         AND btrim(l.hardware_id) <> ''
+         AND (c.id IS NULL OR c.archived_at IS NULL)
+       ORDER BY l.expiry DESC
+       LIMIT ${SAMPLE_LIMIT}
+    `);
+
+    const sampleUnbound = await pool.query(`
+      SELECT l.id, l.license_key, l.created_at, c.name AS customer_name
+        FROM licenses l
+        LEFT JOIN customers c ON c.id = l.customer_id
+       WHERE l.archived_at IS NULL
+         AND ${LICENSE_SQL_ACTIVE_CONDITION}
+         AND (l.hardware_id IS NULL OR btrim(l.hardware_id) = '')
+         AND l.created_at < NOW() - INTERVAL '7 days'
+         AND (c.id IS NULL OR c.archived_at IS NULL)
+       ORDER BY l.created_at ASC
+       LIMIT ${SAMPLE_LIMIT}
+    `);
+
+    const sampleStaleCheckin = await pool.query(`
+      SELECT l.id, l.license_key, ci.last_check_in_at, c.name AS customer_name
+        FROM licenses l
+        LEFT JOIN customers c ON c.id = l.customer_id
+        LEFT JOIN LATERAL (
+          SELECT MAX(created_at) AS last_check_in_at
+            FROM check_ins_log
+           WHERE license_id = l.id
+        ) ci ON TRUE
+       WHERE l.archived_at IS NULL
+         AND l.hardware_id IS NOT NULL
+         AND btrim(l.hardware_id) <> ''
+         AND (ci.last_check_in_at IS NULL OR ci.last_check_in_at < NOW() - INTERVAL '7 days')
+         AND (c.id IS NULL OR c.archived_at IS NULL)
+       ORDER BY ci.last_check_in_at ASC NULLS FIRST
+       LIMIT ${SAMPLE_LIMIT}
+    `);
+
     res.json({
       licenses: {
         active: parseInt(stats.rows[0].active, 10),
@@ -64,10 +154,19 @@ router.get('/', async (_req, res) => {
         revoked: parseInt(stats.rows[0].revoked, 10),
         total: parseInt(stats.rows[0].total, 10),
         expiring_30d: parseInt(expiring30d.rows[0].total, 10),
+        expired_bound: parseInt(expiredBound.rows[0].total, 10),
+        unbound_stale_7d: parseInt(unboundStale.rows[0].total, 10),
+        stale_checkin_7d: parseInt(staleCheckin.rows[0].total, 10),
       },
       customers: parseInt(customers.rows[0].total, 10),
       activations_24h: parseInt(activations24h.rows[0].count, 10),
       recent_activations: recentActivations.rows,
+      action_queue: {
+        expiring_30d: sampleExpiring.rows,
+        expired_bound: sampleExpiredBound.rows,
+        unbound_stale_7d: sampleUnbound.rows,
+        stale_checkin_7d: sampleStaleCheckin.rows,
+      },
     });
   } catch (err) {
     console.error('[DASHBOARD] Error:', err.message);

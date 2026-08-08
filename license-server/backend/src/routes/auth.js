@@ -41,8 +41,21 @@ const {
   setSessionCookie,
   toSessionResponsePayload,
 } = require('../session');
+const {
+  buildOtpauthUri,
+  createTotpChallengeToken,
+  generateTotpSecret,
+  parseTotpChallengeToken,
+  verifyTotp,
+} = require('../totp');
 
 const router = Router();
+
+function getTotpHmacSecret() {
+  return process.env.ADMIN_BEARER_JWT_SECRET
+    || process.env.JWT_SECRET
+    || 'layer7-totp-dev-secret';
+}
 
 router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => {
   try {
@@ -104,6 +117,24 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
 
     await resetLoginProtection({ email, req });
 
+    if (admin.totp_enabled && admin.totp_secret) {
+      const challengeToken = createTotpChallengeToken(admin.id, getTotpHmacSecret());
+      await auditAdminEvent({
+        component: 'auth',
+        eventType: 'login_totp_required',
+        adminId: admin.id,
+        actorIdentifier: admin.email,
+        req,
+        result: 'pending',
+        reason: 'totp_required',
+      });
+      return res.json({
+        status: 'totp_required',
+        challenge_token: challengeToken,
+        email: admin.email,
+      });
+    }
+
     const session = await createSession(admin, req);
     setSessionCookie(res, session.token, session.metadata.session.expires_at);
 
@@ -124,6 +155,167 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
       req,
     }));
     res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
+  }
+});
+
+router.post('/login/totp', loginIpLimiter, async (req, res) => {
+  try {
+    if (!requireSecureSessionRequest(req)) {
+      clearSessionCookie(res);
+      return res.status(400).json(buildAuthErrorResponse(ADMIN_AUTH_CHANNEL_MESSAGE));
+    }
+
+    const challengeToken = typeof req.body?.challenge_token === 'string' ? req.body.challenge_token : '';
+    const code = typeof req.body?.code === 'string' ? req.body.code : '';
+    const challenge = parseTotpChallengeToken(challengeToken, getTotpHmacSecret());
+    if (!challenge) {
+      return res.status(401).json(buildAuthErrorResponse('Desafio 2FA invalido ou expirado.'));
+    }
+
+    const result = await pool.query('SELECT * FROM admins WHERE id = $1', [challenge.admin_id]);
+    if (result.rows.length === 0) {
+      return res.status(401).json(buildAuthErrorResponse(ADMIN_AUTH_INVALID_CREDENTIALS_MESSAGE));
+    }
+
+    const admin = result.rows[0];
+    if (!admin.totp_enabled || !admin.totp_secret || !verifyTotp(admin.totp_secret, code)) {
+      await auditAdminEvent({
+        component: 'auth',
+        eventType: 'login_totp_failed',
+        adminId: admin.id,
+        actorIdentifier: admin.email,
+        req,
+        result: 'fail',
+        reason: 'totp_invalid',
+      });
+      return res.status(401).json(buildAuthErrorResponse('Codigo 2FA invalido.'));
+    }
+
+    const session = await createSession(admin, req);
+    setSessionCookie(res, session.token, session.metadata.session.expires_at);
+    await auditAdminEvent(buildLoginSucceededAuditPayload({ admin, req }));
+    await auditAdminEvent(buildSessionCreatedAuditPayload({ admin, req, session }));
+
+    return res.json(buildAdminAuthResponse(
+      {
+        token: session.token,
+        metadata: toSessionResponsePayload(session.metadata),
+      },
+      createBearerSessionToken
+    ));
+  } catch (err) {
+    console.error('[AUTH] TOTP login error:', err.message);
+    return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
+  }
+});
+
+router.get('/2fa/status', auth, async (req, res) => {
+  const result = await pool.query(
+    'SELECT totp_enabled FROM admins WHERE id = $1',
+    [req.admin.id]
+  );
+  return res.json({
+    totp_enabled: Boolean(result.rows[0]?.totp_enabled),
+  });
+});
+
+router.post('/2fa/setup', auth, async (req, res) => {
+  try {
+    const secret = generateTotpSecret();
+    await pool.query(
+      'UPDATE admins SET totp_pending_secret = $1 WHERE id = $2',
+      [secret, req.admin.id]
+    );
+    return res.json({
+      secret,
+      otpauth_url: buildOtpauthUri({ secret, email: req.admin.email }),
+    });
+  } catch (err) {
+    console.error('[AUTH] 2FA setup error:', err.message);
+    return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
+  }
+});
+
+router.post('/2fa/enable', auth, async (req, res) => {
+  try {
+    const code = typeof req.body?.code === 'string' ? req.body.code : '';
+    const result = await pool.query(
+      'SELECT totp_pending_secret, email FROM admins WHERE id = $1',
+      [req.admin.id]
+    );
+    const pending = result.rows[0]?.totp_pending_secret;
+    if (!pending || !verifyTotp(pending, code)) {
+      return res.status(400).json(buildAuthErrorResponse('Codigo 2FA invalido.'));
+    }
+
+    await pool.query(
+      `UPDATE admins
+          SET totp_secret = totp_pending_secret,
+              totp_enabled = TRUE,
+              totp_pending_secret = NULL
+        WHERE id = $1`,
+      [req.admin.id]
+    );
+
+    await auditAdminEvent({
+      component: 'auth',
+      eventType: 'totp_enabled',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'success',
+      reason: 'totp_enabled',
+    });
+
+    return res.json({ totp_enabled: true });
+  } catch (err) {
+    console.error('[AUTH] 2FA enable error:', err.message);
+    return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
+  }
+});
+
+router.post('/2fa/disable', auth, async (req, res) => {
+  try {
+    const password = typeof req.body?.password === 'string' ? req.body.password : '';
+    const code = typeof req.body?.code === 'string' ? req.body.code : '';
+    const result = await pool.query('SELECT * FROM admins WHERE id = $1', [req.admin.id]);
+    const admin = result.rows[0];
+    if (!admin) {
+      return res.status(404).json(buildAuthErrorResponse('Admin nao encontrado.'));
+    }
+
+    const validPassword = await bcrypt.compare(password, admin.password_hash);
+    if (!validPassword) {
+      return res.status(401).json(buildAuthErrorResponse(ADMIN_AUTH_INVALID_CREDENTIALS_MESSAGE));
+    }
+
+    if (admin.totp_enabled && admin.totp_secret && !verifyTotp(admin.totp_secret, code)) {
+      return res.status(401).json(buildAuthErrorResponse('Codigo 2FA invalido.'));
+    }
+
+    await pool.query(
+      `UPDATE admins
+          SET totp_secret = NULL,
+              totp_pending_secret = NULL,
+              totp_enabled = FALSE
+        WHERE id = $1`,
+      [req.admin.id]
+    );
+
+    await auditAdminEvent({
+      component: 'auth',
+      eventType: 'totp_disabled',
+      adminId: req.admin.id,
+      actorIdentifier: req.admin.email,
+      req,
+      result: 'success',
+      reason: 'totp_disabled',
+    });
+
+    return res.json({ totp_enabled: false });
+  } catch (err) {
+    console.error('[AUTH] 2FA disable error:', err.message);
+    return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
   }
 });
 

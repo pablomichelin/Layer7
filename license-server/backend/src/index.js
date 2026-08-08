@@ -17,8 +17,10 @@ const licensesRoutes = require('./routes/licenses');
 const customersRoutes = require('./routes/customers');
 const dashboardRoutes = require('./routes/dashboard');
 const auditRoutes = require('./routes/audit');
+const searchRoutes = require('./routes/search');
 const { ensureCrudIntegritySchema } = require('./crud-integrity');
 const { ensureSessionSchema } = require('./session');
+const { ensureTotpSchema } = require('./totp-schema');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -39,6 +41,7 @@ app.use('/api/licenses', licensesRoutes);
 app.use('/api/customers', customersRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/search', searchRoutes);
 
 app.use(async (err, req, res, _next) => {
   console.error('[API] Error:', err.message);
@@ -68,6 +71,7 @@ async function startServer() {
     await ensureAdminSurfaceSchema();
     await ensureCrudIntegritySchema();
     await ensureCheckInSchema();
+    await ensureTotpSchema();
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`[API] Layer7 License Server running on port ${PORT}`);
     });

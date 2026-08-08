@@ -16,6 +16,8 @@ router.get('/', async (req, res) => {
       eventType,
       result,
       search,
+      customerId,
+      licenseId,
     } = parseAuditListQuery(req.query);
 
     const conditions = [];
@@ -29,6 +31,16 @@ router.get('/', async (req, res) => {
     if (result) {
       params.push(result);
       conditions.push(`result = $${params.length}`);
+    }
+
+    if (customerId) {
+      params.push(customerId);
+      conditions.push(`(metadata ->> 'customer_id')::int = $${params.length}`);
+    }
+
+    if (licenseId) {
+      params.push(licenseId);
+      conditions.push(`(metadata ->> 'license_id')::int = $${params.length}`);
     }
 
     if (search) {

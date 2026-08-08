@@ -4,6 +4,7 @@ import {
   bootstrapAuthSession,
   clearAuthSessionState,
   loginWithPassword,
+  loginWithTotpCode,
   logoutAuthSession,
   refreshAuthSession,
 } from './auth-controller.js';
@@ -58,6 +59,16 @@ export function AuthProvider({ children }) {
     });
   }
 
+  async function loginTotp(challengeToken, code) {
+    return loginWithTotpCode({
+      postSession: post,
+      challengeToken,
+      code,
+      setAdmin,
+      setSession,
+    });
+  }
+
   async function refreshSession() {
     return refreshAuthSession({
       getSession: get,
@@ -79,6 +90,7 @@ export function AuthProvider({ children }) {
     session,
     loading,
     login,
+    loginTotp,
     logout,
     refreshSession,
   });

@@ -11,6 +11,58 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [1.9.0] — 2026-08-08
+
+### Added
+
+- 2FA TOTP: setup em Segurança, desafio no login, enable/disable
+
+---
+
+## [1.8.0] — 2026-08-08
+
+### Added
+
+- Busca global na sidebar (`GET /api/search`)
+- Export CSV da lista de licenças filtrada
+- Clientes recentes (localStorage)
+
+---
+
+## [1.7.0] — 2026-08-08
+
+### Added
+
+- Timeline de auditoria na ficha do cliente (`customer_id` / `license_id`)
+- Banners renew/rebind com antes → depois
+
+---
+
+## [1.6.0] — 2026-08-08
+
+### Added
+
+- Dashboard **Precisa de acção** (expirar, expiradas vinculadas, por activar, check-in stale)
+
+---
+
+## [1.5.0] — 2026-08-08
+
+### Added
+
+- Lista: último check-in, notas, filtro sem check-in > N dias
+
+---
+
+## [1.4.0] — 2026-08-08
+
+### Added
+
+- Pacote de entrega copiável
+- Confirmações com resumo (cliente/SKU/expiry/equipamento)
+
+---
+
 ## [1.3.2] — 2026-08-08
 
 ### Changed

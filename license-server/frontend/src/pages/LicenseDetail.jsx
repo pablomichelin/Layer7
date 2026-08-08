@@ -11,12 +11,15 @@ import {
 } from '../license-display.js';
 import { formatCalendarDate, formatDateTime } from '../format-date.js';
 import {
+  buildLicenseActionConfirmMessage,
+  buildLicenseDeliveryPack,
+} from '../license-delivery-pack.js';
+import {
   ADMIN_LICENSES_ROUTE,
   buildAdminCustomerDetailRoute,
   buildAdminLicenseDetailRoute,
   buildAdminLicenseEditRoute,
 } from '../panel-routes.js';
-
 const RENEW_OPTIONS = [
   { days: 30, label: '+30 dias' },
   { days: 90, label: '+90 dias' },
@@ -75,7 +78,10 @@ export default function LicenseDetail() {
   }, [location.state, location.pathname, navigate]);
 
   async function handleRevoke() {
-    if (!confirm('Tem certeza que deseja revogar esta licença?')) return;
+    if (!confirm(buildLicenseActionConfirmMessage(
+      'Revogar esta licença. O appliance deixa de receber check-in válido.',
+      licenseForConfirm()
+    ))) return;
     try {
       await post(`/licenses/${id}/revoke`, {});
       setRenewBanner(null);
@@ -85,6 +91,10 @@ export default function LicenseDetail() {
     } catch (err) {
       alert(err.message);
     }
+  }
+
+  function licenseForConfirm() {
+    return data?.license || {};
   }
 
   async function handleDownload() {
@@ -102,13 +112,18 @@ export default function LicenseDetail() {
   }
 
   async function handleRenew(days) {
-    if (!confirm(`Renovar esta licença em ${days} dias?`)) return;
+    if (!confirm(buildLicenseActionConfirmMessage(
+      `Renovar esta licença em ${days} dias.`,
+      licenseForConfirm()
+    ))) return;
     setRenewing(true);
     try {
+      const previousExpiry = data?.license?.expiry;
       const renewed = await post(`/licenses/${id}/renew`, { days });
       setRenewBanner({
         days,
         expiry: renewed.expiry,
+        previousExpiry,
         bound: Boolean(renewed.hardware_id),
       });
       load();
@@ -121,14 +136,18 @@ export default function LicenseDetail() {
 
   async function handleRebind(event) {
     event.preventDefault();
-    const warning = [
-      'ATENÇÃO: o ficheiro .lic antigo pode continuar válido offline no equipamento antigo até à data de expiração + 14 dias de graça.',
-      'Confirma a troca de equipamento?',
-    ].join('\n');
+    const warning = buildLicenseActionConfirmMessage(
+      [
+        'Trocar equipamento desta licença.',
+        'O ficheiro .lic antigo pode continuar válido offline no equipamento antigo até à data de expiração + 14 dias de graça.',
+      ].join(' '),
+      licenseForConfirm()
+    );
     if (!confirm(warning)) return;
 
     setRebinding(true);
     try {
+      const previousHardwareId = data?.license?.hardware_id || null;
       const payload = {
         reason: rebindReason,
         mode: rebindMode,
@@ -140,6 +159,8 @@ export default function LicenseDetail() {
       setRebindBanner({
         mode: rebindMode,
         bound: Boolean(rebound.hardware_id),
+        previousHardwareId,
+        nextHardwareId: rebound.hardware_id || null,
       });
       setShowRebind(false);
       setRebindReason('');
@@ -155,12 +176,13 @@ export default function LicenseDetail() {
 
   async function handleReplace(event) {
     event.preventDefault();
-    const warning = [
-      'Isto cria uma NOVA chave e arquiva a licença revogada.',
-      'Não desrevoga a chave antiga (política conservadora P1d).',
-      'O .lic antigo pode continuar válido offline até expiry+grace.',
-      'Confirma a substituição?',
-    ].join('\n');
+    const warning = buildLicenseActionConfirmMessage(
+      [
+        'Criar NOVA chave e arquivar a licença revogada.',
+        'Não desrevoga a chave antiga. O .lic antigo pode continuar válido offline até expiração + 14 dias.',
+      ].join(' '),
+      licenseForConfirm()
+    );
     if (!confirm(warning)) return;
 
     setReplacing(true);
@@ -226,7 +248,13 @@ export default function LicenseDetail() {
 
       {renewBanner && (
         <div className="bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-3 text-sm mb-4">
-          Licença renovada (+{renewBanner.days} dias). Nova expiração:{' '}
+          Licença renovada (+{renewBanner.days} dias). Expiração:{' '}
+          {renewBanner.previousExpiry ? (
+            <>
+              <strong>{formatCalendarDate(renewBanner.previousExpiry)}</strong>
+              {' → '}
+            </>
+          ) : null}
           <strong>{formatCalendarDate(renewBanner.expiry)}</strong>.
           {renewBanner.bound && canDownload ? (
             <>
@@ -250,6 +278,14 @@ export default function LicenseDetail() {
       {rebindBanner && (
         <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg px-4 py-3 text-sm mb-4">
           Troca de equipamento concluída e auditada.
+          {rebindBanner.previousHardwareId || rebindBanner.nextHardwareId ? (
+            <>
+              {' '}Equipamento:{' '}
+              <code className="text-xs">{rebindBanner.previousHardwareId ? `${String(rebindBanner.previousHardwareId).slice(0, 12)}…` : '—'}</code>
+              {' → '}
+              <code className="text-xs">{rebindBanner.nextHardwareId ? `${String(rebindBanner.nextHardwareId).slice(0, 12)}…` : 'por activar'}</code>.
+            </>
+          ) : null}
           {rebindBanner.mode === 'unbind' ? (
             <> A licença ficou por activar — o cliente deve correr <code>layer7d --activate CHAVE</code> no novo pfSense.</>
           ) : (
@@ -306,6 +342,11 @@ export default function LicenseDetail() {
             <span className="text-gray-500">Chave:</span>{' '}
             <code className="ml-2 break-all">{license.license_key}</code>{' '}
             <CopyButton text={license.license_key} />
+            <CopyButton
+              text={buildLicenseDeliveryPack(license)}
+              label="Copiar pacote de entrega"
+              className="ml-2 font-medium"
+            />
           </div>
           <div>
             <span className="text-gray-500">Cliente:</span>{' '}
@@ -386,7 +427,7 @@ export default function LicenseDetail() {
           )}
           {license.status !== 'active' && !canReplace && (
             <button onClick={async () => {
-              if (!confirm('Arquivar esta licença?')) return;
+              if (!confirm(buildLicenseActionConfirmMessage('Arquivar esta licença.', license))) return;
               try { await del(`/licenses/${id}`); navigate(ADMIN_LICENSES_ROUTE); } catch (err) { alert(err.message); }
             }} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Arquivar Licença
@@ -394,7 +435,10 @@ export default function LicenseDetail() {
           )}
           {canReplace && (
             <button onClick={async () => {
-              if (!confirm('Arquivar esta licença revogada sem criar substituta?')) return;
+              if (!confirm(buildLicenseActionConfirmMessage(
+                'Arquivar esta licença revogada sem criar substituta.',
+                license
+              ))) return;
               try { await del(`/licenses/${id}`); navigate(ADMIN_LICENSES_ROUTE); } catch (err) { alert(err.message); }
             }} className="px-4 py-2 border border-red-600 text-red-700 hover:bg-red-50 text-sm rounded-lg transition-colors">
               Só arquivar

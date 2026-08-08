@@ -170,11 +170,16 @@ router.get('/:id', async (req, res) => {
     }
 
     const licensesResult = await pool.query(
-      `SELECT *
-         FROM licenses
-        WHERE customer_id = $1
-          AND archived_at IS NULL
-        ORDER BY created_at DESC`,
+      `SELECT l.*, ci.last_check_in_at
+         FROM licenses l
+         LEFT JOIN LATERAL (
+           SELECT MAX(created_at) AS last_check_in_at
+             FROM check_ins_log
+            WHERE license_id = l.id
+         ) ci ON TRUE
+        WHERE l.customer_id = $1
+          AND l.archived_at IS NULL
+        ORDER BY l.created_at DESC`,
       [customerId]
     );
 

@@ -12,6 +12,7 @@ import {
 } from '../license-display.js';
 import { formatCalendarDate, formatDateTime } from '../format-date.js';
 import { summarizeCustomerLicenses } from '../customer-license-summary.js';
+import { rememberRecentCustomer } from '../recent-customers.js';
 import {
   ADMIN_CUSTOMERS_ROUTE,
   buildAdminCustomerEditRoute,
@@ -23,13 +24,23 @@ export default function CustomerDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [timeline, setTimeline] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    get(`/customers/${id}`, { signal: controller.signal })
-      .then(setData)
+    Promise.all([
+      get(`/customers/${id}`, { signal: controller.signal }),
+      get(`/audit?customer_id=${id}&limit=15`, { signal: controller.signal }).catch(() => ({ events: [] })),
+    ])
+      .then(([customerPayload, auditPayload]) => {
+        setData(customerPayload);
+        setTimeline(auditPayload.events || []);
+        if (customerPayload?.customer) {
+          rememberRecentCustomer(customerPayload.customer);
+        }
+      })
       .catch((err) => {
         if (err?.name !== 'AbortError') console.error(err);
       })
@@ -86,6 +97,11 @@ export default function CustomerDetail() {
     },
     { key: 'expiry', label: 'Expira', render: (r) => formatCalendarDate(r.expiry) },
     { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+    {
+      key: 'last_check_in_at',
+      label: 'Check-in',
+      render: (r) => (r.last_check_in_at ? formatDateTime(r.last_check_in_at).split(',')[0] : '—'),
+    },
     {
       key: 'activated_at',
       label: 'Activada',
@@ -172,6 +188,33 @@ export default function CustomerDetail() {
         rows={licenses}
         emptyMessage="Nenhuma licença — use Nova licença para emitir a primeira chave."
         onRowClick={(row) => navigate(buildAdminLicenseDetailRoute(row.id, { fromCustomerId: id }))}
+      />
+
+      <h3 className="text-lg font-semibold text-gray-700 mt-8 mb-3">Timeline (auditoria)</h3>
+      <DataTable
+        columns={[
+          { key: 'created_at', label: 'Quando', render: (r) => formatDateTime(r.created_at) },
+          { key: 'event_type', label: 'Evento', render: (r) => r.event_type },
+          { key: 'result', label: 'Resultado', render: (r) => r.result },
+          { key: 'reason', label: 'Motivo', render: (r) => r.reason || '—' },
+          {
+            key: 'license',
+            label: 'Licença',
+            render: (r) => (r.metadata?.license_id
+              ? (
+                <button
+                  type="button"
+                  className="text-brand-600 hover:underline text-xs"
+                  onClick={() => navigate(buildAdminLicenseDetailRoute(r.metadata.license_id, { fromCustomerId: id }))}
+                >
+                  #{r.metadata.license_id}
+                </button>
+              )
+              : '—'),
+          },
+        ]}
+        rows={timeline}
+        emptyMessage="Sem eventos de auditoria para este cliente."
       />
     </div>
   );

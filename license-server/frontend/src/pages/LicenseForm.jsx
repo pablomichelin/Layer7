@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { get, post, put } from '../api';
 import CopyButton from '../components/CopyButton';
 import CustomerSelect from '../components/CustomerSelect.jsx';
+import { buildLicenseDeliveryPack } from '../license-delivery-pack.js';
 import {
   buildLicenseFormState,
   buildLicenseSavePayload,
@@ -138,8 +139,13 @@ export default function LicenseForm() {
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
             <p className="text-xs text-gray-500 mb-1">Chave completa</p>
             <code className="text-sm break-all">{createdLicense.license_key}</code>
-            <div className="mt-2">
+            <div className="mt-2 flex flex-wrap gap-3">
               <CopyButton text={createdLicense.license_key} label="Copiar chave" className="font-medium" />
+              <CopyButton
+                text={buildLicenseDeliveryPack(createdLicense)}
+                label="Copiar pacote de entrega"
+                className="font-medium"
+              />
             </div>
           </div>
           <div className="flex flex-wrap gap-3">

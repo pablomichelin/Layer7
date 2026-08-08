@@ -76,6 +76,8 @@ router.get('/', async (req, res) => {
       offset,
       bound,
       expiringWithinDays,
+      staleCheckinDays,
+      format,
     } = parseLicensesListQuery(req.query);
     const conditions = ['l.archived_at IS NULL', '(c.id IS NULL OR c.archived_at IS NULL)'];
     const params = [];
@@ -106,28 +108,73 @@ router.get('/', async (req, res) => {
       );
     }
 
+    if (staleCheckinDays !== undefined) {
+      params.push(staleCheckinDays);
+      conditions.push(`l.hardware_id IS NOT NULL AND btrim(l.hardware_id) <> ''`);
+      conditions.push(
+        `(ci.last_check_in_at IS NULL OR ci.last_check_in_at < NOW() - ($${params.length}::int * INTERVAL '1 day'))`
+      );
+    }
+
     if (search) {
       params.push(`%${search}%`);
       conditions.push(
-        `(l.license_key ILIKE $${params.length} OR c.name ILIKE $${params.length} OR COALESCE(l.hardware_id, '') ILIKE $${params.length})`
+        `(l.license_key ILIKE $${params.length} OR c.name ILIKE $${params.length} OR COALESCE(l.hardware_id, '') ILIKE $${params.length} OR COALESCE(l.notes, '') ILIKE $${params.length})`
       );
     }
 
     const whereClause = `WHERE ${conditions.join(' AND ')}`;
+    const fromClause = `
+         FROM licenses l
+         LEFT JOIN customers c ON c.id = l.customer_id
+         LEFT JOIN LATERAL (
+           SELECT MAX(created_at) AS last_check_in_at
+             FROM check_ins_log
+            WHERE license_id = l.id
+         ) ci ON TRUE`;
+
+    if (format === 'csv') {
+      const csvResult = await pool.query(
+        `SELECT l.id, l.license_key, c.name AS customer_name, l.features, l.expiry,
+                l.status, l.hardware_id, l.notes, ci.last_check_in_at, l.created_at
+                ${fromClause}
+                ${whereClause}
+         ORDER BY l.created_at DESC
+         LIMIT 5000`,
+        params
+      );
+      const header = [
+        'id', 'license_key', 'customer_name', 'features', 'expiry',
+        'status', 'hardware_id', 'notes', 'last_check_in_at', 'created_at',
+      ];
+      const escapeCsv = (value) => {
+        if (value === null || value === undefined) return '';
+        const text = String(value);
+        if (/[",\n]/.test(text)) {
+          return `"${text.replace(/"/g, '""')}"`;
+        }
+        return text;
+      };
+      const lines = [header.join(',')];
+      for (const row of csvResult.rows.map(applyEffectiveLicenseState)) {
+        lines.push(header.map((key) => escapeCsv(row[key])).join(','));
+      }
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="licenses.csv"');
+      return res.send(lines.join('\n'));
+    }
 
     const countResult = await pool.query(
       `SELECT COUNT(*)
-         FROM licenses l
-         LEFT JOIN customers c ON c.id = l.customer_id
+         ${fromClause}
          ${whereClause}`,
       params
     );
     const total = Number.parseInt(countResult.rows[0].count, 10);
 
     const result = await pool.query(
-      `SELECT l.*, c.name AS customer_name
-         FROM licenses l
-         LEFT JOIN customers c ON c.id = l.customer_id
+      `SELECT l.*, c.name AS customer_name, ci.last_check_in_at
+         ${fromClause}
          ${whereClause}
         ORDER BY l.created_at DESC
         LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,

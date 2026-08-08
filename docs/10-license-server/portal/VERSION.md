@@ -4,16 +4,19 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `1.3.2` |
-| **Codinome** | Nomenclatura equipamento |
+| **Versão** | `1.9.0` |
+| **Codinome** | PORTAL-PLAN-003 fecho D0–D5 |
 | **Estado** | Entregue |
 | **Data** | `2026-08-08` |
 
 ## Inclui
 
-- Labels UI: **Equipamento** → Vinculada / Por activar (sem Bound/Unbound)
-- Botão e fluxos: Trocar equipamento (em vez de Rebind)
-- Mantém API/query `bound` (só texto apresentado muda)
+- D0: pacote de entrega + confirmações com resumo
+- D1: último check-in, notas, filtro silêncio
+- D2: dashboard Precisa de acção
+- D3: timeline cliente + banners antes→depois
+- D4: busca global, CSV, clientes recentes
+- D5: 2FA TOTP (setup em Segurança + login)
 
 ## Próxima
 

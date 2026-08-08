@@ -779,17 +779,16 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 | Campo | Valor |
 |-------|-------|
-| Versão visual actual | **`1.3.2`** (nomenclatura equipamento, `2026-08-08`) |
+| Versão visual actual | **`1.9.0`** (PORTAL-PLAN-003 CONCLUIDO, `2026-08-08`) |
 | Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
 | Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
-| Plano activo | *(nenhum — último: [`PORTAL-PLAN-002`](docs/10-license-server/portal/planos/2026-08-08-ficha-cliente-360.md) CONCLUIDO)* |
+| Plano activo | *(nenhum — último: [`PORTAL-PLAN-003`](docs/10-license-server/portal/planos/2026-08-08-operador-fila-contexto.md) CONCLUIDO)* |
 | Alvo | `1.0.0` — completo para **operador único** |
 | Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
-**Checkpoint `2026-08-08`:** portal **`1.3.2`** — labels Equipamento
-(Vinculada / Por activar); hotfix `1.3.1` (datas/download/auditoria/busca)
-fechado. Plano 002 CONCLUIDO.
+**Checkpoint `2026-08-08`:** portal **`1.9.0`** — PORTAL-PLAN-003 CONCLUIDO
+(D0–D5). Planos 001/002/003 fechados.
 Regra: não saltar blocos do plano portal.
 
 ---

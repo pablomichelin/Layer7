@@ -46,6 +46,7 @@ test('buildAuthContextValue reports authenticated only when admin and session ex
 
 test('buildAuthContextValue preserves the provider contract fields', () => {
   const login = () => 'login';
+  const loginTotp = () => 'loginTotp';
   const logout = () => 'logout';
   const refreshSession = () => 'refresh';
 
@@ -55,6 +56,7 @@ test('buildAuthContextValue preserves the provider contract fields', () => {
       session: { id: 11 },
       loading: true,
       login,
+      loginTotp,
       logout,
       refreshSession,
     }),
@@ -64,6 +66,7 @@ test('buildAuthContextValue preserves the provider contract fields', () => {
       loading: true,
       isAuthenticated: true,
       login,
+      loginTotp,
       logout,
       refreshSession,
     }

@@ -3,6 +3,7 @@ export const ADMIN_DASHBOARD_ROUTE = '/dashboard';
 export const ADMIN_LICENSES_ROUTE = '/licenses';
 export const ADMIN_CUSTOMERS_ROUTE = '/customers';
 export const ADMIN_AUDIT_ROUTE = '/audit';
+export const ADMIN_SECURITY_ROUTE = '/security';
 export const ADMIN_LICENSES_NEW_ROUTE = `${ADMIN_LICENSES_ROUTE}/new`;
 export const ADMIN_CUSTOMERS_NEW_ROUTE = `${ADMIN_CUSTOMERS_ROUTE}/new`;
 

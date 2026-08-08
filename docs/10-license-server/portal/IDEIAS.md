@@ -36,6 +36,25 @@ Registar aqui **antes** de implementar. Ligar a plano/versão quando existir.
 
 ---
 
+## Aceites — plano `PORTAL-PLAN-003` (operador: fila/contexto/entrega)
+
+| ID | Ideia | Origem | Ligação |
+|----|-------|--------|---------|
+| IDEA-040 | Pacote de entrega copiável (chave + activate + SKU + expiry) | Chat `2026-08-08` | Plano 003 — **D0** |
+| IDEA-041 | Confirmações com resumo (cliente/SKU/expiry/equipamento) | Chat `2026-08-08` | Plano 003 — **D0** |
+| IDEA-042 | Último check-in na lista de licenças | Chat `2026-08-08` | Plano 003 — **D1** |
+| IDEA-043 | Notas operacionais na lista | Chat `2026-08-08` | Plano 003 — **D1** |
+| IDEA-044 | Filtro sem check-in > 7 dias | Chat `2026-08-08` | Plano 003 — **D1** |
+| IDEA-045 | Dashboard “Precisa de acção” | Chat `2026-08-08` | Plano 003 — **D2** |
+| IDEA-046 | Timeline de auditoria na ficha do cliente | Chat `2026-08-08` | Plano 003 — **D3** |
+| IDEA-047 | Banners renew/rebind com antes → depois | Chat `2026-08-08` | Plano 003 — **D3** |
+| IDEA-048 | Busca global (chave / hardware / CNPJ / nome) | Chat `2026-08-08` | Plano 003 — **D4** |
+| IDEA-049 | Export CSV da lista filtrada | Chat `2026-08-08` | Plano 003 — **D4** |
+| IDEA-050 | Clientes recentes (atalhos) | Chat `2026-08-08` | Plano 003 — **D4** |
+| IDEA-051 | 2FA TOTP no login admin (promove IDEA-031) | Chat `2026-08-08` | Plano 003 — **D5** |
+
+---
+
 ## Futuras (escala / vendas — **não** no plano actual)
 
 | ID | Ideia | Nota |
@@ -55,7 +74,7 @@ Registar aqui **antes** de implementar. Ligar a plano/versão quando existir.
 | ID | Ideia | Motivo |
 |----|-------|--------|
 | IDEA-030 | Redesign visual completo (branding Systemup) | Depois da completude P0/P1; não bloquear ciclo de vida |
-| IDEA-031 | 2FA no login admin | Desejável; não bloqueia `1.0.0` operador único se sessão F2 mantida |
+| IDEA-031 | 2FA no login admin | Promovida a IDEA-051 / PORTAL-PLAN-003 **D5** |
 
 ---
 

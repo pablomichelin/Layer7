@@ -1,7 +1,7 @@
 const API_BASE = '/api';
 let authToken = null;
 import { AUTH_INVALID_EVENT } from './auth-events.js';
-import { AUTH_LOGIN_PATH } from './auth-paths.js';
+import { AUTH_LOGIN_PATH, AUTH_LOGIN_TOTP_PATH } from './auth-paths.js';
 import { AUTH_SESSION_EXPIRED_MESSAGE } from './auth-messages.js';
 import { ADMIN_LOGIN_ROUTE } from './panel-routes.js';
 import {
@@ -37,7 +37,7 @@ function redirectToLogin() {
 }
 
 function shouldAttachAuthorizationHeader(path) {
-  return path !== AUTH_LOGIN_PATH;
+  return path !== AUTH_LOGIN_PATH && path !== AUTH_LOGIN_TOTP_PATH;
 }
 
 export async function api(path, options = {}) {

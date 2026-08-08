@@ -5,6 +5,7 @@ import {
 } from './auth-session-state.js';
 import {
   AUTH_LOGIN_PATH,
+  AUTH_LOGIN_TOTP_PATH,
   AUTH_LOGOUT_PATH,
   AUTH_SESSION_PATH,
 } from './auth-paths.js';
@@ -51,6 +52,24 @@ export async function loginWithPassword({
   setSession,
 }) {
   const data = await postSession(AUTH_LOGIN_PATH, { email, password }, getAdminAuthRequestOptions());
+  if (data?.status === 'totp_required') {
+    return data;
+  }
+  return syncAuthenticatedSession(data, { setAdmin, setSession });
+}
+
+export async function loginWithTotpCode({
+  postSession,
+  challengeToken,
+  code,
+  setAdmin,
+  setSession,
+}) {
+  const data = await postSession(
+    AUTH_LOGIN_TOTP_PATH,
+    { challenge_token: challengeToken, code },
+    getAdminAuthRequestOptions()
+  );
   return syncAuthenticatedSession(data, { setAdmin, setSession });
 }
 
