@@ -534,22 +534,12 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-07 | **rev. `g` / 20.20 receiver + 1.9.18** — `identity_dc` HTTPS+HMAC; GUI; lab PS1; publicado lab/`latest`; passo → **agente Win** |
 | 2026-08-08 | **rev. `a` / 20.20 agente Win PASS + 1.9.24** — `Layer7IdentityDcAgent.ps1` + Install/Uninstall + README; publicado lab/`latest`; passo → **20.21** |
 | 2026-08-08 | **rev. `b` / 20.21 PASS** — `normalize_user` + `remove_ip`; RADIUS/DC alinhados; candidato `1.9.25`; passo → **20.22** |
-| 2026-08-08 | **rev. `h` / 20.27 PASS** — especificação agente endpoint; recomendação ADIAR salvo GO; passo → **20.28** |
-| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
-| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
-| 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
-| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
-| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
-| 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
-| 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |
-| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
-| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
-| 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
-| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
-| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
-| 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
-| 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |
 | 2026-08-08 | **rev. `c` / 20.22 PASS** — audit conflict/last_writer + GUI topologia; candidato `1.9.26`; passo → **20.23** |
+| 2026-08-08 | **rev. `d` / 20.23 PASS** — políticas `ad_users`/`ad_groups` (parse+GUI); candidato `1.9.27`; passo → **20.24** |
+| 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
+| 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
+| 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
+| 2026-08-08 | **rev. `h` / 20.27 PASS** — especificação agente endpoint; recomendação ADIAR salvo GO; passo → **20.28** |
 
 ---
 
