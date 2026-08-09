@@ -338,11 +338,13 @@ write_stats_json(void)
 	    (access("/usr/local/sbin/layer7-tlsproxy", X_OK) == 0) ?
 	    "true" : "false");
 	/*
-	 * 20.10b: intercept_ready=true (listen/rdr/página wired no pacote).
-	 * mitm_effective permanece false no daemon — autoridade full cascade
-	 * está no PHP (enabled∧entitlement∧CA∧runtime∧intercept_ready).
+	 * 20.10b/1.9.41: intercept_ready=true (wired).
+	 * mitm_effective: flag materializado pelo PHP em sync_helper
+	 * (/var/run/layer7/mitm.effective) — evita claim falso OFF/ON.
 	 */
-	fprintf(f, "  \"mitm_effective\": false,\n");
+	fprintf(f, "  \"mitm_effective\": %s,\n",
+	    (access("/var/run/layer7/mitm.effective", R_OK) == 0) ?
+	    "true" : "false");
 	fprintf(f, "  \"mitm_intercept_ready\": true,\n");
 	{
 		const char *lst = "off";

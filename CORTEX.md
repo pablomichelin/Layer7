@@ -35,13 +35,13 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.40` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.40`;
-`SHA256=fbbf206d1b159722a28073dd402f9b0c8ef381eff07eb3a886e5ef8310a41afe`;
-BG-087/20.10b listen selectivo + PF rdr selectivo + página HTTPS;
-`intercept_ready=true`; default OFF; rdr só com `dest_cidr`;
+`1.9.41` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.41`;
+`SHA256=1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4`;
+BG-087/20.10b correctivo pós-auditoria adversária do `1.9.40` (F1–F6);
+`intercept_ready=true`; default OFF; rdr só com `dest_cidr` IPv4;
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.39`**.
-**MITM:** **GO produto** `2026-08-09`; **20.10a PASS**; **20.10b PASS** (`1.9.40`);
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.40`**.
+**MITM:** **GO produto** `2026-08-09`; **20.10a PASS**; **20.10b PASS** (`1.9.41`);
 GI2/GI3 **DEFERRED** (20.11); **sem** intercept produção `.254/.234/.235`.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
@@ -1317,7 +1317,7 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM GO 2026-08-08)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.40`** (20.10b).
+Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.41`** (20.10b correctivo).
 **IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
 **20.8 PASS** → **20.9 PASS** → **GO produto** → **20.10a PASS** → **20.10b PASS**;
 **IM3–IM9 Identity rede FECHADA** (20.33 / GI9 PASS). **Nicho:** PME / MSP.
@@ -1345,17 +1345,18 @@ default OFF; Squid **rejeitado**; GI2/GI3 **DEFERRED** (20.11).
 - **Backlog:** BG-085…BG-092 (BG-087 **20.10b**; BG-091 fechado ADR-0029)
 - **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→**20.10b**→**20.11**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09ac`
+- **Rev. plano:** `2026-08-09ad`
 - **Evidência 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/)
+- **Auditoria pós-release 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/`](docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/)
 - **Runbook S1–S8:** [`docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md)
 - **Prep 20.10:** [`docs/09-blocking/prep-20.10-checklist.md`](docs/09-blocking/prep-20.10-checklist.md) — **FECHADO**
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.10b PASS** (`1.9.40`; intercept_ready; listen/rdr/página gated)
-- Próximo: **20.11** (GI2/GI3 lab)
-- Latest: **1.9.40** SHA `fbbf206d…1afe`
+- Passo actual: **20.10b PASS** (`1.9.41`; correctivo F1–F6; intercept_ready; listen/rdr/página gated)
+- Próximo: **20.11** (GI2/GI3 lab) — só após release `1.9.41` + gate abaixo
+- Latest: **1.9.41** SHA `1518ad68…c1f4`
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - Squid: REJEITADO; GI2/GI3: DEFERRED; sem intercept produção
 ```
@@ -1546,17 +1547,17 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-09 (20.10b PASS)
+- Data base: 2026-08-09 (20.10b PASS correctivo `1.9.41`)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.40** (BG-087/20.10b; SHA `fbbf206d…1afe`)
+- Canal publico latest: **1.9.41** (BG-087/20.10b correctivo; SHA `1518ad68…c1f4`)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **20.10b PASS**; próximo **20.11** GI2/GI3; Squid rejeitado
+- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **20.10b PASS** (`1.9.41`); próximo **20.11** GI2/GI3; Squid rejeitado
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Proximo trabalho: **20.11** (GI2/GI3 lab) — sem activar intercept em .254/.234/.235 sem GO
-- Pacote publicado: **1.9.40**; rollback lab: **1.9.39**
+- Pacote publicado: **1.9.41**; rollback lab: **1.9.40**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```

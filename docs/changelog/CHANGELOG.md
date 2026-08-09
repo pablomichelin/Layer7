@@ -6,7 +6,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- **20.10b PASS** (`1.9.40`): listen selectivo + PF rdr + página HTTPS; GI2/GI3 DEFERRED (20.11).
+- **20.10b PASS** (`1.9.41`): correctivo F1–F6 pós-auditoria do `1.9.40`; GI2/GI3 DEFERRED (20.11).
+
+## [1.9.41] — 2026-08-09
+
+### Fixed
+
+- **BG-087 / 20.10b correctivo — auditoria adversária do `1.9.40`:**
+  - F1: rdr MITM emite em modo **monitor** (não só enforce).
+  - F2: CA generate/import/delete sincroniza helper + `filter_configure`.
+  - F3: deinstall para tlsproxy, remove gate/flag, flush tabelas MITM.
+  - F4: sem rdr IPv6 sem listener `::1` (só IPv4 → `127.0.0.1`).
+  - F5: daemon reporta `mitm_effective` via flag `/var/run/layer7/mitm.effective`.
+  - F6: exclusão de IPs/CIDRs do appliance em `dest_cidr` (anti-lockout).
+  Evidência: `docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/`.
+
+### Release
+
+- Tag `v1.9.41` / `releases/latest`
+- SHA256: `1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4`
+- Rollback: `1.9.40`
 
 ## [1.9.40] — 2026-08-09
 

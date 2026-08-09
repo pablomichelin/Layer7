@@ -142,6 +142,25 @@ if (!$has_openssl) {
 	    strpos($snip, "127.0.0.1 port 8443") === false) {
 		fail("rdr selectivo incompleto: " . $snip);
 	}
+	/* IPv6 dest nao gera rdr (listener so IPv4) — 1.9.41. */
+	$n6 = layer7_mitm_normalize(array(
+		"enabled" => true,
+		"intercept" => array(
+			"dest_cidr" => array("2001:db8::10"),
+			"block_sni" => array("blocked.test")
+		)
+	));
+	$cfg6 = layer7_mitm_apply_to_config(layer7_bare_config(), $n6);
+	$cfg6["layer7"]["interfaces"] = array("lan");
+	if (layer7_generate_mitm_rdr_snippet($cfg6, true) !== "") {
+		fail("rdr inet6 nao deve ser emitido sem listener ::1");
+	}
+	/* Anti-lockout: host e CIDR que contenham IP do appliance. */
+	if (!layer7_mitm_dest_is_self("192.168.100.254", array("192.168.100.254")) ||
+	    !layer7_mitm_dest_is_self("192.168.100.0/24", array("192.168.100.254")) ||
+	    layer7_mitm_dest_is_self("203.0.113.10", array("192.168.100.254"))) {
+		fail("dest_is_self anti-lockout");
+	}
 	/* Sem dest → zero rdr mesmo com effective. */
 	$n2b = layer7_mitm_normalize(array(
 		"enabled" => true,
@@ -155,12 +174,19 @@ if (!$has_openssl) {
 		fail("sync helper deve escrever gate com effective");
 	}
 	$gate = layer7_mitm_product_gate_path();
+	$flag = layer7_mitm_effective_flag_path();
 	if (!is_file($gate) || strpos(file_get_contents($gate), "LAYER7_TLSPROXY_PRODUCT=1") === false) {
 		fail("gate produto em falta");
+	}
+	if (!is_file($flag)) {
+		fail("flag mitm.effective em falta apos sync ON");
 	}
 	layer7_mitm_sync_helper(layer7_bare_config(), false);
 	if (is_file($gate)) {
 		fail("gate deve ser removido sem effective");
+	}
+	if (is_file($flag)) {
+		fail("flag effective deve ser removida sem effective");
 	}
 	@unlink($fake);
 	layer7_mitm_ca_delete();

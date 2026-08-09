@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.10b PASS** (rev. `2026-08-09ac`)
+**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.10b PASS** (rev. `2026-08-09ad`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -16,7 +16,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.40` (20.10b; SHA `fbbf206d1b159722a28073dd402f9b0c8ef381eff07eb3a886e5ef8310a41afe`)
+**Canal lab/`latest`:** `1.9.41` (20.10b correctivo; SHA `1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4`)
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
@@ -34,7 +34,8 @@
 **Rev. `z` (`2026-08-09`)** = **GO Opção A** + **S1/S2 inline PASS** (netns+REDIRECT+SO_ORIGINAL_DST); PoC-5; IPC mock; 20.10 ainda bloqueado.  
 **Rev. `aa` (`2026-08-09`)** = prep-20.10 itens 1–7 PASS — draft `pkg-plist`/rc/`WITH_LAYER7_TLSPROXY=no` + S8 runtime-present-OFF em `.54`; **sem** merge no `.pkg`; falta só GO produto.  
 **Rev. `ab` (`2026-08-09`)** = **GO produto** + **20.10a** — runtime no `.pkg` (`1.9.39`); rc default OFF; `intercept_ready=false`; próximo **20.10b**.  
-**Rev. `ac` (`2026-08-09`)** = **20.10b PASS** — listen selectivo + PF rdr selectivo + página HTTPS (`1.9.40`); próximo **20.11**.
+**Rev. `ac` (`2026-08-09`)** = **20.10b** inicial (`1.9.40`) — listen/rdr/página; **NO-GO** pós-auditoria.  
+**Rev. `ad` (`2026-08-09`)** = **20.10b PASS** correctivo (`1.9.41`) — F1–F6; próximo **20.11**.
 
 ---
 
@@ -42,20 +43,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.10b PASS** — listen/rdr/página wired; gated por `mitm_effective` |
+| Passo actual | **20.10b PASS** (`1.9.41`) — listen/rdr/página + correctivo F1–F6 |
 | Próximo | **20.11** — GI2/GI3 lab |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
+| Auditoria pós-release | [`../tests/evidence/20260809T053000Z-20.10b-postrelease-audit/`](../tests/evidence/20260809T053000Z-20.10b-postrelease-audit/) |
 
 ```text
 TRILHA — progresso
 - GO produto 2026-08-09
 - 20.10a PASS (1.9.39)
-- 20.10b PASS (1.9.40; intercept_ready; listen/rdr/página gated)
+- 20.10b 1.9.40 NO-GO auditoria → 1.9.41 PASS (F1–F6)
 - 20.11 PENDENTE (GI2/GI3)
-- Plano rev.: 2026-08-09ac
-- Lab/latest: 1.9.40
+- Plano rev.: 2026-08-09ad
+- Lab/latest: 1.9.41
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)

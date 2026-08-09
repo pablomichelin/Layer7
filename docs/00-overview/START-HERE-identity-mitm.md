@@ -1,7 +1,7 @@
-# START HERE — Identity + MITM Add-on 【20.10b PASS — próximo 20.11】
+# START HERE — Identity + MITM Add-on 【20.10b PASS (`1.9.41`) — próximo 20.11】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
-> **20.10b PASS** (`1.9.40`): listen selectivo + PF rdr selectivo + página HTTPS.  
+> **20.10b PASS** (`1.9.41`): correctivo pós-auditoria do `1.9.40` (F1–F6).  
 > **Sem** intercept em `.254`/`.234`/`.235`. Squid rejeitado. Próximo: **20.11**.
 
 ```text
@@ -46,10 +46,10 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; **20.10b PASS** (rev. `2026-08-09ac`) |
-| Passo actual | **20.10b PASS** (`1.9.40`); próximo **20.11** |
+| Plano | Identity **FECHADA**; MITM **GO produto**; **20.10b PASS** (rev. `2026-08-09ad`) |
+| Passo actual | **20.10b PASS** (`1.9.41`); próximo **20.11** |
 | Próximo | **20.11** — GI2/GI3 lab |
-| Rev. do plano | **`2026-08-09ac`** |
+| Rev. do plano | **`2026-08-09ad`** |
 | MITM | `intercept_ready=true`; listen/rdr/página gated; `mitm_effective` só com gates; GI2/GI3 **DEFERRED** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -125,9 +125,9 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.40** (20.10b).
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.41** (20.10b correctivo).
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
-Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; passo actual **20.10b PASS**.
+Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; passo actual **20.10b PASS** (`1.9.41`).
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
 GO produto: docs/09-blocking/GO-produto-20.10.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
@@ -136,7 +136,7 @@ Ler na ordem do START-HERE; executar só o próximo bloco seguro (**20.11**).
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
 um passo/bloco por entrega; português; barra UX PME; Squid rejeitado;
 NÃO activar intercept em .254/.234/.235 sem smoke + GO; NÃO fechar GI2/GI3 sem evidência.
-Estado fechado: 20.10b listen+rdr+página; plano rev. 2026-08-09ac.
+Estado fechado: 20.10b listen+rdr+página correctivo F1–F6; plano rev. 2026-08-09ad.
 Tarefa seguinte: **20.11** (GI2/GI3 lab).
 ```
 
@@ -156,9 +156,9 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.10b PASS** (`1.9.40`; intercept_ready; listen/rdr/página gated)
+- Passo actual: **20.10b PASS** (`1.9.41`; correctivo F1–F6; intercept_ready; listen/rdr/página gated)
 - Próximo: **20.11** (GI2/GI3 lab)
-- Latest: **1.9.40** SHA `fbbf206d…1afe`
+- Latest: **1.9.41** SHA `1518ad68…c1f4`
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

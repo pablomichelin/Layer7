@@ -30,6 +30,12 @@ if (function_exists('layer7_reports_setup_cron')) {
 # Parar o daemon enquanto o rc.d ainda existe (POST-DEINSTALL corre depois da remocao).
 if [ "${2}" = "PRE-DEINSTALL" ]; then
 	/usr/sbin/service layer7-blockpage onestop >/dev/null 2>&1 || true
+	/usr/sbin/service layer7-tlsproxy onestop >/dev/null 2>&1 || true
+	/bin/rm -f /var/run/layer7/tlsproxy.product /var/run/layer7/mitm.effective \
+		/var/run/layer7-tlsproxy.pid >/dev/null 2>&1 || true
+	if command -v sysrc >/dev/null 2>&1; then
+		sysrc layer7_tlsproxy_enable=NO >/dev/null 2>&1 || true
+	fi
 	/usr/local/bin/php -r "
 require_once('/etc/inc/config.inc');
 require_once('/usr/local/pkg/layer7.inc');
@@ -57,9 +63,14 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 	reload_filter
 	# Fallback pos-remocao (helper ja ausente): alinhar com layer7-pfctl flush-all
 	for _t in layer7_block layer7_block_dst layer7_tagged layer7_bl_except \
-	    layer7_allow_dst; do
+	    layer7_allow_dst layer7_mitm_dst layer7_mitm_dst6; do
 		/sbin/pfctl -t "${_t}" -T flush >/dev/null 2>&1 || true
 	done
+	/bin/rm -f /var/run/layer7/tlsproxy.product /var/run/layer7/mitm.effective \
+		/var/run/layer7-tlsproxy.pid >/dev/null 2>&1 || true
+	if command -v sysrc >/dev/null 2>&1; then
+		sysrc layer7_tlsproxy_enable=NO >/dev/null 2>&1 || true
+	fi
 	_i=0
 	while [ "${_i}" -lt 32 ]; do
 		/sbin/pfctl -t "layer7_bld_${_i}" -T flush >/dev/null 2>&1 || true

@@ -1,14 +1,14 @@
 # Mapa de rastreabilidade — Identity + MITM Add-on
 
 **Classificação:** Canónico (trilha Identity + MITM)  
-**Rev.:** `2026-08-09ac` (Identity FECHADA; MITM **20.10b PASS**)  
+**Rev.:** `2026-08-09ad` (Identity FECHADA; MITM **20.10b PASS** `1.9.41`)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
 **Posicionamento:** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md)  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **Desenho MITM:** [`desenho-layer7-tlsproxy-mitm.md`](desenho-layer7-tlsproxy-mitm.md)  
 **Contrato IPC 20.9:** [`contrato-ipc-layer7-tlsproxy-20.9.md`](contrato-ipc-layer7-tlsproxy-20.9.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
-**Baseline:** produto `1.9.8` sem módulos activos; lab/`latest` `1.9.40` (20.10b PASS)
+**Baseline:** produto `1.9.8` sem módulos activos; lab/`latest` `1.9.41` (20.10b PASS)
 
 Actualizar este mapa **a cada passo 20.x** que toque código ou contratos.  
 Identity rede **FECHADA**. MITM: **20.10b PASS** (listen/rdr/página gated); GI2/GI3 **DEFERRED**; Squid **rejeitado**.

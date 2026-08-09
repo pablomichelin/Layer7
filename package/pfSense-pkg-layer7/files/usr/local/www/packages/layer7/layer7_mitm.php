@@ -74,8 +74,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 				$mitm["ca"]["cn"] = $cn;
 				$data = layer7_mitm_apply_to_config($data, $mitm);
 				layer7_save_json($data);
+				$data = layer7_load_or_default();
+				layer7_mitm_sync_helper($data, true);
+				if (function_exists("filter_configure")) {
+					filter_configure();
+				}
 				$savemsg = l7_t("CA gerada. Exporte o certificado e distribua via GPO — a chave nunca sai do appliance.");
-				$mitm = layer7_mitm_from_config(layer7_load_or_default());
+				$mitm = layer7_mitm_from_config($data);
 			}
 		} elseif (isset($_POST["mitm_ca_import"])) {
 			$cert_pem = isset($_POST["ca_cert_pem"]) ? (string)$_POST["ca_cert_pem"] : "";
@@ -86,8 +91,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			} else {
 				$data = layer7_mitm_apply_to_config($data, $mitm);
 				layer7_save_json($data);
+				$data = layer7_load_or_default();
+				layer7_mitm_sync_helper($data, true);
+				if (function_exists("filter_configure")) {
+					filter_configure();
+				}
 				$savemsg = l7_t("CA importada.");
-				$mitm = layer7_mitm_from_config(layer7_load_or_default());
+				$mitm = layer7_mitm_from_config($data);
 			}
 		} elseif (isset($_POST["mitm_ca_delete"])) {
 			if (!layer7_mitm_ca_delete()) {
@@ -95,8 +105,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			} else {
 				$data = layer7_mitm_apply_to_config($data, $mitm);
 				layer7_save_json($data);
-				$savemsg = l7_t("CA removida do appliance.");
-				$mitm = layer7_mitm_from_config(layer7_load_or_default());
+				$data = layer7_load_or_default();
+				/* 1.9.41: derrubar helper/gate/rdr quando CA some (effective OFF). */
+				layer7_mitm_sync_helper($data, true);
+				if (function_exists("filter_configure")) {
+					filter_configure();
+				}
+				$savemsg = l7_t("CA removida do appliance. Helper MITM parado se estava activo.");
+				$mitm = layer7_mitm_from_config($data);
 			}
 		} elseif (isset($_POST["mitm_ca_export"])) {
 			$cert = layer7_mitm_ca_cert_path();
@@ -301,7 +317,8 @@ if ($savemsg !== "") {
 								<textarea name="intercept_dest_cidr" class="form-control" rows="3"
 									placeholder="203.0.113.10&#10;198.51.100.0/24"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["dest_cidr"] ?? array())); ?></textarea>
 								<p class="help-block"><?= htmlspecialchars(l7_t(
-								    "CIDR/IP de destino a redireccionar para o listen local :8443. Vazio = zero regras rdr (seguro)."
+								    "CIDR/IP IPv4 de destino a redireccionar para 127.0.0.1:8443. Vazio = zero rdr. " .
+								    "IPv6 ainda nao e emitido (listener so IPv4). IPs do proprio appliance sao excluidos."
 								)); ?></p>
 							</div>
 						</div>

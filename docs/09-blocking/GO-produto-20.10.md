@@ -15,7 +15,7 @@
 
 | Proibido | Até |
 |----------|-----|
-| Intercept / PF rdr / bind TLS de produto | **20.10b PASS** (`1.9.40`) — gated; lab only neste bloco |
+| Intercept / PF rdr / bind TLS de produto | **20.10b PASS** (`1.9.41`) — gated; lab only neste bloco |
 | `mitm_effective=true` | gates + **intercept_ready** (não activar em `.254` sem GO) |
 | Activar por defeito em upgrade | Nunca |
 | Intercept em `.254`/`.234`/`.235` sem smoke S8 OFF + plano | Controlo explícito |

@@ -409,21 +409,24 @@ function layer7_generate_nat_rules()
 }
 
 /**
- * Snippet NAT completo (force_dns + pagina de bloqueio) para o ruleset
+ * Snippet NAT completo (force_dns + pagina de bloqueio + MITM) para o ruleset
  * principal do pfSense, via discover_pkg_rules("nat").
  */
-function layer7_generate_nat_anchor_snippet()
+function layer7_generate_nat_anchor_snippet($data = null)
 {
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
 	$parts = array();
-	$dns = layer7_generate_rdr_rules_snippet();
+	$dns = layer7_generate_rdr_rules_snippet(null, $data);
 	if ($dns !== "") {
 		$parts[] = trim($dns);
 	}
-	$bp = layer7_generate_blockpage_rdr_snippet();
+	$bp = layer7_generate_blockpage_rdr_snippet($data);
 	if ($bp !== "") {
 		$parts[] = trim($bp);
 	}
-	$mitm = layer7_generate_mitm_rdr_snippet();
+	$mitm = layer7_generate_mitm_rdr_snippet($data);
 	if ($mitm !== "") {
 		$parts[] = trim($mitm);
 	}
@@ -2062,13 +2065,18 @@ function layer7_generate_rules($type)
 	/* Tipo "nat": o pfSense pede as regras de traducao do package em
 	 * filter_nat_rules_generate() (discover_pkg_rules). E aqui que o rdr
 	 * :80 da block page e o DNS forcado :53 entram no ruleset principal —
-	 * o anchor natrules/* NAO serve para rdr (so ha nat-anchor). */
+	 * o anchor natrules/* NAO serve para rdr (so ha nat-anchor).
+	 *
+	 * 20.10b/1.9.41: DNS+blockpage continuam atrás de enforce; o rdr MITM
+	 * selectivo emite-se com mitm_effective mesmo em monitor (Ortogonal). */
 	if ($type === "nat") {
 		$data = layer7_load_or_default();
-		if (!layer7_pf_should_enforce($data)) {
-			return "";
+		if (layer7_pf_should_enforce($data)) {
+			/* Inclui DNS/blockpage + mitm (se effective). */
+			return layer7_generate_nat_anchor_snippet($data);
 		}
-		return layer7_generate_nat_anchor_snippet();
+		/* Monitor/disabled: MITM rdr selectivo ainda pode aplicar. */
+		return layer7_generate_mitm_rdr_snippet($data);
 	}
 
 	/* pfnearly: injectado por filter_rules_generate() ANTES das regras de
@@ -5926,43 +5934,95 @@ function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
 		return "";
 	}
 	$inet = array();
-	$inet6 = array();
 	foreach ($dests as $d) {
 		$fam = layer7_ip_or_cidr_family($d);
+		/* 1.9.41: produto escuta só 127.0.0.1 — não emitir rdr inet6 para ::1
+		 * sem listener (evita blackhole IPv6). IPv6 MITM fica para passo futuro. */
 		if ($fam === "inet") {
 			$inet[] = $d;
-		} elseif ($fam === "inet6") {
-			$inet6[] = $d;
 		}
 	}
 	$inet = array_values(array_unique($inet));
-	$inet6 = array_values(array_unique($inet6));
-	if (empty($inet) && empty($inet6)) {
+	/* Excluir IPs do próprio appliance / portal (anti-lockout webConfigurator). */
+	$self = layer7_mitm_self_ipv4_exclude($data);
+	if (!empty($self)) {
+		$inet = array_values(array_filter($inet, function ($d) use ($self) {
+			return !layer7_mitm_dest_is_self($d, $self);
+		}));
+	}
+	if (empty($inet)) {
 		return "";
 	}
 	$lines = array();
-	$lines[] = "# Layer7 MITM selectivo (20.10b) — só destinos explícitos; loopback listen";
-	if (!empty($inet)) {
-		$lines[] = "table <layer7_mitm_dst> persist { " . implode(", ", $inet) . " }";
-		foreach ($real_ifaces as $iface) {
-			$lines[] = "rdr on {$iface} inet proto tcp" .
-			    " from any to <layer7_mitm_dst> port 443" .
-			    " -> 127.0.0.1 port {$port}";
-		}
-	}
-	if (!empty($inet6)) {
-		$lines[] = "table <layer7_mitm_dst6> persist { " . implode(", ", $inet6) . " }";
-		foreach ($real_ifaces as $iface) {
-			$lines[] = "rdr on {$iface} inet6 proto tcp" .
-			    " from any to <layer7_mitm_dst6> port 443" .
-			    " -> ::1 port {$port}";
-		}
+	$lines[] = "# Layer7 MITM selectivo (20.10b/1.9.41) — destinos IPv4 explícitos; listen 127.0.0.1";
+	$lines[] = "table <layer7_mitm_dst> persist { " . implode(", ", $inet) . " }";
+	foreach ($real_ifaces as $iface) {
+		$lines[] = "rdr on {$iface} inet proto tcp" .
+		    " from any to <layer7_mitm_dst> port 443" .
+		    " -> 127.0.0.1 port {$port}";
 	}
 	return implode("\n", $lines) . "\n";
 }
 
 /**
+ * IPv4 do appliance a excluir de dest_cidr MITM (portal + IPs de interface).
+ */
+function layer7_mitm_self_ipv4_exclude($data = null)
+{
+	$out = array();
+	if (function_exists("layer7_blockpage_portal_ip")) {
+		$p = layer7_blockpage_portal_ip($data);
+		if (is_string($p) && $p !== "" && filter_var($p, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+			$out[] = $p;
+		}
+	}
+	if (is_array($data) && isset($data["layer7"]["interfaces"]) &&
+	    is_array($data["layer7"]["interfaces"]) &&
+	    function_exists("get_interface_ip")) {
+		foreach ($data["layer7"]["interfaces"] as $ifid) {
+			$ip = get_interface_ip($ifid);
+			if (is_string($ip) && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+				$out[] = $ip;
+			}
+		}
+	}
+	return array_values(array_unique($out));
+}
+
+function layer7_mitm_dest_is_self($dest, $self_ips)
+{
+	$dest = trim((string)$dest);
+	if ($dest === "" || !is_array($self_ips) || empty($self_ips)) {
+		return false;
+	}
+	foreach ($self_ips as $sip) {
+		$sip = trim((string)$sip);
+		if ($sip === "") {
+			continue;
+		}
+		if ($dest === $sip || $dest === $sip . "/32") {
+			return true;
+		}
+		/* Rede que contém IP do appliance = risco de loop/lockout. */
+		if (function_exists("layer7_ip_in_cidr") &&
+		    layer7_ip_in_cidr($sip, $dest)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function layer7_mitm_effective_flag_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/var/run/layer7/mitm.effective";
+	}
+	return "/var/run/layer7/mitm.effective";
+}
+
+/**
  * Escreve/remove gate rc + arranca/para helper conforme mitm_effective.
+ * Também materializa flag para o daemon reportar effective sem claim falso.
  */
 function layer7_mitm_sync_helper($data = null, $entitled = null)
 {
@@ -5971,11 +6031,13 @@ function layer7_mitm_sync_helper($data = null, $entitled = null)
 	}
 	$mitm = layer7_mitm_from_config($data);
 	$gate = layer7_mitm_product_gate_path();
+	$flag = layer7_mitm_effective_flag_path();
 	$gatedir = dirname($gate);
 	$want = layer7_mitm_should_start_helper($mitm, $entitled);
 
 	if (!$want) {
 		@unlink($gate);
+		@unlink($flag);
 		if (!getenv("LAYER7_TEST_ROOT")) {
 			@exec("/usr/sbin/service layer7-tlsproxy onestop 2>/dev/null");
 			@exec("/usr/sbin/sysrc layer7_tlsproxy_enable=NO 2>/dev/null");
@@ -6008,6 +6070,8 @@ function layer7_mitm_sync_helper($data = null, $entitled = null)
 	    "LAYER7_TLSPROXY_BLOCK_SNI=\"" . $block_s . "\"\n";
 	@file_put_contents($gate, $body);
 	@chmod($gate, 0600);
+	@file_put_contents($flag, "1\n");
+	@chmod($flag, 0644);
 
 	if (!getenv("LAYER7_TEST_ROOT")) {
 		@exec("/usr/sbin/sysrc layer7_tlsproxy_enable=YES 2>/dev/null");
