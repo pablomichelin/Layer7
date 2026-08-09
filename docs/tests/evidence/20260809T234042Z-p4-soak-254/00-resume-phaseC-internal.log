@@ -1,0 +1,208 @@
+UTC=2026-08-09T23:57:30Z
+RESUME_P4=1 EXTERNAL_DEST=none POSITIVE=mitm-lab.test->198.18.0.10 NEGATIVE=PF+192.168.100.254:9999
+SKIP_MEANING=refused_example.com_only NOT_abort_P4
+=== PHASE A ===
+EVID=/tmp/l7-phaseA-54-20260809T235731Z
+=== BASELINE ===
+Sun Aug  9 11:57:31 PM UTC 2026
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+ens160           UP             192.168.100.54/24 2804:6c4:8ff:f600:250:56ff:fe9d:5fa4/64 fe80::250:56ff:fe9d:5fa4/64 
+default via 192.168.100.254 dev ens160 proto static 
+192.168.100.0/24 dev ens160 proto kernel scope link src 192.168.100.54 
+no_http_listen
+192.168.100.24 dev ens160 src 192.168.100.54 uid 0 
+    cache 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+=== APPLY IP + RETURN ROUTE ===
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet 198.18.0.10/32 scope global lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+192.168.100.24 via 192.168.100.254 dev ens160 
+192.168.100.24 via 192.168.100.254 dev ens160 src 192.168.100.54 uid 0 
+    cache 
+=== EPHEMERAL CA + SERVER CERT ===
+ca_fp=3E:0F:7F:EC:37:5C:CF:1F:69:64:81:94:D3:5F:B8:4B:09:9C:92:0A:5C:BE:67:17:B1:6D:57:49:38:28:4E:CE
+server_fp=91:CE:A1:90:2E:0E:07:08:37:02:BC:8E:77:68:AD:3C:2A:C9:51:EF:E6:04:BD:FA:D3:35:FA:F2:5D:60:FA:30
+ca_subject=subject=CN = Layer7-PhaseA-Ephemeral-CA
+server_subject=subject=CN = mitm-lab.test
+server_san=X509v3 Subject Alternative Name:     DNS:mitm-lab.test, IP Address:198.18.0.10
+=== START HTTPS (bind 198.18.0.10:443 only) ===
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*    users:(("python3",pid=97272,fd=3))                      
+=== LOCAL TLS VALIDATION ===
+-- curl with CA --
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+
+-- openssl s_client SNI --
+subject=CN = mitm-lab.test
+issuer=CN = Layer7-PhaseA-Ephemeral-CA
+X509v3 Subject Alternative Name: 
+    DNS:mitm-lab.test, IP Address:198.18.0.10
+=== FAILSAFE at +250min ===
+warning: commands will be executed using /bin/sh
+job 39 at Mon Aug 10 04:07:00 2026
+=== ROLLBACK REHEARSAL (full cycle: rollback -> re-apply state check) ===
+ROLLBACK_A_OK
+ip_absent_OK
+listen_absent_OK
+=== RE-APPLY after rehearsal (leave Phase A UP for Phase B) ===
+ca_fp=29:E0:E6:6B:69:7E:0A:D9:F9:6C:A8:8B:81:F2:63:C3:A3:0B:A4:E3:76:5F:EB:9D:DD:8A:AC:E3:73:93:FB:3E
+server_fp=9D:3B:C6:E2:1B:65:36:52:08:08:01:3B:A2:F5:DB:6A:1E:2E:61:05:68:6C:AC:D5:5F:9A:8D:F8:42:40:47:F0
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*    users:(("python3",pid=97343,fd=3))                      
+192.168.100.24 via 192.168.100.254 dev ens160 
+warning: commands will be executed using /bin/sh
+job 40 at Mon Aug 10 04:07:00 2026
+PHASE_A=PASS
+LAB_IP=198.18.0.10
+SNI=mitm-lab.test
+LISTEN=198.18.0.10:443
+RETURN_ROUTE=192.168.100.24/32 via 192.168.100.254
+ROLLBACK=/opt/layer7-poc/mitm-lab-a/phase-a-control.sh rollback
+FAILSAFE_MIN=250
+CA_FP=29:E0:E6:6B:69:7E:0A:D9:F9:6C:A8:8B:81:F2:63:C3:A3:0B:A4:E3:76:5F:EB:9D:DD:8A:AC:E3:73:93:FB:3E
+NO_PRIVATE_KEYS_IN_EVID=yes
+PHASE_A_PASS EVID=/tmp/l7-phaseA-54-20260809T235731Z
+/tmp/l7-phaseA-54-20260809T235731Z
+sha256 Fingerprint=29:E0:E6:6B:69:7E:0A:D9:F9:6C:A8:8B:81:F2:63:C3:A3:0B:A4:E3:76:5F:EB:9D:DD:8A:AC:E3:73:93:FB:3E
+39	Mon Aug 10 04:07:00 2026 a root
+40	Mon Aug 10 04:07:00 2026 a root
+atrm_39
+40	Mon Aug 10 04:07:00 2026 a root
+=== PHASE B ===
+=== PHASE B .254 route ===
+delete host 198.18.0.10 fib 0: not in table
+add host 198.18.0.10: gateway 192.168.100.54
+   route to: 198.18.0.10
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+        fib: 0
+  interface: vmx0
+      flags: <UP,GATEWAY,HOST,DONE,STATIC>
+ recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+       0         0         0         0      1500         1         0 
+Job 24 will be executed using /bin/sh
+Date				Owner		Queue	Job#
+Mon Aug 10 01:07:00 -03 2026	root            c	24
+PHASE_B_OK
+=== PHASE D ===
+=== PHASE D MITM activate 1.9.47 max_window=240 ===
+{
+    "ca_gen": "ok",
+    "ca_msg": "CA gerada (CA:TRUE, keyCertSign, SKI).",
+    "sync": "ok",
+    "sync_sec": 1.154,
+    "filter": "ok",
+    "enabled": true,
+    "effective": true,
+    "window": {
+        "max_minutes": 240,
+        "deadline_unix": 1786334257,
+        "activated_unix": 1786319857,
+        "activated_by": "system",
+        "remaining_sec": 14397,
+        "expired": false,
+        "quic_mode": "block",
+        "source_cidr": [
+            "192.168.100.24\/32"
+        ],
+        "dest_cidr": [
+            "198.18.0.10\/32"
+        ],
+        "block_sni": [
+            "mitm-lab.test"
+        ]
+    },
+    "materialized": true
+}
+ACTIVATE_RC=0
+effective=true
+remaining=14396
+src=192.168.100.24/32
+dst=198.18.0.10/32
+sni=mitm-lab.test
+=== PF ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+MITM_SRC_SCOPED_OK
+=== AUDIT ===
+{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-09T23:48:01+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14121,"payload_tls":false,"reason":"P4 abort rollback human"}
+{"ts":"2026-08-09T23:57:37+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786334257,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+layer7_tlsproxy is running as pid 13295.
+/usr/local/etc/layer7/mitm/ca.crt
+subject=CN=Layer7-P4-Soak-CA
+issuer=CN=Layer7-P4-Soak-CA
+sha256 Fingerprint=39:44:B7:60:70:B2:56:13:5A:79:45:09:53:69:37:E8:12:AC:BD:14:19:01:F7:F6:73:B0:83:55:C6:16:0F:87
+GUI9999=200
+=== PHASE C INTERNAL ===
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+[2J[m[H]0;Administrador: C:\Windows\system32\conhost.exe[?25h2026-08-09T20:57:43.9939605-03:00 === PHASE_C_INTERNAL_ONLY ===
+DEST_POSITIVE=198.18.0.10
+SNI_POSITIVE=mitm-lab.test
+DEST_NEGATIVE_INTERNAL=192.168.100.254:9999
+EXTERNAL_DEST=none
+HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-P4-SOAK-mitm-lab.test
+Root "Autoridades de CertificaþÒo Raiz Confißveis"
+Assinatura coincide com Chave p·blica
+Certificado "Layer7-P4-Soak-CA" adicionado ao reposit¾rio.
+CertUtil: -addstore : comando concluÝdo com Ûxito.
+
+IN_SCOPE_PEER_SUBJECT=CN=mitm-lab.test
+IN_SCOPE_PEER_ISSUER=CN=Layer7-P4-Soak-CA
+IN_SCOPE_HTTP_ERR=Exceção ao chamar "GetResponse" com "0" argumento(s): "O servidor remoto retornou um erro: (403) Proibido."
+NEG_INTERNAL_GUI_NOTE=A conexão subjacente estava fechada: Não foi possível estabelecer relação de confiança para o canal seguro de SSL/TLS.
+HTTPS_PROBES=mitm-lab.test_only(+optional_internal_9999)
+EXTERNAL_PROBES=0
+PHASE_C_INTERNAL_DONE
+Connection to 192.168.100.24 closed.
+=== PF OUT-OF-SCOPE AUDIT ===
+UTC=2026-08-09T23:57:44Z
+effective=true
+remaining=14393
+max=240
+MITM_ONLY_RULES:
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+DST_LAB_ONLY
+SRC_LAB_ONLY
+MITM_SRC_SCOPED_OK
+OUT_OF_SCOPE_PROOF=tables_only_src24_dst19818_no_from_any_on_mitm_rules
+{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-09T23:48:01+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14121,"payload_tls":false,"reason":"P4 abort rollback human"}
+{"ts":"2026-08-09T23:57:37+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786334257,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+SOAK_LOOP_PID=8890
+RESUME_OK no_rollback_executed

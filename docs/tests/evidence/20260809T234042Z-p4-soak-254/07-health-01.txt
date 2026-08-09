@@ -1,6 +1,6 @@
-UTC=2026-08-09T23:45:06Z
+UTC=2026-08-09T23:57:45Z
 effective=true
-remaining=14296
+remaining=14391
 expired=false
 src=192.168.100.24/32
 dst=198.18.0.10/32
@@ -11,4 +11,4 @@ DST_LAB_ONLY
 SRC_LAB_ONLY
 LISTEN=1
 GUI=200
-{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-09T23:57:37+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786334257,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}

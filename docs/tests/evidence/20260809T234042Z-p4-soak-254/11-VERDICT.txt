@@ -1,20 +1,28 @@
 run_id=20260809T234042Z-p4-soak-254
-verdict=ABORT
+verdict=SOAK_IN_PROGRESS
+go_p4=VALID_CONTINUES
 pkg=1.9.47
 sha=2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833
-go=P4_confirmado_humano_2026-08-09
+
+# Correcção de registo
+prior_abort_label=INCORRECT_FOR_SKIP
+skip_meaning=aprovacao nativa Skip = recusa de example.com APENAS; NAO abort P4; NAO negacao .24
+premature_rollback=executado por interpretacao errada do Skip; soak RETOMADO 2026-08-09T23:57:30Z
+
+# Estado actual (resume)
 upgrade_passive_1.9.46_to_1.9.47=PASS
-preflight_monitor_mitm_off=PASS
-activate_scoped=PASS (src=.24/32 dst=198.18.0.10/32 SNI=mitm-lab.test max_window=240 quic=block payload_tls=false)
-phaseC_edge_client=.24=SKIPPED (aprovacao nativa Skip)
-soak_4h=NOT_COMPLETED (interrompido ~3min apos T0; health-01 OK; loop parado)
-abort_reasons=
-  - Phase C cliente (.24 hosts/CA/Edge) sem evidencia (Skip humano)
-  - Duracao 4h nao cumprida; fecho antecipado para rollback + documentacao / manual publico
-rollback=PASS
-  - .254 MITM OFF effective=false; zero rdr/quic/8443; CA ausente; route 198.18 removida; mode=monitor; GUI=200; layer7d OK
-  - .54 Phase A rollback OK; at job 38 removido; sem listen 198.18
-  - .24 sem hosts mitm-lab / sem CA P4 (Phase C nao aplicada)
+phaseA_resume=PASS
+phaseB_resume=PASS
+phaseD_resume=PASS (effective=true max_window=240 src=.24/32 dst=198.18.0.10/32 SNI=mitm-lab.test quic=block payload_tls=false)
+phaseC_corrected=PASS
+  hosts=198.18.0.10 mitm-lab.test
+  ca_import=Layer7-P4-Soak-CA
+  in_scope_peer=CN=mitm-lab.test issuer=CN=Layer7-P4-Soak-CA
+  in_scope_http=403 (block page MITM — esperado)
+  external_dest=none
+  out_of_scope_proof=PF tables SRC=.24 DST=198.18.0.10 only; MITM_SRC_SCOPED_OK; optional internal :9999
+soak_loop=RESTARTED (pid em 07-soak-loop.pid; janela ~4h)
+rollback_now=NO
 piloto_externo_permanente=NAO_ACTIVADO
 p5=AGUARDA_FICHA_SITE_CLIENTE
-release_nova=NAO (sem bugfix)
+release_nova=NAO

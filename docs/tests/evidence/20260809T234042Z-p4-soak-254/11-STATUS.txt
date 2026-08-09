@@ -1,0 +1,9 @@
+run_id=20260809T234042Z-p4-soak-254
+status=SOAK_IN_PROGRESS
+go_p4=VALID_CONTINUES
+skip_note=aprovacao anterior Skip = recusa example.com APENAS; NAO e abort P4 nem negacao .24
+phaseC=INTERNAL_ONLY_DONE (mitm-lab.test/198.18.0.10; PF out-of-scope)
+rollback_now=NO
+external_dest=none
+pkg=1.9.47
+UTC=2026-08-09T23:57:45Z

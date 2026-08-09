@@ -1,0 +1,22 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+[2J[m[H]0;Administrador: C:\Windows\system32\conhost.exe[?25h2026-08-09T20:57:43.9939605-03:00 === PHASE_C_INTERNAL_ONLY ===
+DEST_POSITIVE=198.18.0.10
+SNI_POSITIVE=mitm-lab.test
+DEST_NEGATIVE_INTERNAL=192.168.100.254:9999
+EXTERNAL_DEST=none
+HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-P4-SOAK-mitm-lab.test
+Root "Autoridades de CertificaþÒo Raiz Confißveis"
+Assinatura coincide com Chave p·blica
+Certificado "Layer7-P4-Soak-CA" adicionado ao reposit¾rio.
+CertUtil: -addstore : comando concluÝdo com Ûxito.
+
+IN_SCOPE_PEER_SUBJECT=CN=mitm-lab.test
+IN_SCOPE_PEER_ISSUER=CN=Layer7-P4-Soak-CA
+IN_SCOPE_HTTP_ERR=Exceção ao chamar "GetResponse" com "0" argumento(s): "O servidor remoto retornou um erro: (403) Proibido."
+NEG_INTERNAL_GUI_NOTE=A conexão subjacente estava fechada: Não foi possível estabelecer relação de confiança para o canal seguro de SSL/TLS.
+HTTPS_PROBES=mitm-lab.test_only(+optional_internal_9999)
+EXTERNAL_PROBES=0
+PHASE_C_INTERNAL_DONE
+Connection to 192.168.100.24 closed.

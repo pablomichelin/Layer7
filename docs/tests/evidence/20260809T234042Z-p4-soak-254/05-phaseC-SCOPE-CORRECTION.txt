@@ -1,0 +1,8 @@
+UTC=2026-08-09T23:55:00Z
+correction=obrigatoria
+forbidden=qualquer hostname/IP externo (incl. example.com) mesmo como negativo
+positive_only=mitm-lab.test -> 198.18.0.10/32
+negative_internal=PF/config audit + probe interno fora do dest MITM (ex. https://192.168.100.254:9999/)
+credentials_policy=nao embutir senhas em prompt/artefacto; usar ficheiros locais mode 600 ja existentes ou parar
+precondition_mitm=P4 ja em ABORT/rollback; mitm_enabled=false effective=false
+rule=se .24 indisponivel de modo seguro OU mitm OFF sem novo GO de reactivacao -> NAO activar; manter rollback

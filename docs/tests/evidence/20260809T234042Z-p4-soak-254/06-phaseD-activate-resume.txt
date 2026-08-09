@@ -1,0 +1,54 @@
+=== PHASE D MITM activate 1.9.47 max_window=240 ===
+{
+    "ca_gen": "ok",
+    "ca_msg": "CA gerada (CA:TRUE, keyCertSign, SKI).",
+    "sync": "ok",
+    "sync_sec": 1.154,
+    "filter": "ok",
+    "enabled": true,
+    "effective": true,
+    "window": {
+        "max_minutes": 240,
+        "deadline_unix": 1786334257,
+        "activated_unix": 1786319857,
+        "activated_by": "system",
+        "remaining_sec": 14397,
+        "expired": false,
+        "quic_mode": "block",
+        "source_cidr": [
+            "192.168.100.24\/32"
+        ],
+        "dest_cidr": [
+            "198.18.0.10\/32"
+        ],
+        "block_sni": [
+            "mitm-lab.test"
+        ]
+    },
+    "materialized": true
+}
+ACTIVATE_RC=0
+effective=true
+remaining=14396
+src=192.168.100.24/32
+dst=198.18.0.10/32
+sni=mitm-lab.test
+=== PF ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+MITM_SRC_SCOPED_OK
+=== AUDIT ===
+{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-09T23:48:01+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14121,"payload_tls":false,"reason":"P4 abort rollback human"}
+{"ts":"2026-08-09T23:57:37+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786334257,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+layer7_tlsproxy is running as pid 13295.
+/usr/local/etc/layer7/mitm/ca.crt
+subject=CN=Layer7-P4-Soak-CA
+issuer=CN=Layer7-P4-Soak-CA
+sha256 Fingerprint=39:44:B7:60:70:B2:56:13:5A:79:45:09:53:69:37:E8:12:AC:BD:14:19:01:F7:F6:73:B0:83:55:C6:16:0F:87
+GUI9999=200

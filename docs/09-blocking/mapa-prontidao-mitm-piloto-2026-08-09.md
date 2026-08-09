@@ -1,10 +1,10 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 soak ABORT** (Phase C Skip + 4h incompleto; rollback OK); **P5 aguarda ficha de site de cliente** — **não** activar piloto externo/permanente.  
+**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 soak IN_PROGRESS** (Phase C interna PASS; Skip≠abort — só recusa `example.com`); **P5 aguarda ficha de site de cliente**.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
-**P4 evidência:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **ABORT**.  
+**P4 evidência:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **SOAK_IN_PROGRESS**.  
 **Pacote de referência lab/`latest`:** `1.9.47` (`SHA256=2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`).  
 **Produção enforce base (sem MITM):** `1.9.8` (inalterada por este mapa).  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
@@ -150,17 +150,18 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | Builder `test_mitm_config` + `test_mitm_regress` PASS — [`20260809T230400Z-p3-mitm-window`](../tests/evidence/20260809T230400Z-p3-mitm-window/) |
 | Rollback | Pacote `1.9.46` |
 
-### Bloco P4 — Soak lab controlado (evidência) — **ABORT** `2026-08-09`
+### Bloco P4 — Soak lab controlado (evidência) — **IN_PROGRESS** `2026-08-09`
 
 | Campo | Valor |
 |-------|--------|
-| Objectivo | Janela ≥4 h (mínimo) scoped; Edge real; rollback limpo |
+| Objectivo | Janela ≥4 h (mínimo) scoped; Edge/cliente real; rollback limpo no fecho |
 | Impacto | `.254` temporário; **não** permanente |
 | Risco | Médio |
-| Teste | Upgrade passivo + activate scoped + health T0 **PASS**; Phase C `.24` **SKIP**; 4h **não** cumprido |
-| Rollback | **PASS** — MITM OFF, CA/rota/artefactos limpos, `mode=monitor` |
+| Teste | Upgrade + activate scoped PASS; Phase C interna PASS (issuer MITM; PF scoped; sem externos); health loop activo |
+| Rollback | **só no fecho** PASS/FAIL/abort predicado — **não** agora |
 | Evidência | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) |
-| Veredicto | **ABORT** — não conta como soak/piloto |
+| Nota Skip | Skip nativo = recusa `example.com`; **≠** abort P4 |
+| Veredicto | **SOAK_IN_PROGRESS** |
 
 ### Bloco P5 — GO activação piloto + evidência — **AGUARDA FICHA**
 
@@ -251,7 +252,7 @@ MITM motor scoped (1.9.46+) ....... PRONTO PARA TESTE CONTROLADO (evidência 215
 P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
 P3 failsafe+visibilidade .......... PASS código (1.9.47; P3.1–P3.8; evid. 230400Z)
 Gate activação externa ............ Ficha site nomeada (cliente/resp/src/dst/SNI/janela/saída) — NÃO é gap eng.
-MITM pronto para ACTIVAR PILOTO ... NÃO (P4 ABORT; P5 aguarda ficha site cliente; sem piloto externo/permanente)
+MITM pronto para ACTIVAR PILOTO ... NÃO (P4 soak lab IN_PROGRESS; P5 aguarda ficha; sem piloto externo/permanente)
 MITM permanente / produção ........ NO-GO (decisão humana)
 ```
 

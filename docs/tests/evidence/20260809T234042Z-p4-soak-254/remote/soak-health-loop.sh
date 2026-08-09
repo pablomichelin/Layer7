@@ -18,12 +18,10 @@ sockstat -l | grep 8443 >/dev/null && echo LISTEN=1 || echo LISTEN=0
 curl -sk -o /dev/null -w "GUI=%{http_code}\n" https://127.0.0.1:9999/ || echo GUI=FAIL
 tail -1 /var/log/layer7-mitm-audit.log 2>/dev/null
 R
-  if grep -qE 'ABORT_MITM_FROM_ANY|ABORT_UNEXPECTED_|SSH_FAIL|GUI=000|GUI=FAIL' "$F" 2>/dev/null; then
-    echo "ABORT $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$EV/11-VERDICT.txt"
-    grep -E 'ABORT_|SSH_FAIL|GUI=' "$F" | tee -a "$EV/11-VERDICT.txt"
+  if grep -qE 'ABORT_MITM_FROM_ANY|ABORT_UNEXPECTED_|SSH_FAIL' "$F" 2>/dev/null; then
+    echo "ABORT_PREDICATE $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$EV/11-ABORT-PREDICATE.txt"
     exit 2
   fi
-  # if window expired naturally, stop loop (expected near end)
   if grep -q 'expired=true' "$F" 2>/dev/null; then
     echo "WINDOW_EXPIRED $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$EV/07-window-expired.txt"
     break

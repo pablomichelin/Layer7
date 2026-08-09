@@ -1,0 +1,19 @@
+UTC=2026-08-09T23:57:44Z
+effective=true
+remaining=14393
+max=240
+MITM_ONLY_RULES:
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+DST_LAB_ONLY
+SRC_LAB_ONLY
+MITM_SRC_SCOPED_OK
+OUT_OF_SCOPE_PROOF=tables_only_src24_dst19818_no_from_any_on_mitm_rules
+{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-09T23:48:01+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14121,"payload_tls":false,"reason":"P4 abort rollback human"}
+{"ts":"2026-08-09T23:57:37+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786334257,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
