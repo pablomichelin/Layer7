@@ -11,7 +11,7 @@
 #include <string.h>
 
 #ifndef LAYER7_TLSPROXY_VERSION
-#define LAYER7_TLSPROXY_VERSION "0.0.4-poc4"
+#define LAYER7_TLSPROXY_VERSION "0.0.5-poc5"
 #endif
 
 static void
@@ -22,7 +22,7 @@ usage(const char *argv0)
 	    "       %s --ipc-serve|--ipc-ping [--sock PATH] [--oneshot]\n"
 	    "       %s --lab-tls-listen [HOST:PORT] --cert CRT --key KEY \\\n"
 	    "          [--bypass-sni H] [--block-sni H] [--upstream 127.0.0.1:PORT]\n"
-	    "          [--oneshot] [--lab-allow-any]\n"
+	    "          [--lab-transparent] [--oneshot] [--lab-allow-any]\n"
 	    "\n"
 	    "LAYER7_TLSPROXY_LAB=1 required. mitm_effective never claimed true.\n",
 	    argv0, argv0, argv0);
@@ -56,13 +56,14 @@ cmd_health(void)
 	printf("{\n");
 	printf("  \"service\": \"layer7-tlsproxy\",\n");
 	printf("  \"version\": \"%s\",\n", LAYER7_TLSPROXY_VERSION);
-	printf("  \"mode\": \"poc4\",\n");
+	printf("  \"mode\": \"poc5\",\n");
 	printf("  \"bind\": false,\n");
 	printf("  \"intercept\": false,\n");
 	printf("  \"ipc_capable\": true,\n");
 	printf("  \"tls_lab_capable\": true,\n");
 	printf("  \"sni_policy\": true,\n");
 	printf("  \"upstream_capable\": true,\n");
+	printf("  \"transparent_capable\": true,\n");
 	printf("  \"mitm_effective_claim\": false,\n");
 	printf("  \"lab_env\": %s,\n",
 	    l7_ipc_lab_ok() ? "true" : "false");
@@ -122,6 +123,10 @@ main(int argc, char **argv)
 		}
 		if (strcmp(argv[i], "--lab-allow-any") == 0) {
 			l7_tls_set_allow_any(1);
+			continue;
+		}
+		if (strcmp(argv[i], "--lab-transparent") == 0) {
+			l7_tls_set_transparent(1);
 			continue;
 		}
 		if (strcmp(argv[i], "--oneshot") == 0) {

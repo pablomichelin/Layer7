@@ -21,6 +21,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#ifdef __linux__
+#include <linux/netfilter_ipv4.h>
+#include <netinet/in.h>
+#endif
+
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 
@@ -36,6 +41,7 @@ enum l7_verdict {
 
 static volatile sig_atomic_t l7_tls_stop;
 static int l7_tls_allow_any;
+static int l7_tls_transparent;
 static char l7_up_host[64];
 static int l7_up_port;
 
@@ -48,6 +54,12 @@ void
 l7_tls_set_allow_any(int v)
 {
 	l7_tls_allow_any = v;
+}
+
+void
+l7_tls_set_transparent(int v)
+{
+	l7_tls_transparent = v;
 }
 
 void
@@ -146,6 +158,36 @@ decide_sni(const char *sni_in)
 	if (sni_in_list(sni, l7_bypass, l7_nbypass))
 		return L7_BYPASS;
 	return L7_ALLOW;
+}
+
+static void
+log_original_dst(int cfd)
+{
+#ifdef __linux__
+	struct sockaddr_in orig;
+	socklen_t olen = sizeof(orig);
+	char ip[64];
+
+	if (!l7_tls_transparent)
+		return;
+	memset(&orig, 0, sizeof(orig));
+	if (getsockopt(cfd, SOL_IP, SO_ORIGINAL_DST, &orig, &olen) != 0) {
+		fprintf(stderr,
+		    "layer7-tlsproxy: SO_ORIGINAL_DST unavailable (%s)\n",
+		    strerror(errno));
+		return;
+	}
+	if (inet_ntop(AF_INET, &orig.sin_addr, ip, sizeof(ip)) == NULL)
+		return;
+	fprintf(stderr,
+	    "layer7-tlsproxy: transparent orig_dst=%s:%u mitm_effective=false\n",
+	    ip, (unsigned)ntohs(orig.sin_port));
+#else
+	(void)cfd;
+	if (l7_tls_transparent)
+		fprintf(stderr,
+		    "layer7-tlsproxy: --lab-transparent is Linux-only\n");
+#endif
 }
 
 static void
@@ -382,10 +424,10 @@ l7_tls_lab_listen(const char *bind_host, int bind_port,
 	}
 
 	fprintf(stderr,
-	    "layer7-tlsproxy: TLS lab %s:%d (poc4; bypass=%d block=%d "
-	    "upstream=%s:%d; mitm_effective=false)\n",
+	    "layer7-tlsproxy: TLS lab %s:%d (poc5; bypass=%d block=%d "
+	    "upstream=%s:%d transparent=%d; mitm_effective=false)\n",
 	    bind_host, bind_port, l7_nbypass, l7_nblock,
-	    l7_up_port ? l7_up_host : "-", l7_up_port);
+	    l7_up_port ? l7_up_host : "-", l7_up_port, l7_tls_transparent);
 
 	while (!l7_tls_stop) {
 		struct sockaddr_in peer;
@@ -407,6 +449,7 @@ l7_tls_lab_listen(const char *bind_host, int bind_port,
 			close(cfd);
 			continue;
 		}
+		log_original_dst(cfd);
 		SSL_set_fd(ssl, cfd);
 		if (SSL_accept(ssl) <= 0) {
 			ERR_print_errors_fp(stderr);

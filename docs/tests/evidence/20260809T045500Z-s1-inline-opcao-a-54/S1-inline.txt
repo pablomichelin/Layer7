@@ -1,0 +1,3 @@
+cpu_busy_pct_during_50_inline=12.96
+scope=opcao_A_netns_redirect
+product_mitm_effective=false

@@ -40,7 +40,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 BG-087/20.9 MITM intenção vs effective + IPC; sem intercept; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.37`**.
-**MITM:** reopen GO `2026-08-08`; passo **20.9 PASS**; PoC-1 IPC lab (`src/layer7-tlsproxy`); runtime **fora** do `.pkg`.
+**MITM:** reopen GO `2026-08-08`; **20.9 PASS**; PoC-5 + **Opção A S1 inline PASS** em `.54` (`0.0.5-poc5`); runtime **fora** do `.pkg`; **20.10** bloqueado até GO produto.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
@@ -1360,11 +1360,12 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
-- Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab
-- Continuidade: **S1/S2 lab PASS** + PoC-4 em `.54`; S1 inline produto PENDING; 20.10 BLOQUEADO
-- Evidência: docs/tests/evidence/20260809T043000Z-s1s2-load-54/
-- Lab PoC: `root@192.168.100.54`
-- Plano rev.: 2026-08-09y
+- Próximo código: **20.10** BLOQUEADO até GO produto (prep checklist)
+- Continuidade: **Opção A S1/S2 inline PASS** + PoC-5 em `.54`; IPC mock PASS; 20.10 BLOQUEADO
+- Evidência: docs/tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/
+- Lab PoC: `root@192.168.100.54` (`0.0.5-poc5`; `/opt/layer7-poc/`)
+- Prep: docs/09-blocking/prep-20.10-checklist.md
+- Plano rev.: 2026-08-09z
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS — mitm_effective sempre false sem runtime
@@ -1584,8 +1585,9 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: S1 inline (caminho real) exige desenho+GO além do lab localhost; **20.10** BLOQUEADO
-- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md (S1/S2 lab PASS)
+- Proximo trabalho: prep 20.10 (pkg draft + GO produto); **sem** empacotar/`mitm_runtime_available` até GO; **20.10** BLOQUEADO
+- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md (Opção A inline PASS)
+- GO Opção A: docs/09-blocking/GO-opcao-A-inline-lab-54.md
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

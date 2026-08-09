@@ -2,7 +2,7 @@
 OUT ?= layer7-tlsproxy
 CC ?= cc
 CFLAGS ?= -O2 -Wall -Wextra -Werror
-CPPFLAGS += -DLAYER7_TLSPROXY_VERSION=\"0.0.4-poc4\"
+CPPFLAGS += -DLAYER7_TLSPROXY_VERSION=\"0.0.5-poc5\"
 SRCS = main.c ipc.c tls_lab.c
 LDLIBS ?= -lssl -lcrypto
 STUB ?= ./poc-upstream-stub.py
@@ -22,6 +22,7 @@ test: $(OUT)
 	./$(OUT) --health | grep -q '"intercept": false'
 	./$(OUT) --health | grep -q '"mitm_effective_claim": false'
 	./$(OUT) --health | grep -q '"upstream_capable": true'
+	./$(OUT) --health | grep -q '"transparent_capable": true'
 	@rc=0; ./$(OUT) --lab-allow-bind >/dev/null 2>&1 || rc=$$?; test $$rc -eq 3
 	@rc=0; LAYER7_TLSPROXY_LAB=1 ./$(OUT) --lab-allow-bind >/dev/null 2>&1 || rc=$$?; test $$rc -eq 4
 	@rc=0; ./$(OUT) --ipc-serve >/dev/null 2>&1 || rc=$$?; test $$rc -eq 3

@@ -1,0 +1,4 @@
+PING ok effective=False
+STATUS lab-mock effective=False
+DECIDE allow/block/bypass effective=False
+IPC_MOCK_SMOKE: PASS

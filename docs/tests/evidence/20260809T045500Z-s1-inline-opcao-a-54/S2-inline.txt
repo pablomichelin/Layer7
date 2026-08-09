@@ -1,0 +1,6 @@
+n=50
+p50_ms=14.77
+p95_ms=15.60
+max_ms=15.89
+errors=0
+path=netns_redirect_tls_upstream
