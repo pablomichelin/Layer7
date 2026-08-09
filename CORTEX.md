@@ -35,9 +35,10 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-candidato **`1.9.35` / BG-110** — perfis rápidos com rascunho + Aplicar em lote
-(em publicação). Anterior `1.9.34`
-(`SHA256=87982ffb33d533c23638f22ddd481b2d0c85f5a8aa020f4d92583080e8010eec`).
+`1.9.35` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.35`;
+`SHA256=5f88e1312bc30037ffb32141a208860a708440b5271c1adf55c40a2aa992f4f4`;
+BG-110 perfis rápidos em lote; comandos em
+`docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.34`**.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.

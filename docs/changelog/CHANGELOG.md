@@ -19,7 +19,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Release
 
-- Tag `v1.9.35` / `releases/latest` (SHA no fecho do build)
+- Tag `v1.9.35` / `releases/latest`
+- SHA256: `5f88e1312bc30037ffb32141a208860a708440b5271c1adf55c40a2aa992f4f4`
 - Rollback: `1.9.34`
 
 ## [1.9.34] — 2026-08-08
