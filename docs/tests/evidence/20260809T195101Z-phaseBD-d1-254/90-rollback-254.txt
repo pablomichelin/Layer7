@@ -1,0 +1,7 @@
+ROLLBACK_BD_START Sun Aug  9 19:54:23 UTC 2026
+MITM_CLEARED
+delete host 198.18.0.10
+ca_deleted
+ROLLBACK_BD_CORE_DONE Sun Aug  9 19:54:24 UTC 2026
+ca_deleted
+at_cleared

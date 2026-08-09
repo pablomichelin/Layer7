@@ -1,0 +1,12 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+2026-08-09T17:43:51.4908711-03:00 === APPLY C ===
+2026-08-09T17:43:51.6668787-03:00 HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test
+TCP 443 failed to 198.18.0.10
+No C:\Windows\Temp\phase-c-24.ps1:137 caractere:37
++ ...  if (-not $tcp.TcpTestSucceeded) { throw "TCP 443 failed to $LabIp" }
++                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (TCP 443 failed to 198.18.0.10:String) [], RuntimeException
+    + FullyQualifiedErrorId : TCP 443 failed to 198.18.0.10
+ 

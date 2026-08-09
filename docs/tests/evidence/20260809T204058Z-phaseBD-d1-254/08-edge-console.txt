@@ -1,0 +1,10 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+Edge DOM missing Layer7 block marker
+No C:\Windows\Temp\phase-d-24-edge.ps1:100 caractere:5
++     throw "Edge DOM missing Layer7 block marker"
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : OperationStopped: (Edge DOM missing Layer7 block marker:String) [], RuntimeException
+    + FullyQualifiedErrorId : Edge DOM missing Layer7 block marker
+ 

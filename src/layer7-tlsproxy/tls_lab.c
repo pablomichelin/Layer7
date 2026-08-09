@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -26,11 +27,39 @@
 #endif
 
 #include <openssl/err.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
 #include <openssl/ssl.h>
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#if !defined(OPENSSL_VERSION_NUMBER) || OPENSSL_VERSION_NUMBER < 0x30000000L
+#include <openssl/bn.h>
+#include <openssl/rsa.h>
+#endif
+#include <time.h>
 
 #define L7_POLICY_MAX 64
 #define L7_SNI_MAX 253
 #define L7_BUF 8192
+#define L7_LEAF_CACHE 32
+
+/*
+ * Gate D1: se --cert/--key forem uma CA (CA:TRUE), o peer TLS e um leaf
+ * mintado por SNI (EKU serverAuth). Nunca apresentar a CA como peer.
+ * Se --cert for leaf estatico (PoC lab), comportamento legado.
+ */
+struct l7_leaf_ent {
+	char sni[L7_SNI_MAX + 1];
+	X509 *cert;
+};
+
+static X509 *l7_ca_cert;
+static EVP_PKEY *l7_ca_key;
+static EVP_PKEY *l7_leaf_key;
+static int l7_mint_mode;
+static struct l7_leaf_ent l7_leaf_cache[L7_LEAF_CACHE];
+static int l7_nleaf;
+static long l7_leaf_serial;
 
 enum l7_verdict {
 	L7_ALLOW = 0,
@@ -390,6 +419,480 @@ serve_by_verdict(SSL *ssl, enum l7_verdict v, const char *sni)
 	http_reply(ssl, 200, "application/json", json);
 }
 
+static void
+l7_mint_reset(void)
+{
+	int i;
+
+	for (i = 0; i < l7_nleaf; i++) {
+		if (l7_leaf_cache[i].cert != NULL)
+			X509_free(l7_leaf_cache[i].cert);
+		l7_leaf_cache[i].cert = NULL;
+		l7_leaf_cache[i].sni[0] = '\0';
+	}
+	l7_nleaf = 0;
+	if (l7_leaf_key != NULL) {
+		EVP_PKEY_free(l7_leaf_key);
+		l7_leaf_key = NULL;
+	}
+	if (l7_ca_cert != NULL) {
+		X509_free(l7_ca_cert);
+		l7_ca_cert = NULL;
+	}
+	if (l7_ca_key != NULL) {
+		EVP_PKEY_free(l7_ca_key);
+		l7_ca_key = NULL;
+	}
+	l7_mint_mode = 0;
+}
+
+static X509 *
+l7_load_x509_file(const char *path)
+{
+	FILE *fp;
+	X509 *x;
+
+	fp = fopen(path, "r");
+	if (fp == NULL)
+		return NULL;
+	x = PEM_read_X509(fp, NULL, NULL, NULL);
+	fclose(fp);
+	return x;
+}
+
+static EVP_PKEY *
+l7_load_key_file(const char *path)
+{
+	FILE *fp;
+	EVP_PKEY *k;
+
+	fp = fopen(path, "r");
+	if (fp == NULL)
+		return NULL;
+	k = PEM_read_PrivateKey(fp, NULL, NULL, NULL);
+	fclose(fp);
+	return k;
+}
+
+static int
+l7_sni_dns_ok(const char *sni)
+{
+	size_t i, n;
+
+	if (!sni_valid(sni))
+		return 0;
+	n = strlen(sni);
+	for (i = 0; i < n; i++) {
+		unsigned char c = (unsigned char)sni[i];
+
+		if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
+		    c == '.' || c == '-' || c == '_')
+			continue;
+		return 0;
+	}
+	return 1;
+}
+
+/*
+ * Identidade leaf verificável e compatível com Edge/Chromium moderno:
+ * CA:FALSE, KU TLS (sem certSign), EKU serverAuth, SAN=DNS:SNI,
+ * SHA-256, AKI/SKI, issuer=CA, assinatura verificável com chave da CA.
+ */
+static int
+l7_leaf_identity_ok(X509 *leaf, const char *sni)
+{
+	EVP_PKEY *capub = NULL;
+	GENERAL_NAMES *sans = NULL;
+	int i, n, ok = 0;
+
+	if (leaf == NULL || sni == NULL || sni[0] == '\0' ||
+	    l7_ca_cert == NULL)
+		return 0;
+	/* Nunca peer CA — Chromium ERR_SSL_KEY_USAGE_INCOMPATIBLE. */
+	if (X509_check_ca(leaf) > 0)
+		return 0;
+	if (X509_NAME_cmp(X509_get_issuer_name(leaf),
+	    X509_get_subject_name(l7_ca_cert)) != 0)
+		return 0;
+	capub = X509_get_pubkey(l7_ca_cert);
+	if (capub == NULL)
+		return 0;
+	if (X509_verify(leaf, capub) != 1) {
+		EVP_PKEY_free(capub);
+		return 0;
+	}
+	EVP_PKEY_free(capub);
+
+	/* SAN DNS obrigatório (Chromium ignora CN sozinho). */
+	sans = X509_get_ext_d2i(leaf, NID_subject_alt_name, NULL, NULL);
+	if (sans == NULL)
+		return 0;
+	n = sk_GENERAL_NAME_num(sans);
+	for (i = 0; i < n; i++) {
+		GENERAL_NAME *gn = sk_GENERAL_NAME_value(sans, i);
+		ASN1_STRING *d;
+		const char *dns;
+
+		if (gn == NULL || gn->type != GEN_DNS)
+			continue;
+		d = gn->d.dNSName;
+		if (d == NULL)
+			continue;
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000L
+		dns = (const char *)ASN1_STRING_get0_data(d);
+#else
+		dns = (const char *)ASN1_STRING_data(d);
+#endif
+		if (dns != NULL && strcasecmp(dns, sni) == 0) {
+			ok = 1;
+			break;
+		}
+	}
+	GENERAL_NAMES_free(sans);
+	if (!ok)
+		return 0;
+
+	/* EKU serverAuth presente (se EKU existir, Chromium exige-o). */
+	{
+		EXTENDED_KEY_USAGE *eku;
+		int has_sa = 0;
+
+		eku = X509_get_ext_d2i(leaf, NID_ext_key_usage, NULL, NULL);
+		if (eku == NULL)
+			return 0;
+		n = sk_ASN1_OBJECT_num(eku);
+		for (i = 0; i < n; i++) {
+			if (OBJ_obj2nid(sk_ASN1_OBJECT_value(eku, i)) ==
+			    NID_server_auth) {
+				has_sa = 1;
+				break;
+			}
+		}
+		EXTENDED_KEY_USAGE_free(eku);
+		if (!has_sa)
+			return 0;
+	}
+	return 1;
+}
+
+static void
+l7_log_x509_fp(const char *tag, X509 *x)
+{
+	unsigned char md[EVP_MAX_MD_SIZE];
+	unsigned int n = 0;
+	unsigned int i;
+
+	if (x == NULL || tag == NULL)
+		return;
+	if (X509_digest(x, EVP_sha256(), md, &n) != 1 || n == 0)
+		return;
+	fprintf(stderr, "layer7-tlsproxy: %s sha256=", tag);
+	for (i = 0; i < n; i++)
+		fprintf(stderr, "%02x", md[i]);
+	fprintf(stderr, "\n");
+}
+
+static X509 *
+l7_mint_leaf_cert(const char *sni)
+{
+	X509 *x = NULL;
+	X509_NAME *subj = NULL;
+	X509_EXTENSION *ex = NULL;
+	X509V3_CTX v3;
+	char san[L7_SNI_MAX + 8];
+	ASN1_INTEGER *serial;
+
+	if (l7_ca_cert == NULL || l7_ca_key == NULL || l7_leaf_key == NULL)
+		return NULL;
+	if (!l7_sni_dns_ok(sni))
+		return NULL;
+
+	x = X509_new();
+	if (x == NULL)
+		return NULL;
+	if (X509_set_version(x, 2) != 1)
+		goto fail;
+	serial = X509_get_serialNumber(x);
+	if (serial == NULL)
+		goto fail;
+	l7_leaf_serial++;
+	if (ASN1_INTEGER_set(serial, l7_leaf_serial) != 1)
+		goto fail;
+	if (X509_gmtime_adj(X509_getm_notBefore(x), -60) == NULL)
+		goto fail;
+	if (X509_gmtime_adj(X509_getm_notAfter(x), 60L * 60L * 24L * 30L) ==
+	    NULL)
+		goto fail;
+	if (X509_set_pubkey(x, l7_leaf_key) != 1)
+		goto fail;
+	if (X509_set_issuer_name(x, X509_get_subject_name(l7_ca_cert)) != 1)
+		goto fail;
+
+	subj = X509_get_subject_name(x);
+	if (subj == NULL)
+		goto fail;
+	if (X509_NAME_add_entry_by_txt(subj, "CN", MBSTRING_ASC,
+	    (const unsigned char *)sni, -1, -1, 0) != 1)
+		goto fail;
+
+	X509V3_set_ctx_nodb(&v3);
+	X509V3_set_ctx(&v3, l7_ca_cert, x, NULL, NULL, 0);
+
+	ex = X509V3_EXT_nconf_nid(NULL, &v3, NID_basic_constraints,
+	    "critical,CA:FALSE");
+	if (ex == NULL || X509_add_ext(x, ex, -1) != 1)
+		goto fail;
+	X509_EXTENSION_free(ex);
+	ex = NULL;
+
+	/* KU TLS — sem keyCertSign/cRLSign (Edge/Chromium). */
+	ex = X509V3_EXT_nconf_nid(NULL, &v3, NID_key_usage,
+	    "critical,digitalSignature,keyEncipherment");
+	if (ex == NULL || X509_add_ext(x, ex, -1) != 1)
+		goto fail;
+	X509_EXTENSION_free(ex);
+	ex = NULL;
+
+	ex = X509V3_EXT_nconf_nid(NULL, &v3, NID_ext_key_usage, "serverAuth");
+	if (ex == NULL || X509_add_ext(x, ex, -1) != 1)
+		goto fail;
+	X509_EXTENSION_free(ex);
+	ex = NULL;
+
+	if (snprintf(san, sizeof(san), "DNS:%s", sni) >= (int)sizeof(san))
+		goto fail;
+	ex = X509V3_EXT_nconf_nid(NULL, &v3, NID_subject_alt_name, san);
+	if (ex == NULL || X509_add_ext(x, ex, -1) != 1)
+		goto fail;
+	X509_EXTENSION_free(ex);
+	ex = NULL;
+
+	/* SKI/AKI: cadeia verificável e consistente CA↔leaf. */
+	ex = X509V3_EXT_nconf_nid(NULL, &v3, NID_subject_key_identifier,
+	    "hash");
+	if (ex == NULL || X509_add_ext(x, ex, -1) != 1)
+		goto fail;
+	X509_EXTENSION_free(ex);
+	ex = NULL;
+
+	ex = X509V3_EXT_nconf_nid(NULL, &v3, NID_authority_key_identifier,
+	    "keyid,issuer");
+	if (ex == NULL)
+		ex = X509V3_EXT_nconf_nid(NULL, &v3,
+		    NID_authority_key_identifier, "issuer");
+	if (ex != NULL) {
+		if (X509_add_ext(x, ex, -1) != 1) {
+			X509_EXTENSION_free(ex);
+			ex = NULL;
+			goto fail;
+		}
+		X509_EXTENSION_free(ex);
+		ex = NULL;
+	}
+
+	if (X509_sign(x, l7_ca_key, EVP_sha256()) == 0)
+		goto fail;
+	if (!l7_leaf_identity_ok(x, sni)) {
+		fprintf(stderr,
+		    "layer7-tlsproxy: leaf identity check failed sni=%s\n",
+		    sni);
+		goto fail;
+	}
+	return x;
+
+fail:
+	if (ex != NULL)
+		X509_EXTENSION_free(ex);
+	if (x != NULL)
+		X509_free(x);
+	return NULL;
+}
+
+static X509 *
+l7_leaf_get_or_mint(const char *sni)
+{
+	char name[L7_SNI_MAX + 1];
+	int i;
+	X509 *x;
+
+	strncpy(name, sni, L7_SNI_MAX);
+	name[L7_SNI_MAX] = '\0';
+	sni_lower(name);
+	if (!l7_sni_dns_ok(name))
+		return NULL;
+
+	for (i = 0; i < l7_nleaf; i++) {
+		if (strcmp(l7_leaf_cache[i].sni, name) == 0)
+			return l7_leaf_cache[i].cert;
+	}
+	if (l7_nleaf >= L7_LEAF_CACHE) {
+		/* Evict slot 0 (FIFO simples). */
+		X509_free(l7_leaf_cache[0].cert);
+		memmove(&l7_leaf_cache[0], &l7_leaf_cache[1],
+		    sizeof(l7_leaf_cache[0]) * (L7_LEAF_CACHE - 1));
+		l7_nleaf = L7_LEAF_CACHE - 1;
+		l7_leaf_cache[l7_nleaf].cert = NULL;
+		l7_leaf_cache[l7_nleaf].sni[0] = '\0';
+	}
+	x = l7_mint_leaf_cert(name);
+	if (x == NULL)
+		return NULL;
+	strncpy(l7_leaf_cache[l7_nleaf].sni, name, L7_SNI_MAX);
+	l7_leaf_cache[l7_nleaf].sni[L7_SNI_MAX] = '\0';
+	l7_leaf_cache[l7_nleaf].cert = x;
+	l7_nleaf++;
+	return x;
+}
+
+static int
+l7_sni_callback(SSL *ssl, int *ad, void *arg)
+{
+	const char *sni;
+	X509 *leaf;
+	char name[L7_SNI_MAX + 1];
+
+	(void)arg;
+	if (!l7_mint_mode)
+		return SSL_TLSEXT_ERR_OK;
+
+	sni = SSL_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
+	if (sni == NULL || sni[0] == '\0')
+		return SSL_TLSEXT_ERR_OK;
+
+	strncpy(name, sni, L7_SNI_MAX);
+	name[L7_SNI_MAX] = '\0';
+	sni_lower(name);
+	leaf = l7_leaf_get_or_mint(name);
+	if (leaf == NULL) {
+		*ad = SSL_AD_UNRECOGNIZED_NAME;
+		return SSL_TLSEXT_ERR_ALERT_FATAL;
+	}
+	if (SSL_use_certificate(ssl, leaf) != 1 ||
+	    SSL_use_PrivateKey(ssl, l7_leaf_key) != 1) {
+		*ad = SSL_AD_INTERNAL_ERROR;
+		return SSL_TLSEXT_ERR_ALERT_FATAL;
+	}
+	return SSL_TLSEXT_ERR_OK;
+}
+
+static int
+l7_setup_certs(SSL_CTX *ctx, const char *cert_path, const char *key_path)
+{
+	X509 *loaded;
+	EVP_PKEY *loaded_key;
+	const char *def_sni;
+	X509 *def_leaf;
+
+	l7_mint_reset();
+	l7_leaf_serial = (long)time(NULL) & 0x7fffffffL;
+	if (l7_leaf_serial <= 0)
+		l7_leaf_serial = 1;
+
+	loaded = l7_load_x509_file(cert_path);
+	loaded_key = l7_load_key_file(key_path);
+	if (loaded == NULL || loaded_key == NULL) {
+		fprintf(stderr,
+		    "layer7-tlsproxy: failed to load cert/key PEM\n");
+		ERR_print_errors_fp(stderr);
+		if (loaded != NULL)
+			X509_free(loaded);
+		if (loaded_key != NULL)
+			EVP_PKEY_free(loaded_key);
+		return -1;
+	}
+
+	if (X509_check_ca(loaded) > 0) {
+		/* CA key deve corresponder ao certificado (identidade consistente). */
+		if (X509_check_private_key(loaded, loaded_key) != 1) {
+			fprintf(stderr,
+			    "layer7-tlsproxy: CA cert/key mismatch\n");
+			ERR_print_errors_fp(stderr);
+			X509_free(loaded);
+			EVP_PKEY_free(loaded_key);
+			return -1;
+		}
+		l7_mint_mode = 1;
+		l7_ca_cert = loaded;
+		l7_ca_key = loaded_key;
+		l7_log_x509_fp("ca", l7_ca_cert);
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x30000000L
+		l7_leaf_key = EVP_RSA_gen(2048);
+#else
+		l7_leaf_key = EVP_PKEY_new();
+		if (l7_leaf_key != NULL) {
+			RSA *rsa = RSA_new();
+			BIGNUM *e = BN_new();
+
+			if (rsa == NULL || e == NULL ||
+			    BN_set_word(e, RSA_F4) != 1 ||
+			    RSA_generate_key_ex(rsa, 2048, e, NULL) != 1 ||
+			    EVP_PKEY_assign_RSA(l7_leaf_key, rsa) != 1) {
+				if (rsa != NULL)
+					RSA_free(rsa);
+				EVP_PKEY_free(l7_leaf_key);
+				l7_leaf_key = NULL;
+			}
+			/* rsa ownership transferred on success */
+			if (e != NULL)
+				BN_free(e);
+		}
+#endif
+		if (l7_leaf_key == NULL) {
+			fprintf(stderr,
+			    "layer7-tlsproxy: leaf RSA keygen failed\n");
+			l7_mint_reset();
+			return -1;
+		}
+
+		def_sni = (l7_nblock > 0) ? l7_block[0] : "layer7-mitm.local";
+		def_leaf = l7_leaf_get_or_mint(def_sni);
+		if (def_leaf == NULL) {
+			fprintf(stderr,
+			    "layer7-tlsproxy: default leaf mint failed\n");
+			ERR_print_errors_fp(stderr);
+			l7_mint_reset();
+			return -1;
+		}
+		if (SSL_CTX_use_certificate(ctx, def_leaf) != 1 ||
+		    SSL_CTX_use_PrivateKey(ctx, l7_leaf_key) != 1 ||
+		    SSL_CTX_check_private_key(ctx) != 1) {
+			fprintf(stderr,
+			    "layer7-tlsproxy: default leaf install failed\n");
+			ERR_print_errors_fp(stderr);
+			l7_mint_reset();
+			return -1;
+		}
+		/* Não enviar a CA como peer na cadeia — só leaf (CA no trust store). */
+#if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10002000L
+		SSL_CTX_clear_chain_certs(ctx);
+#endif
+		SSL_CTX_set_tlsext_servername_callback(ctx, l7_sni_callback);
+		l7_log_x509_fp("leaf_default", def_leaf);
+		fprintf(stderr,
+		    "layer7-tlsproxy: mint-mode ON (CA issuer; leaf peer "
+		    "serverAuth+SAN; Chromium-safe; default=%s)\n",
+		    def_sni);
+		return 0;
+	}
+
+	/* Legado PoC: ficheiro ja e leaf de servidor. */
+	l7_mint_mode = 0;
+	if (SSL_CTX_use_certificate(ctx, loaded) != 1 ||
+	    SSL_CTX_use_PrivateKey(ctx, loaded_key) != 1 ||
+	    SSL_CTX_check_private_key(ctx) != 1) {
+		ERR_print_errors_fp(stderr);
+		X509_free(loaded);
+		EVP_PKEY_free(loaded_key);
+		return -1;
+	}
+	/* CTX fica com refs proprias via use_*; libertar loads locais. */
+	X509_free(loaded);
+	EVP_PKEY_free(loaded_key);
+	fprintf(stderr,
+	    "layer7-tlsproxy: mint-mode OFF (static server cert)\n");
+	return 0;
+}
+
 int
 l7_tls_lab_listen(const char *bind_host, int bind_port,
     const char *cert_path, const char *key_path, int oneshot)
@@ -432,12 +935,8 @@ l7_tls_lab_listen(const char *bind_host, int bind_port,
 		goto out;
 	}
 	SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
-	if (SSL_CTX_use_certificate_file(ctx, cert_path, SSL_FILETYPE_PEM) != 1 ||
-	    SSL_CTX_use_PrivateKey_file(ctx, key_path, SSL_FILETYPE_PEM) != 1 ||
-	    SSL_CTX_check_private_key(ctx) != 1) {
-		ERR_print_errors_fp(stderr);
+	if (l7_setup_certs(ctx, cert_path, key_path) != 0)
 		goto out;
-	}
 
 	lfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (lfd < 0) {
@@ -517,6 +1016,7 @@ out:
 		close(lfd);
 	if (ctx != NULL)
 		SSL_CTX_free(ctx);
+	l7_mint_reset();
 	EVP_cleanup();
 	return rc;
 }

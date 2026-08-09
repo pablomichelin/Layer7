@@ -1,0 +1,59 @@
+HARNESS=inspect-leaf-chain
+UTC_NOW=2026-08-09T15:39:16Z
+SNI_REQUESTED=mitm-lab.test
+LISTEN=127.0.0.1:18449
+
+=== PEER / LEAF ===
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-Inspect-CA
+SERIAL=6A789F25
+NOT_BEFORE=Aug  9 15:38:16 2026 GMT
+NOT_AFTER=Sep  8 15:39:16 2026 GMT
+CLOCK_VALID_NOW=yes
+SHA256=07:68:16:F3:EB:FD:43:18:98:87:D2:F5:4D:58:E2:EA:AF:10:1F:A9:0F:3A:6A:94:F8:08:6A:B6:79:44:EC:55
+ENCODING_FIRST_LINE=-----BEGIN CERTIFICATE-----
+VERIFY_CAFILE=.../chain1.pem: OK
+
+=== ALGORITMO ===
+Signature Algorithm: sha256WithRSAEncryption
+Public Key Algorithm: rsaEncryption
+Public-Key: (2048 bit)
+
+=== BasicConstraints / KeyUsage / EKU / SAN ===
+X509v3 Basic Constraints: critical
+    CA:FALSE
+X509v3 Key Usage: critical
+    Digital Signature, Key Encipherment
+X509v3 Extended Key Usage:
+    TLS Web Server Authentication
+X509v3 Subject Alternative Name:
+    DNS:mitm-lab.test
+
+=== CHECKS ===
+ISSUER_MATCH_CA=YES
+SAN_HAS_SNI=YES
+EKU_SERVERAUTH=YES
+KU_DIGITAL_SIGNATURE=YES
+KU_KEY_ENCIPHERMENT=YES
+BC_CA_FALSE=YES
+BC_CA_TRUE=NO
+PEER_EQ_CA_FP=NO
+
+=== CHAIN ENVIADA ===
+CHAIN_CERT_COUNT=1
+chain[1]=leaf CN=mitm-lab.test issuer=Layer7-Inspect-CA
+CHAIN_INCLUDES_CA=NO_LEAF_ONLY
+
+=== CACHE / RELOAD ===
+HANDSHAKE1_SERIAL=6A789F25
+HANDSHAKE2_SAME_SNI_SERIAL=6A789F25
+CACHE_HIT_SAME_CERT=YES
+HANDSHAKE3_OTHER_SNI_SERIAL=6A789F26
+OTHER_SNI_DIFFERENT_CERT=YES
+NOTE_CACHE=in-memory L7_LEAF_CACHE=32; FIFO; sem SIGHUP
+NOTE_RELOAD=onerestart / sync_helper reinicia processo e esvazia cache
+
+=== SNI WIRE ===
+TLS server extension "server name" (id=0), len=0
+
+PASS: leaf/chain inspection OK

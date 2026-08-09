@@ -1,0 +1,107 @@
+EVID=/tmp/l7-phaseA-54-20260809T195118Z
+=== BASELINE ===
+Sun Aug  9 07:51:18 PM UTC 2026
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+ens160           UP             192.168.100.54/24 2804:6c4:8ff:f600:250:56ff:fe9d:5fa4/64 fe80::250:56ff:fe9d:5fa4/64 
+default via 192.168.100.254 dev ens160 proto static 
+192.168.100.0/24 dev ens160 proto kernel scope link src 192.168.100.54 
+no_http_listen
+192.168.100.24 dev ens160 src 192.168.100.54 uid 0 
+    cache 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+=== APPLY IP + RETURN ROUTE ===
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet 198.18.0.10/32 scope global lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+192.168.100.24 via 192.168.100.254 dev ens160 
+192.168.100.24 via 192.168.100.254 dev ens160 src 192.168.100.54 uid 0 
+    cache 
+=== EPHEMERAL CA + SERVER CERT ===
+ca_fp=2C:CA:01:A4:9B:95:2F:3C:36:86:3F:78:CB:0F:DC:82:E3:7A:CB:61:6C:BF:9E:F1:D9:4F:4E:F8:BD:B3:D8:25
+server_fp=1E:EB:6F:FE:2D:81:78:40:6C:E6:C2:16:26:81:56:64:02:77:B6:08:E8:9D:6E:C4:6F:C3:1D:72:24:3B:1B:D6
+ca_subject=subject=CN = Layer7-PhaseA-Ephemeral-CA
+server_subject=subject=CN = mitm-lab.test
+server_san=X509v3 Subject Alternative Name:     DNS:mitm-lab.test, IP Address:198.18.0.10
+=== START HTTPS (bind 198.18.0.10:443 only) ===
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*    users:(("python3",pid=85317,fd=3))                      
+=== LOCAL TLS VALIDATION ===
+-- curl with CA --
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+
+-- openssl s_client SNI --
+subject=CN = mitm-lab.test
+issuer=CN = Layer7-PhaseA-Ephemeral-CA
+X509v3 Subject Alternative Name: 
+    DNS:mitm-lab.test, IP Address:198.18.0.10
+=== FAILSAFE at +60min ===
+warning: commands will be executed using /bin/sh
+job 3 at Sun Aug  9 20:51:00 2026
+=== ROLLBACK REHEARSAL (full cycle: rollback -> re-apply state check) ===
+ROLLBACK_A_OK
+ip_absent_OK
+listen_absent_OK
+=== RE-APPLY after rehearsal (leave Phase A UP for Phase B) ===
+ca_fp=B0:1A:D0:89:0D:57:C3:05:63:CC:6A:23:B5:9C:DE:E7:D3:70:5B:83:89:27:B0:47:3E:F3:B9:EB:C1:61:DA:66
+server_fp=9B:52:45:FB:CC:64:C0:41:77:85:22:DD:65:65:BD:E1:DD:B0:6F:FB:DA:AB:67:04:42:02:F3:FF:37:AB:95:3A
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*    users:(("python3",pid=85388,fd=3))                      
+192.168.100.24 via 192.168.100.254 dev ens160 
+warning: commands will be executed using /bin/sh
+job 4 at Sun Aug  9 20:51:00 2026
+PHASE_A=PASS
+LAB_IP=198.18.0.10
+SNI=mitm-lab.test
+LISTEN=198.18.0.10:443
+RETURN_ROUTE=192.168.100.24/32 via 192.168.100.254
+ROLLBACK=/opt/layer7-poc/mitm-lab-a/phase-a-control.sh rollback
+FAILSAFE_MIN=60
+CA_FP=B0:1A:D0:89:0D:57:C3:05:63:CC:6A:23:B5:9C:DE:E7:D3:70:5B:83:89:27:B0:47:3E:F3:B9:EB:C1:61:DA:66
+NO_PRIVATE_KEYS_IN_EVID=yes
+PHASE_A_PASS EVID=/tmp/l7-phaseA-54-20260809T195118Z
+/tmp/l7-phaseA-54-20260809T195118Z
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*    users:(("python3",pid=85388,fd=3))                      
+192.168.100.24 via 192.168.100.254 dev ens160 
+warning: commands will be executed using /bin/sh
+job 4 at Sun Aug  9 20:51:00 2026
+PHASE_A=PASS
+LAB_IP=198.18.0.10
+SNI=mitm-lab.test
+LISTEN=198.18.0.10:443
+RETURN_ROUTE=192.168.100.24/32 via 192.168.100.254
+ROLLBACK=/opt/layer7-poc/mitm-lab-a/phase-a-control.sh rollback
+FAILSAFE_MIN=60
+CA_FP=B0:1A:D0:89:0D:57:C3:05:63:CC:6A:23:B5:9C:DE:E7:D3:70:5B:83:89:27:B0:47:3E:F3:B9:EB:C1:61:DA:66
+NO_PRIVATE_KEYS_IN_EVID=yes
+PHASE_A_PASS EVID=/tmp/l7-phaseA-54-20260809T195118Z
+/tmp/l7-phaseA-54-20260809T195118Z
+    inet 198.18.0.10/32 scope global lo
+192.168.100.24 via 192.168.100.254 dev ens160 
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*          
+PHASE_A=PASS

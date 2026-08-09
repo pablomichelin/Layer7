@@ -90,7 +90,8 @@ layer7_tlsproxy_start()
 		done
 	fi
 
-	/usr/sbin/daemon -p "${pidfile}" \
+	# -f: stdio -> /dev/null para o filho nao segurar pipes do activador PHP.
+	/usr/sbin/daemon -f -p "${pidfile}" \
 	    /usr/bin/env LAYER7_TLSPROXY_PRODUCT=1 \
 	    ${command} ${_args}
 	return $?

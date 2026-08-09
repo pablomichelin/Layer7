@@ -1,0 +1,10 @@
+VERDICT=ROOT_CAUSE_FIXED_REBUILD_DONE
+CLASS=E
+PRIMARY=timeout process-group waits/kills daemonized tlsproxy
+FIX=timeout --foreground in layer7_exec_timeout + daemon -f in rc.d
+OLD_SYNC_SEC=25.54
+NEW_SYNC_SEC=0.332
+NEW_PKG=1.9.44
+NEW_SHA=375fe445984085fe3f96b27ba17f61b07278ce1f6439209d386f2564342e5684
+LEAF=CN=mitm-lab.test issuer=Layer7-19244-Proof2 EKU=serverAuth
+POST=.254 MITM_OFF pkg=1.9.44

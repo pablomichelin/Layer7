@@ -1,0 +1,3 @@
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+---

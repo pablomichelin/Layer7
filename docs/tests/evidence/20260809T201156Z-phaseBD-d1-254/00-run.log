@@ -1,0 +1,7 @@
+=== PRECHECK ===
+=== INSTALL 1.9.43 PASSIVE ===
+=== PHASE A (.54) ===
+=== PHASE B route (.254) ===
+=== PHASE C hosts (.24) ===
+TRAP_FAIL rc=1
+=== ROLLBACK_ALL ===

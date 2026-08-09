@@ -1,0 +1,6 @@
+﻿[7236:7088:0809/173626.482:ERROR:components\optimization_guide\core\model_execution\performance_class.cc:111] Edge LLM: Not supported on non Desktop SKU
+[7236:7088:0809/173627.426:ERROR:chrome\browser\task_manager\providers\fallback_task_provider.cc:126] Every renderer should have at least one task provided by a primary task provider. If a "Renderer" fallback task is shown, it is a bug. If you have repro steps, please file a new bug and tag it as a dependency of crbug.com/40528867.
+[7236:7088:0809/173630.037:ERROR:chrome\browser\edge_pinned_sites\secondary_tile_client.cc:283] OnSecondaryTileManagerDisconnected. Probing host package health before responding to callbacks
+[7236:7088:0809/173630.038:ERROR:chrome\browser\edge_pinned_sites\pinned_sites_cache.cc:218] Failed to retrieve pinned sites
+13053 bytes written to file C:\Windows\Temp\l7-phaseD-evid\08-edge-screenshot.png
+

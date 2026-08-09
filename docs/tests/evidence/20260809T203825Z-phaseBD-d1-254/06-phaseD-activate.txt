@@ -1,0 +1,8 @@
+ca_gen=ok msg=CA gerada (CA:TRUE, keyCertSign, SKI).
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes
+sync=ok
+sync_sec=0.365
+filter_configure_safe=ok=yes skipped=no
+mitm_tables_apply=MISSING

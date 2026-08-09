@@ -1,6 +1,7 @@
 #!/bin/sh
 # Foreground-friendly PoC tests — make must NOT background long listeners.
 # Usage: timeout 25 sh run-poc-tests.sh poc3|poc4
+# TLS: cadeia verificada via -CAfile (sem curl -k / CERT_NONE).
 set -eu
 cd "$(dirname "$0")"
 MODE=${1:-poc3}
@@ -11,11 +12,12 @@ STUB=${STUB:-../../scripts/lab/poc-upstream-stub.py}
 
 test -x "$OUT"
 test -f "$CRT" -a -f "$KEY"
+# shellcheck source=tls-http-get.sh
+. ./tls-http-get.sh
 
 cleanup() {
 	if [ -n "${SPID:-}" ]; then kill -9 "$SPID" 2>/dev/null || true; fi
 	if [ -n "${UPID:-}" ]; then kill -9 "$UPID" 2>/dev/null || true; fi
-	# Avoid pkill -f matching this script/ssh command line.
 	for p in $(pgrep -x layer7-tlsproxy 2>/dev/null || true); do kill -9 "$p" 2>/dev/null || true; done
 	for p in $(pgrep -f '[p]oc-upstream-stub' 2>/dev/null || true); do kill -9 "$p" 2>/dev/null || true; done
 }
@@ -28,7 +30,7 @@ start_proxy() {
 	i=0
 	while [ "$i" -lt 40 ]; do
 		kill -0 "$SPID" 2>/dev/null || { echo "proxy died"; cat /tmp/l7-poc-srv.log; exit 1; }
-		if curl -sSk --connect-timeout 1 --max-time 1 -o /dev/null https://127.0.0.1:8443/ 2>/dev/null; then
+		if https_ready; then
 			return 0
 		fi
 		i=$((i + 1))
@@ -40,9 +42,9 @@ start_proxy() {
 case "$MODE" in
 poc3)
 	start_proxy --block-sni blocked.test --bypass-sni bank.example
-	echo "$(curl -sSk --connect-timeout 2 --max-time 3 --resolve blocked.test:8443:127.0.0.1 https://blocked.test:8443/)" | grep -q 'Acesso bloqueado'
-	echo "$(curl -sSk --connect-timeout 2 --max-time 3 --resolve bank.example:8443:127.0.0.1 https://bank.example:8443/)" | grep -q '"verdict":"bypass"'
-	echo "$(curl -sSk --connect-timeout 2 --max-time 3 --resolve other.test:8443:127.0.0.1 https://other.test:8443/)" | grep -q '"verdict":"allow"'
+	echo "$(https_body blocked.test)" | grep -q 'Acesso bloqueado'
+	echo "$(https_body bank.example)" | grep -q '"verdict":"bypass"'
+	echo "$(https_body other.test)" | grep -q '"verdict":"allow"'
 	echo "PoC-3 S3/S4 lab PASS"
 	;;
 poc4)
@@ -51,7 +53,9 @@ poc4)
 	UPID=$!
 	sleep 0.3
 	start_proxy --upstream 127.0.0.1:19080
-	BODY=$(curl -sSk --connect-timeout 2 --max-time 3 https://127.0.0.1:8443/)
+	BODY=$(https_body "$(openssl x509 -in "$CRT" -noout -subject |
+		sed -n 's/.*CN *= *//p' | head -1)")
+	[ -n "$BODY" ] || BODY=$(https_body lab.local)
 	echo "$BODY" | grep -q UPSTREAM_OK
 	echo "PoC-4 upstream PASS"
 	;;

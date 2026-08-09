@@ -1,0 +1,17 @@
+ca_gen=ok msg=CA gerada (CA:TRUE, keyCertSign, SKI).
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes
+sync=ok
+sync_sec=0.391
+filter_configure_safe=ok=yes skipped=no
+mitm_tables_entries=2
+quic_snippet=yes
+effective_post=yes
+=== PF NAT ===
+SRC_TABLE
+   192.168.100.24
+DST_TABLE
+   198.18.0.10
+=== PF FILTER QUIC ===
+FAIL_NO_QUIC_RULE

@@ -1,6 +1,8 @@
 /*
  * TLS listen — lab (LAYER7_TLSPROXY_LAB=1) ou produto (LAYER7_TLSPROXY_PRODUCT=1).
  * Produto: bind só loopback. Nunca afirma mitm_effective=true. Sem payload em disco.
+ * Gate D1/0.1.3: se --cert for CA, mint leaf por SNI (serverAuth+SAN+AKI/SKI);
+ * CA nunca e peer; identidade verificavel (issuer/verify/fp).
  */
 #ifndef LAYER7_TLSPROXY_TLS_H
 #define LAYER7_TLSPROXY_TLS_H

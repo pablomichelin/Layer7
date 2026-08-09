@@ -1,0 +1,10 @@
+layer7_tlsproxy: mitm_effective gate absent — leaving service stopped
+filter_configure=done
+=== PF ===
+NO_RDR
+pfctl: Table does not exist.
+pfctl: Table does not exist.
+GATE=NO
+EFF=NO
+Could not find certificate from <stdin>
+cp: /usr/local/etc/layer7/mitm/ca.crt: No such file or directory

@@ -1,0 +1,25 @@
+ca_gen=ok msg=CA gerada (CA:TRUE, keyCertSign, SKI).
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes
+sync=ok
+sync_sec=0.341
+filter_configure=done
+effective_post=yes
+=== PF ===
+pfctl: Table does not exist.
+pfctl: Table does not exist.
+GATE=YES
+EFF=YES
+layer7_tlsproxy is running as pid 86676.
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-PhaseD-Lab-CA
+X509v3 Basic Constraints: critical
+    CA:FALSE
+X509v3 Key Usage: critical
+    Digital Signature, Key Encipherment
+X509v3 Extended Key Usage: 
+    TLS Web Server Authentication
+X509v3 Subject Alternative Name: 
+    DNS:mitm-lab.test
+sha1 Fingerprint=17:37:AB:F4:D6:9D:46:84:34:4E:FF:A3:B0:47:01:C9:8C:08:C9:66

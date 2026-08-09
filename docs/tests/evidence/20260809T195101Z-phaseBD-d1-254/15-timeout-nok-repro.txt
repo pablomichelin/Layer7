@@ -1,0 +1,20 @@
+HOST=freebsd (builder 192.168.100.12)
+UTC=2026-08-09T15:57:21Z
+GOAL=provar que /usr/bin/timeout SEC cmd SEM -k pode nao retornar se o filho ignora SIGTERM
+NO_PRODUCT_EDIT=yes
+
+=== timeout WITHOUT -k (child trap '' TERM; sleep 120) ===
+WITHOUT_K_STILL_RUNNING_AFTER_8s=YES
+WITHOUT_K_PROVED_HANG=YES
+
+=== correlacao produto (leitura, sem editar) ===
+layer7_exec_timeout monta: timeout <sec> /bin/sh -c <cmd>  — sem flag -k
+(L7_CTRL_TIMEOUT_SERVICE=20 em layer7.inc)
+
+=== correlacao janela 195101Z ===
+06-phaseD-activate.txt: sync=fail sync_sec=141.646
+Durante hang: ps mostrou "/usr/bin/timeout 20 ... service layer7-tlsproxy onerestart" ainda vivo
+Peer ja era leaf (openssl 127.0.0.1:8443) enquanto sync bloqueado
+
+VERDICT_REPRO=timeout_sem_-k_pode_pendurar_comprovado
+NOTE=nao prova sozinho que onerestart ignora TERM; prova que o wrapper actual nao garante retorno em SEC segundos

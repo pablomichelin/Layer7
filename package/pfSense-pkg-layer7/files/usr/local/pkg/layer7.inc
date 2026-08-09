@@ -201,6 +201,409 @@ function layer7_log_pkg_warn($msg)
 }
 
 /**
+ * Timeouts padrao do control-plane (segundos).
+ * B+D 20260809: exec(service … onerestart) sem timeout pendurou o activador.
+ * D0 addendum 195101Z: timeout SEM -k nao retorna se o filho ignora SIGTERM.
+ */
+define("L7_CTRL_TIMEOUT_SYSRC", 10);
+define("L7_CTRL_TIMEOUT_SERVICE", 20);
+define("L7_CTRL_TIMEOUT_FETCH", 90);
+define("L7_CTRL_TIMEOUT_PKG", 120);
+define("L7_CTRL_TIMEOUT_ACTIVATE", 60);
+/** Reload PF via filter_configure — limite duro (D0 hang activação). */
+define("L7_CTRL_TIMEOUT_FILTER", 90);
+/** Segundos apos TERM antes de KILL (-k do /usr/bin/timeout). */
+define("L7_CTRL_TIMEOUT_KILL_GRACE", 5);
+
+/**
+ * Executa comando externo com timeout finito e resultado explicito.
+ *
+ * Preferencia: /usr/bin/timeout --foreground -k <grace> <sec> (rc=124).
+ * Sem -k, filhos que ignoram SIGTERM podem pendurar o activador (D0 F1-bis).
+ * Fallback: proc_open + proc_terminate(TERM) depois KILL. Nunca usar
+ * exec()/mwexec() nu no control-plane MITM.
+ *
+ * @param string $cmd comando completo (ja com escapes se necessario)
+ * @param int $timeout_sec 1..120
+ * @return array{ok:bool,rc:int,timed_out:bool,output:string,error:string}
+ */
+function layer7_exec_timeout($cmd, $timeout_sec = 15)
+{
+	$cmd = trim((string)$cmd);
+	$timeout_sec = (int)$timeout_sec;
+	if ($timeout_sec < 1) {
+		$timeout_sec = 1;
+	}
+	/* Permitir L7_CTRL_TIMEOUT_FILTER (90) e margem; nunca ilimitado. */
+	if ($timeout_sec > 180) {
+		$timeout_sec = 180;
+	}
+	$kill_grace = defined("L7_CTRL_TIMEOUT_KILL_GRACE")
+	    ? (int)L7_CTRL_TIMEOUT_KILL_GRACE : 5;
+	if ($kill_grace < 1) {
+		$kill_grace = 1;
+	}
+	if ($kill_grace > 30) {
+		$kill_grace = 30;
+	}
+	if ($cmd === "") {
+		return array(
+			"ok" => false,
+			"rc" => -1,
+			"timed_out" => false,
+			"output" => "",
+			"error" => "comando vazio"
+		);
+	}
+
+	$timeout_bin = null;
+	foreach (array("/usr/bin/timeout", "/usr/local/bin/timeout") as $cand) {
+		if (is_executable($cand)) {
+			$timeout_bin = $cand;
+			break;
+		}
+	}
+
+	if ($timeout_bin !== null) {
+		/*
+		 * --foreground: nao criar process group; senao timeout espera/mata o
+		 * helper daemonizado (tlsproxy) e sync_helper ve listen=false apos ~25s
+		 * (evidencia 20260809T201504Z / repro pipe-group).
+		 * -k: SIGKILL apos grace se SIGTERM nao terminar o filho (D0 F1-bis).
+		 */
+		$full = $timeout_bin . " --foreground -k " . $kill_grace . " " .
+		    $timeout_sec . " /bin/sh -c " . escapeshellarg($cmd);
+		$lines = array();
+		$rc = 0;
+		@exec($full . " 2>&1", $lines, $rc);
+		$out = implode("\n", $lines);
+		if ($rc === 124) {
+			return array(
+				"ok" => false,
+				"rc" => 124,
+				"timed_out" => true,
+				"output" => $out,
+				"error" => "timeout apos {$timeout_sec}s: " . $cmd
+			);
+		}
+		return array(
+			"ok" => ($rc === 0),
+			"rc" => (int)$rc,
+			"timed_out" => false,
+			"output" => $out,
+			"error" => ($rc === 0) ? "" : ("rc=" . $rc . ": " . $cmd)
+		);
+	}
+
+	$descriptors = array(
+		0 => array("file", "/dev/null", "r"),
+		1 => array("pipe", "w"),
+		2 => array("pipe", "w")
+	);
+	$pipes = array();
+	$proc = @proc_open($cmd, $descriptors, $pipes);
+	if (!is_resource($proc) && !(is_object($proc) &&
+	    (PHP_VERSION_ID >= 80000))) {
+		return array(
+			"ok" => false,
+			"rc" => -1,
+			"timed_out" => false,
+			"output" => "",
+			"error" => "proc_open falhou: " . $cmd
+		);
+	}
+	if (isset($pipes[1]) && is_resource($pipes[1])) {
+		stream_set_blocking($pipes[1], false);
+	}
+	if (isset($pipes[2]) && is_resource($pipes[2])) {
+		stream_set_blocking($pipes[2], false);
+	}
+
+	$stdout = "";
+	$stderr = "";
+	$start = microtime(true);
+	$timed_out = false;
+	$rc = -1;
+
+	while (true) {
+		$status = proc_get_status($proc);
+		$read = array();
+		if (isset($pipes[1]) && is_resource($pipes[1])) {
+			$read[] = $pipes[1];
+		}
+		if (isset($pipes[2]) && is_resource($pipes[2])) {
+			$read[] = $pipes[2];
+		}
+		if (!empty($read)) {
+			$write = null;
+			$except = null;
+			@stream_select($read, $write, $except, 0, 200000);
+			foreach ($read as $rh) {
+				$chunk = stream_get_contents($rh);
+				if (!is_string($chunk) || $chunk === "") {
+					continue;
+				}
+				if (isset($pipes[1]) && $rh === $pipes[1]) {
+					$stdout .= $chunk;
+				} else {
+					$stderr .= $chunk;
+				}
+			}
+		} else {
+			usleep(200000);
+		}
+
+		if (empty($status["running"])) {
+			$rc = isset($status["exitcode"]) ? (int)$status["exitcode"] : -1;
+			break;
+		}
+		if ((microtime(true) - $start) >= $timeout_sec) {
+			$timed_out = true;
+			@proc_terminate($proc, 15);
+			/* Espelha -k: esperar grace antes de KILL (filho pode ignorar TERM). */
+			$grace_us = $kill_grace * 1000000;
+			$step = 200000;
+			$waited = 0;
+			while ($waited < $grace_us) {
+				usleep($step);
+				$waited += $step;
+				$status = proc_get_status($proc);
+				if (empty($status["running"])) {
+					break;
+				}
+			}
+			$status = proc_get_status($proc);
+			if (!empty($status["running"])) {
+				@proc_terminate($proc, 9);
+				usleep(100000);
+			}
+			$rc = 124;
+			break;
+		}
+	}
+
+	foreach (array(1, 2) as $i) {
+		if (isset($pipes[$i]) && is_resource($pipes[$i])) {
+			$rest = stream_get_contents($pipes[$i]);
+			if (is_string($rest) && $rest !== "") {
+				if ($i === 1) {
+					$stdout .= $rest;
+				} else {
+					$stderr .= $rest;
+				}
+			}
+			fclose($pipes[$i]);
+		}
+	}
+	@proc_close($proc);
+
+	$out = trim($stdout . (($stderr !== "") ? ("\n" . $stderr) : ""));
+	if ($timed_out) {
+		return array(
+			"ok" => false,
+			"rc" => 124,
+			"timed_out" => true,
+			"output" => $out,
+			"error" => "timeout apos {$timeout_sec}s: " . $cmd
+		);
+	}
+	return array(
+		"ok" => ($rc === 0),
+		"rc" => (int)$rc,
+		"timed_out" => false,
+		"output" => $out,
+		"error" => ($rc === 0) ? "" : ("rc=" . $rc . ": " . $cmd)
+	);
+}
+
+/**
+ * filter_configure com anti-reentrada, lock e limite de tempo.
+ * Não recursa (skip se já dentro de filter/resync); não fica sem limite.
+ * Chamada concorrente com lock ocupado → skip idempotente.
+ *
+ * @return array{ok:bool,skipped:bool,timed_out:bool,reason:string,error:string}
+ */
+function layer7_filter_configure_safe()
+{
+	static $depth = 0;
+
+	if ($depth > 0 || !empty($GLOBALS["layer7_resync_active"]) ||
+	    !empty($GLOBALS["layer7_filter_configure_active"])) {
+		layer7_log_pkg_warn(
+		    "Layer7: filter_configure_safe reentrante/resync — skip (nao recursa)"
+		);
+		return array(
+			"ok" => true,
+			"skipped" => true,
+			"timed_out" => false,
+			"reason" => "reentrant",
+			"error" => ""
+		);
+	}
+
+	$lock_dir = getenv("LAYER7_TEST_ROOT")
+	    ? (getenv("LAYER7_TEST_ROOT") . "/var/run/layer7")
+	    : "/var/run/layer7";
+	if (!is_dir($lock_dir)) {
+		@mkdir($lock_dir, 0755, true);
+	}
+	$lock_path = $lock_dir . "/filter_configure.lock";
+	$lock_fh = @fopen($lock_path, "c+");
+	if (is_resource($lock_fh)) {
+		if (!@flock($lock_fh, LOCK_EX | LOCK_NB)) {
+			fclose($lock_fh);
+			layer7_log_pkg_warn(
+			    "Layer7: filter_configure_safe lock ocupado — skip idempotente"
+			);
+			return array(
+				"ok" => true,
+				"skipped" => true,
+				"timed_out" => false,
+				"reason" => "locked",
+				"error" => ""
+			);
+		}
+	}
+
+	$depth++;
+	$GLOBALS["layer7_filter_configure_active"] = true;
+	$timeout = defined("L7_CTRL_TIMEOUT_FILTER")
+	    ? (int)L7_CTRL_TIMEOUT_FILTER : 90;
+	if ($timeout < 5) {
+		$timeout = 5;
+	}
+	if ($timeout > 180) {
+		$timeout = 180;
+	}
+
+	$ret = null;
+	try {
+		/* Harness: sem PF real — no-op se filter_configure ausente. */
+		if (getenv("LAYER7_TEST_ROOT")) {
+			if (function_exists("filter_configure")) {
+				filter_configure();
+			}
+			$ret = array(
+				"ok" => true,
+				"skipped" => false,
+				"timed_out" => false,
+				"reason" => "test",
+				"error" => ""
+			);
+			return $ret;
+		}
+
+		/*
+		 * Subprocess + timeout -k: o PHP da GUI não pode matar-se a si;
+		 * D0 mostrou filter_configure a pendurar o activador.
+		 * Force in-process só com LAYER7_FILTER_CONFIGURE_INPROCESS=1.
+		 */
+		/*
+		 * pfSense: filter_configure() só faz send_event("filter reload")
+		 * (async). MITM rdr/quic precisam de sync real antes do retorno.
+		 * Usar /etc/rc.filter_configure_sync (bootstrap completo: shaper/
+		 * ipsec/vpn) — php -r só com filter.inc falha (dummynet undefined).
+		 */
+		$force_in = (getenv("LAYER7_FILTER_CONFIGURE_INPROCESS") === "1");
+		$rc_sync = "/etc/rc.filter_configure_sync";
+		if ($force_in && function_exists("filter_configure_sync")) {
+			/* In-process só se o caller já carregou shaper/ipsec/vpn. */
+			@require_once("functions.inc");
+			@require_once("shaper.inc");
+			@require_once("ipsec.inc");
+			@require_once("vpn.inc");
+			filter_configure_sync();
+			$ret = array(
+				"ok" => true,
+				"skipped" => false,
+				"timed_out" => false,
+				"reason" => "inprocess_sync",
+				"error" => ""
+			);
+			return $ret;
+		}
+
+		if (is_file($rc_sync) && is_readable($rc_sync)) {
+			$php_cgi = null;
+			foreach (array(
+			    "/usr/local/bin/php-cgi",
+			    "/usr/local/bin/php",
+			    (defined("PHP_BINARY") ? PHP_BINARY : "")
+			) as $cand) {
+				$cand = trim((string)$cand);
+				if ($cand !== "" && is_executable($cand)) {
+					$php_cgi = $cand;
+					break;
+				}
+			}
+			if ($php_cgi !== null) {
+				$r = layer7_exec_timeout(
+				    escapeshellarg($php_cgi) . " -f " .
+				    escapeshellarg($rc_sync),
+				    $timeout
+				);
+				$ok = !empty($r["ok"]);
+				if (!empty($r["timed_out"])) {
+					layer7_log_pkg_warn(
+					    "Layer7: filter_configure_sync timeout apos {$timeout}s"
+					);
+				} elseif (!$ok) {
+					layer7_log_pkg_warn(
+					    "Layer7: filter_configure_sync falhou — " .
+					    $r["error"]
+					);
+				}
+				$ret = array(
+					"ok" => $ok,
+					"skipped" => false,
+					"timed_out" => !empty($r["timed_out"]),
+					"reason" => !empty($r["timed_out"])
+					    ? "timeout" : "rc_sync",
+					"error" => $ok ? "" : (string)$r["error"]
+				);
+				return $ret;
+			}
+		}
+
+		/* Fallback legado: evento async (não garante materialização imediata). */
+		if (function_exists("filter_configure")) {
+			filter_configure();
+			$ret = array(
+				"ok" => true,
+				"skipped" => false,
+				"timed_out" => false,
+				"reason" => "async_event",
+				"error" => ""
+			);
+			return $ret;
+		}
+		$ret = array(
+			"ok" => false,
+			"skipped" => false,
+			"timed_out" => false,
+			"reason" => "nophp",
+			"error" => "filter sync indisponivel"
+		);
+		return $ret;
+	} finally {
+		/*
+		 * Apos reload PF: materializar tabelas MITM (rdr referencia
+		 * <layer7_mitm_src/dst>; persist no ruleset nao basta).
+		 */
+		if (is_array($ret) && !empty($ret["ok"]) &&
+		    function_exists("layer7_mitm_tables_apply_to_pf")) {
+			layer7_mitm_tables_apply_to_pf();
+		}
+		$depth--;
+		$GLOBALS["layer7_filter_configure_active"] = false;
+		if (is_resource($lock_fh)) {
+			@flock($lock_fh, LOCK_UN);
+			fclose($lock_fh);
+		}
+	}
+}
+
+/**
  * Le a primeira linha do pidfile do layer7d e devolve o PID (só dígitos) ou null.
  * Alinhado a `layer7d_pid_from_file` / `send_sighup` nos scripts sh (F4.1).
  *
@@ -1637,50 +2040,56 @@ function layer7_static_origin_tables_apply_to_pf($data = null, $bl_config = null
 
 function layer7_resync()
 {
-	$data = layer7_load_or_default();
+	/* Marca resync activo: filter_configure_safe não reentra (anti-recursão). */
+	$GLOBALS["layer7_resync_active"] = true;
+	try {
+		$data = layer7_load_or_default();
 
-	layer7_ensure_pf_table("layer7_block");
-	layer7_ensure_pf_table("layer7_block_dst");
-	layer7_ensure_pf_table("layer7_tagged");
-	layer7_ensure_pf_table("layer7_allow_dst");
+		layer7_ensure_pf_table("layer7_block");
+		layer7_ensure_pf_table("layer7_block_dst");
+		layer7_ensure_pf_table("layer7_tagged");
+		layer7_ensure_pf_table("layer7_allow_dst");
 
-	$bl_config = layer7_bl_config_load();
-	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
-		foreach ($bl_config["rules"] as $idx => $rule) {
-			layer7_ensure_pf_table("layer7_bld_" . (int)$idx);
+		$bl_config = layer7_bl_config_load();
+		if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
+			foreach ($bl_config["rules"] as $idx => $rule) {
+				layer7_ensure_pf_table("layer7_bld_" . (int)$idx);
+			}
 		}
-	}
 
-	foreach (layer7_policy_enforcement_table_names($data) as $ptbl) {
-		layer7_ensure_pf_table($ptbl);
-	}
-	foreach (layer7_exception_allow_meta($data) as $m) {
-		layer7_ensure_pf_table("layer7_exc_allow_" . (int)$m["idx"]);
-	}
-	foreach (layer7_blacklist_source_scope_meta($bl_config) as $m) {
-		layer7_ensure_pf_table($m["table"]);
-	}
+		foreach (layer7_policy_enforcement_table_names($data) as $ptbl) {
+			layer7_ensure_pf_table($ptbl);
+		}
+		foreach (layer7_exception_allow_meta($data) as $m) {
+			layer7_ensure_pf_table("layer7_exc_allow_" . (int)$m["idx"]);
+		}
+		foreach (layer7_blacklist_source_scope_meta($bl_config) as $m) {
+			layer7_ensure_pf_table($m["table"]);
+		}
 
-	/* As regras rdr (block page + DNS forcado) sao entregues ao pfSense
-	 * por layer7_generate_rules("nat") no filter reload; aqui apenas se
-	 * limpa o anchor legado. Gate Bloco 1: em modo passivo flusha as
-	 * tabelas dinamicas (Bloco 5: evitar IPs `stale`). */
-	layer7_flush_legacy_nat_anchor();
-	if (!layer7_pf_should_enforce()) {
-		layer7_flush_dynamic_tables();
-	} else {
-		/* BG-075: materializar VIP/excepcoes/pexc/blsrc no PF live.
-		 * Declaracoes no rules.debug nao bastam (FreeBSD persist quirk). */
-		layer7_static_origin_tables_apply_to_pf($data, $bl_config);
-	}
+		/* As regras rdr (block page + DNS forcado) sao entregues ao pfSense
+		 * por layer7_generate_rules("nat") no filter reload; aqui apenas se
+		 * limpa o anchor legado. Gate Bloco 1: em modo passivo flusha as
+		 * tabelas dinamicas (Bloco 5: evitar IPs `stale`). */
+		layer7_flush_legacy_nat_anchor();
+		if (!layer7_pf_should_enforce()) {
+			layer7_flush_dynamic_tables();
+		} else {
+			/* BG-075: materializar VIP/excepcoes/pexc/blsrc no PF live.
+			 * Declaracoes no rules.debug nao bastam (FreeBSD persist quirk). */
+			layer7_static_origin_tables_apply_to_pf($data, $bl_config);
+		}
 
-	/* Bloco 3: popular `layer7_allow_dst` com IPs/CIDRs estaticos da
-	 * allowlist (JSON + seed). Dominios sao adicionados em runtime pelo
-	 * daemon, via DNS hint. Executado apos flush dinamico para repor
-	 * entradas estaticas quando `layer7_allow_dst` foi esvaziada. */
-	layer7_dst_allowlist_apply_to_pf();
-	layer7_blockpage_sync($data);
-	layer7_ensure_daemon_running();
+		/* Bloco 3: popular `layer7_allow_dst` com IPs/CIDRs estaticos da
+		 * allowlist (JSON + seed). Dominios sao adicionados em runtime pelo
+		 * daemon, via DNS hint. Executado apos flush dinamico para repor
+		 * entradas estaticas quando `layer7_allow_dst` foi esvaziada. */
+		layer7_dst_allowlist_apply_to_pf();
+		layer7_blockpage_sync($data);
+		layer7_ensure_daemon_running();
+	} finally {
+		$GLOBALS["layer7_resync_active"] = false;
+	}
 }
 
 /**
@@ -1867,15 +2276,16 @@ function layer7_pf_config_resync($flush_dynamic = false)
 		layer7_dst_allowlist_apply_to_pf();
 	}
 	layer7_blockpage_sync();
-	if (function_exists("filter_configure")) {
-		filter_configure();
-	}
-	/* filter_configure chama layer7_resync() (custom_php_resync), que ja
-	 * materializa exc_allow/pexc/blsrc. Reaplicar aqui cobre caminhos que
-	 * chamam este helper sem passar pelo hook de package resync. */
+	layer7_filter_configure_safe();
+	/* filter_configure_safe → filter_configure → layer7_resync();
+	 * reaplicar cobre caminhos sem hook de package resync. */
 	if (layer7_pf_should_enforce()) {
 		layer7_static_origin_tables_apply_to_pf();
 		layer7_dst_allowlist_apply_to_pf();
+	}
+	/* MITM: materializar src/dst mesmo em monitor (rdr ortogonal). */
+	if (function_exists("layer7_mitm_tables_apply_to_pf")) {
+		layer7_mitm_tables_apply_to_pf();
 	}
 	/* Garantir tabelas base apos reload (reduz D4 "tables missing"). */
 	if (is_executable("/usr/local/libexec/layer7-pfctl")) {
@@ -1914,11 +2324,14 @@ function layer7_ensure_daemon_running()
 	if (!file_exists($rc)) {
 		return;
 	}
-	$cmd = "/bin/sh " . escapeshellarg($rc) . " onestart 2>/dev/null";
-	if (function_exists("mwexec")) {
-		mwexec($cmd);
-	} else {
-		@shell_exec($cmd);
+	$start = layer7_exec_timeout(
+	    "/bin/sh " . escapeshellarg($rc) . " onestart",
+	    L7_CTRL_TIMEOUT_SERVICE
+	);
+	if (!$start["ok"]) {
+		layer7_log_pkg_warn(
+		    "Layer7: layer7d onestart falhou — " . $start["error"]
+		);
 	}
 }
 
@@ -2082,9 +2495,11 @@ function layer7_generate_rules($type)
 
 	/* pfnearly: injectado por filter_rules_generate() ANTES das regras de
 	 * interface (pass LAN quick). Sem isto, blocks Layer7 no fim do ruleset
-	 * nunca sao avaliados (G5 two-client FAIL em lab 2026-08-04). */
+	 * nunca sao avaliados (G5 two-client FAIL em lab 2026-08-04).
+	 * MITM anti-QUIC (UDP/443 src→dst) é ortogonal ao enforce — também aqui. */
 	if ($type === "pfearly") {
-		return layer7_pf_early_enforcement_rules_text();
+		return layer7_pf_early_enforcement_rules_text() .
+		    layer7_generate_mitm_quic_filter_rules_text();
 	}
 
 	if ($type !== "filter" && $type !== "rule") {
@@ -2219,11 +2634,29 @@ function layer7_restart_service()
 	if (!file_exists($rc)) {
 		return false;
 	}
-	$cmd = "/bin/sh " . escapeshellarg($rc) . " onestop 2>/dev/null; sleep 1; /bin/sh " . escapeshellarg($rc) . " onestart 2>/dev/null";
-	if (function_exists("mwexec")) {
-		mwexec($cmd);
-	} else {
-		@shell_exec($cmd);
+	$stop = layer7_exec_timeout(
+	    "/bin/sh " . escapeshellarg($rc) . " onestop",
+	    L7_CTRL_TIMEOUT_SERVICE
+	);
+	if (!empty($stop["timed_out"])) {
+		layer7_log_pkg_warn(
+		    "Layer7: layer7d onestop timeout — " . $stop["error"]
+		);
+		layer7_exec_timeout(
+		    "/usr/bin/pkill -TERM -f /usr/local/sbin/layer7d",
+		    5
+		);
+		@unlink("/var/run/layer7d.pid");
+	}
+	$start = layer7_exec_timeout(
+	    "/bin/sh " . escapeshellarg($rc) . " onestart",
+	    L7_CTRL_TIMEOUT_SERVICE
+	);
+	if (!$start["ok"]) {
+		layer7_log_pkg_warn(
+		    "Layer7: layer7d onestart falhou — " . $start["error"]
+		);
+		return false;
 	}
 	usleep(500000);
 	$pid = layer7_daemon_pid_from_file("/var/run/layer7d.pid");
@@ -3305,13 +3738,48 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
  */
 function layer7_ensure_blockpage_service($run)
 {
-	if ($run) {
-		@exec("/usr/sbin/sysrc layer7_blockpage_enable=YES 2>/dev/null");
-		@exec("/usr/sbin/service layer7-blockpage onestart 2>/dev/null");
+	if (getenv("LAYER7_TEST_ROOT")) {
 		return;
 	}
-	@exec("/usr/sbin/service layer7-blockpage onestop 2>/dev/null");
-	@exec("/usr/sbin/sysrc layer7_blockpage_enable=NO 2>/dev/null");
+	if ($run) {
+		$sys = layer7_exec_timeout(
+		    "/usr/sbin/sysrc layer7_blockpage_enable=YES",
+		    L7_CTRL_TIMEOUT_SYSRC
+		);
+		if (!$sys["ok"]) {
+			layer7_log_pkg_warn(
+			    "Layer7 blockpage: sysrc enable falhou — " . $sys["error"]
+			);
+		}
+		$svc = layer7_exec_timeout(
+		    "/usr/sbin/service layer7-blockpage onestart",
+		    L7_CTRL_TIMEOUT_SERVICE
+		);
+		if (!$svc["ok"]) {
+			layer7_log_pkg_warn(
+			    "Layer7 blockpage: onestart falhou — " . $svc["error"]
+			);
+		}
+		return;
+	}
+	$svc = layer7_exec_timeout(
+	    "/usr/sbin/service layer7-blockpage onestop",
+	    L7_CTRL_TIMEOUT_SERVICE
+	);
+	if (!empty($svc["timed_out"])) {
+		layer7_log_pkg_warn(
+		    "Layer7 blockpage: onestop timeout — " . $svc["error"]
+		);
+	}
+	$sys = layer7_exec_timeout(
+	    "/usr/sbin/sysrc layer7_blockpage_enable=NO",
+	    L7_CTRL_TIMEOUT_SYSRC
+	);
+	if (!$sys["ok"]) {
+		layer7_log_pkg_warn(
+		    "Layer7 blockpage: sysrc disable falhou — " . $sys["error"]
+		);
+	}
 }
 
 /**
@@ -5921,35 +6389,281 @@ function layer7_mitm_flush_tables()
 }
 
 /**
+ * Materializa layer7_mitm_src/dst no PF live (ensure + replace).
+ *
+ * O snippet NAT emite `table <…> persist { membros }`, mas no FreeBSD/pfSense
+ * isso NÃO garante `pfctl -t … -T show` (mesmo padrão VIP/exc — ver
+ * layer7_pf_table_replace_entries). Sem materialização, o rdr referencia
+ * tabelas inexistentes e o cliente bypassa o MITM (Edge vê origem).
+ *
+ * @param array|null $data
+ * @return int total de entradas aplicadas (0 se OFF / harness)
+ */
+function layer7_mitm_tables_apply_to_pf($data = null)
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return 0;
+	}
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$mitm = layer7_mitm_from_config($data);
+	if (!layer7_mitm_effective($mitm)) {
+		layer7_mitm_flush_tables();
+		return 0;
+	}
+	$srcs = layer7_mitm_normalize_ipv4_cidr_list(
+	    isset($mitm["intercept"]["source_cidr"])
+		? $mitm["intercept"]["source_cidr"] : array()
+	);
+	$dsts = layer7_mitm_normalize_ipv4_cidr_list(
+	    isset($mitm["intercept"]["dest_cidr"])
+		? $mitm["intercept"]["dest_cidr"] : array()
+	);
+	$self = layer7_mitm_self_ipv4_exclude($data);
+	if (!empty($self)) {
+		$dsts = array_values(array_filter($dsts, function ($d) use ($self) {
+			return !layer7_mitm_dest_is_self($d, $self);
+		}));
+		$srcs = array_values(array_filter($srcs, function ($s) use ($self) {
+			return !layer7_mitm_dest_is_self($s, $self);
+		}));
+	}
+	if (empty($srcs) || empty($dsts)) {
+		layer7_mitm_flush_tables();
+		return 0;
+	}
+	$n = 0;
+	$n += (int)layer7_pf_table_replace_entries("layer7_mitm_src", $srcs);
+	$n += (int)layer7_pf_table_replace_entries("layer7_mitm_dst", $dsts);
+	return $n;
+}
+
+/**
+ * Tokens de lista CIDR (source/dest) — split igual ao normalize.
+ *
+ * @param mixed $raw
+ * @return string[]
+ */
+function layer7_mitm_intercept_list_tokens($raw)
+{
+	if (is_string($raw)) {
+		$raw = preg_split('/[\r\n,]+/', $raw);
+	}
+	if (!is_array($raw)) {
+		return array();
+	}
+	$out = array();
+	foreach ($raw as $net) {
+		$net = strtolower(trim((string)$net));
+		if ($net === "") {
+			continue;
+		}
+		$out[] = $net;
+	}
+	return $out;
+}
+
+/**
+ * Entrada proibida em intercept MITM (não silenciar — fail-closed na activação).
+ * Cobre: any/all/*, 0.0.0.0(/0), ::/0, IPv6, loopback, prefixo IPv4 < /8.
+ *
+ * @param string $net
+ * @return string|null motivo curto ou null se aceite para análise seguinte
+ */
+function layer7_mitm_intercept_token_forbidden_reason($net)
+{
+	$net = strtolower(trim((string)$net));
+	if ($net === "") {
+		return null;
+	}
+	if ($net === "any" || $net === "all" || $net === "*" ||
+	    $net === "0.0.0.0/0" || $net === "0.0.0.0" ||
+	    $net === "::/0" || $net === "::" || $net === "0::0") {
+		return "any/0.0.0.0/0/::/0";
+	}
+	$fam = layer7_ip_or_cidr_family($net);
+	if ($fam === "inet6") {
+		return "ipv6";
+	}
+	if ($fam === "inet") {
+		$ip_only = (strpos($net, "/") !== false)
+		    ? substr($net, 0, strpos($net, "/")) : $net;
+		if (strpos($ip_only, "127.") === 0) {
+			return "loopback";
+		}
+		if (strpos($net, "/") !== false) {
+			$bits = (int)substr($net, strrpos($net, "/") + 1);
+			/* Prefixo < /8 = expansão demasiado ampla (quase-any). */
+			if ($bits < 8) {
+				return "prefixo</8";
+			}
+		}
+		return null;
+	}
+	/* Inválido: não é "expansão" — normalize descarta; validate scope trata. */
+	return null;
+}
+
+/**
+ * Se a lista raw contém token proibido (any / IPv6 / quase-any / loopback).
+ * Usado em validate para impedir activação com expansão silenciosa de escopo.
+ *
+ * @param mixed $raw
+ * @return string|null
+ */
+function layer7_mitm_intercept_list_forbidden_reason($raw)
+{
+	foreach (layer7_mitm_intercept_list_tokens($raw) as $net) {
+		$why = layer7_mitm_intercept_token_forbidden_reason($net);
+		if ($why !== null) {
+			return $why;
+		}
+	}
+	return null;
+}
+
+/**
+ * Linha rdr MITM só é emitida se cumprir o contrato exacto (sem genérico/IPv6).
+ *
+ * @param string $rule
+ * @return bool
+ */
+function layer7_mitm_rdr_line_ok($rule)
+{
+	$rule = trim((string)$rule);
+	if ($rule === "" || $rule[0] === '#') {
+		return true;
+	}
+	if (preg_match('/^table\s+<(layer7_mitm_src|layer7_mitm_dst)>\s+persist\s*\{/', $rule) === 1) {
+		return (stripos($rule, "inet6") === false &&
+		    !preg_match('/\b(any|::)\b/i', $rule));
+	}
+	if (preg_match('/\b(inet6|from\s+any|to\s+any)\b/i', $rule)) {
+		return false;
+	}
+	if (stripos($rule, "::1") !== false) {
+		return false;
+	}
+	return (preg_match(
+	    '/^rdr on \S+ inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> ' .
+	    'port 443 -> 127\.0\.0\.1 port \d+$/',
+	    $rule
+	) === 1);
+}
+
+/**
+ * Linha anti-QUIC MITM: só UDP/443 IPv4 de <layer7_mitm_src> para <layer7_mitm_dst>.
+ * Proibido: inet6, from/to any, global, interface-wide sem tabelas.
+ *
+ * @param string $rule
+ * @return bool
+ */
+function layer7_mitm_quic_line_ok($rule)
+{
+	$rule = trim((string)$rule);
+	if ($rule === "" || $rule[0] === '#') {
+		return true;
+	}
+	if (preg_match('/^table\s+<(layer7_mitm_src|layer7_mitm_dst)>\s+persist\b/', $rule) === 1) {
+		return (stripos($rule, "inet6") === false &&
+		    !preg_match('/\b(any|::)\b/i', $rule));
+	}
+	if (preg_match('/\b(inet6|from\s+any|to\s+any)\b/i', $rule)) {
+		return false;
+	}
+	if (stripos($rule, "::") !== false) {
+		return false;
+	}
+	/* Aceitar drop|return|reject — produto emite drop. */
+	return (preg_match(
+	    '/^block (?:drop|return|reject) quick inet proto udp ' .
+	    'from <layer7_mitm_src> to <layer7_mitm_dst> port 443' .
+	    '(?: label "layer7:mitm-anti-quic")?$/',
+	    $rule
+	) === 1);
+}
+
+/**
+ * Anti-QUIC / HTTP3 no escopo MITM (força fallback TCP para o rdr).
+ *
+ * Emitido só com mitm_effective + control-plane materializado + scope OK.
+ * Ortogonal ao toggle global block_quic / block_quic_interfaces.
+ * Sem IPv6; sem from/to any; activado/desactivado com o MITM.
+ *
+ * @param array|null $data
+ * @param bool|null $entitled
+ * @return string
+ */
+function layer7_generate_mitm_quic_filter_rules_text($data = null, $entitled = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$mitm = layer7_mitm_from_config($data);
+	if (!layer7_mitm_effective($mitm, $entitled)) {
+		return "";
+	}
+	if (!layer7_mitm_intercept_scope_ok($mitm)) {
+		return "";
+	}
+	if (!layer7_mitm_control_plane_materialized()) {
+		return "";
+	}
+	$srcs = layer7_mitm_normalize_ipv4_cidr_list(
+	    isset($mitm["intercept"]["source_cidr"])
+		? $mitm["intercept"]["source_cidr"] : array()
+	);
+	$dsts = layer7_mitm_normalize_ipv4_cidr_list(
+	    isset($mitm["intercept"]["dest_cidr"])
+		? $mitm["intercept"]["dest_cidr"] : array()
+	);
+	$self = layer7_mitm_self_ipv4_exclude($data);
+	if (!empty($self)) {
+		$dsts = array_values(array_filter($dsts, function ($d) use ($self) {
+			return !layer7_mitm_dest_is_self($d, $self);
+		}));
+		$srcs = array_values(array_filter($srcs, function ($s) use ($self) {
+			return !layer7_mitm_dest_is_self($s, $self);
+		}));
+	}
+	if (empty($srcs) || empty($dsts)) {
+		return "";
+	}
+	$line = 'block drop quick inet proto udp' .
+	    ' from <layer7_mitm_src> to <layer7_mitm_dst> port 443' .
+	    ' label "layer7:mitm-anti-quic"';
+	if (!layer7_mitm_quic_line_ok($line)) {
+		return "";
+	}
+	/*
+	 * discover_pkg_rules("pfearly") valida o snippet isolado com pfctl -nf.
+	 * Sem declaração local das tabelas, a validação falha e o pfSense
+	 * descarta TODO o pfearly do pacote (incluindo esta regra).
+	 * Membros vêm de layer7_mitm_tables_apply_to_pf() após o reload.
+	 */
+	return "\n# Layer7 MITM anti-QUIC (UDP/443) — só layer7_mitm_src → layer7_mitm_dst\n" .
+	    "table <layer7_mitm_src> persist\n" .
+	    "table <layer7_mitm_dst> persist\n" .
+	    $line . "\n";
+}
+
+/**
  * Normaliza lista IPv4 CIDR/host para intercept MITM (source ou dest).
- * Rejeita IPv6, invalidos, loopback, 0.0.0.0/0 (equiv. from any) e "any".
+ * Rejeita IPv6, inválidos, loopback, any/0.0.0.0/0, prefixo < /8.
  * Max 64; dedupe. Host sem máscara fica como IP (PF aceita na tabela).
  */
 function layer7_mitm_normalize_ipv4_cidr_list($raw, $max = 64)
 {
 	$out = array();
-	if (is_string($raw)) {
-		$raw = preg_split('/[\r\n,]+/', $raw);
-	}
-	if (!is_array($raw)) {
-		return $out;
-	}
-	foreach ($raw as $net) {
-		$net = strtolower(trim((string)$net));
-		if ($net === "" || strlen($net) > 64) {
+	foreach (layer7_mitm_intercept_list_tokens($raw) as $net) {
+		if (strlen($net) > 64) {
 			continue;
 		}
-		if ($net === "any" || $net === "all" || $net === "0.0.0.0/0" ||
-		    $net === "0.0.0.0") {
+		if (layer7_mitm_intercept_token_forbidden_reason($net) !== null) {
 			continue;
 		}
 		if (layer7_ip_or_cidr_family($net) !== "inet") {
-			continue;
-		}
-		/* Loopback / 127/8 nunca em rdr MITM (source nem dest). */
-		$ip_only = (strpos($net, "/") !== false)
-		    ? substr($net, 0, strpos($net, "/")) : $net;
-		if (strpos($ip_only, "127.") === 0) {
 			continue;
 		}
 		$out[] = $net;
@@ -5961,8 +6675,49 @@ function layer7_mitm_normalize_ipv4_cidr_list($raw, $max = 64)
 }
 
 /**
+ * Fail-closed: scope MITM só com source_cidr E dest_cidr IPv4 explícitos/válidos.
+ * Vazio, "any", 0.0.0.0/0, IPv6 ou lixo normalizado a [] ⇒ false.
+ *
+ * @param array|null $mitm bloco já normalizado (ou raw — re-normaliza se preciso)
+ * @return bool
+ */
+function layer7_mitm_intercept_scope_ok($mitm)
+{
+	if (!is_array($mitm)) {
+		return false;
+	}
+	if (!isset($mitm["intercept"]) || !is_array($mitm["intercept"])) {
+		return false;
+	}
+	$ic = $mitm["intercept"];
+	$srcs = isset($ic["source_cidr"]) && is_array($ic["source_cidr"])
+	    ? $ic["source_cidr"] : array();
+	$dests = isset($ic["dest_cidr"]) && is_array($ic["dest_cidr"])
+	    ? $ic["dest_cidr"] : array();
+	if (empty($srcs) || empty($dests)) {
+		return false;
+	}
+	$src_ok = false;
+	foreach ($srcs as $s) {
+		if (layer7_ip_or_cidr_family($s) === "inet") {
+			$src_ok = true;
+			break;
+		}
+	}
+	$dst_ok = false;
+	foreach ($dests as $d) {
+		if (layer7_ip_or_cidr_family($d) === "inet") {
+			$dst_ok = true;
+			break;
+		}
+	}
+	return ($src_ok && $dst_ok);
+}
+
+/**
  * Rdr selectivo MITM — mitm_effective + source_cidr E dest_cidr IPv4 válidos.
- * Forma obrigatória: from <layer7_mitm_src> to <layer7_mitm_dst> (nunca from any).
+ * Forma obrigatória: from <layer7_mitm_src> to <layer7_mitm_dst>
+ * (nunca from any / to any / inet6 / → ::1 / redirect genérico).
  * $entitled: passar true/false em testes para evitar IO de licença.
  */
 function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
@@ -5972,6 +6727,15 @@ function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
 	}
 	$mitm = layer7_mitm_from_config($data);
 	if (!layer7_mitm_effective($mitm, $entitled)) {
+		return "";
+	}
+	/* Cinto: effective já exige scope; revalidar antes de emitir PF. */
+	if (!layer7_mitm_intercept_scope_ok($mitm)) {
+		return "";
+	}
+	/* Fail-safe lifecycle: sem gate+flag materializados ⇒ zero rdr
+	 * (teardown/cleanup remove ficheiros; intenção ON sozinha não redirecciona). */
+	if (!layer7_mitm_control_plane_materialized()) {
 		return "";
 	}
 	$srcs = isset($mitm["intercept"]["source_cidr"]) &&
@@ -5994,15 +6758,21 @@ function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
 	if ($port === (int)$webgui_port) {
 		return "";
 	}
-	/* 1.9.42: só IPv4 — listener 127.0.0.1; sem rdr inet6. */
+	/* 1.9.43: só IPv4 — listener 127.0.0.1; sem rdr inet6; sem expansão. */
 	$inet_src = array();
 	foreach ($srcs as $s) {
+		if (layer7_mitm_intercept_token_forbidden_reason($s) !== null) {
+			continue;
+		}
 		if (layer7_ip_or_cidr_family($s) === "inet") {
 			$inet_src[] = $s;
 		}
 	}
 	$inet_dst = array();
 	foreach ($dests as $d) {
+		if (layer7_mitm_intercept_token_forbidden_reason($d) !== null) {
+			continue;
+		}
 		if (layer7_ip_or_cidr_family($d) === "inet") {
 			$inet_dst[] = $d;
 		}
@@ -6023,18 +6793,22 @@ function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
 		return "";
 	}
 	$lines = array();
-	$lines[] = "# Layer7 MITM selectivo (1.9.42) — source+dest IPv4; proibido from-any; listen 127.0.0.1";
+	$lines[] = "# Layer7 MITM selectivo (1.9.43) — source+dest IPv4; proibido from-any e rdr generico";
 	$lines[] = "table <layer7_mitm_src> persist { " . implode(", ", $inet_src) . " }";
 	$lines[] = "table <layer7_mitm_dst> persist { " . implode(", ", $inet_dst) . " }";
 	foreach ($real_ifaces as $iface) {
-		$rule = "rdr on {$iface} inet proto tcp" .
-		    " from <layer7_mitm_src> to <layer7_mitm_dst> port 443" .
-		    " -> 127.0.0.1 port {$port}";
-		/* Cinto de segurança: nunca emitir from any nas regras. */
-		if (preg_match('/\bfrom\s+any\b/i', $rule)) {
+		$iface = trim((string)$iface);
+		if ($iface === "" || preg_match('/\s/', $iface)) {
 			return "";
 		}
-		$lines[] = $rule;
+		$lines[] = "rdr on {$iface} inet proto tcp" .
+		    " from <layer7_mitm_src> to <layer7_mitm_dst> port 443" .
+		    " -> 127.0.0.1 port {$port}";
+	}
+	foreach ($lines as $ln) {
+		if (!layer7_mitm_rdr_line_ok($ln)) {
+			return "";
+		}
 	}
 	return implode("\n", $lines) . "\n";
 }
@@ -6096,8 +6870,135 @@ function layer7_mitm_effective_flag_path()
 }
 
 /**
+ * True se o helper produto escuta em 127.0.0.1:<listen_port>.
+ * Usado quando onestart/onerestart reporta timeout mas o processo ja subiu
+ * (evidencia 195101Z: peer leaf UP enquanto sync ainda bloqueado).
+ *
+ * @return bool
+ */
+function layer7_mitm_helper_listening()
+{
+	$port = (int)layer7_mitm_listen_port();
+	if ($port < 1 || $port > 65535) {
+		return false;
+	}
+	$errno = 0;
+	$errstr = "";
+	$fp = @fsockopen("127.0.0.1", $port, $errno, $errstr, 1.0);
+	if (!is_resource($fp)) {
+		return false;
+	}
+	fclose($fp);
+	return true;
+}
+
+/**
+ * True se gate+flag existem (control-plane materializado).
+ * Sem materialização: zero rdr (fail-safe — intenção ON não basta).
+ */
+function layer7_mitm_control_plane_materialized()
+{
+	$gate = layer7_mitm_product_gate_path();
+	$flag = layer7_mitm_effective_flag_path();
+	return (is_string($gate) && is_file($gate) &&
+	    is_string($flag) && is_file($flag));
+}
+
+/**
+ * Limpeza idempotente do control-plane MITM (gate/flag/serviço/tabelas).
+ * Teardown limpo: seguro chamar repetidamente; comandos externos com timeout.
+ *
+ * @param string $reason mensagem para log (vazia = silencio excepto falhas)
+ * @return void
+ */
+function layer7_mitm_ctrl_cleanup($reason = "")
+{
+	$reason = trim((string)$reason);
+	if ($reason !== "") {
+		layer7_log_pkg_warn("Layer7 MITM control-plane: " . $reason);
+	}
+
+	$gate = layer7_mitm_product_gate_path();
+	$flag = layer7_mitm_effective_flag_path();
+	/* Remover materialização primeiro → rdr deixa de ser emitido. */
+	@unlink($gate);
+	@unlink($flag);
+
+	if (!getenv("LAYER7_TEST_ROOT")) {
+		$stop = layer7_exec_timeout(
+		    "/usr/sbin/service layer7-tlsproxy onestop",
+		    L7_CTRL_TIMEOUT_SERVICE
+		);
+		$need_kill = !empty($stop["timed_out"]);
+		if (!$need_kill && function_exists("layer7_mitm_helper_listening") &&
+		    layer7_mitm_helper_listening()) {
+			$need_kill = true;
+		}
+		if ($need_kill) {
+			if (!empty($stop["timed_out"])) {
+				layer7_log_pkg_warn(
+				    "Layer7 MITM: onestop timeout — " . $stop["error"]
+				);
+			} else {
+				layer7_log_pkg_warn(
+				    "Layer7 MITM: helper ainda a escutar apos onestop — pkill"
+				);
+			}
+			layer7_exec_timeout(
+			    "/usr/bin/pkill -TERM -f /usr/local/sbin/layer7-tlsproxy",
+			    5
+			);
+			if (function_exists("layer7_mitm_helper_listening") &&
+			    layer7_mitm_helper_listening()) {
+				layer7_exec_timeout(
+				    "/usr/bin/pkill -KILL -f /usr/local/sbin/layer7-tlsproxy",
+				    5
+				);
+			}
+			@unlink("/var/run/layer7-tlsproxy.pid");
+		}
+		$sys = layer7_exec_timeout(
+		    "/usr/sbin/sysrc layer7_tlsproxy_enable=NO",
+		    L7_CTRL_TIMEOUT_SYSRC
+		);
+		if (!$sys["ok"]) {
+			layer7_log_pkg_warn(
+			    "Layer7 MITM: sysrc disable falhou — " . $sys["error"]
+			);
+		}
+	}
+
+	layer7_mitm_flush_tables();
+	/* Segunda passagem: garantir gate/flag ausentes apos flush. */
+	@unlink($gate);
+	@unlink($flag);
+}
+
+/**
+ * Fail-safe rollback de lifecycle: teardown control-plane + intenção OFF.
+ * Usar quando sync/activate falha — não deixar enabled=ON sem helper/rdr limpo.
+ *
+ * @param array|null $data config layer7
+ * @param string $reason
+ * @return array config com mitm.enabled=false (pronta a gravar)
+ */
+function layer7_mitm_failsafe_rollback($data = null, $reason = "")
+{
+	$why = trim((string)$reason);
+	layer7_mitm_ctrl_cleanup($why !== "" ? $why : "failsafe rollback");
+	if ($data === null || !is_array($data)) {
+		$data = layer7_load_or_default();
+	}
+	$mitm = layer7_mitm_from_config($data);
+	$mitm["enabled"] = false;
+	$mitm = layer7_mitm_normalize($mitm);
+	return layer7_mitm_apply_to_config($data, $mitm);
+}
+
+/**
  * Escreve/remove gate rc + arranca/para helper conforme mitm_effective.
- * Também materializa flag para o daemon reportar effective sem claim falso.
+ * Enable/disable/reload são idempotentes. Comandos via layer7_exec_timeout;
+ * falha → layer7_mitm_ctrl_cleanup + return false.
  */
 function layer7_mitm_sync_helper($data = null, $entitled = null)
 {
@@ -6111,15 +7012,8 @@ function layer7_mitm_sync_helper($data = null, $entitled = null)
 	$want = layer7_mitm_should_start_helper($mitm, $entitled);
 
 	if (!$want) {
-		@unlink($gate);
-		@unlink($flag);
-		if (!getenv("LAYER7_TEST_ROOT")) {
-			@exec("/usr/sbin/service layer7-tlsproxy onestop 2>/dev/null");
-			@exec("/usr/sbin/sysrc layer7_tlsproxy_enable=NO 2>/dev/null");
-			layer7_mitm_flush_tables();
-		} else {
-			layer7_mitm_flush_tables();
-		}
+		/* Disable idempotente: cleanup seguro mesmo se já OFF. */
+		layer7_mitm_ctrl_cleanup("");
 		return false;
 	}
 
@@ -6141,19 +7035,90 @@ function layer7_mitm_sync_helper($data = null, $entitled = null)
 		}
 		$block_s .= ($block_s === "" ? "" : " ") . $sni;
 	}
+	/* CERT/KEY = material da CA; tlsproxy 0.1.2+ minta leaf por SNI (D1). */
 	$body = "LAYER7_TLSPROXY_PRODUCT=1\n" .
 	    "LAYER7_TLSPROXY_LISTEN=" . $listen . "\n" .
 	    "LAYER7_TLSPROXY_CERT=" . $cert . "\n" .
 	    "LAYER7_TLSPROXY_KEY=" . $key . "\n" .
 	    "LAYER7_TLSPROXY_BLOCK_SNI=\"" . $block_s . "\"\n";
-	@file_put_contents($gate, $body);
+
+	/*
+	 * Enable/reload idempotente: mesmo gate + flag + (listen|TEST) ⇒
+	 * não fazer onestop/onestart (evita bounce e hang desnecessário).
+	 */
+	$prev = (is_file($gate)) ? (string)@file_get_contents($gate) : "";
+	$same_gate = ($prev === $body);
+	$has_flag = is_file($flag);
+	$up_ok = getenv("LAYER7_TEST_ROOT")
+	    ? true
+	    : (function_exists("layer7_mitm_helper_listening") &&
+		layer7_mitm_helper_listening());
+	if ($same_gate && $has_flag && $up_ok) {
+		@file_put_contents($flag, "1\n");
+		@chmod($flag, 0644);
+		/* Tabelas antes do próximo filter_configure (pfctl -nf pfearly). */
+		if (function_exists("layer7_mitm_tables_apply_to_pf")) {
+			layer7_mitm_tables_apply_to_pf($data);
+		}
+		return true;
+	}
+
+	if (@file_put_contents($gate, $body) === false) {
+		layer7_mitm_ctrl_cleanup("falha a escrever gate " . $gate);
+		return false;
+	}
 	@chmod($gate, 0600);
-	@file_put_contents($flag, "1\n");
+	if (@file_put_contents($flag, "1\n") === false) {
+		layer7_mitm_ctrl_cleanup("falha a escrever flag effective");
+		return false;
+	}
 	@chmod($flag, 0644);
 
 	if (!getenv("LAYER7_TEST_ROOT")) {
-		@exec("/usr/sbin/sysrc layer7_tlsproxy_enable=YES 2>/dev/null");
-		@exec("/usr/sbin/service layer7-tlsproxy onerestart 2>/dev/null");
+		$sys = layer7_exec_timeout(
+		    "/usr/sbin/sysrc layer7_tlsproxy_enable=YES",
+		    L7_CTRL_TIMEOUT_SYSRC
+		);
+		if (!$sys["ok"]) {
+			layer7_mitm_ctrl_cleanup(
+			    "sysrc enable falhou — " . $sys["error"]
+			);
+			return false;
+		}
+		/*
+		 * Menor caminho seguro (D0 F1 / 195101Z):
+		 * onestop + onestart (evita waiter de onerestart) com timeout -k;
+		 * se o comando falhar/timeout mas ja houver listen → sucesso
+		 * (nao limpar runtime que ja esta UP).
+		 */
+		layer7_exec_timeout(
+		    "/usr/sbin/service layer7-tlsproxy onestop",
+		    L7_CTRL_TIMEOUT_SERVICE
+		);
+		$svc = layer7_exec_timeout(
+		    "/usr/sbin/service layer7-tlsproxy onestart",
+		    L7_CTRL_TIMEOUT_SERVICE
+		);
+		if (!$svc["ok"]) {
+			if (layer7_mitm_helper_listening()) {
+				layer7_log_pkg_warn(
+				    "Layer7 MITM: onestart rc/timeout mas listen OK — " .
+				    $svc["error"]
+				);
+				if (function_exists("layer7_mitm_tables_apply_to_pf")) {
+					layer7_mitm_tables_apply_to_pf($data);
+				}
+				return true;
+			}
+			layer7_mitm_ctrl_cleanup(
+			    "tlsproxy onestart falhou — " . $svc["error"]
+			);
+			return false;
+		}
+	}
+	/* Materializar tabelas antes do filter reload (validação pfearly). */
+	if (function_exists("layer7_mitm_tables_apply_to_pf")) {
+		layer7_mitm_tables_apply_to_pf($data);
 	}
 	return true;
 }
@@ -6167,7 +7132,8 @@ function layer7_mitm_protected_bypass_cidr()
 }
 
 /**
- * Efectivo = intenção ∧ entitlement ∧ CA ∧ runtime ∧ intercept_ready.
+ * Efectivo = intenção ∧ entitlement ∧ CA ∧ runtime ∧ intercept_ready ∧
+ * source_cidr∧dest_cidr IPv4 explícitos (fail-closed; proibido scope vazio).
  * Sem effective: zero intercept / zero helper (S8 / ADR-0017).
  */
 function layer7_mitm_effective($mitm = null, $entitled = null)
@@ -6198,6 +7164,10 @@ function layer7_mitm_effective($mitm = null, $entitled = null)
 		return false;
 	}
 	if (!layer7_mitm_intercept_ready()) {
+		return false;
+	}
+	/* Fail-closed: sem origem E destino válidos ⇒ não effective / não helper. */
+	if (!layer7_mitm_intercept_scope_ok($mitm)) {
 		return false;
 	}
 	return true;
@@ -6503,17 +7473,36 @@ function layer7_mitm_ca_generate($cn, $days = 3650)
 	$key = layer7_mitm_ca_key_path();
 	$subj = "/CN=" . str_replace(array("/", "\0"), "", $cn);
 	$openssl = layer7_mitm_openssl_bin();
+	/* CA com identidade verificável: CA:TRUE + keyCertSign + SKI/AKI. */
+	$cnf = $dir . "/.ca-gen.cnf";
+	$cnf_body = "[req]\n" .
+	    "distinguished_name=req_dn\n" .
+	    "x509_extensions=v3_ca\n" .
+	    "prompt=no\n" .
+	    "[req_dn]\n" .
+	    "CN=" . str_replace(array("\n", "\r", "="), "", $cn) . "\n" .
+	    "[v3_ca]\n" .
+	    "basicConstraints=critical,CA:TRUE\n" .
+	    "keyUsage=critical,keyCertSign,cRLSign\n" .
+	    "subjectKeyIdentifier=hash\n" .
+	    "authorityKeyIdentifier=keyid:always,issuer\n";
+	if (@file_put_contents($cnf, $cnf_body, LOCK_EX) === false) {
+		return array("ok" => false, "msg" => "Falha a escrever config openssl CA.");
+	}
 	$cmd = sprintf(
-		"%s req -x509 -newkey rsa:2048 -sha256 -nodes -days %d -subj %s -keyout %s -out %s 2>&1",
+		"%s req -x509 -newkey rsa:2048 -sha256 -nodes -days %d -subj %s " .
+		"-keyout %s -out %s -config %s -extensions v3_ca 2>&1",
 		escapeshellcmd($openssl),
 		$days,
 		escapeshellarg($subj),
 		escapeshellarg($key),
-		escapeshellarg($cert)
+		escapeshellarg($cert),
+		escapeshellarg($cnf)
 	);
 	$out = array();
 	$code = 0;
 	@exec($cmd, $out, $code);
+	@unlink($cnf);
 	if ($code !== 0 || !is_readable($cert) || !is_readable($key)) {
 		return array(
 			"ok" => false,
@@ -6524,7 +7513,7 @@ function layer7_mitm_ca_generate($cn, $days = 3650)
 	@chmod($cert, 0644);
 	@chown($key, "root");
 	@chgrp($key, "wheel");
-	return array("ok" => true, "msg" => "CA gerada.");
+	return array("ok" => true, "msg" => "CA gerada (CA:TRUE, keyCertSign, SKI).");
 }
 
 /**
@@ -6565,6 +7554,17 @@ function layer7_mitm_ca_import($cert_pem, $key_pem)
 		@unlink($tmp_k);
 		return array("ok" => false, "msg" => "A chave nao corresponde ao certificado.");
 	}
+	/* Import só aceita CA (tlsproxy mint-mode); leaf de servidor rejeitado. */
+	$purp = (string)@shell_exec($openssl . " x509 -in " .
+	    escapeshellarg($tmp_c) . " -noout -text 2>/dev/null");
+	if (strpos($purp, "CA:TRUE") === false) {
+		@unlink($tmp_c);
+		@unlink($tmp_k);
+		return array(
+			"ok" => false,
+			"msg" => "Import exige certificado CA (CA:TRUE) — leaf de servidor nao serve."
+		);
+	}
 	$cert = layer7_mitm_ca_cert_path();
 	$key = layer7_mitm_ca_key_path();
 	if (!@rename($tmp_c, $cert) || !@rename($tmp_k, $key)) {
@@ -6595,12 +7595,34 @@ function layer7_mitm_validate($mitm)
 {
 	$errors = array();
 	$want = is_array($mitm) && !empty($mitm["enabled"]);
+	/* Antes do normalize: rejeitar tokens proibidos (não expandir/aceitar em silêncio). */
+	if ($want && is_array($mitm)) {
+		$ic_raw = (isset($mitm["intercept"]) && is_array($mitm["intercept"]))
+		    ? $mitm["intercept"] : array();
+		foreach (array("source_cidr", "dest_cidr") as $k) {
+			$why = layer7_mitm_intercept_list_forbidden_reason(
+			    isset($ic_raw[$k]) ? $ic_raw[$k] : array());
+			if ($why !== null) {
+				$errors[] = l7_t(
+				    "Scope MITM proibido em {$k}: any / 0.0.0.0/0 / IPv6 / " .
+				    "loopback / prefixo </8 — sem redirect generico nem expansao silenciosa."
+				);
+				break;
+			}
+		}
+	}
 	$mitm = layer7_mitm_normalize($mitm);
 	if ($want && empty($mitm["ca"]["present"])) {
 		$errors[] = l7_t("Nao e possivel activar MITM sem CA instalada.");
 	}
 	if ($want && !layer7_has_entitlement("mitm")) {
 		$errors[] = l7_t("Entitlement mitm obrigatorio para activar.");
+	}
+	if ($want && !layer7_mitm_intercept_scope_ok($mitm)) {
+		$errors[] = l7_t(
+		    "Activacao MITM exige source_cidr e dest_cidr IPv4 explicitos e validos " .
+		    "(vazio, any, 0.0.0.0/0, IPv6, prefixo </8 ou invalido = fail-closed)."
+		);
 	}
 	return $errors;
 }
@@ -8409,9 +9431,7 @@ function layer7_bl_apply()
 		exec(escapeshellarg($helper) . " ensure 2>/dev/null", $ensure_out, $ensure_rc);
 		$ensure_ok = ($ensure_rc === 0);
 	}
-	if (function_exists("filter_configure")) {
-		filter_configure();
-	}
+	layer7_filter_configure_safe();
 	usleep(500000);
 	$tables_raw = array();
 	exec("/sbin/pfctl -s Tables 2>/dev/null", $tables_raw, $tables_rc);

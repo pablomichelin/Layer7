@@ -1,0 +1,9 @@
+=== PRECHECK ===
+=== INSTALL 1.9.44 PASSIVE ===
+=== PHASE A (.54) ===
+=== PHASE B route (.254) ===
+=== PHASE C hosts (.24) ===
+=== PHASE D activate MITM ===
+=== EDGE .24 ===
+TRAP_FAIL rc=255
+=== ROLLBACK_ALL ===

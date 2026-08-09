@@ -1,0 +1,66 @@
+=== H1 CA fingerprint mismatch (loaded vs Root .24 vs peer) ===
+subject=CN=Layer7-PhaseD-Lab-CA
+issuer=CN=Layer7-PhaseD-Lab-CA
+sha1 Fingerprint=25:ED:D8:C0:84:E8:13:F3:C5:57:3F:15:A1:5C:FD:C8:D3:5E:1B:3E
+sha256 Fingerprint=37:8B:46:EC:A6:CE:AF:3D:BD:2A:BB:7D:7A:22:1B:21:BE:A4:35:74:D5:C4:0F:D5:93:92:83:88:17:01:A1:9D
+CA_LOADED_SHA1=25EDD8C084E813F3C5573F15A15CFDC8D35E1B3E
+ROOT_24_THUMB_AT_BD=25EDD8C084E813F3C5573F15A15CFDC8D35E1B3E
+MATCH_LOADED_VS_ROOT=YES
+PHASE_C_THUMB=CA_THUMBPRINT=768AD5B382F2D950DB4273D64E122788732575D8CA_SUBJECT=CN=Layer7-PhaseA-Ephemeral-CA
+PHASE_C_VS_D=NO
+
+=== H2 Peer presented during B+D (was it leaf or CA?) ===
+SOURCE=diagnostico-D0 + 03-harness-bd-peer-was-ca + Edge ERR
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+            X509v3 Key Usage: 
+                Certificate Sign, CRL Sign
+    Signature Algorithm: sha256WithRSAEncryption
+PEER_EQ_CA_IN_PRODUCT_1_9_42=YES (SSL_CTX_use_certificate_file(CA); no mint)
+
+=== H3 Leaf SAN / EKU (product 1.9.42 B+D vs D1 candidata) ===
+B+D_1.9.42: no leaf minted — peer=CA → SAN for SNI N/A; EKU serverAuth ABSENT on peer
+EKU_SERVERAUTH_ON_BD_PEER=NO
+SAN_DNS_MITM_LAB_ON_BD_PEER=NO (peer is CA CN=Layer7-PhaseD-Lab-CA)
+--- D1 candidata (builder repro) ---
+VERIFY_CAFILE=/tmp/l7-leaf-insp.SYrwk0/chain1.pem: OK 
+SAN_HAS_SNI=YES
+EKU_SERVERAUTH=YES
+KU_DIGITAL_SIGNATURE=YES
+BC_CA_FALSE=YES
+BC_CA_TRUE=NO
+PASS: leaf/chain inspection OK (SNI=mitm-lab.test, chain=1 leaf, cache hit, verify OK)
+
+=== H4 Chain incompleta ===
+B+D: peer=single cert (the CA self-signed) — chain length 1, but wrong role
+D1 mint: CHAIN_CERT_COUNT=1 (leaf only; CA not sent) — OK if CA in client Root
+CHAIN_CERT_COUNT=1
+CHAIN_INCLUDES_CA=NO_LEAF_ONLY
+CHAIN_INCOMPLETE_AS_ROOT_CAUSE_OF_BD=NO (browser had Root; error was KEY_USAGE not incomplete chain)
+
+=== H5 Cache antigo ===
+B+D: product had no leaf cache (static CA cert) — stale leaf cache N/A
+D1: CACHE_HIT_SAME_CERT demonstrated; FIFO 32; cleared only on process restart
+CACHE_HIT_SAME_CERT=YES
+NOTE_CACHE=in-memory L7_LEAF_CACHE=32; FIFO evict; sem reload SIGHUP — só restart processo
+NOTE_RELOAD=rc.d onerestart / layer7_mitm_sync_helper reinicia processo e esvazia cache
+STALE_CACHE_AS_BD_ROOT_CAUSE=NO
+
+=== H6 Geração tardia / clock skew ===
+NOT_BEFORE=Aug  9 15:42:08 2026 GMT
+NOT_AFTER=Sep  8 15:43:08 2026 GMT
+CLOCK_VALID_NOW=yes
+notBefore=Aug  9 18:50:45 2026 GMT
+notAfter=Sep  8 18:50:45 2026 GMT
+CLOCK_SKEW_AS_BD_ROOT_CAUSE=NO (error not ERR_CERT_DATE_INVALID)
+
+=== H7 CA não carregada no tlsproxy ===
+CA file existed on appliance during B+D (exported 06-mitm-ca.crt); thumb matched Root install
+CA_NOT_LOADED=NO
+
+=== H8 Import no store errado ===
+phase-d uses certutil -addstore Root → LocalMachine\Root
+Edge error ERR_SSL_KEY_USAGE_INCOMPATIBLE (not ERR_CERT_AUTHORITY_INVALID) ⇒ Root accepted
+WRONG_STORE_AS_BD_ROOT_CAUSE=NO
+
+=== H9 Edge error code (primary evidence) ===

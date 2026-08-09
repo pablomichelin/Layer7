@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **`1.9.42` source_cidr** (rev. `2026-08-09ah`)
+**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **`1.9.42` source_cidr**; **Gate D0 PASS** (rev. `2026-08-09ai`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -39,7 +39,14 @@
 **Rev. `ae` (`2026-08-09`)** = corrida lab 20.11 + docs `8939ddb` (overclaim S3/S6 — **corrigido**).  
 **Rev. `af` (`2026-08-09`)** = rev. gerencial interina (S3 pendente; S6 NA).  
 **Rev. `ag` (`2026-08-09`)** = **20.11 PASS** — S3 Edge Windows `192.168.100.24`; GI2/GI3 PASS; S6 **NA/limite**; próximo fecho IM2 / GO produção MITM (humano).  
-**Rev. `ah` (`2026-08-09`)** = **`1.9.42` PASS** — `intercept.source_cidr` obrigatório com dest; proibido `from any`; runbook activação; `.254` sem escrita neste bloco.
+**Rev. `ah` (`2026-08-09`)** = **`1.9.42` PASS** — `intercept.source_cidr` obrigatório com dest; proibido `from any`; runbook activação; `.254` sem escrita neste bloco.  
+**Rev. `ai` (`2026-08-09`)** = **Gate D0 PASS** — ciclo B+D NO-GO diagnosticado: peer TLS = CA → `ERR_SSL_KEY_USAGE_INCOMPATIBLE`; sem código; próximo D1 mint leaf (GO).  
+**Rev. `aj` (`2026-08-09`)** = **Gate D1 PASS local** — mint leaf SNI `serverAuth` (`tlsproxy` 0.1.2 / candidata `1.9.43`); Edge `.24` / B+D pendente GO + publish.  
+**Rev. `ak` (`2026-08-09`)** = **ETAPA 2 `1.9.43`** — `timeout -k` no control-plane (D0 F1-bis); testes builder PASS; publish + GO B+D/Edge pendentes.  
+**Rev. `al` (`2026-08-09`)** = **Candidata `1.9.44`** — `timeout --foreground -k` + `daemon -f` (sync 0.33s); **Gate B PASS**; publish + GO B+D/Edge pendentes.  
+**Rev. `am` (`2026-08-09`)** = **revogada como PASS** — `204452Z` Edge só com `--disable-quic` = diagnóstico; tabelas PF → `1.9.45`.  
+**Rev. `an` (`2026-08-09`)** = candidata **`1.9.46`** — anti-QUIC escopo MITM; Gate C Edge **sem** flags pendente.  
+**Rev. `ao` (`2026-08-09`)** = **`1.9.46` PASS / publicada** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync; MITM prod DEFER.
 
 ---
 
@@ -47,8 +54,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **`1.9.42` PASS** — hardening source scope (pós-20.11) |
-| Próximo | **GO produção MITM** (humano + [`runbook-activacao-mitm-producao-1.9.42.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.42.md); sem escrita `.254` sem GO) |
+| Passo actual | **`1.9.46` publicada** — Gate B+C PASS; MITM produção `.254` **DEFER** |
+| Próximo | GO humano activação MITM escopada (runbook); `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -61,9 +68,14 @@ TRILHA — progresso
 - 20.10b 1.9.40 NO-GO auditoria → 1.9.41 PASS (F1–F6)
 - 20.11 PASS GI2/GI3 (S3 Edge Windows .24; S6 NA/limite)
 - 1.9.42 PASS source_cidr (proibido from any)
-- Plano rev.: 2026-08-09ah
-- Lab/latest: 1.9.42
-- Próximo: GO produção MITM (humano + runbook)
+- B+D lab NO-GO (20260809T185035Z) → Gate D0 PASS (peer=CA / KEY_USAGE)
+- Gate D1 PASS local (tlsproxy 0.1.3 leaf SNI)
+- 1.9.44/45: foreground timeout + tabelas PF MITM
+- 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
+- 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
+- Plano rev.: 2026-08-09ao
+- Lab/latest publicado: 1.9.46 (SHA 10998477…ae72f5)
+- Próximo: GO activação MITM produção (runbook)
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)

@@ -1,0 +1,9 @@
+=== Candidata working tree (tls_lab mint) ===
+47: * mintado por SNI (EKU serverAuth). Nunca apresentar a CA como peer.
+555:	ex = X509V3_EXT_nconf_nid(NULL, &v3, NID_ext_key_usage, "serverAuth");
+582:l7_leaf_get_or_mint(const char *sni)
+635:	leaf = l7_leaf_get_or_mint(name);
+674:	if (X509_check_ca(loaded) > 0) {
+708:		def_leaf = l7_leaf_get_or_mint(def_sni);
+727:		    "layer7-tlsproxy: mint-mode ON (CA as issuer; leaf peer "
+747:	    "layer7-tlsproxy: mint-mode OFF (static server cert)\n");

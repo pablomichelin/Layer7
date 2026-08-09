@@ -1,0 +1,4 @@
+#!/bin/sh
+# Mock sysrc — no-op rápido (produção: layer7_mitm_sync_helper chama sysrc sem timeout).
+echo "mock-sysrc: $*" >&2
+exit 0

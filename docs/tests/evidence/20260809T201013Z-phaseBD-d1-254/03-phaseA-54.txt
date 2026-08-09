@@ -1,0 +1,2 @@
+PHASE_A_APPLY_FAIL
+usage: /opt/layer7-poc/mitm-lab-a/phase-a-control.sh rollback

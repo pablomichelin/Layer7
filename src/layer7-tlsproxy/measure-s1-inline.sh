@@ -14,6 +14,7 @@ trap cleanup EXIT INT TERM
 
 test -x ./layer7-tlsproxy
 test -f lab-certs/server.crt
+CRT_ABS=$(CDPATH= cd -- "$(pwd)/lab-certs" && pwd)/server.crt
 ./lab-inline-up.sh
 
 python3 ./poc-upstream-stub.py 19080 >/tmp/l7-up-inline.log 2>&1 &
@@ -28,21 +29,31 @@ LAYER7_TLSPROXY_LAB=1 ./layer7-tlsproxy --lab-tls-listen 0.0.0.0:8443 \
 SPID=$!
 sleep 0.5
 kill -0 "$SPID"
-# Ready: curl via redirected path from netns (dest 1.1.1.1:443 → 10.67.67.1:8443)
-ip netns exec l7poccli curl -sSk --connect-timeout 2 --max-time 3 \
-	--resolve lab-inline.test:443:1.1.1.1 https://lab-inline.test/ | grep -q UPSTREAM_OK
+# Ready: openssl s_client com -CAfile (sem curl -k) via netns redirect.
+inline_https_body() {
+	(
+		printf 'GET / HTTP/1.0\r\nHost: lab-inline.test\r\nConnection: close\r\n\r\n'
+		sleep 0.12
+	) | ip netns exec l7poccli openssl s_client -connect 1.1.1.1:443 \
+		-servername lab-inline.test -CAfile "$CRT_ABS" \
+		-verify_return_error -quiet 2>/dev/null
+}
+inline_https_body | grep -q UPSTREAM_OK
 
 IDLE=$(awk '/^cpu /{u=$2+$4; tot=$2+$3+$4+$5+$6+$7+$8; print u,tot}' /proc/stat)
 python3 - <<PY
-import subprocess, time
+import subprocess, time, os
 N=$N
+CRT=os.environ.get("CRT_ABS", "$CRT_ABS")
 times=[]; errors=0
-cmd_prefix=["ip","netns","exec","l7poccli"]
 for _ in range(N):
     t0=time.perf_counter()
-    p=subprocess.run(cmd_prefix+["curl","-sSk","--connect-timeout","2","--max-time","3",
-                     "--resolve","lab-inline.test:443:1.1.1.1","https://lab-inline.test/"],
-                     capture_output=True, text=True)
+    p=subprocess.run(
+        ["ip","netns","exec","l7poccli","openssl","s_client",
+         "-connect","1.1.1.1:443","-servername","lab-inline.test",
+         "-CAfile",CRT,"-verify_return_error","-quiet"],
+        input="GET / HTTP/1.0\r\nHost: lab-inline.test\r\nConnection: close\r\n\r\n",
+        capture_output=True, text=True, timeout=5)
     times.append((time.perf_counter()-t0)*1000)
     if p.returncode!=0 or "UPSTREAM_OK" not in (p.stdout or ""):
         errors+=1

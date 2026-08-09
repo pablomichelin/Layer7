@@ -94,9 +94,7 @@ if ($_POST["import_config"] ?? false) {
 					}
 					if ($save_ok) {
 						layer7_signal_reload();
-						if (function_exists("filter_configure")) {
-							filter_configure();
-						}
+						layer7_filter_configure_safe();
 						$backup_msg = l7_t("Configuracao importada com sucesso.");
 					} else {
 						$backup_err = l7_t("Erro ao gravar a configuracao importada.");
@@ -132,18 +130,46 @@ if ($_POST["do_update"] ?? false) {
 		$pkg_file = "/var/db/layer7/layer7-update.pkg";
 		@unlink($pkg_file);
 
-		exec("service layer7d onestop 2>&1", $stop_out, $stop_rc);
-		exec("/usr/bin/fetch -qo " . escapeshellarg($pkg_file) . " " . escapeshellarg($pkg_url) . " 2>&1", $dl_out, $dl_rc);
-		if ($dl_rc !== 0 || !file_exists($pkg_file)) {
-			$update_err = l7_t("Falha ao baixar o pacote do GitHub.");
-			exec("service layer7d onestart 2>&1");
+		$stop = layer7_exec_timeout(
+		    "/usr/sbin/service layer7d onestop",
+		    L7_CTRL_TIMEOUT_SERVICE
+		);
+		if (!empty($stop["timed_out"])) {
+			layer7_log_pkg_warn(
+			    "Layer7 update: onestop timeout — " . $stop["error"]
+			);
+		}
+		$dl = layer7_exec_timeout(
+		    "/usr/bin/fetch -qo " . escapeshellarg($pkg_file) . " " .
+			escapeshellarg($pkg_url),
+		    L7_CTRL_TIMEOUT_FETCH
+		);
+		if (!$dl["ok"] || !file_exists($pkg_file)) {
+			$update_err = l7_t("Falha ao baixar o pacote do GitHub.") .
+			    (($dl["error"] !== "") ? (" " . $dl["error"]) : "");
+			layer7_exec_timeout(
+			    "/usr/sbin/service layer7d onestart",
+			    L7_CTRL_TIMEOUT_SERVICE
+			);
 		} else {
-			exec("IGNORE_OSVERSION=yes /usr/sbin/pkg add -f " . escapeshellarg($pkg_file) . " 2>&1", $inst_out, $inst_rc);
+			$inst = layer7_exec_timeout(
+			    "IGNORE_OSVERSION=yes /usr/sbin/pkg add -f " .
+				escapeshellarg($pkg_file),
+			    L7_CTRL_TIMEOUT_PKG
+			);
 			@unlink($pkg_file);
-			if ($inst_rc !== 0) {
-				$update_err = l7_t("Falha na instalacao do pacote: ") . implode(" ", $inst_out);
+			if (!$inst["ok"]) {
+				$update_err = l7_t("Falha na instalacao do pacote: ") .
+				    (($inst["error"] !== "") ? $inst["error"] : $inst["output"]);
+				layer7_exec_timeout(
+				    "/usr/sbin/service layer7d onestart",
+				    L7_CTRL_TIMEOUT_SERVICE
+				);
 			} else {
-				exec("service layer7d onestart 2>&1");
+				layer7_exec_timeout(
+				    "/usr/sbin/service layer7d onestart",
+				    L7_CTRL_TIMEOUT_SERVICE
+				);
 				sleep(1);
 				$new_ver = layer7_pkg_version();
 				if ($new_ver === "") {
@@ -161,10 +187,15 @@ if ($_POST["register_license"] ?? false) {
 	if ($license_code === "" || preg_match('/^[A-Za-z0-9]{16,128}$/', $license_code) !== 1) {
 		$input_errors[] = l7_t("Informe um codigo de licenca valido.");
 	} else {
-		$out = array();
-		$rc = 0;
-		exec("/usr/local/sbin/layer7d --activate " . escapeshellarg($license_code) . " 2>&1", $out, $rc);
-		if ($rc === 0) {
+		$act = layer7_exec_timeout(
+		    "/usr/local/sbin/layer7d --activate " . escapeshellarg($license_code),
+		    L7_CTRL_TIMEOUT_ACTIVATE
+		);
+		$out = ($act["output"] !== "")
+		    ? preg_split("/\r\n|\n|\r/", $act["output"])
+		    : array();
+		$rc = (int)$act["rc"];
+		if (!empty($act["ok"])) {
 			$data = layer7_load_or_default();
 			$data["layer7"]["license_key_mask"] = substr($license_code, 0, 5) . "************";
 			if (layer7_save_json($data)) {
@@ -172,7 +203,12 @@ if ($_POST["register_license"] ?? false) {
 				$savemsg = l7_t("Licenca registada com sucesso.");
 			}
 		} else {
-			$input_errors[] = l7_t("Licenca invalida.");
+			if (!empty($act["timed_out"])) {
+				$input_errors[] = l7_t("Timeout ao activar licenca.") .
+				    (($act["error"] !== "") ? (" " . $act["error"]) : "");
+			} else {
+				$input_errors[] = l7_t("Licenca invalida.");
+			}
 		}
 	}
 }
@@ -532,9 +568,7 @@ if ($_POST["save"] ?? false) {
 				if ($em_changed) {
 					layer7_flush_dynamic_tables();
 				}
-				if (function_exists("filter_configure")) {
-					filter_configure();
-				}
+				layer7_filter_configure_safe();
 			} elseif ($bp_changed) {
 				layer7_blockpage_sync($data);
 			}

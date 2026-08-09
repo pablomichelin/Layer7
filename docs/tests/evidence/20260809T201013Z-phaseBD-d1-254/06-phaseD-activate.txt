@@ -1,0 +1,8 @@
+ca_gen=ok msg=CA gerada.
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes
+sync=fail
+sync_sec=25.522
+filter_configure=done
+effective_post=yes

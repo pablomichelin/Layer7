@@ -1,0 +1,9 @@
+===NAT===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+===QUIC===
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+===SRC===
+   192.168.100.24
+===DST===
+   198.18.0.10

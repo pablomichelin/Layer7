@@ -1,0 +1,8 @@
+1.9.44
+MITM_EFF=no
+GATE=no
+   route to: 198.18.0.10
+destination: 0.0.0.0
+       mask: 0.0.0.0
+    gateway: 10.99.99.35
+        fib: 0

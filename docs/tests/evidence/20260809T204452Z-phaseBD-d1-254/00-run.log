@@ -1,0 +1,11 @@
+=== PRECHECK ===
+=== SKIP INSTALL (SKIP_INSTALL=1) ===
+=== HOTPATCH layer7.inc (mitm_tables_apply) ===
+=== PHASE A (.54) ===
+=== PHASE B route (.254) ===
+=== PHASE C hosts (.24) ===
+=== PHASE D activate MITM ===
+=== EDGE .24 ===
+=== ROLLBACK (normal) ===
+=== ROLLBACK_ALL ===
+DONE PASS EVID=/Users/pablomichelin/Documents/Layer 7/docs/tests/evidence/20260809T204452Z-phaseBD-d1-254

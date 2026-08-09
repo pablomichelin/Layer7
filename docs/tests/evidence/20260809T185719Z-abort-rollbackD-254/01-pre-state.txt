@@ -1,0 +1,13 @@
+Sun Aug  9 18:57:20 UTC 2026
+PKG=1.9.42
+en=no eff=no
+src=[]
+dst=[]
+NO_MITM_NAT
+root    nginx       8972  5 tcp4  *:9999                *:*                  
+root    nginx       8830  5 tcp4  *:9999                *:*                  
+root    nginx       8810  5 tcp4  *:9999                *:*                  
+NO_19818
+-rwxr-xr-x  1 root wheel 949 Aug  9 15:50 /tmp/l7-phaseBD-rollback.sh
+-rwxr-xr-x  1 root wheel 949 Aug  9 15:22 /tmp/l7-phaseD-rollback.sh
+no_fs_proc

@@ -1,0 +1,11 @@
+=== PRECHECK ===
+=== INSTALL 1.9.46 PASSIVE ===
+=== PHASE A (.54) ===
+=== PHASE B route (.254) ===
+=== PHASE C hosts (.24) ===
+=== PHASE D activate MITM ===
+=== NEGATIVES (scope) ===
+=== EDGE .24 (sem --disable-quic) ===
+FAIL harness ainda tem --disable-quic
+TRAP_FAIL rc=12
+=== ROLLBACK_ALL ===

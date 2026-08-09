@@ -51,19 +51,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			$mitm = layer7_mitm_normalize($mitm);
 			$data = layer7_mitm_apply_to_config($data, $mitm);
 			if (empty($input_errors) && layer7_save_json($data)) {
-				layer7_mitm_sync_helper($data, true);
-				if (function_exists("filter_configure")) {
-					filter_configure();
+				$want_helper = layer7_mitm_should_start_helper($mitm, true);
+				$sync_ok = layer7_mitm_sync_helper($data, true);
+				if ($want_helper && !$sync_ok) {
+					/* Fail-safe: teardown + intenção OFF + filter sem rdr. */
+					$data = layer7_mitm_failsafe_rollback($data,
+					    "sync falhou apos save");
+					layer7_save_json($data);
+					layer7_filter_configure_safe();
+					$input_errors[] = l7_t(
+					    "Falha no control-plane MITM (tlsproxy timeout/erro). " .
+					    "Rollback fail-safe: helper/gate/flag/tabelas limpos e mitm.enabled=OFF."
+					);
+				} else {
+					layer7_filter_configure_safe();
+					$eff = layer7_mitm_effective($mitm, true);
+					$savemsg = $eff
+					    ? l7_t("Configuracao MITM gravada (mitm_effective ON).") .
+						" " . l7_t("Rdr selectivo activo (source_cidr E dest_cidr obrigatorios).")
+					    : l7_t(
+						"Configuracao MITM gravada. Intencao guardada; mitm_effective OFF " .
+						"(gates incompletos — exige CA, entitlement, runtime e source+dest IPv4)."
+					    );
 				}
-				$eff = layer7_mitm_effective($mitm, true);
-				$ns = count($mitm["intercept"]["source_cidr"] ?? array());
-				$nd = count($mitm["intercept"]["dest_cidr"] ?? array());
-				$savemsg = $eff
-				    ? l7_t("Configuracao MITM gravada (mitm_effective ON).") .
-					(($ns > 0 && $nd > 0)
-					    ? " " . l7_t("Rdr selectivo activo (origem E destino configurados).")
-					    : " " . l7_t("Sem source_cidr e dest_cidr juntos: zero rdr (helper pode escutar em loopback)."))
-				    : l7_t("Configuracao MITM gravada. Intencao guardada; mitm_effective OFF (gates incompletos).");
 				$mitm = layer7_mitm_from_config($data);
 			} elseif (empty($input_errors)) {
 				$input_errors[] = l7_t("Falha ao gravar layer7.json.");
@@ -78,11 +88,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 				$data = layer7_mitm_apply_to_config($data, $mitm);
 				layer7_save_json($data);
 				$data = layer7_load_or_default();
-				layer7_mitm_sync_helper($data, true);
-				if (function_exists("filter_configure")) {
-					filter_configure();
+				$mitm_after = layer7_mitm_from_config($data);
+				$want_helper = layer7_mitm_should_start_helper($mitm_after, true);
+				$sync_ok = layer7_mitm_sync_helper($data, true);
+				if ($want_helper && !$sync_ok) {
+					$data = layer7_mitm_failsafe_rollback($data,
+					    "sync falhou apos CA generate");
+					layer7_save_json($data);
+					layer7_filter_configure_safe();
+					$input_errors[] = l7_t(
+					    "CA gerada, mas falha no control-plane MITM (tlsproxy). " .
+					    "Rollback fail-safe: estado limpo (OFF)."
+					);
+				} else {
+					layer7_filter_configure_safe();
+					$savemsg = l7_t("CA gerada. Exporte o certificado e distribua via GPO — a chave nunca sai do appliance.");
 				}
-				$savemsg = l7_t("CA gerada. Exporte o certificado e distribua via GPO — a chave nunca sai do appliance.");
 				$mitm = layer7_mitm_from_config($data);
 			}
 		} elseif (isset($_POST["mitm_ca_import"])) {
@@ -95,11 +116,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 				$data = layer7_mitm_apply_to_config($data, $mitm);
 				layer7_save_json($data);
 				$data = layer7_load_or_default();
-				layer7_mitm_sync_helper($data, true);
-				if (function_exists("filter_configure")) {
-					filter_configure();
+				$mitm_after = layer7_mitm_from_config($data);
+				$want_helper = layer7_mitm_should_start_helper($mitm_after, true);
+				$sync_ok = layer7_mitm_sync_helper($data, true);
+				if ($want_helper && !$sync_ok) {
+					$data = layer7_mitm_failsafe_rollback($data,
+					    "sync falhou apos CA import");
+					layer7_save_json($data);
+					layer7_filter_configure_safe();
+					$input_errors[] = l7_t(
+					    "CA importada, mas falha no control-plane MITM (tlsproxy). " .
+					    "Rollback fail-safe: estado limpo (OFF)."
+					);
+				} else {
+					layer7_filter_configure_safe();
+					$savemsg = l7_t("CA importada.");
 				}
-				$savemsg = l7_t("CA importada.");
 				$mitm = layer7_mitm_from_config($data);
 			}
 		} elseif (isset($_POST["mitm_ca_delete"])) {
@@ -111,9 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 				$data = layer7_load_or_default();
 				/* 1.9.41: derrubar helper/gate/rdr quando CA some (effective OFF). */
 				layer7_mitm_sync_helper($data, true);
-				if (function_exists("filter_configure")) {
-					filter_configure();
-				}
+				layer7_filter_configure_safe();
 				$savemsg = l7_t("CA removida do appliance. Helper MITM parado se estava activo.");
 				$mitm = layer7_mitm_from_config($data);
 			}
@@ -308,8 +338,8 @@ if ($savemsg !== "") {
 <?php elseif (!$effective): ?>
 								<p class="help-block" style="margin-top:6px;">
 									<?= htmlspecialchars(l7_t(
-									    "Runtime e intercept_ready presentes. mitm_effective activa-se com intencao+CA. " .
-									    "Rdr so com source_cidr E dest_cidr preenchidos (selectivo)."
+									    "Runtime e intercept_ready presentes. mitm_effective exige intencao+CA+" .
+									    "source_cidr E dest_cidr IPv4 explicitos (vazio/invalido/any = fail-closed)."
 									)); ?>
 								</p>
 <?php endif; ?>
@@ -323,7 +353,8 @@ if ($savemsg !== "") {
 								<p class="help-block"><?= htmlspecialchars(l7_t(
 								    "Quem pode ser interceptado: CIDR/IP IPv4 de origem (ex.: um PC de teste 192.168.100.24/32). " .
 								    "Vazio = zero rdr — os outros clientes da LAN nao sao afectados. " .
-								    "Obrigatorio em conjunto com Destinos. Rejeita any, 0.0.0.0/0 e IPv6."
+								    "Obrigatorio em conjunto com Destinos. Proibido: any, 0.0.0.0/0, IPv6, prefixo </8 " .
+								    "(sem from any / expansao silenciosa)."
 								)); ?></p>
 							</div>
 						</div>
@@ -335,7 +366,7 @@ if ($savemsg !== "") {
 								<p class="help-block"><?= htmlspecialchars(l7_t(
 								    "Para onde o trafego e redireccionado (destino IPv4) → 127.0.0.1:8443. " .
 								    "Vazio = zero rdr. Use um destino de teste dedicado — nao a Internet inteira. " .
-								    "IPv6 nao e emitido (listener so IPv4). IPs do proprio appliance / GUI sao excluidos."
+								    "Sem rdr inet6 / ::1 / to any. IPs do proprio appliance / GUI sao excluidos."
 								)); ?></p>
 							</div>
 						</div>
@@ -355,9 +386,9 @@ if ($savemsg !== "") {
 								<select name="quic_mode" class="form-control">
 <?php
 $qmodes = array(
-	"bypass" => l7_t("Bypass (nao interceptar QUIC) — default S5"),
-	"block" => l7_t("Bloquear QUIC"),
-	"downgrade" => l7_t("Preferir downgrade para TCP (futuro)")
+	"bypass" => l7_t("Bypass (legado S5 — runtime ainda bloqueia UDP/443 no escopo MITM)"),
+	"block" => l7_t("Bloquear QUIC no escopo MITM (recomendado)"),
+	"downgrade" => l7_t("Preferir downgrade para TCP (igual a block no runtime actual)")
 );
 $qcur = $mitm["quic_mode"] ?? "bypass";
 foreach ($qmodes as $qv => $ql) {
@@ -366,7 +397,7 @@ foreach ($qmodes as $qv => $ql) {
 }
 ?>
 								</select>
-								<p class="help-block"><?= htmlspecialchars(l7_t("Decisao S5 escrita; sem efeito de intercept neste pacote.")); ?></p>
+								<p class="help-block"><?= htmlspecialchars(l7_t("Com MITM efectivo o produto emite block UDP/443 apenas de layer7_mitm_src para layer7_mitm_dst (forca fallback TCP). Sem regra global/IPv6. Remove-se no rollback.")); ?></p>
 							</div>
 						</div>
 						<div class="form-group">

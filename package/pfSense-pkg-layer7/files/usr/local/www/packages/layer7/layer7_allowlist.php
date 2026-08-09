@@ -86,9 +86,7 @@ if ($_POST["save_allowlist"] ?? false) {
 		if (layer7_save_json($data)) {
 			$applied = layer7_dst_allowlist_apply_to_pf();
 			layer7_signal_reload();
-			if (function_exists("filter_configure")) {
-				filter_configure();
-			}
+			layer7_filter_configure_safe();
 			$savemsg = sprintf(
 			    l7_t("Allowlist gravada (%d entradas do operador). %d IPs/CIDRs aplicados em <layer7_allow_dst>; o daemon repovoa dominios via DNS."),
 			    count($valid), $applied);

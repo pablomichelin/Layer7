@@ -1,0 +1,2 @@
+2026-08-09T19:46:26Z
+SCOPE=diagnose B+D Edge FAIL hypotheses; no .254 mutation; no .24 write

@@ -1,0 +1,45 @@
+#!/bin/sh
+# Mock de /usr/sbin/service para reproduzir bloqueio de onerestart sem appliance.
+# Só afecta invocações "layer7-tlsproxy onerestart|onestop|onestart|onestatus".
+set -eu
+name="${1:-}"
+action="${2:-}"
+sleep_s="${L7_MOCK_SERVICE_SLEEP:-8}"
+log="${L7_MOCK_SERVICE_LOG:-/dev/null}"
+
+logline() {
+	printf '%s %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$1" "$2" >>"$log" 2>/dev/null || true
+}
+
+if [ "$name" != "layer7-tlsproxy" ]; then
+	# Delegar se existir service real fora deste mock-bin (opcional).
+	if [ -x /usr/sbin/service ] && [ "$(command -v service)" != "$0" ]; then
+		exec /usr/sbin/service "$@"
+	fi
+	echo "mock-service: unsupported name=$name" >&2
+	exit 64
+fi
+
+case "$action" in
+onestatus)
+	logline "onestatus" "ok"
+	echo "layer7_tlsproxy is not running (mock)."
+	exit 1
+	;;
+onestop|onestart)
+	logline "$action" "quick"
+	exit 0
+	;;
+onerestart)
+	logline "onerestart" "sleep=${sleep_s}"
+	# Simula service que nao retorna (hipótese B+D).
+	# exec: sob timeout --foreground o TERM tem de atingir o sleep
+	# directamente — se sleep for neto do timeout, PHP exec() pode
+	# esperar o orfao ate ao fim (8s) mesmo com rc=124.
+	exec /bin/sleep "$sleep_s"
+	;;
+*)
+	echo "mock-service: unsupported action=$action" >&2
+	exit 64
+	;;
+esac

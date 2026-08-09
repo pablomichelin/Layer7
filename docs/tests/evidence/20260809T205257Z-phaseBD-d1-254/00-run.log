@@ -1,0 +1,4 @@
+=== PRECHECK ===
+FAIL missing /Users/pablomichelin/Documents/Layer 7/tmp-release/pfSense-pkg-layer7-1.9.46.pkg
+TRAP_FAIL rc=9
+=== ROLLBACK_ALL ===

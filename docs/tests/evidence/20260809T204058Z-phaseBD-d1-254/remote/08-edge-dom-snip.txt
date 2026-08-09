@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A ÔÇö mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+
+</body></html>
+
+

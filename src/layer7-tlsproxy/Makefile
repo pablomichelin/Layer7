@@ -2,12 +2,12 @@
 OUT ?= layer7-tlsproxy
 CC ?= cc
 CFLAGS ?= -O2 -Wall -Wextra -Werror
-CPPFLAGS += -DLAYER7_TLSPROXY_VERSION=\"0.1.1\"
+CPPFLAGS += -DLAYER7_TLSPROXY_VERSION=\"0.1.3\"
 SRCS = main.c ipc.c tls_lab.c
 LDLIBS ?= -lssl -lcrypto
 STUB ?= ./poc-upstream-stub.py
 
-.PHONY: all clean test test-poc3 test-poc4
+.PHONY: all clean test test-regress test-poc3 test-poc4
 
 all: $(OUT)
 
@@ -15,7 +15,11 @@ $(OUT): $(SRCS) ipc.h tls_lab.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $(OUT) $(SRCS) $(LDLIBS)
 
 clean:
-	rm -f $(OUT)
+	rm -f $(OUT) .l7-regress-bin
+
+# Regressões próximas ao código (D1 leaf + política sem bypass).
+test-regress:
+	sh ./test-regress.sh
 
 test: $(OUT)
 	./$(OUT) --version

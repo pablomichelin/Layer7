@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.42
+PORTVERSION=	1.9.46
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -78,7 +78,7 @@ do-build:
 		/usr/lib/libssl.a /usr/lib/libcrypto.a
 .if ${WITH_LAYER7_TLSPROXY:tl} == yes
 	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${LAYER7_TLSPROXY_DIR} \
-		-DLAYER7_TLSPROXY_VERSION=\"0.1.1\" \
+		-DLAYER7_TLSPROXY_VERSION=\"0.1.2\" \
 		-o ${WRKSRC}/layer7-tlsproxy \
 		${LAYER7_TLSPROXY_DIR}/main.c ${LAYER7_TLSPROXY_DIR}/ipc.c \
 		${LAYER7_TLSPROXY_DIR}/tls_lab.c \

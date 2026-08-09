@@ -1,0 +1,2 @@
+Failed to get a pseudo terminal: Operation not permitted
+Failed to get a pseudo terminal: Operation not permitted

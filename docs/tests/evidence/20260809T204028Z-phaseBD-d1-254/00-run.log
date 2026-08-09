@@ -1,0 +1,5 @@
+=== PRECHECK ===
+=== INSTALL 1.9.44 PASSIVE ===
+=== HOTPATCH layer7.inc (mitm_tables_apply) ===
+TRAP_FAIL rc=255
+=== ROLLBACK_ALL ===

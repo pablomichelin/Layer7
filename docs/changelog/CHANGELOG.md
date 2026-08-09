@@ -8,6 +8,142 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - (vazio)
 
+## [1.9.46] — 2026-08-09
+
+### Fixed
+
+- **Anti-QUIC / HTTP3 no escopo MITM:** com `mitm_effective` + control-plane
+  materializado, `layer7_generate_mitm_quic_filter_rules_text()` emite
+  `block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst>
+  port 443` em `pfearly` (antes do pass LAN), com `table … persist` para
+  `pfctl -nf` isolado. Força fallback TCP para o rdr MITM. Sem regra global,
+  sem IPv6; activada/desactivada com o MITM; teardown remove. Contrato:
+  `layer7_mitm_quic_line_ok`. Regressões em
+  `package/pfSense-pkg-layer7/tests/test_mitm_regress.php`.
+- **`layer7_filter_configure_safe` sync real:** invoca
+  `/etc/rc.filter_configure_sync` (bootstrap shaper/ipsec/vpn), não
+  `filter_configure()`/`send_event` async nem `php -r` só com `filter.inc`
+  (falha dummynet). Materializa rdr/quic antes do retorno.
+- Gate Edge: **proibido** `--disable-quic` como critério — o produto trata QUIC.
+
+### Release
+
+- Tag `v1.9.46` / `releases/latest` — Gate B+C **PASS**
+  (`docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/`; Edge sem flags)
+- SHA256: `10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`
+- Rollback lab: `1.9.42`
+
+## [1.9.45] — 2026-08-09 (candidata lab)
+
+### Fixed
+
+- **Tabelas PF MITM não materializadas:** `layer7_mitm_tables_apply_to_pf()`
+  (ensure+replace `layer7_mitm_src/dst`) após `filter_configure_safe` /
+  `layer7_pf_config_resync`. Sem isto o rdr existia mas o cliente via a
+  origem. Diagnóstico lab:
+  `docs/tests/evidence/20260809T204452Z-phaseBD-d1-254/` (Edge c/
+  `--disable-quic` = **não** Gate C PASS; ver `1.9.46` anti-QUIC).
+
+### Release
+
+- Candidata lab — tabelas PF; supersedida por `1.9.46` para Gate C
+- Rollback: `1.9.42` / `1.9.44` sem tabelas apply
+
+## [1.9.44] — 2026-08-09 (candidata lab)
+
+### Fixed
+
+- **Sync MITM ~25s / helper morto pelo `timeout`:** `layer7_exec_timeout`
+  passa a `timeout --foreground -k <grace>` e o rc.d usa `daemon -f`.
+  Sem `--foreground`, o FreeBSD `timeout` acompanha o process group do
+  `layer7-tlsproxy` daemonizado, não regressa no `onestart` e mata o helper
+  após ~20s+grace (`sync_sec≈25.5`). Prova:
+  `docs/tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/`
+  (`SYNC=ok sync_sec=0.332`, MITM left OFF). Consolida correcções `1.9.43`
+  (D1 leaf `0.1.3`, lifecycle, TLS sem bypass).
+- **Harness hang:** mock `onerestart` usa `exec /bin/sleep` para TERM atingir
+  o processo sob `--foreground` (Gate B4).
+
+### Release
+
+- Candidata lab — **Gate B PASS** no builder; publicar `.pkg`+SHA quando GO
+- Rollback: `1.9.42`
+
+## [1.9.43] — 2026-08-09 (candidata lab; supersedida por 1.9.44)
+
+### Fixed
+
+- **Control-plane finito (B+D hang):** `layer7_exec_timeout()` + timeouts
+  (`sysrc`/`service`/`fetch`/`pkg`/`activate`); `layer7_mitm_sync_helper` e
+  blockpage/daemon restart deixam de usar `exec()` sem limite; em falha/timeout
+  MITM faz limpeza idempotente (gate/flag/`onestop`/sysrc NO/flush) e erro
+  explícito na GUI. Causa do hang do activador B+D: `service … onerestart`
+  síncrono sem timeout. Testes:
+  `tests/functional/test_ctrl_exec_timeout.php`,
+  `tests/harness/mitm-activate-hang/run-local-timeout-fix.sh`.
+
+- **ETAPA 2 / D0 F1-bis (`timeout` sem `-k`):** `layer7_exec_timeout` passa a
+  usar `/usr/bin/timeout -k <L7_CTRL_TIMEOUT_KILL_GRACE> <sec>` (default grace
+  5s) para `SIGKILL` se o filho ignorar `SIGTERM` — fecha o hang observado em
+  `sync_sec=141` com constante 20s (`20260809T195101Z` + repro builder).
+  Fallback `proc_open` espelha TERM→grace→KILL. Teste: filho `trap '' TERM`.
+
+- **Correcções mínimas pós-D0 (uma por causa):** ver
+  `docs/09-blocking/correccoes-minimas-1.9.43-pos-D0.md` —
+  (1) leaf SNI D1; (2) `timeout -k`; (3) sync `onestop`+`onestart` +
+  `layer7_mitm_helper_listening()` se timeout com listen já UP (não limpar
+  runtime bom — `195101Z`).
+
+- **Fail-closed scope MITM:** `source_cidr` ∧ `dest_cidr` IPv4 explícitos
+  obrigatórios para `mitm_effective` / helper / rdr; vazio, `any`,
+  `0.0.0.0/0` ou inválido ⇒ OFF (`layer7_mitm_intercept_scope_ok` +
+  `layer7_mitm_validate`). Sem helper em loopback sem scope.
+
+- **Anti-expansão MITM (rdr):** proibido `from any` / `to any`, rdr genérico,
+  `inet6`/`::1` implícito, prefixo IPv4 `</8`, e activação com tokens
+  proibidos misturados (validate falha — sem aceitar o resto em silêncio).
+  Contrato de linha: `layer7_mitm_rdr_line_ok`.
+
+- **Lifecycle fail-safe / teardown / rollback:** rdr só com control-plane
+  materializado (gate+flag); `layer7_mitm_ctrl_cleanup` teardown limpo
+  (onestop→pkill se necessário, sysrc NO, flush tabelas, gate/flag); em falha
+  de sync a GUI chama `layer7_mitm_failsafe_rollback` (enabled=OFF +
+  `filter_configure_safe`). Idempotente.
+
+- **filter_configure bounded:** `layer7_filter_configure_safe` — anti-reentrada
+  (resync/depth/lock), timeout `L7_CTRL_TIMEOUT_FILTER` (subprocess + `-k`),
+  skip idempotente se lock ocupado. MITM enable/disable/reload idempotentes
+  (mesmo gate+listen ⇒ sem bounce). GUI MITM/settings/allowlist/diagnostics
+  e `layer7_pf_config_resync` / `layer7_bl_apply` passam pelo wrapper.
+
+- **TLS sem bypass:** política
+  `docs/09-blocking/politica-tls-sem-bypass.md` — proibido
+  `--ignore-certificate-errors` / `curl -k` / `CERT_NONE` nos gates MITM/Edge;
+  harnesses e PoC passam a `-CAfile`/`CERT_REQUIRED` + helper `tls-http-get.sh`.
+
+- **Testes de regressão próximos ao código:**
+  `src/layer7-tlsproxy/test-regress.sh` (`make test-regress`) e
+  `package/pfSense-pkg-layer7/tests/test_mitm_regress.php` (também em
+  `tests/run-local.sh`).
+
+- **Gates obrigatórios `1.9.43`:** SSOT
+  `docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md` (builder antes de
+  publish; B+D Edge humano; `.254` DEFER).
+
+- **Gate D1 / Edge TLS (B+D NO-GO):** `layer7-tlsproxy` `0.1.3` — se
+  `--cert/--key` forem CA (`CA:TRUE`), minta leaf por SNI (`serverAuth`,
+  `digitalSignature`/`keyEncipherment`, SAN=DNS:SNI, SKI/AKI, SHA-256);
+  verifica issuer/assinatura (`l7_leaf_identity_ok`); CA **não** é peer nem
+  vai na cadeia. Corrige `ERR_SSL_KEY_USAGE_INCOMPATIBLE`. CA GUI gerada com
+  extensões `CA:TRUE`+`keyCertSign`+SKI; import rejeita leaf. Smoke:
+  `tests/harness/mitm-activate-hang/run-local-tls-leaf-fix.sh`.
+  **Edge `.24` / novo B+D:** ainda exige GO humano (sem activar `.254` neste bloco).
+
+### Release
+
+- Candidata lab — publicar `.pkg` + SHA em `pablomichelin/Layer7` quando build OK
+- Rollback: `1.9.42`
+
 ## [1.9.42] — 2026-08-09
 
 ### Security

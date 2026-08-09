@@ -1,0 +1,51 @@
+EVID=/tmp/l7-phaseA-54-20260809T201355Z
+=== BASELINE ===
+Sun Aug  9 08:13:55 PM UTC 2026
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+ens160           UP             192.168.100.54/24 2804:6c4:8ff:f600:250:56ff:fe9d:5fa4/64 fe80::250:56ff:fe9d:5fa4/64 
+default via 192.168.100.254 dev ens160 proto static 
+192.168.100.0/24 dev ens160 proto kernel scope link src 192.168.100.54 
+no_http_listen
+192.168.100.24 dev ens160 src 192.168.100.54 uid 0 
+    cache 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+=== APPLY IP + RETURN ROUTE ===
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet 198.18.0.10/32 scope global lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host noprefixroute 
+       valid_lft forever preferred_lft forever
+192.168.100.24 via 192.168.100.254 dev ens160 
+192.168.100.24 via 192.168.100.254 dev ens160 src 192.168.100.54 uid 0 
+    cache 
+=== EPHEMERAL CA + SERVER CERT ===
+ca_fp=FD:2D:68:87:E6:BE:67:94:FA:42:63:13:0E:07:A2:0F:37:C0:3A:95:B0:8F:68:8C:98:E2:14:C8:3E:0D:3B:FE
+server_fp=87:2D:6A:13:DC:D9:46:2C:CB:F5:FC:5B:03:4C:EC:44:2C:7C:6B:C9:61:C2:7F:79:45:8B:6D:13:3F:E9:78:EA
+ca_subject=subject=CN = Layer7-PhaseA-Ephemeral-CA
+server_subject=subject=CN = mitm-lab.test
+server_san=X509v3 Subject Alternative Name:     DNS:mitm-lab.test, IP Address:198.18.0.10
+=== START HTTPS (bind 198.18.0.10:443 only) ===
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*    users:(("python3",pid=87209,fd=3))                      
+=== LOCAL TLS VALIDATION ===
+-- curl with CA --
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+
+-- openssl s_client SNI --
+subject=CN = mitm-lab.test
+issuer=CN = Layer7-PhaseA-Ephemeral-CA
+X509v3 Subject Alternative Name: 
+    DNS:mitm-lab.test, IP Address:198.18.0.10

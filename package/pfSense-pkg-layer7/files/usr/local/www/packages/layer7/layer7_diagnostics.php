@@ -133,9 +133,7 @@ if (isset($_POST["repair_pf_tables"])) {
 	$helper = layer7_pf_helper_path();
 	if (is_executable($helper)) {
 		exec(escapeshellarg($helper) . " ensure 2>/dev/null", $ensure_out, $ensure_rc);
-		if (function_exists("filter_configure")) {
-			filter_configure();
-		}
+		layer7_filter_configure_safe();
 		usleep(800000);
 		$tables_raw = array();
 		exec("/sbin/pfctl -s Tables 2>/dev/null", $tables_raw, $tables_rc);

@@ -1,0 +1,13 @@
+VER=1.9.46
+MITM_EFF=no
+GATE=no
+LISTEN8443=0
+RDR=0
+QUIC=0
+SRC=0
+DST=0
+GUI=200
+NET=OK
+   route to: 198.18.0.10
+destination: 0.0.0.0
+       mask: 0.0.0.0

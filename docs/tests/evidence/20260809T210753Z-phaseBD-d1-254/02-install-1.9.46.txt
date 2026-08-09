@@ -1,0 +1,32 @@
+Installing pfSense-pkg-layer7-1.9.46...
+pkg: wrong architecture: FreeBSD:15:amd64 instead of FreeBSD:16:amd64
+package pfSense-pkg-layer7 is already installed, forced install
+Extracting pfSense-pkg-layer7-1.9.46: ......... done
+Saving updated package information...
+overwrite!
+Loading package configuration... done.
+Configuring package components...
+Loading package instructions...
+Custom commands...
+Executing custom_php_resync_config_command()...done.
+Menu items... done.
+Services... done.
+Writing configuration... done.
+
+=== Layer7 instalado com sucesso ===
+  Versão:  1.9.46
+  Config:  /usr/local/etc/layer7.json
+  GUI:     Services > Layer 7
+
+  O pacote inicia em modo MONITOR (seguro).
+  Acesse a GUI para configurar interfaces e políticas.
+
+1.9.46
+0.1.2
+AES-256-XTS:1.3.111.2.1619.0.1.2
+layer7-tlsproxy: mint-mode ON (CA issuer; leaf peer serverAuth+SAN; Chromium-safe; default=%s)
+layer7-tlsproxy: mint-mode OFF (static server cert)
+mitm_forced_off
+GATE=NO
+EFF=NO
+LISTEN8443=0

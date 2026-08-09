@@ -1,0 +1,28 @@
+ca_gen=ok msg=CA gerada (CA:TRUE, keyCertSign, SKI).
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes
+sync=ok
+sync_sec=0.374
+filter_configure_safe=ok=yes skipped=no
+mitm_tables_entries=2
+effective_post=yes
+=== PF ===
+SRC_TABLE
+   192.168.100.24
+DST_TABLE
+   198.18.0.10
+GATE=YES
+EFF=YES
+layer7_tlsproxy is running as pid 31937.
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-PhaseD-Lab-CA
+X509v3 Basic Constraints: critical
+    CA:FALSE
+X509v3 Key Usage: critical
+    Digital Signature, Key Encipherment
+X509v3 Extended Key Usage: 
+    TLS Web Server Authentication
+X509v3 Subject Alternative Name: 
+    DNS:mitm-lab.test
+sha1 Fingerprint=E9:48:6C:47:DA:39:3E:97:E2:C6:9B:0A:5A:70:E2:DD:21:09:7D:ED

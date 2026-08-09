@@ -144,10 +144,59 @@ if (!$has_openssl) {
 		fail("runtime deve detectar binario no TEST_ROOT");
 	}
 	if (!layer7_mitm_effective($n2, true)) {
-		fail("effective true com CA+runtime+intercept_ready+enabled+entitlement");
+		fail("effective true com CA+runtime+intercept_ready+enabled+entitlement+scope");
+	}
+	/* Fail-closed: sem source+dest ⇒ effective false mesmo com CA/runtime. */
+	$n_noscope = layer7_mitm_normalize(array(
+		"enabled" => true,
+		"intercept" => array(
+			"source_cidr" => array(),
+			"dest_cidr" => array("203.0.113.10"),
+			"block_sni" => array("blocked.test")
+		)
+	));
+	if (layer7_mitm_effective($n_noscope, true)) {
+		fail("effective deve ser false sem source_cidr");
+	}
+	$errs_ns = layer7_mitm_validate(array(
+		"enabled" => true,
+		"intercept" => array(
+			"source_cidr" => array(),
+			"dest_cidr" => array("203.0.113.10")
+		)
+	));
+	if (empty($errs_ns)) {
+		fail("validate deve rejeitar activacao sem source+dest");
+	}
+	$errs_any = layer7_mitm_validate(array(
+		"enabled" => true,
+		"intercept" => array(
+			"source_cidr" => array("any"),
+			"dest_cidr" => array("203.0.113.10")
+		)
+	));
+	if (empty($errs_any)) {
+		fail("validate deve rejeitar source=any (fail-closed)");
+	}
+	if (!function_exists("layer7_mitm_intercept_scope_ok") ||
+	    layer7_mitm_intercept_scope_ok($n_noscope) ||
+	    !layer7_mitm_intercept_scope_ok($n2)) {
+		fail("intercept_scope_ok");
 	}
 	$cfg = layer7_mitm_apply_to_config(layer7_bare_config(), $n2);
 	$cfg["layer7"]["interfaces"] = array("lan");
+	/* Fail-safe: sem control-plane materializado ⇒ zero rdr. */
+	layer7_mitm_ctrl_cleanup("");
+	if (layer7_generate_mitm_rdr_snippet($cfg, true) !== "") {
+		fail("rdr deve ser vazio sem gate/flag materializados");
+	}
+	if (!layer7_mitm_sync_helper($cfg, true)) {
+		fail("sync ON para materializar control-plane antes do rdr");
+	}
+	if (!function_exists("layer7_mitm_control_plane_materialized") ||
+	    !layer7_mitm_control_plane_materialized()) {
+		fail("control_plane_materialized apos sync ON");
+	}
 	$snip = layer7_generate_mitm_rdr_snippet($cfg, true);
 	if (strpos($snip, "layer7_mitm_src") === false ||
 	    strpos($snip, "layer7_mitm_dst") === false ||
@@ -158,8 +207,63 @@ if (!$has_openssl) {
 	    strpos($snip, "from <layer7_mitm_src> to <layer7_mitm_dst>") === false) {
 		fail("rdr source+dest incompleto: " . $snip);
 	}
-	if (preg_match('/\bfrom\s+any\b/i', $snip)) {
-		fail("from any proibido no rdr MITM");
+	if (preg_match('/\bfrom\s+any\b/i', $snip) || preg_match('/\bto\s+any\b/i', $snip)) {
+		fail("from/to any proibido no rdr MITM");
+	}
+	foreach (explode("\n", $snip) as $ln_chk) {
+		$ln_chk = trim($ln_chk);
+		if ($ln_chk === "" || $ln_chk[0] === '#') {
+			continue;
+		}
+		if (preg_match('/\binet6\b/i', $ln_chk) || strpos($ln_chk, "::1") !== false) {
+			fail("rdr IPv6 / ::1 proibido no MITM: " . $ln_chk);
+		}
+	}
+	if (!function_exists("layer7_mitm_rdr_line_ok")) {
+		fail("layer7_mitm_rdr_line_ok em falta");
+	}
+	foreach (explode("\n", trim($snip)) as $ln) {
+		if ($ln === "") {
+			continue;
+		}
+		if (!layer7_mitm_rdr_line_ok($ln)) {
+			fail("rdr_line_ok rejeitou linha valida: " . $ln);
+		}
+	}
+	if (layer7_mitm_rdr_line_ok(
+	    "rdr on em0 inet proto tcp from any to <layer7_mitm_dst> port 443 -> 127.0.0.1 port 8443")) {
+		fail("rdr_line_ok deve rejeitar from any");
+	}
+	if (layer7_mitm_rdr_line_ok(
+	    "rdr on em0 inet6 proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port 443 -> ::1 port 8443")) {
+		fail("rdr_line_ok deve rejeitar inet6");
+	}
+
+	/* Prefixo </8 e IPv6 misturado: validate fail-closed (sem expansao silenciosa). */
+	if (layer7_mitm_normalize_ipv4_cidr_list(array("10.0.0.0/7", "0.0.0.0/1")) !== array()) {
+		fail("normalize rejeita prefixo </8");
+	}
+	$errs_broad = layer7_mitm_validate(array(
+		"enabled" => true,
+		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32", "10.0.0.0/7"),
+			"dest_cidr" => array("203.0.113.10")
+		)
+	));
+	$broad_txt = implode(" | ", $errs_broad);
+	if (strpos($broad_txt, "proibido") === false && strpos($broad_txt, "prefixo") === false) {
+		fail("validate deve rejeitar prefixo </8 misturado: " . $broad_txt);
+	}
+	$errs_v6mix = layer7_mitm_validate(array(
+		"enabled" => true,
+		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32", "2001:db8::1"),
+			"dest_cidr" => array("203.0.113.10")
+		)
+	));
+	$v6_txt = implode(" | ", $errs_v6mix);
+	if (strpos($v6_txt, "proibido") === false && strpos($v6_txt, "IPv6") === false) {
+		fail("validate deve rejeitar IPv6 misturado: " . $v6_txt);
 	}
 
 	/* Negativo: ambos vazios */
@@ -264,7 +368,39 @@ if (!$has_openssl) {
 	if (!is_file($flag)) {
 		fail("flag mitm.effective em falta apos sync ON");
 	}
+	/* Fail-safe rollback: teardown limpo + intenção OFF; rdr some. */
+	if (!function_exists("layer7_mitm_failsafe_rollback")) {
+		fail("layer7_mitm_failsafe_rollback em falta");
+	}
+	$rolled = layer7_mitm_failsafe_rollback($cfg, "test lifecycle");
+	if (!empty($rolled["layer7"]["mitm"]["enabled"])) {
+		fail("failsafe_rollback deve forcar mitm.enabled=OFF");
+	}
+	if (layer7_mitm_control_plane_materialized() || is_file($gate) || is_file($flag)) {
+		fail("failsafe deve remover gate/flag");
+	}
+	if (layer7_generate_mitm_rdr_snippet($cfg, true) !== "") {
+		fail("apos failsafe, zero rdr mesmo com cfg antiga effective");
+	}
+	/* Idempotente: segundo teardown permanece limpo */
+	layer7_mitm_failsafe_rollback($rolled, "test lifecycle 2");
+	if (layer7_mitm_control_plane_materialized()) {
+		fail("failsafe repetido deve permanecer limpo");
+	}
+	/* enable/disable/reload idempotentes */
+	if (!layer7_mitm_sync_helper($cfg, true)) {
+		fail("sync ON 1");
+	}
+	if (!layer7_mitm_sync_helper($cfg, true)) {
+		fail("sync ON 2 (reload idempotente) deve continuar true");
+	}
+	layer7_mitm_sync_helper(layer7_bare_config(), false);
+	layer7_mitm_sync_helper(layer7_bare_config(), false);
+	if (layer7_mitm_control_plane_materialized()) {
+		fail("disable idempotente deve permanecer limpo");
+	}
 	/* disable/reload OFF limpa gate/flag (+ flush tabelas em path real) */
+	layer7_mitm_sync_helper($cfg, true);
 	layer7_mitm_sync_helper(layer7_bare_config(), false);
 	if (is_file($gate)) {
 		fail("gate deve ser removido sem effective");

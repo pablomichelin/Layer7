@@ -1,6 +1,6 @@
 # Runbook — destino HTTPS lab local (`198.18.0.10/32` via `.54`)
 
-**Estado:** **Fase A+B+C = PASS**; **Fase D (MITM) = aguarda GO humano**.  
+**Estado:** **Fase A+B+C = PASS**; **Fase D = NO-GO** (`20260809T185035Z`); **Gate D0 PASS** (+ addendum); **Gate D1 PASS local**; **ETAPA 2** `timeout -k` na candidata `1.9.43`. **Sem** novo D até publish + GO humano.  
 **Tipo:** topologia de teste sem VPS (custo zero).  
 **Pré-requisito pacote:** `.254` `1.9.42` passivo (MITM OFF) — confirmado durante B/C.  
 **Proibido neste desenho:** `.234` / `.235`; mutações sem fail-safe; CDN público.  
@@ -128,7 +128,7 @@ staticroutes config vazio (não persistido)
 1. Backup `hosts` + inventário `LocalMachine\Root`  
 2. CA efêmera (só `.crt`) → `certutil -addstore Root` — subject `CN=Layer7-PhaseA-Ephemeral-CA`, thumbprint `768AD5B382F2D950DB4273D64E122788732575D8`  
 3. `hosts` marcado: `198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test`  
-4. Validação: resolve→`198.18.0.10`, GW `.254`, TCP/443, TLS trust sem bypass, Edge 151 real **sem** intersticial  
+4. Validação: resolve→`198.18.0.10`, GW `.254`, TCP/443, TLS trust sem bypass, Edge 151 real **sem** intersticial; **proibido** `--ignore-certificate-errors` / `curl -k` como prova de gate ([`politica-tls-sem-bypass.md`](politica-tls-sem-bypass.md))  
 5. Rollback ensaiado (CA+hosts) + re-apply — estado deixado UP para Fase D
 
 **Rollback C:** `powershell -File C:\Windows\Temp\phase-c-24.ps1 rollback`
@@ -171,6 +171,8 @@ Abort se rdr tiver `from any` ou tabelas sem src.
 | Aplicar Fase A? | **GO executado — PASS** (`20260809T180157Z-phaseA-54`) |
 | Aplicar Fase B? | **GO executado — PASS** (`20260809T180624Z-phaseB-254`; PF extra não preciso) |
 | Aplicar Fase C? | **GO executado — PASS** (`20260809T181302Z-phaseC-24`; Edge sem intersticial) |
-| Aplicar Fase D agora? | **GO executado — NO-GO Edge** (`20260809T185035Z-phaseBD-mitm-254`; rollback completo; novo GO necessário) |
+| Aplicar Fase D agora? | **NO-GO** — Edge `ERR_SSL_KEY_USAGE_INCOMPATIBLE`; rollback feito; ver Gate D0 |
+| Gate D0 (diagnóstico)? | **PASS** — [`diagnostico-D0-phaseBD-mitm-20260809.md`](diagnostico-D0-phaseBD-mitm-20260809.md) |
+| Reaplicar Fase D? | **Bloqueado** até Gate D1 (mint leaf) + **novo GO humano** |
 
-**Pedido ao proprietário:** confirmar **GO explícito para Fase D** (MITM escopado source `.24` + dest `198.18.0.10`). Não activar MITM sem esse GO. **Atenção:** fail-safe B (`at` ~15:50 −03 / sleep) ainda remove a rota — estender se D não for imediato.
+**Pedido ao proprietário:** GO para **Gate D1** (código: leaf por SNI). Não reactivar MITM em `.254` só com trust da CA — o peer actual é a própria CA.

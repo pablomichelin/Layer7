@@ -1,0 +1,6 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+2026-08-09T17:16:32.8939271-03:00 REMOVE_CA=DAF4054DA1E794E3E348F12EF2C990B727F11B0D|CN=Layer7-PhaseA-Ephemeral-CA
+2026-08-09T17:16:32.9359268-03:00 HOSTS_RESTORED_FROM_BAK
+2026-08-09T17:16:32.9429263-03:00 ROLLBACK_24_OK

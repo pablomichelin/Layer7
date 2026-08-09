@@ -1,5 +1,6 @@
 #!/bin/sh
 # S1/S2 load measurement on lab .54 — foreground, timeout-friendly, always cleanup.
+# TLS: CERT_REQUIRED + CAfile (proibido CERT_NONE / curl -k).
 set -eu
 cd "$(dirname "$0")"
 OUT=./layer7-tlsproxy
@@ -8,6 +9,8 @@ KEY=lab-certs/server.key
 STUB=./poc-upstream-stub.py
 N=${N:-100}
 SPID="" UPID=""
+# shellcheck source=tls-http-get.sh
+. ./tls-http-get.sh
 
 cleanup() {
 	if [ -n "${SPID:-}" ]; then kill -9 "$SPID" 2>/dev/null || true; fi
@@ -21,6 +24,10 @@ trap cleanup EXIT INT TERM
 test -x "$OUT"
 test -f "$CRT" -a -f "$KEY" -a -f "$STUB"
 
+CN=$(openssl x509 -in "$CRT" -noout -subject 2>/dev/null |
+	sed -n 's/.*CN *= *//p' | head -1)
+[ -n "$CN" ] || CN=lab.local
+
 python3 "$STUB" 19080 >/tmp/l7-up.log 2>&1 &
 UPID=$!
 sleep 0.3
@@ -32,13 +39,13 @@ SPID=$!
 i=0
 while [ "$i" -lt 40 ]; do
 	kill -0 "$SPID" 2>/dev/null || { echo "proxy died"; cat /tmp/l7-poc-s1.log; exit 1; }
-	if curl -sSk --connect-timeout 1 --max-time 1 https://127.0.0.1:8443/ | grep -q UPSTREAM_OK; then
+	if https_body "$CN" | grep -q UPSTREAM_OK; then
 		break
 	fi
 	i=$((i + 1))
 	sleep 0.05
 done
-curl -sSk --max-time 2 https://127.0.0.1:8443/ | grep -q UPSTREAM_OK
+https_body "$CN" | grep -q UPSTREAM_OK
 
 # Baseline: direct upstream (no TLS proxy)
 python3 - <<PY
@@ -60,17 +67,19 @@ IDLE=$(awk '/^cpu /{u=$2+$4; tot=$2+$3+$4+$5+$6+$7+$8; print u,tot}' /proc/stat)
 python3 - <<PY
 import ssl, socket, time
 N=$N
-ctx=ssl.create_default_context()
-ctx.check_hostname=False
-ctx.verify_mode=ssl.CERT_NONE
+CN="$CN"
+CRT="$CRT"
+ctx=ssl.create_default_context(cafile=CRT)
+ctx.verify_mode=ssl.CERT_REQUIRED
+ctx.check_hostname=True
 times=[]
 errors=0
 for _ in range(N):
     t0=time.perf_counter()
     try:
         s=socket.create_connection(("127.0.0.1",8443), timeout=2)
-        ss=ctx.wrap_socket(s, server_hostname="lab.local")
-        ss.sendall(b"GET / HTTP/1.0\\r\\nHost: lab.local\\r\\n\\r\\n")
+        ss=ctx.wrap_socket(s, server_hostname=CN)
+        ss.sendall(("GET / HTTP/1.0\r\nHost: %s\r\n\r\n" % CN).encode())
         data=b""
         while True:
             chunk=ss.recv(4096)

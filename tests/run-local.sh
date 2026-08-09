@@ -343,6 +343,31 @@ else
 	else
 		fail "test_dns_force_inet6"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_ctrl_exec_timeout.php; then
+		pass "test_ctrl_exec_timeout"
+	else
+		fail "test_ctrl_exec_timeout"
+	fi
+	if "$PHP_BIN_E2" package/pfSense-pkg-layer7/tests/test_mitm_regress.php; then
+		pass "test_mitm_regress (package)"
+	else
+		fail "test_mitm_regress (package)"
+	fi
+fi
+
+step "Regress: layer7-tlsproxy (junto ao codigo)"
+if [ -f src/layer7-tlsproxy/test-regress.sh ]; then
+	if command -v cc >/dev/null 2>&1 && command -v openssl >/dev/null 2>&1; then
+		if make -C src/layer7-tlsproxy test-regress; then
+			pass "tlsproxy test-regress"
+		else
+			fail "tlsproxy test-regress"
+		fi
+	else
+		printf "SKIP: tlsproxy test-regress (cc/openssl)\n"
+	fi
+else
+	fail "src/layer7-tlsproxy/test-regress.sh em falta"
 fi
 
 step "Lint: PHP do pacote (php -l)"

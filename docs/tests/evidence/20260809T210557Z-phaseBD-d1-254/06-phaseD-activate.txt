@@ -1,0 +1,36 @@
+ca_gen=ok msg=CA gerada (CA:TRUE, keyCertSign, SKI).
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes
+sync=ok
+sync_sec=0.875
+filter_configure_safe=ok=yes skipped=no
+mitm_tables_entries=2
+quic_snippet=yes
+effective_post=yes
+=== PF NAT ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+SRC_TABLE
+   192.168.100.24
+DST_TABLE
+   198.18.0.10
+=== PF NAT MITM ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+=== PF FILTER QUIC ===
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+GATE=YES
+EFF=YES
+layer7_tlsproxy is running as pid 30090.
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-PhaseD-Lab-CA
+X509v3 Basic Constraints: critical
+    CA:FALSE
+X509v3 Key Usage: critical
+    Digital Signature, Key Encipherment
+X509v3 Extended Key Usage: 
+    TLS Web Server Authentication
+X509v3 Subject Alternative Name: 
+    DNS:mitm-lab.test
+sha1 Fingerprint=47:5F:2D:12:C6:84:7C:12:34:95:66:2A:4C:10:CC:40:38:AC:33:83

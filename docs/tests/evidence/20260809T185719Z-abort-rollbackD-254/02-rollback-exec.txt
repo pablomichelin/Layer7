@@ -1,0 +1,8 @@
+USING=/tmp/l7-phaseBD-rollback.sh
+ROLLBACK_BD_START Sun Aug  9 18:57:21 UTC 2026
+MITM_CLEARED
+delete host 198.18.0.10 fib 0: not in table
+ROLLBACK_BD_CORE_DONE Sun Aug  9 18:57:21 UTC 2026
+layer7_tlsproxy_enable: NO -> NO
+delete host 198.18.0.10 fib 0: not in table
+ROLLBACK_SCRIPT_DONE

@@ -1,0 +1,6 @@
+VERDICT=FAIL
+EDGE_RC=non-zero
+CAUSE=PF_TABLES_NOT_MATERIALIZED
+DETAIL=rdr present; layer7_mitm_src/dst "Table does not exist"; Edge saw Phase A origin page
+SYNC=ok sync_sec=0.341 leaf=serverAuth
+FIX_FOLLOWUP=layer7_mitm_tables_apply_to_pf (1.9.45)

@@ -1,0 +1,93 @@
+HARNESS=inspect-leaf-chain
+UTC_NOW=2026-08-09T15:43:08Z
+SNI_REQUESTED=mitm-lab.test
+LISTEN=127.0.0.1:18449
+
+=== PEER / LEAF ===
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-Inspect-CA
+SERIAL=6A78A00D
+NOT_BEFORE=Aug  9 15:42:08 2026 GMT
+NOT_AFTER=Sep  8 15:43:08 2026 GMT
+CLOCK_VALID_NOW=yes
+SHA256=1D:F2:09:B6:23:85:91:EE:E4:CC:F1:4D:D7:CB:DC:4D:C7:FC:78:80:D6:46:45:1B:BE:05:E5:07:3F:12:3D:8D
+ENCODING_FIRST_LINE=-----BEGIN CERTIFICATE-----
+VERIFY_CAFILE=/tmp/l7-leaf-insp.SYrwk0/chain1.pem: OK 
+
+=== ALGORITMO ===
+        Signature Algorithm: sha256WithRSAEncryption
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+    Signature Algorithm: sha256WithRSAEncryption
+
+=== BasicConstraints / KeyUsage / EKU / SAN ===
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Subject Alternative Name: 
+                DNS:mitm-lab.test
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        0f:f1:75:6c:85:63:a2:89:bd:9b:4a:0d:a2:e9:cc:e5:52:85:
+        15:2e:d1:de:ba:e9:a6:53:74:d8:8c:26:8d:6c:6c:4b:84:cd:
+        b6:74:76:49:f6:e6:c1:db:43:65:d8:91:ab:8a:d1:11:f5:d4:
+        23:92:17:dd:6f:86:e6:5a:a7:f3:c3:23:c4:62:a2:3c:25:73:
+        9a:6c:72:4e:4f:b8:34:57:1d:2e:2c:a7:0e:d1:8a:33:ae:62:
+        27:f9:57:f0:03:dd:09:cb:2b:6e:31:4e:ad:52:90:21:33:08:
+        1d:45:cc:5a:39:77:01:5d:8c:f8:b3:82:4c:b9:47:e4:b4:62:
+        68:db:ea:1c:99:a4:5c:89:d7:85:9a:03:86:fd:06:9c:06:93:
+        de:46:a0:09:c4:54:61:a6:63:9e:83:95:1a:05:c0:66:90:b7:
+        eb:cb:75:89:7a:71:58:00:2a:89:4e:3e:fc:c7:5e:34:98:46:
+        94:3a:e6:4d:af:09:aa:0b:16:f7:a9:06:f9:a1:fd:cd:c9:44:
+        f2:8d:88:22:ac:bb:45:ba:bf:ff:7c:73:a0:ae:3d:ac:56:df:
+        ea:9c:42:af:7d:8c:03:16:81:1e:a5:56:13:a9:94:6a:b5:f2:
+        6a:e3:11:be:09:96:1b:3e:d0:a0:78:dc:62:da:62:2f:92:e9:
+        d7:fe:78:1f
+        X509v3 extensions:
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Subject Alternative Name: 
+                DNS:mitm-lab.test
+    Signature Algorithm: sha256WithRSAEncryption
+
+=== CHECKS ===
+ISSUER_MATCH_CA=YES
+SAN_HAS_SNI=YES
+EKU_SERVERAUTH=YES
+KU_DIGITAL_SIGNATURE=YES
+KU_KEY_ENCIPHERMENT=YES
+BC_CA_FALSE=YES
+BC_CA_TRUE=NO
+PEER_EQ_CA_FP=NO
+
+=== CHAIN ENVIADA ===
+CHAIN_CERT_COUNT=1
+-- chain[1] --
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-Inspect-CA
+sha1 Fingerprint=FD:A9:00:39:40:29:30:18:AF:33:9F:82:CA:93:43:6D:ED:CA:7A:68
+CHAIN_INCLUDES_CA=NO_LEAF_ONLY
+CA_SUBJECT_FILE=subject=CN=Layer7-Inspect-CA
+
+=== CACHE / RELOAD ===
+HANDSHAKE1_SERIAL=6A78A00D SHA256=1D:F2:09:B6:23:85:91:EE:E4:CC:F1:4D:D7:CB:DC:4D:C7:FC:78:80:D6:46:45:1B:BE:05:E5:07:3F:12:3D:8D
+HANDSHAKE2_SAME_SNI_SERIAL=6A78A00D SHA256=1D:F2:09:B6:23:85:91:EE:E4:CC:F1:4D:D7:CB:DC:4D:C7:FC:78:80:D6:46:45:1B:BE:05:E5:07:3F:12:3D:8D
+CACHE_HIT_SAME_CERT=YES
+HANDSHAKE3_OTHER_SNI_SERIAL=6A78A00E SHA256=E6:C6:41:C1:8A:51:5C:85:A4:BB:3F:F5:A5:3E:55:9E:C4:DB:5F:4D:35:C8:18:89:78:0B:21:B6:71:2A:7D:83
+OTHER_SNI_DIFFERENT_CERT=YES
+PROXY_LOG_MINT=layer7-tlsproxy: mint-mode ON (CA as issuer; leaf peer per SNI; default=mitm-lab.test)
+NOTE_CACHE=in-memory L7_LEAF_CACHE=32; FIFO evict; sem reload SIGHUP — só restart processo
+NOTE_RELOAD=rc.d onerestart / layer7_mitm_sync_helper reinicia processo e esvazia cache
+
+=== SNI WIRE (tlsextdebug se disponivel) ===
+TLS server extension "server name" (id=0), len=0
+
+=== VERDICT LINES ===
+PASS: leaf/chain inspection OK (SNI=mitm-lab.test, chain=1 leaf, cache hit, verify OK)

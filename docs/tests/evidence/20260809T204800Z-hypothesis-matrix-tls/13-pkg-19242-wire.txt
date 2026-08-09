@@ -1,0 +1,5 @@
+=== Product 1.9.42 wiring (CA as server cert) ===
+/tmp/l7-pkgwire.951BC0/usr/local/etc/rc.d/layer7-tlsproxy:64:	    [ -z "${LAYER7_TLSPROXY_CERT:-}" ] ||
+/tmp/l7-pkgwire.951BC0/usr/local/etc/rc.d/layer7-tlsproxy:79:	if [ ! -f "${LAYER7_TLSPROXY_CERT}" ] || [ ! -f "${LAYER7_TLSPROXY_KEY}" ]; then
+/tmp/l7-pkgwire.951BC0/usr/local/etc/rc.d/layer7-tlsproxy:85:	_args="--product-listen ${LAYER7_TLSPROXY_LISTEN} --cert ${LAYER7_TLSPROXY_CERT} --key ${LAYER7_TLSPROXY_KEY}"
+/tmp/l7-pkgwire.951BC0/usr/local/pkg/layer7.inc:6146:	    "LAYER7_TLSPROXY_CERT=" . $cert . "\n" .

@@ -1,0 +1,16 @@
+ABORT=filter_configure_hang
+ACTION=rollbackD_prepared_only
+TOUCHED_LICENSE=no
+TOUCHED_24=no
+TOUCHED_54=no
+MANUAL_PF_LOAD=no
+mitm_enabled_no=yes
+mitm_effective_no=yes
+no_mitm_nat=yes
+no_8443=yes
+no_19818=yes
+gui_200=yes
+net_ok=yes
+layer7d=yes
+STATE=PASS_CLEAN
+OVERALL=NO-GO

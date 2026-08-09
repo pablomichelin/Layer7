@@ -1,8 +1,10 @@
-# START HERE — Identity + MITM Add-on 【`1.9.42` source_cidr · 20.11 PASS】
+# START HERE — Identity + MITM Add-on 【`1.9.46` Gate C PASS · anti-QUIC】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
-> **20.10b/20.11 PASS**; hardening **`1.9.42`** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
-> **Sem** intercept em `.254`/`.234`/`.235` sem GO + runbook. Squid rejeitado.
+> **Gate C PASS** (`20260809T210753Z`) — Edge `.24` block page **sem** `--disable-quic`; anti-QUIC UDP/443 escopo MITM.  
+> Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
+> **Sem** intercept em `.254`/`.234`/`.235` sem GO + runbook. Squid rejeitado.  
+> **TLS:** proibido suavizar validação / `--ignore-certificate-errors` — [`politica-tls-sem-bypass.md`](../09-blocking/politica-tls-sem-bypass.md).
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -46,10 +48,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; **`1.9.42` source_cidr** (rev. `2026-08-09ah`) |
-| Passo actual | **`1.9.42` passivo**; ciclo B+D **NO-GO** (`20260809T185035Z`; Edge sem block page; rollback feito) |
-| Próximo | Diagnosticar trust/CA MITM + **novo GO** B+D |
-| Rev. do plano | **`2026-08-09ah`** |
+| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.46`** (Gate C PASS) |
+| Passo actual | **`1.9.46` publicada** — Gate B+C PASS; MITM produção `.254` **DEFER** (GO + runbook) |
+| Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B) PASS**; **C) PASS** (`210753Z`) |
+| Próximo | GO humano activação MITM escopada produção (runbook); `.234`/`.235` proibidos |
+| Rev. do plano | **`2026-08-09ao`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -125,9 +128,9 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.42**.
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.46**.
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
-Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; 20.11 PASS; hardening **1.9.42** source_cidr.
+Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; Gate C PASS (anti-QUIC escopo).
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
 GO produto: docs/09-blocking/GO-produto-20.10.md
 Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md
@@ -135,11 +138,13 @@ Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
 Ler na ordem do START-HERE; executar só o próximo bloco seguro (GO produção MITM via runbook; sem escrita .254 sem GO).
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
-rdr só source∧dest; um passo/bloco por entrega; português; barra UX PME; Squid rejeitado;
-S6 ECH = NA/limite; NÃO activar intercept em .254/.234/.235 sem GO humano produção.
-Estado: 1.9.42 PASS; evidência 20260809T173500Z-1.9.42-source-cidr; plano rev. 2026-08-09ah.
-Tarefa seguinte: **GO produção MITM** (humano + runbook; parar antes da 1ª escrita se não houver GO).
+rdr só source∧dest; anti-QUIC UDP/443 só mitm_src→mitm_dst; um passo/bloco por entrega; português;
+barra UX PME; Squid rejeitado; S6 ECH = NA/limite; NÃO activar intercept em .254/.234/.235 sem GO.
+Estado: 1.9.46 Gate B+C PASS (evidência 20260809T210753Z; Edge sem --disable-quic); plano rev. 2026-08-09ao.
+Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md — B) PASS; C) PASS.
+Tarefa seguinte: GO humano activação MITM escopada produção (runbook); sem mutar .234/.235.
 ```
+
 
 ## Prompt — propor desvio / ADR
 
@@ -153,17 +158,40 @@ Não implementar até GO. Responder em português.
 
 ---
 
+## TESTES / GATES OBRIGATÓRIOS (`1.9.43`)
+
+SSOT: [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md)
+
+| Fase | Obrigatório | Estado |
+|------|-------------|--------|
+| Doc | D0 + D1 local | **PASS** |
+| Builder (antes publish) | `make -C src/layer7-tlsproxy test-regress` · `test_mitm_regress.php` · `test_ctrl_exec_timeout.php` · `run-local-timeout-fix.sh` · `test_mitm_config.php` | **PASS** (`1.9.46`) |
+| Humano | B+D Edge `.24` sem bypass TLS **nem** `--disable-quic` | **PASS** (`20260809T210753Z-phaseBD-d1-254`) |
+| Produção | MITM em `.254` | **DEFER** (GO + runbook) |
+
+```sh
+make -C src/layer7-tlsproxy test-regress
+php package/pfSense-pkg-layer7/tests/test_mitm_regress.php
+php tests/functional/test_ctrl_exec_timeout.php
+sh tests/harness/mitm-activate-hang/run-local-timeout-fix.sh
+php tests/functional/test_mitm_config.php
+```
+
+---
+
 ## Progresso compacto (espelho do plano)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.42 passivo**; ciclo B+D **NO-GO** (`20260809T185035Z`)
-- Próximo: diagnosticar trust/CA MITM + novo GO B+D
-- Latest: **1.9.42** SHA `6bd6ba37…4c4b`
-- Evidência passiva: 20260809T175111Z-1.9.42-passive-254
-- Evidência Fase A/B/C: 20260809T180157Z-phaseA-54 / …phaseB-254 / …phaseC-24
-- Evidência B+D NO-GO: 20260809T185035Z-phaseBD-mitm-254
-- S6 ECH: NA/limite (não exercitado)
+- Passo actual: **1.9.46** lab/latest — Gate B+C PASS; MITM prod DEFER
+- Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B PASS; C PASS 210753Z)
+- 1.9.44: timeout --foreground + daemon -f (Gate B; sync 0.33s)
+- 1.9.45: layer7_mitm_tables_apply_to_pf (tabelas live)
+- 1.9.46: anti-QUIC UDP/443 src→dst + filter_configure_sync; Edge sem flags PASS
+- 204452Z: DIAGNÓSTICO (--disable-quic ≠ PASS); supersedido por 210753Z
+- Latest publicado: **1.9.46** SHA `10998477…ae72f5`
+- Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
+- Próximo: GO activação MITM produção (runbook); .234/.235 proibidos
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
@@ -183,12 +211,18 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
 | Evidência 20.11 | [`../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/) |
 | Evidência 1.9.42 | [`../tests/evidence/20260809T173500Z-1.9.42-source-cidr/`](../tests/evidence/20260809T173500Z-1.9.42-source-cidr/) |
+| Evidência Gate C `1.9.46` | [`../tests/evidence/20260809T210753Z-phaseBD-d1-254/`](../tests/evidence/20260809T210753Z-phaseBD-d1-254/) |
 | Runbook activação prod. | [`../09-blocking/runbook-activacao-mitm-producao-1.9.42.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.42.md) |
 | Destino lab `198.18` via `.54` | [`../09-blocking/runbook-destino-lab-19818-via-54.md`](../09-blocking/runbook-destino-lab-19818-via-54.md) |
 | Evidência Fase A `.54` | [`../tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/) |
 | Evidência Fase B `.254` | [`../tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/) |
 | Evidência Fase C `.24` | [`../tests/evidence/20260809T181302Z-phaseC-24/`](../tests/evidence/20260809T181302Z-phaseC-24/) |
 | Evidência B+D NO-GO | [`../tests/evidence/20260809T185035Z-phaseBD-mitm-254/`](../tests/evidence/20260809T185035Z-phaseBD-mitm-254/) |
+| Abort rollback D | [`../tests/evidence/20260809T185719Z-abort-rollbackD-254/`](../tests/evidence/20260809T185719Z-abort-rollbackD-254/) |
+| Gates obrigatórios `1.9.43` | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) |
+| Gate D0 diagnóstico | [`../09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md`](../09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md) |
+| Gate D1 leaf | [`../09-blocking/gate-D1-leaf-sni-20260809.md`](../09-blocking/gate-D1-leaf-sni-20260809.md) |
+| TLS sem bypass | [`../09-blocking/politica-tls-sem-bypass.md`](../09-blocking/politica-tls-sem-bypass.md) |
 | Spike MITM + reopen | [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) |
 | PoC lab tlsproxy | [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |

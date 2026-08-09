@@ -1,0 +1,5 @@
+=== PRECHECK ===
+=== INSTALL 1.9.44 PASSIVE ===
+=== PHASE A (.54) ===
+TRAP_FAIL rc=1
+=== ROLLBACK_ALL ===

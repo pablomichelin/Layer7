@@ -35,13 +35,14 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.42` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.42`;
-`SHA256=6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`;
-BG-087 hardening `intercept.source_cidr` + `dest_cidr` obrigatórios;
+`1.9.46` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.46`;
+`SHA256=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`;
+anti-QUIC UDP/443 escopo MITM + tabelas PF live + `filter_configure_sync`;
+Gate C Edge PASS `20260809T210753Z`; BG-087 `source_cidr`∧`dest_cidr`;
 `intercept_ready=true`; default OFF; rdr `from <layer7_mitm_src> to <layer7_mitm_dst>`
 (proibido `from any`); comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.41`**.
-**MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **`1.9.42` PASS** source scope;
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.42`**.
+**MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **sem** intercept produção `.254/.234/.235` sem GO + runbook.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
@@ -1317,13 +1318,13 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM GO 2026-08-08)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.42`** (source_cidr hardening).
+Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.46`** (Gate C PASS / anti-QUIC).
 **IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
 **20.8 PASS** → **20.9 PASS** → **GO produto** → **20.10a PASS** → **20.10b PASS** →
-**20.11 PASS** → **`1.9.42` PASS** source∧dest;
+**20.11 PASS** → **`1.9.42` PASS** source∧dest → **`1.9.46` Gate C PASS**;
 **IM3–IM9 Identity rede FECHADA** (20.33 / GI9 PASS). **Nicho:** PME / MSP.
 **MITM:** `intercept_ready=true`; rdr gated por `mitm_effective` + source∧dest;
-default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
+anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1346,7 +1347,15 @@ default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 - **Backlog:** BG-085…BG-092 (BG-087 **`1.9.42` PASS**; BG-091 fechado ADR-0029)
 - **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→20.11→**`1.9.42`**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09ah`
+- **Rev. plano:** `2026-08-09ao`
+- **Gate D0:** [`docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md`](docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md) — **PASS** (+ [addendum hipóteses](docs/09-blocking/diagnostico-D0-addendum-hipoteses-20260809.md))
+- **Gate D1:** [`docs/09-blocking/gate-D1-leaf-sni-20260809.md`](docs/09-blocking/gate-D1-leaf-sni-20260809.md) — **PASS** (Edge Gate C)
+- **`1.9.44`:** D1 leaf `0.1.3` + `timeout --foreground -k` + `daemon -f`; sync prova `0.33s` ([evidência](docs/tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/)); **Gate B PASS**
+- **`1.9.45`:** `layer7_mitm_tables_apply_to_pf` (tabelas live); `204452Z` Edge c/ `--disable-quic` = **diagnóstico**, não Gate C
+- **`1.9.46` (publicada):** anti-QUIC UDP/443 só `layer7_mitm_src`→`layer7_mitm_dst` + `filter_configure_sync`; **Gate C PASS** ([evidência](docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/))
+- **Gates obrigatórios:** [`docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md`](docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B) PASS**; **C) PASS**
+- **Evidência B+D NO-GO:** [`docs/tests/evidence/20260809T185035Z-phaseBD-mitm-254/`](docs/tests/evidence/20260809T185035Z-phaseBD-mitm-254/)
+- **Abort rollback D:** [`docs/tests/evidence/20260809T185719Z-abort-rollbackD-254/`](docs/tests/evidence/20260809T185719Z-abort-rollbackD-254/)
 - **Evidência 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/)
 - **Auditoria pós-release 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/`](docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/)
 - **Evidência 20.11:** [`docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/)
@@ -1359,14 +1368,16 @@ default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.42 passivo**; ciclo B+D lab **NO-GO** (`20260809T185035Z`; Edge sem block page)
-- Próximo: diagnosticar trust/CA MITM no `.24` + novo GO humano B+D
-- Destino lab: `docs/09-blocking/runbook-destino-lab-19818-via-54.md`
-- Evidência A/B/C: `20260809T180157Z-phaseA-54` / `…phaseB-254` / `…phaseC-24`
-- Evidência B+D NO-GO: `20260809T185035Z-phaseBD-mitm-254`
-- Latest: **1.9.42** SHA `6bd6ba37…4c4b`
-- Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; produção sem MITM após rollback
+- Passo actual: **1.9.46** lab/latest — Gate B+C PASS; MITM prod DEFER
+- Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B PASS; C PASS 210753Z)
+- 1.9.45: layer7_mitm_tables_apply_to_pf; 204452Z = DIAGNÓSTICO (--disable-quic ≠ PASS)
+- 1.9.46: anti-QUIC + filter_configure_sync; Edge sem flags PASS
+- Sync foreground: evidência 20260809T202500Z (0.33s; MITM left OFF)
+- Hang F1-bis: timeout --foreground -k (L7_CTRL_TIMEOUT_KILL_GRACE=5)
+- Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
+- Próximo: GO activação MITM produção (runbook); .234/.235 proibidos
+- Latest publicado: **1.9.46** SHA 10998477…ae72f5
+- Identity rede: FECHADA (20.33 / GI9 PASS); Squid REJEITADO
 ```
 
 ---
@@ -1555,19 +1566,20 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-09 (1.9.42 source_cidr PASS; 20.11 GI2/GI3; S6 NA)
+- Data base: 2026-08-09 (1.9.46 Gate C PASS; anti-QUIC escopo MITM; 20.11 GI2/GI3; S6 NA)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.42** (BG-087 source_cidr; SHA `6bd6ba37…4c4b`)
+- Canal publico latest: **1.9.46** (SHA `10998477…ae72f5`)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **1.9.42 PASS** source∧dest; S6 NA; próximo GO produção MITM (humano+runbook); Squid rejeitado
+- Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.46** Gate B+C PASS; MITM prod DEFER; Squid rejeitado
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md
-- Proximo trabalho: GO activação MITM escopada (humano) — destino `/32` dedicado pendente; `.234/.235` proibidos
-- Appliance `.254`: **1.9.42 passivo** (smoke PASS `20260809T175111Z`; MITM OFF; zero rdr)
-- Pacote publicado: **1.9.42**; rollback appliance: **1.9.38** (local `/tmp`); rollback lab: **1.9.41**
+- Evidência Gate C: docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/
+- Proximo trabalho: GO activação MITM escopada (humano) — destino `/32` dedicado; `.234/.235` proibidos
+- Appliance `.254`: **1.9.46 passivo** (MITM OFF; zero rdr/quic/8443; GUI/NET OK pós-teardown)
+- Pacote publicado: **1.9.46**; rollback lab: **1.9.42**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -1578,10 +1590,10 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.38`**
-  publicado em `pablomichelin/Layer7` tag `v1.9.38`
-  (`SHA256=7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`).
-  Rollback lab imediato: **`v1.9.37`**.
+- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.46`**
+  publicado em `pablomichelin/Layer7` tag `v1.9.46`
+  (`SHA256=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`).
+  Rollback lab imediato: **`v1.9.42`**.
 - A referencia de **producao enforce** e **`1.9.8`** (GV7.4 PASS `2026-08-05`;
   evidência `20260805T150500Z-gv7.4-promocao-1.9.8`). Promoção **para além
   de `1.9.8`** permanece **PENDENTE** GO humano (não confundir com `latest`).

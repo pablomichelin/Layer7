@@ -1,0 +1,52 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+No C:\Windows\Temp\phase-c-24.ps1:203 caractere:48
++     throw "TLS trust failed / interstitial É?" do not bypass"
++                                                ~~
+Token 'do' inesperado na express∆o ou instruá∆o.
+No C:\Windows\Temp\phase-c-24.ps1:203 caractere:50
++     throw "TLS trust failed / interstitial É?" do not bypass"
++                                                  ~
+Corpo de instruá∆o ausente no loop do.
+No C:\Windows\Temp\phase-c-24.ps1:293 caractere:64
++ ... f (-not (Test-Path $CaPath)) { throw "Missing $CaPath É?" scp CA firs ...
++                                                               ~~~
+Token 'scp' inesperado na express∆o ou instruá∆o.
+No C:\Windows\Temp\phase-c-24.ps1:309 caractere:39
++ "@ | Set-Content (Join-Path $EvidDir "11-VERDICT.txt")
++                                       ~~~~~~~~~~~~~~~~
+Token '11-VERDICT.txt")
+    Log "PHASE_C_PASS"
+  }
+  default { throw "usage:' inesperado na express∆o ou instruá∆o.
+No C:\Windows\Temp\phase-c-24.ps1:309 caractere:41
++ "@ | Set-Content (Join-Path $EvidDir "11-VERDICT.txt")
++                                         ~~~~~~~~
+Token '-VERDICT' inesperado na express∆o ou instruá∆o.
+No C:\Windows\Temp\phase-c-24.ps1:309 caractere:49
++ "@ | Set-Content (Join-Path $EvidDir "11-VERDICT.txt")
++                                                 ~~~~~~
+Token '.txt")
+    Log "PHASE_C_PASS"
+  }
+  default { throw "usage:' inesperado na express∆o ou instruá∆o.
+No C:\Windows\Temp\phase-c-24.ps1:312 caractere:41
++   default { throw "usage: apply|rollback" }
++                                         ~~~
+A cadeia de caracteres n∆o tem o terminador: ".
+No C:\Windows\Temp\phase-c-24.ps1:293 caractere:35
++     if (-not (Test-Path $CaPath)) { throw "Missing $CaPath É?" scp CA ...
++                                   ~
+'}' de fechamento ausente no bloco de instruá∆o ou na definiá∆o de tipo.
+No C:\Windows\Temp\phase-c-24.ps1:291 caractere:11
++   "apply" {
++           ~
+'}' de fechamento ausente no bloco de instruá∆o ou na definiá∆o de tipo.
+No C:\Windows\Temp\phase-c-24.ps1:283 caractere:18
++ switch ($Action) {
++                  ~
+'}' de fechamento ausente no bloco de instruá∆o ou na definiá∆o de tipo.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : UnexpectedToken
+ 

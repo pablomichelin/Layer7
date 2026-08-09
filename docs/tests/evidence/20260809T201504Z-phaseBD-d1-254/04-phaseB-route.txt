@@ -1,0 +1,24 @@
+Job 10 will be executed using /bin/sh
+Date				Owner		Queue	Job#
+Sun Aug  9 17:24:00 -03 2026	root            c	8
+Sun Aug  9 17:24:00 -03 2026	root            c	9
+Sun Aug  9 17:27:00 -03 2026	root            c	10
+Sun Aug  9 17:22:00 -03 2026	root            c	7
+delete host 198.18.0.10 fib 0: not in table
+add host 198.18.0.10: gateway 192.168.100.54
+   route to: 198.18.0.10
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+        fib: 0
+  interface: vmx0
+      flags: <UP,GATEWAY,HOST,DONE,STATIC>
+ recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+       0         0         0         0      1500         1         0 
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+GUI=200

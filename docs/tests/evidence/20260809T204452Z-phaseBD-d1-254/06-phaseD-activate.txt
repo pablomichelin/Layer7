@@ -1,0 +1,30 @@
+ca_gen=ok msg=CA gerada (CA:TRUE, keyCertSign, SKI).
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes
+sync=ok
+sync_sec=0.358
+filter_configure_safe=ok=yes skipped=no
+mitm_tables_entries=2
+effective_post=yes
+=== PF ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+SRC_TABLE
+   192.168.100.24
+DST_TABLE
+   198.18.0.10
+GATE=YES
+EFF=YES
+layer7_tlsproxy is running as pid 10716.
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-PhaseD-Lab-CA
+X509v3 Basic Constraints: critical
+    CA:FALSE
+X509v3 Key Usage: critical
+    Digital Signature, Key Encipherment
+X509v3 Extended Key Usage: 
+    TLS Web Server Authentication
+X509v3 Subject Alternative Name: 
+    DNS:mitm-lab.test
+sha1 Fingerprint=F7:C4:B7:C7:66:FD:8C:6D:42:6C:54:69:C1:ED:2B:76:0F:33:45:1F

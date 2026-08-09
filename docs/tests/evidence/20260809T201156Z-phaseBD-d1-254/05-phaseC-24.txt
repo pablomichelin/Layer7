@@ -1,0 +1,13 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+2026-08-09T17:12:13.5175586-03:00 === APPLY C ===
+2026-08-09T17:12:13.7015650-03:00 HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test
+Select-String : NÆo ‚ poss¡vel localizar um parƒmetro posicional que aceite o argumento '# 
+L7-PHASE-C-19818-mitm-lab.test'.
+No C:\Windows\Temp\phase-c-24.ps1:118 caractere:15
++ ... $hostsHit = Select-String -Path $HostsFile -Pattern [regex]::Escape($ ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Select-String], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : PositionalParameterNotFound,Microsoft.PowerShell.Commands.SelectStringCommand
+ 

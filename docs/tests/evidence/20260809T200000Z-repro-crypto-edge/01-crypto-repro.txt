@@ -1,0 +1,294 @@
+=== A) CA-as-peer (classe KEY_USAGE) ===
+NOTE: evidencia tem so ca.crt; gerando CA efemera com KU equivalente
+=== Evidencia B+D CA KU ===
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+            X509v3 Key Usage: 
+                Certificate Sign, CRL Sign
+    Signature Algorithm: sha256WithRSAEncryption
+=== Harness CA KU ===
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+            X509v3 Key Usage: 
+                Certificate Sign, CRL Sign
+            X509v3 Subject Key Identifier: 
+                C1:9D:05:E2:CF:B3:1A:E3:F1:7B:21:61:D4:AA:4D:D1:CD:7D:F0:D7
+            X509v3 Authority Key Identifier: 
+                C1:9D:05:E2:CF:B3:1A:E3:F1:7B:21:61:D4:AA:4D:D1:CD:7D:F0:D7
+    Signature Algorithm: sha256WithRSAEncryption
+=== Peer apresentado (s_client) ===
+subject=CN=Layer7-Harness-CA
+            X509v3 Basic Constraints: critical
+                CA:TRUE
+            X509v3 Key Usage: 
+                Certificate Sign, CRL Sign
+            X509v3 Subject Key Identifier: 
+                C1:9D:05:E2:CF:B3:1A:E3:F1:7B:21:61:D4:AA:4D:D1:CD:7D:F0:D7
+            X509v3 Authority Key Identifier: 
+                C1:9D:05:E2:CF:B3:1A:E3:F1:7B:21:61:D4:AA:4D:D1:CD:7D:F0:D7
+    Signature Algorithm: sha256WithRSAEncryption
+PASS: peer TLS = CA com KU certSign/CRLSign (classe B+D / KEY_USAGE)
+PRODUCT_ALIGN=layer7_mitm_sync_helper CERT/KEY=ca + SSL_CTX_use_certificate_file
+WORK=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T//l7-mitm-tls.ZzalN4
+
+=== B) Leaf fix (Gate D1) ===
+HARNESS=mitm-tls-leaf-fix WORK=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T//l7-mitm-leaf.yzAoBh SNI=mitm-lab.test PORT=18445
+cc -DLAYER7_TLSPROXY_VERSION=\"0.1.2\" -O2 -Wall -Wextra -Werror -o /var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T//l7-mitm-leaf.yzAoBh/layer7-tlsproxy main.c ipc.c tls_lab.c -lssl -lcrypto
+ld: warning: ignoring file '/usr/local/lib/libssl.dylib': found architecture 'x86_64', required architecture 'arm64'
+ld: warning: ignoring file '/usr/local/lib/libcrypto.dylib': found architecture 'x86_64', required architecture 'arm64'
+Undefined symbols for architecture arm64:
+  "_ASN1_INTEGER_set", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_ERR_print_errors_fp", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_EVP_PKEY_Q_keygen", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_EVP_PKEY_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_mint_reset in tls_lab-c1b052.o
+      _l7_mint_reset in tls_lab-c1b052.o
+  "_EVP_sha256", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_OPENSSL_init_ssl", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_PEM_read_PrivateKey", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_PEM_read_X509", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_CTX_callback_ctrl", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_CTX_check_private_key", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_CTX_ctrl", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_CTX_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_CTX_new", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_CTX_use_PrivateKey", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_CTX_use_certificate", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_accept", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_get_servername", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_sni_callback in tls_lab-c1b052.o
+  "_SSL_new", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_read", referenced from:
+      _serve_by_verdict in tls_lab-c1b052.o
+  "_SSL_set_fd", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_shutdown", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_SSL_use_PrivateKey", referenced from:
+      _l7_sni_callback in tls_lab-c1b052.o
+  "_SSL_use_certificate", referenced from:
+      _l7_sni_callback in tls_lab-c1b052.o
+  "_SSL_write", referenced from:
+      _serve_by_verdict in tls_lab-c1b052.o
+      _serve_by_verdict in tls_lab-c1b052.o
+      _serve_by_verdict in tls_lab-c1b052.o
+      _serve_by_verdict in tls_lab-c1b052.o
+  "_TLS_server_method", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_X509V3_EXT_nconf_nid", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509V3_set_ctx", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_EXTENSION_free", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_NAME_add_entry_by_txt", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_add_ext", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_check_ca", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+  "_X509_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_tls_lab_listen in tls_lab-c1b052.o
+      _l7_mint_reset in tls_lab-c1b052.o
+      _l7_mint_reset in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      ...
+  "_X509_get_serialNumber", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_get_subject_name", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_getm_notAfter", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_getm_notBefore", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_gmtime_adj", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_new", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_set_issuer_name", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_set_pubkey", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_set_version", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+  "_X509_sign", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-c1b052.o
+ld: symbol(s) not found for architecture arm64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make: *** [/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T//l7-mitm-leaf.yzAoBh/layer7-tlsproxy] Error 1
+
+=== C) Inspect leaf/chain ===
+ld: warning: ignoring file '/usr/local/lib/libcrypto.dylib': found architecture 'x86_64', required architecture 'arm64'
+ld: warning: ignoring file '/usr/local/lib/libssl.dylib': found architecture 'x86_64', required architecture 'arm64'
+Undefined symbols for architecture arm64:
+  "_ASN1_INTEGER_set", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_ERR_print_errors_fp", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_EVP_PKEY_Q_keygen", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_EVP_PKEY_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_mint_reset in tls_lab-99eb2d.o
+      _l7_mint_reset in tls_lab-99eb2d.o
+  "_EVP_sha256", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_OPENSSL_init_ssl", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_PEM_read_PrivateKey", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_PEM_read_X509", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_CTX_callback_ctrl", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_CTX_check_private_key", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_CTX_ctrl", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_CTX_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_CTX_new", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_CTX_use_PrivateKey", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_CTX_use_certificate", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_accept", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_get_servername", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_sni_callback in tls_lab-99eb2d.o
+  "_SSL_new", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_read", referenced from:
+      _serve_by_verdict in tls_lab-99eb2d.o
+  "_SSL_set_fd", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_shutdown", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_SSL_use_PrivateKey", referenced from:
+      _l7_sni_callback in tls_lab-99eb2d.o
+  "_SSL_use_certificate", referenced from:
+      _l7_sni_callback in tls_lab-99eb2d.o
+  "_SSL_write", referenced from:
+      _serve_by_verdict in tls_lab-99eb2d.o
+      _serve_by_verdict in tls_lab-99eb2d.o
+      _serve_by_verdict in tls_lab-99eb2d.o
+      _serve_by_verdict in tls_lab-99eb2d.o
+  "_TLS_server_method", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_X509V3_EXT_nconf_nid", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509V3_set_ctx", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_EXTENSION_free", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_NAME_add_entry_by_txt", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_add_ext", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_check_ca", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+  "_X509_free", referenced from:
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_tls_lab_listen in tls_lab-99eb2d.o
+      _l7_mint_reset in tls_lab-99eb2d.o
+      _l7_mint_reset in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      ...
+  "_X509_get_serialNumber", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_get_subject_name", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_getm_notAfter", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_getm_notBefore", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_gmtime_adj", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_new", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_set_issuer_name", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_set_pubkey", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_set_version", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+  "_X509_sign", referenced from:
+      _l7_leaf_get_or_mint in tls_lab-99eb2d.o
+ld: symbol(s) not found for architecture arm64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make: *** [/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T//l7-leaf-insp.VI9XSk/layer7-tlsproxy] Error 1

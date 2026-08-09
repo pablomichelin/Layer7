@@ -1,0 +1,29 @@
+Sun Aug  9 18:57:21 UTC 2026
+mitm_enabled=no
+mitm_effective=no
+source_cidr=[]
+dest_cidr=[]
+block_sni=[]
+=== NAT ===
+NO_MITM_NAT
+=== TABLES ===
+pfctl: Table does not exist.
+pfctl: Table does not exist.
+=== LISTEN ===
+root    nginx       8972  5 tcp4  *:9999                *:*                  
+root    nginx       8830  5 tcp4  *:9999                *:*                  
+root    nginx       8810  5 tcp4  *:9999                *:*                  
+=== ROUTE ===
+NO_19818
+destination: 0.0.0.0
+    gateway: 10.99.99.35
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+layer7d is running as pid 5401.
+GUI=200
+SSH_LOCAL=ok
+NET=OK
+LAN=OK
+no_leftover_proc
+total 4
+drwxr-xr-x  2 root wheel    0 Aug  9 15:54 .
+drwxrwxrwt  8 root wheel 4480 Aug  9 15:54 ..

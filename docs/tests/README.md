@@ -13,6 +13,15 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 
 ## Local
 
+- **Harness MITM activação (hang legado + timeout fix + CA-as-peer; `.254` só RO):**
+  [`tests/harness/mitm-activate-hang/README.md`](../../tests/harness/mitm-activate-hang/README.md) —
+  `run-local-hang.sh`, `run-local-timeout-fix.sh`,
+  `run-local-tls-ca-peer.sh`, `run-local-tls-leaf-fix.sh` (sem escrita na `.254`).
+- **Regressões próximas ao código (`1.9.46`):**
+  - `make -C src/layer7-tlsproxy test-regress` — leaf D1 + política sem bypass
+  - `php package/pfSense-pkg-layer7/tests/test_mitm_regress.php` — scope/rdr/anti-QUIC/lifecycle/`filter_configure_safe`
+  - Gate C lab: [`evidence/20260809T210753Z-phaseBD-d1-254/`](evidence/20260809T210753Z-phaseBD-d1-254/) (Edge sem `--disable-quic`)
+- **Control-plane timeout:** `php tests/functional/test_ctrl_exec_timeout.php`.
 - **Checklist F5 repetível (Onda G 8.2):** [`f5-smoke-checklist.md`](f5-smoke-checklist.md) —
   `sh tests/lab/run-f5-smoke-checklist.sh` (local + builder + appliance).
 - `sh tests/lab/run-im9-20.31-identity-mesh.sh` — malha IM9 / 20.31 (Identity
