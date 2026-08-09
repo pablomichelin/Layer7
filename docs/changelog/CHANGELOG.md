@@ -6,8 +6,56 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Próximo: BG-109 (mapa Identity GUI) quando houver dump/IPC; builder FreeBSD 16
-  só após 16.0-RELEASE.
+- Próximo: 20.10 só após S1–S8 medidos + GO lab; GI2/GI3 runtime DEFERRED.
+
+## [1.9.38] — 2026-08-08
+
+### Added
+
+- **BG-087 / 20.9 — Toggle intenção + bypass endurecido:** `mitm.enabled`
+  (intenção com CA+entitlement) vs `mitm_effective` (false sem runtime);
+  `quic_mode` (S5); CIDR protegidos loopback; contrato IPC
+  `docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`;
+  status `mitm_effective=false`. Sem intercept TLS. Squid rejeitado.
+
+### Release
+
+- Tag `v1.9.38` / `releases/latest`
+- SHA256: `7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`
+- Rollback: `1.9.37`
+
+
+## [1.9.37] — 2026-08-08
+
+### Added
+
+- **BG-087 / 20.8 — MITM scaffolding:** schema `mitm.*` (default OFF); gestão CA
+  (gerar/importar/exportar/remover; chave 0600 fora do JSON); bypass SNI/CIDR;
+  GUI `layer7_mitm.php`; `mitm_entitled` + `mitm_runtime_available=false` no
+  status do daemon. `enabled` forçado false sem `layer7-tlsproxy`.
+  Teste: `tests/functional/test_mitm_config.php`. Desenho:
+  `docs/01-architecture/desenho-layer7-tlsproxy-mitm.md`. Squid rejeitado.
+
+### Release
+
+- Tag `v1.9.37` (foi `releases/latest` até `1.9.38`)
+- SHA256: `d80b522d386165dcd540c8c90577e3292e6b31c4cd7600305ba5f70fec223868`
+- Rollback: `1.9.36`
+
+## [1.9.36] — 2026-08-08
+
+### Changed
+
+- **BG-111 — Perfis rápidos: categorias colapsadas:** todas as categorias
+  começam fechadas (sem reabrir via localStorage); badges de activos e de
+  alterações pendentes no cabeçalho; botões Expandir/Recolher tudo.
+  BG-110 (aplicar em lote) mantém-se.
+
+### Release
+
+- Tag `v1.9.36` / `releases/latest`
+- SHA256: `abfd772f7cd959b10ff488f7980f6c295e5185fe254a4fc5ffdb3ae88d15a71b`
+- Rollback: `1.9.35`
 
 ## [1.9.35] — 2026-08-08
 

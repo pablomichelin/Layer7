@@ -249,6 +249,31 @@ Artefacto interno:
 Validação passiva ainda é obrigatória. `_29` fica como artefacto de rollback
 pré-FP-019 e não deve ser promovido.
 
+**Addendum da release `1.9.38` (MITM 20.9 intenção/effective / BG-087, `2026-08-08`):**
+Toggle intenção + bypass endurecido + contrato IPC; `mitm_effective=false` sem runtime.
+Builder FreeBSD 15; Plus/16 com `pkg add -f` (BG-106).
+**Canal `latest`:** `1.9.38`. Enforce **`1.9.8`**. Rollback lab: **`1.9.37`**.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.38`
+- **SHA256 esperado:** `7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`
+
+**Addendum da release `1.9.37` (MITM scaffolding 20.8 / BG-087, `2026-08-08`):**
+Schema `mitm.*` OFF; gestão CA; bypass; sem intercept TLS (runtime ausente).
+Builder FreeBSD 15; Plus/16 com `pkg add -f` (BG-106).
+**Canal `latest`:** `1.9.37`. Enforce **`1.9.8`**. Rollback lab: **`1.9.36`**.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.37`
+- **SHA256 esperado:** `d80b522d386165dcd540c8c90577e3292e6b31c4cd7600305ba5f70fec223868`
+
+**Addendum da release `1.9.36` (categorias colapsadas / BG-111, `2026-08-08`):**
+Perfis rápidos: todas as categorias fechadas por defeito; Expandir/Recolher
+tudo; badge de pendentes no cabeçalho. BG-110 (aplicar em lote) intacto.
+Builder FreeBSD 15; Plus/16 com `pkg add -f` (BG-106).
+**Canal `latest`:** `1.9.36`. Enforce **`1.9.8`**. Rollback lab: **`1.9.35`**.
+
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.36`
+- **SHA256 esperado:** `abfd772f7cd959b10ff488f7980f6c295e5185fe254a4fc5ffdb3ae88d15a71b`
+
 **Addendum da release `1.9.35` (perfis rápidos em lote / BG-110, `2026-08-08`):**
 Switches em rascunho + **Aplicar** (1 save + 1 resync). Builder FreeBSD 15;
 Plus/16 com `pkg add -f` (BG-106).
@@ -983,25 +1008,24 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > Apos GO Onda F (`2026-08-05`), producao enforce e canal publico estao alinhados
 > em `_69`; `_24` permanece apenas como rollback historico.
 
-> **Release `1.9.35` (BG-110 perfis em lote, `2026-08-08`):** canal publico `latest` /
-> comandos abaixo → **`1.9.35`**. **Produção enforce** permanece **`1.9.8`**
-> (GV7.4) até GO. Rollback lab: **`1.9.34`**. Rollback enforce: **`1.9.0`**.
-> **Nota:** pacote FreeBSD:15; em pfSense Plus/FreeBSD 16 usar
-> `IGNORE_OSVERSION=yes pkg add -f` (BG-106). Depende de `openldap26-client`.
+> **Release `1.9.38` (MITM 20.9, `2026-08-08`):** canal publico `latest` /
+> comandos abaixo → **`1.9.38`**. **Produção enforce** permanece **`1.9.8`**.
+> Rollback lab: **`1.9.37`**. Rollback enforce: **`1.9.0`**.
 
-**Versao canal publico / lab (`latest` e comandos abaixo):** `1.9.35`
+**Versao canal publico / lab (`latest` e comandos abaixo):** `1.9.38`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.35`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg.sha256`
-- **SHA256 esperado:** `5f88e1312bc30037ffb32141a208860a708440b5271c1adf55c40a2aa992f4f4`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.38`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg.sha256`
+- **SHA256 esperado:** `7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
-**Versao anterior lab (rollback a partir de `1.9.35`):** `1.9.34`
+**Versao anterior lab (rollback a partir de `1.9.38`):** `1.9.37`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.34`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.34/pfSense-pkg-layer7-1.9.34.pkg`
-- **SHA256 esperado:** `87982ffb33d533c23638f22ddd481b2d0c85f5a8aa020f4d92583080e8010eec`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.37`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.37/pfSense-pkg-layer7-1.9.37.pkg`
+- **SHA256 esperado:** `d80b522d386165dcd540c8c90577e3292e6b31c4cd7600305ba5f70fec223868`
+
 
 
 **Versao anterior lab (rollback a partir de `1.9.34`):** `1.9.33`
@@ -1211,16 +1235,16 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 **Comandos rapidos de teste:**
 
-Baixar o `.pkg` directo da versao `1.9.35`:
+Baixar o `.pkg` directo da versao `1.9.38`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg
 ```
 
 Validar checksum:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg.sha256 https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg.sha256 && sha256 -q /tmp/pfSense-pkg-layer7-1.9.35.pkg | tee /tmp/l7-actual.sha256 && cat /tmp/pfSense-pkg-layer7-1.9.35.pkg.sha256
+fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg.sha256 https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg.sha256 && sha256 -q /tmp/pfSense-pkg-layer7-1.9.38.pkg | tee /tmp/l7-actual.sha256 && cat /tmp/pfSense-pkg-layer7-1.9.38.pkg.sha256
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
@@ -1252,26 +1276,26 @@ Cada seccao abaixo inclui:
 
 ## 1. Instalar (primeira vez)
 
-> **Nesta release (`1.9.35`)** o caminho oficial e o **comando unico manual**
+> **Nesta release (`1.9.38`)** o caminho oficial e o **comando unico manual**
 > abaixo. O `install.sh` automatico (carimbado/assinado F1.2) nao e publicado
 > nesta release: ver nota em **Links da versao actual** e **BG-028** no
-> backlog. **Canal lab/`latest`:** **`1.9.35`**. **Producao enforce:**
+> backlog. **Canal lab/`latest`:** **`1.9.38`**. **Producao enforce:**
 > permanece **`1.9.8`** (GV7.4) ate GO de promocao.
 
 **Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.35.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.38.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.35.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.38.pkg
 ```
 
 ```sh
@@ -1348,14 +1372,14 @@ layer7d --license-status
 
 ## 4. Actualizar (upgrade)
 
-> **Nesta release (`1.9.35`)** o caminho oficial e o **comando unico manual**
+> **Nesta release (`1.9.38`)** o caminho oficial e o **comando unico manual**
 > abaixo (sem `install.sh`). Ver nota em **Links da versao actual** e
 > **BG-028**.
 
 **Comando unico manual (recomendado — uma linha, Command Prompt ou SSH):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.35.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.38.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -1365,11 +1389,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.35.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.38.pkg
 ```
 
 ```sh
@@ -1402,7 +1426,7 @@ pfctl -sr | grep -i layer7
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.35.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.38.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -1416,11 +1440,11 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.35.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.38.pkg
 ```
 
 ```sh
@@ -1435,7 +1459,7 @@ service layer7d onestart
 
 ## 6. Desinstalar
 
-> **Nesta release (`1.9.35`)** o `uninstall.sh` automatico nao e publicado
+> **Nesta release (`1.9.38`)** o `uninstall.sh` automatico nao e publicado
 > como asset (depende do trust chain F1.2 — ver **BG-028**). Use a
 > **desinstalacao manual** abaixo, que executa as mesmas etapas: stop do
 > servico, `pkg delete`, limpeza de ficheiros residuais, flush das tabelas PF
@@ -1540,11 +1564,11 @@ apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
 ### Apos desinstalar
 
 O pfSense volta ao funcionamento normal imediatamente.
-Para reinstalar a versao actual (`1.9.35`), usar o **comando unico manual**
+Para reinstalar a versao actual (`1.9.38`), usar o **comando unico manual**
 da seccao **1**:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.35.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.35/pfSense-pkg-layer7-1.9.35.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.35.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.38.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 ---

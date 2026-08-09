@@ -37,22 +37,24 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` quando houver lab.
 
 ---
 
-## GI2 — MITM segurança e default — **DEFERRED** (`2026-08-06`, 20.7a)
+## GI2 — MITM segurança e default — **DEFERRED** (runtime; 20.8/20.9 não fecham)
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GI2.0 | Spike 20.7 registado como GO **ou** DEFER/NO-GO formal | **PASS (DEFER)** — ver `spike-mitm-20.7.md` + ADR-0026 rev. `d` |
-| GI2.1–GI2.5 | Critérios de implementação MITM | **DEFERRED** — reabrir só com novo GO + S1–S8 |
+| GI2.0 | Spike 20.7 registado como GO **ou** DEFER/NO-GO formal | **PASS (DEFER)** — ver `spike-mitm-20.7.md` + ADR-0026; reopen GO `2026-08-08` |
+| GI2.1–GI2.5 | Critérios de implementação / runtime MITM | **DEFERRED** — **20.8/20.9** (schema/CA/bypass/intenção/IPC; `mitm_effective` false) **não** fecham estes critérios; exige S1–S8 + GO lab + runtime `layer7-tlsproxy` |
 
-Identity avança sem GI2/GI3.
+Nota **20.9:** intenção `mitm.enabled` + bypass endurecido + contrato IPC; **não** há intercept; Squid rejeitado. Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md). Contrato: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md).
+
+Identity rede **FECHADA** — GI2/GI3 não a reabrem.
 
 ---
 
-## GI3 — MITM funcional (lab) — **DEFERRED** (`2026-08-06`)
+## GI3 — MITM funcional (lab) — **DEFERRED** (runtime)
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GI3.1–GI3.5 | Lab MITM | **DEFERRED** até reabertura IM2 |
+| GI3.1–GI3.5 | Lab MITM (intercept / block page HTTPS) | **DEFERRED** até runtime + S1–S8 + GO lab; 20.8/20.9 **insuficientes** |
 
 ---
 
@@ -133,8 +135,8 @@ Identity avança sem GI2/GI3.
 |------|------|--------|
 | GI0 | IM0 | **PASS** (`2026-08-05` — ADRs Aceito; T1) |
 | GI1 | IM1 | **PASS** (`2026-08-05`) |
-| GI2 | IM2 | **DEFERRED** (`2026-08-06` — 20.7a; GI2.0 PASS via DEFER) |
-| GI3 | IM2 | **DEFERRED** (`2026-08-06`) |
+| GI2 | IM2 | **DEFERRED** runtime (`2026-08-06` 20.7a; reopen → 20.8/20.9 PASS; GI2.0 PASS via DEFER; GI2.1–2.5 abertos) |
+| GI3 | IM2 | **DEFERRED** runtime (`2026-08-06`; 20.8/20.9 não fecham lab) |
 | GI4 | IM3 | **PASS** (`2026-08-07` — GI4.6 ON lab residual) |
 | GI5 | IM4–IM5 | **PARCIAL** (GI5.3 PASS 20.19; GI5.4 PASS; GI5.1 lab residual) |
 | GI6 | IM5 | **PARCIAL** (código 20.20 PASS; lab DC residual) |
@@ -148,6 +150,8 @@ Identity avança sem GI2/GI3.
 
 | Data | Evento |
 |------|--------|
+| 2026-08-08 | **20.9 PASS** — intenção/`mitm_effective`/bypass/`quic_mode`/IPC; GI2/GI3 **runtime** mantêm-se DEFERRED; 20.10 bloqueado até S1–S8+GO lab |
+| 2026-08-08 | **Reopen MITM GO** — passo **20.8** scaffolding; GI2/GI3 **runtime** mantêm-se DEFERRED; desenho `layer7-tlsproxy`; Squid rejeitado |
 | 2026-08-05 | Criação GI0–GI9 |
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |
 | 2026-08-05 | rev. `c` — GI0.4 (ADR-0028); GI1.7–GI1.8 (contrato parse + check-in); GI4.0/4.5/4.6 (baseline perf, threads, reload); GI6.4–GI6.5 (multi-user, canal agente DC); GI7.4 reconciliado |

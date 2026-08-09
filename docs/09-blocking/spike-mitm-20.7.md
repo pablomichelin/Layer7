@@ -1,12 +1,14 @@
 # Spike MITM 20.7 — desenho e critérios (IM2)
 
-**Estado:** `DEFER FORMAL` (`2026-08-06` — passo **20.7a PASS**)  
-**Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) passo **20.7 / 20.7a**  
-**ADR:** [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) — **Aceito — implementação diferida**  
+**Estado:** `DEFER FORMAL` (`2026-08-06` — passo **20.7a PASS**) + **reopen GO** (`2026-08-08` → passo **20.8**)  
+**Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) passo **20.7 / 20.7a / 20.8**  
+**ADR:** [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) — **Aceito — implementação em curso (scaffolding 20.8)**  
+**Desenho opção E:** [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime **AUSENTE**  
 **Posicionamento PME:** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md)  
-**Baseline enforce doc:** `1.9.8` · **Appliance:** `1.9.13` passivo em `192.168.100.254`  
+**Baseline enforce doc:** `1.9.8` · **lab/`latest`:** `1.9.36`  
 **Evidência preflight:** [`../tests/evidence/20260805T205900Z-appliance254-mitm-preflight/`](../tests/evidence/20260805T205900Z-appliance254-mitm-preflight/)  
-**Regra:** Identity (IM3+) **avança** — este spike **não** bloqueia.
+**Regra:** Identity rede **FECHADA** (20.33/GI9). Este spike **não** autoriza intercept; Squid **rejeitado**.
+
 
 ---
 
@@ -59,8 +61,8 @@ Nota: o repo pkg do Plus ainda lista `pfSense-pkg-squid` / `squid-7.4`, mas **n�
 | A | Squid sslbump | **REJEITADA** | Decisão operador 2026-08-05 |
 | B | nginx stream/ssl | **Não alvo** | Só PoC lab descartável; não arquitectura de produto |
 | C | TLS in-process no `layer7d` | **REJEITADA** MVP | Conflita ADR-0028 |
-| E | Helper Layer7 próprio (`layer7-tlsproxy`) | **Futuro candidato** | Requer novo GO + S1–S8; meses; não bloqueia Identity |
-| D | **DEFER** | **ESCOLHIDA** | Entitlement + GUI upsell; sem runtime; Identity IM3+ |
+| E | Helper Layer7 próprio (`layer7-tlsproxy`) | **Candidata reopen** | Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md); runtime **AUSENTE**; S1–S8 ainda não medidos |
+| D | **DEFER** | **ESCOLHIDA (20.7a)** | Entitlement + GUI upsell; sem runtime; Identity IM3+ fechou |
 
 ---
 
@@ -111,9 +113,9 @@ Requisitos mínimos se reabrir:
 | Squid (A) | **REJEITADA** |
 | PoC intercept | **Não iniciada** (intencional) |
 | GI2 / GI3 | **DEFERRED** |
-| Passos 20.8–20.11 | **Saltados** até novo GO |
-| Próximo plano | **20.12 / IM3** mapa daemon |
-| Reabertura | GO humano + spike S1–S8 (preferência: opção E) |
+| Passos 20.8–20.11 | **20.8 EM CURSO** (scaffolding); 20.9+ / intercept bloqueados até S1–S8 + GO lab |
+| Próximo plano (histórico) | **20.12 / IM3** mapa daemon — **FEITO**; Identity FECHADA |
+| Reabertura | **GO humano `2026-08-08`** — ver §8 |
 
 ### Motivos do DEFER (completos)
 
@@ -126,7 +128,24 @@ Requisitos mínimos se reabrir:
 
 ---
 
-## 7. Histórico
+## 8. Reopen GO humano (`2026-08-08`)
+
+| Campo | Valor |
+|-------|--------|
+| Data | **2026-08-08** |
+| Decisão | **GO reopen IM2** — scaffolding apenas |
+| Passo actual | **20.8 EM CURSO** |
+| Escopo autorizado | Schema `mitm.*` OFF; gestão CA; bypass GUI; `mitm_entitled` no status daemon; `enabled` forçado **false** |
+| Escopo **não** autorizado | Processo `layer7-tlsproxy`; intercept TLS; block page HTTPS via MITM; Squid |
+| Desenho | [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) |
+| S1–S8 | **Não medidos** — obrigatórios antes de runtime / GI2–GI3 lab |
+| Identity rede | **FECHADA** (20.33/GI9) — ortogonal |
+| Squid | **REJEITADO** (permanente) |
+| Honestidade | **Sem claim de intercept** neste reopen |
+
+---
+
+## 9. Histórico
 
 | Data | Evento |
 |------|--------|
@@ -134,3 +153,4 @@ Requisitos mínimos se reabrir:
 | 2026-08-05 | Preflight appliance `254` |
 | 2026-08-05 | Operador: Squid rejeitado; recomenda-se DEFER ou ferramenta própria |
 | 2026-08-06 | **DEFER formal 20.7a** — posicionamento PME; ADR-0026 diferido; avançar IM3 |
+| 2026-08-08 | **Reopen GO** — passo 20.8 scaffolding; desenho `layer7-tlsproxy`; runtime AUSENTE; ADR-0026 rev. `e` |

@@ -293,25 +293,27 @@ reavaliacao formal.
 | BG-083 | DNS forçado / block page / VIP isenção IPv6 (NAT `rdr inet6`) | Alta | package/PF/Unbound | F4 | bypass DNS em v6 | G | Medio | **Concluido (12.10+12.11)** — `1.9.8` | DNS :53 + HTTP/HTTPS portal + VIP ACL v6 |
 | BG-084 | Malha lab dual-stack + fecho trilha (GV6–GV7, release) | Alta | testes/F5/F7 | F5/F7 | sem evidência repetível v6 | M | Alto | **Concluido (12.12+12.13+GV7.4)** | produção enforce `1.9.8` |
 
-## Checkpoint trilha Identity + MITM Add-on (aberta 2026-08-05; rev. `d` 2026-08-06)
+## Checkpoint trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM 2026-08-08)
 
 - Arranque: [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 - Posicionamento PME: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
-- Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-06d`
-- Passo actual: **20.16 / IM4** (LDAP); **IM3/GI4 PASS**; **IM2 DEFER 20.7a**
-- ADRs: 0025/0027/0028 Aceito; **0026 Aceito — implementação diferida**
-- Baseline produção: **`1.9.8`**. Captive portal: **fora de escopo**. Nicho: **PME Identity-first**.
+- Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-08p`
+- Passo actual: **20.9 PASS** (intenção/`mitm_effective`/bypass/`quic_mode`/IPC); próximo **20.10** bloqueado (S1–S8+GO lab); Identity rede **FECHADA** (20.33/GI9)
+- Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime AUSENTE
+- Contrato: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)
+- ADRs: 0025/0027/0028 Aceito; **0026 Aceito — implementação em curso (rev. f — intenção vs effective)**; runtime até S1–S8
+- Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.38`**. Captive portal: **fora de escopo**. Squid: **rejeitado**.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
 | BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **Concluido (20.2 PASS / GI0)** | ADRs 0025–0028 Aceito; T1 |
 | BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Concluido (20.6 / GI1 PASS)** | check-in ∩ .lic + gates |
-| BG-087 | MITM TLS opt-in + CA (IM2) | Critica | daemon/package/PKI | IM2 | UX HTTPS; segundo produto | G | Alto | **Diferido (20.7a)** | ADR-0026 rev. d; Squid rejeitado; GI2/GI3 DEFERRED; reabrir só com novo GO + helper próprio |
+| BG-087 | MITM TLS opt-in + CA (IM2) — 20.8 scaffolding + 20.9 intenção/IPC | Alta | package/GUI | Identity+MITM | runtime ausente; intenção≠effective | M | Alto | **Concluido 20.9 + publicado `1.9.38` (`latest`)** | SHA256 `7c60f6b1…1dab`; sem intercept; 20.10 bloqueado |
 | BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | **20.18 PASS** / fechar IM4 | Test LDAP GUI + GI5.4; GI5.3 = IM5 |
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | **20.20 PASS** / GI6 lab | WinRM outbound não canónico; agente em `docs/samples/identity-dc-agent/` |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Feito (20.24); GI7 lab residual | GI7; não-regressão IP/MAC |
 | BG-091 | Agente endpoint + TS/VDI (IM7–IM8) | Media | endpoint | IM7–IM8 | multi-user/NAT frágil | G | Medio | **Fechado** ADR-0029 (ADIAR+exclusão) | GI8 PASS |
-| BG-092 | Fecho lab/release add-on (IM9) | Alta | testes/F7/docs | IM9 | feature sem MANUAL/release | M | Alto | **Concluido** (20.33/GI9) | homolog `1.9.29`; residuais AD opcionais |
+| BG-092 | Fecho lab/release add-on (IM9) | Alta | testes/F7/docs | IM9 | feature sem MANUAL/release | M | Alto | **Concluido** (20.33/GI9) | Identity rede FECHADA; residuais AD opcionais |
 
 ## Checkpoint auditoria segurança `1.9.8` → candidato `1.9.9` (2026-08-05)
 
@@ -338,7 +340,8 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-107 | Perfis rápidos / Acesso remoto visual + admin-block | Media | package/GUI | Caminho A / UX | RA vermelho/ícones/grelha; RA duplicado; layout inconsistente | P | Baixo | **Concluido em `1.9.33`** | cores marca, aliases FA6, grelha, redirect RA, admin-block |
 | BG-108 | UX visual wave 2 (KPI unificado, subnav Políticas, catálogo, Chart.js offline) | Media | package/GUI | Caminho A / UX | Estado/Relatórios KPI distintos; Kick/Rumble; subnav; CDN Chart.js | P | Baixo | **Concluido; canal publico `1.9.34` (`latest`)** | redeploy limpo; SHA256 `87982ffb…0eec`; appliance PASS |
 | BG-109 | GUI Identity — tabela read-only do mapa user↔IP (daemon) | Media | package/GUI + daemon | Identity | Identity configura LDAP/RADIUS/DC mas não mostra sessões activas | M | Medio | **Aberto — defer** | requer dump/IPC do mapa em `identity_map.*`; não inventar vista sem API |
-| BG-110 | Perfis rápidos: rascunho + Aplicar em lote (sem resync por clique) | Alta | package/GUI | Caminho A / UX | cada toggle faz resync ~20s + refresh; activar N perfis é inviável | M | Alto | **Concluido + publicado `1.9.35` (`latest`)** | SHA256 `5f88e131…f4f4`; appliance PASS |
+| BG-110 | Perfis rápidos: rascunho + Aplicar em lote (sem resync por clique) | Alta | package/GUI | Caminho A / UX | cada toggle faz resync ~20s + refresh; activar N perfis é inviável | M | Alto | **Concluido + publicado `1.9.35`** | SHA256 `5f88e131…f4f4`; appliance PASS |
+| BG-111 | Perfis rápidos: categorias colapsadas + polish UX | Media | package/GUI | Caminho A / UX | grelha poluída (grupos com activos abertos); localStorage reabria | P | Baixo | **Concluido + publicado `1.9.36`** | SHA256 `abfd772f…a71b`; superseded por `1.9.38` latest |
 
 ---
 

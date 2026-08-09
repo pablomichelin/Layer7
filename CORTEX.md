@@ -35,11 +35,12 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.35` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.35`;
-`SHA256=5f88e1312bc30037ffb32141a208860a708440b5271c1adf55c40a2aa992f4f4`;
-BG-110 perfis rápidos em lote; comandos em
+`1.9.38` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.38`;
+`SHA256=7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`;
+BG-087/20.9 MITM intenção vs effective + IPC; sem intercept; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.34`**.
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.37`**.
+**MITM:** reopen GO `2026-08-08`; passo **20.9 PASS**; runtime tlsproxy **ausente**.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
@@ -772,8 +773,11 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
 **Checkpoint `2026-08-08`:** portal **`2.0.0`** — PORTAL-PLAN-004 CONCLUIDO
-(técnicos + RBAC). Planos 003 e 004 fechados.
-Regra: não saltar blocos do plano portal.
+(técnicos + RBAC). Planos 003 e 004 fechados. Live health OK;
+SPA `index-DwHpvSVY.js`. **Dívida de continuidade:** código/docs portal
+`2.0.0` + pacote `1.9.38` ainda no working tree **sem commit** — próximo
+passo seguro = commit(s) com GO humano (não `20.10`).
+Regra: não saltar blocos do plano portal; sem plano `ACTIVO` até GO.
 
 ---
 
@@ -1308,16 +1312,16 @@ TRILHA IPv6 — progresso
 
 ---
 
-## Trilha Identity + MITM Add-on (aberta 2026-08-05; rev. posicionamento 2026-08-06)
+## Trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM GO 2026-08-08)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção / `latest`: **`1.9.8`**. **IM0+IM1 fechados (GI1 PASS)**;
-**IM2 DEFER 20.7a**; **IM3 / 20.11a–20.15 PASS (GI4)**; **20.16 PASS** (GUI LDAP);
-**20.18 PASS** (Test LDAP; GI5.4); **20.19 PASS** (RADIUS; GI5.3); **20.20
-PASS** (desenho A1–A7 + receiver HTTPS + agente Win Event Log samples);
-passo actual **FECHADO** (20.33 / GI9 PASS — Identity de rede; MITM DEFER).
-**Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**Candidato port:** `1.9.29` (**publicado** lab/`latest`; homolog two-client PASS).
+Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.38`** (20.9 PASS).
+**IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
+**20.8 PASS** → **20.9 PASS**; **IM3–IM9 Identity rede FECHADA**
+(20.33 / GI9 PASS). **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
+**MITM:** intenção `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC;
+`mitm_effective` **sempre false** sem runtime; Squid **rejeitado**;
+GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1327,44 +1331,47 @@ passo actual **FECHADO** (20.33 / GI9 PASS — Identity de rede; MITM DEFER).
   [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
 - **Mapa:**
   [`docs/01-architecture/identity-mitm-mapa-rastreabilidade.md`](docs/01-architecture/identity-mitm-mapa-rastreabilidade.md)
+- **Desenho MITM (opção E):**
+  [`docs/01-architecture/desenho-layer7-tlsproxy-mitm.md`](docs/01-architecture/desenho-layer7-tlsproxy-mitm.md)
+  — runtime **AUSENTE**; sem claim de intercept
+- **Contrato IPC 20.9:**
+  [`docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`](docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)
 - **Gates GI0–GI9:**
   [`docs/09-blocking/plano-gates-identity-mitm.md`](docs/09-blocking/plano-gates-identity-mitm.md)
 - **ADRs:** [0025](docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md)
   (SKU; T1), [0026](docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md)
-  (**implementação diferida**), [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md),
+  (**Aceito — implementação em curso / rev. f — intenção vs effective**; runtime até S1–S8),
+  [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md),
   [0028](docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md),
   [0029](docs/03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md)
   (**IM7 ADIAR + IM8 exclusão**)
-- **Spike MITM:** [`docs/09-blocking/spike-mitm-20.7.md`](docs/09-blocking/spike-mitm-20.7.md) — DEFER
-- **Backlog:** BG-085…BG-092 (BG-087 diferido; BG-091 fechado ADR-0029)
-- **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM6 Identity** → **IM7/IM8
-  fechados ADR-0029** → IM9 → (MITM / endpoint só com novo GO)
+- **Spike MITM:** [`docs/09-blocking/spike-mitm-20.7.md`](docs/09-blocking/spike-mitm-20.7.md)
+  — DEFER 20.7a + reopen GO 2026-08-08
+- **Backlog:** BG-085…BG-092 (BG-087 **20.9 PASS**; BG-091 fechado ADR-0029)
+- **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM9 Identity FECHADA** →
+  **reopen MITM 20.8→20.9 PASS** → **20.10** bloqueado (endpoint só com GO separado)
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-08c`
+- **Rev. plano:** `2026-08-08p`
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 - **Desenho DC:** [`docs/01-architecture/desenho-canal-agente-dc-20.20.md`](docs/01-architecture/desenho-canal-agente-dc-20.20.md)
 - **Agente Win:** [`docs/samples/identity-dc-agent/`](docs/samples/identity-dc-agent/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **FECHADO** (20.33 / GI9 PASS)
+- Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
+- Próximo: **20.10** BLOQUEADO até S1–S8 + GO lab
+- Identity rede: **FECHADA** (20.33 / GI9 PASS)
+- 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
+- 20.9: PASS — mitm_effective sempre false sem runtime
 - 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
-- 20.32: PASS (MANUAL + notes comerciais Identity)
-- 20.31: PASS (malha OFF + unit; `20260808T135500Z-im9-20.31-identity-mesh`)
-- 20.22: PASS (audit conflict + last_writer)
-- 20.21: PASS (normalize user + remove_ip)
-- 20.20: PASS (receiver + agente Win Event Log samples)
-- 20.20 desenho: PASS (A1–A7; TLS+HMAC; porto 8743)
-- 20.19: PASS (RADIUS accounting; GI5.3)
-- 20.18: PASS (Test LDAP GUI; GI5.4)
-- 20.17: PASS (LDAP worker + cache + fail-mode)
-- 20.16: PASS (GUI LDAP config)
-- IM3 / GI4: PASS (20.15 entitlement gate)
-- IM2: DEFER 20.7a
-- Plano rev.: 2026-08-08m
+- 20.7a: DEFER histórico; reopen GO → 20.8→20.9
+- IM3 / GI4: PASS (Identity)
+- Plano rev.: 2026-08-08p
 - Baseline enforce: 1.9.8
-- Latest publicado: **1.9.30** (lab/`latest`; grupo Acesso remoto individual)
-- Próximo: manutenção; reopen MITM/endpoint só com GO
+- Latest publicado: **1.9.38** (20.9 PASS)
+- Squid: REJEITADO; GI2/GI3 runtime: DEFERRED
+- Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
+- Contrato: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
 ```
 
 
@@ -1556,17 +1563,19 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-05
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.30** (grupo Acesso remoto individual)
+- Canal publico latest: **1.9.38** (BG-087/20.9; SHA no topo deste ficheiro)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: **FECHADA** (Identity rede 20.33/GI9 PASS; MITM DEFER 20.7a; ADR-0029); arranque docs/00-overview/START-HERE-identity-mitm.md
+- Trilha Identity + MITM: Identity rede **FECHADA** (20.33/GI9); MITM **20.9 PASS** (intenção≠effective; IPC); runtime tlsproxy AUSENTE; Squid rejeitado; ADR-0026 rev. f; arranque docs/00-overview/START-HERE-identity-mitm.md
+- Desenho MITM: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
+- Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Pacote publicado: **1.9.30** (`SHA256=40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`)
-- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.29**; RA individual **1.9.30**
+- Pacote publicado: **1.9.38** (20.9)
+- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.29**; RA/UI **1.9.30**…**1.9.38**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: manutenção produto base; lab AD Identity opcional (`base,identity`); MITM DEFER; GO promoção enforce; BG-028 fase 1
+- Proximo trabalho: **commit local** working tree (`1.9.38` + portal `2.0.0`) com GO; **20.10** BLOQUEADO até S1–S8 + GO lab; GI2/GI3 runtime DEFERRED; lab AD Identity opcional; GO promoção enforce; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

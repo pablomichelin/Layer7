@@ -1036,7 +1036,7 @@ function layer7_policy_match_summary($policy) {
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Perfis rapidos"); ?></div>
 			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Ligue ou desligue perfis na grelha — as alteracoes ficam em rascunho. Clique em Aplicar para gravar e activar tudo de uma vez (um unico reload). Use 'Opcoes' para accao, interfaces e sub-redes. Edite ou crie perfis personalizados em profiles-custom.json (preservado nos upgrades)."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Categorias comecam fechadas — clique no titulo para abrir. Ligue ou desligue perfis na grelha; as alteracoes ficam em rascunho. Clique em Aplicar para gravar e activar tudo de uma vez (um unico reload). Use 'Opcoes' para accao, interfaces e sub-redes. Edite ou crie perfis personalizados em profiles-custom.json (preservado nos upgrades)."); ?></p>
 			<div class="l7-profiles-toolbar" style="margin-bottom:14px;">
 				<div class="l7-profiles-search-wrap">
 					<input type="text" id="l7ProfileSearch" class="form-control input-sm" placeholder="<?= l7_t("Pesquisar perfil..."); ?>" autocomplete="off" oninput="l7filterProfileGrid();" />
@@ -1044,6 +1044,10 @@ function layer7_policy_match_summary($policy) {
 						<input type="checkbox" id="l7ProfileActiveOnly" onchange="l7filterProfileGrid();" />
 						<?= l7_t("So ligados"); ?>
 					</label>
+					<span class="l7-profiles-fold-actions">
+						<button type="button" class="btn btn-default btn-xs" onclick="l7setAllProfileGroups(true);"><?= l7_t("Expandir tudo"); ?></button>
+						<button type="button" class="btn btn-default btn-xs" onclick="l7setAllProfileGroups(false);"><?= l7_t("Recolher tudo"); ?></button>
+					</span>
 				</div>
 				<button type="button" class="btn btn-primary btn-sm" onclick="l7showProfileEditModal('', true);">
 					<i class="fa fa-plus"></i> <?= l7_t("Criar perfil"); ?>
@@ -1421,21 +1425,19 @@ function layer7_policy_match_summary($policy) {
 			$is_presets = !empty($opts["presets"]);
 			$is_hidden_section = !empty($opts["hidden_section"]);
 			$is_ra_group = !empty($opts["remote_access"]);
-			$initial_open = $is_hidden_section ? false : ($active_n > 0);
-			$group_classes = "l7-profile-group";
+			/* Sempre colapsado na primeira vista — o operador expande ao clicar. */
+			$initial_open = false;
+			$group_classes = "l7-profile-group l7-profile-group-collapsed";
 			if ($is_presets) {
 				$group_classes .= " l7-profile-group-presets";
 			}
 			if ($is_hidden_section) {
 				$group_classes .= " l7-profile-group-hidden-section";
 			}
-			if (!$initial_open) {
-				$group_classes .= " l7-profile-group-collapsed";
-			}
 			$anchor_attr = $is_ra_group ? ' id="l7-ra"' : "";
 		?>
-			<div class="<?= $group_classes; ?>"<?= $anchor_attr; ?> data-group-id="<?= htmlspecialchars($gid); ?>" data-group-default-open="<?= $initial_open ? "1" : "0"; ?>">
-				<div class="l7-profile-group-header" role="button" tabindex="0" onclick="l7toggleProfileGroup(this);" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();l7toggleProfileGroup(this);}">
+			<div class="<?= $group_classes; ?>"<?= $anchor_attr; ?> data-group-id="<?= htmlspecialchars($gid); ?>" data-group-default-open="0">
+				<div class="l7-profile-group-header" role="button" tabindex="0" aria-expanded="false" onclick="l7toggleProfileGroup(this);" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();l7toggleProfileGroup(this);}">
 					<span class="l7-profile-group-chevron fa fa-chevron-down" aria-hidden="true"></span>
 					<span class="l7-profile-group-title"><?= htmlspecialchars($gname); ?></span>
 					<span class="l7-profile-group-meta">
@@ -1443,6 +1445,7 @@ function layer7_policy_match_summary($policy) {
 						<?php if ($active_n > 0) { ?>
 						<span class="l7-profile-group-active-badge"><?= $active_n; ?> <?= l7_t("ligados"); ?></span>
 						<?php } ?>
+						<span class="l7-profile-group-pending-badge" hidden></span>
 					</span>
 				</div>
 				<div class="l7-profile-group-body">
@@ -2463,10 +2466,12 @@ function layer7_policy_match_summary($policy) {
 .l7-profiles-search-wrap .form-control { max-width: 280px; min-width: 160px; }
 .l7-profiles-active-only { font-size: 12px; font-weight: normal; margin: 0; white-space: nowrap; cursor: pointer; user-select: none; }
 .l7-profiles-active-only input { margin: 0 4px 0 0; vertical-align: -2px; }
-.l7-profile-group { margin-bottom: 18px; border: 1px solid #e3e3e3; border-radius: 6px; background: #fff; overflow: hidden; }
+.l7-profiles-fold-actions { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.l7-profile-group { margin-bottom: 10px; border: 1px solid #e3e3e3; border-radius: 6px; background: #fff; overflow: hidden; }
 .l7-profile-group-presets { background: #f4fbf9; border-color: #d4ece6; }
-.l7-profile-group-hidden-section { margin-top: 20px; opacity: 0.95; }
+.l7-profile-group-hidden-section { margin-top: 16px; opacity: 0.95; }
 .l7-profile-group-header { display: flex; align-items: center; gap: 8px; padding: 10px 14px; cursor: pointer; user-select: none; background: #fafafa; border-bottom: 1px solid transparent; }
+.l7-profile-group:not(.l7-profile-group-collapsed) .l7-profile-group-header { border-bottom-color: #eee; }
 .l7-profile-group-presets .l7-profile-group-header { background: #eef8f5; }
 .l7-profile-group-header:hover { background: #f3f3f3; }
 .l7-profile-group-presets .l7-profile-group-header:hover { background: #e6f3ef; }
@@ -2474,9 +2479,11 @@ function layer7_policy_match_summary($policy) {
 .l7-profile-group-collapsed .l7-profile-group-chevron { transform: rotate(-90deg); }
 .l7-profile-group-collapsed .l7-profile-group-body { display: none; }
 .l7-profile-group-title { font-weight: 600; font-size: 15px; flex: 1 1 auto; min-width: 0; }
-.l7-profile-group-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.l7-profile-group-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .l7-profile-group-count { font-size: 11px; color: #999; white-space: nowrap; }
 .l7-profile-group-active-badge { font-size: 11px; font-weight: 600; color: #fff; background: #5cb85c; border-radius: 10px; padding: 2px 8px; white-space: nowrap; }
+.l7-profile-group-pending-badge { font-size: 11px; font-weight: 600; color: #6a5500; background: #ffe8a3; border-radius: 10px; padding: 2px 8px; white-space: nowrap; }
+.l7-profile-group-pending-badge[hidden] { display: none !important; }
 .l7-profile-group-body { padding: 12px 14px 14px; }
 .l7-hidden-profiles-help { margin: 0 0 10px 0; font-size: 12px; }
 .l7-profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: stretch; }
@@ -2530,6 +2537,8 @@ var l7ProfileDraftBusy = false;
 var l7ProfileDraftStrings = {
 	pendingOne: <?= json_encode(l7_t("%d alteracao por aplicar")) ?>,
 	pendingMany: <?= json_encode(l7_t("%d alteracoes por aplicar")) ?>,
+	pendingGroupOne: <?= json_encode(l7_t("%d pendente")) ?>,
+	pendingGroupMany: <?= json_encode(l7_t("%d pendentes")) ?>,
 	scoped: <?= json_encode(l7_t("No modo scoped_hybrid, use Opcoes e selecione um CIDR/grupo de origem.")) ?>,
 	confirmOff: <?= json_encode(l7_t("Vai desligar perfil(is) e remover a(s) politica(s). Continuar?")) ?>,
 	applying: <?= json_encode(l7_t("A aplicar... aguarde o reload.")) ?>,
@@ -2582,11 +2591,30 @@ function l7updateProfileDraftBar() {
 	if (n === 0) {
 		bar.hidden = true;
 		msg.textContent = '';
-		return;
+	} else {
+		bar.hidden = false;
+		var tpl = n === 1 ? l7ProfileDraftStrings.pendingOne : l7ProfileDraftStrings.pendingMany;
+		msg.textContent = tpl.replace('%d', String(n));
 	}
-	bar.hidden = false;
-	var tpl = n === 1 ? l7ProfileDraftStrings.pendingOne : l7ProfileDraftStrings.pendingMany;
-	msg.textContent = tpl.replace('%d', String(n));
+	l7updateProfileGroupPendingBadges();
+}
+
+function l7updateProfileGroupPendingBadges() {
+	var groups = document.querySelectorAll('.l7-profiles-groups .l7-profile-group');
+	for (var i = 0; i < groups.length; i++) {
+		var group = groups[i];
+		var pending = group.querySelectorAll('.l7-profile-card.l7-profile-pending').length;
+		var badge = group.querySelector('.l7-profile-group-pending-badge');
+		if (!badge) continue;
+		if (pending > 0) {
+			var tpl = pending === 1 ? l7ProfileDraftStrings.pendingGroupOne : l7ProfileDraftStrings.pendingGroupMany;
+			badge.textContent = tpl.replace('%d', String(pending));
+			badge.hidden = false;
+		} else {
+			badge.textContent = '';
+			badge.hidden = true;
+		}
+	}
 }
 
 function l7discardProfileDraft() {
@@ -2770,14 +2798,9 @@ function l7filter(input, listId) {
 	}
 }
 
-function l7profileGroupStorageKey(groupId) {
-	return 'l7_profile_group_' + groupId;
-}
-
 function l7toggleProfileGroup(headerEl, forceOpen) {
 	var group = headerEl.closest('.l7-profile-group');
 	if (!group) return;
-	var gid = group.getAttribute('data-group-id');
 	var collapsed = group.classList.contains('l7-profile-group-collapsed');
 	var open = (typeof forceOpen === 'boolean') ? forceOpen : collapsed;
 	if (open) {
@@ -2785,37 +2808,38 @@ function l7toggleProfileGroup(headerEl, forceOpen) {
 	} else {
 		group.classList.add('l7-profile-group-collapsed');
 	}
-	if (gid) {
-		try {
-			localStorage.setItem(l7profileGroupStorageKey(gid), open ? '1' : '0');
-		} catch (e) {}
+	if (headerEl && headerEl.setAttribute) {
+		headerEl.setAttribute('aria-expanded', open ? 'true' : 'false');
+	}
+}
+
+function l7setAllProfileGroups(open) {
+	var groups = document.querySelectorAll('.l7-profiles-groups .l7-profile-group');
+	for (var i = 0; i < groups.length; i++) {
+		var hdr = groups[i].querySelector('.l7-profile-group-header');
+		if (hdr) {
+			l7toggleProfileGroup(hdr, !!open);
+		}
 	}
 }
 
 function l7initProfileGroups() {
-	var groups = document.querySelectorAll('.l7-profiles-groups .l7-profile-group[data-group-id]');
+	var groups = document.querySelectorAll('.l7-profiles-groups .l7-profile-group');
 	for (var i = 0; i < groups.length; i++) {
 		var g = groups[i];
-		var gid = g.getAttribute('data-group-id');
-		var stored = null;
-		if (gid) {
-			try {
-				stored = localStorage.getItem(l7profileGroupStorageKey(gid));
-			} catch (e) {}
-		}
-		if (stored === '1') {
-			g.classList.remove('l7-profile-group-collapsed');
-		} else if (stored === '0') {
-			g.classList.add('l7-profile-group-collapsed');
+		g.classList.add('l7-profile-group-collapsed');
+		var hdr = g.querySelector('.l7-profile-group-header');
+		if (hdr) {
+			hdr.setAttribute('aria-expanded', 'false');
 		}
 	}
 	/* Bookmark legado layer7_remote_access.php → #l7-ra */
 	if (window.location.hash === '#l7-ra') {
 		var ra = document.getElementById('l7-ra');
 		if (ra) {
-			var hdr = ra.querySelector('.l7-profile-group-header');
-			if (hdr) {
-				l7toggleProfileGroup(hdr, true);
+			var hdrRa = ra.querySelector('.l7-profile-group-header');
+			if (hdrRa) {
+				l7toggleProfileGroup(hdrRa, true);
 			}
 			try {
 				ra.scrollIntoView({ behavior: 'smooth', block: 'start' });

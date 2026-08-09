@@ -331,6 +331,11 @@ write_stats_json(void)
 	fprintf(f, "  \"identity_entitled\": %s,\n",
 	    layer7_features_allows_identity(s_lic.features_flags) ?
 	    "true" : "false");
+	fprintf(f, "  \"mitm_entitled\": %s,\n",
+	    layer7_features_allows_mitm(s_lic.features_flags) ?
+	    "true" : "false");
+	fprintf(f, "  \"mitm_runtime_available\": false,\n");
+	fprintf(f, "  \"mitm_effective\": false,\n");
 	{
 		const char *lst = "off";
 		enum l7_ldap_status st = s_ldap_worker ?

@@ -2136,7 +2136,9 @@ function layer7_bare_config()
 			"dst_allowlist" => array(),
 			"device_aliases" => array(),
 			/* IM4 / 20.16 — Identity config (default OFF; sem secrets). */
-			"identity" => layer7_identity_defaults()
+			"identity" => layer7_identity_defaults(),
+			/* IM2 / 20.8 — MITM config (default OFF; sem runtime; chave CA fora do JSON). */
+			"mitm" => layer7_mitm_defaults()
 		)
 	);
 }
@@ -2169,6 +2171,14 @@ function layer7_save_json($data)
 
 	$cfgpath = layer7_cfg_path();
 	$data = layer7_config_interfaces_normalize($data);
+	if (isset($data["layer7"]) && is_array($data["layer7"])) {
+		if (isset($data["layer7"]["mitm"])) {
+			$data["layer7"]["mitm"] = layer7_mitm_normalize($data["layer7"]["mitm"]);
+		}
+		if (isset($data["layer7"]["identity"])) {
+			$data["layer7"]["identity"] = layer7_identity_normalize($data["layer7"]["identity"]);
+		}
+	}
 	$json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	if ($json === false) {
 		$input_errors[] = l7_t("Erro ao serializar JSON.");
@@ -5800,6 +5810,421 @@ function layer7_has_entitlement($token)
 		return !empty($e["has_mitm"]);
 	}
 	return false;
+}
+
+/* ============================================================
+ * IM2 / 20.8–20.9 — MITM config (opt-in OFF; effective só com runtime).
+ *
+ * GO humano 2026-08-08. Chave privada NUNCA em layer7.json.
+ * Squid rejeitado (ADR-0026). OFF ≡ ADR-0017.
+ * Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
+ * ============================================================ */
+
+function layer7_mitm_runtime_available()
+{
+	/* Flip para true só quando o helper layer7-tlsproxy existir no pacote. */
+	return false;
+}
+
+/**
+ * CIDRs sempre em bypass (não removíveis) — nunca interceptar loopback.
+ */
+function layer7_mitm_protected_bypass_cidr()
+{
+	return array("127.0.0.1/32", "::1/128");
+}
+
+/**
+ * Efectivo = intenção ∧ entitlement ∧ CA ∧ runtime.
+ * Sem effective: zero intercept / zero helper (S8 / ADR-0017).
+ */
+function layer7_mitm_effective($mitm = null, $entitled = null)
+{
+	if ($entitled === null) {
+		$entitled = layer7_has_entitlement("mitm");
+	}
+	if ($mitm === null) {
+		$mitm = layer7_mitm_from_config(layer7_load_or_default());
+	} elseif (!is_array($mitm)) {
+		$mitm = layer7_mitm_normalize($mitm);
+	} else {
+		/* Evitar reentrância de probe: assumir já normalizado ou normalizar. */
+		if (!isset($mitm["bypass"]) || !isset($mitm["ca"])) {
+			$mitm = layer7_mitm_normalize($mitm);
+		}
+	}
+	if (empty($entitled)) {
+		return false;
+	}
+	if (empty($mitm["enabled"])) {
+		return false;
+	}
+	if (empty($mitm["ca"]["present"])) {
+		return false;
+	}
+	if (!layer7_mitm_runtime_available()) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * O helper só pode arrancar se effective. Hoje: sempre false.
+ */
+function layer7_mitm_should_start_helper($mitm = null, $entitled = null)
+{
+	return layer7_mitm_effective($mitm, $entitled);
+}
+
+function layer7_mitm_dir()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7/mitm";
+	}
+	return "/usr/local/etc/layer7/mitm";
+}
+
+function layer7_mitm_ca_cert_path()
+{
+	return layer7_mitm_dir() . "/ca.crt";
+}
+
+function layer7_mitm_ca_key_path()
+{
+	return layer7_mitm_dir() . "/ca.key";
+}
+
+function layer7_mitm_openssl_bin()
+{
+	static $bin = null;
+	if ($bin !== null) {
+		return $bin;
+	}
+	foreach (array("/usr/bin/openssl", "/usr/local/bin/openssl") as $c) {
+		if (is_executable($c)) {
+			$bin = $c;
+			return $bin;
+		}
+	}
+	$bin = "openssl";
+	return $bin;
+}
+
+function layer7_mitm_defaults()
+{
+	return array(
+		"enabled" => false,
+		"quic_mode" => "bypass",
+		"ca" => array(
+			"present" => false,
+			"subject" => "",
+			"fingerprint_sha256" => "",
+			"not_after" => "",
+			"cn" => "Layer7 MITM CA"
+		),
+		"bypass" => array(
+			"sni" => array(),
+			"cidr" => array()
+		)
+	);
+}
+
+/**
+ * Normaliza bloco mitm (passo 20.9).
+ * - enabled = intenção (só true com CA presente); effective exige também runtime.
+ * - Bypass endurecido + CIDRs protegidos (loopback).
+ * - quic_mode: bypass|block|downgrade (S5; default bypass).
+ * Remove qualquer material de chave que tenha entrado por engano no JSON.
+ */
+function layer7_mitm_normalize($mitm)
+{
+	$defaults = layer7_mitm_defaults();
+	if (!is_array($mitm)) {
+		$mitm = array();
+	}
+	$out = $defaults;
+
+	$ca_in = (isset($mitm["ca"]) && is_array($mitm["ca"])) ? $mitm["ca"] : array();
+	$ca = $defaults["ca"];
+	$ca["cn"] = trim((string)($ca_in["cn"] ?? $defaults["ca"]["cn"]));
+	if ($ca["cn"] === "") {
+		$ca["cn"] = $defaults["ca"]["cn"];
+	}
+	if (strlen($ca["cn"]) > 64) {
+		$ca["cn"] = substr($ca["cn"], 0, 64);
+	}
+	$probe = layer7_mitm_ca_probe();
+	$ca["present"] = !empty($probe["present"]);
+	$ca["subject"] = (string)($probe["subject"] ?? "");
+	$ca["fingerprint_sha256"] = (string)($probe["fingerprint_sha256"] ?? "");
+	$ca["not_after"] = (string)($probe["not_after"] ?? "");
+	$out["ca"] = $ca;
+
+	$want_enabled = !empty($mitm["enabled"]);
+	$out["enabled"] = ($want_enabled && !empty($ca["present"])) ? true : false;
+
+	$qm = strtolower(trim((string)($mitm["quic_mode"] ?? "bypass")));
+	if (!in_array($qm, array("bypass", "block", "downgrade"), true)) {
+		$qm = "bypass";
+	}
+	$out["quic_mode"] = $qm;
+
+	$bp_in = (isset($mitm["bypass"]) && is_array($mitm["bypass"])) ? $mitm["bypass"] : array();
+	$sni = array();
+	$raw_sni = isset($bp_in["sni"]) ? $bp_in["sni"] : array();
+	if (is_string($raw_sni)) {
+		$raw_sni = preg_split('/[\r\n,]+/', $raw_sni);
+	}
+	if (is_array($raw_sni)) {
+		foreach ($raw_sni as $host) {
+			$host = strtolower(trim((string)$host));
+			$host = preg_replace('/^\*\./', '', $host);
+			if ($host === "" || $host === "*" || strlen($host) > 253) {
+				continue;
+			}
+			if ($host[0] === '.' || substr($host, -1) === '.' || strpos($host, "..") !== false) {
+				continue;
+			}
+			if (!preg_match('/^[a-z0-9._-]+$/', $host)) {
+				continue;
+			}
+			if (filter_var($host, FILTER_VALIDATE_IP)) {
+				continue;
+			}
+			$sni[] = $host;
+			if (count($sni) >= 256) {
+				break;
+			}
+		}
+	}
+	$cidr = array();
+	$raw_cidr = isset($bp_in["cidr"]) ? $bp_in["cidr"] : array();
+	if (is_string($raw_cidr)) {
+		$raw_cidr = preg_split('/[\r\n,]+/', $raw_cidr);
+	}
+	if (is_array($raw_cidr)) {
+		foreach ($raw_cidr as $net) {
+			$net = trim((string)$net);
+			if ($net === "" || strlen($net) > 64) {
+				continue;
+			}
+			if (strpos($net, "/") === false) {
+				if (filter_var($net, FILTER_VALIDATE_IP) === false) {
+					continue;
+				}
+			} else {
+				list($ip, $bits) = array_pad(explode("/", $net, 2), 2, "");
+				$bits = (int)$bits;
+				if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+					continue;
+				}
+				$max = (strpos($ip, ":") !== false) ? 128 : 32;
+				if ($bits < 0 || $bits > $max) {
+					continue;
+				}
+				$net = $ip . "/" . $bits;
+			}
+			$cidr[] = $net;
+			if (count($cidr) >= 128) {
+				break;
+			}
+		}
+	}
+	$cidr = array_values(array_unique(array_merge(layer7_mitm_protected_bypass_cidr(), $cidr)));
+	if (count($cidr) > 128) {
+		$cidr = array_slice($cidr, 0, 128);
+	}
+	$out["bypass"] = array(
+		"sni" => array_values(array_unique($sni)),
+		"cidr" => $cidr
+	);
+	return $out;
+}
+
+function layer7_mitm_from_config($data)
+{
+	if (!is_array($data) || !isset($data["layer7"]) || !is_array($data["layer7"])) {
+		return layer7_mitm_normalize(null);
+	}
+	$raw = isset($data["layer7"]["mitm"]) ? $data["layer7"]["mitm"] : null;
+	return layer7_mitm_normalize($raw);
+}
+
+function layer7_mitm_apply_to_config($data, $mitm)
+{
+	if (!is_array($data)) {
+		$data = layer7_bare_config();
+	}
+	if (!isset($data["layer7"]) || !is_array($data["layer7"])) {
+		$data["layer7"] = layer7_bare_config()["layer7"];
+	}
+	$data["layer7"]["mitm"] = layer7_mitm_normalize($mitm);
+	return $data;
+}
+
+function layer7_mitm_ca_probe()
+{
+	$cert = layer7_mitm_ca_cert_path();
+	$key = layer7_mitm_ca_key_path();
+	$out = array(
+		"present" => false,
+		"subject" => "",
+		"fingerprint_sha256" => "",
+		"not_after" => "",
+		"key_present" => is_readable($key)
+	);
+	if (!is_readable($cert)) {
+		return $out;
+	}
+	$out["present"] = true;
+	$openssl = layer7_mitm_openssl_bin();
+	$cmd_subj = $openssl . " x509 -in " . escapeshellarg($cert) . " -noout -subject 2>/dev/null";
+	$cmd_fp = $openssl . " x509 -in " . escapeshellarg($cert) . " -noout -fingerprint -sha256 2>/dev/null";
+	$cmd_end = $openssl . " x509 -in " . escapeshellarg($cert) . " -noout -enddate 2>/dev/null";
+	$subj = @shell_exec($cmd_subj);
+	$fp = @shell_exec($cmd_fp);
+	$end = @shell_exec($cmd_end);
+	if (is_string($subj)) {
+		$out["subject"] = trim(preg_replace('/^subject=\s*/i', '', trim($subj)));
+	}
+	if (is_string($fp) && preg_match('/Fingerprint(?:=|\s)+([0-9A-Fa-f:]+)/', $fp, $m)) {
+		$out["fingerprint_sha256"] = strtoupper(str_replace(":", "", $m[1]));
+	}
+	if (is_string($end)) {
+		$out["not_after"] = trim(preg_replace('/^notAfter=\s*/i', '', trim($end)));
+	}
+	return $out;
+}
+
+/**
+ * Gera CA auto-assinada RSA-2048. Chave 0600; cert 0644. Nunca commit.
+ * @return array{ok:bool,msg:string}
+ */
+function layer7_mitm_ca_generate($cn, $days = 3650)
+{
+	$cn = trim((string)$cn);
+	if ($cn === "") {
+		$cn = "Layer7 MITM CA";
+	}
+	if (strlen($cn) > 64) {
+		$cn = substr($cn, 0, 64);
+	}
+	$days = (int)$days;
+	if ($days < 30) {
+		$days = 30;
+	}
+	if ($days > 8250) {
+		$days = 8250;
+	}
+	$dir = layer7_mitm_dir();
+	if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+		return array("ok" => false, "msg" => "Nao foi possivel criar " . $dir);
+	}
+	@chmod($dir, 0750);
+	$cert = layer7_mitm_ca_cert_path();
+	$key = layer7_mitm_ca_key_path();
+	$subj = "/CN=" . str_replace(array("/", "\0"), "", $cn);
+	$openssl = layer7_mitm_openssl_bin();
+	$cmd = sprintf(
+		"%s req -x509 -newkey rsa:2048 -sha256 -nodes -days %d -subj %s -keyout %s -out %s 2>&1",
+		escapeshellcmd($openssl),
+		$days,
+		escapeshellarg($subj),
+		escapeshellarg($key),
+		escapeshellarg($cert)
+	);
+	$out = array();
+	$code = 0;
+	@exec($cmd, $out, $code);
+	if ($code !== 0 || !is_readable($cert) || !is_readable($key)) {
+		return array(
+			"ok" => false,
+			"msg" => "Falha openssl ao gerar CA" . (!empty($out) ? (": " . implode(" ", $out)) : ".")
+		);
+	}
+	@chmod($key, 0600);
+	@chmod($cert, 0644);
+	@chown($key, "root");
+	@chgrp($key, "wheel");
+	return array("ok" => true, "msg" => "CA gerada.");
+}
+
+/**
+ * Importa PEM cert+key. Valida que a chave corresponde ao certificado.
+ * @return array{ok:bool,msg:string}
+ */
+function layer7_mitm_ca_import($cert_pem, $key_pem)
+{
+	$cert_pem = trim((string)$cert_pem);
+	$key_pem = trim((string)$key_pem);
+	if ($cert_pem === "" || $key_pem === "") {
+		return array("ok" => false, "msg" => "Certificado e chave PEM sao obrigatorios.");
+	}
+	if (strpos($cert_pem, "BEGIN CERTIFICATE") === false) {
+		return array("ok" => false, "msg" => "Certificado PEM invalido.");
+	}
+	if (strpos($key_pem, "BEGIN") === false || strpos($key_pem, "PRIVATE KEY") === false) {
+		return array("ok" => false, "msg" => "Chave privada PEM invalida.");
+	}
+	$dir = layer7_mitm_dir();
+	if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+		return array("ok" => false, "msg" => "Nao foi possivel criar " . $dir);
+	}
+	$tmp_c = $dir . "/.import-ca.crt";
+	$tmp_k = $dir . "/.import-ca.key";
+	if (@file_put_contents($tmp_c, $cert_pem . "\n", LOCK_EX) === false ||
+	    @file_put_contents($tmp_k, $key_pem . "\n", LOCK_EX) === false) {
+		@unlink($tmp_c);
+		@unlink($tmp_k);
+		return array("ok" => false, "msg" => "Falha ao escrever ficheiros temporarios.");
+	}
+	@chmod($tmp_k, 0600);
+	$openssl = layer7_mitm_openssl_bin();
+	$mod_c = trim((string)@shell_exec($openssl . " x509 -noout -modulus -in " . escapeshellarg($tmp_c) . " 2>/dev/null"));
+	$mod_k = trim((string)@shell_exec($openssl . " rsa -noout -modulus -in " . escapeshellarg($tmp_k) . " 2>/dev/null"));
+	if ($mod_c === "" || $mod_k === "" || $mod_c !== $mod_k) {
+		@unlink($tmp_c);
+		@unlink($tmp_k);
+		return array("ok" => false, "msg" => "A chave nao corresponde ao certificado.");
+	}
+	$cert = layer7_mitm_ca_cert_path();
+	$key = layer7_mitm_ca_key_path();
+	if (!@rename($tmp_c, $cert) || !@rename($tmp_k, $key)) {
+		@unlink($tmp_c);
+		@unlink($tmp_k);
+		return array("ok" => false, "msg" => "Falha ao instalar CA importada.");
+	}
+	@chmod($key, 0600);
+	@chmod($cert, 0644);
+	return array("ok" => true, "msg" => "CA importada.");
+}
+
+function layer7_mitm_ca_delete()
+{
+	$cert = layer7_mitm_ca_cert_path();
+	$key = layer7_mitm_ca_key_path();
+	$ok = true;
+	if (file_exists($cert) && !@unlink($cert)) {
+		$ok = false;
+	}
+	if (file_exists($key) && !@unlink($key)) {
+		$ok = false;
+	}
+	return $ok;
+}
+
+function layer7_mitm_validate($mitm)
+{
+	$errors = array();
+	$want = is_array($mitm) && !empty($mitm["enabled"]);
+	$mitm = layer7_mitm_normalize($mitm);
+	if ($want && empty($mitm["ca"]["present"])) {
+		$errors[] = l7_t("Nao e possivel activar MITM sem CA instalada.");
+	}
+	if ($want && !layer7_has_entitlement("mitm")) {
+		$errors[] = l7_t("Entitlement mitm obrigatorio para activar.");
+	}
+	return $errors;
 }
 
 /* ============================================================

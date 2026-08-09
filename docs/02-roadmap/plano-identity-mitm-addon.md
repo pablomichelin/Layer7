@@ -1,19 +1,25 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** `FECHADO` (rev. `2026-08-08m`; **20.33 / GI9 PASS**; Identity de rede; MITM permanece DEFER)
+**Estado do plano:** Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08q`; passo **20.9 PASS** / `1.9.38` / próximo 20.10 bloqueado)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT de estado vivo do produto:** [`../../CORTEX.md`](../../CORTEX.md)  
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
+**Desenho MITM (opção E):** [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime **AUSENTE**  
+**Contrato IPC 20.9:** [`../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
-**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**implementação diferida**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
+**ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Candidato port:** `1.9.29` (**publicado** lab/`latest`)  
+**Canal lab/`latest`:** `1.9.38` (20.9 PASS; SHA `7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`)
 
-**Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; fila Identity rede **FECHADA** (MITM DEFER; lab AD residual).
+**Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
+**Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
+**Rev. `o` (`2026-08-08`)** = **20.8 PASS** (`1.9.37`).  
+**Rev. `p` (`2026-08-08`)** = **20.9 PASS** — intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; `mitm_effective` sempre false sem runtime; Squid rejeitado.  
+**Rev. `q` (`2026-08-08`)** = docs alinhados ao publish **`1.9.38`** (`releases/latest`).
 
 ---
 
@@ -21,21 +27,25 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **FECHADO** — 20.33 / GI9 PASS (homolog `1.9.29`) |
-| Código | **20.22 PASS** (audit); 20.21; 20.20; 20.19 |
-| ADRs | **Aceito** ×5; T1; **0026 diferida**; **0027**; **0029** IM7/IM8 |
-| MITM | **DEFER 20.7a** |
-| Próximo | Manutenção; reopen MITM/endpoint só com GO; lab AD residual opcional |
+| Passo actual | **20.9 PASS** (`1.9.38`); próximo **20.10** **bloqueado** até S1–S8 + GO lab (sem intercept) |
+| Código | Identity **20.22+ PASS**; MITM **20.8** (`1.9.37`) + **20.9** (`1.9.38`; intenção ≠ effective) |
+| ADRs | **Aceito** ×5; T1; **0026 em curso (rev. f — intenção vs effective)**; **0027**; **0029** IM7/IM8 |
+| MITM | **Reopen GO** → 20.8–20.9; runtime AUSENTE; `mitm_effective` **false**; GI2/GI3 runtime **DEFERRED** |
+| Identity rede | **FECHADA** (20.33 / GI9) — não reabrir sem GO |
+| Próximo | **20.10** só após S1–S8 + GO lab; sem claim de intercept |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **FECHADO** (20.33 / GI9 PASS)
-- 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
-- 20.32: PASS (MANUAL + USO-LICENÇAS §14 + notes comerciais)
-- 20.31: PASS (malha OFF + unit; `20260808T135500Z-im9-20.31-identity-mesh`)
-- 20.22: PASS (audit conflict + last_writer)
-- Baseline: 1.9.8 enforce pin; lab/`latest` **1.9.29**
-- MITM: DEFER 20.7a; IM7 ADIAR / IM8 EXCLUÍDO (ADR-0029)
+- Passo actual: **20.9 PASS** (`1.9.38`); próximo **20.10** BLOQUEADO (S1–S8 + GO lab)
+- Identity rede: **FECHADA** (20.33 / GI9 PASS)
+- 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
+- 20.9: PASS (`1.9.38`) — intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC;
+         mitm_effective sempre false sem runtime
+- 20.33: PASS (homolog `20260808T174100Z-im9-20.33-homolog-1.9.29`)
+- Baseline: 1.9.8 enforce pin; lab/`latest` **1.9.38**
+- MITM: reopen GO; Squid REJEITADO; IM7 ADIAR / IM8 EXCLUÍDO (ADR-0029)
+- Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
+- Contrato: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -45,7 +55,7 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 | # | Tema | Decisão canónica |
 |---|------|------------------|
 | R-A | MITM ≠ dependência de Identity | MITM e Identity são **ortogonais**. Preferência de produto “MITM cedo” **não** bloqueia Identity se o spike falhar. |
-| R-B | Spike MITM GO/NO-GO | Passo **20.7** é **spike** (desenho + decisão). **Cumprido:** veredicto **DEFER 20.7a** (`2026-08-06`) sem PoC de intercept (Squid rejeitado; Identity-first). Reabrir implementação exige novo GO + S1–S8. |
+| R-B | Spike MITM GO/NO-GO | Passo **20.7** é **spike** (desenho + decisão). **Cumprido:** veredicto **DEFER 20.7a** (`2026-08-06`) sem PoC de intercept (Squid rejeitado; Identity-first). **Reopen GO `2026-08-08`:** 20.8/20.9 PASS; runtime/intercept exige S1–S8 + GO lab. |
 | R-C | Mapa Identity no **daemon** | SSOT de sessão user↔IP vive no daemon (refresh contínuo → PF/tabelas). **Não** copiar o padrão PHP `device_ips` (resync lento demais para User-ID). |
 | R-D | Eventos AD canónicos | MVP = **agente leve no Domain Controller** → push seguro para o appliance. WinRM/WMI a partir do FreeBSD = **não** canónico. |
 | R-E | RADIUS canónico | MVP = Layer7 como **accounting receiver** (UDP, secret, ACL de NAS). Não confundir com captive portal. |
@@ -73,7 +83,7 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 |---|------|------------------|
 | R-R | Nicho PME / MSP | Produto do add-on = **controlo de internet por pessoa** para empresas **pequenas/médias** e canal MSP em pfSense. **Não** é paridade com NGFW enterprise. Detalhe: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md). |
 | R-S | Identity-first | Após IM1, o **caminho de valor obrigatório** é IM3→IM6. MITM **não** atrasa Identity. |
-| R-T | MITM DEFER 20.7a | Spike fechado como **DEFER** (`2026-08-06`): Squid **rejeitado**; PoC runtime não iniciada; GI2/GI3 `DEFERRED`; passos 20.8–20.11 **saltados** até novo GO + spike S1–S8 com helper próprio (opção E). Token `mitm` pode existir no SKU sem código activo. |
+| R-T | MITM DEFER 20.7a → reopen GO | Spike fechado como **DEFER** (`2026-08-06`): Squid **rejeitado**; PoC runtime não iniciada. **Reopen GO humano `2026-08-08`:** **20.8 PASS** + **20.9 PASS** (intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC); runtime `layer7-tlsproxy` **AUSENTE**; `mitm_effective` **sempre false** sem runtime; GI2/GI3 **runtime** permanece `DEFERRED` até S1–S8 + GO lab. Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md); contrato: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md). Token `mitm` no SKU **sem** intercept activo. |
 | R-U | Barra UX PME | Cada passo Identity deve cumprir critérios U*/P*/H*/N* do posicionamento (§6) — “perfeito para empresas usarem”, não só “compila e passa gate”. |
 | R-V | Anti-overclaim | Materiais e GUI **proibidos** de prometer paridade Fortinet/Palo/Check Point, MITM universal, ou exactidão GlobalProtect sem agente. |
 
@@ -83,7 +93,7 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 |-------|--------|---------|
 | Fecho P0–J | **FECHADO** | Baseline comercial; não reabrir |
 | IPv6 V0–V6 | **FECHADA** | Dual-stack já no produto; Identity/MITM devem **respeitar** IPv4+IPv6 |
-| Este plano | **ABERTO** | Extensão comercial e técnica nova |
+| Este plano | Identity **FECHADA**; MITM **20.9 PASS** | Extensão comercial; Identity rede fechada; MITM intenção/IPC pós-reopen GO; runtime ausente |
 
 Congelamento das filas fechadas:
 [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
@@ -149,7 +159,7 @@ Congelamento das filas fechadas:
 11. **Captive portal fora de escopo.** Não reimplementar o do pfSense.
 12. **Documentação no mesmo bloco** quando houver execução/release.
 13. **Mapa Identity no daemon** (R-C). Pacote configura; não é SSOT de sessão.
-14. **Spike MITM** foi obrigatório antes de investir IM2 completa (R-B) — **cumprido com DEFER 20.7a**; reabrir 20.8+ só com novo GO.
+14. **Spike MITM** foi obrigatório antes de investir IM2 completa (R-B) — **cumprido com DEFER 20.7a**; **reopen GO `2026-08-08`** autoriza 20.8/20.9 (não intercept). Runtime exige S1–S8 + GO lab.
 15. **Nicho PME / barra UX** (R-R, R-U): cada passo Identity revê posicionamento §6 (U*/P*/H*/N*).
 
 ---
@@ -258,40 +268,38 @@ Regras complementares (detalhe no SSOT):
 
 ---
 
-### IM2 — MITM TLS opt-in — **DEFER formal (20.7a)** — não bloqueia Identity
+### IM2 — MITM TLS opt-in — **reopen GO `2026-08-08`** — passo **20.9 PASS**
 
 MITM no stack actual (pcap+nDPI+PF) é **quase um segundo produto** (terminação TLS).
-Decisão de produto PME (`2026-08-06`): **não** investir agora em paridade NGFW TLS;
-Squid **rejeitado**; Identity-first.
+Histórico PME (`2026-08-06`): DEFER 20.7a; Squid **rejeitado**; Identity-first avançou e
+**fechou** (20.33/GI9). **GO humano `2026-08-08`:** reabrir IM2 com scaffolding seguro
+(opt-in OFF); **sem** intercept; runtime helper próprio ainda **ausente**.
 
 | Passo | Entrega | Gate / estado |
 |-------|---------|---------------|
 | **20.7** | Spike: desenho + preflight appliance; Squid rejeitado; opções B/E/D | **PASS documental** (`spike-mitm-20.7.md`) |
-| **20.7a** | **DEFER formal:** emenda ADR-0026 “implementação diferida”; GI2/GI3 `DEFERRED`; **saltar** 20.8–20.11; posicionamento PME; avançar IM3+ | **PASS** (`2026-08-06`) |
-| **20.8** | (só após **novo GO** + spike S1–S8 com helper próprio) Gestão CA | BLOQUEADO até reabrir IM2 |
-| **20.9** | (idem) Toggle `mitm.enabled` + bypass | BLOQUEADO |
-| **20.10** | (idem) Intercept selectivo; block page HTTPS | BLOQUEADO |
-| **20.11** | (idem) Lab CA; GI2–GI3 | BLOQUEADO / gates `DEFERRED` |
+| **20.7a** | **DEFER formal:** ADR-0026 diferida; GI2/GI3 `DEFERRED`; Identity IM3+ | **PASS** (`2026-08-06`) |
+| **20.8** | Scaffolding: schema `mitm.*` OFF; gestão CA; bypass GUI; `mitm_entitled` no status daemon; `enabled` forçado false; **sem** `layer7-tlsproxy` | **PASS** (`1.9.37`, `2026-08-08`) |
+| **20.9** | Toggle **intenção** `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC; `mitm_effective` **sempre false** sem runtime | **PASS** (`1.9.38`, `2026-08-08`) |
+| **20.10** | Intercept selectivo; block page HTTPS — **exige** runtime + S1–S8 + GO lab | **BLOQUEADO** até S1–S8 + GO lab |
+| **20.11** | Lab CA; GI2–GI3 runtime | BLOQUEADO / gates runtime `DEFERRED` |
 
-**Veredicto 20.7a:** **DEFER** — motivos registados no spike + posicionamento:
+**Veredicto 20.7a (histórico):** **DEFER** — Identity avançou; Squid rejeitado.
 
-1. Squid / `pfSense-pkg-squid` **não** é caminho de produto (operador).  
-2. Ferramenta própria ≈ segundo produto (meses); fora do valor imediato PME.  
-3. NGFW enterprise TLS **não** é o objectivo do nicho.  
-4. Identity entrega o valor “por pessoa” sem MITM.  
-5. ADR-0017 permanece verdade com MITM OFF (estado permanente até reabrir).
+**Reopen GO `2026-08-08`:** IM2 reaberto para scaffolding (20.8) e intenção/IPC (20.9), **não** para intercept.
+Desenho opção E: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md).
+Contrato IPC: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md).
+Squid / `pfSense-pkg-squid` permanece **rejeitado**. ADR-0017 permanece verdade enquanto
+`mitm_effective=false` (sempre, sem runtime). Runtime `layer7-tlsproxy` **AUSENTE**.
+GI2/GI3 **critérios de runtime** continuam `DEFERRED` até S1–S8 medidos + GO lab.
 
-**Relação com ADR-0017:** MITM OFF → ADR-0017 intacto (estado actual e diferido).
+**Relação com ADR-0017:** `!mitm_effective` → ADR-0017 intacto (obrigatório no 20.8/20.9).
 
-**Reabrir IM2:** requer GO humano explícito + novo spike S1–S8 (candidata: helper
-`layer7-tlsproxy` / opção E — nunca Squid) + alinhamento ao posicionamento PME
-(MITM selectivo, opt-in, sem overclaim).
-
-**Rollback:** N/A runtime (sem código MITM); docs + ADR diferido.
+**Rollback:** `mitm.enabled=false`; remover entitlement `mitm`; sem processo proxy a parar (ausente).
 
 ---
 
-### IM3 — Núcleo Identity (mapa user↔IP **no daemon**) — **passo actual / caminho de valor PME**
+### IM3 — Núcleo Identity (mapa user↔IP **no daemon**) — **FECHADA** (caminho de valor PME cumprido)
 
 **Foco PME:** estruturas e diagnóstico devem nascer já com linguagem e estados
 úteis à empresa (posicionamento U2/U3/H1) — não só structs internas.
@@ -379,16 +387,19 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 
 ## 5. Ordem de implementação (resumo visual)
 
-**Caminho canónico actual (rev. `d` — PME Identity-first; MITM DEFER):**
+**Caminho canónico actual (rev. `q` — Identity FECHADA; MITM 20.9 PASS):**
 
 ```text
 IM0 → IM1 Entitlements          [FEITO]
-  → IM2 spike 20.7 + 20.7a DEFER [FEITO — saltar 20.8–20.11]
-  → IM3–IM6 Identity MVP         [EM CURSO — valor PME]
-       mapa daemon + LDAP + fontes + políticas ad_*
+  → IM2 spike 20.7 + 20.7a DEFER [FEITO]
+  → IM3–IM6 Identity MVP         [FEITO]
   → IM7 ADIAR + IM8 exclusão (ADR-0029 / GI8 PASS)
-  → IM9 Fecho / release Identity de rede
-  → (IM2 reopen MITM / IM7 reopen endpoint só com novo GO)
+  → IM9 Fecho Identity de rede   [FEITO — 20.33/GI9]
+  → IM2 reopen GO 2026-08-08 → **20.8 PASS** → **20.9 PASS**
+       (intenção/bypass/quic_mode/IPC; mitm_effective=false; tlsproxy AUSENTE;
+        Squid rejeitado; contrato-ipc-layer7-tlsproxy-20.9.md)
+  → **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
+  → IM7 reopen endpoint só com GO separado
 ```
 
 **Caminho histórico (se spike tivesse sido GO) — arquivado como alternativa:**
@@ -428,7 +439,7 @@ Detalhe por superfície: mapa de rastreabilidade §0–§2.
 | ID | Risco | Severidade | Mitigação |
 |----|-------|------------|-----------|
 | R1 | Quebra enforcement base | Crítica | Opt-in; gates; feature flags; testes |
-| R2 | MITM inviável / CPU / segundo produto | Alta | **Mitigado:** DEFER 20.7a; Identity avança; reabrir só com GO + helper próprio |
+| R2 | MITM inviável / CPU / segundo produto | Alta | **Mitigado parcial:** DEFER 20.7a → reopen 20.8/20.9 (intenção ≠ effective); runtime + S1–S8 ainda pendentes; Squid rejeitado |
 | R3 | Pinning / apps quebradas | Alta | Bypass list; docs; default OFF |
 | R4 | Mapa stale / padrão device_ips lento | Alta | Mapa no daemon; TTL; refresh; logout |
 | R5 | Credenciais AD no disco | Alta | Permissões; não logar secrets; LDAPS |
@@ -468,7 +479,7 @@ Detalhe por superfície: mapa de rastreabilidade §0–§2.
 |----|------|------|
 | BG-085 | Governança Identity+MITM (IM0) | IM0 |
 | BG-086 | Entitlements `features` (IM1) | IM1 |
-| BG-087 | MITM TLS opt-in + CA (IM2) — **DEFER 20.7a** | IM2 (diferido) |
+| BG-087 | MITM TLS opt-in + CA (IM2) — **20.9 PASS** (intenção/IPC; runtime diferido) | IM2 (20.8–20.9) |
 | BG-088 | Identity map + LDAP (IM3–IM4) | IM3–IM4 |
 | BG-089 | Fontes RADIUS + AD events (IM5) | IM5 |
 | BG-090 | Políticas user/grupo (IM6) | IM6 |
@@ -540,6 +551,10 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
+| 2026-08-08 | **rev. `q` / docs align** — `latest` **`1.9.38`** publicado (SHA `7c60f6b1…1dab`); passo continua **20.9 PASS**; 20.10 bloqueado |
+| 2026-08-08 | **rev. `p` / 20.9 PASS** — intenção `mitm.enabled`; bypass endurecido; `quic_mode`; contrato IPC; `mitm_effective` sempre false sem runtime; próximo **20.10** bloqueado (S1–S8+GO lab); ADR-0026 rev. `f`; publicado depois como `1.9.38` |
+| 2026-08-08 | **rev. `o` / 20.8 PASS** — scaffolding publicado `1.9.37`; schema/CA/bypass/status; tlsproxy AUSENTE; Squid rejeitado |
+| 2026-08-08 | **rev. `n` / reopen MITM GO** — passo **20.8** scaffolding; Identity rede permanece FECHADA; ADR-0026 rev. `e` |
 | 2026-08-08 | **rev. `m` / 20.33 GI9 PASS** — homolog two-client real; licença Veeam; fila Identity rede **FECHADA** |
 | 2026-08-08 | **rev. `k` / 20.32 PASS** — MANUAL Identity + USO-LICENÇAS §14 + notes comerciais; GI9.2; passo → **20.33** |
 | 2026-08-08 | **rev. `j` / 20.31 PASS** — malha Identity OFF + `run-im9-20.31`; evidência indexada; GI9.1/9.4; passo → **20.32** |
