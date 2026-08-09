@@ -48,6 +48,7 @@ const {
   parseTotpChallengeToken,
   verifyTotp,
 } = require('../totp');
+const { requirePermission } = require('../require-permission');
 
 const router = Router();
 
@@ -103,6 +104,15 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
     }
 
     const admin = result.rows[0];
+    if (admin.is_active === false) {
+      await auditAdminEvent(buildLoginRejectedAuditPayload({
+        email,
+        req,
+        reason: 'account_disabled',
+      }));
+      return res.status(403).json(buildAuthErrorResponse('Conta desactivada.'));
+    }
+
     const valid = await bcrypt.compare(password, admin.password_hash);
     if (!valid) {
       const guards = await registerLoginFailure({ email, req });
@@ -209,7 +219,7 @@ router.post('/login/totp', loginIpLimiter, async (req, res) => {
   }
 });
 
-router.get('/2fa/status', auth, async (req, res) => {
+router.get('/2fa/status', auth, requirePermission('security.self'), async (req, res) => {
   const result = await pool.query(
     'SELECT totp_enabled FROM admins WHERE id = $1',
     [req.admin.id]
@@ -219,7 +229,7 @@ router.get('/2fa/status', auth, async (req, res) => {
   });
 });
 
-router.post('/2fa/setup', auth, async (req, res) => {
+router.post('/2fa/setup', auth, requirePermission('security.self'), async (req, res) => {
   try {
     const secret = generateTotpSecret();
     await pool.query(
@@ -236,7 +246,7 @@ router.post('/2fa/setup', auth, async (req, res) => {
   }
 });
 
-router.post('/2fa/enable', auth, async (req, res) => {
+router.post('/2fa/enable', auth, requirePermission('security.self'), async (req, res) => {
   try {
     const code = typeof req.body?.code === 'string' ? req.body.code : '';
     const result = await pool.query(
@@ -274,7 +284,7 @@ router.post('/2fa/enable', auth, async (req, res) => {
   }
 });
 
-router.post('/2fa/disable', auth, async (req, res) => {
+router.post('/2fa/disable', auth, requirePermission('security.self'), async (req, res) => {
   try {
     const password = typeof req.body?.password === 'string' ? req.body.password : '';
     const code = typeof req.body?.code === 'string' ? req.body.code : '';

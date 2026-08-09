@@ -6,9 +6,11 @@ const {
   LICENSE_SQL_EXPIRED_CONDITION,
   LICENSE_SQL_REVOKED_CONDITION,
 } = require('../license-state');
+const { requirePermission } = require('../require-permission');
 
 const router = Router();
 router.use(auth);
+router.use(requirePermission('dashboard.read'));
 
 const SAMPLE_LIMIT = 8;
 

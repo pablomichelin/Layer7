@@ -2,9 +2,11 @@ const { Router } = require('express');
 const pool = require('../db');
 const auth = require('../auth');
 const { createHttpError, isHttpError } = require('../crud-integrity');
+const { requirePermission } = require('../require-permission');
 
 const router = Router();
 router.use(auth);
+router.use(requirePermission('search.read'));
 
 function parseSearchQuery(value) {
   if (typeof value !== 'string') {

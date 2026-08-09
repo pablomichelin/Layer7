@@ -11,6 +11,7 @@ const {
   verifyBearerSessionToken,
 } = require('./bearer-session-token');
 const { getSessionLifecycleDecision } = require('./session-lifecycle');
+const { toPublicAdmin } = require('./admin-permissions');
 
 const SESSION_COOKIE_NAME = 'layer7_admin_session';
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
@@ -101,13 +102,18 @@ function buildSessionMetadata(row) {
   const expiresAt = new Date(row.expires_at);
   const lastSeenAt = row.last_seen_at ? new Date(row.last_seen_at) : createdAt;
   const absoluteExpiresAt = new Date(createdAt.getTime() + SESSION_ABSOLUTE_TIMEOUT_MS);
+  const publicAdmin = toPublicAdmin({
+    id: row.admin_id,
+    email: row.email,
+    name: row.name,
+    is_owner: row.is_owner,
+    is_active: row.is_active,
+    permissions: row.permissions,
+    totp_enabled: row.totp_enabled,
+  });
 
   return {
-    admin: {
-      id: row.admin_id,
-      email: row.email,
-      name: row.name,
-    },
+    admin: publicAdmin,
     session: {
       id: row.id,
       created_at: createdAt,
@@ -228,11 +234,7 @@ async function createSession(admin, req) {
   return {
     token,
     metadata: {
-      admin: {
-        id: admin.id,
-        email: admin.email,
-        name: admin.name,
-      },
+      admin: toPublicAdmin(admin),
       session: {
         id: sessionRow.id,
         created_at: new Date(sessionRow.created_at),
@@ -262,7 +264,10 @@ async function resolveSessionToken({ token, source }, res) {
         s.ip_address,
         s.user_agent,
         a.email,
-        a.name
+        a.name,
+        a.is_owner,
+        a.is_active,
+        a.permissions
       FROM admin_sessions s
       JOIN admins a ON a.id = s.admin_id
       WHERE s.session_token_hash = $1`,
@@ -275,6 +280,19 @@ async function resolveSessionToken({ token, source }, res) {
 
   const row = result.rows[0];
   if (row.revoked_at) {
+    if (source === 'cookie') {
+      clearSessionCookie(res);
+    }
+    return null;
+  }
+
+  if (row.is_active === false) {
+    await pool.query(
+      `UPDATE admin_sessions
+          SET revoked_at = COALESCE(revoked_at, NOW())
+        WHERE id = $1`,
+      [row.id]
+    );
     if (source === 'cookie') {
       clearSessionCookie(res);
     }
@@ -396,6 +414,7 @@ module.exports = {
   getSessionTokenFromRequest,
   requireSecureSessionRequest,
   resolveSession,
+  revokeActiveSessionsForAdmin,
   revokeSessionByToken,
   setSessionCookie,
   toSessionResponsePayload,

@@ -20,6 +20,8 @@ import {
   buildAdminLicenseDetailRoute,
   buildAdminLicenseEditRoute,
 } from '../panel-routes.js';
+import { usePermission } from '../use-permission.js';
+
 const RENEW_OPTIONS = [
   { days: 30, label: '+30 dias' },
   { days: 90, label: '+90 dias' },
@@ -32,6 +34,13 @@ export default function LicenseDetail() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const fromCustomerId = searchParams.get('from_customer') || '';
+  const canUpdate = usePermission('licenses.update');
+  const canRenewPerm = usePermission('licenses.renew');
+  const canRevoke = usePermission('licenses.revoke');
+  const canRebindPerm = usePermission('licenses.rebind');
+  const canReplacePerm = usePermission('licenses.replace');
+  const canDownloadPerm = usePermission('licenses.download');
+  const canArchive = usePermission('licenses.archive');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [renewing, setRenewing] = useState(false);
@@ -213,10 +222,10 @@ export default function LicenseDetail() {
 
   const { license, activations, check_ins: checkIns = [] } = data;
   const bound = isLicenseBound(license);
-  const canRenew = license.status !== 'revoked';
-  const canRebind = license.status !== 'revoked' && bound;
-  const canDownload = license.status === 'active' && bound;
-  const canReplace = license.status === 'revoked';
+  const canRenew = canRenewPerm && license.status !== 'revoked';
+  const canRebind = canRebindPerm && license.status !== 'revoked' && bound;
+  const canDownload = canDownloadPerm && license.status === 'active' && bound;
+  const canReplace = canReplacePerm && license.status === 'revoked';
   const lastCheckIn = checkIns[0] || null;
 
   const actColumns = [
@@ -386,7 +395,7 @@ export default function LicenseDetail() {
         )}
 
         <div className="flex flex-wrap gap-3 mt-6">
-          {license.status !== 'revoked' && (
+          {canUpdate && license.status !== 'revoked' && (
             <button onClick={() => navigate(buildAdminLicenseEditRoute(id, { fromCustomerId: fromCustomerId || undefined }))} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
               Editar
             </button>
@@ -420,12 +429,12 @@ export default function LicenseDetail() {
               {showReplace ? 'Cancelar substituição' : 'Substituir licença'}
             </button>
           )}
-          {license.status === 'active' && (
+          {canRevoke && license.status === 'active' && (
             <button onClick={handleRevoke} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
               Revogar
             </button>
           )}
-          {license.status !== 'active' && !canReplace && (
+          {canArchive && license.status !== 'active' && !canReplace && (
             <button onClick={async () => {
               if (!confirm(buildLicenseActionConfirmMessage('Arquivar esta licença.', license))) return;
               try { await del(`/licenses/${id}`); navigate(ADMIN_LICENSES_ROUTE); } catch (err) { alert(err.message); }
@@ -433,7 +442,7 @@ export default function LicenseDetail() {
               Arquivar Licença
             </button>
           )}
-          {canReplace && (
+          {canArchive && canReplace && (
             <button onClick={async () => {
               if (!confirm(buildLicenseActionConfirmMessage(
                 'Arquivar esta licença revogada sem criar substituta.',
@@ -444,7 +453,7 @@ export default function LicenseDetail() {
               Só arquivar
             </button>
           )}
-          {license.status === 'active' && bound && (
+          {canDownload && (
             <button onClick={handleDownload} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors">
               Download .lic
             </button>

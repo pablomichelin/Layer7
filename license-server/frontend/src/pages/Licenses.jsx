@@ -20,6 +20,7 @@ import {
   buildAdminLicenseEditRoute,
   buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
+import { usePermission } from '../use-permission.js';
 
 function truncateNotes(value, max = 40) {
   if (!value) return '—';
@@ -28,6 +29,11 @@ function truncateNotes(value, max = 40) {
 }
 
 export default function Licenses() {
+  const canCreate = usePermission('licenses.create');
+  const canUpdate = usePermission('licenses.update');
+  const canRevoke = usePermission('licenses.revoke');
+  const canArchive = usePermission('licenses.archive');
+  const canExport = usePermission('licenses.export');
   const [licenses, setLicenses] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -201,13 +207,13 @@ export default function Licenses() {
       render: (r) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button type="button" onClick={() => navigate(buildAdminLicenseDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
-          {r.status !== 'revoked' && (
+          {canUpdate && r.status !== 'revoked' && (
             <button type="button" onClick={() => navigate(buildAdminLicenseEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
           )}
-          {r.status === 'active' && (
+          {canRevoke && r.status === 'active' && (
             <button type="button" onClick={(e) => handleRevokeReload(r, e)} className="text-xs text-red-600 hover:underline">Revogar</button>
           )}
-          {r.status !== 'active' && (
+          {canArchive && r.status !== 'active' && (
             <button type="button" onClick={(e) => handleArchive(r, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
           )}
         </div>
@@ -220,19 +226,23 @@ export default function Licenses() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Licenças ({total})</h2>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleExportCsv}
-            className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors"
-          >
-            Exportar CSV
-          </button>
-          <button
-            onClick={() => navigate(ADMIN_LICENSES_NEW_ROUTE)}
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            Nova Licença
-          </button>
+          {canExport && (
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors"
+            >
+              Exportar CSV
+            </button>
+          )}
+          {canCreate && (
+            <button
+              onClick={() => navigate(ADMIN_LICENSES_NEW_ROUTE)}
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Nova Licença
+            </button>
+          )}
         </div>
       </div>
 

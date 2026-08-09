@@ -1,27 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth';
 import { get } from '../api';
 import { useDebouncedValue } from '../use-debounced-value.js';
 import { listRecentCustomers } from '../recent-customers.js';
+import { hasPermission } from '../permissions.js';
 import {
   ADMIN_CUSTOMERS_ROUTE,
   ADMIN_DASHBOARD_ROUTE,
   ADMIN_LICENSES_ROUTE,
   ADMIN_AUDIT_ROUTE,
   ADMIN_SECURITY_ROUTE,
+  ADMIN_USERS_ROUTE,
   ADMIN_LOGIN_ROUTE,
   buildAdminCustomerDetailRoute,
   buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
 import { PORTAL_VERSION } from '../portal-version.js';
 
-const links = [
-  { to: ADMIN_DASHBOARD_ROUTE, label: 'Dashboard', icon: '📊' },
-  { to: ADMIN_LICENSES_ROUTE, label: 'Licenças', icon: '🔑' },
-  { to: ADMIN_CUSTOMERS_ROUTE, label: 'Clientes', icon: '👥' },
-  { to: ADMIN_AUDIT_ROUTE, label: 'Auditoria', icon: '📋' },
-  { to: ADMIN_SECURITY_ROUTE, label: 'Segurança', icon: '🔒' },
+const ALL_LINKS = [
+  { to: ADMIN_DASHBOARD_ROUTE, label: 'Dashboard', icon: '📊', permission: 'dashboard.read' },
+  { to: ADMIN_LICENSES_ROUTE, label: 'Licenças', icon: '🔑', permission: 'licenses.read' },
+  { to: ADMIN_CUSTOMERS_ROUTE, label: 'Clientes', icon: '👥', permission: 'customers.read' },
+  { to: ADMIN_AUDIT_ROUTE, label: 'Auditoria', icon: '📋', permission: 'audit.read' },
+  { to: ADMIN_USERS_ROUTE, label: 'Utilizadores', icon: '🧑‍💻', permission: 'users.manage' },
+  { to: ADMIN_SECURITY_ROUTE, label: 'Segurança', icon: '🔒', permission: 'security.self' },
 ];
 
 export default function Sidebar() {
@@ -31,13 +34,18 @@ export default function Sidebar() {
   const debouncedSearch = useDebouncedValue(search, 300);
   const [results, setResults] = useState(null);
   const [recent, setRecent] = useState(() => listRecentCustomers());
+  const canSearch = hasPermission(admin, 'search.read');
+  const links = useMemo(
+    () => ALL_LINKS.filter((link) => hasPermission(admin, link.permission)),
+    [admin]
+  );
 
   useEffect(() => {
     setRecent(listRecentCustomers());
   }, []);
 
   useEffect(() => {
-    if (!debouncedSearch || debouncedSearch.trim().length < 2) {
+    if (!canSearch || !debouncedSearch || debouncedSearch.trim().length < 2) {
       setResults(null);
       return undefined;
     }
@@ -50,7 +58,7 @@ export default function Sidebar() {
       });
 
     return () => controller.abort();
-  }, [debouncedSearch]);
+  }, [debouncedSearch, canSearch]);
 
   async function handleLogout() {
     await logout();
@@ -66,50 +74,52 @@ export default function Sidebar() {
         {admin && <p className="text-brand-100 text-xs mt-3">{admin.email}</p>}
       </div>
 
-      <div className="px-4 py-3 border-b border-brand-600">
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Busca global..."
-          className="w-full px-3 py-2 rounded-lg text-sm text-gray-900 outline-none"
-        />
-        {results && (
-          <div className="mt-2 max-h-56 overflow-auto text-xs space-y-2">
-            {(results.customers || []).map((customer) => (
-              <button
-                key={`c-${customer.id}`}
-                type="button"
-                className="block w-full text-left text-brand-50 hover:underline"
-                onClick={() => {
-                  navigate(buildAdminCustomerDetailRoute(customer.id));
-                  setSearch('');
-                  setResults(null);
-                }}
-              >
-                Cliente: {customer.name}
-              </button>
-            ))}
-            {(results.licenses || []).map((license) => (
-              <button
-                key={`l-${license.id}`}
-                type="button"
-                className="block w-full text-left text-brand-50 hover:underline"
-                onClick={() => {
-                  navigate(buildAdminLicenseDetailRoute(license.id));
-                  setSearch('');
-                  setResults(null);
-                }}
-              >
-                Licença: {license.license_key?.slice(0, 12)}… ({license.customer_name || '—'})
-              </button>
-            ))}
-            {!results.customers?.length && !results.licenses?.length && (
-              <p className="text-brand-200">Sem resultados</p>
-            )}
-          </div>
-        )}
-      </div>
+      {canSearch && (
+        <div className="px-4 py-3 border-b border-brand-600">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Busca global..."
+            className="w-full px-3 py-2 rounded-lg text-sm text-gray-900 outline-none"
+          />
+          {results && (
+            <div className="mt-2 max-h-56 overflow-auto text-xs space-y-2">
+              {(results.customers || []).map((customer) => (
+                <button
+                  key={`c-${customer.id}`}
+                  type="button"
+                  className="block w-full text-left text-brand-50 hover:underline"
+                  onClick={() => {
+                    navigate(buildAdminCustomerDetailRoute(customer.id));
+                    setSearch('');
+                    setResults(null);
+                  }}
+                >
+                  Cliente: {customer.name}
+                </button>
+              ))}
+              {(results.licenses || []).map((license) => (
+                <button
+                  key={`l-${license.id}`}
+                  type="button"
+                  className="block w-full text-left text-brand-50 hover:underline"
+                  onClick={() => {
+                    navigate(buildAdminLicenseDetailRoute(license.id));
+                    setSearch('');
+                    setResults(null);
+                  }}
+                >
+                  Licença: {license.license_key?.slice(0, 12)}… ({license.customer_name || '—'})
+                </button>
+              ))}
+              {!results.customers?.length && !results.licenses?.length && (
+                <p className="text-brand-200">Sem resultados</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <nav className="flex-1 py-4">
         {links.map(({ to, label, icon }) => (
@@ -129,7 +139,7 @@ export default function Sidebar() {
           </NavLink>
         ))}
 
-        {recent.length > 0 && (
+        {recent.length > 0 && hasPermission(admin, 'customers.read') && (
           <div className="px-6 pt-4">
             <p className="text-xs uppercase tracking-wide text-brand-300 mb-2">Recentes</p>
             <ul className="space-y-1">

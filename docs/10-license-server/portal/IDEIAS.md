@@ -55,13 +55,21 @@ Registar aqui **antes** de implementar. Ligar a plano/versão quando existir.
 
 ---
 
+## Aceites — plano `PORTAL-PLAN-004` (técnicos + permissões)
+
+| ID | Ideia | Origem | Ligação |
+|----|-------|--------|---------|
+| IDEA-022 | Multi-admin + papéis (técnicos) | Chat `2026-08-08` GO | Plano 004 |
+| IDEA-052 | Matriz de permissões seleccionáveis por função | Chat `2026-08-08` | Plano 004 |
+
+---
+
 ## Futuras (escala / vendas — **não** no plano actual)
 
 | ID | Ideia | Nota |
 |----|-------|------|
 | IDEA-020 | Portal self-service do cliente | GO futuro |
 | IDEA-021 | Portal MSP multi-cliente | GO futuro |
-| IDEA-022 | Multi-admin + papéis | GO futuro |
 | IDEA-023 | Integração faturação | GO futuro |
 | IDEA-024 | Alertas email de expiração em massa | GO futuro |
 | IDEA-025 | Quotas N appliances / seats por contrato | GO futuro |

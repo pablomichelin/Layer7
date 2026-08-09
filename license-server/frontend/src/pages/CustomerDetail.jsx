@@ -19,10 +19,15 @@ import {
   buildAdminLicenseDetailRoute,
   buildAdminLicenseNewRoute,
 } from '../panel-routes.js';
+import { usePermission } from '../use-permission.js';
 
 export default function CustomerDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const canCreateLicense = usePermission('licenses.create');
+  const canUpdateCustomer = usePermission('customers.update');
+  const canArchiveCustomer = usePermission('customers.archive');
+  const canReadAudit = usePermission('audit.read');
   const [data, setData] = useState(null);
   const [timeline, setTimeline] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +37,9 @@ export default function CustomerDetail() {
     setLoading(true);
     Promise.all([
       get(`/customers/${id}`, { signal: controller.signal }),
-      get(`/audit?customer_id=${id}&limit=15`, { signal: controller.signal }).catch(() => ({ events: [] })),
+      canReadAudit
+        ? get(`/audit?customer_id=${id}&limit=15`, { signal: controller.signal }).catch(() => ({ events: [] }))
+        : Promise.resolve({ events: [] }),
     ])
       .then(([customerPayload, auditPayload]) => {
         setData(customerPayload);
@@ -48,7 +55,7 @@ export default function CustomerDetail() {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [id]);
+  }, [id, canReadAudit]);
 
   async function handleArchive() {
     if (!confirm('Arquivar este cliente e as licenças não activas associadas?')) return;
@@ -132,13 +139,15 @@ export default function CustomerDetail() {
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
           <h2 className="text-xl font-bold text-gray-800">{customer.name}</h2>
-          <button
-            type="button"
-            onClick={() => navigate(buildAdminLicenseNewRoute({ customerId: id }))}
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors"
-          >
-            Nova licença
-          </button>
+          {canCreateLicense && (
+            <button
+              type="button"
+              onClick={() => navigate(buildAdminLicenseNewRoute({ customerId: id }))}
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded-lg transition-colors"
+            >
+              Nova licença
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
@@ -173,12 +182,16 @@ export default function CustomerDetail() {
           {customer.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{customer.notes}</span></div>}
         </div>
         <div className="flex gap-3 mt-6">
-          <button onClick={() => navigate(buildAdminCustomerEditRoute(id))} className="px-4 py-2 border border-brand-600 text-brand-700 hover:bg-brand-50 text-sm rounded-lg transition-colors">
-            Editar cliente
-          </button>
-          <button onClick={handleArchive} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
-            Arquivar Cliente
-          </button>
+          {canUpdateCustomer && (
+            <button onClick={() => navigate(buildAdminCustomerEditRoute(id))} className="px-4 py-2 border border-brand-600 text-brand-700 hover:bg-brand-50 text-sm rounded-lg transition-colors">
+              Editar cliente
+            </button>
+          )}
+          {canArchiveCustomer && (
+            <button onClick={handleArchive} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition-colors">
+              Arquivar Cliente
+            </button>
+          )}
         </div>
       </div>
 
@@ -190,32 +203,36 @@ export default function CustomerDetail() {
         onRowClick={(row) => navigate(buildAdminLicenseDetailRoute(row.id, { fromCustomerId: id }))}
       />
 
-      <h3 className="text-lg font-semibold text-gray-700 mt-8 mb-3">Timeline (auditoria)</h3>
-      <DataTable
-        columns={[
-          { key: 'created_at', label: 'Quando', render: (r) => formatDateTime(r.created_at) },
-          { key: 'event_type', label: 'Evento', render: (r) => r.event_type },
-          { key: 'result', label: 'Resultado', render: (r) => r.result },
-          { key: 'reason', label: 'Motivo', render: (r) => r.reason || '—' },
-          {
-            key: 'license',
-            label: 'Licença',
-            render: (r) => (r.metadata?.license_id
-              ? (
-                <button
-                  type="button"
-                  className="text-brand-600 hover:underline text-xs"
-                  onClick={() => navigate(buildAdminLicenseDetailRoute(r.metadata.license_id, { fromCustomerId: id }))}
-                >
-                  #{r.metadata.license_id}
-                </button>
-              )
-              : '—'),
-          },
-        ]}
-        rows={timeline}
-        emptyMessage="Sem eventos de auditoria para este cliente."
-      />
+      {canReadAudit && (
+        <>
+          <h3 className="text-lg font-semibold text-gray-700 mt-8 mb-3">Timeline (auditoria)</h3>
+          <DataTable
+            columns={[
+              { key: 'created_at', label: 'Quando', render: (r) => formatDateTime(r.created_at) },
+              { key: 'event_type', label: 'Evento', render: (r) => r.event_type },
+              { key: 'result', label: 'Resultado', render: (r) => r.result },
+              { key: 'reason', label: 'Motivo', render: (r) => r.reason || '—' },
+              {
+                key: 'license',
+                label: 'Licença',
+                render: (r) => (r.metadata?.license_id
+                  ? (
+                    <button
+                      type="button"
+                      className="text-brand-600 hover:underline text-xs"
+                      onClick={() => navigate(buildAdminLicenseDetailRoute(r.metadata.license_id, { fromCustomerId: id }))}
+                    >
+                      #{r.metadata.license_id}
+                    </button>
+                  )
+                  : '—'),
+              },
+            ]}
+            rows={timeline}
+            emptyMessage="Sem eventos de auditoria para este cliente."
+          />
+        </>
+      )}
     </div>
   );
 }

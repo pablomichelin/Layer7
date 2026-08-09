@@ -7,6 +7,7 @@ import {
   ADMIN_LICENSES_NEW_ROUTE,
   ADMIN_LICENSES_ROUTE,
   ADMIN_LOGIN_ROUTE,
+  ADMIN_USERS_ROUTE,
   buildAdminCustomerDetailRoute,
   buildAdminCustomerEditRoute,
   buildAdminLicenseDetailRoute,
@@ -21,6 +22,7 @@ test('panel routes expose the canonical navigation destinations', () => {
   assert.equal(ADMIN_CUSTOMERS_ROUTE, '/customers');
   assert.equal(ADMIN_LICENSES_NEW_ROUTE, '/licenses/new');
   assert.equal(ADMIN_CUSTOMERS_NEW_ROUTE, '/customers/new');
+  assert.equal(ADMIN_USERS_ROUTE, '/users');
 });
 
 test('panel routes build canonical detail and edit destinations', () => {

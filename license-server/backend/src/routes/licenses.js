@@ -47,6 +47,7 @@ const {
   LICENSE_SQL_EXPIRED_CONDITION,
   LICENSE_SQL_REVOKED_CONDITION,
 } = require('../license-state');
+const { assertPermission, requirePermission } = require('../require-permission');
 
 const router = Router();
 router.use(auth);
@@ -65,7 +66,7 @@ async function ensureVisibleCustomer(client, customerId) {
   }
 }
 
-router.get('/', async (req, res) => {
+router.get('/', requirePermission('licenses.read'), async (req, res) => {
   try {
     const {
       status,
@@ -79,6 +80,10 @@ router.get('/', async (req, res) => {
       staleCheckinDays,
       format,
     } = parseLicensesListQuery(req.query);
+
+    if (format === 'csv') {
+      assertPermission(req.admin, 'licenses.export');
+    }
     const conditions = ['l.archived_at IS NULL', '(c.id IS NULL OR c.archived_at IS NULL)'];
     const params = [];
 
@@ -198,7 +203,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requirePermission('licenses.create'), async (req, res) => {
   try {
     const payload = parseLicenseCreatePayload(req.body);
 
@@ -262,7 +267,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', requirePermission('licenses.read'), async (req, res) => {
   try {
     const licenseId = parseIdParam(req.params.id, 'license_id');
 
@@ -313,7 +318,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requirePermission('licenses.update'), async (req, res) => {
   try {
     const licenseId = parseIdParam(req.params.id, 'license_id');
     const payload = parseLicenseUpdatePayload(req.body);
@@ -428,7 +433,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.post('/:id/revoke', async (req, res) => {
+router.post('/:id/revoke', requirePermission('licenses.revoke'), async (req, res) => {
   try {
     const licenseId = parseIdParam(req.params.id, 'license_id');
     assertEmptyBody(req.body);
@@ -508,7 +513,7 @@ router.post('/:id/revoke', async (req, res) => {
   }
 });
 
-router.post('/:id/renew', async (req, res) => {
+router.post('/:id/renew', requirePermission('licenses.renew'), async (req, res) => {
   try {
     const licenseId = parseIdParam(req.params.id, 'license_id');
     const { days } = parseRenewPayload(req.body);
@@ -599,7 +604,7 @@ router.post('/:id/renew', async (req, res) => {
   }
 });
 
-router.post('/:id/rebind', async (req, res) => {
+router.post('/:id/rebind', requirePermission('licenses.rebind'), async (req, res) => {
   try {
     const licenseId = parseIdParam(req.params.id, 'license_id');
     const payload = parseRebindPayload(req.body);
@@ -704,7 +709,7 @@ router.post('/:id/rebind', async (req, res) => {
   }
 });
 
-router.post('/:id/replace', async (req, res) => {
+router.post('/:id/replace', requirePermission('licenses.replace'), async (req, res) => {
   try {
     const licenseId = parseIdParam(req.params.id, 'license_id');
     const payload = parseReplacePayload(req.body);
@@ -822,7 +827,7 @@ router.post('/:id/replace', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requirePermission('licenses.archive'), async (req, res) => {
   try {
     assertEmptyBody(req.body);
     const licenseId = parseIdParam(req.params.id, 'license_id');
@@ -903,7 +908,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-router.get('/:id/download', async (req, res) => {
+router.get('/:id/download', requirePermission('licenses.download'), async (req, res) => {
   try {
     const licenseId = parseIdParam(req.params.id, 'license_id');
 

@@ -17,11 +17,12 @@ const {
   applyEffectiveLicenseState,
   LICENSE_SQL_ACTIVE_CONDITION,
 } = require('../license-state');
+const { requirePermission } = require('../require-permission');
 
 const router = Router();
 router.use(auth);
 
-router.get('/', async (req, res) => {
+router.get('/', requirePermission('customers.read'), async (req, res) => {
   try {
     const { search, page, limit, offset } = parseCustomersListQuery(req.query);
     const conditions = ['c.archived_at IS NULL'];
@@ -88,7 +89,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requirePermission('customers.create'), async (req, res) => {
   try {
     const payload = parseCustomerCreatePayload(req.body);
 
@@ -153,7 +154,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', requirePermission('customers.read'), async (req, res) => {
   try {
     const customerId = parseIdParam(req.params.id, 'customer_id');
 
@@ -197,7 +198,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requirePermission('customers.update'), async (req, res) => {
   try {
     const customerId = parseIdParam(req.params.id, 'customer_id');
     const payload = parseCustomerUpdatePayload(req.body);
@@ -302,7 +303,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requirePermission('customers.archive'), async (req, res) => {
   try {
     assertEmptyBody(req.body);
     const customerId = parseIdParam(req.params.id, 'customer_id');

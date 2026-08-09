@@ -7,8 +7,10 @@ import {
   AUTH_2FA_SETUP_PATH,
   AUTH_2FA_STATUS_PATH,
 } from '../auth-paths.js';
+import { usePermission } from '../use-permission.js';
 
 export default function Security() {
+  const canManageSelf = usePermission('security.self');
   const [enabled, setEnabled] = useState(false);
   const [setup, setSetup] = useState(null);
   const [code, setCode] = useState('');
@@ -23,10 +25,18 @@ export default function Security() {
   }
 
   useEffect(() => {
+    if (!canManageSelf) {
+      setLoading(false);
+      return;
+    }
     refreshStatus()
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [canManageSelf]);
+
+  if (!canManageSelf) {
+    return <p className="text-red-600">Sem permissão para gerir a segurança da conta.</p>;
+  }
 
   async function handleSetup() {
     setError('');

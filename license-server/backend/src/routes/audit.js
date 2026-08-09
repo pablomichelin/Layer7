@@ -3,9 +3,11 @@ const pool = require('../db');
 const auth = require('../auth');
 const { isHttpError } = require('../crud-integrity');
 const { parseAuditListQuery } = require('../crud-validation');
+const { requirePermission } = require('../require-permission');
 
 const router = Router();
 router.use(auth);
+router.use(requirePermission('audit.read'));
 
 router.get('/', async (req, res) => {
   try {

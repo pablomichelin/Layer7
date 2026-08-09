@@ -2,6 +2,7 @@
 
 | Documento | Estado | Notas |
 |-----------|--------|-------|
+| [`2026-08-08-gestao-tecnicos-rbac.md`](2026-08-08-gestao-tecnicos-rbac.md) | **CONCLUIDO** | PORTAL-PLAN-004 → `2.0.0` |
 | [`2026-08-08-operador-fila-contexto.md`](2026-08-08-operador-fila-contexto.md) | **CONCLUIDO** | PORTAL-PLAN-003 → `1.9.0` |
 | [`2026-08-08-ficha-cliente-360.md`](2026-08-08-ficha-cliente-360.md) | **CONCLUIDO** | C0–C2 → `1.3.0` |
 | [`2026-08-08-melhoria-total-portal.md`](2026-08-08-melhoria-total-portal.md) | **CONCLUIDO** | Fecho `1.0.0` |

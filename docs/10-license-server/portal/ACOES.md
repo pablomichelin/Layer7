@@ -5,6 +5,60 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-08 — Handoff continuidade (auditoria segura)
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | docs / governação / segurança |
+| Versão | `2.0.0` (sem bump) |
+| Objectivo | Retomar chat via handoff sem avançar trabalho bloqueado |
+| Impacto | Só docs; corrige hash SPA no diário; declara dívida de commit |
+| Risco | Baixo (docs); risco operacional residual = working tree ≠ git |
+| Teste | health live OK; SPA `index-DwHpvSVY.js` + string `2.0.0`; unit RBAC PASS (3+59) |
+| Rollback | Reverter esta entrada |
+| Resultado | **FEITO** — multiagente **não** usado (authz + MITM bloqueado); `20.10` **não** iniciado; commit local **pendente GO** |
+
+Notas de segurança desta auditoria:
+
+- Live `https://license.systemup.inf.br` = portal **`2.0.0`** / health `ok`.
+- Técnicos **não** recebem `users.manage` via `normalizePermissions`.
+- API `/api/users` exige `users.manage`; rotas sensíveis usam `requirePermission`.
+- Contas `is_active=false` rejeitadas no login/sessão.
+- Pacote público **`1.9.38`** (MITM 20.9) e portal **`2.0.0`** estão no working tree **sem commit** — continuidade em risco até GO de commit.
+- MITM: próximo **20.10** permanece **BLOQUEADO** (S1–S8 + GO lab); sem runtime / sem intercept.
+
+---
+
+## 2026-08-08 — PORTAL-PLAN-004 fecho `2.0.0` (U0–U2)
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + deploy + docs |
+| Versão | `2.0.0` |
+| Objectivo | Técnicos com permissões seleccionáveis (RBAC) |
+| Impacto | Schema admins; API /users; gates UI/API; major visual |
+| Risco | Médio (authz); owners preservados na migração |
+| Teste | backend+frontend unit; health; SPA v2.0.0 |
+| Rollback | imagens anteriores; colunas aditivas |
+| Resultado | **FEITO** — health OK; SPA `index-DwHpvSVY.js`; plano 004 CONCLUIDO |
+
+---
+
+## 2026-08-08 — Abrir PORTAL-PLAN-004 (técnicos RBAC)
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | docs / governação |
+| Versão | `1.9.0` (sem bump — só plano) |
+| Objectivo | GO multi-admin técnicos + permissões seleccionáveis |
+| Impacto | Docs; código em U0–U2 |
+| Risco | Baixo (docs) |
+| Teste | Leitura cruzada plano/IDEIAS |
+| Rollback | Reverter docs |
+| Resultado | **FEITO** — plano ACTIVO |
+
+---
+
 ## 2026-08-08 — PORTAL-PLAN-003 fecho `1.9.0` (D0–D5)
 
 | Campo | Valor |

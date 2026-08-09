@@ -11,6 +11,16 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [2.0.0] — 2026-08-08
+
+### Added
+
+- Gestão de técnicos (owner cria utilizadores com permissões seleccionáveis)
+- RBAC: `requirePermission` na API + gates no menu/botões
+- Página Utilizadores; catálogo de permissões fechado
+
+---
+
 ## [1.9.0] — 2026-08-08
 
 ### Added

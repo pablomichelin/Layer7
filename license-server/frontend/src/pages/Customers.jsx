@@ -9,8 +9,12 @@ import {
   buildAdminCustomerDetailRoute,
   buildAdminCustomerEditRoute,
 } from '../panel-routes.js';
+import { usePermission } from '../use-permission.js';
 
 export default function Customers() {
+  const canCreate = usePermission('customers.create');
+  const canUpdate = usePermission('customers.update');
+  const canArchive = usePermission('customers.archive');
   const [customers, setCustomers] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -101,8 +105,12 @@ export default function Customers() {
       render: (r) => (
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <button type="button" onClick={() => navigate(buildAdminCustomerDetailRoute(r.id))} className="text-xs text-brand-600 hover:underline">Ver</button>
-          <button type="button" onClick={() => navigate(buildAdminCustomerEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
-          <button type="button" onClick={(e) => handleArchive(r.id, r.name, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
+          {canUpdate && (
+            <button type="button" onClick={() => navigate(buildAdminCustomerEditRoute(r.id))} className="text-xs text-brand-600 hover:underline">Editar</button>
+          )}
+          {canArchive && (
+            <button type="button" onClick={(e) => handleArchive(r.id, r.name, e)} className="text-xs text-red-600 hover:underline">Arquivar</button>
+          )}
         </div>
       ),
     },
@@ -112,12 +120,14 @@ export default function Customers() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Clientes ({total})</h2>
-        <button
-          onClick={() => navigate(ADMIN_CUSTOMERS_NEW_ROUTE)}
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          Novo Cliente
-        </button>
+        {canCreate && (
+          <button
+            onClick={() => navigate(ADMIN_CUSTOMERS_NEW_ROUTE)}
+            className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Novo Cliente
+          </button>
+        )}
       </div>
 
       <div className="mb-4">

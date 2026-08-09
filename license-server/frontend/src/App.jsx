@@ -17,6 +17,7 @@ import CustomerForm from './pages/CustomerForm';
 import CustomerDetail from './pages/CustomerDetail';
 import Audit from './pages/Audit';
 import Security from './pages/Security';
+import Users from './pages/Users';
 
 function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="customers/:id/edit" element={<CustomerForm />} />
         <Route path="audit" element={<Audit />} />
         <Route path="security" element={<Security />} />
+        <Route path="users" element={<Users />} />
       </Route>
       <Route path="*" element={<Navigate to={ADMIN_DASHBOARD_ROUTE} replace />} />
     </Routes>
