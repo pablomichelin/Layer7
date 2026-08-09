@@ -20,12 +20,14 @@
 | `1.1.1.1` / CDN genérico | Anycast crítico | **NO-GO** |
 | Servidores LAN de produção | Risco operacional | **NO-GO** |
 
-## Recomendação (preferida)
+## Recomendação (preferida) — actualizado sem VPS
 
-**Provisionar um host de teste dedicado** com um único IPv4 `/32`, por exemplo:
+Sem VPS: usar lab `.54` + IP RFC 2544 `198.18.0.10/32` (fora do /24) para forçar path via `.254`.  
+**NÃO** usar `192.168.100.54` como destino (mesmo L2 — bypass do gateway).  
 
-- VM/container lab na LAN (IP novo, **não** `.234`/`.235`/`.254`) com nginx/caddy a servir HTTPS :443 e hostname tipo `mitm-test.lab.local` / FQDN interno; **ou**
-- VPS barato com IP dedicado usado **só** para este gate.
+Runbook de desenho (sem aplicar):  
+[`../../../09-blocking/runbook-destino-lab-19818-via-54.md`](../../../09-blocking/runbook-destino-lab-19818-via-54.md)  
+Veredicto: **GO CONDICIONAL** — aguarda confirmação humana por fase.
 
 No próximo GO de activação (fora deste bloco):
 
