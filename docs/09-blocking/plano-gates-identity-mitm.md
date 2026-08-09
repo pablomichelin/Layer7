@@ -42,7 +42,7 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` quando houver lab.
 | # | Critério | Estado |
 |---|----------|--------|
 | GI2.0 | Spike 20.7 registado como GO **ou** DEFER/NO-GO formal | **PASS (DEFER)** — ver `spike-mitm-20.7.md` + ADR-0026; reopen GO `2026-08-08` |
-| GI2.1–GI2.5 | Critérios de implementação / runtime MITM | **DEFERRED** — **20.8/20.9** (schema/CA/bypass/intenção/IPC; `mitm_effective` false) **não** fecham estes critérios; exige S1–S8 + GO lab + runtime `layer7-tlsproxy` |
+| GI2.1–GI2.5 | Critérios de implementação / runtime MITM | **DEFERRED** — 20.8/20.9 + PoC-0 idle **não** fecham; exige S1–S4/S6 + GO produto + runtime empacotado |
 
 Nota **20.9:** intenção `mitm.enabled` + bypass endurecido + contrato IPC; **não** há intercept; Squid rejeitado. Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md). Contrato: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md).
 
@@ -54,7 +54,7 @@ Identity rede **FECHADA** — GI2/GI3 não a reabrem.
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GI3.1–GI3.5 | Lab MITM (intercept / block page HTTPS) | **DEFERRED** até runtime + S1–S8 + GO lab; 20.8/20.9 **insuficientes** |
+| GI3.1–GI3.5 | Lab MITM (intercept / block page HTTPS) | **DEFERRED** até PoC TLS lab isolado + S1–S4/S6; **proibido** em `.254`/`.234`/`.235` neste GO |
 
 ---
 
@@ -151,6 +151,7 @@ Identity rede **FECHADA** — GI2/GI3 não a reabrem.
 | Data | Evento |
 |------|--------|
 | 2026-08-08 | **20.9 PASS** — intenção/`mitm_effective`/bypass/`quic_mode`/IPC; GI2/GI3 **runtime** mantêm-se DEFERRED; 20.10 bloqueado até S1–S8+GO lab |
+| 2026-08-09 | **GO lab** PoC-0 idle; S5+S7+S8 PASS; GI2/GI3 DEFERRED; 20.10 exige S1–S4/S6 + GO produto |
 | 2026-08-08 | **Reopen MITM GO** — passo **20.8** scaffolding; GI2/GI3 **runtime** mantêm-se DEFERRED; desenho `layer7-tlsproxy`; Squid rejeitado |
 | 2026-08-05 | Criação GI0–GI9 |
 | 2026-08-05 | rev. `b` — GI2 spike/DEFER; GI4 daemon; GI5 fontes canónicas; GI7 fail-mode |

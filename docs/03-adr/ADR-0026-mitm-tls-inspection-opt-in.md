@@ -46,11 +46,12 @@
 | S8 | MITM OFF ≡ ADR-0017 byte-a-byte (sem regressão com módulo presente e OFF) | Smoke comparativo |
 
 6. **DEFER formal (`2026-08-06`):** implementação diferida; Identity avançou; Squid rejeitado.
-7. **Reopen GO (`2026-08-08`):** este ADR passa a **Aceito — implementação em curso**. Escopo **20.8:** schema `mitm.*`, gestão CA, bypass GUI, `mitm_entitled`. Escopo **20.9:** intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; **`mitm_effective` sempre false** sem runtime. **Fora** até S1–S8 + GO lab: processo `layer7-tlsproxy`, intercept TLS, block page HTTPS via MITM. Candidata: helper próprio (opção E) — ver desenho + contrato. **Squid rejeitado** permanentemente.
-8. Se **GO lab** futuro (após S1–S8): intercept **selectivo** (não universal), página HTTPS legível; emenda explícita a ADR-0017; alinhamento PME (sem overclaim NGFW).
-9. Segredos da CA **nunca** no git.
-10. MITM **não** é pré-requisito de Identity (ortogonal); Identity rede permanece **FECHADA**.
-11. **Fora do objectivo:** paridade de motor TLS com NGFW enterprise (Fortinet / Palo Alto / Check Point).
+7. **Reopen GO (`2026-08-08`):** este ADR passa a **Aceito — implementação em curso**. Escopo **20.8:** schema `mitm.*`, gestão CA, bypass GUI, `mitm_entitled`. Escopo **20.9:** intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; **`mitm_effective` sempre false** sem runtime produto. **Squid rejeitado** permanentemente.
+8. **GO lab (`2026-08-09`):** autoriza PoC idle/IPC de `layer7-tlsproxy` em lab **isolado** (ver `poc-layer7-tlsproxy-lab.md`). **Não** autoriza intercept em `.254`/`.234`/`.235`, empacotar no `.pkg` público, nem claim `mitm_effective=true`. **20.10** exige S1–S4/S6 medidos + **GO produto**.
+9. Se **GO produto** (após S1–S8): intercept **selectivo** (não universal), página HTTPS legível; emenda explícita a ADR-0017; alinhamento PME (sem overclaim NGFW).
+10. Segredos da CA **nunca** no git.
+11. MITM **não** é pré-requisito de Identity (ortogonal); Identity rede permanece **FECHADA**.
+12. **Fora do objectivo:** paridade de motor TLS com NGFW enterprise (Fortinet / Palo Alto / Check Point).
 
 ---
 
@@ -61,7 +62,7 @@
 - Qual biblioteca TLS exacta no helper (excepto: **não** Squid; processo separado).
 - Interceptar gestão do pfSense / VIP sem regra explícita.
 - Substituir Identity (ADR-0027).
-- Datas comerciais de GO lab / produção MITM.
+- Datas comerciais de GO produto / produção MITM.
 
 ---
 
@@ -91,7 +92,7 @@
 
 1. `mitm.enabled=false` + reload.  
 2. Remover entitlement `mitm`.  
-3. Sem processo `layer7-tlsproxy` a parar (ainda ausente).  
+3. Sem processo `layer7-tlsproxy` empacotado a parar (PoC fora do `.pkg`).  
 4. Remover CA dos clientes via GPO (ops) — só se alguma vez instalada.
 
 ---
@@ -105,7 +106,8 @@
 | **d** | **2026-08-06** | **Implementação diferida (20.7a)**; Squid rejeitado; Identity avança |
 | **e** | **2026-08-08** | **Aceito — scaffolding 20.8**; reopen GO; runtime diferido até S1–S8; desenho `layer7-tlsproxy` |
 | **f** | **2026-08-08** | **20.9 PASS** — `mitm.enabled` = **intenção**; `mitm_effective` **sempre false** sem runtime; bypass/`quic_mode`/contrato IPC; 20.10 bloqueado |
-| **g** | **2026-08-09** | S5 PASS doc (`quic_mode=bypass`); S7 PASS doc (privacidade); S8 PASS real ADR-0017; S1–S4/S6 + GO lab ainda bloqueiam 20.10 |
+| **g** | **2026-08-09** | S5 PASS doc; S7 PASS doc; S8 PASS real ADR-0017 |
+| **h** | **2026-08-09** | **GO lab** — PoC-0 idle `src/layer7-tlsproxy/`; 20.10 ainda exige S1–S4/S6 + GO produto |
 
 ---
 

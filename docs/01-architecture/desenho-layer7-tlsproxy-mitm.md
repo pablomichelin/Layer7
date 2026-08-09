@@ -1,23 +1,23 @@
 # Desenho — `layer7-tlsproxy` (MITM opt-in, opção E)
 
-**Estado:** `RASCUNHO DE ARQUITECTURA` pós-GO humano (`2026-08-08`)  
-**Tipo:** desenho **antes** de runtime — **sem código C/proxy neste bloco**  
-**Runtime MITM:** **NÃO iniciado**  
-**Intercept TLS:** **NÃO aprovado** até S1–S8 medidos + **GO lab** explícito  
+**Estado:** `ARQUITECTURA + PoC-0 idle` (GO lab `2026-08-09`)  
+**Tipo:** desenho canónico + scaffold idle (`src/layer7-tlsproxy/`) — **fora** do `.pkg`  
+**Runtime MITM produto:** **NÃO empacotado**; `mitm_effective` false  
+**Intercept TLS:** **NÃO aprovado** em produção; lab isolado só sob PoC + flags  
 **Candidata:** opção **E** — helper próprio (`layer7-tlsproxy`)  
 **Squid / `pfSense-pkg-squid`:** **REJEITADO** (permanente neste produto)  
 **Identity de rede:** **FECHADA** (20.33 / GI9) — ortogonal; não reabrir nesta fila  
 **ADR política:** [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md)  
 **Spike:** [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md)  
+**PoC lab:** [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md)  
 **Block page OFF:** [`../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md`](../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md)  
 **Arranque trilha:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **Plano (passos IM2):** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) §20.8–20.11  
 **Concorrência daemon:** [`../03-adr/ADR-0028-concorrencia-io-daemon-identity.md`](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md)
 
-> **Regra inviolável:** este documento **não** autoriza implementação de
-> intercept, CA em produção, nem alteração do hot path `layer7d` (pcap/nDPI/PF).
-> Só fecha o **desenho** da opção E após GO de reabertura. Qualquer PoC
-> exige spike S1–S8 medidos e GO lab separado.
+> **Regra inviolável:** este documento **não** autoriza intercept em `.254`/`.234`/`.235`,
+> nem claim `mitm_effective=true`, nem hot path `layer7d`. PoC idle/IPC em lab isolado
+> está sob [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md).
 
 ---
 
@@ -26,13 +26,14 @@
 | Campo | Valor |
 |-------|--------|
 | Data do GO humano (reabertura desenho) | **2026-08-08** |
+| GO lab (PoC idle) | **2026-08-09** — [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | Veredicto spike 20.7a (histórico) | **DEFER** — Squid rejeitado; Identity avançou |
-| Fase actual | **Desenho de arquitectura** (este ficheiro) |
-| Código / processo `layer7-tlsproxy` | **Ausente** — não iniciar neste bloco |
-| Medições S1–S8 | **Não medidas** (ver §6) |
-| GO lab / intercept selectivo | **Pendente** — bloqueia 20.10+ runtime |
+| Fase actual | Desenho + **PoC-0 idle** (sem bind/TLS) |
+| Código `layer7-tlsproxy` | **Idle no repo** (`src/layer7-tlsproxy/`); **fora** do `.pkg` |
+| Medições S1–S8 | S5+S7+S8 PASS; S1–S4/S6 pendentes |
+| Intercept selectivo / 20.10 | **Pendente** — GO produto após S1–S4/S6 |
 | Identity (User-ID de rede) | **FECHADA** — fora do escopo deste desenho |
-| Entitlement SKU `mitm` | Pode existir (ADR-0025/0026); **sem runtime activo** |
+| Entitlement SKU `mitm` | Pode existir (ADR-0025/0026); **sem** `mitm_effective` |
 
 ---
 
@@ -221,9 +222,9 @@ Desenho (este ficheiro)
 
 ## 10. Decisão pedida ao operador (próximo)
 
-1. Desenho opção E aceite; **20.8/20.9 PASS** (sem runtime).  
-2. **Não** avançar **20.10** até S1–S8 medidos + **GO lab**.  
-3. Squid permanece rejeitado; sem claim de intercept.
+1. Desenho opção E aceite; **20.8/20.9 PASS**; **GO lab** PoC-0 idle.  
+2. **Não** avançar **20.10** até S1–S4/S6 medidos + **GO produto**.  
+3. Squid permanece rejeitado; sem claim de intercept em produção.
 
 ---
 
@@ -236,3 +237,4 @@ Desenho (este ficheiro)
 | 2026-08-08 | Criação deste ficheiro — runtime **não** iniciado; S1–S8 **não** medidos |
 | 2026-08-08 | **20.8 PASS** — scaffolding CA/bypass; sem intercept |
 | 2026-08-08 | **20.9 PASS** — intenção vs `mitm_effective`; contrato IPC; 20.10 bloqueado até S1–S8+GO lab |
+| 2026-08-09 | **GO lab** — PoC-0 idle em `src/layer7-tlsproxy/`; proibido intercept produção |

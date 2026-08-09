@@ -298,8 +298,9 @@ reavaliacao formal.
 - Arranque: [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 - Posicionamento PME: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 - Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-08p`
-- Passo actual: **20.9 PASS** (intenção/`mitm_effective`/bypass/`quic_mode`/IPC); próximo **20.10** bloqueado (S1–S8+GO lab); Identity rede **FECHADA** (20.33/GI9)
-- Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime AUSENTE
+- Passo actual: **20.9 PASS**; **GO lab** PoC-0 idle; próximo **20.10** bloqueado (S1–S4/S6 + GO produto); Identity rede **FECHADA** (20.33/GI9)
+- Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — PoC idle fora do `.pkg`
+- PoC: [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md)
 - Contrato: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)
 - ADRs: 0025/0027/0028 Aceito; **0026 Aceito — implementação em curso (rev. f — intenção vs effective)**; runtime até S1–S8
 - Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.38`**. Captive portal: **fora de escopo**. Squid: **rejeitado**.

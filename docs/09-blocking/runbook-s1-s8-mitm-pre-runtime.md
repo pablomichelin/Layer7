@@ -1,13 +1,13 @@
 # Runbook S1–S8 — pré-runtime MITM (sem intercept)
 
-**Estado:** `ACTIVO` — continuidade documental pós-**20.9 PASS**  
-**Autoriza:** checklist, smoke OFF, decisões escritas, pastas de evidência  
-**NÃO autoriza:** `layer7-tlsproxy`, intercept TLS, block page HTTPS via MITM,
-claim `mitm_effective=true`, Squid, promoção enforce além de `1.9.8`
+**Estado:** `ACTIVO` — continuidade pós-**20.9 PASS**; **GO lab `2026-08-09`** (PoC idle)  
+**Autoriza:** checklist S*, PoC-0 idle `layer7-tlsproxy`, evidências  
+**NÃO autoriza:** intercept em `.254`/`.234`/`.235`; `mitm_effective=true`; empacotar PoC sem GO; Squid; **20.10** produto
 
 | Campo | Valor |
 |-------|--------|
-| Passo plano | **20.9 PASS**; **20.10 BLOQUEADO** |
+| Passo plano | **20.9 PASS**; **GO lab** → PoC-0; **20.10** ainda **BLOQUEADO** |
+| PoC lab | [`poc-layer7-tlsproxy-lab.md`](poc-layer7-tlsproxy-lab.md) |
 | Lab / `latest` | **`1.9.38`** (`SHA256=7c60f6b1…1dab`) |
 | Pin enforce | **`1.9.8`** (não misturar com lab MITM) |
 | Baseline perf | [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/) |
@@ -41,15 +41,15 @@ claim `mitm_effective=true`, Squid, promoção enforce além de `1.9.8`
 ## 1. Ordem segura (obrigatória)
 
 ```text
-S5 (decisão escrita) → S8 (smoke OFF em 1.9.38)
-  → S7 (política escrita / auditoria de defaults)
-  → (só com GO lab) PoC runtime isolada
-  → S1 + S2 + S4 (+ S3 / S6 com tráfego real)
-  → GO lab explícito → só então 20.10
+S5 → S8 → S7 (PASS pré-runtime)
+  → GO lab (2026-08-09) → PoC-0 idle layer7-tlsproxy
+  → PoC-1..3 em lab isolado (NÃO .254 prod) → medir S1–S4/S6
+  → GO produto → só então 20.10
 ```
 
-**Regra:** sem PoC runtime **não** se pode fechar S1–S4/S3/S6.  
-Pré-runtime fechável: **S5 + S7 + S8** (cumpridos `2026-08-09`).
+**Regra:** sem PoC runtime **não** se pode fechar S1–S4/S6.  
+Pré-runtime fechável: **S5 + S7 + S8** (cumpridos `2026-08-09`).  
+**GO lab ≠ 20.10** e **≠** install no appliance de produção.
 
 ---
 
@@ -170,3 +170,4 @@ Rollback de qualquer teste: `mitm.enabled=false`; reinstalar `1.9.37` (lab) ou
 | 2026-08-09 | Lab real obrigatório no runbook; S8 two-client real `20260809T022400Z-s8-real-two-client-1.9.38` |
 | 2026-08-09 | **S8 PASS** ADR-0017 real (`20260809T024500Z-s8-adr0017-real-1.9.38`) — sem mutar config; sinkhole+página nos dois clientes |
 | 2026-08-09 | **S5+S7 PASS documental** (`20260809T031200Z-s5-s7-pre-runtime`) — quic bypass + privacidade; 20.10 ainda bloqueado (S1–S4/S6+GO lab) |
+| 2026-08-09 | **GO lab** — PoC-0 idle `src/layer7-tlsproxy/`; proibido intercept em `.254`/`.234`/`.235`; ver `poc-layer7-tlsproxy-lab.md` |

@@ -1,8 +1,8 @@
-# START HERE — Identity + MITM Add-on 【MITM reopen GO — passo 20.9 PASS】
+# START HERE — Identity + MITM Add-on 【MITM GO lab — PoC-0 idle】
 
 > **Visual:** Identity de rede **FECHADA** (`2026-08-08` — GI9 PASS).  
-> **MITM:** **reopen GO** humano (`2026-08-08`) — passo actual **20.9 PASS** (intenção / bypass / IPC).  
-> Runtime `layer7-tlsproxy` **AUSENTE**; `mitm_effective` **sempre false**; intercept **não** iniciado; Squid **rejeitado**.  
+> **MITM:** **GO lab** (`2026-08-09`) — passo **20.9 PASS**; PoC-0 idle `src/layer7-tlsproxy/`.  
+> Runtime produto **ausente** do `.pkg`; `mitm_effective` **sempre false**; **sem** intercept em `.254`/`.234`/`.235`; Squid **rejeitado**.  
 > Homologação Identity: `20260808T174100Z-im9-20.33-homolog-1.9.29`.
 
 ```text
@@ -14,7 +14,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 1. Colar **apenas** o caminho acima (ou o prompt da secção abaixo).  
 2. O agente **deve** seguir a *Leitura obrigatória* deste ficheiro **antes** de codificar.  
 3. O **passo actual** está na tabela *Estado actual* e no bloco *Progresso compacto* — deve coincidir com o plano §0 e o CORTEX (secção Identity).  
-4. **Não** usar `START-HERE-fecho-producao.md` para executar MITM. Squid permanece **rejeitado**. Intercept só após S1–S8 + GO lab.  
+4. **Não** usar `START-HERE-fecho-producao.md` para executar MITM. Squid permanece **rejeitado**. Intercept de produto só após S1–S8 + **GO produto** (20.10).  
 5. Se CORTEX / plano / este ficheiro divergirem no passo actual → **parar** e declarar conflito (não improvisar).
 
 | Documento | Papel |
@@ -26,9 +26,10 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`especificacao-agente-endpoint-20.27.md`](../01-architecture/especificacao-agente-endpoint-20.27.md) | Espec IM7 agente endpoint (20.27 PASS) |
 | [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) | Gates GI0–GI9 |
 | [`spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) | Spike MITM — DEFER 20.7a + **reopen GO 2026-08-08** |
-| [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) | Desenho opção E (`layer7-tlsproxy`) — **sem runtime** |
+| [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) | Desenho opção E — produto sem runtime; PoC idle no repo |
 | [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md) | Contrato IPC 20.9 — intenção vs `mitm_effective` |
-| ADR-0025 / 0026 / 0027 / 0028 / **0029** | Aceito; **0026** 20.9 PASS / runtime diferido; **0029** IM7 diferido + IM8 excluído |
+| [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) | PoC lab pós-GO — **fora** de produção |
+| ADR-0025 / 0026 / 0027 / 0028 / **0029** | Aceito; **0026** 20.9 + GO lab idle; **0029** IM7 diferido + IM8 excluído |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** do produto |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Filas **fecho + IPv6** (não reabrir) |
 
@@ -43,17 +44,17 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08s`) |
+| Plano | Identity rede **FECHADA**; MITM **GO lab** PoC-0 (rev. `2026-08-09t`) |
+| Passo actual | **20.9 PASS**; PoC-0 idle; próximo **20.10** **bloqueado** (S1–S4/S6 + GO produto) |
+| Pré-20.10 (seguro) | PoC [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) + runbook S*; **sem** intercept produção |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** pin enforce; lab/`latest` **`1.9.38`** |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Passo actual | **20.9 PASS** (intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; `mitm_effective` sempre false); próximo **20.10** **bloqueado** até S1–S8 + GO lab |
-| Pré-20.10 (seguro) | [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md) — S5/S8 docs+**testes reais**; **sem** tlsproxy / intercept |
 | Lab real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — `.254` + `.234` + `.235`; SSH pfSense **8=Shell** |
-| Código do produto nesta trilha | Identity **20.22+ PASS**; MITM **20.8–20.9** em `1.9.38` |
-| Rev. do plano | **`2026-08-08q`** |
-| Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM (SKU; runtime ainda ausente) |
-| MITM | **Reopen GO 2026-08-08** — passo **20.9 PASS**; intenção gravável; `mitm_effective` **false** sem runtime; contrato [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md); Squid **rejeitado**; GI2/GI3 runtime **DEFERRED** até S1–S8 |
+| Código do produto nesta trilha | Identity **20.22+ PASS**; MITM **20.8–20.9** em `1.9.38`; PoC idle fora do `.pkg` |
+| Rev. do plano | **`2026-08-09t`** |
+| Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM (SKU; runtime produto ausente) |
+| MITM | **GO lab 2026-08-09** — PoC-0 idle; intenção gravável; `mitm_effective` **false**; Squid **rejeitado**; GI2/GI3 **DEFERRED** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -139,9 +140,9 @@ Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective sempr
 um passo 20.x por bloco; português; barra UX PME (U*/P*/H*/N*); sem overclaim NGFW;
 sem claim de intercept; Squid rejeitado; não reabrir fecho/IPv6/Identity rede/endpoint sem GO;
 GI2/GI3 runtime DEFERRED até S1–S8 + GO lab.
-Tarefa: continuidade pré-20.10 = runbook S1–S8 com TESTES REAIS
-(docs/08-lab/lab-topology.md: .254/.234/.235; SSH pfSense menu → 8 Shell).
-Executar S5/S8 nos clientes reais; NÃO simular; NÃO tlsproxy/intercept; NÃO claim effective=true.
+Tarefa: GO lab activo — PoC-0 idle (src/layer7-tlsproxy). NÃO intercept em .254/.234/.235;
+NÃO empacotar sem GO; NÃO claim effective=true; NÃO 20.10 produto.
+Próximo seguro: PoC-1 IPC em lab isolado OU medir S* só fora de produção.
 ```
 
 ## Prompt — propor desvio / ADR
@@ -162,11 +163,12 @@ Não implementar até GO. Responder em português.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
-- Continuidade agora: **S5+S7+S8 PASS** (pré-runtime); restam **S1–S4/S6 + GO lab** antes de 20.10
+- Continuidade agora: **GO lab** PoC-0 idle; **S5+S7+S8 PASS**; restam **S1–S4/S6** em lab isolado
+- PoC: src/layer7-tlsproxy + docs/09-blocking/poc-layer7-tlsproxy-lab.md
 - Lab: docs/08-lab/lab-topology.md — SSH pfSense menu → **8 Shell**
 - Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
 - Evidência S5/S7: docs/tests/evidence/20260809T031200Z-s5-s7-pre-runtime/
-- Plano rev.: 2026-08-08s
+- Plano rev.: 2026-08-09t
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md
