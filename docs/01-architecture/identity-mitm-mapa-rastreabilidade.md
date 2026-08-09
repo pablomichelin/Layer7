@@ -11,7 +11,7 @@
 **Baseline:** produto `1.9.8` sem módulos activos; lab/`latest` `1.9.41` (20.10b PASS)
 
 Actualizar este mapa **a cada passo 20.x** que toque código ou contratos.  
-Identity rede **FECHADA**. MITM: **20.11 PASS** GI2/GI3 lab (`1.9.41`); Squid **rejeitado**; sem intercept produção.
+Identity rede **FECHADA**. MITM: **20.11 PARCIAL** — GI2 PASS; GI3 PENDENTE S3 (browser Windows); Squid **rejeitado**; sem intercept produção.
 
 
 ---

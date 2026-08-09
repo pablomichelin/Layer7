@@ -53,15 +53,17 @@ Squid rejeitado. **Sem** intercept em `.254`/`.234`/`.235`. Identity rede **FECH
 
 ---
 
-## GI3 — MITM funcional (lab) — **PASS** (`2026-08-09`, 20.11 / `1.9.41`)
+## GI3 — MITM funcional (lab) — **PENDENTE** (S3 / GI3.1; rev. gerencial `2026-08-09`)
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GI3.1 | Cliente com CA vê block page HTTPS legível | **PASS** — lab `.54` |
-| GI3.2 | Cliente sem CA: falha TLS esperada | **PASS** — verify fail |
+| GI3.1 | Cliente com CA vê block page HTTPS legível — canónico ADR-0026 **S3:** ≥1 **browser Windows corporativo** | **PENDENTE** — corrida 20.11 só `curl`+CA; **curl ≠ browser** |
+| GI3.2 | Cliente sem CA: falha TLS esperada | **PASS** — verify fail (`curl` rc=60) |
 | GI3.3 | App com pinning em bypass **ou** limite documentado | **PASS** — bypass + limite honesto (não NGFW) |
 | GI3.4 | Smoke IPv4 sem regressão base (rdr selectivo isolado) | **PASS** — loopback produto + Opção A ns |
 | GI3.5 | CPU/latência lab anotados | **PASS** — S1/S2 localhost+inline ≤ limiares |
+
+**20.11** = **PARCIAL / NO-GO de fecho** até S3/GI3.1 com browser Windows + CA. S6 ECH = **NA/limite** (não exercitado; não PASS).
 
 ---
 
@@ -143,7 +145,7 @@ Squid rejeitado. **Sem** intercept em `.254`/`.234`/`.235`. Identity rede **FECH
 | GI0 | IM0 | **PASS** (`2026-08-05` — ADRs Aceito; T1) |
 | GI1 | IM1 | **PASS** (`2026-08-05`) |
 | GI2 | IM2 | **PASS** (`2026-08-09` — 20.11 / `1.9.41` lab `.54`) |
-| GI3 | IM2 | **PASS** (`2026-08-09` — 20.11 / `1.9.41` lab `.54`) |
+| GI3 | IM2 | **PENDENTE** S3/GI3.1 browser Windows (rev. gerencial; `curl` insuficiente) |
 | GI4 | IM3 | **PASS** (`2026-08-07` — GI4.6 ON lab residual) |
 | GI5 | IM4–IM5 | **PARCIAL** (GI5.3 PASS 20.19; GI5.4 PASS; GI5.1 lab residual) |
 | GI6 | IM5 | **PARCIAL** (código 20.20 PASS; lab DC residual) |
@@ -157,7 +159,8 @@ Squid rejeitado. **Sem** intercept em `.254`/`.234`/`.235`. Identity rede **FECH
 
 | Data | Evento |
 |------|--------|
-| 2026-08-09 | **20.11 / GI2+GI3 PASS** — lab `.54` com `1.9.41`; S1–S8; sem intercept `.254/.234/.235`; evidência `20260809T060000Z-20.11-gi2-gi3-54` |
+| 2026-08-09 | **Rev. gerencial 20.11** — overclaim S3/S6 corrigido: GI2 **PASS**; GI3 **PENDENTE** S3 (browser Windows); S6 **NA/limite**; 20.11 **PARCIAL/NO-GO fecho**; evidência actualizada |
+| 2026-08-09 | **20.11 corrida lab** — `1.9.41` em `.54` (commit docs `8939ddb` classificou PASS de forma incorrecta em S3/S6; supersedido pela rev. gerencial) |
 | 2026-08-08 | **20.9 PASS** — intenção/`mitm_effective`/bypass/`quic_mode`/IPC; GI2/GI3 **runtime** mantêm-se DEFERRED; 20.10 bloqueado até S1–S8+GO lab |
 | 2026-08-09 | **GO lab** PoC-0 idle; S5+S7+S8 PASS; GI2/GI3 DEFERRED; 20.10 exige S1–S4/S6 + GO produto |
 | 2026-08-08 | **Reopen MITM GO** — passo **20.8** scaffolding; GI2/GI3 **runtime** mantêm-se DEFERRED; desenho `layer7-tlsproxy`; Squid rejeitado |
