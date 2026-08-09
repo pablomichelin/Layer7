@@ -395,7 +395,7 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 **Arranque:** [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **Posicionamento PME:** [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — ACEITE  
-**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-09as`  
+**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-09at`  
 **Gates:** [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
 **Prontidão piloto:** [`mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md)
 
@@ -425,5 +425,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] P1 escopo D1–D9 — **PASS** docs ([`GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md))
 - [x] P2 runbook piloto — **PASS** docs ([`runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md))
 - [x] Norma: activação externa exige ficha nomeada (cliente/responsáveis/src/dst/SNI/janela/saída) — **gate activação, ≠ lacuna eng.**
-- [ ] P3 failsafe+visibilidade — critérios **P3.1–P3.8** fechados no mapa; implementação **PENDENTE**
-- [ ] Ficha site preenchida + soak/evidência antes de qualquer ON externo
+- [x] P3 failsafe+visibilidade — **PASS** `1.9.47` (P3.1–P3.8; evid. `230400Z`)
+- [ ] Ficha site preenchida + soak/evidência (P4/P5) antes de qualquer ON externo

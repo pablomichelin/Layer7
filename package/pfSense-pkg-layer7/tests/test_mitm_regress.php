@@ -49,9 +49,16 @@ foreach (array(
 	"layer7_generate_mitm_rdr_snippet",
 	"layer7_generate_mitm_quic_filter_rules_text",
 	"layer7_mitm_tables_apply_to_pf",
+	"layer7_mitm_expire_if_needed",
+	"layer7_mitm_window_status",
+	"layer7_mitm_audit",
+	"layer7_mitm_prepare_window_on_save",
+	"layer7_mitm_lifecycle_tick",
 ) as $fn) {
 	need(function_exists($fn), "API em falta: $fn");
 }
+need(defined("L7_MITM_WINDOW_MAX_MINUTES_DEFAULT") &&
+    (int)L7_MITM_WINDOW_MAX_MINUTES_DEFAULT === 15, "P3 default 15min");
 /* Harness: apply e no-op (sem pfctl); API deve regressar 0. */
 need(layer7_mitm_tables_apply_to_pf(layer7_bare_config()) === 0,
 	"tables_apply harness OFF = 0");
@@ -130,15 +137,21 @@ $fake = $testdir . "/usr/local/sbin/layer7-tlsproxy";
 file_put_contents($fake, "#!/bin/sh\nexit 0\n");
 chmod($fake, 0755);
 
-$n = layer7_mitm_normalize(array(
+$n = layer7_mitm_prepare_window_on_save(
+    array("enabled" => false),
+    array(
 	"enabled" => true,
+	"quic_mode" => "block",
+	"window" => array("max_minutes" => 15),
 	"intercept" => array(
 		"source_cidr" => array("192.168.100.24/32"),
 		"dest_cidr" => array("203.0.113.10"),
 		"block_sni" => array("mitm-lab.test")
 	)
-));
+    )
+);
 need(!empty($n["enabled"]), "enabled com CA");
+need((int)$n["window"]["deadline_unix"] > time(), "P3 deadline armado");
 $cfg = layer7_mitm_apply_to_config(layer7_bare_config(), $n);
 $cfg["layer7"]["interfaces"] = array("lan");
 
@@ -177,6 +190,32 @@ need(layer7_generate_mitm_rdr_snippet($cfg, true) === "",
 	"apos failsafe zero rdr");
 need(layer7_generate_mitm_quic_filter_rules_text($cfg, true) === "",
 	"apos failsafe zero quic");
+
+/* P3: expire fail-closed + audit + status + S8 */
+need(layer7_mitm_sync_helper($cfg, true) === true, "sync ON para expire");
+$n_exp = $n;
+$n_exp["window"]["deadline_unix"] = time() - 10;
+$cfg_exp = layer7_mitm_apply_to_config(layer7_bare_config(), $n_exp);
+$cfg_exp["layer7"]["interfaces"] = array("lan");
+need(!layer7_mitm_effective($n_exp, true), "P3 effective false expirado");
+$st = layer7_mitm_window_status($n_exp);
+need(!empty($st["expired"]), "P3 status expired");
+need($st["quic_mode"] === "block", "P3 status quic_mode");
+$ex = layer7_mitm_expire_if_needed($cfg_exp);
+need(!empty($ex["changed"]) && !empty($ex["expired"]), "P3 expire changed");
+need(empty($ex["data"]["layer7"]["mitm"]["enabled"]), "P3 expire OFF");
+need(!layer7_mitm_control_plane_materialized(), "P3 S8 limpo apos expire");
+need(layer7_generate_mitm_rdr_snippet($cfg_exp, true) === "", "P3 S8 zero rdr");
+$alog = @file_get_contents(layer7_mitm_audit_path());
+need(is_string($alog) && strpos($alog, '"event":"expire"') !== false, "P3 audit expire");
+need(strpos($alog, '"payload_tls":false') !== false, "P3 audit sem payload");
+need(strpos($alog, "PRIVATE KEY") === false, "P3 audit sem chave");
+
+/* GUI: max_window + break-glass + status fields */
+need(strpos($mitm_src, "mitm_max_window") !== false, "GUI max_window");
+need(strpos($mitm_src, "mitm_break_glass") !== false, "GUI break-glass");
+need(strpos($mitm_src, "tempo restante") !== false, "GUI tempo restante");
+need(strpos($mitm_src, "layer7_mitm_prepare_window_on_save") !== false, "GUI arma janela");
 
 /* filter_configure_safe anti-reentrada */
 $fc = layer7_filter_configure_safe();

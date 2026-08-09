@@ -4,18 +4,30 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Documentação / operação
-
-- **GO humano teste MITM controlado `.254` (`20260809T215442Z`):** runbook
-  canónico `1.9.46` (`quic_mode=block`, anti-QUIC escopo, janela ≤15 min);
-  Edge block page sem flags; negativos escopo+CA; rollback baseline OFF.
-  Activação permanente permanece **NO-GO**. Sem mudança de produto / sem
-  nova release.
-
-
 ### Notes
 
 - (vazio)
+
+## [1.9.47] — 2026-08-09
+
+### Added
+
+- **P3 MITM janela failsafe + visibilidade:** `mitm.window.max_minutes`
+  (1–240, default 15) e `deadline_unix` explícito; `mitm_effective`
+  fail-closed se expirado; auto-disable persiste `enabled=OFF` via
+  `layer7_mitm_expire_if_needed` (sync/resync/GUI); GUI mostra src/dst/
+  block_sni, `quic_mode`, deadline e tempo restante; break-glass OFF;
+  audit metadados em `/var/log/layer7-mitm-audit.log`
+  (activate/deactivate/expire/break_glass/failsafe) — **zero** payload TLS.
+  Sem alargar rdr (`from any` proibido). Suite builder PASS
+  (`docs/tests/evidence/20260809T230400Z-p3-mitm-window/`).
+
+### Release
+
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`
+- Rollback lab: `1.9.46`
+- Activação piloto externa continua **NO-GO** até ficha site + soak (P4/P5)
 
 ## [1.9.46] — 2026-08-09
 

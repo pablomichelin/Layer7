@@ -1,7 +1,7 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO** — P0/P1/P2 docs **PASS**; faltam P3 (código failsafe) + preenchimento site + soak/evidência.  
+**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); faltam ficha site + soak/evidência (P4/P5).  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
 **Pacote de referência lab/`latest`:** `1.9.46` (`SHA256=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`).  
@@ -139,15 +139,15 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | Checklist P2 §11 |
 | Rollback | Reverter commit docs |
 
-### Bloco P3 — **Primeiro bloco de código** (ver secção e + critérios de aceite)
+### Bloco P3 — **Primeiro bloco de código** — **PASS** (`1.9.47`)
 
 | Campo | Valor |
 |-------|--------|
 | Objectivo | Trilho de segurança para janela piloto (failsafe + visibilidade) |
-| Impacto | Package/GUI/daemon control-plane; **sem** alargar blast radius do rdr |
+| Impacto | Package/GUI control-plane; **sem** alargar blast radius do rdr |
 | Risco | Médio |
-| Teste | Suite MITM local + lab auto-disable + S8 OFF — ver **critérios de aceite P3** abaixo |
-| Rollback | Flag OFF; pacote anterior `1.9.46` |
+| Teste | Builder `test_mitm_config` + `test_mitm_regress` PASS — [`20260809T230400Z-p3-mitm-window`](../tests/evidence/20260809T230400Z-p3-mitm-window/) |
+| Rollback | Pacote `1.9.46` |
 
 ### Bloco P4 — Soak lab controlado (evidência)
 
@@ -243,11 +243,11 @@ Fora de P3 (continua gate activação, não eng.): ficha cliente/responsáveis/s
 ## Veredicto final
 
 ```text
-MITM motor scoped (1.9.46) ........ PRONTO PARA TESTE CONTROLADO (evidência 215442Z)
+MITM motor scoped (1.9.46+) ....... PRONTO PARA TESTE CONTROLADO (evidência 215442Z)
 P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
+P3 failsafe+visibilidade .......... PASS código (1.9.47; P3.1–P3.8; evid. 230400Z)
 Gate activação externa ............ Ficha site nomeada (cliente/resp/src/dst/SNI/janela/saída) — NÃO é gap eng.
-Débito engenharia remanescente ... P3 failsafe+visibilidade (critérios P3.1–P3.8)
-MITM pronto para ACTIVAR PILOTO ... NÃO (faltam P3 + ficha site + soak/evidência)
+MITM pronto para ACTIVAR PILOTO ... NÃO (faltam ficha site + soak/evidência P4/P5)
 MITM permanente / produção ........ NO-GO (decisão humana)
 ```
 
@@ -273,3 +273,4 @@ MITM permanente / produção ........ NO-GO (decisão humana)
 | 2026-08-09 | Mapa P0 criado — NÃO PRONTO |
 | 2026-08-09 | P1+P2 reflectidos — D1–D9 |
 | 2026-08-09 | Gate activação externa ≠ lacuna eng.; critérios aceite P3.1–P3.8 fechados |
+| 2026-08-09 | **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS |

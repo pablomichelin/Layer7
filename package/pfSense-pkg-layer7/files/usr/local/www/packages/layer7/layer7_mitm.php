@@ -22,17 +22,37 @@ $l7_feat_raw = isset($l7_ent["raw"]) ? (string)$l7_ent["raw"] : "";
 $savemsg = "";
 $input_errors = array();
 $data = layer7_load_or_default();
+/* P3: expirar janela no load (sobrevive sem depender só do save). */
+if (function_exists("layer7_mitm_expire_if_needed")) {
+	$ex = layer7_mitm_expire_if_needed($data);
+	if (!empty($ex["changed"])) {
+		$data = $ex["data"];
+		layer7_save_json($data);
+		layer7_mitm_sync_helper($data, $unlocked);
+		layer7_filter_configure_safe();
+		$savemsg = l7_t("Janela MITM expirada — auto-disable fail-closed (mitm.enabled OFF).");
+	}
+}
 $mitm = layer7_mitm_from_config($data);
 $runtime_ok = layer7_mitm_runtime_available();
 $effective = layer7_mitm_effective($mitm, $unlocked);
 $ca_ok = !empty($mitm["ca"]["present"]);
 $toggle_ok = $unlocked && $ca_ok;
+$win_status = function_exists("layer7_mitm_window_status")
+    ? layer7_mitm_window_status($mitm) : array();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 	if (!$unlocked) {
 		$input_errors[] = l7_t("Add-on mitm nao incluido nesta licenca.");
 	} else {
-		if (isset($_POST["mitm_save_bypass"])) {
+		if (isset($_POST["mitm_break_glass"])) {
+			$data = layer7_mitm_failsafe_rollback($data, "break-glass operador");
+			layer7_save_json($data);
+			layer7_filter_configure_safe();
+			$savemsg = l7_t("Break-glass: MITM OFF, control-plane limpo.");
+			$mitm = layer7_mitm_from_config($data);
+		} elseif (isset($_POST["mitm_save_bypass"])) {
+			$prev_mitm = $mitm;
 			$mitm["bypass"]["sni"] = isset($_POST["bypass_sni"]) ? (string)$_POST["bypass_sni"] : "";
 			$mitm["bypass"]["cidr"] = isset($_POST["bypass_cidr"]) ? (string)$_POST["bypass_cidr"] : "";
 			$mitm["intercept"]["source_cidr"] = isset($_POST["intercept_source_cidr"])
@@ -44,11 +64,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			$mitm["enabled"] = !empty($_POST["mitm_enabled"]);
 			$mitm["quic_mode"] = isset($_POST["quic_mode"]) ? (string)$_POST["quic_mode"] : "bypass";
 			$mitm["ca"]["cn"] = isset($_POST["ca_cn"]) ? (string)$_POST["ca_cn"] : $mitm["ca"]["cn"];
+			$mitm["window"]["max_minutes"] = isset($_POST["mitm_max_window"])
+			    ? (int)$_POST["mitm_max_window"]
+			    : (int)($mitm["window"]["max_minutes"] ?? 15);
 			$errs = layer7_mitm_validate($mitm);
 			if (!empty($errs)) {
 				$input_errors = array_merge($input_errors, $errs);
 			}
-			$mitm = layer7_mitm_normalize($mitm);
+			$mitm = layer7_mitm_prepare_window_on_save($prev_mitm, $mitm);
 			$data = layer7_mitm_apply_to_config($data, $mitm);
 			if (empty($input_errors) && layer7_save_json($data)) {
 				$want_helper = layer7_mitm_should_start_helper($mitm, true);
@@ -71,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 						" " . l7_t("Rdr selectivo activo (source_cidr E dest_cidr obrigatorios).")
 					    : l7_t(
 						"Configuracao MITM gravada. Intencao guardada; mitm_effective OFF " .
-						"(gates incompletos — exige CA, entitlement, runtime e source+dest IPv4)."
+						"(gates incompletos — exige CA, entitlement, runtime, source+dest IPv4 e janela valida)."
 					    );
 				}
 				$mitm = layer7_mitm_from_config($data);
@@ -168,6 +191,8 @@ $runtime_ok = layer7_mitm_runtime_available();
 $effective = layer7_mitm_effective($mitm, $unlocked);
 $ca_ok = !empty($mitm["ca"]["present"]);
 $toggle_ok = $unlocked && $ca_ok;
+$win_status = function_exists("layer7_mitm_window_status")
+    ? layer7_mitm_window_status($mitm) : array();
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("MITM"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
@@ -190,9 +215,9 @@ if ($savemsg !== "") {
 		<div class="layer7-content">
 			<p class="layer7-lead">
 				<?= htmlspecialchars(l7_t(
-				    "1.9.42: listen selectivo (127.0.0.1:8443) + PF rdr so com origem E destino (source_cidr + dest_cidr). " .
-				    "mitm.enabled e intencao; mitm_effective exige entitlement+CA+runtime+intercept_ready. " .
-				    "Listas vazias = zero rdr (upgrade seguro). Nunca from any. Squid rejeitado."
+				    "1.9.47 P3: janela com max_window + deadline_unix; auto-disable fail-closed ao expirar " .
+				    "(incluindo apos reload). mitm.enabled e intencao; mitm_effective exige " .
+				    "entitlement+CA+runtime+source+dest+janela valida. Nunca from any. Squid rejeitado."
 				)); ?>
 			</p>
 
@@ -224,16 +249,38 @@ if ($savemsg !== "") {
 						    ? l7_t("Runtime presente (20.10b). mitm_effective so com todos os gates.")
 						    : l7_t("Runtime layer7-tlsproxy ausente — inspecao OFF.")); ?>
 					</div>
-					<table class="table table-condensed" style="max-width:640px; margin-bottom:0;">
+					<table class="table table-condensed" style="max-width:720px; margin-bottom:12px;">
 						<tr><th>mitm.enabled (intencao)</th><td><code><?= !empty($mitm["enabled"]) ? "true" : "false"; ?></code></td></tr>
 						<tr><th>mitm_effective</th><td><code><?= $effective ? "true" : "false"; ?></code></td></tr>
 						<tr><th>runtime</th><td><code><?= $runtime_ok ? "yes" : "no"; ?></code></td></tr>
 						<tr><th>intercept_ready</th><td><code><?= layer7_mitm_intercept_ready() ? "true" : "false"; ?></code></td></tr>
-						<tr><th>intercept source_cidr</th><td><code><?= (int)count($mitm["intercept"]["source_cidr"] ?? array()); ?></code></td></tr>
-						<tr><th>intercept dest_cidr</th><td><code><?= (int)count($mitm["intercept"]["dest_cidr"] ?? array()); ?></code></td></tr>
-						<tr><th>quic_mode</th><td><code><?= htmlspecialchars($mitm["quic_mode"] ?? "bypass"); ?></code></td></tr>
+						<tr><th>source_cidr</th><td><code><?= htmlspecialchars(implode(", ", $win_status["source_cidr"] ?? array())); ?></code></td></tr>
+						<tr><th>dest_cidr</th><td><code><?= htmlspecialchars(implode(", ", $win_status["dest_cidr"] ?? array())); ?></code></td></tr>
+						<tr><th>block_sni</th><td><code><?= htmlspecialchars(implode(", ", $win_status["block_sni"] ?? array())); ?></code></td></tr>
+						<tr><th>quic_mode</th><td><code><?= htmlspecialchars($win_status["quic_mode"] ?? ($mitm["quic_mode"] ?? "bypass")); ?></code></td></tr>
+						<tr><th>max_window (min)</th><td><code><?= (int)($win_status["max_minutes"] ?? 15); ?></code></td></tr>
+						<tr><th>deadline_unix (UTC)</th><td><code><?php
+							$dl = (int)($win_status["deadline_unix"] ?? 0);
+							echo $dl > 0 ? htmlspecialchars(gmdate("Y-m-d\TH:i:s\Z", $dl) . " ({$dl})") : "0";
+						?></code></td></tr>
+						<tr><th>tempo restante</th><td><code><?php
+							$rs = (int)($win_status["remaining_sec"] ?? 0);
+							if ($rs <= 0) {
+								echo !empty($win_status["expired"]) ? "expirado / OFF" : "0s";
+							} else {
+								echo htmlspecialchars(sprintf("%dm %ds", intdiv($rs, 60), $rs % 60));
+							}
+						?></code></td></tr>
 						<tr><th>features</th><td><code><?= htmlspecialchars($l7_feat_raw); ?></code></td></tr>
 					</table>
+<?php if ($effective || !empty($mitm["enabled"])): ?>
+					<form method="post" style="margin-bottom:0;">
+						<button type="submit" name="mitm_break_glass" value="1" class="btn btn-danger btn-sm"
+							onclick="return confirm(<?= htmlspecialchars(json_encode(l7_t("Break-glass: desactivar MITM agora e limpar control-plane?")), ENT_QUOTES); ?>);">
+							<i class="fa fa-exclamation-triangle"></i> <?= htmlspecialchars(l7_t("Break-glass (OFF imediato)")); ?>
+						</button>
+					</form>
+<?php endif; ?>
 <?php endif; ?>
 				</div>
 			</div>
@@ -343,6 +390,18 @@ if ($savemsg !== "") {
 									)); ?>
 								</p>
 <?php endif; ?>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("max_window (minutos)")); ?></label>
+							<div class="col-sm-3">
+								<input type="number" name="mitm_max_window" class="form-control" min="1" max="240"
+									value="<?= (int)($mitm["window"]["max_minutes"] ?? 15); ?>" />
+								<p class="help-block"><?= htmlspecialchars(l7_t(
+								    "P3: ao activar, deadline_unix = agora + max_window. " .
+								    "Ao expirar, mitm_effective=false e mitm.enabled=OFF (fail-closed). " .
+								    "1–240 min; default 15. Sem payload TLS em disco."
+								)); ?></p>
 							</div>
 						</div>
 						<div class="form-group">

@@ -1,6 +1,6 @@
 # ADR-0026 — MITM TLS inspection opt-in (certificado / CA)
 
-**Estado:** Aceito — **runtime shipped** (`1.9.39`–`1.9.46`); teste controlado PASS; P1+P2 piloto docs PASS; **activar piloto/permanente NO-GO** até P3+ficha+soak; ficha site = **gate activação** ≠ lacuna eng. (rev. `p`)  
+**Estado:** Aceito — **runtime shipped** (`1.9.39`–`1.9.47`); P3 janela PASS; P1+P2 docs PASS; **activar piloto/permanente NO-GO** até ficha+soak; ficha site = **gate activação** ≠ lacuna eng. (rev. `q`)  
 **Data:** 2026-08-05  
 **Aceite:** `2026-08-05` — passo **20.2** / GI0  
 **Deferral implementação:** `2026-08-06` — passo **20.7a** (GO operador: PME Identity-first)  
@@ -69,7 +69,7 @@
 ## Consequências
 
 - **Histórico (rev. e–f):** GI2–GI3 runtime diferidos até S1–S8 + GO lab.  
-- **Estado vivo (`2026-08-09`, rev. p):** GI2/GI3 **PASS** lab; Gate C + GO teste `.254` **PASS** (`1.9.46` / `215442Z`); P1+P2 docs PASS; ficha site = **gate activação** (≠ gap eng.); activação **piloto/permanente** = **NO-GO** até P3 (P3.1–P3.8) + ficha + soak — [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md).  
+- **Estado vivo (`2026-08-09`, rev. q):** GI2/GI3 **PASS**; Gate C + GO teste (`1.9.46` / `215442Z`); **P3 PASS** (`1.9.47` — max_window/deadline/auto-disable/audit/GUI); ficha site = **gate activação** (≠ gap eng.); activação **piloto/permanente** = **NO-GO** até ficha + soak — [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md).  
 - Runtime `layer7-tlsproxy` **presente** no `.pkg` (default OFF); `mitm_effective` só com gates.  
 - Identity rede **fechada** — não reabrir nesta fila.
 
@@ -116,6 +116,7 @@
 | **n** | **2026-08-09** | **`1.9.46` + mapa piloto** — Gate C / teste controlado PASS; runtime shipped; piloto **NÃO PRONTO**; permanente NO-GO; próximo P3 failsafe após GO escopo |
 | **o** | **2026-08-09** | **P1+P2 docs** — escopo D1–D9 (CA cliente/GPO, metadados 30d, allow explícito, explicabilidade, break-glass+auto-disable); activação ainda NO-GO até P3 |
 | **p** | **2026-08-09** | Ficha site nomeada = **gate activação externa** (≠ gap eng.); aceite P3.1–P3.8 no mapa |
+| **q** | **2026-08-09** | **P3 PASS** `1.9.47` — janela/deadline/failsafe/audit metadados/GUI; suite builder PASS |
 
 ---
 

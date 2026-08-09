@@ -39,6 +39,12 @@ if (!isset($d["intercept"]["dest_cidr"]) || !empty($d["intercept"]["dest_cidr"])
 if (!isset($d["intercept"]["source_cidr"]) || !empty($d["intercept"]["source_cidr"])) {
 	fail("defaults intercept.source_cidr vazio");
 }
+if (!isset($d["window"]["max_minutes"]) || (int)$d["window"]["max_minutes"] !== 15) {
+	fail("defaults window.max_minutes=15");
+}
+if ((int)($d["window"]["deadline_unix"] ?? -1) !== 0) {
+	fail("defaults window.deadline_unix=0");
+}
 
 $bare = layer7_bare_config();
 if (!isset($bare["layer7"]["mitm"]["enabled"]) || $bare["layer7"]["mitm"]["enabled"]) {
@@ -114,7 +120,9 @@ if (!$has_openssl) {
 	if (empty($r["ok"])) {
 		fail("generate: " . $r["msg"]);
 	}
-	$n2 = layer7_mitm_normalize(array(
+	$n2 = layer7_mitm_prepare_window_on_save(
+	    array("enabled" => false),
+	    array(
 		"enabled" => true,
 		"bypass" => array("sni" => array("example.com"), "cidr" => array()),
 		"intercept" => array(
@@ -122,9 +130,13 @@ if (!$has_openssl) {
 			"dest_cidr" => array("203.0.113.10"),
 			"block_sni" => array("blocked.test")
 		)
-	));
+	    )
+	);
 	if (empty($n2["enabled"])) {
 		fail("com CA, intencao enabled deve persistir");
+	}
+	if ((int)($n2["window"]["deadline_unix"] ?? 0) <= time()) {
+		fail("P3: activate deve armar deadline futuro");
 	}
 	if (layer7_mitm_effective($n2, true)) {
 		fail("effective ainda false sem runtime");
@@ -328,13 +340,16 @@ if (!$has_openssl) {
 	}
 
 	/* Topologia: .24 elegivel; outra origem nao esta na tabela src. */
-	$n_topo = layer7_mitm_normalize(array(
+	$n_topo = layer7_mitm_prepare_window_on_save(
+	    array("enabled" => false),
+	    array(
 		"enabled" => true,
 		"intercept" => array(
 			"source_cidr" => array("192.168.100.24/32"),
 			"dest_cidr" => array("203.0.113.10")
 		)
-	));
+	    )
+	);
 	$cfg_t = layer7_mitm_apply_to_config(layer7_bare_config(), $n_topo);
 	$cfg_t["layer7"]["interfaces"] = array("lan");
 	$snip_t = layer7_generate_mitm_rdr_snippet($cfg_t, true);
@@ -408,6 +423,79 @@ if (!$has_openssl) {
 	if (is_file($flag)) {
 		fail("flag effective deve ser removida sem effective");
 	}
+	/* --- P3: janela / expire / audit / S8 OFF --- */
+	$n_win = layer7_mitm_prepare_window_on_save(
+	    array("enabled" => false),
+	    array(
+		"enabled" => true,
+		"window" => array("max_minutes" => 15),
+		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32"),
+			"dest_cidr" => array("203.0.113.10"),
+			"block_sni" => array("blocked.test")
+		)
+	    )
+	);
+	$cfg_w = layer7_mitm_apply_to_config(layer7_bare_config(), $n_win);
+	$cfg_w["layer7"]["interfaces"] = array("lan");
+	if (!layer7_mitm_effective($n_win, true)) {
+		fail("P3: effective true com janela futura + gates");
+	}
+	$st = layer7_mitm_window_status($n_win);
+	if ((int)$st["remaining_sec"] <= 0 || $st["quic_mode"] === "" ||
+	    empty($st["source_cidr"]) || empty($st["dest_cidr"])) {
+		fail("P3: window_status incompleto");
+	}
+	$audit = layer7_mitm_audit_path();
+	$audit_before = is_file($audit) ? filesize($audit) : 0;
+
+	/* Expirar: deadline no passado ⇒ effective false + persist OFF + cleanup */
+	$n_exp = $n_win;
+	$n_exp["window"]["deadline_unix"] = time() - 5;
+	$n_exp = layer7_mitm_normalize($n_exp);
+	if (layer7_mitm_effective($n_exp, true)) {
+		fail("P3: effective false com deadline expirado");
+	}
+	$cfg_exp = layer7_mitm_apply_to_config(layer7_bare_config(), $n_exp);
+	$cfg_exp["layer7"]["interfaces"] = array("lan");
+	layer7_mitm_sync_helper($cfg_w, true); /* materializar primeiro com janela OK */
+	if (!layer7_mitm_control_plane_materialized()) {
+		fail("P3: pre-expire materializado");
+	}
+	/* Gravar estado expirado em disco lógico via apply + expire tick */
+	$ex = layer7_mitm_expire_if_needed($cfg_exp);
+	if (empty($ex["changed"]) || empty($ex["expired"])) {
+		fail("P3: expire_if_needed deve persistir OFF");
+	}
+	if (!empty($ex["data"]["layer7"]["mitm"]["enabled"])) {
+		fail("P3: apos expire enabled=false");
+	}
+	if (layer7_mitm_control_plane_materialized()) {
+		fail("P3: S8 — gate/flag limpos apos expire");
+	}
+	if (layer7_generate_mitm_rdr_snippet($cfg_exp, true) !== "") {
+		fail("P3: S8 — zero rdr apos expire");
+	}
+	if (!is_file($audit) || filesize($audit) <= $audit_before) {
+		fail("P3: audit metadata no expire");
+	}
+	$alog = file_get_contents($audit);
+	if (strpos($alog, '"event":"expire"') === false ||
+	    strpos($alog, '"payload_tls":false') === false) {
+		fail("P3: audit expire metadados");
+	}
+	if (strpos($alog, "BEGIN CERTIFICATE") !== false ||
+	    strpos($alog, "PRIVATE KEY") !== false) {
+		fail("P3: audit nao pode conter PEM");
+	}
+	/* Re-save nao alarga from any */
+	$snip_p3 = layer7_generate_mitm_rdr_snippet(
+	    layer7_mitm_apply_to_config(layer7_bare_config(), $n_win), true);
+	/* OFF apos expire: snippet da cfg_exp OFF */
+	if ($snip_p3 !== "" && preg_match('/\bfrom\s+any\b/i', $snip_p3)) {
+		fail("P3.8: from any proibido");
+	}
+
 	@unlink($fake);
 	layer7_mitm_ca_delete();
 	$n3 = layer7_mitm_normalize(array("enabled" => true));

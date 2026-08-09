@@ -1,8 +1,8 @@
-# START HERE — Identity + MITM Add-on 【`1.9.46` · GO teste controlado PASS】
+# START HERE — Identity + MITM Add-on 【`1.9.47` · P3 PASS · piloto NÃO activar】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
-> **Gate C PASS** (`20260809T210753Z`) — Edge `.24` block page **sem** `--disable-quic`; anti-QUIC UDP/443 escopo MITM.  
-> **GO teste controlado `.254` PASS** (`20260809T215442Z`) — janela ≤15 min; `quic_mode=block`; rollback OK; **NÃO** permanente.  
+> **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
+> **Gate C / GO teste** (`1.9.46`, `215442Z`) — **NÃO** permanente.  
 > Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
 > **Sem** intercept permanente em `.254`/`.234`/`.235`. Squid rejeitado.  
 > **TLS:** proibido suavizar validação / `--ignore-certificate-errors` — [`politica-tls-sem-bypass.md`](../09-blocking/politica-tls-sem-bypass.md).
@@ -49,14 +49,14 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.46`** (Gate C PASS) |
-| Passo actual | **`1.9.46`** — Gate B+C PASS; **GO teste controlado `.254` PASS** (`215442Z`); permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar** — P1+P2 docs **PASS**; falta P3+ficha+soak — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.47`** (P3 PASS) |
+| Passo actual | **`1.9.47`** — P3 failsafe+visibilidade **PASS**; permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar** — P1+P2+P3 **PASS**; falta ficha+soak — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | Gate activação externa | Ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | **P3 código** (aceite P3.1–P3.8 no mapa); MITM OFF; permanente **NO-GO** |
-| Rev. do plano | **`2026-08-09as`** |
+| Próximo | **P4 soak** (GO) / ficha site; MITM OFF; permanente **NO-GO** |
+| Rev. do plano | **`2026-08-09at`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -132,7 +132,7 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.46**.
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.47**.
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
 Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; Gate C PASS (anti-QUIC escopo).
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
@@ -140,11 +140,11 @@ GO produto: docs/09-blocking/GO-produto-20.10.md
 Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (GO teste MITM controlado via runbook 1.9.46; NÃO permanente).
+Ler na ordem do START-HERE; executar só o próximo bloco seguro (P4 soak / ficha — NÃO activar MITM sem GO; NÃO permanente).
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
 rdr só source∧dest; anti-QUIC UDP/443 só mitm_src→mitm_dst; quic_mode=block (sem bypass); um passo/bloco; português;
 barra UX PME; Squid rejeitado; S6 ECH = NA/limite; NÃO activar intercept permanente em .254/.234/.235.
-Estado: 1.9.46 Gate B+C PASS; GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente).
+Estado: 1.9.47 P3 PASS; Gate B+C/GO teste em 1.9.46 (215442Z); piloto NÃO activar até ficha+P4/P5.
 Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md — B/C PASS; prod temporária PASS.
 Tarefa seguinte: P1+P2 docs PASS; implementar P3 failsafe/visibilidade; manter MITM OFF;
 permanente NO-GO; sem mutar .234/.235; sem activar piloto sem ficha P1.
@@ -170,7 +170,7 @@ SSOT: [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-
 | Fase | Obrigatório | Estado |
 |------|-------------|--------|
 | Doc | D0 + D1 local | **PASS** |
-| Builder (antes publish) | `make -C src/layer7-tlsproxy test-regress` · `test_mitm_regress.php` · `test_ctrl_exec_timeout.php` · `run-local-timeout-fix.sh` · `test_mitm_config.php` | **PASS** (`1.9.46`) |
+| Builder (antes publish) | `make -C src/layer7-tlsproxy test-regress` · `test_mitm_regress.php` · `test_ctrl_exec_timeout.php` · `run-local-timeout-fix.sh` · `test_mitm_config.php` | **PASS** (`1.9.47` P3) |
 | Humano | B+D Edge `.24` sem bypass TLS **nem** `--disable-quic` | **PASS** (`20260809T210753Z-phaseBD-d1-254`) |
 | Produção | MITM em `.254` | **PASS temporário** (`215442Z`); permanente **NO-GO** |
 
@@ -188,16 +188,14 @@ php tests/functional/test_mitm_config.php
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.46** — Gate B+C PASS; GO teste controlado .254 PASS (215442Z)
-- Prontidão piloto: **NÃO PRONTO activar** (P1+P2 docs PASS) — mapa-prontidao-mitm-piloto-2026-08-09.md
-- P1: GO-escopo-piloto-mitm-generico.md (D1–D9) · P2: runbook-piloto-mitm-generico.md
-- Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B/C PASS; prod temporária PASS)
-- 1.9.46: anti-QUIC UDP/443 src→dst + filter_configure_sync; Edge sem flags PASS
-- Runbook teste: runbook-activacao-mitm-producao-1.9.46.md (quic_mode=block; ≤15 min; NÃO permanente)
-- Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
-- Evidência GO teste: 20260809T215442Z-phaseBD-d1-254 (rollback OK; baseline OFF)
-- Latest publicado: **1.9.46** SHA `10998477…ae72f5`
-- Próximo: **P3 código** failsafe/visibilidade; MITM OFF; permanente NO-GO
+- Passo actual: **1.9.47** — P3 failsafe+visibilidade PASS
+- Prontidão piloto: **NÃO PRONTO activar** (P1+P2+P3 PASS; falta ficha+soak)
+- P1/P2 docs · P3 código 1.9.47 (max_window/deadline/audit/GUI)
+- Gates: B/C PASS; GO teste .254 PASS (215442Z; 1.9.46)
+- Evidência P3: 20260809T230400Z-p3-mitm-window
+- Evidência GO teste: 20260809T215442Z-phaseBD-d1-254
+- Latest publicado: **1.9.47** SHA `2155daca…9df833`
+- Próximo: **P4 soak** (GO) / ficha; MITM OFF; permanente NO-GO
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

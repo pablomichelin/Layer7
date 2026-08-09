@@ -215,6 +215,15 @@ define("L7_CTRL_TIMEOUT_FILTER", 90);
 /** Segundos apos TERM antes de KILL (-k do /usr/bin/timeout). */
 define("L7_CTRL_TIMEOUT_KILL_GRACE", 5);
 
+/*
+ * P3 — janela MITM (failsafe + visibilidade).
+ * max_minutes default 15 (runbook teste); teto 240 (piloto).
+ * deadline_unix explícito no JSON; effective fail-closed se expirado.
+ */
+define("L7_MITM_WINDOW_MAX_MINUTES_DEFAULT", 15);
+define("L7_MITM_WINDOW_MAX_MINUTES_MIN", 1);
+define("L7_MITM_WINDOW_MAX_MINUTES_CAP", 240);
+
 /**
  * Executa comando externo com timeout finito e resultado explicito.
  *
@@ -2087,6 +2096,10 @@ function layer7_resync()
 		layer7_dst_allowlist_apply_to_pf();
 		layer7_blockpage_sync($data);
 		layer7_ensure_daemon_running();
+		/* P3: expirar janela MITM + rematerializar/teardown após boot/reload. */
+		if (function_exists("layer7_mitm_lifecycle_tick")) {
+			layer7_mitm_lifecycle_tick($data);
+		}
 	} finally {
 		$GLOBALS["layer7_resync_active"] = false;
 	}
@@ -6990,7 +7003,16 @@ function layer7_mitm_failsafe_rollback($data = null, $reason = "")
 		$data = layer7_load_or_default();
 	}
 	$mitm = layer7_mitm_from_config($data);
+	$event = (stripos($why, "break") !== false) ? "break_glass" : "failsafe";
+	if (function_exists("layer7_mitm_audit")) {
+		layer7_mitm_audit($event, $mitm, array("reason" => $why));
+	}
 	$mitm["enabled"] = false;
+	if (isset($mitm["window"]) && is_array($mitm["window"])) {
+		$mitm["window"]["deadline_unix"] = 0;
+		$mitm["window"]["activated_unix"] = 0;
+		$mitm["window"]["activated_by"] = "";
+	}
 	$mitm = layer7_mitm_normalize($mitm);
 	return layer7_mitm_apply_to_config($data, $mitm);
 }
@@ -7004,6 +7026,16 @@ function layer7_mitm_sync_helper($data = null, $entitled = null)
 {
 	if ($data === null) {
 		$data = layer7_load_or_default();
+	}
+	/* P3: se a janela já venceu, persistir OFF antes de decidir arranque. */
+	if (function_exists("layer7_mitm_expire_if_needed")) {
+		$ex = layer7_mitm_expire_if_needed($data);
+		if (!empty($ex["changed"])) {
+			$data = $ex["data"];
+			if (function_exists("layer7_save_json")) {
+				layer7_save_json($data);
+			}
+		}
 	}
 	$mitm = layer7_mitm_from_config($data);
 	$gate = layer7_mitm_product_gate_path();
@@ -7133,8 +7165,9 @@ function layer7_mitm_protected_bypass_cidr()
 
 /**
  * Efectivo = intenção ∧ entitlement ∧ CA ∧ runtime ∧ intercept_ready ∧
- * source_cidr∧dest_cidr IPv4 explícitos (fail-closed; proibido scope vazio).
+ * source_cidr∧dest_cidr IPv4 explícitos ∧ janela não expirada (P3).
  * Sem effective: zero intercept / zero helper (S8 / ADR-0017).
+ * Nota: gate puro — persistência OFF no expire fica em layer7_mitm_expire_if_needed.
  */
 function layer7_mitm_effective($mitm = null, $entitled = null)
 {
@@ -7170,7 +7203,288 @@ function layer7_mitm_effective($mitm = null, $entitled = null)
 	if (!layer7_mitm_intercept_scope_ok($mitm)) {
 		return false;
 	}
+	/* P3: deadline explícito obrigatório e ainda no futuro. */
+	if (function_exists("layer7_mitm_window_expired") &&
+	    layer7_mitm_window_expired($mitm)) {
+		return false;
+	}
+	$dl = 0;
+	if (isset($mitm["window"]["deadline_unix"])) {
+		$dl = (int)$mitm["window"]["deadline_unix"];
+	}
+	if ($dl <= 0) {
+		return false;
+	}
 	return true;
+}
+
+/**
+ * Path do log de auditoria MITM (metadados apenas; zero payload TLS).
+ */
+function layer7_mitm_audit_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		$p = getenv("LAYER7_TEST_ROOT") . "/var/log/layer7-mitm-audit.log";
+		$dir = dirname($p);
+		if (!is_dir($dir)) {
+			@mkdir($dir, 0755, true);
+		}
+		return $p;
+	}
+	return "/var/log/layer7-mitm-audit.log";
+}
+
+/**
+ * Operador para metadados de auditoria (GUI session ou system).
+ */
+function layer7_mitm_operator_label()
+{
+	if (!empty($_SESSION["Username"])) {
+		return substr(preg_replace('/[^\w.@-]/', '',
+		    (string)$_SESSION["Username"]), 0, 64);
+	}
+	if (!empty($GLOBALS["user"])) {
+		return substr(preg_replace('/[^\w.@-]/', '',
+		    (string)$GLOBALS["user"]), 0, 64);
+	}
+	return "system";
+}
+
+/**
+ * Clamp max_minutes da janela piloto.
+ */
+function layer7_mitm_clamp_max_minutes($raw)
+{
+	$n = (int)$raw;
+	if ($n < L7_MITM_WINDOW_MAX_MINUTES_MIN) {
+		$n = L7_MITM_WINDOW_MAX_MINUTES_DEFAULT;
+	}
+	if ($n > L7_MITM_WINDOW_MAX_MINUTES_CAP) {
+		$n = L7_MITM_WINDOW_MAX_MINUTES_CAP;
+	}
+	return $n;
+}
+
+/**
+ * True se intenção ON mas deadline já passou (ou deadline inválido com ON).
+ */
+function layer7_mitm_window_expired($mitm)
+{
+	if (!is_array($mitm) || empty($mitm["enabled"])) {
+		return false;
+	}
+	$dl = 0;
+	if (isset($mitm["window"]["deadline_unix"])) {
+		$dl = (int)$mitm["window"]["deadline_unix"];
+	}
+	if ($dl <= 0) {
+		return true;
+	}
+	return (time() >= $dl);
+}
+
+/**
+ * Estado de diagnóstico da janela (GUI / evidência) — só metadados.
+ *
+ * @return array
+ */
+function layer7_mitm_window_status($mitm = null)
+{
+	if ($mitm === null) {
+		$mitm = layer7_mitm_from_config(layer7_load_or_default());
+	} elseif (!is_array($mitm)) {
+		$mitm = layer7_mitm_normalize($mitm);
+	}
+	$w = (isset($mitm["window"]) && is_array($mitm["window"]))
+	    ? $mitm["window"] : array();
+	$max = layer7_mitm_clamp_max_minutes(
+	    isset($w["max_minutes"]) ? $w["max_minutes"]
+		: L7_MITM_WINDOW_MAX_MINUTES_DEFAULT);
+	$dl = isset($w["deadline_unix"]) ? (int)$w["deadline_unix"] : 0;
+	$act = isset($w["activated_unix"]) ? (int)$w["activated_unix"] : 0;
+	$now = time();
+	$remaining = 0;
+	if ($dl > $now && !empty($mitm["enabled"])) {
+		$remaining = $dl - $now;
+	}
+	$ic = (isset($mitm["intercept"]) && is_array($mitm["intercept"]))
+	    ? $mitm["intercept"] : array();
+	return array(
+		"max_minutes" => $max,
+		"deadline_unix" => $dl,
+		"activated_unix" => $act,
+		"activated_by" => isset($w["activated_by"])
+		    ? (string)$w["activated_by"] : "",
+		"remaining_sec" => $remaining,
+		"expired" => layer7_mitm_window_expired($mitm),
+		"quic_mode" => isset($mitm["quic_mode"])
+		    ? (string)$mitm["quic_mode"] : "bypass",
+		"source_cidr" => isset($ic["source_cidr"]) && is_array($ic["source_cidr"])
+		    ? array_values($ic["source_cidr"]) : array(),
+		"dest_cidr" => isset($ic["dest_cidr"]) && is_array($ic["dest_cidr"])
+		    ? array_values($ic["dest_cidr"]) : array(),
+		"block_sni" => isset($ic["block_sni"]) && is_array($ic["block_sni"])
+		    ? array_values($ic["block_sni"]) : array()
+	);
+}
+
+/**
+ * Auditoria estruturada (JSON line) — activate/deactivate/expire/break_glass/failsafe.
+ * Nunca regista PEM, chave, payload TLS ou body HTTP.
+ *
+ * @param string $event
+ * @param array $mitm
+ * @param array $extra
+ * @return bool
+ */
+function layer7_mitm_audit($event, $mitm = null, $extra = array())
+{
+	$event = preg_replace('/[^a-z0-9_]/', '', strtolower((string)$event));
+	if ($event === "") {
+		$event = "unknown";
+	}
+	if ($mitm === null || !is_array($mitm)) {
+		$mitm = array();
+	}
+	$st = layer7_mitm_window_status($mitm);
+	$rec = array(
+		"ts" => gmdate("c"),
+		"event" => $event,
+		"operator" => layer7_mitm_operator_label(),
+		"mitm_enabled" => !empty($mitm["enabled"]),
+		"quic_mode" => $st["quic_mode"],
+		"source_cidr" => $st["source_cidr"],
+		"dest_cidr" => $st["dest_cidr"],
+		"block_sni" => $st["block_sni"],
+		"max_minutes" => $st["max_minutes"],
+		"deadline_unix" => $st["deadline_unix"],
+		"remaining_sec" => $st["remaining_sec"],
+		"payload_tls" => false
+	);
+	if (is_array($extra)) {
+		foreach ($extra as $k => $v) {
+			$k = preg_replace('/[^a-z0-9_]/', '', strtolower((string)$k));
+			if ($k === "" || $k === "payload" || $k === "body" ||
+			    $k === "cert" || $k === "key" || isset($rec[$k])) {
+				continue;
+			}
+			if (is_scalar($v) || is_array($v)) {
+				$rec[$k] = $v;
+			}
+		}
+	}
+	$line = json_encode($rec, JSON_UNESCAPED_SLASHES);
+	if (!is_string($line) || $line === "") {
+		return false;
+	}
+	$path = layer7_mitm_audit_path();
+	$ok = (@file_put_contents($path, $line . "\n", FILE_APPEND | LOCK_EX) !== false);
+	if ($ok && !getenv("LAYER7_TEST_ROOT")) {
+		@chmod($path, 0640);
+	}
+	layer7_log_pkg_warn("Layer7 MITM audit: " . $event);
+	return $ok;
+}
+
+/**
+ * Se janela expirada com intenção ON: OFF + cleanup + audit expire (fail-closed).
+ *
+ * @return array{changed:bool,data:array,expired:bool}
+ */
+function layer7_mitm_expire_if_needed($data = null)
+{
+	if ($data === null || !is_array($data)) {
+		$data = layer7_load_or_default();
+	}
+	$mitm = layer7_mitm_from_config($data);
+	if (empty($mitm["enabled"]) || !layer7_mitm_window_expired($mitm)) {
+		return array("changed" => false, "data" => $data, "expired" => false);
+	}
+	layer7_mitm_audit("expire", $mitm, array("reason" => "deadline_unix"));
+	layer7_mitm_ctrl_cleanup("janela MITM expirada (P3 auto-disable)");
+	$mitm["enabled"] = false;
+	$mitm["window"]["deadline_unix"] = 0;
+	$mitm["window"]["activated_unix"] = 0;
+	$mitm["window"]["activated_by"] = "";
+	$mitm = layer7_mitm_normalize($mitm);
+	$data = layer7_mitm_apply_to_config($data, $mitm);
+	return array("changed" => true, "data" => $data, "expired" => true);
+}
+
+/**
+ * Tick de lifecycle: expire + sync só se necessário (sobrevive reload/boot).
+ * Evita onestop/onestart em todos os filter reloads quando já está estável.
+ *
+ * @param array|null $data
+ * @return array data actual
+ */
+function layer7_mitm_lifecycle_tick($data = null)
+{
+	if ($data === null || !is_array($data)) {
+		$data = layer7_load_or_default();
+	}
+	$ex = layer7_mitm_expire_if_needed($data);
+	if (!empty($ex["changed"])) {
+		$data = $ex["data"];
+		if (function_exists("layer7_save_json")) {
+			layer7_save_json($data);
+		}
+		layer7_mitm_sync_helper($data);
+		return $data;
+	}
+	$mitm = layer7_mitm_from_config($data);
+	$want = layer7_mitm_should_start_helper($mitm);
+	$mat = layer7_mitm_control_plane_materialized();
+	if (($want && !$mat) || (!$want && $mat)) {
+		layer7_mitm_sync_helper($data);
+	}
+	return $data;
+}
+
+/**
+ * Armar / limpar janela no save GUI (transição enabled).
+ * - OFF→ON ou ON sem deadline válido: deadline = now + max_minutes.
+ * - ON→OFF: limpa deadline; audit deactivate.
+ * Não estende deadline se já futuro (re-save).
+ *
+ * @param array $prev_mitm
+ * @param array $new_mitm
+ * @return array
+ */
+function layer7_mitm_prepare_window_on_save($prev_mitm, $new_mitm)
+{
+	$prev_on = is_array($prev_mitm) && !empty($prev_mitm["enabled"]);
+	$new_mitm = layer7_mitm_normalize($new_mitm);
+	$new_on = !empty($new_mitm["enabled"]);
+
+	if (!$new_on) {
+		if ($prev_on) {
+			layer7_mitm_audit("deactivate", $prev_mitm,
+			    array("reason" => "operator_save"));
+		}
+		$new_mitm["window"]["deadline_unix"] = 0;
+		$new_mitm["window"]["activated_unix"] = 0;
+		$new_mitm["window"]["activated_by"] = "";
+		return layer7_mitm_normalize($new_mitm);
+	}
+
+	$dl = isset($new_mitm["window"]["deadline_unix"])
+	    ? (int)$new_mitm["window"]["deadline_unix"] : 0;
+	$need_arm = (!$prev_on) || ($dl <= 0) || ($dl <= time());
+	if ($need_arm) {
+		$max = layer7_mitm_clamp_max_minutes(
+		    isset($new_mitm["window"]["max_minutes"])
+			? $new_mitm["window"]["max_minutes"]
+			: L7_MITM_WINDOW_MAX_MINUTES_DEFAULT);
+		$now = time();
+		$new_mitm["window"]["max_minutes"] = $max;
+		$new_mitm["window"]["activated_unix"] = $now;
+		$new_mitm["window"]["deadline_unix"] = $now + ($max * 60);
+		$new_mitm["window"]["activated_by"] = layer7_mitm_operator_label();
+		$new_mitm = layer7_mitm_normalize($new_mitm);
+		layer7_mitm_audit("activate", $new_mitm, array("reason" => "operator_save"));
+	}
+	return $new_mitm;
 }
 
 /**
@@ -7236,6 +7550,13 @@ function layer7_mitm_defaults()
 			"source_cidr" => array(),
 			"dest_cidr" => array(),
 			"block_sni" => array()
+		),
+		/* P3: janela com deadline explícito; OFF ⇒ sem deadline. */
+		"window" => array(
+			"max_minutes" => L7_MITM_WINDOW_MAX_MINUTES_DEFAULT,
+			"deadline_unix" => 0,
+			"activated_unix" => 0,
+			"activated_by" => ""
 		)
 	);
 }
@@ -7386,6 +7707,31 @@ function layer7_mitm_normalize($mitm)
 		"dest_cidr" => $dest,
 		"block_sni" => array_values(array_unique($bsni))
 	);
+
+	/* P3 — janela: preservar deadline; OFF limpa; NÃO rearmar aqui
+	 * (armar só em prepare_window_on_save — senão expire fica mascarado). */
+	$win_in = (isset($mitm["window"]) && is_array($mitm["window"]))
+	    ? $mitm["window"] : array();
+	$max = layer7_mitm_clamp_max_minutes(
+	    isset($win_in["max_minutes"]) ? $win_in["max_minutes"]
+		: L7_MITM_WINDOW_MAX_MINUTES_DEFAULT);
+	$dl = isset($win_in["deadline_unix"]) ? (int)$win_in["deadline_unix"] : 0;
+	$act = isset($win_in["activated_unix"]) ? (int)$win_in["activated_unix"] : 0;
+	$by = isset($win_in["activated_by"])
+	    ? substr(preg_replace('/[^\w.@-]/', '',
+		(string)$win_in["activated_by"]), 0, 64) : "";
+	if (!$out["enabled"]) {
+		$dl = 0;
+		$act = 0;
+		$by = "";
+	}
+	$out["window"] = array(
+		"max_minutes" => $max,
+		"deadline_unix" => $dl,
+		"activated_unix" => $act,
+		"activated_by" => $by
+	);
+
 	return $out;
 }
 
@@ -7608,6 +7954,18 @@ function layer7_mitm_validate($mitm)
 				    "loopback / prefixo </8 — sem redirect generico nem expansao silenciosa."
 				);
 				break;
+			}
+		}
+		if (isset($mitm["window"]) && is_array($mitm["window"]) &&
+		    array_key_exists("max_minutes", $mitm["window"])) {
+			$wm = (int)$mitm["window"]["max_minutes"];
+			if ($wm < L7_MITM_WINDOW_MAX_MINUTES_MIN ||
+			    $wm > L7_MITM_WINDOW_MAX_MINUTES_CAP) {
+				$errors[] = l7_t(
+				    "max_window (minutos) deve estar entre " .
+				    L7_MITM_WINDOW_MAX_MINUTES_MIN . " e " .
+				    L7_MITM_WINDOW_MAX_MINUTES_CAP . "."
+				);
 			}
 		}
 	}

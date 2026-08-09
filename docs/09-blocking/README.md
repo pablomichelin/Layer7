@@ -13,7 +13,7 @@ candidatos históricos — ver artefacto abaixo.
 
 ## Documentos
 
-- **[`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md)** — **SSOT prontidão MITM piloto**: **NÃO PRONTO activar**; P1+P2 docs PASS; ficha site = **gate activação** (≠ gap eng.); critérios P3.1–P3.8
+- **[`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md)** — **SSOT prontidão MITM piloto**: **NÃO PRONTO activar**; P1+P2+**P3 PASS** (`1.9.47`); ficha site = **gate activação** (≠ gap eng.)
 - **[`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md)** — P1: decisões D1–D9 + formulário site + norma de gate
 - **[`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md)** — P2: ops piloto (CA/GPO, metadados 30d, break-glass, auto-disable)
 - **[`auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md`](auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md)** — **SSOT decisão `2026-08-09`:** inventário, correções absorvidas, único pacote elegível **`1.9.46`**, gates pré-install, conflitos documentais
