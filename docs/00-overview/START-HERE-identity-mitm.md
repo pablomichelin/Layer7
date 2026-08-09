@@ -132,9 +132,8 @@ Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective sempr
 um passo 20.x por bloco; português; barra UX PME (U*/P*/H*/N*); sem overclaim NGFW;
 sem claim de intercept; Squid rejeitado; não reabrir fecho/IPv6/Identity rede/endpoint sem GO;
 GI2/GI3 runtime DEFERRED até S1–S8 + GO lab.
-Tarefa: lab = root@192.168.100.54. PoC-4 PASS. Harness com timeout (sem hang).
-NÃO .254/.234/.235; NÃO effective=true; NÃO 20.10.
-Próximo: medir S1 com carga allow+upstream só em .54.
+Tarefa: lab=.54 PoC-4 + S1/S2 lab PASS. NÃO .254/.234/.235.
+NÃO effective=true; NÃO 20.10. S1 inline produto exige GO/desenho novo.
 ```
 
 ## Prompt — propor desvio / ADR
@@ -155,9 +154,9 @@ Não implementar até GO. Responder em português.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
-- Continuidade agora: **PoC-4 PASS**; harness anti-hang; S1 produto PENDING
-- Evidência PoC-4: docs/tests/evidence/20260809T042600Z-poc4-upstream-54/
-- Plano rev.: 2026-08-09x
+- Continuidade agora: **S1/S2 lab PASS**; S1 inline PENDING; 20.10 BLOQUEADO
+- Evidência: docs/tests/evidence/20260809T043000Z-s1s2-load-54/
+- Plano rev.: 2026-08-09y
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md
