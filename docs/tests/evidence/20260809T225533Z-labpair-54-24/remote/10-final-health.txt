@@ -1,0 +1,27 @@
+UTC=2026-08-09T23:12:44Z
+{"enabled":true,"mode":"monitor","model":"legacy_global","mitm":false,"block_quic":false}
+PKG=1.9.46 LAYER7D=1.9.46
+layer7d is running as pid 59287.
+---EMPTY_CHECK---
+layer7_block=0
+layer7_block_dst=0
+layer7_allow_dst=0
+layer7_tagged=0
+layer7_bld_0=0
+---L7_SUMMARY---
+L7RULES=0
+L7RDR=0
+QUIC=0
+---ROUTE198---
+destination: default
+gateway: 10.99.99.35
+interface: pppoe0
+---GUI---
+https9999=200
+---SSH---
+sshd listen *:22
+---PFNF---
+pfctl_nf=0
+---MITM---
+tlsproxy_absent
+NOTE=full pfctl -sr dump omitted; see 10b-health-summary.txt

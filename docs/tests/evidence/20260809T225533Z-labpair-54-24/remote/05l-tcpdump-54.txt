@@ -1,0 +1,17 @@
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on ens160, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+23:09:44.223635 IP 192.168.100.24.65112 > 192.168.100.54.8080: Flags [SEW], seq 584157381, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+23:09:44.223681 IP 192.168.100.54.8080 > 192.168.100.24.65112: Flags [S.], seq 2690855514, ack 584157382, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+23:09:45.224832 IP 192.168.100.24.65112 > 192.168.100.54.8080: Flags [SEW], seq 584157381, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+23:09:45.224867 IP 192.168.100.54.8080 > 192.168.100.24.65112: Flags [S.], seq 2690855514, ack 584157382, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+23:09:46.231522 IP 192.168.100.54.8080 > 192.168.100.24.65112: Flags [S.], seq 2690855514, ack 584157382, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+23:09:47.224938 IP 192.168.100.24.65112 > 192.168.100.54.8080: Flags [S], seq 584157381, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+23:09:47.224971 IP 192.168.100.54.8080 > 192.168.100.24.65112: Flags [S.], seq 2690855514, ack 584157382, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+23:09:47.252045 IP 192.168.100.24.65113 > 198.18.0.10.8080: Flags [SEW], seq 3979040716, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+23:09:48.252805 IP 192.168.100.24.65113 > 198.18.0.10.8080: Flags [SEW], seq 3979040716, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+23:09:49.239493 IP 192.168.100.54.8080 > 192.168.100.24.65112: Flags [S.], seq 2690855514, ack 584157382, win 64240, options [mss 1460,nop,nop,sackOK,nop,wscale 7], length 0
+23:09:50.252613 IP 192.168.100.24.65113 > 198.18.0.10.8080: Flags [S], seq 3979040716, win 64240, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+
+11 packets captured
+11 packets received by filter
+0 packets dropped by kernel

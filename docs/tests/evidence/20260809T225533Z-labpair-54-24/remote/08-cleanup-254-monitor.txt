@@ -1,0 +1,14 @@
+SAVE_MONITOR_OK
+RESYNC_MONITOR_OK
+delete host 198.18.0.10
+===PROOF===
+enabled=true mode=monitor model=legacy_global mitm=false
+has_lab_tmp=NO
+---TABLES---
+T_layer7_block_dst
+T_layer7_block
+T_layer7_mitm_src
+pfctl: Table does not exist.
+
+NOTE=script output truncated after mitm_src; continuation in 08b-proof-final.txt / 10-final-health.txt
+CLEANUP_254_CONTINUED=yes

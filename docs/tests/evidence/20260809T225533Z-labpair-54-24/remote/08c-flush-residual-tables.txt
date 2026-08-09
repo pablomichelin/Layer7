@@ -1,0 +1,47 @@
+layer7_pallow_0 count=0
+layer7_pallow_1 count=0
+layer7_pallow_10 count=0
+layer7_pallow_11 count=0
+layer7_pallow_12 count=0
+layer7_pallow_13 count=0
+layer7_pallow_14 count=0
+layer7_pallow_15 count=0
+layer7_pallow_16 count=0
+layer7_pallow_17 count=0
+layer7_pallow_18 count=0
+layer7_pallow_19 count=0
+layer7_pallow_2 count=0
+layer7_pallow_20 count=0
+layer7_pallow_21 count=0
+layer7_pallow_22 count=0
+layer7_pallow_23 count=0
+layer7_pallow_3 count=0
+layer7_pallow_4 count=0
+layer7_pallow_5 count=0
+layer7_pallow_6 count=0
+layer7_pallow_7 count=0
+layer7_pallow_8 count=0
+layer7_pallow_9 count=0
+---AFTER---
+layer7_allow_dst
+layer7_bld_0
+layer7_block
+layer7_block_dst
+layer7_exc_allow_0
+layer7_exc_allow_1
+layer7_exc_allow_10
+layer7_exc_allow_11
+layer7_exc_allow_12
+layer7_exc_allow_13
+layer7_exc_allow_14
+layer7_exc_allow_15
+layer7_exc_allow_2
+layer7_exc_allow_3
+layer7_exc_allow_4
+layer7_exc_allow_5
+layer7_exc_allow_6
+layer7_exc_allow_7
+layer7_exc_allow_8
+layer7_exc_allow_9
+layer7_tagged
+no_layer7_rules

@@ -1,0 +1,6 @@
+FILE /Users/pablomichelin/Documents/Layer 7/docs/tests/evidence/20260809T225533Z-labpair-54-24/remote/05-smoke-24.txt
+ALLOW None
+BLOCK None
+ALLOW_OK False
+BLOCK_FAIL False
+SMOKE_VERDICT=FAIL

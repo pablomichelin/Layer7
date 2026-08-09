@@ -1,0 +1,6 @@
+L7RULES=0
+L7RDR=0
+QUIC=0
+gui9999=200
+ssh_listen=1
+pfnf=0

@@ -1,0 +1,3 @@
+ICMP24=OK
+SSH24=open
+ICMP54=OK

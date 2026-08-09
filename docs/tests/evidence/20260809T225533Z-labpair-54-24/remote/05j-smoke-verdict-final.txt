@@ -1,0 +1,20 @@
+SMOKE3_START 2026-08-09T23:05:31Z
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+PS_OK
+ALLOW FAIL ERR=O tempo limite da opera��o foi atingido. TIME_MS=5056
+ALLOW TNC_TCP=False
+BLOCK FAIL ERR=O tempo limite da opera��o foi atingido. TIME_MS=5002
+BLOCK TNC_TCP=False
+---CURL---
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+ALLOW=000:5,000000 
+BLOCK=000:5,000000
+SMOKE3_END 2026-08-09T23:07:00Z
+
+ALLOW_OK False
+BLOCK_FAIL True
+SMOKE_VERDICT=FAIL

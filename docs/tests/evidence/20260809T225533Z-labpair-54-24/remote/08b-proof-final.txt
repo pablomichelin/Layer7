@@ -1,0 +1,50 @@
+===JSON===
+enabled=true mode=monitor model=legacy_global mitm=false quic=false
+===TABLES===
+T_layer7_block_dst
+T_layer7_block
+T_layer7_allow_dst
+===SCOPED===
+layer7_pallow_0
+layer7_pallow_1
+layer7_pallow_10
+layer7_pallow_11
+layer7_pallow_12
+layer7_pallow_13
+layer7_pallow_14
+layer7_pallow_15
+layer7_pallow_16
+layer7_pallow_17
+layer7_pallow_18
+layer7_pallow_19
+layer7_pallow_2
+layer7_pallow_20
+layer7_pallow_21
+layer7_pallow_22
+layer7_pallow_23
+layer7_pallow_3
+layer7_pallow_4
+layer7_pallow_5
+layer7_pallow_6
+layer7_pallow_7
+layer7_pallow_8
+layer7_pallow_9
+===RULES===
+none
+===ROUTE===
+   route to: 198.18.0.10
+destination: default
+       mask: default
+    gateway: 10.99.99.35
+        fib: 0
+  interface: pppoe0
+===MITM===
+tlsproxy_absent
+no_mitm_listen
+===PFNF===
+pfctl_nf_rc=0
+===SVC===
+layer7d is running as pid 59287.
+1.9.46
+1.9.46
+PROOF_DONE

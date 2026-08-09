@@ -1,0 +1,4 @@
+block drop quick inet from 192.168.100.24 to <layer7_pdst_6> label "layer7:pdst:lab-tmp-24-19818" ! tagged L7ALLOW
+  [ Evaluations: 109454    Packets: 22        Bytes: 1308        States: 0     ]
+  [ Source Nodes: 0      Limit: 0      NAT/RDR: 0      Route: 0      ]
+  [ Inserted: uid 0 pid 0 State Creations: 0     ]

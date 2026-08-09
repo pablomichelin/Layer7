@@ -1,0 +1,10 @@
+SMOKE4_START 2026-08-09T23:11:01Z
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+PS_OK
+ALLOW STATUS=200 TIME_MS=65 BODY=<!doctype html><html><body><p id="marker">L7-LABPAIR-ALLOW-192.168.100.54</p></body></html> 
+ALLOW TNC_TCP=True
+BLOCK FAIL ERR=O tempo limite da opera‡Æo foi atingido. TIME_MS=5035
+BLOCK TNC_TCP=False
+SMOKE4_END 2026-08-09T23:11:54Z

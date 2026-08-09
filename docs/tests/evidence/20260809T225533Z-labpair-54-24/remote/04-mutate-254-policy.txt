@@ -1,0 +1,37 @@
+SAVE_OK
+RESYNC_OK
+PDST_IDX=6
+Adding 198.18.0.10 to layer7_pdst_6
+1 table created.
+1/1 addresses added.
+===STATE===
+enabled=true mode=enforce model=scoped_hybrid mitm=false
+{"id":"lab-tmp-24-19818","name":"LAB tmp .24 to 198.18.0.10","enabled":true,"action":"block","priority":1,"match":{"src_hosts":["192.168.100.24"],"hosts":["labpair-block.invalid"]}}
+===TABLE===
+   198.18.0.10
+===RULE===
+block drop quick inet from any to <layer7_pdst_0> label "layer7:pdst:profile-anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_0> label "layer7:pdst:profile-anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_1> label "layer7:pdst:profile-anydesk" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_1> label "layer7:pdst:profile-anydesk" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_2> label "layer7:pdst:profile-atera" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_2> label "layer7:pdst:profile-atera" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_3> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_3> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_5> label "layer7:pdst:anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_5> label "layer7:pdst:anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet from 192.168.100.24 to <layer7_pdst_6> label "layer7:pdst:lab-tmp-24-19818" ! tagged L7ALLOW
+===MITM===
+block drop quick inet from <layer7_block> to ! <layer7_localnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <layer7_localnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_0> label "layer7:pdst:profile-anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_0> label "layer7:pdst:profile-anti-bypass-dns" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_1> label "layer7:pdst:profile-anydesk" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_1> label "layer7:pdst:profile-anydesk" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_2> label "layer7:pdst:profile-atera" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_2> label "layer7:pdst:profile-atera" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_pdst_3> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_pdst_3> label "layer7:pdst:profile-preset-protecao-infantil" ! tagged L7ALLOW
+no_mitm_quic_rules
+tlsproxy_absent
+MUTATE_254_POLICY_OK

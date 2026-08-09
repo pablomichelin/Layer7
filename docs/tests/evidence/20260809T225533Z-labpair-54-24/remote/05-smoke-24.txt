@@ -1,0 +1,11 @@
+SMOKE_START 2026-08-09T22:58:02Z
+ALLOW=http://192.168.100.54:8080/ BLOCK=http://198.18.0.10:8080/
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+SRC24_OK 
+ALLOW_CODE=000_TIME=8,000000_EC=curl: unknown --write-out variable: 'exitcode'
+ 
+BLOCK_CODE=000_TIME=8,000000_EC=curl: unknown --write-out variable: 'exitcode'
+
+SMOKE_END 2026-08-09T22:58:19Z

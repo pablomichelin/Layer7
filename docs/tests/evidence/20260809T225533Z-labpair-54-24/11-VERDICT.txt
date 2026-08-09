@@ -1,0 +1,16 @@
+run_id=20260809T225533Z-labpair-54-24
+verdict=PASS
+pkg=1.9.46
+src=192.168.100.24
+allow=192.168.100.54:8080
+block=198.18.0.10:8080
+sink=192.168.100.54
+mitm=OFF
+smoke=PASS (ALLOW HTTP 200 marker; BLOCK timeout/TNC=false; PF pdst lab-tmp packets>0)
+cleanup_54=PASS (alias/HTTP/policy-routing removed)
+cleanup_254=PASS (lab policy removed; route 198.18 deleted; flush; MONITOR)
+final_state=enabled=true mode=monitor model=legacy_global mitm=false block_quic=false
+final_pf=layer7_rules=0 rdr_mitm=0 quic_l7=0 block_dst=0 block=0
+final_health=gui9999=200 ssh=listen pfnf=0 layer7d=running
+hosts_untouched=.234 .235
+creds=not_committed

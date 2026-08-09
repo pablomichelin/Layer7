@@ -1,0 +1,53 @@
+HOST=254
+Sun Aug  9 22:55:35 UTC 2026
+1.9.46
+1.9.46
+enabled=true mode=enforce model=legacy_global mitm=false
+---TABLES---
+T_layer7_block_dst
+   17.250.105.4
+   17.250.105.11
+T_layer7_allow_dst
+   1.0.0.1
+   1.1.1.1
+   4.150.223.98
+   8.8.4.4
+   8.8.8.8
+   20.190.173.67
+   20.190.173.68
+   20.190.173.130
+   20.190.173.131
+   20.190.173.132
+   20.190.173.144
+   20.190.173.145
+   20.190.173.146
+   52.123.128.14
+   52.123.129.14
+T_layer7_mitm_src
+pfctl: Table does not exist.
+T_layer7_mitm_dst
+pfctl: Table does not exist.
+T_layer7_pdst
+pfctl: Table does not exist.
+T_layer7_psrc
+pfctl: Table does not exist.
+---RULES---
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+match inet6 from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <layer7_localnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <layer7_localnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+---PROFILES_CUSTOM---
+-rw-rw-r--  1 www wheel 1397 Aug  5 16:33 /usr/local/etc/layer7/profiles-custom.json
+custom_keys=version,overrides,custom_profiles
+---SNAP---
+00-SNAP-META.txt
+01-sources.txt
+02-listing.txt
+RESTORE.txt
+config.xml.bak-preG2-19246-20260809T221620Z
+layer7.json.bak-preG2-19246-20260809T221620Z
+---MITM---
+36007  -  Ss         0:00.01 sh -c echo HOST=254; date -u; pkg query %v pfSense-pkg-layer7; /usr/local/sbin/layer7d -V; /usr/local/bin/php -r '$j=json_decode(file_get_contents("/usr/local/etc/layer7.json"),true); $l=$j["layer7"]??$j; echo "enabled=".json_encode($l["enabled"]??null)." mode=".($l["mode"]??"")." model=".($l["enforcement_model"]??"")." mitm=".json_encode($l["mitm"]["enabled"]??null)."\\n";'; echo ---TABLES---; for t in layer7_block_dst layer7_allow_dst layer7_mitm_src layer7_mitm_dst layer7_pdst layer7_psrc; do echo T_$t; pfctl -t $t -T show 2>&1 | head -15; done; echo ---RULES---; pfctl -sr 2>/dev/null | grep -E "layer7:" | head -40; echo ---PROFILES_CUSTOM---; ls -la /usr/local/etc/layer7/profiles-custom.json 2>&1; /usr/local/bin/php -r '$j=@json_decode(@file_get_contents("/usr/local/etc/layer7/profiles-custom.json"),true); echo "custom_keys=".implode(",", array_keys($j?:[]))."\\n"; if(is_array($j)){foreach($j as $k=>$v){if(stripos(json_encode($v),"198.18")!==false||stripos(json_encode($v),".54")!==false||stripos($k,"lab")!==false) echo "HIT $k\\n";}}'; echo ---SNAP---; ls /tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254 2>&1 | head -8; echo ---MITM---; ps ax | grep -E "[t]lsproxy" || echo tlsproxy_absent; sockstat -4l | grep -E "8443|8080|3128" || echo no_mitm_listen
+no_mitm_listen

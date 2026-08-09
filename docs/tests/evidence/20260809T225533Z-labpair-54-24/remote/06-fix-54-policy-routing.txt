@@ -1,0 +1,5 @@
+192.168.100.24 from 192.168.100.54 dev ens160 uid 0 
+    cache 
+192.168.100.24 from 198.18.0.10 via 192.168.100.254 dev ens160 table 198 uid 0 
+    cache 
+FIX_54_OK

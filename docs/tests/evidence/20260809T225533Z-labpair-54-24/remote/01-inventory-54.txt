@@ -1,0 +1,31 @@
+HOST=54
+ubuntu
+Sun Aug  9 10:55:34 PM UTC 2026
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+ens160           UP             192.168.100.54/24 2804:6c4:8ff:f600:250:56ff:fe9d:5fa4/64 fe80::250:56ff:fe9d:5fa4/64 
+---ALIASES---
+    inet 127.0.0.1/8 scope host lo
+    inet 192.168.100.54/24 brd 192.168.100.255 scope global ens160
+---ROUTES---
+default via 192.168.100.254 dev ens160 proto static 
+192.168.100.0/24 dev ens160 proto kernel scope link src 192.168.100.54 
+---LISTEN---
+Netid State  Recv-Q Send-Q                     Local Address:Port Peer Address:PortProcess                                                  
+udp   UNCONN 0      0                             127.0.0.54:53        0.0.0.0:*    users:(("systemd-resolve",pid=63669,fd=16))             
+udp   UNCONN 0      0                          127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=63669,fd=14))             
+udp   UNCONN 0      0      [fe80::250:56ff:fe9d:5fa4]%ens160:546          [::]:*    users:(("systemd-network",pid=63652,fd=22))             
+tcp   LISTEN 0      4096                       127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=63669,fd=15))             
+tcp   LISTEN 0      4096                          127.0.0.54:53        0.0.0.0:*    users:(("systemd-resolve",pid=63669,fd=17))             
+tcp   LISTEN 0      4096                             0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=71765,fd=3),("systemd",pid=1,fd=164))
+tcp   LISTEN 0      4096                                [::]:22           [::]:*    users:(("sshd",pid=71765,fd=4),("systemd",pid=1,fd=165))
+---HTTP_PROCS---
+---NFT/IPT---
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination         
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination         
+no_tmp_labpair
