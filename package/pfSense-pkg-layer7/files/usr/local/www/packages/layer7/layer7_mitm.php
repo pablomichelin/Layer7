@@ -269,7 +269,7 @@ if ($savemsg !== "") {
 								<p class="help-block" style="margin-top:6px;">
 									<?= htmlspecialchars(l7_t(
 									    "Pode gravar a intencao agora. mitm_effective permanece false ate intercept_ready (20.10b). " .
-									    "Runtime no pacote nao activa inspecao por si."
+									    "Runtime no pacote nao activa inspecao por si. " .
 									    "Upgrades nunca ligam MITM por defeito."
 									)); ?>
 								</p>
