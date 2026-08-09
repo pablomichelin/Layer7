@@ -1,0 +1,21 @@
+BASELINE_direct n=100 p50=0.59ms p95=0.72ms
+S2_proxy n=100 p50=3.00ms p95=3.14ms max=5.28ms errors=0
+S2_GATE: PASS
+S1_cpu_busy_pct_during_load=13.03
+S1_LAB: PASS (local acceptor+upstream; product inline still PENDING)
+MEASURE_PASS
+n=100
+p50_ms=0.59
+p95_ms=0.72
+max_ms=34.06
+path=direct_upstream
+n=100
+p50_ms=3.00
+p95_ms=3.14
+max_ms=5.28
+errors=0
+path=tls_proxy_upstream
+cpu_busy_pct_during_100_proxy_reqs=13.03
+scope=lab_localhost_tls_terminate_plus_upstream
+product_inline_mitm=PENDING
+note=not_gateway_inline; compare later to appliance baseline 20.11a

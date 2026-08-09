@@ -22,4 +22,4 @@
 |-------|----------|--------|
 | **20.10a** | Runtime no `.pkg` + rc default OFF + `runtime_available`; `intercept_ready=false` | **PASS** (`1.9.39`) |
 | **20.10b** | Listen selectivo + PF rdr + block page HTTPS | **PASS** (`1.9.41`; `1.9.40` NO-GO auditoria) |
-| **20.11** | GI2/GI3 lab | Pendente |
+| **20.11** | GI2/GI3 lab | **PASS** (`1.9.41`; evidência `20260809T060000Z-20.11-gi2-gi3-54`) |

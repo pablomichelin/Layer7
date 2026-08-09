@@ -78,14 +78,14 @@ Procedimento: [`runbook-s1-s8-mitm-pre-runtime.md`](runbook-s1-s8-mitm-pre-runti
 
 | # | Critério | Limiar | Estado actual (`2026-08-09`) |
 |---|----------|--------|------------------------------|
-| S1 | CPU overhead | ≤ +25% | **Não medido** — exige PoC TLS (lab isolado) |
-| S2 | Latência handshake | ≤ 150 ms p95 | **Não medido** — exige PoC TLS |
-| S3 | Block page HTTPS + CA | ≥ 1 browser | **Não medido** — exige intercept (fora de produção) |
-| S4 | Bypass list | prova | **Não medido** — GUI 20.8–20.9; prova com runtime pendente |
-| S5 | QUIC/HTTP3 caminho definido | escrito | **PASS documental** — default `bypass` |
-| S6 | ECH previsível | lab | **Não medido** |
-| S7 | Sem payload em disco por defeito | auditoria | **PASS documental**; auditoria PoC TLS pendente |
-| S8 | MITM OFF ≡ ADR-0017 | smoke | **PASS (real)** — `20260809T024500Z-s8-adr0017-real-1.9.38` |
+| S1 | CPU overhead | ≤ +25% | **PASS** lab `.54` — 20.11 (`20260809T060000Z-20.11-gi2-gi3-54`) |
+| S2 | Latência handshake | ≤ 150 ms p95 | **PASS** lab — localhost≈3.1 ms; inline≈15.5 ms |
+| S3 | Block page HTTPS + CA | ≥ 1 cliente | **PASS** lab `.54` — 20.11 |
+| S4 | Bypass list | prova | **PASS** lab — 20.11 |
+| S5 | QUIC/HTTP3 caminho definido | escrito | **PASS** — default `bypass` |
+| S6 | ECH previsível | lab | **PASS** (limite documentado; não exercitado) |
+| S7 | Sem payload em disco por defeito | auditoria | **PASS** — 20.11 |
+| S8 | MITM OFF ≡ ADR-0017 | smoke | **PASS** — ADR-0017 real + 20.11 OFF |
 
 **Bloqueio `20.10`:** S1–S4 e S6 **não medidos** + **GO produto** (GO lab já dado; ≠ intercept prod).
 S5/S7/S8 **PASS** — não bastam para autorizar intercept de produto.

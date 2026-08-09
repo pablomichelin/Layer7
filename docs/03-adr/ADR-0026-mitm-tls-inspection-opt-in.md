@@ -109,6 +109,7 @@
 | **g** | **2026-08-09** | S5 PASS doc; S7 PASS doc; S8 PASS real ADR-0017 |
 | **h** | **2026-08-09** | **GO lab** — PoC-0 idle `src/layer7-tlsproxy/` |
 | **i** | **2026-08-09** | **PoC-1 PASS** — IPC PING lab; path produto recusado; 20.10 ainda exige S1–S4/S6 + GO produto |
+| **j** | **2026-08-09** | **20.11 / GI2+GI3 PASS** lab `.54` (`1.9.41`); S1–S8; sem intercept produção; fecho lab IM2 |
 
 ---
 

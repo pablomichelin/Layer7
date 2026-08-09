@@ -1,0 +1,1 @@
+{"service":"layer7-tlsproxy","poc":"4","verdict":"bypass","sni":"bank.example","mitm_effective":false,"intercept":false,"note":"lab-sim: policy bypass (no upstream)"}

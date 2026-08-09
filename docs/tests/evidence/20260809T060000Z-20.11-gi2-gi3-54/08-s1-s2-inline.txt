@@ -1,0 +1,21 @@
+lab-inline DOWN
+lab-inline UP ns=l7poccli gw=10.67.67.1 cli=10.67.67.2 redirect=443->8443
+S2_inline n=50 p50=14.77ms p95=15.48ms errors=0
+S2_INLINE_GATE: PASS
+TRANSPARENT_DST: PASS
+S1_inline_cpu_busy_pct=12.72
+S1_INLINE_LAB: PASS
+INLINE_MEASURE_PASS
+n=50
+p50_ms=14.77
+p95_ms=15.48
+max_ms=16.37
+errors=0
+path=netns_redirect_tls_upstream
+cpu_busy_pct_during_50_inline=12.72
+scope=opcao_A_netns_redirect
+product_mitm_effective=false
+layer7-tlsproxy: transparent orig_dst=1.1.1.1:443 mitm_effective=false
+layer7-tlsproxy: transparent orig_dst=1.1.1.1:443 mitm_effective=false
+layer7-tlsproxy: transparent orig_dst=1.1.1.1:443 mitm_effective=false
+lab-inline DOWN

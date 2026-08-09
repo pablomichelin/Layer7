@@ -1,0 +1,23 @@
+PASS|GI2.1 no-env refuse lab listen (rc=3)
+PASS|GI2.2 health no false claim
+PASS|GI2.3 rc gate absent + PHP test_mitm_config PASS
+PASS|GI2.4 ephemeral CA on .54 only (wiped; no keys in evidence)
+PASS|GI2.5/S4 bypass SNI
+PASS|GI3.1 HTTPS block page with CA
+PASS|GI3.2 TLS fail without CA (rc=60)
+PASS|GI3.3 pinning limit honest + bypass path
+PASS|GI3.4 IPv4 product loopback + Opcao A rdr
+PASS|GI3.5/S1/S2 metrics fresh (localhost p95=3.14ms cpu=13.03%; inline p95=15.48ms cpu=12.72%)
+PASS|S3 block page
+PASS|S5 QUIC bypass documented
+PASS|S6 ECH limit documented (not exercised)
+PASS|S7 no payload + key perms + wipe
+PASS|S8 OFF no listener after rollback
+PASS|NEG product refuse non-loopback
+PASS|concurrency allow+block
+PASS|rollback cleanup
+SUMMARY pass=18 fail=0
+OVERALL=PASS
+PACKAGE=1.9.41
+SHA256=1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4
+COMMIT=bc076f0

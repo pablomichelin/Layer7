@@ -1,0 +1,8 @@
+UTC=2026-08-09T05:29:14Z
+Host: 192.168.100.254 (READ-ONLY; pfctl -nf only; never -f)
+Kernel: 16.0-CURRENT
+pkg observed: pfSense-pkg-layer7-1.9.38 (not upgraded; no intercept)
+tlsproxy enable: unset; no gate; no :8443 listener
+PARSE table+rdr (em0): EXIT=0
+PARSE inline rdr: EXIT=0
+pfctl -sTables layer7_mitm*: none (confirm audit did not load)

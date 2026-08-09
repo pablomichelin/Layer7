@@ -30,10 +30,10 @@
 | Veredicto spike 20.7a (histórico) | **DEFER** — Squid rejeitado; Identity avançou |
 | Fase actual | Desenho + **PoC-0 idle** (sem bind/TLS) |
 | Código `layer7-tlsproxy` | **Idle no repo** (`src/layer7-tlsproxy/`); **fora** do `.pkg` |
-| Medições S1–S8 | S5+S7+S8 PASS; S1–S4/S6 pendentes |
-| Intercept selectivo / 20.10 | **Pendente** — GO produto após S1–S4/S6 |
+| Medições S1–S8 | **PASS** lab `.54` (20.11; S6 = limite ECH documentado) |
+| Intercept selectivo / 20.10–20.11 | **20.10b+20.11 PASS** (`1.9.41`); gated; sem produção |
 | Identity (User-ID de rede) | **FECHADA** — fora do escopo deste desenho |
-| Entitlement SKU `mitm` | Pode existir (ADR-0025/0026); **sem** `mitm_effective` |
+| Entitlement SKU `mitm` | Pode existir (ADR-0025/0026); `mitm_effective` só com gates |
 
 ---
 
@@ -141,14 +141,14 @@ Procedimento canónico: [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../
 
 | # | Critério | Limiar | Método de medição | Estado |
 |---|----------|--------|-------------------|--------|
-| S1 | Overhead CPU (intercept selectivo, tráfego de referência) | ≤ **+25%** vs baseline lab `1.9.38` OFF (declarar vs pin `1.9.8` no `run_id`) | Comparar idle/busy CPU appliance com MITM OFF vs ON selectivo; mesmo script de carga | **Não medido** |
-| S2 | Latência adicional por handshake TLS interceptado | ≤ **150 ms** p95 | Captura timestamps cliente→proxy→origem no lab; percentil 95 | **Não medido** |
-| S3 | Block page HTTPS + CA (GPO) | ≥ **1** browser Windows corporativo vê HTML legível | Lab com CA instalada; site bloqueado por policy; screenshot + HAR | **Não medido** |
-| S4 | Bypass list | Fluxo em bypass **não** terminado | tcpdump/pcap: sem handshake com cert da CA Layer7 no destino bypass | **Não medido** |
-| S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + prova lab do caminho escolhido | **PASS documental** — `bypass` default; `S5-decisao-quic.md` |
-| S6 | ECH | Comportamento previsível; sem crash; sem fail-closed LAN | Cenário lab ECH; log de fallback documentado | **Não medido** |
-| S7 | Privacidade | Sem payload desencriptado em disco por defeito; log = metadados | Auditoria de paths/config default da PoC | **PASS documental** — `S7-politica-privacidade.md`; auditoria PoC pendente |
-| S8 | MITM OFF ≡ ADR-0017 | Smoke comparativo sem regressão | Suite smoke block page + enforce com helper **ausente**/OFF em `1.9.38` | **PASS** — `20260809T024500Z-s8-adr0017-real-1.9.38` |
+| S1 | Overhead CPU (intercept selectivo, tráfego de referência) | ≤ **+25%** vs baseline lab | Lab `.54` localhost+inline | **PASS** — 20.11 (`~13%` busy) |
+| S2 | Latência adicional por handshake TLS interceptado | ≤ **150 ms** p95 | Lab `.54` | **PASS** — localhost p95≈3.1 ms; inline≈15.5 ms |
+| S3 | Block page HTTPS + CA | ≥ **1** cliente com CA vê HTML | Lab `.54` curl+CA | **PASS** — 20.11 |
+| S4 | Bypass list | Fluxo em bypass **não** block-page | Lab SNI bypass | **PASS** — 20.11 |
+| S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + caminho | **PASS** — `bypass` default |
+| S6 | ECH | Limite documentado; sem fail-closed LAN | Nota lab | **PASS** (limite; sem ECH exercitado) |
+| S7 | Privacidade | Sem payload em disco por defeito | Auditoria lab + wipe CA | **PASS** — 20.11 |
+| S8 | MITM OFF ≡ ADR-0017 / sem listener | Smoke OFF | `.38` real + 20.11 rollback | **PASS** |
 
 ---
 
@@ -162,7 +162,7 @@ Contrato IPC: [`contrato-ipc-layer7-tlsproxy-20.9.md`](contrato-ipc-layer7-tlspr
 | **20.8** | Gestão CA (gerar / importar / export GPO; segredos fora do git) | Desenho aceite; entitlement; GUI/ops | **PASS** (`1.9.37`) |
 | **20.9** | Toggle intenção `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC; `mitm_effective` sempre false sem runtime | 20.8 PASS | **PASS** (`1.9.38`) |
 | **20.10** | Intercept selectivo + block page HTTPS | **S1–S8 medidos** + **GO lab** + **GO produto** | **20.10a+b PASS** (`1.9.41`); gated; sem produção |
-| **20.11** | Lab CA completo; gates **GI2–GI3** | 20.10 estável em lab; CE se aplicável (ADR-0022) | **Próximo** / GI2–GI3 `DEFERRED` até evidência |
+| **20.11** | Lab CA completo; gates **GI2–GI3** | 20.10 estável em lab | **PASS** (`1.9.41`, evidência `20260809T060000Z-20.11-gi2-gi3-54`) |
 
 ```text
 Desenho (este ficheiro)

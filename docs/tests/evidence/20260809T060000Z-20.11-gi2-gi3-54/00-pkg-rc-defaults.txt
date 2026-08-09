@@ -1,0 +1,12 @@
+=== layer7-tlsproxy rc defaults (1.9.41.pkg) ===
+9:# Arranque só com gate de produto escrito por PHP quando mitm_effective=true.
+17:: "${layer7_tlsproxy_enable:=NO}"
+54:	# 20.10b: gate escrito só quando mitm_effective (PHP). Sem gate = parado.
+56:		echo "${name}: mitm_effective gate absent — leaving service stopped" >&2
+74:		echo "${name}: refusing non-loopback listen (${LAYER7_TLSPROXY_LISTEN})" >&2
+
+SHA256 FreeBSD binary:
+2fe04b7b2a7f1f6bff7636612d9eda96c93fb2e4a48cd8760a5b1bcc10a926f0  /tmp/l7-19141-extract-34789/usr/local/sbin/layer7-tlsproxy
+SHA256 pkg:
+1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4
+git HEAD: bc076f082f32635ac4b41787e6696301cd3eb176

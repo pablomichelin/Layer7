@@ -6,7 +6,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- **20.10b PASS** (`1.9.41`): correctivo F1–F6 pós-auditoria do `1.9.40`; GI2/GI3 DEFERRED (20.11).
+- **20.11 PASS** (`1.9.41`): GI2/GI3 lab `.54` — defaults OFF, CA efémera, bypass/block/allow, página HTTPS, Opção A rdr, S1–S8; sem intercept `.254/.234/.235`. Evidência `docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`. Sem bump de PORTVERSION.
+- **20.10b PASS** (`1.9.41`): correctivo F1–F6 pós-auditoria do `1.9.40` (histórico).
 
 ## [1.9.41] — 2026-08-09
 

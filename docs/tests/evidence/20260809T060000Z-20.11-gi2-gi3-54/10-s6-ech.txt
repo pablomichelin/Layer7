@@ -1,0 +1,1 @@
+ECH not exercised on .54; SNI-based policy only; no LAN fail-closed
