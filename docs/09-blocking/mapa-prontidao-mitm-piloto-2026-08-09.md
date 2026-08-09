@@ -63,18 +63,44 @@
 
 ---
 
+## Gate de activação externa (≠ lacuna de engenharia)
+
+| Campo | Valor |
+|-------|--------|
+| **Objectivo** | Separar o que bloqueia **activação num cliente** do que ainda é **débito de código (P3)** |
+| **Impacto** | SSOT / ops; zero runtime |
+| **Risco** | Baixo — evita overclaim “falta feature” quando falta ficha |
+| **Teste documental** | Activação externa exige todos os campos abaixo nomeados; checklist P1 §3 |
+| **Rollback** | N/A (norma); reverter docs se texto for ambíguo |
+
+**Norma:** a activação MITM **externa** (site cliente / produção limitada) **exige**, nomeados e aprovados **antes** de qualquer ON:
+
+1. **Cliente / site**  
+2. **Responsável(is)** (aprovador D5 + contacto break-glass/suporte)  
+3. **Fontes** (SOURCE CIDR/IP fechados)  
+4. **Destinos** (DEST CIDR/IP fechados)  
+5. **SNI / hosts** (lista fechada ou padrão documentado)  
+6. **Janela** (início + fim UTC)  
+7. **Critérios de saída** (PASS / FAIL / ABORT)
+
+Campos vazios ou “a definir” ⇒ **NO-GO de activação**.  
+Isto é **gate operacional/comercial**, **não** lacuna de engenharia do motor `1.9.46`.  
+O débito de engenharia remanescente para *habilitar* janelas longas com segurança é só **P3** (failsafe+visibilidade) — ver §e e critérios de aceite P3.
+
+---
+
 ## (c) Lacunas operacionais / comerciais e decisões humanas
 
-| ID | Decisão / lacuna | Dono | Bloqueia piloto? |
-|----|------------------|------|------------------|
-| H1 | **GO humano “piloto MITM”** (≠ teste 15 min; ≠ permanente) | Operador | **Norma P1 ACEITE**; activação ainda bloqueada |
-| H2 | **Escopo piloto** src/dst/SNI/duração/abort | Operador | **Template P1**; falta ficha site |
-| H3 | CA cliente + GPO/MDM + privkey | Ops / MSP | **D2/D3 + runbook P2**; falta exercício site |
-| H4 | **SKU / entitlement `mitm`** | Comercial + license-server | Campo P1; falta emissão site |
-| H5 | Critérios de **saída** | Operador | **P1 §5** |
-| H6 | Limites (ECH, pinning, não-NGFW) | Produto | **P1 §4** |
-| H7 | `.234/.235` / produção real | Operador | Proibido salvo GO adicional |
-| H8 | Suporte durante piloto | Ops | Campo P1 |
+| ID | Tipo | Decisão / item | Dono | Bloqueia activação? |
+|----|------|----------------|------|---------------------|
+| H1 | Norma | GO piloto controlado (≠ teste 15 min; ≠ permanente) | Operador | Norma P1 ACEITE |
+| H2 | **Gate activação** | Ficha site: src/dst/SNI/janela/saída **nomeados** | Operador | **Sim** (não é gap eng.) |
+| H3 | Ops site | CA cliente + GPO/MDM + privkey | Ops / MSP | **Sim** (exercício site) |
+| H4 | Comercial | SKU / entitlement `mitm` | Comercial | **Sim** (gate site) |
+| H5 | **Gate activação** | Critérios de saída nomeados | Operador | **Sim** (parte da ficha) |
+| H6 | Honesty | Limites ECH/pinning/não-NGFW | Produto | P1 §4 |
+| H7 | Norma lab | `.234/.235` / produção real | Operador | Proibido salvo GO adicional |
+| H8 | **Gate activação** | Responsáveis / suporte nomeados | Ops | **Sim** (parte da ficha) |
 
 ---
 
@@ -113,14 +139,14 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | Checklist P2 §11 |
 | Rollback | Reverter commit docs |
 
-### Bloco P3 — **Primeiro bloco de código** (ver secção e)
+### Bloco P3 — **Primeiro bloco de código** (ver secção e + critérios de aceite)
 
 | Campo | Valor |
 |-------|--------|
 | Objectivo | Trilho de segurança para janela piloto (failsafe + visibilidade) |
 | Impacto | Package/GUI/daemon control-plane; **sem** alargar blast radius do rdr |
 | Risco | Médio |
-| Teste | Suite MITM local + lab `.54`/`.24` com auto-disable |
+| Teste | Suite MITM local + lab auto-disable + S8 OFF — ver **critérios de aceite P3** abaixo |
 | Rollback | Flag OFF; pacote anterior `1.9.46` |
 
 ### Bloco P4 — Soak lab controlado (evidência)
@@ -180,7 +206,25 @@ O salto teste→piloto falha por **ops + failsafe + visibilidade**, não por fal
 | Squid | Rejeitado |
 | CE port completo | ADR-0022 — trilho paralelo, não primeiro bloco MITM |
 
-**Pré-condição:** P0 docs **e** P1 GO de escopo (ou GO explícito “implementar P3 sem activar”).
+**Pré-condição:** P0–P2 docs PASS (já) **ou** GO explícito “implementar P3 sem activar”.  
+**P3 não substitui** o gate de activação externa (ficha site nomeada).
+
+### Critérios de aceite fechados — P3 (failsafe + visibilidade)
+
+P3 só pode marcar **PASS** se **todos** os itens abaixo forem evidência verificável:
+
+| ID | Critério | Prova mínima |
+|----|----------|--------------|
+| P3.1 | **max_window / auto-disable** configurável (minutos) no produto | Config + comportamento: ao expirar ⇒ `mitm_effective=false` sem intervenção |
+| P3.2 | Failsafe **fiável** (não só `at` manual ad-hoc) | Teste automatizado ou lab com relógio/janela curta; OFF limpo |
+| P3.3 | Enquanto ON: GUI ou diagnóstico mostra **src, dst, SNI/hosts, quic_mode, tempo restante** | Screenshot/log de diagnóstico (sem segredos) |
+| P3.4 | **Auditoria de metadados** da activação (quem/quando/escopo) — **zero** payload TLS | Evento/registo inspeccionável |
+| P3.5 | Suite builder MITM regress **PASS** | `test_mitm_config` / `test_mitm_regress` (+ timeout harness se tocado) |
+| P3.6 | **S8**: MITM OFF após timeout ≡ sem rdr/anti-QUIC/`:8443` órfãos | Smoke OFF pós-auto-disable |
+| P3.7 | Docs do bloco: objectivo/impacto/risco/teste/rollback + PORTVERSION se release | Commit no mesmo bloco técnico |
+| P3.8 | **Não** alarga rdr para `from any` nem dest aberto | Grep/regra PF na evidência |
+
+Fora de P3 (continua gate activação, não eng.): ficha cliente/responsáveis/src/dst/SNI/janela/saída.
 
 ---
 
@@ -201,9 +245,10 @@ O salto teste→piloto falha por **ops + failsafe + visibilidade**, não por fal
 ```text
 MITM motor scoped (1.9.46) ........ PRONTO PARA TESTE CONTROLADO (evidência 215442Z)
 P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
+Gate activação externa ............ Ficha site nomeada (cliente/resp/src/dst/SNI/janela/saída) — NÃO é gap eng.
+Débito engenharia remanescente ... P3 failsafe+visibilidade (critérios P3.1–P3.8)
 MITM pronto para ACTIVAR PILOTO ... NÃO (faltam P3 + ficha site + soak/evidência)
 MITM permanente / produção ........ NO-GO (decisão humana)
-Primeiro código ................... P3 failsafe+visibilidade (próximo)
 ```
 
 ---
@@ -213,8 +258,18 @@ Primeiro código ................... P3 failsafe+visibilidade (próximo)
 | Tema | Doc |
 |------|-----|
 | Gates B/C | [`gates-obrigatorios-1.9.43-mitm.md`](gates-obrigatorios-1.9.43-mitm.md) |
-| Runbook teste | [`runbook-activacao-mitm-producao-1.9.46.md`](runbook-activacao-mitm-producao-1.9.46.md) |
+| Escopo P1 / gate ficha | [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) |
+| Runbook piloto P2 | [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) |
+| Runbook teste ≤15 min | [`runbook-activacao-mitm-producao-1.9.46.md`](runbook-activacao-mitm-producao-1.9.46.md) |
 | Evidência Gate C | [`../tests/evidence/20260809T210753Z-phaseBD-d1-254/`](../tests/evidence/20260809T210753Z-phaseBD-d1-254/) |
 | Evidência teste | [`../tests/evidence/20260809T215442Z-phaseBD-d1-254/`](../tests/evidence/20260809T215442Z-phaseBD-d1-254/) |
 | ADR MITM | [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) |
 | BG-087 | [`../02-roadmap/backlog.md`](../02-roadmap/backlog.md) |
+
+### Histórico deste mapa
+
+| Data | Nota |
+|------|------|
+| 2026-08-09 | Mapa P0 criado — NÃO PRONTO |
+| 2026-08-09 | P1+P2 reflectidos — D1–D9 |
+| 2026-08-09 | Gate activação externa ≠ lacuna eng.; critérios aceite P3.1–P3.8 fechados |

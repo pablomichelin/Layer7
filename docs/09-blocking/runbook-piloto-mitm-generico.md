@@ -23,6 +23,8 @@
 
 ## 0. Pré-condições (NO-GO se falhar)
 
+> **Gate de activação (não é lacuna de engenharia):** sem cliente, responsáveis, SOURCE, DEST, SNI, janela e critérios de saída **nomeados**, a activação externa é **NO-GO** — independentemente do estado do código P3/`1.9.46`.
+
 1. P1 formulário §3 **completo** + assinatura responsável (D5).  
 2. Entitlement `mitm` válido no site.  
 3. Pacote ≥ `1.9.46` (SHA verificado).  
@@ -233,3 +235,4 @@ Sem P3 (ou equivalente ops dual aprovado), **não** abrir piloto multi-hora.
 | Data | Nota |
 |------|------|
 | 2026-08-09 | P2 criado — runbook genérico alinhado a P1 D1–D9 |
+| 2026-08-09 | Nota gate activação: ficha incompleta ≠ débito eng. |

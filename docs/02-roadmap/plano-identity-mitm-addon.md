@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **`1.9.46`** Gate B+C + teste controlado PASS; piloto **NÃO PRONTO activar** — P1+P2 docs PASS (rev. `2026-08-09ar`)
+**Estado do plano:** Identity **FECHADA**; MITM **`1.9.46`** Gate B+C + teste controlado PASS; piloto **NÃO PRONTO activar** — P1+P2 docs PASS; gate ficha ≠ eng. (rev. `2026-08-09as`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -52,7 +52,8 @@
 **Rev. `ao` (`2026-08-09`)** = **`1.9.46` PASS / publicada** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync; MITM prod DEFER.  
 **Rev. `ap` (`2026-08-09`)** = **GO teste controlado `.254` PASS** (`215442Z`) — runbook `1.9.46`; `quic_mode=block`; ≤15 min; rollback OK; permanente **NO-GO**.  
 **Rev. `aq` (`2026-08-09`)** = **Mapa prontidão piloto** — veredicto **NÃO PRONTO**; sequência P1→P5; primeiro código = P3 failsafe/visibilidade.  
-**Rev. `ar` (`2026-08-09`)** = **P1+P2 docs PASS** — escopo D1–D9 + runbook piloto genérico; activação ainda **NO-GO** até P3+ficha+soak.
+**Rev. `ar` (`2026-08-09`)** = **P1+P2 docs PASS** — escopo D1–D9 + runbook piloto genérico; activação ainda **NO-GO** até P3+ficha+soak.  
+**Rev. `as` (`2026-08-09`)** = Gate activação externa (ficha nomeada) **≠** lacuna eng.; critérios aceite P3.1–P3.8 fechados no mapa.
 
 ---
 
@@ -61,8 +62,8 @@
 | Campo | Valor |
 |-------|-------|
 | Passo actual | **`1.9.46`** — Gate B+C PASS; **GO teste controlado `.254` PASS**; permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar** — P1+P2 docs PASS; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
-| Próximo | **P3** código failsafe/visibilidade; MITM OFF; `.234`/`.235` proibidos |
+| Prontidão piloto | **NÃO PRONTO activar** — P1+P2 docs PASS; ficha site = **gate activação**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Próximo | **P3** código (aceite P3.1–P3.8); MITM OFF; `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -81,10 +82,10 @@ TRILHA — progresso
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
 - GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
-- Prontidão piloto: NÃO PRONTO activar (P1+P2 docs PASS)
-- Plano rev.: 2026-08-09ar
+- Prontidão piloto: NÃO PRONTO activar (P1+P2 docs PASS; ficha=gate ≠ eng.)
+- Plano rev.: 2026-08-09as
 - Lab/latest publicado: 1.9.46 (SHA 10998477…ae72f5)
-- Próximo: P3 código failsafe; permanente NO-GO
+- Próximo: P3 código (P3.1–P3.8); permanente NO-GO
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -596,6 +597,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-09 | **rev. `ap` / GO teste controlado `.254` PASS** — `215442Z`; runbook `1.9.46`; `quic_mode=block`; rollback OK; permanente **NO-GO** |
 | 2026-08-09 | **rev. `aq` / mapa prontidão piloto** — **NÃO PRONTO**; P1→P5; primeiro código P3 failsafe; conflitos “runtime AUSENTE” reconciliados |
 | 2026-08-09 | **rev. `ar` / P1+P2** — GO-escopo D1–D9 + runbook-piloto-mitm-generico; activação NO-GO até P3 |
+| 2026-08-09 | **rev. `as`** — gate activação externa ≠ gap eng.; P3.1–P3.8 fechados |
 | 2026-08-09 | **rev. `ao` / `1.9.46` PASS** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync |
 | 2026-08-09 | **rev. `ah` / `1.9.42` PASS** — `source_cidr`∧`dest_cidr`; proibido `from any`; runbook activação; `.254` sem escrita |
 | 2026-08-09 | **rev. `af` / rev. gerencial 20.11** — overclaim S3/S6 (interino; supersedido por `ag`) |

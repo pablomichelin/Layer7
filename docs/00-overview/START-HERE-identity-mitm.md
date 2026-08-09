@@ -53,9 +53,10 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Passo actual | **`1.9.46`** — Gate B+C PASS; **GO teste controlado `.254` PASS** (`215442Z`); permanente **NO-GO** |
 | Prontidão piloto | **NÃO PRONTO activar** — P1+P2 docs **PASS**; falta P3+ficha+soak — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
+| Gate activação externa | Ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | **P3 código** failsafe/visibilidade; MITM OFF; permanente **NO-GO**; sem activar sem ficha P1 |
-| Rev. do plano | **`2026-08-09ar`** |
+| Próximo | **P3 código** (aceite P3.1–P3.8 no mapa); MITM OFF; permanente **NO-GO** |
+| Rev. do plano | **`2026-08-09as`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |

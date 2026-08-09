@@ -74,6 +74,20 @@ CRITÉRIO SAÍDA:     «PASS / FAIL / ABORT — métricas»
 
 **Campos vazios ⇒ activação proibida.**
 
+### Gate de activação externa (norma)
+
+| Campo | Valor |
+|-------|--------|
+| **Objectivo** | Impedir ON sem ficha nomeada |
+| **Impacto** | Ops/comercial; **não** implica débito de código |
+| **Risco** | Baixo (docs); alto se ignorado em campo |
+| **Teste documental** | Cliente + responsáveis + SOURCE + DEST + SNI + janela + critérios de saída **todos** preenchidos |
+| **Rollback** | N/A — sem ficha não há activação a reverter |
+
+Activação **externa** (fora do teste ≤15 min Systemup) **exige** esses sete elementos nomeados.  
+Isto é **gate de activação**, **não** lacuna de engenharia do pacote `1.9.46`.  
+O único débito de engenharia pré-soak longo listado no mapa é **P3** (failsafe+visibilidade).
+
 ---
 
 ## 4. Limites honestos (anti-overclaim)
@@ -127,3 +141,4 @@ CRITÉRIO SAÍDA:     «PASS / FAIL / ABORT — métricas»
 | Data | Nota |
 |------|------|
 | 2026-08-09 | P1 criado — materializa D1–D9 aprovadas pelo coordenador humano |
+| 2026-08-09 | Gate activação externa explícito (ficha ≠ gap eng.); aponta critérios P3 no mapa |

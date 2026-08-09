@@ -1348,7 +1348,7 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 - **Backlog:** BG-085…BG-092 (BG-087 **`1.9.42` PASS**; BG-091 fechado ADR-0029)
 - **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→20.11→**`1.9.42`**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09ar`
+- **Rev. plano:** `2026-08-09as`
 - **Mapa prontidão piloto:** [`docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar**; P1+P2 docs PASS; próximo **P3**
 - **P1 escopo:** [`docs/09-blocking/GO-escopo-piloto-mitm-generico.md`](docs/09-blocking/GO-escopo-piloto-mitm-generico.md)
 - **P2 runbook piloto:** [`docs/09-blocking/runbook-piloto-mitm-generico.md`](docs/09-blocking/runbook-piloto-mitm-generico.md)
@@ -1375,6 +1375,7 @@ TRILHA IDENTITY + MITM — progresso
 - Passo actual: **1.9.46** — Gate B+C PASS; GO teste controlado .254 PASS (215442Z)
 - Prontidão piloto: **NÃO PRONTO activar** (P1+P2 docs PASS) — mapa-prontidao-mitm-piloto-2026-08-09.md
 - P1: GO-escopo-piloto-mitm-generico.md · P2: runbook-piloto-mitm-generico.md
+- Gate activação externa: ficha site nomeada (≠ gap eng.); P3 = único débito eng. listado (P3.1–P3.8)
 - Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B/C PASS; prod temporária PASS)
 - 1.9.46: anti-QUIC + filter_configure_sync; Edge sem flags PASS
 - Runbook teste: runbook-activacao-mitm-producao-1.9.46.md (quic_mode=block; ≤15 min; NÃO permanente)
@@ -1579,7 +1580,8 @@ CHECKPOINT CANONICO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.46** Gate B+C PASS; **GO teste controlado `.254` PASS** (`215442Z`); permanente **NO-GO**; Squid rejeitado
-- MITM piloto: **NÃO PRONTO activar** — P1+P2 docs PASS; mapa + GO-escopo + runbook-piloto; próximo **P3**
+- MITM piloto: **NÃO PRONTO activar** — P1+P2 docs PASS; mapa + GO-escopo + runbook-piloto; próximo **P3** (critérios P3.1–P3.8 no mapa)
+- Gate activação externa: ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Runbook activação teste: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md

@@ -395,8 +395,9 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 **Arranque:** [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **Posicionamento PME:** [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — ACEITE  
-**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-06d`  
-**Gates:** [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)
+**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-09as`  
+**Gates:** [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
+**Prontidão piloto:** [`mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md)
 
 ### IM0 — Governança
 
@@ -410,10 +411,19 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 ### IM1–IM9
 
 - [x] IM1 Entitlements (GI1) — BG-086 — **20.3–20.6 PASS**
-- [x] IM2 spike 20.7 + **20.7a DEFER** — BG-087 **Diferido** (GI2/GI3 DEFERRED; saltar 20.8–20.11)
+- [x] IM2 reopen + 20.8–20.11 + Gate C + teste controlado — BG-087 — **`1.9.46` PASS** (`215442Z`); permanente **NO-GO**
 - [x] IM3 Map daemon + gate (GI4) — 20.11a–20.15 PASS (`2026-08-07`)
 - [x] IM3–IM4 Map + LDAP (GI4 + GI5 parcial) — BG-088 — **20.18 PASS**
 - [x] IM5 Fontes RADIUS/AD events (GI5–GI6) — BG-089 — **20.19–20.22 PASS**
 - [x] IM6 Políticas user/grupo (GI7) — BG-090 — **20.23–20.26 PASS unit**; lab residual
 - [x] IM7–IM8 Agente/TS ou exclusão ADR (GI8) — BG-091 — **PASS ADR-0029** (20.28–20.30)
 - [x] IM9 Fecho/release Identity (GI9) — BG-092 — **20.33 PASS** (`20260808T174100Z-im9-20.33-homolog-1.9.29`)
+
+### Piloto MITM (pós-IM2 técnico) — gates docs vs eng.
+
+- [x] P0 mapa prontidão — **PASS** docs
+- [x] P1 escopo D1–D9 — **PASS** docs ([`GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md))
+- [x] P2 runbook piloto — **PASS** docs ([`runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md))
+- [x] Norma: activação externa exige ficha nomeada (cliente/responsáveis/src/dst/SNI/janela/saída) — **gate activação, ≠ lacuna eng.**
+- [ ] P3 failsafe+visibilidade — critérios **P3.1–P3.8** fechados no mapa; implementação **PENDENTE**
+- [ ] Ficha site preenchida + soak/evidência antes de qualquer ON externo
