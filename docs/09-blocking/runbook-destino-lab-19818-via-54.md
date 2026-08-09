@@ -1,10 +1,10 @@
 # Runbook — destino HTTPS lab local (`198.18.0.10/32` via `.54`)
 
-**Estado:** **DESENHO** — aguarda GO humano explícito antes de qualquer escrita.  
+**Estado:** **Fase A = PASS** (`20260809T180157Z` na `.54`); **Fase B = aguarda GO humano**.  
 **Tipo:** topologia de teste sem VPS (custo zero).  
-**Pré-requisito pacote:** `.254` já em `1.9.42` passivo (MITM OFF).  
+**Pré-requisito pacote:** `.254` já em `1.9.42` passivo (MITM OFF) — confirmado read-only após Fase A.  
 **Proibido neste desenho:** `.234` / `.235`; mutações sem fail-safe; CDN público.  
-**Não executar** até o proprietário confirmar o veredicto no fim deste documento.
+**Evidência Fase A:** [`docs/tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/)
 
 ---
 
@@ -82,16 +82,19 @@ Tráfego `.24`→`.54` é L2 on-link: **não** entra no gateway `.254` ⇒ rdr M
 
 ## 3. Fases (exactas) — **parar se qualquer gate falhar**
 
-### Fase A — Preparar `.54` (lab descartável)
+### Fase A — Preparar `.54` (lab descartável) — **PASS** `2026-08-09T18:01:57Z`
 
-**Escrita só em `.54` (após GO).**
+**Escrita só em `.54` (GO humano recebido e executado).**
 
 1. Alias/loopback: `ip addr add 198.18.0.10/32 dev lo`  
 2. Rota de retorno do cliente: `ip route replace 192.168.100.24/32 via 192.168.100.254`  
-3. Cert efêmero + HTTPS em `198.18.0.10:443` (bind explícito a esse IP)  
-4. Teste local na `.54`: `curl -vk --resolve mitm-lab.test:443:198.18.0.10 https://mitm-lab.test/`
+3. Cert efêmero + HTTPS em `198.18.0.10:443` (bind explícito a esse IP; Python `http.server`+TLS)  
+4. Teste local na `.54`: `curl --cacert … --resolve mitm-lab.test:443:198.18.0.10 https://mitm-lab.test/` → marcador `L7-PHASE-A-OK-198.18.0.10`  
+5. Rollback ensaiado (ciclo completo) + re-apply; fail-safe `at` +180 min  
+6. Layout: `/opt/layer7-poc/mitm-lab-a/` (certs `0600`; controlo `phase-a-control.sh`)
 
-**Rollback A:** `ip addr del 198.18.0.10/32 dev lo`; `ip route del 192.168.100.24/32`; stop listener; apagar certs efêmeros.
+**Estado deixado UP** para Fase B (listener + alias + rota retorno).  
+**Rollback A (executável):** `ssh root@192.168.100.54 '/opt/layer7-poc/mitm-lab-a/phase-a-control.sh rollback'`
 
 ### Fase B — Rota + pass mínimo no `.254` (produção; janela curta)
 
@@ -160,6 +163,7 @@ Abort se rdr tiver `from any` ou tabelas sem src.
 | Usar IP `192.168.100.54` como `dest_cidr`? | **NO-GO** (mesmo L2) |
 | Usar `198.18.0.10/32` + rota via `.54`? | **GO CONDICIONAL** |
 | Condições do GO | (1) rota retorno `.24 via .254` na `.54`; (2) pré-check `reply-to/route-to`; (3) pass PF mínimo só `.24`; (4) fail-safe temporizado + rollback; (5) fases A→B→C antes de qualquer MITM; (6) `.234/.235` intocados |
-| Aplicar agora? | **NO-GO automático** — falta confirmação humana **neste momento da mudança** |
+| Aplicar Fase A? | **GO executado — PASS** (evidência `20260809T180157Z-phaseA-54`) |
+| Aplicar Fase B agora? | **NO-GO automático** — falta **GO humano explícito** só para B |
 
-**Pedido ao proprietário:** confirmar **GO explícito para Fase A** (só `.54`), depois **GO separado para Fase B** (rota no `.254`). Não empacotar A+B+D num único GO.
+**Pedido ao proprietário:** confirmar **GO explícito para Fase B** (rota + pass mínimo no `.254`). Não empacotar B+C+D num único GO.

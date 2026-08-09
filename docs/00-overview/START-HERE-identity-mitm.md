@@ -47,8 +47,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Campo | Valor |
 |-------|-------|
 | Plano | Identity **FECHADA**; MITM **GO produto**; **`1.9.42` source_cidr** (rev. `2026-08-09ah`) |
-| Passo actual | **`1.9.42` passivo na `.254`** — smoke PASS; MITM OFF; zero rdr |
-| Próximo | **GO activação escopada** (destino `/32` dedicado + `.24`; humano) |
+| Passo actual | **`1.9.42` passivo na `.254`**; **Fase A destino lab PASS** (`.54` `198.18.0.10:443`) |
+| Próximo | **GO humano Fase B** (rota `/32` + pass mínimo no `.254`; sem MITM) |
 | Rev. do plano | **`2026-08-09ah`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
@@ -157,10 +157,11 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.42 passivo .254** (smoke PASS; MITM OFF)
-- Próximo: GO activação escopada (destino /32 dedicado)
+- Passo actual: **1.9.42 passivo .254**; **Fase A destino lab PASS**
+- Próximo: GO humano **Fase B** (rota no `.254`)
 - Latest: **1.9.42** SHA `6bd6ba37…4c4b`
 - Evidência passiva: 20260809T175111Z-1.9.42-passive-254
+- Evidência Fase A: 20260809T180157Z-phaseA-54
 - S6 ECH: NA/limite (não exercitado)
 ```
 
@@ -182,6 +183,8 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Evidência 20.11 | [`../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/) |
 | Evidência 1.9.42 | [`../tests/evidence/20260809T173500Z-1.9.42-source-cidr/`](../tests/evidence/20260809T173500Z-1.9.42-source-cidr/) |
 | Runbook activação prod. | [`../09-blocking/runbook-activacao-mitm-producao-1.9.42.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.42.md) |
+| Destino lab `198.18` via `.54` | [`../09-blocking/runbook-destino-lab-19818-via-54.md`](../09-blocking/runbook-destino-lab-19818-via-54.md) |
+| Evidência Fase A `.54` | [`../tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/) |
 | Spike MITM + reopen | [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) |
 | PoC lab tlsproxy | [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |

@@ -1,0 +1,10 @@
+EVID=/tmp/l7-phaseA-54-20260809T180157Z
+=== BASELINE ===
+=== APPLY IP + RETURN ROUTE ===
+=== EPHEMERAL CA + SERVER CERT ===
+=== START HTTPS (bind 198.18.0.10:443 only) ===
+=== LOCAL TLS VALIDATION ===
+=== FAILSAFE at +180min ===
+=== ROLLBACK REHEARSAL (full cycle: rollback -> re-apply state check) ===
+=== RE-APPLY after rehearsal (leave Phase A UP for Phase B) ===
+PHASE_A_PASS EVID=/tmp/l7-phaseA-54-20260809T180157Z

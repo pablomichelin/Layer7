@@ -1,0 +1,5 @@
+ca_fp=30:F5:93:C7:B4:B9:BF:FA:F7:99:AD:19:0C:25:1B:76:CC:C6:A1:91:FA:CC:91:76:8A:21:45:3A:73:F3:18:D6
+server_fp=75:95:69:77:66:97:CB:5B:6F:86:7C:18:18:3A:D8:89:BE:60:9F:D1:C4:8A:54:C2:44:59:15:82:FC:BB:E6:03
+ca_subject=subject=CN = Layer7-PhaseA-Ephemeral-CA
+server_subject=subject=CN = mitm-lab.test
+server_san=X509v3 Subject Alternative Name:     DNS:mitm-lab.test, IP Address:198.18.0.10
