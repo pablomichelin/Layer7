@@ -13,6 +13,7 @@ candidatos históricos — ver artefacto abaixo.
 
 ## Documentos
 
+- **[`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md)** — **SSOT prontidão MITM piloto** (`2026-08-09`): **NÃO PRONTO**; P1→P5; primeiro código = P3 failsafe
 - **[`auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md`](auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md)** — **SSOT decisão `2026-08-09`:** inventário, correções absorvidas, único pacote elegível **`1.9.46`**, gates pré-install, conflitos documentais
 - **[`plano-enforcement-100-porcento.md`](plano-enforcement-100-porcento.md)** — plano Caminho B (histórico de execução; não reinstalar `_NN`)
 - [`caminho-a-plano-de-implementacao.md`](caminho-a-plano-de-implementacao.md) — Caminho A (UX/dispositivos/SNI); concluido

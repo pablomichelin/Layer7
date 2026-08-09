@@ -1,6 +1,6 @@
 # ADR-0026 — MITM TLS inspection opt-in (certificado / CA)
 
-**Estado:** Aceito — **implementação em curso** (rev. `f` — **20.9** intenção vs `mitm_effective`; runtime diferido até S1–S8)  
+**Estado:** Aceito — **runtime shipped** (`1.9.39`–`1.9.46`); teste controlado PASS; **piloto/permanente NO-GO** até mapa+GO (rev. `n`)  
 **Data:** 2026-08-05  
 **Aceite:** `2026-08-05` — passo **20.2** / GI0  
 **Deferral implementação:** `2026-08-06` — passo **20.7a** (GO operador: PME Identity-first)  
@@ -68,9 +68,9 @@
 
 ## Consequências
 
-- Gates GI2–GI3 **runtime** = **`DEFERRED`** até S1–S8 + GO lab (20.8/20.9 **não** fecham GI2.1–GI3.5).  
-- Matriz DPI / MANUAL: sem procedimento de intercept enquanto runtime ausente.  
-- GUI pode manter upsell MITM + gestão CA/bypass + intenção honesta vs efectivo; daemon sem intercept.  
+- **Histórico (rev. e–f):** GI2–GI3 runtime diferidos até S1–S8 + GO lab.  
+- **Estado vivo (`2026-08-09`, rev. n):** GI2/GI3 **PASS** lab (`1.9.41`/20.11); Gate C + GO teste controlado `.254` **PASS** (`1.9.46` / `215442Z`); activação **permanente** e **piloto** = **NO-GO** até [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) + GO humano.  
+- Runtime `layer7-tlsproxy` **presente** no `.pkg` (default OFF); `mitm_effective` só com gates.  
 - Identity rede **fechada** — não reabrir nesta fila.
 
 ---
@@ -113,6 +113,7 @@
 | **k** | **2026-08-09** | Rev. gerencial interina: S3 pendente (curl ≠ browser); S6 NA |
 | **l** | **2026-08-09** | **S3 PASS** Edge Windows `192.168.100.24`; **20.11 / GI3 PASS**; S6 permanece **NA/limite**; sem GO produção |
 | **m** | **2026-08-09** | **`1.9.42` source_cidr** — rdr MITM exige origem **e** destino; proibido `from any`; produção `.254` continua sem activação automática |
+| **n** | **2026-08-09** | **`1.9.46` + mapa piloto** — Gate C / teste controlado PASS; runtime shipped; piloto **NÃO PRONTO**; permanente NO-GO; próximo P3 failsafe após GO escopo |
 
 ---
 
