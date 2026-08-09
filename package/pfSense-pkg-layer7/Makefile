@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.39
+PORTVERSION=	1.9.40
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -21,7 +21,7 @@ LIB_DEPENDS=	libldap.so.2:net/openldap26-client
 
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 LAYER7_TLSPROXY_DIR=	${.CURDIR}/../../src/layer7-tlsproxy
-# GO produto 2026-08-09: empacotar helper (20.10a). rc/enable/intercept continuam OFF.
+# GO produto + 20.10b: helper no .pkg; default OFF; listen/rdr só com mitm_effective.
 WITH_LAYER7_TLSPROXY?=	yes
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
@@ -78,7 +78,7 @@ do-build:
 		/usr/lib/libssl.a /usr/lib/libcrypto.a
 .if ${WITH_LAYER7_TLSPROXY:tl} == yes
 	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${LAYER7_TLSPROXY_DIR} \
-		-DLAYER7_TLSPROXY_VERSION=\"0.1.0\" \
+		-DLAYER7_TLSPROXY_VERSION=\"0.1.1\" \
 		-o ${WRKSRC}/layer7-tlsproxy \
 		${LAYER7_TLSPROXY_DIR}/main.c ${LAYER7_TLSPROXY_DIR}/ipc.c \
 		${LAYER7_TLSPROXY_DIR}/tls_lab.c \

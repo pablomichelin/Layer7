@@ -1,8 +1,8 @@
-# START HERE — Identity + MITM Add-on 【GO produto — 20.10a em curso】
+# START HERE — Identity + MITM Add-on 【20.10b PASS — próximo 20.11】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
-> **20.10a:** runtime no `.pkg`, default OFF, `intercept_ready=false`.  
-> **Sem** intercept em `.254`/`.234`/`.235`. Squid rejeitado. Próximo: **20.10b**.
+> **20.10b PASS** (`1.9.40`): listen selectivo + PF rdr selectivo + página HTTPS.  
+> **Sem** intercept em `.254`/`.234`/`.235`. Squid rejeitado. Próximo: **20.11**.
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -22,18 +22,16 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) | **Ideia, objectivo, nicho PME, barra UX** — ACEITE |
 | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **SSOT de execução** (ondas IM0–IM9, passos 20.x) |
 | [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) | GO humano produto — **dado** |
-| [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) | Prep **FECHADO**; pós-GO = 20.10a/b |
+| [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) | Prep **FECHADO**; 20.10a/b **PASS** |
 | [`identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md) | Mapa código / superfícies / não-regressão |
 | [`especificacao-agente-endpoint-20.27.md`](../01-architecture/especificacao-agente-endpoint-20.27.md) | Espec IM7 agente endpoint (20.27 PASS) |
 | [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) | Gates GI0–GI9 |
 | [`spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) | Spike MITM — DEFER 20.7a + **reopen GO 2026-08-08** |
-| [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) | Desenho opção E — produto sem runtime; PoC idle no repo |
-| [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md) | Contrato IPC 20.9 — intenção vs `mitm_effective` |
-| [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) | PoC lab pós-GO — **fora** de produção |
+| [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) | Desenho opção E |
+| [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md) | Contrato IPC — intenção vs `mitm_effective` |
+| [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) | PoC lab — **fora** de produção |
 | [`GO-opcao-A-inline-lab-54.md`](../09-blocking/GO-opcao-A-inline-lab-54.md) | GO humano Opção A (inline só `.54`) — **PASS** |
-| [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) | Prep **sem** GO produto — itens 1–7 PASS; falta GO humano |
-| [`drafts/mitm-packaging-20.10/`](../09-blocking/drafts/mitm-packaging-20.10/) | Draft pkg-plist/rc/`WITH_LAYER7_TLSPROXY=no` (**fora** do `.pkg`) |
-| ADR-0025 / 0026 / 0027 / 0028 / **0029** | Aceito; **0026** 20.9 + GO lab; **0029** IM7 diferido + IM8 excluído |
+| ADR-0025 / 0026 / 0027 / 0028 / **0029** | Aceito; **0026** implementação em curso |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** do produto |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Filas **fecho + IPv6** (não reabrir) |
 
@@ -48,11 +46,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; **20.10a** em curso (rev. `2026-08-09ab`) |
-| Passo actual | **20.10a PASS** (`1.9.39`); próximo **20.10b** |
-| Próximo | **20.10b** — listen + PF rdr + block page HTTPS |
-| Rev. do plano | **`2026-08-09ab`** |
-| MITM | Runtime empacotável; `mitm_effective` **false**; GI2/GI3 **DEFERRED** até 20.10b+ |
+| Plano | Identity **FECHADA**; MITM **GO produto**; **20.10b PASS** (rev. `2026-08-09ac`) |
+| Passo actual | **20.10b PASS** (`1.9.40`); próximo **20.11** |
+| Próximo | **20.11** — GI2/GI3 lab |
+| Rev. do plano | **`2026-08-09ac`** |
+| MITM | `intercept_ready=true`; listen/rdr/página gated; `mitm_effective` só com gates; GI2/GI3 **DEFERRED** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -77,17 +75,17 @@ Grande evolução **opt-in** do Layer7 para o nicho **PME / MSP em pfSense**:
 1. **Add-on comercial** no mesmo `pfSense-pkg-layer7`.
 2. **Licença X (base)** vs **Y (Identity)** via entitlements — Y é a oferta âncora.
 3. **Identity** estilo User-ID de rede: mapa **daemon** user↔IP + LDAP + RADIUS accounting + agente DC (+ agente/TS depois).
-4. **MITM opcional no SKU** — reopen GO `2026-08-08`; **20.9 PASS** (intenção/bypass/IPC); runtime helper próprio (`layer7-tlsproxy`, opção E) **ainda ausente**; **nunca** Squid.
+4. **MITM opcional no SKU** — runtime `layer7-tlsproxy` (opção E); **nunca** Squid.
 5. **Zero impacto** no `1.9.8` com módulos OFF / sem entitlement.
 6. **Barra de qualidade:** utilizável por TI de empresa pequena/média (estados claros, testes de ligação, limites honestos, sem overclaim NGFW).
 
 ### Honestidade MVP (ler)
 
 - Sem agente endpoint (IM7) / TS (IM8), o produto entrega **User-ID de rede**, não exactidão tipo GlobalProtect.
-- MITM **não** é pré-requisito de Identity. Identity rede está **fechada**; MITM está em **scaffolding + intenção** (sem intercept; `mitm_effective` false).
+- MITM **não** é pré-requisito de Identity. Identity rede está **fechada**; MITM tem listen/rdr/página **gated** (`mitm_effective`).
 - Captive portal: usar o do pfSense — fora desta trilha.
 - **Não** prometemos paridade com Fortinet / Palo Alto / Check Point.
-- **Não** há terminação TLS / block page HTTPS via MITM até existir runtime + S1–S8 + GO lab.
+- **Não** activar intercept em produção sem smoke S8 OFF + GO explícito.
 
 ## O que esta trilha **não** é
 
@@ -127,19 +125,19 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.39** (20.10a).
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.40** (20.10b).
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
-Identity de rede: FECHADA (20.33/GI9). MITM: GO produto 2026-08-09; passo actual **20.10a**.
+Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; passo actual **20.10b PASS**.
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
 GO produto: docs/09-blocking/GO-produto-20.10.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (**20.10b**).
-Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective false sem intercept_ready;
+Ler na ordem do START-HERE; executar só o próximo bloco seguro (**20.11**).
+Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
 um passo/bloco por entrega; português; barra UX PME; Squid rejeitado;
-NÃO activar intercept em .254/.234/.235 sem smoke; NÃO mitm_effective=true sem 20.10b.
-Estado fechado: 20.10a packaging + runtime_available + intercept_ready=false; plano rev. 2026-08-09ab.
-Tarefa seguinte: **20.10b** (listen selectivo + PF rdr + página HTTPS).
+NÃO activar intercept em .254/.234/.235 sem smoke + GO; NÃO fechar GI2/GI3 sem evidência.
+Estado fechado: 20.10b listen+rdr+página; plano rev. 2026-08-09ac.
+Tarefa seguinte: **20.11** (GI2/GI3 lab).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -158,14 +156,9 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.10a** (runtime no .pkg; rc OFF; intercept_ready=false)
-- Próximo: **20.10b** (listen + PF rdr + block page HTTPS)
-- GO produto: docs/09-blocking/GO-produto-20.10.md
-- Plano rev.: 2026-08-09ab
-- Lab/`latest` alvo: **1.9.39**
-- Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- 20.9: PASS (`1.9.38`)
-- Squid: REJEITADO; GI2/GI3: DEFERRED até 20.10b+
+- Passo actual: **20.10b PASS** (`1.9.40`; intercept_ready; listen/rdr/página gated)
+- Próximo: **20.11** (GI2/GI3 lab)
+- Latest: **1.9.40** SHA `fbbf206d…1afe`
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
@@ -182,25 +175,12 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Contrato IPC 20.9 | [`../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md) |
 | Mapa técnico | [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md) |
 | Gates | [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) |
+| Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
 | Spike MITM + reopen | [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) |
 | PoC lab tlsproxy | [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
-| GO Opção A (inline `.54`) | [`../09-blocking/GO-opcao-A-inline-lab-54.md`](../09-blocking/GO-opcao-A-inline-lab-54.md) |
-| Prep 20.10 (sem GO) | [`../09-blocking/prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) |
-| Draft packaging MITM | [`../09-blocking/drafts/mitm-packaging-20.10/`](../09-blocking/drafts/mitm-packaging-20.10/) |
-| Evidência S8 OFF+binário | [`../tests/evidence/20260809T050000Z-s8-runtime-present-off-54/`](../tests/evidence/20260809T050000Z-s8-runtime-present-off-54/) |
-| Evidência S1 inline | [`../tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/`](../tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/) |
-| Runbook S1–S8 pré-runtime | [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md) |
 | Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |
 | Features / SKU | [`../03-adr/ADR-0025-entitlements-addon-identity-mitm.md`](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) |
-| MITM (intenção 20.9; runtime diferido) | [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) |
-| Identity multi-fonte | [`../03-adr/ADR-0027-identity-userid-multi-fonte.md`](../03-adr/ADR-0027-identity-userid-multi-fonte.md) |
-| Desenho canal agente DC | [`../01-architecture/desenho-canal-agente-dc-20.20.md`](../01-architecture/desenho-canal-agente-dc-20.20.md) |
-| Agente Win (samples) | [`../samples/identity-dc-agent/`](../samples/identity-dc-agent/) |
-| Concorrência/IO daemon | [`../03-adr/ADR-0028-concorrencia-io-daemon-identity.md`](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) |
-| Block page actual (sem MITM) | [`../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md`](../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) |
-| Identidade dispositivo (MAC) | [`../03-adr/ADR-0011-fonte-de-identidade-de-dispositivo.md`](../03-adr/ADR-0011-fonte-de-identidade-de-dispositivo.md), [`ADR-0012`](../03-adr/ADR-0012-politicas-por-dispositivo-mac-para-ip.md) |
-| Limitações DPI | [`../09-blocking/matriz-limitacoes-dpi.md`](../09-blocking/matriz-limitacoes-dpi.md) |
-| Licenças | [`../10-license-server/MANUAL-USO-LICENCAS.md`](../10-license-server/MANUAL-USO-LICENCAS.md) |
+| MITM | [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) |
 | Backlog | [`../02-roadmap/backlog.md`](../02-roadmap/backlog.md) (BG-085…) |
 | Handoff genérico | [`handoff-chat-novo.md`](handoff-chat-novo.md) |
 
@@ -210,10 +190,10 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 
 1. **Plano manda** — um passo `20.x` por entrega.  
 2. **Não-regressão** — `1.9.8` behaviour com features OFF / `features` legado.  
-3. **Opt-in** — MITM e Identity default OFF; `mitm.enabled` = intenção; `mitm_effective` false sem runtime + S1–S8 + GO lab.  
+3. **Opt-in** — MITM e Identity default OFF; `mitm.enabled` = intenção; `mitm_effective` false sem gates.  
 4. **Entitlement** — GUI pode mostrar upsell; **daemon** é autoridade do gate.  
 5. **Sem captive** nesta trilha.  
 6. **Sem segredos** no git (chaves CA, bind AD, etc.).  
-7. **PME Identity-first** — sem overclaim NGFW; Squid rejeitado; sem claim de intercept sem S1–S8.  
+7. **PME Identity-first** — sem overclaim NGFW; Squid rejeitado; sem claim de intercept produção sem GO.  
 8. Documentação + testes mínimos + rollback **no mesmo bloco**.  
 9. **Identity rede fechada** — não reabrir sem GO separado.

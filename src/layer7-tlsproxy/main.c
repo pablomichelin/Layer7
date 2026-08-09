@@ -1,6 +1,7 @@
 /*
- * layer7-tlsproxy — PoC lab (idle/IPC/TLS/SNI/upstream).
- * Lab: root@192.168.100.54. Squid rejected.
+ * layer7-tlsproxy — produto 20.10b (listen selectivo) + PoC lab.
+ * Lab: LAYER7_TLSPROXY_LAB=1 em .54. Produto: LAYER7_TLSPROXY_PRODUCT=1.
+ * Squid rejeitado. mitm_effective_claim nunca true neste binário.
  */
 
 #include "ipc.h"
@@ -11,7 +12,7 @@
 #include <string.h>
 
 #ifndef LAYER7_TLSPROXY_VERSION
-#define LAYER7_TLSPROXY_VERSION "0.0.5-poc5"
+#define LAYER7_TLSPROXY_VERSION "0.1.1"
 #endif
 
 static void
@@ -20,11 +21,14 @@ usage(const char *argv0)
 	fprintf(stderr,
 	    "usage: %s [--version] [--health] [--help]\n"
 	    "       %s --ipc-serve|--ipc-ping [--sock PATH] [--oneshot]\n"
-	    "       %s --lab-tls-listen [HOST:PORT] --cert CRT --key KEY \\\n"
+	    "       %s --lab-tls-listen|--product-listen [HOST:PORT] \\\n"
+	    "          --cert CRT --key KEY \\\n"
 	    "          [--bypass-sni H] [--block-sni H] [--upstream 127.0.0.1:PORT]\n"
 	    "          [--lab-transparent] [--oneshot] [--lab-allow-any]\n"
 	    "\n"
-	    "LAYER7_TLSPROXY_LAB=1 required. mitm_effective never claimed true.\n",
+	    "Lab: LAYER7_TLSPROXY_LAB=1. Product: LAYER7_TLSPROXY_PRODUCT=1 "
+	    "(loopback only).\n"
+	    "mitm_effective never claimed true by this binary.\n",
 	    argv0, argv0, argv0);
 }
 
@@ -56,18 +60,21 @@ cmd_health(void)
 	printf("{\n");
 	printf("  \"service\": \"layer7-tlsproxy\",\n");
 	printf("  \"version\": \"%s\",\n", LAYER7_TLSPROXY_VERSION);
-	printf("  \"mode\": \"product-scaffold-20.10a\",\n");
+	printf("  \"mode\": \"product-20.10b\",\n");
 	printf("  \"bind\": false,\n");
 	printf("  \"intercept\": false,\n");
-	printf("  \"intercept_ready\": false,\n");
+	printf("  \"intercept_ready\": true,\n");
 	printf("  \"ipc_capable\": true,\n");
 	printf("  \"tls_lab_capable\": true,\n");
+	printf("  \"tls_product_capable\": true,\n");
 	printf("  \"sni_policy\": true,\n");
 	printf("  \"upstream_capable\": true,\n");
 	printf("  \"transparent_capable\": true,\n");
 	printf("  \"mitm_effective_claim\": false,\n");
 	printf("  \"lab_env\": %s,\n",
 	    l7_ipc_lab_ok() ? "true" : "false");
+	printf("  \"product_env\": %s,\n",
+	    l7_tls_product_ok() ? "true" : "false");
 	printf("  \"status\": \"ok\"\n");
 	printf("}\n");
 	return 0;
@@ -116,7 +123,10 @@ main(int argc, char **argv)
 			mode_ping = 1;
 			continue;
 		}
-		if (strcmp(argv[i], "--lab-tls-listen") == 0) {
+		if (strcmp(argv[i], "--lab-tls-listen") == 0 ||
+		    strcmp(argv[i], "--product-listen") == 0) {
+			if (strcmp(argv[i], "--product-listen") == 0)
+				l7_tls_set_product(1);
 			mode_tls = 1;
 			if (i + 1 < argc && argv[i + 1][0] != '-')
 				listen_spec = argv[++i];

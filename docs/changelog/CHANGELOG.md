@@ -6,8 +6,27 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- **20.10a** em curso pós-GO produto: runtime no pacote, default OFF, sem intercept.
-- **20.10b** (PF/listen/página HTTPS) ainda pendente; GI2/GI3 DEFERRED.
+- **20.10b PASS** (`1.9.40`): listen selectivo + PF rdr + página HTTPS; GI2/GI3 DEFERRED (20.11).
+
+## [1.9.40] — 2026-08-09
+
+### Added
+
+- **BG-087 / 20.10b — Listen selectivo + PF rdr + página HTTPS:**
+  `intercept_ready=true`; helper `--product-listen` (loopback only) gated por
+  ficheiro rc `/var/run/layer7/tlsproxy.product` só com `mitm_effective`;
+  gerador `layer7_generate_mitm_rdr_snippet()` selectivo via
+  `mitm.intercept.dest_cidr` (vazio = zero rdr); página HTML HTTPS no helper;
+  GUI campos dest/block SNI. Default OFF; Squid rejeitado. GI2/GI3 não
+  fechados. Sem activação em produção `.254/.234/.235`. Evidência:
+  `docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`.
+
+### Release
+
+- Tag `v1.9.40` / `releases/latest`
+- SHA256: `fbbf206d1b159722a28073dd402f9b0c8ef381eff07eb3a886e5ef8310a41afe`
+- Rollback: `1.9.39`
+
 
 ## [1.9.39] — 2026-08-09
 

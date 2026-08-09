@@ -1,8 +1,7 @@
 /*
- * PoC-2/3/4 — TLS acceptor + SNI policy + optional localhost upstream.
- *
- * Lab VM 192.168.100.54 only.
- * mitm_effective always false. No payload persisted to disk.
+ * TLS acceptor + SNI policy + optional localhost upstream.
+ * Lab (.54) via LAYER7_TLSPROXY_LAB=1; produto via LAYER7_TLSPROXY_PRODUCT=1.
+ * mitm_effective_claim always false aqui. Sem payload em disco.
  */
 
 #include "tls_lab.h"
@@ -42,6 +41,7 @@ enum l7_verdict {
 static volatile sig_atomic_t l7_tls_stop;
 static int l7_tls_allow_any;
 static int l7_tls_transparent;
+static int l7_tls_product;
 static char l7_up_host[64];
 static int l7_up_port;
 
@@ -60,6 +60,23 @@ void
 l7_tls_set_transparent(int v)
 {
 	l7_tls_transparent = v;
+}
+
+void
+l7_tls_set_product(int v)
+{
+	l7_tls_product = v ? 1 : 0;
+}
+
+int
+l7_tls_product_ok(void)
+{
+	const char *e;
+
+	if (l7_tls_product)
+		return 1;
+	e = getenv("LAYER7_TLSPROXY_PRODUCT");
+	return (e != NULL && strcmp(e, "1") == 0);
 }
 
 void
@@ -198,12 +215,27 @@ on_sig(int sig)
 }
 
 static int
+host_is_loopback(const char *host)
+{
+	return (host != NULL &&
+	    (strcmp(host, "127.0.0.1") == 0 || strcmp(host, "::1") == 0));
+}
+
+static int
 host_allowed(const char *host)
 {
 	if (host == NULL || host[0] == '\0')
 		return 0;
-	if (strcmp(host, "127.0.0.1") == 0 || strcmp(host, "::1") == 0)
+	if (host_is_loopback(host))
 		return 1;
+	/* Produto 20.10b: listen selectivo — só loopback. */
+	if (l7_tls_product_ok()) {
+		fprintf(stderr,
+		    "layer7-tlsproxy: product mode refuses bind %s "
+		    "(loopback only; selective listen).\n",
+		    host);
+		return 0;
+	}
 	if (l7_tls_allow_any)
 		return 1;
 	fprintf(stderr,
@@ -305,7 +337,7 @@ serve_by_verdict(SSL *ssl, enum l7_verdict v, const char *sni)
 	req[nread] = '\0';
 
 	if (v == L7_BLOCK) {
-		static const char *page =
+		static const char *page_lab =
 		    "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
 		    "<title>Layer7 — acesso bloqueado</title></head>"
 		    "<body style=\"font-family:sans-serif;max-width:40rem;margin:3rem auto\">"
@@ -313,7 +345,16 @@ serve_by_verdict(SSL *ssl, enum l7_verdict v, const char *sni)
 		    "<p>Este destino foi bloqueado pela política Layer7 (PoC lab).</p>"
 		    "<p><small>mitm_effective=false · lab only · sem persistência de payload</small></p>"
 		    "</body></html>\n";
-		http_reply(ssl, 403, "text/html; charset=utf-8", page);
+		static const char *page_prod =
+		    "<!DOCTYPE html><html><head><meta charset=\"utf-8\">"
+		    "<title>Layer7 — acesso bloqueado</title></head>"
+		    "<body style=\"font-family:sans-serif;max-width:40rem;margin:3rem auto\">"
+		    "<h1>Acesso bloqueado</h1>"
+		    "<p>Este destino foi bloqueado pela política Layer7.</p>"
+		    "<p><small>Block page HTTPS (20.10b) · sem persistência de payload · Squid rejeitado</small></p>"
+		    "</body></html>\n";
+		http_reply(ssl, 403, "text/html; charset=utf-8",
+		    l7_tls_product_ok() ? page_prod : page_lab);
 		return;
 	}
 
@@ -358,10 +399,11 @@ l7_tls_lab_listen(const char *bind_host, int bind_port,
 	int rc = 1;
 	struct sockaddr_in addr4;
 
-	if (!l7_ipc_lab_ok()) {
+	if (!l7_tls_product_ok() && !l7_ipc_lab_ok()) {
 		fprintf(stderr,
 		    "layer7-tlsproxy: refusing TLS listen — "
-		    "set LAYER7_TLSPROXY_LAB=1 (lab .54 only).\n");
+		    "set LAYER7_TLSPROXY_PRODUCT=1 (produto) ou "
+		    "LAYER7_TLSPROXY_LAB=1 (lab .54).\n");
 		return 3;
 	}
 	if (cert_path == NULL || key_path == NULL ||
@@ -424,8 +466,9 @@ l7_tls_lab_listen(const char *bind_host, int bind_port,
 	}
 
 	fprintf(stderr,
-	    "layer7-tlsproxy: TLS lab %s:%d (poc5; bypass=%d block=%d "
-	    "upstream=%s:%d transparent=%d; mitm_effective=false)\n",
+	    "layer7-tlsproxy: TLS %s %s:%d (bypass=%d block=%d "
+	    "upstream=%s:%d transparent=%d; mitm_effective_claim=false)\n",
+	    l7_tls_product_ok() ? "product" : "lab",
 	    bind_host, bind_port, l7_nbypass, l7_nblock,
 	    l7_up_port ? l7_up_host : "-", l7_up_port, l7_tls_transparent);
 

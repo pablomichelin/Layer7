@@ -161,8 +161,8 @@ Contrato IPC: [`contrato-ipc-layer7-tlsproxy-20.9.md`](contrato-ipc-layer7-tlspr
 |-------|----------|--------------|------------|
 | **20.8** | Gestão CA (gerar / importar / export GPO; segredos fora do git) | Desenho aceite; entitlement; GUI/ops | **PASS** (`1.9.37`) |
 | **20.9** | Toggle intenção `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC; `mitm_effective` sempre false sem runtime | 20.8 PASS | **PASS** (`1.9.38`) |
-| **20.10** | Intercept selectivo + block page HTTPS | **S1–S8 medidos** + **GO lab** | **BLOQUEADO** — **não aprovar intercept sem isto** |
-| **20.11** | Lab CA completo; gates **GI2–GI3** | 20.10 estável em lab; CE se aplicável (ADR-0022) | Bloqueado / gates historicamente `DEFERRED` |
+| **20.10** | Intercept selectivo + block page HTTPS | **S1–S8 medidos** + **GO lab** + **GO produto** | **20.10a+b PASS** (`1.9.40`); gated; sem produção |
+| **20.11** | Lab CA completo; gates **GI2–GI3** | 20.10 estável em lab; CE se aplicável (ADR-0022) | **Próximo** / GI2–GI3 `DEFERRED` até evidência |
 
 ```text
 Desenho (este ficheiro)

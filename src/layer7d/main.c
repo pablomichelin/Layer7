@@ -337,9 +337,13 @@ write_stats_json(void)
 	fprintf(f, "  \"mitm_runtime_available\": %s,\n",
 	    (access("/usr/local/sbin/layer7-tlsproxy", X_OK) == 0) ?
 	    "true" : "false");
-	/* 20.10a: intercept_ready=false → effective permanece false no daemon. */
+	/*
+	 * 20.10b: intercept_ready=true (listen/rdr/página wired no pacote).
+	 * mitm_effective permanece false no daemon — autoridade full cascade
+	 * está no PHP (enabled∧entitlement∧CA∧runtime∧intercept_ready).
+	 */
 	fprintf(f, "  \"mitm_effective\": false,\n");
-	fprintf(f, "  \"mitm_intercept_ready\": false,\n");
+	fprintf(f, "  \"mitm_intercept_ready\": true,\n");
 	{
 		const char *lst = "off";
 		enum l7_ldap_status st = s_ldap_worker ?

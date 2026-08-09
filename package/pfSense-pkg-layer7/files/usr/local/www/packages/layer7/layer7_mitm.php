@@ -6,8 +6,8 @@
 ##|*MATCH=layer7_mitm.php*
 ##|-PRIV
 /*
- * MITM / inspecao TLS (IM2 / 20.8–20.9).
- * Intencao mitm.enabled vs mitm_effective (requer runtime).
+ * MITM / inspecao TLS (IM2 / 20.10b).
+ * Intencao mitm.enabled vs mitm_effective (runtime+intercept_ready+CA+entitlement).
  * Chave CA fora do JSON. Squid rejeitado. OFF ≡ ADR-0017.
  */
 
@@ -35,6 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 		if (isset($_POST["mitm_save_bypass"])) {
 			$mitm["bypass"]["sni"] = isset($_POST["bypass_sni"]) ? (string)$_POST["bypass_sni"] : "";
 			$mitm["bypass"]["cidr"] = isset($_POST["bypass_cidr"]) ? (string)$_POST["bypass_cidr"] : "";
+			$mitm["intercept"]["dest_cidr"] = isset($_POST["intercept_dest_cidr"])
+			    ? (string)$_POST["intercept_dest_cidr"] : "";
+			$mitm["intercept"]["block_sni"] = isset($_POST["intercept_block_sni"])
+			    ? (string)$_POST["intercept_block_sni"] : "";
 			$mitm["enabled"] = !empty($_POST["mitm_enabled"]);
 			$mitm["quic_mode"] = isset($_POST["quic_mode"]) ? (string)$_POST["quic_mode"] : "bypass";
 			$mitm["ca"]["cn"] = isset($_POST["ca_cn"]) ? (string)$_POST["ca_cn"] : $mitm["ca"]["cn"];
@@ -45,10 +49,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			$mitm = layer7_mitm_normalize($mitm);
 			$data = layer7_mitm_apply_to_config($data, $mitm);
 			if (empty($input_errors) && layer7_save_json($data)) {
+				layer7_mitm_sync_helper($data, true);
+				if (function_exists("filter_configure")) {
+					filter_configure();
+				}
 				$eff = layer7_mitm_effective($mitm, true);
+				$nd = count($mitm["intercept"]["dest_cidr"] ?? array());
 				$savemsg = $eff
-				    ? l7_t("Configuracao MITM gravada (inspecao efectiva ON).")
-				    : l7_t("Configuracao MITM gravada. Intencao guardada; inspecao efectiva OFF (sem runtime).");
+				    ? l7_t("Configuracao MITM gravada (mitm_effective ON).") .
+					($nd > 0
+					    ? " " . l7_t("Rdr selectivo activo para destinos configurados.")
+					    : " " . l7_t("Sem dest_cidr: helper pode escutar em loopback, zero rdr."))
+				    : l7_t("Configuracao MITM gravada. Intencao guardada; mitm_effective OFF (gates incompletos).");
 				$mitm = layer7_mitm_from_config($data);
 			} elseif (empty($input_errors)) {
 				$input_errors[] = l7_t("Falha ao gravar layer7.json.");
@@ -129,9 +141,9 @@ if ($savemsg !== "") {
 		<div class="layer7-content">
 			<p class="layer7-lead">
 				<?= htmlspecialchars(l7_t(
-				    "Passo 20.10a: runtime layer7-tlsproxy pode estar no pacote (default OFF). " .
-				    "mitm.enabled e intencao; mitm_effective so com intercept_ready (20.10b). " .
-				    "Com effective OFF o bloqueio HTTPS continua ADR-0017."
+				    "Passo 20.10b: listen selectivo (127.0.0.1:8443) + PF rdr por dest_cidr + pagina HTTPS. " .
+				    "mitm.enabled e intencao; mitm_effective exige entitlement+CA+runtime+intercept_ready. " .
+				    "Sem dest_cidr nao ha rdr. Com effective OFF o bloqueio HTTPS continua ADR-0017. Squid rejeitado."
 				)); ?>
 			</p>
 
@@ -160,7 +172,7 @@ if ($savemsg !== "") {
 					<div class="alert alert-success" role="alert" style="margin-bottom:12px;">
 						<?= htmlspecialchars(l7_t("Entitlement mitm activo.")); ?>
 						<?= htmlspecialchars($runtime_ok
-						    ? l7_t("Runtime presente (20.10a). Intercept ainda OFF ate 20.10b.")
+						    ? l7_t("Runtime presente (20.10b). mitm_effective so com todos os gates.")
 						    : l7_t("Runtime layer7-tlsproxy ausente — inspecao OFF.")); ?>
 					</div>
 					<table class="table table-condensed" style="max-width:640px; margin-bottom:0;">
@@ -168,6 +180,7 @@ if ($savemsg !== "") {
 						<tr><th>mitm_effective</th><td><code><?= $effective ? "true" : "false"; ?></code></td></tr>
 						<tr><th>runtime</th><td><code><?= $runtime_ok ? "yes" : "no"; ?></code></td></tr>
 						<tr><th>intercept_ready</th><td><code><?= layer7_mitm_intercept_ready() ? "true" : "false"; ?></code></td></tr>
+						<tr><th>intercept dest_cidr</th><td><code><?= (int)count($mitm["intercept"]["dest_cidr"] ?? array()); ?></code></td></tr>
 						<tr><th>quic_mode</th><td><code><?= htmlspecialchars($mitm["quic_mode"] ?? "bypass"); ?></code></td></tr>
 						<tr><th>features</th><td><code><?= htmlspecialchars($l7_feat_raw); ?></code></td></tr>
 					</table>
@@ -268,12 +281,38 @@ if ($savemsg !== "") {
 <?php elseif (!$runtime_ok): ?>
 								<p class="help-block" style="margin-top:6px;">
 									<?= htmlspecialchars(l7_t(
-									    "Pode gravar a intencao agora. mitm_effective permanece false ate intercept_ready (20.10b). " .
-									    "Runtime no pacote nao activa inspecao por si. " .
+									    "Pode gravar a intencao agora. Sem runtime, mitm_effective permanece false. " .
 									    "Upgrades nunca ligam MITM por defeito."
 									)); ?>
 								</p>
+<?php elseif (!$effective): ?>
+								<p class="help-block" style="margin-top:6px;">
+									<?= htmlspecialchars(l7_t(
+									    "Runtime e intercept_ready presentes. mitm_effective activa-se com intencao+CA. " .
+									    "Rdr so com dest_cidr preenchido (selectivo)."
+									)); ?>
+								</p>
 <?php endif; ?>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Destinos rdr (selectivo)")); ?></label>
+							<div class="col-sm-9">
+								<textarea name="intercept_dest_cidr" class="form-control" rows="3"
+									placeholder="203.0.113.10&#10;198.51.100.0/24"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["dest_cidr"] ?? array())); ?></textarea>
+								<p class="help-block"><?= htmlspecialchars(l7_t(
+								    "CIDR/IP de destino a redireccionar para o listen local :8443. Vazio = zero regras rdr (seguro)."
+								)); ?></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Block SNI (pagina HTTPS)")); ?></label>
+							<div class="col-sm-9">
+								<textarea name="intercept_block_sni" class="form-control" rows="3"
+									placeholder="blocked.example"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["block_sni"] ?? array())); ?></textarea>
+								<p class="help-block"><?= htmlspecialchars(l7_t(
+								    "SNI que recebem a pagina HTML de bloqueio via helper. Nao e bypass."
+								)); ?></p>
 							</div>
 						</div>
 						<div class="form-group">
@@ -339,10 +378,9 @@ foreach ($qmodes as $qv => $ql) {
 				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Proximos passos")); ?></div>
 				<div class="layer7-admin-block__body">
 					<ol style="margin:0; padding-left:18px;">
-						<li><?= htmlspecialchars(l7_t("20.8 — CA / schema — PASS")); ?></li>
-						<li><?= htmlspecialchars(l7_t("20.9 — Toggle intencao + bypass endurecido + contrato IPC (este bloco)")); ?></li>
-						<li><?= htmlspecialchars(l7_t("20.10 — Intercept selectivo + block page HTTPS (apos S1–S8 + GO lab)")); ?></li>
-						<li><?= htmlspecialchars(l7_t("20.11 — Lab GI2/GI3")); ?></li>
+						<li><?= htmlspecialchars(l7_t("20.8–20.10a — CA / intencao / runtime OFF — PASS")); ?></li>
+						<li><?= htmlspecialchars(l7_t("20.10b — Listen selectivo + PF rdr + pagina HTTPS (este bloco)")); ?></li>
+						<li><?= htmlspecialchars(l7_t("20.11 — Lab GI2/GI3 (nao avancado neste bloco)")); ?></li>
 					</ol>
 					<p class="help-block" style="margin:10px 0 0;">
 						<?= htmlspecialchars(l7_t("Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md — Squid rejeitado.")); ?>

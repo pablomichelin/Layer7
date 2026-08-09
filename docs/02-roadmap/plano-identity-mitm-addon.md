@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.10a** em curso (rev. `2026-08-09ab`)
+**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.10b PASS** (rev. `2026-08-09ac`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -16,7 +16,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.39` (20.10a; SHA `6e7f4e9fe751c73a0dbdb990bd7799b37aa6136288dcb3d3941d1b42f2f4f4c9`)
+**Canal lab/`latest`:** `1.9.40` (20.10b; SHA `fbbf206d1b159722a28073dd402f9b0c8ef381eff07eb3a886e5ef8310a41afe`)
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
@@ -33,7 +33,8 @@
 **Rev. `y` (`2026-08-09`)** = **S1/S2 lab PASS** (n=500); concurrent+negativos PASS; S1 inline PENDING.  
 **Rev. `z` (`2026-08-09`)** = **GO Opção A** + **S1/S2 inline PASS** (netns+REDIRECT+SO_ORIGINAL_DST); PoC-5; IPC mock; 20.10 ainda bloqueado.  
 **Rev. `aa` (`2026-08-09`)** = prep-20.10 itens 1–7 PASS — draft `pkg-plist`/rc/`WITH_LAYER7_TLSPROXY=no` + S8 runtime-present-OFF em `.54`; **sem** merge no `.pkg`; falta só GO produto.  
-**Rev. `ab` (`2026-08-09`)** = **GO produto** + **20.10a** — runtime no `.pkg` (`1.9.39`); rc default OFF; `intercept_ready=false`; próximo **20.10b**.
+**Rev. `ab` (`2026-08-09`)** = **GO produto** + **20.10a** — runtime no `.pkg` (`1.9.39`); rc default OFF; `intercept_ready=false`; próximo **20.10b**.  
+**Rev. `ac` (`2026-08-09`)** = **20.10b PASS** — listen selectivo + PF rdr selectivo + página HTTPS (`1.9.40`); próximo **20.11**.
 
 ---
 
@@ -41,18 +42,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.10a** — runtime empacotado; default OFF; sem intercept |
-| Próximo | **20.10b** — listen selectivo + PF rdr + block page HTTPS |
+| Passo actual | **20.10b PASS** — listen/rdr/página wired; gated por `mitm_effective` |
+| Próximo | **20.11** — GI2/GI3 lab |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
+| Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
 
 ```text
 TRILHA — progresso
 - GO produto 2026-08-09
-- 20.10a: layer7-tlsproxy no .pkg; runtime_available; intercept_ready=false
-- 20.10b PENDENTE
-- Plano rev.: 2026-08-09ab
-- Lab/latest alvo: 1.9.39
+- 20.10a PASS (1.9.39)
+- 20.10b PASS (1.9.40; intercept_ready; listen/rdr/página gated)
+- 20.11 PENDENTE (GI2/GI3)
+- Plano rev.: 2026-08-09ac
+- Lab/latest: 1.9.40
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -288,7 +291,7 @@ Histórico PME (`2026-08-06`): DEFER 20.7a; Squid **rejeitado**; Identity-first 
 | **20.7a** | **DEFER formal:** ADR-0026 diferida; GI2/GI3 `DEFERRED`; Identity IM3+ | **PASS** (`2026-08-06`) |
 | **20.8** | Scaffolding: schema `mitm.*` OFF; gestão CA; bypass GUI; `mitm_entitled` no status daemon; `enabled` forçado false; **sem** `layer7-tlsproxy` | **PASS** (`1.9.37`, `2026-08-08`) |
 | **20.9** | Toggle **intenção** `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC; `mitm_effective` **sempre false** sem runtime | **PASS** (`1.9.38`, `2026-08-08`) |
-| **20.10** | Intercept selectivo; block page HTTPS — **exige** runtime + S1–S8 + GO lab + **GO produto** | **20.10a em curso**; **20.10b** pendente |
+| **20.10** | Intercept selectivo; block page HTTPS — **exige** runtime + S1–S8 + GO lab + **GO produto** | **20.10a PASS**; **20.10b PASS** (`1.9.40`) |
 | **20.11** | Lab CA; GI2–GI3 runtime | BLOQUEADO / gates runtime `DEFERRED` |
 
 **Veredicto 20.7a (histórico):** **DEFER** — Identity avançou; Squid rejeitado.
@@ -560,6 +563,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
 | 2026-08-09 | **rev. `ab` / GO produto + 20.10a** — runtime no `.pkg`; rc OFF; intercept_ready=false; candidato `1.9.39`; próximo **20.10b** |
+| 2026-08-09 | **rev. `ac` / 20.10b PASS** — listen selectivo + PF rdr + página HTTPS; `1.9.40`; próximo **20.11** |
 | 2026-08-09 | **rev. `aa` / prep 20.10 1–7** — draft packaging (`docs/09-blocking/drafts/mitm-packaging-20.10/`); S8 runtime-present-OFF PASS (`20260809T050000Z-s8-runtime-present-off-54`); **sem** merge `.pkg`; falta GO produto |
 | 2026-08-09 | **rev. `z` / GO Opção A + S1 inline** — S1/S2 inline PASS; PoC-5; IPC mock; 20.10 bloqueado |
 | 2026-08-09 | **rev. `u` / PoC-1 PASS** — IPC PING lab-only; evidência `20260809T031700Z-poc1-ipc-idle`; 20.10 bloqueado |

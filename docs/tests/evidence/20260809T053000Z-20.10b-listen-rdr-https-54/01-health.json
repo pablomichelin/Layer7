@@ -1,0 +1,19 @@
+layer7-tlsproxy 0.1.1
+{
+  "service": "layer7-tlsproxy",
+  "version": "0.1.1",
+  "mode": "product-20.10b",
+  "bind": false,
+  "intercept": false,
+  "intercept_ready": true,
+  "ipc_capable": true,
+  "tls_lab_capable": true,
+  "tls_product_capable": true,
+  "sni_policy": true,
+  "upstream_capable": true,
+  "transparent_capable": true,
+  "mitm_effective_claim": false,
+  "lab_env": false,
+  "product_env": false,
+  "status": "ok"
+}

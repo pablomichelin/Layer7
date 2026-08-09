@@ -1,7 +1,6 @@
 /*
- * PoC-2/3/4/5 lab TLS — isolated VM (.54) only.
- * Requires LAYER7_TLSPROXY_LAB=1. Default bind 127.0.0.1.
- * Never claims mitm_effective=true. No payload to disk.
+ * TLS listen — lab (LAYER7_TLSPROXY_LAB=1) ou produto (LAYER7_TLSPROXY_PRODUCT=1).
+ * Produto: bind só loopback. Nunca afirma mitm_effective=true. Sem payload em disco.
  */
 #ifndef LAYER7_TLSPROXY_TLS_H
 #define LAYER7_TLSPROXY_TLS_H
@@ -9,6 +8,8 @@
 void l7_tls_set_allow_any(int v);
 void l7_tls_set_upstream(const char *host, int port);
 void l7_tls_set_transparent(int v);
+void l7_tls_set_product(int v);
+int l7_tls_product_ok(void);
 
 int l7_tls_policy_add_bypass(const char *sni);
 int l7_tls_policy_add_block(const char *sni);

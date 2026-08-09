@@ -1,17 +1,17 @@
 # Mapa de rastreabilidade — Identity + MITM Add-on
 
 **Classificação:** Canónico (trilha Identity + MITM)  
-**Rev.:** `2026-08-08p` (Identity FECHADA; MITM **20.9 PASS** — intenção ≠ effective)  
+**Rev.:** `2026-08-09ac` (Identity FECHADA; MITM **20.10b PASS**)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
 **Posicionamento:** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md)  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
-**Desenho MITM:** [`desenho-layer7-tlsproxy-mitm.md`](desenho-layer7-tlsproxy-mitm.md) — runtime **AUSENTE**  
+**Desenho MITM:** [`desenho-layer7-tlsproxy-mitm.md`](desenho-layer7-tlsproxy-mitm.md)  
 **Contrato IPC 20.9:** [`contrato-ipc-layer7-tlsproxy-20.9.md`](contrato-ipc-layer7-tlsproxy-20.9.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
-**Baseline:** produto `1.9.8` sem módulos activos; lab/`latest` `1.9.38` (20.9 PASS)
+**Baseline:** produto `1.9.8` sem módulos activos; lab/`latest` `1.9.40` (20.10b PASS)
 
 Actualizar este mapa **a cada passo 20.x** que toque código ou contratos.  
-Identity rede **FECHADA**. MITM: **20.9 PASS** (intenção/bypass/IPC; `mitm_effective` false); **sem** intercept; Squid **rejeitado**.
+Identity rede **FECHADA**. MITM: **20.10b PASS** (listen/rdr/página gated); GI2/GI3 **DEFERRED**; Squid **rejeitado**.
 
 
 ---
@@ -51,8 +51,8 @@ Estas superfícies **não podem mudar de comportamento** enquanto `identity`/`mi
 | M-06 | Export trust (PEM) para GPO | IM2 | **PASS 20.8** | GUI/OPS | Export trust no scaffolding; intercept N/A |
 | M-07 | Toggle `mitm.enabled` | IM2 | **PASS 20.9** | GUI/PKG | Intenção gravável; **`mitm_effective` sempre false** sem runtime; ver contrato IPC |
 | M-08 | Bypass MITM | IM2 | **PASS 20.9** | GUI/DMN | Bypass endurecido + CIDR protegidos + `quic_mode`; sem tráfego a excluir (sem intercept) |
-| M-09 | Caminho intercept TLS | IM2 | **DEFERRED runtime** | DOC | Squid rejeitado; desenho opção E; `layer7-tlsproxy` **AUSENTE** |
-| M-10 | Block page HTTPS via MITM | IM2 | **DEFERRED runtime** | PKG | ADR-0017 permanece com enabled false |
+| M-09 | Caminho intercept TLS | IM2 | **20.10b PASS** (gated) | PKG | Listen loopback + rdr selectivo `dest_cidr`; Squid rejeitado |
+| M-10 | Block page HTTPS via MITM | IM2 | **20.10b PASS** (gated) | PKG | Página no helper; ADR-0017 com `!mitm_effective` |
 | M-11 | Session map user↔IP **no daemon** | IM3 | **PASS** (20.12–20.15) | DMN | Gated por entitlement |
 | M-12 | Diagnóstico Identity GUI | IM3 | Dump JSON **PASS**; GUI page pendente | GUI/DMN | `layer7_idmap_dump_json` |
 | M-13 | LDAP/LDAPS client | IM4 | **20.17 PASS** (OpenLDAP + worker) | DMN/PKG | LIB_DEPENDS openldap26-client |

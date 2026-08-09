@@ -4,9 +4,9 @@
 # REQUIRE: DAEMON NETWORKING
 # KEYWORD: shutdown
 #
-# layer7-tlsproxy — helper MITM (20.10a). Default OFF.
+# layer7-tlsproxy — helper MITM (20.10b). Default OFF.
 # Upgrade NUNCA activa. Squid rejeitado.
-# Intercept de produto: só após intercept_ready (20.10b) + mitm_effective.
+# Arranque só com gate de produto escrito por PHP quando mitm_effective=true.
 
 . /etc/rc.subr
 
@@ -18,6 +18,7 @@ load_rc_config "${name}"
 
 pidfile="/var/run/layer7-tlsproxy.pid"
 command="/usr/local/sbin/layer7-tlsproxy"
+gatefile="/var/run/layer7/tlsproxy.product"
 
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
@@ -50,10 +51,49 @@ layer7_tlsproxy_start()
 		return 1
 	fi
 
-	# 20.10a: runtime empacotado, sem intercept. Recusar arranque de serviço
-	# mesmo com enable=YES até 20.10b (PF + listen + intercept_ready).
-	echo "${name}: intercept_ready=false (20.10a) — leaving service stopped" >&2
-	return 1
+	# 20.10b: gate escrito só quando mitm_effective (PHP). Sem gate = parado.
+	if [ ! -f "${gatefile}" ]; then
+		echo "${name}: mitm_effective gate absent — leaving service stopped" >&2
+		return 1
+	fi
+
+	# shellcheck disable=SC1090
+	. "${gatefile}"
+
+	if [ -z "${LAYER7_TLSPROXY_LISTEN:-}" ] ||
+	    [ -z "${LAYER7_TLSPROXY_CERT:-}" ] ||
+	    [ -z "${LAYER7_TLSPROXY_KEY:-}" ]; then
+		echo "${name}: incomplete product gate (${gatefile})" >&2
+		return 1
+	fi
+
+	case "${LAYER7_TLSPROXY_LISTEN}" in
+	127.0.0.1:*|::1:*)
+		;;
+	*)
+		echo "${name}: refusing non-loopback listen (${LAYER7_TLSPROXY_LISTEN})" >&2
+		return 1
+		;;
+	esac
+
+	if [ ! -f "${LAYER7_TLSPROXY_CERT}" ] || [ ! -f "${LAYER7_TLSPROXY_KEY}" ]; then
+		echo "${name}: CA cert/key missing" >&2
+		return 1
+	fi
+
+	export LAYER7_TLSPROXY_PRODUCT=1
+	_args="--product-listen ${LAYER7_TLSPROXY_LISTEN} --cert ${LAYER7_TLSPROXY_CERT} --key ${LAYER7_TLSPROXY_KEY}"
+	if [ -n "${LAYER7_TLSPROXY_BLOCK_SNI:-}" ]; then
+		# Multivalor: BLOCK_SNI="a.com b.com"
+		for _sni in ${LAYER7_TLSPROXY_BLOCK_SNI}; do
+			_args="${_args} --block-sni ${_sni}"
+		done
+	fi
+
+	/usr/sbin/daemon -p "${pidfile}" \
+	    /usr/bin/env LAYER7_TLSPROXY_PRODUCT=1 \
+	    ${command} ${_args}
+	return $?
 }
 
 layer7_tlsproxy_stop()
@@ -78,7 +118,7 @@ layer7_tlsproxy_status()
 		echo "${name} is running as pid ${_p}."
 		return 0
 	fi
-	echo "${name} is not running (default OFF; 20.10a)."
+	echo "${name} is not running (default OFF; 20.10b gated)."
 	return 1
 }
 

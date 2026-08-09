@@ -1,6 +1,6 @@
 # Preparação 20.10 (NÃO é GO produto) — 【FECHADO】
 
-**Estado:** **FECHADO** `2026-08-09` — GO produto dado; passo **20.10a** em curso  
+**Estado:** **FECHADO** `2026-08-09` — GO produto; **20.10a PASS**; **20.10b PASS**  
 **GO:** [`GO-produto-20.10.md`](GO-produto-20.10.md)  
 **Draft histórico:** [`drafts/mitm-packaging-20.10/`](drafts/mitm-packaging-20.10/) (mergeado no port em 20.10a)
 
@@ -21,5 +21,5 @@
 | Bloco | Conteúdo | Estado |
 |-------|----------|--------|
 | **20.10a** | Runtime no `.pkg` + rc default OFF + `runtime_available`; `intercept_ready=false` | **PASS** (`1.9.39`) |
-| **20.10b** | Listen selectivo + PF rdr + block page HTTPS | Pendente |
+| **20.10b** | Listen selectivo + PF rdr + block page HTTPS | **PASS** (`1.9.40`) |
 | **20.11** | GI2/GI3 lab | Pendente |

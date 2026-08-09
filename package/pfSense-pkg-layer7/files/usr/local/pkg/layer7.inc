@@ -423,6 +423,10 @@ function layer7_generate_nat_anchor_snippet()
 	if ($bp !== "") {
 		$parts[] = trim($bp);
 	}
+	$mitm = layer7_generate_mitm_rdr_snippet();
+	if ($mitm !== "") {
+		$parts[] = trim($mitm);
+	}
 	if (empty($parts)) {
 		return "";
 	}
@@ -5818,7 +5822,7 @@ function layer7_has_entitlement($token)
  * GO reopen 2026-08-08; GO produto 2026-08-09 (docs/09-blocking/GO-produto-20.10.md).
  * Chave privada NUNCA em layer7.json. Squid rejeitado (ADR-0026). OFF ≡ ADR-0017.
  * Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
- * 20.10a: binário pode existir; intercept_ready=false até 20.10b.
+ * 20.10b: intercept_ready=true; listen/rdr/página só com mitm_effective.
  * ============================================================ */
 
 function layer7_mitm_tlsproxy_bin()
@@ -5836,12 +5840,180 @@ function layer7_mitm_runtime_available()
 }
 
 /**
- * 20.10b: flip para true quando PF rdr + listen produto estiverem wired.
- * Sem isto, mitm_effective permanece false mesmo com runtime no disco.
+ * 20.10b: true — listen selectivo + gerador PF rdr + página HTTPS wired.
+ * mitm_effective continua a exigir enabled∧entitlement∧CA∧runtime∧isto.
  */
 function layer7_mitm_intercept_ready()
 {
-	return false;
+	return true;
+}
+
+/** Porta de listen produto (loopback). */
+function layer7_mitm_listen_port()
+{
+	return 8443;
+}
+
+function layer7_mitm_product_gate_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/var/run/layer7/tlsproxy.product";
+	}
+	return "/var/run/layer7/tlsproxy.product";
+}
+
+/**
+ * Interfaces reais configuradas no layer7 (para rdr selectivo).
+ */
+function layer7_mitm_real_ifaces($data = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$iface_ids = isset($data["layer7"]["interfaces"]) &&
+	    is_array($data["layer7"]["interfaces"])
+	    ? $data["layer7"]["interfaces"]
+	    : array("lan");
+	$real_ifaces = array();
+	foreach ($iface_ids as $ifid) {
+		if (function_exists("get_real_interface")) {
+			$real = get_real_interface($ifid);
+		} else {
+			$real = null;
+		}
+		if ($real) {
+			$real_ifaces[] = $real;
+		} elseif (layer7_pf_ifname_for_rules($ifid)) {
+			$real_ifaces[] = $ifid;
+		}
+	}
+	$real_ifaces = array_values(array_filter(
+	    array_unique($real_ifaces),
+	    "layer7_pf_ifname_for_rules"
+	));
+	sort($real_ifaces, SORT_STRING);
+	return $real_ifaces;
+}
+
+/**
+ * Rdr selectivo MITM — só com mitm_effective e dest_cidr não vazio.
+ * Nunca universal (from any to any port 443).
+ * $entitled: passar true/false em testes para evitar IO de licença.
+ */
+function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$mitm = layer7_mitm_from_config($data);
+	if (!layer7_mitm_effective($mitm, $entitled)) {
+		return "";
+	}
+	$dests = isset($mitm["intercept"]["dest_cidr"]) &&
+	    is_array($mitm["intercept"]["dest_cidr"])
+	    ? $mitm["intercept"]["dest_cidr"]
+	    : array();
+	if (empty($dests)) {
+		return "";
+	}
+	$real_ifaces = layer7_mitm_real_ifaces($data);
+	if (empty($real_ifaces)) {
+		return "";
+	}
+	$port = (int)layer7_mitm_listen_port();
+	$webgui_port = layer7_webgui_port();
+	if ($port === (int)$webgui_port) {
+		return "";
+	}
+	$inet = array();
+	$inet6 = array();
+	foreach ($dests as $d) {
+		$fam = layer7_ip_or_cidr_family($d);
+		if ($fam === "inet") {
+			$inet[] = $d;
+		} elseif ($fam === "inet6") {
+			$inet6[] = $d;
+		}
+	}
+	$inet = array_values(array_unique($inet));
+	$inet6 = array_values(array_unique($inet6));
+	if (empty($inet) && empty($inet6)) {
+		return "";
+	}
+	$lines = array();
+	$lines[] = "# Layer7 MITM selectivo (20.10b) — só destinos explícitos; loopback listen";
+	if (!empty($inet)) {
+		$lines[] = "table <layer7_mitm_dst> persist { " . implode(", ", $inet) . " }";
+		foreach ($real_ifaces as $iface) {
+			$lines[] = "rdr on {$iface} inet proto tcp" .
+			    " from any to <layer7_mitm_dst> port 443" .
+			    " -> 127.0.0.1 port {$port}";
+		}
+	}
+	if (!empty($inet6)) {
+		$lines[] = "table <layer7_mitm_dst6> persist { " . implode(", ", $inet6) . " }";
+		foreach ($real_ifaces as $iface) {
+			$lines[] = "rdr on {$iface} inet6 proto tcp" .
+			    " from any to <layer7_mitm_dst6> port 443" .
+			    " -> ::1 port {$port}";
+		}
+	}
+	return implode("\n", $lines) . "\n";
+}
+
+/**
+ * Escreve/remove gate rc + arranca/para helper conforme mitm_effective.
+ */
+function layer7_mitm_sync_helper($data = null, $entitled = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$mitm = layer7_mitm_from_config($data);
+	$gate = layer7_mitm_product_gate_path();
+	$gatedir = dirname($gate);
+	$want = layer7_mitm_should_start_helper($mitm, $entitled);
+
+	if (!$want) {
+		@unlink($gate);
+		if (!getenv("LAYER7_TEST_ROOT")) {
+			@exec("/usr/sbin/service layer7-tlsproxy onestop 2>/dev/null");
+			@exec("/usr/sbin/sysrc layer7_tlsproxy_enable=NO 2>/dev/null");
+		}
+		return false;
+	}
+
+	if (!is_dir($gatedir)) {
+		@mkdir($gatedir, 0755, true);
+	}
+	$listen = "127.0.0.1:" . (int)layer7_mitm_listen_port();
+	$cert = layer7_mitm_ca_cert_path();
+	$key = layer7_mitm_ca_key_path();
+	$block = isset($mitm["intercept"]["block_sni"]) &&
+	    is_array($mitm["intercept"]["block_sni"])
+	    ? $mitm["intercept"]["block_sni"]
+	    : array();
+	$block_s = "";
+	foreach ($block as $sni) {
+		$sni = preg_replace('/[^a-z0-9._-]/', '', strtolower((string)$sni));
+		if ($sni === "") {
+			continue;
+		}
+		$block_s .= ($block_s === "" ? "" : " ") . $sni;
+	}
+	$body = "LAYER7_TLSPROXY_PRODUCT=1\n" .
+	    "LAYER7_TLSPROXY_LISTEN=" . $listen . "\n" .
+	    "LAYER7_TLSPROXY_CERT=" . $cert . "\n" .
+	    "LAYER7_TLSPROXY_KEY=" . $key . "\n" .
+	    "LAYER7_TLSPROXY_BLOCK_SNI=\"" . $block_s . "\"\n";
+	@file_put_contents($gate, $body);
+	@chmod($gate, 0600);
+
+	if (!getenv("LAYER7_TEST_ROOT")) {
+		@exec("/usr/sbin/sysrc layer7_tlsproxy_enable=YES 2>/dev/null");
+		@exec("/usr/sbin/service layer7-tlsproxy onerestart 2>/dev/null");
+	}
+	return true;
 }
 
 /**
@@ -5946,6 +6118,11 @@ function layer7_mitm_defaults()
 		"bypass" => array(
 			"sni" => array(),
 			"cidr" => array()
+		),
+		/* 20.10b: destinos de rdr selectivo — vazio = zero regras (upgrade seguro). */
+		"intercept" => array(
+			"dest_cidr" => array(),
+			"block_sni" => array()
 		)
 	);
 }
@@ -6058,6 +6235,63 @@ function layer7_mitm_normalize($mitm)
 	$out["bypass"] = array(
 		"sni" => array_values(array_unique($sni)),
 		"cidr" => $cidr
+	);
+
+	/* Intercept selectivo 20.10b */
+	$ic_in = (isset($mitm["intercept"]) && is_array($mitm["intercept"]))
+	    ? $mitm["intercept"] : array();
+	$dest = array();
+	$raw_dest = isset($ic_in["dest_cidr"]) ? $ic_in["dest_cidr"] : array();
+	if (is_string($raw_dest)) {
+		$raw_dest = preg_split('/[\r\n,]+/', $raw_dest);
+	}
+	if (is_array($raw_dest)) {
+		foreach ($raw_dest as $net) {
+			$net = trim((string)$net);
+			if ($net === "" || strlen($net) > 64) {
+				continue;
+			}
+			if (layer7_ip_or_cidr_family($net) === null) {
+				continue;
+			}
+			/* Nunca interceptar loopback via rdr. */
+			if ($net === "127.0.0.1" || $net === "127.0.0.1/32" ||
+			    $net === "::1" || $net === "::1/128") {
+				continue;
+			}
+			$dest[] = $net;
+			if (count($dest) >= 64) {
+				break;
+			}
+		}
+	}
+	$bsni = array();
+	$raw_bsni = isset($ic_in["block_sni"]) ? $ic_in["block_sni"] : array();
+	if (is_string($raw_bsni)) {
+		$raw_bsni = preg_split('/[\r\n,]+/', $raw_bsni);
+	}
+	if (is_array($raw_bsni)) {
+		foreach ($raw_bsni as $host) {
+			$host = strtolower(trim((string)$host));
+			$host = preg_replace('/^\*\./', '', $host);
+			if ($host === "" || strlen($host) > 253) {
+				continue;
+			}
+			if (!preg_match('/^[a-z0-9._-]+$/', $host)) {
+				continue;
+			}
+			if (filter_var($host, FILTER_VALIDATE_IP)) {
+				continue;
+			}
+			$bsni[] = $host;
+			if (count($bsni) >= 256) {
+				break;
+			}
+		}
+	}
+	$out["intercept"] = array(
+		"dest_cidr" => array_values(array_unique($dest)),
+		"block_sni" => array_values(array_unique($bsni))
 	);
 	return $out;
 }
