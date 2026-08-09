@@ -1,0 +1,22 @@
+PKG=1.9.46
+LAYER7D=1.9.46
+enabled=null mode= mitm=null
+BLOCK_DST:
+   17.250.105.4
+MITM_SRC_N=0
+MITM_DST_N=0
+layer7_tlsproxy does not exist in /etc/rc.d or the local startup
+directories (/usr/local/etc/rc.d), or is not executable
+layer7d is running as pid 59287.
+SNAP_CHECK=/tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254
+total 8832
+drwxr-xr-x   2 root wheel      8 Aug  9 19:16 .
+drwxrwxrwt  32 root wheel  77021 Aug  9 19:49 ..
+-rw-r--r--   1 root wheel    138 Aug  9 19:16 00-SNAP-META.txt
+-rw-r--r--   1 root wheel    137 Aug  9 19:16 01-sources.txt
+00-SNAP-META.txt
+01-sources.txt
+02-listing.txt
+RESTORE.txt
+config.xml.bak-preG2-19246-20260809T221620Z
+layer7.json.bak-preG2-19246-20260809T221620Z

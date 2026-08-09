@@ -1,0 +1,9 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+
+PARSED {}
+BLOCK_DST_IP_OK False
+ALLOW_DST_IP_OK False
+PRIMARY_PAIR_PASS False
+SMOKE_VERDICT=FAIL

@@ -1,0 +1,15 @@
+run_id=20260809T224632Z-enfs24-1946
+verdict=NO-GO
+pkg=1.9.46
+sha=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5
+sha_ok=yes
+drift_pre=1.9.44
+upgrade=PASS
+ssh24=PASS (SSH password channel; WinRM nao usado)
+snap_preG2=/tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254 CONSERVED_ON_APPLIANCE
+smoke_enforce=FAIL (probe .24 sem payload util; reexecucao pediu aprovacao nativa e foi SKIPPED x2)
+disable_flush=NOT_EXECUTED (so permitido apos smoke PASS completo)
+mitm=OFF (mitm.enabled=false; mitm_src/dst vazias; tlsproxy nao em execucao)
+layer7_live=enabled=true mode=enforce legacy_global block_dst=17.250.105.4,17.250.105.11
+hosts_untouched=.234 .235 .54
+creds=removed_from_agent_tmp (nao reveladas; nao commitadas)

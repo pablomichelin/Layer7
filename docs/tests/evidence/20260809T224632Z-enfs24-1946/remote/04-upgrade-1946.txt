@@ -1,0 +1,33 @@
+UTC_BEFORE=2026-08-09T22:46:44Z
+PKG_BEFORE=1.9.44
+SHA_RECHECK_OK
+-rw-rw-r--  1 www wheel 6417 Aug  9 19:36 /usr/local/etc/layer7.json
+Installing pfSense-pkg-layer7-1.9.46...
+package pfSense-pkg-layer7 is already installed, forced install
+Extracting pfSense-pkg-layer7-1.9.46: ......... done
+Saving updated package information...
+overwrite!
+Loading package configuration... done.
+Configuring package components...
+Loading package instructions...
+Custom commands...
+Executing custom_php_resync_config_command()...done.
+Menu items... done.
+Services... done.
+Writing configuration... done.
+
+=== Layer7 instalado com sucesso ===
+  Versão:  1.9.46
+  Config:  /usr/local/etc/layer7.json
+  GUI:     Services > Layer 7
+
+  O pacote inicia em modo MONITOR (seguro).
+  Acesse a GUI para configurar interfaces e políticas.
+
+PKG_AFTER=1.9.46
+LAYER7D_AFTER=1.9.46
+layer7d is running as pid 59287.
+{"enabled":true,"mode":"enforce","enforcement_model":"legacy_global","mitm":{"enabled":false}}
+{"version":"1.9.44","enforce_mode":1,"mitm_effective":false,"mitm_intercept_ready":true,"captures":2,"license_valid":true}
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+UTC_AFTER=2026-08-09T22:47:07Z

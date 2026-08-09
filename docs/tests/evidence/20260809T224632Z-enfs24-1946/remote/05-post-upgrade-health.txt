@@ -1,0 +1,21 @@
+PKG=1.9.46
+LAYER7D=1.9.46
+{"version":"1.9.46","enforce_mode":1,"mitm_effective":false,"mitm_intercept_ready":true,"captures":2,"license_valid":true,"total_blocked":3,"dst_add_ok":3}
+{"enabled":true,"mode":"enforce","mitm":{"enabled":false}}
+BLOCK_DST:
+   17.250.105.4
+ALLOW_SAMPLE:
+   1.0.0.1
+   1.1.1.1
+   8.8.4.4
+   8.8.8.8
+   17.250.105.11
+MITM_SRC_N=0
+MITM_DST_N=0
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+p-mon-001|monitor|Monitor geral
+anti-bypass-dns|block|Anti-bypass DNS (DoH/DoT/Private Relay)
+profile-preset-protecao-infantil|block|Protecao infantil
+profile-anti-bypass-dns|block|Anti-bypass DNS
+profile-anydesk|block|AnyDesk
+profile-atera|block|Atera

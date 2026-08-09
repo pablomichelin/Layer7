@@ -1,0 +1,54 @@
+UTC=2026-08-09T22:47:42Z
+=== events involving 192.168.100.24 (last 80 matching) ===
+2026-08-09 19:34:35 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:34:35 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:34:37 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:34:37 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:34:46 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:34:46 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:35:13 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:35:13 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:35:13 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:35:13 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:35:46 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=- app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:35:46 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:40:56 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=- app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:40:56 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:40:59 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:40:59 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:45:47 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:45:47 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:45:53 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:45:53 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:45:54 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:45:54 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:45:58 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:45:59 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:45:59 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:45:59 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:46:02 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=p101-content.icloud.com app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:46:02 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:46:02 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=p101-content.icloud.com app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:46:02 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:46:16 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.4 host=p101-content.icloud.com app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:46:16 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:46:16 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.11 host=p101-content.icloud.com app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:46:16 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:47:24 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=- app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:47:24 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:47:26 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=p170-content.icloud.com app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:47:26 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:47:30 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.4 host=p170-content.icloud.com app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:47:30 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+=== BLOCK_DST now ===
+   17.250.105.4
+=== pf counters layer7 block ===
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+  [ Evaluations: 20003847  Packets: 817939    Bytes: 552826705   States: 0     ]
+--
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+  [ Evaluations: 218393    Packets: 0         Bytes: 0           States: 0     ]
+=== MITM still off? ===
+{"mitm_effective":false,"mitm_intercept_ready":true}
+pfctl: Table does not exist.
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
