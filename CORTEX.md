@@ -1361,12 +1361,12 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab
-- Continuidade: **PoC-1 IPC PASS** (`src/layer7-tlsproxy` 0.0.1-poc1); S5+S7+S8 PASS; 20.10 BLOQUEADO
+- Continuidade: **PoC-2** TLS em `192.168.100.54`; S2 lab PASS; S1 produto PENDING; 20.10 BLOQUEADO
+- Lab PoC: `root@192.168.100.54` (descartável) — docs/08-lab/lab-topology.md
+- Evidência PoC-2: docs/tests/evidence/20260809T041000Z-poc2-tls-lab-54/
 - Evidência PoC-1: docs/tests/evidence/20260809T031700Z-poc1-ipc-idle/
-- Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
-- Evidência S5/S7: docs/tests/evidence/20260809T031200Z-s5-s7-pre-runtime/
 - PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md
-- Plano rev.: 2026-08-09u
+- Plano rev.: 2026-08-09v
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS — mitm_effective sempre false sem runtime
@@ -1586,8 +1586,8 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **PoC-2** TLS em VM lab isolada (não `.254`/`.234`/`.235`); S1–S4/S6; **20.10** BLOQUEADO; GI2/GI3 DEFERRED; GO promoção enforce além 1.9.8; BG-028 fase 1
-- PoC tlsproxy: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-1 PASS; sem intercept prod)
+- Proximo trabalho: **PoC-3** (bypass/block HTTPS) em `.54`; S1 inline lab; **20.10** BLOQUEADO; GI2/GI3 DEFERRED
+- PoC tlsproxy: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-2 em `192.168.100.54`)
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

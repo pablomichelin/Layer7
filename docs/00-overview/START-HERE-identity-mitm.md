@@ -1,7 +1,7 @@
-# START HERE — Identity + MITM Add-on 【MITM GO lab — PoC-1 IPC PASS】
+# START HERE — Identity + MITM Add-on 【MITM GO lab — PoC-2 em .54】
 
 > **Visual:** Identity de rede **FECHADA** (`2026-08-08` — GI9 PASS).  
-> **MITM:** **GO lab** — **PoC-1 PASS** (IPC); passo **20.9 PASS**; binário `0.0.1-poc1`.  
+> **MITM:** **GO lab** — **PoC-2** TLS em `192.168.100.54` (`root`); passo **20.9 PASS**.  
 > Runtime produto **ausente** do `.pkg`; `mitm_effective` **sempre false**; **sem** intercept em `.254`/`.234`/`.235`; Squid **rejeitado**.  
 > Homologação Identity: `20260808T174100Z-im9-20.33-homolog-1.9.29`.
 
@@ -44,17 +44,17 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity rede **FECHADA**; MITM **GO lab** PoC-1 (rev. `2026-08-09u`) |
-| Passo actual | **20.9 PASS**; **PoC-1 PASS**; próximo **20.10** **bloqueado** (S1–S4/S6 + GO produto) |
-| Pré-20.10 (seguro) | PoC-2 TLS em VM isolada — [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
+| Plano | Identity rede **FECHADA**; MITM **GO lab** PoC-2 (rev. `2026-08-09v`) |
+| Passo actual | **20.9 PASS**; **PoC-2** em `.54`; **20.10** **bloqueado** |
+| Pré-20.10 (seguro) | Continuar PoC em **`192.168.100.54`** — [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** pin enforce; lab/`latest` **`1.9.38`** |
 | Rollback enforce conhecido | **`1.9.0`** |
-| Lab real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — `.254` + `.234` + `.235`; SSH pfSense **8=Shell** |
-| Código do produto nesta trilha | Identity **20.22+ PASS**; MITM **20.8–20.9** em `1.9.38`; PoC-1 IPC fora do `.pkg` |
-| Rev. do plano | **`2026-08-09u`** |
+| Lab real | Produção: `.254`+`.234`+`.235`; **PoC MITM:** **`.54`** (`root`); SSH pfSense **8=Shell** |
+| Código do produto nesta trilha | Identity **20.22+ PASS**; MITM **20.8–20.9**; PoC-2 `0.0.2-poc2` fora do `.pkg` |
+| Rev. do plano | **`2026-08-09v`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM (SKU; runtime produto ausente) |
-| MITM | **GO lab** — PoC-1 IPC PASS; intenção gravável; `mitm_effective` **false**; Squid **rejeitado**; GI2/GI3 **DEFERRED** |
+| MITM | **GO lab** — PoC-2 TLS `.54`; `mitm_effective` **false**; Squid **rejeitado**; GI2/GI3 **DEFERRED** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -140,8 +140,9 @@ Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective sempr
 um passo 20.x por bloco; português; barra UX PME (U*/P*/H*/N*); sem overclaim NGFW;
 sem claim de intercept; Squid rejeitado; não reabrir fecho/IPv6/Identity rede/endpoint sem GO;
 GI2/GI3 runtime DEFERRED até S1–S8 + GO lab.
-Tarefa: GO lab — PoC-1 PASS; próximo PoC-2 TLS só em VM isolada (NÃO .254/.234/.235).
-NÃO empacotar sem GO; NÃO claim effective=true; NÃO 20.10 produto.
+Tarefa: lab MITM = root@192.168.100.54 (descartável). PoC-2 TLS OK aí.
+NÃO intercept em .254/.234/.235; NÃO empacotar sem GO; NÃO claim effective=true; NÃO 20.10.
+Próximo: PoC-3 (bypass/block page) ou S1 inline só em .54.
 ```
 
 ## Prompt — propor desvio / ADR
@@ -162,13 +163,12 @@ Não implementar até GO. Responder em português.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
-- Continuidade agora: **PoC-1 IPC PASS**; **S5+S7+S8 PASS**; próximo **PoC-2** (TLS VM isolada)
-- PoC: src/layer7-tlsproxy + docs/09-blocking/poc-layer7-tlsproxy-lab.md
+- Continuidade agora: **PoC-2** em `192.168.100.54`; S2 lab PASS; S1 produto PENDING
+- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md
+- Evidência PoC-2: docs/tests/evidence/20260809T041000Z-poc2-tls-lab-54/
 - Evidência PoC-1: docs/tests/evidence/20260809T031700Z-poc1-ipc-idle/
-- Lab: docs/08-lab/lab-topology.md — SSH pfSense menu → **8 Shell**
-- Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
-- Evidência S5/S7: docs/tests/evidence/20260809T031200Z-s5-s7-pre-runtime/
-- Plano rev.: 2026-08-09u
+- Lab: docs/08-lab/lab-topology.md — `.54` descartável; prod `.254`/`.234`/`.235`
+- Plano rev.: 2026-08-09v
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md

@@ -18,6 +18,17 @@
 | `192.168.100.235` | Ubuntu cliente B (`zpro-aimirim`) | `root@192.168.100.235` (chave do Mac) |
 | `192.168.100.12` | Builder FreeBSD | `root` (ver `builder-freebsd.md`) |
 
+## Lab descartável MITM / tlsproxy (PoC)
+
+| Host | Papel | Acesso SSH |
+|------|--------|------------|
+| `192.168.100.54` | Ubuntu 24.04 — **lab isolado** para PoC `layer7-tlsproxy` | `root@192.168.100.54` (chave do Mac) |
+
+**Regra:** em `.54` o agente **pode** instalar deps, gerar CA de lab, bind TLS e medir S*.  
+**Proibido** repetir esses passos em `.254`/`.234`/`.235` sem GO produto explícito.
+
+Artefacto PoC no `.54`: `/opt/layer7-poc/` (binário + `lab-certs/` locais; chaves **fora** do git).
+
 **Importante:** o appliance **não** tem chave SSH para `.234`/`.235`.  
 Curls/orquestração: **sempre a partir do Mac** para os clientes (ver
 `tests/lab/run-im9-20.33-homolog-orchestrator.sh`).
@@ -64,12 +75,14 @@ inventar resultados a partir de stubs.
 
 ```text
   Mac (orquestrador)
-    |-- SSH root@254 ---------> pfSense Layer7 192.168.100.254
-    |-- SSH root@234 ---------> Ubuntu A "server"          192.168.100.234
-    |-- SSH root@235 ---------> Ubuntu B "zpro-aimirim"    192.168.100.235
+    |-- SSH root@254 ---------> pfSense Layer7 192.168.100.254   [PRODUÇÃO]
+    |-- SSH root@234 ---------> Ubuntu A "server"          192.168.100.234 [PRODUÇÃO]
+    |-- SSH root@235 ---------> Ubuntu B "zpro-aimirim"    192.168.100.235 [PRODUÇÃO]
+    |-- SSH root@54  ---------> Ubuntu lab MITM/PoC        192.168.100.54  [DESCARTÁVEL]
     |-- SSH root@12  ---------> Builder FreeBSD            192.168.100.12
 
   .234 / .235  --LAN-->  .254  --WAN-->  Internet
+  .54          --LAN-->  (PoC tlsproxy local; sem intercept prod)
 ```
 
 ## Diagnóstico / smokes

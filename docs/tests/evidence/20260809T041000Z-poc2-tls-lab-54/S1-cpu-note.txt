@@ -1,0 +1,3 @@
+cpu_busy_pct_during_200_hs=13.25
+note=localhost_lab_acceptor_not_inline_mitm
+s1_product_gate=PENDING_until_inline_path

@@ -3,19 +3,20 @@
  *
  * PoC-0: idle (--version / --health).
  * PoC-1: IPC PING on unix socket under /tmp with LAYER7_TLSPROXY_LAB=1.
+ * PoC-2: TLS listen lab-only (default 127.0.0.1) on disposable VM .54.
  *
- * No TLS terminate, no PF, no production bind.
  * Squid is rejected. See docs/09-blocking/poc-layer7-tlsproxy-lab.md
  */
 
 #include "ipc.h"
+#include "tls_lab.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifndef LAYER7_TLSPROXY_VERSION
-#define LAYER7_TLSPROXY_VERSION "0.0.1-poc1"
+#define LAYER7_TLSPROXY_VERSION "0.0.2-poc2"
 #endif
 
 static void
@@ -25,11 +26,35 @@ usage(const char *argv0)
 	    "usage: %s [--version] [--health] [--help]\n"
 	    "       %s --ipc-serve [--sock PATH] [--oneshot]\n"
 	    "       %s --ipc-ping  [--sock PATH]\n"
-	    "       %s --lab-allow-bind   (REQUIRES LAYER7_TLSPROXY_LAB=1; no TCP yet)\n"
+	    "       %s --lab-tls-listen [HOST:PORT] --cert CRT --key KEY [--oneshot]\n"
+	    "       %s --lab-allow-bind   (REQUIRES LAYER7_TLSPROXY_LAB=1)\n"
 	    "\n"
-	    "PoC-1: IPC only under /tmp with LAYER7_TLSPROXY_LAB=1.\n"
-	    "Never claims mitm_effective=true. No intercept on production hosts.\n",
-	    argv0, argv0, argv0, argv0);
+	    "Lab only: LAYER7_TLSPROXY_LAB=1. Default TLS bind 127.0.0.1.\n"
+	    "Use --lab-allow-any only on disposable .54 (never .254/.234/.235).\n"
+	    "Never claims mitm_effective=true.\n",
+	    argv0, argv0, argv0, argv0, argv0);
+}
+
+static int
+parse_host_port(const char *spec, char *host, size_t host_sz, int *port)
+{
+	const char *colon;
+	size_t hlen;
+
+	if (spec == NULL || host == NULL || port == NULL)
+		return -1;
+	colon = strrchr(spec, ':');
+	if (colon == NULL || colon == spec)
+		return -1;
+	hlen = (size_t)(colon - spec);
+	if (hlen == 0 || hlen >= host_sz)
+		return -1;
+	memcpy(host, spec, hlen);
+	host[hlen] = '\0';
+	*port = atoi(colon + 1);
+	if (*port <= 0 || *port > 65535)
+		return -1;
+	return 0;
 }
 
 static int
@@ -38,10 +63,11 @@ cmd_health(void)
 	printf("{\n");
 	printf("  \"service\": \"layer7-tlsproxy\",\n");
 	printf("  \"version\": \"%s\",\n", LAYER7_TLSPROXY_VERSION);
-	printf("  \"mode\": \"poc1-idle\",\n");
+	printf("  \"mode\": \"poc2\",\n");
 	printf("  \"bind\": false,\n");
 	printf("  \"intercept\": false,\n");
 	printf("  \"ipc_capable\": true,\n");
+	printf("  \"tls_lab_capable\": true,\n");
 	printf("  \"mitm_effective_claim\": false,\n");
 	printf("  \"lab_env\": %s,\n",
 	    l7_ipc_lab_ok() ? "true" : "false");
@@ -54,10 +80,16 @@ int
 main(int argc, char **argv)
 {
 	const char *sock = L7_IPC_DEFAULT_SOCK;
+	const char *cert = NULL;
+	const char *key = NULL;
+	const char *listen_spec = "127.0.0.1:8443";
+	char host[64];
+	int port = 8443;
 	int oneshot = 0;
 	int i;
 	int mode_serve = 0;
 	int mode_ping = 0;
+	int mode_tls = 0;
 
 	if (argc < 2) {
 		usage(argv[0]);
@@ -86,6 +118,17 @@ main(int argc, char **argv)
 			mode_ping = 1;
 			continue;
 		}
+		if (strcmp(argv[i], "--lab-tls-listen") == 0) {
+			mode_tls = 1;
+			if (i + 1 < argc && argv[i + 1][0] != '-') {
+				listen_spec = argv[++i];
+			}
+			continue;
+		}
+		if (strcmp(argv[i], "--lab-allow-any") == 0) {
+			l7_tls_set_allow_any(1);
+			continue;
+		}
 		if (strcmp(argv[i], "--oneshot") == 0) {
 			oneshot = 1;
 			continue;
@@ -98,6 +141,22 @@ main(int argc, char **argv)
 			sock = argv[++i];
 			continue;
 		}
+		if (strcmp(argv[i], "--cert") == 0) {
+			if (i + 1 >= argc) {
+				fprintf(stderr, "--cert requires PATH\n");
+				return 2;
+			}
+			cert = argv[++i];
+			continue;
+		}
+		if (strcmp(argv[i], "--key") == 0) {
+			if (i + 1 >= argc) {
+				fprintf(stderr, "--key requires PATH\n");
+				return 2;
+			}
+			key = argv[++i];
+			continue;
+		}
 		if (strcmp(argv[i], "--lab-allow-bind") == 0) {
 			if (!l7_ipc_lab_ok()) {
 				fprintf(stderr,
@@ -107,8 +166,7 @@ main(int argc, char **argv)
 				return 3;
 			}
 			fprintf(stderr,
-			    "layer7-tlsproxy: PoC-1 has no TCP bind yet.\n"
-			    "lab flag accepted; intercept still disabled.\n");
+			    "layer7-tlsproxy: use --lab-tls-listen for PoC-2 TLS.\n");
 			return 4;
 		}
 		fprintf(stderr, "unknown option: %s\n", argv[i]);
@@ -116,14 +174,21 @@ main(int argc, char **argv)
 		return 2;
 	}
 
-	if (mode_serve && mode_ping) {
-		fprintf(stderr, "choose --ipc-serve or --ipc-ping, not both\n");
+	if ((mode_serve + mode_ping + mode_tls) > 1) {
+		fprintf(stderr, "choose one of --ipc-serve / --ipc-ping / --lab-tls-listen\n");
 		return 2;
 	}
 	if (mode_serve)
 		return l7_ipc_serve(sock, oneshot);
 	if (mode_ping)
 		return l7_ipc_ping(sock);
+	if (mode_tls) {
+		if (parse_host_port(listen_spec, host, sizeof(host), &port) != 0) {
+			fprintf(stderr, "invalid listen spec (want HOST:PORT)\n");
+			return 2;
+		}
+		return l7_tls_lab_listen(host, port, cert, key, oneshot);
+	}
 
 	usage(argv[0]);
 	return 2;
