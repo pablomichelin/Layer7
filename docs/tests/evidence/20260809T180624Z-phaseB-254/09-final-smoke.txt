@@ -1,0 +1,7 @@
+GUI=200
+layer7d is running as pid 88862.
+INET=OK
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+  interface: vmx0
+STATICROUTES_CONFIG_EMPTY=yes

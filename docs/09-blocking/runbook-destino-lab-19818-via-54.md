@@ -1,10 +1,11 @@
 # Runbook — destino HTTPS lab local (`198.18.0.10/32` via `.54`)
 
-**Estado:** **Fase A = PASS** (`20260809T180157Z` na `.54`); **Fase B = aguarda GO humano**.  
+**Estado:** **Fase A = PASS**; **Fase B = PASS** (`20260809T180624Z` no `.254`); **Fase C = aguarda GO humano**.  
 **Tipo:** topologia de teste sem VPS (custo zero).  
-**Pré-requisito pacote:** `.254` já em `1.9.42` passivo (MITM OFF) — confirmado read-only após Fase A.  
+**Pré-requisito pacote:** `.254` `1.9.42` passivo (MITM OFF) — confirmado durante Fase B.  
 **Proibido neste desenho:** `.234` / `.235`; mutações sem fail-safe; CDN público.  
-**Evidência Fase A:** [`docs/tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/)
+**Evidência Fase A:** [`docs/tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/)  
+**Evidência Fase B:** [`docs/tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/)
 
 ---
 
@@ -96,29 +97,28 @@ Tráfego `.24`→`.54` é L2 on-link: **não** entra no gateway `.254` ⇒ rdr M
 **Estado deixado UP** para Fase B (listener + alias + rota retorno).  
 **Rollback A (executável):** `ssh root@192.168.100.54 '/opt/layer7-poc/mitm-lab-a/phase-a-control.sh rollback'`
 
-### Fase B — Rota + pass mínimo no `.254` (produção; janela curta)
+### Fase B — Rota + pass mínimo no `.254` (produção; janela curta) — **PASS** `2026-08-09T18:06:24Z`
 
-**Escrita em `.254` (após GO explícito desta fase).**
+**Escrita em `.254` (GO humano recebido e executado).**
 
-1. Confirmar backup config ainda válido (`/tmp/config.xml.bak-pre-mitm-19242-*`).  
-2. Pré-check: `pfctl -sr | egrep 'reply-to|route-to'` → se houver match relevante a LAN/vmx0, **ABORT** e reavaliar.  
-3. Rota estática (GUI ou `route`): `198.18.0.10/32` → gateway `192.168.100.54` na interface LAN.  
-4. Se forward falhar por policy: **uma** regra pass temporária  
-   `pass in quick on vmx0 inet proto tcp from 192.168.100.24 to 198.18.0.10 port 443`  
-   (+ out correspondente se necessário) — **não** `from any`.  
-5. Fail-safe temporizado (ex. 20 min): script/`at` que remove rota + regra.
+1. Backup operacional: `/tmp/config.xml.bak-phaseB-20260809T180624Z` (+ bak passivo prévio).  
+2. Pré-check `reply-to`/`route-to`: matches existem (WAN dual + policy pontual `.244`/dest `191.5.179.29`); **nenhum** conflito com path `vmx0→198.18.0.10` → prosseguiu.  
+3. Rota **runtime apenas** (sem GUI/`staticroutes`): `route add -host 198.18.0.10 192.168.100.54`.  
+4. Regra PF temporária: **não necessária** — `pass in quick on vmx0 inet all` já permite; TLS/ICMP `.254→lab` OK.  
+5. Fail-safe ≤20 min: `sleep 1140` + `at now + 15 minutes` → `/tmp/l7-phaseB-rollback.sh` (validado antes da rota).
 
-**Testes B (antes de MITM):**
+**Testes B executados (sem tocar `.24`):**
 
 ```text
-No .254: tcpdump -ni vmx0 host 198.18.0.10 and host 192.168.100.24
-No .54:  tcpdump -ni ens160 host 198.18.0.10
-No .24:  curl/browser https://mitm-lab.test/  (com hosts)
-Gates: pacotes SYN via .254; respostas regressam via .254 (não só L2 .54→.24);
-       GUI :9999 OK; Internet OK
+route get 198.18.0.10 → gateway 192.168.100.54 (vmx0)
+curl/openssl .254 → mitm-lab.test @198.18.0.10 → L7-PHASE-A-OK-198.18.0.10
+tcpdump vmx0 + ens160: SYN/ACK :443 + ICMP
+GUI :9999=200; layer7d running; Internet OK; zero :8443 / rdr MITM
+staticroutes config vazio (não persistido)
 ```
 
-**Rollback B:** apagar rota `198.18.0.10/32`; remover regra pass; confirmar `netstat -rn` limpo; GUI 9999 + ping Internet.
+**Estado deixado UP** com fail-safe armado (rota some ao disparar).  
+**Rollback B:** `ssh root@192.168.100.254 '/tmp/l7-phaseB-rollback.sh'`
 
 ### Fase C — Cliente `.24` apenas (DNS/hosts + CA)
 
@@ -163,7 +163,8 @@ Abort se rdr tiver `from any` ou tabelas sem src.
 | Usar IP `192.168.100.54` como `dest_cidr`? | **NO-GO** (mesmo L2) |
 | Usar `198.18.0.10/32` + rota via `.54`? | **GO CONDICIONAL** |
 | Condições do GO | (1) rota retorno `.24 via .254` na `.54`; (2) pré-check `reply-to/route-to`; (3) pass PF mínimo só `.24`; (4) fail-safe temporizado + rollback; (5) fases A→B→C antes de qualquer MITM; (6) `.234/.235` intocados |
-| Aplicar Fase A? | **GO executado — PASS** (evidência `20260809T180157Z-phaseA-54`) |
-| Aplicar Fase B agora? | **NO-GO automático** — falta **GO humano explícito** só para B |
+| Aplicar Fase A? | **GO executado — PASS** (`20260809T180157Z-phaseA-54`) |
+| Aplicar Fase B? | **GO executado — PASS** (`20260809T180624Z-phaseB-254`; PF extra não preciso) |
+| Aplicar Fase C agora? | **NO-GO automático** — falta **GO humano explícito** só para C (`.24`) |
 
-**Pedido ao proprietário:** confirmar **GO explícito para Fase B** (rota + pass mínimo no `.254`). Não empacotar B+C+D num único GO.
+**Pedido ao proprietário:** confirmar **GO explícito para Fase C** (hosts/CA só na `.24`). Não empacotar C+D num único GO. **Atenção:** fail-safe B remove a rota ~15–19 min após apply — estender fail-safe se C não for imediato.

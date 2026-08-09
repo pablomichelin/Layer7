@@ -1,0 +1,8 @@
+Job 2 will be executed using /bin/sh
+sleep_pid=80059
+sleep_sec=1140
+at_jobs:
+Date				Owner		Queue	Job#
+Sun Aug  9 15:21:00 -03 2026	root            c	2
+  PID COMMAND
+80059 sh -c sleep 1140; /tmp/l7-phaseB-rollback.sh >>/tmp/l7-phaseB-failsafe.log 2>&1; echo FAILSAFE_FIRED $(date -u) >>/tmp/l7-phaseB-failsafe.log

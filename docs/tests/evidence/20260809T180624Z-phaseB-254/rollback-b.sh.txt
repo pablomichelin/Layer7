@@ -1,0 +1,11 @@
+#!/bin/sh
+LAB_DST=198.18.0.10
+ANCHOR=layer7-phaseB-lab
+echo "ROLLBACK_B_START $(date -u)"
+# remove temp PF anchor if loaded
+pfctl -a "$ANCHOR" -F all 2>/dev/null || true
+# delete host route (ignore if absent)
+route delete -host "$LAB_DST" 2>/dev/null || true
+echo "ROUTE_AFTER:"
+route -n get "$LAB_DST" 2>&1 | head -12 || true
+echo "ROLLBACK_B_DONE $(date -u)"

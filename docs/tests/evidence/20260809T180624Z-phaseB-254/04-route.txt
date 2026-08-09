@@ -1,0 +1,12 @@
+Sun Aug  9 18:06:27 UTC 2026
+Destination        Gateway            Flags         Netif Expire
+198.18.0.10        192.168.100.54     UGHS           vmx0
+Destination                       Gateway                       Flags         Netif Expire
+   route to: 198.18.0.10
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+        fib: 0
+  interface: vmx0
+      flags: <UP,GATEWAY,HOST,DONE,STATIC>
+ recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+       0         0         0         0      1500         1         0 

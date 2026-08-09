@@ -1,0 +1,23 @@
+18:06:42.931996 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [S], seq 3932936115, win 65228, options [mss 1460,nop,wscale 7,sackOK,TS val 2396005959 ecr 0], length 0
+18:06:42.932097 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [S.], seq 2919149499, ack 3932936116, win 65160, options [mss 1460,sackOK,TS val 1097638899 ecr 2396005959,nop,wscale 7], length 0
+18:06:42.932345 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [.], ack 1, win 514, options [nop,nop,TS val 2396005959 ecr 1097638899], length 0
+18:06:42.936248 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [P.], seq 1:1565, ack 1, win 514, options [nop,nop,TS val 2396005959 ecr 1097638899], length 1564
+18:06:42.936271 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [.], ack 1565, win 497, options [nop,nop,TS val 1097638903 ecr 2396005959], length 0
+18:06:42.937534 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [P.], seq 1:1408, ack 1565, win 497, options [nop,nop,TS val 1097638905 ecr 2396005959], length 1407
+18:06:42.937802 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [.], ack 1408, win 504, options [nop,nop,TS val 2396005959 ecr 1097638905], length 0
+18:06:42.940034 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [P.], seq 1565:1645, ack 1408, win 514, options [nop,nop,TS val 2396005969 ecr 1097638905], length 80
+18:06:42.940146 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [P.], seq 1645:1744, ack 1408, win 514, options [nop,nop,TS val 2396005969 ecr 1097638905], length 99
+18:06:42.940167 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [P.], seq 1408:1663, ack 1744, win 496, options [nop,nop,TS val 1097638907 ecr 2396005969], length 255
+18:06:42.940444 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [.], ack 1663, win 513, options [nop,nop,TS val 2396005969 ecr 1097638907], length 0
+18:06:42.940451 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [P.], seq 1663:1918, ack 1744, win 496, options [nop,nop,TS val 1097638908 ecr 2396005969], length 255
+18:06:42.940615 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [.], ack 1918, win 512, options [nop,nop,TS val 2396005969 ecr 1097638908], length 0
+18:06:42.940719 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [P.], seq 1918:2126, ack 1744, win 496, options [nop,nop,TS val 1097638908 ecr 2396005969], length 208
+18:06:42.940806 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [FP.], seq 2126:2403, ack 1744, win 496, options [nop,nop,TS val 1097638908 ecr 2396005969], length 277
+18:06:42.940865 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [.], ack 2126, win 512, options [nop,nop,TS val 2396005969 ecr 1097638908], length 0
+18:06:42.940946 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [.], ack 2404, win 512, options [nop,nop,TS val 2396005969 ecr 1097638908], length 0
+18:06:42.941065 IP 192.168.100.254.34878 > 198.18.0.10.443: Flags [P.], seq 1744:1768, ack 2404, win 514, options [nop,nop,TS val 2396005969 ecr 1097638908], length 24
+18:06:42.941075 IP 198.18.0.10.443 > 192.168.100.254.34878: Flags [R], seq 2919151903, win 0, length 0
+18:06:42.952818 IP 192.168.100.254 > 198.18.0.10: ICMP echo request, id 10499, seq 0, length 64
+18:06:42.952828 IP 198.18.0.10 > 192.168.100.254: ICMP echo reply, id 10499, seq 0, length 64
+18:06:43.970967 IP 192.168.100.254 > 198.18.0.10: ICMP echo request, id 10499, seq 1, length 64
+18:06:43.971002 IP 198.18.0.10 > 192.168.100.254: ICMP echo reply, id 10499, seq 1, length 64

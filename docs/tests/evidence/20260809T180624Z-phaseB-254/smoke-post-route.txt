@@ -1,0 +1,9 @@
+=== SMOKE post-route ===
+Sun Aug  9 18:06:27 UTC 2026
+GUI=200
+layer7d is running as pid 88862.
+INET_PING=OK
+INET_CURL=OK
+no_8443
+no_mitm_rdr
+ROUTE_LAB=destination: 198.18.0.10     gateway: 192.168.100.54 

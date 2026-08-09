@@ -1,0 +1,13 @@
+PF_RULE_NEEDED=no
+REASON=pass in quick on vmx0 inet all exists; route+TLS from .254 OK; no block to 198.18 observed
+LAN_PASS_ALL_RULE:
+pass in quick on vmx0 inet all flags S/SA keep state (if-bound) label "id=1624548664" label "tags=user_rule" ridentifier 1624548664
+NO_ANCHOR_LOADED=pfctl: Anchor does not exist.
+FAILSAFE_STILL:
+  PID ELAPSED COMMAND
+80059   00:28 sh -c sleep 1140; /tmp/l7-phaseB-rollback.sh >>/tmp/l7-phaseB-failsafe.log 2>&1; echo FAILSAFE_FIRED $(date -u) >>/tmp/l7-phaseB-failsafe.log
+Date				Owner		Queue	Job#
+Sun Aug  9 15:21:00 -03 2026	root            c	2
+MITM_STILL_OFF:
+no_8443
+no_mitm_rdr

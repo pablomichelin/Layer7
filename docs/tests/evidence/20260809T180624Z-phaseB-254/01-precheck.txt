@@ -1,0 +1,14 @@
+PKG=1.9.42
+FORWARD=1
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet proto tcp from 192.168.100.244 port = 10058 to 177.38.10.224 port = 10058 flags S/SA keep state (if-bound) label "id=1759256664" label "tags=user_rule" label "descr=Saida Direcionada Storage Gentil" ridentifier 1759256664
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet proto udp from 192.168.100.244 port = 10058 to 177.38.10.224 port = 10058 keep state (if-bound) label "id=1759256664" label "tags=user_rule" label "descr=Saida Direcionada Storage Gentil" ridentifier 1759256664
+LAN_PASS_ALL=1
+   route to: 198.18.0.10
+destination: 0.0.0.0
+       mask: 0.0.0.0
+    gateway: 10.99.99.35
+        fib: 0
+  interface: pppoe0
+      flags: <UP,GATEWAY,DONE,STATIC>
+ recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+       0         0         0         0      1492         1         0 
