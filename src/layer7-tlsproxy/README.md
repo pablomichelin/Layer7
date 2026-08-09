@@ -1,26 +1,14 @@
 # layer7-tlsproxy (PoC lab)
 
-**Estado:** PoC-2 TLS lab (`0.0.2-poc2`)  
-**Lab autorizado:** `root@192.168.100.54`  
-**NÃO** é runtime de produto / 20.10.
-
-## Comandos
+**Estado:** PoC-3 (`0.0.3-poc3`) — SNI bypass/block + página HTTPS  
+**Lab:** `root@192.168.100.54`
 
 ```bash
-make && make test
-# No .54, com certs em lab-certs/:
 export LAYER7_TLSPROXY_LAB=1
-./layer7-tlsproxy --lab-tls-listen 127.0.0.1:8443 --cert lab-certs/server.crt --key lab-certs/server.key
-curl -k https://127.0.0.1:8443/
-make test-tls-lab
+./layer7-tlsproxy --lab-tls-listen 127.0.0.1:8443 \
+  --cert lab-certs/server.crt --key lab-certs/server.key \
+  --block-sni blocked.test --bypass-sni bank.example
+curl -k --resolve blocked.test:8443:127.0.0.1 https://blocked.test:8443/
 ```
 
-## Regras
-
-- `LAYER7_TLSPROXY_LAB=1` obrigatório para IPC/TLS.
-- TLS default `127.0.0.1`; `0.0.0.0` só com `--lab-allow-any` (somente `.54`).
-- Respostas afirmam `mitm_effective:false`.
-- **Proibido** em `.254` / `.234` / `.235`.
-- Chaves **nunca** no git (`lab-certs/` gitignored).
-
-Ver: `docs/09-blocking/poc-layer7-tlsproxy-lab.md`
+Regras: sem lab env → recusa; `mitm_effective` nunca true; nunca em `.254`/`.234`/`.235`.

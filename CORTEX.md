@@ -1361,12 +1361,10 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab
-- Continuidade: **PoC-2** TLS em `192.168.100.54`; S2 lab PASS; S1 produto PENDING; 20.10 BLOQUEADO
-- Lab PoC: `root@192.168.100.54` (descartável) — docs/08-lab/lab-topology.md
-- Evidência PoC-2: docs/tests/evidence/20260809T041000Z-poc2-tls-lab-54/
-- Evidência PoC-1: docs/tests/evidence/20260809T031700Z-poc1-ipc-idle/
-- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md
-- Plano rev.: 2026-08-09v
+- Continuidade: **PoC-3 PASS** (S3/S4) em `192.168.100.54`; S1 produto PENDING; 20.10 BLOQUEADO
+- Lab PoC: `root@192.168.100.54`
+- Evidência PoC-3: docs/tests/evidence/20260809T041800Z-poc3-sni-s3s4-54/
+- Plano rev.: 2026-08-09w
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS — mitm_effective sempre false sem runtime
@@ -1586,8 +1584,8 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **PoC-3** (bypass/block HTTPS) em `.54`; S1 inline lab; **20.10** BLOQUEADO; GI2/GI3 DEFERRED
-- PoC tlsproxy: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-2 em `192.168.100.54`)
+- Proximo trabalho: splice/upstream ou S1 inline **só** em `.54`; **20.10** BLOQUEADO
+- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-3 PASS)
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

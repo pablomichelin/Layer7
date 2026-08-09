@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity rede **FECHADA**; MITM **GO lab** (rev. `2026-08-09v`; **20.9 PASS**; PoC-2 em `.54`; 20.10 bloqueado)
+**Estado do plano:** Identity **FECHADA**; MITM **GO lab** (rev. `2026-08-09w`; PoC-3 PASS em `.54`; 20.10 bloqueado)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -27,7 +27,8 @@
 **Rev. `s` (`2026-08-09`)** = S5+S7+S8 PASS pré-runtime.  
 **Rev. `t` (`2026-08-09`)** = **GO lab** PoC-0 idle `layer7-tlsproxy`; sem produção; 20.10 bloqueado.  
 **Rev. `u` (`2026-08-09`)** = **PoC-1 PASS** — IPC PING lab-only; `mitm_effective` false.  
-**Rev. `v` (`2026-08-09`)** = lab `.54` + **PoC-2** TLS localhost PASS (S2); S1 produto PENDING.
+**Rev. `v` (`2026-08-09`)** = lab `.54` + **PoC-2** TLS localhost PASS (S2); S1 produto PENDING.  
+**Rev. `w` (`2026-08-09`)** = **PoC-3 PASS** — SNI bypass/block + página HTTPS (S3/S4 lab).
 
 ---
 
@@ -35,21 +36,17 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.9 PASS**; **PoC-2** em `192.168.100.54`; **20.10** **bloqueado** |
-| Código | PoC `src/layer7-tlsproxy/` **0.0.2-poc2** (fora do `.pkg`) |
-| ADRs | **0026**; Squid rejeitado |
-| MITM | GO lab; TLS lab `.54`; `mitm_effective` **false** |
-| Identity rede | **FECHADA** |
-| Próximo | PoC-3 em `.54` (S3/S4) ou S1 inline só em lab; 20.10 só com GO produto |
-| Lab PoC | **`192.168.100.54`** root — descartável |
+| Passo actual | **20.9 PASS**; **PoC-3 PASS** em `.54`; **20.10** bloqueado |
+| Código | `src/layer7-tlsproxy/` **0.0.3-poc3** (fora do `.pkg`) |
+| Próximo | Splice/upstream ou S1 inline **só** em `.54`; GO produto → 20.10 |
+| Lab PoC | **`192.168.100.54`** root |
 
 ```text
-TRILHA IDENTITY + MITM — progresso
-- Passo: **20.9 PASS**; PoC-2 em .54 (S2 lab PASS)
-- 20.10: BLOQUEADO
-- Lab PoC: 192.168.100.54 (root) — NÃO .254/.234/.235
-- Evidência: docs/tests/evidence/20260809T041000Z-poc2-tls-lab-54/
-- Plano rev.: 2026-08-09v
+TRILHA — progresso
+- PoC-3 PASS (S3/S4) em 192.168.100.54
+- 20.10 BLOQUEADO; mitm_effective false
+- Evidência: 20260809T041800Z-poc3-sni-s3s4-54
+- Plano rev.: 2026-08-09w
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)

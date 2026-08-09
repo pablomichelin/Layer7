@@ -1,11 +1,9 @@
 /*
  * layer7-tlsproxy — helper MITM opt-in (PoC lab).
  *
- * PoC-0: idle (--version / --health).
- * PoC-1: IPC PING on unix socket under /tmp with LAYER7_TLSPROXY_LAB=1.
- * PoC-2: TLS listen lab-only (default 127.0.0.1) on disposable VM .54.
- *
- * Squid is rejected. See docs/09-blocking/poc-layer7-tlsproxy-lab.md
+ * PoC-0 idle · PoC-1 IPC · PoC-2 TLS · PoC-3 SNI bypass/block + HTTPS page
+ * Lab: root@192.168.100.54 only for destructive TLS.
+ * Squid rejected. docs/09-blocking/poc-layer7-tlsproxy-lab.md
  */
 
 #include "ipc.h"
@@ -16,7 +14,7 @@
 #include <string.h>
 
 #ifndef LAYER7_TLSPROXY_VERSION
-#define LAYER7_TLSPROXY_VERSION "0.0.2-poc2"
+#define LAYER7_TLSPROXY_VERSION "0.0.3-poc3"
 #endif
 
 static void
@@ -26,13 +24,12 @@ usage(const char *argv0)
 	    "usage: %s [--version] [--health] [--help]\n"
 	    "       %s --ipc-serve [--sock PATH] [--oneshot]\n"
 	    "       %s --ipc-ping  [--sock PATH]\n"
-	    "       %s --lab-tls-listen [HOST:PORT] --cert CRT --key KEY [--oneshot]\n"
-	    "       %s --lab-allow-bind   (REQUIRES LAYER7_TLSPROXY_LAB=1)\n"
+	    "       %s --lab-tls-listen [HOST:PORT] --cert CRT --key KEY \\\n"
+	    "          [--bypass-sni HOST]... [--block-sni HOST]... [--oneshot]\n"
 	    "\n"
 	    "Lab only: LAYER7_TLSPROXY_LAB=1. Default TLS bind 127.0.0.1.\n"
-	    "Use --lab-allow-any only on disposable .54 (never .254/.234/.235).\n"
-	    "Never claims mitm_effective=true.\n",
-	    argv0, argv0, argv0, argv0, argv0);
+	    "Never claims mitm_effective=true. Never on .254/.234/.235.\n",
+	    argv0, argv0, argv0, argv0);
 }
 
 static int
@@ -63,11 +60,12 @@ cmd_health(void)
 	printf("{\n");
 	printf("  \"service\": \"layer7-tlsproxy\",\n");
 	printf("  \"version\": \"%s\",\n", LAYER7_TLSPROXY_VERSION);
-	printf("  \"mode\": \"poc2\",\n");
+	printf("  \"mode\": \"poc3\",\n");
 	printf("  \"bind\": false,\n");
 	printf("  \"intercept\": false,\n");
 	printf("  \"ipc_capable\": true,\n");
 	printf("  \"tls_lab_capable\": true,\n");
+	printf("  \"sni_policy\": true,\n");
 	printf("  \"mitm_effective_claim\": false,\n");
 	printf("  \"lab_env\": %s,\n",
 	    l7_ipc_lab_ok() ? "true" : "false");
@@ -102,9 +100,8 @@ main(int argc, char **argv)
 			printf("layer7-tlsproxy %s\n", LAYER7_TLSPROXY_VERSION);
 			return 0;
 		}
-		if (strcmp(argv[i], "--health") == 0) {
+		if (strcmp(argv[i], "--health") == 0)
 			return cmd_health();
-		}
 		if (strcmp(argv[i], "--help") == 0 ||
 		    strcmp(argv[i], "-h") == 0) {
 			usage(argv[0]);
@@ -120,9 +117,8 @@ main(int argc, char **argv)
 		}
 		if (strcmp(argv[i], "--lab-tls-listen") == 0) {
 			mode_tls = 1;
-			if (i + 1 < argc && argv[i + 1][0] != '-') {
+			if (i + 1 < argc && argv[i + 1][0] != '-')
 				listen_spec = argv[++i];
-			}
 			continue;
 		}
 		if (strcmp(argv[i], "--lab-allow-any") == 0) {
@@ -157,16 +153,38 @@ main(int argc, char **argv)
 			key = argv[++i];
 			continue;
 		}
+		if (strcmp(argv[i], "--bypass-sni") == 0) {
+			if (i + 1 >= argc) {
+				fprintf(stderr, "--bypass-sni requires HOST\n");
+				return 2;
+			}
+			if (l7_tls_policy_add_bypass(argv[++i]) != 0) {
+				fprintf(stderr, "invalid/too many --bypass-sni\n");
+				return 2;
+			}
+			continue;
+		}
+		if (strcmp(argv[i], "--block-sni") == 0) {
+			if (i + 1 >= argc) {
+				fprintf(stderr, "--block-sni requires HOST\n");
+				return 2;
+			}
+			if (l7_tls_policy_add_block(argv[++i]) != 0) {
+				fprintf(stderr, "invalid/too many --block-sni\n");
+				return 2;
+			}
+			continue;
+		}
 		if (strcmp(argv[i], "--lab-allow-bind") == 0) {
 			if (!l7_ipc_lab_ok()) {
 				fprintf(stderr,
 				    "layer7-tlsproxy: refusing bind — "
-				    "set LAYER7_TLSPROXY_LAB=1 for PoC only "
+				    "set LAYER7_TLSPROXY_LAB=1 "
 				    "(never on production .254).\n");
 				return 3;
 			}
 			fprintf(stderr,
-			    "layer7-tlsproxy: use --lab-tls-listen for PoC-2 TLS.\n");
+			    "layer7-tlsproxy: use --lab-tls-listen.\n");
 			return 4;
 		}
 		fprintf(stderr, "unknown option: %s\n", argv[i]);
@@ -175,7 +193,7 @@ main(int argc, char **argv)
 	}
 
 	if ((mode_serve + mode_ping + mode_tls) > 1) {
-		fprintf(stderr, "choose one of --ipc-serve / --ipc-ping / --lab-tls-listen\n");
+		fprintf(stderr, "choose one mode only\n");
 		return 2;
 	}
 	if (mode_serve)

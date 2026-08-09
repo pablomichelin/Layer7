@@ -1,0 +1,7 @@
+host=192.168.100.54
+bin=0.0.3-poc3
+S3=PASS block page HTML 403 via SNI blocked.test
+S4=PASS bypass verdict for bank.example
+allow=PASS other.test
+mitm_effective=false
+S6=NOTE ECH not exercised; cleartext SNI visible in lab
