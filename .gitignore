@@ -30,6 +30,10 @@ scripts/lab/
 /build/
 /release/
 /releases/
+/tmp-release/
+
+# Pacotes locais retidos: só README + .sha256 no git; .pkg ficam locais (*.pkg)
+# Ver artifacts/retained/README.md
 
 # Tools locais
 /tools/
