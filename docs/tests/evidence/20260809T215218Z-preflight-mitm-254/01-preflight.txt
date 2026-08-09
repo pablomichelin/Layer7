@@ -1,0 +1,32 @@
+PKG=1.9.46
+SHA_TMP=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5
+GUI=200
+NET=OK
+SSH_LISTEN=1
+LISTEN9999=3
+LISTEN8443=0
+EFF=NO
+GATE=NO
+TLSPROXY=layer7_tlsproxy is not running (default OFF; 20.10b gated).
+LAYER7D=layer7d is running as pid 60231.
+RDR=0
+QUIC=0
+SRC=0
+DST=0
+ATQ=0
+   route to: 198.18.0.10
+destination: 0.0.0.0
+       mask: 0.0.0.0
+    gateway: 10.99.99.35
+        fib: 0
+  interface: pppoe0
+      flags: <UP,GATEWAY,DONE,STATIC>
+ recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+enabled=false
+quic_mode=bypass
+source=[]
+dest=[]
+block_sni=[]
+ca_present=false
+entitlement_mitm=true
+mitm_effective=false

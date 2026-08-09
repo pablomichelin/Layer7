@@ -1,7 +1,10 @@
-# Runbook — activação MITM produção (pós-`1.9.42`)
+# Runbook — activação MITM produção (pós-`1.9.42`) — **HISTÓRICO**
 
-**Estado:** **etapa passiva FEITA** em `.254` (`1.9.42`, smoke PASS `20260809T175111Z`); activação MITM/rdr **ainda pendente** de GO + destino dedicado.  
-**Pré-requisito pacote:** `1.9.42`  
+> **Superseded** por [`runbook-activacao-mitm-producao-1.9.46.md`](runbook-activacao-mitm-producao-1.9.46.md)  
+> (`1.9.46` SHA `10998477…ae72f5`; anti-QUIC escopo; **`quic_mode=block`** — não usar `bypass` da tabela abaixo).
+
+**Estado:** **HISTÓRICO** — etapa passiva FEITA em `.254` (`1.9.42`, smoke PASS `20260809T175111Z`).  
+**Pré-requisito pacote (este doc):** `1.9.42`  
 `SHA256=6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`  
 **Cliente de teste único:** `192.168.100.24/32` (VM Windows descartável)  
 **Proibido:** `.234` / `.235` como clientes; senha Windows neste documento.  

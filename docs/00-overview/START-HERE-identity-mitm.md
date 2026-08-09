@@ -49,9 +49,9 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Campo | Valor |
 |-------|-------|
 | Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.46`** (Gate C PASS) |
-| Passo actual | **`1.9.46` publicada** — Gate B+C PASS; MITM produção `.254` **DEFER** (GO + runbook) |
+| Passo actual | **`1.9.46`** — Gate B+C PASS; **GO humano** teste MITM controlado `.254` (não permanente) |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B) PASS**; **C) PASS** (`210753Z`) |
-| Próximo | GO humano activação MITM escopada produção (runbook); `.234`/`.235` proibidos |
+| Próximo | Executar runbook `1.9.46` (janela ≤15 min) + rollback obrigatório; `.234`/`.235` proibidos |
 | Rev. do plano | **`2026-08-09ao`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
@@ -133,16 +133,16 @@ Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
 Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; Gate C PASS (anti-QUIC escopo).
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
 GO produto: docs/09-blocking/GO-produto-20.10.md
-Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md
+Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (GO produção MITM via runbook; sem escrita .254 sem GO).
+Ler na ordem do START-HERE; executar só o próximo bloco seguro (GO teste MITM controlado via runbook 1.9.46; NÃO permanente).
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
-rdr só source∧dest; anti-QUIC UDP/443 só mitm_src→mitm_dst; um passo/bloco por entrega; português;
-barra UX PME; Squid rejeitado; S6 ECH = NA/limite; NÃO activar intercept em .254/.234/.235 sem GO.
-Estado: 1.9.46 Gate B+C PASS (evidência 20260809T210753Z; Edge sem --disable-quic); plano rev. 2026-08-09ao.
+rdr só source∧dest; anti-QUIC UDP/443 só mitm_src→mitm_dst; quic_mode=block (sem bypass); um passo/bloco; português;
+barra UX PME; Squid rejeitado; S6 ECH = NA/limite; NÃO activar intercept permanente em .254/.234/.235.
+Estado: 1.9.46 Gate B+C PASS (evidência 20260809T210753Z); GO humano teste controlado .254 (≤15 min).
 Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md — B) PASS; C) PASS.
-Tarefa seguinte: GO humano activação MITM escopada produção (runbook); sem mutar .234/.235.
+Tarefa seguinte: executar runbook 1.9.46 + rollback; sem mutar .234/.235.
 ```
 
 
@@ -167,7 +167,7 @@ SSOT: [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-
 | Doc | D0 + D1 local | **PASS** |
 | Builder (antes publish) | `make -C src/layer7-tlsproxy test-regress` · `test_mitm_regress.php` · `test_ctrl_exec_timeout.php` · `run-local-timeout-fix.sh` · `test_mitm_config.php` | **PASS** (`1.9.46`) |
 | Humano | B+D Edge `.24` sem bypass TLS **nem** `--disable-quic` | **PASS** (`20260809T210753Z-phaseBD-d1-254`) |
-| Produção | MITM em `.254` | **DEFER** (GO + runbook) |
+| Produção | MITM em `.254` | **GO teste controlado** (runbook `1.9.46`; **não** permanente) |
 
 ```sh
 make -C src/layer7-tlsproxy test-regress
@@ -183,15 +183,15 @@ php tests/functional/test_mitm_config.php
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.46** lab/latest — Gate B+C PASS; MITM prod DEFER
+- Passo actual: **1.9.46** — Gate B+C PASS; GO humano teste MITM controlado .254
 - Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B PASS; C PASS 210753Z)
 - 1.9.44: timeout --foreground + daemon -f (Gate B; sync 0.33s)
 - 1.9.45: layer7_mitm_tables_apply_to_pf (tabelas live)
 - 1.9.46: anti-QUIC UDP/443 src→dst + filter_configure_sync; Edge sem flags PASS
-- 204452Z: DIAGNÓSTICO (--disable-quic ≠ PASS); supersedido por 210753Z
+- Runbook canónico: runbook-activacao-mitm-producao-1.9.46.md (quic_mode=block; ≤15 min)
 - Latest publicado: **1.9.46** SHA `10998477…ae72f5`
 - Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
-- Próximo: GO activação MITM produção (runbook); .234/.235 proibidos
+- Próximo: executar janela controlada + rollback; .234/.235 proibidos; NÃO permanente
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
@@ -212,7 +212,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Evidência 20.11 | [`../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/) |
 | Evidência 1.9.42 | [`../tests/evidence/20260809T173500Z-1.9.42-source-cidr/`](../tests/evidence/20260809T173500Z-1.9.42-source-cidr/) |
 | Evidência Gate C `1.9.46` | [`../tests/evidence/20260809T210753Z-phaseBD-d1-254/`](../tests/evidence/20260809T210753Z-phaseBD-d1-254/) |
-| Runbook activação prod. | [`../09-blocking/runbook-activacao-mitm-producao-1.9.42.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.42.md) |
+| Runbook activação prod. | [`../09-blocking/runbook-activacao-mitm-producao-1.9.46.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.46.md) |
 | Destino lab `198.18` via `.54` | [`../09-blocking/runbook-destino-lab-19818-via-54.md`](../09-blocking/runbook-destino-lab-19818-via-54.md) |
 | Evidência Fase A `.54` | [`../tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/) |
 | Evidência Fase B `.254` | [`../tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/) |

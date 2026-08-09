@@ -1,0 +1,4 @@
+VERDICT=PASS
+PKG=1.9.46 GUI=200 NET=OK EFF=NO RDR=0 QUIC=0 LISTEN8443=0
+GO_HUMANO=teste_controlado_nao_permanente
+RUNBOOK=runbook-activacao-mitm-producao-1.9.46.md

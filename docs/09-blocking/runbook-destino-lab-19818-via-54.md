@@ -2,7 +2,7 @@
 
 **Estado:** **Fase A+B+C = PASS**; **Fase D = NO-GO** (`20260809T185035Z`); **Gate D0 PASS** (+ addendum); **Gate D1 PASS local**; **ETAPA 2** `timeout -k` na candidata `1.9.43`. **Sem** novo D até publish + GO humano.  
 **Tipo:** topologia de teste sem VPS (custo zero).  
-**Pré-requisito pacote:** `.254` `1.9.42` passivo (MITM OFF) — confirmado durante B/C.  
+**Pré-requisito pacote:** `.254` `1.9.46` passivo (MITM OFF) — lab/`latest` Gate C; rollback lab `1.9.42`.  
 **Proibido neste desenho:** `.234` / `.235`; mutações sem fail-safe; CDN público.  
 **Evidência Fase A:** [`docs/tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/)  
 **Evidência Fase B:** [`docs/tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/)  
@@ -135,7 +135,7 @@ staticroutes config vazio (não persistido)
 
 ### Fase D — Activação MITM (GO **separado**; fora deste desenho até confirmação)
 
-Seguir [`runbook-activacao-mitm-producao-1.9.42.md`](runbook-activacao-mitm-producao-1.9.42.md) secções 4–7 com:
+Seguir [`runbook-activacao-mitm-producao-1.9.46.md`](runbook-activacao-mitm-producao-1.9.46.md) (canónico; supersede `1.9.42`) com:
 
 | Campo | Valor |
 |-------|--------|

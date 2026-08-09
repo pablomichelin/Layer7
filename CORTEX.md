@@ -1360,7 +1360,7 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 - **Auditoria pós-release 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/`](docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/)
 - **Evidência 20.11:** [`docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/)
 - **Evidência 1.9.42:** [`docs/tests/evidence/20260809T173500Z-1.9.42-source-cidr/`](docs/tests/evidence/20260809T173500Z-1.9.42-source-cidr/)
-- **Runbook activação produção:** [`docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md`](docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md)
+- **Runbook activação produção:** [`docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md`](docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md) (supersede `1.9.42`)
 - **Destino lab A+B+C:** [`docs/09-blocking/runbook-destino-lab-19818-via-54.md`](docs/09-blocking/runbook-destino-lab-19818-via-54.md) · A [`…/20260809T180157Z-phaseA-54/`](docs/tests/evidence/20260809T180157Z-phaseA-54/) · B [`…/20260809T180624Z-phaseB-254/`](docs/tests/evidence/20260809T180624Z-phaseB-254/) · C [`…/20260809T181302Z-phaseC-24/`](docs/tests/evidence/20260809T181302Z-phaseC-24/)
 - **Runbook S1–S8:** [`docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md)
 - **Prep 20.10:** [`docs/09-blocking/prep-20.10-checklist.md`](docs/09-blocking/prep-20.10-checklist.md) — **FECHADO**
@@ -1368,14 +1368,14 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.46** lab/latest — Gate B+C PASS; MITM prod DEFER
+- Passo actual: **1.9.46** — Gate B+C PASS; GO humano teste MITM controlado .254
 - Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B PASS; C PASS 210753Z)
 - 1.9.45: layer7_mitm_tables_apply_to_pf; 204452Z = DIAGNÓSTICO (--disable-quic ≠ PASS)
 - 1.9.46: anti-QUIC + filter_configure_sync; Edge sem flags PASS
-- Sync foreground: evidência 20260809T202500Z (0.33s; MITM left OFF)
-- Hang F1-bis: timeout --foreground -k (L7_CTRL_TIMEOUT_KILL_GRACE=5)
+- Runbook canónico: runbook-activacao-mitm-producao-1.9.46.md (quic_mode=block; ≤15 min; NÃO permanente)
 - Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
-- Próximo: GO activação MITM produção (runbook); .234/.235 proibidos
+- Preflight: 20260809T215218Z-preflight-mitm-254
+- Próximo: executar janela controlada + rollback; .234/.235 proibidos
 - Latest publicado: **1.9.46** SHA 10998477…ae72f5
 - Identity rede: FECHADA (20.33 / GI9 PASS); Squid REJEITADO
 ```
@@ -1572,13 +1572,14 @@ CHECKPOINT CANONICO
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.46** Gate B+C PASS; MITM prod DEFER; Squid rejeitado
+- Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.46** Gate B+C PASS; **GO humano** teste MITM controlado `.254` (não permanente); Squid rejeitado
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
-- Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md
+- Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 - Evidência Gate C: docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/
-- Proximo trabalho: GO activação MITM escopada (humano) — destino `/32` dedicado; `.234/.235` proibidos
-- Appliance `.254`: **1.9.46 passivo** (MITM OFF; zero rdr/quic/8443; GUI/NET OK pós-teardown)
+- Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
+- Proximo trabalho: executar janela ≤15 min (`.24`→`198.18.0.10`/`mitm-lab.test`) + rollback; `.234/.235` proibidos
+- Appliance `.254`: **1.9.46 passivo** (MITM OFF; zero rdr/quic/8443; GUI/NET OK; preflight PASS)
 - Pacote publicado: **1.9.46**; rollback lab: **1.9.42**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
