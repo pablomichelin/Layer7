@@ -1,0 +1,70 @@
+server
+DIG
+hide.me 192.168.100.254 
+bet365.com 192.168.100.254 
+example.com 172.66.147.243 104.20.23.154 
+google.com 172.217.30.46 
+youtube.com 172.217.30.142 
+CURL_SINKHOLE
+DOMAIN=hide.me
+HTTP/1.1 200 OK
+Host: hide.me
+Date: Sun, 09 Aug 2026 03:11:09 GMT
+Connection: close
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+
+BODY
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Acesso bloqueado</title>
+	<style>
+		:root {
+			--bg: #0f172a;
+			--card: #1e293b;
+			--accent: #3b82f6;
+			--text: #f1f5f9;
+			--muted: #94a3b8;
+			--border: #334155;
+		}
+		* { box-sizing: border-box; margin: 
+Acesso bloqueado
+Acesso bloqueado
+DOMAIN=bet365.com
+HTTP/1.1 200 OK
+Host: bet365.com
+Date: Sun, 09 Aug 2026 03:11:09 GMT
+Connection: close
+Content-Type: text/html; charset=UTF-8
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+
+BODY
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Acesso bloqueado</title>
+	<style>
+		:root {
+			--bg: #0f172a;
+			--card: #1e293b;
+			--accent: #3b82f6;
+			--text: #f1f5f9;
+			--muted: #94a3b8;
+			--border: #334155;
+		}
+		* { box-sizing: border-box; margin: 
+Acesso bloqueado
+Acesso bloqueado
+NONREG
+http://example.com 200
+https://www.google.com 200
+https://www.youtube.com 200

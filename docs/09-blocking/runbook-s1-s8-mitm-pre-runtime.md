@@ -168,3 +168,4 @@ Rollback de qualquer teste: `mitm.enabled=false`; reinstalar `1.9.37` (lab) ou
 | 2026-08-08 | Criado na continuidade pós-alinhamento git/docs; passo 20.9 PASS; 20.10 bloqueado |
 | 2026-08-09 | S8 **PASS parcial** lab `1.9.38` — evidência `docs/tests/evidence/20260809T021800Z-s8-mitm-off-1.9.38/` |
 | 2026-08-09 | Lab real obrigatório no runbook; S8 two-client real `20260809T022400Z-s8-real-two-client-1.9.38` |
+| 2026-08-09 | **S8 PASS** ADR-0017 real (`20260809T024500Z-s8-adr0017-real-1.9.38`) — sem mutar config; sinkhole+página nos dois clientes |

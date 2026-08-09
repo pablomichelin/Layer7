@@ -162,8 +162,9 @@ Não implementar até GO. Responder em português.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
-- Continuidade agora: **runbook S1–S8** com **testes reais** `.254`/`.234`/`.235` (S8 PASS parcial; sem tlsproxy)
+- Continuidade agora: **S8 PASS** (ADR-0017 real); próximo docs = **S5 escrito + S7**; sem tlsproxy
 - Lab: docs/08-lab/lab-topology.md — SSH pfSense menu → **8 Shell**
+- Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md

@@ -82,7 +82,7 @@ Após **reopen GO** e **20.9 PASS**, permanecem **obrigatórios** antes de runti
 | S5 | QUIC/HTTP3 caminho definido | escrito | **Parcial** — `quic_mode` default documentado (`bypass`); prova lab pendente |
 | S6 | ECH previsível | lab | **Não medido** |
 | S7 | Sem payload em disco por defeito | auditoria | **Não medido** — desenho exige; auditoria com runtime pendente |
-| S8 | MITM OFF ≡ ADR-0017 | smoke | **PASS parcial (real)** — two-client `20260809T022400Z-s8-real-two-client-1.9.38`; sinkhole ADR-0017 ainda a fechar com block scoped |
+| S8 | MITM OFF ≡ ADR-0017 | smoke | **PASS (real)** — `20260809T024500Z-s8-adr0017-real-1.9.38` (sinkhole+block page em `.234`/`.235`; mitm_effective=false) |
 
 **Bloqueio:** qualquer Si **FAIL** ou não medido (excepto S5 parcial aceite só como doc) **bloqueia `20.10`**.
 

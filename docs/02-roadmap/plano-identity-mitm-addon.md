@@ -35,14 +35,15 @@
 | ADRs | **Aceito** ×5; T1; **0026 em curso (rev. f — intenção vs effective)**; **0027**; **0029** IM7/IM8 |
 | MITM | **Reopen GO** → 20.8–20.9; runtime AUSENTE; `mitm_effective` **false**; GI2/GI3 runtime **DEFERRED** |
 | Identity rede | **FECHADA** (20.33 / GI9) — não reabrir sem GO |
-| Próximo | Continuidade: **S1–S8 runbook** com **testes reais** (`.254`/`.234`/`.235`); **20.10** só após S1–S8 + GO lab |
+| Próximo | Continuidade: **S5 escrito + S7 política**; S8 **PASS**; **20.10** só após S1–S8 + GO lab |
 | Lab real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — pfSense menu **8=Shell**; orquestrar Mac→clientes |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (`1.9.38`); próximo **20.10** BLOQUEADO (S1–S8 + GO lab)
-- Continuidade: runbook S1–S8 pré-runtime (**testes reais** `.254`/`.234`/`.235`)
+- Continuidade: **S8 PASS** ADR-0017 real; próximo **S5/S7 docs**; 20.10 BLOQUEADO
 - Lab: docs/08-lab/lab-topology.md (SSH pfSense → opção **8 Shell** se menu)
+- Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC;

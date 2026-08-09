@@ -1,0 +1,7 @@
+HOST=server
+http://example.com 200
+https://www.google.com 200
+https://www.youtube.com 200
+http://neverssl.com 000
+000
+curl: (28) Failed to connect to neverssl.com port 80 after 2604 ms: Connection timed out

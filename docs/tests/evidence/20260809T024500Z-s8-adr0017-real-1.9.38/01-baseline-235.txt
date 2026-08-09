@@ -1,0 +1,7 @@
+HOST=zpro-aimirim
+http://example.com 200
+https://www.google.com 200
+https://www.youtube.com 200
+http://neverssl.com curl: (28) Failed to connect to neverssl.com port 80 after 2503 ms: Connection timed out
+000
+000

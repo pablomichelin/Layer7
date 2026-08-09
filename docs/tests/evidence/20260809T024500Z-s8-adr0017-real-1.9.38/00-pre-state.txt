@@ -1,0 +1,11 @@
+-rw-rw-r--  1 www wheel 5682 Aug  8 23:01 /root/layer7.json.pre-s8-adr0017-20260809T024246Z
+enabled=true mode=enforce model=legacy_global
+policies=6
+P0 id=p-mon-001 name=Monitor geral en=1 act=monitor
+P1 id=anti-bypass-dns name=Anti-bypass DNS (DoH/DoT/Private Relay) en=1 act=block
+P2 id=profile-preset-protecao-infantil name=Protecao infantil en=1 act=block
+P3 id=profile-anti-bypass-dns name=Anti-bypass DNS en=1 act=block
+P4 id=profile-anydesk name=AnyDesk en=1 act=block
+P5 id=profile-atera name=Atera en=1 act=block
+blockpage=[]
+mitm=null

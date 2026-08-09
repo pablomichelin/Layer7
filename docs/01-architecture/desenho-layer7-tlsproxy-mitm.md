@@ -147,7 +147,7 @@ Procedimento canónico: [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../
 | S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + prova lab do caminho escolhido | **Parcial** — default `bypass` em 20.9; prova lab pendente |
 | S6 | ECH | Comportamento previsível; sem crash; sem fail-closed LAN | Cenário lab ECH; log de fallback documentado | **Não medido** |
 | S7 | Privacidade | Sem payload desencriptado em disco por defeito; log = metadados | Auditoria de paths/config default da PoC | **Não medido** (política no desenho) |
-| S8 | MITM OFF ≡ ADR-0017 | Smoke comparativo sem regressão | Suite smoke block page + enforce com helper **ausente**/OFF em `1.9.38` | **PASS parcial** — `20260809T021800Z-s8-mitm-off-1.9.38` |
+| S8 | MITM OFF ≡ ADR-0017 | Smoke comparativo sem regressão | Suite smoke block page + enforce com helper **ausente**/OFF em `1.9.38` | **PASS** — `20260809T024500Z-s8-adr0017-real-1.9.38` |
 
 ---
 
