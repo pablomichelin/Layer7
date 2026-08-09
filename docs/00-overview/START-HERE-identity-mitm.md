@@ -172,7 +172,6 @@ TRILHA IDENTITY + MITM — progresso
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md
 - 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
 - 20.7a: DEFER histórico; reopen GO → 20.8→20.9
-- Plano rev.: 2026-08-08r
 - Baseline enforce: 1.9.8; lab/`latest`: **1.9.38**
 - Squid: REJEITADO; GI2/GI3 runtime: DEFERRED
 - Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
