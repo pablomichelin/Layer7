@@ -20,16 +20,17 @@ $(OUT): $(SRCS) ipc.h
 clean:
 	rm -f $(OUT)
 
+# FreeBSD make runs recipes under sh -e: expected non-zero exits must use || rc=$$?
 test: $(OUT)
 	./$(OUT) --version
 	./$(OUT) --health | grep -q '"intercept": false'
 	./$(OUT) --health | grep -q '"mitm_effective_claim": false'
 	./$(OUT) --health | grep -q '"ipc_capable": true'
-	./$(OUT) --lab-allow-bind >/dev/null 2>&1; test $$? -eq 3
-	LAYER7_TLSPROXY_LAB=1 ./$(OUT) --lab-allow-bind >/dev/null 2>&1; test $$? -eq 4
-	./$(OUT) --ipc-serve >/dev/null 2>&1; test $$? -eq 3
-	./$(OUT) --ipc-ping >/dev/null 2>&1; test $$? -eq 3
-	LAYER7_TLSPROXY_LAB=1 ./$(OUT) --ipc-serve --sock /var/run/layer7/mitm.sock >/dev/null 2>&1; test $$? -eq 3
+	@rc=0; ./$(OUT) --lab-allow-bind >/dev/null 2>&1 || rc=$$?; test $$rc -eq 3
+	@rc=0; LAYER7_TLSPROXY_LAB=1 ./$(OUT) --lab-allow-bind >/dev/null 2>&1 || rc=$$?; test $$rc -eq 4
+	@rc=0; ./$(OUT) --ipc-serve >/dev/null 2>&1 || rc=$$?; test $$rc -eq 3
+	@rc=0; ./$(OUT) --ipc-ping >/dev/null 2>&1 || rc=$$?; test $$rc -eq 3
+	@rc=0; LAYER7_TLSPROXY_LAB=1 ./$(OUT) --ipc-serve --sock /var/run/layer7/mitm.sock >/dev/null 2>&1 || rc=$$?; test $$rc -eq 3
 	@SOCK=./.poc-test.$$$$.sock; \
 	  LAYER7_TLSPROXY_LAB=1 ./$(OUT) --ipc-serve --sock $$SOCK --oneshot & \
 	  SPID=$$!; \
