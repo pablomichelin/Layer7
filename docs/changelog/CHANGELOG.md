@@ -4,43 +4,53 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Notes
+
+- Próximo: BG-109 (mapa Identity GUI) quando houver dump/IPC; builder FreeBSD 16
+  só após 16.0-RELEASE.
+
+## [1.9.33] — 2026-08-08
+
 ### Changed
 
-- **BG-108 — UX visual wave 2 (`1.9.33`):** unificação dos KPIs Estado/Relatórios
+- **BG-108 — UX visual wave 2:** unificação dos KPIs Estado/Relatórios
   (classes partilhadas `.l7-kpi-card*`), Status e Remoção em `layer7-admin-block`,
   subnav canónica de Políticas (`layer7_render_policies_subnav`), Kick/Rumble
   movidos para o grupo Streaming (IDs de política intactos), meta de perfis
   só-categoria (`N cats`), Chart.js 4.4.4 vendored em
   `packages/layer7/js/chart.umd.min.js` (sem CDN; empty state se ausente),
   tipografia do preset «Distracoes no trabalho». Sem mudança de enforcement.
-  Mapa Identity live fica em BG-109. Build FreeBSD 15 PASS; prerelease GitHub
-  `v1.9.33` (`SHA256=266bf621f03054bcb043a1196d1b917ca3e320d21551a97bc1f8d00372d0ebed`);
-  `releases/latest` permanece `1.9.30` (BG-106).
+  Mapa Identity live fica em BG-109.
+- **BG-107 — Perfis rápidos / layout:** cores de marca RA, aliases FA6, grelha
+  `auto-fill`, agregados «(todas/todos)», redirect RA→`#l7-ra`, admin-block em
+  Identity/Exceptions/Categories/Test/Reports.
 
 ### Fixed
 
-- **BG-108:** Chart.js deixava de carregar em ambientes sem CDN; Kick/Rumble
-  apareciam em «Redes sociais»; tipografia «Distraccoes»; cartões só-categoria
-  mostravam `0 apps · 0 hosts`.
-- **BG-107 — Perfis rápidos / Acesso remoto visual:** o grupo «Acesso remoto»
-  deixava de seguir o padrão visual do resto da grelha — todos os cartões
-  caiam no vermelho de alarme do grupo (`#C0392B` / `#E74C3C`), vários
-  glifos FA 4.7 (`fa-moon-o`, `fa-sun-o`) e a marca `fa-chrome` ficavam
-  invisíveis no Font Awesome 6 do pfSense, e a grelha `flex` esticava
-  cartões órfãos em larguras irregulares. Corrigido com cores de marca por
-  produto, aliases FA6 (+ `fab` para Chrome), ícones distintos no catálogo,
-  ordenação pacote→nDPI→A–Z e grelha CSS `auto-fill`. Também alinhadas cores
-  em falta noutros grupos e o ícone de «Videoconferencia».
-- **BG-107 (continuação) — agregados e ícones:** renomeados os pacotes
-  «Redes Sociais / Mensagens / Streaming / Jogos / Videoconferencia /
-  Musica» para o padrão «… (todas/todos)»; ícones duplicados dentro do
-  mesmo grupo eliminados (Comunicação, Streaming, Mensagens, Redes,
-  Segurança); pacotes agregados passam a aparecer primeiro em cada grupo.
-- **BG-107 (continuação) — UX única Acesso Remoto + layout admin-block:**
-  `layer7_remote_access.php` passa a redireccionar para Politicas
-  `#l7-ra` (cartões = caminho canónico); removido o botão lista extra.
-  Páginas Identity, Exceptions, Categories, Test e Reports alinhadas ao
-  padrão `layer7-admin-block` (como MITM/Settings).
+- **BG-108:** Chart.js offline; Kick/Rumble em Streaming; tipografia
+  «Distraccoes»; cartões só-categoria sem `0 apps · 0 hosts` vazio.
+- **BG-106 (operacional):** builder permanece FreeBSD 15; install Plus/16 com
+  `IGNORE_OSVERSION=yes pkg add -f` documentado no MANUAL.
+
+### Release
+
+- Tag `v1.9.33` / `releases/latest`
+- SHA256: `71e55377fef2de7051b472f3253e51dc56bcb1ca36bd4f9b708ae5418590ec29`
+- Rollback: `1.9.30`
+
+## [1.9.30] — 2026-08-08
+
+### Fixed
+
+- Grupo **Acesso remoto** com perfis individuais + pacote «Acesso Remoto (todos)»;
+  LogMeIn no catálogo.
+
+### Release
+
+- SHA256: `40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`
+
+### Fixed (trilha anterior ainda em Unreleased documental)
+
 - **BG-105 — sinkhole DNS/local portal:** a decisão DNS bloqueada para o IP
   local do firewall continua auditável como `outcome=sinkhole`, mas o fluxo
   subsequente ao portal não volta a ser classificado nem avaliado por

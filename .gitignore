@@ -14,6 +14,9 @@ Desktop.ini
 # do appliance e .pkg) — nunca commitar
 .local/
 
+# Backup local do builder (license.c / Makefiles sensiveis) — nunca commitar
+/artifacts/Bkp Freebsd 15/
+
 # Inventário do lab preenchido localmente (não commitar IPs/senhas)
 docs/08-lab/lab-inventory.md
 

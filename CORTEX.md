@@ -35,42 +35,19 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.30` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.30`;
-`SHA256=40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`; grupo Acesso remoto individual;
-comandos em
+`1.9.33` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.33`;
+`SHA256=71e55377fef2de7051b472f3253e51dc56bcb1ca36bd4f9b708ae5418590ec29`;
+UX visual wave 2 / BG-108 + BG-107; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
-**Candidato publicado (prerelease, não latest):** `1.9.33` / BG-108 — UX visual
-wave 2 (KPI unificado, subnav Políticas, Kick/Rumble→Streaming, Chart.js
-local, Status/Remoção admin-block); inclui BG-107. Sem mudança de enforcement.
-Tag `v1.9.33` (prerelease);
-`SHA256=266bf621f03054bcb043a1196d1b917ca3e320d21551a97bc1f8d00372d0ebed`.
-Build FreeBSD 15 PASS; appliance `192.168.100.254` (FreeBSD 16) instalado com
-`pkg add -f` PASS (`layer7d` running, `layer7d -t` OK) em `2026-08-08`.
-Rollback: **`1.9.30`** (público/latest).
-**Candidato anterior:** `1.9.32` / BG-107 — padronização visual dos Perfis
-rápidos (Acesso remoto + agregados «(todas/todos)» + ícones únicos + grelha
-CSS), UX única RA (`#l7-ra`) e layout admin-block em Identity/Exceptions/
-Categories/Test/Reports.
-**Candidato anterior:** `1.9.31` / BG-105 — evita que o tráfego
-seguinte ao DNS sinkhole para o IP local do firewall seja reclassificado e
-gere log storm; a decisão DNS permanece auditada como `outcome=sinkhole`.
-Suite local, verificação do port e build FreeBSD PASS (SHA256
-`dcbad868b3e06c19214662dd4caf5ac82417c9af4cb17fddff8cbfc425ffcd15`).
-Instalado de forma controlada no appliance `192.168.100.254` em `2026-08-08`:
-daemon, configuração e `pfctl -nf` PASS; bloqueio Unbound de DoH/iCloud nos
-dois clientes mantém-se e não houve nova linha `skip IP local do firewall`.
-O callback DNS do daemon não foi exercitado nessa configuração (`sni_inspection`
-OFF; TLS termina no portal antes da classificação), portanto o evento
-`outcome=sinkhole` permanece validado por regressão/build, não por esta rodada
-física. Pacote ainda não publicado; rollback local/público: **`1.9.30`**.
-**Risco de release (BG-106):** o builder oficial é FreeBSD 15 e o appliance
-observado é FreeBSD 16; o `pkg` exigiu instalação forçada por arquitetura.
-Integridade, dependências e runtime passaram, mas não promover `1.9.31`…
-`1.9.33` como `releases/latest` antes de artefato nativo FreeBSD 16 ou
-validação formal de compatibilidade.
-**Referencia de producao enforce:** **`1.9.31`** (gate BG-105 parcial PASS
-`2026-08-08`; sem promoção pública). Rollback enforce: **`1.9.30`**.
-Historico: `_69`, `_24`.
+Builder FreeBSD **15** (política: manter 15 até FreeBSD 16.0-RELEASE).
+Appliance lab Plus/FreeBSD 16: install com `IGNORE_OSVERSION=yes pkg add -f`
+(BG-106 aceite operacionalmente). Gate `2026-08-08`: daemon running,
+`layer7d -t` PASS, Chart.js/KPI/subnav/catalogo verificados.
+Rollback publico: **`1.9.30`**.
+**BG-106:** ABI builder 15 vs appliance 16 — documentado; promoção `latest`
+feita com procedimento `-f`; builder 16 adiado até RELEASE estável.
+**Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
+Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —
 **nao instalar**; usar `_56` ou superior.
 CE fisico pendente — ADR-0022 aceite. Gates G2–G7 **PASS** (fecho plano).
