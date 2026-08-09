@@ -33,9 +33,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Campo | Valor |
 |-------|-------|
 | Filas fecho P0–J + IPv6 V0–V6 | **FECHADAS** (`2026-08-05`) |
-| Produção enforce / `latest` | **`1.9.8`** (alinhados) |
-| SHA256 | `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec` |
+| Produção enforce / lab `latest` | Pin enforce **`1.9.8`**; lab/`latest` **`1.9.38`** (não alinhados) |
+| SHA256 (enforce `1.9.8`) | `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec` |
+| SHA256 (lab `1.9.38`) | `7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab` |
 | Rollback enforce | **`1.9.0`** |
+| Rollback lab | **`1.9.37`** |
 | Passo residual nestas filas | **Nenhum** |
 | Modo | Manutenção contínua / **novos planos com GO** |
 | Organização docs (F6 H5) | **EXECUTADA** — legado em `docs/archive/` |

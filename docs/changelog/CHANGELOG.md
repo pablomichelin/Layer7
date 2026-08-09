@@ -14,7 +14,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 - **BG-087 / 20.9 — Toggle intenção + bypass endurecido:** `mitm.enabled`
   (intenção com CA+entitlement) vs `mitm_effective` (false sem runtime);
-  `quic_mode` (S5); CIDR protegidos loopback; contrato IPC
+  `quic_mode` default (contribui a **S5 parcial**; S5 lab ainda aberto);
+  CIDR protegidos loopback; contrato IPC
   `docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`;
   status `mitm_effective=false`. Sem intercept TLS. Squid rejeitado.
 

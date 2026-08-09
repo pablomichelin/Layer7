@@ -1003,10 +1003,12 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > 7. seccao **6. Desinstalar** (nota "Nesta release") e **Apos desinstalar**
 >    (comando de reinstalacao).
 >
-> Verificacao rapida (deve devolver apenas referencias historicas):
+> Verificacao rapida (deve devolver apenas referencias historicas fora do
+> caminho operacional actual):
 > `grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md`.
-> Apos GO Onda F (`2026-08-05`), producao enforce e canal publico estao alinhados
-> em `_69`; `_24` permanece apenas como rollback historico.
+> **Estado actual:** lab/`latest` = **`1.9.38`**; pin enforce = **`1.9.8`**
+> (não alinhados). Histórico Onda F (`2026-08-05`) alinhou temporariamente
+> em `_69` — apenas contexto; não usar como canal actual.
 
 > **Release `1.9.38` (MITM 20.9, `2026-08-08`):** canal publico `latest` /
 > comandos abaixo → **`1.9.38`**. **Produção enforce** permanece **`1.9.8`**.
@@ -1248,7 +1250,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.38.pkg.sha256 https://github.com/pablomiche
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`5f88e1312bc30037ffb32141a208860a708440b5271c1adf55c40a2aa992f4f4`.
+`7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`.
 
 ---
 
@@ -1947,9 +1949,25 @@ release — ver nota em **Links da versao actual** e **BG-028**):
 service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
-Para reinstalar uma versao anterior conhecida (rollback imediato pos-`1.9.1` use `1.9.0`; pos-`1.9.0`:
-`1.8.11_69`; rollback historico enforce: `1.8.11_24`; **nao** usar `1.8.11_55`,
-defeituosa):
+Para reinstalar uma versao anterior conhecida:
+rollback **lab** imediato a partir de `1.9.38` → **`1.9.37`**;
+rollback **enforce** → **`1.9.0`** (pin `1.9.8`);
+histórico pos-`1.9.0` → `1.8.11_69`; rollback historico antigo → `1.8.11_24`;
+**nao** usar `1.8.11_55` (defeituosa).
+
+Rollback lab (`1.9.37`):
+
+```sh
+fetch -o /tmp/pfSense-pkg-layer7-1.9.37.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.37/pfSense-pkg-layer7-1.9.37.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.37.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+```
+
+Rollback enforce (`1.9.0`):
+
+```sh
+fetch -o /tmp/pfSense-pkg-layer7-1.9.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.0/pfSense-pkg-layer7-1.9.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+```
+
+Rollback histórico (`1.8.11_69`):
 
 ```sh
 fetch -o /tmp/pfSense-pkg-layer7-1.8.11_69.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_69/pfSense-pkg-layer7-1.8.11_69.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_69.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V

@@ -5,27 +5,25 @@ Mais recente no topo.
 
 ---
 
-## 2026-08-08 — Handoff continuidade (auditoria segura)
+## 2026-08-08 — Alinhamento pós-commit + handoff
 
 | Campo | Valor |
 |-------|-------|
 | Tipo | docs / governação / segurança |
 | Versão | `2.0.0` (sem bump) |
-| Objectivo | Retomar chat via handoff sem avançar trabalho bloqueado |
-| Impacto | Só docs; corrige hash SPA no diário; declara dívida de commit |
-| Risco | Baixo (docs); risco operacional residual = working tree ≠ git |
-| Teste | health live OK; SPA `index-DwHpvSVY.js` + string `2.0.0`; unit RBAC PASS (3+59) |
+| Objectivo | Fechar dívida de continuidade após push e corrigir drift SSOT |
+| Impacto | Só docs; SPA hash; próximo passo = S1–S8 docs (não 20.10) |
+| Risco | Baixo (docs) |
+| Teste | health live OK; SPA `index-DwHpvSVY.js`; `origin/main` @ `657d7f4` |
 | Rollback | Reverter esta entrada |
-| Resultado | **FEITO** — multiagente **não** usado (authz + MITM bloqueado); `20.10` **não** iniciado; commit local **pendente GO** |
+| Resultado | **FEITO** — commits `5fb1009` + `657d7f4` em `origin/main`; alinhamento SSOT + runbook S1–S8; S8 PASS parcial lab; builder sync `657d7f4`; `20.10` **não** iniciado |
 
-Notas de segurança desta auditoria:
+Notas de segurança:
 
 - Live `https://license.systemup.inf.br` = portal **`2.0.0`** / health `ok`.
-- Técnicos **não** recebem `users.manage` via `normalizePermissions`.
-- API `/api/users` exige `users.manage`; rotas sensíveis usam `requirePermission`.
+- Técnicos **não** recebem `users.manage`; `/api/users` exige `users.manage`.
 - Contas `is_active=false` rejeitadas no login/sessão.
-- Pacote público **`1.9.38`** (MITM 20.9) e portal **`2.0.0`** estão no working tree **sem commit** — continuidade em risco até GO de commit.
-- MITM: próximo **20.10** permanece **BLOQUEADO** (S1–S8 + GO lab); sem runtime / sem intercept.
+- MITM: **20.10** BLOQUEADO até S1–S8 + GO lab; sem runtime / sem intercept.
 
 ---
 

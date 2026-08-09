@@ -135,19 +135,19 @@ antes de GO lab de intercept.
 
 ## 6. Checklist S1–S8
 
-Estado actual de todas as linhas: **não medido**.  
+Procedimento canónico: [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md).  
 **Intercept NÃO está aprovado** até medição + GO lab.
 
 | # | Critério | Limiar | Método de medição | Estado |
 |---|----------|--------|-------------------|--------|
-| S1 | Overhead CPU (intercept selectivo, tráfego de referência) | ≤ **+25%** vs baseline `1.9.8` (ADR-0028 / evidência 20.11a) | Comparar idle/busy CPU appliance com MITM OFF vs ON selectivo; mesmo script de carga | **Não medido** |
+| S1 | Overhead CPU (intercept selectivo, tráfego de referência) | ≤ **+25%** vs baseline lab `1.9.38` OFF (declarar vs pin `1.9.8` no `run_id`) | Comparar idle/busy CPU appliance com MITM OFF vs ON selectivo; mesmo script de carga | **Não medido** |
 | S2 | Latência adicional por handshake TLS interceptado | ≤ **150 ms** p95 | Captura timestamps cliente→proxy→origem no lab; percentil 95 | **Não medido** |
 | S3 | Block page HTTPS + CA (GPO) | ≥ **1** browser Windows corporativo vê HTML legível | Lab com CA instalada; site bloqueado por policy; screenshot + HAR | **Não medido** |
 | S4 | Bypass list | Fluxo em bypass **não** terminado | tcpdump/pcap: sem handshake com cert da CA Layer7 no destino bypass | **Não medido** |
-| S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + prova lab do caminho escolhido | **Não medido** |
+| S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + prova lab do caminho escolhido | **Parcial** — default `bypass` em 20.9; prova lab pendente |
 | S6 | ECH | Comportamento previsível; sem crash; sem fail-closed LAN | Cenário lab ECH; log de fallback documentado | **Não medido** |
-| S7 | Privacidade | Sem payload desencriptado em disco por defeito; log = metadados | Auditoria de paths/config default da PoC | **Não medido** |
-| S8 | MITM OFF ≡ ADR-0017 | Smoke comparativo sem regressão | Suite smoke block page + enforce com helper presente e OFF | **Não medido** |
+| S7 | Privacidade | Sem payload desencriptado em disco por defeito; log = metadados | Auditoria de paths/config default da PoC | **Não medido** (política no desenho) |
+| S8 | MITM OFF ≡ ADR-0017 | Smoke comparativo sem regressão | Suite smoke block page + enforce com helper **ausente**/OFF em `1.9.38` | **PASS parcial** — `20260809T021800Z-s8-mitm-off-1.9.38` |
 
 ---
 
@@ -214,6 +214,7 @@ Desenho (este ficheiro)
 | [`ADR-0028`](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) | Sem IO bloqueante no captura; baseline perf |
 | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | Passos 20.8–20.11; R-T / R-P |
 | [`contrato-ipc-layer7-tlsproxy-20.9.md`](contrato-ipc-layer7-tlsproxy-20.9.md) | Intenção vs `mitm_effective`; bypass; `quic_mode`; IPC futuro |
+| [`runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md) | Ordem S1–S8 pré-runtime; smoke S8; sem intercept |
 | [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) | Barra PME; sem overclaim NGFW |
 
 ---

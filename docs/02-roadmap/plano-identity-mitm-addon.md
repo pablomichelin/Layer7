@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08q`; passo **20.9 PASS** / `1.9.38` / próximo 20.10 bloqueado)
+**Estado do plano:** Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08r`; passo **20.9 PASS** / `1.9.38` / próximo 20.10 bloqueado; continuidade S1–S8 docs)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -9,6 +9,7 @@
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
 **Desenho MITM (opção E):** [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime **AUSENTE**  
 **Contrato IPC 20.9:** [`../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)  
+**Runbook S1–S8 pré-runtime:** [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md)  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
@@ -19,7 +20,8 @@
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
 **Rev. `o` (`2026-08-08`)** = **20.8 PASS** (`1.9.37`).  
 **Rev. `p` (`2026-08-08`)** = **20.9 PASS** — intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; `mitm_effective` sempre false sem runtime; Squid rejeitado.  
-**Rev. `q` (`2026-08-08`)** = docs alinhados ao publish **`1.9.38`** (`releases/latest`).
+**Rev. `q` (`2026-08-08`)** = docs alinhados ao publish **`1.9.38`** (`releases/latest`).  
+**Rev. `r` (`2026-08-08`)** = alinhamento git+SSOT + runbook S1–S8 pré-runtime (sem intercept).
 
 ---
 
@@ -32,11 +34,12 @@
 | ADRs | **Aceito** ×5; T1; **0026 em curso (rev. f — intenção vs effective)**; **0027**; **0029** IM7/IM8 |
 | MITM | **Reopen GO** → 20.8–20.9; runtime AUSENTE; `mitm_effective` **false**; GI2/GI3 runtime **DEFERRED** |
 | Identity rede | **FECHADA** (20.33 / GI9) — não reabrir sem GO |
-| Próximo | **20.10** só após S1–S8 + GO lab; sem claim de intercept |
+| Próximo | Continuidade: **S1–S8 runbook** (S5/S8 agora); **20.10** só após S1–S8 + GO lab |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (`1.9.38`); próximo **20.10** BLOQUEADO (S1–S8 + GO lab)
+- Continuidade: runbook S1–S8 pré-runtime
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC;
@@ -46,6 +49,8 @@ TRILHA IDENTITY + MITM — progresso
 - MITM: reopen GO; Squid REJEITADO; IM7 ADIAR / IM8 EXCLUÍDO (ADR-0029)
 - Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 - Contrato: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
+- Runbook: docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md
+- Plano rev.: 2026-08-08r
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -551,6 +556,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `e` / 20.24 PASS** — match `ad_*` via mapa daemon; candidato `1.9.28`; passo → **20.25** |
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
+| 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
 | 2026-08-08 | **rev. `q` / docs align** — `latest` **`1.9.38`** publicado (SHA `7c60f6b1…1dab`); passo continua **20.9 PASS**; 20.10 bloqueado |
 | 2026-08-08 | **rev. `p` / 20.9 PASS** — intenção `mitm.enabled`; bypass endurecido; `quic_mode`; contrato IPC; `mitm_effective` sempre false sem runtime; próximo **20.10** bloqueado (S1–S8+GO lab); ADR-0026 rev. `f`; publicado depois como `1.9.38` |
 | 2026-08-08 | **rev. `o` / 20.8 PASS** — scaffolding publicado `1.9.37`; schema/CA/bypass/status; tlsproxy AUSENTE; Squid rejeitado |

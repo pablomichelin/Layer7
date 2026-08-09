@@ -1,11 +1,12 @@
 # Spike MITM 20.7 — desenho e critérios (IM2)
 
-**Estado:** `DEFER FORMAL` (`2026-08-06` — passo **20.7a PASS**) + **reopen GO** (`2026-08-08` → passo **20.8**)  
-**Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) passo **20.7 / 20.7a / 20.8**  
-**ADR:** [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) — **Aceito — implementação em curso (scaffolding 20.8)**  
+**Estado:** `DEFER FORMAL` (`2026-08-06` — **20.7a PASS**) + **reopen GO** (`2026-08-08`) → **20.8 PASS** → **20.9 PASS**  
+**Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) — passo actual **20.9 PASS**; **20.10 BLOQUEADO**  
+**ADR:** [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) — intenção 20.9 PASS; runtime diferido  
 **Desenho opção E:** [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime **AUSENTE**  
+**Runbook S1–S8 (pré-runtime):** [`runbook-s1-s8-mitm-pre-runtime.md`](runbook-s1-s8-mitm-pre-runtime.md)  
 **Posicionamento PME:** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md)  
-**Baseline enforce doc:** `1.9.8` · **lab/`latest`:** `1.9.36`  
+**Baseline enforce doc:** `1.9.8` · **lab/`latest`:** `1.9.38`  
 **Evidência preflight:** [`../tests/evidence/20260805T205900Z-appliance254-mitm-preflight/`](../tests/evidence/20260805T205900Z-appliance254-mitm-preflight/)  
 **Regra:** Identity rede **FECHADA** (20.33/GI9). Este spike **não** autoriza intercept; Squid **rejeitado**.
 
@@ -69,18 +70,21 @@ Nota: o repo pkg do Plus ainda lista `pfSense-pkg-squid` / `squid-7.4`, mas **n�
 ## 4. Critérios S1–S8
 
 Com **DEFER**: S1–S8 **não** foram medidos em PoC de intercept (não houve PoC).
-Ficam obrigatórios **se** IM2 for reaberto com opção E (ou outra candidata aprovada).
+Após **reopen GO** e **20.9 PASS**, permanecem **obrigatórios** antes de runtime /
+`20.10` / GI2–GI3 lab. Procedimento: [`runbook-s1-s8-mitm-pre-runtime.md`](runbook-s1-s8-mitm-pre-runtime.md).
 
-| # | Critério | Limiar | Evidência |
-|---|----------|--------|-----------|
-| S1 | CPU overhead | ≤ +25% | _adiado — reabrir IM2_ |
-| S2 | Latência handshake | ≤ 150 ms p95 | _adiado_ |
-| S3 | Block page HTTPS + CA | ≥ 1 browser | _adiado_ |
-| S4 | Bypass list | prova | _adiado_ |
-| S5 | QUIC/HTTP3 caminho definido | escrito | _adiado_ |
-| S6 | ECH previsível | lab | _adiado_ |
-| S7 | Sem payload em disco por defeito | auditoria | _adiado_ |
-| S8 | MITM OFF ≡ ADR-0017 | smoke | _adiado_ (cumprido por ausência de código MITM) |
+| # | Critério | Limiar | Estado actual (`2026-08-08`) |
+|---|----------|--------|------------------------------|
+| S1 | CPU overhead | ≤ +25% | **Não medido** — exige PoC runtime; baseline 20.11a / pin `1.9.8` |
+| S2 | Latência handshake | ≤ 150 ms p95 | **Não medido** — exige PoC runtime |
+| S3 | Block page HTTPS + CA | ≥ 1 browser | **Não medido** — exige intercept (bloqueado) |
+| S4 | Bypass list | prova | **Não medido** — GUI/bypass 20.8–20.9; prova com runtime pendente |
+| S5 | QUIC/HTTP3 caminho definido | escrito | **Parcial** — `quic_mode` default documentado (`bypass`); prova lab pendente |
+| S6 | ECH previsível | lab | **Não medido** |
+| S7 | Sem payload em disco por defeito | auditoria | **Não medido** — desenho exige; auditoria com runtime pendente |
+| S8 | MITM OFF ≡ ADR-0017 | smoke | **PASS parcial** — evidência `20260809T021800Z-s8-mitm-off-1.9.38` (effective/runtime false; página HTTP ADR-0017 ainda a fechar) |
+
+**Bloqueio:** qualquer Si **FAIL** ou não medido (excepto S5 parcial aceite só como doc) **bloqueia `20.10`**.
 
 ---
 
@@ -113,7 +117,7 @@ Requisitos mínimos se reabrir:
 | Squid (A) | **REJEITADA** |
 | PoC intercept | **Não iniciada** (intencional) |
 | GI2 / GI3 | **DEFERRED** |
-| Passos 20.8–20.11 | **20.8 EM CURSO** (scaffolding); 20.9+ / intercept bloqueados até S1–S8 + GO lab |
+| Passos 20.8–20.11 | **20.8 PASS** → **20.9 PASS** (`1.9.38`); **20.10** / intercept **BLOQUEADOS** até S1–S8 + GO lab |
 | Próximo plano (histórico) | **20.12 / IM3** mapa daemon — **FEITO**; Identity FECHADA |
 | Reabertura | **GO humano `2026-08-08`** — ver §8 |
 
@@ -133,12 +137,12 @@ Requisitos mínimos se reabrir:
 | Campo | Valor |
 |-------|--------|
 | Data | **2026-08-08** |
-| Decisão | **GO reopen IM2** — scaffolding apenas |
-| Passo actual | **20.8 EM CURSO** |
-| Escopo autorizado | Schema `mitm.*` OFF; gestão CA; bypass GUI; `mitm_entitled` no status daemon; `enabled` forçado **false** |
-| Escopo **não** autorizado | Processo `layer7-tlsproxy`; intercept TLS; block page HTTPS via MITM; Squid |
+| Decisão | **GO reopen IM2** — scaffolding + intenção/IPC (não intercept) |
+| Passo actual | **20.9 PASS** (`1.9.38`) |
+| Escopo autorizado (cumprido) | Schema `mitm.*`; CA/bypass GUI; `mitm_entitled`; intenção `mitm.enabled`; `quic_mode`; contrato IPC; `mitm_effective` **sempre false** sem runtime |
+| Escopo **não** autorizado | Processo `layer7-tlsproxy`; intercept TLS; block page HTTPS via MITM; Squid; claim `mitm_effective=true` |
 | Desenho | [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) |
-| S1–S8 | **Não medidos** — obrigatórios antes de runtime / GI2–GI3 lab |
+| S1–S8 | **Não medidos** (S5 parcial doc) — obrigatórios antes de runtime / GI2–GI3 / `20.10` |
 | Identity rede | **FECHADA** (20.33/GI9) — ortogonal |
 | Squid | **REJEITADO** (permanente) |
 | Honestidade | **Sem claim de intercept** neste reopen |

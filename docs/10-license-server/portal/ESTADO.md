@@ -22,6 +22,6 @@
 
 ## Próximo
 
-1. **Commit local + push** do working tree portal `2.0.0` (e, em bloco separado, pacote `1.9.38`) — **pendente GO humano**.
+1. Git alinhado: `origin/main` @ `657d7f4` (portal `2.0.0`) + `5fb1009` (pacote `1.9.38`).
 2. Novo plano portal só com ideias **ACEITE** + GO (nenhum plano `ACTIVO`).
 3. Não misturar com MITM `20.10` (bloqueado até S1–S8 + GO lab).

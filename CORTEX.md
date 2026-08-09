@@ -774,10 +774,10 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 **Checkpoint `2026-08-08`:** portal **`2.0.0`** — PORTAL-PLAN-004 CONCLUIDO
 (técnicos + RBAC). Planos 003 e 004 fechados. Live health OK;
-SPA `index-DwHpvSVY.js`. **Dívida de continuidade:** código/docs portal
-`2.0.0` + pacote `1.9.38` ainda no working tree **sem commit** — próximo
-passo seguro = commit(s) com GO humano (não `20.10`).
-Regra: não saltar blocos do plano portal; sem plano `ACTIVO` até GO.
+SPA `index-DwHpvSVY.js`. Git sincronizado em `origin/main`
+(`5fb1009` pacote `1.9.38` + `657d7f4` portal `2.0.0`).
+Regra: não saltar blocos do plano portal; sem plano `ACTIVO` até GO;
+**não** abrir `20.10` sem S1–S8 + GO lab.
 
 ---
 
@@ -1351,7 +1351,8 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 - **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM9 Identity FECHADA** →
   **reopen MITM 20.8→20.9 PASS** → **20.10** bloqueado (endpoint só com GO separado)
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-08p`
+- **Rev. plano:** `2026-08-08r`
+- **Runbook S1–S8:** [`docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md)
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 - **Desenho DC:** [`docs/01-architecture/desenho-canal-agente-dc-20.20.md`](docs/01-architecture/desenho-canal-agente-dc-20.20.md)
 - **Agente Win:** [`docs/samples/identity-dc-agent/`](docs/samples/identity-dc-agent/)
@@ -1359,19 +1360,21 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
-- Próximo: **20.10** BLOQUEADO até S1–S8 + GO lab
+- Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab
+- Continuidade: runbook S1–S8 pré-runtime (S5/S8; sem tlsproxy)
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS — mitm_effective sempre false sem runtime
 - 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
 - 20.7a: DEFER histórico; reopen GO → 20.8→20.9
 - IM3 / GI4: PASS (Identity)
-- Plano rev.: 2026-08-08p
+- Plano rev.: 2026-08-08r
 - Baseline enforce: 1.9.8
 - Latest publicado: **1.9.38** (20.9 PASS)
 - Squid: REJEITADO; GI2/GI3 runtime: DEFERRED
 - Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 - Contrato: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
+- Runbook: docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md
 ```
 
 
@@ -1561,21 +1564,23 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-05
+- Data base: 2026-08-08 (sync git + alinhamento docs)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.38** (BG-087/20.9; SHA no topo deste ficheiro)
-- Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **PENDENTE GO**
+- Canal publico latest: **1.9.38** (BG-087/20.9; SHA `7c60f6b1…1dab`)
+- Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
+- Portal visual: **2.0.0** (RBAC); git `origin/main` @ `657d7f4`
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: Identity rede **FECHADA** (20.33/GI9); MITM **20.9 PASS** (intenção≠effective; IPC); runtime tlsproxy AUSENTE; Squid rejeitado; ADR-0026 rev. f; arranque docs/00-overview/START-HERE-identity-mitm.md
 - Desenho MITM: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 - Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
+- Pré-20.10 (docs): docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
 - Pacote publicado: **1.9.38** (20.9)
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.29**; RA/UI **1.9.30**…**1.9.38**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **commit local** working tree (`1.9.38` + portal `2.0.0`) com GO; **20.10** BLOQUEADO até S1–S8 + GO lab; GI2/GI3 runtime DEFERRED; lab AD Identity opcional; GO promoção enforce; BG-028 fase 1
+- Proximo trabalho: **S1–S8 pré-runtime** (só docs/lab checklist; sem tlsproxy); **20.10** BLOQUEADO; GI2/GI3 runtime DEFERRED; lab AD Identity opcional; GO promoção enforce além 1.9.8; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
@@ -1588,13 +1593,14 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.10`**
-  publicado em `pablomichelin/Layer7` tag `v1.9.10`
-  (`SHA256=323e3a74dd41eaa31210de47ef94b13e9d5c1ca9c1b5b54b04d2353cf527f2f2`).
+- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.38`**
+  publicado em `pablomichelin/Layer7` tag `v1.9.38`
+  (`SHA256=7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`).
+  Rollback lab imediato: **`v1.9.37`**.
 - A referencia de **producao enforce** e **`1.9.8`** (GV7.4 PASS `2026-08-05`;
-  evidência `20260805T150500Z-gv7.4-promocao-1.9.8`). Promoção a `1.9.10`
-  **PENDENTE** GO humano.
-  Rollback imediato: **`v1.9.0`**. Historico: `v1.8.11_69`, `v1.8.11_24`.
+  evidência `20260805T150500Z-gv7.4-promocao-1.9.8`). Promoção **para além
+  de `1.9.8`** permanece **PENDENTE** GO humano (não confundir com `latest`).
+  Rollback enforce: **`v1.9.0`**. Historico: `v1.8.11_69`, `v1.8.11_24`.
   Trilha IPv6: **FECHADA (V0–V6)** — dual-stack comercial no âmbito documentado.
 - A trilha **F1.3 de blacklists** passa a ter primeira snapshot UT1 publica
   assinada em `pablomichelin/Layer7` rolling tag `blacklists-ut1-current`
