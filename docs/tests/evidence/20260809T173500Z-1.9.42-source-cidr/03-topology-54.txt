@@ -1,0 +1,9 @@
+=== TOPOLOGY ISOLATED .54 ===
+source_cidr=192.168.100.24/32
+dest_cidr=203.0.113.10
+client_24_in_src=YES
+client_100_in_src=NO
+has_from_any=NO
+VERDICT=PASS_ONLY_24
+pkg_on_254_unchanged=1.9.38
+mitm_tables_on_254=none

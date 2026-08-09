@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.11 PASS** GI2/GI3 (rev. `2026-08-09ag`)
+**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **`1.9.42` source_cidr** (rev. `2026-08-09ah`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -16,7 +16,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.41` (20.10b correctivo; SHA `1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4`)
+**Canal lab/`latest`:** `1.9.42` (source_cidr; SHA `6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`)
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
@@ -38,7 +38,8 @@
 **Rev. `ad` (`2026-08-09`)** = **20.10b PASS** correctivo (`1.9.41`) — F1–F6; próximo **20.11**.  
 **Rev. `ae` (`2026-08-09`)** = corrida lab 20.11 + docs `8939ddb` (overclaim S3/S6 — **corrigido**).  
 **Rev. `af` (`2026-08-09`)** = rev. gerencial interina (S3 pendente; S6 NA).  
-**Rev. `ag` (`2026-08-09`)** = **20.11 PASS** — S3 Edge Windows `192.168.100.24`; GI2/GI3 PASS; S6 **NA/limite**; próximo fecho IM2 / GO produção MITM (humano).
+**Rev. `ag` (`2026-08-09`)** = **20.11 PASS** — S3 Edge Windows `192.168.100.24`; GI2/GI3 PASS; S6 **NA/limite**; próximo fecho IM2 / GO produção MITM (humano).  
+**Rev. `ah` (`2026-08-09`)** = **`1.9.42` PASS** — `intercept.source_cidr` obrigatório com dest; proibido `from any`; runbook activação; `.254` sem escrita neste bloco.
 
 ---
 
@@ -46,8 +47,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.11 PASS** (`1.9.41`) — GI2/GI3 lab (S3 Edge Windows) |
-| Próximo | **Fecho IM2 / GO produção MITM** (humano; sem activar `.254`) |
+| Passo actual | **`1.9.42` PASS** — hardening source scope (pós-20.11) |
+| Próximo | **GO produção MITM** (humano + [`runbook-activacao-mitm-producao-1.9.42.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.42.md); sem escrita `.254` sem GO) |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -59,9 +60,10 @@ TRILHA — progresso
 - 20.10a PASS (1.9.39)
 - 20.10b 1.9.40 NO-GO auditoria → 1.9.41 PASS (F1–F6)
 - 20.11 PASS GI2/GI3 (S3 Edge Windows .24; S6 NA/limite)
-- Plano rev.: 2026-08-09ag
-- Lab/latest: 1.9.41
-- Próximo: fecho IM2 / GO produção MITM (humano)
+- 1.9.42 PASS source_cidr (proibido from any)
+- Plano rev.: 2026-08-09ah
+- Lab/latest: 1.9.42
+- Próximo: GO produção MITM (humano + runbook)
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -570,6 +572,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
 | 2026-08-09 | **rev. `ab` / GO produto + 20.10a** — runtime no `.pkg`; rc OFF; intercept_ready=false; candidato `1.9.39`; próximo **20.10b** |
 | 2026-08-09 | **rev. `ag` / 20.11 PASS** — S3 Edge Windows `.24` + screenshot; GI2/GI3 PASS; S6 NA; sem GO produção |
+| 2026-08-09 | **rev. `ah` / `1.9.42` PASS** — `source_cidr`∧`dest_cidr`; proibido `from any`; runbook activação; `.254` sem escrita |
 | 2026-08-09 | **rev. `af` / rev. gerencial 20.11** — overclaim S3/S6 (interino; supersedido por `ag`) |
 | 2026-08-09 | **rev. `ae` / 20.11 corrida** — lab `.54` (`1.9.41`); docs `8939ddb` overclaim S3/S6 (supersedido por `af`) |
 | 2026-08-09 | **rev. `ac` / 20.10b PASS** — listen selectivo + PF rdr + página HTTPS; `1.9.40`; próximo **20.11** |

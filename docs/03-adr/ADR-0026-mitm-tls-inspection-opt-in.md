@@ -112,6 +112,7 @@
 | **j** | **2026-08-09** | Corrida lab 20.11 (`.54` / `1.9.41`); docs iniciais overclaimaram S3/S6 |
 | **k** | **2026-08-09** | Rev. gerencial interina: S3 pendente (curl ≠ browser); S6 NA |
 | **l** | **2026-08-09** | **S3 PASS** Edge Windows `192.168.100.24`; **20.11 / GI3 PASS**; S6 permanece **NA/limite**; sem GO produção |
+| **m** | **2026-08-09** | **`1.9.42` source_cidr** — rdr MITM exige origem **e** destino; proibido `from any`; produção `.254` continua sem activação automática |
 
 ---
 

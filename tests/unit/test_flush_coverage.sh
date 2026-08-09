@@ -70,6 +70,20 @@ assert_grep "layer7-pfctl flush-all inclui pexc" \
     'layer7_pexc_' "$PFCTL"
 assert_grep "pkg-deinstall POST fallback inclui allow_dst" \
     'layer7_allow_dst' "$DEINSTALL"
+assert_grep "pkg-deinstall POST fallback inclui layer7_mitm_src" \
+    'layer7_mitm_src' "$DEINSTALL"
+assert_grep "pkg-deinstall POST fallback inclui layer7_mitm_dst" \
+    'layer7_mitm_dst' "$DEINSTALL"
+assert_grep "layer7-pfctl define flush_tables_mitm" \
+    'flush_tables_mitm' "$PFCTL"
+if grep -A12 'flush_tables_all()' "$PFCTL" | grep -q 'flush_tables_mitm'; then
+	printf "PASS: layer7-pfctl flush-all inclui mitm\n"
+else
+	printf "FAIL: layer7-pfctl flush-all inclui mitm\n"
+	fail=1
+fi
+assert_grep "layer7.inc flush inclui layer7_mitm_src" \
+    'layer7_mitm_src' "$INC"
 
 if [ "$fail" -ne 0 ]; then
 	printf "\nTEST FLUSH COVERAGE: FAILED\n"

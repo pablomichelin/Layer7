@@ -1,0 +1,4 @@
+# Layer7 MITM selectivo (1.9.42) — source+dest IPv4; proibido from-any; listen 127.0.0.1
+table <layer7_mitm_src> persist { 192.168.100.24/32 }
+table <layer7_mitm_dst> persist { 203.0.113.10 }
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port 443 -> 127.0.0.1 port 8443

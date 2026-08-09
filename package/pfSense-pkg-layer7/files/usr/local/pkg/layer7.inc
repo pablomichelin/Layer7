@@ -1821,7 +1821,8 @@ function layer7_flush_dynamic_tables()
 {
 	$tables = array(
 	    "layer7_block", "layer7_block_dst", "layer7_tagged",
-	    "layer7_allow_dst");
+	    "layer7_allow_dst", "layer7_mitm_src", "layer7_mitm_dst",
+	    "layer7_mitm_dst6");
 	$bl_config = layer7_bl_config_load();
 	if (!empty($bl_config["rules"]) && is_array($bl_config["rules"])) {
 		foreach (array_keys($bl_config["rules"]) as $idx) {
@@ -5904,8 +5905,64 @@ function layer7_mitm_real_ifaces($data = null)
 }
 
 /**
- * Rdr selectivo MITM — só com mitm_effective e dest_cidr não vazio.
- * Nunca universal (from any to any port 443).
+ * Flush tabelas PF MITM (src+dst) — OFF / disable / uninstall / sync OFF.
+ */
+function layer7_mitm_flush_tables()
+{
+	foreach (array("layer7_mitm_src", "layer7_mitm_dst", "layer7_mitm_dst6") as $t) {
+		if (function_exists("layer7_pf_table_flush")) {
+			layer7_pf_table_flush($t);
+		} else {
+			exec("/sbin/pfctl -t " . escapeshellarg($t) .
+			    " -T flush >/dev/null 2>&1", $o, $c);
+			unset($o, $c);
+		}
+	}
+}
+
+/**
+ * Normaliza lista IPv4 CIDR/host para intercept MITM (source ou dest).
+ * Rejeita IPv6, invalidos, loopback, 0.0.0.0/0 (equiv. from any) e "any".
+ * Max 64; dedupe. Host sem máscara fica como IP (PF aceita na tabela).
+ */
+function layer7_mitm_normalize_ipv4_cidr_list($raw, $max = 64)
+{
+	$out = array();
+	if (is_string($raw)) {
+		$raw = preg_split('/[\r\n,]+/', $raw);
+	}
+	if (!is_array($raw)) {
+		return $out;
+	}
+	foreach ($raw as $net) {
+		$net = strtolower(trim((string)$net));
+		if ($net === "" || strlen($net) > 64) {
+			continue;
+		}
+		if ($net === "any" || $net === "all" || $net === "0.0.0.0/0" ||
+		    $net === "0.0.0.0") {
+			continue;
+		}
+		if (layer7_ip_or_cidr_family($net) !== "inet") {
+			continue;
+		}
+		/* Loopback / 127/8 nunca em rdr MITM (source nem dest). */
+		$ip_only = (strpos($net, "/") !== false)
+		    ? substr($net, 0, strpos($net, "/")) : $net;
+		if (strpos($ip_only, "127.") === 0) {
+			continue;
+		}
+		$out[] = $net;
+		if (count($out) >= (int)$max) {
+			break;
+		}
+	}
+	return array_values(array_unique($out));
+}
+
+/**
+ * Rdr selectivo MITM — mitm_effective + source_cidr E dest_cidr IPv4 válidos.
+ * Forma obrigatória: from <layer7_mitm_src> to <layer7_mitm_dst> (nunca from any).
  * $entitled: passar true/false em testes para evitar IO de licença.
  */
 function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
@@ -5917,11 +5974,15 @@ function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
 	if (!layer7_mitm_effective($mitm, $entitled)) {
 		return "";
 	}
+	$srcs = isset($mitm["intercept"]["source_cidr"]) &&
+	    is_array($mitm["intercept"]["source_cidr"])
+	    ? $mitm["intercept"]["source_cidr"]
+	    : array();
 	$dests = isset($mitm["intercept"]["dest_cidr"]) &&
 	    is_array($mitm["intercept"]["dest_cidr"])
 	    ? $mitm["intercept"]["dest_cidr"]
 	    : array();
-	if (empty($dests)) {
+	if (empty($srcs) || empty($dests)) {
 		return "";
 	}
 	$real_ifaces = layer7_mitm_real_ifaces($data);
@@ -5933,33 +5994,47 @@ function layer7_generate_mitm_rdr_snippet($data = null, $entitled = null)
 	if ($port === (int)$webgui_port) {
 		return "";
 	}
-	$inet = array();
-	foreach ($dests as $d) {
-		$fam = layer7_ip_or_cidr_family($d);
-		/* 1.9.41: produto escuta só 127.0.0.1 — não emitir rdr inet6 para ::1
-		 * sem listener (evita blackhole IPv6). IPv6 MITM fica para passo futuro. */
-		if ($fam === "inet") {
-			$inet[] = $d;
+	/* 1.9.42: só IPv4 — listener 127.0.0.1; sem rdr inet6. */
+	$inet_src = array();
+	foreach ($srcs as $s) {
+		if (layer7_ip_or_cidr_family($s) === "inet") {
+			$inet_src[] = $s;
 		}
 	}
-	$inet = array_values(array_unique($inet));
-	/* Excluir IPs do próprio appliance / portal (anti-lockout webConfigurator). */
+	$inet_dst = array();
+	foreach ($dests as $d) {
+		if (layer7_ip_or_cidr_family($d) === "inet") {
+			$inet_dst[] = $d;
+		}
+	}
+	$inet_src = array_values(array_unique($inet_src));
+	$inet_dst = array_values(array_unique($inet_dst));
+	/* Anti-lockout: excluir IPs/CIDRs do appliance em dest (e source). */
 	$self = layer7_mitm_self_ipv4_exclude($data);
 	if (!empty($self)) {
-		$inet = array_values(array_filter($inet, function ($d) use ($self) {
+		$inet_dst = array_values(array_filter($inet_dst, function ($d) use ($self) {
 			return !layer7_mitm_dest_is_self($d, $self);
 		}));
+		$inet_src = array_values(array_filter($inet_src, function ($s) use ($self) {
+			return !layer7_mitm_dest_is_self($s, $self);
+		}));
 	}
-	if (empty($inet)) {
+	if (empty($inet_src) || empty($inet_dst)) {
 		return "";
 	}
 	$lines = array();
-	$lines[] = "# Layer7 MITM selectivo (20.10b/1.9.41) — destinos IPv4 explícitos; listen 127.0.0.1";
-	$lines[] = "table <layer7_mitm_dst> persist { " . implode(", ", $inet) . " }";
+	$lines[] = "# Layer7 MITM selectivo (1.9.42) — source+dest IPv4; proibido from-any; listen 127.0.0.1";
+	$lines[] = "table <layer7_mitm_src> persist { " . implode(", ", $inet_src) . " }";
+	$lines[] = "table <layer7_mitm_dst> persist { " . implode(", ", $inet_dst) . " }";
 	foreach ($real_ifaces as $iface) {
-		$lines[] = "rdr on {$iface} inet proto tcp" .
-		    " from any to <layer7_mitm_dst> port 443" .
+		$rule = "rdr on {$iface} inet proto tcp" .
+		    " from <layer7_mitm_src> to <layer7_mitm_dst> port 443" .
 		    " -> 127.0.0.1 port {$port}";
+		/* Cinto de segurança: nunca emitir from any nas regras. */
+		if (preg_match('/\bfrom\s+any\b/i', $rule)) {
+			return "";
+		}
+		$lines[] = $rule;
 	}
 	return implode("\n", $lines) . "\n";
 }
@@ -6041,6 +6116,9 @@ function layer7_mitm_sync_helper($data = null, $entitled = null)
 		if (!getenv("LAYER7_TEST_ROOT")) {
 			@exec("/usr/sbin/service layer7-tlsproxy onestop 2>/dev/null");
 			@exec("/usr/sbin/sysrc layer7_tlsproxy_enable=NO 2>/dev/null");
+			layer7_mitm_flush_tables();
+		} else {
+			layer7_mitm_flush_tables();
 		}
 		return false;
 	}
@@ -6183,8 +6261,9 @@ function layer7_mitm_defaults()
 			"sni" => array(),
 			"cidr" => array()
 		),
-		/* 20.10b: destinos de rdr selectivo — vazio = zero regras (upgrade seguro). */
+		/* 1.9.42: source+dest obrigatórios para rdr; default vazio = zero regras. */
 		"intercept" => array(
+			"source_cidr" => array(),
 			"dest_cidr" => array(),
 			"block_sni" => array()
 		)
@@ -6301,34 +6380,13 @@ function layer7_mitm_normalize($mitm)
 		"cidr" => $cidr
 	);
 
-	/* Intercept selectivo 20.10b */
+	/* Intercept selectivo 1.9.42 — source_cidr + dest_cidr (IPv4). */
 	$ic_in = (isset($mitm["intercept"]) && is_array($mitm["intercept"]))
 	    ? $mitm["intercept"] : array();
-	$dest = array();
-	$raw_dest = isset($ic_in["dest_cidr"]) ? $ic_in["dest_cidr"] : array();
-	if (is_string($raw_dest)) {
-		$raw_dest = preg_split('/[\r\n,]+/', $raw_dest);
-	}
-	if (is_array($raw_dest)) {
-		foreach ($raw_dest as $net) {
-			$net = trim((string)$net);
-			if ($net === "" || strlen($net) > 64) {
-				continue;
-			}
-			if (layer7_ip_or_cidr_family($net) === null) {
-				continue;
-			}
-			/* Nunca interceptar loopback via rdr. */
-			if ($net === "127.0.0.1" || $net === "127.0.0.1/32" ||
-			    $net === "::1" || $net === "::1/128") {
-				continue;
-			}
-			$dest[] = $net;
-			if (count($dest) >= 64) {
-				break;
-			}
-		}
-	}
+	$src = layer7_mitm_normalize_ipv4_cidr_list(
+	    isset($ic_in["source_cidr"]) ? $ic_in["source_cidr"] : array(), 64);
+	$dest = layer7_mitm_normalize_ipv4_cidr_list(
+	    isset($ic_in["dest_cidr"]) ? $ic_in["dest_cidr"] : array(), 64);
 	$bsni = array();
 	$raw_bsni = isset($ic_in["block_sni"]) ? $ic_in["block_sni"] : array();
 	if (is_string($raw_bsni)) {
@@ -6354,7 +6412,8 @@ function layer7_mitm_normalize($mitm)
 		}
 	}
 	$out["intercept"] = array(
-		"dest_cidr" => array_values(array_unique($dest)),
+		"source_cidr" => $src,
+		"dest_cidr" => $dest,
 		"block_sni" => array_values(array_unique($bsni))
 	);
 	return $out;

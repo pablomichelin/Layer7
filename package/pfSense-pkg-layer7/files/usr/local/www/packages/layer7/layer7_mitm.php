@@ -35,6 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 		if (isset($_POST["mitm_save_bypass"])) {
 			$mitm["bypass"]["sni"] = isset($_POST["bypass_sni"]) ? (string)$_POST["bypass_sni"] : "";
 			$mitm["bypass"]["cidr"] = isset($_POST["bypass_cidr"]) ? (string)$_POST["bypass_cidr"] : "";
+			$mitm["intercept"]["source_cidr"] = isset($_POST["intercept_source_cidr"])
+			    ? (string)$_POST["intercept_source_cidr"] : "";
 			$mitm["intercept"]["dest_cidr"] = isset($_POST["intercept_dest_cidr"])
 			    ? (string)$_POST["intercept_dest_cidr"] : "";
 			$mitm["intercept"]["block_sni"] = isset($_POST["intercept_block_sni"])
@@ -54,12 +56,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 					filter_configure();
 				}
 				$eff = layer7_mitm_effective($mitm, true);
+				$ns = count($mitm["intercept"]["source_cidr"] ?? array());
 				$nd = count($mitm["intercept"]["dest_cidr"] ?? array());
 				$savemsg = $eff
 				    ? l7_t("Configuracao MITM gravada (mitm_effective ON).") .
-					($nd > 0
-					    ? " " . l7_t("Rdr selectivo activo para destinos configurados.")
-					    : " " . l7_t("Sem dest_cidr: helper pode escutar em loopback, zero rdr."))
+					(($ns > 0 && $nd > 0)
+					    ? " " . l7_t("Rdr selectivo activo (origem E destino configurados).")
+					    : " " . l7_t("Sem source_cidr e dest_cidr juntos: zero rdr (helper pode escutar em loopback)."))
 				    : l7_t("Configuracao MITM gravada. Intencao guardada; mitm_effective OFF (gates incompletos).");
 				$mitm = layer7_mitm_from_config($data);
 			} elseif (empty($input_errors)) {
@@ -157,9 +160,9 @@ if ($savemsg !== "") {
 		<div class="layer7-content">
 			<p class="layer7-lead">
 				<?= htmlspecialchars(l7_t(
-				    "Passo 20.10b: listen selectivo (127.0.0.1:8443) + PF rdr por dest_cidr + pagina HTTPS. " .
+				    "1.9.42: listen selectivo (127.0.0.1:8443) + PF rdr so com origem E destino (source_cidr + dest_cidr). " .
 				    "mitm.enabled e intencao; mitm_effective exige entitlement+CA+runtime+intercept_ready. " .
-				    "Sem dest_cidr nao ha rdr. Com effective OFF o bloqueio HTTPS continua ADR-0017. Squid rejeitado."
+				    "Listas vazias = zero rdr (upgrade seguro). Nunca from any. Squid rejeitado."
 				)); ?>
 			</p>
 
@@ -196,6 +199,7 @@ if ($savemsg !== "") {
 						<tr><th>mitm_effective</th><td><code><?= $effective ? "true" : "false"; ?></code></td></tr>
 						<tr><th>runtime</th><td><code><?= $runtime_ok ? "yes" : "no"; ?></code></td></tr>
 						<tr><th>intercept_ready</th><td><code><?= layer7_mitm_intercept_ready() ? "true" : "false"; ?></code></td></tr>
+						<tr><th>intercept source_cidr</th><td><code><?= (int)count($mitm["intercept"]["source_cidr"] ?? array()); ?></code></td></tr>
 						<tr><th>intercept dest_cidr</th><td><code><?= (int)count($mitm["intercept"]["dest_cidr"] ?? array()); ?></code></td></tr>
 						<tr><th>quic_mode</th><td><code><?= htmlspecialchars($mitm["quic_mode"] ?? "bypass"); ?></code></td></tr>
 						<tr><th>features</th><td><code><?= htmlspecialchars($l7_feat_raw); ?></code></td></tr>
@@ -305,20 +309,33 @@ if ($savemsg !== "") {
 								<p class="help-block" style="margin-top:6px;">
 									<?= htmlspecialchars(l7_t(
 									    "Runtime e intercept_ready presentes. mitm_effective activa-se com intencao+CA. " .
-									    "Rdr so com dest_cidr preenchido (selectivo)."
+									    "Rdr so com source_cidr E dest_cidr preenchidos (selectivo)."
 									)); ?>
 								</p>
 <?php endif; ?>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Destinos rdr (selectivo)")); ?></label>
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Origens rdr (obrigatorio)")); ?></label>
+							<div class="col-sm-9">
+								<textarea name="intercept_source_cidr" class="form-control" rows="3"
+									placeholder="192.168.100.24/32"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["source_cidr"] ?? array())); ?></textarea>
+								<p class="help-block"><?= htmlspecialchars(l7_t(
+								    "Quem pode ser interceptado: CIDR/IP IPv4 de origem (ex.: um PC de teste 192.168.100.24/32). " .
+								    "Vazio = zero rdr — os outros clientes da LAN nao sao afectados. " .
+								    "Obrigatorio em conjunto com Destinos. Rejeita any, 0.0.0.0/0 e IPv6."
+								)); ?></p>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Destinos rdr (obrigatorio)")); ?></label>
 							<div class="col-sm-9">
 								<textarea name="intercept_dest_cidr" class="form-control" rows="3"
 									placeholder="203.0.113.10&#10;198.51.100.0/24"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["dest_cidr"] ?? array())); ?></textarea>
 								<p class="help-block"><?= htmlspecialchars(l7_t(
-								    "CIDR/IP IPv4 de destino a redireccionar para 127.0.0.1:8443. Vazio = zero rdr. " .
-								    "IPv6 ainda nao e emitido (listener so IPv4). IPs do proprio appliance sao excluidos."
+								    "Para onde o trafego e redireccionado (destino IPv4) → 127.0.0.1:8443. " .
+								    "Vazio = zero rdr. Use um destino de teste dedicado — nao a Internet inteira. " .
+								    "IPv6 nao e emitido (listener so IPv4). IPs do proprio appliance / GUI sao excluidos."
 								)); ?></p>
 							</div>
 						</div>

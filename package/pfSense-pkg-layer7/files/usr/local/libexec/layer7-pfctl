@@ -231,6 +231,13 @@ flush_tables_allow_dst() {
 	/sbin/pfctl -t "${TABLE_ALLOW_DST}" -T flush >/dev/null 2>&1 || true
 }
 
+# Tabelas MITM rdr selectivo (1.9.42+: src+dst; flush em OFF/uninstall).
+flush_tables_mitm() {
+	/sbin/pfctl -t layer7_mitm_src -T flush >/dev/null 2>&1 || true
+	/sbin/pfctl -t layer7_mitm_dst -T flush >/dev/null 2>&1 || true
+	/sbin/pfctl -t layer7_mitm_dst6 -T flush >/dev/null 2>&1 || true
+}
+
 # Excepcoes allow por origem (estaticas no ruleset; flush evita indices orfaos).
 flush_tables_exception_allow() {
 	_i=0
@@ -246,6 +253,7 @@ flush_tables_all() {
 	flush_tables_exception_allow
 	flush_tables_policy_scoped
 	flush_tables_allow_dst
+	flush_tables_mitm
 	# Residuos de lab (QA D5): ancora de teste G5 nao faz parte do ciclo
 	# de vida do pacote — limpar se existir.
 	/sbin/pfctl -a layer7_g5_test -F all >/dev/null 2>&1 || true

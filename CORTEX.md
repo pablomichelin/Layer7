@@ -35,14 +35,14 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.41` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.41`;
-`SHA256=1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4`;
-BG-087/20.10b correctivo pós-auditoria adversária do `1.9.40` (F1–F6);
-`intercept_ready=true`; default OFF; rdr só com `dest_cidr` IPv4;
-comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.40`**.
-**MITM:** **GO produto** `2026-08-09`; **20.10a PASS**; **20.10b PASS** (`1.9.41`);
-**20.11 PASS** GI2/GI3 lab (S3 Edge Windows; S6 NA); **sem** intercept produção `.254/.234/.235`.
+`1.9.42` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.42`;
+`SHA256=6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`;
+BG-087 hardening `intercept.source_cidr` + `dest_cidr` obrigatórios;
+`intercept_ready=true`; default OFF; rdr `from <layer7_mitm_src> to <layer7_mitm_dst>`
+(proibido `from any`); comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.41`**.
+**MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **`1.9.42` PASS** source scope;
+**sem** intercept produção `.254/.234/.235` sem GO + runbook.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
@@ -1317,12 +1317,12 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM GO 2026-08-08)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.41`** (20.10b + 20.11 lab).
+Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.42`** (source_cidr hardening).
 **IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
 **20.8 PASS** → **20.9 PASS** → **GO produto** → **20.10a PASS** → **20.10b PASS** →
-**20.11 PASS** GI2/GI3 (S3 Edge Windows; S6 NA);
+**20.11 PASS** → **`1.9.42` PASS** source∧dest;
 **IM3–IM9 Identity rede FECHADA** (20.33 / GI9 PASS). **Nicho:** PME / MSP.
-**MITM:** `intercept_ready=true`; listen/rdr/página gated por `mitm_effective`;
+**MITM:** `intercept_ready=true`; rdr gated por `mitm_effective` + source∧dest;
 default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 
 - **Arranque (único desta trilha):**
@@ -1343,24 +1343,26 @@ default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
   [`docs/09-blocking/plano-gates-identity-mitm.md`](docs/09-blocking/plano-gates-identity-mitm.md)
 - **ADRs:** 0025–0029 (0026 implementação em curso; 0029 IM7 diferido)
 - **Spike MITM:** [`docs/09-blocking/spike-mitm-20.7.md`](docs/09-blocking/spike-mitm-20.7.md)
-- **Backlog:** BG-085…BG-092 (BG-087 **20.11 PASS**; BG-091 fechado ADR-0029)
-- **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→**20.11 PASS**
+- **Backlog:** BG-085…BG-092 (BG-087 **`1.9.42` PASS**; BG-091 fechado ADR-0029)
+- **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→20.11→**`1.9.42`**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09ag`
+- **Rev. plano:** `2026-08-09ah`
 - **Evidência 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/)
 - **Auditoria pós-release 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/`](docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/)
 - **Evidência 20.11:** [`docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/)
+- **Evidência 1.9.42:** [`docs/tests/evidence/20260809T173500Z-1.9.42-source-cidr/`](docs/tests/evidence/20260809T173500Z-1.9.42-source-cidr/)
+- **Runbook activação produção:** [`docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md`](docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md)
 - **Runbook S1–S8:** [`docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md)
 - **Prep 20.10:** [`docs/09-blocking/prep-20.10-checklist.md`](docs/09-blocking/prep-20.10-checklist.md) — **FECHADO**
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.11 PASS** (`1.9.41`; GI2/GI3; S3 Edge Windows)
-- Próximo: fecho IM2 / GO produção MITM (humano)
-- Latest: **1.9.41** SHA `1518ad68…c1f4`
+- Passo actual: **1.9.42 PASS** (source_cidr; pós-20.11)
+- Próximo: GO produção MITM (humano + runbook 1.9.42)
+- Latest: **1.9.42** SHA `6bd6ba37…4c4b`
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; sem intercept produção
+- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; sem intercept produção sem GO
 ```
 
 ---
@@ -1549,17 +1551,18 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-09 (20.11 PASS GI2/GI3 — S3 Edge Windows; S6 NA)
+- Data base: 2026-08-09 (1.9.42 source_cidr PASS; 20.11 GI2/GI3; S6 NA)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.41** (BG-087/20.10b+20.11; SHA `1518ad68…c1f4`)
+- Canal publico latest: **1.9.42** (BG-087 source_cidr; SHA `6bd6ba37…4c4b`)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **20.11 PASS** GI2/GI3; S6 NA; próximo fecho IM2 / GO produção MITM (humano); Squid rejeitado
+- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **1.9.42 PASS** source∧dest; S6 NA; próximo GO produção MITM (humano+runbook); Squid rejeitado
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
-- Proximo trabalho: fecho IM2 / GO produção MITM (humano) — sem activar intercept .254/.234/.235 sem GO
-- Pacote publicado: **1.9.41**; rollback lab: **1.9.40**
+- Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md
+- Proximo trabalho: GO produção MITM (humano) — sem activar intercept .254/.234/.235 sem GO
+- Pacote publicado: **1.9.42**; rollback lab: **1.9.41**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```

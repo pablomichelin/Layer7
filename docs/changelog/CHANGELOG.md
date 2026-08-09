@@ -6,8 +6,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- **20.11 PASS** (`1.9.41`): GI2/GI3 lab — S3 **PASS** com Microsoft Edge **151** em VM Windows `192.168.100.24` (CA trust + screenshot HTML); S6 ECH = **NA/limite**. Evidência `docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/` (incl. `s3-windows/`). Sem GO produção MITM. Sem bump de PORTVERSION.
-- **20.10b PASS** (`1.9.41`): correctivo F1–F6 pós-auditoria do `1.9.40` (histórico).
+- (vazio)
+
+## [1.9.42] — 2026-08-09
+
+### Security
+
+- **BG-087 / hardening MITM source scope:** `intercept.source_cidr` (IPv4, default vazio)
+  obrigatório **em conjunto** com `dest_cidr` para emitir rdr; tabelas
+  `<layer7_mitm_src>` + `<layer7_mitm_dst>`; forma
+  `from <layer7_mitm_src> to <layer7_mitm_dst>` — **proibido** `from any`.
+  Dest-only (regressão `1.9.41`) = zero rdr. Anti-lockout/self, limites,
+  dedupe, rejeição `any`/`0.0.0.0/0`/IPv6/loopback. Lifecycle OFF/uninstall
+  limpa ambas as tabelas. GUI PME com ajuda clara. Evidência:
+  `docs/tests/evidence/20260809T173500Z-1.9.42-source-cidr/`.
+
+### Release
+
+- Tag `v1.9.42` / `releases/latest`
+- SHA256: `6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`
+- Rollback: `1.9.41`
 
 ## [1.9.41] — 2026-08-09
 

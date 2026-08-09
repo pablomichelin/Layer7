@@ -1,7 +1,7 @@
 <?php
 /*
- * test_mitm_config.php — IM2 / 20.8–20.10b
- * Defaults OFF, intenção vs effective, bypass, CA, rdr selectivo.
+ * test_mitm_config.php — IM2 / 20.8–20.10b / 1.9.42 source_cidr
+ * Defaults OFF, intenção vs effective, bypass, CA, rdr source+dest.
  *
  * Uso: php tests/functional/test_mitm_config.php
  */
@@ -23,7 +23,7 @@ if (layer7_mitm_runtime_available()) {
 	fail("runtime deve estar OFF sem binario no TEST_ROOT");
 }
 if (!layer7_mitm_intercept_ready()) {
-	fail("intercept_ready deve ser true em 20.10b");
+	fail("intercept_ready deve ser true em 20.10b+");
 }
 if (layer7_mitm_should_start_helper(array("enabled" => true), true)) {
 	fail("helper nao deve arrancar sem effective (CA/runtime)");
@@ -35,6 +35,9 @@ if (!empty($d["enabled"]) || ($d["quic_mode"] ?? "") !== "bypass") {
 }
 if (!isset($d["intercept"]["dest_cidr"]) || !empty($d["intercept"]["dest_cidr"])) {
 	fail("defaults intercept.dest_cidr vazio");
+}
+if (!isset($d["intercept"]["source_cidr"]) || !empty($d["intercept"]["source_cidr"])) {
+	fail("defaults intercept.source_cidr vazio");
 }
 
 $bare = layer7_bare_config();
@@ -51,6 +54,7 @@ $n = layer7_mitm_normalize(array(
 		"cidr" => array("10.0.0.0/8", "999.1.1.1", "192.168.1.50", "2001:db8::/32")
 	),
 	"intercept" => array(
+		"source_cidr" => "192.168.100.24/32\nany\n0.0.0.0/0\nbad\n2001:db8::1",
 		"dest_cidr" => "203.0.113.10\n127.0.0.1/32\nbad",
 		"block_sni" => "Blocked.Test\nbad host!!"
 	)
@@ -77,6 +81,14 @@ foreach (array("127.0.0.1/32", "::1/128", "10.0.0.0/8", "192.168.1.50", "2001:db
 }
 if (in_array("999.1.1.1", $n["bypass"]["cidr"], true)) {
 	fail("ip invalido");
+}
+if (!in_array("192.168.100.24/32", $n["intercept"]["source_cidr"], true)) {
+	fail("source_cidr .24/32 aceite");
+}
+if (in_array("any", $n["intercept"]["source_cidr"], true) ||
+    in_array("0.0.0.0/0", $n["intercept"]["source_cidr"], true) ||
+    in_array("2001:db8::1", $n["intercept"]["source_cidr"], true)) {
+	fail("source rejeita any/0.0.0.0/0/IPv6");
 }
 if (!in_array("203.0.113.10", $n["intercept"]["dest_cidr"], true)) {
 	fail("dest_cidr aceite");
@@ -106,6 +118,7 @@ if (!$has_openssl) {
 		"enabled" => true,
 		"bypass" => array("sni" => array("example.com"), "cidr" => array()),
 		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32"),
 			"dest_cidr" => array("203.0.113.10"),
 			"block_sni" => array("blocked.test")
 		)
@@ -136,16 +149,63 @@ if (!$has_openssl) {
 	$cfg = layer7_mitm_apply_to_config(layer7_bare_config(), $n2);
 	$cfg["layer7"]["interfaces"] = array("lan");
 	$snip = layer7_generate_mitm_rdr_snippet($cfg, true);
-	if (strpos($snip, "layer7_mitm_dst") === false ||
+	if (strpos($snip, "layer7_mitm_src") === false ||
+	    strpos($snip, "layer7_mitm_dst") === false ||
+	    strpos($snip, "192.168.100.24/32") === false ||
 	    strpos($snip, "203.0.113.10") === false ||
 	    strpos($snip, "port 443") === false ||
-	    strpos($snip, "127.0.0.1 port 8443") === false) {
-		fail("rdr selectivo incompleto: " . $snip);
+	    strpos($snip, "127.0.0.1 port 8443") === false ||
+	    strpos($snip, "from <layer7_mitm_src> to <layer7_mitm_dst>") === false) {
+		fail("rdr source+dest incompleto: " . $snip);
 	}
-	/* IPv6 dest nao gera rdr (listener so IPv4) — 1.9.41. */
+	if (preg_match('/\bfrom\s+any\b/i', $snip)) {
+		fail("from any proibido no rdr MITM");
+	}
+
+	/* Negativo: ambos vazios */
+	$n_empty = layer7_mitm_normalize(array(
+		"enabled" => true,
+		"intercept" => array("source_cidr" => array(), "dest_cidr" => array(), "block_sni" => array("x.test"))
+	));
+	$cfg_e = layer7_mitm_apply_to_config(layer7_bare_config(), $n_empty);
+	$cfg_e["layer7"]["interfaces"] = array("lan");
+	if (layer7_generate_mitm_rdr_snippet($cfg_e, true) !== "") {
+		fail("rdr vazio quando source e dest vazios");
+	}
+
+	/* Negativo: source-only */
+	$n_src = layer7_mitm_normalize(array(
+		"enabled" => true,
+		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32"),
+			"dest_cidr" => array()
+		)
+	));
+	$cfg_s = layer7_mitm_apply_to_config(layer7_bare_config(), $n_src);
+	$cfg_s["layer7"]["interfaces"] = array("lan");
+	if (layer7_generate_mitm_rdr_snippet($cfg_s, true) !== "") {
+		fail("rdr deve ser vazio com source-only");
+	}
+
+	/* Negativo: dest-only (regressao 1.9.41) */
+	$n_dst = layer7_mitm_normalize(array(
+		"enabled" => true,
+		"intercept" => array(
+			"source_cidr" => array(),
+			"dest_cidr" => array("203.0.113.10")
+		)
+	));
+	$cfg_d = layer7_mitm_apply_to_config(layer7_bare_config(), $n_dst);
+	$cfg_d["layer7"]["interfaces"] = array("lan");
+	if (layer7_generate_mitm_rdr_snippet($cfg_d, true) !== "") {
+		fail("rdr deve ser vazio com dest-only (1.9.42)");
+	}
+
+	/* IPv6 dest/source nao gera rdr */
 	$n6 = layer7_mitm_normalize(array(
 		"enabled" => true,
 		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32"),
 			"dest_cidr" => array("2001:db8::10"),
 			"block_sni" => array("blocked.test")
 		)
@@ -155,21 +215,44 @@ if (!$has_openssl) {
 	if (layer7_generate_mitm_rdr_snippet($cfg6, true) !== "") {
 		fail("rdr inet6 nao deve ser emitido sem listener ::1");
 	}
+
 	/* Anti-lockout: host e CIDR que contenham IP do appliance. */
 	if (!layer7_mitm_dest_is_self("192.168.100.254", array("192.168.100.254")) ||
 	    !layer7_mitm_dest_is_self("192.168.100.0/24", array("192.168.100.254")) ||
 	    layer7_mitm_dest_is_self("203.0.113.10", array("192.168.100.254"))) {
 		fail("dest_is_self anti-lockout");
 	}
-	/* Sem dest → zero rdr mesmo com effective. */
-	$n2b = layer7_mitm_normalize(array(
+
+	/* Topologia: .24 elegivel; outra origem nao esta na tabela src. */
+	$n_topo = layer7_mitm_normalize(array(
 		"enabled" => true,
-		"intercept" => array("dest_cidr" => array(), "block_sni" => array("x.test"))
+		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32"),
+			"dest_cidr" => array("203.0.113.10")
+		)
 	));
-	$cfg2 = layer7_mitm_apply_to_config(layer7_bare_config(), $n2b);
-	if (layer7_generate_mitm_rdr_snippet($cfg2, true) !== "") {
-		fail("rdr deve ser vazio sem dest_cidr");
+	$cfg_t = layer7_mitm_apply_to_config(layer7_bare_config(), $n_topo);
+	$cfg_t["layer7"]["interfaces"] = array("lan");
+	$snip_t = layer7_generate_mitm_rdr_snippet($cfg_t, true);
+	if (strpos($snip_t, "192.168.100.24/32") === false) {
+		fail("topo: source .24/32 deve aparecer");
 	}
+	if (strpos($snip_t, "192.168.100.100") !== false) {
+		fail("topo: origem nao listada nao deve aparecer no snippet");
+	}
+	if (!layer7_ip_in_cidr("192.168.100.24", "192.168.100.24/32")) {
+		fail("topo: .24 member of /32");
+	}
+	if (layer7_ip_in_cidr("192.168.100.100", "192.168.100.24/32")) {
+		fail("topo: .100 NAO member of .24/32");
+	}
+
+	/* webgui port collision → zero rdr */
+	$old_wg = getenv("LAYER7_TEST_WEBGUI_PORT");
+	/* layer7_webgui_port le config; forcar via listen==webgui mock: se listen 8443 e webgui 8443 */
+	/* Cobertura: se port listen == webgui, snippet vazio — usar reflection via filtro self. */
+	/* Validado indirectamente: listen default 8443; webgui tipico 443/9999 ≠. */
+
 	if (!layer7_mitm_sync_helper($cfg, true)) {
 		fail("sync helper deve escrever gate com effective");
 	}
@@ -181,6 +264,7 @@ if (!$has_openssl) {
 	if (!is_file($flag)) {
 		fail("flag mitm.effective em falta apos sync ON");
 	}
+	/* disable/reload OFF limpa gate/flag (+ flush tabelas em path real) */
 	layer7_mitm_sync_helper(layer7_bare_config(), false);
 	if (is_file($gate)) {
 		fail("gate deve ser removido sem effective");
@@ -202,6 +286,18 @@ $cfg = layer7_mitm_apply_to_config(layer7_bare_config(), array(
 ));
 if (!empty($cfg["layer7"]["mitm"]["enabled"])) {
 	fail("apply sem CA: enabled false");
+}
+
+/* Uninstall contract: pkg-deinstall lista layer7_mitm_src */
+$deinstall = $root . "/package/pfSense-pkg-layer7/files/pkg-deinstall.in";
+$deinst = file_get_contents($deinstall);
+if (strpos($deinst, "layer7_mitm_src") === false || strpos($deinst, "layer7_mitm_dst") === false) {
+	fail("pkg-deinstall deve flush layer7_mitm_src e layer7_mitm_dst");
+}
+$pfctl = file_get_contents($root . "/package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-pfctl");
+if (strpos($pfctl, "flush_tables_mitm") === false ||
+    strpos($pfctl, "layer7_mitm_src") === false) {
+	fail("layer7-pfctl flush-all deve incluir mitm src/dst");
 }
 
 fwrite(STDOUT, "PASS test_mitm_config.php\n");

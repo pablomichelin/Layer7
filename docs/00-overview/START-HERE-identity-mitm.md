@@ -1,8 +1,8 @@
-# START HERE — Identity + MITM Add-on 【20.11 PASS GI2/GI3 (`1.9.41`)】
+# START HERE — Identity + MITM Add-on 【`1.9.42` source_cidr · 20.11 PASS】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
-> **20.10b PASS** (`1.9.41`); **20.11 PASS** — GI2/GI3 lab (S3 Edge Windows). S6 **NA/limite**.  
-> **Sem** intercept em `.254`/`.234`/`.235`. Squid rejeitado. **Sem** GO produção MITM automático.
+> **20.10b/20.11 PASS**; hardening **`1.9.42`** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
+> **Sem** intercept em `.254`/`.234`/`.235` sem GO + runbook. Squid rejeitado.
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -46,11 +46,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; **20.11 PASS** (rev. `2026-08-09ag`) |
-| Passo actual | **20.11 PASS** (`1.9.41`) — GI2/GI3 lab |
-| Próximo | **Fecho IM2 / GO produção MITM** (humano explícito; sem activar `.254`) |
-| Rev. do plano | **`2026-08-09ag`** |
-| MITM | `intercept_ready=true`; listen/rdr/página gated; GI2/GI3 **PASS**; S6 **NA/limite** |
+| Plano | Identity **FECHADA**; MITM **GO produto**; **`1.9.42` source_cidr** (rev. `2026-08-09ah`) |
+| Passo actual | **`1.9.42` PASS** — hardening source scope (pós-20.11) |
+| Próximo | **GO produção MITM** via runbook `1.9.42` (humano; `.254` ainda sem escrita automática) |
+| Rev. do plano | **`2026-08-09ah`** |
+| MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -125,19 +125,20 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.41**.
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.42**.
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
-Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; **20.11 PASS** GI2/GI3 (S3 Edge Windows).
+Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; 20.11 PASS; hardening **1.9.42** source_cidr.
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
 GO produto: docs/09-blocking/GO-produto-20.10.md
+Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (fecho IM2 / GO produção MITM humano).
+Ler na ordem do START-HERE; executar só o próximo bloco seguro (GO produção MITM via runbook; sem escrita .254 sem GO).
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
-um passo/bloco por entrega; português; barra UX PME; Squid rejeitado;
+rdr só source∧dest; um passo/bloco por entrega; português; barra UX PME; Squid rejeitado;
 S6 ECH = NA/limite; NÃO activar intercept em .254/.234/.235 sem GO humano produção.
-Estado: 20.11 PASS; evidência 20260809T060000Z-20.11-gi2-gi3-54 (incl. s3-windows/); plano rev. 2026-08-09ag.
-Tarefa seguinte: **fecho IM2 / GO produção MITM** (humano; sem activar produção).
+Estado: 1.9.42 PASS; evidência 20260809T173500Z-1.9.42-source-cidr; plano rev. 2026-08-09ah.
+Tarefa seguinte: **GO produção MITM** (humano + runbook; parar antes da 1ª escrita se não houver GO).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -156,9 +157,9 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.11 PASS** (`1.9.41`; GI2/GI3; S3 Edge Windows)
-- Próximo: fecho IM2 / GO produção MITM (humano)
-- Latest: **1.9.41** SHA `1518ad68…c1f4`
+- Passo actual: **1.9.42 PASS** (source_cidr; pós-20.11)
+- Próximo: GO produção MITM (humano + runbook 1.9.42)
+- Latest: **1.9.42** SHA `6bd6ba37…4c4b`
 - S6 ECH: NA/limite (não exercitado)
 ```
 
@@ -178,6 +179,8 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Gates | [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
 | Evidência 20.11 | [`../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](../tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/) |
+| Evidência 1.9.42 | [`../tests/evidence/20260809T173500Z-1.9.42-source-cidr/`](../tests/evidence/20260809T173500Z-1.9.42-source-cidr/) |
+| Runbook activação prod. | [`../09-blocking/runbook-activacao-mitm-producao-1.9.42.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.42.md) |
 | Spike MITM + reopen | [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) |
 | PoC lab tlsproxy | [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |
