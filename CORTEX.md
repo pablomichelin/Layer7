@@ -35,12 +35,13 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.38` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.38`;
-`SHA256=7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`;
-BG-087/20.9 MITM intenção vs effective + IPC; sem intercept; comandos em
+`1.9.39` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.39`;
+SHA a confirmar no publish; BG-087/20.10a runtime no `.pkg` default OFF;
+`intercept_ready=false`; sem intercept; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.37`**.
-**MITM:** reopen GO `2026-08-08`; **20.9 PASS**; PoC-5 + **Opção A S1 inline PASS** em `.54` (`0.0.5-poc5`); prep 20.10 itens **1–7 PASS** (draft packaging fora do `.pkg`); runtime **ainda fora** do `.pkg`; **20.10** bloqueado até GO produto.
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.38`**.
+**MITM:** **GO produto** `2026-08-09`; **20.10a** (runtime empacotado, OFF);
+**20.10b** pendente; PoC lab `.54` continua; **sem** intercept produção.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
@@ -1315,74 +1316,49 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM GO 2026-08-08)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.38`** (20.9 PASS).
+Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.39`** (20.10a).
 **IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
-**20.8 PASS** → **20.9 PASS**; **IM3–IM9 Identity rede FECHADA**
-(20.33 / GI9 PASS). **Nicho:** PME / MSP — Identity-first (não paridade NGFW TLS).
-**MITM:** intenção `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC;
-`mitm_effective` **sempre false** sem runtime; Squid **rejeitado**;
-GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
+**20.8 PASS** → **20.9 PASS** → **GO produto `2026-08-09`** → **20.10a**;
+**IM3–IM9 Identity rede FECHADA** (20.33 / GI9 PASS). **Nicho:** PME / MSP.
+**MITM:** runtime no `.pkg` (default OFF); `mitm_effective` false sem
+`intercept_ready` (20.10b); Squid **rejeitado**; GI2/GI3 **DEFERRED**.
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
-- **Posicionamento PME (ideia/objectivo/UX):**
+- **Posicionamento PME:**
   [`docs/00-overview/posicionamento-pme-identity-first.md`](docs/00-overview/posicionamento-pme-identity-first.md)
 - **Plano SSOT:**
   [`docs/02-roadmap/plano-identity-mitm-addon.md`](docs/02-roadmap/plano-identity-mitm-addon.md)
+- **GO produto:**
+  [`docs/09-blocking/GO-produto-20.10.md`](docs/09-blocking/GO-produto-20.10.md)
 - **Mapa:**
   [`docs/01-architecture/identity-mitm-mapa-rastreabilidade.md`](docs/01-architecture/identity-mitm-mapa-rastreabilidade.md)
 - **Desenho MITM (opção E):**
   [`docs/01-architecture/desenho-layer7-tlsproxy-mitm.md`](docs/01-architecture/desenho-layer7-tlsproxy-mitm.md)
-  — runtime **AUSENTE**; sem claim de intercept
-- **Contrato IPC 20.9:**
+- **Contrato IPC:**
   [`docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`](docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)
 - **Gates GI0–GI9:**
   [`docs/09-blocking/plano-gates-identity-mitm.md`](docs/09-blocking/plano-gates-identity-mitm.md)
-- **ADRs:** [0025](docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md)
-  (SKU; T1), [0026](docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md)
-  (**Aceito — implementação em curso / rev. f — intenção vs effective**; runtime até S1–S8),
-  [0027](docs/03-adr/ADR-0027-identity-userid-multi-fonte.md),
-  [0028](docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md),
-  [0029](docs/03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md)
-  (**IM7 ADIAR + IM8 exclusão**)
+- **ADRs:** 0025–0029 (0026 implementação em curso; 0029 IM7 diferido)
 - **Spike MITM:** [`docs/09-blocking/spike-mitm-20.7.md`](docs/09-blocking/spike-mitm-20.7.md)
-  — DEFER 20.7a + reopen GO 2026-08-08
-- **Backlog:** BG-085…BG-092 (BG-087 **20.9 PASS**; BG-091 fechado ADR-0029)
-- **Ordem:** IM0 → IM1 → **20.7a DEFER** → **IM3–IM9 Identity FECHADA** →
-  **reopen MITM 20.8→20.9 PASS** → **20.10** bloqueado (endpoint só com GO separado)
+- **Backlog:** BG-085…BG-092 (BG-087 **20.10a**; BG-091 fechado ADR-0029)
+- **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→**20.10a**→**20.10b**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09aa`
+- **Rev. plano:** `2026-08-09ab`
 - **Runbook S1–S8:** [`docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md)
-- **Prep 20.10:** [`docs/09-blocking/prep-20.10-checklist.md`](docs/09-blocking/prep-20.10-checklist.md) — itens **1–7 PASS**; falta GO produto
-- **Draft packaging:** [`docs/09-blocking/drafts/mitm-packaging-20.10/`](docs/09-blocking/drafts/mitm-packaging-20.10/) (**fora** do `.pkg`)
+- **Prep 20.10:** [`docs/09-blocking/prep-20.10-checklist.md`](docs/09-blocking/prep-20.10-checklist.md) — **FECHADO**
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
-- **Desenho DC:** [`docs/01-architecture/desenho-canal-agente-dc-20.20.md`](docs/01-architecture/desenho-canal-agente-dc-20.20.md)
-- **Agente Win:** [`docs/samples/identity-dc-agent/`](docs/samples/identity-dc-agent/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
-- Próximo código: **20.10** BLOQUEADO até GO produto (prep 1–7 PASS; falta item 8)
-- Continuidade: prep draft packaging + S8 runtime-present-OFF PASS; Opção A inline PASS
-- Draft: docs/09-blocking/drafts/mitm-packaging-20.10/
-- Evidência S8 OFF+binário: docs/tests/evidence/20260809T050000Z-s8-runtime-present-off-54/
-- Evidência inline: docs/tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/
-- Lab PoC: `root@192.168.100.54` (`0.0.5-poc5`; `/opt/layer7-poc/`)
-- Prep: docs/09-blocking/prep-20.10-checklist.md
-- Plano rev.: 2026-08-09aa
+- Passo actual: **20.10a** (runtime no .pkg; rc OFF; intercept_ready=false)
+- Próximo: **20.10b** (listen + PF rdr + block page HTTPS)
+- GO produto: docs/09-blocking/GO-produto-20.10.md
+- Plano rev.: 2026-08-09ab
+- Latest alvo: **1.9.39**
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE do .pkg
-- 20.9: PASS — mitm_effective sempre false sem runtime
-- 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
-- 20.7a: DEFER histórico; reopen GO → 20.8→20.9
-- Baseline enforce: 1.9.8
-- Latest publicado: **1.9.38** (20.9 PASS)
-- Squid: REJEITADO; GI2/GI3 runtime: DEFERRED
-- Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
-- Contrato: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-- Runbook: docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md
+- Squid: REJEITADO; GI2/GI3: DEFERRED
 ```
-
 
 ---
 
@@ -1570,30 +1546,19 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-08 (sync git + alinhamento docs)
+- Data base: 2026-08-09 (GO produto + 20.10a)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.38** (BG-087/20.9; SHA `7c60f6b1…1dab`)
+- Canal publico latest: **1.9.39** (BG-087/20.10a; SHA no publish)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
-- Portal visual: **2.0.0** (RBAC); git `origin/main` @ `657d7f4`
+- Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA** (20.33/GI9); MITM **20.9 PASS**; prep 20.10 itens **1–7 PASS** (draft packaging + S8 runtime-present-OFF); runtime **ainda fora** do `.pkg`; Squid rejeitado; ADR-0026 rev. f; arranque docs/00-overview/START-HERE-identity-mitm.md
-- Desenho MITM: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
-- Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-- Pré-20.10: docs/09-blocking/prep-20.10-checklist.md + drafts/mitm-packaging-20.10/
-- Lab real: docs/08-lab/lab-topology.md (`.254`/`.234`/`.235`; SSH menu → **8 Shell**)
-- Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
-- Pacote publicado: **1.9.38** (20.9)
-- Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.29**; RA/UI **1.9.30**…**1.9.38**
-- Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
-- F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
-- F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **GO produto humano** (prep item 8); **sem** empacotar/`mitm_runtime_available` até GO; **20.10** BLOQUEADO
-- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md (Opção A inline PASS)
-- GO Opção A: docs/09-blocking/GO-opcao-A-inline-lab-54.md
-- Evidência S8 OFF+binário: docs/tests/evidence/20260809T050000Z-s8-runtime-present-off-54/- Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
+- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **GO produto** + **20.10a**; **20.10b** pendente; Squid rejeitado
+- GO produto: docs/09-blocking/GO-produto-20.10.md
+- Arranque: docs/00-overview/START-HERE-identity-mitm.md
+- Proximo trabalho: **20.10b** (listen + PF rdr + página HTTPS)
+- Pacote alvo: **1.9.39**; rollback lab: **1.9.38**
+- Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
-- Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
-- Arranque Identity+MITM: docs/00-overview/START-HERE-identity-mitm.md
 ```
 
 ---

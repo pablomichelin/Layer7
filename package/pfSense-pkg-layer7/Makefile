@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.38
+PORTVERSION=	1.9.39
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -20,12 +20,19 @@ LICENSE_FILE=	${.CURDIR}/../../LICENSE
 LIB_DEPENDS=	libldap.so.2:net/openldap26-client
 
 LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
+LAYER7_TLSPROXY_DIR=	${.CURDIR}/../../src/layer7-tlsproxy
+# GO produto 2026-08-09: empacotar helper (20.10a). rc/enable/intercept continuam OFF.
+WITH_LAYER7_TLSPROXY?=	yes
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
 .if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c) || !exists(${LAYER7D_DIR}/identity_ldap.c) || !exists(${LAYER7D_DIR}/identity_radius.c) || !exists(${LAYER7D_DIR}/identity_dc.c)
 .error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c … identity_dc.c)."
 .endif
-
+.if ${WITH_LAYER7_TLSPROXY:tl} == yes
+.if !exists(${LAYER7_TLSPROXY_DIR}/main.c) || !exists(${LAYER7_TLSPROXY_DIR}/ipc.c) || !exists(${LAYER7_TLSPROXY_DIR}/tls_lab.c)
+.error "layer7-tlsproxy: fontes em falta em ${LAYER7_TLSPROXY_DIR}/ (GO produto / 20.10a)."
+.endif
+.endif
 NDPI_PREFIX=	/usr/local
 .if exists(${NDPI_PREFIX}/include/ndpi/ndpi_api.h)
 LAYER7_NDPI_CFLAGS=	-I${NDPI_PREFIX}/include/ndpi -DHAVE_NDPI=1
@@ -69,6 +76,14 @@ do-build:
 		${LAYER7_NDPI_SRCS} ${LAYER7_NDPI_LDFLAGS} ${LAYER7_PTHREAD_LDFLAGS} \
 		${LAYER7_LDAP_LDFLAGS} \
 		/usr/lib/libssl.a /usr/lib/libcrypto.a
+.if ${WITH_LAYER7_TLSPROXY:tl} == yes
+	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${LAYER7_TLSPROXY_DIR} \
+		-DLAYER7_TLSPROXY_VERSION=\"0.1.0\" \
+		-o ${WRKSRC}/layer7-tlsproxy \
+		${LAYER7_TLSPROXY_DIR}/main.c ${LAYER7_TLSPROXY_DIR}/ipc.c \
+		${LAYER7_TLSPROXY_DIR}/tls_lab.c \
+		/usr/lib/libssl.a /usr/lib/libcrypto.a
+.endif
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
@@ -81,6 +96,11 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/libexec
 	${MKDIR} ${STAGEDIR}${DATADIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/layer7d ${STAGEDIR}${PREFIX}/sbin
+.if ${WITH_LAYER7_TLSPROXY:tl} == yes
+	${INSTALL_PROGRAM} ${WRKSRC}/layer7-tlsproxy ${STAGEDIR}${PREFIX}/sbin
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7-tlsproxy \
+		${STAGEDIR}${PREFIX}/etc/rc.d
+.endif
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7.json.sample \
 		${STAGEDIR}${PREFIX}/etc
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7-protos.txt.sample \

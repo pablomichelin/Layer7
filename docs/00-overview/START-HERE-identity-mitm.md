@@ -1,8 +1,8 @@
-# START HERE — Identity + MITM Add-on 【MITM GO lab — Opção A S1 inline PASS em .54】
+# START HERE — Identity + MITM Add-on 【GO produto — 20.10a em curso】
 
-> **MITM lab:** **PoC-5** + **S1/S2 inline Opção A PASS** em `192.168.100.54`.  
-> Prep 20.10 itens **1–7 PASS** (draft packaging + S8 runtime-present-OFF).  
-> `mitm_effective` **false**; **sem** intercept em `.254`/`.234`/`.235`. **20.10** bloqueado até GO produto.
+> **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
+> **20.10a:** runtime no `.pkg`, default OFF, `intercept_ready=false`.  
+> **Sem** intercept em `.254`/`.234`/`.235`. Squid rejeitado. Próximo: **20.10b**.
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -13,7 +13,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 1. Colar **apenas** o caminho acima (ou o prompt da secção abaixo).  
 2. O agente **deve** seguir a *Leitura obrigatória* deste ficheiro **antes** de codificar.  
 3. O **passo actual** está na tabela *Estado actual* e no bloco *Progresso compacto* — deve coincidir com o plano §0 e o CORTEX (secção Identity).  
-4. **Não** usar `START-HERE-fecho-producao.md` para executar MITM. Squid permanece **rejeitado**. Intercept de produto só após S1–S8 + **GO produto** (20.10).  
+4. **Não** usar `START-HERE-fecho-producao.md` para executar MITM. Squid permanece **rejeitado**.  
 5. Se CORTEX / plano / este ficheiro divergirem no passo actual → **parar** e declarar conflito (não improvisar).
 
 | Documento | Papel |
@@ -21,6 +21,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 | **Este ficheiro** | Arranque de chat + estado + prompt (ler primeiro) |
 | [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) | **Ideia, objectivo, nicho PME, barra UX** — ACEITE |
 | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **SSOT de execução** (ondas IM0–IM9, passos 20.x) |
+| [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) | GO humano produto — **dado** |
+| [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) | Prep **FECHADO**; pós-GO = 20.10a/b |
 | [`identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md) | Mapa código / superfícies / não-regressão |
 | [`especificacao-agente-endpoint-20.27.md`](../01-architecture/especificacao-agente-endpoint-20.27.md) | Espec IM7 agente endpoint (20.27 PASS) |
 | [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) | Gates GI0–GI9 |
@@ -46,11 +48,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO lab** Opção A inline PASS (rev. `2026-08-09z`) |
-| Passo actual | **20.9 PASS**; prep 20.10 itens **1–7 PASS**; **20.10** **bloqueado** até GO produto |
-| Pré-20.10 (seguro) | Checklist [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) — **itens 1–7 PASS**; falta só **GO produto** |
-| Rev. do plano | **`2026-08-09aa`** |
-| MITM | S1/S2 lab+inline PASS; `mitm_effective` **false**; GI2/GI3 **DEFERRED** |
+| Plano | Identity **FECHADA**; MITM **GO produto**; **20.10a** em curso (rev. `2026-08-09ab`) |
+| Passo actual | **20.10a** — runtime no `.pkg`, default OFF, `intercept_ready=false` |
+| Próximo | **20.10b** — listen + PF rdr + block page HTTPS |
+| Rev. do plano | **`2026-08-09ab`** |
+| MITM | Runtime empacotável; `mitm_effective` **false**; GI2/GI3 **DEFERRED** até 20.10b+ |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -125,25 +127,19 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.38**.
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.39** (20.10a).
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
-Identity de rede: FECHADA (20.33/GI9). MITM: reopen GO 2026-08-08; passo actual **20.9 PASS**.
+Identity de rede: FECHADA (20.33/GI9). MITM: GO produto 2026-08-09; passo actual **20.10a**.
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
-Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md (opção E; runtime AUSENTE do .pkg).
+GO produto: docs/09-blocking/GO-produto-20.10.md
+Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-PoC lab: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-5; Opção A PASS).
-GO Opção A: docs/09-blocking/GO-opcao-A-inline-lab-54.md
-Prep 20.10: docs/09-blocking/prep-20.10-checklist.md
-Draft packaging: docs/09-blocking/drafts/mitm-packaging-20.10/ (fora do .pkg)
-Ler na ordem do START-HERE; executar só o próximo bloco seguro.
-Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective sempre false sem runtime;
-um passo 20.x por bloco; português; barra UX PME (U*/P*/H*/N*); sem overclaim NGFW;
-sem claim de intercept produto; Squid rejeitado; não reabrir fecho/IPv6/Identity rede/endpoint sem GO;
-NÃO .254/.234/.235 para MITM; NÃO empacotar / mitm_runtime_available=true / 20.10 sem GO produto.
-Estado fechado neste chat: Opção A S1/S2 inline PASS + IPC mock; prep itens 1–7 PASS
-(draft packaging + S8 runtime-present-OFF); evidências 20260809T045500Z-s1-inline-opcao-a-54
-e 20260809T050000Z-s8-runtime-present-off-54; plano rev. 2026-08-09aa.
-Tarefa seguinte: **GO produto humano** (checklist item 8) — sem isso, 20.10 continua bloqueado.
+Ler na ordem do START-HERE; executar só o próximo bloco seguro (**20.10b**).
+Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective false sem intercept_ready;
+um passo/bloco por entrega; português; barra UX PME; Squid rejeitado;
+NÃO activar intercept em .254/.234/.235 sem smoke; NÃO mitm_effective=true sem 20.10b.
+Estado fechado: 20.10a packaging + runtime_available + intercept_ready=false; plano rev. 2026-08-09ab.
+Tarefa seguinte: **20.10b** (listen selectivo + PF rdr + página HTTPS).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -162,26 +158,14 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
-- Próximo código: **20.10** BLOQUEADO até GO produto (prep 1–7 PASS; falta item 8)
-- Continuidade agora: prep packaging draft + S8 runtime-present-OFF PASS; Opção A inline PASS
-- Draft: docs/09-blocking/drafts/mitm-packaging-20.10/
-- Evidência S8 OFF+binário: docs/tests/evidence/20260809T050000Z-s8-runtime-present-off-54/
-- Evidência inline: docs/tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/
-- GO Opção A: docs/09-blocking/GO-opcao-A-inline-lab-54.md
-- Prep (sem GO): docs/09-blocking/prep-20.10-checklist.md
-- Plano rev.: 2026-08-09aa
-- PoC binário lab: `0.0.5-poc5` em `/opt/layer7-poc/` no `.54` (fora do .pkg)
+- Passo actual: **20.10a** (runtime no .pkg; rc OFF; intercept_ready=false)
+- Próximo: **20.10b** (listen + PF rdr + block page HTTPS)
+- GO produto: docs/09-blocking/GO-produto-20.10.md
+- Plano rev.: 2026-08-09ab
+- Lab/`latest` alvo: **1.9.39**
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
-- 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md
-- 20.33: PASS (homolog two-client `20260808T174100Z-im9-20.33-homolog-1.9.29`)
-- 20.7a: DEFER histórico; reopen GO → 20.8→20.9
-- Baseline enforce: 1.9.8; lab/`latest`: **1.9.38**
-- Squid: REJEITADO; GI2/GI3 runtime: DEFERRED
-- Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
-- Contrato: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-- Runbook S1–S8: docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md
+- 20.9: PASS (`1.9.38`)
+- Squid: REJEITADO; GI2/GI3: DEFERRED até 20.10b+
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

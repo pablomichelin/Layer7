@@ -6,7 +6,26 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- Próximo: 20.10 só após S1–S8 medidos + GO lab; GI2/GI3 runtime DEFERRED.
+- **20.10a** em curso pós-GO produto: runtime no pacote, default OFF, sem intercept.
+- **20.10b** (PF/listen/página HTTPS) ainda pendente; GI2/GI3 DEFERRED.
+
+## [1.9.39] — 2026-08-09
+
+### Added
+
+- **BG-087 / 20.10a — Runtime empacotado (GO produto):** `layer7-tlsproxy` `0.1.0`
+  no `.pkg`; `rc.d` default OFF (recusa start até intercept_ready); PHP
+  `layer7_mitm_runtime_available()` detecta binário;
+  `layer7_mitm_intercept_ready()=false` ⇒ `mitm_effective` permanece false;
+  daemon reporta `mitm_runtime_available` via `access(2)`. Sem PF rdr / sem
+  intercept. Squid rejeitado. GO: `docs/09-blocking/GO-produto-20.10.md`.
+
+### Release
+
+- Tag `v1.9.39` / `releases/latest` (após publish)
+- SHA256: *(preencher no publish)*
+- Rollback: `1.9.38`
+
 
 ## [1.9.38] — 2026-08-08
 

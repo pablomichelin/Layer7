@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO lab** (rev. `2026-08-09aa`; prep 1–7 PASS; 20.10 bloqueado até GO produto)
+**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.10a** em curso (rev. `2026-08-09ab`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -32,7 +32,8 @@
 **Rev. `x` (`2026-08-09`)** = **PoC-4 PASS** — upstream allow localhost; harness anti-hang.  
 **Rev. `y` (`2026-08-09`)** = **S1/S2 lab PASS** (n=500); concurrent+negativos PASS; S1 inline PENDING.  
 **Rev. `z` (`2026-08-09`)** = **GO Opção A** + **S1/S2 inline PASS** (netns+REDIRECT+SO_ORIGINAL_DST); PoC-5; IPC mock; 20.10 ainda bloqueado.  
-**Rev. `aa` (`2026-08-09`)** = prep-20.10 itens 1–7 PASS — draft `pkg-plist`/rc/`WITH_LAYER7_TLSPROXY=no` + S8 runtime-present-OFF em `.54`; **sem** merge no `.pkg`; falta só GO produto.
+**Rev. `aa` (`2026-08-09`)** = prep-20.10 itens 1–7 PASS — draft `pkg-plist`/rc/`WITH_LAYER7_TLSPROXY=no` + S8 runtime-present-OFF em `.54`; **sem** merge no `.pkg`; falta só GO produto.  
+**Rev. `ab` (`2026-08-09`)** = **GO produto** + **20.10a** — runtime no `.pkg` (`1.9.39`); rc default OFF; `intercept_ready=false`; próximo **20.10b**.
 
 ---
 
@@ -40,21 +41,18 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.9 PASS**; prep 20.10 itens **1–7 PASS**; **20.10** bloqueado até GO produto |
-| Próximo | **GO produto humano** (checklist item 8); sem empacotar / sem `mitm_runtime_available=true` antes |
+| Passo actual | **20.10a** — runtime empacotado; default OFF; sem intercept |
+| Próximo | **20.10b** — listen selectivo + PF rdr + block page HTTPS |
 | Lab PoC | **`192.168.100.54`** |
-| Draft packaging | [`../09-blocking/drafts/mitm-packaging-20.10/`](../09-blocking/drafts/mitm-packaging-20.10/) |
+| GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 
 ```text
 TRILHA — progresso
-- S2 lab PASS p95~3.4ms n=500; S2 inline p95~15.6ms n=50
-- S1 lab+inline PASS (~13% CPU); Opção A GO
-- IPC mock PING/STATUS/DECIDE PASS (effective=false)
-- Prep 1–7 PASS: draft packaging + S8 runtime-present-OFF
-- Evidência S8 OFF+binário: 20260809T050000Z-s8-runtime-present-off-54
-- Evidência inline: 20260809T045500Z-s1-inline-opcao-a-54
-- 20.10 BLOQUEADO (falta GO produto)
-- Plano rev.: 2026-08-09aa
+- GO produto 2026-08-09
+- 20.10a: layer7-tlsproxy no .pkg; runtime_available; intercept_ready=false
+- 20.10b PENDENTE
+- Plano rev.: 2026-08-09ab
+- Lab/latest alvo: 1.9.39
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -290,7 +288,7 @@ Histórico PME (`2026-08-06`): DEFER 20.7a; Squid **rejeitado**; Identity-first 
 | **20.7a** | **DEFER formal:** ADR-0026 diferida; GI2/GI3 `DEFERRED`; Identity IM3+ | **PASS** (`2026-08-06`) |
 | **20.8** | Scaffolding: schema `mitm.*` OFF; gestão CA; bypass GUI; `mitm_entitled` no status daemon; `enabled` forçado false; **sem** `layer7-tlsproxy` | **PASS** (`1.9.37`, `2026-08-08`) |
 | **20.9** | Toggle **intenção** `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC; `mitm_effective` **sempre false** sem runtime | **PASS** (`1.9.38`, `2026-08-08`) |
-| **20.10** | Intercept selectivo; block page HTTPS — **exige** runtime + S1–S8 + GO lab | **BLOQUEADO** até S1–S8 + GO lab |
+| **20.10** | Intercept selectivo; block page HTTPS — **exige** runtime + S1–S8 + GO lab + **GO produto** | **20.10a em curso**; **20.10b** pendente |
 | **20.11** | Lab CA; GI2–GI3 runtime | BLOQUEADO / gates runtime `DEFERRED` |
 
 **Veredicto 20.7a (histórico):** **DEFER** — Identity avançou; Squid rejeitado.
@@ -561,6 +559,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
+| 2026-08-09 | **rev. `ab` / GO produto + 20.10a** — runtime no `.pkg`; rc OFF; intercept_ready=false; candidato `1.9.39`; próximo **20.10b** |
 | 2026-08-09 | **rev. `aa` / prep 20.10 1–7** — draft packaging (`docs/09-blocking/drafts/mitm-packaging-20.10/`); S8 runtime-present-OFF PASS (`20260809T050000Z-s8-runtime-present-off-54`); **sem** merge `.pkg`; falta GO produto |
 | 2026-08-09 | **rev. `z` / GO Opção A + S1 inline** — S1/S2 inline PASS; PoC-5; IPC mock; 20.10 bloqueado |
 | 2026-08-09 | **rev. `u` / PoC-1 PASS** — IPC PING lab-only; evidência `20260809T031700Z-poc1-ipc-idle`; 20.10 bloqueado |

@@ -129,8 +129,8 @@ if ($savemsg !== "") {
 		<div class="layer7-content">
 			<p class="layer7-lead">
 				<?= htmlspecialchars(l7_t(
-				    "Passo 20.9: pode gravar a intencao mitm.enabled (requer CA + entitlement). " .
-				    "A inspecao efectiva so liga com runtime layer7-tlsproxy — hoje OFF. " .
+				    "Passo 20.10a: runtime layer7-tlsproxy pode estar no pacote (default OFF). " .
+				    "mitm.enabled e intencao; mitm_effective so com intercept_ready (20.10b). " .
 				    "Com effective OFF o bloqueio HTTPS continua ADR-0017."
 				)); ?>
 			</p>
@@ -160,13 +160,14 @@ if ($savemsg !== "") {
 					<div class="alert alert-success" role="alert" style="margin-bottom:12px;">
 						<?= htmlspecialchars(l7_t("Entitlement mitm activo.")); ?>
 						<?= htmlspecialchars($runtime_ok
-						    ? l7_t("Runtime disponivel.")
-						    : l7_t("Runtime layer7-tlsproxy ainda nao incluido — inspecao OFF.")); ?>
+						    ? l7_t("Runtime presente (20.10a). Intercept ainda OFF ate 20.10b.")
+						    : l7_t("Runtime layer7-tlsproxy ausente — inspecao OFF.")); ?>
 					</div>
 					<table class="table table-condensed" style="max-width:640px; margin-bottom:0;">
 						<tr><th>mitm.enabled (intencao)</th><td><code><?= !empty($mitm["enabled"]) ? "true" : "false"; ?></code></td></tr>
 						<tr><th>mitm_effective</th><td><code><?= $effective ? "true" : "false"; ?></code></td></tr>
 						<tr><th>runtime</th><td><code><?= $runtime_ok ? "yes" : "no"; ?></code></td></tr>
+						<tr><th>intercept_ready</th><td><code><?= layer7_mitm_intercept_ready() ? "true" : "false"; ?></code></td></tr>
 						<tr><th>quic_mode</th><td><code><?= htmlspecialchars($mitm["quic_mode"] ?? "bypass"); ?></code></td></tr>
 						<tr><th>features</th><td><code><?= htmlspecialchars($l7_feat_raw); ?></code></td></tr>
 					</table>
@@ -267,7 +268,8 @@ if ($savemsg !== "") {
 <?php elseif (!$runtime_ok): ?>
 								<p class="help-block" style="margin-top:6px;">
 									<?= htmlspecialchars(l7_t(
-									    "Pode gravar a intencao agora. mitm_effective permanece false ate existir layer7-tlsproxy. " .
+									    "Pode gravar a intencao agora. mitm_effective permanece false ate intercept_ready (20.10b). " .
+									    "Runtime no pacote nao activa inspecao por si."
 									    "Upgrades nunca ligam MITM por defeito."
 									)); ?>
 								</p>

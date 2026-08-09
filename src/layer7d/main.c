@@ -334,8 +334,12 @@ write_stats_json(void)
 	fprintf(f, "  \"mitm_entitled\": %s,\n",
 	    layer7_features_allows_mitm(s_lic.features_flags) ?
 	    "true" : "false");
-	fprintf(f, "  \"mitm_runtime_available\": false,\n");
+	fprintf(f, "  \"mitm_runtime_available\": %s,\n",
+	    (access("/usr/local/sbin/layer7-tlsproxy", X_OK) == 0) ?
+	    "true" : "false");
+	/* 20.10a: intercept_ready=false → effective permanece false no daemon. */
 	fprintf(f, "  \"mitm_effective\": false,\n");
+	fprintf(f, "  \"mitm_intercept_ready\": false,\n");
 	{
 		const char *lst = "off";
 		enum l7_ldap_status st = s_ldap_worker ?

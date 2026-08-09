@@ -19,10 +19,13 @@ function fail($msg)
 }
 
 if (layer7_mitm_runtime_available()) {
-	fail("runtime deve estar OFF neste bloco");
+	fail("runtime deve estar OFF sem binario no TEST_ROOT");
+}
+if (layer7_mitm_intercept_ready()) {
+	fail("intercept_ready deve ser false em 20.10a");
 }
 if (layer7_mitm_should_start_helper(array("enabled" => true), true)) {
-	fail("helper nao deve arrancar sem runtime");
+	fail("helper nao deve arrancar sem effective");
 }
 
 $d = layer7_mitm_defaults();
@@ -87,7 +90,7 @@ if (!$has_openssl) {
 		fail("com CA, intencao enabled deve persistir");
 	}
 	if (layer7_mitm_effective($n2, true)) {
-		fail("effective ainda false sem runtime");
+		fail("effective ainda false sem intercept_ready (20.10a)");
 	}
 	if (layer7_mitm_effective($n2, false)) {
 		fail("effective false sem entitlement");
@@ -95,6 +98,18 @@ if (!$has_openssl) {
 	if (!in_array("127.0.0.1/32", $n2["bypass"]["cidr"], true)) {
 		fail("protegido loopback");
 	}
+	/* Runtime presente no TEST_ROOT: available=true, effective ainda false. */
+	@mkdir($testdir . "/usr/local/sbin", 0755, true);
+	$fake = $testdir . "/usr/local/sbin/layer7-tlsproxy";
+	file_put_contents($fake, "#!/bin/sh\nexit 0\n");
+	chmod($fake, 0755);
+	if (!layer7_mitm_runtime_available()) {
+		fail("runtime deve detectar binario no TEST_ROOT");
+	}
+	if (layer7_mitm_effective($n2, true)) {
+		fail("effective false com runtime mas sem intercept_ready");
+	}
+	@unlink($fake);
 	layer7_mitm_ca_delete();
 	$n3 = layer7_mitm_normalize(array("enabled" => true));
 	if (!empty($n3["enabled"])) {

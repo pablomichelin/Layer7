@@ -1,0 +1,85 @@
+#!/bin/sh
+#
+# PROVIDES: layer7_tlsproxy
+# REQUIRE: DAEMON NETWORKING
+# KEYWORD: shutdown
+#
+# layer7-tlsproxy — helper MITM (20.10a). Default OFF.
+# Upgrade NUNCA activa. Squid rejeitado.
+# Intercept de produto: só após intercept_ready (20.10b) + mitm_effective.
+
+. /etc/rc.subr
+
+name="layer7_tlsproxy"
+rcvar="${name}_enable"
+load_rc_config "${name}"
+
+: "${layer7_tlsproxy_enable:=NO}"
+
+pidfile="/var/run/layer7-tlsproxy.pid"
+command="/usr/local/sbin/layer7-tlsproxy"
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+status_cmd="${name}_status"
+
+layer7_tlsproxy_pid_from_file()
+{
+	_p=""
+	[ -f "${pidfile}" ] || return 1
+	if ! IFS= read -r _p <"${pidfile}" 2>/dev/null && [ -z "${_p}" ]; then
+		_p=""
+		return 1
+	fi
+	_p=$(printf '%s' "${_p}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+	case "${_p}" in
+	''|*[!0-9]*)
+		_p=""
+		return 1
+		;;
+	esac
+	return 0
+}
+
+layer7_tlsproxy_start()
+{
+	checkyesno "${rcvar}" || return 0
+
+	if [ ! -x "${command}" ]; then
+		echo "${name}: binary missing (${command})" >&2
+		return 1
+	fi
+
+	# 20.10a: runtime empacotado, sem intercept. Recusar arranque de serviço
+	# mesmo com enable=YES até 20.10b (PF + listen + intercept_ready).
+	echo "${name}: intercept_ready=false (20.10a) — leaving service stopped" >&2
+	return 1
+}
+
+layer7_tlsproxy_stop()
+{
+	_p=""
+	if [ -f "${pidfile}" ] && layer7_tlsproxy_pid_from_file; then
+		:
+	else
+		_p=""
+	fi
+	/bin/rm -f "${pidfile}"
+	[ -n "${_p}" ] && /bin/kill -TERM "${_p}" 2>/dev/null
+	if [ -x /usr/bin/pkill ]; then
+		/usr/bin/pkill -TERM -f "/usr/local/sbin/layer7-tlsproxy" 2>/dev/null || true
+	fi
+	return 0
+}
+
+layer7_tlsproxy_status()
+{
+	if [ -f "${pidfile}" ] && layer7_tlsproxy_pid_from_file && /bin/kill -0 "${_p}" 2>/dev/null; then
+		echo "${name} is running as pid ${_p}."
+		return 0
+	fi
+	echo "${name} is not running (default OFF; 20.10a)."
+	return 1
+}
+
+run_rc_command "$1"

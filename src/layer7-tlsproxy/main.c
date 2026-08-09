@@ -56,9 +56,10 @@ cmd_health(void)
 	printf("{\n");
 	printf("  \"service\": \"layer7-tlsproxy\",\n");
 	printf("  \"version\": \"%s\",\n", LAYER7_TLSPROXY_VERSION);
-	printf("  \"mode\": \"poc5\",\n");
+	printf("  \"mode\": \"product-scaffold-20.10a\",\n");
 	printf("  \"bind\": false,\n");
 	printf("  \"intercept\": false,\n");
+	printf("  \"intercept_ready\": false,\n");
 	printf("  \"ipc_capable\": true,\n");
 	printf("  \"tls_lab_capable\": true,\n");
 	printf("  \"sni_policy\": true,\n");

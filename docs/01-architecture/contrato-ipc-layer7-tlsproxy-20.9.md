@@ -36,15 +36,16 @@ mitm_effective =
     mitm.enabled          (intenção do operador em layer7.json)
   ∧ entitlement mitm      (features ∩ .lic)
   ∧ CA presente           (cert+key em /usr/local/etc/layer7/mitm/)
-  ∧ runtime_available     (binário layer7-tlsproxy no pacote)
-  ∧ (futuro) GO lab / S8
+  ∧ runtime_available     (binário layer7-tlsproxy no pacote — 20.10a+)
+  ∧ intercept_ready       (PF rdr + listen produto — **false** até 20.10b)
 ```
 
 | Campo | Quem escreve | Semântica |
 |-------|--------------|-----------|
 | `mitm.enabled` | GUI / JSON | Intenção; default **false**; upgrade não liga |
 | `mitm_effective` | Runtime (PHP + futuro helper) | **Única** condição para bind/redirect |
-| `mitm_runtime_available` | Pacote / compile-time | Hoje: **sempre false** |
+| `mitm_runtime_available` | Pacote / `access(2)` | **20.10a+:** true se binário existir |
+| `mitm_intercept_ready` | Código produto | **20.10a:** false; flip em **20.10b** |
 
 **Regra:** sem `mitm_effective`, o helper **não** escuta, **não** há rdr PF
 para MITM, ADR-0017 permanece a verdade.

@@ -5813,16 +5813,34 @@ function layer7_has_entitlement($token)
 }
 
 /* ============================================================
- * IM2 / 20.8–20.9 — MITM config (opt-in OFF; effective só com runtime).
+ * IM2 / 20.8–20.10a — MITM config (opt-in OFF; effective só com intercept).
  *
- * GO humano 2026-08-08. Chave privada NUNCA em layer7.json.
- * Squid rejeitado (ADR-0026). OFF ≡ ADR-0017.
+ * GO reopen 2026-08-08; GO produto 2026-08-09 (docs/09-blocking/GO-produto-20.10.md).
+ * Chave privada NUNCA em layer7.json. Squid rejeitado (ADR-0026). OFF ≡ ADR-0017.
  * Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
+ * 20.10a: binário pode existir; intercept_ready=false até 20.10b.
  * ============================================================ */
+
+function layer7_mitm_tlsproxy_bin()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/sbin/layer7-tlsproxy";
+	}
+	return "/usr/local/sbin/layer7-tlsproxy";
+}
 
 function layer7_mitm_runtime_available()
 {
-	/* Flip para true só quando o helper layer7-tlsproxy existir no pacote. */
+	$bin = layer7_mitm_tlsproxy_bin();
+	return (is_string($bin) && $bin !== "" && is_executable($bin));
+}
+
+/**
+ * 20.10b: flip para true quando PF rdr + listen produto estiverem wired.
+ * Sem isto, mitm_effective permanece false mesmo com runtime no disco.
+ */
+function layer7_mitm_intercept_ready()
+{
 	return false;
 }
 
@@ -5835,7 +5853,7 @@ function layer7_mitm_protected_bypass_cidr()
 }
 
 /**
- * Efectivo = intenção ∧ entitlement ∧ CA ∧ runtime.
+ * Efectivo = intenção ∧ entitlement ∧ CA ∧ runtime ∧ intercept_ready.
  * Sem effective: zero intercept / zero helper (S8 / ADR-0017).
  */
 function layer7_mitm_effective($mitm = null, $entitled = null)
@@ -5865,11 +5883,14 @@ function layer7_mitm_effective($mitm = null, $entitled = null)
 	if (!layer7_mitm_runtime_available()) {
 		return false;
 	}
+	if (!layer7_mitm_intercept_ready()) {
+		return false;
+	}
 	return true;
 }
 
 /**
- * O helper só pode arrancar se effective. Hoje: sempre false.
+ * O helper de intercept só pode arrancar se effective (20.10b+).
  */
 function layer7_mitm_should_start_helper($mitm = null, $entitled = null)
 {

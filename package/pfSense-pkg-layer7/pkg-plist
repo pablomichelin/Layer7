@@ -25,6 +25,7 @@
 /usr/local/www/packages/layer7/layer7_reports.php
 /usr/local/www/packages/layer7/layer7_reports_export.php
 /usr/local/sbin/layer7d
+/usr/local/sbin/layer7-tlsproxy
 /usr/local/etc/layer7.json.sample
 /usr/local/etc/layer7-protos.txt.sample
 /usr/local/etc/layer7/pf.conf.sample
@@ -33,6 +34,7 @@
 /usr/local/etc/layer7/allowlist-seed.txt
 /usr/local/etc/layer7/blacklists/config.json.sample
 /usr/local/etc/rc.d/layer7d
+/usr/local/etc/rc.d/layer7-tlsproxy
 /usr/local/libexec/layer7-pfctl
 /usr/local/libexec/layer7-unbound-anti-doh
 /usr/local/libexec/layer7-blockpage

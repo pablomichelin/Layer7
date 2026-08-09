@@ -17,6 +17,7 @@ while IFS= read -r line || [ -n "$line" ]; do
 	'' | \#*) continue ;;
 	@*) continue ;;
 	/usr/local/sbin/layer7d | sbin/layer7d) continue ;;
+	/usr/local/sbin/layer7-tlsproxy | sbin/layer7-tlsproxy) continue ;;
 	esac
 
 	case "$line" in
