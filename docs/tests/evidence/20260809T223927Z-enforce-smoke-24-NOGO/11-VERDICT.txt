@@ -1,0 +1,11 @@
+VERDICT=NO-GO
+REASON=no_safe_block_target_and_no_ssh_to_source_24
+PKG_OBSERVED=1.9.44
+PKG_PRE_G2_WAS=1.9.46
+BLOCK_DST=absent
+MITM_EFFECTIVE=false
+MITM_RDR_RESIDUE=present_empty_tables
+TRAFFIC_GENERATED=no
+LAYER7_DISABLED=no
+CONFIG_MUTATED=no
+NEXT=restore_.24_access + confirm_pkg_version + materialize_safe_block_dst_lab_ip; then retry smoke; disable only on PASS

@@ -1351,7 +1351,7 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 - **Rev. plano:** `2026-08-09ap`
 - **Gate D0:** [`docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md`](docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md) — **PASS** (+ [addendum hipóteses](docs/09-blocking/diagnostico-D0-addendum-hipoteses-20260809.md))
 - **Gate D1:** [`docs/09-blocking/gate-D1-leaf-sni-20260809.md`](docs/09-blocking/gate-D1-leaf-sni-20260809.md) — **PASS** (Edge Gate C)
-- **`1.9.44`:** D1 leaf `0.1.3` + `timeout --foreground -k` + `daemon -f`; sync prova `0.33s` ([evidência](docs/tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/)); **Gate B PASS**
+- **`1.9.44`:** D1 leaf + `timeout --foreground -k` + `daemon -f`; sync ~0.3–0.8s; **B+D/Edge PASS** `20260809T223526Z` ([evidência](docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/); prova sync [202500Z](docs/tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/)); **Gate B PASS**
 - **`1.9.45`:** `layer7_mitm_tables_apply_to_pf` (tabelas live); `204452Z` Edge c/ `--disable-quic` = **diagnóstico**, não Gate C
 - **`1.9.46` (publicada):** anti-QUIC UDP/443 só `layer7_mitm_src`→`layer7_mitm_dst` + `filter_configure_sync`; **Gate C PASS** ([evidência](docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/))
 - **Gates obrigatórios:** [`docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md`](docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B) PASS**; **C) PASS**
@@ -1581,8 +1581,10 @@ CHECKPOINT CANONICO
 - Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
 - Evidência GO teste: docs/tests/evidence/20260809T215442Z-phaseBD-d1-254/
 - Proximo trabalho: manter MITM OFF; activação permanente só com novo GO; `.234/.235` proibidos
-- Appliance `.254`: **1.9.46 instalado**; MITM OFF (`mitm_effective=false`); **Layer7 `enabled=true` / `mode=enforce`** (não passivo) — Pré-G2/G2 passivo **NO-GO** `20260809T221619Z-preG2-G2-254`
-- Pacote publicado: **1.9.46**; rollback lab: **1.9.42**
+- Appliance `.254`: pacote observado **`1.9.44`** (drift vs Pré-G2 `1.9.46`); MITM OFF (`mitm_effective=false`, tlsproxy parado; **resíduo** rdr/anti-QUIC com tabelas vazias); Layer7 **`enabled=true` / `mode=enforce`** — **não** desactivado
+- Smoke enforce a partir de `.24`: **NO-GO** `20260809T223927Z-enforce-smoke-24-NOGO` (sem SSH `.24`; `block_dst` ausente; sem tráfego arbitrário; config intocada)
+- Pré-G2/G2 passivo: **NO-GO** `20260809T221619Z-preG2-G2-254`
+- Pacote publicado (canal `latest`): **1.9.46**; rollback lab: **1.9.42**
 - Reconciliacao F4 enforcement `_24`…`_65` vs `1.9.46` (`2026-08-09`): **NO-GO** instalar qualquer `1.8.11_*` da linha histórica; único pacote elegível lab = **`1.9.46`** — docs/09-blocking/auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md

@@ -1,0 +1,66 @@
+UTC=2026-08-09T22:39:27Z
+PKG=1.9.44
+LAYER7D=1.9.44
+{"enabled":true,"mode":"enforce","enforcement_model":"legacy_global","mitm":{"enabled":false,"ca_present":true,"intercept":{"source_cidr":[],"dest_cidr":[],"block_sni":[]}}}
+===TABLES===
+layer7_allow_dst
+layer7_mitm_dst
+layer7_mitm_src
+===BLOCK_DST===
+pfctl: Table does not exist.
+===BLOCK_SRC===
+pfctl: Table does not exist.
+===ALLOW_DST_N===
+       3
+===MITM_SRC===
+===MITM_DST===
+===NAT_MITM===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+===ANTI_QUIC_MITM===
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+===TLSPROXY===
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+===STATS===
+{
+  "version": "1.9.44",
+  "enforce_mode": 1,
+  "total_blocked": 1,
+  "dst_add_ok": 1,
+  "top_apps_blocked": [
+    {
+      "app": "AppleiCloud",
+      "count": 1
+    }
+  ],
+  "top_sources_blocked": [
+    {
+      "ip": "192.168.95.7",
+      "count": 1
+    }
+  ],
+  "mitm_effective": false,
+  "mitm_intercept_ready": true,
+  "captures": 2
+}
+===EVENTS last block lines===
+2026-08-09 19:33:56 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:34:34 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:34:34 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:34:35 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:34:35 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:34:37 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:34:37 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:34:46 [notice] flow_decide: iface=vmx0 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:34:46 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:35:13 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:35:13 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:35:13 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.11 host=gateway.fe2.apple-dns.net app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:35:13 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.11 ip=17.250.105.11 policy=anti-bypass-dns reason=flow_block
+2026-08-09 19:35:46 [notice] flow_decide: iface=vmx0.95 src=192.168.95.7 dst=17.250.105.4 host=- app=AppleiCloud cat=Web action=block reason=policy_match policy=anti-bypass-dns
+2026-08-09 19:35:46 [notice] enforce_block: kind=dst_scoped table=layer7_block_dst src=192.168.95.7 dst=17.250.105.4 ip=17.250.105.4 policy=anti-bypass-dns reason=flow_block
+{"id":"anti-bypass-dns","name":"Anti-bypass DNS (DoH\/DoT\/Private Relay)","apps":["DoH_DoT"],"hosts":["mask.icloud.com","mask-h2.icloud.com","use-application-dns.net","dns.google","dns.google.com","cloudflare-dns.com","one.one.one.one","dns.quad9.net","dns.adguard.com","doh.opendns.com","doh.cleanbrowsing.org","dns.nextdns.io"],"categories":[],"profile":"anti-bypass-dns"}
+{"id":"profile-preset-protecao-infantil","name":"Protecao infantil","apps":["Psiphon","UltraSurf","CloudflareWarp","Tor","Badoo"],"hosts":["pornhub.com","xvideos.com","xhamster.com","redtube.com","youporn.com","xnxx.com","onlyfans.com","chaturbate.com","stripchat.com","livejasmin.com","spankbang.com","brazzers.com","eporner.com","rule34.xxx","xvideos2.com","tinder.com","bumble.com","grindr.com","bet365.com","betano.com","blaze.com","croxyproxy.com","hide.me","proxysite.com"],"categories":["AdultContent","Gambling","Dating"],"profile":"preset-protecao-infantil"}
+{"id":"profile-anti-bypass-dns","name":"Anti-bypass DNS","apps":["DoH_DoT"],"hosts":["mask.icloud.com","mask-h2.icloud.com","use-application-dns.net","dns.google","dns.google.com","cloudflare-dns.com","one.one.one.one","dns.quad9.net","dns.adguard.com","doh.opendns.com","doh.cleanbrowsing.org","dns.nextdns.io"],"categories":[],"profile":"anti-bypass-dns"}
+{"id":"profile-anydesk","name":"AnyDesk","apps":["AnyDesk"],"hosts":["anydesk.com"],"categories":[],"profile":"anydesk"}
+{"id":"profile-atera","name":"Atera","apps":[],"hosts":["atera.com"],"categories":[],"profile":"atera"}

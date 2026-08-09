@@ -1,0 +1,13 @@
+===PING24===
+64 bytes from 192.168.100.24: icmp_seq=1 ttl=127 time=0.817 ms
+
+--- 192.168.100.24 ping statistics ---
+2 packets transmitted, 2 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 0.741/0.779/0.817/0.038 ms
+===SSH24 attempts===
+user=root result=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html root@192.168.100.24: Permission denied (publickey,password,keyboard-interactive). 
+user=admin result=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html admin@192.168.100.24: Permission denied (publickey,password,keyboard-interactive). 
+user=Administrator result=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html Administrator@192.168.100.24: Permission denied (publickey,password,keyboard-interactive). 
+user=pablo result=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html pablo@192.168.100.24: Permission denied (publickey,password,keyboard-interactive). 
+user=michelle result=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html michelle@192.168.100.24: Permission denied (publickey,password,keyboard-interactive). 
+user=systemup result=** WARNING: connection is not using a post-quantum key exchange algorithm. ** This session may be vulnerable to "store now, decrypt later" attacks. ** The server may need to be upgraded. See https://openssh.com/pq.html systemup@192.168.100.24: Permission denied (publickey,password,keyboard-interactive). 
