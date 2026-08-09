@@ -556,6 +556,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
+| 2026-08-09 | **rev. `v` / PoC-2** — lab `192.168.100.54`; TLS localhost; S2 p95≈2.8 ms PASS; S1 produto PENDING |
 | 2026-08-09 | **rev. `u` / PoC-1 PASS** — IPC PING lab-only; evidência `20260809T031700Z-poc1-ipc-idle`; 20.10 bloqueado |
 | 2026-08-09 | **rev. `t` / GO lab PoC-0** — `src/layer7-tlsproxy` idle; proibido intercept em `.254`/`.234`/`.235`; 20.10 bloqueado |
 | 2026-08-09 | **rev. `s` / S5+S7+S8** — S8 ADR-0017 real PASS; S5 quic bypass PASS doc; S7 privacidade PASS doc; 20.10 bloqueado (S1–S4/S6+GO lab) |
