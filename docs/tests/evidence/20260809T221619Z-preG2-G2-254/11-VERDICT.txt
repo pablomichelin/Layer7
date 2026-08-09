@@ -1,0 +1,8 @@
+VERDICT=NO-GO
+GATE=G2-passive
+PKG=1.9.46
+SHA=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5
+REASON=enabled=true mode=enforce block_dst_nonempty (not passive)
+MITM_EFFECTIVE=false
+ROLLBACK_RUNTIME=none (no live config mutation in this block)
+NEXT=human GO: accept enforce baseline OR controlled passivation window; then G3/G4 — no G5

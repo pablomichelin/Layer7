@@ -1,0 +1,203 @@
+===G2.1 PKG/VERSION===
+pfSense-pkg-layer7 1.9.46
+1.9.46
+===G2.2 SERVICE/PID===
+layer7d is running as pid 96485.
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+-rw-r--r--  1 root wheel 5 Aug  9 18:54 /var/run/layer7d.pid
+PID=96485
+PID_ALIVE=yes
+===G2.5 LDD/BINARY===
+-r-xr-xr-x  1 root wheel 5542760 Aug  9 14:06 /usr/local/sbin/layer7-tlsproxy
+-r-xr-xr-x  1 root wheel 8120224 Aug  9 14:06 /usr/local/sbin/layer7d
+/usr/local/sbin/layer7d:
+	libpcap.so.8 => /lib/libpcap.so.8 (0x1f4e80f18000)
+	libm.so.5 => /lib/libm.so.5 (0x1f4e82278000)
+	libthr.so.3 => /lib/libthr.so.3 (0x1f4e82320000)
+	libldap.so.2 => /usr/local/lib/libldap.so.2 (0x1f4e832fa000)
+	liblber.so.2 => /usr/local/lib/liblber.so.2 (0x1f4e8355f000)
+	libc.so.7 => /lib/libc.so.7 (0x1f4e83ef1000)
+	libibverbs.so.1 => /lib/libibverbs.so.1 (0x1f4e8434e000)
+	libbnxtre.so.1 => /lib/libbnxtre.so.1 (0x1f4e84e92000)
+	libmlx5.so.1 => /lib/libmlx5.so.1 (0x1f4e855e6000)
+	libsys.so.7 => /lib/libsys.so.7 (0x1f4e85a20000)
+	libsasl2.so.3 => /usr/local/lib/libsasl2.so.3 (0x1f4e81400000)
+	libssl.so.35 => /usr/lib/libssl.so.35 (0x1f4e874c7000)
+	libcrypto.so.35 => /lib/libcrypto.so.35 (0x1f4e89000000)
+	libdl.so.1 => /usr/lib/libdl.so.1 (0x1f4e86d5c000)
+	[vdso] (0x1f4e802ac000)
+===CONFIG JSON KEY FIELDS===
+{
+  "enabled": null,
+  "mode": null,
+  "enforcement_model": null,
+  "quic_mode": null,
+  "mitm": {
+    "enabled": null,
+    "quic_mode": null,
+    "intercept": null
+  }
+}
+===G2.3 PF LAYER7 RULES===
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+match inet6 from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <layer7_localnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <layer7_localnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+pass in quick on vmx0 inet6 all flags S/SA keep state (if-bound) label "id=1785929863" label "tags=user_rule" label "descr=Layer7 lab GV4 allow IPv6 LAN" ridentifier 1785929863
+COUNT_LAYER7_RULES=7
+COUNT_BLOCK_LAYER7=4
+COUNT_MITM_ANTIQUIC=0
+===NAT/RDR===
+COUNT_NAT_L7=0
+===LISTEN===
+root    layer7d    96485  4 seqpack (not connected)       ??                   
+===TABLES NAMES===
+layer7_allow_dst
+layer7_block_dst
+===TABLE CONTENTS SAMPLE===
+-- layer7_block --
+pfctl: Table does not exist.
+MEMBER_COUNT=0
+-- layer7_block_dst --
+   17.250.105.4
+   17.250.105.11
+MEMBER_COUNT=0
+-- layer7_mitm_src --
+pfctl: Table does not exist.
+MEMBER_COUNT=0
+-- layer7_mitm_dst --
+pfctl: Table does not exist.
+MEMBER_COUNT=0
+-- layer7_pdst_0 --
+pfctl: Table does not exist.
+MEMBER_COUNT=0
+-- layer7_psrc_0 --
+pfctl: Table does not exist.
+MEMBER_COUNT=0
+-- layer7_pallow_0 --
+pfctl: Table does not exist.
+MEMBER_COUNT=0
+-- layer7_exc_allow_0 --
+pfctl: Table does not exist.
+MEMBER_COUNT=0
+===PFCTL -nf DRY RUN===
+PFCTL_NF_RC=0
+===STATS HEAD===
+{
+  "version": "1.9.46",
+  "boot_time": 1786312495,
+  "uptime_seconds": 1321,
+  "timestamp": 1786313816,
+  "total_classified": 23440,
+  "total_blocked": 57,
+  "total_allowed": 23383,
+  "policies_active": 6,
+  "exceptions": 0,
+  "enforce_mode": 1,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 57,
+  "dst_add_fail": 0,
+  "cap_pkts": 1203352,
+  "cap_pkts_v4": 1201210,
+  "cap_pkts_v6": 956,
+  "cap_active": 4195,
+  "cap_active_v4": 4152,
+  "cap_active_v6": 43,
+  "cap_classified": 24578,
+  "cap_classified_v4": 24443,
+  "cap_classified_v6": 135,
+  "cap_expired": 25333,
+  "cap_evicted": 0,
+  "cap_dropped": 0,
+  "captures": 2,
+  "top_apps_blocked": [
+    {"app": "AppleiCloud", "count": 57}
+  ],
+  "top_sources_blocked": [
+    {"ip": "192.168.95.7", "count": 57}
+  ],
+  "license_valid": true,
+  "license_expired": false,
+  "license_grace": false,
+  "license_dev_mode": false,
+  "license_days_left": 1248,
+  "license_customer": "Systemup",
+  "license_expiry": "2030-01-09",
+  "license_hardware_id": "e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826",
+  "license_error": "",
+  "license_features": "base,identity,mitm",
+  "license_features_flags": 0,
+  "license_features_truncated": false,
+  "identity_active": false,
+  "identity_sessions": 0,
+  "identity_multi_user_sessions": 0,
+  "identity_audit_conflicts": 0,
+  "identity_audit_last_writers": 0,
+  "identity_entitled": false,
+  "mitm_entitled": false,
+  "mitm_runtime_available": true,
+  "mitm_effective": false,
+  "mitm_intercept_ready": true,
+  "identity_ldap_status": "off",
+  "identity_radius_status": "off",
+  "identity_radius_accepted": 0,
+  "identity_radius_rejected": 0,
+  "identity_dc_status": "off",
+  "identity_dc_accepted": 0,
+  "identity_dc_rejected": 0,
+  "license_check_in_enabled": false,
+  "license_check_in_ok": true,
+  "license_last_check_in": 1786299970,
+  "license_next_check_in": 1786904770,
+  "license_check_in_error": "",
+  "bl_enabled": false,
+  "bl_domains_loaded": 0,
+  "bl_categories_active": 0,
+  "bl_lookups": 0,
+  "bl_hits": 0,
+  "bl_dns_hits": 0,
+  "bl_sni_hits": 0,
+  "bl_rules_active": 0,
+  "bl_top_categories": []
+}
+
+===MITM FILES===
+total 97
+drwxr-xr-x   6 root wheel    17 Aug  9 18:54 .
+drwxr-xr-x  33 root wheel    94 Aug  9 18:54 ..
+-rw-r--r--   1 root wheel  2571 Aug  9 14:06 allowlist-seed.txt
+drwxrwxr-x  82 www  wheel    86 Aug  9 14:06 blacklists
+drwxr-xr-x   2 root wheel     4 Aug  9 18:54 lang
+-r-xr-xr-x   1 root wheel   253 Aug  9 14:06 layer7-reports-collect.php
+-r-xr-xr-x   1 root wheel  2848 Aug  9 14:06 layer7-stats-collect.sh
+-r-xr-xr-x   1 root wheel  1899 Aug  9 14:06 layer7-stats-purge.sh
+drwxr-x---   2 root wheel     2 Aug  9 18:56 mitm
+-rw-r--r--   1 root wheel  2045 Aug  9 18:54 pf.conf
+-rw-r--r--   1 root wheel  1373 Aug  9 14:06 pf.conf.sample
+-rw-rw-r--   1 www  wheel  1397 Aug  5 16:33 profiles-custom.json
+-rw-r--r--   1 root wheel 47581 Aug  9 14:06 profiles.json
+-rw-r--r--   1 root wheel  8097 Aug  9 14:06 remote-access-catalog.json
+-rw-rw-r--   1 root wheel    82 Aug  5 16:33 remote-access.json
+drwxr-xr-x   2 root wheel     4 Aug  6 03:15 reports
+-r-xr-xr-x   1 root wheel 24428 Aug  9 14:06 update-blacklists.sh
+ls: /var/db/layer7/mitm*: No such file or directory
+/usr/local/etc/layer7/mitm:
+total 9
+drwxr-x---  2 root wheel  2 Aug  9 18:56 .
+drwxr-xr-x  6 root wheel 17 Aug  9 18:54 ..
+===ROUTE 198.18===
+NO_19818_ROUTE
+===SNAP STILL PRESENT===
+total 8832
+drwxr-xr-x   2 root wheel      8 Aug  9 19:16 .
+drwxrwxrwt  32 root wheel  77017 Aug  9 19:17 ..
+-rw-r--r--   1 root wheel    138 Aug  9 19:16 00-SNAP-META.txt
+-rw-r--r--   1 root wheel    137 Aug  9 19:16 01-sources.txt
+-rw-r--r--   1 root wheel    471 Aug  9 19:16 02-listing.txt
+-rw-r--r--   1 root wheel    716 Aug  9 19:16 RESTORE.txt
+-rw-r--r--   1 root wheel 958316 Aug  9 18:54 config.xml.bak-preG2-19246-20260809T221620Z
+-rw-rw-r--   1 www  wheel   6416 Aug  9 18:56 layer7.json.bak-preG2-19246-20260809T221620Z
+===DONE===

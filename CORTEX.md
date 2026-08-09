@@ -1581,7 +1581,7 @@ CHECKPOINT CANONICO
 - Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
 - Evidência GO teste: docs/tests/evidence/20260809T215442Z-phaseBD-d1-254/
 - Proximo trabalho: manter MITM OFF; activação permanente só com novo GO; `.234/.235` proibidos
-- Appliance `.254`: **1.9.46 passivo** (MITM OFF; zero rdr/quic/8443; GUI/NET OK pós-rollback)
+- Appliance `.254`: **1.9.46 instalado**; MITM OFF (`mitm_effective=false`); **Layer7 `enabled=true` / `mode=enforce`** (não passivo) — Pré-G2/G2 passivo **NO-GO** `20260809T221619Z-preG2-G2-254`
 - Pacote publicado: **1.9.46**; rollback lab: **1.9.42**
 - Reconciliacao F4 enforcement `_24`…`_65` vs `1.9.46` (`2026-08-09`): **NO-GO** instalar qualquer `1.8.11_*` da linha histórica; único pacote elegível lab = **`1.9.46`** — docs/09-blocking/auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md

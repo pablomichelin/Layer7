@@ -1,0 +1,6 @@
+RESTORE PROCEDURE (config-level, documented runbook path):
+1) cp -a /tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254/config.xml.bak-preG2-19246-20260809T221620Z /cf/conf/config.xml
+2) [ -f /tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254/layer7.json.bak-preG2-19246-20260809T221620Z ] && cp -a /tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254/layer7.json.bak-preG2-19246-20260809T221620Z /usr/local/etc/layer7.json
+3) Do NOT auto filter_configure in this Pre-G2/G2 block unless rollback of a mutation is required.
+VM-level restore: Veeam daily backup of 192.168.100.254 (p1-snapshot-gate-b1.md) — operator restore in Veeam console.
+Package rollback lab: reinstall 1.9.42 (CORTEX) if package-level rollback needed.

@@ -1,0 +1,8 @@
+total 8268
+drwxr-xr-x   2 root wheel      7 Aug  9 19:16 .
+drwxrwxrwt  32 root wheel  77020 Aug  9 19:16 ..
+-rw-r--r--   1 root wheel    138 Aug  9 19:16 00-SNAP-META.txt
+-rw-r--r--   1 root wheel    137 Aug  9 19:16 01-sources.txt
+-rw-r--r--   1 root wheel    716 Aug  9 19:16 RESTORE.txt
+-rw-r--r--   1 root wheel 958316 Aug  9 18:54 config.xml.bak-preG2-19246-20260809T221620Z
+-rw-rw-r--   1 www  wheel   6416 Aug  9 18:56 layer7.json.bak-preG2-19246-20260809T221620Z

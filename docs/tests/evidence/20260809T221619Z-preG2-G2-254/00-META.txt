@@ -1,0 +1,4 @@
+SHA_EXPECTED=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5
+PKG=1.9.46
+SCOPE=Pre-G2 snapshot + inventory + G2 passive iff 1.9.46 already installed
+NO_INSTALL_IF_NOT_1946=1

@@ -1,0 +1,109 @@
+===JSON TOP KEYS===
+[
+  "layer7"
+]
+===JSON LAYER7 SUB===
+{
+  "enabled": true,
+  "mode": "enforce",
+  "enforcement_model": "legacy_global",
+  "quic_mode": null
+}
+===MITM SUB===
+{
+  "enabled": false,
+  "quic_mode": "block",
+  "ca": {
+    "present": true,
+    "subject": "CN=Layer7-PhaseD-Lab-CA",
+    "fingerprint_sha256": "CF2EA1522F4554A5E9A14B6C852FD246EEC4E61119255AE19F8E6F587BE195D7",
+    "not_after": "Sep  8 21:55:43 2026 GMT",
+    "cn": "Layer7 MITM CA"
+  },
+  "bypass": {
+    "sni": [],
+    "cidr": [
+      "127.0.0.1/32",
+      "::1/128"
+    ]
+  },
+  "intercept": {
+    "source_cidr": [],
+    "dest_cidr": [],
+    "block_sni": []
+  }
+}
+===FULL SMALL===
+{
+  "layer7": {
+    "enabled": true,
+    "mode": "enforce",
+    "enforcement_model": "legacy_global",
+    "quic_mode": null,
+    "mitm": {
+      "enabled": false,
+      "quic_mode": "block",
+      "ca": {
+        "present": true,
+        "subject": "CN=Layer7-PhaseD-Lab-CA",
+        "fingerprint_sha256": "CF2EA1522F4554A5E9A14B6C852FD246EEC4E61119255AE19F8E6F587BE195D7",
+        "not_after": "Sep  8 21:55:43 2026 GMT",
+        "cn": "Layer7 MITM CA"
+      },
+      "bypass": {
+        "sni": [],
+        "cidr": [
+          "127.0.0.1/32",
+          "::1/128"
+        ]
+      },
+      "intercept": {
+        "source_cidr": [],
+        "dest_cidr": [],
+        "block_sni": []
+      }
+    }
+  },
+  "root_enabled": null
+}
+===BLOCK_DST FULL===
+   17.250.105.4
+   17.250.105.11
+COUNT_BLOCK_DST=2
+===ALLOW_DST===
+   51.11.192.50
+   52.123.128.14
+   52.123.129.14
+   135.234.160.245
+   142.251.150.1
+   142.251.150.2
+   142.251.151.1
+   142.251.151.2
+   142.251.152.1
+   142.251.152.2
+   142.251.153.1
+   142.251.153.2
+   142.251.154.1
+   142.251.154.2
+   142.251.155.1
+   142.251.155.2
+   142.251.156.1
+   142.251.156.2
+   142.251.157.1
+   142.251.157.2
+COUNT_ALLOW=31
+===STATS ENFORCE FIELDS===
+{
+  "version": "1.9.46",
+  "enforce_mode": 1,
+  "total_blocked": 57,
+  "dst_add_ok": 57,
+  "pf_add_ok": 0,
+  "mitm_effective": false,
+  "mitm_intercept_ready": true,
+  "captures": 2,
+  "license_valid": true
+}
+===pkg checksum local file if any===
+-rw-r--r--  1 root wheel 3297839 Aug  9 18:54 /tmp/pfSense-pkg-layer7-1.9.46.pkg
+SHA256 (/tmp/pfSense-pkg-layer7-1.9.46.pkg) = 10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5
