@@ -39,11 +39,14 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `SHA256=40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`; grupo Acesso remoto individual;
 comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
-**Candidato local em validação:** `1.9.33` / BG-108 — UX visual wave 2
-(KPI unificado Estado/Relatórios, subnav Políticas, Kick/Rumble→Streaming,
-Chart.js local, Status/Remoção admin-block); sem mudança de enforcement.
-**Código concluído** (`2026-08-08`); Build FreeBSD e appliance **pendentes**.
-Rollback: **`1.9.30`** (público) / `1.9.32` (BG-107) se já no lab.
+**Candidato publicado (prerelease, não latest):** `1.9.33` / BG-108 — UX visual
+wave 2 (KPI unificado, subnav Políticas, Kick/Rumble→Streaming, Chart.js
+local, Status/Remoção admin-block); inclui BG-107. Sem mudança de enforcement.
+Tag `v1.9.33` (prerelease);
+`SHA256=266bf621f03054bcb043a1196d1b917ca3e320d21551a97bc1f8d00372d0ebed`.
+Build FreeBSD 15 PASS; appliance `192.168.100.254` (FreeBSD 16) instalado com
+`pkg add -f` PASS (`layer7d` running, `layer7d -t` OK) em `2026-08-08`.
+Rollback: **`1.9.30`** (público/latest).
 **Candidato anterior:** `1.9.32` / BG-107 — padronização visual dos Perfis
 rápidos (Acesso remoto + agregados «(todas/todos)» + ícones únicos + grelha
 CSS), UX única RA (`#l7-ra`) e layout admin-block em Identity/Exceptions/
@@ -62,9 +65,9 @@ OFF; TLS termina no portal antes da classificação), portanto o evento
 física. Pacote ainda não publicado; rollback local/público: **`1.9.30`**.
 **Risco de release (BG-106):** o builder oficial é FreeBSD 15 e o appliance
 observado é FreeBSD 16; o `pkg` exigiu instalação forçada por arquitetura.
-Integridade, dependências e runtime passaram, mas não promover `1.9.31`/
-`1.9.32` publicamente antes de artefato nativo FreeBSD 16 ou validação formal
-de compatibilidade.
+Integridade, dependências e runtime passaram, mas não promover `1.9.31`…
+`1.9.33` como `releases/latest` antes de artefato nativo FreeBSD 16 ou
+validação formal de compatibilidade.
 **Referencia de producao enforce:** **`1.9.31`** (gate BG-105 parcial PASS
 `2026-08-08`; sem promoção pública). Rollback enforce: **`1.9.30`**.
 Historico: `_69`, `_24`.

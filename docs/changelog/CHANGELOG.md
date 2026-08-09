@@ -13,8 +13,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   só-categoria (`N cats`), Chart.js 4.4.4 vendored em
   `packages/layer7/js/chart.umd.min.js` (sem CDN; empty state se ausente),
   tipografia do preset «Distracoes no trabalho». Sem mudança de enforcement.
-  Mapa Identity live fica em BG-109. Build/release e promoção pública
-  **não** neste bloco (gate appliance + BG-106).
+  Mapa Identity live fica em BG-109. Build FreeBSD 15 PASS; prerelease GitHub
+  `v1.9.33` (`SHA256=266bf621f03054bcb043a1196d1b917ca3e320d21551a97bc1f8d00372d0ebed`);
+  `releases/latest` permanece `1.9.30` (BG-106).
 
 ### Fixed
 
