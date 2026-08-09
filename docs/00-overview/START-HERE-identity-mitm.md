@@ -47,8 +47,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Campo | Valor |
 |-------|-------|
 | Plano | Identity **FECHADA**; MITM **GO produto**; **`1.9.42` source_cidr** (rev. `2026-08-09ah`) |
-| Passo actual | **`1.9.42` passivo**; **Fase A+B destino lab PASS** (rota runtime `198.18.0.10→.54`) |
-| Próximo | **GO humano Fase C** (hosts/CA só `.24`; sem MITM) |
+| Passo actual | **`1.9.42` passivo**; **Fase A+B+C destino lab PASS** (`.24` Edge OK sem MITM) |
+| Próximo | **GO humano Fase D** (MITM source∧dest; runbook activação `1.9.42`) |
 | Rev. do plano | **`2026-08-09ah`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
@@ -157,12 +157,11 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.42 passivo**; **Fase A+B destino lab PASS**
-- Próximo: GO humano **Fase C** (`.24` hosts/CA)
+- Passo actual: **1.9.42 passivo**; **Fase A+B+C destino lab PASS**
+- Próximo: GO humano **Fase D** (MITM escopado)
 - Latest: **1.9.42** SHA `6bd6ba37…4c4b`
 - Evidência passiva: 20260809T175111Z-1.9.42-passive-254
-- Evidência Fase A: 20260809T180157Z-phaseA-54
-- Evidência Fase B: 20260809T180624Z-phaseB-254
+- Evidência Fase A/B/C: 20260809T180157Z-phaseA-54 / …phaseB-254 / …phaseC-24
 - S6 ECH: NA/limite (não exercitado)
 ```
 
@@ -187,6 +186,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Destino lab `198.18` via `.54` | [`../09-blocking/runbook-destino-lab-19818-via-54.md`](../09-blocking/runbook-destino-lab-19818-via-54.md) |
 | Evidência Fase A `.54` | [`../tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/) |
 | Evidência Fase B `.254` | [`../tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/) |
+| Evidência Fase C `.24` | [`../tests/evidence/20260809T181302Z-phaseC-24/`](../tests/evidence/20260809T181302Z-phaseC-24/) |
 | Spike MITM + reopen | [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) |
 | PoC lab tlsproxy | [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |

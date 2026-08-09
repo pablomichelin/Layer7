@@ -1352,18 +1352,17 @@ default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 - **Evidência 20.11:** [`docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/)
 - **Evidência 1.9.42:** [`docs/tests/evidence/20260809T173500Z-1.9.42-source-cidr/`](docs/tests/evidence/20260809T173500Z-1.9.42-source-cidr/)
 - **Runbook activação produção:** [`docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md`](docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md)
-- **Destino lab A+B:** [`docs/09-blocking/runbook-destino-lab-19818-via-54.md`](docs/09-blocking/runbook-destino-lab-19818-via-54.md) · A [`docs/tests/evidence/20260809T180157Z-phaseA-54/`](docs/tests/evidence/20260809T180157Z-phaseA-54/) · B [`docs/tests/evidence/20260809T180624Z-phaseB-254/`](docs/tests/evidence/20260809T180624Z-phaseB-254/)
+- **Destino lab A+B+C:** [`docs/09-blocking/runbook-destino-lab-19818-via-54.md`](docs/09-blocking/runbook-destino-lab-19818-via-54.md) · A [`…/20260809T180157Z-phaseA-54/`](docs/tests/evidence/20260809T180157Z-phaseA-54/) · B [`…/20260809T180624Z-phaseB-254/`](docs/tests/evidence/20260809T180624Z-phaseB-254/) · C [`…/20260809T181302Z-phaseC-24/`](docs/tests/evidence/20260809T181302Z-phaseC-24/)
 - **Runbook S1–S8:** [`docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md)
 - **Prep 20.10:** [`docs/09-blocking/prep-20.10-checklist.md`](docs/09-blocking/prep-20.10-checklist.md) — **FECHADO**
 - **Baseline perf 20.11a:** [`docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/)
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.42 passivo**; **Fase A+B destino lab PASS** (rota runtime `198.18.0.10→.54`)
-- Próximo: GO humano explícito **Fase C** (hosts/CA só `.24`; sem MITM)
+- Passo actual: **1.9.42 passivo**; **Fase A+B+C destino lab PASS** (`.24` Edge OK sem MITM)
+- Próximo: GO humano explícito **Fase D** (MITM source∧dest escopado)
 - Destino lab: `docs/09-blocking/runbook-destino-lab-19818-via-54.md`
-- Evidência A: `docs/tests/evidence/20260809T180157Z-phaseA-54/`
-- Evidência B: `docs/tests/evidence/20260809T180624Z-phaseB-254/`
+- Evidência A/B/C: `20260809T180157Z-phaseA-54` / `…phaseB-254` / `…phaseC-24`
 - Latest: **1.9.42** SHA `6bd6ba37…4c4b`
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; zero rdr MITM em produção

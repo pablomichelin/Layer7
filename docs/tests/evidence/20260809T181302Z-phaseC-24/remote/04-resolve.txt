@@ -1,0 +1,8 @@
+
+Name                                           Type   TTL   Section    IPAddress                                
+----                                           ----   ---   -------    ---------                                
+mitm-lab.test                                  A      0     Answer     198.18.0.10                              
+
+
+
+RESOLVED=198.18.0.10

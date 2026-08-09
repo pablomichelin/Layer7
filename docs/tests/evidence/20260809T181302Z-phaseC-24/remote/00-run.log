@@ -1,0 +1,94 @@
+2026-08-09T15:14:31.2986220-03:00 === APPLY C ===
+2026-08-09T15:14:31.4366269-03:00 CA_SUBJECT=CN=Layer7-PhaseA-Ephemeral-CA
+2026-08-09T15:14:31.4376272-03:00 CA_THUMBPRINT=768AD5B382F2D950DB4273D64E122788732575D8
+2026-08-09T15:14:31.4886250-03:00 CERTUTIL_ADD=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Assinatura coincide com Chave p∑blica
+Certificado "Layer7-PhaseA-Ephemeral-CA" adicionado ao repositærio.
+CertUtil: -addstore : comando conclu›do com €xito.
+
+2026-08-09T15:14:31.5256303-03:00 HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test
+2026-08-09T15:15:25.9317685-03:00 === ROLLBACK C ===
+2026-08-09T15:15:25.9927662-03:00 CERTUTIL_DEL=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Excluindo certificado 7: CN=Layer7-PhaseA-Ephemeral-CA:768ad5b382f2d950db4273d64e122788732575d8
+CertUtil: -delstore : comando conclu›do com €xito.
+
+2026-08-09T15:15:26.0557718-03:00 CA_REMOVED 768AD5B382F2D950DB4273D64E122788732575D8
+2026-08-09T15:15:26.0627713-03:00 HOSTS_RESTORED_FROM_BAK
+2026-08-09T15:15:26.0687732-03:00 ROLLBACK_C_OK
+2026-08-09T15:15:26.6617937-03:00 === APPLY C ===
+2026-08-09T15:15:26.7658013-03:00 CA_SUBJECT=CN=Layer7-PhaseA-Ephemeral-CA
+2026-08-09T15:15:26.7667990-03:00 CA_THUMBPRINT=768AD5B382F2D950DB4273D64E122788732575D8
+2026-08-09T15:15:26.8068035-03:00 CERTUTIL_ADD=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Assinatura coincide com Chave p∑blica
+Certificado "Layer7-PhaseA-Ephemeral-CA" adicionado ao repositærio.
+CertUtil: -addstore : comando conclu›do com €xito.
+
+2026-08-09T15:15:26.8328019-03:00 HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test
+2026-08-09T15:15:51.3963610-03:00 SSL_ERRORS=None
+CHAIN_STATUS_COUNT=0
+TLS_AUTH=OK
+PEER_SUBJECT=CN=mitm-lab.test
+PEER_ISSUER=CN=Layer7-PhaseA-Ephemeral-CA
+HTTP_SNIP=HTTP/1.0 200 OK  Server: SimpleHTTP/0.6 Python/3.12.3  Date: Sun, 09 Aug 2026 18:15:51 GMT  Content-type: text/html  Content-Length: 255  Last-Modified: Sun, 09 Aug 2026 18:02:00 GMT    
+BODY_MARKER=NO
+TRUST_OK=YES
+
+
+2026-08-09T15:16:20.1667254-03:00 === ROLLBACK C ===
+2026-08-09T15:16:20.2237225-03:00 CERTUTIL_DEL=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Excluindo certificado 7: CN=Layer7-PhaseA-Ephemeral-CA:768ad5b382f2d950db4273d64e122788732575d8
+CertUtil: -delstore : comando conclu›do com €xito.
+
+2026-08-09T15:16:20.2847266-03:00 CA_REMOVED 768AD5B382F2D950DB4273D64E122788732575D8
+2026-08-09T15:16:20.2917279-03:00 HOSTS_RESTORED_FROM_BAK
+2026-08-09T15:16:20.2957287-03:00 ROLLBACK_C_OK
+2026-08-09T15:16:20.8777480-03:00 === APPLY C ===
+2026-08-09T15:16:20.9857543-03:00 CA_SUBJECT=CN=Layer7-PhaseA-Ephemeral-CA
+2026-08-09T15:16:20.9867539-03:00 CA_THUMBPRINT=768AD5B382F2D950DB4273D64E122788732575D8
+2026-08-09T15:16:21.0357621-03:00 CERTUTIL_ADD=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Assinatura coincide com Chave p∑blica
+Certificado "Layer7-PhaseA-Ephemeral-CA" adicionado ao repositærio.
+CertUtil: -addstore : comando conclu›do com €xito.
+
+2026-08-09T15:16:21.0627564-03:00 HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test
+2026-08-09T15:17:00.0038662-03:00 SSL_ERRORS=None
+CHAIN_STATUS_COUNT=0
+TLS_AUTH=OK
+PEER_SUBJECT=CN=mitm-lab.test
+PEER_ISSUER=CN=Layer7-PhaseA-Ephemeral-CA
+HTTP_SNIP=HTTP/1.0 200 OK  Server: SimpleHTTP/0.6 Python/3.12.3  Date: Sun, 09 Aug 2026 18:16:59 GMT  Content-type: text/html  Content-Length: 255  Last-Modified: Sun, 09 Aug 2026 18:02:00 GMT    <!DOCTYPE html> <html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head> <body> <h1>Layer7 Phase A ó mitm-lab.test</h1> <p id="marker">L7-PHASE-A-OK-198.18.0.10</p> <p>Ephemeral lab HTTPS destination. Not production.</p> </body></html> 
+BODY_MARKER=YES
+TRUST_OK=YES
+
+
+2026-08-09T15:17:10.8350063-03:00 EDGE_OK
+2026-08-09T15:17:10.8390062-03:00 PHASE_C_PASS
+2026-08-09T15:17:11.8370561-03:00 === ROLLBACK C ===
+2026-08-09T15:17:11.8970486-03:00 CERTUTIL_DEL=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Excluindo certificado 7: CN=Layer7-PhaseA-Ephemeral-CA:768ad5b382f2d950db4273d64e122788732575d8
+CertUtil: -delstore : comando conclu›do com €xito.
+
+2026-08-09T15:17:11.9580543-03:00 CA_REMOVED 768AD5B382F2D950DB4273D64E122788732575D8
+2026-08-09T15:17:11.9650503-03:00 HOSTS_RESTORED_FROM_BAK
+2026-08-09T15:17:11.9700580-03:00 ROLLBACK_C_OK
+2026-08-09T15:17:13.1811035-03:00 === APPLY C ===
+2026-08-09T15:17:13.2871120-03:00 CA_SUBJECT=CN=Layer7-PhaseA-Ephemeral-CA
+2026-08-09T15:17:13.2881122-03:00 CA_THUMBPRINT=768AD5B382F2D950DB4273D64E122788732575D8
+2026-08-09T15:17:13.3311090-03:00 CERTUTIL_ADD=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Assinatura coincide com Chave p∑blica
+Certificado "Layer7-PhaseA-Ephemeral-CA" adicionado ao repositærio.
+CertUtil: -addstore : comando conclu›do com €xito.
+
+2026-08-09T15:17:13.3601112-03:00 HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test
+2026-08-09T15:17:52.3062687-03:00 SSL_ERRORS=None
+CHAIN_STATUS_COUNT=0
+TLS_AUTH=OK
+PEER_SUBJECT=CN=mitm-lab.test
+PEER_ISSUER=CN=Layer7-PhaseA-Ephemeral-CA
+HTTP_SNIP=HTTP/1.0 200 OK  Server: SimpleHTTP/0.6 Python/3.12.3  Date: Sun, 09 Aug 2026 18:17:52 GMT  Content-type: text/html  Content-Length: 255  Last-Modified: Sun, 09 Aug 2026 18:02:00 GMT    <!DOCTYPE html> <html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head> <body> <h1>Layer7 Phase A ó mitm-lab.test</h1> <p id="marker">L7-PHASE-A-OK-198.18.0.10</p> <p>Ephemeral lab HTTPS destination. Not production.</p> </body></html> 
+BODY_MARKER=YES
+TRUST_OK=YES
+
+
+2026-08-09T15:18:03.4360568-03:00 EDGE_OK
+2026-08-09T15:18:03.4390575-03:00 PHASE_C_PASS

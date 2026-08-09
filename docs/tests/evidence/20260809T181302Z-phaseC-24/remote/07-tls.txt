@@ -1,0 +1,9 @@
+﻿SSL_ERRORS=None
+CHAIN_STATUS_COUNT=0
+TLS_AUTH=OK
+PEER_SUBJECT=CN=mitm-lab.test
+PEER_ISSUER=CN=Layer7-PhaseA-Ephemeral-CA
+HTTP_SNIP=HTTP/1.0 200 OK  Server: SimpleHTTP/0.6 Python/3.12.3  Date: Sun, 09 Aug 2026 18:17:52 GMT  Content-type: text/html  Content-Length: 255  Last-Modified: Sun, 09 Aug 2026 18:02:00 GMT    <!DOCTYPE html> <html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head> <body> <h1>Layer7 Phase A — mitm-lab.test</h1> <p id="marker">L7-PHASE-A-OK-198.18.0.10</p> <p>Ephemeral lab HTTPS destination. Not production.</p> </body></html> 
+BODY_MARKER=YES
+TRUST_OK=YES
+

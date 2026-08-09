@@ -1,11 +1,12 @@
 # Runbook — destino HTTPS lab local (`198.18.0.10/32` via `.54`)
 
-**Estado:** **Fase A = PASS**; **Fase B = PASS** (`20260809T180624Z` no `.254`); **Fase C = aguarda GO humano**.  
+**Estado:** **Fase A+B+C = PASS**; **Fase D (MITM) = aguarda GO humano**.  
 **Tipo:** topologia de teste sem VPS (custo zero).  
-**Pré-requisito pacote:** `.254` `1.9.42` passivo (MITM OFF) — confirmado durante Fase B.  
+**Pré-requisito pacote:** `.254` `1.9.42` passivo (MITM OFF) — confirmado durante B/C.  
 **Proibido neste desenho:** `.234` / `.235`; mutações sem fail-safe; CDN público.  
 **Evidência Fase A:** [`docs/tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/)  
-**Evidência Fase B:** [`docs/tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/)
+**Evidência Fase B:** [`docs/tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/)  
+**Evidência Fase C:** [`docs/tests/evidence/20260809T181302Z-phaseC-24/`](../tests/evidence/20260809T181302Z-phaseC-24/)
 
 ---
 
@@ -120,13 +121,17 @@ staticroutes config vazio (não persistido)
 **Estado deixado UP** com fail-safe armado (rota some ao disparar).  
 **Rollback B:** `ssh root@192.168.100.254 '/tmp/l7-phaseB-rollback.sh'`
 
-### Fase C — Cliente `.24` apenas (DNS/hosts + CA)
+### Fase C — Cliente `.24` apenas (DNS/hosts + CA) — **PASS** `2026-08-09T18:13:02Z`
 
-1. `hosts`: `198.18.0.10 mitm-lab.test`  
-2. Importar CA efêmera no Root (só `.24`)  
-3. Smoke browser Edge → `https://mitm-lab.test/` **sem** MITM (página do servidor lab)
+**Escrita só em `.24` (GO humano; fail-safe B estendido antes dos testes).**
 
-**Rollback C:** remover hosts + CA; limpar perfil se necessário.
+1. Backup `hosts` + inventário `LocalMachine\Root`  
+2. CA efêmera (só `.crt`) → `certutil -addstore Root` — subject `CN=Layer7-PhaseA-Ephemeral-CA`, thumbprint `768AD5B382F2D950DB4273D64E122788732575D8`  
+3. `hosts` marcado: `198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test`  
+4. Validação: resolve→`198.18.0.10`, GW `.254`, TCP/443, TLS trust sem bypass, Edge 151 real **sem** intersticial  
+5. Rollback ensaiado (CA+hosts) + re-apply — estado deixado UP para Fase D
+
+**Rollback C:** `powershell -File C:\Windows\Temp\phase-c-24.ps1 rollback`
 
 ### Fase D — Activação MITM (GO **separado**; fora deste desenho até confirmação)
 
@@ -165,6 +170,7 @@ Abort se rdr tiver `from any` ou tabelas sem src.
 | Condições do GO | (1) rota retorno `.24 via .254` na `.54`; (2) pré-check `reply-to/route-to`; (3) pass PF mínimo só `.24`; (4) fail-safe temporizado + rollback; (5) fases A→B→C antes de qualquer MITM; (6) `.234/.235` intocados |
 | Aplicar Fase A? | **GO executado — PASS** (`20260809T180157Z-phaseA-54`) |
 | Aplicar Fase B? | **GO executado — PASS** (`20260809T180624Z-phaseB-254`; PF extra não preciso) |
-| Aplicar Fase C agora? | **NO-GO automático** — falta **GO humano explícito** só para C (`.24`) |
+| Aplicar Fase C? | **GO executado — PASS** (`20260809T181302Z-phaseC-24`; Edge sem intersticial) |
+| Aplicar Fase D agora? | **NO-GO automático** — falta **GO humano explícito** só para D (MITM `1.9.42`) |
 
-**Pedido ao proprietário:** confirmar **GO explícito para Fase C** (hosts/CA só na `.24`). Não empacotar C+D num único GO. **Atenção:** fail-safe B remove a rota ~15–19 min após apply — estender fail-safe se C não for imediato.
+**Pedido ao proprietário:** confirmar **GO explícito para Fase D** (MITM escopado source `.24` + dest `198.18.0.10`). Não activar MITM sem esse GO. **Atenção:** fail-safe B (`at` ~15:50 −03 / sleep) ainda remove a rota — estender se D não for imediato.

@@ -1,0 +1,8 @@
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+GUI=200
+MITM=off
+  PID      
+75275 07:32
+Date				Owner		Queue	Job#
+Sun Aug  9 15:50:00 -03 2026	root            c	3

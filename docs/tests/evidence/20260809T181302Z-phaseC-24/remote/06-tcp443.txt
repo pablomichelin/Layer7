@@ -1,0 +1,12 @@
+
+
+ComputerName     : 198.18.0.10
+RemoteAddress    : 198.18.0.10
+RemotePort       : 443
+InterfaceAlias   : Ethernet0 2
+SourceAddress    : 192.168.100.24
+TcpTestSucceeded : True
+
+
+
+
