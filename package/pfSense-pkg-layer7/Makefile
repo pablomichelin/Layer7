@@ -125,6 +125,9 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_settings_update.js \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/packages/layer7/js
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/js/chart.umd.min.js \
+		${STAGEDIR}${PREFIX}/www/packages/layer7/js
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_allowlist.php \
 		${STAGEDIR}${PREFIX}/www/packages/layer7
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/packages/layer7/layer7_devices.php \
