@@ -82,7 +82,7 @@ do-build:
 		-o ${WRKSRC}/layer7-tlsproxy \
 		${LAYER7_TLSPROXY_DIR}/main.c ${LAYER7_TLSPROXY_DIR}/ipc.c \
 		${LAYER7_TLSPROXY_DIR}/tls_lab.c \
-		/usr/lib/libssl.a /usr/lib/libcrypto.a
+		/usr/lib/libssl.a /usr/lib/libcrypto.a -lpthread
 .endif
 
 do-install:
