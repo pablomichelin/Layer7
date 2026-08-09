@@ -4845,6 +4845,182 @@ function layer7_load_profiles($include_hidden = false)
 }
 
 /**
+ * BG-110 — aplica ligar/desligar de vários perfis rápidos numa única
+ * gravação + um único resync PF (evita ~20s por clique).
+ *
+ * @param array $enable_ids  ids de perfil (sem prefixo profile-)
+ * @param array $disable_ids ids de perfil a desligar
+ * @return array{ok:bool,errors:array,msg:string,enabled:int,disabled:int,doh:bool}
+ */
+function layer7_apply_profile_toggles($enable_ids, $disable_ids)
+{
+	$out = array(
+		"ok" => false,
+		"errors" => array(),
+		"msg" => "",
+		"enabled" => 0,
+		"disabled" => 0,
+		"doh" => false,
+	);
+	if (!is_array($enable_ids)) {
+		$enable_ids = array();
+	}
+	if (!is_array($disable_ids)) {
+		$disable_ids = array();
+	}
+	$enable_ids = array_values(array_unique(array_filter(array_map("strval", $enable_ids))));
+	$disable_ids = array_values(array_unique(array_filter(array_map("strval", $disable_ids))));
+
+	$data = layer7_load_or_default();
+	if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
+		$data["layer7"]["policies"] = array();
+	}
+	$policies = &$data["layer7"]["policies"];
+	$profiles = layer7_load_profiles(true);
+	$by_id = array();
+	foreach ($profiles as $p) {
+		if (is_array($p) && isset($p["id"])) {
+			$by_id[(string)$p["id"]] = $p;
+		}
+	}
+	$scoped = layer7_enforcement_is_scoped_hybrid($data);
+	$changed = false;
+	$doh_needed = false;
+	$enabled_names = array();
+	$disabled_names = array();
+
+	foreach ($disable_ids as $profile_id) {
+		if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $profile_id)) {
+			$out["errors"][] = sprintf(l7_t("Perfil invalido: %s"), $profile_id);
+			continue;
+		}
+		$pid = "profile-" . $profile_id;
+		$before = count($policies);
+		$policies = array_values(array_filter(
+			$policies,
+			function ($p) use ($pid) {
+				return ($p["id"] ?? "") !== $pid;
+			}
+		));
+		if (count($policies) !== $before) {
+			$changed = true;
+			$out["disabled"]++;
+			$disabled_names[] = isset($by_id[$profile_id]["name"])
+			    ? (string)$by_id[$profile_id]["name"] : $profile_id;
+		}
+	}
+
+	foreach ($enable_ids as $profile_id) {
+		if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $profile_id)) {
+			$out["errors"][] = sprintf(l7_t("Perfil invalido: %s"), $profile_id);
+			continue;
+		}
+		if (!isset($by_id[$profile_id])) {
+			$out["errors"][] = sprintf(l7_t("Perfil nao encontrado: %s"), $profile_id);
+			continue;
+		}
+		$profile = $by_id[$profile_id];
+		$pid = "profile-" . $profile_id;
+		$dup = false;
+		foreach ($policies as $ex) {
+			if (($ex["id"] ?? "") === $pid) {
+				$dup = true;
+				break;
+			}
+		}
+		if ($dup) {
+			continue;
+		}
+		if ($scoped) {
+			$out["errors"][] = sprintf(
+			    l7_t("Perfil '%s': no modo scoped_hybrid use Opcoes e escolha CIDR/grupo."),
+			    $profile["name"] ?? $profile_id
+			);
+			continue;
+		}
+		if (count($policies) >= 24) {
+			$out["errors"][] = l7_t("Limite de 24 politicas.");
+			break;
+		}
+		$rule = array(
+			"id" => $pid,
+			"name" => $profile["name"] ?? $pid,
+			"enabled" => true,
+			"action" => "block",
+			"priority" => 20,
+			"match" => array(),
+		);
+		$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]))
+		    ? $profile["ndpi_apps"] : array();
+		$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"]))
+		    ? $profile["hosts"] : array();
+		$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]))
+		    ? $profile["ndpi_categories"] : array();
+		if (!empty($apps)) {
+			$rule["match"]["ndpi_app"] = array_slice($apps, 0, 64);
+		}
+		if (!empty($cats)) {
+			$rule["match"]["ndpi_category"] = array_slice($cats, 0, 8);
+		}
+		if (!empty($hosts)) {
+			$rule["match"]["hosts"] = array_slice($hosts, 0, 64);
+		}
+		$policies[] = $rule;
+		$changed = true;
+		$out["enabled"]++;
+		$enabled_names[] = (string)($profile["name"] ?? $profile_id);
+		if (($profile["extra_action"] ?? "") === "configure_unbound_anti_doh") {
+			$doh_needed = true;
+		}
+	}
+	unset($policies);
+
+	if (!$changed) {
+		if (!empty($out["errors"])) {
+			$out["msg"] = implode(" ", $out["errors"]);
+		} else {
+			$out["ok"] = true;
+			$out["msg"] = l7_t("Nenhuma alteracao de perfil a aplicar.");
+		}
+		return $out;
+	}
+
+	if (!layer7_save_json($data)) {
+		$out["errors"][] = l7_t("Falha ao gravar configuracao.");
+		$out["msg"] = $out["errors"][count($out["errors"]) - 1];
+		return $out;
+	}
+	layer7_pf_config_resync(true);
+	if ($doh_needed) {
+		$doh_result = layer7_configure_unbound_anti_doh();
+		$out["doh"] = !empty($doh_result["ok"]);
+	}
+
+	$parts = array();
+	if ($out["enabled"] > 0) {
+		$parts[] = sprintf(
+		    l7_t("%d perfil(is) ligado(s)"),
+		    $out["enabled"]
+		);
+	}
+	if ($out["disabled"] > 0) {
+		$parts[] = sprintf(
+		    l7_t("%d perfil(is) desligado(s)"),
+		    $out["disabled"]
+		);
+	}
+	$out["msg"] = implode("; ", $parts) . ".";
+	if ($out["doh"]) {
+		$out["msg"] .= " " . l7_t("Unbound anti-DoH tambem configurado.");
+	}
+	if (!empty($out["errors"])) {
+		$out["msg"] .= " " . implode(" ", $out["errors"]);
+	}
+	$out["ok"] = true;
+	return $out;
+}
+
+/**
  * Caminho A / A4 — hits por perfil a partir das stats do daemon.
  *
  * Soma os `count` das apps nDPI bloqueadas (`top_apps_blocked`) que pertencem

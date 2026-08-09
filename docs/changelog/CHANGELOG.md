@@ -9,6 +9,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - Próximo: BG-109 (mapa Identity GUI) quando houver dump/IPC; builder FreeBSD 16
   só após 16.0-RELEASE.
 
+## [1.9.35] — 2026-08-08
+
+### Changed
+
+- **BG-110 — Perfis rápidos em lote:** switches passam a rascunho local; barra
+  **Aplicar / Descartar**; um único `save` + `layer7_pf_config_resync` para N
+  perfis (em vez de ~20s por clique). AJAX com fallback form.
+
+### Release
+
+- Tag `v1.9.35` / `releases/latest` (SHA no fecho do build)
+- Rollback: `1.9.34`
+
 ## [1.9.34] — 2026-08-08
 
 ### Changed

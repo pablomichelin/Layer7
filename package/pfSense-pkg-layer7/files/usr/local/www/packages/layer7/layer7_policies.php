@@ -177,92 +177,64 @@ if ($_POST["add_profile_policy"] ?? false) {
 		}
 }
 
-/* Caminho A / A4 — toggle directo de perfil ON (um clique). Cria a politica
- * `profile-<id>` com accao block (em modo monitor fica apenas observada). Para
- * controlo fino (interfaces, CIDRs, grupos) continua a existir o modal. */
+/* BG-110 — aplicar vários perfis rápidos de uma vez (1 save + 1 resync). */
+if ($_POST["apply_profiles_batch"] ?? false) {
+	$parse_ids = function ($raw) {
+		if (is_array($raw)) {
+			return array_values(array_filter(array_map("strval", $raw)));
+		}
+		$raw = trim((string)$raw);
+		if ($raw === "") {
+			return array();
+		}
+		return preg_split('/\s*,\s*/', $raw, -1, PREG_SPLIT_NO_EMPTY);
+	};
+	$enable_ids = $parse_ids($_POST["enable_ids"] ?? "");
+	$disable_ids = $parse_ids($_POST["disable_ids"] ?? "");
+	$result = layer7_apply_profile_toggles($enable_ids, $disable_ids);
+	if (!empty($_POST["ajax"])) {
+		header("Content-Type: application/json; charset=utf-8");
+		header("Cache-Control: no-cache, no-store");
+		echo json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		exit;
+	}
+	if (!empty($result["ok"])) {
+		$savemsg = (string)($result["msg"] ?? "");
+	} elseif (!empty($result["errors"]) && is_array($result["errors"])) {
+		$input_errors = array_merge(
+		    is_array($input_errors ?? null) ? $input_errors : array(),
+		    $result["errors"]
+		);
+	} elseif (!empty($result["msg"])) {
+		$input_errors[] = (string)$result["msg"];
+	}
+}
+
+/* Caminho A / A4 — toggle directo de perfil ON (fallback sem JS). */
 if ($_POST["toggle_profile_on"] ?? false) {
 		$profile_id = trim($_POST["profile_id"] ?? "");
-		if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $profile_id)) {
-			$input_errors[] = l7_t("Perfil invalido.");
-		} else {
-			$profiles = layer7_load_profiles();
-			$profile = null;
-			foreach ($profiles as $p) {
-				if (($p["id"] ?? "") === $profile_id) { $profile = $p; break; }
-			}
-			if ($profile === null) {
-				$input_errors[] = l7_t("Perfil nao encontrado.");
-			} else {
-				$data = layer7_load_or_default();
-				if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
-					$data["layer7"]["policies"] = array();
-				}
-				$policies = &$data["layer7"]["policies"];
-				$pid = "profile-" . $profile_id;
-				$dup = false;
-				foreach ($policies as $ex) {
-					if (($ex["id"] ?? "") === $pid) { $dup = true; break; }
-				}
-				if ($dup) {
-					$savemsg = sprintf(l7_t("Perfil '%s' ja esta ligado."), $profile["name"] ?? $profile_id);
-				} elseif (count($policies) >= 24) {
-					$input_errors[] = l7_t("Limite de 24 politicas.");
-				} elseif (layer7_enforcement_is_scoped_hybrid($data)) {
-					$input_errors[] = l7_t("No modo scoped_hybrid, use Configurar e selecione um CIDR/grupo de origem. O botao de um clique nao cria escopo global implicito.");
-				} else {
-					$rule = array(
-						"id" => $pid,
-						"name" => $profile["name"] ?? $pid,
-						"enabled" => true,
-						"action" => "block",
-						"priority" => 20,
-						"match" => array(),
-					);
-					$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"])) ? $profile["ndpi_apps"] : array();
-					$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"])) ? $profile["hosts"] : array();
-					$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"])) ? $profile["ndpi_categories"] : array();
-					if (!empty($apps)) { $rule["match"]["ndpi_app"] = array_slice($apps, 0, 64); }
-					if (!empty($cats)) { $rule["match"]["ndpi_category"] = array_slice($cats, 0, 8); }
-					if (!empty($hosts)) { $rule["match"]["hosts"] = array_slice($hosts, 0, 64); }
-					$policies[] = $rule;
-					if (layer7_save_json($data)) {
-						layer7_pf_config_resync(true);
-						$savemsg = sprintf(l7_t("Perfil '%s' ligado (accao block; em modo monitor fica apenas observado)."), $profile["name"] ?? $profile_id);
-						if (($profile["extra_action"] ?? "") === "configure_unbound_anti_doh") {
-							$doh_result = layer7_configure_unbound_anti_doh();
-							if ($doh_result["ok"]) { $savemsg .= " " . l7_t("Unbound anti-DoH tambem configurado."); }
-						}
-					}
-				}
-				unset($policies);
-			}
+		$result = layer7_apply_profile_toggles(array($profile_id), array());
+		if (!empty($result["ok"])) {
+			$savemsg = (string)($result["msg"] ?? "");
+		} elseif (!empty($result["errors"])) {
+			$input_errors = array_merge(
+			    is_array($input_errors ?? null) ? $input_errors : array(),
+			    $result["errors"]
+			);
 		}
 }
 
-/* Caminho A / A4 — toggle directo de perfil OFF. Remove a politica
- * `profile-<id>`. Seguro: so remove politicas cujo id casa exactamente. */
+/* Caminho A / A4 — toggle directo de perfil OFF (fallback sem JS). */
 if ($_POST["toggle_profile_off"] ?? false) {
 		$profile_id = trim($_POST["profile_id"] ?? "");
-		if (!preg_match('/^[A-Za-z0-9_-]{1,64}$/', $profile_id)) {
-			$input_errors[] = l7_t("Perfil invalido.");
-		} else {
-			$pid = "profile-" . $profile_id;
-			$data = layer7_load_or_default();
-			if (isset($data["layer7"]["policies"]) && is_array($data["layer7"]["policies"])) {
-				$before = count($data["layer7"]["policies"]);
-				$data["layer7"]["policies"] = array_values(array_filter(
-					$data["layer7"]["policies"],
-					function ($p) use ($pid) { return ($p["id"] ?? "") !== $pid; }
-				));
-				if (count($data["layer7"]["policies"]) !== $before) {
-					if (layer7_save_json($data)) {
-						layer7_pf_config_resync(true);
-						$savemsg = sprintf(l7_t("Perfil '%s' desligado."), $profile_id);
-					}
-				} else {
-					$savemsg = sprintf(l7_t("Perfil '%s' ja estava desligado."), $profile_id);
-				}
-			}
+		$result = layer7_apply_profile_toggles(array(), array($profile_id));
+		if (!empty($result["ok"])) {
+			$savemsg = (string)($result["msg"] ?? "");
+		} elseif (!empty($result["errors"])) {
+			$input_errors = array_merge(
+			    is_array($input_errors ?? null) ? $input_errors : array(),
+			    $result["errors"]
+			);
 		}
 }
 
@@ -1064,7 +1036,7 @@ function layer7_policy_match_summary($policy) {
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Perfis rapidos"); ?></div>
 			<div class="layer7-admin-block__body">
-			<p class="layer7-lead"><?= l7_t("Ligue ou desligue um perfil com um clique — cria/remove automaticamente a politica com todas as apps e dominios associados (accao block; em modo monitor fica apenas observado). Use 'Opcoes' para escolher accao, interfaces e sub-redes. Edite ou crie perfis personalizados — as alteracoes ficam em profiles-custom.json (preservado nos upgrades)."); ?></p>
+			<p class="layer7-lead"><?= l7_t("Ligue ou desligue perfis na grelha — as alteracoes ficam em rascunho. Clique em Aplicar para gravar e activar tudo de uma vez (um unico reload). Use 'Opcoes' para accao, interfaces e sub-redes. Edite ou crie perfis personalizados em profiles-custom.json (preservado nos upgrades)."); ?></p>
 			<div class="l7-profiles-toolbar" style="margin-bottom:14px;">
 				<div class="l7-profiles-search-wrap">
 					<input type="text" id="l7ProfileSearch" class="form-control input-sm" placeholder="<?= l7_t("Pesquisar perfil..."); ?>" autocomplete="off" oninput="l7filterProfileGrid();" />
@@ -1076,6 +1048,13 @@ function layer7_policy_match_summary($policy) {
 				<button type="button" class="btn btn-primary btn-sm" onclick="l7showProfileEditModal('', true);">
 					<i class="fa fa-plus"></i> <?= l7_t("Criar perfil"); ?>
 				</button>
+			</div>
+			<div id="l7ProfileDraftBar" class="l7-profile-draft-bar" hidden>
+				<span id="l7ProfileDraftMsg" class="l7-profile-draft-msg"></span>
+				<span class="l7-profile-draft-actions">
+					<button type="button" class="btn btn-default btn-sm" id="l7ProfileDraftDiscard" onclick="l7discardProfileDraft();"><?= l7_t("Descartar"); ?></button>
+					<button type="button" class="btn btn-success btn-sm" id="l7ProfileDraftApply" onclick="l7applyProfileDraft();"><i class="fa fa-check"></i> <?= l7_t("Aplicar alteracoes"); ?></button>
+				</span>
 			</div>
 
 		<?php
@@ -1313,8 +1292,9 @@ function layer7_policy_match_summary($policy) {
 			$l7_gprofs_sort = array_merge($first, $rest);
 		}
 		unset($l7_gprofs_sort);
+		$l7_quick_scoped = layer7_enforcement_is_scoped_hybrid(layer7_load_or_default());
 		$l7_groups_rendered = array();
-		$l7_render_profile_card = function ($prof, $is_hidden = false) use ($policies, $l7_brand_colors, $l7_group_colors, $l7_prof_hits, $l7_profiles_custom_raw) {
+		$l7_render_profile_card = function ($prof, $is_hidden = false) use ($policies, $l7_brand_colors, $l7_group_colors, $l7_prof_hits, $l7_profiles_custom_raw, $l7_quick_scoped) {
 			$prof_id = isset($prof["id"]) ? htmlspecialchars($prof["id"]) : "";
 			$prof_id_raw = (string)($prof["id"] ?? "");
 			$prof_name = isset($prof["name"]) ? htmlspecialchars(l7_t($prof["name"])) : $prof_id;
@@ -1396,17 +1376,17 @@ function layer7_policy_match_summary($policy) {
 					<div class="l7-profile-meta"><?= implode(" &middot; ", $meta_parts); ?></div>
 				</div>
 				<div class="l7-profile-actions">
-				<?php if ($prof_exists) { ?>
-				<form method="post" action="layer7_policies.php#l7-policies" class="l7-profile-toggle-form" style="margin:0;" onsubmit='return confirm(<?= htmlspecialchars(json_encode(l7_t("Desligar este perfil (remove a politica)? A excepcao VIP isentos, se existir, permanece activa.")), ENT_QUOTES); ?>);'>
-					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
-					<button type="submit" name="toggle_profile_off" value="1" class="l7-switch l7-switch-on" title="<?= l7_t("Desligar"); ?>" aria-label="<?= l7_t("Desligar"); ?>"><span class="l7-switch-track"></span></button>
-				</form>
-				<?php } else { ?>
-				<form method="post" action="layer7_policies.php#l7-policies" class="l7-profile-toggle-form" style="margin:0;display:inline-block;">
-					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
-					<button type="submit" name="toggle_profile_on" value="1" class="l7-switch l7-switch-off" title="<?= l7_t("Ligar"); ?>" aria-label="<?= l7_t("Ligar"); ?>"><span class="l7-switch-track"></span></button>
-				</form>
-				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Opcoes"); ?>" onclick="l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof_name), ENT_QUOTES) ?>);"><i class="fa fa-cog"></i></button>
+				<button type="button"
+					class="l7-switch <?= $prof_exists ? "l7-switch-on" : "l7-switch-off"; ?>"
+					data-profile-id="<?= htmlspecialchars($prof_id_raw, ENT_QUOTES); ?>"
+					data-saved="<?= $prof_exists ? "1" : "0"; ?>"
+					data-desired="<?= $prof_exists ? "1" : "0"; ?>"
+					data-scoped="<?= $l7_quick_scoped ? "1" : "0"; ?>"
+					title="<?= $prof_exists ? l7_t("Desligar") : l7_t("Ligar"); ?>"
+					aria-label="<?= $prof_exists ? l7_t("Desligar") : l7_t("Ligar"); ?>"
+					onclick="l7toggleProfileDraft(this);"><span class="l7-switch-track"></span></button>
+				<?php if (!$prof_exists) { ?>
+				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Opcoes"); ?>" onclick="l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof["name"] ?? $prof_id_raw), ENT_QUOTES) ?>);"><i class="fa fa-cog"></i></button>
 				<?php } ?>
 				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Editar perfil"); ?>" onclick="l7showProfileEditModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, false);"><i class="fa fa-pencil"></i></button>
 				<?php if ($is_hidden) { ?>
@@ -2520,6 +2500,12 @@ function layer7_policy_match_summary($policy) {
 .l7-profile-icon-btn { border: none; background: transparent; color: #666; padding: 4px 6px; line-height: 1; border-radius: 4px; cursor: pointer; font-size: 14px; }
 .l7-profile-icon-btn:hover { background: #eee; color: #333; }
 .l7-profile-toggle-form { display: inline-block; line-height: 0; }
+.l7-profile-draft-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 14px; padding: 10px 12px; background: #fff8e6; border: 1px solid #f0d78c; border-radius: 6px; position: sticky; top: 8px; z-index: 20; }
+.l7-profile-draft-bar[hidden] { display: none !important; }
+.l7-profile-draft-msg { font-size: 13px; font-weight: 600; color: #6a5500; }
+.l7-profile-draft-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.l7-profile-card.l7-profile-pending { outline: 2px dashed #f0ad4e; outline-offset: 1px; }
+.l7-profile-draft-busy { opacity: 0.7; pointer-events: none; }
 .l7-switch { position: relative; display: inline-block; width: 36px; height: 20px; padding: 0; border: none; background: transparent; cursor: pointer; vertical-align: middle; }
 .l7-switch-track { position: absolute; inset: 0; border-radius: 20px; background: #ccc; transition: background 0.2s; }
 .l7-switch-track:before { content: ""; position: absolute; width: 16px; height: 16px; left: 2px; top: 2px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.2s; }
@@ -2540,6 +2526,168 @@ function layer7_policy_match_summary($policy) {
 .l7-modal-box h4 { margin: 0 0 18px; font-size: 18px; font-weight: 600; }
 </style>
 <script>
+var l7ProfileDraftBusy = false;
+var l7ProfileDraftStrings = {
+	pendingOne: <?= json_encode(l7_t("%d alteracao por aplicar")) ?>,
+	pendingMany: <?= json_encode(l7_t("%d alteracoes por aplicar")) ?>,
+	scoped: <?= json_encode(l7_t("No modo scoped_hybrid, use Opcoes e selecione um CIDR/grupo de origem.")) ?>,
+	confirmOff: <?= json_encode(l7_t("Vai desligar perfil(is) e remover a(s) politica(s). Continuar?")) ?>,
+	applying: <?= json_encode(l7_t("A aplicar... aguarde o reload.")) ?>,
+	fail: <?= json_encode(l7_t("Falha ao aplicar alteracoes de perfis.")) ?>
+};
+
+function l7toggleProfileDraft(btn) {
+	if (l7ProfileDraftBusy || !btn) return;
+	var saved = btn.getAttribute('data-saved') === '1';
+	var desired = btn.getAttribute('data-desired') === '1';
+	var next = !desired;
+	if (next && btn.getAttribute('data-scoped') === '1') {
+		alert(l7ProfileDraftStrings.scoped);
+		return;
+	}
+	btn.setAttribute('data-desired', next ? '1' : '0');
+	btn.classList.toggle('l7-switch-on', next);
+	btn.classList.toggle('l7-switch-off', !next);
+	btn.title = next ? <?= json_encode(l7_t("Desligar")) ?> : <?= json_encode(l7_t("Ligar")) ?>;
+	btn.setAttribute('aria-label', btn.title);
+	var card = btn.closest('.l7-profile-card');
+	if (card) {
+		card.classList.toggle('l7-profile-pending', next !== saved);
+		card.classList.toggle('l7-profile-on', next);
+	}
+	l7updateProfileDraftBar();
+}
+
+function l7collectProfileDraft() {
+	var enableIds = [];
+	var disableIds = [];
+	document.querySelectorAll('.l7-switch[data-profile-id]').forEach(function(btn) {
+		var id = btn.getAttribute('data-profile-id') || '';
+		if (!id) return;
+		var saved = btn.getAttribute('data-saved') === '1';
+		var desired = btn.getAttribute('data-desired') === '1';
+		if (desired === saved) return;
+		if (desired) enableIds.push(id);
+		else disableIds.push(id);
+	});
+	return { enableIds: enableIds, disableIds: disableIds };
+}
+
+function l7updateProfileDraftBar() {
+	var d = l7collectProfileDraft();
+	var n = d.enableIds.length + d.disableIds.length;
+	var bar = document.getElementById('l7ProfileDraftBar');
+	var msg = document.getElementById('l7ProfileDraftMsg');
+	if (!bar || !msg) return;
+	if (n === 0) {
+		bar.hidden = true;
+		msg.textContent = '';
+		return;
+	}
+	bar.hidden = false;
+	var tpl = n === 1 ? l7ProfileDraftStrings.pendingOne : l7ProfileDraftStrings.pendingMany;
+	msg.textContent = tpl.replace('%d', String(n));
+}
+
+function l7discardProfileDraft() {
+	if (l7ProfileDraftBusy) return;
+	document.querySelectorAll('.l7-switch[data-profile-id]').forEach(function(btn) {
+		var saved = btn.getAttribute('data-saved') === '1';
+		btn.setAttribute('data-desired', saved ? '1' : '0');
+		btn.classList.toggle('l7-switch-on', saved);
+		btn.classList.toggle('l7-switch-off', !saved);
+		btn.title = saved ? <?= json_encode(l7_t("Desligar")) ?> : <?= json_encode(l7_t("Ligar")) ?>;
+		btn.setAttribute('aria-label', btn.title);
+		var card = btn.closest('.l7-profile-card');
+		if (card) {
+			card.classList.remove('l7-profile-pending');
+			card.classList.toggle('l7-profile-on', saved);
+		}
+	});
+	l7updateProfileDraftBar();
+}
+
+function l7csrfToken() {
+	var el = document.querySelector('input[name="__csrf_magic"]');
+	return el ? el.value : '';
+}
+
+function l7applyProfileDraft() {
+	if (l7ProfileDraftBusy) return;
+	var d = l7collectProfileDraft();
+	if (!d.enableIds.length && !d.disableIds.length) {
+		l7updateProfileDraftBar();
+		return;
+	}
+	if (d.disableIds.length && !confirm(l7ProfileDraftStrings.confirmOff)) {
+		return;
+	}
+	l7ProfileDraftBusy = true;
+	var bar = document.getElementById('l7ProfileDraftBar');
+	var msg = document.getElementById('l7ProfileDraftMsg');
+	var applyBtn = document.getElementById('l7ProfileDraftApply');
+	if (bar) bar.classList.add('l7-profile-draft-busy');
+	if (msg) msg.textContent = l7ProfileDraftStrings.applying;
+	if (applyBtn) applyBtn.disabled = true;
+
+	var body = new FormData();
+	body.append('apply_profiles_batch', '1');
+	body.append('ajax', '1');
+	body.append('enable_ids', d.enableIds.join(','));
+	body.append('disable_ids', d.disableIds.join(','));
+	var csrf = l7csrfToken();
+	if (csrf) body.append('__csrf_magic', csrf);
+
+	fetch('layer7_policies.php', {
+		method: 'POST',
+		body: body,
+		credentials: 'same-origin',
+		headers: { 'X-Requested-With': 'XMLHttpRequest' }
+	}).then(function(r) {
+		return r.json().then(function(j) { return { okHttp: r.ok, j: j }; }).catch(function() {
+			return { okHttp: false, j: null };
+		});
+	}).then(function(res) {
+		if (res.j && res.j.ok) {
+			window.location.href = 'layer7_policies.php#l7-policies';
+			return;
+		}
+		l7ProfileDraftBusy = false;
+		if (bar) bar.classList.remove('l7-profile-draft-busy');
+		if (applyBtn) applyBtn.disabled = false;
+		var err = (res.j && (res.j.msg || (res.j.errors && res.j.errors.join(' ')))) || l7ProfileDraftStrings.fail;
+		alert(err);
+		l7updateProfileDraftBar();
+	}).catch(function() {
+		/* Fallback: form classico se fetch/CSRF falhar */
+		var f = document.createElement('form');
+		f.method = 'post';
+		f.action = 'layer7_policies.php#l7-policies';
+		function add(name, val) {
+			var i = document.createElement('input');
+			i.type = 'hidden';
+			i.name = name;
+			i.value = val;
+			f.appendChild(i);
+		}
+		add('apply_profiles_batch', '1');
+		add('enable_ids', d.enableIds.join(','));
+		add('disable_ids', d.disableIds.join(','));
+		if (csrf) add('__csrf_magic', csrf);
+		document.body.appendChild(f);
+		f.submit();
+	});
+}
+
+window.addEventListener('beforeunload', function(ev) {
+	if (l7ProfileDraftBusy) return;
+	var d = l7collectProfileDraft();
+	if (d.enableIds.length + d.disableIds.length > 0) {
+		ev.preventDefault();
+		ev.returnValue = '';
+	}
+});
+
 function l7showProfileModal(profileId, profileName) {
 	document.getElementById('l7ProfileId').value = profileId;
 	document.getElementById('l7ProfileModalTitle').textContent = profileName;

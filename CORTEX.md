@@ -35,13 +35,10 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.34` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.34`;
-`SHA256=87982ffb33d533c23638f22ddd481b2d0c85f5a8aa020f4d92583080e8010eec`;
-redeploy limpo do BG-108/`1.9.33` para upgrade via pacote; comandos em
-`docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15** (política: manter 15 até FreeBSD 16.0-RELEASE).
-Appliance lab Plus/FreeBSD 16: `IGNORE_OSVERSION=yes pkg add -f` (BG-106);
-gate `2026-08-08` PASS (`layer7d -V`/`-t`). Rollback: **`1.9.33`** / **`1.9.30`**.
+candidato **`1.9.35` / BG-110** — perfis rápidos com rascunho + Aplicar em lote
+(em publicação). Anterior `1.9.34`
+(`SHA256=87982ffb33d533c23638f22ddd481b2d0c85f5a8aa020f4d92583080e8010eec`).
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.34`**.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.

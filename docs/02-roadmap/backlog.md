@@ -338,6 +338,7 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-107 | Perfis rápidos / Acesso remoto visual + admin-block | Media | package/GUI | Caminho A / UX | RA vermelho/ícones/grelha; RA duplicado; layout inconsistente | P | Baixo | **Concluido em `1.9.33`** | cores marca, aliases FA6, grelha, redirect RA, admin-block |
 | BG-108 | UX visual wave 2 (KPI unificado, subnav Políticas, catálogo, Chart.js offline) | Media | package/GUI | Caminho A / UX | Estado/Relatórios KPI distintos; Kick/Rumble; subnav; CDN Chart.js | P | Baixo | **Concluido; canal publico `1.9.34` (`latest`)** | redeploy limpo; SHA256 `87982ffb…0eec`; appliance PASS |
 | BG-109 | GUI Identity — tabela read-only do mapa user↔IP (daemon) | Media | package/GUI + daemon | Identity | Identity configura LDAP/RADIUS/DC mas não mostra sessões activas | M | Medio | **Aberto — defer** | requer dump/IPC do mapa em `identity_map.*`; não inventar vista sem API |
+| BG-110 | Perfis rápidos: rascunho + Aplicar em lote (sem resync por clique) | Alta | package/GUI | Caminho A / UX | cada toggle faz resync ~20s + refresh; activar N perfis é inviável | M | Alto | **Em curso (`1.9.35`)** | switches locais; barra Aplicar/Descartar; 1 save + 1 resync |
 
 ---
 
