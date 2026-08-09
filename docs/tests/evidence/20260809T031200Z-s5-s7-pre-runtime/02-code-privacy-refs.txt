@@ -1,0 +1,40 @@
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:25:IPC = metadados e veredictos leves. **Proibido:** payload decifrado no hot path
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:36:  ∧ CA presente           (cert+key em /usr/local/etc/layer7/mitm/)
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:56:| CA cert | `/usr/local/etc/layer7/mitm/ca.crt` | `0644` | Exportável GPO |
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:57:| CA key | `/usr/local/etc/layer7/mitm/ca.key` | `0600` root:wheel | **Nunca** no git / JSON |
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:69:Encoding: JSON UTF-8, **sem** payload TLS.
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:142:4. Remover CA só se ops o exigir (GPO nos clientes)
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:148:- [x] Intenção `enabled` gravável com gates (entitlement + CA)  
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:18:> intercept, CA em produção, nem alteração do hot path `layer7d` (pcap/nDPI/PF).
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:47:1. servir **block page HTTPS legível** quando o operador activa MITM + CA
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:75:       │                              │  · termina TLS (CA local)      │
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:89:| `layer7-tlsproxy` | Terminação TLS selectiva; CA; bypass; block page HTTPS; métricas S1–S2 | Não partilhar loop pcap; não persistir payload (S7) |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:92:| GUI / config | Toggle, CA ops, bypass, entitlement gate | Segredos CA **fora** do git e de `layer7.json` em claro |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:110:| CA (gerar / importar / export GPO) | Só com entitlement + toggle consciente | Chaves **nunca** no repositório |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:112:| Block page HTTPS | Só com MITM ON + CA confiada no cliente | Com OFF: ADR-0017 (HTTP sinkhole; HTTPS sem HTML legível) |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:115:| Logging | Metadados apenas por defeito (S7) | Sem payload desencriptado em disco |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:145:| S3 | Block page HTTPS + CA (GPO) | ≥ **1** browser Windows corporativo vê HTML legível | Lab com CA instalada; site bloqueado por policy; screenshot + HAR | **Não medido** |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:146:| S4 | Bypass list | Fluxo em bypass **não** terminado | tcpdump/pcap: sem handshake com cert da CA Layer7 no destino bypass | **Não medido** |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:149:| S7 | Privacidade | Sem payload desencriptado em disco por defeito; log = metadados | Auditoria de paths/config default da PoC | **Não medido** (política no desenho) |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:161:| **20.8** | Gestão CA (gerar / importar / export GPO; segredos fora do git) | Desenho aceite; entitlement; GUI/ops | **PASS** (`1.9.37`) |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:164:| **20.11** | Lab CA completo; gates **GI2–GI3** | 20.10 estável em lab; CE se aplicável (ADR-0022) | Bloqueado / gates historicamente `DEFERRED` |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:169:  → 20.8 CA PASS
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:190:| R4 | CA / privacidade (payload em disco) | Alta | Segredos fora do git; S7 default metadados |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:201:| Ops CA | Remover CA dos clientes via GPO (só se alguma vez distribuída) |
+docs/01-architecture/desenho-layer7-tlsproxy-mitm.md:237:| 2026-08-08 | **20.8 PASS** — scaffolding CA/bypass; sem intercept |
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:1:# ADR-0026 — MITM TLS inspection opt-in (certificado / CA)
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:21:- O operador quer **opção** de MITM com CA no domínio (SKU + plano).
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:41:| S3 | Cliente com CA via GPO vê block page HTTPS legível | Funcional em ≥ 1 browser Windows corporativo |
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:45:| S7 | Privacidade: nenhum payload desencriptado persiste em disco por defeito; logging só de metadados | Auditoria da PoC |
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:49:7. **Reopen GO (`2026-08-08`):** este ADR passa a **Aceito — implementação em curso**. Escopo **20.8:** schema `mitm.*`, gestão CA, bypass GUI, `mitm_entitled`. Escopo **20.9:** intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; **`mitm_effective` sempre false** sem runtime. **Fora** até S1–S8 + GO lab: processo `layer7-tlsproxy`, intercept TLS, block page HTTPS via MITM. Candidata: helper próprio (opção E) — ver desenho + contrato. **Squid rejeitado** permanentemente.
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:51:9. Segredos da CA **nunca** no git.
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:72:- GUI pode manter upsell MITM + gestão CA/bypass + intenção honesta vs efectivo; daemon sem intercept.  
+docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md:95:4. Remover CA dos clientes via GPO (ops) — só se alguma vez instalada.
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:2140:			/* IM2 / 20.8 — MITM config (default OFF; sem runtime; chave CA fora do JSON). */
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:2182:	$json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:4492:	$payload = layer7_profiles_custom_defaults();
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:4493:	$payload["version"] = 1;
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:4495:		$payload["overrides"] = $data["overrides"];
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:4498:		$payload["custom_profiles"] = $data["custom_profiles"];
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:4501:	$json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:5564:function layer7_vip_export_payload($data)

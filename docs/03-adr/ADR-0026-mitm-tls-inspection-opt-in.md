@@ -105,6 +105,7 @@
 | **d** | **2026-08-06** | **Implementação diferida (20.7a)**; Squid rejeitado; Identity avança |
 | **e** | **2026-08-08** | **Aceito — scaffolding 20.8**; reopen GO; runtime diferido até S1–S8; desenho `layer7-tlsproxy` |
 | **f** | **2026-08-08** | **20.9 PASS** — `mitm.enabled` = **intenção**; `mitm_effective` **sempre false** sem runtime; bypass/`quic_mode`/contrato IPC; 20.10 bloqueado |
+| **g** | **2026-08-09** | S5 PASS doc (`quic_mode=bypass`); S7 PASS doc (privacidade); S8 PASS real ADR-0017; S1–S4/S6 + GO lab ainda bloqueiam 20.10 |
 
 ---
 

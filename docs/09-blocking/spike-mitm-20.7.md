@@ -79,12 +79,13 @@ Após **reopen GO** e **20.9 PASS**, permanecem **obrigatórios** antes de runti
 | S2 | Latência handshake | ≤ 150 ms p95 | **Não medido** — exige PoC runtime |
 | S3 | Block page HTTPS + CA | ≥ 1 browser | **Não medido** — exige intercept (bloqueado) |
 | S4 | Bypass list | prova | **Não medido** — GUI/bypass 20.8–20.9; prova com runtime pendente |
-| S5 | QUIC/HTTP3 caminho definido | escrito | **Parcial** — `quic_mode` default documentado (`bypass`); prova lab pendente |
+| S5 | QUIC/HTTP3 caminho definido | escrito | **PASS documental** — default `bypass` (`20260809T031200Z-s5-s7-pre-runtime`); prova lab sob runtime pendente |
 | S6 | ECH previsível | lab | **Não medido** |
-| S7 | Sem payload em disco por defeito | auditoria | **Não medido** — desenho exige; auditoria com runtime pendente |
-| S8 | MITM OFF ≡ ADR-0017 | smoke | **PASS (real)** — `20260809T024500Z-s8-adr0017-real-1.9.38` (sinkhole+block page em `.234`/`.235`; mitm_effective=false) |
+| S7 | Sem payload em disco por defeito | auditoria | **PASS documental** — política + ausência runtime (`20260809T031200Z-s5-s7-pre-runtime`); auditoria PoC pendente |
+| S8 | MITM OFF ≡ ADR-0017 | smoke | **PASS (real)** — `20260809T024500Z-s8-adr0017-real-1.9.38` |
 
-**Bloqueio:** qualquer Si **FAIL** ou não medido (excepto S5 parcial aceite só como doc) **bloqueia `20.10`**.
+**Bloqueio `20.10`:** S1–S4 e S6 **não medidos** (exigem PoC runtime) + **GO lab**.
+S5/S7/S8 **PASS** (pré-runtime) — não bastam para autorizar intercept.
 
 ---
 

@@ -49,7 +49,7 @@ S5 (decisão escrita) → S8 (smoke OFF em 1.9.38)
 ```
 
 **Regra:** sem PoC runtime **não** se pode fechar S1–S4/S3/S6.  
-Fechar **S5 parcial + S8 smoke** é o máximo seguro **sem** código de intercept.
+Pré-runtime fechável: **S5 + S7 + S8** (cumpridos `2026-08-09`).
 
 ---
 
@@ -70,9 +70,9 @@ lab já corre `1.9.38` — declarar explicitamente no `run_id`.
 
 | # | Como provar (mínimo) | Artefacto | Pode fechar sem runtime? |
 |---|----------------------|-----------|---------------------------|
-| **S5** | Confirmar default `quic_mode=bypass` no schema/docs/GUI; escrever decisão (bypass vs block) | nota em evidência + ADR/contrato | **Sim (parcial)** — já em 20.9 |
-| **S8** | Appliance lab `1.9.38`, `mitm.enabled` false ou sem entitlement: sinkhole + block page HTTP ≡ ADR-0017; status `mitm_effective=false` | `smoke-s8-off/` | **Sim** (obrigatório agora) |
-| **S7** | Checklist: sem dump de payload por defeito no desenho; paths de log só metadados; CA fora do git | checklist assinado | **Parcial** (política) |
+| **S5** | Confirmar default `quic_mode=bypass` no schema/docs/GUI; escrever decisão (bypass vs block) | `S5-decisao-quic.md` | **Sim** — **PASS** `20260809T031200Z-s5-s7-pre-runtime` |
+| **S8** | Appliance lab `1.9.38`, sinkhole + block page HTTP ≡ ADR-0017; `mitm_effective=false` | evidência two-client | **Sim** — **PASS** `20260809T024500Z-s8-adr0017-real-1.9.38` |
+| **S7** | Checklist: sem dump de payload por defeito; paths de log só metadados; CA fora do git | `S7-politica-privacidade.md` | **Sim (política)** — **PASS** documental; auditoria PoC pendente |
 | **S1** | CPU idle/load com e sem proxy sob carga definida | `s1-cpu/` | **Não** |
 | **S2** | Handshake TLS p95 ≤ 150 ms via proxy | `s2-latency/` | **Não** |
 | **S3** | ≥1 browser: block page HTTPS com CA lab | `s3-blockpage/` | **Não** |
@@ -169,3 +169,4 @@ Rollback de qualquer teste: `mitm.enabled=false`; reinstalar `1.9.37` (lab) ou
 | 2026-08-09 | S8 **PASS parcial** lab `1.9.38` — evidência `docs/tests/evidence/20260809T021800Z-s8-mitm-off-1.9.38/` |
 | 2026-08-09 | Lab real obrigatório no runbook; S8 two-client real `20260809T022400Z-s8-real-two-client-1.9.38` |
 | 2026-08-09 | **S8 PASS** ADR-0017 real (`20260809T024500Z-s8-adr0017-real-1.9.38`) — sem mutar config; sinkhole+página nos dois clientes |
+| 2026-08-09 | **S5+S7 PASS documental** (`20260809T031200Z-s5-s7-pre-runtime`) — quic bypass + privacidade; 20.10 ainda bloqueado (S1–S4/S6+GO lab) |

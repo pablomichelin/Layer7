@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08r`; passo **20.9 PASS** / `1.9.38` / próximo 20.10 bloqueado; continuidade S1–S8 docs)
+**Estado do plano:** Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08s`; passo **20.9 PASS** / `1.9.38`; S5+S7+S8 PASS pré-runtime; 20.10 bloqueado)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -35,15 +35,16 @@
 | ADRs | **Aceito** ×5; T1; **0026 em curso (rev. f — intenção vs effective)**; **0027**; **0029** IM7/IM8 |
 | MITM | **Reopen GO** → 20.8–20.9; runtime AUSENTE; `mitm_effective` **false**; GI2/GI3 runtime **DEFERRED** |
 | Identity rede | **FECHADA** (20.33 / GI9) — não reabrir sem GO |
-| Próximo | Continuidade: **S5 escrito + S7 política**; S8 **PASS**; **20.10** só após S1–S8 + GO lab |
+| Próximo | Continuidade: S5/S7/S8 **PASS**; restam **S1–S4/S6** (PoC) + **GO lab** antes de **20.10** |
 | Lab real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — pfSense menu **8=Shell**; orquestrar Mac→clientes |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (`1.9.38`); próximo **20.10** BLOQUEADO (S1–S8 + GO lab)
-- Continuidade: **S8 PASS** ADR-0017 real; próximo **S5/S7 docs**; 20.10 BLOQUEADO
+- Continuidade: **S5+S7+S8 PASS** (pré-runtime); restam S1–S4/S6 + GO lab para 20.10
 - Lab: docs/08-lab/lab-topology.md (SSH pfSense → opção **8 Shell** se menu)
 - Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
+- Evidência S5/S7: docs/tests/evidence/20260809T031200Z-s5-s7-pre-runtime/
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC;
@@ -561,6 +562,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
+| 2026-08-09 | **rev. `s` / S5+S7+S8** — S8 ADR-0017 real PASS; S5 quic bypass PASS doc; S7 privacidade PASS doc; 20.10 bloqueado (S1–S4/S6+GO lab) |
 | 2026-08-09 | **rev. `r+` / lab real obrigatório** — topologia `.254`/`.234`/`.235`; SSH pfSense opção 8; S8 two-client real; sem simular gates |
 | 2026-08-08 | **rev. `q` / docs align** — `latest` **`1.9.38`** publicado (SHA `7c60f6b1…1dab`); passo continua **20.9 PASS**; 20.10 bloqueado |
 | 2026-08-08 | **rev. `p` / 20.9 PASS** — intenção `mitm.enabled`; bypass endurecido; `quic_mode`; contrato IPC; `mitm_effective` sempre false sem runtime; próximo **20.10** bloqueado (S1–S8+GO lab); ADR-0026 rev. `f`; publicado depois como `1.9.38` |

@@ -1,0 +1,10 @@
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:103:- `quic_mode`: `bypass` \| `block` \| `downgrade` (default **`bypass`** — decisão S5 escrita até PoC)
+docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md:151:- [x] `quic_mode` default documentado  
+package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php:39:			$mitm["quic_mode"] = isset($_POST["quic_mode"]) ? (string)$_POST["quic_mode"] : "bypass";
+package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php:170:						<tr><th>quic_mode</th><td><code><?= htmlspecialchars($mitm["quic_mode"] ?? "bypass"); ?></code></td></tr>
+package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php:280:								<select name="quic_mode" class="form-control">
+package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php:287:$qcur = $mitm["quic_mode"] ?? "bypass";
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:5917:		"quic_mode" => "bypass",
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:5936: * - quic_mode: bypass|block|downgrade (S5; default bypass).
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:5966:	$qm = strtolower(trim((string)($mitm["quic_mode"] ?? "bypass")));
+package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc:5970:	$out["quic_mode"] = $qm;

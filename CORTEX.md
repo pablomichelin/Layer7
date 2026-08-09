@@ -1361,8 +1361,10 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab
-- Continuidade: **S8 PASS** ADR-0017 real; próximo **S5/S7 docs**; sem tlsproxy
+- Continuidade: **S5+S7+S8 PASS** (pré-runtime); restam S1–S4/S6 + GO lab para 20.10
 - Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
+- Evidência S5/S7: docs/tests/evidence/20260809T031200Z-s5-s7-pre-runtime/
+- Plano rev.: 2026-08-08s
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS — mitm_effective sempre false sem runtime
@@ -1582,7 +1584,7 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **S5+S7 docs** (S8 PASS real); **20.10** BLOQUEADO até S1–S8+GO lab; GI2/GI3 runtime DEFERRED; lab AD Identity opcional; GO promoção enforce além 1.9.8; BG-028 fase 1
+- Proximo trabalho: **S1–S4/S6 exigem PoC+GO lab** (S5+S7+S8 PASS); **20.10** BLOQUEADO; GI2/GI3 runtime DEFERRED; lab AD Identity opcional; GO promoção enforce além 1.9.8; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

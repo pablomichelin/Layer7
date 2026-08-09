@@ -100,7 +100,7 @@ Validações:
 - SNI: hostname DNS-like, ≤253, sem espaços; `*.` → apex  
 - CIDR: IP ou IP/prefixo válido; IPv4 prefix 0–32; IPv6 0–128  
 - Limites: ≤256 SNI, ≤128 CIDR  
-- `quic_mode`: `bypass` \| `block` \| `downgrade` (default **`bypass`** — decisão S5 escrita até PoC)
+- `quic_mode`: `bypass` \| `block` \| `downgrade` (default **`bypass`** — **S5 PASS documental** `2026-08-09`; prova lab sob runtime pendente)
 
 Gestão pfSense / VIP: operador deve acrescentar CIDR/SNI explícitos; o produto
 **não** intercepta localhost.

@@ -43,7 +43,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08r`) |
+| Plano | Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-08s`) |
 | Posicionamento | **PME / Identity-first** — [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md) |
 | Produção enforce / `latest` (baseline) | **`1.9.8`** pin enforce; lab/`latest` **`1.9.38`** |
 | Rollback enforce conhecido | **`1.9.0`** |
@@ -162,9 +162,11 @@ Não implementar até GO. Responder em português.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
-- Continuidade agora: **S8 PASS** (ADR-0017 real); próximo docs = **S5 escrito + S7**; sem tlsproxy
+- Continuidade agora: **S5+S7+S8 PASS** (pré-runtime); restam **S1–S4/S6 + GO lab** antes de 20.10
 - Lab: docs/08-lab/lab-topology.md — SSH pfSense menu → **8 Shell**
 - Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
+- Evidência S5/S7: docs/tests/evidence/20260809T031200Z-s5-s7-pre-runtime/
+- Plano rev.: 2026-08-08s
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md

@@ -1,0 +1,10 @@
+			display: flex;
+			align-items: center;
+			justify-content: center;
+---
+  "version": "1.9.38",
+  "mitm_entitled": false,
+  "mitm_runtime_available": false,
+  "mitm_effective": false,
+no-tlsproxy
+no-squid

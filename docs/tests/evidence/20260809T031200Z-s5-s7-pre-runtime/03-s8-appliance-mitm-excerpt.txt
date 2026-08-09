@@ -1,0 +1,62 @@
+  ipsec
+  natearly
+  natrules
+  natrules/layer7_nat
+  openvpn
+  tftp-proxy
+  userrules
+  cpzoneid_2_allowedhosts
+  cpzoneid_2_auth
+  cpzoneid_2_passthrumac
+---
+rdr on vmx0 inet proto tcp from any to 192.168.100.254 port = http -> 127.0.0.1 port 8099
+rdr on vmx0.95 inet proto tcp from any to 192.168.100.254 port = http -> 127.0.0.1 port 8099
+rdr on vmx0 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto udp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+rdr on vmx0.95 inet proto tcp from any to ! 127.0.0.1 port = domain -> 127.0.0.1
+---
+root    php         7508  8 tcp4  127.0.0.1:8099        *:*                  
+root    nginx      10868  5 tcp4  *:8002                *:*                  
+root    nginx      10599  5 tcp4  *:8002                *:*                  
+root    nginx      10491  5 tcp4  *:8002                *:*                  
+root    nginx      10380  5 tcp4  *:8002                *:*                  
+root    nginx      10268  5 tcp4  *:8002                *:*                  
+root    nginx       9961  5 tcp4  *:8002                *:*                  
+root    nginx       9679  5 tcp4  *:8002                *:*                  
+root    nginx       8972  7 tcp4  *:80                  *:*                  
+root    nginx       8830  7 tcp4  *:80                  *:*                  
+root    nginx       8810  7 tcp4  *:80                  *:*                  
+---
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="robots" content="noindex,nofollow">
+	<title>Acesso bloqueado</title>
+	<style>
+		:root {
+			--bg: #0f172a;
+			--card: #1e293b;
+			--accent: #3b82f6;
+			--text: #f1f5f9;
+			--muted: #94a3b8;
+			--border: #334155;
+		}
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			background: linear-gradient(145deg, var(--bg) 0%, #1a1f35 100%);
+			color: var(--text);
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+---
+  "version": "1.9.38",
+  "mitm_entitled": false,
+  "mitm_runtime_available": false,
+  "mitm_effective": false,
+no-tlsproxy
+no-squid

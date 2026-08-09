@@ -144,9 +144,9 @@ Procedimento canónico: [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../
 | S2 | Latência adicional por handshake TLS interceptado | ≤ **150 ms** p95 | Captura timestamps cliente→proxy→origem no lab; percentil 95 | **Não medido** |
 | S3 | Block page HTTPS + CA (GPO) | ≥ **1** browser Windows corporativo vê HTML legível | Lab com CA instalada; site bloqueado por policy; screenshot + HAR | **Não medido** |
 | S4 | Bypass list | Fluxo em bypass **não** terminado | tcpdump/pcap: sem handshake com cert da CA Layer7 no destino bypass | **Não medido** |
-| S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + prova lab do caminho escolhido | **Parcial** — default `bypass` em 20.9; prova lab pendente |
+| S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + prova lab do caminho escolhido | **PASS documental** — `bypass` default; `S5-decisao-quic.md` |
 | S6 | ECH | Comportamento previsível; sem crash; sem fail-closed LAN | Cenário lab ECH; log de fallback documentado | **Não medido** |
-| S7 | Privacidade | Sem payload desencriptado em disco por defeito; log = metadados | Auditoria de paths/config default da PoC | **Não medido** (política no desenho) |
+| S7 | Privacidade | Sem payload desencriptado em disco por defeito; log = metadados | Auditoria de paths/config default da PoC | **PASS documental** — `S7-politica-privacidade.md`; auditoria PoC pendente |
 | S8 | MITM OFF ≡ ADR-0017 | Smoke comparativo sem regressão | Suite smoke block page + enforce com helper **ausente**/OFF em `1.9.38` | **PASS** — `20260809T024500Z-s8-adr0017-real-1.9.38` |
 
 ---
