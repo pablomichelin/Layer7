@@ -1,0 +1,24 @@
+=== webgui nginx 9999 ===
+root    nginx       8972  5 tcp4  *:9999                *:*                  
+root    nginx       8830  5 tcp4  *:9999                *:*                  
+root    nginx       8810  5 tcp4  *:9999                *:*                  
+=== curl local webgui ===
+https_9999_http=200
+=== ping LAN self ===
+lan_self=OK
+=== ping Internet ===
+inet_ping=OK
+=== DNS ===
+Using domain server:
+Name: 1.1.1.1
+Address: 1.1.1.1#53
+=== SSHD ===
+root    sshd       36560  7 tcp4  *:22                  *:*                  
+=== layer7d ===
+layer7d is running as pid 88862.
+=== pf info ===
+Status: Enabled for 35 days 23:23:46          Debug: Urgent
+
+Interface Stats for vmx0              IPv4             IPv6
+  Bytes In                               0                0
+  Bytes Out                              0                0

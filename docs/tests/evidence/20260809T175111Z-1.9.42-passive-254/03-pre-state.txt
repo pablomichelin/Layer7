@@ -1,0 +1,6 @@
+pkg_pre=1.9.38
+layer7d_pre=layer7d is running as pid 70309.
+enabled=true
+mode="enforce"
+has_mitm=no
+nat_mitm=none

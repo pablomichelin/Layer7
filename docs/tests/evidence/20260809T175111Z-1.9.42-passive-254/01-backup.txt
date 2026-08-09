@@ -1,0 +1,4 @@
+-rw-r--r--  1 root wheel 958316 Aug  8 23:01 /tmp/config.xml.bak-pre-mitm-19242-20260809T175111Z
+-rw-r--r--  1 root wheel 958316 Aug  8 23:01 /tmp/l7-19242-passive-20260809T175111Z/config.xml.bak-pre-mitm-19242-20260809T175111Z
+-rw-rw-r--  1 www  wheel   5682 Aug  8 23:01 /tmp/l7-19242-passive-20260809T175111Z/layer7.json.bak-pre-mitm-19242-20260809T175111Z
+-rw-r--r--  1 root wheel 2903947 Aug  8 23:01 /tmp/pfSense-pkg-layer7-1.9.38.pkg

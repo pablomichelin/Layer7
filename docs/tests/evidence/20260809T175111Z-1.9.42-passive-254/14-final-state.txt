@@ -1,0 +1,5 @@
+pkg=1.9.42
+layer7d=layer7d is running as pid 88862.
+tlsproxy=layer7_tlsproxy is not running (default OFF; 20.10b gated).
+gui9999=3
+listen8443=0

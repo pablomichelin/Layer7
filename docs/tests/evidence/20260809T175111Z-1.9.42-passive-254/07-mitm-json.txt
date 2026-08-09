@@ -1,0 +1,8 @@
+enabled=true
+mode="enforce"
+has_mitm=no
+mitm.enabled=null
+source_cidr=[]
+dest_cidr=[]
+source_count=0
+dest_count=0

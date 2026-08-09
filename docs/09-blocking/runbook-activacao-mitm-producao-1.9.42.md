@@ -1,10 +1,11 @@
 # Runbook — activação MITM produção (pós-`1.9.42`)
 
-**Estado:** pronto para GO humano — **não executar** até autorização explícita.  
+**Estado:** **etapa passiva FEITA** em `.254` (`1.9.42`, smoke PASS `20260809T175111Z`); activação MITM/rdr **ainda pendente** de GO + destino dedicado.  
 **Pré-requisito pacote:** `1.9.42`  
 `SHA256=6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`  
 **Cliente de teste único:** `192.168.100.24/32` (VM Windows descartável)  
-**Proibido:** `.234` / `.235` como clientes; senha Windows neste documento.
+**Proibido:** `.234` / `.235` como clientes; senha Windows neste documento.  
+**Evidência passiva:** [`../tests/evidence/20260809T175111Z-1.9.42-passive-254/`](../tests/evidence/20260809T175111Z-1.9.42-passive-254/)
 
 ---
 
@@ -147,9 +148,11 @@ IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.41.pkg
 
 ---
 
-## Veredicto pré-activação (este documento)
+## Veredicto
 
 | Item | Estado |
 |------|--------|
 | Pacote `1.9.42` com source scope | **GO** (publicado) |
-| Escrita na `.254` | **NO-GO** até GO humano explícito neste runbook |
+| Instalação passiva `.254` + smoke OFF | **PASS** (`20260809T175111Z`) — MITM não activado |
+| Activação MITM / rdr / CA em `.24` | **NO-GO** até GO humano + destino `/32` dedicado |
+| Destino HTTPS | **pendente escolha** — ver evidência `16-TARGET-RECOMMENDATION.md` |

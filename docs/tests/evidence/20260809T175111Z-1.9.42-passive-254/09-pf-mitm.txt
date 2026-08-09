@@ -1,0 +1,10 @@
+=== nat mitm/8443 ===
+none
+=== tables mitm ===
+none
+-- layer7_mitm_src
+(absent)
+-- layer7_mitm_dst
+(absent)
+=== from any mitm? ===
+none

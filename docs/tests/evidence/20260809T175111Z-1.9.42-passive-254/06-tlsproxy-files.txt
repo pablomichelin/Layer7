@@ -1,0 +1,2 @@
+-r-xr-xr-x  1 root wheel    2894 Aug  9 10:36 /usr/local/etc/rc.d/layer7-tlsproxy
+-r-xr-xr-x  1 root wheel 5534928 Aug  9 10:36 /usr/local/sbin/layer7-tlsproxy

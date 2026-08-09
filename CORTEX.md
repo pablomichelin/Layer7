@@ -1358,11 +1358,11 @@ default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.42 PASS** (source_cidr; pós-20.11)
-- Próximo: GO produção MITM (humano + runbook 1.9.42)
+- Passo actual: **1.9.42 passivo na .254** (smoke PASS; MITM OFF)
+- Próximo: GO activação escopada (destino /32 dedicado + .24)
 - Latest: **1.9.42** SHA `6bd6ba37…4c4b`
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; sem intercept produção sem GO
+- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; zero rdr MITM em produção
 ```
 
 ---
@@ -1561,8 +1561,9 @@ CHECKPOINT CANONICO
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.42.md
-- Proximo trabalho: GO produção MITM (humano) — sem activar intercept .254/.234/.235 sem GO
-- Pacote publicado: **1.9.42**; rollback lab: **1.9.41**
+- Proximo trabalho: GO activação MITM escopada (humano) — destino `/32` dedicado pendente; `.234/.235` proibidos
+- Appliance `.254`: **1.9.42 passivo** (smoke PASS `20260809T175111Z`; MITM OFF; zero rdr)
+- Pacote publicado: **1.9.42**; rollback appliance: **1.9.38** (local `/tmp`); rollback lab: **1.9.41**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```

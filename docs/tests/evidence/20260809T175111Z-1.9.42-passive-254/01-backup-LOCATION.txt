@@ -1,0 +1,5 @@
+Backups permanecem no appliance:
+/tmp/config.xml.bak-pre-mitm-19242-20260809T175111Z
+/tmp/layer7.json.bak-pre-mitm-19242-20260809T175111Z
+/tmp/l7-19242-passive-20260809T175111Z/
+(não commitados — possíveis segredos/config sensível)

@@ -1,0 +1,46 @@
+=== CANDIDATE DISCOVERY (read-only; NOT configured) ===
+timestamp_utc=20260809T175226Z
+pkg=1.9.42
+
+-- resolve candidates (A only) --
+HOST=example.com
+Using domain server:
+Name: 1.1.1.1
+Address: 1.1.1.1#53
+Aliases: 
+
+
+HOST=neverssl.com
+Using domain server:
+Name: 1.1.1.1
+Address: 1.1.1.1#53
+Aliases: 
+
+
+HOST=www.cloudflare.com
+Using domain server:
+Name: 1.1.1.1
+Address: 1.1.1.1#53
+Aliases: 
+
+
+HOST=one.one.one.one
+Using domain server:
+Name: 1.1.1.1
+Address: 1.1.1.1#53
+Aliases: 
+
+
+-- local LAN hosts that are NOT .234/.235/.24 (info only) --
+policy: do not use production servers; prefer dedicated TEST host
+
+-- existing layer7 allow/block sample (names only, no secrets) --
+policies=6
+exceptions=0
+
+-- recommendation criteria --
+1) IPv4 /32 dedicated to MITM lab
+2) HTTPS :443 stable
+3) not appliance/self, not GUI, not .234/.235
+4) blast radius limited by source .24/32 in 1.9.42
+5) prefer owner-controlled host over public CDN anycast

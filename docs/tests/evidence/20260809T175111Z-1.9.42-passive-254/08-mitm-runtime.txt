@@ -1,0 +1,7 @@
+gate=NO
+effective_flag=NO
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+root    php         7508  8 tcp4  127.0.0.1:8099        *:*                  
+root    nginx       8972  5 tcp4  *:9999                *:*                  
+root    nginx       8830  5 tcp4  *:9999                *:*                  
+root    nginx       8810  5 tcp4  *:9999                *:*                  
