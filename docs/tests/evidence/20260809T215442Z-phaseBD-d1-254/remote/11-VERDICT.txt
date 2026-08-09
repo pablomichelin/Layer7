@@ -1,0 +1,4 @@
+PHASE_D_EDGE=PASS
+URL=https://mitm-lab.test/
+BLOCK_MARKER=acesso bloqueado
+EDGE_INTERSTITIAL=NO

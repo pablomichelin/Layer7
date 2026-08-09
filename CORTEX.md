@@ -43,7 +43,8 @@ Gate C Edge PASS `20260809T210753Z`; BG-087 `source_cidr`∧`dest_cidr`;
 (proibido `from any`); comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.42`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
-**sem** intercept produção `.254/.234/.235` sem GO + runbook.
+**GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
+sem novo GO + runbook.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
@@ -1347,7 +1348,7 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 - **Backlog:** BG-085…BG-092 (BG-087 **`1.9.42` PASS**; BG-091 fechado ADR-0029)
 - **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→20.11→**`1.9.42`**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09ao`
+- **Rev. plano:** `2026-08-09ap`
 - **Gate D0:** [`docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md`](docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md) — **PASS** (+ [addendum hipóteses](docs/09-blocking/diagnostico-D0-addendum-hipoteses-20260809.md))
 - **Gate D1:** [`docs/09-blocking/gate-D1-leaf-sni-20260809.md`](docs/09-blocking/gate-D1-leaf-sni-20260809.md) — **PASS** (Edge Gate C)
 - **`1.9.44`:** D1 leaf `0.1.3` + `timeout --foreground -k` + `daemon -f`; sync prova `0.33s` ([evidência](docs/tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/)); **Gate B PASS**
@@ -1368,14 +1369,14 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.46** — Gate B+C PASS; GO humano teste MITM controlado .254
-- Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B PASS; C PASS 210753Z)
-- 1.9.45: layer7_mitm_tables_apply_to_pf; 204452Z = DIAGNÓSTICO (--disable-quic ≠ PASS)
+- Passo actual: **1.9.46** — Gate B+C PASS; GO teste controlado .254 PASS (215442Z)
+- Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B/C PASS; prod temporária PASS)
 - 1.9.46: anti-QUIC + filter_configure_sync; Edge sem flags PASS
 - Runbook canónico: runbook-activacao-mitm-producao-1.9.46.md (quic_mode=block; ≤15 min; NÃO permanente)
 - Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
 - Preflight: 20260809T215218Z-preflight-mitm-254
-- Próximo: executar janela controlada + rollback; .234/.235 proibidos
+- Evidência GO teste: 20260809T215442Z-phaseBD-d1-254 (rollback OK; baseline OFF)
+- Próximo: manter MITM OFF; permanente só com novo GO; .234/.235 proibidos
 - Latest publicado: **1.9.46** SHA 10998477…ae72f5
 - Identity rede: FECHADA (20.33 / GI9 PASS); Squid REJEITADO
 ```
@@ -1572,14 +1573,15 @@ CHECKPOINT CANONICO
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.46** Gate B+C PASS; **GO humano** teste MITM controlado `.254` (não permanente); Squid rejeitado
+- Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.46** Gate B+C PASS; **GO teste controlado `.254` PASS** (`215442Z`); permanente **NO-GO**; Squid rejeitado
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 - Evidência Gate C: docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/
 - Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
-- Proximo trabalho: executar janela ≤15 min (`.24`→`198.18.0.10`/`mitm-lab.test`) + rollback; `.234/.235` proibidos
-- Appliance `.254`: **1.9.46 passivo** (MITM OFF; zero rdr/quic/8443; GUI/NET OK; preflight PASS)
+- Evidência GO teste: docs/tests/evidence/20260809T215442Z-phaseBD-d1-254/
+- Proximo trabalho: manter MITM OFF; activação permanente só com novo GO; `.234/.235` proibidos
+- Appliance `.254`: **1.9.46 passivo** (MITM OFF; zero rdr/quic/8443; GUI/NET OK pós-rollback)
 - Pacote publicado: **1.9.46**; rollback lab: **1.9.42**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md

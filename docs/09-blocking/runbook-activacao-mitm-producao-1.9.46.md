@@ -204,13 +204,15 @@ IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.42.pkg
 
 ---
 
-## Veredicto (preencher após execução)
+## Veredicto (execução `20260809T215442Z`)
 
 | Item | Estado |
 |------|--------|
-| Pacote `1.9.46` + SHA | **GO** (publicado; Gate C PASS) |
-| Preflight `.254` limpo | **pendente evidência desta janela** |
-| Activação temporária escopada + Edge | **pendente evidência desta janela** |
-| Rollback / baseline OFF | **obrigatório** no fim (PASS ou FAIL) |
-| Activação permanente | **NO-GO** (decisão humana) |
+| Pacote `1.9.46` + SHA | **PASS** |
+| Preflight `.254` limpo | **PASS** ([`../tests/evidence/20260809T215218Z-preflight-mitm-254/`](../tests/evidence/20260809T215218Z-preflight-mitm-254/)) |
+| Activação temporária escopada + Edge | **PASS** ([`../tests/evidence/20260809T215442Z-phaseBD-d1-254/`](../tests/evidence/20260809T215442Z-phaseBD-d1-254/)) |
+| `quic_mode=block` + anti-QUIC escopo | **PASS** |
+| Negativos escopo + CA | **PASS** |
+| Rollback / baseline OFF | **PASS** (MITM OFF; zero rdr/quic/8443; GUI/NET OK; CA `.24` removida) |
+| Activação permanente | **NO-GO** (decisão humana mantida) |
 | `.234` / `.235` | **intocadas** |

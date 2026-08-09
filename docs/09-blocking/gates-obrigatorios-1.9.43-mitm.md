@@ -5,9 +5,10 @@
 **Política TLS:** [`politica-tls-sem-bypass.md`](politica-tls-sem-bypass.md)  
 **Prova sync foreground:** [`../tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/`](../tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/)  
 **Gate C Edge:** [`../tests/evidence/20260809T210753Z-phaseBD-d1-254/`](../tests/evidence/20260809T210753Z-phaseBD-d1-254/) — **PASS** sem `--disable-quic`  
+**GO teste controlado prod.:** [`../tests/evidence/20260809T215442Z-phaseBD-d1-254/`](../tests/evidence/20260809T215442Z-phaseBD-d1-254/) — **PASS** (temporário; `quic_mode=block`; rollback OK)  
 **Diagnóstico QUIC (histórico):** [`../tests/evidence/20260809T204452Z-phaseBD-d1-254/`](../tests/evidence/20260809T204452Z-phaseBD-d1-254/) — c/ `--disable-quic` **≠** PASS
 
-MITM produção `.254` permanece **DEFER** (GO + runbook).
+MITM produção `.254`: teste controlado **PASS**; activação **permanente** permanece **NO-GO**.
 
 ---
 
@@ -19,7 +20,7 @@ MITM produção `.254` permanece **DEFER** (GO + runbook).
 | **D1** | Peer = leaf `serverAuth`+SAN; CA não é peer | **PASS local** | [`gate-D1-leaf-sni-20260809.md`](gate-D1-leaf-sni-20260809.md) |
 | **GI2/GI3** | Lab MITM pré-1.9.43 | **PASS** (histórico) | `20260809T060000Z-20.11-gi2-gi3-54` |
 | **B+D Edge `.24`** | HTML Layer7 «acesso bloqueado» **sem** bypass TLS **nem** `--disable-quic` | **PASS** | `20260809T210753Z-phaseBD-d1-254` (`1.9.46`) |
-| **Produção `.254`** | MITM OFF salvo GO + runbook | **DEFER** | sem activação neste bloco |
+| **Produção `.254`** | GO teste controlado (não permanente) + rollback | **PASS temporário** | `20260809T215442Z`; permanente **NO-GO** |
 
 ---
 

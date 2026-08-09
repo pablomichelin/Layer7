@@ -21,6 +21,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
   - `make -C src/layer7-tlsproxy test-regress` — leaf D1 + política sem bypass
   - `php package/pfSense-pkg-layer7/tests/test_mitm_regress.php` — scope/rdr/anti-QUIC/lifecycle/`filter_configure_safe`
   - Gate C lab: [`evidence/20260809T210753Z-phaseBD-d1-254/`](evidence/20260809T210753Z-phaseBD-d1-254/) (Edge sem `--disable-quic`)
+  - GO teste controlado `.254`: [`evidence/20260809T215442Z-phaseBD-d1-254/`](evidence/20260809T215442Z-phaseBD-d1-254/) (`quic_mode=block`; rollback OK; permanente NO-GO)
 - **Control-plane timeout:** `php tests/functional/test_ctrl_exec_timeout.php`.
 - **Checklist F5 repetível (Onda G 8.2):** [`f5-smoke-checklist.md`](f5-smoke-checklist.md) —
   `sh tests/lab/run-f5-smoke-checklist.sh` (local + builder + appliance).

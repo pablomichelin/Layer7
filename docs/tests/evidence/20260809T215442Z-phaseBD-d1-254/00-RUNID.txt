@@ -1,0 +1,2 @@
+20260809T215442Z
+PKG=1.9.46 GO-humano-teste-controlado quic_mode=block failsafe=15m Edge-no-flags NÃO-permanente

@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentação / operação
+
+- **GO humano teste MITM controlado `.254` (`20260809T215442Z`):** runbook
+  canónico `1.9.46` (`quic_mode=block`, anti-QUIC escopo, janela ≤15 min);
+  Edge block page sem flags; negativos escopo+CA; rollback baseline OFF.
+  Activação permanente permanece **NO-GO**. Sem mudança de produto / sem
+  nova release.
+
+
 ### Notes
 
 - (vazio)

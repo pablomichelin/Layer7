@@ -1,0 +1,8 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+2026-08-09T18:56:06.0000833-03:00 REMOVE_MITM_CA=16977A13C833DDFDAFFBB6F608ADEE9F3456176D
+2026-08-09T18:56:07.7741400-03:00 NEG_CA_BLOCK_MARKER=False
+2026-08-09T18:56:07.7741400-03:00 NEG_CA_INTERSTITIAL_HINT=True
+2026-08-09T18:56:07.8001363-03:00 CA_RESTORED_FOR_ROLLBACK
+2026-08-09T18:56:07.8001363-03:00 NEG_CA=PASS

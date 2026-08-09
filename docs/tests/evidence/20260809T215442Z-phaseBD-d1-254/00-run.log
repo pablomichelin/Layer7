@@ -1,0 +1,12 @@
+=== PRECHECK ===
+=== INSTALL 1.9.46 PASSIVE ===
+=== PHASE A (.54) ===
+=== PHASE B route (.254) ===
+=== PHASE C hosts (.24) ===
+=== PHASE D activate MITM ===
+=== NEGATIVES (scope) ===
+=== EDGE .24 (sem --disable-quic) ===
+=== NEGATIVE CA (remove MITM CA briefly) ===
+=== TEARDOWN + BASELINE ===
+=== ROLLBACK_ALL ===
+DONE PASS EVID=/Users/pablomichelin/Documents/Layer 7/docs/tests/evidence/20260809T215442Z-phaseBD-d1-254

@@ -16,7 +16,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.42` (source_cidr; SHA `6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`)
+**Canal lab/`latest`:** `1.9.46` (anti-QUIC escopo; SHA `10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`)
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
@@ -46,7 +46,8 @@
 **Rev. `al` (`2026-08-09`)** = **Candidata `1.9.44`** — `timeout --foreground -k` + `daemon -f` (sync 0.33s); **Gate B PASS**; publish + GO B+D/Edge pendentes.  
 **Rev. `am` (`2026-08-09`)** = **revogada como PASS** — `204452Z` Edge só com `--disable-quic` = diagnóstico; tabelas PF → `1.9.45`.  
 **Rev. `an` (`2026-08-09`)** = candidata **`1.9.46`** — anti-QUIC escopo MITM; Gate C Edge **sem** flags pendente.  
-**Rev. `ao` (`2026-08-09`)** = **`1.9.46` PASS / publicada** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync; MITM prod DEFER.
+**Rev. `ao` (`2026-08-09`)** = **`1.9.46` PASS / publicada** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync; MITM prod DEFER.  
+**Rev. `ap` (`2026-08-09`)** = **GO teste controlado `.254` PASS** (`215442Z`) — runbook `1.9.46`; `quic_mode=block`; ≤15 min; rollback OK; permanente **NO-GO**.
 
 ---
 
@@ -54,8 +55,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **`1.9.46` publicada** — Gate B+C PASS; MITM produção `.254` **DEFER** |
-| Próximo | GO humano activação MITM escopada (runbook); `.234`/`.235` proibidos |
+| Passo actual | **`1.9.46`** — Gate B+C PASS; **GO teste controlado `.254` PASS**; permanente **NO-GO** |
+| Próximo | Manter MITM OFF; activação permanente só com novo GO; `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -73,9 +74,10 @@ TRILHA — progresso
 - 1.9.44/45: foreground timeout + tabelas PF MITM
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
-- Plano rev.: 2026-08-09ao
+- GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
+- Plano rev.: 2026-08-09ap
 - Lab/latest publicado: 1.9.46 (SHA 10998477…ae72f5)
-- Próximo: GO activação MITM produção (runbook)
+- Próximo: manter MITM OFF; permanente só com novo GO
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -584,6 +586,8 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
 | 2026-08-09 | **rev. `ab` / GO produto + 20.10a** — runtime no `.pkg`; rc OFF; intercept_ready=false; candidato `1.9.39`; próximo **20.10b** |
 | 2026-08-09 | **rev. `ag` / 20.11 PASS** — S3 Edge Windows `.24` + screenshot; GI2/GI3 PASS; S6 NA; sem GO produção |
+| 2026-08-09 | **rev. `ap` / GO teste controlado `.254` PASS** — `215442Z`; runbook `1.9.46`; `quic_mode=block`; rollback OK; permanente **NO-GO** |
+| 2026-08-09 | **rev. `ao` / `1.9.46` PASS** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync |
 | 2026-08-09 | **rev. `ah` / `1.9.42` PASS** — `source_cidr`∧`dest_cidr`; proibido `from any`; runbook activação; `.254` sem escrita |
 | 2026-08-09 | **rev. `af` / rev. gerencial 20.11** — overclaim S3/S6 (interino; supersedido por `ag`) |
 | 2026-08-09 | **rev. `ae` / 20.11 corrida** — lab `.54` (`1.9.41`); docs `8939ddb` overclaim S3/S6 (supersedido por `af`) |

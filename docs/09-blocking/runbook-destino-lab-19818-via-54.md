@@ -1,6 +1,6 @@
 # Runbook — destino HTTPS lab local (`198.18.0.10/32` via `.54`)
 
-**Estado:** **Fase A+B+C = PASS**; **Fase D = NO-GO** (`20260809T185035Z`); **Gate D0 PASS** (+ addendum); **Gate D1 PASS local**; **ETAPA 2** `timeout -k` na candidata `1.9.43`. **Sem** novo D até publish + GO humano.  
+**Estado:** **Fase A+B+C = PASS**; Fase D histórica NO-GO (`185035Z`) supersedida por **Gate C** (`210753Z`) + **GO teste controlado** (`215442Z` **PASS**, rollback OK; permanente **NO-GO**).  
 **Tipo:** topologia de teste sem VPS (custo zero).  
 **Pré-requisito pacote:** `.254` `1.9.46` passivo (MITM OFF) — lab/`latest` Gate C; rollback lab `1.9.42`.  
 **Proibido neste desenho:** `.234` / `.235`; mutações sem fail-safe; CDN público.  

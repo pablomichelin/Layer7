@@ -1,0 +1,17 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+2026-08-09T18:55:07.2409799-03:00 === APPLY C ===
+2026-08-09T18:55:07.4409876-03:00 HOSTS_APPLIED 198.18.0.10 mitm-lab.test # L7-PHASE-C-19818-mitm-lab.test
+2026-08-09T18:55:31.7985951-03:00 SSL_ERRORS=None
+CHAIN_STATUS_COUNT=0
+TLS_AUTH=OK
+PEER_SUBJECT=CN=mitm-lab.test
+PEER_ISSUER=CN=Layer7-PhaseA-Ephemeral-CA
+HTTP_SNIP=HTTP/1.0 200 OK  Server: SimpleHTTP/0.6 Python/3.12.3  Date: Sun, 09 Aug 2026 21:55:31 GMT  Content-type: text/html  Content-Length: 255  Last-Modified: Sun, 09 Aug 2026 21:55:04 GMT    <!DOCTYPE html> <html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head> <body> <h1>Layer7 Phase A - mitm-lab.test</h1> <p id="marker">L7-PHASE-A-OK-198.18.0.10</p> <p>Ephemeral lab HTTPS destinati
+BODY_MARKER=YES
+TRUST_OK=YES
+
+
+2026-08-09T18:55:43.2235410-03:00 EDGE_OK
+2026-08-09T18:55:43.2265458-03:00 PHASE_C_PASS
