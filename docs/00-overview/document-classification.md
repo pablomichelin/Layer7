@@ -164,7 +164,8 @@ vence o canónico.
 | `docs/08-lab/quick-start-lab.md` | quick start lab | sequencia builder → `.pkg` → pfSense; passo 6 remete a Gates F4, `10a`/`10b`/`11` (na 11, VLAN opcional) e matriz; suplementar a `validacao-lab` | Suplementar | parcialmente sobreposto por `MANUAL-INSTALL` e `scripts/release/README` para install oficial | manter alinhado ao artefacto `.pkg` (nao `.txz`) | F4/F5 |
 | `docs/08-lab/snapshots-e-gate.md` | snapshots | runbook de gate de lab | Suplementar | — | manter | F5 |
 | `docs/08-lab/syslog-remote.md` | syslog remoto | guia especifico de lab | Suplementar | complementar a docs de logging | manter | F5/F7 |
-| `docs/09-blocking/README.md` | trilha de bloqueio | resumo de trilha concluida | Historico | complementar ao changelog | preservar | F6 |
+| `docs/09-blocking/README.md` | trilha de bloqueio | índice da área (actualizado `2026-08-09`) | Suplementar (índice) | aponta para reconciliação e gates | manter com SSOT da área | F4+ |
+| `docs/09-blocking/auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md` | reconciliação enforcement | **SSOT decisão** `_24`…`_65` vs `1.9.46` (NO-GO misturar; único pacote lab `1.9.46`) | Canónico | supersede B1/`_31`/`_65` como próximo install | manter; não reinstalar `1.8.11_*` | F4 |
 | `docs/09-blocking/blocking-master-plan.md` | plano de bloqueio | referencia historica de implementacao concluida | Historico | — | preservar | F6 |
 | `docs/10-license-server/MANUAL-INSTALL.md` | instalacao/upgrade/uninstall | manual operacional principal do pacote | Canónico | substitui instrucoes operacionais dispersas | manter sempre sincronizado | F0+ |
 | `docs/10-license-server/MANUAL-USO-LICENCAS.md` | operacao de licencas | manual canónico do uso do sistema de licencas | Canónico | — | manter vivo quando F2/F3 mexerem em licenciamento | F2/F3 |

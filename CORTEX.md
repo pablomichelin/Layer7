@@ -1583,6 +1583,7 @@ CHECKPOINT CANONICO
 - Proximo trabalho: manter MITM OFF; activação permanente só com novo GO; `.234/.235` proibidos
 - Appliance `.254`: **1.9.46 passivo** (MITM OFF; zero rdr/quic/8443; GUI/NET OK pós-rollback)
 - Pacote publicado: **1.9.46**; rollback lab: **1.9.42**
+- Reconciliacao F4 enforcement `_24`…`_65` vs `1.9.46` (`2026-08-09`): **NO-GO** instalar qualquer `1.8.11_*` da linha histórica; único pacote elegível lab = **`1.9.46`** — docs/09-blocking/auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```

@@ -6,23 +6,27 @@ real de aplicacoes, sites, servicos e funcoes de produto no pfSense CE.
 ## Estado
 
 **Caminho A (A0–A5):** concluido em `1.8.11_23`.  
-**Caminho B (Enforcement 100%):** em execucao — ver plano abaixo.
+**Caminho B (enforcement):** linhagem `_24`…`_69` → `1.9.0`…`1.9.8` (G2–G7
+PASS / produção enforce). Base lab/`latest`: **`1.9.46`**.  
+**Reconciliação `_24`…`_65` vs `1.9.46` (`2026-08-09`):** **NO-GO** reinstalar
+candidatos históricos — ver artefacto abaixo.
 
 ## Documentos
 
-- **[`plano-enforcement-100-porcento.md`](plano-enforcement-100-porcento.md)** — **SSOT Caminho B:** corrigir enforcement PF escopado por cliente (prioridade actual)
+- **[`auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md`](auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md)** — **SSOT decisão `2026-08-09`:** inventário, correções absorvidas, único pacote elegível **`1.9.46`**, gates pré-install, conflitos documentais
+- **[`plano-enforcement-100-porcento.md`](plano-enforcement-100-porcento.md)** — plano Caminho B (histórico de execução; não reinstalar `_NN`)
 - [`caminho-a-plano-de-implementacao.md`](caminho-a-plano-de-implementacao.md) — Caminho A (UX/dispositivos/SNI); concluido
 - [`blocking-master-plan.md`](blocking-master-plan.md) — plano mestre historico (v1.0.0, 2026-03-23)
 - [`revisao-codigo-pre-install-2026-06-15.md`](revisao-codigo-pre-install-2026-06-15.md) — revisao geral pre-instalação (50 achados REV-001..050)
-- [`revisao-funcional-pre-producao-2026-07-29.md`](revisao-funcional-pre-producao-2026-07-29.md) — revisão funcional, correcções `_27` e riscos que ainda impedem produção
-- **[`auditoria-end-to-end-2026-07-29.md`](auditoria-end-to-end-2026-07-29.md)** — **SSOT auditoria Etapa 1:** inventário, veredicto **NO-GO**, registo **AUD-001..015**
+- [`revisao-funcional-pre-producao-2026-07-29.md`](revisao-funcional-pre-producao-2026-07-29.md) — revisão funcional, correcções `_27` (histórico)
+- **[`auditoria-end-to-end-2026-07-29.md`](auditoria-end-to-end-2026-07-29.md)** — auditoria Etapa 1 (histórico `_31` NO-GO)
 - [`matriz-cadeia-de-enforcement.md`](matriz-cadeia-de-enforcement.md) — cadeia config→daemon→PF
 - [`matriz-state-table.md`](matriz-state-table.md) — `pfctl -k`, flush e limitações stateful
 - [`matriz-compatibilidade-ce-plus-freebsd.md`](matriz-compatibilidade-ce-plus-freebsd.md) — CE vs Plus vs FreeBSD 15/16
 - [`matriz-limitacoes-dpi.md`](matriz-limitacoes-dpi.md) — nDPI, captura passiva, ECH/CDN/QUIC
-- **[`plano-gates-producao.md`](plano-gates-producao.md)** — gates **G0–G7** e **Bloco B1** (install passivo `_31`)
-- **[`matriz-unificada-rev-fp-aud.md`](matriz-unificada-rev-fp-aud.md)** — ledger REV/FP/AUD/BG (SSOT defeitos)
-- **[`diagnostico-multitask-2026-07-30.md`](diagnostico-multitask-2026-07-30.md)** — consolidação rodada multitask; veredicto **NO-GO**
+- **[`plano-gates-producao.md`](plano-gates-producao.md)** — gates **G0–G7** (PASS na linhagem `_69`/`1.9.x`; B1 `_31` supersedido)
+- **[`matriz-unificada-rev-fp-aud.md`](matriz-unificada-rev-fp-aud.md)** — ledger REV/FP/AUD/BG (histórico defeitos `_31`)
+- **[`diagnostico-multitask-2026-07-30.md`](diagnostico-multitask-2026-07-30.md)** — consolidação multitask (histórico)
 
 ## Funcionalidades de bloqueio na V1
 
