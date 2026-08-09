@@ -205,69 +205,85 @@ if ($savemsg !== "") {
 		<?php layer7_render_tabs("identity"); ?>
 		<div class="layer7-content">
 <?php if (!$unlocked): ?>
-			<div class="alert alert-info" role="alert">
-				<strong><?= htmlspecialchars(l7_t("Add-on nao incluido nesta licenca")); ?></strong>
-				<p style="margin: 10px 0 0;">
-					<?= htmlspecialchars(l7_t(
-					    "Identity (politicas por utilizador/grupo AD, mapa user↔IP) " .
-					    "requer o entitlement \"identity\" na licenca (SKU Y). " .
-					    "A licenca actual nao inclui este add-on. " .
-					    "Contacte a Systemup para upgrade. O produto base continua a funcionar normalmente."
-					)); ?>
-				</p>
-				<p style="margin: 10px 0 0; color: #666; font-size: 12px;">
-					features=<?= htmlspecialchars($l7_feat_raw !== "" ? $l7_feat_raw : "(base / legado)"); ?>
-					· ADR-0025 / ADR-0027 · captive portal do pfSense permanece fora de escopo
-				</p>
+			<div class="layer7-admin-block">
+				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Estado do add-on")); ?></div>
+				<div class="layer7-admin-block__body">
+					<div class="alert alert-info" role="alert" style="margin-bottom:0;">
+						<strong><?= htmlspecialchars(l7_t("Add-on nao incluido nesta licenca")); ?></strong>
+						<p style="margin: 10px 0 0;">
+							<?= htmlspecialchars(l7_t(
+							    "Identity (politicas por utilizador/grupo AD, mapa user↔IP) " .
+							    "requer o entitlement \"identity\" na licenca (SKU Y). " .
+							    "A licenca actual nao inclui este add-on. " .
+							    "Contacte a Systemup para upgrade. O produto base continua a funcionar normalmente."
+							)); ?>
+						</p>
+						<p style="margin: 10px 0 0; color: #666; font-size: 12px;">
+							features=<?= htmlspecialchars($l7_feat_raw !== "" ? $l7_feat_raw : "(base / legado)"); ?>
+							· ADR-0025 / ADR-0027 · captive portal do pfSense permanece fora de escopo
+						</p>
+					</div>
+				</div>
 			</div>
-			<p class="layer7-lead">
-				<?= htmlspecialchars(l7_t(
-				    "Quando o entitlement estiver activo, esta pagina configura o directorio LDAP " .
-				    "e, em passos seguintes, as fontes de sessao (RADIUS, agente no Domain Controller)."
-				)); ?>
-			</p>
+			<div class="layer7-admin-block">
+				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Proximos passos")); ?></div>
+				<div class="layer7-admin-block__body">
+					<p class="layer7-lead" style="margin:0;">
+						<?= htmlspecialchars(l7_t(
+						    "Quando o entitlement estiver activo, esta pagina configura o directorio LDAP " .
+						    "e, em passos seguintes, as fontes de sessao (RADIUS, agente no Domain Controller)."
+						)); ?>
+					</p>
+				</div>
+			</div>
 <?php else: ?>
-			<div class="alert alert-success" role="alert" style="margin-bottom: 16px;">
-				<?= htmlspecialchars(l7_t("Entitlement identity activo.")); ?>
-				<?= htmlspecialchars(l7_t(
-				    "Isto e User-ID de rede (mapa utilizador↔IP), nao um agente em cada PC."
-				)); ?>
+			<div class="layer7-admin-block">
+				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Estado do add-on")); ?></div>
+				<div class="layer7-admin-block__body">
+					<div class="alert alert-success" role="alert" style="margin-bottom: 12px;">
+						<?= htmlspecialchars(l7_t("Entitlement identity activo.")); ?>
+						<?= htmlspecialchars(l7_t(
+						    "Isto e User-ID de rede (mapa utilizador↔IP), nao um agente em cada PC."
+						)); ?>
+					</div>
+					<p class="help-block" style="margin-top:0;">
+						<?= htmlspecialchars(l7_t(
+						    "Quando usar: ligue o directorio LDAP do Active Directory (ou LDAP " .
+						    "compativel) para expandir grupos. A sessao (quem esta em que IP) chega " .
+						    "via RADIUS accounting ou agente no Domain Controller — " .
+						    "nao use captive portal do Layer7."
+						)); ?>
+					</p>
+					<p class="help-block text-muted">
+						<?= htmlspecialchars(l7_t(
+						    "Sem inspeccao TLS (MITM): bloqueio HTTPS continua alinhado a pagina HTTP/DNS. " .
+						    "Se o LDAP falhar depois de activo, politicas por grupo deixam de aplicar " .
+						    "(fail-mode seguro) — a LAN nao e fechada."
+						)); ?>
+					</p>
+					<p class="help-block text-muted">
+						<?= htmlspecialchars(l7_t(
+						    "Limite honesto (topologia): o IP reportado pelo AD/RADIUS pode diferir do IP " .
+						    "visto no firewall (NAT, Wi-Fi partilhado). Se dois utilizadores aparecerem no " .
+						    "mesmo IP ao mesmo tempo, o mapa marca multi-user e politicas ad_* nao aplicam " .
+						    "nesse IP (fallback seguro) — evento identity_ip_conflict no log."
+						)); ?>
+					</p>
+					<p class="help-block text-muted" style="margin-bottom:0;">
+						<?= htmlspecialchars(l7_t(
+						    "Limite honesto (ADR-0029): nao ha agente endpoint em cada PC nesta release " .
+						    "(User-ID de rede via RADIUS/DC). Terminal Server / VDI com varios users no " .
+						    "mesmo IP nao e suportado para politicas ad_* — usa-se multi-user / nao-match."
+						)); ?>
+					</p>
+				</div>
 			</div>
-
-			<p class="help-block" style="margin-top:0;">
-				<?= htmlspecialchars(l7_t(
-				    "Quando usar: ligue o directorio LDAP do Active Directory (ou LDAP " .
-				    "compativel) para expandir grupos. A sessao (quem esta em que IP) chega " .
-				    "via RADIUS accounting ou agente no Domain Controller — " .
-				    "nao use captive portal do Layer7."
-				)); ?>
-			</p>
-			<p class="help-block text-muted">
-				<?= htmlspecialchars(l7_t(
-				    "Sem inspeccao TLS (MITM): bloqueio HTTPS continua alinhado a pagina HTTP/DNS. " .
-				    "Se o LDAP falhar depois de activo, politicas por grupo deixam de aplicar " .
-				    "(fail-mode seguro) — a LAN nao e fechada."
-				)); ?>
-			</p>
-			<p class="help-block text-muted">
-				<?= htmlspecialchars(l7_t(
-				    "Limite honesto (topologia): o IP reportado pelo AD/RADIUS pode diferir do IP " .
-				    "visto no firewall (NAT, Wi-Fi partilhado). Se dois utilizadores aparecerem no " .
-				    "mesmo IP ao mesmo tempo, o mapa marca multi-user e politicas ad_* nao aplicam " .
-				    "nesse IP (fallback seguro) — evento identity_ip_conflict no log."
-				)); ?>
-			</p>
-			<p class="help-block text-muted">
-				<?= htmlspecialchars(l7_t(
-				    "Limite honesto (ADR-0029): nao ha agente endpoint em cada PC nesta release " .
-				    "(User-ID de rede via RADIUS/DC). Terminal Server / VDI com varios users no " .
-				    "mesmo IP nao e suportado para politicas ad_* — usa-se multi-user / nao-match."
-				)); ?>
-			</p>
 
 			<form method="post" action="layer7_identity.php" class="form-horizontal">
 
-				<h3 style="margin-top: 8px;"><?= htmlspecialchars(l7_t("Modulo Identity")); ?></h3>
+				<div class="layer7-admin-block">
+					<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Modulo Identity")); ?></div>
+					<div class="layer7-admin-block__body">
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Activar Identity")); ?></label>
 					<div class="col-sm-9">
@@ -284,9 +300,12 @@ if ($savemsg !== "") {
 						</p>
 					</div>
 				</div>
+					</div>
+				</div>
 
-				<hr />
-				<h3><?= htmlspecialchars(l7_t("Directorio LDAP / LDAPS")); ?></h3>
+				<div class="layer7-admin-block">
+					<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Directorio LDAP / LDAPS")); ?></div>
+					<div class="layer7-admin-block__body">
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Usar directorio")); ?></label>
 					<div class="col-sm-9">
@@ -396,8 +415,12 @@ if ($savemsg !== "") {
 					</div>
 				</div>
 
-				<hr />
-				<h3><?= htmlspecialchars(l7_t("RADIUS accounting (fonte de sessao)")); ?></h3>
+				</div>
+				</div>
+
+				<div class="layer7-admin-block">
+					<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("RADIUS accounting (fonte de sessao)")); ?></div>
+					<div class="layer7-admin-block__body">
 				<p class="help-block">
 					<?= htmlspecialchars(l7_t(
 					    "O Layer7 escuta Accounting-Request (User-Name + Framed-IP) " .
@@ -479,8 +502,12 @@ if ($savemsg !== "") {
 					</div>
 				</div>
 
-				<hr />
-				<h3><?= htmlspecialchars(l7_t("Agente DC (fonte de sessao)")); ?></h3>
+				</div>
+				</div>
+
+				<div class="layer7-admin-block">
+					<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Agente DC (fonte de sessao)")); ?></div>
+					<div class="layer7-admin-block__body">
 				<p class="help-block">
 					<?= htmlspecialchars(l7_t(
 					    "Receiver HTTPS no appliance (porto 8743) para o agente no Domain Controller. " .
@@ -564,8 +591,12 @@ if ($savemsg !== "") {
 					</div>
 				</div>
 
-				<hr />
-				<h3><?= htmlspecialchars(l7_t("Limites de escala")); ?></h3>
+				</div>
+				</div>
+
+				<div class="layer7-admin-block">
+					<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Limites de escala")); ?></div>
+					<div class="layer7-admin-block__body">
 				<p class="help-block">
 					<?= htmlspecialchars(l7_t(
 					    "Limites para expansao de grupos aninhados (defaults ADR-0027). " .
@@ -608,16 +639,13 @@ if ($savemsg !== "") {
 						</p>
 					</div>
 				</div>
+					</div>
+				</div>
 			</form>
 <?php if (is_array($ldap_test)): ?>
-			<div class="panel panel-<?= !empty($ldap_test["ok"]) ? "success" : "warning"; ?>"
-				style="margin-top: 16px;">
-				<div class="panel-heading">
-					<h3 class="panel-title" style="font-size: 14px;">
-						<?= htmlspecialchars(l7_t("Ultimo teste LDAP")); ?>
-					</h3>
-				</div>
-				<div class="panel-body" style="font-size: 13px;">
+			<div class="layer7-admin-block">
+				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Ultimo teste LDAP")); ?></div>
+				<div class="layer7-admin-block__body">
 					<p style="margin: 0 0 6px;">
 						<strong><?= htmlspecialchars(l7_t("Resultado")); ?>:</strong>
 						<?= !empty($ldap_test["ok"])

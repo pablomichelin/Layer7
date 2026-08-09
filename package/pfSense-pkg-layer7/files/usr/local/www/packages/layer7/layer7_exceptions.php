@@ -326,9 +326,11 @@ function layer7_exc_target_summary($exception) {
 		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
+			<?php layer7_render_policies_subnav("exceptions"); ?>
 
-			<div class="layer7-section" id="l7-vip-list">
-			<h3 class="layer7-section-title"><?= l7_t("Lista VIP (isencao total)"); ?></h3>
+			<div class="layer7-admin-block" id="l7-vip-list">
+			<div class="layer7-admin-block__header"><?= l7_t("Lista VIP (isencao total)"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Origens isentas de todos os bloqueios Layer7 (PF, daemon e sinkhole DNS quando enforce activo). Gere a excepcao canonica vip-isentos com descricao por entrada."); ?></p>
 			<?php if ($vip_dns_mode === "rdr_fallback") { ?>
 			<div class="alert alert-warning">
@@ -387,7 +389,7 @@ function layer7_exc_target_summary($exception) {
 			<p class="help-block small"><?= sprintf(l7_t("Limites actuais: %d IPs + %d CIDRs (daemon)."), LAYER7_VIP_MAX_HOSTS, LAYER7_VIP_MAX_CIDRS); ?></p>
 
 			<div class="layer7-form-card" style="margin-top:16px;">
-				<h4 class="layer7-section-title"><?= l7_t("Adicionar isento"); ?></h4>
+				<h4 class="layer7-form-card__title"><?= l7_t("Adicionar isento"); ?></h4>
 				<?php if ($vip_at_host_limit && $vip_at_cidr_limit) { ?>
 				<div class="alert alert-warning"><?= l7_t("Limites da Lista VIP atingidos."); ?></div>
 				<?php } else { ?>
@@ -431,11 +433,13 @@ function layer7_exc_target_summary($exception) {
 				</form>
 			</div>
 			</div>
+			</div>
 
 			<p class="layer7-lead"><?= l7_t("Excecoes sao avaliadas antes das politicas e ajudam a preservar trafego de gestao, redes internas e casos especiais durante os testes."); ?></p>
 
-		<div class="layer7-section" id="l7-exceptions">
-			<h3 class="layer7-section-title"><?= l7_t("Excecoes atuais"); ?></h3>
+		<div class="layer7-admin-block" id="l7-exceptions">
+			<div class="layer7-admin-block__header"><?= l7_t("Excecoes atuais"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="help-block"><?= l7_t("Prioridade maior = regra avaliada primeiro."); ?></p>
 			<?php if (count($exceptions) === 0) { ?>
 			<div class="alert alert-info"><?= l7_t("Nenhuma excecao cadastrada no momento."); ?></div>
@@ -505,6 +509,7 @@ function layer7_exc_target_summary($exception) {
 			</div>
 			<?php } ?>
 		</div>
+		</div>
 
 		<?php if ($edit_ex !== null && $edit_ex_idx !== null) {
 			$edit_id = isset($edit_ex["id"]) ? (string)$edit_ex["id"] : "";
@@ -532,8 +537,9 @@ function layer7_exc_target_summary($exception) {
 			}
 			$ee_ifaces = layer7_get_pfsense_interfaces();
 		?>
-		<div class="layer7-section" id="l7-edit-exc">
-			<h3 class="layer7-section-title"><?= l7_t("Editar excecao"); ?></h3>
+		<div class="layer7-admin-block" id="l7-edit-exc">
+			<div class="layer7-admin-block__header"><?= l7_t("Editar excecao"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Use excecoes para trafego de gestao, IPs criticos e redes que nao devem ser avaliadas pelas politicas gerais."); ?></p>
 			<div class="layer7-toolbar">
 				<a href="layer7_exceptions.php" class="btn btn-default"><?= l7_t("Cancelar edicao"); ?></a>
@@ -625,10 +631,12 @@ function layer7_exc_target_summary($exception) {
 				</div>
 			</form>
 		</div>
+		</div>
 		<?php } ?>
 
-		<div class="layer7-section" id="l7-add-exc">
-			<h3 class="layer7-section-title"><?= l7_t("Adicionar excecao"); ?></h3>
+		<div class="layer7-admin-block" id="l7-add-exc">
+			<div class="layer7-admin-block__header"><?= l7_t("Adicionar excecao"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= l7_t("Cadastre aqui os alvos que devem fugir do fluxo padrao de classificacao, sem precisar editar o JSON manualmente."); ?></p>
 			<?php if ($exc_limit) { ?>
 			<div class="alert alert-warning"><?= l7_t("Limite de 16 excecoes atingido."); ?></div>
@@ -717,6 +725,7 @@ function layer7_exc_target_summary($exception) {
 			<?php } ?>
 
 			<p class="layer7-muted-note small"><?= l7_t("Para alterar o id de uma excecao existente, edite /usr/local/etc/layer7.json diretamente."); ?></p>
+		</div>
 		</div>
 		</div>
 	</div>

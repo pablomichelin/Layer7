@@ -101,31 +101,41 @@ layer7_render_styles();
 		<div class="alert alert-danger"><i class="fa fa-times-circle"></i> <?= htmlspecialchars($restart_err); ?></div>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<div class="l7-dashboard-cards">
-				<div class="l7-dash-card">
-					<div class="l7-dash-card-value"><?= number_format($total_classified); ?></div>
-					<div class="l7-dash-card-label"><?= l7_t("Conexoes classificadas"); ?></div>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Resumo"); ?></div>
+			<div class="layer7-admin-block__body">
+				<div class="l7-kpi-cards">
+					<div class="l7-kpi-card">
+						<div class="l7-kpi-card__value"><?= number_format($total_classified); ?></div>
+						<div class="l7-kpi-card__label"><?= l7_t("Conexoes classificadas"); ?></div>
+					</div>
+					<div class="l7-kpi-card l7-kpi-card--danger">
+						<div class="l7-kpi-card__value"><?= number_format($total_blocked); ?></div>
+						<div class="l7-kpi-card__label"><?= l7_t("Bloqueios"); ?></div>
+					</div>
+					<div class="l7-kpi-card l7-kpi-card--success">
+						<div class="l7-kpi-card__value"><?= number_format($total_allowed); ?></div>
+						<div class="l7-kpi-card__label"><?= l7_t("Permitidos"); ?></div>
+					</div>
+					<div class="l7-kpi-card">
+						<div class="l7-kpi-card__value"><?= $n_policies_active; ?></div>
+						<div class="l7-kpi-card__label"><?= l7_t("Politicas activas"); ?></div>
+					</div>
 				</div>
-				<div class="l7-dash-card l7-dash-card-danger">
-					<div class="l7-dash-card-value"><?= number_format($total_blocked); ?></div>
-					<div class="l7-dash-card-label"><?= l7_t("Bloqueios"); ?></div>
-				</div>
-				<div class="l7-dash-card l7-dash-card-success">
-					<div class="l7-dash-card-value"><?= number_format($total_allowed); ?></div>
-					<div class="l7-dash-card-label"><?= l7_t("Permitidos"); ?></div>
-				</div>
-				<div class="l7-dash-card">
-					<div class="l7-dash-card-value"><?= $n_policies_active; ?></div>
-					<div class="l7-dash-card-label"><?= l7_t("Politicas activas"); ?></div>
+				<div class="l7-kpi-shortcuts">
+					<a href="layer7_policies.php" class="btn btn-sm btn-default"><i class="fa fa-sliders"></i> <?= l7_t("Perfis rapidos"); ?></a>
+					<a href="layer7_events.php" class="btn btn-sm btn-default"><i class="fa fa-list"></i> <?= l7_t("Eventos"); ?></a>
+					<a href="layer7_reports.php" class="btn btn-sm btn-default"><i class="fa fa-bar-chart"></i> <?= l7_t("Relatorios"); ?></a>
 				</div>
 			</div>
 		</div>
 
-		<div class="layer7-section">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Tops"); ?></div>
+			<div class="layer7-admin-block__body">
 			<div class="row">
 				<div class="col-md-6">
-					<h3 class="layer7-section-title"><?= l7_t("Top 10 apps bloqueadas"); ?></h3>
+					<h4 class="layer7-form-card__title"><?= l7_t("Top 10 apps bloqueadas"); ?></h4>
 					<?php if (empty($top_apps)) { ?>
 					<p class="text-muted"><?= l7_t("Sem dados. O daemon precisa de trafego classificado para gerar estatisticas."); ?></p>
 					<?php } else { ?>
@@ -153,11 +163,10 @@ layer7_render_styles();
 					<?php } ?>
 				</div>
 				<div class="col-md-6">
-					<h3 class="layer7-section-title"><?= l7_t("Top 10 clientes bloqueados"); ?></h3>
+					<h4 class="layer7-form-card__title"><?= l7_t("Top 10 clientes bloqueados"); ?></h4>
 					<?php if (empty($top_sources)) { ?>
 					<p class="text-muted"><?= l7_t("Sem dados."); ?></p>
 					<?php } else {
-						/* A4: enriquece com nome/alias do dispositivo (inventario A1). */
 						$dev_by_ip = array();
 						if (function_exists("layer7_device_inventory")) {
 							$inv = layer7_device_inventory();
@@ -198,10 +207,12 @@ layer7_render_styles();
 					<?php } ?>
 				</div>
 			</div>
+			</div>
 		</div>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Estado do daemon"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Estado do daemon"); ?></div>
+			<div class="layer7-admin-block__body">
 			<div class="layer7-callout">
 				<dl class="dl-horizontal layer7-summary">
 					<dt><?= l7_t("Daemon"); ?></dt>
@@ -251,30 +262,20 @@ layer7_render_styles();
 
 					</dl>
 			</div>
-		</div>
-
-		<div class="layer7-toolbar" id="l7-toolbar">
-			<form method="post" action="layer7_status.php#l7-toolbar" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
-				<button type="submit" name="restart_service" value="1" class="btn btn-warning"
-					onclick="return confirm(<?= json_encode(l7_t('Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart.')) ?>);">
-					<i class="fa fa-refresh"></i> <?= l7_t("Reiniciar servico"); ?>
-				</button>
-			</form>
-			<a href="layer7_settings.php" class="btn btn-primary"><?= l7_t("Abrir definicoes"); ?></a>
-			<a href="layer7_policies.php" class="btn btn-default"><?= l7_t("Ver politicas"); ?></a>
-			<a href="layer7_diagnostics.php" class="btn btn-default"><?= l7_t("Diagnosticos"); ?></a>
-			<a href="layer7_events.php" class="btn btn-default"><?= l7_t("Eventos"); ?></a>
+			<div class="layer7-toolbar" id="l7-toolbar" style="margin-top:14px;">
+				<form method="post" action="layer7_status.php#l7-toolbar" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
+					<button type="submit" name="restart_service" value="1" class="btn btn-warning"
+						onclick="return confirm(<?= json_encode(l7_t('Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart.')) ?>);">
+						<i class="fa fa-refresh"></i> <?= l7_t("Reiniciar servico"); ?>
+					</button>
+				</form>
+				<a href="layer7_settings.php" class="btn btn-primary"><?= l7_t("Abrir definicoes"); ?></a>
+				<a href="layer7_diagnostics.php" class="btn btn-default"><?= l7_t("Diagnosticos"); ?></a>
+			</div>
+			</div>
 		</div>
 		</div>
 	</div>
 </div>
-<style>
-.l7-dashboard-cards { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 10px; }
-.l7-dash-card { flex: 1; min-width: 160px; max-width: 240px; background: #f9fafb; border: 1px solid #e5e5e5; border-radius: 6px; padding: 20px 18px; text-align: center; }
-.l7-dash-card-value { font-size: 32px; font-weight: 700; color: #333; line-height: 1.1; }
-.l7-dash-card-label { font-size: 13px; color: #777; margin-top: 6px; }
-.l7-dash-card-danger .l7-dash-card-value { color: #d9534f; }
-.l7-dash-card-success .l7-dash-card-value { color: #5cb85c; }
-</style>
 <?php layer7_render_footer(); ?>
 <?php require_once("foot.inc"); ?>

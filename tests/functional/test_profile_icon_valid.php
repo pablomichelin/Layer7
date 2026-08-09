@@ -53,6 +53,12 @@ $render_checks = array(
 	array("fa-comments", "fa", "fa-comments"),
 	array("fa-users", "fa", "fa-users"),
 	array("fa-video-camera", "fa", "fa-video"),
+	array("fa-moon-o", "fa", "fa-moon"),
+	array("fa-sun-o", "fa", "fa-sun"),
+	array("fa-chrome", "fab", "fa-chrome"),
+	array("fa-sign-in", "fa", "fa-right-to-bracket"),
+	array("fa-picture-o", "fa", "fa-image"),
+	array("fa-money", "fa", "fa-money-bill"),
 );
 foreach ($render_checks as $c) {
 	$spec = layer7_profile_icon_render_spec($c[0]);

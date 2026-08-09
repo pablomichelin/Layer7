@@ -80,24 +80,41 @@ layer7_render_styles();
 		<div class="layer7-content">
 		<?php layer7_render_messages(); ?>
 
-		<div class="alert alert-danger">
-			<strong><?= l7_t("Atencao"); ?>:</strong>
-			<?= l7_t("Esta operacao remove o pacote pfSense-pkg-layer7, o daemon, a GUI Layer7, blacklists locais, cron e limpa as tabelas PF layer7_* . Equivalente a uma desinstalacao completa."); ?>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Atencao"); ?></div>
+			<div class="layer7-admin-block__body">
+				<div class="alert alert-danger" style="margin:0;">
+					<strong><?= l7_t("Atencao"); ?>:</strong>
+					<?= l7_t("Esta operacao remove o pacote pfSense-pkg-layer7, o daemon, a GUI Layer7, blacklists locais, cron e limpa as tabelas PF layer7_* . Equivalente a uma desinstalacao completa."); ?>
+				</div>
+				<p class="layer7-lead" style="margin-top:12px;margin-bottom:0;"><?= l7_t("Alternativa: System > Package Manager > Installed Packages > Remove (o hook do pacote tambem limpa residuos). Esta pagina permite o mesmo com opcoes de preservacao e arranque em segundo plano."); ?></p>
+			</div>
 		</div>
 
-		<p class="layer7-lead"><?= l7_t("Alternativa: System > Package Manager > Installed Packages > Remove (o hook do pacote tambem limpa residuos). Esta pagina permite o mesmo com opcoes de preservacao e arranque em segundo plano."); ?></p>
-
 		<?php if (!$pkg_installed) { ?>
-		<div class="alert alert-info"><?= l7_t("O pacote Layer7 nao esta instalado neste sistema (ou a remocao ja terminou)."); ?></div>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Estado"); ?></div>
+			<div class="layer7-admin-block__body">
+				<div class="alert alert-info" style="margin:0;"><?= l7_t("O pacote Layer7 nao esta instalado neste sistema (ou a remocao ja terminou)."); ?></div>
+			</div>
+		</div>
 		<?php } elseif ($job_running) { ?>
-		<div class="alert alert-warning">
-			<?= l7_t("Um pedido de remocao foi iniciado recentemente. Aguarde e verifique o Package Manager. Log:"); ?>
-			<code><?= htmlspecialchars($log_rm); ?></code>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Estado"); ?></div>
+			<div class="layer7-admin-block__body">
+				<div class="alert alert-warning" style="margin:0;">
+					<?= l7_t("Um pedido de remocao foi iniciado recentemente. Aguarde e verifique o Package Manager. Log:"); ?>
+					<code><?= htmlspecialchars($log_rm); ?></code>
+				</div>
+			</div>
 		</div>
 		<?php } else { ?>
 
 		<form method="post" class="form-horizontal">
-			<div class="form-group">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Opcoes"); ?></div>
+			<div class="layer7-admin-block__body">
+			<div class="form-group" style="margin-bottom:0;">
 				<label class="col-sm-3 control-label"><?= l7_t("Preservar ficheiros"); ?></label>
 				<div class="col-sm-9">
 					<div class="checkbox">
@@ -115,6 +132,12 @@ layer7_render_styles();
 					<p class="help-block"><?= l7_t("Se marcar ambos, prevalece \"manter configuracao\" (ambos os ficheiros)."); ?></p>
 				</div>
 			</div>
+			</div>
+		</div>
+
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Confirmar"); ?></div>
+			<div class="layer7-admin-block__body">
 			<div class="form-group">
 				<label class="col-sm-3 control-label"><?= l7_t("Confirmacao"); ?></label>
 				<div class="col-sm-9">
@@ -122,7 +145,7 @@ layer7_render_styles();
 					<p class="help-block"><?= l7_t("Escreva REMOVER em maiusculas para confirmar."); ?></p>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" style="margin-bottom:0;">
 				<div class="col-sm-offset-3 col-sm-9">
 					<button type="submit" name="layer7_pkg_remove_do" value="1" class="btn btn-danger">
 						<i class="fa fa-trash icon-embed-btn"></i>
@@ -130,16 +153,20 @@ layer7_render_styles();
 					</button>
 				</div>
 			</div>
+			</div>
+		</div>
 		</form>
 		<?php } ?>
 
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Apos remover"); ?></h3>
-			<ul>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Apos remover"); ?></div>
+			<div class="layer7-admin-block__body">
+			<ul style="margin-bottom:0;">
 				<li><?= l7_t("Recarregue o painel ou aceda a System > Package Manager para confirmar."); ?></li>
 				<li><?= l7_t("Se usou overrides anti-DoH no Unbound, remova-os manualmente em Services > DNS Resolver se ainda existirem."); ?></li>
 				<li><?= l7_t("Log da ultima remocao via GUI:"); ?> <code><?= htmlspecialchars($log_rm); ?></code></li>
 			</ul>
+			</div>
 		</div>
 
 		<?php layer7_render_footer(); ?>

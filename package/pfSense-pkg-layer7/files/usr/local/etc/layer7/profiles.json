@@ -1,6 +1,64 @@
 {
   "profiles": [
     {
+      "id": "social",
+      "name": "Redes Sociais (todas)",
+      "group": "Redes sociais",
+      "icon": "fa-users",
+      "description": "Agrega Facebook, Instagram, TikTok, Twitter/X, LinkedIn, Reddit, Kwai, Threads, Bluesky, Snapchat e Pinterest.",
+      "ndpi_apps": [
+        "Facebook",
+        "FacebookMessenger",
+        "Instagram",
+        "TikTok",
+        "Twitter",
+        "LinkedIn",
+        "Snapchat",
+        "Pinterest",
+        "Reddit",
+        "Likee",
+        "Threads",
+        "Bluesky"
+      ],
+      "ndpi_categories": [],
+      "hosts": [
+        "facebook.com",
+        "fbcdn.net",
+        "fb.com",
+        "fbsbx.com",
+        "instagram.com",
+        "cdninstagram.com",
+        "tiktok.com",
+        "tiktokcdn.com",
+        "tiktokv.com",
+        "tiktokcdn-us.com",
+        "ttwstatic.com",
+        "musical.ly",
+        "twitter.com",
+        "x.com",
+        "twimg.com",
+        "t.co",
+        "linkedin.com",
+        "licdn.com",
+        "snapchat.com",
+        "sc-cdn.net",
+        "pinterest.com",
+        "pinimg.com",
+        "reddit.com",
+        "redditstatic.com",
+        "redd.it",
+        "kwai.com",
+        "kwai-pro.com",
+        "likee.com",
+        "likeevideo.com",
+        "threads.net",
+        "threads.com",
+        "bsky.app",
+        "bsky.social",
+        "bsky.network"
+      ]
+    },
+    {
       "id": "facebook",
       "name": "Facebook",
       "group": "Redes sociais",
@@ -140,7 +198,7 @@
       "id": "kwai",
       "name": "Kwai",
       "group": "Redes sociais",
-      "icon": "fa-video-camera",
+      "icon": "fa-mobile",
       "description": "Bloqueia Kwai (Likee) e dominios associados.",
       "ndpi_apps": [
         "Likee"
@@ -155,61 +213,122 @@
       ]
     },
     {
-      "id": "social",
-      "name": "Redes Sociais",
+      "id": "threads",
+      "name": "Threads",
       "group": "Redes sociais",
-      "icon": "fa-users",
-      "description": "Agrega Facebook, Instagram, TikTok, Twitter/X, LinkedIn, Reddit, Kwai, Threads, Bluesky, Snapchat e Pinterest.",
+      "icon": "fa-at",
+      "description": "Bloqueia Threads (Meta).",
       "ndpi_apps": [
-        "Facebook",
-        "FacebookMessenger",
-        "Instagram",
-        "TikTok",
-        "Twitter",
-        "LinkedIn",
-        "Snapchat",
-        "Pinterest",
-        "Reddit",
-        "Likee",
-        "Threads",
+        "Threads"
+      ],
+      "ndpi_categories": [],
+      "hosts": [
+        "threads.net",
+        "threads.com"
+      ]
+    },
+    {
+      "id": "bluesky",
+      "name": "Bluesky",
+      "group": "Redes sociais",
+      "icon": "fa-cloud",
+      "description": "Bloqueia Bluesky.",
+      "ndpi_apps": [
         "Bluesky"
       ],
       "ndpi_categories": [],
       "hosts": [
-        "facebook.com",
-        "fbcdn.net",
-        "fb.com",
-        "fbsbx.com",
-        "instagram.com",
-        "cdninstagram.com",
-        "tiktok.com",
-        "tiktokcdn.com",
-        "tiktokv.com",
-        "tiktokcdn-us.com",
-        "ttwstatic.com",
-        "musical.ly",
-        "twitter.com",
-        "x.com",
-        "twimg.com",
-        "t.co",
-        "linkedin.com",
-        "licdn.com",
-        "snapchat.com",
-        "sc-cdn.net",
-        "pinterest.com",
-        "pinimg.com",
-        "reddit.com",
-        "redditstatic.com",
-        "redd.it",
-        "kwai.com",
-        "kwai-pro.com",
-        "likee.com",
-        "likeevideo.com",
-        "threads.net",
-        "threads.com",
         "bsky.app",
         "bsky.social",
         "bsky.network"
+      ]
+    },
+    {
+      "id": "kick",
+      "name": "Kick",
+      "group": "Streaming",
+      "icon": "fa-bolt",
+      "description": "Bloqueia Kick (lives e streaming).",
+      "ndpi_apps": [
+        "Kick"
+      ],
+      "ndpi_categories": [],
+      "hosts": [
+        "kick.com"
+      ]
+    },
+    {
+      "id": "rumble",
+      "name": "Rumble",
+      "group": "Streaming",
+      "icon": "fa-play",
+      "description": "Bloqueia Rumble.",
+      "ndpi_apps": [
+        "Rumble"
+      ],
+      "ndpi_categories": [],
+      "hosts": [
+        "rumble.com",
+        "rmbl.ws"
+      ]
+    },
+    {
+      "id": "redes-alternativas",
+      "name": "Redes alternativas",
+      "group": "Redes sociais",
+      "icon": "fa-globe",
+      "description": "Agrega Mastodon, Tumblr, VK e SinaWeibo.",
+      "ndpi_apps": [
+        "Mastodon",
+        "Tumblr",
+        "VK",
+        "SinaWeibo"
+      ],
+      "ndpi_categories": [],
+      "hosts": [
+        "mastodon.social",
+        "tumblr.com",
+        "vk.com",
+        "weibo.com"
+      ]
+    },
+    {
+      "id": "mensageria",
+      "name": "Mensagens (todas)",
+      "group": "Mensagens",
+      "icon": "fa-comments",
+      "description": "Pacote completo de mensageria: Telegram, Discord, Signal, WeChat, Viber, Line, Snapchat e Facebook Messenger. WhatsApp tem cartao proprio.",
+      "ndpi_apps": [
+        "Telegram",
+        "TelegramVoip",
+        "Discord",
+        "Signal",
+        "WeChat",
+        "Viber",
+        "Line",
+        "Snapchat",
+        "FacebookMessenger"
+      ],
+      "ndpi_categories": [
+        "Chat"
+      ],
+      "hosts": [
+        "telegram.org",
+        "t.me",
+        "telegram.me",
+        "discord.com",
+        "discordapp.com",
+        "discord.gg",
+        "signal.org",
+        "whispersystems.org",
+        "wechat.com",
+        "weixin.qq.com",
+        "viber.com",
+        "line.me",
+        "line-apps.com",
+        "snapchat.com",
+        "sc-cdn.net",
+        "messenger.com"
       ]
     },
     {
@@ -251,7 +370,7 @@
       "id": "discord",
       "name": "Discord",
       "group": "Mensagens",
-      "icon": "fa-comments",
+      "icon": "fa-hashtag",
       "description": "Bloqueia Discord.",
       "ndpi_apps": [
         "Discord"
@@ -266,42 +385,34 @@
       ]
     },
     {
-      "id": "mensageria",
-      "name": "Mensagens",
-      "group": "Mensagens",
-      "icon": "fa-comments",
-      "description": "Agrega Telegram, Discord, Signal, WeChat, Viber, Line, Snapchat e Facebook Messenger.",
+      "id": "videoconferencia",
+      "name": "Videoconferencia (todas)",
+      "group": "Comunicação e reuniões",
+      "icon": "fa-th-list",
+      "description": "Agrega Zoom, Teams, Google Meet, Webex e TeamSpeak (apps VoIP + hosts).",
       "ndpi_apps": [
-        "Telegram",
-        "TelegramVoip",
-        "Discord",
-        "Signal",
-        "WeChat",
-        "Viber",
-        "Line",
-        "Snapchat",
-        "FacebookMessenger"
+        "Zoom",
+        "Teams",
+        "TeamsCall",
+        "GoogleMeet",
+        "Webex"
       ],
       "ndpi_categories": [
-        "Chat"
+        "VoIP"
       ],
       "hosts": [
-        "telegram.org",
-        "t.me",
-        "telegram.me",
-        "discord.com",
-        "discordapp.com",
-        "discord.gg",
-        "signal.org",
-        "whispersystems.org",
-        "wechat.com",
-        "weixin.qq.com",
-        "viber.com",
-        "line.me",
-        "line-apps.com",
-        "snapchat.com",
-        "sc-cdn.net",
-        "messenger.com"
+        "zoom.us",
+        "zoom.com",
+        "zoomgov.com",
+        "zoomcdn.com",
+        "teams.microsoft.com",
+        "teams.live.com",
+        "teams.cdn.office.net",
+        "meet.google.com",
+        "webex.com",
+        "ciscospark.com",
+        "wbx2.com",
+        "teamspeak.com"
       ]
     },
     {
@@ -342,7 +453,7 @@
       "id": "google-meet",
       "name": "Google Meet",
       "group": "Comunicação e reuniões",
-      "icon": "fa-video-camera",
+      "icon": "fa-google",
       "description": "Bloqueia Google Meet.",
       "ndpi_apps": [
         "GoogleMeet"
@@ -356,7 +467,7 @@
       "id": "webex",
       "name": "Webex",
       "group": "Comunicação e reuniões",
-      "icon": "fa-video-camera",
+      "icon": "fa-briefcase",
       "description": "Bloqueia Cisco Webex.",
       "ndpi_apps": [
         "Webex"
@@ -383,42 +494,11 @@
       ]
     },
     {
-      "id": "videoconferencia",
-      "name": "Videoconferencia",
-      "group": "Comunicação e reuniões",
-      "icon": "fa-users",
-      "description": "Agrega Zoom, Teams, Google Meet, Webex e TeamSpeak (apps VoIP + hosts).",
-      "ndpi_apps": [
-        "Zoom",
-        "Teams",
-        "TeamsCall",
-        "GoogleMeet",
-        "Webex"
-      ],
-      "ndpi_categories": [
-        "VoIP"
-      ],
-      "hosts": [
-        "zoom.us",
-        "zoom.com",
-        "zoomgov.com",
-        "zoomcdn.com",
-        "teams.microsoft.com",
-        "teams.live.com",
-        "teams.cdn.office.net",
-        "meet.google.com",
-        "webex.com",
-        "ciscospark.com",
-        "wbx2.com",
-        "teamspeak.com"
-      ]
-    },
-    {
       "id": "remote-access",
       "name": "Acesso Remoto (todos)",
       "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Pacote completo: bloqueia softwares de acesso remoto conhecidos de uma vez. Preferir os cartoes individuais abaixo se a empresa usa so alguns (ex.: AnyDesk sim, TeamViewer nao).",
+      "icon": "fa-th-list",
+      "description": "Pacote completo: bloqueia softwares de acesso remoto conhecidos de uma vez. Preferir os cartoes individuais do mesmo grupo se a empresa usa so alguns (ex.: AnyDesk sim, TeamViewer nao).",
       "ndpi_apps": [
         "TeamViewer",
         "AnyDesk",
@@ -484,17 +564,15 @@
       "hosts": []
     },
     {
-      "id": "teamviewer",
-      "name": "TeamViewer",
+      "id": "aeroadmin",
+      "name": "AeroAdmin",
       "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia TeamViewer.",
-      "ndpi_apps": [
-        "TeamViewer"
-      ],
+      "icon": "fa-plane",
+      "description": "Bloqueia AeroAdmin.",
+      "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "teamviewer.com"
+        "aeroadmin.com"
       ]
     },
     {
@@ -512,16 +590,27 @@
       ]
     },
     {
-      "id": "rustdesk",
-      "name": "RustDesk",
+      "id": "atera",
+      "name": "Atera",
       "group": "Acesso remoto",
-      "icon": "fa-terminal",
-      "description": "Bloqueia RustDesk.",
+      "icon": "fa-cogs",
+      "description": "Bloqueia Atera.",
       "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "rustdesk.com",
-        "rustdesk.net"
+        "atera.com"
+      ]
+    },
+    {
+      "id": "awesun",
+      "name": "AweSun",
+      "group": "Acesso remoto",
+      "icon": "fa-picture-o",
+      "description": "Bloqueia AweSun.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "aweray.com"
       ]
     },
     {
@@ -537,93 +626,28 @@
       ]
     },
     {
-      "id": "logmein",
-      "name": "LogMeIn / GoTo Resolve",
+      "id": "screenconnect",
+      "name": "ConnectWise ScreenConnect",
       "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia LogMeIn / GoTo Resolve.",
+      "icon": "fa-building",
+      "description": "Bloqueia ConnectWise ScreenConnect.",
       "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "logmein.com",
-        "logmeinrescue.com",
-        "goto.com",
-        "getgo.com",
-        "gotomypc.com"
+        "screenconnect.com",
+        "connectwise.com"
       ]
     },
     {
-      "id": "splashtop",
-      "name": "Splashtop",
+      "id": "datto-rmm",
+      "name": "Datto RMM",
       "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia Splashtop.",
+      "icon": "fa-server",
+      "description": "Bloqueia Datto RMM.",
       "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "splashtop.com"
-      ]
-    },
-    {
-      "id": "zoho-assist",
-      "name": "Zoho Assist",
-      "group": "Acesso remoto",
-      "icon": "fa-headphones",
-      "description": "Bloqueia Zoho Assist.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "zohoassist.com"
-      ]
-    },
-    {
-      "id": "ultraviewer",
-      "name": "UltraViewer",
-      "group": "Acesso remoto",
-      "icon": "fa-eye",
-      "description": "Bloqueia UltraViewer.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "ultraviewer.net",
-        "nanosystems.it"
-      ]
-    },
-    {
-      "id": "supremo",
-      "name": "Supremo",
-      "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia Supremo.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "supremocontrol.com"
-      ]
-    },
-    {
-      "id": "remotepc",
-      "name": "RemotePC",
-      "group": "Acesso remoto",
-      "icon": "fa-laptop",
-      "description": "Bloqueia RemotePC.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "remotepc.com"
-      ]
-    },
-    {
-      "id": "isl-online",
-      "name": "ISL Online",
-      "group": "Acesso remoto",
-      "icon": "fa-globe",
-      "description": "Bloqueia ISL Online.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "islonline.com",
-        "islonline.net"
+        "datto.com"
       ]
     },
     {
@@ -642,7 +666,7 @@
       "id": "getscreen",
       "name": "GetScreen",
       "group": "Acesso remoto",
-      "icon": "fa-desktop",
+      "icon": "fa-camera",
       "description": "Bloqueia GetScreen.",
       "ndpi_apps": [],
       "ndpi_categories": [],
@@ -663,15 +687,15 @@
       ]
     },
     {
-      "id": "aeroadmin",
-      "name": "AeroAdmin",
+      "id": "hoptodesk",
+      "name": "HopToDesk",
       "group": "Acesso remoto",
-      "icon": "fa-plane",
-      "description": "Bloqueia AeroAdmin.",
+      "icon": "fa-share-alt",
+      "description": "Bloqueia HopToDesk.",
       "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "aeroadmin.com"
+        "hoptodesk.com"
       ]
     },
     {
@@ -687,6 +711,96 @@
       ]
     },
     {
+      "id": "isl-online",
+      "name": "ISL Online",
+      "group": "Acesso remoto",
+      "icon": "fa-wifi",
+      "description": "Bloqueia ISL Online.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "islonline.com",
+        "islonline.net"
+      ]
+    },
+    {
+      "id": "logmein",
+      "name": "LogMeIn / GoTo Resolve",
+      "group": "Acesso remoto",
+      "icon": "fa-sign-in",
+      "description": "Bloqueia LogMeIn / GoTo Resolve.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "logmein.com",
+        "logmeinrescue.com",
+        "goto.com",
+        "getgo.com",
+        "gotomypc.com"
+      ]
+    },
+    {
+      "id": "meshcentral",
+      "name": "MeshCentral",
+      "group": "Acesso remoto",
+      "icon": "fa-sitemap",
+      "description": "Bloqueia MeshCentral. Instâncias self-host podem escapar à lista de hosts.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "meshcentral.com"
+      ]
+    },
+    {
+      "id": "moonlight",
+      "name": "Moonlight / Sunshine",
+      "group": "Acesso remoto",
+      "icon": "fa-moon-o",
+      "description": "Bloqueia Moonlight / Sunshine.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "moonlight-stream.org"
+      ]
+    },
+    {
+      "id": "ninjaone",
+      "name": "NinjaOne",
+      "group": "Acesso remoto",
+      "icon": "fa-crosshairs",
+      "description": "Bloqueia NinjaOne.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "ninjaone.com",
+        "ninjarmm.com"
+      ]
+    },
+    {
+      "id": "nomachine",
+      "name": "NoMachine",
+      "group": "Acesso remoto",
+      "icon": "fa-cube",
+      "description": "Bloqueia NoMachine.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "nomachine.com"
+      ]
+    },
+    {
+      "id": "parsec",
+      "name": "Parsec",
+      "group": "Acesso remoto",
+      "icon": "fa-gamepad",
+      "description": "Bloqueia Parsec.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "parsec.app"
+      ]
+    },
+    {
       "id": "rdp",
       "name": "RDP (Microsoft Remote Desktop)",
       "group": "Acesso remoto",
@@ -694,18 +808,6 @@
       "description": "Bloqueia RDP (Microsoft Remote Desktop).",
       "ndpi_apps": [
         "RDP"
-      ],
-      "ndpi_categories": [],
-      "hosts": []
-    },
-    {
-      "id": "vnc",
-      "name": "VNC (genérico)",
-      "group": "Acesso remoto",
-      "icon": "fa-th",
-      "description": "Bloqueia VNC (genérico).",
-      "ndpi_apps": [
-        "VNC"
       ],
       "ndpi_categories": [],
       "hosts": []
@@ -723,138 +825,53 @@
       ]
     },
     {
-      "id": "nomachine",
-      "name": "NoMachine",
+      "id": "remotepc",
+      "name": "RemotePC",
       "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia NoMachine.",
+      "icon": "fa-tablet",
+      "description": "Bloqueia RemotePC.",
       "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "nomachine.com"
+        "remotepc.com"
+      ]
+    },
+    {
+      "id": "rustdesk",
+      "name": "RustDesk",
+      "group": "Acesso remoto",
+      "icon": "fa-terminal",
+      "description": "Bloqueia RustDesk.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "rustdesk.com",
+        "rustdesk.net"
+      ]
+    },
+    {
+      "id": "splashtop",
+      "name": "Splashtop",
+      "group": "Acesso remoto",
+      "icon": "fa-tint",
+      "description": "Bloqueia Splashtop.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
+      "hosts": [
+        "splashtop.com"
       ]
     },
     {
       "id": "ssh",
       "name": "SSH",
       "group": "Acesso remoto",
-      "icon": "fa-terminal",
+      "icon": "fa-key",
       "description": "Bloqueia SSH. Atenção: pode afectar administração legítima.",
       "ndpi_apps": [
         "SSH"
       ],
       "ndpi_categories": [],
       "hosts": []
-    },
-    {
-      "id": "parsec",
-      "name": "Parsec",
-      "group": "Acesso remoto",
-      "icon": "fa-gamepad",
-      "description": "Bloqueia Parsec.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "parsec.app"
-      ]
-    },
-    {
-      "id": "moonlight",
-      "name": "Moonlight / Sunshine",
-      "group": "Acesso remoto",
-      "icon": "fa-moon-o",
-      "description": "Bloqueia Moonlight / Sunshine.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "moonlight-stream.org"
-      ]
-    },
-    {
-      "id": "hoptodesk",
-      "name": "HopToDesk",
-      "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia HopToDesk.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "hoptodesk.com"
-      ]
-    },
-    {
-      "id": "screenconnect",
-      "name": "ConnectWise ScreenConnect",
-      "group": "Acesso remoto",
-      "icon": "fa-building",
-      "description": "Bloqueia ConnectWise ScreenConnect.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "screenconnect.com",
-        "connectwise.com"
-      ]
-    },
-    {
-      "id": "atera",
-      "name": "Atera",
-      "group": "Acesso remoto",
-      "icon": "fa-cogs",
-      "description": "Bloqueia Atera.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "atera.com"
-      ]
-    },
-    {
-      "id": "ninjaone",
-      "name": "NinjaOne",
-      "group": "Acesso remoto",
-      "icon": "fa-shield",
-      "description": "Bloqueia NinjaOne.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "ninjaone.com",
-        "ninjarmm.com"
-      ]
-    },
-    {
-      "id": "meshcentral",
-      "name": "MeshCentral",
-      "group": "Acesso remoto",
-      "icon": "fa-sitemap",
-      "description": "Bloqueia MeshCentral. Instâncias self-host podem escapar à lista de hosts.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "meshcentral.com"
-      ]
-    },
-    {
-      "id": "datto-rmm",
-      "name": "Datto RMM",
-      "group": "Acesso remoto",
-      "icon": "fa-server",
-      "description": "Bloqueia Datto RMM.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "datto.com"
-      ]
-    },
-    {
-      "id": "todesk",
-      "name": "ToDesk",
-      "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia ToDesk.",
-      "ndpi_apps": [],
-      "ndpi_categories": [],
-      "hosts": [
-        "todesk.com"
-      ]
     },
     {
       "id": "sunlogin",
@@ -870,95 +887,162 @@
       ]
     },
     {
-      "id": "awesun",
-      "name": "AweSun",
+      "id": "supremo",
+      "name": "Supremo",
       "group": "Acesso remoto",
-      "icon": "fa-desktop",
-      "description": "Bloqueia AweSun.",
+      "icon": "fa-star",
+      "description": "Bloqueia Supremo.",
       "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "aweray.com"
+        "supremocontrol.com"
       ]
     },
     {
-      "id": "threads",
-      "name": "Threads",
-      "group": "Redes sociais",
-      "icon": "fa-at",
-      "description": "Bloqueia Threads (Meta).",
+      "id": "teamviewer",
+      "name": "TeamViewer",
+      "group": "Acesso remoto",
+      "icon": "fa-desktop",
+      "description": "Bloqueia TeamViewer.",
       "ndpi_apps": [
-        "Threads"
+        "TeamViewer"
       ],
       "ndpi_categories": [],
       "hosts": [
-        "threads.net",
-        "threads.com"
+        "teamviewer.com"
       ]
     },
     {
-      "id": "bluesky",
-      "name": "Bluesky",
-      "group": "Redes sociais",
-      "icon": "fa-cloud",
-      "description": "Bloqueia Bluesky.",
-      "ndpi_apps": [
-        "Bluesky"
-      ],
+      "id": "todesk",
+      "name": "ToDesk",
+      "group": "Acesso remoto",
+      "icon": "fa-plug",
+      "description": "Bloqueia ToDesk.",
+      "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "bsky.app",
-        "bsky.social",
-        "bsky.network"
+        "todesk.com"
       ]
     },
     {
-      "id": "kick",
-      "name": "Kick",
-      "group": "Redes sociais",
-      "icon": "fa-video-camera",
-      "description": "Bloqueia Kick (lives e streaming).",
-      "ndpi_apps": [
-        "Kick"
-      ],
+      "id": "ultraviewer",
+      "name": "UltraViewer",
+      "group": "Acesso remoto",
+      "icon": "fa-eye",
+      "description": "Bloqueia UltraViewer.",
+      "ndpi_apps": [],
       "ndpi_categories": [],
       "hosts": [
-        "kick.com"
+        "ultraviewer.net",
+        "nanosystems.it"
       ]
     },
     {
-      "id": "rumble",
-      "name": "Rumble",
-      "group": "Redes sociais",
-      "icon": "fa-play",
-      "description": "Bloqueia Rumble.",
+      "id": "vnc",
+      "name": "VNC (genérico)",
+      "group": "Acesso remoto",
+      "icon": "fa-th",
+      "description": "Bloqueia VNC (genérico).",
       "ndpi_apps": [
-        "Rumble"
+        "VNC"
       ],
       "ndpi_categories": [],
+      "hosts": []
+    },
+    {
+      "id": "zoho-assist",
+      "name": "Zoho Assist",
+      "group": "Acesso remoto",
+      "icon": "fa-headphones",
+      "description": "Bloqueia Zoho Assist.",
+      "ndpi_apps": [],
+      "ndpi_categories": [],
       "hosts": [
-        "rumble.com",
-        "rmbl.ws"
+        "zohoassist.com"
       ]
     },
     {
-      "id": "redes-alternativas",
-      "name": "Redes alternativas",
-      "group": "Redes sociais",
-      "icon": "fa-globe",
-      "description": "Agrega Mastodon, Tumblr, VK e SinaWeibo.",
+      "id": "streaming",
+      "name": "Streaming (todos)",
+      "group": "Streaming",
+      "icon": "fa-th-list",
+      "description": "Agrega YouTube, Netflix, Spotify, Twitch, Prime, Disney+, Max, Globoplay, Crunchyroll e mais.",
       "ndpi_apps": [
-        "Mastodon",
-        "Tumblr",
-        "VK",
-        "SinaWeibo"
+        "YouTube",
+        "YouTubeUpload",
+        "NetFlix",
+        "Spotify",
+        "Twitch",
+        "Vimeo",
+        "DisneyPlus",
+        "AmazonVideo",
+        "HBO",
+        "ParamountPlus",
+        "Hulu",
+        "AppleTVPlus"
       ],
       "ndpi_categories": [],
       "hosts": [
-        "mastodon.social",
-        "tumblr.com",
-        "vk.com",
-        "weibo.com"
+        "youtube.com",
+        "googlevideo.com",
+        "ytimg.com",
+        "youtu.be",
+        "netflix.com",
+        "nflxvideo.net",
+        "nflximg.net",
+        "nflxso.net",
+        "nflxext.com",
+        "spotify.com",
+        "scdn.co",
+        "spotifycdn.com",
+        "twitch.tv",
+        "jtvnw.net",
+        "twitchcdn.net",
+        "vimeo.com",
+        "disneyplus.com",
+        "disney-plus.net",
+        "primevideo.com",
+        "amazonvideo.com",
+        "aiv-cdn.net",
+        "max.com",
+        "hbomax.com",
+        "hbo.com",
+        "globoplay.globo.com",
+        "globoplay.com.br",
+        "playback.globo.com",
+        "crunchyroll.com",
+        "vid.crunchyroll.com",
+        "paramountplus.com",
+        "hulu.com",
+        "tv.apple.com"
+      ]
+    },
+    {
+      "id": "musica",
+      "name": "Musica (todas)",
+      "group": "Streaming",
+      "icon": "fa-headphones",
+      "description": "Agrega Spotify, Deezer, SoundCloud, Tidal, IHeartRadio e TuneIn (categoria Music).",
+      "ndpi_apps": [
+        "Spotify",
+        "Deezer",
+        "SoundCloud",
+        "Tidal",
+        "IHeartRadio",
+        "TuneIn"
+      ],
+      "ndpi_categories": [
+        "Music"
+      ],
+      "hosts": [
+        "spotify.com",
+        "scdn.co",
+        "deezer.com",
+        "dzcdn.net",
+        "soundcloud.com",
+        "sndcdn.com",
+        "tidal.com",
+        "tunein.com"
       ]
     },
     {
@@ -1054,7 +1138,7 @@
       "id": "disneyplus",
       "name": "Disney+",
       "group": "Streaming",
-      "icon": "fa-play-circle",
+      "icon": "fa-magic",
       "description": "Bloqueia Disney+.",
       "ndpi_apps": [
         "DisneyPlus"
@@ -1105,7 +1189,7 @@
       "id": "crunchyroll",
       "name": "Crunchyroll",
       "group": "Streaming",
-      "icon": "fa-play-circle",
+      "icon": "fa-rss",
       "description": "Bloqueia Crunchyroll.",
       "ndpi_apps": [],
       "ndpi_categories": [],
@@ -1115,62 +1199,6 @@
         "static.crunchyroll.com",
         "vid.crunchyroll.com",
         "crunchyrollcdn.com"
-      ]
-    },
-    {
-      "id": "streaming",
-      "name": "Streaming",
-      "group": "Streaming",
-      "icon": "fa-play-circle",
-      "description": "Agrega YouTube, Netflix, Spotify, Twitch, Prime, Disney+, Max, Globoplay, Crunchyroll e mais.",
-      "ndpi_apps": [
-        "YouTube",
-        "YouTubeUpload",
-        "NetFlix",
-        "Spotify",
-        "Twitch",
-        "Vimeo",
-        "DisneyPlus",
-        "AmazonVideo",
-        "HBO",
-        "ParamountPlus",
-        "Hulu",
-        "AppleTVPlus"
-      ],
-      "ndpi_categories": [],
-      "hosts": [
-        "youtube.com",
-        "googlevideo.com",
-        "ytimg.com",
-        "youtu.be",
-        "netflix.com",
-        "nflxvideo.net",
-        "nflximg.net",
-        "nflxso.net",
-        "nflxext.com",
-        "spotify.com",
-        "scdn.co",
-        "spotifycdn.com",
-        "twitch.tv",
-        "jtvnw.net",
-        "twitchcdn.net",
-        "vimeo.com",
-        "disneyplus.com",
-        "disney-plus.net",
-        "primevideo.com",
-        "amazonvideo.com",
-        "aiv-cdn.net",
-        "max.com",
-        "hbomax.com",
-        "hbo.com",
-        "globoplay.globo.com",
-        "globoplay.com.br",
-        "playback.globo.com",
-        "crunchyroll.com",
-        "vid.crunchyroll.com",
-        "paramountplus.com",
-        "hulu.com",
-        "tv.apple.com"
       ]
     },
     {
@@ -1201,34 +1229,6 @@
       "hosts": [
         "soundcloud.com",
         "sndcdn.com"
-      ]
-    },
-    {
-      "id": "musica",
-      "name": "Musica",
-      "group": "Streaming",
-      "icon": "fa-headphones",
-      "description": "Agrega Spotify, Deezer, SoundCloud, Tidal, IHeartRadio e TuneIn (categoria Music).",
-      "ndpi_apps": [
-        "Spotify",
-        "Deezer",
-        "SoundCloud",
-        "Tidal",
-        "IHeartRadio",
-        "TuneIn"
-      ],
-      "ndpi_categories": [
-        "Music"
-      ],
-      "hosts": [
-        "spotify.com",
-        "scdn.co",
-        "deezer.com",
-        "dzcdn.net",
-        "soundcloud.com",
-        "sndcdn.com",
-        "tidal.com",
-        "tunein.com"
       ]
     },
     {
@@ -1265,7 +1265,7 @@
       "id": "hulu",
       "name": "Hulu",
       "group": "Streaming",
-      "icon": "fa-television",
+      "icon": "fa-tv",
       "description": "Bloqueia Hulu.",
       "ndpi_apps": [
         "Hulu"
@@ -1280,7 +1280,7 @@
       "id": "vimeo-dailymotion",
       "name": "Vimeo/Dailymotion",
       "group": "Streaming",
-      "icon": "fa-play-circle",
+      "icon": "fa-vimeo",
       "description": "Bloqueia Vimeo e Dailymotion.",
       "ndpi_apps": [
         "Vimeo",
@@ -1318,7 +1318,7 @@
     },
     {
       "id": "gaming",
-      "name": "Jogos",
+      "name": "Jogos (todos)",
       "group": "Jogos",
       "icon": "fa-gamepad",
       "description": "Bloqueia plataformas de jogos (Steam, Xbox, PlayStation, Epic, Blizzard, Nintendo, Riot, Roblox, NetEase).",
@@ -1371,7 +1371,7 @@
       "id": "roblox",
       "name": "Roblox",
       "group": "Jogos",
-      "icon": "fa-cube",
+      "icon": "fa-cubes",
       "description": "Bloqueia Roblox.",
       "ndpi_apps": [
         "Roblox"
@@ -1683,7 +1683,7 @@
       "id": "anti-bypass-dns",
       "name": "Anti-bypass DNS",
       "group": "Segurança e bypass",
-      "icon": "fa-shield",
+      "icon": "fa-random",
       "description": "Bloqueia bypass DNS: DoH, DoT e iCloud Private Relay. Tambem configura Unbound anti-DoH.",
       "ndpi_apps": [
         "DoH_DoT"
@@ -1913,10 +1913,10 @@
     },
     {
       "id": "preset-distracoes",
-      "name": "Distraccoes no trabalho",
+      "name": "Distracoes no trabalho",
       "group": "Presets",
       "icon": "fa-coffee",
-      "description": "Preset: bloqueia distraccoes comuns (redes sociais, streaming, jogos, apostas, namoro).",
+      "description": "Preset: bloqueia distracoes comuns (redes sociais, streaming, jogos, apostas, namoro).",
       "ndpi_apps": [
         "Facebook",
         "Instagram",

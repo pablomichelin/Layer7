@@ -408,11 +408,13 @@ layer7_render_styles();
 		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
+			<?php layer7_render_policies_subnav("test"); ?>
 
 			<p class="layer7-lead"><?= l7_t("Simule o que aconteceria a um fluxo de trafego com as politicas e excepcoes actuais. Util para diagnostico antes de activar o modo enforce."); ?></p>
 
-		<div class="layer7-section" id="l7-test">
-			<h3 class="layer7-section-title"><?= l7_t("Parametros do teste"); ?></h3>
+		<div class="layer7-admin-block" id="l7-test">
+			<div class="layer7-admin-block__header"><?= l7_t("Parametros do teste"); ?></div>
+			<div class="layer7-admin-block__body">
 			<form method="post" action="layer7_test.php#l7-test" class="form-horizontal">
 
 				<div class="form-group">
@@ -470,14 +472,16 @@ layer7_render_styles();
 				</div>
 			</form>
 		</div>
+		</div>
 
 		<?php if ($test_results !== null) {
 			$res = $test_results["results"];
 			$resolved = $test_results["resolved_ips"];
 			$cur_mode = $test_results["mode"];
 		?>
-		<div class="layer7-section">
-			<h3 class="layer7-section-title"><?= l7_t("Resultado do teste"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Resultado do teste"); ?></div>
+			<div class="layer7-admin-block__body">
 
 			<?php if (!empty($resolved)) { ?>
 			<div class="alert alert-info">
@@ -560,6 +564,7 @@ layer7_render_styles();
 			<?php } ?>
 
 			<p class="layer7-muted-note small"><?= l7_t("Esta simulacao usa as politicas e excepcoes do JSON actual. O daemon nDPI pode ter resultados diferentes dependendo da classificacao real do trafego."); ?></p>
+		</div>
 		</div>
 		<?php } ?>
 		</div>

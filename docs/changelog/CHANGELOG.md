@@ -4,8 +4,42 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **BG-108 — UX visual wave 2 (`1.9.33`):** unificação dos KPIs Estado/Relatórios
+  (classes partilhadas `.l7-kpi-card*`), Status e Remoção em `layer7-admin-block`,
+  subnav canónica de Políticas (`layer7_render_policies_subnav`), Kick/Rumble
+  movidos para o grupo Streaming (IDs de política intactos), meta de perfis
+  só-categoria (`N cats`), Chart.js 4.4.4 vendored em
+  `packages/layer7/js/chart.umd.min.js` (sem CDN; empty state se ausente),
+  tipografia do preset «Distracoes no trabalho». Sem mudança de enforcement.
+  Mapa Identity live fica em BG-109. Build/release e promoção pública
+  **não** neste bloco (gate appliance + BG-106).
+
 ### Fixed
 
+- **BG-108:** Chart.js deixava de carregar em ambientes sem CDN; Kick/Rumble
+  apareciam em «Redes sociais»; tipografia «Distraccoes»; cartões só-categoria
+  mostravam `0 apps · 0 hosts`.
+- **BG-107 — Perfis rápidos / Acesso remoto visual:** o grupo «Acesso remoto»
+  deixava de seguir o padrão visual do resto da grelha — todos os cartões
+  caiam no vermelho de alarme do grupo (`#C0392B` / `#E74C3C`), vários
+  glifos FA 4.7 (`fa-moon-o`, `fa-sun-o`) e a marca `fa-chrome` ficavam
+  invisíveis no Font Awesome 6 do pfSense, e a grelha `flex` esticava
+  cartões órfãos em larguras irregulares. Corrigido com cores de marca por
+  produto, aliases FA6 (+ `fab` para Chrome), ícones distintos no catálogo,
+  ordenação pacote→nDPI→A–Z e grelha CSS `auto-fill`. Também alinhadas cores
+  em falta noutros grupos e o ícone de «Videoconferencia».
+- **BG-107 (continuação) — agregados e ícones:** renomeados os pacotes
+  «Redes Sociais / Mensagens / Streaming / Jogos / Videoconferencia /
+  Musica» para o padrão «… (todas/todos)»; ícones duplicados dentro do
+  mesmo grupo eliminados (Comunicação, Streaming, Mensagens, Redes,
+  Segurança); pacotes agregados passam a aparecer primeiro em cada grupo.
+- **BG-107 (continuação) — UX única Acesso Remoto + layout admin-block:**
+  `layer7_remote_access.php` passa a redireccionar para Politicas
+  `#l7-ra` (cartões = caminho canónico); removido o botão lista extra.
+  Páginas Identity, Exceptions, Categories, Test e Reports alinhadas ao
+  padrão `layer7-admin-block` (como MITM/Settings).
 - **BG-105 — sinkhole DNS/local portal:** a decisão DNS bloqueada para o IP
   local do firewall continua auditável como `outcome=sinkhole`, mas o fluxo
   subsequente ao portal não volta a ser classificado nem avaliado por

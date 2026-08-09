@@ -152,22 +152,9 @@ include("head.inc");
 layer7_render_styles();
 ?>
 <style>
-.l7r-cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
-.l7r-card{flex:1;min-width:170px;background:#f7f9fc;border:1px solid #e0e5ec;border-radius:6px;padding:14px;text-align:center}
-.l7r-val{font-size:26px;font-weight:700}
-.l7r-label{font-size:12px;color:#777}
-.l7r-block .l7r-val{color:#d9534f}
-.l7r-allow .l7r-val{color:#5cb85c}
-.l7r-chart{background:#fff;border:1px solid #e5e5e5;border-radius:5px;padding:14px;margin-bottom:18px}
-.l7r-section{margin-top:26px}
-.l7r-title{font-size:20px;font-weight:600;margin:0 0 12px}
-.l7r-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
-.l7r-filters .form-group{margin-bottom:0}
 .l7r-summary{background:#fbfbfb;border:1px solid #e5e5e5;padding:12px 14px;border-radius:6px}
 .l7r-summary ul{margin:0;padding-left:20px}
 .l7r-summary li{margin:4px 0}
-.l7r-inferred{display:inline-block;margin-left:6px;font-size:10px;padding:2px 6px;border-radius:10px;background:#f0ad4e;color:#fff;vertical-align:middle}
-.l7r-note{margin-top:10px;color:#666;font-size:12px}
 </style>
 
 <div class="panel panel-default layer7-page">
@@ -208,6 +195,9 @@ if (!empty($_rpt_notices)) { ?>
 </div>
 <?php } ?>
 
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Filtros e exportacao"); ?></div>
+			<div class="layer7-admin-block__body">
 <form method="get" class="l7r-filters">
 	<div class="form-group">
 		<label><?= l7_t("Periodo"); ?></label><br>
@@ -255,7 +245,7 @@ if (!empty($_rpt_notices)) { ?>
 	</div>
 </form>
 
-<div id="l7-tools" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+<div id="l7-tools" style="margin-bottom:0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-top:12px;">
 	<div>
 		<a href="layer7_reports_export.php?format=html&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">HTML</a>
 		<a href="layer7_reports_export.php?format=csv&range=<?= urlencode($range) ?>&from=<?= urlencode($custom_from ?: date('Y-m-d', $from_ts)) ?>&to=<?= urlencode($custom_to ?: date('Y-m-d', $to_ts)) ?>&src_ip=<?= urlencode($filters["src_ip"]) ?>&host=<?= urlencode($filters["host"]) ?>&action=<?= urlencode($filters["action"]) ?>&q=<?= urlencode($filters["q"]) ?>" class="btn btn-sm btn-default">CSV</a>
@@ -268,26 +258,39 @@ if (!empty($_rpt_notices)) { ?>
 		</button>
 	</form>
 </div>
+			</div>
+		</div>
 
-<p class="text-muted small"><?= htmlspecialchars($period_label); ?></p>
-
-<div class="l7r-cards">
-	<div class="l7r-card"><div class="l7r-val"><?= number_format($total_events); ?></div><div class="l7r-label"><?= l7_t("Tentativas totais"); ?></div></div>
-	<div class="l7r-card l7r-block"><div class="l7r-val"><?= number_format($blocked_events); ?></div><div class="l7r-label"><?= l7_t("Tentativas bloqueadas"); ?></div></div>
-	<div class="l7r-card l7r-allow"><div class="l7r-val"><?= number_format($allowed_events); ?></div><div class="l7r-label"><?= l7_t("Tentativas permitidas"); ?></div></div>
-	<div class="l7r-card"><div class="l7r-val"><?= $block_rate; ?>%</div><div class="l7r-label"><?= l7_t("Indice de bloqueio"); ?></div></div>
-	<div class="l7r-card"><div class="l7r-val"><?= number_format($unique_devices); ?></div><div class="l7r-label"><?= l7_t("Dispositivos observados"); ?></div></div>
-	<div class="l7r-card"><div class="l7r-val"><?= number_format($unique_sites); ?></div><div class="l7r-label"><?= l7_t("Sites observados"); ?></div></div>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Resumo"); ?> <span class="badge"><?= htmlspecialchars($period_label); ?></span></div>
+			<div class="layer7-admin-block__body">
+<div class="l7-kpi-cards">
+	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= number_format($total_events); ?></div><div class="l7-kpi-card__label"><?= l7_t("Tentativas totais"); ?></div></div>
+	<div class="l7-kpi-card l7-kpi-card--danger"><div class="l7-kpi-card__value"><?= number_format($blocked_events); ?></div><div class="l7-kpi-card__label"><?= l7_t("Tentativas bloqueadas"); ?></div></div>
+	<div class="l7-kpi-card l7-kpi-card--success"><div class="l7-kpi-card__value"><?= number_format($allowed_events); ?></div><div class="l7-kpi-card__label"><?= l7_t("Tentativas permitidas"); ?></div></div>
+	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= $block_rate; ?>%</div><div class="l7-kpi-card__label"><?= l7_t("Indice de bloqueio"); ?></div></div>
+	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= number_format($unique_devices); ?></div><div class="l7-kpi-card__label"><?= l7_t("Dispositivos observados"); ?></div></div>
+	<div class="l7-kpi-card"><div class="l7-kpi-card__value"><?= number_format($unique_sites); ?></div><div class="l7-kpi-card__label"><?= l7_t("Sites observados"); ?></div></div>
 </div>
+			</div>
+		</div>
 
-<div class="l7r-section">
-	<h3 class="l7r-title"><?= l7_t("Evolucao no periodo"); ?></h3>
-	<div class="l7r-chart"><canvas id="timelineChart" height="85"></canvas></div>
-</div>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Evolucao no periodo"); ?></div>
+			<div class="layer7-admin-block__body">
+	<div class="l7r-chart" id="l7r-chart-wrap" style="margin-bottom:0;">
+		<canvas id="timelineChart" height="85"></canvas>
+		<div id="l7r-chart-empty" class="alert alert-info" style="display:none;margin:0;"><?= l7_t("Grafico indisponivel (biblioteca offline ausente ou sem dados no periodo)."); ?></div>
+	</div>
+			</div>
+		</div>
 
-<div class="row l7r-section">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Tops"); ?></div>
+			<div class="layer7-admin-block__body">
+<div class="row">
 	<div class="col-md-6">
-		<h3 class="l7r-title"><?= l7_t("Dispositivos com mais bloqueios"); ?></h3>
+		<h4 class="layer7-form-card__title"><?= l7_t("Dispositivos com mais bloqueios"); ?></h4>
 		<?php if (!$rpt_detail_enabled) { ?>
 		<div class="alert alert-info"><?= l7_t("Esta visao requer log detalhado activo."); ?></div>
 		<?php } else { ?>
@@ -312,7 +315,7 @@ if (!empty($_rpt_notices)) { ?>
 		<?php } ?>
 	</div>
 	<div class="col-md-6">
-		<h3 class="l7r-title"><?= l7_t("Sites mais tentados"); ?></h3>
+		<h4 class="layer7-form-card__title"><?= l7_t("Sites mais tentados"); ?></h4>
 		<?php if (!$rpt_detail_enabled) { ?>
 		<div class="alert alert-info"><?= l7_t("Esta visao requer log detalhado activo."); ?></div>
 		<?php } else { ?>
@@ -334,9 +337,12 @@ if (!empty($_rpt_notices)) { ?>
 		<?php } ?>
 	</div>
 </div>
+			</div>
+		</div>
 
-<div class="l7r-section">
-	<h3 class="l7r-title"><?= l7_t("Eventos detalhados"); ?></h3>
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Eventos detalhados"); ?></div>
+			<div class="layer7-admin-block__body">
 	<?php if (!$rpt_detail_enabled) { ?>
 		<div class="alert alert-info"><?= l7_t("Eventos detalhados estao desactivados neste appliance. Active o log detalhado em Definicoes para pesquisa operacional."); ?></div>
 	<?php } else { ?>
@@ -410,22 +416,25 @@ if (!empty($_rpt_notices)) { ?>
 		</nav>
 	<?php } ?>
 	<?php } ?>
-</div>
+			</div>
+		</div>
 
 <?php layer7_render_footer(); ?>
 </div>
 </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="/packages/layer7/js/chart.umd.min.js"></script>
 <script>
 var timeline = <?= json_encode($timeline); ?>;
-if (typeof Chart !== 'undefined' && timeline.length > 0) {
+var chartCanvas = document.getElementById('timelineChart');
+var chartEmpty = document.getElementById('l7r-chart-empty');
+if (typeof Chart !== 'undefined' && timeline.length > 0 && chartCanvas) {
 	var labels = timeline.map(function(x) {
 		var dt = new Date(x.ts * 1000);
 		return dt.toLocaleString();
 	});
-	new Chart(document.getElementById('timelineChart'), {
+	new Chart(chartCanvas, {
 		type: 'line',
 		data: {
 			labels: labels,
@@ -437,6 +446,9 @@ if (typeof Chart !== 'undefined' && timeline.length > 0) {
 		},
 		options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
 	});
+} else {
+	if (chartCanvas) { chartCanvas.style.display = 'none'; }
+	if (chartEmpty) { chartEmpty.style.display = 'block'; }
 }
 </script>
 

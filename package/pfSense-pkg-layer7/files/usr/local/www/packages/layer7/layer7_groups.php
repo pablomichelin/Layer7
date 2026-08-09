@@ -227,6 +227,7 @@ layer7_render_styles();
 		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
+			<?php layer7_render_policies_subnav("groups"); ?>
 
 			<p class="layer7-lead"><?= l7_t("Crie grupos nomeados (ex.: Funcionarios, Visitantes, Sala 3) por CIDR/sub-rede, por IPs individuais ou por dispositivos (MAC). Depois aplique politicas por grupo. Dispositivos por MAC sao resolvidos para o IP actual via DHCP/ARP."); ?></p>
 

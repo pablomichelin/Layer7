@@ -68,7 +68,7 @@
       "id": "logmein",
       "name": "LogMeIn / GoTo Resolve",
       "group": "Consumidor / SMB",
-      "icon": "fa-desktop",
+      "icon": "fa-sign-in",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -83,7 +83,7 @@
       "id": "splashtop",
       "name": "Splashtop",
       "group": "Consumidor / SMB",
-      "icon": "fa-desktop",
+      "icon": "fa-tint",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -117,7 +117,7 @@
       "id": "supremo",
       "name": "Supremo",
       "group": "Consumidor / SMB",
-      "icon": "fa-desktop",
+      "icon": "fa-star",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -128,7 +128,7 @@
       "id": "remotepc",
       "name": "RemotePC",
       "group": "Consumidor / SMB",
-      "icon": "fa-laptop",
+      "icon": "fa-tablet",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -139,7 +139,7 @@
       "id": "isl-online",
       "name": "ISL Online",
       "group": "Consumidor / SMB",
-      "icon": "fa-globe",
+      "icon": "fa-wifi",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -162,7 +162,7 @@
       "id": "getscreen",
       "name": "GetScreen",
       "group": "Consumidor / SMB",
-      "icon": "fa-desktop",
+      "icon": "fa-camera",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -239,7 +239,7 @@
       "id": "nomachine",
       "name": "NoMachine",
       "group": "Protocolos / SO",
-      "icon": "fa-desktop",
+      "icon": "fa-cube",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -250,7 +250,7 @@
       "id": "ssh",
       "name": "SSH",
       "group": "Protocolos / SO",
-      "icon": "fa-terminal",
+      "icon": "fa-key",
       "detection": "ndpi",
       "note": "Atenção: pode afectar administração legítima.",
       "ndpi_apps": [
@@ -284,7 +284,7 @@
       "id": "hoptodesk",
       "name": "HopToDesk",
       "group": "Gaming / média",
-      "icon": "fa-desktop",
+      "icon": "fa-share-alt",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -318,7 +318,7 @@
       "id": "ninjaone",
       "name": "NinjaOne",
       "group": "IT / MSP / RMM",
-      "icon": "fa-shield",
+      "icon": "fa-crosshairs",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -353,7 +353,7 @@
       "id": "todesk",
       "name": "ToDesk",
       "group": "Regionais",
-      "icon": "fa-desktop",
+      "icon": "fa-plug",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [
@@ -376,7 +376,7 @@
       "id": "awesun",
       "name": "AweSun",
       "group": "Regionais",
-      "icon": "fa-desktop",
+      "icon": "fa-picture-o",
       "detection": "host",
       "ndpi_apps": [],
       "hosts": [

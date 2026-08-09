@@ -4265,6 +4265,7 @@ function layer7_profile_icon_render_spec($icon)
 			"fa-android" => true,
 			"fa-apple" => true,
 			"fa-bitcoin" => true,
+			"fa-chrome" => true,
 			"fa-dropbox" => true,
 			"fa-facebook" => true,
 			"fa-facebook-f" => true,
@@ -4316,9 +4317,18 @@ function layer7_profile_icon_render_spec($icon)
 			"fa-file-o" => "fa-file",
 			"fa-clock-o" => "fa-clock",
 			"fa-trash-o" => "fa-trash",
+			"fa-moon-o" => "fa-moon",
+			"fa-sun-o" => "fa-sun",
+			"fa-picture-o" => "fa-image",
+			"fa-handshake-o" => "fa-handshake",
+			"fa-hdd-o" => "fa-hard-drive",
+			"fa-keyboard-o" => "fa-keyboard",
+			"fa-sign-in" => "fa-right-to-bracket",
+			"fa-mobile" => "fa-mobile-screen",
 			"fa-tachometer" => "fa-gauge",
 			"fa-exchange" => "fa-right-left",
 			"fa-bar-chart" => "fa-chart-bar",
+			"fa-money" => "fa-money-bill",
 		);
 	}
 
@@ -6998,6 +7008,24 @@ function layer7_render_styles()
 	.layer7-page .l7-bulk-tools .btn { margin-right: 6px; margin-bottom: 6px; }
 	.layer7-page .l7-detail-grid dt { width: 170px; }
 	.layer7-page .l7-detail-grid dd { margin-left: 190px; margin-bottom: 10px; }
+	/* KPI cards partilhados (Estado + Relatorios) */
+	.layer7-page .l7-kpi-cards { display: flex; flex-wrap: wrap; gap: 14px; margin: 0; }
+	.layer7-page .l7-kpi-card { flex: 1 1 160px; min-width: 150px; max-width: 240px; background: #f9fafb; border: 1px solid #e5e5e5; border-radius: 6px; padding: 18px 16px; text-align: center; box-sizing: border-box; }
+	.layer7-page .l7-kpi-card__value { font-size: 28px; font-weight: 700; color: #333; line-height: 1.1; }
+	.layer7-page .l7-kpi-card__label { font-size: 12px; color: #777; margin-top: 6px; }
+	.layer7-page .l7-kpi-card--danger .l7-kpi-card__value { color: #d9534f; }
+	.layer7-page .l7-kpi-card--success .l7-kpi-card__value { color: #5cb85c; }
+	.layer7-page .l7-kpi-shortcuts { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+	/* Subnav Politicas */
+	.layer7-page .l7-policies-subnav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; padding: 0; list-style: none; }
+	.layer7-page .l7-policies-subnav a { display: inline-block; padding: 6px 12px; font-size: 13px; font-weight: 600; color: #555; background: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 4px; text-decoration: none; }
+	.layer7-page .l7-policies-subnav a:hover { background: #eee; color: #333; text-decoration: none; }
+	.layer7-page .l7-policies-subnav a.active { background: #fff; color: #333; border-color: #bbb; box-shadow: inset 0 -2px 0 #5cb85c; }
+	.layer7-page .l7r-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px; }
+	.layer7-page .l7r-filters .form-group { margin-bottom: 0; }
+	.layer7-page .l7r-chart { background: #fff; border: 1px solid #e5e5e5; border-radius: 5px; padding: 14px; margin-bottom: 0; }
+	.layer7-page .l7r-inferred { display: inline-block; margin-left: 6px; font-size: 10px; padding: 2px 6px; border-radius: 10px; background: #f0ad4e; color: #fff; vertical-align: middle; }
+	.layer7-page .l7r-note { margin-top: 10px; color: #666; font-size: 12px; }
 	</style>';
 }
 
@@ -7019,6 +7047,29 @@ function layer7_render_tabs($active)
 		    htmlspecialchars($item["label"]) . '</a></li>';
 	}
 	echo '</ul>';
+}
+
+/**
+ * Subnav canónica sob as tabs quando a área activa é Políticas (ou subpáginas).
+ *
+ * @param string $active policies|groups|exceptions|categories|test
+ */
+function layer7_render_policies_subnav($active)
+{
+	$items = array(
+		"policies" => array("href" => "layer7_policies.php", "label" => l7_t("Politicas")),
+		"groups" => array("href" => "layer7_groups.php", "label" => l7_t("Grupos")),
+		"exceptions" => array("href" => "layer7_exceptions.php", "label" => l7_t("Excecoes")),
+		"categories" => array("href" => "layer7_categories.php", "label" => l7_t("Categorias nDPI")),
+		"test" => array("href" => "layer7_test.php", "label" => l7_t("Simular teste")),
+	);
+	echo '<nav class="l7-policies-subnav" aria-label="' . htmlspecialchars(l7_t("Politicas")) . '">';
+	foreach ($items as $key => $item) {
+		$cls = ($key === $active) ? ' class="active"' : '';
+		echo '<a href="' . htmlspecialchars($item["href"]) . '"' . $cls . '>' .
+		    htmlspecialchars($item["label"]) . '</a>';
+	}
+	echo '</nav>';
 }
 
 function layer7_render_messages()

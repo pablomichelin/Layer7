@@ -1036,6 +1036,7 @@ function layer7_policy_match_summary($policy) {
 		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
 			<?php layer7_render_messages(); ?>
+			<?php layer7_render_policies_subnav("policies"); ?>
 
 			<p class="layer7-lead"><?= l7_t("Gerir politicas de classificacao e bloqueio."); ?></p>
 
@@ -1138,15 +1139,70 @@ function layer7_policy_match_summary($policy) {
 			"streaming" => "#FF6D00",
 			"gaming" => "#7B2FBE",
 			"vpn-proxy" => "#2C3E50",
-			"remote-access" => "#E74C3C",
+			"remote-access" => "#3D5A80",
 			"anti-bypass-dns" => "#E67E22",
+			/* Acesso remoto — cores por produto (evita muro vermelho do grupo). */
+			"ndpi-remote-category" => "#607D8B",
+			"teamviewer" => "#0E8EE9",
+			"anydesk" => "#EF7B18",
+			"rustdesk" => "#1B9E77",
+			"chrome-remote" => "#4285F4",
+			"logmein" => "#F15A29",
+			"splashtop" => "#00A4E4",
+			"zoho-assist" => "#C62828",
+			"ultraviewer" => "#5C6BC0",
+			"supremo" => "#FFB300",
+			"remotepc" => "#00897B",
+			"isl-online" => "#1565C0",
+			"dwservice" => "#039BE5",
+			"getscreen" => "#7B1FA2",
+			"helpwire" => "#00838F",
+			"aeroadmin" => "#5D4037",
+			"iperius" => "#455A64",
+			"rdp" => "#0078D4",
+			"vnc" => "#37474F",
+			"realvnc" => "#00ADEF",
+			"nomachine" => "#E65100",
+			"ssh" => "#212121",
+			"parsec" => "#F04E32",
+			"moonlight" => "#3949AB",
+			"hoptodesk" => "#2E7D32",
+			"screenconnect" => "#D32F2F",
+			"atera" => "#FF6B00",
+			"ninjaone" => "#1A237E",
+			"meshcentral" => "#546E7A",
+			"datto-rmm" => "#00AEEF",
+			"todesk" => "#1E88E5",
+			"sunlogin" => "#FF8F00",
+			"awesun" => "#FB8C00",
+			/* Outros perfis sem cor de marca (alinhamento visual). */
+			"mensageria" => "#00A884",
+			"videoconferencia" => "#2D8CFF",
+			"redes-alternativas" => "#5C6BC0",
+			"musica" => "#1DB954",
+			"futebol-pirata" => "#C62828",
+			"cloud-gaming" => "#7B2FBE",
+			"cloud-storage" => "#4285F4",
+			"empregos" => "#455A64",
+			"noticias" => "#546E7A",
+			"desporto" => "#2E7D32",
+			"viagens" => "#0277BD",
+			"speedtest" => "#FF6D00",
+			"torrent-p2p" => "#6A1B9A",
+			"apostas" => "#2E7D32",
+			"anonymizers" => "#37474F",
+			"publicidade" => "#F9A825",
+			"mining" => "#795548",
+			"preset-distracoes" => "#00897B",
+			"preset-protecao-infantil" => "#5C6BC0",
+			"preset-higiene" => "#16A085",
 		);
 		$l7_group_colors = array(
 			"Redes sociais" => "#4267B2",
 			"Mensagens" => "#00A884",
 			"Mensageria" => "#00A884", /* legado overlay/custom */
 			"Comunicação e reuniões" => "#2D8CFF",
-			"Acesso remoto" => "#C0392B",
+			"Acesso remoto" => "#3D5A80",
 			"Streaming" => "#FF6D00",
 			"Jogos" => "#7B2FBE",
 			"Produtividade" => "#546E7A",
@@ -1215,6 +1271,48 @@ function layer7_policy_match_summary($policy) {
 				"connected" => $e_connected,
 			);
 		}
+		/* Pacotes agregados primeiro em todos os grupos.
+		 * Acesso remoto: restantes A–Z por nome; outros grupos mantêm
+		 * a ordem relativa do catalogo (popularidade / JSON). */
+		$l7_aggregate_prio = array(
+			"remote-access" => 0,
+			"ndpi-remote-category" => 1,
+			"social" => 0,
+			"mensageria" => 0,
+			"videoconferencia" => 0,
+			"streaming" => 0,
+			"musica" => 1,
+			"gaming" => 0,
+		);
+		$l7_ra_group_label = l7_t("Acesso remoto");
+		foreach ($l7_profiles_by_group as $l7_gk => &$l7_gprofs_sort) {
+			$is_ra = ($l7_gk === $l7_ra_group_label);
+			$first = array();
+			$rest = array();
+			foreach ($l7_gprofs_sort as $gp) {
+				$gid = (string)($gp["id"] ?? "");
+				if ($gid !== "" && isset($l7_aggregate_prio[$gid])) {
+					$first[] = $gp;
+				} else {
+					$rest[] = $gp;
+				}
+			}
+			usort($first, function ($a, $b) use ($l7_aggregate_prio) {
+				$pa = $l7_aggregate_prio[(string)($a["id"] ?? "")] ?? 0;
+				$pb = $l7_aggregate_prio[(string)($b["id"] ?? "")] ?? 0;
+				if ($pa !== $pb) {
+					return $pa - $pb;
+				}
+				return strcasecmp((string)($a["name"] ?? ""), (string)($b["name"] ?? ""));
+			});
+			if ($is_ra) {
+				usort($rest, function ($a, $b) {
+					return strcasecmp((string)($a["name"] ?? ""), (string)($b["name"] ?? ""));
+				});
+			}
+			$l7_gprofs_sort = array_merge($first, $rest);
+		}
+		unset($l7_gprofs_sort);
 		$l7_groups_rendered = array();
 		$l7_render_profile_card = function ($prof, $is_hidden = false) use ($policies, $l7_brand_colors, $l7_group_colors, $l7_prof_hits, $l7_profiles_custom_raw) {
 			$prof_id = isset($prof["id"]) ? htmlspecialchars($prof["id"]) : "";
@@ -1257,10 +1355,17 @@ function layer7_policy_match_summary($policy) {
 				$search_hosts = implode(" ", $prof["hosts"]);
 			}
 			$card_title = $prof_desc !== "" ? $prof_desc : $prof_name;
-			$meta_parts = array(
-				$prof_apps_count . " apps",
-				$prof_hosts_count . " " . l7_t("hosts"),
-			);
+			$prof_cats_count = isset($prof["ndpi_categories"]) && is_array($prof["ndpi_categories"]) ? count($prof["ndpi_categories"]) : 0;
+			$meta_parts = array();
+			if ($prof_cats_count > 0 && $prof_apps_count === 0 && $prof_hosts_count === 0) {
+				$meta_parts[] = $prof_cats_count . " " . l7_t("cats");
+			} else {
+				$meta_parts[] = $prof_apps_count . " apps";
+				$meta_parts[] = $prof_hosts_count . " " . l7_t("hosts");
+				if ($prof_cats_count > 0) {
+					$meta_parts[] = $prof_cats_count . " " . l7_t("cats");
+				}
+			}
 			if ($prof_hit > 0) {
 				$meta_parts[] = $prof_hit . " " . l7_t("hits");
 			}
@@ -1304,9 +1409,6 @@ function layer7_policy_match_summary($policy) {
 				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Opcoes"); ?>" onclick="l7showProfileModal(<?= htmlspecialchars(json_encode($prof_id), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($prof_name), ENT_QUOTES) ?>);"><i class="fa fa-cog"></i></button>
 				<?php } ?>
 				<button type="button" class="l7-profile-icon-btn" title="<?= l7_t("Editar perfil"); ?>" onclick="l7showProfileEditModal(<?= htmlspecialchars(json_encode($prof_id_raw), ENT_QUOTES) ?>, false);"><i class="fa fa-pencil"></i></button>
-				<?php if ($prof_id_raw === "remote-access") { ?>
-				<a href="layer7_remote_access.php" class="l7-profile-icon-btn" title="<?= l7_t("Editor do pacote completo (alternativa aos cartoes individuais)"); ?>"><i class="fa fa-list"></i></a>
-				<?php } ?>
 				<?php if ($is_hidden) { ?>
 				<form method="post" action="layer7_policies.php#l7-policies" style="margin:0;display:inline-block;">
 					<input type="hidden" name="profile_id" value="<?= $prof_id; ?>" />
@@ -1338,6 +1440,7 @@ function layer7_policy_match_summary($policy) {
 			$active_n = $l7_count_group_active($gprofs);
 			$is_presets = !empty($opts["presets"]);
 			$is_hidden_section = !empty($opts["hidden_section"]);
+			$is_ra_group = !empty($opts["remote_access"]);
 			$initial_open = $is_hidden_section ? false : ($active_n > 0);
 			$group_classes = "l7-profile-group";
 			if ($is_presets) {
@@ -1349,8 +1452,9 @@ function layer7_policy_match_summary($policy) {
 			if (!$initial_open) {
 				$group_classes .= " l7-profile-group-collapsed";
 			}
+			$anchor_attr = $is_ra_group ? ' id="l7-ra"' : "";
 		?>
-			<div class="<?= $group_classes; ?>" data-group-id="<?= htmlspecialchars($gid); ?>" data-group-default-open="<?= $initial_open ? "1" : "0"; ?>">
+			<div class="<?= $group_classes; ?>"<?= $anchor_attr; ?> data-group-id="<?= htmlspecialchars($gid); ?>" data-group-default-open="<?= $initial_open ? "1" : "0"; ?>">
 				<div class="l7-profile-group-header" role="button" tabindex="0" onclick="l7toggleProfileGroup(this);" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();l7toggleProfileGroup(this);}">
 					<span class="l7-profile-group-chevron fa fa-chevron-down" aria-hidden="true"></span>
 					<span class="l7-profile-group-title"><?= htmlspecialchars($gname); ?></span>
@@ -1383,6 +1487,7 @@ function layer7_policy_match_summary($policy) {
 			$l7_groups_rendered[$l7_gname] = true;
 			$l7_render_profile_group($l7_gname, $l7_profiles_by_group[$l7_gname], array(
 				"presets" => ($l7_gname === l7_t("Presets")),
+				"remote_access" => ($l7_gname === l7_t("Acesso remoto")),
 			));
 		}
 		foreach ($l7_profiles_by_group as $l7_gname => $l7_gprofs) {
@@ -2394,8 +2499,8 @@ function layer7_policy_match_summary($policy) {
 .l7-profile-group-active-badge { font-size: 11px; font-weight: 600; color: #fff; background: #5cb85c; border-radius: 10px; padding: 2px 8px; white-space: nowrap; }
 .l7-profile-group-body { padding: 12px 14px 14px; }
 .l7-hidden-profiles-help { margin: 0 0 10px 0; font-size: 12px; }
-.l7-profiles-grid { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
-.l7-profile-card { position: relative; display: flex; flex-direction: row; align-items: center; gap: 10px; border: 1px solid #ddd; border-left-width: 1px; border-radius: 6px; padding: 10px 12px; min-height: 64px; flex: 1 1 280px; max-width: 100%; width: auto; background: #fdfdfd; transition: box-shadow 0.15s, border-color 0.15s; box-sizing: border-box; }
+.l7-profiles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: stretch; }
+.l7-profile-card { position: relative; display: flex; flex-direction: row; align-items: center; gap: 10px; border: 1px solid #ddd; border-left-width: 1px; border-radius: 6px; padding: 10px 12px; min-height: 64px; width: 100%; max-width: 100%; background: #fdfdfd; transition: box-shadow 0.15s, border-color 0.15s; box-sizing: border-box; }
 .l7-profile-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .l7-profile-card.l7-profile-on { border-left: 3px solid #5cb85c; padding-left: 10px; }
 .l7-profile-card.l7-profile-card-hidden { opacity: 0.92; }
@@ -2425,7 +2530,8 @@ function layer7_policy_match_summary($policy) {
 .l7-profile-group.l7-profile-group-filter-hidden { display: none; }
 .l7-profile-card.l7-profile-filter-hidden { display: none !important; }
 @media (max-width: 480px) {
-	.l7-profile-card { flex-basis: 100%; max-width: 100%; }
+	.l7-profiles-grid { grid-template-columns: 1fr; }
+	.l7-profile-card { max-width: 100%; }
 	.l7-profiles-search-wrap .form-control { max-width: 100%; width: 100%; }
 }
 .l7-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.45); z-index: 9999; display: flex; align-items: center; justify-content: center; }
@@ -2553,6 +2659,21 @@ function l7initProfileGroups() {
 			g.classList.remove('l7-profile-group-collapsed');
 		} else if (stored === '0') {
 			g.classList.add('l7-profile-group-collapsed');
+		}
+	}
+	/* Bookmark legado layer7_remote_access.php → #l7-ra */
+	if (window.location.hash === '#l7-ra') {
+		var ra = document.getElementById('l7-ra');
+		if (ra) {
+			var hdr = ra.querySelector('.l7-profile-group-header');
+			if (hdr) {
+				l7toggleProfileGroup(hdr, true);
+			}
+			try {
+				ra.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			} catch (e2) {
+				ra.scrollIntoView(true);
+			}
 		}
 	}
 }

@@ -310,7 +310,7 @@ sao pontos coloridos. O grupo **Presets** tem fundo ligeiramente tintado.
 
 Exemplos de perfis individuais: Zoom, Teams, Threads, Bluesky, Deezer, DAZN,
 Anonymizers, Roblox, Free Fire. Agregados: Videoconferencia, Musica, Redes
-alternativas. **Presets:** Distraccoes no trabalho, Protecao infantil, Higiene
+alternativas. **Presets:** Distracoes no trabalho, Protecao infantil, Higiene
 de rede. O atalho **Conteudo adulto** e leve — para cobertura completa use
 blacklists UT1.
 

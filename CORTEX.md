@@ -39,7 +39,16 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `SHA256=40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`; grupo Acesso remoto individual;
 comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
-**Candidato local em validação:** `1.9.31` / BG-105 — evita que o tráfego
+**Candidato local em validação:** `1.9.33` / BG-108 — UX visual wave 2
+(KPI unificado Estado/Relatórios, subnav Políticas, Kick/Rumble→Streaming,
+Chart.js local, Status/Remoção admin-block); sem mudança de enforcement.
+**Código concluído** (`2026-08-08`); Build FreeBSD e appliance **pendentes**.
+Rollback: **`1.9.30`** (público) / `1.9.32` (BG-107) se já no lab.
+**Candidato anterior:** `1.9.32` / BG-107 — padronização visual dos Perfis
+rápidos (Acesso remoto + agregados «(todas/todos)» + ícones únicos + grelha
+CSS), UX única RA (`#l7-ra`) e layout admin-block em Identity/Exceptions/
+Categories/Test/Reports.
+**Candidato anterior:** `1.9.31` / BG-105 — evita que o tráfego
 seguinte ao DNS sinkhole para o IP local do firewall seja reclassificado e
 gere log storm; a decisão DNS permanece auditada como `outcome=sinkhole`.
 Suite local, verificação do port e build FreeBSD PASS (SHA256
@@ -53,9 +62,9 @@ OFF; TLS termina no portal antes da classificação), portanto o evento
 física. Pacote ainda não publicado; rollback local/público: **`1.9.30`**.
 **Risco de release (BG-106):** o builder oficial é FreeBSD 15 e o appliance
 observado é FreeBSD 16; o `pkg` exigiu instalação forçada por arquitetura.
-Integridade, dependências e runtime passaram, mas não promover `1.9.31`
-publicamente antes de artefato nativo FreeBSD 16 ou validação formal de
-compatibilidade.
+Integridade, dependências e runtime passaram, mas não promover `1.9.31`/
+`1.9.32` publicamente antes de artefato nativo FreeBSD 16 ou validação formal
+de compatibilidade.
 **Referencia de producao enforce:** **`1.9.31`** (gate BG-105 parcial PASS
 `2026-08-08`; sem promoção pública). Rollback enforce: **`1.9.30`**.
 Historico: `_69`, `_24`.
@@ -779,16 +788,16 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 | Campo | Valor |
 |-------|-------|
-| Versão visual actual | **`1.9.0`** (PORTAL-PLAN-003 CONCLUIDO, `2026-08-08`) |
+| Versão visual actual | **`2.0.0`** |
 | Arranque | [`docs/10-license-server/portal/README.md`](docs/10-license-server/portal/README.md) |
 | Governação | [`docs/10-license-server/portal/GOVERNANCE.md`](docs/10-license-server/portal/GOVERNANCE.md) |
-| Plano activo | *(nenhum — último: [`PORTAL-PLAN-003`](docs/10-license-server/portal/planos/2026-08-08-operador-fila-contexto.md) CONCLUIDO)* |
-| Alvo | `1.0.0` — completo para **operador único** |
-| Fora de escopo até GO | MSP, self-service, multi-admin vendas, billing |
+| Plano activo | nenhum (004 CONCLUIDO) |
+| Alvo | multi-admin técnicos com permissões seleccionáveis — entregue em `2.0.0` |
+| Fora de escopo até GO | MSP, self-service, billing |
 | Live | `192.168.100.244:/opt/layer7-license` → `https://license.systemup.inf.br` |
 
-**Checkpoint `2026-08-08`:** portal **`1.9.0`** — PORTAL-PLAN-003 CONCLUIDO
-(D0–D5). Planos 001/002/003 fechados.
+**Checkpoint `2026-08-08`:** portal **`2.0.0`** — PORTAL-PLAN-004 CONCLUIDO
+(técnicos + RBAC). Planos 003 e 004 fechados.
 Regra: não saltar blocos do plano portal.
 
 ---

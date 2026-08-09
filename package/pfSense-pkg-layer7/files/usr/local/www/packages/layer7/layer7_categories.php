@@ -29,8 +29,11 @@ layer7_render_styles();
 	<div class="panel-body">
 		<?php layer7_render_tabs("policies"); ?>
 		<div class="layer7-content">
+			<?php layer7_render_policies_subnav("categories"); ?>
 
-		<div class="layer7-section">
+		<div class="layer7-admin-block">
+			<div class="layer7-admin-block__header"><?= l7_t("Categorias nDPI"); ?></div>
+			<div class="layer7-admin-block__body">
 			<p class="layer7-lead"><?= sprintf(l7_t("Referencia de todas as aplicacoes detectaveis pelo nDPI, organizadas por categoria. Total: %d apps em %d categorias."), $total_protos, $total_cats); ?></p>
 
 			<?php if (empty($by_cat)) { ?>
@@ -70,6 +73,7 @@ layer7_render_styles();
 			</div>
 
 			<?php } ?>
+			</div>
 		</div>
 
 		</div>
