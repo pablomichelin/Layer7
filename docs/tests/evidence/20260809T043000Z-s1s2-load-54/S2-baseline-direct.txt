@@ -1,0 +1,4 @@
+n=500
+p50_ms=0.58
+p95_ms=0.67
+path=direct_upstream

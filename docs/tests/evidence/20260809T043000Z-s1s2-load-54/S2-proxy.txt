@@ -1,0 +1,6 @@
+n=500
+p50_ms=3.07
+p95_ms=3.39
+max_ms=5.72
+errors=0
+gate=PASS_le_150ms

@@ -15,9 +15,9 @@ test -f "$CRT" -a -f "$KEY"
 cleanup() {
 	if [ -n "${SPID:-}" ]; then kill -9 "$SPID" 2>/dev/null || true; fi
 	if [ -n "${UPID:-}" ]; then kill -9 "$UPID" 2>/dev/null || true; fi
-	# belt-and-suspenders
-	pkill -9 -f "$OUT --lab-tls-listen" 2>/dev/null || true
-	pkill -9 -f "poc-upstream-stub" 2>/dev/null || true
+	# Avoid pkill -f matching this script/ssh command line.
+	for p in $(pgrep -x layer7-tlsproxy 2>/dev/null || true); do kill -9 "$p" 2>/dev/null || true; done
+	for p in $(pgrep -f '[p]oc-upstream-stub' 2>/dev/null || true); do kill -9 "$p" 2>/dev/null || true; done
 }
 trap cleanup EXIT INT TERM
 

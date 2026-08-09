@@ -1361,10 +1361,10 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab
-- Continuidade: **PoC-4 PASS** (upstream) em `192.168.100.54`; harness anti-hang; 20.10 BLOQUEADO
+- Continuidade: **S1/S2 lab PASS** + PoC-4 em `.54`; S1 inline produto PENDING; 20.10 BLOQUEADO
+- Evidência: docs/tests/evidence/20260809T043000Z-s1s2-load-54/
 - Lab PoC: `root@192.168.100.54`
-- Evidência PoC-4: docs/tests/evidence/20260809T042600Z-poc4-upstream-54/
-- Plano rev.: 2026-08-09x
+- Plano rev.: 2026-08-09y
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS — mitm_effective sempre false sem runtime
@@ -1584,8 +1584,8 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: S1 medido com carga allow+upstream em `.54`; **20.10** BLOQUEADO
-- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-4 PASS)
+- Proximo trabalho: S1 inline (caminho real) exige desenho+GO além do lab localhost; **20.10** BLOQUEADO
+- PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md (S1/S2 lab PASS)
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

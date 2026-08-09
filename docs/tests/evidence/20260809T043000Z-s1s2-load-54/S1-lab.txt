@@ -1,0 +1,4 @@
+cpu_busy_pct_during_500=12.88
+scope=lab_localhost_tls_plus_upstream
+product_inline_mitm=PENDING
+lab_gate=PASS_lt_80pct

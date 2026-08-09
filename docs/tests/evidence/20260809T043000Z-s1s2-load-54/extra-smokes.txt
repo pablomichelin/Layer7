@@ -1,0 +1,4 @@
+CONC_PASS
+allow+block parallel after warm
+NEG: no LAB exit 3
+NEG: upstream 8.8.8.8 refused

@@ -42,12 +42,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO lab** PoC-4 (rev. `2026-08-09x`) |
-| Passo actual | **20.9 PASS**; **PoC-4 PASS** em `.54`; **20.10** **bloqueado** |
-| Pré-20.10 (seguro) | S1 com carga em **`.54`** — [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
-| Lab real | Prod: `.254`+`.234`+`.235`; **PoC:** **`.54`** (`root`) |
-| Rev. do plano | **`2026-08-09x`** |
-| MITM | PoC-4 upstream PASS; `mitm_effective` **false**; GI2/GI3 **DEFERRED** |
+| Plano | Identity **FECHADA**; MITM **GO lab** S1/S2 lab PASS (rev. `2026-08-09y`) |
+| Passo actual | **20.9 PASS**; lab S1/S2/S3/S4; **20.10** **bloqueado** |
+| Pré-20.10 (seguro) | S1 inline produto ainda PENDING — só `.54` até GO |
+| Rev. do plano | **`2026-08-09y`** |
+| MITM | S1/S2 lab PASS; `mitm_effective` **false**; GI2/GI3 **DEFERRED** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |

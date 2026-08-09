@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO lab** (rev. `2026-08-09x`; PoC-4 PASS; 20.10 bloqueado)
+**Estado do plano:** Identity **FECHADA**; MITM **GO lab** (rev. `2026-08-09y`; S1/S2 lab PASS; 20.10 bloqueado)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -29,7 +29,8 @@
 **Rev. `u` (`2026-08-09`)** = **PoC-1 PASS** — IPC PING lab-only; `mitm_effective` false.  
 **Rev. `v` (`2026-08-09`)** = lab `.54` + **PoC-2** TLS localhost PASS (S2); S1 produto PENDING.  
 **Rev. `w` (`2026-08-09`)** = **PoC-3 PASS** — SNI bypass/block + página HTTPS (S3/S4 lab).  
-**Rev. `x` (`2026-08-09`)** = **PoC-4 PASS** — upstream allow localhost; harness anti-hang.
+**Rev. `x` (`2026-08-09`)** = **PoC-4 PASS** — upstream allow localhost; harness anti-hang.  
+**Rev. `y` (`2026-08-09`)** = **S1/S2 lab PASS** (n=500); concurrent+negativos PASS; S1 inline PENDING.
 
 ---
 
@@ -37,17 +38,17 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.9 PASS**; **PoC-4 PASS** em `.54`; **20.10** bloqueado |
-| Código | `0.0.4-poc4` fora do `.pkg` |
-| Próximo | S1 com carga em `.54`; GO produto → 20.10 |
+| Passo actual | **20.9 PASS**; S1/S2/S3/S4 lab; **20.10** bloqueado |
+| Próximo | S1 inline (não localhost) só com desenho+GO; depois GO produto |
 | Lab PoC | **`192.168.100.54`** |
 
 ```text
 TRILHA — progresso
-- PoC-4 PASS (upstream) em 192.168.100.54
-- Harness: run-poc-tests.sh + timeout (sem hang make)
+- S2 lab PASS p95~3.4ms n=500
+- S1 lab PASS (~13% CPU burst); inline produto PENDING
 - 20.10 BLOQUEADO
-- Plano rev.: 2026-08-09x
+- Evidência: 20260809T043000Z-s1s2-load-54
+- Plano rev.: 2026-08-09y
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
