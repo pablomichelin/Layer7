@@ -1591,9 +1591,10 @@ CHECKPOINT CANONICO
 - Proximo trabalho MITM: **P5 só com ficha**; **proibido** piloto externo/permanente; MITM OFF; `.234/.235` proibidos
 - Appliance `.254`: **`1.9.47`** MONITOR / MITM OFF (pós-rollback P4 `234042Z`)
 - Smoke LAB `.24`: allow/block lab-pair **PASS**; `.234/.235` intocados
-- Próximo trabalho docs: manual público do produto (bloco separado); activação enforce/MITM só com novo GO
+- Manual público do produto: **docs/MANUAL-PRODUTO.md** (hub + guia operador; SSOT de navegação pública; comanda → MANUAL-INSTALL)
+- Próximo trabalho docs: manter MANUAL-PRODUTO alinhado a cada release; activação enforce/MITM só com novo GO
 - Pacote publicado (canal `latest`): **1.9.47**; rollback lab: **1.9.46**
-- Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
+- Fonte canonica instalacao (comandos): docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
 ---
@@ -1651,6 +1652,10 @@ CHECKPOINT CANONICO
 
 - A canonicidade passou a estar explicitamente declarada.
 - O projecto ja nao depende da raiz como fonte principal de governanca.
+- O hub público do produto para operadores/clientes é
+  `docs/MANUAL-PRODUTO.md` (ligado a `MANUAL-INSTALL`, licenças, MITM e
+  runbooks; o tutorial `docs/tutorial/guia-completo-layer7.md` permanece
+  preservado e **não** é SSOT).
 - O backlog, o roadmap, o checklist mestre e o mapa de equivalencia passam a
   servir de ponte segura entre chats e entre fases.
 - A F1.2 passou a ter manifesto versionado, assinatura destacada e cadeia

@@ -54,6 +54,7 @@ vence o canónico.
 | Arquivo | Tema | Papel actual | Classificacao | Substitui ou e substituido por | Accao futura sugerida | Fase |
 |---------|------|--------------|---------------|--------------------------------|-----------------------|------|
 | `docs/README.md` | indice oficial | porta de entrada canónica da arvore `docs/` | Canónico | substitui a falta de indice formal | manter vivo | F0+ |
+| `docs/MANUAL-PRODUTO.md` | manual público do produto | hub + guia operador (instalação, GUI, modos, MITM gates, suporte); navega para manuais canónicos por área | Canónico | hub público SSOT de navegação; **não** substitui `MANUAL-INSTALL.md` (comandos) nem o tutorial legado | actualizar a cada release `latest` e veredicto MITM | F0+ |
 | `docs/00-overview/product-charter.md` | charter | resumo canónico de produto/escopo | Canónico | resume `01-VISAO-GERAL-E-ESCOPO.md` | manter vivo | F0+ |
 | `docs/00-overview/document-classification.md` | classificacao | matriz de estatuto dos docs | Canónico | novo | manter vivo quando surgirem conflitos | F0+ |
 | `docs/00-overview/document-equivalence-map.md` | equivalencia | mapa raiz <-> docs | Canónico | novo | manter vivo ate a F6 | F0-F6 |
@@ -210,7 +211,7 @@ vence o canónico.
 | `docs/tests/test-matrix.md` | matriz de testes | matriz canónica de referencia | Canónico | complementar ao plano antigo de testes | manter/rever na F5 | F5 |
 | `docs/tests/templates/f3-scenario-evidence.md` | template de evidencia F3 | template minimo para registo operacional por cenario da F3.7 | Placeholder | novo | manter enquanto a F3 estiver aberta | F3/F5 |
 | `docs/tests/templates/f3-validation-campaign-report.md` | relatorio final de campanha F3 | template canónico do relatorio final unico da campanha de validacao da F3.8 | Placeholder | novo | manter enquanto a F3 estiver aberta | F3/F5 |
-| `docs/tutorial/guia-completo-layer7.md` | tutorial longo | guia amplo preservado para contexto e clientes | Preservado por compatibilidade | nao substitui `MANUAL-INSTALL.md` nem `CORTEX.md` | refrescar numa fase posterior | F7 |
+| `docs/tutorial/guia-completo-layer7.md` | tutorial longo | guia amplo preservado para contexto e clientes | Preservado por compatibilidade | **não** é SSOT; hub público = `docs/MANUAL-PRODUTO.md`; comandos = `MANUAL-INSTALL.md` | refrescar numa fase posterior | F7 |
 
 ---
 
