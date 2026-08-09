@@ -1,6 +1,6 @@
 # ADR-0026 — MITM TLS inspection opt-in (certificado / CA)
 
-**Estado:** Aceito — **runtime shipped** (`1.9.39`–`1.9.46`); teste controlado PASS; **piloto/permanente NO-GO** até mapa+GO (rev. `n`)  
+**Estado:** Aceito — **runtime shipped** (`1.9.39`–`1.9.46`); teste controlado PASS; P1+P2 piloto docs PASS; **activar piloto/permanente NO-GO** até P3+ficha+soak (rev. `o`)  
 **Data:** 2026-08-05  
 **Aceite:** `2026-08-05` — passo **20.2** / GI0  
 **Deferral implementação:** `2026-08-06` — passo **20.7a** (GO operador: PME Identity-first)  
@@ -114,6 +114,7 @@
 | **l** | **2026-08-09** | **S3 PASS** Edge Windows `192.168.100.24`; **20.11 / GI3 PASS**; S6 permanece **NA/limite**; sem GO produção |
 | **m** | **2026-08-09** | **`1.9.42` source_cidr** — rdr MITM exige origem **e** destino; proibido `from any`; produção `.254` continua sem activação automática |
 | **n** | **2026-08-09** | **`1.9.46` + mapa piloto** — Gate C / teste controlado PASS; runtime shipped; piloto **NÃO PRONTO**; permanente NO-GO; próximo P3 failsafe após GO escopo |
+| **o** | **2026-08-09** | **P1+P2 docs** — escopo D1–D9 (CA cliente/GPO, metadados 30d, allow explícito, explicabilidade, break-glass+auto-disable); activação ainda NO-GO até P3 |
 
 ---
 

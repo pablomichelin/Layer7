@@ -1348,8 +1348,10 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 - **Backlog:** BG-085…BG-092 (BG-087 **`1.9.42` PASS**; BG-091 fechado ADR-0029)
 - **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→20.11→**`1.9.42`**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09aq`
-- **Mapa prontidão piloto:** [`docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO**; próximo P1→P3
+- **Rev. plano:** `2026-08-09ar`
+- **Mapa prontidão piloto:** [`docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar**; P1+P2 docs PASS; próximo **P3**
+- **P1 escopo:** [`docs/09-blocking/GO-escopo-piloto-mitm-generico.md`](docs/09-blocking/GO-escopo-piloto-mitm-generico.md)
+- **P2 runbook piloto:** [`docs/09-blocking/runbook-piloto-mitm-generico.md`](docs/09-blocking/runbook-piloto-mitm-generico.md)
 - **Gate D0:** [`docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md`](docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md) — **PASS** (+ [addendum hipóteses](docs/09-blocking/diagnostico-D0-addendum-hipoteses-20260809.md))
 - **Gate D1:** [`docs/09-blocking/gate-D1-leaf-sni-20260809.md`](docs/09-blocking/gate-D1-leaf-sni-20260809.md) — **PASS** (Edge Gate C)
 - **`1.9.44`:** D1 leaf + `timeout --foreground -k` + `daemon -f`; sync ~0.3–0.8s; **B+D/Edge PASS** `20260809T223526Z` ([evidência](docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/); prova sync [202500Z](docs/tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/)); **Gate B PASS**
@@ -1371,14 +1373,15 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **1.9.46** — Gate B+C PASS; GO teste controlado .254 PASS (215442Z)
-- Prontidão piloto: **NÃO PRONTO** — mapa-prontidao-mitm-piloto-2026-08-09.md
+- Prontidão piloto: **NÃO PRONTO activar** (P1+P2 docs PASS) — mapa-prontidao-mitm-piloto-2026-08-09.md
+- P1: GO-escopo-piloto-mitm-generico.md · P2: runbook-piloto-mitm-generico.md
 - Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B/C PASS; prod temporária PASS)
 - 1.9.46: anti-QUIC + filter_configure_sync; Edge sem flags PASS
 - Runbook teste: runbook-activacao-mitm-producao-1.9.46.md (quic_mode=block; ≤15 min; NÃO permanente)
 - Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
 - Preflight: 20260809T215218Z-preflight-mitm-254
 - Evidência GO teste: 20260809T215442Z-phaseBD-d1-254 (rollback OK; baseline OFF)
-- Próximo: P1 GO escopo piloto → P2 runbook piloto → P3 código failsafe/visibilidade
+- Próximo: **P3 código** failsafe/visibilidade
 - Latest publicado: **1.9.46** SHA 10998477…ae72f5
 - Identity rede: FECHADA (20.33 / GI9 PASS); Squid REJEITADO
 ```
@@ -1576,14 +1579,14 @@ CHECKPOINT CANONICO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.46** Gate B+C PASS; **GO teste controlado `.254` PASS** (`215442Z`); permanente **NO-GO**; Squid rejeitado
-- MITM piloto: **NÃO PRONTO** — docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md (P1→P3)
+- MITM piloto: **NÃO PRONTO activar** — P1+P2 docs PASS; mapa + GO-escopo + runbook-piloto; próximo **P3**
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Runbook activação teste: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 - Evidência Gate C: docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/
 - Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
 - Evidência GO teste: docs/tests/evidence/20260809T215442Z-phaseBD-d1-254/
-- Proximo trabalho MITM: P1 GO escopo piloto → P2 runbook piloto → P3 failsafe; MITM OFF; `.234/.235` proibidos
+- Proximo trabalho MITM: **P3** failsafe/visibilidade; MITM OFF; `.234/.235` proibidos
 - Appliance `.254`: pacote **`1.9.46`**; Layer7 **`enabled=true` / `mode=monitor`** / `legacy_global` / MITM OFF / `block_quic=false`; tabelas block vazias; **0** regras `layer7:` / rdr MITM / QUIC L7 — evidência `20260809T225533Z-labpair-54-24` (**PASS**)
 - Smoke LAB `.24`: allow `192.168.100.54:8080` + block `198.18.0.10:8080` (sink `.54`) **PASS**; cleanup `.54`+`.254` completo; `.234/.235` intocados
 - Snapshot pré-G2 conservado no appliance: `/tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254`

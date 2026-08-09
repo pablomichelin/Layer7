@@ -1,7 +1,9 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA PILOTO** — evidência verificável cobre teste controlado temporário; **não** cobre janela piloto operacional/comercial.  
+**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO** — P0/P1/P2 docs **PASS**; faltam P3 (código failsafe) + preenchimento site + soak/evidência.  
+**P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
+**P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
 **Pacote de referência lab/`latest`:** `1.9.46` (`SHA256=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`).  
 **Produção enforce base (sem MITM):** `1.9.8` (inalterada por este mapa).  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
@@ -17,7 +19,7 @@
 | **Teste controlado** | Janela ≤15 min; src `/32` × dst `/32` + SNI lab; rollback imediato | **PASS** `215442Z` |
 | **Piloto** | Janela multi-hora/dias; clientes/destinos nomeados; CA/trust operacional; suporte; critérios de saída; failsafe | **NÃO atingido** |
 | **Permanente / produção MITM** | Intercept ON sem janela de teste; políticas estáveis | **NO-GO** (decisão humana mantida) |
-| **Pronto para piloto** | (a)+(ops)+(GO humano piloto) com evidência; **não** equivale a GO permanente | **NO-GO** neste mapa |
+| **Pronto para piloto** | P1+P2+P3+ficha site+soak com evidência; **não** equivale a GO permanente | **NO-GO activação** (P1/P2 docs OK) |
 
 **Regra:** nenhum documento pode marcar “pronto para piloto” sem evidência de soak/ops + GO humano explícito de piloto.
 
@@ -65,14 +67,14 @@
 
 | ID | Decisão / lacuna | Dono | Bloqueia piloto? |
 |----|------------------|------|------------------|
-| H1 | **GO humano “piloto MITM”** (≠ teste 15 min; ≠ permanente) | Operador | **Sim** |
-| H2 | Definir **escopo piloto:** src CIDRs, dest CIDRs/SNI, duração, horário, abort | Operador | **Sim** |
-| H3 | **Cliente(s) piloto** e processo de trust CA (GPO / manual) | Ops / MSP | **Sim** |
-| H4 | **SKU / entitlement `mitm`** emitido para o site piloto | Comercial + license-server | **Sim** |
-| H5 | Critérios de **saída do piloto** (PASS/FAIL/rollback) | Operador | **Sim** |
-| H6 | Comunicação de limites (ECH, pinning, não-NGFW) | Produto | Sim (honesty) |
-| H7 | Autorizar ou não tocar `.234/.235` / produção real | Operador | Sim se escopo > `.24` |
-| H8 | Janela de suporte / contacto durante piloto | Ops | Sim |
+| H1 | **GO humano “piloto MITM”** (≠ teste 15 min; ≠ permanente) | Operador | **Norma P1 ACEITE**; activação ainda bloqueada |
+| H2 | **Escopo piloto** src/dst/SNI/duração/abort | Operador | **Template P1**; falta ficha site |
+| H3 | CA cliente + GPO/MDM + privkey | Ops / MSP | **D2/D3 + runbook P2**; falta exercício site |
+| H4 | **SKU / entitlement `mitm`** | Comercial + license-server | Campo P1; falta emissão site |
+| H5 | Critérios de **saída** | Operador | **P1 §5** |
+| H6 | Limites (ECH, pinning, não-NGFW) | Produto | **P1 §4** |
+| H7 | `.234/.235` / produção real | Operador | Proibido salvo GO adicional |
+| H8 | Suporte durante piloto | Ops | Campo P1 |
 
 ---
 
@@ -81,7 +83,7 @@
 Cada bloco: objectivo / impacto / risco / teste / rollback.  
 **Parar** se qualquer bloco falhar. **Sem** classificar pronto sem evidência.
 
-### Bloco P0 — Fecho documental / SSOT (este mapa) — **em curso**
+### Bloco P0 — Fecho documental / SSOT (este mapa) — **PASS** (`bc6f5c2`)
 
 | Campo | Valor |
 |-------|--------|
@@ -91,25 +93,25 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | Links vivos; CORTEX/START-HERE/plano/ADR/backlog alinhados |
 | Rollback | Reverter commit docs |
 
-### Bloco P1 — GO humano de escopo piloto (sem código)
+### Bloco P1 — GO / escopo piloto genérico — **PASS docs** (`GO-escopo-piloto-mitm-generico.md`)
 
 | Campo | Valor |
 |-------|--------|
-| Objectivo | Escrita formal: src/dst/SNI, duração, hosts, abort, SKU |
-| Impacto | Desbloqueia P2–P5 |
+| Objectivo | Materializar D1–D9 + formulário site |
+| Impacto | Desbloqueia P2–P5 (norma); não activa |
 | Risco | Baixo |
-| Teste | Checklist H1–H5 preenchida |
-| Rollback | N/A (não activar) |
+| Teste | Checklist P1 §6 |
+| Rollback | Reverter commit docs |
 
-### Bloco P2 — Runbook piloto (docs)
+### Bloco P2 — Runbook piloto genérico — **PASS docs** (`runbook-piloto-mitm-generico.md`)
 
 | Campo | Valor |
 |-------|--------|
-| Objectivo | Runbook distinto do teste 15 min: CA, GPO, monitorização, abort, cleanup |
+| Objectivo | Ops: CA/GPO, metadados 30d, allow explícito, explicabilidade, break-glass, auto-disable |
 | Impacto | Ops |
 | Risco | Baixo |
-| Teste | Revisão cruzada vs runbook `1.9.46` + topologia `198.18` |
-| Rollback | Arquivar draft |
+| Teste | Checklist P2 §11 |
+| Rollback | Reverter commit docs |
 
 ### Bloco P3 — **Primeiro bloco de código** (ver secção e)
 
@@ -198,9 +200,10 @@ O salto teste→piloto falha por **ops + failsafe + visibilidade**, não por fal
 
 ```text
 MITM motor scoped (1.9.46) ........ PRONTO PARA TESTE CONTROLADO (evidência 215442Z)
-MITM pronto para PILOTO ........... NÃO (faltam H1–H5 + P2–P5 + evidência soak)
+P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
+MITM pronto para ACTIVAR PILOTO ... NÃO (faltam P3 + ficha site + soak/evidência)
 MITM permanente / produção ........ NO-GO (decisão humana)
-Primeiro código ................... P3 failsafe+visibilidade (após P1 ou GO explícito)
+Primeiro código ................... P3 failsafe+visibilidade (próximo)
 ```
 
 ---

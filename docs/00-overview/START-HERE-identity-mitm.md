@@ -51,10 +51,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 |-------|-------|
 | Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.46`** (Gate C PASS) |
 | Passo actual | **`1.9.46`** — Gate B+C PASS; **GO teste controlado `.254` PASS** (`215442Z`); permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO** — mapa [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Prontidão piloto | **NÃO PRONTO activar** — P1+P2 docs **PASS**; falta P3+ficha+soak — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | P0 docs (mapa) feito; **P1 GO humano escopo piloto** → P2 runbook piloto → **P3 código failsafe/visibilidade**; MITM OFF até GO; permanente **NO-GO** |
-| Rev. do plano | **`2026-08-09aq`** |
+| Próximo | **P3 código** failsafe/visibilidade; MITM OFF; permanente **NO-GO**; sem activar sem ficha P1 |
+| Rev. do plano | **`2026-08-09ar`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -144,8 +145,8 @@ rdr só source∧dest; anti-QUIC UDP/443 só mitm_src→mitm_dst; quic_mode=bloc
 barra UX PME; Squid rejeitado; S6 ECH = NA/limite; NÃO activar intercept permanente em .254/.234/.235.
 Estado: 1.9.46 Gate B+C PASS; GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente).
 Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md — B/C PASS; prod temporária PASS.
-Tarefa seguinte: mapa prontidão piloto (NÃO PRONTO); P1 GO escopo piloto → P2 runbook → P3 failsafe;
-manter MITM OFF; permanente NO-GO; sem mutar .234/.235.
+Tarefa seguinte: P1+P2 docs PASS; implementar P3 failsafe/visibilidade; manter MITM OFF;
+permanente NO-GO; sem mutar .234/.235; sem activar piloto sem ficha P1.
 ```
 
 
@@ -187,14 +188,15 @@ php tests/functional/test_mitm_config.php
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **1.9.46** — Gate B+C PASS; GO teste controlado .254 PASS (215442Z)
-- Prontidão piloto: **NÃO PRONTO** — docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md
+- Prontidão piloto: **NÃO PRONTO activar** (P1+P2 docs PASS) — mapa-prontidao-mitm-piloto-2026-08-09.md
+- P1: GO-escopo-piloto-mitm-generico.md (D1–D9) · P2: runbook-piloto-mitm-generico.md
 - Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md (B/C PASS; prod temporária PASS)
 - 1.9.46: anti-QUIC UDP/443 src→dst + filter_configure_sync; Edge sem flags PASS
 - Runbook teste: runbook-activacao-mitm-producao-1.9.46.md (quic_mode=block; ≤15 min; NÃO permanente)
 - Evidência Gate C: 20260809T210753Z-phaseBD-d1-254
 - Evidência GO teste: 20260809T215442Z-phaseBD-d1-254 (rollback OK; baseline OFF)
 - Latest publicado: **1.9.46** SHA `10998477…ae72f5`
-- Próximo: P1 GO escopo piloto → P2 runbook piloto → P3 código failsafe; MITM OFF; permanente NO-GO
+- Próximo: **P3 código** failsafe/visibilidade; MITM OFF; permanente NO-GO
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
@@ -218,6 +220,8 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Evidência GO teste controlado | [`../tests/evidence/20260809T215442Z-phaseBD-d1-254/`](../tests/evidence/20260809T215442Z-phaseBD-d1-254/) |
 | Runbook activação prod. | [`../09-blocking/runbook-activacao-mitm-producao-1.9.46.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.46.md) |
 | Mapa prontidão piloto | [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Escopo piloto (P1) | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) |
+| Runbook piloto (P2) | [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | Destino lab `198.18` via `.54` | [`../09-blocking/runbook-destino-lab-19818-via-54.md`](../09-blocking/runbook-destino-lab-19818-via-54.md) |
 | Evidência Fase A `.54` | [`../tests/evidence/20260809T180157Z-phaseA-54/`](../tests/evidence/20260809T180157Z-phaseA-54/) |
 | Evidência Fase B `.254` | [`../tests/evidence/20260809T180624Z-phaseB-254/`](../tests/evidence/20260809T180624Z-phaseB-254/) |

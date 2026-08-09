@@ -166,7 +166,9 @@ vence o canónico.
 | `docs/08-lab/syslog-remote.md` | syslog remoto | guia especifico de lab | Suplementar | complementar a docs de logging | manter | F5/F7 |
 | `docs/09-blocking/README.md` | trilha de bloqueio | índice da área (actualizado `2026-08-09`) | Suplementar (índice) | aponta para reconciliação e gates | manter com SSOT da área | F4+ |
 | `docs/09-blocking/auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md` | reconciliação enforcement | **SSOT decisão** `_24`…`_65` vs `1.9.46` (NO-GO misturar; único pacote lab `1.9.46`) | Canónico | supersede B1/`_31`/`_65` como próximo install | manter; não reinstalar `1.8.11_*` | F4 |
-| `docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md` | prontidão MITM piloto | **SSOT** veredicto piloto (**NÃO PRONTO**); sequência P1–P5 | Canónico | alinha START-HERE / CORTEX / ADR-0026 rev.n | actualizar só com evidência+GO | F4 |
+| `docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md` | prontidão MITM piloto | **SSOT** veredicto (**NÃO PRONTO activar**); P1–P5 | Canónico | alinha START-HERE / CORTEX / ADR-0026 | actualizar só com evidência+GO | F4 |
+| `docs/09-blocking/GO-escopo-piloto-mitm-generico.md` | escopo piloto MITM | **SSOT P1** decisões D1–D9 + formulário site | Canónico | materializa GO humano genérico | preencher ficha por site antes de activar | F4 |
+| `docs/09-blocking/runbook-piloto-mitm-generico.md` | runbook piloto MITM | **SSOT P2** ops (CA/GPO, metadados, break-glass) | Canónico | distinto do teste ≤15 min | não activar sem P3+ficha | F4 |
 | `docs/09-blocking/blocking-master-plan.md` | plano de bloqueio | referencia historica de implementacao concluida | Historico | — | preservar | F6 |
 | `docs/10-license-server/MANUAL-INSTALL.md` | instalacao/upgrade/uninstall | manual operacional principal do pacote | Canónico | substitui instrucoes operacionais dispersas | manter sempre sincronizado | F0+ |
 | `docs/10-license-server/MANUAL-USO-LICENCAS.md` | operacao de licencas | manual canónico do uso do sistema de licencas | Canónico | — | manter vivo quando F2/F3 mexerem em licenciamento | F2/F3 |

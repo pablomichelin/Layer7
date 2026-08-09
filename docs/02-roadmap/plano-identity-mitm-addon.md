@@ -1,13 +1,15 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **`1.9.46`** Gate B+C + teste controlado PASS; piloto **NÃO PRONTO** (rev. `2026-08-09aq`)
+**Estado do plano:** Identity **FECHADA**; MITM **`1.9.46`** Gate B+C + teste controlado PASS; piloto **NÃO PRONTO activar** — P1+P2 docs PASS (rev. `2026-08-09ar`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT de estado vivo do produto:** [`../../CORTEX.md`](../../CORTEX.md)  
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
-**Mapa prontidão piloto:** [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO**  
+**Mapa prontidão piloto:** [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar**  
+**P1 escopo:** [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md)  
+**P2 runbook piloto:** [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md)  
 **Desenho MITM (opção E):** [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime **no `.pkg` desde `1.9.39`**; default OFF; `mitm_effective` gated (texto “AUSENTE” = histórico pré-20.10)  
 **Contrato IPC 20.9:** [`../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)  
 **Runbook S1–S8 pré-runtime:** [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md)  
@@ -49,7 +51,8 @@
 **Rev. `an` (`2026-08-09`)** = candidata **`1.9.46`** — anti-QUIC escopo MITM; Gate C Edge **sem** flags pendente.  
 **Rev. `ao` (`2026-08-09`)** = **`1.9.46` PASS / publicada** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync; MITM prod DEFER.  
 **Rev. `ap` (`2026-08-09`)** = **GO teste controlado `.254` PASS** (`215442Z`) — runbook `1.9.46`; `quic_mode=block`; ≤15 min; rollback OK; permanente **NO-GO**.  
-**Rev. `aq` (`2026-08-09`)** = **Mapa prontidão piloto** — veredicto **NÃO PRONTO**; sequência P1→P5; primeiro código = P3 failsafe/visibilidade.
+**Rev. `aq` (`2026-08-09`)** = **Mapa prontidão piloto** — veredicto **NÃO PRONTO**; sequência P1→P5; primeiro código = P3 failsafe/visibilidade.  
+**Rev. `ar` (`2026-08-09`)** = **P1+P2 docs PASS** — escopo D1–D9 + runbook piloto genérico; activação ainda **NO-GO** até P3+ficha+soak.
 
 ---
 
@@ -58,8 +61,8 @@
 | Campo | Valor |
 |-------|-------|
 | Passo actual | **`1.9.46`** — Gate B+C PASS; **GO teste controlado `.254` PASS**; permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO** — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
-| Próximo | **P1** GO humano escopo piloto → **P2** runbook piloto → **P3** código failsafe; MITM OFF; `.234`/`.235` proibidos |
+| Prontidão piloto | **NÃO PRONTO activar** — P1+P2 docs PASS; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Próximo | **P3** código failsafe/visibilidade; MITM OFF; `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -78,10 +81,10 @@ TRILHA — progresso
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
 - GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
-- Prontidão piloto: NÃO PRONTO (mapa 2026-08-09)
-- Plano rev.: 2026-08-09aq
+- Prontidão piloto: NÃO PRONTO activar (P1+P2 docs PASS)
+- Plano rev.: 2026-08-09ar
 - Lab/latest publicado: 1.9.46 (SHA 10998477…ae72f5)
-- Próximo: P1 GO escopo piloto → P2 runbook → P3 failsafe; permanente NO-GO
+- Próximo: P3 código failsafe; permanente NO-GO
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -592,6 +595,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-09 | **rev. `ag` / 20.11 PASS** — S3 Edge Windows `.24` + screenshot; GI2/GI3 PASS; S6 NA; sem GO produção |
 | 2026-08-09 | **rev. `ap` / GO teste controlado `.254` PASS** — `215442Z`; runbook `1.9.46`; `quic_mode=block`; rollback OK; permanente **NO-GO** |
 | 2026-08-09 | **rev. `aq` / mapa prontidão piloto** — **NÃO PRONTO**; P1→P5; primeiro código P3 failsafe; conflitos “runtime AUSENTE” reconciliados |
+| 2026-08-09 | **rev. `ar` / P1+P2** — GO-escopo D1–D9 + runbook-piloto-mitm-generico; activação NO-GO até P3 |
 | 2026-08-09 | **rev. `ao` / `1.9.46` PASS** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync |
 | 2026-08-09 | **rev. `ah` / `1.9.42` PASS** — `source_cidr`∧`dest_cidr`; proibido `from any`; runbook activação; `.254` sem escrita |
 | 2026-08-09 | **rev. `af` / rev. gerencial 20.11** — overclaim S3/S6 (interino; supersedido por `ag`) |
