@@ -1574,13 +1574,14 @@ CHECKPOINT CANONICO
 - Desenho MITM: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 - Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
 - Pré-20.10 (docs): docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md
+- Lab real: docs/08-lab/lab-topology.md (`.254`/`.234`/`.235`; SSH menu → **8 Shell**)
 - Baseline perf: docs/tests/evidence/20260806T174000Z-20.11a-baseline-perf/
 - Pacote publicado: **1.9.38** (20.9)
 - Hardening: **1.9.9**…**1.9.12** + guia RA **1.9.13**; Identity **1.9.14**…**1.9.29**; RA/UI **1.9.30**…**1.9.38**
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **S1–S8 pré-runtime** (só docs/lab checklist; sem tlsproxy); **20.10** BLOQUEADO; GI2/GI3 runtime DEFERRED; lab AD Identity opcional; GO promoção enforce além 1.9.8; BG-028 fase 1
+- Proximo trabalho: **S1–S8 pré-runtime** com **testes reais** two-client; **20.10** BLOQUEADO; GI2/GI3 runtime DEFERRED; lab AD Identity opcional; GO promoção enforce além 1.9.8; BG-028 fase 1
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md

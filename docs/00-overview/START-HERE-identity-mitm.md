@@ -48,7 +48,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Produção enforce / `latest` (baseline) | **`1.9.8`** pin enforce; lab/`latest` **`1.9.38`** |
 | Rollback enforce conhecido | **`1.9.0`** |
 | Passo actual | **20.9 PASS** (intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; `mitm_effective` sempre false); próximo **20.10** **bloqueado** até S1–S8 + GO lab |
-| Pré-20.10 (seguro) | [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md) — S5/S8 docs+smoke; **sem** tlsproxy / intercept |
+| Pré-20.10 (seguro) | [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md) — S5/S8 docs+**testes reais**; **sem** tlsproxy / intercept |
+| Lab real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — `.254` + `.234` + `.235`; SSH pfSense **8=Shell** |
 | Código do produto nesta trilha | Identity **20.22+ PASS**; MITM **20.8–20.9** em `1.9.38` |
 | Rev. do plano | **`2026-08-08q`** |
 | Entitlement comercial | Modelo **X = base** / **Y = Identity (âncora PME)**; legado **T1**; Y+ MITM (SKU; runtime ainda ausente) |
@@ -138,8 +139,9 @@ Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective sempr
 um passo 20.x por bloco; português; barra UX PME (U*/P*/H*/N*); sem overclaim NGFW;
 sem claim de intercept; Squid rejeitado; não reabrir fecho/IPv6/Identity rede/endpoint sem GO;
 GI2/GI3 runtime DEFERRED até S1–S8 + GO lab.
-Tarefa: continuidade pré-20.10 = runbook S1–S8 (docs/09-blocking/runbook-s1-s8-mitm-pre-runtime.md).
-Executar só S5/S8 docs+smoke OFF; NÃO iniciar layer7-tlsproxy nem intercept; NÃO claim de effective=true.
+Tarefa: continuidade pré-20.10 = runbook S1–S8 com TESTES REAIS
+(docs/08-lab/lab-topology.md: .254/.234/.235; SSH pfSense menu → 8 Shell).
+Executar S5/S8 nos clientes reais; NÃO simular; NÃO tlsproxy/intercept; NÃO claim effective=true.
 ```
 
 ## Prompt — propor desvio / ADR
@@ -160,7 +162,8 @@ Não implementar até GO. Responder em português.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
-- Continuidade agora: **runbook S1–S8 pré-runtime** (S5 parcial + S8 PASS parcial; sem tlsproxy)
+- Continuidade agora: **runbook S1–S8** com **testes reais** `.254`/`.234`/`.235` (S8 PASS parcial; sem tlsproxy)
+- Lab: docs/08-lab/lab-topology.md — SSH pfSense menu → **8 Shell**
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md
@@ -190,6 +193,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Gates | [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md) |
 | Spike MITM + reopen | [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) |
 | Runbook S1–S8 pré-runtime | [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md) |
+| Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |
 | Features / SKU | [`../03-adr/ADR-0025-entitlements-addon-identity-mitm.md`](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) |
 | MITM (intenção 20.9; runtime diferido) | [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) |
 | Identity multi-fonte | [`../03-adr/ADR-0027-identity-userid-multi-fonte.md`](../03-adr/ADR-0027-identity-userid-multi-fonte.md) |

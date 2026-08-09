@@ -14,6 +14,27 @@ claim `mitm_effective=true`, Squid, promoção enforce além de `1.9.8`
 | Spike | [`spike-mitm-20.7.md`](spike-mitm-20.7.md) §4 |
 | Desenho | [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) |
 | Arranque | [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md) |
+| Malha real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — `.254` + `.234` + `.235` |
+
+---
+
+## 0. Lab real (obrigatório — não simular)
+
+| Host | Papel |
+|------|--------|
+| `192.168.100.254` | pfSense + Layer7 |
+| `192.168.100.234` | Ubuntu cliente A (`server`) |
+| `192.168.100.235` | Ubuntu cliente B (`zpro-aimirim`) |
+
+**Regras:**
+
+1. Gates S8 / two-client / ADR-0017 exigem **tráfego real** dos clientes (SSH
+   `root@234` / `root@235` a partir do Mac) — **não** curls só no Mac nem
+   unit tests como substituto.
+2. pfSense: se SSH abrir o **menu**, escolher **`8) Shell`** antes de comandos.
+   Automação deste lab: `root@254` (shell directo).
+3. Appliance **não** alcança SSH aos clientes — orquestrar no Mac.
+4. Hosts são **funcionais em produção** — mutações scoped + rollback no mesmo bloco.
 
 ---
 
@@ -60,23 +81,36 @@ lab já corre `1.9.38` — declarar explicitamente no `run_id`.
 
 ---
 
-## 4. Smoke S8 (executável agora — sem intercept)
+## 4. Smoke S8 — **teste real** (sem intercept)
 
-Pré-requisitos: lab appliance; pacote **`1.9.38`**; modo seguro (preferir
-monitor / sem enforce de produção); snapshot/rollback disponíveis.
+Pré-requisitos: pacote **`1.9.38`** no `.254`; clientes `.234`/`.235` acessíveis
+do Mac; preferir mutações **scoped**; snapshot/rollback disponíveis.
 
-Checklist mínimo:
+Checklist mínimo (**real**):
 
-1. `layer7d -V` → `1.9.38`
-2. Status JSON: `mitm_effective` **false**; `mitm_runtime_available` **false** (ou equivalente)
-3. Com MITM OFF / sem entitlement: domínio bloqueado por política → DNS sinkhole → página HTTP ADR-0017
-4. Confirmar **nenhum** processo `layer7-tlsproxy` / Squid a interceptar
-5. Guardar evidência em  
-   `docs/tests/evidence/<run_id>-s8-mitm-off-1.9.38/`  
-   (`run_id` UTC, ex. `20260809T030000Z-s8-mitm-off-1.9.38`)
+1. Appliance: `layer7d -V` → `1.9.38` (shell; menu → **8**)
+2. Stats: `mitm_effective=false`; `mitm_runtime_available=false`
+3. Sem processos `layer7-tlsproxy` / Squid
+4. **Cliente A e B:** `curl` real a `http(s)://example.com` (esperado 200) —
+   prova de caminho sem MITM
+5. Com política de block + sinkhole activa (quando aplicável): domínio bloqueado
+   → DNS sinkhole → página HTTP ADR-0017 num dos clientes
+6. Evidência em `docs/tests/evidence/<run_id>-s8-…/` com outputs dos **dois**
+   clientes + appliance
 
-**PASS S8:** ADR-0017 intacto + `mitm_effective=false` + sem runtime.  
+**PASS S8:** ADR-0017 intacto (quando block activo) + `mitm_effective=false` +
+sem runtime + two-client sem intercept.  
 **FAIL S8:** qualquer intercept, página HTTPS via MITM, ou effective true.
+
+Orquestração tipica:
+
+```sh
+# Mac → clientes
+ssh root@192.168.100.234 'curl -sS -o /dev/null -w "%{http_code}\n" --max-time 12 http://example.com'
+ssh root@192.168.100.235 'curl -sS -o /dev/null -w "%{http_code}\n" --max-time 12 http://example.com'
+# Mac → appliance
+ssh root@192.168.100.254 'layer7d -V; grep mitm_effective /var/db/layer7/layer7-stats.json'
+```
 
 ---
 
@@ -133,3 +167,4 @@ Rollback de qualquer teste: `mitm.enabled=false`; reinstalar `1.9.37` (lab) ou
 |------|------|
 | 2026-08-08 | Criado na continuidade pós-alinhamento git/docs; passo 20.9 PASS; 20.10 bloqueado |
 | 2026-08-09 | S8 **PASS parcial** lab `1.9.38` — evidência `docs/tests/evidence/20260809T021800Z-s8-mitm-off-1.9.38/` |
+| 2026-08-09 | Lab real obrigatório no runbook; S8 two-client real `20260809T022400Z-s8-real-two-client-1.9.38` |

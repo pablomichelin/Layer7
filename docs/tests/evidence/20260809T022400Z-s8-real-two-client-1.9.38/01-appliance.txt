@@ -1,0 +1,101 @@
+1.9.38
+---
+{
+  "version": "1.9.38",
+  "boot_time": 1786240885,
+  "uptime_seconds": 1380,
+  "timestamp": 1786242265,
+  "total_classified": 25387,
+  "total_blocked": 103,
+  "total_allowed": 25284,
+  "policies_active": 6,
+  "exceptions": 0,
+  "enforce_mode": 1,
+  "pf_add_ok": 0,
+  "pf_add_fail": 0,
+  "dst_add_ok": 103,
+  "dst_add_fail": 0,
+  "cap_pkts": 1572480,
+  "cap_pkts_v4": 1569581,
+  "cap_pkts_v6": 1627,
+  "cap_active": 2637,
+  "cap_active_v4": 2601,
+  "cap_active_v6": 36,
+  "cap_classified": 26517,
+  "cap_classified_v4": 26322,
+  "cap_classified_v6": 195,
+  "cap_expired": 31023,
+  "cap_evicted": 0,
+  "cap_dropped": 0,
+  "captures": 2,
+  "top_apps_blocked": [
+    {"app": "AppleiCloud", "count": 103}
+  ],
+  "top_sources_blocked": [
+    {"ip": "192.168.95.7", "count": 103}
+  ],
+  "license_valid": true,
+  "license_expired": false,
+  "license_grace": false,
+  "license_dev_mode": false,
+  "license_days_left": 699,
+  "license_customer": "Systemup",
+  "license_expiry": "2028-07-08",
+  "license_hardware_id": "e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826",
+  "license_error": "",
+  "license_features": "full",
+  "license_features_flags": 1,
+  "license_features_truncated": false,
+  "identity_active": false,
+  "identity_sessions": 0,
+  "identity_multi_user_sessions": 0,
+  "identity_audit_conflicts": 0,
+  "identity_audit_last_writers": 0,
+  "identity_entitled": false,
+  "mitm_entitled": false,
+  "mitm_runtime_available": false,
+  "mitm_effective": false,
+  "identity_ldap_status": "off",
+  "identity_radius_status": "off",
+  "identity_radius_accepted": 0,
+  "identity_radius_rejected": 0,
+  "identity_dc_status": "off",
+  "identity_dc_accepted": 0,
+  "identity_dc_rejected": 0,
+  "license_check_in_enabled": false,
+  "license_check_in_ok": true,
+  "license_last_check_in": 1785888833,
+  "license_next_check_in": 1786493633,
+  "license_check_in_error": "",
+  "bl_enabled": false,
+  "bl_domains_loaded": 0,
+  "bl_categories_active": 0,
+  "bl_lookups": 0,
+  "bl_hits": 0,
+  "bl_dns_hits": 0,
+  "bl_sni_hits": 0,
+  "bl_rules_active": 0,
+  "bl_top_categories": []
+}
+---
+enabled=true mode="enforce" mitm=null
+---
+no-tlsproxy
+no-squid
+---
+match inet from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+match inet6 from any to <layer7_allow_dst> label "layer7:allow:dst" tag L7ALLOW
+block drop quick inet from <layer7_block> to ! <layer7_localnets> label "layer7:block:src" ! tagged L7ALLOW
+block drop quick inet6 from <layer7_block> to ! <layer7_localnets> label "layer7:block:src6" ! tagged L7ALLOW
+block drop quick inet from any to <layer7_block_dst> label "layer7:block:dst" ! tagged L7ALLOW
+block drop quick inet6 from any to <layer7_block_dst> label "layer7:block:dst6" ! tagged L7ALLOW
+pass in quick on vmx0 inet6 all flags S/SA keep state (if-bound) label "id=1785929863" label "tags=user_rule" label "descr=Layer7 lab GV4 allow IPv6 LAN" ridentifier 1785929863
+---
+index.php
+router.php
+root    nginx       8972  7 tcp4    *:80                  *:*                  
+root    nginx       8972  8 tcp6    *:80                  *:*                  
+root    nginx       8830  7 tcp4    *:80                  *:*                  
+root    nginx       8830  8 tcp6    *:80                  *:*                  
+root    nginx       8810  7 tcp4    *:80                  *:*                  
+root    nginx       8810  8 tcp6    *:80                  *:*                  

@@ -10,6 +10,7 @@
 **Desenho MITM (opção E):** [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime **AUSENTE**  
 **Contrato IPC 20.9:** [`../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)  
 **Runbook S1–S8 pré-runtime:** [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md)  
+**Lab real (testes):** [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — `.254`/`.234`/`.235`; SSH pfSense **8=Shell**  
 **Gates:** [`../09-blocking/plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
@@ -34,12 +35,14 @@
 | ADRs | **Aceito** ×5; T1; **0026 em curso (rev. f — intenção vs effective)**; **0027**; **0029** IM7/IM8 |
 | MITM | **Reopen GO** → 20.8–20.9; runtime AUSENTE; `mitm_effective` **false**; GI2/GI3 runtime **DEFERRED** |
 | Identity rede | **FECHADA** (20.33 / GI9) — não reabrir sem GO |
-| Próximo | Continuidade: **S1–S8 runbook** (S5/S8 agora); **20.10** só após S1–S8 + GO lab |
+| Próximo | Continuidade: **S1–S8 runbook** com **testes reais** (`.254`/`.234`/`.235`); **20.10** só após S1–S8 + GO lab |
+| Lab real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — pfSense menu **8=Shell**; orquestrar Mac→clientes |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (`1.9.38`); próximo **20.10** BLOQUEADO (S1–S8 + GO lab)
-- Continuidade: runbook S1–S8 pré-runtime
+- Continuidade: runbook S1–S8 pré-runtime (**testes reais** `.254`/`.234`/`.235`)
+- Lab: docs/08-lab/lab-topology.md (SSH pfSense → opção **8 Shell** se menu)
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC;
@@ -557,6 +560,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
+| 2026-08-09 | **rev. `r+` / lab real obrigatório** — topologia `.254`/`.234`/`.235`; SSH pfSense opção 8; S8 two-client real; sem simular gates |
 | 2026-08-08 | **rev. `q` / docs align** — `latest` **`1.9.38`** publicado (SHA `7c60f6b1…1dab`); passo continua **20.9 PASS**; 20.10 bloqueado |
 | 2026-08-08 | **rev. `p` / 20.9 PASS** — intenção `mitm.enabled`; bypass endurecido; `quic_mode`; contrato IPC; `mitm_effective` sempre false sem runtime; próximo **20.10** bloqueado (S1–S8+GO lab); ADR-0026 rev. `f`; publicado depois como `1.9.38` |
 | 2026-08-08 | **rev. `o` / 20.8 PASS** — scaffolding publicado `1.9.37`; schema/CA/bypass/status; tlsproxy AUSENTE; Squid rejeitado |

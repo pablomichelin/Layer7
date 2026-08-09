@@ -1,0 +1,37 @@
+server
+    inet 127.0.0.1/8 scope host lo
+    inet 192.168.100.234/24 brd 192.168.100.255 scope global ens160
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+---
+== http://example.com ==
+code=200 time=0.220875
+== https://example.com ==
+code=200 time=0.105457
+== http://www.youtube.com/ ==
+code=301 time=0.221011
+== https://www.youtube.com/ ==
+code=200 time=0.358901
+---DNS---
+142.251.157.4
+142.251.152.4
+142.251.151.4
+142.251.150.4
+142.251.154.4
+172.66.147.243
+104.20.23.154
+---HDR---
+HTTP/1.1 301 Moved Permanently
+Content-Type: application/binary
+X-Content-Type-Options: nosniff
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: Mon, 01 Jan 1990 00:00:00 GMT
+Date: Sun, 09 Aug 2026 02:24:53 GMT
+Location: https://www.youtube.com/
+Server: ESF
+Content-Length: 0
+X-XSS-Protection: 0
+X-Frame-Options: SAMEORIGIN
+
+---BODY---
+
