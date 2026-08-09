@@ -107,7 +107,8 @@
 | **e** | **2026-08-08** | **Aceito — scaffolding 20.8**; reopen GO; runtime diferido até S1–S8; desenho `layer7-tlsproxy` |
 | **f** | **2026-08-08** | **20.9 PASS** — `mitm.enabled` = **intenção**; `mitm_effective` **sempre false** sem runtime; bypass/`quic_mode`/contrato IPC; 20.10 bloqueado |
 | **g** | **2026-08-09** | S5 PASS doc; S7 PASS doc; S8 PASS real ADR-0017 |
-| **h** | **2026-08-09** | **GO lab** — PoC-0 idle `src/layer7-tlsproxy/`; 20.10 ainda exige S1–S4/S6 + GO produto |
+| **h** | **2026-08-09** | **GO lab** — PoC-0 idle `src/layer7-tlsproxy/` |
+| **i** | **2026-08-09** | **PoC-1 PASS** — IPC PING lab; path produto recusado; 20.10 ainda exige S1–S4/S6 + GO produto |
 
 ---
 

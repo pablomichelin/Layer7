@@ -38,3 +38,4 @@ scripts/lab/
 src/layer7d/layer7d
 src/layer7d/layer7d-smoke
 src/layer7-tlsproxy/layer7-tlsproxy
+src/layer7-tlsproxy/.poc-test*.sock

@@ -7,9 +7,11 @@
 **ADR:** [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md)  
 **Não-regressão OFF:** [`../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md`](../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md)
 
-> **Segurança:** este contrato **não** autoriza intercept. O helper **não**
-> existe no pacote `1.9.38` (20.9; inclui scaffolding 20.8). `mitm_effective` permanece **false**
-> até runtime + S1–S8 + GO lab (20.10). Squid **rejeitado**.
+> **Segurança:** este contrato **não** autoriza intercept de produto. O helper
+> **não** está no pacote `1.9.38`. `mitm_effective` permanece **false** até
+> runtime empacotado + S1–S8 + GO produto (20.10). Squid **rejeitado**.
+> PoC lab (`src/layer7-tlsproxy/` PoC-1): socket **só** lab (`/tmp` ou relativo)
+> com `LAYER7_TLSPROXY_LAB=1`; path produto `/var/run/layer7/mitm.sock` recusado.
 
 ---
 
@@ -56,7 +58,8 @@ para MITM, ADR-0017 permanece a verdade.
 | CA cert | `/usr/local/etc/layer7/mitm/ca.crt` | `0644` | Exportável GPO |
 | CA key | `/usr/local/etc/layer7/mitm/ca.key` | `0600` root:wheel | **Nunca** no git / JSON |
 | Config | `/usr/local/etc/layer7.json` → `layer7.mitm` | existente | Sem chave privada |
-| Socket IPC (futuro) | `/var/run/layer7/mitm.sock` | `0660` root:wheel | Unix domain; só local |
+| Socket IPC (futuro produto) | `/var/run/layer7/mitm.sock` | `0660` root:wheel | Unix domain; só com `mitm_effective` |
+| Socket IPC (PoC-1 lab) | `/tmp/layer7-tlsproxy-poc.sock` ou relativo | `0600` | Exige `LAYER7_TLSPROXY_LAB=1`; **não** usar path produto |
 | Pidfile (futuro) | `/var/run/layer7/tlsproxy.pid` | `0644` | |
 
 Socket **só** após `mitm_effective`. Remover socket no stop.

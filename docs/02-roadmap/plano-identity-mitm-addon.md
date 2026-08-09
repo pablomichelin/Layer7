@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity rede **FECHADA**; MITM **reopen GO** (rev. `2026-08-09t`; passo **20.9 PASS** / `1.9.38`; S5+S7+S8 PASS; **GO lab** PoC-0 idle; 20.10 bloqueado)
+**Estado do plano:** Identity rede **FECHADA**; MITM **GO lab** (rev. `2026-08-09u`; **20.9 PASS** / `1.9.38`; PoC-1 IPC PASS; 20.10 bloqueado)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -25,7 +25,8 @@
 **Rev. `q` (`2026-08-08`)** = docs alinhados ao publish **`1.9.38`** (`releases/latest`).  
 **Rev. `r` (`2026-08-08`)** = alinhamento git+SSOT + runbook S1–S8 pré-runtime (sem intercept).  
 **Rev. `s` (`2026-08-09`)** = S5+S7+S8 PASS pré-runtime.  
-**Rev. `t` (`2026-08-09`)** = **GO lab** PoC-0 idle `layer7-tlsproxy`; sem produção; 20.10 bloqueado.
+**Rev. `t` (`2026-08-09`)** = **GO lab** PoC-0 idle `layer7-tlsproxy`; sem produção; 20.10 bloqueado.  
+**Rev. `u` (`2026-08-09`)** = **PoC-1 PASS** — IPC PING lab-only; `mitm_effective` false.
 
 ---
 
@@ -33,22 +34,22 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.9 PASS** (`1.9.38`); **GO lab** PoC-0 idle; **20.10** **bloqueado** |
-| Código | Identity **20.22+ PASS**; MITM **20.8–20.9**; PoC `src/layer7-tlsproxy/` **idle** (fora do `.pkg`) |
-| ADRs | **Aceito** ×5; **0026 rev. g**; **0027**; **0029** |
-| MITM | Reopen + **GO lab**; runtime idle-only; `mitm_effective` **false**; Squid rejeitado |
+| Passo actual | **20.9 PASS** (`1.9.38`); **PoC-1 PASS**; **20.10** **bloqueado** |
+| Código | Identity **20.22+ PASS**; MITM **20.8–20.9**; PoC `src/layer7-tlsproxy/` **IPC** (fora do `.pkg`) |
+| ADRs | **Aceito** ×5; **0026 rev. h+**; **0027**; **0029** |
+| MITM | GO lab; PoC-1 IPC; `mitm_effective` **false**; Squid rejeitado |
 | Identity rede | **FECHADA** (20.33 / GI9) |
-| Próximo | PoC-1 IPC em lab **isolado** (não `.254` prod); medir S1–S4/S6; 20.10 só com GO produto |
+| Próximo | **PoC-2** TLS em VM **isolada** (não `.254`); medir S1–S2; 20.10 só com GO produto |
 | Lab real | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) — menu **8=Shell** |
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.9 PASS**; **GO lab** → PoC-0 idle
+- Passo actual: **20.9 PASS**; **PoC-1 IPC PASS**
 - 20.10 produto: BLOQUEADO (S1–S4/S6 + GO produto)
-- PoC: src/layer7-tlsproxy (idle; sem bind; fora do pkg)
+- PoC: src/layer7-tlsproxy 0.0.1-poc1 (IPC lab; sem TLS/bind prod)
+- Evidência PoC-1: docs/tests/evidence/20260809T031700Z-poc1-ipc-idle/
 - S5+S7+S8: PASS; Identity rede: FECHADA
-- Plano rev.: 2026-08-09t
-- PoC doc: docs/09-blocking/poc-layer7-tlsproxy-lab.md
+- Plano rev.: 2026-08-09u
 - latest: 1.9.38; enforce pin: 1.9.8; Squid: REJEITADO
 ```
 
@@ -556,6 +557,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
+| 2026-08-09 | **rev. `u` / PoC-1 PASS** — IPC PING lab-only; evidência `20260809T031700Z-poc1-ipc-idle`; 20.10 bloqueado |
 | 2026-08-09 | **rev. `t` / GO lab PoC-0** — `src/layer7-tlsproxy` idle; proibido intercept em `.254`/`.234`/`.235`; 20.10 bloqueado |
 | 2026-08-09 | **rev. `s` / S5+S7+S8** — S8 ADR-0017 real PASS; S5 quic bypass PASS doc; S7 privacidade PASS doc; 20.10 bloqueado (S1–S4/S6+GO lab) |
 | 2026-08-09 | **rev. `r+` / lab real obrigatório** — topologia `.254`/`.234`/`.235`; SSH pfSense opção 8; S8 two-client real; sem simular gates |

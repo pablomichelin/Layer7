@@ -162,3 +162,4 @@ Requisitos mínimos se reabrir:
 | 2026-08-06 | **DEFER formal 20.7a** — posicionamento PME; ADR-0026 diferido; avançar IM3 |
 | 2026-08-08 | **Reopen GO** — passo 20.8 scaffolding; desenho `layer7-tlsproxy`; runtime AUSENTE; ADR-0026 rev. `e` |
 | 2026-08-09 | **GO lab** — PoC-0 idle; S5+S7+S8 PASS; 20.10 bloqueado (S1–S4/S6 + GO produto) |
+| 2026-08-09 | **PoC-1 PASS** — IPC PING; evidência `20260809T031700Z-poc1-ipc-idle` |

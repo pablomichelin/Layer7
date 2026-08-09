@@ -40,7 +40,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 BG-087/20.9 MITM intenção vs effective + IPC; sem intercept; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.37`**.
-**MITM:** reopen GO `2026-08-08`; passo **20.9 PASS**; runtime tlsproxy **ausente**.
+**MITM:** reopen GO `2026-08-08`; passo **20.9 PASS**; PoC-1 IPC lab (`src/layer7-tlsproxy`); runtime **fora** do `.pkg`.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
@@ -1361,11 +1361,12 @@ GI2/GI3 runtime **DEFERRED** até S1–S8; **20.10** bloqueado.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab
-- Continuidade: **GO lab** PoC-0 idle (`src/layer7-tlsproxy`); S5+S7+S8 PASS; 20.10 BLOQUEADO
+- Continuidade: **PoC-1 IPC PASS** (`src/layer7-tlsproxy` 0.0.1-poc1); S5+S7+S8 PASS; 20.10 BLOQUEADO
+- Evidência PoC-1: docs/tests/evidence/20260809T031700Z-poc1-ipc-idle/
 - Evidência S8: docs/tests/evidence/20260809T024500Z-s8-adr0017-real-1.9.38/
 - Evidência S5/S7: docs/tests/evidence/20260809T031200Z-s5-s7-pre-runtime/
 - PoC: docs/09-blocking/poc-layer7-tlsproxy-lab.md
-- Plano rev.: 2026-08-09t
+- Plano rev.: 2026-08-09u
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS — mitm_effective sempre false sem runtime
@@ -1585,8 +1586,8 @@ CHECKPOINT CANONICO
 - Campanha two-client lab: PASS (20260805T162500Z-prod-align-two-client-1.9.8)
 - F6: H1–H5 PASS (raiz legado + planos fechados → `docs/archive/`; stubs + banners 【FECHADO】)
 - F7: RELEASE-CHECKLIST + ADR-0023 fase 0; BG-018 telemetria mínima se GO
-- Proximo trabalho: **PoC-1** IPC lab isolado (não `.254` prod); S1–S4/S6; **20.10** BLOQUEADO; GI2/GI3 DEFERRED; GO promoção enforce além 1.9.8; BG-028 fase 1
-- PoC tlsproxy: docs/09-blocking/poc-layer7-tlsproxy-lab.md (GO lab; idle only)
+- Proximo trabalho: **PoC-2** TLS em VM lab isolada (não `.254`/`.234`/`.235`); S1–S4/S6; **20.10** BLOQUEADO; GI2/GI3 DEFERRED; GO promoção enforce além 1.9.8; BG-028 fase 1
+- PoC tlsproxy: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-1 PASS; sem intercept prod)
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 - Arranque manutencao: docs/00-overview/START-HERE-fecho-producao.md
