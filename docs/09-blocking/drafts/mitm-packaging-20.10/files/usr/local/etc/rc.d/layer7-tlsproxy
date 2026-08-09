@@ -1,0 +1,98 @@
+#!/bin/sh
+#
+# DRAFT — layer7-tlsproxy rc.d (prep 20.10)
+# NÃO instalar em package/pfSense-pkg-layer7/files/ sem GO produto.
+#
+# PROVIDES: layer7_tlsproxy
+# REQUIRE: DAEMON NETWORKING
+# KEYWORD: shutdown
+#
+# Default OFF. Upgrade nunca activa. Squid rejeitado.
+
+. /etc/rc.subr
+
+name="layer7_tlsproxy"
+rcvar="${name}_enable"
+load_rc_config "${name}"
+
+: "${layer7_tlsproxy_enable:=NO}"
+
+pidfile="/var/run/layer7-tlsproxy.pid"
+command="/usr/local/sbin/layer7-tlsproxy"
+# Produto futuro: args de serviço definitivos no passo 20.10.
+# Este draft recusa start mesmo com enable=YES (guarda explícita abaixo).
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+status_cmd="${name}_status"
+
+layer7_tlsproxy_pid_from_file()
+{
+	_p=""
+	[ -f "${pidfile}" ] || return 1
+	if ! IFS= read -r _p <"${pidfile}" 2>/dev/null && [ -z "${_p}" ]; then
+		_p=""
+		return 1
+	fi
+	_p=$(printf '%s' "${_p}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+	case "${_p}" in
+	''|*[!0-9]*)
+		_p=""
+		return 1
+		;;
+	esac
+	return 0
+}
+
+layer7_tlsproxy_start()
+{
+	# Hard stop: sem enable explícito não arranca (rc.subr já respeita rcvar;
+	# esta guarda documenta a política para operadores/scripts).
+	checkyesno "${rcvar}" || return 0
+
+	if [ ! -x "${command}" ]; then
+		echo "${name}: binary missing (${command}) — leave OFF" >&2
+		return 1
+	fi
+
+	/bin/mkdir -p /var/run
+	if [ -f "${pidfile}" ]; then
+		if layer7_tlsproxy_pid_from_file && /bin/kill -0 "${_p}" 2>/dev/null; then
+			return 0
+		fi
+		/bin/rm -f "${pidfile}"
+	fi
+
+	# DRAFT: não iniciar intercept. Quando 20.10 existir, aqui valida
+	# entitlement + mitm.enabled + CA antes de daemon(8).
+	echo "${name}: DRAFT start refused until GO produto / 20.10 wiring" >&2
+	return 1
+}
+
+layer7_tlsproxy_stop()
+{
+	_p=""
+	if [ -f "${pidfile}" ] && layer7_tlsproxy_pid_from_file; then
+		:
+	else
+		_p=""
+	fi
+	/bin/rm -f "${pidfile}"
+	[ -n "${_p}" ] && /bin/kill -TERM "${_p}" 2>/dev/null
+	if [ -x /usr/bin/pkill ]; then
+		/usr/bin/pkill -TERM -f "/usr/local/sbin/layer7-tlsproxy" 2>/dev/null || true
+	fi
+	return 0
+}
+
+layer7_tlsproxy_status()
+{
+	if [ -f "${pidfile}" ] && layer7_tlsproxy_pid_from_file && /bin/kill -0 "${_p}" 2>/dev/null; then
+		echo "${name} is running as pid ${_p}."
+		return 0
+	fi
+	echo "${name} is not running (default OFF)."
+	return 1
+}
+
+run_rc_command "$1"

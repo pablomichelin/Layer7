@@ -1,0 +1,6 @@
+# Fragmento proposto — NÃO está no pkg-plist vivo
+# Só merge após GO produto + passo 20.10.
+#
+# Destinos FreeBSD/pfSense (não Linux lab .54):
+/usr/local/sbin/layer7-tlsproxy
+/usr/local/etc/rc.d/layer7-tlsproxy

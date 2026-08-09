@@ -1,7 +1,8 @@
 # START HERE — Identity + MITM Add-on 【MITM GO lab — Opção A S1 inline PASS em .54】
 
 > **MITM lab:** **PoC-5** + **S1/S2 inline Opção A PASS** em `192.168.100.54`.  
-> `mitm_effective` **false**; **sem** intercept em `.254`/`.234`/`.235`. **20.10** bloqueado.
+> Prep 20.10 itens **1–7 PASS** (draft packaging + S8 runtime-present-OFF).  
+> `mitm_effective` **false**; **sem** intercept em `.254`/`.234`/`.235`. **20.10** bloqueado até GO produto.
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -28,7 +29,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md) | Contrato IPC 20.9 — intenção vs `mitm_effective` |
 | [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) | PoC lab pós-GO — **fora** de produção |
 | [`GO-opcao-A-inline-lab-54.md`](../09-blocking/GO-opcao-A-inline-lab-54.md) | GO humano Opção A (inline só `.54`) — **PASS** |
-| [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) | Prep **sem** GO produto — próximo bloco seguro |
+| [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) | Prep **sem** GO produto — itens 1–7 PASS; falta GO humano |
+| [`drafts/mitm-packaging-20.10/`](../09-blocking/drafts/mitm-packaging-20.10/) | Draft pkg-plist/rc/`WITH_LAYER7_TLSPROXY=no` (**fora** do `.pkg`) |
 | ADR-0025 / 0026 / 0027 / 0028 / **0029** | Aceito; **0026** 20.9 + GO lab; **0029** IM7 diferido + IM8 excluído |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** do produto |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Filas **fecho + IPv6** (não reabrir) |
@@ -45,9 +47,9 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Campo | Valor |
 |-------|-------|
 | Plano | Identity **FECHADA**; MITM **GO lab** Opção A inline PASS (rev. `2026-08-09z`) |
-| Passo actual | **20.9 PASS**; lab S1–S4 + inline Opção A; **20.10** **bloqueado** |
-| Pré-20.10 (seguro) | Checklist [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) — falta packaging draft + GO produto |
-| Rev. do plano | **`2026-08-09z`** |
+| Passo actual | **20.9 PASS**; prep 20.10 itens **1–7 PASS**; **20.10** **bloqueado** até GO produto |
+| Pré-20.10 (seguro) | Checklist [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) — **itens 1–7 PASS**; falta só **GO produto** |
+| Rev. do plano | **`2026-08-09aa`** |
 | MITM | S1/S2 lab+inline PASS; `mitm_effective` **false**; GI2/GI3 **DEFERRED** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -132,13 +134,16 @@ Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
 PoC lab: docs/09-blocking/poc-layer7-tlsproxy-lab.md (PoC-5; Opção A PASS).
 GO Opção A: docs/09-blocking/GO-opcao-A-inline-lab-54.md
 Prep 20.10: docs/09-blocking/prep-20.10-checklist.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (prep checklist).
+Draft packaging: docs/09-blocking/drafts/mitm-packaging-20.10/ (fora do .pkg)
+Ler na ordem do START-HERE; executar só o próximo bloco seguro.
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective sempre false sem runtime;
 um passo 20.x por bloco; português; barra UX PME (U*/P*/H*/N*); sem overclaim NGFW;
 sem claim de intercept produto; Squid rejeitado; não reabrir fecho/IPv6/Identity rede/endpoint sem GO;
 NÃO .254/.234/.235 para MITM; NÃO empacotar / mitm_runtime_available=true / 20.10 sem GO produto.
-Estado fechado neste chat: Opção A S1/S2 inline PASS + IPC mock; evidência 20260809T045500Z-s1-inline-opcao-a-54; plano rev. 2026-08-09z.
-Tarefa seguinte: itens abertos do prep-20.10-checklist (pkg-plist/rc draft default OFF; S8 com runtime presente OFF) — ainda SEM GO produto.
+Estado fechado neste chat: Opção A S1/S2 inline PASS + IPC mock; prep itens 1–7 PASS
+(draft packaging + S8 runtime-present-OFF); evidências 20260809T045500Z-s1-inline-opcao-a-54
+e 20260809T050000Z-s8-runtime-present-off-54; plano rev. 2026-08-09aa.
+Tarefa seguinte: **GO produto humano** (checklist item 8) — sem isso, 20.10 continua bloqueado.
 ```
 
 ## Prompt — propor desvio / ADR
@@ -158,12 +163,14 @@ Não implementar até GO. Responder em português.
 ```text
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
-- Próximo código: **20.10** BLOQUEADO até GO produto (prep checklist)
-- Continuidade agora: **Opção A S1/S2 inline PASS** em `.54`; IPC mock PASS; 20.10 BLOQUEADO
+- Próximo código: **20.10** BLOQUEADO até GO produto (prep 1–7 PASS; falta item 8)
+- Continuidade agora: prep packaging draft + S8 runtime-present-OFF PASS; Opção A inline PASS
+- Draft: docs/09-blocking/drafts/mitm-packaging-20.10/
+- Evidência S8 OFF+binário: docs/tests/evidence/20260809T050000Z-s8-runtime-present-off-54/
 - Evidência inline: docs/tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/
 - GO Opção A: docs/09-blocking/GO-opcao-A-inline-lab-54.md
 - Prep (sem GO): docs/09-blocking/prep-20.10-checklist.md
-- Plano rev.: 2026-08-09z
+- Plano rev.: 2026-08-09aa
 - PoC binário lab: `0.0.5-poc5` em `/opt/layer7-poc/` no `.54` (fora do .pkg)
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
@@ -195,6 +202,8 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | PoC lab tlsproxy | [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | GO Opção A (inline `.54`) | [`../09-blocking/GO-opcao-A-inline-lab-54.md`](../09-blocking/GO-opcao-A-inline-lab-54.md) |
 | Prep 20.10 (sem GO) | [`../09-blocking/prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md) |
+| Draft packaging MITM | [`../09-blocking/drafts/mitm-packaging-20.10/`](../09-blocking/drafts/mitm-packaging-20.10/) |
+| Evidência S8 OFF+binário | [`../tests/evidence/20260809T050000Z-s8-runtime-present-off-54/`](../tests/evidence/20260809T050000Z-s8-runtime-present-off-54/) |
 | Evidência S1 inline | [`../tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/`](../tests/evidence/20260809T045500Z-s1-inline-opcao-a-54/) |
 | Runbook S1–S8 pré-runtime | [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../09-blocking/runbook-s1-s8-mitm-pre-runtime.md) |
 | Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |

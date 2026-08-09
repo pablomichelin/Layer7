@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO lab** (rev. `2026-08-09z`; Opção A S1 inline PASS; 20.10 bloqueado)
+**Estado do plano:** Identity **FECHADA**; MITM **GO lab** (rev. `2026-08-09aa`; prep 1–7 PASS; 20.10 bloqueado até GO produto)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -31,7 +31,8 @@
 **Rev. `w` (`2026-08-09`)** = **PoC-3 PASS** — SNI bypass/block + página HTTPS (S3/S4 lab).  
 **Rev. `x` (`2026-08-09`)** = **PoC-4 PASS** — upstream allow localhost; harness anti-hang.  
 **Rev. `y` (`2026-08-09`)** = **S1/S2 lab PASS** (n=500); concurrent+negativos PASS; S1 inline PENDING.  
-**Rev. `z` (`2026-08-09`)** = **GO Opção A** + **S1/S2 inline PASS** (netns+REDIRECT+SO_ORIGINAL_DST); PoC-5; IPC mock; 20.10 ainda bloqueado.
+**Rev. `z` (`2026-08-09`)** = **GO Opção A** + **S1/S2 inline PASS** (netns+REDIRECT+SO_ORIGINAL_DST); PoC-5; IPC mock; 20.10 ainda bloqueado.  
+**Rev. `aa` (`2026-08-09`)** = prep-20.10 itens 1–7 PASS — draft `pkg-plist`/rc/`WITH_LAYER7_TLSPROXY=no` + S8 runtime-present-OFF em `.54`; **sem** merge no `.pkg`; falta só GO produto.
 
 ---
 
@@ -39,18 +40,21 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.9 PASS**; S1–S4 + inline Opção A lab; **20.10** bloqueado |
-| Próximo | Prep 20.10 (checklist) → **GO produto** explícito; sem empacotar antes |
+| Passo actual | **20.9 PASS**; prep 20.10 itens **1–7 PASS**; **20.10** bloqueado até GO produto |
+| Próximo | **GO produto humano** (checklist item 8); sem empacotar / sem `mitm_runtime_available=true` antes |
 | Lab PoC | **`192.168.100.54`** |
+| Draft packaging | [`../09-blocking/drafts/mitm-packaging-20.10/`](../09-blocking/drafts/mitm-packaging-20.10/) |
 
 ```text
 TRILHA — progresso
 - S2 lab PASS p95~3.4ms n=500; S2 inline p95~15.6ms n=50
 - S1 lab+inline PASS (~13% CPU); Opção A GO
 - IPC mock PING/STATUS/DECIDE PASS (effective=false)
-- 20.10 BLOQUEADO (prep-20.10-checklist.md)
-- Evidência: 20260809T045500Z-s1-inline-opcao-a-54
-- Plano rev.: 2026-08-09z
+- Prep 1–7 PASS: draft packaging + S8 runtime-present-OFF
+- Evidência S8 OFF+binário: 20260809T050000Z-s8-runtime-present-off-54
+- Evidência inline: 20260809T045500Z-s1-inline-opcao-a-54
+- 20.10 BLOQUEADO (falta GO produto)
+- Plano rev.: 2026-08-09aa
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -557,7 +561,8 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `f` / 20.25 PASS** — `core/precedence.md` Identity formalizado; GI7.4 unit; passo → **20.26** |
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
-| 2026-08-09 | **rev. `v` / PoC-2** — lab `192.168.100.54`; TLS localhost; S2 p95≈2.8 ms PASS; S1 produto PENDING |
+| 2026-08-09 | **rev. `aa` / prep 20.10 1–7** — draft packaging (`docs/09-blocking/drafts/mitm-packaging-20.10/`); S8 runtime-present-OFF PASS (`20260809T050000Z-s8-runtime-present-off-54`); **sem** merge `.pkg`; falta GO produto |
+| 2026-08-09 | **rev. `z` / GO Opção A + S1 inline** — S1/S2 inline PASS; PoC-5; IPC mock; 20.10 bloqueado |
 | 2026-08-09 | **rev. `u` / PoC-1 PASS** — IPC PING lab-only; evidência `20260809T031700Z-poc1-ipc-idle`; 20.10 bloqueado |
 | 2026-08-09 | **rev. `t` / GO lab PoC-0** — `src/layer7-tlsproxy` idle; proibido intercept em `.254`/`.234`/`.235`; 20.10 bloqueado |
 | 2026-08-09 | **rev. `s` / S5+S7+S8** — S8 ADR-0017 real PASS; S5 quic bypass PASS doc; S7 privacidade PASS doc; 20.10 bloqueado (S1–S4/S6+GO lab) |

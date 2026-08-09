@@ -171,3 +171,4 @@ Rollback de qualquer teste: `mitm.enabled=false`; reinstalar `1.9.37` (lab) ou
 | 2026-08-09 | **S8 PASS** ADR-0017 real (`20260809T024500Z-s8-adr0017-real-1.9.38`) — sem mutar config; sinkhole+página nos dois clientes |
 | 2026-08-09 | **S5+S7 PASS documental** (`20260809T031200Z-s5-s7-pre-runtime`) — quic bypass + privacidade; 20.10 ainda bloqueado (S1–S4/S6+GO lab) |
 | 2026-08-09 | **GO lab** — PoC-0 idle `src/layer7-tlsproxy/`; proibido intercept em `.254`/`.234`/`.235`; ver `poc-layer7-tlsproxy-lab.md` |
+| 2026-08-09 | Prep 20.10 itens 6–7 — draft packaging + **S8 runtime-present-OFF PASS** (`20260809T050000Z-s8-runtime-present-off-54`); 20.10 ainda exige GO produto |

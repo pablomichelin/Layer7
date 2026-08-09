@@ -1,0 +1,38 @@
+=== host ===
+ubuntu
+2026-08-09T04:52:33Z
+=== binary present ===
+-rwxr-xr-x 1 root root 36464 Aug  9 04:41 /opt/layer7-poc/src/layer7-tlsproxy
+layer7-tlsproxy 0.0.5-poc5
+{
+  "service": "layer7-tlsproxy",
+  "version": "0.0.5-poc5",
+  "mode": "poc5",
+  "bind": false,
+  "intercept": false,
+  "ipc_capable": true,
+  "tls_lab_capable": true,
+  "sni_policy": true,
+  "upstream_capable": true,
+  "transparent_capable": true,
+  "mitm_effective_claim": false,
+  "lab_env": true,
+  "status": "ok"
+}
+=== ensure inline down ===
+lab-inline DOWN
+=== no layer7 processes ===
+pgrep: none
+=== no listen 8443/443 (tlsproxy) ===
+ss: no 443/8443 listeners
+=== no netns l7poccli ===
+netns: none
+=== iptables nat REDIRECT check ===
+iptables: no REDIRECT
+=== curl direct (no MITM path) ===
+example_http=200
+=== PASS criteria ===
+runtime_present=yes
+service_running=no
+intercept=no
+mitm_effective_claim=false
