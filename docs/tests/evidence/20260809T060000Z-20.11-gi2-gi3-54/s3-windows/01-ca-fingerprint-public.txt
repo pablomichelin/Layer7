@@ -1,0 +1,2 @@
+subject=CN=Layer7-S3-Ephemeral-CA
+sha256 Fingerprint=7D:E9:8F:4B:DC:C0:B6:EC:BD:2C:3E:02:AA:2B:C6:EE:21:45:65:A1:B8:2B:03:E7:CD:02:3D:D1:E7:DF:1B:66

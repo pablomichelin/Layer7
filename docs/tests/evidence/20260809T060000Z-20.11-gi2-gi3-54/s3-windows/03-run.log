@@ -1,0 +1,30 @@
+START
+HOSTS_EXISTS
+CERTUTIL=Root "Autoridades de Certifica˛“o Raiz Confiﬂveis"
+Assinatura coincide com Chave p∑blica
+Certificados relacionados:
+
+Correspond€ncia exata:
+Elemento 12:
+N∑mero de S⁄rie: 3c61480c2c44e0bf1ffeaaa989ebe6452a64c5e0
+Emissor: CN=Layer7-S3-Ephemeral-CA
+ NotBefore: 09/08/2026 14:23
+ NotAfter: 10/08/2026 14:23
+Requerente: CN=Layer7-S3-Ephemeral-CA
+Assinatura coincide com Chave p∑blica
+Certificado raiz: requerente coincide com o emissor
+Hash Cert(sha1): 0cd1c18a73319ec0f170f858e40c25910b9f7cac
+
+Certificado "Layer7-S3-Ephemeral-CA" jﬂ no repositærio.
+CertUtil: -addstore : comando conclu›do com €xito.
+
+CA_THUMBPRINT=0CD1C18A73319EC0F170F858E40C25910B9F7CAC
+EDGE_VERSION=msedge-present-unknown-version
+EDGE_DIR_VERSION=151.0.4129.72
+EDGE_EXIT=0
+SCREENSHOT_OK size=12383
+HTTP_STATUS=403
+BODY_BLOCK_PAGE=YES
+PEER_SUBJECT=CN=blocked.test
+PEER_ISSUER=CN=Layer7-S3-Ephemeral-CA
+BROWSER_RUN_OK

@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.11 PARCIAL** — GI2 PASS; GI3 PENDENTE S3 (rev. `2026-08-09af`)
+**Estado do plano:** Identity **FECHADA**; MITM **GO produto**; **20.11 PASS** GI2/GI3 (rev. `2026-08-09ag`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -37,7 +37,8 @@
 **Rev. `ac` (`2026-08-09`)** = **20.10b** inicial (`1.9.40`) — listen/rdr/página; **NO-GO** pós-auditoria.  
 **Rev. `ad` (`2026-08-09`)** = **20.10b PASS** correctivo (`1.9.41`) — F1–F6; próximo **20.11**.  
 **Rev. `ae` (`2026-08-09`)** = corrida lab 20.11 + docs `8939ddb` (overclaim S3/S6 — **corrigido**).  
-**Rev. `af` (`2026-08-09`)** = **rev. gerencial:** 20.11 **PARCIAL/NO-GO fecho**; GI2 **PASS**; GI3 **PENDENTE** S3 (browser Windows); S6 **NA/limite**; próximo **lab S3** (sem GO produção).
+**Rev. `af` (`2026-08-09`)** = rev. gerencial interina (S3 pendente; S6 NA).  
+**Rev. `ag` (`2026-08-09`)** = **20.11 PASS** — S3 Edge Windows `192.168.100.24`; GI2/GI3 PASS; S6 **NA/limite**; próximo fecho IM2 / GO produção MITM (humano).
 
 ---
 
@@ -45,8 +46,8 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.11 PARCIAL** (`1.9.41`) — GI2 PASS; GI3 PENDENTE S3 |
-| Próximo | **Lab S3** — browser Windows + CA → GI3.1 (sem GO produção; sem `.254`) |
+| Passo actual | **20.11 PASS** (`1.9.41`) — GI2/GI3 lab (S3 Edge Windows) |
+| Próximo | **Fecho IM2 / GO produção MITM** (humano; sem activar `.254`) |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -57,10 +58,10 @@ TRILHA — progresso
 - GO produto 2026-08-09
 - 20.10a PASS (1.9.39)
 - 20.10b 1.9.40 NO-GO auditoria → 1.9.41 PASS (F1–F6)
-- 20.11 PARCIAL: GI2 PASS; GI3 PENDENTE S3 (curl≠browser); S6 NA/limite
-- Plano rev.: 2026-08-09af
+- 20.11 PASS GI2/GI3 (S3 Edge Windows .24; S6 NA/limite)
+- Plano rev.: 2026-08-09ag
 - Lab/latest: 1.9.41
-- Próximo: lab S3 browser Windows + CA (fechar GI3) — sem GO produção
+- Próximo: fecho IM2 / GO produção MITM (humano)
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -297,7 +298,7 @@ Histórico PME (`2026-08-06`): DEFER 20.7a; Squid **rejeitado**; Identity-first 
 | **20.8** | Scaffolding: schema `mitm.*` OFF; gestão CA; bypass GUI; `mitm_entitled` no status daemon; `enabled` forçado false; **sem** `layer7-tlsproxy` | **PASS** (`1.9.37`, `2026-08-08`) |
 | **20.9** | Toggle **intenção** `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC; `mitm_effective` **sempre false** sem runtime | **PASS** (`1.9.38`, `2026-08-08`) |
 | **20.10** | Intercept selectivo; block page HTTPS — **exige** runtime + S1–S8 + GO lab + **GO produto** | **20.10a PASS**; **20.10b PASS** (`1.9.40`) |
-| **20.11** | Lab CA; GI2–GI3 runtime | **PARCIAL** — GI2 PASS; GI3 PENDENTE S3 (browser Windows); S6 NA |
+| **20.11** | Lab CA; GI2–GI3 runtime | **PASS** (`1.9.41`; S3 Edge Windows; S6 NA) |
 
 **Veredicto 20.7a (histórico):** **DEFER** — Identity avançou; Squid rejeitado.
 
@@ -568,7 +569,8 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-08 | **rev. `g` / 20.26 GI7 PASS unitário** — testes GI7.1–7.5; lab residual; passo → **20.27** |
 | 2026-08-08 | **rev. `r` / alinhamento + S1–S8 runbook** — git `1.9.38`+portal `2.0.0` em origin; MANUAL SHA; runbook pré-runtime; 20.10 bloqueado |
 | 2026-08-09 | **rev. `ab` / GO produto + 20.10a** — runtime no `.pkg`; rc OFF; intercept_ready=false; candidato `1.9.39`; próximo **20.10b** |
-| 2026-08-09 | **rev. `af` / rev. gerencial 20.11** — corrige overclaim: GI2 PASS; GI3 PENDENTE S3; S6 NA/limite; 20.11 PARCIAL; próximo lab S3 browser Windows |
+| 2026-08-09 | **rev. `ag` / 20.11 PASS** — S3 Edge Windows `.24` + screenshot; GI2/GI3 PASS; S6 NA; sem GO produção |
+| 2026-08-09 | **rev. `af` / rev. gerencial 20.11** — overclaim S3/S6 (interino; supersedido por `ag`) |
 | 2026-08-09 | **rev. `ae` / 20.11 corrida** — lab `.54` (`1.9.41`); docs `8939ddb` overclaim S3/S6 (supersedido por `af`) |
 | 2026-08-09 | **rev. `ac` / 20.10b PASS** — listen selectivo + PF rdr + página HTTPS; `1.9.40`; próximo **20.11** |
 | 2026-08-09 | **rev. `aa` / prep 20.10 1–7** — draft packaging (`docs/09-blocking/drafts/mitm-packaging-20.10/`); S8 runtime-present-OFF PASS (`20260809T050000Z-s8-runtime-present-off-54`); **sem** merge `.pkg`; falta GO produto |

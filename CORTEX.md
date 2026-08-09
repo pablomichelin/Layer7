@@ -42,7 +42,7 @@ BG-087/20.10b correctivo pós-auditoria adversária do `1.9.40` (F1–F6);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.40`**.
 **MITM:** **GO produto** `2026-08-09`; **20.10a PASS**; **20.10b PASS** (`1.9.41`);
-**20.11 PARCIAL** (GI2 PASS; GI3 PENDENTE S3 browser Windows); **sem** intercept produção `.254/.234/.235`.
+**20.11 PASS** GI2/GI3 lab (S3 Edge Windows; S6 NA); **sem** intercept produção `.254/.234/.235`.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
@@ -1320,10 +1320,10 @@ Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
 Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.41`** (20.10b + 20.11 lab).
 **IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
 **20.8 PASS** → **20.9 PASS** → **GO produto** → **20.10a PASS** → **20.10b PASS** →
-**20.11 PARCIAL** (GI2 PASS; GI3 PENDENTE S3);
+**20.11 PASS** GI2/GI3 (S3 Edge Windows; S6 NA);
 **IM3–IM9 Identity rede FECHADA** (20.33 / GI9 PASS). **Nicho:** PME / MSP.
 **MITM:** `intercept_ready=true`; listen/rdr/página gated por `mitm_effective`;
-default OFF; Squid **rejeitado**; GI2 **PASS**; GI3 **PENDENTE** S3; S6 **NA/limite**.
+default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 
 - **Arranque (único desta trilha):**
   [`docs/00-overview/START-HERE-identity-mitm.md`](docs/00-overview/START-HERE-identity-mitm.md)
@@ -1343,10 +1343,10 @@ default OFF; Squid **rejeitado**; GI2 **PASS**; GI3 **PENDENTE** S3; S6 **NA/lim
   [`docs/09-blocking/plano-gates-identity-mitm.md`](docs/09-blocking/plano-gates-identity-mitm.md)
 - **ADRs:** 0025–0029 (0026 implementação em curso; 0029 IM7 diferido)
 - **Spike MITM:** [`docs/09-blocking/spike-mitm-20.7.md`](docs/09-blocking/spike-mitm-20.7.md)
-- **Backlog:** BG-085…BG-092 (BG-087 **20.11 PARCIAL**; BG-091 fechado ADR-0029)
-- **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→**20.11 PARCIAL**
+- **Backlog:** BG-085…BG-092 (BG-087 **20.11 PASS**; BG-091 fechado ADR-0029)
+- **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→**20.11 PASS**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
-- **Rev. plano:** `2026-08-09af`
+- **Rev. plano:** `2026-08-09ag`
 - **Evidência 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](docs/tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/)
 - **Auditoria pós-release 20.10b:** [`docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/`](docs/tests/evidence/20260809T053000Z-20.10b-postrelease-audit/)
 - **Evidência 20.11:** [`docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`](docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/)
@@ -1356,11 +1356,11 @@ default OFF; Squid **rejeitado**; GI2 **PASS**; GI3 **PENDENTE** S3; S6 **NA/lim
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.11 PARCIAL** (`1.9.41`; GI2 PASS; GI3 PENDENTE S3)
-- Próximo: lab S3 browser Windows + CA (fechar GI3.1) — sem GO produção
+- Passo actual: **20.11 PASS** (`1.9.41`; GI2/GI3; S3 Edge Windows)
+- Próximo: fecho IM2 / GO produção MITM (humano)
 - Latest: **1.9.41** SHA `1518ad68…c1f4`
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- Squid: REJEITADO; GI2 PASS; GI3 PENDENTE; S6 NA/limite; sem intercept produção
+- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; sem intercept produção
 ```
 
 ---
@@ -1549,16 +1549,16 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-09 (20.11 PARCIAL — GI2 PASS; GI3 PENDENTE S3)
+- Data base: 2026-08-09 (20.11 PASS GI2/GI3 — S3 Edge Windows; S6 NA)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.41** (BG-087/20.10b; SHA `1518ad68…c1f4`)
+- Canal publico latest: **1.9.41** (BG-087/20.10b+20.11; SHA `1518ad68…c1f4`)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **20.11 PARCIAL** (GI2 PASS; GI3 PENDENTE S3 browser Windows; S6 NA); Squid rejeitado
+- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **20.11 PASS** GI2/GI3; S6 NA; próximo fecho IM2 / GO produção MITM (humano); Squid rejeitado
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
-- Proximo trabalho: **lab S3** (browser Windows + CA) — NÃO GO produção MITM; sem intercept .254/.234/.235
+- Proximo trabalho: fecho IM2 / GO produção MITM (humano) — sem activar intercept .254/.234/.235 sem GO
 - Pacote publicado: **1.9.41**; rollback lab: **1.9.40**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md

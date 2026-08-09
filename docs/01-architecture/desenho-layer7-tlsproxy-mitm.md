@@ -30,8 +30,8 @@
 | Veredicto spike 20.7a (histórico) | **DEFER** — Squid rejeitado; Identity avançou |
 | Fase actual | Desenho + **PoC-0 idle** (sem bind/TLS) |
 | Código `layer7-tlsproxy` | **Idle no repo** (`src/layer7-tlsproxy/`); **fora** do `.pkg` |
-| Medições S1–S8 | S1/S2/S4/S5/S7/S8 lab PASS; **S3 PENDENTE** (browser Windows); **S6 NA/limite** |
-| Intercept selectivo / 20.10–20.11 | **20.10b PASS**; **20.11 PARCIAL** (`1.9.41`); gated; sem produção |
+| Medições S1–S8 | S1–S5/S7/S8 PASS; **S3 PASS** Edge Windows; **S6 NA/limite** |
+| Intercept selectivo / 20.10–20.11 | **20.10b+20.11 PASS** (`1.9.41`); gated; sem produção |
 | Identity (User-ID de rede) | **FECHADA** — fora do escopo deste desenho |
 | Entitlement SKU `mitm` | Pode existir (ADR-0025/0026); `mitm_effective` só com gates |
 
@@ -143,7 +143,7 @@ Procedimento canónico: [`../09-blocking/runbook-s1-s8-mitm-pre-runtime.md`](../
 |---|----------|--------|-------------------|--------|
 | S1 | Overhead CPU (intercept selectivo, tráfego de referência) | ≤ **+25%** vs baseline lab | Lab `.54` localhost+inline | **PASS** — 20.11 (`~13%` busy) |
 | S2 | Latência adicional por handshake TLS interceptado | ≤ **150 ms** p95 | Lab `.54` | **PASS** — localhost p95≈3.1 ms; inline≈15.5 ms |
-| S3 | Block page HTTPS + CA | ≥ **1 browser Windows corporativo** com CA | Lab Windows + screenshot | **PENDENTE** — 20.11 só `curl` (≠ browser) |
+| S3 | Block page HTTPS + CA | ≥ **1 browser Windows corporativo** com CA | Edge 151 + screenshot `.24` | **PASS** — `s3-windows/` |
 | S4 | Bypass list | Fluxo em bypass **não** block-page | Lab SNI bypass | **PASS** — 20.11 |
 | S5 | QUIC/HTTP3 | Decisão escrita (block / downgrade TCP / bypass) | Documento + caminho | **PASS** — `bypass` default |
 | S6 | ECH | Limite documentado; prova lab se exercitável | Nota lab | **NA / limite** (não exercitado; não PASS) |
@@ -162,7 +162,7 @@ Contrato IPC: [`contrato-ipc-layer7-tlsproxy-20.9.md`](contrato-ipc-layer7-tlspr
 | **20.8** | Gestão CA (gerar / importar / export GPO; segredos fora do git) | Desenho aceite; entitlement; GUI/ops | **PASS** (`1.9.37`) |
 | **20.9** | Toggle intenção `mitm.enabled` + bypass endurecido + `quic_mode` + contrato IPC; `mitm_effective` sempre false sem runtime | 20.8 PASS | **PASS** (`1.9.38`) |
 | **20.10** | Intercept selectivo + block page HTTPS | **S1–S8 medidos** + **GO lab** + **GO produto** | **20.10a+b PASS** (`1.9.41`); gated; sem produção |
-| **20.11** | Lab CA completo; gates **GI2–GI3** | 20.10 estável em lab | **PARCIAL** — GI2 PASS; GI3 PENDENTE S3; evidência `20260809T060000Z-20.11-gi2-gi3-54` |
+| **20.11** | Lab CA completo; gates **GI2–GI3** | 20.10 estável em lab | **PASS** (`1.9.41`; S3 Edge Windows; evidência `20260809T060000Z-20.11-gi2-gi3-54`) |
 
 ```text
 Desenho (este ficheiro)

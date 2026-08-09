@@ -1,8 +1,8 @@
-# START HERE — Identity + MITM Add-on 【20.11 PARCIAL — GI2 PASS; GI3 PENDENTE S3】
+# START HERE — Identity + MITM Add-on 【20.11 PASS GI2/GI3 (`1.9.41`)】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
-> **20.10b PASS** (`1.9.41`); **20.11 PARCIAL**: GI2 **PASS**; GI3 **PENDENTE** (S3 browser Windows).  
-> **Sem** intercept em `.254`/`.234`/`.235`. Squid rejeitado. **Não** avançar GO produção MITM.
+> **20.10b PASS** (`1.9.41`); **20.11 PASS** — GI2/GI3 lab (S3 Edge Windows). S6 **NA/limite**.  
+> **Sem** intercept em `.254`/`.234`/`.235`. Squid rejeitado. **Sem** GO produção MITM automático.
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -46,11 +46,11 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; **20.11 PARCIAL** (rev. `2026-08-09af`) |
-| Passo actual | **20.11 PARCIAL** (`1.9.41`) — GI2 PASS; GI3 PENDENTE S3 |
-| Próximo | **Lab S3**: browser Windows + CA → fechar GI3.1 / 20.11 (sem GO produção) |
-| Rev. do plano | **`2026-08-09af`** |
-| MITM | `intercept_ready=true`; listen/rdr/página gated; GI2 **PASS**; GI3 **PENDENTE** S3; S6 **NA/limite** |
+| Plano | Identity **FECHADA**; MITM **GO produto**; **20.11 PASS** (rev. `2026-08-09ag`) |
+| Passo actual | **20.11 PASS** (`1.9.41`) — GI2/GI3 lab |
+| Próximo | **Fecho IM2 / GO produção MITM** (humano explícito; sem activar `.254`) |
+| Rev. do plano | **`2026-08-09ag`** |
+| MITM | `intercept_ready=true`; listen/rdr/página gated; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -127,18 +127,17 @@ Baseline produto (não reabrir):
 ```text
 Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest **1.9.41**.
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
-Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; **20.11 PARCIAL** (GI2 PASS; GI3 PENDENTE S3).
+Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; **20.11 PASS** GI2/GI3 (S3 Edge Windows).
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
 GO produto: docs/09-blocking/GO-produto-20.10.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (**lab S3 browser Windows**).
+Ler na ordem do START-HERE; executar só o próximo bloco seguro (fecho IM2 / GO produção MITM humano).
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
 um passo/bloco por entrega; português; barra UX PME; Squid rejeitado;
-curl ≠ browser (S3 ADR-0026); S6 ECH não exercitado = NA/limite (não PASS);
-NÃO activar intercept em .254/.234/.235; NÃO GO produção MITM neste estado.
-Estado: 20.11 PARCIAL; evidência 20260809T060000Z-20.11-gi2-gi3-54; plano rev. 2026-08-09af.
-Tarefa seguinte: **S3/GI3.1** — browser Windows corporativo + CA + HTML legível (lab).
+S6 ECH = NA/limite; NÃO activar intercept em .254/.234/.235 sem GO humano produção.
+Estado: 20.11 PASS; evidência 20260809T060000Z-20.11-gi2-gi3-54 (incl. s3-windows/); plano rev. 2026-08-09ag.
+Tarefa seguinte: **fecho IM2 / GO produção MITM** (humano; sem activar produção).
 ```
 
 ## Prompt — propor desvio / ADR
@@ -157,8 +156,8 @@ Não implementar até GO. Responder em português.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.11 PARCIAL** (`1.9.41`; GI2 PASS; GI3 PENDENTE S3)
-- Próximo: lab S3 browser Windows + CA (fechar GI3.1) — sem GO produção
+- Passo actual: **20.11 PASS** (`1.9.41`; GI2/GI3; S3 Edge Windows)
+- Próximo: fecho IM2 / GO produção MITM (humano)
 - Latest: **1.9.41** SHA `1518ad68…c1f4`
 - S6 ECH: NA/limite (não exercitado)
 ```

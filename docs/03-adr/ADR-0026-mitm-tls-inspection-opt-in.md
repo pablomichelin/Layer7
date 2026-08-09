@@ -110,7 +110,8 @@
 | **h** | **2026-08-09** | **GO lab** — PoC-0 idle `src/layer7-tlsproxy/` |
 | **i** | **2026-08-09** | **PoC-1 PASS** — IPC PING lab; path produto recusado; 20.10 ainda exige S1–S4/S6 + GO produto |
 | **j** | **2026-08-09** | Corrida lab 20.11 (`.54` / `1.9.41`); docs iniciais overclaimaram S3/S6 |
-| **k** | **2026-08-09** | **Rev. gerencial:** S3 exige browser Windows (curl ≠ browser) → GI3/S3 **PENDENTE**; S6 ECH **NA/limite** (não PASS); 20.11 **PARCIAL**; GI2 PASS |
+| **k** | **2026-08-09** | Rev. gerencial interina: S3 pendente (curl ≠ browser); S6 NA |
+| **l** | **2026-08-09** | **S3 PASS** Edge Windows `192.168.100.24`; **20.11 / GI3 PASS**; S6 permanece **NA/limite**; sem GO produção |
 
 ---
 

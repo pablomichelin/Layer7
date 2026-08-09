@@ -80,7 +80,7 @@ Procedimento: [`runbook-s1-s8-mitm-pre-runtime.md`](runbook-s1-s8-mitm-pre-runti
 |---|----------|--------|------------------------------|
 | S1 | CPU overhead | ≤ +25% | **PASS** lab `.54` — 20.11 (`20260809T060000Z-20.11-gi2-gi3-54`) |
 | S2 | Latência handshake | ≤ 150 ms p95 | **PASS** lab — localhost≈3.1 ms; inline≈15.5 ms |
-| S3 | Block page HTTPS + CA | ≥ 1 **browser Windows** | **PENDENTE** — 20.11 só `curl`+CA (≠ browser) |
+| S3 | Block page HTTPS + CA | ≥ 1 **browser Windows** | **PASS** — Edge 151 em `.24` (`s3-windows/`) |
 | S4 | Bypass list | prova | **PASS** lab — 20.11 |
 | S5 | QUIC/HTTP3 caminho definido | escrito | **PASS** — default `bypass` |
 | S6 | ECH previsível | lab | **NA / limite** — não exercitado (não PASS) |

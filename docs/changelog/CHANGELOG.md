@@ -6,7 +6,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Notes
 
-- **20.11 PARCIAL / NO-GO fecho** (`1.9.41`, rev. gerencial): GI2 **PASS**; GI3 **PENDENTE** — S3/GI3.1 exige ≥1 browser Windows corporativo com CA (ADR-0026); a corrida lab só provou `curl`+CA (**curl ≠ browser**). S6 ECH = **NA/limite** (não exercitado; não PASS). Evidência corrigida em `docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/`. Commit docs `8939ddb` supersedido nesta classificação. Sem GO produção MITM. Sem bump de PORTVERSION.
+- **20.11 PASS** (`1.9.41`): GI2/GI3 lab — S3 **PASS** com Microsoft Edge **151** em VM Windows `192.168.100.24` (CA trust + screenshot HTML); S6 ECH = **NA/limite**. Evidência `docs/tests/evidence/20260809T060000Z-20.11-gi2-gi3-54/` (incl. `s3-windows/`). Sem GO produção MITM. Sem bump de PORTVERSION.
 - **20.10b PASS** (`1.9.41`): correctivo F1–F6 pós-auditoria do `1.9.40` (histórico).
 
 ## [1.9.41] — 2026-08-09
