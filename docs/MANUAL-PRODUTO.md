@@ -1,12 +1,14 @@
 # Manual do Produto Layer7 (pfSense CE)
 
 > **Hub público + guia do operador** — SSOT de navegação do produto para
-> clientes e operadores.  
+> clientes e operadores (árvore interna `docs/`).  
+> **Espelho no canal público** `pablomichelin/Layer7`:
+> [`docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md`](https://github.com/pablomichelin/Layer7/blob/main/docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md)
+> (versão sanitizada: sem SSOTs internos / license server).  
 > **Pacote de referência (canal `latest`):** **`1.9.47`**  
 > **SHA256:** `2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`  
 > **Release:** <https://github.com/pablomichelin/Layer7/releases/latest>  
 > **Data de alinhamento:** `2026-08-09`
-
 ---
 
 ## 0. Como usar este manual
