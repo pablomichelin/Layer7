@@ -225,8 +225,9 @@ Palavra de ordem: **preferir OFF indevido a ON fora de escopo**.
 
 ## 12. Próximo bloco
 
-**P3 — código:** failsafe de janela + visibilidade operador + auditoria de metadados de activação (ver mapa §e).  
-Sem P3 (ou equivalente ops dual aprovado), **não** abrir piloto multi-hora.
+**P3 — código:** **PASS** (`1.9.47`).  
+**P4 soak lab:** **ABORT** — evidência [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) (Phase C Skip; 4h incompleto; rollback OK).  
+**P5:** aguarda **ficha de site de cliente** — **não** activar piloto externo nem permanente sem P5 PASS + GO humano.
 
 ---
 
@@ -236,3 +237,4 @@ Sem P3 (ou equivalente ops dual aprovado), **não** abrir piloto multi-hora.
 |------|------|
 | 2026-08-09 | P2 criado — runbook genérico alinhado a P1 D1–D9 |
 | 2026-08-09 | Nota gate activação: ficha incompleta ≠ débito eng. |
+| 2026-08-09 | P4 ABORT `234042Z`; P5 bloqueado à ficha; sem piloto externo/permanente |

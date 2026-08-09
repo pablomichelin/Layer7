@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **`1.9.47`** P3 PASS; Gate B+C/teste em `1.9.46`; piloto **NÃO PRONTO activar** — falta ficha+P4/P5 (rev. `2026-08-09at`)
+**Estado do plano:** Identity **FECHADA**; MITM **`1.9.47`** P3 PASS; **P4 ABORT**; Gate B+C/teste em `1.9.46`; piloto **NÃO PRONTO activar** — **P5 aguarda ficha site** (rev. `2026-08-09au`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -19,7 +19,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.46` (anti-QUIC escopo; SHA `10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`)
+**Canal lab/`latest`:** `1.9.47` (P3 janela; SHA `2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`)
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
@@ -54,7 +54,8 @@
 **Rev. `aq` (`2026-08-09`)** = **Mapa prontidão piloto** — veredicto **NÃO PRONTO**; sequência P1→P5; primeiro código = P3 failsafe/visibilidade.  
 **Rev. `ar` (`2026-08-09`)** = **P1+P2 docs PASS** — escopo D1–D9 + runbook piloto genérico; activação ainda **NO-GO** até P3+ficha+soak.  
 **Rev. `as` (`2026-08-09`)** = Gate activação externa (ficha nomeada) **≠** lacuna eng.; critérios aceite P3.1–P3.8 fechados no mapa.  
-**Rev. `at` (`2026-08-09`)** = **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS.
+**Rev. `at` (`2026-08-09`)** = **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS.  
+**Rev. `au` (`2026-08-09`)** = **P4 ABORT** (`234042Z`) — upgrade/activate scoped OK; Phase C Skip; 4h incompleto; rollback PASS; **P5 aguarda ficha**; proibido piloto externo/permanente.
 
 ---
 
@@ -62,9 +63,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **`1.9.47`** — P3 PASS; permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar** — P1+P2+P3 PASS; ficha site = **gate activação**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
-| Próximo | **P4** soak (GO) / ficha; MITM OFF; `.234`/`.235` proibidos |
+| Passo actual | **`1.9.47`** MONITOR/MITM OFF; P4 **ABORT**; permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar** — P1+P2+P3 PASS; P4 ABORT; ficha = **gate**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Próximo | **P5** só com ficha site cliente; MITM OFF; `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -83,10 +84,11 @@ TRILHA — progresso
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
 - GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
-- Prontidão piloto: NÃO PRONTO activar (P1+P2+P3 PASS; ficha=gate ≠ eng.)
-- Plano rev.: 2026-08-09at
+- Prontidão piloto: NÃO PRONTO activar (P1+P2+P3 PASS; P4 ABORT; P5 aguarda ficha)
+- P4 evidência ABORT: 20260809T234042Z-p4-soak-254 (rollback PASS)
+- Plano rev.: 2026-08-09au
 - Lab/latest publicado: 1.9.47 (SHA 2155daca…9df833)
-- Próximo: P4 soak / ficha; permanente NO-GO
+- Próximo: P5 só com ficha; proibido piloto externo/permanente
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)

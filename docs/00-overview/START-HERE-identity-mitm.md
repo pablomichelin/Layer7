@@ -1,7 +1,9 @@
-# START HERE — Identity + MITM Add-on 【`1.9.47` · P3 PASS · piloto NÃO activar】
+# START HERE — Identity + MITM Add-on 【`1.9.47` · P4 ABORT · P5 aguarda ficha】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
+> **P4 soak ABORT** (`234042Z`) — rollback OK; **não** conta como soak/piloto.  
+> **P5** aguarda **ficha de site de cliente** — **proibido** piloto externo/permanente.  
 > **Gate C / GO teste** (`1.9.46`, `215442Z`) — **NÃO** permanente.  
 > Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
 > **Sem** intercept permanente em `.254`/`.234`/`.235`. Squid rejeitado.  
@@ -49,14 +51,15 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.47`** (P3 PASS) |
-| Passo actual | **`1.9.47`** — P3 failsafe+visibilidade **PASS**; permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar** — P1+P2+P3 **PASS**; falta ficha+soak — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.47`** (P3 PASS; P4 ABORT) |
+| Passo actual | **`1.9.47`** no `.254` MONITOR/MITM OFF; permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar** — P1+P2+P3 **PASS**; **P4 ABORT**; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | Gate activação externa | Ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | **P4 soak** (GO) / ficha site; MITM OFF; permanente **NO-GO** |
-| Rev. do plano | **`2026-08-09at`** |
+| Próximo | **P5 só com ficha site cliente**; MITM OFF; **proibido** piloto externo/permanente |
+| Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **ABORT** |
+| Rev. do plano | **`2026-08-09au`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -140,14 +143,14 @@ GO produto: docs/09-blocking/GO-produto-20.10.md
 Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (P4 soak / ficha — NÃO activar MITM sem GO; NÃO permanente).
+Ler na ordem do START-HERE; executar só o próximo bloco seguro (P5 com ficha — NÃO activar MITM sem GO; NÃO permanente).
 Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
 rdr só source∧dest; anti-QUIC UDP/443 só mitm_src→mitm_dst; quic_mode=block (sem bypass); um passo/bloco; português;
 barra UX PME; Squid rejeitado; S6 ECH = NA/limite; NÃO activar intercept permanente em .254/.234/.235.
-Estado: 1.9.47 P3 PASS; Gate B+C/GO teste em 1.9.46 (215442Z); piloto NÃO activar até ficha+P4/P5.
+Estado: 1.9.47 P3 PASS; P4 ABORT (234042Z; rollback OK); Gate B+C/GO teste em 1.9.46 (215442Z);
+piloto NÃO activar — P5 aguarda ficha site cliente; proibido piloto externo/permanente.
 Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md — B/C PASS; prod temporária PASS.
-Tarefa seguinte: P1+P2 docs PASS; implementar P3 failsafe/visibilidade; manter MITM OFF;
-permanente NO-GO; sem mutar .234/.235; sem activar piloto sem ficha P1.
+Tarefa seguinte: manter MITM OFF; P5 só com ficha nomeada; sem mutar .234/.235.
 ```
 
 
@@ -188,14 +191,13 @@ php tests/functional/test_mitm_config.php
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.47** — P3 failsafe+visibilidade PASS
-- Prontidão piloto: **NÃO PRONTO activar** (P1+P2+P3 PASS; falta ficha+soak)
-- P1/P2 docs · P3 código 1.9.47 (max_window/deadline/audit/GUI)
+- Passo actual: **1.9.47** MONITOR/MITM OFF (pós-rollback P4)
+- Prontidão piloto: **NÃO PRONTO activar** (P1+P2+P3 PASS; P4 ABORT; P5 aguarda ficha)
+- P4: 20260809T234042Z-p4-soak-254 ABORT (Phase C Skip; 4h incompleto; rollback PASS)
 - Gates: B/C PASS; GO teste .254 PASS (215442Z; 1.9.46)
 - Evidência P3: 20260809T230400Z-p3-mitm-window
-- Evidência GO teste: 20260809T215442Z-phaseBD-d1-254
 - Latest publicado: **1.9.47** SHA `2155daca…9df833`
-- Próximo: **P4 soak** (GO) / ficha; MITM OFF; permanente NO-GO
+- Próximo: **P5 só com ficha site cliente**; MITM OFF; proibido piloto externo/permanente
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

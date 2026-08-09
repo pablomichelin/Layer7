@@ -426,4 +426,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] P2 runbook piloto — **PASS** docs ([`runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md))
 - [x] Norma: activação externa exige ficha nomeada (cliente/responsáveis/src/dst/SNI/janela/saída) — **gate activação, ≠ lacuna eng.**
 - [x] P3 failsafe+visibilidade — **PASS** `1.9.47` (P3.1–P3.8; evid. `230400Z`)
-- [ ] Ficha site preenchida + soak/evidência (P4/P5) antes de qualquer ON externo
+- [x] P4 soak lab tentado — **ABORT** `234042Z` (Phase C Skip; 4h incompleto; rollback PASS) — **não** desbloqueia piloto
+- [ ] P5: ficha site de cliente preenchida + GO + evidência antes de qualquer ON externo/permanente

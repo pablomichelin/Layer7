@@ -1,0 +1,26 @@
+ROLLBACK_P4_START 2026-08-09T23:48:00Z
+Date				Owner		Queue	Job#
+Mon Aug 10 00:53:00 -03 2026	root            c	23
+atrm_Date
+atrm_Mon
+ca_delete=fail
+enabled=false
+effective=false
+mode=monitor
+intercept_cleared
+delete host 198.18.0.10
+=== PF MITM ===
+NO_MITM_RDR
+NO_MITM_FILTER
+SRC:
+pfctl: Table does not exist.
+DST:
+pfctl: Table does not exist.
+NO_8443
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+GUI9999=200
+PKG=1.9.47
+mode=monitor
+{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-09T23:48:01+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14121,"payload_tls":false,"reason":"P4 abort rollback human"}
+ROLLBACK_P4_254_DONE 2026-08-09T23:48:07Z

@@ -1,0 +1,1 @@
+NOTE: prior ABORT_FROM_ANY in 07-health-t0.txt was FALSE POSITIVE (matched non-MITM pfSense NAT). Correct predicate: MITM rules only.

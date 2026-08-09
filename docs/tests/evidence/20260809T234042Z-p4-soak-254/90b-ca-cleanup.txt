@@ -1,0 +1,12 @@
+UTC=2026-08-09T23:48:18Z
+ls: /var/db/layer7/mitm*: No such file or directory
+/usr/local/etc/layer7/mitm:
+total 9
+drwxr-x---  2 root wheel  2 Aug  9 20:48 .
+drwxr-xr-x  6 root wheel 17 Aug  9 20:41 ..
+true
+cert_exists=no
+key_exists=no
+Date				Owner		Queue	Job#
+Mon Aug 10 00:53:00 -03 2026	root            c	23
+POST_OK

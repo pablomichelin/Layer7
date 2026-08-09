@@ -1,0 +1,890 @@
+UTC=2026-08-09T23:44:39Z
+PKG=1.9.47
+mode=monitor
+enabled=true
+effective=true
+remaining_sec=14323
+deadline_unix=1786333402
+max_minutes=240
+quic=block
+src=192.168.100.24/32
+dst=198.18.0.10/32
+sni=mitm-lab.test
+materialized=true
+LISTEN8443=1
+=== RDR ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+=== QUIC ===
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+=== TABLES ===
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+rdr on vmx0.10 inet proto tcp from any to ! <cpzoneid_2_cpips> port = http tagged cpzoneid_2_rdr -> 10.0.85.1 port 8002
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = 62354 -> 192.168.100.247
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = 62354 -> 192.168.100.247
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = 62355 -> 192.168.100.228 port 62354
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = 62355 -> 192.168.100.228 port 62354
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = 8081 -> 192.168.100.228
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = 8081 -> 192.168.100.228
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 9999 -> 192.168.100.254
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 9999 -> 192.168.100.254
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 7989 -> 192.168.100.252
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 7989 -> 192.168.100.252
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = http -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = https -> 192.168.100.253
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = http -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = https -> 192.168.100.253
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = ftp -> 192.168.100.253
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = ftp -> 192.168.100.253
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 45.238.165.154 port 40110:40210 -> 192.168.100.253
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 177.38.10.224 port 40110:40210 -> 192.168.100.253
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = http-alt -> 192.168.100.253
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = http-alt -> 192.168.100.253
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = 5678 -> 192.168.100.227
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = 5678 -> 192.168.100.227
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = zabbix-agent -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = zabbix-trapper -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 10052 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 10053 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 10054 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 10055 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 10056 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 10057 -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = zabbix-agent -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = zabbix-trapper -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 10052 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 10053 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 10054 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 10055 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 10056 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 10057 -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = snmp -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = snmp -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = snmptrap -> 192.168.100.244
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = snmptrap -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 30000 -> 192.168.100.244
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = 6638 -> 192.168.100.112
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = 51820 -> 192.168.100.112
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = 6638 -> 192.168.100.112
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on pppoe0 inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on pppoe0 inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = smtp -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = smtps -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = submission -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = imaps -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 177.38.10.224 port = sieve -> 192.168.100.224
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on pppoe1 inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on pppoe1 inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0 inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0 inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.10 inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.10 inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.50 inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.50 inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.95 inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.95 inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.52 inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on vmx0.52 inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on enc0 inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on enc0 inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on openvpn inet proto tcp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = smtp -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = smtps -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = submission -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = imaps -> 192.168.100.224
+rdr on openvpn inet proto udp from any to 45.238.165.154 port = sieve -> 192.168.100.224
+scrub from any to <vpn_networks> max-mss 1360 fragment no reassemble
+block drop in log quick inet6 from any to <_nat64reserved_> label "descr=Block NAT64 for non-global IPv4" ridentifier 1000000001
+block drop out log quick inet6 from any to <_nat64reserved_> label "descr=Block NAT64 for non-global IPv4" ridentifier 1000000002
+block drop in log quick inet from any to 169.254.0.0/16 label "descr=Block IPv4 link-local" ridentifier 1000000102
+block drop log quick inet proto tcp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000114
+block drop log quick inet proto udp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000114
+block drop log quick inet proto tcp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000115
+block drop log quick inet proto udp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000115
+block drop log quick inet6 proto tcp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000116
+block drop log quick inet6 proto udp from any port = 0 to any label "descr=Block traffic from port 0" ridentifier 1000000116
+block drop log quick inet6 proto tcp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000117
+block drop log quick inet6 proto udp from any to any port = 0 label "descr=Block traffic to port 0" ridentifier 1000000117
+block drop log quick from any to <snort2c> label "descr=Block snort2c hosts" ridentifier 1000000119
+block drop out quick proto udp from any port = bootps to any port = bootpc label "descr=Prevent routing dhcp responses" ridentifier 1000000451 tagged dhcpin
+pass in quick on pppoe0 proto udp from any port = dhcpv6-server to any port = dhcpv6-client keep state (if-bound) label "descr=allow dhcpv6 client in P4NET" ridentifier 1000000462
+pass out quick on pppoe0 proto udp from any port = dhcpv6-client to any port = dhcpv6-server keep state (if-bound) label "descr=allow dhcpv6 client out P4NET" ridentifier 1000000463
+pass in quick on vmx0 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002541
+pass in quick on vmx0 inet proto udp from any port = bootpc to 192.168.100.254 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000002542
+pass in quick on pppoe1 proto udp from any port = dhcpv6-server to any port = dhcpv6-client keep state (if-bound) label "descr=allow dhcpv6 client in MHNET" ridentifier 1000002562
+pass out quick on pppoe1 proto udp from any port = dhcpv6-client to any port = dhcpv6-server keep state (if-bound) label "descr=allow dhcpv6 client out MHNET" ridentifier 1000002563
+pass in quick on vmx0.10 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004641
+pass in quick on vmx0.10 inet proto udp from any port = bootpc to 10.0.85.1 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000004642
+pass in quick on vmx0.95 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006741
+pass in quick on vmx0.95 inet proto udp from any port = bootpc to 192.168.95.254 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000006742
+pass in quick on vmx0.52 inet proto udp from any port = bootpc to 255.255.255.255 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007791
+pass in quick on vmx0.52 inet proto udp from any port = bootpc to 192.168.52.1 port = bootps keep state (if-bound) label "descr=allow access to DHCP server" ridentifier 1000007792
+pass in quick on vmx0 proto tcp from any to (vmx0) port = 9999 flags S/SA keep state (if-bound) label "descr=anti-lockout rule" ridentifier 10001
+pass in quick on vmx0 proto tcp from any to (vmx0) port = http flags S/SA keep state (if-bound) label "descr=anti-lockout rule" ridentifier 10001
+pass in quick on vmx0 proto tcp from any to (vmx0) port = ssh flags S/SA keep state (if-bound) label "descr=anti-lockout rule" ridentifier 10001
+pass in quick on vmx0.10 proto tcp from any to <cpzoneid_2_cpips> port = 8002 flags S/SA keep state (if-bound, sloppy) label "descr=Captive Portal operation" ridentifier 13001
+block drop in quick on vmx0.10 from any to ! <cpzoneid_2_cpips> label "descr=Captive Portal operation" ridentifier 13003 ! tagged cpzoneid_2_auth
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.254 port = 9999 flags S/SA keep state (if-bound) label "id=1592242767" label "tags=user_rule" label "descr=NAT Acesso Externo" ridentifier 1592242767
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = zabbix-agent flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = zabbix-trapper flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10052 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10054 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10055 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10056 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10057 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.252 port = 7989 flags S/SA keep state (if-bound) label "id=1598870767" label "tags=user_rule" label "descr=NAT" ridentifier 1598870767
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 45.238.165.154 port = openvpn keep state (if-bound) label "id=1734229064" label "tags=user_rule" label "descr=Allow OpenVPN on MHNET Interface" ridentifier 1734229064
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.227 port = 5678 flags S/SA keep state (if-bound) label "id=1727188162" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188162
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.227 port = 5678 keep state (if-bound) label "id=1727188162" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188162
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = http flags S/SA keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = https flags S/SA keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = http keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = https keep state (if-bound) label "id=1727402602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1727402602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 30000 flags S/SA keep state (if-bound) label "id=1741714485" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1741714485
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = snmp flags S/SA keep state (if-bound) label "id=1743450285" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450285
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.244 port = snmp keep state (if-bound) label "id=1743450285" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450285
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = snmptrap flags S/SA keep state (if-bound) label "id=1743450321" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450321
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.244 port = snmptrap keep state (if-bound) label "id=1743450321" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450321
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.247 port = 62354 flags S/SA keep state (if-bound) label "id=1747867144" label "tags=user_rule" label "descr=NAT" ridentifier 1747867144
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.247 port = 62354 keep state (if-bound) label "id=1747867144" label "tags=user_rule" label "descr=NAT" ridentifier 1747867144
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.228 port = 62354 flags S/SA keep state (if-bound) label "id=1751027756" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027756
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.228 port = 62354 keep state (if-bound) label "id=1751027756" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027756
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.228 port = 8081 flags S/SA keep state (if-bound) label "id=1751027973" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027973
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.228 port = 8081 keep state (if-bound) label "id=1751027973" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027973
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = http-alt flags S/SA keep state (if-bound) label "id=1759858602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = http-alt keep state (if-bound) label "id=1759858602" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858602
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 177.38.10.224 port = rsf-1 keep state (if-bound) label "id=1772483083" label "tags=user_rule" label "descr=OpenVPN Quality wizard" ridentifier 1772483083
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 6638 flags S/SA keep state (if-bound) label "id=1779150151" label "tags=user_rule" label "descr=NAT" ridentifier 1779150151
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 6638 keep state (if-bound) label "id=1779150151" label "tags=user_rule" label "descr=NAT" ridentifier 1779150151
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 6638 flags S/SA keep state (if-bound) label "id=1779150153" label "tags=user_rule" label "descr=NAT" ridentifier 1779150153
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 6638 keep state (if-bound) label "id=1779150153" label "tags=user_rule" label "descr=NAT" ridentifier 1779150153
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.112 port = 51820 flags S/SA keep state (if-bound) label "id=1780355374" label "tags=user_rule" label "descr=NAT" ridentifier 1780355374
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.112 port = 51820 keep state (if-bound) label "id=1780355374" label "tags=user_rule" label "descr=NAT" ridentifier 1780355374
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = smtp flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = smtps flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = submission flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = imaps flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.224 port = sieve flags S/SA keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = smtp keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = smtps keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = submission keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = imaps keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.224 port = sieve keep state (if-bound) label "id=1783198849" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198849
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port = ftp flags S/SA keep state (if-bound) label "id=1784901254" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901254
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port = ftp keep state (if-bound) label "id=1784901254" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901254
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.253 port 40109 >< 40211 flags S/SA keep state (if-bound) label "id=1784901607" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901607
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.253 port 40109 >< 40211 keep state (if-bound) label "id=1784901607" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901607
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet from any to 191.5.179.29 flags S/SA keep state (if-bound) label "id=1741637243" label "tags=user_rule" ridentifier 1741637243
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.254 port = 9999 flags S/SA keep state (if-bound) label "id=1734504431" label "tags=user_rule" label "descr=NAT" ridentifier 1734504431
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = zabbix-agent flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = zabbix-trapper flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10052 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10054 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10055 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10056 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10057 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.252 port = 7989 flags S/SA keep state (if-bound) label "id=1704385249" label "tags=user_rule" label "descr=NAT" ridentifier 1704385249
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 45.238.165.154 port = openvpn keep state (if-bound) label "id=1734215950" label "tags=user_rule" label "descr=Allow OpenVPN on MHNET Interface" ridentifier 1734215950
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.227 port = 5678 flags S/SA keep state (if-bound) label "id=1727188175" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188175
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.227 port = 5678 keep state (if-bound) label "id=1727188175" label "tags=user_rule" label "descr=NAT N8n" ridentifier 1727188175
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = http flags S/SA keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = https flags S/SA keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = http keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = https keep state (if-bound) label "id=1734502041" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1734502041
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = snmptrap flags S/SA keep state (if-bound) label "id=1743592897" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743592897
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.244 port = snmptrap keep state (if-bound) label "id=1743592897" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743592897
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.247 port = 62354 flags S/SA keep state (if-bound) label "id=1747867161" label "tags=user_rule" label "descr=NAT" ridentifier 1747867161
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.247 port = 62354 keep state (if-bound) label "id=1747867161" label "tags=user_rule" label "descr=NAT" ridentifier 1747867161
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = snmp flags S/SA keep state (if-bound) label "id=1751027636" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1751027636
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.244 port = snmp keep state (if-bound) label "id=1751027636" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1751027636
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.228 port = 62354 flags S/SA keep state (if-bound) label "id=1751027745" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027745
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.228 port = 62354 keep state (if-bound) label "id=1751027745" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027745
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.228 port = 8081 flags S/SA keep state (if-bound) label "id=1751027983" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027983
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.228 port = 8081 keep state (if-bound) label "id=1751027983" label "tags=user_rule" label "descr=NAT GLPI CBHIDRO" ridentifier 1751027983
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = http-alt flags S/SA keep state (if-bound) label "id=1759858581" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858581
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = http-alt keep state (if-bound) label "id=1759858581" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1759858581
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = smtp flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = smtps flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = submission flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = imaps flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.224 port = sieve flags S/SA keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = smtp keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = smtps keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = submission keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = imaps keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.224 port = sieve keep state (if-bound) label "id=1783198879" label "tags=user_rule" label "descr=NAT Servidor Mailcow" ridentifier 1783198879
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port = ftp flags S/SA keep state (if-bound) label "id=1784901243" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901243
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port = ftp keep state (if-bound) label "id=1784901243" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901243
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.253 port 40109 >< 40211 flags S/SA keep state (if-bound) label "id=1784901588" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901588
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.253 port 40109 >< 40211 keep state (if-bound) label "id=1784901588" label "tags=user_rule" label "descr=NAT Servidor Web" ridentifier 1784901588
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to (self) port = isakmp keep state (if-bound) label "descr=IPsec: Quality - inbound isakmp" ridentifier 1000110659
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to (self) port = ipsec-nat-t keep state (if-bound) label "descr=IPsec: Quality - inbound nat-t" ridentifier 1000110660
+pass in on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto esp from any to (self) keep state (if-bound) label "descr=IPsec: Quality - inbound esp proto" ridentifier 1000110661
+ABORT_FROM_ANY
+=== AUDIT ===
+{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+layer7_tlsproxy is running as pid 74662.
+layer7d is running as pid 50918.
+subject=CN=mitm-lab.test
+issuer=CN=Layer7-P4-Soak-CA
+GUI9999=200

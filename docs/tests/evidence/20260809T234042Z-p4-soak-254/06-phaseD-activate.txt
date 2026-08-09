@@ -1,0 +1,43 @@
+=== PHASE D MITM activate 1.9.47 max_window=240 ===
+{
+    "ca_gen": "ok",
+    "ca_msg": "CA gerada (CA:TRUE, keyCertSign, SKI).",
+    "sync": "ok",
+    "sync_sec": 0.936,
+    "filter": "ok",
+    "enabled": true,
+    "effective": true,
+    "window": {
+        "max_minutes": 240,
+        "deadline_unix": 1786333402,
+        "activated_unix": 1786319002,
+        "activated_by": "system",
+        "remaining_sec": 14396,
+        "expired": false,
+        "quic_mode": "block",
+        "source_cidr": [
+            "192.168.100.24\/32"
+        ],
+        "dest_cidr": [
+            "198.18.0.10\/32"
+        ],
+        "block_sni": [
+            "mitm-lab.test"
+        ]
+    },
+    "materialized": true
+}
+ACTIVATE_RC=0
+=== PF ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+=== AUDIT tail ===
+{"ts":"2026-08-09T23:43:22+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786333402,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+layer7_tlsproxy is running as pid 74662.
+subject=CN=Layer7-P4-Soak-CA
+sha256 Fingerprint=F4:1B:00:5A:DB:A1:07:84:D4:95:C3:8D:3A:FF:1A:A0:59:7B:16:79:56:8E:77:81:DF:76:6E:1E:68:01:DE:48

@@ -1,0 +1,6 @@
+UTC=2026-08-09T23:46:30Z
+event=phaseC_native_approval_SKIPPED
+note=Humano escolheu Skip na aprovacao nativa para SSH/hosts/CA/probes no .24.
+impacto=Sem evidencia cliente in-scope (block page Edge/curl) ate nova aprovacao.
+estado_soak=MITM permanece ON scoped; loop health 15min activo; .54 at job 38 only.
+next=reaprovar Phase C (.24 hosts+CA+probes) ou abort/rollback se desejado.

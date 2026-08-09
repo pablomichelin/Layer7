@@ -1,10 +1,11 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); faltam ficha site + soak/evidência (P4/P5).  
+**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 soak ABORT** (Phase C Skip + 4h incompleto; rollback OK); **P5 aguarda ficha de site de cliente** — **não** activar piloto externo/permanente.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
-**Pacote de referência lab/`latest`:** `1.9.46` (`SHA256=10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`).  
+**P4 evidência:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **ABORT**.  
+**Pacote de referência lab/`latest`:** `1.9.47` (`SHA256=2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`).  
 **Produção enforce base (sem MITM):** `1.9.8` (inalterada por este mapa).  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT execução:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
@@ -19,7 +20,7 @@
 | **Teste controlado** | Janela ≤15 min; src `/32` × dst `/32` + SNI lab; rollback imediato | **PASS** `215442Z` |
 | **Piloto** | Janela multi-hora/dias; clientes/destinos nomeados; CA/trust operacional; suporte; critérios de saída; failsafe | **NÃO atingido** |
 | **Permanente / produção MITM** | Intercept ON sem janela de teste; políticas estáveis | **NO-GO** (decisão humana mantida) |
-| **Pronto para piloto** | P1+P2+P3+ficha site+soak com evidência; **não** equivale a GO permanente | **NO-GO activação** (P1/P2 docs OK) |
+| **Pronto para piloto** | P1+P2+P3+ficha site+soak com evidência; **não** equivale a GO permanente | **NO-GO activação** (P4 ABORT; falta ficha+P5) |
 
 **Regra:** nenhum documento pode marcar “pronto para piloto” sem evidência de soak/ops + GO humano explícito de piloto.
 
@@ -149,17 +150,19 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | Builder `test_mitm_config` + `test_mitm_regress` PASS — [`20260809T230400Z-p3-mitm-window`](../tests/evidence/20260809T230400Z-p3-mitm-window/) |
 | Rollback | Pacote `1.9.46` |
 
-### Bloco P4 — Soak lab controlado (evidência)
+### Bloco P4 — Soak lab controlado (evidência) — **ABORT** `2026-08-09`
 
 | Campo | Valor |
 |-------|--------|
 | Objectivo | Janela ≥4 h (mínimo) scoped; Edge real; rollback limpo |
 | Impacto | `.254` temporário; **não** permanente |
 | Risco | Médio |
-| Teste | Health periódica; zero rdr órfão; GUI/NET/SSH |
-| Rollback | Runbook disable + flush |
+| Teste | Upgrade passivo + activate scoped + health T0 **PASS**; Phase C `.24` **SKIP**; 4h **não** cumprido |
+| Rollback | **PASS** — MITM OFF, CA/rota/artefactos limpos, `mode=monitor` |
+| Evidência | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) |
+| Veredicto | **ABORT** — não conta como soak/piloto |
 
-### Bloco P5 — GO activação piloto + evidência
+### Bloco P5 — GO activação piloto + evidência — **AGUARDA FICHA**
 
 | Campo | Valor |
 |-------|--------|
@@ -168,6 +171,7 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Risco | Alto (mitigado por escopo) |
 | Teste | Critérios H5 + evidência commitada |
 | Rollback | Disable imediato; reinstall `1.9.46` se necessário |
+| Estado | **Bloqueado** até ficha de site de cliente nomeada; **proibido** piloto externo/permanente sem P5 PASS + GO |
 
 **Só após P5 PASS** se pode escrever “pronto para piloto (janela X)” no CORTEX.  
 **Permanente** continua a exigir GO separado.
@@ -247,7 +251,7 @@ MITM motor scoped (1.9.46+) ....... PRONTO PARA TESTE CONTROLADO (evidência 215
 P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
 P3 failsafe+visibilidade .......... PASS código (1.9.47; P3.1–P3.8; evid. 230400Z)
 Gate activação externa ............ Ficha site nomeada (cliente/resp/src/dst/SNI/janela/saída) — NÃO é gap eng.
-MITM pronto para ACTIVAR PILOTO ... NÃO (faltam ficha site + soak/evidência P4/P5)
+MITM pronto para ACTIVAR PILOTO ... NÃO (P4 ABORT; P5 aguarda ficha site cliente; sem piloto externo/permanente)
 MITM permanente / produção ........ NO-GO (decisão humana)
 ```
 

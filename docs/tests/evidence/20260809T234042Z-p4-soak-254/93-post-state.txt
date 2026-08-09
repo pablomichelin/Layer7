@@ -1,0 +1,15 @@
+UTC=2026-08-09T23:48:08Z
+PKG=1.9.47
+mode=monitor
+mitm_enabled=false
+effective=false
+materialized=false
+NO_MITM_RDR
+NO_MITM_FILTER
+SRC_N=0 0
+DST_N=0 0
+NO_8443
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+layer7d is running as pid 50918.
+GUI9999=200
+NO_HOST_ROUTE_19818

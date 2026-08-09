@@ -1,0 +1,20 @@
+SITE / CLIENTE:     Systemup lab P4 soak (controlado)
+RESPONSÁVEL (D5):   Coordenador humano — GO P4 confirmado 2026-08-09 (chat)
+PACOTE Layer7:      1.9.47 (P3)               ENTITLEMENT mitm: sim (lab)
+APPLIANCE:          192.168.100.254
+INÍCIO JANELA:      (preencher no activate UTC)
+FIM JANELA:         início + 4h (max_window=240)
+SOURCE CIDR(s):     192.168.100.24/32
+DEST CIDR/IP(s):    198.18.0.10/32  (via lab .54; NÃO Internet)
+SNI / hosts:        mitm-lab.test (block_sni)
+QUIC MODE:          block
+ALLOW EXPLÍCITO:    nenhum
+BREAK-GLASS:        mitm.enabled=false + sync; botão break-glass GUI
+SUPORTE DURANTE:    chat Cursor / ops Systemup
+CRITÉRIO SAÍDA:
+  PASS  — escopo respeitado 4h; health OK; audit metadados; rollback OFF limpo
+  FAIL  — from any / dest aberto / payload / fora de escopo / sem auto-disable
+  ABORT — degradação GUI/SSH/NET ou escopo inesperado → OFF imediato
+
+PROIBIDO: .234 .235; alvos externos; source/dest aberto; persistir TLS payload
+GO: chat 2026-08-09 — «GO P4 confirmado pelo responsável agora»

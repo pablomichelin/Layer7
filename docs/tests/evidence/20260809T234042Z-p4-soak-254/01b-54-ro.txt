@@ -1,0 +1,37 @@
+===IP===
+2: ens160: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    altname enp3s0
+    inet 192.168.100.54/24 brd 192.168.100.255 scope global ens160
+       valid_lft forever preferred_lft forever
+===19818===
+===ROUTE24===
+192.168.100.24 dev ens160 src 192.168.100.54 uid 0 
+    cache 
+===LISTEN443===
+none
+===CTRL===
+certs
+https.log
+https_server.py
+phase-a-control.sh
+rollback-a.sh
+www
+#!/bin/bash
+BASE=/opt/layer7-poc/mitm-lab-a
+LAB_IP=198.18.0.10
+RET_DST=192.168.100.24
+RET_VIA=192.168.100.254
+if [ "${1:-}" = "rollback" ]; then
+  if [ -f "$BASE/https.pid" ]; then kill "$(cat "$BASE/https.pid")" 2>/dev/null || true; rm -f "$BASE/https.pid"; fi
+  pids=$(pgrep -f '[p]ython3 .*mitm-lab-a/https_server\.py' || true)
+  [ -n "$pids" ] && kill $pids 2>/dev/null || true
+  ip addr del "$LAB_IP/32" dev lo 2>/dev/null || true
+  ip route del "$RET_DST/32" via "$RET_VIA" 2>/dev/null || true
+  rm -f "$BASE/certs/ca.key" "$BASE/certs/server.key" "$BASE/certs/ca.crt" \
+        "$BASE/certs/server.crt" "$BASE/certs/ca.srl" "$BASE/certs/server.csr" \
+        "$BASE/certs/server.ext" 2>/dev/null || true
+  echo "ROLLBACK_A_OK"
+  exit 0
+fi
+echo "usage: $0 rollback"
+exit 1

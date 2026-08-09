@@ -1,0 +1,4 @@
+** WARNING: connection is not using a post-quantum key exchange algorithm.
+** This session may be vulnerable to "store now, decrypt later" attacks.
+** The server may need to be upgraded. See https://openssh.com/pq.html
+[2J[m[H]0;Administrador: C:\Windows\system32\conhost.exe[?25hConnection to 192.168.100.24 closed.
