@@ -1,0 +1,4 @@
+UTC=2026-08-09T22:50:44Z
+ICMP24=OK
+SSH24_PORT=open
+NOTE=no outbound smoke from .24; no external destinations probed; no credentials used in this step

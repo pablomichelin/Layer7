@@ -1581,9 +1581,10 @@ CHECKPOINT CANONICO
 - Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
 - Evidência GO teste: docs/tests/evidence/20260809T215442Z-phaseBD-d1-254/
 - Proximo trabalho: manter MITM OFF; activação permanente só com novo GO; `.234/.235` proibidos
-- Appliance `.254`: pacote **`1.9.46`** (restore oficial SHA `10998477…ae72f5` em `20260809T224632Z-enfs24-1946`; drift `1.9.44` corrigido); MITM OFF; Layer7 **`enabled=true` / `mode=enforce`** — **não** desactivado (smoke sem PASS)
-- Smoke enforce a partir de `.24`: SSH OK; upgrade PASS; smoke **FAIL**/re-smoke SKIPPED → **NO-GO** disable/flush — evidência `20260809T224632Z-enfs24-1946` (anterior: `20260809T223927Z-enforce-smoke-24-NOGO`)
+- Appliance `.254`: pacote **`1.9.46`** (restore oficial SHA `10998477…ae72f5` em `20260809T224632Z-enfs24-1946`; drift `1.9.44` corrigido); MITM OFF; Layer7 **`enabled=true` / `mode=enforce`** — **não** desactivado
+- Smoke enforce `.24`: **NO-GO parcial** — upgrade+SSH OK; smoke **bloqueado** sem par LAB local/isolado (destinos públicos rejeitados pelo GO); zero tráfego externo; disable/flush **não** feitos — evidência `20260809T224632Z-enfs24-1946` + `REQUIREMENTS-NEXT-LAB-PAIR.md`
 - Snapshot pré-G2 conservado no appliance: `/tmp/l7-preg2-snap-20260809T221619Z-preG2-G2-254`
+- Próximo gate smoke: definir `BLOCK_LAB`/`ALLOW_LAB` RFC1918 (ex. sink em `.54`) antes de qualquer probe
 - Pré-G2/G2 passivo: **NO-GO** `20260809T221619Z-preG2-G2-254`
 - Pacote publicado (canal `latest`): **1.9.46**; rollback lab: **1.9.42**
 - Reconciliacao F4 enforcement `_24`…`_65` vs `1.9.46` (`2026-08-09`): **NO-GO** instalar qualquer `1.8.11_*` da linha histórica; único pacote elegível lab = **`1.9.46`** — docs/09-blocking/auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md
