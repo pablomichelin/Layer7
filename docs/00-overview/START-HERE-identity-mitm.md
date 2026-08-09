@@ -1,8 +1,7 @@
-# START HERE — Identity + MITM Add-on 【MITM GO lab — PoC-3 PASS em .54】
+# START HERE — Identity + MITM Add-on 【MITM GO lab — PoC-4 PASS em .54】
 
-> **Visual:** Identity de rede **FECHADA**.  
-> **MITM:** **PoC-3 PASS** (SNI bypass/block + página HTTPS) em `192.168.100.54`.  
-> `mitm_effective` **false**; **sem** intercept em `.254`/`.234`/`.235`; Squid **rejeitado**.
+> **MITM lab:** **PoC-4 PASS** (upstream allow) em `192.168.100.54`.  
+> `mitm_effective` **false**; **sem** intercept em `.254`/`.234`/`.235`.
 
 ```text
 docs/00-overview/START-HERE-identity-mitm.md
@@ -43,12 +42,12 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO lab** PoC-3 (rev. `2026-08-09w`) |
-| Passo actual | **20.9 PASS**; **PoC-3 PASS** em `.54`; **20.10** **bloqueado** |
-| Pré-20.10 (seguro) | Continuar em **`192.168.100.54`** — splice/S1 inline lab |
+| Plano | Identity **FECHADA**; MITM **GO lab** PoC-4 (rev. `2026-08-09x`) |
+| Passo actual | **20.9 PASS**; **PoC-4 PASS** em `.54`; **20.10** **bloqueado** |
+| Pré-20.10 (seguro) | S1 com carga em **`.54`** — [`../09-blocking/poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) |
 | Lab real | Prod: `.254`+`.234`+`.235`; **PoC:** **`.54`** (`root`) |
-| Rev. do plano | **`2026-08-09w`** |
-| MITM | PoC-3 S3/S4 lab PASS; `mitm_effective` **false**; GI2/GI3 **DEFERRED** |
+| Rev. do plano | **`2026-08-09x`** |
+| MITM | PoC-4 upstream PASS; `mitm_effective` **false**; GI2/GI3 **DEFERRED** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
 | Captive portal pfSense | **FORA DE ESCOPO** |
@@ -134,9 +133,9 @@ Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective sempr
 um passo 20.x por bloco; português; barra UX PME (U*/P*/H*/N*); sem overclaim NGFW;
 sem claim de intercept; Squid rejeitado; não reabrir fecho/IPv6/Identity rede/endpoint sem GO;
 GI2/GI3 runtime DEFERRED até S1–S8 + GO lab.
-Tarefa: lab = root@192.168.100.54. PoC-3 PASS (S3/S4).
+Tarefa: lab = root@192.168.100.54. PoC-4 PASS. Harness com timeout (sem hang).
 NÃO .254/.234/.235; NÃO effective=true; NÃO 20.10.
-Próximo: upstream splice / S1 inline só em .54.
+Próximo: medir S1 com carga allow+upstream só em .54.
 ```
 
 ## Prompt — propor desvio / ADR
@@ -157,10 +156,9 @@ Não implementar até GO. Responder em português.
 TRILHA IDENTITY + MITM — progresso
 - Passo actual: **20.9 PASS** (intenção mitm.enabled; bypass endurecido; quic_mode; contrato IPC)
 - Próximo código: **20.10** BLOQUEADO até S1–S8 + GO lab (sem intercept)
-- Continuidade agora: **PoC-3 PASS** (S3/S4) em `.54`; S1 produto PENDING
-- Evidência PoC-3: docs/tests/evidence/20260809T041800Z-poc3-sni-s3s4-54/
-- Evidência PoC-2: docs/tests/evidence/20260809T041000Z-poc2-tls-lab-54/
-- Plano rev.: 2026-08-09w
+- Continuidade agora: **PoC-4 PASS**; harness anti-hang; S1 produto PENDING
+- Evidência PoC-4: docs/tests/evidence/20260809T042600Z-poc4-upstream-54/
+- Plano rev.: 2026-08-09x
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
 - 20.8: PASS (`1.9.37`) — schema/CA/bypass/status; tlsproxy AUSENTE
 - 20.9: PASS (`1.9.38`) — intenção vs mitm_effective=false; contrato-ipc-layer7-tlsproxy-20.9.md

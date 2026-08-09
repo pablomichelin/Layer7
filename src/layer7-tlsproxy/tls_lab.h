@@ -1,5 +1,5 @@
 /*
- * PoC-2/3 lab TLS — isolated VM (.54) only.
+ * PoC-2/3/4 lab TLS — isolated VM (.54) only.
  * Requires LAYER7_TLSPROXY_LAB=1. Default bind 127.0.0.1.
  * Never claims mitm_effective=true. No PF redirect. No payload to disk.
  */
@@ -7,8 +7,8 @@
 #define LAYER7_TLSPROXY_TLS_H
 
 void l7_tls_set_allow_any(int v);
+void l7_tls_set_upstream(const char *host, int port);
 
-/* PoC-3 policy: exact SNI (case-insensitive). Max entries modest. */
 int l7_tls_policy_add_bypass(const char *sni);
 int l7_tls_policy_add_block(const char *sni);
 

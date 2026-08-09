@@ -1,8 +1,8 @@
 /*
- * PoC-2/3 — TLS acceptor + SNI policy (bypass | block | allow).
+ * PoC-2/3/4 — TLS acceptor + SNI policy + optional localhost upstream.
  *
- * Lab VM 192.168.100.54 only. No decrypted payload on disk.
- * mitm_effective always reported false (product claim forbidden).
+ * Lab VM 192.168.100.54 only.
+ * mitm_effective always false. No payload persisted to disk.
  */
 
 #include "tls_lab.h"
@@ -11,6 +11,7 @@
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <signal.h>
 #include <stdint.h>
@@ -25,6 +26,7 @@
 
 #define L7_POLICY_MAX 64
 #define L7_SNI_MAX 253
+#define L7_BUF 8192
 
 enum l7_verdict {
 	L7_ALLOW = 0,
@@ -34,6 +36,8 @@ enum l7_verdict {
 
 static volatile sig_atomic_t l7_tls_stop;
 static int l7_tls_allow_any;
+static char l7_up_host[64];
+static int l7_up_port;
 
 static char l7_bypass[L7_POLICY_MAX][L7_SNI_MAX + 1];
 static int l7_nbypass;
@@ -44,6 +48,29 @@ void
 l7_tls_set_allow_any(int v)
 {
 	l7_tls_allow_any = v;
+}
+
+void
+l7_tls_set_upstream(const char *host, int port)
+{
+	if (host == NULL || port <= 0 || port > 65535) {
+		l7_up_host[0] = '\0';
+		l7_up_port = 0;
+		return;
+	}
+	/* Fail-closed: upstream only on loopback in PoC-4. */
+	if (strcmp(host, "127.0.0.1") != 0 && strcmp(host, "::1") != 0) {
+		fprintf(stderr,
+		    "layer7-tlsproxy: refusing upstream %s "
+		    "(PoC-4 allows only 127.0.0.1)\n",
+		    host);
+		l7_up_host[0] = '\0';
+		l7_up_port = 0;
+		return;
+	}
+	strncpy(l7_up_host, host, sizeof(l7_up_host) - 1);
+	l7_up_host[sizeof(l7_up_host) - 1] = '\0';
+	l7_up_port = port;
 }
 
 static void
@@ -114,7 +141,6 @@ decide_sni(const char *sni_in)
 	strncpy(sni, sni_in, L7_SNI_MAX);
 	sni[L7_SNI_MAX] = '\0';
 	sni_lower(sni);
-	/* block wins over bypass if both listed (fail-closed for explicit block) */
 	if (sni_in_list(sni, l7_block, l7_nblock))
 		return L7_BLOCK;
 	if (sni_in_list(sni, l7_bypass, l7_nbypass))
@@ -166,15 +192,75 @@ http_reply(SSL *ssl, int code, const char *ctype, const char *body)
 	SSL_write(ssl, body, (int)strlen(body));
 }
 
+static int
+write_full(int fd, const char *buf, size_t n)
+{
+	size_t off = 0;
+
+	while (off < n) {
+		ssize_t w = write(fd, buf + off, n - off);
+
+		if (w < 0) {
+			if (errno == EINTR)
+				continue;
+			return -1;
+		}
+		if (w == 0)
+			return -1;
+		off += (size_t)w;
+	}
+	return 0;
+}
+
+/* PoC-4: one-shot HTTP reverse-proxy to loopback upstream. No body logging. */
+static int
+proxy_allow_upstream(SSL *ssl, const char *req, int req_len)
+{
+	struct sockaddr_in addr;
+	char buf[L7_BUF];
+	int ufd = -1;
+	ssize_t n;
+	int rc = -1;
+
+	if (l7_up_port <= 0 || l7_up_host[0] == '\0')
+		return -1;
+
+	ufd = socket(AF_INET, SOCK_STREAM, 0);
+	if (ufd < 0)
+		return -1;
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons((uint16_t)l7_up_port);
+	if (inet_pton(AF_INET, l7_up_host, &addr.sin_addr) != 1)
+		goto out;
+	if (connect(ufd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
+		goto out;
+	if (write_full(ufd, req, (size_t)req_len) != 0)
+		goto out;
+	shutdown(ufd, SHUT_WR);
+	while ((n = read(ufd, buf, sizeof(buf))) > 0) {
+		if (SSL_write(ssl, buf, (int)n) <= 0)
+			goto out;
+	}
+	rc = 0;
+out:
+	if (ufd >= 0)
+		close(ufd);
+	return rc;
+}
+
 static void
 serve_by_verdict(SSL *ssl, enum l7_verdict v, const char *sni)
 {
-	char req[2048];
+	char req[L7_BUF];
 	char json[512];
 	const char *sni_show = (sni && sni[0]) ? sni : "";
+	int nread;
 
-	/* Read request (discard body). No payload persisted. */
-	SSL_read(ssl, req, (int)sizeof(req) - 1);
+	nread = SSL_read(ssl, req, (int)sizeof(req) - 1);
+	if (nread < 0)
+		nread = 0;
+	req[nread] = '\0';
 
 	if (v == L7_BLOCK) {
 		static const char *page =
@@ -191,17 +277,30 @@ serve_by_verdict(SSL *ssl, enum l7_verdict v, const char *sni)
 
 	if (v == L7_BYPASS) {
 		snprintf(json, sizeof(json),
-		    "{\"service\":\"layer7-tlsproxy\",\"poc\":\"3\","
+		    "{\"service\":\"layer7-tlsproxy\",\"poc\":\"4\","
 		    "\"verdict\":\"bypass\",\"sni\":\"%s\","
 		    "\"mitm_effective\":false,\"intercept\":false,"
-		    "\"note\":\"lab-sim: policy bypass (no upstream splice yet)\"}\n",
+		    "\"note\":\"lab-sim: policy bypass (no upstream)\"}\n",
+		    sni_show);
+		http_reply(ssl, 200, "application/json", json);
+		return;
+	}
+
+	/* ALLOW */
+	if (l7_up_port > 0 && nread > 0) {
+		if (proxy_allow_upstream(ssl, req, nread) == 0)
+			return;
+		snprintf(json, sizeof(json),
+		    "{\"service\":\"layer7-tlsproxy\",\"poc\":\"4\","
+		    "\"verdict\":\"allow\",\"sni\":\"%s\","
+		    "\"mitm_effective\":false,\"upstream_error\":true}\n",
 		    sni_show);
 		http_reply(ssl, 200, "application/json", json);
 		return;
 	}
 
 	snprintf(json, sizeof(json),
-	    "{\"service\":\"layer7-tlsproxy\",\"poc\":\"3\","
+	    "{\"service\":\"layer7-tlsproxy\",\"poc\":\"4\","
 	    "\"verdict\":\"allow\",\"sni\":\"%s\","
 	    "\"mitm_effective\":false,\"intercept\":false}\n",
 	    sni_show);
@@ -249,7 +348,6 @@ l7_tls_lab_listen(const char *bind_host, int bind_port,
 		goto out;
 	}
 	SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
-	/* Need servername callback for SNI visibility on some stacks; get after accept. */
 	if (SSL_CTX_use_certificate_file(ctx, cert_path, SSL_FILETYPE_PEM) != 1 ||
 	    SSL_CTX_use_PrivateKey_file(ctx, key_path, SSL_FILETYPE_PEM) != 1 ||
 	    SSL_CTX_check_private_key(ctx) != 1) {
@@ -284,9 +382,10 @@ l7_tls_lab_listen(const char *bind_host, int bind_port,
 	}
 
 	fprintf(stderr,
-	    "layer7-tlsproxy: TLS lab %s:%d (poc3; bypass=%d block=%d; "
-	    "mitm_effective=false)\n",
-	    bind_host, bind_port, l7_nbypass, l7_nblock);
+	    "layer7-tlsproxy: TLS lab %s:%d (poc4; bypass=%d block=%d "
+	    "upstream=%s:%d; mitm_effective=false)\n",
+	    bind_host, bind_port, l7_nbypass, l7_nblock,
+	    l7_up_port ? l7_up_host : "-", l7_up_port);
 
 	while (!l7_tls_stop) {
 		struct sockaddr_in peer;

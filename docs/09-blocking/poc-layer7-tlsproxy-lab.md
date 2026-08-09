@@ -1,40 +1,27 @@
-# PoC lab — `layer7-tlsproxy` (pós GO lab)
+# PoC lab — `layer7-tlsproxy`
 
-**Estado:** `ACTIVO` — **PoC-3 PASS** (S3/S4) em `192.168.100.54`  
-**NÃO é** passo **20.10**.  
+**Estado:** **PoC-4 PASS** (upstream allow) em `192.168.100.54`  
+**NÃO é** 20.10.
 
 | Campo | Valor |
 |-------|--------|
-| GO lab | **SIM** (`2026-08-09`) |
-| Fase actual | **PoC-3 PASS** — próximo: splice/upstream ou S1 inline **só** em `.54` |
-| Lab descartável | **`192.168.100.54`** (`root`) |
-| Produção `.254`/`.234`/`.235` | **PROIBIDO** intercept |
-| Binário | `0.0.3-poc3` · `/opt/layer7-poc/` no `.54` |
-| `mitm_effective` | **false** |
+| Lab | `root@192.168.100.54` |
+| Binário | `0.0.4-poc4` · `/opt/layer7-poc/` |
+| Produção | **PROIBIDO** intercept |
 
 ## Fases
 
-| Fase | Gate |
-|------|------|
-| PoC-0 idle | **PASS** |
-| PoC-1 IPC | **PASS** |
-| PoC-2 TLS | **PASS** (S2 lab) |
-| PoC-3 SNI bypass/block + página HTTPS | **PASS** — `20260809T041800Z-poc3-sni-s3s4-54` |
-| → 20.10 | S1 inline + GO produto |
+| Fase | Estado |
+|------|--------|
+| PoC-0…3 | PASS |
+| PoC-4 upstream localhost | **PASS** — `20260809T042600Z-poc4-upstream-54` |
+| 20.10 | BLOQUEADO |
 
-## Hardening
+## Smoke (no hang)
 
-```text
-LAYER7_TLSPROXY_LAB=1
-TLS default 127.0.0.1
---block-sni / --bypass-sni (lab)
-mitm_effective=false sempre
-chaves só em /opt/layer7-poc/lab-certs (não git)
+```bash
+cd /opt/layer7-poc/src
+make STUB=/opt/layer7-poc/scripts/poc-upstream-stub.py test test-poc3 test-poc4
 ```
 
-## Histórico
-
-| Data | Nota |
-|------|------|
-| 2026-08-09 | PoC-0…2 |
-| 2026-08-09 | **PoC-3 PASS** S3/S4 em `.54` |
+Harness: `run-poc-tests.sh` + `timeout` (make não espera daemons em background).
