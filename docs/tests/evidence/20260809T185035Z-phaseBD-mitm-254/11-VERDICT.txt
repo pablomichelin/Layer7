@@ -1,0 +1,11 @@
+PHASE_BD=NO-GO
+REASON=Edge DOM missing Layer7 block marker (Chromium error page / interstitial path)
+MITM_ACTIVATED=yes_temporarily
+PF_RDR=present_on_vmx0_and_vmx0.95
+FROM_ANY=no_in_mitm_rdr
+EFFECTIVE=yes_during_test
+EDGE_INTERSTITIAL_OR_ERROR_PAGE=yes
+ROLLBACK_254=MITM_OFF_route_gone_rdr_cleared_8443_gone
+ROLLBACK_24=hosts_and_CAs_removed
+ROLLBACK_54=endpoint_removed
+LICENSE_SERVER=not_touched

@@ -1,0 +1,12 @@
+=== PF AUDIT ===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+FROM_ANY_LINES=745
+INET6_RDR=0
+GUI=200
+EFF
+yes

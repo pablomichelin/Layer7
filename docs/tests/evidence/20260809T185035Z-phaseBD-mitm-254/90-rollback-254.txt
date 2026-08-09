@@ -1,0 +1,20 @@
+ROLLBACK_BD_START Sun Aug  9 18:54:37 UTC 2026
+MITM_CLEARED
+delete host 198.18.0.10
+ROLLBACK_BD_CORE_DONE Sun Aug  9 18:54:37 UTC 2026
+ca_del=fail
+=== POST ROLLBACK 254 ===
+en=no eff=no
+src=[] dst=[]
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+root    layer7-tls 77030  3 tcp4  127.0.0.1:8443        *:*                  
+destination: 0.0.0.0
+    gateway: 10.99.99.35
+NO_19818
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+layer7d is running as pid 5401.
+GUI=200
+NET=OK
+Date				Owner		Queue	Job#
+Sun Aug  9 15:58:00 -03 2026	root            c	5

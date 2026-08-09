@@ -1,0 +1,9 @@
+total 18
+drwxr-x---  2 root wheel    4 Aug  9 15:50 .
+drwxr-xr-x  6 root wheel   17 Aug  9 15:50 ..
+-rw-r--r--  1 root wheel 1245 Aug  9 15:50 ca.crt
+-rw-------  1 root wheel 1704 Aug  9 15:50 ca.key
+subject=CN=Layer7-PhaseD-Lab-CA
+sha1 Fingerprint=25:ED:D8:C0:84:E8:13:F3:C5:57:3F:15:A1:5C:FD:C8:D3:5E:1B:3E
+subject=CN=Layer7-PhaseD-Lab-CA
+sha1 Fingerprint=25:ED:D8:C0:84:E8:13:F3:C5:57:3F:15:A1:5C:FD:C8:D3:5E:1B:3E

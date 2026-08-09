@@ -1,0 +1,8 @@
+add host 198.18.0.10: gateway 192.168.100.54
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+  interface: vmx0
+curl=200
+https_from_254=200
+L7-PHASE-A-OK-198.18.0.10
+GUI=200

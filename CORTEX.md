@@ -1359,13 +1359,14 @@ default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab; S6 **NA/limite**.
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.42 passivo**; **Fase A+B+C destino lab PASS** (`.24` Edge OK sem MITM)
-- Próximo: GO humano explícito **Fase D** (MITM source∧dest escopado)
+- Passo actual: **1.9.42 passivo**; ciclo B+D lab **NO-GO** (`20260809T185035Z`; Edge sem block page)
+- Próximo: diagnosticar trust/CA MITM no `.24` + novo GO humano B+D
 - Destino lab: `docs/09-blocking/runbook-destino-lab-19818-via-54.md`
 - Evidência A/B/C: `20260809T180157Z-phaseA-54` / `…phaseB-254` / `…phaseC-24`
+- Evidência B+D NO-GO: `20260809T185035Z-phaseBD-mitm-254`
 - Latest: **1.9.42** SHA `6bd6ba37…4c4b`
 - Identity rede: **FECHADA** (20.33 / GI9 PASS)
-- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; zero rdr MITM em produção
+- Squid: REJEITADO; GI2/GI3 PASS lab; S6 NA/limite; produção sem MITM após rollback
 ```
 
 ---

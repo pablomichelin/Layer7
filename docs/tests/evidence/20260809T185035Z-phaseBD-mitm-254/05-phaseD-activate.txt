@@ -1,0 +1,4 @@
+ca_gen=ok msg=CA gerada.
+enabled=yes
+ca_present=yes
+effective_pre_sync=yes

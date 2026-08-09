@@ -171,6 +171,6 @@ Abort se rdr tiver `from any` ou tabelas sem src.
 | Aplicar Fase A? | **GO executado — PASS** (`20260809T180157Z-phaseA-54`) |
 | Aplicar Fase B? | **GO executado — PASS** (`20260809T180624Z-phaseB-254`; PF extra não preciso) |
 | Aplicar Fase C? | **GO executado — PASS** (`20260809T181302Z-phaseC-24`; Edge sem intersticial) |
-| Aplicar Fase D agora? | **NO-GO automático** — falta **GO humano explícito** só para D (MITM `1.9.42`) |
+| Aplicar Fase D agora? | **GO executado — NO-GO Edge** (`20260809T185035Z-phaseBD-mitm-254`; rollback completo; novo GO necessário) |
 
 **Pedido ao proprietário:** confirmar **GO explícito para Fase D** (MITM escopado source `.24` + dest `198.18.0.10`). Não activar MITM sem esse GO. **Atenção:** fail-safe B (`at` ~15:50 −03 / sleep) ainda remove a rota — estender se D não for imediato.

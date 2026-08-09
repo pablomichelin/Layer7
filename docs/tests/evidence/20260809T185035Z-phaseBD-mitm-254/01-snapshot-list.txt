@@ -1,0 +1,6 @@
+total 8267
+drwxr-xr-x   2 root wheel      5 Aug  9 15:50 .
+drwxrwxrwt  27 root wheel  76929 Aug  9 15:50 ..
+-rw-r--r--   1 root wheel      0 Aug  9 15:50 01-snapshot-list.txt
+-rw-r--r--   1 root wheel 958316 Aug  9 14:51 config.xml.bak
+-rw-rw-r--   1 www  wheel   5682 Aug  9 15:26 layer7.json.bak
