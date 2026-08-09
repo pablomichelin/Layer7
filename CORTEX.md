@@ -35,17 +35,12 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.33` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.33`;
-`SHA256=71e55377fef2de7051b472f3253e51dc56bcb1ca36bd4f9b708ae5418590ec29`;
-UX visual wave 2 / BG-108 + BG-107; comandos em
-`docs/10-license-server/MANUAL-INSTALL.md`).
+`1.9.34` (em publicação — redeploy limpo do conteúdo `1.9.33` / BG-108 para
+clientes actualizarem via pacote; `1.9.33` ficou como rebuild in-place e
+não serve como bump de upgrade). Rollback: **`1.9.33`** / **`1.9.30`**.
 Builder FreeBSD **15** (política: manter 15 até FreeBSD 16.0-RELEASE).
-Appliance lab Plus/FreeBSD 16: install com `IGNORE_OSVERSION=yes pkg add -f`
-(BG-106 aceite operacionalmente). Gate `2026-08-08`: daemon running,
-`layer7d -t` PASS, Chart.js/KPI/subnav/catalogo verificados.
-Rollback publico: **`1.9.30`**.
-**BG-106:** ABI builder 15 vs appliance 16 — documentado; promoção `latest`
-feita com procedimento `-f`; builder 16 adiado até RELEASE estável.
+Appliance lab Plus/FreeBSD 16: `IGNORE_OSVERSION=yes pkg add -f` (BG-106).
+**BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
 Rollback enforce: **`1.9.0`** / historico `_69`, `_24`.
 **Nota:** `1.8.11_55` foi publicada com artefacto incompleto (BG-070 a meio) —

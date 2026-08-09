@@ -9,6 +9,20 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 - Próximo: BG-109 (mapa Identity GUI) quando houver dump/IPC; builder FreeBSD 16
   só após 16.0-RELEASE.
 
+## [1.9.34] — 2026-08-08
+
+### Changed
+
+- **Redeploy público do BG-108:** mesma funcionalidade de `1.9.33` (KPI unificado,
+  subnav Políticas, Chart.js offline, Kick/Rumble→Streaming, admin-block),
+  publicada como **`1.9.34`** para permitir upgrade limpo via pacote em todos os
+  clientes (o `1.9.33` tinha sido rebuild/promovido in-place com SHA diferente).
+
+### Release
+
+- Tag `v1.9.34` / `releases/latest` (SHA no fecho do build)
+- Rollback: `1.9.33` ou `1.9.30`
+
 ## [1.9.33] — 2026-08-08
 
 ### Changed
