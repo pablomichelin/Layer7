@@ -20,6 +20,6 @@
 
 | Bloco | Conteúdo | Estado |
 |-------|----------|--------|
-| **20.10a** | Runtime no `.pkg` + rc default OFF + `runtime_available`; `intercept_ready=false` | **em curso** |
+| **20.10a** | Runtime no `.pkg` + rc default OFF + `runtime_available`; `intercept_ready=false` | **PASS** (`1.9.39`) |
 | **20.10b** | Listen selectivo + PF rdr + block page HTTPS | Pendente |
 | **20.11** | GI2/GI3 lab | Pendente |

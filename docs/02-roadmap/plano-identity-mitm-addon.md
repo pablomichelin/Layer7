@@ -16,7 +16,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.38` (20.9 PASS; SHA `7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`)
+**Canal lab/`latest`:** `1.9.39` (20.10a; SHA `6e7f4e9fe751c73a0dbdb990bd7799b37aa6136288dcb3d3941d1b42f2f4f4c9`)
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  

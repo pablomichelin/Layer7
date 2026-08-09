@@ -49,7 +49,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 | Campo | Valor |
 |-------|-------|
 | Plano | Identity **FECHADA**; MITM **GO produto**; **20.10a** em curso (rev. `2026-08-09ab`) |
-| Passo actual | **20.10a** — runtime no `.pkg`, default OFF, `intercept_ready=false` |
+| Passo actual | **20.10a PASS** (`1.9.39`); próximo **20.10b** |
 | Próximo | **20.10b** — listen + PF rdr + block page HTTPS |
 | Rev. do plano | **`2026-08-09ab`** |
 | MITM | Runtime empacotável; `mitm_effective` **false**; GI2/GI3 **DEFERRED** até 20.10b+ |

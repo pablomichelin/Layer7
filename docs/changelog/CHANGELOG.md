@@ -22,8 +22,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Release
 
-- Tag `v1.9.39` / `releases/latest` (após publish)
-- SHA256: *(preencher no publish)*
+- Tag `v1.9.39` / `releases/latest`
+- SHA256: `6e7f4e9fe751c73a0dbdb990bd7799b37aa6136288dcb3d3941d1b42f2f4f4c9`
 - Rollback: `1.9.38`
 
 

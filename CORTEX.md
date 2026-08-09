@@ -36,11 +36,11 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.39` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.39`;
-SHA a confirmar no publish; BG-087/20.10a runtime no `.pkg` default OFF;
-`intercept_ready=false`; sem intercept; comandos em
-`docs/10-license-server/MANUAL-INSTALL.md`).
+`SHA256=6e7f4e9fe751c73a0dbdb990bd7799b37aa6136288dcb3d3941d1b42f2f4f4c9`;
+BG-087/20.10a runtime no `.pkg` default OFF; `intercept_ready=false`;
+sem intercept; comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback: **`1.9.38`**.
-**MITM:** **GO produto** `2026-08-09`; **20.10a** (runtime empacotado, OFF);
+**MITM:** **GO produto** `2026-08-09`; **20.10a PASS** (runtime empacotado, OFF);
 **20.10b** pendente; PoC lab `.54` continua; **sem** intercept produção.
 **BG-106:** ABI 15 vs 16 — aceite operacional com `-f`; builder 16 adiado.
 **Referencia de producao enforce:** **`1.9.8`** (GV7.4) até GO enforce.
@@ -1548,15 +1548,15 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 CHECKPOINT CANONICO
 - Data base: 2026-08-09 (GO produto + 20.10a)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
-- Canal publico latest: **1.9.39** (BG-087/20.10a; SHA no publish)
+- Canal publico latest: **1.9.39** (BG-087/20.10a; SHA `6e7f4e9f…f4c9`)
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
-- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **GO produto** + **20.10a**; **20.10b** pendente; Squid rejeitado
+- Trilha Identity + MITM: Identity rede **FECHADA**; MITM **GO produto** + **20.10a PASS**; **20.10b** pendente; Squid rejeitado
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Proximo trabalho: **20.10b** (listen + PF rdr + página HTTPS)
-- Pacote alvo: **1.9.39**; rollback lab: **1.9.38**
+- Pacote publicado: **1.9.39**; rollback lab: **1.9.38**
 - Fonte canonica instalacao: docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
