@@ -1577,12 +1577,14 @@ historicos de continuidade em `docs/07-prompts` esta resolvida no
 
 ```text
 CHECKPOINT CANONICO
-- Data base: 2026-08-09 (1.9.46 Gate C PASS; anti-QUIC escopo MITM; 20.11 GI2/GI3; S6 NA)
+- Data base: 2026-08-10 (BG-113 polish pack produto + Reportar erro UX; latest publicado ainda 1.9.47)
 - Produto: Layer7 para pfSense CE — **PRONTO PARA ENFORCE** (excepções ADR-0022 CE, ADR-0023 BG-028 fase 0)
 - Canal publico latest: **1.9.47** (SHA `2155daca…9df833`)
+- Candidato local: **1.9.48** (Reportar erro Diagnósticos, UX 3 passos) — **não** publicado
 - Producao enforce: **1.9.8** (GV7.4; rollback 1.9.0) — promoção **para além de 1.9.8** PENDENTE GO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
+- Pack produto: docs/00-overview/pack-produto-layer7.md → prd / uml / catalogo
 - Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.47** P3 PASS; Gate B+C/`215442Z` em `1.9.46`; permanente **NO-GO**; Squid rejeitado
 - MITM piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; **P4 CLOSED FAIL/ABORT**; **P5 aguarda ficha**
 - Gate activação externa: ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia

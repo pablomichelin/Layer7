@@ -56,6 +56,10 @@ vence o canónico.
 | `docs/README.md` | indice oficial | porta de entrada canónica da arvore `docs/` | Canónico | substitui a falta de indice formal | manter vivo | F0+ |
 | `docs/MANUAL-PRODUTO.md` | manual público do produto | hub + guia operador (instalação, GUI, modos, MITM gates, suporte); navega para manuais canónicos por área | Canónico | hub público SSOT de navegação; **não** substitui `MANUAL-INSTALL.md` (comandos) nem o tutorial legado | actualizar a cada release `latest` e veredicto MITM | F0+ |
 | `docs/00-overview/product-charter.md` | charter | resumo canónico de produto/escopo | Canónico | resume `01-VISAO-GERAL-E-ESCOPO.md` | manter vivo | F0+ |
+| `docs/00-overview/pack-produto-layer7.md` | pack produto | índice navegável PRD+UML+catálogo + fluxo Reportar erro | Canónico | porta de entrada do pack; não substitui CORTEX | manter com releases/UI report | F0+ |
+| `docs/00-overview/prd-layer7.md` | PRD | requisitos funcionais/não-funcionais, personas, aceitação | Canónico | complementa charter; não substitui CORTEX | actualizar com releases/gates | F0+ |
+| `docs/00-overview/uml-layer7.md` | UML | classes + sequências Mermaid (GUI/daemon/LS/MITM/report) | Canónico | resume `target-architecture` + core | actualizar se fronteiras mudarem | F0+ |
+| `docs/00-overview/catalogo-funcionalidades.md` | catálogo | inventário capacidades com status | Canónico | liga PRD ↔ CORTEX ↔ backlog | actualizar a cada feature/release | F0+ |
 | `docs/00-overview/document-classification.md` | classificacao | matriz de estatuto dos docs | Canónico | novo | manter vivo quando surgirem conflitos | F0+ |
 | `docs/00-overview/document-equivalence-map.md` | equivalencia | mapa raiz <-> docs + regra pós-H5 + higiene residual | Canónico | novo | manter vivo (H1–H5 FECHADA; residual BG-112) | F0-F6 |
 | `docs/00-overview/f6-mapa-consolidacao-H0.md` | mapa F6 Onda H | H1–H5 executados | Canónico (histórico de fase) | — | não reabrir H1–H5; apontar residual | F6 |

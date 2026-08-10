@@ -567,6 +567,14 @@ usar o handoff e hierarquia em
 [`00-overview/handoff-chat-novo.md`](00-overview/handoff-chat-novo.md)
 (equipa de produto — não substitui suporte ao cliente).
 
+**Reportar erro (GUI):** em **Services → Layer 7 → Diagnósticos**, bloco
+**Reportar erro** (candidato `1.9.48`). Fluxo: (1) descrever o sintoma,
+(2) rever metadados seguros, (3) **Abrir issue no GitHub** ou
+**Copiar URL (sem redirect)**. Nada é enviado até clicar. **Não** inclui
+`.lic`, chaves, logs, dumps nem IPs de clientes. No GitHub: login →
+completar reprodução → Submit. Fluxo completo:
+[`00-overview/pack-produto-layer7.md`](00-overview/pack-produto-layer7.md#como-funciona-reportar-erro).
+
 ---
 
 ## 17. Caminhos importantes (referência)

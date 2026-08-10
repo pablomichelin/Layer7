@@ -3953,6 +3953,159 @@ function layer7_pkg_version()
 }
 
 /**
+ * Contexto seguro para "Reportar erro" (GUI Diagnósticos).
+ * Apenas metadados não sensíveis — sem .lic, chaves, logs, dumps, hostnames.
+ *
+ * @param array $cfg Config layer7 (array decodificado ou sub-árvore "layer7")
+ * @param bool|null $daemon_running
+ * @return array<string,string>
+ */
+function layer7_error_report_safe_context($cfg, $daemon_running = null)
+{
+	$l7 = array();
+	if (is_array($cfg)) {
+		if (isset($cfg["layer7"]) && is_array($cfg["layer7"])) {
+			$l7 = $cfg["layer7"];
+		} else {
+			$l7 = $cfg;
+		}
+	}
+
+	$enabled = !empty($l7["enabled"]) ? "true" : "false";
+	$mode = isset($l7["mode"]) ? (string)$l7["mode"] : "";
+	if ($mode !== "monitor" && $mode !== "enforce") {
+		$mode = "(unset)";
+	}
+	$model = isset($l7["enforcement_model"]) ? (string)$l7["enforcement_model"] : "legacy_global";
+	if (!preg_match('/^[A-Za-z0-9_.-]{1,64}$/', $model)) {
+		$model = "(invalid)";
+	}
+
+	$iface_count = 0;
+	if (!empty($l7["interfaces"]) && is_array($l7["interfaces"])) {
+		$iface_count = count($l7["interfaces"]);
+	}
+
+	$mitm = "off";
+	if (!empty($l7["mitm"]) && is_array($l7["mitm"]) && !empty($l7["mitm"]["enabled"])) {
+		$mitm = "configured_on";
+	}
+
+	$daemon = "unknown";
+	if ($daemon_running === true) {
+		$daemon = "running";
+	} elseif ($daemon_running === false) {
+		$daemon = "stopped";
+	}
+
+	$pkg = layer7_pkg_version();
+	$daemon_ver = layer7_daemon_version();
+
+	return array(
+		"pkg_version" => ($pkg !== "" ? $pkg : "(unknown)"),
+		"daemon_version" => ($daemon_ver !== "" ? $daemon_ver : "(unknown)"),
+		"daemon" => $daemon,
+		"enabled" => $enabled,
+		"mode" => $mode,
+		"enforcement_model" => $model,
+		"interface_count" => (string)$iface_count,
+		"mitm" => $mitm,
+	);
+}
+
+/**
+ * Sanitiza resumo opcional do operador (sem caminhos de ficheiros longos).
+ *
+ * @param string $summary
+ * @param int $max_len
+ * @return string
+ */
+function layer7_error_report_sanitize_summary($summary, $max_len = 500)
+{
+	if (!is_string($summary)) {
+		return "";
+	}
+	$summary = str_replace(array("\r\n", "\r"), "\n", $summary);
+	/* Remove control chars except tab/newline (compat PHP pfSense). */
+	$summary = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $summary);
+	$summary = trim($summary);
+	if ($summary === "") {
+		return "";
+	}
+	if (function_exists("mb_substr")) {
+		$summary = mb_substr($summary, 0, $max_len);
+	} else {
+		$summary = substr($summary, 0, $max_len);
+	}
+	return trim($summary);
+}
+
+/**
+ * Monta URL GitHub Issues/new com título/corpo pré-preenchidos.
+ * Opt-in do operador — não envia dados automaticamente.
+ *
+ * @param array $context Saída de layer7_error_report_safe_context()
+ * @param string $user_summary
+ * @return string
+ */
+function layer7_error_report_issue_url($context, $user_summary = "")
+{
+	if (!is_array($context)) {
+		$context = array();
+	}
+	$summary = layer7_error_report_sanitize_summary($user_summary);
+	$pkg = isset($context["pkg_version"]) ? (string)$context["pkg_version"] : "(unknown)";
+
+	$title = "Bug report: Layer7 " . $pkg;
+	if ($summary !== "") {
+		$one = preg_replace('/\s+/', ' ', $summary);
+		if (function_exists("mb_substr")) {
+			$one = mb_substr($one, 0, 80);
+		} else {
+			$one = substr($one, 0, 80);
+		}
+		$title = "Bug report: " . $one;
+	}
+
+	$lines = array(
+		"## Descrição",
+		"",
+		($summary !== "" ? $summary : "_Descreva o problema observado_"),
+		"",
+		"## Contexto automático (não sensível)",
+		"",
+		"- Pacote: `" . (isset($context["pkg_version"]) ? $context["pkg_version"] : "(unknown)") . "`",
+		"- Daemon banner: `" . (isset($context["daemon_version"]) ? $context["daemon_version"] : "(unknown)") . "`",
+		"- Daemon: `" . (isset($context["daemon"]) ? $context["daemon"] : "unknown") . "`",
+		"- Enabled: `" . (isset($context["enabled"]) ? $context["enabled"] : "unknown") . "`",
+		"- Mode: `" . (isset($context["mode"]) ? $context["mode"] : "unknown") . "`",
+		"- Enforcement model: `" . (isset($context["enforcement_model"]) ? $context["enforcement_model"] : "unknown") . "`",
+		"- Interface count: `" . (isset($context["interface_count"]) ? $context["interface_count"] : "0") . "`",
+		"- MITM config flag: `" . (isset($context["mitm"]) ? $context["mitm"] : "off") . "`",
+		"",
+		"## O que NÃO foi enviado",
+		"",
+		"- Ficheiro `.lic`, chaves, senhas, dumps, logs brutos, hostnames, IPs de clientes, regras PF completas.",
+		"",
+		"## Passos para reproduzir",
+		"",
+		"1. ",
+		"2. ",
+		"",
+		"## Resultado esperado vs obtido",
+		"",
+		"_preencher_",
+	);
+
+	$body = implode("\n", $lines);
+	$q = http_build_query(array(
+		"title" => $title,
+		"body" => $body,
+	));
+	return "https://github.com/pablomichelin/Layer7/issues/new?" . $q;
+}
+
+/**
  * Consulta GitHub Releases/latest e compara com a versao instalada do pacote.
  * Usado pelo updater da GUI (POST legado e AJAX).
  *
@@ -9385,6 +9538,24 @@ function layer7_render_styles()
 	.layer7-page .l7r-chart { background: #fff; border: 1px solid #e5e5e5; border-radius: 5px; padding: 14px; margin-bottom: 0; }
 	.layer7-page .l7r-inferred { display: inline-block; margin-left: 6px; font-size: 10px; padding: 2px 6px; border-radius: 10px; background: #f0ad4e; color: #fff; vertical-align: middle; }
 	.layer7-page .l7r-note { margin-top: 10px; color: #666; font-size: 12px; }
+	/* Reportar erro — fluxo em 3 passos (Diagnósticos) */
+	.layer7-page .l7-report-flow { margin: 0; }
+	.layer7-page .l7-report-step { margin-top: 14px; padding: 14px 16px; background: #fafafa; border: 1px solid #e2e2e2; border-radius: 4px; }
+	.layer7-page .l7-report-step:first-child { margin-top: 0; }
+	.layer7-page .l7-report-step__label { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #333; line-height: 1.35; }
+	.layer7-page .l7-report-step__num { display: inline-block; width: 22px; height: 22px; margin-right: 6px; border-radius: 50%; background: #4b4b4b; color: #fff; font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; vertical-align: middle; }
+	.layer7-page .l7-report-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+	.layer7-page .l7-report-chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; background: #fff; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; line-height: 1.35; }
+	.layer7-page .l7-report-chip__k { color: #777; font-weight: 600; text-transform: uppercase; font-size: 10px; letter-spacing: 0.03em; }
+	.layer7-page .l7-report-chip code { font-size: 12px; color: #333; background: transparent; padding: 0; }
+	.layer7-page .l7-report-privacy { display: flex; flex-wrap: wrap; gap: 12px; }
+	.layer7-page .l7-report-privacy__col { flex: 1 1 220px; padding: 10px 12px; border-radius: 3px; font-size: 12px; line-height: 1.45; }
+	.layer7-page .l7-report-privacy__col ul { margin: 6px 0 0; padding-left: 18px; }
+	.layer7-page .l7-report-privacy__col--ok { background: #f4faf4; border: 1px solid #d6e9d6; }
+	.layer7-page .l7-report-privacy__col--no { background: #fff8f8; border: 1px solid #ebcccc; }
+	.layer7-page .l7-report-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+	.layer7-page .l7-report-url-box { margin-top: 14px; margin-bottom: 0; }
+	.layer7-page .l7-report-url { font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 11px; word-break: break-all; background: #fff; }
 	</style>';
 }
 

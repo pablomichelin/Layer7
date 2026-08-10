@@ -70,6 +70,7 @@ Ele existe para evitar tres erros comuns:
 | continuidade (chat longo, handoff) | `docs/00-overview/handoff-chat-novo.md` (procedimento, prompt, pos-clone) vs `CORTEX.md` (Politica de continuidade entre chats) | `CORTEX.md` para estado e prioridade; `handoff-chat-novo.md` para o *como* sem contrariar o SSOT | o handoff expande; nunca substitui fase, backlog ou checkpoint do CORTEX |
 | IPv6 / dual-stack | notas antigas «planeado V2» vs limitação FP-010 | [`【FECHADO】 plano-ipv6`](../archive/planos-fechados/plano-ipv6-completo.md) + mapa + ADR-0024; START-HERE; ESTADO-PRODUTO | trilha **FECHADA**; stubs em `02-roadmap/` |
 | Fecho vs estado vivo | planos arquivados vs CORTEX | CORTEX = vivo; ESTADO-PRODUTO = veredicto; `archive/planos-fechados/` = histórico | em “está aberto?”, vence ESTADO-PRODUTO + CORTEX |
+| Escopo produto | charter vs pack/PRD/catálogo vs README raiz | `pack-produto-layer7.md` → `prd-layer7.md` + `catalogo-funcionalidades.md` + CORTEX | charter resume; README raiz pode estar atrasado na versão |
 
 ---
 

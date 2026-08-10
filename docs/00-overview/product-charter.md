@@ -24,3 +24,12 @@ O pfSense CE não oferece, de fábrica, classificação Layer 7 orientada a apli
 ## Documento expandido
 
 Detalhes completos: [`../../01-VISAO-GERAL-E-ESCOPO.md`](../../01-VISAO-GERAL-E-ESCOPO.md) (raiz do repositório).
+
+## Pack de produto (canónico)
+
+| Documento | Papel |
+|-----------|--------|
+| [`pack-produto-layer7.md`](pack-produto-layer7.md) | Índice do pack (PRD + UML + catálogo + fluxo Report) |
+| [`prd-layer7.md`](prd-layer7.md) | PRD — requisitos, personas, aceitação, riscos |
+| [`uml-layer7.md`](uml-layer7.md) | UML — classes e sequências (Mermaid) |
+| [`catalogo-funcionalidades.md`](catalogo-funcionalidades.md) | Catálogo com status Produção / Lab / NO-GO |

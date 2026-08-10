@@ -108,6 +108,7 @@ Pasta de evidências: [`docs/tests/evidence/`](../tests/evidence/).
 | IPv6 (histórico da fila) | [`【FECHADO】 plano-ipv6`](../archive/planos-fechados/plano-ipv6-completo.md), [`plano-gates-ipv6.md`](../09-blocking/plano-gates-ipv6.md), [`f4-ipv6-mapa-rastreabilidade.md`](../01-architecture/f4-ipv6-mapa-rastreabilidade.md), [`ADR-0024`](../03-adr/ADR-0024-suporte-ipv6-ativacao-faseada.md) |
 | Fecho P0–J (histórico) | [`【FECHADO】 plano-fecho`](../archive/planos-fechados/plano-fecho-producao-e-consolidacao.md) |
 | Classificação / equivalência | [`document-classification.md`](document-classification.md), [`document-equivalence-map.md`](document-equivalence-map.md) |
+| Pack produto (PRD / UML / catálogo) | [`pack-produto-layer7.md`](pack-produto-layer7.md) → [`prd-layer7.md`](prd-layer7.md), [`uml-layer7.md`](uml-layer7.md), [`catalogo-funcionalidades.md`](catalogo-funcionalidades.md) |
 | Limitações DPI / MITM | [`matriz-limitacoes-dpi.md`](../09-blocking/matriz-limitacoes-dpi.md), [`ADR-0017`](../03-adr/ADR-0017-pagina-bloqueio-utilizador-dns-sinkhole.md) |
 | Lab | [`08-lab/README.md`](../08-lab/README.md) |
 | Testes | [`tests/README.md`](../tests/README.md) |

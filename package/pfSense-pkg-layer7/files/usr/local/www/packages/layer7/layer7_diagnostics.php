@@ -304,6 +304,27 @@ if ($protos_exists) {
 	}
 }
 
+$error_report_ctx = layer7_error_report_safe_context($data, $status_ok);
+$error_report_summary = "";
+$error_report_copy_text = "";
+if (isset($_POST["report_error"])) {
+	$error_report_summary = isset($_POST["error_summary"])
+	    ? layer7_error_report_sanitize_summary($_POST["error_summary"])
+	    : "";
+	$report_url = layer7_error_report_issue_url($error_report_ctx, $error_report_summary);
+	if (!headers_sent()) {
+		header("Location: " . $report_url);
+		exit;
+	}
+}
+if (isset($_POST["copy_error_report"])) {
+	$error_report_summary = isset($_POST["error_summary"])
+	    ? layer7_error_report_sanitize_summary($_POST["error_summary"])
+	    : "";
+	$copy_url = layer7_error_report_issue_url($error_report_ctx, $error_report_summary);
+	$error_report_copy_text = $copy_url;
+}
+
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Diagnostics"));
 include("head.inc");
 layer7_render_styles();
@@ -654,6 +675,85 @@ layer7_render_styles();
 			</div>
 		</div>
 		<?php } ?>
+
+		<div class="layer7-admin-block" id="l7-report-error">
+			<div class="layer7-admin-block__header">
+				<?= l7_t("Reportar erro"); ?>
+				<span class="badge"><?= l7_t("Opt-in"); ?></span>
+				<span class="badge"><?= l7_t("Sem telemetria"); ?></span>
+			</div>
+			<div class="layer7-admin-block__body">
+				<p class="layer7-lead" style="margin-bottom:16px;">
+					<?= l7_t("Descreva o problema, reveja os metadados seguros e abra uma issue no GitHub. Nada e enviado ate clicar. Licenca, chaves, logs e IPs de clientes nunca sao incluidos."); ?>
+				</p>
+
+				<form method="post" action="layer7_diagnostics.php#l7-report-error" class="l7-report-flow">
+					<div class="l7-report-step">
+						<div class="l7-report-step__label"><span class="l7-report-step__num">1</span> <?= l7_t("Descreva o problema"); ?></div>
+						<div class="form-group" style="margin-bottom:0;">
+							<label class="sr-only" for="error_summary"><?= l7_t("Descricao curta (opcional)"); ?></label>
+							<textarea id="error_summary" name="error_summary" class="form-control" rows="3"
+								maxlength="500" placeholder="<?= htmlspecialchars(l7_t("Ex.: politicas nao bloqueiam YouTube em enforce")); ?>"><?= htmlspecialchars($error_report_summary); ?></textarea>
+							<p class="help-block"><?= l7_t("Opcional. Ate 500 caracteres. Evite colar chaves, dumps ou logs."); ?></p>
+						</div>
+					</div>
+
+					<div class="l7-report-step">
+						<div class="l7-report-step__label"><span class="l7-report-step__num">2</span> <?= l7_t("Reveja o que sera anexado"); ?></div>
+						<div class="l7-report-meta">
+							<span class="l7-report-chip"><span class="l7-report-chip__k"><?= l7_t("Pacote"); ?></span> <code><?= htmlspecialchars($error_report_ctx["pkg_version"]); ?></code></span>
+							<span class="l7-report-chip"><span class="l7-report-chip__k"><?= l7_t("Daemon"); ?></span> <code><?= htmlspecialchars($error_report_ctx["daemon"]); ?></code><?php if ($error_report_ctx["daemon_version"] !== "(unknown)") { ?> <code><?= htmlspecialchars($error_report_ctx["daemon_version"]); ?></code><?php } ?></span>
+							<span class="l7-report-chip"><span class="l7-report-chip__k"><?= l7_t("Enabled"); ?></span> <code><?= htmlspecialchars($error_report_ctx["enabled"]); ?></code></span>
+							<span class="l7-report-chip"><span class="l7-report-chip__k"><?= l7_t("Modo"); ?></span> <code><?= htmlspecialchars($error_report_ctx["mode"]); ?></code></span>
+							<span class="l7-report-chip"><span class="l7-report-chip__k"><?= l7_t("Modelo"); ?></span> <code><?= htmlspecialchars($error_report_ctx["enforcement_model"]); ?></code></span>
+							<span class="l7-report-chip"><span class="l7-report-chip__k"><?= l7_t("Interfaces"); ?></span> <code><?= htmlspecialchars($error_report_ctx["interface_count"]); ?></code></span>
+							<span class="l7-report-chip"><span class="l7-report-chip__k"><?= l7_t("MITM"); ?></span> <code><?= htmlspecialchars($error_report_ctx["mitm"]); ?></code></span>
+						</div>
+						<div class="l7-report-privacy">
+							<div class="l7-report-privacy__col l7-report-privacy__col--ok">
+								<strong><?= l7_t("Inclui"); ?></strong>
+								<ul>
+									<li><?= l7_t("Versoes e estado do daemon"); ?></li>
+									<li><?= l7_t("Modo / modelo / contagem de interfaces"); ?></li>
+									<li><?= l7_t("Flag MITM (ligado ou desligado na config)"); ?></li>
+								</ul>
+							</div>
+							<div class="l7-report-privacy__col l7-report-privacy__col--no">
+								<strong><?= l7_t("Nunca inclui"); ?></strong>
+								<ul>
+									<li><?= l7_t("Ficheiro .lic, chaves ou senhas"); ?></li>
+									<li><?= l7_t("Logs brutos, dumps ou regras PF"); ?></li>
+									<li><?= l7_t("Hostnames ou IPs de clientes"); ?></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<div class="l7-report-step">
+						<div class="l7-report-step__label"><span class="l7-report-step__num">3</span> <?= l7_t("Abra a issue"); ?></div>
+						<div class="l7-report-actions">
+							<button type="submit" name="report_error" value="1" class="btn btn-primary">
+								<i class="fa fa-external-link"></i> <?= l7_t("Abrir issue no GitHub"); ?>
+							</button>
+							<button type="submit" name="copy_error_report" value="1" class="btn btn-default">
+								<i class="fa fa-link"></i> <?= l7_t("Copiar URL (sem redirect)"); ?>
+							</button>
+						</div>
+						<p class="help-block" style="margin-top:10px;">
+							<?= l7_t("No GitHub: inicie sessao, complete os passos de reproducao e publique a issue. Se o firewall nao tiver internet, use Copiar URL noutro browser."); ?>
+						</p>
+					</div>
+				</form>
+
+				<?php if ($error_report_copy_text !== "") { ?>
+				<div class="alert alert-info l7-report-url-box">
+					<strong><?= l7_t("URL pronta para copiar"); ?></strong>
+					<p class="help-block" style="margin:6px 0 8px;"><?= l7_t("Seleccione o texto abaixo e cole num browser com acesso ao GitHub."); ?></p>
+					<textarea class="form-control l7-report-url" rows="3" readonly onclick="this.focus(); this.select();"><?= htmlspecialchars($error_report_copy_text); ?></textarea>
+				</div>
+				<?php } ?>
+			</div>
+		</div>
 
 		<div class="layer7-admin-block">
 			<div class="layer7-admin-block__header"><?= l7_t("Logs recentes"); ?></div>

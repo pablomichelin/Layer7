@@ -104,4 +104,8 @@ Não executar até GO e item de backlog. Responder em português.
 | [【FECHADO】 plano-fecho](../archive/planos-fechados/plano-fecho-producao-e-consolidacao.md) | Histórico P0–J (arquivo) |
 | [Raiz legado](../archive/raiz-legado/README.md) | `00-`…`16-` arquivados |
 | [MANUAL-INSTALL.md](../10-license-server/MANUAL-INSTALL.md) | Instalação |
+| [pack-produto-layer7.md](pack-produto-layer7.md) | Pack produto (índice + fluxo Reportar erro) |
+| [prd-layer7.md](prd-layer7.md) | PRD (requisitos / aceitação) |
+| [uml-layer7.md](uml-layer7.md) | UML classes + sequências |
+| [catalogo-funcionalidades.md](catalogo-funcionalidades.md) | Catálogo de funcionalidades |
 | [handoff-chat-novo.md](handoff-chat-novo.md) | Chat esgotado |

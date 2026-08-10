@@ -4,9 +4,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **GUI Diagnósticos — Reportar erro:** fluxo opt-in em 3 passos
+  (descrever → pré-visualizar metadados seguros → abrir GitHub ou
+  copiar URL). Issue pré-preenchida em `pablomichelin/Layer7` com
+  versão pkg/daemon, modo, model, contagem de interfaces e flag MITM.
+  Não envia `.lic`, chaves, logs, dumps nem IPs de clientes. Sem
+  telemetria/backend. Helpers
+  `layer7_error_report_safe_context` /
+  `layer7_error_report_issue_url` em `layer7.inc`. Regressão
+  `package/pfSense-pkg-layer7/tests/test_error_report.php`.
+- **Pack produto:** índice navegável
+  `docs/00-overview/pack-produto-layer7.md` + PRD / UML / catálogo
+  reorganizados (TOC, badges, diagramas Mermaid legíveis, fluxo Report).
+
 ### Notes
 
-- (vazio)
+- Candidato interno **`1.9.48`** (PORTVERSION) — **não** publicado;
+  canal `latest` continua `1.9.47` até release.
 
 ## [1.9.47] — 2026-08-09
 
