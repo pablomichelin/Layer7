@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **`1.9.47`** P3 PASS; **P4 soak IN_PROGRESS**; Gate B+C/teste em `1.9.46`; piloto externo **NÃO PRONTO** — **P5 aguarda ficha site** (rev. `2026-08-09av`)
+**Estado do plano:** Identity **FECHADA**; MITM **`1.9.47`** P3 PASS; **P4 CLOSED FAIL/ABORT**; Gate B+C/teste em `1.9.46`; piloto externo **NÃO PRONTO** — **P5 aguarda ficha site** (rev. `2026-08-09aw`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -56,7 +56,7 @@
 **Rev. `as` (`2026-08-09`)** = Gate activação externa (ficha nomeada) **≠** lacuna eng.; critérios aceite P3.1–P3.8 fechados no mapa.  
 **Rev. `at` (`2026-08-09`)** = **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS.  
 **Rev. `au` (`2026-08-09`)** = registo incorrecto de P4 como ABORT por Skip (`example.com`) — **corrigido**.  
-**Rev. `av` (`2026-08-09`)** = **P4 soak IN_PROGRESS** — retomado; Phase C interna PASS (issuer MITM; PF scoped; sem externos); Skip≠abort; rollback só no fecho.
+**Rev. `av` (`2026-08-09`)** = **P4 CLOSED FAIL/ABORT** — retomado; Phase C interna PASS (issuer MITM; PF scoped; sem externos); Skip≠abort; rollback só no fecho.
 
 ---
 
@@ -64,7 +64,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **`1.9.47`** — P4 soak **IN_PROGRESS**; permanente **NO-GO** |
+| Passo actual | **`1.9.47`** MONITOR/MITM OFF (pós-P4 FAIL/ABORT); permanente **NO-GO** |
 | Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 PASS; P4 lab; ficha = **gate**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Próximo | Concluir soak P4 → rollback limpo; depois **P5** com ficha; `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
@@ -85,11 +85,11 @@ TRILHA — progresso
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
 - GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
-- Prontidão piloto: NÃO PRONTO activar externo (P1+P2+P3 PASS; P4 soak IN_PROGRESS; P5 aguarda ficha)
-- P4: 20260809T234042Z SOAK_IN_PROGRESS (Phase C interna PASS; Skip≠abort)
-- Plano rev.: 2026-08-09av
+- Prontidão piloto: NÃO PRONTO activar externo (P1+P2+P3 PASS; P4 CLOSED FAIL/ABORT; P5 aguarda ficha)
+- P4: 20260809T234042Z CLOSED FAIL/ABORT (Phase C interna PASS; Skip≠abort)
+- Plano rev.: 2026-08-09aw
 - Lab/latest publicado: 1.9.47 (SHA 2155daca…9df833)
-- Próximo: concluir soak P4 + rollback limpo; P5 só com ficha
+- Próximo: P4 FAIL/ABORT; P5 só com ficha; sem reactivar MITM
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)

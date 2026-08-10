@@ -1349,11 +1349,11 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 - **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→20.11→**`1.9.42`**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
 - **Rev. plano:** `2026-08-09at`
-- **Mapa prontidão piloto:** [`docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar externo**; P1+P2+**P3 PASS**; **P4 soak IN_PROGRESS**; **P5 aguarda ficha**
+- **Mapa prontidão piloto:** [`docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar externo**; P1+P2+**P3 PASS**; **P4 CLOSED FAIL/ABORT**; **P5 aguarda ficha**
 - **P1 escopo:** [`docs/09-blocking/GO-escopo-piloto-mitm-generico.md`](docs/09-blocking/GO-escopo-piloto-mitm-generico.md)
 - **P2 runbook piloto:** [`docs/09-blocking/runbook-piloto-mitm-generico.md`](docs/09-blocking/runbook-piloto-mitm-generico.md)
 - **P3 evidência:** [`docs/tests/evidence/20260809T230400Z-p3-mitm-window/`](docs/tests/evidence/20260809T230400Z-p3-mitm-window/)
-- **P4 evidência:** [`docs/tests/evidence/20260809T234042Z-p4-soak-254/`](docs/tests/evidence/20260809T234042Z-p4-soak-254/) — **SOAK_IN_PROGRESS** (Phase C interna PASS; Skip≠abort)
+- **P4 evidência:** [`docs/tests/evidence/20260809T234042Z-p4-soak-254/`](docs/tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT** (supervisor nao armado; rollback limpo; Phase C interna tinha PASS)
 - **Gate D0:** [`docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md`](docs/09-blocking/diagnostico-D0-phaseBD-mitm-20260809.md) — **PASS** (+ [addendum hipóteses](docs/09-blocking/diagnostico-D0-addendum-hipoteses-20260809.md))
 - **Gate D1:** [`docs/09-blocking/gate-D1-leaf-sni-20260809.md`](docs/09-blocking/gate-D1-leaf-sni-20260809.md) — **PASS** (Edge Gate C)
 - **`1.9.44`:** D1 leaf + `timeout --foreground -k` + `daemon -f`; sync ~0.3–0.8s; **B+D/Edge PASS** `20260809T223526Z` ([evidência](docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/); prova sync [202500Z](docs/tests/evidence/20260809T202500Z-sync-timeout-foreground-fix/)); **Gate B PASS**
@@ -1374,13 +1374,13 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.47** — **P4 soak IN_PROGRESS** (MITM ON scoped lab; janela 240)
-- Prontidão piloto: **NÃO PRONTO activar externo** (P1+P2+P3 PASS; P4 lab em curso; P5 aguarda ficha)
-- P4: 20260809T234042Z-p4-soak-254 — retomado; Phase C interna PASS; Skip≠abort (só recusa example.com)
+- Passo actual: **1.9.47** MONITOR/MITM OFF (pós-P4 FAIL/ABORT)
+- Prontidão piloto: **NÃO PRONTO activar externo** (P1+P2+P3 PASS; P4 FAIL/ABORT operacional; P5 aguarda ficha)
+- P4: 20260809T234042Z — CLOSED FAIL/ABORT (supervisor nao armado; rollback limpo)
 - Gate activação externa: ficha site nomeada (≠ gap eng.) — **proibido** piloto externo/permanente sem P5
 - Gates: B/C PASS; GO teste .254 PASS (215442Z; 1.9.46)
 - Evidência P3: 20260809T230400Z-p3-mitm-window
-- Próximo MITM: concluir soak P4 → rollback limpo; **P5 só com ficha**; `.234/.235` proibidos
+- Próximo MITM: **P5 só com ficha**; sem reactivar MITM; `.234/.235` proibidos
 - Latest publicado: **1.9.47** SHA 2155daca…9df833
 - Identity rede: FECHADA (20.33 / GI9 PASS); Squid REJEITADO
 ```
@@ -1578,19 +1578,19 @@ CHECKPOINT CANONICO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.47** P3 PASS; Gate B+C/`215442Z` em `1.9.46`; permanente **NO-GO**; Squid rejeitado
-- MITM piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; **P4 soak IN_PROGRESS**; **P5 aguarda ficha**
+- MITM piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; **P4 CLOSED FAIL/ABORT**; **P5 aguarda ficha**
 - Gate activação externa: ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
 - Runbook activação teste: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 - Evidência P3: docs/tests/evidence/20260809T230400Z-p3-mitm-window/
-- Evidência P4: docs/tests/evidence/20260809T234042Z-p4-soak-254/ (**SOAK_IN_PROGRESS**; Phase C interna PASS; Skip≠abort)
+- Evidência P4: docs/tests/evidence/20260809T234042Z-p4-soak-254/ (**CLOSED FAIL/ABORT**; supervisor nao armado; rollback limpo)
 - Evidência Gate C: docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/
 - Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
 - Evidência GO teste: docs/tests/evidence/20260809T215442Z-phaseBD-d1-254/
-- Proximo trabalho MITM: concluir soak P4 + rollback limpo; **P5 só com ficha**; `.234/.235` proibidos
-- Appliance `.254`: **`1.9.47`** — MITM ON scoped lab (P4); sem piloto externo
-- Smoke LAB `.24`: Phase C interna PASS (issuer Layer7-P4-Soak-CA); `.234/.235` intocados
+- Proximo trabalho MITM: **P5 só com ficha**; sem reactivar MITM; `.234/.235` proibidos
+- Appliance `.254`: **`1.9.47`** MONITOR / MITM OFF (pós-P4); sem piloto externo
+- Smoke LAB `.24`: limpo pós-rollback P4; `.234/.235` intocados
 - Manual público do produto: **docs/MANUAL-PRODUTO.md** (hub + guia operador; SSOT de navegação pública; comanda → MANUAL-INSTALL)
 - Próximo trabalho docs: manter MANUAL-PRODUTO alinhado a cada release; activação enforce/MITM só com novo GO
 - Pacote publicado (canal `latest`): **1.9.47**; rollback lab: **1.9.46**

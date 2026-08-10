@@ -1,0 +1,3 @@
+UTC=2026-08-10T00:08:50Z
+status=SUPERSEDED_BY_ABORT
+note=supervisor nunca armado; P4 CLOSED FAIL/ABORT com rollback completo

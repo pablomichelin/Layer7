@@ -1,0 +1,7 @@
+UTC=2026-08-10T00:08:50Z
+reason=P4 ABORT operacional: supervisor remoto nao armado (failsafe incompleto apesar P3 auto-expiry)
+rb254_exit=0 rb54_exit=0 rb24_ok=1
+rollback_clean=1
+mitm_reactivation_guard=enforced
+auth_method=.254=ssh_key_batchmode .54=ssh_key_batchmode .24=sshpass_file_0600
+post_verify=mode=monitor mitm_effective=false LISTEN8443=0 LAB_HOST_ROUTE=absent ca_present=false .54=NO_LISTEN .24=ROLLBACK_24_OK

@@ -1,31 +1,126 @@
 #!/bin/bash
+# P4 soak supervisor: health periódica → abort+rollback OU fim de janela+rollback → finalize.
+# Segredos: apenas via remote/p4-lib-auth.sh (chave / SSHPASS / ficheiro 0600 fora do repo).
+set -u
 EV="/Users/pablomichelin/Documents/Layer 7/docs/tests/evidence/20260809T234042Z-p4-soak-254"
-END=$(( $(date +%s) + 14400 ))
+# shellcheck source=p4-lib-auth.sh
+. "$EV/remote/p4-lib-auth.sh"
+REMOTE_H="$EV/remote/p4-health-remote.sh"
+RB="$EV/remote/p4-full-rollback.sh"
+FIN="$EV/remote/p4-finalize.sh"
+LOG="$EV/07-soak-loop.log"
+INTERVAL="${INTERVAL:-900}"
+SSH_RETRY=3
+
+exec >>"$LOG" 2>&1
+echo "SOAK_LOOP_START $(date -u +%Y-%m-%dT%H:%M:%SZ) pid=$$"
+echo "auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env"
+
+DEADLINE=$(p4_ssh_254 "php -r 'require_once(\"/usr/local/pkg/layer7.inc\"); \$m=layer7_mitm_from_config(layer7_load_or_default()); \$s=layer7_mitm_window_status(\$m); echo (int)\$s[\"deadline_unix\"];'")
+NOW=$(date -u +%s)
+if ! [[ "$DEADLINE" =~ ^[0-9]+$ ]] || [ "$DEADLINE" -le "$NOW" ]; then
+  echo "DEADLINE_INVALID=$DEADLINE NOW=$NOW — abort to rollback"
+  bash "$RB" "P4 deadline invalid/missing"
+  bash "$FIN" "FAIL" "deadline invalid at loop start"
+  exit 2
+fi
+echo "deadline_unix=$DEADLINE remaining=$((DEADLINE-NOW))"
+echo "$DEADLINE" >"$EV/00-deadline-unix.txt"
+date -u -r "$DEADLINE" +%Y-%m-%dT%H:%M:%SZ >"$EV/00-deadline-utc.txt" 2>/dev/null \
+  || date -u -d "@$DEADLINE" +%Y-%m-%dT%H:%M:%SZ >"$EV/00-deadline-utc.txt" 2>/dev/null || true
+
+sample_health() {
+  local n="$1" f tries=0
+  f=$(printf "%s/07-health-%02d.txt" "$EV" "$n")
+  while [ $tries -lt $SSH_RETRY ]; do
+    tries=$((tries+1))
+    if p4_ssh_254 "sh -s" <"$REMOTE_H" >"$f" 2>&1; then
+      if grep -qE 'UTC=|effective=' "$f"; then
+        # strip any accidental auth noise from sample body already separate
+        echo "health_$n ok tries=$tries"
+        return 0
+      fi
+    fi
+    echo "health_$n ssh_retry=$tries" >>"$f"
+    sleep 5
+  done
+  echo SSH_FAIL >>"$f"
+  echo "health_$n FAIL after retries"
+  return 1
+}
+
+abort_now() {
+  local why="$1"
+  echo "ABORT_PREDICATE $(date -u +%Y-%m-%dT%H:%M:%SZ) $why" | tee "$EV/11-ABORT-PREDICATE.txt"
+  bash "$RB" "P4 abort: $why"
+  bash "$FIN" "ABORT" "$why"
+  exit 2
+}
+
 N=0
-while [ $(date +%s) -lt $END ]; do
-  N=$((N+1))
-  F=$(printf "%s/07-health-%02d.txt" "$EV" "$N")
-  sshpass -p 'pablo' ssh -o ConnectTimeout=15 -o StrictHostKeyChecking=no root@192.168.100.254 "sh -s" <<'R' >"$F" 2>&1 || echo SSH_FAIL >>"$F"
-set +e
-echo UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-php -r 'require_once("/usr/local/pkg/layer7.inc"); $m=layer7_mitm_from_config(layer7_load_or_default()); $s=layer7_mitm_window_status($m); echo "effective=".(layer7_mitm_effective($m,true)?"true":"false")."\n"; echo "remaining=".$s["remaining_sec"]."\n"; echo "expired=".(!empty($s["expired"])?"true":"false")."\n"; echo "src=".implode(",",$s["source_cidr"])."\n"; echo "dst=".implode(",",$s["dest_cidr"])."\n";'
-if (pfctl -sn; pfctl -sr) 2>/dev/null | grep -i mitm | grep -E 'from[[:space:]]+any'; then echo ABORT_MITM_FROM_ANY; else echo MITM_SRC_SCOPED_OK; fi
-echo SRC=$(pfctl -t layer7_mitm_src -T show | tr '\n' ' ')
-echo DST=$(pfctl -t layer7_mitm_dst -T show | tr '\n' ' ')
-pfctl -t layer7_mitm_dst -T show | grep -vE '198\.18\.0\.10|^$' >/dev/null && echo ABORT_UNEXPECTED_DST || echo DST_LAB_ONLY
-pfctl -t layer7_mitm_src -T show | grep -vE '192\.168\.100\.24|^$' >/dev/null && echo ABORT_UNEXPECTED_SRC || echo SRC_LAB_ONLY
-sockstat -l | grep 8443 >/dev/null && echo LISTEN=1 || echo LISTEN=0
-curl -sk -o /dev/null -w "GUI=%{http_code}\n" https://127.0.0.1:9999/ || echo GUI=FAIL
-tail -1 /var/log/layer7-mitm-audit.log 2>/dev/null
-R
-  if grep -qE 'ABORT_MITM_FROM_ANY|ABORT_UNEXPECTED_|SSH_FAIL' "$F" 2>/dev/null; then
-    echo "ABORT_PREDICATE $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$EV/11-ABORT-PREDICATE.txt"
-    exit 2
-  fi
-  if grep -q 'expired=true' "$F" 2>/dev/null; then
-    echo "WINDOW_EXPIRED $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$EV/07-window-expired.txt"
+for f in "$EV"/07-health-[0-9][0-9].txt; do
+  [ -f "$f" ] || continue
+  b=$(basename "$f" .txt)
+  num=${b#07-health-}
+  case "$num" in
+    ''|*[!0-9]*) ;;
+    *) [ "$num" -gt "$N" ] && N=$num ;;
+  esac
+done
+echo "health_seq_start=$N"
+
+while true; do
+  NOW=$(date -u +%s)
+  if [ "$NOW" -ge $((DEADLINE - 60)) ]; then
+    echo "WINDOW_END_APPROACHING now=$NOW deadline=$DEADLINE"
     break
   fi
-  sleep 900
+
+  N=$((N+1))
+  if ! sample_health "$N"; then
+    abort_now "health_ssh_fail sample=$N"
+  fi
+  F=$(printf "%s/07-health-%02d.txt" "$EV" "$N")
+
+  if grep -qE 'ABORT_MITM_FROM_ANY|ABORT_UNEXPECTED_' "$F"; then
+    abort_now "pf_scope_drift sample=$N"
+  fi
+  if grep -q 'GUI=FAIL' "$F"; then
+    abort_now "gui_health_fail sample=$N"
+  fi
+  if grep -q 'expired=true' "$F"; then
+    echo "WINDOW_EXPIRED_IN_SAMPLE $(date -u +%Y-%m-%dT%H:%M:%SZ)" | tee "$EV/07-window-expired.txt"
+    break
+  fi
+  if grep -q 'effective=false' "$F"; then
+    abort_now "mitm_effective_false_mid_window sample=$N"
+  fi
+  if grep -q 'ROUTE_LAB_MISSING' "$F"; then
+    abort_now "lab_route_missing sample=$N"
+  fi
+  if grep -q 'LISTEN=0' "$F"; then
+    abort_now "helper_8443_down sample=$N"
+  fi
+
+  NOW=$(date -u +%s)
+  LEFT=$((DEADLINE - 60 - NOW))
+  if [ "$LEFT" -le 0 ]; then
+    break
+  fi
+  SLEEP=$INTERVAL
+  if [ "$LEFT" -lt "$SLEEP" ]; then
+    SLEEP=$LEFT
+  fi
+  echo "sleep ${SLEEP}s until next health (left_to_close=${LEFT}s)"
+  sleep "$SLEEP"
 done
-echo SOAK_LOOP_DONE $(date -u +%Y-%m-%dT%H:%M:%SZ) | tee "$EV/07-soak-loop-done.txt"
+
+echo "SOAK_WINDOW_CLOSE $(date -u +%Y-%m-%dT%H:%M:%SZ) samples=$N" | tee "$EV/07-soak-loop-done.txt"
+bash "$RB" "P4 window end rollback"
+RB_EC=$?
+if [ "$RB_EC" -eq 0 ] && [ "$N" -ge 1 ]; then
+  bash "$FIN" "PASS" "soak completed samples=$N; rollback clean"
+  exit 0
+fi
+bash "$FIN" "FAIL" "window end but rollback_ec=$RB_EC samples=$N"
+exit 1

@@ -1,0 +1,12 @@
+LOCAL_VALIDATE_START 2026-08-10T00:09:32Z
+SECRET_SCAN_OK
+TOKEN_OK
+MITM_TRUE_OK
+MITM_FALSE_OK
+HARNESS_OK watchdog_calls_rollback_and_finalize_on_orphan
+STUB_ROLLBACK_CALLED reason=P4 watchdog orphan MITM after deadline
+STUB_FINALIZE_CALLED FAIL watchdog forced rollback (loop missed close)
+credfile_absent path=/tmp/l7-lab-254.pass (ok se chave SSH BatchMode)
+credfile_present path=/tmp/l7-p4-user.env mode=600
+credfile_present path=/tmp/l7-p4-pass.env mode=600
+LOCAL_VALIDATE_PASS

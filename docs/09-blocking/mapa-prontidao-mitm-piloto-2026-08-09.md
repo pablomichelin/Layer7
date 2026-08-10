@@ -1,10 +1,10 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 soak IN_PROGRESS** (Phase C interna PASS; Skip≠abort — só recusa `example.com`); **P5 aguarda ficha de site de cliente**.  
+**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 CLOSED FAIL/ABORT** (supervisor nao armado; rollback limpo); **P5 aguarda ficha de site de cliente**.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
-**P4 evidência:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **SOAK_IN_PROGRESS**.  
+**P4 evidência:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT**.  
 **Pacote de referência lab/`latest`:** `1.9.47` (`SHA256=2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`).  
 **Produção enforce base (sem MITM):** `1.9.8` (inalterada por este mapa).  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
@@ -161,7 +161,7 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Rollback | **só no fecho** PASS/FAIL/abort predicado — **não** agora |
 | Evidência | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) |
 | Nota Skip | Skip nativo = recusa `example.com`; **≠** abort P4 |
-| Veredicto | **SOAK_IN_PROGRESS** |
+| Veredicto | **FAIL/ABORT** |
 
 ### Bloco P5 — GO activação piloto + evidência — **AGUARDA FICHA**
 

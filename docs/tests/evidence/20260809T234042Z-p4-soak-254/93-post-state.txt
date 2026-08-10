@@ -1,15 +1,14 @@
-UTC=2026-08-09T23:48:08Z
-PKG=1.9.47
 mode=monitor
+layer7_enabled=true
 mitm_enabled=false
-effective=false
-materialized=false
-NO_MITM_RDR
-NO_MITM_FILTER
-SRC_N=0 0
-DST_N=0 0
-NO_8443
-layer7_tlsproxy is not running (default OFF; 20.10b gated).
-layer7d is running as pid 50918.
-GUI9999=200
-NO_HOST_ROUTE_19818
+mitm_effective=false
+ca_present=false
+RDR_COUNT=0
+FROM_ANY=no
+LISTEN8443=0
+destination: 0.0.0.0
+    gateway: 10.99.99.35
+LAB_HOST_ROUTE=absent
+ls: /usr/local/etc/layer7-mitm-ca*: No such file or directory
+NO_CA_FILES
+1.9.47

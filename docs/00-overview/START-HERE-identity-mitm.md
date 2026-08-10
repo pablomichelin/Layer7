@@ -2,7 +2,7 @@
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
-> **P4 soak IN_PROGRESS** (`234042Z`) — Phase C interna PASS; Skip≠abort (só recusa `example.com`).  
+> **P4 CLOSED FAIL/ABORT** (`234042Z`) — supervisor nao armado; rollback limpo; **não** PASS 4h.  
 > **P5** aguarda **ficha de site de cliente** — **proibido** piloto externo/permanente.  
 > **Gate C / GO teste** (`1.9.46`, `215442Z`) — **NÃO** permanente.  
 > Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
@@ -51,15 +51,15 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.47`** (P3 PASS; P4 soak em curso) |
-| Passo actual | **`1.9.47`** — **P4 soak IN_PROGRESS** (MITM ON scoped lab); permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 lab em curso; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.47`** (P3 PASS; P4 FAIL/ABORT) |
+| Passo actual | **`1.9.47`** MONITOR/MITM OFF (pós-P4 FAIL/ABORT); permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 FAIL/ABORT; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | Gate activação externa | Ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | Concluir soak P4 → rollback limpo; depois **P5 só com ficha**; **proibido** piloto externo/permanente |
-| Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **SOAK_IN_PROGRESS** |
-| Rev. do plano | **`2026-08-09av`** |
+| Próximo | **P5 só com ficha**; MITM OFF; **proibido** piloto externo/permanente |
+| Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT** |
+| Rev. do plano | **`2026-08-09aw`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -191,13 +191,13 @@ php tests/functional/test_mitm_config.php
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **1.9.47** — P4 soak IN_PROGRESS (MITM ON scoped lab)
-- Prontidão piloto: **NÃO PRONTO activar externo** (P1+P2+P3 PASS; P4 lab; P5 aguarda ficha)
-- P4: 20260809T234042Z — retomado; Phase C interna PASS; Skip≠abort (só example.com)
+- Passo actual: **1.9.47** MONITOR/MITM OFF (pós-P4 FAIL/ABORT)
+- Prontidão piloto: **NÃO PRONTO activar externo** (P1+P2+P3 PASS; P4 FAIL/ABORT; P5 aguarda ficha)
+- P4: 20260809T234042Z CLOSED FAIL/ABORT (supervisor nao armado; rollback limpo)
 - Gates: B/C PASS; GO teste .254 PASS (215442Z; 1.9.46)
 - Evidência P3: 20260809T230400Z-p3-mitm-window
 - Latest publicado: **1.9.47** SHA `2155daca…9df833`
-- Próximo: concluir soak P4 + rollback limpo; P5 só com ficha; sem piloto externo/permanente
+- Próximo: P5 só com ficha; sem reactivar MITM; sem piloto externo/permanente
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

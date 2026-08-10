@@ -1,7 +1,7 @@
 ** WARNING: connection is not using a post-quantum key exchange algorithm.
 ** This session may be vulnerable to "store now, decrypt later" attacks.
 ** The server may need to be upgraded. See https://openssh.com/pq.html
-[2J[m[H]0;Administrador: C:\Windows\system32\conhost.exe[?25hROLLBACK24B
+[2J[m[H]0;REDACTED_USER: C:\Windows\system32\conhost.exe[?25hROLLBACK24B
 Root "Autoridades de CertificaþÒo Raiz Confißveis"
 CertUtil: -store comando FALHOU: 0x80090011 (-2146893807 NTE_NOT_FOUND)
 CertUtil: Objeto nÒo encontrado.

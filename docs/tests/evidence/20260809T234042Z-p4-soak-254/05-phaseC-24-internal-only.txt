@@ -1,7 +1,7 @@
 ** WARNING: connection is not using a post-quantum key exchange algorithm.
 ** This session may be vulnerable to "store now, decrypt later" attacks.
 ** The server may need to be upgraded. See https://openssh.com/pq.html
-[2J[m[H]0;Administrador: C:\Windows\system32\conhost.exe[?25h2026-08-09T20:57:43.9939605-03:00 === PHASE_C_INTERNAL_ONLY ===
+[2J[m[H]0;REDACTED_USER: C:\Windows\system32\conhost.exe[?25h2026-08-09T20:57:43.9939605-03:00 === PHASE_C_INTERNAL_ONLY ===
 DEST_POSITIVE=198.18.0.10
 SNI_POSITIVE=mitm-lab.test
 DEST_NEGATIVE_INTERNAL=192.168.100.254:9999

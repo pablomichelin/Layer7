@@ -1,28 +1,15 @@
-run_id=20260809T234042Z-p4-soak-254
-verdict=SOAK_IN_PROGRESS
-go_p4=VALID_CONTINUES
-pkg=1.9.47
-sha=2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833
-
-# Correcção de registo
-prior_abort_label=INCORRECT_FOR_SKIP
-skip_meaning=aprovacao nativa Skip = recusa de example.com APENAS; NAO abort P4; NAO negacao .24
-premature_rollback=executado por interpretacao errada do Skip; soak RETOMADO 2026-08-09T23:57:30Z
-
-# Estado actual (resume)
-upgrade_passive_1.9.46_to_1.9.47=PASS
-phaseA_resume=PASS
-phaseB_resume=PASS
-phaseD_resume=PASS (effective=true max_window=240 src=.24/32 dst=198.18.0.10/32 SNI=mitm-lab.test quic=block payload_tls=false)
-phaseC_corrected=PASS
-  hosts=198.18.0.10 mitm-lab.test
-  ca_import=Layer7-P4-Soak-CA
-  in_scope_peer=CN=mitm-lab.test issuer=CN=Layer7-P4-Soak-CA
-  in_scope_http=403 (block page MITM — esperado)
-  external_dest=none
-  out_of_scope_proof=PF tables SRC=.24 DST=198.18.0.10 only; MITM_SRC_SCOPED_OK; optional internal :9999
-soak_loop=RESTARTED (pid em 07-soak-loop.pid; janela ~4h)
-rollback_now=NO
-piloto_externo_permanente=NAO_ACTIVADO
-p5=AGUARDA_FICHA_SITE_CLIENTE
-release_nova=NAO
+P4_SOAK_VERDICT=FAIL
+closed_utc=2026-08-10T00:08:50Z
+outcome_raw=ABORT
+reason=ABORT operacional: supervisor remoto/failsafe nao armado (aprovacao Skip); P4 nao pode permanecer ativo sem supervisor; rollback completo executado. P3 auto-expiry sozinho nao basta como failsafe operacional.
+health_samples_incomplete=yes
+rollback_clean=1
+mitm_off_verified=1
+.post_254=mode=monitor mitm_enabled=false mitm_effective=false RDR=0 LISTEN8443=0 LAB_HOST_ROUTE=absent ca_present=false
+.post_54=NO_LISTEN NO_VIP
+.post_24=REMOVE_CA Layer7-P4-Soak-CA; HOSTS_MITM_LAB_LINES_REMOVED; ROLLBACK_24_OK
+auth_method=.254=ssh_key_batchmode; .54=ssh_key_batchmode; .24=sshpass_file_0600
+scope_respected=src=192.168.100.24/32 dst=198.18.0.10/32 SNI=mitm-lab.test; external_dest=none
+phaseC_internal_before_abort=PASS
+p5_external=FORBIDDEN
+notes=nao e PASS de soak 4h; e FAIL/ABORT operacional com rollback limpo
