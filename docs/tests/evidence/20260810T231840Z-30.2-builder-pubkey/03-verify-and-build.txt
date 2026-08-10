@@ -1,0 +1,109 @@
+=== PUBKEY EXTRACT (awk) ===
+pubkey_hex=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+matches_field=yes
+=== VERIFY SCRIPT ===
+PASS: license.c pubkey == SoT (/root/layer7-build-secrets/l7_ed25519_pubkey.hex)
+pubkey_hex=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+=== NEW FLOW: pull WITHOUT stash dance ===
+From github.com:pablomichelin/pfsense-layer7
+ * branch            main       -> FETCH_HEAD
+   7c727b5..b2783bb  main       -> origin/main
+Updating 7c727b5..b2783bb
+Fast-forward
+ CORTEX.md                                    | 20 ++++----
+ docs/00-overview/START-HERE-identity-mitm.md |  2 +-
+ docs/00-overview/catalogo-funcionalidades.md |  4 +-
+ docs/00-overview/pack-produto-layer7.md      |  4 +-
+ docs/00-overview/prd-layer7.md               | 10 ++--
+ docs/02-roadmap/backlog.md                   |  4 +-
+ docs/10-license-server/MANUAL-INSTALL.md     | 73 +++++++++++++++++-----------
+ docs/MANUAL-PRODUTO.md                       | 12 ++---
+ docs/changelog/CHANGELOG.md                  |  9 ++--
+ 9 files changed, 78 insertions(+), 60 deletions(-)
+PASS: license.c pubkey == SoT (/root/layer7-build-secrets/l7_ed25519_pubkey.hex)
+pubkey_hex=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+HEAD_AFTER_PULL=b2783bb93ed0e13bb2be7188bcbe449aa6e8b805
+=== BUILD CLEAN PACKAGE ===
+===>  Cleaning for pfSense-pkg-layer7-1.9.48
+===>   pfSense-pkg-layer7-1.9.48 depends on file: /usr/local/sbin/pkg - found
+===> Fetching all distfiles required by pfSense-pkg-layer7-1.9.48 for building
+===>  Extracting for pfSense-pkg-layer7-1.9.48
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work
+===>  Patching for pfSense-pkg-layer7-1.9.48
+===>   pfSense-pkg-layer7-1.9.48 depends on shared library: libldap.so.2 - found (/usr/local/lib/libldap.so.2)
+===>  Configuring for pfSense-pkg-layer7-1.9.48
+===>  Building for pfSense-pkg-layer7-1.9.48
+cc -O2 -pipe -fstack-protector-strong -fno-strict-aliasing  -Wall -Wextra -O2 -I/root/pfsense-layer7/package/pfSense-pkg-layer7/work -I/root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d -I/root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/common  -I/usr/local/include/ndpi -DHAVE_NDPI=1 -DHAVE_OPENLDAP=1 -I/usr/local/include -o /root/pfsense-layer7/package/pfSense-pkg-layer7/work/layer7d  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/main.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/config_parse.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/policy.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/enforce.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/license.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/features.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/blacklist.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/bl_config.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/allowlist.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/log_store.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/identity_map.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/identity_ldap.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/identity_radius.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/identity_dc.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7d/capture.c /usr/local/lib/libndpi.a -lpcap -lm -lpthread  -L/usr/local/lib -lldap -llber  /usr/lib/libssl.a /usr/lib/libcrypto.a
+cc -O2 -pipe -fstack-protector-strong -fno-strict-aliasing  -Wall -Wextra -O2 -I/root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7-tlsproxy  -DLAYER7_TLSPROXY_VERSION=\"0.1.2\"  -o /root/pfsense-layer7/package/pfSense-pkg-layer7/work/layer7-tlsproxy  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7-tlsproxy/main.c /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7-tlsproxy/ipc.c  /root/pfsense-layer7/package/pfSense-pkg-layer7/../../src/layer7-tlsproxy/tls_lab.c  /usr/lib/libssl.a /usr/lib/libcrypto.a -lpthread
+===>  Staging for pfSense-pkg-layer7-1.9.48
+===>   Generating temporary packing list
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/pkg
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/etc/inc/priv
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/sbin
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/rc.d
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/libexec
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/share/pfSense-pkg-layer7
+install  -s -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/work/layer7d /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/sbin
+install  -s -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/work/layer7-tlsproxy /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/sbin
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7-tlsproxy  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/rc.d
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7.json.sample  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7-protos.txt.sample  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.xml  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/pkg
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/pkg
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7-fa47-icons.inc  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/pkg
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/etc/inc/priv/layer7.priv.inc  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/etc/inc/priv/layer7.priv.inc
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_status.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_settings.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_policies.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_remote_access.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_identity.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_mitm.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_groups.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_categories.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_exceptions.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_events.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_test.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_diagnostics.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_blacklists.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_bl_ajax.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_settings_ajax.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_settings_update.js  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7/js
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/js/chart.umd.min.js  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7/js
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_allowlist.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_devices.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_reports.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_reports_export.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/packages/layer7/layer7_removal.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/packages/layer7
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/rc.d
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-pfctl  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/libexec
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-unbound-anti-doh  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/libexec
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-blockpage  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/libexec
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7-blockpage  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/rc.d
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/layer7-blockpage
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/layer7-blockpage/router.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/layer7-blockpage
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/www/layer7-blockpage/index.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/www/layer7-blockpage
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/pf.conf.sample  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/profiles.json  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/remote-access-catalog.json  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/allowlist-seed.txt  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7/blacklists
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/blacklists/config.json.sample  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7/blacklists
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/update-blacklists.sh  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/layer7-stats-collect.sh  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/layer7-reports-collect.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+install  -m 555 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/layer7-stats-purge.sh  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7/reports
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7/blacklists
+/bin/mkdir -p /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7/lang
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/en.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7/lang
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/lang/pt.php  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/etc/layer7/lang
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/share/pfSense-pkg-layer7
+install  -m 0644 /root/pfsense-layer7/package/pfSense-pkg-layer7/files/usr/local/share/pfSense-pkg-layer7/info.xml  /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/share/pfSense-pkg-layer7
+====> Compressing man pages (compress-man)
+===>  Building packages for pfSense-pkg-layer7-1.9.48
+===>   Building pfSense-pkg-layer7-1.9.48
+ls: pfSense-pkg-layer7-*.pkg: No such file or directory

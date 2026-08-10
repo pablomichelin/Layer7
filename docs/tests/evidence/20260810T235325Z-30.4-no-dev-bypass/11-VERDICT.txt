@@ -1,0 +1,14 @@
+VERDICT: PASS — passo 30.4 FECHADO; GA2.1/GA2.2/GA2.3 PASS
+RUNID: 20260810T235325Z
+DATE_UTC: 2026-08-10
+
+BG-114: is_dev_key apenas sob #ifdef L7_DEV_BUILD
+Port Makefile: sem -DL7_DEV_BUILD activo
+Runtime builder: zero-pubkey produção => invalid (dev_mode=0)
+Controlo lab: L7_DEV_BUILD+zero => bypass activo
+Pubkey SoT: inalterada (GA1.8)
+Candidato: pfSense-pkg-layer7-1.9.49.pkg
+  pkg_sha256=f380ad493c5229fc08704673abf758edaa5e15ea05061820d04bb9abdca4d3cb
+  layer7d_sha256=76d7f44b351ce7ac512ca96b17c581627492d987521bdb5a5a9e22414f9b1789
+Publicação GitHub: SIM (v1.9.49) — sob pedido explícito
+Próximo: 30.5 (strip / BG-115) — GA2 parcial até 30.5/30.7

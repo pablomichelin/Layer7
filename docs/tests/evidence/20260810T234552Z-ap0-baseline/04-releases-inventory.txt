@@ -1,0 +1,246 @@
+# Inventário releases publicadas (pablomichelin/Layer7) — RR-3 / decisão 8
+# Gerado: 2026-08-10T23:46:26Z
+# Nota: NÃO despublicar neste passo (30.3 = inventário; execução em 30.19)
+# Decisão 8: Limitar apontadores (latest/docs); manter tags com aviso
+
+v1.9.48 — pack produto + Reportar erro	Latest	v1.9.48	2026-08-10T21:52:41Z
+1.9.47 — P3 MITM janela failsafe + visibilidade		v1.9.47	2026-08-09T23:35:20Z
+1.9.46 — MITM anti-QUIC escopo + Gate C PASS		v1.9.46	2026-08-09T21:11:55Z
+1.9.42 — MITM source_cidr hardening		v1.9.42	2026-08-09T17:39:42Z
+1.9.41 — MITM 20.10b correctivo (F1–F6)		v1.9.41	2026-08-09T05:33:47Z
+1.9.40 — MITM 20.10b listen/rdr/página HTTPS		v1.9.40	2026-08-09T05:27:23Z
+Layer7 1.9.39 — MITM 20.10a (runtime no pacote, OFF)		v1.9.39	2026-08-09T05:00:28Z
+Layer7 1.9.38 — MITM 20.9 (intenção vs effective, sem intercept)		v1.9.38	2026-08-09T02:01:28Z
+Layer7 1.9.37 — MITM scaffolding 20.8 (CA/bypass, sem intercept)		v1.9.37	2026-08-09T01:43:19Z
+Layer7 1.9.36 — categorias colapsadas (BG-111)		v1.9.36	2026-08-09T01:19:48Z
+1.9.35 — Perfis rápidos em lote (BG-110)		v1.9.35	2026-08-09T01:15:01Z
+1.9.34 — redeploy limpo BG-108 (upgrade clientes)		v1.9.34	2026-08-09T01:03:16Z
+1.9.33 — UX visual wave 2 (BG-108)		v1.9.33	2026-08-09T00:14:38Z
+1.9.30 — Acesso remoto individual		v1.9.30	2026-08-08T18:38:43Z
+Layer7 1.9.29 — ADR-0029 GI8 (sequência segura)		v1.9.29	2026-08-08T13:51:20Z
+1.9.28 — Identity 20.24 match ad_* via mapa		v1.9.28	2026-08-08T12:05:17Z
+1.9.27 — Identity 20.23 políticas ad_users/ad_groups		v1.9.27	2026-08-08T11:45:51Z
+Layer7 1.9.26 — Identity 20.22 conflict audit		v1.9.26	2026-08-08T11:27:29Z
+Layer7 1.9.25 — Identity 20.21 normalize + remove_ip		v1.9.25	2026-08-08T10:12:16Z
+Layer7 1.9.24 — Identity DC agente Windows (20.20)		v1.9.24	2026-08-08T05:27:54Z
+1.9.23 — MITM no menu com layout padrao		v1.9.23	2026-08-08T04:46:36Z
+1.9.22 — MITM fora do menu		v1.9.22	2026-08-07T18:24:02Z
+1.9.21 — menu UX (Acesso Remoto / MITM)		v1.9.21	2026-08-07T14:33:40Z
+1.9.20 — GUI tabs contraste		v1.9.20	2026-08-07T14:23:52Z
+1.9.19 — GUI MITM/tabs fix		v1.9.19	2026-08-07T13:46:02Z
+1.9.18 — Identity DC receiver (20.20)		v1.9.18	2026-08-07T13:18:30Z
+Layer7 1.9.17 — Identity RADIUS accounting (20.19)		v1.9.17	2026-08-07T12:32:50Z
+Layer7 1.9.16 — Test LDAP GUI (20.18)		v1.9.16	2026-08-07T11:38:57Z
+Layer7 1.9.15 — Identity LDAP client (20.17)		v1.9.15	2026-08-07T11:19:07Z
+Layer7 1.9.14 — Identity IM3–IM4 (mapa + GUI LDAP)		v1.9.14	2026-08-07T10:46:17Z
+Layer7 1.9.13 — Guia Acesso Remoto		v1.9.13	2026-08-05T19:35:21Z
+Layer7 1.9.12 — BG-100 teto BL + % RAM		v1.9.12	2026-08-05T19:21:22Z
+Layer7 1.9.11 — TOCTOU rules.debug + DNS corr		v1.9.11	2026-08-05T18:57:45Z
+Layer7 1.9.10 — allowlist inet6 + residual /tmp		v1.9.10	2026-08-05T18:41:49Z
+Layer7 1.9.9 — hardening pós-auditoria		v1.9.9	2026-08-05T18:25:37Z
+1.9.8 — HTTP/VIP rdr inet6 (12.11 / V5 completa)		v1.9.8	2026-08-05T14:26:36Z
+1.9.7 — DNS rdr inet6 / 12.10 (lab)		v1.9.7	2026-08-05T13:54:31Z
+1.9.6 — DNS AAAA observe endurecido (lab)		v1.9.6	2026-08-05T12:20:20Z
+Layer7 1.9.5 — DNS AAAA hint (GV4 A3)		v1.9.5	2026-08-05T11:53:41Z
+Layer7 1.9.4 — GV1.6 layer7_localnets (S-02)		v1.9.4	2026-08-05T11:27:37Z
+Layer7 1.9.3 — QA IPv4 D1–D6 (two-client scoped)		v1.9.3	2026-08-05T10:18:49Z
+Layer7 1.9.2 — lab IPv6 (12.6–12.9 + banner V5)		v1.9.2	2026-08-05T03:26:09Z
+Layer7 1.9.1 — lab IPv6 (12.1–12.5)		v1.9.1	2026-08-05T02:42:16Z
+Layer7 1.9.0 — fecho plano mestre		v1.9.0	2026-08-05T01:31:29Z
+Layer7 1.8.11_69		v1.8.11_69	2026-08-05T00:27:26Z
+1.8.11_68 — BG-077 check-in online / revogação remota		v1.8.11_68	2026-08-05T00:06:11Z
+v1.8.11_66 — Fix precedência PF pfnearly (G5)		v1.8.11_66	2026-08-04T22:44:30Z
+1.8.11_65 — GUI i18n EN/PT + ícones FA6 + Mensagens (BG-076)		v1.8.11_65	2026-08-04T20:16:30Z
+1.8.11_64 — Materializar VIP/excepções PF live (BG-075)		v1.8.11_64	2026-08-04T20:01:50Z
+v1.8.11_63		v1.8.11_63	2026-07-31T16:07:40Z
+v1.8.11_62		v1.8.11_62	2026-07-31T14:15:44Z
+v1.8.11_61		v1.8.11_61	2026-07-31T13:51:43Z
+Layer7 1.8.11_60 — Pós-auditoria Lista VIP (fix BG-073 rdr fallback)		v1.8.11_60	2026-07-31T13:30:26Z
+1.8.11_59 — BG-073 isenção VIP caminho DNS (Bloco D)		v1.8.11_59	2026-07-31T13:04:34Z
+Layer7 v1.8.11_23 — Caminho A completo (UX/eficacia tipo UDM Pro)		v1.8.11_23	2026-05-31T01:22:43Z
+1.8.11_58 — BG-072 limites daemon Lista VIP		v1.8.11_58	2026-07-31T12:46:19Z
+1.8.11_57 — BG-071 Lista VIP global		v1.8.11_57	2026-07-31T12:41:53Z
+Layer7 1.8.11_56 — BG-070 integral (supersedes defective _55)		v1.8.11_56	2026-07-31T12:15:42Z
+1.8.11_55 — Perfis editáveis e personalizados (BG-070)		v1.8.11_55	2026-07-31T11:50:07Z
+1.8.11_54 — Correcção visual da grelha Perfis rápidos (BG-069)		v1.8.11_54	2026-07-31T11:09:45Z
+1.8.11_53 — Expansão catálogo Perfis rápidos Bloco 2 (BG-068)		v1.8.11_53	2026-07-31T04:07:56Z
+1.8.11_52 — Catálogo Perfis rápidos UniFi/UDM (BG-067)		v1.8.11_52	2026-07-31T02:27:26Z
+Layer7 1.8.11_51 — fix ordem PF da exclusao por politica		v1.8.11_51	2026-07-30T20:26:31Z
+1.8.11_50 — Exclusão por política (BG-066)		v1.8.11_50	2026-07-30T19:36:35Z
+Layer7 1.8.11_49		v1.8.11_49	2026-07-30T19:29:11Z
+Layer7 1.8.11_47		v1.8.11_47	2026-07-30T18:43:30Z
+Layer7 1.8.11_45		v1.8.11_45	2026-07-30T17:41:59Z
+Layer7 1.8.11_44		v1.8.11_44	2026-07-30T17:24:48Z
+Layer7 1.8.11_43 — rc.d block page: dedup por porta e status robusto		v1.8.11_43	2026-07-30T15:11:03Z
+Layer7 1.8.11_42 — Fix rdr block page e arranque do servico		v1.8.11_42	2026-07-30T15:09:23Z
+Layer7 1.8.11_41 — Fix IP portal (interfaces por nome real)		v1.8.11_41	2026-07-30T15:09:21Z
+Layer7 1.8.11_40 — DNS forcado global (anti-bypass sinkhole)		v1.8.11_40	2026-07-30T15:03:50Z
+Layer7 1.8.11_39 — Fix bloqueio YouTube vs allowlist		v1.8.11_39	2026-07-30T14:48:01Z
+Layer7 1.8.11_38 — Updater AJAX ficheiro externo (CSP)		v1.8.11_38	2026-07-30T14:38:30Z
+Layer7 1.8.11_37 — Fix botao Verificar actualizacao		v1.8.11_37	2026-07-30T14:34:41Z
+Layer7 1.8.11_36 — Fix updater GUI + pagina de bloqueio		v1.8.11_36	2026-07-30T14:30:18Z
+Layer7 1.8.11_35 — Pagina de bloqueio utilizador final		v1.8.11_35	2026-07-30T13:48:35Z
+Layer7 v1.8.11_34 — Verificar actualização sem reload		v1.8.11_34	2026-07-30T12:51:33Z
+Layer7 v1.8.11_33 — GUI progresso download blacklists		v1.8.11_33	2026-07-30T12:46:49Z
+Layer7 v1.8.11_32 — candidato interno (flush PF lifecycle)		v1.8.11_32	2026-07-30T12:28:32Z
+Layer7 v1.8.11_24 — Caminho B E0–E3 + estabilização pós-revisão		v1.8.11_24	2026-06-16T17:06:38Z
+Layer7 v1.8.11_18 — Fase 1: monitor passivo + allowlist de destinos		v1.8.11_18	2026-05-30T21:50:57Z
+v1.8.11_17		v1.8.11_17	2026-04-27T11:33:05Z
+v1.8.11_16		v1.8.11_16	2026-04-27T11:17:02Z
+v1.8.11_14		v1.8.11_14	2026-04-25T02:43:43Z
+Blacklists UT1 - snapshot corrente assinada (F1.3)	Pre-release	blacklists-ut1-current	2026-04-25T02:14:48Z
+v1.8.11_13		v1.8.11_13	2026-04-25T02:13:38Z
+Layer7 v1.8.11_12 — F4.1/F4.2/F4.3 (force_dns + DRY layer7_pf_ifname_for_rules)		v1.8.11_12	2026-04-25T01:59:44Z
+Layer7 v1.8.3 — Bloqueio de QUIC por interface seleccionável		v1.8.3	2026-04-01T17:56:18Z
+Layer7 v1.8.2 — Bloqueio restrito a destinos externos		v1.8.2	2026-04-01T17:44:52Z
+Layer7 v1.8.0 — rdr DNS forçado totalmente funcional		v1.8.0	2026-04-01T11:07:13Z
+Layer7 v1.7.9 — Fix rdr DNS forçado (sintaxe + injecção via pfctl)		v1.7.9	2026-04-01T11:04:49Z
+Layer7 v1.7.8 — Fix crítico: rdr DNS forçado agora funciona		v1.7.8	2026-04-01T10:59:26Z
+Layer7 v1.7.7 — Fix crítico: rdr DNS forçado em interfaces VLAN		v1.7.7	2026-04-01T10:50:12Z
+Layer7 v1.7.6 — Monitor ao vivo acumulativo		v1.7.6	2026-03-31T17:03:12Z
+Layer7 v1.7.5 — Fix: botão Aplicar (Perfis Rápidos)		v1.7.5	2026-03-31T16:53:59Z
+Layer7 v1.7.4 — Segunda revisão: código morto, stats e validação GUI		v1.7.4	2026-03-31T16:43:11Z
+Layer7 v1.7.3 — Hotfix: bugs críticos do Bloqueio Total		v1.7.3	2026-03-31T16:37:32Z
+Layer7 v1.7.2 — Bloqueio Total: DNS Forçado + SNI Blocking + Estatísticas		v1.7.2	2026-03-31T16:29:05Z
+Layer7 v1.6.7 — Fix SIGSEGV: crash ao activar blacklists		v1.6.7	2026-03-31T15:27:06Z
+Layer7 v1.6.6 — Fix crítico: blacklists nunca carregavam no daemon		v1.6.6	2026-03-31T14:31:29Z
+Layer7 v1.6.5 — Fix CI smoke layer7d		v1.6.5	2026-03-31T14:08:16Z
+Layer7 v1.6.4 — Auto-start do daemon após reboot		v1.6.4	2026-03-31T12:31:56Z
+Layer7 v1.6.3		v1.6.3	2026-03-26T03:00:34Z
+Layer 7 v1.6.2 — Fix edição de categorias custom		v1.6.2	2026-03-26T02:45:42Z
+Layer 7 v1.6.1 — Blacklists simplificadas + Backup completo		v1.6.1	2026-03-26T02:40:44Z
+Layer 7 v1.6.0 — Reorganização do Frontend		v1.6.0	2026-03-26T02:28:40Z
+Layer7 v1.5.3 — Tabelas PF persistentes		v1.5.3	2026-03-26T02:07:22Z
+Layer7 v1.5.2 — Fix limpeza de relatórios		v1.5.2	2026-03-26T01:57:49Z
+Layer7 v1.5.1 — Limpeza total de relatórios		v1.5.1	2026-03-26T01:53:25Z
+Layer7 v1.5.0 — Auditoria de segurança e robustez		v1.5.0	2026-03-26T01:49:03Z
+v1.4.17 - Categorias customizadas de blacklist		v1.4.17	2026-03-26T01:20:33Z
+v1.4.16		v1.4.16	2026-03-26T00:39:51Z
+v1.4.15		v1.4.15	2026-03-26T00:27:29Z
+v1.4.14		v1.4.14	2026-03-25T23:42:03Z
+Layer7 v1.4.13		v1.4.13	2026-03-25T12:22:41Z
+Layer7 v1.4.12		v1.4.12	2026-03-25T12:03:39Z
+Layer7 v1.4.11		v1.4.11	2026-03-25T11:36:37Z
+Layer7 v1.4.10		v1.4.10	2026-03-25T11:30:55Z
+v1.4.9		v1.4.9	2026-03-25T10:52:05Z
+
+=== tags com asset .pkg (exceto blacklists) ===
+{"assets":["pfSense-pkg-layer7-1.9.48.pkg","pfSense-pkg-layer7-1.9.48.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.48"}
+{"assets":["pfSense-pkg-layer7-1.9.47.pkg","pfSense-pkg-layer7-1.9.47.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.47"}
+{"assets":["pfSense-pkg-layer7-1.9.46.pkg","pfSense-pkg-layer7-1.9.46.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.46"}
+{"assets":["pfSense-pkg-layer7-1.9.42.pkg","pfSense-pkg-layer7-1.9.42.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.42"}
+{"assets":["pfSense-pkg-layer7-1.9.41.pkg","pfSense-pkg-layer7-1.9.41.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.41"}
+{"assets":["pfSense-pkg-layer7-1.9.40.pkg","pfSense-pkg-layer7-1.9.40.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.40"}
+{"assets":["pfSense-pkg-layer7-1.9.39.pkg","pfSense-pkg-layer7-1.9.39.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.39"}
+{"assets":["pfSense-pkg-layer7-1.9.38.pkg","pfSense-pkg-layer7-1.9.38.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.38"}
+{"assets":["pfSense-pkg-layer7-1.9.37.pkg","pfSense-pkg-layer7-1.9.37.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.37"}
+{"assets":["pfSense-pkg-layer7-1.9.36.pkg","pfSense-pkg-layer7-1.9.36.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.36"}
+{"assets":["pfSense-pkg-layer7-1.9.35.pkg","pfSense-pkg-layer7-1.9.35.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.35"}
+{"assets":["pfSense-pkg-layer7-1.9.34.pkg","pfSense-pkg-layer7-1.9.34.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.34"}
+{"assets":["pfSense-pkg-layer7-1.9.33.pkg","pfSense-pkg-layer7-1.9.33.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.33"}
+{"assets":["pfSense-pkg-layer7-1.9.30.pkg","pfSense-pkg-layer7-1.9.30.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.30"}
+{"assets":["pfSense-pkg-layer7-1.9.29.pkg","pfSense-pkg-layer7-1.9.29.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.29"}
+{"assets":["pfSense-pkg-layer7-1.9.28.pkg","pfSense-pkg-layer7-1.9.28.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.28"}
+{"assets":["pfSense-pkg-layer7-1.9.27.pkg","pfSense-pkg-layer7-1.9.27.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.27"}
+{"assets":["pfSense-pkg-layer7-1.9.26.pkg","pfSense-pkg-layer7-1.9.26.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.26"}
+{"assets":["pfSense-pkg-layer7-1.9.25.pkg","pfSense-pkg-layer7-1.9.25.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.25"}
+{"assets":["pfSense-pkg-layer7-1.9.24.pkg","pfSense-pkg-layer7-1.9.24.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.24"}
+{"assets":["pfSense-pkg-layer7-1.9.23.pkg","pfSense-pkg-layer7-1.9.23.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.23"}
+{"assets":["pfSense-pkg-layer7-1.9.22.pkg","pfSense-pkg-layer7-1.9.22.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.22"}
+{"assets":["pfSense-pkg-layer7-1.9.21.pkg","pfSense-pkg-layer7-1.9.21.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.21"}
+{"assets":["pfSense-pkg-layer7-1.9.20.pkg","pfSense-pkg-layer7-1.9.20.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.20"}
+{"assets":["pfSense-pkg-layer7-1.9.19.pkg","pfSense-pkg-layer7-1.9.19.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.19"}
+{"assets":["pfSense-pkg-layer7-1.9.18.pkg","pfSense-pkg-layer7-1.9.18.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.18"}
+{"assets":["pfSense-pkg-layer7-1.9.17.pkg","pfSense-pkg-layer7-1.9.17.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.17"}
+{"assets":["pfSense-pkg-layer7-1.9.16.pkg","pfSense-pkg-layer7-1.9.16.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.16"}
+{"assets":["pfSense-pkg-layer7-1.9.15.pkg","pfSense-pkg-layer7-1.9.15.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.15"}
+{"assets":["pfSense-pkg-layer7-1.9.14.pkg","pfSense-pkg-layer7-1.9.14.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.14"}
+{"assets":["pfSense-pkg-layer7-1.9.13.pkg","pfSense-pkg-layer7-1.9.13.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.13"}
+{"assets":["pfSense-pkg-layer7-1.9.12.pkg","pfSense-pkg-layer7-1.9.12.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.12"}
+{"assets":["pfSense-pkg-layer7-1.9.11.pkg","pfSense-pkg-layer7-1.9.11.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.11"}
+{"assets":["pfSense-pkg-layer7-1.9.10.pkg","pfSense-pkg-layer7-1.9.10.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.10"}
+{"assets":["pfSense-pkg-layer7-1.9.9.pkg","pfSense-pkg-layer7-1.9.9.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.9"}
+{"assets":["pfSense-pkg-layer7-1.9.8.pkg","pfSense-pkg-layer7-1.9.8.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.8"}
+{"assets":["pfSense-pkg-layer7-1.9.7.pkg","pfSense-pkg-layer7-1.9.7.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.7"}
+{"assets":["pfSense-pkg-layer7-1.9.6.pkg","pfSense-pkg-layer7-1.9.6.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.6"}
+{"assets":["pfSense-pkg-layer7-1.9.5.pkg","pfSense-pkg-layer7-1.9.5.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.5"}
+{"assets":["pfSense-pkg-layer7-1.9.4.pkg","pfSense-pkg-layer7-1.9.4.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.4"}
+{"assets":["pfSense-pkg-layer7-1.9.3.pkg","pfSense-pkg-layer7-1.9.3.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.3"}
+{"assets":["pfSense-pkg-layer7-1.9.2.pkg","pfSense-pkg-layer7-1.9.2.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.2"}
+{"assets":["pfSense-pkg-layer7-1.9.1.pkg","pfSense-pkg-layer7-1.9.1.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.1"}
+{"assets":["pfSense-pkg-layer7-1.9.0.pkg","pfSense-pkg-layer7-1.9.0.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.9.0"}
+{"assets":["pfSense-pkg-layer7-1.8.11_69.pkg","pfSense-pkg-layer7-1.8.11_69.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_69"}
+{"assets":["pfSense-pkg-layer7-1.8.11_68.pkg","pfSense-pkg-layer7-1.8.11_68.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_68"}
+{"assets":["pfSense-pkg-layer7-1.8.11_66.pkg","pfSense-pkg-layer7-1.8.11_66.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_66"}
+{"assets":["pfSense-pkg-layer7-1.8.11_65.pkg","pfSense-pkg-layer7-1.8.11_65.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_65"}
+{"assets":["pfSense-pkg-layer7-1.8.11_64.pkg","pfSense-pkg-layer7-1.8.11_64.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_64"}
+{"assets":["pfSense-pkg-layer7-1.8.11_63.pkg","pfSense-pkg-layer7-1.8.11_63.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_63"}
+{"assets":["pfSense-pkg-layer7-1.8.11_62.pkg","pfSense-pkg-layer7-1.8.11_62.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_62"}
+{"assets":["pfSense-pkg-layer7-1.8.11_61.pkg","pfSense-pkg-layer7-1.8.11_61.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_61"}
+{"assets":["pfSense-pkg-layer7-1.8.11_60.pkg","pfSense-pkg-layer7-1.8.11_60.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_60"}
+{"assets":["pfSense-pkg-layer7-1.8.11_59.pkg","pfSense-pkg-layer7-1.8.11_59.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_59"}
+{"assets":["pfSense-pkg-layer7-1.8.11_58.pkg","pfSense-pkg-layer7-1.8.11_58.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_58"}
+{"assets":["pfSense-pkg-layer7-1.8.11_57.pkg","pfSense-pkg-layer7-1.8.11_57.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_57"}
+{"assets":["pfSense-pkg-layer7-1.8.11_56.pkg","pfSense-pkg-layer7-1.8.11_56.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_56"}
+{"assets":["pfSense-pkg-layer7-1.8.11_55.pkg","pfSense-pkg-layer7-1.8.11_55.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_55"}
+{"assets":["pfSense-pkg-layer7-1.8.11_54.pkg","pfSense-pkg-layer7-1.8.11_54.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_54"}
+{"assets":["pfSense-pkg-layer7-1.8.11_53.pkg","pfSense-pkg-layer7-1.8.11_53.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_53"}
+{"assets":["pfSense-pkg-layer7-1.8.11_52.pkg","pfSense-pkg-layer7-1.8.11_52.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_52"}
+{"assets":["pfSense-pkg-layer7-1.8.11_51.pkg","pfSense-pkg-layer7-1.8.11_51.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_51"}
+{"assets":["pfSense-pkg-layer7-1.8.11_50.pkg","pfSense-pkg-layer7-1.8.11_50.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_50"}
+{"assets":["pfSense-pkg-layer7-1.8.11_49.pkg","pfSense-pkg-layer7-1.8.11_49.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_49"}
+{"assets":["pfSense-pkg-layer7-1.8.11_47.pkg","pfSense-pkg-layer7-1.8.11_47.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_47"}
+{"assets":["pfSense-pkg-layer7-1.8.11_45.pkg","pfSense-pkg-layer7-1.8.11_45.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_45"}
+{"assets":["pfSense-pkg-layer7-1.8.11_44.pkg","pfSense-pkg-layer7-1.8.11_44.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_44"}
+{"assets":["pfSense-pkg-layer7-1.8.11_43.pkg","pfSense-pkg-layer7-1.8.11_43.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_43"}
+{"assets":["pfSense-pkg-layer7-1.8.11_42.pkg","pfSense-pkg-layer7-1.8.11_42.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_42"}
+{"assets":["pfSense-pkg-layer7-1.8.11_41.pkg","pfSense-pkg-layer7-1.8.11_41.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_41"}
+{"assets":["pfSense-pkg-layer7-1.8.11_40.pkg","pfSense-pkg-layer7-1.8.11_40.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_40"}
+{"assets":["pfSense-pkg-layer7-1.8.11_39.pkg","pfSense-pkg-layer7-1.8.11_39.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_39"}
+{"assets":["pfSense-pkg-layer7-1.8.11_38.pkg","pfSense-pkg-layer7-1.8.11_38.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_38"}
+{"assets":["pfSense-pkg-layer7-1.8.11_37.pkg","pfSense-pkg-layer7-1.8.11_37.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_37"}
+{"assets":["pfSense-pkg-layer7-1.8.11_36.pkg","pfSense-pkg-layer7-1.8.11_36.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_36"}
+{"assets":["pfSense-pkg-layer7-1.8.11_35.pkg","pfSense-pkg-layer7-1.8.11_35.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_35"}
+{"assets":["pfSense-pkg-layer7-1.8.11_34.pkg","pfSense-pkg-layer7-1.8.11_34.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_34"}
+{"assets":["pfSense-pkg-layer7-1.8.11_33.pkg","pfSense-pkg-layer7-1.8.11_33.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_33"}
+{"assets":["pfSense-pkg-layer7-1.8.11_32.pkg","pfSense-pkg-layer7-1.8.11_32.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_32"}
+{"assets":["pfSense-pkg-layer7-1.8.11_24.pkg","pfSense-pkg-layer7-1.8.11_24.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_24"}
+{"assets":["pfSense-pkg-layer7-1.8.11_23.pkg","pfSense-pkg-layer7-1.8.11_23.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_23"}
+{"assets":["pfSense-pkg-layer7-1.8.11_18.pkg","pfSense-pkg-layer7-1.8.11_18.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_18"}
+{"assets":["pfSense-pkg-layer7-1.8.11_17.pkg","pfSense-pkg-layer7-1.8.11_17.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_17"}
+{"assets":["pfSense-pkg-layer7-1.8.11_16.pkg","pfSense-pkg-layer7-1.8.11_16.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_16"}
+{"assets":["pfSense-pkg-layer7-1.8.11_14.pkg","pfSense-pkg-layer7-1.8.11_14.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_14"}
+{"assets":["pfSense-pkg-layer7-1.8.11_13.pkg","pfSense-pkg-layer7-1.8.11_13.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_13"}
+{"assets":["pfSense-pkg-layer7-1.8.11_12.pkg","pfSense-pkg-layer7-1.8.11_12.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.11_12"}
+{"assets":["pfSense-pkg-layer7-1.8.3.pkg","pfSense-pkg-layer7-1.8.3.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.3"}
+{"assets":["pfSense-pkg-layer7-1.8.2.pkg","pfSense-pkg-layer7-1.8.2.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.2"}
+{"assets":["pfSense-pkg-layer7-1.8.0.pkg","pfSense-pkg-layer7-1.8.0.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.8.0"}
+{"assets":["pfSense-pkg-layer7-1.7.9.pkg","pfSense-pkg-layer7-1.7.9.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.9"}
+{"assets":["pfSense-pkg-layer7-1.7.8.pkg","pfSense-pkg-layer7-1.7.8.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.8"}
+{"assets":["pfSense-pkg-layer7-1.7.7.pkg","pfSense-pkg-layer7-1.7.7.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.7"}
+{"assets":["pfSense-pkg-layer7-1.7.6.pkg","pfSense-pkg-layer7-1.7.6.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.6"}
+{"assets":["pfSense-pkg-layer7-1.7.5.pkg","pfSense-pkg-layer7-1.7.5.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.5"}
+{"assets":["pfSense-pkg-layer7-1.7.4.pkg","pfSense-pkg-layer7-1.7.4.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.4"}
+{"assets":["pfSense-pkg-layer7-1.7.3.pkg","pfSense-pkg-layer7-1.7.3.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.3"}
+{"assets":["pfSense-pkg-layer7-1.7.2.pkg","pfSense-pkg-layer7-1.7.2.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.7.2"}
+{"assets":["pfSense-pkg-layer7-1.6.7.pkg","pfSense-pkg-layer7-1.6.7.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.6.7"}
+{"assets":["pfSense-pkg-layer7-1.6.6.pkg","pfSense-pkg-layer7-1.6.6.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.6.6"}
+{"assets":["pfSense-pkg-layer7-1.6.5.pkg","pfSense-pkg-layer7-1.6.5.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.6.5"}
+{"assets":["pfSense-pkg-layer7-1.6.4.pkg","pfSense-pkg-layer7-1.6.4.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.6.4"}
+{"assets":["pfSense-pkg-layer7-1.6.3.pkg"],"draft":false,"prerelease":false,"tag":"v1.6.3"}
+{"assets":["pfSense-pkg-layer7-1.6.2.pkg"],"draft":false,"prerelease":false,"tag":"v1.6.2"}
+{"assets":["pfSense-pkg-layer7-1.6.1.pkg"],"draft":false,"prerelease":false,"tag":"v1.6.1"}
+{"assets":["pfSense-pkg-layer7-1.6.0.pkg"],"draft":false,"prerelease":false,"tag":"v1.6.0"}
+{"assets":["pfSense-pkg-layer7-1.5.3.pkg","pfSense-pkg-layer7-1.5.3.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.5.3"}
+{"assets":["pfSense-pkg-layer7-1.5.2.pkg","pfSense-pkg-layer7-1.5.2.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.5.2"}
+{"assets":["pfSense-pkg-layer7-1.5.1.pkg","pfSense-pkg-layer7-1.5.1.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.5.1"}
+{"assets":["pfSense-pkg-layer7-1.5.0.pkg","pfSense-pkg-layer7-1.5.0.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.5.0"}
+{"assets":["pfSense-pkg-layer7-1.4.17.pkg","pfSense-pkg-layer7-1.4.17.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.4.17"}
+{"assets":["pfSense-pkg-layer7-1.4.16.pkg","pfSense-pkg-layer7-1.4.16.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.4.16"}
+{"assets":["pfSense-pkg-layer7-1.4.15.pkg","pfSense-pkg-layer7-1.4.15.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.4.15"}
+{"assets":["pfSense-pkg-layer7-1.4.14.pkg","pfSense-pkg-layer7-1.4.14.pkg.sha256"],"draft":false,"prerelease":false,"tag":"v1.4.14"}
+{"assets":["install.sh","pfSense-pkg-layer7-1.4.13.pkg","pfSense-pkg-layer7-1.4.13.pkg.sha256","uninstall.sh"],"draft":false,"prerelease":false,"tag":"v1.4.13"}
+{"assets":["install.sh","pfSense-pkg-layer7-1.4.12.pkg","pfSense-pkg-layer7-1.4.12.pkg.sha256","uninstall.sh"],"draft":false,"prerelease":false,"tag":"v1.4.12"}
+{"assets":["install.sh","pfSense-pkg-layer7-1.4.11.pkg","pfSense-pkg-layer7-1.4.11.pkg.sha256","uninstall.sh"],"draft":false,"prerelease":false,"tag":"v1.4.11"}
+{"assets":["install.sh","pfSense-pkg-layer7-1.4.10.pkg","pfSense-pkg-layer7-1.4.10.pkg.sha256","uninstall.sh"],"draft":false,"prerelease":false,"tag":"v1.4.10"}
+{"assets":["install.sh","pfSense-pkg-layer7-1.4.9.pkg","pfSense-pkg-layer7-1.4.9.pkg.sha256","uninstall.sh"],"draft":false,"prerelease":false,"tag":"v1.4.9"}

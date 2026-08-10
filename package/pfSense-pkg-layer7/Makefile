@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.48
+PORTVERSION=	1.9.49
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -62,6 +62,8 @@ SUB_LIST=	PORTNAME=${PORTNAME}
 do-extract:
 	${MKDIR} ${WRKSRC}
 
+# Anti-pirataria 30.4 / GA2.3: NÃO definir -DL7_DEV_BUILD aqui.
+# O bypass is_dev_key existe só sob L7_DEV_BUILD (lab explícito).
 do-build:
 	@${ECHO_CMD} '"${PKGVERSION}"' > ${WRKSRC}/version.str
 	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} \

@@ -37,8 +37,8 @@ if [ "$SMOKE_OS" != "FreeBSD" ]; then
 	cat > "$SMOKE_VER/license_smoke_stub.c" <<'STUB'
 /* Stub de licenciamento — exclusivo para smoke em Linux/Darwin.
  * Substitui src/layer7d/license.c (que usa headers FreeBSD-only).
- * Sempre devolve dev_mode=1 / valid=1, equivalente ao comportamento do
- * license.c real quando a chave Ed25519 embutida está zerada (DEV MODE).
+ * Devolve valid=1 para o smoke de CI compilar/arrancar sem .lic.
+ * NÃO equivale ao license.c de produção (30.4: all-zeros ⇒ inválida).
  * Não é instalado no pacote; nunca executa fora do CI/smoke.
  */
 #include "license.h"

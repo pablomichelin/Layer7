@@ -1,0 +1,25 @@
+VERDICT: PASS — passo 30.3 FECHADO; GA1.6 PASS; GA1.7 PASS
+RUNID: 20260810T234552Z
+DATE_UTC: 2026-08-10
+
+GA1.6 — inventário 1.9.48:
+  pkg_sha256=78fb0cfd151d2d32c19d8892ed176df8992f9c265a0d88fdfd005a624eab84eb
+  layer7d_sha256=509a7dd748dbe3b4eb6a19d5e5b2a302e2b393633f939c0fb3267434aa6e67cc
+  symbols=stripped; is_dev_key symbol ABSENT
+  bypass string "development key" ABSENT (likely DCE)
+  pubkey prod FOUND
+  source residual is_dev_key PRESENT (esperado até 30.4) — NÃO é falso PASS do artefacto
+
+GA1.7 — teste automatizado:
+  scripts/package/audit-release-dev-bypass.sh
+  --selftest PASS
+  --gate dirty.fixture EXIT 1 (FAIL correcto)
+  --gate 1.9.48 EXIT 0 (sem marcadores binários)
+
+RR-3 / decisão 8:
+  inventário de releases publicadas registado
+  amostra 1.9.48/1.9.47/1.9.8/1.8.11_24 sem marcadores binários
+  NÃO despublicado nada (execução 30.19)
+
+Código de produto: NENHUM
+Próximo: 30.4 (AP1 — remover is_dev_key do caminho de produção)

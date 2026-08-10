@@ -1,0 +1,24 @@
+pkg_path=/Users/pablomichelin/Documents/Layer 7/docs/tests/evidence/20260810T234552Z-ap0-baseline/tmp-dirty/dirty.pkg
+pkg_sha256=aab0e5e875a010dd2d6a8ff78edd022c8fc9e3b319e983a37119eb1fb4080053
+mode=gate
+layer7d_sha256=45066e6aeff1acd993e375817b5d4d9372e838f2455f5313e8658e04fd1423d9
+bin_path=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T/l7-audit-pkg.OoBDBe/root/usr/local/sbin/layer7d
+bin_size=51
+marker_development_key=FOUND
+marker_verification_skipped=FOUND
+marker_is_dev_key_string=ABSENT
+marker_license_dev_mode=ABSENT
+bypass_markers_hit=2
+pubkey_expected=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+pubkey_in_bin=ABSENT
+pubkey_offset=-1
+elf_hint=unknown
+file_desc=data 
+symbol_is_dev_key=ABSENT
+symbol_bypass_hit=0
+--- source residual (informativo; não é o .pkg) ---
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=ABSENT
+source_verdict=FAIL (residual A-01 no fonte — esperado até 30.4)
+artifact_verdict=FAIL (caminho de bypass dev detectado no binário)

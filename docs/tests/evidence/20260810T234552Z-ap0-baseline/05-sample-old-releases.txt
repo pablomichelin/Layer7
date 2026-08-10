@@ -1,0 +1,116 @@
+# Amostra de .pkg antigos — marcadores binários de bypass
+# Script: scripts/package/audit-release-dev-bypass.sh --inventory
+
+======== 1.9.48 ========
+pkg_path=pfSense-pkg-layer7-1.9.48.pkg
+pkg_sha256=78fb0cfd151d2d32c19d8892ed176df8992f9c265a0d88fdfd005a624eab84eb
+mode=inventory
+layer7d_sha256=509a7dd748dbe3b4eb6a19d5e5b2a302e2b393633f939c0fb3267434aa6e67cc
+bin_path=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T/l7-audit-pkg.n9iL3t/root/usr/local/sbin/layer7d
+bin_size=8121312
+marker_development_key=ABSENT
+marker_verification_skipped=ABSENT
+marker_is_dev_key_string=ABSENT
+marker_license_dev_mode=FOUND
+bypass_markers_hit=0
+pubkey_expected=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+pubkey_in_bin=FOUND
+pubkey_offset=845984
+elf_hint=elf
+file_desc=ELF 64-bit LSB executable, x86-64, version 1 (FreeBSD), dynamically linked, interpreter /libexec/ld-elf.so.1, for FreeBSD 15.0 (1500068), FreeBSD-style, stripped 
+symbol_is_dev_key=ABSENT (stripped/no symbols)
+symbol_bypass_hit=0
+--- source residual (informativo; não é o .pkg) ---
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=ABSENT
+source_verdict=FAIL (residual A-01 no fonte — esperado até 30.4)
+artifact_verdict=PASS (sem marcadores binários de bypass dev)
+
+======== 1.9.47 ========
+pkg_path=pfSense-pkg-layer7-1.9.47.pkg
+pkg_sha256=2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833
+mode=inventory
+layer7d_sha256=a8cd4b519a8a45a18b4434992e96c1d4b0553640fcc66381114d3b8a38e3f47f
+bin_path=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T/l7-audit-pkg.Q9sTSc/root/usr/local/sbin/layer7d
+bin_size=8120224
+marker_development_key=ABSENT
+marker_verification_skipped=ABSENT
+marker_is_dev_key_string=ABSENT
+marker_license_dev_mode=FOUND
+bypass_markers_hit=0
+pubkey_expected=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+pubkey_in_bin=FOUND
+pubkey_offset=845760
+elf_hint=elf
+file_desc=ELF 64-bit LSB executable, x86-64, version 1 (FreeBSD), dynamically linked, interpreter /libexec/ld-elf.so.1, for FreeBSD 15.0 (1500068), FreeBSD-style, stripped 
+symbol_is_dev_key=ABSENT (stripped/no symbols)
+symbol_bypass_hit=0
+--- source residual (informativo; não é o .pkg) ---
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=ABSENT
+source_verdict=FAIL (residual A-01 no fonte — esperado até 30.4)
+artifact_verdict=PASS (sem marcadores binários de bypass dev)
+
+======== 1.9.8 ========
+pkg_path=pfSense-pkg-layer7-1.9.8.pkg
+pkg_sha256=229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec
+mode=inventory
+layer7d_sha256=49d8b609da0e9a2e8bd4ca0d5b7a477a266b2cdce401e329f3822c1276aa08bb
+bin_path=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T/l7-audit-pkg.HANo7r/root/usr/local/sbin/layer7d
+bin_size=7189336
+marker_development_key=ABSENT
+marker_verification_skipped=ABSENT
+marker_is_dev_key_string=ABSENT
+marker_license_dev_mode=FOUND
+bypass_markers_hit=0
+pubkey_expected=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+pubkey_in_bin=FOUND
+pubkey_offset=799872
+elf_hint=elf
+file_desc=ELF 64-bit LSB executable, x86-64, version 1 (FreeBSD), dynamically linked, interpreter /libexec/ld-elf.so.1, for FreeBSD 15.0 (1500068), FreeBSD-style, stripped 
+symbol_is_dev_key=ABSENT (stripped/no symbols)
+symbol_bypass_hit=0
+--- source residual (informativo; não é o .pkg) ---
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=ABSENT
+source_verdict=FAIL (residual A-01 no fonte — esperado até 30.4)
+artifact_verdict=PASS (sem marcadores binários de bypass dev)
+
+======== 1.8.11_24 ========
+pkg_path=pfSense-pkg-layer7-1.8.11_24.pkg
+pkg_sha256=1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818
+mode=inventory
+layer7d_sha256=e7573bb411cfb877326769927ab5f13656398bded28e8f77b0dd86e67ae1e032
+bin_path=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T/l7-audit-pkg.gb94qV/root/usr/local/sbin/layer7d
+bin_size=7165336
+marker_development_key=ABSENT
+marker_verification_skipped=ABSENT
+marker_is_dev_key_string=ABSENT
+marker_license_dev_mode=FOUND
+bypass_markers_hit=0
+pubkey_expected=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+pubkey_in_bin=FOUND
+pubkey_offset=796720
+elf_hint=elf
+file_desc=ELF 64-bit LSB executable, x86-64, version 1 (FreeBSD), dynamically linked, interpreter /libexec/ld-elf.so.1, for FreeBSD 15.0 (1500068), FreeBSD-style, stripped 
+symbol_is_dev_key=ABSENT (stripped/no symbols)
+symbol_bypass_hit=0
+--- source residual (informativo; não é o .pkg) ---
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=ABSENT
+source_verdict=FAIL (residual A-01 no fonte — esperado até 30.4)
+artifact_verdict=PASS (sem marcadores binários de bypass dev)
+
+=== Conclusão amostra ===
+Em todos os .pkg amostrados (1.9.48, 1.9.47, 1.9.8, 1.8.11_24):
+- binário stripped; símbolo is_dev_key ABSENT
+- string 'development key' ABSENT (provável DCE com pubkey const ≠ 0)
+- pubkey produção FOUND
+- license_dev_mode (campo status JSON) FOUND — não é o bypass
+Residual A-01 permanece no FONTE (license.c) até 30.4.
+RR-3: tags antigas continuam descarregáveis; risco residual documentado;
+decisão 8 adia despublicação para 30.19 (limitar apontadores).

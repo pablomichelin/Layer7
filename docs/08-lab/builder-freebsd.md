@@ -99,6 +99,36 @@ gh release create "v1.8.11_XX" \
 
 Confirmar: `curl -s https://api.github.com/repos/pablomichelin/Layer7/releases/latest | grep tag_name`
 
+## Anti-pirataria / passo 30.2 — pubkey fora do git
+
+Builder de produto actual: **`192.168.100.12`** (FreeBSD 15;
+`/root/pfsense-layer7`). Credenciais operacionais: ver `AGENTS.md`.
+
+### SoT da pubkey de produção (decisão 4)
+
+| Ficheiro | Papel |
+|----------|--------|
+| `/root/layer7-build-secrets/l7_ed25519_pubkey.hex` | 64 nibbles hex (32 bytes) — **SoT** |
+| `/root/layer7-build-secrets/l7_ed25519_pubkey.inc` | fragmento C de referência |
+| `/root/layer7-build-secrets/backup/<RUNID>/` | cópias antes de mudanças |
+
+Antes de cada `make package` de produção:
+
+```sh
+cd /root/pfsense-layer7
+git pull --ff-only origin main
+sh scripts/package/verify-prod-pubkey.sh
+cd package/pfSense-pkg-layer7
+make clean && DISABLE_LICENSES=yes make package DISABLE_VULNERABILITIES=yes
+```
+
+O script **FAIL** se `src/layer7d/license.c` divergir do SoT (protege GA1.8).
+
+**Não** usar o antigo fluxo `git stash` → `pull` → `checkout stash -- license.c Makefile`
+→ `stash drop`. Esse fluxo era a causa do achado A-09 e foi retirado em `30.2`.
+
+Evidência de fecho: `docs/tests/evidence/20260810T231840Z-30.2-builder-pubkey/`.
+
 ## Acesso SSH (automacao e scripts)
 
 Sessoes nao interactivas e ferramentas com `BatchMode` necessitam de

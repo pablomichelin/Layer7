@@ -50,6 +50,17 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0027](ADR-0027-identity-userid-multi-fonte.md) | Identity User-ID multi-fonte (sem captive) | **Aceito** (rev.c) | Mapa no daemon; RADIUS; agente DC A1–A7; fail-mode; NAT `multi-user` |
 | [ADR-0028](ADR-0028-concorrencia-io-daemon-identity.md) | Concorrência e IO do daemon para Identity | **Aceito** | Sem IO bloqueante no hot path; threads + rwlock; baseline perf no 20.11a |
 | [ADR-0029](ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) | Adiamento IM7 agente endpoint + exclusão IM8 TS/VDI | **Aceito** (20.28) | Sequência segura; GI8 PASS; reopen IM7 com GO + espec 20.27 |
+| [ADR-0030](ADR-0030-postura-anti-tamper-layer7d.md) | Postura anti-tamper do `layer7d` e remoção do modo dev de produção | **Aceito** (`2026-08-10`, `30.1b`) | Trilha anti-pirataria; R-A/R-G/RR-3; passos `30.4`/`30.5`/`30.7` |
+| [ADR-0031](ADR-0031-entitlement-entrega-conteudo.md) | Entitlement na entrega de conteúdo (token de subscrição para blacklists/catálogos) | **Aceito** (`2026-08-10`, `30.1b`) | RR-1/RR-2/R-B/R-D; AP2; GO espelho `30.11` |
+| [ADR-0032](ADR-0032-check-in-obrigatorio-e-assinado.md) | Check-in obrigatório por defeito e resposta assinada com anti-replay | **Aceito** (`2026-08-10`, `30.1b`) | **Emenda ADR-0021**; RR-1/RR-5/R-C; GO `30.14`; BG-101 reaberto |
+| [ADR-0033](ADR-0033-anti-rollback-relogio.md) | Anti-rollback de relógio e estado temporal suspeito | **Aceito** (`2026-08-10`, `30.1b`) | Emenda `f3-expiracao-revogacao-grace.md`; RR-4/R-J; passo `30.6` |
+
+**Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`)
+com GO humano (recomendações do plano). Ficha:
+[`../09-blocking/decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md).
+GA0 completo. Próximo passo de execução: **`30.2`**. Plano rev. `2026-08-10c`
+([`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md),
+arranque [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md)).
 
 **Nota importante:** a distribuicao actual conhecida do projecto usa `.pkg`.
 O ADR-0002 fica preservado por rastreabilidade, mas a referencia normativa
@@ -78,9 +89,16 @@ Sempre que um ADR nascer, actualizar tambem:
 **Aceitos** (ver tabela acima) — **não** reutilizar. Em especial, ADR-0012 é
 *Politicas por dispositivo: resolucao MAC -> IP*, **não** reorganização F6.
 
+**Nota (`2026-08-10`) — reatribuição declarada de ID:** o ID `ADR-0030` estava aqui
+sugerido para a higiene estrutural F6 residual. Como esse ADR é **condicional** («só
+se moves futuros precisarem de decisão normativa») e **nunca foi criado**, o ID
+`ADR-0030` passou a ser usado pela trilha anti-pirataria (tabela acima) e a sugestão
+F6 passa a **`ADR-0034`**. Nenhum ADR existente foi renumerado; nenhum ID `Aceito` foi
+reutilizado. Conflito registado em vez de silenciado.
+
 | Proximo ID sugerido | Tema | Fase | Motivo |
 |---------------------|------|------|--------|
-| ADR-0030 | Reorganizacao estrutural controlada / higiene residual (se GO exigir ADR formal além do plano BG-112) | F6 residual | só se moves futuros precisarem de decisão normativa para além de `f6-plano-higiene-estrutural-residual.md` |
+| ADR-0034 | Reorganizacao estrutural controlada / higiene residual (se GO exigir ADR formal além do plano BG-112) | F6 residual | só se moves futuros precisarem de decisão normativa para além de `f6-plano-higiene-estrutural-residual.md`; **era** `ADR-0030` antes de `2026-08-10` |
 | — | Modelo de estados do licenciamento/activacao | F3 | já coberto por docs canónicos F3 (`f3-arquitetura-licenciamento-ativacao.md` e relacionados); **não** abrir ADR-0011 duplicado |
 
 ---

@@ -5,8 +5,10 @@
 #   OUT       — nome do binário (default: layer7d)
 #   VSTR_DIR  — diretório que contém version.str para -I (default: .)
 #   NDPI      — 0 para compilar sem nDPI (smoke tests CI), 1 com nDPI (default: auto)
+#   L7_DEV_BUILD — se 1, adiciona -DL7_DEV_BUILD (lab only; ausente no port)
 #
 # Smoke: make OUT=layer7d-smoke VSTR_DIR=/tmp/l7vers NDPI=0
+# Lab com bypass dev (NÃO usar em package): make L7_DEV_BUILD=1
 
 LAYER7_COMMON = ../common
 SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c features.c \
@@ -41,6 +43,14 @@ NDPI_LDFLAGS =
 
 .PHONY: all clean check
 
+# Default: produção (sem bypass). Só lab: make L7_DEV_BUILD=1
+L7_DEV_BUILD ?= 0
+.if $(L7_DEV_BUILD) == 1
+DEV_CFLAGS = -DL7_DEV_BUILD
+.else
+DEV_CFLAGS =
+.endif
+
 all: $(OUT)
 
 $(OUT): $(SRCS)
@@ -50,7 +60,7 @@ $(OUT): $(SRCS)
 		echo "layer7d Makefile: falta /usr/local/lib/libndpi.a para gerar binário autocontido"; exit 1; \
 	fi
 	$(CC) $(CFLAGS) -Wall -Wextra -O2 -I$(VSTR_DIR) -I. -I$(LAYER7_COMMON) \
-		$(NDPI_CFLAGS) $(LDAP_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS) \
+		$(NDPI_CFLAGS) $(LDAP_CFLAGS) $(DEV_CFLAGS) -o $(OUT) $(SRCS) $(NDPI_LDFLAGS) \
 		$(PTHREAD_LDFLAGS) $(LDAP_LDFLAGS) -lssl -lcrypto
 
 clean:

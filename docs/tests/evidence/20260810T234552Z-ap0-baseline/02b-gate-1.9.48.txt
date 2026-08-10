@@ -1,0 +1,24 @@
+pkg_path=/Users/pablomichelin/Documents/Layer 7/artifacts/30.3-tmp/pfSense-pkg-layer7-1.9.48.pkg
+pkg_sha256=78fb0cfd151d2d32c19d8892ed176df8992f9c265a0d88fdfd005a624eab84eb
+mode=gate
+layer7d_sha256=509a7dd748dbe3b4eb6a19d5e5b2a302e2b393633f939c0fb3267434aa6e67cc
+bin_path=/var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T/l7-audit-pkg.yS5QzG/root/usr/local/sbin/layer7d
+bin_size=8121312
+marker_development_key=ABSENT
+marker_verification_skipped=ABSENT
+marker_is_dev_key_string=ABSENT
+marker_license_dev_mode=FOUND
+bypass_markers_hit=0
+pubkey_expected=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+pubkey_in_bin=FOUND
+pubkey_offset=845984
+elf_hint=elf
+file_desc=ELF 64-bit LSB executable, x86-64, version 1 (FreeBSD), dynamically linked, interpreter /libexec/ld-elf.so.1, for FreeBSD 15.0 (1500068), FreeBSD-style, stripped 
+symbol_is_dev_key=ABSENT (stripped/no symbols)
+symbol_bypass_hit=0
+--- source residual (informativo; não é o .pkg) ---
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=ABSENT
+source_verdict=FAIL (residual A-01 no fonte — esperado até 30.4)
+artifact_verdict=PASS (sem marcadores binários de bypass dev)

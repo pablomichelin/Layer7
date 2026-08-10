@@ -1,0 +1,4 @@
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=PRESENT
+source_verdict=PASS (is_dev_key apenas sob L7_DEV_BUILD)

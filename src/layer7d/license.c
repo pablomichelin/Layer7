@@ -27,17 +27,27 @@
 static unsigned checkin_effective_features(unsigned lic_flags);
 
 /*
- * Ed25519 public key (32 bytes). Replace with real key before production.
- * All-zeros = development mode (license verification skipped).
- * Use scripts/license/generate-license.py to create a key pair.
+ * Ed25519 public key (32 bytes). Material SoT no builder (passo 30.2);
+ * este array é espelho transitório até AP1 remover o embutido.
+ *
+ * Produção (sem L7_DEV_BUILD): all-zeros NÃO salta verificação — licença
+ * inválida / monitor (A-01 / passo 30.4 / ADR-0030).
+ * Lab: apenas builds com -DL7_DEV_BUILD (flag ausente do Makefile do port).
+ *
+ * L7_TEST_ZERO_PUBKEY: só para o harness de teste (nunca no port).
  */
+#ifdef L7_TEST_ZERO_PUBKEY
+static const unsigned char l7_ed25519_pubkey[32] = { 0 };
+#else
 static const unsigned char l7_ed25519_pubkey[32] = {
 	0x8c, 0x52, 0xb6, 0x77, 0x2a, 0x64, 0x74, 0x9e,
 	0x4a, 0x57, 0xb3, 0x4b, 0xa1, 0x65, 0x78, 0xa1,
 	0xb1, 0x30, 0x96, 0x0b, 0x1a, 0x8e, 0x88, 0xe6,
 	0xc1, 0xd8, 0x6d, 0xbd, 0x99, 0xfd, 0x18, 0x24
 };
+#endif
 
+#ifdef L7_DEV_BUILD
 static int
 is_dev_key(void)
 {
@@ -48,6 +58,7 @@ is_dev_key(void)
 	}
 	return 1;
 }
+#endif /* L7_DEV_BUILD */
 
 /* --- hex helpers --- */
 
@@ -258,6 +269,7 @@ layer7_license_check(struct l7_license_info *info)
 	memset(customer, 0, sizeof(customer));
 	memset(features, 0, sizeof(features));
 
+#ifdef L7_DEV_BUILD
 	if (is_dev_key()) {
 		info->dev_mode = 1;
 		info->valid = 1;
@@ -271,6 +283,7 @@ layer7_license_check(struct l7_license_info *info)
 			    sizeof(info->hardware_id), "(unknown)");
 		return 0;
 	}
+#endif /* L7_DEV_BUILD */
 
 	if (layer7_hw_fingerprint(hw_id, sizeof(hw_id)) != 0) {
 		snprintf(info->error, sizeof(info->error),
@@ -973,8 +986,10 @@ layer7_check_in(const char *url)
 	char server_error[256];
 	int rc, http_status;
 
+#ifdef L7_DEV_BUILD
 	if (is_dev_key())
 		return L7_CHECKIN_SKIP;
+#endif /* L7_DEV_BUILD */
 
 	if (!checkin_load_state(&st) || !st.license_key[0]) {
 		fprintf(stderr,

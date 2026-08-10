@@ -1,0 +1,51 @@
+=== test-prod-no-dev-bypass ===
+=== 30.4 / GA2 — produção sem bypass dev ===
+PASS: port Makefile sem -DL7_DEV_BUILD activo
+PASS: is_dev_key() apenas sob #ifdef L7_DEV_BUILD
+PASS: string bypass ausente no binário de produção (zero-key)
+PASS: pubkey all-zeros + build produção => invalid (dev_mode=0 valid=0 rc=-1)
+error=Ed25519 signature verification failed
+PASS: L7_DEV_BUILD+zero => bypass activo (controlo)
+PASS: GA2.1/GA2.2/GA2.3 (runtime FreeBSD)
+=== check-source ===
+source_path=/root/pfsense-layer7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=PRESENT
+source_verdict=PASS (is_dev_key apenas sob L7_DEV_BUILD)
+=== verify-prod-pubkey ===
+PASS: license.c pubkey == SoT (/root/layer7-build-secrets/l7_ed25519_pubkey.hex)
+pubkey_hex=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+=== layer7d from stage ===
+-rw-r--r--  1 root staff 3296958 Aug 10 17:24 package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-1.9.49.pkg
+-r-xr-xr-x  1 root staff 8121312 Aug 10 17:24 package/pfSense-pkg-layer7/work/stage/usr/local/sbin/layer7d
+f380ad493c5229fc08704673abf758edaa5e15ea05061820d04bb9abdca4d3cb
+76d7f44b351ce7ac512ca96b17c581627492d987521bdb5a5a9e22414f9b1789
+package/pfSense-pkg-layer7/work/stage/usr/local/sbin/layer7d: ELF 64-bit LSB executable, x86-64, version 1 (FreeBSD), dynamically linked, interpreter /libexec/ld-elf.so.1, for FreeBSD 15.0 (1500068), FreeBSD-style, stripped
+=== nm / strings markers ===
+package/pfSense-pkg-layer7/work/stage/usr/local/sbin/layer7d: no symbols
+NO_DEV_MARKERS
+=== -V -t fingerprint ===
+1.9.49
+layer7d_version: 1.9.49
+config: samples/config/layer7-minimal.json
+  layer7: found
+  enabled: false
+  mode: monitor
+  log_level: info
+  syslog_remote: false
+  syslog_remote_host: (not set)
+  syslog_remote_port: 514
+  debug_minutes: 0 (boost após reload)
+  protos_file: (default /usr/local/etc/layer7-protos.txt)
+  interfaces: [lan]
+  policies: 4 (sorted priority desc, id asc)
+    [0] id=p-blk-bt-001 pri=100 action=block enabled=false app=[BitTorrent]
+    [1] id=p-tag-http-055 pri=55 action=tag enabled=true tag_table=layer7_http_users app=[HTTP]
+    [2] id=p-web-050 pri=50 action=monitor enabled=true cat=[Web]
+    [3] id=p-mon-001 pri=10 action=monitor enabled=true match.*
+  exceptions: 2 (priority desc)
+    [0] id=ex-mgmt-host pri=1000 action=allow host=10.0.0.99
+    [1] id=ex-lab-cidr pri=500 action=allow cidr/pref=24
+7209217784b0ca2c9584fa39437e2b001757b5c8a2c2af8835ff0e25ae620966
+=== audit gate on pkg ===
+FAIL: comando em falta: python3

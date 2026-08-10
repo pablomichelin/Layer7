@@ -1,0 +1,33 @@
+=== SECRETS ===
+/root/layer7-build-secrets:
+total 15
+drwx------  3 root wheel   5 Aug 10 16:50 .
+drwxr-x---  9 root wheel  23 Aug 10 16:50 ..
+drwxr-xr-x  3 root wheel   3 Aug 10 16:50 backup
+-rw-------  1 root wheel  65 Aug 10 16:50 l7_ed25519_pubkey.hex
+-rw-------  1 root wheel 314 Aug 10 16:50 l7_ed25519_pubkey.inc
+
+/root/layer7-build-secrets/backup/20260810T231840Z:
+total 3
+drwxr-xr-x  2 root wheel     6 Aug 10 16:50 .
+drwxr-xr-x  3 root wheel     3 Aug 10 16:50 ..
+-rw-r--r--  1 root staff  2162 Aug  9 17:06 Makefile
+-rw-r--r--  1 root wheel    65 Aug 10 16:50 l7_ed25519_pubkey.hex
+-rw-r--r--  1 root wheel   314 Aug 10 16:50 l7_ed25519_pubkey.inc
+-rw-r--r--  1 root staff 27533 Aug  9 17:06 license.c
+=== GIT ===
+## main...origin/main
+?? package/pfSense-pkg-layer7/work/
+HEAD=7c727b5edf4fd4645a2ca5087dcbe240d180afc1
+7c727b5 feat(gui): pack produto canónico e Reportar erro (1.9.48)
+=== DIFF WT vs HEAD (license.c Makefile) ===
+(empty — WT == HEAD)
+=== STASH LIST (preservados; NÃO drop) ===
+stash@{0}: WIP on main: bc076f0 fix(mitm): 20.10b correctivo pós-auditoria (1.9.41)
+stash@{1}: WIP on main: 7389d0b chore(release): migrar distribuicao publica para Layer7
+=== PUBKEY EXTRACT license.c ===
+sh: python3: not found
+
+=== PUBKEY EXTRACT license.c (completed via 03) ===
+pubkey_hex=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+matches_field=yes

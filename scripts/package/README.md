@@ -15,6 +15,42 @@ sh scripts/package/check-port-files.sh
 Corre no **CI Linux** antes do smoke. O antigo `check-port-files.ps1` fica
 preservado apenas como legado ate F6; nao e fluxo vigente do projecto.
 
+## `verify-prod-pubkey.sh`
+
+Compara a pubkey Ed25519 embutida em `src/layer7d/license.c` com o SoT fora
+do git no builder (`/root/layer7-build-secrets/`). Usar **antes** de
+`make package` (passo 30.2 / GA1.8).
+
+```sh
+sh scripts/package/verify-prod-pubkey.sh
+```
+
+## `audit-release-dev-bypass.sh`
+
+Auditoria de um **`.pkg` publicado** quanto a marcadores do bypass de
+desenvolvimento (A-01 / `is_dev_key`) — passo **30.3** / GA1.6 / GA1.7.
+
+```sh
+sh scripts/package/audit-release-dev-bypass.sh --selftest
+sh scripts/package/audit-release-dev-bypass.sh --inventory path/to.pkg
+sh scripts/package/audit-release-dev-bypass.sh --gate path/to.pkg   # exit 1 se marcadores
+sh scripts/package/audit-release-dev-bypass.sh --check-source       # residual no fonte
+```
+
+`--gate` falha se o binário contiver a string `development key` ou o símbolo
+`is_dev_key`. `--check-source` exige que `is_dev_key()` exista só sob
+`#ifdef L7_DEV_BUILD` (passo **30.4** / BG-114).
+
+## `test-prod-no-dev-bypass.sh`
+
+Gate GA2.1–2.3 / passo **30.4**: port sem `-DL7_DEV_BUILD`; runtime FreeBSD com
+pubkey all-zeros em build de produção ⇒ licença inválida; controlo com
+`L7_DEV_BUILD` confirma que o bypass lab ainda funciona.
+
+```sh
+sh scripts/package/test-prod-no-dev-bypass.sh   # runtime completo no builder
+```
+
 ## `smoke-layer7d.sh`
 
 Valida **compilação** (`smoke`), **`-V`**, **`-t`** nos dois JSONs, **`-e -n`**

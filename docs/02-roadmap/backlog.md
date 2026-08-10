@@ -335,7 +335,7 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-098 | `waitpid` sem retry EINTR em enforce | Media | daemon | F4 | falsos fails / zombies | P | Medio | **Concluido (`1.9.9`)** | `waitpid_retry` |
 | BG-099 | Update GUI: URL só prefixo `https://github.com/` | Media | GUI/release | F7 | admin instala `.pkg` de outro repo | P | Medio | **Concluido (`1.9.9`)** | restringir a `pablomichelin/Layer7/` |
 | BG-100 | Teto blacklist 8M entradas (OOM) | Media | daemon/blacklists | F4 | OOM com feed externo grande | M | Medio | **Concluido (`1.9.12`)** | hard-cap 5M + `mem_percent` 5–50% de `hw.physmem` (clamp 128–1536 MB) + GUI; truncagem com WARN |
-| BG-101 | Revogação remota fail-open até offline max (~14d) | Baixa | licenciamento | F3 | design ADR-0021; janela longa se rede cortada | — | — | Documentado | não é bug; rever só com GO comercial |
+| BG-101 | Revogação remota ineficaz com check-in default OFF (A-04) | Alta | licenciamento | AP3 / `30.14` | appliance instalado ignora revogação até expiry+grace | M | Alto | **Reaberto `2026-08-10` (`30.1b`) — lacuna comercial** | era `Documentado` (ADR-0021); GO: corrigir via ADR-0032 / BG-118; nunca fail-closed (R-C) |
 | BG-102 | Allowlist PF sem `match inet6` (L7ALLOW só inet) | Alta | package/PF | F4/hardening | IPs v6 na tabela allow_dst sem tag; block inet6 ignora allowlist | P | Alto | **Concluido (`1.9.10`)** | `layer7_pf_inet46_rules` + helper; smoke `pfctl -sr` PASS |
 | BG-103 | TOCTOU `pfctl -f /tmp/rules.debug` (check≠use) | Alta | daemon/package/PF | F4/hardening | ruleset arbitrário entre `stat` e `pfctl -f` | M | Alto | **Concluido (`1.9.11`)** | open+O_NOFOLLOW+fstat → `pfctl -f -` (stdin); PHP+helper+daemon |
 | BG-104 | DNS observe residual (spoof com txid+client) | Alta | daemon/capture | F4/hardening | sniffer LAN spoofa resposta com ID visto | M | Alto | **Concluido (`1.9.11`)** | pend client+txid+resolver+qname; allowlist auto-seed+`dns_observe_resolvers[]`; limite: spoof-as-resolver L2 |
@@ -348,6 +348,37 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-111 | Perfis rápidos: categorias colapsadas + polish UX | Media | package/GUI | Caminho A / UX | grelha poluída (grupos com activos abertos); localStorage reabria | P | Baixo | **Concluido + publicado `1.9.36`** | SHA256 `abfd772f…a71b`; superseded por `1.9.38` latest |
 | BG-112 | F6 higiene estrutural residual pós-H5 (inventário, classificação, plano, gate, exclusões; lotes P1–P4) | Media | estrutura/documentacao | F6 residual | resíduo local/untracked/links/status F6; risco de apagar evidência ou misturar código/lab | P | Baixo (auditoria) / Medio (lotes) | **Auditoria PASS**; **P1 CORRIGIR PASS** (`2026-08-10`); P2–P4 físicos **bloqueados** ate GO + G0–G7 | Plano [`../00-overview/f6-plano-higiene-estrutural-residual.md`](../00-overview/f6-plano-higiene-estrutural-residual.md); inv/class `f6-*-2026-08-09.md`; **nao** reabre H1–H5; P4 FAIL/ABORT = MANTER |
 | BG-113 | Pack produto PRD+UML+catálogo + botão GUI «Reportar erro» (opt-in GitHub, sem telemetria) | Media | docs + package/GUI | F4 / manutenção | operadores sem caminho seguro para reportar bugs; docs sem PRD/UML/catálogo canónicos | P | Medio | **Concluido — publicado `1.9.48`** | Hub `pack-produto-layer7.md`; PRD/UML/catálogo; GUI Diagnósticos fluxo 3 passos; `test_error_report.php`; sem segredos |
+
+### Trilha Anti-pirataria / Anti-tamper (BG-114…BG-123)
+
+Fila governada por [`plano-antipirataria-anti-tamper.md`](plano-antipirataria-anti-tamper.md)
+(ondas AP0–AP4, passos `30.x`), arranque em
+[`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md),
+diagnóstico em
+[`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md)
+e gates em
+[`../09-blocking/plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md).
+
+**`30.3` e `30.4` FECHADOS** (`2026-08-10`). GA1 PASS; GA2.1–2.3 PASS (BG-114).
+A-09 resolvido em `30.2`. Próximo AP1: **`30.5`** (BG-115). Ver plano §8.
+
+| ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
+|----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
+| BG-114 | Remover modo dev (`is_dev_key`) do binário de produção; gate por `L7_DEV_BUILD` | **Critica** | daemon/licenciamento | AP1 / passo `30.4` | 32 bytes zerados no binário publicado dão licença universal permanente (achado A-01) | P | Alto | **Concluido** (`30.4` + release `1.9.49`, `2026-08-10`) | GA2.1–2.3 PASS; evidência `20260810T235325Z-30.4-no-dev-bypass` |
+| BG-115 | Strip do `layer7d` no port; remover símbolos de licença | Alta | package/build | AP1 / passo `30.5` | mapa de símbolos aponta para as funções de licença (A-01) | P | Alto | **Aberto — próximo** | sem ofuscação (R-G); registar limite de diagnóstico; gate GA2 |
+| BG-116 | Anti-rollback de relógio (marca persistente + degradação para monitor) | Alta | daemon/licenciamento | AP1 / passo `30.6` | `date` para trás estende licença expirada indefinidamente (A-03) | M | Alto | **Aberto — aguarda `30.5`** | ADR-0033 Aceito; nunca crash; N6; gate GA3 |
+| BG-117 | Token de subscrição na entrega de blacklists/catálogos; retirar espelho público corrente | Alta | blacklists + license server | AP2 / passos `30.8`–`30.11` | cópia pirata mantém-se actualizada indefinidamente (A-06) | G | **Alto** | **Aberto — prioridade de valor** | defesa estruturalmente sólida; conteúdo em falta **não** desliga enforce (R-D); `30.11` exige GO próprio; gate GA4 |
+| BG-118 | Check-in `true` por defeito + política de migração | Alta | package + licenciamento | AP3 / passo `30.14` | revogação no painel não corta appliance instalado (A-04) | M | Alto | **Aberto — exige GO próprio** | **reabre/emenda BG-101**; cria dependência de rede; runbook obrigatório; gate GA5 |
+| BG-119 | Resposta de check-in assinada com nonce; rejeitar não assinada | Alta | daemon + license server | AP3 / passos `30.12`–`30.13` | servidor falso via `/etc/hosts` mantém licença viva (A-05) | M | Alto | **Aberto** | sem pinning hoje; ADR-0032 emenda ADR-0021; gate GA5 |
+| BG-120 | Estado de entitlements assinado para a GUI; eliminar fallback sem verificação | Media | package/GUI + daemon | AP1 / passo `30.7` | stats forjados desbloqueiam UX de Identity/MITM (A-07) | M | Medio | **Aberto** | coordenar com ADR-0025; fechar gate `tlsproxy.product`; gate GA2 |
+| BG-121 | Alerta de abuso multi-appliance no license server (+ decisão sobre `max_activations`) | Media | license server | AP3 / passo `30.15` | integrador multi-cliente invisível (A-08) | M | Alto | **Aberto** | dados já existem em `activations_log`; falta alerta; gate GA5 |
+| BG-122 | Distribuir decisão de licença (remover ponto único em `refresh_enforce_cfg`) | Media | daemon | AP4 / passo `30.16` | um NOP activa enforce sem licença (A-02) | M | Medio | **Aberto** | manter legibilidade; N1/N2 obrigatórios; gate GA6 |
+| BG-123 | Completar cadeia de assinatura de release nas publicações (manifesto + `.sig`) | Baixa | release | AP4 / passo `30.18` | releases só com `.sha256`; contrato F1.2/ADR-0023 incompleto (A-10) | P | Medio | **Aberto** | não é bypass de licença; integridade/proveniência; gate GA6 |
+
+**Nota sobre BG-101:** reaberto em **`30.1b`** (`2026-08-10`) como **lacuna comercial
+a corrigir** (achado A-04), via ADR-0032 / BG-118 — decisão humana n.º 5 na ficha
+[`../09-blocking/decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md).
+Antes: `Documentado` como design da ADR-0021. Execução no passo `30.14` (GO próprio).
 
 ---
 

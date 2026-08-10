@@ -1,0 +1,200 @@
+# Gates — Anti-pirataria e Anti-tamper (GA0–GA6)
+
+**Plano:** [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md)
+**Arranque:** [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md)
+**Modelo de ameaças:** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md)
+
+Cada critério: `PASS` | `FAIL` | `BLOCKED` | `DEFERRED` (só com ADR) | `PENDENTE`.
+Evidência: pasta `docs/tests/evidence/<run_id>/` sempre que houver lab.
+
+**Regra dos gates desta trilha:** todo critério que envolva o binário valida o
+**`.pkg` publicado**, nunca só o código no repositório (R-H — o builder tem
+`license.c`/`Makefile` divergentes).
+
+**Regra de não-regressão:** os invariantes **N1–N8** do plano §1 são critério de
+`FAIL` em **todos** os gates de AP1 em diante, além dos critérios próprios de cada gate.
+
+---
+
+## GA0 — Governação *(onda AP0, passos 30.0–30.1b)*
+
+| # | Critério | Estado |
+|---|----------|--------|
+| GA0.1 | `START-HERE` + plano + este ficheiro existem e os links resolvem | **PASS** (`2026-08-10`) |
+| GA0.2 | CORTEX / `docs/README.md` / backlog / índice de ADRs apontam a trilha | **PASS** (`2026-08-10`) |
+| GA0.3 | Modelo de ameaças aceite como diagnóstico | **PASS** (`2026-08-10`) |
+| GA0.4 | ADR-0030/0031/0032/0033 com estado `Aceito` (ou emenda registada) | **PASS** (`2026-08-10`, `30.1b`) |
+| GA0.5 | As **oito** decisões humanas do plano §5 resolvidas e registadas na ficha | **PASS** (`2026-08-10`, `30.1b`) |
+| GA0.6 | BG-114…BG-123 registados no backlog canónico | **PASS** (`2026-08-10`) |
+| GA0.7 | BG-101 reclassificado ou mantido, com justificação escrita | **PASS** (`2026-08-10`, `30.1b`) — reaberto lacuna comercial |
+| GA0.8 | Ficheiros ADR-0030…0033 existem em `Proposto` + ficha `decisoes-humanas-30.1.md` | **PASS** (`2026-08-10`, `30.1a`) |
+| GA0.9 | Plano §8 (protocolo Composer) + RR-1…RR-5 presentes no SSOT | **PASS** (`2026-08-10c`) |
+
+**Saída:** GA0 **completo** (`2026-08-10`). Bloqueio A-09 / pubkey fora do git
+resolvido em **`30.2` FECHADO**. **`30.3` FECHADO** / **GA1 PASS** — próximo AP1 (`30.4`+).
+
+---
+
+## GA1 — Baseline e integridade do artefacto *(passos 30.2–30.3)*
+
+| # | Critério | Estado |
+|---|----------|--------|
+| GA1.1 | Diff builder ↔ repo de `license.c` e `Makefile` documentado como evidência | **PASS** (`20260810T231840Z` — WT==HEAD) |
+| GA1.2 | Decisão sobre a residência da pubkey de produção aplicada e registada | **PASS** (SoT `/root/layer7-build-secrets/`) |
+| GA1.3 | Fluxo de build actualizado (`AGENTS.md` + `builder-freebsd.md`) e executado com sucesso | **PASS** (sem stash; verify+package) |
+| GA1.4 | Build limpo pós-mudança produz `.pkg` funcional; `layer7d -t` e `--fingerprint` PASS | **PASS** |
+| GA1.5 | `strings`/`nm` do `.pkg` confirmam a pubkey de produção esperada | **PASS** (sbin contém SoT) |
+| GA1.6 | Inventário do `1.9.48` em campo registado (sha256, símbolos, presença de caminho dev) | **PASS** (`20260810T234552Z` — stripped; string bypass ABSENT; pubkey FOUND; residual fonte até 30.4) |
+| GA1.7 | Teste automatizado que **falha** se um artefacto de release contiver o caminho de bypass dev | **PASS** (`audit-release-dev-bypass.sh` — selftest + dirty fixture exit 1) |
+| GA1.8 | Licenças válidas em campo continuam válidas após a mudança de fluxo (pubkey inalterada) | **PASS** (sbin sha256 == `1.9.48` publicado) |
+
+**Saída:** deixa de existir ambiguidade entre o que está no git e o que está em campo.
+**GA1.8 é bloqueante absoluto** — trocar a pubkey inadvertidamente invalida licenças
+de clientes pagantes.
+**Estado GA1:** **PASS** completo (`30.2` + `30.3`). Evidências:
+[`../tests/evidence/20260810T231840Z-30.2-builder-pubkey/`](../tests/evidence/20260810T231840Z-30.2-builder-pubkey/),
+[`../tests/evidence/20260810T234552Z-ap0-baseline/`](../tests/evidence/20260810T234552Z-ap0-baseline/).
+**Nota GA1.6:** o `.pkg` `1.9.48` **não** expõe marcadores binários de
+`is_dev_key` (strip + DCE); o residual A-01 permanece no **fonte** até `30.4`
+(`--check-source` exit 1). Isto **não** é falso PASS do artefacto.
+
+---
+
+## GA2 — Anti-tamper do binário *(passos 30.4, 30.5, 30.7)*
+
+| # | Critério | Estado |
+|---|----------|--------|
+| GA2.1 | Build de produção **não contém** `is_dev_key` nem o bloco de bypass | **PASS** (`20260810T235325Z` — `#ifdef L7_DEV_BUILD`; marcadores ausentes no `.pkg` 1.9.49) |
+| GA2.2 | Pubkey inválida/all-zeros num build de produção ⇒ licença **inválida** (monitor), nunca válida | **PASS** (`test-prod-no-dev-bypass.sh` no builder) |
+| GA2.3 | Modo dev existe apenas sob `L7_DEV_BUILD`, flag ausente do port | **PASS** (`30.4`) |
+| GA2.4 | Artefacto strippado: `nm`/`strings` sem símbolos de licença | **PENDENTE** |
+| GA2.5 | Daemon arranca, `-t` PASS, `--fingerprint` PASS após strip | **PENDENTE** |
+| GA2.6 | Licença válida ⇒ enforce idêntico ao `1.9.48` (**N1**) | **PENDENTE** |
+| GA2.7 | Licença ausente/inválida ⇒ monitor, daemon vivo, zero regras PF de block (**N2**) | **PENDENTE** |
+| GA2.8 | Stats/ficheiros forjados **não** desbloqueiam Identity/MITM na GUI | **PENDENTE** |
+| GA2.9 | Gate MITM não é activável escrevendo ficheiros à mão | **PENDENTE** |
+| GA2.10 | Sem regressão na trilha Identity+MITM: `test_mitm_config.php` e suite de entitlements PASS | **PENDENTE** |
+| GA2.11 | Limite de diagnóstico do strip registado honestamente (core dumps menos legíveis) | **PENDENTE** |
+
+**Saída:** o caminho de bypass mais curto desaparece e o custo de ataque sobe de
+minutos para horas com ferramentas. **Não** se declara "impossível de contornar".
+**Estado GA2:** parcial — GA2.1–2.3 **PASS** (`30.4`, evidência
+`20260810T235325Z-30.4-no-dev-bypass`); GA2.4+ pendentes (`30.5` / `30.7`).
+
+---
+
+## GA3 — Anti-rollback temporal *(passo 30.6)*
+
+| # | Critério | Estado |
+|---|----------|--------|
+| GA3.1 | Marca persistente do maior timestamp observado, resistente a reinício | **PENDENTE** |
+| GA3.2 | Relógio a avançar normalmente ⇒ zero efeito | **PENDENTE** |
+| GA3.3 | Retrocesso pequeno (ajuste NTP legítimo) ⇒ tolerado sem evento de alarme | **PENDENTE** |
+| GA3.4 | Retrocesso grande ⇒ estado suspeito, degradação para **monitor**, evento de auditoria | **PENDENTE** |
+| GA3.5 | Daemon **nunca** termina nem entra em crash por estado temporal (**R-C**) | **PENDENTE** |
+| GA3.6 | Recuperação após corrigir a hora: documentada, testada e executável pelo operador (**N6**) | **PENDENTE** |
+| GA3.7 | Licença dentro da validade com relógio correcto ⇒ inalterado (**N1**) | **PENDENTE** |
+| GA3.8 | Rollback ao `.pkg` anterior ignora o ficheiro de estado sem erro (**N7**) | **PENDENTE** |
+| GA3.9 | ADR-0033 / runbook declaram explicitamente as evasões RR-4 (apagar estado; relógio congelado) e que o fecho real é AP3 | **PENDENTE** |
+
+**Saída:** prolongar licença expirada com `date` deixa de ser trivial, sem punir
+clientes com relógio genuinamente errado. **Não** se afirma que 30.6 contém o T2 técnico.
+
+---
+
+## GA4 — Entitlement na entrega de conteúdo *(passos 30.8–30.11)*
+
+Gate da onda de **maior valor estratégico**. Também o de maior risco de suporte.
+
+| # | Critério | Estado |
+|---|----------|--------|
+| GA4.1 | Desenho e contrato do token fechados e revistos antes de código | **PENDENTE** |
+| GA4.2 | Servidor emite token para licença activa; recusa para revogada/expirada | **PENDENTE** |
+| GA4.3 | Token ligado ao `hardware_id`; inútil noutro appliance | **PENDENTE** |
+| GA4.4 | Cliente com token válido actualiza conteúdo (PASS ponta a ponta) | **PENDENTE** |
+| GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PENDENTE** |
+| GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PENDENTE** |
+| GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PENDENTE** |
+| GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PENDENTE** |
+| GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PENDENTE** |
+| GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** |
+| GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **PENDENTE** |
+| GA4.12 | Comunicação a clientes emitida antes de 30.11 | **PENDENTE** |
+| GA4.13 | Sem segredos novos no repositório, incluindo fixtures (**N8**, **R-K**) | **PENDENTE** |
+| GA4.14 | ADR-0031 / desenho 30.8 declaram RR-2 (redistribuição por appliance licenciado) e que a resposta é atribuição+contratual, não bloqueio técnico | **PENDENTE** |
+| GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** |
+
+**Saída:** uma cópia sem subscrição válida degrada sozinha ao longo do tempo, sem
+que nada no appliance precise de se defender — **desde que** 30.11 tenha GO Sim.
+
+---
+
+## GA5 — Check-in verificável e obrigatório *(passos 30.12–30.15)*
+
+Gate de maior impacto em suporte. **Não abrir sem GA4 estável.**
+
+| # | Critério | Estado |
+|---|----------|--------|
+| GA5.1 | Protocolo assinado com nonce especificado e revisto | **PENDENTE** |
+| GA5.2 | Resposta legítima assinada é aceite | **PENDENTE** |
+| GA5.3 | Resposta **não assinada** é rejeitada pelo cliente | **PENDENTE** |
+| GA5.4 | Replay de resposta anterior rejeitado | **PENDENTE** |
+| GA5.5 | Servidor falso via `/etc/hosts` ou DNS **não** consegue manter licença viva | **PENDENTE** |
+| GA5.6 | Falha de rede continua a não afectar enforce (**N3**) — verificado explicitamente neste gate | **PENDENTE** |
+| GA5.7 | Instalação nova arranca com check-in activo | **PENDENTE** |
+| GA5.8 | Upgrade de instalação existente não quebra o appliance | **PENDENTE** |
+| GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **PENDENTE** |
+| GA5.10 | Caminho de excepção para appliance isolado documentado e testado | **PENDENTE** |
+| GA5.11 | Runbook de suporte publicado antes da release | **PENDENTE** |
+| GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PENDENTE** |
+| GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PENDENTE** |
+
+**Saída:** revogar uma licença passa a ter efeito real, sem transformar
+indisponibilidade de rede em firewall parado.
+
+---
+
+## GA6 — Endurecimento residual e fecho *(passos 30.16–30.19)*
+
+| # | Critério | Estado |
+|---|----------|--------|
+| GA6.1 | Decisão de licença distribuída sem regressão de enforce (**N1**, **N2**) | **PENDENTE** |
+| GA6.2 | Código continua legível e mantível apesar da distribuição de decisão | **PENDENTE** |
+| GA6.3 | Marcação por cliente implementada com avaliação de privacidade registada | **PENDENTE** |
+| GA6.4 | Sem telemetria introduzida (coerente com a política do produto) | **PENDENTE** |
+| GA6.5 | Releases publicam manifesto + `.sig` + chave pública (ADR-0023 / F1.2) | **PENDENTE** |
+| GA6.6 | `MANUAL-INSTALL.md` com comandos e links da versão actual (regra especial do `AGENTS.md`) | **PENDENTE** |
+| GA6.7 | Revisão jurídica da EULA concluída | **PENDENTE** |
+| GA6.8 | Modelo de ameaças reavaliado com os controlos novos | **PENDENTE** |
+| GA6.9 | Declaração honesta do que **continua** possível para root (**RR-1…RR-5**) | **PENDENTE** |
+| GA6.10 | O que ficou sem prova em pfSense CE declarado (**R-L**, ADR-0022) | **PENDENTE** |
+| GA6.11 | Fecho registado no CORTEX e no `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | **PENDENTE** |
+| GA6.12 | Decisão §5 n.º 8 (releases antigas com bypass) executada ou risco residual aceite por escrito (RR-3) | **PENDENTE** |
+
+**Saída:** trilha fechada, com limites declarados sem overclaim.
+
+---
+
+## Critérios transversais de `FAIL` imediato
+
+Qualquer um destes, em qualquer gate, é `FAIL` sem discussão:
+
+1. Falha de rede, DNS ou license server a reduzir enforce ou a parar o daemon (**R-C**).
+2. Conteúdo em falta a desligar enforce em vez de apenas não actualizar (**R-D**).
+3. Mecanismo que permita a um servidor desligar o enforce de um appliance (**R-E**).
+4. Cliente legítimo sem caminho de recuperação documentado (**R-J**).
+5. Segredo ou material de assinatura commitado (**R-K**).
+6. Passo desta trilha misturado com promoção de enforce, MITM ou IPv6 (**R-I**).
+7. Gate validado só contra o repositório, sem verificar o `.pkg` publicado (**R-H**).
+8. Alegação de que o produto ficou "impossível de contornar" (**R-A**).
+
+---
+
+## Registo de veredictos
+
+| Data | Gate | Passo | Veredicto | Evidência |
+|------|------|-------|-----------|-----------|
+| `2026-08-10` | GA0 (parcial) | 30.0 | **PASS parcial** — GA0.1/0.2/0.3/0.6 PASS; 0.4/0.5/0.7 pendentes de 30.1b | documental (sem lab) |
+| `2026-08-10` | GA0.9 | rev. `c` | **PASS** — protocolo Composer §8 + RR-1…RR-5 no plano | documental |
+| `2026-08-10` | GA0.8 | 30.1a | **PASS** — ADR-0030…0033 `Proposto` + ficha | documental |
+| `2026-08-10` | **GA0** | 30.1b | **PASS completo** — ADRs `Aceito`; 8 decisões; BG-101 reaberto | ficha + ADRs + backlog |

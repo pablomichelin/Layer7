@@ -1,0 +1,5 @@
+=== 30.4 / GA2 — produção sem bypass dev ===
+PASS: port Makefile sem -DL7_DEV_BUILD activo
+PASS: is_dev_key() apenas sob #ifdef L7_DEV_BUILD
+SKIP runtime: Darwin não é FreeBSD (compile/runtime no builder)
+PASS parcial (fonte + Makefile). Correr este script no builder para GA2.2.

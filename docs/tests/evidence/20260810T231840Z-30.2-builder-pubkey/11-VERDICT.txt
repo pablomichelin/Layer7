@@ -1,0 +1,14 @@
+VERDICT: PASS — passo 30.2 FECHADO (2026-08-10)
+
+GA1.1 PASS — diff builder↔repo license.c/Makefile documentado (vazio; WT==HEAD)
+GA1.2 PASS — decisão 4 aplicada: SoT /root/layer7-build-secrets/ (fora do git)
+GA1.3 PASS — fluxo AGENTS/builder sem stash; pull+verify+package executado
+GA1.4 PASS — .pkg 1.9.48; layer7d -t / -V / --fingerprint PASS
+GA1.5 PASS — pubkey no sbin do .pkg == SoT == campo
+GA1.8 PASS — sbin sha256 idêntico ao 1.9.48 publicado (pubkey inalterada)
+
+GA1.6 / GA1.7 — PENDENTE (passo 30.3)
+GA1 completo — PENDENTE até 30.3
+
+STOP: stashes NÃO dropados; pubkey NÃO trocada; license.c NÃO editado.
+Próximo: 30.3

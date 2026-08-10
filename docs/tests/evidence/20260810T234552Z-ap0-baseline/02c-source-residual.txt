@@ -1,0 +1,4 @@
+source_path=/Users/pablomichelin/Documents/Layer 7/src/layer7d/license.c
+source_is_dev_key=PRESENT
+source_L7_DEV_BUILD=ABSENT
+source_verdict=FAIL (residual A-01 no fonte — esperado até 30.4)

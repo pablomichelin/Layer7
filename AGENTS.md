@@ -211,19 +211,39 @@ como um unico bloco governado por checklist.
 - **Repo no builder:** `/root/pfsense-layer7`
 - **Guia (verificacao minima, smoke, acesso SSH por chave):** `docs/08-lab/builder-freebsd.md`
 
-### Ficheiros locais sensiveis no builder
+### Pubkey de produção no builder (passo 30.2 / decisão 4)
 
-**Nao commitar estas alteracoes locais do builder:**
+Material da pubkey Ed25519 de produção vive **fora do git** (SoT no builder).
+Versionar só o *procedimento* — nunca commitar rotação casual da pubkey.
 
-- `src/layer7d/license.c`
-- `src/layer7d/Makefile`
+| Item | Caminho |
+|------|---------|
+| SoT hex (32 bytes) | `/root/layer7-build-secrets/l7_ed25519_pubkey.hex` |
+| SoT include C (referência) | `/root/layer7-build-secrets/l7_ed25519_pubkey.inc` |
+| Backups | `/root/layer7-build-secrets/backup/<RUNID>/` |
+| Verificação pré-package | `sh scripts/package/verify-prod-pubkey.sh` |
+
+Notas:
+
+- A pubkey é material **público** (embutida no `.pkg`); a chave **privada**
+  permanece no license-server — não misturar.
+- `src/layer7d/license.c` no git contém um **espelho transitório** dos mesmos
+  bytes (necessário até AP1 remover o embutido). Builds de produção **falham**
+  se o espelho divergir do SoT (`verify-prod-pubkey.sh`).
+- **Não** restaurar stashes antigos sobre `license.c` / `Makefile` — o fluxo
+  stash→pull→checkout foi **retirado** em `30.2` (A-09). Stashes históricos
+  no builder podem existir para auditoria; **não** `stash drop` sem backup.
+- **GA1.8:** trocar a pubkey invalida licenças em campo — proibido sem gate.
 
 ### Fluxo de build padrao
 
 1. `sshpass -p 'pablo' ssh root@192.168.100.12`
-2. `cd /root/pfsense-layer7 && git stash && git pull origin main && git checkout "stash@{0}" -- src/layer7d/license.c src/layer7d/Makefile && git stash drop`
-3. `cd package/pfSense-pkg-layer7 && make clean && DISABLE_LICENSES=yes make package DISABLE_VULNERABILITIES=yes`
-4. copiar o `.pkg` para a maquina local se a fase exigir artefacto
+2. `cd /root/pfsense-layer7 && git pull --ff-only origin main`
+3. `sh scripts/package/verify-prod-pubkey.sh`  # FAIL se SoT ≠ license.c
+4. `cd package/pfSense-pkg-layer7 && make clean && DISABLE_LICENSES=yes make package DISABLE_VULNERABILITIES=yes`
+5. copiar o `.pkg` para a maquina local se a fase exigir artefacto
+
+Guia expandido: `docs/08-lab/builder-freebsd.md` (secção *Anti-pirataria / 30.2*).
 
 ---
 

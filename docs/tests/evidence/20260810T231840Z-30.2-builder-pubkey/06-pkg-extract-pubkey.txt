@@ -1,0 +1,9 @@
+-rwxr-xr-x  1 root staff 33227024 Aug 10 16:50 /root/pfsense-layer7/package/pfSense-pkg-layer7/work/layer7d
+-r-xr-xr-x  1 root staff  8121312 Aug 10 16:50 /root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/sbin/layer7d
+/root/pfsense-layer7/package/pfSense-pkg-layer7/work/layer7d size=33227024 pubkey=yes
+/root/pfsense-layer7/package/pfSense-pkg-layer7/work/stage/usr/local/sbin/layer7d size=8121312 pubkey=yes
+sha256_stage=509a7dd748dbe3b4eb6a19d5e5b2a302e2b393633f939c0fb3267434aa6e67cc
+-r-xr-xr-x  1 root wheel 8121312 Aug 10 16:50 usr/local/sbin/layer7d
+sha256_pkg_sbin=509a7dd748dbe3b4eb6a19d5e5b2a302e2b393633f939c0fb3267434aa6e67cc
+pubkey_in_pkg_sbin=yes
+published_1.9.48_sbin_sha256=509a7dd748dbe3b4eb6a19d5e5b2a302e2b393633f939c0fb3267434aa6e67cc

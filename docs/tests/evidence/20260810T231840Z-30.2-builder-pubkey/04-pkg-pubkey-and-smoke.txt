@@ -1,0 +1,32 @@
+=== SHA256 PKG ===
+0ab9154b98665f09a6c5d21a9e58e199d9773791c00bdae14174c789e3742e81
+-rwxr-xr-x  1 root staff 33227024 Aug 10 16:50 package/pfSense-pkg-layer7/work/layer7d
+-rw-r--r--  1 root staff  3296983 Aug 10 16:50 package/pfSense-pkg-layer7/work/pkg/pfSense-pkg-layer7-1.9.48.pkg
+=== layer7d -t / -V / fingerprint ===
+1.9.48
+layer7d_version: 1.9.48
+config: samples/config/layer7-minimal.json
+  layer7: found
+  enabled: false
+  mode: monitor
+  log_level: info
+  syslog_remote: false
+  syslog_remote_host: (not set)
+  syslog_remote_port: 514
+  debug_minutes: 0 (boost após reload)
+  protos_file: (default /usr/local/etc/layer7-protos.txt)
+  interfaces: [lan]
+  policies: 4 (sorted priority desc, id asc)
+    [0] id=p-blk-bt-001 pri=100 action=block enabled=false app=[BitTorrent]
+    [1] id=p-tag-http-055 pri=55 action=tag enabled=true tag_table=layer7_http_users app=[HTTP]
+    [2] id=p-web-050 pri=50 action=monitor enabled=true cat=[Web]
+    [3] id=p-mon-001 pri=10 action=monitor enabled=true match.*
+  exceptions: 2 (priority desc)
+    [0] id=ex-mgmt-host pri=1000 action=allow host=10.0.0.99
+    [1] id=ex-lab-cidr pri=500 action=allow cidr/pref=24
+7209217784b0ca2c9584fa39437e2b001757b5c8a2c2af8835ff0e25ae620966
+=== PUBKEY IN BINARY ===
+pubkey_in_work_layer7d=yes
+size=33227024
+bsdtar: usr/local/sbin/layer7d: Not found in archive
+bsdtar: Error exit delayed from previous errors.

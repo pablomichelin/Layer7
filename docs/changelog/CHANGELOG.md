@@ -4,6 +4,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.49] — 2026-08-10
+
+### Security
+
+- **Anti-pirataria 30.4 / BG-114:** `is_dev_key()` e o bypass de desenvolvimento
+  existem apenas sob `#ifdef L7_DEV_BUILD` (flag ausente do Makefile do port).
+  Pubkey all-zeros num build de produção ⇒ licença inválida (monitor), nunca
+  válida. Gate GA2.1–2.3 PASS (`scripts/package/test-prod-no-dev-bypass.sh`).
+  Pubkey SoT inalterada (GA1.8).
+
+### Release
+
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `f380ad493c5229fc08704673abf758edaa5e15ea05061820d04bb9abdca4d3cb`
+- Rollback lab: `1.9.48`
+
 ## [1.9.48] — 2026-08-10
 
 ### Added
