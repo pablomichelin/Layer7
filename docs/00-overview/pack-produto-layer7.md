@@ -2,7 +2,7 @@
 
 **Classificação:** Canónico (índice do pack)  
 **Actualizado:** `2026-08-10`  
-**Canal `latest` publicado:** `1.9.47` · **Candidato local:** `1.9.48` (não publicado)  
+**Canal `latest` publicado:** `1.9.48`  
 **Pin enforce:** `1.9.8` · **SSOT vivo:** [`../../CORTEX.md`](../../CORTEX.md)
 
 Este é o **ponto de entrada** do pack de produto. Lê-se em 2–5 minutos;
@@ -37,7 +37,7 @@ flowchart LR
 | Núcleo V1 | **Pronto para enforce** (excepções ADR-0022 CE, ADR-0023 fase 0) |
 | Identity (rede) | Trilha **FECHADA** no âmbito documentado |
 | MITM TLS | Lab opt-in; permanente **NO-GO** sem ficha + GO |
-| Reportar erro | Candidato GUI `1.9.48` — opt-in GitHub, sem telemetria |
+| Reportar erro | GUI `1.9.48` — opt-in GitHub, sem telemetria |
 
 ---
 

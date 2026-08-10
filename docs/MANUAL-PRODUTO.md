@@ -5,10 +5,10 @@
 > **Espelho no canal público** `pablomichelin/Layer7`:
 > [`docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md`](https://github.com/pablomichelin/Layer7/blob/main/docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md)
 > (versão sanitizada: sem SSOTs internos / license server).  
-> **Pacote de referência (canal `latest`):** **`1.9.47`**  
-> **SHA256:** `2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`  
+> **Pacote de referência (canal `latest`):** **`1.9.48`**  
+> **SHA256:** `78fb0cfd151d2d32c19d8892ed176df8992f9c265a0d88fdfd005a624eab84eb`  
 > **Release:** <https://github.com/pablomichelin/Layer7/releases/latest>  
-> **Data de alinhamento:** `2026-08-09`
+> **Data de alinhamento:** `2026-08-10`
 ---
 
 ## 0. Como usar este manual
@@ -39,9 +39,9 @@ MANUAL-INSTALL**. Actualizar este hub no mesmo bloco da release.
 
 | Canal | Versão | Papel |
 |-------|--------|--------|
-| **`latest` / lab / updater GUI** | **`1.9.47`** | Pacote público actual (GitHub Releases) |
+| **`latest` / lab / updater GUI** | **`1.9.48`** | Pacote público actual (GitHub Releases) |
 | **Produção enforce (pin)** | **`1.9.8`** | Referência de enforce estável (GV7.4) até GO de promoção |
-| Rollback lab a partir de `1.9.47` | **`1.9.46`** | Ver links em MANUAL-INSTALL |
+| Rollback lab a partir de `1.9.48` | **`1.9.47`** | Ver links em MANUAL-INSTALL |
 | Rollback enforce | **`1.9.0`** (histórico `_69`, `_24`) | Ver MANUAL-INSTALL |
 
 **MITM (TLS inspection):**
@@ -568,7 +568,7 @@ usar o handoff e hierarquia em
 (equipa de produto — não substitui suporte ao cliente).
 
 **Reportar erro (GUI):** em **Services → Layer 7 → Diagnósticos**, bloco
-**Reportar erro** (candidato `1.9.48`). Fluxo: (1) descrever o sintoma,
+**Reportar erro** (`1.9.48`). Fluxo: (1) descrever o sintoma,
 (2) rever metadados seguros, (3) **Abrir issue no GitHub** ou
 **Copiar URL (sem redirect)**. Nada é enviado até clicar. **Não** inclui
 `.lic`, chaves, logs, dumps nem IPs de clientes. No GitHub: login →

@@ -4,6 +4,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.48] — 2026-08-10
+
 ### Added
 
 - **GUI Diagnósticos — Reportar erro:** fluxo opt-in em 3 passos
@@ -19,10 +21,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `docs/00-overview/pack-produto-layer7.md` + PRD / UML / catálogo
   reorganizados (TOC, badges, diagramas Mermaid legíveis, fluxo Report).
 
-### Notes
+### Release
 
-- Candidato interno **`1.9.48`** (PORTVERSION) — **não** publicado;
-  canal `latest` continua `1.9.47` até release.
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `78fb0cfd151d2d32c19d8892ed176df8992f9c265a0d88fdfd005a624eab84eb`
+- Rollback lab: `1.9.47`
 
 ## [1.9.47] — 2026-08-09
 

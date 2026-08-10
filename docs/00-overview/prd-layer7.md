@@ -2,7 +2,7 @@
 
 **Pack:** [`pack-produto-layer7.md`](pack-produto-layer7.md) · **UML:** [`uml-layer7.md`](uml-layer7.md) · **Catálogo:** [`catalogo-funcionalidades.md`](catalogo-funcionalidades.md)  
 **Classificação:** Canónico · **SSOT vivo:** [`../../CORTEX.md`](../../CORTEX.md)  
-**Referência:** `latest` = `1.9.47` · pin enforce = `1.9.8` · candidato Report = `1.9.48`
+**Referência:** `latest` = `1.9.48` · pin enforce = `1.9.8`
 
 > Não inventa capacidades. Em conflito, prevalece o `CORTEX.md`.
 
@@ -65,7 +65,7 @@ Nicho PME (trilha activa): Identity-first —
 | GUI | Estado, Definições, Políticas, Grupos, Categorias, Teste, Excepções, Events, Diagnósticos, Relatórios, Blacklists, Identity, MITM, … |
 | Licença | Ed25519 + fingerprint · activação online · grace local |
 | Distribuição | Updater via GitHub Releases `pablomichelin/Layer7` |
-| Observabilidade local | Logs L1 (ADR-0015) · reports SQLite · **Reportar erro** opt-in (candidato `1.9.48`) |
+| Observabilidade local | Logs L1 (ADR-0015) · reports SQLite · **Reportar erro** opt-in (`1.9.48`) |
 
 ### 3.2 Add-ons / trilhas
 
@@ -89,7 +89,7 @@ Nicho PME (trilha activa): Identity-first —
 | RF-06 | Install/upgrade/rollback `.pkg`+SHA256 | Must | Cumprido |
 | RF-07 | Blacklists UT1 assinadas fail-closed | Must | Cumprido |
 | RF-08 | Diagnósticos locais | Should | Cumprido |
-| RF-09 | Reportar erro sem segredos (GitHub pré-preenchido) | Should | **Candidato `1.9.48`** |
+| RF-09 | Reportar erro sem segredos (GitHub pré-preenchido) | Should | **`1.9.48`** |
 | RF-10 | Identity User-ID de rede | Should | Cumprido (âmbito IM) |
 | RF-11 | MITM TLS opt-in escopado | Could | Lab; não permanente |
 
@@ -177,9 +177,9 @@ Nicho PME (trilha activa): Identity-first —
 | **Onde** | Diagnósticos (`layer7_diagnostics.php`) |
 | **Anexa** | pkg/daemon version, daemon state, enabled, mode, model, iface count, mitm flag |
 | **Nunca anexa** | `.lic`, chaves, logs, dumps, hostnames, IPs de clientes, PF completo |
-| **Impacto** | GUI + helpers PHP; docs; candidato `1.9.48` |
+| **Impacto** | GUI + helpers PHP; docs; release `1.9.48` |
 | **Risco** | Baixo — opt-in; sem upload; sem backend novo |
 | **Teste** | `tests/test_error_report.php` + smoke manual Diagnósticos |
-| **Rollback** | Remover painel/helpers; reverter `PORTVERSION` se não publicado |
+| **Rollback** | Remover painel/helpers; rollback lab → `1.9.47` |
 
 Fluxo narrativo completo: [`pack-produto-layer7.md`](pack-produto-layer7.md#como-funciona-reportar-erro).

@@ -51,7 +51,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.47`** (P3 PASS; P4 FAIL/ABORT) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; lab/`latest` **`1.9.48`** (P3 PASS em `1.9.47`; P4 FAIL/ABORT) |
 | Passo actual | **`1.9.47`** MONITOR/MITM OFF (pós-P4 FAIL/ABORT); permanente **NO-GO** |
 | Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 FAIL/ABORT; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |

@@ -25,7 +25,7 @@
 | Status | Significado |
 |--------|-------------|
 | **Produção** | Pin enforce `1.9.8` (e superiores com GO) |
-| **Lab / latest** | Canal `latest` (`1.9.47+`); pode não estar no pin |
+| **Lab / latest** | Canal `latest` (`1.9.48+`); pode não estar no pin |
 | **Experimental** | Existe; OFF por defeito |
 | **Candidato** | Local / não publicado |
 | **NO-GO** | Activação bloqueada |
@@ -75,7 +75,7 @@
 | F-GUI-02 | GUI bilingue PT/EN | Produção | `l7_t()` |
 | F-GUI-03 | Dashboard / Events / Relatórios | Produção | ADR-0015 |
 | F-GUI-04 | Diagnósticos (PID, PF, sinais, logs) | Produção | |
-| F-GUI-05 | **Reportar erro** (GitHub pré-preenchido) | Candidato `1.9.48` | Opt-in; sem segredos — [fluxo](pack-produto-layer7.md#como-funciona-reportar-erro) |
+| F-GUI-05 | **Reportar erro** (GitHub pré-preenchido) | Lab / latest (`1.9.48`) | Opt-in; sem segredos — [fluxo](pack-produto-layer7.md#como-funciona-reportar-erro) |
 | F-GUI-06 | Verificar / instalar actualização | Produção | BG-030 |
 | F-GUI-07 | Backup/restore JSON | Produção | |
 | F-GUI-08 | Removal GUI + pkg-deinstall limpo | Produção | BG-033 |
