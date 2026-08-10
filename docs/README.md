@@ -35,6 +35,7 @@ Quando houver conflito, seguir esta ordem:
 | Trilha IPv6 | [`archive/planos-fechados/plano-ipv6-completo.md`](archive/planos-fechados/plano-ipv6-completo.md) ([stub](02-roadmap/plano-ipv6-completo.md)) | **【FECHADA】** V0–V6 |
 | Arranque chat (unico) | [`00-overview/START-HERE-fecho-producao.md`](00-overview/START-HERE-fecho-producao.md) | unico ponto de entrada pós-fecho (**manutenção**); Identity/MITM → [`START-HERE-identity-mitm.md`](00-overview/START-HERE-identity-mitm.md) |
 | Mapa F6 (consolidação docs) | [`00-overview/f6-mapa-consolidacao-H0.md`](00-overview/f6-mapa-consolidacao-H0.md) | H1–H5 executados |
+| F6 higiene residual (pós-H5) | [`00-overview/f6-plano-higiene-estrutural-residual.md`](00-overview/f6-plano-higiene-estrutural-residual.md) | Plano + gate + exclusões; inventário/classificação ligados |
 | Índice roadmap | [`02-roadmap/README.md`](02-roadmap/README.md) | activo vs 【FECHADO】 |
 | Classificacao dos documentos | [`00-overview/document-classification.md`](00-overview/document-classification.md) | diz o que e canónico, historico, placeholder ou preservado |
 | Equivalencia raiz <-> docs | [`00-overview/document-equivalence-map.md`](00-overview/document-equivalence-map.md) | resolve sobreposicoes e conflitos |

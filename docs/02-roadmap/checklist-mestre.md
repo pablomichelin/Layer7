@@ -38,10 +38,33 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] na F3.7, pack operacional com nomes de ficheiros, estados de resultado e template de evidencia foi formalizado antes de qualquer tentativa de “automatizar” o laboratorio
 - [ ] na F3.8, gate canónico de fechamento, classificacao bloqueante/nao bloqueante e relatorio final unico de campanha foram formalizados antes de qualquer declaracao de fecho da F3
 - [ ] sem refactor amplo nao solicitado
-- [ ] sem mover/apagar/renomear antes da F6
+- [ ] sem mover/apagar/renomear fora de lote F6 autorizado (H1–H5 ja FECHADA; residual so BG-112 + gate G0–G7)
 - [ ] sem tratar documento historico como SSOT
 - [ ] docs afectadas identificadas antes da primeira alteracao
 - [ ] backlog e roadmap alinhados ao bloco em execucao
+
+---
+
+## Gate F6 higiene residual (BG-112)
+
+Plano SSOT:
+[`../00-overview/f6-plano-higiene-estrutural-residual.md`](../00-overview/f6-plano-higiene-estrutural-residual.md)
+(§3 exclusões; §4 G0–G7).
+
+- [x] inventário rastreável criado (`f6-inventario-higiene-estrutural-2026-08-09.md`)
+- [x] classificação MANTER/ARQUIVAR/REMOVER/CORRIGIR (`f6-classificacao-candidatos-higiene-2026-08-09.md`)
+- [x] plano residual com gate + lista de exclusão
+- [x] mapa de equivalência / README / mapa H0 apontam higiene residual
+- [x] canonicidade F6: H1–H5 FECHADA nos SSOTs (deixar de dizer só “planeada”)
+- [ ] G0 — humano marcou IDs GO/DEFER para o lote
+- [ ] G1 — exclusões §3 reafirmadas no pedido de execução
+- [ ] G2 — mapa de links do lote preenchido (se move/rename)
+- [ ] G3 — rollback do lote definido
+- [ ] G4 — scan de segredos no diff PASS
+- [ ] G5 — nenhum path da exclusão §3 no lote
+- [ ] G6 — evidências MANTER (P4, Gate C, GO teste, P3, ABORTs) fora de remoção
+- [ ] G7 — commit por lote pequeno; push só com pedido explícito
+- [ ] **bloqueio:** sem G0 PASS → não executar REMOVER/ARQUIVAR
 
 ---
 
@@ -172,7 +195,7 @@ roadmap nem o backlog; ele transforma ambos em disciplina executavel.
 - [ ] rollback preserva a ultima versao segura conhecida
 - [ ] rollback de `_26` aponta para `_24` passivo e preserva evidência de logs
 - [ ] impacto do rollback sobre docs e artefactos foi considerado
-- [ ] para reorganizacao estrutural futura, rollback de links e caminhos foi previsto
+- [ ] para reorganizacao estrutural (H1–H5 ou BG-112), rollback de links e caminhos foi previsto
 
 ---
 
@@ -220,7 +243,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | F3 | activacao, revogacao e offline ficam previsiveis, com estados/transicoes explicitos, evidencias reais dos cenarios obrigatorios e relatorio final de campanha antes do fecho |
 | F4 | package, daemon e blacklists com runtime mais confiavel e evidencia minima por subfase (ex.: F4.3 em `validacao-lab` / `test-matrix`); ver plano e backlog |
 | F5 | existe malha real de nao regressao por componente |
-| F6 | reorganizacao fisica acontece sem perda de contexto nem links quebrados |
+| F6 | H1–H5 sem perda de contexto; higiene residual BG-112 com gate G0–G7 + exclusões; sem falsificar evidências |
 | F7 | release e observabilidade deixam de depender de memoria operacional |
 
 ---
@@ -235,7 +258,7 @@ appliance, salvo se o proprio pedido disser o contrario.
 | F3 | `CORTEX`, `docs/01-architecture/f3-arquitetura-licenciamento-ativacao.md`, `docs/01-architecture/f3-fingerprint-e-binding.md`, `docs/01-architecture/f3-expiracao-revogacao-grace.md`, `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`, `docs/01-architecture/f3-emissao-reemissao-rastreabilidade.md`, `docs/01-architecture/f3-validacao-manual-evidencias.md`, `docs/01-architecture/f3-pack-operacional-validacao.md`, `docs/01-architecture/f3-gate-fechamento-validacao.md`, backlog, docs de licencas, matriz de testes, ADRs afectados |
 | F4 | `CORTEX`, `f4-plano-de-implementacao.md`, backlog, `MANUAL-INSTALL`, docs de blacklists, runbooks, changelog |
 | F5 | `CORTEX`, `f5-preparacao-malha.md`, backlog, docs de testes, checklist mestre, evidencias |
-| F6 | `CORTEX`, backlog, classificacao, equivalencia, changelog estrutural |
+| F6 | `CORTEX`, backlog, classificacao, equivalencia, changelog estrutural; higiene residual: plano/inventário/classificação BG-112 |
 | F7 | `CORTEX`, backlog, releases, changelog, `MANUAL-INSTALL`, checklist interno |
 
 ---

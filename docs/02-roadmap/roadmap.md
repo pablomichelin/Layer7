@@ -20,7 +20,7 @@ com hardening tecnico ou com release engineering.
 | F3 | Robustez de licenciamento/activacao | **concluida** em `2026-08-04` (Onda C — veredito `F3 pode fechar`) | activacao, revogacao e offline deixam de depender de suposicoes |
 | F4 | Confiabilidade package/daemon/blacklists | **F4.0 aberta** em `2026-04-24` (plano: [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md); F3 fechada) | runtime e operacao ficam mais previsiveis |
 | F5 | Malha de testes e regressao | preparacao em [`f5-preparacao-malha.md`](f5-preparacao-malha.md); execucao plena apos saida F4 | gates de nao regressao ficam executaveis e repetiveis |
-| F6 | Reorganizacao estrutural controlada | planeada | reorganizacao fisica acontece com mapa, links e rollback |
+| F6 | Reorganizacao estrutural controlada | **H1–H5 FECHADA** (`2026-08-05`); higiene residual em auditoria (BG-112) | moves só com mapa/links/rollback; gate em [`../00-overview/f6-plano-higiene-estrutural-residual.md`](../00-overview/f6-plano-higiene-estrutural-residual.md) |
 | F7 | Observabilidade e release engineering | planeada | release e operacao passam a ter governanca forte e verificavel |
 
 **Orquestracao ponta a ponta (fecho producao + consolidacao docs):** ver
@@ -701,28 +701,44 @@ Transformar evidencias dispersas numa malha real de nao regressao.
 Reorganizar fisicamente o repositório apenas quando a base tecnica e
 documental ja estiver segura para isso.
 
+### Checkpoint actual
+
+- **Onda H (H1–H5):** **FECHADA** `2026-08-05` — mapa
+  [`../00-overview/f6-mapa-consolidacao-H0.md`](../00-overview/f6-mapa-consolidacao-H0.md);
+  BG-015/016 concluídos.
+- **Higiene residual pós-H5 (BG-112):** auditoria inventário/classificação
+  **PASS**; execução de REMOVER/ARQUIVAR **bloqueada** até GO + gate G0–G7 em
+  [`../00-overview/f6-plano-higiene-estrutural-residual.md`](../00-overview/f6-plano-higiene-estrutural-residual.md).
+- **P4 evidência:** FAIL/ABORT preservado — não faz parte de limpeza destrutiva.
+
 ### Escopo
 
 - mover ou consolidar documentos da raiz;
 - normalizar duplicidades (`docs/tests` vs `docs/04-tests`, etc.);
 - racionalizar pastas e readmes historicos;
-- actualizar links, indices e referencias cruzadas.
+- actualizar links, indices e referencias cruzadas;
+- higiene residual: lixo local, untracked, links partidos, arquivo de
+  iterações de evidência (com índice) — conforme plano residual.
 
 ### Exclusoes
 
 - sem alterar logica funcional na mesma entrega;
-- sem hardening tecnico misturado com reestrutura estrutural.
+- sem hardening tecnico misturado com reestrutura estrutural;
+- sem código/package/builder/pfSense/lab/releases no mesmo lote;
+- sem apagar ou falsificar evidências canónicas / FAIL/ABORT (incl. P4);
+- lista completa de exclusão: plano residual §3.
 
 ### Dependencias
 
-- F5 concluida;
+- F5 minima concluida (Onda G / plano fecho);
 - mapas de classificacao e equivalencia maduros;
-- backlog estrutural aprovado.
+- backlog estrutural aprovado (BG-015 feito; BG-112 para residual).
 
 ### Criterios de entrada
 
 - canonicidade ja estabilizada por varias fases;
-- risco de perda de contexto suficientemente baixo.
+- risco de perda de contexto suficientemente baixo;
+- para lotes residual: gate G0–G7 do plano de higiene.
 
 ### Criterios de saida
 
@@ -733,7 +749,8 @@ documental ja estiver segura para isso.
 ### Gate
 
 - qualquer ficheiro movido ou renomeado tem justificacao, equivalencia e
-  rollback documentados.
+  rollback documentados;
+- higiene residual: gate explícito no plano BG-112 (G0–G7).
 
 ### Documentacao obrigatoria da fase
 
@@ -743,6 +760,7 @@ documental ja estiver segura para isso.
 - classificacao documental
 - equivalencia documental
 - changelog estrutural da fase
+- plano/inventário/classificação higiene residual (BG-112)
 
 ---
 

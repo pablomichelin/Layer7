@@ -922,7 +922,7 @@ blockers administrativos do live deixam de bloquear a F3, ficando apenas o
 | F3 | Robustez de licenciamento/activacao | aberta em `2026-04-01` | tornar activacao, revogacao e modo offline previsiveis |
 | F4 | Confiabilidade package/daemon/blacklists | **F4.0 aberta** em `2026-04-24` (F3 ainda aberta; ver `f4-plano-de-implementacao.md`) | reduzir falhas operacionais e alinhar runtime com docs e gates |
 | F5 | Malha de testes e regressao | preparacao (`f5-preparacao-malha.md`); fase plena apos criterio F4 | formalizar cobertura, evidencias e gates de nao regressao |
-| F6 | Reorganizacao estrutural controlada | planeada | mover/normalizar estrutura apenas com mapa e rollback |
+| F6 | Reorganizacao estrutural controlada | **H1–H5 FECHADA** (`2026-08-05`); higiene residual **auditoria PASS** (BG-112; execucao fisica bloqueada) | consolidacao principal feita; residual so com gate G0–G7 em `docs/00-overview/f6-plano-higiene-estrutural-residual.md` |
 | F7 | Observabilidade e release engineering | planeada | fortalecer telemetria, verificacao de artefactos e governanca de release |
 
 ---
@@ -962,10 +962,11 @@ validacao fora da operacao real.
 ## Proximos passos autorizados
 
 1. Manter a **ordem segura** de fases (F0–F7) e o backlog; **nao reabrir** F1/F2
-   como trabalho novo; **F6/F7** continuam fora de escopo ate os gates
-   respectivos. A **F3** permanece em fecho: **DR-05** (appliance) e relatorio
-   de campanha sob gate F3.8. Em **paralelo operacional e documental**,
-   a **F4.0+** esta autorizada conforme
+   como trabalho novo; **F6 H1–H5** esta **FECHADA**; higiene residual (BG-112)
+   so com GO + gate do plano residual; **F7** continua fora de escopo ate os
+   gates respectivos. A **F3** permanece em fecho: **DR-05** (appliance) e
+   relatorio de campanha sob gate F3.8. Em **paralelo operacional e
+   documental**, a **F4.0+** esta autorizada conforme
    `docs/02-roadmap/f4-plano-de-implementacao.md` (package/daemon/blacklists
    **sem** mudar o contrato de licenciamento salvo bloco aprovado).
 2. Usar `docs/00-overview/f3-11-start-here.md`,
@@ -1251,6 +1252,10 @@ com appliance (A–G) e GO/release (F, I–J). Ver grafo de dependencias no plan
 (sec. 3.3).
 
 **F6:** H1–H5 **PASS** (`2026-08-05`) — legado e planos fechados em `docs/archive/`.
+**F6 higiene residual (BG-112):** auditoria inventário/classificação/plano
+**PASS** (`2026-08-10`) — execução REMOVER/ARQUIVAR **bloqueada** até GO +
+gate G0–G7
+([`f6-plano-higiene-estrutural-residual.md`](docs/00-overview/f6-plano-higiene-estrutural-residual.md)).
 **Onda F (GO enforce):** **PASS** (`2026-08-05`) — promovido a **`1.9.0`** (fecho plano)
 (ADR-0022 aceite; CE fisico pendente).
 **Congelamento P0.2:** sem novo polish GUI (i18n, redesign, icones) ate Onda A
@@ -1265,6 +1270,7 @@ PLANO FECHO/CONSOLIDAÇÃO — progresso
 - Canal latest: 1.9.0 (alinhado)
 - F5 mínima: **PASS**
 - F6: **FECHADA** (H1–H5; raiz legado + planos fechados em `docs/archive/`)
+- F6 higiene residual (BG-112): auditoria PASS; execucao fisica PENDENTE GO
 - F7/BG-028: **Fase 0** (ADR-0023); BG-017 checklist PASS
 - R1-R12: **11/12 verdes + 2 excepções assinadas** (R7, CE)
 - CE: LIMITAÇÃO (ADR-0022 aceite)
@@ -1593,6 +1599,7 @@ CHECKPOINT CANONICO
 - Smoke LAB `.24`: limpo pós-rollback P4; `.234/.235` intocados
 - Manual público do produto: **docs/MANUAL-PRODUTO.md** (hub + guia operador; SSOT de navegação pública; comanda → MANUAL-INSTALL)
 - Próximo trabalho docs: manter MANUAL-PRODUTO alinhado a cada release; activação enforce/MITM só com novo GO
+- F6: H1–H5 FECHADA; higiene residual BG-112 auditoria PASS — plano docs/00-overview/f6-plano-higiene-estrutural-residual.md (gate G0–G7; exclusões §3); P4 FAIL/ABORT preservado
 - Pacote publicado (canal `latest`): **1.9.47**; rollback lab: **1.9.46**
 - Fonte canonica instalacao (comandos): docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md

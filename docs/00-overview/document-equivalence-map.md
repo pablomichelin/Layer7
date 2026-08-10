@@ -97,6 +97,22 @@ Ele existe para evitar tres erros comuns:
 - Planos fecho+IPv6 → **stubs** em `02-roadmap/`; texto em `docs/archive/planos-fechados/` (**H5**).
 - Mapa completo: [`f6-mapa-consolidacao-H0.md`](f6-mapa-consolidacao-H0.md).
 
+## Higienização residual pós-H5 (auditoria `2026-08-10`)
+
+Não reabre H1–H5. Trata resíduo local, untracked, links partidos e ruído de
+evidências **sem** apagar canónicos nem falsificar veredictos (P4 FAIL/ABORT
+permanece FAIL/ABORT).
+
+| Artefacto | Papel |
+|-----------|-------|
+| [`f6-plano-higiene-estrutural-residual.md`](f6-plano-higiene-estrutural-residual.md) | Plano + **gate de execução** + **lista de exclusão** |
+| [`f6-inventario-higiene-estrutural-2026-08-09.md`](f6-inventario-higiene-estrutural-2026-08-09.md) | Inventário INV-* |
+| [`f6-classificacao-candidatos-higiene-2026-08-09.md`](f6-classificacao-candidatos-higiene-2026-08-09.md) | MANTER / ARQUIVAR / REMOVER / CORRIGIR |
+
+**Conflito formal (status F6):** tabelas antigas podiam dizer F6 “planeada”
+enquanto o checkpoint regista H1–H5 **FECHADA** — resolvido nos SSOTs a favor
+de: **H1–H5 FECHADA** + higiene residual sob BG-112 / plano acima.
+
 ## Regra de uso antes da F6 (histórico)
 
 Antes dos moves H1–H5:

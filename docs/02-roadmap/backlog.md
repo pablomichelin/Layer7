@@ -346,6 +346,7 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-109 | GUI Identity — tabela read-only do mapa user↔IP (daemon) | Media | package/GUI + daemon | Identity | Identity configura LDAP/RADIUS/DC mas não mostra sessões activas | M | Medio | **Aberto — defer** | requer dump/IPC do mapa em `identity_map.*`; não inventar vista sem API |
 | BG-110 | Perfis rápidos: rascunho + Aplicar em lote (sem resync por clique) | Alta | package/GUI | Caminho A / UX | cada toggle faz resync ~20s + refresh; activar N perfis é inviável | M | Alto | **Concluido + publicado `1.9.35`** | SHA256 `5f88e131…f4f4`; appliance PASS |
 | BG-111 | Perfis rápidos: categorias colapsadas + polish UX | Media | package/GUI | Caminho A / UX | grelha poluída (grupos com activos abertos); localStorage reabria | P | Baixo | **Concluido + publicado `1.9.36`** | SHA256 `abfd772f…a71b`; superseded por `1.9.38` latest |
+| BG-112 | F6 higiene estrutural residual pós-H5 (inventário, classificação, plano, gate, exclusões; lotes P1–P4) | Media | estrutura/documentacao | F6 residual | resíduo local/untracked/links/status F6; risco de apagar evidência ou misturar código/lab | P | Baixo (auditoria) / Medio (lotes) | **Auditoria PASS** (`2026-08-10`); execucao fisica **bloqueada** ate GO + G0–G7 | Plano [`../00-overview/f6-plano-higiene-estrutural-residual.md`](../00-overview/f6-plano-higiene-estrutural-residual.md); inv/class `f6-*-2026-08-09.md`; **nao** reabre H1–H5; P4 FAIL/ABORT = MANTER |
 
 ---
 

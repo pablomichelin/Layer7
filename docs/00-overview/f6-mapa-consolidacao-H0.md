@@ -65,3 +65,10 @@ Ou restaurar ficheiros de `docs/archive/` para os caminhos originais e remover s
 - [`document-classification.md`](document-classification.md)
 - [`../archive/planos-fechados/plano-fecho-producao-e-consolidacao.md`](../archive/planos-fechados/plano-fecho-producao-e-consolidacao.md) sec. Onda H
 - [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)
+
+## Pós-H5 — higiene residual (não reabre este mapa)
+
+Auditoria e lotes opcionais:  
+[`f6-plano-higiene-estrutural-residual.md`](f6-plano-higiene-estrutural-residual.md) ·
+[`f6-inventario-higiene-estrutural-2026-08-09.md`](f6-inventario-higiene-estrutural-2026-08-09.md) ·
+[`f6-classificacao-candidatos-higiene-2026-08-09.md`](f6-classificacao-candidatos-higiene-2026-08-09.md).
