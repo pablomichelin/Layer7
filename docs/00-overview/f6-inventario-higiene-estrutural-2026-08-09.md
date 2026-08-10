@@ -134,7 +134,7 @@ iteração” + opcional move para `docs/tests/evidence/archive/` **só com GO F
 | ID | Conflito | Fontes | Classe | Nota |
 |----|----------|--------|--------|------|
 | INV-060 | Estado F6 | Histórico: tabelas diziam F6 **planeada** vs checkpoint **FECHADA** (H1–H5) | C | **Resolvido** neste bloco (INV-080 / BG-112): SSOTs = H1–H5 FECHADA + higiene residual |
-| INV-061 | ADR-0012 | `docs/03-adr/README.md` “próximos ADRs” ainda sugere ADR-0012 = reorg estrutural; ficheiro real = políticas MAC→IP | C | Corrigir índice ADR (docs-only) |
+| INV-061 | ADR-0012 | `docs/03-adr/README.md` “próximos ADRs” sugeria ADR-0012 = reorg; ficheiro real = políticas MAC→IP | C | **Resolvido** lote P1 (classificação INV-081): índice actualizado |
 | INV-062 | Links em arquivo H5 | `docs/archive/raiz-legado/*` aponta com `../00-overview/...` (partido a partir do arquivo) | L/O | Aceitável como legado **ou** corrigir stubs/arquivo num lote F6 docs |
 | INV-063 | CHANGELOG paths | `docs/changelog/CHANGELOG.md` usa `docs/02-roadmap/...` (relativo a `docs/changelog/` → partido) | L | Corrigir para `../02-roadmap/...` |
 | INV-064 | Prompts | `docs/07-prompts/README.md` → `../CORTEX.md` (deveria `../../CORTEX.md`) | L | Corrigir num lote docs |
@@ -151,11 +151,11 @@ iteração” + opcional move para `docs/tests/evidence/archive/` **só com GO F
 
 | ID | Ficheiro | Alvo partido | Correcção provável |
 |----|----------|--------------|--------------------|
-| INV-070 | `docs/07-prompts/README.md` | `../CORTEX.md` | `../../CORTEX.md` |
-| INV-071 | `docs/07-prompts/f3-prompt-continuacao-2026-04-03.md` | `../../tests/templates/f3-validation-campaign-report.md` | `../tests/templates/...` |
-| INV-072 | `docs/changelog/CHANGELOG.md` | `docs/00-overview/handoff-chat-novo.md` | `../00-overview/handoff-chat-novo.md` |
-| INV-073 | `docs/changelog/CHANGELOG.md` | `docs/02-roadmap/f4-plano-de-implementacao.md` | `../02-roadmap/f4-...` |
-| INV-074 | `docs/changelog/CHANGELOG.md` | `docs/02-roadmap/f5-preparacao-malha.md` | `../02-roadmap/f5-...` |
+| INV-070 | `docs/07-prompts/README.md` | `../CORTEX.md` | **corrigido** → `../../CORTEX.md` (P1 / INV-082) |
+| INV-071 | `docs/07-prompts/f3-prompt-continuacao-2026-04-03.md` | `../../tests/templates/...` | **corrigido** → `../tests/templates/f3-validation-campaign-report.md` |
+| INV-072 | `docs/changelog/CHANGELOG.md` | `docs/00-overview/handoff-chat-novo.md` | **corrigido** → `../00-overview/handoff-chat-novo.md` |
+| INV-073 | `docs/changelog/CHANGELOG.md` | `docs/02-roadmap/f4-plano-de-implementacao.md` | **corrigido** → `../02-roadmap/f4-plano-de-implementacao.md` |
+| INV-074 | `docs/changelog/CHANGELOG.md` | `docs/02-roadmap/f5-preparacao-malha.md` | **corrigido** → `../02-roadmap/f5-preparacao-malha.md` |
 
 ### 7.2 Arquivo (baixo risco operacional)
 
@@ -169,8 +169,8 @@ Restantes ~26 partidos concentrados em `docs/archive/raiz-legado/` e
 | ID | Área | Achado | Classe |
 |----|------|--------|--------|
 | INV-080 | Canal `latest` / SSOT vivo | `1.9.47` em CORTEX / START-HERE / MANUAL (secções actuais) | — | OK |
-| INV-081 | `MANUAL-INSTALL.md` | **11** URLs `v1.9.47`; **23** URLs `v1.9.0`…`v1.9.46` em addenda/histórico | V | **Provável intencional** (addenda); validar gate AGENTS: nenhum comando *operacional actual* apontar para versão antiga |
-| INV-082 | `MANUAL-INSTALL.md` L2068/L2074 | `fetch`/`pkg add` ainda com `1.9.37` e `1.9.0` | V | Confirmar se estão em secção histórica ou comando “rápido” vivo |
+| INV-081 | `MANUAL-INSTALL.md` addenda | URLs `v1.9.0`…`v1.9.46` em addenda/histórico | V | **Intencional** — addenda históricas **MANTER** |
+| INV-082 | `MANUAL-INSTALL.md` §12 rollback lab | era `1.9.37` (vivo, desactualizado vs `latest` `1.9.47`) | V | **Corrigido** lote P1 (classificação INV-083) → rollback lab `1.9.46`; enforce `1.9.0` + `_69`/`_24` intencionais |
 | INV-083 | Produção enforce | `1.9.8` referido como referência enforce (ADR/gates) | V | Intencional — não é drift de `latest` |
 | INV-084 | `tmp-release/*.pkg` | Locais `1.9.42`–`1.9.47` não versionados no git | R | Limpeza local pós-GO |
 | INV-085 | `artifacts/*.pkg` | Locais ignored; hashes tracked | R | Manter política actual |
@@ -193,11 +193,11 @@ Restantes ~26 partidos concentrados em `docs/archive/raiz-legado/` e
 1. Remover `${TMPDIR:-` e `.git.broken.*` (INV-001/002)  
 2. Decidir retenção de `tmp-release/` e `.pkg` locais (INV-011/010/084)
 
-### P1 — docs activos (sem move de árvore)
-1. Corrigir 5 links activos (INV-070–074)  
-2. Resolver conflito status F6 planeada vs FECHADA (INV-060)  
-3. Corrigir índice ADR-0012 (INV-061)  
-4. Auditar comandos operacionais MANUAL vs addenda (INV-081/082)
+### P1 — docs activos (sem move de árvore) — **PASS** `2026-08-10`
+1. ~~Corrigir 5 links activos (INV-070–074 / class. INV-082)~~  
+2. ~~Resolver conflito status F6 planeada vs FECHADA (INV-060 / class. INV-080)~~  
+3. ~~Corrigir índice ADR-0012 (INV-061 / class. INV-081)~~  
+4. ~~Auditar/corrigir MANUAL vivos vs `1.9.47` (class. INV-083; inv. INV-082)~~
 
 ### P2 — evidências (só com GO F6)
 1. Indexar cluster `phaseBD-d1` (23 dirs) — canónicos vs iterações  

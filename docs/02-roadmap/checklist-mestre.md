@@ -56,7 +56,8 @@ Plano SSOT:
 - [x] plano residual com gate + lista de exclusão
 - [x] mapa de equivalência / README / mapa H0 apontam higiene residual
 - [x] canonicidade F6: H1–H5 FECHADA nos SSOTs (deixar de dizer só “planeada”)
-- [ ] G0 — humano marcou IDs GO/DEFER para o lote
+- [x] lote P1 CORRIGIR INV-081/082/083 PASS (`2026-08-10`)
+- [ ] G0 — humano marcou IDs GO/DEFER para o lote (P2–P4 físicos)
 - [ ] G1 — exclusões §3 reafirmadas no pedido de execução
 - [ ] G2 — mapa de links do lote preenchido (se move/rename)
 - [ ] G3 — rollback do lote definido

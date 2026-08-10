@@ -74,10 +74,14 @@ Sempre que um ADR nascer, actualizar tambem:
 
 ## Proximos ADRs recomendados
 
+**Nota (BG-112 / INV-081):** os IDs **ADR-0011** e **ADR-0012** já estão
+**Aceitos** (ver tabela acima) — **não** reutilizar. Em especial, ADR-0012 é
+*Politicas por dispositivo: resolucao MAC -> IP*, **não** reorganização F6.
+
 | Proximo ID sugerido | Tema | Fase | Motivo |
 |---------------------|------|------|--------|
-| ADR-0011 | Modelo de estados do licenciamento e activacao | F3 | tornar activacao/revogacao/offline previsiveis e rastreaveis |
-| ADR-0012 | Reorganizacao estrutural controlada do repositório | F6 | garantir que mover ficheiros nao destrua contexto |
+| ADR-0030 | Reorganizacao estrutural controlada / higiene residual (se GO exigir ADR formal além do plano BG-112) | F6 residual | só se moves futuros precisarem de decisão normativa para além de `f6-plano-higiene-estrutural-residual.md` |
+| — | Modelo de estados do licenciamento/activacao | F3 | já coberto por docs canónicos F3 (`f3-arquitetura-licenciamento-ativacao.md` e relacionados); **não** abrir ADR-0011 duplicado |
 
 ---
 

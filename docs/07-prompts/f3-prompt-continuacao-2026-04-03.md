@@ -187,7 +187,7 @@ primeiro; depois S12 ou S13 apenas com snapshot e janela de manutencao.
    scorecard, execution master register, `f3-11-start-here`, `CORTEX.md`
    (trilha F3).
 3. Preencher
-   [`docs/tests/templates/f3-validation-campaign-report.md`](../../tests/templates/f3-validation-campaign-report.md)
+   [`docs/tests/templates/f3-validation-campaign-report.md`](../tests/templates/f3-validation-campaign-report.md)
    com o veredito binario.
 
 Este e o UNICO blocker restante da F3.

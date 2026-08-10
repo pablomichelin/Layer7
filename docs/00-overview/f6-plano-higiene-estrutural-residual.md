@@ -76,10 +76,10 @@ G2/G3 aplicam-se a paths alterados (links), não a moves.
 
 | Item | IDs | Acção | Estado |
 |------|-----|-------|--------|
-| Status F6 roadmap/CORTEX/checklist/backlog | INV-080 | CORRIGIR canonicidade | **aplicado** neste bloco documental (H1–H5 FECHADA + BG-112) |
-| Índice ADR-0012 | INV-081 | CORRIGIR | PENDENTE GO lote P1 |
-| Links activos partidos | INV-070–074 inv. / INV-082 class. | CORRIGIR | PENDENTE GO lote P1 |
-| Gate MANUAL comandos vivos vs addenda | INV-083 | Auditar/CORRIGIR só se drift operacional | PENDENTE |
+| Status F6 roadmap/CORTEX/checklist/backlog | INV-080 | CORRIGIR canonicidade | **PASS** (bloco auditoria) |
+| Índice ADR-0012 | INV-081 | CORRIGIR | **PASS** (`2026-08-10` lote P1) — «Próximos ADRs» já não reutiliza 0011/0012 |
+| Links activos partidos | INV-082 (inv. 070–074) | CORRIGIR | **PASS** — 5 links corrigidos (prompts + CHANGELOG) |
+| Gate MANUAL comandos vivos vs addenda | INV-083 | Auditar/CORRIGIR drift vivo | **PASS** — sec.12 rollback lab `1.9.37`→`1.9.46`; install/upgrade já `1.9.47`; addenda históricas + enforce `1.9.0`/`1.9.8`/`_24` intencionais |
 
 **Exclusão do lote:** qualquer `git mv` / delete de evidência.
 
@@ -111,11 +111,12 @@ G2/G3 aplicam-se a paths alterados (links), não a moves.
 ## 6. Critérios de saída do plano residual
 
 - [x] Conflito F6 planeada vs FECHADA **resolvido** nos SSOTs (INV-080)  
-- [ ] Links activos partidos = 0 (ou DEFER documentado)  
-- [x] Inventário/classificação/plano commitados (este bloco)  
+- [x] Links activos partidos = 0 (INV-082 lote P1)  
+- [x] Inventário/classificação/plano commitados  
 - [x] Nenhum canónico/P4 removido ou falsificado (este bloco só docs)  
 - [ ] Lixos locais P2 tratados ou DEFER explícito  
-- [x] CORTEX checkpoint reflecte: H1–H5 FECHADA + higiene residual (auditoria/lotes)
+- [x] CORTEX checkpoint reflecte: H1–H5 FECHADA + higiene residual (auditoria/lotes)  
+- [x] Lote P1 CORRIGIR (INV-081/082/083) **PASS**
 
 ---
 

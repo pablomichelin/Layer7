@@ -162,9 +162,9 @@ docs/tests/evidence/20260809T210557Z-phaseBD-d1-254/
 | ID | Alvo | Git | Uso | Motivo | Acção | Impacto | Rollback |
 |----|------|-----|-----|--------|-------|---------|----------|
 | INV-080 | `docs/02-roadmap/roadmap.md` linha estado F6 + espelho em `CORTEX.md` tabela fases (+ checklist/backlog BG-112) | tracked | SSOT fases | Dizia F6 **planeada** vs checkpoint **FECHADA** H1–H5 | **CORRIGIR** — **aplicado** neste bloco (H1–H5 FECHADA + BG-112 auditoria) | Consistência agentes | git |
-| INV-081 | `docs/03-adr/README.md` “próximo ADR-0012 = reorg” vs `ADR-0012-politicas-por-dispositivo-mac-para-ip.md` | tracked | índice ADR | ID reutilizado / desactualizado | **CORRIGIR** índice (sugerir novo ID se ADR estrutural for necessário) | Evita ADR errado | git |
-| INV-082 | Links partidos activos (prompts + CHANGELOG) | tracked | nav | Paths relativos errados | **CORRIGIR** (ver inventário §7.1) | Navegação | git |
-| INV-083 | `docs/10-license-server/MANUAL-INSTALL.md` addenda `v1.9.0`…`v1.9.46` | tracked | ops | Histórico vs comandos vivos | **MANTER** addenda; **CORRIGIR** só se gate operacional apontar versão morta fora de addenda | Risco install errada se drift real | git |
+| INV-081 | `docs/03-adr/README.md` “próximo ADR-0012 = reorg” vs `ADR-0012-politicas-por-dispositivo-mac-para-ip.md` | tracked | índice ADR | ID reutilizado / desactualizado | **CORRIGIR** — **PASS** (`2026-08-10`): próximos = ADR-0030 (opcional F6); nota 0011/0012 já Aceitos | Evita ADR errado | git |
+| INV-082 | Links partidos activos (prompts + CHANGELOG) | tracked | nav | Paths relativos errados | **CORRIGIR** — **PASS**: `07-prompts/README`→`../../CORTEX.md`; f3-prompt→`../tests/templates/…`; CHANGELOG→`../00-overview/…` + `../02-roadmap/…` (×3) | Navegação | git |
+| INV-083 | `docs/10-license-server/MANUAL-INSTALL.md` comandos vivos vs `latest` `1.9.47` | tracked | ops | Drift sec.12 rollback lab `1.9.37` | **CORRIGIR** — **PASS**: rollback lab vivo → `1.9.46`; install/upgrade/test já `1.9.47`; addenda + enforce `1.9.0`/`1.9.8`/`_24` **MANTER** (intencional) | Risco install/rollback errado | git |
 | INV-084 | `docs/tests/evidence/20260809T234042Z-p4-soak-254/07-failsafe-validate-local.txt` | `M` | evidência P4 | Re-scan local pós-commit | **MANTER**; commit cosmético opcional | Nulo | git checkout |
 
 ---

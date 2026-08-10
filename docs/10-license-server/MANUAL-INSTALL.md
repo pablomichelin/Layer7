@@ -2057,18 +2057,18 @@ service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
 Para reinstalar uma versao anterior conhecida:
-rollback **lab** imediato a partir de `1.9.38` → **`1.9.37`**;
-rollback **enforce** → **`1.9.0`** (pin `1.9.8`);
+rollback **lab** imediato a partir de `1.9.47` (`latest`) → **`1.9.46`**;
+rollback **enforce** → **`1.9.0`** (pin produção **`1.9.8`**);
 histórico pos-`1.9.0` → `1.8.11_69`; rollback historico antigo → `1.8.11_24`;
 **nao** usar `1.8.11_55` (defeituosa).
 
-Rollback lab (`1.9.37`):
+Rollback lab (`1.9.46` — a partir de `1.9.47`):
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.37.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.37/pfSense-pkg-layer7-1.9.37.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.37.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.9.46.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.46/pfSense-pkg-layer7-1.9.46.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.46.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
-Rollback enforce (`1.9.0`):
+Rollback enforce (`1.9.0` — pin histórico; produção enforce permanece `1.9.8`):
 
 ```sh
 fetch -o /tmp/pfSense-pkg-layer7-1.9.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.0/pfSense-pkg-layer7-1.9.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
