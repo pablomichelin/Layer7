@@ -157,6 +157,170 @@ grep -q "snapshot-keep-me" "$ACTIVE" || fail "GA4.6 active snapshot lost"
 grep -q 'openssl pkeyutl -verify -rawin' "$WORK_SCRIPT" \
 	|| fail "GA4.9 manifest verify removed"
 
+# --- Regressão 30.10: fetch_authed 302→200 sem vazar Bearer cross-host ---
+FAKEBIN="$TESTDIR/fakebin"
+FAKESTATE="$TESTDIR/fake-curl-state"
+mkdir -p "$FAKEBIN" "$FAKESTATE" "$TESTDIR/tmp-fetch"
+cat > "$FAKEBIN/curl" <<'EOF'
+#!/bin/sh
+OUT=""
+CODE_FMT=""
+HDR_OUT=""
+URL=""
+HAS_AUTH=0
+HAS_XLAYER=0
+i=1
+while [ "$i" -le "$#" ]; do
+	eval "arg=\${$i}"
+	case "$arg" in
+	-o)
+		i=$((i + 1))
+		eval "OUT=\${$i}"
+		;;
+	-w)
+		i=$((i + 1))
+		eval "CODE_FMT=\${$i}"
+		;;
+	-D)
+		i=$((i + 1))
+		eval "HDR_OUT=\${$i}"
+		;;
+	-H)
+		i=$((i + 1))
+		eval "h=\${$i}"
+		case "$h" in
+		[Aa]uthorization:*|[Aa]uthorization:\ *) HAS_AUTH=1 ;;
+		[Xx]-[Ll]ayer7-[Cc]ontent-[Tt]oken:*|[Xx]-[Ll]ayer7-[Cc]ontent-[Tt]oken:\ *) HAS_XLAYER=1 ;;
+		esac
+		;;
+	--connect-timeout|--max-time|--proto|--proto-redir|--max-redirs)
+		i=$((i + 1))
+		;;
+	-sS|-s|-S|-L|--location|--location-trusted|--fail)
+		;;
+	https://*|http://*)
+		URL="$arg"
+		;;
+	esac
+	i=$((i + 1))
+done
+
+_state="${L7_FAKE_CURL_STATE:-/tmp}"
+_emit_code() {
+	if [ "$CODE_FMT" = "%{http_code}" ]; then
+		printf '%s' "$1"
+	fi
+}
+
+case "$URL" in
+https://mirror.test/asset)
+	printf 'hop1 auth=%s x=%s\n' "$HAS_AUTH" "$HAS_XLAYER" >>"$_state/curl.log"
+	[ "$HAS_AUTH" -eq 1 ] || { _emit_code 401; exit 0; }
+	[ -n "$HDR_OUT" ] && printf 'HTTP/1.1 302 Found\nLocation: https://cdn.test/asset\n\n' >"$HDR_OUT"
+	[ -n "$OUT" ] && : >"$OUT"
+	_emit_code 302
+	exit 0
+	;;
+https://cdn.test/asset)
+	printf 'hop2 auth=%s x=%s\n' "$HAS_AUTH" "$HAS_XLAYER" >>"$_state/curl.log"
+	if [ "$HAS_AUTH" -eq 1 ] || [ "$HAS_XLAYER" -eq 1 ]; then
+		echo LEAK >>"$_state/curl.log"
+		[ -n "$OUT" ] && : >"$OUT"
+		_emit_code 403
+		exit 0
+	fi
+	[ -n "$HDR_OUT" ] && printf 'HTTP/1.1 200 OK\n\n' >"$HDR_OUT"
+	[ -n "$OUT" ] && printf 'ok-body\n' >"$OUT"
+	_emit_code 200
+	exit 0
+	;;
+https://same.test/a)
+	[ -n "$HDR_OUT" ] && printf 'HTTP/1.1 302 Found\nLocation: https://same.test/b\n\n' >"$HDR_OUT"
+	[ -n "$OUT" ] && : >"$OUT"
+	_emit_code 302
+	exit 0
+	;;
+https://same.test/b)
+	if [ "$HAS_AUTH" -ne 1 ] || [ "$HAS_XLAYER" -ne 1 ]; then
+		_emit_code 401
+		exit 0
+	fi
+	[ -n "$HDR_OUT" ] && printf 'HTTP/1.1 200 OK\n\n' >"$HDR_OUT"
+	[ -n "$OUT" ] && printf 'same-ok\n' >"$OUT"
+	_emit_code 200
+	exit 0
+	;;
+https://evil.test/http-redir)
+	[ -n "$HDR_OUT" ] && printf 'HTTP/1.1 302 Found\nLocation: http://evil.test/plain\n\n' >"$HDR_OUT"
+	[ -n "$OUT" ] && : >"$OUT"
+	_emit_code 302
+	exit 0
+	;;
+*)
+	printf 'unexpected:%s\n' "$URL" >>"$_state/curl.log"
+	_emit_code 000
+	exit 1
+	;;
+esac
+EOF
+chmod +x "$FAKEBIN/curl"
+
+HARNESS="$TESTDIR/fetch_authed_harness.sh"
+{
+	echo '#!/bin/sh'
+	echo 'set -eu'
+	echo "TMP=\"$TESTDIR/tmp-fetch\""
+	echo "LOG=\"$TESTDIR/fetch-authed.log\""
+	echo 'CONTENT_BEARER="test-bearer-token"'
+	echo 'log() { echo "$*" >> "$LOG"; }'
+	sed -n '/^https_url_host()/,/^require_content_subscription_or_hold()/p' "$SCRIPT" | sed '$d'
+	echo 'fetch_authed "$1" "$2"'
+	echo 'exit $?'
+} > "$HARNESS"
+chmod +x "$HARNESS"
+
+export L7_FAKE_CURL_STATE="$FAKESTATE"
+export PATH="$FAKEBIN:$PATH"
+: > "$FAKESTATE/curl.log"
+
+set +e
+sh "$HARNESS" "$TESTDIR/out-redir.txt" "https://mirror.test/asset"
+_rc=$?
+set -e
+[ "$_rc" -eq 0 ] || {
+	cat "$TESTDIR/fetch-authed.log" >&2
+	fail "302→200 cross-host should succeed"
+}
+grep -qx 'ok-body' "$TESTDIR/out-redir.txt" || fail "redirect body missing"
+grep -q 'hop2 auth=0 x=0' "$FAKESTATE/curl.log" || fail "credentials leaked to CDN host"
+grep -q LEAK "$FAKESTATE/curl.log" && fail "CDN saw auth headers"
+
+set +e
+sh "$HARNESS" "$TESTDIR/out-same.txt" "https://same.test/a"
+_rc=$?
+set -e
+[ "$_rc" -eq 0 ] || fail "same-host 302 should keep Bearer"
+grep -qx 'same-ok' "$TESTDIR/out-same.txt" || fail "same-host body missing"
+
+set +e
+sh "$HARNESS" "$TESTDIR/out-http.txt" "https://evil.test/http-redir"
+_rc=$?
+set -e
+[ "$_rc" -ne 0 ] || fail "http redirect must be refused"
+grep -qi 'unsafe redirect\|non-HTTPS\|refused' "$TESTDIR/fetch-authed.log" \
+	|| fail "unsafe redirect log missing"
+
+# Confirmar hold-active / sem-token intacto após regressão redirect
+rm -f "$CS"
+set +e
+sh "$WORK_SCRIPT" --download >"$TESTDIR/out-hold-after.txt" 2>&1
+_rc=$?
+set -e
+[ "$_rc" -ne 0 ] || fail "hold-active broken after redirect fix"
+[ -f "$TESTDIR/usr/local/etc/layer7/blacklists/keep-marker.txt" ] \
+	|| fail "local content removed after redirect tests"
+grep -q "snapshot-keep-me" "$ACTIVE" || fail "active snapshot lost after redirect tests"
+
 rm -rf "$TESTDIR"
 echo "PASS test_content_subscription_update.sh"
 exit 0

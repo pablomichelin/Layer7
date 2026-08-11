@@ -419,10 +419,37 @@ print("%d|%s|%s|%d|%d" % (int(m["v"]), m["scope"], m["hardware_id"], int(m["iat"
 	return 0
 }
 
+# Host de URL https:// (sem path/query). Vazio se não for HTTPS absoluto.
+https_url_host() {
+	_u="$1"
+	case "$_u" in
+	https://*)
+		_rest="${_u#https://}"
+		_h="${_rest%%/*}"
+		_h="${_h%%\?*}"
+		_h="${_h%%#*}"
+		case "$_h" in
+		*@*) _h="${_h##*@}" ;;
+		esac
+		printf '%s' "$_h"
+		;;
+	*)
+		printf ''
+		;;
+	esac
+}
+
+# fetch_authed: segue redirects HTTPS (espelho GitHub 302→CDN) sem
+# --location-trusted. Credenciais (Bearer + X-Layer7-Content-Token) só no
+# host actual; em cross-host são omitidas. Só Location https:// ou path
+# absoluto no mesmo host; max 5 hops. Não usar curl -L cego: libcurl não
+# remove headers custom em redirect cross-host.
 fetch_authed() {
 	_out="$1"
 	_url="$2"
 	_code_file="$TMP/fetch-http-code"
+	_hdr_file="$TMP/fetch-headers"
+	_max_redirs=5
 	if [ -z "${CONTENT_BEARER:-}" ]; then
 		log "WARN: fetch_authed called without CONTENT_BEARER"
 		return 1
@@ -431,26 +458,102 @@ fetch_authed() {
 		log "WARN: curl not found; cannot present content subscription token"
 		return 1
 	fi
-	_code="$(
-		curl -sS --connect-timeout 30 --max-time 180 \
-			-H "Authorization: Bearer ${CONTENT_BEARER}" \
-			-H "X-Layer7-Content-Token: ${CONTENT_BEARER}" \
-			-o "$_out" -w '%{http_code}' "$_url" 2>>"$LOG" || true
-	)"
-	printf '%s' "$_code" > "$_code_file"
-	case "$_code" in
-	200|204)
-		return 0
-		;;
-	401|403)
-		log "WARN: content server rejected subscription token (HTTP $_code) for $_url"
-		return 1
-		;;
-	*)
-		log "WARN: authenticated fetch failed (HTTP ${_code:-000}) for $_url"
-		return 1
-		;;
-	esac
+
+	_current="$_url"
+	_send_creds=1
+	_n=0
+	while [ "$_n" -le "$_max_redirs" ]; do
+		case "$_current" in
+		https://*)
+			;;
+		*)
+			log "WARN: authenticated fetch refused non-HTTPS URL for $_url"
+			printf '%s' "000" > "$_code_file"
+			return 1
+			;;
+		esac
+
+		_prev_host="$(https_url_host "$_current")"
+		if [ -z "$_prev_host" ]; then
+			log "WARN: authenticated fetch refused unparseable URL for $_url"
+			printf '%s' "000" > "$_code_file"
+			return 1
+		fi
+
+		rm -f "$_hdr_file"
+		if [ "$_send_creds" -eq 1 ]; then
+			_code="$(
+				curl -sS --connect-timeout 30 --max-time 180 \
+					--proto '=https' \
+					-D "$_hdr_file" \
+					-H "Authorization: Bearer ${CONTENT_BEARER}" \
+					-H "X-Layer7-Content-Token: ${CONTENT_BEARER}" \
+					-o "$_out" -w '%{http_code}' "$_current" 2>>"$LOG" || true
+			)"
+		else
+			_code="$(
+				curl -sS --connect-timeout 30 --max-time 180 \
+					--proto '=https' \
+					-D "$_hdr_file" \
+					-o "$_out" -w '%{http_code}' "$_current" 2>>"$LOG" || true
+			)"
+		fi
+		printf '%s' "$_code" > "$_code_file"
+
+		case "$_code" in
+		200|204)
+			return 0
+			;;
+		301|302|303|307|308)
+			_loc="$(
+				if [ -f "$_hdr_file" ]; then
+					tr -d '\r' < "$_hdr_file" \
+						| grep -i '^Location:' \
+						| head -n 1 \
+						| sed 's/^[Ll]ocation:[[:space:]]*//'
+				fi
+			)"
+			if [ -z "$_loc" ]; then
+				log "WARN: authenticated fetch redirect without Location (HTTP $_code) for $_current"
+				return 1
+			fi
+			case "$_loc" in
+			https://*)
+				_next="$_loc"
+				;;
+			/*)
+				_next="https://${_prev_host}${_loc}"
+				;;
+			*)
+				log "WARN: authenticated fetch refused unsafe redirect Location for $_current"
+				return 1
+				;;
+			esac
+			_next_host="$(https_url_host "$_next")"
+			if [ -z "$_next_host" ]; then
+				log "WARN: authenticated fetch refused unparseable redirect for $_current"
+				return 1
+			fi
+			if [ "$_next_host" != "$_prev_host" ]; then
+				_send_creds=0
+			fi
+			_current="$_next"
+			_n=$((_n + 1))
+			continue
+			;;
+		401|403)
+			log "WARN: content server rejected subscription token (HTTP $_code) for $_url"
+			return 1
+			;;
+		*)
+			log "WARN: authenticated fetch failed (HTTP ${_code:-000}) for $_url"
+			return 1
+			;;
+		esac
+	done
+
+	log "WARN: authenticated fetch exceeded redirect limit for $_url"
+	return 1
 }
 
 require_content_subscription_or_hold() {

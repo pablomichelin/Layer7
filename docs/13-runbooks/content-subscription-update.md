@@ -1,15 +1,16 @@
 # Runbook — Subscrição de conteúdo / update de blacklists (passo 30.10)
 
-**Versão do mecanismo:** a partir de `1.9.53`  
+**Versão do mecanismo:** a partir de `1.9.53` (token); fix redirects em **`1.9.54`**  
 **Gate:** GA4.5–4.7/4.9 **PASS** (local + parcial campo); **GA4.4 BLOCKED** —
-token/check-in OK com 30.9 live; update autenticado FAIL (HTTP 302)  
+aguarda e2e `.254` com `1.9.54`  
 **Contrato:** [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md)  
 **Estado persistente:** `/var/db/layer7/content-subscription.json` (modo `0600`)  
 **Validade nominal:** 30 dias · skew ±1 dia  
-**Campo (`2026-08-11` revalidação):** STOP/ROLLBACK — evidência
+**Campo:** STOP em `1.9.53` por HTTP 302 —
 [`../tests/evidence/20260811T110638Z-30.10-revalidate-254/`](../tests/evidence/20260811T110638Z-30.10-revalidate-254/);
-produção restaurada a `1.9.47`. **Não** promover `1.9.53` até `fetch_authed`
-seguir redirects do mirror (ou primary CDN operacional).
+produção observada `1.9.47`. Candidato **`1.9.54`** corrige `fetch_authed`
+(seguir HTTPS 302 sem vazar Bearer cross-host). **Não** declarar GA4.4 PASS
+sem nova janela `.254`.
 
 ---
 
@@ -21,7 +22,8 @@ seguir redirects do mirror (ou primary CDN operacional).
    token local for válido (assinatura Ed25519 da pubkey de licença, `scope=content`,
    `hardware_id` local, janela `iat`/`exp` ± skew).
 3. Apresenta `Authorization: Bearer <base64url(envelope)>` (e header fallback
-   `X-Layer7-Content-Token`).
+   `X-Layer7-Content-Token`) no host actual; em redirect HTTPS cross-host as
+   credenciais são omitidas (máx. 5 hops; Location não-HTTPS recusada).
 4. A verificação do **manifesto** assinado (ADR-0005) continua obrigatória após
    o download — entitlement ≠ integridade.
 
@@ -36,7 +38,7 @@ por rede (R-C, R-D, R-E).
 |---------|-------------------|
 | GUI Blacklists → Subscrição **Ausente** / **Expirada** / **Inválida** | Sem token utilizável para update corrente |
 | Log `/var/log/layer7-bl-update.log`: `content subscription not valid` | Update abortado **antes** do fetch |
-| Log: `content subscription token OK` + `authenticated fetch failed (HTTP 302)` | Token válido, mas `fetch_authed`/`curl` **não** segue redirect do mirror GitHub — conhecido em `1.9.53` (GA4.4 BLOCKED) |
+| Log: `content subscription token OK` + `authenticated fetch failed (HTTP 302)` | Em **`1.9.53`**: bug conhecido (não seguia redirect). Em **`≥1.9.54`**: investigar Location/cadeia ou CDN |
 | Snapshot activa / LKG inalterados após falha | Comportamento correcto (hold-active) |
 | Enforce / modo Layer7 inalterado | Esperado (token ≠ licença de runtime) |
 
@@ -84,16 +86,19 @@ primeiro (ver também runbook anti-rollback).
 
 ## Rollback de pacote
 
-Instalar `.pkg` anterior (lab: `1.9.52`) volta a actualizar **sem** exigir
-token no cliente. O ficheiro `content-subscription.json` pode permanecer; versões
-antigas ignoram-no.
+Instalar `.pkg` anterior (lab: `1.9.53`) mantém o mecanismo de token; para
+cliente **sem** exigir token no update, usar `1.9.52` ou anterior. O ficheiro
+`content-subscription.json` pode permanecer; versões antigas ignoram-no.
 
 ```sh
-# exemplo — rollback lab a partir de 1.9.53
-fetch -o /tmp/pfSense-pkg-layer7-1.9.52.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.52/pfSense-pkg-layer7-1.9.52.pkg
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.52.pkg
+# exemplo — rollback lab a partir de 1.9.54 → 1.9.53
+fetch -o /tmp/pfSense-pkg-layer7-1.9.53.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.53/pfSense-pkg-layer7-1.9.53.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.53.pkg
 ```
+
+Produção observada após STOP: `1.9.47`. Comandos completos:
+`docs/10-license-server/MANUAL-INSTALL.md`.
 
 ---
 

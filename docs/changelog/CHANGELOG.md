@@ -4,14 +4,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Documentation
+## [1.9.54] — 2026-08-11
 
-- **Anti-pirataria 30.10 — consolidação pós-validação `.254`:** código/release
-  `1.9.53` e testes locais/builder permanecem válidos; uso em campo **BLOCKED**
-  até deploy do license-server com emissão `content_subscription` (30.9 live).
-  Validação `.254` parcial + rollback PASS → `1.9.47`. GA4.4 **BLOCKED**;
-  GA/e2e de campo **não** concluído. Evidência
-  `docs/tests/evidence/20260811T020533Z-30.10-validate-254/`. Sem nova release.
+### Fixed
+
+- **Anti-pirataria 30.10 / BG-117 — `fetch_authed` redirects:** update autenticado
+  segue redirects HTTPS (caso GitHub Releases 302→CDN) sem `--location-trusted`.
+  Credenciais `Authorization: Bearer` e `X-Layer7-Content-Token` ficam no host
+  actual e são omitidas em cross-host; Location não-HTTPS é recusada (máx. 5
+  hops). Preserva hold-active/enforce sem token (contrato 30.8). Testes
+  regressivos 302→200 + anti-leak em
+  `tests/functional/test_content_subscription_update.sh`. Pubkey SoT inalterada.
+  Sem `30.11` / license-server / nginx. **GA4.4 e2e `.254` ainda pendente** —
+  não promover produção até nova janela. Rollback lab: `1.9.53`.
+
+### Release
+
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `e9935975990448d46aaf1f6e598d2b76b986f43d5df8b50a5aee35000aa0351a`
+- Rollback lab: `1.9.53`
 
 ## [1.9.53] — 2026-08-10
 
