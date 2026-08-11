@@ -1,0 +1,4 @@
+NOTE: first post-update grep matched HISTORICAL HTTP 302 lines from prior 1.9.53 run in /var/log/layer7-bl-update.log.
+Authenticated update on 1.9.54 had RC=0, validated_at advanced, and "update complete" before mistaken rollback.
+Package reinstalled to 1.9.54 to continue remaining gates.
+REINSTALL_TS=2026-08-11T11:48:06Z

@@ -1,0 +1,15 @@
+RUN: 30.10 e2e field validation on 192.168.100.254 with 1.9.54
+RUNID=20260811T114320Z
+RESULT: PASS — keep 1.9.54 in production
+Baseline: 1.9.47 (monitor, license valid, snapshot ut1-2026-04-25 healthy)
+Installed: 1.9.54 — POSTINSTALL_PASS (service/license/mode/net/snapshot/fix present)
+Check-in: OK + content_subscription PRESENT (mode 0600; struct PASS; check-subscription=ok)
+Update with token: PASS — RC=0; mirror via HTTPS redirect; validated_at 11:09:09Z -> 11:47:12Z; mode/enforce intact
+  primary CDN DNS still fails (pre-existing); mirror path OK with fetch_authed redirects
+Update without token: PASS — RC!=0; hold-active; snapshot/validated_at intact; mode/enforce intact; token restored
+GUI helper: PASS (status=ok)
+Final: 1.9.54 running, monitor, valid=1, net OK, token OK
+Note: one false-positive STOP matched historical HTTP 302 log lines; package briefly rolled to 1.9.47 then reinstalled 1.9.54; functional update had already PASS
+30.11: NOT started
+license-server/nginx: NOT touched
+GA4.4: PASS (field e2e)

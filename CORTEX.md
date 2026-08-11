@@ -37,12 +37,10 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.54` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.54`;
 `SHA256=e9935975990448d46aaf1f6e598d2b76b986f43d5df8b50a5aee35000aa0351a`;
-anti-pirataria **30.10** / BG-117 — fix `fetch_authed` (seguir HTTPS 302
-sem vazar Bearer cross-host); herda cliente token de `1.9.53`;
-**30.9 live PASS**; **e2e `.254` ainda pendente** (revalidação anterior STOP
-em `1.9.53` por HTTP 302 — evidência `20260811T110638Z-30.10-revalidate-254`);
-produção observada **`1.9.47`**; comandos em
-`docs/10-license-server/MANUAL-INSTALL.md`).
+anti-pirataria **30.10** / BG-117 — fix `fetch_authed` + **e2e `.254` PASS**
+(`20260811T114320Z`); herda cliente token de `1.9.53`; **30.9 live PASS**;
+produção observada **`1.9.54`**; GA4.4 **PASS**; falta `30.11` (GO próprio);
+comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.53`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
@@ -1399,15 +1397,13 @@ TRILHA IDENTITY + MITM — progresso
 
 Nova trilha pós-fecho. **Não** reabre P0–J, IPv6 nem Identity de rede.
 Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.54`** (`.pkg`; rollback lab `1.9.53`).
-Produção `.254` observada: **`1.9.47`** (rollback PASS da revalidação `1.9.53`).
-**`30.10`:** código token **`1.9.53`** + fix `fetch_authed` **`1.9.54`** publicados;
-testes locais/builder **PASS** (incl. regressão 302→200); **e2e `.254` ainda
-pendente** — não declarar GA4.4 PASS sem nova janela. Evidência do STOP anterior:
-[`20260811T110638Z-30.10-revalidate-254`](docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/)
-· [`20260811T020533Z-30.10-validate-254`](docs/tests/evidence/20260811T020533Z-30.10-validate-254/).
-GA4.4 **BLOCKED** (aguarda e2e); GA4.5–4.7/4.9 **PASS** (local + parcial `.254`).
-**Não** iniciar `30.11` agora.
-**Próxima decisão humana:** validação `.254` do candidato **`1.9.54`** (GO).
+Produção `.254` observada: **`1.9.54`** (e2e PASS `20260811T114320Z`).
+**`30.10` FECHADO** (código + fix + e2e campo): token `1.9.53` + `fetch_authed`
+`1.9.54`; GA4.4 **PASS**; GA4.5–4.7/4.9 **PASS**. Evidências:
+[`20260811T114320Z-30.10-e2e-154-254`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
+· STOP anterior [`20260811T110638Z-30.10-revalidate-254`](docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/).
+**Não** iniciar `30.11` sem GO próprio (RR-1).
+**Próxima decisão humana:** GO `30.11` (retirada espelho) — fora deste bloco.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1432,8 +1428,10 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; GA4.4 **BLOCKED** (aguarda e2e `.254` com `1.9.54`); GA4.5–4.7/4.9 PASS; GA2 parcial
-- **Evidência campo 30.10 (revalidação STOP `1.9.53`):**
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4 PASS** (e2e `1.9.54`); GA4.5–4.7/4.9 PASS; GA2 parcial; falta `30.11`
+- **Evidência campo 30.10 (e2e PASS `1.9.54`):**
+  [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
+- **Evidência campo 30.10 (STOP `1.9.53`):**
   [`docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`](docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/)
 - **Evidência campo 30.10 (1ª janela):**
   [`docs/tests/evidence/20260811T020533Z-30.10-validate-254/`](docs/tests/evidence/20260811T020533Z-30.10-validate-254/)
@@ -1445,10 +1443,10 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
   [0033](docs/03-adr/ADR-0033-anti-rollback-relogio.md) — **`Aceito`**
 - **Contrato AP2:** [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md)
 - **Runbook 30.10:** [`docs/13-runbooks/content-subscription-update.md`](docs/13-runbooks/content-subscription-update.md)
-- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (cliente `1.9.54` fix fetch; falta e2e `.254` + `30.11`); **BG-101** reaberto
-- **Ordem:** `30.0`→…→`30.10` código ✓→30.9 live ✓→fix fetch `1.9.54` ✓→**revalidação `.254`**→`30.11`→
+- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (cliente+e2e OK; falta `30.11`); **BG-101** reaberto
+- **Ordem:** `30.0`→…→`30.10` ✓ (código+fix+e2e)→**`30.11` (GO)**→
   AP3 `30.12`–`30.15`→AP4 `30.16`–`30.19`
-- **GOs humanos:** revalidação `.254` com `1.9.54` · `30.11` (espelho) · `30.14` (check-in default)
+- **GOs humanos:** `30.11` (espelho) · `30.14` (check-in default)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
   kill-switch, CRL offline, telemetria
@@ -1459,15 +1457,14 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Onda: AP2 em curso
-- Passo: 30.10 — fix fetch_authed publicado (1.9.54); e2e .254 pendente
-- 30.9 live: PASS (20260811T110043Z); check-in+token em .254 PASS (janela anterior)
+- Passo: 30.10 FECHADO (1.9.54 + e2e .254 PASS); próximo 30.11 (GO)
+- 30.9 live: PASS; e2e 1.9.54: 20260811T114320Z-30.10-e2e-154-254
 - Fix: fetch_authed segue HTTPS 302 sem vazar Bearer cross-host
-- Evidência STOP 1.9.53: 20260811T110638Z-30.10-revalidate-254 (rollback → 1.9.47)
-- Gate GA0/GA1/GA3: PASS; GA4.4 BLOCKED (aguarda e2e 1.9.54); GA4.5–4.7/4.9 PASS
+- Gate GA0/GA1/GA3: PASS; GA4.4 PASS; GA4.5–4.7/4.9 PASS; falta 30.11
 - ADRs 0030-0033: Aceito
-- BG-117: falta e2e .254 + 30.11
-- Latest publicado: 1.9.54; produção .254: 1.9.47
-- NÃO iniciar 30.11
+- BG-117: falta 30.11 (RR-1)
+- Latest / produção .254: 1.9.54
+- NÃO iniciar 30.11 sem GO
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

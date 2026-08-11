@@ -1,0 +1,5 @@
+gui_status=ok
+gui_ok=1
+gui_reason=ok
+gui_message=Subscrição de conteúdo válida
+GUI_HELPER=PASS

@@ -1,0 +1,13 @@
+=== post-rollback ===
+Tue Aug 11 11:47:25 UTC 2026
+version=1.9.47
+Name           : pfSense-pkg-layer7
+Version        : 1.9.47
+Installed on   : Tue Aug 11 08:47:16 2026 -03
+layer7d is running as pid 98259.
+valid=1
+customer=Systemup
+features=base,identity,mitm
+enabled=true mode="monitor"
+snapshot_id=ut1-2026-04-25
+NET_WAN_OK

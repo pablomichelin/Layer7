@@ -1,0 +1,3 @@
+INFO: content subscription token OK (scope=content)
+INFO: validated snapshot ut1-2026-04-25 from mirror
+INFO: update complete

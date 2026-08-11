@@ -1,0 +1,11 @@
+INFO: starting trusted blacklist update
+INFO: content subscription token OK (scope=content)
+INFO: trying primary source https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt
+WARN: authenticated fetch failed (HTTP 000) for https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt
+WARN: failed to fetch manifest from https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt
+INFO: trying mirror source https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt
+INFO: validated snapshot ut1-2026-04-25 from mirror
+INFO: sent SIGHUP to daemon (pid 45384)
+INFO: activated snapshot ut1-2026-04-25 from mirror
+INFO: update complete
+heal_rc=0

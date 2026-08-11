@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation
+
+- **Anti-pirataria 30.10 — e2e `.254` PASS com `1.9.54`:** GA4.4 PASS;
+  produção mantida em `1.9.54`; evidência
+  `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`. Sem nova release
+  nem alteração de código neste bloco. Próximo: `30.11` (GO).
+
 ## [1.9.54] — 2026-08-11
 
 ### Fixed
@@ -15,8 +22,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   hops). Preserva hold-active/enforce sem token (contrato 30.8). Testes
   regressivos 302→200 + anti-leak em
   `tests/functional/test_content_subscription_update.sh`. Pubkey SoT inalterada.
-  Sem `30.11` / license-server / nginx. **GA4.4 e2e `.254` ainda pendente** —
-  não promover produção até nova janela. Rollback lab: `1.9.53`.
+  Sem `30.11` / license-server / nginx. **Campo:** e2e `.254` **PASS**
+  (`20260811T114320Z`) — produção `1.9.54`. Rollback lab: `1.9.53`.
 
 ### Release
 

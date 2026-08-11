@@ -1,0 +1,11 @@
+=== NO TOKEN ===
+INFO: starting trusted blacklist update
+DEGRADED: content subscription unavailable (missing); current content update skipped; keeping active snapshot ut1-2026-04-25
+WARN: content subscription not valid (missing); keeping existing blacklists; enforce untouched
+RC_NT=1
+snap_before=snapshot_id=ut1-2026-04-25 snap_after=snapshot_id=ut1-2026-04-25
+val_before=validated_at_utc=2026-08-11T11:47:12Z val_after=validated_at_utc=2026-08-11T11:47:12Z
+mode=monitor enabled=true
+content_subscription=ok
+reason=ok
+NO_TOKEN_PASS

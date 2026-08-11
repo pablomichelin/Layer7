@@ -1,0 +1,21 @@
+=== final ===
+Tue Aug 11 11:49:15 UTC 2026
+version=1.9.54
+Name           : pfSense-pkg-layer7
+Version        : 1.9.54
+Installed on   : Tue Aug 11 08:47:55 2026 -03
+layer7d is running as pid 45384.
+valid=1
+dev_mode=0
+customer=Systemup
+features=base,identity,mitm
+enabled=true mode="monitor"
+snapshot_id=ut1-2026-04-25
+validated_at_utc=2026-08-11T11:47:12Z
+status=degraded
+NET_WAN_OK
+NET_LAN_OK
+content_subscription=ok
+reason=ok
+forwarding=1
+FETCH_AUTHED_FIX_PRESENT

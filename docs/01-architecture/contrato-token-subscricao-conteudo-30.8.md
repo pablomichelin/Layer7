@@ -234,7 +234,7 @@ listas” está **em falta** face a este contrato e ao ADR-0031.
 |-------|------------------|
 | **30.8** (este) | Contrato + decisões D1–D10 + RR-2 — **FECHADO** |
 | **30.9** | Emitir `content_subscription` no check-in — **FECHADO** (`content-subscription.js`) |
-| **30.10** | Cliente: persistir, enviar Bearer, GUI, runbook — **FECHADO** código/`1.9.53` + fix fetch/`1.9.54`; e2e `.254` pendente |
+| **30.10** | Cliente: persistir, enviar Bearer, GUI, runbook — **FECHADO** código/`1.9.53` + fix/`1.9.54` + e2e `.254` PASS |
 | **30.11** | GO + retirar/limitar espelho corrente; comunicação; rollback do espelho |
 
 **Rollback deste passo:** reverter o commit documental.  

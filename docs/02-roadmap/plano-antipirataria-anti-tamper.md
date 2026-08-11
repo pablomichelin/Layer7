@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.10` fix `fetch_authed` FECHADO** (`1.9.54`); **30.9 live PASS**; **e2e `.254` pendente** (STOP anterior em `1.9.53` por HTTP 302); próximo = validação `.254` com `1.9.54` (não `30.11`); lab/`latest` **`1.9.54`**; produção observada **`1.9.47`**; GA4.4 **BLOCKED**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.10` FECHADO** (código + fix `1.9.54` + e2e `.254` PASS `20260811T114320Z`); **30.9 live PASS**; próximo = **`30.11`** (GO próprio); lab/`latest` = produção **`1.9.54`**; GA4.4 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -25,12 +25,12 @@
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
-| Passo actual | **`30.10`** — fix `fetch_authed` **FECHADO** (`1.9.54`); e2e **pendente** |
-| Próximo | **Validação `.254` com `1.9.54`** (GO) — **antes** de `30.11` |
-| Depois | `30.11` (GO espelho) → AP3 `30.12`… |
-| Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2`; e2e AP2 aguarda janela `.254` |
-| Código alterado até agora | `license-server` **30.9 live**; cliente/pkg **`1.9.53`** + fix **`1.9.54`** |
-| Gate activo | **GA4 parcial** — GA4.4 **BLOCKED**; GA4.5–4.7/4.9 PASS; falta e2e e `30.11` |
+| Passo actual | **`30.10` FECHADO** — próximo a executar: **`30.11`** |
+| Próximo | **`30.11`** (GO espelho / RR-1) |
+| Depois | AP3 `30.12`… |
+| Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2` |
+| Código alterado até agora | `license-server` **30.9 live**; cliente/pkg **`1.9.54`** em produção |
+| Gate activo | **GA4 parcial** — GA4.4–4.7/4.9 **PASS**; falta `30.11` |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -39,15 +39,14 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo: 30.10 fix fetch_authed FECHADO (1.9.54); e2e .254 pendente
-- 30.9 live: PASS (20260811T110043Z); check-in+token .254 PASS (janela 1.9.53)
-- Fix: HTTPS 302 sem vazar Bearer cross-host; testes regressivos PASS
+- Passo: 30.10 FECHADO; próximo 30.11 (GO)
+- 30.9 live PASS; e2e 1.9.54 PASS (20260811T114320Z-30.10-e2e-154-254)
+- Fix: HTTPS 302 sem vazar Bearer cross-host
 - ADRs 0030–0033: Aceito (30.1b)
-- Gate GA0/GA1/GA3: PASS; GA4.4 BLOCKED (aguarda e2e 1.9.54); GA4.5–4.7/4.9 PASS
-- Evidência STOP 1.9.53: 20260811T110638Z-30.10-revalidate-254 (rollback → 1.9.47)
-- Produção .254: 1.9.47; latest git/release: 1.9.54
-- BG-117: falta e2e .254 + 30.11
-- NÃO iniciar 30.11 neste estado
+- Gate GA0/GA1/GA3: PASS; GA4.4 PASS; GA4.5–4.7/4.9 PASS; falta 30.11
+- Produção .254 / latest: 1.9.54
+- BG-117: falta 30.11 (RR-1)
+- NÃO iniciar 30.11 sem GO
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -301,7 +300,7 @@ campo `content_subscription` no JSON activo; denied sem campo; mesma
 **Risco:** Médio (serviço). **Rollback:** imagem `api` pré-tag + tarball.
 **Gate:** GA4.2 / GA4.3 / GA4.13 **PASS**.
 
-#### 30.10 — Cliente: actualização de conteúdo com token — **FECHADO (código/release + fix)** / **e2e pendente** (`2026-08-10`/`11`)
+#### 30.10 — Cliente: actualização de conteúdo com token — **FECHADO** (`2026-08-10`/`11`)
 
 **Objectivo:** `update-blacklists.sh` apresenta o token; sem token válido não
 actualiza, mas **mantém** o conteúdo e o enforce (R-C, R-D, N4).
@@ -314,16 +313,16 @@ omitidas em cross-host (sem `--location-trusted`); Location não-HTTPS recusada;
 máx. 5 hops. Testes regressivos 302→200 + anti-leak + hold-active PASS.
 **Teste local/builder:** `test_content_subscription_update.sh` +
 `test_content_subscription_client.php` **PASS**.
-**Validação `.254` (1ª janela):** token ausente (30.9 ainda não live) — evidência
-`20260811T020533Z-30.10-validate-254/`.
-**Revalidação `.254` (pós-30.9 live, `1.9.53`):** install OK; check-in+token **PASS**;
-update com token **FAIL** — HTTP **302** sem follow. Rollback **PASS** → **`1.9.47`**.
-Evidência `docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`.
-**Risco:** Médio residual até e2e — primary CDN DNS continua factor externo.
-**Rollback:** lab **`1.9.53`**; produção observada **`1.9.47`**.
-**Gate:** GA4.5–4.7/4.9 **PASS**; **GA4.4 BLOCKED** até e2e update com `1.9.54`.
-**Não** iniciar `30.11` neste estado.
-**Pré-requisito / decisão humana:** nova janela `.254` com **`1.9.54`**.
+**E2e `.254` (`1.9.54`, `20260811T114320Z`):** install OK; check-in+token **PASS**;
+update autenticado **PASS** (mirror HTTPS redirect; primary CDN DNS ainda fail
+pré-existente); sem token hold-active **PASS**; GUI helper **PASS**; produção
+mantida em **`1.9.54`**. Evidência
+`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`.
+**Histórico:** STOP em `1.9.53` por HTTP 302 —
+`20260811T110638Z-30.10-revalidate-254/`.
+**Risco residual:** primary CDN DNS externo; RR-1 até `30.11`.
+**Rollback lab:** **`1.9.53`**.
+**Gate:** **GA4.4 PASS**; GA4.5–4.7/4.9 **PASS**. **Não** iniciar `30.11` sem GO.
 
 #### 30.11 — Retirada do espelho público de conteúdo corrente
 

@@ -255,9 +255,13 @@ corrige `fetch_authed` em `update-blacklists.sh`: segue redirects HTTPS
 `X-Layer7-Content-Token` só no host actual — omitidos em cross-host.
 Recusa Location não-HTTPS. Sem token: hold-active/enforce intactos (contrato
 30.8). Testes regressivos 302→200 + anti-leak + hold-active PASS. Pubkey SoT
-inalterada. Sem 30.11 / license-server / nginx. **GA4.4** continua a exigir
-e2e `.254` (não declarado PASS neste bloco). Produção observada permanece
-`1.9.47` até nova janela. Rollback lab: **`1.9.53`**.
+inalterada. Sem 30.11 / license-server / nginx neste bloco.
+**Campo (`2026-08-11` e2e):** install em `192.168.100.254` **PASS** —
+check-in+token OK; update autenticado OK (mirror HTTPS redirect; primary CDN
+DNS ainda fail pré-existente); hold-active/GUI OK; produção mantida em
+**`1.9.54`**. Evidência:
+`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`. GA4.4 **PASS**.
+Rollback lab: **`1.9.53`**.
 **Canal `latest`:** `1.9.54` (publicado). Enforce **`1.9.8`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.54`

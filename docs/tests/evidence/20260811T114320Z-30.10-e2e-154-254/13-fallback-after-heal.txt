@@ -1,0 +1,9 @@
+status=healthy
+component=blacklists-update
+mode=normal
+updated_at_utc=2026-08-11T11:49:45Z
+reason=validated snapshot promoted from official source
+safe_state=snapshot:ut1-2026-04-25
+operator_action=none
+active_snapshot_id=ut1-2026-04-25
+lkg_snapshot_id=ut1-2026-04-25

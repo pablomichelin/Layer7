@@ -1,0 +1,10 @@
+top_keys=data,sig
+has_data=1
+has_sig=[REDACTED]
+payload_v=1
+payload_scope=content
+payload_has_hw=1
+payload_has_license_id=1
+payload_has_iat=1
+payload_has_exp=1
+TOKEN_STRUCT=PASS

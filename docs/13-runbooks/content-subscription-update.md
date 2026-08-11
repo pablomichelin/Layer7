@@ -1,16 +1,15 @@
 # Runbook — Subscrição de conteúdo / update de blacklists (passo 30.10)
 
 **Versão do mecanismo:** a partir de `1.9.53` (token); fix redirects em **`1.9.54`**  
-**Gate:** GA4.5–4.7/4.9 **PASS** (local + parcial campo); **GA4.4 BLOCKED** —
-aguarda e2e `.254` com `1.9.54`  
+**Gate:** GA4.4–4.7/4.9 **PASS** (local + e2e campo `1.9.54`)  
 **Contrato:** [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md)  
 **Estado persistente:** `/var/db/layer7/content-subscription.json` (modo `0600`)  
 **Validade nominal:** 30 dias · skew ±1 dia  
-**Campo:** STOP em `1.9.53` por HTTP 302 —
-[`../tests/evidence/20260811T110638Z-30.10-revalidate-254/`](../tests/evidence/20260811T110638Z-30.10-revalidate-254/);
-produção observada `1.9.47`. Candidato **`1.9.54`** corrige `fetch_authed`
-(seguir HTTPS 302 sem vazar Bearer cross-host). **Não** declarar GA4.4 PASS
-sem nova janela `.254`.
+**Campo:** e2e PASS —
+[`../tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](../tests/evidence/20260811T114320Z-30.10-e2e-154-254/);
+produção observada **`1.9.54`**. Primary CDN `downloads.systemup.inf.br` pode
+falhar DNS; o mirror GitHub com `fetch_authed` (redirect HTTPS) é o caminho
+operacional actual.
 
 ---
 
@@ -38,7 +37,8 @@ por rede (R-C, R-D, R-E).
 |---------|-------------------|
 | GUI Blacklists → Subscrição **Ausente** / **Expirada** / **Inválida** | Sem token utilizável para update corrente |
 | Log `/var/log/layer7-bl-update.log`: `content subscription not valid` | Update abortado **antes** do fetch |
-| Log: `content subscription token OK` + `authenticated fetch failed (HTTP 302)` | Em **`1.9.53`**: bug conhecido (não seguia redirect). Em **`≥1.9.54`**: investigar Location/cadeia ou CDN |
+| Log: `content subscription token OK` + `authenticated fetch failed (HTTP 302)` | Em **`1.9.53`**: bug conhecido. Em **`≥1.9.54`**: investigar Location/cadeia ou CDN |
+| Log: primary DNS fail + mirror `validated snapshot` / `update complete` | Esperado enquanto CDN primary sem DNS — caminho mirror OK |
 | Snapshot activa / LKG inalterados após falha | Comportamento correcto (hold-active) |
 | Enforce / modo Layer7 inalterado | Esperado (token ≠ licença de runtime) |
 
@@ -51,9 +51,7 @@ Executável pelo operador **sem** contactar suporte:
 1. Confirmar conectividade / DNS ao license server.
 2. Forçar check-in (licença activa):
    ```sh
-   # via GUI Definições (check-in periódico) ou, se disponível no lab:
-   layer7d  # com check-in enabled — aguardar ciclo
-   # confirmar ficheiro:
+   layer7d --check-in
    ls -l /var/db/layer7/content-subscription.json
    # esperado: mode 0600, ficheiro presente
    ```
@@ -97,7 +95,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.53.pkg \
 IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.53.pkg
 ```
 
-Produção observada após STOP: `1.9.47`. Comandos completos:
+Produção observada pós-e2e: `1.9.54`. Comandos completos:
 `docs/10-license-server/MANUAL-INSTALL.md`.
 
 ---
@@ -108,3 +106,4 @@ Produção observada após STOP: `1.9.47`. Comandos completos:
 - Gates GA4 em [`../09-blocking/plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md)  
 - Testes: `tests/functional/test_content_subscription_client.php`,
   `tests/functional/test_content_subscription_update.sh`
+- Evidência e2e: [`../tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](../tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
