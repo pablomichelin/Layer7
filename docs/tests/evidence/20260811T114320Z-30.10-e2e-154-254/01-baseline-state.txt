@@ -54,7 +54,7 @@ active_snapshot_id=ut1-2026-04-25
 lkg_snapshot_id=ut1-2026-04-25
 === checkin meta (redacted) ===
 {
-    "license_key": "[REDACTED]"",
+    "license_key": "[REDACTED]",
     "last_check_in_ok": 1786446463,
     "last_check_in_attempt": 1786446462,
     "check_in_interval_hours": 168,

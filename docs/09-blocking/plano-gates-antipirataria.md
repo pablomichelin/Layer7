@@ -115,7 +115,7 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.4 | Cliente com token válido actualiza conteúdo (PASS ponta a ponta) | **PASS** (campo `1.9.54`, `20260811T114320Z`) — update autenticado via mirror HTTPS redirect; primary CDN DNS ainda fail pré-existente; hold-active/GUI OK |
 | GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PASS** (local/builder + `.254` hold-active; snapshot intacto; evidência `20260811T020533Z`) |
 | GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PASS** (`30.10` — sem token: conteúdo local mantido; enforce/mode intactos no `.254`) |
-| GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (GUI + helper; `.254` reportou `status=missing`) |
+| GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (GUI + helper; e2e `1.9.54` / `20260811T114320Z` reportou `status=ok`) |
 | GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** (local — skew ±1d / token na janela em teste PHP); **não** provado em campo com token real |
 | GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto no cliente) |
 | GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** |
