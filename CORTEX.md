@@ -37,8 +37,9 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.53` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.53`;
 `SHA256=5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`;
-anti-pirataria **30.10** / BG-117 — cliente update-blacklists com token de
-subscrição; herda `30.7`/`30.9`;
+anti-pirataria **30.10** / BG-117 — cliente update-blacklists com token;
+**uso em campo BLOCKED** até deploy license-server **30.9** live;
+produção `.254` observada após validação: **`1.9.47`** (rollback PASS);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.52`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
@@ -1396,22 +1397,29 @@ TRILHA IDENTITY + MITM — progresso
 
 Nova trilha pós-fecho. **Não** reabre P0–J, IPv6 nem Identity de rede.
 Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.53`** (`.pkg`; rollback lab `1.9.52`).
-**`30.10` FECHADO** (`2026-08-10`) + **`1.9.53` publicado**: cliente
-`update-blacklists` com token Bearer; GUI subscrição; runbook; GA4.4–GA4.9 **PASS**.
-**`30.9` FECHADO:** emissão `content_subscription` no check-in; GA4.2/GA4.3/GA4.13 **PASS**.
+Produção `.254` após validação 30.10: **`1.9.47`** (rollback PASS).
+**`30.10` código/release FECHADO** + **`1.9.53` publicado**; testes locais/builder
+**PASS**; **campo BLOCKED** — `license.systemup.inf.br` sem emissão
+`content_subscription` (30.9 **não** deployado no servidor live). Evidência:
+[`docs/tests/evidence/20260811T020533Z-30.10-validate-254/`](docs/tests/evidence/20260811T020533Z-30.10-validate-254/).
+GA4.4 **BLOCKED**; GA4.5–4.7/4.9 **PASS** (local + parcial `.254`).
+**Não** declarar GA/e2e de campo concluído. **Não** iniciar `30.11` agora.
+**Próxima decisão humana:** deploy controlado license-server **30.9** + nova
+janela de validação appliance.
+**`30.9` FECHADO no repo** (emissão); **não** equivale a deploy live.
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
 GA4.1/GA4.14 **PASS**.
 **`30.7` FECHADO** (`1.9.52`): entitlements GUI; GA2.8–2.10 **PASS**.
 **`30.6` FECHADO:** anti-rollback; GA3 PASS (GA3.7 DEFERRED).
 **`30.5`/`30.4`/`30.3`/`30.2` FECHADOS** (strip / no-dev-bypass / inventário / SoT pubkey).
-**Próximo a executar: `30.11`** (retirada espelho — **GO humano**).
 **ADRs 0030–0033:** **`Aceito`**. Ficha GO:
 [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md).
 **BG-101:** reaberto lacuna comercial → BG-118 / `30.14`.
 **A-09:** resolvido operacionalmente em `30.2`.
 **Prioridade de valor: AP2** — dec. 1 e 3 = Sim em princípio; execução ainda exige
-passos `30.11`/`30.14`. Riscos residuais **RR-1…RR-5** no plano §0.1.
+passos `30.11`/`30.14` **após** desbloquear GA4.4.
+Riscos residuais **RR-1…RR-5** no plano §0.1.
 **Agente:** Composer 2.5 — um passo por chat (plano §8).
 **Limite honesto:** root **pode** contornar verificação local; proibido overclaim.
 
@@ -1422,7 +1430,9 @@ passos `30.11`/`30.14`. Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; GA4.1–4.9/4.13/4.14 **PASS**; GA2 parcial
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; GA4.4 **BLOCKED**; GA4.5–4.7/4.9 PASS; GA2 parcial
+- **Evidência campo 30.10:**
+  [`docs/tests/evidence/20260811T020533Z-30.10-validate-254/`](docs/tests/evidence/20260811T020533Z-30.10-validate-254/)
 - **Ficha 30.1 (GO):**
   [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md)
 - **ADRs:** [0030](docs/03-adr/ADR-0030-postura-anti-tamper-layer7d.md) ·
@@ -1431,10 +1441,10 @@ passos `30.11`/`30.14`. Riscos residuais **RR-1…RR-5** no plano §0.1.
   [0033](docs/03-adr/ADR-0033-anti-rollback-relogio.md) — **`Aceito`**
 - **Contrato AP2:** [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md)
 - **Runbook 30.10:** [`docs/13-runbooks/content-subscription-update.md`](docs/13-runbooks/content-subscription-update.md)
-- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (`30.8`–`30.10` OK; falta `30.11`); **BG-101** reaberto
-- **Ordem:** `30.0`→…→`30.10` ✓→**`30.11`**→
+- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (cliente `1.9.53` OK; falta deploy 30.9 live + e2e + `30.11`); **BG-101** reaberto
+- **Ordem:** `30.0`→…→`30.10` código ✓→**deploy live 30.9 + revalidação**→`30.11`→
   AP3 `30.12`–`30.15`→AP4 `30.16`–`30.19`
-- **GOs humanos de execução:** `30.11` (espelho) · `30.14` (check-in default)
+- **GOs humanos:** deploy license-server 30.9 · `30.11` (espelho) · `30.14` (check-in default)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
   kill-switch, CRL offline, telemetria
@@ -1445,13 +1455,14 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Onda: AP2 em curso
-- Passo: 30.10 FECHADO; PRÓXIMO = 30.11 (GO espelho)
-- Gate GA0/GA1/GA3: PASS; GA4.1–4.9/4.13/4.14 PASS
-- Contrato 30.8 + emissão 30.9 + cliente 30.10
+- Passo: 30.10 código/release FECHADO (1.9.53); campo BLOCKED
+- Pré-requisito: deploy license-server 30.9 + revalidação (GO humano)
+- Gate GA0/GA1/GA3: PASS; GA4.4 BLOCKED; GA4.5–4.7/4.9 PASS
+- Evidência: 20260811T020533Z-30.10-validate-254 (rollback → 1.9.47)
 - ADRs 0030-0033: Aceito
-- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 em curso (falta 30.11); BG-101 → 30.14
-- SoT pubkey: /root/layer7-build-secrets/
-- Latest: 1.9.53 (.pkg; rollback lab 1.9.52)
+- BG-117: cliente publicado; falta 30.9 live + e2e + 30.11
+- Latest publicado: 1.9.53; produção .254: 1.9.47
+- NÃO iniciar 30.11
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

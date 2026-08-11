@@ -1,0 +1,80 @@
+=== post-install ===
+Tue Aug 11 02:06:36 UTC 2026
+1.9.53
+pfSense-pkg-layer7-1.9.53
+Name           : pfSense-pkg-layer7
+Version        : 1.9.53
+Installed on   : Mon Aug 10 23:06:21 2026 -03
+Origin         : sysutils/pfSense-pkg-layer7
+Architecture   : FreeBSD:15:amd64
+layer7d is running as pid 60063.
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=1247
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2030-01-09
+features=base,identity,mitm
+features_flags=0x7
+features_truncated=0
+clock_suspect=0
+clock_max_seen=1786413996
+clock_delta_sec=0
+1
+enabled=true mode="monitor"
+snapshot_id=ut1-2026-04-25
+NET_WAN_OK
+NET_LAN_OK
+====
+=== post-rollback ===
+Tue Aug 11 02:08:05 UTC 2026
+1.9.47
+pfSense-pkg-layer7-1.9.47
+Name           : pfSense-pkg-layer7
+Version        : 1.9.47
+Installed on   : Mon Aug 10 23:07:55 2026 -03
+Origin         : sysutils/pfSense-pkg-layer7
+layer7d is running as pid 13181.
+valid=1
+customer=Systemup
+features=base,identity,mitm
+enabled=true mode="monitor"
+snapshot_id=ut1-2026-04-25
+0
+token_gate_absent_ok
+1
+NET_OK
+LAN_OK
+====
+2026-08-08 03:01:22 INFO: sent SIGHUP to daemon (pid 39610)
+2026-08-08 03:01:22 INFO: activated snapshot ut1-2026-04-25 from mirror
+2026-08-08 03:01:22 INFO: update complete
+2026-08-09 03:00:00 INFO: starting trusted blacklist update
+2026-08-09 03:00:00 INFO: trying primary source https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt
+fetch: https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt: Host does not resolve
+2026-08-09 03:00:00 WARN: failed to fetch manifest from https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt
+2026-08-09 03:00:00 INFO: trying mirror source https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt
+/var/db/layer7/bl-update.69368/layer7-blacklists-manifest.v1.tx         823  B 7052 kBps    00s
+/var/db/layer7/bl-update.69368/layer7-blacklists-manifest.v1.tx          64  B  583 kBps    00s
+/var/db/layer7/bl-update.69368/layer7-blacklists-ut1.tar.gz          29 MB   22 MBps    01s
+2026-08-09 03:00:05 INFO: validated snapshot ut1-2026-04-25 from mirror
+2026-08-09 03:00:07 INFO: sent SIGHUP to daemon (pid 70309)
+2026-08-09 03:00:07 INFO: activated snapshot ut1-2026-04-25 from mirror
+2026-08-09 03:00:08 INFO: update complete
+2026-08-10 03:00:00 INFO: starting trusted blacklist update
+2026-08-10 03:00:00 INFO: trying primary source https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt
+fetch: https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt: Host does not resolve
+2026-08-10 03:00:00 WARN: failed to fetch manifest from https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt
+2026-08-10 03:00:00 INFO: trying mirror source https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt
+/var/db/layer7/bl-update.98690/layer7-blacklists-manifest.v1.tx         823  B 4208 kBps    00s
+/var/db/layer7/bl-update.98690/layer7-blacklists-manifest.v1.tx          64  B  463 kBps    00s
+/var/db/layer7/bl-update.98690/layer7-blacklists-ut1.tar.gz          29 MB   35 MBps    01s
+2026-08-10 03:00:04 INFO: validated snapshot ut1-2026-04-25 from mirror
+2026-08-10 03:00:07 INFO: sent SIGHUP to daemon (pid 50918)
+2026-08-10 03:00:07 INFO: activated snapshot ut1-2026-04-25 from mirror
+2026-08-10 03:00:07 INFO: update complete
+2026-08-10 23:07:41 INFO: starting trusted blacklist update
+2026-08-10 23:07:41 DEGRADED: content subscription unavailable (missing); current content update skipped; keeping active snapshot ut1-2026-04-25
+2026-08-10 23:07:41 WARN: content subscription not valid (missing); keeping existing blacklists; enforce untouched

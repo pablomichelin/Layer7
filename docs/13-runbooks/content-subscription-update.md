@@ -1,10 +1,14 @@
 # Runbook — Subscrição de conteúdo / update de blacklists (passo 30.10)
 
 **Versão do mecanismo:** a partir de `1.9.53`  
-**Gate:** GA4.4–GA4.9  
+**Gate:** GA4.5–4.7/4.9 **PASS** (local + parcial campo); **GA4.4 BLOCKED** até
+deploy license-server **30.9** live + e2e  
 **Contrato:** [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md)  
 **Estado persistente:** `/var/db/layer7/content-subscription.json` (modo `0600`)  
-**Validade nominal:** 30 dias · skew ±1 dia
+**Validade nominal:** 30 dias · skew ±1 dia  
+**Campo (`2026-08-11`):** STOP/BLOCKED — evidência
+[`../tests/evidence/20260811T020533Z-30.10-validate-254/`](../tests/evidence/20260811T020533Z-30.10-validate-254/);
+produção restaurada a `1.9.47`. **Não** promover `1.9.53` sem emissão live.
 
 ---
 

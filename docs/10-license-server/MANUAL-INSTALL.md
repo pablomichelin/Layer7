@@ -254,8 +254,14 @@ cliente `update-blacklists` exige token de subscrição válido (Bearer);
 sem token não actualiza conteúdo corrente; mantém blacklists locais e enforce
 (R-D/R-C). Persistência `/var/db/layer7/content-subscription.json` no check-in;
 GUI estado de subscrição; runbook `docs/13-runbooks/content-subscription-update.md`.
-GA4.4–GA4.9 PASS (testes locais). Pubkey SoT inalterada. Sem 30.11 (espelho).
-**Canal `latest`:** `1.9.53`. Enforce **`1.9.8`**. Rollback lab: **`1.9.52`**.
+Testes locais/builder PASS. Pubkey SoT inalterada. Sem 30.11 (espelho).
+**Nota campo (`2026-08-11`):** validação em `192.168.100.254` terminou
+**STOP/BLOCKED** — `license.systemup.inf.br` ainda não emite
+`content_subscription` (30.9 não deployado no servidor). Rollback PASS para
+baseline real **`1.9.47`**. **Não** promover `1.9.53` em produção até deploy
+controlado do license-server 30.9 + nova janela de validação. GA4.4 **BLOCKED**.
+Evidência: `docs/tests/evidence/20260811T020533Z-30.10-validate-254/`.
+**Canal `latest`:** `1.9.53` (publicado). Enforce **`1.9.8`**. Rollback lab: **`1.9.52`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.53`
 - **SHA256 esperado:** `5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`

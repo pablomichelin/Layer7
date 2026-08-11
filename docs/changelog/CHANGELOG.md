@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Documentation
+
+- **Anti-pirataria 30.10 — consolidação pós-validação `.254`:** código/release
+  `1.9.53` e testes locais/builder permanecem válidos; uso em campo **BLOCKED**
+  até deploy do license-server com emissão `content_subscription` (30.9 live).
+  Validação `.254` parcial + rollback PASS → `1.9.47`. GA4.4 **BLOCKED**;
+  GA/e2e de campo **não** concluído. Evidência
+  `docs/tests/evidence/20260811T020533Z-30.10-validate-254/`. Sem nova release.
+
 ## [1.9.53] — 2026-08-10
 
 ### Security
@@ -16,9 +25,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `X-Layer7-Content-Token`. GUI (Blacklists/Settings) mostra estado da
   subscrição. Runbook `docs/13-runbooks/content-subscription-update.md`.
   Manifesto Ed25519 (ADR-0005) continua obrigatório. Pubkey SoT inalterada.
-  Sem retirada do espelho (`30.11`). GA4.4–GA4.9 PASS
+  Sem retirada do espelho (`30.11`). Testes locais/builder PASS
   (`test_content_subscription_update.sh`, `test_content_subscription_client.php`).
-  Herda 30.7–30.9.
+  **Nota operacional (`2026-08-11`):** GA4.4 campo **BLOCKED** — license-server
+  live ainda sem 30.9; não promover em produção até deploy + revalidação.
+  Herda 30.7–30.9 (repo).
 
 ### Changed
 

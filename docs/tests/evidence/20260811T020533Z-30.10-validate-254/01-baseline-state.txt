@@ -1,0 +1,96 @@
+=== date ===
+Tue Aug 11 02:05:34 UTC 2026
+=== pkg ===
+pfSense-pkg-layer7-1.9.47
+Name           : pfSense-pkg-layer7
+Version        : 1.9.47
+Installed on   : Mon Aug 10 07:42:07 2026 -03
+Origin         : sysutils/pfSense-pkg-layer7
+Architecture   : FreeBSD:15:amd64
+Prefix         : /usr/local
+Categories     : sysutils
+Licenses       : EULA
+Maintainer     : contato@systemup.inf.br
+WWW            : https://github.com/pablomichelin/pfsense-layer7
+Comment        : Layer 7 for pfSense CE by Systemup (www.systemup.inf.br)
+Shared Libs required:
+	libc.so.7
+	liblber.so.2
+	libldap.so.2
+	libm.so.5
+	libpcap.so.8
+	libthr.so.3
+Annotations    :
+	FreeBSD_version: 1500068
+Flat size      : 14.2MiB
+Description    :
+Layer 7 traffic classification and policy package for pfSense CE.
+
+WIP: port builds layer7d (C) from src; XML/PHP/rc.d in repo. Lab validation
+required before claiming install/GUI/service OK — see repo docs/04-package/.
+
+WWW: https://github.com/pablomichelin/pfsense-layer7
+=== layer7d -V ===
+1.9.47
+=== service ===
+layer7d is running as pid 54088.
+=== license-status ===
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=1247
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2030-01-09
+features=base,identity,mitm
+features_flags=0x7
+features_truncated=0
+=== fingerprint ===
+e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+=== forwarding ===
+net.inet.ip.forwarding: 1
+net.inet6.ip6.forwarding: 1
+=== mode/config snippets ===
+enabled=true
+mode="monitor"
+=== content-subscription ===
+ls: /var/db/layer7/content-subscription.json: No such file or directory
+=== active snapshot ===
+snapshot_id=ut1-2026-04-25
+manifest_url=https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt
+snapshot_url=https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-ut1.tar.gz
+source_role=mirror
+validated_at_utc=2026-08-10T06:00:04Z
+applied_at_utc=2026-08-10T06:00:06Z
+upstream_url=https://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz
+upstream_acquired_at_utc=2026-04-25T02:13:58Z
+categories_count=69
+domains_count=6623069
+cache_dir=/usr/local/etc/layer7/blacklists/.cache/ut1-2026-04-25
+=== fallback ===
+status=healthy
+component=blacklists-update
+mode=normal
+updated_at_utc=2026-08-10T06:00:07Z
+reason=validated snapshot promoted from official source
+safe_state=snapshot:ut1-2026-04-25
+operator_action=none
+active_snapshot_id=ut1-2026-04-25
+lkg_snapshot_id=ut1-2026-04-25
+=== checkin ===
+-rw-------  1 root wheel 254 Aug  9 15:26 /var/db/layer7-checkin.json
+{
+  "license_key": "[REDACTED]",
+  "last_check_in_ok": 1786299970,
+  "last_check_in_attempt": 1786299970,
+  "check_in_interval_hours": 168,
+  "max_offline_hours": 336,
+  "last_error": "",
+  "features": "",
+  "features_set": false
+}
+
+=== pf tables sample ===
+=== ping lan gw self ===
+PING_OK

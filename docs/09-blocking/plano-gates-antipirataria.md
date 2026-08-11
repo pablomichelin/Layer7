@@ -112,12 +112,12 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.1 | Desenho e contrato do token fechados e revistos antes de código | **PASS** (`contrato-token-subscricao-conteudo-30.8.md`; revisão humana OK `2026-08-10`) |
 | GA4.2 | Servidor emite token para licença activa; recusa para revogada/expirada | **PASS** (`30.9` — `content_subscription` só em active; npm test) |
 | GA4.3 | Token ligado ao `hardware_id`; inútil noutro appliance | **PASS** (`30.9` — payload `hardware_id`; verify testes) |
-| GA4.4 | Cliente com token válido actualiza conteúdo (PASS ponta a ponta) | **PASS** (`30.10` — gate+Bearer; `L7_BL_SKIP_FETCH` + `--check-subscription`; e2e CDN pós-install lab) |
-| GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PASS** (`30.10` — hold-active; marker/snapshot intactos) |
-| GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PASS** (`30.10` — sem token/rede: conteúdo local mantido; enforce não tocado) |
-| GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (`30.10` — Blacklists + Settings; `layer7_content_subscription_status`) |
-| GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** (`30.10` — skew ±1d; token válido na janela; teste PHP) |
-| GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto) |
+| GA4.4 | Cliente com token válido actualiza conteúdo (PASS ponta a ponta) | **BLOCKED** (campo) — pré-requisito: deploy license-server **30.9** em `license.systemup.inf.br`; local/builder só gate+Bearer com `L7_BL_SKIP_FETCH` (`20260811T020533Z`) |
+| GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PASS** (local/builder + `.254` hold-active; snapshot intacto; evidência `20260811T020533Z`) |
+| GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PASS** (`30.10` — sem token: conteúdo local mantido; enforce/mode intactos no `.254`) |
+| GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (GUI + helper; `.254` reportou `status=missing`) |
+| GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** (local — skew ±1d / token na janela em teste PHP); **não** provado em campo com token real |
+| GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto no cliente) |
 | GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** |
 | GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **PENDENTE** |
 | GA4.12 | Comunicação a clientes emitida antes de 30.11 | **PENDENTE** |
@@ -125,11 +125,18 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.14 | ADR-0031 / desenho 30.8 declaram RR-2 (redistribuição por appliance licenciado) e que a resposta é atribuição+contratual, não bloqueio técnico | **PASS** (ADR-0031 §5 + contrato 30.8 §7) |
 | GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** |
 
-**Estado GA4:** parcial — GA4.1–4.9 + GA4.13 + GA4.14 **PASS** (`30.8`–`30.10`);
-falta espelho/`30.11` (GA4.10–4.12/4.15).
+**Estado GA4:** parcial — GA4.1–4.3/4.5–4.7/4.9/4.13/4.14 **PASS** (código +
+local/builder; GA4.5–4.7 também observados no `.254`); **GA4.4 BLOCKED** até
+deploy controlado do license-server com **30.9** + nova janela de validação;
+GA4.8 só local. Falta ainda espelho/`30.11` (GA4.10–4.12/4.15).
+**Não** declarar GA/e2e de campo concluído para AP2 cliente.
+
+Evidência campo: `docs/tests/evidence/20260811T020533Z-30.10-validate-254/`
+(STOP/BLOCKED; rollback PASS → `1.9.47`).
 
 **Saída:** uma cópia sem subscrição válida degrada sozinha ao longo do tempo, sem
-que nada no appliance precise de se defender — **desde que** 30.11 tenha GO Sim.
+que nada no appliance precise de se defender — **desde que** 30.11 tenha GO Sim
+**e** o license-server emita token em produção.
 
 ---
 

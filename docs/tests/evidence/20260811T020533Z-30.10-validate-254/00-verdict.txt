@@ -1,0 +1,23 @@
+RUN: 30.10 controlled validation on 192.168.100.254
+RESULT: STOP + ROLLBACK (operational blocker) — field GA/e2e NOT complete
+
+Baseline: 1.9.47 (monitor, license valid, snapshot ut1-2026-04-25 healthy)
+Installed: 1.9.53 — POSTINSTALL_PASS (service/license/mode/net/snapshot OK)
+Check-in: OK (status=active) but license server response has NO content_subscription
+  keys=status,expiry,customer,features,check_in_interval_hours,max_offline_hours
+  => production license-server has NOT deployed 30.9 emission yet
+check-subscription: invalid/missing (expected without server field)
+No-token update: RC=1, hold-active, snapshot unchanged, enforce/mode untouched — PASS (R-D/R-C)
+Token+real update: BLOCKED (no token available from server)
+GUI helper: status=missing — PASS
+
+Regression decision: leaving 1.9.53 would block blacklist auto-updates until
+license-server 30.9 is deployed → STOP + rollback to baseline 1.9.47.
+User named rollback 1.9.52; actual pre-test package was 1.9.47 — restored 1.9.47.
+
+ROLLBACK_PASS: 1.9.47, layer7d running, monitor, valid=1, snapshot intact, net OK
+30.11: NOT started
+
+Local/builder 30.10 tests remain PASS; GitHub release v1.9.53 remains published
+(lab/latest). Field use of 1.9.53 is BLOCKED pending license-server 30.9 deploy
++ new validation window (human GO).
