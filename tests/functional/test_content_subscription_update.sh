@@ -58,14 +58,25 @@ sign_token() {
 	printf '%s' "$_payload" > "$_df"
 	"$OPENSSL" pkeyutl -sign -inkey "$PRIV" -rawin -in "$_df" -out "$_sf" 2>/dev/null \
 		|| fail "sign"
-	_sig=$(python3 -c 'import sys; print(open(sys.argv[1],"rb").read().hex())' "$_sf")
-	[ "${#_sig}" -eq 128 ] || fail "sig len ${#_sig}"
-	python3 -c '
+	if command -v php >/dev/null 2>&1; then
+		_sig=$(php -r 'echo bin2hex(file_get_contents($argv[1]));' "$_sf")
+		php -r '
+$payload = file_get_contents($argv[1]);
+$sig = $argv[2];
+file_put_contents($argv[3], json_encode(["data" => $payload, "sig" => $sig]));
+' "$_df" "$_sig" "$CS"
+	elif command -v python3 >/dev/null 2>&1; then
+		_sig=$(python3 -c 'import sys; print(open(sys.argv[1],"rb").read().hex())' "$_sf")
+		python3 -c '
 import json,sys
 payload=open(sys.argv[1],"r",encoding="utf-8").read()
 sig=sys.argv[2]
 open(sys.argv[3],"w",encoding="utf-8").write(json.dumps({"data":payload,"sig":sig}))
 ' "$_df" "$_sig" "$CS"
+	else
+		fail "need php or python3 to build fixture token"
+	fi
+	[ "${#_sig}" -eq 128 ] || fail "sig len ${#_sig}"
 	chmod 600 "$CS"
 }
 
