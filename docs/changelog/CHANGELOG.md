@@ -29,7 +29,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Release
 
 - Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
-- SHA256: `SHA256_PLACEHOLDER_1_9_53`
+- SHA256: `5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`
 - Rollback lab: `1.9.52`
 
 ## [1.9.52] — 2026-08-10

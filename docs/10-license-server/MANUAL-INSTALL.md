@@ -258,7 +258,7 @@ GA4.4–GA4.9 PASS (testes locais). Pubkey SoT inalterada. Sem 30.11 (espelho).
 **Canal `latest`:** `1.9.53`. Enforce **`1.9.8`**. Rollback lab: **`1.9.52`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.53`
-- **SHA256 esperado:** `SHA256_PLACEHOLDER_1_9_53`
+- **SHA256 esperado:** `5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`
 
 **Addendum da release `1.9.52` (anti-pirataria 30.7 / BG-120, `2026-08-10`):**
 entitlements GUI derivados de `.lic` Ed25519 verificado (`openssl pkeyutl`);
@@ -1154,7 +1154,7 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.53`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.53/pfSense-pkg-layer7-1.9.53.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.53/pfSense-pkg-layer7-1.9.53.pkg.sha256`
-- **SHA256 esperado:** `SHA256_PLACEHOLDER_1_9_53`
+- **SHA256 esperado:** `5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
 **Versao anterior lab (rollback a partir de `1.9.53`):** `1.9.52`
@@ -1457,7 +1457,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.53.pkg.sha256 https://github.com/pablomiche
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`SHA256_PLACEHOLDER_1_9_53`.
+`5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`.
 
 ---
 

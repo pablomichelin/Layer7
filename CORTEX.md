@@ -36,7 +36,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.53` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.53`;
-`SHA256=SHA256_PLACEHOLDER_1_9_53`;
+`SHA256=5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`;
 anti-pirataria **30.10** / BG-117 — cliente update-blacklists com token de
 subscrição; herda `30.7`/`30.9`;
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
