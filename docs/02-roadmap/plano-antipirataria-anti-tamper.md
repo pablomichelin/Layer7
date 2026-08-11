@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.4` FECHADO** + **`1.9.49` publicado** (`2026-08-10`); próximo **`30.5`** (strip / BG-115); **GA1 PASS**; GA2.1–2.3 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.5` FECHADO** + **`1.9.50` publicado** (`2026-08-10`); próximo **`30.6`** (anti-rollback / BG-116); **GA1 PASS**; GA2.1–2.5 + GA2.11 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -25,12 +25,12 @@
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP1 em curso** (AP0 FECHADA; GA1 PASS) |
-| Passo actual | **`30.4`** — remover `is_dev_key` produção — **FECHADO** (`2026-08-10`) |
-| Próximo | **`30.5`** — strip / endurecimento de build (BG-115) |
-| Depois | AP1 `30.6`… |
+| Passo actual | **`30.5`** — strip / endurecimento de build — **FECHADO** (`2026-08-10`) |
+| Próximo | **`30.6`** — anti-rollback de relógio (BG-116) |
+| Depois | AP1 `30.7`… |
 | Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2` |
-| Código alterado até agora | `license.c` + Makefiles (`30.4` / BG-114); **`1.9.49` publicado** |
-| Gate activo | **GA2 parcial** (GA2.1–2.3 PASS; GA2.4+ → `30.5`/`30.7`) |
+| Código alterado até agora | `license.c` + Makefiles (`30.4`/`30.5`); **`1.9.50` publicado** |
+| Gate activo | **GA2 parcial** (GA2.1–2.5 + GA2.11 PASS; GA2.6–2.10 → lab/`30.7`) |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -39,16 +39,16 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo actual: 30.4 FECHADO; próximo 30.5 (strip BG-115)
+- Passo actual: 30.5 FECHADO; próximo 30.6 (anti-rollback BG-116)
 - ADRs 0030–0033: Aceito (30.1b)
 - Ficha: docs/09-blocking/decisoes-humanas-30.1.md (8/8 preenchidas)
-- Gate GA0: PASS; GA1 PASS; GA2.1–2.3 PASS
-- Evidência 30.4: docs/tests/evidence/20260810T235325Z-30.4-no-dev-bypass/
+- Gate GA0: PASS; GA1 PASS; GA2.1–2.5 + GA2.11 PASS
+- Evidência 30.5: docs/tests/evidence/20260810T200329Z-30.5-strip/
 - BG-101: reaberto lacuna comercial → BG-118 / 30.14
-- BG-114: Concluido (30.4)
+- BG-114/BG-115: Concluido (30.4/30.5)
 - SoT pubkey: /root/layer7-build-secrets/ (fora do git)
-- Latest publicado: 1.9.49 (.pkg; rollback lab 1.9.48)
-- Próximo agente: 30.5 — ver §8 e START-HERE
+- Latest publicado: 1.9.50 (.pkg; rollback lab 1.9.49)
+- Próximo agente: 30.6 — ver §8 e START-HERE
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -224,17 +224,22 @@ appliance `.254` não corrido neste passo.
 **Risco:** Médio — caminho crítico de licença. **Rollback:** `.pkg` anterior.
 **Gate:** GA2 (parcial — GA2.1–2.3).
 
-#### 30.5 — Strip e endurecimento de build — **BG-115**
+#### 30.5 — Strip e endurecimento de build — **BG-115** — **FECHADO** (`2026-08-10`)
 
 **Objectivo:** remover o mapa de símbolos que aponta para as funções de licença.
-**Implementação:** strip no `INSTALL_PROGRAM` do port; avaliar
-`-fvisibility=hidden` onde não quebre nada. **Não** introduzir ofuscação (R-G).
-**Ficheiros:** `package/pfSense-pkg-layer7/Makefile`.
+**Implementação:** `${STRIP_CMD}` explícito após `INSTALL_PROGRAM` para `layer7d`
+e `layer7-tlsproxy`; `-fvisibility=hidden` nos binários standalone (avaliado
+seguro — sem ABI/.so exportada). **Não** introduzir ofuscação (R-G).
+**Ficheiros:** `package/pfSense-pkg-layer7/Makefile`; teste
+`scripts/package/test-prod-strip.sh`.
+**Resultado:** GA2.4 / GA2.5 / GA2.11 **PASS** no builder; release **`1.9.50`**
+(`SHA256=3598828d057948732efb10ac0e958b3078f93a7ce86ad35f73d5f5ce086ec85e`);
+evidência `docs/tests/evidence/20260810T200329Z-30.5-strip/`.
 **Teste mínimo:** `nm`/`strings` do artefacto sem `is_dev_key`/`layer7_license_check`;
 daemon arranca, `layer7d -t` PASS, `--fingerprint` PASS.
 **Risco:** Baixo — atenção a diagnóstico futuro (core dumps menos legíveis; registar
-como limite aceite). **Rollback:** `.pkg` anterior.
-**Gate:** GA2.
+como limite aceite). **Rollback:** `.pkg` anterior (`1.9.49`).
+**Gate:** GA2 (parcial — GA2.4/2.5/2.11).
 
 #### 30.6 — Anti-rollback de relógio — **BG-116**
 

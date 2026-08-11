@@ -4,6 +4,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.50] — 2026-08-10
+
+### Security
+
+- **Anti-pirataria 30.5 / BG-115:** strip explícito (`${STRIP_CMD}`) no
+  `INSTALL_PROGRAM` do port para `layer7d` e `layer7-tlsproxy`;
+  `-fvisibility=hidden` nos binários standalone. `nm`/`strings` sem
+  `is_dev_key` / `layer7_license_check`. Gate GA2.4 / GA2.5 / GA2.11 PASS
+  (`scripts/package/test-prod-strip.sh`). Sem ofuscação (R-G). Limite
+  aceite: core dumps de produção menos legíveis. Pubkey SoT inalterada.
+  Herda `30.4` (`is_dev_key` só sob `L7_DEV_BUILD`).
+
+### Release
+
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `3598828d057948732efb10ac0e958b3078f93a7ce86ad35f73d5f5ce086ec85e`
+- Rollback lab: `1.9.49`
+
 ## [1.9.49] — 2026-08-10
 
 ### Security

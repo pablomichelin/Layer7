@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.49
+PORTVERSION=	1.9.50
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -23,6 +23,15 @@ LAYER7D_DIR=	${.CURDIR}/../../src/layer7d
 LAYER7_TLSPROXY_DIR=	${.CURDIR}/../../src/layer7-tlsproxy
 # GO produto + 20.10b: helper no .pkg; default OFF; listen/rdr só com mitm_effective.
 WITH_LAYER7_TLSPROXY?=	yes
+
+# Anti-pirataria 30.5 / BG-115 / GA2.4:
+# - INSTALL_PROGRAM do bsd.port.mk já aplica ${STRIP_CMD} (-s).
+# - Reforço explícito em do-install (não depender só do default).
+# - Release: não passar STRIP= vazio nem empacotar com símbolos de debug.
+# -fvisibility=hidden: aplicado nos binários standalone (sem ABI exportada).
+#   Avaliado seguro: não há plugins/.so do produto; strip remove .symtab.
+# Limite (GA2.11): core dumps de produção menos legíveis — aceite deliberado.
+LAYER7_HARDEN_CFLAGS=	-fvisibility=hidden
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
 .if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c) || !exists(${LAYER7D_DIR}/identity_ldap.c) || !exists(${LAYER7D_DIR}/identity_radius.c) || !exists(${LAYER7D_DIR}/identity_dc.c)
@@ -64,9 +73,11 @@ do-extract:
 
 # Anti-pirataria 30.4 / GA2.3: NÃO definir -DL7_DEV_BUILD aqui.
 # O bypass is_dev_key existe só sob L7_DEV_BUILD (lab explícito).
+# Anti-pirataria 30.5 / GA2.4: LAYER7_HARDEN_CFLAGS + strip em do-install.
 do-build:
 	@${ECHO_CMD} '"${PKGVERSION}"' > ${WRKSRC}/version.str
-	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} \
+	${CC} ${CFLAGS} -Wall -Wextra -O2 ${LAYER7_HARDEN_CFLAGS} \
+		-I${WRKSRC} -I${LAYER7D_DIR} -I${LAYER7_COMMON} \
 		${LAYER7_NDPI_CFLAGS} ${LAYER7_LDAP_CFLAGS} -o ${WRKSRC}/layer7d \
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
 		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
@@ -79,7 +90,8 @@ do-build:
 		${LAYER7_LDAP_LDFLAGS} \
 		/usr/lib/libssl.a /usr/lib/libcrypto.a
 .if ${WITH_LAYER7_TLSPROXY:tl} == yes
-	${CC} ${CFLAGS} -Wall -Wextra -O2 -I${LAYER7_TLSPROXY_DIR} \
+	${CC} ${CFLAGS} -Wall -Wextra -O2 ${LAYER7_HARDEN_CFLAGS} \
+		-I${LAYER7_TLSPROXY_DIR} \
 		-DLAYER7_TLSPROXY_VERSION=\"0.1.2\" \
 		-o ${WRKSRC}/layer7-tlsproxy \
 		${LAYER7_TLSPROXY_DIR}/main.c ${LAYER7_TLSPROXY_DIR}/ipc.c \
@@ -98,8 +110,10 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/libexec
 	${MKDIR} ${STAGEDIR}${DATADIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/layer7d ${STAGEDIR}${PREFIX}/sbin
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/sbin/layer7d
 .if ${WITH_LAYER7_TLSPROXY:tl} == yes
 	${INSTALL_PROGRAM} ${WRKSRC}/layer7-tlsproxy ${STAGEDIR}${PREFIX}/sbin
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/sbin/layer7-tlsproxy
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7-tlsproxy \
 		${STAGEDIR}${PREFIX}/etc/rc.d
 .endif

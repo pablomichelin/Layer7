@@ -51,6 +51,16 @@ pubkey all-zeros em build de produção ⇒ licença inválida; controlo com
 sh scripts/package/test-prod-no-dev-bypass.sh   # runtime completo no builder
 ```
 
+## `test-prod-strip.sh`
+
+Gate GA2.4 / GA2.5 / GA2.11 / passo **30.5**: `.pkg` com `layer7d` strippado;
+`nm`/`strings` sem `is_dev_key` / `layer7_license_check`; em FreeBSD corre
+`-t` e `--fingerprint`.
+
+```sh
+sh scripts/package/test-prod-strip.sh --gate path/to.pkg
+```
+
 ## `smoke-layer7d.sh`
 
 Valida **compilação** (`smoke`), **`-V`**, **`-t`** nos dois JSONs, **`-e -n`**

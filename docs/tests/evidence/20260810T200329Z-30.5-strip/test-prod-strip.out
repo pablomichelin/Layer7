@@ -1,0 +1,13 @@
+file=/tmp/l7-strip.rzUZxG/usr/local/sbin/layer7d: ELF 64-bit LSB executable, x86-64, version 1 (FreeBSD), dynamically linked, interpreter /libexec/ld-elf.so.1, for FreeBSD 15.0 (1500068), FreeBSD-style, stripped
+stripped=1
+nm_head=/tmp/l7-strip.rzUZxG/usr/local/sbin/layer7d: no symbols;
+symbol_is_dev_key=0
+symbol_layer7_license_check=0
+string_is_dev_key=0
+string_layer7_license_check=0
+smoke_t=pass
+smoke_fingerprint=pass
+version=1.9.50
+diagnostic_limit=GA2.11: core dumps de produção menos legíveis após strip (aceite deliberado; sem ofuscação R-G)
+PASS: GA2.4/GA2.5 (strip + ausência marcadores + smoke quando FreeBSD)
+PASS: GA2.11 limite de diagnóstico registado
