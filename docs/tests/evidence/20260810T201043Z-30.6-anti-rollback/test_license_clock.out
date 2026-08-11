@@ -1,0 +1,8 @@
+PASS: primeira marca = now
+PASS: avanco normal actualiza marca
+PASS: retrocesso 1h tolerado; marca intacta
+PASS: retrocesso == limiar tolerado
+PASS: retrocesso >1d => suspeito
+PASS: recuperacao apos correcao de hora
+PASS: now<=0 nao altera marca
+RESULT: PASS

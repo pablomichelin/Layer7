@@ -4,6 +4,24 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.51] — 2026-08-10
+
+### Security
+
+- **Anti-pirataria 30.6 / BG-116:** anti-rollback de relógio (ADR-0033). Marca
+  persistente em `/var/db/layer7/clock-mark.json`; retrocesso >1 dia ⇒
+  `clock_suspect`, enforce degradado para monitor + `L7_AUDIT_NOTE`.
+  Recuperação N6: sincronizar hora e reiniciar `layer7d` (runbook
+  `docs/13-runbooks/anti-rollback-relogio.md`). RR-4 declarado. Teste
+  `tests/functional/test_license_clock.c`. Pubkey SoT inalterada. Herda
+  30.4/30.5.
+
+### Release
+
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `aec3642824df0fd8b3a49d9cc41b4b8a30e8c88dd5be6d6da7e142965b722204`
+- Rollback lab: `1.9.50`
+
 ## [1.9.50] — 2026-08-10
 
 ### Security

@@ -16,6 +16,13 @@
 #define L7_CHECKIN_DEFAULT_INTERVAL_HOURS 168
 #define L7_CHECKIN_DEFAULT_MAX_OFFLINE_HOURS 336
 
+/* Anti-rollback 30.6 / ADR-0033 — marca do maior timestamp observado.
+ * Limiar conservador: retrocesso ≤ 1 dia = tolerado (NTP/VM); > 1 dia =
+ * estado temporal suspeito → monitor. RR-4: apagar o ficheiro ou relógio
+ * congelado desde a instalação contornam isto; fecho real = AP3. */
+#define L7_CLOCK_MARK_PATH       "/var/db/layer7/clock-mark.json"
+#define L7_CLOCK_SUSPECT_SEC     86400L  /* 1 dia */
+
 #define L7_CHECKIN_OK           0
 #define L7_CHECKIN_DENIED       1
 #define L7_CHECKIN_NETWORK      2
@@ -28,6 +35,9 @@ struct l7_license_info {
 	int   grace;          /* 1 = expired but within grace period */
 	int   days_left;      /* days until expiry; negative if expired */
 	int   dev_mode;       /* 1 = placeholder key, verification skipped */
+	int   clock_suspect;  /* 1 = anti-rollback: relógio atrás da marca (30.6) */
+	time_t clock_max_seen;/* maior timestamp persistido / observado */
+	long  clock_delta_sec;/* max_seen - now quando há retrocesso; senão 0 */
 	char  hardware_id[L7_HW_ID_LEN];
 	char  customer[256];
 	char  expiry[16];     /* YYYY-MM-DD */
@@ -60,6 +70,14 @@ int layer7_hw_fingerprint(char *out, size_t outsz);
  * (enforce allowed), -1 if invalid (monitor-only).
  */
 int layer7_license_check(struct l7_license_info *info);
+
+/*
+ * Avalia anti-rollback temporal (puro — sem I/O). Retorna 1 se suspeito
+ * (retrocesso > L7_CLOCK_SUSPECT_SEC), 0 caso contrário.
+ * Nunca move *new_max_seen para trás. Usado por license_check e testes.
+ */
+int layer7_clock_eval(time_t now, time_t max_seen,
+    time_t *new_max_seen, long *delta_sec);
 
 /*
  * Attempt online activation: POST fingerprint + key to server, save .lic.

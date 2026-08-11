@@ -20,6 +20,9 @@ Seguranca da WebGUI do pfSense durante testes do pacote: [`pfsense-webgui-safety
 
 Rollback do pacote Layer7: [`rollback.md`](rollback.md).
 
+Anti-rollback de relógio (30.6 / ADR-0033 — recuperação N6, limites RR-4):
+[`anti-rollback-relogio.md`](anti-rollback-relogio.md).
+
 Publicacao segura do license server (TLS, edge proxy, origin privado `8445`):
 [`license-server-publicacao-segura.md`](license-server-publicacao-segura.md).
 

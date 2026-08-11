@@ -87,18 +87,19 @@ GA2.6–2.7 (lab enforce) e GA2.8–2.10 (`30.7`) pendentes.
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GA3.1 | Marca persistente do maior timestamp observado, resistente a reinício | **PENDENTE** |
-| GA3.2 | Relógio a avançar normalmente ⇒ zero efeito | **PENDENTE** |
-| GA3.3 | Retrocesso pequeno (ajuste NTP legítimo) ⇒ tolerado sem evento de alarme | **PENDENTE** |
-| GA3.4 | Retrocesso grande ⇒ estado suspeito, degradação para **monitor**, evento de auditoria | **PENDENTE** |
-| GA3.5 | Daemon **nunca** termina nem entra em crash por estado temporal (**R-C**) | **PENDENTE** |
-| GA3.6 | Recuperação após corrigir a hora: documentada, testada e executável pelo operador (**N6**) | **PENDENTE** |
-| GA3.7 | Licença dentro da validade com relógio correcto ⇒ inalterado (**N1**) | **PENDENTE** |
-| GA3.8 | Rollback ao `.pkg` anterior ignora o ficheiro de estado sem erro (**N7**) | **PENDENTE** |
-| GA3.9 | ADR-0033 / runbook declaram explicitamente as evasões RR-4 (apagar estado; relógio congelado) e que o fecho real é AP3 | **PENDENTE** |
+| GA3.1 | Marca persistente do maior timestamp observado, resistente a reinício | **PASS** (`clock-mark.json` + `20260810T201043Z`) |
+| GA3.2 | Relógio a avançar normalmente ⇒ zero efeito | **PASS** (`test_license_clock`) |
+| GA3.3 | Retrocesso pequeno (ajuste NTP legítimo) ⇒ tolerado sem evento de alarme | **PASS** (≤86400 s) |
+| GA3.4 | Retrocesso grande ⇒ estado suspeito, degradação para **monitor**, evento de auditoria | **PASS** (lógica + `L7_AUDIT_NOTE`; lab appliance DEFERRED) |
+| GA3.5 | Daemon **nunca** termina nem entra em crash por estado temporal (**R-C**) | **PASS** |
+| GA3.6 | Recuperação após corrigir a hora: documentada, testada e executável pelo operador (**N6**) | **PASS** (runbook + unitário recuperação) |
+| GA3.7 | Licença dentro da validade com relógio correcto ⇒ inalterado (**N1**) | **DEFERRED** (lab `.254` / `.lic` — não bloqueia fecho documental do passo) |
+| GA3.8 | Rollback ao `.pkg` anterior ignora o ficheiro de estado sem erro (**N7**) | **PASS** (doc — versões <1.9.51 ignoram o ficheiro) |
+| GA3.9 | ADR-0033 / runbook declaram explicitamente as evasões RR-4 (apagar estado; relógio congelado) e que o fecho real é AP3 | **PASS** |
 
 **Saída:** prolongar licença expirada com `date` deixa de ser trivial, sem punir
 clientes com relógio genuinamente errado. **Não** se afirma que 30.6 contém o T2 técnico.
+**Estado GA3:** **PASS** com GA3.7 DEFERRED (prova N1 em appliance).
 
 ---
 

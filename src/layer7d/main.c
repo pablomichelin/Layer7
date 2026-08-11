@@ -318,6 +318,12 @@ write_stats_json(void)
 	    s_lic.features_flags ? s_lic.features_flags : 0);
 	fprintf(f, "  \"license_features_truncated\": %s,\n",
 	    s_lic.features_truncated ? "true" : "false");
+	fprintf(f, "  \"license_clock_suspect\": %s,\n",
+	    s_lic.clock_suspect ? "true" : "false");
+	fprintf(f, "  \"license_clock_max_seen\": %lld,\n",
+	    (long long)s_lic.clock_max_seen);
+	fprintf(f, "  \"license_clock_delta_sec\": %ld,\n",
+	    s_lic.clock_delta_sec);
 	fprintf(f, "  \"identity_active\": %s,\n",
 	    s_idmap_active ? "true" : "false");
 	fprintf(f, "  \"identity_sessions\": %u,\n",
@@ -2946,6 +2952,11 @@ int main(int argc, char **argv)
 			printf("features_flags=0x%x\n", li.features_flags);
 			printf("features_truncated=%d\n",
 			    li.features_truncated ? 1 : 0);
+			printf("clock_suspect=%d\n",
+			    li.clock_suspect ? 1 : 0);
+			printf("clock_max_seen=%lld\n",
+			    (long long)li.clock_max_seen);
+			printf("clock_delta_sec=%ld\n", li.clock_delta_sec);
 			if (li.error[0])
 				printf("error=%s\n", li.error);
 			return li.valid ? 0 : 1;
@@ -3139,6 +3150,13 @@ int main(int argc, char **argv)
 		s_license_state = 0;
 		L7_WARN("license: INVALID — %s", s_lic.error);
 		L7_WARN("license: enforce disabled, monitor-only mode");
+		if (s_lic.clock_suspect) {
+			L7_AUDIT_NOTE(NULL,
+			    "license_clock_suspect: max_seen=%lld delta=%ld "
+			    "— enforce degraded to monitor (30.6)",
+			    (long long)s_lic.clock_max_seen,
+			    s_lic.clock_delta_sec);
+		}
 	}
 
 	if (stat(config_path, &st) == 0) {
@@ -3466,6 +3484,15 @@ int main(int argc, char **argv)
 						    "%s", li.error);
 						L7_WARN("license_recheck: enforce "
 						    "disabled, monitor-only");
+						if (li.clock_suspect) {
+							L7_AUDIT_NOTE(NULL,
+							    "license_clock_suspect: "
+							    "max_seen=%lld delta=%ld "
+							    "— enforce degraded to "
+							    "monitor (30.6)",
+							    (long long)li.clock_max_seen,
+							    li.clock_delta_sec);
+						}
 					} else
 						L7_DBG("license_recheck: unchanged "
 						    "state=invalid");

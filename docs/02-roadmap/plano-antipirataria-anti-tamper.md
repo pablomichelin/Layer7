@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.5` FECHADO** + **`1.9.50` publicado** (`2026-08-10`); próximo **`30.6`** (anti-rollback / BG-116); **GA1 PASS**; GA2.1–2.5 + GA2.11 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.6` FECHADO** + **`1.9.51` publicado** (`2026-08-10`); próximo **`30.7`** (entitlements GUI / BG-120); **GA1 PASS**; GA2.1–2.5 + GA2.11 **PASS**; **GA3 PASS** (GA3.7 DEFERRED); ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -25,12 +25,12 @@
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP1 em curso** (AP0 FECHADA; GA1 PASS) |
-| Passo actual | **`30.5`** — strip / endurecimento de build — **FECHADO** (`2026-08-10`) |
-| Próximo | **`30.6`** — anti-rollback de relógio (BG-116) |
-| Depois | AP1 `30.7`… |
+| Passo actual | **`30.6`** — anti-rollback de relógio — **FECHADO** (`2026-08-10`) |
+| Próximo | **`30.7`** — entitlements assinados GUI (BG-120) |
+| Depois | AP2 `30.8`… |
 | Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2` |
-| Código alterado até agora | `license.c` + Makefiles (`30.4`/`30.5`); **`1.9.50` publicado** |
-| Gate activo | **GA2 parcial** (GA2.1–2.5 + GA2.11 PASS; GA2.6–2.10 → lab/`30.7`) |
+| Código alterado até agora | `license.c`/`main.c` + Makefiles (`30.4`–`30.6`); **`1.9.51` publicado** |
+| Gate activo | **GA2 parcial** (faltam GA2.6–2.10 / `30.7`); **GA3 PASS** (GA3.7 DEFERRED) |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -39,16 +39,16 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo actual: 30.5 FECHADO; próximo 30.6 (anti-rollback BG-116)
+- Passo actual: 30.6 FECHADO; próximo 30.7 (entitlements GUI BG-120)
 - ADRs 0030–0033: Aceito (30.1b)
 - Ficha: docs/09-blocking/decisoes-humanas-30.1.md (8/8 preenchidas)
-- Gate GA0: PASS; GA1 PASS; GA2.1–2.5 + GA2.11 PASS
-- Evidência 30.5: docs/tests/evidence/20260810T200329Z-30.5-strip/
+- Gate GA0/GA1: PASS; GA2.1–2.5 + GA2.11 PASS; GA3 PASS (GA3.7 DEFERRED)
+- Evidência 30.6: docs/tests/evidence/20260810T201043Z-30.6-anti-rollback/
 - BG-101: reaberto lacuna comercial → BG-118 / 30.14
-- BG-114/BG-115: Concluido (30.4/30.5)
+- BG-114/BG-115/BG-116: Concluido
 - SoT pubkey: /root/layer7-build-secrets/ (fora do git)
-- Latest publicado: 1.9.50 (.pkg; rollback lab 1.9.49)
-- Próximo agente: 30.6 — ver §8 e START-HERE
+- Latest publicado: 1.9.51 (.pkg; rollback lab 1.9.50)
+- Próximo agente: 30.7 — ver §8 e START-HERE
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -241,24 +241,23 @@ daemon arranca, `layer7d -t` PASS, `--fingerprint` PASS.
 como limite aceite). **Rollback:** `.pkg` anterior (`1.9.49`).
 **Gate:** GA2 (parcial — GA2.4/2.5/2.11).
 
-#### 30.6 — Anti-rollback de relógio — **BG-116**
+#### 30.6 — Anti-rollback de relógio — **BG-116** — **FECHADO** (`2026-08-10`)
 
 **Objectivo:** corrigir A-03 sem penalizar erro honesto (R-J).
-**Implementação:** persistir o maior timestamp já observado; retrocesso acima de um
-limiar marca estado temporal **suspeito** → degradação para monitor + evento de
-auditoria. Nunca crash, nunca paragem do daemon. Recuperação documentada
-(re-sincronizar hora e reiniciar serviço).
-**Ficheiros:** `src/layer7d/license.c`, `src/layer7d/license.h`, estado em `/var/db/`,
-GUI de estado, runbook.
+**Implementação:** marca em `/var/db/layer7/clock-mark.json`; limiar
+`L7_CLOCK_SUSPECT_SEC=86400`; retrocesso maior ⇒ `clock_suspect` + `valid=0` +
+`L7_AUDIT_NOTE`; GUI badge; runbook N6.
+**Ficheiros:** `src/layer7d/license.c`, `license.h`, `main.c`, `layer7.inc`,
+`layer7_settings.php`, lang, `tests/functional/test_license_clock.c`,
+`docs/13-runbooks/anti-rollback-relogio.md`.
+**Resultado:** GA3 **PASS** (GA3.7 DEFERRED lab); release **`1.9.51`**
+(`SHA256=aec3642824df0fd8b3a49d9cc41b4b8a30e8c88dd5be6d6da7e142965b722204`);
+evidência `docs/tests/evidence/20260810T201043Z-30.6-anti-rollback/`.
 **Limites declarados (RR-4):** root pode apagar o ficheiro de estado; relógio
-**congelado desde a instalação** não gera retrocesso e não é detectado por este
-mecanismo. O ADR-0033 e o runbook devem declarar ambos; o fecho real do vector é
-AP3. Este passo encarece o truque casual, não o T2 técnico.
-**Teste mínimo:** relógio para a frente PASS; retrocesso pequeno tolerado; retrocesso
-grande → monitor + evento; recuperação após correcção de hora PASS. Verificar N6.
-**Risco:** Médio — falso positivo afecta cliente legítimo. Mitigação: limiar
-conservador + degradação suave.
-**Rollback:** `.pkg` anterior; ficheiro de estado ignorado por versões antigas.
+**congelado desde a instalação** não é detectado. Fecho real = AP3.
+**Teste mínimo:** unitário `test_license_clock` PASS; `layer7d -t` PASS.
+**Risco:** Médio — falso positivo mitiga-se com limiar 1 dia.
+**Rollback:** `.pkg` `1.9.50`; ficheiro de estado ignorado por versões antigas.
 **Gate:** GA3.
 
 #### 30.7 — Entitlements assinados para a GUI — **BG-120**

@@ -936,6 +936,7 @@ layer7_render_styles();
 			$lic_expired = !empty($lic_status["expired"]);
 			$lic_grace = !empty($lic_status["grace"]);
 			$lic_dev = !empty($lic_status["dev_mode"]);
+			$lic_clock_suspect = !empty($lic_status["clock_suspect"]);
 			$lic_hw = isset($lic_status["hardware_id"]) ? $lic_status["hardware_id"] : "";
 			$lic_customer = isset($lic_status["customer"]) ? $lic_status["customer"] : "";
 			$lic_expiry = isset($lic_status["expiry"]) ? $lic_status["expiry"] : "";
@@ -945,6 +946,8 @@ layer7_render_styles();
 
 			if ($lic_dev) {
 				$lic_badge = '<span class="label label-warning">DEV MODE</span>';
+			} elseif ($lic_clock_suspect) {
+				$lic_badge = '<span class="label label-danger">' . l7_t("Relogio suspeito") . '</span>';
 			} elseif ($lic_valid && !$lic_expired) {
 				$lic_badge = '<span class="label label-success">' . l7_t("Valida") . '</span>';
 			} elseif ($lic_valid && $lic_grace) {
@@ -1098,6 +1101,17 @@ layer7_render_styles();
 						<small class="text-muted">(<?= $lic_days; ?> <?= l7_t("dias restantes"); ?>)</small>
 						<?php } ?>
 					</dd>
+					<?php } ?>
+					<?php if ($lic_clock_suspect && $lic_err !== "") { ?>
+					<dt><?= l7_t("Detalhe"); ?></dt>
+					<dd><span class="text-danger"><?= htmlspecialchars($lic_err); ?></span>
+						<p class="help-block" style="margin-top:6px;">
+							<?= l7_t("Relogio do sistema atrasado face a marca observada. Sincronize a hora (NTP) e reinicie o servico layer7d. Ver runbook anti-rollback."); ?>
+						</p>
+					</dd>
+					<?php } elseif (!$lic_valid && $lic_err !== "" && !$lic_dev) { ?>
+					<dt><?= l7_t("Detalhe"); ?></dt>
+					<dd><span class="text-muted"><?= htmlspecialchars($lic_err); ?></span></dd>
 					<?php } ?>
 				</dl>
 				<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>

@@ -246,6 +246,133 @@ parse_date(const char *s, struct tm *tm)
 	return 0;
 }
 
+/* --- anti-rollback clock mark (30.6 / ADR-0033) --- */
+
+static int parse_time_json_field(const char *json, const char *key, time_t *out);
+
+int
+layer7_clock_eval(time_t now, time_t max_seen,
+    time_t *new_max_seen, long *delta_sec)
+{
+	long delta;
+
+	if (new_max_seen)
+		*new_max_seen = max_seen;
+	if (delta_sec)
+		*delta_sec = 0;
+
+	if (now <= 0)
+		return 0;
+
+	if (max_seen <= 0) {
+		if (new_max_seen)
+			*new_max_seen = now;
+		return 0;
+	}
+
+	if (now >= max_seen) {
+		if (new_max_seen)
+			*new_max_seen = now;
+		return 0;
+	}
+
+	delta = (long)(max_seen - now);
+	if (delta_sec)
+		*delta_sec = delta;
+	/* Nunca mover a marca para trás. */
+	if (new_max_seen)
+		*new_max_seen = max_seen;
+	if (delta > L7_CLOCK_SUSPECT_SEC)
+		return 1;
+	return 0;
+}
+
+static const char *
+clock_mark_path(void)
+{
+	const char *e = getenv("L7_CLOCK_MARK_PATH");
+
+	if (e != NULL && e[0] != '\0')
+		return e;
+	return L7_CLOCK_MARK_PATH;
+}
+
+static int
+clock_mark_ensure_dir(const char *path)
+{
+	char dir[512];
+	char *slash;
+	size_t n;
+
+	n = strlen(path);
+	if (n == 0 || n >= sizeof(dir))
+		return -1;
+	memcpy(dir, path, n + 1);
+	slash = strrchr(dir, '/');
+	if (slash == NULL || slash == dir)
+		return 0;
+	*slash = '\0';
+	if (mkdir(dir, 0755) == 0 || errno == EEXIST)
+		return 0;
+	/* pai /var/db pode já existir; tentar só o leaf falhou por outro motivo */
+	return -1;
+}
+
+static int
+clock_mark_load(time_t *max_seen)
+{
+	char *raw;
+	size_t len;
+	time_t v = 0;
+
+	if (max_seen)
+		*max_seen = 0;
+	raw = read_file_alloc(clock_mark_path(), &len);
+	if (!raw)
+		return 0;
+	if (parse_time_json_field(raw, "max_seen", &v) == 0 && v > 0) {
+		if (max_seen)
+			*max_seen = v;
+		free(raw);
+		return 1;
+	}
+	free(raw);
+	return 0;
+}
+
+static int
+clock_mark_save(time_t max_seen)
+{
+	const char *path;
+	char tmp[560];
+	FILE *f;
+
+	if (max_seen <= 0)
+		return -1;
+	path = clock_mark_path();
+	(void)clock_mark_ensure_dir(path);
+	snprintf(tmp, sizeof(tmp), "%s.tmp", path);
+	f = fopen(tmp, "w");
+	if (!f)
+		return -1;
+	fprintf(f,
+	    "{\n"
+	    "  \"v\": 1,\n"
+	    "  \"max_seen\": %lld\n"
+	    "}\n",
+	    (long long)max_seen);
+	if (fclose(f) != 0) {
+		(void)unlink(tmp);
+		return -1;
+	}
+	(void)chmod(tmp, 0600);
+	if (rename(tmp, path) != 0) {
+		(void)unlink(tmp);
+		return -1;
+	}
+	return 0;
+}
+
 int
 layer7_license_check(struct l7_license_info *info)
 {
@@ -410,6 +537,35 @@ layer7_license_check(struct l7_license_info *info)
 		info->features_flags = checkin_effective_features(feat.flags);
 	}
 	info->days_left = (int)diff_days;
+
+	/* Anti-rollback 30.6: após assinatura+HW OK; antes de aceitar valid/grace. */
+	{
+		time_t max_seen = 0;
+		time_t new_max = 0;
+		long delta = 0;
+		int suspect;
+
+		(void)clock_mark_load(&max_seen);
+		suspect = layer7_clock_eval(now, max_seen, &new_max, &delta);
+		info->clock_max_seen = new_max;
+		info->clock_delta_sec = delta;
+		if (new_max > max_seen)
+			(void)clock_mark_save(new_max);
+
+		if (suspect) {
+			info->clock_suspect = 1;
+			info->valid = 0;
+			info->grace = 0;
+			if (diff_days < 0)
+				info->expired = 1;
+			snprintf(info->error, sizeof(info->error),
+			    "clock rollback suspected (delta=%ld s) — "
+			    "enforce degraded to monitor; sync time and "
+			    "restart layer7d",
+			    delta);
+			return -1;
+		}
+	}
 
 	if (diff_days >= 0) {
 		info->valid = 1;

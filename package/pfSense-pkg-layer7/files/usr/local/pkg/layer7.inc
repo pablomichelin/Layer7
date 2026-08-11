@@ -6305,6 +6305,11 @@ function layer7_read_license_status()
 			"expired" => !empty($stats["license_expired"]),
 			"grace" => !empty($stats["license_grace"]),
 			"dev_mode" => !empty($stats["license_dev_mode"]),
+			"clock_suspect" => !empty($stats["license_clock_suspect"]),
+			"clock_max_seen" => isset($stats["license_clock_max_seen"])
+			    ? (int)$stats["license_clock_max_seen"] : 0,
+			"clock_delta_sec" => isset($stats["license_clock_delta_sec"])
+			    ? (int)$stats["license_clock_delta_sec"] : 0,
 			"days_left" => isset($stats["license_days_left"]) ? (int)$stats["license_days_left"] : 0,
 			"customer" => isset($stats["license_customer"]) ? $stats["license_customer"] : "",
 			"expiry" => isset($stats["license_expiry"]) ? $stats["license_expiry"] : "",
