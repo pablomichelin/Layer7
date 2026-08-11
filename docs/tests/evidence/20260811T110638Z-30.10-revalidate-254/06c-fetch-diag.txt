@@ -1,0 +1,7 @@
+=== diag fetch vs curl ===
+/tmp/l7-manifest-fetch-test.txt                        823  B 5186 kBps    00s
+-rw-r--r--  1 root wheel 823 Apr 24 23:14 /tmp/l7-manifest-fetch-test.txt
+http=302 redir=https://release-assets.githubusercontent.com/[REDACTED]
+http=200
+-rw-r--r--  1 root wheel 823 Aug 11 08:08 /tmp/l7-manifest-curl-L.txt
+-rw-r--r--  1 root wheel   0 Aug 11 08:08 /tmp/l7-manifest-curl-nol.txt

@@ -1,0 +1,3 @@
+layer7d: check-in OK — license active
+-rw-------  1 root wheel 424 Aug 11 08:07 /var/db/layer7/content-subscription.json
+mode_octal=600

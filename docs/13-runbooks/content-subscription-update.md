@@ -1,14 +1,15 @@
 # Runbook — Subscrição de conteúdo / update de blacklists (passo 30.10)
 
 **Versão do mecanismo:** a partir de `1.9.53`  
-**Gate:** GA4.5–4.7/4.9 **PASS** (local + parcial campo); **GA4.4 BLOCKED** até
-deploy license-server **30.9** live + e2e  
+**Gate:** GA4.5–4.7/4.9 **PASS** (local + parcial campo); **GA4.4 BLOCKED** —
+token/check-in OK com 30.9 live; update autenticado FAIL (HTTP 302)  
 **Contrato:** [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md)  
 **Estado persistente:** `/var/db/layer7/content-subscription.json` (modo `0600`)  
 **Validade nominal:** 30 dias · skew ±1 dia  
-**Campo (`2026-08-11`):** STOP/BLOCKED — evidência
-[`../tests/evidence/20260811T020533Z-30.10-validate-254/`](../tests/evidence/20260811T020533Z-30.10-validate-254/);
-produção restaurada a `1.9.47`. **Não** promover `1.9.53` sem emissão live.
+**Campo (`2026-08-11` revalidação):** STOP/ROLLBACK — evidência
+[`../tests/evidence/20260811T110638Z-30.10-revalidate-254/`](../tests/evidence/20260811T110638Z-30.10-revalidate-254/);
+produção restaurada a `1.9.47`. **Não** promover `1.9.53` até `fetch_authed`
+seguir redirects do mirror (ou primary CDN operacional).
 
 ---
 
@@ -35,6 +36,7 @@ por rede (R-C, R-D, R-E).
 |---------|-------------------|
 | GUI Blacklists → Subscrição **Ausente** / **Expirada** / **Inválida** | Sem token utilizável para update corrente |
 | Log `/var/log/layer7-bl-update.log`: `content subscription not valid` | Update abortado **antes** do fetch |
+| Log: `content subscription token OK` + `authenticated fetch failed (HTTP 302)` | Token válido, mas `fetch_authed`/`curl` **não** segue redirect do mirror GitHub — conhecido em `1.9.53` (GA4.4 BLOCKED) |
 | Snapshot activa / LKG inalterados após falha | Comportamento correcto (hold-active) |
 | Enforce / modo Layer7 inalterado | Esperado (token ≠ licença de runtime) |
 

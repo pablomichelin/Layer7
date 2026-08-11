@@ -255,12 +255,13 @@ sem token não actualiza conteúdo corrente; mantém blacklists locais e enforce
 (R-D/R-C). Persistência `/var/db/layer7/content-subscription.json` no check-in;
 GUI estado de subscrição; runbook `docs/13-runbooks/content-subscription-update.md`.
 Testes locais/builder PASS. Pubkey SoT inalterada. Sem 30.11 (espelho).
-**Nota campo (`2026-08-11`):** validação em `192.168.100.254` terminou
-**STOP/BLOCKED** — `license.systemup.inf.br` ainda não emite
-`content_subscription` (30.9 não deployado no servidor). Rollback PASS para
-baseline real **`1.9.47`**. **Não** promover `1.9.53` em produção até deploy
-controlado do license-server 30.9 + nova janela de validação. GA4.4 **BLOCKED**.
-Evidência: `docs/tests/evidence/20260811T020533Z-30.10-validate-254/`.
+**Nota campo (`2026-08-11`):** 30.9 **live PASS** (emite `content_subscription`).
+Revalidação em `192.168.100.254` terminou **STOP/ROLLBACK** — check-in+token
+**PASS**, mas update autenticado **FAIL** (`fetch_authed` HTTP 302 no mirror
+GitHub; primary CDN sem DNS). Rollback PASS para baseline real **`1.9.47`** +
+heal fallback healthy. **Não** promover `1.9.53` em produção até fix do fetch
+autenticado + nova janela. GA4.4 **BLOCKED**.
+Evidência: `docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`.
 **Canal `latest`:** `1.9.53` (publicado). Enforce **`1.9.8`**. Rollback lab: **`1.9.52`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.53`

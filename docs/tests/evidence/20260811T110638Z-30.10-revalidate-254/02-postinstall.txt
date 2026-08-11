@@ -1,0 +1,48 @@
+=== post-install ===
+Tue Aug 11 11:07:42 UTC 2026
+version=1.9.53
+Name           : pfSense-pkg-layer7
+Version        : 1.9.53
+Installed on   : Tue Aug 11 08:07:11 2026 -03
+layer7d is running as pid 26759.
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=1246
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2030-01-09
+features=base,identity,mitm
+features_flags=0x7
+features_truncated=0
+clock_suspect=0
+clock_max_seen=1786446462
+clock_delta_sec=0
+enabled=true
+mode="monitor"
+=== active snapshot ===
+snapshot_id=ut1-2026-04-25
+manifest_url=https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt
+snapshot_url=https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-ut1.tar.gz
+source_role=mirror
+validated_at_utc=2026-08-11T06:00:04Z
+applied_at_utc=2026-08-11T06:00:05Z
+upstream_url=https://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz
+upstream_acquired_at_utc=2026-04-25T02:13:58Z
+categories_count=69
+domains_count=6623069
+cache_dir=/usr/local/etc/layer7/blacklists/.cache/ut1-2026-04-25
+=== fallback ===
+status=healthy
+component=blacklists-update
+mode=normal
+updated_at_utc=2026-08-11T06:00:07Z
+reason=validated snapshot promoted from official source
+safe_state=snapshot:ut1-2026-04-25
+operator_action=none
+active_snapshot_id=ut1-2026-04-25
+lkg_snapshot_id=ut1-2026-04-25
+NET_WAN_OK
+NET_LAN_OK
+forwarding=1

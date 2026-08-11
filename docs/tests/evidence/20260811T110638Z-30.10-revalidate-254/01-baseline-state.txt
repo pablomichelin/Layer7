@@ -1,0 +1,57 @@
+=== date ===
+Tue Aug 11 11:07:08 UTC 2026
+=== pkg ===
+Name           : pfSense-pkg-layer7
+Version        : 1.9.47
+Installed on   : Mon Aug 10 23:07:55 2026 -03
+=== layer7d -V ===
+1.9.47
+=== service ===
+layer7d is running as pid 13181.
+=== license-status ===
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=1246
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2030-01-09
+features=base,identity,mitm
+features_flags=0x0
+features_truncated=0
+=== fingerprint ===
+e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+=== forwarding ===
+net.inet.ip.forwarding: 1
+net.inet6.ip6.forwarding: 1
+=== mode/config snippets ===
+enabled=null
+mode=null
+=== content-subscription ===
+ls: /var/db/layer7/content-subscription.json: No such file or directory
+=== active snapshot ===
+=== fallback ===
+status=healthy
+component=blacklists-update
+mode=normal
+updated_at_utc=2026-08-11T06:00:07Z
+reason=validated snapshot promoted from official source
+safe_state=snapshot:ut1-2026-04-25
+operator_action=none
+active_snapshot_id=ut1-2026-04-25
+lkg_snapshot_id=ut1-2026-04-25
+=== checkin meta (redacted) ===
+{
+    "license_key": "[REDACTED]",
+    "last_check_in_ok": 1786414061,
+    "last_check_in_attempt": 1786414060,
+    "check_in_interval_hours": 168,
+    "max_offline_hours": 336,
+    "last_error": "",
+    "features": "base,identity,mitm",
+    "features_set": true
+}
+=== ping ===
+NET_WAN_OK
+NET_LAN_OK

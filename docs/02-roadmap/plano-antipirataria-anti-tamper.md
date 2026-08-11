@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.10` código/release FECHADO** (`1.9.53`); **uso em campo BLOCKED** até deploy license-server **30.9**; próximo operacional = essa decisão humana (não `30.11`); lab/`latest` **`1.9.53`**; produção observada **`1.9.47`** (rollback PASS); GA4.4 **BLOCKED**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.10` código/release FECHADO** (`1.9.53`); **30.9 live PASS**; **campo BLOCKED** — revalidação `.254` STOP (`fetch_authed` HTTP 302); próximo = fix fetch autenticado + nova janela (não `30.11`); lab/`latest` **`1.9.53`**; produção observada **`1.9.47`** (rollback PASS); GA4.4 **BLOCKED**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -26,11 +26,11 @@
 |-------|-------|
 | Onda actual | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
 | Passo actual | **`30.10`** — código/release **FECHADO**; campo **BLOCKED** |
-| Próximo | **Deploy controlado license-server 30.9** + nova validação (GO humano) — **antes** de `30.11` |
+| Próximo | **Fix `fetch_authed` (302)** + candidato `.pkg` + revalidação `.254` (GO) — **antes** de `30.11` |
 | Depois | `30.11` (GO espelho) → AP3 `30.12`… |
-| Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2`; campo AP2 bloqueado sem emissão live |
-| Código alterado até agora | `license-server` repo (`30.9`) + cliente/pkg **`1.9.53`** (`30.10`); **servidor live sem 30.9** |
-| Gate activo | **GA4 parcial** — GA4.4 **BLOCKED**; GA4.5–4.7/4.9 PASS; falta deploy+e2e e `30.11` |
+| Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2`; e2e AP2 bloqueado por fetch autenticado 302 |
+| Código alterado até agora | `license-server` **30.9 live**; cliente/pkg **`1.9.53`** (`30.10`) |
+| Gate activo | **GA4 parcial** — GA4.4 **BLOCKED**; GA4.5–4.7/4.9 PASS; falta fix+e2e e `30.11` |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -40,12 +40,13 @@ TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Passo: 30.10 código/release FECHADO (1.9.53); campo BLOCKED
-- Pré-requisito humano: deploy license-server 30.9 + revalidação
+- 30.9 live: PASS (20260811T110043Z); check-in+token .254 PASS
+- Bloqueio e2e: fetch_authed HTTP 302 + primary CDN DNS
 - ADRs 0030–0033: Aceito (30.1b)
 - Gate GA0/GA1/GA3: PASS; GA4.4 BLOCKED; GA4.5–4.7/4.9 PASS (local+.254 parcial)
-- Evidência: docs/tests/evidence/20260811T020533Z-30.10-validate-254/
-- Produção .254: rollback PASS → 1.9.47; latest git/release: 1.9.53
-- BG-117: cliente publicado; falta deploy 30.9 live + e2e + 30.11
+- Evidência: 20260811T110638Z-30.10-revalidate-254 (rollback → 1.9.47)
+- Produção .254: 1.9.47; latest git/release: 1.9.53
+- BG-117: falta fix fetch autenticado + e2e + 30.11
 - NÃO iniciar 30.11 neste estado
 ```
 
@@ -289,14 +290,15 @@ casos C1–C12. **Zero código.**
 **Risco:** nulo (documental). **Rollback:** reverter commit documental.
 **Gate:** GA4.1 / GA4.14 **PASS**.
 
-#### 30.9 — Emissão do token no license server — **FECHADO** (`2026-08-10`)
+#### 30.9 — Emissão do token no license server — **FECHADO** (`2026-08-10`) + **live PASS** (`2026-08-11`)
 
 **Objectivo:** servidor emite token de subscrição para licença activa.
 **Implementação:** `content-subscription.js` + `buildActiveCheckInResponse(..., {hardwareId})`;
 campo `content_subscription` no JSON activo; denied sem campo; mesma
 `ED25519_PRIVATE_KEY` do `.lic`; TTL 30d; sem migração schema; sem segredos no git.
 **Teste:** `npm test` no backend — **112 PASS** (incl. GA4.2/GA4.3).
-**Risco:** Médio (serviço). **Rollback:** deploy anterior do license-server.
+**Deploy live:** `192.168.100.244` RUNID `20260811T110043Z` — smoke active/denied PASS.
+**Risco:** Médio (serviço). **Rollback:** imagem `api` pré-tag + tarball.
 **Gate:** GA4.2 / GA4.3 / GA4.13 **PASS**.
 
 #### 30.10 — Cliente: actualização de conteúdo com token — **FECHADO (código/release)** / **BLOCKED (campo)** (`2026-08-10`/`11`)
@@ -309,19 +311,21 @@ Blacklists/Settings; runbook `content-subscription-update.md`; `.pkg` **`1.9.53`
 publicado (`v1.9.53`).
 **Teste local/builder:** `test_content_subscription_update.sh` +
 `test_content_subscription_client.php` **PASS**.
-**Validação `.254`:** parcial — install OK; check-in OK; sem-token hold-active
-**PASS**; token válido **BLOCKED** porque `license.systemup.inf.br` **não**
-emite `content_subscription` (30.9 não deployado no servidor live). Rollback
-**PASS** → baseline real **`1.9.47`**. Evidência
-`docs/tests/evidence/20260811T020533Z-30.10-validate-254/`.
-**Risco:** **Alto operacional** em campo sem emissão live — updates de BL
-ficam bloqueados. Mitigação: não promover `1.9.53` em produção até deploy 30.9
-+ revalidação.
+**Validação `.254` (1ª janela):** token ausente (30.9 ainda não live) — evidência
+`20260811T020533Z-30.10-validate-254/`.
+**Revalidação `.254` (pós-30.9 live):** install OK; check-in+token **PASS**;
+update com token **FAIL** — `fetch_authed` recebe HTTP **302** no mirror GitHub
+(`curl` sem seguir redirect); primary `downloads.systemup.inf.br` sem DNS.
+Hold-active; enforce/mode intactos. Rollback **PASS** → **`1.9.47`** + heal
+fallback healthy. Evidência
+`docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`.
+**Risco:** **Alto operacional** — `1.9.53` em campo bloqueia updates de BL enquanto
+o fetch autenticado não seguir redirects (ou o primary CDN não existir).
 **Rollback:** lab `1.9.52`; produção observada restaurou **`1.9.47`**.
-**Gate:** GA4.5–4.7/4.9 **PASS**; **GA4.4 BLOCKED** (e2e campo). **Não**
+**Gate:** GA4.5–4.7/4.9 **PASS**; **GA4.4 BLOCKED** (e2e update). **Não**
 considerar GA/e2e de campo concluído. **Não** iniciar `30.11` neste estado.
-**Pré-requisito / decisão humana:** deploy controlado do license-server com
-**30.9**, seguido de nova janela de validação.
+**Pré-requisito / decisão humana:** corrigir `fetch_authed` num candidato `.pkg`
++ nova janela de validação.
 
 #### 30.11 — Retirada do espelho público de conteúdo corrente
 

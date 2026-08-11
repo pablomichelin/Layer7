@@ -2,10 +2,12 @@
 
 > **Diagnóstico ACEITE** `2026-08-10` — [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md).
 > **`30.10` código/build/release FECHADO** — `.pkg` `1.9.53` + testes locais/builder PASS.
-> **Campo STOP/BLOCKED:** `license.systemup.inf.br` ainda **não** emite `content_subscription`
-> (30.9 **não** deployado no servidor). Validação `.254` parcial; rollback PASS → **`1.9.47`**.
+> **`30.9` live PASS** — `license.systemup.inf.br` emite `content_subscription` (`20260811T110043Z`).
+> **Campo STOP/BLOCKED:** revalidação `.254` — check-in+token **PASS**, update autenticado
+> **FAIL** (`fetch_authed` HTTP 302 no mirror GitHub; primary CDN sem DNS). Rollback PASS → **`1.9.47`**.
+> Evidência: [`../tests/evidence/20260811T110638Z-30.10-revalidate-254/`](../tests/evidence/20260811T110638Z-30.10-revalidate-254/).
 > **Não** declarar GA/e2e de campo concluído. **Não** iniciar `30.11` neste estado.
-> **Próxima decisão humana:** deploy controlado license-server **30.9** + nova janela de validação.
+> **Próxima decisão humana:** corrigir `fetch_authed` (seguir redirect) num candidato `.pkg` + nova janela `.254`.
 > **Proibido:** fail-closed por rede · kill-switch remoto · ofuscação pesada · anti-debug.
 > **Proibido:** misturar um passo `30.x` com promoção de enforce, MITM (`20.x`) ou IPv6.
 > **Honestidade:** root no appliance **pode** contornar verificação local. Não prometer o contrário.
@@ -25,7 +27,7 @@ docs/00-overview/START-HERE-antipirataria.md
 3. O **passo actual** está na tabela *Estado actual* e no progresso compacto — deve coincidir com o plano §0 e o CORTEX.
 4. **Um passo por chat** (plano §8). Não usar `START-HERE-identity-mitm.md` nem `START-HERE-fecho-producao.md` para esta trilha.
 5. Se CORTEX / plano / este ficheiro divergirem no passo actual → **parar** e declarar conflito.
-6. **Não** iniciar `30.11` enquanto GA4.4 estiver **BLOCKED** / license-server live sem 30.9.
+6. **Não** iniciar `30.11` enquanto GA4.4 estiver **BLOCKED**.
 
 | Documento | Papel |
 |-----------|--------|
@@ -33,7 +35,7 @@ docs/00-overview/START-HERE-antipirataria.md
 | [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) | Diagnóstico A-01…A-10 — ACEITE |
 | [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) | **SSOT** (ondas AP0–AP4, passos `30.x`, §8 Composer) |
 | [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) | Gates — GA4.4 **BLOCKED**; GA4.5–4.7/4.9 PASS |
-| Evidência `.254` | [`../tests/evidence/20260811T020533Z-30.10-validate-254/`](../tests/evidence/20260811T020533Z-30.10-validate-254/) |
+| Evidência `.254` (revalidação) | [`../tests/evidence/20260811T110638Z-30.10-revalidate-254/`](../tests/evidence/20260811T110638Z-30.10-revalidate-254/) |
 | [ADR-0030](../03-adr/ADR-0030-postura-anti-tamper-layer7d.md) … [0033](../03-adr/ADR-0033-anti-rollback-relogio.md) | **`Aceito`** |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional vivo |
 
@@ -47,12 +49,13 @@ docs/00-overview/START-HERE-antipirataria.md
 |-------|-------|
 | Onda | **AP2 em curso** |
 | Passo código | **`30.10` FECHADO** (cliente `1.9.53` publicado) |
-| Campo / e2e | **BLOCKED** — falta deploy live 30.9 + revalidação |
-| Próxima acção | **Deploy controlado license-server 30.9** (GO humano) — **não** `30.11` |
+| Campo / e2e | **BLOCKED** — token OK; update autenticado FAIL (302) |
+| Próxima acção | **Fix `fetch_authed` + candidato `.pkg` + revalidação `.254`** — **não** `30.11` |
 | Gate activo | **GA4 parcial** — GA4.4 **BLOCKED**; GA4.5–4.7/4.9 PASS; falta `30.11` |
 | Código de produto | **`.pkg` lab/`latest` `1.9.53`**; produção `.254` = **`1.9.47`** |
 | Canal lab/`latest` | **`1.9.53`** — rollback lab **`1.9.52`** |
 | Baseline produção enforce | **`1.9.8`** — rollback enforce `1.9.0` |
+| License-server 30.9 | **live PASS** |
 | Rev. do plano | **`2026-08-10c`** |
 
 ### Desambiguação
@@ -95,7 +98,7 @@ a execução controlada de `30.11` e `30.14`.
 4. [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md)
 5. [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) — §0, §0.0, §0.1 RR, §1 N1–N8, **§8 Composer**, estado `30.10`
 6. [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) — GA4 (esp. GA4.4 BLOCKED)
-7. Evidência [`../tests/evidence/20260811T020533Z-30.10-validate-254/`](../tests/evidence/20260811T020533Z-30.10-validate-254/)
+7. Evidência [`../tests/evidence/20260811T110638Z-30.10-revalidate-254/`](../tests/evidence/20260811T110638Z-30.10-revalidate-254/)
 8. Contrato [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md) + ADR-0031
 
 Baseline: [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)
@@ -106,14 +109,15 @@ Baseline: [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHAD
 
 ```text
 Modelo: Composer 2.5.
-Contexto: trilha Anti-pirataria; 30.10 código/release 1.9.53 FECHADO; campo BLOCKED.
+Contexto: trilha Anti-pirataria; 30.10 código/release 1.9.53 FECHADO; 30.9 live PASS;
+campo BLOCKED por fetch_authed HTTP 302 no mirror.
 Arranque: docs/00-overview/START-HERE-antipirataria.md
-Estado: license.systemup.inf.br NÃO emite content_subscription (30.9 não deployado).
-Evidência: docs/tests/evidence/20260811T020533Z-30.10-validate-254/
-AGORA (só com GO humano): deploy controlado do license-server com 30.9;
+Estado: token/check-in OK em .254; update autenticado FAIL; produção 1.9.47.
+Evidência: docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/
+AGORA (só com GO humano): corrigir fetch_authed (seguir 302) num candidato .pkg;
 depois nova janela de validação appliance (check-in→token→update).
 Proibido neste chat sem GO: 30.11; promover 1.9.53 em produção; ofuscação.
-NÃO declarar GA4.4 PASS sem e2e de campo com token real.
+NÃO declarar GA4.4 PASS sem e2e de campo com update real.
 Português.
 ```
 
@@ -156,9 +160,10 @@ TRILHA ANTI-PIRATARIA — progresso
 - Rev. plano: 2026-08-10c
 - Onda: AP2 em curso
 - Passo: 30.10 código/release FECHADO (1.9.53); campo BLOCKED
-- Pré-requisito: deploy license-server 30.9 + revalidação (GO humano)
+- 30.9 live: PASS; check-in+token .254 PASS
+- Bloqueio e2e: fetch_authed HTTP 302 + primary CDN DNS
 - Gate: GA4.4 BLOCKED; GA4.5–4.7/4.9 PASS; NÃO e2e campo completo
-- Evidência .254: 20260811T020533Z — rollback PASS → 1.9.47
+- Evidência: 20260811T110638Z-30.10-revalidate-254 — rollback PASS → 1.9.47
 - Latest publicado: 1.9.53; produção observada: 1.9.47
 - NÃO iniciar 30.11
 - Agente: Composer 2.5 — um passo / chat (plano §8)
@@ -174,7 +179,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit de cada f
 |------|-----------|
 | Plano + §8 Composer | [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) |
 | Gates | [`../09-blocking/plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) |
-| Evidência campo 30.10 | [`../tests/evidence/20260811T020533Z-30.10-validate-254/`](../tests/evidence/20260811T020533Z-30.10-validate-254/) |
+| Evidência revalidação | [`../tests/evidence/20260811T110638Z-30.10-revalidate-254/`](../tests/evidence/20260811T110638Z-30.10-revalidate-254/) |
 | Runbook 30.10 | [`../13-runbooks/content-subscription-update.md`](../13-runbooks/content-subscription-update.md) |
 | Contrato 30.8 | [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md) |
 

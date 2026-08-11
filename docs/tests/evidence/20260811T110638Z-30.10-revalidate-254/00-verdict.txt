@@ -1,0 +1,22 @@
+RUN: 30.10 revalidation on 192.168.100.254 after 30.9 live
+RUNID=20260811T110638Z
+RESULT: STOP + ROLLBACK — field e2e NOT complete
+
+Baseline: 1.9.47 (monitor, license valid, snapshot ut1-2026-04-25 healthy)
+Installed: 1.9.53 — POSTINSTALL_PASS (service/license/mode/net/snapshot OK)
+Check-in: OK (status=active) + content_subscription PRESENT (30.9 live PASS)
+  token file mode 0600; check-subscription=ok; payload v=1 scope=content
+Update with token: FAIL
+  token gate PASS (content subscription token OK)
+  primary downloads.systemup.inf.br: DNS fail (pre-existing)
+  mirror GitHub: authenticated fetch HTTP 302 (curl without follow) — blocks update
+  hold-active kept snapshot ut1-2026-04-25; enforce/mode untouched
+No-token / GUI helper: NOT reached (STOP after token-update FAIL)
+Regression decision: 1.9.53 cannot complete functional blacklist update in field
+  while authenticated mirror fetch fails on redirect → STOP + rollback 1.9.47
+ROLLBACK_PASS: 1.9.47, layer7d running, monitor, valid=1, snapshot intact, net OK
+Heal after rollback: anonymous update on 1.9.47 RC=0; fallback status=healthy
+30.9 live remains deployed on license-server (untouched)
+30.11: NOT started
+Follow-up needed: fix authenticated fetch redirect handling (client curl -L / equiv)
+  and/or primary CDN downloads.systemup.inf.br DNS

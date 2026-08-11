@@ -1,0 +1,6 @@
+=== pre-rollback ===
+Tue Aug 11 11:08:38 UTC 2026
+1.9.53
+layer7d is running as pid 26759.
+enabled=true mode="monitor"
+snapshot_id=ut1-2026-04-25
