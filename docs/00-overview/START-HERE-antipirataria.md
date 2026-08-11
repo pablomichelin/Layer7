@@ -1,15 +1,15 @@
-# START HERE — Anti-pirataria e Anti-tamper 【`30.9` FECHADO · próximo `30.10` · **Composer 2.5**】
+# START HERE — Anti-pirataria e Anti-tamper 【`30.10` FECHADO · próximo `30.11` · **Composer 2.5**】
 
 > **Diagnóstico ACEITE** `2026-08-10` — [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md).
-> **`30.9` FECHADO** — emissão `content_subscription` no check-in; GA4.2/GA4.3/GA4.13 **PASS**.
-> **Passo actual a executar: `30.10`** — cliente update-blacklists com token.
+> **`30.10` FECHADO** — cliente update-blacklists + token; GUI; runbook; `.pkg` `1.9.53`.
+> **Passo actual a executar: `30.11`** — retirada do espelho (exige **GO humano**).
 > **Proibido:** fail-closed por rede · kill-switch remoto · ofuscação pesada · anti-debug.
 > **Proibido:** misturar um passo `30.x` com promoção de enforce, MITM (`20.x`) ou IPv6.
 > **Honestidade:** root no appliance **pode** contornar verificação local. Não prometer o contrário.
 > **Artefacto:** **`.pkg`** FreeBSD/pfSense (não APK Android).
 > **Rev. plano:** `2026-08-10c` — protocolo Composer §8 + RR-1…RR-5.
 > **Contrato 30.8:** [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md)
-> **Canal lab/`latest`:** `1.9.52` (publicado). Rollback lab: `1.9.51`.
+> **Canal lab/`latest`:** `1.9.53` (publicado). Rollback lab: `1.9.52`.
 
 ```text
 docs/00-overview/START-HERE-antipirataria.md
@@ -17,7 +17,7 @@ docs/00-overview/START-HERE-antipirataria.md
 
 ### Continuidade em chat limpo (obrigatório)
 
-1. Colar **apenas** o caminho acima **ou** o *Prompt — 30.10* abaixo.
+1. Colar **apenas** o caminho acima **ou** o *Prompt — 30.11* abaixo.
 2. O agente **deve** seguir a *Leitura obrigatória* **antes** de editar.
 3. O **passo actual** está na tabela *Estado actual* e no progresso compacto — deve coincidir com o plano §0 e o CORTEX.
 4. **Um passo por chat** (plano §8). Não usar `START-HERE-identity-mitm.md` nem `START-HERE-fecho-producao.md` para esta trilha.
@@ -28,7 +28,7 @@ docs/00-overview/START-HERE-antipirataria.md
 | **Este ficheiro** | Arranque de chat + estado + prompt Composer |
 | [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) | Diagnóstico A-01…A-10 — ACEITE |
 | [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) | **SSOT** (ondas AP0–AP4, passos `30.x`, §8 Composer) |
-| [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) | Gates — GA0/GA1/GA3 **PASS**; GA4.1/GA4.14 **PASS**; GA2 parcial |
+| [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) | Gates — GA0/GA1/GA3 **PASS**; GA4.1–4.9/4.13/4.14 **PASS**; GA2 parcial |
 | [`decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md) | 8 decisões — **GO `2026-08-10`** |
 | [ADR-0030](../03-adr/ADR-0030-postura-anti-tamper-layer7d.md) … [0033](../03-adr/ADR-0033-anti-rollback-relogio.md) | **`Aceito`** |
 | [`builder-freebsd.md`](../08-lab/builder-freebsd.md) | Builder — SoT pubkey (30.2) |
@@ -43,12 +43,12 @@ docs/00-overview/START-HERE-antipirataria.md
 | Campo | Valor |
 |-------|-------|
 | Onda | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
-| Passo actual | **`30.9` FECHADO** — próximo a executar: **`30.10`** |
+| Passo actual | **`30.10` FECHADO** — próximo a executar: **`30.11`** (GO espelho) |
 | Decisão 4 (pubkey) | **Fora do git (builder)** — SoT / chave licença inalterada |
-| Gate activo | **GA4 parcial** — GA4.1–4.3/4.13/4.14 **PASS**; falta `30.10`–`30.11` |
-| Código de produto | **license-server** (`30.9`); `.pkg` lab **`1.9.52`** (sem bump) |
+| Gate activo | **GA4 parcial** — GA4.1–4.9/4.13/4.14 **PASS**; falta `30.11` (GA4.10–4.12/4.15) |
+| Código de produto | **`.pkg` lab `1.9.53`** + license-server (`30.9`) |
 | Agente | **Composer 2.5** — um passo por chat (plano §8) |
-| Canal lab/`latest` | **`1.9.52`** — rollback lab **`1.9.51`** |
+| Canal lab/`latest` | **`1.9.53`** — rollback lab **`1.9.52`** |
 | Baseline produção enforce | **`1.9.8`** — rollback enforce `1.9.0` |
 | Prioridade de valor | **AP2** — GOs comerciais em princípio; execução `30.11`/`30.14` |
 | Rev. do plano | **`2026-08-10c`** |
@@ -91,32 +91,29 @@ a execução controlada de `30.11` e `30.14`.
 2. [`AGENTS.md`](../../AGENTS.md)
 3. [`CORTEX.md`](../../CORTEX.md) — secção *Trilha Anti-pirataria*
 4. [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md)
-5. [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) — §0, §0.0, §0.1 RR, §1 N1–N8, **§8 Composer**, passo actual (`30.10`)
-6. [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) — GA4.4+
+5. [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) — §0, §0.0, §0.1 RR, §1 N1–N8, **§8 Composer**, passo actual (`30.11`)
+6. [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) — GA4.10+
 7. Contrato [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md) + ADR-0031
-8. Código emissão: `license-server/backend/src/content-subscription.js`
+8. Runbook cliente: [`../13-runbooks/content-subscription-update.md`](../13-runbooks/content-subscription-update.md)
 
 Baseline: [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md)
 
 ---
 
-## Prompt — Composer 2.5 (passo `30.10`)
+## Prompt — Composer 2.5 (passo `30.11`)
 
 ```text
 Modelo: Composer 2.5.
-Contexto: trilha Anti-pirataria / Anti-tamper; baseline enforce 1.9.8; lab/latest 1.9.52 (.pkg).
+Contexto: trilha Anti-pirataria / Anti-tamper; baseline enforce 1.9.8; lab/latest 1.9.53 (.pkg).
 Arranque: docs/00-overview/START-HERE-antipirataria.md
 Plano SSOT: docs/02-roadmap/plano-antipirataria-anti-tamper.md (rev 2026-08-10c)
 Contrato: docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md
-Gates: docs/09-blocking/plano-gates-antipirataria.md (GA4.4–GA4.9)
+Gates: docs/09-blocking/plano-gates-antipirataria.md (GA4.10–GA4.12/GA4.15)
 Ler na ordem do START-HERE; cumprir plano §8 e contrato 30.8.
-Estado: 30.9 FECHADO; executar SOMENTE 30.10.
-AGORA: 30.10 — cliente update-blacklists apresenta token; sem token válido não
-actualiza mas mantém conteúdo e enforce (R-D/R-C); GUI estado subscrição;
-runbook; bump .pkg se necessário; SEM retirar espelho (30.11); NÃO iniciar
-30.11 neste chat salvo pedido explícito + GO.
-Proibido: ofuscação; misturar passos; MITM/IPv6/enforce; trocar pubkey;
-fail-closed; apagar blacklists sem token; segredos no git.
+Estado: 30.10 FECHADO; executar SOMENTE 30.11 — EXIGE GO HUMANO PRÓPRIO.
+AGORA: 30.11 — retirar/limitar espelho anónimo de conteúdo corrente; comunicação;
+procedimento de reposição (GA4.11); SEM misturar enforce/MITM/IPv6/pubkey.
+Proibido: ofuscação; misturar passos; falhar enforce; executar sem GO 30.11.
 Imprimir cartão PASSO/PERMITIDO/PROIBIDO/STOP/GATE/DoD antes de editar.
 Resposta final: Resumo, Arquivos, Implementação, Teste, Risco, Rollback, Docs.
 Português.
@@ -145,7 +142,7 @@ SSOT: [`../09-blocking/plano-gates-antipirataria.md`](../09-blocking/plano-gates
 | AP0 | GA1 | **PASS** (`30.2`+`30.3`) |
 | AP1 | GA2 | **PARCIAL** — GA2.1–2.5 + GA2.8–2.11 PASS; faltam GA2.6–2.7 (lab) |
 | AP1 | GA3 | **PASS** (`30.6`; GA3.7 DEFERRED) |
-| AP2 | GA4 | **PARCIAL** — GA4.1–4.3/4.13/4.14 PASS; falta cliente+espelho |
+| AP2 | GA4 | **PARCIAL** — GA4.1–4.9/4.13/4.14 PASS; falta espelho `30.11` |
 | AP3 | GA5 | PENDENTE |
 | AP4 | GA6 | PENDENTE |
 
@@ -162,12 +159,12 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c
 - Onda: AP2 em curso
-- Passo: 30.9 FECHADO; PRÓXIMO EXECUTAR = 30.10
+- Passo: 30.10 FECHADO; PRÓXIMO EXECUTAR = 30.11 (GO espelho)
 - ADRs 0030-0033: Aceito
-- Gate GA0/GA1/GA3: PASS; GA4.1–4.3/4.13/4.14 PASS
-- Contrato 30.8 + emissão check-in 30.9
-- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 em curso
-- Latest: 1.9.52 (.pkg; rollback lab 1.9.51) — sem bump 30.9
+- Gate GA0/GA1/GA3: PASS; GA4.1–4.9/4.13/4.14 PASS
+- Contrato 30.8 + emissão 30.9 + cliente 30.10
+- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 em curso (falta 30.11)
+- Latest: 1.9.53 (.pkg; rollback lab 1.9.52)
 - SoT pubkey: /root/layer7-build-secrets/
 - Agente: Composer 2.5 — um passo / chat (plano §8)
 ```
@@ -183,10 +180,10 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit de cada f
 | Plano + §8 Composer | [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) |
 | Gates | [`../09-blocking/plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) |
 | Runbook 30.6 | [`../13-runbooks/anti-rollback-relogio.md`](../13-runbooks/anti-rollback-relogio.md) |
+| Runbook 30.10 | [`../13-runbooks/content-subscription-update.md`](../13-runbooks/content-subscription-update.md) |
 | Contrato 30.8 | [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md) |
+| Teste 30.10 | [`../../tests/functional/test_content_subscription_update.sh`](../../tests/functional/test_content_subscription_update.sh) |
 | Teste 30.7 | [`../../tests/functional/test_entitlements_gui.php`](../../tests/functional/test_entitlements_gui.php) |
-| Teste 30.6 | [`../../tests/functional/test_license_clock.c`](../../tests/functional/test_license_clock.c) |
-| Teste 30.5 | [`../../scripts/package/test-prod-strip.sh`](../../scripts/package/test-prod-strip.sh) |
 | Builder | [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md) |
 
 ---

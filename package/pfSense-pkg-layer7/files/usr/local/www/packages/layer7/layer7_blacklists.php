@@ -263,6 +263,9 @@ $last_update = layer7_bl_last_update();
 $runtime_state = layer7_bl_runtime_state_load();
 $fallback_state = layer7_bl_fallback_state_load();
 $lkg_state = layer7_bl_lkg_state_load();
+$content_sub = function_exists("layer7_content_subscription_status")
+    ? layer7_content_subscription_status()
+    : array("status" => "missing", "ok" => false, "message" => "", "exp" => 0);
 $rules = isset($bl_config["rules"]) && is_array($bl_config["rules"]) ? $bl_config["rules"] : array();
 $bl_config = layer7_bl_normalize_resource_limits($bl_config);
 $bl_phys = layer7_bl_physmem_bytes();
@@ -352,6 +355,37 @@ htmlspecialchars(implode("\n", layer7_bl_official_mirror_urls()))?></textarea>
 		onclick="pollDownloadLog();">
 		<i class="fa fa-refresh"></i> <?=l7_t("Actualizar log")?>
 	</button>
+</div>
+
+<?php
+$cs_status = (string)($content_sub["status"] ?? "missing");
+if (!empty($content_sub["ok"])) {
+	$cs_badge = '<span class="label label-success">' . l7_t("OK") . '</span>';
+} elseif ($cs_status === "expired") {
+	$cs_badge = '<span class="label label-warning">' . l7_t("Expirada") . '</span>';
+} elseif ($cs_status === "missing") {
+	$cs_badge = '<span class="label label-warning">' . l7_t("Ausente") . '</span>';
+} else {
+	$cs_badge = '<span class="label label-danger">' . l7_t("Invalida") . '</span>';
+}
+$cs_exp_txt = "-";
+if (!empty($content_sub["exp"])) {
+	$cs_exp_txt = gmdate("Y-m-d H:i:s", (int)$content_sub["exp"]) . " UTC";
+}
+?>
+<div class="layer7-readonly-block" style="margin-top:14px;">
+	<label><?=l7_t("Subscricao de conteudo")?></label>
+	<dl class="dl-horizontal" style="margin-bottom:0;">
+		<dt><?=l7_t("Estado")?></dt>
+		<dd><?=$cs_badge?>
+			<small class="text-muted" style="margin-left:8px;"><?=htmlspecialchars((string)($content_sub["message"] ?? ""))?></small>
+		</dd>
+		<dt><?=l7_t("Valido ate")?></dt>
+		<dd><?=htmlspecialchars($cs_exp_txt)?></dd>
+		<dt><?=l7_t("Ficheiro")?></dt>
+		<dd><code>/var/db/layer7/content-subscription.json</code></dd>
+	</dl>
+	<p class="help-block" style="margin-top:10px;"><?=l7_t("Sem token valido o update de blacklists correntes nao corre; o conteudo local e o enforce mantem-se. Force check-in com licenca activa para renovar. Ver runbook de subscricao de conteudo.")?></p>
 </div>
 
 <div class="layer7-readonly-block" style="margin-top:14px;">

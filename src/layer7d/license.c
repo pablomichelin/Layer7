@@ -625,6 +625,10 @@ shell_safe_url(const char *s)
 #define L7_ACTIVATE_BODY_TMP "/var/db/layer7/activate.body"
 #define L7_ACTIVATE_HTTP_TMP "/var/db/layer7/activate.http"
 #define L7_VAR_DB_DIR "/var/db/layer7"
+/* Contrato 30.8 D6 — espelho do path em license.h. */
+#ifndef L7_CONTENT_SUBSCRIPTION_PATH
+#define L7_CONTENT_SUBSCRIPTION_PATH "/var/db/layer7/content-subscription.json"
+#endif
 
 static int
 ensure_layer7_var_db(void)
@@ -1005,6 +1009,70 @@ checkin_save_state(const struct l7_checkin_state *st)
 	return 0;
 }
 
+/*
+ * 30.10 / contrato 30.8: persiste content_subscription do check-in activo.
+ * Falha de parse/rede NÃO apaga o ficheiro anterior (R-J / offline).
+ * Denied paths não chamam isto — token antigo permanece até exp.
+ */
+static int
+checkin_persist_content_subscription(const char *response_body)
+{
+	char data_str[1536];
+	char sig_hex[140];
+	char tmp_path[sizeof(L7_CONTENT_SUBSCRIPTION_PATH) + 8];
+	FILE *f;
+	size_t i;
+
+	if (!response_body || !strstr(response_body, "\"content_subscription\""))
+		return 0;
+
+	memset(data_str, 0, sizeof(data_str));
+	memset(sig_hex, 0, sizeof(sig_hex));
+	if (!json_find_string(response_body, "data", data_str, sizeof(data_str)))
+		return -1;
+	if (!json_find_string(response_body, "sig", sig_hex, sizeof(sig_hex)))
+		return -1;
+	if (strlen(sig_hex) != 128)
+		return -1;
+	for (i = 0; sig_hex[i] != '\0'; i++) {
+		char c = sig_hex[i];
+		if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
+		    (c >= 'A' && c <= 'F')))
+			return -1;
+	}
+	if (data_str[0] == '\0')
+		return -1;
+
+	if (ensure_layer7_var_db() != 0)
+		return -1;
+
+	snprintf(tmp_path, sizeof(tmp_path), "%s.tmp",
+	    L7_CONTENT_SUBSCRIPTION_PATH);
+	f = fopen(tmp_path, "w");
+	if (!f)
+		return -1;
+
+	fputs("{\"data\":\"", f);
+	for (i = 0; data_str[i] != '\0'; i++) {
+		unsigned char c = (unsigned char)data_str[i];
+		if (c == '\\' || c == '"')
+			fputc('\\', f);
+		fputc((int)c, f);
+	}
+	fprintf(f, "\",\"sig\":\"%s\"}\n", sig_hex);
+	if (fclose(f) != 0) {
+		(void)unlink(tmp_path);
+		return -1;
+	}
+	(void)chmod(tmp_path, 0600);
+	if (rename(tmp_path, L7_CONTENT_SUBSCRIPTION_PATH) != 0) {
+		(void)unlink(tmp_path);
+		return -1;
+	}
+	(void)chmod(L7_CONTENT_SUBSCRIPTION_PATH, 0600);
+	return 0;
+}
+
 static int
 checkin_interval_seconds(const struct l7_checkin_state *st)
 {
@@ -1137,7 +1205,8 @@ layer7_check_in(const char *url)
 	char cmd[2048];
 	char body[512];
 	char http_code[8];
-	char response_body[2048];
+	/* 30.10: resposta activa inclui content_subscription (~1 KiB). */
+	char response_body[8192];
 	char status[32];
 	char server_error[256];
 	int rc, http_status;
@@ -1240,6 +1309,13 @@ layer7_check_in(const char *url)
 				    sizeof(st.features));
 				st.features_set = 1;
 			}
+		}
+
+		/* 30.10: token de conteúdo — só substitui se parse OK (R-J). */
+		if (checkin_persist_content_subscription(response_body) != 0) {
+			fprintf(stderr,
+			    "layer7d: check-in OK — content_subscription "
+			    "persist skipped (keeping previous token if any)\n");
 		}
 
 		st.last_check_in_ok = time(NULL);

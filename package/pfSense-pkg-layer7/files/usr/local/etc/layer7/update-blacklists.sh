@@ -3,10 +3,14 @@
 # Layer7 para pfSense CE — Systemup (www.systemup.inf.br)
 #
 # Uso:
-#   update-blacklists.sh                — download + apply (cron)
-#   update-blacklists.sh --download     — download + validacao + apply
-#   update-blacklists.sh --apply        — SIGHUP ao daemon
-#   update-blacklists.sh --restore-lkg  — restaura a last-known-good validada
+#   update-blacklists.sh                      — download + apply (cron)
+#   update-blacklists.sh --download           — download + validacao + apply
+#   update-blacklists.sh --apply              — SIGHUP ao daemon
+#   update-blacklists.sh --restore-lkg        — restaura a last-known-good validada
+#   update-blacklists.sh --check-subscription — valida token local (sem rede)
+#
+# 30.10: update de conteúdo corrente exige content-subscription.json válido
+# (Bearer). Sem token: não contacta URLs current; mantém snapshot; enforce OK.
 
 set -eu
 
@@ -27,6 +31,10 @@ CACHE_DIR="$BL_DIR/.cache"
 LKG_DIR="$BL_DIR/.last-known-good"
 LKG_STATE="$LKG_DIR/snapshot.state"
 PUBKEY="/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem"
+LICENSE_PUBKEY="${L7_LICENSE_PUBKEY:-/usr/local/share/pfSense-pkg-layer7/license-signing-public-key.pem}"
+CONTENT_SUBSCRIPTION_PATH="${L7_CONTENT_SUBSCRIPTION_PATH:-/var/db/layer7/content-subscription.json}"
+# Contrato 30.8 D1/D2
+CONTENT_SUBSCRIPTION_SKEW_SEC=86400
 PRIMARY_MANIFEST_URL="https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt"
 MIRROR_MANIFEST_URLS="https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt"
 LEGACY_HTTP_URL="http://dsi.ut-capitole.fr/blacklists/download/blacklists.tar.gz"
@@ -36,6 +44,9 @@ SIG_NAME="${MANIFEST_NAME}.sig"
 PUBKEY_ASSET="blacklists-signing-public-key.pem"
 SNAPSHOT_ASSET="layer7-blacklists-ut1.tar.gz"
 MIN_SIZE=1000000
+# Bearer base64url do envelope (preenchido após verify OK)
+CONTENT_BEARER=""
+CONTENT_SUB_REASON=""
 
 # Estado runtime fora de /tmp (auditoria 1.9.10).
 mkdir -p "$L7_VAR_DB"
@@ -189,6 +200,269 @@ state_value() {
 
 json_escape() {
 	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+# Extrai valor string JSON simples (primeira ocorrência da chave).
+json_string_field() {
+	_key="$1"
+	_file="$2"
+	# shellcheck disable=SC2016
+	sed -n "s/.*\"${_key}\"[[:space:]]*:[[:space:]]*\"\\(\\(\\\\.\\|[^\"\\\\]\\)*\\)\".*/\\1/p" "$_file" | head -1 | sed 's/\\"/"/g; s/\\\\/\\/g'
+}
+
+json_int_field() {
+	_key="$1"
+	_file="$2"
+	sed -n "s/.*\"${_key}\"[[:space:]]*:[[:space:]]*\\([0-9][0-9]*\\).*/\\1/p" "$_file" | head -1
+}
+
+base64url_file() {
+	_file="$1"
+	openssl base64 -A -in "$_file" 2>/dev/null | tr '+/' '-_' | tr -d '=\n\r'
+}
+
+local_hardware_id() {
+	if [ -n "${L7_CONTENT_HW_ID:-}" ]; then
+		printf '%s' "$L7_CONTENT_HW_ID"
+		return 0
+	fi
+	if command -v layer7d >/dev/null 2>&1; then
+		layer7d --fingerprint 2>/dev/null | head -1 | tr -d '\n\r'
+		return 0
+	fi
+	return 1
+}
+
+verify_ed25519_data_sig() {
+	_data_file="$1"
+	_sig_hex="$2"
+	_pubkey="$3"
+	_td="$TMP/cs-verify.$$"
+	mkdir -p "$_td"
+	_sig_bin="$_td/sig.bin"
+	# Hex → bin via PHP (sempre presente no appliance pfSense) ou python3.
+	if command -v php >/dev/null 2>&1; then
+		php -r 'file_put_contents($argv[2], hex2bin($argv[1]));' \
+			"$_sig_hex" "$_sig_bin" || {
+			rm -rf "$_td"
+			return 1
+		}
+	elif command -v python3 >/dev/null 2>&1; then
+		python3 -c 'import sys; open(sys.argv[2],"wb").write(bytes.fromhex(sys.argv[1]))' \
+			"$_sig_hex" "$_sig_bin" || {
+			rm -rf "$_td"
+			return 1
+		}
+	else
+		rm -rf "$_td"
+		return 1
+	fi
+	if openssl pkeyutl -verify -pubin -inkey "$_pubkey" -rawin \
+		-in "$_data_file" -sigfile "$_sig_bin" >/dev/null 2>&1; then
+		rm -rf "$_td"
+		return 0
+	fi
+	rm -rf "$_td"
+	return 1
+}
+
+# Extrai data/sig/payload fields do envelope via PHP ou python3.
+cs_parse_envelope() {
+	_env="$1"
+	_data_out="$2"
+	_sig_out="$3"
+	_meta_out="$4"
+	if command -v php >/dev/null 2>&1; then
+		php -r '
+$j = json_decode(file_get_contents($argv[1]), true);
+if (!is_array($j) || empty($j["data"]) || !is_string($j["data"]) ||
+    empty($j["sig"]) || !is_string($j["sig"])) { exit(1); }
+if (!preg_match("/^[0-9a-fA-F]{128}$/", $j["sig"])) { exit(1); }
+$p = json_decode($j["data"], true);
+if (!is_array($p)) { exit(1); }
+file_put_contents($argv[2], $j["data"]);
+file_put_contents($argv[3], $j["sig"]);
+$meta = array(
+  "v" => isset($p["v"]) ? (int)$p["v"] : -1,
+  "scope" => isset($p["scope"]) ? (string)$p["scope"] : "",
+  "hardware_id" => isset($p["hardware_id"]) ? (string)$p["hardware_id"] : "",
+  "iat" => isset($p["iat"]) ? (int)$p["iat"] : 0,
+  "exp" => isset($p["exp"]) ? (int)$p["exp"] : 0,
+);
+file_put_contents($argv[4], json_encode($meta));
+' "$_env" "$_data_out" "$_sig_out" "$_meta_out"
+		return $?
+	fi
+	if command -v python3 >/dev/null 2>&1; then
+		python3 -c '
+import json,sys,re
+j=json.load(open(sys.argv[1]))
+if not isinstance(j,dict) or not isinstance(j.get("data"),str) or not isinstance(j.get("sig"),str):
+    sys.exit(1)
+if not re.fullmatch(r"[0-9a-fA-F]{128}", j["sig"]):
+    sys.exit(1)
+p=json.loads(j["data"])
+open(sys.argv[2],"w").write(j["data"])
+open(sys.argv[3],"w").write(j["sig"])
+meta={"v":int(p.get("v",-1)),"scope":str(p.get("scope","")),
+      "hardware_id":str(p.get("hardware_id","")),
+      "iat":int(p.get("iat",0)),"exp":int(p.get("exp",0))}
+open(sys.argv[4],"w").write(json.dumps(meta))
+' "$_env" "$_data_out" "$_sig_out" "$_meta_out"
+		return $?
+	fi
+	return 1
+}
+
+# Verifica content-subscription.json (contrato 30.8). 0=OK; 1=inválido.
+# Define CONTENT_BEARER e CONTENT_SUB_REASON.
+load_and_verify_content_subscription() {
+	CONTENT_BEARER=""
+	CONTENT_SUB_REASON=""
+	_cs_path="$CONTENT_SUBSCRIPTION_PATH"
+	_pub="$LICENSE_PUBKEY"
+
+	if [ ! -f "$_cs_path" ]; then
+		CONTENT_SUB_REASON="missing"
+		return 1
+	fi
+	if [ ! -f "$_pub" ]; then
+		CONTENT_SUB_REASON="license-pubkey-missing"
+		return 1
+	fi
+
+	mkdir -p "$TMP"
+	_env_copy="$TMP/content-subscription.envelope.json"
+	_data_raw="$TMP/content-subscription.data.txt"
+	_sig_file="$TMP/content-subscription.sig.hex"
+	_meta_file="$TMP/content-subscription.meta.json"
+	cp "$_cs_path" "$_env_copy"
+
+	if ! cs_parse_envelope "$_env_copy" "$_data_raw" "$_sig_file" "$_meta_file"; then
+		CONTENT_SUB_REASON="envelope"
+		return 1
+	fi
+	_sig=$(cat "$_sig_file")
+
+	if ! verify_ed25519_data_sig "$_data_raw" "$_sig" "$_pub"; then
+		CONTENT_SUB_REASON="sig_verify"
+		return 1
+	fi
+
+	# Ler meta sem sed (portável BSD/GNU).
+	if command -v php >/dev/null 2>&1; then
+		_meta_line=$(php -r '
+$m=json_decode(file_get_contents($argv[1]), true);
+if (!is_array($m)) exit(1);
+echo (int)$m["v"]."|".$m["scope"]."|".$m["hardware_id"]."|".(int)$m["iat"]."|".(int)$m["exp"];
+' "$_meta_file") || {
+			CONTENT_SUB_REASON="fields"
+			return 1
+		}
+	elif command -v python3 >/dev/null 2>&1; then
+		_meta_line=$(python3 -c '
+import json,sys
+m=json.load(open(sys.argv[1]))
+print("%d|%s|%s|%d|%d" % (int(m["v"]), m["scope"], m["hardware_id"], int(m["iat"]), int(m["exp"])))
+' "$_meta_file") || {
+			CONTENT_SUB_REASON="fields"
+			return 1
+		}
+	else
+		CONTENT_SUB_REASON="no-json-tool"
+		return 1
+	fi
+	_v=$(printf '%s' "$_meta_line" | cut -d'|' -f1)
+	_scope=$(printf '%s' "$_meta_line" | cut -d'|' -f2)
+	_hw=$(printf '%s' "$_meta_line" | cut -d'|' -f3)
+	_iat=$(printf '%s' "$_meta_line" | cut -d'|' -f4)
+	_exp=$(printf '%s' "$_meta_line" | cut -d'|' -f5)
+
+	[ "$_v" = "1" ] || {
+		CONTENT_SUB_REASON="version"
+		return 1
+	}
+	[ "$_scope" = "content" ] || {
+		CONTENT_SUB_REASON="scope"
+		return 1
+	}
+	[ -n "$_hw" ] && [ -n "$_iat" ] && [ -n "$_exp" ] || {
+		CONTENT_SUB_REASON="fields"
+		return 1
+	}
+
+	_local_hw="$(local_hardware_id || true)"
+	if [ -z "$_local_hw" ]; then
+		CONTENT_SUB_REASON="local-hw"
+		return 1
+	fi
+	if [ "$_hw" != "$_local_hw" ]; then
+		CONTENT_SUB_REASON="hw_mismatch"
+		return 1
+	fi
+
+	_now=$(date +%s)
+	_skew="$CONTENT_SUBSCRIPTION_SKEW_SEC"
+	_min=$((_iat - _skew))
+	_max=$((_exp + _skew))
+	if [ "$_now" -lt "$_min" ] || [ "$_now" -gt "$_max" ]; then
+		CONTENT_SUB_REASON="expired"
+		return 1
+	fi
+
+	CONTENT_BEARER="$(base64url_file "$_env_copy")"
+	if [ -z "$CONTENT_BEARER" ]; then
+		CONTENT_SUB_REASON="bearer-encode"
+		return 1
+	fi
+	CONTENT_SUB_REASON="ok"
+	return 0
+}
+
+fetch_authed() {
+	_out="$1"
+	_url="$2"
+	_code_file="$TMP/fetch-http-code"
+	if [ -z "${CONTENT_BEARER:-}" ]; then
+		log "WARN: fetch_authed called without CONTENT_BEARER"
+		return 1
+	fi
+	if ! command -v curl >/dev/null 2>&1; then
+		log "WARN: curl not found; cannot present content subscription token"
+		return 1
+	fi
+	_code="$(
+		curl -sS --connect-timeout 30 --max-time 180 \
+			-H "Authorization: Bearer ${CONTENT_BEARER}" \
+			-H "X-Layer7-Content-Token: ${CONTENT_BEARER}" \
+			-o "$_out" -w '%{http_code}' "$_url" 2>>"$LOG" || true
+	)"
+	printf '%s' "$_code" > "$_code_file"
+	case "$_code" in
+	200|204)
+		return 0
+		;;
+	401|403)
+		log "WARN: content server rejected subscription token (HTTP $_code) for $_url"
+		return 1
+		;;
+	*)
+		log "WARN: authenticated fetch failed (HTTP ${_code:-000}) for $_url"
+		return 1
+		;;
+	esac
+}
+
+require_content_subscription_or_hold() {
+	if load_and_verify_content_subscription; then
+		log "INFO: content subscription token OK (scope=content)"
+		return 0
+	fi
+	mark_blacklists_degraded \
+		"content subscription unavailable (${CONTENT_SUB_REASON:-unknown}); current content update skipped" \
+		"force check-in with active license, confirm /var/db/layer7/content-subscription.json, then retry update"
+	log "WARN: content subscription not valid (${CONTENT_SUB_REASON:-unknown}); keeping existing blacklists; enforce untouched"
+	return 1
 }
 
 write_fallback_state() {
@@ -527,12 +801,12 @@ try_candidate() {
 	mkdir -p "$_extract_root"
 
 	log "INFO: trying $_source_role source $_manifest_url"
-	if ! fetch -o "$_manifest_local" "$_manifest_url" 2>>"$LOG"; then
+	if ! fetch_authed "$_manifest_local" "$_manifest_url"; then
 		log "WARN: failed to fetch manifest from $_manifest_url"
 		return 1
 	fi
 
-	if ! fetch -o "$_sig_local" "${_manifest_url}.sig" 2>>"$LOG"; then
+	if ! fetch_authed "$_sig_local" "${_manifest_url}.sig"; then
 		log "WARN: failed to fetch manifest signature from ${_manifest_url}.sig"
 		return 1
 	fi
@@ -630,7 +904,7 @@ try_candidate() {
 	fi
 
 	_snapshot_url="${_manifest_url%/*}/$_snapshot_asset"
-	if ! fetch -o "$_archive_local" "$_snapshot_url" 2>>"$LOG"; then
+	if ! fetch_authed "$_archive_local" "$_snapshot_url"; then
 		log "WARN: failed to fetch snapshot asset from $_snapshot_url"
 		return 1
 	fi
@@ -778,6 +1052,19 @@ do_download() {
 	: > "$PROGRESS"
 	log "INFO: starting trusted blacklist update"
 
+	mkdir -p "$TMP" "$BL_DIR" "$STATE_DIR" "$CACHE_DIR"
+
+	# 30.10 / contrato 30.8 §4.2: sem token válido → não contactar URLs current.
+	if ! require_content_subscription_or_hold; then
+		exit 1
+	fi
+
+	# Hook de teste (GA4.4/4.5): valida gate+Bearer sem rede.
+	if [ "${L7_BL_SKIP_FETCH:-0}" = "1" ]; then
+		log "INFO: L7_BL_SKIP_FETCH=1 — subscription OK; skipping network fetch"
+		exit 0
+	fi
+
 	AVAIL=$(df -k /usr/local/etc 2>/dev/null | tail -1 | awk '{print $4}')
 	if [ -n "$AVAIL" ] && [ "$AVAIL" -lt 250000 ] 2>/dev/null; then
 		mark_blacklists_degraded \
@@ -787,7 +1074,6 @@ do_download() {
 		exit 1
 	fi
 
-	mkdir -p "$TMP" "$BL_DIR" "$STATE_DIR" "$CACHE_DIR"
 	_candidates_file="$(build_candidate_list)"
 	_success="0"
 
@@ -811,14 +1097,27 @@ do_download() {
 	log "INFO: update complete"
 }
 
+do_check_subscription() {
+	mkdir -p "$TMP"
+	if load_and_verify_content_subscription; then
+		echo "content_subscription=ok"
+		echo "reason=ok"
+		exit 0
+	fi
+	echo "content_subscription=invalid"
+	echo "reason=${CONTENT_SUB_REASON:-unknown}"
+	exit 1
+}
+
 MODE=""
 case "${1:-}" in
 --download) MODE="download" ;;
 --apply) MODE="apply" ;;
 --restore-lkg) MODE="restore-lkg" ;;
+--check-subscription) MODE="check-subscription" ;;
 "") MODE="full" ;;
 *)
-	echo "Usage: $0 [--download|--apply|--restore-lkg]" >&2
+	echo "Usage: $0 [--download|--apply|--restore-lkg|--check-subscription]" >&2
 	exit 1
 	;;
 esac
@@ -827,5 +1126,6 @@ case "$MODE" in
 download) do_download ;;
 apply) do_apply ;;
 restore-lkg) do_restore_lkg ;;
+check-subscription) do_check_subscription ;;
 full) do_download ;;
 esac

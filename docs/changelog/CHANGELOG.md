@@ -4,12 +4,33 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.53] — 2026-08-10
+
+### Security
+
+- **Anti-pirataria 30.10 / BG-117:** cliente de update de blacklists exige token
+  de subscrição de conteúdo válido (contrato 30.8). Check-in activo persiste
+  `/var/db/layer7/content-subscription.json` (`0600`). Sem token válido:
+  **não** contacta URLs `current`; mantém snapshot local; enforce intacto
+  (R-D/R-C/N3/N4). Fetch autenticado com `Authorization: Bearer` +
+  `X-Layer7-Content-Token`. GUI (Blacklists/Settings) mostra estado da
+  subscrição. Runbook `docs/13-runbooks/content-subscription-update.md`.
+  Manifesto Ed25519 (ADR-0005) continua obrigatório. Pubkey SoT inalterada.
+  Sem retirada do espelho (`30.11`). GA4.4–GA4.9 PASS
+  (`test_content_subscription_update.sh`, `test_content_subscription_client.php`).
+  Herda 30.7–30.9.
+
 ### Changed
 
-- **Anti-pirataria 30.9 / BG-117 (license-server):** `POST /api/license/check-in`
-  activo passa a emitir `content_subscription` (Ed25519, TTL 30d, ligado a
-  `hardware_id`) conforme contrato 30.8. Sem bump do `.pkg` pfSense.
-  GA4.2 / GA4.3 / GA4.13 PASS (`npm test` backend).
+- **Anti-pirataria 30.9 / BG-117 (license-server, sem bump):** `POST /api/license/check-in`
+  activo emite `content_subscription` (Ed25519, TTL 30d). GA4.2/GA4.3/GA4.13
+  PASS — consolidado na trilha com `1.9.53` no cliente.
+
+### Release
+
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `SHA256_PLACEHOLDER_1_9_53`
+- Rollback lab: `1.9.52`
 
 ## [1.9.52] — 2026-08-10
 

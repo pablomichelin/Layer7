@@ -13,6 +13,7 @@
 #define L7_HW_ID_LEN       65  /* 64 hex chars + NUL */
 #define L7_LIC_GRACE_DAYS  14
 #define L7_CHECKIN_STATE_PATH "/var/db/layer7-checkin.json"
+#define L7_CONTENT_SUBSCRIPTION_PATH "/var/db/layer7/content-subscription.json"
 #define L7_CHECKIN_DEFAULT_INTERVAL_HOURS 168
 #define L7_CHECKIN_DEFAULT_MAX_OFFLINE_HOURS 336
 

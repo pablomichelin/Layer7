@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.9` FECHADO** (emissão token check-in, `2026-08-10`); próximo **`30.10`** (cliente update-blacklists); lab/`latest` **`1.9.52`**; GA4.1–4.3/4.13/4.14 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.10` FECHADO** (cliente update-blacklists + token, `2026-08-10`); próximo **`30.11`** (GO espelho); lab/`latest` **`1.9.53`**; GA4.1–4.9/4.13/4.14 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -25,12 +25,12 @@
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
-| Passo actual | **`30.9`** — emissão token — **FECHADO** (`2026-08-10`) |
-| Próximo | **`30.10`** — cliente: update de conteúdo com token |
-| Depois | AP2 `30.11` (GO espelho)… |
+| Passo actual | **`30.10`** — cliente token — **FECHADO** (`2026-08-10`) |
+| Próximo | **`30.11`** — retirada do espelho (GO humano próprio) |
+| Depois | AP3 `30.12`… |
 | Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2` |
-| Código alterado até agora | `license-server` check-in (`30.9`); pkg lab **`1.9.52`** (sem bump) |
-| Gate activo | **GA4 parcial** (GA4.1–4.3/4.13/4.14 PASS; falta cliente+espelho); GA2 parcial |
+| Código alterado até agora | `license-server` (`30.9`) + cliente/pkg **`1.9.53`** (`30.10`) |
+| Gate activo | **GA4 parcial** (GA4.1–4.9/4.13/4.14 PASS; falta espelho `30.11`); GA2 parcial |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -39,16 +39,16 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo actual: 30.9 FECHADO; próximo 30.10 (cliente update-blacklists + token)
+- Passo actual: 30.10 FECHADO; próximo 30.11 (GO espelho)
 - ADRs 0030–0033: Aceito (30.1b)
 - Ficha: docs/09-blocking/decisoes-humanas-30.1.md (8/8 preenchidas)
-- Gate GA0/GA1/GA3: PASS; GA4.1–4.3/4.13/4.14 PASS
-- Contrato 30.8 + emissão 30.9 (content_subscription no check-in)
+- Gate GA0/GA1/GA3: PASS; GA4.1–4.9/4.13/4.14 PASS
+- Contrato 30.8 + emissão 30.9 + cliente 30.10
 - BG-101: reaberto lacuna comercial → BG-118 / 30.14
-- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 em curso (falta 30.10/30.11)
+- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 em curso (falta 30.11)
 - SoT pubkey: /root/layer7-build-secrets/ (fora do git)
-- Latest publicado: 1.9.52 (.pkg; rollback lab 1.9.51) — sem bump neste passo
-- Próximo agente: 30.10 — ver §8 e START-HERE
+- Latest publicado: 1.9.53 (.pkg; rollback lab 1.9.52)
+- Próximo agente: 30.11 — ver §8 e START-HERE (GO humano)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -301,20 +301,20 @@ campo `content_subscription` no JSON activo; denied sem campo; mesma
 **Risco:** Médio (serviço). **Rollback:** deploy anterior do license-server.
 **Gate:** GA4.2 / GA4.3 / GA4.13 **PASS**.
 
-#### 30.10 — Cliente: actualização de conteúdo com token
+#### 30.10 — Cliente: actualização de conteúdo com token — **FECHADO** (`2026-08-10`)
 
 **Objectivo:** `update-blacklists.sh` apresenta o token; sem token válido não
 actualiza, mas **mantém** o conteúdo e o enforce (R-C, R-D, N4).
-**Ficheiros:** `package/pfSense-pkg-layer7/files/usr/local/etc/layer7/update-blacklists.sh`,
-GUI (estado da subscrição de conteúdo), runbook.
-**Teste mínimo:** com token PASS; sem token → não actualiza, conteúdo antigo activo,
-enforce intacto, aviso visível na GUI; offline prolongado dentro da janela PASS;
-manifesto continua a ser verificado por assinatura como hoje.
-**Risco:** **Alto operacional** — pode parar actualizações de clientes legítimos.
-Mitigação: janela generosa, degradação suave, aviso claro, e publicação apenas após
-GA4 completo.
-**Rollback:** `.pkg` anterior (volta a buscar sem token).
-**Gate:** GA4.
+**Implementação:** persistência `/var/db/layer7/content-subscription.json` no
+check-in activo (`license.c`); gate + Bearer em `update-blacklists.sh`; GUI
+Blacklists/Settings; runbook `content-subscription-update.md`; `.pkg` **`1.9.53`**.
+**Teste:** `test_content_subscription_update.sh` + `test_content_subscription_client.php`
+— GA4.4–GA4.9 PASS (locais; SKIP_FETCH para gate Bearer).
+**Risco:** **Alto operacional** — clientes sem check-in recente param updates até
+renovar token. Mitigação: TTL 30d, hold-active, aviso GUI, R-J.
+**Rollback:** `.pkg` `1.9.52` (volta a buscar sem token).
+**Gate:** GA4.4–GA4.9 **PASS**. **Nota RR-1:** sem `30.11` o espelho anónimo
+continua a servir conteúdo corrente fora do cliente.
 
 #### 30.11 — Retirada do espelho público de conteúdo corrente
 

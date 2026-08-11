@@ -6556,6 +6556,135 @@ function layer7_checkin_features_raw()
 	return isset($j["features"]) ? (string)$j["features"] : "";
 }
 
+/**
+ * Path do token de subscrição de conteúdo (contrato 30.8 D6 / passo 30.10).
+ */
+function layer7_content_subscription_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") .
+		    "/var/db/layer7/content-subscription.json";
+	}
+	return "/var/db/layer7/content-subscription.json";
+}
+
+/**
+ * Estado da subscrição de conteúdo para GUI (GA4.7).
+ * Nunca afecta enforce (D10 / R-D). Skew ±86400 (D2).
+ *
+ * @return array{status:string,reason:string,ok:bool,exp:int,iat:int,
+ *               hardware_id:string,message:string}
+ */
+function layer7_content_subscription_status($now = null, $local_hw = null)
+{
+	$path = layer7_content_subscription_path();
+	$out = array(
+		"status" => "missing",
+		"reason" => "missing",
+		"ok" => false,
+		"exp" => 0,
+		"iat" => 0,
+		"hardware_id" => "",
+		"message" => "Sem token de subscrição de conteúdo"
+	);
+	if (!is_readable($path)) {
+		return $out;
+	}
+	$raw = @file_get_contents($path);
+	if ($raw === false || $raw === "") {
+		$out["status"] = "invalid";
+		$out["reason"] = "empty";
+		$out["message"] = "Ficheiro de subscrição vazio";
+		return $out;
+	}
+	$env = json_decode($raw, true);
+	if (!is_array($env) || empty($env["data"]) || !is_string($env["data"]) ||
+	    empty($env["sig"]) || !is_string($env["sig"])) {
+		$out["status"] = "invalid";
+		$out["reason"] = "envelope";
+		$out["message"] = "Envelope de subscrição inválido";
+		return $out;
+	}
+	$sig_hex = trim($env["sig"]);
+	if (!preg_match('/^[0-9a-fA-F]{128}$/', $sig_hex)) {
+		$out["status"] = "invalid";
+		$out["reason"] = "sig-format";
+		$out["message"] = "Assinatura de subscrição inválida";
+		return $out;
+	}
+	$sig_bin = @hex2bin($sig_hex);
+	if ($sig_bin === false || strlen($sig_bin) !== 64) {
+		$out["status"] = "invalid";
+		$out["reason"] = "sig-format";
+		$out["message"] = "Assinatura de subscrição inválida";
+		return $out;
+	}
+	if (!layer7_license_ed25519_verify($env["data"], $sig_bin,
+	    layer7_license_pubkey_path())) {
+		$out["status"] = "invalid";
+		$out["reason"] = "sig_verify";
+		$out["message"] = "Assinatura de subscrição rejeitada";
+		return $out;
+	}
+	$payload = json_decode($env["data"], true);
+	if (!is_array($payload)) {
+		$out["status"] = "invalid";
+		$out["reason"] = "json";
+		$out["message"] = "Payload de subscrição inválido";
+		return $out;
+	}
+	$v = isset($payload["v"]) ? (int)$payload["v"] : -1;
+	$scope = isset($payload["scope"]) ? (string)$payload["scope"] : "";
+	$hw = isset($payload["hardware_id"]) ?
+	    (string)$payload["hardware_id"] : "";
+	$iat = isset($payload["iat"]) ? (int)$payload["iat"] : 0;
+	$exp = isset($payload["exp"]) ? (int)$payload["exp"] : 0;
+	$out["iat"] = $iat;
+	$out["exp"] = $exp;
+	$out["hardware_id"] = $hw;
+	if ($v !== 1 || $scope !== "content" || $hw === "" ||
+	    $iat <= 0 || $exp <= 0) {
+		$out["status"] = "invalid";
+		$out["reason"] = "fields";
+		$out["message"] = "Campos de subscrição incompletos";
+		return $out;
+	}
+	if ($local_hw === null) {
+		$env_hw = getenv("LAYER7_TEST_HW_ID");
+		if (is_string($env_hw) && $env_hw !== "") {
+			$local_hw = $env_hw;
+		} else {
+			$st = layer7_read_license_status();
+			$local_hw = isset($st["hardware_id"]) ?
+			    (string)$st["hardware_id"] : "";
+		}
+	}
+	$local_hw = trim((string)$local_hw);
+	if ($local_hw !== "" && $hw !== $local_hw) {
+		$out["status"] = "hw_mismatch";
+		$out["reason"] = "hw_mismatch";
+		$out["message"] = "Token de outro appliance (hardware_id)";
+		return $out;
+	}
+	if ($now === null) {
+		$now = time();
+	}
+	$now = (int)$now;
+	$skew = 86400;
+	if ($now < ($iat - $skew) || $now > ($exp + $skew)) {
+		$out["status"] = "expired";
+		$out["reason"] = "expired";
+		$out["message"] = "Subscrição de conteúdo expirada — " .
+		    "listas locais mantidas; enforce intacto";
+		return $out;
+	}
+	$out["status"] = "ok";
+	$out["reason"] = "ok";
+	$out["ok"] = true;
+	$out["message"] = "Subscrição de conteúdo válida";
+	return $out;
+}
+
 function layer7_features_intersect_php($a, $b)
 {
 	/* Sempre BASE; add-ons só se presentes em ambos. */

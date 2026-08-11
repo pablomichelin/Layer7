@@ -955,6 +955,18 @@ layer7_render_styles();
 			} else {
 				$lic_badge = '<span class="label label-danger">' . l7_t("Sem licenca") . '</span>';
 			}
+			$cs_st = function_exists("layer7_content_subscription_status")
+			    ? layer7_content_subscription_status(null, $lic_hw)
+			    : array("ok" => false, "status" => "missing", "message" => "");
+			if (!empty($cs_st["ok"])) {
+				$cs_badge = '<span class="label label-success">' . l7_t("OK") . '</span>';
+			} elseif (($cs_st["status"] ?? "") === "expired") {
+				$cs_badge = '<span class="label label-warning">' . l7_t("Expirada") . '</span>';
+			} elseif (($cs_st["status"] ?? "") === "missing") {
+				$cs_badge = '<span class="label label-warning">' . l7_t("Ausente") . '</span>';
+			} else {
+				$cs_badge = '<span class="label label-danger">' . l7_t("Invalida") . '</span>';
+			}
 			?>
 
 			<?php
@@ -1113,6 +1125,10 @@ layer7_render_styles();
 					<dt><?= l7_t("Detalhe"); ?></dt>
 					<dd><span class="text-muted"><?= htmlspecialchars($lic_err); ?></span></dd>
 					<?php } ?>
+					<dt><?= l7_t("Subscricao de conteudo"); ?></dt>
+					<dd><?= $cs_badge; ?>
+						<small class="text-muted" style="margin-left:8px;"><?= htmlspecialchars((string)($cs_st["message"] ?? "")); ?></small>
+					</dd>
 				</dl>
 				<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>
 					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
