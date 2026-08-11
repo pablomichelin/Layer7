@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.7` FECHADO** + **`1.9.52` publicado** (`2026-08-10`); próximo **`30.8`** (token subscrição / AP2); **GA1 PASS**; GA2.1–2.5 + GA2.8–2.11 **PASS**; faltam GA2.6–2.7 (lab); **GA3 PASS** (GA3.7 DEFERRED); ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.8` FECHADO** (desenho token, `2026-08-10`); próximo **`30.9`** (emissão no license server); lab/`latest` **`1.9.52`**; **GA1 PASS**; GA2.1–2.5 + GA2.8–2.11 **PASS**; faltam GA2.6–2.7 (lab); **GA3 PASS**; GA4.1/GA4.14 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -24,13 +24,13 @@
 
 | Campo | Valor |
 |-------|-------|
-| Onda actual | **AP1 higiene FECHADA** · **AP2 a iniciar** (AP0 FECHADA; GA1 PASS) |
-| Passo actual | **`30.7`** — entitlements GUI — **FECHADO** (`2026-08-10`) |
-| Próximo | **`30.8`** — desenho token de subscrição (AP2) |
-| Depois | AP2 `30.9`… |
+| Onda actual | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
+| Passo actual | **`30.8`** — desenho token — **FECHADO** (`2026-08-10`) |
+| Próximo | **`30.9`** — emissão do token no license server |
+| Depois | AP2 `30.10`… |
 | Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2` |
-| Código alterado até agora | `layer7.inc` + gate tlsproxy (`30.7`); herda `30.4`–`30.6`; **`1.9.52` publicado** |
-| Gate activo | **GA2 parcial** (faltam GA2.6–2.7 lab); GA2.8–2.10 **PASS**; **GA3 PASS** (GA3.7 DEFERRED) |
+| Código alterado até agora | nenhum em `30.8` (só doc); produto lab **`1.9.52`** |
+| Gate activo | **GA4 parcial** (GA4.1/GA4.14 PASS; resto pendente); GA2 parcial (2.6–2.7 lab) |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -39,16 +39,16 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo actual: 30.7 FECHADO; próximo 30.8 (token subscrição AP2)
+- Passo actual: 30.8 FECHADO; próximo 30.9 (emissão token license-server)
 - ADRs 0030–0033: Aceito (30.1b)
 - Ficha: docs/09-blocking/decisoes-humanas-30.1.md (8/8 preenchidas)
-- Gate GA0/GA1: PASS; GA2.1–2.5 + GA2.8–2.11 PASS; GA3 PASS (GA3.7 DEFERRED)
-- Evidência 30.7: docs/tests/evidence/20260810T214800Z-30.7-entitlements/
+- Gate GA0/GA1: PASS; GA2.1–2.5 + GA2.8–2.11 PASS; GA3 PASS; GA4.1/GA4.14 PASS
+- Contrato 30.8: docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md
 - BG-101: reaberto lacuna comercial → BG-118 / 30.14
-- BG-114/BG-115/BG-116/BG-120: Concluido
+- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 desenho OK
 - SoT pubkey: /root/layer7-build-secrets/ (fora do git)
 - Latest publicado: 1.9.52 (.pkg; rollback lab 1.9.51)
-- Próximo agente: 30.8 — ver §8 e START-HERE
+- Próximo agente: 30.9 — ver §8 e START-HERE
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -279,23 +279,17 @@ sync_helper revalida em produção. Sem assinatura local no daemon.
 
 Corrige A-06. É a onda que faz a cópia sem licença **degradar sozinha**.
 
-#### 30.8 — Desenho e contrato do token de subscrição
+#### 30.8 — Desenho e contrato do token de subscrição — **FECHADO** (`2026-08-10`)
 
 **Objectivo:** fechar o desenho **antes** de qualquer código (padrão da casa).
-**Entrega:** documento de arquitectura com: formato do token (assinado Ed25519,
-ligado ao `hardware_id`, validade curta), como é obtido (resposta de check-in),
-onde é guardado, como é apresentado ao servidor de conteúdo, política de validade e
-de degradação, e o que acontece a appliances legitimamente offline.
-**Decisões a fechar:** validade do token; janela de tolerância; se o conteúdo
-histórico continua servido sem token (**recomendado: sim**, R-D).
-**Limite declarado (RR-2):** o desenho deve registar que o token não impede a
-redistribuição interna de conteúdo por um appliance licenciado; a resposta a esse
-vector é a marcação por cliente (`30.17`) + via contratual, e o ADR-0031 deve
-dizê-lo explicitamente.
-**Teste mínimo:** revisão humana do desenho; casos-limite enumerados (incluindo
-appliance legitimamente offline e o cenário de redistribuição RR-2).
-**Risco:** nulo (documental). **Rollback:** n/a.
-**Gate:** GA4.
+**Entrega:** [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md)
+— formato Ed25519; TTL **30d**; skew ±1d; histórico sem token (R-D); obtenção via
+check-in; path `/var/db/layer7/content-subscription.json`; Bearer no CDN; RR-2 §7;
+casos C1–C12. **Zero código.**
+**Decisões fechadas:** D1–D10 no contrato.
+**Teste mínimo:** revisão humana do desenho (pedir «desenho 30.8 OK»).
+**Risco:** nulo (documental). **Rollback:** reverter commit documental.
+**Gate:** GA4.1 / GA4.14 **PASS**.
 
 #### 30.9 — Emissão do token no license server
 

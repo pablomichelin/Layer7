@@ -97,8 +97,11 @@ exige **GO humano próprio** (decisão n.º 3 do §5).
 ## Implementação prevista
 
 - `30.8` (desenho) → `30.9` (servidor) → `30.10` (cliente) → `30.11` (GO + espelho).
+- **Desenho `30.8`:** [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md)
+  (TTL 30d; histórico sem token; RR-2 explícito; zero código).
 - Rollback: `.pkg` anterior + repor espelho (procedimento pronto).
-- Gate GA4; critério GA4.14 exige declaração explícita de RR-2 neste ADR/desenho.
+- Gate GA4; critério GA4.14 exige declaração explícita de RR-2 neste ADR/desenho
+  (**cumprido** neste ADR §5 + contrato `30.8` §7).
 
 ## Referências
 
