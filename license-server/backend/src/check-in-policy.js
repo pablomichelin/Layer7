@@ -41,8 +41,9 @@ function formatExpiryDate(expiry) {
 }
 
 const { normalizeFeatures } = require('./crud-validation');
+const { buildContentSubscriptionEnvelope } = require('./content-subscription');
 
-function buildActiveCheckInResponse(license, policy = getCheckInPolicy()) {
+function buildActiveCheckInResponse(license, policy = getCheckInPolicy(), options = {}) {
   let features = 'base';
   try {
     features = normalizeFeatures(license.features || 'base');
@@ -50,7 +51,7 @@ function buildActiveCheckInResponse(license, policy = getCheckInPolicy()) {
     features = 'base';
   }
 
-  return {
+  const response = {
     status: 'active',
     expiry: formatExpiryDate(license.expiry),
     customer: license.customer_name || 'Unknown',
@@ -58,6 +59,27 @@ function buildActiveCheckInResponse(license, policy = getCheckInPolicy()) {
     check_in_interval_hours: policy.checkInIntervalHours,
     max_offline_hours: policy.maxOfflineHours,
   };
+
+  /*
+   * 30.9 / contrato 30.8: token de conteúdo só em check-in activo.
+   * hardwareId vem do pedido (já validado pelo binding). Denied paths
+   * usam buildDeniedCheckInResponse e nunca passam aqui.
+   */
+  const hardwareId = options.hardwareId;
+  if (hardwareId) {
+    response.content_subscription = buildContentSubscriptionEnvelope({
+      hardwareId,
+      licenseId: license.id,
+      customerId: license.customer_id != null ? license.customer_id : null,
+      features,
+      nowSec: options.nowSec,
+      ttlSec: options.ttlSec,
+      signFn: options.signFn,
+      jti: options.jti,
+    });
+  }
+
+  return response;
 }
 
 function buildDeniedCheckInResponse(effectiveStatus, errorMessage) {

@@ -232,8 +232,8 @@ listas” está **em falta** face a este contrato e ao ADR-0031.
 
 | Passo | Responsabilidade |
 |-------|------------------|
-| **30.8** (este) | Contrato + decisões D1–D10 + RR-2 |
-| **30.9** | Emitir `content_subscription` no check-in; testes npm; sem segredos no git (N8) |
+| **30.8** (este) | Contrato + decisões D1–D10 + RR-2 — **FECHADO** |
+| **30.9** | Emitir `content_subscription` no check-in — **FECHADO** (`content-subscription.js`) |
 | **30.10** | Cliente: persistir, enviar Bearer, GUI, runbook; degradar suave |
 | **30.11** | GO + retirar/limitar espelho corrente; comunicação; rollback do espelho |
 

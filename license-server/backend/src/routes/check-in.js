@@ -134,7 +134,10 @@ router.post('/license/check-in', checkInLimiter, async (req, res) => {
     }
 
     const policy = getCheckInPolicy();
-    const responseBody = buildActiveCheckInResponse(license, policy);
+    /* 30.9: emite content_subscription assinado (contrato 30.8). */
+    const responseBody = buildActiveCheckInResponse(license, policy, {
+      hardwareId,
+    });
 
     await logCheckIn(pool, license.id, hardwareId, ip, ua, 'active', null);
 

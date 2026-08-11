@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Anti-pirataria 30.9 / BG-117 (license-server):** `POST /api/license/check-in`
+  activo passa a emitir `content_subscription` (Ed25519, TTL 30d, ligado a
+  `hardware_id`) conforme contrato 30.8. Sem bump do `.pkg` pfSense.
+  GA4.2 / GA4.3 / GA4.13 PASS (`npm test` backend).
+
 ## [1.9.52] — 2026-08-10
 
 ### Security

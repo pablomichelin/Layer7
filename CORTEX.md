@@ -1396,18 +1396,16 @@ TRILHA IDENTITY + MITM — progresso
 
 Nova trilha pós-fecho. **Não** reabre P0–J, IPv6 nem Identity de rede.
 Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.52`** (`.pkg`; rollback lab `1.9.51`).
-**`30.8` FECHADO** (`2026-08-10`): contrato token de conteúdo
+**`30.9` FECHADO** (`2026-08-10`): emissão `content_subscription` no
+`POST /api/license/check-in` activo (`license-server/backend`); GA4.2/GA4.3/GA4.13
+**PASS**; **sem** bump `.pkg`.
+**`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
-GA4.1/GA4.14 **PASS**; **zero código**.
-**`30.7` FECHADO** + **`1.9.52` publicado**: entitlements GUI
-(`.lic` Ed25519 + gate `layer7-mitm-entitle-ok`); GA2.8–2.10 **PASS**; BG-120
-**Concluido**; evidência `docs/tests/evidence/20260810T214800Z-30.7-entitlements/`.
-**`30.6` FECHADO:** anti-rollback (`clock-mark.json`); GA3 PASS (GA3.7 DEFERRED).
-**`30.5` FECHADO:** strip + `-fvisibility=hidden`; GA2.4/2.5/2.11 PASS.
-**`30.4` FECHADO:** `is_dev_key` só sob `L7_DEV_BUILD`; GA2.1–2.3 PASS.
-**`30.3` FECHADO:** inventário `.pkg` `1.9.48`; **GA1 PASS**.
-**`30.2` FECHADO:** SoT pubkey **fora do git** (`/root/layer7-build-secrets/`).
-**Próximo a executar: `30.9`** (emissão token no license server).
+GA4.1/GA4.14 **PASS**.
+**`30.7` FECHADO** + **`1.9.52` publicado**: entitlements GUI; GA2.8–2.10 **PASS**.
+**`30.6` FECHADO:** anti-rollback; GA3 PASS (GA3.7 DEFERRED).
+**`30.5`/`30.4`/`30.3`/`30.2` FECHADOS** (strip / no-dev-bypass / inventário / SoT pubkey).
+**Próximo a executar: `30.10`** (cliente `update-blacklists` + token).
 **ADRs 0030–0033:** **`Aceito`**. Ficha GO:
 [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md).
 **BG-101:** reaberto lacuna comercial → BG-118 / `30.14`.
@@ -1424,7 +1422,7 @@ passos `30.11`/`30.14`. Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; GA4.1/GA4.14 **PASS**; GA2 parcial
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; GA4.1–4.3/4.13/4.14 **PASS**; GA2 parcial
 - **Ficha 30.1 (GO):**
   [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md)
 - **ADRs:** [0030](docs/03-adr/ADR-0030-postura-anti-tamper-layer7d.md) ·
@@ -1432,9 +1430,9 @@ passos `30.11`/`30.14`. Riscos residuais **RR-1…RR-5** no plano §0.1.
   [0032](docs/03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md) (**emenda ADR-0021**) ·
   [0033](docs/03-adr/ADR-0033-anti-rollback-relogio.md) — **`Aceito`**
 - **Contrato AP2:** [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md)
-- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (desenho OK; falta código); BG-118…BG-123; **BG-101** reaberto (`30.1b`)
-- **Ordem:** `30.0`→…→`30.8` ✓→**`30.9`**→
-  AP2 `30.9`–`30.11`→AP3 `30.12`–`30.15`→AP4 `30.16`–`30.19`
+- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (`30.8`+`30.9` OK; falta `30.10`/`30.11`); **BG-101** reaberto
+- **Ordem:** `30.0`→…→`30.9` ✓→**`30.10`**→
+  AP2 `30.10`–`30.11`→AP3 `30.12`–`30.15`→AP4 `30.16`–`30.19`
 - **GOs humanos de execução:** `30.11` (espelho) · `30.14` (check-in default)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
@@ -1446,13 +1444,13 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Onda: AP2 em curso
-- Passo: 30.8 FECHADO; PRÓXIMO = 30.9 (emissão token)
-- Gate GA0/GA1/GA3: PASS; GA4.1/GA4.14 PASS; GA2 parcial
-- Contrato 30.8: contrato-token-subscricao-conteudo-30.8.md
+- Passo: 30.9 FECHADO; PRÓXIMO = 30.10 (cliente token)
+- Gate GA0/GA1/GA3: PASS; GA4.1–4.3/4.13/4.14 PASS
+- Contrato 30.8 + content_subscription no check-in
 - ADRs 0030-0033: Aceito
-- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 desenho OK; BG-101 → 30.14
+- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 em curso; BG-101 → 30.14
 - SoT pubkey: /root/layer7-build-secrets/
-- Latest: 1.9.52 (.pkg; rollback lab 1.9.51)
+- Latest: 1.9.52 (.pkg; rollback lab 1.9.51) — sem bump 30.9
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

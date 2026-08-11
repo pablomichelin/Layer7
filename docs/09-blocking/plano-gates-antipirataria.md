@@ -110,8 +110,8 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | # | Critério | Estado |
 |---|----------|--------|
 | GA4.1 | Desenho e contrato do token fechados e revistos antes de código | **PASS** (`contrato-token-subscricao-conteudo-30.8.md`; revisão humana OK `2026-08-10`) |
-| GA4.2 | Servidor emite token para licença activa; recusa para revogada/expirada | **PENDENTE** |
-| GA4.3 | Token ligado ao `hardware_id`; inútil noutro appliance | **PENDENTE** |
+| GA4.2 | Servidor emite token para licença activa; recusa para revogada/expirada | **PASS** (`30.9` — `content_subscription` só em active; npm test) |
+| GA4.3 | Token ligado ao `hardware_id`; inútil noutro appliance | **PASS** (`30.9` — payload `hardware_id`; verify testes) |
 | GA4.4 | Cliente com token válido actualiza conteúdo (PASS ponta a ponta) | **PENDENTE** |
 | GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PENDENTE** |
 | GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PENDENTE** |
@@ -121,12 +121,12 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** |
 | GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **PENDENTE** |
 | GA4.12 | Comunicação a clientes emitida antes de 30.11 | **PENDENTE** |
-| GA4.13 | Sem segredos novos no repositório, incluindo fixtures (**N8**, **R-K**) | **PENDENTE** |
+| GA4.13 | Sem segredos novos no repositório, incluindo fixtures (**N8**, **R-K**) | **PASS** (`30.9` — seed efémera só em teste; prod via `ED25519_PRIVATE_KEY`) |
 | GA4.14 | ADR-0031 / desenho 30.8 declaram RR-2 (redistribuição por appliance licenciado) e que a resposta é atribuição+contratual, não bloqueio técnico | **PASS** (ADR-0031 §5 + contrato 30.8 §7) |
 | GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** |
 
-**Estado GA4:** parcial — GA4.1 + GA4.14 **PASS** (`30.8`); restante pendente
-(`30.9`–`30.11`).
+**Estado GA4:** parcial — GA4.1–4.3 + GA4.13 + GA4.14 **PASS** (`30.8`+`30.9`);
+restante pendente (`30.10`–`30.11`).
 
 **Saída:** uma cópia sem subscrição válida degrada sozinha ao longo do tempo, sem
 que nada no appliance precise de se defender — **desde que** 30.11 tenha GO Sim.

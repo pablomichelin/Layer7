@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.8` FECHADO** (desenho token, `2026-08-10`); próximo **`30.9`** (emissão no license server); lab/`latest` **`1.9.52`**; **GA1 PASS**; GA2.1–2.5 + GA2.8–2.11 **PASS**; faltam GA2.6–2.7 (lab); **GA3 PASS**; GA4.1/GA4.14 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.9` FECHADO** (emissão token check-in, `2026-08-10`); próximo **`30.10`** (cliente update-blacklists); lab/`latest` **`1.9.52`**; GA4.1–4.3/4.13/4.14 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -25,12 +25,12 @@
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
-| Passo actual | **`30.8`** — desenho token — **FECHADO** (`2026-08-10`) |
-| Próximo | **`30.9`** — emissão do token no license server |
-| Depois | AP2 `30.10`… |
+| Passo actual | **`30.9`** — emissão token — **FECHADO** (`2026-08-10`) |
+| Próximo | **`30.10`** — cliente: update de conteúdo com token |
+| Depois | AP2 `30.11` (GO espelho)… |
 | Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2` |
-| Código alterado até agora | nenhum em `30.8` (só doc); produto lab **`1.9.52`** |
-| Gate activo | **GA4 parcial** (GA4.1/GA4.14 PASS; resto pendente); GA2 parcial (2.6–2.7 lab) |
+| Código alterado até agora | `license-server` check-in (`30.9`); pkg lab **`1.9.52`** (sem bump) |
+| Gate activo | **GA4 parcial** (GA4.1–4.3/4.13/4.14 PASS; falta cliente+espelho); GA2 parcial |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -39,16 +39,16 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo actual: 30.8 FECHADO; próximo 30.9 (emissão token license-server)
+- Passo actual: 30.9 FECHADO; próximo 30.10 (cliente update-blacklists + token)
 - ADRs 0030–0033: Aceito (30.1b)
 - Ficha: docs/09-blocking/decisoes-humanas-30.1.md (8/8 preenchidas)
-- Gate GA0/GA1: PASS; GA2.1–2.5 + GA2.8–2.11 PASS; GA3 PASS; GA4.1/GA4.14 PASS
-- Contrato 30.8: docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md
+- Gate GA0/GA1/GA3: PASS; GA4.1–4.3/4.13/4.14 PASS
+- Contrato 30.8 + emissão 30.9 (content_subscription no check-in)
 - BG-101: reaberto lacuna comercial → BG-118 / 30.14
-- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 desenho OK
+- BG-114/BG-115/BG-116/BG-120: Concluido; BG-117 em curso (falta 30.10/30.11)
 - SoT pubkey: /root/layer7-build-secrets/ (fora do git)
-- Latest publicado: 1.9.52 (.pkg; rollback lab 1.9.51)
-- Próximo agente: 30.9 — ver §8 e START-HERE
+- Latest publicado: 1.9.52 (.pkg; rollback lab 1.9.51) — sem bump neste passo
+- Próximo agente: 30.10 — ver §8 e START-HERE
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -291,15 +291,15 @@ casos C1–C12. **Zero código.**
 **Risco:** nulo (documental). **Rollback:** reverter commit documental.
 **Gate:** GA4.1 / GA4.14 **PASS**.
 
-#### 30.9 — Emissão do token no license server
+#### 30.9 — Emissão do token no license server — **FECHADO** (`2026-08-10`)
 
 **Objectivo:** servidor emite token de subscrição para licença activa.
-**Ficheiros:** `license-server/backend/src/` (check-in), migração de schema se
-necessário, testes npm.
-**Teste mínimo:** licença activa recebe token válido; licença revogada/expirada
-**não** recebe; token não é aceite para outro `hardware_id`; rate limit mantido.
-**Risco:** Médio (serviço de produção). **Rollback:** deploy anterior do servidor.
-**Gate:** GA4.
+**Implementação:** `content-subscription.js` + `buildActiveCheckInResponse(..., {hardwareId})`;
+campo `content_subscription` no JSON activo; denied sem campo; mesma
+`ED25519_PRIVATE_KEY` do `.lic`; TTL 30d; sem migração schema; sem segredos no git.
+**Teste:** `npm test` no backend — **112 PASS** (incl. GA4.2/GA4.3).
+**Risco:** Médio (serviço). **Rollback:** deploy anterior do license-server.
+**Gate:** GA4.2 / GA4.3 / GA4.13 **PASS**.
 
 #### 30.10 — Cliente: actualização de conteúdo com token
 

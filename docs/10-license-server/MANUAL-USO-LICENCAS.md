@@ -411,6 +411,10 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
   `check_in_enabled=true` em `layer7.json` (BG-077 / ADR-0021)
 - `POST /api/license/check-in` com a mesma chave da activação; resposta
   `409` revoked/expired remove o `.lic` local e desliga enforce
+- resposta **activa** (desde **30.9**) inclui `content_subscription`
+  (envelope Ed25519 — token de conteúdo; contrato
+  `docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`);
+  respostas denied/revoked/expired **não** incluem o token
 - sem check-in activo, o comportamento offline permanece:
   - assinatura
   - mismatch de `hardware_id`
