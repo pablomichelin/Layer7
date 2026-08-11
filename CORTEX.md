@@ -35,12 +35,12 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.51` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.51`;
-`SHA256=aec3642824df0fd8b3a49d9cc41b4b8a30e8c88dd5be6d6da7e142965b722204`;
-anti-pirataria **30.6** / BG-116 — anti-rollback de relógio (`clock-mark.json`);
-herda `30.4`/`30.5`;
+`1.9.52` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.52`;
+`SHA256=79312d1b73eb8744be817c9ef2b9a7cdf768439632dabbad35e9fb7bfa607134`;
+anti-pirataria **30.7** / BG-120 — entitlements GUI via `.lic` Ed25519;
+herda `30.4`/`30.5`/`30.6`;
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.50`**.
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.51`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
@@ -1395,15 +1395,16 @@ TRILHA IDENTITY + MITM — progresso
 ## Trilha Anti-pirataria / Anti-tamper (aberta 2026-08-10)
 
 Nova trilha pós-fecho. **Não** reabre P0–J, IPv6 nem Identity de rede.
-Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.51`** (`.pkg`; rollback lab `1.9.50`).
-**`30.6` FECHADO** + **`1.9.51` publicado** (`2026-08-10`): anti-rollback
-(`/var/db/layer7/clock-mark.json`); GA3 **PASS** (GA3.7 DEFERRED); BG-116
-**Concluido**; evidência `docs/tests/evidence/20260810T201043Z-30.6-anti-rollback/`.
+Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.52`** (`.pkg`; rollback lab `1.9.51`).
+**`30.7` FECHADO** + **`1.9.52` publicado** (`2026-08-10`): entitlements GUI
+(`.lic` Ed25519 + gate `layer7-mitm-entitle-ok`); GA2.8–2.10 **PASS**; BG-120
+**Concluido**; evidência `docs/tests/evidence/20260810T214800Z-30.7-entitlements/`.
+**`30.6` FECHADO:** anti-rollback (`clock-mark.json`); GA3 PASS (GA3.7 DEFERRED).
 **`30.5` FECHADO:** strip + `-fvisibility=hidden`; GA2.4/2.5/2.11 PASS.
 **`30.4` FECHADO:** `is_dev_key` só sob `L7_DEV_BUILD`; GA2.1–2.3 PASS.
 **`30.3` FECHADO:** inventário `.pkg` `1.9.48`; **GA1 PASS**.
 **`30.2` FECHADO:** SoT pubkey **fora do git** (`/root/layer7-build-secrets/`).
-**Próximo a executar: `30.7`** (entitlements GUI / BG-120).
+**Próximo a executar: `30.8`** (desenho token de subscrição / AP2).
 **ADRs 0030–0033:** **`Aceito`**. Ficha GO:
 [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md).
 **BG-101:** reaberto lacuna comercial → BG-118 / `30.14`.
@@ -1420,15 +1421,15 @@ passos `30.11`/`30.14`. Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; GA2 parcial
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; GA2 parcial (faltam GA2.6–2.7)
 - **Ficha 30.1 (GO):**
   [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md)
 - **ADRs:** [0030](docs/03-adr/ADR-0030-postura-anti-tamper-layer7d.md) ·
   [0031](docs/03-adr/ADR-0031-entitlement-entrega-conteudo.md) ·
   [0032](docs/03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md) (**emenda ADR-0021**) ·
   [0033](docs/03-adr/ADR-0033-anti-rollback-relogio.md) — **`Aceito`**
-- **Backlog:** BG-114…BG-116 **Concluido**; BG-117…BG-123; **BG-101** reaberto (`30.1b`)
-- **Ordem:** `30.0`→…→`30.6` ✓→**`30.7`**→
+- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117…BG-123; **BG-101** reaberto (`30.1b`)
+- **Ordem:** `30.0`→…→`30.7` ✓→**`30.8`**→
   AP2 `30.8`–`30.11`→AP3 `30.12`–`30.15`→AP4 `30.16`–`30.19`
 - **GOs humanos de execução:** `30.11` (espelho) · `30.14` (check-in default)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
@@ -1440,14 +1441,14 @@ passos `30.11`/`30.14`. Riscos residuais **RR-1…RR-5** no plano §0.1.
 TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Onda: AP1 em curso
-- Passo: 30.6 FECHADO; PRÓXIMO = 30.7 (entitlements GUI BG-120)
-- Gate GA0/GA1/GA3: PASS; GA2.1–2.5 + GA2.11 PASS
-- Evidência 30.6: 20260810T201043Z-30.6-anti-rollback
+- Onda: AP1 higiene FECHADA; próximo AP2 / 30.8
+- Passo: 30.7 FECHADO; PRÓXIMO = 30.8 (token subscrição)
+- Gate GA0/GA1/GA3: PASS; GA2.1–2.5 + GA2.8–2.11 PASS
+- Evidência 30.7: 20260810T214800Z-30.7-entitlements
 - ADRs 0030-0033: Aceito
-- BG-114/BG-115/BG-116: Concluido; BG-101 → 30.14
+- BG-114/BG-115/BG-116/BG-120: Concluido; BG-101 → 30.14
 - SoT pubkey: /root/layer7-build-secrets/
-- Latest: 1.9.51 (.pkg; rollback lab 1.9.50)
+- Latest: 1.9.52 (.pkg; rollback lab 1.9.51)
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

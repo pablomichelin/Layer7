@@ -4694,6 +4694,9 @@ function layer7_profile_parse_hosts_textarea($text, $max = 64)
 
 function layer7_stats_path()
 {
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/var/db/layer7/layer7-stats.json";
+	}
 	return "/var/db/layer7/layer7-stats.json";
 }
 
@@ -6288,6 +6291,13 @@ function layer7_vip_import_apply(&$data, $imported)
 
 function layer7_lic_path()
 {
+	$env = getenv("LAYER7_LIC_PATH");
+	if (is_string($env) && $env !== "") {
+		return $env;
+	}
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/usr/local/etc/layer7.lic";
+	}
 	return "/usr/local/etc/layer7.lic";
 }
 
@@ -6349,13 +6359,34 @@ function layer7_read_license_status()
 }
 
 /**
- * ADR-0025 / passo 20.5 — entitlements para UX (upsell).
- * Espelha a semântica T1 do daemon (features.c): full/vazio → base;
- * identity/mitm só com token explícito. A autoridade de gate continua no daemon.
+ * ADR-0025 / passo 20.5 + anti-pirataria 30.7 / BG-120 — entitlements UX.
+ * Espelha T1 do daemon (features.c): full/vazio → base; identity/mitm só
+ * com token explícito.
+ *
+ * 30.7: unlock de Identity/MITM deriva APENAS de material já assinado pelo
+ * servidor (`.lic` Ed25519). Stats JSON e leitura `.lic` sem verify NÃO
+ * desbloqueiam add-ons (A-07). Daemon NÃO assina localmente (ADR-0030 / R-A).
+ * Check-in local só pode RETIRAR bits (∩), nunca acrescentar.
  */
 define("L7_FEAT_BASE", 1);
 define("L7_FEAT_IDENTITY", 2);
 define("L7_FEAT_MITM", 4);
+
+function layer7_license_pubkey_path()
+{
+	$env = getenv("LAYER7_LICENSE_PUBKEY");
+	if (is_string($env) && $env !== "") {
+		return $env;
+	}
+	if (getenv("LAYER7_TEST_ROOT")) {
+		$p = getenv("LAYER7_TEST_ROOT") .
+		    "/usr/local/share/pfSense-pkg-layer7/license-signing-public-key.pem";
+		if (is_readable($p)) {
+			return $p;
+		}
+	}
+	return "/usr/local/share/pfSense-pkg-layer7/license-signing-public-key.pem";
+}
 
 function layer7_features_parse_php($raw)
 {
@@ -6395,9 +6426,119 @@ function layer7_features_parse_php($raw)
 	return array("flags" => $flags, "truncated" => $truncated, "normalized" => $norm);
 }
 
+/**
+ * Verifica assinatura Ed25519 do campo data do .lic via openssl pkeyutl.
+ * (PHP openssl_verify + Ed25519 falha neste stack OpenSSL 3 / PHP 8.3.)
+ */
+function layer7_license_ed25519_verify($data, $sig_bin, $pubkey_pem_path)
+{
+	if (!is_string($data) || $data === "" || !is_string($sig_bin) ||
+	    strlen($sig_bin) !== 64 || !is_readable($pubkey_pem_path)) {
+		return false;
+	}
+	$openssl = "/usr/bin/openssl";
+	if (!is_executable($openssl)) {
+		$openssl = "openssl";
+	}
+	$td = rtrim(sys_get_temp_dir(), "/") . "/l7licver." . getmypid() .
+	    "." . mt_rand(1000, 9999);
+	if (!@mkdir($td, 0700, true) && !is_dir($td)) {
+		return false;
+	}
+	$data_f = $td . "/data";
+	$sig_f = $td . "/sig";
+	$ok = false;
+	try {
+		if (@file_put_contents($data_f, $data) === false ||
+		    @file_put_contents($sig_f, $sig_bin) === false) {
+			return false;
+		}
+		@chmod($data_f, 0600);
+		@chmod($sig_f, 0600);
+		$cmd = escapeshellarg($openssl) .
+		    " pkeyutl -verify -pubin -inkey " .
+		    escapeshellarg($pubkey_pem_path) .
+		    " -rawin -in " . escapeshellarg($data_f) .
+		    " -sigfile " . escapeshellarg($sig_f) .
+		    " 2>/dev/null";
+		$out = array();
+		$rc = 1;
+		exec($cmd, $out, $rc);
+		$ok = ($rc === 0);
+	} finally {
+		@unlink($data_f);
+		@unlink($sig_f);
+		@rmdir($td);
+	}
+	return $ok;
+}
+
+/**
+ * Lê e verifica o .lic. Retorna null se ausente/inválido.
+ * Nunca confia em stats. Features só do payload assinado.
+ */
+function layer7_license_read_verified($lic_path = null)
+{
+	if ($lic_path === null) {
+		$lic_path = layer7_lic_path();
+	}
+	if (!is_readable($lic_path)) {
+		return null;
+	}
+	$raw = @file_get_contents($lic_path);
+	if ($raw === false || $raw === "") {
+		return null;
+	}
+	$env = json_decode($raw, true);
+	if (!is_array($env) || empty($env["data"]) || !is_string($env["data"]) ||
+	    empty($env["sig"]) || !is_string($env["sig"])) {
+		return null;
+	}
+	$sig_hex = trim($env["sig"]);
+	if (!preg_match('/^[0-9a-fA-F]{128}$/', $sig_hex)) {
+		return null;
+	}
+	$sig_bin = @hex2bin($sig_hex);
+	if ($sig_bin === false || strlen($sig_bin) !== 64) {
+		return null;
+	}
+	if (!layer7_license_ed25519_verify($env["data"], $sig_bin,
+	    layer7_license_pubkey_path())) {
+		return null;
+	}
+	$data = json_decode($env["data"], true);
+	if (!is_array($data)) {
+		return null;
+	}
+	$features = isset($data["features"]) ? (string)$data["features"] : "";
+	return array(
+		"data" => $data,
+		"features" => $features,
+		"hardware_id" => isset($data["hardware_id"]) ?
+		    (string)$data["hardware_id"] : "",
+		"expiry" => isset($data["expiry"]) ? (string)$data["expiry"] : "",
+		"customer" => isset($data["customer"]) ?
+		    (string)$data["customer"] : "",
+		"verified" => true
+	);
+}
+
+/** @deprecated 30.7 — sem verify; não usar para unlock. Mantido só p/ compat. */
 function layer7_features_from_lic_file()
 {
-	$path = layer7_lic_path();
+	$v = layer7_license_read_verified();
+	return ($v !== null) ? (string)$v["features"] : "";
+}
+
+function layer7_checkin_features_raw()
+{
+	$path = "/var/db/layer7-checkin.json";
+	if (getenv("LAYER7_TEST_ROOT")) {
+		$alt = getenv("LAYER7_TEST_ROOT") . "/var/db/layer7-checkin.json";
+		if (is_readable($alt)) {
+			$path = $alt;
+		}
+	}
 	if (!is_readable($path)) {
 		return "";
 	}
@@ -6405,46 +6546,61 @@ function layer7_features_from_lic_file()
 	if ($raw === false || $raw === "") {
 		return "";
 	}
-	$env = json_decode($raw, true);
-	if (!is_array($env) || empty($env["data"]) || !is_string($env["data"])) {
+	$j = json_decode($raw, true);
+	if (!is_array($j)) {
 		return "";
 	}
-	$data = json_decode($env["data"], true);
-	if (is_array($data) && isset($data["features"])) {
-		return (string)$data["features"];
+	if (empty($j["features_set"]) && empty($j["features"])) {
+		return "";
 	}
-	if (preg_match('/"features"\s*:\s*"([^"]*)"/', $env["data"], $m)) {
-		return $m[1];
+	return isset($j["features"]) ? (string)$j["features"] : "";
+}
+
+function layer7_features_intersect_php($a, $b)
+{
+	/* Sempre BASE; add-ons só se presentes em ambos. */
+	$out = L7_FEAT_BASE;
+	if (($a & L7_FEAT_IDENTITY) && ($b & L7_FEAT_IDENTITY)) {
+		$out |= L7_FEAT_IDENTITY;
 	}
-	return "";
+	if (($a & L7_FEAT_MITM) && ($b & L7_FEAT_MITM)) {
+		$out |= L7_FEAT_MITM;
+	}
+	return $out;
 }
 
 function layer7_entitlements()
 {
 	$status = layer7_read_license_status();
+	$verified = layer7_license_read_verified();
 	$raw = "";
-	$flags = 0;
-	if (!empty($status["features_flags"])) {
-		$flags = (int)$status["features_flags"];
-		$raw = isset($status["features"]) ? (string)$status["features"] : "";
-	} elseif (!empty($status["features"])) {
-		$raw = (string)$status["features"];
+	$flags = L7_FEAT_BASE;
+	$source = "none";
+
+	if ($verified !== null) {
+		$raw = (string)$verified["features"];
 		$parsed = layer7_features_parse_php($raw);
-		$flags = $parsed["flags"];
-	} else {
-		$raw = layer7_features_from_lic_file();
-		$parsed = layer7_features_parse_php($raw);
-		$flags = $parsed["flags"];
+		$flags = $parsed["flags"] | L7_FEAT_BASE;
+		$source = "lic_verified";
+		/* ADR-0025: check-in só retira. */
+		$ci = layer7_checkin_features_raw();
+		if ($ci !== "") {
+			$ci_flags = layer7_features_parse_php($ci)["flags"] |
+			    L7_FEAT_BASE;
+			$flags = layer7_features_intersect_php($flags, $ci_flags);
+			$source = "lic_verified_intersect_checkin";
+		}
 	}
-	/* Sempre garantir BASE para UX do produto. */
-	$flags |= L7_FEAT_BASE;
+
 	return array(
 		"raw" => $raw,
 		"flags" => $flags,
 		"has_identity" => ($flags & L7_FEAT_IDENTITY) !== 0,
 		"has_mitm" => ($flags & L7_FEAT_MITM) !== 0,
 		"license_valid" => !empty($status["valid"]),
-		"dev_mode" => !empty($status["dev_mode"])
+		"dev_mode" => !empty($status["dev_mode"]),
+		"source" => $source,
+		"verified" => ($verified !== null)
 	);
 }
 
@@ -7199,6 +7355,16 @@ function layer7_mitm_sync_helper($data = null, $entitled = null)
 	$gate = layer7_mitm_product_gate_path();
 	$flag = layer7_mitm_effective_flag_path();
 	$gatedir = dirname($gate);
+	/*
+	 * 30.7 / GA2.9: em produção nunca confiar no booleano do caller —
+	 * revalidar entitlement a partir do .lic assinado. Em LAYER7_TEST_ROOT
+	 * os testes podem forçar $entitled=true/false.
+	 */
+	if (!getenv("LAYER7_TEST_ROOT")) {
+		$entitled = layer7_has_entitlement("mitm");
+	} elseif ($entitled === null) {
+		$entitled = layer7_has_entitlement("mitm");
+	}
 	$want = layer7_mitm_should_start_helper($mitm, $entitled);
 
 	if (!$want) {

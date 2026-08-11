@@ -57,6 +57,15 @@ layer7_tlsproxy_start()
 		return 1
 	fi
 
+	# 30.7 / GA2.9: rejeitar gate escrito à mão sem .lic assinado com mitm.
+	# Root ainda pode contornar (R-A); fecha o caminho trivial A-07.
+	if [ -x /usr/local/libexec/layer7-mitm-entitle-ok ]; then
+		if ! /usr/local/libexec/layer7-mitm-entitle-ok; then
+			echo "${name}: MITM entitlement check failed — refusing start" >&2
+			return 1
+		fi
+	fi
+
 	# shellcheck disable=SC1090
 	. "${gatefile}"
 

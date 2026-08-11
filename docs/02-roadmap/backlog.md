@@ -360,7 +360,7 @@ e gates em
 [`../09-blocking/plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md).
 
 **`30.3`–`30.6` FECHADOS** (`2026-08-10`). GA1 PASS; GA2.1–2.5 + GA2.11 PASS;
-GA3 PASS (GA3.7 DEFERRED lab). Próximo AP1: **`30.7`** (BG-120). Ver plano §8.
+GA3 PASS (GA3.7 DEFERRED lab). BG-120 **Concluido** (`30.7` / `1.9.52`). Próximo: **`30.8`** (AP2 token). Ver plano §8.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
@@ -370,7 +370,7 @@ GA3 PASS (GA3.7 DEFERRED lab). Próximo AP1: **`30.7`** (BG-120). Ver plano §8.
 | BG-117 | Token de subscrição na entrega de blacklists/catálogos; retirar espelho público corrente | Alta | blacklists + license server | AP2 / passos `30.8`–`30.11` | cópia pirata mantém-se actualizada indefinidamente (A-06) | G | **Alto** | **Aberto — prioridade de valor** | defesa estruturalmente sólida; conteúdo em falta **não** desliga enforce (R-D); `30.11` exige GO próprio; gate GA4 |
 | BG-118 | Check-in `true` por defeito + política de migração | Alta | package + licenciamento | AP3 / passo `30.14` | revogação no painel não corta appliance instalado (A-04) | M | Alto | **Aberto — exige GO próprio** | **reabre/emenda BG-101**; cria dependência de rede; runbook obrigatório; gate GA5 |
 | BG-119 | Resposta de check-in assinada com nonce; rejeitar não assinada | Alta | daemon + license server | AP3 / passos `30.12`–`30.13` | servidor falso via `/etc/hosts` mantém licença viva (A-05) | M | Alto | **Aberto** | sem pinning hoje; ADR-0032 emenda ADR-0021; gate GA5 |
-| BG-120 | Estado de entitlements assinado para a GUI; eliminar fallback sem verificação | Media | package/GUI + daemon | AP1 / passo `30.7` | stats forjados desbloqueiam UX de Identity/MITM (A-07) | M | Medio | **Aberto — próximo** | coordenar com ADR-0025; fechar gate `tlsproxy.product`; gate GA2 |
+| BG-120 | Estado de entitlements assinado para a GUI; eliminar fallback sem verificação | Media | package/GUI | AP1 / passo `30.7` | stats forjados desbloqueiam UX de Identity/MITM (A-07) | M | Medio | **Concluido** (`30.7` + release `1.9.52`, `2026-08-10`) | GA2.8–2.10 PASS; evidência `20260810T214800Z-30.7-entitlements`; verify via `pkeyutl` |
 | BG-121 | Alerta de abuso multi-appliance no license server (+ decisão sobre `max_activations`) | Media | license server | AP3 / passo `30.15` | integrador multi-cliente invisível (A-08) | M | Alto | **Aberto** | dados já existem em `activations_log`; falta alerta; gate GA5 |
 | BG-122 | Distribuir decisão de licença (remover ponto único em `refresh_enforce_cfg`) | Media | daemon | AP4 / passo `30.16` | um NOP activa enforce sem licença (A-02) | M | Medio | **Aberto** | manter legibilidade; N1/N2 obrigatórios; gate GA6 |
 | BG-123 | Completar cadeia de assinatura de release nas publicações (manifesto + `.sig`) | Baixa | release | AP4 / passo `30.18` | releases só com `.sha256`; contrato F1.2/ADR-0023 incompleto (A-10) | P | Medio | **Aberto** | não é bypass de licença; integridade/proveniência; gate GA6 |

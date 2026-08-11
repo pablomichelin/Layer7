@@ -4,6 +4,25 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.52] — 2026-08-10
+
+### Security
+
+- **Anti-pirataria 30.7 / BG-120:** entitlements da GUI derivados apenas de
+  `.lic` Ed25519 verificado (`openssl pkeyutl`; PHP `openssl_verify` inviável
+  neste stack). Stats / `.lic` sem sig / check-in sozinho **não** desbloqueiam
+  Identity/MITM. Check-in só intersecta (retira bits). PEM
+  `license-signing-public-key.pem`. Gate rc.d `layer7-mitm-entitle-ok` (GA2.9).
+  Sem assinatura local no daemon (ADR-0030 / R-A). GA2.8–2.10 PASS
+  (`tests/functional/test_entitlements_gui.php`). Pubkey SoT inalterada.
+  Herda 30.4–30.6.
+
+### Release
+
+- Canal publico `latest` — `.pkg` + `.sha256` em `pablomichelin/Layer7`
+- SHA256: `79312d1b73eb8744be817c9ef2b9a7cdf768439632dabbad35e9fb7bfa607134`
+- Rollback lab: `1.9.51`
+
 ## [1.9.51] — 2026-08-10
 
 ### Security

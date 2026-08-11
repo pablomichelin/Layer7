@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.51
+PORTVERSION=	1.9.52
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -182,6 +182,8 @@ do-install:
 		${STAGEDIR}${PREFIX}/libexec
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-blockpage \
 		${STAGEDIR}${PREFIX}/libexec
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-mitm-entitle-ok \
+		${STAGEDIR}${PREFIX}/libexec
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7-blockpage \
 		${STAGEDIR}${PREFIX}/etc/rc.d
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/layer7-blockpage
@@ -216,6 +218,8 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/lang/pt.php \
 		${STAGEDIR}${PREFIX}/etc/layer7/lang
 	${INSTALL_DATA} ${FILESDIR}${DATADIR}/blacklists-signing-public-key.pem \
+		${STAGEDIR}${DATADIR}
+	${INSTALL_DATA} ${FILESDIR}${DATADIR}/license-signing-public-key.pem \
 		${STAGEDIR}${DATADIR}
 	${INSTALL_DATA} ${FILESDIR}${DATADIR}/info.xml \
 		${STAGEDIR}${DATADIR}

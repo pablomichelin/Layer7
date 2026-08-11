@@ -1,6 +1,6 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.6` FECHADO** + **`1.9.51` publicado** (`2026-08-10`); próximo **`30.7`** (entitlements GUI / BG-120); **GA1 PASS**; GA2.1–2.5 + GA2.11 **PASS**; **GA3 PASS** (GA3.7 DEFERRED); ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.7` FECHADO** + **`1.9.52` publicado** (`2026-08-10`); próximo **`30.8`** (token subscrição / AP2); **GA1 PASS**; GA2.1–2.5 + GA2.8–2.11 **PASS**; faltam GA2.6–2.7 (lab); **GA3 PASS** (GA3.7 DEFERRED); ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -24,13 +24,13 @@
 
 | Campo | Valor |
 |-------|-------|
-| Onda actual | **AP1 em curso** (AP0 FECHADA; GA1 PASS) |
-| Passo actual | **`30.6`** — anti-rollback de relógio — **FECHADO** (`2026-08-10`) |
-| Próximo | **`30.7`** — entitlements assinados GUI (BG-120) |
-| Depois | AP2 `30.8`… |
+| Onda actual | **AP1 higiene FECHADA** · **AP2 a iniciar** (AP0 FECHADA; GA1 PASS) |
+| Passo actual | **`30.7`** — entitlements GUI — **FECHADO** (`2026-08-10`) |
+| Próximo | **`30.8`** — desenho token de subscrição (AP2) |
+| Depois | AP2 `30.9`… |
 | Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2` |
-| Código alterado até agora | `license.c`/`main.c` + Makefiles (`30.4`–`30.6`); **`1.9.51` publicado** |
-| Gate activo | **GA2 parcial** (faltam GA2.6–2.10 / `30.7`); **GA3 PASS** (GA3.7 DEFERRED) |
+| Código alterado até agora | `layer7.inc` + gate tlsproxy (`30.7`); herda `30.4`–`30.6`; **`1.9.52` publicado** |
+| Gate activo | **GA2 parcial** (faltam GA2.6–2.7 lab); GA2.8–2.10 **PASS**; **GA3 PASS** (GA3.7 DEFERRED) |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir execução `30.11`/`30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -39,16 +39,16 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo actual: 30.6 FECHADO; próximo 30.7 (entitlements GUI BG-120)
+- Passo actual: 30.7 FECHADO; próximo 30.8 (token subscrição AP2)
 - ADRs 0030–0033: Aceito (30.1b)
 - Ficha: docs/09-blocking/decisoes-humanas-30.1.md (8/8 preenchidas)
-- Gate GA0/GA1: PASS; GA2.1–2.5 + GA2.11 PASS; GA3 PASS (GA3.7 DEFERRED)
-- Evidência 30.6: docs/tests/evidence/20260810T201043Z-30.6-anti-rollback/
+- Gate GA0/GA1: PASS; GA2.1–2.5 + GA2.8–2.11 PASS; GA3 PASS (GA3.7 DEFERRED)
+- Evidência 30.7: docs/tests/evidence/20260810T214800Z-30.7-entitlements/
 - BG-101: reaberto lacuna comercial → BG-118 / 30.14
-- BG-114/BG-115/BG-116: Concluido
+- BG-114/BG-115/BG-116/BG-120: Concluido
 - SoT pubkey: /root/layer7-build-secrets/ (fora do git)
-- Latest publicado: 1.9.51 (.pkg; rollback lab 1.9.50)
-- Próximo agente: 30.7 — ver §8 e START-HERE
+- Latest publicado: 1.9.52 (.pkg; rollback lab 1.9.51)
+- Próximo agente: 30.8 — ver §8 e START-HERE
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -260,26 +260,18 @@ evidência `docs/tests/evidence/20260810T201043Z-30.6-anti-rollback/`.
 **Rollback:** `.pkg` `1.9.50`; ficheiro de estado ignorado por versões antigas.
 **Gate:** GA3.
 
-#### 30.7 — Entitlements assinados para a GUI — **BG-120**
+#### 30.7 — Entitlements assinados para a GUI — **BG-120** — **FECHADO** (`2026-08-10`)
 
 **Objectivo:** corrigir A-07 (stats forjados desbloqueiam UX de add-ons).
-**Implementação:** o estado de entitlements consumido pelo PHP passa a ser derivado
-de material **assinado**; eliminar o fallback sem verificação em
-`layer7_entitlements()`. Fechar também o gate MITM que hoje aceita
-`/var/run/layer7/tlsproxy.product` escrito à mão.
-**Restrição de desenho (obrigatória):** o estado assinado tem de derivar de material
-**já assinado pelo servidor** (`.lic` e/ou resposta de check-in). O daemon **não**
-assina localmente com chave própria embutida — root extrairia a chave do binário e o
-mecanismo seria circular. Se esta derivação não for viável, parar e propor ADR.
-**Ficheiros:** `package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc`, daemon
-(produção do estado assinado), testes PHP.
-**Teste mínimo:** stats forjados **não** desbloqueiam Identity/MITM na GUI; com
-licença legítima a GUI mostra o correcto; `test_mitm_config.php` e testes de
-entitlements PASS. Coordenação obrigatória com ADR-0025.
-**Risco:** Médio — toca em superfície partilhada com a trilha Identity+MITM.
-**Cuidado R-I:** bloco separado, sem alterar comportamento MITM.
-**Rollback:** `.pkg` anterior.
-**Gate:** GA2.
+**Implementação (entregue):** `layer7_entitlements()` deriva só de `.lic` Ed25519
+verificado (`openssl pkeyutl`); check-in só ∩ (retira); PEM
+`license-signing-public-key.pem`; rc.d + `layer7-mitm-entitle-ok` (GA2.9);
+sync_helper revalida em produção. Sem assinatura local no daemon.
+**Release:** `1.9.52`. Evidência: `docs/tests/evidence/20260810T214800Z-30.7-entitlements/`.
+**Teste:** `test_entitlements_gui.php` + `test_mitm_config.php` + `test_mitm_regress.php` **PASS**.
+**Risco:** Médio — superfície partilhada Identity+MITM; mitigado (R-I / TEST_ROOT).
+**Rollback:** `.pkg` `1.9.51`.
+**Gate:** GA2.8–2.10 **PASS**.
 
 ---
 

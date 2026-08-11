@@ -1,0 +1,28 @@
+=== test_entitlements_gui ===
+PASS test_entitlements_gui.php
+=== test_mitm_config ===
+Layer7 MITM audit: activate
+Layer7 MITM audit: activate
+Layer7 MITM control-plane: test lifecycle
+Layer7 MITM audit: failsafe
+Layer7 MITM control-plane: test lifecycle 2
+Layer7 MITM audit: failsafe
+Layer7 MITM audit: activate
+Layer7 MITM audit: expire
+Layer7 MITM control-plane: janela MITM expirada (P3 auto-disable)
+PASS test_mitm_config.php
+=== test_mitm_regress ===
+Layer7 MITM audit: activate
+Layer7 MITM control-plane: regress
+Layer7 MITM audit: failsafe
+Layer7 MITM audit: expire
+Layer7 MITM control-plane: janela MITM expirada (P3 auto-disable)
+PASS package/pfSense-pkg-layer7/tests/test_mitm_regress.php
+Layer7: filter_configure_safe reentrante/resync — skip (nao recursa)
+=== verify-prod-pubkey ===
+PASS: license.c pubkey == SoT (/root/layer7-build-secrets/l7_ed25519_pubkey.hex)
+pubkey_hex=8c52b6772a64749e4a57b34ba16578a1b130960b1a8e88e6c1d86dbd99fd1824
+=== sha256 ===
+79312d1b73eb8744be817c9ef2b9a7cdf768439632dabbad35e9fb7bfa607134
+=== pem fingerprint ===
+8e62b031fd4bedf43dce93d7890f18923256ff298d535f4ac101b9ad67b2c9ce

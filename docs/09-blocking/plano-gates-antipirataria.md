@@ -71,15 +71,15 @@ de clientes pagantes.
 | GA2.5 | Daemon arranca, `-t` PASS, `--fingerprint` PASS após strip | **PASS** (`1.9.50` no builder) |
 | GA2.6 | Licença válida ⇒ enforce idêntico ao `1.9.48` (**N1**) | **PENDENTE** |
 | GA2.7 | Licença ausente/inválida ⇒ monitor, daemon vivo, zero regras PF de block (**N2**) | **PENDENTE** |
-| GA2.8 | Stats/ficheiros forjados **não** desbloqueiam Identity/MITM na GUI | **PENDENTE** |
-| GA2.9 | Gate MITM não é activável escrevendo ficheiros à mão | **PENDENTE** |
-| GA2.10 | Sem regressão na trilha Identity+MITM: `test_mitm_config.php` e suite de entitlements PASS | **PENDENTE** |
+| GA2.8 | Stats/ficheiros forjados **não** desbloqueiam Identity/MITM na GUI | **PASS** (`20260810T214800Z` — `test_entitlements_gui.php`) |
+| GA2.9 | Gate MITM não é activável escrevendo ficheiros à mão | **PASS** (`layer7-mitm-entitle-ok` + rc.d; R-A permanece) |
+| GA2.10 | Sem regressão na trilha Identity+MITM: `test_mitm_config.php` e suite de entitlements PASS | **PASS** (`1.9.52` builder) |
 | GA2.11 | Limite de diagnóstico do strip registado honestamente (core dumps menos legíveis) | **PASS** (evidência `30.5` + ADR-0030) |
 
 **Saída:** o caminho de bypass mais curto desaparece e o custo de ataque sobe de
 minutos para horas com ferramentas. **Não** se declara "impossível de contornar".
-**Estado GA2:** parcial — GA2.1–2.5 + GA2.11 **PASS** (`30.4`+`30.5`);
-GA2.6–2.7 (lab enforce) e GA2.8–2.10 (`30.7`) pendentes.
+**Estado GA2:** parcial — GA2.1–2.5 + GA2.8–2.11 **PASS** (`30.4`+`30.5`+`30.7`);
+GA2.6–2.7 (lab enforce) pendentes.
 
 ---
 
