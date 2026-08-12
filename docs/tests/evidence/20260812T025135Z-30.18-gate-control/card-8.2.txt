@@ -1,0 +1,6 @@
+PASSO: 30.18 (gate-control)
+PERMITIDO: docs estado EM EXECUÇÃO→FECHADO; evidência; re-run bateria; revisão diff b36f2e3
+PROIBIDO: 30.19; MITM/IPv6; .254; CF/DNS; license-server; publish; novos segredos
+STOP SE: bateria FAIL; diff com private key / publish indevido
+GATE: GA6.5 (processo) + GA6.6
+DoD: PENDENTE→bateria PASS→diff review→FECHADO→commit+push

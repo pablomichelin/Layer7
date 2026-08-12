@@ -1,0 +1,9 @@
+Manifesto assinado com sucesso.
+Stage dir: /var/folders/_8/wl6qn28x76xdyz8s9tgpb9540000gn/T//layer7-f12-30.18.53733/stage
+Manifesto: release-manifest.v1.txt
+Assinatura: release-manifest.v1.txt.sig
+Chave publica staged: release-signing-public-key.pem
+Fingerprint SHA256 da chave publica: ea52463b172f3ad420466ecd25911e49f458de2ed30fdf6c2972aae19e753a1b
+Manifesto, assets e assinatura verificados com sucesso.
+PASS: 30.18 F1.2 sign+verify dry-run (GA6.5 toolchain)
+exit:0

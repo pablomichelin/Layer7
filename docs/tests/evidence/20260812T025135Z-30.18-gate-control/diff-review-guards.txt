@@ -1,0 +1,16 @@
+=== files touching secrets / publish / product binary ===
+10:docs/10-license-server/MANUAL-INSTALL.md
+15:docs/tests/evidence/20260812T024826Z-30.18-release-signing/no-private-key-in-status.txt
+
+=== publish still calls verify ===
+44:"$SCRIPT_DIR/verify-release.sh" --stage-dir "$STAGE_DIR"
+
+=== mktemp uses TMPDIR ===
+scripts/release/sign-release.sh:67:  _tmp_install="$(mktemp "${TMPDIR:-/tmp}/layer7-install-stage.XXXXXX.sh")"
+scripts/release/sign-release.sh:90:  TMP_PUB="$(mktemp "${TMPDIR:-/tmp}/layer7-release-pub.XXXXXX.pem")"
+scripts/release/sign-release.sh:142:TMP_MANIFEST="$(mktemp "${TMPDIR:-/tmp}/layer7-release-manifest.XXXXXX.txt")"
+scripts/release/sign-release.sh:175:TMP_VERIFY="$(mktemp "${TMPDIR:-/tmp}/layer7-release-verify.XXXXXX.log")"
+scripts/release/verify-release.sh:73:ASSET_LINES_FILE="$(mktemp "${TMPDIR:-/tmp}/layer7-release-assets.XXXXXX.txt")"
+
+=== no private key in commit tree of b36f2e3 ===
+docs/tests/evidence/20260812T024826Z-30.18-release-signing/no-private-key-in-status.txt

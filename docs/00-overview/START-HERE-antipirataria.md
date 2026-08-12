@@ -1,11 +1,14 @@
-# START HERE — Anti-pirataria e Anti-tamper 【`30.18` FECHADO · GA6.5 processo / GA6.6 **PASS** · **Composer 2.5**】
+# START HERE — Anti-pirataria e Anti-tamper 【`30.18` FECHADO (gate-control) · GA6.5 processo / GA6.6 **PASS** · **Composer 2.5**】
 
 > **Diagnóstico ACEITE** `2026-08-10` — [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md).
 > **AP3 código FECHADA** (`30.12`–`30.15`). **`30.16`/`30.17` FECHADOS**.
-> **`30.18` FECHADO** — cadeia F1.2 obrigatória no *processo* de release
-> (BG-123); dry-run sign/verify **PASS**; **sem** GitHub Release neste bloco.
-> GA6.5 **PASS (processo)** + residual campo até BG-028/ADR-0023 Fase 1;
-> GA6.6 **PASS**. Evidência:
+> **`30.18` FECHADO após gate-control** — bateria factual `20260812T025135Z`
+> (antes: tratado **EM EXECUÇÃO/PENDENTE** até PASS); cadeia F1.2 no *processo*
+> (BG-123); **sem** GitHub Release. Impl. `b36f2e3`.
+> GA6.5 **PASS (processo)** + residual campo até BG-028; GA6.6 **PASS**.
+> Evidência fecho:
+> [`../tests/evidence/20260812T025135Z-30.18-gate-control/`](../tests/evidence/20260812T025135Z-30.18-gate-control/).
+> Evidência impl.:
 > [`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/).
 > **Produção `.254`:** **`1.9.54`** (intocada). Candidato **`1.9.58`** (**sem** release).
 > **Próximo passo:** AP4 **`30.19`** — **só** com pedido explícito (**não** aberto).
@@ -43,8 +46,8 @@ docs/00-overview/START-HERE-antipirataria.md
 | Campo | Valor |
 |-------|-------|
 | Onda | **AP4 em curso** |
-| Passo | **`30.18` FECHADO** (F1.2 processo / BG-123) |
-| GA6.1–6.6 | **PASS** (6.5 = processo + residual campo/BG-028) |
+| Passo | **`30.18` FECHADO** (após gate-control; não antes) |
+| GA6.1–6.6 | **PASS** (6.5 = processo + residual campo/BG-028; revalidado `20260812T025135Z`) |
 | GA5.9 | **PENDENTE campo** (sem `.254`/release) |
 | Campo / e2e | produção `.254` = `1.9.54` intocada |
 | Próxima acção | AP4 **`30.19`** — **sob pedido** (**não** iniciado) |
@@ -61,7 +64,7 @@ docs/00-overview/START-HERE-antipirataria.md
 3. [`CORTEX.md`](../../CORTEX.md) — *Trilha Anti-pirataria*
 4. [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) — §0, passo `30.19`
 5. [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) — GA6.7+
-6. Evidência [`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/)
+6. Evidência gate-control [`../tests/evidence/20260812T025135Z-30.18-gate-control/`](../tests/evidence/20260812T025135Z-30.18-gate-control/)
 
 ---
 
@@ -69,7 +72,7 @@ docs/00-overview/START-HERE-antipirataria.md
 
 ```text
 Modelo: Composer 2.5.
-Contexto: trilha Anti-pirataria; 30.18 FECHADO (F1.2 processo; GA6.5 processo + residual BG-028; GA6.6 PASS);
+Contexto: trilha Anti-pirataria; 30.18 FECHADO após gate-control (F1.2 processo; GA6.5/6.6 PASS);
 produção .254 = 1.9.54; candidato 1.9.58 sem release.
 Arranque: docs/00-overview/START-HERE-antipirataria.md
 AGORA: implementar SOMENTE 30.19 se e só se o humano pediu esse cartão.
@@ -99,8 +102,9 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c
 - Onda: AP4 em curso
-- Passo: 30.18 FECHADO (F1.2 processo; GA6.5 processo + residual BG-028; GA6.6 PASS)
-- Evidência: 20260812T024826Z-30.18-release-signing
+- Passo: 30.18 FECHADO após gate-control (bateria 20260812T025135Z)
+- GA6.1-6.6 PASS (6.5 processo + residual BG-028); GA5.9 campo PENDENTE
+- Evidência: 20260812T025135Z-30.18-gate-control
 - Produção .254: 1.9.54; candidato 1.9.58 (sem release)
 - Próximo: AP4 30.19 (só com pedido explícito; NÃO aberto)
 - Agente: Composer 2.5 — um passo / chat (plano §8)

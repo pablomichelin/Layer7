@@ -14,8 +14,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `publish-release.sh` já exige `verify-release.sh`. **Sem** GitHub Release,
   **sem** chave de produção, **sem** `.254` / license-server, **sem** bump
   PORTVERSION. Canal `1.9.54` permanece `.pkg`+`.sha256` (ADR-0023 Fase 0);
-  1ª publish assinada = **BG-028**. GA6.5 **PASS (processo)** + residual
-  campo; GA6.6 **PASS**. Evidência
+  1ª publish assinada = **BG-028**. **Gate-control:** fecho documental só após
+  bateria `20260812T025135Z` (estado intermédio EM EXECUÇÃO/PENDENTE até PASS).
+  GA6.5 **PASS (processo)** + residual campo; GA6.6 **PASS**. Evidência fecho
+  `docs/tests/evidence/20260812T025135Z-30.18-gate-control/`; impl.
   `docs/tests/evidence/20260812T024826Z-30.18-release-signing/`.
 
 - **Anti-pirataria 30.17 — marcação por cliente (atribuição):** após update

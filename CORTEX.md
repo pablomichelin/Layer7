@@ -50,9 +50,10 @@ em instalações novas; upgrade não regressivo; runbook isolados; GA5.7/5.8/5.1
 GA5.12 **PASS** (unit); **`30.16` FECHADO** — decisão de licença distribuída
 (BG-122 / A-02); GA6.1/6.2 **PASS**; **`30.17` FECHADO** — marcação por cliente
 (sidecar opaco; sem telemetria); GA6.3/6.4 **PASS**; candidato **`1.9.58`**
-(**sem** GitHub Release); **`30.18` FECHADO** (F1.2 processo / BG-123; GA6.5
-processo + residual BG-028; GA6.6 **PASS**; **sem** publish); próximo
-**`30.19`** (AP4 — **não** iniciar sem pedido); comandos em
+(**sem** GitHub Release); **`30.18` FECHADO após gate-control** (F1.2 processo /
+BG-123; bateria `20260812T025135Z`; antes EM EXECUÇÃO/PENDENTE; GA6.5 processo
++ residual BG-028; GA6.6 **PASS**; **sem** publish); próximo **`30.19`**
+(AP4 — **não** iniciar sem pedido); comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.54`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
@@ -1457,10 +1458,13 @@ BG-122 **Concluido**; GA6.1/6.2 **PASS** (unit); candidato **`1.9.57`**
 GA6.3/6.4 **PASS**; candidato **`1.9.58`** (**sem** release/LS/`.254`);
 evidência fecho
 [`20260812T024408Z-30.17-gate-control`](docs/tests/evidence/20260812T024408Z-30.17-gate-control/).
-**`30.18` FECHADO** (`20260812T024826Z`): cadeia F1.2 obrigatória no *processo*
-de release (BG-123 / A-10); dry-run sign/verify **PASS**; **sem** GitHub
-Release / chave de produção / `.254`; GA6.5 **PASS (processo)** + residual
-campo (**BG-028** Fase 1); GA6.6 **PASS**; evidência
+**`30.18` FECHADO após gate-control** (`20260812T025135Z`): cadeia F1.2
+obrigatória no *processo* de release (BG-123 / A-10; impl. `b36f2e3`); fecho
+documental só após bateria (estado intermédio: EM EXECUÇÃO/PENDENTE até PASS);
+**sem** GitHub Release / chave de produção / `.254`; GA6.5 **PASS (processo)**
++ residual campo (**BG-028** Fase 1); GA6.6 **PASS**; evidência fecho
+[`20260812T025135Z-30.18-gate-control`](docs/tests/evidence/20260812T025135Z-30.18-gate-control/);
+evidência impl.
 [`20260812T024826Z-30.18-release-signing`](docs/tests/evidence/20260812T024826Z-30.18-release-signing/).
 **Próximo na trilha:** AP4 `30.19` (**não** iniciar sem pedido explícito).
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
@@ -1510,8 +1514,10 @@ pendente release).
   [`docs/tests/evidence/20260812T024235Z-30.17-content-attribution/`](docs/tests/evidence/20260812T024235Z-30.17-content-attribution/)
 - **Evidência 30.17 gate-control (fecho):**
   [`docs/tests/evidence/20260812T024408Z-30.17-gate-control/`](docs/tests/evidence/20260812T024408Z-30.17-gate-control/)
-- **Evidência 30.18 F1.2 processo:**
+- **Evidência 30.18 F1.2 processo (impl.):**
   [`docs/tests/evidence/20260812T024826Z-30.18-release-signing/`](docs/tests/evidence/20260812T024826Z-30.18-release-signing/)
+- **Evidência 30.18 gate-control (fecho):**
+  [`docs/tests/evidence/20260812T025135Z-30.18-gate-control/`](docs/tests/evidence/20260812T025135Z-30.18-gate-control/)
 - **Marcação 30.17 (privacidade):** [`docs/01-architecture/marcacao-cliente-30.17.md`](docs/01-architecture/marcacao-cliente-30.17.md)
 - **Runbook 30.14:** [`docs/13-runbooks/check-in-migration-30.14.md`](docs/13-runbooks/check-in-migration-30.14.md)
 - **Evidência campo 30.10 (STOP `1.9.53`):**
@@ -1543,8 +1549,9 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Onda: AP4 em curso
-- Passo: 30.18 FECHADO (F1.2 processo; GA6.5 processo + residual BG-028; GA6.6 PASS)
-- Evidência 30.18: 20260812T024826Z-30.18-release-signing
+- Passo: 30.18 FECHADO após gate-control (bateria 20260812T025135Z)
+- Evidência 30.18 gate-control: 20260812T025135Z-30.18-gate-control
+- Impl. 30.18: b36f2e3 (antes FECHADO prematuro → EM EXECUÇÃO/PENDENTE)
 - GO 30.14 + decisão 7 aplicados; sem max_activations
 - 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
 - GA5.1-5.8+5.10-5.12 PASS; GA6.1-6.6 PASS; GA5.9 campo PENDENTE

@@ -185,8 +185,8 @@ indisponibilidade de rede em firewall parado.
 | GA6.2 | Código continua legível e mantível apesar da distribuição de decisão | **PASS** — módulo puro `license_enforce_gate.c` + `enforce_armed` sem ofuscação |
 | GA6.3 | Marcação por cliente implementada com avaliação de privacidade registada | **PASS** (gate-control `20260812T024419Z`; sidecar + [`../01-architecture/marcacao-cliente-30.17.md`](../01-architecture/marcacao-cliente-30.17.md)) |
 | GA6.4 | Sem telemetria introduzida (coerente com a política do produto) | **PASS** (gate-control `20260812T024419Z`) — marca só local; `policy=local_only_no_telemetry` |
-| GA6.5 | Releases publicam manifesto + `.sig` + chave pública (ADR-0023 / F1.2) | **PASS (processo)** (`30.18` `20260812T024826Z`) — dry-run + política obrigatória; **residual campo** até 1ª publish Fase 1 (**BG-028**) |
-| GA6.6 | `MANUAL-INSTALL.md` com comandos e links da versão actual (regra especial do `AGENTS.md`) | **PASS** (`30.18`) — links `1.9.54` + nota/procedimento F1.2 |
+| GA6.5 | Releases publicam manifesto + `.sig` + chave pública (ADR-0023 / F1.2) | **PASS (processo)** (gate-control `20260812T025135Z`; impl. `b36f2e3`) — dry-run ×2 + política; **residual campo** até 1ª publish Fase 1 (**BG-028**) |
+| GA6.6 | `MANUAL-INSTALL.md` com comandos e links da versão actual (regra especial do `AGENTS.md`) | **PASS** (gate-control `20260812T025135Z`) — links `1.9.54` + nota/procedimento F1.2 |
 | GA6.7 | Revisão jurídica da EULA concluída | **PENDENTE** |
 | GA6.8 | Modelo de ameaças reavaliado com os controlos novos | **PENDENTE** |
 | GA6.9 | Declaração honesta do que **continua** possível para root (**RR-1…RR-5**) | **PENDENTE** |
@@ -196,7 +196,8 @@ indisponibilidade de rede em firewall parado.
 
 **Estado GA6:** **parcial** — GA6.1–6.6 **PASS** (6.5 = processo + residual campo/BG-028);
 restante → `30.19` (**não** aberto).
-Evidência `30.18`: `docs/tests/evidence/20260812T024826Z-30.18-release-signing/`.
+Evidência fecho `30.18` (gate-control): `docs/tests/evidence/20260812T025135Z-30.18-gate-control/`.
+Evidência impl. `30.18`: `docs/tests/evidence/20260812T024826Z-30.18-release-signing/`.
 Evidência fecho `30.17` (gate-control): `docs/tests/evidence/20260812T024408Z-30.17-gate-control/`.
 
 **Saída:** trilha fechada, com limites declarados sem overclaim.

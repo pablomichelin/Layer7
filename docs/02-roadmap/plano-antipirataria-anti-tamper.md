@@ -1,11 +1,12 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.18` FECHADO** (BG-123; cadeia F1.2 no processo;
-GA6.5 **PASS processo** + residual campo/BG-028; GA6.6 **PASS**; evidência
-[`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/));
-**`30.17` FECHADO** (gate-control); **`30.16`/`30.15`/`30.14` FECHADOS**;
-produção **`1.9.54`**; candidato Makefile **`1.9.58`** (**sem** release);
-ADRs 0030–0033 **`Aceito`**; **próximo AP4 `30.19`** (sob pedido; **não** aberto)
+**Estado do plano:** **`30.18` FECHADO após gate-control** (bateria
+`20260812T025135Z`; antes EM EXECUÇÃO/PENDENTE; BG-123; GA6.5 **PASS processo**
++ residual BG-028; GA6.6 **PASS**; evidência
+[`../tests/evidence/20260812T025135Z-30.18-gate-control/`](../tests/evidence/20260812T025135Z-30.18-gate-control/);
+impl. `b36f2e3`); **`30.17` FECHADO** (gate-control); produção **`1.9.54`**;
+candidato Makefile **`1.9.58`** (**sem** release); ADRs 0030–0033 **`Aceito`**;
+**próximo AP4 `30.19`** (sob pedido; **não** aberto)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -30,7 +31,7 @@ ADRs 0030–0033 **`Aceito`**; **próximo AP4 `30.19`** (sob pedido; **não** ab
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP4 em curso** (AP0–AP3 código FECHADOS; GA1/GA4 cut PASS) |
-| Passo actual | **`30.18` FECHADO** (cadeia F1.2 no processo / BG-123) |
+| Passo actual | **`30.18` FECHADO** após gate-control (F1.2 processo / BG-123) |
 | Próximo | AP4 **`30.19`** (sob pedido explícito; **não** aberto) |
 | Depois | fecho trilha |
 | Bloqueio duro | A-09 resolvido; cut PASS; GO `30.14` + decisão 7 **aplicados**; GA5.9 campo pós-release; A-10 residual campo → BG-028 |
@@ -44,10 +45,10 @@ ADRs 0030–0033 **`Aceito`**; **próximo AP4 `30.19`** (sob pedido; **não** ab
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo: 30.18 FECHADO (F1.2 processo; GA6.5 processo + residual BG-028; GA6.6 PASS)
-- Evidência 30.18: 20260812T024826Z-30.18-release-signing
-- 30.17 FECHADO (gate-control); GA6.1-6.4 PASS
-- GA5.1-5.8+5.10-5.12 PASS; GA5.9 campo PENDENTE
+- Passo: 30.18 FECHADO após gate-control (bateria 20260812T025135Z)
+- Evidência 30.18 gate-control: 20260812T025135Z-30.18-gate-control
+- Impl. 30.18: b36f2e3 (antes FECHADO prematuro → EM EXECUÇÃO/PENDENTE)
+- GA5.1-5.8+5.10-5.12 PASS; GA6.1-6.6 PASS; GA5.9 campo PENDENTE
 - Produção .254: 1.9.54; candidato Makefile 1.9.58 (sem release)
 - BG-117/118/119/121/122/123/101 Concluido; BG-028 Fase 1 pendente
 - Próximo: AP4 30.19 (só com pedido explícito; NÃO aberto)
@@ -440,18 +441,21 @@ bateria gate-control (fecho documental prematuro em `7f30b56` corrigido).
 **Evidência fecho:** [`../tests/evidence/20260812T024408Z-30.17-gate-control/`](../tests/evidence/20260812T024408Z-30.17-gate-control/).
 **Evidência impl. (histórica):** [`../tests/evidence/20260812T024235Z-30.17-content-attribution/`](../tests/evidence/20260812T024235Z-30.17-content-attribution/).
 
-#### 30.18 — Cadeia de assinatura de release completa — **BG-123** — **FECHADO** (`20260812T024826Z`)
+#### 30.18 — Cadeia de assinatura de release completa — **BG-123** — **FECHADO** (gate-control `20260812T025135Z`)
 
 | Campo | Valor |
 |-------|--------|
 | **Objectivo** | Activar/obrigar F1.2 no processo de release (manifesto + `.sig` + pubkey além de `.sha256`); provar sign/verify; alinhar MANUAL (mitigar A-10 no fluxo) |
 | **Impacto** | Docs + checklist + teste dry-run; **sem** GitHub Release, sem `.254`, sem chave de produção, sem bump PORTVERSION |
 | **Risco** | Baixo (processo); residual A-10 em tags já publicadas até 1ª publish Fase 1 (**BG-028** / ADR-0023) |
-| **Teste** | `sh tests/functional/test_release_signing_f12_30.18.sh` — **PASS**; `publish-release.sh` chama verify |
-| **Rollback** | Reverter commit 30.18; canal `1.9.54` inalterado |
+| **Teste** | `sh tests/functional/test_release_signing_f12_30.18.sh` — **PASS** (gate-control ×2); `publish-release.sh` chama verify |
+| **Rollback** | Reverter commits 30.18; canal `1.9.54` inalterado |
 | **Ficheiros** | `RELEASE-SIGNING.md`, `RELEASE-CHECKLIST.md`, `MANUAL-INSTALL.md`, `scripts/release/*` (sem publish), teste + evidência |
-| **Gate** | GA6.5 **PASS (processo)** + residual campo; GA6.6 **PASS** |
-| **Evidência** | [`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/) |
+| **Gate** | GA6.5 **PASS (processo)** + residual campo; GA6.6 **PASS** — só após gate-control |
+| **Estado intermédio** | `FECHADO` prematuro em docs → **EM EXECUÇÃO/PENDENTE** até bateria `20260812T025135Z` |
+| **Impl.** | `b36f2e3` |
+| **Evidência fecho** | [`../tests/evidence/20260812T025135Z-30.18-gate-control/`](../tests/evidence/20260812T025135Z-30.18-gate-control/) |
+| **Evidência impl.** | [`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/) |
 
 #### 30.19 — Fecho da trilha
 
