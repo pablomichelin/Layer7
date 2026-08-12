@@ -1,0 +1,5 @@
+SCOPE REVIEW 30.14 — factual
+Commit base: cb86766
+IN SCOPE files OK (sample, layer7.inc, settings GUI, pkg-install, Makefile 1.9.56, runbook, GO ficha, tests, SSOTs)
+OUT OF SCOPE absent: .254 deploy release CF DNS MITM IPv6 30.15
+NO_SCOPE_LEAK=1

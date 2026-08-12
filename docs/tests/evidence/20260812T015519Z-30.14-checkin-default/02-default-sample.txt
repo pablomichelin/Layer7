@@ -1,0 +1,1 @@
+8:    "check_in_enabled": true,

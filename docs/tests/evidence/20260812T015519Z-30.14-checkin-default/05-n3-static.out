@@ -1,0 +1,8 @@
+PASS: tick invalida so em DENIED/OFFLINE_MAX
+PASS: tick ignora NETWORK (N3 — sem invalidate)
+PASS: check_in invalidate count=1
+PASS: invalidate apenas no bloco revoked/expired
+PASS: unsigned => L7_CHECKIN_NETWORK
+PASS: unsigned nao chama checkin_invalidate_local
+RESULT: PASS
+n3_exit=0

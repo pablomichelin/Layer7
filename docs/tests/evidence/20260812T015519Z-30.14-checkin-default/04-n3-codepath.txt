@@ -1,0 +1,30 @@
+=== N3 code grep layer7_check_in / offline ===
+src/layer7d/license.c:1093:checkin_invalidate_local(struct l7_checkin_state *st, const char *reason)
+src/layer7d/license.c:1379:		return L7_CHECKIN_NETWORK;
+src/layer7d/license.c:1385:		return L7_CHECKIN_NETWORK;
+src/layer7d/license.c:1395:		return L7_CHECKIN_NETWORK;
+src/layer7d/license.c:1404:		return L7_CHECKIN_NETWORK;
+src/layer7d/license.c:1424:		    "license server unreachable");
+src/layer7d/license.c:1430:		return L7_CHECKIN_NETWORK;
+src/layer7d/license.c:1449:		    "unsigned or invalid check-in response");
+src/layer7d/license.c:1455:		return L7_CHECKIN_NETWORK;
+src/layer7d/license.c:1469:			return L7_CHECKIN_NETWORK;
+src/layer7d/license.c:1518:		checkin_invalidate_local(&st, st.last_error);
+src/layer7d/license.c:1531:	return L7_CHECKIN_NETWORK;
+src/layer7d/main.c:1138:license_checkin_tick(void)
+src/layer7d/main.c:3508:		license_checkin_tick();
+=== assert: NETWORK path does not call checkin_invalidate_local ===
+32:		return L7_CHECKIN_NETWORK;
+38:		return L7_CHECKIN_NETWORK;
+48:		return L7_CHECKIN_NETWORK;
+57:		return L7_CHECKIN_NETWORK;
+83:		return L7_CHECKIN_NETWORK;
+94:	 * check-in sem invalidar licença (N3), excepto revoked/expired
+102:		    "unsigned or invalid check-in response");
+108:		return L7_CHECKIN_NETWORK;
+122:			return L7_CHECKIN_NETWORK;
+157:	if (strcmp(status, "revoked") == 0 || strcmp(status, "expired") == 0) {
+164:		else if (strcmp(status, "expired") == 0)
+171:		checkin_invalidate_local(&st, st.last_error);
+176:		return L7_CHECKIN_DENIED;
+184:	return L7_CHECKIN_NETWORK;

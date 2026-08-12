@@ -1,10 +1,19 @@
-VEREDITO: 30.14 FECHADO
+VEREDITO: 30.14 FECHADO — bateria final factual PASS
 
-Objectivo: default check_in_enabled=true em novas; upgrade nao regressivo; isolados documentados; N3.
-Impacto: sample/bare/GUI/runbook; existentes preservam false/ausente.
-Risco: Medio (mitigado); GA5.9 campo PENDENTE sem .254.
-Teste: sample grep; C config enabled PASS; PHP no builder.
-Rollback: check_in_enabled=false ou .pkg anterior.
+UTC bateria builder: 20260811T220030Z (HEAD cb86766 + follow-up evidência)
+Commit implementação: cb86766
+Follow-up: evidência + test_check_in_n3_30.14.sh (este bloco)
 
-GA5.7/5.8/5.10/5.11 PASS
-GA5.9 PENDENTE campo
+RESULTADOS FACTUAIS
+- GA5.7 sample default true: PASS (grep line 8; php sample+bare)
+- GA5.8 upgrade preserva false/ausente: PASS (php_exit=0)
+- GA5.10 isolado OFF: PASS (php + C false/ausente)
+- N3 static (unsigned/NETWORK nao invalida; tick so DENIED/OFFLINE_MAX): PASS local
+- C config enabled: PASS local+builder (c_exit=0)
+- smoke-layer7d: PASS (smoke_exit=0)
+- Scope review: NO_SCOPE_LEAK=1
+
+NAO PASS / PENDENTE
+- GA5.9 campo (revogacao em <= intervalo): PENDENTE — sem .254/release (proibido)
+
+PROIBIDO RESPEITADO: sem .254, deploy, release, CF/DNS, MITM, IPv6, 30.15

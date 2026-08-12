@@ -1,0 +1,30 @@
+pull_exit=0
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+UTC=20260811T220030Z
+HEAD=cb86766
+=== PHP default/preserve/isolado ===
+PASS: GA5.7 sample check_in_enabled=true
+PASS: GA5.7 bare_config default true
+PASS: helper default new install
+PASS: GA5.8 upgrade preserva false
+PASS: GA5.8 upgrade nao injecta true se ausente
+PASS: GA5.8 ausente => efectivo OFF
+PASS: config nova sem chave recebe true
+PASS: GA5.10 isolado efectivo OFF
+PASS: GA5.6/N3: check-in OFF => daemon nao agenda (contrato)
+RESULT: PASS
+php_exit=0
+=== C config ===
+PASS: true => enabled
+PASS: false => disabled (isolado)
+PASS: ausente => disabled (nao regressivo)
+RESULT: PASS
+c_exit=0
+=== N3 static (needs updated script — may miss until push) ===
+n3_script=absent_pre_push
+=== SAMPLE ===
+8:    "check_in_enabled": true,
+=== SMOKE ===
+smoke_exit=0
+smoke-layer7d: OK
