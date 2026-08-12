@@ -1,0 +1,153 @@
+# Prep — Cut do espelho anónimo (`30.11`) · inventário + comando pendente
+
+**Estado:** **PREP ONLY** — cut **não** executado; aguarda confirmação explícita do gestor  
+**Data prep:** `2026-08-12`  
+**Trilha:** Anti-pirataria / Anti-tamper · AP2 · BG-117  
+**Plano:** [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) § `30.11`  
+**Gates:** [`plano-gates-antipirataria.md`](plano-gates-antipirataria.md) GA4.10 / GA4.11 / GA4.12 / GA4.15  
+**ADR:** [ADR-0031](../03-adr/ADR-0031-entitlement-entrega-conteudo.md) §4–§5  
+**Rollback:** [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md)
+
+---
+
+## 1. Decisão humana — GA4.12 (comunicação externa)
+
+| Campo | Valor |
+|-------|--------|
+| Pedido | Comunicação externa a clientes antes do cut? |
+| Decisão | **Não necessária** |
+| Âmbito | Decisões **internas** de desenvolvimento |
+| Destinatários externos agora | **Nenhum** |
+| Se houver impacto futuro | Aviso em **janela de manutenção** previamente comunicada por e-mail (ops Systemup) — **não** inventar nem enviar e-mail neste passo |
+| Estado do gate GA4.12 | **N/A** (waived) — ver §1.1 |
+
+### 1.1 Justificativa (plano / ADR / gates)
+
+| Fonte | Leitura |
+|-------|---------|
+| Gate GA4.12 | «Comunicação a clientes emitida antes de 30.11» — pressupõe **audiência externa** a avisar |
+| Plano § `30.11` | Entrega inclui comunicação **antes** do cut quando há dependentes do espelho |
+| ADR-0031 | «Retirar o espelho afecta quem depende dele hoje — exige comunicação» — a obrigação liga-se a **dependentes** |
+| Decisão gestor `2026-08-12` | Sem destinatários externos; cut é decisão interna; impacto futuro → janela de manutenção por e-mail já existente na ops |
+
+**Conclusão canónica:** com audiência externa vazia e decisão humana registada, GA4.12
+passa a **N/A** (não é PASS de emissão; não é FAIL). **Não** substitui o GO próprio
+de **cut** (GA4.15 / decisão 3 de execução).
+
+**Proibido:** inventar lista de destinatários; enviar e-mail; marcar GA4.12 PASS
+como se tivesse havido emissão.
+
+---
+
+## 2. Pré-requisitos do cut (checklist)
+
+| # | Pré-requisito | Estado |
+|---|---------------|--------|
+| P1 | `30.10` FECHADO + e2e `.254` / `1.9.54` PASS | **PASS** (`20260811T114320Z`) |
+| P2 | `30.9` live (token emitido) | **PASS** |
+| P3 | Primary auth GET manifesto/`.sig` 200/200 + sem token 401 | **PASS** (`20260812T003214Z`) |
+| P4 | Primary sem token continua 401 (recheck prep) | **PASS** (`2026-08-12`) |
+| P5 | GA4.11 rollback doc ready | **DOC READY** |
+| P6 | Cópia íntegra do snapshot no origin (rollback) | **PASS** — cksums runbook = assets GitHub (823 / 64 / 113 / 31169229) |
+| P7 | GA4.12 comunicação externa | **N/A** (esta ficha §1) |
+| P8 | GO explícito de **cut** (GA4.15) | **PENDENTE** — confirmação do gestor |
+| P9 | Não misturar enforce / MITM / IPv6 | **OK** (escopo só espelho) |
+
+**Recheck primary (prep, sem token):**
+`https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt`
+→ HTTP **401**.
+
+---
+
+## 3. Alvo exacto no GitHub (espelho anónimo corrente)
+
+| Campo | Valor |
+|-------|--------|
+| Repo | `pablomichelin/Layer7` |
+| Tag / release | `blacklists-ut1-current` |
+| Release id | `313502667` |
+| Nome | Blacklists UT1 - snapshot corrente assinada (F1.3) |
+| Draft | `false` |
+| Prerelease | `true` |
+| URL | https://github.com/pablomichelin/Layer7/releases/tag/blacklists-ut1-current |
+
+### Assets anónimos a remover (conteúdo corrente)
+
+Inventário live `2026-08-12` — **todos** os quatro assets da release rolling
+(alinhados ao conjunto do runbook de reposição GA4.11):
+
+| # | Asset | size | asset id (API) | sha256 (digest API) | downloads |
+|---|-------|-----:|----------------|---------------------|----------:|
+| 1 | `layer7-blacklists-manifest.v1.txt` | 823 | `405033619` | `3be4330830a58011bcef82d1225d224eb5d8a4d4a5836e31dceeedc503b61dae` | 26 |
+| 2 | `layer7-blacklists-manifest.v1.txt.sig` | 64 | `405033621` | `27d9552270b43aac422e54cee19b4a6045629f153e1c19d793148ae0144d6de7` | 22 |
+| 3 | `layer7-blacklists-ut1.tar.gz` | 31169229 | `405033618` | `4191e2ebdc13e3c87d777103528bab4fda6b273bc40c62a2c39cb820ad493d36` | 24 |
+| 4 | `blacklists-signing-public-key.pem` | 113 | `405033620` | `42180a4af6fae8e85af5f499eb63f4b1bb3e156ee14a117243c5c7e72071c0f7` | 4 |
+
+**Prova anónima actual (HEAD):** os quatro URLs
+`…/releases/download/blacklists-ut1-current/<asset>` respondem **HTTP 200**.
+
+**Fora do cut (não mexer neste passo):**
+- releases de pacote `v1.9.*` / `latest` do produto;
+- primary `downloads.systemup.inf.br` / license-server;
+- appliance `.254` / Cloudflare / DNS;
+- tag git `blacklists-ut1-current` em si (mantém-se; só assets — rollback = re-upload).
+
+---
+
+## 4. Acção irreversível pendente (NÃO executar sem GO)
+
+Após **confirmação explícita** do gestor («GO cut 30.11»), a acção mínima
+recomendada é **apagar os quatro assets** da release rolling (não apagar a
+release/tag inteira — simplifica rollback GA4.11):
+
+```sh
+# IRREVERSÍVEL sem cópia local — executar SÓ com GO cut explícito
+# Repo público: pablomichelin/Layer7 · tag: blacklists-ut1-current
+
+gh release delete-asset blacklists-ut1-current \
+  layer7-blacklists-manifest.v1.txt \
+  --repo pablomichelin/Layer7 --yes
+
+gh release delete-asset blacklists-ut1-current \
+  layer7-blacklists-manifest.v1.txt.sig \
+  --repo pablomichelin/Layer7 --yes
+
+gh release delete-asset blacklists-ut1-current \
+  layer7-blacklists-ut1.tar.gz \
+  --repo pablomichelin/Layer7 --yes
+
+gh release delete-asset blacklists-ut1-current \
+  blacklists-signing-public-key.pem \
+  --repo pablomichelin/Layer7 --yes
+```
+
+**Alternativa mais larga (NÃO preferida neste prep):**  
+`gh release delete blacklists-ut1-current --repo pablomichelin/Layer7 --yes`  
+apaga a release inteira (ainda recuperável via recriar release + upload do
+runbook, mas é superfície maior).
+
+### Teste mínimo pós-cut (quando autorizado)
+
+1. Anónimo: os quatro URLs acima → **404** (ou não 200).  
+2. Primary sem token → continua **401**.  
+3. Cliente legítimo `≥ 1.9.54` com token → update pelo primary (GA4.4).  
+4. Enforce / modo no `.254` → **inalterados**.  
+5. Se precisar repor → runbook GA4.11 (`gh release upload … --clobber`).
+
+---
+
+## 5. O que **não** está autorizado neste prep
+
+- Executar `delete-asset` / `release delete`
+- Alterar produção, Cloudflare, DNS, license-server live
+- Enviar e-mail / comunicação externa
+- Publicar nova GitHub Release de pacote
+- Declarar GA4.10 / GA4.15 PASS
+
+---
+
+## Ligação
+
+- Evidência primary auth: [`../tests/evidence/20260812T003214Z-30.11-auth-get-254/`](../tests/evidence/20260812T003214Z-30.11-auth-get-254/)
+- Rascunho coms (histórico; não emitir): [`../13-runbooks/content-mirror-comms-ga4.12-draft.md`](../13-runbooks/content-mirror-comms-ga4.12-draft.md)
+- Ficha 30.1 (dec. 3 Sim em princípio): [`decisoes-humanas-30.1.md`](decisoes-humanas-30.1.md)

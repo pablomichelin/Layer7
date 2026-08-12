@@ -4,7 +4,9 @@
 **Arranque:** [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md)
 **Modelo de ameaças:** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md)
 
-Cada critério: `PASS` | `FAIL` | `BLOCKED` | `DEFERRED` (só com ADR) | `PENDENTE`.
+Cada critério: `PASS` | `FAIL` | `BLOCKED` | `DEFERRED` (só com ADR) |
+`PENDENTE` | `N/A` (só com **decisão humana registada** + justificativa
+rastreável — ex.: audiência vazia; **não** usar para esconder FAIL técnico).
 Evidência: pasta `docs/tests/evidence/<run_id>/` sempre que houver lab.
 
 **Regra dos gates desta trilha:** todo critério que envolva o binário valida o
@@ -120,10 +122,10 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto no cliente) |
 | GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** (cut **não** executado) |
 | GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **DOC READY** — [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md); teste pós-cut ainda PENDENTE |
-| GA4.12 | Comunicação a clientes emitida antes de 30.11 | **PENDENTE** — rascunho [`../13-runbooks/content-mirror-comms-ga4.12-draft.md`](../13-runbooks/content-mirror-comms-ga4.12-draft.md) (**não emitido**) |
+| GA4.12 | Comunicação a clientes emitida antes de 30.11 | **N/A** (`2026-08-12`) — decisão humana: sem destinatários externos; cut = decisão interna; impacto futuro → janela de manutenção por e-mail ops. Rastreio: [`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md) §1. Rascunho histórico **não emitido**: [`../13-runbooks/content-mirror-comms-ga4.12-draft.md`](../13-runbooks/content-mirror-comms-ga4.12-draft.md) |
 | GA4.13 | Sem segredos novos no repositório, incluindo fixtures (**N8**, **R-K**) | **PASS** (`30.9` — seed efémera só em teste; prod via `ED25519_PRIVATE_KEY`) |
 | GA4.14 | ADR-0031 / desenho 30.8 declaram RR-2 (redistribuição por appliance licenciado) e que a resposta é atribuição+contratual, não bloqueio técnico | **PASS** (ADR-0031 §5 + contrato 30.8 §7) |
-| GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** (preflight auth autorizado; **cut** ainda sem GO) |
+| GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** — prep cut pronto ([`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md)); **cut ainda sem GO explícito** |
 
 **Preflight primary (pré-cut, não substitui GA4.10):** GET HTTPS
 `downloads.systemup.inf.br/.../manifest` + `.sig` com token local → **200/200**
@@ -132,8 +134,9 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 
 **Estado GA4:** parcial — GA4.1–4.7/4.9/4.13/4.14 **PASS** (código +
 local/builder + **e2e `.254`** com `1.9.54`); primary auth preflight **PASS**;
-30.9 **já live**; GA4.8 só local; GA4.11 doc ready.
-Falta **cut** `30.11` (GA4.10 / emissão GA4.12 / GA4.15).
+30.9 **já live**; GA4.8 só local; GA4.11 doc ready; **GA4.12 N/A** (waived).
+Falta **cut** `30.11` (GA4.10 / GA4.15) — inventário e comando em
+[`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md).
 
 Evidência e2e PASS: `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`.
 Evidência primary auth PASS: `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`.

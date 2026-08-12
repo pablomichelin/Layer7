@@ -30,7 +30,10 @@ Reposição do espelho público de conteúdo corrente (GA4.11 / `30.11` — roll
 comercial, sem tocar enforce):
 [`content-mirror-rollback-ga4.11.md`](content-mirror-rollback-ga4.11.md).
 
-Rascunho de comunicação a clientes antes do cut do espelho (GA4.12):
+Prep cut espelho anónimo (`30.11` — inventário + comando pendente):
+[`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md).
+
+Coms GA4.12 (histórico; gate **N/A** — não emitir):
 [`content-mirror-comms-ga4.12-draft.md`](content-mirror-comms-ga4.12-draft.md).
 
 Publicacao segura do license server (TLS, edge proxy, origin privado `8445`):

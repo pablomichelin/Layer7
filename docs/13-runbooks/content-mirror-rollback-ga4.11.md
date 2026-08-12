@@ -96,7 +96,8 @@ pública da tag `blacklists-ut1-current` **antes** do upload (painel GitHub ou
 - Não altera licenças, check-in nem enforce.
 - Não apaga blacklists locais nos appliances.
 - Não reverte o código do primary autenticado no license-server.
-- Não é substituto de comunicação a clientes (GA4.12).
+- Não é substituto de comunicação a clientes quando GA4.12 aplicável;
+  no cut `30.11` actual GA4.12 está **N/A** (ver prep-cut §1).
 
 ## Ligação
 

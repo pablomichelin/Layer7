@@ -62,7 +62,19 @@
 
 **Decisão humana:** Sim  
 **Data:** 2026-08-10  
-**Notas:** Aceite a recomendação. GO próprio de execução permanece em `30.11` (janela de transição e comunicação a clientes nesse passo).
+**Notas:** Aceite a recomendação. GO próprio de execução permanece em `30.11`
+(janela de transição nesse passo).
+
+### Addendum execução `30.11` — GA4.12 (`2026-08-12`)
+
+| Campo | Valor |
+|-------|--------|
+| Decisão | Comunicação **externa** a clientes **não necessária** para o cut |
+| Destinatários externos | Nenhum neste momento |
+| Âmbito | Decisões internas de desenvolvimento |
+| Impacto futuro | Janela de manutenção previamente comunicada por e-mail (ops) |
+| Gate GA4.12 | **N/A** (waived) — ver [`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md) §1 |
+| GO cut (GA4.15) | **Ainda pendente** — distinto desta dispensa de coms |
 
 ---
 

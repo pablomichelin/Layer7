@@ -40,8 +40,9 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 anti-pirataria **30.10** / BG-117 — fix `fetch_authed` + **e2e `.254` PASS**
 (`20260811T114320Z`); herda cliente token de `1.9.53`; **30.9 live PASS**;
 produção observada **`1.9.54`**; GA4.4 **PASS**; **`30.11` preflight** primary
-auth GET **PASS** (`20260812T003214Z` — 200/200 + 401); **cut espelho
-PENDENTE** (GO próprio + GA4.12); comandos em
+auth GET **PASS** (`20260812T003214Z` — 200/200 + 401); **GA4.12 N/A**
+(coms externas dispensadas); **cut espelho PENDENTE** (GO próprio GA4.15;
+prep `docs/09-blocking/prep-cut-30.11-espelho.md`); comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.53`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
@@ -1407,9 +1408,11 @@ Produção `.254` observada: **`1.9.54`** (e2e PASS `20260811T114320Z`).
 **`30.11` preflight:** primary `downloads.systemup.inf.br` GET autenticado
 manifesto/`.sig` **200/200** + sem token **401** —
 [`20260812T003214Z-30.11-auth-get-254`](docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/)
-**PASS**. **Cut do espelho não executado.**
-**Não** cortar espelho sem GO próprio + GA4.12 emitida (RR-1).
-**Próxima decisão humana:** GO `30.11` **cut** (retirada espelho) + emissão GA4.12.
+**PASS**. **GA4.12 N/A** (`2026-08-12` — sem coms externas; decisão interna).
+**Cut do espelho não executado.** Prep:
+[`docs/09-blocking/prep-cut-30.11-espelho.md`](docs/09-blocking/prep-cut-30.11-espelho.md).
+**Não** cortar espelho sem GO próprio explícito (GA4.15 / RR-1).
+**Próxima decisão humana:** confirmação explícita do **cut** `30.11`.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1434,7 +1437,7 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4 PASS** (e2e `1.9.54`); GA4.5–4.7/4.9 PASS; primary auth preflight PASS; GA2 parcial; falta cut `30.11` (GA4.10/12/15)
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4 PASS** (e2e `1.9.54`); GA4.5–4.7/4.9 PASS; primary auth preflight PASS; **GA4.12 N/A**; GA2 parcial; falta cut `30.11` (GA4.10/15)
 - **Evidência campo 30.10 (e2e PASS `1.9.54`):**
   [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
 - **Evidência 30.11 primary auth GET PASS:**
@@ -1451,12 +1454,13 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
   [0033](docs/03-adr/ADR-0033-anti-rollback-relogio.md) — **`Aceito`**
 - **Contrato AP2:** [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md)
 - **Runbook 30.10:** [`docs/13-runbooks/content-subscription-update.md`](docs/13-runbooks/content-subscription-update.md)
+- **Prep cut `30.11`:** [`docs/09-blocking/prep-cut-30.11-espelho.md`](docs/09-blocking/prep-cut-30.11-espelho.md)
 - **GA4.11 / GA4.12 (docs):** [`docs/13-runbooks/content-mirror-rollback-ga4.11.md`](docs/13-runbooks/content-mirror-rollback-ga4.11.md) ·
-  [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**rascunho — não emitido**)
-- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (cliente+e2e+primary auth OK; falta **cut** `30.11`); **BG-101** reaberto
-- **Ordem:** `30.0`→…→`30.10` ✓ →**`30.11` preflight ✓ / cut PENDENTE**→
+  [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**histórico — GA4.12 N/A**)
+- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; BG-117 (cliente+e2e+primary auth OK; GA4.12 N/A; falta **cut** `30.11`); **BG-101** reaberto
+- **Ordem:** `30.0`→…→`30.10` ✓ →**`30.11` preflight ✓ / GA4.12 N/A / cut PENDENTE**→
   AP3 `30.12`–`30.15`→AP4 `30.16`–`30.19`
-- **GOs humanos:** `30.11` cut (espelho) · `30.14` (check-in default)
+- **GOs humanos:** `30.11` cut (espelho, GA4.15) · `30.14` (check-in default)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
   kill-switch, CRL offline, telemetria
@@ -1470,12 +1474,14 @@ TRILHA ANTI-PIRATARIA — progresso
 - Passo: 30.10 FECHADO; 30.11 preflight auth PASS; cut PENDENTE
 - 30.9 live: PASS; e2e 1.9.54: 20260811T114320Z-30.10-e2e-154-254
 - Primary auth GET: 200/200 + 401 (20260812T003214Z) PASS
+- GA4.12: N/A (sem coms externas 2026-08-12)
 - Fix: fetch_authed segue HTTPS 302 sem vazar Bearer cross-host
-- Gate GA0/GA1/GA3: PASS; GA4.4–4.7/4.9 PASS; falta GA4.10/12/15
+- Gate GA0/GA1/GA3: PASS; GA4.4–4.7/4.9 PASS; falta GA4.10/15
+- Prep cut: docs/09-blocking/prep-cut-30.11-espelho.md
 - ADRs 0030-0033: Aceito
 - BG-117: falta cut 30.11 (RR-1)
 - Latest / produção .254: 1.9.54
-- NÃO cut espelho sem GO gestor + GA4.12 emitida
+- NÃO cut espelho sem GO gestor explícito
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

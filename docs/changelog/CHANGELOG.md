@@ -6,13 +6,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Documentation
 
+- **Anti-pirataria 30.11 — GA4.12 N/A + prep cut:** decisão humana
+  (`2026-08-12`): comunicação externa a clientes não necessária (decisões
+  internas; sem destinatários; impacto futuro → janela de manutenção ops).
+  Gate GA4.12 = **N/A** com rastreio em
+  `docs/09-blocking/prep-cut-30.11-espelho.md` (inventário exacto dos 4 assets
+  `blacklists-ut1-current` + comando `gh release delete-asset` **não
+  executado**). Cut / GA4.10 / GA4.15 continuam pendentes de GO explícito.
+  Sem e-mail, sem delete, sem alteração produção/CF/GitHub.
+
 - **Anti-pirataria 30.11 preflight — primary auth GET PASS:** em `.254`
   (`1.9.54`), GET HTTPS a `downloads.systemup.inf.br/.../manifest` + `.sig`
   com Bearer local → **200/200** (823/64); sem token → **401**. Evidência
   `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`. Sem cut do
   espelho; sem emissão GA4.12 a clientes; sem alteração produção/CF/GitHub.
   Docs canónicos (START-HERE / CORTEX / plano §0 / gates / backlog) alinhados.
-  Próximo: emitir GA4.12 + GO cut (GA4.10/15).
+  (Supersedido: GA4.12 passou a N/A; falta só GO cut.)
 
 - **Anti-pirataria 30.10 — e2e `.254` PASS com `1.9.54`:** GA4.4 PASS;
   produção mantida em `1.9.54`; evidência

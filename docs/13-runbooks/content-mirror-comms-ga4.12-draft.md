@@ -1,11 +1,12 @@
 # Rascunho — Comunicação a clientes (GA4.12) · passo `30.11`
 
-**Estado:** **RASCUNHO** — não emitir até GO do gestor (GA4.12 exige emissão
-**antes** do cut do espelho)  
+**Estado:** **HISTÓRICO / NÃO EMITIR** — gate GA4.12 marcado **N/A**
+(`2026-08-12`): gestor dispensou comunicação externa (sem destinatários;
+decisão interna; impacto futuro → janela de manutenção ops por e-mail).  
+Rastreio: [`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md) §1.  
 **Trilha:** Anti-pirataria / Anti-tamper · AP2  
-**Canal / audiência:** **BLOQUEADO** — gestor ainda **não** definiu canal nem
-lista de destinatários; o texto abaixo é só proposta interna  
-**Canal sugerido (proposta):** e-mail / portal de suporte Systemup (operador único)  
+**Canal / audiência:** **nenhum externo** (decisão humana)  
+**Canal sugerido (proposta legada):** e-mail / portal de suporte Systemup  
 **Idioma:** PT-BR
 
 ---
@@ -72,10 +73,9 @@ Equipa Systemup
 
 ## Checklist de emissão (operador)
 
-- [ ] Canal e audiência/destinatários **definidos pelo gestor** (bloqueio actual)  
-- [ ] `DATA_CORTE` e janela de transição aprovadas pelo gestor  
-- [ ] Primary público: `/api/health` = 200; `/layer7/...` sem token = 401  
-- [ ] Lista de destinatários confirmada  
-- [ ] Rascunho revisto (sem segredos)  
-- [ ] Emissão registada (data/hora + canal) → marcar GA4.12  
-- [ ] Só depois: GO de cut do espelho (GA4.10 / GA4.15)
+**Supersedido:** GA4.12 = **N/A** — não emitir este rascunho para o cut `30.11`.
+
+- [x] Decisão humana: sem destinatários externos (`2026-08-12`)  
+- [x] Gate GA4.12 → **N/A** (prep-cut §1)  
+- [ ] Só com novo GO: emitir aviso se ops abrir janela de manutenção  
+- [ ] GO de cut do espelho (GA4.10 / GA4.15) — **ainda pendente**

@@ -77,7 +77,12 @@ exige **GO humano próprio** (decisão n.º 3 do §5).
 ### Negativas / riscos
 
 - Alto risco de suporte se a janela offline for curta demais (`30.10`).
-- Retirar o espelho (`30.11`) afecta quem depende dele hoje — exige comunicação.
+- Retirar o espelho (`30.11`) afecta quem depende dele hoje — exige comunicação
+  **quando existem dependentes externos**. Se o gestor registar audiência
+  externa vazia (decisão interna), GA4.12 pode ser **N/A** com rastreio
+  ([`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md));
+  impacto futuro continua coberto por janela de manutenção ops — **não**
+  inventar emissão.
 - Redistribuição interna (**RR-2**) continua possível.
 - Sem GO `30.11`, AP2 não protege de facto (**RR-1**).
 
