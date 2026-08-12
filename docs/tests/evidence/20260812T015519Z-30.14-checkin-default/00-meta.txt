@@ -1,0 +1,7 @@
+passo=30.14
+bg=BG-118,BG-101
+utc=20260812T015519Z
+go_literal=aprovado activar check_in_enabled por defeito para novas instalacoes, priorizando seguranca anti-pirataria
+portversion_candidato=1.9.56
+producao_254=1.9.54 (intocada)
+release_github=nao

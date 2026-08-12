@@ -335,7 +335,7 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-098 | `waitpid` sem retry EINTR em enforce | Media | daemon | F4 | falsos fails / zombies | P | Medio | **Concluido (`1.9.9`)** | `waitpid_retry` |
 | BG-099 | Update GUI: URL só prefixo `https://github.com/` | Media | GUI/release | F7 | admin instala `.pkg` de outro repo | P | Medio | **Concluido (`1.9.9`)** | restringir a `pablomichelin/Layer7/` |
 | BG-100 | Teto blacklist 8M entradas (OOM) | Media | daemon/blacklists | F4 | OOM com feed externo grande | M | Medio | **Concluido (`1.9.12`)** | hard-cap 5M + `mem_percent` 5–50% de `hw.physmem` (clamp 128–1536 MB) + GUI; truncagem com WARN |
-| BG-101 | Revogação remota ineficaz com check-in default OFF (A-04) | Alta | licenciamento | AP3 / `30.14` | appliance instalado ignora revogação até expiry+grace | M | Alto | **Reaberto `2026-08-10` (`30.1b`) — lacuna comercial** | era `Documentado` (ADR-0021); GO: corrigir via ADR-0032 / BG-118; nunca fail-closed (R-C) |
+| BG-101 | Revogação remota ineficaz com check-in default OFF (A-04) | Alta | licenciamento | AP3 / `30.14` | appliance instalado ignora revogação até expiry+grace | M | Alto | **Concluido** (`30.14` / BG-118) | default ON em novas; existentes opt-in; isolados opt-out; N3 mantido |
 | BG-102 | Allowlist PF sem `match inet6` (L7ALLOW só inet) | Alta | package/PF | F4/hardening | IPs v6 na tabela allow_dst sem tag; block inet6 ignora allowlist | P | Alto | **Concluido (`1.9.10`)** | `layer7_pf_inet46_rules` + helper; smoke `pfctl -sr` PASS |
 | BG-103 | TOCTOU `pfctl -f /tmp/rules.debug` (check≠use) | Alta | daemon/package/PF | F4/hardening | ruleset arbitrário entre `stat` e `pfctl -f` | M | Alto | **Concluido (`1.9.11`)** | open+O_NOFOLLOW+fstat → `pfctl -f -` (stdin); PHP+helper+daemon |
 | BG-104 | DNS observe residual (spoof com txid+client) | Alta | daemon/capture | F4/hardening | sniffer LAN spoofa resposta com ID visto | M | Alto | **Concluido (`1.9.11`)** | pend client+txid+resolver+qname; allowlist auto-seed+`dns_observe_resolvers[]`; limite: spoof-as-resolver L2 |
@@ -366,9 +366,9 @@ GA3 PASS. BG-120 **Concluido**. Token: `30.8`–`30.10` + e2e `1.9.54` PASS;
 dispensadas `2026-08-12`). **`30.11` cut FECHADO** (`20260812T011217Z`);
 **BG-117 Concluido**. Evidência:
 [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
-**`30.12`/`30.13` FECHADOS** (contrato + implementação check-in assinado;
-GA5.1–5.6 PASS; BG-119 **Concluido**). Candidato `1.9.55` sem release.
-**Próximo:** `30.14` (**GO**) — não misturar com enforce/MITM.
+**`30.12`–`30.14` FECHADOS** (contrato + assinatura + default check-in;
+GA5.1–5.8 + 5.10–5.11 PASS; BG-118/119/101 **Concluido**). Candidato `1.9.56`
+sem release. **Próximo:** `30.15` — não misturar com enforce/MITM.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
@@ -376,7 +376,7 @@ GA5.1–5.6 PASS; BG-119 **Concluido**). Candidato `1.9.55` sem release.
 | BG-115 | Strip do `layer7d` no port; remover símbolos de licença | Alta | package/build | AP1 / passo `30.5` | mapa de símbolos aponta para as funções de licença (A-01) | P | Alto | **Concluido** (`30.5` + release `1.9.50`, `2026-08-10`) | GA2.4/2.5/2.11 PASS; evidência `20260810T200329Z-30.5-strip`; `-fvisibility=hidden`; sem ofuscação |
 | BG-116 | Anti-rollback de relógio (marca persistente + degradação para monitor) | Alta | daemon/licenciamento | AP1 / passo `30.6` | `date` para trás estende licença expirada indefinidamente (A-03) | M | Alto | **Concluido** (`30.6` + release `1.9.51`, `2026-08-10`) | GA3 PASS (GA3.7 DEFERRED); evidência `20260810T201043Z-30.6-anti-rollback`; RR-4 no runbook |
 | BG-117 | Token de subscrição na entrega de blacklists/catálogos; retirar espelho público corrente | Alta | blacklists + license server | AP2 / passos `30.8`–`30.11` | cópia pirata mantém-se actualizada indefinidamente (A-06) | G | **Alto** | **Concluido** (`30.11` cut `20260812T011217Z`; GA4.10/15 PASS; GA4.12 N/A) | API `asset_count=0`; residual CDN @cut documentado; recheck 404×4; evidência `20260812T011217Z-30.11-cut-mirror` |
-| BG-118 | Check-in `true` por defeito + política de migração | Alta | package + licenciamento | AP3 / passo `30.14` | revogação no painel não corta appliance instalado (A-04) | M | Alto | **Aberto — exige GO próprio** | **reabre/emenda BG-101**; cria dependência de rede; runbook obrigatório; gate GA5 |
+| BG-118 | Check-in `true` por defeito + política de migração | Alta | package + licenciamento | AP3 / passo `30.14` | revogação no painel não corta appliance instalado (A-04) | M | Alto | **Concluido** (`30.14` `20260812T015519Z`; GO registado) | novas=ON; upgrade preserva; runbook isolados; GA5.9 campo PENDENTE; candidato `1.9.56` |
 | BG-119 | Resposta de check-in assinada com nonce; rejeitar não assinada | Alta | daemon + license server | AP3 / passos `30.12`–`30.13` | servidor falso via `/etc/hosts` mantém licença viva (A-05) | M | Alto | **Concluido** (`30.13` `20260812T013913Z`; GA5.2–5.6 PASS unit) | dual-mode D10; candidato `1.9.55` sem release; evidência `20260812T013913Z-30.13-checkin-signed` |
 | BG-120 | Estado de entitlements assinado para a GUI; eliminar fallback sem verificação | Media | package/GUI | AP1 / passo `30.7` | stats forjados desbloqueiam UX de Identity/MITM (A-07) | M | Medio | **Concluido** (`30.7` + release `1.9.52`, `2026-08-10`) | GA2.8–2.10 PASS; evidência `20260810T214800Z-30.7-entitlements`; verify via `pkeyutl` |
 | BG-121 | Alerta de abuso multi-appliance no license server (+ decisão sobre `max_activations`) | Media | license server | AP3 / passo `30.15` | integrador multi-cliente invisível (A-08) | M | Alto | **Aberto** | dados já existem em `activations_log`; falta alerta; gate GA5 |

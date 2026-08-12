@@ -2539,6 +2539,54 @@ function layer7_generate_rules($type)
 	return layer7_pf_schema_rules_text($data);
 }
 
+/**
+ * 30.14 / BG-118 — default seguro para instalações novas (sample/bare).
+ * Existentes: ver layer7_check_in_effective_enabled() (ausente/false = OFF).
+ */
+function layer7_check_in_default_new_install()
+{
+	return true;
+}
+
+/**
+ * Efectivo para runtime/GUI. Chave ausente ⇒ OFF (migração não regressiva).
+ * Nunca falha-fechado por rede: o daemon só age se explicitamente true.
+ */
+function layer7_check_in_effective_enabled($data = null)
+{
+	if (!is_array($data)) {
+		$data = layer7_load_or_default();
+	}
+	if (!isset($data["layer7"]) || !is_array($data["layer7"])) {
+		return false;
+	}
+	if (!array_key_exists("check_in_enabled", $data["layer7"])) {
+		return false;
+	}
+	return !empty($data["layer7"]["check_in_enabled"]);
+}
+
+/**
+ * Upgrade não regressivo: se a chave já existe, preserva o valor.
+ * Se ausente numa config existente, NÃO injecta true (opt-in / anúncio).
+ * Instalações novas obtêm true via layer7.json.sample / bare_config.
+ */
+function layer7_check_in_apply_migration_policy($data, $is_existing_config)
+{
+	if (!is_array($data) || !isset($data["layer7"]) ||
+	    !is_array($data["layer7"])) {
+		return $data;
+	}
+	if ($is_existing_config) {
+		return $data;
+	}
+	if (!array_key_exists("check_in_enabled", $data["layer7"])) {
+		$data["layer7"]["check_in_enabled"] =
+		    layer7_check_in_default_new_install();
+	}
+	return $data;
+}
+
 function layer7_bare_config()
 {
 	return array(
@@ -2548,6 +2596,8 @@ function layer7_bare_config()
 			"log_level" => "info",
 			"log_file_max_mb" => 5,
 			"log_file_keep" => 3,
+			/* 30.14: default ON só em configs novas (bare/sample). */
+			"check_in_enabled" => layer7_check_in_default_new_install(),
 			"syslog_remote" => false,
 			"syslog_remote_host" => "",
 			"syslog_remote_port" => 514,

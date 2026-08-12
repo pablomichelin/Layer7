@@ -57,7 +57,10 @@ CRL offline continua **fora de escopo** (rejeitada na ADR-0021).
 (D1–D12; GA5.1 PASS).
 **Implementação `30.13` FECHADA** (`20260812T013913Z`): servidor dual-mode +
 cliente exige envelope; GA5.2–5.6 PASS (unit); evidência
-`20260812T013913Z-30.13-checkin-signed`. Default `check_in_enabled` = `30.14`.
+`20260812T013913Z-30.13-checkin-signed`.
+**Default `30.14` FECHADO** (`20260812T015519Z`): GO humano explícito registado
+na ficha `decisoes-humanas-30.1.md`; novas = ON; upgrade não regressivo;
+runbook isolados; evidência `20260812T015519Z-30.14-checkin-default`.
 
 ### 3. Nunca fail-closed por rede (**R-C**)
 
@@ -77,7 +80,7 @@ cliente exige envelope; GA5.2–5.6 PASS (unit); evidência
 | Regra / RR | Declaração |
 |------------|------------|
 | **R-C** | Indisponibilidade de rede nunca reduz enforce nem para o daemon. |
-| **RR-1** | Cut `30.11` **feito** (`20260812T011217Z`). Sem GO/execução em `30.14`, revogação em campo continua fraca (default check-in OFF). |
+| **RR-1** | Cut `30.11` **feito**; GO/execução `30.14` **feito** (default ON em novas). Revogação em campo na base antiga ainda depende de opt-in/release. |
 | **RR-5** | Resposta assinada impede **servidor falso**; **não** impede root de patchar o `layer7d` para ignorar o check-in. Valor de AP3: contra T2 *não-técnico* (ex-cliente que não pacha). O técnico é contido por AP2 + `30.15` + AP4. Coberto por **R-A**. |
 
 O que a ADR-0021 **mantém:** formato `.lic`, activação, binding, ausência de

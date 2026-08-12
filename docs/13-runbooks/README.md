@@ -26,6 +26,9 @@ Anti-rollback de relógio (30.6 / ADR-0033 — recuperação N6, limites RR-4):
 Subscrição de conteúdo / update de blacklists (30.10 — token Bearer, R-D/R-J):
 [`content-subscription-update.md`](content-subscription-update.md).
 
+Check-in default ON + migração / isolados (30.14 / BG-118 — N3, R-J):
+[`check-in-migration-30.14.md`](check-in-migration-30.14.md).
+
 Reposição do espelho público de conteúdo corrente (GA4.11 / `30.11` — rollback
 comercial, sem tocar enforce):
 [`content-mirror-rollback-ga4.11.md`](content-mirror-rollback-ga4.11.md).

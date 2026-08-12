@@ -1,0 +1,10 @@
+VEREDITO: 30.14 FECHADO
+
+Objectivo: default check_in_enabled=true em novas; upgrade nao regressivo; isolados documentados; N3.
+Impacto: sample/bare/GUI/runbook; existentes preservam false/ausente.
+Risco: Medio (mitigado); GA5.9 campo PENDENTE sem .254.
+Teste: sample grep; C config enabled PASS; PHP no builder.
+Rollback: check_in_enabled=false ou .pkg anterior.
+
+GA5.7/5.8/5.10/5.11 PASS
+GA5.9 PENDENTE campo

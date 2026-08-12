@@ -65,7 +65,7 @@ Isto é exactamente A-05: servidor falso via `/etc/hosts` pode manter licença v
 | D9 | Cliente novo (`30.13`) | Sempre envia `nonce`; **rejeita** resposta sem envelope/`sig` válido | Fecha A-05 para builds novos |
 | D10 | Transição / legado | Pedido **sem** `nonce` → servidor pode responder JSON legado (ADR-0021) | Só para clientes antigos; **não** reabre A-05 nos novos |
 | D11 | Rede / N3 / R-C | Falha de rede, timeout, 5xx, verify falha ⇒ **zero** impacto em enforce enquanto dentro de `max_offline_hours` | Revogação só com resposta **assinada** `revoked`/`expired` aceite |
-| D12 | Relação com `30.14` | Este contrato **não** muda `check_in_enabled` default | Default ON = GO próprio `30.14` / BG-118 |
+| D12 | Relação com `30.14` | Default ON = GO/`30.14` (fora deste contrato documental) | **`30.14` FECHADO** `20260812T015519Z` — ver runbook migração |
 
 Estas decisões só mudam com emenda explícita a este documento + nota no plano §0.
 

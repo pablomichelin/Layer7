@@ -4,6 +4,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Anti-pirataria 30.14 / BG-118 — check-in default ON (GO humano):**
+  `check_in_enabled: true` em `layer7.json.sample` / bare config (instalações
+  novas); upgrade **não** altera valor já gravado (`false`/ausente = OFF);
+  GUI toggle + runbook isolados
+  (`docs/13-runbooks/check-in-migration-30.14.md`); **N3** intacto. GO literal
+  registado em `docs/09-blocking/decisoes-humanas-30.1.md`. Candidato
+  `PORTVERSION=1.9.56` — **sem** GitHub Release / `.254` / deploy. GA5.7/5.8/5.10/5.11
+  PASS; GA5.9 campo PENDENTE. Evidência
+  `docs/tests/evidence/20260812T015519Z-30.14-checkin-default/`.
+
 ### Added
 
 - **Anti-pirataria 30.13 / BG-119 — check-in assinado com nonce:** license-server

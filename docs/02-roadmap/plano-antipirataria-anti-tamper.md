@@ -1,13 +1,12 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.13` FECHADO** (implementação check-in assinado;
-GA5.2–5.6 **PASS** unit; BG-119 **Concluido**); **`30.12` FECHADO** (contrato;
-GA5.1 **PASS**); **`30.11` FECHADO** (cut; GA4.10/15 **PASS**); **GA4.12 N/A**;
-**30.9/30.10** FECHADOS; produção **`1.9.54`**; candidato Makefile **`1.9.55`**
-(**sem** release neste fecho); ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`);
-contrato
-[`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md);
-**próximo `30.14`** (**GO humano** — default check-in)
+**Estado do plano:** **`30.14` FECHADO** (GO + default check-in ON; GA5.7/5.8/5.10/5.11
+**PASS**; BG-118/BG-101 **Concluido**); **`30.13` FECHADO** (assinatura; GA5.2–5.6
+**PASS**); **`30.12` FECHADO**; **`30.11` FECHADO**; **GA4.12 N/A**; produção
+**`1.9.54`**; candidato Makefile **`1.9.56`** (**sem** release); ADRs 0030–0033
+**`Aceito`**; runbook
+[`../13-runbooks/check-in-migration-30.14.md`](../13-runbooks/check-in-migration-30.14.md);
+**próximo `30.15`**
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -32,13 +31,13 @@ contrato
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP3 em curso** (AP0/AP1/AP2 cut FECHADOS; GA1/GA4 cut PASS) |
-| Passo actual | **`30.13` FECHADO** (implementação assinatura) |
-| Próximo | **`30.14`** (**GO humano** — default check-in) |
-| Depois | `30.15`… |
-| Bloqueio duro | A-09 resolvido; cut PASS; falta GO `30.14` para revogação em campo |
-| Código alterado até agora | `license-server` dual-mode 30.13 + `license.c`; candidato **`1.9.55`**; produção **`1.9.54`**; espelho sem assets |
-| Gate activo | **GA5.1–5.6 PASS**; GA5.7+ **PENDENTE**; GA4 cut PASS; GA4.12 **N/A** |
-| Decisões 1/3 (RR-1) | **Sim** / **Sim** — cut `30.11` **feito**; falta GO/execução `30.14` |
+| Passo actual | **`30.14` FECHADO** (default check-in + migração) |
+| Próximo | **`30.15`** (abuso multi-appliance) |
+| Depois | AP4 `30.16`… |
+| Bloqueio duro | A-09 resolvido; cut PASS; GO `30.14` **aplicado**; GA5.9 campo pós-release |
+| Código alterado até agora | 30.13 + sample/GUI/runbook 30.14; candidato **`1.9.56`**; produção **`1.9.54`** |
+| Gate activo | **GA5.1–5.8 + 5.10–5.11 PASS**; GA5.9 campo **PENDENTE**; GA4 cut PASS |
+| Decisões 1/3 (RR-1) | **Sim** / **Sim** — cut + GO execução `30.14` **feitos** |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
 
@@ -46,14 +45,14 @@ contrato
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo: 30.13 FECHADO (check-in assinado implementado)
+- Passo: 30.14 FECHADO (check-in default ON + migração)
+- GO 30.14: registado (anti-pirataria)
 - 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
-- GA5.1-5.6 PASS; GA5.7+ PENDENTE
-- Contrato: docs/01-architecture/contrato-check-in-assinado-30.12.md
-- Evidência 30.13: 20260812T013913Z-30.13-checkin-signed
-- Produção .254: 1.9.54; candidato Makefile 1.9.55 (sem release)
-- BG-117/BG-119 Concluido
-- Próximo: 30.14 (GO humano) — sem default check-in sem GO
+- GA5.1-5.8+5.10-5.11 PASS; GA5.9 campo PENDENTE
+- Evidência 30.14: 20260812T015519Z-30.14-checkin-default
+- Produção .254: 1.9.54; candidato Makefile 1.9.56 (sem release)
+- BG-117/118/119/101 Concluido
+- Próximo: 30.15 (abuso multi-appliance)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -381,18 +380,22 @@ legado); `layer7d` gera nonce, verifica sig+nonce+hw+iat, rejeita unsigned;
 [`../tests/evidence/20260812T013913Z-30.13-checkin-signed/`](../tests/evidence/20260812T013913Z-30.13-checkin-signed/).
 **Candidato:** `PORTVERSION=1.9.55` — **sem** GitHub Release neste passo.
 
-#### 30.14 — Check-in activo por defeito e política de migração — **BG-118**
+#### 30.14 — Check-in activo por defeito e política de migração — **FECHADO** (`20260812T015519Z`)
 
-**Objectivo:** corrigir A-04, a lacuna comercial mais caras.
-**Entrega:** `check_in_enabled: true` em instalações novas; política explícita para
-instalações existentes; caminho de excepção documentado para appliances
-verdadeiramente isolados; runbook de suporte.
-**Teste mínimo:** instalação nova arranca com check-in activo; upgrade não quebra
-appliance existente; revogação no painel corta enforce em ≤ intervalo; **N3 mantido**.
-**Risco:** **Alto** — muda comportamento de clientes instalados e cria dependência
-de rede que hoje não existe. **Exige GO humano próprio** (secção 5, pontos 1 e 2).
-**Rollback:** `.pkg` anterior + reverter default por configuração.
-**Gate:** GA5.
+**GO humano (literal):** «aprovado activar check_in_enabled por defeito para
+novas instalações, priorizando segurança anti-pirataria» — ficha
+[`../09-blocking/decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md).
+**Objectivo:** corrigir A-04 / BG-118 / BG-101.
+**Entrega:** sample/bare `check_in_enabled: true`; upgrade **preserva**
+`false`/ausente; GUI toggle; runbook isolados
+[`../13-runbooks/check-in-migration-30.14.md`](../13-runbooks/check-in-migration-30.14.md);
+**N3** intacto (rede/unsigned ≠ invalidate).
+**Teste:** PHP política + C `checkin_config_enabled` + sample grep **PASS**.
+**Risco:** Médio (mitigado pela não-regressão no upgrade). **Rollback:** flag
+`false` ou `.pkg` anterior.
+**Gate:** GA5.7/5.8/5.10/5.11 **PASS**; GA5.9 **PENDENTE campo** (sem `.254`).
+**Candidato:** `1.9.56` — **sem** GitHub Release neste passo.
+**Evidência:** [`../tests/evidence/20260812T015519Z-30.14-checkin-default/`](../tests/evidence/20260812T015519Z-30.14-checkin-default/).
 
 #### 30.15 — Detecção de abuso multi-appliance — **BG-121**
 

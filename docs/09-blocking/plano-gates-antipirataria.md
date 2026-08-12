@@ -160,17 +160,17 @@ Gate de maior impacto em suporte. **Não abrir sem GA4 estável.**
 | GA5.4 | Replay de resposta anterior rejeitado | **PASS** — nonce mismatch (JS C4 + `test_checkin_signed.c`) |
 | GA5.5 | Servidor falso via `/etc/hosts` ou DNS **não** consegue manter licença viva | **PASS** (unit lógico C5/C6 — chave errada/unsigned); campo `/etc/hosts` opcional pós-deploy |
 | GA5.6 | Falha de rede continua a não afectar enforce (**N3**) — verificado explicitamente neste gate | **PASS** — verify/rede → `L7_CHECKIN_NETWORK` sem invalidate |
-| GA5.7 | Instalação nova arranca com check-in activo | **PENDENTE** (`30.14` / GO) |
-| GA5.8 | Upgrade de instalação existente não quebra o appliance | **PENDENTE** (`30.14`) |
-| GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **PENDENTE** (`30.14`) |
-| GA5.10 | Caminho de excepção para appliance isolado documentado e testado | **PENDENTE** (`30.14`) |
-| GA5.11 | Runbook de suporte publicado antes da release | **PENDENTE** (`30.14`) |
+| GA5.7 | Instalação nova arranca com check-in activo | **PASS** (`20260812T015519Z`) — sample/bare `true`; evidência `20260812T015519Z-30.14-checkin-default` |
+| GA5.8 | Upgrade de instalação existente não quebra o appliance | **PASS** — preserva `false`/ausente (unit PHP+C) |
+| GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **PENDENTE campo** — caminho código `30.13` OK; sem `.254`/release neste passo |
+| GA5.10 | Caminho de excepção para appliance isolado documentado e testado | **PASS** — runbook + `false` efectivo OFF |
+| GA5.11 | Runbook de suporte publicado antes da release | **PASS** — [`../13-runbooks/check-in-migration-30.14.md`](../13-runbooks/check-in-migration-30.14.md) |
 | GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PENDENTE** (`30.15`) |
-| GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PASS parcial** — dual-mode D10 unit (C9); campo após deploy |
+| GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PASS parcial** — dual-mode D10 + upgrade preserve |
 
-**Estado GA5:** **parcial** — GA5.1–5.6 **PASS** (`30.12`+`30.13`);
-GA5.7–5.12 **PENDENTE** (`30.14`/`30.15` + GO onde aplicável); GA5.13 parcial.
-Evidência: `docs/tests/evidence/20260812T013913Z-30.13-checkin-signed/`.
+**Estado GA5:** **parcial** — GA5.1–5.8 + 5.10–5.11 **PASS**;
+GA5.9 **PENDENTE campo**; GA5.12 → `30.15`.
+Evidência `30.14`: `docs/tests/evidence/20260812T015519Z-30.14-checkin-default/`.
 
 **Saída:** revogar uma licença passa a ter efeito real, sem transformar
 indisponibilidade de rede em firewall parado.

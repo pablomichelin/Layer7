@@ -171,3 +171,17 @@
 **Próximo após GO:** `30.2` — reconciliação builder ↔ repo (pubkey fora do git, conforme decisão 4).
 **Estado:** `30.2` **FECHADO** (`2026-08-10`) — evidência
 `docs/tests/evidence/20260810T231840Z-30.2-builder-pubkey/`. Próximo: **`30.3`**.
+
+---
+
+## Addendum — GO de execução `30.14` / BG-118 (`2026-08-12`)
+
+| Campo | Valor |
+|-------|--------|
+| Passo | `30.14` (check-in default ON + migração) |
+| Natureza | **GO humano de execução** (decisões 1 e 2 do §5 / ficha) |
+| Texto literal do operador | «GO humano explícito para 30.14/BG-118: aprovado activar check_in_enabled por defeito para novas instalações, priorizando segurança anti-pirataria.» |
+| Data / UTC | `2026-08-12` / evidência `20260812T015519Z` |
+| Política confirmada | **Novas** = `check_in_enabled: true`; **existentes** = migração **não regressiva** (preservar `false`/ausente); isolados = opt-out documentado (**R-J**); **N3/R-C** intactos |
+| Proibido neste GO | Tocar `.254`; deploy/release/CF/DNS; abrir MITM/IPv6/`30.15` |
+| Gate | GA5.7–5.11 (ver `plano-gates-antipirataria.md`) |

@@ -213,6 +213,20 @@ if ($_POST["register_license"] ?? false) {
 	}
 }
 
+/* 30.14 / BG-118 — toggle check-in (isolados = OFF documentado). */
+if ($_POST["save_check_in"] ?? false) {
+	$data = layer7_load_or_default();
+	$data["layer7"]["check_in_enabled"] = isset($_POST["check_in_enabled"]);
+	if (layer7_save_json($data)) {
+		layer7_restart_service();
+		if (!empty($data["layer7"]["check_in_enabled"])) {
+			$savemsg = l7_t("Check-in online activado. O appliance contacta periodicamente o servidor de licencas; falha de rede nao derruba o enforce (N3).");
+		} else {
+			$savemsg = l7_t("Check-in online desactivado (modo isolado). A revogacao remota nao aplica ate reactivar. Ver runbook check-in.");
+		}
+	}
+}
+
 if ($_POST["revoke_license"] ?? false) {
 	$lic_file = layer7_lic_path();
 	if (file_exists($lic_file)) {
@@ -1129,7 +1143,32 @@ layer7_render_styles();
 					<dd><?= $cs_badge; ?>
 						<small class="text-muted" style="margin-left:8px;"><?= htmlspecialchars((string)($cs_st["message"] ?? "")); ?></small>
 					</dd>
+					<?php
+					$check_in_on = function_exists("layer7_check_in_effective_enabled")
+					    ? layer7_check_in_effective_enabled(array("layer7" => $L))
+					    : !empty($L["check_in_enabled"]);
+					?>
+					<dt><?= l7_t("Check-in online"); ?></dt>
+					<dd><?= $check_in_on
+					    ? '<span class="label label-success">' . l7_t("Activo") . '</span>'
+					    : '<span class="label label-default">' . l7_t("Desactivo") . '</span>'; ?></dd>
 				</dl>
+				<form method="post" action="layer7_settings.php#l7-sistema" class="form-horizontal" style="margin-bottom:12px;">
+					<input type="hidden" name="save_check_in" value="1">
+					<div class="form-group" style="margin-bottom:8px;">
+						<label class="col-sm-3 control-label"><?= l7_t("Check-in periodico"); ?></label>
+						<div class="col-sm-9">
+							<label class="checkbox-inline">
+								<input type="checkbox" name="check_in_enabled" <?= $check_in_on ? 'checked' : ''; ?>>
+								<?= l7_t("Activar (recomendado — revogacao remota)"); ?>
+							</label>
+							<p class="help-block">
+								<?= l7_t("Instalacoes novas: activo por defeito (30.14). Appliance isolado/air-gap: desactive e documente. Falha de rede nao reduz enforce enquanto dentro da janela offline (N3)."); ?>
+							</p>
+							<button type="submit" class="btn btn-sm btn-primary"><?= l7_t("Guardar check-in"); ?></button>
+						</div>
+					</div>
+				</form>
 				<?php if ($lic_valid && !$lic_expired && !$lic_dev): ?>
 					<form method="post" action="layer7_settings.php#l7-sistema" style="display:inline;">
 						<button type="submit" name="revoke_license" value="1" class="btn btn-sm btn-danger"

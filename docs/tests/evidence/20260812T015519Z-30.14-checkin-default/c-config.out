@@ -1,0 +1,4 @@
+PASS: true => enabled
+PASS: false => disabled (isolado)
+PASS: ausente => disabled (nao regressivo)
+RESULT: PASS
