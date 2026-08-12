@@ -1,0 +1,32 @@
+From github.com:pablomichelin/pfsense-layer7
+ * branch            main       -> FETCH_HEAD
+   cb86766..f365144  main       -> origin/main
+Updating cb86766..f365144
+Fast-forward
+ .../00-verdict.txt                                 | 25 ++++++---
+ .../02-default-sample.txt                          |  1 +
+ .../03-c-compile.err                               |  0
+ .../03-c-config-enabled.out                        |  5 ++
+ .../04-n3-codepath.txt                             | 30 +++++++++++
+ .../05-n3-static.out                               |  8 +++
+ .../06-builder-final-battery.out                   | 30 +++++++++++
+ .../07-scope-review.txt                            |  5 ++
+ .../README.md                                      | 29 ++++++++--
+ tests/functional/test_check_in_n3_30.14.sh         | 61 ++++++++++++++++++++++
+ 10 files changed, 183 insertions(+), 11 deletions(-)
+ create mode 100644 docs/tests/evidence/20260812T015519Z-30.14-checkin-default/02-default-sample.txt
+ create mode 100644 docs/tests/evidence/20260812T015519Z-30.14-checkin-default/03-c-compile.err
+ create mode 100644 docs/tests/evidence/20260812T015519Z-30.14-checkin-default/03-c-config-enabled.out
+ create mode 100644 docs/tests/evidence/20260812T015519Z-30.14-checkin-default/04-n3-codepath.txt
+ create mode 100644 docs/tests/evidence/20260812T015519Z-30.14-checkin-default/05-n3-static.out
+ create mode 100644 docs/tests/evidence/20260812T015519Z-30.14-checkin-default/06-builder-final-battery.out
+ create mode 100644 docs/tests/evidence/20260812T015519Z-30.14-checkin-default/07-scope-review.txt
+ create mode 100755 tests/functional/test_check_in_n3_30.14.sh
+PASS: tick invalida so em DENIED/OFFLINE_MAX
+PASS: tick ignora NETWORK (N3 — sem invalidate)
+PASS: check_in invalidate count=1
+PASS: invalidate apenas no bloco revoked/expired
+PASS: unsigned => L7_CHECKIN_NETWORK
+PASS: unsigned nao chama checkin_invalidate_local
+RESULT: PASS
+n3_builder_exit=0
