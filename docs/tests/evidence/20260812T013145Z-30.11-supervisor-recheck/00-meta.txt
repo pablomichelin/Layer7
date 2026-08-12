@@ -1,0 +1,5 @@
+RUNID=20260812T013145Z
+STEP=30.11-supervisor-recheck
+MODE=read-only
+NO_TOUCH=.254 Cloudflare DNS license-server GitHub-assets package-release
+TOKEN_REAUTH=not_rerun (Bearer only on appliance; prior PASS 20260812T003214Z)

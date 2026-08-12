@@ -154,7 +154,7 @@ Gate de maior impacto em suporte. **Não abrir sem GA4 estável.**
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GA5.1 | Protocolo assinado com nonce especificado e revisto | **PENDENTE** |
+| GA5.1 | Protocolo assinado com nonce especificado e revisto | **PASS** (`2026-08-12`) — [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md); evidência `20260812T013200Z-30.12-protocol-design` |
 | GA5.2 | Resposta legítima assinada é aceite | **PENDENTE** |
 | GA5.3 | Resposta **não assinada** é rejeitada pelo cliente | **PENDENTE** |
 | GA5.4 | Replay de resposta anterior rejeitado | **PENDENTE** |
@@ -167,6 +167,10 @@ Gate de maior impacto em suporte. **Não abrir sem GA4 estável.**
 | GA5.11 | Runbook de suporte publicado antes da release | **PENDENTE** |
 | GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PENDENTE** |
 | GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PENDENTE** |
+
+**Estado GA5:** **parcial** — GA5.1 **PASS** (contrato `30.12`);
+GA5.2–5.13 **PENDENTE** (`30.13`–`30.15` + GO `30.14` onde aplicável).
+Evidência desenho: `docs/tests/evidence/20260812T013200Z-30.12-protocol-design/`.
 
 **Saída:** revogar uma licença passa a ter efeito real, sem transformar
 indisponibilidade de rede em firewall parado.

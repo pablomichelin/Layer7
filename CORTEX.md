@@ -39,11 +39,11 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `SHA256=e9935975990448d46aaf1f6e598d2b76b986f43d5df8b50a5aee35000aa0351a`;
 anti-pirataria **30.10** / BG-117 — fix `fetch_authed` + **e2e `.254` PASS**
 (`20260811T114320Z`); herda cliente token de `1.9.53`; **30.9 live PASS**;
-produção observada **`1.9.54`**; GA4.4 **PASS**; **`30.11` FECHADO** — cut
-espelho (`20260812T011217Z`, `delete-asset` ×4; release/tag preservados);
-GA4.10/15 **PASS**; **GA4.12 N/A**; primary auth preflight
-`20260812T003214Z` **PASS**; evidência cut
-`docs/tests/evidence/20260812T011217Z-30.11-cut-mirror/`; comandos em
+produção observada **`1.9.54`**; GA4.4 **PASS**; **`30.11` FECHADO** (cut
+espelho; GA4.10/15 **PASS**; GA4.12 **N/A**); **`30.12` FECHADO** — contrato
+check-in assinado/nonce (GA5.1 **PASS**; zero código);
+[`docs/01-architecture/contrato-check-in-assinado-30.12.md`](docs/01-architecture/contrato-check-in-assinado-30.12.md);
+próximo **`30.13`**; comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.53`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
@@ -1412,9 +1412,15 @@ manifesto/`.sig` **200/200** + sem token **401** —
 **PASS**. **GA4.12 N/A** (`2026-08-12` — sem coms externas; decisão interna).
 **`30.11` cut FECHADO** (`20260812T011217Z`): 4 assets apagados;
 `blacklists-ut1-current` com **0 assets**; tag/release id `313502667`
-preservados; residual CDN @cut documentado; recheck `012017Z` **404×4**.
-Evidência: [`docs/tests/evidence/20260812T011217Z-30.11-cut-mirror/`](docs/tests/evidence/20260812T011217Z-30.11-cut-mirror/).
-**Próximo na trilha:** AP3 `30.12` (não misturar).
+preservados; residual CDN @cut documentado; recheck/supervisor **404×4**.
+Evidências cut/recheck:
+[`20260812T011217Z-30.11-cut-mirror`](docs/tests/evidence/20260812T011217Z-30.11-cut-mirror/) ·
+[`20260812T013145Z-30.11-supervisor-recheck`](docs/tests/evidence/20260812T013145Z-30.11-supervisor-recheck/).
+**`30.12` FECHADO** (`2026-08-12`): contrato check-in assinado/nonce
+([`contrato-check-in-assinado-30.12.md`](docs/01-architecture/contrato-check-in-assinado-30.12.md));
+GA5.1 **PASS**; evidência
+[`20260812T013200Z-30.12-protocol-design`](docs/tests/evidence/20260812T013200Z-30.12-protocol-design/).
+**Próximo na trilha:** `30.13` (implementação — chat novo; não misturar).
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1426,8 +1432,8 @@ GA4.1/GA4.14 **PASS**.
 [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md).
 **BG-101:** reaberto lacuna comercial → BG-118 / `30.14`.
 **A-09:** resolvido operacionalmente em `30.2`.
-**Prioridade de valor: AP2** — dec. 1 e 3 = Sim em princípio; execução ainda exige
-passos `30.11`/`30.14` **após** desbloquear GA4.4.
+**Prioridade de valor:** AP2 conteúdo fechado no eixo espelho; AP3 desenho
+`30.12` feito — falta `30.13` + GO `30.14` para revogação forte em campo.
 Riscos residuais **RR-1…RR-5** no plano §0.1.
 **Agente:** Composer 2.5 — um passo por chat (plano §8).
 **Limite honesto:** root **pode** contornar verificação local; proibido overclaim.
@@ -1439,13 +1445,17 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4/10/15 PASS**; GA4.5–4.7/4.9 PASS; primary auth PASS; **GA4.12 N/A**; GA2 parcial
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4/10/15 PASS**; **GA5.1 PASS**; GA4.12 **N/A**; GA2 parcial; GA5.2+ PENDENTE
 - **Evidência campo 30.10 (e2e PASS `1.9.54`):**
   [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
 - **Evidência 30.11 primary auth GET PASS:**
   [`docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`](docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/)
 - **Evidência 30.11 cut espelho PASS:**
   [`docs/tests/evidence/20260812T011217Z-30.11-cut-mirror/`](docs/tests/evidence/20260812T011217Z-30.11-cut-mirror/)
+- **Evidência 30.11 supervisor recheck:**
+  [`docs/tests/evidence/20260812T013145Z-30.11-supervisor-recheck/`](docs/tests/evidence/20260812T013145Z-30.11-supervisor-recheck/)
+- **Evidência 30.12 desenho:**
+  [`docs/tests/evidence/20260812T013200Z-30.12-protocol-design/`](docs/tests/evidence/20260812T013200Z-30.12-protocol-design/)
 - **Evidência campo 30.10 (STOP `1.9.53`):**
   [`docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`](docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/)
 - **Evidência campo 30.10 (1ª janela):**
@@ -1457,13 +1467,14 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
   [0032](docs/03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md) (**emenda ADR-0021**) ·
   [0033](docs/03-adr/ADR-0033-anti-rollback-relogio.md) — **`Aceito`**
 - **Contrato AP2:** [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md)
+- **Contrato AP3/`30.12`:** [`docs/01-architecture/contrato-check-in-assinado-30.12.md`](docs/01-architecture/contrato-check-in-assinado-30.12.md)
 - **Runbook 30.10:** [`docs/13-runbooks/content-subscription-update.md`](docs/13-runbooks/content-subscription-update.md)
 - **Prep/fecho cut `30.11`:** [`docs/09-blocking/prep-cut-30.11-espelho.md`](docs/09-blocking/prep-cut-30.11-espelho.md)
 - **GA4.11 / GA4.12 (docs):** [`docs/13-runbooks/content-mirror-rollback-ga4.11.md`](docs/13-runbooks/content-mirror-rollback-ga4.11.md) ·
   [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**histórico — GA4.12 N/A**)
-- **Backlog:** BG-114…BG-116 + BG-120 **Concluido**; **BG-117 Concluido** (`30.11` cut); **BG-101** reaberto
-- **Ordem:** `30.0`→…→`30.10` ✓ →**`30.11` FECHADO**→
-  AP3 `30.12`–`30.15`→AP4 `30.16`–`30.19`
+- **Backlog:** BG-114…BG-117 + BG-120 **Concluido**; BG-119 desenho OK / código PENDENTE; **BG-101** reaberto
+- **Ordem:** `30.0`→…→**`30.12` FECHADO**→
+  `30.13`→`30.14` (GO)→`30.15`→AP4 `30.16`–`30.19`
 - **GOs humanos remanescentes:** `30.14` (check-in default)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
@@ -1474,18 +1485,16 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
 TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Onda: AP2 em curso
-- Passo: 30.10 FECHADO; 30.11 FECHADO (cut 20260812T011217Z)
-- 30.9 live: PASS; e2e 1.9.54: 20260811T114320Z-30.10-e2e-154-254
-- Primary auth GET: 200/200 + 401 (20260812T003214Z) PASS
-- Cut: delete-asset x4; asset_count=0; residual CDN @cut; recheck 404x4
-- GA4.12: N/A; GA4.10/15: PASS
-- Gate GA0/GA1/GA3: PASS; GA4 cut PASS
-- Evidência cut: 20260812T011217Z-30.11-cut-mirror
+- Onda: AP3 em curso
+- Passo: 30.12 FECHADO (contrato check-in assinado)
+- 30.11 cut FECHADO; supervisor recheck 404x4 / asset_count=0
+- GA4.10/15 PASS; GA4.12 N/A; GA5.1 PASS; GA5.2+ PENDENTE
+- Contrato: docs/01-architecture/contrato-check-in-assinado-30.12.md
+- Evidência 30.12: 20260812T013200Z-30.12-protocol-design
 - ADRs 0030-0033: Aceito
-- BG-117: Concluido (RR-1 cut feito)
+- BG-117 Concluido; BG-119 desenho OK (código=30.13)
 - Latest / produção .254: 1.9.54
-- Próximo: AP3 30.12
+- Próximo: 30.13 (implementação) — chat novo; sem 30.14 sem GO
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

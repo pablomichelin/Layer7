@@ -61,7 +61,7 @@ exige **GO humano próprio** (decisão n.º 3 do §5).
 |------------|------------|
 | **R-B** | AP2 é a prioridade de valor da trilha; higiene AP1 não a substitui. |
 | **R-D** | Falta de token impede actualizar; nunca apaga conteúdo nem desliga enforce. |
-| **RR-1** | Sem GO em `30.11` (espelho) — e, na prática comercial, sem `30.14` — a trilha entrega **higiene**, não protecção contra T1/T2. Se o GO do espelho for **Não**, o veredicto deve declarar AP2 = higiene parcial. |
+| **RR-1** | Cut `30.11` **executado** (`20260812T011217Z`; `asset_count=0`). Sem `30.14` (check-in default), a protecção comercial contra T2 no eixo *revogação* continua incompleta; AP2 conteúdo já não depende do espelho anónimo corrente. |
 | **RR-2** | Um integrador com **1 licença legítima** pode descarregar blacklists nesse appliance e re-servi-las internamente a N cópias. O token trava o download **anónimo**, não a redistribuição de ficheiros. Resposta: marcação por cliente (`30.17`) + via contratual (AP4) — **não** bloqueio técnico neste ADR. |
 
 ---
@@ -84,7 +84,7 @@ exige **GO humano próprio** (decisão n.º 3 do §5).
   impacto futuro continua coberto por janela de manutenção ops — **não**
   inventar emissão.
 - Redistribuição interna (**RR-2**) continua possível.
-- Sem GO `30.11`, AP2 não protege de facto (**RR-1**).
+- Cut `30.11` feito; residual RR-1 remanescente concentra-se em `30.14`.
 
 ---
 

@@ -52,6 +52,10 @@ CRL offline continua **fora de escopo** (rejeitada na ADR-0021).
 5. Compatibilidade de transição com clientes antigos: explícita no desenho
    `30.12`.
 
+**Desenho `30.12` FECHADO** (`2026-08-12`):
+[`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md)
+(D1–D12; GA5.1 PASS). Implementação = `30.13` (ainda não aberta).
+
 ### 3. Nunca fail-closed por rede (**R-C**)
 
 1. Rede/license server indisponível ⇒ **zero** impacto em enforce enquanto
@@ -70,7 +74,7 @@ CRL offline continua **fora de escopo** (rejeitada na ADR-0021).
 | Regra / RR | Declaração |
 |------------|------------|
 | **R-C** | Indisponibilidade de rede nunca reduz enforce nem para o daemon. |
-| **RR-1** | Sem GO em `30.14` (e sem `30.11` no lado conteúdo), a trilha não entrega protecção comercial real contra T2 — só higiene AP1 + mecanismos opcionais. |
+| **RR-1** | Cut `30.11` **feito** (`20260812T011217Z`). Sem GO/execução em `30.14`, revogação em campo continua fraca (default check-in OFF). |
 | **RR-5** | Resposta assinada impede **servidor falso**; **não** impede root de patchar o `layer7d` para ignorar o check-in. Valor de AP3: contra T2 *não-técnico* (ex-cliente que não pacha). O técnico é contido por AP2 + `30.15` + AP4. Coberto por **R-A**. |
 
 O que a ADR-0021 **mantém:** formato `.lic`, activação, binding, ausência de

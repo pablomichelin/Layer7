@@ -1,11 +1,11 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.10` FECHADO**; **`30.11` FECHADO** (cut
-`20260812T011217Z` — `delete-asset` ×4; release/tag preservados; GA4.10/15
-**PASS**; residual CDN @cut + recheck 404×4); **GA4.12 N/A**; **30.9 live PASS**;
-evidência [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/);
-lab/`latest` = produção **`1.9.54`**; GA4.4 **PASS**; ADRs 0030–0033 **`Aceito`**
-(rev. `2026-08-10c`); **próximo AP3 `30.12`**
+**Estado do plano:** **`30.12` FECHADO** (contrato check-in assinado/nonce;
+GA5.1 **PASS**); **`30.11` FECHADO** (cut `20260812T011217Z`; GA4.10/15
+**PASS**); **GA4.12 N/A**; **30.9/30.10** FECHADOS; lab/`latest` = produção
+**`1.9.54`**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`); contrato
+[`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md);
+**próximo `30.13`** (implementação — **não** aberto neste fecho)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -29,13 +29,13 @@ lab/`latest` = produção **`1.9.54`**; GA4.4 **PASS**; ADRs 0030–0033 **`Acei
 
 | Campo | Valor |
 |-------|-------|
-| Onda actual | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
-| Passo actual | **`30.11` FECHADO** (cut espelho); AP2 cut feito |
-| Próximo | AP3 **`30.12`** |
-| Depois | `30.13`… |
-| Bloqueio duro | A-09 / pubkey: **resolvido**; primary auth: **PASS**; cut: **PASS** |
-| Código alterado até agora | `license-server` **30.9 live** + primary content; cliente/pkg **`1.9.54`**; espelho GitHub sem assets correntes |
-| Gate activo | **GA4 cut PASS** (GA4.10/15); GA4.12 **N/A**; próximo gate GA5 (AP3) |
+| Onda actual | **AP3 em curso** (AP0/AP1/AP2 cut FECHADOS; GA1/GA4 cut PASS) |
+| Passo actual | **`30.12` FECHADO** (contrato documental) |
+| Próximo | **`30.13`** (implementação assinatura — chat novo) |
+| Depois | `30.14` (GO) → `30.15`… |
+| Bloqueio duro | A-09 resolvido; cut PASS; implementação `30.13` ainda não iniciada |
+| Código alterado até agora | `license-server` **30.9 live** + primary; cliente/pkg **`1.9.54`**; espelho sem assets; **sem** código `30.12` |
+| Gate activo | **GA5.1 PASS**; GA5.2+ **PENDENTE**; GA4 cut PASS; GA4.12 **N/A** |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — cut `30.11` **feito**; falta GO/execução `30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -44,14 +44,14 @@ lab/`latest` = produção **`1.9.54`**; GA4.4 **PASS**; ADRs 0030–0033 **`Acei
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo: 30.11 FECHADO (cut 20260812T011217Z)
-- 30.9 live PASS; e2e 1.9.54 PASS; primary auth PASS
-- Cut: delete-asset x4; asset_count=0; residual CDN @cut; recheck 404x4
-- GA4.12 N/A; GA4.10/15 PASS
-- Evidência: 20260812T011217Z-30.11-cut-mirror
+- Passo: 30.12 FECHADO (contrato check-in assinado)
+- 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
+- GA5.1 PASS; GA5.2+ PENDENTE
+- Contrato: docs/01-architecture/contrato-check-in-assinado-30.12.md
+- Evidência 30.12: 20260812T013200Z-30.12-protocol-design
 - Produção .254 / latest: 1.9.54
-- BG-117: Concluido
-- Próximo: AP3 30.12
+- BG-117 Concluido; BG-119 desenho OK (código=30.13)
+- Próximo: 30.13 (implementação) — chat novo; sem 30.14 sem GO
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -89,7 +89,7 @@ riscos invalida o plano; invalidam apenas *overclaim*.
 
 | # | Risco residual | Onde se trata | O que continua possível |
 |---|----------------|---------------|--------------------------|
-| RR-1 | **A protecção real depende dos GOs comerciais de `30.11` e `30.14`.** Sem retirar o espelho público, o token de AP2 é decorativo (o pirata actualiza pelo caminho anónimo); sem check-in por defeito, revogar licença continua inócuo. | Decisões 1–3 do §5; GA4.10; GA5.7 | Se os GOs não forem dados, a trilha entrega **higiene (AP1)**, não protecção contra T1/T2 |
+| RR-1 | **Cut `30.11` feito.** Protecção de revogação em campo ainda depende do GO/execução `30.14` (default check-in). Sem `30.14`, AP3 fica parcial mesmo com protocolo `30.12`/`30.13`. | Decisões 1–3 do §5; GA4.10; GA5.7 | Sem GO `30.14`, revogação continua fraca na base instalada |
 | RR-2 | **Redistribuição de conteúdo por appliance licenciado** (variante de T1): um integrador com 1 licença legítima pode descarregar as blacklists nesse appliance e espelhá-las internamente para N cópias piratas. O token trava o download anónimo, não a re-serva de ficheiros. | `30.17` (marcação por cliente → atribuição a posteriori); ADR-0031 declara o limite; GA4.14 | Redistribuição interna continua tecnicamente possível; a resposta é **atribuição + via contratual (AP4)**, não bloqueio |
 | RR-3 | **Os `.pkg` já publicados continuam vulneráveis para sempre.** Remover `is_dev_key` (30.4) só afecta builds futuros; a `1.9.48` e anteriores, com o caminho de bypass intacto, permanecem publicamente descarregáveis. Um pirata pode fixar-se na `1.9.48` indefinidamente. | Inventário em `30.3`; decisão n.º 8 do §5 (despublicar/limitar releases antigas); a desvalorização vem de AP2 (conteúdo obsoleto) | Binário antigo patchado continua a correr; perde valor com o tempo, não deixa de existir |
 | RR-4 | **Anti-rollback (30.6) tem duas evasões conhecidas:** (a) root pode apagar o ficheiro de estado em `/var/db/`; (b) a marca «maior timestamp observado» detecta *retrocesso*, não um relógio **congelado/atrasado desde a instalação**. | ADR-0033 declara o limite; GA3.9; fecho real do vector é AP3 (o servidor conhece a hora real) | `30.6` encarece o truque casual do `date`; o T2 técnico só é contido com check-in obrigatório |
@@ -353,15 +353,16 @@ Prep: [`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11
 Corrige A-04, A-05 e A-08. É a onda de maior impacto em suporte — não iniciar
 sem AP2 estável.
 
-#### 30.12 — Protocolo de check-in assinado com anti-replay
+#### 30.12 — Protocolo de check-in assinado com anti-replay — **FECHADO** (`2026-08-12`)
 
 **Objectivo:** corrigir A-05 (resposta hoje é JSON simples, sem assinatura nem nonce).
-**Entrega:** contrato do protocolo (nonce emitido pelo cliente, `hardware_id` e
-estado dentro do payload assinado, resposta Ed25519), com compatibilidade explícita
-para clientes antigos durante a transição.
-**Ficheiros:** documento de arquitectura + ADR-0032.
-**Teste mínimo:** revisão humana; casos de replay e de servidor falso enumerados.
-**Risco:** nulo (documental). **Gate:** GA5.
+**Entrega:** [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md)
+(D1–D12; C1–C10; dual-mode legado; N3/R-C explícitos).
+**Ficheiros:** contrato + refs ADR-0032 / gates / SSOTs — **zero código**.
+**Teste mínimo:** revisão do contrato; casos replay/servidor falso/N3 enumerados — **PASS**.
+**Risco:** nulo (documental). **Gate:** **GA5.1 PASS**; GA5.2+ → `30.13`+.
+**Evidência:** [`../tests/evidence/20260812T013200Z-30.12-protocol-design/`](../tests/evidence/20260812T013200Z-30.12-protocol-design/).
+**Rollback:** reverter docs; runtime intacto.
 
 #### 30.13 — Implementação: servidor assina, cliente exige assinatura
 

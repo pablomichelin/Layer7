@@ -1,0 +1,5 @@
+RUNID=20260812T013200Z
+STEP=30.12
+KIND=documentary-design
+CODE_CHANGED=0
+CONTRACT=docs/01-architecture/contrato-check-in-assinado-30.12.md

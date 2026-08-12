@@ -1,0 +1,18 @@
+=== supervisor recheck 2026-08-12T01:30:46Z (read-only) ===
+api_release_id=313502667
+api_tag=blacklists-ut1-current
+api_asset_count=0
+api_assets=[]
+anon_nofollow layer7-blacklists-manifest.v1.txt=404
+anon_follow   layer7-blacklists-manifest.v1.txt=404|9
+anon_nofollow layer7-blacklists-manifest.v1.txt.sig=404
+anon_follow   layer7-blacklists-manifest.v1.txt.sig=404|9
+anon_nofollow layer7-blacklists-ut1.tar.gz=404
+anon_follow   layer7-blacklists-ut1.tar.gz=404|9
+anon_nofollow blacklists-signing-public-key.pem=404
+anon_follow   blacklists-signing-public-key.pem=404|9
+primary_notoken_manifest=401
+primary_notoken_sig=401
+primary_authed=NOT_RERUN (no token export; .254 untouched; prior 200/200 @ 20260812T003214Z)
+residual_cdn_now=NONE_OBSERVED (404x4 nofollow+follow)
+historical_residual_at_cut=see 20260812T011217Z-30.11-cut-mirror/02-validate.txt

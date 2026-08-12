@@ -52,7 +52,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0029](ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) | Adiamento IM7 agente endpoint + exclusão IM8 TS/VDI | **Aceito** (20.28) | Sequência segura; GI8 PASS; reopen IM7 com GO + espec 20.27 |
 | [ADR-0030](ADR-0030-postura-anti-tamper-layer7d.md) | Postura anti-tamper do `layer7d` e remoção do modo dev de produção | **Aceito** (`2026-08-10`, `30.1b`) | Trilha anti-pirataria; R-A/R-G/RR-3; passos `30.4`/`30.5`/`30.7` |
 | [ADR-0031](ADR-0031-entitlement-entrega-conteudo.md) | Entitlement na entrega de conteúdo (token de subscrição para blacklists/catálogos) | **Aceito** (`2026-08-10`, `30.1b`) | RR-1/RR-2/R-B/R-D; AP2; GO espelho `30.11` |
-| [ADR-0032](ADR-0032-check-in-obrigatorio-e-assinado.md) | Check-in obrigatório por defeito e resposta assinada com anti-replay | **Aceito** (`2026-08-10`, `30.1b`) | **Emenda ADR-0021**; RR-1/RR-5/R-C; GO `30.14`; BG-101 reaberto |
+| [ADR-0032](ADR-0032-check-in-obrigatorio-e-assinado.md) | Check-in obrigatório por defeito e resposta assinada com anti-replay | **Aceito** (`2026-08-10`, `30.1b`) | **Emenda ADR-0021**; desenho `30.12` FECHADO ([contrato](../01-architecture/contrato-check-in-assinado-30.12.md)); GO `30.14`; BG-101 reaberto |
 | [ADR-0033](ADR-0033-anti-rollback-relogio.md) | Anti-rollback de relógio e estado temporal suspeito | **Aceito** (`2026-08-10`, `30.1b`) | Emenda `f3-expiracao-revogacao-grace.md`; RR-4/R-J; passo `30.6` |
 
 **Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`)

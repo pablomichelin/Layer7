@@ -124,8 +124,10 @@ Na resposta JSON de check-in **activa** (`status: active`), acrescentar:
 - Renovação: cada check-in activo **substitui** o ficheiro local (novo `jti`/`iat`/`exp`).
 
 Detalhe de schema HTTP e testes: passo **`30.9`**. Assinatura da *resposta*
-completa de check-in (anti-replay) é **AP3 / `30.12`**, ortogonal: o token de
-conteúdo já vai assinado no campo; AP3 endurece o envelope exterior.
+completa de check-in (anti-replay) é **AP3 / `30.12`** — desenho
+[`contrato-check-in-assinado-30.12.md`](contrato-check-in-assinado-30.12.md)
+(**FECHADO** `2026-08-12`; GA5.1 PASS); implementação = `30.13`. Ortogonal:
+o token de conteúdo já vai assinado no campo; AP3 endurece o envelope exterior.
 
 ### 4.2 Uso no update de conteúdo (`30.10` — contrato, não código)
 

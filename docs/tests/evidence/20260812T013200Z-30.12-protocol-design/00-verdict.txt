@@ -1,0 +1,11 @@
+STEP=30.12
+DELIVERABLE=contrato-check-in-assinado-30.12.md
+DECISIONS=D1-D12 closed
+CASES=C1-C10 enumerated
+GA5.1=PASS (protocol specified+reviewed)
+GA5.2plus=PENDENTE (need 30.13+)
+CODE=none
+DEPLOY=none
+OPENED_30.13=no
+OPENED_30.14=no
+VERDICT=30.12_DOC_CLOSED
