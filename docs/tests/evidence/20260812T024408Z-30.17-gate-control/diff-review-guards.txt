@@ -1,0 +1,16 @@
+== proibido (deve estar ausente) ==
+docs/01-architecture/marcacao-cliente-30.17.md:41:`snapshot_id`, `marked_at_utc`, `policy=local_only_no_telemetry`.
+docs/01-architecture/marcacao-cliente-30.17.md:53:| Telemetria / phone-home | **Não** | GA6.4; política do produto |
+package/pfSense-pkg-layer7/files/usr/local/etc/layer7/update-blacklists.sh:461:	_json=$(printf '{"v":1,"scheme":"l7-attr-v1","mark":"%s","license_id":%s,"hardware_id":"%s","snapshot_id":"%s","marked_at_utc":"%s","policy":"local_only_no_telemetry"}' \
+package/pfSense-pkg-layer7/files/usr/local/etc/layer7/update-blacklists.sh:466:	*\"customer\"*|*\"customer_name\"*|*\"email\"*)
+== obrigatorio (deve existir) ==
+433:# mark = SHA256("l7-attr-v1:" || license_id || ":" || hardware_id)
+438:	printf 'l7-attr-v1:%s:%s' "$_lic" "$_hw" | openssl dgst -sha256 2>/dev/null \
+442:write_content_attribution() {
+461:	_json=$(printf '{"v":1,"scheme":"l7-attr-v1","mark":"%s","license_id":%s,"hardware_id":"%s","snapshot_id":"%s","marked_at_utc":"%s","policy":"local_only_no_telemetry"}' \
+938:	write_content_attribution "$CANDIDATE_SNAPSHOT_ID" || true
+1239:		write_content_attribution "${_snap:-skip-fetch}" || true
+1297:	if ! write_content_attribution "${_snap:-manual}"; then
+1313:--stamp-attribution) MODE="stamp-attribution" ;;
+1316:	echo "Usage: $0 [--download|--apply|--restore-lkg|--check-subscription|--stamp-attribution]" >&2
+1326:stamp-attribution) do_stamp_attribution ;;

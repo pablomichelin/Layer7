@@ -1448,12 +1448,13 @@ código no git (**sem** deploy live); evidência
 BG-122 **Concluido**; GA6.1/6.2 **PASS** (unit); candidato **`1.9.57`**
 (**sem** release/`.254`/license-server); evidência
 [`20260812T023529Z-30.16-license-enforce-gate`](docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/).
-**`30.17` FECHADO** (`20260812T024235Z`): marcação por cliente (RR-2) via
-sidecars opacos em `update-blacklists.sh`; privacidade em
+**`30.17` FECHADO após gate-control** (`20260812T024419Z`): marcação por cliente
+(RR-2) via sidecars opacos (`7f30b56`); fecho documental só após bateria
+(estado intermédio: EM EXECUÇÃO/PENDENTE até PASS); privacidade em
 [`marcacao-cliente-30.17.md`](docs/01-architecture/marcacao-cliente-30.17.md);
 GA6.3/6.4 **PASS**; candidato **`1.9.58`** (**sem** release/LS/`.254`);
-evidência
-[`20260812T024235Z-30.17-content-attribution`](docs/tests/evidence/20260812T024235Z-30.17-content-attribution/).
+evidência fecho
+[`20260812T024408Z-30.17-gate-control`](docs/tests/evidence/20260812T024408Z-30.17-gate-control/).
 **Próximo na trilha:** AP4 `30.18` (**não** iniciar sem pedido explícito).
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
@@ -1498,8 +1499,10 @@ pendente release).
   [`docs/tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/`](docs/tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/)
 - **Evidência 30.16 decisão distribuída:**
   [`docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/`](docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/)
-- **Evidência 30.17 marcação cliente:**
+- **Evidência 30.17 marcação cliente (impl.):**
   [`docs/tests/evidence/20260812T024235Z-30.17-content-attribution/`](docs/tests/evidence/20260812T024235Z-30.17-content-attribution/)
+- **Evidência 30.17 gate-control (fecho):**
+  [`docs/tests/evidence/20260812T024408Z-30.17-gate-control/`](docs/tests/evidence/20260812T024408Z-30.17-gate-control/)
 - **Marcação 30.17 (privacidade):** [`docs/01-architecture/marcacao-cliente-30.17.md`](docs/01-architecture/marcacao-cliente-30.17.md)
 - **Runbook 30.14:** [`docs/13-runbooks/check-in-migration-30.14.md`](docs/13-runbooks/check-in-migration-30.14.md)
 - **Evidência campo 30.10 (STOP `1.9.53`):**
@@ -1531,15 +1534,15 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Onda: AP4 em curso
-- Passo: 30.17 FECHADO (marcação por cliente; sem telemetria)
+- Passo: 30.17 FECHADO após gate-control (bateria 20260812T024419Z)
 - GO 30.14 + decisão 7 aplicados; sem max_activations
 - 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
 - GA5.1-5.8+5.10-5.12 PASS; GA6.1-6.4 PASS; GA5.9 campo PENDENTE
-- Evidência 30.17: 20260812T024235Z-30.17-content-attribution
+- Evidência 30.17 gate-control: 20260812T024408Z-30.17-gate-control
 - ADRs 0030-0033: Aceito
 - BG-117/118/119/121/122/101 Concluido
 - Produção .254: 1.9.54; candidato Makefile 1.9.58 (sem release)
-- Próximo: AP4 30.18 (só com pedido explícito)
+- Próximo: AP4 30.18 (só com pedido explícito; NÃO aberto)
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

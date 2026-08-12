@@ -1,0 +1,16 @@
+commit 7f30b56524e9327435d0e71dff2f2fd656685e4a
+Author: Pablo <pablo.michelin@gmail.com>
+Date:   Tue Aug 11 23:43:42 2026 -0300
+
+    feat(antipirataria): 30.17 — marcação por cliente (atribuição local)
+    
+    Sidecar opaco pós-promote/--stamp-attribution; sem PII/telemetria/LS.
+    Candidato 1.9.58 sem release; GA6.3/6.4 PASS.
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ docs/01-architecture/marcacao-cliente-30.17.md     |  89 +++++++++++++
+ package/pfSense-pkg-layer7/Makefile                |   2 +-
+ .../usr/local/etc/layer7/update-blacklists.sh      | 100 +++++++++++++-
+ tests/functional/test_content_attribution_30.17.sh | 144 +++++++++++++++++++++
+ 4 files changed, 331 insertions(+), 4 deletions(-)

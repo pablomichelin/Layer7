@@ -1,13 +1,14 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
 **Estado do plano:** **`30.14` FECHADO** (GO + default check-in ON; GA5.7/5.8/5.10/5.11
-**PASS**; BG-118/BG-101 **Concluido**); **`30.17` FECHADO** (marcação cliente;
-GA6.3/6.4 **PASS**); **`30.16` FECHADO** (GA6.1/6.2 **PASS**; BG-122
-**Concluido**); **`30.15` FECHADO**; **`30.13`/`30.14` FECHADOS**; **`30.12`
-FECHADO**; **`30.11` FECHADO**; **GA4.12 N/A**; produção **`1.9.54`**; candidato
-Makefile **`1.9.58`** (**sem** release); ADRs 0030–0033 **`Aceito`**; evidência
-[`../tests/evidence/20260812T024235Z-30.17-content-attribution/`](../tests/evidence/20260812T024235Z-30.17-content-attribution/);
-**próximo AP4 `30.18`** (sob pedido)
+**PASS**; BG-118/BG-101 **Concluido**); **`30.17` FECHADO** após gate-control
+(bateria `20260812T024419Z`; GA6.3/6.4 **PASS**); **`30.16` FECHADO** (GA6.1/6.2
+**PASS**; BG-122 **Concluido**); **`30.15` FECHADO**; **`30.13`/`30.14`
+FECHADOS**; **`30.12` FECHADO**; **`30.11` FECHADO**; **GA4.12 N/A**; produção
+**`1.9.54`**; candidato Makefile **`1.9.58`** (**sem** release); ADRs 0030–0033
+**`Aceito`**; evidência
+[`../tests/evidence/20260812T024408Z-30.17-gate-control/`](../tests/evidence/20260812T024408Z-30.17-gate-control/);
+**próximo AP4 `30.18`** (sob pedido; **não** aberto)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -32,8 +33,8 @@ Makefile **`1.9.58`** (**sem** release); ADRs 0030–0033 **`Aceito`**; evidênc
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP4 em curso** (AP0–AP3 código FECHADOS; GA1/GA4 cut PASS) |
-| Passo actual | **`30.17` FECHADO** (marcação por cliente) |
-| Próximo | AP4 **`30.18`** (sob pedido explícito) |
+| Passo actual | **`30.17` FECHADO** após gate-control (marcação por cliente) |
+| Próximo | AP4 **`30.18`** (sob pedido explícito; **não** aberto) |
 | Depois | `30.19`… |
 | Bloqueio duro | A-09 resolvido; cut PASS; GO `30.14` + decisão 7 **aplicados**; GA5.9 campo pós-release |
 | Código alterado até agora | 30.13–30.17; candidato **`1.9.58`**; produção **`1.9.54`**; LS 30.15 **sem** deploy |
@@ -50,10 +51,10 @@ TRILHA ANTI-PIRATARIA — progresso
 - GO 30.14: registado (anti-pirataria)
 - 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
 - GA5.1-5.8+5.10-5.12 PASS; GA6.1-6.4 PASS; GA5.9 campo PENDENTE
-- Evidência 30.17: 20260812T024235Z-30.17-content-attribution
+- Evidência 30.17 gate-control: 20260812T024408Z-30.17-gate-control
 - Produção .254: 1.9.54; candidato Makefile 1.9.58 (sem release)
 - BG-117/118/119/121/122/101 Concluido
-- Próximo: AP4 30.18 (só com pedido explícito)
+- Próximo: AP4 30.18 (só com pedido explícito; NÃO aberto)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -429,7 +430,7 @@ hot-paths DNS/flow/apply; `refresh_enforce_cfg` deixa de usar só `s_lic.valid`.
 **Candidato:** `1.9.57` — **sem** GitHub Release neste passo.
 **Evidência:** [`../tests/evidence/20260812T023529Z-30.16-license-enforce-gate/`](../tests/evidence/20260812T023529Z-30.16-license-enforce-gate/).
 
-#### 30.17 — Marcação por cliente (atribuição) — **FECHADO**
+#### 30.17 — Marcação por cliente (atribuição) — **FECHADO** (gate-control)
 
 **Objectivo:** tornar uma cópia encontrada em campo atribuível à origem (RR-2).
 **Entrega:** sidecar opaco no cliente após promote / `--stamp-attribution`
@@ -437,9 +438,11 @@ hot-paths DNS/flow/apply; `refresh_enforce_cfg` deixa de usar só `s_lic.valid`.
 privacidade em
 [`../01-architecture/marcacao-cliente-30.17.md`](../01-architecture/marcacao-cliente-30.17.md);
 **sem** telemetria; **sem** alterar tar/manifesto; **sem** license-server.
-**Risco:** Médio (privacidade) — mitigado. **Gate:** GA6.3/6.4 **PASS**.
+**Risco:** Médio (privacidade) — mitigado. **Gate:** GA6.3/6.4 **PASS** após
+bateria gate-control (fecho documental prematuro em `7f30b56` corrigido).
 **Candidato:** `1.9.58` — **sem** GitHub Release.
-**Evidência:** [`../tests/evidence/20260812T024235Z-30.17-content-attribution/`](../tests/evidence/20260812T024235Z-30.17-content-attribution/).
+**Evidência fecho:** [`../tests/evidence/20260812T024408Z-30.17-gate-control/`](../tests/evidence/20260812T024408Z-30.17-gate-control/).
+**Evidência impl. (histórica):** [`../tests/evidence/20260812T024235Z-30.17-content-attribution/`](../tests/evidence/20260812T024235Z-30.17-content-attribution/).
 
 #### 30.18 — Cadeia de assinatura de release completa — **BG-123**
 

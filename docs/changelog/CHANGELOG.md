@@ -13,8 +13,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   telemetria; não altera tar/manifesto. Doc privacidade
   `docs/01-architecture/marcacao-cliente-30.17.md`. Candidato
   `PORTVERSION=1.9.58` — **sem** GitHub Release / `.254` / license-server.
-  GA6.3/GA6.4 PASS. Evidência
-  `docs/tests/evidence/20260812T024235Z-30.17-content-attribution/`.
+  **Gate-control:** fecho documental só após bateria `20260812T024419Z`
+  (estado intermédio EM EXECUÇÃO/PENDENTE até PASS). GA6.3/GA6.4 PASS.
+  Evidência fecho
+  `docs/tests/evidence/20260812T024408Z-30.17-gate-control/`.
 
 - **Anti-pirataria 30.16 / BG-122 — decisão de licença distribuída:** gates A/B
   com cruzamento (`license_enforce_gate.c`); `refresh_enforce_cfg` + hot-paths

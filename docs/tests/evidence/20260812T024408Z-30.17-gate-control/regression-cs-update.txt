@@ -1,0 +1,1 @@
+PASS test_content_subscription_update.sh

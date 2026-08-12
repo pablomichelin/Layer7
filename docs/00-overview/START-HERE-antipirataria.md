@@ -1,13 +1,14 @@
-# START HERE — Anti-pirataria e Anti-tamper 【`30.17` FECHADO · GA6.3/6.4 **PASS** · **Composer 2.5**】
+# START HERE — Anti-pirataria e Anti-tamper 【`30.17` FECHADO (gate-control) · GA6.3/6.4 **PASS** · **Composer 2.5**】
 
 > **Diagnóstico ACEITE** `2026-08-10` — [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md).
 > **AP3 código FECHADA** (`30.12`–`30.15`). **`30.16` FECHADO** (GA6.1/6.2).
-> **`30.17` FECHADO** — marcação por cliente (sidecar opaco; sem telemetria);
-> GA6.3/6.4 **PASS**; candidato **`1.9.58`** (**sem** release).
+> **`30.17` FECHADO após gate-control** — bateria factual `20260812T024419Z`
+> (antes: tratado **EM EXECUÇÃO/PENDENTE** até PASS); GA6.3/6.4 **PASS**;
+> candidato **`1.9.58`** (**sem** release). Código `7f30b56`.
 > Doc: [`../01-architecture/marcacao-cliente-30.17.md`](../01-architecture/marcacao-cliente-30.17.md).
-> Evidência: [`../tests/evidence/20260812T024235Z-30.17-content-attribution/`](../tests/evidence/20260812T024235Z-30.17-content-attribution/).
+> Evidência fecho: [`../tests/evidence/20260812T024408Z-30.17-gate-control/`](../tests/evidence/20260812T024408Z-30.17-gate-control/).
 > **Produção `.254`:** **`1.9.54`** (intocada).
-> **Próximo passo:** AP4 **`30.18`** — **só** com pedido explícito.
+> **Próximo passo:** AP4 **`30.18`** — **só** com pedido explícito (**não** aberto).
 > **Proibido:** fail-closed por rede · kill-switch · ofuscação · misturar enforce/MITM/IPv6.
 > **Honestidade:** root **pode** contornar verificação local (RR-5 / R-A).
 > **Artefacto:** **`.pkg`** FreeBSD/pfSense (não APK Android).
@@ -42,11 +43,11 @@ docs/00-overview/START-HERE-antipirataria.md
 | Campo | Valor |
 |-------|-------|
 | Onda | **AP4 em curso** |
-| Passo | **`30.17` FECHADO** |
-| GA6.1–6.4 | **PASS** |
+| Passo | **`30.17` FECHADO** (após gate-control; não antes) |
+| GA6.1–6.4 | **PASS** (6.3/6.4 revalidados `20260812T024419Z`) |
 | GA5.9 | **PENDENTE campo** (sem `.254`/release) |
 | Campo / e2e | produção `.254` = `1.9.54` intocada |
-| Próxima acção | AP4 **`30.18`** (assinatura release / BG-123) — **sob pedido** |
+| Próxima acção | AP4 **`30.18`** — **sob pedido** (**não** iniciado) |
 | Código produto | candidato **`1.9.58`**; release **não** publicada |
 | Baseline enforce | **`1.9.8`** |
 | Rev. do plano | **`2026-08-10c`** |
@@ -60,7 +61,7 @@ docs/00-overview/START-HERE-antipirataria.md
 3. [`CORTEX.md`](../../CORTEX.md) — *Trilha Anti-pirataria*
 4. [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) — §0, passo `30.18`
 5. [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) — GA6.5/6.6
-6. Evidência [`../tests/evidence/20260812T024235Z-30.17-content-attribution/`](../tests/evidence/20260812T024235Z-30.17-content-attribution/)
+6. Evidência gate-control [`../tests/evidence/20260812T024408Z-30.17-gate-control/`](../tests/evidence/20260812T024408Z-30.17-gate-control/)
 
 ---
 
@@ -98,10 +99,10 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c
 - Onda: AP4 em curso
-- Passo: 30.17 FECHADO (marcação por cliente; sem telemetria)
+- Passo: 30.17 FECHADO após gate-control (bateria 20260812T024419Z)
 - GA6.1-6.4 PASS; GA5.9 campo PENDENTE
-- Evidência: 20260812T024235Z-30.17-content-attribution
+- Evidência: 20260812T024408Z-30.17-gate-control
 - Produção .254: 1.9.54; candidato 1.9.58 (sem release)
-- Próximo: AP4 30.18 (só com pedido explícito)
+- Próximo: AP4 30.18 (só com pedido explícito; NÃO aberto)
 - Agente: Composer 2.5 — um passo / chat (plano §8)
 ```

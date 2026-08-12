@@ -1,8 +1,10 @@
 # Marcação por cliente (atribuição) — passo `30.17`
 
-**Estado:** FECHADO no código (candidato package; **sem** release neste passo)  
+**Estado:** **FECHADO** após gate-control (`20260812T024419Z`) — código em
+`7f30b56`; fecho documental só após bateria
+[`../tests/evidence/20260812T024408Z-30.17-gate-control/`](../tests/evidence/20260812T024408Z-30.17-gate-control/)  
 **Plano:** [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md)  
-**Gates:** GA6.3 · GA6.4  
+**Gates:** GA6.3 · GA6.4 (**PASS** pós-bateria)  
 **RR:** RR-2 (redistribuição a partir de appliance licenciado)  
 **Código:** `update-blacklists.sh` (cliente) — **sem** license-server / CDN / telemetria
 

@@ -1,0 +1,6 @@
+    1442 docs/tests/evidence/20260812T024408Z-30.17-gate-control/diff-review-guards.txt
+     734 docs/tests/evidence/20260812T024408Z-30.17-gate-control/diff-review-stat.txt
+      41 docs/tests/evidence/20260812T024408Z-30.17-gate-control/regression-cs-update.txt
+     109 docs/tests/evidence/20260812T024408Z-30.17-gate-control/session.txt
+      46 docs/tests/evidence/20260812T024408Z-30.17-gate-control/unit-attribution.txt
+    2372 total

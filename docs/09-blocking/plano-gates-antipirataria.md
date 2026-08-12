@@ -183,8 +183,8 @@ indisponibilidade de rede em firewall parado.
 |---|----------|--------|
 | GA6.1 | Decisão de licença distribuída sem regressão de enforce (**N1**, **N2**) | **PASS** (unit `30.16` — `test_license_enforce_gate.c`) |
 | GA6.2 | Código continua legível e mantível apesar da distribuição de decisão | **PASS** — módulo puro `license_enforce_gate.c` + `enforce_armed` sem ofuscação |
-| GA6.3 | Marcação por cliente implementada com avaliação de privacidade registada | **PASS** (`30.17` — sidecar + [`../01-architecture/marcacao-cliente-30.17.md`](../01-architecture/marcacao-cliente-30.17.md)) |
-| GA6.4 | Sem telemetria introduzida (coerente com a política do produto) | **PASS** — marca só local; `policy=local_only_no_telemetry` |
+| GA6.3 | Marcação por cliente implementada com avaliação de privacidade registada | **PASS** (gate-control `20260812T024419Z`; sidecar + [`../01-architecture/marcacao-cliente-30.17.md`](../01-architecture/marcacao-cliente-30.17.md)) |
+| GA6.4 | Sem telemetria introduzida (coerente com a política do produto) | **PASS** (gate-control `20260812T024419Z`) — marca só local; `policy=local_only_no_telemetry` |
 | GA6.5 | Releases publicam manifesto + `.sig` + chave pública (ADR-0023 / F1.2) | **PENDENTE** |
 | GA6.6 | `MANUAL-INSTALL.md` com comandos e links da versão actual (regra especial do `AGENTS.md`) | **PENDENTE** |
 | GA6.7 | Revisão jurídica da EULA concluída | **PENDENTE** |
@@ -194,8 +194,8 @@ indisponibilidade de rede em firewall parado.
 | GA6.11 | Fecho registado no CORTEX e no `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | **PENDENTE** |
 | GA6.12 | Decisão §5 n.º 8 (releases antigas com bypass) executada ou risco residual aceite por escrito (RR-3) | **PENDENTE** |
 
-**Estado GA6:** **parcial** — GA6.1–6.4 **PASS** (`30.16`/`30.17`); restante → `30.18`–`30.19`.
-Evidência `30.17`: `docs/tests/evidence/20260812T024235Z-30.17-content-attribution/`.
+**Estado GA6:** **parcial** — GA6.1–6.4 **PASS** (`30.16`/`30.17`); restante → `30.18`–`30.19` (**não** aberto).
+Evidência fecho `30.17` (gate-control): `docs/tests/evidence/20260812T024408Z-30.17-gate-control/`.
 
 **Saída:** trilha fechada, com limites declarados sem overclaim.
 
