@@ -1,0 +1,17 @@
+expected_paths_30.19:
+1:CORTEX.md
+2:docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
+3:docs/00-overview/START-HERE-antipirataria.md
+4:docs/01-architecture/modelo-ameacas-antipirataria.md
+5:docs/02-roadmap/backlog.md
+6:docs/02-roadmap/plano-antipirataria-anti-tamper.md
+7:docs/03-adr/README.md
+8:docs/09-blocking/decisoes-humanas-30.1.md
+9:docs/09-blocking/plano-gates-antipirataria.md
+10:docs/10-license-server/MANUAL-INSTALL.md
+11:docs/README.md
+12:docs/changelog/CHANGELOG.md
+23:docs/01-architecture/fecho-trilha-antipirataria-30.19.md
+24:docs/06-releases/aviso-releases-antigas-rr3-30.19.md
+25:docs/09-blocking/eula-revisao-juridica-30.19.md
+36:docs/tests/evidence/20260812T025741Z-30.19-fecho/

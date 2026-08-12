@@ -1,0 +1,8 @@
+GA6.7: PASS (agenda) — eula-revisao-juridica-30.19.md
+GA6.8: PASS — fecho-trilha §GA6.8 + modelo-ameacas reavaliacao
+GA6.9: PASS — fecho-trilha §GA6.9 RR-1..RR-5
+GA6.10: PASS — fecho-trilha §GA6.10 R-L
+GA6.11: PASS — CORTEX + ESTADO + START-HERE
+GA6.12: PASS — aviso RR-3 + MANUAL; tags not altered
+utc:20260812T025741Z
+scope:documentary_only

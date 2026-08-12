@@ -253,6 +253,17 @@ de release + dry-run sign/verify **PASS**. **Residual campo:** tags já
 publicadas e `latest` até GO ADR-0023 Fase 1 / **BG-028** (1ª publish com
 manifesto + `.sig` + pubkey).
 
+---
+
+## Reavaliação pós-controlos (`30.19` / GA6.8)
+
+A trilha AP0–AP4 aplicou controlos A-01…A-10 conforme
+[`fecho-trilha-antipirataria-30.19.md`](fecho-trilha-antipirataria-30.19.md).
+**Não** se declara o produto incontornável (R-A). Residuais **RR-1…RR-5** e
+**R-L** (prova CE) estão declarados no fecho `30.19`. Diagnóstico original
+desta secção permanece válido como baseline; o fecho actualiza o *estado de
+mitigação*, não reescreve a história do achado.
+
 ### Resumo ordenado por facilidade de exploração
 
 | Ordem | Achado | Perfil | Efeito |

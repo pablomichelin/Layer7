@@ -1,0 +1,6 @@
+PASSO: 30.19
+PERMITIDO: docs fecho GA6.7-6.12; CORTEX/START-HERE/plano/gates/backlog/ESTADO/EULA agenda/aviso RR-3/MANUAL aviso
+PROIBIDO: codigo; PORTVERSION; publish/release; alterar tags; .254; CF/DNS; license-server; MITM/IPv6
+STOP SE: necessidade de delete de tags; redigir EULA vinculativa; misturar residual LS
+GATE: GA6.7-6.12
+DoD: docs+evidencia+revisao cruzada; commit so ficheiros 30.19

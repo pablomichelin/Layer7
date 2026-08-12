@@ -40,8 +40,10 @@ substitui o `CORTEX.md` (que continua a mudar em manutenção); fixa o
 | HTTP/VIP dual-stack (12.11) | ADR-0024 / BG-083 | **CONCLUÍDO** (`1.9.8`) | `20260805T143000Z-gv5-12.11-smoke-1.9.8` |
 | Promoção enforce (GV7.4) | gates IPv6 + CORTEX | **PASS** | `20260805T150500Z-gv7.4-promocao-1.9.8` |
 | Validação two-client lab | `validacao-lab` + campanha | **PASS** | `20260805T162500Z-prod-align-two-client-1.9.8` |
+| Anti-pirataria / Anti-tamper AP0–AP4 (`30.0`–`30.19`) | [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) | **FECHADA** (`20260812T025741Z`) | [`fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md) · evidência `20260812T025741Z-30.19-fecho` |
 
-**BG IPv6:** BG-078 … BG-084 **concluídos**.
+**BG IPv6:** BG-078 … BG-084 **concluídos**.  
+**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (residual campo: BG-028 Fase 1; GA5.9).
 
 ---
 
@@ -131,6 +133,9 @@ stubs na raiz do repo. Ver equivalência. Onboarding:
 | `scoped_hybrid` default produção | Não | Validado; lab usa `legacy_global` |
 | Analytics / SIEM pesado | Fora de fila | Só telemetria mínima F7 (BG-018) se GO |
 | MITM / Identity add-on | **Plano ABERTO** (PME Identity-first; MITM **DEFER** 20.7a) | [`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md) · [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md); ADR-0017 com MITM OFF; ADR-0026 diferido |
+| Anti-pirataria residual RR-3 | Tags antigas descarregáveis | Aviso [`aviso-releases-antigas-rr3-30.19.md`](../06-releases/aviso-releases-antigas-rr3-30.19.md); tags **não** removidas (decisão 8) |
+| EULA parecer jurídico | Agenda registada (`30.19`) | [`eula-revisao-juridica-30.19.md`](../09-blocking/eula-revisao-juridica-30.19.md) — parecer externo pendente |
+| Trust chain pacote F1.2 campo | Processo obrigatório (`30.18`); publish Fase 1 pendente | BG-028 / ADR-0023 |
 | Console multi-firewall | Fora de fila | — |
 | Rebind automático de licença | Fora de fila | — |
 
@@ -180,5 +185,5 @@ Responder em português.
 | 2026-08-05 | Criação — consolidação pós GV7.4 + campanha two-client `1.9.8` |
 | 2026-08-05 | Nota: aberto plano **Identity + MITM Add-on** (não reabre P0–J/IPv6); arranque `START-HERE-identity-mitm.md` |
 | 2026-08-06 | Posicionamento PME Identity-first ACEITE; MITM DEFER 20.7a; passo → IM3 |
-
 | 2026-08-05 | F6 H5 — arquivo físico raiz `00-`…`16-` + planos fecho/IPv6 |
+| 2026-08-12 | Trilha Anti-pirataria AP0–AP4 **FECHADA** (`30.19`; GA6 PASS) |

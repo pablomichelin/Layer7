@@ -55,7 +55,9 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0032](ADR-0032-check-in-obrigatorio-e-assinado.md) | Check-in obrigatório por defeito e resposta assinada com anti-replay | **Aceito** (`2026-08-10`, `30.1b`) | **Emenda ADR-0021**; desenho `30.12` FECHADO ([contrato](../01-architecture/contrato-check-in-assinado-30.12.md)); GO `30.14`; BG-101 reaberto |
 | [ADR-0033](ADR-0033-anti-rollback-relogio.md) | Anti-rollback de relógio e estado temporal suspeito | **Aceito** (`2026-08-10`, `30.1b`) | Emenda `f3-expiracao-revogacao-grace.md`; RR-4/R-J; passo `30.6` |
 
-**Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`)
+**Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`);
+trilha **FECHADA** em **`30.19`** (`2026-08-12`) — fecho
+[`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md)
 com GO humano (recomendações do plano). Ficha:
 [`../09-blocking/decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md).
 GA0 completo. Próximo passo de execução: **`30.2`**. Plano rev. `2026-08-10c`

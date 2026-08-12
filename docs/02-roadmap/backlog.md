@@ -366,10 +366,10 @@ GA3 PASS. BG-120 **Concluido**. Token: `30.8`–`30.10` + e2e `1.9.54` PASS;
 dispensadas `2026-08-12`). **`30.11` cut FECHADO** (`20260812T011217Z`);
 **BG-117 Concluido**. Evidência:
 [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
-**`30.12`–`30.18` FECHADOS** (AP3 + AP4/`30.16`–`30.18`; GA5.1–5.8 + 5.10–5.12
-PASS; GA6.1–6.6 PASS com 6.5 processo + residual campo; BG-118/119/121/122/123/101
-**Concluido**). Candidato `1.9.58` sem release. **Próximo:** AP4 `30.19` —
-só com pedido; não misturar com MITM/IPv6.
+**`30.12`–`30.19` FECHADOS** — **trilha FECHADA** (`20260812T025741Z`; GA6
+PASS; BG-114…123/101 **Concluido**). Candidato `1.9.58` sem release. Residuais
+fora da fila: BG-028 Fase 1; GA5.9 campo; parecer EULA externo. **Não reabrir**
+sem GO + backlog; não misturar com MITM/IPv6.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|

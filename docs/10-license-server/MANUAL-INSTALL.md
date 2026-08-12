@@ -1151,6 +1151,14 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 ## Links da versao actual (para teste)
 
+> **Aviso RR-3 / decisão 8 (`30.19`):** o canal oficial de instalação lab/`latest`
+> é **`1.9.54`** (comandos abaixo). Tags **≤ `1.9.48`** (e outras pré-higiene
+> `30.4`) **não** são recomendadas para instalação nova — podem ser
+> descarregáveis no GitHub (risco residual aceite; tags **não** foram
+> removidas). Ver
+> [`docs/06-releases/aviso-releases-antigas-rr3-30.19.md`](../06-releases/aviso-releases-antigas-rr3-30.19.md).
+> Pin enforce de produção permanece **`1.9.8`** até GO de promoção.
+
 > **Nota de manutencao (obrigatoria em cada release publicada):** ao publicar
 > uma nova versao do pacote, actualizar **todas** as seccoes deste manual que
 > apontam para a versao do canal publico:

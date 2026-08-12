@@ -6,6 +6,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **Anti-pirataria 30.19 — fecho da trilha AP0–AP4:** GA6.7–6.12 **PASS**
+  (agenda EULA; reavaliação ameaças; RR-1…RR-5; R-L/CE; decisão 8/RR-3 com
+  aviso + apontadores `1.9.54`; tags **não** alteradas; CORTEX + ESTADO).
+  **Sem** código / PORTVERSION / publish / produção. Doc
+  `docs/01-architecture/fecho-trilha-antipirataria-30.19.md`. Evidência
+  `docs/tests/evidence/20260812T025741Z-30.19-fecho/`.
+
 - **Anti-pirataria 30.18 / BG-123 — cadeia F1.2 no processo de release:**
   política obrigatória manifesto + `.sig` + pubkey nas *próximas* publicações
   (`RELEASE-SIGNING.md` / checklist); dry-run

@@ -124,6 +124,14 @@
 **Data:** 2026-08-10  
 **Notas:** Aceite. Não bloqueia AP1/AP2; execução/fecho no `30.19`.
 
+### Addendum execução `30.19` / GA6.7 (`2026-08-12`)
+
+| Campo | Valor |
+|-------|--------|
+| Estado | **Agenda registada** — [`eula-revisao-juridica-30.19.md`](eula-revisao-juridica-30.19.md) |
+| Parecer jurídico externo | **Pendente** (fora do escopo do agente) |
+| Gate | GA6.7 **PASS (agenda)** |
+
 ---
 
 ## Decisão 7 — `max_activations` vs só alerta
@@ -166,6 +174,15 @@
 **Decisão humana:** Limitar apontadores (latest/docs); manter tags com aviso  
 **Data:** 2026-08-10  
 **Notas:** Inventário em `30.3`; execução/fecho em `30.19`. Risco residual das tags antigas permanece declarado (RR-3).
+
+### Addendum execução `30.19` / GA6.12 (`2026-08-12`)
+
+| Campo | Valor |
+|-------|--------|
+| Apontadores oficiais | lab/`latest` = **`1.9.54`**; enforce = **`1.9.8`** |
+| Aviso | [`../06-releases/aviso-releases-antigas-rr3-30.19.md`](../06-releases/aviso-releases-antigas-rr3-30.19.md) + `MANUAL-INSTALL` |
+| Tags GitHub | **Não alteradas** (cumprimento decisão 8 + GO chat) |
+| Gate | GA6.12 **PASS**; residual RR-3 aceite por escrito |
 
 ---
 

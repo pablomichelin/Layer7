@@ -1,0 +1,45 @@
+=== apontadores latest ===
+1185:**Versao canal publico / lab (`latest` e comandos abaixo):** `1.9.54`
+1186-
+1187-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.54`
+1188-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.54/pfSense-pkg-layer7-1.9.54.pkg`
+
+=== aviso RR-3 presente ===
+docs/10-license-server/MANUAL-INSTALL.md:1154:> **Aviso RR-3 / decisão 8 (`30.19`):** o canal oficial de instalação lab/`latest`
+docs/10-license-server/MANUAL-INSTALL.md:1159:> [`docs/06-releases/aviso-releases-antigas-rr3-30.19.md`](../06-releases/aviso-releases-antigas-rr3-30.19.md).
+
+=== GA6.7-6.12 in gates ===
+190:| GA6.7 | Revisão jurídica da EULA concluída | **PASS (agenda)** (`30.19` `20260812T025741Z`) — âmbito registado; parecer externo residual |
+191:| GA6.8 | Modelo de ameaças reavaliado com os controlos novos | **PASS** (`30.19`) — [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md) |
+192:| GA6.9 | Declaração honesta do que **continua** possível para root (**RR-1…RR-5**) | **PASS** (`30.19`) — RR-1…RR-5 + R-A no fecho |
+193:| GA6.10 | O que ficou sem prova em pfSense CE declarado (**R-L**, ADR-0022) | **PASS** (`30.19`) — CE sem prova; lab Plus |
+194:| GA6.11 | Fecho registado no CORTEX e no `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | **PASS** (`30.19`) |
+195:| GA6.12 | Decisão §5 n.º 8 (releases antigas com bypass) executada ou risco residual aceite por escrito (RR-3) | **PASS** (`30.19`) — apontadores `1.9.54` + aviso; tags **não** alteradas |
+
+=== fecho doc exists ===
+fecho:OK
+eula:OK
+
+=== CORTEX says FECHADA ===
+1560:TRILHA ANTI-PIRATARIA — FECHADA
+1562:- Passo: 30.19 FECHADO (20260812T025741Z)
+
+=== plano FECHADA ===
+3:**Estado do plano:** **TRILHA FECHADA** — **`30.19` FECHADO** (`20260812T025741Z`;
+48:- Passo: 30.19 FECHADO (20260812T025741Z)
+
+=== ESTADO entry ===
+43:| Anti-pirataria / Anti-tamper AP0–AP4 (`30.0`–`30.19`) | [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) | **FECHADA** (`20260812T025741Z`) | [`fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md) · evidência `20260812T025741Z-30.19-fecho` |
+46:**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (residual campo: BG-028 Fase 1; GA5.9).
+136:| Anti-pirataria residual RR-3 | Tags antigas descarregáveis | Aviso [`aviso-releases-antigas-rr3-30.19.md`](../06-releases/aviso-releases-antigas-rr3-30.19.md); tags **não** removidas (decisão 8) |
+189:| 2026-08-12 | Trilha Anti-pirataria AP0–AP4 **FECHADA** (`30.19`; GA6 PASS) |
+
+=== ADR note ===
+47:| [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | Trilha IPv6 **FECHADA**; produção `1.9.8` |
+59:trilha **FECHADA** em **`30.19`** (`2026-08-12`) — fecho
+60:[`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md)
+
+=== no PORTVERSION / package code in this worktree vs HEAD for product ===
+
+=== no tag mutation commands run ===
+gh release delete*: NOT RUN (policy)

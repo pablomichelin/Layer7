@@ -50,11 +50,11 @@ em instalações novas; upgrade não regressivo; runbook isolados; GA5.7/5.8/5.1
 GA5.12 **PASS** (unit); **`30.16` FECHADO** — decisão de licença distribuída
 (BG-122 / A-02); GA6.1/6.2 **PASS**; **`30.17` FECHADO** — marcação por cliente
 (sidecar opaco; sem telemetria); GA6.3/6.4 **PASS**; candidato **`1.9.58`**
-(**sem** GitHub Release); **`30.18` FECHADO após gate-control** (F1.2 processo /
-BG-123; bateria `20260812T025135Z`; antes EM EXECUÇÃO/PENDENTE; GA6.5 processo
-+ residual BG-028; GA6.6 **PASS**; **sem** publish); próximo **`30.19`**
-(AP4 — **não** iniciar sem pedido); comandos em
-`docs/10-license-server/MANUAL-INSTALL.md`).
+(**sem** GitHub Release); **`30.18` FECHADO** (gate-control); **trilha
+Anti-pirataria FECHADA** em **`30.19`** (`20260812T025741Z`; GA6.7–6.12 **PASS**;
+só docs; **sem** publish/tags/produção); fecho
+[`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
+comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.54`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
@@ -1466,7 +1466,14 @@ documental só após bateria (estado intermédio: EM EXECUÇÃO/PENDENTE até PA
 [`20260812T025135Z-30.18-gate-control`](docs/tests/evidence/20260812T025135Z-30.18-gate-control/);
 evidência impl.
 [`20260812T024826Z-30.18-release-signing`](docs/tests/evidence/20260812T024826Z-30.18-release-signing/).
-**Próximo na trilha:** AP4 `30.19` (**não** iniciar sem pedido explícito).
+**`30.19` FECHADO — trilha FECHADA** (`20260812T025741Z`): fecho documental
+GA6.7–6.12; agenda EULA; reavaliação ameaças; RR-1…RR-5; R-L; decisão 8/RR-3
+(aviso + apontadores `1.9.54`; tags **não** alteradas); **sem** código/
+PORTVERSION/publish/produção; fecho
+[`fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
+evidência
+[`20260812T025741Z-30.19-fecho`](docs/tests/evidence/20260812T025741Z-30.19-fecho/).
+**Próximo:** manutenção — **não** reabrir trilha sem GO + backlog.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1491,7 +1498,7 @@ pendente release).
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4/10/15 PASS**; **GA5.1–5.8 + 5.10–5.12 PASS**; **GA6.1–6.6 PASS** (6.5 processo + residual BG-028; `30.16`–`30.18`); GA5.9 campo **PENDENTE**; GA4.12 **N/A**; GA2 parcial
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0–GA6 PASS** (trilha fechada `30.19`; 6.5 residual BG-028; 6.7 residual parecer EULA); GA5.9 campo **PENDENTE**; GA4.12 **N/A**; GA2 parcial histórico
 - **Evidência campo 30.10 (e2e PASS `1.9.54`):**
   [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
 - **Evidência 30.11 primary auth GET PASS:**
@@ -1518,6 +1525,11 @@ pendente release).
   [`docs/tests/evidence/20260812T024826Z-30.18-release-signing/`](docs/tests/evidence/20260812T024826Z-30.18-release-signing/)
 - **Evidência 30.18 gate-control (fecho):**
   [`docs/tests/evidence/20260812T025135Z-30.18-gate-control/`](docs/tests/evidence/20260812T025135Z-30.18-gate-control/)
+- **Evidência 30.19 fecho trilha:**
+  [`docs/tests/evidence/20260812T025741Z-30.19-fecho/`](docs/tests/evidence/20260812T025741Z-30.19-fecho/)
+- **Fecho 30.19:** [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md)
+- **EULA agenda:** [`docs/09-blocking/eula-revisao-juridica-30.19.md`](docs/09-blocking/eula-revisao-juridica-30.19.md)
+- **Aviso RR-3:** [`docs/06-releases/aviso-releases-antigas-rr3-30.19.md`](docs/06-releases/aviso-releases-antigas-rr3-30.19.md)
 - **Marcação 30.17 (privacidade):** [`docs/01-architecture/marcacao-cliente-30.17.md`](docs/01-architecture/marcacao-cliente-30.17.md)
 - **Runbook 30.14:** [`docs/13-runbooks/check-in-migration-30.14.md`](docs/13-runbooks/check-in-migration-30.14.md)
 - **Evidência campo 30.10 (STOP `1.9.53`):**
@@ -1537,29 +1549,24 @@ pendente release).
 - **GA4.11 / GA4.12 (docs):** [`docs/13-runbooks/content-mirror-rollback-ga4.11.md`](docs/13-runbooks/content-mirror-rollback-ga4.11.md) ·
   [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**histórico — GA4.12 N/A**)
 - **Backlog:** BG-114…BG-123 **Concluido** (incl. BG-101/118); residual F1.2 campo → BG-028
-- **Ordem:** `30.0`→…→**`30.18` FECHADO**→AP4 `30.19` (sob pedido)
-- **GOs humanos remanescentes:** BG-028 Fase 1 (1ª publish F1.2); AP4 `30.19` sob pedido
+- **Ordem:** `30.0`→…→**`30.19` FECHADO** — **trilha FECHADA**
+- **GOs humanos remanescentes (fora da trilha):** BG-028 Fase 1; parecer EULA externo; GA5.9 campo
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
   kill-switch, CRL offline, telemetria
-- **Rev. plano:** `2026-08-10c`
+- **Rev. plano:** `2026-08-10c` + fecho `30.19`
 
 ```text
-TRILHA ANTI-PIRATARIA — progresso
-- Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
-- Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Onda: AP4 em curso
-- Passo: 30.18 FECHADO após gate-control (bateria 20260812T025135Z)
-- Evidência 30.18 gate-control: 20260812T025135Z-30.18-gate-control
-- Impl. 30.18: b36f2e3 (antes FECHADO prematuro → EM EXECUÇÃO/PENDENTE)
-- GO 30.14 + decisão 7 aplicados; sem max_activations
-- 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
-- GA5.1-5.8+5.10-5.12 PASS; GA6.1-6.6 PASS; GA5.9 campo PENDENTE
+TRILHA ANTI-PIRATARIA — FECHADA
+- Diagnóstico: ACEITE 2026-08-10 (A-01..A-10); reavaliado 30.19
+- Passo: 30.19 FECHADO (20260812T025741Z)
+- Evidência: 20260812T025741Z-30.19-fecho
+- GA6.1-6.12 PASS (residuais: BG-028 campo; parecer EULA externo)
+- GA5.9 campo PENDENTE (fora do fecho documental)
 - ADRs 0030-0033: Aceito
-- BG-117/118/119/121/122/123/101 Concluido; BG-028 Fase 1 pendente
+- BG-114…123/101 Concluido
 - Produção .254: 1.9.54; candidato Makefile 1.9.58 (sem release)
-- Próximo: AP4 30.19 (só com pedido explícito; NÃO aberto)
-- Agente: Composer 2.5 — um passo/chat (plano §8)
+- Não reabrir sem GO + backlog
 ```
 
 ---

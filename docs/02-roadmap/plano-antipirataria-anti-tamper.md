@@ -1,12 +1,13 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.18` FECHADO após gate-control** (bateria
-`20260812T025135Z`; antes EM EXECUÇÃO/PENDENTE; BG-123; GA6.5 **PASS processo**
-+ residual BG-028; GA6.6 **PASS**; evidência
-[`../tests/evidence/20260812T025135Z-30.18-gate-control/`](../tests/evidence/20260812T025135Z-30.18-gate-control/);
-impl. `b36f2e3`); **`30.17` FECHADO** (gate-control); produção **`1.9.54`**;
-candidato Makefile **`1.9.58`** (**sem** release); ADRs 0030–0033 **`Aceito`**;
-**próximo AP4 `30.19`** (sob pedido; **não** aberto)
+**Estado do plano:** **TRILHA FECHADA** — **`30.19` FECHADO** (`20260812T025741Z`;
+GA6.7–6.12 **PASS**; fecho
+[`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md);
+evidência
+[`../tests/evidence/20260812T025741Z-30.19-fecho/`](../tests/evidence/20260812T025741Z-30.19-fecho/));
+**`30.18` FECHADO** (gate-control); produção **`1.9.54`**; candidato
+**`1.9.58`** (**sem** release); ADRs 0030–0033 **`Aceito`**; **não reabrir**
+sem GO + backlog
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -30,28 +31,25 @@ candidato Makefile **`1.9.58`** (**sem** release); ADRs 0030–0033 **`Aceito`**
 
 | Campo | Valor |
 |-------|-------|
-| Onda actual | **AP4 em curso** (AP0–AP3 código FECHADOS; GA1/GA4 cut PASS) |
-| Passo actual | **`30.18` FECHADO** após gate-control (F1.2 processo / BG-123) |
-| Próximo | AP4 **`30.19`** (sob pedido explícito; **não** aberto) |
-| Depois | fecho trilha |
-| Bloqueio duro | A-09 resolvido; cut PASS; GO `30.14` + decisão 7 **aplicados**; GA5.9 campo pós-release; A-10 residual campo → BG-028 |
-| Código alterado até agora | 30.13–30.17; candidato **`1.9.58`**; produção **`1.9.54`**; `30.18` = processo/docs/teste (sem PORTVERSION) |
-| Gate activo | **GA5.1–5.8 + 5.10–5.12 PASS**; **GA6.1–6.6** (6.5 processo + residual campo); GA5.9 campo **PENDENTE** |
-| Decisões 1/3 (RR-1) | **Sim** / **Sim** — cut + GO execução `30.14` **feitos** |
-| Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
-| Rev. do plano | **`2026-08-10c`** |
+| Onda actual | **AP4 FECHADA** — trilha completa |
+| Passo actual | **`30.19` FECHADO** (fecho documental GA6.7–6.12) |
+| Próximo | Manutenção — **não** reabrir sem GO + backlog |
+| Depois | — |
+| Bloqueio duro | Residuais: BG-028 Fase 1; GA5.9 campo; parecer EULA externo; RR-3 tags |
+| Código alterado até agora | 30.13–30.17; candidato **`1.9.58`**; `30.18`/`30.19` docs/processo; produção **`1.9.54`** |
+| Gate activo | **GA6 PASS** (trilha); GA5.9 campo **PENDENTE** (fora do fecho documental) |
+| Decisões 1/3/6/8 | Aplicadas (cut, check-in, agenda EULA, aviso RR-3) |
+| Agente recomendado | **Composer 2.5** — manutenção sob GO |
+| Rev. do plano | **`2026-08-10c` + fecho `30.19`** |
 
 ```text
-TRILHA ANTI-PIRATARIA — progresso
-- Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
-- Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo: 30.18 FECHADO após gate-control (bateria 20260812T025135Z)
-- Evidência 30.18 gate-control: 20260812T025135Z-30.18-gate-control
-- Impl. 30.18: b36f2e3 (antes FECHADO prematuro → EM EXECUÇÃO/PENDENTE)
-- GA5.1-5.8+5.10-5.12 PASS; GA6.1-6.6 PASS; GA5.9 campo PENDENTE
+TRILHA ANTI-PIRATARIA — FECHADA
+- Modelo de ameaças: ACEITE (2026-08-10); reavaliado em 30.19 (GA6.8)
+- Passo: 30.19 FECHADO (20260812T025741Z)
+- Evidência: 20260812T025741Z-30.19-fecho
+- GA6.1-6.12 PASS (residuais: BG-028; parecer EULA externo)
 - Produção .254: 1.9.54; candidato Makefile 1.9.58 (sem release)
-- BG-117/118/119/121/122/123/101 Concluido; BG-028 Fase 1 pendente
-- Próximo: AP4 30.19 (só com pedido explícito; NÃO aberto)
+- BG-114…123/101 Concluido; não reabrir sem GO
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -457,15 +455,18 @@ bateria gate-control (fecho documental prematuro em `7f30b56` corrigido).
 | **Evidência fecho** | [`../tests/evidence/20260812T025135Z-30.18-gate-control/`](../tests/evidence/20260812T025135Z-30.18-gate-control/) |
 | **Evidência impl.** | [`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/) |
 
-#### 30.19 — Fecho da trilha
+#### 30.19 — Fecho da trilha — **FECHADO** (`20260812T025741Z`)
 
-**Entrega:** revisão jurídica da EULA quanto a auditoria e penalidade por instalação
-excedente; reavaliação do modelo de ameaças com os controlos novos; declaração
-honesta do que **continua** possível para root (usar RR-1…RR-5 do §0.1 como base);
-**execução da decisão n.º 8 do §5** sobre as releases antigas publicadas com o
-caminho dev (RR-3); registo do que ficou sem prova CE (R-L); fecho no CORTEX e no
-`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`.
-**Gate:** GA6.
+| Campo | Valor |
+|-------|--------|
+| **Objectivo** | Fechar AP4/trilha: EULA agenda (dec. 6), ameaças, RR-1…RR-5, R-L, decisão 8/RR-3, CORTEX+ESTADO |
+| **Impacto** | Só documentação; sem código/PORTVERSION/publish/tags/produção |
+| **Risco** | Baixo; residual RR-3 tags + parecer EULA externo + BG-028 |
+| **Teste** | GA6.7–6.12 + revisão cruzada (evidência) |
+| **Rollback** | Reverter commit 30.19 |
+| **Gate** | GA6.7–6.12 **PASS** |
+| **Doc** | [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md) |
+| **Evidência** | [`../tests/evidence/20260812T025741Z-30.19-fecho/`](../tests/evidence/20260812T025741Z-30.19-fecho/) |
 
 ---
 

@@ -187,20 +187,20 @@ indisponibilidade de rede em firewall parado.
 | GA6.4 | Sem telemetria introduzida (coerente com a política do produto) | **PASS** (gate-control `20260812T024419Z`) — marca só local; `policy=local_only_no_telemetry` |
 | GA6.5 | Releases publicam manifesto + `.sig` + chave pública (ADR-0023 / F1.2) | **PASS (processo)** (gate-control `20260812T025135Z`; impl. `b36f2e3`) — dry-run ×2 + política; **residual campo** até 1ª publish Fase 1 (**BG-028**) |
 | GA6.6 | `MANUAL-INSTALL.md` com comandos e links da versão actual (regra especial do `AGENTS.md`) | **PASS** (gate-control `20260812T025135Z`) — links `1.9.54` + nota/procedimento F1.2 |
-| GA6.7 | Revisão jurídica da EULA concluída | **PENDENTE** |
-| GA6.8 | Modelo de ameaças reavaliado com os controlos novos | **PENDENTE** |
-| GA6.9 | Declaração honesta do que **continua** possível para root (**RR-1…RR-5**) | **PENDENTE** |
-| GA6.10 | O que ficou sem prova em pfSense CE declarado (**R-L**, ADR-0022) | **PENDENTE** |
-| GA6.11 | Fecho registado no CORTEX e no `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | **PENDENTE** |
-| GA6.12 | Decisão §5 n.º 8 (releases antigas com bypass) executada ou risco residual aceite por escrito (RR-3) | **PENDENTE** |
+| GA6.7 | Revisão jurídica da EULA concluída | **PASS (agenda)** (`30.19` `20260812T025741Z`) — âmbito registado; parecer externo residual |
+| GA6.8 | Modelo de ameaças reavaliado com os controlos novos | **PASS** (`30.19`) — [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md) |
+| GA6.9 | Declaração honesta do que **continua** possível para root (**RR-1…RR-5**) | **PASS** (`30.19`) — RR-1…RR-5 + R-A no fecho |
+| GA6.10 | O que ficou sem prova em pfSense CE declarado (**R-L**, ADR-0022) | **PASS** (`30.19`) — CE sem prova; lab Plus |
+| GA6.11 | Fecho registado no CORTEX e no `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | **PASS** (`30.19`) |
+| GA6.12 | Decisão §5 n.º 8 (releases antigas com bypass) executada ou risco residual aceite por escrito (RR-3) | **PASS** (`30.19`) — apontadores `1.9.54` + aviso; tags **não** alteradas |
 
-**Estado GA6:** **parcial** — GA6.1–6.6 **PASS** (6.5 = processo + residual campo/BG-028);
-restante → `30.19` (**não** aberto).
+**Estado GA6:** **PASS** (`30.16`–`30.19`) — 6.5 residual campo/BG-028; 6.7 residual parecer EULA externo.
+Evidência fecho `30.19`: `docs/tests/evidence/20260812T025741Z-30.19-fecho/`.
 Evidência fecho `30.18` (gate-control): `docs/tests/evidence/20260812T025135Z-30.18-gate-control/`.
 Evidência impl. `30.18`: `docs/tests/evidence/20260812T024826Z-30.18-release-signing/`.
 Evidência fecho `30.17` (gate-control): `docs/tests/evidence/20260812T024408Z-30.17-gate-control/`.
 
-**Saída:** trilha fechada, com limites declarados sem overclaim.
+**Saída:** trilha **fechada**, com limites declarados sem overclaim.
 
 ---
 

@@ -452,3 +452,11 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] P3 failsafe+visibilidade — **PASS** `1.9.47` (P3.1–P3.8; evid. `230400Z`)
 - [ ] P4 soak lab — **CLOSED FAIL/ABORT** `234042Z` (supervisor nao armado; rollback limpo; nao desbloqueia piloto)
 - [ ] P5: ficha site de cliente preenchida + GO + evidência antes de qualquer ON externo/permanente
+
+### Anti-pirataria / Anti-tamper (AP0–AP4, passos `30.x`)
+
+- [x] Trilha **FECHADA** em `30.19` (`20260812T025741Z`) — GA6.7–6.12 PASS
+- [x] Fecho: [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md)
+- [x] Evidência: `docs/tests/evidence/20260812T025741Z-30.19-fecho/`
+- [x] Residuais declarados: BG-028 Fase 1; GA5.9 campo; parecer EULA externo; RR-3 tags
+- [x] **Não** reabrir sem GO humano + backlog
