@@ -366,9 +366,10 @@ GA3 PASS. BG-120 **Concluido**. Token: `30.8`–`30.10` + e2e `1.9.54` PASS;
 dispensadas `2026-08-12`). **`30.11` cut FECHADO** (`20260812T011217Z`);
 **BG-117 Concluido**. Evidência:
 [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
-**`30.12`–`30.14` FECHADOS** (contrato + assinatura + default check-in;
-GA5.1–5.8 + 5.10–5.11 PASS; BG-118/119/101 **Concluido**). Candidato `1.9.56`
-sem release. **Próximo:** `30.15` — não misturar com enforce/MITM.
+**`30.12`–`30.15` FECHADOS** (contrato + assinatura + default check-in +
+alerta multi-appliance; GA5.1–5.8 + 5.10–5.12 PASS; BG-118/119/121/101
+**Concluido**). Candidato `1.9.56` sem release. **Próximo:** AP4 `30.16` —
+só com pedido; não misturar com enforce/MITM.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
@@ -379,7 +380,7 @@ sem release. **Próximo:** `30.15` — não misturar com enforce/MITM.
 | BG-118 | Check-in `true` por defeito + política de migração | Alta | package + licenciamento | AP3 / passo `30.14` | revogação no painel não corta appliance instalado (A-04) | M | Alto | **Concluido** (`30.14` `20260812T015519Z`; GO registado) | novas=ON; upgrade preserva; runbook isolados; GA5.9 campo PENDENTE; candidato `1.9.56` |
 | BG-119 | Resposta de check-in assinada com nonce; rejeitar não assinada | Alta | daemon + license server | AP3 / passos `30.12`–`30.13` | servidor falso via `/etc/hosts` mantém licença viva (A-05) | M | Alto | **Concluido** (`30.13` `20260812T013913Z`; GA5.2–5.6 PASS unit) | dual-mode D10; candidato `1.9.55` sem release; evidência `20260812T013913Z-30.13-checkin-signed` |
 | BG-120 | Estado de entitlements assinado para a GUI; eliminar fallback sem verificação | Media | package/GUI | AP1 / passo `30.7` | stats forjados desbloqueiam UX de Identity/MITM (A-07) | M | Medio | **Concluido** (`30.7` + release `1.9.52`, `2026-08-10`) | GA2.8–2.10 PASS; evidência `20260810T214800Z-30.7-entitlements`; verify via `pkeyutl` |
-| BG-121 | Alerta de abuso multi-appliance no license server (+ decisão sobre `max_activations`) | Media | license server | AP3 / passo `30.15` | integrador multi-cliente invisível (A-08) | M | Alto | **Aberto** | dados já existem em `activations_log`; falta alerta; gate GA5 |
+| BG-121 | Alerta de abuso multi-appliance no license server (+ decisão sobre `max_activations`) | Media | license server | AP3 / passo `30.15` | integrador multi-cliente invisível (A-08) | M | Alto | **Concluido** (`30.15` `20260812T020331Z`; decisão 7 = só alerta) | dashboard queue; rebind sem FP; sem `max_activations`; sem deploy; GA5.12 PASS unit |
 | BG-122 | Distribuir decisão de licença (remover ponto único em `refresh_enforce_cfg`) | Media | daemon | AP4 / passo `30.16` | um NOP activa enforce sem licença (A-02) | M | Medio | **Aberto** | manter legibilidade; N1/N2 obrigatórios; gate GA6 |
 | BG-123 | Completar cadeia de assinatura de release nas publicações (manifesto + `.sig`) | Baixa | release | AP4 / passo `30.18` | releases só com `.sha256`; contrato F1.2/ADR-0023 incompleto (A-10) | P | Medio | **Aberto** | não é bypass de licença; integridade/proveniência; gate GA6 |
 

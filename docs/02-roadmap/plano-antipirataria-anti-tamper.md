@@ -1,12 +1,13 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
 **Estado do plano:** **`30.14` FECHADO** (GO + default check-in ON; GA5.7/5.8/5.10/5.11
-**PASS**; BG-118/BG-101 **Concluido**); **`30.13` FECHADO** (assinatura; GA5.2–5.6
-**PASS**); **`30.12` FECHADO**; **`30.11` FECHADO**; **GA4.12 N/A**; produção
+**PASS**; BG-118/BG-101 **Concluido**); **`30.15` FECHADO** (alerta multi-appliance;
+GA5.12 **PASS**; decisão 7 = só alerta; BG-121 **Concluido**); **`30.13`/`30.14`
+FECHADOS**; **`30.12` FECHADO**; **`30.11` FECHADO**; **GA4.12 N/A**; produção
 **`1.9.54`**; candidato Makefile **`1.9.56`** (**sem** release); ADRs 0030–0033
-**`Aceito`**; runbook
-[`../13-runbooks/check-in-migration-30.14.md`](../13-runbooks/check-in-migration-30.14.md);
-**próximo `30.15`**
+**`Aceito`**; evidência
+[`../tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/`](../tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/);
+**próximo AP4 `30.16`** (sob pedido)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -30,13 +31,13 @@
 
 | Campo | Valor |
 |-------|-------|
-| Onda actual | **AP3 em curso** (AP0/AP1/AP2 cut FECHADOS; GA1/GA4 cut PASS) |
-| Passo actual | **`30.14` FECHADO** (default check-in + migração) |
-| Próximo | **`30.15`** (abuso multi-appliance) |
-| Depois | AP4 `30.16`… |
-| Bloqueio duro | A-09 resolvido; cut PASS; GO `30.14` **aplicado**; GA5.9 campo pós-release |
-| Código alterado até agora | 30.13 + sample/GUI/runbook 30.14; candidato **`1.9.56`**; produção **`1.9.54`** |
-| Gate activo | **GA5.1–5.8 + 5.10–5.11 PASS**; GA5.9 campo **PENDENTE**; GA4 cut PASS |
+| Onda actual | **AP3 FECHADA no código** (AP0/AP1/AP2 cut FECHADOS; GA1/GA4 cut PASS) |
+| Passo actual | **`30.15` FECHADO** (alerta multi-appliance; só alerta) |
+| Próximo | AP4 **`30.16`** (sob pedido explícito) |
+| Depois | `30.17`… |
+| Bloqueio duro | A-09 resolvido; cut PASS; GO `30.14` + decisão 7 **aplicados**; GA5.9 campo pós-release |
+| Código alterado até agora | 30.13–30.15; candidato **`1.9.56`**; produção **`1.9.54`**; LS 30.15 **sem** deploy |
+| Gate activo | **GA5.1–5.8 + 5.10–5.12 PASS**; GA5.9 campo **PENDENTE**; GA4 cut PASS |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — cut + GO execução `30.14` **feitos** |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -48,11 +49,11 @@ TRILHA ANTI-PIRATARIA — progresso
 - Passo: 30.14 FECHADO (check-in default ON + migração)
 - GO 30.14: registado (anti-pirataria)
 - 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
-- GA5.1-5.8+5.10-5.11 PASS; GA5.9 campo PENDENTE
-- Evidência 30.14: 20260812T015519Z-30.14-checkin-default
+- GA5.1-5.8+5.10-5.12 PASS; GA5.9 campo PENDENTE
+- Evidência 30.15: 20260812T020331Z-30.15-multi-appliance-abuse
 - Produção .254: 1.9.54; candidato Makefile 1.9.56 (sem release)
-- BG-117/118/119/101 Concluido
-- Próximo: 30.15 (abuso multi-appliance)
+- BG-117/118/119/121/101 Concluido
+- Próximo: AP4 30.16 (só com pedido explícito)
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -397,17 +398,20 @@ novas instalações, priorizando segurança anti-pirataria» — ficha
 **Candidato:** `1.9.56` — **sem** GitHub Release neste passo.
 **Evidência:** [`../tests/evidence/20260812T015519Z-30.14-checkin-default/`](../tests/evidence/20260812T015519Z-30.14-checkin-default/).
 
-#### 30.15 — Detecção de abuso multi-appliance — **BG-121**
+#### 30.15 — Detecção de abuso multi-appliance — **BG-121** — **FECHADO**
 
 **Objectivo:** corrigir A-08; tornar T1 (integrador multi-cliente) visível.
 **Entrega:** alerta no license server quando a mesma chave tenta activar ou fazer
-check-in de múltiplos `hardware_id`/IPs; painel mostra o sinal; decisão registada
-sobre introduzir `max_activations`.
-**Ficheiros:** `license-server/backend/src/`, migração, frontend admin.
+check-in de múltiplos `hardware_id`; painel (dashboard) mostra o sinal; decisão 7
+aplicada — **fase 1 = só alerta** (sem `max_activations`). Sem migração nova
+(usa `activations_log` / `check_ins_log` / `admin_audit_log`).
+**Ficheiros:** `license-server/backend/src/multi-appliance-abuse*.js`,
+`routes/dashboard.js`, `frontend/src/pages/Dashboard.jsx`.
 **Teste mínimo:** cenário simulado gera alerta; licença legítima com rebind
-autorizado **não** gera falso positivo.
-**Risco:** Baixo (só servidor). **Rollback:** deploy anterior.
-**Gate:** GA5.
+autorizado **não** gera falso positivo — **PASS** unit.
+**Risco:** Baixo (só servidor; sem deploy neste passo). **Rollback:** reverter commit.
+**Gate:** GA5.12 **PASS**.
+**Evidência:** [`../tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/`](../tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/).
 
 ---
 

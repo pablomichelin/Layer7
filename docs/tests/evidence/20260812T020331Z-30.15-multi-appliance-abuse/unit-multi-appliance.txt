@@ -1,0 +1,13 @@
+✔ sem alerta com um único hardware_id (0.506709ms)
+✔ abuso: mesma chave em dois appliances sem rebind → alerta (0.370458ms)
+✔ rebind autorizado A→B: histórico A+B não gera falso positivo (0.080667ms)
+✔ após rebind A→B, terceiro appliance C → alerta (0.072334ms)
+✔ buildAuthorizedHardwareSet inclui current + cadeia de rebind (0.065375ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47.87425

@@ -4,20 +4,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `2.0.0` |
-| **Codinome** | PORTAL-PLAN-004 — técnicos + RBAC |
-| **Estado** | Entregue |
-| **Data** | `2026-08-08` |
+| **Versão** | `2.1.0` |
+| **Codinome** | 30.15 — alerta multi-appliance |
+| **Estado** | Entregue no git (**sem** deploy live neste passo) |
+| **Data** | `2026-08-12` |
 
 ## Inclui
 
-- Owner vs técnico (`is_owner`, `permissions`, `is_active`)
-- API `/api/users` + `requirePermission` em rotas sensíveis
-- Página **Utilizadores** com checkboxes por função
-- Menu/botões condicionados a permissões
+- Fila «Abuso multi-appliance (30d)» no Dashboard
+- Contagem `licenses.multi_appliance_abuse` na API `/dashboard`
+- Política fase 1: **só alerta** (decisão 7); sem `max_activations`
+- Rebind autorizado não gera falso positivo
 
 ## Próxima
 
-Só ideias com GO.
+Deploy live sob GO operacional; ideias de escala só com GO.
 
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

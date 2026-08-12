@@ -165,12 +165,12 @@ Gate de maior impacto em suporte. **Não abrir sem GA4 estável.**
 | GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **PENDENTE campo** — caminho código `30.13` OK; sem `.254`/release neste passo |
 | GA5.10 | Caminho de excepção para appliance isolado documentado e testado | **PASS** — runbook + `false` efectivo OFF |
 | GA5.11 | Runbook de suporte publicado antes da release | **PASS** — [`../13-runbooks/check-in-migration-30.14.md`](../13-runbooks/check-in-migration-30.14.md) |
-| GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PENDENTE** (`30.15`) |
+| GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PASS** — unit `multi-appliance-abuse.test.js` (`30.15`) |
 | GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PASS parcial** — dual-mode D10 + upgrade preserve |
 
-**Estado GA5:** **parcial** — GA5.1–5.8 + 5.10–5.11 **PASS**;
-GA5.9 **PENDENTE campo**; GA5.12 → `30.15`.
-Evidência `30.14`: `docs/tests/evidence/20260812T015519Z-30.14-checkin-default/`.
+**Estado GA5:** **parcial** — GA5.1–5.8 + 5.10–5.12 **PASS**;
+GA5.9 **PENDENTE campo**.
+Evidência `30.15`: `docs/tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/`.
 
 **Saída:** revogar uma licença passa a ter efeito real, sem transformar
 indisponibilidade de rede em firewall parado.

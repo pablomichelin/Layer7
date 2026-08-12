@@ -10,7 +10,7 @@ import {
   buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
 
-function ActionQueueSection({ title, count, href, rows, emptyLabel }) {
+function ActionQueueSection({ title, count, href, rows, emptyLabel, renderMeta }) {
   return (
     <div className="bg-white rounded-lg shadow p-4">
       <div className="flex items-center justify-between mb-3">
@@ -18,7 +18,11 @@ function ActionQueueSection({ title, count, href, rows, emptyLabel }) {
           <h4 className="font-semibold text-gray-800">{title}</h4>
           <p className="text-xs text-gray-500">{count} no total</p>
         </div>
-        <Link to={href} className="text-sm text-brand-600 hover:underline">Ver lista</Link>
+        {href ? (
+          <Link to={href} className="text-sm text-brand-600 hover:underline">Ver lista</Link>
+        ) : (
+          <span className="text-xs text-gray-400">Só alerta</span>
+        )}
       </div>
       {rows.length === 0 ? (
         <p className="text-sm text-gray-400">{emptyLabel}</p>
@@ -30,7 +34,13 @@ function ActionQueueSection({ title, count, href, rows, emptyLabel }) {
                 {row.customer_name || '—'} · <code className="text-xs">{row.license_key?.slice(0, 10)}…</code>
               </Link>
               <span className="text-xs text-gray-500 shrink-0">
-                {row.expiry ? formatCalendarDate(row.expiry) : (row.last_check_in_at ? new Date(row.last_check_in_at).toLocaleDateString('pt-BR') : '—')}
+                {renderMeta
+                  ? renderMeta(row)
+                  : (row.expiry
+                    ? formatCalendarDate(row.expiry)
+                    : (row.last_check_in_at
+                      ? new Date(row.last_check_in_at).toLocaleDateString('pt-BR')
+                      : '—'))}
               </span>
             </li>
           ))}
@@ -112,6 +122,15 @@ export default function Dashboard() {
           href={`${ADMIN_LICENSES_ROUTE}?stale_checkin_days=7`}
           rows={queue.stale_checkin_7d || []}
           emptyLabel="Nenhuma vinculada em silêncio"
+        />
+        <ActionQueueSection
+          title="Abuso multi-appliance (30d)"
+          count={licenses.multi_appliance_abuse ?? 0}
+          rows={queue.multi_appliance_abuse || []}
+          emptyLabel="Nenhum sinal de abuso multi-appliance"
+          renderMeta={(row) => (
+            `${row.unexplained_count ?? row.distinct_count ?? '?'} hw não explicado`
+          )}
         />
       </div>
 

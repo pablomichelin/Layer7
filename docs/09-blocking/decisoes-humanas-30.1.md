@@ -140,6 +140,17 @@
 **Data:** 2026-08-10  
 **Notas:** Aceite a recomendação. `max_activations` só após medir falsos positivos.
 
+### Addendum — execução `30.15` / BG-121 (`2026-08-12`)
+
+| Campo | Valor |
+|-------|--------|
+| Passo | `30.15` (alerta multi-appliance) |
+| Aplicação | **Só alerta** no dashboard (`policy: alert_only`); sem hard-limit; sem bloquear activate/check-in |
+| Anti falso positivo | Rebind `license_rebound` sucesso explica hw anterior/novo |
+| Deploy live | **Não** neste passo (código no git) |
+| Evidência | `docs/tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/` |
+| Gate | GA5.12 **PASS** (unit) |
+
 ---
 
 ## Decisão 8 — Releases antigas com caminho `is_dev_key` (RR-3)

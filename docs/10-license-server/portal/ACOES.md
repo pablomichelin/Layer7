@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-12 — 30.15 alerta multi-appliance (`2.1.0`)
+
+| Campo | Valor |
+|-------|-------|
+| Tipo | código + docs (sem deploy) |
+| Versão | `2.1.0` |
+| Objectivo | BG-121 / GA5.12 — sinal T1 no painel; só alerta (decisão 7) |
+| Impacto | API dashboard + UI fila; sem package/daemon; sem hard-limit |
+| Risco | Baixo — alerta informativo; rebind filtrado |
+| Teste | `multi-appliance-abuse.test.js` 5/5; `npm test` backend 133/133 |
+| Rollback | Reverter commit; em deploy futuro, imagem anterior |
+| Resultado | **FEITO** no git; evidência `20260812T020331Z-30.15-multi-appliance-abuse`; **sem** deploy `.244`/live |
+
+---
+
 ## 2026-08-08 — Alinhamento pós-commit + handoff
 
 | Campo | Valor |

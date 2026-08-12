@@ -7,6 +7,7 @@ const {
   LICENSE_SQL_REVOKED_CONDITION,
 } = require('../license-state');
 const { requirePermission } = require('../require-permission');
+const { collectMultiApplianceAlerts } = require('../multi-appliance-abuse-query');
 
 const router = Router();
 router.use(auth);
@@ -149,6 +150,11 @@ router.get('/', async (_req, res) => {
        LIMIT ${SAMPLE_LIMIT}
     `);
 
+    // 30.15 / GA5.12 — só alerta; rebind autorizado filtrado na avaliação
+    const multiAppliance = await collectMultiApplianceAlerts(pool, {
+      sampleLimit: SAMPLE_LIMIT,
+    });
+
     res.json({
       licenses: {
         active: parseInt(stats.rows[0].active, 10),
@@ -159,6 +165,7 @@ router.get('/', async (_req, res) => {
         expired_bound: parseInt(expiredBound.rows[0].total, 10),
         unbound_stale_7d: parseInt(unboundStale.rows[0].total, 10),
         stale_checkin_7d: parseInt(staleCheckin.rows[0].total, 10),
+        multi_appliance_abuse: multiAppliance.total,
       },
       customers: parseInt(customers.rows[0].total, 10),
       activations_24h: parseInt(activations24h.rows[0].count, 10),
@@ -168,6 +175,12 @@ router.get('/', async (_req, res) => {
         expired_bound: sampleExpiredBound.rows,
         unbound_stale_7d: sampleUnbound.rows,
         stale_checkin_7d: sampleStaleCheckin.rows,
+        multi_appliance_abuse: multiAppliance.sample,
+      },
+      multi_appliance_abuse: {
+        lookback_days: multiAppliance.lookback_days,
+        total: multiAppliance.total,
+        policy: 'alert_only',
       },
     });
   } catch (err) {

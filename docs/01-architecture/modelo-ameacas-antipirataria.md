@@ -213,6 +213,10 @@ Mitigação parcial já existente: `/var/db/layer7-checkin.json` só permite
 
 ### A-08 — Sem detecção de abuso multi-appliance
 
+> **Mitigação fase 1 (`30.15` / `20260812T020331Z`):** alerta no dashboard
+> (só sinal; sem `max_activations`). Residual: pirata sem check-in/activate
+> recente no lookback permanece invisível; hard-limit adiado (decisão 7).
+
 **Severidade: Média (comercial). Custo de exploração: n/a.**
 
 O servidor guarda `activations_log` mas **não há alerta nem contador** para

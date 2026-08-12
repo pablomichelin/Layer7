@@ -11,6 +11,21 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ---
 
+## [2.1.0] — 2026-08-12
+
+### Added
+
+- Dashboard: fila e contagem de abuso multi-appliance (lookback 30d)
+- Backend: `evaluateMultiApplianceAbuse` + query em activate/check-in logs
+- Anti falso positivo para rebind autorizado (`license_rebound`)
+- Política explícita `alert_only` (decisão 7 / 30.15) — sem `max_activations`
+
+### Notes
+
+- Código no git; **deploy live não** incluído neste bump
+
+---
+
 ## [2.0.0] — 2026-08-08
 
 ### Added
