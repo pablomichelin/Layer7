@@ -68,7 +68,12 @@ Executável pelo operador **sem** contactar suporte:
    ```sh
    /usr/local/etc/layer7/update-blacklists.sh --download
    ```
-5. GUI: Blacklists → **Subscrição de conteúdo: OK**.
+5. (30.17) Confirmar marca local de atribuição (sem telemetria):
+   ```sh
+   cat /usr/local/etc/layer7/blacklists/.l7-content-attribution
+   # ou re-stamp: update-blacklists.sh --stamp-attribution
+   ```
+6. GUI: Blacklists → **Subscrição de conteúdo: OK**.
 
 Se o relógio do appliance estiver errado (>1 dia fora da janela), corrigir NTP
 primeiro (ver também runbook anti-rollback).
@@ -81,7 +86,7 @@ primeiro (ver também runbook anti-rollback).
 |--------|------------|
 | **R-A** | Root no appliance pode contornar verificação local (substituir script, copiar token, etc.). |
 | **RR-1** | Enquanto o espelho anónimo de conteúdo corrente existir (`pré-30.11`), o token **não** fecha A-06 para quem bypassa o cliente. |
-| **RR-2** | Um appliance licenciado pode descarregar listas e redistribuí-las internamente — resposta é atribuição/contratual (AP4), não bloqueio técnico aqui. |
+| **RR-2** | Um appliance licenciado pode descarregar listas e redistribuí-las internamente — resposta é atribuição (`30.17` sidecar opaco; ver `marcacao-cliente-30.17.md`) + contratual, não bloqueio técnico aqui. |
 | **D10** | Falha de token **nunca** reduz enforce. |
 
 ---

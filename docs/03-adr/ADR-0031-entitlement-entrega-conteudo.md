@@ -62,7 +62,7 @@ exige **GO humano próprio** (decisão n.º 3 do §5).
 | **R-B** | AP2 é a prioridade de valor da trilha; higiene AP1 não a substitui. |
 | **R-D** | Falta de token impede actualizar; nunca apaga conteúdo nem desliga enforce. |
 | **RR-1** | Cut `30.11` **executado** (`20260812T011217Z`; `asset_count=0`). Sem `30.14` (check-in default), a protecção comercial contra T2 no eixo *revogação* continua incompleta; AP2 conteúdo já não depende do espelho anónimo corrente. |
-| **RR-2** | Um integrador com **1 licença legítima** pode descarregar blacklists nesse appliance e re-servi-las internamente a N cópias. O token trava o download **anónimo**, não a redistribuição de ficheiros. Resposta: marcação por cliente (`30.17`) + via contratual (AP4) — **não** bloqueio técnico neste ADR. |
+| **RR-2** | Um integrador com **1 licença legítima** pode descarregar blacklists nesse appliance e re-servi-las internamente a N cópias. O token trava o download **anónimo**, não a redistribuição de ficheiros. Resposta: marcação por cliente (`30.17` — sidecar local opaco; ver [`../01-architecture/marcacao-cliente-30.17.md`](../01-architecture/marcacao-cliente-30.17.md)) + via contratual (AP4) — **não** bloqueio técnico neste ADR. |
 
 ---
 

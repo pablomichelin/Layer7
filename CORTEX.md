@@ -48,8 +48,9 @@ check-in assinado/nonce (GA5.1 **PASS**);
 em instalações novas; upgrade não regressivo; runbook isolados; GA5.7/5.8/5.10/5.11
 **PASS**; **`30.15` FECHADO** — alerta multi-appliance (só alerta; decisão 7);
 GA5.12 **PASS** (unit); **`30.16` FECHADO** — decisão de licença distribuída
-(BG-122 / A-02); GA6.1/6.2 **PASS** (unit); candidato **`1.9.57`** (**sem**
-GitHub Release); próximo **`30.17`** (AP4 — **não** iniciar sem pedido);
+(BG-122 / A-02); GA6.1/6.2 **PASS**; **`30.17` FECHADO** — marcação por cliente
+(sidecar opaco; sem telemetria); GA6.3/6.4 **PASS**; candidato **`1.9.58`**
+(**sem** GitHub Release); próximo **`30.18`** (AP4 — **não** iniciar sem pedido);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.54`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
@@ -1447,7 +1448,13 @@ código no git (**sem** deploy live); evidência
 BG-122 **Concluido**; GA6.1/6.2 **PASS** (unit); candidato **`1.9.57`**
 (**sem** release/`.254`/license-server); evidência
 [`20260812T023529Z-30.16-license-enforce-gate`](docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/).
-**Próximo na trilha:** AP4 `30.17` (**não** iniciar sem pedido explícito).
+**`30.17` FECHADO** (`20260812T024235Z`): marcação por cliente (RR-2) via
+sidecars opacos em `update-blacklists.sh`; privacidade em
+[`marcacao-cliente-30.17.md`](docs/01-architecture/marcacao-cliente-30.17.md);
+GA6.3/6.4 **PASS**; candidato **`1.9.58`** (**sem** release/LS/`.254`);
+evidência
+[`20260812T024235Z-30.17-content-attribution`](docs/tests/evidence/20260812T024235Z-30.17-content-attribution/).
+**Próximo na trilha:** AP4 `30.18` (**não** iniciar sem pedido explícito).
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1472,7 +1479,7 @@ pendente release).
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4/10/15 PASS**; **GA5.1–5.8 + 5.10–5.12 PASS**; **GA6.1/6.2 PASS** (`30.16`); GA5.9 campo **PENDENTE**; GA4.12 **N/A**; GA2 parcial
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4/10/15 PASS**; **GA5.1–5.8 + 5.10–5.12 PASS**; **GA6.1–6.4 PASS** (`30.16`/`30.17`); GA5.9 campo **PENDENTE**; GA4.12 **N/A**; GA2 parcial
 - **Evidência campo 30.10 (e2e PASS `1.9.54`):**
   [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
 - **Evidência 30.11 primary auth GET PASS:**
@@ -1491,6 +1498,9 @@ pendente release).
   [`docs/tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/`](docs/tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/)
 - **Evidência 30.16 decisão distribuída:**
   [`docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/`](docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/)
+- **Evidência 30.17 marcação cliente:**
+  [`docs/tests/evidence/20260812T024235Z-30.17-content-attribution/`](docs/tests/evidence/20260812T024235Z-30.17-content-attribution/)
+- **Marcação 30.17 (privacidade):** [`docs/01-architecture/marcacao-cliente-30.17.md`](docs/01-architecture/marcacao-cliente-30.17.md)
 - **Runbook 30.14:** [`docs/13-runbooks/check-in-migration-30.14.md`](docs/13-runbooks/check-in-migration-30.14.md)
 - **Evidência campo 30.10 (STOP `1.9.53`):**
   [`docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`](docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/)
@@ -1509,7 +1519,7 @@ pendente release).
 - **GA4.11 / GA4.12 (docs):** [`docs/13-runbooks/content-mirror-rollback-ga4.11.md`](docs/13-runbooks/content-mirror-rollback-ga4.11.md) ·
   [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**histórico — GA4.12 N/A**)
 - **Backlog:** BG-114…BG-122 **Concluido** (incl. BG-101/118); BG-123 → `30.18`
-- **Ordem:** `30.0`→…→**`30.16` FECHADO**→AP4 `30.17`–`30.19` (sob pedido)
+- **Ordem:** `30.0`→…→**`30.17` FECHADO**→AP4 `30.18`–`30.19` (sob pedido)
 - **GOs humanos remanescentes:** nenhum bloqueante AP3; AP4 passos sob pedido explícito
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
@@ -1521,15 +1531,15 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Onda: AP4 em curso
-- Passo: 30.16 FECHADO (decisão licença distribuída)
+- Passo: 30.17 FECHADO (marcação por cliente; sem telemetria)
 - GO 30.14 + decisão 7 aplicados; sem max_activations
 - 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
-- GA5.1-5.8+5.10-5.12 PASS; GA6.1/6.2 PASS; GA5.9 campo PENDENTE
-- Evidência 30.16: 20260812T023529Z-30.16-license-enforce-gate
+- GA5.1-5.8+5.10-5.12 PASS; GA6.1-6.4 PASS; GA5.9 campo PENDENTE
+- Evidência 30.17: 20260812T024235Z-30.17-content-attribution
 - ADRs 0030-0033: Aceito
 - BG-117/118/119/121/122/101 Concluido
-- Produção .254: 1.9.54; candidato Makefile 1.9.57 (sem release)
-- Próximo: AP4 30.17 (só com pedido explícito)
+- Produção .254: 1.9.54; candidato Makefile 1.9.58 (sem release)
+- Próximo: AP4 30.18 (só com pedido explícito)
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

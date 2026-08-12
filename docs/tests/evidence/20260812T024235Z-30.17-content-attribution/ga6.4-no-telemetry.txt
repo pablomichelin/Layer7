@@ -1,0 +1,1 @@
+GA6.4: no network/telemetry in stamp path — verified by --stamp-attribution (local token only)

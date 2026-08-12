@@ -47,6 +47,11 @@ MIN_SIZE=1000000
 # Bearer base64url do envelope (preenchido após verify OK)
 CONTENT_BEARER=""
 CONTENT_SUB_REASON=""
+# 30.17 — campos do token verificados (para marcação local; sem telemetria)
+CONTENT_LICENSE_ID=""
+CONTENT_HW_ID=""
+ATTR_MARK_PATH_STATE=""
+ATTR_MARK_PATH_TREE=""
 
 # Estado runtime fora de /tmp (auditoria 1.9.10).
 mkdir -p "$L7_VAR_DB"
@@ -286,6 +291,7 @@ $meta = array(
   "v" => isset($p["v"]) ? (int)$p["v"] : -1,
   "scope" => isset($p["scope"]) ? (string)$p["scope"] : "",
   "hardware_id" => isset($p["hardware_id"]) ? (string)$p["hardware_id"] : "",
+  "license_id" => isset($p["license_id"]) ? (int)$p["license_id"] : 0,
   "iat" => isset($p["iat"]) ? (int)$p["iat"] : 0,
   "exp" => isset($p["exp"]) ? (int)$p["exp"] : 0,
 );
@@ -306,6 +312,7 @@ open(sys.argv[2],"w").write(j["data"])
 open(sys.argv[3],"w").write(j["sig"])
 meta={"v":int(p.get("v",-1)),"scope":str(p.get("scope","")),
       "hardware_id":str(p.get("hardware_id","")),
+      "license_id":int(p.get("license_id",0) or 0),
       "iat":int(p.get("iat",0)),"exp":int(p.get("exp",0))}
 open(sys.argv[4],"w").write(json.dumps(meta))
 ' "$_env" "$_data_out" "$_sig_out" "$_meta_out"
@@ -354,7 +361,7 @@ load_and_verify_content_subscription() {
 		_meta_line=$(php -r '
 $m=json_decode(file_get_contents($argv[1]), true);
 if (!is_array($m)) exit(1);
-echo (int)$m["v"]."|".$m["scope"]."|".$m["hardware_id"]."|".(int)$m["iat"]."|".(int)$m["exp"];
+echo (int)$m["v"]."|".$m["scope"]."|".$m["hardware_id"]."|".(int)$m["iat"]."|".(int)$m["exp"]."|".(int)$m["license_id"];
 ' "$_meta_file") || {
 			CONTENT_SUB_REASON="fields"
 			return 1
@@ -363,7 +370,7 @@ echo (int)$m["v"]."|".$m["scope"]."|".$m["hardware_id"]."|".(int)$m["iat"]."|".(
 		_meta_line=$(python3 -c '
 import json,sys
 m=json.load(open(sys.argv[1]))
-print("%d|%s|%s|%d|%d" % (int(m["v"]), m["scope"], m["hardware_id"], int(m["iat"]), int(m["exp"])))
+print("%d|%s|%s|%d|%d|%d" % (int(m["v"]), m["scope"], m["hardware_id"], int(m["iat"]), int(m["exp"]), int(m.get("license_id",0) or 0)))
 ' "$_meta_file") || {
 			CONTENT_SUB_REASON="fields"
 			return 1
@@ -377,6 +384,7 @@ print("%d|%s|%s|%d|%d" % (int(m["v"]), m["scope"], m["hardware_id"], int(m["iat"
 	_hw=$(printf '%s' "$_meta_line" | cut -d'|' -f3)
 	_iat=$(printf '%s' "$_meta_line" | cut -d'|' -f4)
 	_exp=$(printf '%s' "$_meta_line" | cut -d'|' -f5)
+	_lic=$(printf '%s' "$_meta_line" | cut -d'|' -f6)
 
 	[ "$_v" = "1" ] || {
 		CONTENT_SUB_REASON="version"
@@ -415,7 +423,66 @@ print("%d|%s|%s|%d|%d" % (int(m["v"]), m["scope"], m["hardware_id"], int(m["iat"
 		CONTENT_SUB_REASON="bearer-encode"
 		return 1
 	fi
+	CONTENT_LICENSE_ID="${_lic:-0}"
+	CONTENT_HW_ID="$_hw"
 	CONTENT_SUB_REASON="ok"
+	return 0
+}
+
+# 30.17 / GA6.3 — marca opaca local (sem telemetria / GA6.4).
+# mark = SHA256("l7-attr-v1:" || license_id || ":" || hardware_id)
+# Nunca grava nome de cliente nem contacta rede.
+compute_content_attribution_mark() {
+	_lic="$1"
+	_hw="$2"
+	printf 'l7-attr-v1:%s:%s' "$_lic" "$_hw" | openssl dgst -sha256 2>/dev/null \
+		| awk '{print $NF}' | tr -d '\n\r'
+}
+
+write_content_attribution() {
+	_snapshot_id="${1:-}"
+	_lic="${CONTENT_LICENSE_ID:-}"
+	_hw="${CONTENT_HW_ID:-}"
+
+	if [ -z "$_lic" ] || [ "$_lic" = "0" ] || [ -z "$_hw" ]; then
+		log "WARN: content attribution skipped (missing license_id/hardware_id)"
+		return 1
+	fi
+	_mark="$(compute_content_attribution_mark "$_lic" "$_hw")"
+	if [ -z "$_mark" ] || [ "${#_mark}" -ne 64 ]; then
+		log "WARN: content attribution mark compute failed"
+		return 1
+	fi
+
+	mkdir -p "$STATE_DIR" "$BL_DIR"
+	ATTR_MARK_PATH_STATE="$STATE_DIR/content-attribution.json"
+	ATTR_MARK_PATH_TREE="$BL_DIR/.l7-content-attribution"
+	_marked_at="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+	_json=$(printf '{"v":1,"scheme":"l7-attr-v1","mark":"%s","license_id":%s,"hardware_id":"%s","snapshot_id":"%s","marked_at_utc":"%s","policy":"local_only_no_telemetry"}' \
+		"$_mark" "$_lic" "$_hw" "$_snapshot_id" "$_marked_at")
+
+	# Validar JSON mínimo e ausência de campos PII proibidos.
+	case "$_json" in
+	*\"customer\"*|*\"customer_name\"*|*\"email\"*)
+		log "WARN: content attribution aborted (PII field guard)"
+		return 1
+		;;
+	esac
+
+	printf '%s\n' "$_json" > "$ATTR_MARK_PATH_STATE"
+	chmod 600 "$ATTR_MARK_PATH_STATE" 2>/dev/null || true
+	cp "$ATTR_MARK_PATH_STATE" "$ATTR_MARK_PATH_TREE"
+	chmod 644 "$ATTR_MARK_PATH_TREE" 2>/dev/null || true
+
+	if [ -n "${CANDIDATE_SNAPSHOT_ID:-}" ] && [ -d "$CACHE_DIR/$CANDIDATE_SNAPSHOT_ID" ]; then
+		cp "$ATTR_MARK_PATH_STATE" "$CACHE_DIR/$CANDIDATE_SNAPSHOT_ID/content-attribution.json" \
+			2>/dev/null || true
+	fi
+	if [ -d "$LKG_DIR" ]; then
+		cp "$ATTR_MARK_PATH_STATE" "$LKG_DIR/content-attribution.json" 2>/dev/null || true
+	fi
+
+	log "INFO: content attribution mark written (30.17; local only)"
 	return 0
 }
 
@@ -867,6 +934,9 @@ promote_candidate() {
 
 	update_lkg "$_discovered_tmp" "$_state_tmp"
 
+	# 30.17 — marca local após promote (não altera tar/manifesto assinados)
+	write_content_attribution "$CANDIDATE_SNAPSHOT_ID" || true
+
 	PROMOTION_ACTIVE="0"
 	rm -rf "$PREVIOUS_DIR" "$INCOMING_DIR"
 	PREVIOUS_DIR=""
@@ -1163,7 +1233,10 @@ do_download() {
 	fi
 
 	# Hook de teste (GA4.4/4.5): valida gate+Bearer sem rede.
+	# 30.17: ainda assim grava marca local (sem rede / sem telemetria).
 	if [ "${L7_BL_SKIP_FETCH:-0}" = "1" ]; then
+		_snap="$(state_value snapshot_id "$ACTIVE_STATE" 2>/dev/null || true)"
+		write_content_attribution "${_snap:-skip-fetch}" || true
 		log "INFO: L7_BL_SKIP_FETCH=1 — subscription OK; skipping network fetch"
 		exit 0
 	fi
@@ -1212,15 +1285,35 @@ do_check_subscription() {
 	exit 1
 }
 
+# 30.17 — só marca (token OK); sem rede. Para testes / re-stamp local.
+do_stamp_attribution() {
+	mkdir -p "$TMP" "$STATE_DIR" "$BL_DIR"
+	if ! load_and_verify_content_subscription; then
+		echo "content_attribution=invalid"
+		echo "reason=${CONTENT_SUB_REASON:-unknown}"
+		exit 1
+	fi
+	_snap="$(state_value snapshot_id "$ACTIVE_STATE" 2>/dev/null || true)"
+	if ! write_content_attribution "${_snap:-manual}"; then
+		echo "content_attribution=fail"
+		exit 1
+	fi
+	echo "content_attribution=ok"
+	echo "mark_path_state=$ATTR_MARK_PATH_STATE"
+	echo "mark_path_tree=$ATTR_MARK_PATH_TREE"
+	exit 0
+}
+
 MODE=""
 case "${1:-}" in
 --download) MODE="download" ;;
 --apply) MODE="apply" ;;
 --restore-lkg) MODE="restore-lkg" ;;
 --check-subscription) MODE="check-subscription" ;;
+--stamp-attribution) MODE="stamp-attribution" ;;
 "") MODE="full" ;;
 *)
-	echo "Usage: $0 [--download|--apply|--restore-lkg|--check-subscription]" >&2
+	echo "Usage: $0 [--download|--apply|--restore-lkg|--check-subscription|--stamp-attribution]" >&2
 	exit 1
 	;;
 esac
@@ -1230,5 +1323,6 @@ download) do_download ;;
 apply) do_apply ;;
 restore-lkg) do_restore_lkg ;;
 check-subscription) do_check_subscription ;;
+stamp-attribution) do_stamp_attribution ;;
 full) do_download ;;
 esac

@@ -6,6 +6,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **Anti-pirataria 30.17 — marcação por cliente (atribuição):** após update
+  autenticado (ou `--stamp-attribution`), grava sidecars opacos
+  `.state/content-attribution.json` + `.l7-content-attribution`
+  (`mark=SHA256(l7-attr-v1:license_id:hardware_id)`); sem PII cleartext; sem
+  telemetria; não altera tar/manifesto. Doc privacidade
+  `docs/01-architecture/marcacao-cliente-30.17.md`. Candidato
+  `PORTVERSION=1.9.58` — **sem** GitHub Release / `.254` / license-server.
+  GA6.3/GA6.4 PASS. Evidência
+  `docs/tests/evidence/20260812T024235Z-30.17-content-attribution/`.
+
 - **Anti-pirataria 30.16 / BG-122 — decisão de licença distribuída:** gates A/B
   com cruzamento (`license_enforce_gate.c`); `refresh_enforce_cfg` + hot-paths
   (`enforce_armed`) deixam de depender do `if` único sobre `s_lic.valid`
