@@ -41,11 +41,13 @@ anti-pirataria **30.10** / BG-117 — fix `fetch_authed` + **e2e `.254` PASS**
 (`20260811T114320Z`); herda cliente token de `1.9.53`; **30.9 live PASS**;
 produção observada **`1.9.54`**; GA4.4 **PASS**; **`30.11` FECHADO** (cut
 espelho; GA4.10/15 **PASS**; GA4.12 **N/A**); **`30.12` FECHADO** — contrato
-check-in assinado/nonce (GA5.1 **PASS**; zero código);
+check-in assinado/nonce (GA5.1 **PASS**);
 [`docs/01-architecture/contrato-check-in-assinado-30.12.md`](docs/01-architecture/contrato-check-in-assinado-30.12.md);
-próximo **`30.13`**; comandos em
+**`30.13` FECHADO** — servidor assina + cliente exige (GA5.2–5.6 **PASS** unit;
+candidato **`1.9.55`** no Makefile, **sem** GitHub Release neste passo);
+próximo **`30.14`** (GO); comandos em
 `docs/10-license-server/MANUAL-INSTALL.md`).
-Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.53`**.
+Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab: **`1.9.54`**.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
@@ -1420,7 +1422,12 @@ Evidências cut/recheck:
 ([`contrato-check-in-assinado-30.12.md`](docs/01-architecture/contrato-check-in-assinado-30.12.md));
 GA5.1 **PASS**; evidência
 [`20260812T013200Z-30.12-protocol-design`](docs/tests/evidence/20260812T013200Z-30.12-protocol-design/).
-**Próximo na trilha:** `30.13` (implementação — chat novo; não misturar).
+**`30.13` FECHADO** (`20260812T013913Z`): implementação assinatura/nonce
+(dual-mode legado; cliente rejeita unsigned); GA5.2–5.6 **PASS** (unit);
+BG-119 **Concluido**; candidato Makefile **`1.9.55`** (**sem** release/
+deploy neste passo); evidência
+[`20260812T013913Z-30.13-checkin-signed`](docs/tests/evidence/20260812T013913Z-30.13-checkin-signed/).
+**Próximo na trilha:** `30.14` (**GO humano** — default check-in; não abrir sem GO).
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1432,8 +1439,8 @@ GA4.1/GA4.14 **PASS**.
 [`docs/09-blocking/decisoes-humanas-30.1.md`](docs/09-blocking/decisoes-humanas-30.1.md).
 **BG-101:** reaberto lacuna comercial → BG-118 / `30.14`.
 **A-09:** resolvido operacionalmente em `30.2`.
-**Prioridade de valor:** AP2 conteúdo fechado no eixo espelho; AP3 desenho
-`30.12` feito — falta `30.13` + GO `30.14` para revogação forte em campo.
+**Prioridade de valor:** AP2 conteúdo fechado no eixo espelho; AP3 código
+`30.13` feito — falta GO `30.14` para revogação forte em campo.
 Riscos residuais **RR-1…RR-5** no plano §0.1.
 **Agente:** Composer 2.5 — um passo por chat (plano §8).
 **Limite honesto:** root **pode** contornar verificação local; proibido overclaim.
@@ -1445,7 +1452,7 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4/10/15 PASS**; **GA5.1 PASS**; GA4.12 **N/A**; GA2 parcial; GA5.2+ PENDENTE
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0/GA1/GA3 PASS**; **GA4.4/10/15 PASS**; **GA5.1–5.6 PASS**; GA4.12 **N/A**; GA2 parcial; GA5.7+ PENDENTE (`30.14`+)
 - **Evidência campo 30.10 (e2e PASS `1.9.54`):**
   [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
 - **Evidência 30.11 primary auth GET PASS:**
@@ -1456,6 +1463,8 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
   [`docs/tests/evidence/20260812T013145Z-30.11-supervisor-recheck/`](docs/tests/evidence/20260812T013145Z-30.11-supervisor-recheck/)
 - **Evidência 30.12 desenho:**
   [`docs/tests/evidence/20260812T013200Z-30.12-protocol-design/`](docs/tests/evidence/20260812T013200Z-30.12-protocol-design/)
+- **Evidência 30.13 implementação:**
+  [`docs/tests/evidence/20260812T013913Z-30.13-checkin-signed/`](docs/tests/evidence/20260812T013913Z-30.13-checkin-signed/)
 - **Evidência campo 30.10 (STOP `1.9.53`):**
   [`docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`](docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/)
 - **Evidência campo 30.10 (1ª janela):**
@@ -1472,9 +1481,9 @@ Riscos residuais **RR-1…RR-5** no plano §0.1.
 - **Prep/fecho cut `30.11`:** [`docs/09-blocking/prep-cut-30.11-espelho.md`](docs/09-blocking/prep-cut-30.11-espelho.md)
 - **GA4.11 / GA4.12 (docs):** [`docs/13-runbooks/content-mirror-rollback-ga4.11.md`](docs/13-runbooks/content-mirror-rollback-ga4.11.md) ·
   [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**histórico — GA4.12 N/A**)
-- **Backlog:** BG-114…BG-117 + BG-120 **Concluido**; BG-119 desenho OK / código PENDENTE; **BG-101** reaberto
-- **Ordem:** `30.0`→…→**`30.12` FECHADO**→
-  `30.13`→`30.14` (GO)→`30.15`→AP4 `30.16`–`30.19`
+- **Backlog:** BG-114…BG-117 + BG-119 + BG-120 **Concluido**; **BG-101** reaberto → BG-118/`30.14`
+- **Ordem:** `30.0`→…→**`30.13` FECHADO**→
+  `30.14` (GO)→`30.15`→AP4 `30.16`–`30.19`
 - **GOs humanos remanescentes:** `30.14` (check-in default)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
@@ -1486,15 +1495,15 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
 - Onda: AP3 em curso
-- Passo: 30.12 FECHADO (contrato check-in assinado)
+- Passo: 30.13 FECHADO (check-in assinado implementado)
 - 30.11 cut FECHADO; supervisor recheck 404x4 / asset_count=0
-- GA4.10/15 PASS; GA4.12 N/A; GA5.1 PASS; GA5.2+ PENDENTE
+- GA4.10/15 PASS; GA4.12 N/A; GA5.1-5.6 PASS; GA5.7+ PENDENTE
 - Contrato: docs/01-architecture/contrato-check-in-assinado-30.12.md
-- Evidência 30.12: 20260812T013200Z-30.12-protocol-design
+- Evidência 30.13: 20260812T013913Z-30.13-checkin-signed
 - ADRs 0030-0033: Aceito
-- BG-117 Concluido; BG-119 desenho OK (código=30.13)
-- Latest / produção .254: 1.9.54
-- Próximo: 30.13 (implementação) — chat novo; sem 30.14 sem GO
+- BG-117/BG-119 Concluido
+- Produção .254: 1.9.54; candidato Makefile 1.9.55 (sem release)
+- Próximo: 30.14 (GO humano) — sem default check-in sem GO
 - Agente: Composer 2.5 — um passo/chat (plano §8)
 ```
 

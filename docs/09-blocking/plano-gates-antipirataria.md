@@ -155,22 +155,22 @@ Gate de maior impacto em suporte. **Não abrir sem GA4 estável.**
 | # | Critério | Estado |
 |---|----------|--------|
 | GA5.1 | Protocolo assinado com nonce especificado e revisto | **PASS** (`2026-08-12`) — [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md); evidência `20260812T013200Z-30.12-protocol-design` |
-| GA5.2 | Resposta legítima assinada é aceite | **PENDENTE** |
-| GA5.3 | Resposta **não assinada** é rejeitada pelo cliente | **PENDENTE** |
-| GA5.4 | Replay de resposta anterior rejeitado | **PENDENTE** |
-| GA5.5 | Servidor falso via `/etc/hosts` ou DNS **não** consegue manter licença viva | **PENDENTE** |
-| GA5.6 | Falha de rede continua a não afectar enforce (**N3**) — verificado explicitamente neste gate | **PENDENTE** |
-| GA5.7 | Instalação nova arranca com check-in activo | **PENDENTE** |
-| GA5.8 | Upgrade de instalação existente não quebra o appliance | **PENDENTE** |
-| GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **PENDENTE** |
-| GA5.10 | Caminho de excepção para appliance isolado documentado e testado | **PENDENTE** |
-| GA5.11 | Runbook de suporte publicado antes da release | **PENDENTE** |
-| GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PENDENTE** |
-| GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PENDENTE** |
+| GA5.2 | Resposta legítima assinada é aceite | **PASS** (`20260812T013913Z`) — unit JS C1 + payload C |
+| GA5.3 | Resposta **não assinada** é rejeitada pelo cliente | **PASS** — cliente novo exige envelope; C2 unit |
+| GA5.4 | Replay de resposta anterior rejeitado | **PASS** — nonce mismatch (JS C4 + `test_checkin_signed.c`) |
+| GA5.5 | Servidor falso via `/etc/hosts` ou DNS **não** consegue manter licença viva | **PASS** (unit lógico C5/C6 — chave errada/unsigned); campo `/etc/hosts` opcional pós-deploy |
+| GA5.6 | Falha de rede continua a não afectar enforce (**N3**) — verificado explicitamente neste gate | **PASS** — verify/rede → `L7_CHECKIN_NETWORK` sem invalidate |
+| GA5.7 | Instalação nova arranca com check-in activo | **PENDENTE** (`30.14` / GO) |
+| GA5.8 | Upgrade de instalação existente não quebra o appliance | **PENDENTE** (`30.14`) |
+| GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **PENDENTE** (`30.14`) |
+| GA5.10 | Caminho de excepção para appliance isolado documentado e testado | **PENDENTE** (`30.14`) |
+| GA5.11 | Runbook de suporte publicado antes da release | **PENDENTE** (`30.14`) |
+| GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PENDENTE** (`30.15`) |
+| GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PASS parcial** — dual-mode D10 unit (C9); campo após deploy |
 
-**Estado GA5:** **parcial** — GA5.1 **PASS** (contrato `30.12`);
-GA5.2–5.13 **PENDENTE** (`30.13`–`30.15` + GO `30.14` onde aplicável).
-Evidência desenho: `docs/tests/evidence/20260812T013200Z-30.12-protocol-design/`.
+**Estado GA5:** **parcial** — GA5.1–5.6 **PASS** (`30.12`+`30.13`);
+GA5.7–5.12 **PENDENTE** (`30.14`/`30.15` + GO onde aplicável); GA5.13 parcial.
+Evidência: `docs/tests/evidence/20260812T013913Z-30.13-checkin-signed/`.
 
 **Saída:** revogar uma licença passa a ter efeito real, sem transformar
 indisponibilidade de rede em firewall parado.

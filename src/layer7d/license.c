@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 #include <openssl/evp.h>
+#include <openssl/rand.h>
 #include <openssl/sha.h>
 
 static unsigned checkin_effective_features(unsigned lic_flags);
@@ -373,22 +374,58 @@ clock_mark_save(time_t max_seen)
 	return 0;
 }
 
+/* Ed25519 verify — mesma pubkey embutida (.lic e check-in 30.13). */
+static int
+l7_ed25519_verify(const char *data, const char *sig_hex)
+{
+	unsigned char sig_bin[64];
+	int sig_len;
+	EVP_PKEY *pkey;
+	EVP_MD_CTX *mdctx;
+	int verify_ok;
+
+	if (!data || !sig_hex || strlen(sig_hex) != 128)
+		return -1;
+	sig_len = hex_decode(sig_hex, 128, sig_bin, sizeof(sig_bin));
+	if (sig_len != 64)
+		return -1;
+
+	pkey = EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, NULL,
+	    l7_ed25519_pubkey, 32);
+	if (!pkey)
+		return -1;
+
+	mdctx = EVP_MD_CTX_new();
+	if (!mdctx) {
+		EVP_PKEY_free(pkey);
+		return -1;
+	}
+
+	if (EVP_DigestVerifyInit(mdctx, NULL, NULL, NULL, pkey) != 1) {
+		EVP_MD_CTX_free(mdctx);
+		EVP_PKEY_free(pkey);
+		return -1;
+	}
+
+	verify_ok = EVP_DigestVerify(mdctx, sig_bin, 64,
+	    (const unsigned char *)data, strlen(data));
+
+	EVP_MD_CTX_free(mdctx);
+	EVP_PKEY_free(pkey);
+	return (verify_ok == 1) ? 0 : -1;
+}
+
 int
 layer7_license_check(struct l7_license_info *info)
 {
 	char *lic_raw = NULL;
 	size_t lic_len;
 	char data_str[4096], sig_hex[256];
-	unsigned char sig_bin[64];
-	int sig_len;
 	char hw_id[L7_HW_ID_LEN];
 	char lic_hwid[L7_HW_ID_LEN], expiry[16], customer[256], features[256];
 	struct tm exp_tm;
 	time_t exp_time, now;
 	double diff_days;
-	EVP_PKEY *pkey = NULL;
-	EVP_MD_CTX *mdctx = NULL;
-	int verify_ok = 0;
 
 	memset(info, 0, sizeof(*info));
 	memset(lic_hwid, 0, sizeof(lic_hwid));
@@ -440,46 +477,7 @@ layer7_license_check(struct l7_license_info *info)
 	}
 	free(lic_raw);
 
-	sig_len = hex_decode(sig_hex, strlen(sig_hex), sig_bin, sizeof(sig_bin));
-	if (sig_len != 64) {
-		snprintf(info->error, sizeof(info->error),
-		    "invalid signature length (%d bytes, expected 64)",
-		    sig_len);
-		return -1;
-	}
-
-	/* Ed25519 verification via OpenSSL EVP */
-	pkey = EVP_PKEY_new_raw_public_key(EVP_PKEY_ED25519, NULL,
-	    l7_ed25519_pubkey, 32);
-	if (!pkey) {
-		snprintf(info->error, sizeof(info->error),
-		    "failed to load Ed25519 public key");
-		return -1;
-	}
-
-	mdctx = EVP_MD_CTX_new();
-	if (!mdctx) {
-		EVP_PKEY_free(pkey);
-		snprintf(info->error, sizeof(info->error),
-		    "EVP_MD_CTX_new failed");
-		return -1;
-	}
-
-	if (EVP_DigestVerifyInit(mdctx, NULL, NULL, NULL, pkey) != 1) {
-		EVP_MD_CTX_free(mdctx);
-		EVP_PKEY_free(pkey);
-		snprintf(info->error, sizeof(info->error),
-		    "EVP_DigestVerifyInit failed");
-		return -1;
-	}
-
-	verify_ok = EVP_DigestVerify(mdctx, sig_bin, 64,
-	    (const unsigned char *)data_str, strlen(data_str));
-
-	EVP_MD_CTX_free(mdctx);
-	EVP_PKEY_free(pkey);
-
-	if (verify_ok != 1) {
+	if (l7_ed25519_verify(data_str, sig_hex) != 0) {
 		snprintf(info->error, sizeof(info->error),
 		    "Ed25519 signature verification failed");
 		return -1;
@@ -1197,19 +1195,171 @@ layer7_checkin_offline_expired(time_t now)
 	return (now - anchor) >= max_offline_sec;
 }
 
+/* base64url sem padding — 32 bytes → 43 chars (contrato 30.12 D3). */
+static int
+checkin_b64url_encode32(const unsigned char in[L7_CHECKIN_NONCE_BYTES],
+    char out[L7_CHECKIN_NONCE_B64_LEN + 1])
+{
+	static const char tbl[] =
+	    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+	size_t i, o;
+
+	o = 0;
+	for (i = 0; i + 2 < L7_CHECKIN_NONCE_BYTES; i += 3) {
+		unsigned int n = ((unsigned int)in[i] << 16) |
+		    ((unsigned int)in[i + 1] << 8) | (unsigned int)in[i + 2];
+		out[o++] = tbl[(n >> 18) & 63];
+		out[o++] = tbl[(n >> 12) & 63];
+		out[o++] = tbl[(n >> 6) & 63];
+		out[o++] = tbl[n & 63];
+	}
+	/* 32 % 3 == 2 → um grupo final de 2 bytes → 3 chars, sem padding. */
+	{
+		unsigned int n = ((unsigned int)in[30] << 16) |
+		    ((unsigned int)in[31] << 8);
+		out[o++] = tbl[(n >> 18) & 63];
+		out[o++] = tbl[(n >> 12) & 63];
+		out[o++] = tbl[(n >> 6) & 63];
+	}
+	out[o] = '\0';
+	return (o == L7_CHECKIN_NONCE_B64_LEN) ? 0 : -1;
+}
+
+static int
+checkin_generate_nonce(char out[L7_CHECKIN_NONCE_B64_LEN + 1])
+{
+	unsigned char raw[L7_CHECKIN_NONCE_BYTES];
+
+	if (RAND_bytes(raw, L7_CHECKIN_NONCE_BYTES) != 1)
+		return -1;
+	return checkin_b64url_encode32(raw, out);
+}
+
+/*
+ * Contrato 30.12 §4.5 passos 3–6 sobre o JSON interior (já verificado).
+ * Retorna 0 se OK; -1 se rejeitar (check-in falho / N3).
+ */
+static int
+checkin_validate_v2_payload(const char *payload, const char *nonce,
+    const char *hw_id, time_t now, char *status_out, size_t status_sz)
+{
+	char got_nonce[L7_CHECKIN_NONCE_B64_LEN + 1];
+	char got_hw[L7_HW_ID_LEN];
+	char status[32];
+	int ver;
+	time_t iat;
+	long skew;
+
+	if (!payload || !nonce || !hw_id)
+		return -1;
+
+	ver = 0;
+	if (parse_int_json_field(payload, "v", &ver) != 0 || ver != 1)
+		return -1;
+
+	memset(status, 0, sizeof(status));
+	if (!json_find_string(payload, "status", status, sizeof(status)))
+		return -1;
+
+	memset(got_nonce, 0, sizeof(got_nonce));
+	if (!json_find_string(payload, "nonce", got_nonce, sizeof(got_nonce)))
+		return -1;
+	if (strcmp(got_nonce, nonce) != 0)
+		return -1;
+
+	memset(got_hw, 0, sizeof(got_hw));
+	if (!json_find_string(payload, "hardware_id", got_hw, sizeof(got_hw)))
+		return -1;
+	if (strcmp(got_hw, hw_id) != 0)
+		return -1;
+
+	iat = 0;
+	if (parse_time_json_field(payload, "iat", &iat) != 0 || iat <= 0)
+		return -1;
+	skew = (long)now - (long)iat;
+	if (skew < 0)
+		skew = -skew;
+	if (skew > L7_CHECKIN_IAT_SKEW_SEC)
+		return -1;
+
+	if (status_out && status_sz > 0) {
+		snprintf(status_out, status_sz, "%s", status);
+	}
+	return 0;
+}
+
+#ifdef L7_TEST_CHECKIN_SIGNED
+int
+layer7_checkin_validate_payload_test(const char *payload,
+    const char *nonce, const char *hw_id, time_t now,
+    char *status_out, size_t status_sz)
+{
+	return checkin_validate_v2_payload(payload, nonce, hw_id, now,
+	    status_out, status_sz);
+}
+#endif
+
+/*
+ * Extrai envelope v2, verifica Ed25519 e passos 3–6.
+ * Em sucesso escreve payload interior em payload_out.
+ * Retorna 0 OK; -1 envelope/sig/campos inválidos.
+ */
+static int
+checkin_open_signed_envelope(const char *response_body, const char *nonce,
+    const char *hw_id, time_t now, char *payload_out, size_t payload_sz,
+    char *status_out, size_t status_sz)
+{
+	char data_str[6144];
+	char sig_hex[140];
+	size_t i;
+
+	if (!response_body || !payload_out || payload_sz < 2)
+		return -1;
+
+	memset(data_str, 0, sizeof(data_str));
+	memset(sig_hex, 0, sizeof(sig_hex));
+	if (!json_find_string(response_body, "data", data_str, sizeof(data_str)))
+		return -1;
+	if (!json_find_string(response_body, "sig", sig_hex, sizeof(sig_hex)))
+		return -1;
+	if (strlen(sig_hex) != 128)
+		return -1;
+	for (i = 0; sig_hex[i] != '\0'; i++) {
+		char c = sig_hex[i];
+		if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
+		    (c >= 'A' && c <= 'F')))
+			return -1;
+	}
+
+	if (l7_ed25519_verify(data_str, sig_hex) != 0)
+		return -1;
+
+	if (checkin_validate_v2_payload(data_str, nonce, hw_id, now,
+	    status_out, status_sz) != 0)
+		return -1;
+
+	if (strlen(data_str) >= payload_sz)
+		return -1;
+	memcpy(payload_out, data_str, strlen(data_str) + 1);
+	return 0;
+}
+
 int
 layer7_check_in(const char *url)
 {
 	struct l7_checkin_state st;
 	char hw_id[L7_HW_ID_LEN];
+	char nonce[L7_CHECKIN_NONCE_B64_LEN + 1];
 	char cmd[2048];
-	char body[512];
+	char body[640];
 	char http_code[8];
-	/* 30.10: resposta activa inclui content_subscription (~1 KiB). */
+	/* 30.13: envelope + content_subscription aninhado. */
 	char response_body[8192];
+	char payload[6144];
 	char status[32];
 	char server_error[256];
 	int rc, http_status;
+	time_t now;
 
 #ifdef L7_DEV_BUILD
 	if (is_dev_key())
@@ -1229,6 +1379,12 @@ layer7_check_in(const char *url)
 		return L7_CHECKIN_NETWORK;
 	}
 
+	if (checkin_generate_nonce(nonce) != 0) {
+		fprintf(stderr,
+		    "layer7d: check-in failed — cannot generate nonce\n");
+		return L7_CHECKIN_NETWORK;
+	}
+
 	if (!url || url[0] == '\0') {
 		url = getenv("L7_CHECK_IN_URL");
 		if (!url || url[0] == '\0')
@@ -1239,7 +1395,8 @@ layer7_check_in(const char *url)
 		return L7_CHECKIN_NETWORK;
 	}
 
-	st.last_check_in_attempt = time(NULL);
+	now = time(NULL);
+	st.last_check_in_attempt = now;
 	if (ensure_layer7_var_db() != 0) {
 		snprintf(st.last_error, sizeof(st.last_error),
 		    "cannot create %s", L7_VAR_DB_DIR);
@@ -1248,9 +1405,10 @@ layer7_check_in(const char *url)
 	}
 	checkin_cleanup_temp();
 
+	/* 30.13 D2/D9: cliente novo sempre envia nonce. */
 	snprintf(body, sizeof(body),
-	    "{\"key\":\"%s\",\"hardware_id\":\"%s\"}",
-	    st.license_key, hw_id);
+	    "{\"key\":\"%s\",\"hardware_id\":\"%s\",\"nonce\":\"%s\"}",
+	    st.license_key, hw_id, nonce);
 
 	snprintf(cmd, sizeof(cmd),
 	    "curl -sS --connect-timeout 10 --max-time 30 "
@@ -1277,42 +1435,59 @@ layer7_check_in(const char *url)
 	    sizeof(response_body)) != 0)
 		response_body[0] = '\0';
 
-	if (http_status >= 200 && http_status <= 299) {
-		if (!json_find_string(response_body, "status", status,
-		    sizeof(status)) || strcmp(status, "active") != 0) {
+	/*
+	 * 30.13 D9/D11: cliente novo exige envelope assinado.
+	 * JSON legado, sig inválida, replay ou servidor falso → falha de
+	 * check-in sem invalidar licença (N3), excepto revoked/expired
+	 * autenticados.
+	 */
+	memset(payload, 0, sizeof(payload));
+	memset(status, 0, sizeof(status));
+	if (checkin_open_signed_envelope(response_body, nonce, hw_id, now,
+	    payload, sizeof(payload), status, sizeof(status)) != 0) {
+		snprintf(st.last_error, sizeof(st.last_error),
+		    "unsigned or invalid check-in response");
+		(void)checkin_save_state(&st);
+		checkin_cleanup_temp();
+		fprintf(stderr,
+		    "layer7d: check-in failed — response not signed/valid "
+		    "(HTTP %d)\n", http_status);
+		return L7_CHECKIN_NETWORK;
+	}
+
+	if (strcmp(status, "active") == 0) {
+		int interval = st.check_in_interval_hours;
+		int max_offline = st.max_offline_hours;
+		char feat_raw[256];
+
+		if (http_status < 200 || http_status > 299) {
 			snprintf(st.last_error, sizeof(st.last_error),
-			    "unexpected check-in status");
+			    "active status with unexpected HTTP %d",
+			    http_status);
 			(void)checkin_save_state(&st);
 			checkin_cleanup_temp();
 			return L7_CHECKIN_NETWORK;
 		}
 
-		{
-			int interval = st.check_in_interval_hours;
-			int max_offline = st.max_offline_hours;
-			char feat_raw[256];
+		if (parse_int_json_field(payload, "check_in_interval_hours",
+		    &interval) == 0)
+			st.check_in_interval_hours = interval;
+		if (parse_int_json_field(payload, "max_offline_hours",
+		    &max_offline) == 0)
+			st.max_offline_hours = max_offline;
 
-			if (parse_int_json_field(response_body,
-			    "check_in_interval_hours", &interval) == 0)
-				st.check_in_interval_hours = interval;
-			if (parse_int_json_field(response_body,
-			    "max_offline_hours", &max_offline) == 0)
-				st.max_offline_hours = max_offline;
+		memset(feat_raw, 0, sizeof(feat_raw));
+		if (json_find_string(payload, "features", feat_raw,
+		    sizeof(feat_raw))) {
+			struct l7_features feat;
 
-			memset(feat_raw, 0, sizeof(feat_raw));
-			if (json_find_string(response_body, "features",
-			    feat_raw, sizeof(feat_raw))) {
-				struct l7_features feat;
-
-				(void)layer7_features_parse(feat_raw, &feat);
-				memcpy(st.features, feat.normalized,
-				    sizeof(st.features));
-				st.features_set = 1;
-			}
+			(void)layer7_features_parse(feat_raw, &feat);
+			memcpy(st.features, feat.normalized, sizeof(st.features));
+			st.features_set = 1;
 		}
 
-		/* 30.10: token de conteúdo — só substitui se parse OK (R-J). */
-		if (checkin_persist_content_subscription(response_body) != 0) {
+		/* 30.10/C10: token dentro do payload assinado. */
+		if (checkin_persist_content_subscription(payload) != 0) {
 			fprintf(stderr,
 			    "layer7d: check-in OK — content_subscription "
 			    "persist skipped (keeping previous token if any)\n");
@@ -1326,16 +1501,10 @@ layer7_check_in(const char *url)
 		return L7_CHECKIN_OK;
 	}
 
-	server_error[0] = '\0';
-	status[0] = '\0';
-	(void)json_find_string(response_body, "status", status, sizeof(status));
-	(void)json_find_string(response_body, "error", server_error,
-	    sizeof(server_error));
-
-	if (http_status == 409 &&
-	    (strcmp(status, "revoked") == 0 ||
-	     strcmp(status, "expired") == 0 ||
-	     server_error[0] != '\0')) {
+	if (strcmp(status, "revoked") == 0 || strcmp(status, "expired") == 0) {
+		server_error[0] = '\0';
+		(void)json_find_string(payload, "error", server_error,
+		    sizeof(server_error));
 		if (server_error[0] != '\0')
 			snprintf(st.last_error, sizeof(st.last_error), "%s",
 			    server_error);
@@ -1354,11 +1523,8 @@ layer7_check_in(const char *url)
 		return L7_CHECKIN_DENIED;
 	}
 
-	if (server_error[0] != '\0')
-		snprintf(st.last_error, sizeof(st.last_error), "%s", server_error);
-	else
-		snprintf(st.last_error, sizeof(st.last_error),
-		    "check-in rejected (HTTP %d)", http_status);
+	snprintf(st.last_error, sizeof(st.last_error),
+	    "check-in rejected (status=%s HTTP %d)", status, http_status);
 	(void)checkin_save_state(&st);
 	checkin_cleanup_temp();
 	fprintf(stderr, "layer7d: check-in failed — %s\n", st.last_error);

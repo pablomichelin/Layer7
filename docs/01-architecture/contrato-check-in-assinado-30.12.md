@@ -209,17 +209,17 @@ forjar `active`.
 
 ---
 
-## 9. Mapa para implementação (`30.13` — **não** neste passo)
+## 9. Mapa de implementação (`30.13` — **FECHADO** `20260812T013913Z`)
 
-| Componente | Alteração prevista |
-|------------|--------------------|
-| `license-server/.../check-in.js` + `check-in-policy.js` | Ler `nonce`; emitir envelope D4; dual-mode D10 |
-| `src/layer7d/license.c` | Gerar nonce; verificar sig+nonce+hw; rejeitar legado |
-| Testes C/JS | C1–C10 |
-| `.pkg` | Só quando `30.13` exigir release |
+| Componente | Estado |
+|------------|--------|
+| `license-server/.../check-in.js` + `check-in-policy.js` | **Feito** — nonce + envelope D4; dual-mode D10 |
+| `src/layer7d/license.c` | **Feito** — nonce; verify sig+nonce+hw+iat; rejeita legado |
+| Testes C/JS | **Feito** — evidência `20260812T013913Z-30.13-checkin-signed` |
+| `.pkg` | Candidato `1.9.55` no Makefile; **sem** GitHub Release em `30.13` |
 
-**Rollback `30.13` (futuro):** `.pkg` anterior + deploy anterior do servidor
-(dual-mode permite rollback do cliente sem partir legado).
+**Rollback:** `.pkg` `1.9.54` + deploy anterior do servidor (dual-mode permite
+rollback do cliente sem partir legado).
 
 ---
 

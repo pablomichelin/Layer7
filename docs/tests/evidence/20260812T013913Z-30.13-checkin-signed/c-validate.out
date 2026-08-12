@@ -1,0 +1,7 @@
+PASS: C1 campos activos aceites
+PASS: C4 replay nonce rejeitado
+PASS: hardware_id mismatch rejeitado
+PASS: C7 denied revoked campos OK
+PASS: iat skew >1d rejeitado (N3/falha check-in)
+PASS: v!=1 rejeitado
+RESULT: PASS

@@ -1,16 +1,17 @@
-# START HERE — Anti-pirataria e Anti-tamper 【`30.12` FECHADO · GA5.1 **PASS** · **Composer 2.5**】
+# START HERE — Anti-pirataria e Anti-tamper 【`30.13` FECHADO · GA5.1–5.6 **PASS** · **Composer 2.5**】
 
 > **Diagnóstico ACEITE** `2026-08-10` — [`modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md).
 > **`30.10`/`30.11` FECHADOS** — e2e `1.9.54`; cut espelho (`asset_count=0`);
 > GA4.10/15 **PASS**; GA4.12 **N/A**.
-> **`30.12` FECHADO** — contrato check-in assinado/nonce (zero código);
-> GA5.1 **PASS**.
+> **`30.12` FECHADO** — contrato check-in assinado/nonce; GA5.1 **PASS**.
+> **`30.13` FECHADO** — servidor assina + cliente exige; dual-mode legado;
+> GA5.2–5.6 **PASS** (unit); BG-119 **Concluido**.
 > Contrato: [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md).
-> Evidência: [`../tests/evidence/20260812T013200Z-30.12-protocol-design/`](../tests/evidence/20260812T013200Z-30.12-protocol-design/).
-> **Produção `.254`:** **`1.9.54`**. Rollback lab: `1.9.53`.
-> **Próximo passo:** **`30.13`** (implementação — chat novo).
+> Evidência: [`../tests/evidence/20260812T013913Z-30.13-checkin-signed/`](../tests/evidence/20260812T013913Z-30.13-checkin-signed/).
+> **Produção `.254`:** **`1.9.54`**. Candidato Makefile **`1.9.55`** (**sem** release).
+> **Próximo passo:** **`30.14`** (**GO humano** — default check-in).
 > **Proibido:** fail-closed por rede · kill-switch · ofuscação · misturar enforce/MITM/IPv6.
-> **Proibido:** abrir `30.14` sem GO humano; abrir `30.13` no mesmo chat sem pedido.
+> **Proibido:** abrir `30.14` sem GO humano.
 > **Honestidade:** root **pode** contornar verificação local (RR-5 / R-A).
 > **Artefacto:** **`.pkg`** FreeBSD/pfSense (não APK Android).
 > **Rev. plano:** `2026-08-10c`.
@@ -33,7 +34,7 @@ docs/00-overview/START-HERE-antipirataria.md
 |-----------|--------|
 | **Este ficheiro** | Arranque de chat + estado + prompt |
 | [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) | **SSOT** passos `30.x` |
-| [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) | Gates — GA5.1 **PASS**; GA5.2+ PENDENTE |
+| [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) | Gates — GA5.1–5.6 **PASS**; GA5.7+ PENDENTE |
 | Contrato `30.12` | [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md) |
 | Contrato `30.8` | [`../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../01-architecture/contrato-token-subscricao-conteudo-30.8.md) |
 | ADR-0032 | [`../03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md`](../03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md) |
@@ -46,43 +47,43 @@ docs/00-overview/START-HERE-antipirataria.md
 | Campo | Valor |
 |-------|-------|
 | Onda | **AP3 em curso** |
-| Passo | **`30.12` FECHADO** (documental) |
-| Campo / e2e | **PASS** — `1.9.54` em `.254` |
+| Passo | **`30.13` FECHADO** (implementação) |
+| Campo / e2e | **PASS** — `1.9.54` em `.254` (intocada neste passo) |
 | Cut espelho | **PASS** — `asset_count=0`; anónimo 404×4 |
-| GA5.1 | **PASS** — contrato revisto |
-| Próxima acção | **`30.13`** implementação (chat novo) |
-| Gate activo | GA5 parcial (5.1 PASS; 5.2+ PENDENTE) |
-| Código produto | **`1.9.54`** (lab = produção) |
+| GA5.1–5.6 | **PASS** — contrato + unit assinatura/nonce/N3 |
+| Próxima acção | **`30.14`** com **GO humano** (default check-in) |
+| Gate activo | GA5 parcial (5.1–5.6 PASS; 5.7+ PENDENTE) |
+| Código produto | candidato **`1.9.55`** (Makefile); release **não** publicada |
 | Baseline enforce | **`1.9.8`** |
-| License-server 30.9 | **live PASS** |
+| License-server 30.13 | código no git (dual-mode); **deploy ops separado** |
 | Rev. do plano | **`2026-08-10c`** |
 
 ---
 
-## Leitura obrigatória (chat novo → `30.13`)
+## Leitura obrigatória (chat novo → `30.14`)
 
 1. **Este ficheiro**
 2. [`AGENTS.md`](../../AGENTS.md)
 3. [`CORTEX.md`](../../CORTEX.md) — *Trilha Anti-pirataria*
-4. [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) — §0, §0.1, §1, §8, passo `30.13`
-5. [`contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md) — D1–D12 / C1–C10
-6. [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) — GA5.2+
-7. ADR-0032 + ADR-0021
-8. Evidência desenho [`../tests/evidence/20260812T013200Z-30.12-protocol-design/`](../tests/evidence/20260812T013200Z-30.12-protocol-design/)
+4. [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) — §0, §0.1, §1, §5, §8, passo `30.14`
+5. [`contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md)
+6. [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) — GA5.7+
+7. ADR-0032 + ADR-0021 + ficha [`../09-blocking/decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md)
+8. Evidência [`../tests/evidence/20260812T013913Z-30.13-checkin-signed/`](../tests/evidence/20260812T013913Z-30.13-checkin-signed/)
 
 ---
 
-## Prompt — passo `30.13` (chat novo)
+## Prompt — passo `30.14` (chat novo — **só com GO**)
 
 ```text
 Modelo: Composer 2.5.
-Contexto: trilha Anti-pirataria; 30.12 FECHADO; GA5.1 PASS;
+Contexto: trilha Anti-pirataria; 30.13 FECHADO; GA5.1-5.6 PASS;
 contrato docs/01-architecture/contrato-check-in-assinado-30.12.md;
-produção .254 = 1.9.54.
+produção .254 = 1.9.54; candidato 1.9.55 sem release.
 Arranque: docs/00-overview/START-HERE-antipirataria.md
-AGORA: implementar SOMENTE 30.13 (servidor assina + cliente exige)
-conforme D1–D12 / C1–C10; dual-mode legado; N3 intacto.
-Proibido: 30.14 sem GO; fail-closed rede; enforce/MITM/IPv6; ofuscação.
+AGORA: SOMENTE 30.14 se GO humano explícito (check_in_enabled default +
+migração + runbook). Sem GO → parar.
+Proibido: fail-closed rede; enforce/MITM/IPv6; ofuscação.
 Português.
 ```
 
@@ -106,7 +107,7 @@ Não implementar até GO. Português.
 | AP1 | GA2 | **PARCIAL** |
 | AP1 | GA3 | **PASS** |
 | AP2 | GA4 | **PASS** cut (GA4.10/15); GA4.12 **N/A** |
-| AP3 | GA5 | **PARCIAL** — GA5.1 **PASS**; GA5.2+ **PENDENTE** |
+| AP3 | GA5 | **PARCIAL** — GA5.1–5.6 **PASS**; GA5.7+ **PENDENTE** |
 
 ---
 
@@ -117,13 +118,13 @@ TRILHA ANTI-PIRATARIA — progresso
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Rev. plano: 2026-08-10c
 - Onda: AP3 em curso
-- Passo: 30.12 FECHADO (contrato check-in assinado)
-- GA5.1 PASS; GA5.2+ PENDENTE
+- Passo: 30.13 FECHADO (check-in assinado implementado)
+- GA5.1-5.6 PASS; GA5.7+ PENDENTE
 - Contrato: docs/01-architecture/contrato-check-in-assinado-30.12.md
-- Evidência: 20260812T013200Z-30.12-protocol-design
+- Evidência: 20260812T013913Z-30.13-checkin-signed
 - 30.11 cut FECHADO; asset_count=0; anon 404x4
-- Latest / produção .254: 1.9.54
-- Próximo: 30.13 (implementação) — chat novo; sem 30.14 sem GO
+- Produção .254: 1.9.54; candidato 1.9.55 (sem release)
+- Próximo: 30.14 (GO humano) — sem default check-in sem GO
 - Agente: Composer 2.5 — um passo / chat (plano §8)
 ```
 
@@ -136,8 +137,7 @@ TRILHA ANTI-PIRATARIA — progresso
 | Contrato `30.12` | [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md) |
 | Plano + §8 | [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) |
 | Gates | [`../09-blocking/plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) |
-| Cut `30.11` | [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/) |
-| Supervisor recheck | [`../tests/evidence/20260812T013145Z-30.11-supervisor-recheck/`](../tests/evidence/20260812T013145Z-30.11-supervisor-recheck/) |
+| Impl. `30.13` | [`../tests/evidence/20260812T013913Z-30.13-checkin-signed/`](../tests/evidence/20260812T013913Z-30.13-checkin-signed/) |
 | Desenho `30.12` | [`../tests/evidence/20260812T013200Z-30.12-protocol-design/`](../tests/evidence/20260812T013200Z-30.12-protocol-design/) |
 | ADR-0032 | [`../03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md`](../03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md) |
 
@@ -146,4 +146,4 @@ TRILHA ANTI-PIRATARIA — progresso
 ## Nota de manutenção
 
 Actualizar título, estado, progresso, CORTEX e plano §0 no **mesmo** commit
-de cada fecho. Não declarar PASS de gate de código sem evidência de runtime.
+de cada fecho de passo. Não declarar PASS de gate de código sem evidência de runtime.

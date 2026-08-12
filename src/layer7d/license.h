@@ -30,6 +30,11 @@
 #define L7_CHECKIN_SKIP         3
 #define L7_CHECKIN_OFFLINE_MAX  4
 
+/* 30.13 / contrato 30.12 — skew de iat (±1 dia); falha ⇒ check-in falho (N3). */
+#define L7_CHECKIN_IAT_SKEW_SEC 86400L
+#define L7_CHECKIN_NONCE_BYTES  32
+#define L7_CHECKIN_NONCE_B64_LEN 43 /* base64url sem padding */
+
 struct l7_license_info {
 	int   valid;          /* 1 = signature ok + hw match + not expired (or grace) */
 	int   expired;        /* 1 = past expiry date */
@@ -98,5 +103,15 @@ int layer7_checkin_due(time_t now);
 int layer7_checkin_offline_expired(time_t now);
 int layer7_check_in(const char *url);
 int layer7_checkin_get_status(struct l7_checkin_status *st);
+
+#ifdef L7_TEST_CHECKIN_SIGNED
+/*
+ * Harness 30.13: valida payload interior v2 (passos 3–6 do contrato) sem I/O.
+ * Retorna 0 se campos OK; -1 se rejeitado. status_out recebe status.
+ */
+int layer7_checkin_validate_payload_test(const char *payload,
+    const char *nonce, const char *hw_id, time_t now,
+    char *status_out, size_t status_sz);
+#endif
 
 #endif /* LAYER7_LICENSE_H */

@@ -1,11 +1,13 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.12` FECHADO** (contrato check-in assinado/nonce;
-GA5.1 **PASS**); **`30.11` FECHADO** (cut `20260812T011217Z`; GA4.10/15
-**PASS**); **GA4.12 N/A**; **30.9/30.10** FECHADOS; lab/`latest` = produção
-**`1.9.54`**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`); contrato
+**Estado do plano:** **`30.13` FECHADO** (implementação check-in assinado;
+GA5.2–5.6 **PASS** unit; BG-119 **Concluido**); **`30.12` FECHADO** (contrato;
+GA5.1 **PASS**); **`30.11` FECHADO** (cut; GA4.10/15 **PASS**); **GA4.12 N/A**;
+**30.9/30.10** FECHADOS; produção **`1.9.54`**; candidato Makefile **`1.9.55`**
+(**sem** release neste fecho); ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`);
+contrato
 [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md);
-**próximo `30.13`** (implementação — **não** aberto neste fecho)
+**próximo `30.14`** (**GO humano** — default check-in)
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -30,12 +32,12 @@ GA5.1 **PASS**); **`30.11` FECHADO** (cut `20260812T011217Z`; GA4.10/15
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP3 em curso** (AP0/AP1/AP2 cut FECHADOS; GA1/GA4 cut PASS) |
-| Passo actual | **`30.12` FECHADO** (contrato documental) |
-| Próximo | **`30.13`** (implementação assinatura — chat novo) |
-| Depois | `30.14` (GO) → `30.15`… |
-| Bloqueio duro | A-09 resolvido; cut PASS; implementação `30.13` ainda não iniciada |
-| Código alterado até agora | `license-server` **30.9 live** + primary; cliente/pkg **`1.9.54`**; espelho sem assets; **sem** código `30.12` |
-| Gate activo | **GA5.1 PASS**; GA5.2+ **PENDENTE**; GA4 cut PASS; GA4.12 **N/A** |
+| Passo actual | **`30.13` FECHADO** (implementação assinatura) |
+| Próximo | **`30.14`** (**GO humano** — default check-in) |
+| Depois | `30.15`… |
+| Bloqueio duro | A-09 resolvido; cut PASS; falta GO `30.14` para revogação em campo |
+| Código alterado até agora | `license-server` dual-mode 30.13 + `license.c`; candidato **`1.9.55`**; produção **`1.9.54`**; espelho sem assets |
+| Gate activo | **GA5.1–5.6 PASS**; GA5.7+ **PENDENTE**; GA4 cut PASS; GA4.12 **N/A** |
 | Decisões 1/3 (RR-1) | **Sim** / **Sim** — cut `30.11` **feito**; falta GO/execução `30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
@@ -44,14 +46,14 @@ GA5.1 **PASS**); **`30.11` FECHADO** (cut `20260812T011217Z`; GA4.10/15
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo: 30.12 FECHADO (contrato check-in assinado)
+- Passo: 30.13 FECHADO (check-in assinado implementado)
 - 30.11 cut FECHADO; GA4.10/15 PASS; GA4.12 N/A
-- GA5.1 PASS; GA5.2+ PENDENTE
+- GA5.1-5.6 PASS; GA5.7+ PENDENTE
 - Contrato: docs/01-architecture/contrato-check-in-assinado-30.12.md
-- Evidência 30.12: 20260812T013200Z-30.12-protocol-design
-- Produção .254 / latest: 1.9.54
-- BG-117 Concluido; BG-119 desenho OK (código=30.13)
-- Próximo: 30.13 (implementação) — chat novo; sem 30.14 sem GO
+- Evidência 30.13: 20260812T013913Z-30.13-checkin-signed
+- Produção .254: 1.9.54; candidato Makefile 1.9.55 (sem release)
+- BG-117/BG-119 Concluido
+- Próximo: 30.14 (GO humano) — sem default check-in sem GO
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -364,15 +366,20 @@ sem AP2 estável.
 **Evidência:** [`../tests/evidence/20260812T013200Z-30.12-protocol-design/`](../tests/evidence/20260812T013200Z-30.12-protocol-design/).
 **Rollback:** reverter docs; runtime intacto.
 
-#### 30.13 — Implementação: servidor assina, cliente exige assinatura
+#### 30.13 — Implementação: servidor assina, cliente exige assinatura — **FECHADO** (`20260812T013913Z`)
 
-**Ficheiros:** `license-server/backend/src/routes/check-in.js`,
-`src/layer7d/license.c`, testes de ambos os lados.
-**Teste mínimo:** resposta legítima aceita; resposta não assinada **rejeitada**;
-replay rejeitado; servidor falso via `/etc/hosts` **não** consegue manter licença
-viva; falha de rede continua a **não** afectar enforce (N3).
-**Risco:** Médio-Alto. **Rollback:** `.pkg` anterior + deploy anterior do servidor.
-**Gate:** GA5.
+**Objectivo:** implementar D1–D12 / C1–C10 do contrato `30.12` (A-05 / BG-119).
+**Entrega:** dual-mode no license-server (nonce → envelope Ed25519; sem nonce →
+legado); `layer7d` gera nonce, verifica sig+nonce+hw+iat, rejeita unsigned;
+`check_in_enabled` default **inalterado** (OFF até `30.14`).
+**Ficheiros:** `license-server/backend/src/{routes/check-in.js,check-in-policy.js,crud-validation.js}`,
+`src/layer7d/license.c`, testes JS/C.
+**Teste mínimo:** unit C1–C7/C10 + `test_checkin_signed.c` (replay/skew/v) **PASS**.
+**Risco:** Médio — deploy servidor deve preceder `.pkg` novo se check-in ON.
+**Rollback:** commit anterior; `.pkg` `1.9.54`; servidor anterior (legado intacto).
+**Gate:** GA5.2–5.6 **PASS** (unit). Evidência:
+[`../tests/evidence/20260812T013913Z-30.13-checkin-signed/`](../tests/evidence/20260812T013913Z-30.13-checkin-signed/).
+**Candidato:** `PORTVERSION=1.9.55` — **sem** GitHub Release neste passo.
 
 #### 30.14 — Check-in activo por defeito e política de migração — **BG-118**
 

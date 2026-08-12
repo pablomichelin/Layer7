@@ -4,6 +4,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Anti-pirataria 30.13 / BG-119 — check-in assinado com nonce:** license-server
+  dual-mode (pedido com `nonce` → envelope `{data,sig}` Ed25519; sem nonce →
+  JSON legado ADR-0021); `layer7d` gera nonce CSPRNG/base64url, verifica
+  assinatura + eco nonce/hardware_id + skew `iat`, rejeita resposta não
+  assinada; denied autenticado `revoked`/`expired` continua a invalidar;
+  falha de verify/rede → `L7_CHECKIN_NETWORK` (**N3**). Default
+  `check_in_enabled` **inalterado** (OFF até `30.14`/GO). Candidato
+  `PORTVERSION=1.9.55` — **sem** GitHub Release / sem deploy / `.254` intocada.
+  GA5.2–5.6 PASS (unit). Evidência
+  `docs/tests/evidence/20260812T013913Z-30.13-checkin-signed/`.
+
 ### Documentation
 
 - **Anti-pirataria 30.11 — GA4.12 N/A + prep cut:** decisão humana

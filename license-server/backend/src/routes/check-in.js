@@ -6,14 +6,17 @@ const {
   createHardwareBindingError,
 } = require('../activation-policy');
 const {
+  buildActiveCheckInPayloadV2,
   buildActiveCheckInResponse,
+  buildDeniedCheckInPayloadV2,
   buildDeniedCheckInResponse,
   getCheckInPolicy,
   mapActivationErrorToDeniedResponse,
+  wrapSignedCheckInEnvelope,
 } = require('../check-in-policy');
 const { createHttpError, isHttpError } = require('../crud-integrity');
 const { getEffectiveLicenseState } = require('../license-state');
-const { parseActivatePayload } = require('../crud-validation');
+const { parseCheckInPayload } = require('../crud-validation');
 
 const router = Router();
 
@@ -90,15 +93,37 @@ function resolveCheckInFailure(error, effectiveState) {
   };
 }
 
+/**
+ * 30.13 / D10: pedido com nonce → envelope assinado; sem nonce → JSON legado.
+ */
+function maybeSignCheckInBody(body, { nonce, hardwareId, nowSec, signFn } = {}) {
+  if (!nonce || !hardwareId) {
+    return body;
+  }
+
+  const status = body.status || 'fail';
+  const errorMessage = body.error || 'Check-in negado.';
+  return wrapSignedCheckInEnvelope(
+    buildDeniedCheckInPayloadV2(status, errorMessage, {
+      hardwareId,
+      nonce,
+      nowSec,
+    }),
+    { signFn, nowSec }
+  );
+}
+
 router.post('/license/check-in', checkInLimiter, async (req, res) => {
   const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip;
   const ua = req.headers['user-agent'] || '';
   let requestedHardwareId = null;
+  let requestedNonce = null;
   let effectiveState = null;
 
   try {
-    const { key, hardwareId } = parseActivatePayload(req.body);
+    const { key, hardwareId, nonce } = parseCheckInPayload(req.body);
     requestedHardwareId = hardwareId;
+    requestedNonce = nonce;
 
     const result = await pool.query(
       `SELECT l.*, c.name AS customer_name
@@ -135,13 +160,26 @@ router.post('/license/check-in', checkInLimiter, async (req, res) => {
 
     const policy = getCheckInPolicy();
     /* 30.9: emite content_subscription assinado (contrato 30.8). */
-    const responseBody = buildActiveCheckInResponse(license, policy, {
+    const legacyBody = buildActiveCheckInResponse(license, policy, {
       hardwareId,
     });
 
     await logCheckIn(pool, license.id, hardwareId, ip, ua, 'active', null);
 
-    return res.json(responseBody);
+    /* 30.13: dual-mode — nonce ⇒ envelope v2; sem nonce ⇒ legado ADR-0021. */
+    if (nonce) {
+      return res.json(
+        wrapSignedCheckInEnvelope(
+          buildActiveCheckInPayloadV2(license, policy, {
+            hardwareId,
+            nonce,
+          }),
+          {}
+        )
+      );
+    }
+
+    return res.json(legacyBody);
   } catch (error) {
     if (isHttpError(error)) {
       const failure = resolveCheckInFailure(error, effectiveState);
@@ -155,11 +193,23 @@ router.post('/license/check-in', checkInLimiter, async (req, res) => {
         failure.body.error || error.message
       );
 
-      return res.status(failure.status).json(failure.body);
+      const body = maybeSignCheckInBody(failure.body, {
+        nonce: requestedNonce,
+        hardwareId: requestedHardwareId,
+      });
+
+      return res.status(failure.status).json(body);
     }
 
     console.error('[CHECK-IN] Error:', error.message);
-    return res.status(500).json({ error: 'Erro interno no check-in.' });
+    const body = maybeSignCheckInBody(
+      { error: 'Erro interno no check-in.' },
+      {
+        nonce: requestedNonce,
+        hardwareId: requestedHardwareId,
+      }
+    );
+    return res.status(500).json(body);
   }
 });
 

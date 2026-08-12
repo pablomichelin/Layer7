@@ -1,0 +1,9 @@
+passo=30.13
+trilha=antipirataria-AP3
+bg=BG-119
+contrato=docs/01-architecture/contrato-check-in-assinado-30.12.md
+utc=20260812T013913Z
+portversion_candidato=1.9.55
+producao_254=1.9.54 (intocada)
+release_github=nao (proibido neste passo)
+deploy_license_server=nao (código no git; dual-mode; deploy = passo ops separado)

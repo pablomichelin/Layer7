@@ -1,0 +1,32 @@
+✔ buildActiveCheckInResponse returns ADR-0021 active payload (1.309125ms)
+✔ buildActiveCheckInResponse includes normalized SKU features (0.169708ms)
+✔ buildDeniedCheckInResponse returns revoked payload (0.079291ms)
+✔ mapActivationErrorToDeniedResponse maps revoked and expired errors (0.109833ms)
+✔ formatExpiryDate normalizes Date and string values (0.970625ms)
+✔ normalizeCheckInNonce accepts 43-char base64url (D3) (0.5315ms)
+✔ normalizeCheckInNonce rejects padding and short values (0.264125ms)
+✔ parseCheckInPayload dual-mode: sem nonce (D10 / C9) (0.180791ms)
+✔ parseCheckInPayload exige nonce válido quando presente (0.10525ms)
+✔ C1 — envelope activo assinado verifica com mesma chave (24.498084ms)
+✔ C2 — JSON legado sem sig não é envelope v2 (4.28125ms)
+✔ C3 — sig adulterada falha verify (14.248625ms)
+✔ C4 — replay: nonce do envelope ≠ nonce do pedido actual (4.295333ms)
+✔ C5/C6 — sem chave correcta o verify falha (servidor falso) (13.884ms)
+✔ C7 — denied revoked assinado inclui eco nonce/hw (10.229792ms)
+✔ C10 — content_subscription aninhado no payload activo (3.675792ms)
+✔ createHttpError shape preserved for unexpected fields (0.118792ms)
+✔ buildContentSubscriptionEnvelope signs Ed25519 envelope (GA4.2) (19.660875ms)
+✔ token hardware_id binding — different appliance fails client check (GA4.3) (10.264459ms)
+✔ tampered data fails signature verify (10.588833ms)
+✔ buildActiveCheckInResponse includes content_subscription when hardwareId set (4.504209ms)
+✔ buildActiveCheckInResponse without hardwareId omits token (unit compat) (0.148625ms)
+✔ denied check-in never carries content_subscription (GA4.2) (0.081916ms)
+✔ signData + nacl roundtrip uses seed (no prod secrets in repo) (10.20775ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 133.809791

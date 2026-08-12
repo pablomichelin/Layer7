@@ -54,7 +54,10 @@ CRL offline continua **fora de escopo** (rejeitada na ADR-0021).
 
 **Desenho `30.12` FECHADO** (`2026-08-12`):
 [`../01-architecture/contrato-check-in-assinado-30.12.md`](../01-architecture/contrato-check-in-assinado-30.12.md)
-(D1–D12; GA5.1 PASS). Implementação = `30.13` (ainda não aberta).
+(D1–D12; GA5.1 PASS).
+**Implementação `30.13` FECHADA** (`20260812T013913Z`): servidor dual-mode +
+cliente exige envelope; GA5.2–5.6 PASS (unit); evidência
+`20260812T013913Z-30.13-checkin-signed`. Default `check_in_enabled` = `30.14`.
 
 ### 3. Nunca fail-closed por rede (**R-C**)
 

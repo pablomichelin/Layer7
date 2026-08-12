@@ -565,6 +565,50 @@ function parseActivatePayload(body) {
   };
 }
 
+/**
+ * Check-in 30.13 / contrato 30.12 — key + hardware_id + nonce opcional.
+ * Sem nonce → caminho legado (D10). client_ts opcional (auditoria; ignorado).
+ */
+function normalizeCheckInNonce(raw) {
+  if (raw === undefined || raw === null || raw === '') {
+    return null;
+  }
+  if (typeof raw !== 'string') {
+    throw createHttpError(400, 'nonce invalido.');
+  }
+  const nonce = raw.trim();
+  /* 32 bytes CSPRNG → base64url sem padding = 43 chars (D3). */
+  if (!/^[A-Za-z0-9_-]{43}$/.test(nonce)) {
+    throw createHttpError(400, 'nonce invalido.');
+  }
+  return nonce;
+}
+
+function parseCheckInPayload(body) {
+  const payload = ensureObject(body);
+  rejectUnexpectedFields(payload, ['key', 'hardware_id', 'nonce', 'client_ts']);
+
+  const key = normalizeRequiredText(payload.key, 'key', 32).toLowerCase();
+  const hardwareId = normalizeStoredHardwareId(
+    normalizeRequiredText(payload.hardware_id, 'hardware_id', 64)
+  );
+
+  if (!LICENSE_KEY_PATTERN.test(key)) {
+    throw createHttpError(400, 'key invalida.');
+  }
+  if (!hardwareId) {
+    throw createHttpError(400, 'hardware_id invalido.');
+  }
+
+  const nonce = normalizeCheckInNonce(payload.nonce);
+
+  return {
+    key,
+    hardwareId,
+    nonce,
+  };
+}
+
 function assertEmptyBody(body) {
   if (body === undefined || body === null) {
     return;
@@ -614,10 +658,12 @@ module.exports = {
   assertEmptyBody,
   FEATURES_MAX_BYTES,
   isLicenseExpired,
+  normalizeCheckInNonce,
   normalizeExpiryDate,
   normalizeFeatures,
   normalizeStoredHardwareId,
   parseActivatePayload,
+  parseCheckInPayload,
   parseAuditListQuery,
   parseCustomerCreatePayload,
   parseCustomerUpdatePayload,

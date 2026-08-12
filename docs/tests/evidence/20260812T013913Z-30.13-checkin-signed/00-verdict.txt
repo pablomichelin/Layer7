@@ -1,0 +1,21 @@
+VEREDITO: 30.13 FECHADO (implementação)
+
+Objectivo: servidor assina check-in (envelope+nonce); cliente novo exige sig.
+Impacto: license-server dual-mode (D10); layer7d envia nonce e rejeita legado/unsigned.
+Risco: Médio — deploy servidor deve preceder .pkg 1.9.55 em campo com check-in ON.
+         Default check_in_enabled permanece OFF (30.14 / GO).
+Teste: node check-in-signed + policy + content-subscription PASS (24);
+       test_checkin_signed.c PASS (campos C1/C4/C7/skew/v).
+Rollback: reverter commit; .pkg anterior; servidor anterior (legado intacto).
+
+GA5.1 PASS (prévio)
+GA5.2 PASS (unit — envelope legítimo)
+GA5.3 PASS (unit — sem sig / legado rejeitado no cliente novo)
+GA5.4 PASS (unit — nonce mismatch)
+GA5.5 PASS (unit — chave errada / servidor falso lógico)
+GA5.6 PASS (código — falha verify/rede → L7_CHECKIN_NETWORK; sem invalidate)
+GA5.7+ PENDENTE (30.14+ / campo)
+GA5.13 PASS parcial (dual-mode D10 unit; clientes antigos sem nonce)
+
+Proibido respeitado: sem 30.14; sem .254; sem CF/DNS; sem GitHub release/assets;
+sem enforce/MITM/IPv6; sem segredos.
