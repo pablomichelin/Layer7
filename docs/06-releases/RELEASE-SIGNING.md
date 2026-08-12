@@ -261,3 +261,42 @@ openssl pkeyutl -verify -rawin \
 
 Depois conferir os `sha256` listados no manifesto contra os ficheiros
 publicados no stage dir ou na release.
+
+---
+
+## Addendum operacional — `30.18` / BG-123 (`2026-08-12`)
+
+**Objectivo:** tornar a cadeia F1.2 **obrigatória no processo** de qualquer
+publicação futura de pacote em `pablomichelin/Layer7` (mitigar A-10 no fluxo),
+sem activar ainda a Fase 1 de campo da [ADR-0023](../03-adr/ADR-0023-trust-chain-pacote-ativacao-faseada.md)
+(custódia humana da chave + primeira release assinada — **BG-028**).
+
+**Política (pós-30.18):**
+
+1. Stage dir oficial = `.pkg` + `.pkg.sha256` + `install.sh` + `uninstall.sh` +
+   `release-manifest.v1.txt`.
+2. Assinatura fora do builder (`sign-release.sh`) com chave **fora do git**.
+3. `verify-release.sh` **PASS** antes de qualquer `publish-release.sh`
+   (o publisher já chama verify e falha se inválido).
+4. Assets mínimos na release: itens da secção *Artefactos oficiais* acima.
+5. **Proibido** publicar só `.pkg` + `.sha256` em releases novas de pacote.
+
+**Prova offline (sem publish, sem chave de produção):**
+
+```sh
+sh tests/functional/test_release_signing_f12_30.18.sh
+```
+
+Usa chave Ed25519 **efémera** em TMP; nunca escreve private key no repositório.
+Os scripts `sign-release.sh` / `verify-release.sh` respeitam `TMPDIR` nos
+`mktemp` (hardening `30.18`) para evitar colisões em `/tmp`.
+
+**Residual honesto:**
+
+- Canal lab/`latest` actual (`1.9.54`) continua `.pkg` + `.sha256` (Fase 0 ADR-0023).
+- A-10 em tags já publicadas permanece até GO de publish Fase 1 (BG-028).
+- Este passo **não** gera nem committa chave de produção (R-K).
+
+**Gates:** GA6.5 **PASS (processo)** + residual campo; GA6.6 via
+`MANUAL-INSTALL.md`. Evidência:
+[`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/).

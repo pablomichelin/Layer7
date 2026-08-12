@@ -20,11 +20,15 @@
 
 Adoptar **ativação faseada** do trust chain do **pacote**:
 
-### Fase 0 (actual — pós-GO Onda F)
+### Fase 0 (actual — pós-GO Onda F; processo reforçado em `30.18`)
 
-- Canal oficial: **comando único manual** em `MANUAL-INSTALL.md` §1/§4/§5.
-- Publicação: `.pkg` + `.pkg.sha256` em `pablomichelin/Layer7`.
-- `install.sh` / `uninstall.sh` automáticos **não** são oferecidos no `latest`.
+- Canal oficial publicado (`1.9.54`): **comando único manual** em
+  `MANUAL-INSTALL.md` §1/§4/§5; assets = `.pkg` + `.pkg.sha256`.
+- **Processo** (pós-`30.18` / BG-123): releases *novas* de pacote **não**
+  podem omitir F1.2 no stage/sign/verify; ver addendum em
+  [`RELEASE-SIGNING.md`](../06-releases/RELEASE-SIGNING.md).
+- `install.sh` / `uninstall.sh` automáticos **não** são oferecidos no `latest`
+  até Fase 1.
 - Checklist: [`docs/06-releases/RELEASE-CHECKLIST.md`](../06-releases/RELEASE-CHECKLIST.md).
 
 ### Fase 1 (critérios de activação — gate humano)

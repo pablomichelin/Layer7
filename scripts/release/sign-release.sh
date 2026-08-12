@@ -64,7 +64,7 @@ stamp_install_script() {
   _install_path="$1"
   _pubkey_path="$2"
   _fingerprint="$3"
-  _tmp_install="$(mktemp /tmp/layer7-install-stage.XXXXXX.sh)"
+  _tmp_install="$(mktemp "${TMPDIR:-/tmp}/layer7-install-stage.XXXXXX.sh")"
   _pubkey_b64="$(openssl base64 -A -in "$_pubkey_path")"
 
   sed \
@@ -87,7 +87,7 @@ if [ -n "$PUBLIC_KEY" ]; then
   [ -f "$PUBLIC_KEY" ] || die "public key nao existe: $PUBLIC_KEY"
   cp "$PUBLIC_KEY" "$PUBKEY_PATH"
 else
-  TMP_PUB="$(mktemp /tmp/layer7-release-pub.XXXXXX.pem)"
+  TMP_PUB="$(mktemp "${TMPDIR:-/tmp}/layer7-release-pub.XXXXXX.pem")"
   openssl pkey -in "$PRIVATE_KEY" -pubout -out "$TMP_PUB" >/dev/null 2>&1
   cp "$TMP_PUB" "$PUBKEY_PATH"
 fi
@@ -139,7 +139,7 @@ UNINSTALL_ASSET_NAME="$(manifest_asset_name_by_role uninstaller "$MANIFEST")"
 
 stamp_install_script "$STAGE_DIR/$INSTALL_ASSET_NAME" "$PUBKEY_PATH" "$PUBKEY_FINGERPRINT"
 
-TMP_MANIFEST="$(mktemp /tmp/layer7-release-manifest.XXXXXX.txt)"
+TMP_MANIFEST="$(mktemp "${TMPDIR:-/tmp}/layer7-release-manifest.XXXXXX.txt")"
 {
   echo "manifest_version=1"
   echo "release_version=$RELEASE_VERSION"
@@ -172,7 +172,7 @@ openssl pkeyutl -sign -rawin \
   -in "$MANIFEST" \
   -out "$SIG_PATH" >/dev/null 2>&1
 
-TMP_VERIFY="$(mktemp /tmp/layer7-release-verify.XXXXXX.log)"
+TMP_VERIFY="$(mktemp "${TMPDIR:-/tmp}/layer7-release-verify.XXXXXX.log")"
 if ! openssl pkeyutl -verify -rawin \
   -pubin \
   -inkey "$PUBKEY_PATH" \

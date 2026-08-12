@@ -243,10 +243,15 @@ sobre o `.pkg` publicado, não sobre o repositório.
 
 **Severidade: Baixa (não é bypass). Custo: n/a.**
 
-A `v1.9.48` publica apenas `.pkg` + `.pkg.sha256`; o manifesto assinado
-previsto no contrato F1.2 (`docs/06-releases/RELEASE-SIGNING.md`, ADR-0023)
-não acompanha a release. Isto afecta integridade/proveniência do download,
-não o licenciamento.
+A `v1.9.48` (e o canal actual `1.9.54`) publica apenas `.pkg` + `.pkg.sha256`;
+o manifesto assinado previsto no contrato F1.2
+(`docs/06-releases/RELEASE-SIGNING.md`, ADR-0023) não acompanha a release.
+Isto afecta integridade/proveniência do download, não o licenciamento.
+
+**Mitigação processo (`30.18` / BG-123):** cadeia F1.2 obrigatória no fluxo
+de release + dry-run sign/verify **PASS**. **Residual campo:** tags já
+publicadas e `latest` até GO ADR-0023 Fase 1 / **BG-028** (1ª publish com
+manifesto + `.sig` + pubkey).
 
 ### Resumo ordenado por facilidade de exploração
 

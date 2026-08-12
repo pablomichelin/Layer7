@@ -1,0 +1,6 @@
+PASSO: 30.18
+PERMITIDO: scripts/release (sem publish), docs/06-releases/RELEASE-SIGNING.md, MANUAL-INSTALL.md (secção F1.2), CORTEX/START-HERE/plano/gates/backlog/changelog, teste dry-run F1.2, evidência
+PROIBIDO: 30.19; MITM/IPv6; .254; CF/DNS; license-server; GitHub Release/deploy; chave privada no git; PORTVERSION bump sem necessidade
+STOP SE: necessidade de chave de produção no repo; pedido de publish sem GO Fase 1 ADR-0023; divergência CORTEX/plano/START-HERE
+GATE: GA6.5 (processo) + GA6.6
+DoD: dry-run sign+verify PASS; publish-release exige verify; docs F1.2; MANUAL com versão actual + procedimento F1.2; residual A-10 campo/BG-028 declarado; sem segredos

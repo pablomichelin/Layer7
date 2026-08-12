@@ -55,15 +55,22 @@
 
 ---
 
-## 5. Trust chain pacote (BG-028 — fase actual)
+## 5. Trust chain pacote (F1.2 / `30.18` + BG-028)
 
-| # | Item | Estado `2026-08-05` | ☐ |
+> **Pós-`30.18`:** cadeia F1.2 é **obrigatória no processo** de releases
+> novas de pacote. Campo/canal `latest` (`1.9.54`) ainda Fase 0 (só
+> `.pkg`+`.sha256`) até GO ADR-0023 Fase 1 / **BG-028**.
+
+| # | Item | Estado `2026-08-12` | ☐ |
 |---|------|----------------------|---|
-| 5.1 | Manifesto + assinatura Ed25519 | **Não activo** — ver [ADR-0023](../03-adr/ADR-0023-trust-chain-pacote-ativacao-faseada.md) | N/A |
-| 5.2 | `install.sh` carimbado fail-closed | **Não activo** — caminho manual `MANUAL-INSTALL` §1/§4 | N/A |
-| 5.3 | Scripts prontos (`deployz`, `sign`, `verify`, `publish`) | Verificados no repo | ✓ |
+| 5.1 | Processo F1.2 (deployz→sign→verify→publish) | **Obrigatório** — [`RELEASE-SIGNING.md`](RELEASE-SIGNING.md) addendum `30.18` | |
+| 5.2 | Dry-run local (chave efémera) | `sh tests/functional/test_release_signing_f12_30.18.sh` | |
+| 5.3 | `publish-release.sh` chama `verify-release.sh` | Confirmado no repo (`30.18`) | ✓ |
+| 5.4 | Manifesto + `.sig` + pubkey na release publicada | **Pendente campo** — ADR-0023 Fase 1 / BG-028 | |
+| 5.5 | `install.sh` carimbado fail-closed no `latest` | **Pendente campo** — caminho manual vigente em `1.9.54` | |
 
-**Quando ADR-0023 fase 1 activar:** acrescentar passos 5.4–5.8 de `RELEASE-SIGNING.md` a esta checklist.
+**Quando ADR-0023 fase 1 activar (GO humano + chave em custódia):** cumprir 5.4–5.5
+na mesma publicação e actualizar `MANUAL-INSTALL.md` (regra especial AGENTS).
 
 ---
 

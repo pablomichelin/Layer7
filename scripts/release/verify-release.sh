@@ -70,7 +70,7 @@ PKG_SHA_FILE=""
 PKG_SHA_FILE_HASH=""
 ASSET_COUNT=0
 
-ASSET_LINES_FILE="$(mktemp /tmp/layer7-release-assets.XXXXXX.txt)"
+ASSET_LINES_FILE="$(mktemp "${TMPDIR:-/tmp}/layer7-release-assets.XXXXXX.txt")"
 grep '^asset|' "$MANIFEST" > "$ASSET_LINES_FILE"
 
 while IFS= read -r line; do

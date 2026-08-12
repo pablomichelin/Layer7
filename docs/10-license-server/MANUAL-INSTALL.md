@@ -1462,16 +1462,22 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **SHA256 do tar.gz:** `4191e2ebdc13e3c87d777103528bab4fda6b273bc40c62a2c39cb820ad493d36`
 - **Fingerprint da chave publica embutida no pacote:** `6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc`
 
-> **Nota operacional sobre F1.2 nesta release:** o trust chain F1.2/F1.4
-> (`release-manifest.v1.txt`, `release-manifest.v1.txt.sig`,
-> `release-signing-public-key.pem`, `install.sh` carimbado e fail-closed) **nao
-> esta activo nesta release**, mantendo o padrao operacional das releases
-> publicas anteriores (`v1.7.8` a `v1.8.3`), que tambem so publicaram `.pkg` +
-> `.pkg.sha256`. A activacao formal da F1.2 assinada pela primeira vez fica
-> registada como item dedicado no backlog (ver `docs/02-roadmap/backlog.md`,
-> **BG-028**) e sera tratada num bloco controlado proprio com ADR. Nesta
-> release, instalar/actualizar via **comando unico manual** desta seccao (sem
+> **Nota operacional sobre F1.2 nesta release (`1.9.54`):** o trust chain
+> F1.2/F1.4 **nao esta activo nos assets publicados desta tag** (apenas
+> `.pkg` + `.pkg.sha256`), alinhado à Fase 0 da ADR-0023. **`30.18` / BG-123**
+> tornou a cadeia F1.2 **obrigatoria no processo** de *proximas* publicacoes
+> de pacote (`deployz` → `sign-release` → `verify-release` → `publish-release`;
+> ver `docs/06-releases/RELEASE-SIGNING.md`). A **primeira** publicacao com
+> manifesto + `.sig` + pubkey + `install.sh` carimbado continua gate humano
+> **BG-028** (ADR-0023 Fase 1 — custodia da chave fora do git). Nesta release,
+> instalar/actualizar via **comando unico manual** desta seccao (sem
 > `install.sh`/`uninstall.sh`).
+>
+> **Verificacao F1.2 (quando a release publicar os assets):** apos descarregar
+> o stage/release, validar com
+> `sh scripts/release/verify-release.sh --stage-dir <dir>`
+> (ou OpenSSL em `RELEASE-SIGNING.md`). Dry-run offline (chave efemera, sem
+> publish): `sh tests/functional/test_release_signing_f12_30.18.sh`.
 
 **Comandos rapidos de teste:**
 

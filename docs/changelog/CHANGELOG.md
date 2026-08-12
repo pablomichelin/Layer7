@@ -6,6 +6,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **Anti-pirataria 30.18 / BG-123 — cadeia F1.2 no processo de release:**
+  política obrigatória manifesto + `.sig` + pubkey nas *próximas* publicações
+  (`RELEASE-SIGNING.md` / checklist); dry-run
+  `tests/functional/test_release_signing_f12_30.18.sh` (chave efémera TMP);
+  `sign-release.sh`/`verify-release.sh` usam `${TMPDIR:-/tmp}` nos `mktemp`;
+  `publish-release.sh` já exige `verify-release.sh`. **Sem** GitHub Release,
+  **sem** chave de produção, **sem** `.254` / license-server, **sem** bump
+  PORTVERSION. Canal `1.9.54` permanece `.pkg`+`.sha256` (ADR-0023 Fase 0);
+  1ª publish assinada = **BG-028**. GA6.5 **PASS (processo)** + residual
+  campo; GA6.6 **PASS**. Evidência
+  `docs/tests/evidence/20260812T024826Z-30.18-release-signing/`.
+
 - **Anti-pirataria 30.17 — marcação por cliente (atribuição):** após update
   autenticado (ou `--stamp-attribution`), grava sidecars opacos
   `.state/content-attribution.json` + `.l7-content-attribution`
