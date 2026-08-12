@@ -1,7 +1,8 @@
-# Prep — Cut do espelho anónimo (`30.11`) · inventário + comando pendente
+# Prep / fecho — Cut do espelho anónimo (`30.11`)
 
-**Estado:** **PREP ONLY** — cut **não** executado; aguarda confirmação explícita do gestor  
-**Data prep:** `2026-08-12`  
+**Estado:** **CUT EXECUTADO** (`20260812T011217Z`) — ver evidência
+[`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/)  
+**Data prep:** `2026-08-12` · **Data cut:** `2026-08-12T01:12:17Z`  
 **Trilha:** Anti-pirataria / Anti-tamper · AP2 · BG-117  
 **Plano:** [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) § `30.11`  
 **Gates:** [`plano-gates-antipirataria.md`](plano-gates-antipirataria.md) GA4.10 / GA4.11 / GA4.12 / GA4.15  
@@ -50,7 +51,7 @@ como se tivesse havido emissão.
 | P5 | GA4.11 rollback doc ready | **DOC READY** |
 | P6 | Cópia íntegra do snapshot no origin (rollback) | **PASS** — cksums runbook = assets GitHub (823 / 64 / 113 / 31169229) |
 | P7 | GA4.12 comunicação externa | **N/A** (esta ficha §1) |
-| P8 | GO explícito de **cut** (GA4.15) | **PENDENTE** — confirmação do gestor |
+| P8 | GO explícito de **cut** (GA4.15) | **PASS** — GO gestor + `delete-asset` ×4 |
 | P9 | Não misturar enforce / MITM / IPv6 | **OK** (escopo só espelho) |
 
 **Recheck primary (prep, sem token):**
@@ -83,8 +84,12 @@ Inventário live `2026-08-12` — **todos** os quatro assets da release rolling
 | 3 | `layer7-blacklists-ut1.tar.gz` | 31169229 | `405033618` | `4191e2ebdc13e3c87d777103528bab4fda6b273bc40c62a2c39cb820ad493d36` | 24 |
 | 4 | `blacklists-signing-public-key.pem` | 113 | `405033620` | `42180a4af6fae8e85af5f499eb63f4b1bb3e156ee14a117243c5c7e72071c0f7` | 4 |
 
-**Prova anónima actual (HEAD):** os quatro URLs
-`…/releases/download/blacklists-ut1-current/<asset>` respondem **HTTP 200**.
+**Inventário pré-cut (HEAD histórico):** os quatro URLs anónimos
+respondiam **HTTP 200** (base do cut).
+
+**Pós-cut / recheck:** API `asset_count=0`; anónimo @ cut+~1min com
+residual CDN (302 / manifesto 200); recheck `20260812T012017Z` → **404×4**.
+Ver evidência `03-recheck-cdn.txt`.
 
 **Fora do cut (não mexer neste passo):**
 - releases de pacote `v1.9.*` / `latest` do produto;
@@ -94,55 +99,35 @@ Inventário live `2026-08-12` — **todos** os quatro assets da release rolling
 
 ---
 
-## 4. Acção irreversível pendente (NÃO executar sem GO)
+## 4. Acção executada (`20260812T011217Z`)
 
-Após **confirmação explícita** do gestor («GO cut 30.11»), a acção mínima
-recomendada é **apagar os quatro assets** da release rolling (não apagar a
-release/tag inteira — simplifica rollback GA4.11):
+GO gestor explícito cumprido — **só** `delete-asset` ×4 (release/tag intactos):
 
-```sh
-# IRREVERSÍVEL sem cópia local — executar SÓ com GO cut explícito
-# Repo público: pablomichelin/Layer7 · tag: blacklists-ut1-current
+| Asset | id | Resultado |
+|-------|-----|-----------|
+| `layer7-blacklists-manifest.v1.txt` | `405033619` | deleted |
+| `layer7-blacklists-manifest.v1.txt.sig` | `405033621` | deleted |
+| `layer7-blacklists-ut1.tar.gz` | `405033618` | deleted |
+| `blacklists-signing-public-key.pem` | `405033620` | deleted |
 
-gh release delete-asset blacklists-ut1-current \
-  layer7-blacklists-manifest.v1.txt \
-  --repo pablomichelin/Layer7 --yes
+Pós-cut: `asset_count=0`; release id `313502667`; tag `blacklists-ut1-current` OK.
 
-gh release delete-asset blacklists-ut1-current \
-  layer7-blacklists-manifest.v1.txt.sig \
-  --repo pablomichelin/Layer7 --yes
+### Validação pós-cut
 
-gh release delete-asset blacklists-ut1-current \
-  layer7-blacklists-ut1.tar.gz \
-  --repo pablomichelin/Layer7 --yes
-
-gh release delete-asset blacklists-ut1-current \
-  blacklists-signing-public-key.pem \
-  --repo pablomichelin/Layer7 --yes
-```
-
-**Alternativa mais larga (NÃO preferida neste prep):**  
-`gh release delete blacklists-ut1-current --repo pablomichelin/Layer7 --yes`  
-apaga a release inteira (ainda recuperável via recriar release + upload do
-runbook, mas é superfície maior).
-
-### Teste mínimo pós-cut (quando autorizado)
-
-1. Anónimo: os quatro URLs acima → **404** (ou não 200).  
-2. Primary sem token → continua **401**.  
-3. Cliente legítimo `≥ 1.9.54` com token → update pelo primary (GA4.4).  
-4. Enforce / modo no `.254` → **inalterados**.  
-5. Se precisar repor → runbook GA4.11 (`gh release upload … --clobber`).
+1. API release: **0 assets** — **PASS**  
+2. Primary sem token → **401** — **PASS**  
+3. Anónimo: residual CDN @cut (302→SAS; manifesto 200; tarball 404);
+   recheck `012017Z` **404×4** — `03-recheck-cdn.txt`
+4. Enforce / `.254` / CF / DNS / license-server: **não tocados**  
+5. Rollback: [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md)
 
 ---
 
-## 5. O que **não** está autorizado neste prep
+## 5. Escopo cumprido / não feito
 
-- Executar `delete-asset` / `release delete`
-- Alterar produção, Cloudflare, DNS, license-server live
-- Enviar e-mail / comunicação externa
-- Publicar nova GitHub Release de pacote
-- Declarar GA4.10 / GA4.15 PASS
+- **Feito:** `delete-asset` ×4  
+- **Não feito:** apagar release/tag; mexer `.254`/CF/DNS/license-server;
+  e-mail; release de pacote
 
 ---
 

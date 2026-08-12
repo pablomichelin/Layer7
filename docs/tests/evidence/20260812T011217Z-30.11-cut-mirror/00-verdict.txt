@@ -1,0 +1,11 @@
+CUT_API=PASS asset_count=0 release+tag preserved
+DELETED=4 assets (405033619 405033621 405033618 405033620)
+PRIMARY_NOTOKEN=401 PASS
+PRIMARY_AUTH=unchanged (prior PASS 20260812T003214Z; .254 not touched)
+ANON_URLS_AT_CUT=RESIDUAL_CDN — github.com 302→SAS; follow manifesto/PEM 200|823; tarball CDN 404 (02-validate.txt @ 01:13:43Z)
+ANON_URLS_RECHECK=404×4 nofollow+follow (03-recheck-cdn.txt @ 01:20:17Z) — residual CDN cleared from this vantage
+GA4.10=PASS_RELEASE_EMPTY + residual@cut documented + recheck 404
+GA4.15=PASS GO executed
+ROLLBACK=docs/13-runbooks/content-mirror-rollback-ga4.11.md (upload --clobber)
+NO_TOUCH=.254 Cloudflare DNS license-server package-release
+VERDICT=CUT_DONE

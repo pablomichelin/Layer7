@@ -30,8 +30,9 @@ Reposição do espelho público de conteúdo corrente (GA4.11 / `30.11` — roll
 comercial, sem tocar enforce):
 [`content-mirror-rollback-ga4.11.md`](content-mirror-rollback-ga4.11.md).
 
-Prep cut espelho anónimo (`30.11` — inventário + comando pendente):
-[`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md).
+Prep/fecho cut espelho anónimo (`30.11` — **CUT EXECUTADO** `20260812T011217Z`):
+[`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md);
+evidência [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
 
 Coms GA4.12 (histórico; gate **N/A** — não emitir):
 [`content-mirror-comms-ga4.12-draft.md`](content-mirror-comms-ga4.12-draft.md).

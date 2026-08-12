@@ -1,0 +1,13 @@
+=== post-cut validation 2026-08-12T01:13:43Z ===
+api_asset_count=0
+release_draft=false
+release_prerelease=true
+anon_nofollow layer7-blacklists-manifest.v1.txt -> 302
+anon_nofollow layer7-blacklists-manifest.v1.txt.sig -> 302
+anon_nofollow layer7-blacklists-ut1.tar.gz -> 302
+anon_nofollow blacklists-signing-public-key.pem -> 302
+anon_follow_manifest=200|823
+anon_follow_tarball=404|215
+primary_notoken_manifest=401
+primary_notoken_sig=401
+license_health=200

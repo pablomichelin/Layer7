@@ -1,0 +1,9 @@
+deleted_assets:
+405033619 layer7-blacklists-manifest.v1.txt size=823
+405033621 layer7-blacklists-manifest.v1.txt.sig size=64
+405033618 layer7-blacklists-ut1.tar.gz size=31169229
+405033620 blacklists-signing-public-key.pem size=113
+post_api_asset_count=0
+release_id_preserved=313502667
+tag_preserved=blacklists-ut1-current
+tag_object_sha=653740b7a5e2d92638044a7e7369a0ab7fa9ec32

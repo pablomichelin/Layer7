@@ -1,0 +1,7 @@
+RUNID=20260812T011217Z
+STEP=30.11-cut
+REPO=pablomichelin/Layer7
+TAG=blacklists-ut1-current
+RELEASE_ID=313502667
+ACTION=gh release delete-asset x4 (no release/tag delete)
+GO=gestor explicito 2026-08-12

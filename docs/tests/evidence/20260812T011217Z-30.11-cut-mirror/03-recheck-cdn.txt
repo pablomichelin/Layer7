@@ -1,0 +1,16 @@
+=== CDN/API recheck 2026-08-12T01:20:17Z (fecho documental; read-only) ===
+api_asset_count=0
+release_id=313502667
+tag=blacklists-ut1-current
+anon_nofollow layer7-blacklists-manifest.v1.txt -> 404
+anon_nofollow layer7-blacklists-manifest.v1.txt.sig -> 404
+anon_nofollow layer7-blacklists-ut1.tar.gz -> 404
+anon_nofollow blacklists-signing-public-key.pem -> 404
+anon_follow layer7-blacklists-manifest.v1.txt -> 404|9
+anon_follow layer7-blacklists-manifest.v1.txt.sig -> 404|9
+anon_follow layer7-blacklists-ut1.tar.gz -> 404|9
+anon_follow blacklists-signing-public-key.pem -> 404|9
+primary_notoken_manifest=401
+primary_notoken_sig=401
+license_health=200
+NOTE=At cut+~1min (02-validate.txt) residual CDN: github 302 + follow manifesto 200|823; tarball 404. Recheck ~8min later: all anon 404 (nofollow+follow). No GitHub assets recreated.

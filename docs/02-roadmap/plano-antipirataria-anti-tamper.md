@@ -1,6 +1,11 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **`30.10` FECHADO** (código + fix `1.9.54` + e2e `.254` PASS `20260811T114320Z`); **30.9 live PASS**; **`30.11` preflight** primary auth GET **PASS** (`20260812T003214Z` — 200/200 + 401); **GA4.12 N/A** (coms externas dispensadas `2026-08-12`); **cut espelho PENDENTE** (GO próprio GA4.15); prep [`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md); lab/`latest` = produção **`1.9.54`**; GA4.4 **PASS**; ADRs 0030–0033 **`Aceito`** (rev. `2026-08-10c`)
+**Estado do plano:** **`30.10` FECHADO**; **`30.11` FECHADO** (cut
+`20260812T011217Z` — `delete-asset` ×4; release/tag preservados; GA4.10/15
+**PASS**; residual CDN @cut + recheck 404×4); **GA4.12 N/A**; **30.9 live PASS**;
+evidência [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/);
+lab/`latest` = produção **`1.9.54`**; GA4.4 **PASS**; ADRs 0030–0033 **`Aceito`**
+(rev. `2026-08-10c`); **próximo AP3 `30.12`**
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -25,13 +30,13 @@
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP2 em curso** (AP0/AP1 higiene FECHADAS; GA1 PASS) |
-| Passo actual | **`30.10` FECHADO**; **`30.11` preflight auth PASS**; cut **PENDENTE** |
-| Próximo | **`30.11` cut** (GO espelho / RR-1 / GA4.15) — prep pronto |
-| Depois | AP3 `30.12`… |
-| Bloqueio duro | A-09 / pubkey: **resolvido** em `30.2`; primary auth: **PASS**; GA4.12: **N/A** |
-| Código alterado até agora | `license-server` **30.9 live** + primary content; cliente/pkg **`1.9.54`** em produção |
-| Gate activo | **GA4 parcial** — GA4.4–4.7/4.9 **PASS**; primary auth **PASS**; GA4.12 **N/A**; falta GA4.10/15 |
-| Decisões 1/3 (RR-1) | **Sim** / **Sim** — protecção T1/T2 continua a exigir **cut** `30.11`/`30.14` |
+| Passo actual | **`30.11` FECHADO** (cut espelho); AP2 cut feito |
+| Próximo | AP3 **`30.12`** |
+| Depois | `30.13`… |
+| Bloqueio duro | A-09 / pubkey: **resolvido**; primary auth: **PASS**; cut: **PASS** |
+| Código alterado até agora | `license-server` **30.9 live** + primary content; cliente/pkg **`1.9.54`**; espelho GitHub sem assets correntes |
+| Gate activo | **GA4 cut PASS** (GA4.10/15); GA4.12 **N/A**; próximo gate GA5 (AP3) |
+| Decisões 1/3 (RR-1) | **Sim** / **Sim** — cut `30.11` **feito**; falta GO/execução `30.14` |
 | Agente recomendado | **Composer 2.5** — um passo `30.x` por chat (§8) |
 | Rev. do plano | **`2026-08-10c`** |
 
@@ -39,16 +44,14 @@
 TRILHA ANTI-PIRATARIA — progresso
 - Modelo de ameaças: ACEITE como diagnóstico (2026-08-10)
 - Rev. plano: 2026-08-10c (Composer-ready; RR-1..RR-5)
-- Passo: 30.10 FECHADO; 30.11 preflight auth PASS; cut PENDENTE
-- 30.9 live PASS; e2e 1.9.54 PASS (20260811T114320Z-30.10-e2e-154-254)
-- Primary auth GET: 200/200 + 401 (20260812T003214Z) PASS
-- Fix: HTTPS 302 sem vazar Bearer cross-host
-- ADRs 0030–0033: Aceito (30.1b)
-- Gate GA0/GA1/GA3: PASS; GA4.4–4.7/4.9 PASS; GA4.12 N/A; falta GA4.10/15
+- Passo: 30.11 FECHADO (cut 20260812T011217Z)
+- 30.9 live PASS; e2e 1.9.54 PASS; primary auth PASS
+- Cut: delete-asset x4; asset_count=0; residual CDN @cut; recheck 404x4
+- GA4.12 N/A; GA4.10/15 PASS
+- Evidência: 20260812T011217Z-30.11-cut-mirror
 - Produção .254 / latest: 1.9.54
-- BG-117: falta cut 30.11 (RR-1)
-- Prep cut: docs/09-blocking/prep-cut-30.11-espelho.md
-- NÃO cut espelho sem GO gestor explícito (GA4.15)
+- BG-117: Concluido
+- Próximo: AP3 30.12
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.
@@ -322,7 +325,8 @@ mantida em **`1.9.54`**. Evidência
 `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`.
 **Histórico:** STOP em `1.9.53` por HTTP 302 —
 `20260811T110638Z-30.10-revalidate-254/`.
-**Risco residual:** RR-1 até **cut** `30.11` (espelho anónimo ainda público).
+**Risco residual (histórico pré-cut):** RR-1 enquanto o espelho anónimo servia
+conteúdo corrente — **fechado em `30.11`**.
 **Rollback lab:** **`1.9.53`**.
 **Gate:** **GA4.4 PASS**; GA4.5–4.7/4.9 **PASS**. Primary auth preflight **PASS**.
 
@@ -332,23 +336,15 @@ mantida em **`1.9.54`**. Evidência
 **Nota de dependência (RR-1):** este passo é o que dá valor real a AP2 — sem ele,
 o token dos passos 30.8–30.10 é decorativo, porque o caminho anónimo continua a
 servir conteúdo corrente. O GO deve ser pedido com esta consequência à vista.
-**Preflight (2026-08-12):** primary `downloads.systemup.inf.br` — GET autenticado
-manifesto/`.sig` **200/200** (823/64) + sem token **401** —
-[`../tests/evidence/20260812T003214Z-30.11-auth-get-254/`](../tests/evidence/20260812T003214Z-30.11-auth-get-254/)
-**PASS**. **Cut ainda não executado.**
-**Entrega (cut):** remover/limitar o espelho público do conteúdo **corrente**;
-comunicação a clientes (GA4.12) **antes** do cut **quando houver audiência
-externa**; inventário/comando em
-[`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md).
-**GA4.12 (`2026-08-12`):** **N/A** — gestor: sem destinatários externos; decisão
-interna; impacto futuro → janela de manutenção por e-mail ops (não emitir agora).
-**Teste mínimo:** cliente legítimo actualiza pelo caminho novo; caminho anónimo já
-não serve conteúdo corrente; nenhum appliance legítimo fica sem enforce.
-**Risco:** **Alto de suporte** — afecta quem depende do espelho hoje.
-**Rollback:** repor o espelho —
-[`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md).
-**Gate:** GA4. **Exige GO humano próprio** (secção 5, ponto 3) para o **cut**
-(GA4.15) — distinto da dispensa GA4.12.
+**FECHADO (`20260812T011217Z`):** GO gestor + `gh release delete-asset` ×4 em
+`blacklists-ut1-current` (ids `405033619`/`405033621`/`405033618`/`405033620`);
+release/tag preservados (`313502667`); `asset_count=0`.
+Evidência: [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
+Prep: [`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md).
+**GA4.12:** **N/A**. **GA4.10/15:** **PASS** (residual CDN @cut; recheck
+`012017Z` anónimo **404×4**).
+**Rollback:** [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md).
+**Gate:** GA4 cut **PASS**.
 
 ---
 

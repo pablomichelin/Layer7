@@ -120,32 +120,31 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (GUI + helper; e2e `1.9.54` / `20260811T114320Z` reportou `status=ok`) |
 | GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** (local — skew ±1d / token na janela em teste PHP); **não** provado em campo com token real |
 | GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto no cliente) |
-| GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** (cut **não** executado) |
-| GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **DOC READY** — [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md); teste pós-cut ainda PENDENTE |
+| GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PASS** (`20260812T011217Z`) — release `blacklists-ut1-current` com **0 assets**; enforce não tocado. Residual CDN @ cut+~1min (302→SAS; manifesto 200; tarball 404); recheck `20260812T012017Z` **404×4** — evidência `03-recheck-cdn.txt` |
+| GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **DOC READY** — [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md); reposição não executada (não necessária) |
 | GA4.12 | Comunicação a clientes emitida antes de 30.11 | **N/A** (`2026-08-12`) — decisão humana: sem destinatários externos; cut = decisão interna; impacto futuro → janela de manutenção por e-mail ops. Rastreio: [`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md) §1. Rascunho histórico **não emitido**: [`../13-runbooks/content-mirror-comms-ga4.12-draft.md`](../13-runbooks/content-mirror-comms-ga4.12-draft.md) |
 | GA4.13 | Sem segredos novos no repositório, incluindo fixtures (**N8**, **R-K**) | **PASS** (`30.9` — seed efémera só em teste; prod via `ED25519_PRIVATE_KEY`) |
 | GA4.14 | ADR-0031 / desenho 30.8 declaram RR-2 (redistribuição por appliance licenciado) e que a resposta é atribuição+contratual, não bloqueio técnico | **PASS** (ADR-0031 §5 + contrato 30.8 §7) |
-| GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** — prep cut pronto ([`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md)); **cut ainda sem GO explícito** |
+| GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PASS** (`2026-08-12`) — GO gestor explícito + cut executado (`delete-asset` ×4); evidência [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/) |
 
 **Preflight primary (pré-cut, não substitui GA4.10):** GET HTTPS
 `downloads.systemup.inf.br/.../manifest` + `.sig` com token local → **200/200**
 (823/64); sem token → **401** — evidência
 `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/` **PASS**.
 
-**Estado GA4:** parcial — GA4.1–4.7/4.9/4.13/4.14 **PASS** (código +
-local/builder + **e2e `.254`** com `1.9.54`); primary auth preflight **PASS**;
-30.9 **já live**; GA4.8 só local; GA4.11 doc ready; **GA4.12 N/A** (waived).
-Falta **cut** `30.11` (GA4.10 / GA4.15) — inventário e comando em
-[`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md).
+**Estado GA4:** **PASS** nos critérios de cut (GA4.10/15) + GA4.1–4.7/4.9/4.13/4.14
+**PASS**; primary auth preflight **PASS**; 30.9 **live**; GA4.8 só local;
+GA4.11 doc ready; **GA4.12 N/A**. Residual CDN GitHub @ cut documentado;
+recheck anónimo **404×4** (`03-recheck-cdn.txt`) — release continua vazia.
 
+Evidência cut PASS: `docs/tests/evidence/20260812T011217Z-30.11-cut-mirror/`.
 Evidência e2e PASS: `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`.
 Evidência primary auth PASS: `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`.
 Evidência STOP `1.9.53`: `docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`.
 Evidência 1ª janela: `docs/tests/evidence/20260811T020533Z-30.10-validate-254/`.
 
-**Saída:** uma cópia sem subscrição válida degrada sozinha ao longo do tempo, sem
-que nada no appliance precise de se defender — **desde que** 30.11 tenha GO Sim
-**e** o license-server emita token em produção.
+**Saída:** uma cópia sem subscrição válida degrada sozinha ao longo do tempo —
+token obrigatório no primary; espelho rolling sem assets correntes.
 
 ---
 

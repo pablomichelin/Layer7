@@ -74,7 +74,7 @@
 | Âmbito | Decisões internas de desenvolvimento |
 | Impacto futuro | Janela de manutenção previamente comunicada por e-mail (ops) |
 | Gate GA4.12 | **N/A** (waived) — ver [`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md) §1 |
-| GO cut (GA4.15) | **Ainda pendente** — distinto desta dispensa de coms |
+| GO cut (GA4.15) | **PASS** — cut executado `20260812T011217Z` (`delete-asset` ×4); evidência [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/) |
 
 ---
 
