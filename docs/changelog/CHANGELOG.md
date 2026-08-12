@@ -6,10 +6,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Documentation
 
+- **Anti-pirataria 30.11 preflight — primary auth GET PASS:** em `.254`
+  (`1.9.54`), GET HTTPS a `downloads.systemup.inf.br/.../manifest` + `.sig`
+  com Bearer local → **200/200** (823/64); sem token → **401**. Evidência
+  `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`. Sem cut do
+  espelho; sem emissão GA4.12 a clientes; sem alteração produção/CF/GitHub.
+  Docs canónicos (START-HERE / CORTEX / plano §0 / gates / backlog) alinhados.
+  Próximo: emitir GA4.12 + GO cut (GA4.10/15).
+
 - **Anti-pirataria 30.10 — e2e `.254` PASS com `1.9.54`:** GA4.4 PASS;
   produção mantida em `1.9.54`; evidência
   `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`. Sem nova release
-  nem alteração de código neste bloco. Próximo: `30.11` (GO).
+  nem alteração de código neste bloco.
 
 ## [1.9.54] — 2026-08-11
 

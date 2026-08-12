@@ -1,0 +1,17 @@
+2026-08-12T00:32:14Z
+1.9.54
+token_mode_line=-rw-------  1 root wheel 424 Aug 11 08:46 /var/db/layer7/content-subscription.json
+=== GET manifest with Bearer ===
+manifest_http=200 size=823 ssl_verify=0
+manifest_version=1
+dataset=ut1
+snapshot_id=ut1-2026-04-25
+snapshot_asset=layer7-blacklists-ut1.tar.gz
+snapshot_size=31169229
+=== GET sig with Bearer ===
+sig_http=200 size=64 ssl_verify=0
+sig_bytes_on_disk=64
+=== control: same URLs without token (expect 401) ===
+manifest_notoken_http=401 size=60
+{"error":"content_subscription_required","reason":"missing"}
+AUTH_GET_DONE

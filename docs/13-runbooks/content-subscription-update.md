@@ -7,9 +7,12 @@
 **Validade nominal:** 30 dias · skew ±1 dia  
 **Campo:** e2e PASS —
 [`../tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](../tests/evidence/20260811T114320Z-30.10-e2e-154-254/);
-produção observada **`1.9.54`**. Primary CDN `downloads.systemup.inf.br` pode
-falhar DNS; o mirror GitHub com `fetch_authed` (redirect HTTPS) é o caminho
-operacional actual.
+produção observada **`1.9.54`**. Primary CDN `downloads.systemup.inf.br`:
+DNS/público **PASS**; smoke autenticado campo **PASS**
+(`20260812T003214Z` — manifesto/`.sig` **200/200**; sem token **401**).
+Enquanto o espelho GitHub anónimo existir (`pré-30.11` cut), o cliente pode
+ainda actualizar por esse caminho com `fetch_authed` — o cut exige GO próprio
++ GA4.12 emitida.
 
 ---
 

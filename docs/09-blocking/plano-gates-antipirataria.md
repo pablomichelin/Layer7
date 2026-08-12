@@ -112,24 +112,31 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.1 | Desenho e contrato do token fechados e revistos antes de código | **PASS** (`contrato-token-subscricao-conteudo-30.8.md`; revisão humana OK `2026-08-10`) |
 | GA4.2 | Servidor emite token para licença activa; recusa para revogada/expirada | **PASS** (`30.9` — `content_subscription` só em active; npm test) |
 | GA4.3 | Token ligado ao `hardware_id`; inútil noutro appliance | **PASS** (`30.9` — payload `hardware_id`; verify testes) |
-| GA4.4 | Cliente com token válido actualiza conteúdo (PASS ponta a ponta) | **PASS** (campo `1.9.54`, `20260811T114320Z`) — update autenticado via mirror HTTPS redirect; primary CDN DNS ainda fail pré-existente; hold-active/GUI OK |
+| GA4.4 | Cliente com token válido actualiza conteúdo (PASS ponta a ponta) | **PASS** (campo `1.9.54`, `20260811T114320Z`) — update autenticado (mirror); primary público também OK após DNS; hold-active/GUI OK |
 | GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PASS** (local/builder + `.254` hold-active; snapshot intacto; evidência `20260811T020533Z`) |
 | GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PASS** (`30.10` — sem token: conteúdo local mantido; enforce/mode intactos no `.254`) |
 | GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (GUI + helper; e2e `1.9.54` / `20260811T114320Z` reportou `status=ok`) |
 | GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** (local — skew ±1d / token na janela em teste PHP); **não** provado em campo com token real |
 | GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto no cliente) |
-| GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** |
-| GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **PENDENTE** |
-| GA4.12 | Comunicação a clientes emitida antes de 30.11 | **PENDENTE** |
+| GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PENDENTE** (cut **não** executado) |
+| GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **DOC READY** — [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md); teste pós-cut ainda PENDENTE |
+| GA4.12 | Comunicação a clientes emitida antes de 30.11 | **PENDENTE** — rascunho [`../13-runbooks/content-mirror-comms-ga4.12-draft.md`](../13-runbooks/content-mirror-comms-ga4.12-draft.md) (**não emitido**) |
 | GA4.13 | Sem segredos novos no repositório, incluindo fixtures (**N8**, **R-K**) | **PASS** (`30.9` — seed efémera só em teste; prod via `ED25519_PRIVATE_KEY`) |
 | GA4.14 | ADR-0031 / desenho 30.8 declaram RR-2 (redistribuição por appliance licenciado) e que a resposta é atribuição+contratual, não bloqueio técnico | **PASS** (ADR-0031 §5 + contrato 30.8 §7) |
-| GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** |
+| GA4.15 | GO próprio de 30.11 registado; se GO=Não, veredicto declara que AP2 ficou **higiene parcial** (RR-1) | **PENDENTE** (preflight auth autorizado; **cut** ainda sem GO) |
+
+**Preflight primary (pré-cut, não substitui GA4.10):** GET HTTPS
+`downloads.systemup.inf.br/.../manifest` + `.sig` com token local → **200/200**
+(823/64); sem token → **401** — evidência
+`docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/` **PASS**.
 
 **Estado GA4:** parcial — GA4.1–4.7/4.9/4.13/4.14 **PASS** (código +
-local/builder + **e2e `.254`** com `1.9.54`); 30.9 **já live**; GA4.8 só local.
-Falta ainda espelho/`30.11` (GA4.10–4.12/4.15).
+local/builder + **e2e `.254`** com `1.9.54`); primary auth preflight **PASS**;
+30.9 **já live**; GA4.8 só local; GA4.11 doc ready.
+Falta **cut** `30.11` (GA4.10 / emissão GA4.12 / GA4.15).
 
 Evidência e2e PASS: `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`.
+Evidência primary auth PASS: `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`.
 Evidência STOP `1.9.53`: `docs/tests/evidence/20260811T110638Z-30.10-revalidate-254/`.
 Evidência 1ª janela: `docs/tests/evidence/20260811T020533Z-30.10-validate-254/`.
 

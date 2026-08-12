@@ -26,6 +26,13 @@ Anti-rollback de relógio (30.6 / ADR-0033 — recuperação N6, limites RR-4):
 Subscrição de conteúdo / update de blacklists (30.10 — token Bearer, R-D/R-J):
 [`content-subscription-update.md`](content-subscription-update.md).
 
+Reposição do espelho público de conteúdo corrente (GA4.11 / `30.11` — rollback
+comercial, sem tocar enforce):
+[`content-mirror-rollback-ga4.11.md`](content-mirror-rollback-ga4.11.md).
+
+Rascunho de comunicação a clientes antes do cut do espelho (GA4.12):
+[`content-mirror-comms-ga4.12-draft.md`](content-mirror-comms-ga4.12-draft.md).
+
 Publicacao segura do license server (TLS, edge proxy, origin privado `8445`):
 [`license-server-publicacao-segura.md`](license-server-publicacao-segura.md).
 

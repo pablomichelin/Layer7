@@ -1,0 +1,4 @@
+manifest_http=200 size=823
+sig_http=200 size=64
+manifest_notoken_http=401
+VERDICT=PASS

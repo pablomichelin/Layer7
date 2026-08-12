@@ -361,15 +361,17 @@ e gates em
 
 **`30.3`–`30.6` FECHADOS** (`2026-08-10`). GA1 PASS; GA2.1–2.5 + GA2.11 PASS;
 GA3 PASS. BG-120 **Concluido**. Token: `30.8`–`30.10` + e2e `1.9.54` PASS;
-**30.9 live PASS**. BG-117: falta **`30.11`** (GO).
-**Próximo:** `30.11` com GO humano — não misturar com enforce/MITM.
+**30.9 live PASS**. Primary auth preflight **PASS**
+(`20260812T003214Z` — 200/200 + 401). BG-117: falta **cut** **`30.11`** (GO).
+**Próximo:** emitir GA4.12 + cut `30.11` com GO humano — não misturar com
+enforce/MITM.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
 | BG-114 | Remover modo dev (`is_dev_key`) do binário de produção; gate por `L7_DEV_BUILD` | **Critica** | daemon/licenciamento | AP1 / passo `30.4` | 32 bytes zerados no binário publicado dão licença universal permanente (achado A-01) | P | Alto | **Concluido** (`30.4` + release `1.9.49`, `2026-08-10`) | GA2.1–2.3 PASS; evidência `20260810T235325Z-30.4-no-dev-bypass` |
 | BG-115 | Strip do `layer7d` no port; remover símbolos de licença | Alta | package/build | AP1 / passo `30.5` | mapa de símbolos aponta para as funções de licença (A-01) | P | Alto | **Concluido** (`30.5` + release `1.9.50`, `2026-08-10`) | GA2.4/2.5/2.11 PASS; evidência `20260810T200329Z-30.5-strip`; `-fvisibility=hidden`; sem ofuscação |
 | BG-116 | Anti-rollback de relógio (marca persistente + degradação para monitor) | Alta | daemon/licenciamento | AP1 / passo `30.6` | `date` para trás estende licença expirada indefinidamente (A-03) | M | Alto | **Concluido** (`30.6` + release `1.9.51`, `2026-08-10`) | GA3 PASS (GA3.7 DEFERRED); evidência `20260810T201043Z-30.6-anti-rollback`; RR-4 no runbook |
-| BG-117 | Token de subscrição na entrega de blacklists/catálogos; retirar espelho público corrente | Alta | blacklists + license server | AP2 / passos `30.8`–`30.11` | cópia pirata mantém-se actualizada indefinidamente (A-06) | G | **Alto** | **Aberto** — cliente+e2e `1.9.54` PASS + **30.9 live**; falta **`30.11`** | GA4.4 PASS (`20260811T114320Z`); produção `.254`=`1.9.54`; RR-1 |
+| BG-117 | Token de subscrição na entrega de blacklists/catálogos; retirar espelho público corrente | Alta | blacklists + license server | AP2 / passos `30.8`–`30.11` | cópia pirata mantém-se actualizada indefinidamente (A-06) | G | **Alto** | **Aberto** — cliente+e2e `1.9.54` PASS + **30.9 live** + primary auth GET PASS (`20260812T003214Z`); falta **cut** **`30.11`** | GA4.4 PASS; primary 200/200+401; cut/GA4.10 PENDENTE; RR-1 |
 | BG-118 | Check-in `true` por defeito + política de migração | Alta | package + licenciamento | AP3 / passo `30.14` | revogação no painel não corta appliance instalado (A-04) | M | Alto | **Aberto — exige GO próprio** | **reabre/emenda BG-101**; cria dependência de rede; runbook obrigatório; gate GA5 |
 | BG-119 | Resposta de check-in assinada com nonce; rejeitar não assinada | Alta | daemon + license server | AP3 / passos `30.12`–`30.13` | servidor falso via `/etc/hosts` mantém licença viva (A-05) | M | Alto | **Aberto** | sem pinning hoje; ADR-0032 emenda ADR-0021; gate GA5 |
 | BG-120 | Estado de entitlements assinado para a GUI; eliminar fallback sem verificação | Media | package/GUI | AP1 / passo `30.7` | stats forjados desbloqueiam UX de Identity/MITM (A-07) | M | Medio | **Concluido** (`30.7` + release `1.9.52`, `2026-08-10`) | GA2.8–2.10 PASS; evidência `20260810T214800Z-30.7-entitlements`; verify via `pkeyutl` |

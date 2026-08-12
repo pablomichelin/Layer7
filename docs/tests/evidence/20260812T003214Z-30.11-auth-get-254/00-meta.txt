@@ -1,0 +1,6 @@
+RUNID=20260812T003214Z
+scope=GET HTTPS authenticated primary only
+host=192.168.100.254
+no_token_export=1
+no_update_blacklists=1
+2026-08-12T00:32:14Z
