@@ -181,8 +181,8 @@ indisponibilidade de rede em firewall parado.
 
 | # | Critério | Estado |
 |---|----------|--------|
-| GA6.1 | Decisão de licença distribuída sem regressão de enforce (**N1**, **N2**) | **PENDENTE** |
-| GA6.2 | Código continua legível e mantível apesar da distribuição de decisão | **PENDENTE** |
+| GA6.1 | Decisão de licença distribuída sem regressão de enforce (**N1**, **N2**) | **PASS** (unit `30.16` — `test_license_enforce_gate.c`) |
+| GA6.2 | Código continua legível e mantível apesar da distribuição de decisão | **PASS** — módulo puro `license_enforce_gate.c` + `enforce_armed` sem ofuscação |
 | GA6.3 | Marcação por cliente implementada com avaliação de privacidade registada | **PENDENTE** |
 | GA6.4 | Sem telemetria introduzida (coerente com a política do produto) | **PENDENTE** |
 | GA6.5 | Releases publicam manifesto + `.sig` + chave pública (ADR-0023 / F1.2) | **PENDENTE** |
@@ -193,6 +193,9 @@ indisponibilidade de rede em firewall parado.
 | GA6.10 | O que ficou sem prova em pfSense CE declarado (**R-L**, ADR-0022) | **PENDENTE** |
 | GA6.11 | Fecho registado no CORTEX e no `ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | **PENDENTE** |
 | GA6.12 | Decisão §5 n.º 8 (releases antigas com bypass) executada ou risco residual aceite por escrito (RR-3) | **PENDENTE** |
+
+**Estado GA6:** **parcial** — GA6.1/6.2 **PASS** (`30.16`); restante → `30.17`–`30.19`.
+Evidência `30.16`: `docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/`.
 
 **Saída:** trilha fechada, com limites declarados sem overclaim.
 

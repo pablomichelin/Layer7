@@ -78,6 +78,16 @@ int layer7_hw_fingerprint(char *out, size_t outsz);
 int layer7_license_check(struct l7_license_info *info);
 
 /*
+ * 30.16 / BG-122 — gates de enforce (puros, sem I/O).
+ * Gate A: bit canónico `valid`.
+ * Gate B: recomputa a partir de expiry/expired/grace/clock_suspect.
+ * allows_enforce: ambos 1; discordância ⇒ 0 (monitor / N2).
+ */
+int layer7_license_gate_a(const struct l7_license_info *li);
+int layer7_license_gate_b(const struct l7_license_info *li);
+int layer7_license_allows_enforce(const struct l7_license_info *li);
+
+/*
  * Avalia anti-rollback temporal (puro — sem I/O). Retorna 1 se suspeito
  * (retrocesso > L7_CLOCK_SUSPECT_SEC), 0 caso contrário.
  * Nunca move *new_max_seen para trás. Usado por license_check e testes.

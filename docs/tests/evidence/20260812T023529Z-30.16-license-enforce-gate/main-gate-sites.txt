@@ -1,0 +1,21 @@
+294:	    s_lic.valid ? "true" : "false");
+916:static void refresh_enforce_cfg(void);
+920: * Revalida nos hot-paths para que um NOP isolado em refresh_enforce_cfg
+924:enforce_armed(void)
+926:	return s_ge && layer7_license_allows_enforce(&s_lic);
+954:	refresh_enforce_cfg();
+1184:			refresh_enforce_cfg();
+1496:	if (!dec || !enforce_armed() ||
+1532:	if (!dec || !enforce_armed())
+1881:	if (!s_have_parse || cfg_disabled(&s_parsed) || !enforce_armed())
+1892:	    enforce_armed(), iface, client_ip, domain, NULL, NULL, &dec);
+2036:	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, enforce_armed(),
+2089:	if (!enforce_armed())
+2417:refresh_enforce_cfg(void)
+2424:	/* Ponto de decisão 1: cruzamento gate_a ∩ gate_b (não só s_lic.valid). */
+2425:	if (ge && !layer7_license_allows_enforce(&s_lic))
+2737:		refresh_enforce_cfg();
+3149:	 * Licenca ANTES do primeiro apply_config (QA D3): refresh_enforce_cfg()
+3150:	 * exige s_lic.valid; se a licenca viesse depois, o log inicial ficava
+3202:		refresh_enforce_cfg();
+3483:					refresh_enforce_cfg();

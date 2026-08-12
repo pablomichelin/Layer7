@@ -125,17 +125,22 @@ Agravantes:
 
 ### A-02 — Ponto único de decisão do enforce
 
+> **Mitigação (`30.16` / `20260812T023529Z`):** gates A/B cruzados
+> (`license_enforce_gate.c`) + revalidação `enforce_armed()` nos hot-paths.
+> Residual **R-A:** root ainda pode patchar múltiplos sítios; custo sobe
+> face ao NOP único histórico.
+
 **Severidade: Alta. Custo de exploração: horas (T4).**
 
-Toda a ligação entre licença e bloqueio é uma comparação isolada:
+Historicamente a ligação entre licença e bloqueio era uma comparação isolada:
 
 ```
-src/layer7d/main.c:2406-2407
+src/layer7d/main.c (pré-30.16)
 	if (ge && !s_lic.valid)
 		ge = 0;
 ```
 
-Neutralizar essas instruções activa enforce sem licença nenhuma. Um único
+Neutralizar essas instruções activava enforce sem licença nenhuma. Um único
 ponto de falha é exactamente o que um atacante procura primeiro.
 
 ### A-03 — Relógio para trás não é detectado

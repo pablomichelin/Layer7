@@ -6,6 +6,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **Anti-pirataria 30.16 / BG-122 — decisão de licença distribuída:** gates A/B
+  com cruzamento (`license_enforce_gate.c`); `refresh_enforce_cfg` + hot-paths
+  (`enforce_armed`) deixam de depender do `if` único sobre `s_lic.valid`
+  (mitiga A-02; R-A permanece). Unit N1/N2 + anti-forja **PASS**. Candidato
+  `PORTVERSION=1.9.57` — **sem** GitHub Release / `.254` / license-server.
+  GA6.1/GA6.2 PASS (unit). Evidência
+  `docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/`.
+
 - **Anti-pirataria 30.14 / BG-118 — check-in default ON (GO humano):**
   `check_in_enabled: true` em `layer7.json.sample` / bare config (instalações
   novas); upgrade **não** altera valor já gravado (`false`/ausente = OFF);

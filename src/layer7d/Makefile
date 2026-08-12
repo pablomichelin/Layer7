@@ -11,7 +11,8 @@
 # Lab com bypass dev (NÃO usar em package): make L7_DEV_BUILD=1
 
 LAYER7_COMMON = ../common
-SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c features.c \
+SRCS_BASE = main.c config_parse.c policy.c enforce.c license.c \
+	license_enforce_gate.c features.c \
 	blacklist.c bl_config.c allowlist.c log_store.c identity_map.c \
 	identity_ldap.c identity_radius.c identity_dc.c
 OUT ?= layer7d

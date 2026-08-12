@@ -915,6 +915,17 @@ pf_table_flush_logged(const char *table, const char *ctx)
 
 static void refresh_enforce_cfg(void);
 
+/*
+ * 30.16 / BG-122 — enforce só se s_ge e cruzamento de gates de licença.
+ * Revalida nos hot-paths para que um NOP isolado em refresh_enforce_cfg
+ * não active bloqueio sem licença (mitiga A-02; R-A permanece).
+ */
+static int
+enforce_armed(void)
+{
+	return s_ge && layer7_license_allows_enforce(&s_lic);
+}
+
 static void
 enforce_ge_downgrade(int prev_ge, const char *reason)
 {
@@ -1482,7 +1493,8 @@ layer7_apply_policy_allow_enforcement(const struct layer7_decision *dec,
 	char tbl[64];
 	int r;
 
-	if (!dec || dec->action != LAYER7_ACTION_ALLOW ||
+	if (!dec || !enforce_armed() ||
+	    dec->action != LAYER7_ACTION_ALLOW ||
 	    dec->reason != L7_DECIDE_POLICY_MATCH ||
 	    dec->policy_table_idx < 0 ||
 	    !dst_ip || !layer7_pf_host_enforce_ok(dst_ip))
@@ -1517,7 +1529,7 @@ layer7_apply_block_enforcement(const struct layer7_decision *dec,
 	const char *ip;
 	int r;
 
-	if (!dec || !s_ge)
+	if (!dec || !enforce_armed())
 		return;
 
 	r = layer7_pf_resolve_block_target(dec, src_ip, dst_ip, scoped_hybrid,
@@ -1866,7 +1878,7 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 	int scoped;
 	int dom_allow, ip_allow;
 
-	if (!s_have_parse || cfg_disabled(&s_parsed) || !s_ge)
+	if (!s_have_parse || cfg_disabled(&s_parsed) || !enforce_armed())
 		return;
 
 	L7_EVENT_DBG(iface,
@@ -1876,8 +1888,8 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 
 	scoped = enforcement_is_scoped_hybrid();
 	memset(&dec, 0, sizeof(dec));
-	(void)layer7_decide_for_client(s_exc, s_nx, s_rules, s_np, s_ge,
-	    iface, client_ip, domain, NULL, NULL, &dec);
+	(void)layer7_decide_for_client(s_exc, s_nx, s_rules, s_np,
+	    enforce_armed(), iface, client_ip, domain, NULL, NULL, &dec);
 	if (resolved_ip && *resolved_ip) {
 		strncpy(dec.enforce_dst_ip, resolved_ip,
 		    sizeof(dec.enforce_dst_ip) - 1);
@@ -2021,8 +2033,8 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		    host ? host : "-", ndpi_app ? ndpi_app : "-");
 		return;
 	}
-	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, s_ge, iface, src_ip,
-	    ndpi_app, ndpi_cat, host, &dec);
+	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, enforce_armed(),
+	    iface, src_ip, ndpi_app, ndpi_cat, host, &dec);
 
 	s_total_classified++;
 	if (dec.action == LAYER7_ACTION_BLOCK) {
@@ -2074,7 +2086,7 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		    layer7_decide_reason_str(dec.reason));
 	}
 
-	if (!s_ge)
+	if (!enforce_armed())
 		return;
 
 	if (layer7_decision_is_explicit_allow(&dec) && dst_ip &&
@@ -2409,7 +2421,13 @@ refresh_enforce_cfg(void)
 	if (s_have_parse && !cfg_disabled(&s_parsed) &&
 	    s_parsed.has_mode && strcmp(s_parsed.mode, "enforce") == 0)
 		ge = 1;
-	if (ge && !s_lic.valid)
+	/* Ponto de decisão 1: cruzamento gate_a ∩ gate_b (não só s_lic.valid). */
+	if (ge && !layer7_license_allows_enforce(&s_lic))
+		ge = 0;
+	/* Ponto de decisão 2: reconfirmação redundante legível (GA6.2). */
+	if (ge && !layer7_license_gate_a(&s_lic))
+		ge = 0;
+	if (ge && !layer7_license_gate_b(&s_lic))
 		ge = 0;
 	s_ge = ge;
 }

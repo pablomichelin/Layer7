@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.56
+PORTVERSION=	1.9.57
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -34,7 +34,7 @@ WITH_LAYER7_TLSPROXY?=	yes
 LAYER7_HARDEN_CFLAGS=	-fvisibility=hidden
 
 LAYER7_COMMON=	${.CURDIR}/../../src/common
-.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c) || !exists(${LAYER7D_DIR}/identity_ldap.c) || !exists(${LAYER7D_DIR}/identity_radius.c) || !exists(${LAYER7D_DIR}/identity_dc.c)
+.if !exists(${LAYER7D_DIR}/main.c) || !exists(${LAYER7D_DIR}/config_parse.c) || !exists(${LAYER7D_DIR}/policy.c) || !exists(${LAYER7D_DIR}/enforce.c) || !exists(${LAYER7D_DIR}/license.c) || !exists(${LAYER7D_DIR}/license_enforce_gate.c) || !exists(${LAYER7D_DIR}/features.c) || !exists(${LAYER7D_DIR}/blacklist.c) || !exists(${LAYER7D_DIR}/bl_config.c) || !exists(${LAYER7D_DIR}/allowlist.c) || !exists(${LAYER7D_DIR}/log_store.c) || !exists(${LAYER7D_DIR}/identity_map.c) || !exists(${LAYER7D_DIR}/identity_ldap.c) || !exists(${LAYER7D_DIR}/identity_radius.c) || !exists(${LAYER7D_DIR}/identity_dc.c)
 .error "layer7d: fontes em falta em ${LAYER7D_DIR}/ (main.c … identity_dc.c)."
 .endif
 .if ${WITH_LAYER7_TLSPROXY:tl} == yes
@@ -81,6 +81,7 @@ do-build:
 		${LAYER7_NDPI_CFLAGS} ${LAYER7_LDAP_CFLAGS} -o ${WRKSRC}/layer7d \
 		${LAYER7D_DIR}/main.c ${LAYER7D_DIR}/config_parse.c ${LAYER7D_DIR}/policy.c \
 		${LAYER7D_DIR}/enforce.c ${LAYER7D_DIR}/license.c \
+		${LAYER7D_DIR}/license_enforce_gate.c \
 		${LAYER7D_DIR}/features.c \
 		${LAYER7D_DIR}/blacklist.c ${LAYER7D_DIR}/bl_config.c \
 		${LAYER7D_DIR}/allowlist.c ${LAYER7D_DIR}/log_store.c \

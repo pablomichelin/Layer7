@@ -1,0 +1,14 @@
+PASS: N1 gate_a valid
+PASS: N1 gate_b structural
+PASS: N1 allows_enforce
+PASS: N2 missing license
+PASS: N2 NULL
+PASS: N2 expired no grace
+PASS: grace allows enforce
+PASS: clock_suspect gate_b
+PASS: clock_suspect cruzamento nega
+PASS: forged valid bit
+PASS: forged sem expiry
+PASS: A-02 forged valid sem material
+PASS: A-02 valid+expired sem grace
+RESULT: PASS
