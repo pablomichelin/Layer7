@@ -4,6 +4,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.60] — 2026-08-13
+
+### Fixed
+
+- **MITM rc.d / GA2.9:** `layer7-mitm-entitle-ok` passa a resolver PHP/Python
+  por caminho absoluto (`/usr/local/bin/php`). O PATH do `rc.d` é
+  `/sbin:/bin:/usr/sbin:/usr/bin` e não via `php` no PATH — o helper
+  recusava arranque mesmo com `.lic` `mitm` assinado (P4 retry `170000Z`).
+  Entitlement **não** foi enfraquecido. Teste PATH curto em
+  `test_entitlements_gui.php`. **Não** promove enforce `1.9.8` nem MITM
+  permanente. Soak P4 no `.254` **não** é actualizado neste bloco.
+
 ## [1.9.59] — 2026-08-13
 
 ### Added

@@ -1,9 +1,11 @@
-# START HERE — Identity + MITM Add-on 【P4.1 `1.9.59` publicado · P5 aguarda ficha】
+# START HERE — Identity + MITM Add-on 【P4 soak IN_PROGRESS · `1.9.60` entitle-ok PATH】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
 > **P4 CLOSED FAIL/ABORT** (`234042Z`) — supervisor nao armado; rollback limpo; **não** PASS 4h.  
-> **P4.1** **`1.9.59`** publicado — supervisor on-box (cron 1 min); **sem** MITM permanente.  
+> **P4.1** **`1.9.59`** publicado — supervisor on-box (cron 1 min).  
+> **P4 retry** `170000Z` **IN_PROGRESS** no `.254` (não PASS neste turno).  
+> **`1.9.60`** — `entitle-ok` PATH absoluto (rc.d); **não** upgrade do soak.  
 > **P5** aguarda **ficha de site de cliente** — **proibido** piloto externo/permanente.  
 > **Gate C / GO teste** (`1.9.46`, `215442Z`) — **NÃO** permanente.  
 > Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
@@ -52,8 +54,8 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; publicado **`1.9.59`**; P3 em `1.9.47`; P4 FAIL/ABORT; P4.1 **publicado** |
-| Passo actual | **P4 retry** (GO lab + `1.9.59`); MITM OFF até arranque do soak; permanente **NO-GO** |
+| Plano | Identity **FECHADA**; MITM **GO produto**; P4.1 `1.9.59`; P4 retry **IN_PROGRESS**; candidato **`1.9.60`** (entitle-ok PATH) |
+| Passo actual | **P4 soak IN_PROGRESS** (`170000Z`); permanente **NO-GO**; **não** upgrade `.254` a meio do soak |
 | Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 FAIL/ABORT; P4.1 publicado; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | P4.1 / retry | [`../09-blocking/runbook-p4-retry-supervisor-onbox.md`](../09-blocking/runbook-p4-retry-supervisor-onbox.md) |

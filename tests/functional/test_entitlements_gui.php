@@ -44,7 +44,13 @@ function l7_ent_cleanup($testdir)
 }
 
 /* Gerar keypair Ed25519 efémero para o teste (não usa pubkey de produção). */
-$openssl = is_executable("/usr/bin/openssl") ? "/usr/bin/openssl" : "openssl";
+$openssl = "openssl";
+foreach (array("/usr/local/bin/openssl", "/usr/bin/openssl") as $cand) {
+	if (is_executable($cand)) {
+		$openssl = $cand;
+		break;
+	}
+}
 $priv = $testdir . "/test-priv.pem";
 $pub = $testdir . "/usr/local/share/pfSense-pkg-layer7/license-signing-public-key.pem";
 exec(escapeshellarg($openssl) . " genpkey -algorithm ED25519 -out " .
@@ -69,7 +75,8 @@ function l7_sign_lic($priv, $features, $path)
 	$data_f = $td . "/data";
 	$sig_f = $td . "/sig";
 	file_put_contents($data_f, $data);
-	$openssl = is_executable("/usr/bin/openssl") ? "/usr/bin/openssl" : "openssl";
+	$openssl = is_executable("/usr/local/bin/openssl") ? "/usr/local/bin/openssl" :
+	    (is_executable("/usr/bin/openssl") ? "/usr/bin/openssl" : "openssl");
 	exec(escapeshellarg($openssl) . " pkeyutl -sign -inkey " .
 	    escapeshellarg($priv) . " -rawin -in " . escapeshellarg($data_f) .
 	    " -out " . escapeshellarg($sig_f) . " 2>/dev/null", $out, $rc);
@@ -157,6 +164,19 @@ need($erc === 0, "entitle-ok PASS with mitm signed");
 l7_sign_lic($priv, "base,identity", $lic);
 exec($cmd . " 2>/dev/null", $eo2, $erc2);
 need($erc2 !== 0, "entitle-ok FAIL without mitm token");
+
+/* 1.9.60: rc.d PATH curto nao inclui /usr/local/bin — php absoluto. */
+l7_sign_lic($priv, "base,mitm", $lic);
+$cmd_rcpath = "env -i PATH=/sbin:/bin:/usr/sbin:/usr/bin" .
+    " LAYER7_LIC_PATH=" . escapeshellarg($lic) .
+    " LAYER7_LICENSE_PUBKEY=" . escapeshellarg($pub) .
+    " OPENSSL_BIN=" . escapeshellarg($openssl) .
+    " /bin/sh " . escapeshellarg($entitle);
+exec($cmd_rcpath . " 2>/dev/null", $eo3, $erc3);
+need($erc3 === 0, "entitle-ok PASS under rc.d PATH with mitm");
+l7_sign_lic($priv, "base,identity", $lic);
+exec($cmd_rcpath . " 2>/dev/null", $eo4, $erc4);
+need($erc4 !== 0, "entitle-ok FAIL under rc.d PATH without mitm");
 
 /* Sync helper em TEST_ROOT ainda aceita entitled forçado (GA2.10 / R-I). */
 $cfg = layer7_bare_config();
