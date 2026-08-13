@@ -1,6 +1,6 @@
 # Runbook — P4.1 supervisor on-box + retry P4 (sem activação neste bloco)
 
-**Estado:** **P4.1 código local** `2026-08-13` — candidato `1.9.59`; **sem** publish; **sem** activar MITM.  
+**Estado:** **P4.1 publicado** `2026-08-13` — `v1.9.59`; **sem** MITM permanente. Retry P4 no `.254` após install.  
 **Causa P4 FAIL/ABORT:** supervisor remoto/failsafe **não armado** (aprovação Skip); P3 auto-expiry sozinho foi considerado insuficiente como failsafe operacional.  
 **Evidência P4:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/).  
 **Mapa:** [`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md).  

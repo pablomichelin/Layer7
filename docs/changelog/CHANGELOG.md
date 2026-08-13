@@ -4,7 +4,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-## [1.9.59] — candidato (P4.1, sem publish)
+## [1.9.59] — 2026-08-13
 
 ### Added
 
@@ -15,7 +15,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   GUI mostra o estado. O tick **nunca** liga `mitm.enabled`.
   Testes `test_mitm_config.php` + `test_mitm_regress.php` PASS.
   Runbook: `docs/09-blocking/runbook-p4-retry-supervisor-onbox.md`.
-  **Não** activa MITM; **não** autoriza P4 retry nem P5 sem GO/ficha.
+  Publicado `v1.9.59` (`SHA256=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9`).
+  **Não** promove enforce `1.9.8` nem MITM permanente.
 
 ## [1.9.58] — 2026-08-13
 

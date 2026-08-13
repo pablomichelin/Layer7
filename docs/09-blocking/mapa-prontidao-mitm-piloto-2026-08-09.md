@@ -1,7 +1,7 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 CLOSED FAIL/ABORT** (supervisor nao armado; rollback limpo); **P4.1** supervisor on-box **local** (`1.9.59`; sem publish); **P5 aguarda ficha de site de cliente**.  
+**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 CLOSED FAIL/ABORT** (supervisor nao armado; rollback limpo); **P4.1** supervisor on-box **publicado** (`1.9.59`); **P5 aguarda ficha de site de cliente**.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
 **P4 evidência:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT**.  
@@ -51,7 +51,7 @@
 
 | ID | Lacuna | Porquê bloqueia piloto | Severidade |
 |----|--------|------------------------|------------|
-| T1 | **Sem failsafe de janela longa** | P3 auto-disable + **P4.1 cron on-box** (local `1.9.59`); prova de soak 4h ainda falta (P4 FAIL) | Alta (ops) |
+| T1 | **Sem failsafe de janela longa** | P3 auto-disable + **P4.1 cron on-box** (`1.9.59` publicado); prova de soak 4h ainda falta (P4 FAIL) | Alta (ops) |
 | T2 | **Observabilidade operador insuficiente para soak** | Contadores/banner/`mitm_effective` claros na GUI durante ON; evidência só de janela curta | Alta |
 | T3 | **S6 ECH = NA/limite** | Comportamento previsível documentado, **não** exercitado; piloto deve declarar limite honesto | Média (aceite se honesto) |
 | T4 | **Prova CE física ausente** | Lab = pfSense Plus; ADR-0022 — não inferir CE só de Plus | Média |
@@ -150,7 +150,7 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | Builder `test_mitm_config` + `test_mitm_regress` PASS — [`20260809T230400Z-p3-mitm-window`](../tests/evidence/20260809T230400Z-p3-mitm-window/) |
 | Rollback | Pacote `1.9.46` |
 
-### Bloco P4.1 — Supervisor on-box (código) — **PASS local** (`1.9.59` candidato)
+### Bloco P4.1 — Supervisor on-box (código) — **PASS publicado** (`1.9.59`)
 
 | Campo | Valor |
 |-------|--------|
@@ -160,7 +160,7 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | `test_mitm_config.php` + `test_mitm_regress.php` PASS |
 | Rollback | Pacote `1.9.58` |
 | Runbook | [`runbook-p4-retry-supervisor-onbox.md`](runbook-p4-retry-supervisor-onbox.md) |
-| Estado | Código local; **sem** publish; **sem** activar MITM |
+| Estado | **`v1.9.59` publicado**; **sem** MITM permanente; P4 retry no `.254` |
 
 ### Bloco P4 — Soak lab controlado (evidência) — **CLOSED FAIL/ABORT** `20260809T234042Z`
 
@@ -264,7 +264,7 @@ MITM motor scoped (1.9.46+) ....... PRONTO PARA TESTE CONTROLADO (evidência 215
 P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
 P3 failsafe+visibilidade .......... PASS código (1.9.47; P3.1–P3.8; evid. 230400Z)
 Gate activação externa ............ Ficha site nomeada (cliente/resp/src/dst/SNI/janela/saída) — NÃO é gap eng.
-MITM pronto para ACTIVAR PILOTO ... NÃO (P4 FAIL/ABORT; P4.1 local; P5 aguarda ficha; sem piloto externo/permanente)
+MITM pronto para ACTIVAR PILOTO ... NÃO (P4 FAIL/ABORT; P4.1 publicado; P5 aguarda ficha; sem piloto externo/permanente)
 MITM permanente / produção ........ NO-GO (decisão humana)
 ```
 
@@ -291,4 +291,5 @@ MITM permanente / produção ........ NO-GO (decisão humana)
 | 2026-08-09 | P1+P2 reflectidos — D1–D9 |
 | 2026-08-09 | Gate activação externa ≠ lacuna eng.; critérios aceite P3.1–P3.8 fechados |
 | 2026-08-09 | **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS |
+| 2026-08-13 | **P4.1 publicado** — `v1.9.59`; supervisor on-box; P4 retry no `.254` |
 | 2026-08-13 | **P4.1 local** — supervisor on-box cron; candidato `1.9.59`; sem publish/activar |

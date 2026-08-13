@@ -1,9 +1,9 @@
-# START HERE — Identity + MITM Add-on 【P4.1 `1.9.59` local · P5 aguarda ficha】
+# START HERE — Identity + MITM Add-on 【P4.1 `1.9.59` publicado · P5 aguarda ficha】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
 > **P4 CLOSED FAIL/ABORT** (`234042Z`) — supervisor nao armado; rollback limpo; **não** PASS 4h.  
-> **P4.1** candidato **`1.9.59`** (local) — supervisor on-box (cron 1 min); **sem** publish; **sem** activar MITM.  
+> **P4.1** **`1.9.59`** publicado — supervisor on-box (cron 1 min); **sem** MITM permanente.  
 > **P5** aguarda **ficha de site de cliente** — **proibido** piloto externo/permanente.  
 > **Gate C / GO teste** (`1.9.46`, `215442Z`) — **NÃO** permanente.  
 > Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
@@ -52,16 +52,16 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; publicado **`1.9.58`**; P3 em `1.9.47`; P4 FAIL/ABORT; P4.1 candidato **`1.9.59`** (local) |
-| Passo actual | **P4.1** supervisor on-box (código local `1.9.59`); MITM OFF; permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 FAIL/ABORT; P4.1 local; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; publicado **`1.9.59`**; P3 em `1.9.47`; P4 FAIL/ABORT; P4.1 **publicado** |
+| Passo actual | **P4 retry** (GO lab + `1.9.59`); MITM OFF até arranque do soak; permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 FAIL/ABORT; P4.1 publicado; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | P4.1 / retry | [`../09-blocking/runbook-p4-retry-supervisor-onbox.md`](../09-blocking/runbook-p4-retry-supervisor-onbox.md) |
 | Gate activação externa | Ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | **P4 retry só com GO lab** + pacote `1.9.59`; **P5 só com ficha**; MITM OFF; **proibido** piloto externo/permanente |
+| Próximo | **P4 retry** no `.254` com `1.9.59` + supervisor armado; **P5 só com ficha**; MITM OFF permanente; **proibido** piloto externo |
 | Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT** |
-| Rev. do plano | **`2026-08-13ax`** |
+| Rev. do plano | **`2026-08-13ay`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |

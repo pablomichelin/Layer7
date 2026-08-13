@@ -35,8 +35,10 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.58` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.58`;
-`SHA256=8b4a2dc6ecd62c126222186112ea80ee75407d35c35049f94631980092108d3d`;
+`1.9.59` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.59`;
+`SHA256=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9`;
+**P4.1** supervisor on-box; herda F1.2 de `1.9.58`
+(`SHA256=8b4a2dc6ecd62c126222186112ea80ee75407d35c35049f94631980092108d3d`);
 **BG-028 Fase 1 / F1.2** — manifesto + `.sig` + `install.sh` carimbado;
 fingerprint pubkey release
 `d26e3f007e81298bad910f99dd62a22e2109740158b3b3c7f4e79490bdc5a998`;
@@ -1342,7 +1344,7 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM GO 2026-08-08)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção: **`1.9.8`**. Publicado: **`1.9.58`**. MITM P3: **`1.9.47`**. P4.1 candidato: **`1.9.59`** (local).
+Baseline produção: **`1.9.8`**. Publicado: **`1.9.59`**. MITM P3: **`1.9.47`**. P4.1: **`1.9.59`**.
 **IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
 **20.8 PASS** → **20.9 PASS** → **GO produto** → **20.10a PASS** → **20.10b PASS** →
 **20.11 PASS** → **`1.9.42` PASS** source∧dest → **`1.9.46` Gate C PASS**;
@@ -1372,7 +1374,7 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 - **Ordem:** IM0→IM1→20.7a DEFER→IM3–IM9 FECHADA→20.8→20.9→20.10a→20.10b→20.11→**`1.9.42`**
 - **Não-regressão:** módulos default OFF; daemon autoridade do gate
 - **Rev. plano:** `2026-08-13ax`
-- **Mapa prontidão piloto:** [`docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar externo**; P1+P2+**P3 PASS**; **P4 CLOSED FAIL/ABORT**; **P4.1 local `1.9.59`**; **P5 aguarda ficha**
+- **Mapa prontidão piloto:** [`docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar externo**; P1+P2+**P3 PASS**; **P4 CLOSED FAIL/ABORT**; **P4.1 publicado `1.9.59`**; **P5 aguarda ficha**
 - **P4.1 runbook:** [`docs/09-blocking/runbook-p4-retry-supervisor-onbox.md`](docs/09-blocking/runbook-p4-retry-supervisor-onbox.md)
 - **P1 escopo:** [`docs/09-blocking/GO-escopo-piloto-mitm-generico.md`](docs/09-blocking/GO-escopo-piloto-mitm-generico.md)
 - **P2 runbook piloto:** [`docs/09-blocking/runbook-piloto-mitm-generico.md`](docs/09-blocking/runbook-piloto-mitm-generico.md)
@@ -1398,16 +1400,16 @@ anti-QUIC UDP/443 escopo; default OFF; Squid **rejeitado**; GI2/GI3 **PASS** lab
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **P4.1** supervisor on-box (candidato 1.9.59 local; MITM OFF)
-- Prontidão piloto: **NÃO PRONTO activar externo** (P1+P2+P3 PASS; P4 FAIL/ABORT; P4.1 local; P5 aguarda ficha)
+- Passo actual: **P4 retry** (`1.9.59` publicado; MITM OFF até soak)
+- Prontidão piloto: **NÃO PRONTO activar externo** (P1+P2+P3 PASS; P4 FAIL/ABORT; P4.1 publicado; P5 aguarda ficha)
 - P4: 20260809T234042Z — CLOSED FAIL/ABORT (supervisor nao armado; rollback limpo)
-- P4.1: cron 1 min + stamp + GUI; testes MITM PASS; sem publish; sem activar
+- P4.1: cron 1 min + stamp + GUI; testes MITM PASS; `v1.9.59` publicado
 - Gate activação externa: ficha site nomeada (≠ gap eng.) — **proibido** piloto externo/permanente sem P5
 - Gates: B/C PASS; GO teste .254 PASS (215442Z; 1.9.46)
 - Evidência P3: 20260809T230400Z-p3-mitm-window
 - Runbook P4.1: docs/09-blocking/runbook-p4-retry-supervisor-onbox.md
-- Próximo MITM: **P4 retry só com GO lab** + 1.9.59; **P5 só com ficha**; MITM OFF; `.234/.235` proibidos
-- Latest publicado: **1.9.58**; MITM P3 em 1.9.47
+- Próximo MITM: **P4 retry** no `.254` com `1.9.59`; **P5 só com ficha**; MITM OFF permanente; `.234/.235` proibidos
+- Latest publicado: **1.9.59** (P4.1); MITM P3 em 1.9.47
 - Identity rede: FECHADA (20.33 / GI9 PASS); Squid REJEITADO
 ```
 
@@ -1416,7 +1418,7 @@ TRILHA IDENTITY + MITM — progresso
 ## Trilha Anti-pirataria / Anti-tamper (aberta 2026-08-10)
 
 Nova trilha pós-fecho. **Não** reabre P0–J, IPv6 nem Identity de rede.
-Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.58`** (F1.2; rollback lab `1.9.54`).
+Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.59`** (P4.1; rollback lab `1.9.58`).
 Produção `.254` observada: **`1.9.54`** (e2e PASS `20260811T114320Z`; **não**
 actualizada neste bloco BG-028).
 **`30.10` FECHADO** (código + fix + e2e campo): token `1.9.53` + `fetch_authed`
@@ -1575,7 +1577,7 @@ TRILHA ANTI-PIRATARIA — FECHADA
 - GA5.9 campo PENDENTE (fora do fecho documental)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)
-- Produção .254: 1.9.54; lab/latest: 1.9.58 (F1.2)
+- Produção .254: 1.9.54; lab/latest: 1.9.59 (P4.1)
 - Não reabrir sem GO + backlog
 ```
 
@@ -1785,8 +1787,8 @@ CHECKPOINT CANONICO
 - Portal visual: **2.0.0** (RBAC)
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Pack produto: docs/00-overview/pack-produto-layer7.md → prd / uml / catalogo
-- Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.47** P3 PASS; **P4.1** candidato `1.9.59` local; Gate B+C/`215442Z` em `1.9.46`; permanente **NO-GO**; Squid rejeitado
-- MITM piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; **P4 CLOSED FAIL/ABORT**; **P4.1 local**; **P5 aguarda ficha**
+- Trilha Identity + MITM: Identity rede **FECHADA**; **1.9.47** P3 PASS; **P4.1** `1.9.59` publicado; Gate B+C/`215442Z` em `1.9.46`; permanente **NO-GO**; Squid rejeitado
+- MITM piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; **P4 CLOSED FAIL/ABORT**; **P4.1 publicado**; **P5 aguarda ficha**
 - Gate activação externa: ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md
@@ -1796,7 +1798,7 @@ CHECKPOINT CANONICO
 - Evidência Gate C: docs/tests/evidence/20260809T210753Z-phaseBD-d1-254/
 - Preflight: docs/tests/evidence/20260809T215218Z-preflight-mitm-254/
 - Evidência GO teste: docs/tests/evidence/20260809T215442Z-phaseBD-d1-254/
-- Proximo trabalho MITM: **P4 retry só com GO lab** + `1.9.59`; **P5 só com ficha**; MITM OFF; `.234/.235` proibidos
+- Proximo trabalho MITM: **P4 retry** no `.254` com `1.9.59`; **P5 só com ficha**; MITM OFF permanente; `.234/.235` proibidos
 - Runbook P4.1: docs/09-blocking/runbook-p4-retry-supervisor-onbox.md
 - Appliance `.254`: **`1.9.47`** MONITOR / MITM OFF (pós-P4); sem piloto externo
 - Smoke LAB `.24`: limpo pós-rollback P4; `.234/.235` intocados
