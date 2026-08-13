@@ -274,8 +274,8 @@ reavaliacao formal.
 | BG-075 | Materializar tabelas PF estaticas VIP/excepcoes (`exc_allow`/`pexc`/`blsrc`) no PF live | Critica | package/PF | Caminho B / F4.3 | VIP correcto no JSON/rules.debug mas `pfctl -t layer7_exc_allow_N` = Table does not exist; sem `L7ALLOW` o VIP cai no block global | P | Alto | Concluido codigo (`1.8.11_64`); gate appliance pendente | padrao 1.5.3 + replace de membros; `layer7_static_origin_tables_apply_to_pf` em resync; ensure `exc_allow_0..15`; producao enforce continua `_24` |
 | BG-076 | GUI i18n EN/PT completo + icones FA6 Perfis rapidos + renome Mensagens | Media | package/GUI | Caminho A / UX F4.3 | opcoes novas so em PT; marcas FA4 mostram X branco no FA6 do pfSense; label Mensageria | M | Medio | Concluido codigo (`1.8.11_65`); gate appliance pendente | so apresentacao: `en.php`, `layer7_profile_icon_*`, `profiles.json` labels; id `mensageria` intacto; zero mudanca daemon/enforcement; producao enforce continua `_24` |
 | BG-077 | Check-in online periodico e revogacao remota de licenca (cancelamento comercial) | **Critica** | license-server/daemon/licenciamento | **F3+** (bloqueante comercial recomendado antes GO enforce) | revogacao no servidor nao corta appliance; cliente cancelado continua em enforce ate expiry+grace offline | G | **Alto** | **Implementado** (`2026-08-04`) | API `244` + daemon `1.8.11_68`; S14 PASS; flag `check_in_enabled` default OFF; ADR-0021; plano `f3-plano-check-in-online-revogacao-remota.md` |
-| BG-124 | Lista VIP em texto simples (export/import .txt + editor em lote) | Media | package/GUI | F4.3 / UX | operador PME edita JSON, falha com «JSON invalido» (virgula final) | P | Alto | **Codigo no branch** (`1.9.61` candidato; nao publicado) | uma linha `IP, nome`; JSON legado aceite; `test_vip_exception.php`; daemon intacto |
-| BG-125 | Lista VIP a partir das reservas DHCP das interfaces | Media | package/GUI | F4.3 / UX | operador recopia IPs prefixados a mao; drift face ao DHCP | P | Alto | **Codigo no branch** (`1.9.61` candidato; nao publicado) | `dhcpd/<if>/staticmap`; colunas+filtro por interface; sem auto-isencao; daemon intacto |
+| BG-124 | Lista VIP em texto simples (export/import .txt + editor em lote) | Media | package/GUI | F4.3 / UX | operador PME edita JSON, falha com «JSON invalido» (virgula final) | P | Alto | **Concluido** (`1.9.61` publicado) | uma linha `IP, nome`; JSON legado aceite; `test_vip_exception.php`; daemon intacto |
+| BG-125 | Lista VIP a partir das reservas DHCP das interfaces | Media | package/GUI | F4.3 / UX | operador recopia IPs prefixados a mao; drift face ao DHCP | P | Alto | **Concluido** (`1.9.61` publicado) | `dhcpd/<if>/staticmap`; colunas+filtro por interface; sem auto-isencao; daemon intacto |
 
 ## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-05, rev. L)
 
@@ -300,7 +300,7 @@ reavaliacao formal.
 - Arranque: [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 - Posicionamento PME: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 - Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-13ay`
-- Passo actual: **P4 soak IN_PROGRESS** (`170000Z` / `1.9.59`); candidato **`1.9.60`** (entitle-ok PATH); Identity rede **FECHADA** (20.33/GI9)
+- Passo actual: **P4 soak IN_PROGRESS** (`170000Z` / `1.9.59`); lab/`latest` **`1.9.61`** (Lista VIP); Identity rede **FECHADA** (20.33/GI9)
 - Prontidão piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; P4 FAIL/ABORT; P4.1 publicado; **P5 aguarda ficha**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md)
 - Gate activação externa: ficha site nomeada — **≠ lacuna eng.**; **proibido** piloto externo/permanente sem P5
 - Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime no `.pkg` desde `1.9.39`
@@ -308,7 +308,7 @@ reavaliacao formal.
 - Prep: [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md)
 - Contrato: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)
 - ADRs: 0025/0027/0028 Aceito; **0026 Aceito — runtime shipped (rev. n)**; piloto/permanente NO-GO até mapa+GO
-- Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.60`**. Soak `.254`: **`1.9.59`**. Captive portal: **fora de escopo**. Squid: **rejeitado**.
+- Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.61`**. Soak `.254`: **`1.9.59`**. Captive portal: **fora de escopo**. Squid: **rejeitado**.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|

@@ -4,7 +4,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-## [1.9.61] — 2026-08-13 (candidato; não publicado)
+## [1.9.61] — 2026-08-13
 
 ### Changed
 
@@ -19,6 +19,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   filtro. Não isenta automaticamente.
   Daemon, `vip-isentos` e limites 32+16 inalterados.
   **Não** promove enforce `1.9.8` nem MITM permanente.
+  Publicado `v1.9.61` (`SHA256=eda5a10e1a9ca597d3bf8051c0ee372840caddffa133abee5e8d9383a5dba426`).
 
 ## [1.9.60] — 2026-08-13
 

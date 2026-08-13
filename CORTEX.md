@@ -35,13 +35,13 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.60` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.60`;
-`SHA256=ec22d3b636adf73bbb6497c2bec05a6ae2c34984e0b92815bfb36dc8ff89329f`;
-**entitle-ok PATH** (rc.d); herda P4.1 `1.9.59`
+`1.9.61` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.61`;
+`SHA256=eda5a10e1a9ca597d3bf8051c0ee372840caddffa133abee5e8d9383a5dba426`;
+**Lista VIP** texto simples + reservas DHCP por interface (BG-124/BG-125);
+herda entitle-ok PATH de `1.9.60`
+(`SHA256=ec22d3b636adf73bbb6497c2bec05a6ae2c34984e0b92815bfb36dc8ff89329f`);
+herda P4.1 `1.9.59`
 (`SHA256=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9`);
-**candidato no branch (não publicado):** `1.9.61` — Lista VIP texto simples
-(BG-124; uma linha `IP, nome`; JSON legado aceite) + reservas DHCP
-(BG-125; picker `staticmap`; sem auto-isenção);
 herda F1.2 de `1.9.58`
 (`SHA256=8b4a2dc6ecd62c126222186112ea80ee75407d35c35049f94631980092108d3d`);
 **BG-028 Fase 1 / F1.2** — manifesto + `.sig` + `install.sh` carimbado;
@@ -1349,7 +1349,7 @@ TRILHA IPv6 — progresso
 ## Trilha Identity + MITM Add-on (aberta 2026-08-05; reopen MITM GO 2026-08-08)
 
 Novo plano pós-fecho (ESTADO-PRODUTO §6). **Não** reabre P0–J nem IPv6.
-Baseline produção: **`1.9.8`**. Publicado: **`1.9.60`**. MITM P3: **`1.9.47`**. P4.1: **`1.9.59`**. Soak `.254`: **`1.9.59`** (não upgrade a meio).
+Baseline produção: **`1.9.8`**. Publicado: **`1.9.61`**. MITM P3: **`1.9.47`**. P4.1: **`1.9.59`**. Soak `.254`: **`1.9.59`** (não upgrade a meio).
 **IM0+IM1 fechados (GI1 PASS)**; **IM2 DEFER 20.7a** → **reopen GO `2026-08-08`**
 **20.8 PASS** → **20.9 PASS** → **GO produto** → **20.10a PASS** → **20.10b PASS** →
 **20.11 PASS** → **`1.9.42` PASS** source∧dest → **`1.9.46` Gate C PASS**;
@@ -1414,7 +1414,7 @@ TRILHA IDENTITY + MITM — progresso
 - Evidência P3: 20260809T230400Z-p3-mitm-window
 - Runbook P4.1: docs/09-blocking/runbook-p4-retry-supervisor-onbox.md
 - Próximo MITM: **P4 retry** no `.254` com `1.9.59`; **P5 só com ficha**; MITM OFF permanente; `.234/.235` proibidos
-- Latest publicado: **1.9.60** (entitle-ok PATH); MITM P3 em 1.9.47; P4 soak em 1.9.59
+- Latest publicado: **1.9.61** (Lista VIP texto + DHCP); MITM P3 em 1.9.47; P4 soak em 1.9.59
 - Identity rede: FECHADA (20.33 / GI9 PASS); Squid REJEITADO
 ```
 
@@ -1423,7 +1423,7 @@ TRILHA IDENTITY + MITM — progresso
 ## Trilha Anti-pirataria / Anti-tamper (aberta 2026-08-10)
 
 Nova trilha pós-fecho. **Não** reabre P0–J, IPv6 nem Identity de rede.
-Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.60`** (entitle-ok PATH; rollback lab `1.9.59`).
+Baseline produção enforce: **`1.9.8`**. lab/`latest`: **`1.9.61`** (Lista VIP texto + DHCP; rollback lab `1.9.60`).
 Produção `.254` observada: **`1.9.54`** (e2e PASS `20260811T114320Z`; **não**
 actualizada neste bloco BG-028).
 **`30.10` FECHADO** (código + fix + e2e campo): token `1.9.53` + `fetch_authed`
@@ -1582,7 +1582,7 @@ TRILHA ANTI-PIRATARIA — FECHADA
 - GA5.9 campo PENDENTE (fora do fecho documental)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)
-- Produção .254 soak P4: 1.9.59; lab/latest: 1.9.60 (entitle-ok PATH)
+- Produção .254 soak P4: 1.9.59; lab/latest: 1.9.61 (Lista VIP texto + DHCP)
 - Não reabrir sem GO + backlog
 ```
 
