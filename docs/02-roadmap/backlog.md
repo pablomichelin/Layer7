@@ -306,7 +306,7 @@ reavaliacao formal.
 - Prep: [`prep-20.10-checklist.md`](../09-blocking/prep-20.10-checklist.md)
 - Contrato: [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md)
 - ADRs: 0025/0027/0028 Aceito; **0026 Aceito — runtime shipped (rev. n)**; piloto/permanente NO-GO até mapa+GO
-- Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.59`** (candidato `1.9.60`). Captive portal: **fora de escopo**. Squid: **rejeitado**.
+- Baseline produção: **`1.9.8`**. lab/`latest`: **`1.9.60`**. Soak `.254`: **`1.9.59`**. Captive portal: **fora de escopo**. Squid: **rejeitado**.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|

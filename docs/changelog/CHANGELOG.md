@@ -15,6 +15,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   Entitlement **não** foi enfraquecido. Teste PATH curto em
   `test_entitlements_gui.php`. **Não** promove enforce `1.9.8` nem MITM
   permanente. Soak P4 no `.254` **não** é actualizado neste bloco.
+  Publicado `v1.9.60` (`SHA256=ec22d3b636adf73bbb6497c2bec05a6ae2c34984e0b92815bfb36dc8ff89329f`).
 
 ## [1.9.59] — 2026-08-13
 

@@ -54,7 +54,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; P4.1 `1.9.59`; P4 retry **IN_PROGRESS**; candidato **`1.9.60`** (entitle-ok PATH) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; P4.1 `1.9.59`; P4 soak **IN_PROGRESS**; publicado **`1.9.60`** (entitle-ok PATH) |
 | Passo actual | **P4 soak IN_PROGRESS** (`170000Z`); permanente **NO-GO**; **não** upgrade `.254` a meio do soak |
 | Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 FAIL/ABORT; P4.1 publicado; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
