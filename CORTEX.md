@@ -38,7 +38,9 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `1.9.61` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.61`;
 `SHA256=eda5a10e1a9ca597d3bf8051c0ee372840caddffa133abee5e8d9383a5dba426`;
 **Lista VIP** texto simples + reservas DHCP por interface (BG-124/BG-125);
-herda entitle-ok PATH de `1.9.60`
+**candidato no branch (não publicado):** `1.9.62` — copy de operador nas
+páginas MITM/Identity/check-in (BG-126; sem ADRs, gates nem paths de `docs/`
+na GUI); herda entitle-ok PATH de `1.9.60`
 (`SHA256=ec22d3b636adf73bbb6497c2bec05a6ae2c34984e0b92815bfb36dc8ff89329f`);
 herda P4.1 `1.9.59`
 (`SHA256=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9`);

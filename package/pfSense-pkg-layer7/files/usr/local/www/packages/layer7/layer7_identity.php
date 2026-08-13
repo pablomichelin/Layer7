@@ -212,26 +212,22 @@ if ($savemsg !== "") {
 						<strong><?= htmlspecialchars(l7_t("Add-on nao incluido nesta licenca")); ?></strong>
 						<p style="margin: 10px 0 0;">
 							<?= htmlspecialchars(l7_t(
-							    "Identity (politicas por utilizador/grupo AD, mapa user↔IP) " .
-							    "requer o entitlement \"identity\" na licenca (SKU Y). " .
-							    "A licenca actual nao inclui este add-on. " .
-							    "Contacte a Systemup para upgrade. O produto base continua a funcionar normalmente."
+							    "Politicas por utilizador ou grupo do Active Directory nao fazem parte desta licenca. " .
+							    "O produto base (politicas por IP, dispositivo e perfil) continua a funcionar. " .
+							    "Para activar o mapa de utilizadores, contacte a Systemup."
 							)); ?>
-						</p>
-						<p style="margin: 10px 0 0; color: #666; font-size: 12px;">
-							features=<?= htmlspecialchars($l7_feat_raw !== "" ? $l7_feat_raw : "(base / legado)"); ?>
-							· ADR-0025 / ADR-0027 · captive portal do pfSense permanece fora de escopo
 						</p>
 					</div>
 				</div>
 			</div>
 			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Proximos passos")); ?></div>
+				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("O que inclui o add-on")); ?></div>
 				<div class="layer7-admin-block__body">
 					<p class="layer7-lead" style="margin:0;">
 						<?= htmlspecialchars(l7_t(
-						    "Quando o entitlement estiver activo, esta pagina configura o directorio LDAP " .
-						    "e, em passos seguintes, as fontes de sessao (RADIUS, agente no Domain Controller)."
+						    "Com o add-on na licenca, esta pagina liga o directorio (Active Directory / LDAP) " .
+						    "e as sessoes de utilizador (RADIUS ou agente no controlador de dominio), " .
+						    "para aplicar politicas por pessoa ou grupo — nao por um portal cativo."
 						)); ?>
 					</p>
 				</div>
@@ -271,9 +267,9 @@ if ($savemsg !== "") {
 					</p>
 					<p class="help-block text-muted" style="margin-bottom:0;">
 						<?= htmlspecialchars(l7_t(
-						    "Limite honesto (ADR-0029): nao ha agente endpoint em cada PC nesta release " .
-						    "(User-ID de rede via RADIUS/DC). Terminal Server / VDI com varios users no " .
-						    "mesmo IP nao e suportado para politicas ad_* — usa-se multi-user / nao-match."
+						    "Nesta versao nao ha agente em cada PC: o mapa e por utilizador e IP " .
+						    "(RADIUS ou controlador de dominio). Varios utilizadores no mesmo IP " .
+						    "(por exemplo Terminal Server) nao recebem politica por utilizador."
 						)); ?>
 					</p>
 				</div>
@@ -294,8 +290,8 @@ if ($savemsg !== "") {
 						</label>
 						<p class="help-block">
 							<?= htmlspecialchars(l7_t(
-							    "O daemon so inicializa o mapa com entitlement. Este toggle prepara a config; " .
-							    "fontes de sessao e politicas por grupo entram em passos seguintes."
+							    "O mapa de utilizadores so fica activo com o add-on na licenca. " .
+							    "Esta opcao prepara a configuracao neste appliance."
 							)); ?>
 						</p>
 					</div>
@@ -599,8 +595,8 @@ if ($savemsg !== "") {
 					<div class="layer7-admin-block__body">
 				<p class="help-block">
 					<?= htmlspecialchars(l7_t(
-					    "Limites para expansao de grupos aninhados (defaults ADR-0027). " .
-					    "Estouro = log previsivel, sem fechar a LAN."
+					    "Limites para expansao de grupos aninhados. " .
+					    "Se o limite for atingido, fica um aviso no log — a rede nao e fechada."
 					)); ?>
 				</p>
 				<div class="form-group">

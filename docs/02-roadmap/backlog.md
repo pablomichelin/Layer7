@@ -276,6 +276,7 @@ reavaliacao formal.
 | BG-077 | Check-in online periodico e revogacao remota de licenca (cancelamento comercial) | **Critica** | license-server/daemon/licenciamento | **F3+** (bloqueante comercial recomendado antes GO enforce) | revogacao no servidor nao corta appliance; cliente cancelado continua em enforce ate expiry+grace offline | G | **Alto** | **Implementado** (`2026-08-04`) | API `244` + daemon `1.8.11_68`; S14 PASS; flag `check_in_enabled` default OFF; ADR-0021; plano `f3-plano-check-in-online-revogacao-remota.md` |
 | BG-124 | Lista VIP em texto simples (export/import .txt + editor em lote) | Media | package/GUI | F4.3 / UX | operador PME edita JSON, falha com «JSON invalido» (virgula final) | P | Alto | **Concluido** (`1.9.61` publicado) | uma linha `IP, nome`; JSON legado aceite; `test_vip_exception.php`; daemon intacto |
 | BG-125 | Lista VIP a partir das reservas DHCP das interfaces | Media | package/GUI | F4.3 / UX | operador recopia IPs prefixados a mao; drift face ao DHCP | P | Alto | **Concluido** (`1.9.61` publicado) | `dhcpd/<if>/staticmap`; colunas+filtro por interface; sem auto-isencao; daemon intacto |
+| BG-126 | Copy de operador nas paginas MITM / Identity / check-in | Media | package/GUI | F4.3 / UX | GUI expoe ADRs, gates `20.x`, paths de `docs/` e checklist de lab | P | Alto | **Codigo no branch** (`1.9.62` candidato; nao publicado) | so texto; daemon/licenca intactos; `test_gui_operator_copy.php` |
 
 ## Checkpoint trilha IPv6 (pós-fecho plano mestre — 2026-08-05, rev. L)
 

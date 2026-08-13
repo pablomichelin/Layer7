@@ -317,6 +317,7 @@ ADR-0020 (Bloco A). SSOT da isenção: excepção `vip-isentos` (D1); labels em
 - [x] Export/import da lista; link «Gerir Lista VIP» no modal Perfis rápidos
 - [x] BG-124: formato operador = texto simples (`IP, nome`) + editor em lote; JSON legado aceite (`1.9.61` publicado)
 - [x] BG-125: picker de reservas DHCP estáticas (`dhcpd/<if>/staticmap`) para a Lista VIP; colunas e filtro por interface; sem auto-isenção
+- [x] BG-126: copy de operador em MITM/Identity/check-in (sem ADRs/gates/paths na GUI; `1.9.62` candidato)
 - [x] Aviso DHCP static mapping; aviso sinkhole DNS até Bloco D
 - [x] `php -l` + teste funcional PHP PASS
 - [x] Release `1.8.11_57` publicada em `pablomichelin/Layer7`

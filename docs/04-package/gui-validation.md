@@ -64,3 +64,11 @@ Helpers em **`/usr/local/pkg/layer7.inc`**.
 |------|--------|
 | Versão binário | `layer7_daemon_version()` → `layer7d -V` |
 | Parse JSON | `layer7d -t -c …` |
+
+## Copy de operador (MITM / Identity / Definições)
+
+A GUI **não** mostra ADRs, IDs de passo (`20.8`…), paths de `docs/`,
+checklist de lab nem códigos internos (`N3`, `30.14`). Essas decisões
+ficam na documentação do repositório. O operador vê: se o add-on está
+na licença, o que o produto faz sem ele, e a quem contactar.
+Gate: `php tests/functional/test_gui_operator_copy.php`.

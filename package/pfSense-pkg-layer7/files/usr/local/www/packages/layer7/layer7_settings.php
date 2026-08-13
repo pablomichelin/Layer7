@@ -220,9 +220,9 @@ if ($_POST["save_check_in"] ?? false) {
 	if (layer7_save_json($data)) {
 		layer7_restart_service();
 		if (!empty($data["layer7"]["check_in_enabled"])) {
-			$savemsg = l7_t("Check-in online activado. O appliance contacta periodicamente o servidor de licencas; falha de rede nao derruba o enforce (N3).");
+			$savemsg = l7_t("Check-in online activado. O appliance contacta periodicamente o servidor de licencas; uma falha de rede nao desliga o bloqueio.");
 		} else {
-			$savemsg = l7_t("Check-in online desactivado (modo isolado). A revogacao remota nao aplica ate reactivar. Ver runbook check-in.");
+			$savemsg = l7_t("Check-in online desactivado. A revogacao remota nao aplica ate reactivar.");
 		}
 	}
 }
@@ -1163,7 +1163,7 @@ layer7_render_styles();
 								<?= l7_t("Activar (recomendado — revogacao remota)"); ?>
 							</label>
 							<p class="help-block">
-								<?= l7_t("Instalacoes novas: activo por defeito (30.14). Appliance isolado/air-gap: desactive e documente. Falha de rede nao reduz enforce enquanto dentro da janela offline (N3)."); ?>
+								<?= l7_t("Activo por defeito. Num appliance sem acesso a Internet, desactive. Uma falha de rede nao desliga o bloqueio enquanto a licenca estiver valida."); ?>
 							</p>
 							<button type="submit" class="btn btn-sm btn-primary"><?= l7_t("Guardar check-in"); ?></button>
 						</div>

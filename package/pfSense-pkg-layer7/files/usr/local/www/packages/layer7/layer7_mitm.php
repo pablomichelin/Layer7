@@ -83,18 +83,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 					layer7_save_json($data);
 					layer7_filter_configure_safe();
 					$input_errors[] = l7_t(
-					    "Falha no control-plane MITM (tlsproxy timeout/erro). " .
-					    "Rollback fail-safe: helper/gate/flag/tabelas limpos e mitm.enabled=OFF."
+					    "Nao foi possivel activar a inspeccao TLS. " .
+					    "Por seguranca, a inspeccao ficou desligada. Verifique o certificado e tente de novo."
 					);
 				} else {
 					layer7_filter_configure_safe();
 					$eff = layer7_mitm_effective($mitm, true);
 					$savemsg = $eff
-					    ? l7_t("Configuracao MITM gravada (mitm_effective ON).") .
-						" " . l7_t("Rdr selectivo activo (source_cidr E dest_cidr obrigatorios).")
+					    ? l7_t("Configuracao gravada. A inspeccao TLS esta activa para os origens e destinos definidos.")
 					    : l7_t(
-						"Configuracao MITM gravada. Intencao guardada; mitm_effective OFF " .
-						"(gates incompletos — exige CA, entitlement, runtime, source+dest IPv4 e janela valida)."
+						"Configuracao gravada. A inspeccao permanece desligada ate existirem " .
+						"certificado, origens e destinos validos (e o add-on na licenca)."
 					    );
 				}
 				$mitm = layer7_mitm_from_config($data);
@@ -217,9 +216,11 @@ if ($savemsg !== "") {
 		<div class="layer7-content">
 			<p class="layer7-lead">
 				<?= htmlspecialchars(l7_t(
-				    "1.9.47 P3: janela com max_window + deadline_unix; auto-disable fail-closed ao expirar " .
-				    "(incluindo apos reload). mitm.enabled e intencao; mitm_effective exige " .
-				    "entitlement+CA+runtime+source+dest+janela valida. Nunca from any. Squid rejeitado."
+				    "Inspecao TLS (MITM) e um add-on opcional: o firewall pode abrir HTTPS " .
+				    "para aplicar bloqueios com pagina segura. Esta desligada por defeito e so " .
+				    "funciona com o add-on na licenca, um certificado de inspeccao instalado e " .
+				    "origens e destinos definidos. Sem este add-on, o bloqueio HTTPS continua " .
+				    "pela pagina HTTP e pelo DNS."
 				)); ?>
 			</p>
 
@@ -233,23 +234,18 @@ if ($savemsg !== "") {
 						<strong><?= htmlspecialchars(l7_t("Add-on nao incluido nesta licenca")); ?></strong>
 						<p style="margin: 10px 0 0;">
 							<?= htmlspecialchars(l7_t(
-							    "A inspecao TLS (MITM) com CA no dominio requer o entitlement \"mitm\". " .
-							    "A licenca actual nao inclui este add-on. " .
-							    "Sem MITM, o bloqueio HTTPS continua conforme ADR-0017 (DNS sinkhole / pagina HTTP). " .
-							    "Contacte a Systemup para upgrade."
+							    "A inspecao TLS (MITM) nao faz parte desta licenca. " .
+							    "O produto base continua a bloquear sites pela pagina HTTP e pelo DNS. " .
+							    "Para activar a inspeccao HTTPS, contacte a Systemup."
 							)); ?>
-						</p>
-						<p style="margin: 10px 0 0; color: #666; font-size: 12px;">
-							features=<?= htmlspecialchars($l7_feat_raw !== "" ? $l7_feat_raw : "(base / legado)"); ?>
-							· ADR-0025 / ADR-0026 · default OFF
 						</p>
 					</div>
 <?php else: ?>
 					<div class="alert alert-success" role="alert" style="margin-bottom:12px;">
 						<?= htmlspecialchars(l7_t("Entitlement mitm activo.")); ?>
 						<?= htmlspecialchars($runtime_ok
-						    ? l7_t("Runtime presente (20.10b). mitm_effective so com todos os gates.")
-						    : l7_t("Runtime layer7-tlsproxy ausente — inspecao OFF.")); ?>
+						    ? l7_t("O motor de inspeccao esta instalado. A inspeccao so liga com certificado, origens e destinos definidos.")
+						    : l7_t("O motor de inspeccao nao esta disponivel neste appliance — inspecao desligada.")); ?>
 					</div>
 					<table class="table table-condensed" style="max-width:720px; margin-bottom:12px;">
 						<tr><th>mitm.enabled (intencao)</th><td><code><?= !empty($mitm["enabled"]) ? "true" : "false"; ?></code></td></tr>
@@ -273,7 +269,7 @@ if ($savemsg !== "") {
 								echo htmlspecialchars(sprintf("%dm %ds", intdiv($rs, 60), $rs % 60));
 							}
 						?></code></td></tr>
-						<tr><th><?= htmlspecialchars(l7_t("Supervisor on-box (P4.1)")); ?></th><td><code><?php
+						<tr><th><?= htmlspecialchars(l7_t("Supervisor automatico")); ?></th><td><code><?php
 							if (!empty($sup_status["armed"])) {
 								$ls = (int)($sup_status["last_unix"] ?? 0);
 								echo htmlspecialchars(l7_t("armado") . ($ls > 0
@@ -390,15 +386,15 @@ if ($savemsg !== "") {
 <?php elseif (!$runtime_ok): ?>
 								<p class="help-block" style="margin-top:6px;">
 									<?= htmlspecialchars(l7_t(
-									    "Pode gravar a intencao agora. Sem runtime, mitm_effective permanece false. " .
-									    "Upgrades nunca ligam MITM por defeito."
+									    "Pode gravar agora. Sem o motor de inspeccao instalado, a inspeccao permanece desligada. " .
+									    "Uma actualizacao do pacote nunca liga a inspeccao por defeito."
 									)); ?>
 								</p>
 <?php elseif (!$effective): ?>
 								<p class="help-block" style="margin-top:6px;">
 									<?= htmlspecialchars(l7_t(
-									    "Runtime e intercept_ready presentes. mitm_effective exige intencao+CA+" .
-									    "source_cidr E dest_cidr IPv4 explicitos (vazio/invalido/any = fail-closed)."
+									    "O motor de inspeccao esta pronto. A inspeccao so liga com certificado, " .
+									    "origens e destinos IPv4 definidos (nao use «qualquer destino»)."
 									)); ?>
 								</p>
 <?php endif; ?>
@@ -410,9 +406,8 @@ if ($savemsg !== "") {
 								<input type="number" name="mitm_max_window" class="form-control" min="1" max="240"
 									value="<?= (int)($mitm["window"]["max_minutes"] ?? 15); ?>" />
 								<p class="help-block"><?= htmlspecialchars(l7_t(
-								    "P3: ao activar, deadline_unix = agora + max_window. " .
-								    "Ao expirar, mitm_effective=false e mitm.enabled=OFF (fail-closed). " .
-								    "1–240 min; default 15. Sem payload TLS em disco."
+								    "Ao activar, a inspeccao dura no maximo este tempo e desliga-se sozinha. " .
+								    "1 a 240 minutos; padrao 15."
 								)); ?></p>
 							</div>
 						</div>
@@ -509,20 +504,6 @@ foreach ($qmodes as $qv => $ql) {
 				</div>
 			</div>
 <?php endif; ?>
-
-			<div class="layer7-admin-block">
-				<div class="layer7-admin-block__header"><?= htmlspecialchars(l7_t("Proximos passos")); ?></div>
-				<div class="layer7-admin-block__body">
-					<ol style="margin:0; padding-left:18px;">
-						<li><?= htmlspecialchars(l7_t("20.8–20.10a — CA / intencao / runtime OFF — PASS")); ?></li>
-						<li><?= htmlspecialchars(l7_t("20.10b — Listen selectivo + PF rdr + pagina HTTPS (este bloco)")); ?></li>
-						<li><?= htmlspecialchars(l7_t("20.11 — Lab GI2/GI3 (nao avancado neste bloco)")); ?></li>
-					</ol>
-					<p class="help-block" style="margin:10px 0 0;">
-						<?= htmlspecialchars(l7_t("Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md — Squid rejeitado.")); ?>
-					</p>
-				</div>
-			</div>
 		</div>
 	</div>
 </div>

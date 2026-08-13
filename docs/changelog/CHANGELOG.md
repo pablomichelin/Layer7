@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.62] — 2026-08-13 (candidato; não publicado)
+
+### Changed
+
+- **GUI operador (BG-126):** páginas MITM, Identity e o texto de check-in
+  em Definições deixam de mostrar ADRs, IDs de passo (`20.8`…), paths de
+  `docs/`, checklist de lab e códigos internos (`N3`, `30.14`, `SKU Y`).
+  O comportamento do add-on e da licença **não** muda — só a copy.
+  **Não** promove enforce `1.9.8` nem MITM permanente.
+
 ## [1.9.61] — 2026-08-13
 
 ### Changed
