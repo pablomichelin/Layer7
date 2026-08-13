@@ -5,8 +5,8 @@ GA6.7–6.12 **PASS**; fecho
 [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md);
 evidência
 [`../tests/evidence/20260812T025741Z-30.19-fecho/`](../tests/evidence/20260812T025741Z-30.19-fecho/));
-**`30.18` FECHADO** (gate-control); produção **`1.9.54`**; candidato
-**`1.9.58`** (**sem** release); ADRs 0030–0033 **`Aceito`**; **não reabrir**
+**`30.18` FECHADO** (gate-control); produção **`.254` = `1.9.54`**; lab/`latest`
+**`1.9.58`** (BG-028 Fase 1 / F1.2); ADRs 0030–0033 **`Aceito`**; **não reabrir**
 sem GO + backlog
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
@@ -35,8 +35,8 @@ sem GO + backlog
 | Passo actual | **`30.19` FECHADO** (fecho documental GA6.7–6.12) |
 | Próximo | Manutenção — **não** reabrir sem GO + backlog |
 | Depois | — |
-| Bloqueio duro | Residuais: BG-028 Fase 1; GA5.9 campo; parecer EULA externo; RR-3 tags |
-| Código alterado até agora | 30.13–30.17; candidato **`1.9.58`**; `30.18`/`30.19` docs/processo; produção **`1.9.54`** |
+| Bloqueio duro | Residuais: GA5.9 campo; parecer EULA externo; RR-3 tags |
+| Código alterado até agora | 30.13–30.17; **`1.9.58` publicado** (F1.2); `30.18`/`30.19` docs/processo; produção `.254` **`1.9.54`** |
 | Gate activo | **GA6 PASS** (trilha); GA5.9 campo **PENDENTE** (fora do fecho documental) |
 | Decisões 1/3/6/8 | Aplicadas (cut, check-in, agenda EULA, aviso RR-3) |
 | Agente recomendado | **Composer 2.5** — manutenção sob GO |
@@ -47,9 +47,9 @@ TRILHA ANTI-PIRATARIA — FECHADA
 - Modelo de ameaças: ACEITE (2026-08-10); reavaliado em 30.19 (GA6.8)
 - Passo: 30.19 FECHADO (20260812T025741Z)
 - Evidência: 20260812T025741Z-30.19-fecho
-- GA6.1-6.12 PASS (residuais: BG-028; parecer EULA externo)
-- Produção .254: 1.9.54; candidato Makefile 1.9.58 (sem release)
-- BG-114…123/101 Concluido; não reabrir sem GO
+- GA6.1-6.12 PASS (residuais: parecer EULA externo; RR-3 tags)
+- Produção .254: 1.9.54; lab/latest: 1.9.58 (F1.2 / BG-028)
+- BG-114…123/101 + BG-028 Fase 1 Concluido; não reabrir sem GO
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.

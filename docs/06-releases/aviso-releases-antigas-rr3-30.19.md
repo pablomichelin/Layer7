@@ -13,8 +13,9 @@
 
 | Canal | Versão | Nota |
 |-------|--------|------|
-| Lab / `latest` (comandos `MANUAL-INSTALL`) | **`1.9.54`** | Inclui anti-pirataria AP1+ relevante publicada |
+| Lab / `latest` (comandos `MANUAL-INSTALL`) | **`1.9.58`** | F1.2 (BG-028 Fase 1); herda anti-pirataria AP1+ |
 | Produção enforce (pin) | **`1.9.8`** | Pin histórico GV7.4 — **não** é o build mais endurecido da trilha AP1 |
+| Produção observada `.254` | **`1.9.54`** | Intocada no bloco BG-028; GA5.9 separado |
 | Primeiro build publicado pós-remoção bypass dev (`30.4`) | **`1.9.49`** | Referência de higiene AP1 |
 
 **Não recomendado** para nova instalação ou “última versão segura anti-bypass”:
@@ -30,7 +31,7 @@ caminho `is_dev_key` de produção (AP1); check-in (AP3) quando activo.
 
 ## Execução neste passo
 
-- [x] Confirmar que secção **Links da versão actual** aponta `1.9.54` (não ≤48)
+- [x] Confirmar que secção **Links da versão actual** aponta `1.9.58` (não ≤48)
 - [x] Aviso explícito no `MANUAL-INSTALL.md` + este ficheiro
 - [x] Tags **não** alteradas (cumprimento literal da decisão 8 + GO do chat)
 - [ ] Despublicar assets — **fora de escopo** (exigiria GO novo)

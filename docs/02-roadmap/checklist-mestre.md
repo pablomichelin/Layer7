@@ -458,5 +458,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] Trilha **FECHADA** em `30.19` (`20260812T025741Z`) — GA6.7–6.12 PASS
 - [x] Fecho: [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md)
 - [x] Evidência: `docs/tests/evidence/20260812T025741Z-30.19-fecho/`
-- [x] Residuais declarados: BG-028 Fase 1; GA5.9 campo; parecer EULA externo; RR-3 tags
+- [x] Residuais declarados: BG-028 Fase 1 **Concluido** (`v1.9.58`); GA5.9 campo; parecer EULA externo; RR-3 tags
 - [x] **Não** reabrir sem GO humano + backlog

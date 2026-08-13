@@ -293,10 +293,11 @@ Os scripts `sign-release.sh` / `verify-release.sh` respeitam `TMPDIR` nos
 
 **Residual honesto:**
 
-- Canal lab/`latest` actual (`1.9.54`) continua `.pkg` + `.sha256` (Fase 0 ADR-0023).
-- A-10 em tags já publicadas permanece até GO de publish Fase 1 (BG-028).
-- Este passo **não** gera nem committa chave de produção (R-K).
+- Canal lab/`latest` (`1.9.58`) = **Fase 1 ADR-0023 / BG-028** (F1.2 completo).
+- A-10 em tags já publicadas **antes** de `v1.9.58` permanece (RR-3).
+- Produção `.254` permanece `1.9.54` até GO de upgrade (GA5.9 separado).
 
-**Gates:** GA6.5 **PASS (processo)** + residual campo; GA6.6 via
-`MANUAL-INSTALL.md`. Evidência:
+**Gates:** GA6.5 **PASS (processo + campo `v1.9.58`)**. Evidência processo:
 [`../tests/evidence/20260812T024826Z-30.18-release-signing/`](../tests/evidence/20260812T024826Z-30.18-release-signing/).
+Evidência Fase 1:
+[`../tests/evidence/20260813T154800Z-bg028-f12-publish/`](../tests/evidence/20260813T154800Z-bg028-f12-publish/).

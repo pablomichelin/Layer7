@@ -4,58 +4,38 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Changed
+## [1.9.58] — 2026-08-13
 
-- **Anti-pirataria 30.19 — fecho da trilha AP0–AP4:** GA6.7–6.12 **PASS**
-  (agenda EULA; reavaliação ameaças; RR-1…RR-5; R-L/CE; decisão 8/RR-3 com
-  aviso + apontadores `1.9.54`; tags **não** alteradas; CORTEX + ESTADO).
-  **Sem** código / PORTVERSION / publish / produção. Doc
-  `docs/01-architecture/fecho-trilha-antipirataria-30.19.md`. Evidência
-  `docs/tests/evidence/20260812T025741Z-30.19-fecho/`.
+### Security
 
-- **Anti-pirataria 30.18 / BG-123 — cadeia F1.2 no processo de release:**
-  política obrigatória manifesto + `.sig` + pubkey nas *próximas* publicações
-  (`RELEASE-SIGNING.md` / checklist); dry-run
-  `tests/functional/test_release_signing_f12_30.18.sh` (chave efémera TMP);
-  `sign-release.sh`/`verify-release.sh` usam `${TMPDIR:-/tmp}` nos `mktemp`;
-  `publish-release.sh` já exige `verify-release.sh`. **Sem** GitHub Release,
-  **sem** chave de produção, **sem** `.254` / license-server, **sem** bump
-  PORTVERSION. Canal `1.9.54` permanece `.pkg`+`.sha256` (ADR-0023 Fase 0);
-  1ª publish assinada = **BG-028**. **Gate-control:** fecho documental só após
-  bateria `20260812T025135Z` (estado intermédio EM EXECUÇÃO/PENDENTE até PASS).
-  GA6.5 **PASS (processo)** + residual campo; GA6.6 **PASS**. Evidência fecho
-  `docs/tests/evidence/20260812T025135Z-30.18-gate-control/`; impl.
-  `docs/tests/evidence/20260812T024826Z-30.18-release-signing/`.
+- **BG-028 Fase 1 / ADR-0023 — primeira publish F1.2:** GitHub Release
+  `v1.9.58` em `pablomichelin/Layer7` com manifesto Ed25519, `.sig`, chave
+  pública, `install.sh` carimbado fail-closed e `uninstall.sh`. Fingerprint
+  SHA256 da chave pública:
+  `d26e3f007e81298bad910f99dd62a22e2109740158b3b3c7f4e79490bdc5a998`.
+  Custódia da privada: humana, fora do git e do builder. **Não** promove
+  `.254` / GA5.9 neste bloco. Evidência
+  `docs/tests/evidence/20260813T154800Z-bg028-f12-publish/`.
 
 - **Anti-pirataria 30.17 — marcação por cliente (atribuição):** após update
   autenticado (ou `--stamp-attribution`), grava sidecars opacos
   `.state/content-attribution.json` + `.l7-content-attribution`
   (`mark=SHA256(l7-attr-v1:license_id:hardware_id)`); sem PII cleartext; sem
   telemetria; não altera tar/manifesto. Doc privacidade
-  `docs/01-architecture/marcacao-cliente-30.17.md`. Candidato
-  `PORTVERSION=1.9.58` — **sem** GitHub Release / `.254` / license-server.
-  **Gate-control:** fecho documental só após bateria `20260812T024419Z`
-  (estado intermédio EM EXECUÇÃO/PENDENTE até PASS). GA6.3/GA6.4 PASS.
-  Evidência fecho
-  `docs/tests/evidence/20260812T024408Z-30.17-gate-control/`.
+  `docs/01-architecture/marcacao-cliente-30.17.md`. GA6.3/GA6.4 PASS.
 
 - **Anti-pirataria 30.16 / BG-122 — decisão de licença distribuída:** gates A/B
   com cruzamento (`license_enforce_gate.c`); `refresh_enforce_cfg` + hot-paths
   (`enforce_armed`) deixam de depender do `if` único sobre `s_lic.valid`
-  (mitiga A-02; R-A permanece). Unit N1/N2 + anti-forja **PASS**. Candidato
-  `PORTVERSION=1.9.57` — **sem** GitHub Release / `.254` / license-server.
-  GA6.1/GA6.2 PASS (unit). Evidência
-  `docs/tests/evidence/20260812T023529Z-30.16-license-enforce-gate/`.
+  (mitiga A-02; R-A permanece). Unit N1/N2 + anti-forja **PASS**. GA6.1/GA6.2
+  PASS (unit).
 
 - **Anti-pirataria 30.14 / BG-118 — check-in default ON (GO humano):**
   `check_in_enabled: true` em `layer7.json.sample` / bare config (instalações
   novas); upgrade **não** altera valor já gravado (`false`/ausente = OFF);
   GUI toggle + runbook isolados
-  (`docs/13-runbooks/check-in-migration-30.14.md`); **N3** intacto. GO literal
-  registado em `docs/09-blocking/decisoes-humanas-30.1.md`. Candidato
-  `PORTVERSION=1.9.56` — **sem** GitHub Release / `.254` / deploy. GA5.7/5.8/5.10/5.11
-  PASS; GA5.9 campo PENDENTE. Evidência
-  `docs/tests/evidence/20260812T015519Z-30.14-checkin-default/`.
+  (`docs/13-runbooks/check-in-migration-30.14.md`); **N3** intacto. GA5.7/5.8/5.10/5.11
+  PASS; GA5.9 campo PENDENTE.
 
 ### Added
 
@@ -63,36 +43,40 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   dual-mode (pedido com `nonce` → envelope `{data,sig}` Ed25519; sem nonce →
   JSON legado ADR-0021); `layer7d` gera nonce CSPRNG/base64url, verifica
   assinatura + eco nonce/hardware_id + skew `iat`, rejeita resposta não
-  assinada; denied autenticado `revoked`/`expired` continua a invalidar;
-  falha de verify/rede → `L7_CHECKIN_NETWORK` (**N3**). Default
-  `check_in_enabled` **inalterado** (OFF até `30.14`/GO). Candidato
-  `PORTVERSION=1.9.55` — **sem** GitHub Release / sem deploy / `.254` intocada.
-  GA5.2–5.6 PASS (unit). Evidência
-  `docs/tests/evidence/20260812T013913Z-30.13-checkin-signed/`.
+  assinada. GA5.2–5.6 PASS (unit).
 
 ### Documentation
+
+- **Anti-pirataria 30.19 — fecho da trilha AP0–AP4:** GA6.7–6.12 **PASS**
+  (agenda EULA; reavaliação ameaças; RR-1…RR-5; R-L/CE; decisão 8/RR-3;
+  tags **não** alteradas). Doc
+  `docs/01-architecture/fecho-trilha-antipirataria-30.19.md`.
+
+- **Anti-pirataria 30.18 / BG-123 — cadeia F1.2 no processo de release:**
+  política obrigatória manifesto + `.sig` + pubkey; dry-run
+  `tests/functional/test_release_signing_f12_30.18.sh`. Activação de campo
+  neste `1.9.58` (BG-028).
 
 - **Anti-pirataria 30.11 — GA4.12 N/A + prep cut:** decisão humana
   (`2026-08-12`): comunicação externa a clientes não necessária (decisões
   internas; sem destinatários; impacto futuro → janela de manutenção ops).
-  Gate GA4.12 = **N/A** com rastreio em
-  `docs/09-blocking/prep-cut-30.11-espelho.md` (inventário exacto dos 4 assets
-  `blacklists-ut1-current` + comando `gh release delete-asset` **não
-  executado**). Cut / GA4.10 / GA4.15 continuam pendentes de GO explícito.
-  Sem e-mail, sem delete, sem alteração produção/CF/GitHub.
+  Gate GA4.12 = **N/A**. Cut / GA4.10 / GA4.15 executados no passo `30.11`.
 
 - **Anti-pirataria 30.11 preflight — primary auth GET PASS:** em `.254`
   (`1.9.54`), GET HTTPS a `downloads.systemup.inf.br/.../manifest` + `.sig`
   com Bearer local → **200/200** (823/64); sem token → **401**. Evidência
-  `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`. Sem cut do
-  espelho; sem emissão GA4.12 a clientes; sem alteração produção/CF/GitHub.
-  Docs canónicos (START-HERE / CORTEX / plano §0 / gates / backlog) alinhados.
-  (Supersedido: GA4.12 passou a N/A; falta só GO cut.)
+  `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/`.
 
 - **Anti-pirataria 30.10 — e2e `.254` PASS com `1.9.54`:** GA4.4 PASS;
   produção mantida em `1.9.54`; evidência
-  `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`. Sem nova release
-  nem alteração de código neste bloco.
+  `docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`.
+
+### Release
+
+- Canal publico `latest` — F1.2 completo em `pablomichelin/Layer7`
+- SHA256: `8b4a2dc6ecd62c126222186112ea80ee75407d35c35049f94631980092108d3d`
+- Rollback lab: `1.9.54`
+- Produção `.254` **não** actualizada (`1.9.54`)
 
 ## [1.9.54] — 2026-08-11
 

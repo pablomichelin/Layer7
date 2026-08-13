@@ -43,7 +43,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0020](ADR-0020-isencao-vip-dns.md) | Isenção VIP no caminho DNS (sinkhole + DNS forçado) | Implementado; `_59` opção (a) | view Unbound `layer7-vip-exempt`; fallback rdr `from !<layer7_exc_allow_N>`; SSOT `vip-isentos` inalterado |
 | [ADR-0021](ADR-0021-check-in-online-e-revogacao-remota.md) | Check-in online e revogação remota de licença | Aceito | BG-077; `POST /api/license/check-in` + daemon; S14 PASS (`2026-08-04`) |
 | [ADR-0022](ADR-0022-compatibilidade-pfsense-ce-escopo-e-limitacao.md) | Compatibilidade pfSense CE — escopo e limitação (Onda E) | Aceito + GO Onda F | CE físico pendente; produção enforce = `_69` |
-| [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (fase 0) | Fase 1 pendente custódia chaves Ed25519 |
+| [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (**fase 1** `v1.9.58`) | F1.2 activo; fingerprint `d26e3f00…c5a998` |
 | [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | Trilha IPv6 **FECHADA**; produção `1.9.8` |
 | [ADR-0025](ADR-0025-entitlements-addon-identity-mitm.md) | Entitlements add-on Identity + MITM (SKU X/Y) | **Aceito** (rev.c; T1) | `features` CSV (P1–P6); gate daemon; legado `full`→`base`; check-in ∩ `.lic` |
 | [ADR-0026](ADR-0026-mitm-tls-inspection-opt-in.md) | MITM TLS inspection opt-in (CA/certificado) | **Aceito — runtime shipped** (rev.q; `1.9.47`) | P3 PASS; activar piloto NO-GO até ficha+soak; ficha=gate ≠ gap eng.; Squid rejeitado |
