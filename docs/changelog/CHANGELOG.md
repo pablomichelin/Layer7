@@ -4,7 +4,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-## [1.9.62] — 2026-08-13 (candidato; não publicado)
+## [1.9.62] — 2026-08-13
 
 ### Changed
 
@@ -13,6 +13,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `docs/`, checklist de lab e códigos internos (`N3`, `30.14`, `SKU Y`).
   O comportamento do add-on e da licença **não** muda — só a copy.
   **Não** promove enforce `1.9.8` nem MITM permanente.
+  Publicado `v1.9.62` (`SHA256=b6700576afb47cf9790c4c3fddb746b3021d7070e260ef0e6551c712a7948e5f`).
 
 ## [1.9.61] — 2026-08-13
 
