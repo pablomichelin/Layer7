@@ -6260,7 +6260,7 @@ function layer7_vip_remove_entry(&$data, $target)
 }
 
 /**
- * Payload JSON para export da Lista VIP (padrao BG-070).
+ * Payload estruturado da Lista VIP (compatibilidade JSON legado BG-070).
  *
  * @return array<string, mixed>
  */
@@ -6281,8 +6281,243 @@ function layer7_vip_export_payload($data)
 	);
 }
 
+function layer7_vip_strip_bom($raw)
+{
+	$raw = (string)$raw;
+	if (strncmp($raw, "\xEF\xBB\xBF", 3) === 0) {
+		return substr($raw, 3);
+	}
+	return $raw;
+}
+
+function layer7_vip_looks_like_json($raw)
+{
+	$t = ltrim((string)$raw);
+	return $t !== "" && ($t[0] === "{" || $t[0] === "[");
+}
+
 /**
- * Importa Lista VIP a partir de JSON exportado.
+ * json_decode tolerante a virgula final (edicao manual / Excel).
+ *
+ * @return array<string, mixed>|null
+ */
+function layer7_vip_json_decode_tolerant($raw)
+{
+	$decoded = json_decode((string)$raw, true);
+	if (is_array($decoded)) {
+		return $decoded;
+	}
+	$fixed = preg_replace('/,\s*([}\]])/s', '$1', (string)$raw);
+	if (!is_string($fixed) || $fixed === (string)$raw) {
+		return null;
+	}
+	$decoded = json_decode($fixed, true);
+	return is_array($decoded) ? $decoded : null;
+}
+
+function layer7_vip_is_header_line($line)
+{
+	$n = strtolower(str_replace(" ", "", trim((string)$line)));
+	$headers = array(
+		"description,target",
+		"target,description",
+		"descricao,ip",
+		"ip,descricao",
+		"nome,ip",
+		"ip,nome",
+		"description,ip",
+		"ip,description",
+		"cidr,descricao",
+		"descricao,target",
+		"nome,endereco"
+	);
+	return in_array($n, $headers, true);
+}
+
+function layer7_vip_csv_quote($value)
+{
+	$value = (string)$value;
+	if (strpbrk($value, ",;\"\t") !== false) {
+		return '"' . str_replace('"', '""', $value) . '"';
+	}
+	return $value;
+}
+
+/**
+ * Texto simples da Lista VIP (uma linha por isento: IP, nome).
+ */
+function layer7_vip_export_text($data, $with_header = true)
+{
+	$lines = array();
+	if ($with_header) {
+		$lines[] = "# Lista VIP Layer7";
+		$lines[] = "# Uma linha por isento: IP ou rede, nome";
+		$lines[] = "# Linhas que comecam com # sao ignoradas";
+		$lines[] = "";
+	}
+	foreach (layer7_vip_list_entries($data) as $row) {
+		$target = (string)($row["target"] ?? "");
+		$desc = (string)($row["description"] ?? "");
+		if ($target === "") {
+			continue;
+		}
+		if ($desc === "" || $desc === $target) {
+			$lines[] = $target;
+		} else {
+			$lines[] = $target . ", " . layer7_vip_csv_quote($desc);
+		}
+	}
+	return implode("\n", $lines) . "\n";
+}
+
+/**
+ * @return array{skip?: bool, ok?: bool, error?: string, target?: string, description?: string}
+ */
+function layer7_vip_parse_list_line($line, $lineno)
+{
+	$line = trim((string)$line);
+	if ($line === "" || $line[0] === "#" || $line[0] === ";") {
+		return array("skip" => true);
+	}
+	if (layer7_vip_is_header_line($line)) {
+		return array("skip" => true);
+	}
+
+	$delim = ",";
+	if (strpos($line, "\t") !== false && strpos($line, ",") === false) {
+		$delim = "\t";
+	} elseif (strpos($line, ";") !== false && strpos($line, ",") === false) {
+		$delim = ";";
+	}
+	$parts = str_getcsv($line, $delim);
+	if (!is_array($parts)) {
+		$parts = array($line);
+	}
+	$clean = array();
+	foreach ($parts as $p) {
+		$p = trim((string)$p);
+		if ($p !== "") {
+			$clean[] = $p;
+		}
+	}
+	if (empty($clean)) {
+		return array("skip" => true);
+	}
+
+	$target = "";
+	$desc_bits = array();
+	foreach ($clean as $p) {
+		if ($target === "" && layer7_ip_or_cidr_valid($p)) {
+			$target = $p;
+		} else {
+			$desc_bits[] = $p;
+		}
+	}
+
+	if ($target === "" && count($clean) === 1) {
+		$tokens = preg_split('/\s+/', $clean[0]);
+		if (!is_array($tokens)) {
+			$tokens = array($clean[0]);
+		}
+		$desc_bits = array();
+		foreach ($tokens as $tok) {
+			if ($target === "" && layer7_ip_or_cidr_valid($tok)) {
+				$target = $tok;
+			} else {
+				$desc_bits[] = $tok;
+			}
+		}
+	}
+
+	if ($target === "") {
+		return array(
+			"ok" => false,
+			"error" => sprintf(l7_t("Linha %d: IP ou CIDR invalido."), (int)$lineno)
+		);
+	}
+	$desc = layer7_vip_sanitize_label(implode(" ", $desc_bits));
+	if ($desc === "") {
+		$desc = $target;
+	}
+	return array("ok" => true, "target" => $target, "description" => $desc);
+}
+
+/**
+ * @return array{ok: bool, error: string, entries: array<int, array{target: string, description: string}>}
+ */
+function layer7_vip_parse_list_text($raw, $allow_empty = false)
+{
+	$raw = layer7_vip_strip_bom($raw);
+	$raw = str_replace("\r\n", "\n", (string)$raw);
+	$raw = str_replace("\r", "\n", $raw);
+	$lines = explode("\n", $raw);
+	$entries = array();
+	$errors = array();
+	$lineno = 0;
+	foreach ($lines as $line) {
+		$lineno++;
+		$parsed = layer7_vip_parse_list_line($line, $lineno);
+		if (!empty($parsed["skip"])) {
+			continue;
+		}
+		if (empty($parsed["ok"])) {
+			$errors[] = (string)($parsed["error"] ?? sprintf(
+			    l7_t("Linha %d: IP ou CIDR invalido."), $lineno));
+			if (count($errors) >= 8) {
+				break;
+			}
+			continue;
+		}
+		$entries[] = array(
+			"target" => (string)$parsed["target"],
+			"description" => (string)$parsed["description"]
+		);
+	}
+	if (!empty($errors)) {
+		return array("ok" => false, "error" => implode(" ", $errors), "entries" => array());
+	}
+	if (empty($entries) && !$allow_empty) {
+		return array("ok" => false, "error" => l7_t("Nenhuma linha valida na lista."),
+		    "entries" => array());
+	}
+	return array("ok" => true, "error" => "", "entries" => $entries);
+}
+
+/**
+ * Importa Lista VIP a partir de texto simples, CSV ou JSON legado.
+ *
+ * @return array{ok: bool, error: string, updated: bool}
+ */
+function layer7_vip_import_from_raw(&$data, $raw, $allow_empty = false)
+{
+	$raw = layer7_vip_strip_bom($raw);
+	if (!is_string($raw) || trim($raw) === "") {
+		if ($allow_empty) {
+			return layer7_vip_import_apply($data, array(
+				"layer7_vip_list" => true,
+				"entries" => array()
+			));
+		}
+		return array("ok" => false, "error" => l7_t("Ficheiro vazio."), "updated" => false);
+	}
+	if (layer7_vip_looks_like_json($raw)) {
+		$imported = layer7_vip_json_decode_tolerant($raw);
+		if (is_array($imported)) {
+			return layer7_vip_import_apply($data, $imported);
+		}
+	}
+	$parsed = layer7_vip_parse_list_text($raw, $allow_empty);
+	if (!$parsed["ok"]) {
+		return array("ok" => false, "error" => $parsed["error"], "updated" => false);
+	}
+	return layer7_vip_import_apply($data, array(
+		"layer7_vip_list" => true,
+		"entries" => $parsed["entries"]
+	));
+}
+
+/**
+ * Importa Lista VIP a partir de JSON exportado (ou entries ja parseadas).
  *
  * @return array{ok: bool, error: string, updated: bool}
  */
@@ -6340,6 +6575,227 @@ function layer7_vip_import_apply(&$data, $imported)
 	$data["layer7"]["vip_meta"]["labels"] = $labels;
 	layer7_vip_labels_cleanup($data, $hosts, $cidrs);
 	return array("ok" => true, "error" => "", "updated" => true);
+}
+
+/**
+ * Ramo do config.xml do pfSense (`dhcpd`, `dhcpdv6`, `interfaces`).
+ *
+ * @return array<string, mixed>
+ */
+function layer7_pfsense_config_branch($path)
+{
+	$path = (string)$path;
+	if (function_exists("config_get_path")) {
+		$v = config_get_path($path, array());
+		if (is_array($v)) {
+			return $v;
+		}
+	}
+	global $config;
+	if (isset($config) && is_array($config) &&
+	    isset($config[$path]) && is_array($config[$path])) {
+		return $config[$path];
+	}
+	return array();
+}
+
+function layer7_dhcp_static_map_label($descr, $hostname, $ip)
+{
+	$descr = layer7_vip_sanitize_label($descr);
+	if ($descr !== "") {
+		return $descr;
+	}
+	$hostname = layer7_vip_sanitize_label($hostname);
+	if ($hostname !== "") {
+		return $hostname;
+	}
+	return layer7_vip_sanitize_label($ip);
+}
+
+function layer7_dhcp_static_maps_iface_label($ifid)
+{
+	$ifid = (string)$ifid;
+	$ifs = layer7_pfsense_config_branch("interfaces");
+	if (isset($ifs[$ifid]) && is_array($ifs[$ifid]) &&
+	    !empty($ifs[$ifid]["descr"]) && is_string($ifs[$ifid]["descr"])) {
+		$label = trim($ifs[$ifid]["descr"]);
+		if ($label !== "") {
+			return $label;
+		}
+	}
+	return strtoupper($ifid);
+}
+
+/**
+ * IPs prefixados (reservas / static mapping) do DHCP de cada interface.
+ * Le `dhcpd/<if>/staticmap` e `dhcpdv6/<if>/staticmap` do config.xml —
+ * a mesma lista da GUI Services > DHCP Server. Nao isenta automaticamente.
+ *
+ * @param array<string, mixed>|null $dhcpd
+ * @param array<string, mixed>|null $dhcpdv6
+ * @return array<int, array{ip: string, mac: string, hostname: string, descr: string, label: string, ifid: string, iface: string}>
+ */
+function layer7_dhcp_static_maps($dhcpd = null, $dhcpdv6 = null)
+{
+	if ($dhcpd === null) {
+		$dhcpd = layer7_pfsense_config_branch("dhcpd");
+	}
+	if ($dhcpdv6 === null) {
+		$dhcpdv6 = layer7_pfsense_config_branch("dhcpdv6");
+	}
+	if (!is_array($dhcpd)) {
+		$dhcpd = array();
+	}
+	if (!is_array($dhcpdv6)) {
+		$dhcpdv6 = array();
+	}
+
+	$out = array();
+	$seen = array();
+	$collect = function ($ifid, $entry, $ip_key) use (&$out, &$seen) {
+		if (!is_array($entry)) {
+			return;
+		}
+		$ip = trim((string)($entry[$ip_key] ?? ""));
+		if ($ip === "" || !layer7_ip_valid($ip) || isset($seen[$ip])) {
+			return;
+		}
+		$mac = strtolower(trim((string)($entry["mac"] ?? "")));
+		$hostname = trim((string)($entry["hostname"] ?? ""));
+		$descr = trim((string)($entry["descr"] ?? ""));
+		$seen[$ip] = true;
+		$out[] = array(
+			"ip" => $ip,
+			"mac" => $mac,
+			"hostname" => $hostname,
+			"descr" => $descr,
+			"label" => layer7_dhcp_static_map_label($descr, $hostname, $ip),
+			"ifid" => (string)$ifid,
+			"iface" => layer7_dhcp_static_maps_iface_label($ifid)
+		);
+	};
+
+	foreach ($dhcpd as $ifid => $ifc) {
+		if (!is_array($ifc) || empty($ifc["staticmap"]) || !is_array($ifc["staticmap"])) {
+			continue;
+		}
+		foreach ($ifc["staticmap"] as $entry) {
+			$collect($ifid, $entry, "ipaddr");
+		}
+	}
+	foreach ($dhcpdv6 as $ifid => $ifc) {
+		if (!is_array($ifc) || empty($ifc["staticmap"]) || !is_array($ifc["staticmap"])) {
+			continue;
+		}
+		foreach ($ifc["staticmap"] as $entry) {
+			$collect($ifid, $entry, "ipaddrv6");
+		}
+	}
+
+	usort($out, function ($a, $b) {
+		$la = @ip2long($a["ip"]);
+		$lb = @ip2long($b["ip"]);
+		if ($la !== false && $lb !== false) {
+			return $la <=> $lb;
+		}
+		return strcmp((string)$a["ip"], (string)$b["ip"]);
+	});
+	return $out;
+}
+
+/**
+ * Agrupa reservas DHCP por interface (colunas na GUI).
+ *
+ * @param array<int, array<string, string>> $maps
+ * @return array<int, array{ifid: string, iface: string, entries: array}>
+ */
+function layer7_dhcp_maps_group_by_iface($maps)
+{
+	$groups = array();
+	foreach ((array)$maps as $m) {
+		$ifid = (string)($m["ifid"] ?? "");
+		if ($ifid === "") {
+			$ifid = "_";
+		}
+		if (!isset($groups[$ifid])) {
+			$groups[$ifid] = array(
+				"ifid" => $ifid,
+				"iface" => (string)($m["iface"] ?? strtoupper($ifid)),
+				"entries" => array()
+			);
+		}
+		$groups[$ifid]["entries"][] = $m;
+	}
+	return array_values($groups);
+}
+
+/**
+ * Indice IP -> interface (label + ifid) a partir das reservas DHCP.
+ *
+ * @param array<int, array<string, string>> $maps
+ * @return array<string, array{ifid: string, iface: string}>
+ */
+function layer7_dhcp_ip_iface_index($maps)
+{
+	$idx = array();
+	foreach ((array)$maps as $m) {
+		$ip = (string)($m["ip"] ?? "");
+		if ($ip === "" || isset($idx[$ip])) {
+			continue;
+		}
+		$idx[$ip] = array(
+			"ifid" => (string)($m["ifid"] ?? ""),
+			"iface" => (string)($m["iface"] ?? "")
+		);
+	}
+	return $idx;
+}
+
+/**
+ * Adiciona IPs da reserva DHCP a Lista VIP (so IPs que existem no mapping).
+ *
+ * @param string[] $ips
+ * @param array<int, array<string, string>>|null $maps
+ * @return array{ok: bool, error: string, updated: bool, added: int, skipped: int}
+ */
+function layer7_vip_add_from_dhcp_ips(&$data, $ips, $maps = null)
+{
+	if ($maps === null) {
+		$maps = layer7_dhcp_static_maps();
+	}
+	$by_ip = array();
+	foreach ($maps as $m) {
+		$by_ip[(string)($m["ip"] ?? "")] = $m;
+	}
+
+	$added = 0;
+	$skipped = 0;
+	$last_error = "";
+	foreach ((array)$ips as $ip) {
+		$ip = trim((string)$ip);
+		if ($ip === "" || !isset($by_ip[$ip])) {
+			$skipped++;
+			continue;
+		}
+		$res = layer7_vip_add_entry($data, $by_ip[$ip]["label"], $ip);
+		if (!empty($res["ok"])) {
+			$added++;
+		} else {
+			$skipped++;
+			$last_error = (string)($res["error"] ?? "");
+			if ($last_error !== "" && strpos($last_error, "Limite") !== false) {
+				break;
+			}
+		}
+	}
+
+	if ($added === 0) {
+		$err = $last_error !== "" ? $last_error : l7_t("Nenhuma reserva DHCP nova para adicionar.");
+		return array("ok" => false, "error" => $err, "updated" => false,
+		    "added" => 0, "skipped" => $skipped);
+	}
+	return array("ok" => true, "error" => "", "updated" => true,
+	    "added" => $added, "skipped" => $skipped);
 }
 
 function layer7_lic_path()
@@ -10023,6 +10479,16 @@ function layer7_render_styles()
 	.layer7-page .l7-filter { margin-bottom: 6px; }
 	.layer7-page .l7-bulk-tools { margin: 0 0 6px; }
 	.layer7-page .l7-bulk-tools .btn { margin-right: 6px; margin-bottom: 6px; }
+	.layer7-page .l7-iface-filter { margin: 0 0 10px; }
+	.layer7-page .l7-iface-filter .btn { margin: 0 6px 6px 0; }
+	.layer7-page .l7-iface-filter .btn.active { background: #5cb85c; border-color: #4cae4c; color: #fff; }
+	.layer7-page .l7-iface-cols { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
+	.layer7-page .l7-iface-col { flex: 1 1 260px; min-width: 240px; max-width: 420px; background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 10px 12px; box-sizing: border-box; }
+	.layer7-page .l7-iface-col.is-hidden,
+	.layer7-page .l7-iface-row.is-hidden { display: none; }
+	.layer7-page .l7-iface-col__title { margin: 0 0 8px; padding-bottom: 6px; border-bottom: 2px solid #5cb85c; font-size: 13px; font-weight: 700; }
+	.layer7-page .l7-iface-col__title .badge { margin-left: 4px; }
+	.layer7-page .l7-iface-col .table { margin-bottom: 8px; }
 	.layer7-page .l7-detail-grid dt { width: 170px; }
 	.layer7-page .l7-detail-grid dd { margin-left: 190px; margin-bottom: 10px; }
 	/* KPI cards partilhados (Estado + Relatorios) */

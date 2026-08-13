@@ -10,14 +10,14 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
 
 $layer7_exception_edit_retry = null;
+$vip_bulk_retry = null;
 
 if ($_POST["export_vip_list"] ?? false) {
 	$data = layer7_load_or_default();
-	$payload = layer7_vip_export_payload($data);
-	$json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-	header("Content-Type: application/json");
-	header("Content-Disposition: attachment; filename=\"layer7-vip-list-" . date("Ymd-His") . ".json\"");
-	echo $json;
+	$text = layer7_vip_export_text($data, true);
+	header("Content-Type: text/plain; charset=UTF-8");
+	header("Content-Disposition: attachment; filename=\"layer7-vip-list-" . date("Ymd-His") . ".txt\"");
+	echo $text;
 	exit;
 }
 
@@ -30,9 +30,8 @@ if ($_POST["import_vip_list"] ?? false) {
 		if (!is_string($raw) || $raw === "") {
 			$input_errors[] = l7_t("Ficheiro vazio.");
 		} else {
-			$imported = @json_decode($raw, true);
 			$data = layer7_load_or_default();
-			$res = layer7_vip_import_apply($data, $imported);
+			$res = layer7_vip_import_from_raw($data, $raw);
 			if (!$res["ok"]) {
 				$input_errors[] = $res["error"];
 			} elseif (layer7_save_json($data)) {
@@ -42,6 +41,21 @@ if ($_POST["import_vip_list"] ?? false) {
 				$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
 			}
 		}
+	}
+}
+
+if ($_POST["save_vip_bulk"] ?? false) {
+	$vip_bulk_retry = (string)($_POST["vip_bulk_text"] ?? "");
+	$data = layer7_load_or_default();
+	$res = layer7_vip_import_from_raw($data, $vip_bulk_retry, true);
+	if (!$res["ok"]) {
+		$input_errors[] = $res["error"];
+	} elseif (layer7_save_json($data)) {
+		layer7_pf_config_resync(true);
+		$savemsg = l7_t("Lista VIP actualizada a partir do texto.");
+		$vip_bulk_retry = null;
+	} else {
+		$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
 	}
 }
 
@@ -59,6 +73,28 @@ if ($_POST["add_vip_entry"] ?? false) {
 		$savemsg = l7_t("Isento adicionado a Lista VIP.");
 	} else {
 		$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
+	}
+}
+
+if ($_POST["add_vip_from_dhcp"] ?? false) {
+	$selected = array();
+	if (isset($_POST["vip_dhcp_ip"]) && is_array($_POST["vip_dhcp_ip"])) {
+		$selected = $_POST["vip_dhcp_ip"];
+	}
+	if (empty($selected)) {
+		$input_errors[] = l7_t("Selecione pelo menos uma reserva DHCP.");
+	} else {
+		$data = layer7_load_or_default();
+		$res = layer7_vip_add_from_dhcp_ips($data, $selected);
+		if (!$res["ok"]) {
+			$input_errors[] = $res["error"];
+		} elseif (layer7_save_json($data)) {
+			layer7_pf_config_resync(true);
+			$savemsg = sprintf(l7_t("%d isento(s) adicionados a partir das reservas DHCP."),
+			    (int)$res["added"]);
+		} else {
+			$input_errors[] = l7_t("Nao foi possivel gravar a configuracao.");
+		}
 	}
 }
 
@@ -281,6 +317,31 @@ $vip_cidr_count = count(array_filter($vip_entries, function ($r) {
 $vip_at_host_limit = $vip_host_count >= LAYER7_VIP_MAX_HOSTS;
 $vip_at_cidr_limit = $vip_cidr_count >= LAYER7_VIP_MAX_CIDRS;
 $vip_dns_mode = layer7_vip_dns_mode_get($data);
+$vip_bulk_text = ($vip_bulk_retry !== null)
+	? $vip_bulk_retry
+	: rtrim(layer7_vip_export_text($data, false));
+$vip_dhcp_maps = layer7_dhcp_static_maps();
+$vip_present = array();
+foreach ($vip_entries as $ventry) {
+	$vip_present[(string)($ventry["target"] ?? "")] = true;
+}
+$vip_dhcp_available = array();
+foreach ($vip_dhcp_maps as $dmap) {
+	$dip = (string)($dmap["ip"] ?? "");
+	if ($dip !== "" && empty($vip_present[$dip])) {
+		$vip_dhcp_available[] = $dmap;
+	}
+}
+$vip_iface_index = layer7_dhcp_ip_iface_index($vip_dhcp_maps);
+$vip_dhcp_groups = layer7_dhcp_maps_group_by_iface($vip_dhcp_available);
+$vip_filter_ifaces = array();
+foreach ($vip_dhcp_maps as $dmap) {
+	$ifid = (string)($dmap["ifid"] ?? "");
+	if ($ifid === "") {
+		continue;
+	}
+	$vip_filter_ifaces[$ifid] = (string)($dmap["iface"] ?? strtoupper($ifid));
+}
 
 $edit_ex_idx = null;
 $edit_ex = null;
@@ -353,6 +414,15 @@ function layer7_exc_target_summary($exception) {
 			<?php if (count($vip_entries) === 0) { ?>
 			<div class="alert alert-info"><?= l7_t("Nenhum isento directo na Lista VIP."); ?></div>
 			<?php } else { ?>
+			<?php if (count($vip_filter_ifaces) > 1) { ?>
+			<div class="l7-iface-filter" id="l7-vip-iface-filter">
+				<span class="help-block" style="display:inline; margin-right:8px;"><?= l7_t("Filtrar por interface"); ?>:</span>
+				<button type="button" class="btn btn-xs btn-default active" data-iface="" onclick="l7filterIface('');"><?= l7_t("Todas as interfaces"); ?></button>
+				<?php foreach ($vip_filter_ifaces as $fid => $flabel) { ?>
+				<button type="button" class="btn btn-xs btn-default" data-iface="<?= htmlspecialchars($fid); ?>" onclick="l7filterIface(<?= json_encode($fid); ?>);"><?= htmlspecialchars($flabel); ?></button>
+				<?php } ?>
+			</div>
+			<?php } ?>
 			<div class="layer7-form-card">
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
@@ -360,6 +430,7 @@ function layer7_exc_target_summary($exception) {
 							<tr>
 								<th><?= l7_t("Descricao"); ?></th>
 								<th><?= l7_t("IP/CIDR"); ?></th>
+								<th><?= l7_t("Interface"); ?></th>
 								<th><?= l7_t("Acoes"); ?></th>
 							</tr>
 						</thead>
@@ -367,10 +438,14 @@ function layer7_exc_target_summary($exception) {
 						<?php foreach ($vip_entries as $ventry) {
 							$vtarget = (string)($ventry["target"] ?? "");
 							$vdesc = (string)($ventry["description"] ?? "");
+							$vif = isset($vip_iface_index[$vtarget]) ? $vip_iface_index[$vtarget] : array("ifid" => "", "iface" => "");
+							$vifid = (string)($vif["ifid"] ?? "");
+							$viflabel = (string)($vif["iface"] ?? "");
 						?>
-							<tr>
+							<tr class="l7-iface-row" data-iface="<?= htmlspecialchars($vifid); ?>">
 								<td><?= htmlspecialchars($vdesc !== "" ? $vdesc : "—"); ?></td>
 								<td><code><?= htmlspecialchars($vtarget); ?></code></td>
+								<td><?= htmlspecialchars($viflabel !== "" ? $viflabel : "—"); ?></td>
 								<td class="layer7-table-actions">
 									<form method="post" action="layer7_exceptions.php#l7-vip-list" style="display:inline;"
 										onsubmit='return confirm(<?= json_encode(l7_t("Remover este isento da Lista VIP?")); ?>);'>
@@ -418,6 +493,92 @@ function layer7_exc_target_summary($exception) {
 				<?php } ?>
 			</div>
 
+			<div class="layer7-form-card" style="margin-top:16px;">
+				<h4 class="layer7-form-card__title"><?= l7_t("Reservas DHCP (IPs prefixados)"); ?></h4>
+				<p class="help-block"><?= l7_t("Le as reservas estaticas de Services > DHCP Server em cada interface. Escolha quais IPs entram na Lista VIP — nada e isento automaticamente."); ?></p>
+				<p class="help-block"><?= l7_t("Cada coluna e uma interface: so ve os IPs prefixados nessa rede."); ?></p>
+				<?php if (count($vip_dhcp_maps) === 0) { ?>
+				<div class="alert alert-info"><?= l7_t("Nenhuma reserva DHCP com IP nas interfaces. Crie mapeamentos estaticos no DHCP do pfSense."); ?></div>
+				<?php } elseif (count($vip_dhcp_available) === 0) { ?>
+				<div class="alert alert-info"><?= l7_t("Todas as reservas DHCP com IP ja estao na Lista VIP."); ?></div>
+				<?php } elseif ($vip_at_host_limit) { ?>
+				<div class="alert alert-warning"><?= l7_t("Limites da Lista VIP atingidos."); ?></div>
+				<?php } else { ?>
+				<form method="post" action="layer7_exceptions.php#l7-vip-list">
+					<?php if (count($vip_filter_ifaces) > 1) { ?>
+					<div class="l7-iface-filter" id="l7-dhcp-iface-filter">
+						<span class="help-block" style="display:inline; margin-right:8px;"><?= l7_t("Filtrar por interface"); ?>:</span>
+						<button type="button" class="btn btn-xs btn-default active" data-iface="" onclick="l7filterIface('');"><?= l7_t("Todas as interfaces"); ?></button>
+						<?php foreach ($vip_filter_ifaces as $fid => $flabel) { ?>
+						<button type="button" class="btn btn-xs btn-default" data-iface="<?= htmlspecialchars($fid); ?>" onclick="l7filterIface(<?= json_encode($fid); ?>);"><?= htmlspecialchars($flabel); ?></button>
+						<?php } ?>
+					</div>
+					<?php } ?>
+					<div class="l7-bulk-tools" style="margin-bottom:8px;">
+						<button type="button" class="btn btn-xs btn-default" onclick="l7setVisibleChecks('vip_dhcp_list', true);"><?= l7_t("Selecionar tudo"); ?></button>
+						<button type="button" class="btn btn-xs btn-default" onclick="l7setVisibleChecks('vip_dhcp_list', false);"><?= l7_t("Limpar"); ?></button>
+					</div>
+					<div class="l7-iface-cols" id="vip_dhcp_list">
+					<?php foreach ($vip_dhcp_groups as $group) {
+						$gid = (string)($group["ifid"] ?? "");
+						$glabel = (string)($group["iface"] ?? $gid);
+						$col_id = "vip_dhcp_col_" . preg_replace('/[^a-zA-Z0-9_]/', '_', $gid);
+					?>
+						<div class="l7-iface-col" data-iface="<?= htmlspecialchars($gid); ?>" id="<?= htmlspecialchars($col_id); ?>">
+							<div class="l7-iface-col__title">
+								<?= htmlspecialchars($glabel); ?>
+								<span class="badge"><?= count($group["entries"]); ?></span>
+							</div>
+							<div class="table-responsive">
+								<table class="table table-condensed table-striped">
+									<thead>
+										<tr>
+											<th></th>
+											<th><?= l7_t("Descricao"); ?></th>
+											<th><?= l7_t("IP"); ?></th>
+										</tr>
+									</thead>
+									<tbody>
+									<?php foreach ($group["entries"] as $dmap) {
+										$dip = (string)$dmap["ip"];
+										$dlabel = (string)($dmap["label"] ?? $dip);
+									?>
+										<tr>
+											<td><input type="checkbox" name="vip_dhcp_ip[]" value="<?= htmlspecialchars($dip); ?>" /></td>
+											<td><?= htmlspecialchars($dlabel); ?></td>
+											<td><code><?= htmlspecialchars($dip); ?></code></td>
+										</tr>
+									<?php } ?>
+									</tbody>
+								</table>
+							</div>
+							<button type="button" class="btn btn-xs btn-default" onclick="l7setChecks(<?= json_encode($col_id); ?>, true);"><?= l7_t("Selecionar esta interface"); ?></button>
+						</div>
+					<?php } ?>
+					</div>
+					<button type="submit" name="add_vip_from_dhcp" value="1" class="btn btn-success">
+						<?= l7_t("Adicionar seleccionados a Lista VIP"); ?>
+					</button>
+				</form>
+				<?php } ?>
+			</div>
+
+			<div class="layer7-form-card" style="margin-top:16px;">
+				<h4 class="layer7-form-card__title"><?= l7_t("Editar lista em lote"); ?></h4>
+				<p class="help-block"><?= l7_t("Formato simples: uma linha por isento, IP ou rede, virgula e nome. Linhas com # sao ignoradas."); ?></p>
+				<p class="help-block"><code>192.168.1.60, Silvana</code></p>
+				<form method="post" action="layer7_exceptions.php#l7-vip-list">
+					<div class="form-group">
+						<textarea name="vip_bulk_text" class="form-control" rows="12" spellcheck="false"
+							style="font-family:Menlo,Consolas,monospace; max-width:640px;"><?= htmlspecialchars($vip_bulk_text); ?></textarea>
+					</div>
+					<button type="submit" name="save_vip_bulk" value="1" class="btn btn-primary"
+						onclick="return confirm(<?= json_encode(l7_t("Guardar a lista em lote substitui as entradas directas da Lista VIP. Continuar?")); ?>);">
+						<?= l7_t("Guardar lista em lote"); ?>
+					</button>
+				</form>
+			</div>
+
 			<div class="layer7-toolbar" style="margin-top:16px;">
 				<form method="post" action="layer7_exceptions.php#l7-vip-list" style="display:inline;">
 					<button type="submit" name="export_vip_list" value="1" class="btn btn-sm btn-info">
@@ -425,12 +586,13 @@ function layer7_exc_target_summary($exception) {
 					</button>
 				</form>
 				<form method="post" action="layer7_exceptions.php#l7-vip-list" enctype="multipart/form-data" class="form-inline" style="display:inline; margin-left:8px;">
-					<input type="file" name="vip_import_file" accept=".json" style="display:inline-block; width:auto;" />
+					<input type="file" name="vip_import_file" accept=".txt,.csv,.json,text/plain,text/csv,application/json" style="display:inline-block; width:auto;" />
 					<button type="submit" name="import_vip_list" value="1" class="btn btn-sm btn-warning"
 						onclick="return confirm(<?= json_encode(l7_t("Importar substitui entradas directas da Lista VIP (grupos isentos sao limpos). Continuar?")); ?>);">
 						<i class="fa fa-upload"></i> <?= l7_t("Importar Lista VIP"); ?>
 					</button>
 				</form>
+				<p class="help-block" style="margin-top:8px;"><?= l7_t("Tambem pode exportar/importar um ficheiro .txt (Excel e Bloco de notas). JSON antigo continua a ser aceite."); ?></p>
 			</div>
 			</div>
 			</div>
@@ -738,6 +900,56 @@ function l7setChecks(listId, checked) {
 	boxes = wrap.querySelectorAll('input[type="checkbox"]');
 	for (i = 0; i < boxes.length; i++) {
 		boxes[i].checked = checked;
+	}
+}
+function l7setVisibleChecks(listId, checked) {
+	var wrap = document.getElementById(listId);
+	var i, boxes, col;
+	if (!wrap) return;
+	boxes = wrap.querySelectorAll('input[type="checkbox"]');
+	for (i = 0; i < boxes.length; i++) {
+		col = boxes[i].parentNode;
+		while (col && col !== wrap) {
+			if (col.className && String(col.className).indexOf("l7-iface-col") !== -1) {
+				if (String(col.className).indexOf("is-hidden") !== -1) {
+					col = null;
+					break;
+				}
+			}
+			col = col.parentNode;
+		}
+		if (col === null) {
+			continue;
+		}
+		boxes[i].checked = checked;
+	}
+}
+function l7filterIface(ifid) {
+	var i, el, match, btns, cols, rows;
+	ifid = ifid || "";
+	cols = document.querySelectorAll(".l7-iface-col");
+	for (i = 0; i < cols.length; i++) {
+		match = (ifid === "" || cols[i].getAttribute("data-iface") === ifid);
+		cols[i].className = cols[i].className.replace(/\s*is-hidden\b/g, "");
+		if (!match) {
+			cols[i].className += " is-hidden";
+		}
+	}
+	rows = document.querySelectorAll(".l7-iface-row");
+	for (i = 0; i < rows.length; i++) {
+		match = (ifid === "" || rows[i].getAttribute("data-iface") === ifid);
+		rows[i].className = rows[i].className.replace(/\s*is-hidden\b/g, "");
+		if (!match) {
+			rows[i].className += " is-hidden";
+		}
+	}
+	btns = document.querySelectorAll(".l7-iface-filter .btn");
+	for (i = 0; i < btns.length; i++) {
+		el = btns[i];
+		el.className = el.className.replace(/\s*active\b/g, "");
+		if ((el.getAttribute("data-iface") || "") === ifid) {
+			el.className += " active";
+		}
 	}
 }
 </script>

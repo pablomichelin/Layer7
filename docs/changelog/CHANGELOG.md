@@ -4,6 +4,22 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.61] — 2026-08-13 (candidato; não publicado)
+
+### Changed
+
+- **Lista VIP (BG-124):** export/import deixa de exigir JSON. O formato
+  canónico para o operador é texto simples, uma linha por isento
+  (`192.168.1.60, Silvana`). A GUI passa a ter editor em lote (textarea).
+  Import aceita `.txt` / `.csv` e JSON legado (incluindo vírgula final de
+  edição manual).
+- **Lista VIP (BG-125):** lê as reservas DHCP estáticas de cada interface
+  (`dhcpd/<if>/staticmap` e DHCPv6) e permite adicionar os IPs prefixados
+  à Lista VIP com o nome da reserva. GUI em colunas por interface, com
+  filtro. Não isenta automaticamente.
+  Daemon, `vip-isentos` e limites 32+16 inalterados.
+  **Não** promove enforce `1.9.8` nem MITM permanente.
+
 ## [1.9.60] — 2026-08-13
 
 ### Fixed

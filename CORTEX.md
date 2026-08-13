@@ -39,6 +39,9 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 `SHA256=ec22d3b636adf73bbb6497c2bec05a6ae2c34984e0b92815bfb36dc8ff89329f`;
 **entitle-ok PATH** (rc.d); herda P4.1 `1.9.59`
 (`SHA256=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9`);
+**candidato no branch (não publicado):** `1.9.61` — Lista VIP texto simples
+(BG-124; uma linha `IP, nome`; JSON legado aceite) + reservas DHCP
+(BG-125; picker `staticmap`; sem auto-isenção);
 herda F1.2 de `1.9.58`
 (`SHA256=8b4a2dc6ecd62c126222186112ea80ee75407d35c35049f94631980092108d3d`);
 **BG-028 Fase 1 / F1.2** — manifesto + `.sig` + `install.sh` carimbado;

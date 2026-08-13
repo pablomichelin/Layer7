@@ -46,7 +46,8 @@ Referência rápida do que o PHP valida antes de gravar `layer7.json`.
 | IP ou CIDR | `layer7_ipv4_valid` ou `layer7_cidr_valid`; único na lista |
 | Limites | `LAYER7_VIP_MAX_HOSTS` (32) + `LAYER7_VIP_MAX_CIDRS` (16) — rejeição visível |
 | Labels | `layer7.vip_meta.labels` mapa alvo → descrição; cleanup de órfãos no save |
-| Export/import | JSON `layer7_vip_list` com array `entries` |
+| Export/import | Texto simples (uma linha `IP, nome`); JSON legado `layer7_vip_list` ainda aceite |
+| Reservas DHCP | `layer7_dhcp_static_maps()` lê `dhcpd/<if>/staticmap` (+ DHCPv6); colunas por interface + filtro; picker na GUI; não isenta automaticamente |
 | SSOT | Excepção canónica `vip-isentos` (sem chaves novas dentro do objecto) |
 | Isenção DNS (BG-073) | `layer7_vip_dns_sync()` em resync; view Unbound ou fallback rdr; modo visível via `layer7_vip_dns_mode_get()` |
 

@@ -296,7 +296,7 @@ Menu base: **Services > Layer 7**.
 | Estado / Dashboard | Serviço, versão, resumo |
 | Definições | Modo, interfaces, licença, logs, relatórios, actualização |
 | Políticas | Regras L7 (monitor/allow/block/tag) |
-| Excepções / Lista VIP | Isenções por host/CIDR |
+| Excepções / Lista VIP | Isenções por host/CIDR; lista em texto simples (`IP, nome`); reservas DHCP das interfaces |
 | Dispositivos / perfis | Inventário e perfis (Caminho A) |
 | Blacklists | UT1 + categorias locais / regras |
 | Identity | User-ID (quando entitlement) |
