@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.58
+PORTVERSION=	1.9.59
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -210,6 +210,8 @@ do-install:
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/layer7-reports-collect.php \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/layer7-stats-purge.sh \
+		${STAGEDIR}${PREFIX}/etc/layer7
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/layer7/layer7-mitm-window-tick.php \
 		${STAGEDIR}${PREFIX}/etc/layer7
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/layer7/reports
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/layer7/blacklists

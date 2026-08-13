@@ -193,6 +193,8 @@ $ca_ok = !empty($mitm["ca"]["present"]);
 $toggle_ok = $unlocked && $ca_ok;
 $win_status = function_exists("layer7_mitm_window_status")
     ? layer7_mitm_window_status($mitm) : array();
+$sup_status = function_exists("layer7_mitm_window_supervisor_status")
+    ? layer7_mitm_window_supervisor_status() : array();
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("MITM"));
 $pglinks = array("", "/packages/layer7/layer7_status.php", "@self");
@@ -269,6 +271,16 @@ if ($savemsg !== "") {
 								echo !empty($win_status["expired"]) ? "expirado / OFF" : "0s";
 							} else {
 								echo htmlspecialchars(sprintf("%dm %ds", intdiv($rs, 60), $rs % 60));
+							}
+						?></code></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("Supervisor on-box (P4.1)")); ?></th><td><code><?php
+							if (!empty($sup_status["armed"])) {
+								$ls = (int)($sup_status["last_unix"] ?? 0);
+								echo htmlspecialchars(l7_t("armado") . ($ls > 0
+								    ? " " . gmdate("Y-m-d\\TH:i:s\\Z", $ls)
+								    : ""));
+							} else {
+								echo htmlspecialchars(l7_t("nao armado / stale"));
 							}
 						?></code></td></tr>
 						<tr><th>features</th><td><code><?= htmlspecialchars($l7_feat_raw); ?></code></td></tr>

@@ -46,6 +46,7 @@
 /usr/local/etc/layer7/layer7-stats-collect.sh
 /usr/local/etc/layer7/layer7-reports-collect.php
 /usr/local/etc/layer7/layer7-stats-purge.sh
+/usr/local/etc/layer7/layer7-mitm-window-tick.php
 /usr/local/etc/layer7/lang/en.php
 /usr/local/etc/layer7/lang/pt.php
 /usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem

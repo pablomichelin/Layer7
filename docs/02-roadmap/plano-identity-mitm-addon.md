@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM **`1.9.47`** P3 PASS; **P4 CLOSED FAIL/ABORT**; Gate B+C/teste em `1.9.46`; piloto externo **NÃO PRONTO** — **P5 aguarda ficha site** (rev. `2026-08-09aw`)
+**Estado do plano:** Identity **FECHADA**; MITM P3 **`1.9.47`**; **P4 CLOSED FAIL/ABORT**; **P4.1** candidato **`1.9.59`** (local, supervisor on-box); Gate B+C/teste em `1.9.46`; piloto externo **NÃO PRONTO** — **P5 aguarda ficha site** (rev. `2026-08-13ax`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -56,7 +56,8 @@
 **Rev. `as` (`2026-08-09`)** = Gate activação externa (ficha nomeada) **≠** lacuna eng.; critérios aceite P3.1–P3.8 fechados no mapa.  
 **Rev. `at` (`2026-08-09`)** = **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS.  
 **Rev. `au` (`2026-08-09`)** = registo incorrecto de P4 como ABORT por Skip (`example.com`) — **corrigido**.  
-**Rev. `av` (`2026-08-09`)** = **P4 CLOSED FAIL/ABORT** — retomado; Phase C interna PASS (issuer MITM; PF scoped; sem externos); Skip≠abort; rollback só no fecho.
+**Rev. `av` (`2026-08-09`)** = **P4 CLOSED FAIL/ABORT** — retomado; Phase C interna PASS (issuer MITM; PF scoped; sem externos); Skip≠abort; rollback só no fecho.  
+**Rev. `ax` (`2026-08-13`)** = **P4.1** supervisor on-box (cron 1 min / stamp / GUI); candidato `1.9.59` local; testes MITM PASS; **sem** publish; **sem** activar MITM; P5 continua a aguardar ficha.
 
 ---
 
@@ -64,9 +65,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **`1.9.47`** MONITOR/MITM OFF (pós-P4 FAIL/ABORT); permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 PASS; P4 lab; ficha = **gate**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
-| Próximo | Concluir soak P4 → rollback limpo; depois **P5** com ficha; `.234`/`.235` proibidos |
+| Passo actual | **P4.1** supervisor on-box (candidato `1.9.59` local); MITM OFF; permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 PASS; P4 FAIL/ABORT; P4.1 local; ficha = **gate**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Próximo | **P4 retry só com GO lab** + pacote `1.9.59`; depois **P5** com ficha; `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -85,11 +86,12 @@ TRILHA — progresso
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
 - GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
-- Prontidão piloto: NÃO PRONTO activar externo (P1+P2+P3 PASS; P4 CLOSED FAIL/ABORT; P5 aguarda ficha)
+- Prontidão piloto: NÃO PRONTO activar externo (P1+P2+P3 PASS; P4 CLOSED FAIL/ABORT; P4.1 local; P5 aguarda ficha)
 - P4: 20260809T234042Z CLOSED FAIL/ABORT (Phase C interna PASS; Skip≠abort)
-- Plano rev.: 2026-08-09aw
-- Lab/latest publicado: 1.9.47 (SHA 2155daca…9df833)
-- Próximo: P4 FAIL/ABORT; P5 só com ficha; sem reactivar MITM
+- P4.1: supervisor on-box (1.9.59 local; cron+stamp+GUI; testes PASS; sem publish)
+- Plano rev.: 2026-08-13ax
+- Latest publicado: 1.9.58; MITM P3 em 1.9.47
+- Próximo: P4 retry só com GO lab + 1.9.59; P5 só com ficha; MITM OFF
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -603,6 +605,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-09 | **rev. `ar` / P1+P2** — GO-escopo D1–D9 + runbook-piloto-mitm-generico; activação NO-GO até P3 |
 | 2026-08-09 | **rev. `as`** — gate activação externa ≠ gap eng.; P3.1–P3.8 fechados |
 | 2026-08-09 | **rev. `at` / P3 PASS** — `1.9.47` max_window/deadline/audit/GUI; evid. `230400Z` |
+| 2026-08-13 | **rev. `ax` / P4.1** — supervisor on-box cron 1 min; candidato `1.9.59` local; sem publish/activar |
 | 2026-08-09 | **rev. `ao` / `1.9.46` PASS** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync |
 | 2026-08-09 | **rev. `ah` / `1.9.42` PASS** — `source_cidr`∧`dest_cidr`; proibido `from any`; runbook activação; `.254` sem escrita |
 | 2026-08-09 | **rev. `af` / rev. gerencial 20.11** — overclaim S3/S6 (interino; supersedido por `ag`) |

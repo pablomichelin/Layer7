@@ -24,6 +24,9 @@ if (function_exists('layer7_bl_setup_cron')) {
 if (function_exists('layer7_reports_setup_cron')) {
 	layer7_reports_setup_cron(false, 5);
 }
+if (function_exists('layer7_mitm_setup_window_cron')) {
+	layer7_mitm_setup_window_cron(false);
+}
 " >/dev/null 2>&1 || true
 }
 

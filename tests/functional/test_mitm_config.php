@@ -496,6 +496,19 @@ if (!$has_openssl) {
 		fail("P3.8: from any proibido");
 	}
 
+	/* P4.1: tick on-box expira janela sem GUI (CA ainda presente). */
+	$n_exp2 = $n_win;
+	$n_exp2["window"]["deadline_unix"] = time() - 5;
+	$n_exp2 = layer7_mitm_normalize($n_exp2);
+	$cfg_exp2 = layer7_mitm_apply_to_config(layer7_bare_config(), $n_exp2);
+	$t1 = layer7_mitm_window_supervisor_tick($cfg_exp2);
+	if (empty($t1["expired"]) || !empty($t1["mitm_enabled"])) {
+		fail("P4.1: tick deve expirar janela e deixar MITM OFF");
+	}
+	if (!empty($t1["data"]["layer7"]["mitm"]["enabled"])) {
+		fail("P4.1: persistencia apos tick expire = OFF");
+	}
+
 	@unlink($fake);
 	layer7_mitm_ca_delete();
 	$n3 = layer7_mitm_normalize(array("enabled" => true));
@@ -510,6 +523,47 @@ $cfg = layer7_mitm_apply_to_config(layer7_bare_config(), array(
 ));
 if (!empty($cfg["layer7"]["mitm"]["enabled"])) {
 	fail("apply sem CA: enabled false");
+}
+
+/* --- P4.1: supervisor on-box (cron tick; nunca activa MITM) --- */
+if (!function_exists("layer7_mitm_setup_window_cron") ||
+    !function_exists("layer7_mitm_window_supervisor_tick")) {
+	fail("P4.1: API supervisor em falta");
+}
+$cron_cmd = layer7_mitm_setup_window_cron(true);
+if (strpos($cron_cmd, "layer7-mitm-window-tick.php") === false) {
+	fail("P4.1: cron deve apontar ao tick on-box");
+}
+if (preg_match('/sshpass|mitm\.enabled\s*=\s*true/i', $cron_cmd)) {
+	fail("P4.1: cron nao pode ter segredos nem activar MITM");
+}
+$tick_src = file_get_contents($root .
+    "/package/pfSense-pkg-layer7/files/usr/local/etc/layer7/layer7-mitm-window-tick.php");
+if (strpos($tick_src, "layer7_mitm_window_supervisor_tick") === false) {
+	fail("P4.1: script tick deve chamar supervisor_tick");
+}
+if (preg_match('/enabled["\']?\s*=\s*true/i', $tick_src)) {
+	fail("P4.1: script tick nao pode ligar mitm.enabled");
+}
+$inst = file_get_contents($root .
+    "/package/pfSense-pkg-layer7/files/pkg-install.in");
+if (strpos($inst, "layer7_mitm_setup_window_cron") === false) {
+	fail("P4.1: pkg-install deve armar cron");
+}
+$deinst = file_get_contents($root .
+    "/package/pfSense-pkg-layer7/files/pkg-deinstall.in");
+if (strpos($deinst, "layer7_mitm_setup_window_cron") === false) {
+	fail("P4.1: pkg-deinstall deve desarmar cron");
+}
+
+$off = layer7_bare_config();
+$t0 = layer7_mitm_window_supervisor_tick($off);
+if (!empty($t0["mitm_enabled"]) || !empty($t0["expired"])) {
+	fail("P4.1: tick OFF nao activa MITM");
+}
+$sup = layer7_mitm_window_supervisor_status();
+if (empty($sup["armed"]) || (int)$sup["last_unix"] <= 0) {
+	fail("P4.1: tick deve armar stamp");
 }
 
 /* Uninstall contract: pkg-deinstall lista layer7_mitm_src */

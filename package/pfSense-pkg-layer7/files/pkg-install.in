@@ -89,6 +89,12 @@ reload_filter
 require_once('${PKG_ROOTDIR}/etc/inc/filter.inc');
 require_once('${PKG_ROOTDIR}/usr/local/pkg/layer7.inc');
 layer7_reports_setup_cron(true, 5);
+if (function_exists('layer7_mitm_setup_window_cron')) {
+	layer7_mitm_setup_window_cron(true);
+}
+if (function_exists('layer7_mitm_window_supervisor_tick')) {
+	layer7_mitm_window_supervisor_tick();
+}
 " >/dev/null 2>&1 || true
 
 # --- Habilitar e (re)iniciar o serviço ---

@@ -54,6 +54,9 @@ foreach (array(
 	"layer7_mitm_audit",
 	"layer7_mitm_prepare_window_on_save",
 	"layer7_mitm_lifecycle_tick",
+	"layer7_mitm_setup_window_cron",
+	"layer7_mitm_window_supervisor_tick",
+	"layer7_mitm_window_supervisor_status",
 ) as $fn) {
 	need(function_exists($fn), "API em falta: $fn");
 }

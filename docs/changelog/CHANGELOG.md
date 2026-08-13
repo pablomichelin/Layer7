@@ -4,6 +4,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.59] — candidato (P4.1, sem publish)
+
+### Added
+
+- **MITM P4.1 — supervisor on-box:** cron `* * * * *` chama
+  `layer7-mitm-window-tick.php` (armado no `pkg-install`, removido no
+  deinstall). Expire/cleanup da janela sem GUI nem watchdog no Mac.
+  Stamp `/var/run/layer7/mitm.window-supervisor` (armado se fresco ≤180 s);
+  GUI mostra o estado. O tick **nunca** liga `mitm.enabled`.
+  Testes `test_mitm_config.php` + `test_mitm_regress.php` PASS.
+  Runbook: `docs/09-blocking/runbook-p4-retry-supervisor-onbox.md`.
+  **Não** activa MITM; **não** autoriza P4 retry nem P5 sem GO/ficha.
+
 ## [1.9.58] — 2026-08-13
 
 ### Security

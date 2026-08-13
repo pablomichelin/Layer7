@@ -223,6 +223,9 @@ define("L7_CTRL_TIMEOUT_KILL_GRACE", 5);
 define("L7_MITM_WINDOW_MAX_MINUTES_DEFAULT", 15);
 define("L7_MITM_WINDOW_MAX_MINUTES_MIN", 1);
 define("L7_MITM_WINDOW_MAX_MINUTES_CAP", 240);
+/** P4.1 — supervisor on-box: cron 1 min; stamp fresco ≤180s = armado. */
+define("L7_MITM_WINDOW_TICK", "/usr/local/etc/layer7/layer7-mitm-window-tick.php");
+define("L7_MITM_WINDOW_SUPERVISOR_STALE_SEC", 180);
 
 /**
  * Executa comando externo com timeout finito e resultado explicito.
@@ -7942,6 +7945,158 @@ function layer7_mitm_lifecycle_tick($data = null)
 		layer7_mitm_sync_helper($data);
 	}
 	return $data;
+}
+
+/**
+ * P4.1 — comando cron do supervisor on-box (nunca activa MITM).
+ */
+function layer7_mitm_window_tick_cmd()
+{
+	return "/usr/local/bin/php -f " . L7_MITM_WINDOW_TICK;
+}
+
+/**
+ * P4.1 — arma/desarma cron * * * * * do tick. Sem install_cron_job = no-op.
+ *
+ * @param bool $enabled
+ * @return string comando (para testes / evidência)
+ */
+function layer7_mitm_setup_window_cron($enabled)
+{
+	$cmd = layer7_mitm_window_tick_cmd();
+	if (function_exists("install_cron_job")) {
+		install_cron_job($cmd, (bool)$enabled, "*", "*", "*", "*", "*");
+	}
+	return $cmd;
+}
+
+/**
+ * Path do stamp do supervisor (TEST_ROOT isolado).
+ */
+function layer7_mitm_window_supervisor_stamp_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") .
+		    "/var/run/layer7/mitm.window-supervisor";
+	}
+	return "/var/run/layer7/mitm.window-supervisor";
+}
+
+/**
+ * Escreve stamp armado (metadados; zero segredos / PEM).
+ *
+ * @param array $extra
+ * @return string path
+ */
+function layer7_mitm_window_supervisor_write_stamp($extra = array())
+{
+	$path = layer7_mitm_window_supervisor_stamp_path();
+	$dir = dirname($path);
+	if (!is_dir($dir)) {
+		@mkdir($dir, 0755, true);
+	}
+	$event = isset($extra["event"])
+	    ? preg_replace('/[^a-z0-9_]/', '', strtolower((string)$extra["event"]))
+	    : "tick";
+	if ($event === "") {
+		$event = "tick";
+	}
+	$lines = array(
+		"armed=1",
+		"ts=" . time(),
+		"event=" . $event,
+		"mitm_enabled=" . (!empty($extra["mitm_enabled"]) ? "true" : "false"),
+		"expired=" . (!empty($extra["expired"]) ? "true" : "false")
+	);
+	@file_put_contents($path, implode("\n", $lines) . "\n", LOCK_EX);
+	if (!getenv("LAYER7_TEST_ROOT")) {
+		@chmod($path, 0640);
+	}
+	return $path;
+}
+
+/**
+ * Estado do supervisor on-box para GUI / evidência.
+ *
+ * @return array{armed:bool,stale:bool,last_unix:int,event:string,path:string}
+ */
+function layer7_mitm_window_supervisor_status()
+{
+	$path = layer7_mitm_window_supervisor_stamp_path();
+	$st = array(
+		"armed" => false,
+		"stale" => true,
+		"last_unix" => 0,
+		"event" => "",
+		"path" => $path
+	);
+	if (!is_readable($path)) {
+		return $st;
+	}
+	$raw = @file_get_contents($path);
+	$ts = 0;
+	$event = "";
+	foreach (explode("\n", (string)$raw) as $ln) {
+		if (strpos($ln, "ts=") === 0) {
+			$ts = (int)substr($ln, 3);
+		} elseif (strpos($ln, "event=") === 0) {
+			$event = substr($ln, 6);
+		}
+	}
+	$age = ($ts > 0) ? (time() - $ts) : 99999;
+	$stale_sec = (int)L7_MITM_WINDOW_SUPERVISOR_STALE_SEC;
+	$st["last_unix"] = $ts;
+	$st["event"] = $event;
+	$st["stale"] = ($age > $stale_sec);
+	$st["armed"] = ($ts > 0 && $age <= $stale_sec);
+	return $st;
+}
+
+/**
+ * P4.1 — tick do supervisor: expire/cleanup sem GUI nem Mac.
+ * Nunca liga mitm.enabled. filter_configure só se expirou (não em TEST_ROOT).
+ *
+ * @param array|null $data
+ * @return array{data:array,expired:bool,mitm_enabled:bool}
+ */
+function layer7_mitm_window_supervisor_tick($data = null)
+{
+	if ($data === null || !is_array($data)) {
+		$data = layer7_load_or_default();
+	}
+	$mitm_before = layer7_mitm_from_config($data);
+	$enabled_before = !empty($mitm_before["enabled"]);
+	$expired = false;
+	if (function_exists("layer7_mitm_lifecycle_tick")) {
+		$data = layer7_mitm_lifecycle_tick($data);
+	}
+	$mitm = layer7_mitm_from_config($data);
+	if ($enabled_before && empty($mitm["enabled"])) {
+		$expired = true;
+		if (function_exists("layer7_filter_configure_safe") &&
+		    !getenv("LAYER7_TEST_ROOT")) {
+			layer7_filter_configure_safe();
+		}
+	}
+	/* Cinto: o tick não pode passar OFF→ON. */
+	if (!$enabled_before && !empty($mitm["enabled"])) {
+		$mitm["enabled"] = false;
+		if (isset($mitm["window"]) && is_array($mitm["window"])) {
+			$mitm["window"]["deadline_unix"] = 0;
+		}
+		$mitm = layer7_mitm_normalize($mitm);
+		$data = layer7_mitm_apply_to_config($data, $mitm);
+	}
+	layer7_mitm_window_supervisor_write_stamp(array(
+		"event" => $expired ? "expire" : "tick",
+		"mitm_enabled" => !empty($mitm["enabled"]),
+		"expired" => $expired
+	));
+	return array(
+		"data" => $data,
+		"expired" => $expired,
+		"mitm_enabled" => !empty($mitm["enabled"])
+	);
 }
 
 /**
