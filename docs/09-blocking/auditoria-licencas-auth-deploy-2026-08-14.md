@@ -39,9 +39,12 @@ sem deploy / `PORTVERSION`).
 `LAYER7_TEST_ROOT`; sem deploy / `PORTVERSION`).
 **P2-3 FEITO** no git (`2026-08-14`; origin `X-Forwarded-Proto $scheme`;
 login HTTP+proto https → 400; sem deploy / `PORTVERSION`).
+**P1-9 AVALIADO** no git (`2026-08-14`) — residual pós-P2-3 (Host oficial
+no origin HTTP) **não** é fluxo aberto no contrato HEAD; sem mudança de
+runtime; bind live `0.0.0.0` não versionado.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13/P2-17/P2-3).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13/P2-17/P2-3; sem P1-9 runtime).
 
 ---
 
@@ -242,6 +245,11 @@ só corre se `PKG_UPGRADE` estiver vazio e não houver keep. Manual e
 
 ### P1-9 — Compose/nginx/bind live ≠ HEAD
 
+**AVALIADO no git** (`2026-08-14`) — residual pós-P2-3 **não** é um fluxo
+aberto no contrato HEAD. Sem mudança de runtime (login/TOTP/nginx/compose
+intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
+**P0-1 ACTIVO.**
+
 | Campo | Valor |
 |-------|--------|
 | **Evidência** | HEAD compose default `127.0.0.1:8445`; evidência `20260811T135140Z-pre-30.11-primary-cdn` restaurou `0.0.0.0:8445` para edge `.253`; HEAD nginx sem `downloads.systemup.inf.br` |
@@ -249,6 +257,7 @@ só corre se `PKG_UPGRADE` estiver vazio e não houver keep. Manual e
 | **Impacto** | Primary público parte mesmo que o código 30.11 fosse copiado à mão. Edge `.253` deixa de alcançar o origin. |
 | **Correcção mínima** | Bind `0.0.0.0` é ajuste **live/edge**, não default do repo. Deploy por allowlist; nunca substituir compose/nginx live sem diff. |
 | **Testes** | Diff compose/nginx live vs HEAD antes de qualquer up; smoke origin via edge. |
+| **Prova residual pós-P2-3** | Ver secção *Prova P1-9* abaixo. |
 
 ### P1-10 — Git e live divergem nos dois sentidos
 
@@ -409,7 +418,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 12. **M1 FEITO no git** (`2026-08-14`) — GUI/helper fingerprint via `layer7d --fingerprint`; **sem** deploy / `PORTVERSION`.
 13. **P2-17 FEITO no git** (`2026-08-14`) — `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`; **sem** deploy / `PORTVERSION`.
 14. **P2-3 FEITO no git** (`2026-08-14`) — origin `X-Forwarded-Proto $scheme`; `req.secure` deixa de autenticar o canal. **Não** deployado.
-15. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-2 CSRF fica na fila; P2-9 só com GO. Sem M1/P2-17/P2-3.
+15. **P1-9 AVALIADO no git** (`2026-08-14`) — residual pós-P2-3 **não** aberto no HEAD; sem mudança de runtime; bind live não versionado. **Não** deployado.
+16. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-2 CSRF fica na fila; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -421,11 +431,47 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 |-------|--------|
 | Objectivo | Impedir que um cliente force `req.secure===true` no origin HTTP com `X-Forwarded-Proto: https`, para password/TOTP/Bearer não serem aceites nesse canal |
 | Impacto | `nginx/nginx.conf` (`$scheme`); `requireSecureSessionRequest` deixa de confiar em `req.secure`; testes `session-forwarded-proto.test.js` + `nginx-xff-config.test.js` + docs. Sem CSRF/DST/lifecycle, sem package/daemon/SPA, sem deploy / `PORTVERSION` |
-| Risco | Baixo. Canal oficial F2.1 (`Host: license.systemup.inf.br`) continua aceite depois do origin emitir `$scheme=http`. Residual: quem alcançar o origin e enviar o Host oficial ainda autentica em HTTP (P1-9 bind); P2-2 CSRF aberto; live sem overlay (P0-1) |
+| Risco | Baixo. Canal oficial F2.1 (`Host: license.systemup.inf.br`) continua aceite depois do origin emitir `$scheme=http`. Residual P1-9 **avaliado** (não aberto no HEAD; bind live não versionado); P2-2 CSRF aberto; live sem overlay (P0-1) |
 | Teste | Suite backend `179/179` PASS. Adversarial HTTP + proto https + Host de origin → 400 (antes `req.secure` abria). Host oficial + proto http → 200. Nginx sem `$http_x_forwarded_proto` |
 | Rollback | Reverter o commit; o origin volta ao mapa que honra o proto do cliente e o login volta a `req.secure` |
 
 **Conflito documental do pedido:** o título «prototype pollution» **não** é o P2-3 canónico. P2-3 = `X-Forwarded-Proto`. Parsers/merge JSON (`json_decode` / `JSON.parse` / `array_merge`) **não** são este achado; sem evidência de pollution neste bloco.
+
+## Prova P1-9 — residual pós-P2-3 (Host oficial no origin HTTP)
+
+**Pedido avaliado:** autenticação ainda pode ocorrer no origin HTTP quando o
+Host oficial é enviado. **Veredicto:** o fluxo **não** está aberto no
+contrato HEAD. Sem mudança de runtime. Cadeado executável em
+`origin-bind-p19.test.js`.
+
+| Camada | Estado | Prova |
+|--------|--------|-------|
+| Express `requireSecureSessionRequest` | Host `license.systemup.inf.br` aceite mesmo com `$scheme=http` | Contrato F2.1: edge TLS → origin HTTP. Teste P2-3 `official host still logs in` → 200. Recusar este Host no origin **parte** o canal oficial. |
+| Origin nginx | `X-Forwarded-Proto $scheme` (sempre `http` no :8445) | P2-3. Passar o proto do cliente reabre o spoof. Hardcodar `https` no vhost oficial **não** distingue edge de atacante. |
+| Distinção edge vs atacante no :8445 | Impossível sem segredo / PROXY / TLS no origin | Com `ports:` Docker, `$remote_addr` é o hop do publisher para **ambos**. |
+| Bind HEAD | `127.0.0.1:8445` | `docker-compose.yml` default; `.env.example`. LAN não alcança o origin. |
+| Host desconhecido | `default_server` → `444` | `nginx.conf`. Login por IP/`X-Forwarded-Proto: https` → 400 (P2-3). |
+| API/db/web | sem `ports:` | Só o nginx publica porta no host. |
+| Bind live | `0.0.0.0:8445` para edge `.253` | Canónico P1-9: ajuste **live/edge**, **não** versionar. P0-1 impede substituir compose live. |
+| Login / TOTP | mesmo gate de canal | `POST /login` e `POST /login/totp` chamam `requireSecureSessionRequest`. `/session` e `/2fa/*` exigem sessão já emitida. |
+| Dev/test | localhost só com `NODE_ENV=development`/`test` | Isolamento explícito; produção recusa IP/localhost. |
+
+**Porque não se fechou o Host oficial em HTTP:** exigir `https` no origin
+rejeita o F2.1 (o origin emite `$scheme=http`). Honrar
+`X-Forwarded-Proto` do cliente reabre P2-3. Um header secreto ou TLS no
+origin sai do bloco (segredos / topologia / deploy). O controlo real é o
+bind loopback + ACL de borda — já o default HEAD; o `0.0.0.0` live não
+entra no git.
+
+## Objectivo / impacto / risco / teste / rollback — P1-9 prova (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Provar se o residual pós-P2-3 (auth HTTP com Host oficial) é exposição aberta; se não for, não alterar o runtime |
+| Impacto | Cadeado `origin-bind-p19.test.js` + docs. Login/TOTP/`session.js`/nginx/compose **intactos**. Sem CSRF/DST, sem package/daemon/SPA, sem deploy / `PORTVERSION` |
+| Risco | Nenhum de runtime. Residual: bind live `0.0.0.0` (operacional, não versionado); P2-2 CSRF; P0-1 |
+| Teste | Antes: P2-3 Host oficial + proto http → 200; Host de origin + proto https → 400. Depois: o mesmo + cadeado compose/nginx/`.env.example`. Suite backend `184/184` PASS |
+| Rollback | Remover o teste e a nota documental; o runtime já era o anterior |
 
 ## Objectivo / impacto / risco / teste / rollback — P2-17 `LAYER7_TEST_NOW` (`2026-08-14`)
 

@@ -14,6 +14,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   integral / rebuild / overlay no `.244` continua proibido. Sem
   `index.js`/auth/TOTP/SPA/package/daemon/`.env`/bind/snapshot/host.
 
+### Changed
+
+- **BG-128 P1-9 — prova residual pós-P2-3:** AVALIADO no git após gates
+  deste bloco. Auth com Host oficial no origin HTTP é o contrato F2.1
+  (edge TLS → origin HTTP + `$scheme`). Não é exposição aberta no HEAD
+  (`127.0.0.1:8445`, `default_server` 444, API sem `ports:`). Fechar o
+  Host oficial partiria o F2.1 ou reabriria P2-3. Bind live `0.0.0.0`
+  continua operacional, **não** versionado. Sem mudança de runtime.
+  Cadeado `origin-bind-p19.test.js`. Sem `PORTVERSION`, sem deploy
+  (P0-1 ACTIVO).
+
 ### Fixed
 
 - **BG-128 P2-3 — `X-Forwarded-Proto` fail-closed:** FEITO no git após

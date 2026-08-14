@@ -137,7 +137,9 @@ Documentos normativos desta arquitetura:
   `$remote_addr`; o cliente deixa de escolher a chave de rate-limit/lock.
   `X-Forwarded-Proto` no origin passa a `$scheme` (P2-3 / BG-128
   `2026-08-14`); o login deixa de tratar `req.secure` como prova de TLS.
-  Sem deploy.
+  P1-9 residual (Host oficial no origin HTTP) **avaliado** `2026-08-14`:
+  contrato F2.1, não exposição aberta no HEAD; bind live `0.0.0.0` não
+  versionado. Sem deploy.
 - `001-init.sql` passa a trazer `admin_audit_log` e `admin_login_guards` para
   persistir auth, lockouts e mutacoes administrativas
 - `customers.js` e `licenses.js` passam a registar sucesso/negacao/erro de

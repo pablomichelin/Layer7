@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-128 P1-9 prova residual pós-P2-3
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | prova + cadeado de teste (sem bump visual / sem deploy / sem runtime) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Verificar se auth HTTP com Host oficial é exposição aberta; se não for, não alterar o canal F2.1 |
+| Impacto | `origin-bind-p19.test.js` + docs. Login/TOTP/nginx/compose intactos |
+| Risco | Nenhum de runtime. Residual: bind live `0.0.0.0` (não versionado); P2-2 CSRF; live sem overlay (P0-1) |
+| Teste | Suite backend `184/184` PASS. Antes=depois: Host oficial + proto http → 200; Host de origin + proto https → 400; bind HEAD `127.0.0.1:8445` |
+| Rollback | Remover o teste e a nota documental; o runtime já era o anterior |
+| Resultado | **AVALIADO no git** — fluxo não aberto no contrato HEAD; sem `.244` / sem 30.11 / sem SPA / sem CSRF / sem DST |
+
 ## 2026-08-14 — BG-128 P2-3 X-Forwarded-Proto
 
 | Campo | Valor |
@@ -13,7 +26,7 @@ Mais recente no topo.
 | Versão | `2.1.0` git / SPA live `2.0.0` intocada |
 | Objectivo | Cliente externo não força `req.secure` no origin HTTP com `X-Forwarded-Proto: https` |
 | Impacto | Origin `X-Forwarded-Proto $scheme`; login só no host F2.1 (localhost só em `development`/`test`) |
-| Risco | Baixo. Residual: Host oficial no origin HTTP (P1-9); P2-2 CSRF; live sem overlay (P0-1) |
+| Risco | Baixo. Residual P1-9 **avaliado** (não aberto no HEAD); P2-2 CSRF; live sem overlay (P0-1) |
 | Teste | `npm test` no backend — `179/179` PASS (incl. `session-forwarded-proto` + `nginx-xff-config`) |
 | Rollback | Reverter o commit; o mapa volta a honrar o proto do cliente e o login volta a `req.secure` |
 | Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem CSRF / sem DST |

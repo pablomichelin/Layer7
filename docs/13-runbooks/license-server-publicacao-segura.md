@@ -129,7 +129,11 @@ caminho edge-only confirmado — **fora** deste bloco (P1-9 live
 
 `X-Forwarded-Proto` no origin passa a `$scheme` (P2-3 / BG-128). O
 cliente deixa de forçar `https` no hop HTTP. O login administrativo
-aceita o host oficial F2.1 mesmo quando o origin emite `http`. Este
+aceita o host oficial F2.1 mesmo quando o origin emite `http` — isso é
+o canal HTTPS de borda, não um login por IP no `:8445`. A prova P1-9
+(`2026-08-14`) confirma que este residual **não** está aberto no
+contrato HEAD (bind loopback; Host desconhecido → 444). Bind live
+`0.0.0.0` continua ajuste de edge, **não** default do repo. Este
 runbook **não** autoriza deploy no `.244` (P0-1).
 
 ### 4. Deploy por allowlist de paths (nunca integral)
