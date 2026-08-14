@@ -6,6 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P1-3 — segundo factor TOTP:** `POST /api/auth/login/totp`
+  recusa `is_active=false`; password OK com TOTP ligado deixa de resetar
+  as guardas de login; falha TOTP incrementa o lock existente (email+IP)
+  e devolve `401` genérico sem enumerar conta/desafio/código. Contrato de
+  sucesso inalterado. Sem XFF/rate-limit (P1-2), sem single-use/bind
+  (residual P0-2), sem deploy (P0-1 ACTIVO).
 - **BG-128 P0-2 — TOTP challenge fail-closed:** o HMAC do `challenge_token`
   deixa de aceitar o fallback estático `layer7-totp-dev-secret`. Em produção
   (ou `NODE_ENV` vazio) a API recusa arrancar sem

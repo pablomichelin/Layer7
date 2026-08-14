@@ -26,7 +26,9 @@
 
 **P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244` enquanto o serving `30.11` live não estiver reconciliado **e** versionado no git (allowlist, sem snapshot). Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
-**P0-2 e P1-1 FEITOS no git** (`2026-08-14`; sem deploy). Próximo código com GO: **P1-2** (rate-limit/IP TOTP). Não mistura 30.11, não toca `.244`.
+**P0-2, P1-1 e P1-3 FEITOS no git** (`2026-08-14`; sem deploy). P2-5
+(reset/lock no 2FA) ficou absorvido no P1-3. Próximo código com GO: **P1-2**
+(XFF / rate-limit IP). Não mistura 30.11, não toca `.244`.
 
 ---
 
@@ -108,13 +110,22 @@ continua 404. **Não** deployado (P0-1).
 
 ### P1-3 — `/login/totp` não verifica `is_active`
 
+**FEITO no git** (`2026-08-14`). `/api/auth/login/totp` recusa
+`is_active === false`; password OK com TOTP ligado **não** faz
+`resetLoginProtection`; falha TOTP incrementa as guardas existentes
+(`account` por email + `ip`) e o lock activo devolve o mesmo `429` do
+`/login`. Respostas de falha do segundo factor são `401` genéricas
+(`Credenciais invalidas`) — sem enumerar conta/desafio/código. Contrato de
+sucesso inalterado. **Não** deployado (P0-1). **Fora:** P1-2 XFF/rate-limit;
+residual P0-2 single-use/bind.
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `auth.js:185-215` vs `:107-114`; `session.js:289-300` |
+| **Evidência** | `auth.js` + `auth-totp-login.js`; vs `session.js` (`is_active === false`) |
 | **Cenário** | Owner desactiva conta (`is_active=false`, sessões revogadas). Challenge TOTP residual (5 min) ou forjado (P0-2) → `POST /login/totp` cria sessão nova. |
-| **Impacto** | Disable não é enforce no segundo factor. |
-| **Correcção mínima** | Após carregar o admin: recusar se `is_active === false`. |
-| **Testes** | Admin TOTP + `is_active=false` + challenge válido → 401/403, sem cookie / sem sessão. |
+| **Impacto** | Disable não é enforce no segundo factor. Reset prematuro no `/login` anulava o lock antes do TOTP. |
+| **Correcção mínima** | Após carregar o admin: recusar se `is_active === false`. Reset só após TOTP OK. Falhas TOTP chamam `registerLoginFailure`. |
+| **Testes** | Admin TOTP + `is_active=false` + challenge/código válidos → 401 genérico, sem sessão, sem reset, com incremento de guarda. Falha TOTP e desafio inválido → mesmo 401. Quase locked + password OK + TOTP falho → lock. Suite backend `159/159` PASS. |
 
 ### P1-4 — Bootstrap `init` sem lock: dois owners
 
@@ -196,7 +207,7 @@ continua 404. **Não** deployado (P0-1).
 | **P2-2** | `admin-surface.js:39-45`, `:188-196`; `index.js:47-48` | Sem `Origin` → `next()`; `/api/users` e `/api/search` fora de `isAdminApiPath` | CSRF clássico mitigado por SameSite=strict; defesa em profundidade inconsistente | Incluir users/search; state-changing fail-closed (`Origin` ou `Sec-Fetch-Site`) | `POST /api/users` com Origin evil → 403 |
 | **P2-3** | `nginx.conf:6-9`, `:47`; `session.js:372-374`; `index.js:31` | HTTP ao origin + `X-Forwarded-Proto: https` | `req.secure===true`; password/TOTP/Bearer em HTTP se bind ≠ loopback | Nginx: `X-Forwarded-Proto $scheme` | HTTP + header https → login 400 no origin HTTP |
 | **P2-4** | `admin-surface.js:267-295` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasa-se (read-then-write) | `failure_count = … + 1` atómico ou `FOR UPDATE` | 10 `registerLoginFailure` concorrentes → count=10 + lock |
-| **P2-5** | `auth.js:128-146` | Password OK em `/login` chama `resetLoginProtection` **antes** do TOTP | 2FA não herda lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se |
+| **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual P1-2 = só XFF/rate-limit. |
 | **P2-6** | `backend/Dockerfile`; `frontend/Dockerfile`; compose | Root; sem healthcheck; sem `.dockerignore`; `COPY . .` | RCE = root; `.env` no layer se estiver no contexto; API sobe antes do PG | `USER node`; `.dockerignore` (`.env`); `pg_isready` + `depends_on` healthy | `docker inspect` User ≠ root; build com `.env` no contexto → ausente na imagem |
 | **P2-7** | `license.c:1104-1115`, `:922-932` | `store_key` mantém `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar `features` / `features_set` | store_key(nova) → `features_set==0`; intersect só do `.lic` novo |
 | **P2-8** | `license.c:975-1007` vs clock-mark `:345-374` | `fopen(..., "w")` trunca; crash a meio | Estado vazio → check-in SKIP + offline morto; `.lic` intacto (fail-open comercial) | tmp + `fsync` + `rename`; escape JSON | Kill após fopen → ficheiro anterior sobrevive |
@@ -323,7 +334,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 1. **P0-1 (ops, já activo)** — freeze de deploy integral; inventário allowlist quando houver GO de reconciliação.
 2. **P1-1 FEITO no git** (`2026-08-14`) — SELECT de check-in + testes JS; **sem** deploy `.244`.
 3. **P0-2 FEITO no git** (`2026-08-14`) — fallback TOTP removido + arranque fail-closed; residual single-use/bind. **sem** deploy `.244`.
-4. **P1-2 + P1-3 + P2-5** — fechar caminho TOTP restante (IP real, `is_active`, lock no 2FA). Exige restart API + GO.
+4. **P1-3 + P2-5 FEITOS no git** (`2026-08-14`) — `is_active` + reset/lock no 2FA. **P1-2** restante = XFF / rate-limit IP. Exige restart API + GO. Sem `.244` neste bloco.
 5. **P1-4 + P2-1** — um único owner no bootstrap/boot.
 6. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
 7. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).

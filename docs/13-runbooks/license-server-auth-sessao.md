@@ -59,6 +59,15 @@ Referencias normativas:
 - O HMAC do `challenge_token` TOTP reutiliza `ADMIN_BEARER_JWT_SECRET` ou
   `JWT_SECRET`. Nao existe fallback estatico. Sem esses valores o challenge
   nao e emitido nem aceite.
+- Segundo factor (`POST /api/auth/login/totp`, P1-3):
+  - recusa `is_active === false` sem emitir cookie/sessao;
+  - password OK com TOTP ligado **nao** faz reset das guardas;
+  - falha TOTP incrementa `admin_login_guards` (conta por email + IP) e o
+    lock activo devolve o mesmo `429` do `/login`;
+  - respostas de falha do 2FA sao `401` genericas (`Credenciais invalidas`),
+    sem distinguir conta desactivada, desafio invalido ou codigo errado;
+  - o contrato de sucesso (cookie + payload `buildAdminAuthResponse`)
+    permanece o do login sem TOTP.
 - Em producao a API recusa arrancar se ambos os segredos estiverem vazios.
 - A ponte Bearer administrativa, quando activada para compatibilidade, deve:
   - preferir `ADMIN_BEARER_JWT_SECRET`;

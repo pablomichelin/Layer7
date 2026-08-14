@@ -31,6 +31,14 @@ const {
   resetLoginProtection,
 } = require('../admin-surface');
 const {
+  applySecondFactorProtection,
+  decideSecondFactorAttempt,
+  lockedSecondFactorOutcome,
+  passwordLoginRequiresTotp,
+  secondFactorHttpResponse,
+  shouldResetLoginProtectionAfterPassword,
+} = require('../auth-totp-login');
+const {
   clearSessionCookie,
   createBearerSessionToken,
   createSession,
@@ -120,9 +128,7 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
       return res.status(401).json(buildAuthErrorResponse(ADMIN_AUTH_INVALID_CREDENTIALS_MESSAGE));
     }
 
-    await resetLoginProtection({ email, req });
-
-    if (admin.totp_enabled && admin.totp_secret) {
+    if (passwordLoginRequiresTotp(admin)) {
       const totpHmacSecret = getTotpHmacSecret();
       if (!totpHmacSecret) {
         return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
@@ -143,6 +149,10 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
         challenge_token: challengeToken,
         email: admin.email,
       });
+    }
+
+    if (shouldResetLoginProtectionAfterPassword(admin)) {
+      await resetLoginProtection({ email, req });
     }
 
     const session = await createSession(admin, req);
@@ -181,27 +191,68 @@ router.post('/login/totp', loginIpLimiter, async (req, res) => {
     const challenge = totpHmacSecret
       ? parseTotpChallengeToken(challengeToken, totpHmacSecret)
       : null;
-    if (!challenge) {
-      return res.status(401).json(buildAuthErrorResponse('Desafio 2FA invalido ou expirado.'));
+
+    let admin = null;
+    if (challenge) {
+      const result = await pool.query('SELECT * FROM admins WHERE id = $1', [challenge.admin_id]);
+      admin = result.rows[0] || null;
     }
 
-    const result = await pool.query('SELECT * FROM admins WHERE id = $1', [challenge.admin_id]);
-    if (result.rows.length === 0) {
-      return res.status(401).json(buildAuthErrorResponse(ADMIN_AUTH_INVALID_CREDENTIALS_MESSAGE));
-    }
-
-    const admin = result.rows[0];
-    if (!admin.totp_enabled || !admin.totp_secret || !verifyTotp(admin.totp_secret, code)) {
-      await auditAdminEvent({
-        component: 'auth',
-        eventType: 'login_totp_failed',
-        adminId: admin.id,
-        actorIdentifier: admin.email,
-        req,
-        result: 'fail',
-        reason: 'totp_invalid',
+    const email = admin?.email || null;
+    const activeLock = await getActiveLoginLock({ email, req });
+    if (activeLock) {
+      const locked = lockedSecondFactorOutcome({
+        email,
+        adminId: admin?.id || null,
+        activeLock,
       });
-      return res.status(401).json(buildAuthErrorResponse('Codigo 2FA invalido.'));
+      await auditAdminEvent(buildLoginLockedAuditPayload({
+        email,
+        req,
+        activeLock,
+      }));
+      const http = secondFactorHttpResponse(locked);
+      return res.status(http.status).json(http.body);
+    }
+
+    const totpValid = Boolean(
+      admin?.totp_enabled && admin?.totp_secret && verifyTotp(admin.totp_secret, code)
+    );
+    const outcome = decideSecondFactorAttempt({ challenge, admin, totpValid });
+    const protection = await applySecondFactorProtection(outcome, {
+      req,
+      registerLoginFailure,
+      resetLoginProtection,
+    });
+
+    if (outcome.kind !== 'success') {
+      if (outcome.reason === 'account_disabled') {
+        await auditAdminEvent(buildLoginRejectedAuditPayload({
+          email: outcome.email,
+          req,
+          reason: 'account_disabled',
+        }));
+      } else if (outcome.reason === 'totp_invalid') {
+        await auditAdminEvent({
+          component: 'auth',
+          eventType: 'login_totp_failed',
+          adminId: outcome.adminId,
+          actorIdentifier: outcome.email,
+          req,
+          result: 'fail',
+          reason: 'totp_invalid',
+        });
+      } else {
+        await auditAdminEvent(buildLoginFailedAuditPayload({
+          email: outcome.email,
+          req,
+          guards: protection.guards,
+          adminId: outcome.adminId,
+        }));
+      }
+
+      const http = secondFactorHttpResponse(outcome);
+      return res.status(http.status).json(http.body);
     }
 
     const session = await createSession(admin, req);

@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-128 P1-3 segundo factor TOTP (`is_active` + lock)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | `/api/auth/login/totp` recusar conta desactivada; não resetar protecção antes do TOTP válido; falha TOTP participar do lock existente sem enumerar utilizador |
+| Impacto | Só `license-server/backend` auth + testes; contrato de sucesso intacto; `/login` 403 de conta desactivada **não** alterado (P3-3) |
+| Risco | Baixo (fail-closed no 2FA). Residual: P1-2 XFF/rate-limit; P0-2 single-use/bind; live `.244` sem overlay (P0-1) |
+| Teste | `npm test` no backend — `159/159` PASS (incl. `auth-totp-login.test.js`) |
+| Rollback | Reverter o commit; o 2FA volta a emitir sessão a conta `is_active=false` e a resetar guardas após password OK |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem P1-2 |
+
+---
+
 ## 2026-08-14 — BG-128 P1-1 check-in arquivada → 409 revoked/expired
 
 | Campo | Valor |
