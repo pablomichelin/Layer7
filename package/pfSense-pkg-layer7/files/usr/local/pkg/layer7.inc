@@ -7127,7 +7127,8 @@ function layer7_local_hardware_id()
 
 /**
  * Binding canónico do daemon (license.c): HW exacto + expiry/grace 14d.
- * mktime local à meia-noite de YYYY-MM-DD; residual DST = P2-13 (fora).
+ * mktime local à meia-noite de YYYY-MM-DD. P2-13 AVALIADO: sem mudança
+ * de política (meia-noite / DST / UTC) sem GO; ver auditoria 2026-08-14.
  *
  * @return array{ok:bool,reason:string,grace:bool,days_left:int}
  */

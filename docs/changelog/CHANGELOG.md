@@ -16,6 +16,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P2-13 — política de datas / meia-noite / DST:** AVALIADO
+  no git após gates deste bloco. `expiry=YYYY-MM-DD` continua a
+  meia-noite local (`mktime` hora 0). No dia D às 12:00 a licença já
+  está em grace; o servidor UTC ainda a trata como activa. `tm_isdst=0`
+  no daemon pode divergir ±1 h da GUI em fusos com DST. Não há correção
+  única segura (fim do dia UTC vs local vs `timegm` vs só `tm_isdst=-1`
+  colidem com REV-030 / P3-7 / P2-11). Sem mudança de runtime em
+  `license.c` / binding PHP. Cadeado
+  `test_license_expiry_policy.php`. Sem `PORTVERSION`, sem deploy
+  (P0-1 ACTIVO).
 - **BG-128 P1-9 — prova residual pós-P2-3:** AVALIADO no git após gates
   deste bloco. Auth com Host oficial no origin HTTP é o contrato F2.1
   (edge TLS → origin HTTP + `$scheme`). Não é exposição aberta no HEAD

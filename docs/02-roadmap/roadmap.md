@@ -61,9 +61,11 @@ fail-closed; sem P2-13). **M1 FEITO** no git (`2026-08-14`; GUI/helper via
 `X-Forwarded-Proto $scheme`; sem deploy / `PORTVERSION`). **P1-9 AVALIADO**
 no git (`2026-08-14`; residual pós-P2-3 não aberto no HEAD; sem mudança de
 runtime). **P2-2 FEITO** no git (`2026-08-14`; CSRF admin fail-closed
-`Origin` / `Sec-Fetch-Site`; sem deploy / `PORTVERSION`). Próximo código
+`Origin` / `Sec-Fetch-Site`; sem deploy / `PORTVERSION`). **P2-13
+AVALIADO** no git (`2026-08-14`; meia-noite local / DST / UTC sem
+correção única segura; sem mudança de runtime). Próximo código
 com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem
-M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2). **P0-1 ACTIVO**
+M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13). **P0-1 ACTIVO**
 inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).

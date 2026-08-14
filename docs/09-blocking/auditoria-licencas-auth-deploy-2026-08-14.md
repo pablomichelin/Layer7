@@ -45,9 +45,12 @@ runtime; bind live `0.0.0.0` não versionado.
 **P2-2 FEITO** no git (`2026-08-14`) — CSRF admin fail-closed; users/search
 na superfície; mutações exigem `Origin` allowlist ou `Sec-Fetch-Site:
 same-origin` (Bearer autenticado exceptuado). Sem deploy / `PORTVERSION`.
+**P2-13 AVALIADO** no git (`2026-08-14`) — meia-noite local / DST ±1 h /
+divergência UTC do servidor **não** têm correção única segura; sem
+mudança de runtime; cadeado `test_license_expiry_policy.php`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13/P2-17/P2-3; sem P1-9 runtime; sem P2-2).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13).
 
 ---
 
@@ -290,7 +293,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P2-10 FEITO no git** (`2026-08-14`) | `license.c` `promote_activate_body` / `write_bytes_0600` | `--activate` gravava `.lic` sem `chmod` | umask 022 → 0644; payload assinado legível localmente | `fchmod`/`chmod 0600` | `stat` do `.lic` = 0600. **Não** deployado. |
 | **P2-11 FEITO no git** (`2026-08-14`) | `layer7.inc` `layer7_entitlements()` / `layer7_license_binding_ok()`; `layer7-mitm-entitle-ok` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` + helper exigem HW + expiry/grace 14d | `.lic` HW errado / expiry além da graça → GUI locked; graça/válido → unlock; stats forjados → locked. **Não** deployado. |
 | **P2-12 FEITO no git** (`c2b9fdb`; governação após gates) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
-| **P2-13** | `license.c:238-247`, `518-520`, `568-573` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | Fim do dia UTC / `tm_isdst=-1` | Relógio no dia D 12:00; hoje cai para grace |
+| **P2-13 AVALIADO no git** (`2026-08-14`) | `license.c:238-247`, `518-520`, `568-573`; `layer7.inc` `layer7_license_binding_ok` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | **Sem mudança** — políticas candidatas colidem (ver prova) | Relógio no dia D 12:00 → grace (HEAD). Cadeado `test_license_expiry_policy.php`. **Não** deployado. |
 | **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
 | **P2-15 FEITO no git** (`2026-08-14`) | Worktree local vs MATCH `20260812T002500Z` | Serving allowlist versionado; snapshot continua só em disco | Gap de código 30.11 no git fechado; snapshot/`.env` continuam fora | Inventário + commit allowlist **FEITO**; P0-1 **não** encerrado | Hashes = inventário; `check-ignore` do tarball |
 | **P2-16** | Tag `layer7-license-api:pre-30.13-20260814T142739Z` | Rollback da imagem pré-30.13 | Reabre rejeição de `nonce` (GA5.9 FAIL); **mantém** 30.11 | Não usar essa tag salvo incidente 30.13; preferir overlay | Smoke nonce → não pode voltar a 400 |
@@ -424,11 +427,85 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 14. **P2-3 FEITO no git** (`2026-08-14`) — origin `X-Forwarded-Proto $scheme`; `req.secure` deixa de autenticar o canal. **Não** deployado.
 15. **P1-9 AVALIADO no git** (`2026-08-14`) — residual pós-P2-3 **não** aberto no HEAD; sem mudança de runtime; bind live não versionado. **Não** deployado.
 16. **P2-2 FEITO no git** (`2026-08-14`) — CSRF admin fail-closed; users/search na superfície. **Não** deployado.
-17. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2.
+17. **P2-13 AVALIADO no git** (`2026-08-14`) — meia-noite / DST / UTC sem correção única segura; sem mudança de runtime. **Não** deployado.
+18. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Prova P2-13 — política de datas, meia-noite e DST (`2026-08-14`)
+
+**Pedido avaliado:** corrigir `expiry=YYYY-MM-DD` + `mktime` hora 0
+(«válido até D» acaba à meia-noite; `tm_isdst=0` pode desviar 1 h).
+**Veredicto:** **não** há correção mínima inequívoca e compatível.
+Sem mudança de runtime. Cadeado executável em
+`tests/functional/test_license_expiry_policy.php`.
+
+Consumidores localizados (HEAD):
+
+| Camada | Função | Instante |
+|--------|--------|----------|
+| Daemon C | `license.c` `parse_date` + `mktime(&exp_tm)` + `difftime/86400` | meia-noite local; `memset` ⇒ `tm_isdst=0` |
+| GUI PHP | `layer7.inc` `layer7_license_binding_ok` | `mktime(0,0,0,$mo,$d,$y)` (DST automático do PHP) |
+| Relógio GUI | `layer7_license_now` | `time()`; `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT` (P2-17) |
+| Servidor | `crud-validation.js` `isLicenseExpired` | `expiry < today_UTC` (calendário) |
+| SQL | `LICENSE_SQL_ACTIVE_CONDITION` | `expiry >= CURRENT_DATE` |
+| Gates | `layer7_license_gate_b` | usa `expired`/`grace` já derivados; não volta a parsear a data |
+
+Prova reproduzida (sem hosts; instantes unix fixos):
+
+| Cenário | Daemon C HEAD | GUI PHP HEAD | Servidor UTC |
+|---------|---------------|--------------|--------------|
+| `America/Sao_Paulo` D 00:00 | VALID | VALID | ACTIVE |
+| BR D 00:00:01 | GRACE | GRACE | ACTIVE |
+| BR D 12:00 (teste da auditoria) | GRACE | GRACE | ACTIVE |
+| BR D−1 23:59:59 | VALID | VALID | ACTIVE |
+| BR D+14 12:00 | EXPIRED (14.5 d) | EXPIRED | EXPIRED |
+| UTC D 12:00 | GRACE | GRACE | ACTIVE |
+| `America/New_York` 2026-07-15 00:30 EDT | **VALID** (`tm_isdst=0`, +3600 s) | **GRACE** (DST auto) | ACTIVE |
+
+Porque não se corrigiu neste bloco:
+
+1. **Fim do dia UTC** (texto P2-13) alinha o daemon ao calendário do
+   servidor, mas em `UTC−3` «válido até D» acaba às 21:00 local. Em
+   `UTC−3` o fim do dia *local* deixa o cliente **mais permissivo** que
+   o servidor entre 21:00 e 24:00 — o inverso de P3-7.
+2. **Fim do dia local** muda o corte comercial ~24 h (D 12:00 passa de
+   grace a VALID; D+14 12:00 reabre grace). Exige C **e** PHP juntos
+   (P2-11). Não é bugfix pontual.
+3. **`tm_isdst=-1` só** alinha C à GUI em DST e é no-op no Brasil
+   (sem DST). Não fecha o teste canónico «D 12:00 → grace». Em NY verão
+   *aperta* o daemon 1 h (VALID→GRACE). Incompleto para P2-13.
+4. **`timegm` / meio-dia UTC** (P3-7 / REV-030) *aperta* o Brasil: grace
+   começa às 21:00 de D−1. Contradiz «fim do dia UTC».
+
+Políticas históricas em conflito: P2-13 «fim do dia UTC / `tm_isdst=-1`»;
+REV-030 «meio-dia UTC ou `timegm`»; P3-7 «`timegm`». Escolher uma é GO
+de política de licenciamento, não correção mecânica.
+
+### Menor plano de teste (só após GO de uma política)
+
+1. Escolher **uma** letra: (A) HEAD meia-noite local; (B) fim do dia
+   local; (C) fim do dia UTC; (D) só `tm_isdst=-1`. Não misturar P3-7
+   no mesmo bloco se a letra não for UTC.
+2. Extraír função pura C (sem I/O / sem assinatura) e reusar a PHP.
+3. Vectores determinísticos com `TZ` fixo: D 00:00 / 00:00:01 / 12:00 /
+   D−1 23:59:59 / D+14 12:00 em `America/Sao_Paulo` e `UTC`; NY 00:30
+   verão e 00:30 fall-back.
+4. Fail-before: o cadeado actual falha na letra escolhida. Pass-after:
+   C e PHP concordam; servidor UTC documentado no mesmo unix.
+5. Fora: CSRF / proxy / lifecycle / `PORTVERSION` / hosts.
+
+## Objectivo / impacto / risco / teste / rollback — P2-13 prova (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Provar se meia-noite / DST / UTC têm correção mínima segura e compatível GUI↔daemon; se não tiverem, não alterar o runtime de licença |
+| Impacto | Cadeado `test_license_expiry_policy.php` + docs. `license.c` / binding PHP **intactos** (só comentário). Sem CSRF/proxy/lifecycle, sem package/daemon runtime, sem deploy / `PORTVERSION` |
+| Risco | Nenhum de runtime. Residual: D 12:00 → grace (contrato HEAD); DST ±1 h C vs PHP em fusos com horário de verão; P3-7 / REV-030 abertos; P0-1 |
+| Teste | Antes=depois: BR D 12:00 → grace; D 00:00 → valid; D+14 12:00 → expired; NY 00:30 verão PHP → grace. Cadeado de fórmula (`mktime` hora 0, sem `timegm` / EOD). `test_license_now_gate.php` + `test_entitlements_gui.php` regressão |
+| Rollback | Remover o teste e a nota documental; o runtime já era o anterior |
 
 ## Objectivo / impacto / risco / teste / rollback — P2-2 CSRF (`2026-08-14`)
 
@@ -524,7 +601,7 @@ entra no git.
 |-------|--------|
 | Objectivo | Impedir que a GUI Identity/MITM e `layer7-mitm-entitle-ok` desbloqueiem com um `.lic` apenas assinado quando HW ou validade/grace não batem com o daemon |
 | Impacto | `layer7.inc` (fingerprint local + binding + entitlements), helper `layer7-mitm-entitle-ok`, `test_entitlements_gui.php`, `run-local.sh`, docs canónicas. Sem P2-9/P2-13/P3, sem daemon `enforce_armed`, sem license server/SPA/compose, sem `PORTVERSION`/build/release/hosts |
-| Risco | Baixo. Grace de 14 dias alinhada ao daemon (evita false-lock comercial). Residual P2-11: fingerprint PHP sysctl/ifconfig **substituído em M1** por `layer7d --fingerprint`. Anti-rollback 30.6 continua só no daemon; DST ±1 h = P2-13 (fora) |
+| Risco | Baixo. Grace de 14 dias alinhada ao daemon (evita false-lock comercial). Residual P2-11: fingerprint PHP sysctl/ifconfig **substituído em M1** por `layer7d --fingerprint`. Anti-rollback 30.6 continua só no daemon; DST ±1 h = P2-13 **AVALIADO** (sem mudança) |
 | Teste | `php tests/functional/test_entitlements_gui.php` — HW errado, expiry além da graça, dentro da graça, válido, stats forjados + helper/rc.d PATH |
 | Rollback | Reverter o commit; a GUI/helper voltam a desbloquear só com assinatura Ed25519 |
 

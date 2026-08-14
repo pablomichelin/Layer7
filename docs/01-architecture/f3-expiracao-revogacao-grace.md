@@ -184,13 +184,25 @@ Observado em `src/layer7d/license.c`:
   - o daemon invalida a licenca;
   - `main.c` desactiva enforce e cai para monitor-only.
 
+O instante de `expiry=YYYY-MM-DD` e a **meia-noite local**
+(`parse_date` + `mktime` com `tm_isdst=0` no daemon; `mktime(0,0,0,…)`
+na GUI). Por isso, no dia D as 12:00 a licenca ja esta em grace, enquanto
+o servidor (`isLicenseExpired` / `CURRENT_DATE`) ainda trata o dia D UTC
+como activo. **P2-13 AVALIADO** (`2026-08-14`): nao ha correcao unica
+segura (fim do dia UTC vs local vs `timegm` vs so `tm_isdst=-1` colidem
+com REV-030 / P3-7 / P2-11). Contrato-as-implemented travado em
+`tests/functional/test_license_expiry_policy.php`. Mudanca de politica
+so com GO.
+
 Conclusao factual:
 
 - o grace e **local ao daemon**;
 - o grace depende apenas de:
   - assinatura valida;
   - `hardware_id` local correspondente;
-  - data local do appliance.
+  - data local do appliance;
+  - o instante de corte e a meia-noite local de `expiry`, nao o fim do
+    dia civil.
 
 ### 1.8 Onde servidor e daemon divergem e onde se complementam
 

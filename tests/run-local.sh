@@ -442,6 +442,11 @@ else
 	else
 		fail "test_license_now_gate"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_license_expiry_policy.php; then
+		pass "test_license_expiry_policy"
+	else
+		fail "test_license_expiry_policy"
+	fi
 fi
 
 step "Regress: layer7-tlsproxy (junto ao codigo)"
