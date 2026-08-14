@@ -485,4 +485,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] **BG-128 P2-17** — FEITO no git após gates (`2026-08-14`) — `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`; sem deploy / `PORTVERSION`
 - [x] **BG-128 P2-3** — FEITO no git após gates (`2026-08-14`) — origin `X-Forwarded-Proto $scheme`; login HTTP+proto https no Host de origin → 400; sem deploy / `PORTVERSION`
 - [x] **BG-128 P1-9** — AVALIADO no git (`2026-08-14`) — residual pós-P2-3 não aberto no contrato HEAD; cadeado compose/nginx; sem mudança de runtime; bind live não versionado; sem deploy / `PORTVERSION`
-- [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem `.244` neste bloco)
+- [x] **BG-128 P2-2** — FEITO no git (`2026-08-14`) — CSRF admin fail-closed (`Origin` allowlist ou `Sec-Fetch-Site: same-origin`); `/api/users` e `/api/search` na superfície; Bearer autenticado e GET sem Origin compatíveis; sem deploy / `PORTVERSION`
+- [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem `.244` neste bloco)

@@ -140,6 +140,11 @@ Documentos normativos desta arquitetura:
   P1-9 residual (Host oficial no origin HTTP) **avaliado** `2026-08-14`:
   contrato F2.1, não exposição aberta no HEAD; bind live `0.0.0.0` não
   versionado. Sem deploy.
+  **P2-2 / BG-128 (`2026-08-14`):** `/api/users` e `/api/search` entram
+  em `isAdminApiPath`; mutações admin (incl. login/logout) falham
+  fechadas sem `Origin` allowlist nem `Sec-Fetch-Site: same-origin`.
+  Pedidos Bearer autenticados e GET sem Origin permanecem compatíveis.
+  Sem deploy.
 - `001-init.sql` passa a trazer `admin_audit_log` e `admin_login_guards` para
   persistir auth, lockouts e mutacoes administrativas
 - `customers.js` e `licenses.js` passam a registar sucesso/negacao/erro de

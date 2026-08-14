@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-128 P2-2 CSRF fail-closed
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Mutações e emissão de sessão admin exigem prova same-origin; users/search na superfície |
+| Impacto | `isAdminApiPath` inclui `/api/users` e `/api/search`; POST/PUT/PATCH/DELETE sem `Origin` allowlist nem `Sec-Fetch-Site: same-origin` → 403; Bearer autenticado exceptuado |
+| Risco | Baixo. Residual: GET admin sem Origin; browsers antigos sem os dois sinais falham no login; live sem overlay (P0-1) |
+| Teste | Suite backend `199/199` PASS. Antes: `POST /api/users` Origin evil → 201. Depois: 403 |
+| Rollback | Reverter o commit; o middleware volta a `next()` sem Origin e users/search saem do path |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem P2-13 / sem proxy / sem lifecycle |
+
 ## 2026-08-14 — BG-128 P1-9 prova residual pós-P2-3
 
 | Campo | Valor |

@@ -27,6 +27,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P2-2 — CSRF admin fail-closed:** FEITO no git após gates
+  deste bloco. `/api/users` e `/api/search` entram na superfície
+  administrativa. Mutações e emissão de sessão sem `Origin` na allowlist
+  nem `Sec-Fetch-Site: same-origin` → 403. Portal oficial e APIs Bearer
+  autenticadas intactas. Activate/check-in/content/health fora do gate.
+  Sem P2-13/proxy/lifecycle, sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P2-3 — `X-Forwarded-Proto` fail-closed:** FEITO no git após
   gates deste bloco. O origin deixa de honrar o proto do cliente
   (`$scheme`). `requireSecureSessionRequest` deixa de tratar `req.secure`

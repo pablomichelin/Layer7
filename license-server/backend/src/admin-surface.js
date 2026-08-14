@@ -36,12 +36,29 @@ function getAllowedAdminOrigins() {
   return origins;
 }
 
+const ADMIN_STATE_CHANGING_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
 function isAdminApiPath(pathname = '') {
   return pathname.startsWith('/api/auth/')
     || pathname.startsWith('/api/dashboard')
     || pathname.startsWith('/api/licenses')
     || pathname.startsWith('/api/customers')
-    || pathname.startsWith('/api/audit');
+    || pathname.startsWith('/api/audit')
+    || pathname.startsWith('/api/users')
+    || pathname.startsWith('/api/search');
+}
+
+function isStateChangingAdminMethod(method = '') {
+  return ADMIN_STATE_CHANGING_METHODS.has(String(method).toUpperCase());
+}
+
+function hasSameOriginFetchSite(req) {
+  return String(req?.headers?.['sec-fetch-site'] || '').toLowerCase() === 'same-origin';
+}
+
+function hasBearerAuthorization(req) {
+  const header = req?.headers?.authorization || req?.headers?.Authorization || '';
+  return /^Bearer\s+\S+/i.test(String(header));
 }
 
 function getAuditContext(req) {
@@ -185,33 +202,45 @@ function adminNoStoreMiddleware(req, res, next) {
   next();
 }
 
-async function enforceAdminOrigin(req, res, next) {
-  if (!isAdminApiPath(req.path)) {
-    return next();
-  }
-
-  const origin = req.headers.origin;
-  if (!origin) {
-    return next();
-  }
-
-  res.setHeader('Vary', 'Origin');
-
-  if (getAllowedAdminOrigins().has(origin)) {
-    return next();
-  }
-
+async function denyAdminOrigin(req, res, reason) {
   await auditAdminEvent({
     component: 'admin-surface',
     eventType: 'origin_denied',
     actorIdentifier: normalizeAdminEmail(req.body?.email),
     req,
     result: 'denied',
-    reason: 'origin_not_allowed',
+    reason,
     metadata: { allowed_origins: Array.from(getAllowedAdminOrigins()) },
   });
 
   return res.status(403).json({ error: ADMIN_AUTH_ORIGIN_MESSAGE });
+}
+
+async function enforceAdminOrigin(req, res, next) {
+  if (!isAdminApiPath(req.path)) {
+    return next();
+  }
+
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Vary', 'Origin');
+
+    if (getAllowedAdminOrigins().has(origin)) {
+      return next();
+    }
+
+    return denyAdminOrigin(req, res, 'origin_not_allowed');
+  }
+
+  if (!isStateChangingAdminMethod(req.method)) {
+    return next();
+  }
+
+  if (hasSameOriginFetchSite(req) || hasBearerAuthorization(req)) {
+    return next();
+  }
+
+  return denyAdminOrigin(req, res, 'state_changing_unproven_origin');
 }
 
 function buildLoginLimiter({ name, windowMs, max, keyGenerator }) {
@@ -382,6 +411,7 @@ module.exports = {
   ADMIN_AUTH_CHANNEL_MESSAGE,
   ADMIN_AUTH_INVALID_CREDENTIALS_MESSAGE,
   ADMIN_AUTH_LOCKED_MESSAGE,
+  ADMIN_AUTH_ORIGIN_MESSAGE,
   ADMIN_AUTH_RATE_LIMIT_MESSAGE,
   ADMIN_AUTH_REQUIRED_MESSAGE,
   ADMIN_INTERNAL_ERROR_MESSAGE,

@@ -50,6 +50,13 @@ Referencias normativas:
 
 - O login administrativo deve falhar fechado fora de HTTPS/TLS real.
 - Browser com `Origin` fora da allowlist same-origin deve falhar fechado.
+- **P2-2 / BG-128:** mutações administrativas (`POST`/`PUT`/`PATCH`/`DELETE`
+  em `/api/auth/*`, `/api/licenses*`, `/api/customers*`, `/api/users*`)
+  e emissão de sessão falham fechadas sem `Origin` na allowlist nem
+  `Sec-Fetch-Site: same-origin`. APIs autenticadas com `Authorization:
+  Bearer` ficam exceptuadas. GET sem `Origin` (ops/curl) continua.
+  `/api/activate`, `/api/license/check-in`, content e `/api/health`
+  estão fora desta superfície.
 - Respostas de auth devem permanecer genericas:
   - `401` para credenciais invalidas
   - `429` para limite/lockout
@@ -216,6 +223,17 @@ curl -s -o /tmp/layer7-origin-check.out -w '%{http_code}\n' \
 ```
 
 Resultado esperado: `403`
+
+```bash
+curl -s -o /tmp/layer7-csrf-users.out -w '%{http_code}\n' \
+  https://license.systemup.inf.br/api/users \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://evil.example' \
+  -H 'Cookie: layer7_admin_session=dummy' \
+  -d '{"email":"tech@example.com","name":"x","password":"0123456789ab"}'
+```
+
+Resultado esperado: `403` (P2-2; users na superfície admin).
 
 ### Testar o origin privado no host
 

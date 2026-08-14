@@ -42,9 +42,12 @@ login HTTP+proto https → 400; sem deploy / `PORTVERSION`).
 **P1-9 AVALIADO** no git (`2026-08-14`) — residual pós-P2-3 (Host oficial
 no origin HTTP) **não** é fluxo aberto no contrato HEAD; sem mudança de
 runtime; bind live `0.0.0.0` não versionado.
+**P2-2 FEITO** no git (`2026-08-14`) — CSRF admin fail-closed; users/search
+na superfície; mutações exigem `Origin` allowlist ou `Sec-Fetch-Site:
+same-origin` (Bearer autenticado exceptuado). Sem deploy / `PORTVERSION`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13/P2-17/P2-3; sem P1-9 runtime).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13/P2-17/P2-3; sem P1-9 runtime; sem P2-2).
 
 ---
 
@@ -276,7 +279,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | ID | Evidência | Cenário | Impacto | Correcção mínima | Testes |
 |----|-----------|---------|---------|------------------|--------|
 | **P2-1 FEITO no git** (`2026-08-14`; absorvido no P1-4) | `users-rbac-schema.js` | Restart sem owner | `UPDATE` sem `LIMIT` promovia **todos** a owner | Promover só `ORDER BY id LIMIT 1`; alertar se `COUNT>1` sem demover | 3 admins `is_owner=false` → exactamente 1 owner. **Não** deployado. |
-| **P2-2** | `admin-surface.js:39-45`, `:188-196`; `index.js:47-48` | Sem `Origin` → `next()`; `/api/users` e `/api/search` fora de `isAdminApiPath` | CSRF clássico mitigado por SameSite=strict; defesa em profundidade inconsistente | Incluir users/search; state-changing fail-closed (`Origin` ou `Sec-Fetch-Site`) | `POST /api/users` com Origin evil → 403 |
+| **P2-2 FEITO no git** (`2026-08-14`) | `admin-surface.js` `isAdminApiPath` + `enforceAdminOrigin` | Sem `Origin` → `next()`; `/api/users` e `/api/search` fora de `isAdminApiPath` | CSRF clássico mitigado por SameSite=strict; defesa em profundidade inconsistente | Incluir users/search; state-changing fail-closed (`Origin` allowlist ou `Sec-Fetch-Site: same-origin`); Bearer autenticado exceptuado | `POST /api/users` com Origin evil → 403. **Não** deployado. |
 | **P2-3 FEITO no git** (`2026-08-14`) | `nginx.conf`; `session.js` `requireSecureSessionRequest`; `index.js` `trust proxy: 1` | HTTP ao origin + `X-Forwarded-Proto: https` | `req.secure===true` (antes); password/TOTP/Bearer em HTTP se bind ≠ loopback | Nginx: `X-Forwarded-Proto $scheme`; login só no host F2.1 (ou localhost em `development`/`test`) | HTTP + header https + Host de origin → login 400. **Não** deployado. Residual: Host oficial no origin HTTP. |
 | **P2-4** | `admin-surface.js:267-295` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasa-se (read-then-write) | `failure_count = … + 1` atómico ou `FOR UPDATE` | 10 `registerLoginFailure` concorrentes → count=10 + lock |
 | **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual XFF = P1-2 **FEITO** no git. |
@@ -342,6 +345,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 - Login **não** adopta cookie do cliente; token = 32 bytes — `session.js:29-30`, `:203-209`.
 - Cookie `httpOnly` + `secure` + `sameSite: 'strict'` + sem `Domain`.
 - Pacote `cors` **não** é `require`d.
+- **P2-2 FEITO no git** (`2026-08-14`): `/api/users` e `/api/search` entram em `isAdminApiPath`; mutações admin sem `Origin` allowlist nem `Sec-Fetch-Site: same-origin` → 403; Bearer autenticado exceptuado; GET sem Origin continua. **Não** deployado.
 - JWT Bearer só desembrulha `session_token`; authz relê BD. Sem JWT secret: Bearer não é emitido (fail-closed **só** no bridge).
 - `normalizePermissions` remove `*` / `users.manage` para não-owners. `POST /users` força `is_owner=FALSE`. Owner não é editável pela API.
 
@@ -419,11 +423,22 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 13. **P2-17 FEITO no git** (`2026-08-14`) — `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`; **sem** deploy / `PORTVERSION`.
 14. **P2-3 FEITO no git** (`2026-08-14`) — origin `X-Forwarded-Proto $scheme`; `req.secure` deixa de autenticar o canal. **Não** deployado.
 15. **P1-9 AVALIADO no git** (`2026-08-14`) — residual pós-P2-3 **não** aberto no HEAD; sem mudança de runtime; bind live não versionado. **Não** deployado.
-16. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-2 CSRF fica na fila; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime.
+16. **P2-2 FEITO no git** (`2026-08-14`) — CSRF admin fail-closed; users/search na superfície. **Não** deployado.
+17. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — P2-2 CSRF (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Fechar a defesa em profundidade CSRF na superfície admin: users/search no path; mutações e emissão de sessão fail-closed sem prova same-origin |
+| Impacto | `admin-surface.js` (`isAdminApiPath` + `enforceAdminOrigin`); testes `admin-surface-csrf.test.js` + docs. Portal oficial (`Origin` allowlist) e APIs Bearer autenticadas intactos. Activate/check-in/content/health fora do gate. Sem P2-13/proxy/lifecycle, sem package/daemon/SPA, sem deploy / `PORTVERSION` |
+| Risco | Baixo. Cookie continua `SameSite=Strict`. Residual: GET admin sem `Origin` (ops/curl); browsers antigos no portal sem `Origin` nem `Sec-Fetch-Site` falham fechado no login; live sem overlay (P0-1) |
+| Teste | Antes: `POST /api/users` Origin evil → 201; mutação sem Origin → 200. Depois: ambos 403. Compat: Origin oficial / `Sec-Fetch-Site: same-origin` / Bearer / GET sem Origin / activate+check-in. Suite backend `199/199` PASS |
+| Rollback | Reverter o commit; users/search saem do path e mutações sem Origin voltam a `next()` |
 
 ## Objectivo / impacto / risco / teste / rollback — P2-3 `X-Forwarded-Proto` (`2026-08-14`)
 
