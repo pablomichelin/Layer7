@@ -34,8 +34,8 @@ function normalizeRequiredName(value) {
 }
 
 function normalizePassword(value) {
-  if (typeof value !== 'string' || value.length < 10) {
-    throw createHttpError(400, 'Password deve ter pelo menos 10 caracteres.');
+  if (typeof value !== 'string' || value.length < 12) {
+    throw createHttpError(400, 'Password deve ter pelo menos 12 caracteres.');
   }
   if (value.length > 200) {
     throw createHttpError(400, 'Password demasiado longa.');

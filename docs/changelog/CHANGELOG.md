@@ -37,6 +37,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-3B / BG-136 — password de técnico >=12:** FEITO
+  no git após gates deste bloco. `normalizePassword` em `routes/users.js`
+  sobe de 10 para 12 e a mensagem passa a «pelo menos 12 caracteres».
+  `POST /api/users` com 10 → 400; com 12 → 201 (`is_owner=false`).
+  `PUT` com password 10 → 400 e hash inalterado; `PUT` sem password
+  não toca no hash nem revoga sessões. Autorização `users.manage` e
+  owner 409 intactos. `/login` **não** rejeita password de 10.
+  `Users.jsx` (`minLength={10}`) e `bootstrap-admin.js` intocados.
+  Residual P3-3C (`===` no TOTP). Sem `PORTVERSION`, sem deploy
+  (P0-1 ACTIVO).
 - **BG-128 P3-3A / BG-134 — enumeração disabled em POST /login:** FEITO
   no git após gates deste bloco. `POST /api/auth/login` trata conta
   desactivada e email inexistente com a mesma `401` `Credenciais
@@ -44,7 +54,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   constante) e chamam `registerLoginFailure`. A auditoria interna
   pode continuar `account_disabled`; o body HTTP não vaza estado.
   Sucesso, falha de conta activa, lock 5/15 e 10/15, TOTP e CSRF
-  intactos. Residual P3-3: política mínima 10 vs 12 e `===` no TOTP.
+  intactos. Residual P3-3 após P3-3B: `===` no TOTP (P3-3C).
   Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-2 / BG-132 — exactidão TOTP em GET /session:** FEITO
   no git após gates deste bloco. O SELECT de `resolveSessionToken`

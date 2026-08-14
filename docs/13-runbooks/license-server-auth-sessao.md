@@ -55,6 +55,11 @@ Referencias normativas:
   IP). A auditoria interna pode continuar `account_disabled`; o body
   HTTP não vaza estado. Sucesso, falha de conta activa, lock, TOTP e
   CSRF intactos.
+- **P3-3B / BG-136:** `POST`/`PUT /api/users` exige password >=12
+  (mesma política do `bootstrap-admin.js`). Password de 10 caracteres
+  → `400`. `PUT` sem campo `password` não altera o hash. `/login` **não**
+  rejeita password existente de 10 caracteres. `Users.jsx` permanece
+  `minLength={10}` neste bloco.
 - Auditoria minima:
   - auth/sessao e mutacoes administrativas em `admin_audit_log`
   - guardas de lockout em `admin_login_guards`

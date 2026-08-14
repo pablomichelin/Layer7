@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-136 P3-3B password de técnico >=12
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Criação/edição de técnico alinha a política canónica de password >=12 do bootstrap |
+| Impacto | Só `normalizePassword` em `routes/users.js` (10→12 + mensagem). POST/PUT com 10 → 400; POST 12 → 201; PUT sem password inalterado. Authz `users.manage` e owner 409 intactos. `/login` não rejeita 10. `Users.jsx` / bootstrap / auth / TOTP / sessão / compose intocados |
+| Risco | Baixo. SPA `Users.jsx` continua `minLength={10}` (fora deste bloco); API passa a recusar 10–11. Residual P3-3C. Overlay P0-1 |
+| Teste | Suite backend `225/225` PASS. Antes: POST 10 → 201, PUT 10 → 200. Depois: POST 10 → 400, POST 12 → 201, PUT 10 → 400, PUT sem password inalterado |
+| Rollback | Reverter o commit; `users.js` volta a aceitar password >=10 |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem bootstrap / sem auth.js / sem totp.js |
+
 ## 2026-08-14 — BG-134 P3-3A enumeração disabled em POST /login
 
 | Campo | Valor |

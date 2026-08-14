@@ -36,6 +36,9 @@ Referencias normativas:
 - `ADMIN_BOOTSTRAP_PASSWORD` e segredo transitório de bootstrap/recuperacao;
   nao e credencial normativa permanente e deve ser removido do shell/.env
   logo apos o uso.
+- **P3-3B / BG-136:** a password minima canónica e **12 caracteres** no
+  bootstrap **e** na criação/edição de técnico (`POST`/`PUT /api/users`).
+  O `/login` continua a aceitar passwords existentes mais curtas.
 - `seed.js` permanece apenas por compatibilidade e delega para o bootstrap
   oficial; o fluxo normativo passa a ser `bootstrap-admin.js`.
 

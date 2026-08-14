@@ -106,6 +106,9 @@ Documentos normativos desta arquitetura:
   enumerar conta desactivada. Disabled e inexistente devolvem o mesmo
   `401` genérico, fazem bcrypt (hash real ou dummy) e incrementam as
   guardas. Sem deploy.
+  **P3-3B / BG-136 (`2026-08-14`):** criação/edição de técnico em
+  `POST`/`PUT /api/users` exige password >=12 (alinhado ao bootstrap).
+  `/login` não rejeita 10. Sem deploy.
 
 ### Frontend
 
