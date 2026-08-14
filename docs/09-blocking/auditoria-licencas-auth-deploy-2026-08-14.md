@@ -100,7 +100,7 @@ GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
 - Testes JS locais de check-in/policy/crud já tinham PASS `31/31` na evidência do deploy `30.13`.
 - Material de chave, `.env`, tokens e licenças **não** foi lido nem impresso.
 - Achados são do **código HEAD** (e, para P0-1, do gap documentado HEAD↔live). O worktree sujo `30.11` **não** foi tratado como HEAD.
-- **P3-8 (pós-auditoria):** a auditoria original **não** contactou o GitHub. O recheck read-only BG-146 (`20260814T200900Z`) confirmou o cut; fecho documental BG-148. Sem hosts de produto.
+- **P3-8 (pós-auditoria):** a auditoria original **não** contactou o GitHub. Recheck read-only BG-146 + confirmação BG-148 (`20260814T200900Z` / `20260814T201800Z`): id `313502667`, `asset_count=0`, 404×4, primary 401. Sem hosts de produto. P3-9 separado.
 
 ---
 
@@ -353,7 +353,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P3-5 FEITO no git** (`2026-08-14`) | `license.c` `promote_license_atomic` / `layer7_license_check_path` | Activate escrevia `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha apagava o anterior | tmp 0600 no mesmo dir + verify + `rename`; falha preserva o anterior | Crash após write do tmp → final anterior intacto; inválido remove tmp; sucesso 0600. **Não** deployado. |
 | **P3-6 FEITO no git** (`2026-08-14`) | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Gate exige PEM == SoT == C (32 B raw SPKI) | Coincidente PASS; ausente/inválido/divergente FAIL; SoT≠C FAIL. **Não** deployado. |
 | **P3-7** | `license.c:518-520` vs `crud-validation.js:647-654` | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local antes do servidor); não é bypass | Interpretar expiry como UTC (`timegm`) | `TZ=America/Sao_Paulo` vs `TZ=UTC` no dia fronteira |
-| **P3-8 AVALIADO no git** (`2026-08-14`) | Recheck `20260814T200900Z` (BG-146) + `20260812T013145Z` | Auditoria original sem contacto GitHub | Outros PoPs/TTL não observados na auditoria | **Sem mudança** — recheck read-only confirmou o cut (ver prova) | `asset_count=0`; 404 anónimo ×4; primary 401. Residual P3-9. |
+| **P3-8 AVALIADO no git** (`2026-08-14`) | Recheck `20260814T200900Z` + confirmação `20260814T201800Z` (BG-148) + `20260812T013145Z` | Auditoria original sem contacto GitHub | Outros PoPs/TTL não observados na auditoria | **Sem mudança** — cut confirmado (ver prova). P3-9 separado; URLs **não** removidos | `asset_count=0`; `assets=[]`; 404 anónimo ×4; primary 401. Residual P3-9. |
 | **P3-9** | `update-blacklists.sh:38-39`; `layer7.inc:10659-10668`; `config.json.sample:1-4` | Cliente ainda aponta espelho GitHub / tarball anónimo | Cut = 404 esperado; confunde ops; risco de reupload GA4.11 sem GO | Documentar «404 esperado» vs remover URL (bloco separado) | Sample/docs alinhados ao cut |
 
 ---
@@ -501,10 +501,12 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 **Pedido avaliado:** recheck `asset_count` + 404 anónimo do espelho
 `blacklists-ut1-current` (último prova `20260812T013145Z`; a auditoria
 original **não** contactou o GitHub).
-**Veredicto:** o cut **continua fechado**. Sem mudança de runtime.
-Evidência [`../tests/evidence/20260814T200900Z-p38-cut-recheck/`](../tests/evidence/20260814T200900Z-p38-cut-recheck/).
+**Veredicto:** o cut **continua fechado**. P3-8 fechado como evidência.
+Sem mudança de runtime. P3-9 separado; URLs **não** removidos.
+Evidência [`../tests/evidence/20260814T200900Z-p38-cut-recheck/`](../tests/evidence/20260814T200900Z-p38-cut-recheck/)
+(`00-meta` / `00-verdict` / `01-validate`; confirmação `20260814T201800Z`).
 
-| Check | `20260812T013145Z` | Recheck 14-08 (BG-146) |
+| Check | `20260812T013145Z` | Recheck 14-08 (BG-146 + BG-148) |
 |-------|--------------------|------------------------|
 | Release id | `313502667` | `313502667` |
 | Tag | `blacklists-ut1-current` | igual; `prerelease=true`; `draft=false` |

@@ -91,6 +91,7 @@ docs/00-overview/START-HERE-antipirataria.md
 | [`plano-gates-antipirataria.md`](../09-blocking/plano-gates-antipirataria.md) | Gates — engenharia PASS; campo = BG-127 |
 | [`backlog.md`](../02-roadmap/backlog.md) | **BG-127** (ciclo evidência); **BG-128** (auditoria / P0-1) |
 | [`auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md) | Achados P0–P3 + freeze P0-1 |
+| [`20260814T200900Z-p38-cut-recheck`](../tests/evidence/20260814T200900Z-p38-cut-recheck/) | P3-8 fechado como evidência (`asset_count=0` + 404×4); **não** é P3-9 |
 | [`bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md) | Runbook: proibido deploy integral HEAD |
 | [`evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md) | Runbook de campo (`.54`→`.254`) |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional vivo |

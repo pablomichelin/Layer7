@@ -1,0 +1,7 @@
+RUNID=20260814T200900Z
+STEP=p38-cut-recheck
+MODE=read-only
+CHAT=BG-146+BG-148
+NO_TOUCH=.244 .254 Cloudflare DNS license-server GitHub-assets package-release builder Docker secrets
+TOKEN_REAUTH=not_rerun (Bearer only on appliance; prior PASS 20260812T003214Z)
+CONFIRM_TURN=20260814T201800Z
