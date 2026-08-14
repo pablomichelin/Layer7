@@ -68,7 +68,8 @@ GA5.12 **PASS** (unit); **`30.16` FECHADO** — decisão de licença distribuíd
 (sidecar opaco; sem telemetria); GA6.3/6.4 **PASS**; candidato **`1.9.58`**
 (publicado `v1.9.58` / BG-028 Fase 1); **`30.18` FECHADO** (gate-control); **engenharia
 Anti-pirataria FECHADA** em **`30.19`** (`20260812T025741Z`; GA6.7–6.12 **PASS**);
-**ciclo de evidência operacional ABERTO** (**BG-127**, GO `2026-08-14`); fecho
+**ciclo de evidência operacional ABERTO** (**BG-127**, GO `2026-08-14`;
+continuação `20260814T053905Z` GA2.7 PASS / GA5.9 FAIL campo); fecho
 [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab actual: **`1.9.62`**;
@@ -1501,10 +1502,14 @@ PORTVERSION/publish/produção nesse passo; fecho
 [`fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
 evidência
 [`20260812T025741Z-30.19-fecho`](docs/tests/evidence/20260812T025741Z-30.19-fecho/).
-**Ciclo evidência operacional ABERTO** (`2026-08-14`): **BG-127** — GA2.6, GA2.7,
-GA3.7, GA4.8, GA5.9; **GA6.7** continua parecer jurídico externo. Hosts `.54` e
-`.254` **fora do horário comercial**. Publicar **só** se necessidade técnica
-verificada. **Não** reabre AP0–AP4 / código / MITM.
+**Ciclo evidência operacional ABERTO** (`2026-08-14`): **BG-127** — 1ª campanha
+**PARTIAL** `20260814T051611Z`; continuação **PARTIAL** `20260814T053905Z`
+(GA2.7 **PASS** N2 com licença teste id 14; GA5.9 **FAIL campo** — API live
+rejeita `nonce`/pré-30.13; N3 manteve `valid=1`; legado sem nonce = `409
+revoked`; id 13 intocado; produção restaurada). MITM OFF. Evidência
+[`20260814T051611Z-bg127`](docs/tests/evidence/20260814T051611Z-bg127/) +
+[`20260814T053905Z-bg127`](docs/tests/evidence/20260814T053905Z-bg127/).
+**GA6.7** continua parecer jurídico externo. **Não** reabre AP0–AP4 / código / MITM.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1530,7 +1535,7 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0–GA6 PASS** (engenharia fechada `30.19`; 6.5 residual BG-028 **FECHADO** `v1.9.58`; 6.7 residual parecer EULA **externo**); ciclo evidência **BG-127** (GA2.6/2.7, GA3.7, GA4.8, GA5.9); GA4.12 **N/A**
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0–GA6 PASS** (engenharia fechada `30.19`; 6.5 residual BG-028 **FECHADO** `v1.9.58`; 6.7 residual parecer EULA **externo**); ciclo evidência **BG-127 PARTIAL** `20260814T051611Z`+`20260814T053905Z` (GA2.6 PASS parcial / GA2.7 **PASS** / GA3.7 PASS / GA4.8 DEFERRED / GA5.9 **FAIL campo** API live pré-30.13); GA4.12 **N/A**
 - **Evidência campo 30.10 (e2e PASS `1.9.54`):**
   [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
 - **Evidência 30.11 primary auth GET PASS:**
@@ -1561,6 +1566,10 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
   [`docs/tests/evidence/20260812T025741Z-30.19-fecho/`](docs/tests/evidence/20260812T025741Z-30.19-fecho/)
 - **Evidência viva soak `.254` (estado actual, 20.36):**
   [`docs/tests/evidence/20260814T034904Z-20.36-soak-align-163-254/`](docs/tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)
+- **Evidência BG-127 1ª campanha (PARTIAL):**
+  [`docs/tests/evidence/20260814T051611Z-bg127/`](docs/tests/evidence/20260814T051611Z-bg127/)
+- **Evidência BG-127 continuação (PARTIAL; GA2.7 PASS / GA5.9 FAIL campo):**
+  [`docs/tests/evidence/20260814T053905Z-bg127/`](docs/tests/evidence/20260814T053905Z-bg127/)
 - **Backlog evidência operacional:** BG-127
 - **Runbook evidência operacional:**
   [`docs/13-runbooks/evidencia-operacional-antipirataria-bg127.md`](docs/13-runbooks/evidencia-operacional-antipirataria-bg127.md)
@@ -1589,7 +1598,7 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
   [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**histórico — GA4.12 N/A**)
 - **Backlog:** BG-114…BG-123 **Concluido** (incl. BG-101/118); **BG-028 Fase 1 Concluido** (`v1.9.58`)
 - **Ordem:** `30.0`→…→**`30.19` FECHADO** — **engenharia FECHADA**
-- **Ciclo evidência:** **BG-127 ABERTO** (GO `2026-08-14`)
+- **Ciclo evidência:** **BG-127 ABERTO** (GO `2026-08-14`; PARTIAL `20260814T051611Z` + `20260814T053905Z`)
 - **GOs humanos remanescentes (fora da engenharia):** parecer EULA externo (GA6.7)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
@@ -1601,11 +1610,12 @@ TRILHA ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10); reavaliado 30.19
 - Engenharia: 30.19 FECHADO (20260812T025741Z)
 - Evidência fecho: 20260812T025741Z-30.19-fecho
-- Ciclo evidência: BG-127 ABERTO (GO 2026-08-14) — GA2.6/2.7, GA3.7, GA4.8, GA5.9
+- Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
+- Campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 FAIL campo (API live pré-30.13)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)
-- .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254)
+- .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254; reconfirmado 20260814T053905Z)
 - Histórico e2e AP2: .254=1.9.54 (20260811T114320Z)
 - lab/latest: 1.9.63
 ```
@@ -1817,7 +1827,7 @@ CHECKPOINT CANONICO
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Pack produto: docs/00-overview/pack-produto-layer7.md → prd / uml / catalogo
 - Trilha Identity + MITM: **【FILA FECHADA】** (20.37); soak `.254` = `1.9.63` MITM OFF; Squid rejeitado
-- Anti-pirataria: engenharia **FECHADA** (`30.19`); evidência operacional **ABERTA** (BG-127 / GO `2026-08-14`)
+- Anti-pirataria: engenharia **FECHADA** (`30.19`); evidência operacional **ABERTA** (BG-127 PARTIAL `20260814T051611Z`+`20260814T053905Z`; GA2.7 PASS; GA5.9 FAIL campo)
 - MITM: operação = GUI + entitlement; **sem** ficha-papel
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md

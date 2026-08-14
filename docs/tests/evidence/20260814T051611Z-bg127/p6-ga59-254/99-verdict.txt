@@ -1,0 +1,3 @@
+ABORT
+reason=no test license with check-in; production check_in_enabled absent; no opt-in
+next=create test license + opt-in check-in on that license only; never revoke id 13

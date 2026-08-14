@@ -1,0 +1,3 @@
+ABORT
+reason=no test license available; installing/revoking production license is forbidden
+next=issue a dedicated test license (unbound or lab customer) then retry GA2.7

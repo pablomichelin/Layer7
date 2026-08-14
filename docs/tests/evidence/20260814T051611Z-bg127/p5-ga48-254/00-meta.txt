@@ -1,0 +1,16 @@
+utc=20260814T051959Z
+gate=GA4.8
+content_subscription=ok
+reason=ok
+token_present=yes
+token_len_not_serialized=yes
+v=1
+scope=content
+iat=1786448788
+exp=1789040788
+window_ok=yes
+days_left=27.3
+sig_len=128
+network_isolation=not_executed
+duration_observed=campaign window only (~4 min observational; not multi-day)
+lkg_present=yes

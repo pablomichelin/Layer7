@@ -1,0 +1,5 @@
+hostname=ubuntu
+layer7d=NO_LAYER7D
+pkg_layer7=none
+forward_to_soak_for_license_test=no
+mutation=none

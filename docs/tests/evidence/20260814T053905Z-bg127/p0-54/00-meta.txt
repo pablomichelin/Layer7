@@ -1,0 +1,6 @@
+utc=20260814T053907Z
+host=192.168.100.54
+role=witness
+gate=P0
+campaign=20260814T053905Z-bg127
+continuation_of=20260814T051611Z-bg127

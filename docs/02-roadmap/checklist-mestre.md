@@ -466,6 +466,6 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] Evidência fecho: `docs/tests/evidence/20260812T025741Z-30.19-fecho/`
 - [x] BG-028 Fase 1 **Concluido** (`v1.9.58`); RR-3 tags; GA6.7 parecer EULA **externo**
 - [x] **Não** reabrir engenharia AP0–AP4
-- [ ] Ciclo evidência operacional **BG-127** (GO `2026-08-14`) — GA2.6, GA2.7, GA3.7, GA4.8, GA5.9
+- [ ] Ciclo evidência operacional **BG-127** (GO `2026-08-14`) — PARTIAL `20260814T051611Z` + `20260814T053905Z` (GA2.6 PASS parcial + enforce DEFERRED; GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 FAIL campo — API live pré-30.13) — item permanece aberto
 - [x] Runbook campo: [`../13-runbooks/evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md)
 - [x] `.254` vivo = `1.9.63` `mode=monitor` MITM OFF — [`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)

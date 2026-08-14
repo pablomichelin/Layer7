@@ -1,0 +1,2 @@
+PASS
+reason=clock correct; valid=1; clock_suspect=0; mode=P0

@@ -1,0 +1,10 @@
+customer_id=9
+customer_name=BG-127-TEST
+license_id=14
+license_status=active
+license_expiry=2026-08-16
+license_features=base
+license_hw=unbound
+license_key_len=32
+id13_unchanged=13|active|2030-01-09|base,identity,mitm|bound
+license_is_id13=no

@@ -1,0 +1,4 @@
+utc=20260814T051804Z
+host=ubuntu
+role=witness_only
+mutation=none

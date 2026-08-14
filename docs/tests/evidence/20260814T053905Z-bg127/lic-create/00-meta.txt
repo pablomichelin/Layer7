@@ -1,0 +1,5 @@
+utc=20260814T054000Z
+gate=license-create
+campaign=20260814T053905Z-bg127
+portal=https://license.systemup.inf.br
+auth=temporary admin session on .244 (no password printed; session not in git)

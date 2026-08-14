@@ -1,0 +1,4 @@
+identical_to_pre=yes
+aligned_to_20.36=yes
+aligned_to_051611Z=yes
+mutation=none

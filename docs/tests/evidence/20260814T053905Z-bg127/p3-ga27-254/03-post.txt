@@ -1,0 +1,24 @@
+after_invalidate:
+valid=0
+error=license file not found: /usr/local/etc/layer7.lic
+daemon=running pid 83842
+mode=monitor
+mitm_effective=false
+NO_8443
+NO_MITM_RDR
+NO_LAYER7_BLOCK
+ping54=ok
+ping1111=ok
+after_restore:
+valid=1
+customer=Systemup
+expiry=2030-01-09
+lic_sha=05fd6411aa3f1be9af2ceb7a05b4493c4b2be58c5b46e0cc8c3f0e2e3d8c629e
+json_sha=f966fc92b622ad6391bf633b0b1567e0d87703a75526c02c86cf03eae5587b32
+mitm_effective=false
+NO_8443
+NO_MITM_RDR
+ping54=ok
+ping1111=ok
+portal_id13=untouched
+portal_id14=still active (revoke reserved for GA5.9)

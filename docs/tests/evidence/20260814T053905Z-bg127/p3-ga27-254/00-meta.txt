@@ -1,0 +1,6 @@
+utc=20260814T054200Z
+host=192.168.100.254
+gate=GA2.7
+campaign=20260814T053905Z-bg127
+test_license_id=14
+prod_license_id=13

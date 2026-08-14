@@ -1,0 +1,4 @@
+/usr/local/etc/layer7/update-blacklists.sh --check-subscription
+# PHP parse of envelope data string for v/scope/iat/exp only (no Bearer, no jti)
+# DID NOT: block content host, add PF rules, expire token, run --download
+# reason=soak DUT is production-functional; traffic-risk stop per GO

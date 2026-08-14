@@ -1,0 +1,32 @@
+hostname=systemupfw.system.up
+utc=Fri Aug 14 05:39:08 UTC 2026
+pkg=pfSense-pkg-layer7-1.9.63
+layer7d_V=1.9.63
+layer7d=running as pid 59747
+tlsproxy=not running (default OFF; 20.10b gated)
+license_status:
+valid=1
+expired=0
+grace=0
+dev_mode=0
+days_left=1243
+hardware_id=e31560f5bc9894e92b9007d3e2e897a374f3d0b493b803c929d54acf51f8f826
+customer=Systemup
+expiry=2030-01-09
+features=base,identity,mitm
+features_flags=0x7
+clock_suspect=0
+clock_delta_sec=0
+mode=monitor
+layer7_enabled=true
+mitm.enabled=false
+check_in_enabled=absent
+mitm_effective=false
+NO_8443
+NO_MITM_RDR
+NO_LAYER7_BLOCK
+ping54=ok
+ping1111=ok
+lic_sha=05fd6411aa3f1be9af2ceb7a05b4493c4b2be58c5b46e0cc8c3f0e2e3d8c629e
+json_sha=f966fc92b622ad6391bf633b0b1567e0d87703a75526c02c86cf03eae5587b32
+aligned_to_051611Z=yes

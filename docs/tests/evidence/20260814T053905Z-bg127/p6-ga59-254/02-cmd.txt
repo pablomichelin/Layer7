@@ -1,0 +1,8 @@
+# opt-in check_in_enabled=true on DUT (restored afterwards)
+# layer7d --check-in  (official; always sends nonce)
+# POST /api/licenses/14/revoke  (empty body; guard id!=13)
+# layer7d --check-in again
+# supplementary: POST /api/license/check-in WITHOUT nonce from .244 (HTTP/status only)
+# restore production .lic + layer7.json from /root/layer7-backup-bg127-20260814T053905Z.tgz
+# rm leftover /var/db/layer7-checkin.json (test key)
+# DID NOT revoke id 13

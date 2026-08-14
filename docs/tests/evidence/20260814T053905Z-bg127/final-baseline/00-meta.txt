@@ -1,0 +1,4 @@
+utc=20260814T054541Z
+host=192.168.100.254
+pkg=pfSense-pkg-layer7-1.9.63
+campaign=20260814T053905Z-bg127

@@ -1,0 +1,4 @@
+# POST /api/customers {name:BG-127-TEST, tags:BG-127-TEST,lab}
+# POST /api/licenses {customer_id:9, expiry:2026-08-16, features:base, notes:BG-127-TEST...}
+# session via hashed token in admin_sessions (host .244); cookie not copied to git
+# DID NOT: PUT/revoke/rebind id 13; DID NOT print license_key

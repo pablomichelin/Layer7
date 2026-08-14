@@ -1,0 +1,3 @@
+ssh root@192.168.100.254 'date -u; layer7d --license-status'
+# ntpq -p (read-only)
+# no date -s

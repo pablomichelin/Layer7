@@ -1,0 +1,3 @@
+PASS
+reason=Ubuntu lab reachable; no production intercept listener; no layer7d; PoC not started
+ga_layer7=N/A

@@ -1,0 +1,7 @@
+ssh root@192.168.100.254 'hostname; date -u; pkg query %n-%v pfSense-pkg-layer7; layer7d -V; service layer7d status; service layer7-tlsproxy status || true'
+ssh root@192.168.100.254 'layer7d --license-status'
+# PHP field-specific extract of layer7.json (mode / layer7_enabled / mitm.enabled / check_in_enabled / mitm_effective)
+# sockstat 8443; pfctl mitm rdr
+# connectivity ping .54 and 1.1.1.1
+# sha256 of .lic and layer7.json (hashes only)
+# no mutation of config/license

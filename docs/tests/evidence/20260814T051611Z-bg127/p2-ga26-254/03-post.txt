@@ -1,0 +1,16 @@
+valid=1
+expired=0
+dev_mode=0
+days_left=1243
+customer=Systemup
+expiry=2030-01-09
+clock_suspect=0
+layer7d=running pid=59747
+pf_layer7_block=NO_LAYER7_BLOCK
+mode=monitor
+mitm_effective=false
+NO_8443
+NO_MITM_RDR
+daemon_crash=no
+mode_changed=no
+mitm_on=no

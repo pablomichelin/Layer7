@@ -1,0 +1,6 @@
+utc=20260814T051830Z
+gate=GA2.6
+pkg=pfSense-pkg-layer7-1.9.63
+mode=monitor
+mitm_effective=false
+check_in=absent

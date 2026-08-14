@@ -1,0 +1,7 @@
+hostname=ubuntu
+utc=Fri Aug 14 05:39:07 AM UTC 2026
+iface=ens160 inet 192.168.100.54/24
+listen_443_8443=NO_443_8443
+poc_dir=/opt/layer7-poc (present; not started)
+layer7d=NO_LAYER7D
+default_route=via 192.168.100.254

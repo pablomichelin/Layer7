@@ -15,11 +15,21 @@
 **Soak vivo `.254`:** `1.9.63` `mode=monitor` MITM **OFF** —
 [`../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)
 
-> **BLOCO 2 (`2026-08-14`) — só formalização.** Este runbook **não** foi
-> executado. **Nenhum** gate de campo (GA2.6, GA2.7, GA3.7, GA4.8, GA5.9)
-> está **PASS**. Não houve mudança de versão, código, package, release,
-> serviço, licenças ou EULA. A campanha começa só quando um operador
-> humano correr os passos P0–P6 fora do horário comercial.
+> **BLOCO 3 (`2026-08-14` `20260814T051611Z`) — 1ª execução de campo.**
+> Campanha **PARTIAL** (não é PASS BG-127). P0/P1 **PASS**; GA2.6 **PASS
+> parcial** (monitor) + enforce **DEFERRED**; GA3.7 **PASS**; GA2.7 **ABORT**
+> (sem licença de teste); GA4.8 **DEFERRED** (token `ok`, sem isolamento de
+> rede); GA5.9 **ABORT** (sem teste + check-in ausente). Licença de produção
+> **não** revogada nem substituída. MITM OFF. Sem código/release.
+> Evidência: [`../tests/evidence/20260814T051611Z-bg127/`](../tests/evidence/20260814T051611Z-bg127/).
+>
+> **BLOCO 4 (`2026-08-14` `20260814T053905Z`) — continuação autorizada.**
+> Licença teste id **14** / cliente **9** `BG-127-TEST` (expiry `2026-08-16`,
+> bind `.254`); id **13** intocado. GA2.7 **PASS**. GA5.9 **FAIL campo**:
+> API live rejeita `nonce` (pré-30.13); `--check-in` oficial HTTP 400; N3
+> manteve `valid=1`; legado sem nonce = `409 revoked`. Produção restaurada.
+> MITM OFF. Sem código/release.
+> Evidência: [`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/).
 
 Este ficheiro **não** substitui os runbooks de mecanismo
 ([`check-in-migration-30.14.md`](check-in-migration-30.14.md),
@@ -62,16 +72,16 @@ Este ficheiro **não** substitui os runbooks de mecanismo
 
 Marcar cada linha antes do passo 1. Falha = **ABORT** da campanha.
 
-- [ ] GO `2026-08-14` + item **BG-127** lidos; engenharia `30.19` permanece fechada
-- [ ] Janela **fora do horário comercial** (ambos os hosts)
-- [ ] Operador humano presente; este runbook **não** corre sozinho
-- [ ] Inventário de acesso **fora do git** (`docs/08-lab/lab-inventory.md` gitignored, ou equivalente local)
-- [ ] Snapshot/backup do `.lic` **de produção** do `.254` guardado **fora do git** (operador)
-- [ ] Licença de **teste** disponível no license server para GA2.7 / GA5.9 — **não** revogar a licença de produção
-- [ ] Soak `.254` confirmado `1.9.63` `mode=monitor` MITM OFF (evidência 20.36 ou re-baseline P0)
-- [ ] `.234` / `.235` **intocados** salvo passo que os cite explicitamente (este runbook **não** os cita)
-- [ ] Pasta de evidência criada (secção 5); `run_id` UTC
-- [ ] Rollback (secção 9) ensaiado em papel: comandos e artefactos localizados
+- [x] GO `2026-08-14` + item **BG-127** lidos; engenharia `30.19` permanece fechada
+- [x] Janela **fora do horário comercial** (ambos os hosts) — `2026-08-14` ~02:16 `-03`
+- [x] Operador humano presente; este runbook **não** corre sozinho
+- [x] Inventário de acesso **fora do git** (SSH já configurado; sem passwords no git)
+- [x] Snapshot/backup do `.lic` **de produção** do `.254` guardado **fora do git** (`~/Documents/layer7-operator-backups/20260814T051611Z-bg127/` + `/root/layer7-backup-bg127-20260814T051611Z.tgz`)
+- [x] Licença de **teste** disponível no license server para GA2.7 / GA5.9 — **não** revogar a licença de produção — criada em `20260814T053905Z` (id 14 / `BG-127-TEST`; id 13 intocado)
+- [x] Soak `.254` confirmado `1.9.63` `mode=monitor` MITM OFF (P0 + final)
+- [x] `.234` / `.235` **intocados** salvo passo que os cite explicitamente (este runbook **não** os cita)
+- [x] Pasta de evidência criada (secção 5); `run_id` `20260814T051611Z`
+- [x] Rollback (secção 9) ensaiado em papel: comandos e artefactos localizados — **não** executado (sem mutação)
 
 ---
 
@@ -429,3 +439,11 @@ Não fazer reset/rebase/stash. Evidência nova = ficheiros em
 Actualizar no **mesmo** bloco documental (depois da campanha, não antes):
 `plano-gates-antipirataria.md`, CORTEX (secção anti-pirataria), BG-127,
 checklist-mestre. **Não** antecipar PASS neste runbook.
+
+**1ª campanha `20260814T051611Z`:** **PARTIAL** — ver
+[`../tests/evidence/20260814T051611Z-bg127/`](../tests/evidence/20260814T051611Z-bg127/).
+**Continuação `20260814T053905Z`:** **PARTIAL** — GA2.7 **PASS**; GA5.9 **FAIL
+campo** (API live pré-30.13) — ver
+[`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/).
+BG-127 permanece **aberto**. Residual: deploy API `30.13` no `.244` com GO
+próprio, depois repetir só GA5.9.

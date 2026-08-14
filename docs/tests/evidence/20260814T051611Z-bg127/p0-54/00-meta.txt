@@ -1,0 +1,6 @@
+utc=20260814T051615Z
+host=ubuntu
+addr=192.168.100.54/24
+role=witness
+pkg_layer7=absent
+layer7d=absent

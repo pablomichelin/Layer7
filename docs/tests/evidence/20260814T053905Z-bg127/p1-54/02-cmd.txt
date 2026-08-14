@@ -1,0 +1,3 @@
+# confirm .54 is not a Layer7 DUT; do not install pfSense-pkg-layer7
+# do not route license activation through this host
+ssh root@192.168.100.54 'hostname; dpkg -l 2>/dev/null | grep -i layer7 || echo NO_DEB_LAYER7'

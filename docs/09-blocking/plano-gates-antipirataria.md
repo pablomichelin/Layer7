@@ -18,13 +18,18 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` sempre que houver lab.
 
 **Dois ciclos (não misturar):** engenharia AP0–AP4 **FECHADA** em `30.19`
 (`20260812T025741Z`). Ciclo de **evidência operacional ABERTO** — **BG-127**
-(GO `2026-08-14`): GA2.6, GA2.7, GA3.7, GA4.8, GA5.9. **GA6.7** permanece
-parecer jurídico **externo**. **`.254` vivo:** `1.9.63` `mode=monitor` MITM
-**OFF**
+(GO `2026-08-14`): GA2.6, GA2.7, GA3.7, GA4.8, GA5.9. **1ª execução**
+`20260814T051611Z` = **PARTIAL**; continuação `20260814T053905Z` = **PARTIAL**
+(GA2.7 **PASS**; GA5.9 **FAIL campo** — API live rejeita `nonce`). **Não**
+fecha BG-127. **GA6.7** permanece parecer jurídico **externo**. **`.254` vivo:**
+`1.9.63` `mode=monitor` MITM **OFF**
 ([`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)).
 Histórico e2e AP2: `.254` = `1.9.54` (`20260811T114320Z`).
 Runbook de campo:
 [`../13-runbooks/evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md).
+Evidência:
+[`../tests/evidence/20260814T051611Z-bg127/`](../tests/evidence/20260814T051611Z-bg127/)
++ [`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/).
 
 ---
 
@@ -81,8 +86,8 @@ de clientes pagantes.
 | GA2.3 | Modo dev existe apenas sob `L7_DEV_BUILD`, flag ausente do port | **PASS** (`30.4`) |
 | GA2.4 | Artefacto strippado: `nm`/`strings` sem símbolos de licença | **PASS** (`20260810T200329Z` — stripped; marcadores ausentes) |
 | GA2.5 | Daemon arranca, `-t` PASS, `--fingerprint` PASS após strip | **PASS** (`1.9.50` no builder) |
-| GA2.6 | Licença válida ⇒ enforce idêntico ao `1.9.48` (**N1**) | **PENDENTE campo** — ciclo **BG-127** (GO `2026-08-14`) |
-| GA2.7 | Licença ausente/inválida ⇒ monitor, daemon vivo, zero regras PF de block (**N2**) | **PENDENTE campo** — ciclo **BG-127** (GO `2026-08-14`) |
+| GA2.6 | Licença válida ⇒ enforce idêntico ao `1.9.48` (**N1**) | **PASS parcial** campo (`20260814T051611Z`) — modo **monitor** inalterado; enforce activo **DEFERRED** (sem GO de janela) |
+| GA2.7 | Licença ausente/inválida ⇒ monitor, daemon vivo, zero regras PF de block (**N2**) | **PASS** campo (`20260814T053905Z`) — licença teste id 14 ausente ⇒ `valid=0`, daemon vivo, zero block; produção restaurada |
 | GA2.8 | Stats/ficheiros forjados **não** desbloqueiam Identity/MITM na GUI | **PASS** (`20260810T214800Z` — `test_entitlements_gui.php`) |
 | GA2.9 | Gate MITM não é activável escrevendo ficheiros à mão | **PASS** (`layer7-mitm-entitle-ok` + rc.d; R-A permanece) |
 | GA2.10 | Sem regressão na trilha Identity+MITM: `test_mitm_config.php` e suite de entitlements PASS | **PASS** (`1.9.52` builder) |
@@ -91,7 +96,9 @@ de clientes pagantes.
 **Saída:** o caminho de bypass mais curto desaparece e o custo de ataque sobe de
 minutos para horas com ferramentas. **Não** se declara "impossível de contornar".
 **Estado GA2:** parcial — GA2.1–2.5 + GA2.8–2.11 **PASS** (`30.4`+`30.5`+`30.7`);
-GA2.6–2.7 (lab enforce) **PENDENTE campo** — **BG-127**.
+GA2.6 **PASS parcial** (monitor) + enforce **DEFERRED**; GA2.7 **PASS**
+(`20260814T053905Z`) — campanhas [`20260814T051611Z-bg127`](../tests/evidence/20260814T051611Z-bg127/)
++ [`20260814T053905Z-bg127`](../tests/evidence/20260814T053905Z-bg127/).
 
 ---
 
@@ -105,13 +112,13 @@ GA2.6–2.7 (lab enforce) **PENDENTE campo** — **BG-127**.
 | GA3.4 | Retrocesso grande ⇒ estado suspeito, degradação para **monitor**, evento de auditoria | **PASS** (lógica + `L7_AUDIT_NOTE`; lab appliance DEFERRED) |
 | GA3.5 | Daemon **nunca** termina nem entra em crash por estado temporal (**R-C**) | **PASS** |
 | GA3.6 | Recuperação após corrigir a hora: documentada, testada e executável pelo operador (**N6**) | **PASS** (runbook + unitário recuperação) |
-| GA3.7 | Licença dentro da validade com relógio correcto ⇒ inalterado (**N1**) | **DEFERRED** → ciclo **BG-127** (lab `.254` / `.lic`; não reabre `30.6`) |
+| GA3.7 | Licença dentro da validade com relógio correcto ⇒ inalterado (**N1**) | **PASS** campo (`20260814T051611Z`) — NTP OK; `clock_suspect=0`; `valid=1`; modo = P0 |
 | GA3.8 | Rollback ao `.pkg` anterior ignora o ficheiro de estado sem erro (**N7**) | **PASS** (doc — versões <1.9.51 ignoram o ficheiro) |
 | GA3.9 | ADR-0033 / runbook declaram explicitamente as evasões RR-4 (apagar estado; relógio congelado) e que o fecho real é AP3 | **PASS** |
 
 **Saída:** prolongar licença expirada com `date` deixa de ser trivial, sem punir
 clientes com relógio genuinamente errado. **Não** se afirma que 30.6 contém o T2 técnico.
-**Estado GA3:** **PASS** (engenharia) com GA3.7 **DEFERRED** → **BG-127**.
+**Estado GA3:** **PASS** (engenharia) + GA3.7 **PASS** campo (`20260814T051611Z`).
 
 ---
 
@@ -128,7 +135,7 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PASS** (local/builder + `.254` hold-active; snapshot intacto; evidência `20260811T020533Z`) |
 | GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PASS** (`30.10` — sem token: conteúdo local mantido; enforce/mode intactos no `.254`) |
 | GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (GUI + helper; e2e `1.9.54` / `20260811T114320Z` reportou `status=ok`) |
-| GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** local (PHP); **campo** → ciclo **BG-127** (token real) |
+| GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** local (PHP); **DEFERRED** campo (`20260814T051611Z`) — token real `ok` (~27 d); isolamento de rede **não** executado (risco de tráfego no soak) |
 | GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto no cliente) |
 | GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PASS** (`20260812T011217Z`) — release `blacklists-ut1-current` com **0 assets**; enforce não tocado. Residual CDN @ cut+~1min (302→SAS; manifesto 200; tarball 404); recheck `20260812T012017Z` **404×4** — evidência `03-recheck-cdn.txt` |
 | GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **DOC READY** — [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md); reposição não executada (não necessária) |
@@ -143,7 +150,7 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/` **PASS**.
 
 **Estado GA4:** **PASS** nos critérios de cut (GA4.10/15) + GA4.1–4.7/4.9/4.13/4.14
-**PASS**; primary auth preflight **PASS**; 30.9 **live**; GA4.8 local **PASS**, campo **BG-127**;
+**PASS**; primary auth preflight **PASS**; 30.9 **live**; GA4.8 local **PASS**, campo **DEFERRED** (`20260814T051611Z`);
 GA4.11 doc ready; **GA4.12 N/A**. Residual CDN GitHub @ cut documentado;
 recheck anónimo **404×4** (`03-recheck-cdn.txt`) — release continua vazia.
 
@@ -172,14 +179,15 @@ Gate de maior impacto em suporte. **Não abrir sem GA4 estável.**
 | GA5.6 | Falha de rede continua a não afectar enforce (**N3**) — verificado explicitamente neste gate | **PASS** — verify/rede → `L7_CHECKIN_NETWORK` sem invalidate |
 | GA5.7 | Instalação nova arranca com check-in activo | **PASS** (`20260812T015519Z`) — sample/bare `true`; evidência `20260812T015519Z-30.14-checkin-default` |
 | GA5.8 | Upgrade de instalação existente não quebra o appliance | **PASS** — preserva `false`/ausente (unit PHP+C) |
-| GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **PENDENTE campo** — caminho código `30.13` OK; ciclo **BG-127** (GO `2026-08-14`) |
+| GA5.9 | Revogação no painel corta enforce em ≤ intervalo configurado | **FAIL** campo (`20260814T053905Z`) — id 14 revogado; `--check-in` oficial HTTP 400 (API live rejeita `nonce`); `valid` ficou 1 (N3); legado sem nonce = `409 revoked` |
 | GA5.10 | Caminho de excepção para appliance isolado documentado e testado | **PASS** — runbook + `false` efectivo OFF |
 | GA5.11 | Runbook de suporte publicado antes da release | **PASS** — [`../13-runbooks/check-in-migration-30.14.md`](../13-runbooks/check-in-migration-30.14.md) |
 | GA5.12 | Alerta de abuso multi-appliance funciona; rebind autorizado **não** gera falso positivo | **PASS** — unit `multi-appliance-abuse.test.js` (`30.15`) |
 | GA5.13 | Compatibilidade de transição com clientes antigos verificada | **PASS parcial** — dual-mode D10 + upgrade preserve |
 
 **Estado GA5:** **parcial** (engenharia PASS) — GA5.1–5.8 + 5.10–5.12 **PASS**;
-GA5.9 **PENDENTE campo** — **BG-127**.
+GA5.9 **FAIL campo** (`20260814T053905Z`) — API live pré-30.13; residual
+deploy API + repetir corte. BG-127 permanece aberto.
 Evidência `30.15`: `docs/tests/evidence/20260812T020331Z-30.15-multi-appliance-abuse/`.
 
 **Saída:** revogar uma licença passa a ter efeito real, sem transformar
@@ -239,3 +247,5 @@ Qualquer um destes, em qualquer gate, é `FAIL` sem discussão:
 | `2026-08-10` | GA0.8 | 30.1a | **PASS** — ADR-0030…0033 `Proposto` + ficha | documental |
 | `2026-08-10` | **GA0** | 30.1b | **PASS completo** — ADRs `Aceito`; 8 decisões; BG-101 reaberto | ficha + ADRs + backlog |
 | `2026-08-14` | campo residual | **BG-127** | **ABERTO** — formalização documental apenas; **sem** execução; **sem** PASS de GA2.6/2.7/3.7/4.8/5.9; GA6.7 fora | soak vivo [`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/) (`.254`=`1.9.63` monitor / MITM OFF) |
+| `2026-08-14` | campo residual | **BG-127** P0–P6 | **PARTIAL** — P0/P1 **PASS**; GA2.6 **PASS parcial** (monitor) + enforce **DEFERRED**; GA3.7 **PASS**; GA2.7 **ABORT**; GA4.8 **DEFERRED**; GA5.9 **ABORT**; produção intocada; MITM OFF | [`20260814T051611Z-bg127`](../tests/evidence/20260814T051611Z-bg127/) |
+| `2026-08-14` | campo residual | **BG-127** P3+P6 | **PARTIAL** — GA2.7 **PASS**; GA5.9 **FAIL campo** (API live rejeita `nonce`; N3; legado 409 revoked); id 13 intocado; produção restaurada; MITM OFF | [`20260814T053905Z-bg127`](../tests/evidence/20260814T053905Z-bg127/) |

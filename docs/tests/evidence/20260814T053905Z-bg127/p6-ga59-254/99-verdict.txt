@@ -1,0 +1,2 @@
+FAIL
+reason=official --check-in cannot apply panel revoke: live API rejects nonce (HTTP 400); valid stayed 1 (N3). Server-side revoke of id 14 confirmed (legacy 409 revoked, unsigned). id 13 untouched. Residual: deploy 30.13 API to .244 (GO proprio; fora deste bloco).

@@ -1,0 +1,6 @@
+dut_lic=/usr/local/etc/layer7.lic (production; sha matches backup)
+extra_test_lic_on_dut=none
+portal_health=ok (unauthenticated /api/health only)
+license_server_inventory=read-only metadata; 0 rows classified as test/lab
+soak_license=id 13 Systemup active expiry=2030-01-09 features=base,identity,mitm bound
+check_in_enabled=absent

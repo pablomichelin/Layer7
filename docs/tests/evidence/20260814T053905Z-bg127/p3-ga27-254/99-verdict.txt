@@ -1,0 +1,2 @@
+PASS
+reason=valid=0 with daemon alive, zero Layer7 block, MITM OFF; production .lic restored

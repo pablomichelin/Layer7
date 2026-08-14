@@ -1,0 +1,11 @@
+# read-only witness
+hostname; date -u
+dpkg -l | grep layer7 || true
+ps aux | grep tlsproxy/layer7-poc
+sysctl net.ipv4.ip_forward
+ip -4 route show default
+iptables -t nat -S
+nft list ruleset (nat only)
+ss -lntup
+# no install of pfSense-pkg-layer7
+# no start of /opt/layer7-poc

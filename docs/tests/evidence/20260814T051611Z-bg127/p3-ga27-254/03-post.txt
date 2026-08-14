@@ -1,0 +1,6 @@
+production_lic_sha_unchanged=yes
+valid=1
+mode=monitor
+mitm_effective=false
+NO_LAYER7_BLOCK
+rollback=not_required (no mutation)

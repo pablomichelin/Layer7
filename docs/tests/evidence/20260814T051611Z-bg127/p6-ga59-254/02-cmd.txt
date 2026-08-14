@@ -1,0 +1,6 @@
+# not executed:
+# layer7d --check-in
+# portal revoke
+# .lic swap
+# check_in_enabled=true write
+# reason=no test license + no opt-in on production base

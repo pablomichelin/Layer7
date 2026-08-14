@@ -1,0 +1,7 @@
+utc=20260814T051959Z
+gate=GA5.9
+check_in_enabled=absent
+check_in_interval_hours=absent
+max_offline_hours=absent
+test_license=absent
+production_revoke=forbidden

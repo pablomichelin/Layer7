@@ -1,0 +1,3 @@
+PASS_PARTIAL
+reason=valid=1; daemon alive; mode=monitor same as P0; MITM OFF
+deferred=GA2.6 enforce-active smoke (no window GO)

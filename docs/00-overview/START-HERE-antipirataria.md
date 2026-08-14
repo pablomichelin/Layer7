@@ -6,7 +6,11 @@
 > Doc fecho: [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md).
 > Evidência fecho: [`../tests/evidence/20260812T025741Z-30.19-fecho/`](../tests/evidence/20260812T025741Z-30.19-fecho/).
 > **GO `2026-08-14`:** ciclo de **evidência operacional** aberto — **BG-127**
-> (GA2.6, GA2.7, GA3.7, GA4.8, GA5.9). **GA6.7** = parecer jurídico **externo**.
+> (GA2.6, GA2.7, GA3.7, GA4.8, GA5.9). Campanhas **PARTIAL**
+> [`20260814T051611Z-bg127`](../tests/evidence/20260814T051611Z-bg127/) +
+> [`20260814T053905Z-bg127`](../tests/evidence/20260814T053905Z-bg127/)
+> (GA2.7 **PASS**; GA5.9 **FAIL campo**).
+> **GA6.7** = parecer jurídico **externo**.
 > **`.254` vivo:** **`1.9.63`** `mode=monitor` MITM **OFF**
 > ([`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)).
 > Histórico e2e AP2: `.254` = `1.9.54` (`20260811T114320Z`) — **não** é o estado vivo.
@@ -46,14 +50,14 @@ docs/00-overview/START-HERE-antipirataria.md
 | Campo | Valor |
 |-------|-------|
 | Engenharia | **AP4 / `30.19` FECHADA** |
-| Ciclo evidência | **ABERTO** — **BG-127** (GO `2026-08-14`) |
-| Gates de campo | GA2.6, GA2.7, GA3.7, GA4.8, GA5.9 — **PENDENTE/DEFERRED**; **nenhum** PASS neste bloco |
+| Ciclo evidência | **ABERTO** — **BG-127** (GO `2026-08-14`); PARTIAL `20260814T051611Z` + `20260814T053905Z` |
+| Gates de campo | GA2.6 **PASS parcial** (monitor) + enforce **DEFERRED**; GA2.7 **PASS**; GA3.7 **PASS**; GA4.8 **DEFERRED**; GA5.9 **FAIL campo** (API live rejeita `nonce`) |
 | Fora deste ciclo | **GA6.7** (parecer EULA externo) |
-| `.254` vivo | **`1.9.63`** `mode=monitor` MITM **OFF** (`20260814T034904Z-20.36-soak-align-163-254`) |
+| `.254` vivo | **`1.9.63`** `mode=monitor` MITM **OFF** (`20260814T034904Z-20.36-soak-align-163-254`; reconfirmado `20260814T053905Z`) |
 | Histórico e2e AP2 | `.254` = `1.9.54` (`20260811T114320Z`) |
 | lab/`latest` | **`1.9.63`** |
 | Baseline enforce | **`1.9.8`** |
-| Próxima acção | Evidência operacional BG-127 (**não** executada neste bloco documental) |
+| Próxima acção | Deploy do API `30.13` no live `.244` (**GO próprio**) e repetir só GA5.9; isolamento GA4.8 só com janela que não arrisque tráfego |
 
 ---
 
@@ -64,8 +68,8 @@ ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10)
 - Engenharia: 30.19 FECHADO (20260812T025741Z)
 - Evidência fecho: 20260812T025741Z-30.19-fecho
-- Ciclo evidência: BG-127 ABERTO (GO 2026-08-14)
-- Gates campo: GA2.6, GA2.7, GA3.7, GA4.8, GA5.9
+- Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
+- Gates campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 FAIL campo (API live pré-30.13)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254)
 - Histórico e2e: .254=1.9.54 (20260811T114320Z)

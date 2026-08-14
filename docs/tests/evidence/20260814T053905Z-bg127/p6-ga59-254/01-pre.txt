@@ -1,0 +1,9 @@
+test_license_installed=yes
+customer=BG-127-TEST
+valid=1
+check_in_enabled=true (opt-in test window only)
+checkin1_before_revoke=HTTP 400 unsigned (live API: Payload contem campos nao permitidos: nonce)
+valid_after_ci1=1
+n3_intact=yes
+id13_on_server=active
+id14_on_server=active (pre-revoke)

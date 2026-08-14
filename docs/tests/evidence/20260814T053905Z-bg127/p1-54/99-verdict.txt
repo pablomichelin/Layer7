@@ -1,0 +1,3 @@
+PASS
+reason=lab witness stable; no production mutation
+gates_GA26_plus=N/A

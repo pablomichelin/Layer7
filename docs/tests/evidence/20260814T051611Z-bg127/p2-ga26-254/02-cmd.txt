@@ -1,0 +1,4 @@
+ssh root@192.168.100.254 'layer7d --license-status'
+ssh root@192.168.100.254 'service layer7d status'
+ssh root@192.168.100.254 'pfctl -sr | grep -i layer7 || true'
+# no mode flip; no enforce GO

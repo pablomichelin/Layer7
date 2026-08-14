@@ -1,0 +1,8 @@
+utc_clock=Fri Aug 14 05:18:31 UTC 2026
+ntp_peer=*a.st1.ntp.br st=1 offset~-1.6ms reach=377
+valid=1
+clock_suspect=0
+clock_delta_sec=0
+days_left=1243
+mode=monitor
+mitm_effective=false

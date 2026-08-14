@@ -1,0 +1,26 @@
+revoke_http=200
+revoke_id=14
+revoke_status=revoked
+id13_after=active expiry=2030-01-09
+official_checkin2=HTTP 400 response not signed/valid
+elapsed_sec=1
+valid_after_official=1
+customer_after_official=BG-127-TEST
+enforce_drop=no
+legacy_no_nonce_http=409
+legacy_no_nonce_status=revoked
+legacy_has_sig=no
+n3=unsigned 400 did not invalidate local .lic
+mitm_effective=false
+NO_8443
+NO_MITM_RDR
+NO_LAYER7_BLOCK
+after_restore:
+valid=1
+customer=Systemup
+expiry=2030-01-09
+check_in_enabled=absent
+lic_sha=05fd6411aa3f1be9af2ceb7a05b4493c4b2be58c5b46e0cc8c3f0e2e3d8c629e
+json_sha=f966fc92b622ad6391bf633b0b1567e0d87703a75526c02c86cf03eae5587b32
+ping54=ok
+ping1111=ok

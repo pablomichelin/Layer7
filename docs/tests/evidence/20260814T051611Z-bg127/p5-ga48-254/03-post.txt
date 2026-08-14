@@ -1,0 +1,9 @@
+content_subscription=ok
+mode=monitor
+valid=1
+layer7d=running pid=59747
+mitm_effective=false
+NO_LAYER7_BLOCK
+lkg_intact=yes
+lic_sha_unchanged=yes
+json_sha_unchanged=yes

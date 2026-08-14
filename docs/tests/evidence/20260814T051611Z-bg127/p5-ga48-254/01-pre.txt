@@ -1,0 +1,5 @@
+token_file=/var/db/layer7/content-subscription.json mode=600
+check_subscription=ok
+mode=monitor
+valid=1
+lkg=/usr/local/etc/layer7/blacklists/.last-known-good present

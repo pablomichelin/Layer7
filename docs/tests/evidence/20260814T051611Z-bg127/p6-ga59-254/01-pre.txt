@@ -1,0 +1,4 @@
+check_in_enabled=absent (upgrade preserve; daemon treats as OFF)
+runbook=do not force ON on production install
+test_license=none
+portal_revoke=not_attempted

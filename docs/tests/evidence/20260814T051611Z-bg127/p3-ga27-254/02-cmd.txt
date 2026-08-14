@@ -1,0 +1,7 @@
+# discovery only — no activate, no revoke, no .lic swap
+find DUT for *test*.lic / *lab*.lic → none
+GET https://license.systemup.inf.br/api/health → 200 status=ok
+# license-server .244: SELECT id, customer, status, expiry, features, archived, bind, class
+# (no license_key / notes / tokens printed into git)
+# class=maybe_test when name/notes match test|lab → 0 rows
+# DID NOT: download .lic, replace /usr/local/etc/layer7.lic, revoke any license

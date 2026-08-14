@@ -1,0 +1,4 @@
+DEFERRED
+reason=token real ok inside ~27d window; no intervention; mode/LKG intact
+not_proven=offline isolation of content update path (traffic risk on soak)
+local_php_proof=already PASS from engineering; this step is field isolation

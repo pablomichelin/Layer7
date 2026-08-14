@@ -1,0 +1,3 @@
+utc=20260814T051831Z
+gate=GA3.7
+date_s=not_used

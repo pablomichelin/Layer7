@@ -1,0 +1,3 @@
+p3_aborted_without_mutation=yes
+license_restored_already=n/a (never swapped)
+mode=monitor

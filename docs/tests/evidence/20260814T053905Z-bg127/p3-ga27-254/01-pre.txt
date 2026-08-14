@@ -1,0 +1,11 @@
+test_license_installed=yes
+customer=BG-127-TEST
+valid=1
+expiry=2026-08-16
+days_left=1
+features=base
+mode=monitor
+mitm_effective=false
+NO_LAYER7_BLOCK
+daemon=running pid 59747
+prod_id13_on_server=active (not revoked)

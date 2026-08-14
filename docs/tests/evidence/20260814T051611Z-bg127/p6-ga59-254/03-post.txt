@@ -1,0 +1,6 @@
+production_lic_sha_unchanged=yes
+valid=1
+mode=monitor
+check_in_enabled=absent
+mitm_effective=false
+rollback=not_required

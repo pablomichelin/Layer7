@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-127 licença de teste `BG-127-TEST`
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | operação live (sem código / sem bump visual) |
+| Versão | `2.1.0` (sem alteração) |
+| Objectivo | Emitir licença de teste dedicada para GA2.7 / GA5.9 sem tocar id 13 |
+| Impacto | Cliente id **9** `BG-127-TEST`; licença id **14** expiry `2026-08-16` `base`; depois **revogada** no GA5.9 |
+| Risco | Médio (soak `.254`); mitigado: backup, bind só ao FP do `.254`, restore integral |
+| Teste | GA2.7 PASS; GA5.9 FAIL campo (API live rejeita `nonce`); id 13 intacto |
+| Rollback | `.lic`/JSON de produção restaurados; sessão admin temporária revogada |
+| Resultado | **FEITO** — evidência `20260814T053905Z-bg127`; produção restaurada; MITM OFF |
+
+---
+
 ## 2026-08-12 — 30.15 alerta multi-appliance (`2.1.0`)
 
 | Campo | Valor |

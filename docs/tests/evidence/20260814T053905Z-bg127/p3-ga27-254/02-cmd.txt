@@ -1,0 +1,5 @@
+# activate already done (id 14 / BG-127-TEST)
+# invalidate: rm /usr/local/etc/layer7.lic ; service layer7d restart
+# observe --license-status + MITM + pf block + ping
+# restore: tar xf /root/layer7-backup-bg127-20260814T053905Z.tgz ; cp layer7.lic+json ; restart
+# DID NOT revoke id 13 or id 14 on the portal in this step

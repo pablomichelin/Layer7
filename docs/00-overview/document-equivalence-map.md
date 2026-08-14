@@ -71,7 +71,7 @@ Ele existe para evitar tres erros comuns:
 | IPv6 / dual-stack | notas antigas «planeado V2» vs limitação FP-010 | [`【FECHADO】 plano-ipv6`](../archive/planos-fechados/plano-ipv6-completo.md) + mapa + ADR-0024; START-HERE; ESTADO-PRODUTO | trilha **FECHADA**; stubs em `02-roadmap/` |
 | Fecho vs estado vivo | planos arquivados vs CORTEX | CORTEX = vivo; ESTADO-PRODUTO = veredicto; `archive/planos-fechados/` = histórico | em “está aberto?”, vence ESTADO-PRODUTO + CORTEX |
 | Escopo produto | charter vs pack/PRD/catálogo vs README raiz | `pack-produto-layer7.md` → `prd-layer7.md` + `catalogo-funcionalidades.md` + CORTEX | charter resume; README raiz pode estar atrasado na versão |
-| Anti-pirataria estado vivo | START-HERE / plano §0 / fecho `30.19` / gates vs soak 20.36 | `CORTEX.md` (vivo) + `START-HERE-antipirataria.md`; fecho `30.19` = engenharia; **BG-127** = evidência | `.254` vivo = `1.9.63` MITM OFF (`20260814T034904Z-20.36-soak-align-163-254`); `1.9.54` = histórico e2e AP2 |
+| Anti-pirataria estado vivo | START-HERE / plano §0 / fecho `30.19` / gates vs soak 20.36 | `CORTEX.md` (vivo) + `START-HERE-antipirataria.md`; fecho `30.19` = engenharia; **BG-127** = evidência | `.254` vivo = `1.9.63` MITM OFF (`20260814T034904Z-20.36-soak-align-163-254`); 1ª campanha BG-127 **PARTIAL** `20260814T051611Z`; `1.9.54` = histórico e2e AP2 |
 
 ---
 
