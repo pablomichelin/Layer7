@@ -6,6 +6,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P1-1 — check-in de chave arquivada:** `POST /api/license/check-in`
+  com nonce passa a ver linhas `revoked`/`expired` arquivadas (replace/DELETE)
+  e devolve envelope v2 assinado HTTP 409 com esse status. Chave inexistente
+  continua 404. Sem deploy (P0-1 ACTIVO); sem package/daemon.
 - **CI smoke layer7d (Linux):** `src/layer7d/features.h` foi renomeado para
   `l7_features.h` para não tapar `<features.h>` da glibc (`-I src/layer7d`).
   O workflow falhava em todo o push com `__GLIBC_USE (…)` / `SSL` em cadeia.

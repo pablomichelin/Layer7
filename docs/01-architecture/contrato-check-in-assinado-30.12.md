@@ -183,6 +183,7 @@ forjar `active`.
 | C8 | Rede down / timeout | Enforce intacto (N3) dentro de `max_offline_hours` |
 | C9 | Pedido **sem** nonce (cliente antigo) | Servidor responde legado; appliance antigo continua |
 | C10 | `content_subscription` aninhado em `data` activo | Persistência `30.10` continua; verify do token `30.8` intacto |
+| C11 | Chave arquivada `revoked`/`expired` + nonce (P1-1 / BG-128) | HTTP 409; envelope v2 `status` = esse estado; sig válida. Chave inexistente continua 404 |
 
 ---
 

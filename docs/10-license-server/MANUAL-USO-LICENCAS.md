@@ -411,6 +411,9 @@ ja registado. A reactivacao valida do mesmo hardware nao reescreve o bind.
   `check_in_enabled=true` em `layer7.json` (BG-077 / ADR-0021)
 - `POST /api/license/check-in` com a mesma chave da activação; resposta
   `409` revoked/expired remove o `.lic` local e desliga enforce
+- **P1-1:** se a chave antiga foi arquivada por replace/DELETE mas o estado
+  efectivo é `revoked` ou `expired`, o check-in com nonce devolve o mesmo
+  envelope v2 `409` (não `404`/`fail`). Chave que nunca existiu continua `404`
 - resposta **activa** (desde **30.9**) inclui `content_subscription`
   (envelope Ed25519 — token de conteúdo; contrato
   `docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`);
@@ -803,6 +806,9 @@ Na F3.5, os caminhos que entregam `.lic` passam a deixar rasto adicional de:
 A chave de licenca esta incorrecta ou nao existe no servidor.
 - Verificar a chave com `layer7d --activate CHAVE_CORRECTA`
 - Verificar no painel web se a licenca existe
+- **P1-1:** chave antiga arquivada após revoke/replace **não** deve cair
+  aqui — o check-in devolve `409` `revoked`/`expired` para o cliente
+  invalidar o `.lic`. `404` fica reservado a chave inexistente.
 
 ### "Hardware ID nao corresponde" (409)
 

@@ -2,6 +2,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const nacl = require('tweetnacl');
 
+const { createActivationStateError } = require('./activation-policy');
+const {
+  ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL,
+  VISIBLE_CHECK_IN_LICENSE_SQL,
+  loadLicenseForCheckIn,
+} = require('./check-in-lookup');
 const {
   CHECK_IN_ENVELOPE_VERSION,
   buildActiveCheckInPayloadV2,
@@ -9,6 +15,7 @@ const {
   buildDeniedCheckInPayloadV2,
   wrapSignedCheckInEnvelope,
 } = require('./check-in-policy');
+const { getEffectiveLicenseState } = require('./license-state');
 const { signData } = require('./crypto');
 const {
   normalizeCheckInNonce,
@@ -159,6 +166,47 @@ test('C7 — denied revoked assinado inclui eco nonce/hw', () => {
     hardwareId: HW,
     nonce: NONCE,
     nowSec: 1_700_000_100,
+  });
+  const env = wrapSignedCheckInEnvelope(denied, { signFn: testSign });
+  assert.equal(testVerify(env.data, env.sig), true);
+  const inner = JSON.parse(env.data);
+  assert.equal(inner.status, 'revoked');
+  assert.equal(inner.nonce, NONCE);
+  assert.equal(inner.hardware_id, HW);
+  assert.equal(inner.error, 'Licenca revogada.');
+});
+
+test('C11 — P1-1 revoke+replace: chave arquivada + nonce → 409 envelope revoked', async () => {
+  const archived = {
+    id: 15,
+    license_key: LICENSE_KEY,
+    status: 'revoked',
+    archived_at: '2026-08-14T12:00:00Z',
+    hardware_id: HW,
+    expiry: '2027-12-31',
+    customer_name: 'Cliente AP3',
+  };
+  const queryable = {
+    async query(sql) {
+      if (sql === VISIBLE_CHECK_IN_LICENSE_SQL) {
+        return { rows: [] };
+      }
+      if (sql === ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL) {
+        return { rows: [archived] };
+      }
+      throw new Error('SQL inesperado');
+    },
+  };
+
+  const license = await loadLicenseForCheckIn(queryable, LICENSE_KEY);
+  const error = createActivationStateError(license, getEffectiveLicenseState(license));
+  assert.equal(error.status, 409);
+  assert.equal(error.message, 'Licenca revogada.');
+
+  const denied = buildDeniedCheckInPayloadV2('revoked', error.message, {
+    hardwareId: HW,
+    nonce: NONCE,
+    nowSec: 1_700_000_200,
   });
   const env = wrapSignedCheckInEnvelope(denied, { signFn: testSign });
   assert.equal(testVerify(env.data, env.sig), true);

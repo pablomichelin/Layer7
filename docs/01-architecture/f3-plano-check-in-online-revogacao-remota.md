@@ -73,6 +73,9 @@ Persistência local proposta: `/var/db/layer7-checkin.json` (ou campo em
 
 - [x] Rota `POST /api/license/check-in` (`license-server/backend/src/routes/check-in.js`)
 - [x] Reutilizar `getEffectiveLicenseState`, `createHardwareBindingError`
+- [x] **P1-1 / BG-128** (`2026-08-14`): lookup também vê chave arquivada
+  `revoked`/`expired` (replace/DELETE) e devolve 409 envelope v2; 404 só
+  para chave inexistente — `check-in-lookup.js` (sem deploy; P0-1)
 - [x] Tabela `check_ins_log` (`check-in-schema.js`)
 - [x] Testes unitários (`check-in-policy.test.js`)
 - [x] Deploy em `192.168.100.244` (`2026-08-04`)

@@ -20,7 +20,8 @@
 > `.244` enquanto o serving `30.11` live não estiver versionado —
 > [`auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
 > + [`bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-> Worktree sujo `30.11` **preservar**. **BG-128** aberto; próximo código = **P1-1**.
+> Worktree sujo `30.11` **preservar**. **BG-128** aberto; **P1-1 FEITO** no git
+> (`2026-08-14`; sem deploy). Próximo código com GO = **P0-2**.
 > **Proibido neste ciclo:** MITM · enfraquecer segurança · falsear · apagar
 > dados · reset/rebase/stash · reabrir engenharia · rsync/rebuild integral HEAD.
 > **Honestidade:** root **pode** contornar verificação local (RR-5 / R-A).
@@ -35,7 +36,8 @@ docs/00-overview/START-HERE-antipirataria.md
 
 1. Ler este ficheiro + CORTEX + fecho `30.19` + **BG-127** + **BG-128**.
 2. **Não** reabrir AP0–AP4. O GO `2026-08-14` autoriza evidência de campo.
-   Código seguinte = **P1-1** (BG-128), sem `.244` e sem commit 30.11.
+   **P1-1 FEITO** no git. Código seguinte com GO = **P0-2** (BG-128), sem `.244`
+   e sem commit 30.11.
 3. **P0-1 ACTIVO:** proibido deploy integral do HEAD. Worktree sujo 30.11
    **preservar**.
 4. Residuais campo: ciclo **BG-127**; parecer EULA externo (GA6.7); RR-3 tags.
@@ -68,7 +70,7 @@ docs/00-overview/START-HERE-antipirataria.md
 | lab/`latest` | **`1.9.63`** |
 | Baseline enforce | **`1.9.8`** |
 | Freeze deploy | **P0-1 ACTIVO** — sem rsync/rebuild integral HEAD→`.244` |
-| Próxima acção código | **P1-1** (BG-128) — check-in arquivada → `revoked`; sem `.244` / sem commit 30.11 |
+| Próxima acção código | **P0-2** (BG-128; GO + restart API). **P1-1 FEITO** no git (sem deploy) |
 | Residual campo BG-127 | GA2.6 enforce / GA4.8 só com janela própria que não arrisque tráfego |
 
 ---
@@ -82,7 +84,7 @@ ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
 - Gates campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
-- Auditoria 2026-08-14: P0-1 ACTIVO; BG-128 ABERTO; próximo código = P1-1
+- Auditoria 2026-08-14: P0-1 ACTIVO; BG-128 ABERTO; P1-1 FEITO no git; próximo código com GO = P0-2
 - GA6.7: parecer EULA externo (fora do BG-127)
 - .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254)
 - Histórico e2e: .254=1.9.54 (20260811T114320Z)

@@ -29,7 +29,8 @@
 
 1. **P0-1:** sem rsync/rebuild integral HEAD→`.244`. Runbook
    [`../../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-2. Código seguinte (BG-128): **P1-1** — sem tocar neste host.
+2. **P1-1 FEITO** no git (`2026-08-14`) — **não** deployar neste host (P0-1).
+   Próximo código com GO: **P0-2**.
 3. Novo plano portal só com ideias **ACEITE** + GO (nenhum plano `ACTIVO`).
 4. Não misturar com MITM permanente (fila 20.37 fechada).
 5. Não sincronizar SPA `2.1.0` sem GO.

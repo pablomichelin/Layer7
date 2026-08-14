@@ -15,6 +15,7 @@ const {
   wrapSignedCheckInEnvelope,
 } = require('../check-in-policy');
 const { createHttpError, isHttpError } = require('../crud-integrity');
+const { loadLicenseForCheckIn } = require('../check-in-lookup');
 const { getEffectiveLicenseState } = require('../license-state');
 const { parseCheckInPayload } = require('../crud-validation');
 
@@ -125,21 +126,7 @@ router.post('/license/check-in', checkInLimiter, async (req, res) => {
     requestedHardwareId = hardwareId;
     requestedNonce = nonce;
 
-    const result = await pool.query(
-      `SELECT l.*, c.name AS customer_name
-         FROM licenses l
-         LEFT JOIN customers c ON c.id = l.customer_id
-        WHERE l.license_key = $1
-          AND l.archived_at IS NULL
-          AND (c.id IS NULL OR c.archived_at IS NULL)`,
-      [key]
-    );
-
-    if (result.rows.length === 0) {
-      throw createHttpError(404, 'Licenca nao encontrada.');
-    }
-
-    const license = result.rows[0];
+    const license = await loadLicenseForCheckIn(pool, key);
     effectiveState = getEffectiveLicenseState(license);
 
     if (!effectiveState.activated) {

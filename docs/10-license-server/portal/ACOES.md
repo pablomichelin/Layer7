@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-128 P1-1 check-in arquivada → 409 revoked/expired
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Chave antiga arquivada por replace com status `revoked`/`expired` deixa de devolver 404/`fail` no check-in com nonce |
+| Impacto | Só `license-server/backend` lookup + testes; envelope v2 409; chave inexistente continua 404 |
+| Risco | Baixo (SELECT extra; sem mutação). Residual: live `.244` ainda sem este overlay (P0-1) |
+| Teste | `npm test` no backend (lookup + C11 + suite) |
+| Rollback | Reverter o commit; o SELECT volta a exigir `archived_at IS NULL` |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA |
+
+---
+
 ## 2026-08-14 — GA5.9 campo PASS (licença teste id 15)
 
 | Campo | Valor |

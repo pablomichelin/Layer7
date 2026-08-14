@@ -471,4 +471,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] `.254` vivo = `1.9.63` `mode=monitor` MITM OFF — [`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)
 - [x] Auditoria `2026-08-14` registada — [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
 - [x] **P0-1 ACTIVO** — proibido deploy integral do HEAD enquanto 30.11 live não estiver versionado — [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md)
-- [ ] **BG-128** remediações auditoria — aberto; próximo bloco técnico seguro = **P1-1** (sem `.244`, sem commit 30.11)
+- [x] **BG-128 P1-1** — check-in arquivada `revoked`/`expired` → 409 envelope v2 (`2026-08-14`; sem deploy)
+- [ ] **BG-128** remediações restantes — P0-1 ACTIVO; próximo código com GO = **P0-2** (sem `.244`, sem commit 30.11)

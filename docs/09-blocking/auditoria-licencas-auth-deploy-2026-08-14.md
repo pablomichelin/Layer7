@@ -21,12 +21,12 @@
 | Serving autenticado `30.11` versionado no git | **NO-GO** — ausente do HEAD; presente no live e no worktree sujo |
 | Superfície admin (TOTP / rate-limit / bootstrap) | **P0-2 + P1** — não é bloqueio de deploy de conteúdo; é hardening da API |
 | Revogação autenticada quando a linha **não** está arquivada | **OK** (GA5.9 campo PASS) |
-| Revogação após replace/arquivo | **P1-1** — check-in devolve 404/`fail`; o cliente não invalida |
+| Revogação após replace/arquivo | **P1-1 FEITO no git** (`2026-08-14`) — check-in devolve 409 envelope `revoked`/`expired`; **não** deployado |
 | Worktree local `30.11` | **Preservar** — não commitar neste bloco |
 
 **P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244` enquanto o serving `30.11` live não estiver reconciliado **e** versionado no git (allowlist, sem snapshot). Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
-**Próximo bloco técnico seguro:** **P1-1** (check-in de chave arquivada/revogada → envelope `revoked`). Não mistura 30.11, não toca `.244`, não roda TOTP/segredos.
+**P1-1 FEITO no git** (`2026-08-14`; sem deploy). Próximo código com GO: **P0-2** (TOTP; restart API). Não mistura 30.11, não toca `.244`.
 
 ---
 
@@ -79,7 +79,9 @@ Facetas do mesmo bloqueio (não são P0 independentes):
 
 ### P1-1 — Check-in trata licença arquivada como 404/`fail` (não `revoked`)
 
-**Próximo bloco técnico seguro.**
+**FEITO no git** (`2026-08-14`). `loadLicenseForCheckIn` vê linhas arquivadas
+`revoked`/`expired` e a rota devolve 409 + envelope v2. Chave inexistente
+continua 404. **Não** deployado (P0-1).
 
 | Campo | Valor |
 |-------|--------|
@@ -87,7 +89,7 @@ Facetas do mesmo bloqueio (não são P0 independentes):
 | **Cenário** | Appliance com `.lic` + chave em `/var/db/layer7-checkin.json` + `check_in_enabled=true`. Portal: revoke e depois replace/arquivo. `layer7d --check-in` → SELECT exige `archived_at IS NULL` → 404. Envelope assinado leva `status: "fail"`. Cliente só invalida `revoked`/`expired` → `L7_CHECKIN_NETWORK`, `.lic` intacto. |
 | **Impacto** | O caminho oficial pós-revogação **desliga** o corte 30.13. O `.lic` antigo vive até `max_offline_hours` (check-in ON) ou `expiry+grace` (check-in OFF). Reabre o sintoma S09 (ADR-0021). |
 | **Correcção mínima** | No check-in, ver também linhas arquivadas com `status` `revoked`/`expired` e devolver envelope v2 com esse status (409), não 404. |
-| **Testes** | JS: revoke → replace → `POST /license/check-in` chave antiga + nonce → HTTP 409, `data.status === "revoked"`, sig válida. Negativo: chave inexistente continua 404. C: já existe C7 para revoked vivo; falta o caso arquivado. |
+| **Testes** | JS: `check-in-lookup.test.js` + C11 em `check-in-signed.test.js` (arquivada revoked + nonce → 409/`revoked`/sig; inexistente → 404). C: C7 vivo inalterado; C11 cobre o caso arquivado no lookup+envelope. |
 | **Fora deste bloco** | Deploy `.244`; commit 30.11; P0-2; daemon C. |
 
 ### P1-2 — `X-Forwarded-For` cliente-controlado anula rate-limit / lock IP
@@ -298,7 +300,7 @@ Facetas do mesmo bloqueio (não são P0 independentes):
 | D8 `content_subscription` em `data` | Cumprido | emissão no git; **serving** GET = P0-1 |
 | D10 dual-mode | Cumprido | legado ainda ligado (só remover com GO) |
 | D12 / 30.14 default ON | Cumprido no código novo | upgrade **não** injecta `true` (P2-9 / RR-1) |
-| ADR-0021 corte imediato online | **Buraco P1-1** | após replace/arquivo |
+| ADR-0021 corte imediato online | **P1-1 FEITO no git** | após replace/arquivo; **não** live até overlay |
 
 Stale documental (não é bug de runtime): 30.12 §7 ainda diz default OFF; §8 ainda diz GA5.2–5.13 PENDENTE.
 
@@ -315,7 +317,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 ## Fila de remediação (ordem; não implementar neste commit)
 
 1. **P0-1 (ops, já activo)** — freeze de deploy integral; inventário allowlist quando houver GO de reconciliação.
-2. **P1-1 (próximo bloco técnico seguro)** — SELECT de check-in + testes JS; sem `.244`, sem 30.11, sem TOTP.
+2. **P1-1 FEITO no git** (`2026-08-14`) — SELECT de check-in + testes JS; **sem** deploy `.244`.
 3. **P0-2 + P1-2 + P1-3 + P2-5** — fechar caminho TOTP (segredo obrigatório, IP real, `is_active`, lock no 2FA). Exige restart API + GO.
 4. **P1-4 + P2-1** — um único owner no bootstrap/boot.
 5. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
