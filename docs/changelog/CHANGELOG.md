@@ -37,6 +37,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-5 / BG-142 — promoção atómica do `.lic` em Activate:**
+  FEITO no git após gates deste bloco. `layer7_activate` deixa de
+  truncar/substituir `L7_LIC_PATH` antes de validar o candidato.
+  `promote_license_atomic` grava tmp 0600 no mesmo directório do
+  destino, corre `layer7_license_check_path` no candidato e só então
+  faz `rename`. Falha/unlink do tmp preserva o `.lic` anterior.
+  `activate.body` em `/var` não é renameado. `layer7_license_check`
+  permanece wrapper do path final (contrato intacto). Mensagens/
+  exit de sucesso e cleanup preservados. Sem fsync novo. Hook
+  `L7_ACTIVATE_PROMOTE_HOOK` só com `L7_TEST_ACTIVATE_PROMOTE` +
+  `LAYER7_TEST_ROOT` (ausente do Makefile do port). Sem check-in/
+  clock/pakey/expiry. Residual P3-6. Sem `PORTVERSION`, sem deploy
+  (P0-1 ACTIVO).
 - **BG-128 P3-4 / BG-140 — falha de pool em GET /2fa/status:** FEITO
   no git após gates deste bloco. `GET /api/auth/2fa/status` passa a
   capturar rejeição de `pool.query` com try/catch local. Log interno

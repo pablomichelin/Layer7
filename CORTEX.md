@@ -102,6 +102,8 @@ rejeita 10);
 `timingSafeEqual`;
 **P3-4** FEITO no git `2026-08-14` sem deploy —
 `GET /api/auth/2fa/status` captura falha de pool e devolve 500 JSON;
+**P3-5** FEITO no git `2026-08-14` sem deploy —
+promoção atómica do `.lic` em Activate (tmp 0600 + verify + rename);
 fecho
 [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
@@ -897,7 +899,10 @@ sem deploy / `PORTVERSION`).
 **P3-4** FEITO no git (`2026-08-14`;
 `GET /api/auth/2fa/status` try/catch + 500 JSON `Erro interno.`;
 sem deploy / `PORTVERSION`).
-Próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4).
+**P3-5** FEITO no git (`2026-08-14`;
+promoção atómica do `.lic` em Activate — tmp 0600 + verify + rename;
+sem deploy / `PORTVERSION`).
+Próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5).
 **não** reabrir MITM permanente (20.37). `.254` **não** tocado neste bloco.
 
 ---
@@ -1635,7 +1640,10 @@ sem deploy / `PORTVERSION`).
 **P3-4** FEITO no git (`2026-08-14`;
 `GET /api/auth/2fa/status` try/catch + 500 JSON `Erro interno.`;
 sem deploy / `PORTVERSION`).
-Próximo código com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4).
+**P3-5** FEITO no git (`2026-08-14`;
+promoção atómica do `.lic` em Activate — tmp 0600 + verify + rename;
+sem deploy / `PORTVERSION`).
+Próximo código com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5).
 Snapshot/`.env`/SPA `30.11` **fora do git**. **GA6.7** continua
 parecer jurídico externo. **Não** reabre AP0–AP4 / código / MITM.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
@@ -1754,7 +1762,8 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
   **P3-3A FEITO** no git (`2026-08-14`; `/login` disabled e inexistente partilham 401 genérico + bcrypt + `registerLoginFailure`; sem deploy / `PORTVERSION`);
   **P3-3B** FEITO no git (`2026-08-14`; `POST`/`PUT /api/users` exige password >=12; `/login` não rejeita 10; sem deploy / `PORTVERSION`);
   **P3-3C** FEITO no git (`2026-08-14`; `verifyTotp` Buffer UTF-8 + guarda de comprimento + `timingSafeEqual`; sem deploy / `PORTVERSION`);
-  **P3-4** FEITO no git (`2026-08-14`; `GET /api/auth/2fa/status` try/catch + 500 JSON; sem deploy / `PORTVERSION`)
+  **P3-4** FEITO no git (`2026-08-14`; `GET /api/auth/2fa/status` try/catch + 500 JSON; sem deploy / `PORTVERSION`);
+  **P3-5** FEITO no git (`2026-08-14`; promoção atómica do `.lic` em Activate; sem deploy / `PORTVERSION`)
   ([relatório](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
   [runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md))
 - **GOs humanos remanescentes (fora da engenharia):** parecer EULA externo (GA6.7);
@@ -1771,7 +1780,7 @@ TRILHA ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
 - Campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
-- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git (c2b9fdb + governação após gates); P2-7+P2-8+P2-10 FEITOS no git; P2-11 FEITO no git; A1/A2/M2 FEITO no git (28c97ad + governação após gates); M1 FEITO no git (GUI/helper via layer7d --fingerprint); P2-17 FEITO no git (LAYER7_TEST_NOW só com LAYER7_TEST_ROOT); P2-3 FEITO no git (origin X-Forwarded-Proto $scheme); P1-9 AVALIADO no git (residual pós-P2-3 não aberto no HEAD; sem mudança de runtime); P2-2 FEITO no git (CSRF admin fail-closed Origin/Sec-Fetch-Site); P2-13 AVALIADO no git (meia-noite local / DST / UTC sem correção única segura; sem mudança de runtime); P2-4 FEITO no git (incremento atómico de failure_count; sem deploy); P3-1 FEITO no git (sessão única atómica com lock do admin; sem deploy); P3-2 FEITO no git (GET /api/auth/session inclui a.totp_enabled; sem deploy); P3-3A FEITO no git (POST /login disabled e inexistente partilham 401 genérico + bcrypt + registerLoginFailure; sem deploy); P3-3B FEITO no git (POST/PUT /api/users exige password >=12; /login não rejeita 10; sem deploy); P3-3C FEITO no git (verifyTotp Buffer UTF-8 + guarda de comprimento + timingSafeEqual; sem deploy); P3-4 FEITO no git (GET /2fa/status try/catch + 500 JSON; sem deploy); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4)
+- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git (c2b9fdb + governação após gates); P2-7+P2-8+P2-10 FEITOS no git; P2-11 FEITO no git; A1/A2/M2 FEITO no git (28c97ad + governação após gates); M1 FEITO no git (GUI/helper via layer7d --fingerprint); P2-17 FEITO no git (LAYER7_TEST_NOW só com LAYER7_TEST_ROOT); P2-3 FEITO no git (origin X-Forwarded-Proto $scheme); P1-9 AVALIADO no git (residual pós-P2-3 não aberto no HEAD; sem mudança de runtime); P2-2 FEITO no git (CSRF admin fail-closed Origin/Sec-Fetch-Site); P2-13 AVALIADO no git (meia-noite local / DST / UTC sem correção única segura; sem mudança de runtime); P2-4 FEITO no git (incremento atómico de failure_count; sem deploy); P3-1 FEITO no git (sessão única atómica com lock do admin; sem deploy); P3-2 FEITO no git (GET /api/auth/session inclui a.totp_enabled; sem deploy); P3-3A FEITO no git (POST /login disabled e inexistente partilham 401 genérico + bcrypt + registerLoginFailure; sem deploy); P3-3B FEITO no git (POST/PUT /api/users exige password >=12; /login não rejeita 10; sem deploy); P3-3C FEITO no git (verifyTotp Buffer UTF-8 + guarda de comprimento + timingSafeEqual; sem deploy); P3-4 FEITO no git (GET /2fa/status try/catch + 500 JSON; sem deploy); P3-5 FEITO no git (promoção atómica do .lic em Activate; sem deploy); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)

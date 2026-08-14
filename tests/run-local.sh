@@ -322,6 +322,22 @@ else
 	cat /tmp/test_checkin_state_persist.cc.err
 	fail "test_checkin_state_persist compile"
 fi
+step "Unit: activate promote atomico (P3-5)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d -DL7_TEST_ACTIVATE_PROMOTE \
+    -o /tmp/test_activate_promote_atomic \
+    tests/functional/test_activate_promote_atomic.c \
+    src/layer7d/license.c src/layer7d/features.c \
+    $CRYPTO_FLAGS \
+    2>/tmp/test_activate_promote_atomic.cc.err; then
+	if /tmp/test_activate_promote_atomic; then
+		pass "test_activate_promote_atomic"
+	else
+		fail "test_activate_promote_atomic runtime"
+	fi
+else
+	cat /tmp/test_activate_promote_atomic.cc.err
+	fail "test_activate_promote_atomic compile"
+fi
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_license_enforce_gate \
     tests/functional/test_license_enforce_gate.c \

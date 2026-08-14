@@ -117,6 +117,14 @@ Daemon/pfSense:
 - leitura de estado da GUI em
   `package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc`
 
+Checkpoint P3-5 / BG-142 (`2026-08-14`): a promoção do `.lic` em
+`--activate` grava um tmp 0600 no mesmo directório do destino, valida
+o candidato (`layer7_license_check_path`) e só então faz `rename`
+atómico. Falha ou unlink do tmp preserva o `.lic` anterior.
+`activate.body` em `/var` não é renameado. `layer7_license_check`
+continua a ser o wrapper do path final; o contrato de check, check-in,
+clock, pakey e expiry não mudam. Sem fsync novo.
+
 ### 3.2 Tabelas e campos relevantes
 
 - `licenses`

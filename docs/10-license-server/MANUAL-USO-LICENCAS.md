@@ -136,7 +136,8 @@ O sistema de licencas Layer7 funciona com dois componentes:
 3. No pfSense, executa `layer7d --activate CHAVE`
 4. O daemon envia chave + hardware ID ao servidor
 5. O servidor assina o ficheiro `.lic` com Ed25519 e devolve
-6. O daemon grava em `/usr/local/etc/layer7.lic` e valida
+6. O daemon valida o candidato num tmp 0600 e só então faz `rename`
+   atómico para `/usr/local/etc/layer7.lic` (falha preserva o `.lic` anterior)
 7. Com licenca valida: **enforce** (bloqueio activo)
 8. Sem licenca valida: **monitor-only** (sem bloqueio)
 
@@ -380,8 +381,12 @@ layer7d: license valid — customer=Empresa ABC Ltda expiry=2027-12-31 features=
    - Se outro hardware tentar reactivar depois do bind, responde `409`
    - Gera e assina o ficheiro `.lic` com Ed25519
    - Retorna o JSON assinado
-4. O daemon grava em `/usr/local/etc/layer7.lic`
-5. Verifica a assinatura com a chave publica embutida
+4. O daemon grava o candidato num tmp 0600 no mesmo directório de
+   `/usr/local/etc/layer7.lic` e verifica a assinatura com a chave
+   publica embutida **antes** do `rename` (P3-5 / BG-142)
+5. Só se o candidato for válido faz `rename` atómico para
+   `/usr/local/etc/layer7.lic`; falha ou unlink do tmp preserva o
+   `.lic` anterior
 6. Se valido, o daemon opera em modo **enforce** (bloqueio activo)
 
 ### 5.3 Re-activacao

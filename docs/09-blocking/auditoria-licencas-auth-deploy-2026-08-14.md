@@ -73,11 +73,15 @@ comprimento + `timingSafeEqual`. Residual P3-4 (fechado neste bloco). Sem deploy
 `PORTVERSION`.
 **P3-4** FEITO no git (`2026-08-14`) —
 `GET /api/auth/2fa/status` captura rejeição de `pool.query` e
-devolve 500 JSON `Erro interno.`. Residual P3-5. Sem deploy /
+devolve 500 JSON `Erro interno.`. Residual P3-5 (fechado neste bloco). Sem deploy /
 `PORTVERSION`.
+**P3-5** FEITO no git (`2026-08-14`) —
+Activate promove `.lic` de forma atómica (tmp 0600 + verify +
+`rename`); falha/unlink do tmp preserva o anterior. Residual P3-6.
+Sem deploy / `PORTVERSION`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5).
 
 ---
 
@@ -338,7 +342,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P3-3B** FEITO no git (`2026-08-14`) | `users.js` `normalizePassword` vs `bootstrap-admin.js:94-106` | users aceitava password ≥10; bootstrap exige 12 | Política inconsistente | Subir só `users.js` para 12; não rejeitar 10 no `/login` | `POST /api/users` com 10 → 400; 12 → 201; PUT 10 → 400; PUT sem password inalterado. **Não** deployado. |
 | **P3-3C** FEITO no git (`2026-08-14`) | `totp.js` `verifyTotp` | Comparação HOTP com `===` | Timing teórico de prefixo (6 dígitos) | Buffer UTF-8 + guarda de comprimento + `timingSafeEqual` | Código válido → true; 6 dígitos inválidos → false; malformed → false sem throw. **Não** deployado. |
 | **P3-4 FEITO no git** (`2026-08-14`) | `auth.js` `GET /2fa/status`; Express `^4.21.2` | Falha de BD em `GET /2fa/status` | Promise rejeitada sem error handler | `try/catch` local (sem wrapper global / Express 5) | Pool a rejeitar → 500 JSON `Erro interno.`; sem unhandledRejection; segundo GET 200; 401/403 intactos. **Não** deployado. |
-| **P3-5** | `license.c:803-833` | Activate escreve `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha ⇒ unlink (sem bypass) | Verificar tmp e `rename` atómico | Crash entre write e verify → sem `.lic` inválido permanente |
+| **P3-5 FEITO no git** (`2026-08-14`) | `license.c` `promote_license_atomic` / `layer7_license_check_path` | Activate escrevia `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha apagava o anterior | tmp 0600 no mesmo dir + verify + `rename`; falha preserva o anterior | Crash após write do tmp → final anterior intacto; inválido remove tmp; sucesso 0600. **Não** deployado. |
 | **P3-6** | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` só C vs SoT | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Estender o gate ao PEM do port | Gate FAIL se PEM ≠ SoT |
 | **P3-7** | `license.c:518-520` vs `crud-validation.js:647-654` | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local antes do servidor); não é bypass | Interpretar expiry como UTC (`timegm`) | `TZ=America/Sao_Paulo` vs `TZ=UTC` no dia fronteira |
 | **P3-8** | `20260812T013145Z` último `asset_count=0` | Sem recheck em 14-08 | Outros PoPs/TTL não observados | Recheck só com pedido do gestor (esta auditoria não contactou GitHub) | `asset_count` + 404 anónimo |
@@ -475,7 +479,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 22. **P3-3B** FEITO no git (`2026-08-14`) — `POST`/`PUT /api/users` exige password >=12; `/login` não rejeita 10. **Não** deployado.
 23. **P3-3C** FEITO no git (`2026-08-14`) — `verifyTotp` Buffer UTF-8 + guarda de comprimento + `timingSafeEqual`. **Não** deployado.
 24. **P3-4** FEITO no git (`2026-08-14`) — `GET /api/auth/2fa/status` try/catch; pool rejeitado → 500 JSON; processo vivo. **Não** deployado.
-25. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4. Residual P3-5.
+25. **P3-5** FEITO no git (`2026-08-14`) — promoção atómica do `.lic` em Activate (tmp 0600 + verify + rename); falha preserva o anterior. **Não** deployado.
+26. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5. Residual P3-6.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 

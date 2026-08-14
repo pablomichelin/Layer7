@@ -415,8 +415,8 @@ l7_ed25519_verify(const char *data, const char *sig_hex)
 	return (verify_ok == 1) ? 0 : -1;
 }
 
-int
-layer7_license_check(struct l7_license_info *info)
+static int
+layer7_license_check_path(const char *path, struct l7_license_info *info)
 {
 	char *lic_raw = NULL;
 	size_t lic_len;
@@ -432,6 +432,12 @@ layer7_license_check(struct l7_license_info *info)
 	memset(expiry, 0, sizeof(expiry));
 	memset(customer, 0, sizeof(customer));
 	memset(features, 0, sizeof(features));
+
+	if (!path || path[0] == '\0') {
+		snprintf(info->error, sizeof(info->error),
+		    "license file not found: %s", L7_LIC_PATH);
+		return -1;
+	}
 
 #ifdef L7_DEV_BUILD
 	if (is_dev_key()) {
@@ -456,10 +462,10 @@ layer7_license_check(struct l7_license_info *info)
 	}
 	memcpy(info->hardware_id, hw_id, L7_HW_ID_LEN);
 
-	lic_raw = read_file_alloc(L7_LIC_PATH, &lic_len);
+	lic_raw = read_file_alloc(path, &lic_len);
 	if (!lic_raw) {
 		snprintf(info->error, sizeof(info->error),
-		    "license file not found: %s", L7_LIC_PATH);
+		    "license file not found: %s", path);
 		return -1;
 	}
 
@@ -590,6 +596,12 @@ layer7_license_check(struct l7_license_info *info)
 	return -1;
 }
 
+int
+layer7_license_check(struct l7_license_info *info)
+{
+	return layer7_license_check_path(L7_LIC_PATH, info);
+}
+
 /* --- online activation (stub — requires license server) --- */
 
 static int
@@ -704,20 +716,99 @@ write_bytes_0600(const char *path, const void *buf, size_t len)
 	return 0;
 }
 
+#ifdef L7_TEST_ACTIVATE_PROMOTE
 static int
-promote_activate_body(void)
+l7_test_root_active(void)
 {
+	const char *r = getenv("LAYER7_TEST_ROOT");
+
+	return (r != NULL && r[0] != '\0');
+}
+
+static const char *
+l7_test_promote_hook(void)
+{
+	if (!l7_test_root_active())
+		return NULL;
+	return getenv("L7_ACTIVATE_PROMOTE_HOOK");
+}
+#endif
+
+static int
+license_sibling_tmp(const char *dest, char *out, size_t outsz)
+{
+	if (!dest || dest[0] == '\0' || !out || outsz < 8)
+		return -1;
+	if (snprintf(out, outsz, "%s.tmp", dest) >= (int)outsz)
+		return -1;
+	return 0;
+}
+
+/*
+ * Copia src para dest.tmp (0600, mesmo directório), valida o candidato
+ * e só então faz rename atómico. Falha/unlink do tmp não toca dest.
+ * Não rename de activate.body (/var). Sem fsync novo.
+ */
+static int
+promote_license_atomic(const char *src_path, const char *dest_path,
+    struct l7_license_info *info, int *verify_fail)
+{
+	char tmp[1024];
 	char *raw;
 	size_t len;
-	int rc;
+	struct l7_license_info local;
+	struct l7_license_info *li = info ? info : &local;
+	int need_verify = 1;
 
-	raw = read_file_alloc(L7_ACTIVATE_BODY_TMP, &len);
-	if (!raw)
+	if (verify_fail)
+		*verify_fail = 0;
+	memset(li, 0, sizeof(*li));
+
+	if (!src_path || !dest_path)
+		return -1;
+	if (license_sibling_tmp(dest_path, tmp, sizeof(tmp)) != 0)
 		return -1;
 
-	rc = write_bytes_0600(L7_LIC_PATH, raw, len);
+	raw = read_file_alloc(src_path, &len);
+	if (!raw)
+		return -1;
+	if (write_bytes_0600(tmp, raw, len) != 0) {
+		free(raw);
+		(void)unlink(tmp);
+		return -1;
+	}
 	free(raw);
-	return rc;
+
+#ifdef L7_TEST_ACTIVATE_PROMOTE
+	{
+		const char *hook = l7_test_promote_hook();
+
+		if (hook && strcmp(hook, "stop-after-write") == 0)
+			return -1;
+		if (hook && strcmp(hook, "accept-candidate") == 0)
+			need_verify = 0;
+	}
+#endif
+
+	if (need_verify && layer7_license_check_path(tmp, li) != 0) {
+		if (verify_fail)
+			*verify_fail = 1;
+		(void)unlink(tmp);
+		return -1;
+	}
+
+	if (rename(tmp, dest_path) != 0) {
+		(void)unlink(tmp);
+		return -1;
+	}
+	return 0;
+}
+
+static int
+promote_activate_body(struct l7_license_info *info, int *verify_fail)
+{
+	return promote_license_atomic(L7_ACTIVATE_BODY_TMP, L7_LIC_PATH,
+	    info, verify_fail);
 }
 
 int
@@ -817,20 +908,28 @@ layer7_activate(const char *key, const char *url)
 		return -1;
 	}
 
-	if (promote_activate_body() != 0) {
-		activation_cleanup_temp();
-		fprintf(stderr,
-		    "layer7d: activation failed — could not save license to "
-		    "%s\n", L7_LIC_PATH);
-		return -1;
-	}
-
-	activation_cleanup_temp();
-
-	fprintf(stderr, "layer7d: license saved to %s\n", L7_LIC_PATH);
-
 	{
 		struct l7_license_info li;
+		int verify_fail = 0;
+
+		if (promote_activate_body(&li, &verify_fail) != 0) {
+			activation_cleanup_temp();
+			if (verify_fail) {
+				fprintf(stderr,
+				    "layer7d: activation rejected — downloaded license did not "
+				    "pass verification: %s\n",
+				    li.error);
+			} else {
+				fprintf(stderr,
+				    "layer7d: activation failed — could not save license to "
+				    "%s\n", L7_LIC_PATH);
+			}
+			return -1;
+		}
+
+		activation_cleanup_temp();
+
+		fprintf(stderr, "layer7d: license saved to %s\n", L7_LIC_PATH);
 
 		if (layer7_license_check(&li) == 0) {
 			(void)layer7_checkin_store_key(key);
@@ -842,7 +941,6 @@ layer7_activate(const char *key, const char *url)
 			return 0;
 		}
 
-		(void)unlink(L7_LIC_PATH);
 		fprintf(stderr,
 		    "layer7d: activation rejected — downloaded license did not "
 		    "pass verification: %s\n",
@@ -1681,5 +1779,16 @@ int
 layer7_test_write_bytes_0600(const char *path, const void *buf, size_t len)
 {
 	return write_bytes_0600(path, buf, len);
+}
+#endif
+
+#ifdef L7_TEST_ACTIVATE_PROMOTE
+int
+layer7_test_promote_license(const char *src_path, const char *dest_path)
+{
+	struct l7_license_info li;
+	int verify_fail = 0;
+
+	return promote_license_atomic(src_path, dest_path, &li, &verify_fail);
 }
 #endif

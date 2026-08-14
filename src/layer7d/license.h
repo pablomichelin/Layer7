@@ -139,4 +139,14 @@ int layer7_test_checkin_save_error(const char *key, const char *last_error);
 int layer7_test_write_bytes_0600(const char *path, const void *buf, size_t len);
 #endif
 
+#ifdef L7_TEST_ACTIVATE_PROMOTE
+/*
+ * Harness P3-5: promoção atómica do .lic (tmp 0600 + verify + rename).
+ * Não entra no binário do port (flag ausente do Makefile).
+ * Hook L7_ACTIVATE_PROMOTE_HOOK só com LAYER7_TEST_ROOT:
+ *   stop-after-write | accept-candidate
+ */
+int layer7_test_promote_license(const char *src_path, const char *dest_path);
+#endif
+
 #endif /* LAYER7_LICENSE_H */
