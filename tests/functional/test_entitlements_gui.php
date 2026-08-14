@@ -97,6 +97,7 @@ function l7_sign_lic($priv, $features, $path, $hw = "test-hw-30.7",
 $lic = layer7_lic_path();
 $inc = $root . "/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc";
 $now = 1786708800; /* 2026-08-14 15:00:00 UTC — longe de fronteira DST */
+/* LAYER7_TEST_NOW só é honrado com LAYER7_TEST_ROOT (já definido acima). */
 putenv("LAYER7_TEST_NOW=" . (string)$now);
 $exp_ok = date("Y-m-d", $now + (30 * 86400));
 $exp_grace = date("Y-m-d", $now - (5 * 86400));

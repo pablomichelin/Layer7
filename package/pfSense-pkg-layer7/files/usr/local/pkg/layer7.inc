@@ -7041,13 +7041,19 @@ function layer7_license_read_verified($lic_path = null)
 }
 
 /**
- * Relógio para binding de `.lic`. LAYER7_TEST_NOW (unix) congela testes.
+ * Relógio para binding de `.lic` (P2-17).
+ * LAYER7_TEST_NOW (unix) só com LAYER7_TEST_ROOT (harness; sem
+ * congelar a data de produção só pelo ambiente).
  */
 function layer7_license_now()
 {
-	$env = getenv("LAYER7_TEST_NOW");
-	if (is_string($env) && $env !== "" && preg_match('/^[0-9]+$/', $env)) {
-		return (int)$env;
+	$test_root = getenv("LAYER7_TEST_ROOT");
+	if (is_string($test_root) && $test_root !== "") {
+		$env = getenv("LAYER7_TEST_NOW");
+		if (is_string($env) && $env !== "" &&
+		    preg_match('/^[0-9]+$/', $env)) {
+			return (int)$env;
+		}
 	}
 	return time();
 }

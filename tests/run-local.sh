@@ -437,6 +437,11 @@ else
 	else
 		fail "test_fingerprint_gui_daemon"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_license_now_gate.php; then
+		pass "test_license_now_gate"
+	else
+		fail "test_license_now_gate"
+	fi
 fi
 
 step "Regress: layer7-tlsproxy (junto ao codigo)"

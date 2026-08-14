@@ -16,6 +16,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P2-17 — `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`:**
+  FEITO no git após gates deste bloco. `layer7_license_now()` deixa de
+  congelar a data de binding da GUI só pelo ambiente. O harness
+  (`test_entitlements_gui.php`) continua a poder fixar o relógio sob
+  raiz controlada. Sem P2-9/P2-13/P3, sem `PORTVERSION`, sem deploy
+  (P0-1 ACTIVO). O daemon C não lê esta variável.
 - **BG-128 M1 — fingerprint GUI via daemon:** FEITO no git após gates
   deste bloco. `layer7_local_hardware_id()` deixa a fórmula PHP
   (`sysctl kern.hostuuid` + `ifconfig -l ether`) e chama

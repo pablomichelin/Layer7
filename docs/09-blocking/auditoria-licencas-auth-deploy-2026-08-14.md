@@ -35,9 +35,11 @@ deploy). P2-5 ficou absorvido no P1-3.
 `28c97ad` + governação após gates; `2026-08-14`; sem deploy / `PORTVERSION`).
 **M1 FEITO no git** (`2026-08-14`; GUI/helper via `layer7d --fingerprint`;
 sem deploy / `PORTVERSION`).
+**P2-17 FEITO no git** (`2026-08-14`; `LAYER7_TEST_NOW` só com
+`LAYER7_TEST_ROOT`; sem deploy / `PORTVERSION`).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13/P2-17).
 
 ---
 
@@ -278,6 +280,7 @@ só corre se `PKG_UPGRADE` estiver vazio e não houver keep. Manual e
 | **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
 | **P2-15 FEITO no git** (`2026-08-14`) | Worktree local vs MATCH `20260812T002500Z` | Serving allowlist versionado; snapshot continua só em disco | Gap de código 30.11 no git fechado; snapshot/`.env` continuam fora | Inventário + commit allowlist **FEITO**; P0-1 **não** encerrado | Hashes = inventário; `check-ignore` do tarball |
 | **P2-16** | Tag `layer7-license-api:pre-30.13-20260814T142739Z` | Rollback da imagem pré-30.13 | Reabre rejeição de `nonce` (GA5.9 FAIL); **mantém** 30.11 | Não usar essa tag salvo incidente 30.13; preferir overlay | Smoke nonce → não pode voltar a 400 |
+| **P2-17 FEITO no git** (`2026-08-14`) | `layer7.inc` `layer7_license_now()` | `LAYER7_TEST_NOW` honrado só pelo ambiente | GUI Identity/MITM podia congelar a data de expiry/grace sem `TEST_ROOT` (daemon C intacto) | Honrar `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`, como `LAYER7_TEST_HW_ID` | Harness com raiz controlada congela; sem gate o env é ignorado. **Não** deployado. |
 
 ---
 
@@ -402,11 +405,22 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 10. **P2-11 FEITO no git** (`2026-08-14`) — GUI/helper binding HW + expiry/grace; **sem** deploy / `PORTVERSION`.
 11. **A1/A2/M2 FEITO no git** (`28c97ad` + governação após gates; `2026-08-14`) — staging persistente + fail-closed + harness funcional; **sem** deploy / `PORTVERSION`. Sem P2-13.
 12. **M1 FEITO no git** (`2026-08-14`) — GUI/helper fingerprint via `layer7d --fingerprint`; **sem** deploy / `PORTVERSION`.
-13. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO. Sem M1.
+13. **P2-17 FEITO no git** (`2026-08-14`) — `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`; **sem** deploy / `PORTVERSION`.
+14. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO. Sem M1/P2-17.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — P2-17 `LAYER7_TEST_NOW` (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Em produção, a data de binding da GUI não pode ser influenciada só pelo ambiente; preservar congelamento explícito sob `LAYER7_TEST_ROOT`, coerente com `LAYER7_TEST_HW_ID` |
+| Impacto | `layer7_license_now()` em `layer7.inc`, `test_license_now_gate.php`, `run-local.sh`, comentário em `test_entitlements_gui.php` + docs. Sem P2-9/P2-13/P3, sem daemon/`PORTVERSION`/build/release/hosts |
+| Risco | Baixo. O daemon C **não** lê `LAYER7_TEST_NOW` (enforce intacto). Residual: quem definir `LAYER7_TEST_ROOT` no processo PHP já controla o harness (RR-5 / root). Empty `TEST_ROOT` não conta |
+| Teste | `php tests/functional/test_license_now_gate.php` PASS (congelamento com `TEST_ROOT`; recusa sem gate / `TEST_ROOT` vazio; binding morto não reabre só com env; harness controlado pode congelar). Regressão `test_entitlements_gui.php` + `test_fingerprint_gui_daemon.php` + revoke/30.14 PASS |
+| Rollback | Reverter o commit; `LAYER7_TEST_NOW` volta a congelar a data da GUI só pelo ambiente |
 
 ## Objectivo / impacto / risco / teste / rollback — M1 fingerprint GUI (`2026-08-14`)
 

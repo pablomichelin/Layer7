@@ -54,9 +54,10 @@ em PHP. Obtêm o mesmo `hardware_id` via CLI one-shot:
 
 (`main.c` imprime 64 hex e sai; o daemon em execução não é necessário.)
 Binário ausente, `rc≠0` ou saída que não seja `^[a-f0-9]{64}$` → string
-vazia → binding fail-closed. `LAYER7_TEST_HW_ID` só é lido quando
-`LAYER7_TEST_ROOT` está definido (harness de teste; inacessível em
-produção). A fórmula em `license.c` **não** muda.
+vazia → binding fail-closed. `LAYER7_TEST_HW_ID` e `LAYER7_TEST_NOW`
+só são lidos quando `LAYER7_TEST_ROOT` está definido (harness de
+teste; inacessível em produção — P2-17). A fórmula em `license.c`
+**não** muda. O daemon **não** honra `LAYER7_TEST_NOW`.
 
 Validação de equivalência FreeBSD (`sysctlbyname` + `getifaddrs` /
 `IFT_ETHER`) no appliance permanece **pendente** — um host macOS com
