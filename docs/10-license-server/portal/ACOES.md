@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — Deploy controlado API `30.13` no `.244`
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | operação live (sem código novo / sem bump visual / sem frontend) |
+| Versão | `2.1.0` no git; SPA live `2.0.0` **intocada** |
+| Objectivo | Corrigir GA5.9 residual: API live aceitar `nonce` 30.13 (dual-mode) |
+| Impacto | Só serviço `api` em `192.168.100.244`; check-in sintético 404 em vez de 400 nonce |
+| Risco | Médio (API de licenças); mitigado: backup SQL, tag `pre-30.13`, sem `--delete`, sem `down -v` |
+| Teste | health 200; POST+nonce → 404; POST sem nonce → legado; admin+id13 activos; stacks intactas |
+| Rollback | `docker tag layer7-license-api:pre-30.13-20260814T142739Z layer7-license-api:latest` + `up -d --no-deps --no-build api` + `restart nginx` |
+| Resultado | **FEITO** — evidência `20260814T142739Z-30.13-api-244`; `.254` e licenças **não** tocados |
+
+---
+
 ## 2026-08-14 — BG-127 licença de teste `BG-127-TEST`
 
 | Campo | Valor |

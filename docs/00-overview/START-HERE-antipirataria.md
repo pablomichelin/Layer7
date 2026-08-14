@@ -51,13 +51,13 @@ docs/00-overview/START-HERE-antipirataria.md
 |-------|-------|
 | Engenharia | **AP4 / `30.19` FECHADA** |
 | Ciclo evidência | **ABERTO** — **BG-127** (GO `2026-08-14`); PARTIAL `20260814T051611Z` + `20260814T053905Z` |
-| Gates de campo | GA2.6 **PASS parcial** (monitor) + enforce **DEFERRED**; GA2.7 **PASS**; GA3.7 **PASS**; GA4.8 **DEFERRED**; GA5.9 **FAIL campo** (API live rejeita `nonce`) |
+| Gates de campo | GA2.6 **PASS parcial** (monitor) + enforce **DEFERRED**; GA2.7 **PASS**; GA3.7 **PASS**; GA4.8 **DEFERRED**; GA5.9 **FAIL campo** (pré-deploy); API `30.13` live `.244` — reteste campo **pendente** |
 | Fora deste ciclo | **GA6.7** (parecer EULA externo) |
 | `.254` vivo | **`1.9.63`** `mode=monitor` MITM **OFF** (`20260814T034904Z-20.36-soak-align-163-254`; reconfirmado `20260814T053905Z`) |
 | Histórico e2e AP2 | `.254` = `1.9.54` (`20260811T114320Z`) |
 | lab/`latest` | **`1.9.63`** |
 | Baseline enforce | **`1.9.8`** |
-| Próxima acção | Deploy do API `30.13` no live `.244` (**GO próprio**) e repetir só GA5.9; isolamento GA4.8 só com janela que não arrisque tráfego |
+| Próxima acção | API `30.13` **já live** no `.244` (`20260814T142739Z`); **repetir só GA5.9** no `.254` com GO próprio; isolamento GA4.8 só com janela que não arrisque tráfego |
 
 ---
 
@@ -69,7 +69,7 @@ ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Engenharia: 30.19 FECHADO (20260812T025741Z)
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
-- Gates campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 FAIL campo (API live pré-30.13)
+- Gates campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 FAIL campo (pré-deploy); API 30.13 live .244 20260814T142739Z
 - GA6.7: parecer EULA externo (fora do BG-127)
 - .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254)
 - Histórico e2e: .254=1.9.54 (20260811T114320Z)
