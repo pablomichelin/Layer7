@@ -34,7 +34,8 @@
    [`../../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 2. **P0-2 residual single-use/bind FEITO** no git (`2026-08-14`) —
    **não** deployar neste host (P0-1). HMAC fail-closed já estava
-   no git. Próximo código com GO: P2 restantes (exceto P2-9 sem GO).
+   no git. **P2-9 AVALIADO** neste bloco (BG-154; upgrade **não**
+   injecta `true`). Próximo: P0-1 rebuild `api` + smoke só com GO.
 3. Novo plano portal só com ideias **ACEITE** + GO (nenhum plano `ACTIVO`).
 4. Não misturar com MITM permanente (fila 20.37 fechada).
 5. Não sincronizar SPA `2.1.0` sem GO.

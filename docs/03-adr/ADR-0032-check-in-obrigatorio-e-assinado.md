@@ -80,7 +80,7 @@ runbook isolados; evidência `20260812T015519Z-30.14-checkin-default`.
 | Regra / RR | Declaração |
 |------------|------------|
 | **R-C** | Indisponibilidade de rede nunca reduz enforce nem para o daemon. |
-| **RR-1** | Cut `30.11` **feito**; GO/execução `30.14` **feito** (default ON em novas). Revogação em campo na base antiga ainda depende de opt-in/release. |
+| **RR-1** | Cut `30.11` **feito**; GO/execução `30.14` **feito** (default ON em novas). Revogação em campo na base antiga ainda depende de opt-in/release. **P2-9 AVALIADO** (`2026-08-14`; BG-154): upgrade **não** injecta `true` — injectar invertiria este ADR. |
 | **RR-5** | Resposta assinada impede **servidor falso**; **não** impede root de patchar o `layer7d` para ignorar o check-in. Valor de AP3: contra T2 *não-técnico* (ex-cliente que não pacha). O técnico é contido por AP2 + `30.15` + AP4. Coberto por **R-A**. |
 
 O que a ADR-0021 **mantém:** formato `.lic`, activação, binding, ausência de

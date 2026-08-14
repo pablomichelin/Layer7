@@ -16,6 +16,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P2-9 / BG-154 — upgrade não injecta check-in ON:**
+  AVALIADO neste bloco (opção A — cadeado + docs). O GO `30.14` /
+  ADR-0032 permanece: novas = ON; existentes = opt-in; isolados =
+  `false` (R-J). `load_or_default` e `pkg-install.in` **não** chamam
+  `layer7_check_in_apply_migration_policy`; chave ausente ⇒ efectivo
+  OFF. Injectar `true` no upgrade invertiria o `30.14` — só com GO
+  novo. Cadeado em `test_check_in_default_30.14.php`. Sem mudança de
+  runtime. Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P0-2 residual — TOTP challenge single-use + bind:** FEITO
   no git. O `challenge_token` passa a levar `jti` aleatório no HMAC.
   `/login` invalida desafios unused do admin, grava

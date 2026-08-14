@@ -107,8 +107,9 @@ no backend; sem compose/healthcheck; sem Docker build/up).
 **P2-6 Bloco B FEITO** no git (`2026-08-14`; `pg_isready` + `depends_on`
 `service_healthy`; sem Docker build/up).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
-GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7).
+GitHub Release / `PORTVERSION`. **P2-9 AVALIADO** neste bloco
+(BG-154; opção A — upgrade **não** injecta `true`). Próximo: P0-1
+rebuild `api` + smoke só com GO (sem P2-9; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7).
 
 ---
 
@@ -350,7 +351,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P2-6 Bloco B FEITO no git** (`2026-08-14`) | `docker-compose.yml` | `depends_on: - db` (só arranque do contentor) | API corre `ensure*Schema()` antes do `listen`; race → `process.exit(1)` | `db.healthcheck` `pg_isready` via `$$POSTGRES_USER`/`$$POSTGRES_DB` + `api.depends_on.db.condition: service_healthy`. Sem healthcheck em `api`/`web`/`nginx`. Sem `USER node`/imagem/tag/env | Cadeado `dockerfile-p26.test.js` (4 PASS). Hash compose P0-1 actualizado. Residual: Compose 1.x v3 ignora/rejeita `condition`; prova `docker compose` (proibido). **Não** deployado. |
 | **P2-7 FEITO no git** (`2026-08-14`) | `license.c` `layer7_checkin_store_key` | `store_key` mantinha `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar só `features` / `features_set` | store_key(nova) → `features_set==0`; intervalos preservados. **Não** deployado. |
 | **P2-8 FEITO no git** (`2026-08-14`) | `license.c` `checkin_save_state` vs clock-mark | `fopen(..., "w")` truncava; crash a meio | Após P1-5, estado vazio recusa enforce; `.lic` intacto | tmp + `chmod 0600` + `rename`; escape JSON | Falha de tmp preserva o ficheiro anterior; aspas/barra re-lidas. **Não** deployado. |
-| **P2-9** | `layer7.inc:2552-2593`; `pkg-install.in:43-44` | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF. Documentado (RR-1), residual comercial | Só com GO: migração opt-in ou injectar `true` | Já existe `test_check_in_default_30.14.php`; falta teste de install a **não** migrar |
+| **P2-9 AVALIADO neste bloco** (`2026-08-14`; **BG-154**; opção A — cadeado + docs) | `layer7.inc:2552-2593`; `pkg-install.in:43-44` (intactos) | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF | **Opção A:** isto **é** o contrato `30.14` / ADR-0032 (opt-in; isolados R-J). Injectar `true` invertiria o GO `30.14`. Sem runtime. | Cadeado `test_check_in_default_30.14.php` (GA5.8 + install não chama migration). Runbook §7. |
 | **P2-10 FEITO no git** (`2026-08-14`) | `license.c` `promote_activate_body` / `write_bytes_0600` | `--activate` gravava `.lic` sem `chmod` | umask 022 → 0644; payload assinado legível localmente | `fchmod`/`chmod 0600` | `stat` do `.lic` = 0600. **Não** deployado. |
 | **P2-11 FEITO no git** (`2026-08-14`) | `layer7.inc` `layer7_entitlements()` / `layer7_license_binding_ok()`; `layer7-mitm-entitle-ok` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` + helper exigem HW + expiry/grace 14d | `.lic` HW errado / expiry além da graça → GUI locked; graça/válido → unlock; stats forjados → locked. **Não** deployado. |
 | **P2-12 FEITO no git** (`c2b9fdb`; governação após gates) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
@@ -468,7 +469,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | D6 sem store de nonce | Cumprido | MVP explícito |
 | D8 `content_subscription` em `data` | Cumprido | emissão no git; **serving** GET = P0-1 |
 | D10 dual-mode | Cumprido | legado ainda ligado (só remover com GO) |
-| D12 / 30.14 default ON | Cumprido no código novo | upgrade **não** injecta `true` (P2-9 / RR-1) |
+| D12 / 30.14 default ON | Cumprido no código novo | upgrade **não** injecta `true` (P2-9 **AVALIADO** / BG-154 / RR-1) |
 | ADR-0021 corte imediato online | **P1-1 FEITO no git** | após replace/arquivo; **não** live até overlay |
 
 Stale documental (não é bug de runtime): 30.12 §7 ainda diz default OFF; §8 ainda diz GA5.2–5.13 PENDENTE.
@@ -519,7 +520,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 32. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
 33. **P2-6 Bloco B FEITO no git** (`2026-08-14`) — `pg_isready` + `depends_on` `service_healthy`; hash compose P0-1 actualizado; sem Docker build/up; sem deploy.
 34. **P0-2 residual single-use/bind FEITO no git** (`2026-08-14`) — `jti` no HMAC; `admin_totp_challenges`; consumo `FOR UPDATE` + `used_at` antes da sessão. **Não** deployado.
-35. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7; sem P0-2 residual. Residual: P2-9 (só com GO); P0-1 rebuild `api`.
+35. **P2-9 AVALIADO neste bloco** (`2026-08-14`; **BG-154**; opção A — cadeado + docs). Upgrade **não** injecta `true` (contrato `30.14` / ADR-0032). Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7; sem P0-2 residual. Residual: P0-1 rebuild `api`.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -675,6 +676,30 @@ SSOT [`../01-architecture/f3-expiracao-revogacao-grace.md`](../01-architecture/f
 **Não é P3-7:** `timegm` / `gmmktime` / meio-dia UTC no daemon ou PHP (isso muda o contrato e aperta o Brasil).
 **Não é P3-7:** fim do dia UTC/local ou só `tm_isdst=-1` (isso é GO de política, prova P2-13).
 **Não é P3-7:** deploy / `PORTVERSION` / hosts.
+
+## Prova P2-9 — opção A: upgrade **não** injecta check-in ON (`2026-08-14`)
+
+**Pedido avaliado:** GO para fechar o residual P2-9. A correcção
+mínima da auditoria («migração opt-in ou injectar `true`») **colide**
+com o GO `30.14` / ADR-0032 (upgrade não regressivo; isolados R-J).
+**Veredicto:** P2-9 **AVALIADO** (**BG-154**; opção A — cadeado +
+docs). O comportamento actual **é** o contrato: `load_or_default` e
+`pkg-install.in` **não** chamam `layer7_check_in_apply_migration_policy`;
+chave ausente ⇒ efectivo OFF. Injectar `true` no upgrade invertiria
+o `30.14` e arriscaria air-gap. Sem mudança de runtime.
+SSOT [`../13-runbooks/check-in-migration-30.14.md`](../13-runbooks/check-in-migration-30.14.md) §7.
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Fechar P2-9 como docs+cadeado: upgrade não injecta; injectar `true` só com GO que emende o `30.14` |
+| Impacto | Teste `test_check_in_default_30.14.php` + docs. `layer7.inc` / `pkg-install.in` / package / `PORTVERSION` / hosts **intactos** |
+| Risco | Nenhum de runtime. Residual comercial (RR-1): base antiga continua OFF até opt-in GUI; injectar `true` = GO novo |
+| Teste | Cadeado: install chama `load_or_default`+`save_json` e **não** a migration; `load_or_default` não chama migration; echo «Upgrades NAO alteram». PHP local ausente neste Mac — asserts verificados por leitura do fonte; `run-local.sh` já inclui o teste |
+| Rollback | Reverter o commit de docs+teste. O runtime já era o anterior. **Não** injectar `true` |
+
+**Não é P2-9:** injectar `check_in_enabled=true` no upgrade / `load_or_default` (isso invertiria o `30.14`).
+**Não é P2-9:** rebuild `api` / deploy `.244` (isso é P0-1).
+**Não é P2-9:** `PORTVERSION` / hosts / builder.
 
 ## Prova P2-6 Bloco A — `.dockerignore` + `USER node` no backend (`2026-08-14`)
 
@@ -917,7 +942,7 @@ SSOTs e checklist **não** antecipam «FEITO no git». Código do bloco:
 |-------|--------|
 | Objectivo | Recusar enforce sem estado de check-in quando a flag está ON; preservar json/`.lic`/CA/secrets/check-in em upgrade e keep-config; limpar `/var/db` + anti-DoH no deinstall real |
 | Impacto | Daemon (`license.c`/`main.c`), hooks `pkg-deinstall.in`, `uninstall.sh`, revoke GUI, copy de remoção, docs de install/rollback. Sem P2-9, sem license server/SPA, sem `PORTVERSION`/build/release/hosts |
-| Risco | Médio-baixo. Air-gap continua `check_in_enabled=false`. N3 intacto (falha de rede ≠ recusar enforce). Upgrade deixa de apagar licença/políticas. Residual: P2-9 (migração check-in em upgrade) só com GO |
+| Risco | Médio-baixo. Air-gap continua `check_in_enabled=false`. N3 intacto (falha de rede ≠ recusar enforce). Upgrade deixa de apagar licença/políticas. Residual P2-9 **AVALIADO** (BG-154): injectar `true` só com GO que emende o `30.14` |
 | Teste | `test_checkin_config_enabled` + `test_license_enforce_gate` + `test_pkg_deinstall_lifecycle.sh` + `test_license_revoke_state.php` + `sh tests/run-local.sh` |
 | Rollback | Reverter o commit; `enforce_armed` volta a armar sem chave; POST-DEINSTALL volta a apagar json/`.lic` em upgrade e a deixar leftovers em `/var/db` |
 

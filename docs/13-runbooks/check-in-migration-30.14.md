@@ -106,6 +106,26 @@ activa. O scheduler periódico só corre com `check_in_enabled: true`.)
 # Sample novo = true
 grep -n 'check_in_enabled' package/pfSense-pkg-layer7/files/usr/local/etc/layer7.json.sample
 
-# Teste unitário PHP da política
+# Teste unitário PHP da política + cadeado P2-9 (install não migra)
 php tests/functional/test_check_in_default_30.14.php
 ```
+
+---
+
+## 7. P2-9 / BG-154 — upgrade **não** injecta `true` (`2026-08-14`)
+
+**AVALIADO neste bloco** (opção A). O GO `30.14` e a ADR-0032
+permanecem: novas = ON; existentes = opt-in anunciado; isolados =
+`false` explícito (R-J). **Não** é correção injectar `true` no
+upgrade — isso invertaria o GO `30.14` e arriscaria air-gap.
+
+| Caminho | Contrato |
+|---------|----------|
+| `layer7_load_or_default()` | Devolve o JSON existente; **não** chama a migration |
+| `pkg-install.in` POST-INSTALL | `load_or_default` + `save_json`; **não** chama `layer7_check_in_apply_migration_policy` |
+| Chave ausente em config existente | Efectivo **OFF** (`layer7_check_in_effective_enabled`) |
+| Injectar `true` / migração forçada | **Fora** — só com GO novo que emende o `30.14` |
+
+Cadeado: `tests/functional/test_check_in_default_30.14.php` (GA5.8 +
+asserts do `pkg-install.in`). Runtime `layer7.inc` / `pkg-install.in`
+**intacto**.

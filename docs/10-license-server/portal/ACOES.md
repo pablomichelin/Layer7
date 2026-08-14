@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-154 P2-9 upgrade não injecta check-in ON
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | docs + cadeado PHP (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Fechar P2-9 sem invertir o GO `30.14`: upgrade **não** injecta `true` |
+| Impacto | `test_check_in_default_30.14.php` + runbook `30.14` §7 + SSOTs. Runtime `layer7.inc` / `pkg-install.in` intactos |
+| Risco | Nenhum de runtime. Residual RR-1: base antiga OFF até opt-in; injectar `true` só com GO que emende o `30.14` |
+| Teste | Cadeado de fonte (install não chama migration). PHP local ausente neste Mac |
+| Rollback | Reverter docs+teste. **Não** injectar `true` |
+| Resultado | **AVALIADO neste bloco** — sem `.244` / sem SPA / sem `PORTVERSION` |
+
 ## 2026-08-14 — BG-128 P0-2 residual TOTP single-use + bind
 
 | Campo | Valor |
