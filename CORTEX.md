@@ -112,6 +112,9 @@ gate PEM do port == SoT (`verify-prod-pubkey.sh`);
 404×4 (recheck `20260814T200900Z`); sem mudança de runtime;
 **P3-9 AVALIADO** no git `2026-08-14` — **BG-150**; opção A — **FEITO
 documental**; URLs **não** removidos; sem mudança de runtime;
+**P2-16 AVALIADO** no git `2026-08-14` — **BG-151**; opção A — **FEITO
+documental**; rollback preferido = overlay `bbc74a5…`; tag `pre-30.13`
+**não** é padrão/`latest`; sem tag/retag/deploy;
 fecho
 [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
@@ -854,8 +857,10 @@ Trilha de **produto UI** do license server, com versionamento **próprio**
 
 **Checkpoint `2026-08-14`:** API live **`30.13`** no `.244`
 (`20260814T142739Z`; git `5754bfa`; só serviço `api`; SPA `2.0.0` intocada).
-Health público/origin `ok`. Tag rollback
-`layer7-license-api:pre-30.13-20260814T142739Z`.
+Health público/origin `ok`. Rollback preferido: overlay `30.13` /
+imagem `bbc74a5…` (`sha256:bbc74a53651f835d4dd0b07f2d5f97c2a3cd25e99c8e965309aa6ea018aadb9f`).
+A tag `layer7-license-api:pre-30.13-20260814T142739Z` **não** é
+rollback padrão/`latest` — só incidente específico de `30.13` (P2-16).
 Portal visual git **`2.1.0`** (30.15) **sem** deploy SPA.
 Planos 003/004 CONCLUIDOS; sem plano `ACTIVO`.
 **P0-1 ACTIVO:** proibido deploy integral do HEAD (rsync/rebuild/playbook).
@@ -918,7 +923,10 @@ gate PEM do port == SoT; sem deploy / `PORTVERSION`).
 404×4; sem mudança de runtime).
 **P3-9 AVALIADO** no git (`2026-08-14`; **BG-150**; opção A — **FEITO
 documental**; URLs **não** removidos; sem mudança de runtime).
-Próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9).
+**P2-16 AVALIADO** no git (`2026-08-14`; **BG-151**; opção A — **FEITO
+documental**; rollback preferido = overlay `bbc74a5…`; tag `pre-30.13`
+**não** é padrão/`latest`; sem tag/retag/deploy).
+Próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16).
 **não** reabrir MITM permanente (20.37). `.254` **não** tocado neste bloco.
 
 ---
@@ -1667,7 +1675,10 @@ gate PEM do port == SoT; sem deploy / `PORTVERSION`).
 404×4; sem mudança de runtime).
 **P3-9 AVALIADO** no git (`2026-08-14`; **BG-150**; opção A — **FEITO
 documental**; URLs **não** removidos; sem mudança de runtime).
-Próximo código com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9).
+**P2-16 AVALIADO** no git (`2026-08-14`; **BG-151**; opção A — **FEITO
+documental**; rollback preferido = overlay `bbc74a5…`; tag `pre-30.13`
+**não** é padrão/`latest`; sem tag/retag/deploy).
+Próximo código com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16).
 Snapshot/`.env`/SPA `30.11` **fora do git**. **GA6.7** continua
 parecer jurídico externo. **Não** reabre AP0–AP4 / código / MITM.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
@@ -1710,6 +1721,9 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
   [`docs/09-blocking/nota-404-esperado-cut-30.11.md`](docs/09-blocking/nota-404-esperado-cut-30.11.md)
 - **Evidência P3-9 / BG-150 (documental):**
   [`docs/tests/evidence/20260814T204500Z-p39-404-esperado/`](docs/tests/evidence/20260814T204500Z-p39-404-esperado/)
+- **P2-16 / BG-151 (rollback preferido ≠ tag `pre-30.13`):**
+  [`docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md`](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md)
+  + evidência [`docs/tests/evidence/20260814T142739Z-30.13-api-244/`](docs/tests/evidence/20260814T142739Z-30.13-api-244/)
 - **Evidência 30.12 desenho:**
   [`docs/tests/evidence/20260812T013200Z-30.12-protocol-design/`](docs/tests/evidence/20260812T013200Z-30.12-protocol-design/)
 - **Evidência 30.13 implementação:**
@@ -1796,7 +1810,8 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
   **P3-5** FEITO no git (`2026-08-14`; promoção atómica do `.lic` em Activate; sem deploy / `PORTVERSION`);
   **P3-6** FEITO no git (`2026-08-14`; gate PEM do port == SoT; sem deploy / `PORTVERSION`);
   **P3-8 AVALIADO** no git (`2026-08-14`; cut `30.11` `asset_count=0` + 404×4; sem mudança de runtime);
-  **P3-9 AVALIADO** no git (`2026-08-14`; **BG-150**; opção A — **FEITO documental**; URLs **não** removidos; sem mudança de runtime)
+  **P3-9 AVALIADO** no git (`2026-08-14`; **BG-150**; opção A — **FEITO documental**; URLs **não** removidos; sem mudança de runtime);
+  **P2-16 AVALIADO** no git (`2026-08-14`; **BG-151**; opção A — **FEITO documental**; rollback preferido = overlay `bbc74a5…`; tag `pre-30.13` **não** é padrão/`latest`)
   ([relatório](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
   [runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md))
 - **GOs humanos remanescentes (fora da engenharia):** parecer EULA externo (GA6.7);
@@ -1813,7 +1828,7 @@ TRILHA ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
 - Campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
-- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git (c2b9fdb + governação após gates); P2-7+P2-8+P2-10 FEITOS no git; P2-11 FEITO no git; A1/A2/M2 FEITO no git (28c97ad + governação após gates); M1 FEITO no git (GUI/helper via layer7d --fingerprint); P2-17 FEITO no git (LAYER7_TEST_NOW só com LAYER7_TEST_ROOT); P2-3 FEITO no git (origin X-Forwarded-Proto $scheme); P1-9 AVALIADO no git (residual pós-P2-3 não aberto no HEAD; sem mudança de runtime); P2-2 FEITO no git (CSRF admin fail-closed Origin/Sec-Fetch-Site); P2-13 AVALIADO no git (meia-noite local / DST / UTC sem correção única segura; sem mudança de runtime); P2-4 FEITO no git (incremento atómico de failure_count; sem deploy); P2-6 Bloco A FEITO no git (.dockerignore + USER node no backend; sem compose/healthcheck; sem deploy); P3-1 FEITO no git (sessão única atómica com lock do admin; sem deploy); P3-2 FEITO no git (GET /api/auth/session inclui a.totp_enabled; sem deploy); P3-3A FEITO no git (POST /login disabled e inexistente partilham 401 genérico + bcrypt + registerLoginFailure; sem deploy); P3-3B FEITO no git (POST/PUT /api/users exige password >=12; /login não rejeita 10; sem deploy); P3-3C FEITO no git (verifyTotp Buffer UTF-8 + guarda de comprimento + timingSafeEqual; sem deploy); P3-4 FEITO no git (GET /2fa/status try/catch + 500 JSON; sem deploy); P3-5 FEITO no git (promoção atómica do .lic em Activate; sem deploy); P3-6 FEITO no git (gate PEM do port == SoT; sem deploy); P3-8 AVALIADO no git (cut 30.11 asset_count=0 + 404x4; sem mudança de runtime); P3-9 AVALIADO no git (BG-150; opção A — FEITO documental; URLs não removidos; sem mudança de runtime); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9)
+- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git (c2b9fdb + governação após gates); P2-7+P2-8+P2-10 FEITOS no git; P2-11 FEITO no git; A1/A2/M2 FEITO no git (28c97ad + governação após gates); M1 FEITO no git (GUI/helper via layer7d --fingerprint); P2-17 FEITO no git (LAYER7_TEST_NOW só com LAYER7_TEST_ROOT); P2-3 FEITO no git (origin X-Forwarded-Proto $scheme); P1-9 AVALIADO no git (residual pós-P2-3 não aberto no HEAD; sem mudança de runtime); P2-2 FEITO no git (CSRF admin fail-closed Origin/Sec-Fetch-Site); P2-13 AVALIADO no git (meia-noite local / DST / UTC sem correção única segura; sem mudança de runtime); P2-4 FEITO no git (incremento atómico de failure_count; sem deploy); P2-6 Bloco A FEITO no git (.dockerignore + USER node no backend; sem compose/healthcheck; sem deploy); P3-1 FEITO no git (sessão única atómica com lock do admin; sem deploy); P3-2 FEITO no git (GET /api/auth/session inclui a.totp_enabled; sem deploy); P3-3A FEITO no git (POST /login disabled e inexistente partilham 401 genérico + bcrypt + registerLoginFailure; sem deploy); P3-3B FEITO no git (POST/PUT /api/users exige password >=12; /login não rejeita 10; sem deploy); P3-3C FEITO no git (verifyTotp Buffer UTF-8 + guarda de comprimento + timingSafeEqual; sem deploy); P3-4 FEITO no git (GET /2fa/status try/catch + 500 JSON; sem deploy); P3-5 FEITO no git (promoção atómica do .lic em Activate; sem deploy); P3-6 FEITO no git (gate PEM do port == SoT; sem deploy); P3-8 AVALIADO no git (cut 30.11 asset_count=0 + 404x4; sem mudança de runtime); P3-9 AVALIADO no git (BG-150; opção A — FEITO documental; URLs não removidos; sem mudança de runtime); P2-16 AVALIADO no git (BG-151; opção A — FEITO documental; rollback preferido = overlay bbc74a5; tag pre-30.13 não é padrão/latest); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)

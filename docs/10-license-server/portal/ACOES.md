@@ -220,8 +220,13 @@ Mais recente no topo.
 | Impacto | Só serviço `api` em `192.168.100.244`; check-in sintético 404 em vez de 400 nonce |
 | Risco | Médio (API de licenças); mitigado: backup SQL, tag `pre-30.13`, sem `--delete`, sem `down -v` |
 | Teste | health 200; POST+nonce → 404; POST sem nonce → legado; admin+id13 activos; stacks intactas |
-| Rollback | `docker tag layer7-license-api:pre-30.13-20260814T142739Z layer7-license-api:latest` + `up -d --no-deps --no-build api` + `restart nginx` |
+| Rollback | (histórico deste deploy) `docker tag layer7-license-api:pre-30.13-20260814T142739Z layer7-license-api:latest` + `up -d --no-deps --no-build api` + `restart nginx` |
 | Resultado | **FEITO** — evidência `20260814T142739Z-30.13-api-244`; `.254` e licenças **não** tocados |
+
+**P2-16 (`2026-08-14`):** o rollback da linha acima é **histórico do overlay
+`30.13`**. **Não** é o rollback padrão/`latest` actual. Preferir a imagem
+pós-overlay `bbc74a5…`. A tag `pre-30.13` só cabe em incidente específico
+de `30.13` (reabre rejeição de `nonce` / GA5.9 FAIL).
 
 ---
 

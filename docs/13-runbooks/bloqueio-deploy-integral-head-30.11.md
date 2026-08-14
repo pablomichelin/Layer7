@@ -103,6 +103,19 @@ Até 5+6 o bloqueio permanece mesmo com o serving versionado no git.
 
 ---
 
+## Rollback preferido (P2-16)
+
+A tag `layer7-license-api:pre-30.13-20260814T142739Z` **não** é o
+rollback padrão nem o `latest`.
+
+| Situação | Alvo | Não usar |
+|----------|------|----------|
+| Violação do freeze / imagem `api` mudou | Imagem pós-overlay `bbc74a5…` (`sha256:bbc74a53651f835d4dd0b07f2d5f97c2a3cd25e99c8e965309aa6ea018aadb9f`) | Tag `pre-30.13` como `latest` |
+| Incidente específico do overlay `30.13` (reverter o dual-mode nonce) | Tag `layer7-license-api:pre-30.13-20260814T142739Z` | — |
+
+Usar a tag `pre-30.13` como rollback habitual reabre rejeição de
+`nonce` (GA5.9 FAIL) e **mantém** 30.11.
+
 ## Rollback se alguém violar o freeze
 
 1. **Não** `docker compose down -v`.

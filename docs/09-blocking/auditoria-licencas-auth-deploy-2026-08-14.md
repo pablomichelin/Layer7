@@ -90,11 +90,15 @@ Sem mudança de runtime. Residual P3-9 (fechado neste bloco — opção A).
 documental**; URLs **não** removidos). Sem mudança de runtime.
 Nota [`nota-404-esperado-cut-30.11.md`](nota-404-esperado-cut-30.11.md);
 evidência [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/).
+**P2-16 AVALIADO** no git (`2026-08-14`; **BG-151**; opção A — **FEITO
+documental**). Rollback preferido = overlay `bbc74a5…`; tag `pre-30.13`
+**não** é padrão/`latest` (só incidente específico de `30.13`). Sem
+tag/retag/deploy.
 **P2-6 Bloco A FEITO** no git (`2026-08-14`; `.dockerignore` + `USER node`
 no backend; sem compose/healthcheck; sem Docker build/up).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16).
 
 ---
 
@@ -341,7 +345,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P2-13 AVALIADO no git** (`2026-08-14`) | `license.c:238-247`, `518-520`, `568-573`; `layer7.inc` `layer7_license_binding_ok` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | **Sem mudança** — políticas candidatas colidem (ver prova) | Relógio no dia D 12:00 → grace (HEAD). Cadeado `test_license_expiry_policy.php`. **Não** deployado. |
 | **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
 | **P2-15 FEITO no git** (`2026-08-14`) | Worktree local vs MATCH `20260812T002500Z` | Serving allowlist versionado; snapshot continua só em disco | Gap de código 30.11 no git fechado; snapshot/`.env` continuam fora | Inventário + commit allowlist **FEITO**; P0-1 **não** encerrado | Hashes = inventário; `check-ignore` do tarball |
-| **P2-16** | Tag `layer7-license-api:pre-30.13-20260814T142739Z` | Rollback da imagem pré-30.13 | Reabre rejeição de `nonce` (GA5.9 FAIL); **mantém** 30.11 | Não usar essa tag salvo incidente 30.13; preferir overlay | Smoke nonce → não pode voltar a 400 |
+| **P2-16 AVALIADO no git** (`2026-08-14`; **BG-151**; opção A — **FEITO documental**) | Tag `layer7-license-api:pre-30.13-20260814T142739Z` | Rollback da imagem pré-30.13 anunciado como padrão/`latest` | Reabre rejeição de `nonce` (GA5.9 FAIL); **mantém** 30.11 | **Opção A:** documentar rollback preferido = overlay `bbc74a5…`; tag `pre-30.13` só incidente específico de `30.13`. Sem tag/retag/deploy. História preservada. | SSOTs deixam de anunciar a tag como `latest`; smoke nonce **não** reexecutado (docs-only) |
 | **P2-17 FEITO no git** (`2026-08-14`) | `layer7.inc` `layer7_license_now()` | `LAYER7_TEST_NOW` honrado só pelo ambiente | GUI Identity/MITM podia congelar a data de expiry/grace sem `TEST_ROOT` (daemon C intacto) | Honrar `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`, como `LAYER7_TEST_HW_ID` | Harness com raiz controlada congela; sem gate o env é ignorado. **Não** deployado. |
 
 ---
@@ -497,8 +501,9 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 26. **P3-6** FEITO no git (`2026-08-14`) — `verify-prod-pubkey.sh` exige PEM do port == SoT; selftest local sem builder. **Não** deployado.
 27. **P3-8 AVALIADO no git** (`2026-08-14`) — recheck read-only do cut `30.11` (`asset_count=0`, 404×4, primary 401). Sem mudança de runtime. Residual P3-9 (fechado neste bloco — opção A).
 28. **P3-9 AVALIADO no git** (`2026-08-14`; **BG-150**; opção A — **FEITO documental**) — docs «404 esperado»; URLs **não** removidos. Sem mudança de runtime. Residual: remover URL = bloco futuro + GO.
-29. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
-30. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9. Residual P2-6 Bloco B + P3-7.
+29. **P2-16 AVALIADO no git** (`2026-08-14`; **BG-151**; opção A — **FEITO documental**) — rollback preferido = overlay `bbc74a5…`; tag `pre-30.13` **não** é padrão/`latest`. Sem tag/retag/deploy.
+30. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
+31. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16. Residual P2-6 Bloco B + P3-7.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -567,6 +572,32 @@ Evidência [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evi
 **Não é P3-9:** recheck `asset_count` (isso é **P3-8**, já fechado).
 **Não é P3-9:** `gh release upload` na tag `blacklists-ut1-current` (isso é
 **GA4.11**, o contrário — reabre A-06).
+
+## Prova P2-16 — opção A: rollback preferido ≠ tag `pre-30.13` (`2026-08-14`)
+
+**Pedido implementado:** só a opção A da triagem P2-16 — documentação
+mínima. **Nada** de tag/retag, Docker, compose, host, deploy ou runtime.
+**Veredicto:** P2-16 **AVALIADO** (**BG-151**; opção A — **FEITO
+documental**). O rollback preferido do `.244` é o overlay conhecido
+`30.13` / imagem `bbc74a5…`. A tag
+`layer7-license-api:pre-30.13-20260814T142739Z` **não** é rollback
+padrão/`latest` — só incidente específico de `30.13` (reabre rejeição
+de `nonce` / GA5.9 FAIL e **mantém** 30.11). História do deploy
+`20260814T142739Z` **preservada**.
+Runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
+Evidência (âmbito clarificado)
+[`../tests/evidence/20260814T142739Z-30.13-api-244/`](../tests/evidence/20260814T142739Z-30.13-api-244/).
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Eliminar o conflito: `pre-30.13` deixa de aparecer como rollback padrão/`latest` |
+| Impacto | Só docs. Imagem live, tag Docker, compose, `.244`/`.254`, builder, package, `PORTVERSION` **intactos** |
+| Risco | Baixo. Residual: operadores que ainda tenham a tag local podem usá-la por hábito; o runbook passa a ser o SSOT |
+| Teste | CORTEX/ESTADO sem «Tag rollback = pre-30.13» como padrão; runbook com tabela preferido vs incidente; `git diff` só docs; untracked fora do stage |
+| Rollback | Reverter o commit de docs. A tag e o overlay live não mudam. **Não** retaggar |
+
+**Não é P2-16:** retaggar / apagar a tag `pre-30.13` (isso é runtime).
+**Não é P2-16:** deploy ou rebuild `api` no `.244` (isso viola P0-1).
 
 ## Prova P2-6 Bloco A — `.dockerignore` + `USER node` no backend (`2026-08-14`)
 

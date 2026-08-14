@@ -61,7 +61,18 @@ Sincronizados **só** ficheiros `30.13` extraídos de `git archive HEAD`:
 
 **GA5.9 de campo** (revogação no `.254`) **não** foi repetido neste bloco.
 
-## Rollback executável
+## Âmbito do rollback desta evidência (P2-16)
+
+Este procedimento **só** reverte o overlay `30.13` deste run
+(`20260814T142739Z`). **Não** é o rollback padrão/`latest` do `.244`.
+
+O rollback **preferido** do freeze P0-1 é a imagem pós-overlay
+`bbc74a5…` (`sha256:bbc74a53651f835d4dd0b07f2d5f97c2a3cd25e99c8e965309aa6ea018aadb9f`).
+Retaggar `pre-30.13` → `latest` reabre rejeição de `nonce` (GA5.9 FAIL)
+e **mantém** 30.11. Ver
+[`../../../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../../../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
+
+## Rollback executável (só incidente específico de `30.13`)
 
 ```sh
 cd /opt/layer7-license
@@ -72,5 +83,6 @@ curl -sS -o /dev/null -w "%{http_code}\n" -H "Host: license.systemup.inf.br" htt
 ```
 
 Não restaurar o SQL salvo incidente de dados. Não usar `docker compose down -v`.
+Não usar estes comandos como rollback padrão/`latest`.
 
 Nenhum `.env` / chave / token / licença neste directório.
