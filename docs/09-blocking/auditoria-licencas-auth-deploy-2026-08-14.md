@@ -26,7 +26,7 @@
 
 **P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244` enquanto o serving `30.11` live não estiver reconciliado **e** versionado no git (allowlist, sem snapshot). Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
-**P1-1 FEITO no git** (`2026-08-14`; sem deploy). Próximo código com GO: **P0-2** (TOTP; restart API). Não mistura 30.11, não toca `.244`.
+**P0-2 e P1-1 FEITOS no git** (`2026-08-14`; sem deploy). Próximo código com GO: **P1-2** (rate-limit/IP TOTP). Não mistura 30.11, não toca `.244`.
 
 ---
 
@@ -64,14 +64,18 @@ Facetas do mesmo bloqueio (não são P0 independentes):
 
 ### P0-2 — HMAC do desafio TOTP com fallback hardcoded
 
+**FEITO no git** (`2026-08-14`) para o fallback/arranque. Residual: challenge
+single-use + bind à tentativa de login. **Não** deployado (P0-1).
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `license-server/backend/src/routes/auth.js:55-59` (usado em `:131` e `:180`) |
+| **Evidência** | `license-server/backend/src/routes/auth.js` (antes `:55-59`); agora `admin-bearer-secret.js` + `totp.js` |
 | **Cenário** | `ADMIN_BEARER_JWT_SECRET` e `JWT_SECRET` vazios (default do compose: `${…:-}`). Conta com TOTP ligado. Atacante forja o challenge HMAC com o literal de desenvolvimento no código e `admin_id` sequencial (tipicamente `1`) e faz `POST /api/auth/login/totp`. **Não passa por `/login` nem pela password.** |
 | **Impacto** | 2FA vira 1FA (só TOTP). Encadeado com P1-2 (brute TOTP sem rate-limit efectivo) → takeover admin sem credenciais. O Bearer JWT é fail-closed sem segredo; o TOTP **não**. |
 | **Correcção mínima** | Remover o literal. Exigir segredo forte no boot (`process.exit(1)` se vazio). Challenge single-use + bind à tentativa de login. Segredo TOTP distinto do Bearer, ou o mesmo **sem** default. |
-| **Testes** | Boot sem env → recusa start. `getTotpHmacSecret()` nunca devolve default. Challenge forjado com o literal antigo → `401`. Challenge só válido após password OK. |
-| **Nota** | Remediação implica restart da API live e rotação de segredo — **não** é o próximo bloco seguro. Não misturar com P0-1 / P1-1. |
+| **Implementado** | Literal removido. `getTotpHmacSecret()` reutiliza `ADMIN_BEARER_JWT_SECRET`/`JWT_SECRET` sem default. Arranque produção/`NODE_ENV` vazio recusa segredos vazios. `NODE_ENV=development`/`test` explícitos podem arrancar sem esses valores; create/parse do challenge recusam segredo vazio. Sem variável nova. Residual: single-use + bind. |
+| **Testes** | Boot sem env → recusa start. `getTotpHmacSecret()` nunca devolve default. Challenge forjado com o literal antigo → rejeitado. Suite backend `148/148` PASS. |
+| **Nota** | Remediação live implica restart da API e confirmação dos segredos no `.env` — **proibido** neste bloco (P0-1). |
 
 ---
 
@@ -318,11 +322,12 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 
 1. **P0-1 (ops, já activo)** — freeze de deploy integral; inventário allowlist quando houver GO de reconciliação.
 2. **P1-1 FEITO no git** (`2026-08-14`) — SELECT de check-in + testes JS; **sem** deploy `.244`.
-3. **P0-2 + P1-2 + P1-3 + P2-5** — fechar caminho TOTP (segredo obrigatório, IP real, `is_active`, lock no 2FA). Exige restart API + GO.
-4. **P1-4 + P2-1** — um único owner no bootstrap/boot.
-5. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
-6. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).
-7. **P2 / P3 restantes** — por severidade; P2-9 só com GO (muda frota antiga).
+3. **P0-2 FEITO no git** (`2026-08-14`) — fallback TOTP removido + arranque fail-closed; residual single-use/bind. **sem** deploy `.244`.
+4. **P1-2 + P1-3 + P2-5** — fechar caminho TOTP restante (IP real, `is_active`, lock no 2FA). Exige restart API + GO.
+5. **P1-4 + P2-1** — um único owner no bootstrap/boot.
+6. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
+7. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).
+8. **P2 / P3 restantes** — por severidade; P2-9 só com GO (muda frota antiga).
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 

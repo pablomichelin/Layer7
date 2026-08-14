@@ -23,3 +23,16 @@ test('TOTP challenge token roundtrip', () => {
   assert.equal(parsed.admin_id, 42);
   assert.ok(parsed.exp > Date.now());
 });
+
+test('TOTP challenge helpers refuse an empty HMAC secret', () => {
+  assert.throws(
+    () => createTotpChallengeToken(1, ''),
+    /TOTP challenge secret missing/
+  );
+  assert.throws(
+    () => createTotpChallengeToken(1, '   '),
+    /TOTP challenge secret missing/
+  );
+  assert.equal(parseTotpChallengeToken('payload.sig', ''), null);
+  assert.equal(parseTotpChallengeToken('payload.sig', '   '), null);
+});

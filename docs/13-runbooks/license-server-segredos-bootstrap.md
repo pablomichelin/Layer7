@@ -24,6 +24,11 @@ Referencias normativas:
   issue, PR, changelog ou manual operacional.
 - O ficheiro `.env` do deploy e secreto local do host; deve existir fora do
   versionamento e com permissao minima `600`.
+- Em producao (`NODE_ENV=production` ou `NODE_ENV` vazio) a API recusa
+  arrancar se `ADMIN_BEARER_JWT_SECRET` e `JWT_SECRET` estiverem ambos
+  vazios. `NODE_ENV=development` ou `NODE_ENV=test` explicitos podem
+  arrancar sem esses valores; o challenge TOTP continua fail-closed sem
+  segredo (sem fallback estatico).
 - `POSTGRES_PASSWORD` permanece segredo persistente local do stack actual.
 - `ED25519_PRIVATE_KEY` pode ser fornecida por variavel directa ou por
   `ED25519_PRIVATE_KEY_FILE` quando houver montagem segura do ficheiro no
@@ -41,8 +46,8 @@ Referencias normativas:
 | Segredo / activo | Quem gera | Quem guarda | Quem usa | Rotacao minima |
 |------------------|-----------|-------------|----------|----------------|
 | `POSTGRES_PASSWORD` | owner operacional do license server | cofre interno da Systemup + `.env` local do host | PostgreSQL e API via `DATABASE_URL` | em incidente, troca de host ou suspeita de exposicao |
-| `ADMIN_BEARER_JWT_SECRET` | owner operacional do license server | cofre interno da Systemup + `.env` local do host | backend da API para a ponte Bearer administrativa opcional | em incidente, troca de host ou suspeita de exposicao |
-| `JWT_SECRET` | legado de deploys antigos | `.env` local do host apenas enquanto houver stack antiga | compatibilidade transitória de upgrade para a ponte Bearer | remover/substituir por `ADMIN_BEARER_JWT_SECRET` apos alinhar o deploy |
+| `ADMIN_BEARER_JWT_SECRET` | owner operacional do license server | cofre interno da Systemup + `.env` local do host | backend da API: HMAC do challenge TOTP e ponte Bearer administrativa | em incidente, troca de host ou suspeita de exposicao |
+| `JWT_SECRET` | legado de deploys antigos | `.env` local do host apenas enquanto houver stack antiga | compatibilidade transitória de upgrade para o HMAC TOTP e a ponte Bearer | remover/substituir por `ADMIN_BEARER_JWT_SECRET` apos alinhar o deploy |
 | `ED25519_PRIVATE_KEY` | owner de licenciamento/Systemup | cofre interno offline + host de producao | backend da API para assinar `.lic` | em incidente de exposicao ou troca formal do par de chaves |
 | `ADMIN_BOOTSTRAP_PASSWORD` | owner operacional do license server | temporariamente no shell seguro ou cofre interno | apenas operador autorizado durante `init` ou `reset-password` | a cada bootstrap, recuperacao ou suspeita de exposicao |
 | cookie `layer7_admin_session` | backend em runtime | browser do operador + tabela `admin_sessions` | frontend/backend same-origin | revogacao por logout, reset de password ou expiracao |
@@ -166,6 +171,13 @@ SELECT id, email, name, created_at
 FROM admins
 ORDER BY id;
 ```
+
+### API recusa arrancar por falta de `ADMIN_BEARER_JWT_SECRET`/`JWT_SECRET`
+
+- comportamento esperado em producao quando ambos estao vazios;
+- definir um dos dois no `.env` local do host (sem o commitar);
+- `NODE_ENV=development` ou `NODE_ENV=test` so para lab/teste local;
+- nao imprimir o valor do segredo em logs ou tickets.
 
 ### Falta de segredo Ed25519 no arranque
 

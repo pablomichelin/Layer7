@@ -98,6 +98,10 @@ function buildOtpauthUri({ secret, email, issuer = 'Layer7 License' }) {
 }
 
 function createTotpChallengeToken(adminId, secret) {
+  if (typeof secret !== 'string' || secret.trim() === '') {
+    throw new Error('TOTP challenge secret missing.');
+  }
+
   const exp = Date.now() + (5 * 60 * 1000);
   const payload = Buffer.from(JSON.stringify({ admin_id: adminId, exp })).toString('base64url');
   const sig = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
@@ -105,6 +109,10 @@ function createTotpChallengeToken(adminId, secret) {
 }
 
 function parseTotpChallengeToken(token, secret) {
+  if (typeof secret !== 'string' || secret.trim() === '') {
+    return null;
+  }
+
   if (typeof token !== 'string' || !token.includes('.')) {
     return null;
   }

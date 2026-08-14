@@ -88,6 +88,10 @@ Documentos normativos desta arquitetura:
   e opcional, preferindo `ADMIN_BEARER_JWT_SECRET` e aceitando `JWT_SECRET`
   apenas como compatibilidade de upgrade; sem reutilizar a
   `ED25519_PRIVATE_KEY` e sem substituir a sessao stateful
+- o HMAC do challenge TOTP reutiliza as mesmas variaveis, sem fallback
+  estatico; em producao a API recusa arrancar se ambas estiverem vazias
+  (`NODE_ENV=development`/`test` explicitos podem arrancar sem esses
+  valores, mas o challenge continua fail-closed)
 - a expiracao passa a ser dupla: `30 minutos` de ociosidade e `8 horas` de
   vida absoluta, com renovacao controlada perto da janela ociosa
 - novo login passa a revogar sessoes activas anteriores do mesmo admin

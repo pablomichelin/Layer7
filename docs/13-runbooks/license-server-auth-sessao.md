@@ -56,6 +56,10 @@ Referencias normativas:
   - `403` para origin administrativo nao autorizado
 - O cookie de sessao nao deve ser lido nem persistido pelo JavaScript da SPA.
 - O frontend deve manter apenas estado transitório em memoria.
+- O HMAC do `challenge_token` TOTP reutiliza `ADMIN_BEARER_JWT_SECRET` ou
+  `JWT_SECRET`. Nao existe fallback estatico. Sem esses valores o challenge
+  nao e emitido nem aceite.
+- Em producao a API recusa arrancar se ambos os segredos estiverem vazios.
 - A ponte Bearer administrativa, quando activada para compatibilidade, deve:
   - preferir `ADMIN_BEARER_JWT_SECRET`;
   - aceitar `JWT_SECRET` apenas como compatibilidade transitória de upgrade

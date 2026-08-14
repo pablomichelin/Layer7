@@ -23,6 +23,8 @@ const { ensureSessionSchema } = require('./session');
 const { ensureTotpSchema } = require('./totp-schema');
 const { ensureUsersRbacSchema } = require('./users-rbac-schema');
 const usersRoutes = require('./routes/users');
+const contentRoutes = require('./routes/content');
+const { assertRequiredAuthSecrets } = require('./admin-bearer-secret');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -45,6 +47,8 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/audit', auditRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/users', usersRoutes);
+/* Prefixo /layer7/... (primary downloads) — auth Bearer; sem SPA fallback. */
+app.use(contentRoutes);
 
 app.use(async (err, req, res, _next) => {
   console.error('[API] Error:', err.message);
@@ -70,6 +74,7 @@ app.use(async (err, req, res, _next) => {
 
 async function startServer() {
   try {
+    assertRequiredAuthSecrets();
     await ensureSessionSchema();
     await ensureAdminSurfaceSchema();
     await ensureCrudIntegritySchema();

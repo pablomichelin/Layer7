@@ -49,14 +49,9 @@ const {
   verifyTotp,
 } = require('../totp');
 const { requirePermission } = require('../require-permission');
+const { getTotpHmacSecret } = require('../admin-bearer-secret');
 
 const router = Router();
-
-function getTotpHmacSecret() {
-  return process.env.ADMIN_BEARER_JWT_SECRET
-    || process.env.JWT_SECRET
-    || 'layer7-totp-dev-secret';
-}
 
 router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => {
   try {
@@ -128,7 +123,12 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
     await resetLoginProtection({ email, req });
 
     if (admin.totp_enabled && admin.totp_secret) {
-      const challengeToken = createTotpChallengeToken(admin.id, getTotpHmacSecret());
+      const totpHmacSecret = getTotpHmacSecret();
+      if (!totpHmacSecret) {
+        return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
+      }
+
+      const challengeToken = createTotpChallengeToken(admin.id, totpHmacSecret);
       await auditAdminEvent({
         component: 'auth',
         eventType: 'login_totp_required',
@@ -177,7 +177,10 @@ router.post('/login/totp', loginIpLimiter, async (req, res) => {
 
     const challengeToken = typeof req.body?.challenge_token === 'string' ? req.body.challenge_token : '';
     const code = typeof req.body?.code === 'string' ? req.body.code : '';
-    const challenge = parseTotpChallengeToken(challengeToken, getTotpHmacSecret());
+    const totpHmacSecret = getTotpHmacSecret();
+    const challenge = totpHmacSecret
+      ? parseTotpChallengeToken(challengeToken, totpHmacSecret)
+      : null;
     if (!challenge) {
       return res.status(401).json(buildAuthErrorResponse('Desafio 2FA invalido ou expirado.'));
     }

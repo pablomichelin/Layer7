@@ -6,6 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P0-2 — TOTP challenge fail-closed:** o HMAC do `challenge_token`
+  deixa de aceitar o fallback estático `layer7-totp-dev-secret`. Em produção
+  (ou `NODE_ENV` vazio) a API recusa arrancar sem
+  `ADMIN_BEARER_JWT_SECRET`/`JWT_SECRET`. `development`/`test` explícitos
+  podem arrancar sem esses valores; o challenge continua recusado sem
+  segredo. Sem deploy (P0-1 ACTIVO); sem package/daemon/SPA.
 - **BG-128 P1-1 — check-in de chave arquivada:** `POST /api/license/check-in`
   com nonce passa a ver linhas `revoked`/`expired` arquivadas (replace/DELETE)
   e devolve envelope v2 assinado HTTP 409 com esse status. Chave inexistente

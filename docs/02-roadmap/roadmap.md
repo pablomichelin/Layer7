@@ -48,8 +48,8 @@ Ciclo de **evidência operacional ABERTO:** **BG-127** (GO `2026-08-14`; GA2.6/2
 enquanto o serving `30.11` live não estiver versionado — **BG-128**;
 relatório [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
 runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-**P1-1 FEITO** no git (`2026-08-14`; sem deploy). Próximo código com GO:
-**P0-2** (TOTP; restart API). **P0-1 ACTIVO** inalterado.
+**P0-2 e P1-1 FEITOS** no git (`2026-08-14`; sem deploy). Próximo código com
+GO: **P1-2** (rate-limit/IP TOTP). **P0-1 ACTIVO** inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
 

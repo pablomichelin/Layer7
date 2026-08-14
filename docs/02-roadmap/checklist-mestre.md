@@ -472,4 +472,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] Auditoria `2026-08-14` registada — [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
 - [x] **P0-1 ACTIVO** — proibido deploy integral do HEAD enquanto 30.11 live não estiver versionado — [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md)
 - [x] **BG-128 P1-1** — check-in arquivada `revoked`/`expired` → 409 envelope v2 (`2026-08-14`; sem deploy)
-- [ ] **BG-128** remediações restantes — P0-1 ACTIVO; próximo código com GO = **P0-2** (sem `.244`, sem commit 30.11)
+- [x] **BG-128 P0-2** — TOTP HMAC fail-closed (sem fallback estático; arranque produção recusa segredos vazios; `2026-08-14`; sem deploy)
+- [ ] **BG-128** remediações restantes — P0-1 ACTIVO; próximo código com GO = **P1-2** (sem `.244`, sem commit 30.11)
