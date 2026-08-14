@@ -188,11 +188,15 @@ O instante de `expiry=YYYY-MM-DD` e a **meia-noite local**
 (`parse_date` + `mktime` com `tm_isdst=0` no daemon; `mktime(0,0,0,…)`
 na GUI). Por isso, no dia D as 12:00 a licenca ja esta em grace, enquanto
 o servidor (`isLicenseExpired` / `CURRENT_DATE`) ainda trata o dia D UTC
-como activo. **P2-13 AVALIADO** (`2026-08-14`): nao ha correcao unica
-segura (fim do dia UTC vs local vs `timegm` vs so `tm_isdst=-1` colidem
-com REV-030 / P3-7 / P2-11). Contrato-as-implemented travado em
-`tests/functional/test_license_expiry_policy.php`. Mudanca de politica
-so com GO.
+como activo. Isto e o contrato HEAD: o cliente e mais estrito; **nao** e
+bypass. **P2-13 AVALIADO** (`2026-08-14`): nao ha correcao unica
+segura (fim do dia UTC vs local vs `timegm` vs so `tm_isdst=-1`).
+**P3-7 AVALIADO** (`2026-08-14`; **BG-153**; opcao A — **FEITO
+documental**): **nao** usar `timegm` / `gmmktime` / meio-dia UTC
+como correcao — altera o contrato e piora a diferenca Brasil/UTC
+(grace passaria a comecar as 21:00 de D-1). Contrato-as-implemented
+travado em `tests/functional/test_license_expiry_policy.php`.
+Mudanca de politica so com GO (letras A-D da prova P2-13).
 
 Conclusao factual:
 
@@ -217,7 +221,10 @@ Divergem deliberadamente hoje:
 - o servidor recusa activacao/download apos expiracao efectiva;
 - o daemon ainda aceita o `.lic` ja emitido por ate `14` dias de grace;
 - o servidor persiste revogacao;
-- o daemon nao conhece revogacao offline.
+- o daemon nao conhece revogacao offline;
+- no dia D (fuso UTC-3), o daemon/GUI ja podem estar em grace enquanto
+  o servidor UTC ainda trata D como activo; **nao** corrigir com
+  `timegm`/`gmmktime` (P3-7 / P2-13 / BG-153).
 
 **Lacuna comercial registada (BG-077 / ADR-0021 Proposto):** revogacao no
 servidor nao corta enforce remoto. Plano de check-in online em

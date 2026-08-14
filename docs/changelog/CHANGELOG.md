@@ -16,6 +16,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P3-7 / BG-153 — colisão TZ/expiry; não usar timegm:**
+  AVALIADO no git (opção A — **FEITO documental**). A divergência
+  appliance UTC−3 vs expiry UTC no servidor é o contrato HEAD
+  (cliente mais estrito no dia D; **não** é bypass). A correção
+  histórica REV-030 / texto original P3-7 (`timegm` / meio-dia UTC
+  / `gmmktime`) **altera o contrato** e **piora** a diferença
+  Brasil/UTC (grace passaria a começar às 21:00 de D−1). Sem
+  mudança de runtime em `license.c` / `layer7.inc` /
+  `crud-validation.js`. Cadeado `test_license_expiry_policy.php`
+  intacto (meia-noite local, `mktime` hora 0). Política A–D só
+  com GO (prova P2-13). Sem `PORTVERSION`, sem deploy
+  (P0-1 ACTIVO).
 - **BG-128 P2-6 Bloco A — Docker context + user:** FEITO no git.
   `backend/.dockerignore` e `frontend/.dockerignore` excluem `.env`,
   `.env.*`, `node_modules` e `.git`. O `backend/Dockerfile` corre

@@ -542,7 +542,15 @@ if (p <= 0)
 
 **Impacto:** Expiração pode variar ±1 dia consoante timezone do firewall.
 
-**Correcção:** Meio-dia UTC ou `timegm`.
+**Correcção (histórica, 2026-06-15):** Meio-dia UTC ou `timegm`.
+
+**Estado `2026-08-14` (P2-13 / P3-7 / BG-153):** a «correcção»
+meio-dia UTC / `timegm` **não** deve ser aplicada. P2-13 provou
+que altera o contrato (meia-noite local) e *aperta* o Brasil
+(grace às 21:00 de D−1). `gmmktime` é o equivalente PHP e cai
+na mesma proibição. P3-7 fechado como **FEITO documental**.
+Mudança de política só com GO (letras A–D da prova P2-13 na
+auditoria `2026-08-14`).
 
 ---
 

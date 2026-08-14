@@ -102,9 +102,13 @@ padrão/`latest`; sem tag/retag/deploy).
 (`2026-08-14`; **BG-152**; opção A — **FEITO documental**; bypass ABI
 `-f` = política BG-106; builder FreeBSD 16 **não** provado; sem
 código/`PORTVERSION`).
+**P3-7 AVALIADO** no git
+(`2026-08-14`; **BG-153**; opção A — **FEITO documental**; colisão
+TZ/expiry já provada em P2-13/REV-030; `timegm`/`gmmktime` **não**
+são correção; sem mudança de runtime).
 Próximo código
 com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem
-M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14). **P0-1 ACTIVO**
+M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7). **P0-1 ACTIVO**
 inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).

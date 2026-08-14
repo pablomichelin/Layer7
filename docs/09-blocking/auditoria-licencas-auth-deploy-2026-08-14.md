@@ -80,8 +80,12 @@ Activate promove `.lic` de forma atómica (tmp 0600 + verify +
 `rename`); falha/unlink do tmp preserva o anterior. Residual P3-6
 (fechado neste bloco). Sem deploy / `PORTVERSION`.
 **P3-6** FEITO no git (`2026-08-14`) —
-`verify-prod-pubkey.sh` exige PEM do port == SoT (e == C). Residual P3-7.
-Sem deploy / `PORTVERSION`.
+`verify-prod-pubkey.sh` exige PEM do port == SoT (e == C). Residual P3-7
+fechado neste bloco (opção A). Sem deploy / `PORTVERSION`.
+**P3-7 AVALIADO** no git (`2026-08-14`; **BG-153**; opção A — **FEITO
+documental**). Colisão TZ/expiry já provada em P2-13/REV-030;
+`timegm`/`gmmktime` **não** são correção (alteram o contrato e
+pioram Brasil/UTC). Sem mudança de runtime.
 **P3-8 AVALIADO** no git (`2026-08-14`) — recheck read-only do cut
 `30.11`: `asset_count=0`, 404×4, primary 401
 ([`20260814T200900Z-p38-cut-recheck`](../tests/evidence/20260814T200900Z-p38-cut-recheck/)).
@@ -102,7 +106,7 @@ suporte nativo ABI 16. Sem código / `PORTVERSION` / hosts.
 no backend; sem compose/healthcheck; sem Docker build/up).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7).
 
 ---
 
@@ -366,7 +370,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P3-4 FEITO no git** (`2026-08-14`) | `auth.js` `GET /2fa/status`; Express `^4.21.2` | Falha de BD em `GET /2fa/status` | Promise rejeitada sem error handler | `try/catch` local (sem wrapper global / Express 5) | Pool a rejeitar → 500 JSON `Erro interno.`; sem unhandledRejection; segundo GET 200; 401/403 intactos. **Não** deployado. |
 | **P3-5 FEITO no git** (`2026-08-14`) | `license.c` `promote_license_atomic` / `layer7_license_check_path` | Activate escrevia `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha apagava o anterior | tmp 0600 no mesmo dir + verify + `rename`; falha preserva o anterior | Crash após write do tmp → final anterior intacto; inválido remove tmp; sucesso 0600. **Não** deployado. |
 | **P3-6 FEITO no git** (`2026-08-14`) | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Gate exige PEM == SoT == C (32 B raw SPKI) | Coincidente PASS; ausente/inválido/divergente FAIL; SoT≠C FAIL. **Não** deployado. |
-| **P3-7** | `license.c:518-520` vs `crud-validation.js:647-654` | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local antes do servidor); não é bypass | Interpretar expiry como UTC (`timegm`) | `TZ=America/Sao_Paulo` vs `TZ=UTC` no dia fronteira |
+| **P3-7 AVALIADO no git** (`2026-08-14`; **BG-153**; opção A — **FEITO documental**) | `license.c:518-520` vs `crud-validation.js:647-654` (intactos) | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local no dia D; servidor UTC ainda ACTIVE); **não** é bypass | **Opção A:** consolidar a colisão já provada em P2-13/REV-030. **Não** usar `timegm`/`gmmktime` (altera o contrato e piora Brasil/UTC). Sem C/PHP/JS. Residual: política A–D só com GO | SSOTs deixam de listar P3-7 como buraco a tapar com `timegm`. Runtime intacto. **Não** deployado. |
 | **P3-8 AVALIADO no git** (`2026-08-14`) | Recheck `20260814T200900Z` + confirmação `20260814T201800Z` (BG-148) + `20260812T013145Z` | Auditoria original sem contacto GitHub | Outros PoPs/TTL não observados na auditoria | **Sem mudança** — cut confirmado (ver prova). P3-9 opção A neste bloco; URLs **não** removidos | `asset_count=0`; `assets=[]`; 404 anónimo ×4; primary 401. Residual P3-9 = docs «404 esperado». |
 | **P3-9 AVALIADO no git** (`2026-08-14`; **BG-150**; opção A — **FEITO documental**) | `update-blacklists.sh:38-39`; `layer7.inc:10659-10668`; `config.json.sample:1-4` (intactos) | Cliente ainda aponta espelho GitHub / tarball anónimo | Cut = 404 esperado; confunde ops; risco de reupload GA4.11 sem GO | **Opção A:** documentar «404 esperado». URLs **não** removidos (legado / fallback). Remover URL = bloco futuro + GO + `PORTVERSION` | Nota + evidência `20260814T204500Z-p39-404-esperado`. Runtime intacto. **Não** deployado. |
 
@@ -507,8 +511,9 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 28. **P3-9 AVALIADO no git** (`2026-08-14`; **BG-150**; opção A — **FEITO documental**) — docs «404 esperado»; URLs **não** removidos. Sem mudança de runtime. Residual: remover URL = bloco futuro + GO.
 29. **P2-16 AVALIADO no git** (`2026-08-14`; **BG-151**; opção A — **FEITO documental**) — rollback preferido = overlay `bbc74a5…`; tag `pre-30.13` **não** é padrão/`latest`. Sem tag/retag/deploy.
 30. **P2-14 AVALIADO no git** (`2026-08-14`; **BG-152**; opção A — **FEITO documental**) — bypass ABI `-f` = política BG-106; builder FreeBSD 16 **não** provado. Sem código/`PORTVERSION`/hosts.
-31. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
-32. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14. Residual P2-6 Bloco B + P3-7.
+31. **P3-7 AVALIADO no git** (`2026-08-14`; **BG-153**; opção A — **FEITO documental**) — colisão TZ/expiry já provada em P2-13/REV-030; `timegm`/`gmmktime` **não** são correção. Sem mudança de runtime.
+32. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
+33. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7. Residual P2-6 Bloco B.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -631,6 +636,40 @@ Guia [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md).
 **Não é P2-14:** levantar builder FreeBSD 16 (isso é F7 + host).
 **Não é P2-14:** alegar suporte nativo ABI 16 ou mudar comandos de install.
 
+## Prova P3-7 — opção A: consolidar colisão TZ/expiry; não usar timegm (`2026-08-14`)
+
+**Pedido implementado:** só a opção documental mínima da revisão
+P2-13 / REV-030 — consolidar a colisão de fuso/expiração já
+provada e tornar explícito que `timegm` / `gmmktime` **não** é
+correção. **Nada** de C/C++, PHP, JS, scripts runtime, Docker,
+builder, hosts, package, `PORTVERSION`, release ou deploy.
+**Veredicto:** P3-7 **AVALIADO** (**BG-153**; opção A — **FEITO
+documental**). A divergência appliance UTC−3 vs expiry UTC no
+servidor é o contrato HEAD: o cliente é mais estrito (grace
+local no dia D enquanto o servidor UTC ainda trata D como
+activo). **Não** é bypass. A correção histórica REV-030
+(«meio-dia UTC ou `timegm`») e o texto original P3-7
+(«interpretar expiry como UTC (`timegm`)») **alteram o
+contrato** e **pioram** a diferença Brasil/UTC: grace passaria
+a começar às 21:00 de D−1. Isso contradiz «fim do dia UTC» e
+o cadeado `test_license_expiry_policy.php` (meia-noite local,
+`mktime` hora 0). Mudança de política só com GO — letras A–D
+da prova P2-13; **não** misturar `timegm`/`gmmktime`.
+Prova já existente: secção *Prova P2-13* neste ficheiro.
+SSOT [`../01-architecture/f3-expiracao-revogacao-grace.md`](../01-architecture/f3-expiracao-revogacao-grace.md).
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Fechar P3-7 como docs: colisão TZ/expiry já provada; `timegm`/`gmmktime` proibidos como correção |
+| Impacto | Só docs. `license.c` / `layer7.inc` / `crud-validation.js` / package / `PORTVERSION` / hosts **intactos** |
+| Risco | Nenhum de runtime. Residual: D 12:00 → grace (contrato HEAD); DST ±1 h C vs PHP; política A–D só com GO; P2-6 Bloco B; P0-1 |
+| Teste | P3-7 deixa de aparecer como aberto; SSOTs dizem não usar `timegm`/`gmmktime`; `git diff` só docs; 325 untracked fora do stage; P0-1 intacto |
+| Rollback | Reverter o commit de docs. O runtime já era o anterior. **Não** aplicar `timegm`/`gmmktime` |
+
+**Não é P3-7:** `timegm` / `gmmktime` / meio-dia UTC no daemon ou PHP (isso muda o contrato e aperta o Brasil).
+**Não é P3-7:** fim do dia UTC/local ou só `tm_isdst=-1` (isso é GO de política, prova P2-13).
+**Não é P3-7:** deploy / `PORTVERSION` / hosts.
+
 ## Prova P2-6 Bloco A — `.dockerignore` + `USER node` no backend (`2026-08-14`)
 
 **Pedido implementado:** só o Bloco A da triagem P2-6 — ignore do
@@ -692,17 +731,19 @@ Porque não se corrigiu neste bloco:
    (sem DST). Não fecha o teste canónico «D 12:00 → grace». Em NY verão
    *aperta* o daemon 1 h (VALID→GRACE). Incompleto para P2-13.
 4. **`timegm` / meio-dia UTC** (P3-7 / REV-030) *aperta* o Brasil: grace
-   começa às 21:00 de D−1. Contradiz «fim do dia UTC».
+   começa às 21:00 de D−1. Contradiz «fim do dia UTC». **P3-7 fechado
+   como docs (BG-153):** `timegm` / `gmmktime` **não** são correção.
 
 Políticas históricas em conflito: P2-13 «fim do dia UTC / `tm_isdst=-1`»;
-REV-030 «meio-dia UTC ou `timegm`»; P3-7 «`timegm`». Escolher uma é GO
-de política de licenciamento, não correção mecânica.
+REV-030 «meio-dia UTC ou `timegm`»; P3-7 original «`timegm`». Escolher
+A–D é GO de política de licenciamento, não correção mecânica.
+`timegm`/`gmmktime` ficam **fora** dessa escolha.
 
 ### Menor plano de teste (só após GO de uma política)
 
 1. Escolher **uma** letra: (A) HEAD meia-noite local; (B) fim do dia
-   local; (C) fim do dia UTC; (D) só `tm_isdst=-1`. Não misturar P3-7
-   no mesmo bloco se a letra não for UTC.
+   local; (C) fim do dia UTC; (D) só `tm_isdst=-1`. **Não** usar
+   `timegm`/`gmmktime` (P3-7 / BG-153).
 2. Extraír função pura C (sem I/O / sem assinatura) e reusar a PHP.
 3. Vectores determinísticos com `TZ` fixo: D 00:00 / 00:00:01 / 12:00 /
    D−1 23:59:59 / D+14 12:00 em `America/Sao_Paulo` e `UTC`; NY 00:30
@@ -727,7 +768,7 @@ de política de licenciamento, não correção mecânica.
 |-------|--------|
 | Objectivo | Provar se meia-noite / DST / UTC têm correção mínima segura e compatível GUI↔daemon; se não tiverem, não alterar o runtime de licença |
 | Impacto | Cadeado `test_license_expiry_policy.php` + docs. `license.c` / binding PHP **intactos** (só comentário). Sem CSRF/proxy/lifecycle, sem package/daemon runtime, sem deploy / `PORTVERSION` |
-| Risco | Nenhum de runtime. Residual: D 12:00 → grace (contrato HEAD); DST ±1 h C vs PHP em fusos com horário de verão; P3-7 / REV-030 abertos; P0-1 |
+| Risco | Nenhum de runtime. Residual: D 12:00 → grace (contrato HEAD); DST ±1 h C vs PHP em fusos com horário de verão; P3-7 / REV-030 fechados como docs (BG-153; `timegm`/`gmmktime` proibidos); P0-1 |
 | Teste | Antes=depois: BR D 12:00 → grace; D 00:00 → valid; D+14 12:00 → expired; NY 00:30 verão PHP → grace. Cadeado de fórmula (`mktime` hora 0, sem `timegm` / EOD). `test_license_now_gate.php` + `test_entitlements_gui.php` regressão |
 | Rollback | Remover o teste e a nota documental; o runtime já era o anterior |
 

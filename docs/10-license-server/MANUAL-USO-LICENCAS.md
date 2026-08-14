@@ -49,6 +49,12 @@
 > hardware ate `expiry + grace`, e qualquer rebind administrativo precoce
 > continua bloqueado por risco real do `.lic` antigo permanecer operacional.
 >
+> **P2-13 / P3-7 (`2026-08-14`; BG-153):** `expiry=YYYY-MM-DD` corta a
+> meia-noite local. No Brasil, o dia D as 12:00 ja esta em grace local
+> enquanto o servidor UTC ainda trata D como activo. **Nao** interpretar
+> a data com `timegm` / `gmmktime` — isso muda o contrato e aperta o
+> corte. Detalhe no SSOT F3.3 acima.
+>
 > Estado canónico apos a F3.4: a superficie administrativa de mutacao e
 > reemissao passa a viver em
 > `docs/01-architecture/f3-mutacao-admin-reemissao-guardrails.md`. A politica
