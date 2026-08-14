@@ -12,7 +12,7 @@
 #include "bl_config.h"
 #include "config_parse.h"
 #include "enforce.h"
-#include "features.h"
+#include "l7_features.h"
 #include "identity_map.h"
 #include "identity_ldap.h"
 #include "identity_radius.h"

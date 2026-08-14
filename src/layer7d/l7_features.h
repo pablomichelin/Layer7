@@ -1,6 +1,10 @@
 /*
  * Layer7 license features CSV parse — ADR-0025 (P1–P6, transição T1).
  * Módulo puro (sem OpenSSL/FreeBSD) para testes unitários portáteis.
+ *
+ * Nome l7_features.h (não features.h): em Linux, -I src/layer7d + features.h
+ * tapa <features.h> da glibc e parte o CI smoke-layer7d
+ * (`__GLIBC_USE (…)` → missing binary operator).
  */
 #ifndef LAYER7_FEATURES_H
 #define LAYER7_FEATURES_H

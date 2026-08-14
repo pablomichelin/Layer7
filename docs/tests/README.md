@@ -8,6 +8,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 - instala toolchain no **Ubuntu**;
 - executa **`scripts/package/smoke-layer7d.sh`** (compilação completa, incluindo
   módulos Identity, + `-t` + cenários **`-e -n`**).
+  Header de entitlements: **`l7_features.h`** (não `features.h`) — evita
+  colisão com a glibc no Ubuntu do Actions.
 
 **Limitações:** não compila o **port** `.pkg`, não corre no **pfSense**, não executa **pfctl**, não cobre os roteiros **10a** / **10b** / **11** no appliance. Gate de pacote: [`../04-package/validacao-lab.md`](../04-package/validacao-lab.md). Matriz de regressão: [`layer7-regression-matrix.md`](layer7-regression-matrix.md) (R-01..R-21; gates G0–G7 em [`../09-blocking/plano-gates-producao.md`](../09-blocking/plano-gates-producao.md)).
 

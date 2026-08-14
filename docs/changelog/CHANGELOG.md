@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **CI smoke layer7d (Linux):** `src/layer7d/features.h` foi renomeado para
+  `l7_features.h` para não tapar `<features.h>` da glibc (`-I src/layer7d`).
+  O workflow falhava em todo o push com `__GLIBC_USE (…)` / `SSL` em cadeia.
+  Sem mudança de comportamento do daemon; **sem** novo `PORTVERSION`.
+
 ## [1.9.62] — 2026-08-13
 
 ### Changed

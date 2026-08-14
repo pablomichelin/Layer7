@@ -2,7 +2,7 @@
  * Parse de entitlements `features` (ADR-0025 P1–P6, T1).
  */
 
-#include "features.h"
+#include "l7_features.h"
 
 #include <ctype.h>
 #include <string.h>

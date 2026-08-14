@@ -4,7 +4,7 @@
  */
 
 #include "license.h"
-#include "features.h"
+#include "l7_features.h"
 
 #include <ctype.h>
 #include <errno.h>

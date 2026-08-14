@@ -4,7 +4,7 @@
  *   cc -Wall -Wextra -O2 -I src/layer7d -o /tmp/t_feat \
  *      tests/functional/test_features_parse.c src/layer7d/features.c && /tmp/t_feat
  */
-#include "features.h"
+#include "l7_features.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -42,7 +42,7 @@ if [ "$SMOKE_OS" != "FreeBSD" ]; then
  * Não é instalado no pacote; nunca executa fora do CI/smoke.
  */
 #include "license.h"
-#include "features.h"
+#include "l7_features.h"
 #include <stdio.h>
 #include <string.h>
 
