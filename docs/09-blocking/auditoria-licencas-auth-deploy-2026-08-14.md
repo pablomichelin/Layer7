@@ -94,11 +94,15 @@ evidência [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evi
 documental**). Rollback preferido = overlay `bbc74a5…`; tag `pre-30.13`
 **não** é padrão/`latest` (só incidente específico de `30.13`). Sem
 tag/retag/deploy.
+**P2-14 AVALIADO** no git (`2026-08-14`; **BG-152**; opção A — **FEITO
+documental**). Bypass ABI `-f` (GUI + `install.sh`) = política BG-106;
+builder FreeBSD 16 **não** existe / **não** está provado; **não** é
+suporte nativo ABI 16. Sem código / `PORTVERSION` / hosts.
 **P2-6 Bloco A FEITO** no git (`2026-08-14`; `.dockerignore` + `USER node`
 no backend; sem compose/healthcheck; sem Docker build/up).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14).
 
 ---
 
@@ -343,7 +347,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P2-11 FEITO no git** (`2026-08-14`) | `layer7.inc` `layer7_entitlements()` / `layer7_license_binding_ok()`; `layer7-mitm-entitle-ok` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` + helper exigem HW + expiry/grace 14d | `.lic` HW errado / expiry além da graça → GUI locked; graça/válido → unlock; stats forjados → locked. **Não** deployado. |
 | **P2-12 FEITO no git** (`c2b9fdb`; governação após gates) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
 | **P2-13 AVALIADO no git** (`2026-08-14`) | `license.c:238-247`, `518-520`, `568-573`; `layer7.inc` `layer7_license_binding_ok` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | **Sem mudança** — políticas candidatas colidem (ver prova) | Relógio no dia D 12:00 → grace (HEAD). Cadeado `test_license_expiry_policy.php`. **Não** deployado. |
-| **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
+| **P2-14 AVALIADO no git** (`2026-08-14`; **BG-152**; opção A — **FEITO documental**) | `layer7_settings.php:156-157`; `install.sh:314` (intactos) | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106) | **Opção A:** o `-f` **é** a política aceite (GUI + CLI). Builder 16 **não** provado. Sem gate novo / código / `PORTVERSION`. Residual: builder 16 (F7 + GO) ou recusar ABI com override explícito | SSOTs deixam de listar P2-14 como buraco. Runtime intacto. **Não** deployado. |
 | **P2-15 FEITO no git** (`2026-08-14`) | Worktree local vs MATCH `20260812T002500Z` | Serving allowlist versionado; snapshot continua só em disco | Gap de código 30.11 no git fechado; snapshot/`.env` continuam fora | Inventário + commit allowlist **FEITO**; P0-1 **não** encerrado | Hashes = inventário; `check-ignore` do tarball |
 | **P2-16 AVALIADO no git** (`2026-08-14`; **BG-151**; opção A — **FEITO documental**) | Tag `layer7-license-api:pre-30.13-20260814T142739Z` | Rollback da imagem pré-30.13 anunciado como padrão/`latest` | Reabre rejeição de `nonce` (GA5.9 FAIL); **mantém** 30.11 | **Opção A:** documentar rollback preferido = overlay `bbc74a5…`; tag `pre-30.13` só incidente específico de `30.13`. Sem tag/retag/deploy. História preservada. | SSOTs deixam de anunciar a tag como `latest`; smoke nonce **não** reexecutado (docs-only) |
 | **P2-17 FEITO no git** (`2026-08-14`) | `layer7.inc` `layer7_license_now()` | `LAYER7_TEST_NOW` honrado só pelo ambiente | GUI Identity/MITM podia congelar a data de expiry/grace sem `TEST_ROOT` (daemon C intacto) | Honrar `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`, como `LAYER7_TEST_HW_ID` | Harness com raiz controlada congela; sem gate o env é ignorado. **Não** deployado. |
@@ -502,8 +506,9 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 27. **P3-8 AVALIADO no git** (`2026-08-14`) — recheck read-only do cut `30.11` (`asset_count=0`, 404×4, primary 401). Sem mudança de runtime. Residual P3-9 (fechado neste bloco — opção A).
 28. **P3-9 AVALIADO no git** (`2026-08-14`; **BG-150**; opção A — **FEITO documental**) — docs «404 esperado»; URLs **não** removidos. Sem mudança de runtime. Residual: remover URL = bloco futuro + GO.
 29. **P2-16 AVALIADO no git** (`2026-08-14`; **BG-151**; opção A — **FEITO documental**) — rollback preferido = overlay `bbc74a5…`; tag `pre-30.13` **não** é padrão/`latest`. Sem tag/retag/deploy.
-30. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
-31. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16. Residual P2-6 Bloco B + P3-7.
+30. **P2-14 AVALIADO no git** (`2026-08-14`; **BG-152**; opção A — **FEITO documental**) — bypass ABI `-f` = política BG-106; builder FreeBSD 16 **não** provado. Sem código/`PORTVERSION`/hosts.
+31. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
+32. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14. Residual P2-6 Bloco B + P3-7.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -598,6 +603,33 @@ Evidência (âmbito clarificado)
 
 **Não é P2-16:** retaggar / apagar a tag `pre-30.13` (isso é runtime).
 **Não é P2-16:** deploy ou rebuild `api` no `.244` (isso viola P0-1).
+
+## Prova P2-14 — opção A: limite do builder 16 e fronteira ABI (`2026-08-14`)
+
+**Pedido implementado:** só a opção A da triagem P2-14 — documentação
+mínima. **Nada** de PHP, `install.sh`, package, `PORTVERSION`, builder,
+hosts, tags, release ou deploy.
+**Veredicto:** P2-14 **AVALIADO** (**BG-152**; opção A — **FEITO
+documental**). O updater GUI (`layer7_settings.php:156-157`) e o
+`install.sh:314` instalam o `.pkg` ABI 15 em Plus/16 com
+`IGNORE_OSVERSION=yes pkg add -f`. Esse bypass **é** a política BG-106
+já aceite — não um buraco por tapar neste ciclo. O builder de produto
+permanece FreeBSD **15**. **Não** existe builder FreeBSD 16 em operação
+e **não** há evidência de build nativo ABI 16. Isto **não** é suporte
+provado a FreeBSD 16 e **não** muda comandos operacionais.
+Guia [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md).
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Consolidar o limite conhecido (builder 16 não provado) e a fronteira ABI 15→16 (`-f` = política, não suporte nativo) |
+| Impacto | Só docs. `layer7_settings.php` / `install.sh` / package / `PORTVERSION` / builder / hosts / release **intactos** |
+| Risco | Baixo. Residual: builder 16 (F7 + GO + 16.0-RELEASE) ou gate «recusar ABI salvo override» (GO + `PORTVERSION`) |
+| Teste | P2-14 deixa de aparecer como aberto; CORTEX/backlog/checklist/roadmap alinhados; `git diff` só docs; 325 untracked fora do stage |
+| Rollback | Reverter o commit de docs. O `-f` e o builder 15 não mudam. **Não** migrar o builder |
+
+**Não é P2-14:** recusar `pkg add` se ABI ≠ (isso é código + `PORTVERSION`).
+**Não é P2-14:** levantar builder FreeBSD 16 (isso é F7 + host).
+**Não é P2-14:** alegar suporte nativo ABI 16 ou mudar comandos de install.
 
 ## Prova P2-6 Bloco A — `.dockerignore` + `USER node` no backend (`2026-08-14`)
 

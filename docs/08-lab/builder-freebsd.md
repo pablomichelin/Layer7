@@ -12,6 +12,24 @@ Host onde se compila codigo nativo (nDPI, PoC, futuro pacote) com ABI/libs proxi
 
 > Desvio de major aumenta risco de binarios incompativeis no appliance.
 
+## Fronteira actual — builder 15 vs appliance 16 (BG-106 / P2-14)
+
+O builder de produto em operação é FreeBSD **15.0-RELEASE**
+(`192.168.100.12`). **Não** existe builder FreeBSD 16 em operação e
+**não** há evidência de build nativo ABI 16. Isto **não** é suporte
+provado a FreeBSD 16 como host de compilação.
+
+O appliance de lab observado (pfSense Plus 26.03.1 / FreeBSD
+16.0-CURRENT) instala o `.pkg` ABI 15 com
+`IGNORE_OSVERSION=yes pkg add -f` (BG-106). O updater GUI
+(`layer7_settings.php`) e o `install.sh` oficial usam o mesmo `-f`.
+Isto é a **política aceite**, não um buraco por tapar neste ciclo, e
+**não** equivale a pacote nativo ABI 16 nem a mudança operacional.
+
+O «preferir a mesma major» acima **não** autoriza migrar o host de
+build. Mover o builder para FreeBSD 16 exige GO + F7 + FreeBSD
+**16.0-RELEASE** (não CURRENT).
+
 ## VM / host minimo sugerido
 
 | Recurso | Minimo razoavel |

@@ -72,6 +72,7 @@ Ele existe para evitar tres erros comuns:
 | Fecho vs estado vivo | planos arquivados vs CORTEX | CORTEX = vivo; ESTADO-PRODUTO = veredicto; `archive/planos-fechados/` = histórico | em “está aberto?”, vence ESTADO-PRODUTO + CORTEX |
 | Escopo produto | charter vs pack/PRD/catálogo vs README raiz | `pack-produto-layer7.md` → `prd-layer7.md` + `catalogo-funcionalidades.md` + CORTEX | charter resume; README raiz pode estar atrasado na versão |
 | Anti-pirataria estado vivo | START-HERE / plano §0 / fecho `30.19` / gates vs soak 20.36 | `CORTEX.md` (vivo) + `START-HERE-antipirataria.md`; fecho `30.19` = engenharia; **BG-127** = evidência | `.254` vivo = `1.9.63` MITM OFF (`20260814T034904Z-20.36-soak-align-163-254`); 1ª campanha BG-127 **PARTIAL** `20260814T051611Z`; `1.9.54` = histórico e2e AP2 |
+| Builder ABI 15 vs 16 | «preferir a mesma major» em `builder-freebsd.md` vs builder 15 + appliance Plus/16 | `CORTEX.md` + BG-106 + P2-14 (BG-152) + [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md) | builder permanece 15; `-f` no Plus/16 é workaround aceite, **não** suporte nativo ABI 16; builder 16 **não** provado |
 
 ---
 
@@ -95,6 +96,11 @@ Ele existe para evitar tres erros comuns:
    + [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
    **Não** tratar o compose HEAD como descrição do live (bind / P0-2…P1-4)
    enquanto P0-1 estiver activo. Snapshot/`.env` **não** são HEAD.
+6. **Builder FreeBSD 16 (`2026-08-14`, P2-14 / BG-152):** o guia do
+   builder pede «preferir a mesma major» que o appliance; o appliance de
+   lab é FreeBSD 16 e o builder de produto é 15. Fonte canónica: builder
+   permanece 15; `-f` no Plus/16 é política BG-106, **não** suporte nativo
+   ABI 16. Builder 16 **não** está provado.
 
 ---
 

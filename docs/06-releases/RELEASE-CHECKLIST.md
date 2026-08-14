@@ -23,6 +23,11 @@
 
 ## 2. Build (FreeBSD builder)
 
+> Host canónico: FreeBSD **15** (`192.168.100.12`). Builder FreeBSD 16
+> **não** existe / **não** está provado (BG-106 / P2-14). O `-f` no
+> appliance Plus/16 é política aceite, **não** build nativo ABI 16.
+> Ver [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md).
+
 | # | Item | Comando / prova | ☐ |
 |---|------|-----------------|---|
 | 2.1 | Build pacote | `cd package/pfSense-pkg-layer7 && make clean && DISABLE_LICENSES=yes make package DISABLE_VULNERABILITIES=yes` | |
