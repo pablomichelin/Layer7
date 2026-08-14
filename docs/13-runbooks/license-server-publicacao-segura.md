@@ -137,9 +137,12 @@ contrato HEAD (bind loopback; Host desconhecido → 444). Bind live
 runbook **não** autoriza deploy no `.244` (P0-1).
 
 P2-6 Bloco A (`2026-08-14`) versiona `.dockerignore` nos contextos
-`backend`/`frontend` e `USER node` só no `api`. Isso **não** autoriza
-rebuild da imagem no `.244`. Compose/healthcheck (Bloco B) **não**
-entrou neste bloco; o hash do compose no inventário P0-1 permanece.
+`backend`/`frontend` e `USER node` só no `api`. P2-6 Bloco B
+(`2026-08-14`) versiona `db.healthcheck` (`pg_isready` via
+`$$POSTGRES_*`) e `api.depends_on.db.condition: service_healthy`.
+Isso **não** autoriza rebuild/`docker compose up` no `.244`. O hash
+do compose no inventário P0-1 foi actualizado (`b0dcfe28…`); os 4
+hashes JS/gitkeep permanecem.
 
 ### 4. Deploy por allowlist de paths (nunca integral)
 

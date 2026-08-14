@@ -104,9 +104,11 @@ builder FreeBSD 16 **não** existe / **não** está provado; **não** é
 suporte nativo ABI 16. Sem código / `PORTVERSION` / hosts.
 **P2-6 Bloco A FEITO** no git (`2026-08-14`; `.dockerignore` + `USER node`
 no backend; sem compose/healthcheck; sem Docker build/up).
+**P2-6 Bloco B FEITO** no git (`2026-08-14`; `pg_isready` + `depends_on`
+`service_healthy`; sem Docker build/up).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7).
 
 ---
 
@@ -343,7 +345,8 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P2-3 FEITO no git** (`2026-08-14`) | `nginx.conf`; `session.js` `requireSecureSessionRequest`; `index.js` `trust proxy: 1` | HTTP ao origin + `X-Forwarded-Proto: https` | `req.secure===true` (antes); password/TOTP/Bearer em HTTP se bind ≠ loopback | Nginx: `X-Forwarded-Proto $scheme`; login só no host F2.1 (ou localhost em `development`/`test`) | HTTP + header https + Host de origin → login 400. **Não** deployado. Residual: Host oficial no origin HTTP. |
 | **P2-4 FEITO no git** (`2026-08-14`) | `admin-surface.js` `updateLoginGuard` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasava-se (SELECT + `failure_count+1` + UPSERT `EXCLUDED`) | UPSERT atómico `failure_count = failure_count + 1` na janela de 15 min; `RETURNING` | 10 `registerLoginFailure` concorrentes → count=10 + lock. **Não** deployado. |
 | **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual XFF = P1-2 **FEITO** no git. |
-| **P2-6 Bloco A FEITO no git** (`2026-08-14`) | `backend/Dockerfile`; `backend/.dockerignore`; `frontend/.dockerignore` | Root no `api`; sem `.dockerignore`; `COPY . .` | RCE no contentor = root; `.env` no layer se estiver no contexto | `.dockerignore` (`.env` / `.env.*` / `node_modules` / `.git`) + `USER node` só no backend após `COPY`. Frontend nginx listen 80 **sem** `USER node`. Compose/healthcheck = Bloco B (fora) | Cadeado `dockerfile-p26.test.js` (4 PASS). Residual: `docker inspect` / build com `.env` (proibido neste bloco); Bloco B. **Não** deployado. |
+| **P2-6 Bloco A FEITO no git** (`2026-08-14`) | `backend/Dockerfile`; `backend/.dockerignore`; `frontend/.dockerignore` | Root no `api`; sem `.dockerignore`; `COPY . .` | RCE no contentor = root; `.env` no layer se estiver no contexto | `.dockerignore` (`.env` / `.env.*` / `node_modules` / `.git`) + `USER node` só no backend após `COPY`. Frontend nginx listen 80 **sem** `USER node`. Compose/healthcheck = Bloco B (**FEITO**) | Cadeado `dockerfile-p26.test.js` (4 PASS). Residual: `docker inspect` / build com `.env` (proibido). **Não** deployado. |
+| **P2-6 Bloco B FEITO no git** (`2026-08-14`) | `docker-compose.yml` | `depends_on: - db` (só arranque do contentor) | API corre `ensure*Schema()` antes do `listen`; race → `process.exit(1)` | `db.healthcheck` `pg_isready` via `$$POSTGRES_USER`/`$$POSTGRES_DB` + `api.depends_on.db.condition: service_healthy`. Sem healthcheck em `api`/`web`/`nginx`. Sem `USER node`/imagem/tag/env | Cadeado `dockerfile-p26.test.js` (4 PASS). Hash compose P0-1 actualizado. Residual: Compose 1.x v3 ignora/rejeita `condition`; prova `docker compose` (proibido). **Não** deployado. |
 | **P2-7 FEITO no git** (`2026-08-14`) | `license.c` `layer7_checkin_store_key` | `store_key` mantinha `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar só `features` / `features_set` | store_key(nova) → `features_set==0`; intervalos preservados. **Não** deployado. |
 | **P2-8 FEITO no git** (`2026-08-14`) | `license.c` `checkin_save_state` vs clock-mark | `fopen(..., "w")` truncava; crash a meio | Após P1-5, estado vazio recusa enforce; `.lic` intacto | tmp + `chmod 0600` + `rename`; escape JSON | Falha de tmp preserva o ficheiro anterior; aspas/barra re-lidas. **Não** deployado. |
 | **P2-9** | `layer7.inc:2552-2593`; `pkg-install.in:43-44` | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF. Documentado (RR-1), residual comercial | Só com GO: migração opt-in ou injectar `true` | Já existe `test_check_in_default_30.14.php`; falta teste de install a **não** migrar |
@@ -448,7 +451,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 
 - Sem `privileged`, sem `network_mode: host`.
 - Portas: só nginx no bind configurável; `db` e `api` não publicados.
-- Residual: P2-6 Bloco B (`pg_isready` + `depends_on` healthy). Bloco A **FEITO** no git (`2026-08-14`; sem deploy).
+- P2-6 Bloco A+B **FEITOS** no git (`2026-08-14`; sem deploy). Residual: Compose 1.x v3 pode ignorar/rejeitar `condition`; prova `docker compose` (proibida neste bloco).
 
 ### Package rc.d / PF
 
@@ -513,7 +516,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 30. **P2-14 AVALIADO no git** (`2026-08-14`; **BG-152**; opção A — **FEITO documental**) — bypass ABI `-f` = política BG-106; builder FreeBSD 16 **não** provado. Sem código/`PORTVERSION`/hosts.
 31. **P3-7 AVALIADO no git** (`2026-08-14`; **BG-153**; opção A — **FEITO documental**) — colisão TZ/expiry já provada em P2-13/REV-030; `timegm`/`gmmktime` **não** são correção. Sem mudança de runtime.
 32. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
-33. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7. Residual P2-6 Bloco B.
+33. **P2-6 Bloco B FEITO no git** (`2026-08-14`) — `pg_isready` + `depends_on` `service_healthy`; hash compose P0-1 actualizado; sem Docker build/up; sem deploy.
+34. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7. Residual: P2-9 (só com GO); P0-2 single-use/bind; P0-1 rebuild `api`.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -662,7 +666,7 @@ SSOT [`../01-architecture/f3-expiracao-revogacao-grace.md`](../01-architecture/f
 |-------|--------|
 | Objectivo | Fechar P3-7 como docs: colisão TZ/expiry já provada; `timegm`/`gmmktime` proibidos como correção |
 | Impacto | Só docs. `license.c` / `layer7.inc` / `crud-validation.js` / package / `PORTVERSION` / hosts **intactos** |
-| Risco | Nenhum de runtime. Residual: D 12:00 → grace (contrato HEAD); DST ±1 h C vs PHP; política A–D só com GO; P2-6 Bloco B; P0-1 |
+| Risco | Nenhum de runtime. Residual: D 12:00 → grace (contrato HEAD); DST ±1 h C vs PHP; política A–D só com GO; P0-1 |
 | Teste | P3-7 deixa de aparecer como aberto; SSOTs dizem não usar `timegm`/`gmmktime`; `git diff` só docs; 325 untracked fora do stage; P0-1 intacto |
 | Rollback | Reverter o commit de docs. O runtime já era o anterior. **Não** aplicar `timegm`/`gmmktime` |
 
@@ -683,9 +687,28 @@ release, package, `PORTVERSION` ou rebuild `api`.
 |-------|--------|
 | Objectivo | Impedir `.env`/lixo no layer (`COPY . .`) e correr a API como `node` |
 | Impacto | `backend/Dockerfile` + `.dockerignore` backend/frontend + cadeado `dockerfile-p26.test.js` + docs. Compose hash P0-1 **intacto** |
-| Risco | Baixo. Live inalterado sem rebuild. Residual: prova `docker inspect` / build com `.env`; Bloco B (`pg_isready`) |
+| Risco | Baixo. Live inalterado sem rebuild. Residual: prova `docker inspect` / build com `.env` (proibido). Bloco B **FEITO** |
 | Teste | `node --test src/dockerfile-p26.test.js` — 4 PASS. Sem Docker |
 | Rollback | `git revert` deste commit. Live não muda. Freeze permanece |
+
+## Prova P2-6 Bloco B — `pg_isready` + `depends_on` healthy (`2026-08-14`)
+
+**Pedido implementado:** só o Bloco B da triagem P2-6 — healthcheck
+PostgreSQL com `pg_isready` via env **dentro** do contentor
+(`$$POSTGRES_USER` / `$$POSTGRES_DB`) e `api.depends_on.db.condition:
+service_healthy`. **Sem** healthcheck em `api`/`web`/`nginx`. **Sem**
+mudança de `USER node`, frontend, Dockerfile, código API, imagem/tag,
+env/segredos. **Sem** Docker build/up/pull/push, deploy, `.244`/`.254`,
+builder, release, package, `PORTVERSION`.
+**Veredicto:** P2-6 Bloco B **FEITO** no git. P0-1 **ACTIVO**.
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Impedir a API de correr schema/listen antes do Postgres aceitar ligações |
+| Impacto | Só `docker-compose.yml` + cadeado `dockerfile-p26.test.js` + docs. `USER node` / frontend / Dockerfile / API **intactos**. Hash compose P0-1 **actualizado** (`b0dcfe28…`); os 4 hashes JS/gitkeep **intactos** |
+| Risco | Baixo. Live inalterado sem substituir compose. Residual: Compose 1.x v3 pode ignorar/rejeitar `condition`; prova `docker compose` (proibida) |
+| Teste | `node --test src/dockerfile-p26.test.js` — 4 PASS. Sem Docker |
+| Rollback | `git revert` deste commit. Live não muda. Freeze permanece. Hash compose volta a `7845ac36…` |
 
 ## Prova P2-13 — política de datas, meia-noite e DST (`2026-08-14`)
 

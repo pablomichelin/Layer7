@@ -53,9 +53,19 @@ test('P2-6A: backend and frontend .dockerignore exclude .env and context junk', 
   }
 });
 
-test('P2-6A residual: compose has no healthcheck (Block B out of scope)', () => {
+test('P2-6B: db healthcheck uses in-container pg_isready; api waits for healthy', () => {
   const compose = load(COMPOSE);
-  assert.equal(/\bhealthcheck\s*:/.test(compose), false);
-  assert.equal(/condition:\s*service_healthy/.test(compose), false);
-  assert.match(compose, /depends_on:\n {6}- db\n/);
+  const healthchecks = compose.match(/^\s+healthcheck\s*:/gm) || [];
+
+  assert.equal(healthchecks.length, 1, 'only db may declare healthcheck');
+  assert.match(compose, /pg_isready -U \$\$POSTGRES_USER -d \$\$POSTGRES_DB/);
+  assert.match(compose, /condition:\s*service_healthy/);
+  assert.match(
+    compose,
+    /depends_on:\n {6}db:\n {8}condition:\s*service_healthy\n/
+  );
+  assert.equal(/depends_on:\n {6}- db\n/.test(compose), false);
+  assert.match(compose, /image:\s*postgres:17-alpine/);
+  assert.match(compose, /image:\s*nginx:alpine/);
+  assert.equal(/\bUSER\s+node\b/.test(compose), false);
 });

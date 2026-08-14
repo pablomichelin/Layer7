@@ -32,11 +32,14 @@ Hashes reconfirmados (worktree = inventário `2026-08-14T15:31:37Z`):
 | `backend/src/content-auth.test.js` | `f06962ac40def35e3897a046cc3f709e56fcab1f98e3f66f27823782798c389d` |
 | `backend/src/routes/content.js` | `8b039f2363a2d38ca46195e54feda1de6e1340f92b0287b2d7fb42994226e324` |
 | `content/blacklists/ut1/current/.gitkeep` | `b737992495499531e471c1af53a8aabf551f8b4365c52670b6d03950a4e321d5` |
-| `docker-compose.yml` | `7845ac363911bce8828a957cd520ff2c7d40316e37cac5eff29df4d98974f63a` |
+| `docker-compose.yml` | `b0dcfe2890984f483be1d2e2098f10591521c5394db1cc1ad637c542c00782d7` |
 
-P2-6 Bloco A (`2026-08-14`) **não** altera este compose. Ignore +
-`USER node` no backend ficam no git; rebuild `api` no `.244` continua
-**proibido** até GO do primeiro overlay + smoke.
+Inventário original do compose (`2026-08-14T15:31:37Z`, pré-P2-6B):
+`7845ac363911bce8828a957cd520ff2c7d40316e37cac5eff29df4d98974f63a`.
+P2-6 Bloco B (`2026-08-14`) altera **só** `db.healthcheck` (`pg_isready`
+via `$$POSTGRES_*`) e `api.depends_on.db.condition: service_healthy`.
+Os 4 hashes JS/gitkeep permanecem o lock P0-1. Rebuild `api` no `.244`
+continua **proibido** até GO do primeiro overlay + smoke.
 
 ---
 

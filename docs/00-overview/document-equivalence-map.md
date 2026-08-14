@@ -95,8 +95,10 @@ Ele existe para evitar tres erros comuns:
    corre serving `30.11` + overlay `30.13` + bind de edge `0.0.0.0`. Fonte
    canónica do gap restante e do freeze: [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
    + [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-   **Não** tratar o compose HEAD como descrição do live (bind / P0-2…P1-4)
-   enquanto P0-1 estiver activo. Snapshot/`.env` **não** são HEAD.
+   **Não** tratar o compose HEAD como descrição do live (bind / P0-2…P1-4
+   / healthcheck P2-6B) enquanto P0-1 estiver activo. Snapshot/`.env`
+   **não** são HEAD. P2-6 Bloco B versiona `pg_isready` +
+   `service_healthy` só no HEAD.
 6. **Builder FreeBSD 16 (`2026-08-14`, P2-14 / BG-152):** o guia do
    builder pede «preferir a mesma major» que o appliance; o appliance de
    lab é FreeBSD 16 e o builder de produto é 15. Fonte canónica: builder

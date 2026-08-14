@@ -15,13 +15,19 @@ services:
       - ./backend/migrations/001-init.sql:/docker-entrypoint-initdb.d/001-init.sql
     networks:
       - layer7-license-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   api:
     container_name: layer7-license-api
     build: ./backend
     restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       TZ: ${TZ:-UTC}
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}

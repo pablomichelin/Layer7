@@ -16,6 +16,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P2-6 Bloco B — Postgres healthy antes da API:** FEITO no
+  git. `docker-compose.yml` passa a ter `db.healthcheck` com
+  `pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB` (env **dentro** do
+  contentor) e `api.depends_on.db.condition: service_healthy`. Sem
+  healthcheck em `api`/`web`/`nginx`. Sem mudança de `USER node`,
+  frontend, Dockerfile, código API, imagem/tag ou env. Hash compose
+  P0-1 actualizado (`b0dcfe28…`); inventário original `7845ac36…`
+  preservado; 4 hashes JS/gitkeep intactos. Cadeado
+  `dockerfile-p26.test.js` (4 PASS). Sem Docker build/up, sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-7 / BG-153 — colisão TZ/expiry; não usar timegm:**
   AVALIADO no git (opção A — **FEITO documental**). A divergência
   appliance UTC−3 vs expiry UTC no servidor é o contrato HEAD
