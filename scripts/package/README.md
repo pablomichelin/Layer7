@@ -17,9 +17,19 @@ preservado apenas como legado ate F6; nao e fluxo vigente do projecto.
 
 ## `verify-prod-pubkey.sh`
 
-Compara a pubkey Ed25519 embutida em `src/layer7d/license.c` com o SoT fora
-do git no builder (`/root/layer7-build-secrets/`). Usar **antes** de
-`make package` (passo 30.2 / GA1.8).
+Compara a pubkey Ed25519 embutida em `src/layer7d/license.c` **e** o PEM
+do port (`license-signing-public-key.pem`) com o SoT fora do git no
+builder (`/root/layer7-build-secrets/`). Usar **antes** de `make package`
+(passo 30.2 / GA1.8 / P3-6). **FAIL** se C, PEM ou SoT divergirem
+(PEM ausente, inválido ou outra Ed25519). A validação C vs SoT
+mantém-se.
+
+Selftest local com fixture (`L7_PROD_PUBKEY_HEX_FILE` + PEM
+temporário; sem ler o SoT do builder):
+
+```sh
+sh tests/functional/test_verify_prod_pubkey.sh
+```
 
 ```sh
 sh scripts/package/verify-prod-pubkey.sh

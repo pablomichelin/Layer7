@@ -122,7 +122,11 @@ cd package/pfSense-pkg-layer7
 make clean && DISABLE_LICENSES=yes make package DISABLE_VULNERABILITIES=yes
 ```
 
-O script **FAIL** se `src/layer7d/license.c` divergir do SoT (protege GA1.8).
+O script **FAIL** se `src/layer7d/license.c` **ou** o PEM do port
+(`license-signing-public-key.pem`) divergir do SoT, ou se o PEM
+divergir do array C (protege GA1.8 / P3-6). A validação C vs SoT
+mantém-se. Selftest local: `sh tests/functional/test_verify_prod_pubkey.sh`
+(fixture `L7_PROD_PUBKEY_HEX_FILE`; sem o SoT do builder).
 
 **Não** usar o antigo fluxo `git stash` → `pull` → `checkout stash -- license.c Makefile`
 → `stash drop`. Esse fluxo era a causa do achado A-09 e foi retirado em `30.2`.

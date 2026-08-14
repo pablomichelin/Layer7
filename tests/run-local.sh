@@ -273,6 +273,13 @@ else
 	fail "test_flush_coverage"
 fi
 
+step "Gate: prod pubkey PEM vs SoT (P3-6)"
+if sh tests/functional/test_verify_prod_pubkey.sh; then
+	pass "test_verify_prod_pubkey"
+else
+	fail "test_verify_prod_pubkey"
+fi
+
 step "Unit: pkg-deinstall lifecycle (P1-6/7/8 + P2-12 + A1/A2/M2)"
 if sh tests/unit/test_pkg_deinstall_lifecycle.sh; then
 	pass "test_pkg_deinstall_lifecycle"
@@ -514,6 +521,8 @@ for f in package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d \
     tests/unit/test_rc_pidfile.sh \
     tests/unit/test_flush_coverage.sh \
     tests/unit/test_pkg_deinstall_lifecycle.sh \
+    tests/functional/test_verify_prod_pubkey.sh \
+    scripts/package/verify-prod-pubkey.sh \
     tests/lab/smoke-monitor-mode.sh \
     tests/lab/smoke-caminho-a.sh \
     tests/run-local.sh; do

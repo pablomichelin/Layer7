@@ -37,6 +37,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-6 / BG-144 — gate de alinhamento da chave de produção:**
+  FEITO no git após gates deste bloco. `verify-prod-pubkey.sh` deixa de
+  comparar só o array C de `license.c` com o SoT do builder: extrai os
+  32 bytes raw do PEM do port (`license-signing-public-key.pem`, SPKI
+  Ed25519 44 B) e **FAIL** se PEM ≠ SoT ou PEM ≠ C (em falta,
+  inválido, OID errado ou outra Ed25519). Validação C vs SoT
+  preservada. Selftest local
+  `test_verify_prod_pubkey.sh` (SoT=C=PEM PASS; outra Ed25519 / PEM
+  em falta / inválido / SoT≠C FAIL) via
+  `L7_PROD_PUBKEY_HEX_FILE` + PEM temporário, sem
+  `/root/layer7-build-secrets`. `license.c`, PEM e `PORTVERSION`
+  intactos. Residual P3-7. Sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-5 / BG-142 — promoção atómica do `.lic` em Activate:**
   FEITO no git após gates deste bloco. `layer7_activate` deixa de
   truncar/substituir `L7_LIC_PATH` antes de validar o candidato.
@@ -48,8 +60,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   exit de sucesso e cleanup preservados. Sem fsync novo. Hook
   `L7_ACTIVATE_PROMOTE_HOOK` só com `L7_TEST_ACTIVATE_PROMOTE` +
   `LAYER7_TEST_ROOT` (ausente do Makefile do port). Sem check-in/
-  clock/pakey/expiry. Residual P3-6. Sem `PORTVERSION`, sem deploy
-  (P0-1 ACTIVO).
+  clock/pakey/expiry. Residual P3-6 (fechado neste bloco). Sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-4 / BG-140 — falha de pool em GET /2fa/status:** FEITO
   no git após gates deste bloco. `GET /api/auth/2fa/status` passa a
   capturar rejeição de `pool.query` com try/catch local. Log interno
