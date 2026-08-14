@@ -37,6 +37,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-2 / BG-132 — exactidão TOTP em GET /session:** FEITO
+  no git após gates deste bloco. O SELECT de `resolveSessionToken`
+  passa a incluir `a.totp_enabled`. `buildSessionMetadata` já lia o
+  campo; sem a coluna, `toPublicAdmin` convertia `undefined` em
+  `false` e a UI via TOTP desligado. Auth/TTL/revoke/`createSession`/
+  CSRF/TOTP flows intactos. Sem `PORTVERSION`, sem deploy (P0-1
+  ACTIVO).
 - **BG-128 P3-1 / BG-131 — sessão única atómica:** FEITO no git após
   gates deste bloco. `createSession` passa a
   `BEGIN` + `SELECT id FROM admins WHERE id = $1 FOR UPDATE` + revoke +

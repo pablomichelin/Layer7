@@ -99,6 +99,9 @@ Documentos normativos desta arquitetura:
   (`BEGIN` + `SELECT … FOR UPDATE` na linha de `admins` + revoke +
   insert + `COMMIT`). `BEGIN` sozinho não basta (READ COMMITTED).
   Sem unique parcial. Refresh/revogação/TTL/TOTP/CSRF intactos. Sem deploy.
+  **P3-2 / BG-128 (`2026-08-14`):** `GET /api/auth/session` lê
+  `a.totp_enabled` no SELECT de `resolveSessionToken`. Sem a coluna,
+  `toPublicAdmin` reportava `false` para admin com TOTP ligado. Sem deploy.
 
 ### Frontend
 

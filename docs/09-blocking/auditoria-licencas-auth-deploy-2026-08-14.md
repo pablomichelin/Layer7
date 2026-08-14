@@ -55,9 +55,12 @@ Sem deploy / `PORTVERSION`.
 (`BEGIN` + `FOR UPDATE` no admin + revoke + insert); dois
 `createSession` paralelos → 1 `revoked_at IS NULL`. `BEGIN` sozinho
 não basta. Sem unique parcial. Sem deploy / `PORTVERSION`.
+**P3-2 FEITO** no git (`2026-08-14`) — `resolveSessionToken` SELECT
+inclui `a.totp_enabled`; `GET /api/auth/session` deixa de reportar
+`false` para admin com TOTP ligado. Sem deploy / `PORTVERSION`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2).
 
 ---
 
@@ -313,7 +316,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | ID | Evidência | Cenário | Impacto | Correcção mínima | Testes |
 |----|-----------|---------|---------|------------------|--------|
 | **P3-1 FEITO no git** (`2026-08-14`) | `session.js` `createSession` | Dois logins/TOTP em paralelo | Política “uma sessão” deixava 2 tokens (`revoked_at IS NULL`) | `BEGIN` + `SELECT … FOR UPDATE` em `admins` + revoke + insert + `COMMIT`. `BEGIN` sozinho **não** basta (READ COMMITTED). Sem unique parcial | Dois `createSession` → 1 activa. Antes: 2. **Não** deployado. |
-| **P3-2** | `session.js:256-275` vs `:112` | `GET /api/auth/session` | `totp_enabled` omitido no SELECT → UI vê `false` | Incluir `a.totp_enabled` | Sessão com TOTP → `totp_enabled: true` |
+| **P3-2 FEITO no git** (`2026-08-14`) | `session.js` `resolveSessionToken` vs `buildSessionMetadata` | `GET /api/auth/session` | `totp_enabled` omitido no SELECT → UI vê `false` | Incluir `a.totp_enabled` | Sessão com TOTP → `totp_enabled: true`. Antes: `false`. **Não** deployado. |
 | **P3-3** | `auth.js:107-114`; `users.js:36-38` vs `bootstrap-admin.js:94-106`; `totp.js:81` | Email disabled → 403 distinto; users aceita password ≥10; TOTP com `===` | Enumeração; lock não aplica a disabled; política inconsistente; timing TOTP teórico | Mesma 401 + bcrypt dummy; mínimo 12; `timingSafeEqual` | Disabled vs unknown → mesmo status/body |
 | **P3-4** | `auth.js:222-230`; Express `^4.21.2` | Falha de BD em `GET /2fa/status` | Promise rejeitada sem error handler | `try/catch` ou wrapper async | Pool a rejeitar → 500 JSON; processo vivo |
 | **P3-5** | `license.c:803-833` | Activate escreve `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha ⇒ unlink (sem bypass) | Verificar tmp e `rename` atómico | Crash entre write e verify → sem `.lic` inválido permanente |
@@ -354,6 +357,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 
 - Login **não** adopta cookie do cliente; token = 32 bytes — `session.js:29-30`.
 - **P3-1 FEITO no git** (`2026-08-14`): `createSession` serializa com lock da linha de `admins`; um admin → uma linha `revoked_at IS NULL`. **Não** deployado.
+- **P3-2 FEITO no git** (`2026-08-14`): SELECT de `resolveSessionToken` inclui `a.totp_enabled`; `GET /api/auth/session` deixa de mentir `false`. **Não** deployado.
 - Cookie `httpOnly` + `secure` + `sameSite: 'strict'` + sem `Domain`.
 - Pacote `cors` **não** é `require`d.
 - **P2-2 FEITO no git** (`2026-08-14`): `/api/users` e `/api/search` entram em `isAdminApiPath`; mutações admin sem `Origin` allowlist nem `Sec-Fetch-Site: same-origin` → 403; Bearer autenticado exceptuado; GET sem Origin continua. **Não** deployado.
@@ -375,6 +379,9 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 - **P3-1 FEITO no git** (`2026-08-14`): `createSession` serializa com
   lock da linha de `admins`. Dois logins paralelos → 1
   `revoked_at IS NULL`. **Não** deployado.
+- **P3-2 FEITO no git** (`2026-08-14`): SELECT de `resolveSessionToken`
+  inclui `a.totp_enabled`; `buildSessionMetadata` deixa de receber
+  `undefined`. **Não** deployado.
 - **SQLite:** não se aplica (`pg.Pool`).
 - Activate: `runInTransaction` + `FOR UPDATE OF l` + update condicional de `hardware_id` — um 200, outro 409.
 - Check-in: só SELECT + log; não muta binding. Nonce não é single-use no servidor (contrato).
@@ -444,7 +451,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 17. **P2-13 AVALIADO no git** (`2026-08-14`) — meia-noite / DST / UTC sem correção única segura; sem mudança de runtime. **Não** deployado.
 18. **P2-4 FEITO no git** (`2026-08-14`) — incremento atómico de `failure_count`; 10 `registerLoginFailure` paralelos → count=10 + lock. **Não** deployado.
 19. **P3-1 FEITO no git** (`2026-08-14`) — sessão única atómica (`FOR UPDATE` no admin); 2 `createSession` → 1 activa. **Não** deployado.
-20. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1.
+20. **P3-2 FEITO no git** (`2026-08-14`) — `GET /api/auth/session` inclui `a.totp_enabled`. **Não** deployado.
+21. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 

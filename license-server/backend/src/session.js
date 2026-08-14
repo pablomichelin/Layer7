@@ -301,7 +301,8 @@ async function resolveSessionToken({ token, source }, res) {
         a.name,
         a.is_owner,
         a.is_active,
-        a.permissions
+        a.permissions,
+        a.totp_enabled
       FROM admin_sessions s
       JOIN admins a ON a.id = s.admin_id
       WHERE s.session_token_hash = $1`,

@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-132 P3-2 exactidão TOTP em GET /session
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | `GET /api/auth/session` reporta `totp_enabled: true` quando o admin tem TOTP ligado |
+| Impacto | Só o SELECT de `resolveSessionToken` passa a incluir `a.totp_enabled`. Auth/TTL/revoke/`createSession`/CSRF/TOTP flows intactos |
+| Risco | Baixo. Residual: overlay P0-1; não existe `getSessionMetadata` — a query vive em `resolveSessionToken` |
+| Teste | Suite backend `212/212` PASS. Antes: SELECT omitia a coluna → `toPublicAdmin` → `false`. Depois: `true` |
+| Rollback | Reverter o commit; o SELECT volta a omitir `a.totp_enabled` |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem admin-surface / sem compose |
+
 ## 2026-08-14 — BG-131 P3-1 sessão única atómica
 
 | Campo | Valor |

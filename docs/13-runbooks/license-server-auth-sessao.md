@@ -44,6 +44,10 @@ Referencias normativas:
   insere a nova. `BEGIN`+revoke+insert sem lock **não** serializa.
   Unique parcial `(admin_id) WHERE revoked_at IS NULL` fica fora
   (exigiria limpar duplicados live). Refresh/TTL/TOTP/CSRF intactos.
+- **P3-2 / BG-128:** `GET /api/auth/session` inclui `a.totp_enabled`
+  no SELECT de `resolveSessionToken`. Admin com TOTP ligado deixa de
+  aparecer como `totp_enabled: false`. Auth/TTL/revoke/`createSession`/
+  CSRF/TOTP flows intactos.
 - Auditoria minima:
   - auth/sessao e mutacoes administrativas em `admin_audit_log`
   - guardas de lockout em `admin_login_guards`
