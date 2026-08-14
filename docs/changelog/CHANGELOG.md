@@ -17,7 +17,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Fixed
 
 - **BG-128 A1/A2/M2 — lifecycle keep-config/upgrade fail-closed:**
-  implementado, pendente de gates/commit. Staging de CA MITM e secrets
+  FEITO no git após gates deste bloco (`28c97ad` + governação). Staging de CA MITM e secrets
   Identity deixa `/tmp` e passa a `/var/db/layer7/deinstall-preserve`
   (0700). Segredos ficam 0600 em todo o fluxo. Se o backup obrigatório
   falhar, **não** há `rm -rf` de `/usr/local/etc/layer7`. Contratos

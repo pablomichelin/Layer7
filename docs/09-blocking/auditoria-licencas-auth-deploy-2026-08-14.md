@@ -31,8 +31,8 @@ FEITOS no git** (`2026-08-14`; `c2b9fdb` + governação após gates; sem
 deploy). P2-5 ficou absorvido no P1-3.
 **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
 **P2-11 FEITO no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
-**A1/A2/M2** (auditoria independente do lifecycle `c2b9fdb`) —
-implementado, pendente de gates/commit. Sem deploy / `PORTVERSION`.
+**A1/A2/M2 FEITO no git** (auditoria independente do lifecycle `c2b9fdb`;
+`28c97ad` + governação após gates; `2026-08-14`; sem deploy / `PORTVERSION`).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
 (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13).
@@ -398,7 +398,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 8. **P1-5…P1-8 + P2-12 FEITOS no git** (`c2b9fdb` + governação após gates) — package/daemon; **sem** deploy / `PORTVERSION`.
 9. **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`) — daemon local; **sem** deploy / `PORTVERSION`.
 10. **P2-11 FEITO no git** (`2026-08-14`) — GUI/helper binding HW + expiry/grace; **sem** deploy / `PORTVERSION`.
-11. **A1/A2/M2** — implementado, pendente de gates/commit — staging persistente + fail-closed + harness funcional; **sem** deploy / `PORTVERSION`. Sem M1/P2-13.
+11. **A1/A2/M2 FEITO no git** (`28c97ad` + governação após gates; `2026-08-14`) — staging persistente + fail-closed + harness funcional; **sem** deploy / `PORTVERSION`. Sem M1/P2-13.
 12. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO. Sem M1.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
