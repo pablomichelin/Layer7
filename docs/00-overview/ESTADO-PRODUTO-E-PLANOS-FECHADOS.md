@@ -41,9 +41,11 @@ substitui o `CORTEX.md` (que continua a mudar em manutenção); fixa o
 | Promoção enforce (GV7.4) | gates IPv6 + CORTEX | **PASS** | `20260805T150500Z-gv7.4-promocao-1.9.8` |
 | Validação two-client lab | `validacao-lab` + campanha | **PASS** | `20260805T162500Z-prod-align-two-client-1.9.8` |
 | Anti-pirataria / Anti-tamper AP0–AP4 (`30.0`–`30.19`) | [`plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md) | **FECHADA** (`20260812T025741Z`) | [`fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md) · evidência `20260812T025741Z-30.19-fecho` |
+| Identity + MITM Add-on IM0–IM9 (`20.1`–`20.37`) | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **FECHADA** (`20260814T035500Z`) | [`fecho-trilha-identity-mitm-20.37.md`](../01-architecture/fecho-trilha-identity-mitm-20.37.md) · evidência `20260814T035500Z-20.37-fecho-identity-mitm` |
 
 **BG IPv6:** BG-078 … BG-084 **concluídos**.  
-**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (residual campo: BG-028 Fase 1; GA5.9).
+**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (residual campo: BG-028 Fase 1; GA5.9).  
+**BG Identity+MITM:** BG-085 … BG-092 **concluídos** (20.37).
 
 ---
 
@@ -187,3 +189,4 @@ Responder em português.
 | 2026-08-06 | Posicionamento PME Identity-first ACEITE; MITM DEFER 20.7a; passo → IM3 |
 | 2026-08-05 | F6 H5 — arquivo físico raiz `00-`…`16-` + planos fecho/IPv6 |
 | 2026-08-12 | Trilha Anti-pirataria AP0–AP4 **FECHADA** (`30.19`; GA6 PASS) |
+| 2026-08-14 | Trilha Identity + MITM **FECHADA** (`20.37`; soak `1.9.63` MITM OFF) |

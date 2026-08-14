@@ -422,7 +422,7 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 **Arranque:** [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **Posicionamento PME:** [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — ACEITE  
-**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-14be`  
+**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-14bh` — **【FILA FECHADA】**  
 **Gates:** [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
 **Prontidão piloto:** [`mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md)
 
@@ -456,6 +456,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] P4 soak lab retry2 — **CLOSED PASS** `224009Z` (16/16 health; rollback_clean=1; MITM OFF; Phase C NA). Histórico: P4 `234042Z` FAIL/ABORT; retry `170000Z` FAIL
 - [x] P5 / 20.34 — ficha **cancelada**; ADR-0035 aceite
 - [x] 20.35: productizar MITM na GUI (até desligar + copy operador); publicado `1.9.63`
+- [x] 20.36: soak `.254` alinhado a `1.9.63`; MITM OFF
+- [x] 20.37: 【FILA FECHADA】 — [`fecho-trilha-identity-mitm-20.37.md`](../01-architecture/fecho-trilha-identity-mitm-20.37.md)
 
 ### Anti-pirataria / Anti-tamper (AP0–AP4, passos `30.x`)
 

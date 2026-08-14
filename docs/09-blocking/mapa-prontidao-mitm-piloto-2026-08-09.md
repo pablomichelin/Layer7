@@ -1,7 +1,7 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** ficha/P5 **RETIRADOS** (ADR-0035). **20.36 PASS**. Operação MITM = GUI + entitlement. Soak `.254` = `1.9.63` MITM **OFF**. Default OFF. Sem overclaim de paridade **já** atingida.  
+**Veredicto:** ficha/P5 **RETIRADOS** (ADR-0035). Trilha **【FILA FECHADA】** (20.37). Operação MITM = GUI + entitlement. Soak `.254` = `1.9.63` MITM **OFF**. Default OFF. Sem overclaim de paridade **já** atingida.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
 **P4 evidência (PASS):** [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS**. Histórico FAIL: [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/).  

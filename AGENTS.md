@@ -35,10 +35,10 @@ Antes de agir, ler nesta ordem:
 
 Depois disso, ler apenas a documentacao da area em causa:
 
-- **trilha Identity + MITM (activa):**
+- **trilha Identity + MITM (【FILA FECHADA】 20.37):**
   `docs/00-overview/START-HERE-identity-mitm.md`
-  (ordem de leitura **dentro** desse ficheiro; inclui posicionamento PME,
-  plano 20.x, mapa, gates; MITM **DEFER** — nao implementar sem novo GO)
+  e `docs/01-architecture/fecho-trilha-identity-mitm-20.37.md`
+  (nao reabrir sem GO humano + backlog; MITM permanente NO-GO)
 - instalacao, upgrade, uninstall, rollback:
   `docs/10-license-server/MANUAL-INSTALL.md`
 - licenciamento e license server:

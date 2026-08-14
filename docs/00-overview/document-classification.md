@@ -69,9 +69,10 @@ vence o canónico.
 | `docs/00-overview/handoff-chat-novo.md` | handoff de chat Cursor | quando/como abrir chat novo, prompt de continuacao, verificacao opcional pos-clone (`check-port-files`, `smoke-layer7d` por SO) e ligacao a F3/F4 no lab | Canónico | concretiza a politica de continuidade do `CORTEX.md` para contexto longo | manter alinhado ao `CORTEX` e a `docs/README.md` | F0+ |
 | `docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md` | fecho consolidado filas | congelamento P0–J + IPv6 + mapa navegação + porta planos novos | Canónico | complementa CORTEX (vivo) e START-HERE | actualizar só se reabrir fila ou mudar veredicto | F0+ |
 | `docs/00-overview/START-HERE-fecho-producao.md` | arranque manutencao pós-fecho | ponto de entrada manutenção / filas fechadas | Canónico | Identity/MITM tem START-HERE próprio | manter vivo com CORTEX | F0+ |
-| `docs/00-overview/START-HERE-identity-mitm.md` | arranque Identity+MITM | **único** arranque da trilha IM0–IM9 | Canónico | plano `plano-identity-mitm-addon.md` | manter com passo actual | novo plano |
+| `docs/00-overview/START-HERE-identity-mitm.md` | arranque Identity+MITM | **【FILA FECHADA】** 20.37; histórico IM0–IM9 | Canónico (fechado) | plano + fecho 20.37 | não reabrir sem GO | fechado |
 | `docs/00-overview/posicionamento-pme-identity-first.md` | posicionamento PME Identity-first | ideia, objectivo, nicho, barra UX | Canónico | START-HERE + plano rev.d | manter com decisões de produto | novo plano |
-| `docs/02-roadmap/plano-identity-mitm-addon.md` | plano Identity+MITM | SSOT execução 20.x | Canónico | — | actualizar a cada passo | novo plano |
+| `docs/02-roadmap/plano-identity-mitm-addon.md` | plano Identity+MITM | SSOT execução 20.x — **FECHADA** | Canónico (fechado) | fecho 20.37 | não reabrir sem GO | fechado |
+| `docs/01-architecture/fecho-trilha-identity-mitm-20.37.md` | fecho Identity+MITM | veredicto §11 + o que não é fecho | Canónico | START-HERE + ESTADO | só reabrir com GO | fechado |
 | `docs/01-architecture/identity-mitm-mapa-rastreabilidade.md` | mapa Identity+MITM | NR-* + M-xx | Canónico | — | actualizar com código | novo plano |
 | `docs/09-blocking/spike-mitm-20.7.md` | spike MITM 20.7 | **DEFER formal 20.7a** | Canónico (fechado diferido) | ADR-0026 rev.d | só reabrir com novo GO | novo plano |
 | `docs/09-blocking/plano-gates-identity-mitm.md` | gates GI0–GI9 | gates da trilha | Canónico | — | marcar PASS | novo plano |

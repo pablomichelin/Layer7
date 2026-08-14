@@ -40,7 +40,7 @@ estado actual deixa de ser suficiente para agir sem reler o repo; o
 2. Abrir **novo chat** no mesmo workspace (Layer7).
 3. **Colar** na primeira mensagem **apenas** o START-HERE da trilha:
    - manutenção pós-fecho: `docs/00-overview/START-HERE-fecho-producao.md`
-   - Identity + MITM: `docs/00-overview/START-HERE-identity-mitm.md`
+   - Identity + MITM (**fila fechada**): `docs/00-overview/START-HERE-identity-mitm.md` — não reabrir sem GO
    (ou o [Prompt de continuação](#prompt-de-continuacao-copiar-e-colar) se for outro tema).
 4. Opcional: anexar ou mencionar ficheiros abertos relevantes.
 5. No chat antigo, **nao** apagar; serve de arquivo informal.

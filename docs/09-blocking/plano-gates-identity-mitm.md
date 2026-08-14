@@ -153,6 +153,8 @@ Squid rejeitado. **Sem** intercept em `.254`/`.234`/`.235`. Identity rede **FECH
 | GI8 | IM7–IM8 | **PASS** (`ADR-0029`, 2026-08-08) |
 | GI9 | IM9 | **PASS** (20.33; residuais AD lab GI5–GI7 assinados) |
 
+**20.37:** fila **FECHADA**. GI5/GI6 PARCIAL permanecem residual AD assinado — **não** reabrem a trilha.
+
 ---
 
 ## Histórico

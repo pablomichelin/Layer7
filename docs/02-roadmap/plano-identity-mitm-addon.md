@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; **20.36 PASS** (soak `.254` = `1.9.63` MITM OFF); publicado **`1.9.63`**; **ADR-0035**; P4 retry2 CLOSED PASS (rev. `2026-08-14bg`)
+**Estado do plano:** **【FILA FECHADA】** — **20.37 PASS**; soak + latest **`1.9.63`** MITM OFF; **ADR-0035**; P4 retry2 CLOSED PASS (rev. `2026-08-14bh`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -67,6 +67,7 @@
 **Rev. `be` (`2026-08-14`)** = **20.35 PASS** — GUI até desligar (`max_minutes=0`); copy operador; candidato `1.9.63` sem publish.
 **Rev. `bf` (`2026-08-14`)** = **`1.9.63` publicado** — MITM como política; ADR-0035; melhorar todos os dias sem tecto; soak `.254` intocado (histórico).
 **Rev. `bg` (`2026-08-14`)** = **20.36 PASS** — soak `.254` `1.9.59` → `1.9.63`; MITM OFF; evidência `20260814T034904Z`.
+**Rev. `bh` (`2026-08-14`)** = **20.37 PASS** — 【FILA FECHADA】; §11; sem código / sem `.254`.
 
 ---
 
@@ -74,9 +75,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.36 PASS** — soak `.254` = `1.9.63` MITM OFF |
+| Passo actual | **20.37 PASS** — 【FILA FECHADA】 |
 | Prontidão | Ficha **já não é gate**. Operação = GUI + entitlement. Default OFF. |
-| Próximo | Evoluir MITM/UX sem tecto; `.234`/`.235` sem mutação neste passo |
+| Próximo | Não reabrir sem GO + backlog; permanente **NO-GO** |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -104,9 +105,10 @@ TRILHA — progresso
 - ADR-0035 / 20.34 PASS: ficha RETIRADA; ambição paridade NGFW no tempo
 - 20.35 PASS: GUI até desligar; copy operador; publicado 1.9.63
 - 20.36 PASS: soak .254 alinhado a 1.9.63; MITM OFF
-- Plano rev.: 2026-08-14bg
+- 20.37 PASS: 【FILA FECHADA】 (docs; sem código)
+- Plano rev.: 2026-08-14bh
 - Latest + soak: 1.9.63 MITM OFF
-- Próximo: evoluir MITM/UX sem tecto; sem ligar MITM no .254
+- Próximo: não reabrir sem GO + backlog
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -154,7 +156,7 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 |-------|--------|---------|
 | Fecho P0–J | **FECHADO** | Baseline comercial; não reabrir |
 | IPv6 V0–V6 | **FECHADA** | Dual-stack já no produto; Identity/MITM devem **respeitar** IPv4+IPv6 |
-| Este plano | Identity **FECHADA**; MITM **`1.9.63`** | Extensão comercial; ficha retirada (ADR-0035); soak alinhado (20.36) |
+| Este plano | **【FILA FECHADA】** (`20.37`) | Não reabrir sem GO; permanente NO-GO |
 
 Congelamento das filas fechadas:
 [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
@@ -185,9 +187,9 @@ Congelamento das filas fechadas:
 |---|----------|-------|
 | C1 | Entitlements no `.lic` com gate real (daemon + GUI) | GI1 |
 | C2 | Compat: `features=full` e licenças antigas não partem o produto base | GI1 |
-| C3 | MITM: spike 20.7 GO **ou** DEFER formal; se GO — opt-in OFF + lab GI2–GI3 | **DEFER formal 20.7a** (`2026-08-06`) — GI2/GI3 `DEFERRED`; C3 **satisfeito por defer** |
+| C3 | MITM: spike 20.7 GO **ou** DEFER formal; se GO — opt-in OFF + lab GI2–GI3 | **PASS** — defer 20.7a + reopen; GI2/GI3 **PASS** (`2026-08-09`) |
 | C3b | Posicionamento PME documentado + caminho Identity-first | [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) **ACEITE** |
-| C4 | Sem entitlement MITM: zero interceptação TLS (mesmo com código presente) | GI1.3 + defer (sem runtime MITM) |
+| C4 | Sem entitlement MITM: zero interceptação TLS (mesmo com código presente) | **PASS** — GI1.3; runtime no `.pkg` gated (`mitm_effective`) |
 | C5 | Mapa user→IP **no daemon** (TTL, refresh, logout/stale; N IPs/user) | GI4 |
 | C6 | LDAP/LDAPS para grupos | GI5 |
 | C7 | Fonte eventos AD (agente DC) **e/ou** RADIUS accounting receiver (MVP ≥1) | GI5–GI6 |
@@ -451,6 +453,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 | **20.34** | GO docs: retirar ficha; ambição de paridade NGFW no tempo | **PASS** (`2026-08-14`; ADR-0035) |
 | **20.35** | Productizar operação MITM na GUI (até desligar + copy operador) | **PASS** (`2026-08-14`; publicado `1.9.63`) |
 | **20.36** | Alinhar soak `.254` ao `latest` (`1.9.59` → `1.9.63`); MITM OFF | **PASS** (`20260814T034904Z`) |
+| **20.37** | Fecho documental da fila (§11 + START-HERE 【FILA FECHADA】) | **PASS** (`20260814T035500Z`) |
 
 ---
 
@@ -580,12 +583,12 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 - [x] Filas fecho+IPv6 fechadas  
 - [x] Captive excluído; MITM incluído como opção; multi-fonte Identity; add-on X/Y  
 
-### Saída (fecho futuro)
+### Saída (20.37 — **CUMPRIDA** `2026-08-14`)
 
-- [ ] C1–C11 satisfeitos ou excluídos por ADR  
-- [ ] GI0–GI9 PASS (ou exclusões assinadas)  
-- [ ] Produção: add-on documentado; default OFF  
-- [ ] START-HERE marcado 【FILA FECHADA】 + arquivo se aplicável  
+- [x] C1–C11 satisfeitos ou excluídos por ADR  
+- [x] GI0–GI9 PASS (ou exclusões assinadas — residual AD GI5–GI7 em GI9)  
+- [x] Produção: add-on documentado; default OFF  
+- [x] START-HERE marcado 【FILA FECHADA】 — **sem** arquivo físico (só na F6)  
 
 ---
 
@@ -628,6 +631,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-09 | **rev. `ar` / P1+P2** — GO-escopo D1–D9 + runbook-piloto-mitm-generico; activação NO-GO até P3 |
 | 2026-08-09 | **rev. `as`** — gate activação externa ≠ gap eng.; P3.1–P3.8 fechados |
 | 2026-08-09 | **rev. `at` / P3 PASS** — `1.9.47` max_window/deadline/audit/GUI; evid. `230400Z` |
+| 2026-08-14 | **rev. `bh` / 20.37 PASS** — 【FILA FECHADA】; §11; evid. `20260814T035500Z` |
 | 2026-08-14 | **rev. `bg` / 20.36 PASS** — soak `.254` `1.9.59` → `1.9.63`; MITM OFF; evid. `20260814T034904Z` |
 | 2026-08-14 | **rev. `bf` / `1.9.63` publicado** — MITM política; ADR-0035; soak `.254` intocado |
 | 2026-08-14 | **rev. `be` / 20.35 PASS** — GUI até desligar; copy operador; candidato `1.9.63` |
