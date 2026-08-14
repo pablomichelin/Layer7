@@ -730,6 +730,11 @@ o risco de regressão.
 | `enabled` | boolean | Activar/desactivar blacklists |
 | `source_url` | string | URL do manifesto oficial assinado |
 | `mirror_urls` | string[] | Mirrors oficiais apenas para disponibilidade |
+
+> **Addendum pós-cut `30.11` (P3-9 opção A):** o exemplo `mirror_urls`
+> GitHub acima é o contrato F1.3 / cliente actual — **não** foi removido.
+> GET anónimo devolve **404 esperado**. Não reupload sem GO (GA4.11).
+> Nota: [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
 | `auto_update` | boolean | Actualização automática via cron |
 | `update_interval_hours` | int | Intervalo em horas (mínimo 1) |
 | `categories` | string[] | IDs das categorias com acção `deny` |

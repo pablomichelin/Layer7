@@ -16,6 +16,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P3-9 / BG-150 — docs pós-cut «404 esperado»:** AVALIADO
+  no git (opção A; triagem BG-149). GET anónimo nos quatro URLs de
+  *download* `blacklists-ut1-current` é **404 esperado** — não é
+  incidente. Primary sem token = 401. `releases/latest` / `v1.9.63` é
+  o canal do **pacote**, não deste espelho. URLs no runtime
+  (`update-blacklists.sh` / `layer7.inc` / `config.json.sample`)
+  **mantidos** de propósito (rollback GA4.11 sem `.pkg` novo).
+  **Proibido** reupload sem GO (A-06). Nota
+  `docs/09-blocking/nota-404-esperado-cut-30.11.md`. Sem mudança de
+  runtime. Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-8 / BG-148 — recheck read-only do cut `30.11`:** AVALIADO
   no git após a evidência `20260814T200900Z` (confirmação
   `20260814T201800Z`). Release `blacklists-ut1-current` id `313502667`
@@ -23,8 +33,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `asset_count=0`; anónimo 404×4 (nofollow e follow, size 9, sem
   302→CDN); primary sem token 401. Contraste `releases/latest` =
   `v1.9.63` (7 assets) — canal do pacote, **não** é P3-8. Sem mudança
-  de runtime. Residual P3-9 (cliente/docs ainda anunciam o URL; **não**
-  removido neste bloco). Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
+  de runtime. Residual P3-9 fechado em BG-150 (opção A; URLs **não**
+  removidos). Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P2-13 — política de datas / meia-noite / DST:** AVALIADO
   no git após gates deste bloco. `expiry=YYYY-MM-DD` continua a
   meia-noite local (`mktime` hora 0). No dia D às 12:00 a licença já

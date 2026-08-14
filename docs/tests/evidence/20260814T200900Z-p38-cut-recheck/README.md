@@ -39,5 +39,6 @@ Primary autenticado **não** foi reexecutado (token só no appliance;
 [`../20260812T003214Z-30.11-auth-get-254/`](../20260812T003214Z-30.11-auth-get-254/).
 
 **Veredicto:** cut `30.11` continua **FECHADO**. P3-8 **fechado como
-evidência**. Residual: **P3-9** (cliente/docs ainda anunciam o URL
-morto — bloco separado; URLs **não** removidos aqui).
+evidência**. Residual P3-9 fechado à parte (BG-150 / opção A):
+docs «404 esperado»; URLs **não** removidos — ver
+[`../../../09-blocking/nota-404-esperado-cut-30.11.md`](../../../09-blocking/nota-404-esperado-cut-30.11.md).

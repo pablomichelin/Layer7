@@ -490,6 +490,12 @@ Gerado automaticamente pelo script de download após extrair o arquivo.
   `https://downloads.systemup.inf.br/layer7/blacklists/ut1/current/layer7-blacklists-manifest.v1.txt`
 - mirror controlado:
   `https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt`
+
+> **Addendum pós-cut `30.11` (P3-9 opção A):** o `mirror_urls` GitHub acima
+> é o contrato F1.3 / cliente actual — **não** foi removido. GET anónimo
+> devolve **404 esperado**. Primary autenticado sem token = 401. Não
+> reupload sem GO (GA4.11). Nota:
+> [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
 - chave publica pinned:
   `/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem`
 - cache local:

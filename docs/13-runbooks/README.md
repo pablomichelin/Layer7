@@ -40,6 +40,8 @@ comercial, sem tocar enforce):
 Prep/fecho cut espelho anónimo (`30.11` — **CUT EXECUTADO** `20260812T011217Z`):
 [`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md);
 evidência [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
+404 anónimo **esperado** (P3-9 opção A; URLs no cliente mantidos):
+[`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
 
 Coms GA4.12 (histórico; gate **N/A** — não emitir):
 [`content-mirror-comms-ga4.12-draft.md`](content-mirror-comms-ga4.12-draft.md).
