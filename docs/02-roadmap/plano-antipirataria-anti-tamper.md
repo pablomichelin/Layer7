@@ -1,13 +1,16 @@
 # Plano — Anti-pirataria e Anti-tamper (trilha AP0–AP4)
 
-**Estado do plano:** **TRILHA FECHADA** — **`30.19` FECHADO** (`20260812T025741Z`;
+**Estado do plano:** **ENGENHARIA FECHADA** — **`30.19` FECHADO** (`20260812T025741Z`;
 GA6.7–6.12 **PASS**; fecho
 [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md);
 evidência
 [`../tests/evidence/20260812T025741Z-30.19-fecho/`](../tests/evidence/20260812T025741Z-30.19-fecho/));
-**`30.18` FECHADO** (gate-control); produção **`.254` = `1.9.54`**; lab/`latest`
-**`1.9.58`** (BG-028 Fase 1 / F1.2); ADRs 0030–0033 **`Aceito`**; **não reabrir**
-sem GO + backlog
+**ciclo de evidência operacional ABERTO** (**BG-127**, GO `2026-08-14`);
+**`30.18` FECHADO** (gate-control); **`.254` vivo = `1.9.63`** `mode=monitor`
+MITM **OFF**
+([`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/));
+histórico e2e AP2 **`.254` = `1.9.54`** (`20260811T114320Z`); lab/`latest`
+**`1.9.63`**; ADRs 0030–0033 **`Aceito`**; **não** reabrir AP0–AP4 / código
 **Tipo:** nova trilha pós-fecho; **não** reabre P0–J, IPv6 V0–V6 nem Identity de rede
 **Modelo de ameaças (base analítica):** [`../01-architecture/modelo-ameacas-antipirataria.md`](../01-architecture/modelo-ameacas-antipirataria.md) — **ACEITE como diagnóstico**
 **SSOT de execução:** este ficheiro
@@ -19,7 +22,7 @@ sem GO + backlog
 **Baseline produção enforce:** `1.9.8` — rollback enforce `1.9.0`
 **Canal lab/`latest` no arranque da trilha:** `1.9.48` — rollback lab `1.9.47`
 **Artefacto de produto:** sempre **`.pkg`** FreeBSD/pfSense (nunca APK Android). Releases novas desta trilha publicam-se em `pablomichelin/Layer7`.
-**Backlog:** BG-114…BG-123
+**Backlog:** BG-114…BG-123 **Concluido** (engenharia); **BG-127 ABERTO** (evidência operacional)
 
 **Rev. `a` (`2026-08-10`)** = criação da trilha; modelo de ameaças aceite; ondas AP0–AP4; **zero código**.
 **Rev. `b` (`2026-08-10`)** = riscos residuais RR-1…RR-5 (§0.1); emendas 30.3/30.6/30.7/30.8/30.11/30.19.
@@ -31,25 +34,28 @@ sem GO + backlog
 
 | Campo | Valor |
 |-------|-------|
-| Onda actual | **AP4 FECHADA** — trilha completa |
-| Passo actual | **`30.19` FECHADO** (fecho documental GA6.7–6.12) |
-| Próximo | Manutenção — **não** reabrir sem GO + backlog |
+| Onda actual | **AP4 FECHADA** — engenharia completa |
+| Passo actual | **`30.19` FECHADO** (engenharia); **BG-127 ABERTO** (evidência) |
+| Próximo | Evidência operacional BG-127 — **não** reabrir AP0–AP4 |
 | Depois | — |
-| Bloqueio duro | Residuais: GA5.9 campo; parecer EULA externo; RR-3 tags |
-| Código alterado até agora | 30.13–30.17; **`1.9.58` publicado** (F1.2); `30.18`/`30.19` docs/processo; produção `.254` **`1.9.54`** |
-| Gate activo | **GA6 PASS** (trilha); GA5.9 campo **PENDENTE** (fora do fecho documental) |
+| Bloqueio duro | Campo: GA2.6/2.7, GA3.7, GA4.8, GA5.9 (**BG-127**); parecer EULA externo (GA6.7); RR-3 tags |
+| Código alterado até agora | 30.13–30.17; **`1.9.58` publicado** (F1.2); `30.18`/`30.19` docs/processo; **`.254` vivo `1.9.63`** (20.36) |
+| Gate activo | **GA6 PASS** (engenharia); ciclo evidência **BG-127** |
 | Decisões 1/3/6/8 | Aplicadas (cut, check-in, agenda EULA, aviso RR-3) |
-| Agente recomendado | **Composer 2.5** — manutenção sob GO |
-| Rev. do plano | **`2026-08-10c` + fecho `30.19`** |
+| Agente recomendado | **Composer 2.5** — evidência sob GO `2026-08-14` |
+| Rev. do plano | **`2026-08-10c` + fecho `30.19` + GO evidência `2026-08-14`** |
 
 ```text
-TRILHA ANTI-PIRATARIA — FECHADA
+ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Modelo de ameaças: ACEITE (2026-08-10); reavaliado em 30.19 (GA6.8)
-- Passo: 30.19 FECHADO (20260812T025741Z)
-- Evidência: 20260812T025741Z-30.19-fecho
-- GA6.1-6.12 PASS (residuais: parecer EULA externo; RR-3 tags)
-- Produção .254: 1.9.54; lab/latest: 1.9.58 (F1.2 / BG-028)
-- BG-114…123/101 + BG-028 Fase 1 Concluido; não reabrir sem GO
+- Engenharia: 30.19 FECHADO (20260812T025741Z)
+- Evidência fecho: 20260812T025741Z-30.19-fecho
+- Ciclo evidência: BG-127 ABERTO (GO 2026-08-14) — GA2.6/2.7, GA3.7, GA4.8, GA5.9
+- GA6.7: parecer EULA externo (fora do BG-127)
+- .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254)
+- Histórico e2e AP2: .254=1.9.54 (20260811T114320Z)
+- lab/latest: 1.9.63
+- BG-114…123/101 + BG-028 Fase 1 Concluido
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o `START-HERE` no mesmo commit documental de cada fecho de passo.

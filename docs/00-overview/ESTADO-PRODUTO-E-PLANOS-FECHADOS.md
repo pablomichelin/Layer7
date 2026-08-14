@@ -44,7 +44,7 @@ substitui o `CORTEX.md` (que continua a mudar em manutenção); fixa o
 | Identity + MITM Add-on IM0–IM9 (`20.1`–`20.37`) | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **FECHADA** (`20260814T035500Z`) | [`fecho-trilha-identity-mitm-20.37.md`](../01-architecture/fecho-trilha-identity-mitm-20.37.md) · evidência `20260814T035500Z-20.37-fecho-identity-mitm` |
 
 **BG IPv6:** BG-078 … BG-084 **concluídos**.  
-**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (residual campo: BG-028 Fase 1; GA5.9).  
+**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (engenharia `30.19`). Residual campo = **BG-127** (GO `2026-08-14`; GA2.6/2.7, GA3.7, GA4.8, GA5.9). GA6.7 = parecer EULA externo. `.254` vivo = `1.9.63` MITM OFF (`20260814T034904Z-20.36-soak-align-163-254`).
 **BG Identity+MITM:** BG-085 … BG-092 **concluídos** (20.37).
 
 ---
@@ -190,3 +190,4 @@ Responder em português.
 | 2026-08-05 | F6 H5 — arquivo físico raiz `00-`…`16-` + planos fecho/IPv6 |
 | 2026-08-12 | Trilha Anti-pirataria AP0–AP4 **FECHADA** (`30.19`; GA6 PASS) |
 | 2026-08-14 | Trilha Identity + MITM **FECHADA** (`20.37`; soak `1.9.63` MITM OFF) |
+| 2026-08-14 | Anti-pirataria: engenharia permanece **FECHADA** (`30.19`); ciclo evidência **BG-127** aberto; `.254` vivo `1.9.63` (`20260814T034904Z-20.36-soak-align-163-254`) |

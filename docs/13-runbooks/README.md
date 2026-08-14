@@ -29,6 +29,10 @@ Subscrição de conteúdo / update de blacklists (30.10 — token Bearer, R-D/R-
 Check-in default ON + migração / isolados (30.14 / BG-118 — N3, R-J):
 [`check-in-migration-30.14.md`](check-in-migration-30.14.md).
 
+Evidência operacional anti-pirataria em campo (BG-127 / GO `2026-08-14` —
+GA2.6, GA2.7, GA3.7, GA4.8, GA5.9; ordem `.54`→`.254`):
+[`evidencia-operacional-antipirataria-bg127.md`](evidencia-operacional-antipirataria-bg127.md).
+
 Reposição do espelho público de conteúdo corrente (GA4.11 / `30.11` — rollback
 comercial, sem tocar enforce):
 [`content-mirror-rollback-ga4.11.md`](content-mirror-rollback-ga4.11.md).

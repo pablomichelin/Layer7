@@ -9,6 +9,7 @@
 | [`f5-preparacao-malha.md`](f5-preparacao-malha.md) | ACTIVO (área F5) | Malha de testes |
 | [`plano-isencao-vip-e-ux-gui.md`](plano-isencao-vip-e-ux-gui.md) | Ver backlog | VIP / UX |
 | [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) | **【FECHADA】** | 20.37; soak/`latest` `1.9.63` MITM OFF |
+| [`plano-antipirataria-anti-tamper.md`](plano-antipirataria-anti-tamper.md) | **engenharia FECHADA** / evidência **ABERTA** | `30.19`; ciclo **BG-127**; `.254` vivo `1.9.63` MITM OFF |
 | [`../10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md`](../10-license-server/portal/planos/2026-08-08-melhoria-total-portal.md) | **ACTIVO** (portal UI) | Melhoria total portal admin `0.0.1` → `1.0.0` (operador único; sem escala) |
 | [`f1-plano-de-implementacao.md`](f1-plano-de-implementacao.md) | Histórico F1 | — |
 | [`f2-plano-de-implementacao.md`](f2-plano-de-implementacao.md) | Histórico F2 | — |

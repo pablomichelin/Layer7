@@ -461,8 +461,11 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 ### Anti-pirataria / Anti-tamper (AP0–AP4, passos `30.x`)
 
-- [x] Trilha **FECHADA** em `30.19` (`20260812T025741Z`) — GA6.7–6.12 PASS
+- [x] Engenharia **FECHADA** em `30.19` (`20260812T025741Z`) — GA6.7–6.12 PASS
 - [x] Fecho: [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md)
-- [x] Evidência: `docs/tests/evidence/20260812T025741Z-30.19-fecho/`
-- [x] Residuais declarados: BG-028 Fase 1 **Concluido** (`v1.9.58`); GA5.9 campo; parecer EULA externo; RR-3 tags
-- [x] **Não** reabrir sem GO humano + backlog
+- [x] Evidência fecho: `docs/tests/evidence/20260812T025741Z-30.19-fecho/`
+- [x] BG-028 Fase 1 **Concluido** (`v1.9.58`); RR-3 tags; GA6.7 parecer EULA **externo**
+- [x] **Não** reabrir engenharia AP0–AP4
+- [ ] Ciclo evidência operacional **BG-127** (GO `2026-08-14`) — GA2.6, GA2.7, GA3.7, GA4.8, GA5.9
+- [x] Runbook campo: [`../13-runbooks/evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md)
+- [x] `.254` vivo = `1.9.63` `mode=monitor` MITM OFF — [`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)

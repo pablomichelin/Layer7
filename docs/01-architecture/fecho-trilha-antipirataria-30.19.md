@@ -1,13 +1,22 @@
 # Fecho da trilha Anti-pirataria / Anti-tamper — `30.19`
 
-**Estado:** FECHADO documental (`20260812T025741Z`)  
-**Trilha:** AP0–AP4 (`30.0`…`30.19`)  
+**Estado:** FECHADO documental (`20260812T025741Z`) — **engenharia** AP0–AP4
+
+**Trilha:** AP0–AP4 (`30.0`…`30.19`) — **não** reaberta
 **Escopo deste passo:** **apenas documentação** — sem código, PORTVERSION,
 publish/release, alteração de tags GitHub, produção/`.254`, CF/DNS,
 license-server.  
 **Evidência:** [`../tests/evidence/20260812T025741Z-30.19-fecho/`](../tests/evidence/20260812T025741Z-30.19-fecho/)  
 **Plano SSOT:** [`../02-roadmap/plano-antipirataria-anti-tamper.md`](../02-roadmap/plano-antipirataria-anti-tamper.md)  
 **Gates:** GA6.7–GA6.12
+
+> **Addendum `2026-08-14` (não reabre este fecho):** o ciclo de **evidência
+> operacional** passou a **BG-127** (GO humano). Este documento continua a
+> ser o fecho de **engenharia**. Estado vivo do soak `.254`: **`1.9.63`**
+> `mode=monitor` MITM **OFF** —
+> [`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/).
+> O apontador `1.9.54` abaixo é o estado **à data do fecho** (`20260812T025741Z`),
+> não o estado vivo.
 
 ---
 
@@ -125,3 +134,12 @@ builds novos sem bypass (AP1).
 
 MITM · IPv6 · ofuscação · fail-closed por rede · kill-switch · telemetria ·
 BG-028 Fase 1 (1ª publish F1.2) · promoção enforce · deploy license-server
+
+---
+
+## Addendum — ciclo de evidência operacional (`2026-08-14`)
+
+Este fecho **permanece**. O GO `2026-08-14` abre **BG-127** (GA2.6, GA2.7,
+GA3.7, GA4.8, GA5.9) sem reabrir AP0–AP4. **GA6.7** continua parecer jurídico
+externo. Hosts `.54` / `.254` fora do horário comercial; publicar só com
+necessidade técnica verificada.

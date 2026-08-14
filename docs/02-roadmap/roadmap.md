@@ -40,6 +40,19 @@ Arranque histórico: [`../00-overview/START-HERE-identity-mitm.md`](../00-overvi
 Fecho: [`../01-architecture/fecho-trilha-identity-mitm-20.37.md`](../01-architecture/fecho-trilha-identity-mitm-20.37.md).  
 Não reabrir sem GO + backlog. MITM permanente **NO-GO**.
 
+**Trilha Anti-pirataria / Anti-tamper:** [`plano-antipirataria-anti-tamper.md`](plano-antipirataria-anti-tamper.md) — **engenharia FECHADA** (`30.19`).
+
+Ciclo de **evidência operacional ABERTO:** **BG-127** (GO `2026-08-14`; GA2.6/2.7, GA3.7, GA4.8, GA5.9).
+
+Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
+
+Fecho engenharia: [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md).
+
+**`.254` vivo:** `1.9.63` `mode=monitor` MITM **OFF**
+([`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)).
+
+Não reabrir AP0–AP4 / código. GA6.7 = parecer jurídico externo.
+
 ---
 
 ## F0 — Governanca documental

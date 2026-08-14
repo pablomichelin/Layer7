@@ -319,7 +319,9 @@ primeira publicação do pacote com trust chain F1.2 activo: manifesto
 `install.sh` carimbado fail-closed e `uninstall.sh`. Herda no binário a
 trilha anti-pirataria `30.13`–`30.17` (check-in assinado, default ON em
 instalações novas, decisão de licença distribuída, marcação por cliente).
-**Não** promove produção `.254` neste bloco (permanece `1.9.54`); GA5.9
+**Não** promove produção `.254` neste bloco (permanece `1.9.54` **à data
+deste addendum** — histórico e2e AP2; soak vivo 20.36 = **`1.9.63`**
+MITM OFF); GA5.9
 campo continua separado. Pubkey de licença SoT inalterada.
 Fingerprint SHA256 da chave **pública** de release:
 `d26e3f007e81298bad910f99dd62a22e2109740158b3b3c7f4e79490bdc5a998`.

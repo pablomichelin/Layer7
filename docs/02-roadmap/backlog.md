@@ -352,7 +352,7 @@ Veredicto: núcleo sólido; Altos reais em `/tmp`, DNS passivo e allowlist IPv6.
 | BG-112 | F6 higiene estrutural residual pós-H5 (inventário, classificação, plano, gate, exclusões; lotes P1–P4) | Media | estrutura/documentacao | F6 residual | resíduo local/untracked/links/status F6; risco de apagar evidência ou misturar código/lab | P | Baixo (auditoria) / Medio (lotes) | **Auditoria PASS**; **P1 CORRIGIR PASS** (`2026-08-10`); P2–P4 físicos **bloqueados** ate GO + G0–G7 | Plano [`../00-overview/f6-plano-higiene-estrutural-residual.md`](../00-overview/f6-plano-higiene-estrutural-residual.md); inv/class `f6-*-2026-08-09.md`; **nao** reabre H1–H5; P4 FAIL/ABORT = MANTER |
 | BG-113 | Pack produto PRD+UML+catálogo + botão GUI «Reportar erro» (opt-in GitHub, sem telemetria) | Media | docs + package/GUI | F4 / manutenção | operadores sem caminho seguro para reportar bugs; docs sem PRD/UML/catálogo canónicos | P | Medio | **Concluido — publicado `1.9.48`** | Hub `pack-produto-layer7.md`; PRD/UML/catálogo; GUI Diagnósticos fluxo 3 passos; `test_error_report.php`; sem segredos |
 
-### Trilha Anti-pirataria / Anti-tamper (BG-114…BG-123)
+### Trilha Anti-pirataria / Anti-tamper (BG-114…BG-123 engenharia; BG-127 evidência)
 
 Fila governada por [`plano-antipirataria-anti-tamper.md`](plano-antipirataria-anti-tamper.md)
 (ondas AP0–AP4, passos `30.x`), arranque em
@@ -369,10 +369,12 @@ GA3 PASS. BG-120 **Concluido**. Token: `30.8`–`30.10` + e2e `1.9.54` PASS;
 dispensadas `2026-08-12`). **`30.11` cut FECHADO** (`20260812T011217Z`);
 **BG-117 Concluido**. Evidência:
 [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
-**`30.12`–`30.19` FECHADOS** — **trilha FECHADA** (`20260812T025741Z`; GA6
-PASS; BG-114…123/101 **Concluido**; **BG-028 Fase 1 Concluido** (`v1.9.58`). Candidato `1.9.58` publicado. Residuais
-fora da fila: GA5.9 campo; parecer EULA externo. **Não reabrir**
-sem GO + backlog; não misturar com MITM/IPv6.
+**`30.12`–`30.19` FECHADOS** — **trilha FECHADA** como engenharia
+(`20260812T025741Z`; GA6 PASS; BG-114…123/101 **Concluido**; **BG-028 Fase 1
+Concluido** (`v1.9.58`)). **Não** reabrir AP0–AP4 / código / PORTVERSION.
+**GO `2026-08-14`:** reabre **somente** evidência operacional em campo —
+item **BG-127**. **GA6.7** permanece parecer jurídico **externo** (fora deste
+item). Não misturar com MITM/IPv6.
 
 | ID | Item | Severidade | Area | Fase | Risco se adiado | Esforco | Beneficio | Status | Notas |
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
@@ -386,6 +388,7 @@ sem GO + backlog; não misturar com MITM/IPv6.
 | BG-121 | Alerta de abuso multi-appliance no license server (+ decisão sobre `max_activations`) | Media | license server | AP3 / passo `30.15` | integrador multi-cliente invisível (A-08) | M | Alto | **Concluido** (`30.15` `20260812T020331Z`; decisão 7 = só alerta) | dashboard queue; rebind sem FP; sem `max_activations`; sem deploy; GA5.12 PASS unit |
 | BG-122 | Distribuir decisão de licença (remover ponto único em `refresh_enforce_cfg`) | Media | daemon | AP4 / passo `30.16` | um NOP activa enforce sem licença (A-02) | M | Medio | **Concluido** (`30.16` `20260812T023529Z`; GA6.1/6.2 PASS) | gates A/B + `enforce_armed`; candidato `1.9.57` sem release; R-A declarado |
 | BG-123 | Completar cadeia de assinatura de release nas publicações (manifesto + `.sig`) | Baixa | release | AP4 / passo `30.18` | releases só com `.sha256`; contrato F1.2/ADR-0023 incompleto (A-10) | P | Medio | **Concluido** (`30.18` gate-control `20260812T025135Z`; GA6.5 processo + GA6.6) | processo F1.2 obrigatório + dry-run PASS; campo/tags → BG-028 Fase 1 **Concluido** em `v1.9.58` |
+| BG-127 | Evidência operacional em campo dos residuais anti-pirataria (N1/N2, anti-rollback, token offline, revogação) | Alta | testes/lab/licenciamento | manutenção / evidência campo (pós-`30.19`) | controlos AP1–AP3 fechados em engenharia sem prova viva N1/N2/GA3.7/GA4.8/GA5.9 | M | Alto | **Aberto — GO 2026-08-14** (só evidência; sem reabrir trilha) | Runbook [`../13-runbooks/evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md). Gates: **GA2.6**, **GA2.7**, **GA3.7**, **GA4.8**, **GA5.9**. **Fora:** GA6.7. Ordem `.54`→`.254` fora do horário comercial. Soak vivo `.254` = `1.9.63` monitor / MITM OFF (`20260814T034904Z-20.36`). Publicar só se necessidade técnica verificada. **Proibido:** MITM, enfraquecer segurança, falsear, apagar dados, reset/rebase/stash, código neste bloco documental |
 
 **Nota sobre BG-101:** reaberto em **`30.1b`** (`2026-08-10`) como **lacuna comercial
 a corrigir** (achado A-04), via ADR-0032 / BG-118 — decisão humana n.º 5 na ficha
