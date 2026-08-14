@@ -17,6 +17,11 @@ do repositório apos a consolidacao da F0.
 **Regra:** se houver conflito entre um documento canónico e um historico,
 vence o canónico.
 
+**Estado vs commit:** SSOTs e checklist **não** podem dizer «FEITO no git»
+nem marcar `[x]` como concluído **antes** de testes/gates PASS, revisão do
+diff, staging explícito por paths e commit realmente criado. Até lá o
+estado canónico é «implementado, pendente de gates/commit» (`AGENTS.md`).
+
 ---
 
 ## 1. Raiz do repositório

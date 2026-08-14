@@ -118,6 +118,11 @@ operacional.
 - manter gates, teste minimo e rollback proporcionais ao risco;
 - usar o mapa de equivalencia documental antes de assumir que raiz e `docs/`
   dizem a mesma coisa.
+- **Estado vs commit:** proibido escrever «FEITO no git», marcar checklist
+  `[x]` como concluído, ou equivalente, **antes** de testes/gates PASS,
+  revisão do diff, staging explícito por paths e commit realmente criado.
+  Até lá o estado canónico é «implementado, pendente de gates/commit».
+  «FEITO no git» só depois desses quatro passos, no mesmo bloco do commit.
 
 ---
 

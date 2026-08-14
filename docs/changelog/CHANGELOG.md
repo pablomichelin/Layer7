@@ -16,7 +16,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 governação estado vs commit:** SSOTs/checklist não dizem
+  «FEITO no git» nem marcam `[x]` antes de gates PASS, revisão do diff,
+  staging por paths e commit. Até lá o estado é «implementado, pendente
+  de gates/commit» (`AGENTS.md`).
 - **BG-128 P1-5…P1-8 + P2-12 — package/daemon lifecycle:**
+  FEITO no git após gates (`c2b9fdb` + governação neste commit).
   `layer7_checkin_enforce_ready()` recusa enforce se `check_in_enabled` e
   não houver `license_key` (air-gap = flag `false`; N3 intacto).
   `PKG_UPGRADE` e keep-config preservam `layer7.json` / `.lic` / CA MITM /

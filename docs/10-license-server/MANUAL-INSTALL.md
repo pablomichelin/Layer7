@@ -41,8 +41,8 @@ da public key ou checksum divergirem, o comportamento passa a ser
 (PF, Unbound, arranque do servico) ficam rastreaveis como `DEGRADED` no
 stdout e no syslog (`layer7-install`).
 
-**Addendum operacional BG-128 P1-5…P1-8 + P2-12 (`2026-08-14`, git, sem
-`PORTVERSION`):** check-in obrigatório (`check_in_enabled=true`) sem
+**Addendum operacional BG-128 P1-5…P1-8 + P2-12 (`2026-08-14`,
+`c2b9fdb` + governação após gates, sem `PORTVERSION`):** check-in obrigatório (`check_in_enabled=true`) sem
 `license_key` em `/var/db/layer7-checkin.json` **não arma enforce** (air-gap
 = `check_in_enabled=false`). `pkg delete` sem keep apaga json/`.lic` e o
 estado em `/var/db` (`layer7-checkin.json`, `clock-mark.json`,

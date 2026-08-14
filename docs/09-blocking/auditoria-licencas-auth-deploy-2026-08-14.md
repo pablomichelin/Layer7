@@ -27,7 +27,8 @@
 **P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244`. O serving `30.11` **já está versionado** (allowlist, sem snapshot); o freeze **não** caiu — falta GO do primeiro rebuild `api` + smoke. Um rebuild integral injectaria também P0-2…P1-4. Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
 **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12
-FEITOS no git** (`2026-08-14`; sem deploy). P2-5 ficou absorvido no P1-3.
+FEITOS no git** (`2026-08-14`; `c2b9fdb` + governação após gates; sem
+deploy). P2-5 ficou absorvido no P1-3.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
 (exceto P2-9 sem GO).
@@ -169,9 +170,10 @@ residual P0-2 single-use/bind.
 
 ### P1-5 — `.lic` manual sem chave de check-in = sem revogação / sem max-offline
 
-**FEITO no git** (`2026-08-14`). `layer7_checkin_enforce_ready()` recusa
-enforce se `check_in_enabled` e não houver `license_key`. Air-gap =
-`check_in_enabled=false`. Sem deploy / `PORTVERSION`.
+**FEITO no git** (`c2b9fdb`; governação após gates).
+`layer7_checkin_enforce_ready()` recusa enforce se `check_in_enabled` e
+não houver `license_key`. Air-gap = `check_in_enabled=false`. Sem deploy /
+`PORTVERSION`.
 
 | Campo | Valor |
 |-------|--------|
@@ -184,9 +186,9 @@ enforce se `check_in_enabled` e não houver `license_key`. Air-gap =
 
 ### P1-6 — Uninstall/revoke deixam chave e tokens em `/var/db`
 
-**FEITO no git** (`2026-08-14`). Uninstall real apaga os três paths;
-keep-config/keep-license/`PKG_UPGRADE` preservam. Revoke GUI chama
-`layer7_clear_local_license_state()`. Sem deploy.
+**FEITO no git** (`c2b9fdb`; governação após gates). Uninstall real apaga
+os três paths; keep-config/keep-license/`PKG_UPGRADE` preservam. Revoke
+GUI chama `layer7_clear_local_license_state()`. Sem deploy.
 
 | Campo | Valor |
 |-------|--------|
@@ -199,8 +201,9 @@ keep-config/keep-license/`PKG_UPGRADE` preservam. Revoke GUI chama
 
 ### P1-7 — “Manter configuração” apaga CA MITM e segredos Identity
 
-**FEITO no git** (`2026-08-14`). keep-config e `PKG_UPGRADE` fazem backup/
-restore de `mitm/` e `identity-*.secret`. Copy da GUI corrigido. Sem deploy.
+**FEITO no git** (`c2b9fdb`; governação após gates). keep-config e
+`PKG_UPGRADE` fazem backup/restore de `mitm/` e `identity-*.secret`.
+Copy da GUI corrigido. Sem deploy.
 
 | Campo | Valor |
 |-------|--------|
@@ -213,9 +216,9 @@ restore de `mitm/` e `identity-*.secret`. Copy da GUI corrigido. Sem deploy.
 
 ### P1-8 — POST-DEINSTALL apaga `layer7.json`/`.lic` sem guarda `PKG_UPGRADE`
 
-**FEITO no git** (`2026-08-14`). Delete de json/`.lic` só corre se
-`PKG_UPGRADE` estiver vazio e não houver keep. Manual e `rollback.md`
-alinhados. Sem deploy.
+**FEITO no git** (`c2b9fdb`; governação após gates). Delete de json/`.lic`
+só corre se `PKG_UPGRADE` estiver vazio e não houver keep. Manual e
+`rollback.md` alinhados. Sem deploy.
 
 | Campo | Valor |
 |-------|--------|
@@ -263,7 +266,7 @@ alinhados. Sem deploy.
 | **P2-9** | `layer7.inc:2552-2593`; `pkg-install.in:43-44` | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF. Documentado (RR-1), residual comercial | Só com GO: migração opt-in ou injectar `true` | Já existe `test_check_in_default_30.14.php`; falta teste de install a **não** migrar |
 | **P2-10** | `license.c:678-703` | `--activate` grava `.lic` sem `chmod` | umask 022 → 0644; payload assinado legível localmente | `chmod 0600` / `fchmod` como no check-in | `stat` do `.lic` = 0600 |
 | **P2-11** | `layer7.inc:6992-7035`, `7213-7234` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` exigir HW + expiry | `.lic` HW errado / expiry passado → GUI locked, daemon `valid=0` |
-| **P2-12 FEITO no git** (`2026-08-14`) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
+| **P2-12 FEITO no git** (`c2b9fdb`; governação após gates) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
 | **P2-13** | `license.c:238-247`, `518-520`, `568-573` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | Fim do dia UTC / `tm_isdst=-1` | Relógio no dia D 12:00; hoje cai para grace |
 | **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
 | **P2-15 FEITO no git** (`2026-08-14`) | Worktree local vs MATCH `20260812T002500Z` | Serving allowlist versionado; snapshot continua só em disco | Gap de código 30.11 no git fechado; snapshot/`.env` continuam fora | Inventário + commit allowlist **FEITO**; P0-1 **não** encerrado | Hashes = inventário; `check-ignore` do tarball |
@@ -387,12 +390,18 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 5. **P1-2 FEITO no git** (`2026-08-14`) — XFF / rate-limit IP; origin substitui XFF; `getClientIp` = `req.ip`. **Não** deployado. Residual: IP público no origin (PROXY/P1-9); P2-3 Proto; P2-2 CSRF.
 6. **P1-4 + P2-1 FEITOS no git** (`2026-08-14`) — lock no init; primeiro admin já owner; promoção `LIMIT 1`; alerta se `COUNT>1`. **sem** deploy `.244`.
 7. **Commit allowlist 30.11 FEITO no git** (`2026-08-14`) — **não** levanta P0-1. Sem snapshot/SPA/bind/`.env`/host.
-8. **P1-5…P1-8 + P2-12 FEITOS no git** (`2026-08-14`) — package/daemon; **sem** deploy / `PORTVERSION`.
+8. **P1-5…P1-8 + P2-12 FEITOS no git** (`c2b9fdb` + governação após gates) — package/daemon; **sem** deploy / `PORTVERSION`.
 9. **P2 / P3 restantes** — por severidade; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Governação — estado vs commit (`2026-08-14`)
+
+SSOTs e checklist **não** antecipam «FEITO no git». Código do bloco:
+`c2b9fdb`. Estado canónico **após** gates PASS + staging + este commit:
+**FEITO no git**. `P0-1` permanece ACTIVO. Sem deploy / `PORTVERSION`.
 
 ## Objectivo / impacto / risco / teste / rollback — P1-5…P1-8 + P2-12 (`2026-08-14`)
 
