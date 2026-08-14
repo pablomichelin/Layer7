@@ -445,5 +445,6 @@ checklist-mestre. **Não** antecipar PASS neste runbook.
 **Continuação `20260814T053905Z`:** **PARTIAL** — GA2.7 **PASS**; GA5.9 **FAIL
 campo** (API live pré-30.13) — ver
 [`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/).
-BG-127 permanece **aberto**. Residual: deploy API `30.13` no `.244` com GO
-próprio, depois repetir só GA5.9.
+BG-127 permanece **aberto**. **GA5.9 campo PASS** `20260814T143406Z` — ver
+[`../tests/evidence/20260814T143406Z-bg127-ga59/`](../tests/evidence/20260814T143406Z-bg127-ga59/).
+Residual: GA2.6 enforce / GA4.8 só com janela própria.

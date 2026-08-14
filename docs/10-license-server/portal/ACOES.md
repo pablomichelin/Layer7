@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — GA5.9 campo PASS (licença teste id 15)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | operação live (sem código / sem bump visual) |
+| Versão | `2.1.0` (sem alteração) |
+| Objectivo | Repetir só GA5.9 no `.254` com API `30.13` live |
+| Impacto | Cliente 9; licença id **15** expiry `2026-08-16` `base`; activada no FP `.254`; **revogada** |
+| Risco | Médio (soak `.254`); mitigado: backup novo, id 13 intocado, restore integral |
+| Teste | check-in 1 OK assinado; revoke 15; check-in 2 `revoked` assinado; `valid=0`; restore hashes |
+| Rollback | `.lic`/JSON de produção restaurados; sessão admin temporária revogada |
+| Resultado | **FEITO** — GA5.9 **PASS**; evidência `20260814T143406Z-bg127-ga59`; produção restaurada; MITM OFF |
+
+---
+
 ## 2026-08-14 — Deploy controlado API `30.13` no `.244`
 
 | Campo | Valor |

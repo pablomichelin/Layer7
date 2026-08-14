@@ -1,0 +1,13 @@
+run_id=20260814T143406Z-bg127-ga59
+utc_start=2026-08-14T14:34:06Z
+utc_end=2026-08-14T14:36:04Z
+host=192.168.100.254
+pkg=pfSense-pkg-layer7-1.9.63
+mode=monitor
+mitm_effective=false
+check_in_window=true_then_restored_absent
+test_license_id=15
+prod_license_id=13
+api_244=30.13
+code_changed=no
+package_changed=no

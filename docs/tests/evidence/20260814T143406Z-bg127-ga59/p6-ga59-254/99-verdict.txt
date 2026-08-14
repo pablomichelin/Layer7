@@ -1,0 +1,2 @@
+PASS
+reason=signed revoked accepted; valid=0; daemon alive; monitor; MITM OFF; zero Layer7 block; id13 untouched; production hashes restored
