@@ -69,11 +69,15 @@ POST 12 → 201; PUT 10 → 400; PUT sem password inalterado. `/login` não
 rejeita 10. Sem deploy / `PORTVERSION`.
 **P3-3C** FEITO no git (`2026-08-14`) —
 `verifyTotp` compara HOTP/TOTP com Buffer UTF-8 + guarda de
-comprimento + `timingSafeEqual`. Residual P3-4. Sem deploy /
+comprimento + `timingSafeEqual`. Residual P3-4 (fechado neste bloco). Sem deploy /
+`PORTVERSION`.
+**P3-4** FEITO no git (`2026-08-14`) —
+`GET /api/auth/2fa/status` captura rejeição de `pool.query` e
+devolve 500 JSON `Erro interno.`. Residual P3-5. Sem deploy /
 `PORTVERSION`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4).
 
 ---
 
@@ -333,7 +337,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P3-3A FEITO no git** (`2026-08-14`) | `routes/auth.js` `POST /login` | Email disabled → 403 `Conta desactivada.` sem bcrypt nem `registerLoginFailure` | Enumeração remota; lock 5/15 não fechava em disabled | Mesma 401 genérica + bcrypt (hash real ou dummy) + `registerLoginFailure`; audit interno `account_disabled` | Disabled vs unknown → mesmo status/body + guardas. **Não** deployado. |
 | **P3-3B** FEITO no git (`2026-08-14`) | `users.js` `normalizePassword` vs `bootstrap-admin.js:94-106` | users aceitava password ≥10; bootstrap exige 12 | Política inconsistente | Subir só `users.js` para 12; não rejeitar 10 no `/login` | `POST /api/users` com 10 → 400; 12 → 201; PUT 10 → 400; PUT sem password inalterado. **Não** deployado. |
 | **P3-3C** FEITO no git (`2026-08-14`) | `totp.js` `verifyTotp` | Comparação HOTP com `===` | Timing teórico de prefixo (6 dígitos) | Buffer UTF-8 + guarda de comprimento + `timingSafeEqual` | Código válido → true; 6 dígitos inválidos → false; malformed → false sem throw. **Não** deployado. |
-| **P3-4** | `auth.js:222-230`; Express `^4.21.2` | Falha de BD em `GET /2fa/status` | Promise rejeitada sem error handler | `try/catch` ou wrapper async | Pool a rejeitar → 500 JSON; processo vivo |
+| **P3-4 FEITO no git** (`2026-08-14`) | `auth.js` `GET /2fa/status`; Express `^4.21.2` | Falha de BD em `GET /2fa/status` | Promise rejeitada sem error handler | `try/catch` local (sem wrapper global / Express 5) | Pool a rejeitar → 500 JSON `Erro interno.`; sem unhandledRejection; segundo GET 200; 401/403 intactos. **Não** deployado. |
 | **P3-5** | `license.c:803-833` | Activate escreve `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha ⇒ unlink (sem bypass) | Verificar tmp e `rename` atómico | Crash entre write e verify → sem `.lic` inválido permanente |
 | **P3-6** | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` só C vs SoT | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Estender o gate ao PEM do port | Gate FAIL se PEM ≠ SoT |
 | **P3-7** | `license.c:518-520` vs `crud-validation.js:647-654` | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local antes do servidor); não é bypass | Interpretar expiry como UTC (`timegm`) | `TZ=America/Sao_Paulo` vs `TZ=UTC` no dia fronteira |
@@ -470,7 +474,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 21. **P3-3A FEITO no git** (`2026-08-14`) — `POST /api/auth/login` disabled e inexistente partilham 401 genérico + bcrypt + `registerLoginFailure`. **Não** deployado.
 22. **P3-3B** FEITO no git (`2026-08-14`) — `POST`/`PUT /api/users` exige password >=12; `/login` não rejeita 10. **Não** deployado.
 23. **P3-3C** FEITO no git (`2026-08-14`) — `verifyTotp` Buffer UTF-8 + guarda de comprimento + `timingSafeEqual`. **Não** deployado.
-24. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C. Residual P3-4.
+24. **P3-4** FEITO no git (`2026-08-14`) — `GET /api/auth/2fa/status` try/catch; pool rejeitado → 500 JSON; processo vivo. **Não** deployado.
+25. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4. Residual P3-5.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 

@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-140 P3-4 falha de pool em GET /2fa/status
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | `GET /api/auth/2fa/status` deixa de rejeitar a Promise sem resposta HTTP quando o pool falha |
+| Impacto | Só o handler `/2fa/status` em `routes/auth.js`: try/catch local + log `[AUTH] 2FA status error:` com `err.message` + 500 JSON `buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE)`. Sem wrapper global, sem Express 5, sem dependência nova. `totp.js` / `users.js` / `session.js` / frontend / compose intocados |
+| Risco | Baixo. Contrato 200/401/403 intacto. Overlay P0-1. Residual P3-5 |
+| Teste | Suite backend `235/235` PASS. Fail-before Express 4: timeout + unhandledRejection, sem 500 JSON. Depois: 500 `{error:'Erro interno.'}`, nenhum unhandledRejection, segundo GET saudável 200 `{totp_enabled:true}` |
+| Rollback | Reverter o commit; `/2fa/status` volta a rejeitar sem 500 JSON |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem totp.js / sem users.js / sem session.js |
+
 ## 2026-08-14 — BG-138 P3-3C comparação TOTP timing-safe
 
 | Campo | Valor |

@@ -37,6 +37,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-4 / BG-140 — falha de pool em GET /2fa/status:** FEITO
+  no git após gates deste bloco. `GET /api/auth/2fa/status` passa a
+  capturar rejeição de `pool.query` com try/catch local. Log interno
+  só `err.message` (sem email/token/segredo). Resposta 500
+  `{error:'Erro interno.'}` via `buildAuthErrorResponse`. Express 4
+  sem o catch deixava a Promise rejeitada sem 500 JSON
+  (`unhandledRejection`; pedido HTTP pendente). Segundo GET saudável
+  continua 200 `{totp_enabled:true}`; 401/403 intactos. Sem wrapper
+  global, sem Express 5, sem dependência. Residual P3-5. Sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-3C / BG-138 — comparação TOTP timing-safe:** FEITO
   no git após gates deste bloco. `verifyTotp` deixa o `===` e compara
   HOTP/TOTP com Buffer UTF-8 + guarda de comprimento +

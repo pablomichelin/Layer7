@@ -269,13 +269,18 @@ router.post('/login/totp', loginIpLimiter, async (req, res) => {
 });
 
 router.get('/2fa/status', auth, requirePermission('security.self'), async (req, res) => {
-  const result = await pool.query(
-    'SELECT totp_enabled FROM admins WHERE id = $1',
-    [req.admin.id]
-  );
-  return res.json({
-    totp_enabled: Boolean(result.rows[0]?.totp_enabled),
-  });
+  try {
+    const result = await pool.query(
+      'SELECT totp_enabled FROM admins WHERE id = $1',
+      [req.admin.id]
+    );
+    return res.json({
+      totp_enabled: Boolean(result.rows[0]?.totp_enabled),
+    });
+  } catch (err) {
+    console.error('[AUTH] 2FA status error:', err.message);
+    return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
+  }
 });
 
 router.post('/2fa/setup', auth, requirePermission('security.self'), async (req, res) => {

@@ -112,6 +112,9 @@ Documentos normativos desta arquitetura:
   **P3-3C / BG-138 (`2026-08-14`):** `verifyTotp` compara HOTP/TOTP
   com Buffer UTF-8 + guarda de comprimento + `timingSafeEqual`.
   Janela/step/HMAC/normalização intactos. Sem deploy.
+  **P3-4 / BG-140 (`2026-08-14`):** `GET /api/auth/2fa/status` captura
+  rejeição de `pool.query` com try/catch local e devolve 500 JSON
+  `Erro interno.`. Sem wrapper global, sem Express 5. Sem deploy.
 
 ### Frontend
 

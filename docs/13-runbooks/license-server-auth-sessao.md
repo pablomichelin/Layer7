@@ -65,6 +65,13 @@ Referencias normativas:
   diferentes = mismatch sem chamar `timingSafeEqual`. Janela/step/HMAC/
   normalização intactos. `/login/totp`, enable e disable continuam a
   receber booleanos. `auth.js` intocado.
+- **P3-4 / BG-140:** `GET /api/auth/2fa/status` captura falha de
+  `pool.query` com try/catch local. Log interno só `err.message`
+  (sem email/token/segredo). Resposta 500
+  `buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE)` =
+  `{error:'Erro interno.'}`. 401/403 e 200 normal intactos. Sem
+  wrapper global / Express 5. `totp.js` / `users.js` / `session.js`
+  intocados.
 - Auditoria minima:
   - auth/sessao e mutacoes administrativas em `admin_audit_log`
   - guardas de lockout em `admin_login_guards`
