@@ -136,6 +136,11 @@ contrato HEAD (bind loopback; Host desconhecido → 444). Bind live
 `0.0.0.0` continua ajuste de edge, **não** default do repo. Este
 runbook **não** autoriza deploy no `.244` (P0-1).
 
+P2-6 Bloco A (`2026-08-14`) versiona `.dockerignore` nos contextos
+`backend`/`frontend` e `USER node` só no `api`. Isso **não** autoriza
+rebuild da imagem no `.244`. Compose/healthcheck (Bloco B) **não**
+entrou neste bloco; o hash do compose no inventário P0-1 permanece.
+
 ### 4. Deploy por allowlist de paths (nunca integral)
 
 É **proibido** `rsync` do tree `license-server/`, `docker compose`

@@ -90,9 +90,11 @@ Sem mudança de runtime. Residual P3-9 (fechado neste bloco — opção A).
 documental**; URLs **não** removidos). Sem mudança de runtime.
 Nota [`nota-404-esperado-cut-30.11.md`](nota-404-esperado-cut-30.11.md);
 evidência [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/).
+**P2-6 Bloco A FEITO** no git (`2026-08-14`; `.dockerignore` + `USER node`
+no backend; sem compose/healthcheck; sem Docker build/up).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9).
 
 ---
 
@@ -329,7 +331,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P2-3 FEITO no git** (`2026-08-14`) | `nginx.conf`; `session.js` `requireSecureSessionRequest`; `index.js` `trust proxy: 1` | HTTP ao origin + `X-Forwarded-Proto: https` | `req.secure===true` (antes); password/TOTP/Bearer em HTTP se bind ≠ loopback | Nginx: `X-Forwarded-Proto $scheme`; login só no host F2.1 (ou localhost em `development`/`test`) | HTTP + header https + Host de origin → login 400. **Não** deployado. Residual: Host oficial no origin HTTP. |
 | **P2-4 FEITO no git** (`2026-08-14`) | `admin-surface.js` `updateLoginGuard` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasava-se (SELECT + `failure_count+1` + UPSERT `EXCLUDED`) | UPSERT atómico `failure_count = failure_count + 1` na janela de 15 min; `RETURNING` | 10 `registerLoginFailure` concorrentes → count=10 + lock. **Não** deployado. |
 | **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual XFF = P1-2 **FEITO** no git. |
-| **P2-6** | `backend/Dockerfile`; `frontend/Dockerfile`; compose | Root; sem healthcheck; sem `.dockerignore`; `COPY . .` | RCE = root; `.env` no layer se estiver no contexto; API sobe antes do PG | `USER node`; `.dockerignore` (`.env`); `pg_isready` + `depends_on` healthy | `docker inspect` User ≠ root; build com `.env` no contexto → ausente na imagem |
+| **P2-6 Bloco A FEITO no git** (`2026-08-14`) | `backend/Dockerfile`; `backend/.dockerignore`; `frontend/.dockerignore` | Root no `api`; sem `.dockerignore`; `COPY . .` | RCE no contentor = root; `.env` no layer se estiver no contexto | `.dockerignore` (`.env` / `.env.*` / `node_modules` / `.git`) + `USER node` só no backend após `COPY`. Frontend nginx listen 80 **sem** `USER node`. Compose/healthcheck = Bloco B (fora) | Cadeado `dockerfile-p26.test.js` (4 PASS). Residual: `docker inspect` / build com `.env` (proibido neste bloco); Bloco B. **Não** deployado. |
 | **P2-7 FEITO no git** (`2026-08-14`) | `license.c` `layer7_checkin_store_key` | `store_key` mantinha `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar só `features` / `features_set` | store_key(nova) → `features_set==0`; intervalos preservados. **Não** deployado. |
 | **P2-8 FEITO no git** (`2026-08-14`) | `license.c` `checkin_save_state` vs clock-mark | `fopen(..., "w")` truncava; crash a meio | Após P1-5, estado vazio recusa enforce; `.lic` intacto | tmp + `chmod 0600` + `rename`; escape JSON | Falha de tmp preserva o ficheiro anterior; aspas/barra re-lidas. **Não** deployado. |
 | **P2-9** | `layer7.inc:2552-2593`; `pkg-install.in:43-44` | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF. Documentado (RR-1), residual comercial | Só com GO: migração opt-in ou injectar `true` | Já existe `test_check_in_default_30.14.php`; falta teste de install a **não** migrar |
@@ -434,7 +436,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 
 - Sem `privileged`, sem `network_mode: host`.
 - Portas: só nginx no bind configurável; `db` e `api` não publicados.
-- Residual: P2-6.
+- Residual: P2-6 Bloco B (`pg_isready` + `depends_on` healthy). Bloco A **FEITO** no git (`2026-08-14`; sem deploy).
 
 ### Package rc.d / PF
 
@@ -495,7 +497,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 26. **P3-6** FEITO no git (`2026-08-14`) — `verify-prod-pubkey.sh` exige PEM do port == SoT; selftest local sem builder. **Não** deployado.
 27. **P3-8 AVALIADO no git** (`2026-08-14`) — recheck read-only do cut `30.11` (`asset_count=0`, 404×4, primary 401). Sem mudança de runtime. Residual P3-9 (fechado neste bloco — opção A).
 28. **P3-9 AVALIADO no git** (`2026-08-14`; **BG-150**; opção A — **FEITO documental**) — docs «404 esperado»; URLs **não** removidos. Sem mudança de runtime. Residual: remover URL = bloco futuro + GO.
-29. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9. Residual P3-7.
+29. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
+30. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9. Residual P2-6 Bloco B + P3-7.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -564,6 +567,23 @@ Evidência [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evi
 **Não é P3-9:** recheck `asset_count` (isso é **P3-8**, já fechado).
 **Não é P3-9:** `gh release upload` na tag `blacklists-ut1-current` (isso é
 **GA4.11**, o contrário — reabre A-06).
+
+## Prova P2-6 Bloco A — `.dockerignore` + `USER node` no backend (`2026-08-14`)
+
+**Pedido implementado:** só o Bloco A da triagem P2-6 — ignore do
+contexto + processo `node` no `api`. **Sem** compose/healthcheck
+(Bloco B). **Sem** `USER node` no frontend (`nginx:alpine`, listen 80).
+**Sem** Docker build/up/pull/push, deploy, `.244`/`.254`, builder,
+release, package, `PORTVERSION` ou rebuild `api`.
+**Veredicto:** P2-6 Bloco A **FEITO** no git. P0-1 **ACTIVO**.
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Impedir `.env`/lixo no layer (`COPY . .`) e correr a API como `node` |
+| Impacto | `backend/Dockerfile` + `.dockerignore` backend/frontend + cadeado `dockerfile-p26.test.js` + docs. Compose hash P0-1 **intacto** |
+| Risco | Baixo. Live inalterado sem rebuild. Residual: prova `docker inspect` / build com `.env`; Bloco B (`pg_isready`) |
+| Teste | `node --test src/dockerfile-p26.test.js` — 4 PASS. Sem Docker |
+| Rollback | `git revert` deste commit. Live não muda. Freeze permanece |
 
 ## Prova P2-13 — política de datas, meia-noite e DST (`2026-08-14`)
 

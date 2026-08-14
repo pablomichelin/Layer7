@@ -16,6 +16,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P2-6 Bloco A — Docker context + user:** FEITO no git.
+  `backend/.dockerignore` e `frontend/.dockerignore` excluem `.env`,
+  `.env.*`, `node_modules` e `.git`. O `backend/Dockerfile` corre
+  `CMD` como `USER node` após o último `COPY`. Frontend nginx
+  listen 80 **sem** `USER node`. Compose/healthcheck **fora**
+  (Bloco B; hash P0-1 intacto). Cadeado
+  `dockerfile-p26.test.js` (4 PASS). Sem Docker build/up, sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-9 / BG-150 — docs pós-cut «404 esperado»:** AVALIADO
   no git (opção A — **FEITO documental**; URLs **não** removidos).
   A tag `blacklists-ut1-current` foi cortada em `30.11`; os quatro

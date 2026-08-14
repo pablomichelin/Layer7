@@ -34,6 +34,10 @@ Hashes reconfirmados (worktree = inventário `2026-08-14T15:31:37Z`):
 | `content/blacklists/ut1/current/.gitkeep` | `b737992495499531e471c1af53a8aabf551f8b4365c52670b6d03950a4e321d5` |
 | `docker-compose.yml` | `7845ac363911bce8828a957cd520ff2c7d40316e37cac5eff29df4d98974f63a` |
 
+P2-6 Bloco A (`2026-08-14`) **não** altera este compose. Ignore +
+`USER node` no backend ficam no git; rebuild `api` no `.244` continua
+**proibido** até GO do primeiro overlay + smoke.
+
 ---
 
 ## Regra
