@@ -133,6 +133,7 @@ Pós-cut: `asset_count=0`; release id `313502667`; tag `blacklists-ut1-current` 
 
 ## Ligação
 
+- Recheck P3-8 (`2026-08-14`): [`../tests/evidence/20260814T200900Z-p38-cut-recheck/`](../tests/evidence/20260814T200900Z-p38-cut-recheck/) (`asset_count=0`; 404×4)
 - Evidência primary auth: [`../tests/evidence/20260812T003214Z-30.11-auth-get-254/`](../tests/evidence/20260812T003214Z-30.11-auth-get-254/)
 - Rascunho coms (histórico; não emitir): [`../13-runbooks/content-mirror-comms-ga4.12-draft.md`](../13-runbooks/content-mirror-comms-ga4.12-draft.md)
 - Ficha 30.1 (dec. 3 Sim em princípio): [`decisoes-humanas-30.1.md`](decisoes-humanas-30.1.md)

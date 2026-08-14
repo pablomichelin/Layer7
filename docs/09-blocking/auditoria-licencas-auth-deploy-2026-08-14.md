@@ -82,9 +82,13 @@ Activate promove `.lic` de forma atómica (tmp 0600 + verify +
 **P3-6** FEITO no git (`2026-08-14`) —
 `verify-prod-pubkey.sh` exige PEM do port == SoT (e == C). Residual P3-7.
 Sem deploy / `PORTVERSION`.
+**P3-8 AVALIADO** no git (`2026-08-14`) — recheck read-only do cut
+`30.11`: `asset_count=0`, 404×4, primary 401
+([`20260814T200900Z-p38-cut-recheck`](../tests/evidence/20260814T200900Z-p38-cut-recheck/)).
+Sem mudança de runtime. Residual P3-9.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8).
 
 ---
 
@@ -96,6 +100,7 @@ GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
 - Testes JS locais de check-in/policy/crud já tinham PASS `31/31` na evidência do deploy `30.13`.
 - Material de chave, `.env`, tokens e licenças **não** foi lido nem impresso.
 - Achados são do **código HEAD** (e, para P0-1, do gap documentado HEAD↔live). O worktree sujo `30.11` **não** foi tratado como HEAD.
+- **P3-8 (pós-auditoria):** a auditoria original **não** contactou o GitHub. O recheck read-only BG-146 (`20260814T200900Z`) confirmou o cut; fecho documental BG-148. Sem hosts de produto.
 
 ---
 
@@ -108,7 +113,7 @@ GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
 | **Estado** | **BLOQUEIO OPERACIONAL ACTIVO** — serving versionado no git; **não** encerrado |
 | **Evidência** | Inventário read-only `2026-08-14T15:31:37Z`; hashes dos 7 paths no runbook de freeze. Histórico pré-commit: evidência `20260814T142739Z`; HEAD sem `content-auth.js` / `routes/content.js` / volume / vhost `downloads`. |
 | **Cenário** | `rsync` / `docker compose` rebuild / playbook genérico do clone HEAD sobre `/opt/layer7-license`. Também: `rsync --delete`; substituir compose/nginx live pelo HEAD; `git add -A` (tarball ~31 MB + risco de `.env`). |
-| **Impacto** | Primary autenticado de blacklists cai. Clientes `1.9.54+` com token falham o GET current; o espelho GitHub já está `asset_count=0` (último recheck `20260812T013145Z`). Actualização de conteúdo parte. `rsync --delete` pode ainda apagar snapshot e `.env` (crash-loop histórico). Rebuild integral injecta também P0-2…P1-4. |
+| **Impacto** | Primary autenticado de blacklists cai. Clientes `1.9.54+` com token falham o GET current; o espelho GitHub está `asset_count=0` (recheck `20260814T200900Z` / BG-146; anterior `20260812T013145Z`). Actualização de conteúdo parte. `rsync --delete` pode ainda apagar snapshot e `.env` (crash-loop histórico). Rebuild integral injecta também P0-2…P1-4. |
 | **Correcção mínima** | 1) Inventário **FEITO**. 2) Commit allowlist **FEITO** (7 paths; sem `index.js` — mount já no HEAD). 3) Gate de deploy: nunca sync integral; overlay por paths. 4) GO humano + smoke **PENDENTE**. |
 | **Testes** | Hashes = inventário; `npm test` content + backend `173/173`; `git archive` resolve `routes/content`; `check-ignore` do snapshot. Smoke live **só com GO**. **Não** repetir GA5.9 sem GO. |
 | **Até lá** | Proibido deploy integral do HEAD. Overlay `30.13` permanece o único padrão autorizado. Snapshot/`.env` **não** entram no git. |
@@ -348,7 +353,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P3-5 FEITO no git** (`2026-08-14`) | `license.c` `promote_license_atomic` / `layer7_license_check_path` | Activate escrevia `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha apagava o anterior | tmp 0600 no mesmo dir + verify + `rename`; falha preserva o anterior | Crash após write do tmp → final anterior intacto; inválido remove tmp; sucesso 0600. **Não** deployado. |
 | **P3-6 FEITO no git** (`2026-08-14`) | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Gate exige PEM == SoT == C (32 B raw SPKI) | Coincidente PASS; ausente/inválido/divergente FAIL; SoT≠C FAIL. **Não** deployado. |
 | **P3-7** | `license.c:518-520` vs `crud-validation.js:647-654` | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local antes do servidor); não é bypass | Interpretar expiry como UTC (`timegm`) | `TZ=America/Sao_Paulo` vs `TZ=UTC` no dia fronteira |
-| **P3-8** | `20260812T013145Z` último `asset_count=0` | Sem recheck em 14-08 | Outros PoPs/TTL não observados | Recheck só com pedido do gestor (esta auditoria não contactou GitHub) | `asset_count` + 404 anónimo |
+| **P3-8 AVALIADO no git** (`2026-08-14`) | Recheck `20260814T200900Z` (BG-146) + `20260812T013145Z` | Auditoria original sem contacto GitHub | Outros PoPs/TTL não observados na auditoria | **Sem mudança** — recheck read-only confirmou o cut (ver prova) | `asset_count=0`; 404 anónimo ×4; primary 401. Residual P3-9. |
 | **P3-9** | `update-blacklists.sh:38-39`; `layer7.inc:10659-10668`; `config.json.sample:1-4` | Cliente ainda aponta espelho GitHub / tarball anónimo | Cut = 404 esperado; confunde ops; risco de reupload GA4.11 sem GO | Documentar «404 esperado» vs remover URL (bloco separado) | Sample/docs alinhados ao cut |
 
 ---
@@ -484,11 +489,50 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 24. **P3-4** FEITO no git (`2026-08-14`) — `GET /api/auth/2fa/status` try/catch; pool rejeitado → 500 JSON; processo vivo. **Não** deployado.
 25. **P3-5** FEITO no git (`2026-08-14`) — promoção atómica do `.lic` em Activate (tmp 0600 + verify + rename); falha preserva o anterior. **Não** deployado.
 26. **P3-6** FEITO no git (`2026-08-14`) — `verify-prod-pubkey.sh` exige PEM do port == SoT; selftest local sem builder. **Não** deployado.
-27. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6. Residual P3-7.
+27. **P3-8 AVALIADO no git** (`2026-08-14`) — recheck read-only do cut `30.11` (`asset_count=0`, 404×4, primary 401). Sem mudança de runtime. Residual P3-9.
+28. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8. Residual P3-7 / P3-9.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Prova P3-8 — recheck read-only do cut `30.11` (`2026-08-14`)
+
+**Pedido avaliado:** recheck `asset_count` + 404 anónimo do espelho
+`blacklists-ut1-current` (último prova `20260812T013145Z`; a auditoria
+original **não** contactou o GitHub).
+**Veredicto:** o cut **continua fechado**. Sem mudança de runtime.
+Evidência [`../tests/evidence/20260814T200900Z-p38-cut-recheck/`](../tests/evidence/20260814T200900Z-p38-cut-recheck/).
+
+| Check | `20260812T013145Z` | Recheck 14-08 (BG-146) |
+|-------|--------------------|------------------------|
+| Release id | `313502667` | `313502667` |
+| Tag | `blacklists-ut1-current` | igual; `prerelease=true`; `draft=false` |
+| `asset_count` | **0** | **0** (`assets=[]`) |
+| Anónimo nofollow ×4 | 404 / size 9 | **404 / size 9** |
+| Anónimo follow ×4 | 404 / size 9 | **404 / size 9** (sem 302→CDN) |
+| Residual CDN | nenhum neste vantage | **nenhum** |
+| Primary sem token | 401 | **401** |
+
+**Não é P3-8:** `releases/latest` / botão «Verificar actualização» /
+`v1.9.63` (canal do **pacote**; a tag `blacklists-ut1-current` é
+ignorada pelo updater, BG-030). **Não é P3-8:** remover URLs do
+cliente — isso é **P3-9**.
+
+No HEAD o 404 do espelho é o comportamento esperado: a cadeia pára no
+HTTP antes de `pkeyutl`; `hold-active` / LKG preservam listas; enforce
+não desliga. Primary autenticado **não** foi reexecutado (token só no
+appliance).
+
+## Objectivo / impacto / risco / teste / rollback — P3-8 prova (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Reconfirmar em 14-08 que o cut `30.11` continua vazio, sem reabrir o espelho |
+| Impacto | Só docs + evidência. Daemon / pacote / `PORTVERSION` / builder / release / deploy **intactos** |
+| Risco | Nenhum de runtime. Residual: cliente/docs ainda anunciam o URL (P3-9); PoPs/TTL não vistos noutros vantages |
+| Teste | `asset_count=0`; 404 anónimo ×4; primary 401. Contraste `latest` = `v1.9.63` (7 assets) |
+| Rollback | Remover a nota documental; o cut já era o anterior. **Não** reupload (GA4.11 / A-06) |
 
 ## Prova P2-13 — política de datas, meia-noite e DST (`2026-08-14`)
 

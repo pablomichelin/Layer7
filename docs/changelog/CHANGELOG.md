@@ -16,6 +16,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P3-8 / BG-148 — recheck read-only do cut `30.11`:** AVALIADO
+  no git após a evidência `20260814T200900Z`. Release
+  `blacklists-ut1-current` id `313502667` continua `asset_count=0`;
+  anónimo 404×4 (nofollow e follow, size 9, sem 302→CDN); primary sem
+  token 401. Contraste `releases/latest` = `v1.9.63` (7 assets) — canal
+  do pacote, **não** é P3-8. Sem mudança de runtime. Residual P3-9
+  (cliente/docs ainda anunciam o URL). Sem `PORTVERSION`, sem deploy
+  (P0-1 ACTIVO).
 - **BG-128 P2-13 — política de datas / meia-noite / DST:** AVALIADO
   no git após gates deste bloco. `expiry=YYYY-MM-DD` continua a
   meia-noite local (`mktime` hora 0). No dia D às 12:00 a licença já

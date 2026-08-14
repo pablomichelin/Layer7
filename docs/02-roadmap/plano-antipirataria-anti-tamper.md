@@ -343,6 +343,8 @@ servir conteúdo corrente. O GO deve ser pedido com esta consequência à vista.
 **FECHADO (`20260812T011217Z`):** GO gestor + `gh release delete-asset` ×4 em
 `blacklists-ut1-current` (ids `405033619`/`405033621`/`405033618`/`405033620`);
 release/tag preservados (`313502667`); `asset_count=0`.
+Recheck P3-8 `2026-08-14`: ainda `asset_count=0` + 404×4
+([`../tests/evidence/20260814T200900Z-p38-cut-recheck/`](../tests/evidence/20260814T200900Z-p38-cut-recheck/)).
 Evidência: [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evidence/20260812T011217Z-30.11-cut-mirror/).
 Prep: [`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md).
 **GA4.12:** **N/A**. **GA4.10/15:** **PASS** (residual CDN @cut; recheck
