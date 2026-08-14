@@ -1,0 +1,15 @@
+utc=20260814T224254Z
+host=systemupfw.system.up
+pkg=pfSense-pkg-layer7-1.9.63
+layer7d=running pid 98114
+tlsproxy=not running
+mode=monitor
+layer7_enabled=true
+mitm.enabled=false
+mitm_effective=false
+check_in_enabled=absent
+valid=1
+clock_suspect=0
+content_subscription=ok
+json_sha256=f966fc92b622ad6391bf633b0b1567e0d87703a75526c02c86cf03eae5587b32
+lic_sha256=05fd6411aa3f1be9af2ceb7a05b4493c4b2be58c5b46e0cc8c3f0e2e3d8c629e

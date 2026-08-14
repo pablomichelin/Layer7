@@ -1,0 +1,5 @@
+hostname=ubuntu
+date_utc=Fri Aug 14 22:42:51 UTC 2026
+iface=ens160 inet 192.168.100.54/24
+listen_443_8443=NO_443_8443
+poc_dir=/opt/layer7-poc present (not listening)

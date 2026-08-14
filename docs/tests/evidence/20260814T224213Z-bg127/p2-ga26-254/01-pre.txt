@@ -1,0 +1,8 @@
+TAG=PRE
+mode=monitor
+layer7_enabled=true
+mitm.enabled=false
+mitm_effective=false
+should_enforce=false
+valid=1 clock_suspect=0 customer=Systemup
+layer7d is running as pid 98114

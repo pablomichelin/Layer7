@@ -1,0 +1,11 @@
+utc=20260814T224435Z
+gate=GA2.6
+mode_pre=monitor
+mode_during=enforce
+mode_post=monitor
+valid=1
+pid=98114
+should_enforce_during=true
+mitm_effective=false
+json_sha256_final=f966fc92b622ad6391bf633b0b1567e0d87703a75526c02c86cf03eae5587b32
+duration_s=~7

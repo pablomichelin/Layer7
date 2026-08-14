@@ -1,0 +1,2 @@
+PASS
+offline within token window: no intervention; hold-active; mode/valid/daemon intact

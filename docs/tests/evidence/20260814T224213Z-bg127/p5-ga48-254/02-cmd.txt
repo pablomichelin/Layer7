@@ -1,0 +1,6 @@
+# Attempt 1 (INEFFECTIVE on pfSense): append 127.0.0.2 downloads.systemup.inf.br
+# and github.com to /etc/hosts — curl still resolved via Unbound and fetched
+# primary (same snapshot ut1-2026-04-25). hosts restored from backup.
+# Attempt 2 (EFFECTIVE): HTTPS_PROXY/https_proxy/HTTP_PROXY/ALL_PROXY=http://127.0.0.2:1
+# only around update-blacklists.sh --download. LAN/Unbound untouched.
+# --check-subscription before/during/after (status only; Bearer redacted in log tail).

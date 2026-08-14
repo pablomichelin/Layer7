@@ -1,0 +1,14 @@
+utc=20260814T224620Z
+pkg=pfSense-pkg-layer7-1.9.63
+mode=monitor
+layer7_enabled=true
+mitm_effective=false
+valid=1
+pid=98114
+json_sha256=f966fc92b622ad6391bf633b0b1567e0d87703a75526c02c86cf03eae5587b32
+lic_sha256=05fd6411aa3f1be9af2ceb7a05b4493c4b2be58c5b46e0cc8c3f0e2e3d8c629e
+hosts_sha256=4d7a31a86a64e57a86b19e3d15513af7a34ec58ef7cbc32faeaa43c09e1df0fb
+content_subscription=ok
+NO_8443
+NO_MITM_RDR
+tlsproxy=not running

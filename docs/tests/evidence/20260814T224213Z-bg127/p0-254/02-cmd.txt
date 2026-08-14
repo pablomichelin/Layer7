@@ -1,0 +1,7 @@
+ssh root@192.168.100.254 'hostname; date -u; pkg query %n-%v pfSense-pkg-layer7; layer7d -V; service layer7d status; service layer7-tlsproxy status || true'
+ssh root@192.168.100.254 'layer7d --license-status'
+# PHP field-specific extract (mode / enabled / mitm / check_in / mitm_effective)
+# sockstat 8443; pfctl mitm rdr
+# sha256 layer7.json + layer7.lic
+# --check-subscription (status only; token not copied)
+# backup tarball /root/layer7-backup-bg127-20260814T224213Z.tgz (copy only)

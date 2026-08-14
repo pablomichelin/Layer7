@@ -1,0 +1,2 @@
+PASS
+valid license + enforce mode identical to N1: daemon alive, PF block rules present, MITM OFF, restore to monitor

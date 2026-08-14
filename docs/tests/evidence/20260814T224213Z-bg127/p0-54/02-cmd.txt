@@ -1,0 +1,2 @@
+ssh root@192.168.100.54 'hostname; date -u; ip -4 addr show; ss -lnt | grep -E ":443|:8443" || echo NO_443_8443; ls -ld /opt/layer7-poc'
+# ICMP ping timed out; SSH BatchMode OK on retry

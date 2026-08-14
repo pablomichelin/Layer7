@@ -17,11 +17,9 @@ Evidência: pasta `docs/tests/evidence/<run_id>/` sempre que houver lab.
 `FAIL` em **todos** os gates de AP1 em diante, além dos critérios próprios de cada gate.
 
 **Dois ciclos (não misturar):** engenharia AP0–AP4 **FECHADA** em `30.19`
-(`20260812T025741Z`). Ciclo de **evidência operacional ABERTO** — **BG-127**
-(GO `2026-08-14`): GA2.6, GA2.7, GA3.7, GA4.8, GA5.9. **1ª execução**
-`20260814T051611Z` = **PARTIAL**; continuação `20260814T053905Z` = **PARTIAL**
-(GA2.7 **PASS**; GA5.9 **FAIL campo** — API live rejeita `nonce`). **Não**
-fecha BG-127. **GA6.7** permanece parecer jurídico **externo**. **`.254` vivo:**
+(`20260812T025741Z`). Ciclo de **evidência operacional FECHADO** — **BG-127 PASS**
+(`20260814T224213Z`; GA2.6 enforce + GA4.8 campo; GA2.7/GA3.7/GA5.9 já PASS).
+**GA6.7** permanece parecer jurídico **externo**. **`.254` vivo:**
 `1.9.63` `mode=monitor` MITM **OFF**
 ([`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)).
 Histórico e2e AP2: `.254` = `1.9.54` (`20260811T114320Z`).
@@ -29,7 +27,8 @@ Runbook de campo:
 [`../13-runbooks/evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md).
 Evidência:
 [`../tests/evidence/20260814T051611Z-bg127/`](../tests/evidence/20260814T051611Z-bg127/)
-+ [`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/).
++ [`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/)
++ [`../tests/evidence/20260814T224213Z-bg127/`](../tests/evidence/20260814T224213Z-bg127/).
 
 ---
 
@@ -86,7 +85,7 @@ de clientes pagantes.
 | GA2.3 | Modo dev existe apenas sob `L7_DEV_BUILD`, flag ausente do port | **PASS** (`30.4`) |
 | GA2.4 | Artefacto strippado: `nm`/`strings` sem símbolos de licença | **PASS** (`20260810T200329Z` — stripped; marcadores ausentes) |
 | GA2.5 | Daemon arranca, `-t` PASS, `--fingerprint` PASS após strip | **PASS** (`1.9.50` no builder) |
-| GA2.6 | Licença válida ⇒ enforce idêntico ao `1.9.48` (**N1**) | **PASS parcial** campo (`20260814T051611Z`) — modo **monitor** inalterado; enforce activo **DEFERRED** (sem GO de janela) |
+| GA2.6 | Licença válida ⇒ enforce idêntico ao `1.9.48` (**N1**) | **PASS** campo (`20260814T224213Z`) — `mode=enforce` + PF `layer7:block:*`; `valid=1`; PID intacto; MITM OFF; restore a `monitor`. Monitor já PASS em `20260814T051611Z` |
 | GA2.7 | Licença ausente/inválida ⇒ monitor, daemon vivo, zero regras PF de block (**N2**) | **PASS** campo (`20260814T053905Z`) — licença teste id 14 ausente ⇒ `valid=0`, daemon vivo, zero block; produção restaurada |
 | GA2.8 | Stats/ficheiros forjados **não** desbloqueiam Identity/MITM na GUI | **PASS** (`20260810T214800Z` — `test_entitlements_gui.php`) |
 | GA2.9 | Gate MITM não é activável escrevendo ficheiros à mão | **PASS** (`layer7-mitm-entitle-ok` + rc.d; R-A permanece) |
@@ -95,10 +94,11 @@ de clientes pagantes.
 
 **Saída:** o caminho de bypass mais curto desaparece e o custo de ataque sobe de
 minutos para horas com ferramentas. **Não** se declara "impossível de contornar".
-**Estado GA2:** parcial — GA2.1–2.5 + GA2.8–2.11 **PASS** (`30.4`+`30.5`+`30.7`);
-GA2.6 **PASS parcial** (monitor) + enforce **DEFERRED**; GA2.7 **PASS**
-(`20260814T053905Z`) — campanhas [`20260814T051611Z-bg127`](../tests/evidence/20260814T051611Z-bg127/)
-+ [`20260814T053905Z-bg127`](../tests/evidence/20260814T053905Z-bg127/).
+**Estado GA2:** **PASS** — GA2.1–2.5 + GA2.8–2.11 (`30.4`+`30.5`+`30.7`);
+GA2.6 **PASS** enforce (`20260814T224213Z`); GA2.7 **PASS**
+(`20260814T053905Z`). Campanhas [`20260814T051611Z-bg127`](../tests/evidence/20260814T051611Z-bg127/)
++ [`20260814T053905Z-bg127`](../tests/evidence/20260814T053905Z-bg127/)
++ [`20260814T224213Z-bg127`](../tests/evidence/20260814T224213Z-bg127/).
 
 ---
 
@@ -135,7 +135,7 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 | GA4.5 | Cliente **sem** token: não actualiza, mantém conteúdo antigo, **enforce intacto** (**R-D**, **N4**) | **PASS** (local/builder + `.254` hold-active; snapshot intacto; evidência `20260811T020533Z`) |
 | GA4.6 | Falha de rede/servidor: **zero** impacto em enforce (**R-C**, **N3**) | **PASS** (`30.10` — sem token: conteúdo local mantido; enforce/mode intactos no `.254`) |
 | GA4.7 | Estado da subscrição de conteúdo visível e compreensível na GUI | **PASS** (GUI + helper; e2e `1.9.54` / `20260811T114320Z` reportou `status=ok`) |
-| GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** local (PHP); **DEFERRED** campo (`20260814T051611Z`) — token real `ok` (~27 d); isolamento de rede **não** executado (risco de tráfego no soak) |
+| GA4.8 | Offline prolongado dentro da janela definida: PASS sem intervenção | **PASS** campo (`20260814T224213Z`) — token `ok`; corte do updater (proxy morto) → HTTP 000 primary+mirror; hold-active `ut1-2026-04-25`; modo/`valid`/PID intactos. Duração real ~60 s (declarada). `/etc/hosts` no pfSense **não** isola `curl` (Unbound) |
 | GA4.9 | Assinatura do manifesto continua verificada como hoje (integridade preservada) | **PASS** (`30.10` — `openssl pkeyutl -verify` do manifesto intacto no cliente) |
 | GA4.10 | Espelho anónimo já não serve conteúdo **corrente**; nenhum appliance legítimo perde enforce | **PASS** (`20260812T011217Z`) — release `blacklists-ut1-current` com **0 assets**; enforce não tocado. Residual CDN @ cut+~1min (302→SAS; manifesto 200; tarball 404); recheck `20260812T012017Z` **404×4** — evidência `03-recheck-cdn.txt` |
 | GA4.11 | Procedimento de reposição do espelho pronto e testado (rollback comercial) | **DOC READY** — [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md); reposição não executada (não necessária) |
@@ -150,7 +150,7 @@ Gate da onda de **maior valor estratégico**. Também o de maior risco de suport
 `docs/tests/evidence/20260812T003214Z-30.11-auth-get-254/` **PASS**.
 
 **Estado GA4:** **PASS** nos critérios de cut (GA4.10/15) + GA4.1–4.7/4.9/4.13/4.14
-**PASS**; primary auth preflight **PASS**; 30.9 **live**; GA4.8 local **PASS**, campo **DEFERRED** (`20260814T051611Z`);
+**PASS**; primary auth preflight **PASS**; 30.9 **live**; GA4.8 campo **PASS** (`20260814T224213Z`);
 GA4.11 doc ready; **GA4.12 N/A**. Residual CDN GitHub @ cut documentado;
 recheck anónimo **404×4** (`03-recheck-cdn.txt`) — release continua vazia.
 
@@ -249,3 +249,4 @@ Qualquer um destes, em qualquer gate, é `FAIL` sem discussão:
 | `2026-08-14` | campo residual | **BG-127** | **ABERTO** — formalização documental apenas; **sem** execução; **sem** PASS de GA2.6/2.7/3.7/4.8/5.9; GA6.7 fora | soak vivo [`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/) (`.254`=`1.9.63` monitor / MITM OFF) |
 | `2026-08-14` | campo residual | **BG-127** P0–P6 | **PARTIAL** — P0/P1 **PASS**; GA2.6 **PASS parcial** (monitor) + enforce **DEFERRED**; GA3.7 **PASS**; GA2.7 **ABORT**; GA4.8 **DEFERRED**; GA5.9 **ABORT**; produção intocada; MITM OFF | [`20260814T051611Z-bg127`](../tests/evidence/20260814T051611Z-bg127/) |
 | `2026-08-14` | campo residual | **BG-127** P3+P6 | **PARTIAL** — GA2.7 **PASS**; GA5.9 **FAIL campo** (API live rejeita `nonce`; N3; legado 409 revoked); id 13 intocado; produção restaurada; MITM OFF | [`20260814T053905Z-bg127`](../tests/evidence/20260814T053905Z-bg127/) |
+| `2026-08-14` | campo residual | **BG-127** P2+P5 | **PASS** — GA2.6 enforce + GA4.8 campo; soak restaurado `1.9.63` monitor / MITM OFF; fecha BG-127 | [`20260814T224213Z-bg127`](../tests/evidence/20260814T224213Z-bg127/) |

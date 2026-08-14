@@ -22,7 +22,7 @@ histórico e2e AP2 **`.254` = `1.9.54`** (`20260811T114320Z`); lab/`latest`
 **Baseline produção enforce:** `1.9.8` — rollback enforce `1.9.0`
 **Canal lab/`latest` no arranque da trilha:** `1.9.48` — rollback lab `1.9.47`
 **Artefacto de produto:** sempre **`.pkg`** FreeBSD/pfSense (nunca APK Android). Releases novas desta trilha publicam-se em `pablomichelin/Layer7`.
-**Backlog:** BG-114…BG-123 **Concluido** (engenharia); **BG-127 ABERTO** (evidência operacional)
+**Backlog:** BG-114…BG-123 **Concluido** (engenharia); **BG-127 PASS** (evidência operacional `20260814T224213Z`)
 
 **Rev. `a` (`2026-08-10`)** = criação da trilha; modelo de ameaças aceite; ondas AP0–AP4; **zero código**.
 **Rev. `b` (`2026-08-10`)** = riscos residuais RR-1…RR-5 (§0.1); emendas 30.3/30.6/30.7/30.8/30.11/30.19.
@@ -35,7 +35,7 @@ histórico e2e AP2 **`.254` = `1.9.54`** (`20260811T114320Z`); lab/`latest`
 | Campo | Valor |
 |-------|-------|
 | Onda actual | **AP4 FECHADA** — engenharia completa |
-| Passo actual | **`30.19` FECHADO** (engenharia); **BG-127 ABERTO** (evidência) |
+| Passo actual | **`30.19` FECHADO** (engenharia); **BG-127 PASS** (evidência `20260814T224213Z`) |
 | Próximo | Evidência operacional BG-127 — **não** reabrir AP0–AP4 |
 | Depois | — |
 | Bloqueio duro | Campo: GA2.6/2.7, GA3.7, GA4.8, GA5.9 (**BG-127**); parecer EULA externo (GA6.7); RR-3 tags |
@@ -46,11 +46,11 @@ histórico e2e AP2 **`.254` = `1.9.54`** (`20260811T114320Z`); lab/`latest`
 | Rev. do plano | **`2026-08-10c` + fecho `30.19` + GO evidência `2026-08-14`** |
 
 ```text
-ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
+ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL FECHADA (BG-127 PASS)
 - Modelo de ameaças: ACEITE (2026-08-10); reavaliado em 30.19 (GA6.8)
 - Engenharia: 30.19 FECHADO (20260812T025741Z)
 - Evidência fecho: 20260812T025741Z-30.19-fecho
-- Ciclo evidência: BG-127 ABERTO (GO 2026-08-14) — PARTIAL 20260814T051611Z + 20260814T053905Z (GA2.7 PASS; GA5.9 FAIL campo)
+- Ciclo evidência: BG-127 PASS (20260814T224213Z; GA2.6 enforce + GA4.8 campo)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254)
 - Histórico e2e AP2: .254=1.9.54 (20260811T114320Z)

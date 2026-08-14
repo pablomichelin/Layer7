@@ -1,0 +1,2 @@
+identical to 01-pre plus backup created (no mutation of active .lic/json)
+backup_tgz_sha256=63f08e04aa56e06388989c70f8e66165c186dd823c38126fed0af5f0d3e53d42

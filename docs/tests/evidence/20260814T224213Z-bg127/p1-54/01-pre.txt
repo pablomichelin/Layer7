@@ -1,0 +1,1 @@
+ubuntu 192.168.100.54/24; NO_443_8443; no pfSense-pkg-layer7

@@ -1,0 +1,7 @@
+mode=monitor
+valid=1 clock_suspect=0
+pid=98114
+content_subscription=ok
+lkg_present=82 files
+token_file=/var/db/layer7/content-subscription.json mode=600 size=410
+hosts_sha256=4d7a31a86a64e57a86b19e3d15513af7a34ec58ef7cbc32faeaa43c09e1df0fb

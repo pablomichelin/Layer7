@@ -1,0 +1,4 @@
+utc=20260814T224251Z
+host=192.168.100.54
+role=witness
+layer7_dut=N/A

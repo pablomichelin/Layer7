@@ -1,6 +1,6 @@
 # Runbook — Evidência operacional anti-pirataria (BG-127)
 
-**Estado:** activo com GO humano `2026-08-14` (só evidência; **não** reabre `30.19`)
+**Estado:** **FECHADO — PASS** `20260814T224213Z` (só evidência; **não** reabre `30.19`)
 
 **Backlog:** BG-127
 
@@ -30,6 +30,13 @@
 > manteve `valid=1`; legado sem nonce = `409 revoked`. Produção restaurada.
 > MITM OFF. Sem código/release.
 > Evidência: [`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/).
+>
+> **BLOCO 5 (`2026-08-14` `20260814T224213Z`) — residual GA2.6 enforce + GA4.8.**
+> Campanha **PASS**. GA2.6 enforce: `mode=enforce` + PF block; `valid=1`;
+> mesmo PID; MITM OFF; restore a `monitor`. GA4.8: token `ok`; corte do
+> updater → HTTP 000; hold-active; modo intacto. Produção restaurada.
+> Sem código/release. Evidência:
+> [`../tests/evidence/20260814T224213Z-bg127/`](../tests/evidence/20260814T224213Z-bg127/).
 
 Este ficheiro **não** substitui os runbooks de mecanismo
 ([`check-in-migration-30.14.md`](check-in-migration-30.14.md),
@@ -447,4 +454,6 @@ campo** (API live pré-30.13) — ver
 [`../tests/evidence/20260814T053905Z-bg127/`](../tests/evidence/20260814T053905Z-bg127/).
 BG-127 permanece **aberto**. **GA5.9 campo PASS** `20260814T143406Z` — ver
 [`../tests/evidence/20260814T143406Z-bg127-ga59/`](../tests/evidence/20260814T143406Z-bg127-ga59/).
-Residual: GA2.6 enforce / GA4.8 só com janela própria.
+Residual: **nenhum** — GA2.6 enforce + GA4.8 **PASS** em
+[`../tests/evidence/20260814T224213Z-bg127/`](../tests/evidence/20260814T224213Z-bg127/).
+BG-127 **FECHADO**.

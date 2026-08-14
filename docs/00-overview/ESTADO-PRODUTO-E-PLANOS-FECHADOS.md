@@ -44,7 +44,7 @@ substitui o `CORTEX.md` (que continua a mudar em manutenção); fixa o
 | Identity + MITM Add-on IM0–IM9 (`20.1`–`20.37`) | [`plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md) | **FECHADA** (`20260814T035500Z`) | [`fecho-trilha-identity-mitm-20.37.md`](../01-architecture/fecho-trilha-identity-mitm-20.37.md) · evidência `20260814T035500Z-20.37-fecho-identity-mitm` |
 
 **BG IPv6:** BG-078 … BG-084 **concluídos**.  
-**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (engenharia `30.19`). Residual campo = **BG-127 ABERTO / PARCIAL** (GO `2026-08-14`; campanhas `20260814T051611Z` + `20260814T053905Z`). GA2.7 **PASS**; GA3.7 **PASS**; GA4.8 **DEFERRED**; GA5.9 **FAIL campo** (API live pré-30.13 rejeita `nonce` HTTP 400). GA2.6 PASS parcial (monitor) + enforce DEFERRED. **Este bloco:** só docs — **sem** código / release / deploy. GA6.7 = parecer EULA externo. `.254` vivo = `1.9.63` MITM OFF (`20260814T034904Z-20.36-soak-align-163-254`).
+**BG Anti-pirataria:** BG-114 … BG-123 (+ BG-101) **concluídos** (engenharia `30.19`). Residual campo = **BG-127 PASS** (`20260814T224213Z`; GA2.6 enforce + GA4.8 campo; GA2.7/GA3.7/GA5.9 já PASS). GA6.7 = parecer EULA externo. `.254` vivo = `1.9.63` MITM OFF (`20260814T034904Z-20.36-soak-align-163-254`).
 **BG Identity+MITM:** BG-085 … BG-092 **concluídos** (20.37).
 
 ---
@@ -137,7 +137,7 @@ stubs na raiz do repo. Ver equivalência. Onboarding:
 | MITM / Identity add-on | **Plano ABERTO** (PME Identity-first; MITM **DEFER** 20.7a) | [`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md) · [`posicionamento-pme-identity-first.md`](posicionamento-pme-identity-first.md); ADR-0017 com MITM OFF; ADR-0026 diferido |
 | Anti-pirataria residual RR-3 | Tags antigas descarregáveis | Aviso [`aviso-releases-antigas-rr3-30.19.md`](../06-releases/aviso-releases-antigas-rr3-30.19.md); tags **não** removidas (decisão 8) |
 | EULA parecer jurídico | Agenda registada (`30.19`) | [`eula-revisao-juridica-30.19.md`](../09-blocking/eula-revisao-juridica-30.19.md) — parecer externo pendente; minuta-base `2026-08-14` **não** é parecer nem fecha GA6.7 |
-| Evidência operacional anti-pirataria (BG-127) | **ABERTO / PARCIAL** | GA2.7 **PASS**; GA3.7 **PASS**; GA4.8 **DEFERRED**; GA5.9 **FAIL campo** (API live pré-30.13 rejeita `nonce` HTTP 400). Runbook [`evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md). Evidência [`20260814T051611Z-bg127`](../tests/evidence/20260814T051611Z-bg127/) + [`20260814T053905Z-bg127`](../tests/evidence/20260814T053905Z-bg127/). **Sem** código / release / deploy neste bloco. **Não** fecha a trilha `30.19`. |
+| Evidência operacional anti-pirataria (BG-127) | **FECHADO / PASS** | GA2.6 **PASS** (monitor + enforce); GA2.7 **PASS**; GA3.7 **PASS**; GA4.8 **PASS** campo; GA5.9 **PASS**. Fecho [`20260814T224213Z-bg127`](../tests/evidence/20260814T224213Z-bg127/). **Não** reabre a trilha `30.19`. GA6.7 fora. |
 | Trust chain pacote F1.2 campo | Processo obrigatório (`30.18`); publish Fase 1 pendente | BG-028 / ADR-0023 |
 | Console multi-firewall | Fora de fila | — |
 | Rebind automático de licença | Fora de fila | — |
@@ -192,4 +192,4 @@ Responder em português.
 | 2026-08-12 | Trilha Anti-pirataria AP0–AP4 **FECHADA** (`30.19`; GA6 PASS) |
 | 2026-08-14 | Trilha Identity + MITM **FECHADA** (`20.37`; soak `1.9.63` MITM OFF) |
 | 2026-08-14 | Anti-pirataria: engenharia permanece **FECHADA** (`30.19`); ciclo evidência **BG-127** aberto; `.254` vivo `1.9.63` (`20260814T034904Z-20.36-soak-align-163-254`) |
-| 2026-08-14 | BG-127 permanece **ABERTO / PARCIAL** (bloco documental): GA2.7 e GA3.7 **PASS**; GA4.8 **DEFERRED**; GA5.9 **FAIL campo** (API live pré-30.13 rejeita `nonce` HTTP 400); minuta EULA registada; **sem** código / release / deploy |
+| 2026-08-14 | BG-127 **PASS** (`20260814T224213Z`): GA2.6 enforce + GA4.8 campo; soak restaurado `1.9.63` monitor / MITM OFF; **sem** código / release / deploy |

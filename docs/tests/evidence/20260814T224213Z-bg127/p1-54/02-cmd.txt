@@ -1,0 +1,1 @@
+read-only hostname/date/ss; no install; no license test routed via .54

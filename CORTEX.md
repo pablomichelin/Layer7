@@ -68,7 +68,7 @@ GA5.12 **PASS** (unit); **`30.16` FECHADO** — decisão de licença distribuíd
 (sidecar opaco; sem telemetria); GA6.3/6.4 **PASS**; candidato **`1.9.58`**
 (publicado `v1.9.58` / BG-028 Fase 1); **`30.18` FECHADO** (gate-control); **engenharia
 Anti-pirataria FECHADA** em **`30.19`** (`20260812T025741Z`; GA6.7–6.12 **PASS**);
-**ciclo de evidência operacional ABERTO** (**BG-127**, GO `2026-08-14`;
+**ciclo de evidência operacional FECHADO** (**BG-127 PASS** `20260814T224213Z`;
 continuação `20260814T053905Z` GA2.7 PASS / GA5.9 FAIL campo;
 API `30.13` live `.244` `20260814T142739Z`; GA5.9 campo **PASS**
 `20260814T143406Z`; **P0-1 ACTIVO** — proibido deploy integral do HEAD
@@ -1748,7 +1748,7 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
 - **Plano SSOT (ondas AP0–AP4, passos `30.x`, §8 Composer):**
   [`docs/02-roadmap/plano-antipirataria-anti-tamper.md`](docs/02-roadmap/plano-antipirataria-anti-tamper.md)
 - **Gates GA0–GA6:**
-  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0–GA6 PASS** (engenharia fechada `30.19`; 6.5 residual BG-028 **FECHADO** `v1.9.58`; 6.7 residual parecer EULA **externo**); ciclo evidência **BG-127 PARTIAL** (GA2.6 PASS parcial / GA2.7 **PASS** / GA3.7 PASS / GA4.8 DEFERRED / GA5.9 **PASS** `20260814T143406Z`); API `30.13` live `.244`; GA4.12 **N/A**
+  [`docs/09-blocking/plano-gates-antipirataria.md`](docs/09-blocking/plano-gates-antipirataria.md) — **GA0–GA6 PASS** (engenharia fechada `30.19`; 6.5 residual BG-028 **FECHADO** `v1.9.58`; 6.7 residual parecer EULA **externo**); ciclo evidência **BG-127 PASS** (`20260814T224213Z`; GA2.6 enforce + GA4.8 campo); API `30.13` live `.244`; GA4.12 **N/A**
 - **Evidência campo 30.10 (e2e PASS `1.9.54`):**
   [`docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/`](docs/tests/evidence/20260811T114320Z-30.10-e2e-154-254/)
 - **Evidência 30.11 primary auth GET PASS:**
@@ -1829,7 +1829,7 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
   [`docs/13-runbooks/content-mirror-comms-ga4.12-draft.md`](docs/13-runbooks/content-mirror-comms-ga4.12-draft.md) (**histórico — GA4.12 N/A**)
 - **Backlog:** BG-114…BG-123 **Concluido** (incl. BG-101/118); **BG-028 Fase 1 Concluido** (`v1.9.58`)
 - **Ordem:** `30.0`→…→**`30.19` FECHADO** — **engenharia FECHADA**
-- **Ciclo evidência:** **BG-127 ABERTO** (GO `2026-08-14`; PARTIAL `20260814T051611Z` + `20260814T053905Z`)
+- **Ciclo evidência:** **BG-127 PASS** (`20260814T224213Z`; GA2.6 enforce + GA4.8 campo)
 - **Auditoria `2026-08-14` / freeze deploy:** **BG-128 ABERTO** — P0-1 ACTIVO
   (serving `30.11` versionado no git; **não** encerrado);
   **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git (`2026-08-14`; `c2b9fdb` + governação após gates; sem deploy / `PORTVERSION`);
@@ -1874,8 +1874,8 @@ TRILHA ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Diagnóstico: ACEITE 2026-08-10 (A-01..A-10); reavaliado 30.19
 - Engenharia: 30.19 FECHADO (20260812T025741Z)
 - Evidência fecho: 20260812T025741Z-30.19-fecho
-- Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
-- Campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
+- Ciclo evidência: BG-127 PASS (20260814T224213Z)
+- Campo: GA2.6 PASS (monitor+enforce); GA2.7 PASS; GA3.7 PASS; GA4.8 PASS; GA5.9 PASS
 - Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git (c2b9fdb + governação após gates); P2-7+P2-8+P2-10 FEITOS no git; P2-11 FEITO no git; A1/A2/M2 FEITO no git (28c97ad + governação após gates); M1 FEITO no git (GUI/helper via layer7d --fingerprint); P2-17 FEITO no git (LAYER7_TEST_NOW só com LAYER7_TEST_ROOT); P2-3 FEITO no git (origin X-Forwarded-Proto $scheme); P1-9 AVALIADO no git (residual pós-P2-3 não aberto no HEAD; sem mudança de runtime); P2-2 FEITO no git (CSRF admin fail-closed Origin/Sec-Fetch-Site); P2-13 AVALIADO no git (meia-noite local / DST / UTC sem correção única segura; sem mudança de runtime); P2-4 FEITO no git (incremento atómico de failure_count; sem deploy); P2-6 Bloco A FEITO no git (.dockerignore + USER node no backend; sem compose/healthcheck; sem deploy); P2-6 Bloco B FEITO no git (pg_isready + depends_on service_healthy; sem Docker build/up; sem deploy); P0-2 residual single-use/bind FEITO no git (jti + admin_totp_challenges; sem deploy); P3-1 FEITO no git (sessão única atómica com lock do admin; sem deploy); P3-2 FEITO no git (GET /api/auth/session inclui a.totp_enabled; sem deploy); P3-3A FEITO no git (POST /login disabled e inexistente partilham 401 genérico + bcrypt + registerLoginFailure; sem deploy); P3-3B FEITO no git (POST/PUT /api/users exige password >=12; /login não rejeita 10; sem deploy); P3-3C FEITO no git (verifyTotp Buffer UTF-8 + guarda de comprimento + timingSafeEqual; sem deploy); P3-4 FEITO no git (GET /2fa/status try/catch + 500 JSON; sem deploy); P3-5 FEITO no git (promoção atómica do .lic em Activate; sem deploy); P3-6 FEITO no git (gate PEM do port == SoT; sem deploy); P3-8 AVALIADO no git (cut 30.11 asset_count=0 + 404x4; sem mudança de runtime); P3-9 AVALIADO no git (BG-150; opção A — FEITO documental; URLs não removidos; sem mudança de runtime); P2-16 AVALIADO no git (BG-151; opção A — FEITO documental; rollback preferido = overlay bbc74a5; tag pre-30.13 não é padrão/latest); P2-14 AVALIADO no git (BG-152; opção A — FEITO documental; bypass ABI -f = política BG-106; builder FreeBSD 16 não provado); P3-7 AVALIADO no git (BG-153; opção A — FEITO documental; timegm/gmmktime não são correção; sem mudança de runtime); próximo código com GO = P0-1 rebuild api + smoke (sem P2-9; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - ADRs 0030-0033: Aceito
@@ -2092,7 +2092,7 @@ CHECKPOINT CANONICO
 - Planos fecho P0–J + IPv6 V0–V6: **FECHADOS** — ver docs/00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md
 - Pack produto: docs/00-overview/pack-produto-layer7.md → prd / uml / catalogo
 - Trilha Identity + MITM: **【FILA FECHADA】** (20.37); soak `.254` = `1.9.63` MITM OFF; Squid rejeitado
-- Anti-pirataria: engenharia **FECHADA** (`30.19`); evidência operacional **ABERTA** (BG-127 PARTIAL; GA5.9 campo **PASS** `20260814T143406Z`; residual GA2.6 enforce / GA4.8)
+- Anti-pirataria: engenharia **FECHADA** (`30.19`); evidência operacional **FECHADA** (BG-127 **PASS** `20260814T224213Z`)
 - MITM: operação = GUI + entitlement; **sem** ficha-papel
 - GO produto: docs/09-blocking/GO-produto-20.10.md
 - Arranque: docs/00-overview/START-HERE-identity-mitm.md

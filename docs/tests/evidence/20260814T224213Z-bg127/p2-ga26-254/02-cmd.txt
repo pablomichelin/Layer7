@@ -1,0 +1,6 @@
+# PHP on DUT (same path as GUI Settings):
+# layer7_load_or_default(); mode=enforce; layer7_save_json();
+# layer7_signal_reload(); layer7_filter_configure_safe();
+# observe license-status / service / pfctl -sr / MITM tokens
+# then mode=monitor via the same path (restore in the same SSH)
+# MITM fields never written

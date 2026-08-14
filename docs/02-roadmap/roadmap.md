@@ -42,7 +42,7 @@ Não reabrir sem GO + backlog. MITM permanente **NO-GO**.
 
 **Trilha Anti-pirataria / Anti-tamper:** [`plano-antipirataria-anti-tamper.md`](plano-antipirataria-anti-tamper.md) — **engenharia FECHADA** (`30.19`).
 
-Ciclo de **evidência operacional ABERTO:** **BG-127** (GO `2026-08-14`; GA2.6/2.7, GA3.7, GA4.8, GA5.9).
+Ciclo de **evidência operacional FECHADO:** **BG-127 PASS** (`20260814T224213Z`; GA2.6 enforce + GA4.8 campo). GA6.7 permanece parecer jurídico externo.
 
 **P0-1 ACTIVO** (`2026-08-14`): proibido deploy integral do HEAD sobre o `.244`.
 Serving `30.11` **versionado no git** (allowlist 7 paths); o freeze **não**

@@ -1,0 +1,2 @@
+PASS
+GA2.6+ on this host = N/A

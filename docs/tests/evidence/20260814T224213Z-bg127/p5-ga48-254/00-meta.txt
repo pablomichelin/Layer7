@@ -1,0 +1,12 @@
+utc=20260814T224456Z
+gate=GA4.8
+token=ok
+isolation=process_proxy_127.0.0.2:1
+hosts_override=ineffective_unbound
+duration_s=~60
+snapshot_kept=ut1-2026-04-25
+lkg_sha_during=2fac7c2fa01ee37cced304de9937cd8d3fab59cf16dbbe9a2c018b087da73333
+mode=monitor
+valid=1
+pid=98114
+hosts_sha_final=4d7a31a86a64e57a86b19e3d15513af7a34ec58ef7cbc32faeaa43c09e1df0fb

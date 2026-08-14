@@ -1,0 +1,12 @@
+pkg=pfSense-pkg-layer7-1.9.63
+layer7d=running pid 98114
+tlsproxy=not running (default OFF)
+mode=monitor
+layer7_enabled=true
+mitm.enabled=false
+mitm_effective=false
+NO_8443
+NO_MITM_RDR
+valid=1 customer=Systemup expiry=2030-01-09 clock_suspect=0
+content_subscription=ok
+lkg=present
