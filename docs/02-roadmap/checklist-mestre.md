@@ -469,3 +469,6 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [ ] Ciclo evidência operacional **BG-127** (GO `2026-08-14`) — PARTIAL; GA5.9 campo **PASS** `20260814T143406Z`; residual GA2.6 enforce / GA4.8 **DEFERRED** — item permanece aberto
 - [x] Runbook campo: [`../13-runbooks/evidencia-operacional-antipirataria-bg127.md`](../13-runbooks/evidencia-operacional-antipirataria-bg127.md)
 - [x] `.254` vivo = `1.9.63` `mode=monitor` MITM OFF — [`20260814T034904Z-20.36-soak-align-163-254`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/)
+- [x] Auditoria `2026-08-14` registada — [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
+- [x] **P0-1 ACTIVO** — proibido deploy integral do HEAD enquanto 30.11 live não estiver versionado — [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md)
+- [ ] **BG-128** remediações auditoria — aberto; próximo bloco técnico seguro = **P1-1** (sem `.244`, sem commit 30.11)

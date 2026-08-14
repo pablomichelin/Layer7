@@ -71,7 +71,10 @@ Anti-pirataria FECHADA** em **`30.19`** (`20260812T025741Z`; GA6.7–6.12 **PASS
 **ciclo de evidência operacional ABERTO** (**BG-127**, GO `2026-08-14`;
 continuação `20260814T053905Z` GA2.7 PASS / GA5.9 FAIL campo;
 API `30.13` live `.244` `20260814T142739Z`; GA5.9 campo **PASS**
-`20260814T143406Z`); fecho
+`20260814T143406Z`; **P0-1 ACTIVO** — proibido deploy integral do HEAD
+enquanto `30.11` live não estiver versionado
+([auditoria `2026-08-14`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md));
+**BG-128** aberto); fecho
 [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab actual: **`1.9.62`**;
@@ -817,6 +820,12 @@ Health público/origin `ok`. Tag rollback
 `layer7-license-api:pre-30.13-20260814T142739Z`.
 Portal visual git **`2.1.0`** (30.15) **sem** deploy SPA.
 Planos 003/004 CONCLUIDOS; sem plano `ACTIVO`.
+**P0-1 ACTIVO:** proibido deploy integral do HEAD (rsync/rebuild/playbook)
+enquanto o serving `30.11` live não estiver reconciliado/versionado —
+[`auditoria-licencas-auth-deploy-2026-08-14.md`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
++ [`bloqueio-deploy-integral-head-30.11.md`](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md).
+Worktree sujo `30.11` **preservar** (não `git add -A`). **BG-128** aberto;
+próximo bloco técnico seguro = **P1-1** (check-in arquivada → `revoked`).
 **não** reabrir MITM permanente (20.37). `.254` **não** tocado neste bloco.
 
 ---
@@ -1518,7 +1527,14 @@ PASS; legado sem nonce preservado). Evidência
 **GA5.9 campo PASS** `20260814T143406Z` (id 15 revogada; envelope assinado
 `revoked`; `valid=0`; id 13 intocado; produção restaurada). Evidência
 [`20260814T143406Z-bg127-ga59`](docs/tests/evidence/20260814T143406Z-bg127-ga59/).
-**GA6.7** continua parecer jurídico externo. **Não** reabre AP0–AP4 / código / MITM.
+**Auditoria `2026-08-14` registada** (somente leitura; sem hosts):
+[`auditoria-licencas-auth-deploy-2026-08-14.md`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md).
+**P0-1 ACTIVO** — bloqueio operacional contra deploy integral do HEAD
+enquanto `30.11` live não estiver versionado
+([runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md)).
+**BG-128** aberto (remediações P0–P3). Próximo bloco técnico seguro:
+**P1-1**. Worktree sujo `30.11` **não** commitado. **GA6.7** continua
+parecer jurídico externo. **Não** reabre AP0–AP4 / código / MITM.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
 [`docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md`](docs/01-architecture/contrato-token-subscricao-conteudo-30.8.md);
@@ -1583,7 +1599,12 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
   [`docs/tests/evidence/20260814T142739Z-30.13-api-244/`](docs/tests/evidence/20260814T142739Z-30.13-api-244/)
 - **Evidência GA5.9 campo PASS:**
   [`docs/tests/evidence/20260814T143406Z-bg127-ga59/`](docs/tests/evidence/20260814T143406Z-bg127-ga59/)
+- **Auditoria licenças/auth/deploy `2026-08-14`:**
+  [`docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
+- **Runbook freeze deploy integral (P0-1):**
+  [`docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md`](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md)
 - **Backlog evidência operacional:** BG-127
+- **Backlog remediações auditoria:** BG-128
 - **Runbook evidência operacional:**
   [`docs/13-runbooks/evidencia-operacional-antipirataria-bg127.md`](docs/13-runbooks/evidencia-operacional-antipirataria-bg127.md)
 - **Evidência BG-028 Fase 1 (`v1.9.58` F1.2):**
@@ -1612,7 +1633,11 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
 - **Backlog:** BG-114…BG-123 **Concluido** (incl. BG-101/118); **BG-028 Fase 1 Concluido** (`v1.9.58`)
 - **Ordem:** `30.0`→…→**`30.19` FECHADO** — **engenharia FECHADA**
 - **Ciclo evidência:** **BG-127 ABERTO** (GO `2026-08-14`; PARTIAL `20260814T051611Z` + `20260814T053905Z`)
-- **GOs humanos remanescentes (fora da engenharia):** parecer EULA externo (GA6.7)
+- **Auditoria `2026-08-14` / freeze deploy:** **BG-128 ABERTO** — P0-1 ACTIVO
+  ([relatório](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
+  [runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md))
+- **GOs humanos remanescentes (fora da engenharia):** parecer EULA externo (GA6.7);
+  GO para levantar P0-1 (commit allowlist 30.11 + primeiro rebuild)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
   kill-switch, CRL offline, telemetria; reabrir AP0–AP4; alterar MITM
@@ -1625,6 +1650,7 @@ TRILHA ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
 - Campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
+- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD); BG-128 ABERTO; próximo código = P1-1
 - GA6.7: parecer EULA externo (fora do BG-127)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)

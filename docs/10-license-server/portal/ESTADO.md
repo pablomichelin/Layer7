@@ -1,6 +1,7 @@
 # Estado Actual — Portal Admin
 
 > Snapshot: **2026-08-14** — API live **`30.13`** (`20260814T142739Z`); SPA visual **`2.0.0`** intocada.
+> **P0-1 ACTIVO:** proibido deploy integral do HEAD enquanto `30.11` live não estiver versionado.
 
 ## Ambiente
 
@@ -26,6 +27,9 @@
 
 ## Próximo
 
-1. Repetir **só** GA5.9 no `.254` com GO próprio — **não** neste bloco.
-2. Novo plano portal só com ideias **ACEITE** + GO (nenhum plano `ACTIVO`).
-3. Não misturar com MITM permanente (fila 20.37 fechada).
+1. **P0-1:** sem rsync/rebuild integral HEAD→`.244`. Runbook
+   [`../../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
+2. Código seguinte (BG-128): **P1-1** — sem tocar neste host.
+3. Novo plano portal só com ideias **ACEITE** + GO (nenhum plano `ACTIVO`).
+4. Não misturar com MITM permanente (fila 20.37 fechada).
+5. Não sincronizar SPA `2.1.0` sem GO.

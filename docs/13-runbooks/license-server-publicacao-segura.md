@@ -13,6 +13,12 @@ Este runbook complementa:
 - [`../03-adr/ADR-0007-publicacao-segura-license-server.md`](../03-adr/ADR-0007-publicacao-segura-license-server.md)
 - [`../10-license-server/MANUAL-USO-LICENCAS.md`](../10-license-server/MANUAL-USO-LICENCAS.md)
 
+**P0-1 ACTIVO (`2026-08-14`):** este runbook **não** autoriza rsync/rebuild
+integral do HEAD sobre `/opt/layer7-license`. O live corre serving `30.11`
+que o HEAD ainda não versiona. Freeze e critérios de levantamento:
+[`bloqueio-deploy-integral-head-30.11.md`](bloqueio-deploy-integral-head-30.11.md).
+Auditoria: [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md).
+
 ---
 
 ## Topologia oficial

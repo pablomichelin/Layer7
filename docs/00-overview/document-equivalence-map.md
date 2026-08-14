@@ -87,6 +87,13 @@ Ele existe para evitar tres erros comuns:
    mas a continuidade oficial passa a viver no `CORTEX.md`, complementada em
    `docs/00-overview/handoff-chat-novo.md` (procedimento, prompt modelo e
    verificacao opcional pos-clone), sem conflito com a hierarquia do CORTEX.
+5. **License-server HEAD vs live `.244` (`2026-08-14`):** o compose/nginx
+   HEAD descrevem o contrato F2.1 (`127.0.0.1:8445`, sem vhost `downloads`);
+   o live corre serving `30.11` + overlay `30.13`. Fonte canónica do gap e
+   do freeze: [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
+   + [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
+   **Não** tratar o compose HEAD como descrição do live enquanto P0-1 estiver
+   activo. Worktree sujo `30.11` **não** é HEAD.
 
 ---
 

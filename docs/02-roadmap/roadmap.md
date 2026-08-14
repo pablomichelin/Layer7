@@ -44,6 +44,12 @@ Não reabrir sem GO + backlog. MITM permanente **NO-GO**.
 
 Ciclo de **evidência operacional ABERTO:** **BG-127** (GO `2026-08-14`; GA2.6/2.7, GA3.7, GA4.8, GA5.9).
 
+**P0-1 ACTIVO** (`2026-08-14`): proibido deploy integral do HEAD sobre o `.244`
+enquanto o serving `30.11` live não estiver versionado — **BG-128**;
+relatório [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
+runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
+Próximo bloco técnico seguro: **P1-1**.
+
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
 
 Fecho engenharia: [`../01-architecture/fecho-trilha-antipirataria-30.19.md`](../01-architecture/fecho-trilha-antipirataria-30.19.md).
