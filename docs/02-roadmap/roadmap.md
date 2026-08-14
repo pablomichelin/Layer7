@@ -90,8 +90,8 @@ verify + rename; sem deploy / `PORTVERSION`).
 (`2026-08-14`; cut `30.11` `asset_count=0` + 404×4; sem mudança de
 runtime).
 **P3-9 AVALIADO** no git
-(`2026-08-14`; opção A — docs «404 esperado»; URLs de runtime
-mantidos; sem mudança de runtime).
+(`2026-08-14`; **BG-150**; opção A — **FEITO documental**; URLs
+**não** removidos; sem mudança de runtime).
 Próximo código
 com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem
 M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9). **P0-1 ACTIVO**

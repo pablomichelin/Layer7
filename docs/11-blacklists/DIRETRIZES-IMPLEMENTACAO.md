@@ -735,8 +735,10 @@ o risco de regressão.
 > GitHub acima é **legado / fallback de runtime** — **não** se remove
 > neste bloco. GET anónimo devolve **404 esperado**. Primary exige
 > token (401 sem token). Isto **não** é o canal do pacote nem motivo
-> para reupload GA4.11. Nota:
+> para reupload GA4.11. URLs **não** removidos. Nota:
 > [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
+> Evidência BG-150:
+> [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/).
 | `auto_update` | boolean | Actualização automática via cron |
 | `update_interval_hours` | int | Intervalo em horas (mínimo 1) |
 | `categories` | string[] | IDs das categorias com acção `deny` |

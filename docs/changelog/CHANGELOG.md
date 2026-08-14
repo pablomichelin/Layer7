@@ -17,14 +17,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Changed
 
 - **BG-128 P3-9 / BG-150 — docs pós-cut «404 esperado»:** AVALIADO
-  no git (opção A; triagem BG-149). A tag `blacklists-ut1-current` foi
-  cortada em `30.11`; os quatro URLs GitHub de *download* devolvem
-  **404 esperado**. Primary **exige token** (401 sem token). Isto
-  **não** é o canal do pacote (`releases/latest` / `v1.9.63`) nem
-  motivo para reupload GA4.11. O espelho no runtime é **legado /
-  fallback** e **não** se remove neste bloco. Nota
-  `docs/09-blocking/nota-404-esperado-cut-30.11.md`. Sem mudança de
-  runtime. Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
+  no git (opção A — **FEITO documental**; URLs **não** removidos).
+  A tag `blacklists-ut1-current` foi cortada em `30.11`; os quatro
+  URLs GitHub de *download* devolvem **404 esperado**. Primary
+  **exige token** (401 sem token). Isto **não** é o canal do pacote
+  (`releases/latest` / `v1.9.63`) nem motivo para reupload GA4.11.
+  O espelho no runtime é **legado / fallback**. Nota
+  `docs/09-blocking/nota-404-esperado-cut-30.11.md`. Evidência
+  `docs/tests/evidence/20260814T204500Z-p39-404-esperado/`. Sem
+  mudança de runtime. Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-8 / BG-148 — recheck read-only do cut `30.11`:** AVALIADO
   no git após a evidência `20260814T200900Z` (confirmação
   `20260814T201800Z`). Release `blacklists-ut1-current` id `313502667`

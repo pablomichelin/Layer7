@@ -495,8 +495,10 @@ Gerado automaticamente pelo script de download após extrair o arquivo.
 > é **legado / fallback de runtime** — **não** se remove neste bloco.
 > GET anónimo devolve **404 esperado**. Primary exige token (401 sem
 > token). Isto **não** é o canal do pacote nem motivo para reupload
-> GA4.11. Nota:
+> GA4.11. URLs **não** removidos. Nota:
 > [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
+> Evidência BG-150:
+> [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/).
 - chave publica pinned:
   `/usr/local/share/pfSense-pkg-layer7/blacklists-signing-public-key.pem`
 - cache local:

@@ -1618,6 +1618,8 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > cliente é **legado / fallback de runtime** e **não** se remove neste
 > bloco. Nota:
 > [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
+> Evidência BG-150:
+> [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/).
 
 > **Nota operacional sobre F1.2 nesta release (`1.9.62`):** o trust chain
 > F1.2/F1.4 **está activo** (ADR-0023 Fase 1 / **BG-028**). A tag publica

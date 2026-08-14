@@ -1,8 +1,10 @@
 # Nota — 404 esperado no espelho GitHub após o cut `30.11` (P3-9 opção A)
 
-**Estado:** **AVALIADO no git** (`2026-08-14`; BG-150 / opção A)  
+**Estado:** **AVALIADO no git** (`2026-08-14`; **BG-150** / opção A — **FEITO documental**)  
+**URLs:** **não** removidos (legado / fallback de runtime).  
 **Objectivo:** eliminar a confusão operacional. **Sem** mudança de runtime.  
-**HEAD de partida:** `82c69d6` (fecho documental P3-8)
+**HEAD de partida:** `82c69d6` (fecho documental P3-8)  
+**Evidência:** [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/)
 
 ---
 
@@ -73,5 +75,6 @@ confundir ops. GA4.11 = rollback comercial **só com GO** — o contrário de
 
 - Prep/fecho do cut: [`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md)
 - Recheck P3-8: [`../tests/evidence/20260814T200900Z-p38-cut-recheck/`](../tests/evidence/20260814T200900Z-p38-cut-recheck/)
+- Evidência P3-9 / BG-150: [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/)
 - Rollback (só com GO — **não** por causa deste 404): [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md)
 - Auditoria: [`auditoria-licencas-auth-deploy-2026-08-14.md`](auditoria-licencas-auth-deploy-2026-08-14.md)

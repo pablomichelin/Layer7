@@ -86,8 +86,10 @@ Sem deploy / `PORTVERSION`.
 `30.11`: `asset_count=0`, 404×4, primary 401
 ([`20260814T200900Z-p38-cut-recheck`](../tests/evidence/20260814T200900Z-p38-cut-recheck/)).
 Sem mudança de runtime. Residual P3-9 (fechado neste bloco — opção A).
-**P3-9 AVALIADO** no git (`2026-08-14`; opção A — docs «404 esperado»;
-URLs de runtime mantidos). Sem mudança de runtime.
+**P3-9 AVALIADO** no git (`2026-08-14`; **BG-150**; opção A — **FEITO
+documental**; URLs **não** removidos). Sem mudança de runtime.
+Nota [`nota-404-esperado-cut-30.11.md`](nota-404-esperado-cut-30.11.md);
+evidência [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
 (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9).
@@ -356,7 +358,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P3-6 FEITO no git** (`2026-08-14`) | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Gate exige PEM == SoT == C (32 B raw SPKI) | Coincidente PASS; ausente/inválido/divergente FAIL; SoT≠C FAIL. **Não** deployado. |
 | **P3-7** | `license.c:518-520` vs `crud-validation.js:647-654` | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local antes do servidor); não é bypass | Interpretar expiry como UTC (`timegm`) | `TZ=America/Sao_Paulo` vs `TZ=UTC` no dia fronteira |
 | **P3-8 AVALIADO no git** (`2026-08-14`) | Recheck `20260814T200900Z` + confirmação `20260814T201800Z` (BG-148) + `20260812T013145Z` | Auditoria original sem contacto GitHub | Outros PoPs/TTL não observados na auditoria | **Sem mudança** — cut confirmado (ver prova). P3-9 opção A neste bloco; URLs **não** removidos | `asset_count=0`; `assets=[]`; 404 anónimo ×4; primary 401. Residual P3-9 = docs «404 esperado». |
-| **P3-9 AVALIADO no git** (`2026-08-14`; opção A) | `update-blacklists.sh:38-39`; `layer7.inc:10659-10668`; `config.json.sample:1-4` (intactos) | Cliente ainda aponta espelho GitHub / tarball anónimo | Cut = 404 esperado; confunde ops; risco de reupload GA4.11 sem GO | **Opção A:** documentar «404 esperado»; URLs **mantidos** (GA4.11). Remover URL = bloco futuro + GO + `PORTVERSION` | Docs/sample alinhados ao cut; runtime intacto. **Não** deployado. |
+| **P3-9 AVALIADO no git** (`2026-08-14`; **BG-150**; opção A — **FEITO documental**) | `update-blacklists.sh:38-39`; `layer7.inc:10659-10668`; `config.json.sample:1-4` (intactos) | Cliente ainda aponta espelho GitHub / tarball anónimo | Cut = 404 esperado; confunde ops; risco de reupload GA4.11 sem GO | **Opção A:** documentar «404 esperado». URLs **não** removidos (legado / fallback). Remover URL = bloco futuro + GO + `PORTVERSION` | Nota + evidência `20260814T204500Z-p39-404-esperado`. Runtime intacto. **Não** deployado. |
 
 ---
 
@@ -492,7 +494,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 25. **P3-5** FEITO no git (`2026-08-14`) — promoção atómica do `.lic` em Activate (tmp 0600 + verify + rename); falha preserva o anterior. **Não** deployado.
 26. **P3-6** FEITO no git (`2026-08-14`) — `verify-prod-pubkey.sh` exige PEM do port == SoT; selftest local sem builder. **Não** deployado.
 27. **P3-8 AVALIADO no git** (`2026-08-14`) — recheck read-only do cut `30.11` (`asset_count=0`, 404×4, primary 401). Sem mudança de runtime. Residual P3-9 (fechado neste bloco — opção A).
-28. **P3-9 AVALIADO no git** (`2026-08-14`; opção A) — docs «404 esperado»; URLs de runtime **mantidos**. Sem mudança de runtime. Residual: remover URL = bloco futuro + GO.
+28. **P3-9 AVALIADO no git** (`2026-08-14`; **BG-150**; opção A — **FEITO documental**) — docs «404 esperado»; URLs **não** removidos. Sem mudança de runtime. Residual: remover URL = bloco futuro + GO.
 29. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9. Residual P3-7.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
@@ -543,11 +545,13 @@ appliance).
 
 **Pedido implementado:** só a opção A da triagem BG-149 — documentação
 pós-cut «404 esperado». **Nada** de runtime.
-**Veredicto:** P3-9 **AVALIADO** (opção A). A tag foi cortada; 404
-anónimo é esperado; primary exige token; isto **não** é o canal do
-pacote nem motivo para reupload GA4.11. O espelho no cliente é
-**legado / fallback de runtime** e **não** se remove neste bloco.
-Nota canónica [`nota-404-esperado-cut-30.11.md`](nota-404-esperado-cut-30.11.md).
+**Veredicto:** P3-9 **AVALIADO** (**BG-150**; opção A — **FEITO
+documental**). A tag foi cortada; 404 anónimo é esperado; primary
+exige token; isto **não** é o canal do pacote nem motivo para
+reupload GA4.11. O espelho no cliente é **legado / fallback de
+runtime**. URLs **não** removidos.
+Nota [`nota-404-esperado-cut-30.11.md`](nota-404-esperado-cut-30.11.md).
+Evidência [`../tests/evidence/20260814T204500Z-p39-404-esperado/`](../tests/evidence/20260814T204500Z-p39-404-esperado/).
 
 | Campo | Valor |
 |-------|--------|
