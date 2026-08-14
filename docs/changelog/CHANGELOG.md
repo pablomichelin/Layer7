@@ -37,6 +37,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-1 / BG-131 — sessão única atómica:** FEITO no git após
+  gates deste bloco. `createSession` passa a
+  `BEGIN` + `SELECT id FROM admins WHERE id = $1 FOR UPDATE` + revoke +
+  insert + `COMMIT`. Prova: `BEGIN` sozinho (sem lock) continua a
+  deixar 2 linhas `revoked_at IS NULL` em READ COMMITTED. Unique
+  parcial fora (exigiria limpar duplicados). Dois `createSession`
+  paralelos → 1 activa. Refresh/revogação/TTL 30 min/8 h / TOTP /
+  CSRF intactos. Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P2-4 — lock de login atómico:** FEITO no git após gates
   deste bloco. `updateLoginGuard` deixa o read-modify-write
   (SELECT + `failure_count+1` + UPSERT `EXCLUDED`) e incrementa

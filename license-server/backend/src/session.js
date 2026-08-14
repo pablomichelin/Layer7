@@ -200,8 +200,8 @@ async function revokeSessionByToken(token) {
   );
 }
 
-async function revokeActiveSessionsForAdmin(adminId) {
-  await pool.query(
+async function revokeActiveSessionsForAdmin(adminId, executor = pool) {
+  await executor.query(
     `UPDATE admin_sessions
         SET revoked_at = COALESCE(revoked_at, NOW())
       WHERE admin_id = $1
@@ -215,47 +215,71 @@ async function createSession(admin, req) {
   const tokenHash = hashSessionToken(token);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + SESSION_IDLE_TIMEOUT_MS);
+  const client = await pool.connect();
 
-  await revokeActiveSessionsForAdmin(admin.id);
+  try {
+    await client.query('BEGIN');
+    // P3-1: revoke+insert na mesma tx sem lock do admin nao serializa
+    // (READ COMMITTED). Unique parcial fica fora — exigiria limpar duplicados.
+    const locked = await client.query(
+      'SELECT id FROM admins WHERE id = $1 FOR UPDATE',
+      [admin.id]
+    );
+    if (locked.rows.length === 0) {
+      throw new Error('Admin inexistente para criar sessao');
+    }
 
-  const result = await pool.query(
-    `INSERT INTO admin_sessions (
-        admin_id,
-        session_token_hash,
-        created_at,
-        expires_at,
-        last_seen_at,
-        ip_address,
-        user_agent
-      )
-      VALUES ($1, $2, $3, $4, $3, $5, $6)
-      RETURNING id, created_at, expires_at, last_seen_at, ip_address, user_agent`,
-    [
-      admin.id,
-      tokenHash,
-      now,
-      expiresAt,
-      getClientIp(req),
-      req.headers['user-agent'] || null,
-    ]
-  );
+    await revokeActiveSessionsForAdmin(admin.id, client);
 
-  const sessionRow = result.rows[0];
-  return {
-    token,
-    metadata: {
-      admin: toPublicAdmin(admin),
-      session: {
-        id: sessionRow.id,
-        created_at: new Date(sessionRow.created_at),
-        last_seen_at: new Date(sessionRow.last_seen_at),
-        expires_at: new Date(sessionRow.expires_at),
-        absolute_expires_at: new Date(new Date(sessionRow.created_at).getTime() + SESSION_ABSOLUTE_TIMEOUT_MS),
-        ip_address: sessionRow.ip_address,
-        user_agent: sessionRow.user_agent,
+    const result = await client.query(
+      `INSERT INTO admin_sessions (
+          admin_id,
+          session_token_hash,
+          created_at,
+          expires_at,
+          last_seen_at,
+          ip_address,
+          user_agent
+        )
+        VALUES ($1, $2, $3, $4, $3, $5, $6)
+        RETURNING id, created_at, expires_at, last_seen_at, ip_address, user_agent`,
+      [
+        admin.id,
+        tokenHash,
+        now,
+        expiresAt,
+        getClientIp(req),
+        req.headers['user-agent'] || null,
+      ]
+    );
+    await client.query('COMMIT');
+
+    const sessionRow = result.rows[0];
+    return {
+      token,
+      metadata: {
+        admin: toPublicAdmin(admin),
+        session: {
+          id: sessionRow.id,
+          created_at: new Date(sessionRow.created_at),
+          last_seen_at: new Date(sessionRow.last_seen_at),
+          expires_at: new Date(sessionRow.expires_at),
+          absolute_expires_at: new Date(new Date(sessionRow.created_at).getTime() + SESSION_ABSOLUTE_TIMEOUT_MS),
+          ip_address: sessionRow.ip_address,
+          user_agent: sessionRow.user_agent,
+        },
       },
-    },
-  };
+    };
+  } catch (err) {
+    try {
+      await client.query('ROLLBACK');
+    } catch {
+      // ignore rollback errors
+    }
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 async function resolveSessionToken({ token, source }, res) {

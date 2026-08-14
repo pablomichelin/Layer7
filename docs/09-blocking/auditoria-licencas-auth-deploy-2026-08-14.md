@@ -51,9 +51,13 @@ mudança de runtime; cadeado `test_license_expiry_policy.php`.
 **P2-4 FEITO** no git (`2026-08-14`) — incremento atómico de
 `failure_count` no lock de login; 10 falhas paralelas → count=10 + lock.
 Sem deploy / `PORTVERSION`.
+**P3-1 FEITO** no git (`2026-08-14`) — sessão única atómica
+(`BEGIN` + `FOR UPDATE` no admin + revoke + insert); dois
+`createSession` paralelos → 1 `revoked_at IS NULL`. `BEGIN` sozinho
+não basta. Sem unique parcial. Sem deploy / `PORTVERSION`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1).
 
 ---
 
@@ -308,7 +312,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 
 | ID | Evidência | Cenário | Impacto | Correcção mínima | Testes |
 |----|-----------|---------|---------|------------------|--------|
-| **P3-1** | `session.js:203-231` | Dois logins/TOTP em paralelo | Política “uma sessão” pode deixar 2 tokens | `BEGIN` + revoke + insert + `COMMIT` | Dois `createSession` → 1 `revoked_at IS NULL` |
+| **P3-1 FEITO no git** (`2026-08-14`) | `session.js` `createSession` | Dois logins/TOTP em paralelo | Política “uma sessão” deixava 2 tokens (`revoked_at IS NULL`) | `BEGIN` + `SELECT … FOR UPDATE` em `admins` + revoke + insert + `COMMIT`. `BEGIN` sozinho **não** basta (READ COMMITTED). Sem unique parcial | Dois `createSession` → 1 activa. Antes: 2. **Não** deployado. |
 | **P3-2** | `session.js:256-275` vs `:112` | `GET /api/auth/session` | `totp_enabled` omitido no SELECT → UI vê `false` | Incluir `a.totp_enabled` | Sessão com TOTP → `totp_enabled: true` |
 | **P3-3** | `auth.js:107-114`; `users.js:36-38` vs `bootstrap-admin.js:94-106`; `totp.js:81` | Email disabled → 403 distinto; users aceita password ≥10; TOTP com `===` | Enumeração; lock não aplica a disabled; política inconsistente; timing TOTP teórico | Mesma 401 + bcrypt dummy; mínimo 12; `timingSafeEqual` | Disabled vs unknown → mesmo status/body |
 | **P3-4** | `auth.js:222-230`; Express `^4.21.2` | Falha de BD em `GET /2fa/status` | Promise rejeitada sem error handler | `try/catch` ou wrapper async | Pool a rejeitar → 500 JSON; processo vivo |
@@ -348,7 +352,8 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 
 ### Authn / sessão / CSRF cookie / Bearer
 
-- Login **não** adopta cookie do cliente; token = 32 bytes — `session.js:29-30`, `:203-209`.
+- Login **não** adopta cookie do cliente; token = 32 bytes — `session.js:29-30`.
+- **P3-1 FEITO no git** (`2026-08-14`): `createSession` serializa com lock da linha de `admins`; um admin → uma linha `revoked_at IS NULL`. **Não** deployado.
 - Cookie `httpOnly` + `secure` + `sameSite: 'strict'` + sem `Domain`.
 - Pacote `cors` **não** é `require`d.
 - **P2-2 FEITO no git** (`2026-08-14`): `/api/users` e `/api/search` entram em `isAdminApiPath`; mutações admin sem `Origin` allowlist nem `Sec-Fetch-Site: same-origin` → 403; Bearer autenticado exceptuado; GET sem Origin continua. **Não** deployado.
@@ -367,6 +372,9 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 - **P2-4 FEITO no git** (`2026-08-14`): `updateLoginGuard` incrementa
   `failure_count` no `ON CONFLICT` (janela 15 min). Já não há
   SELECT + `+ 1` + `EXCLUDED.failure_count`. **Não** deployado.
+- **P3-1 FEITO no git** (`2026-08-14`): `createSession` serializa com
+  lock da linha de `admins`. Dois logins paralelos → 1
+  `revoked_at IS NULL`. **Não** deployado.
 - **SQLite:** não se aplica (`pg.Pool`).
 - Activate: `runInTransaction` + `FOR UPDATE OF l` + update condicional de `hardware_id` — um 200, outro 409.
 - Check-in: só SELECT + log; não muta binding. Nonce não é single-use no servidor (contrato).
@@ -435,7 +443,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 16. **P2-2 FEITO no git** (`2026-08-14`) — CSRF admin fail-closed; users/search na superfície. **Não** deployado.
 17. **P2-13 AVALIADO no git** (`2026-08-14`) — meia-noite / DST / UTC sem correção única segura; sem mudança de runtime. **Não** deployado.
 18. **P2-4 FEITO no git** (`2026-08-14`) — incremento atómico de `failure_count`; 10 `registerLoginFailure` paralelos → count=10 + lock. **Não** deployado.
-19. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4.
+19. **P3-1 FEITO no git** (`2026-08-14`) — sessão única atómica (`FOR UPDATE` no admin); 2 `createSession` → 1 activa. **Não** deployado.
+20. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 

@@ -38,6 +38,12 @@ Referencias normativas:
     `UPSERT` (`failure_count = failure_count + 1` dentro da janela de
     15 min). Falhas paralelas no mesmo email/IP já não perdem
     incrementos nem atrasam o lock. CSRF/proxy/sessão/TOTP intactos.
+- **P3-1 / BG-128:** um admin tem no máximo uma linha
+  `admin_sessions.revoked_at IS NULL`. `createSession` abre transacção,
+  tranca a linha de `admins` (`FOR UPDATE`), revoga as activas e
+  insere a nova. `BEGIN`+revoke+insert sem lock **não** serializa.
+  Unique parcial `(admin_id) WHERE revoked_at IS NULL` fica fora
+  (exigiria limpar duplicados live). Refresh/TTL/TOTP/CSRF intactos.
 - Auditoria minima:
   - auth/sessao e mutacoes administrativas em `admin_audit_log`
   - guardas de lockout em `admin_login_guards`

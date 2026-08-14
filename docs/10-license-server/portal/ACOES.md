@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-131 P3-1 sessão única atómica
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Dois logins/TOTP em paralelo deixam uma só sessão `revoked_at IS NULL` por admin |
+| Impacto | Só `createSession` (`BEGIN` + `FOR UPDATE` em `admins` + revoke + insert). Refresh/revogação/TTL/TOTP/CSRF intactos |
+| Risco | Baixo. Residual: unique parcial não criado (live pode ter duplicados); overlay P0-1 |
+| Teste | Suite backend `208/208` PASS. Antes: 2 `createSession` paralelos → 2 activas. Depois: 1. `BEGIN` sem lock também deixava 2 |
+| Rollback | Reverter o commit; `createSession` volta a revoke+insert sem transacção |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem admin-surface / sem compose |
+
 ## 2026-08-14 — BG-128 P2-4 lock de login atómico
 
 | Campo | Valor |

@@ -95,6 +95,10 @@ Documentos normativos desta arquitetura:
 - a expiracao passa a ser dupla: `30 minutos` de ociosidade e `8 horas` de
   vida absoluta, com renovacao controlada perto da janela ociosa
 - novo login passa a revogar sessoes activas anteriores do mesmo admin
+  **P3-1 / BG-128 (`2026-08-14`):** `createSession` serializa por admin
+  (`BEGIN` + `SELECT … FOR UPDATE` na linha de `admins` + revoke +
+  insert + `COMMIT`). `BEGIN` sozinho não basta (READ COMMITTED).
+  Sem unique parcial. Refresh/revogação/TTL/TOTP/CSRF intactos. Sem deploy.
 
 ### Frontend
 
