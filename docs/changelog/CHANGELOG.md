@@ -16,6 +16,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 A1/A2/M2 — lifecycle keep-config/upgrade fail-closed:**
+  FEITO no git após gates deste bloco. Staging de CA MITM e secrets
+  Identity deixa `/tmp` e passa a `/var/db/layer7/deinstall-preserve`
+  (0700). Segredos ficam 0600 em todo o fluxo. Se o backup obrigatório
+  falhar, **não** há `rm -rf` de `/usr/local/etc/layer7`. Contratos
+  keep-config / keep-license / upgrade / uninstall inalterados. Harness
+  funcional em tempdir (quatro ramos + mutante de backup). Sem M1/P2-13/
+  P2-9/P3, sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P2-11 — binding HW + expiry/grace na GUI/helper:**
   FEITO no git após gates deste bloco. `layer7_entitlements()` e
   `layer7-mitm-entitle-ok` deixam de desbloquear Identity/MITM com um

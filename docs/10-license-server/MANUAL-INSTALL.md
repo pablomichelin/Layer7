@@ -51,6 +51,15 @@ keep-config preservam json/`.lic`/CA MITM/secrets Identity/check-in.
 Revoke na GUI limpa o `.lic` e os três paths `/var/db`. Sem release nova —
 o `.pkg` publicado continua `1.9.63` até GO de build.
 
+**Addendum operacional BG-128 A1/A2/M2 (`2026-08-14`, sem `PORTVERSION`):**
+upgrade e `--keep-config` fazem staging persistente em
+`/var/db/layer7/deinstall-preserve` (0700; **não** `/tmp`). Secrets
+Identity e `mitm/ca.key` ficam 0600 durante o fluxo. Se o backup
+obrigatório (CA MITM / Identity) falhar, o hook **não** apaga
+`/usr/local/etc/layer7`. `--keep-license` e uninstall real continuam a
+limpar `etc/layer7`. Staging é removido só após restore ou aborto
+válido. Sem release nova — o `.pkg` publicado continua `1.9.63`.
+
 **Addendum operacional da F4.1 (BG-009, branch / `PORTVERSION` de trabalho):**
 o hook **POST-INSTALL** do port executa `service layer7d onestop` antes de
 `onestart`, para que um **upgrade** por `pkg` carregue o binario do pacote

@@ -273,7 +273,7 @@ else
 	fail "test_flush_coverage"
 fi
 
-step "Unit: pkg-deinstall lifecycle (P1-6/7/8 + P2-12)"
+step "Unit: pkg-deinstall lifecycle (P1-6/7/8 + P2-12 + A1/A2/M2)"
 if sh tests/unit/test_pkg_deinstall_lifecycle.sh; then
 	pass "test_pkg_deinstall_lifecycle"
 else

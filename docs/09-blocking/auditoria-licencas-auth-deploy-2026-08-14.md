@@ -31,9 +31,11 @@ FEITOS no git** (`2026-08-14`; `c2b9fdb` + governação após gates; sem
 deploy). P2-5 ficou absorvido no P1-3.
 **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
 **P2-11 FEITO no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
+**A1/A2/M2 FEITO no git** (auditoria independente do lifecycle `c2b9fdb`;
+`2026-08-14`; sem deploy / `PORTVERSION`).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13).
 
 ---
 
@@ -215,6 +217,7 @@ Copy da GUI corrigido. Sem deploy.
 | **Correcção mínima** | Se `keep_config`, preservar `mitm/` e `identity-*.secret` (ou não fazer `rm -rf` cego). Corrigir o copy. |
 | **Implementado** | Backup/restore no mesmo padrão de `profiles-custom.json`. |
 | **Testes** | `test_pkg_deinstall_lifecycle.sh` (contratos de ficheiro). |
+| **Residual independente** | A1 (backup em `/tmp` ignorando falha antes do wipe) e A2 (secrets 0644 no tmp) — ver addendum A1/A2/M2 neste ficheiro. |
 
 ### P1-8 — POST-DEINSTALL apaga `layer7.json`/`.lic` sem guarda `PKG_UPGRADE`
 
@@ -395,11 +398,22 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 8. **P1-5…P1-8 + P2-12 FEITOS no git** (`c2b9fdb` + governação após gates) — package/daemon; **sem** deploy / `PORTVERSION`.
 9. **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`) — daemon local; **sem** deploy / `PORTVERSION`.
 10. **P2-11 FEITO no git** (`2026-08-14`) — GUI/helper binding HW + expiry/grace; **sem** deploy / `PORTVERSION`.
-11. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
+11. **A1/A2/M2 FEITO no git** (`2026-08-14`) — staging persistente + fail-closed + harness funcional; **sem** deploy / `PORTVERSION`. Sem M1/P2-13.
+12. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO. Sem M1.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — A1/A2/M2 lifecycle (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Impedir wipe de `/usr/local/etc/layer7` se o backup obrigatório (CA MITM / Identity secrets) falhar; não usar `/tmp` para segredo; 0600 em todo o fluxo |
+| Impacto | Só `pkg-deinstall.in`, `uninstall.sh` e `test_pkg_deinstall_lifecycle.sh` + docs. Contratos keep-config / keep-license / upgrade / uninstall **inalterados**. Sem M1/fingerprint, sem P2-13/P2-9/P3, sem `PORTVERSION`/build/release/hosts |
+| Risco | Baixo. Fail-closed conserva CA/secrets se o staging falhar. Residual: `uninstall.sh --keep-config` continua a não armar o flag `/var/run` antes do `pkg delete` (contrato pré-existente; leftover cleanup) |
+| Teste | Harness em tempdir: upgrade / keep-config / keep-license / uninstall + mutante `cp` falha (versão vulnerável apaga; corrigida conserva) + `stat` 0600/0700. Smoke `grep` P2-12 mantido |
+| Rollback | Reverter o commit; volta o backup em `/tmp` + `\|\| true` de `c2b9fdb` (P1-7 funcional, A1/A2 reabertos) |
 
 ## Objectivo / impacto / risco / teste / rollback — P2-11 (`2026-08-14`)
 

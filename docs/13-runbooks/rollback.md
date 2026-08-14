@@ -11,7 +11,10 @@ anterior do appliance **sem** deixar enforcement ou artefactos inconsistentes.
 
 Upgrade/rollback in-place. O hook vê `PKG_UPGRADE` e **preserva**
 `layer7.json`, `layer7.lic`, CA MITM, secrets Identity, `profiles-custom.json`
-e o estado de check-in em `/var/db` (BG-128 P1-7/P1-8).
+e o estado de check-in em `/var/db` (BG-128 P1-7/P1-8). O staging de
+CA/secrets é `/var/db/layer7/deinstall-preserve` (0700, 0600 nos
+segredos); se o backup obrigatório falhar, o hook **não** faz
+`rm -rf /usr/local/etc/layer7` (A1/A2).
 
 ```sh
 fetch -o /tmp/pfSense-pkg-layer7-VERSAO.pkg \

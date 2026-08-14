@@ -30,6 +30,163 @@ if (function_exists('layer7_mitm_setup_window_cron')) {
 " >/dev/null 2>&1 || true
 }
 
+# A1/A2: staging persistente privado (nunca /tmp). Segredos 0600.
+# Se a preservação obrigatória (MITM CA / Identity secrets) falhar, não
+# há rm/wipe de ${LAYER7_ETC_DIR:-/usr/local/etc}/layer7.
+layer7_deinstall_init_paths() {
+	_l7_etc="${LAYER7_ETC_DIR:-/usr/local/etc}"
+	_l7_var_db="${LAYER7_VAR_DB_DIR:-/var/db}"
+	_l7_stage="${LAYER7_PRESERVE_DIR:-${_l7_var_db}/layer7/deinstall-preserve}"
+}
+
+layer7_deinstall_secure_rm() {
+	_p="$1"
+	[ -n "${_p}" ] || return 0
+	if [ -e "${_p}" ]; then
+		chmod -R u+w "${_p}" 2>/dev/null || true
+		/bin/rm -rf "${_p}"
+	fi
+}
+
+layer7_deinstall_mandatory_present() {
+	_etc_l7="${_l7_etc}/layer7"
+	[ -d "${_etc_l7}/mitm" ] && return 0
+	[ -f "${_etc_l7}/identity-ldap.secret" ] && return 0
+	[ -f "${_etc_l7}/identity-radius.secret" ] && return 0
+	[ -f "${_etc_l7}/identity-dc.secret" ] && return 0
+	return 1
+}
+
+layer7_deinstall_stage_secrets() {
+	_etc_l7="${_l7_etc}/layer7"
+	_old_umask=$(umask)
+	umask 077
+	if ! /bin/mkdir -p "${_l7_stage}" 2>/dev/null; then
+		umask "${_old_umask}"
+		if layer7_deinstall_mandatory_present; then
+			return 1
+		fi
+		return 0
+	fi
+	if ! chmod 0700 "${_l7_stage}"; then
+		umask "${_old_umask}"
+		return 1
+	fi
+	if [ -d "${_etc_l7}/mitm" ]; then
+		/bin/rm -rf "${_l7_stage}/mitm"
+		if ! /bin/cp -a "${_etc_l7}/mitm" "${_l7_stage}/mitm"; then
+			umask "${_old_umask}"
+			return 1
+		fi
+		[ -d "${_l7_stage}/mitm" ] || {
+			umask "${_old_umask}"
+			return 1
+		}
+		if [ -f "${_l7_stage}/mitm/ca.key" ]; then
+			if ! chmod 0600 "${_l7_stage}/mitm/ca.key"; then
+				umask "${_old_umask}"
+				return 1
+			fi
+		fi
+	fi
+	for _s in identity-ldap.secret identity-radius.secret identity-dc.secret; do
+		if [ -f "${_etc_l7}/${_s}" ]; then
+			if ! /bin/cp -p "${_etc_l7}/${_s}" "${_l7_stage}/${_s}"; then
+				umask "${_old_umask}"
+				return 1
+			fi
+			if ! chmod 0600 "${_l7_stage}/${_s}"; then
+				umask "${_old_umask}"
+				return 1
+			fi
+			[ -f "${_l7_stage}/${_s}" ] || {
+				umask "${_old_umask}"
+				return 1
+			}
+		fi
+	done
+	if [ -f "${_etc_l7}/profiles-custom.json" ]; then
+		/bin/cp -f "${_etc_l7}/profiles-custom.json" \
+			"${_l7_stage}/profiles-custom.json" 2>/dev/null || true
+	fi
+	umask "${_old_umask}"
+	return 0
+}
+
+layer7_deinstall_restore_secrets() {
+	_etc_l7="${_l7_etc}/layer7"
+	/bin/mkdir -p "${_etc_l7}" || return 1
+	if [ -d "${_l7_stage}/mitm" ]; then
+		/bin/rm -rf "${_etc_l7}/mitm"
+		/bin/mv -f "${_l7_stage}/mitm" "${_etc_l7}/mitm" || return 1
+		if [ -f "${_etc_l7}/mitm/ca.key" ]; then
+			chmod 0600 "${_etc_l7}/mitm/ca.key" || return 1
+		fi
+	fi
+	for _s in identity-ldap.secret identity-radius.secret identity-dc.secret; do
+		if [ -f "${_l7_stage}/${_s}" ]; then
+			/bin/mv -f "${_l7_stage}/${_s}" "${_etc_l7}/${_s}" || return 1
+			chmod 0600 "${_etc_l7}/${_s}" || return 1
+		fi
+	done
+	if [ -f "${_l7_stage}/profiles-custom.json" ]; then
+		/bin/mv -f "${_l7_stage}/profiles-custom.json" \
+			"${_etc_l7}/profiles-custom.json" 2>/dev/null || true
+		chown www:wheel "${_etc_l7}/profiles-custom.json" \
+			2>/dev/null || true
+		chmod 0664 "${_etc_l7}/profiles-custom.json" 2>/dev/null || true
+	fi
+	return 0
+}
+
+# Contratos P1-6/P1-7/P1-8 (inalterados):
+# upgrade / keep-config → preserva json/.lic + mitm + identity + /var/db
+# keep-license → apaga json, mantém .lic + /var/db, wipe etc/layer7
+# uninstall real → apaga json/.lic + etc/layer7 + /var/db leftovers
+layer7_deinstall_etc_lifecycle() {
+	layer7_deinstall_init_paths
+	_preserve_runtime=0
+	if [ "${_keep_config}" -eq 1 ] || [ "${_is_upgrade}" -eq 1 ]; then
+		_preserve_runtime=1
+	fi
+	if [ "${_is_upgrade}" -eq 0 ]; then
+		if [ "${_keep_config}" -eq 1 ]; then
+			:
+		elif [ "${_keep_license}" -eq 1 ]; then
+			/bin/rm -f "${_l7_etc}/layer7.json" >/dev/null 2>&1 || true
+		else
+			/bin/rm -f "${_l7_etc}/layer7.json" \
+				"${_l7_etc}/layer7.lic" >/dev/null 2>&1 || true
+		fi
+	fi
+	if [ "${_preserve_runtime}" -eq 1 ]; then
+		if ! layer7_deinstall_stage_secrets; then
+			layer7_deinstall_secure_rm "${_l7_stage}"
+			return 0
+		fi
+		/bin/rm -rf "${_l7_etc}/layer7"
+		if ! layer7_deinstall_restore_secrets; then
+			return 0
+		fi
+		layer7_deinstall_secure_rm "${_l7_stage}"
+	else
+		/bin/rm -rf "${_l7_etc}/layer7"
+		layer7_deinstall_secure_rm "${_l7_stage}"
+	fi
+	if [ "${_is_upgrade}" -eq 0 ] && [ "${_keep_config}" -eq 0 ] && \
+	    [ "${_keep_license}" -eq 0 ]; then
+		/bin/rm -f "${_l7_var_db}/layer7-checkin.json" \
+			"${_l7_var_db}/layer7/clock-mark.json" \
+			"${_l7_var_db}/layer7/content-subscription.json" \
+			>/dev/null 2>&1 || true
+	fi
+	return 0
+}
+
+if [ "${LAYER7_DEINSTALL_LIB:-}" = "1" ]; then
+	return 0 2>/dev/null || exit 0
+fi
+
 # Parar o daemon enquanto o rc.d ainda existe (POST-DEINSTALL corre depois da remocao).
 if [ "${2}" = "PRE-DEINSTALL" ]; then
 	/usr/sbin/service layer7-blockpage onestop >/dev/null 2>&1 || true
@@ -104,117 +261,23 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 		_i=$((_i + 1))
 	done
 
-	_profiles_custom_bak="/tmp/layer7-profiles-custom.json.bak"
-	_mitm_bak="/tmp/layer7-mitm.bak"
-	_id_ldap_bak="/tmp/layer7-identity-ldap.secret.bak"
-	_id_radius_bak="/tmp/layer7-identity-radius.secret.bak"
-	_id_dc_bak="/tmp/layer7-identity-dc.secret.bak"
 	_keep_config=0
 	_keep_license=0
 	_is_upgrade=0
 	if [ -n "${PKG_UPGRADE:-}" ]; then
 		_is_upgrade=1
 	fi
-	if [ -f /var/run/layer7-uninstall-keep-config ]; then
+	_l7_run="${LAYER7_RUN_DIR:-/var/run}"
+	if [ -f "${_l7_run}/layer7-uninstall-keep-config" ]; then
 		_keep_config=1
-		/bin/rm -f /var/run/layer7-uninstall-keep-config
-	elif [ -f /var/run/layer7-uninstall-keep-license ]; then
+		/bin/rm -f "${_l7_run}/layer7-uninstall-keep-config"
+	elif [ -f "${_l7_run}/layer7-uninstall-keep-license" ]; then
 		_keep_license=1
-		/bin/rm -f /var/run/layer7-uninstall-keep-license
+		/bin/rm -f "${_l7_run}/layer7-uninstall-keep-license"
 	fi
-	_preserve_runtime=0
-	if [ "${_keep_config}" -eq 1 ] || [ "${_is_upgrade}" -eq 1 ]; then
-		_preserve_runtime=1
-	fi
-	if [ "${_preserve_runtime}" -eq 1 ]; then
-		if [ -f /usr/local/etc/layer7/profiles-custom.json ]; then
-			/bin/cp -f /usr/local/etc/layer7/profiles-custom.json \
-				"${_profiles_custom_bak}" 2>/dev/null || true
-		fi
-		if [ -d /usr/local/etc/layer7/mitm ]; then
-			/bin/rm -rf "${_mitm_bak}"
-			/bin/cp -a /usr/local/etc/layer7/mitm "${_mitm_bak}" \
-				2>/dev/null || true
-		fi
-		if [ -f /usr/local/etc/layer7/identity-ldap.secret ]; then
-			/bin/cp -f /usr/local/etc/layer7/identity-ldap.secret \
-				"${_id_ldap_bak}" 2>/dev/null || true
-		fi
-		if [ -f /usr/local/etc/layer7/identity-radius.secret ]; then
-			/bin/cp -f /usr/local/etc/layer7/identity-radius.secret \
-				"${_id_radius_bak}" 2>/dev/null || true
-		fi
-		if [ -f /usr/local/etc/layer7/identity-dc.secret ]; then
-			/bin/cp -f /usr/local/etc/layer7/identity-dc.secret \
-				"${_id_dc_bak}" 2>/dev/null || true
-		fi
-	fi
-
 	# P1-8: upgrade nunca apaga json/.lic. Uninstall real honra keep-*.
-	if [ "${_is_upgrade}" -eq 0 ]; then
-		if [ "${_keep_config}" -eq 1 ]; then
-			:
-		elif [ "${_keep_license}" -eq 1 ]; then
-			/bin/rm -f /usr/local/etc/layer7.json >/dev/null 2>&1 || true
-		else
-			/bin/rm -f /usr/local/etc/layer7.json \
-				/usr/local/etc/layer7.lic >/dev/null 2>&1 || true
-		fi
-	fi
-	# Cache blacklists / relatorios — runtime preservado acima
-	/bin/rm -rf /usr/local/etc/layer7 >/dev/null 2>&1 || true
-
-	if [ "${_preserve_runtime}" -eq 1 ]; then
-		/bin/mkdir -p /usr/local/etc/layer7
-		if [ -f "${_profiles_custom_bak}" ]; then
-			/bin/mv -f "${_profiles_custom_bak}" \
-				/usr/local/etc/layer7/profiles-custom.json \
-				2>/dev/null || true
-			chown www:wheel /usr/local/etc/layer7/profiles-custom.json \
-				2>/dev/null || true
-			chmod 0664 /usr/local/etc/layer7/profiles-custom.json \
-				2>/dev/null || true
-		fi
-		if [ -d "${_mitm_bak}" ]; then
-			/bin/rm -rf /usr/local/etc/layer7/mitm
-			/bin/mv -f "${_mitm_bak}" /usr/local/etc/layer7/mitm \
-				2>/dev/null || true
-		fi
-		if [ -f "${_id_ldap_bak}" ]; then
-			/bin/mv -f "${_id_ldap_bak}" \
-				/usr/local/etc/layer7/identity-ldap.secret \
-				2>/dev/null || true
-			chmod 0600 /usr/local/etc/layer7/identity-ldap.secret \
-				2>/dev/null || true
-		fi
-		if [ -f "${_id_radius_bak}" ]; then
-			/bin/mv -f "${_id_radius_bak}" \
-				/usr/local/etc/layer7/identity-radius.secret \
-				2>/dev/null || true
-			chmod 0600 /usr/local/etc/layer7/identity-radius.secret \
-				2>/dev/null || true
-		fi
-		if [ -f "${_id_dc_bak}" ]; then
-			/bin/mv -f "${_id_dc_bak}" \
-				/usr/local/etc/layer7/identity-dc.secret \
-				2>/dev/null || true
-			chmod 0600 /usr/local/etc/layer7/identity-dc.secret \
-				2>/dev/null || true
-		fi
-	else
-		/bin/rm -f "${_profiles_custom_bak}" "${_id_ldap_bak}" \
-			"${_id_radius_bak}" "${_id_dc_bak}" >/dev/null 2>&1 || true
-		/bin/rm -rf "${_mitm_bak}" >/dev/null 2>&1 || true
-	fi
-
-	# P1-6: estado /var/db só em uninstall real sem keep
-	if [ "${_is_upgrade}" -eq 0 ] && [ "${_keep_config}" -eq 0 ] && \
-	    [ "${_keep_license}" -eq 0 ]; then
-		/bin/rm -f /var/db/layer7-checkin.json \
-			/var/db/layer7/clock-mark.json \
-			/var/db/layer7/content-subscription.json \
-			>/dev/null 2>&1 || true
-	fi
+	# A1: wipe de /usr/local/etc/layer7 só após staging obrigatório OK.
+	layer7_deinstall_etc_lifecycle || true
 
 	/bin/rm -f /usr/local/etc/layer7-protos.txt >/dev/null 2>&1 || true
 	/bin/rm -f /var/log/layer7d.log /var/log/layer7-events.log \

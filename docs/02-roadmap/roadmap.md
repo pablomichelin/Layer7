@@ -52,8 +52,10 @@ runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks
 **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git
 (`2026-08-14`; `c2b9fdb` + governação após gates; sem deploy / `PORTVERSION`; P2-5 absorvido no P1-3).
 **P2-7+P2-8+P2-10 FEITOS** no git (`2026-08-14`; sem deploy / `PORTVERSION`).
-**P2-11 FEITO** no git (`2026-08-14`; sem deploy / `PORTVERSION`). Próximo código com GO:
-P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11). **P0-1 ACTIVO** inalterado.
+**P2-11 FEITO** no git (`2026-08-14`; sem deploy / `PORTVERSION`).
+**A1/A2/M2 FEITO** no git (`2026-08-14`; lifecycle
+fail-closed; sem M1/P2-13). Próximo código com GO:
+P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1). **P0-1 ACTIVO** inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
 
