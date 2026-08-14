@@ -480,5 +480,6 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] **BG-128 P1-5…P1-8 + P2-12** — FEITO no git após gates (`c2b9fdb` + governação neste commit) — enforce recusa check-in ON sem chave; upgrade/keep-config preserva json/`.lic`/CA/secrets/check-in; deinstall real limpa `/var/db` + anti-DoH (`2026-08-14`; sem deploy / `PORTVERSION`)
 - [x] **BG-128 P2-7+P2-8+P2-10** — FEITO no git após gates (`2026-08-14`) — save atómico check-in + SKU + `.lic` 0600; sem deploy / `PORTVERSION`
 - [x] **BG-128 P2-11** — FEITO no git após gates (`2026-08-14`) — GUI Identity/MITM + `layer7-mitm-entitle-ok` exigem HW + expiry/grace 14d; sem deploy / `PORTVERSION`
-- [x] **BG-128 A1/A2/M2** — FEITO no git após gates (`28c97ad` + governação após gates; `2026-08-14`) — staging persistente + fail-closed + harness funcional; sem deploy / `PORTVERSION`; sem M1/P2-13
+- [x] **BG-128 A1/A2/M2** — FEITO no git após gates (`28c97ad` + governação após gates; `2026-08-14`) — staging persistente + fail-closed + harness funcional; sem deploy / `PORTVERSION`; sem P2-13
+- [x] **BG-128 M1** — FEITO no git após gates (`2026-08-14`) — GUI/helper fingerprint via `layer7d --fingerprint`; `LAYER7_TEST_HW_ID` só com `LAYER7_TEST_ROOT`; sem deploy / `PORTVERSION`; campo FreeBSD pendente
 - [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1; sem `.244` neste bloco)

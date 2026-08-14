@@ -33,6 +33,8 @@ deploy). P2-5 ficou absorvido no P1-3.
 **P2-11 FEITO no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
 **A1/A2/M2 FEITO no git** (auditoria independente do lifecycle `c2b9fdb`;
 `28c97ad` + governação após gates; `2026-08-14`; sem deploy / `PORTVERSION`).
+**M1 FEITO no git** (`2026-08-14`; GUI/helper via `layer7d --fingerprint`;
+sem deploy / `PORTVERSION`).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
 (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-13).
@@ -398,19 +400,30 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 8. **P1-5…P1-8 + P2-12 FEITOS no git** (`c2b9fdb` + governação após gates) — package/daemon; **sem** deploy / `PORTVERSION`.
 9. **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`) — daemon local; **sem** deploy / `PORTVERSION`.
 10. **P2-11 FEITO no git** (`2026-08-14`) — GUI/helper binding HW + expiry/grace; **sem** deploy / `PORTVERSION`.
-11. **A1/A2/M2 FEITO no git** (`28c97ad` + governação após gates; `2026-08-14`) — staging persistente + fail-closed + harness funcional; **sem** deploy / `PORTVERSION`. Sem M1/P2-13.
-12. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO. Sem M1.
+11. **A1/A2/M2 FEITO no git** (`28c97ad` + governação após gates; `2026-08-14`) — staging persistente + fail-closed + harness funcional; **sem** deploy / `PORTVERSION`. Sem P2-13.
+12. **M1 FEITO no git** (`2026-08-14`) — GUI/helper fingerprint via `layer7d --fingerprint`; **sem** deploy / `PORTVERSION`.
+13. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO. Sem M1.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — M1 fingerprint GUI (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | GUI/helper obter o fingerprint canónico via `/usr/local/sbin/layer7d --fingerprint` (CLI one-shot); deixar de reimplementar a fórmula F3.2 em PHP (`sysctl`/`ifconfig`); fail-closed se o binário ou a saída forem inválidos; `LAYER7_TEST_HW_ID` só com `LAYER7_TEST_ROOT` |
+| Impacto | `layer7.inc` (binário canónico + binding + subscrição de conteúdo), comentário em `layer7-mitm-entitle-ok`, `test_fingerprint_gui_daemon.php`, `run-local.sh` + docs. Sem P2-9/P2-13/P3, sem daemon/`PORTVERSION`/build/release/hosts |
+| Risco | Baixo. Empacotamento inalterado (`pkg-plist` `/usr/local/sbin/layer7d`; Makefile `PREFIX/sbin`). Residual: equivalência FreeBSD (`kern.hostuuid` + `getifaddrs`/`IFT_ETHER`) **não** prova neste Mac — validação de campo pendente no appliance (`layer7d --fingerprint` = HW da GUI) |
+| Teste | `php tests/functional/test_fingerprint_gui_daemon.php` PASS (stub `--fingerprint`, saída inválida/rc≠0/binário ausente, override só com `TEST_ROOT`, binding + entitle-ok). Regressão `test_entitlements_gui.php` PASS. `test_license_revoke_state.php` + `test_check_in_default_30.14.php` PASS. `test_content_subscription_client.php` **não** correu neste Mac (`/usr/bin/openssl` = LibreSSL sem Ed25519; pré-existente) |
+| Rollback | Reverter o commit; a GUI volta à fórmula PHP sysctl/ifconfig do P2-11 |
 
 ## Objectivo / impacto / risco / teste / rollback — A1/A2/M2 lifecycle (`2026-08-14`)
 
 | Campo | Valor |
 |-------|--------|
 | Objectivo | Impedir wipe de `/usr/local/etc/layer7` se o backup obrigatório (CA MITM / Identity secrets) falhar; não usar `/tmp` para segredo; 0600 em todo o fluxo |
-| Impacto | Só `pkg-deinstall.in`, `uninstall.sh` e `test_pkg_deinstall_lifecycle.sh` + docs. Contratos keep-config / keep-license / upgrade / uninstall **inalterados**. Sem M1/fingerprint, sem P2-13/P2-9/P3, sem `PORTVERSION`/build/release/hosts |
+| Impacto | Só `pkg-deinstall.in`, `uninstall.sh` e `test_pkg_deinstall_lifecycle.sh` + docs. Contratos keep-config / keep-license / upgrade / uninstall **inalterados**. Sem P2-13/P2-9/P3, sem `PORTVERSION`/build/release/hosts |
 | Risco | Baixo. Fail-closed conserva CA/secrets se o staging falhar. Residual: `uninstall.sh --keep-config` continua a não armar o flag `/var/run` antes do `pkg delete` (contrato pré-existente; leftover cleanup) |
 | Teste | Harness em tempdir: upgrade / keep-config / keep-license / uninstall + mutante `cp` falha (versão vulnerável apaga; corrigida conserva) + `stat` 0600/0700. Smoke `grep` P2-12 mantido |
 | Rollback | Reverter o commit; volta o backup em `/tmp` + `\|\| true` de `c2b9fdb` (P1-7 funcional, A1/A2 reabertos) |
@@ -421,7 +434,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 |-------|--------|
 | Objectivo | Impedir que a GUI Identity/MITM e `layer7-mitm-entitle-ok` desbloqueiem com um `.lic` apenas assinado quando HW ou validade/grace não batem com o daemon |
 | Impacto | `layer7.inc` (fingerprint local + binding + entitlements), helper `layer7-mitm-entitle-ok`, `test_entitlements_gui.php`, `run-local.sh`, docs canónicas. Sem P2-9/P2-13/P3, sem daemon `enforce_armed`, sem license server/SPA/compose, sem `PORTVERSION`/build/release/hosts |
-| Risco | Baixo. Grace de 14 dias alinhada ao daemon (evita false-lock comercial). Fingerprint = `sysctl kern.hostuuid` + primeira `ifconfig -l ether` (mesmo filtro IFT_ETHER). Residual: anti-rollback 30.6 continua só no daemon; DST ±1 h = P2-13 (fora) |
+| Risco | Baixo. Grace de 14 dias alinhada ao daemon (evita false-lock comercial). Residual P2-11: fingerprint PHP sysctl/ifconfig **substituído em M1** por `layer7d --fingerprint`. Anti-rollback 30.6 continua só no daemon; DST ±1 h = P2-13 (fora) |
 | Teste | `php tests/functional/test_entitlements_gui.php` — HW errado, expiry além da graça, dentro da graça, válido, stats forjados + helper/rc.d PATH |
 | Rollback | Reverter o commit; a GUI/helper voltam a desbloquear só com assinatura Ed25519 |
 

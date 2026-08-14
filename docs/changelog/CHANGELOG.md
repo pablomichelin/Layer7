@@ -16,6 +16,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 M1 — fingerprint GUI via daemon:** FEITO no git após gates
+  deste bloco. `layer7_local_hardware_id()` deixa a fórmula PHP
+  (`sysctl kern.hostuuid` + `ifconfig -l ether`) e chama
+  `/usr/local/sbin/layer7d --fingerprint` (CLI one-shot; empacotado em
+  `PREFIX/sbin`). Saída inválida / `rc≠0` / binário ausente fecha.
+  `LAYER7_TEST_HW_ID` só com `LAYER7_TEST_ROOT`. Sem P2-9/P2-13/P3, sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO). Equivalência FreeBSD no
+  appliance **pendente**.
 - **BG-128 A1/A2/M2 — lifecycle keep-config/upgrade fail-closed:**
   FEITO no git após gates deste bloco (`28c97ad` + governação). Staging de CA MITM e secrets
   Identity deixa `/tmp` e passa a `/var/db/layer7/deinstall-preserve`

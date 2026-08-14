@@ -43,6 +43,25 @@ Formula observada:
 hardware_id = SHA256(kern.hostuuid + ":" + primeira_mac_ethernet_nao_loopback)
 ```
 
+### 1.1a Fonte da GUI / helper (M1 / BG-128)
+
+A GUI e o helper `layer7-mitm-entitle-ok` **não** recalculam esta fórmula
+em PHP. Obtêm o mesmo `hardware_id` via CLI one-shot:
+
+```text
+/usr/local/sbin/layer7d --fingerprint
+```
+
+(`main.c` imprime 64 hex e sai; o daemon em execução não é necessário.)
+Binário ausente, `rc≠0` ou saída que não seja `^[a-f0-9]{64}$` → string
+vazia → binding fail-closed. `LAYER7_TEST_HW_ID` só é lido quando
+`LAYER7_TEST_ROOT` está definido (harness de teste; inacessível em
+produção). A fórmula em `license.c` **não** muda.
+
+Validação de equivalência FreeBSD (`sysctlbyname` + `getifaddrs` /
+`IFT_ETHER`) no appliance permanece **pendente** — um host macOS com
+stub **não** prova o binário empacotado.
+
 ### 1.2 Normalizacoes e fontes de dados
 
 Observado no codigo actual:

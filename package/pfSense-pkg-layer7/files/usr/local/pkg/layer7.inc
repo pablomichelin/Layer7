@@ -6843,14 +6843,7 @@ function layer7_read_license_status()
 			"features_truncated" => !empty($stats["license_features_truncated"])
 		);
 	}
-	$hw = "";
-	$bin = "/usr/local/sbin/layer7d";
-	if (is_executable($bin)) {
-		exec(escapeshellarg($bin) . " --fingerprint 2>/dev/null", $out, $rc);
-		if ($rc === 0 && !empty($out[0])) {
-			$hw = trim($out[0]);
-		}
-	}
+	$hw = layer7_hw_fingerprint_from_daemon();
 	$lic_path = layer7_lic_path();
 	$has_lic = file_exists($lic_path);
 	return array(
@@ -6883,6 +6876,10 @@ function layer7_read_license_status()
  * P2-11 / BG-128: assinatura sozinha NÃO chega. O payload tem de passar o
  * mesmo binding do daemon (`license.c`): hardware_id exacto + expiry com
  * grace local de 14 dias. Sem anti-rollback (30.6) e sem reabrir P2-13.
+ *
+ * M1 / BG-128: o hardware_id local vem de `layer7d --fingerprint` (CLI
+ * one-shot; daemon em execução não é necessário). Sem reimplementação PHP
+ * da fórmula F3.2. Falha fechada se o binário/saída for inválido.
  */
 define("L7_FEAT_BASE", 1);
 define("L7_FEAT_IDENTITY", 2);
@@ -7056,81 +7053,70 @@ function layer7_license_now()
 }
 
 /**
- * Fingerprint local sem processo do daemon.
- * Formula F3.2: SHA256(kern.hostuuid + ":" + primeira MAC ether).
- * Fonte: sysctl -n kern.hostuuid + ifconfig -l ether (mesmo filtro
- * IFT_ETHER / getifaddrs do daemon). LAYER7_TEST_HW_ID ganha nos testes.
- * Vazio = indisponível → fail-closed (como license.c).
+ * Binário canónico do fingerprint. Produção: /usr/local/sbin/layer7d
+ * (pkg-plist + Makefile PREFIX/sbin). Com LAYER7_TEST_ROOT, só o stub
+ * sob o tempdir — sem fallback ao host (macOS não prova FreeBSD).
+ */
+function layer7_layer7d_bin()
+{
+	$prod = "/usr/local/sbin/layer7d";
+	$test_root = getenv("LAYER7_TEST_ROOT");
+	if (is_string($test_root) && $test_root !== "") {
+		$cand = rtrim($test_root, "/") . "/usr/local/sbin/layer7d";
+		if (is_executable($cand)) {
+			return $cand;
+		}
+		return "";
+	}
+	return $prod;
+}
+
+function layer7_hw_id_valid($hw)
+{
+	return is_string($hw) && preg_match('/^[a-f0-9]{64}$/', $hw);
+}
+
+/**
+ * Fonte canónica do fingerprint: CLI `layer7d --fingerprint`.
+ * Não exige daemon em execução (main.c sai após imprimir).
+ * Saída inválida / rc≠0 / binário ausente → "" (fail-closed).
+ */
+function layer7_hw_fingerprint_from_daemon()
+{
+	$bin = layer7_layer7d_bin();
+	if ($bin === "" || !is_executable($bin)) {
+		return "";
+	}
+	$out = array();
+	$rc = 1;
+	exec(escapeshellarg($bin) . " --fingerprint 2>/dev/null", $out, $rc);
+	if ($rc !== 0 || empty($out[0])) {
+		return "";
+	}
+	$hw = strtolower(trim((string)$out[0]));
+	if (!layer7_hw_id_valid($hw)) {
+		return "";
+	}
+	return $hw;
+}
+
+/**
+ * Fingerprint local para binding GUI/helper.
+ * Produção: apenas `layer7d --fingerprint`.
+ * LAYER7_TEST_HW_ID só com LAYER7_TEST_ROOT (injeção de teste; sem
+ * bypass de produção). Vazio = indisponível → fail-closed.
  */
 function layer7_local_hardware_id()
 {
-	$env = getenv("LAYER7_TEST_HW_ID");
-	if (is_string($env) && $env !== "") {
-		return trim($env);
+	$test_root = getenv("LAYER7_TEST_ROOT");
+	if (is_string($test_root) && $test_root !== "") {
+		$env = getenv("LAYER7_TEST_HW_ID");
+		if (is_string($env) && $env !== "") {
+			return trim($env);
+		}
 	}
-	$computed = layer7_hw_fingerprint_local();
+	$computed = layer7_hw_fingerprint_from_daemon();
 	return is_string($computed) ? $computed : "";
-}
-
-function layer7_hw_hostuuid_raw()
-{
-	$sysctl = "/sbin/sysctl";
-	if (!is_executable($sysctl)) {
-		$sysctl = "sysctl";
-	}
-	$out = array();
-	$rc = 1;
-	exec(escapeshellarg($sysctl) . " -n kern.hostuuid 2>/dev/null", $out, $rc);
-	if ($rc !== 0 || empty($out[0])) {
-		return "";
-	}
-	$uuid = (string)$out[0];
-	while ($uuid !== "" && ($uuid[strlen($uuid) - 1] === "\n" ||
-	    $uuid[strlen($uuid) - 1] === "\r")) {
-		$uuid = substr($uuid, 0, -1);
-	}
-	return $uuid;
-}
-
-function layer7_hw_first_ether_mac()
-{
-	$ifconfig = "/sbin/ifconfig";
-	if (!is_executable($ifconfig)) {
-		$ifconfig = "ifconfig";
-	}
-	$out = array();
-	$rc = 1;
-	exec(escapeshellarg($ifconfig) . " -l ether 2>/dev/null", $out, $rc);
-	if ($rc !== 0 || empty($out[0])) {
-		return "";
-	}
-	$names = preg_split('/\s+/', trim($out[0]), -1, PREG_SPLIT_NO_EMPTY);
-	if (!is_array($names) || empty($names[0])) {
-		return "";
-	}
-	$ifn = $names[0];
-	if (!preg_match('/^[A-Za-z][A-Za-z0-9._-]*$/', $ifn)) {
-		return "";
-	}
-	$out2 = array();
-	exec(escapeshellarg($ifconfig) . " " . escapeshellarg($ifn) .
-	    " 2>/dev/null", $out2, $rc2);
-	$blob = implode("\n", $out2);
-	if (!preg_match('/\bether\s+([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5})\b/',
-	    $blob, $m)) {
-		return "";
-	}
-	return strtolower($m[1]);
-}
-
-function layer7_hw_fingerprint_local()
-{
-	$uuid = layer7_hw_hostuuid_raw();
-	$mac = layer7_hw_first_ether_mac();
-	if ($uuid === "" || $mac === "") {
-		return "";
-	}
-	return hash("sha256", $uuid . ":" . $mac);
 }
 
 /**
@@ -7367,14 +7353,7 @@ function layer7_content_subscription_status($now = null, $local_hw = null)
 		return $out;
 	}
 	if ($local_hw === null) {
-		$env_hw = getenv("LAYER7_TEST_HW_ID");
-		if (is_string($env_hw) && $env_hw !== "") {
-			$local_hw = $env_hw;
-		} else {
-			$st = layer7_read_license_status();
-			$local_hw = isset($st["hardware_id"]) ?
-			    (string)$st["hardware_id"] : "";
-		}
+		$local_hw = layer7_local_hardware_id();
 	}
 	$local_hw = trim((string)$local_hw);
 	if ($local_hw !== "" && $hw !== $local_hw) {

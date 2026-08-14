@@ -432,6 +432,11 @@ else
 	else
 		fail "test_entitlements_gui"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_fingerprint_gui_daemon.php; then
+		pass "test_fingerprint_gui_daemon"
+	else
+		fail "test_fingerprint_gui_daemon"
+	fi
 fi
 
 step "Regress: layer7-tlsproxy (junto ao codigo)"

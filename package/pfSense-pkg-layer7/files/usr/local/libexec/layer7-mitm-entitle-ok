@@ -1,7 +1,9 @@
 #!/bin/sh
-# layer7-mitm-entitle-ok — GA2.9 / passo 30.7 + P2-11 / BG-128
+# layer7-mitm-entitle-ok — GA2.9 / passo 30.7 + P2-11 / M1 / BG-128
 # Exit 0 se o .lic assinado concede mitm E o binding (HW + expiry/grace)
 # corresponde ao contrato do daemon. Senão 1.
+# HW local: layer7.inc chama /usr/local/sbin/layer7d --fingerprint
+# (mesmo host/pkg; CLI one-shot, sem daemon em execução).
 # Usado pelo rc.d layer7-tlsproxy. Root ainda pode patchar (R-A).
 # Sem fallback só-assinatura: PHP + layer7.inc é o único caminho.
 

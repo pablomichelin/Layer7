@@ -54,7 +54,8 @@ runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks
 **P2-7+P2-8+P2-10 FEITOS** no git (`2026-08-14`; sem deploy / `PORTVERSION`).
 **P2-11 FEITO** no git (`2026-08-14`; sem deploy / `PORTVERSION`).
 **A1/A2/M2 FEITO** no git (`28c97ad` + governação após gates; `2026-08-14`; lifecycle
-fail-closed; sem M1/P2-13). Próximo código com GO:
+fail-closed; sem P2-13). **M1 FEITO** no git (`2026-08-14`; GUI/helper via
+`layer7d --fingerprint`; sem deploy / `PORTVERSION`). Próximo código com GO:
 P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1). **P0-1 ACTIVO** inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
