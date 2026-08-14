@@ -77,11 +77,14 @@ devolve 500 JSON `Erro interno.`. Residual P3-5 (fechado neste bloco). Sem deplo
 `PORTVERSION`.
 **P3-5** FEITO no git (`2026-08-14`) —
 Activate promove `.lic` de forma atómica (tmp 0600 + verify +
-`rename`); falha/unlink do tmp preserva o anterior. Residual P3-6.
+`rename`); falha/unlink do tmp preserva o anterior. Residual P3-6
+(fechado neste bloco). Sem deploy / `PORTVERSION`.
+**P3-6** FEITO no git (`2026-08-14`) —
+`verify-prod-pubkey.sh` exige PEM do port == SoT (e == C). Residual P3-7.
 Sem deploy / `PORTVERSION`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6).
 
 ---
 
@@ -343,7 +346,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P3-3C** FEITO no git (`2026-08-14`) | `totp.js` `verifyTotp` | Comparação HOTP com `===` | Timing teórico de prefixo (6 dígitos) | Buffer UTF-8 + guarda de comprimento + `timingSafeEqual` | Código válido → true; 6 dígitos inválidos → false; malformed → false sem throw. **Não** deployado. |
 | **P3-4 FEITO no git** (`2026-08-14`) | `auth.js` `GET /2fa/status`; Express `^4.21.2` | Falha de BD em `GET /2fa/status` | Promise rejeitada sem error handler | `try/catch` local (sem wrapper global / Express 5) | Pool a rejeitar → 500 JSON `Erro interno.`; sem unhandledRejection; segundo GET 200; 401/403 intactos. **Não** deployado. |
 | **P3-5 FEITO no git** (`2026-08-14`) | `license.c` `promote_license_atomic` / `layer7_license_check_path` | Activate escrevia `.lic` **antes** de verificar | Janela de ficheiro lixo se crash; verify falha apagava o anterior | tmp 0600 no mesmo dir + verify + `rename`; falha preserva o anterior | Crash após write do tmp → final anterior intacto; inválido remove tmp; sucesso 0600. **Não** deployado. |
-| **P3-6** | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` só C vs SoT | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Estender o gate ao PEM do port | Gate FAIL se PEM ≠ SoT |
+| **P3-6 FEITO no git** (`2026-08-14`) | `license.c:43-48`; PEM do port; `verify-prod-pubkey.sh` | Rotação desalinha PEM vs array C | Daemon e GUI podem discordar no mesmo `.lic` | Gate exige PEM == SoT == C (32 B raw SPKI) | Coincidente PASS; ausente/inválido/divergente FAIL; SoT≠C FAIL. **Não** deployado. |
 | **P3-7** | `license.c:518-520` vs `crud-validation.js:647-654` | Appliance UTC−3 vs expiry UTC no servidor | Cliente mais estrito (grace local antes do servidor); não é bypass | Interpretar expiry como UTC (`timegm`) | `TZ=America/Sao_Paulo` vs `TZ=UTC` no dia fronteira |
 | **P3-8** | `20260812T013145Z` último `asset_count=0` | Sem recheck em 14-08 | Outros PoPs/TTL não observados | Recheck só com pedido do gestor (esta auditoria não contactou GitHub) | `asset_count` + 404 anónimo |
 | **P3-9** | `update-blacklists.sh:38-39`; `layer7.inc:10659-10668`; `config.json.sample:1-4` | Cliente ainda aponta espelho GitHub / tarball anónimo | Cut = 404 esperado; confunde ops; risco de reupload GA4.11 sem GO | Documentar «404 esperado» vs remover URL (bloco separado) | Sample/docs alinhados ao cut |
@@ -480,7 +483,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 23. **P3-3C** FEITO no git (`2026-08-14`) — `verifyTotp` Buffer UTF-8 + guarda de comprimento + `timingSafeEqual`. **Não** deployado.
 24. **P3-4** FEITO no git (`2026-08-14`) — `GET /api/auth/2fa/status` try/catch; pool rejeitado → 500 JSON; processo vivo. **Não** deployado.
 25. **P3-5** FEITO no git (`2026-08-14`) — promoção atómica do `.lic` em Activate (tmp 0600 + verify + rename); falha preserva o anterior. **Não** deployado.
-26. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5. Residual P3-6.
+26. **P3-6** FEITO no git (`2026-08-14`) — `verify-prod-pubkey.sh` exige PEM do port == SoT; selftest local sem builder. **Não** deployado.
+27. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6. Residual P3-7.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
