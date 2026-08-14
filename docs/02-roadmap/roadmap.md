@@ -49,9 +49,9 @@ Serving `30.11` **versionado no git** (allowlist 7 paths); o freeze **não**
 encerrou — **BG-128**;
 relatório [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
 runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git
-(`2026-08-14`; sem deploy; P2-5 absorvido no P1-3). Próximo código com GO:
-**P1-5** (package/daemon). **P0-1 ACTIVO** inalterado.
+**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git
+(`2026-08-14`; sem deploy / `PORTVERSION`; P2-5 absorvido no P1-3). Próximo código com GO:
+P2 restantes (exceto P2-9 sem GO). **P0-1 ACTIVO** inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
 

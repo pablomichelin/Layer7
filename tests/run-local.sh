@@ -273,6 +273,54 @@ else
 	fail "test_flush_coverage"
 fi
 
+step "Unit: pkg-deinstall lifecycle (P1-6/7/8 + P2-12)"
+if sh tests/unit/test_pkg_deinstall_lifecycle.sh; then
+	pass "test_pkg_deinstall_lifecycle"
+else
+	fail "test_pkg_deinstall_lifecycle"
+fi
+
+step "Unit: check-in config + enforce_ready (P1-5)"
+CRYPTO_FLAGS=""
+if [ -d /opt/homebrew/opt/openssl ]; then
+	CRYPTO_FLAGS="-I/opt/homebrew/opt/openssl/include -L/opt/homebrew/opt/openssl/lib -lssl -lcrypto"
+elif [ -d /usr/local/opt/openssl ]; then
+	CRYPTO_FLAGS="-I/usr/local/opt/openssl/include -L/usr/local/opt/openssl/lib -lssl -lcrypto"
+elif pkg-config --exists libssl 2>/dev/null; then
+	CRYPTO_FLAGS="$(pkg-config --cflags --libs libssl libcrypto)"
+else
+	CRYPTO_FLAGS="-lssl -lcrypto"
+fi
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_checkin_config_enabled \
+    tests/functional/test_checkin_config_enabled.c \
+    src/layer7d/license.c src/layer7d/features.c \
+    $CRYPTO_FLAGS \
+    2>/tmp/test_checkin_config_enabled.cc.err; then
+	if /tmp/test_checkin_config_enabled; then
+		pass "test_checkin_config_enabled"
+	else
+		fail "test_checkin_config_enabled runtime"
+	fi
+else
+	cat /tmp/test_checkin_config_enabled.cc.err
+	fail "test_checkin_config_enabled compile"
+fi
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
+    -o /tmp/test_license_enforce_gate \
+    tests/functional/test_license_enforce_gate.c \
+    src/layer7d/license_enforce_gate.c \
+    2>/tmp/test_license_enforce_gate.cc.err; then
+	if /tmp/test_license_enforce_gate; then
+		pass "test_license_enforce_gate"
+	else
+		fail "test_license_enforce_gate runtime"
+	fi
+else
+	cat /tmp/test_license_enforce_gate.cc.err
+	fail "test_license_enforce_gate compile"
+fi
+
 step "Unit: bl_src_match (except_ips)"
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_bl_src_match \
@@ -353,6 +401,16 @@ else
 	else
 		fail "test_mitm_regress (package)"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_check_in_default_30.14.php; then
+		pass "test_check_in_default_30.14"
+	else
+		fail "test_check_in_default_30.14"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_license_revoke_state.php; then
+		pass "test_license_revoke_state"
+	else
+		fail "test_license_revoke_state"
+	fi
 fi
 
 step "Regress: layer7-tlsproxy (junto ao codigo)"
@@ -397,10 +455,13 @@ for f in package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d \
     package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-pfctl \
     package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-unbound-anti-doh \
     package/pfSense-pkg-layer7/files/usr/local/etc/layer7/*.sh \
+    package/pfSense-pkg-layer7/files/pkg-deinstall.in \
+    package/pfSense-pkg-layer7/files/pkg-install.in \
     scripts/diagnose-layer7-appliance.sh \
     scripts/release/uninstall.sh \
     tests/unit/test_rc_pidfile.sh \
     tests/unit/test_flush_coverage.sh \
+    tests/unit/test_pkg_deinstall_lifecycle.sh \
     tests/lab/smoke-monitor-mode.sh \
     tests/lab/smoke-caminho-a.sh \
     tests/run-local.sh; do

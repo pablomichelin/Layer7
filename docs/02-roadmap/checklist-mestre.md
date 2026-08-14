@@ -477,4 +477,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] **BG-128 P1-2** — origin substitui `X-Forwarded-For` por `$remote_addr`; `getClientIp` usa `req.ip` (`trust proxy: 1`); Proto intacto (`2026-08-14`; sem deploy)
 - [x] **BG-128 P1-4 + P2-1** — lock no `init`; primeiro admin já owner; promoção legado `LIMIT 1`; alerta se vários owners (`2026-08-14`; sem deploy)
 - [x] **BG-128 allowlist `30.11`** — 7 paths versionados no git (`2026-08-14`; sem deploy; P0-1 **não** encerrado)
-- [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo código com GO = **P1-5** (sem `.244` neste bloco)
+- [x] **BG-128 P1-5…P1-8 + P2-12** — enforce recusa check-in ON sem chave; upgrade/keep-config preserva json/`.lic`/CA/secrets/check-in; deinstall real limpa `/var/db` + anti-DoH (`2026-08-14`; sem deploy / `PORTVERSION`)
+- [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem `.244` neste bloco)

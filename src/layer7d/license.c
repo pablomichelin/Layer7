@@ -940,6 +940,16 @@ checkin_state_defaults(struct l7_checkin_state *st)
 	st->max_offline_hours = L7_CHECKIN_DEFAULT_MAX_OFFLINE_HOURS;
 }
 
+static const char *
+checkin_state_path(void)
+{
+	const char *e = getenv("L7_CHECKIN_STATE_PATH");
+
+	if (e != NULL && e[0] != '\0')
+		return e;
+	return L7_CHECKIN_STATE_PATH;
+}
+
 static int
 checkin_load_state(struct l7_checkin_state *st)
 {
@@ -947,7 +957,7 @@ checkin_load_state(struct l7_checkin_state *st)
 	size_t len;
 
 	checkin_state_defaults(st);
-	raw = read_file_alloc(L7_CHECKIN_STATE_PATH, &len);
+	raw = read_file_alloc(checkin_state_path(), &len);
 	if (!raw)
 		return 0;
 
@@ -977,7 +987,7 @@ checkin_save_state(const struct l7_checkin_state *st)
 {
 	FILE *f;
 
-	f = fopen(L7_CHECKIN_STATE_PATH, "w");
+	f = fopen(checkin_state_path(), "w");
 	if (!f)
 		return -1;
 
@@ -1003,7 +1013,7 @@ checkin_save_state(const struct l7_checkin_state *st)
 
 
 	fclose(f);
-	(void)chmod(L7_CHECKIN_STATE_PATH, 0600);
+	(void)chmod(checkin_state_path(), 0600);
 	return 0;
 }
 
@@ -1152,6 +1162,18 @@ layer7_checkin_config_enabled(const char *config_path)
 
 	free(json);
 	return enabled;
+}
+
+int
+layer7_checkin_enforce_ready(const char *config_path)
+{
+	struct l7_checkin_state st;
+
+	if (!layer7_checkin_config_enabled(config_path))
+		return 1;
+	if (!checkin_load_state(&st) || !st.license_key[0])
+		return 0;
+	return 1;
 }
 
 int

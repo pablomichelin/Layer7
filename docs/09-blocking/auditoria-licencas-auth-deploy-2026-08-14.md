@@ -26,10 +26,11 @@
 
 **P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244`. O serving `30.11` **já está versionado** (allowlist, sem snapshot); o freeze **não** caiu — falta GO do primeiro rebuild `api` + smoke. Um rebuild integral injectaria também P0-2…P1-4. Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
-**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS no git**
-(`2026-08-14`; sem deploy). P2-5 ficou absorvido no P1-3. **P0-1
-permanece ACTIVO** — versionar ≠ publicar. Próximo código com GO:
-**P1-5** (package/daemon). Sem `.244` / rebuild / GitHub Release.
+**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12
+FEITOS no git** (`2026-08-14`; sem deploy). P2-5 ficou absorvido no P1-3.
+**P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
+GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
+(exceto P2-9 sem GO).
 
 ---
 
@@ -168,43 +169,62 @@ residual P0-2 single-use/bind.
 
 ### P1-5 — `.lic` manual sem chave de check-in = sem revogação / sem max-offline
 
+**FEITO no git** (`2026-08-14`). `layer7_checkin_enforce_ready()` recusa
+enforce se `check_in_enabled` e não houver `license_key`. Air-gap =
+`check_in_enabled=false`. Sem deploy / `PORTVERSION`.
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `license.c:1163-1172`, `1176-1195`, `771-775`, `972`, `819`; `main.c:1154-1162`; GUI só activa por código (`layer7_settings.php:184-191`) |
+| **Evidência** | `license.c` `layer7_checkin_enforce_ready`; `main.c` `enforce_armed` + `refresh_enforce_cfg` |
 | **Cenário** | Cópia de `.lic` assinado para `/usr/local/etc/layer7.lic` sem `--activate`. |
 | **Impacto** | Sem `license_key` em `/var/db/layer7-checkin.json`, check-in nunca corre. Revogação remota e teto offline (336 h) não aplicam. Enforce até expiry + 14 d de grace. |
 | **Correcção mínima** | Recusar enforce se `check_in_enabled` e não existir estado de check-in com chave; ou exigir activate. Air-gap: flag explícita. |
-| **Testes** | `.lic` válido sem `layer7-checkin.json` + `check_in_enabled=true` → `checkin_due`/`offline_expired` = 0; `--check-in` = `L7_CHECKIN_SKIP`. |
+| **Implementado** | Gate no daemon; `--check-in` continua `SKIP`; N3 intacto (rede ≠ sem chave). |
+| **Testes** | `test_checkin_config_enabled.c`: enabled+sem estado ⇒ `enforce_ready=0`; air-gap ⇒ 1; chave presente ⇒ 1. |
 
 ### P1-6 — Uninstall/revoke deixam chave e tokens em `/var/db`
 
+**FEITO no git** (`2026-08-14`). Uninstall real apaga os três paths;
+keep-config/keep-license/`PKG_UPGRADE` preservam. Revoke GUI chama
+`layer7_clear_local_license_state()`. Sem deploy.
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `pkg-deinstall.in:108-146`; `scripts/release/uninstall.sh:120-137`; `layer7_settings.php:230-242`; paths em `license.c:984-1006` |
+| **Evidência** | `pkg-deinstall.in`; `uninstall.sh`; `layer7_clear_local_license_state()` |
 | **Cenário** | `pkg delete` / remoção GUI (mesmo sem “manter licença”) / “Revogar licença” na GUI. |
-| **Impacto** | Sobrevivem `layer7-checkin.json` (chave em claro, 0600), `clock-mark.json`, `content-subscription.json`. Reinstall retoma check-in sem activate. GUI revoke apaga só o `.lic`. `MANUAL-INSTALL.md` residual **não** lista estes paths. |
+| **Impacto** | Sobrevivem `layer7-checkin.json` (chave em claro, 0600), `clock-mark.json`, `content-subscription.json`. Reinstall retoma check-in sem activate. GUI revoke apaga só o `.lic`. |
 | **Correcção mínima** | Apagar os três ficheiros em POST-DEINSTALL e no revoke GUI; documentar no manual. |
-| **Testes** | Activate → `pkg delete` → `test ! -f /var/db/layer7-checkin.json`. Revoke GUI → o mesmo. |
+| **Implementado** | Wipe só em uninstall real sem keep; revoke limpa os três paths. |
+| **Testes** | `test_pkg_deinstall_lifecycle.sh` + `test_license_revoke_state.php`. |
 
 ### P1-7 — “Manter configuração” apaga CA MITM e segredos Identity
 
+**FEITO no git** (`2026-08-14`). keep-config e `PKG_UPGRADE` fazem backup/
+restore de `mitm/` e `identity-*.secret`. Copy da GUI corrigido. Sem deploy.
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `pkg-deinstall.in:109-118` (`rm -rf /usr/local/etc/layer7` **fora** do `if` keep-config); restore só `profiles-custom.json` `:120-124`; GUI `layer7_removal.php:128-129`; CA/secrets em `layer7.inc:8661-8676`, `9161-9174` |
+| **Evidência** | `pkg-deinstall.in` `_preserve_runtime`; `uninstall.sh --keep-config`; `layer7_removal.php` |
 | **Cenário** | Uninstall com `keep_config`. |
-| **Impacto** | Perdem-se `mitm/ca.key`+`ca.crt` e `identity-*.secret`. Copy da GUI sugere que só o cache de blacklists desaparece. Reinstall: CA nova (clientes com CA antiga) e LDAP/RADIUS sem secret. |
+| **Impacto** | Perdem-se `mitm/ca.key`+`ca.crt` e `identity-*.secret`. Copy da GUI sugere que só o cache de blacklists desaparece. |
 | **Correcção mínima** | Se `keep_config`, preservar `mitm/` e `identity-*.secret` (ou não fazer `rm -rf` cego). Corrigir o copy. |
-| **Testes** | Gerar CA + secrets → uninstall keep-config → paths ainda existem. |
+| **Implementado** | Backup/restore no mesmo padrão de `profiles-custom.json`. |
+| **Testes** | `test_pkg_deinstall_lifecycle.sh` (contratos de ficheiro). |
 
 ### P1-8 — POST-DEINSTALL apaga `layer7.json`/`.lic` sem guarda `PKG_UPGRADE`
 
+**FEITO no git** (`2026-08-14`). Delete de json/`.lic` só corre se
+`PKG_UPGRADE` estiver vazio e não houver keep. Manual e `rollback.md`
+alinhados. Sem deploy.
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `pkg-deinstall.in:101-116` vs guarda `PKG_UPGRADE` só em profiles-custom `:101-103`; manual afirma preservação (`MANUAL-INSTALL.md:2364-2365`, `:1815`) |
+| **Evidência** | `pkg-deinstall.in` `_is_upgrade`; `MANUAL-INSTALL.md` §5; `docs/13-runbooks/rollback.md` |
 | **Cenário** | `pkg delete` (reinstall oficial: delete + `pkg add -f`). Se o ramo POST-DEINSTALL correr sem flags keep, apaga json **e** `.lic`. |
-| **Impacto** | Reinstall oficial pode deixar o appliance sem licença; POST-INSTALL copia o sample e perde políticas. Upgrades de campo a sobreviverem sugerem que `pkg add -f` **pode** não correr este ramo — isso **não** está no código do produto. |
+| **Impacto** | Reinstall oficial pode deixar o appliance sem licença; POST-INSTALL copia o sample e perde políticas. |
 | **Correcção mínima** | `if [ -z "${PKG_UPGRADE:-}" ]` à volta do delete de json/lic. Alinhar o manual. |
-| **Testes** | POST-DEINSTALL com `PKG_UPGRADE=true` → json/lic ficam. Sem flags → apagar. |
+| **Implementado** | Upgrade não apaga; `pkg delete` sem keep apaga; reinstall preferido = `pkg add -f` sem delete. |
+| **Testes** | `test_pkg_deinstall_lifecycle.sh`. |
 
 ### P1-9 — Compose/nginx/bind live ≠ HEAD
 
@@ -243,7 +263,7 @@ residual P0-2 single-use/bind.
 | **P2-9** | `layer7.inc:2552-2593`; `pkg-install.in:43-44` | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF. Documentado (RR-1), residual comercial | Só com GO: migração opt-in ou injectar `true` | Já existe `test_check_in_default_30.14.php`; falta teste de install a **não** migrar |
 | **P2-10** | `license.c:678-703` | `--activate` grava `.lic` sem `chmod` | umask 022 → 0644; payload assinado legível localmente | `chmod 0600` / `fchmod` como no check-in | `stat` do `.lic` = 0600 |
 | **P2-11** | `layer7.inc:6992-7035`, `7213-7234` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` exigir HW + expiry | `.lic` HW errado / expiry passado → GUI locked, daemon `valid=0` |
-| **P2-12** | `pkg-deinstall.in:42-51` vs `layer7.inc:2843` | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL | anti-DoH ON → delete → `configured() === false` |
+| **P2-12 FEITO no git** (`2026-08-14`) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
 | **P2-13** | `license.c:238-247`, `518-520`, `568-573` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | Fim do dia UTC / `tm_isdst=-1` | Relógio no dia D 12:00; hoje cai para grace |
 | **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
 | **P2-15 FEITO no git** (`2026-08-14`) | Worktree local vs MATCH `20260812T002500Z` | Serving allowlist versionado; snapshot continua só em disco | Gap de código 30.11 no git fechado; snapshot/`.env` continuam fora | Inventário + commit allowlist **FEITO**; P0-1 **não** encerrado | Hashes = inventário; `check-ignore` do tarball |
@@ -367,12 +387,22 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 5. **P1-2 FEITO no git** (`2026-08-14`) — XFF / rate-limit IP; origin substitui XFF; `getClientIp` = `req.ip`. **Não** deployado. Residual: IP público no origin (PROXY/P1-9); P2-3 Proto; P2-2 CSRF.
 6. **P1-4 + P2-1 FEITOS no git** (`2026-08-14`) — lock no init; primeiro admin já owner; promoção `LIMIT 1`; alerta se `COUNT>1`. **sem** deploy `.244`.
 7. **Commit allowlist 30.11 FEITO no git** (`2026-08-14`) — **não** levanta P0-1. Sem snapshot/SPA/bind/`.env`/host.
-8. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).
+8. **P1-5…P1-8 + P2-12 FEITOS no git** (`2026-08-14`) — package/daemon; **sem** deploy / `PORTVERSION`.
 9. **P2 / P3 restantes** — por severidade; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — P1-5…P1-8 + P2-12 (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Recusar enforce sem estado de check-in quando a flag está ON; preservar json/`.lic`/CA/secrets/check-in em upgrade e keep-config; limpar `/var/db` + anti-DoH no deinstall real |
+| Impacto | Daemon (`license.c`/`main.c`), hooks `pkg-deinstall.in`, `uninstall.sh`, revoke GUI, copy de remoção, docs de install/rollback. Sem P2-9, sem license server/SPA, sem `PORTVERSION`/build/release/hosts |
+| Risco | Médio-baixo. Air-gap continua `check_in_enabled=false`. N3 intacto (falha de rede ≠ recusar enforce). Upgrade deixa de apagar licença/políticas. Residual: P2-9 (migração check-in em upgrade) só com GO |
+| Teste | `test_checkin_config_enabled` + `test_license_enforce_gate` + `test_pkg_deinstall_lifecycle.sh` + `test_license_revoke_state.php` + `sh tests/run-local.sh` |
+| Rollback | Reverter o commit; `enforce_armed` volta a armar sem chave; POST-DEINSTALL volta a apagar json/`.lic` em upgrade e a deixar leftovers em `/var/db` |
 
 ## Objectivo / impacto / risco / teste / rollback — allowlist `30.11` / P0-1 git (`2026-08-14`)
 

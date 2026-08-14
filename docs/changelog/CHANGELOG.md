@@ -16,6 +16,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P1-5…P1-8 + P2-12 — package/daemon lifecycle:**
+  `layer7_checkin_enforce_ready()` recusa enforce se `check_in_enabled` e
+  não houver `license_key` (air-gap = flag `false`; N3 intacto).
+  `PKG_UPGRADE` e keep-config preservam `layer7.json` / `.lic` / CA MITM /
+  `identity-*.secret` / estado de check-in. Uninstall real sem keep apaga
+  os três paths em `/var/db` e remove anti-DoH no PRE-DEINSTALL. Revoke
+  GUI chama `layer7_clear_local_license_state()`. Sem P2-9, sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P1-4 + P2-1 — bootstrap owner:** `init` adquire
   `LOCK TABLE admins IN SHARE ROW EXCLUSIVE MODE` e cria o primeiro admin
   já como owner activo com `*`. A promoção de legado no arranque fica

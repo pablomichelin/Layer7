@@ -6,8 +6,9 @@
 #   fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/vX.Y.Z/uninstall.sh && sh /tmp/uninstall.sh
 #
 # Opcoes:
-#   --keep-config   Preserva layer7.json e layer7.lic para reinstalacao futura
-#   --keep-license  Preserva apenas layer7.lic
+#   --keep-config   Preserva layer7.json, layer7.lic, CA MITM, secrets Identity
+#                   e estado de check-in (/var/db)
+#   --keep-license  Preserva layer7.lic e estado de check-in (/var/db)
 #   --clean-unbound Remove overrides anti-DoH do Unbound custom_options (config.xml)
 #   --yes           Nao pedir confirmacao
 #
@@ -38,8 +39,8 @@ while [ $# -gt 0 ]; do
         --help|-h)
             echo "Uso: sh uninstall.sh [--keep-config] [--keep-license] [--clean-unbound] [--yes]"
             echo ""
-            echo "  --keep-config    Preserva layer7.json e layer7.lic"
-            echo "  --keep-license   Preserva apenas layer7.lic"
+            echo "  --keep-config    Preserva json, .lic, CA MITM, secrets e check-in"
+            echo "  --keep-license   Preserva .lic e estado de check-in"
             echo "  --clean-unbound  Remove overrides anti-DoH do Unbound (config.xml)"
             echo "  --yes            Nao pedir confirmacao"
             exit 0
@@ -123,18 +124,68 @@ rm -f /usr/local/etc/layer7.json.sample
 rm -f /usr/local/etc/layer7-protos.txt.sample
 rm -f /usr/local/etc/layer7-protos.txt
 
+_mitm_bak="/tmp/layer7-mitm.bak"
+_id_ldap_bak="/tmp/layer7-identity-ldap.secret.bak"
+_id_radius_bak="/tmp/layer7-identity-radius.secret.bak"
+_id_dc_bak="/tmp/layer7-identity-dc.secret.bak"
+_profiles_custom_bak="/tmp/layer7-profiles-custom.json.bak"
 if [ "$KEEP_CONFIG" -eq 1 ]; then
-    echo "      --keep-config: preservando layer7.json e layer7.lic"
+    echo "      --keep-config: preservando layer7.json, layer7.lic, CA MITM e secrets"
+    if [ -d /usr/local/etc/layer7/mitm ]; then
+        rm -rf "${_mitm_bak}"
+        cp -a /usr/local/etc/layer7/mitm "${_mitm_bak}" 2>/dev/null || true
+    fi
+    if [ -f /usr/local/etc/layer7/identity-ldap.secret ]; then
+        cp -f /usr/local/etc/layer7/identity-ldap.secret "${_id_ldap_bak}" 2>/dev/null || true
+    fi
+    if [ -f /usr/local/etc/layer7/identity-radius.secret ]; then
+        cp -f /usr/local/etc/layer7/identity-radius.secret "${_id_radius_bak}" 2>/dev/null || true
+    fi
+    if [ -f /usr/local/etc/layer7/identity-dc.secret ]; then
+        cp -f /usr/local/etc/layer7/identity-dc.secret "${_id_dc_bak}" 2>/dev/null || true
+    fi
+    if [ -f /usr/local/etc/layer7/profiles-custom.json ]; then
+        cp -f /usr/local/etc/layer7/profiles-custom.json "${_profiles_custom_bak}" 2>/dev/null || true
+    fi
 elif [ "$KEEP_LICENSE" -eq 1 ]; then
     rm -f /usr/local/etc/layer7.json
-    echo "      --keep-license: preservando layer7.lic, removendo layer7.json"
+    echo "      --keep-license: preservando layer7.lic e estado de check-in"
 else
     rm -f /usr/local/etc/layer7.json
     rm -f /usr/local/etc/layer7.lic
-    echo "      Configuracao e licenca removidas."
+    rm -f /var/db/layer7-checkin.json \
+        /var/db/layer7/clock-mark.json \
+        /var/db/layer7/content-subscription.json
+    echo "      Configuracao, licenca e estado local removidos."
 fi
 
 rm -rf /usr/local/etc/layer7
+if [ "$KEEP_CONFIG" -eq 1 ]; then
+    mkdir -p /usr/local/etc/layer7
+    if [ -d "${_mitm_bak}" ]; then
+        rm -rf /usr/local/etc/layer7/mitm
+        mv -f "${_mitm_bak}" /usr/local/etc/layer7/mitm 2>/dev/null || true
+    fi
+    if [ -f "${_id_ldap_bak}" ]; then
+        mv -f "${_id_ldap_bak}" /usr/local/etc/layer7/identity-ldap.secret 2>/dev/null || true
+        chmod 0600 /usr/local/etc/layer7/identity-ldap.secret 2>/dev/null || true
+    fi
+    if [ -f "${_id_radius_bak}" ]; then
+        mv -f "${_id_radius_bak}" /usr/local/etc/layer7/identity-radius.secret 2>/dev/null || true
+        chmod 0600 /usr/local/etc/layer7/identity-radius.secret 2>/dev/null || true
+    fi
+    if [ -f "${_id_dc_bak}" ]; then
+        mv -f "${_id_dc_bak}" /usr/local/etc/layer7/identity-dc.secret 2>/dev/null || true
+        chmod 0600 /usr/local/etc/layer7/identity-dc.secret 2>/dev/null || true
+    fi
+    if [ -f "${_profiles_custom_bak}" ]; then
+        mv -f "${_profiles_custom_bak}" /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
+        chmod 0664 /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
+    fi
+else
+    rm -rf "${_mitm_bak}"
+    rm -f "${_id_ldap_bak}" "${_id_radius_bak}" "${_id_dc_bak}" "${_profiles_custom_bak}"
+fi
 echo "      Ficheiros residuais limpos."
 
 echo "[4/5] Limpando tabelas PF..."

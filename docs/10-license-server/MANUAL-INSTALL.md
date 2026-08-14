@@ -41,6 +41,16 @@ da public key ou checksum divergirem, o comportamento passa a ser
 (PF, Unbound, arranque do servico) ficam rastreaveis como `DEGRADED` no
 stdout e no syslog (`layer7-install`).
 
+**Addendum operacional BG-128 P1-5…P1-8 + P2-12 (`2026-08-14`, git, sem
+`PORTVERSION`):** check-in obrigatório (`check_in_enabled=true`) sem
+`license_key` em `/var/db/layer7-checkin.json` **não arma enforce** (air-gap
+= `check_in_enabled=false`). `pkg delete` sem keep apaga json/`.lic` e o
+estado em `/var/db` (`layer7-checkin.json`, `clock-mark.json`,
+`content-subscription.json`) e remove anti-DoH do Unbound. `PKG_UPGRADE` e
+keep-config preservam json/`.lic`/CA MITM/secrets Identity/check-in.
+Revoke na GUI limpa o `.lic` e os três paths `/var/db`. Sem release nova —
+o `.pkg` publicado continua `1.9.63` até GO de build.
+
 **Addendum operacional da F4.1 (BG-009, branch / `PORTVERSION` de trabalho):**
 o hook **POST-INSTALL** do port executa `service layer7d onestop` antes de
 `onestart`, para que um **upgrade** por `pkg` carregue o binario do pacote
@@ -1809,6 +1819,12 @@ pfctl -sr | grep -i layer7
 
 ## 5. Reinstalar (mesma versao)
 
+> **BG-128 P1-8:** `pkg delete` **sem** flag keep apaga `layer7.json` e
+> `layer7.lic`. Para reinstalar **sem** perder licença/políticas, use
+> `pkg add -f` **sem** `pkg delete` prévio (o hook vê `PKG_UPGRADE` e
+> preserva). Se precisar de `pkg delete`, faça antes
+> `touch /var/run/layer7-uninstall-keep-config`.
+
 **Comando unico (Command Prompt):**
 
 ```sh
@@ -1871,8 +1887,8 @@ fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/down
 | Flag | O que faz |
 |------|-----------|
 | `--clean-unbound` | Remove overrides anti-DoH do Unbound (`config.xml`) |
-| `--keep-config` | Preserva `layer7.json` e `layer7.lic` para reinstalacao futura |
-| `--keep-license` | Preserva apenas `layer7.lic` |
+| `--keep-config` | Preserva `layer7.json`, `layer7.lic`, CA MITM, secrets Identity, `profiles-custom.json` e estado de check-in em `/var/db` |
+| `--keep-license` | Preserva `layer7.lic` e o estado de check-in em `/var/db` |
 | `--yes` | Nao pede confirmacao (obrigatorio no Command Prompt) |
 | `--help` | Mostra ajuda |
 
@@ -1936,7 +1952,14 @@ rm -f /usr/local/libexec/layer7-pfctl
 rm -f /usr/local/libexec/layer7-unbound-anti-doh
 rm -f /var/run/layer7d.pid
 rm -f /var/log/layer7d.log
+rm -f /var/db/layer7-checkin.json
+rm -f /var/db/layer7/clock-mark.json
+rm -f /var/db/layer7/content-subscription.json
 ```
+
+O `pkg delete` (hooks do port, BG-128 P1-6/P2-12) já remove estes paths de
+estado e os overrides anti-DoH do Unbound quando **não** é upgrade e **não**
+há keep-config/keep-license. A lista acima é só para limpeza manual residual.
 
 Limpar tabelas PF:
 
@@ -2361,8 +2384,10 @@ Rollback histórico (`1.8.11_69`):
 fetch -o /tmp/pfSense-pkg-layer7-1.8.11_69.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_69/pfSense-pkg-layer7-1.8.11_69.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_69.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
-A configuracao (`/usr/local/etc/layer7.json`, `/usr/local/etc/layer7.lic`) e
-preservada por defeito durante `pkg delete`/`pkg add -f`.
+`pkg add -f` sobre o pacote já instalado (upgrade) preserva
+`/usr/local/etc/layer7.json`, `/usr/local/etc/layer7.lic`, CA MITM, secrets
+Identity e o estado de check-in (`PKG_UPGRADE`, BG-128 P1-7/P1-8).
+`pkg delete` **sem** keep-config **apaga** json e `.lic`.
 
 Ou limpeza manual completa:
 
@@ -2381,5 +2406,6 @@ for t in $(pfctl -s Tables 2>/dev/null | awk '/^layer7_bld_[0-9]+$/{print $1}');
 ```
 
 O pfSense volta ao funcionamento normal imediatamente.
-A configuracao (`layer7.json`), a licenca (`layer7.lic`) e as blacklists
-sao preservadas para uma reinstalacao futura.
+`pkg delete` sem keep-config **não** preserva `layer7.json` / `layer7.lic`.
+Para rollback com preservação, use `pkg add -f` da versão anterior **sem**
+`pkg delete`, ou `touch /var/run/layer7-uninstall-keep-config` antes do delete.

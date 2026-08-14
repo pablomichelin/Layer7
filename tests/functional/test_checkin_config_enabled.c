@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 static int g_fail;
@@ -64,6 +65,52 @@ main(void)
 	check(write_cfg(path, "{\"layer7\":{\"enabled\":false}}\n") == 0 &&
 	    layer7_checkin_config_enabled(path) == 0,
 	    "ausente => disabled (nao regressivo)");
+
+	/* P1-5 / BG-128: enforce_ready + due/offline sem chave. */
+	{
+		char state[256];
+		time_t now = time(NULL);
+
+		snprintf(state, sizeof(state), "%s/checkin.json", dir);
+		unsetenv("L7_CHECK_IN_FORCE");
+		if (setenv("L7_CHECKIN_STATE_PATH", state, 1) != 0) {
+			perror("setenv");
+			return 1;
+		}
+		unlink(state);
+
+		check(write_cfg(path,
+		    "{\"layer7\":{\"check_in_enabled\":true}}\n") == 0 &&
+		    layer7_checkin_enforce_ready(path) == 0,
+		    "P1-5 enabled + sem estado => enforce_ready=0");
+		check(layer7_checkin_due(now) == 0,
+		    "P1-5 sem chave => checkin_due=0");
+		check(layer7_checkin_offline_expired(now) == 0,
+		    "P1-5 sem chave => offline_expired=0");
+
+		check(write_cfg(path,
+		    "{\"layer7\":{\"check_in_enabled\":false}}\n") == 0 &&
+		    layer7_checkin_enforce_ready(path) == 1,
+		    "P1-5 air-gap (false) => enforce_ready=1");
+
+		check(write_cfg(path, "{\"layer7\":{\"enabled\":false}}\n") == 0 &&
+		    layer7_checkin_enforce_ready(path) == 1,
+		    "P1-5 chave ausente no JSON => enforce_ready=1");
+
+		check(write_cfg(state,
+		    "{\"license_key\":\"ABC123\",\"last_check_in_ok\":1}\n") == 0 &&
+		    write_cfg(path,
+		    "{\"layer7\":{\"check_in_enabled\":true}}\n") == 0 &&
+		    layer7_checkin_enforce_ready(path) == 1,
+		    "P1-5 enabled + chave => enforce_ready=1");
+
+		check(write_cfg(state, "{\"license_key\":\"\"}\n") == 0 &&
+		    layer7_checkin_enforce_ready(path) == 0,
+		    "P1-5 enabled + chave vazia => enforce_ready=0");
+
+		unsetenv("L7_CHECKIN_STATE_PATH");
+		unlink(state);
+	}
 
 	unlink(path);
 	rmdir(dir);

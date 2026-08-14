@@ -228,10 +228,7 @@ if ($_POST["save_check_in"] ?? false) {
 }
 
 if ($_POST["revoke_license"] ?? false) {
-	$lic_file = layer7_lic_path();
-	if (file_exists($lic_file)) {
-		@unlink($lic_file);
-	}
+	layer7_clear_local_license_state();
 	$data = layer7_load_or_default();
 	if (isset($data["layer7"]["license_key_mask"])) {
 		unset($data["layer7"]["license_key_mask"]);

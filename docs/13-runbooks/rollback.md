@@ -2,78 +2,88 @@
 
 ## Objetivo
 
-Reverter a instalação do pacote Layer7 no pfSense, restaurando o estado anterior do appliance.
+Reverter a instalação do pacote Layer7 no pfSense, restaurando o estado
+anterior do appliance **sem** deixar enforcement ou artefactos inconsistentes.
 
 ---
 
-## Procedimento rápido
+## Preferido: `pkg add -f` sem `pkg delete`
+
+Upgrade/rollback in-place. O hook vê `PKG_UPGRADE` e **preserva**
+`layer7.json`, `layer7.lic`, CA MITM, secrets Identity, `profiles-custom.json`
+e o estado de check-in em `/var/db` (BG-128 P1-7/P1-8).
 
 ```sh
-pkg delete pfSense-pkg-layer7
+fetch -o /tmp/pfSense-pkg-layer7-VERSAO.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/vVERSAO/pfSense-pkg-layer7-VERSAO.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-VERSAO.pkg
+sysrc layer7d_enable=YES
+service layer7d onestart
+layer7d -V
 ```
 
-Confirmar remoção:
-
-```sh
-pkg info pfSense-pkg-layer7 2>&1
-```
-
-Esperado: `pkg: No package(s) matching pfSense-pkg-layer7`.
+Versões canónicas: lab `1.9.62`; soak `1.9.59`; enforce produção `1.9.0`
+(pin histórico; produção enforce permanece `1.9.8`).
 
 ---
 
-## O que o `pkg delete` remove
+## `pkg delete` (desinstalação real)
+
+```sh
+pkg delete -y pfSense-pkg-layer7
+```
+
+**Sem** `/var/run/layer7-uninstall-keep-config` (nem `--keep-config`), o
+POST-DEINSTALL **apaga**:
+
+- `/usr/local/etc/layer7.json` e `/usr/local/etc/layer7.lic`
+- `/usr/local/etc/layer7/` (cache; CA/secrets só se não houver keep-config)
+- `/var/db/layer7-checkin.json`
+- `/var/db/layer7/clock-mark.json`
+- `/var/db/layer7/content-subscription.json`
+- overrides anti-DoH do Unbound (P2-12)
+
+Para apagar o pacote e **manter** licença/config/CA/secrets/check-in:
+
+```sh
+touch /var/run/layer7-uninstall-keep-config
+pkg delete -y pfSense-pkg-layer7
+```
+
+Ou: `sh uninstall.sh --keep-config --yes`.
+
+---
+
+## O que o `pkg delete` remove (ficheiros do port)
 
 - `/usr/local/sbin/layer7d`
-- `/usr/local/pkg/layer7.xml`
-- `/usr/local/pkg/layer7.inc`
+- `/usr/local/pkg/layer7.xml` / `layer7.inc`
 - `/usr/local/www/packages/layer7/*.php`
 - `/usr/local/etc/rc.d/layer7d`
 - `/usr/local/etc/layer7.json.sample`
 - `/etc/inc/priv/layer7.priv.inc`
 - `/usr/local/share/pfSense-pkg-layer7/info.xml`
 
----
-
-## O que NÃO é removido automaticamente
-
-- `/usr/local/etc/layer7.json` (configuração do operador)
-- Tabelas PF criadas manualmente (ex: `layer7_block`)
-- Entradas sysrc (`layer7d_enable`)
-- Logs em syslog
-
-### Limpeza manual (opcional)
-
-```sh
-rm -f /usr/local/etc/layer7.json
-sysrc -x layer7d_enable 2>/dev/null || true
-```
-
-Para limpar tabela PF (se criada):
-
-```sh
-pfctl -t layer7_block -T flush 2>/dev/null || true
-```
+O hook também pára o daemon, faz flush PF `layer7_*` e `sysrc layer7d_enable=NO`.
 
 ---
 
 ## Reinstalar versão anterior
 
-Usar o `install.sh` versionado da release desejada:
+Preferir o `pkg add -f` da tag desejada (secção *Preferido*). O `install.sh`
+versionado da release também serve.
 
-```sh
-fetch -o /tmp/install.sh https://github.com/REPO_OWNER/REPO_NAME/releases/download/vVERSAO_ANTERIOR/install.sh && sh /tmp/install.sh
-```
+Se o fluxo oficial de reinstall do `MANUAL-INSTALL` usar `pkg delete` +
+`pkg add -f`, **sem** keep-config a licença e as políticas **não** sobrevivem
+— é preciso reactivar.
 
 ---
 
 ## Rollback completo (snapshot)
 
-Se houver snapshot da VM antes da instalação:
-
 1. Parar o pacote: `service layer7d onestop`
-2. Remover: `pkg delete pfSense-pkg-layer7`
-3. Ou restaurar snapshot diretamente
+2. Remover com keep-config se quiser repor o `.pkg` depois
+3. Ou restaurar snapshot da VM
 
 ---
 
@@ -83,7 +93,9 @@ Se houver snapshot da VM antes da instalação:
 pkg info | grep layer7
 ps auxww | grep layer7d | grep -v grep
 ls -la /usr/local/sbin/layer7d 2>&1
-ls -la /usr/local/etc/layer7.json 2>&1
+ls -la /usr/local/etc/layer7.json /usr/local/etc/layer7.lic 2>&1
+ls -la /var/db/layer7-checkin.json 2>&1
 ```
 
-Todos devem indicar ausência do pacote/binário/processo.
+Após desinstalação **completa**, json/`.lic`/check-in devem estar ausentes.
+Após `pkg add -f` de rollback, json/`.lic`/check-in devem ter sobrevivido.

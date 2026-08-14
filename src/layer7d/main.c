@@ -923,7 +923,8 @@ static void refresh_enforce_cfg(void);
 static int
 enforce_armed(void)
 {
-	return s_ge && layer7_license_allows_enforce(&s_lic);
+	return s_ge && layer7_license_allows_enforce(&s_lic) &&
+	    layer7_checkin_enforce_ready(config_path);
 }
 
 static void
@@ -2423,6 +2424,9 @@ refresh_enforce_cfg(void)
 		ge = 1;
 	/* Ponto de decisão 1: cruzamento gate_a ∩ gate_b (não só s_lic.valid). */
 	if (ge && !layer7_license_allows_enforce(&s_lic))
+		ge = 0;
+	/* P1-5 / BG-128: check-in obrigatório sem chave ⇒ não armar. */
+	if (ge && !layer7_checkin_enforce_ready(config_path))
 		ge = 0;
 	/* Ponto de decisão 2: reconfirmação redundante legível (GA6.2). */
 	if (ge && !layer7_license_gate_a(&s_lic))

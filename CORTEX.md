@@ -74,7 +74,7 @@ API `30.13` live `.244` `20260814T142739Z`; GA5.9 campo **PASS**
 `20260814T143406Z`; **P0-1 ACTIVO** — proibido deploy integral do HEAD
 (serving `30.11` **versionado no git**; freeze **não** encerrado)
 ([auditoria `2026-08-14`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md));
-**BG-128** aberto; **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git `2026-08-14` sem deploy); fecho
+**BG-128** aberto; **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git `2026-08-14` sem deploy); fecho
 [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab actual: **`1.9.62`**;
@@ -826,12 +826,15 @@ Serving `30.11` **versionado no git** (7 paths; `2026-08-14`); o freeze
 [`auditoria-licencas-auth-deploy-2026-08-14.md`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
 + [`bloqueio-deploy-integral-head-30.11.md`](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 Snapshot/`.env`/SPA **fora do git** (não `git add -A`). **BG-128** aberto;
-**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git (`2026-08-14`; TOTP HMAC fail-closed;
+**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git (`2026-08-14`; TOTP HMAC fail-closed;
 check-in arquivada → 409 `revoked`/`expired`; `/login/totp` recusa
 `is_active=false` + lock/reset no 2FA; origin substitui XFF / `getClientIp`
 usa `req.ip`; bootstrap `init` com lock + owner no INSERT; promoção legado
-`LIMIT 1` + alerta se vários owners; serving content versionado; sem deploy).
-Próximo código com GO = **P1-5** (package/daemon).
+`LIMIT 1` + alerta se vários owners; serving content versionado;
+enforce recusa check-in ON sem chave; upgrade/keep-config preserva
+json/`.lic`/CA/secrets/check-in; deinstall real limpa `/var/db` + anti-DoH;
+sem deploy / `PORTVERSION`).
+Próximo código com GO = P2 restantes (exceto P2-9 sem GO).
 **não** reabrir MITM permanente (20.37). `.254` **não** tocado neste bloco.
 
 ---
@@ -1538,8 +1541,8 @@ PASS; legado sem nonce preservado). Evidência
 **P0-1 ACTIVO** — bloqueio operacional contra deploy integral do HEAD
 (serving `30.11` **versionado no git**; freeze **não** encerrado)
 ([runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md)).
-**BG-128** aberto (remediações P0–P3). **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git
-(`2026-08-14`; sem deploy). Próximo código com GO: **P1-5** (package/daemon).
+**BG-128** aberto (remediações P0–P3). **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git
+(`2026-08-14`; sem deploy / `PORTVERSION`). Próximo código com GO: P2 restantes (exceto P2-9 sem GO).
 Snapshot/`.env`/SPA `30.11` **fora do git**. **GA6.7** continua
 parecer jurídico externo. **Não** reabre AP0–AP4 / código / MITM.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
@@ -1642,7 +1645,7 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
 - **Ciclo evidência:** **BG-127 ABERTO** (GO `2026-08-14`; PARTIAL `20260814T051611Z` + `20260814T053905Z`)
 - **Auditoria `2026-08-14` / freeze deploy:** **BG-128 ABERTO** — P0-1 ACTIVO
   (serving `30.11` versionado no git; **não** encerrado);
-  **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git (`2026-08-14`; sem deploy)
+  **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git (`2026-08-14`; sem deploy / `PORTVERSION`)
   ([relatório](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
   [runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md))
 - **GOs humanos remanescentes (fora da engenharia):** parecer EULA externo (GA6.7);
@@ -1659,7 +1662,7 @@ TRILHA ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
 - Campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
-- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist 30.11 FEITOS no git; próximo código com GO = P1-5
+- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git; próximo código com GO = P2 restantes (exceto P2-9 sem GO)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)

@@ -7042,15 +7042,46 @@ function layer7_features_from_lic_file()
 	return ($v !== null) ? (string)$v["features"] : "";
 }
 
-function layer7_checkin_features_raw()
+function layer7_checkin_state_path()
 {
-	$path = "/var/db/layer7-checkin.json";
 	if (getenv("LAYER7_TEST_ROOT")) {
-		$alt = getenv("LAYER7_TEST_ROOT") . "/var/db/layer7-checkin.json";
-		if (is_readable($alt)) {
-			$path = $alt;
+		return getenv("LAYER7_TEST_ROOT") . "/var/db/layer7-checkin.json";
+	}
+	return "/var/db/layer7-checkin.json";
+}
+
+function layer7_clock_mark_path()
+{
+	if (getenv("LAYER7_TEST_ROOT")) {
+		return getenv("LAYER7_TEST_ROOT") . "/var/db/layer7/clock-mark.json";
+	}
+	return "/var/db/layer7/clock-mark.json";
+}
+
+/**
+ * P1-6 / BG-128: revoke local — apaga .lic e estado /var/db (chave, marca,
+ * token de conteúdo). Não toca em layer7.json.
+ */
+function layer7_clear_local_license_state()
+{
+	$lic = layer7_lic_path();
+	if (file_exists($lic)) {
+		@unlink($lic);
+	}
+	foreach (array(
+	    layer7_checkin_state_path(),
+	    layer7_clock_mark_path(),
+	    layer7_content_subscription_path(),
+	) as $p) {
+		if (is_string($p) && $p !== "" && file_exists($p)) {
+			@unlink($p);
 		}
 	}
+}
+
+function layer7_checkin_features_raw()
+{
+	$path = layer7_checkin_state_path();
 	if (!is_readable($path)) {
 		return "";
 	}

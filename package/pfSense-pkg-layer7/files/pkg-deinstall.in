@@ -49,6 +49,16 @@ if (function_exists('layer7_remove_unbound_vip_dns')) {
 	layer7_remove_unbound_vip_dns();
 }
 " >/dev/null 2>&1 || true
+	# P2-12: anti-DoH só em uninstall real (upgrade reaplicaria o bloco).
+	if [ -z "${PKG_UPGRADE:-}" ]; then
+		/usr/local/bin/php -r "
+require_once('/etc/inc/config.inc');
+require_once('/usr/local/pkg/layer7.inc');
+if (function_exists('layer7_remove_unbound_anti_doh')) {
+	layer7_remove_unbound_anti_doh();
+}
+" >/dev/null 2>&1 || true
+	fi
 	/usr/sbin/service layer7d onestop >/dev/null 2>&1 || true
 	layer7_remove_crontabs
 	if [ -x /usr/local/libexec/layer7-pfctl ]; then
@@ -95,35 +105,115 @@ if [ "${2}" = "POST-DEINSTALL" ]; then
 	done
 
 	_profiles_custom_bak="/tmp/layer7-profiles-custom.json.bak"
-	_keep_profiles_custom=0
-	if [ -f /var/run/layer7-uninstall-keep-config ]; then
-		_keep_profiles_custom=1
-	elif [ -n "${PKG_UPGRADE:-}" ]; then
-		_keep_profiles_custom=1
+	_mitm_bak="/tmp/layer7-mitm.bak"
+	_id_ldap_bak="/tmp/layer7-identity-ldap.secret.bak"
+	_id_radius_bak="/tmp/layer7-identity-radius.secret.bak"
+	_id_dc_bak="/tmp/layer7-identity-dc.secret.bak"
+	_keep_config=0
+	_keep_license=0
+	_is_upgrade=0
+	if [ -n "${PKG_UPGRADE:-}" ]; then
+		_is_upgrade=1
 	fi
-	if [ -f /usr/local/etc/layer7/profiles-custom.json ]; then
-		/bin/cp -f /usr/local/etc/layer7/profiles-custom.json "${_profiles_custom_bak}" 2>/dev/null || true
-	fi
-
-	# Ficheiros de configuracao nao listados no plist (ou gerados em runtime)
 	if [ -f /var/run/layer7-uninstall-keep-config ]; then
+		_keep_config=1
 		/bin/rm -f /var/run/layer7-uninstall-keep-config
 	elif [ -f /var/run/layer7-uninstall-keep-license ]; then
-		/bin/rm -f /usr/local/etc/layer7.json >/dev/null 2>&1 || true
+		_keep_license=1
 		/bin/rm -f /var/run/layer7-uninstall-keep-license
-	else
-		/bin/rm -f /usr/local/etc/layer7.json /usr/local/etc/layer7.lic >/dev/null 2>&1 || true
 	fi
-	# Cache blacklists, relatorios, estado — alinhado a scripts/release/uninstall.sh
+	_preserve_runtime=0
+	if [ "${_keep_config}" -eq 1 ] || [ "${_is_upgrade}" -eq 1 ]; then
+		_preserve_runtime=1
+	fi
+	if [ "${_preserve_runtime}" -eq 1 ]; then
+		if [ -f /usr/local/etc/layer7/profiles-custom.json ]; then
+			/bin/cp -f /usr/local/etc/layer7/profiles-custom.json \
+				"${_profiles_custom_bak}" 2>/dev/null || true
+		fi
+		if [ -d /usr/local/etc/layer7/mitm ]; then
+			/bin/rm -rf "${_mitm_bak}"
+			/bin/cp -a /usr/local/etc/layer7/mitm "${_mitm_bak}" \
+				2>/dev/null || true
+		fi
+		if [ -f /usr/local/etc/layer7/identity-ldap.secret ]; then
+			/bin/cp -f /usr/local/etc/layer7/identity-ldap.secret \
+				"${_id_ldap_bak}" 2>/dev/null || true
+		fi
+		if [ -f /usr/local/etc/layer7/identity-radius.secret ]; then
+			/bin/cp -f /usr/local/etc/layer7/identity-radius.secret \
+				"${_id_radius_bak}" 2>/dev/null || true
+		fi
+		if [ -f /usr/local/etc/layer7/identity-dc.secret ]; then
+			/bin/cp -f /usr/local/etc/layer7/identity-dc.secret \
+				"${_id_dc_bak}" 2>/dev/null || true
+		fi
+	fi
+
+	# P1-8: upgrade nunca apaga json/.lic. Uninstall real honra keep-*.
+	if [ "${_is_upgrade}" -eq 0 ]; then
+		if [ "${_keep_config}" -eq 1 ]; then
+			:
+		elif [ "${_keep_license}" -eq 1 ]; then
+			/bin/rm -f /usr/local/etc/layer7.json >/dev/null 2>&1 || true
+		else
+			/bin/rm -f /usr/local/etc/layer7.json \
+				/usr/local/etc/layer7.lic >/dev/null 2>&1 || true
+		fi
+	fi
+	# Cache blacklists / relatorios — runtime preservado acima
 	/bin/rm -rf /usr/local/etc/layer7 >/dev/null 2>&1 || true
 
-	if [ "${_keep_profiles_custom}" -eq 1 ] && [ -f "${_profiles_custom_bak}" ]; then
+	if [ "${_preserve_runtime}" -eq 1 ]; then
 		/bin/mkdir -p /usr/local/etc/layer7
-		/bin/mv -f "${_profiles_custom_bak}" /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
-		chown www:wheel /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
-		chmod 0664 /usr/local/etc/layer7/profiles-custom.json 2>/dev/null || true
-	elif [ -f "${_profiles_custom_bak}" ]; then
-		/bin/rm -f "${_profiles_custom_bak}" >/dev/null 2>&1 || true
+		if [ -f "${_profiles_custom_bak}" ]; then
+			/bin/mv -f "${_profiles_custom_bak}" \
+				/usr/local/etc/layer7/profiles-custom.json \
+				2>/dev/null || true
+			chown www:wheel /usr/local/etc/layer7/profiles-custom.json \
+				2>/dev/null || true
+			chmod 0664 /usr/local/etc/layer7/profiles-custom.json \
+				2>/dev/null || true
+		fi
+		if [ -d "${_mitm_bak}" ]; then
+			/bin/rm -rf /usr/local/etc/layer7/mitm
+			/bin/mv -f "${_mitm_bak}" /usr/local/etc/layer7/mitm \
+				2>/dev/null || true
+		fi
+		if [ -f "${_id_ldap_bak}" ]; then
+			/bin/mv -f "${_id_ldap_bak}" \
+				/usr/local/etc/layer7/identity-ldap.secret \
+				2>/dev/null || true
+			chmod 0600 /usr/local/etc/layer7/identity-ldap.secret \
+				2>/dev/null || true
+		fi
+		if [ -f "${_id_radius_bak}" ]; then
+			/bin/mv -f "${_id_radius_bak}" \
+				/usr/local/etc/layer7/identity-radius.secret \
+				2>/dev/null || true
+			chmod 0600 /usr/local/etc/layer7/identity-radius.secret \
+				2>/dev/null || true
+		fi
+		if [ -f "${_id_dc_bak}" ]; then
+			/bin/mv -f "${_id_dc_bak}" \
+				/usr/local/etc/layer7/identity-dc.secret \
+				2>/dev/null || true
+			chmod 0600 /usr/local/etc/layer7/identity-dc.secret \
+				2>/dev/null || true
+		fi
+	else
+		/bin/rm -f "${_profiles_custom_bak}" "${_id_ldap_bak}" \
+			"${_id_radius_bak}" "${_id_dc_bak}" >/dev/null 2>&1 || true
+		/bin/rm -rf "${_mitm_bak}" >/dev/null 2>&1 || true
+	fi
+
+	# P1-6: estado /var/db só em uninstall real sem keep
+	if [ "${_is_upgrade}" -eq 0 ] && [ "${_keep_config}" -eq 0 ] && \
+	    [ "${_keep_license}" -eq 0 ]; then
+		/bin/rm -f /var/db/layer7-checkin.json \
+			/var/db/layer7/clock-mark.json \
+			/var/db/layer7/content-subscription.json \
+			>/dev/null 2>&1 || true
 	fi
 
 	/bin/rm -f /usr/local/etc/layer7-protos.txt >/dev/null 2>&1 || true
