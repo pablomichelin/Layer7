@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-134 P3-3A enumeração disabled em POST /login
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | `POST /api/auth/login` deixa de enumerar conta desactivada face a email inexistente |
+| Impacto | Só `routes/auth.js`: disabled e unknown passam a 401 genérico, bcrypt (hash real ou dummy) e `registerLoginFailure`. Sucesso, lock 5/15 e 10/15, TOTP e CSRF intactos |
+| Risco | Baixo. Operador deixa de ver «Conta desactivada» no formulário; o audit interno continua `account_disabled`. Residual P3-3B/P3-3C. Overlay P0-1 |
+| Teste | Suite backend `219/219` PASS. Antes: disabled 403 distinto, sem bcrypt nem guarda. Depois: mesmo 401/body + guardas |
+| Rollback | Reverter o commit; `/login` volta a 403 `Conta desactivada.` sem lock |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem `users.js` / sem `totp.js` / sem compose |
+
 ## 2026-08-14 — BG-132 P3-2 exactidão TOTP em GET /session
 
 | Campo | Valor |

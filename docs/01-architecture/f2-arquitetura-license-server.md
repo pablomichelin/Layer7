@@ -102,6 +102,10 @@ Documentos normativos desta arquitetura:
   **P3-2 / BG-128 (`2026-08-14`):** `GET /api/auth/session` lê
   `a.totp_enabled` no SELECT de `resolveSessionToken`. Sem a coluna,
   `toPublicAdmin` reportava `false` para admin com TOTP ligado. Sem deploy.
+  **P3-3A / BG-134 (`2026-08-14`):** `POST /api/auth/login` deixa de
+  enumerar conta desactivada. Disabled e inexistente devolvem o mesmo
+  `401` genérico, fazem bcrypt (hash real ou dummy) e incrementam as
+  guardas. Sem deploy.
 
 ### Frontend
 

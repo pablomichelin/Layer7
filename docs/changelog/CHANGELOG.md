@@ -37,6 +37,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-3A / BG-134 — enumeração disabled em POST /login:** FEITO
+  no git após gates deste bloco. `POST /api/auth/login` trata conta
+  desactivada e email inexistente com a mesma `401` `Credenciais
+  invalidas`. Ambos fazem trabalho bcrypt (hash real ou dummy
+  constante) e chamam `registerLoginFailure`. A auditoria interna
+  pode continuar `account_disabled`; o body HTTP não vaza estado.
+  Sucesso, falha de conta activa, lock 5/15 e 10/15, TOTP e CSRF
+  intactos. Residual P3-3: política mínima 10 vs 12 e `===` no TOTP.
+  Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-2 / BG-132 — exactidão TOTP em GET /session:** FEITO
   no git após gates deste bloco. O SELECT de `resolveSessionToken`
   passa a incluir `a.totp_enabled`. `buildSessionMetadata` já lia o

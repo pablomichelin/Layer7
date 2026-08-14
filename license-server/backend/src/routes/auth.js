@@ -59,7 +59,10 @@ const {
 const { requirePermission } = require('../require-permission');
 const { getTotpHmacSecret } = require('../admin-bearer-secret');
 
+const DUMMY_PASSWORD_HASH = '$2a$12$QyQlJA0Ta4kg92.WPfKvU.N.6UsOshLLG.QZ5CT/NgrKQffGv0Swi';
+
 const router = Router();
+router.DUMMY_PASSWORD_HASH = DUMMY_PASSWORD_HASH;
 
 router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => {
   try {
@@ -96,35 +99,27 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
     }
 
     const result = await pool.query('SELECT * FROM admins WHERE LOWER(email) = $1', [email]);
-    if (result.rows.length === 0) {
-      const guards = await registerLoginFailure({ email, req });
-      await auditAdminEvent(buildLoginFailedAuditPayload({
-        email,
-        req,
-        guards,
-      }));
-      return res.status(401).json(buildAuthErrorResponse(ADMIN_AUTH_INVALID_CREDENTIALS_MESSAGE));
-    }
+    const admin = result.rows[0] || null;
+    const passwordHash = admin?.password_hash || DUMMY_PASSWORD_HASH;
+    const valid = await bcrypt.compare(password, passwordHash);
+    const disabled = Boolean(admin) && admin.is_active === false;
 
-    const admin = result.rows[0];
-    if (admin.is_active === false) {
-      await auditAdminEvent(buildLoginRejectedAuditPayload({
-        email,
-        req,
-        reason: 'account_disabled',
-      }));
-      return res.status(403).json(buildAuthErrorResponse('Conta desactivada.'));
-    }
-
-    const valid = await bcrypt.compare(password, admin.password_hash);
-    if (!valid) {
+    if (!admin || !valid || disabled) {
       const guards = await registerLoginFailure({ email, req });
-      await auditAdminEvent(buildLoginFailedAuditPayload({
-        email,
-        req,
-        guards,
-        adminId: admin.id,
-      }));
+      if (disabled) {
+        await auditAdminEvent(buildLoginRejectedAuditPayload({
+          email,
+          req,
+          reason: 'account_disabled',
+        }));
+      } else {
+        await auditAdminEvent(buildLoginFailedAuditPayload({
+          email,
+          req,
+          guards,
+          adminId: admin ? admin.id : undefined,
+        }));
+      }
       return res.status(401).json(buildAuthErrorResponse(ADMIN_AUTH_INVALID_CREDENTIALS_MESSAGE));
     }
 

@@ -48,6 +48,13 @@ Referencias normativas:
   no SELECT de `resolveSessionToken`. Admin com TOTP ligado deixa de
   aparecer como `totp_enabled: false`. Auth/TTL/revoke/`createSession`/
   CSRF/TOTP flows intactos.
+- **P3-3A / BG-134:** `POST /api/auth/login` trata conta desactivada e
+  email inexistente com a mesma semântica `401` `Credenciais invalidas`.
+  Ambos fazem trabalho bcrypt (hash real da conta ou hash dummy
+  constante) e chamam `registerLoginFailure` (lock 5/15 conta, 10/15
+  IP). A auditoria interna pode continuar `account_disabled`; o body
+  HTTP não vaza estado. Sucesso, falha de conta activa, lock, TOTP e
+  CSRF intactos.
 - Auditoria minima:
   - auth/sessao e mutacoes administrativas em `admin_audit_log`
   - guardas de lockout em `admin_login_guards`
@@ -72,7 +79,7 @@ Referencias normativas:
   `/api/activate`, `/api/license/check-in`, content e `/api/health`
   estão fora desta superfície.
 - Respostas de auth devem permanecer genericas:
-  - `401` para credenciais invalidas
+  - `401` para credenciais invalidas (conta inexistente, desactivada ou password errada)
   - `429` para limite/lockout
   - `403` para origin administrativo nao autorizado
 - O cookie de sessao nao deve ser lido nem persistido pelo JavaScript da SPA.
