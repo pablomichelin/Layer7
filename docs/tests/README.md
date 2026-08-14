@@ -17,6 +17,9 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
   [`tests/harness/mitm-activate-hang/README.md`](../../tests/harness/mitm-activate-hang/README.md) —
   `run-local-hang.sh`, `run-local-timeout-fix.sh`,
   `run-local-tls-ca-peer.sh`, `run-local-tls-leaf-fix.sh` (sem escrita na `.254`).
+- **Harness P4 soak / auth `-T` (P4.2; sem activar MITM):**
+  [`tests/harness/mitm-p4-soak/README.md`](../../tests/harness/mitm-p4-soak/README.md) —
+  `run-local-auth-fix.sh`, `p4-validate-local.sh`. Novo soak só com GO lab.
 - **Regressões próximas ao código (`1.9.46`):**
   - `make -C src/layer7-tlsproxy test-regress` — leaf D1 + política sem bypass
   - `php package/pfSense-pkg-layer7/tests/test_mitm_regress.php` — scope/rdr/anti-QUIC/lifecycle/`filter_configure_safe`

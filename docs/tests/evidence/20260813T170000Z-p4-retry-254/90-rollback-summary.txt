@@ -1,0 +1,5 @@
+UTC=2026-08-13T20:12:00Z
+reason=P4 abort: health_ssh_fail sample=14
+rb254_exit=9 rb54_exit=0 rb24_ok=1
+rollback_clean=0
+mitm_reactivation_guard=enforced

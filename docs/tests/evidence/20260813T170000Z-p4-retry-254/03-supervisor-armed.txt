@@ -1,0 +1,6 @@
+UTC=2026-08-13T17:00:58Z
+pkg=1.9.59
+cron=/etc/crontab * * * * * layer7-mitm-window-tick.php
+stamp_ts0=1786640341 stamp_ts70=1786640400
+supervisor.armed=true supervisor.stale=false
+mitm.enabled=false mitm.effective=false LISTEN8443=0

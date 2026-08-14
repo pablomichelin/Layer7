@@ -1,0 +1,212 @@
+SOAK_LOOP_START 2026-08-13T17:05:18Z pid=10571
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env
+AUTH_FAIL no_key_no_SSHPASS_no_passfile
+DEADLINE_INVALID= NOW=1786640718 — abort to rollback
+P4_FULL_ROLLBACK_START 2026-08-13T17:05:18Z reason=P4 deadline invalid/missing
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env
+AUTH_FAIL no_key_no_SSHPASS_no_passfile
+AUTH_FAIL .54 requires BatchMode key
+AUTH_FAIL .24 missing user/pass files (0600 out of repo)
+AUTH_FAIL no_key_no_SSHPASS_no_passfile
+UTC=2026-08-13T17:05:18Z
+reason=P4 deadline invalid/missing
+rb254_exit=9 rb54_exit=9 rb24_ok=1
+rollback_clean=0
+mitm_reactivation_guard=enforced
+P4_FULL_ROLLBACK_INCOMPLETE 2026-08-13T17:05:18Z
+docs_patched verdict= FAIL
+[main 312a38e] docs(mitm): P4 soak CLOSED FAIL
+ 43 files changed, 1444 insertions(+)
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/.finalize.lock
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/00-RUNID.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/00-deadline-unix.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/00-deadline-utc.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/00-soak-armed-utc.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/00-soak-start-utc.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/02-upgrade-1959.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/03-phaseA-54.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/03-supervisor-armed.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/04-phaseB-route.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/05-phaseC-NA.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/06-entitle-ok-path-hotfix.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate-retry.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate-retry2.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-failsafe-arm.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-health-00.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-soak-loop.log
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-soak-loop.pid
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-soak-loop.stdout
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-watchdog.log
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-watchdog.pid
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/07-watchdog.stdout
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/11-STATUS.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/11-VERDICT.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/90-rollback-254.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/90-rollback-full-start.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/90-rollback-incomplete.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/90-rollback-summary.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/91-rollback-24.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/92-rollback-54.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/93-post-state.txt
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/README.md
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-activate-254.php
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-finalize.sh
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-full-rollback.sh
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-health-remote.sh
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-lib-auth.sh
+ create mode 100644 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-phaseC-internal-only.ps1
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-validate-failsafe.sh
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-validate-local.sh
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/p4-watchdog.sh
+ create mode 100755 docs/tests/evidence/20260813T170000Z-p4-retry-254/remote/soak-health-loop.sh
+Connection to github.com closed by remote host.
+client_loop: send disconnect: Broken pipe
+send-pack: unexpected disconnect while reading sideband packet
+fatal: the remote end hung up unexpectedly
+PUSH_FAIL
+## main...origin/main [ahead 1]
+ M docs/tests/evidence/20260813T170000Z-p4-retry-254/07-soak-loop.log
+ M license-server/.env.example
+ M license-server/.gitignore
+ M license-server/backend/src/index.js
+ M license-server/docker-compose.yml
+ M license-server/nginx/nginx.conf
+ M package/pfSense-pkg-layer7/files/usr/local/libexec/layer7-mitm-entitle-ok
+?? artifacts/30.3-tmp/
+?? artifacts/30.4/
+?? artifacts/pfSense-pkg-layer7-1.9.52.pkg.sha256
+?? artifacts/pfSense-pkg-layer7-1.9.53.pkg.sha256
+?? artifacts/pfSense-pkg-layer7-1.9.54.pkg.sha256
+?? docs/tests/evidence/20260809T212230Z-phaseBD-d1-254/
+?? docs/tests/evidence/20260809T212234Z-phaseBD-d1-254/
+?? docs/tests/evidence/20260809T223526Z-phaseBD-d1-254/
+?? docs/tests/evidence/20260809T223909Z-post-rollback-baseline/
+?? docs/tests/evidence/20260810T070513Z-build-1.9.47-builder12/
+?? docs/tests/evidence/20260810T093521Z-phaseBD-d1-254/
+?? docs/tests/evidence/20260810T093711Z-phaseBD-d1-254/
+FINALIZE_DONE 2026-08-13T17:05:18Z FAIL
+SOAK_LOOP_START 2026-08-13T17:06:01Z pid=10881
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env
+deadline_unix=1786655107 remaining=14346
+health_seq_start=0
+health_1 FAIL after retries
+ABORT_PREDICATE 2026-08-13T17:06:16Z health_ssh_fail sample=1
+P4_FULL_ROLLBACK_START 2026-08-13T17:06:16Z reason=P4 abort: health_ssh_fail sample=1
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env
+AUTH_FAIL no_key_no_SSHPASS_no_passfile
+AUTH_FAIL .54 requires BatchMode key
+AUTH_FAIL .24 missing user/pass files (0600 out of repo)
+AUTH_FAIL no_key_no_SSHPASS_no_passfile
+UTC=2026-08-13T17:06:17Z
+reason=P4 abort: health_ssh_fail sample=1
+rb254_exit=9 rb54_exit=9 rb24_ok=1
+rollback_clean=0
+mitm_reactivation_guard=enforced
+P4_FULL_ROLLBACK_INCOMPLETE 2026-08-13T17:06:17Z
+docs_patched verdict= FAIL
+COMMIT_SKIP_BY_POLICY — finalize nao commita/push sozinho (P4.1 retry)
+## main...origin/main
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/.finalize.lock
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-RUNID.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-deadline-unix.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-deadline-utc.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-soak-armed-utc.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-soak-start-utc.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/02-upgrade-1959.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/03-phaseA-54.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/03-supervisor-armed.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/04-phaseB-route.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/05-phaseC-NA.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-entitle-ok-path-hotfix.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate-retry.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate-retry2.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/07-failsafe-arm.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/07-health-00.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/07-health-01.txt
+AM docs/tests/evidence/20260813T170000Z-p4-retry-254/07-soak-loop.log
+FINALIZE_DONE 2026-08-13T17:06:17Z FAIL
+SOAK_LOOP_START 2026-08-13T17:06:51Z pid=11160
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env
+deadline_unix=1786655107 remaining=14296
+health_seq_start=01
+health_2 ok tries=1
+sleep 900s until next health (left_to_close=14233s)
+health_3 ok tries=1
+sleep 900s until next health (left_to_close=13110s)
+health_4 ok tries=1
+sleep 900s until next health (left_to_close=12207s)
+health_5 ok tries=1
+sleep 900s until next health (left_to_close=11304s)
+health_6 ok tries=1
+sleep 900s until next health (left_to_close=10401s)
+health_7 ok tries=1
+sleep 900s until next health (left_to_close=9499s)
+health_8 ok tries=1
+sleep 900s until next health (left_to_close=8596s)
+health_9 ok tries=1
+sleep 900s until next health (left_to_close=7694s)
+health_10 ok tries=1
+sleep 900s until next health (left_to_close=6790s)
+health_11 ok tries=1
+sleep 900s until next health (left_to_close=5888s)
+health_12 ok tries=1
+sleep 900s until next health (left_to_close=4986s)
+health_13 ok tries=1
+sleep 900s until next health (left_to_close=4084s)
+health_14 FAIL after retries
+ABORT_PREDICATE 2026-08-13T20:11:42Z health_ssh_fail sample=14
+P4_FULL_ROLLBACK_START 2026-08-13T20:11:42Z reason=P4 abort: health_ssh_fail sample=14
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env
+AUTH_FAIL no_key_no_SSHPASS_no_passfile
+auth_method=ssh_key_batchmode_54
+ROLLBACK_A_OK
+NO_LISTEN
+NO_VIP
+ROLLBACK_A_DONE 2026-08-13T20:11:57Z
+AUTH_FAIL .24 missing user/pass files (0600 out of repo)
+auth_method=ssh_key_batchmode_254
+mode=monitor
+layer7_enabled=true
+mitm_enabled=true
+mitm_effective=true
+ca_present=true
+RDR=3
+root    layer7-tls 96518  3 tcp4    127.0.0.1:8443        *:*                  
+LISTEN8443=1
+   route to: 198.18.0.10
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+ls: /usr/local/etc/layer7-mitm-ca*: No such file or directory
+NO_CA_FILES
+UTC=2026-08-13T20:12:00Z
+reason=P4 abort: health_ssh_fail sample=14
+rb254_exit=9 rb54_exit=0 rb24_ok=1
+rollback_clean=0
+mitm_reactivation_guard=enforced
+P4_FULL_ROLLBACK_INCOMPLETE 2026-08-13T20:12:00Z
+docs_patched verdict= FAIL
+patched docs/02-roadmap/backlog.md
+COMMIT_SKIP_BY_POLICY — finalize nao commita/push sozinho (P4.1 retry)
+## main...origin/main
+M  docs/00-overview/START-HERE-identity-mitm.md
+M  docs/02-roadmap/backlog.md
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/.finalize.lock
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-RUNID.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-deadline-unix.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-deadline-utc.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-soak-armed-utc.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/00-soak-start-utc.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/02-upgrade-1959.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/03-phaseA-54.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/03-supervisor-armed.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/04-phaseB-route.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/05-phaseC-NA.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-entitle-ok-path-hotfix.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate-retry.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate-retry2.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/06-phaseD-activate.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/07-failsafe-arm.txt
+A  docs/tests/evidence/20260813T170000Z-p4-retry-254/07-health-00.txt
+FINALIZE_DONE 2026-08-13T20:12:00Z FAIL

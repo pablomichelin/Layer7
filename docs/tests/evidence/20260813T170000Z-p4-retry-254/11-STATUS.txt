@@ -1,0 +1,4 @@
+status=CLOSED_FAIL
+closed_utc=2026-08-13T20:12:00Z
+rollback_now=DONE
+mitm_should_be=OFF

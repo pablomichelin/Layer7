@@ -300,9 +300,9 @@ reavaliacao formal.
 
 - Arranque: [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)
 - Posicionamento PME: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
-- Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-13ay`
-- Passo actual: **P4 soak IN_PROGRESS** (`170000Z` / `1.9.59`); lab/`latest` **`1.9.62`** (copy de operador); Identity rede **FECHADA** (20.33/GI9)
-- Prontidão piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; P4 FAIL/ABORT; P4.1 publicado; **P5 aguarda ficha**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md)
+- Plano: [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-14bc`
+- Passo actual: **P5 aguarda ficha** (P4 retry2 **CLOSED PASS** `224009Z` / `1.9.59`); lab/`latest` **`1.9.62`**; Identity rede **FECHADA** (20.33/GI9)
+- Prontidão piloto: **NÃO PRONTO activar externo** — P1+P2+P3 PASS; P4 retry2 **PASS**; **P5 aguarda ficha**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md)
 - Gate activação externa: ficha site nomeada — **≠ lacuna eng.**; **proibido** piloto externo/permanente sem P5
 - Desenho: [`desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime no `.pkg` desde `1.9.39`
 - PoC: [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) — Opção A PASS
@@ -315,7 +315,7 @@ reavaliacao formal.
 |----|------|------------|------|------|-----------------|---------|-----------|--------|-------|
 | BG-085 | Governança IM0: START-HERE, plano, mapa, gates, índices, ADRs | Alta | documentacao/governanca | F4+/novo plano | drift; chat sem continuidade | M | Alto | **Concluido (20.2 PASS / GI0)** | ADRs 0025–0028 Aceito; T1 |
 | BG-086 | Entitlements `features` CSV + gates daemon/GUI/license-server (IM1) | Critica | licenciamento | IM1 | add-on sem enforcement comercial | G | Alto | **Concluido (20.6 / GI1 PASS)** | check-in ∩ .lic + gates |
-| BG-087 | MITM TLS opt-in + CA (IM2) — 20.8–20.11 + D0/D1 + Gate C + GO teste + P3 + P4.1 | Alta | package/GUI | Identity+MITM | Piloto sem ficha/soak | M | Alto | **P3 PASS** `1.9.47`; **P4 soak IN_PROGRESS** `1.9.59`; **`1.9.60`** entitle-ok PATH; activar externo **NO-GO** até ficha+P5 | sem upgrade soak; sem piloto externo |
+| BG-087 | MITM TLS opt-in + CA (IM2) — 20.8–20.11 + D0/D1 + Gate C + GO teste + P3 + P4.1 | Alta | package/GUI | Identity+MITM | Piloto sem ficha | M | Alto | **P3 PASS** `1.9.47`; **P4 retry2 CLOSED PASS** `224009Z`; P4.2 harness PASS; activar externo **NO-GO** até ficha+P5 | Phase C NA neste retry; sem piloto externo |
 | BG-088 | Identity map **daemon** + LDAP/LDAPS (IM3–IM4) — **caminho de valor PME** | Critica | daemon/GUI | IM3–IM4 | user/grupo sem mapa dinâmico | G | Alto | **20.18 PASS** / fechar IM4 | Test LDAP GUI + GI5.4; GI5.3 = IM5 |
 | BG-089 | RADIUS **accounting receiver** + **agente DC** (IM5) | Critica | daemon/ops | IM5 | Identity incompleto | G | Alto | **20.20 PASS** / GI6 lab | WinRM outbound não canónico; agente em `docs/samples/identity-dc-agent/` |
 | BG-090 | Políticas `ad_users`/`ad_groups` → identity_ips (IM6) | Alta | package/daemon | IM6 | directório sem enforcement útil | G | Alto | Feito (20.24); GI7 lab residual | GI7; não-regressão IP/MAC |

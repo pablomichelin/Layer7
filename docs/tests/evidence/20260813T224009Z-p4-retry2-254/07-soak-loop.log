@@ -1,0 +1,53 @@
+SOAK_LOOP_START 2026-08-13T22:40:25Z pid=51611 harness=/Users/pablomichelin/Documents/Layer 7/tests/harness/mitm-p4-soak
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env; probe=-T
+deadline_unix=1786675219 remaining=14394
+health_seq_start=0
+health_1 ok tries=1
+sleep 900s until next health (left_to_close=14332s)
+health_2 ok tries=1
+sleep 900s until next health (left_to_close=13431s)
+health_3 ok tries=1
+sleep 900s until next health (left_to_close=12529s)
+health_4 ok tries=1
+sleep 900s until next health (left_to_close=11627s)
+health_5 ok tries=1
+sleep 900s until next health (left_to_close=10724s)
+health_6 ok tries=1
+sleep 900s until next health (left_to_close=9822s)
+health_7 ok tries=1
+sleep 900s until next health (left_to_close=8920s)
+health_8 ok tries=1
+sleep 900s until next health (left_to_close=8017s)
+health_9 ok tries=1
+sleep 900s until next health (left_to_close=7115s)
+health_10 ok tries=1
+sleep 900s until next health (left_to_close=6213s)
+health_11 ok tries=1
+sleep 900s until next health (left_to_close=5311s)
+health_12 ok tries=1
+sleep 900s until next health (left_to_close=4409s)
+health_13 ok tries=1
+sleep 900s until next health (left_to_close=3508s)
+health_14 ok tries=1
+sleep 900s until next health (left_to_close=2606s)
+health_15 ok tries=1
+sleep 900s until next health (left_to_close=1704s)
+health_16 ok tries=1
+sleep 802s until next health (left_to_close=802s)
+WINDOW_END_APPROACHING now=1786675159 deadline=1786675219
+SOAK_WINDOW_CLOSE 2026-08-14T02:39:19Z samples=16
+P4_FULL_ROLLBACK_START 2026-08-14T02:39:19Z reason=P4 window end rollback
+auth_policy=no_literal_secrets; probe=-T; retry_254=3
+auth_method=ssh_key_batchmode_54
+ROLLBACK_A_OK
+NO_LISTEN
+NO_VIP
+ROLLBACK_A_DONE 2026-08-14T02:39:28Z
+AUTH_FAIL .24 missing user/pass files (0600 out of repo)
+UTC=2026-08-14T02:39:29Z
+reason=P4 window end rollback
+rb254_exit=0 rb54_exit=0 rb24_ok=1
+rollback_clean=1
+mitm_reactivation_guard=enforced
+P4_FULL_ROLLBACK_OK 2026-08-14T02:39:29Z
+SOAK_PASS samples=16 rollback_clean

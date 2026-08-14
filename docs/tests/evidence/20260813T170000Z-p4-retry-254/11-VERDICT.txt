@@ -1,0 +1,12 @@
+P4_SOAK_VERDICT=FAIL
+closed_utc=2026-08-13T20:12:00Z
+outcome_raw=ABORT
+reason=health_ssh_fail sample=14
+health_samples=15
+abort_files=1
+rollback_clean=0
+mitm_off_verified=0
+scope=src=192.168.100.24/32 dst=198.18.0.10/32 SNI=mitm-lab.test max_window=240
+external_dest=none
+phaseC_internal=PASS (resume)
+notes=Skip example.com ≠ abort; soak lab-only; P5 externo ainda proibido

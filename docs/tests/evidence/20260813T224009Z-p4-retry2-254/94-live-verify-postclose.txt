@@ -1,0 +1,12 @@
+UTC=2026-08-14T02:54:33Z
+verify=live_ssh_key_batchmode_254
+loop_pid=51611 DEAD
+watchdog_pid=51610 DEAD
+mode_php_key=?
+mitm_enabled=false
+mitm_effective=false
+RDR=0
+LISTEN8443=0
+tlsproxy=not_running
+pkg=1.9.59
+note=post-state rollback 02:39:29Z already mode=monitor; this sample ~15 min after close

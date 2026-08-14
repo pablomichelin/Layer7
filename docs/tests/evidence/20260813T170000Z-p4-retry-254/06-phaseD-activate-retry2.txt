@@ -1,0 +1,51 @@
+=== RETRY2 activate 2026-08-13T17:05:05Z after entitle-ok PATH fix ===
+{
+    "ca_gen": "ok",
+    "ca_msg": "CA gerada (CA:TRUE, keyCertSign, SKI).",
+    "sync": "ok",
+    "sync_sec": 1.145,
+    "filter": "ok",
+    "enabled": true,
+    "effective": true,
+    "window": {
+        "max_minutes": 240,
+        "deadline_unix": 1786655107,
+        "activated_unix": 1786640707,
+        "activated_by": "system",
+        "remaining_sec": 14396,
+        "expired": false,
+        "quic_mode": "block",
+        "source_cidr": [
+            "192.168.100.24\/32"
+        ],
+        "dest_cidr": [
+            "198.18.0.10\/32"
+        ],
+        "block_sni": [
+            "mitm-lab.test"
+        ]
+    },
+    "materialized": true
+}
+ACTIVATE_RC=0
+===PF===
+rdr on vmx0 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+rdr on vmx0.95 inet proto tcp from <layer7_mitm_src> to <layer7_mitm_dst> port = https -> 127.0.0.1 port 8443
+block drop quick inet proto udp from <layer7_mitm_src> to <layer7_mitm_dst> port = https label "layer7:mitm-anti-quic"
+SRC
+   192.168.100.24
+DST
+   198.18.0.10
+NO_FROM_ANY
+root    layer7-tls 96518  3 tcp4    127.0.0.1:8443        *:*                  
+layer7_tlsproxy is running as pid 96518.
+supervisor.armed=true
+mitm.enabled=true
+effective=true
+deadline_unix=1786655107
+remaining_sec=14394
+["192.168.100.24\/32"]
+["198.18.0.10\/32"]
+===AUDIT===
+{"ts":"2026-08-13T17:03:59+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786655037,"remaining_sec":14398,"payload_tls":false,"reason":"P4 sync fail"}
+{"ts":"2026-08-13T17:05:07+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786655107,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}

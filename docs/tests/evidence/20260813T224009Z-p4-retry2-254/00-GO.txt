@@ -1,0 +1,1 @@
+GO=continue chat 2026-08-13 P4.2 harness; scoped lab only; no .234/.235

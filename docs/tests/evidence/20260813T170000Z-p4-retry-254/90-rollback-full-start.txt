@@ -1,0 +1,2 @@
+P4_FULL_ROLLBACK_START 2026-08-13T20:11:42Z reason=P4 abort: health_ssh_fail sample=14
+auth_policy=no_literal_secrets; key_or_0600_tmp_or_SSHPASS_env

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Mock ssh: sempre timeout (transiente). Nunca "Permission denied".
+echo "ssh: connect to host 192.168.100.254 port 22: Operation timed out" >&2
+exit 255

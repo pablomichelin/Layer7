@@ -1,0 +1,13 @@
+auth_method=ssh_key_batchmode_254
+mode=monitor
+layer7_enabled=true
+mitm_enabled=false
+mitm_effective=false
+ca_present=false
+RDR=0
+LISTEN8443=0
+   route to: 198.18.0.10
+destination: 0.0.0.0
+       mask: 0.0.0.0
+ls: /usr/local/etc/layer7-mitm-ca*: No such file or directory
+NO_CA_FILES

@@ -1,0 +1,30 @@
+rollback_254_try=1
+auth_method=ssh_key_batchmode_254
+ROLLBACK_P4_START 2026-08-14T02:39:20Z
+at_cleared
+ca_delete=ok
+mitm_enabled=false
+mitm_effective=false
+post_mode=monitor
+post_mitm_enabled=false
+post_effective=false
+delete host 198.18.0.10
+route_delete_done
+=== PF MITM ===
+NO_MITM_RDR
+NO_FROM_ANY
+pfctl: Table does not exist.
+pfctl: Table does not exist.
+NO_8443
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+   route to: 198.18.0.10
+destination: 0.0.0.0
+       mask: 0.0.0.0
+    gateway: 10.99.99.35
+        fib: 0
+GUI9999=200
+1.9.59
+{"ts":"2026-08-13T21:06:00+00:00","event":"expire","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786655107,"remaining_sec":0,"payload_tls":false,"reason":"deadline_unix"}
+{"ts":"2026-08-13T22:40:19+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786675219,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-14T02:39:21+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786675219,"remaining_sec":58,"payload_tls":false,"reason":"P4 window end rollback"}
+ROLLBACK_P4_254_DONE 2026-08-14T02:39:26Z

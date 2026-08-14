@@ -1,0 +1,13 @@
+mode=monitor
+layer7_enabled=true
+mitm_enabled=true
+mitm_effective=true
+ca_present=true
+RDR=3
+root    layer7-tls 96518  3 tcp4    127.0.0.1:8443        *:*                  
+LISTEN8443=1
+   route to: 198.18.0.10
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+ls: /usr/local/etc/layer7-mitm-ca*: No such file or directory
+NO_CA_FILES

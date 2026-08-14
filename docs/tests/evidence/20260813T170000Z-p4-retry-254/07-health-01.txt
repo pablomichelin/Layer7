@@ -1,0 +1,13 @@
+UTC=2026-08-13T17:06:43Z
+effective=true
+mitm.enabled=true
+supervisor.armed=true
+deadline_unix=1786655107
+remaining_sec=14304
+expired=false
+LISTEN=1
+SRC=192.168.100.24
+DST=198.18.0.10
+NO_FROM_ANY
+ROUTE_LAB=192.168.100.54
+GUI=200

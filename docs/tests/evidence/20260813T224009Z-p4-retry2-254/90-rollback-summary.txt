@@ -1,0 +1,5 @@
+UTC=2026-08-14T02:39:29Z
+reason=P4 window end rollback
+rb254_exit=0 rb54_exit=0 rb24_ok=1
+rollback_clean=1
+mitm_reactivation_guard=enforced

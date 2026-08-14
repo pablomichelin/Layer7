@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM P3 **`1.9.47`**; **P4 CLOSED FAIL/ABORT**; **P4.1** **`1.9.59` publicado** (supervisor on-box); Gate B+C/teste em `1.9.46`; piloto externo **NÃO PRONTO** — **P5 aguarda ficha site** (rev. `2026-08-13ay`)
+**Estado do plano:** Identity **FECHADA**; MITM P3 **`1.9.47`**; **P4 soak retry2 CLOSED PASS** (`224009Z` / `1.9.59`); P4.2 harness **PASS**; P4.1 live; permanente **NO-GO**; **P5 aguarda ficha** (rev. `2026-08-14bc`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -19,7 +19,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.47` (P3 janela; SHA `2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`)
+**Canal lab/`latest`:** `1.9.62` (copy operador; SHA `b6700576afb47cf9790c4c3fddb746b3021d7070e260ef0e6551c712a7948e5f`). Soak `.254`: `1.9.59`.
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
@@ -59,6 +59,10 @@
 **Rev. `av` (`2026-08-09`)** = **P4 CLOSED FAIL/ABORT** — retomado; Phase C interna PASS (issuer MITM; PF scoped; sem externos); Skip≠abort; rollback só no fecho.  
 **Rev. `ax` (`2026-08-13`)** = **P4.1** supervisor on-box (cron 1 min / stamp / GUI); candidato `1.9.59` local; testes MITM PASS; **sem** publish; **sem** activar MITM; P5 continua a aguardar ficha.
 **Rev. `ay` (`2026-08-13`)** = **`1.9.59` publicado** (`v1.9.59` / SHA `64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9`); P4 retry autorizado após install no `.254`; P5 continua a aguardar ficha.
+**Rev. `az` (`2026-08-13`)** = **P4 retry CLOSED FAIL** (`170000Z`, `health_ssh_fail` sample=14); rollback no fecho incompleto; **P4.1 failsafe confirmado live**; MITM OFF verificado `223009Z`; lab/`latest` `1.9.62`; próximo = diagnóstico auth helper **antes** de novo soak.
+**Rev. `ba` (`2026-08-13`)** = **P4.2 PASS** — causa-raiz = probe SSH sem `-T`; harness `tests/harness/mitm-p4-soak/`; testes locais PASS; **sem** activar MITM; novo soak só com GO lab.
+**Rev. `bb` (`2026-08-13`)** = **P4 soak retry2 IN_PROGRESS** (`224009Z`); health_1 ok tries=1; watchdog auto-arm; escopo `.24`→`198.18.0.10`; permanente **NO-GO**.
+**Rev. `bc` (`2026-08-14`)** = **P4 soak retry2 CLOSED PASS** (`224009Z`); 16/16 health tries=1; `rollback_clean=1`; MITM OFF verify `02:54:33Z`; Phase C NA; permanente **NO-GO**; **P5 aguarda ficha**.
 
 ---
 
@@ -66,9 +70,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **P4 retry** (`1.9.59` publicado); MITM OFF até arranque do soak; permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 PASS; P4 FAIL/ABORT; P4.1 publicado; ficha = **gate**; [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
-| Próximo | **P4 retry** no `.254` com supervisor armado; depois **P5** com ficha; `.234`/`.235` proibidos |
+| Passo actual | **P5 aguarda ficha** (P4 retry2 **CLOSED PASS** `224009Z` / `1.9.59`); permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar externo** — P4 4h+rollback **PASS**; ficha = **gate** |
+| Próximo | **P5** só com ficha; `.234`/`.235` proibidos |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -87,12 +91,15 @@ TRILHA — progresso
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
 - GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
-- Prontidão piloto: NÃO PRONTO activar externo (P1+P2+P3 PASS; P4 CLOSED FAIL/ABORT; P4.1 publicado; P5 aguarda ficha)
+- Prontidão piloto: NÃO PRONTO activar externo (P1+P2+P3 PASS; P4 CLOSED FAIL/ABORT; P4 retry CLOSED FAIL; P4.1 live; P5 aguarda ficha)
 - P4: 20260809T234042Z CLOSED FAIL/ABORT (Phase C interna PASS; Skip≠abort)
-- P4.1: supervisor on-box (1.9.59 publicado; cron+stamp+GUI)
-- Plano rev.: 2026-08-13ay
-- Latest publicado: 1.9.59; MITM P3 em 1.9.47
-- Próximo: P4 retry no .254 com 1.9.59; P5 só com ficha; MITM OFF permanente
+- P4 retry: 20260813T170000Z CLOSED FAIL (health_ssh_fail sample=14; rollback incompleto)
+- P4.1: supervisor on-box live (1.9.59; cron+stamp; failsafe limpou intercept)
+- Pós-fail: 20260813T223009Z MITM OFF no .254
+- P4 retry2: 20260813T224009Z CLOSED PASS (16/16 health tries=1; rollback_clean=1; MITM OFF 02:54:33Z; Phase C NA)
+- Plano rev.: 2026-08-14bc
+- Latest publicado: 1.9.62; soak .254 = 1.9.59 MITM OFF
+- Próximo: P5 só com ficha; MITM OFF permanente
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -606,6 +613,10 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-09 | **rev. `ar` / P1+P2** — GO-escopo D1–D9 + runbook-piloto-mitm-generico; activação NO-GO até P3 |
 | 2026-08-09 | **rev. `as`** — gate activação externa ≠ gap eng.; P3.1–P3.8 fechados |
 | 2026-08-09 | **rev. `at` / P3 PASS** — `1.9.47` max_window/deadline/audit/GUI; evid. `230400Z` |
+| 2026-08-14 | **rev. `bc` / P4 soak retry2 CLOSED PASS** — `224009Z`; 16/16 health; rollback_clean=1; MITM OFF |
+| 2026-08-13 | **rev. `bb` / P4 soak retry2 IN_PROGRESS** — `224009Z`; health_1 tries=1; harness P4.2 |
+| 2026-08-13 | **rev. `ba` / P4.2 PASS** — probe `-T`; harness `mitm-p4-soak`; sem activar MITM |
+| 2026-08-13 | **rev. `az` / P4 retry CLOSED FAIL** — `170000Z` health_ssh_fail; MITM OFF `223009Z`; P4.1 live; `latest` `1.9.62` |
 | 2026-08-13 | **rev. `ay` / `1.9.59` publicado** — P4.1 F1.2; SHA `64899e15…`; P4 retry no `.254` |
 | 2026-08-13 | **rev. `ax` / P4.1** — supervisor on-box cron 1 min; candidato `1.9.59` local; sem publish/activar |
 | 2026-08-09 | **rev. `ao` / `1.9.46` PASS** — Gate C Edge sem flags (`210753Z`); anti-QUIC + filter sync |

@@ -1,11 +1,15 @@
-# START HERE — Identity + MITM Add-on 【P4 soak IN_PROGRESS · lab/`latest` `1.9.61`】
+# START HERE — Identity + MITM Add-on 【P4 soak retry2 CLOSED PASS · lab/`latest` `1.9.62`】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
 > **P4 CLOSED FAIL/ABORT** (`234042Z`) — supervisor nao armado; rollback limpo; **não** PASS 4h.  
-> **P4.1** **`1.9.59`** publicado — supervisor on-box (cron 1 min).  
-> **P4 retry** `170000Z` **IN_PROGRESS** no `.254` (não PASS neste turno).  
-> **`1.9.61`** — Lista VIP texto simples + DHCP (lab/`latest`); **não** upgrade do soak.  
+> **P4.1** **`1.9.59`** publicado — supervisor on-box (cron 1 min); **live** no `.254`.  
+> **P4 retry** `170000Z` **CLOSED FAIL** — `health_ssh_fail` sample=14; rollback no fecho incompleto.  
+> **P4.2** — diagnóstico + harness auth `-T` (`tests/harness/mitm-p4-soak/`); testes locais **PASS**.  
+> **P4 soak retry2** `224009Z` **CLOSED PASS** — 16/16 health tries=1; `rollback_clean=1`; MITM **OFF** (verify `02:54:33Z`).  
+> **Não** upgrade do soak para `1.9.62`.  
+> **`1.9.62`** — copy de operador MITM/Identity (lab/`latest`); **não** upgrade do soak.  
+> **`1.9.61`** — Lista VIP texto simples + DHCP.  
 > **`1.9.60`** — `entitle-ok` PATH absoluto (rc.d).  
 > **P5** aguarda **ficha de site de cliente** — **proibido** piloto externo/permanente.  
 > **Gate C / GO teste** (`1.9.46`, `215442Z`) — **NÃO** permanente.  
@@ -55,16 +59,19 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; P4.1 `1.9.59`; P4 soak **IN_PROGRESS**; publicado **`1.9.61`** (Lista VIP) |
-| Passo actual | **P4 soak IN_PROGRESS** (`170000Z`); permanente **NO-GO**; **não** upgrade `.254` a meio do soak |
-| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 FAIL/ABORT; P4.1 publicado; P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; P4.1 live; P4.2 PASS; P4 soak retry2 **CLOSED PASS**; publicado **`1.9.62`** |
+| Passo actual | **P5 aguarda ficha** (P4 retry2 **CLOSED PASS** `224009Z` / `1.9.59`); permanente **NO-GO** |
+| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 retry2 **PASS** (4h+rollback); P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | P4.1 / retry | [`../09-blocking/runbook-p4-retry-supervisor-onbox.md`](../09-blocking/runbook-p4-retry-supervisor-onbox.md) |
 | Gate activação externa | Ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | **P4 retry** no `.254` com `1.9.59` + supervisor armado; **P5 só com ficha**; MITM OFF permanente; **proibido** piloto externo |
+| Próximo | **P5 só com ficha**; MITM OFF permanente; **proibido** piloto externo |
+| Evidência P4 retry2 | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS** |
 | Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT** |
-| Rev. do plano | **`2026-08-13ay`** |
+| Evidência P4 retry | [`../tests/evidence/20260813T170000Z-p4-retry-254/`](../tests/evidence/20260813T170000Z-p4-retry-254/) — **CLOSED FAIL** |
+| Evidência pós-fail | [`../tests/evidence/20260813T223009Z-p4-postfail-verify-254/`](../tests/evidence/20260813T223009Z-p4-postfail-verify-254/) — MITM **OFF** (pré-retry2) |
+| Rev. do plano | **`2026-08-14bc`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -140,7 +147,7 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; publicado 1.9.58; P4.1 candidato 1.9.59 (local).
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest 1.9.62; soak .254 = 1.9.59.
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
 Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; Gate C PASS (anti-QUIC escopo).
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
@@ -149,14 +156,10 @@ Runbook P4.1: docs/09-blocking/runbook-p4-retry-supervisor-onbox.md
 Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; executar só o próximo bloco seguro (P4 retry só com GO lab; P5 só com ficha — NÃO activar MITM sem GO; NÃO permanente).
-Regras: não-regressão; opt-in; mitm.enabled = intenção; mitm_effective só com gates;
-rdr só source∧dest; anti-QUIC UDP/443 só mitm_src→mitm_dst; quic_mode=block (sem bypass); um passo/bloco; português;
-barra UX PME; Squid rejeitado; S6 ECH = NA/limite; NÃO activar intercept permanente em .254/.234/.235.
-Estado: P3 PASS (1.9.47); P4 ABORT (234042Z); P4.1 supervisor on-box local (1.9.59); Gate B+C/GO teste em 1.9.46 (215442Z);
+Ler na ordem do START-HERE; P4 soak retry2 CLOSED PASS — não activar permanente; P5 só com ficha.
+Estado: P3 PASS (1.9.47); P4 ABORT (234042Z); P4.1 live; P4 retry FAIL (170000Z); P4.2 PASS; soak retry2 CLOSED PASS (224009Z / rollback_clean=1 / MITM OFF);
 piloto NÃO activar — P5 aguarda ficha site cliente; proibido piloto externo/permanente.
-Gates: docs/09-blocking/gates-obrigatorios-1.9.43-mitm.md — B/C PASS; prod temporária PASS.
-Tarefa seguinte: build/publish 1.9.59 só com GO; P4 retry só com GO lab; P5 só com ficha; MITM OFF; sem mutar .234/.235.
+Tarefa seguinte: P5 só com ficha; MITM OFF permanente; sem mutar .234/.235.
 ```
 
 
@@ -189,6 +192,8 @@ php package/pfSense-pkg-layer7/tests/test_mitm_regress.php
 php tests/functional/test_ctrl_exec_timeout.php
 sh tests/harness/mitm-activate-hang/run-local-timeout-fix.sh
 php tests/functional/test_mitm_config.php
+sh tests/harness/mitm-p4-soak/run-local-auth-fix.sh
+sh tests/harness/mitm-p4-soak/p4-validate-local.sh
 ```
 
 ---
@@ -197,14 +202,12 @@ php tests/functional/test_mitm_config.php
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **P4.1** supervisor on-box (candidato 1.9.59 local; MITM OFF)
-- Prontidão piloto: **NÃO PRONTO activar externo** (P1+P2+P3 PASS; P4 FAIL/ABORT; P4.1 local; P5 aguarda ficha)
-- P4: 20260809T234042Z CLOSED FAIL/ABORT (supervisor nao armado; rollback limpo)
-- P4.1: cron 1 min + stamp + GUI; testes MITM PASS; sem publish; sem activar
-- Gates: B/C PASS; GO teste .254 PASS (215442Z; 1.9.46)
-- Evidência P3: 20260809T230400Z-p3-mitm-window
-- Latest publicado: **1.9.58** (anti-pirataria); MITM P3 em 1.9.47
-- Próximo: P4 retry só com GO lab + 1.9.59; P5 só com ficha; MITM OFF
+- Passo actual: **P5 aguarda ficha** (P4 retry2 CLOSED PASS 224009Z / 1.9.59)
+- Prontidão piloto: **NÃO PRONTO activar externo** (P4 4h+rollback PASS; falta ficha+P5)
+- P4 retry2: CLOSED PASS; 16/16 health tries=1; rollback_clean=1; MITM OFF 02:54:33Z
+- P4.2: harness -T PASS (16/16 tries=1)
+- Latest publicado: **1.9.62**; soak .254 = 1.9.59 (não upgrade a meio)
+- Próximo: P5 só com ficha; MITM OFF permanente
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
@@ -229,6 +232,11 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Runbook activação prod. | [`../09-blocking/runbook-activacao-mitm-producao-1.9.46.md`](../09-blocking/runbook-activacao-mitm-producao-1.9.46.md) |
 | Mapa prontidão piloto | [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | P4.1 supervisor on-box | [`../09-blocking/runbook-p4-retry-supervisor-onbox.md`](../09-blocking/runbook-p4-retry-supervisor-onbox.md) |
+| Diagnóstico P4.2 `health_ssh_fail` | [`../09-blocking/diagnostico-p4-retry-health-ssh-fail-20260813.md`](../09-blocking/diagnostico-p4-retry-health-ssh-fail-20260813.md) |
+| Harness P4 soak | [`../../tests/harness/mitm-p4-soak/`](../../tests/harness/mitm-p4-soak/) |
+| Evidência P4 retry FAIL | [`../tests/evidence/20260813T170000Z-p4-retry-254/`](../tests/evidence/20260813T170000Z-p4-retry-254/) |
+| Evidência P4 retry2 CLOSED PASS | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) |
+| Evidência pós-fail MITM OFF | [`../tests/evidence/20260813T223009Z-p4-postfail-verify-254/`](../tests/evidence/20260813T223009Z-p4-postfail-verify-254/) |
 | Escopo piloto (P1) | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) |
 | Runbook piloto (P2) | [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | Destino lab `198.18` via `.54` | [`../09-blocking/runbook-destino-lab-19818-via-54.md`](../09-blocking/runbook-destino-lab-19818-via-54.md) |

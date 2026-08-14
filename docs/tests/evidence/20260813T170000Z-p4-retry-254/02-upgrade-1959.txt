@@ -1,0 +1,52 @@
+GO=P4-retry chat 2026-08-13 — upgrade passivo 1.9.54→1.9.59 (sem MITM ON)
+UTC_START=2026-08-13T16:58:55Z
+PRE_PKG=1.9.54
+ACTUAL=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9
+FILESHA=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9
+EXPECTED=64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9
+SHA_OK
+Installing pfSense-pkg-layer7-1.9.59...
+package pfSense-pkg-layer7 is already installed, forced install
+Extracting pfSense-pkg-layer7-1.9.59: ......... done
+Saving updated package information...
+overwrite!
+Loading package configuration... done.
+Configuring package components...
+Loading package instructions...
+Custom commands...
+Executing custom_php_resync_config_command()...done.
+Menu items... done.
+Services... done.
+Writing configuration... done.
+
+=== Layer7 instalado com sucesso ===
+  Versão:  1.9.59
+  Config:  /usr/local/etc/layer7.json
+  GUI:     Services > Layer 7
+
+  O pacote inicia em modo MONITOR (seguro).
+  Acesse a GUI para configurar interfaces e políticas.
+
+  Check-in online (30.14): instalacoes NOVAS usam check_in_enabled=true
+  por defeito (sample). Upgrades NAO alteram o valor ja gravado.
+  Appliance isolado: defina check_in_enabled=false (GUI ou JSON).
+  Falha de rede nao derruba enforce (N3). Runbook:
+  docs/13-runbooks/check-in-migration-30.14.md
+
+layer7d_enable: YES -> YES
+POST_PKG=1.9.59
+LAYER7D=1.9.59
+enabled=true
+mode=monitor
+mitm.enabled=false
+mitm.effective=false
+supervisor.armed=true
+supervisor.stale=false
+supervisor.event=tick
+LISTEN8443=0
+NO_MITM_NAT
+NO_CRON_TICK
+-r-xr-xr-x  1 root wheel 444 Aug 13 09:52 /usr/local/etc/layer7/layer7-mitm-window-tick.php
+-rw-r-----  1 root wheel  66 Aug 13 13:59 /var/run/layer7/mitm.window-supervisor
+UTC_END=2026-08-13T16:59:07Z
+UPGRADE_PASSIVE_OK

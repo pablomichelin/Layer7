@@ -1,11 +1,11 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 CLOSED FAIL/ABORT** (supervisor nao armado; rollback limpo); **P4.1** supervisor on-box **publicado** (`1.9.59`); **P5 aguarda ficha de site de cliente**.  
+**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 retry2 CLOSED PASS** (`224009Z`; 4h+rollback; Phase C NA); **P4.1** supervisor on-box **live** (`1.9.59`); MITM OFF `02:54:33Z`; **P5 aguarda ficha de site de cliente**.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
-**P4 evidência:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT**.  
-**Pacote de referência lab/`latest`:** `1.9.47` (`SHA256=2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`).  
+**P4 evidência (PASS):** [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS**. Histórico FAIL: [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/).  
+**Pacote de referência lab/`latest`:** `1.9.62` (`SHA256=b6700576afb47cf9790c4c3fddb746b3021d7070e260ef0e6551c712a7948e5f`). Soak `.254`: `1.9.59` MITM OFF.  
 **Produção enforce base (sem MITM):** `1.9.8` (inalterada por este mapa).  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT execução:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
@@ -20,7 +20,7 @@
 | **Teste controlado** | Janela ≤15 min; src `/32` × dst `/32` + SNI lab; rollback imediato | **PASS** `215442Z` |
 | **Piloto** | Janela multi-hora/dias; clientes/destinos nomeados; CA/trust operacional; suporte; critérios de saída; failsafe | **NÃO atingido** |
 | **Permanente / produção MITM** | Intercept ON sem janela de teste; políticas estáveis | **NO-GO** (decisão humana mantida) |
-| **Pronto para piloto** | P1+P2+P3+ficha site+soak com evidência; **não** equivale a GO permanente | **NO-GO activação** (P4 ABORT; falta ficha+P5) |
+| **Pronto para piloto** | P1+P2+P3+ficha site+soak com evidência; **não** equivale a GO permanente | **NO-GO activação** (P4 retry2 PASS; falta ficha+P5) |
 
 **Regra:** nenhum documento pode marcar “pronto para piloto” sem evidência de soak/ops + GO humano explícito de piloto.
 
@@ -44,6 +44,9 @@
 | A12 | Squid rejeitado | ADR-0026 / spike | Permanente |
 | A13 | Identity rede FECHADA (ortogonal) | 20.33 / GI9 | Não bloqueia MITM |
 | A14 | Baseline appliance pós lab-pair | `225533Z` → MONITOR; MITM OFF | Bom ponto de partida |
+| A15 | P4.1 supervisor on-box live | cron `/etc/crontab` 1 min; stamp fresco; MITM OFF pós-retry2 | Failsafe confirmado |
+| A16 | P4.2 helper SSH `-T` | `tests/harness/mitm-p4-soak/` local PASS + 16/16 health retry2 | Corrige falso `no_key` |
+| A17 | P4 soak 4 h + rollback limpo | `224009Z` CLOSED PASS; `rollback_clean=1`; verify `02:54:33Z` | Phase C `.24` **NA** neste retry |
 
 ---
 
@@ -51,11 +54,11 @@
 
 | ID | Lacuna | Porquê bloqueia piloto | Severidade |
 |----|--------|------------------------|------------|
-| T1 | **Sem failsafe de janela longa** | P3 auto-disable + **P4.1 cron on-box** (`1.9.59` publicado); prova de soak 4h ainda falta (P4 FAIL) | Alta (ops) |
+| T1 | **Failsafe de janela longa** | P3 + P4.1 + soak retry2 **PASS** (`224009Z`); residual = ops em site cliente (P5) | Baixa (ops piloto) |
 | T2 | **Observabilidade operador insuficiente para soak** | Contadores/banner/`mitm_effective` claros na GUI durante ON; evidência só de janela curta | Alta |
 | T3 | **S6 ECH = NA/limite** | Comportamento previsível documentado, **não** exercitado; piloto deve declarar limite honesto | Média (aceite se honesto) |
 | T4 | **Prova CE física ausente** | Lab = pfSense Plus; ADR-0022 — não inferir CE só de Plus | Média |
-| T5 | **Soak multi-hora não evidenciado** | S1/S2/GI3 = lab curto; sem evidência de estabilidade 4–24 h | Alta |
+| T5 | **Soak multi-hora** | **Fechado** no lab (`224009Z` PASS; 16 health; rollback limpo). Residual: Phase C NA neste retry; Edge já em P4 original | Baixa |
 | T6 | **CA piloto vs CA efémera** | Teste apaga CA; piloto exige ciclo export GPO / rotação / revogação documentado **e** exercitado | Alta (ops+tech) |
 | T7 | **Escopo multi-cliente não aprovado** | Só `.24` evidenciado; `.234/.235` proibidos sem GO | Depende do GO piloto |
 | T8 | **Resíduos documentais “runtime AUSENTE”** | Plano/ADR/R-T desactualizados vs `1.9.46` — risco de agente errar | Média (docs; corrigido neste bloco) |
@@ -160,20 +163,21 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Teste | `test_mitm_config.php` + `test_mitm_regress.php` PASS |
 | Rollback | Pacote `1.9.58` |
 | Runbook | [`runbook-p4-retry-supervisor-onbox.md`](runbook-p4-retry-supervisor-onbox.md) |
-| Estado | **`v1.9.59` publicado**; **sem** MITM permanente; P4 retry no `.254` |
+| Estado | **P4 retry2 CLOSED PASS** (`224009Z`); **P4.1 live**; MITM OFF `02:54:33Z`; **sem** MITM permanente |
 
-### Bloco P4 — Soak lab controlado (evidência) — **CLOSED FAIL/ABORT** `20260809T234042Z`
+### Bloco P4 — Soak lab controlado (evidência) — **CLOSED PASS** retry2 `20260813T224009Z`
 
 | Campo | Valor |
 |-------|--------|
-| Objectivo | Janela ≥4 h (mínimo) scoped; Edge/cliente real; rollback limpo no fecho |
+| Objectivo | Janela ≥4 h (mínimo) scoped; rollback limpo no fecho |
 | Impacto | `.254` temporário; **não** permanente |
 | Risco | Médio |
-| Teste | Upgrade + activate scoped PASS; Phase C interna PASS (issuer MITM; PF scoped; sem externos); health loop activo |
-| Rollback | **só no fecho** PASS/FAIL/abort predicado — **não** agora |
-| Evidência | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) |
-| Nota Skip | Skip nativo = recusa `example.com`; **≠** abort P4 |
-| Veredicto | **FAIL/ABORT** |
+| Teste | 16/16 health tries=1 (P4.2 `-T`); escopo `.24`→`198.18.0.10`; `rollback_clean=1`; verify live OFF |
+| Rollback | Fecho automático `02:39:19Z` + watchdog `02:43:21Z` |
+| Evidência PASS | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) |
+| Histórico FAIL | `234042Z` supervisor não armado; `170000Z` `health_ssh_fail` |
+| Phase C | **NA** neste retry (sem cliente `.24`); Edge já em P4 original |
+| Veredicto | **PASS** (janela+rollback). **Não** desbloqueia piloto sem P5 |
 
 ### Bloco P5 — GO activação piloto + evidência — **AGUARDA FICHA**
 
@@ -264,7 +268,7 @@ MITM motor scoped (1.9.46+) ....... PRONTO PARA TESTE CONTROLADO (evidência 215
 P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
 P3 failsafe+visibilidade .......... PASS código (1.9.47; P3.1–P3.8; evid. 230400Z)
 Gate activação externa ............ Ficha site nomeada (cliente/resp/src/dst/SNI/janela/saída) — NÃO é gap eng.
-MITM pronto para ACTIVAR PILOTO ... NÃO (P4 FAIL/ABORT; P4.1 publicado; P5 aguarda ficha; sem piloto externo/permanente)
+MITM pronto para ACTIVAR PILOTO ... NÃO (P4 retry2 PASS; P5 aguarda ficha; sem piloto externo/permanente)
 MITM permanente / produção ........ NO-GO (decisão humana)
 ```
 
@@ -291,5 +295,9 @@ MITM permanente / produção ........ NO-GO (decisão humana)
 | 2026-08-09 | P1+P2 reflectidos — D1–D9 |
 | 2026-08-09 | Gate activação externa ≠ lacuna eng.; critérios aceite P3.1–P3.8 fechados |
 | 2026-08-09 | **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS |
+| 2026-08-14 | **P4 soak retry2 CLOSED PASS** — `224009Z`; 16/16 health; rollback_clean=1; MITM OFF `02:54:33Z`; Phase C NA |
+| 2026-08-13 | **P4 soak retry2 IN_PROGRESS** — `224009Z`; health_1 tries=1; deadline `2026-08-14T02:40:19Z` |
+| 2026-08-13 | **P4.2 PASS** — causa-raiz probe sem `-T`; harness `tests/harness/mitm-p4-soak`; sem activar MITM |
+| 2026-08-13 | **P4 retry CLOSED FAIL** — `170000Z` `health_ssh_fail`; MITM OFF `223009Z`; P4.1 live; `latest` `1.9.62` |
 | 2026-08-13 | **P4.1 publicado** — `v1.9.59`; supervisor on-box; P4 retry no `.254` |
 | 2026-08-13 | **P4.1 local** — supervisor on-box cron; candidato `1.9.59`; sem publish/activar |

@@ -1,0 +1,7 @@
+=== PHASE A .54 ===
+ROLLBACK_A_OK
+LISTEN 0      5        198.18.0.10:443       0.0.0.0:*    users:(("python3",pid=127782,fd=3))                     
+atq_failsafe_250min
+    inet 198.18.0.10/32 scope global lo
+PHASE_A=PASS
+PHASE_A_RC=0

@@ -1,0 +1,1 @@
+PHASE_C=NA .24 auth files ausentes; soak failsafe sem cliente Edge

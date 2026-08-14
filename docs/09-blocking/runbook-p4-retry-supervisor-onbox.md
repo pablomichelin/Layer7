@@ -1,6 +1,6 @@
 # Runbook — P4.1 supervisor on-box + retry P4 (sem activação neste bloco)
 
-**Estado:** **P4.1 publicado** `2026-08-13` — `v1.9.59`; **sem** MITM permanente. Retry P4 no `.254` após install.  
+**Estado:** **P4 soak retry2 CLOSED PASS** `224009Z` (`1.9.59` MITM **OFF**); P4.1 live; P4.2 harness. **Sem** MITM permanente.  
 **Causa P4 FAIL/ABORT:** supervisor remoto/failsafe **não armado** (aprovação Skip); P3 auto-expiry sozinho foi considerado insuficiente como failsafe operacional.  
 **Evidência P4:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/).  
 **Mapa:** [`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md).  
@@ -54,3 +54,20 @@ Watchdog: o script de soak deve arrancar `p4-watchdog.sh` **no mesmo passo** que
 
 **Proibido** até ficha de site nomeada (cliente/responsáveis/src/dst/SNI/janela/saída) + P4 retry PASS.  
 P4.1 **não** substitui a ficha.
+
+---
+
+## Resultado do P4 retry `170000Z`
+
+| Campo | Valor |
+|-------|--------|
+| Veredicto | **CLOSED FAIL** (`2026-08-13T20:12:00Z`) |
+| Causa | `health_ssh_fail` sample=14 — `AUTH_FAIL no_key_no_SSHPASS_no_passfile` (orquestrador, não motor TLS) |
+| Rollback no fecho | incompleto (`rollback_clean=0`) |
+| Pós-fail `223009Z` | MITM OFF; P4.1 cron live; residual `ca.present=true` sem ficheiros |
+| Evidência soak | [`../tests/evidence/20260813T170000Z-p4-retry-254/`](../tests/evidence/20260813T170000Z-p4-retry-254/) |
+| Evidência verify | [`../tests/evidence/20260813T223009Z-p4-postfail-verify-254/`](../tests/evidence/20260813T223009Z-p4-postfail-verify-254/) |
+
+**Novo soak** exige GO lab **e** o harness [`../../tests/harness/mitm-p4-soak/`](../../tests/harness/mitm-p4-soak/) (probe `-T`). **Não** activar MITM neste bloco.
+
+Diagnóstico: [`diagnostico-p4-retry-health-ssh-fail-20260813.md`](diagnostico-p4-retry-health-ssh-fail-20260813.md).

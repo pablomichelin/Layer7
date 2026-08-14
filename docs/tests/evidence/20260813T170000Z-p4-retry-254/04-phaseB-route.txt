@@ -1,0 +1,58 @@
+=== PHASE B .254 route ===
+UTC=2026-08-13T17:02:07Z
+BACKUP_OK
+=== reply-to/route-to (informational) ===
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = zabbix-agent flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = zabbix-trapper flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10052 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10054 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10055 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10056 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 10057 flags S/SA keep state (if-bound) label "id=1595266821" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1595266821
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = 30000 flags S/SA keep state (if-bound) label "id=1741714485" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1741714485
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = snmp flags S/SA keep state (if-bound) label "id=1743450285" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450285
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.244 port = snmp keep state (if-bound) label "id=1743450285" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450285
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.244 port = snmptrap flags S/SA keep state (if-bound) label "id=1743450321" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450321
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.244 port = snmptrap keep state (if-bound) label "id=1743450321" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743450321
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto tcp from any to 192.168.100.247 port = 62354 flags S/SA keep state (if-bound) label "id=1747867144" label "tags=user_rule" label "descr=NAT" ridentifier 1747867144
+pass in quick on pppoe0 reply-to (pppoe0 10.99.99.35) inet proto udp from any to 192.168.100.247 port = 62354 keep state (if-bound) label "id=1747867144" label "tags=user_rule" label "descr=NAT" ridentifier 1747867144
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet proto tcp from 192.168.100.244 port = 10058 to 177.38.10.224 port = 10058 flags S/SA keep state (if-bound) label "id=1759256664" label "tags=user_rule" label "descr=Saida Direcionada Storage Gentil" ridentifier 1759256664
+pass in quick on vmx0 route-to (pppoe0 10.99.99.35) inet proto udp from 192.168.100.244 port = 10058 to 177.38.10.224 port = 10058 keep state (if-bound) label "id=1759256664" label "tags=user_rule" label "descr=Saida Direcionada Storage Gentil" ridentifier 1759256664
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = zabbix-agent flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = zabbix-trapper flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10052 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10053 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10054 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10055 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10056 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = 10057 flags S/SA keep state (if-bound) label "id=1674581933" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1674581933
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = snmptrap flags S/SA keep state (if-bound) label "id=1743592897" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743592897
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.244 port = snmptrap keep state (if-bound) label "id=1743592897" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1743592897
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.247 port = 62354 flags S/SA keep state (if-bound) label "id=1747867161" label "tags=user_rule" label "descr=NAT" ridentifier 1747867161
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.247 port = 62354 keep state (if-bound) label "id=1747867161" label "tags=user_rule" label "descr=NAT" ridentifier 1747867161
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto tcp from any to 192.168.100.244 port = snmp flags S/SA keep state (if-bound) label "id=1751027636" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1751027636
+pass in quick on pppoe1 reply-to (pppoe1 179.127.141.233) inet proto udp from any to 192.168.100.244 port = snmp keep state (if-bound) label "id=1751027636" label "tags=user_rule" label "descr=NAT Zabbix Server" ridentifier 1751027636
+delete host 198.18.0.10 fib 0: not in table
+add host 198.18.0.10: gateway 192.168.100.54
+   route to: 198.18.0.10
+destination: 198.18.0.10
+    gateway: 192.168.100.54
+        fib: 0
+  interface: vmx0
+      flags: <UP,GATEWAY,HOST,DONE,STATIC>
+ recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+       0         0         0         0      1500         1         0 
+=== TLS from .254 to lab (CA of Phase A) ===
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Layer7 MITM Lab A</title></head>
+<body>
+<h1>Layer7 Phase A — mitm-lab.test</h1>
+<p id="marker">L7-PHASE-A-OK-198.18.0.10</p>
+<p>Ephemeral lab HTTPS destination. Not production.</p>
+</body></html>
+
+=== FAILSAFE at +250min route delete ===
+Date				Owner		Queue	Job#
+Thu Aug 13 18:12:00 -03 2026	root            c	31
+PHASE_B_OK

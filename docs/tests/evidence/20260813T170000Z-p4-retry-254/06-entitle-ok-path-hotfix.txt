@@ -1,0 +1,4 @@
+===TEST_RC_PATH===
+entitle_rc_path=0
+===TEST_FULL===
+entitle_rc_full=0

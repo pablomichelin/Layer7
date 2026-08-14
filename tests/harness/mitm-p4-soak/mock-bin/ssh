@@ -1,0 +1,14 @@
+#!/bin/bash
+# Mock ssh: falha SEM -T (menu pfSense); sucesso COM -T.
+# Não fala com a rede.
+has_T=0
+for a in "$@"; do
+  if [ "$a" = "-T" ]; then has_T=1; fi
+  if [ "$a" = "RequestTTY=no" ]; then has_T=1; fi
+done
+if [ "$has_T" -eq 0 ]; then
+  echo "Mock: PTY/menu would eat remote command" >&2
+  exit 255
+fi
+echo MOCK_SSH_OK
+exit 0

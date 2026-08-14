@@ -1,0 +1,19 @@
+auth_method=ssh_key_batchmode_254
+UTC=2026-08-14T00:40:42Z
+effective=true
+enabled=true
+remaining=7176
+deadline=1786675219
+expired=false
+src=192.168.100.24/32
+dst=198.18.0.10/32
+MITM_SRC_SCOPED_OK
+SRC= 192.168.100.24
+DST= 198.18.0.10
+DST_LAB_ONLY
+SRC_LAB_ONLY
+ROUTE_LAB_OK
+LISTEN=1
+GUI=200
+{"ts":"2026-08-13T22:40:19+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786675219,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+1.9.59

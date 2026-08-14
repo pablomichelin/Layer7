@@ -1,0 +1,21 @@
+=== PHASE D activate ===
+{
+    "ca_gen": "ok",
+    "ca_msg": "CA gerada (CA:TRUE, keyCertSign, SKI).",
+    "sync": "fail",
+    "sync_sec": 0.862
+}
+ACTIVATE_RC=5
+=== PF ===
+SRC
+DST
+=== FROM_ANY_CHECK ===
+NO_FROM_ANY
+NO_8443
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+supervisor.armed=true
+deadline_unix=0
+remaining_sec=0
+effective=false
+{"ts":"2026-08-13T17:02:19+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786654939,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-13T17:02:20+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786654939,"remaining_sec":14399,"payload_tls":false,"reason":"P4 sync fail"}

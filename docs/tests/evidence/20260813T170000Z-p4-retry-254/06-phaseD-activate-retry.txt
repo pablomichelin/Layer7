@@ -1,0 +1,34 @@
+=== RETRY activate 2026-08-13T17:03:55Z ===
+{
+    "ca_gen": "ok",
+    "ca_msg": "CA gerada (CA:TRUE, keyCertSign, SKI).",
+    "sync": "fail",
+    "sync_sec": 0.838
+}
+ACTIVATE_RC=5
+===GATE===
+total 8
+drwxr-xr-x  2 root wheel  128 Aug 13 14:03 .
+drwxrwxrwt  8 root wheel 4416 Aug 13 14:03 ..
+-rw-r--r--  1 root wheel    0 Aug  9 18:00 filter_configure.lock
+-rw-r-----  1 root wheel   66 Aug 13 14:04 mitm.window-supervisor
+===PF===
+SRC
+pfctl: Table does not exist.
+DST
+pfctl: Table does not exist.
+NO_FROM_ANY
+NO_8443
+layer7_tlsproxy is not running (default OFF; 20.10b gated).
+supervisor.armed=true
+mitm.enabled=false
+effective=false
+deadline_unix=0
+remaining_sec=0
+===SYSLOG===
+<11>1 2026-08-13T14:03:58.664354-03:00 systemupfw.system.up php 41544 - - ERROR Layer7 MITM control-plane: tlsproxy onestart falhou ‚M-^@M-^T rc=1: /usr/sbin/service layer7-tlsproxy onestart
+===AUDIT===
+{"ts":"2026-08-13T17:02:19+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786654939,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-13T17:02:20+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786654939,"remaining_sec":14399,"payload_tls":false,"reason":"P4 sync fail"}
+{"ts":"2026-08-13T17:03:57+00:00","event":"activate","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786655037,"remaining_sec":14400,"payload_tls":false,"reason":"operator_save"}
+{"ts":"2026-08-13T17:03:59+00:00","event":"failsafe","operator":"system","mitm_enabled":true,"quic_mode":"block","source_cidr":["192.168.100.24/32"],"dest_cidr":["198.18.0.10/32"],"block_sni":["mitm-lab.test"],"max_minutes":240,"deadline_unix":1786655037,"remaining_sec":14398,"payload_tls":false,"reason":"P4 sync fail"}
