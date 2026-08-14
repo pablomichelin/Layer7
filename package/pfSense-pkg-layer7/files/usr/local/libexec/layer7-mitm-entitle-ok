@@ -1,27 +1,15 @@
 #!/bin/sh
-# layer7-mitm-entitle-ok — GA2.9 / passo 30.7
-# Exit 0 se o .lic assinado concede feature mitm; senão 1.
-# Usado pelo rc.d layer7-tlsproxy para rejeitar tlsproxy.product escrito à mão
-# sem entitlement criptográfico. Root ainda pode patchar (R-A).
+# layer7-mitm-entitle-ok — GA2.9 / passo 30.7 + P2-11 / BG-128
+# Exit 0 se o .lic assinado concede mitm E o binding (HW + expiry/grace)
+# corresponde ao contrato do daemon. Senão 1.
+# Usado pelo rc.d layer7-tlsproxy. Root ainda pode patchar (R-A).
+# Sem fallback só-assinatura: PHP + layer7.inc é o único caminho.
 
 set -eu
 
-LIC="${LAYER7_LIC_PATH:-/usr/local/etc/layer7.lic}"
-PUB="${LAYER7_LICENSE_PUBKEY:-/usr/local/share/pfSense-pkg-layer7/license-signing-public-key.pem}"
-OPENSSL="${OPENSSL_BIN:-/usr/bin/openssl}"
+INC="${LAYER7_INC:-/usr/local/pkg/layer7.inc}"
 
-if [ ! -r "$LIC" ] || [ ! -r "$PUB" ]; then
-	exit 1
-fi
-if [ ! -x "$OPENSSL" ]; then
-	OPENSSL="openssl"
-fi
-
-TD=$(mktemp -d /tmp/l7mitm.XXXXXX) || exit 1
-trap 'rm -rf "$TD"' EXIT
-
-# Extrair data + sig do envelope JSON.
-# rc.d PATH e so /sbin:/bin:/usr/sbin:/usr/bin — php/python3 vivem em /usr/local/bin.
+# rc.d PATH e so /sbin:/bin:/usr/sbin:/usr/bin — php vive em /usr/local/bin.
 PHP_BIN=""
 for _p in /usr/local/bin/php /usr/local/mds-php/bin/php; do
 	if [ -x "$_p" ]; then
@@ -32,58 +20,10 @@ done
 if [ -z "$PHP_BIN" ] && command -v php >/dev/null 2>&1; then
 	PHP_BIN=$(command -v php)
 fi
-PY3_BIN=""
-for _p in /usr/local/bin/python3 /usr/bin/python3; do
-	if [ -x "$_p" ]; then
-		PY3_BIN="$_p"
-		break
-	fi
-done
-if [ -z "$PY3_BIN" ] && command -v python3 >/dev/null 2>&1; then
-	PY3_BIN=$(command -v python3)
-fi
 
-if [ -n "$PHP_BIN" ]; then
-	"$PHP_BIN" -r '
-$lic=$argv[1]; $td=$argv[2];
-$env=json_decode(file_get_contents($lic), true);
-if (!is_array($env) || empty($env["data"]) || empty($env["sig"])) exit(1);
-file_put_contents("$td/data", $env["data"]);
-$sig=hex2bin(trim($env["sig"]));
-if ($sig===false || strlen($sig)!==64) exit(1);
-file_put_contents("$td/sig", $sig);
-$d=json_decode($env["data"], true);
-$feat=is_array($d)&&isset($d["features"])?(string)$d["features"]:"";
-file_put_contents("$td/features", $feat);
-' "$LIC" "$TD"
-elif [ -n "$PY3_BIN" ]; then
-	"$PY3_BIN" - "$LIC" "$TD" <<'PY'
-import json, sys, binascii, pathlib
-lic, td = sys.argv[1], sys.argv[2]
-env = json.loads(pathlib.Path(lic).read_text())
-data = env.get("data")
-sig = env.get("sig")
-if not isinstance(data, str) or not isinstance(sig, str):
-    sys.exit(1)
-pathlib.Path(td, "data").write_text(data)
-pathlib.Path(td, "sig").write_bytes(binascii.unhexlify(sig.strip()))
-feat = ""
-try:
-    feat = json.loads(data).get("features") or ""
-except Exception:
-    pass
-pathlib.Path(td, "features").write_text(str(feat))
-PY
-else
+if [ -z "$PHP_BIN" ] || [ ! -r "$INC" ]; then
 	exit 1
 fi
 
-"$OPENSSL" pkeyutl -verify -pubin -inkey "$PUB" \
-	-rawin -in "$TD/data" -sigfile "$TD/sig" >/dev/null 2>&1 || exit 1
-
-FEAT=$(cat "$TD/features" 2>/dev/null || echo "")
-# T1: full/vazio NÃO concedem mitm; só token explícito.
-case ",$(echo "$FEAT" | tr '[:upper:]' '[:lower:]' | tr -d ' ')," in
-*,mitm,*) exit 0 ;;
-*) exit 1 ;;
-esac
+"$PHP_BIN" -r 'require $argv[1]; exit(layer7_has_entitlement("mitm") ? 0 : 1);' \
+	"$INC"

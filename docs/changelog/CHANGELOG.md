@@ -16,6 +16,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P2-11 — binding HW + expiry/grace na GUI/helper:**
+  FEITO no git após gates deste bloco. `layer7_entitlements()` e
+  `layer7-mitm-entitle-ok` deixam de desbloquear Identity/MITM com um
+  `.lic` só assinado: exigem o mesmo binding do daemon (hardware_id
+  exacto + expiry com grace de 14 dias). Fingerprint local sem processo
+  do daemon (`sysctl kern.hostuuid` + `ifconfig -l ether`). Stats
+  forjados continuam sem unlock. Sem P2-9/P2-13/P3, sem `PORTVERSION`,
+  sem deploy (P0-1 ACTIVO).
 - **BG-128 P2-7 + P2-8 + P2-10 — persistência check-in / `.lic`:**
   FEITO no git após gates deste bloco. `checkin_save_state`
   passa a tmp + `chmod 0600` + `rename` com escape JSON; `store_key` zera

@@ -6879,10 +6879,15 @@ function layer7_read_license_status()
  * servidor (`.lic` Ed25519). Stats JSON e leitura `.lic` sem verify NÃO
  * desbloqueiam add-ons (A-07). Daemon NÃO assina localmente (ADR-0030 / R-A).
  * Check-in local só pode RETIRAR bits (∩), nunca acrescentar.
+ *
+ * P2-11 / BG-128: assinatura sozinha NÃO chega. O payload tem de passar o
+ * mesmo binding do daemon (`license.c`): hardware_id exacto + expiry com
+ * grace local de 14 dias. Sem anti-rollback (30.6) e sem reabrir P2-13.
  */
 define("L7_FEAT_BASE", 1);
 define("L7_FEAT_IDENTITY", 2);
 define("L7_FEAT_MITM", 4);
+define("L7_LIC_GRACE_DAYS", 14);
 
 function layer7_license_pubkey_path()
 {
@@ -6948,7 +6953,10 @@ function layer7_license_ed25519_verify($data, $sig_bin, $pubkey_pem_path)
 	    strlen($sig_bin) !== 64 || !is_readable($pubkey_pem_path)) {
 		return false;
 	}
-	$openssl = "/usr/bin/openssl";
+	$openssl = getenv("OPENSSL_BIN");
+	if (!is_string($openssl) || $openssl === "" || !is_executable($openssl)) {
+		$openssl = "/usr/bin/openssl";
+	}
 	if (!is_executable($openssl)) {
 		$openssl = "openssl";
 	}
@@ -7033,6 +7041,172 @@ function layer7_license_read_verified($lic_path = null)
 		    (string)$data["customer"] : "",
 		"verified" => true
 	);
+}
+
+/**
+ * Relógio para binding de `.lic`. LAYER7_TEST_NOW (unix) congela testes.
+ */
+function layer7_license_now()
+{
+	$env = getenv("LAYER7_TEST_NOW");
+	if (is_string($env) && $env !== "" && preg_match('/^[0-9]+$/', $env)) {
+		return (int)$env;
+	}
+	return time();
+}
+
+/**
+ * Fingerprint local sem processo do daemon.
+ * Formula F3.2: SHA256(kern.hostuuid + ":" + primeira MAC ether).
+ * Fonte: sysctl -n kern.hostuuid + ifconfig -l ether (mesmo filtro
+ * IFT_ETHER / getifaddrs do daemon). LAYER7_TEST_HW_ID ganha nos testes.
+ * Vazio = indisponível → fail-closed (como license.c).
+ */
+function layer7_local_hardware_id()
+{
+	$env = getenv("LAYER7_TEST_HW_ID");
+	if (is_string($env) && $env !== "") {
+		return trim($env);
+	}
+	$computed = layer7_hw_fingerprint_local();
+	return is_string($computed) ? $computed : "";
+}
+
+function layer7_hw_hostuuid_raw()
+{
+	$sysctl = "/sbin/sysctl";
+	if (!is_executable($sysctl)) {
+		$sysctl = "sysctl";
+	}
+	$out = array();
+	$rc = 1;
+	exec(escapeshellarg($sysctl) . " -n kern.hostuuid 2>/dev/null", $out, $rc);
+	if ($rc !== 0 || empty($out[0])) {
+		return "";
+	}
+	$uuid = (string)$out[0];
+	while ($uuid !== "" && ($uuid[strlen($uuid) - 1] === "\n" ||
+	    $uuid[strlen($uuid) - 1] === "\r")) {
+		$uuid = substr($uuid, 0, -1);
+	}
+	return $uuid;
+}
+
+function layer7_hw_first_ether_mac()
+{
+	$ifconfig = "/sbin/ifconfig";
+	if (!is_executable($ifconfig)) {
+		$ifconfig = "ifconfig";
+	}
+	$out = array();
+	$rc = 1;
+	exec(escapeshellarg($ifconfig) . " -l ether 2>/dev/null", $out, $rc);
+	if ($rc !== 0 || empty($out[0])) {
+		return "";
+	}
+	$names = preg_split('/\s+/', trim($out[0]), -1, PREG_SPLIT_NO_EMPTY);
+	if (!is_array($names) || empty($names[0])) {
+		return "";
+	}
+	$ifn = $names[0];
+	if (!preg_match('/^[A-Za-z][A-Za-z0-9._-]*$/', $ifn)) {
+		return "";
+	}
+	$out2 = array();
+	exec(escapeshellarg($ifconfig) . " " . escapeshellarg($ifn) .
+	    " 2>/dev/null", $out2, $rc2);
+	$blob = implode("\n", $out2);
+	if (!preg_match('/\bether\s+([0-9a-fA-F]{2}(?::[0-9a-fA-F]{2}){5})\b/',
+	    $blob, $m)) {
+		return "";
+	}
+	return strtolower($m[1]);
+}
+
+function layer7_hw_fingerprint_local()
+{
+	$uuid = layer7_hw_hostuuid_raw();
+	$mac = layer7_hw_first_ether_mac();
+	if ($uuid === "" || $mac === "") {
+		return "";
+	}
+	return hash("sha256", $uuid . ":" . $mac);
+}
+
+/**
+ * Binding canónico do daemon (license.c): HW exacto + expiry/grace 14d.
+ * mktime local à meia-noite de YYYY-MM-DD; residual DST = P2-13 (fora).
+ *
+ * @return array{ok:bool,reason:string,grace:bool,days_left:int}
+ */
+function layer7_license_binding_ok($verified, $local_hw = null, $now = null)
+{
+	$out = array(
+		"ok" => false,
+		"reason" => "invalid",
+		"grace" => false,
+		"days_left" => 0
+	);
+	if (!is_array($verified)) {
+		$out["reason"] = "unverified";
+		return $out;
+	}
+	$lic_hw = isset($verified["hardware_id"]) ?
+	    (string)$verified["hardware_id"] : "";
+	$expiry = isset($verified["expiry"]) ?
+	    (string)$verified["expiry"] : "";
+	if ($lic_hw === "" || $expiry === "") {
+		$out["reason"] = "missing_fields";
+		return $out;
+	}
+	if ($local_hw === null) {
+		$local_hw = layer7_local_hardware_id();
+	}
+	$local_hw = (string)$local_hw;
+	if ($local_hw === "") {
+		$out["reason"] = "hw_unavailable";
+		return $out;
+	}
+	if ($lic_hw !== $local_hw) {
+		$out["reason"] = "hw_mismatch";
+		return $out;
+	}
+	if (!preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', trim($expiry), $m)) {
+		$out["reason"] = "expiry_format";
+		return $out;
+	}
+	$y = (int)$m[1];
+	$mo = (int)$m[2];
+	$d = (int)$m[3];
+	if ($mo < 1 || $mo > 12 || $d < 1 || $d > 31) {
+		$out["reason"] = "expiry_format";
+		return $out;
+	}
+	if ($now === null) {
+		$now = layer7_license_now();
+	}
+	$now = (int)$now;
+	$exp_ts = mktime(0, 0, 0, $mo, $d, $y);
+	if ($exp_ts === false) {
+		$out["reason"] = "expiry_format";
+		return $out;
+	}
+	$diff_days = ($exp_ts - $now) / 86400.0;
+	$out["days_left"] = (int)$diff_days;
+	if ($diff_days >= 0) {
+		$out["ok"] = true;
+		$out["reason"] = "valid";
+		$out["grace"] = false;
+		return $out;
+	}
+	if (-$diff_days <= L7_LIC_GRACE_DAYS) {
+		$out["ok"] = true;
+		$out["reason"] = "grace";
+		$out["grace"] = true;
+		return $out;
+	}
+	$out["reason"] = "expired";
+	return $out;
 }
 
 /** @deprecated 30.7 — sem verify; não usar para unlock. Mantido só p/ compat. */
@@ -7248,19 +7422,28 @@ function layer7_entitlements()
 	$raw = "";
 	$flags = L7_FEAT_BASE;
 	$source = "none";
+	$bind_ok = false;
+	$bind_reason = "none";
 
 	if ($verified !== null) {
-		$raw = (string)$verified["features"];
-		$parsed = layer7_features_parse_php($raw);
-		$flags = $parsed["flags"] | L7_FEAT_BASE;
-		$source = "lic_verified";
-		/* ADR-0025: check-in só retira. */
-		$ci = layer7_checkin_features_raw();
-		if ($ci !== "") {
-			$ci_flags = layer7_features_parse_php($ci)["flags"] |
-			    L7_FEAT_BASE;
-			$flags = layer7_features_intersect_php($flags, $ci_flags);
-			$source = "lic_verified_intersect_checkin";
+		$bind = layer7_license_binding_ok($verified);
+		$bind_ok = !empty($bind["ok"]);
+		$bind_reason = (string)$bind["reason"];
+		if ($bind_ok) {
+			$raw = (string)$verified["features"];
+			$parsed = layer7_features_parse_php($raw);
+			$flags = $parsed["flags"] | L7_FEAT_BASE;
+			$source = "lic_verified";
+			/* ADR-0025: check-in só retira. */
+			$ci = layer7_checkin_features_raw();
+			if ($ci !== "") {
+				$ci_flags = layer7_features_parse_php($ci)["flags"] |
+				    L7_FEAT_BASE;
+				$flags = layer7_features_intersect_php($flags, $ci_flags);
+				$source = "lic_verified_intersect_checkin";
+			}
+		} else {
+			$source = "lic_" . $bind_reason;
 		}
 	}
 
@@ -7269,10 +7452,11 @@ function layer7_entitlements()
 		"flags" => $flags,
 		"has_identity" => ($flags & L7_FEAT_IDENTITY) !== 0,
 		"has_mitm" => ($flags & L7_FEAT_MITM) !== 0,
-		"license_valid" => !empty($status["valid"]),
+		"license_valid" => $bind_ok,
 		"dev_mode" => !empty($status["dev_mode"]),
 		"source" => $source,
-		"verified" => ($verified !== null)
+		"verified" => ($verified !== null),
+		"binding_reason" => $bind_reason
 	);
 }
 

@@ -427,6 +427,11 @@ else
 	else
 		fail "test_license_revoke_state"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_entitlements_gui.php; then
+		pass "test_entitlements_gui"
+	else
+		fail "test_entitlements_gui"
+	fi
 fi
 
 step "Regress: layer7-tlsproxy (junto ao codigo)"

@@ -30,9 +30,10 @@
 FEITOS no git** (`2026-08-14`; `c2b9fdb` + governação após gates; sem
 deploy). P2-5 ficou absorvido no P1-3.
 **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
+**P2-11 FEITO no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10).
+(exceto P2-9 sem GO; sem P2-7/8/10/11).
 
 ---
 
@@ -266,7 +267,7 @@ só corre se `PKG_UPGRADE` estiver vazio e não houver keep. Manual e
 | **P2-8 FEITO no git** (`2026-08-14`) | `license.c` `checkin_save_state` vs clock-mark | `fopen(..., "w")` truncava; crash a meio | Após P1-5, estado vazio recusa enforce; `.lic` intacto | tmp + `chmod 0600` + `rename`; escape JSON | Falha de tmp preserva o ficheiro anterior; aspas/barra re-lidas. **Não** deployado. |
 | **P2-9** | `layer7.inc:2552-2593`; `pkg-install.in:43-44` | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF. Documentado (RR-1), residual comercial | Só com GO: migração opt-in ou injectar `true` | Já existe `test_check_in_default_30.14.php`; falta teste de install a **não** migrar |
 | **P2-10 FEITO no git** (`2026-08-14`) | `license.c` `promote_activate_body` / `write_bytes_0600` | `--activate` gravava `.lic` sem `chmod` | umask 022 → 0644; payload assinado legível localmente | `fchmod`/`chmod 0600` | `stat` do `.lic` = 0600. **Não** deployado. |
-| **P2-11** | `layer7.inc:6992-7035`, `7213-7234` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` exigir HW + expiry | `.lic` HW errado / expiry passado → GUI locked, daemon `valid=0` |
+| **P2-11 FEITO no git** (`2026-08-14`) | `layer7.inc` `layer7_entitlements()` / `layer7_license_binding_ok()`; `layer7-mitm-entitle-ok` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` + helper exigem HW + expiry/grace 14d | `.lic` HW errado / expiry além da graça → GUI locked; graça/válido → unlock; stats forjados → locked. **Não** deployado. |
 | **P2-12 FEITO no git** (`c2b9fdb`; governação após gates) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
 | **P2-13** | `license.c:238-247`, `518-520`, `568-573` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | Fim do dia UTC / `tm_isdst=-1` | Relógio no dia D 12:00; hoje cai para grace |
 | **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
@@ -393,11 +394,22 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 7. **Commit allowlist 30.11 FEITO no git** (`2026-08-14`) — **não** levanta P0-1. Sem snapshot/SPA/bind/`.env`/host.
 8. **P1-5…P1-8 + P2-12 FEITOS no git** (`c2b9fdb` + governação após gates) — package/daemon; **sem** deploy / `PORTVERSION`.
 9. **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`) — daemon local; **sem** deploy / `PORTVERSION`.
-10. **P2 / P3 restantes** — por severidade; P2-11/P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
+10. **P2-11 FEITO no git** (`2026-08-14`) — GUI/helper binding HW + expiry/grace; **sem** deploy / `PORTVERSION`.
+11. **P2 / P3 restantes** — por severidade; P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — P2-11 (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Impedir que a GUI Identity/MITM e `layer7-mitm-entitle-ok` desbloqueiem com um `.lic` apenas assinado quando HW ou validade/grace não batem com o daemon |
+| Impacto | `layer7.inc` (fingerprint local + binding + entitlements), helper `layer7-mitm-entitle-ok`, `test_entitlements_gui.php`, `run-local.sh`, docs canónicas. Sem P2-9/P2-13/P3, sem daemon `enforce_armed`, sem license server/SPA/compose, sem `PORTVERSION`/build/release/hosts |
+| Risco | Baixo. Grace de 14 dias alinhada ao daemon (evita false-lock comercial). Fingerprint = `sysctl kern.hostuuid` + primeira `ifconfig -l ether` (mesmo filtro IFT_ETHER). Residual: anti-rollback 30.6 continua só no daemon; DST ±1 h = P2-13 (fora) |
+| Teste | `php tests/functional/test_entitlements_gui.php` — HW errado, expiry além da graça, dentro da graça, válido, stats forjados + helper/rc.d PATH |
+| Rollback | Reverter o commit; a GUI/helper voltam a desbloquear só com assinatura Ed25519 |
 
 ## Objectivo / impacto / risco / teste / rollback — P2-7+P2-8+P2-10 (`2026-08-14`)
 
@@ -405,7 +417,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 |-------|--------|
 | Objectivo | Persistência atómica do estado de check-in; limpar só o cache de features ao substituir a chave; gravar `.lic` com modo 0600 |
 | Impacto | Só `src/layer7d/license.c` / `license.h` + teste C + runner + docs canónicas. Sem P2-9/P2-11/P2-13, sem license server/SPA/compose, sem `PORTVERSION`/build/release/hosts |
-| Risco | Baixo. P1-5 e N3 intactos. `store_key` não mexe em intervalos. Residual: P2-11 (GUI) e P2-13 (expiry) fora deste bloco |
+| Risco | Baixo. P1-5 e N3 intactos. `store_key` não mexe em intervalos. Residual: P2-13 (expiry) fora deste bloco; P2-11 fechado noutro commit |
 | Teste | `test_checkin_state_persist` (sucesso, JSON, falha tmp, SKU, 0600) + `sh tests/run-local.sh` |
 | Rollback | Reverter o commit; o save volta a truncar no sítio, `store_key` herda features e o `.lic` volta ao umask |
 
