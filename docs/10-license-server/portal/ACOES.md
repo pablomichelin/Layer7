@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-138 P3-3C comparação TOTP timing-safe
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Comparação HOTP/TOTP deixa de usar `===` (timing teórico de prefixo) |
+| Impacto | Só `totp.js`: Buffer UTF-8 + guarda de comprimento + `timingSafeEqual`. Janela/step/HMAC/normalização intactos. `auth.js` / users / sessão / frontend / compose intocados |
+| Risco | Baixo. Contrato funcional idêntico (true/false). Overlay P0-1. Residual P3-4 |
+| Teste | Suite backend `229/229` PASS. Válido mesmo now → true; 6 dígitos inválidos → false; malformed → false sem throw; guarda evita RangeError |
+| Rollback | Reverter o commit; `verifyTotp` volta a `===` |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem auth.js / sem users.js / sem session.js |
+
 ## 2026-08-14 — BG-136 P3-3B password de técnico >=12
 
 | Campo | Valor |

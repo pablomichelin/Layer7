@@ -70,6 +70,15 @@ function generateTotp(secret, { step = 30, now = Date.now() } = {}) {
   return hotp(base32Decode(secret), counter);
 }
 
+function timingSafeEqualUtf8(left, right) {
+  const leftBuf = Buffer.from(left, 'utf8');
+  const rightBuf = Buffer.from(right, 'utf8');
+  if (leftBuf.length !== rightBuf.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(leftBuf, rightBuf);
+}
+
 function verifyTotp(secret, token, { window = 1, step = 30, now = Date.now() } = {}) {
   const cleaned = String(token || '').replace(/\s+/g, '');
   if (!/^\d{6}$/.test(cleaned)) {
@@ -78,7 +87,7 @@ function verifyTotp(secret, token, { window = 1, step = 30, now = Date.now() } =
 
   const counter = Math.floor(now / 1000 / step);
   for (let i = -window; i <= window; i += 1) {
-    if (hotp(base32Decode(secret), counter + i) === cleaned) {
+    if (timingSafeEqualUtf8(hotp(base32Decode(secret), counter + i), cleaned)) {
       return true;
     }
   }
@@ -140,5 +149,6 @@ module.exports = {
   generateTotp,
   generateTotpSecret,
   parseTotpChallengeToken,
+  timingSafeEqualUtf8,
   verifyTotp,
 };

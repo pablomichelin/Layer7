@@ -74,9 +74,12 @@ correção única segura; sem mudança de runtime). **P2-4 FEITO** no git
 bcrypt + `registerLoginFailure`; sem deploy / `PORTVERSION`).
 **P3-3B** FEITO no git
 (`2026-08-14`; `POST`/`PUT /api/users` exige password >=12; `/login` não
-rejeita 10; sem deploy / `PORTVERSION`). Próximo código
+rejeita 10; sem deploy / `PORTVERSION`).
+**P3-3C** FEITO no git
+(`2026-08-14`; `verifyTotp` Buffer UTF-8 + guarda de comprimento +
+`timingSafeEqual`; sem deploy / `PORTVERSION`). Próximo código
 com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem
-M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B). **P0-1 ACTIVO**
+M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C). **P0-1 ACTIVO**
 inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).

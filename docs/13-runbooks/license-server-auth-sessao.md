@@ -60,6 +60,11 @@ Referencias normativas:
   → `400`. `PUT` sem campo `password` não altera o hash. `/login` **não**
   rejeita password existente de 10 caracteres. `Users.jsx` permanece
   `minLength={10}` neste bloco.
+- **P3-3C / BG-138:** `verifyTotp` compara HOTP/TOTP com Buffer UTF-8
+  + guarda de comprimento + `crypto.timingSafeEqual`. Comprimentos
+  diferentes = mismatch sem chamar `timingSafeEqual`. Janela/step/HMAC/
+  normalização intactos. `/login/totp`, enable e disable continuam a
+  receber booleanos. `auth.js` intocado.
 - Auditoria minima:
   - auth/sessao e mutacoes administrativas em `admin_audit_log`
   - guardas de lockout em `admin_login_guards`

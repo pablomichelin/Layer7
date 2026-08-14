@@ -37,6 +37,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P3-3C / BG-138 — comparação TOTP timing-safe:** FEITO
+  no git após gates deste bloco. `verifyTotp` deixa o `===` e compara
+  HOTP/TOTP com Buffer UTF-8 + guarda de comprimento +
+  `crypto.timingSafeEqual`. Comprimentos diferentes = mismatch sem
+  chamar `timingSafeEqual` (evita RangeError). Janela/step/HMAC/
+  normalização intactos. Código válido no mesmo `now` → true;
+  6 dígitos inválidos → false; `''`, null/undefined, 5/7 dígitos e
+  não-dígitos → false sem throw. `auth.js` / `/login/totp` / enable /
+  disable continuam a receber booleanos. Residual P3-4. Sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-3B / BG-136 — password de técnico >=12:** FEITO
   no git após gates deste bloco. `normalizePassword` em `routes/users.js`
   sobe de 10 para 12 e a mensagem passa a «pelo menos 12 caracteres».

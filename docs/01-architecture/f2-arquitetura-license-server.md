@@ -109,6 +109,9 @@ Documentos normativos desta arquitetura:
   **P3-3B / BG-136 (`2026-08-14`):** criação/edição de técnico em
   `POST`/`PUT /api/users` exige password >=12 (alinhado ao bootstrap).
   `/login` não rejeita 10. Sem deploy.
+  **P3-3C / BG-138 (`2026-08-14`):** `verifyTotp` compara HOTP/TOTP
+  com Buffer UTF-8 + guarda de comprimento + `timingSafeEqual`.
+  Janela/step/HMAC/normalização intactos. Sem deploy.
 
 ### Frontend
 
