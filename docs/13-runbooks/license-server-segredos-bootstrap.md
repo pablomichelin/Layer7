@@ -68,9 +68,16 @@ Comportamento oficial:
 
 - `status`: mostra quantos admins existem; nao altera estado.
 - `init`: cria o primeiro admin apenas se a tabela `admins` estiver vazia.
+  O `BEGIN` adquire `LOCK TABLE admins IN SHARE ROW EXCLUSIVE MODE` antes
+  do `COUNT`; o `INSERT` grava já `is_owner=TRUE`, `is_active=TRUE` e
+  `permissions=['*']`. Dois `init` em paralelo: um sucesso, o outro
+  «ja existe pelo menos um admin».
 - `reset-password`: redefine a password de um admin existente e revoga as
   sessoes activas desse admin no mesmo passo.
 - ambos os fluxos auditam o evento em `admin_audit_log`.
+- No arranque da API, `ensureUsersRbacSchema` só promove **um** legado
+  (`ORDER BY id ASC LIMIT 1`) quando não existe owner. Se já houver
+  vários owners, emite alerta observável e **não** promove nem demove.
 
 ---
 
@@ -103,9 +110,22 @@ unset ADMIN_PASSWORD
 Resultado esperado:
 
 - comando devolve `Admin inicial criado`;
+- o admin criado já é owner activo (`is_owner=true`, `permissions=['*']`);
 - `bootstrap-admin.js status` passa a indicar `total_admins >= 1`;
 - o primeiro login administrativo passa a ocorrer apenas pelo canal oficial
   `https://license.systemup.inf.br`.
+
+---
+
+## 4.1 P1-4 / P2-1 — um único owner (2026-08-14)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Fechar a corrida de bootstrap e a promoção de legado que criavam dois owners com `*` |
+| Impacto | Só backend (`bootstrap-admin-init.js`, `users-rbac-schema.js`); CLI `init`/`status`/`reset-password` inalterados para o operador |
+| Risco | Baixo. Owners extra já existentes no live **não** são reduzidos. Sem unique index. Sem deploy (P0-1) |
+| Teste | Suite backend: dois `init` concorrentes; restart com 2+ não-owners → 1 owner; restart com owner existente → 0 promoções; alerta se `COUNT>1` |
+| Rollback | Reverter o commit; o `init` volta ao `COUNT` sem lock e o boot volta a promover todos |
 
 ---
 

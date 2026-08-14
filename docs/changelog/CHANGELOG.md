@@ -6,6 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P1-4 + P2-1 — bootstrap owner:** `init` adquire
+  `LOCK TABLE admins IN SHARE ROW EXCLUSIVE MODE` e cria o primeiro admin
+  já como owner activo com `*`. A promoção de legado no arranque fica
+  limitada a `ORDER BY id ASC LIMIT 1`. Vários owners geram alerta e não
+  são promovidos nem demovidos. Sem unique index, sem transferência, sem
+  compose/.env/seed/SPA, sem deploy (P0-1 ACTIVO).
 - **BG-128 P1-2 — XFF / rate-limit IP:** `getClientIp` deixa de usar o
   primeiro hop de `X-Forwarded-For` (cliente) e passa a `req.ip`
   (`trust proxy: 1`) ou ao socket. O nginx de origin substitui

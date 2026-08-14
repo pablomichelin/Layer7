@@ -9,6 +9,8 @@ const {
   normalizeAdminEmail,
 } = require('./src/admin-surface');
 const { readSecret } = require('./src/secret-config');
+const { ensureUsersRbacSchema } = require('./src/users-rbac-schema');
+const { runBootstrapInitTransaction } = require('./src/bootstrap-admin-init');
 
 const BCRYPT_ROUNDS = 12;
 const VALID_COMMANDS = new Set(['init', 'reset-password', 'status']);
@@ -145,49 +147,36 @@ async function runInit() {
 
   validatePassword(identity.password);
 
+  const passwordHash = await bcrypt.hash(identity.password, BCRYPT_ROUNDS);
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN');
-
-    const adminCountResult = await client.query('SELECT COUNT(*)::integer AS total FROM admins');
-    const totalAdmins = adminCountResult.rows[0].total;
-
-    if (totalAdmins > 0) {
-      throw new Error('Bootstrap inicial recusado: ja existe pelo menos um admin');
-    }
-
-    const passwordHash = await bcrypt.hash(identity.password, BCRYPT_ROUNDS);
-    const insertResult = await client.query(
-      `INSERT INTO admins (email, name, password_hash)
-       VALUES ($1, $2, $3)
-       RETURNING id, email, name, created_at`,
-      [identity.email, identity.name, passwordHash]
-    );
-    const admin = insertResult.rows[0];
-
-    await logBootstrapEvent(client, {
-      adminId: admin.id,
-      actorIdentifier: admin.email,
-      eventType: 'initial_admin_created',
-      result: 'success',
-      reason: 'bootstrap_init',
-      metadata: {
-        mode: 'init',
-        admin_name: admin.name,
+    const admin = await runBootstrapInitTransaction(client, {
+      email: identity.email,
+      name: identity.name,
+      passwordHash,
+    }, {
+      audit: async (txn, created) => {
+        await logBootstrapEvent(txn, {
+          adminId: created.id,
+          actorIdentifier: created.email,
+          eventType: 'initial_admin_created',
+          result: 'success',
+          reason: 'bootstrap_init',
+          metadata: {
+            mode: 'init',
+            admin_name: created.name,
+            is_owner: created.is_owner === true,
+          },
+        });
       },
     });
-
-    await client.query('COMMIT');
 
     const createdAtIso = new Date(admin.created_at).toISOString();
 
     console.log(
       `[BOOTSTRAP] Admin inicial criado: ${admin.email} (id=${admin.id}, created_at=${createdAtIso})`
     );
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
   } finally {
     client.release();
   }
@@ -260,6 +249,7 @@ async function main() {
   const { command, flags } = parseArgs(process.argv.slice(2));
 
   await ensureAdminSurfaceSchema();
+  await ensureUsersRbacSchema();
 
   if (command === 'status') {
     await runStatus();

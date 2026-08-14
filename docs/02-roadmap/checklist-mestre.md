@@ -475,4 +475,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] **BG-128 P0-2** — TOTP HMAC fail-closed (sem fallback estático; arranque produção recusa segredos vazios; `2026-08-14`; sem deploy)
 - [x] **BG-128 P1-3** — `/login/totp` recusa `is_active=false`; reset só após TOTP OK; falha TOTP no lock existente sem enumerar (`2026-08-14`; P2-5 absorvido; sem deploy)
 - [x] **BG-128 P1-2** — origin substitui `X-Forwarded-For` por `$remote_addr`; `getClientIp` usa `req.ip` (`trust proxy: 1`); Proto intacto (`2026-08-14`; sem deploy)
-- [ ] **BG-128** remediações restantes — P0-1 ACTIVO; próximo código com GO = **P1-4** bootstrap owner (sem `.244`, sem commit 30.11)
+- [x] **BG-128 P1-4 + P2-1** — lock no `init`; primeiro admin já owner; promoção legado `LIMIT 1`; alerta se vários owners (`2026-08-14`; sem deploy)
+- [ ] **BG-128** remediações restantes — P0-1 ACTIVO; próximo código com GO = **P1-5** ou commit allowlist 30.11 (sem `.244` neste bloco)

@@ -5,6 +5,21 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-128 P1-4 + P2-1 bootstrap owner
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Um único owner no bootstrap e no boot; o primeiro admin nasce já como owner activo |
+| Impacto | Lock transacional no `init`; INSERT com `is_owner=TRUE`; promoção legado `LIMIT 1`; alerta se `COUNT>1` sem demotion |
+| Risco | Baixo (fail-closed na corrida). Residual: owners extra já existentes no live não são reduzidos; P0-1 impede overlay |
+| Teste | `npm test` no backend — `173/173` PASS (incl. `bootstrap-admin-init` + `users-rbac-schema`) |
+| Rollback | Reverter o commit; o `init` volta ao `COUNT` sem lock e o boot volta a promover todos |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem unique / sem demotion |
+
+---
+
 ## 2026-08-14 — BG-128 P1-2 XFF / rate-limit IP
 
 | Campo | Valor |

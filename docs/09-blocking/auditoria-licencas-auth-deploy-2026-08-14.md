@@ -26,9 +26,9 @@
 
 **P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244` enquanto o serving `30.11` live não estiver reconciliado **e** versionado no git (allowlist, sem snapshot). Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
-**P0-2, P1-1, P1-2 e P1-3 FEITOS no git** (`2026-08-14`; sem deploy). P2-5
-(reset/lock no 2FA) ficou absorvido no P1-3. Próximo código com GO: **P1-4**
-(bootstrap owner). Não mistura 30.11, não toca `.244`.
+**P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS no git** (`2026-08-14`; sem
+deploy). P2-5 ficou absorvido no P1-3. Próximo código com GO: **P1-5**
+(package/daemon) ou commit allowlist `30.11`. Não mistura 30.11, não toca `.244`.
 
 ---
 
@@ -154,13 +154,17 @@ residual P0-2 single-use/bind.
 
 ### P1-4 — Bootstrap `init` sem lock: dois owners
 
+**FEITO no git** (`2026-08-14`; opção A). P2-1 absorvido no mesmo bloco.
+**Não** deployado (P0-1). Sem unique index, sem demotion, sem transferência.
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `bootstrap-admin.js:151-166`; `users-rbac-schema.js:12-21` |
-| **Cenário** | BD vazia. Dois `node bootstrap-admin.js init` em paralelo, emails distintos. Unique só no email. No start, `ensureUsersRbacSchema` promove **todos** a owner. |
+| **Evidência** | `bootstrap-admin-init.js`; `users-rbac-schema.js` |
+| **Cenário** | BD vazia. Dois `node bootstrap-admin.js init` em paralelo, emails distintos. Unique só no email. No start, `ensureUsersRbacSchema` promovia **todos** a owner. |
 | **Impacto** | Dois owners com `*`. Não é remoto (precisa env/DB); é corrida de trusted entry. |
-| **Correcção mínima** | `LOCK TABLE admins` no `BEGIN`, ou `INSERT … WHERE NOT EXISTS`. Gravar `is_owner=TRUE` no mesmo INSERT. Promover **um** row (`ORDER BY id LIMIT 1`). |
-| **Testes** | Dois inits concorrentes → um sucesso, um “já existe”. Restart com 2 admins sem owner → só `id` mínimo vira owner. |
+| **Correcção mínima** | `LOCK TABLE admins IN SHARE ROW EXCLUSIVE MODE` no `BEGIN`. Gravar `is_owner=TRUE` no mesmo INSERT. Promover **um** row (`ORDER BY id LIMIT 1`). Alertar se `COUNT>1` sem promover/demover. |
+| **Implementado** | Lock transacional no init; primeiro admin já owner activo com `*`; promoção legado `ORDER BY id ASC LIMIT 1`; `console.warn` se houver vários owners. Sem unique, sem demotion, sem compose/.env/seed/SPA. |
+| **Testes** | Dois inits concorrentes → um sucesso, um “já existe”, um só owner. Restart com 2+ admins sem owner → só `id` mínimo. Restart com owner existente → zero promoções extra. Vários owners → alerta, sem mutação. Suite backend `173/173` PASS. |
 
 ### P1-5 — `.lic` manual sem chave de check-in = sem revogação / sem max-offline
 
@@ -228,7 +232,7 @@ residual P0-2 single-use/bind.
 
 | ID | Evidência | Cenário | Impacto | Correcção mínima | Testes |
 |----|-----------|---------|---------|------------------|--------|
-| **P2-1** | `users-rbac-schema.js:12-21` | Restart sem owner | `UPDATE` sem `LIMIT` promove **todos** a owner | Promover só `ORDER BY id LIMIT 1`; alertar se `COUNT>1` | 3 admins `is_owner=false` → exactamente 1 owner |
+| **P2-1 FEITO no git** (`2026-08-14`; absorvido no P1-4) | `users-rbac-schema.js` | Restart sem owner | `UPDATE` sem `LIMIT` promovia **todos** a owner | Promover só `ORDER BY id LIMIT 1`; alertar se `COUNT>1` sem demover | 3 admins `is_owner=false` → exactamente 1 owner. **Não** deployado. |
 | **P2-2** | `admin-surface.js:39-45`, `:188-196`; `index.js:47-48` | Sem `Origin` → `next()`; `/api/users` e `/api/search` fora de `isAdminApiPath` | CSRF clássico mitigado por SameSite=strict; defesa em profundidade inconsistente | Incluir users/search; state-changing fail-closed (`Origin` ou `Sec-Fetch-Site`) | `POST /api/users` com Origin evil → 403 |
 | **P2-3** | `nginx.conf:6-9`, `:47`; `session.js:372-374`; `index.js:31` | HTTP ao origin + `X-Forwarded-Proto: https` | `req.secure===true`; password/TOTP/Bearer em HTTP se bind ≠ loopback | Nginx: `X-Forwarded-Proto $scheme` | HTTP + header https → login 400 no origin HTTP |
 | **P2-4** | `admin-surface.js:267-295` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasa-se (read-then-write) | `failure_count = … + 1` atómico ou `FOR UPDATE` | 10 `registerLoginFailure` concorrentes → count=10 + lock |
@@ -302,7 +306,7 @@ residual P0-2 single-use/bind.
 - API **não** cria admin no start. Só `bootstrap-admin.js init` (one-shot se `COUNT>0` no mesmo serial).
 - Password bootstrap ≥12, rejeita prefixo `CHANGE_ME`; aceita `ADMIN_BOOTSTRAP_PASSWORD_FILE`.
 - Compose **sem** passwords default; `.env` no `.gitignore`; `001-init.sql` sem row seed.
-- Residual: P1-4 / P2-1.
+- Residual: P1-4 / P2-1 **FEITOS no git** (`2026-08-14`; sem unique/demotion; sem deploy).
 
 ### Concorrência activate / check-in / SQLite
 
@@ -361,7 +365,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 3. **P0-2 FEITO no git** (`2026-08-14`) — fallback TOTP removido + arranque fail-closed; residual single-use/bind. **sem** deploy `.244`.
 4. **P1-3 + P2-5 FEITOS no git** (`2026-08-14`) — `is_active` + reset/lock no 2FA.
 5. **P1-2 FEITO no git** (`2026-08-14`) — XFF / rate-limit IP; origin substitui XFF; `getClientIp` = `req.ip`. **Não** deployado. Residual: IP público no origin (PROXY/P1-9); P2-3 Proto; P2-2 CSRF.
-6. **P1-4 + P2-1** — um único owner no bootstrap/boot.
+6. **P1-4 + P2-1 FEITOS no git** (`2026-08-14`) — lock no init; primeiro admin já owner; promoção `LIMIT 1`; alerta se `COUNT>1`. **sem** deploy `.244`.
 7. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
 8. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).
 9. **P2 / P3 restantes** — por severidade; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
@@ -369,6 +373,16 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — P1-4 + P2-1 (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Um único owner no bootstrap e no boot; o primeiro admin nasce já como owner activo |
+| Impacto | Só `license-server/backend` init/RBAC + testes + docs; sem unique index; sem demotion; sem compose/.env/seed/SPA/nginx/package/daemon; sem `.244` |
+| Risco | Baixo (fail-closed na corrida de trusted entry). Residual: owners extra já existentes no live não são reduzidos; P0-1 impede overlay |
+| Teste | Suite backend `173/173` PASS (`bootstrap-admin-init` + `users-rbac-schema`) |
+| Rollback | Reverter o commit; o `init` volta ao `COUNT` sem lock e o boot volta a promover todos os não-owners |
 
 ## Objectivo / impacto / risco / teste / rollback — P1-2 (`2026-08-14`)
 
