@@ -1,13 +1,13 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; MITM P3 **`1.9.47`**; **P4 soak retry2 CLOSED PASS** (`224009Z` / `1.9.59`); P4.2 harness **PASS**; P4.1 live; permanente **NO-GO**; **P5 aguarda ficha** (rev. `2026-08-14bc`)
+**Estado do plano:** Identity **FECHADA**; **20.35 PASS** (GUI política MITM; até desligar); candidato **`1.9.63`**; **ADR-0035**; P4 retry2 CLOSED PASS (rev. `2026-08-14be`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
 **Arranque de chat (único desta trilha):** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT de estado vivo do produto:** [`../../CORTEX.md`](../../CORTEX.md)  
 **Mapa técnico:** [`../01-architecture/identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)  
-**Mapa prontidão piloto:** [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — **NÃO PRONTO activar**  
+**Mapa prontidão piloto:** [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) — ficha **RETIRADA** (ADR-0035)  
 **P1 escopo:** [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md)  
 **P2 runbook piloto:** [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md)  
 **Desenho MITM (opção E):** [`../01-architecture/desenho-layer7-tlsproxy-mitm.md`](../01-architecture/desenho-layer7-tlsproxy-mitm.md) — runtime **no `.pkg` desde `1.9.39`**; default OFF; `mitm_effective` gated (texto “AUSENTE” = histórico pré-20.10)  
@@ -63,6 +63,8 @@
 **Rev. `ba` (`2026-08-13`)** = **P4.2 PASS** — causa-raiz = probe SSH sem `-T`; harness `tests/harness/mitm-p4-soak/`; testes locais PASS; **sem** activar MITM; novo soak só com GO lab.
 **Rev. `bb` (`2026-08-13`)** = **P4 soak retry2 IN_PROGRESS** (`224009Z`); health_1 ok tries=1; watchdog auto-arm; escopo `.24`→`198.18.0.10`; permanente **NO-GO**.
 **Rev. `bc` (`2026-08-14`)** = **P4 soak retry2 CLOSED PASS** (`224009Z`); 16/16 health tries=1; `rollback_clean=1`; MITM OFF verify `02:54:33Z`; Phase C NA; permanente **NO-GO**; **P5 aguarda ficha**.
+**Rev. `bd` (`2026-08-14`)** = **ADR-0035** — ficha/P5 **RETIRADOS**; ambição de paridade NGFW no tempo; **20.34 PASS docs**; próximo **20.35** productizar MITM na GUI.
+**Rev. `be` (`2026-08-14`)** = **20.35 PASS** — GUI até desligar (`max_minutes=0`); copy operador; candidato `1.9.63` sem publish.
 
 ---
 
@@ -70,9 +72,9 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **P5 aguarda ficha** (P4 retry2 **CLOSED PASS** `224009Z` / `1.9.59`); permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar externo** — P4 4h+rollback **PASS**; ficha = **gate** |
-| Próximo | **P5** só com ficha; `.234`/`.235` proibidos |
+| Passo actual | **20.35 PASS** — GUI política MITM; até desligar; candidato `1.9.63` |
+| Prontidão | Ficha **já não é gate**. Operação = GUI + entitlement. Default OFF. |
+| Próximo | Publish `1.9.63` com GO; `.234`/`.235` sem mutação neste passo |
 | Lab PoC | **`192.168.100.54`** |
 | GO produto | [`../09-blocking/GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md) |
 | Evidência 20.10b | [`../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/`](../tests/evidence/20260809T053000Z-20.10b-listen-rdr-https-54/) |
@@ -91,15 +93,17 @@ TRILHA — progresso
 - 204452Z: Edge c/ --disable-quic = DIAGNÓSTICO (não Gate C)
 - 1.9.46 PASS: anti-QUIC + filter_configure_sync; Gate C 210753Z
 - GO teste controlado .254 PASS (215442Z; quic_mode=block; rollback OK; NÃO permanente)
-- Prontidão piloto: NÃO PRONTO activar externo (P1+P2+P3 PASS; P4 CLOSED FAIL/ABORT; P4 retry CLOSED FAIL; P4.1 live; P5 aguarda ficha)
+- Prontidão (histórico pré-0035): P5 era ficha; **supersedido** por ADR-0035
 - P4: 20260809T234042Z CLOSED FAIL/ABORT (Phase C interna PASS; Skip≠abort)
 - P4 retry: 20260813T170000Z CLOSED FAIL (health_ssh_fail sample=14; rollback incompleto)
 - P4.1: supervisor on-box live (1.9.59; cron+stamp; failsafe limpou intercept)
 - Pós-fail: 20260813T223009Z MITM OFF no .254
 - P4 retry2: 20260813T224009Z CLOSED PASS (16/16 health tries=1; rollback_clean=1; MITM OFF 02:54:33Z; Phase C NA)
-- Plano rev.: 2026-08-14bc
+- ADR-0035 / 20.34 PASS: ficha RETIRADA; ambição paridade NGFW no tempo
+- 20.35 PASS: GUI até desligar; copy operador; candidato 1.9.63
+- Plano rev.: 2026-08-14be
 - Latest publicado: 1.9.62; soak .254 = 1.9.59 MITM OFF
-- Próximo: P5 só com ficha; MITM OFF permanente
+- Próximo: publish 1.9.63 com GO
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -135,11 +139,11 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 
 | # | Tema | Decisão canónica |
 |---|------|------------------|
-| R-R | Nicho PME / MSP | Produto do add-on = **controlo de internet por pessoa** para empresas **pequenas/médias** e canal MSP em pfSense. **Não** é paridade com NGFW enterprise. Detalhe: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md). |
+| R-R | Nicho PME / MSP | Produto do add-on = **controlo de internet por pessoa** para PME/MSP em pfSense. **Mercado de entrada** = PME; **norte** = paridade NGFW no tempo (ADR-0035). Detalhe: [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md). |
 | R-S | Identity-first | Após IM1, o **caminho de valor obrigatório** é IM3→IM6. MITM **não** atrasa Identity. |
-| R-T | MITM DEFER 20.7a → reopen → runtime | **Histórico até 20.9:** runtime ausente; effective false. **Estado vivo (`1.9.46`):** runtime no `.pkg` (default OFF); GI2/GI3 **PASS** lab; Gate C + teste controlado `.254` **PASS**; permanente/piloto **NO-GO** até mapa+GO — [`mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md). Squid **rejeitado**. |
+| R-T | MITM DEFER 20.7a → reopen → runtime | Runtime no `.pkg` (default OFF); GI2/GI3 **PASS**; P3+P4 retry2 **PASS**; ficha **RETIRADA** (ADR-0035). Squid **rejeitado**. |
 | R-U | Barra UX PME | Cada passo Identity deve cumprir critérios U*/P*/H*/N* do posicionamento (§6) — “perfeito para empresas usarem”, não só “compila e passa gate”. |
-| R-V | Anti-overclaim | Materiais e GUI **proibidos** de prometer paridade Fortinet/Palo/Check Point, MITM universal, ou exactidão GlobalProtect sem agente. |
+| R-V | Anti-overclaim de **estado** | Proibido afirmar que **já** temos paridade Fortinet/Palo/Check Point, MITM universal sem política, ou GlobalProtect sem agente. **Proibido** tratar isso como tecto (ADR-0035). |
 
 ### 0.1 Relação com planos fechados
 
@@ -147,7 +151,7 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 |-------|--------|---------|
 | Fecho P0–J | **FECHADO** | Baseline comercial; não reabrir |
 | IPv6 V0–V6 | **FECHADA** | Dual-stack já no produto; Identity/MITM devem **respeitar** IPv4+IPv6 |
-| Este plano | Identity **FECHADA**; MITM **`1.9.46`** | Extensão comercial; Identity fechada; runtime no `.pkg` (OFF); teste controlado PASS; piloto **NÃO PRONTO** |
+| Este plano | Identity **FECHADA**; MITM **`1.9.47`+** | Extensão comercial; ficha retirada (ADR-0035); próximo 20.35 |
 
 Congelamento das filas fechadas:
 [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
@@ -168,7 +172,7 @@ Congelamento das filas fechadas:
 7. **Mercado-alvo:** empresas **pequenas e médias** (+ MSP). Empresas grandes contratam NGFW caro — **fora** do objectivo de paridade.
 8. **Ideia:** não desistir porque “já existe NGFW”; criar o produto que o NGFW **não** empacota bem no pfSense/PME (Identity + DPI + um pacote + ops simples).
 9. **Objectivo mensurável:** “quem na rede pode o quê” por user/grupo, instalável e **utilizável** por TI PME/MSP (barra U*/P*/H* do posicionamento).
-10. **MITM:** diferido formalmente (R-T); futuro = helper próprio selectivo, **não** Squid, **não** paridade enterprise.
+10. **MITM:** helper próprio selectivo, **não** Squid; **norte** = paridade NGFW no tempo (ADR-0035).
 11. Documento canónico da ideia/objectivo/nicho/UX:
     [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md).
 
@@ -437,6 +441,13 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 | **20.32** | MANUAL-INSTALL + MANUAL-USO-LICENCAS + changelog + commercial notes | **PASS** (`2026-08-08`) |
 | **20.33** | Release candidata + GO produção add-on (pode ser prerelease) | **PASS** (`20260808T174100Z-im9-20.33-homolog-1.9.29`; GI9) |
 
+### Pós-IM9 — productizar MITM (ADR-0035)
+
+| Passo | Entrega | Gate |
+|-------|---------|------|
+| **20.34** | GO docs: retirar ficha; ambição de paridade NGFW no tempo | **PASS** (`2026-08-14`; ADR-0035) |
+| **20.35** | Productizar operação MITM na GUI (até desligar + copy operador) | **PASS** (`2026-08-14`; candidato `1.9.63`) |
+
 ---
 
 ## 5. Ordem de implementação (resumo visual)
@@ -466,7 +477,7 @@ IM0 → IM1 → IM2 GO → 20.8–20.11 MITM → IM3–IM6 → IM7–IM9
 **Proibido:** MITM activo sem entitlement, bypass e **novo GO** pós-defer.  
 **Proibido:** tratar `device_ips` PHP como SSOT de Identity.  
 **Proibido:** Squid como caminho de produto.  
-**Proibido:** overclaim de paridade NGFW (R-V).
+**Proibido:** overclaim de paridade **já atingida** (R-V); **proibido** recusar evoluir porque «nunca seremos NGFW».
 
 ---
 
@@ -613,6 +624,8 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-09 | **rev. `ar` / P1+P2** — GO-escopo D1–D9 + runbook-piloto-mitm-generico; activação NO-GO até P3 |
 | 2026-08-09 | **rev. `as`** — gate activação externa ≠ gap eng.; P3.1–P3.8 fechados |
 | 2026-08-09 | **rev. `at` / P3 PASS** — `1.9.47` max_window/deadline/audit/GUI; evid. `230400Z` |
+| 2026-08-14 | **rev. `be` / 20.35 PASS** — GUI até desligar; copy operador; candidato `1.9.63` |
+| 2026-08-14 | **rev. `bd` / ADR-0035 + 20.34 PASS** — ficha/P5 RETIRADOS; ambição paridade NGFW; próximo **20.35** |
 | 2026-08-14 | **rev. `bc` / P4 soak retry2 CLOSED PASS** — `224009Z`; 16/16 health; rollback_clean=1; MITM OFF |
 | 2026-08-13 | **rev. `bb` / P4 soak retry2 IN_PROGRESS** — `224009Z`; health_1 tries=1; harness P4.2 |
 | 2026-08-13 | **rev. `ba` / P4.2 PASS** — probe `-T`; harness `mitm-p4-soak`; sem activar MITM |

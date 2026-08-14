@@ -217,12 +217,15 @@ define("L7_CTRL_TIMEOUT_KILL_GRACE", 5);
 
 /*
  * P3 — janela MITM (failsafe + visibilidade).
- * max_minutes default 15 (runbook teste); teto 240 (piloto).
- * deadline_unix explícito no JSON; effective fail-closed se expirado.
+ * max_minutes default 15; teto 240 no modo temporizado.
+ * 20.35: max_minutes=0 = até o operador desligar (sem deadline).
+ * deadline_unix explícito no JSON; effective fail-closed se expirado
+ * (excepto modo até-desligar).
  */
 define("L7_MITM_WINDOW_MAX_MINUTES_DEFAULT", 15);
 define("L7_MITM_WINDOW_MAX_MINUTES_MIN", 1);
 define("L7_MITM_WINDOW_MAX_MINUTES_CAP", 240);
+define("L7_MITM_WINDOW_UNTIL_OFF", 0);
 /** P4.1 — supervisor on-box: cron 1 min; stamp fresco ≤180s = armado. */
 define("L7_MITM_WINDOW_TICK", "/usr/local/etc/layer7/layer7-mitm-window-tick.php");
 define("L7_MITM_WINDOW_SUPERVISOR_STALE_SEC", 180);
@@ -8165,10 +8168,14 @@ function layer7_mitm_effective($mitm = null, $entitled = null)
 	if (!layer7_mitm_intercept_scope_ok($mitm)) {
 		return false;
 	}
-	/* P3: deadline explícito obrigatório e ainda no futuro. */
+	/* P3: janela expirada ⇒ não effective. 20.35: até-desligar não exige deadline. */
 	if (function_exists("layer7_mitm_window_expired") &&
 	    layer7_mitm_window_expired($mitm)) {
 		return false;
+	}
+	if (function_exists("layer7_mitm_window_until_off") &&
+	    layer7_mitm_window_until_off($mitm)) {
+		return true;
 	}
 	$dl = 0;
 	if (isset($mitm["window"]["deadline_unix"])) {
@@ -8213,11 +8220,14 @@ function layer7_mitm_operator_label()
 }
 
 /**
- * Clamp max_minutes da janela piloto.
+ * Clamp max_minutes. 0 = até o operador desligar (20.35).
  */
 function layer7_mitm_clamp_max_minutes($raw)
 {
 	$n = (int)$raw;
+	if ($n === (int)L7_MITM_WINDOW_UNTIL_OFF) {
+		return (int)L7_MITM_WINDOW_UNTIL_OFF;
+	}
 	if ($n < L7_MITM_WINDOW_MAX_MINUTES_MIN) {
 		$n = L7_MITM_WINDOW_MAX_MINUTES_DEFAULT;
 	}
@@ -8228,11 +8238,30 @@ function layer7_mitm_clamp_max_minutes($raw)
 }
 
 /**
+ * True se a duração é «até desligar» (sem auto-expire por tempo).
+ */
+function layer7_mitm_window_until_off($mitm)
+{
+	if (!is_array($mitm) || !isset($mitm["window"])) {
+		return false;
+	}
+	$max = layer7_mitm_clamp_max_minutes(
+	    isset($mitm["window"]["max_minutes"])
+		? $mitm["window"]["max_minutes"]
+		: L7_MITM_WINDOW_MAX_MINUTES_DEFAULT);
+	return ($max === (int)L7_MITM_WINDOW_UNTIL_OFF);
+}
+
+/**
  * True se intenção ON mas deadline já passou (ou deadline inválido com ON).
+ * Modo até-desligar: nunca expira por tempo.
  */
 function layer7_mitm_window_expired($mitm)
 {
 	if (!is_array($mitm) || empty($mitm["enabled"])) {
+		return false;
+	}
+	if (layer7_mitm_window_until_off($mitm)) {
 		return false;
 	}
 	$dl = 0;
@@ -8262,17 +8291,19 @@ function layer7_mitm_window_status($mitm = null)
 	$max = layer7_mitm_clamp_max_minutes(
 	    isset($w["max_minutes"]) ? $w["max_minutes"]
 		: L7_MITM_WINDOW_MAX_MINUTES_DEFAULT);
+	$until_off = ($max === (int)L7_MITM_WINDOW_UNTIL_OFF);
 	$dl = isset($w["deadline_unix"]) ? (int)$w["deadline_unix"] : 0;
 	$act = isset($w["activated_unix"]) ? (int)$w["activated_unix"] : 0;
 	$now = time();
 	$remaining = 0;
-	if ($dl > $now && !empty($mitm["enabled"])) {
+	if (!$until_off && $dl > $now && !empty($mitm["enabled"])) {
 		$remaining = $dl - $now;
 	}
 	$ic = (isset($mitm["intercept"]) && is_array($mitm["intercept"]))
 	    ? $mitm["intercept"] : array();
 	return array(
 		"max_minutes" => $max,
+		"until_off" => $until_off,
 		"deadline_unix" => $dl,
 		"activated_unix" => $act,
 		"activated_by" => isset($w["activated_by"])
@@ -8582,14 +8613,32 @@ function layer7_mitm_prepare_window_on_save($prev_mitm, $new_mitm)
 		return layer7_mitm_normalize($new_mitm);
 	}
 
+	$max = layer7_mitm_clamp_max_minutes(
+	    isset($new_mitm["window"]["max_minutes"])
+		? $new_mitm["window"]["max_minutes"]
+		: L7_MITM_WINDOW_MAX_MINUTES_DEFAULT);
+	$new_mitm["window"]["max_minutes"] = $max;
+	$prev_until = is_array($prev_mitm) && layer7_mitm_window_until_off($prev_mitm);
+	$until_off = ($max === (int)L7_MITM_WINDOW_UNTIL_OFF);
+
+	if ($until_off) {
+		$need_arm = (!$prev_on) || !$prev_until;
+		if ($need_arm) {
+			$now = time();
+			$new_mitm["window"]["activated_unix"] = $now;
+			$new_mitm["window"]["deadline_unix"] = 0;
+			$new_mitm["window"]["activated_by"] = layer7_mitm_operator_label();
+			$new_mitm = layer7_mitm_normalize($new_mitm);
+			layer7_mitm_audit("activate", $new_mitm,
+			    array("reason" => "operator_save_until_off"));
+		}
+		return $new_mitm;
+	}
+
 	$dl = isset($new_mitm["window"]["deadline_unix"])
 	    ? (int)$new_mitm["window"]["deadline_unix"] : 0;
-	$need_arm = (!$prev_on) || ($dl <= 0) || ($dl <= time());
+	$need_arm = (!$prev_on) || $prev_until || ($dl <= 0) || ($dl <= time());
 	if ($need_arm) {
-		$max = layer7_mitm_clamp_max_minutes(
-		    isset($new_mitm["window"]["max_minutes"])
-			? $new_mitm["window"]["max_minutes"]
-			: L7_MITM_WINDOW_MAX_MINUTES_DEFAULT);
 		$now = time();
 		$new_mitm["window"]["max_minutes"] = $max;
 		$new_mitm["window"]["activated_unix"] = $now;

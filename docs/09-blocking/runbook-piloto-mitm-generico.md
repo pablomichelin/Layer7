@@ -23,15 +23,14 @@
 
 ## 0. Pré-condições (NO-GO se falhar)
 
-> **Gate de activação (não é lacuna de engenharia):** sem cliente, responsáveis, SOURCE, DEST, SNI, janela e critérios de saída **nomeados**, a activação externa é **NO-GO** — independentemente do estado do código P3/`1.9.46`.
+> **ADR-0035:** a ficha P1 §3 **já não é gate**. Pré-condições abaixo = qualidade de produto (GUI/entitlement/escopo), não papel.
 
-1. P1 formulário §3 **completo** + assinatura responsável (D5).  
-2. Entitlement `mitm` válido no site.  
-3. Pacote ≥ `1.9.46` (SHA verificado).  
-4. **P3 failsafe código** disponível **ou** failsafe ops dual (cron/`at` + vigilância humana) documentado na ficha do site — janelas longas **sem** auto-disable = NO-GO.  
-5. MITM actualmente **OFF**; zero rdr/tabelas mitm órfãs; GUI/SSH/NET saudáveis.  
-6. Listas SOURCE / DEST / SNI / ALLOW explícitas (D6/D7) — nenhuma implícita.  
-7. Política de metadados 30 dias comunicada (D4).
+1. Entitlement `mitm` + política na GUI (origem∧destino). Sem formulário em papel.  
+2. Pacote ≥ `1.9.46` (SHA verificado).  
+3. **P3 failsafe** no produto (`max_window` / supervisor) — janelas longas sem auto-disable = má prática, não gate papel.  
+4. Confirmar estado actual (OFF vs ON) e rdr scoped; GUI/SSH/NET saudáveis.  
+5. SOURCE / DEST / SNI / ALLOW na GUI (D6/D7) — nenhuma implícita `from any`.  
+6. Política de metadados 30 dias (D4) — produto, não ficha.
 
 ---
 
@@ -227,7 +226,7 @@ Palavra de ordem: **preferir OFF indevido a ON fora de escopo**.
 
 **P3 — código:** **PASS** (`1.9.47`).  
 **P4 soak lab:** **CLOSED FAIL/ABORT** — evidência [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) (supervisor nao armado; rollback limpo; nao PASS 4h).  
-**P5:** aguarda **ficha de site de cliente** — **não** activar piloto externo nem permanente sem P5 PASS + GO humano.
+**P5:** **RETIRADO** (ADR-0035). Próximo: **20.35** productizar MITM na GUI.
 
 ---
 
@@ -238,3 +237,4 @@ Palavra de ordem: **preferir OFF indevido a ON fora de escopo**.
 | 2026-08-09 | P2 criado — runbook genérico alinhado a P1 D1–D9 |
 | 2026-08-09 | Nota gate activação: ficha incompleta ≠ débito eng. |
 | 2026-08-10 | P4 CLOSED FAIL/ABORT `234042Z` (supervisor nao armado; rollback limpo); P5 bloqueado à ficha |
+| 2026-08-14 | **ADR-0035** — ficha/P5 retirados; runbook = ops de produto, não gate papel |

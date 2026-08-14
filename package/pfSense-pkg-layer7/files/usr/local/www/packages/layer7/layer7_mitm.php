@@ -17,7 +17,6 @@ require_once("/usr/local/pkg/layer7.inc");
 /* Nao usar $ent: head.inc faz foreach ($ifentries as $ent => ...) e sobrescreve. */
 $l7_ent = layer7_entitlements();
 $unlocked = !empty($l7_ent["has_mitm"]);
-$l7_feat_raw = isset($l7_ent["raw"]) ? (string)$l7_ent["raw"] : "";
 
 $savemsg = "";
 $input_errors = array();
@@ -64,9 +63,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			$mitm["enabled"] = !empty($_POST["mitm_enabled"]);
 			$mitm["quic_mode"] = isset($_POST["quic_mode"]) ? (string)$_POST["quic_mode"] : "bypass";
 			$mitm["ca"]["cn"] = isset($_POST["ca_cn"]) ? (string)$_POST["ca_cn"] : $mitm["ca"]["cn"];
-			$mitm["window"]["max_minutes"] = isset($_POST["mitm_max_window"])
-			    ? (int)$_POST["mitm_max_window"]
-			    : (int)($mitm["window"]["max_minutes"] ?? 15);
+			$dur_mode = isset($_POST["mitm_duration_mode"])
+			    ? (string)$_POST["mitm_duration_mode"] : "timed";
+			if ($dur_mode === "until_off") {
+				$mitm["window"]["max_minutes"] = 0;
+			} else {
+				$mitm["window"]["max_minutes"] = isset($_POST["mitm_max_window"])
+				    ? (int)$_POST["mitm_max_window"]
+				    : (int)($mitm["window"]["max_minutes"] ?? 15);
+			}
 			$errs = layer7_mitm_validate($mitm);
 			if (!empty($errs)) {
 				$input_errors = array_merge($input_errors, $errs);
@@ -241,51 +246,57 @@ if ($savemsg !== "") {
 						</p>
 					</div>
 <?php else: ?>
-					<div class="alert alert-success" role="alert" style="margin-bottom:12px;">
-						<?= htmlspecialchars(l7_t("Entitlement mitm activo.")); ?>
-						<?= htmlspecialchars($runtime_ok
-						    ? l7_t("O motor de inspeccao esta instalado. A inspeccao so liga com certificado, origens e destinos definidos.")
-						    : l7_t("O motor de inspeccao nao esta disponivel neste appliance — inspecao desligada.")); ?>
+					<div class="alert <?= $effective ? "alert-success" : "alert-info"; ?>" role="alert" style="margin-bottom:12px;">
+						<strong><?= htmlspecialchars($effective
+						    ? l7_t("Inspeccao TLS ligada")
+						    : l7_t("Inspeccao TLS desligada")); ?></strong>
+						<p style="margin: 10px 0 0;">
+							<?= htmlspecialchars($runtime_ok
+							    ? l7_t("Incluida nesta licenca. Liga com certificado, origens e destinos definidos — como uma politica, nao um formulario em papel.")
+							    : l7_t("O motor de inspeccao nao esta disponivel neste appliance — inspecao desligada.")); ?>
+						</p>
 					</div>
 					<table class="table table-condensed" style="max-width:720px; margin-bottom:12px;">
-						<tr><th>mitm.enabled (intencao)</th><td><code><?= !empty($mitm["enabled"]) ? "true" : "false"; ?></code></td></tr>
-						<tr><th>mitm_effective</th><td><code><?= $effective ? "true" : "false"; ?></code></td></tr>
-						<tr><th>runtime</th><td><code><?= $runtime_ok ? "yes" : "no"; ?></code></td></tr>
-						<tr><th>intercept_ready</th><td><code><?= layer7_mitm_intercept_ready() ? "true" : "false"; ?></code></td></tr>
-						<tr><th>source_cidr</th><td><code><?= htmlspecialchars(implode(", ", $win_status["source_cidr"] ?? array())); ?></code></td></tr>
-						<tr><th>dest_cidr</th><td><code><?= htmlspecialchars(implode(", ", $win_status["dest_cidr"] ?? array())); ?></code></td></tr>
-						<tr><th>block_sni</th><td><code><?= htmlspecialchars(implode(", ", $win_status["block_sni"] ?? array())); ?></code></td></tr>
-						<tr><th>quic_mode</th><td><code><?= htmlspecialchars($win_status["quic_mode"] ?? ($mitm["quic_mode"] ?? "bypass")); ?></code></td></tr>
-						<tr><th>max_window (min)</th><td><code><?= (int)($win_status["max_minutes"] ?? 15); ?></code></td></tr>
-						<tr><th>deadline_unix (UTC)</th><td><code><?php
-							$dl = (int)($win_status["deadline_unix"] ?? 0);
-							echo $dl > 0 ? htmlspecialchars(gmdate("Y-m-d\TH:i:s\Z", $dl) . " ({$dl})") : "0";
-						?></code></td></tr>
-						<tr><th>tempo restante</th><td><code><?php
-							$rs = (int)($win_status["remaining_sec"] ?? 0);
-							if ($rs <= 0) {
-								echo !empty($win_status["expired"]) ? "expirado / OFF" : "0s";
+						<tr><th><?= htmlspecialchars(l7_t("Pedido do operador")); ?></th><td><?= !empty($mitm["enabled"]) ? htmlspecialchars(l7_t("Ligar")) : htmlspecialchars(l7_t("Desligar")); ?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("Estado real")); ?></th><td><?= $effective ? htmlspecialchars(l7_t("Activa")) : htmlspecialchars(l7_t("Inactiva")); ?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("Origens")); ?></th><td><?= htmlspecialchars(implode(", ", $win_status["source_cidr"] ?? array()) ?: "—"); ?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("Destinos")); ?></th><td><?= htmlspecialchars(implode(", ", $win_status["dest_cidr"] ?? array()) ?: "—"); ?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("Sites com pagina HTTPS")); ?></th><td><?= htmlspecialchars(implode(", ", $win_status["block_sni"] ?? array()) ?: "—"); ?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("QUIC / HTTP3")); ?></th><td><?= htmlspecialchars($win_status["quic_mode"] ?? ($mitm["quic_mode"] ?? "bypass")); ?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("Duracao")); ?></th><td><?php
+							if (!empty($win_status["until_off"])) {
+								echo htmlspecialchars(l7_t("Ate desligar"));
 							} else {
-								echo htmlspecialchars(sprintf("%dm %ds", intdiv($rs, 60), $rs % 60));
+								echo htmlspecialchars((int)($win_status["max_minutes"] ?? 15) . " " . l7_t("minutos"));
 							}
-						?></code></td></tr>
-						<tr><th><?= htmlspecialchars(l7_t("Supervisor automatico")); ?></th><td><code><?php
+						?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("tempo restante")); ?></th><td><?php
+							if (!empty($win_status["until_off"])) {
+								echo htmlspecialchars(l7_t("Sem limite de tempo"));
+							} else {
+								$rs = (int)($win_status["remaining_sec"] ?? 0);
+								if ($rs <= 0) {
+									echo !empty($win_status["expired"])
+									    ? htmlspecialchars(l7_t("Expirada / desligada"))
+									    : "—";
+								} else {
+									echo htmlspecialchars(sprintf("%dm %ds", intdiv($rs, 60), $rs % 60));
+								}
+							}
+						?></td></tr>
+						<tr><th><?= htmlspecialchars(l7_t("Supervisor automatico")); ?></th><td><?php
 							if (!empty($sup_status["armed"])) {
-								$ls = (int)($sup_status["last_unix"] ?? 0);
-								echo htmlspecialchars(l7_t("armado") . ($ls > 0
-								    ? " " . gmdate("Y-m-d\\TH:i:s\\Z", $ls)
-								    : ""));
+								echo htmlspecialchars(l7_t("A vigiar"));
 							} else {
-								echo htmlspecialchars(l7_t("nao armado / stale"));
+								echo htmlspecialchars(l7_t("Ainda nao reportou"));
 							}
-						?></code></td></tr>
-						<tr><th>features</th><td><code><?= htmlspecialchars($l7_feat_raw); ?></code></td></tr>
+						?></td></tr>
 					</table>
 <?php if ($effective || !empty($mitm["enabled"])): ?>
 					<form method="post" style="margin-bottom:0;">
 						<button type="submit" name="mitm_break_glass" value="1" class="btn btn-danger btn-sm"
-							onclick="return confirm(<?= htmlspecialchars(json_encode(l7_t("Break-glass: desactivar MITM agora e limpar control-plane?")), ENT_QUOTES); ?>);">
-							<i class="fa fa-exclamation-triangle"></i> <?= htmlspecialchars(l7_t("Break-glass (OFF imediato)")); ?>
+							onclick="return confirm(<?= htmlspecialchars(json_encode(l7_t("Desligar a inspeccao TLS agora e limpar o redireccionamento?")), ENT_QUOTES); ?>);">
+							<i class="fa fa-exclamation-triangle"></i> <?= htmlspecialchars(l7_t("Desligar agora")); ?>
 						</button>
 					</form>
 <?php endif; ?>
@@ -299,8 +310,8 @@ if ($savemsg !== "") {
 				<div class="layer7-admin-block__body">
 					<p class="help-block">
 						<?= htmlspecialchars(l7_t(
-						    "A chave privada fica em /usr/local/etc/layer7/mitm/ (0600) e nunca no git nem em layer7.json. " .
-						    "Exporte so o certificado (.crt) para GPO / trust store dos clientes."
+						    "A chave privada fica so neste firewall e nunca e exportada. " .
+						    "Exporte so o certificado (.crt) e distribua-o aos PCs (GPO ou instalacao manual)."
 						)); ?>
 					</p>
 <?php if (!empty($mitm["ca"]["present"])) { ?>
@@ -371,13 +382,13 @@ if ($savemsg !== "") {
 					<form method="post" class="form-horizontal">
 						<input type="hidden" name="ca_cn" value="<?= htmlspecialchars($mitm["ca"]["cn"] ?? "Layer7 MITM CA"); ?>" />
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("mitm.enabled")); ?></label>
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Activar inspeccao TLS")); ?></label>
 							<div class="col-sm-9">
 								<label class="checkbox-inline">
 									<input type="checkbox" name="mitm_enabled" value="1"
 										<?= !empty($mitm["enabled"]) ? 'checked="checked"' : ""; ?>
 										<?= $toggle_ok ? "" : 'disabled="disabled"'; ?> />
-									<?= htmlspecialchars(l7_t("Intencao: activar inspecao TLS quando o runtime existir")); ?>
+									<?= htmlspecialchars(l7_t("Ligar a inspeccao para as origens e destinos abaixo")); ?>
 								</label>
 <?php if (!$ca_ok): ?>
 								<p class="help-block" style="margin-top:6px;">
@@ -401,48 +412,63 @@ if ($savemsg !== "") {
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("max_window (minutos)")); ?></label>
-							<div class="col-sm-3">
-								<input type="number" name="mitm_max_window" class="form-control" min="1" max="240"
-									value="<?= (int)($mitm["window"]["max_minutes"] ?? 15); ?>" />
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Duracao")); ?></label>
+							<div class="col-sm-9">
+<?php
+$until_off_ui = ((int)($mitm["window"]["max_minutes"] ?? 15) === 0);
+$win_ui = $until_off_ui ? 15 : (int)($mitm["window"]["max_minutes"] ?? 15);
+?>
+								<label class="radio-inline" style="display:block; margin-bottom:8px;">
+									<input type="radio" name="mitm_duration_mode" value="until_off"
+										<?= $until_off_ui ? 'checked="checked"' : ""; ?> />
+									<?= htmlspecialchars(l7_t("Manter ligada ate eu desligar")); ?>
+								</label>
+								<label class="radio-inline" style="display:block; margin-bottom:8px;">
+									<input type="radio" name="mitm_duration_mode" value="timed"
+										<?= $until_off_ui ? "" : 'checked="checked"'; ?> />
+									<?= htmlspecialchars(l7_t("Desligar automaticamente apos")); ?>
+								</label>
+								<div style="max-width:160px; margin: 6px 0 0 22px;">
+									<input type="number" name="mitm_max_window" class="form-control" min="1" max="240"
+										value="<?= $win_ui; ?>" />
+								</div>
 								<p class="help-block"><?= htmlspecialchars(l7_t(
-								    "Ao activar, a inspeccao dura no maximo este tempo e desliga-se sozinha. " .
-								    "1 a 240 minutos; padrao 15."
+								    "O modo temporizado desliga sozinho (1 a 240 minutos). " .
+								    "Pode sempre desligar agora. Uma actualizacao do pacote nunca liga a inspeccao sozinha."
 								)); ?></p>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Origens rdr (obrigatorio)")); ?></label>
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Origens (obrigatorio)")); ?></label>
 							<div class="col-sm-9">
 								<textarea name="intercept_source_cidr" class="form-control" rows="3"
 									placeholder="192.168.100.24/32"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["source_cidr"] ?? array())); ?></textarea>
 								<p class="help-block"><?= htmlspecialchars(l7_t(
-								    "Quem pode ser interceptado: CIDR/IP IPv4 de origem (ex.: um PC de teste 192.168.100.24/32). " .
-								    "Vazio = zero rdr — os outros clientes da LAN nao sao afectados. " .
-								    "Obrigatorio em conjunto com Destinos. Proibido: any, 0.0.0.0/0, IPv6, prefixo </8 " .
-								    "(sem from any / expansao silenciosa)."
+								    "Quem e inspeccionado: IP ou rede IPv4 (ex.: 192.168.100.24/32). " .
+								    "Vazio = ninguem. Obrigatorio em conjunto com Destinos. " .
+								    "Nao use «qualquer origem» nem a Internet inteira."
 								)); ?></p>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Destinos rdr (obrigatorio)")); ?></label>
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Destinos (obrigatorio)")); ?></label>
 							<div class="col-sm-9">
 								<textarea name="intercept_dest_cidr" class="form-control" rows="3"
 									placeholder="203.0.113.10&#10;198.51.100.0/24"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["dest_cidr"] ?? array())); ?></textarea>
 								<p class="help-block"><?= htmlspecialchars(l7_t(
-								    "Para onde o trafego e redireccionado (destino IPv4) → 127.0.0.1:8443. " .
-								    "Vazio = zero rdr. Use um destino de teste dedicado — nao a Internet inteira. " .
-								    "Sem rdr inet6 / ::1 / to any. IPs do proprio appliance / GUI sao excluidos."
+								    "Para onde o HTTPS e inspeccionado (IP ou rede IPv4). " .
+								    "Vazio = ninguem. Nao use a Internet inteira. " .
+								    "Os enderecos deste firewall ficam de fora."
 								)); ?></p>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Block SNI (pagina HTTPS)")); ?></label>
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Sites a bloquear (HTTPS)")); ?></label>
 							<div class="col-sm-9">
 								<textarea name="intercept_block_sni" class="form-control" rows="3"
 									placeholder="blocked.example"><?= htmlspecialchars(implode("\n", $mitm["intercept"]["block_sni"] ?? array())); ?></textarea>
 								<p class="help-block"><?= htmlspecialchars(l7_t(
-								    "SNI que recebem a pagina HTML de bloqueio via helper. Nao e bypass."
+								    "Dominios que recebem a pagina de bloqueio em HTTPS. Nao e excepcao."
 								)); ?></p>
 							</div>
 						</div>
@@ -452,9 +478,9 @@ if ($savemsg !== "") {
 								<select name="quic_mode" class="form-control">
 <?php
 $qmodes = array(
-	"bypass" => l7_t("Bypass (legado S5 — runtime ainda bloqueia UDP/443 no escopo MITM)"),
-	"block" => l7_t("Bloquear QUIC no escopo MITM (recomendado)"),
-	"downgrade" => l7_t("Preferir downgrade para TCP (igual a block no runtime actual)")
+	"bypass" => l7_t("Nao forcar (o motor ainda pode bloquear QUIC no mesmo escopo)"),
+	"block" => l7_t("Bloquear QUIC nestas origens e destinos (recomendado)"),
+	"downgrade" => l7_t("Preferir TCP (igual a bloquear QUIC nesta versao)")
 );
 $qcur = $mitm["quic_mode"] ?? "bypass";
 foreach ($qmodes as $qv => $ql) {
@@ -463,11 +489,11 @@ foreach ($qmodes as $qv => $ql) {
 }
 ?>
 								</select>
-								<p class="help-block"><?= htmlspecialchars(l7_t("Com MITM efectivo o produto emite block UDP/443 apenas de layer7_mitm_src para layer7_mitm_dst (forca fallback TCP). Sem regra global/IPv6. Remove-se no rollback.")); ?></p>
+								<p class="help-block"><?= htmlspecialchars(l7_t("O bloqueio QUIC aplica-se so as origens e destinos desta pagina, para o browser cair em HTTPS normal. Desliga-se com a inspeccao.")); ?></p>
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Bypass SNI")); ?></label>
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Excepcoes (dominios)")); ?></label>
 							<div class="col-sm-9">
 								<textarea name="bypass_sni" class="form-control" rows="4"
 									placeholder="banco.exemplo.pt&#10;login.microsoftonline.com"><?= htmlspecialchars(implode("\n", $mitm["bypass"]["sni"] ?? array())); ?></textarea>
@@ -475,7 +501,7 @@ foreach ($qmodes as $qv => $ql) {
 							</div>
 						</div>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Bypass CIDR/IP")); ?></label>
+							<label class="col-sm-3 control-label"><?= htmlspecialchars(l7_t("Excepcoes (IP ou rede)")); ?></label>
 							<div class="col-sm-9">
 								<textarea name="bypass_cidr" class="form-control" rows="3"
 									placeholder="10.0.0.0/8&#10;192.168.1.50"><?php

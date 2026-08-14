@@ -1,7 +1,7 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** **NÃO PRONTO PARA ACTIVAR PILOTO EXTERNO** — P0/P1/P2 docs **PASS**; **P3 código PASS** (`1.9.47`); **P4 retry2 CLOSED PASS** (`224009Z`; 4h+rollback; Phase C NA); **P4.1** supervisor on-box **live** (`1.9.59`); MITM OFF `02:54:33Z`; **P5 aguarda ficha de site de cliente**.  
+**Veredicto:** ficha/P5 **RETIRADOS** (ADR-0035). **20.35 PASS**. Operação MITM = GUI + entitlement. Soak `.254` MITM **OFF**. Default OFF. Candidato `1.9.63`. Sem overclaim de paridade **já** atingida.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
 **P4 evidência (PASS):** [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS**. Histórico FAIL: [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/).  
@@ -20,7 +20,7 @@
 | **Teste controlado** | Janela ≤15 min; src `/32` × dst `/32` + SNI lab; rollback imediato | **PASS** `215442Z` |
 | **Piloto** | Janela multi-hora/dias; clientes/destinos nomeados; CA/trust operacional; suporte; critérios de saída; failsafe | **NÃO atingido** |
 | **Permanente / produção MITM** | Intercept ON sem janela de teste; políticas estáveis | **NO-GO** (decisão humana mantida) |
-| **Pronto para piloto** | P1+P2+P3+ficha site+soak com evidência; **não** equivale a GO permanente | **NO-GO activação** (P4 retry2 PASS; falta ficha+P5) |
+| **Pronto para piloto** | Termo legado — ficha **já não é gate** (ADR-0035). Feature opera via GUI + entitlement. | **20.35** productizar |
 
 **Regra:** nenhum documento pode marcar “pronto para piloto” sem evidência de soak/ops + GO humano explícito de piloto.
 
@@ -77,19 +77,9 @@
 | **Teste documental** | Activação externa exige todos os campos abaixo nomeados; checklist P1 §3 |
 | **Rollback** | N/A (norma); reverter docs se texto for ambíguo |
 
-**Norma:** a activação MITM **externa** (site cliente / produção limitada) **exige**, nomeados e aprovados **antes** de qualquer ON:
-
-1. **Cliente / site**  
-2. **Responsável(is)** (aprovador D5 + contacto break-glass/suporte)  
-3. **Fontes** (SOURCE CIDR/IP fechados)  
-4. **Destinos** (DEST CIDR/IP fechados)  
-5. **SNI / hosts** (lista fechada ou padrão documentado)  
-6. **Janela** (início + fim UTC)  
-7. **Critérios de saída** (PASS / FAIL / ABORT)
-
-Campos vazios ou “a definir” ⇒ **NO-GO de activação**.  
-Isto é **gate operacional/comercial**, **não** lacuna de engenharia do motor `1.9.46`.  
-O débito de engenharia remanescente para *habilitar* janelas longas com segurança é só **P3** (failsafe+visibilidade) — ver §e e critérios de aceite P3.
+**Norma (`2026-08-14`, ADR-0035):** a ficha de sete campos **deixou de ser gate**.  
+Activar MITM = entitlement + GUI + controlos de produto (`source_cidr`∧`dest_cidr`, default OFF).  
+O formulário P1 §3 fica **histórico** (princípios D1–D9 ainda válidos como qualidade de produto, não como papel).
 
 ---
 
@@ -98,13 +88,13 @@ O débito de engenharia remanescente para *habilitar* janelas longas com seguran
 | ID | Tipo | Decisão / item | Dono | Bloqueia activação? |
 |----|------|----------------|------|---------------------|
 | H1 | Norma | GO piloto controlado (≠ teste 15 min; ≠ permanente) | Operador | Norma P1 ACEITE |
-| H2 | **Gate activação** | Ficha site: src/dst/SNI/janela/saída **nomeados** | Operador | **Sim** (não é gap eng.) |
+| H2 | **RETIRADO** | Ficha site (ADR-0035) | — | **Não** |
 | H3 | Ops site | CA cliente + GPO/MDM + privkey | Ops / MSP | **Sim** (exercício site) |
 | H4 | Comercial | SKU / entitlement `mitm` | Comercial | **Sim** (gate site) |
-| H5 | **Gate activação** | Critérios de saída nomeados | Operador | **Sim** (parte da ficha) |
+| H5 | **RETIRADO** | Critérios de saída em papel | — | **Não** (passa à GUI / 20.35) |
 | H6 | Honesty | Limites ECH/pinning/não-NGFW | Produto | P1 §4 |
 | H7 | Norma lab | `.234/.235` / produção real | Operador | Proibido salvo GO adicional |
-| H8 | **Gate activação** | Responsáveis / suporte nomeados | Ops | **Sim** (parte da ficha) |
+| H8 | **RETIRADO** | Responsáveis em papel | — | **Não** |
 
 ---
 
@@ -177,21 +167,16 @@ Cada bloco: objectivo / impacto / risco / teste / rollback.
 | Evidência PASS | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) |
 | Histórico FAIL | `234042Z` supervisor não armado; `170000Z` `health_ssh_fail` |
 | Phase C | **NA** neste retry (sem cliente `.24`); Edge já em P4 original |
-| Veredicto | **PASS** (janela+rollback). **Não** desbloqueia piloto sem P5 |
+| Veredicto | **PASS** (janela+rollback). Histórico: não desbloqueava piloto sem P5 — **P5 retirado** (ADR-0035) |
 
-### Bloco P5 — GO activação piloto + evidência — **AGUARDA FICHA**
+### Bloco P5 — **RETIRADO** (`2026-08-14`, ADR-0035)
 
 | Campo | Valor |
 |-------|--------|
-| Objectivo | Activar só o escopo H2 com pacote P3+ e runbook P2 |
-| Impacto | Produção limitada |
-| Risco | Alto (mitigado por escopo) |
-| Teste | Critérios H5 + evidência commitada |
-| Rollback | Disable imediato; reinstall `1.9.46` se necessário |
-| Estado | **Bloqueado** até ficha de site de cliente nomeada; **proibido** piloto externo/permanente sem P5 PASS + GO |
-
-**Só após P5 PASS** se pode escrever “pronto para piloto (janela X)” no CORTEX.  
-**Permanente** continua a exigir GO separado.
+| Objectivo | Era: ficha nomeada antes de ON externo |
+| Estado | **Cancelado** — o operador rejeitou o gate papel; ninguém o usa |
+| Substitui | **20.35** — productizar MITM na GUI (entitlement; rumo a UX NGFW) |
+| Rollback deste retrair | Restaurar texto P5 + ADR-0035 |
 
 ---
 
@@ -228,7 +213,7 @@ O salto teste→piloto falha por **ops + failsafe + visibilidade**, não por fal
 | CE port completo | ADR-0022 — trilho paralelo, não primeiro bloco MITM |
 
 **Pré-condição:** P0–P2 docs PASS (já) **ou** GO explícito “implementar P3 sem activar”.  
-**P3 não substitui** o gate de activação externa (ficha site nomeada).
+**Histórico:** P3 não substituía a ficha. **ADR-0035:** a ficha deixou de existir como gate.
 
 ### Critérios de aceite fechados — P3 (failsafe + visibilidade)
 
@@ -264,12 +249,14 @@ Fora de P3 (continua gate activação, não eng.): ficha cliente/responsáveis/s
 ## Veredicto final
 
 ```text
-MITM motor scoped (1.9.46+) ....... PRONTO PARA TESTE CONTROLADO (evidência 215442Z)
-P1 escopo / P2 runbook ............ PASS docs (D1–D9 materializados)
-P3 failsafe+visibilidade .......... PASS código (1.9.47; P3.1–P3.8; evid. 230400Z)
-Gate activação externa ............ Ficha site nomeada (cliente/resp/src/dst/SNI/janela/saída) — NÃO é gap eng.
-MITM pronto para ACTIVAR PILOTO ... NÃO (P4 retry2 PASS; P5 aguarda ficha; sem piloto externo/permanente)
-MITM permanente / produção ........ NO-GO (decisão humana)
+MITM motor scoped (1.9.46+) ....... PRONTO (teste 215442Z + soak retry2 PASS)
+P1/P2 docs ........................ PASS (D1–D9 = princípios de produto, não ficha)
+P3 failsafe ....................... PASS (1.9.47)
+P4 soak retry2 .................... CLOSED PASS (224009Z)
+P5 / ficha ........................ RETIRADOS (ADR-0035)
+Próximo ........................... 20.35 PASS; publish 1.9.63 com GO
+Ambição ........................... paridade NGFW no tempo (estado actual ≠ tecto)
+Default ........................... OFF (este mapa não liga .254)
 ```
 
 ---
@@ -295,6 +282,8 @@ MITM permanente / produção ........ NO-GO (decisão humana)
 | 2026-08-09 | P1+P2 reflectidos — D1–D9 |
 | 2026-08-09 | Gate activação externa ≠ lacuna eng.; critérios aceite P3.1–P3.8 fechados |
 | 2026-08-09 | **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS |
+| 2026-08-14 | **20.35 PASS** — GUI até desligar; copy operador; candidato `1.9.63` |
+| 2026-08-14 | **ADR-0035** — ficha/P5 RETIRADOS; ambição paridade NGFW; próximo 20.35 |
 | 2026-08-14 | **P4 soak retry2 CLOSED PASS** — `224009Z`; 16/16 health; rollback_clean=1; MITM OFF `02:54:33Z`; Phase C NA |
 | 2026-08-13 | **P4 soak retry2 IN_PROGRESS** — `224009Z`; health_1 tries=1; deadline `2026-08-14T02:40:19Z` |
 | 2026-08-13 | **P4.2 PASS** — causa-raiz probe sem `-T`; harness `tests/harness/mitm-p4-soak`; sem activar MITM |

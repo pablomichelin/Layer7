@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **20.35 / `1.9.63` (candidato, sem publish):** MITM opera como política na
+  GUI — «Manter ligada até eu desligar» (`max_minutes=0`) além da janela
+  temporizada 1–240 min. Copy de operador (sem `mitm_effective` / rdr / ficha).
+  Default continua OFF; origem∧destino obrigatórios; break-glass e supervisor
+  mantêm-se. **Não** liga `.254`.
+
 ### Fixed
 
 - **CI smoke layer7d (Linux):** `src/layer7d/features.h` foi renomeado para

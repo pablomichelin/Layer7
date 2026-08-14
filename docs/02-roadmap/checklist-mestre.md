@@ -422,7 +422,7 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 
 **Arranque:** [`START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **Posicionamento PME:** [`posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — ACEITE  
-**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-09at`  
+**Plano:** [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) rev. `2026-08-14be`  
 **Gates:** [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)  
 **Prontidão piloto:** [`mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md)
 
@@ -451,10 +451,11 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] P0 mapa prontidão — **PASS** docs
 - [x] P1 escopo D1–D9 — **PASS** docs ([`GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md))
 - [x] P2 runbook piloto — **PASS** docs ([`runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md))
-- [x] Norma: activação externa exige ficha nomeada (cliente/responsáveis/src/dst/SNI/janela/saída) — **gate activação, ≠ lacuna eng.**
+- [x] Norma ficha (legado) — **RETIRADA** ADR-0035 (`2026-08-14`)
 - [x] P3 failsafe+visibilidade — **PASS** `1.9.47` (P3.1–P3.8; evid. `230400Z`)
 - [x] P4 soak lab retry2 — **CLOSED PASS** `224009Z` (16/16 health; rollback_clean=1; MITM OFF; Phase C NA). Histórico: P4 `234042Z` FAIL/ABORT; retry `170000Z` FAIL
-- [ ] P5: ficha site de cliente preenchida + GO + evidência antes de qualquer ON externo/permanente
+- [x] P5 / 20.34 — ficha **cancelada**; ADR-0035 aceite
+- [x] 20.35: productizar MITM na GUI (até desligar + copy operador); candidato `1.9.63`
 
 ### Anti-pirataria / Anti-tamper (AP0–AP4, passos `30.x`)
 

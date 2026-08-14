@@ -90,6 +90,9 @@ ponto 4 da lista *Conflitos documentais formais registados na F0*).
    - rollback.
 7. Se o bloco ficar grande, quebrar em partes menores.
 8. Na duvida, conservar e documentar em vez de improvisar.
+9. Melhorar todos os dias, sem tecto. Estado actual honesto nao e destino
+   nem trava. Proibido tratar «nao somos X» (NGFW ou outro) como teto
+   permanente — ver ADR-0035.
 
 ---
 

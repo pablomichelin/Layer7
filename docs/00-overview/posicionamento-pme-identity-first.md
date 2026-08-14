@@ -1,10 +1,10 @@
 # Posicionamento de produto — Layer7 Identity-first para PME
 
 **Classificação:** Canónico (trilha Identity + MITM)  
-**Estado:** `ACEITE` (`2026-08-06` — GO operador: linha PME / Identity-first; MITM diferido)  
+**Estado:** `ACEITE` (`2026-08-06` PME Identity-first; **emenda `2026-08-14` ADR-0035** — ambição de paridade NGFW no tempo; ficha retirada)  
 **Plano SSOT:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
 **Arranque:** [`START-HERE-identity-mitm.md`](START-HERE-identity-mitm.md)  
-**ADRs:** 0025 (SKU) · 0026 (**implementação MITM diferida**) · 0027 (Identity) · 0028 (daemon)  
+**ADRs:** 0025 (SKU) · 0026 (MITM opt-in) · 0027 (Identity) · 0028 (daemon) · **0035** (ambição NGFW + ficha fora)  
 **Spike MITM:** [`../09-blocking/spike-mitm-20.7.md`](../09-blocking/spike-mitm-20.7.md) — veredicto **DEFER (20.7a)**
 
 Este documento congela a **ideia, o objectivo, o nicho e a barra de qualidade** do
@@ -17,8 +17,8 @@ para o cliente PME/MSP.
 
 > **Layer7 para PME = controlo de internet por pessoa (utilizador/grupo) no
 > pfSense que a empresa já tem**, com políticas simples, licença clara e
-> experiência utilizável por TI interno ou MSP — **sem** pretender ser um NGFW
-> enterprise (Fortinet / Palo Alto / Check Point).
+> experiência utilizável por TI interno ou MSP — e um rumo explícito de
+> **evoluir até paridade (ou melhor) com NGFW**, sem fingir que já chegámos.
 
 ---
 
@@ -31,7 +31,7 @@ para o cliente PME/MSP.
 | O3 | Ser **instalável e operável** por PME/MSP em tempo curto (ordem de uma tarde para lab típico) | Docs + GUI sem jargão NGFW; wizards/testes de ligação |
 | O4 | Comunicar **limites honestos** (User-ID de rede, NAT, QUIC, HTTPS sem MITM) | Textos GUI + MANUAL; sem overclaim |
 | O5 | Monetizar add-on **Y = Identity** (e Y+ MITM só quando existir implementação) | SKU ADR-0025; upsell sem activar runtime |
-| O6 | **Não** competir em paridade TLS/decrypt com NGFW enterprise | MITM diferido; sem Squid; sem promessa de ASIC |
+| O6 | **Evoluir** TLS/decrypt e Identity até paridade NGFW (e além) no tempo | ADR-0035; gaps actuais honestos; sem Squid; sem ASIC inventado |
 
 ---
 
@@ -47,21 +47,21 @@ para o cliente PME/MSP.
 
 ### 3.2 Anti-nicho (não é o produto)
 
-| Segmento | Porquê fora |
-|----------|-------------|
-| Grande empresa / datacenter | Contrata NGFW caro com decrypt TLS e hardware |
-| Quem exige paridade App-ID/URL de milhares de apps | Fora de escopo desta trilha |
-| Quem exige MITM universal de todo o HTTPS | Diferido; quando existir = selectivo + opt-in |
+| Segmento | Nota |
+|----------|------|
+| Grande empresa / datacenter *hoje* | Ainda compra NGFW caro; **não** é o primeiro mercado — **não** é tecto eterno |
+| Quem exige já milhares de App-ID/URL | **Gap actual** honesto; objectivo de evolução (ADR-0035), não “nunca” |
+| Quem exige MITM de todo o HTTPS sem política | Continua errado (NGFW também usa perfil/escopo); MITM Layer7 = opt-in + origem∧destino |
 | Quem quer captive portal Layer7 | Usar captive nativo do pfSense |
 
 ### 3.3 Princípio de mercado (acordado `2026-08-06`)
 
 - **“Já existe NGFW”** não impede o produto: o NGFW **não resolve** bem o
   nicho pfSense/PME/MSP com preço e ops simples.
-- **Ir ao contrário da desistência** = atacar o nicho mal servido; **não** =
-  copiar o motor TLS da Fortinet.
+- **Ir ao contrário da desistência** = atacar o nicho mal servido **e**
+  subir a qualidade até o NGFW deixar de ser a desculpa.
 - Inovação = **combinação** (Identity + DPI + PF + licenciamento + um pacote) +
-  **experiência** (GUI/docs perfeitos para empresa pequena/média).
+  **experiência** + **evolução contínua** rumo a paridade (ADR-0035).
 
 ---
 
@@ -70,7 +70,7 @@ para o cliente PME/MSP.
 **Curta:**
 
 > Controle quem na sua rede pode aceder a quê — por utilizador e grupo — no
-> pfSense, sem trocar por um NGFW enterprise.
+> pfSense que já tem, com um produto que evolui até competir de igual para igual.
 
 **Com honestidade:**
 
@@ -79,12 +79,17 @@ para o cliente PME/MSP.
 > HTTPS continua alinhado à página HTTP/DNS (ADR-0017). Limites de NAT,
 > Wi‑Fi partilhado e VDI estão documentados na interface.
 
-**O que NÃO dizer:**
+**O que NÃO dizer *hoje* (overclaim de estado):**
 
-- “Somos iguais à Fortinet / Palo Alto.”
-- “Desencriptamos todo o HTTPS.”
-- “Exactidão GlobalProtect sem agente.”
+- “Já somos iguais à Fortinet / Palo Alto / Check Point.”
+- “Desencriptamos todo o HTTPS sem política.”
+- “Exactidão GlobalProtect sem agente *nesta* release.”
 - “Zero configuração.”
+
+**O que SIM dizer (rumo):**
+
+- Melhorar todos os dias, sem tecto. O estado actual honesto não é trava.
+- Vamos melhorar até a barra NGFW (e para além dela). «Não somos NGFW» = hoje, não destino.
 
 ---
 
@@ -156,7 +161,7 @@ gates GI). São obrigatórios na revisão de passo; falhar = não fechar o passo
 | H2 | multi-user / NAT | Estado `multi-user` → não aplicar `ad_*` ao user errado |
 | H3 | Fail-mode LDAP | Cache TTL; depois não-match `ad_*`; **nunca** fechar a LAN toda |
 | H4 | HTTPS sem MITM | Continua ADR-0017; texto na GUI Identity/MITM |
-| H5 | Sem overclaim NGFW | Posicionamento §3–§4 obrigatório em materiais comerciais internos |
+| H5 | Sem overclaim do **estado actual** | Pode haver rumo a paridade (ADR-0035); **proibido** afirmar que já chegámos |
 
 ### 6.4 Não-regressão (empresa já em produção)
 
@@ -195,7 +200,7 @@ gates GI). São obrigatórios na revisão de passo; falhar = não fechar o passo
 |---------|-------|
 | Data | `2026-08-06` |
 | Squid / pfSense-pkg-squid | **REJEITADO** (operador: não é caminho habilitado) |
-| Paridade NGFW TLS | **Fora** do objectivo PME |
+| Paridade NGFW TLS | **Norte de evolução** (ADR-0035); ainda não atingida |
 | Runtime MITM agora | **Não** — DEFER formal 20.7a |
 | Token `mitm` no SKU | Pode existir; **sem código activo** |
 | Futuro | Helper próprio (`layer7-tlsproxy` ou equivalente) só com **novo GO** + spike S1–S8; selectivo; opt-in |
@@ -237,7 +242,9 @@ IM0 → IM1 (feitos)
 
 - Bloquear Identity à espera de MITM.  
 - Implementar Squid como caminho de produto.  
-- Prometer paridade NGFW em materiais.  
+- Prometer que **já** temos paridade NGFW.  
+- Tratar «não somos NGFW» como tecto permanente.  
+- Exigir ficha-papel para ligar MITM (ADR-0035).  
 - Activar Identity/MITM por defeito em upgrade.
 
 ---
@@ -261,3 +268,4 @@ Antes de marcar um passo 20.x Identity como PASS:
 |------|--------|
 | 2026-08-06 | Criação — GO operador: nicho PME/MSP; Identity-first; MITM DEFER; barra “perfeito para empresas usarem” |
 | 2026-08-05–06 | Contexto prévio: Squid rejeitado; estimativa MITM próprio = meses; NGFW = segundo produto |
+| 2026-08-14 | **ADR-0035** — tecto “nunca NGFW” removido; ficha retirada; ambição de paridade no tempo |

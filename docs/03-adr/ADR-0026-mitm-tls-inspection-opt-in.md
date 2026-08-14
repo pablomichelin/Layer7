@@ -1,6 +1,6 @@
 # ADR-0026 — MITM TLS inspection opt-in (certificado / CA)
 
-**Estado:** Aceito — **runtime shipped** (`1.9.39`–`1.9.47`); P3 janela PASS; P1+P2 docs PASS; **activar piloto/permanente NO-GO** até ficha+soak; ficha site = **gate activação** ≠ lacuna eng. (rev. `q`)  
+**Estado:** Aceito — **runtime shipped** (`1.9.39`–`1.9.47`); P3/P4 retry2 PASS; ficha **RETIRADA** (ADR-0035); ambição de paridade NGFW no tempo (rev. `r`)  
 **Data:** 2026-08-05  
 **Aceite:** `2026-08-05` — passo **20.2** / GI0  
 **Deferral implementação:** `2026-08-06` — passo **20.7a** (GO operador: PME Identity-first)  
@@ -48,10 +48,10 @@
 6. **DEFER formal (`2026-08-06`):** implementação diferida; Identity avançou; Squid rejeitado.
 7. **Reopen GO (`2026-08-08`):** este ADR passa a **Aceito — implementação em curso**. Escopo **20.8:** schema `mitm.*`, gestão CA, bypass GUI, `mitm_entitled`. Escopo **20.9:** intenção `mitm.enabled`, bypass endurecido, `quic_mode`, contrato IPC; **`mitm_effective` sempre false** sem runtime produto. **Squid rejeitado** permanentemente.
 8. **GO lab (`2026-08-09`):** autoriza PoC idle/IPC de `layer7-tlsproxy` em lab **isolado** (ver `poc-layer7-tlsproxy-lab.md`). **Não** autoriza intercept em `.254`/`.234`/`.235`, empacotar no `.pkg` público, nem claim `mitm_effective=true`. **20.10** exige S1–S4/S6 medidos + **GO produto**.
-9. Se **GO produto** (após S1–S8): intercept **selectivo** (não universal), página HTTPS legível; emenda explícita a ADR-0017; alinhamento PME (sem overclaim NGFW).
+9. Se **GO produto** (após S1–S8): intercept **selectivo** (não universal), página HTTPS legível; emenda explícita a ADR-0017; honestidade do **estado actual** (sem fingir paridade já atingida).
 10. Segredos da CA **nunca** no git.
 11. MITM **não** é pré-requisito de Identity (ortogonal); Identity rede permanece **FECHADA**.
-12. **Fora do objectivo:** paridade de motor TLS com NGFW enterprise (Fortinet / Palo Alto / Check Point).
+12. **Emenda ADR-0035 (`2026-08-14`):** paridade NGFW **deixa de ser “fora do objectivo”**. É o **norte de evolução**. O ponto 12 original («fora do objectivo») fica **substituído**. Ficha de site **deixou de ser gate**.
 
 ---
 
@@ -69,7 +69,7 @@
 ## Consequências
 
 - **Histórico (rev. e–f):** GI2–GI3 runtime diferidos até S1–S8 + GO lab.  
-- **Estado vivo (`2026-08-09`, rev. q):** GI2/GI3 **PASS**; Gate C + GO teste (`1.9.46` / `215442Z`); **P3 PASS** (`1.9.47` — max_window/deadline/auto-disable/audit/GUI); ficha site = **gate activação** (≠ gap eng.); activação **piloto/permanente** = **NO-GO** até ficha + soak — [`mapa`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md).  
+- **Estado vivo (`2026-08-14`, rev. r):** GI2/GI3 **PASS**; P3+P4 retry2 **PASS**; ficha **RETIRADA** (ADR-0035); **20.35 PASS** (até desligar). Permanente default ON continua **não** autorizado neste ADR.  
 - Runtime `layer7-tlsproxy` **presente** no `.pkg` (default OFF); `mitm_effective` só com gates.  
 - Identity rede **fechada** — não reabrir nesta fila.
 
@@ -117,6 +117,7 @@
 | **o** | **2026-08-09** | **P1+P2 docs** — escopo D1–D9 (CA cliente/GPO, metadados 30d, allow explícito, explicabilidade, break-glass+auto-disable); activação ainda NO-GO até P3 |
 | **p** | **2026-08-09** | Ficha site nomeada = **gate activação externa** (≠ gap eng.); aceite P3.1–P3.8 no mapa |
 | **q** | **2026-08-09** | **P3 PASS** `1.9.47` — janela/deadline/failsafe/audit metadados/GUI; suite builder PASS |
+| **r** | **2026-08-14** | **ADR-0035** — ficha retirada; ponto 12 (tecto NGFW) substituído; ambição de paridade no tempo |
 
 ---
 

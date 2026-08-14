@@ -1,4 +1,4 @@
-# START HERE — Identity + MITM Add-on 【P4 soak retry2 CLOSED PASS · lab/`latest` `1.9.62`】
+# START HERE — Identity + MITM Add-on 【20.35 PASS · candidato `1.9.63` · lab/`latest` `1.9.62`】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
@@ -11,8 +11,9 @@
 > **`1.9.62`** — copy de operador MITM/Identity (lab/`latest`); **não** upgrade do soak.  
 > **`1.9.61`** — Lista VIP texto simples + DHCP.  
 > **`1.9.60`** — `entitle-ok` PATH absoluto (rc.d).  
-> **P5** aguarda **ficha de site de cliente** — **proibido** piloto externo/permanente.  
-> **Gate C / GO teste** (`1.9.46`, `215442Z`) — **NÃO** permanente.  
+> **20.35 PASS** — MITM productizado na GUI (até desligar + copy operador); candidato **`1.9.63`** sem publish.  
+> **Ambição:** paridade NGFW no tempo — «não somos NGFW» = estado actual, **não** tecto.  
+> **Gate C / GO teste** (`1.9.46`, `215442Z`) — default OFF; este bloco **não** liga permanente.  
 > Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
 > **Sem** intercept permanente em `.254`/`.234`/`.235`. Squid rejeitado.  
 > **TLS:** proibido suavizar validação / `--ignore-certificate-errors` — [`politica-tls-sem-bypass.md`](../09-blocking/politica-tls-sem-bypass.md).
@@ -44,7 +45,7 @@ docs/00-overview/START-HERE-identity-mitm.md
 | [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md) | Contrato IPC — intenção vs `mitm_effective` |
 | [`poc-layer7-tlsproxy-lab.md`](../09-blocking/poc-layer7-tlsproxy-lab.md) | PoC lab — **fora** de produção |
 | [`GO-opcao-A-inline-lab-54.md`](../09-blocking/GO-opcao-A-inline-lab-54.md) | GO humano Opção A (inline só `.54`) — **PASS** |
-| ADR-0025 / 0026 / 0027 / 0028 / **0029** | Aceito; **0026** implementação em curso |
+| ADR-0025 / 0026 / 0027 / 0028 / 0029 / **0035** | Aceito; **0035** ambição NGFW + ficha retirada |
 | [`CORTEX.md`](../../CORTEX.md) | SSOT operacional **vivo** do produto |
 | [`ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Filas **fecho + IPv6** (não reabrir) |
 
@@ -59,19 +60,19 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; P4.1 live; P4.2 PASS; P4 soak retry2 **CLOSED PASS**; publicado **`1.9.62`** |
-| Passo actual | **P5 aguarda ficha** (P4 retry2 **CLOSED PASS** `224009Z` / `1.9.59`); permanente **NO-GO** |
-| Prontidão piloto | **NÃO PRONTO activar externo** — P1+P2+P3 **PASS**; P4 retry2 **PASS** (4h+rollback); P5 aguarda ficha — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; P4 retry2 **CLOSED PASS**; **ADR-0035**; **20.35 PASS**; publicado **`1.9.62`**; candidato **`1.9.63`** |
+| Passo actual | **20.35 PASS** — GUI política MITM (até desligar); publish `1.9.63` pendente |
+| Prontidão piloto | Ficha **já não é gate**. Operação = GUI + entitlement. Default OFF. Soak `.254` MITM **OFF**. — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | P4.1 / retry | [`../09-blocking/runbook-p4-retry-supervisor-onbox.md`](../09-blocking/runbook-p4-retry-supervisor-onbox.md) |
-| Gate activação externa | Ficha **nomeada** (cliente/responsáveis/src/dst/SNI/janela/saída) — **não** é lacuna de engenharia |
-| Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS**; produção temporária **PASS** |
-| Próximo | **P5 só com ficha**; MITM OFF permanente; **proibido** piloto externo |
+| Gate activação | **RETIRADO** (ADR-0035) — sem ficha-papel |
+| Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS** |
+| Próximo | Publish **`1.9.63`** quando o operador pedir; sem ligar `.254` neste passo |
 | Evidência P4 retry2 | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS** |
 | Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT** |
 | Evidência P4 retry | [`../tests/evidence/20260813T170000Z-p4-retry-254/`](../tests/evidence/20260813T170000Z-p4-retry-254/) — **CLOSED FAIL** |
 | Evidência pós-fail | [`../tests/evidence/20260813T223009Z-p4-postfail-verify-254/`](../tests/evidence/20260813T223009Z-p4-postfail-verify-254/) — MITM **OFF** (pré-retry2) |
-| Rev. do plano | **`2026-08-14bc`** |
+| Rev. do plano | **`2026-08-14be`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -99,14 +100,14 @@ Grande evolução **opt-in** do Layer7 para o nicho **PME / MSP em pfSense**:
 3. **Identity** estilo User-ID de rede: mapa **daemon** user↔IP + LDAP + RADIUS accounting + agente DC (+ agente/TS depois).
 4. **MITM opcional no SKU** — runtime `layer7-tlsproxy` (opção E); **nunca** Squid.
 5. **Zero impacto** no `1.9.8` com módulos OFF / sem entitlement.
-6. **Barra de qualidade:** utilizável por TI de empresa pequena/média (estados claros, testes de ligação, limites honestos, sem overclaim NGFW).
+6. **Barra de qualidade:** utilizável por TI PME/MSP **e** a subir rumo a paridade NGFW (ADR-0035); limites honestos do estado *actual*.
 
 ### Honestidade MVP (ler)
 
 - Sem agente endpoint (IM7) / TS (IM8), o produto entrega **User-ID de rede**, não exactidão tipo GlobalProtect.
 - MITM **não** é pré-requisito de Identity. Identity rede está **fechada**; MITM tem listen/rdr/página **gated** (`mitm_effective`).
 - Captive portal: usar o do pfSense — fora desta trilha.
-- **Não** prometemos paridade com Fortinet / Palo Alto / Check Point.
+- **Ainda não** temos paridade com Fortinet / Palo Alto / Check Point — o rumo é chegar lá (ADR-0035).
 - **Não** activar intercept em produção sem smoke S8 OFF + GO explícito.
 
 ## O que esta trilha **não** é
@@ -114,7 +115,7 @@ Grande evolução **opt-in** do Layer7 para o nicho **PME / MSP em pfSense**:
 - Reabrir fecho P0–J ou IPv6 V0–V6.
 - Substituir o captive portal do pfSense.
 - Activar MITM ou AD por defeito em upgrades.
-- MITM “universal obrigatório” ou motor TLS nível NGFW enterprise.
+- MITM “universal obrigatório” sem política (NGFW também usa perfil/escopo).
 - Analytics/SIEM pesado, console multi-firewall, rebind automático de licença.
 - Caminho Squid / `pfSense-pkg-squid`.
 - Reabrir Identity de rede ou agente endpoint sem GO separado.
@@ -134,7 +135,7 @@ Ordem **estrita** — não improvisar:
 7. [`contrato-ipc-layer7-tlsproxy-20.9.md`](../01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md) — intenção vs effective (20.9)
 8. [`identity-mitm-mapa-rastreabilidade.md`](../01-architecture/identity-mitm-mapa-rastreabilidade.md)
 9. [`plano-gates-identity-mitm.md`](../09-blocking/plano-gates-identity-mitm.md)
-10. ADRs da trilha (0025, **0026 intenção 20.9 / runtime diferido**, 0027, 0028)
+10. ADRs da trilha (0025–0029, **0035** ambição NGFW / ficha fora)
 11. Área do passo (ex.: license → `docs/10-license-server/`; enforce → `docs/05-daemon/pf-enforcement.md`)
 
 Baseline produto (não reabrir):
@@ -156,10 +157,9 @@ Runbook P4.1: docs/09-blocking/runbook-p4-retry-supervisor-onbox.md
 Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; P4 soak retry2 CLOSED PASS — não activar permanente; P5 só com ficha.
-Estado: P3 PASS (1.9.47); P4 ABORT (234042Z); P4.1 live; P4 retry FAIL (170000Z); P4.2 PASS; soak retry2 CLOSED PASS (224009Z / rollback_clean=1 / MITM OFF);
-piloto NÃO activar — P5 aguarda ficha site cliente; proibido piloto externo/permanente.
-Tarefa seguinte: P5 só com ficha; MITM OFF permanente; sem mutar .234/.235.
+Ler na ordem do START-HERE; ADR-0035 aceite; 20.35 PASS (GUI até desligar); candidato 1.9.63 sem publish.
+Estado: P4 retry2 CLOSED PASS; soak .254 = 1.9.59 MITM OFF; latest 1.9.62.
+Tarefa seguinte: publish 1.9.63 só com GO; não ligar permanente; sem mutar .234/.235.
 ```
 
 
@@ -202,12 +202,11 @@ sh tests/harness/mitm-p4-soak/p4-validate-local.sh
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **P5 aguarda ficha** (P4 retry2 CLOSED PASS 224009Z / 1.9.59)
-- Prontidão piloto: **NÃO PRONTO activar externo** (P4 4h+rollback PASS; falta ficha+P5)
-- P4 retry2: CLOSED PASS; 16/16 health tries=1; rollback_clean=1; MITM OFF 02:54:33Z
-- P4.2: harness -T PASS (16/16 tries=1)
-- Latest publicado: **1.9.62**; soak .254 = 1.9.59 (não upgrade a meio)
-- Próximo: P5 só com ficha; MITM OFF permanente
+- Passo actual: **20.35 PASS** — GUI política MITM; até desligar; candidato 1.9.63
+- Próximo: publish 1.9.63 com GO operador
+- Ambição: paridade NGFW no tempo (estado actual ≠ tecto)
+- P4 retry2: CLOSED PASS; soak .254 = 1.9.59 MITM OFF
+- Latest publicado: **1.9.62**
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
@@ -254,6 +253,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Lab real (two-client) | [`../08-lab/lab-topology.md`](../08-lab/lab-topology.md) |
 | Features / SKU | [`../03-adr/ADR-0025-entitlements-addon-identity-mitm.md`](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) |
 | MITM | [`../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md`](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) |
+| Ambição NGFW / ficha | [`../03-adr/ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md`](../03-adr/ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md) |
 | Backlog | [`../02-roadmap/backlog.md`](../02-roadmap/backlog.md) (BG-085…) |
 | Handoff genérico | [`handoff-chat-novo.md`](handoff-chat-novo.md) |
 
@@ -267,6 +267,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 4. **Entitlement** — GUI pode mostrar upsell; **daemon** é autoridade do gate.  
 5. **Sem captive** nesta trilha.  
 6. **Sem segredos** no git (chaves CA, bind AD, etc.).  
-7. **PME Identity-first** — sem overclaim NGFW; Squid rejeitado; sem claim de intercept produção sem GO.  
+7. **PME Identity-first** + **ambição NGFW no tempo** (ADR-0035). Sem overclaim do estado *actual*. Squid rejeitado.  
 8. Documentação + testes mínimos + rollback **no mesmo bloco**.  
-9. **Identity rede fechada** — não reabrir sem GO separado.
+9. **Identity rede fechada** — não reabrir sem GO separado.  
+10. **Sem ficha-papel** — agentes não bloqueiam trabalho com «falta a ficha».

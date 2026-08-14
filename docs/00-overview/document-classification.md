@@ -76,7 +76,8 @@ vence o canónico.
 | `docs/09-blocking/spike-mitm-20.7.md` | spike MITM 20.7 | **DEFER formal 20.7a** | Canónico (fechado diferido) | ADR-0026 rev.d | só reabrir com novo GO | novo plano |
 | `docs/09-blocking/plano-gates-identity-mitm.md` | gates GI0–GI9 | gates da trilha | Canónico | — | marcar PASS | novo plano |
 | `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Aceito (T1) | Canónico | — | manter vivo com IM1 | novo plano |
-| `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | **Aceito — implementação diferida** (rev.d) | Canónico | ADR-0017 com MITM OFF | reabrir com GO + S1–S8 | novo plano |
+| `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | **Aceito — runtime shipped** (rev.r; emenda 0035) | Canónico | ADR-0017 com MITM OFF | ponto 12 tecto NGFW substituído | novo plano |
+| `docs/03-adr/ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md` | ambição NGFW + ficha fora | **Aceito** (`2026-08-14`) | Canónico | emenda ADR-0026 + P5 | manter | novo plano |
 | `docs/03-adr/ADR-0027-identity-userid-multi-fonte.md` | ADR User-ID | Aceito | Canónico | evolui ADR-0011/0012 | IM3–IM6 | novo plano |
 | `docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md` | ADR concorrência/IO daemon | Aceito | Canónico | pré-requisito IM3–IM5; baseline perf 20.11a | IM3 | novo plano |
 | `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir | F6 H5 |
@@ -175,7 +176,7 @@ vence o canónico.
 | `docs/08-lab/syslog-remote.md` | syslog remoto | guia especifico de lab | Suplementar | complementar a docs de logging | manter | F5/F7 |
 | `docs/09-blocking/README.md` | trilha de bloqueio | índice da área (actualizado `2026-08-09`) | Suplementar (índice) | aponta para reconciliação e gates | manter com SSOT da área | F4+ |
 | `docs/09-blocking/auditoria-reconciliacao-enforcement-1.8.11_24-_65-vs-1.9.46-2026-08-09.md` | reconciliação enforcement | **SSOT decisão** `_24`…`_65` vs `1.9.46` (NO-GO misturar; único pacote lab `1.9.46`) | Canónico | supersede B1/`_31`/`_65` como próximo install | manter; não reinstalar `1.8.11_*` | F4 |
-| `docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md` | prontidão MITM piloto | **SSOT** veredicto (**NÃO PRONTO activar**); P1–P5 | Canónico | alinha START-HERE / CORTEX / ADR-0026 | actualizar só com evidência+GO | F4 |
+| `docs/09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md` | prontidão MITM piloto | **SSOT** — ficha/P5 RETIRADOS (ADR-0035); próximo 20.35 | Canónico | alinha START-HERE / CORTEX / ADR-0035 | actualizar com passo | F4 |
 | `docs/09-blocking/GO-escopo-piloto-mitm-generico.md` | escopo piloto MITM | **SSOT P1** decisões D1–D9 + formulário site | Canónico | materializa GO humano genérico | preencher ficha por site antes de activar | F4 |
 | `docs/09-blocking/runbook-piloto-mitm-generico.md` | runbook piloto MITM | **SSOT P2** ops (CA/GPO, metadados, break-glass) | Canónico | distinto do teste ≤15 min | não activar sem P3+ficha | F4 |
 | `docs/09-blocking/blocking-master-plan.md` | plano de bloqueio | referencia historica de implementacao concluida | Historico | — | preservar | F6 |

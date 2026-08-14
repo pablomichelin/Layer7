@@ -52,8 +52,8 @@ Watchdog: o script de soak deve arrancar `p4-watchdog.sh` **no mesmo passo** que
 
 ## P5
 
-**Proibido** até ficha de site nomeada (cliente/responsáveis/src/dst/SNI/janela/saída) + P4 retry PASS.  
-P4.1 **não** substitui a ficha.
+**RETIRADO** (`2026-08-14`, ADR-0035). P4 retry2 já **CLOSED PASS**.  
+Próximo da trilha: **20.35** (productizar MITM na GUI). Este runbook **não** é gate papel.
 
 ---
 

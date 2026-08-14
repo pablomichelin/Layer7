@@ -46,7 +46,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (**fase 1** `v1.9.58`) | F1.2 activo; fingerprint `d26e3f00…c5a998` |
 | [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | Trilha IPv6 **FECHADA**; produção `1.9.8` |
 | [ADR-0025](ADR-0025-entitlements-addon-identity-mitm.md) | Entitlements add-on Identity + MITM (SKU X/Y) | **Aceito** (rev.c; T1) | `features` CSV (P1–P6); gate daemon; legado `full`→`base`; check-in ∩ `.lic` |
-| [ADR-0026](ADR-0026-mitm-tls-inspection-opt-in.md) | MITM TLS inspection opt-in (CA/certificado) | **Aceito — runtime shipped** (rev.q; `1.9.47`) | P3 PASS; activar piloto NO-GO até ficha+soak; ficha=gate ≠ gap eng.; Squid rejeitado |
+| [ADR-0026](ADR-0026-mitm-tls-inspection-opt-in.md) | MITM TLS inspection opt-in (CA/certificado) | **Aceito — runtime shipped** (rev.r; ADR-0035) | P3/P4 PASS; ficha **RETIRADA**; ponto 12 (tecto NGFW) substituído; Squid rejeitado |
 | [ADR-0027](ADR-0027-identity-userid-multi-fonte.md) | Identity User-ID multi-fonte (sem captive) | **Aceito** (rev.c) | Mapa no daemon; RADIUS; agente DC A1–A7; fail-mode; NAT `multi-user` |
 | [ADR-0028](ADR-0028-concorrencia-io-daemon-identity.md) | Concorrência e IO do daemon para Identity | **Aceito** | Sem IO bloqueante no hot path; threads + rwlock; baseline perf no 20.11a |
 | [ADR-0029](ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) | Adiamento IM7 agente endpoint + exclusão IM8 TS/VDI | **Aceito** (20.28) | Sequência segura; GI8 PASS; reopen IM7 com GO + espec 20.27 |
@@ -54,6 +54,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0031](ADR-0031-entitlement-entrega-conteudo.md) | Entitlement na entrega de conteúdo (token de subscrição para blacklists/catálogos) | **Aceito** (`2026-08-10`, `30.1b`) | RR-1/RR-2/R-B/R-D; AP2; GO espelho `30.11` |
 | [ADR-0032](ADR-0032-check-in-obrigatorio-e-assinado.md) | Check-in obrigatório por defeito e resposta assinada com anti-replay | **Aceito** (`2026-08-10`, `30.1b`) | **Emenda ADR-0021**; desenho `30.12` FECHADO ([contrato](../01-architecture/contrato-check-in-assinado-30.12.md)); GO `30.14`; BG-101 reaberto |
 | [ADR-0033](ADR-0033-anti-rollback-relogio.md) | Anti-rollback de relógio e estado temporal suspeito | **Aceito** (`2026-08-10`, `30.1b`) | Emenda `f3-expiracao-revogacao-grace.md`; RR-4/R-J; passo `30.6` |
+| [ADR-0035](ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md) | Ambição de paridade NGFW no tempo + retirada da ficha | **Aceito** (`2026-08-14`) | Emenda ADR-0026 §12; P5/ficha **RETIRADOS**; **20.35 PASS** |
 
 **Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`);
 trilha **FECHADA** em **`30.19`** (`2026-08-12`) — fecho
@@ -100,8 +101,8 @@ reutilizado. Conflito registado em vez de silenciado.
 
 | Proximo ID sugerido | Tema | Fase | Motivo |
 |---------------------|------|------|--------|
-| ADR-0034 | Reorganizacao estrutural controlada / higiene residual (se GO exigir ADR formal além do plano BG-112) | F6 residual | só se moves futuros precisarem de decisão normativa para além de `f6-plano-higiene-estrutural-residual.md`; **era** `ADR-0030` antes de `2026-08-10` |
-| — | Modelo de estados do licenciamento/activacao | F3 | já coberto por docs canónicos F3 (`f3-arquitetura-licenciamento-ativacao.md` e relacionados); **não** abrir ADR-0011 duplicado |
+| ADR-0034 | Reorganizacao estrutural controlada / higiene residual (se GO exigir ADR formal além do plano BG-112) | F6 residual | **reservado** — não usar para outro tema; condicional BG-112 |
+| ADR-0036 | (livre) | — | próximo ID livre após **0035** (ambição NGFW / ficha retirada) |
 
 ---
 

@@ -446,6 +446,34 @@ if (!$has_openssl) {
 	    empty($st["source_cidr"]) || empty($st["dest_cidr"])) {
 		fail("P3: window_status incompleto");
 	}
+	/* 20.35: até desligar — deadline 0 não é expire */
+	$n_until = layer7_mitm_prepare_window_on_save(
+	    array("enabled" => false),
+	    array(
+		"enabled" => true,
+		"window" => array("max_minutes" => 0),
+		"intercept" => array(
+			"source_cidr" => array("192.168.100.24/32"),
+			"dest_cidr" => array("203.0.113.10"),
+			"block_sni" => array("blocked.test")
+		)
+	    )
+	);
+	if ((int)$n_until["window"]["max_minutes"] !== 0 ||
+	    (int)$n_until["window"]["deadline_unix"] !== 0) {
+		fail("20.35: until_off persiste max=0 deadline=0");
+	}
+	if (!layer7_mitm_window_until_off($n_until) ||
+	    layer7_mitm_window_expired($n_until)) {
+		fail("20.35: until_off nao expira");
+	}
+	if (!layer7_mitm_effective($n_until, true)) {
+		fail("20.35: effective true sem deadline (ate desligar)");
+	}
+	$st_u = layer7_mitm_window_status($n_until);
+	if (empty($st_u["until_off"]) || !empty($st_u["expired"])) {
+		fail("20.35: window_status until_off");
+	}
 	$audit = layer7_mitm_audit_path();
 	$audit_before = is_file($audit) ? filesize($audit) : 0;
 

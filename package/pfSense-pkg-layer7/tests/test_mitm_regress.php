@@ -51,6 +51,7 @@ foreach (array(
 	"layer7_mitm_tables_apply_to_pf",
 	"layer7_mitm_expire_if_needed",
 	"layer7_mitm_window_status",
+	"layer7_mitm_window_until_off",
 	"layer7_mitm_audit",
 	"layer7_mitm_prepare_window_on_save",
 	"layer7_mitm_lifecycle_tick",
@@ -62,6 +63,8 @@ foreach (array(
 }
 need(defined("L7_MITM_WINDOW_MAX_MINUTES_DEFAULT") &&
     (int)L7_MITM_WINDOW_MAX_MINUTES_DEFAULT === 15, "P3 default 15min");
+need(defined("L7_MITM_WINDOW_UNTIL_OFF") &&
+    (int)L7_MITM_WINDOW_UNTIL_OFF === 0, "20.35 until_off=0");
 /* Harness: apply e no-op (sem pfctl); API deve regressar 0. */
 need(layer7_mitm_tables_apply_to_pf(layer7_bare_config()) === 0,
 	"tables_apply harness OFF = 0");
@@ -216,9 +219,34 @@ need(strpos($alog, "PRIVATE KEY") === false, "P3 audit sem chave");
 
 /* GUI: max_window + break-glass + status fields */
 need(strpos($mitm_src, "mitm_max_window") !== false, "GUI max_window");
+need(strpos($mitm_src, "mitm_duration_mode") !== false, "GUI duration mode");
 need(strpos($mitm_src, "mitm_break_glass") !== false, "GUI break-glass");
 need(strpos($mitm_src, "tempo restante") !== false, "GUI tempo restante");
 need(strpos($mitm_src, "layer7_mitm_prepare_window_on_save") !== false, "GUI arma janela");
+need(strpos($mitm_src, "Activar inspeccao TLS") !== false, "GUI label produto");
+need(strpos($mitm_src, "Manter ligada ate eu desligar") !== false, "GUI ate desligar");
+
+/* 20.35: até desligar — sem deadline, não expira, effective possível */
+$n_off = layer7_mitm_prepare_window_on_save(
+    array("enabled" => false),
+    array(
+	"enabled" => true,
+	"quic_mode" => "block",
+	"window" => array("max_minutes" => 0),
+	"intercept" => array(
+		"source_cidr" => array("192.168.100.24/32"),
+		"dest_cidr" => array("203.0.113.10"),
+		"block_sni" => array("mitm-lab.test")
+	)
+    )
+);
+need((int)$n_off["window"]["max_minutes"] === 0, "20.35 max_minutes=0");
+need((int)$n_off["window"]["deadline_unix"] === 0, "20.35 sem deadline");
+need(layer7_mitm_window_until_off($n_off), "20.35 until_off");
+need(!layer7_mitm_window_expired($n_off), "20.35 nao expira por tempo");
+$st_off = layer7_mitm_window_status($n_off);
+need(!empty($st_off["until_off"]), "20.35 status until_off");
+need(empty($st_off["expired"]), "20.35 status nao expired");
 
 /* filter_configure_safe anti-reentrada */
 $fc = layer7_filter_configure_safe();

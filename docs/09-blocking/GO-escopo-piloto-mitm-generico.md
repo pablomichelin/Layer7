@@ -2,8 +2,9 @@
 
 **Estado:** **ACEITE documental** `2026-08-09` (decisões humanas materializadas).  
 **Bloco:** P1 do [`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md).  
-**Tipo:** escopo operacional **genérico** — preencher campos `«…»` por site antes de qualquer activação.  
-**Não autoriza:** activação em lab/produção; código; build/release.  
+**Tipo:** princípios de produto D1–D9 (histórico P1).  
+**Ficha §3:** **RETIRADA como gate** (`2026-08-14`, [ADR-0035](../03-adr/ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md)).  
+**Não autoriza:** este ficheiro sozinho não liga MITM.  
 **Não confunde com:** teste controlado ≤15 min ([`runbook-activacao-mitm-producao-1.9.46.md`](runbook-activacao-mitm-producao-1.9.46.md)).  
 **Permanente / produção MITM sem janela:** continua **NO-GO**.  
 **Runbook ops:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) (P2).  
@@ -53,7 +54,10 @@
 
 ---
 
-## 3. Formulário de escopo por site (preencher antes de activar)
+## 3. Formulário de escopo por site — **HISTÓRICO** (não é gate)
+
+> **ADR-0035:** este bloco **já não bloqueia** activação. Conservado para
+> rastreabilidade. Operação = GUI + entitlement + `source_cidr`∧`dest_cidr`.
 
 ```text
 SITE / CLIENTE:     «nome»
@@ -72,9 +76,9 @@ SUPORTE DURANTE:    «contacto / canal»
 CRITÉRIO SAÍDA:     «PASS / FAIL / ABORT — métricas»
 ```
 
-**Campos vazios ⇒ activação proibida.**
+**Campos vazios ⇒ já não proíbem activação** (ADR-0035).
 
-### Gate de activação externa (norma)
+### Gate de activação externa — **RETIRADO** (`2026-08-14`)
 
 | Campo | Valor |
 |-------|--------|
@@ -84,9 +88,8 @@ CRITÉRIO SAÍDA:     «PASS / FAIL / ABORT — métricas»
 | **Teste documental** | Cliente + responsáveis + SOURCE + DEST + SNI + janela + critérios de saída **todos** preenchidos |
 | **Rollback** | N/A — sem ficha não há activação a reverter |
 
-Activação **externa** (fora do teste ≤15 min Systemup) **exige** esses sete elementos nomeados.  
-Isto é **gate de activação**, **não** lacuna de engenharia do pacote `1.9.46`.  
-O único débito de engenharia pré-soak longo listado no mapa é **P3** (failsafe+visibilidade).
+**Supersedido por ADR-0035.** Os sete campos deixaram de ser gate.
+P3 failsafe permanece **no produto** (feature, não papel).
 
 ---
 
@@ -117,7 +120,7 @@ O único débito de engenharia pré-soak longo listado no mapa é **P3** (failsa
 - [x] Formulário site (§3)  
 - [x] Ligação a runbook P2  
 - [x] Sem autorização de activação neste bloco  
-- [ ] Campos §3 preenchidos **por site** (ops — fora deste commit)
+- [x] Campos §3 **já não são obrigatórios** (ADR-0035)
 
 ---
 
@@ -142,3 +145,4 @@ O único débito de engenharia pré-soak longo listado no mapa é **P3** (failsa
 |------|------|
 | 2026-08-09 | P1 criado — materializa D1–D9 aprovadas pelo coordenador humano |
 | 2026-08-09 | Gate activação externa explícito (ficha ≠ gap eng.); aponta critérios P3 no mapa |
+| 2026-08-14 | **ADR-0035** — ficha §3 deixou de ser gate; D1–D9 = princípios de produto |
