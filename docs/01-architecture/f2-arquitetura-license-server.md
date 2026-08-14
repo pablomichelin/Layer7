@@ -145,6 +145,9 @@ Documentos normativos desta arquitetura:
   fechadas sem `Origin` allowlist nem `Sec-Fetch-Site: same-origin`.
   Pedidos Bearer autenticados e GET sem Origin permanecem compatíveis.
   Sem deploy.
+  **P2-4 / BG-128 (`2026-08-14`):** `updateLoginGuard` incrementa
+  `failure_count` de forma atómica no `ON CONFLICT` (janela 15 min;
+  lock conta 5 / IP 10 / 15 min). Sem CSRF/proxy/sessão/TOTP. Sem deploy.
 - `001-init.sql` passa a trazer `admin_audit_log` e `admin_login_guards` para
   persistir auth, lockouts e mutacoes administrativas
 - `customers.js` e `licenses.js` passam a registar sucesso/negacao/erro de

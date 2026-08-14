@@ -37,6 +37,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P2-4 — lock de login atómico:** FEITO no git após gates
+  deste bloco. `updateLoginGuard` deixa o read-modify-write
+  (SELECT + `failure_count+1` + UPSERT `EXCLUDED`) e incrementa
+  `failure_count` no próprio `ON CONFLICT`. Contrato intacto: 5 falhas
+  de conta / 10 de IP na janela de 15 min → lock de 15 min. 10
+  `registerLoginFailure` paralelos → count=10 + lock. Sem CSRF/proxy/
+  sessão/TOTP/compose, sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P2-2 — CSRF admin fail-closed:** FEITO no git após gates
   deste bloco. `/api/users` e `/api/search` entram na superfície
   administrativa. Mutações e emissão de sessão sem `Origin` na allowlist

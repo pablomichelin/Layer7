@@ -48,9 +48,12 @@ same-origin` (Bearer autenticado exceptuado). Sem deploy / `PORTVERSION`.
 **P2-13 AVALIADO** no git (`2026-08-14`) — meia-noite local / DST ±1 h /
 divergência UTC do servidor **não** têm correção única segura; sem
 mudança de runtime; cadeado `test_license_expiry_policy.php`.
+**P2-4 FEITO** no git (`2026-08-14`) — incremento atómico de
+`failure_count` no lock de login; 10 falhas paralelas → count=10 + lock.
+Sem deploy / `PORTVERSION`.
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13).
+(exceto P2-9 sem GO; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4).
 
 ---
 
@@ -284,7 +287,7 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 | **P2-1 FEITO no git** (`2026-08-14`; absorvido no P1-4) | `users-rbac-schema.js` | Restart sem owner | `UPDATE` sem `LIMIT` promovia **todos** a owner | Promover só `ORDER BY id LIMIT 1`; alertar se `COUNT>1` sem demover | 3 admins `is_owner=false` → exactamente 1 owner. **Não** deployado. |
 | **P2-2 FEITO no git** (`2026-08-14`) | `admin-surface.js` `isAdminApiPath` + `enforceAdminOrigin` | Sem `Origin` → `next()`; `/api/users` e `/api/search` fora de `isAdminApiPath` | CSRF clássico mitigado por SameSite=strict; defesa em profundidade inconsistente | Incluir users/search; state-changing fail-closed (`Origin` allowlist ou `Sec-Fetch-Site: same-origin`); Bearer autenticado exceptuado | `POST /api/users` com Origin evil → 403. **Não** deployado. |
 | **P2-3 FEITO no git** (`2026-08-14`) | `nginx.conf`; `session.js` `requireSecureSessionRequest`; `index.js` `trust proxy: 1` | HTTP ao origin + `X-Forwarded-Proto: https` | `req.secure===true` (antes); password/TOTP/Bearer em HTTP se bind ≠ loopback | Nginx: `X-Forwarded-Proto $scheme`; login só no host F2.1 (ou localhost em `development`/`test`) | HTTP + header https + Host de origin → login 400. **Não** deployado. Residual: Host oficial no origin HTTP. |
-| **P2-4** | `admin-surface.js:267-295` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasa-se (read-then-write) | `failure_count = … + 1` atómico ou `FOR UPDATE` | 10 `registerLoginFailure` concorrentes → count=10 + lock |
+| **P2-4 FEITO no git** (`2026-08-14`) | `admin-surface.js` `updateLoginGuard` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasava-se (SELECT + `failure_count+1` + UPSERT `EXCLUDED`) | UPSERT atómico `failure_count = failure_count + 1` na janela de 15 min; `RETURNING` | 10 `registerLoginFailure` concorrentes → count=10 + lock. **Não** deployado. |
 | **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual XFF = P1-2 **FEITO** no git. |
 | **P2-6** | `backend/Dockerfile`; `frontend/Dockerfile`; compose | Root; sem healthcheck; sem `.dockerignore`; `COPY . .` | RCE = root; `.env` no layer se estiver no contexto; API sobe antes do PG | `USER node`; `.dockerignore` (`.env`); `pg_isready` + `depends_on` healthy | `docker inspect` User ≠ root; build com `.env` no contexto → ausente na imagem |
 | **P2-7 FEITO no git** (`2026-08-14`) | `license.c` `layer7_checkin_store_key` | `store_key` mantinha `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar só `features` / `features_set` | store_key(nova) → `features_set==0`; intervalos preservados. **Não** deployado. |
@@ -361,6 +364,9 @@ intactos). Bind live `0.0.0.0` continua operacional, **não** versionado.
 
 ### Concorrência activate / check-in / SQLite
 
+- **P2-4 FEITO no git** (`2026-08-14`): `updateLoginGuard` incrementa
+  `failure_count` no `ON CONFLICT` (janela 15 min). Já não há
+  SELECT + `+ 1` + `EXCLUDED.failure_count`. **Não** deployado.
 - **SQLite:** não se aplica (`pg.Pool`).
 - Activate: `runInTransaction` + `FOR UPDATE OF l` + update condicional de `hardware_id` — um 200, outro 409.
 - Check-in: só SELECT + log; não muta binding. Nonce não é single-use no servidor (contrato).
@@ -428,7 +434,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 15. **P1-9 AVALIADO no git** (`2026-08-14`) — residual pós-P2-3 **não** aberto no HEAD; sem mudança de runtime; bind live não versionado. **Não** deployado.
 16. **P2-2 FEITO no git** (`2026-08-14`) — CSRF admin fail-closed; users/search na superfície. **Não** deployado.
 17. **P2-13 AVALIADO no git** (`2026-08-14`) — meia-noite / DST / UTC sem correção única segura; sem mudança de runtime. **Não** deployado.
-18. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13.
+18. **P2-4 FEITO no git** (`2026-08-14`) — incremento atómico de `failure_count`; 10 `registerLoginFailure` paralelos → count=10 + lock. **Não** deployado.
+19. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
@@ -496,6 +503,16 @@ de política de licenciamento, não correção mecânica.
 4. Fail-before: o cadeado actual falha na letra escolhida. Pass-after:
    C e PHP concordam; servidor UTC documentado no mesmo unix.
 5. Fora: CSRF / proxy / lifecycle / `PORTVERSION` / hosts.
+
+## Objectivo / impacto / risco / teste / rollback — P2-4 lock atómico (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Impedir que falhas de login paralelas percam incrementos e atrasem o lock (conta 5 / IP 10 / janela e duração 15 min) |
+| Impacto | Só `updateLoginGuard` em `admin-surface.js` + teste `admin-surface-login-guard.test.js` + docs. CSRF/proxy/sessão/TOTP/compose **intactos**. Sem package/daemon/SPA, sem deploy / `PORTVERSION` |
+| Risco | Baixo. O UPSERT atómico serializa no mesmo `(scope_type, scope_key)`. Residual: live sem overlay (P0-1); rate-limit em memória (express-rate-limit) continua independente do lock persistido |
+| Teste | Antes: 10 `registerLoginFailure` paralelos → `failure_count=1` sem lock. Depois: count=10 + lock conta e IP. Sequencial: 4 falhas sem lock, 5.ª tranca 15 min. Janela expirada reinicia. Suite backend `203/203` PASS |
+| Rollback | Reverter o commit; o lock volta ao SELECT + `failure_count+1` + `EXCLUDED.failure_count` e volta a perder incrementos sob concorrência |
 
 ## Objectivo / impacto / risco / teste / rollback — P2-13 prova (`2026-08-14`)
 

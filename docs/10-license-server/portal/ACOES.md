@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-128 P2-4 lock de login atómico
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | Falhas de login paralelas deixam de perder incrementos; o lock 5/15 min aplica-se a tempo |
+| Impacto | Só `updateLoginGuard` (`failure_count = failure_count + 1` no UPSERT). CSRF/proxy/sessão/TOTP/compose intactos |
+| Risco | Baixo. Residual: live sem overlay (P0-1); limiter em memória continua separado |
+| Teste | Suite backend `203/203` PASS. Antes: 10 `registerLoginFailure` paralelos → count=1. Depois: count=10 + lock |
+| Rollback | Reverter o commit; o lock volta ao read-modify-write |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem CSRF / sem TOTP / sem compose |
+
 ## 2026-08-14 — BG-128 P2-2 CSRF fail-closed
 
 | Campo | Valor |

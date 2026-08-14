@@ -294,16 +294,8 @@ async function getLoginGuard(scopeType, scopeKey) {
 }
 
 async function updateLoginGuard(scopeType, scopeKey, threshold, now) {
-  const guard = await getLoginGuard(scopeType, scopeKey);
-  const firstFailureAt = guard?.first_failure_at ? new Date(guard.first_failure_at) : null;
-  const withinWindow = firstFailureAt && (now.getTime() - firstFailureAt.getTime()) <= LOGIN_GUARD_WINDOW_MS;
-  const failureCount = withinWindow ? guard.failure_count + 1 : 1;
-  const nextFirstFailureAt = withinWindow ? firstFailureAt : now;
-  const lockedUntil = failureCount >= threshold
-    ? new Date(now.getTime() + LOGIN_LOCK_DURATION_MS)
-    : null;
-
-  await pool.query(
+  const lockedUntilCandidate = new Date(now.getTime() + LOGIN_LOCK_DURATION_MS);
+  const result = await pool.query(
     `INSERT INTO admin_login_guards (
         scope_type,
         scope_key,
@@ -313,21 +305,50 @@ async function updateLoginGuard(scopeType, scopeKey, threshold, now) {
         locked_until,
         last_success_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, NULL)
+      VALUES ($1, $2, 1, $3, $3, CASE WHEN 1 >= $4 THEN $5 ELSE NULL END, NULL)
       ON CONFLICT (scope_type, scope_key)
       DO UPDATE SET
-        failure_count = EXCLUDED.failure_count,
-        first_failure_at = EXCLUDED.first_failure_at,
+        failure_count = CASE
+          WHEN admin_login_guards.first_failure_at IS NOT NULL
+           AND EXCLUDED.last_failure_at
+             <= admin_login_guards.first_failure_at + ($6 * INTERVAL '1 millisecond')
+          THEN admin_login_guards.failure_count + 1
+          ELSE 1
+        END,
+        first_failure_at = CASE
+          WHEN admin_login_guards.first_failure_at IS NOT NULL
+           AND EXCLUDED.last_failure_at
+             <= admin_login_guards.first_failure_at + ($6 * INTERVAL '1 millisecond')
+          THEN admin_login_guards.first_failure_at
+          ELSE EXCLUDED.first_failure_at
+        END,
         last_failure_at = EXCLUDED.last_failure_at,
-        locked_until = EXCLUDED.locked_until`,
-    [scopeType, scopeKey, failureCount, nextFirstFailureAt, now, lockedUntil]
+        locked_until = CASE
+          WHEN (
+            CASE
+              WHEN admin_login_guards.first_failure_at IS NOT NULL
+               AND EXCLUDED.last_failure_at
+                 <= admin_login_guards.first_failure_at + ($6 * INTERVAL '1 millisecond')
+              THEN admin_login_guards.failure_count + 1
+              ELSE 1
+            END
+          ) >= $4 THEN $5
+          ELSE NULL
+        END
+      RETURNING failure_count, locked_until`,
+    [scopeType, scopeKey, now, threshold, lockedUntilCandidate, LOGIN_GUARD_WINDOW_MS]
   );
+
+  const row = result.rows[0];
+  if (!row) {
+    throw new Error('admin_login_guards upsert returned no row');
+  }
 
   return {
     scopeType,
     scopeKey,
-    failureCount,
-    lockedUntil,
+    failureCount: Number(row.failure_count),
+    lockedUntil: row.locked_until ? new Date(row.locked_until) : null,
   };
 }
 

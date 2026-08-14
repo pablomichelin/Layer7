@@ -34,6 +34,10 @@ Referencias normativas:
   - `5` falhas por conta alvo em `15 minutos`
   - `10` falhas por IP em `15 minutos`
   - bloqueio temporario de `15 minutos`
+  - **P2-4 / BG-128:** o incremento de `failure_count` é atómico no
+    `UPSERT` (`failure_count = failure_count + 1` dentro da janela de
+    15 min). Falhas paralelas no mesmo email/IP já não perdem
+    incrementos nem atrasam o lock. CSRF/proxy/sessão/TOTP intactos.
 - Auditoria minima:
   - auth/sessao e mutacoes administrativas em `admin_audit_log`
   - guardas de lockout em `admin_login_guards`
