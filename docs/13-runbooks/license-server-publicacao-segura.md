@@ -127,8 +127,10 @@ confiável. Recuperar o IP público no origin exige PROXY protocol ou
 caminho edge-only confirmado — **fora** deste bloco (P1-9 live
 `0.0.0.0` / `.253` não foi adivinhado).
 
-`X-Forwarded-Proto` continua no mapa `$layer7_forwarded_proto` (P2-3
-separado). Este runbook **não** autoriza deploy no `.244` (P0-1).
+`X-Forwarded-Proto` no origin passa a `$scheme` (P2-3 / BG-128). O
+cliente deixa de forçar `https` no hop HTTP. O login administrativo
+aceita o host oficial F2.1 mesmo quando o origin emite `http`. Este
+runbook **não** autoriza deploy no `.244` (P0-1).
 
 ### 4. Deploy por allowlist de paths (nunca integral)
 

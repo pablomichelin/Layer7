@@ -57,8 +57,10 @@ runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks
 fail-closed; sem P2-13). **M1 FEITO** no git (`2026-08-14`; GUI/helper via
 `layer7d --fingerprint`; sem deploy / `PORTVERSION`). **P2-17 FEITO** no git
 (`2026-08-14`; `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`; sem deploy /
-`PORTVERSION`). Próximo código com GO: P2 restantes (exceto P2-9 sem GO;
-sem P2-7/8/10/11; sem M1/P2-17). **P0-1 ACTIVO** inalterado.
+`PORTVERSION`). **P2-3 FEITO** no git (`2026-08-14`; origin
+`X-Forwarded-Proto $scheme`; sem deploy / `PORTVERSION`). Próximo código
+com GO: P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10/11; sem
+M1/P2-17/P2-3). **P0-1 ACTIVO** inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
 

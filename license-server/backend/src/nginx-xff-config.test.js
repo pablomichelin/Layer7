@@ -31,17 +31,26 @@ test('origin nginx replaces X-Forwarded-For with $remote_addr and never appends 
   );
 });
 
-test('P2-3 X-Forwarded-Proto map stays unchanged in this block', () => {
+test('P2-3 origin nginx sets X-Forwarded-Proto from $scheme, not the client header', () => {
   const conf = loadNginxConf();
-  assert.match(conf, /map \$http_x_forwarded_proto \$layer7_forwarded_proto/);
-  assert.match(conf, /proxy_set_header X-Forwarded-Proto \$layer7_forwarded_proto;/);
-  const protoLines = conf
+  const activeDirectives = conf
     .split('\n')
     .map((line) => line.trim())
-    .filter((line) => line.startsWith('proxy_set_header X-Forwarded-Proto'));
+    .filter((line) => line && !line.startsWith('#'));
+  assert.equal(
+    activeDirectives.some((line) => line.includes('$http_x_forwarded_proto')),
+    false
+  );
+  assert.equal(
+    activeDirectives.some((line) => line.includes('$layer7_forwarded_proto')),
+    false
+  );
+  const protoLines = activeDirectives.filter((line) => (
+    line.startsWith('proxy_set_header X-Forwarded-Proto')
+  ));
   assert.ok(protoLines.length >= 3);
   for (const line of protoLines) {
-    assert.equal(line, 'proxy_set_header X-Forwarded-Proto $layer7_forwarded_proto;');
+    assert.equal(line, 'proxy_set_header X-Forwarded-Proto $scheme;');
   }
 });
 

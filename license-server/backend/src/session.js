@@ -17,6 +17,7 @@ const SESSION_COOKIE_NAME = 'layer7_admin_session';
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
 const SESSION_RENEW_WINDOW_MS = 5 * 60 * 1000;
+const ADMIN_PUBLIC_SESSION_HOST = 'license.systemup.inf.br';
 
 function getBearerJwtSecret() {
   return getAdminBearerJwtSecret(process.env) || null;
@@ -378,8 +379,41 @@ async function resolveSession(req, res) {
   return null;
 }
 
-function requireSecureSessionRequest(req) {
-  return req.secure;
+function normalizeSessionChannelHost(value) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.includes(',')) {
+    return '';
+  }
+  return trimmed.split(':')[0].trim().toLowerCase();
+}
+
+function getSessionChannelHost(req) {
+  const forwarded = normalizeSessionChannelHost(req?.headers?.['x-forwarded-host']);
+  if (forwarded) {
+    return forwarded;
+  }
+  return normalizeSessionChannelHost(req?.headers?.host);
+}
+
+function isExplicitNonProductionEnv(env = process.env) {
+  return env.NODE_ENV === 'development' || env.NODE_ENV === 'test';
+}
+
+function requireSecureSessionRequest(req, env = process.env) {
+  // P2-3: req.secure e spoofable com trust proxy + X-Forwarded-Proto.
+  // O origin passa a emitir $scheme (HTTP). O canal oficial F2.1 e o
+  // host publico; IP/localhost em producao ficam fail-closed.
+  const host = getSessionChannelHost(req);
+  if (host === ADMIN_PUBLIC_SESSION_HOST) {
+    return true;
+  }
+  if (isExplicitNonProductionEnv(env) && (host === 'localhost' || host === '127.0.0.1')) {
+    return true;
+  }
+  return false;
 }
 
 function toSessionResponsePayload(metadata) {
@@ -420,6 +454,7 @@ module.exports = {
   getBearerTokenFromRequest,
   ensureSessionSchema,
   getClientIp,
+  getSessionChannelHost,
   getSessionTokenFromRequest,
   requireSecureSessionRequest,
   resolveSession,

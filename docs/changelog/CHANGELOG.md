@@ -16,6 +16,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P2-3 — `X-Forwarded-Proto` fail-closed:** FEITO no git após
+  gates deste bloco. O origin deixa de honrar o proto do cliente
+  (`$scheme`). `requireSecureSessionRequest` deixa de tratar `req.secure`
+  como prova de TLS. HTTP + `X-Forwarded-Proto: https` no Host de origin
+  → login 400. Canal oficial F2.1 intacto. Sem CSRF/DST/lifecycle, sem
+  `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P2-17 — `LAYER7_TEST_NOW` só com `LAYER7_TEST_ROOT`:**
   FEITO no git após gates deste bloco. `layer7_license_now()` deixa de
   congelar a data de binding da GUI só pelo ambiente. O harness
