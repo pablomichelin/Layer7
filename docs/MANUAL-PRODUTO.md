@@ -372,7 +372,12 @@ cat /usr/local/etc/layer7/blacklists/.state/fallback.state 2>/dev/null
 ```
 
 Snapshot oficial (prerelease GitHub, não rouba `latest`):
-tag `blacklists-ut1-current` — links e fingerprint em MANUAL-INSTALL.
+tag `blacklists-ut1-current` — **cortada** em `30.11`; os quatro URLs
+de *download* devolvem **404 esperado**. Primary exige token. Isto
+**não** é o canal do pacote nem motivo para reupload GA4.11. O
+espelho no cliente é legado / fallback e **não** se remove neste
+bloco. Links e fingerprint em MANUAL-INSTALL; nota
+[`09-blocking/nota-404-esperado-cut-30.11.md`](09-blocking/nota-404-esperado-cut-30.11.md).
 
 ### 9.3 DNS forçado / anti-QUIC
 

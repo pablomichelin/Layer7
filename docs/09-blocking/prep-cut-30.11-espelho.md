@@ -133,9 +133,11 @@ Pós-cut: `asset_count=0`; release id `313502667`; tag `blacklists-ut1-current` 
 
 ## 6. 404 esperado (P3-9 opção A)
 
-GET anónimo nos quatro URLs de *download* desta tag devolve **404 esperado**.
-Não é incidente. Não reupload sem GO (GA4.11 / A-06). URLs no cliente
-**mantidos** de propósito. Nota canónica:
+A tag `blacklists-ut1-current` foi cortada em `30.11`. GET anónimo nos
+quatro URLs de *download* devolve **404 esperado**. Primary exige token
+(401 sem token). Isto **não** é o canal do pacote nem motivo para
+reupload GA4.11. O espelho no cliente é **legado / fallback de runtime**
+e **não** se remove neste bloco. Nota canónica:
 [`nota-404-esperado-cut-30.11.md`](nota-404-esperado-cut-30.11.md).
 
 ---

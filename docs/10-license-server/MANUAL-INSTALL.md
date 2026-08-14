@@ -1609,14 +1609,14 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **SHA256 do tar.gz:** `4191e2ebdc13e3c87d777103528bab4fda6b273bc40c62a2c39cb820ad493d36`
 - **Fingerprint da chave publica embutida no pacote:** `6190b8d26fb9cb951ccb2c1f4e921228e4edf388c23f51afd93f1fd3ca1ba4fc`
 
-> **Pós-cut `30.11` (P3-9 opção A):** GET anónimo nos quatro URLs de
-> *download* acima devolve **404 esperado** (`asset_count=0`; recheck
-> `20260814T200900Z`). Não é incidente. Primary autenticado
-> (`downloads.systemup.inf.br`) sem token = **401**. `releases/latest` /
-> `v1.9.63` é o canal do **pacote** (BG-030) — a tag
-> `blacklists-ut1-current` é ignorada pelo updater. URLs no cliente
-> **mantidos** de propósito (rollback GA4.11 sem `.pkg` novo). **Proibido**
-> reupload sem GO (A-06). Nota:
+> **Pós-cut `30.11` (P3-9 opção A):** a tag `blacklists-ut1-current` foi
+> cortada. GET anónimo nos quatro URLs de *download* acima devolve
+> **404 esperado** — não é incidente. Primary
+> (`downloads.systemup.inf.br`) **exige token** (sem token = **401**).
+> Isto **não** é o canal do pacote (`releases/latest` / `v1.9.63`;
+> BG-030). Isto **não** é motivo para reupload GA4.11. O espelho no
+> cliente é **legado / fallback de runtime** e **não** se remove neste
+> bloco. Nota:
 > [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
 
 > **Nota operacional sobre F1.2 nesta release (`1.9.62`):** o trust chain

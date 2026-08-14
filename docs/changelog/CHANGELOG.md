@@ -17,13 +17,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 ### Changed
 
 - **BG-128 P3-9 / BG-150 — docs pós-cut «404 esperado»:** AVALIADO
-  no git (opção A; triagem BG-149). GET anónimo nos quatro URLs de
-  *download* `blacklists-ut1-current` é **404 esperado** — não é
-  incidente. Primary sem token = 401. `releases/latest` / `v1.9.63` é
-  o canal do **pacote**, não deste espelho. URLs no runtime
-  (`update-blacklists.sh` / `layer7.inc` / `config.json.sample`)
-  **mantidos** de propósito (rollback GA4.11 sem `.pkg` novo).
-  **Proibido** reupload sem GO (A-06). Nota
+  no git (opção A; triagem BG-149). A tag `blacklists-ut1-current` foi
+  cortada em `30.11`; os quatro URLs GitHub de *download* devolvem
+  **404 esperado**. Primary **exige token** (401 sem token). Isto
+  **não** é o canal do pacote (`releases/latest` / `v1.9.63`) nem
+  motivo para reupload GA4.11. O espelho no runtime é **legado /
+  fallback** e **não** se remove neste bloco. Nota
   `docs/09-blocking/nota-404-esperado-cut-30.11.md`. Sem mudança de
   runtime. Sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 P3-8 / BG-148 — recheck read-only do cut `30.11`:** AVALIADO

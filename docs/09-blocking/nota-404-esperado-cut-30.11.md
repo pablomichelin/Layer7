@@ -1,50 +1,59 @@
 # Nota — 404 esperado no espelho GitHub após o cut `30.11` (P3-9 opção A)
 
 **Estado:** **AVALIADO no git** (`2026-08-14`; BG-150 / opção A)  
-**Pedido:** documentar que o 404 anónimo do espelho é o **contrato** pós-cut;
-manter os URLs no cliente. **Sem** mudança de runtime.  
-**Não é:** P3-8 (prova de que o cut continua vazio) · GA4.11 (repor assets)  
+**Objectivo:** eliminar a confusão operacional. **Sem** mudança de runtime.  
 **HEAD de partida:** `82c69d6` (fecho documental P3-8)
 
 ---
 
-## Contrato
+## Leitura em 30 segundos
 
-O cut `30.11` (`20260812T011217Z`) retirou os quatro assets da release
-rolling `blacklists-ut1-current` (id `313502667`). Recheck P3-8
-(`20260814T200900Z` / confirmação `20260814T201800Z`):
+1. A tag `blacklists-ut1-current` foi **cortada** em `30.11` (`20260812T011217Z`).
+2. Os **quatro** URLs GitHub de *download* dessa tag devolvem **404 esperado**.
+   Não é incidente. Não é regressão do updater.
+3. O **primary** (`downloads.systemup.inf.br`) **exige token**: sem token = **401**.
+4. Isto **não** é o canal do pacote (`releases/latest` / `v1.9.63` / botão
+   «Verificar actualização» — BG-030).
+5. Isto **não** é motivo para reupload GA4.11. Reupload sem GO reabre A-06.
+6. O espelho no cliente é **legado / fallback de runtime**. **Não** se remove
+   neste bloco (`update-blacklists.sh` / `layer7.inc` / `config.json.sample`
+   intactos).
+
+---
+
+## Contrato (prova P3-8, leitura P3-9)
+
+Release rolling `blacklists-ut1-current` (id `313502667`). Recheck
+`20260814T200900Z` / confirmação `20260814T201800Z`:
 
 | Check | Resultado | Leitura operacional |
 |-------|-----------|---------------------|
-| `asset_count` | **0** (`assets=[]`) | Release vazia de propósito |
-| GET anónimo nos 4 URLs de *download* | **404** / size 9 (nofollow e follow; sem 302→CDN) | **404 esperado** — não é incidente |
-| Primary `downloads.systemup.inf.br` sem token | **401** | Canal autenticado intacto |
-| `releases/latest` / `v1.9.63` | 7 assets (`.pkg` + cadeia F1.2) | Canal do **pacote** (BG-030) — **não** é este espelho |
+| `asset_count` | **0** (`assets=[]`) | Cut `30.11` — release vazia de propósito |
+| GET anónimo nos 4 URLs de *download* | **404** / size 9 (nofollow e follow; sem 302→CDN) | **404 esperado** |
+| Primary sem token | **401** | Token obrigatório; canal autenticado intacto |
+| `releases/latest` / `v1.9.63` | 7 assets (`.pkg` + cadeia F1.2) | Canal do **pacote** — outra tag |
 
-Os quatro URLs anónimos (ainda anunciados no cliente e neste manual):
+Os quatro URLs (legado / fallback ainda anunciado no runtime; **não** removidos):
 
 - `https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt`
 - `https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-manifest.v1.txt.sig`
 - `https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/layer7-blacklists-ut1.tar.gz`
 - `https://github.com/pablomichelin/Layer7/releases/download/blacklists-ut1-current/blacklists-signing-public-key.pem`
 
-**Proibido** tratar o 404 como regressão, «reparar» com `gh release upload`,
-ou reabrir o espelho anónimo sem GO humano (GA4.11 / A-06).
-
 ---
 
-## Três coisas distintas
+## O que isto **não** é
 
-| ID | Pergunta | Estado |
-|----|----------|--------|
-| **P3-8** | O cut no GitHub ainda está vazio? | **Fechado** (BG-146/BG-148) — prova, não cliente |
-| **P3-9 opção A** | O anúncio do URL morto confunde ops? | **Este bloco** — docs «404 esperado»; URLs **mantidos** |
-| **GA4.11** | Repor assets na tag? | Runbook pronto; **proibido sem GO** — reabre A-06 |
+| Confusão | Facto |
+|----------|--------|
+| «O pacote partiu» / `latest` 404 | Canal do pacote é `v1.9.63`. A tag `blacklists-ut1-current` é **ignorada** pelo updater (BG-030). |
+| «Há que repor os assets» (GA4.11) | O 404 **é** o cut. Reupload sem GO reabre o espelho anónimo (A-06). |
+| «Há que apagar o URL do `.sh` / GUI» | Espelho = legado / fallback de runtime. Remover = bloco futuro + GO + `PORTVERSION`. **Não** este bloco. |
+| «O primary também morreu» | Primary sem token = **401** (esperado). Com token + CDN OK = 200 (prova `20260812T003214Z`). |
 
-Remover os URLs do runtime (`update-blacklists.sh` / `layer7.inc` /
-`config.json.sample`) é um **bloco futuro** com GO + `PORTVERSION`. Não é
-esta opção. Manter o URL permite rollback GA4.11 à frota **sem** `.pkg`
-novo (contrato 30.8).
+P3-8 = o cut no GitHub continua vazio. P3-9 opção A = o anúncio deixa de
+confundir ops. GA4.11 = rollback comercial **só com GO** — o contrário de
+«fechar» o 404.
 
 ---
 
@@ -52,7 +61,8 @@ novo (contrato 30.8).
 
 - `≥1.9.53`: sem token válido **não** há fetch de conteúdo corrente
   (hold-active / LKG / enforce intactos).
-- Com token, a ordem default é primary Systemup e depois o mirror GitHub.
+- Com token, a ordem default é primary Systemup e depois o mirror GitHub
+  (legado / fallback).
 - 404 no manifesto GitHub falha o candidato **antes** de `pkeyutl` / tarball;
   não promove snapshot; não apaga LKG; não desliga enforce.
 - Os 404×4 do P3-8 foram `curl` de auditoria, não o updater.
@@ -63,5 +73,5 @@ novo (contrato 30.8).
 
 - Prep/fecho do cut: [`prep-cut-30.11-espelho.md`](prep-cut-30.11-espelho.md)
 - Recheck P3-8: [`../tests/evidence/20260814T200900Z-p38-cut-recheck/`](../tests/evidence/20260814T200900Z-p38-cut-recheck/)
-- Rollback (só com GO): [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md)
+- Rollback (só com GO — **não** por causa deste 404): [`../13-runbooks/content-mirror-rollback-ga4.11.md`](../13-runbooks/content-mirror-rollback-ga4.11.md)
 - Auditoria: [`auditoria-licencas-auth-deploy-2026-08-14.md`](auditoria-licencas-auth-deploy-2026-08-14.md)

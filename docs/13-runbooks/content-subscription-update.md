@@ -10,11 +10,12 @@
 produção observada **`1.9.54`**. Primary CDN `downloads.systemup.inf.br`:
 DNS/público **PASS**; smoke autenticado campo **PASS**
 (`20260812T003214Z` — manifesto/`.sig` **200/200**; sem token **401**).
-O cut `30.11` **já foi executado**: GET anónimo no espelho GitHub
-`blacklists-ut1-current` devolve **404 esperado** (P3-9 opção A). Não é
-incidente; hold-active / LKG / enforce ficam intactos. URLs no cliente
-**mantidos** de propósito (rollback GA4.11 sem `.pkg` novo). **Proibido**
-reupload sem GO. Nota:
+O cut `30.11` **já foi executado**: a tag `blacklists-ut1-current` está
+vazia; GET anónimo nos quatro URLs GitHub devolve **404 esperado**
+(P3-9 opção A). Não é incidente. Primary **exige token** (401 sem token).
+Isto **não** é o canal do pacote nem motivo para reupload GA4.11. O
+espelho no cliente é **legado / fallback de runtime** e **não** se
+remove neste bloco. hold-active / LKG / enforce intactos. Nota:
 [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
 Prep: [`../09-blocking/prep-cut-30.11-espelho.md`](../09-blocking/prep-cut-30.11-espelho.md).
 

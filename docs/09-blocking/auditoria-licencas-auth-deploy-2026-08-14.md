@@ -543,15 +543,15 @@ appliance).
 
 **Pedido implementado:** só a opção A da triagem BG-149 — documentação
 pós-cut «404 esperado». **Nada** de runtime.
-**Veredicto:** P3-9 **AVALIADO** (opção A). URLs no cliente **mantidos**
-de propósito (rollback GA4.11 sem `.pkg` novo). Remover URL = bloco
-futuro + GO + `PORTVERSION`.
+**Veredicto:** P3-9 **AVALIADO** (opção A). A tag foi cortada; 404
+anónimo é esperado; primary exige token; isto **não** é o canal do
+pacote nem motivo para reupload GA4.11. O espelho no cliente é
+**legado / fallback de runtime** e **não** se remove neste bloco.
 Nota canónica [`nota-404-esperado-cut-30.11.md`](nota-404-esperado-cut-30.11.md).
-Triagem BG-149 (só leitura): manter URLs; só documentar o 404.
 
 | Campo | Valor |
 |-------|--------|
-| Objectivo | Declarar que o 404 anónimo do espelho é o contrato pós-`30.11`, sem remover URLs |
+| Objectivo | Eliminar a confusão operacional: 404 esperado, primary com token, não é pacote, não é GA4.11, espelho legado intacto |
 | Impacto | Só docs. `update-blacklists.sh` / `layer7.inc` / `config.json.sample` / GUI / `PORTVERSION` / builder / release / deploy **intactos** |
 | Risco | Baixo. Residual: GUI ainda mostra o URL (copy GUI = package); remover URL enfraquece GA4.11 para clientes novos |
 | Teste | Nota presente; MANUAL-INSTALL UT1 oficial diz 404 esperado; PLANO/DIRETRIZES com addendum; `git diff` só docs; 325 untracked fora do stage |

@@ -732,9 +732,11 @@ o risco de regressão.
 | `mirror_urls` | string[] | Mirrors oficiais apenas para disponibilidade |
 
 > **Addendum pós-cut `30.11` (P3-9 opção A):** o exemplo `mirror_urls`
-> GitHub acima é o contrato F1.3 / cliente actual — **não** foi removido.
-> GET anónimo devolve **404 esperado**. Não reupload sem GO (GA4.11).
-> Nota: [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
+> GitHub acima é **legado / fallback de runtime** — **não** se remove
+> neste bloco. GET anónimo devolve **404 esperado**. Primary exige
+> token (401 sem token). Isto **não** é o canal do pacote nem motivo
+> para reupload GA4.11. Nota:
+> [`../09-blocking/nota-404-esperado-cut-30.11.md`](../09-blocking/nota-404-esperado-cut-30.11.md).
 | `auto_update` | boolean | Actualização automática via cron |
 | `update_interval_hours` | int | Intervalo em horas (mínimo 1) |
 | `categories` | string[] | IDs das categorias com acção `deny` |
