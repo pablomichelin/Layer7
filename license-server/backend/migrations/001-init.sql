@@ -86,6 +86,14 @@ CREATE TABLE admin_login_guards (
     UNIQUE(scope_type, scope_key)
 );
 
+CREATE TABLE admin_totp_challenges (
+    jti         VARCHAR(64) PRIMARY KEY,
+    admin_id    INTEGER NOT NULL REFERENCES admins(id) ON DELETE CASCADE,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    used_at     TIMESTAMPTZ,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX idx_licenses_key ON licenses(license_key);
 CREATE INDEX idx_licenses_status ON licenses(status);
 CREATE INDEX idx_licenses_customer ON licenses(customer_id);
@@ -100,3 +108,5 @@ CREATE INDEX idx_admin_audit_log_created_at ON admin_audit_log(created_at);
 CREATE INDEX idx_admin_audit_log_event_type ON admin_audit_log(event_type);
 CREATE INDEX idx_admin_audit_log_actor_admin ON admin_audit_log(actor_admin_id);
 CREATE INDEX idx_admin_login_guards_locked_until ON admin_login_guards(locked_until);
+CREATE INDEX idx_admin_totp_challenges_admin ON admin_totp_challenges(admin_id);
+CREATE INDEX idx_admin_totp_challenges_expires ON admin_totp_challenges(expires_at);

@@ -106,13 +106,22 @@ function buildOtpauthUri({ secret, email, issuer = 'Layer7 License' }) {
   return `otpauth://totp/${label}?${params.toString()}`;
 }
 
+function generateTotpChallengeJti() {
+  return crypto.randomBytes(16).toString('hex');
+}
+
+function isTotpChallengeJti(value) {
+  return typeof value === 'string' && /^[0-9a-f]{32}$/.test(value);
+}
+
 function createTotpChallengeToken(adminId, secret) {
   if (typeof secret !== 'string' || secret.trim() === '') {
     throw new Error('TOTP challenge secret missing.');
   }
 
   const exp = Date.now() + (5 * 60 * 1000);
-  const payload = Buffer.from(JSON.stringify({ admin_id: adminId, exp })).toString('base64url');
+  const jti = generateTotpChallengeJti();
+  const payload = Buffer.from(JSON.stringify({ admin_id: adminId, exp, jti })).toString('base64url');
   const sig = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
   return `${payload}.${sig}`;
 }
@@ -134,7 +143,7 @@ function parseTotpChallengeToken(token, secret) {
   }
   try {
     const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
-    if (!data?.admin_id || !data?.exp || Date.now() > data.exp) {
+    if (!data?.admin_id || !data?.exp || !isTotpChallengeJti(data.jti) || Date.now() > data.exp) {
       return null;
     }
     return data;
@@ -147,7 +156,9 @@ module.exports = {
   buildOtpauthUri,
   createTotpChallengeToken,
   generateTotp,
+  generateTotpChallengeJti,
   generateTotpSecret,
+  isTotpChallengeJti,
   parseTotpChallengeToken,
   timingSafeEqualUtf8,
   verifyTotp,

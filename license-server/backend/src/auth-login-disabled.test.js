@@ -61,7 +61,9 @@ function loadLoginRouter({ rows = [], activeLock = null } = {}) {
   const surfacePath = require.resolve('./admin-surface');
   const sessionPath = require.resolve('./session');
   const bcryptPath = require.resolve('bcryptjs');
+  const totpChallengePath = require.resolve('./totp-challenge');
   const authRoutePath = require.resolve('./routes/auth');
+  const { createTotpChallengeToken } = require('./totp');
   const realSurface = require('./admin-surface');
   const realSession = require('./session');
 
@@ -152,6 +154,16 @@ function loadLoginRouter({ rows = [], activeLock = null } = {}) {
         compares.push({ password, hash });
         return bcrypt.compare(password, hash);
       },
+    },
+  };
+
+  require.cache[totpChallengePath] = {
+    id: totpChallengePath,
+    filename: totpChallengePath,
+    loaded: true,
+    exports: {
+      issueTotpChallenge: async (adminId, secret) => createTotpChallengeToken(adminId, secret),
+      consumeTotpChallenge: async () => true,
     },
   };
 

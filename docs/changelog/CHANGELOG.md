@@ -16,6 +16,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Changed
 
+- **BG-128 P0-2 residual — TOTP challenge single-use + bind:** FEITO
+  no git. O `challenge_token` passa a levar `jti` aleatório no HMAC.
+  `/login` invalida desafios unused do admin, grava
+  `admin_totp_challenges` e só depois devolve o token. `/login/totp`
+  valida HMAC+`jti` e consome com `SELECT … FOR UPDATE` + `used_at`
+  **antes** de `createSession`. Replay, `jti` forjado/inexistente,
+  token antigo sem `jti` e desafio anterior → `401` genérico. Sem
+  bind IP/UA, sem env/segredo novo, sem SPA, sem rate-limit, sem
+  compose/Docker/deploy/`PORTVERSION` (P0-1 ACTIVO).
 - **BG-128 P2-6 Bloco B — Postgres healthy antes da API:** FEITO no
   git. `docker-compose.yml` passa a ter `db.healthcheck` com
   `pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB` (env **dentro** do

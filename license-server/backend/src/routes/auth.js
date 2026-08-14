@@ -51,11 +51,14 @@ const {
 } = require('../session');
 const {
   buildOtpauthUri,
-  createTotpChallengeToken,
   generateTotpSecret,
   parseTotpChallengeToken,
   verifyTotp,
 } = require('../totp');
+const {
+  consumeTotpChallenge,
+  issueTotpChallenge,
+} = require('../totp-challenge');
 const { requirePermission } = require('../require-permission');
 const { getTotpHmacSecret } = require('../admin-bearer-secret');
 
@@ -129,7 +132,7 @@ router.post('/login', loginIpLimiter, loginIdentityLimiter, async (req, res) => 
         return res.status(500).json(buildAuthErrorResponse(ADMIN_INTERNAL_ERROR_MESSAGE));
       }
 
-      const challengeToken = createTotpChallengeToken(admin.id, totpHmacSecret);
+      const challengeToken = await issueTotpChallenge(admin.id, totpHmacSecret);
       await auditAdminEvent({
         component: 'auth',
         eventType: 'login_totp_required',
@@ -213,7 +216,22 @@ router.post('/login/totp', loginIpLimiter, async (req, res) => {
     const totpValid = Boolean(
       admin?.totp_enabled && admin?.totp_secret && verifyTotp(admin.totp_secret, code)
     );
-    const outcome = decideSecondFactorAttempt({ challenge, admin, totpValid });
+    let outcome = decideSecondFactorAttempt({ challenge, admin, totpValid });
+    if (outcome.kind === 'success') {
+      const consumed = await consumeTotpChallenge({
+        jti: challenge.jti,
+        adminId: admin.id,
+      });
+      if (!consumed) {
+        outcome = {
+          kind: 'invalid_second_factor',
+          email: admin.email,
+          adminId: admin.id,
+          reason: 'challenge_not_consumable',
+        };
+      }
+    }
+
     const protection = await applySecondFactorProtection(outcome, {
       req,
       registerLoginFailure,

@@ -92,6 +92,10 @@ Documentos normativos desta arquitetura:
   estatico; em producao a API recusa arrancar se ambas estiverem vazias
   (`NODE_ENV=development`/`test` explicitos podem arrancar sem esses
   valores, mas o challenge continua fail-closed)
+  **P0-2 residual / BG-128 (`2026-08-14`):** o challenge deixa de ser
+  stateless. Payload HMAC = `{admin_id, exp, jti}`; tabela
+  `admin_totp_challenges`; consumo transaccional (`FOR UPDATE` +
+  `used_at`) antes de `createSession`. Sem bind IP/UA. Sem deploy.
 - a expiracao passa a ser dupla: `30 minutos` de ociosidade e `8 horas` de
   vida absoluta, com renovacao controlada perto da janela ociosa
 - novo login passa a revogar sessoes activas anteriores do mesmo admin

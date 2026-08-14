@@ -86,6 +86,21 @@ test('TOTP challenge token roundtrip', () => {
   const parsed = parseTotpChallengeToken(token, secret);
   assert.equal(parsed.admin_id, 42);
   assert.ok(parsed.exp > Date.now());
+  assert.match(parsed.jti, /^[0-9a-f]{32}$/);
+});
+
+test('P0-2 — cada challenge traz jti aleatório e rejeita payload antigo sem jti', () => {
+  const secret = 'test-hmac-secret';
+  const first = parseTotpChallengeToken(createTotpChallengeToken(7, secret), secret);
+  const second = parseTotpChallengeToken(createTotpChallengeToken(7, secret), secret);
+  assert.notEqual(first.jti, second.jti);
+
+  const payload = Buffer.from(JSON.stringify({
+    admin_id: 7,
+    exp: Date.now() + 60_000,
+  })).toString('base64url');
+  const sig = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
+  assert.equal(parseTotpChallengeToken(`${payload}.${sig}`, secret), null);
 });
 
 test('TOTP challenge helpers refuse an empty HMAC secret', () => {

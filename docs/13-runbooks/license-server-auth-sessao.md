@@ -104,6 +104,17 @@ Referencias normativas:
 - O HMAC do `challenge_token` TOTP reutiliza `ADMIN_BEARER_JWT_SECRET` ou
   `JWT_SECRET`. Nao existe fallback estatico. Sem esses valores o challenge
   nao e emitido nem aceite.
+- **P0-2 residual / BG-128:** o desafio TOTP e single-use e fica
+  ligado a uma tentativa no servidor. O payload HMAC leva `jti`
+  aleatorio; a linha vive em `admin_totp_challenges` (`jti` unico,
+  `admin_id`, `expires_at`, `used_at`). Password OK invalida os
+  unused do mesmo admin, insere o novo e so depois devolve o token.
+  `/login/totp` valida HMAC+`jti` e consome com `BEGIN` +
+  `SELECT … FOR UPDATE` + `used_at` **antes** de criar sessao.
+  Token sem linha, `jti` forjado, replay ou desafio anterior
+  devolvem o mesmo `401` genérico. Sem bind por IP/UA. Sem
+  variavel/segredo novo. `ensureTotpSchema` cria a tabela no boot;
+  `001-init.sql` espelha installs novas.
 - Segundo factor (`POST /api/auth/login/totp`, P1-3):
   - recusa `is_active === false` sem emitir cookie/sessao;
   - password OK com TOTP ligado **nao** faz reset das guardas;

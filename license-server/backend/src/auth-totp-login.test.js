@@ -27,7 +27,11 @@ const DISABLED_ADMIN = {
   is_active: false,
 };
 
-const CHALLENGE = { admin_id: 7, exp: Date.now() + 60_000 };
+const CHALLENGE = {
+  admin_id: 7,
+  exp: Date.now() + 60_000,
+  jti: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+};
 
 function genericUnauthorized() {
   return {
@@ -65,6 +69,18 @@ test('P1-3 — conta desactivada recusa mesmo com TOTP válido', () => {
 
   assert.equal(outcome.kind, 'invalid_second_factor');
   assert.equal(outcome.reason, 'account_disabled');
+  assert.deepEqual(secondFactorHttpResponse(outcome), genericUnauthorized());
+});
+
+test('P0-2 — desafio HMAC sem jti não autoriza o segundo factor', () => {
+  const outcome = decideSecondFactorAttempt({
+    challenge: { admin_id: 7, exp: Date.now() + 60_000 },
+    admin: ACTIVE_ADMIN,
+    totpValid: true,
+  });
+
+  assert.equal(outcome.kind, 'invalid_second_factor');
+  assert.equal(outcome.reason, 'challenge_or_admin_unresolved');
   assert.deepEqual(secondFactorHttpResponse(outcome), genericUnauthorized());
 });
 

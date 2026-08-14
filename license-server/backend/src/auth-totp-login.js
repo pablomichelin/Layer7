@@ -21,7 +21,7 @@ function decideSecondFactorAttempt({
   admin = null,
   totpValid = false,
 } = {}) {
-  if (!challenge || !admin) {
+  if (!challenge || !challenge.jti || !admin) {
     return {
       kind: 'invalid_second_factor',
       email: admin?.email || null,

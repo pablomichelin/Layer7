@@ -146,8 +146,9 @@ Facetas do mesmo bloqueio (não são P0 independentes):
 
 ### P0-2 — HMAC do desafio TOTP com fallback hardcoded
 
-**FEITO no git** (`2026-08-14`) para o fallback/arranque. Residual: challenge
-single-use + bind à tentativa de login. **Não** deployado (P0-1).
+**FEITO no git** (`2026-08-14`) para o fallback/arranque. Residual
+single-use + bind **FEITO** no git neste bloco (`jti` +
+`admin_totp_challenges` + consumo transaccional). **Não** deployado (P0-1).
 
 | Campo | Valor |
 |-------|--------|
@@ -155,7 +156,7 @@ single-use + bind à tentativa de login. **Não** deployado (P0-1).
 | **Cenário** | `ADMIN_BEARER_JWT_SECRET` e `JWT_SECRET` vazios (default do compose: `${…:-}`). Conta com TOTP ligado. Atacante forja o challenge HMAC com o literal de desenvolvimento no código e `admin_id` sequencial (tipicamente `1`) e faz `POST /api/auth/login/totp`. **Não passa por `/login` nem pela password.** |
 | **Impacto** | 2FA vira 1FA (só TOTP). Encadeado com P1-2 (brute TOTP sem rate-limit efectivo) → takeover admin sem credenciais. O Bearer JWT é fail-closed sem segredo; o TOTP **não**. |
 | **Correcção mínima** | Remover o literal. Exigir segredo forte no boot (`process.exit(1)` se vazio). Challenge single-use + bind à tentativa de login. Segredo TOTP distinto do Bearer, ou o mesmo **sem** default. |
-| **Implementado** | Literal removido. `getTotpHmacSecret()` reutiliza `ADMIN_BEARER_JWT_SECRET`/`JWT_SECRET` sem default. Arranque produção/`NODE_ENV` vazio recusa segredos vazios. `NODE_ENV=development`/`test` explícitos podem arrancar sem esses valores; create/parse do challenge recusam segredo vazio. Sem variável nova. Residual: single-use + bind. |
+| **Implementado** | Literal removido. `getTotpHmacSecret()` reutiliza `ADMIN_BEARER_JWT_SECRET`/`JWT_SECRET` sem default. Arranque produção/`NODE_ENV` vazio recusa segredos vazios. `NODE_ENV=development`/`test` explícitos podem arrancar sem esses valores; create/parse do challenge recusam segredo vazio. Sem variável nova. Residual single-use + bind **FEITO** no git: `jti` no HMAC; tabela `admin_totp_challenges`; `/login` invalida unused e insere; `/login/totp` consome com `FOR UPDATE` + `used_at` antes da sessão. Sem bind IP/UA. |
 | **Testes** | Boot sem env → recusa start. `getTotpHmacSecret()` nunca devolve default. Challenge forjado com o literal antigo → rejeitado. Suite backend `148/148` PASS. |
 | **Nota** | Remediação live implica restart da API e confirmação dos segredos no `.env` — **proibido** neste bloco (P0-1). |
 
@@ -222,7 +223,7 @@ foi este bloco.
 `/login`. Respostas de falha do segundo factor são `401` genéricas
 (`Credenciais invalidas`) — sem enumerar conta/desafio/código. Contrato de
 sucesso inalterado. **Não** deployado (P0-1). **Fora:** P1-2 XFF/rate-limit;
-residual P0-2 single-use/bind.
+residual P0-2 single-use/bind fechado neste bloco.
 
 | Campo | Valor |
 |-------|--------|
@@ -486,7 +487,7 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 
 1. **P0-1 (ops, ACTIVO)** — freeze de deploy integral **mantém-se**. Inventário + commit allowlist **FEITOS** no git (`2026-08-14`); **não** levanta o bloqueio. Falta GO do primeiro rebuild `api` + smoke.
 2. **P1-1 FEITO no git** (`2026-08-14`) — SELECT de check-in + testes JS; **sem** deploy `.244`.
-3. **P0-2 FEITO no git** (`2026-08-14`) — fallback TOTP removido + arranque fail-closed; residual single-use/bind. **sem** deploy `.244`.
+3. **P0-2 FEITO no git** (`2026-08-14`) — fallback TOTP removido + arranque fail-closed; residual single-use/bind **FEITO** no git neste bloco (`jti` + tabela + consumo transaccional). **sem** deploy `.244`.
 4. **P1-3 + P2-5 FEITOS no git** (`2026-08-14`) — `is_active` + reset/lock no 2FA.
 5. **P1-2 FEITO no git** (`2026-08-14`) — XFF / rate-limit IP; origin substitui XFF; `getClientIp` = `req.ip`. **Não** deployado. Residual: IP público no origin (PROXY/P1-9); P2-2 CSRF. **P2-3 Proto FEITO** no git neste bloco.
 6. **P1-4 + P2-1 FEITOS no git** (`2026-08-14`) — lock no init; primeiro admin já owner; promoção `LIMIT 1`; alerta se `COUNT>1`. **sem** deploy `.244`.
@@ -517,7 +518,8 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 31. **P3-7 AVALIADO no git** (`2026-08-14`; **BG-153**; opção A — **FEITO documental**) — colisão TZ/expiry já provada em P2-13/REV-030; `timegm`/`gmmktime` **não** são correção. Sem mudança de runtime.
 32. **P2-6 Bloco A FEITO no git** (`2026-08-14`) — `.dockerignore` + `USER node` no backend; sem compose/healthcheck; sem Docker build/up; sem deploy.
 33. **P2-6 Bloco B FEITO no git** (`2026-08-14`) — `pg_isready` + `depends_on` `service_healthy`; hash compose P0-1 actualizado; sem Docker build/up; sem deploy.
-34. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7. Residual: P2-9 (só com GO); P0-2 single-use/bind; P0-1 rebuild `api`.
+34. **P0-2 residual single-use/bind FEITO no git** (`2026-08-14`) — `jti` no HMAC; `admin_totp_challenges`; consumo `FOR UPDATE` + `used_at` antes da sessão. **Não** deployado.
+35. **P2 / P3 restantes** — por severidade; P2-9 só com GO. Sem M1/P2-17/P2-3/P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7; sem P0-2 residual. Residual: P2-9 (só com GO); P0-1 rebuild `api`.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 

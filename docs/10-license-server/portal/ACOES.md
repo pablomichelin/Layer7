@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-14 — BG-128 P0-2 residual TOTP single-use + bind
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend API (sem bump visual / sem deploy) |
+| Versão | `2.1.0` git / SPA live `2.0.0` intocada |
+| Objectivo | O `challenge_token` TOTP deixa de ser stateless: `jti` no HMAC + linha em `admin_totp_challenges`; replay e token forjado sem password falham fechado |
+| Impacto | `totp.js` + `totp-challenge.js` + `totp-schema.js` + `/login` + `/login/totp` + `001-init.sql`. Contrato HTTP de sucesso intacto (`totp_required` + token opaco). Sem env/segredo novo, sem SPA, sem bind IP/UA |
+| Risco | Baixo no git. Tokens em voo (≤5 min) falham após deploy futuro. Overlay P0-1. Residual: consumir só no sucesso (spray no mesmo token até lock/exp) |
+| Teste | Suite backend `256/256` PASS (replay, `jti` forjado/inexistente, corrida paralela, desafio anterior, token antigo sem `jti`, regressões P1-3/P3-3A) |
+| Rollback | Reverter o commit; o challenge volta a ser `{admin_id, exp}` sem linha. `DROP TABLE admin_totp_challenges` só se a tabela tiver sido criada no live |
+| Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem compose / sem `PORTVERSION` |
+
 ## 2026-08-14 — BG-140 P3-4 falha de pool em GET /2fa/status
 
 | Campo | Valor |
@@ -173,7 +186,7 @@ Mais recente no topo.
 | Versão | `2.1.0` git / SPA live `2.0.0` intocada |
 | Objectivo | `/api/auth/login/totp` recusar conta desactivada; não resetar protecção antes do TOTP válido; falha TOTP participar do lock existente sem enumerar utilizador |
 | Impacto | Só `license-server/backend` auth + testes; contrato de sucesso intacto; `/login` 403 de conta desactivada **não** alterado (P3-3) |
-| Risco | Baixo (fail-closed no 2FA). Residual: P0-2 single-use/bind; live `.244` sem overlay (P0-1) |
+| Risco | Baixo (fail-closed no 2FA). Residual P0-2 single-use/bind fechado neste bloco; live `.244` sem overlay (P0-1) |
 | Teste | `npm test` no backend — `159/159` PASS (incl. `auth-totp-login.test.js`) |
 | Rollback | Reverter o commit; o 2FA volta a emitir sessão a conta `is_active=false` e a resetar guardas após password OK |
 | Resultado | **FEITO no git** — sem `.244` / sem 30.11 / sem SPA / sem P1-2 |

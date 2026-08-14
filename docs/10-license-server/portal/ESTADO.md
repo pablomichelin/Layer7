@@ -32,8 +32,9 @@
 
 1. **P0-1:** sem rsync/rebuild integral HEAD→`.244`. Runbook
    [`../../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-2. **P0-2, P1-1, P1-2 e P1-3 FEITOS** no git (`2026-08-14`) — **não**
-   deployar neste host (P0-1). Próximo código com GO: **P1-4**.
+2. **P0-2 residual single-use/bind FEITO** no git (`2026-08-14`) —
+   **não** deployar neste host (P0-1). HMAC fail-closed já estava
+   no git. Próximo código com GO: P2 restantes (exceto P2-9 sem GO).
 3. Novo plano portal só com ideias **ACEITE** + GO (nenhum plano `ACTIVO`).
 4. Não misturar com MITM permanente (fila 20.37 fechada).
 5. Não sincronizar SPA `2.1.0` sem GO.
