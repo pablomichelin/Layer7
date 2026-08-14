@@ -1,6 +1,6 @@
 # Runbook — P4.1 supervisor on-box + retry P4 (sem activação neste bloco)
 
-**Estado:** **P4 soak retry2 CLOSED PASS** `224009Z` (`1.9.59` MITM **OFF**); P4.1 live; P4.2 harness. **Sem** MITM permanente.  
+**Estado:** **P4 soak retry2 CLOSED PASS** `224009Z` (correu em `1.9.59`); soak actual **`1.9.63`** MITM **OFF** (20.36). P4.1 live; P4.2 harness. **Sem** MITM permanente.  
 **Causa P4 FAIL/ABORT:** supervisor remoto/failsafe **não armado** (aprovação Skip); P3 auto-expiry sozinho foi considerado insuficiente como failsafe operacional.  
 **Evidência P4:** [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/).  
 **Mapa:** [`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md).  

@@ -1,6 +1,6 @@
 # Plano — Identity + MITM Add-on (trilha IM0–IM9)
 
-**Estado do plano:** Identity **FECHADA**; **20.35 PASS** (GUI política MITM; até desligar); publicado **`1.9.63`**; **ADR-0035**; P4 retry2 CLOSED PASS (rev. `2026-08-14bf`)
+**Estado do plano:** Identity **FECHADA**; **20.36 PASS** (soak `.254` = `1.9.63` MITM OFF); publicado **`1.9.63`**; **ADR-0035**; P4 retry2 CLOSED PASS (rev. `2026-08-14bg`)
 **Tipo:** novo plano pós-fecho (ESTADO-PRODUTO §6); **não** reabre P0–J nem IPv6
 **Posicionamento de produto (nicho PME):** [`../00-overview/posicionamento-pme-identity-first.md`](../00-overview/posicionamento-pme-identity-first.md) — **ACEITE**
 **SSOT de execução:** este ficheiro  
@@ -19,7 +19,7 @@
 **ADRs:** [0025](../03-adr/ADR-0025-entitlements-addon-identity-mitm.md) · [0026](../03-adr/ADR-0026-mitm-tls-inspection-opt-in.md) (**Aceito — implementação em curso / 20.9 intenção; runtime diferido**) · [0027](../03-adr/ADR-0027-identity-userid-multi-fonte.md) · [0028](../03-adr/ADR-0028-concorrencia-io-daemon-identity.md) · [0029](../03-adr/ADR-0029-adiamento-agente-endpoint-exclusao-ts.md) (**IM7 ADIAR + IM8 exclusão**)  
 **Baseline produção:** `1.9.8` — rollback enforce `1.9.0`  
 **Baseline perf 20.11a:** [`../tests/evidence/20260806T174000Z-20.11a-baseline-perf/`](../tests/evidence/20260806T174000Z-20.11a-baseline-perf/)  
-**Canal lab/`latest`:** `1.9.63` (MITM política; SHA `f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`). Soak `.254`: `1.9.59`.
+**Canal lab/`latest`:** `1.9.63` (MITM política; SHA `f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`). Soak `.254`: `1.9.63` MITM OFF.
 
 **Nota:** **Rev. `m` (`2026-08-08`)** = 20.33 homolog two-client PASS; GI9; Identity rede **FECHADA**.  
 **Rev. `n` (`2026-08-08`)** = **GO humano reopen MITM**; passo **20.8** scaffolding.  
@@ -65,7 +65,8 @@
 **Rev. `bc` (`2026-08-14`)** = **P4 soak retry2 CLOSED PASS** (`224009Z`); 16/16 health tries=1; `rollback_clean=1`; MITM OFF verify `02:54:33Z`; Phase C NA; permanente **NO-GO**; **P5 aguarda ficha**.
 **Rev. `bd` (`2026-08-14`)** = **ADR-0035** — ficha/P5 **RETIRADOS**; ambição de paridade NGFW no tempo; **20.34 PASS docs**; próximo **20.35** productizar MITM na GUI.
 **Rev. `be` (`2026-08-14`)** = **20.35 PASS** — GUI até desligar (`max_minutes=0`); copy operador; candidato `1.9.63` sem publish.
-**Rev. `bf` (`2026-08-14`)** = **`1.9.63` publicado** — MITM como política; ADR-0035; melhorar todos os dias sem tecto; soak `.254` intocado.
+**Rev. `bf` (`2026-08-14`)** = **`1.9.63` publicado** — MITM como política; ADR-0035; melhorar todos os dias sem tecto; soak `.254` intocado (histórico).
+**Rev. `bg` (`2026-08-14`)** = **20.36 PASS** — soak `.254` `1.9.59` → `1.9.63`; MITM OFF; evidência `20260814T034904Z`.
 
 ---
 
@@ -73,7 +74,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| Passo actual | **20.35 PASS** — GUI política MITM; até desligar; publicado `1.9.63` |
+| Passo actual | **20.36 PASS** — soak `.254` = `1.9.63` MITM OFF |
 | Prontidão | Ficha **já não é gate**. Operação = GUI + entitlement. Default OFF. |
 | Próximo | Evoluir MITM/UX sem tecto; `.234`/`.235` sem mutação neste passo |
 | Lab PoC | **`192.168.100.54`** |
@@ -102,9 +103,10 @@ TRILHA — progresso
 - P4 retry2: 20260813T224009Z CLOSED PASS (16/16 health tries=1; rollback_clean=1; MITM OFF 02:54:33Z; Phase C NA)
 - ADR-0035 / 20.34 PASS: ficha RETIRADA; ambição paridade NGFW no tempo
 - 20.35 PASS: GUI até desligar; copy operador; publicado 1.9.63
-- Plano rev.: 2026-08-14bf
-- Latest publicado: 1.9.63; soak .254 = 1.9.59 MITM OFF
-- Próximo: evoluir MITM/UX sem tecto; sem ligar .254
+- 20.36 PASS: soak .254 alinhado a 1.9.63; MITM OFF
+- Plano rev.: 2026-08-14bg
+- Latest + soak: 1.9.63 MITM OFF
+- Próximo: evoluir MITM/UX sem tecto; sem ligar MITM no .254
 ```
 
 ### 0.0 Correcções arquitectónicas obrigatórias (rev. `b`)
@@ -152,7 +154,7 @@ Estas regras **substituem** interpretações ingénuas da rev. `a`:
 |-------|--------|---------|
 | Fecho P0–J | **FECHADO** | Baseline comercial; não reabrir |
 | IPv6 V0–V6 | **FECHADA** | Dual-stack já no produto; Identity/MITM devem **respeitar** IPv4+IPv6 |
-| Este plano | Identity **FECHADA**; MITM **`1.9.47`+** | Extensão comercial; ficha retirada (ADR-0035); próximo 20.35 |
+| Este plano | Identity **FECHADA**; MITM **`1.9.63`** | Extensão comercial; ficha retirada (ADR-0035); soak alinhado (20.36) |
 
 Congelamento das filas fechadas:
 [`../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](../00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md).
@@ -448,6 +450,7 @@ MVP fecho parcial: LDAP + **pelo menos uma** fonte. Ambas no plano completo.
 |-------|---------|------|
 | **20.34** | GO docs: retirar ficha; ambição de paridade NGFW no tempo | **PASS** (`2026-08-14`; ADR-0035) |
 | **20.35** | Productizar operação MITM na GUI (até desligar + copy operador) | **PASS** (`2026-08-14`; publicado `1.9.63`) |
+| **20.36** | Alinhar soak `.254` ao `latest` (`1.9.59` → `1.9.63`); MITM OFF | **PASS** (`20260814T034904Z`) |
 
 ---
 
@@ -625,6 +628,7 @@ Detalhe em [`../02-roadmap/backlog.md`](backlog.md).
 | 2026-08-09 | **rev. `ar` / P1+P2** — GO-escopo D1–D9 + runbook-piloto-mitm-generico; activação NO-GO até P3 |
 | 2026-08-09 | **rev. `as`** — gate activação externa ≠ gap eng.; P3.1–P3.8 fechados |
 | 2026-08-09 | **rev. `at` / P3 PASS** — `1.9.47` max_window/deadline/audit/GUI; evid. `230400Z` |
+| 2026-08-14 | **rev. `bg` / 20.36 PASS** — soak `.254` `1.9.59` → `1.9.63`; MITM OFF; evid. `20260814T034904Z` |
 | 2026-08-14 | **rev. `bf` / `1.9.63` publicado** — MITM política; ADR-0035; soak `.254` intocado |
 | 2026-08-14 | **rev. `be` / 20.35 PASS** — GUI até desligar; copy operador; candidato `1.9.63` |
 | 2026-08-14 | **rev. `bd` / ADR-0035 + 20.34 PASS** — ficha/P5 RETIRADOS; ambição paridade NGFW; próximo **20.35** |

@@ -1,11 +1,11 @@
 # Mapa canónico — prontidão MITM para piloto (`2026-08-09`)
 
 **Tipo:** auditoria **somente leitura / documental** (sem mutação lab, código, build ou release).  
-**Veredicto:** ficha/P5 **RETIRADOS** (ADR-0035). **20.35 PASS**. Operação MITM = GUI + entitlement. Soak `.254` MITM **OFF**. Default OFF. Candidato `1.9.63`. Sem overclaim de paridade **já** atingida.  
+**Veredicto:** ficha/P5 **RETIRADOS** (ADR-0035). **20.36 PASS**. Operação MITM = GUI + entitlement. Soak `.254` = `1.9.63` MITM **OFF**. Default OFF. Sem overclaim de paridade **já** atingida.  
 **P1:** [`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md) — D1–D9 **ACEITE**.  
 **P2:** [`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md) — canónico ops.  
 **P4 evidência (PASS):** [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS**. Histórico FAIL: [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/).  
-**Pacote de referência lab/`latest`:** `1.9.62` (`SHA256=b6700576afb47cf9790c4c3fddb746b3021d7070e260ef0e6551c712a7948e5f`). Soak `.254`: `1.9.59` MITM OFF.  
+**Pacote de referência lab/`latest`:** `1.9.63` (`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`). Soak `.254`: `1.9.63` MITM OFF (20.36).  
 **Produção enforce base (sem MITM):** `1.9.8` (inalterada por este mapa).  
 **Arranque:** [`../00-overview/START-HERE-identity-mitm.md`](../00-overview/START-HERE-identity-mitm.md)  
 **SSOT execução:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  

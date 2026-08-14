@@ -1,4 +1,4 @@
-# START HERE — Identity + MITM Add-on 【20.35 PASS · lab/`latest` `1.9.63`】
+# START HERE — Identity + MITM Add-on 【20.36 PASS · soak/`latest` `1.9.63`】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
@@ -7,8 +7,8 @@
 > **P4 retry** `170000Z` **CLOSED FAIL** — `health_ssh_fail` sample=14; rollback no fecho incompleto.  
 > **P4.2** — diagnóstico + harness auth `-T` (`tests/harness/mitm-p4-soak/`); testes locais **PASS**.  
 > **P4 soak retry2** `224009Z` **CLOSED PASS** — 16/16 health tries=1; `rollback_clean=1`; MITM **OFF** (verify `02:54:33Z`).  
-> **Não** upgrade do soak para `1.9.63`.  
-> **`1.9.63`** — MITM como política (até desligar + copy); ADR-0035; lab/`latest`.  
+> **20.36 PASS** — soak `.254` alinhado a **`1.9.63`**; MITM **OFF**.  
+> **`1.9.63`** — MITM como política (até desligar + copy); ADR-0035; lab/`latest` + soak.  
 > **`1.9.62`** — copy de operador MITM/Identity.  
 > **`1.9.61`** — Lista VIP texto simples + DHCP.  
 > **`1.9.60`** — `entitle-ok` PATH absoluto (rc.d).  
@@ -61,19 +61,20 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; P4 retry2 **CLOSED PASS**; **ADR-0035**; **20.35 PASS**; publicado **`1.9.63`** |
-| Passo actual | **20.35 PASS** — GUI política MITM (até desligar); lab/`latest` `1.9.63` |
-| Prontidão piloto | Ficha **já não é gate**. Operação = GUI + entitlement. Default OFF. Soak `.254` MITM **OFF**. — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
+| Plano | Identity **FECHADA**; MITM **GO produto**; P4 retry2 **CLOSED PASS**; **ADR-0035**; **20.36 PASS**; soak + latest **`1.9.63`** |
+| Passo actual | **20.36 PASS** — soak `.254` = `1.9.63` MITM OFF |
+| Prontidão piloto | Ficha **já não é gate**. Operação = GUI + entitlement. Default OFF. Soak `.254` = `1.9.63` MITM **OFF**. — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | P4.1 / retry | [`../09-blocking/runbook-p4-retry-supervisor-onbox.md`](../09-blocking/runbook-p4-retry-supervisor-onbox.md) |
 | Gate activação | **RETIRADO** (ADR-0035) — sem ficha-papel |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS** |
-| Próximo | Evoluir MITM/UX sem tecto; sem ligar `.254` neste passo |
+| Próximo | Evoluir MITM/UX sem tecto; sem ligar MITM no `.254` neste passo |
+| Evidência 20.36 | [`../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/) — soak = `1.9.63` MITM OFF |
 | Evidência P4 retry2 | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS** |
 | Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT** |
 | Evidência P4 retry | [`../tests/evidence/20260813T170000Z-p4-retry-254/`](../tests/evidence/20260813T170000Z-p4-retry-254/) — **CLOSED FAIL** |
 | Evidência pós-fail | [`../tests/evidence/20260813T223009Z-p4-postfail-verify-254/`](../tests/evidence/20260813T223009Z-p4-postfail-verify-254/) — MITM **OFF** (pré-retry2) |
-| Rev. do plano | **`2026-08-14bf`** |
+| Rev. do plano | **`2026-08-14bg`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -149,7 +150,7 @@ Baseline produto (não reabrir):
 ## Prompt — continuar a trilha (copiar e colar)
 
 ```text
-Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest 1.9.62; soak .254 = 1.9.59.
+Contexto: trilha Identity + MITM Add-on; baseline produção 1.9.8; lab/latest 1.9.63; soak .254 = 1.9.63 MITM OFF.
 Posicionamento: PME Identity-first (posicionamento-pme-identity-first.md).
 Identity de rede: FECHADA (20.33/GI9). MITM: GO produto; Gate C PASS (anti-QUIC escopo).
 Arranque: docs/00-overview/START-HERE-identity-mitm.md
@@ -158,8 +159,8 @@ Runbook P4.1: docs/09-blocking/runbook-p4-retry-supervisor-onbox.md
 Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; ADR-0035 aceite; 20.35 PASS (GUI até desligar); publicado 1.9.63.
-Estado: P4 retry2 CLOSED PASS; soak .254 = 1.9.59 MITM OFF; latest 1.9.63.
+Ler na ordem do START-HERE; ADR-0035 aceite; 20.36 PASS (soak alinhado a 1.9.63).
+Estado: P4 retry2 CLOSED PASS; soak .254 = 1.9.63 MITM OFF; latest 1.9.63.
 Tarefa seguinte: evoluir sem tecto; não ligar permanente; sem mutar .234/.235.
 ```
 
@@ -203,11 +204,11 @@ sh tests/harness/mitm-p4-soak/p4-validate-local.sh
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.35 PASS** — GUI política MITM; até desligar; publicado 1.9.63
-- Próximo: evoluir MITM/UX sem tecto; sem ligar .254
+- Passo actual: **20.36 PASS** — soak .254 alinhado a 1.9.63; MITM OFF
+- Próximo: evoluir MITM/UX sem tecto; sem ligar MITM no .254
 - Ambição: melhorar todos os dias, sem tecto; paridade NGFW no tempo
-- P4 retry2: CLOSED PASS; soak .254 = 1.9.59 MITM OFF
-- Latest publicado: **1.9.63**
+- P4 retry2: CLOSED PASS (histórico em 1.9.59)
+- Latest + soak: **1.9.63**
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.
@@ -235,6 +236,7 @@ Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documenta
 | Diagnóstico P4.2 `health_ssh_fail` | [`../09-blocking/diagnostico-p4-retry-health-ssh-fail-20260813.md`](../09-blocking/diagnostico-p4-retry-health-ssh-fail-20260813.md) |
 | Harness P4 soak | [`../../tests/harness/mitm-p4-soak/`](../../tests/harness/mitm-p4-soak/) |
 | Evidência P4 retry FAIL | [`../tests/evidence/20260813T170000Z-p4-retry-254/`](../tests/evidence/20260813T170000Z-p4-retry-254/) |
+| Evidência 20.36 soak align | [`../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/`](../tests/evidence/20260814T034904Z-20.36-soak-align-163-254/) |
 | Evidência P4 retry2 CLOSED PASS | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) |
 | Evidência pós-fail MITM OFF | [`../tests/evidence/20260813T223009Z-p4-postfail-verify-254/`](../tests/evidence/20260813T223009Z-p4-postfail-verify-254/) |
 | Escopo piloto (P1) | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) |

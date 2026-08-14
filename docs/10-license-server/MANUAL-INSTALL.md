@@ -255,8 +255,8 @@ MITM opera na GUI como política — «Manter ligada até eu desligar»
 retirados (ADR-0035). Copy de operador (sem paths internos). Default
 continua OFF; origem∧destino obrigatórios; break-glass e supervisor
 mantêm-se. **Não** promove enforce `1.9.8` nem MITM permanente.
-**Não** actualiza o soak P4 no `.254` (fica `1.9.59` MITM OFF).
-Rollback lab: **`1.9.62`**.
+Soak `.254` alinhado a **`1.9.63`** MITM OFF (20.36).
+Rollback lab: **`1.9.62`**. Rollback soak: **`1.9.59`**.
 **Canal `latest`:** `1.9.63` (publicado). Enforce **`1.9.8`**.
 
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.63`
@@ -1652,7 +1652,7 @@ Cada seccao abaixo inclui:
 > carimbado F1.2 (fail-closed). O comando unico manual permanece como
 > alternativa. **Canal lab/`latest`:** **`1.9.63`**. **Producao enforce:**
 > permanece **`1.9.8`** (GV7.4) ate GO de promocao. Soak `.254`
-> permanece **`1.9.59`** MITM OFF — este bloco **não** faz upgrade.
+> = **`1.9.63`** MITM OFF (20.36).
 
 **Comando unico oficial (`install.sh` — Command Prompt ou SSH):**
 
