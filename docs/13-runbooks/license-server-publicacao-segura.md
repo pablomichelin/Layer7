@@ -105,6 +105,28 @@ server {
 ```
 
 Se a borda for ISPConfig/Apache equivalente, o contrato e o mesmo.
+Mesmo que a borda ainda faça `$proxy_add_x_forwarded_for`, o origin
+**substitui** o header (secção 3). Endurecer a borda com
+`X-Forwarded-For $remote_addr` fica para GO de edge — não neste bloco.
+
+### 3. IP de confiança no origin (P1-2 / BG-128)
+
+O nginx **interno** do stack **substitui** `X-Forwarded-For` por
+`$remote_addr`. Não usa `$proxy_add_x_forwarded_for`: um cliente externo
+não escolhe o IP de rate-limit/lock administrativo.
+
+`getClientIp` no backend usa `req.ip` (`trust proxy: 1`) ou o socket —
+nunca o primeiro hop de XFF.
+
+**Topologia HEAD (F2.1):** edge TLS → `127.0.0.1:8445` → nginx interno →
+API. Com `ports:` Docker, `$remote_addr` no origin é o hop do publisher
+(tipicamente o gateway da bridge), não o IP público. Isso é o hop
+confiável. Recuperar o IP público no origin exige PROXY protocol ou
+caminho edge-only confirmado — **fora** deste bloco (P1-9 live
+`0.0.0.0` / `.253` não foi adivinhado).
+
+`X-Forwarded-Proto` continua no mapa `$layer7_forwarded_proto` (P2-3
+separado). Este runbook **não** autoriza deploy no `.244` (P0-1).
 
 ---
 

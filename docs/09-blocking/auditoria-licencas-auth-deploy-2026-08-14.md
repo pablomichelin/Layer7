@@ -26,9 +26,9 @@
 
 **P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244` enquanto o serving `30.11` live não estiver reconciliado **e** versionado no git (allowlist, sem snapshot). Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
-**P0-2, P1-1 e P1-3 FEITOS no git** (`2026-08-14`; sem deploy). P2-5
-(reset/lock no 2FA) ficou absorvido no P1-3. Próximo código com GO: **P1-2**
-(XFF / rate-limit IP). Não mistura 30.11, não toca `.244`.
+**P0-2, P1-1, P1-2 e P1-3 FEITOS no git** (`2026-08-14`; sem deploy). P2-5
+(reset/lock no 2FA) ficou absorvido no P1-3. Próximo código com GO: **P1-4**
+(bootstrap owner). Não mistura 30.11, não toca `.244`.
 
 ---
 
@@ -100,13 +100,38 @@ continua 404. **Não** deployado (P0-1).
 
 ### P1-2 — `X-Forwarded-For` cliente-controlado anula rate-limit / lock IP
 
+**FEITO no git** (`2026-08-14`). `getClientIp` deixa de ler o primeiro hop
+de `X-Forwarded-For` e usa `req.ip` (`trust proxy: 1`) ou o socket.
+O nginx de origin substitui `X-Forwarded-For` por `$remote_addr` em todos
+os `proxy_pass` (já não usa `$proxy_add_x_forwarded_for`). O mapa
+`X-Forwarded-Proto` **não** foi alterado (P2-3). Lock/reset TOTP já estava
+no P1-3. **Não** deployado (P0-1).
+
+**Topologia validada (HEAD, sem contactar hosts):**
+
+```text
+cliente → edge TLS → origin 127.0.0.1:8445 (compose default)
+       → nginx interno → Express trust proxy: 1
+```
+
+Com `ports:` Docker, `$remote_addr` no origin é o hop do publisher
+(tipicamente gateway da bridge), não o IP público. Substituir XFF por
+`$remote_addr` é seguro nas duas variantes documentadas (loopback HEAD e
+bind live `0.0.0.0` / edge `.253` da P1-9): o cliente deixa de escolher a
+chave. **Não** se adivinhou o IP do edge live nem se activou `real_ip` em
+RFC1918. Residual: a chave de rate-limit/lock IP no origin é o hop
+confiável, não o IP público; recuperar o IP público exige PROXY protocol
+ou caminho edge-only confirmado — fora deste bloco. P2-2 (CSRF) **não**
+foi este bloco.
+
 | Campo | Valor |
 |-------|--------|
-| **Evidência** | `session.js:91-98`; `admin-surface.js:239-254`, `305-317`, `353-357`; `nginx/nginx.conf:6-9`, `:45`, `:86`; `index.js:31`; `auth.js:171` (`/login/totp` só tem `loginIpLimiter`) |
+| **Evidência** | `session.js` `getClientIp`; `admin-surface.js` limiters/lock; `nginx/nginx.conf` `X-Forwarded-For $remote_addr`; `index.js` `trust proxy: 1` |
 | **Cenário** | Pedido ao origin com `X-Forwarded-For` falso. Nginx faz `$proxy_add_x_forwarded_for`. `getClientIp` usa o **primeiro** hop e ignora `X-Real-IP`. Em `/login/totp` não há lock de conta. |
 | **Impacto** | Rate-limit IP e lock IP tornam-se irrelevantes. Spray online do TOTP (`window=1` ⇒ 3 códigos / 30s). Encadeado com P0-2: takeover sem password. Lock de **conta** no password ainda funciona. |
 | **Correcção mínima** | IP de confiança = `req.ip` (`trust proxy: 1`) ou só `X-Real-IP`. Nginx: `proxy_set_header X-Forwarded-For $remote_addr;`. Em `/login/totp`: `registerLoginFailure` + lock por `admin_id`. |
-| **Testes** | XFF spoof vs IP real → mesma chave de limiter. 11.º TOTP no mesmo IP → 429. 6.ª falha TOTP na mesma conta → lock. |
+| **Implementado** | `getClientIp` = `req.ip` / socket; origin XFF = `$remote_addr`; testes `session-client-ip.test.js` + `nginx-xff-config.test.js`. Lock TOTP = P1-3. Sem Proto (P2-3). Sem `.244`. |
+| **Testes** | XFF spoof vs hop confiável → mesma chave. Nginx sem `$proxy_add_x_forwarded_for` nas directivas. Proto map intacto. Suite backend `166/166` PASS. |
 
 ### P1-3 — `/login/totp` não verifica `is_active`
 
@@ -207,7 +232,7 @@ residual P0-2 single-use/bind.
 | **P2-2** | `admin-surface.js:39-45`, `:188-196`; `index.js:47-48` | Sem `Origin` → `next()`; `/api/users` e `/api/search` fora de `isAdminApiPath` | CSRF clássico mitigado por SameSite=strict; defesa em profundidade inconsistente | Incluir users/search; state-changing fail-closed (`Origin` ou `Sec-Fetch-Site`) | `POST /api/users` com Origin evil → 403 |
 | **P2-3** | `nginx.conf:6-9`, `:47`; `session.js:372-374`; `index.js:31` | HTTP ao origin + `X-Forwarded-Proto: https` | `req.secure===true`; password/TOTP/Bearer em HTTP se bind ≠ loopback | Nginx: `X-Forwarded-Proto $scheme` | HTTP + header https → login 400 no origin HTTP |
 | **P2-4** | `admin-surface.js:267-295` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasa-se (read-then-write) | `failure_count = … + 1` atómico ou `FOR UPDATE` | 10 `registerLoginFailure` concorrentes → count=10 + lock |
-| **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual P1-2 = só XFF/rate-limit. |
+| **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual XFF = P1-2 **FEITO** no git. |
 | **P2-6** | `backend/Dockerfile`; `frontend/Dockerfile`; compose | Root; sem healthcheck; sem `.dockerignore`; `COPY . .` | RCE = root; `.env` no layer se estiver no contexto; API sobe antes do PG | `USER node`; `.dockerignore` (`.env`); `pg_isready` + `depends_on` healthy | `docker inspect` User ≠ root; build com `.env` no contexto → ausente na imagem |
 | **P2-7** | `license.c:1104-1115`, `:922-932` | `store_key` mantém `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar `features` / `features_set` | store_key(nova) → `features_set==0`; intersect só do `.lic` novo |
 | **P2-8** | `license.c:975-1007` vs clock-mark `:345-374` | `fopen(..., "w")` trunca; crash a meio | Estado vazio → check-in SKIP + offline morto; `.lic` intacto (fail-open comercial) | tmp + `fsync` + `rename`; escape JSON | Kill após fopen → ficheiro anterior sobrevive |
@@ -334,15 +359,26 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 1. **P0-1 (ops, já activo)** — freeze de deploy integral; inventário allowlist quando houver GO de reconciliação.
 2. **P1-1 FEITO no git** (`2026-08-14`) — SELECT de check-in + testes JS; **sem** deploy `.244`.
 3. **P0-2 FEITO no git** (`2026-08-14`) — fallback TOTP removido + arranque fail-closed; residual single-use/bind. **sem** deploy `.244`.
-4. **P1-3 + P2-5 FEITOS no git** (`2026-08-14`) — `is_active` + reset/lock no 2FA. **P1-2** restante = XFF / rate-limit IP. Exige restart API + GO. Sem `.244` neste bloco.
-5. **P1-4 + P2-1** — um único owner no bootstrap/boot.
-6. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
-7. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).
-8. **P2 / P3 restantes** — por severidade; P2-9 só com GO (muda frota antiga).
+4. **P1-3 + P2-5 FEITOS no git** (`2026-08-14`) — `is_active` + reset/lock no 2FA.
+5. **P1-2 FEITO no git** (`2026-08-14`) — XFF / rate-limit IP; origin substitui XFF; `getClientIp` = `req.ip`. **Não** deployado. Residual: IP público no origin (PROXY/P1-9); P2-3 Proto; P2-2 CSRF.
+6. **P1-4 + P2-1** — um único owner no bootstrap/boot.
+7. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
+8. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).
+9. **P2 / P3 restantes** — por severidade; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — P1-2 (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Cliente externo não escolhe o IP de rate-limit/lock admin via `X-Forwarded-For` |
+| Impacto | `getClientIp` + nginx de origin no git; sem Proto (P2-3); sem TOTP single-use; sem package/daemon/SPA; sem host/deploy |
+| Risco | Baixo (fail-closed no hop confiável). Residual: chave = hop do origin (não IP público); live `.244` sem overlay (P0-1); P2-2 CSRF aberto |
+| Teste | Suite backend `166/166` PASS (`session-client-ip` + `nginx-xff-config`); `nginx` local ausente — asserções de ficheiro cobrem a sintaxe do contrato |
+| Rollback | Reverter o commit; `getClientIp` volta ao primeiro hop de XFF e o origin volta a `$proxy_add_x_forwarded_for` |
 
 ## Objectivo / impacto / risco / teste / rollback deste registo documental
 

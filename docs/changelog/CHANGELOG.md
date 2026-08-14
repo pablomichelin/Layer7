@@ -6,6 +6,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P1-2 — XFF / rate-limit IP:** `getClientIp` deixa de usar o
+  primeiro hop de `X-Forwarded-For` (cliente) e passa a `req.ip`
+  (`trust proxy: 1`) ou ao socket. O nginx de origin substitui
+  `X-Forwarded-For` por `$remote_addr` (já não `$proxy_add_x_forwarded_for`).
+  `X-Forwarded-Proto` intacto (P2-3). Sem single-use TOTP, sem deploy
+  (P0-1 ACTIVO), sem package/daemon/SPA.
 - **BG-128 P1-3 — segundo factor TOTP:** `POST /api/auth/login/totp`
   recusa `is_active=false`; password OK com TOTP ligado deixa de resetar
   as guardas de login; falha TOTP incrementa o lock existente (email+IP)

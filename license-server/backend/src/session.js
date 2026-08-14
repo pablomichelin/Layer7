@@ -89,12 +89,21 @@ function getAdminAccessTokenCandidates(req) {
 }
 
 function getClientIp(req) {
-  const forwardedFor = req.headers['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor.trim()) {
-    return forwardedFor.split(',')[0].trim();
+  if (!req || typeof req !== 'object') {
+    return null;
   }
 
-  return req.ip || req.socket?.remoteAddress || null;
+  // P1-2 / BG-128: nunca usar o primeiro hop de X-Forwarded-For (cliente).
+  // req.ip respeita trust proxy: 1; o origin substitui XFF por $remote_addr.
+  const trusted = typeof req.ip === 'string' ? req.ip.trim() : '';
+  if (trusted) {
+    return trusted;
+  }
+
+  const socketIp = typeof req.socket?.remoteAddress === 'string'
+    ? req.socket.remoteAddress.trim()
+    : '';
+  return socketIp || null;
 }
 
 function buildSessionMetadata(row) {
