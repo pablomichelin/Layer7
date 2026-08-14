@@ -675,32 +675,49 @@ read_text_file_trim(const char *path, char *buf, size_t bufsz)
 }
 
 static int
+write_bytes_0600(const char *path, const void *buf, size_t len)
+{
+	FILE *out;
+
+	if (!path || !buf)
+		return -1;
+
+	out = fopen(path, "w");
+	if (!out)
+		return -1;
+
+	if (fwrite(buf, 1, len, out) != len) {
+		fclose(out);
+		(void)unlink(path);
+		return -1;
+	}
+	if (fchmod(fileno(out), 0600) != 0) {
+		fclose(out);
+		(void)unlink(path);
+		return -1;
+	}
+	if (fclose(out) != 0) {
+		(void)unlink(path);
+		return -1;
+	}
+	(void)chmod(path, 0600);
+	return 0;
+}
+
+static int
 promote_activate_body(void)
 {
 	char *raw;
 	size_t len;
-	FILE *out;
+	int rc;
 
 	raw = read_file_alloc(L7_ACTIVATE_BODY_TMP, &len);
 	if (!raw)
 		return -1;
 
-	out = fopen(L7_LIC_PATH, "w");
-	if (!out) {
-		free(raw);
-		return -1;
-	}
-
-	if (fwrite(raw, 1, len, out) != len) {
-		fclose(out);
-		free(raw);
-		(void)unlink(L7_LIC_PATH);
-		return -1;
-	}
-
-	fclose(out);
+	rc = write_bytes_0600(L7_LIC_PATH, raw, len);
 	free(raw);
-	return 0;
+	return rc;
 }
 
 int
@@ -982,38 +999,91 @@ checkin_load_state(struct l7_checkin_state *st)
 	return st->license_key[0] != '\0' ? 1 : 0;
 }
 
+static void
+json_escape_fprint(FILE *f, const char *s)
+{
+	if (!s)
+		return;
+	for (; *s; s++) {
+		unsigned char c = (unsigned char)*s;
+
+		if (c < 0x20)
+			continue;
+		if (c == '"' || c == '\\')
+			fputc('\\', f);
+		fputc((int)c, f);
+	}
+}
+
 static int
 checkin_save_state(const struct l7_checkin_state *st)
 {
+	const char *path;
+	const char *tmp;
+	char tmp_buf[1024];
 	FILE *f;
 
-	f = fopen(checkin_state_path(), "w");
+	if (!st)
+		return -1;
+
+	path = checkin_state_path();
+#ifdef L7_TEST_CHECKIN_STATE
+	{
+		const char *e = getenv("L7_CHECKIN_STATE_TMP");
+
+		if (e != NULL && e[0] != '\0')
+			tmp = e;
+		else {
+			if (snprintf(tmp_buf, sizeof(tmp_buf), "%s.tmp",
+			    path) >= (int)sizeof(tmp_buf))
+				return -1;
+			tmp = tmp_buf;
+		}
+	}
+#else
+	if (snprintf(tmp_buf, sizeof(tmp_buf), "%s.tmp", path) >=
+	    (int)sizeof(tmp_buf))
+		return -1;
+	tmp = tmp_buf;
+#endif
+
+	f = fopen(tmp, "w");
 	if (!f)
 		return -1;
 
-	fprintf(f,
-	    "{\n"
-	    "  \"license_key\": \"%s\",\n"
-	    "  \"last_check_in_ok\": %lld,\n"
-	    "  \"last_check_in_attempt\": %lld,\n"
-	    "  \"check_in_interval_hours\": %d,\n"
-	    "  \"max_offline_hours\": %d,\n"
-	    "  \"last_error\": \"%s\",\n"
-	    "  \"features\": \"%s\",\n"
-	    "  \"features_set\": %s\n"
-	    "}\n",
-	    st->license_key,
-	    (long long)st->last_check_in_ok,
-	    (long long)st->last_check_in_attempt,
-	    st->check_in_interval_hours,
-	    st->max_offline_hours,
-	    st->last_error,
-	    st->features,
+	fputs("{\n  \"license_key\": \"", f);
+	json_escape_fprint(f, st->license_key);
+	fprintf(f, "\",\n  \"last_check_in_ok\": %lld,\n",
+	    (long long)st->last_check_in_ok);
+	fprintf(f, "  \"last_check_in_attempt\": %lld,\n",
+	    (long long)st->last_check_in_attempt);
+	fprintf(f, "  \"check_in_interval_hours\": %d,\n",
+	    st->check_in_interval_hours);
+	fprintf(f, "  \"max_offline_hours\": %d,\n",
+	    st->max_offline_hours);
+	fputs("  \"last_error\": \"", f);
+	json_escape_fprint(f, st->last_error);
+	fputs("\",\n  \"features\": \"", f);
+	json_escape_fprint(f, st->features_set ? st->features : "");
+	fprintf(f, "\",\n  \"features_set\": %s\n}\n",
 	    st->features_set ? "true" : "false");
 
-
-	fclose(f);
-	(void)chmod(checkin_state_path(), 0600);
+	if (fflush(f) != 0) {
+		fclose(f);
+		(void)unlink(tmp);
+		return -1;
+	}
+	(void)fchmod(fileno(f), 0600);
+	if (fclose(f) != 0) {
+		(void)unlink(tmp);
+		return -1;
+	}
+	(void)chmod(tmp, 0600);
+	if (rename(tmp, path) != 0) {
+		(void)unlink(tmp);
+		return -1;
+	}
+	(void)chmod(path, 0600);
 	return 0;
 }
 
@@ -1122,6 +1192,8 @@ layer7_checkin_store_key(const char *key)
 	if (checkin_load_state(&st))
 		; /* keep intervals if file existed */
 	snprintf(st.license_key, sizeof(st.license_key), "%s", key);
+	st.features[0] = '\0';
+	st.features_set = 0;
 	return checkin_save_state(&st);
 }
 
@@ -1588,3 +1660,26 @@ layer7_checkin_get_status(struct l7_checkin_status *st)
 	}
 	return 0;
 }
+
+#ifdef L7_TEST_CHECKIN_STATE
+int
+layer7_test_checkin_save_error(const char *key, const char *last_error)
+{
+	struct l7_checkin_state st;
+
+	checkin_state_defaults(&st);
+	if (checkin_load_state(&st))
+		;
+	if (key && key[0] != '\0' && json_safe_string(key))
+		snprintf(st.license_key, sizeof(st.license_key), "%s", key);
+	if (last_error)
+		snprintf(st.last_error, sizeof(st.last_error), "%s", last_error);
+	return checkin_save_state(&st);
+}
+
+int
+layer7_test_write_bytes_0600(const char *path, const void *buf, size_t len)
+{
+	return write_bytes_0600(path, buf, len);
+}
+#endif

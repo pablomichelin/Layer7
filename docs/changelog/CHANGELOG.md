@@ -16,6 +16,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-128 P2-7 + P2-8 + P2-10 — persistência check-in / `.lic`:**
+  FEITO no git após gates deste bloco. `checkin_save_state`
+  passa a tmp + `chmod 0600` + `rename` com escape JSON; `store_key` zera
+  só `features`/`features_set`; `promote_activate_body` grava `.lic` 0600.
+  Sem P2-9/P2-11/P2-13, sem `PORTVERSION`, sem deploy (P0-1 ACTIVO).
 - **BG-128 governação estado vs commit:** SSOTs/checklist não dizem
   «FEITO no git» nem marcam `[x]` antes de gates PASS, revisão do diff,
   staging por paths e commit. Até lá o estado é «implementado, pendente

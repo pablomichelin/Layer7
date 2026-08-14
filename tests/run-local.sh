@@ -306,6 +306,22 @@ else
 	cat /tmp/test_checkin_config_enabled.cc.err
 	fail "test_checkin_config_enabled compile"
 fi
+step "Unit: check-in persist atomico + SKU + 0600 (P2-7/P2-8/P2-10)"
+if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d -DL7_TEST_CHECKIN_STATE \
+    -o /tmp/test_checkin_state_persist \
+    tests/functional/test_checkin_state_persist.c \
+    src/layer7d/license.c src/layer7d/features.c \
+    $CRYPTO_FLAGS \
+    2>/tmp/test_checkin_state_persist.cc.err; then
+	if /tmp/test_checkin_state_persist; then
+		pass "test_checkin_state_persist"
+	else
+		fail "test_checkin_state_persist runtime"
+	fi
+else
+	cat /tmp/test_checkin_state_persist.cc.err
+	fail "test_checkin_state_persist compile"
+fi
 if "$CC_BIN" -Wall -Wextra -O2 -I src/layer7d \
     -o /tmp/test_license_enforce_gate \
     tests/functional/test_license_enforce_gate.c \

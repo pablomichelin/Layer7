@@ -23,7 +23,8 @@
 > Snapshot/`.env`/SPA **fora do git**. **BG-128** aberto; **P0-2, P1-1, P1-2,
 > P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git
 > (`2026-08-14`; `c2b9fdb` + governação após gates; sem deploy /
-> `PORTVERSION`). Próximo código com GO = P2 restantes (exceto P2-9 sem GO).
+> `PORTVERSION`). **P2-7+P2-8+P2-10 FEITOS** no git (`2026-08-14`; sem deploy).
+> Próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10).
 > **Proibido neste ciclo:** MITM · enfraquecer segurança · falsear · apagar
 > dados · reset/rebase/stash · reabrir engenharia · rsync/rebuild integral HEAD.
 > **Honestidade:** root **pode** contornar verificação local (RR-5 / R-A).
@@ -40,8 +41,8 @@ docs/00-overview/START-HERE-antipirataria.md
 2. **Não** reabrir AP0–AP4. O GO `2026-08-14` autoriza evidência de campo.
    **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 +
    P2-12 FEITOS** no git (`c2b9fdb` + governação após gates). Código
-   seguinte com GO = P2 restantes (exceto P2-9 sem GO; BG-128), sem
-   `.244` neste bloco.
+   seguinte com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10;
+   BG-128), sem `.244` neste bloco. **P2-7+P2-8+P2-10 FEITOS** no git.
 3. **P0-1 ACTIVO:** proibido deploy integral do HEAD. Serving versionado;
    freeze **não** encerrado. Snapshot/`.env` **fora do git**.
 4. Residuais campo: ciclo **BG-127**; parecer EULA externo (GA6.7); RR-3 tags.
@@ -74,7 +75,7 @@ docs/00-overview/START-HERE-antipirataria.md
 | lab/`latest` | **`1.9.63`** |
 | Baseline enforce | **`1.9.8`** |
 | Freeze deploy | **P0-1 ACTIVO** — serving `30.11` versionado no git; sem rsync/rebuild integral HEAD→`.244` |
-| Próxima acção código | P2 restantes (exceto P2-9 sem GO). **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git (`c2b9fdb` + governação após gates; sem deploy / `PORTVERSION`) |
+| Próxima acção código | P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10). **P2-7+P2-8+P2-10 FEITOS** no git. **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12 FEITOS** no git (`c2b9fdb` + governação após gates; sem deploy / `PORTVERSION`) |
 | Residual campo BG-127 | GA2.6 enforce / GA4.8 só com janela própria que não arrisque tráfego |
 
 ---
@@ -88,7 +89,7 @@ ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
 - Gates campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
-- Auditoria 2026-08-14: P0-1 ACTIVO (serving 30.11 versionado; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git (c2b9fdb + governação após gates); próximo código com GO = P2 restantes (exceto P2-9 sem GO)
+- Auditoria 2026-08-14: P0-1 ACTIVO (serving 30.11 versionado; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist 30.11 e P1-5…P1-8 + P2-12 FEITOS no git (c2b9fdb + governação após gates); P2-7+P2-8+P2-10 FEITOS no git; próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10)
 - GA6.7: parecer EULA externo (fora do BG-127)
 - .254 vivo: 1.9.63 mode=monitor MITM OFF (20260814T034904Z-20.36-soak-align-163-254)
 - Histórico e2e: .254=1.9.54 (20260811T114320Z)

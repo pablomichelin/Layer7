@@ -130,4 +130,13 @@ int layer7_checkin_validate_payload_test(const char *payload,
     char *status_out, size_t status_sz);
 #endif
 
+#ifdef L7_TEST_CHECKIN_STATE
+/*
+ * Harness P2-7/P2-8/P2-10: persistência atómica + escape + promote 0600.
+ * Não entra no binário do port (flag ausente do Makefile).
+ */
+int layer7_test_checkin_save_error(const char *key, const char *last_error);
+int layer7_test_write_bytes_0600(const char *path, const void *buf, size_t len);
+#endif
+
 #endif /* LAYER7_LICENSE_H */

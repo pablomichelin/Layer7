@@ -478,4 +478,5 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] **BG-128 P1-4 + P2-1** — lock no `init`; primeiro admin já owner; promoção legado `LIMIT 1`; alerta se vários owners (`2026-08-14`; sem deploy)
 - [x] **BG-128 allowlist `30.11`** — 7 paths versionados no git (`2026-08-14`; sem deploy; P0-1 **não** encerrado)
 - [x] **BG-128 P1-5…P1-8 + P2-12** — FEITO no git após gates (`c2b9fdb` + governação neste commit) — enforce recusa check-in ON sem chave; upgrade/keep-config preserva json/`.lic`/CA/secrets/check-in; deinstall real limpa `/var/db` + anti-DoH (`2026-08-14`; sem deploy / `PORTVERSION`)
-- [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem `.244` neste bloco)
+- [x] **BG-128 P2-7+P2-8+P2-10** — FEITO no git após gates (`2026-08-14`) — save atómico check-in + SKU + `.lic` 0600; sem deploy / `PORTVERSION`
+- [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo código com GO = P2 restantes (exceto P2-9 sem GO; sem P2-7/8/10; sem `.244` neste bloco)

@@ -54,6 +54,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 | `tests/functional/test_policy_decide.c` | E1/E5/BG-056 | decisão, escopo, app/host=`pdst`, quarentena=`psrc`, allow preserva índice |
 | `tests/functional/test_enforce_scoped.c` | E3/BG-056 | runtime PF (`pdst_N` / `psrc_N` / `pallow_N`), exception block e cache TTL |
 | `tests/unit/test_sinkhole_local_guard.sh` | BG-105 | destino local do portal/sinkhole é filtrado antes da decisão; DNS bloqueado mantém auditoria `outcome=sinkhole` |
+| `tests/functional/test_checkin_state_persist.c` | BG-128 P2-7/P2-8/P2-10 | save atómico check-in, escape JSON, falha tmp, troca SKU, `.lic` 0600 |
 | `tests/functional/test_bl_src_match.c` | pós-REV-007 | `except_ips` em `l7_bl_rule_matches_src()` |
 | `tests/functional/test_scoped_pf_inc.php` | E2/E4/BG-056 | regras PF scoped, quarentena, allow por tag sem `pass quick` e flush |
 | `tests/functional/test_interface_normalization.php` | BG-053 | `lan`/`optN` → interface real em todos os consumidores |

@@ -29,9 +29,10 @@
 **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1, allowlist `30.11` e P1-5…P1-8 + P2-12
 FEITOS no git** (`2026-08-14`; `c2b9fdb` + governação após gates; sem
 deploy). P2-5 ficou absorvido no P1-3.
+**P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`; sem deploy / `PORTVERSION`).
 **P0-1 permanece ACTIVO** — versionar ≠ publicar. Sem `.244` / rebuild /
 GitHub Release / `PORTVERSION`. Próximo código com GO: P2 restantes
-(exceto P2-9 sem GO).
+(exceto P2-9 sem GO; sem P2-7/8/10).
 
 ---
 
@@ -261,10 +262,10 @@ só corre se `PKG_UPGRADE` estiver vazio e não houver keep. Manual e
 | **P2-4** | `admin-surface.js:267-295` | N falhas paralelas no mesmo email | Lock (5/15 min) atrasa-se (read-then-write) | `failure_count = … + 1` atómico ou `FOR UPDATE` | 10 `registerLoginFailure` concorrentes → count=10 + lock |
 | **P2-5 FEITO no git** (`2026-08-14`; absorvido no P1-3) | `auth.js` + `auth-totp-login.js` | Password OK em `/login` chamava `resetLoginProtection` **antes** do TOTP | 2FA não herdava lockout; agrava P1-2 | Reset só após TOTP OK; falhas TOTP incrementam o guard | Quase locked + password OK + TOTP falho → lock mantém-se. **Não** deployado. Residual XFF = P1-2 **FEITO** no git. |
 | **P2-6** | `backend/Dockerfile`; `frontend/Dockerfile`; compose | Root; sem healthcheck; sem `.dockerignore`; `COPY . .` | RCE = root; `.env` no layer se estiver no contexto; API sobe antes do PG | `USER node`; `.dockerignore` (`.env`); `pg_isready` + `depends_on` healthy | `docker inspect` User ≠ root; build com `.env` no contexto → ausente na imagem |
-| **P2-7** | `license.c:1104-1115`, `:922-932` | `store_key` mantém `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar `features` / `features_set` | store_key(nova) → `features_set==0`; intersect só do `.lic` novo |
-| **P2-8** | `license.c:975-1007` vs clock-mark `:345-374` | `fopen(..., "w")` trunca; crash a meio | Estado vazio → check-in SKIP + offline morto; `.lic` intacto (fail-open comercial) | tmp + `fsync` + `rename`; escape JSON | Kill após fopen → ficheiro anterior sobrevive |
+| **P2-7 FEITO no git** (`2026-08-14`) | `license.c` `layer7_checkin_store_key` | `store_key` mantinha `features` da licença anterior | Negação de SKU pago após replace no mesmo HW até check-in activo novo | Em `store_key`, limpar só `features` / `features_set` | store_key(nova) → `features_set==0`; intervalos preservados. **Não** deployado. |
+| **P2-8 FEITO no git** (`2026-08-14`) | `license.c` `checkin_save_state` vs clock-mark | `fopen(..., "w")` truncava; crash a meio | Após P1-5, estado vazio recusa enforce; `.lic` intacto | tmp + `chmod 0600` + `rename`; escape JSON | Falha de tmp preserva o ficheiro anterior; aspas/barra re-lidas. **Não** deployado. |
 | **P2-9** | `layer7.inc:2552-2593`; `pkg-install.in:43-44` | Upgrade de frota pré-30.14 | `load_or_default` **não** chama a migration; chave ausente ⇒ check-in OFF. Documentado (RR-1), residual comercial | Só com GO: migração opt-in ou injectar `true` | Já existe `test_check_in_default_30.14.php`; falta teste de install a **não** migrar |
-| **P2-10** | `license.c:678-703` | `--activate` grava `.lic` sem `chmod` | umask 022 → 0644; payload assinado legível localmente | `chmod 0600` / `fchmod` como no check-in | `stat` do `.lic` = 0600 |
+| **P2-10 FEITO no git** (`2026-08-14`) | `license.c` `promote_activate_body` / `write_bytes_0600` | `--activate` gravava `.lic` sem `chmod` | umask 022 → 0644; payload assinado legível localmente | `fchmod`/`chmod 0600` | `stat` do `.lic` = 0600. **Não** deployado. |
 | **P2-11** | `layer7.inc:6992-7035`, `7213-7234` | Drop de `.lic` só assinado (HW/expiry errados) | GUI Identity/MITM abre; daemon **não** arma enforce | `layer7_entitlements()` exigir HW + expiry | `.lic` HW errado / expiry passado → GUI locked, daemon `valid=0` |
 | **P2-12 FEITO no git** (`c2b9fdb`; governação após gates) | `pkg-deinstall.in` PRE | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL (não em `PKG_UPGRADE`) | Contrato no `test_pkg_deinstall_lifecycle.sh`. **Não** deployado. |
 | **P2-13** | `license.c:238-247`, `518-520`, `568-573` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | Fim do dia UTC / `tm_isdst=-1` | Relógio no dia D 12:00; hoje cai para grace |
@@ -391,11 +392,22 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 6. **P1-4 + P2-1 FEITOS no git** (`2026-08-14`) — lock no init; primeiro admin já owner; promoção `LIMIT 1`; alerta se `COUNT>1`. **sem** deploy `.244`.
 7. **Commit allowlist 30.11 FEITO no git** (`2026-08-14`) — **não** levanta P0-1. Sem snapshot/SPA/bind/`.env`/host.
 8. **P1-5…P1-8 + P2-12 FEITOS no git** (`c2b9fdb` + governação após gates) — package/daemon; **sem** deploy / `PORTVERSION`.
-9. **P2 / P3 restantes** — por severidade; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
+9. **P2-7+P2-8+P2-10 FEITOS no git** (`2026-08-14`) — daemon local; **sem** deploy / `PORTVERSION`.
+10. **P2 / P3 restantes** — por severidade; P2-11/P2-13 **não** neste bloco; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — P2-7+P2-8+P2-10 (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Persistência atómica do estado de check-in; limpar só o cache de features ao substituir a chave; gravar `.lic` com modo 0600 |
+| Impacto | Só `src/layer7d/license.c` / `license.h` + teste C + runner + docs canónicas. Sem P2-9/P2-11/P2-13, sem license server/SPA/compose, sem `PORTVERSION`/build/release/hosts |
+| Risco | Baixo. P1-5 e N3 intactos. `store_key` não mexe em intervalos. Residual: P2-11 (GUI) e P2-13 (expiry) fora deste bloco |
+| Teste | `test_checkin_state_persist` (sucesso, JSON, falha tmp, SKU, 0600) + `sh tests/run-local.sh` |
+| Rollback | Reverter o commit; o save volta a truncar no sítio, `store_key` herda features e o `.lic` volta ao umask |
 
 ## Governação — estado vs commit (`2026-08-14`)
 
