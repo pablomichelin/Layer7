@@ -4,20 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Added
-
-- **20.35 / `1.9.63` (candidato, sem publish):** MITM opera como política na
-  GUI — «Manter ligada até eu desligar» (`max_minutes=0`) além da janela
-  temporizada 1–240 min. Copy de operador (sem `mitm_effective` / rdr / ficha).
-  Default continua OFF; origem∧destino obrigatórios; break-glass e supervisor
-  mantêm-se. **Não** liga `.254`.
-
 ### Fixed
 
 - **CI smoke layer7d (Linux):** `src/layer7d/features.h` foi renomeado para
   `l7_features.h` para não tapar `<features.h>` da glibc (`-I src/layer7d`).
   O workflow falhava em todo o push com `__GLIBC_USE (…)` / `SSL` em cadeia.
   Sem mudança de comportamento do daemon; **sem** novo `PORTVERSION`.
+
+## [1.9.63] — 2026-08-14
+
+### Added
+
+- **20.35 / MITM como política:** a GUI passa a oferecer «Manter ligada até
+  eu desligar» (`max_minutes=0`) além da janela temporizada 1–240 min.
+  Copy de operador (sem `mitm_effective` / rdr / ficha). Default continua
+  OFF; origem∧destino obrigatórios; break-glass e supervisor mantêm-se.
+  Ficha/P5 retirados (ADR-0035). **Não** liga `.254`.
+  Publicado `v1.9.63` (`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`).
 
 ## [1.9.62] — 2026-08-13
 

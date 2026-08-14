@@ -1,4 +1,4 @@
-# START HERE — Identity + MITM Add-on 【20.35 PASS · candidato `1.9.63` · lab/`latest` `1.9.62`】
+# START HERE — Identity + MITM Add-on 【20.35 PASS · lab/`latest` `1.9.63`】
 
 > **GO produto** `2026-08-09` — [`GO-produto-20.10.md`](../09-blocking/GO-produto-20.10.md).  
 > **P3 PASS** (`1.9.47`) — janela `max_window`/`deadline_unix`, auto-disable, GUI, audit metadados.  
@@ -7,12 +7,13 @@
 > **P4 retry** `170000Z` **CLOSED FAIL** — `health_ssh_fail` sample=14; rollback no fecho incompleto.  
 > **P4.2** — diagnóstico + harness auth `-T` (`tests/harness/mitm-p4-soak/`); testes locais **PASS**.  
 > **P4 soak retry2** `224009Z` **CLOSED PASS** — 16/16 health tries=1; `rollback_clean=1`; MITM **OFF** (verify `02:54:33Z`).  
-> **Não** upgrade do soak para `1.9.62`.  
-> **`1.9.62`** — copy de operador MITM/Identity (lab/`latest`); **não** upgrade do soak.  
+> **Não** upgrade do soak para `1.9.63`.  
+> **`1.9.63`** — MITM como política (até desligar + copy); ADR-0035; lab/`latest`.  
+> **`1.9.62`** — copy de operador MITM/Identity.  
 > **`1.9.61`** — Lista VIP texto simples + DHCP.  
 > **`1.9.60`** — `entitle-ok` PATH absoluto (rc.d).  
-> **20.35 PASS** — MITM productizado na GUI (até desligar + copy operador); candidato **`1.9.63`** sem publish.  
-> **Ambição:** paridade NGFW no tempo — «não somos NGFW» = estado actual, **não** tecto.  
+> **20.35 PASS** — MITM productizado na GUI (até desligar + copy operador); publicado **`1.9.63`**.  
+> **Ambição:** melhorar todos os dias, sem tecto; paridade NGFW no tempo.  
 > **Gate C / GO teste** (`1.9.46`, `215442Z`) — default OFF; este bloco **não** liga permanente.  
 > Hardening **`1.9.42`+** — rdr exige `source_cidr`∧`dest_cidr` (proibido `from any`).  
 > **Sem** intercept permanente em `.254`/`.234`/`.235`. Squid rejeitado.  
@@ -60,19 +61,19 @@ docs/00-overview/START-HERE-identity-mitm.md
 
 | Campo | Valor |
 |-------|-------|
-| Plano | Identity **FECHADA**; MITM **GO produto**; P4 retry2 **CLOSED PASS**; **ADR-0035**; **20.35 PASS**; publicado **`1.9.62`**; candidato **`1.9.63`** |
-| Passo actual | **20.35 PASS** — GUI política MITM (até desligar); publish `1.9.63` pendente |
+| Plano | Identity **FECHADA**; MITM **GO produto**; P4 retry2 **CLOSED PASS**; **ADR-0035**; **20.35 PASS**; publicado **`1.9.63`** |
+| Passo actual | **20.35 PASS** — GUI política MITM (até desligar); lab/`latest` `1.9.63` |
 | Prontidão piloto | Ficha **já não é gate**. Operação = GUI + entitlement. Default OFF. Soak `.254` MITM **OFF**. — [`../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md`](../09-blocking/mapa-prontidao-mitm-piloto-2026-08-09.md) |
 | Escopo / runbook piloto | [`../09-blocking/GO-escopo-piloto-mitm-generico.md`](../09-blocking/GO-escopo-piloto-mitm-generico.md) · [`../09-blocking/runbook-piloto-mitm-generico.md`](../09-blocking/runbook-piloto-mitm-generico.md) |
 | P4.1 / retry | [`../09-blocking/runbook-p4-retry-supervisor-onbox.md`](../09-blocking/runbook-p4-retry-supervisor-onbox.md) |
 | Gate activação | **RETIRADO** (ADR-0035) — sem ficha-papel |
 | Gates obrigatórios | [`../09-blocking/gates-obrigatorios-1.9.43-mitm.md`](../09-blocking/gates-obrigatorios-1.9.43-mitm.md) — **B/C PASS** |
-| Próximo | Publish **`1.9.63`** quando o operador pedir; sem ligar `.254` neste passo |
+| Próximo | Evoluir MITM/UX sem tecto; sem ligar `.254` neste passo |
 | Evidência P4 retry2 | [`../tests/evidence/20260813T224009Z-p4-retry2-254/`](../tests/evidence/20260813T224009Z-p4-retry2-254/) — **CLOSED PASS** |
 | Evidência P4 | [`../tests/evidence/20260809T234042Z-p4-soak-254/`](../tests/evidence/20260809T234042Z-p4-soak-254/) — **CLOSED FAIL/ABORT** |
 | Evidência P4 retry | [`../tests/evidence/20260813T170000Z-p4-retry-254/`](../tests/evidence/20260813T170000Z-p4-retry-254/) — **CLOSED FAIL** |
 | Evidência pós-fail | [`../tests/evidence/20260813T223009Z-p4-postfail-verify-254/`](../tests/evidence/20260813T223009Z-p4-postfail-verify-254/) — MITM **OFF** (pré-retry2) |
-| Rev. do plano | **`2026-08-14be`** |
+| Rev. do plano | **`2026-08-14bf`** |
 | MITM | `intercept_ready=true`; rdr só com source∧dest; GI2/GI3 **PASS**; S6 **NA/limite** |
 | Identity (User-ID) | Mapa no **daemon**; RADIUS + agente DC; sem captive (ADR-0027) — **FECHADA** (20.33/GI9) |
 | Exactidão MVP | User-ID de **rede** (ADR-0029: sem agente PC; TS excluído) |
@@ -157,9 +158,9 @@ Runbook P4.1: docs/09-blocking/runbook-p4-retry-supervisor-onbox.md
 Runbook activação: docs/09-blocking/runbook-activacao-mitm-producao-1.9.46.md
 Desenho: docs/01-architecture/desenho-layer7-tlsproxy-mitm.md
 Contrato IPC: docs/01-architecture/contrato-ipc-layer7-tlsproxy-20.9.md
-Ler na ordem do START-HERE; ADR-0035 aceite; 20.35 PASS (GUI até desligar); candidato 1.9.63 sem publish.
-Estado: P4 retry2 CLOSED PASS; soak .254 = 1.9.59 MITM OFF; latest 1.9.62.
-Tarefa seguinte: publish 1.9.63 só com GO; não ligar permanente; sem mutar .234/.235.
+Ler na ordem do START-HERE; ADR-0035 aceite; 20.35 PASS (GUI até desligar); publicado 1.9.63.
+Estado: P4 retry2 CLOSED PASS; soak .254 = 1.9.59 MITM OFF; latest 1.9.63.
+Tarefa seguinte: evoluir sem tecto; não ligar permanente; sem mutar .234/.235.
 ```
 
 
@@ -202,11 +203,11 @@ sh tests/harness/mitm-p4-soak/p4-validate-local.sh
 
 ```text
 TRILHA IDENTITY + MITM — progresso
-- Passo actual: **20.35 PASS** — GUI política MITM; até desligar; candidato 1.9.63
-- Próximo: publish 1.9.63 com GO operador
-- Ambição: paridade NGFW no tempo (estado actual ≠ tecto)
+- Passo actual: **20.35 PASS** — GUI política MITM; até desligar; publicado 1.9.63
+- Próximo: evoluir MITM/UX sem tecto; sem ligar .254
+- Ambição: melhorar todos os dias, sem tecto; paridade NGFW no tempo
 - P4 retry2: CLOSED PASS; soak .254 = 1.9.59 MITM OFF
-- Latest publicado: **1.9.62**
+- Latest publicado: **1.9.63**
 ```
 
 Actualizar este bloco **e** o CORTEX **e** o plano §0 no mesmo commit documental de cada fecho de passo.

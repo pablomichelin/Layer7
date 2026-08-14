@@ -254,7 +254,7 @@ P1/P2 docs ........................ PASS (D1–D9 = princípios de produto, não
 P3 failsafe ....................... PASS (1.9.47)
 P4 soak retry2 .................... CLOSED PASS (224009Z)
 P5 / ficha ........................ RETIRADOS (ADR-0035)
-Próximo ........................... 20.35 PASS; publish 1.9.63 com GO
+Próximo ........................... evoluir MITM/UX sem tecto; sem ligar .254
 Ambição ........................... paridade NGFW no tempo (estado actual ≠ tecto)
 Default ........................... OFF (este mapa não liga .254)
 ```
@@ -282,7 +282,7 @@ Default ........................... OFF (este mapa não liga .254)
 | 2026-08-09 | P1+P2 reflectidos — D1–D9 |
 | 2026-08-09 | Gate activação externa ≠ lacuna eng.; critérios aceite P3.1–P3.8 fechados |
 | 2026-08-09 | **P3 PASS** — `1.9.47` janela/deadline/audit/GUI; suite builder PASS |
-| 2026-08-14 | **20.35 PASS** — GUI até desligar; copy operador; candidato `1.9.63` |
+| 2026-08-14 | **20.35 PASS** — GUI até desligar; copy operador; publicado `1.9.63` |
 | 2026-08-14 | **ADR-0035** — ficha/P5 RETIRADOS; ambição paridade NGFW; próximo 20.35 |
 | 2026-08-14 | **P4 soak retry2 CLOSED PASS** — `224009Z`; 16/16 health; rollback_clean=1; MITM OFF `02:54:33Z`; Phase C NA |
 | 2026-08-13 | **P4 soak retry2 IN_PROGRESS** — `224009Z`; health_1 tries=1; deadline `2026-08-14T02:40:19Z` |

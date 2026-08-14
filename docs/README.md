@@ -26,7 +26,7 @@ Quando houver conflito, seguir esta ordem:
 |------|--------------------|-------|
 | Estado global do projecto | [`../CORTEX.md`](../CORTEX.md) | SSOT operacional, fase actual e checkpoint |
 | **Fecho consolidado (filas)** | [`00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md`](00-overview/ESTADO-PRODUTO-E-PLANOS-FECHADOS.md) | Congelamento P0–J + IPv6 + mapa + porta para planos novos |
-| **Identity + MITM Add-on** | [`00-overview/START-HERE-identity-mitm.md`](00-overview/START-HERE-identity-mitm.md) | **Arranque trilha ACTIVA** (Identity FECHADA; 20.35 PASS; candidato `1.9.63`; lab/`latest` `1.9.62`; soak MITM OFF) |
+| **Identity + MITM Add-on** | [`00-overview/START-HERE-identity-mitm.md`](00-overview/START-HERE-identity-mitm.md) | **Arranque trilha ACTIVA** (Identity FECHADA; 20.35 PASS; lab/`latest` `1.9.63`; soak MITM OFF) |
 | Uso desta arvore documental | [`README.md`](README.md) | indice oficial e ordem de leitura |
 | Fases aprovadas | [`02-roadmap/roadmap.md`](02-roadmap/roadmap.md) | roadmap F0-F7 com gates |
 | Priorizacao | [`02-roadmap/backlog.md`](02-roadmap/backlog.md) | backlog unico priorizado |

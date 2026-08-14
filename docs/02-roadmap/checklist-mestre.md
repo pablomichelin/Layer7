@@ -455,7 +455,7 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] P3 failsafe+visibilidade — **PASS** `1.9.47` (P3.1–P3.8; evid. `230400Z`)
 - [x] P4 soak lab retry2 — **CLOSED PASS** `224009Z` (16/16 health; rollback_clean=1; MITM OFF; Phase C NA). Histórico: P4 `234042Z` FAIL/ABORT; retry `170000Z` FAIL
 - [x] P5 / 20.34 — ficha **cancelada**; ADR-0035 aceite
-- [x] 20.35: productizar MITM na GUI (até desligar + copy operador); candidato `1.9.63`
+- [x] 20.35: productizar MITM na GUI (até desligar + copy operador); publicado `1.9.63`
 
 ### Anti-pirataria / Anti-tamper (AP0–AP4, passos `30.x`)
 
