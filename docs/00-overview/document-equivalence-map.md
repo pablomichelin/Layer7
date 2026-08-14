@@ -88,12 +88,13 @@ Ele existe para evitar tres erros comuns:
    `docs/00-overview/handoff-chat-novo.md` (procedimento, prompt modelo e
    verificacao opcional pos-clone), sem conflito com a hierarquia do CORTEX.
 5. **License-server HEAD vs live `.244` (`2026-08-14`):** o compose/nginx
-   HEAD descrevem o contrato F2.1 (`127.0.0.1:8445`, sem vhost `downloads`);
-   o live corre serving `30.11` + overlay `30.13`. Fonte canónica do gap e
-   do freeze: [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
+   HEAD descrevem o contrato F2.1 (`127.0.0.1:8445`) **e**, após o commit
+   allowlist, o vhost `downloads` + volume `CONTENT_BLACKLISTS_DIR`. O live
+   corre serving `30.11` + overlay `30.13` + bind de edge `0.0.0.0`. Fonte
+   canónica do gap restante e do freeze: [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
    + [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-   **Não** tratar o compose HEAD como descrição do live enquanto P0-1 estiver
-   activo. Worktree sujo `30.11` **não** é HEAD.
+   **Não** tratar o compose HEAD como descrição do live (bind / P0-2…P1-4)
+   enquanto P0-1 estiver activo. Snapshot/`.env` **não** são HEAD.
 
 ---
 

@@ -14,8 +14,10 @@ Este runbook complementa:
 - [`../10-license-server/MANUAL-USO-LICENCAS.md`](../10-license-server/MANUAL-USO-LICENCAS.md)
 
 **P0-1 ACTIVO (`2026-08-14`):** este runbook **não** autoriza rsync/rebuild
-integral do HEAD sobre `/opt/layer7-license`. O live corre serving `30.11`
-que o HEAD ainda não versiona. Freeze e critérios de levantamento:
+integral do HEAD sobre `/opt/layer7-license`. O serving `30.11` **já está
+versionado no git** (allowlist de 7 paths); o freeze **não** caiu — falta
+GO humano do primeiro rebuild `api` + smoke. Publicar **só** por overlay
+de paths (padrão `20260814T142739Z`). Freeze:
 [`bloqueio-deploy-integral-head-30.11.md`](bloqueio-deploy-integral-head-30.11.md).
 Auditoria: [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md).
 
@@ -127,6 +129,33 @@ caminho edge-only confirmado — **fora** deste bloco (P1-9 live
 
 `X-Forwarded-Proto` continua no mapa `$layer7_forwarded_proto` (P2-3
 separado). Este runbook **não** autoriza deploy no `.244` (P0-1).
+
+### 4. Deploy por allowlist de paths (nunca integral)
+
+É **proibido** `rsync` do tree `license-server/`, `docker compose`
+build/up a substituir compose/nginx live, ou playbook “deploy do main”.
+
+Caminho autorizado (já usado no overlay `30.13`):
+
+1. Extrair **só** os paths do GO a partir de `git archive`.
+2. Copiar esses ficheiros para `/opt/layer7-license` sem `--delete`.
+3. Rebuild **apenas** o serviço nomeado no GO (`api` ou `nginx`).
+4. **Não** `docker compose down -v`. **Não** substituir `.env`.
+5. Bind live `0.0.0.0:8445` (P1-9 / edge `.253`) **não** é o default
+   do repo (`127.0.0.1`). Não gravar o bind live no git.
+6. SPA/`web` HEAD `2.1.0` ≠ live `2.0.0` — fora de qualquer sync sem
+   GO de portal.
+7. Snapshot UT1 (`content/blacklists/ut1/current/*` excepto `.gitkeep`)
+   **não** vai no git; vive só em disco no host.
+
+### 5. Vhost `downloads` no origin
+
+O nginx interno do repo passa a ter `server_name downloads.systemup.inf.br`
+a proxiar `/layer7/` e `/api/health` para a API, com
+`X-Forwarded-For $remote_addr` (P1-2). Sem SPA neste vhost. GET sem
+token = 401 (auth na API). O live **já** tem este vhost; versioná-lo
+**não** exige mudança no host. Substituir o nginx live pelo do HEAD
+é deploy P1-2 (XFF) — **proibido** sem GO.
 
 ---
 

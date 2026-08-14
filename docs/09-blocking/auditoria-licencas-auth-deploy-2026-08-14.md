@@ -18,17 +18,18 @@
 | Bypass de assinatura Ed25519 / replay de envelope / escalada de features via check-in | **Sem achado** (evidência na secção *Áreas sem achado*) |
 | Dual-mode 30.13 no HEAD e no overlay live | **Alinhado** (smoke + GA5.9 campo PASS) |
 | Deploy **integral** do HEAD sobre `/opt/layer7-license` | **NO-GO** — **P0-1** |
-| Serving autenticado `30.11` versionado no git | **NO-GO** — ausente do HEAD; presente no live e no worktree sujo |
+| Serving autenticado `30.11` versionado no git | **FEITO no git** (`2026-08-14`; 7 paths) — **P0-1 NÃO encerrado** |
 | Superfície admin (TOTP / rate-limit / bootstrap) | **P0-2 + P1** — não é bloqueio de deploy de conteúdo; é hardening da API |
 | Revogação autenticada quando a linha **não** está arquivada | **OK** (GA5.9 campo PASS) |
 | Revogação após replace/arquivo | **P1-1 FEITO no git** (`2026-08-14`) — check-in devolve 409 envelope `revoked`/`expired`; **não** deployado |
-| Worktree local `30.11` | **Preservar** — não commitar neste bloco |
+| Worktree local `30.11` | Allowlist de 7 paths **versionada**; snapshot/`.env`/SPA **fora do git** |
 
-**P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244` enquanto o serving `30.11` live não estiver reconciliado **e** versionado no git (allowlist, sem snapshot). Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
+**P0-1 é bloqueio operacional explícito:** é **proibido** rsync/rebuild/playbook integral do HEAD contra o `.244`. O serving `30.11` **já está versionado** (allowlist, sem snapshot); o freeze **não** caiu — falta GO do primeiro rebuild `api` + smoke. Um rebuild integral injectaria também P0-2…P1-4. Runbook: [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
 
-**P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS no git** (`2026-08-14`; sem
-deploy). P2-5 ficou absorvido no P1-3. Próximo código com GO: **P1-5**
-(package/daemon) ou commit allowlist `30.11`. Não mistura 30.11, não toca `.244`.
+**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS no git**
+(`2026-08-14`; sem deploy). P2-5 ficou absorvido no P1-3. **P0-1
+permanece ACTIVO** — versionar ≠ publicar. Próximo código com GO:
+**P1-5** (package/daemon). Sem `.244` / rebuild / GitHub Release.
 
 ---
 
@@ -49,20 +50,19 @@ deploy). P2-5 ficou absorvido no P1-3. Próximo código com GO: **P1-5**
 
 | Campo | Valor |
 |-------|--------|
-| **Estado** | **BLOQUEIO OPERACIONAL ACTIVO** |
-| **Evidência** | `docs/tests/evidence/20260814T142739Z-30.13-api-244/README.md:35-44`; `git show HEAD:license-server/backend/src/index.js` (termina rotas em `/api/users`, sem `content`); `git ls-files` **não** lista `content-auth.js` nem `routes/content.js`; HEAD `docker-compose.yml` sem `CONTENT_BLACKLISTS_DIR`; HEAD `nginx/nginx.conf` sem `downloads.systemup.inf.br` / `location /layer7/` |
-| **Cenário** | `rsync` / `docker compose` rebuild / playbook genérico do clone HEAD sobre `/opt/layer7-license`. Também: `rsync --delete`; substituir compose/nginx live pelo HEAD; `git add -A` do worktree (tarball ~31 MB + risco de `.env`). |
-| **Impacto** | Primary autenticado de blacklists cai. Clientes `1.9.54+` com token falham o GET current; o espelho GitHub já está `asset_count=0` (último recheck `20260812T013145Z`). Actualização de conteúdo parte. `rsync --delete` pode ainda apagar snapshot e `.env` (crash-loop histórico). |
-| **Correcção mínima** | 1) Inventário allowlist (docs + cksum, sem rsync). 2) Commit **só** serving `30.11` (index/content-auth/content.js + volume compose + bloco nginx `downloads` + `.gitignore` do snapshot). **Excluir** `.env`, tarball/manifest/sig/pem, SPA live, bind `0.0.0.0`, vhost `.253`. 3) Gate de deploy: nunca sync integral; overlay por paths. |
-| **Testes** | Cksum allowlist vs evidência `20260812T002500Z` / imagem live; `npm test` content-auth + check-in; smoke **só com GO**: health license+downloads; GET sem token = 401; com token = 200 no host que já tem o ficheiro; check-in com e sem nonce. **Não** repetir GA5.9 sem GO. |
-| **Até lá** | Proibido deploy integral do HEAD. Overlay `30.13` (já feito) permanece o único padrão autorizado. Worktree sujo **não** se commita neste bloco. |
+| **Estado** | **BLOQUEIO OPERACIONAL ACTIVO** — serving versionado no git; **não** encerrado |
+| **Evidência** | Inventário read-only `2026-08-14T15:31:37Z`; hashes dos 7 paths no runbook de freeze. Histórico pré-commit: evidência `20260814T142739Z`; HEAD sem `content-auth.js` / `routes/content.js` / volume / vhost `downloads`. |
+| **Cenário** | `rsync` / `docker compose` rebuild / playbook genérico do clone HEAD sobre `/opt/layer7-license`. Também: `rsync --delete`; substituir compose/nginx live pelo HEAD; `git add -A` (tarball ~31 MB + risco de `.env`). |
+| **Impacto** | Primary autenticado de blacklists cai. Clientes `1.9.54+` com token falham o GET current; o espelho GitHub já está `asset_count=0` (último recheck `20260812T013145Z`). Actualização de conteúdo parte. `rsync --delete` pode ainda apagar snapshot e `.env` (crash-loop histórico). Rebuild integral injecta também P0-2…P1-4. |
+| **Correcção mínima** | 1) Inventário **FEITO**. 2) Commit allowlist **FEITO** (7 paths; sem `index.js` — mount já no HEAD). 3) Gate de deploy: nunca sync integral; overlay por paths. 4) GO humano + smoke **PENDENTE**. |
+| **Testes** | Hashes = inventário; `npm test` content + backend `173/173`; `git archive` resolve `routes/content`; `check-ignore` do snapshot. Smoke live **só com GO**. **Não** repetir GA5.9 sem GO. |
+| **Até lá** | Proibido deploy integral do HEAD. Overlay `30.13` permanece o único padrão autorizado. Snapshot/`.env` **não** entram no git. |
 
 Facetas do mesmo bloqueio (não são P0 independentes):
 
-- HEAD sem volume `CONTENT_BLACKLISTS_DIR` → contentor sem snapshot.
-- HEAD nginx sem vhost `downloads.systemup.inf.br`.
-- HEAD `.gitignore` **ainda não** ignora `content/blacklists/ut1/current/*` (só o worktree).
-- Bind compose HEAD = `127.0.0.1:8445`; live restaurou `0.0.0.0:8445` para o edge `.253` (**P1-9**).
+- Volume `CONTENT_BLACKLISTS_DIR` + vhost `downloads` + ignore do snapshot: **versionados** neste bloco.
+- Bind compose HEAD = `127.0.0.1:8445`; live restaurou `0.0.0.0:8445` para o edge `.253` (**P1-9**). **Não** versionar o bind live.
+- Rebuild integral HEAD→`.244` continua a injectar P0-2…P1-4 (live `index.js` ≠ HEAD).
 
 ### P0-2 — HMAC do desafio TOTP com fallback hardcoded
 
@@ -246,7 +246,7 @@ residual P0-2 single-use/bind.
 | **P2-12** | `pkg-deinstall.in:42-51` vs `layer7.inc:2843` | `pkg delete` | Overrides NXDOMAIN DoH ficam no Unbound | Chamar `layer7_remove_unbound_anti_doh()` no PRE-DEINSTALL | anti-DoH ON → delete → `configured() === false` |
 | **P2-13** | `license.c:238-247`, `518-520`, `568-573` | `expiry=YYYY-MM-DD` + `mktime` hora 0 | “Válido até D” acaba à meia-noite de D; `tm_isdst=0` pode desviar 1 h | Fim do dia UTC / `tm_isdst=-1` | Relógio no dia D 12:00; hoje cai para grace |
 | **P2-14** | `layer7_settings.php:156-157`; `install.sh:314` | Updater / `install.sh` forçam `.pkg` 15 em Plus/16 | Bypass ABI (BG-106, documentado) | Fora deste bloco (builder 16) | Gate operacional: recusar add se ABI ≠ salvo override |
-| **P2-15** | Worktree local vs MATCH `20260812T002500Z` | 30.11 não commitado continua a editar-se | Gap HEAD↔live cresce sem aparecer no `git log` | Inventário + commit allowlist (P0-1) | Cksum path-a-path vs evidência |
+| **P2-15 FEITO no git** (`2026-08-14`) | Worktree local vs MATCH `20260812T002500Z` | Serving allowlist versionado; snapshot continua só em disco | Gap de código 30.11 no git fechado; snapshot/`.env` continuam fora | Inventário + commit allowlist **FEITO**; P0-1 **não** encerrado | Hashes = inventário; `check-ignore` do tarball |
 | **P2-16** | Tag `layer7-license-api:pre-30.13-20260814T142739Z` | Rollback da imagem pré-30.13 | Reabre rejeição de `nonce` (GA5.9 FAIL); **mantém** 30.11 | Não usar essa tag salvo incidente 30.13; preferir overlay | Smoke nonce → não pode voltar a 400 |
 
 ---
@@ -352,7 +352,7 @@ Stale documental (não é bug de runtime): 30.12 §7 ainda diz default OFF; §8 
 
 ## Conflito documental formal
 
-O compose/nginx **HEAD** descrevem o contrato F2.1 (`127.0.0.1:8445`, sem vhost `downloads`). O live `.244` corre serving `30.11` + bind de edge. **Fonte canónica do gap:** evidência `20260814T142739Z-30.13-api-244` + este relatório + runbook de bloqueio. **Não** tratar o compose HEAD como descrição do live enquanto P0-1 estiver activo.
+O compose/nginx **HEAD** descrevem o contrato F2.1 (`127.0.0.1:8445`) **e**, após o commit allowlist, o vhost `downloads` + volume `CONTENT_BLACKLISTS_DIR`. O live `.244` corre serving `30.11` + overlay `30.13` + bind de edge `0.0.0.0`. **Fonte canónica do gap restante:** evidência `20260814T142739Z-30.13-api-244` + este relatório + runbook de bloqueio. **Não** tratar o compose HEAD como descrição do live (bind/P0-2…P1-4) enquanto P0-1 estiver activo.
 
 Registado também em [`../00-overview/document-equivalence-map.md`](../00-overview/document-equivalence-map.md) (conflito n.º 5).
 
@@ -360,19 +360,29 @@ Registado também em [`../00-overview/document-equivalence-map.md`](../00-overvi
 
 ## Fila de remediação (ordem; não implementar neste commit)
 
-1. **P0-1 (ops, já activo)** — freeze de deploy integral; inventário allowlist quando houver GO de reconciliação.
+1. **P0-1 (ops, ACTIVO)** — freeze de deploy integral **mantém-se**. Inventário + commit allowlist **FEITOS** no git (`2026-08-14`); **não** levanta o bloqueio. Falta GO do primeiro rebuild `api` + smoke.
 2. **P1-1 FEITO no git** (`2026-08-14`) — SELECT de check-in + testes JS; **sem** deploy `.244`.
 3. **P0-2 FEITO no git** (`2026-08-14`) — fallback TOTP removido + arranque fail-closed; residual single-use/bind. **sem** deploy `.244`.
 4. **P1-3 + P2-5 FEITOS no git** (`2026-08-14`) — `is_active` + reset/lock no 2FA.
 5. **P1-2 FEITO no git** (`2026-08-14`) — XFF / rate-limit IP; origin substitui XFF; `getClientIp` = `req.ip`. **Não** deployado. Residual: IP público no origin (PROXY/P1-9); P2-3 Proto; P2-2 CSRF.
 6. **P1-4 + P2-1 FEITOS no git** (`2026-08-14`) — lock no init; primeiro admin já owner; promoção `LIMIT 1`; alerta se `COUNT>1`. **sem** deploy `.244`.
-7. **Commit allowlist 30.11** — levanta P0-1; **depois** de P1-1 ou em chat próprio; sem snapshot/SPA/bind.
+7. **Commit allowlist 30.11 FEITO no git** (`2026-08-14`) — **não** levanta P0-1. Sem snapshot/SPA/bind/`.env`/host.
 8. **P1-5…P1-8** — package/daemon (revoke local, leftovers, keep-config, `PKG_UPGRADE`).
 9. **P2 / P3 restantes** — por severidade; P2-3 Proto e P2-2 CSRF ficam na fila; P2-9 só com GO.
 
 **Fora:** reabrir AP0–AP4; MITM permanente; deploy SPA `2.1.0`; GA4.11 reupload; contactar `.244`/`.254`/builder neste bloco.
 
 ---
+
+## Objectivo / impacto / risco / teste / rollback — allowlist `30.11` / P0-1 git (`2026-08-14`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Versionar no git o serving autenticado `30.11` (7 paths) para clone limpo resolver `routes/content` |
+| Impacto | Só allowlist + docs; sem `index.js`/auth/TOTP/SPA/package/daemon/`.env`/bind/snapshot; sem host |
+| Risco | Baixo no git. **P0-1 não encerrado** — rebuild integral continua proibido |
+| Teste | Hashes = inventário; backend `173/173`; `git archive`; `check-ignore`; diff compose/nginx exacto; scan de segredo |
+| Rollback | `git revert` do commit allowlist; live intocado |
 
 ## Objectivo / impacto / risco / teste / rollback — P1-4 + P2-1 (`2026-08-14`)
 

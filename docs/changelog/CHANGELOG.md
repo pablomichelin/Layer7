@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **BG-128 P0-1 git — serving `30.11` versionado:** allowlist de 7 paths
+  (`content-auth.js` + teste, `routes/content.js`, `.gitkeep`,
+  `CONTENT_BLACKLISTS_DIR` + volume `:ro`, vhost `downloads` sobre o nginx
+  HEAD com P1-2 `$remote_addr`, `.gitignore` do snapshot). Clone limpo
+  resolve `require('./routes/content')`. **P0-1 NÃO encerrado** — deploy
+  integral / rebuild / overlay no `.244` continua proibido. Sem
+  `index.js`/auth/TOTP/SPA/package/daemon/`.env`/bind/snapshot/host.
+
 ### Fixed
 
 - **BG-128 P1-4 + P2-1 — bootstrap owner:** `init` adquire

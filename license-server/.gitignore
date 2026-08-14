@@ -4,3 +4,8 @@ dist/
 build/
 *.log
 .DS_Store
+
+# Snapshot UT1 corrente (runtime/deploy) — GA4 / pré-30.11
+# Manter .gitkeep para preservar a árvore; nunca versionar o tarball.
+content/blacklists/ut1/current/*
+!content/blacklists/ut1/current/.gitkeep

@@ -1,7 +1,7 @@
 # Estado Actual — Portal Admin
 
 > Snapshot: **2026-08-14** — API live **`30.13`** (`20260814T142739Z`); SPA visual **`2.0.0`** intocada.
-> **P0-1 ACTIVO:** proibido deploy integral do HEAD enquanto `30.11` live não estiver versionado.
+> **P0-1 ACTIVO:** serving `30.11` versionado no git; **proibido** deploy integral do HEAD (freeze **não** encerrado).
 
 ## Ambiente
 

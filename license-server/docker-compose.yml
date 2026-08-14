@@ -29,8 +29,11 @@ services:
       JWT_SECRET: ${JWT_SECRET:-}
       ED25519_PRIVATE_KEY: ${ED25519_PRIVATE_KEY}
       ED25519_PRIVATE_KEY_FILE: ${ED25519_PRIVATE_KEY_FILE:-}
+      CONTENT_BLACKLISTS_DIR: /var/lib/layer7-content/blacklists/ut1/current
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3001
+    volumes:
+      - ./content/blacklists/ut1/current:/var/lib/layer7-content/blacklists/ut1/current:ro
     networks:
       - layer7-license-net
 

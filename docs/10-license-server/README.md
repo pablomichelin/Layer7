@@ -30,6 +30,7 @@ continuam SSOT operacional. A pasta `portal/` governa o **produto painel**
 | Deploy live | `192.168.100.244:/opt/layer7-license` |
 | URL pública | `https://license.systemup.inf.br` |
 | Origin privado | `127.0.0.1:8445` (via ISPConfig) |
+| Freeze P0-1 | **ACTIVO** — serving `30.11` no git; **proibido** deploy integral HEAD→`.244` |
 
 ## Versão do portal (visual / produto UI)
 

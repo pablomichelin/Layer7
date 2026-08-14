@@ -44,14 +44,14 @@ Não reabrir sem GO + backlog. MITM permanente **NO-GO**.
 
 Ciclo de **evidência operacional ABERTO:** **BG-127** (GO `2026-08-14`; GA2.6/2.7, GA3.7, GA4.8, GA5.9).
 
-**P0-1 ACTIVO** (`2026-08-14`): proibido deploy integral do HEAD sobre o `.244`
-enquanto o serving `30.11` live não estiver versionado — **BG-128**;
+**P0-1 ACTIVO** (`2026-08-14`): proibido deploy integral do HEAD sobre o `.244`.
+Serving `30.11` **versionado no git** (allowlist 7 paths); o freeze **não**
+encerrou — **BG-128**;
 relatório [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
 runbook [`../13-runbooks/bloqueio-deploy-integral-head-30.11.md`](../13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-**P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS** no git (`2026-08-14`; sem
-deploy; P2-5 absorvido no P1-3). Próximo código com GO: **P1-5**
-(package/daemon) ou commit allowlist `30.11`.
-**P0-1 ACTIVO** inalterado.
+**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git
+(`2026-08-14`; sem deploy; P2-5 absorvido no P1-3). Próximo código com GO:
+**P1-5** (package/daemon). **P0-1 ACTIVO** inalterado.
 
 Arranque: [`../00-overview/START-HERE-antipirataria.md`](../00-overview/START-HERE-antipirataria.md).
 

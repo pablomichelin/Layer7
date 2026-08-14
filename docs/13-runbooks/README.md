@@ -44,8 +44,8 @@ evidência [`../tests/evidence/20260812T011217Z-30.11-cut-mirror/`](../tests/evi
 Coms GA4.12 (histórico; gate **N/A** — não emitir):
 [`content-mirror-comms-ga4.12-draft.md`](content-mirror-comms-ga4.12-draft.md).
 
-**P0-1 ACTIVO** — proibido deploy integral do HEAD sobre o `.244` enquanto
-o serving `30.11` live não estiver versionado:
+**P0-1 ACTIVO** — proibido deploy integral do HEAD sobre o `.244`. Serving
+`30.11` versionado no git; freeze **não** encerrado:
 [`bloqueio-deploy-integral-head-30.11.md`](bloqueio-deploy-integral-head-30.11.md).
 Auditoria: [`../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md`](../09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md).
 

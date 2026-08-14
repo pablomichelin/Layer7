@@ -13,7 +13,7 @@ candidatos históricos — ver artefacto abaixo.
 
 ## Documentos
 
-- **[`auditoria-licencas-auth-deploy-2026-08-14.md`](auditoria-licencas-auth-deploy-2026-08-14.md)** — **SSOT auditoria `2026-08-14`:** P0–P3 licenças/auth/daemon/package/Docker; **P0-1 ACTIVO** (proibido deploy integral HEAD enquanto 30.11 live não estiver versionado); BG-128
+- **[`auditoria-licencas-auth-deploy-2026-08-14.md`](auditoria-licencas-auth-deploy-2026-08-14.md)** — **SSOT auditoria `2026-08-14`:** P0–P3 licenças/auth/daemon/package/Docker; **P0-1 ACTIVO** (serving `30.11` versionado no git; freeze **não** encerrado; proibido deploy integral HEAD); BG-128
 - **[`mapa-prontidao-mitm-piloto-2026-08-09.md`](mapa-prontidao-mitm-piloto-2026-08-09.md)** — **SSOT prontidão MITM piloto**: **NÃO PRONTO activar**; P1+P2+**P3 PASS** (`1.9.47`); ficha site = **gate activação** (≠ gap eng.)
 - **[`GO-escopo-piloto-mitm-generico.md`](GO-escopo-piloto-mitm-generico.md)** — P1: decisões D1–D9 + formulário site + norma de gate
 - **[`runbook-piloto-mitm-generico.md`](runbook-piloto-mitm-generico.md)** — P2: ops piloto (CA/GPO, metadados 30d, break-glass, auto-disable)

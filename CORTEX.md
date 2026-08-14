@@ -72,9 +72,9 @@ Anti-pirataria FECHADA** em **`30.19`** (`20260812T025741Z`; GA6.7–6.12 **PASS
 continuação `20260814T053905Z` GA2.7 PASS / GA5.9 FAIL campo;
 API `30.13` live `.244` `20260814T142739Z`; GA5.9 campo **PASS**
 `20260814T143406Z`; **P0-1 ACTIVO** — proibido deploy integral do HEAD
-enquanto `30.11` live não estiver versionado
+(serving `30.11` **versionado no git**; freeze **não** encerrado)
 ([auditoria `2026-08-14`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md));
-**BG-128** aberto; **P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS** no git `2026-08-14` sem deploy); fecho
+**BG-128** aberto; **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git `2026-08-14` sem deploy); fecho
 [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
 comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab actual: **`1.9.62`**;
@@ -820,17 +820,18 @@ Health público/origin `ok`. Tag rollback
 `layer7-license-api:pre-30.13-20260814T142739Z`.
 Portal visual git **`2.1.0`** (30.15) **sem** deploy SPA.
 Planos 003/004 CONCLUIDOS; sem plano `ACTIVO`.
-**P0-1 ACTIVO:** proibido deploy integral do HEAD (rsync/rebuild/playbook)
-enquanto o serving `30.11` live não estiver reconciliado/versionado —
+**P0-1 ACTIVO:** proibido deploy integral do HEAD (rsync/rebuild/playbook).
+Serving `30.11` **versionado no git** (7 paths; `2026-08-14`); o freeze
+**não** encerrado — falta GO do primeiro rebuild `api` + smoke.
 [`auditoria-licencas-auth-deploy-2026-08-14.md`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md)
 + [`bloqueio-deploy-integral-head-30.11.md`](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md).
-Worktree sujo `30.11` **preservar** (não `git add -A`). **BG-128** aberto;
-**P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS** no git (`2026-08-14`; TOTP HMAC fail-closed;
+Snapshot/`.env`/SPA **fora do git** (não `git add -A`). **BG-128** aberto;
+**P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git (`2026-08-14`; TOTP HMAC fail-closed;
 check-in arquivada → 409 `revoked`/`expired`; `/login/totp` recusa
 `is_active=false` + lock/reset no 2FA; origin substitui XFF / `getClientIp`
 usa `req.ip`; bootstrap `init` com lock + owner no INSERT; promoção legado
-`LIMIT 1` + alerta se vários owners; sem deploy). Próximo código com GO = **P1-5**
-(package/daemon) ou commit allowlist `30.11`.
+`LIMIT 1` + alerta se vários owners; serving content versionado; sem deploy).
+Próximo código com GO = **P1-5** (package/daemon).
 **não** reabrir MITM permanente (20.37). `.254` **não** tocado neste bloco.
 
 ---
@@ -1535,13 +1536,11 @@ PASS; legado sem nonce preservado). Evidência
 **Auditoria `2026-08-14` registada** (somente leitura; sem hosts):
 [`auditoria-licencas-auth-deploy-2026-08-14.md`](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md).
 **P0-1 ACTIVO** — bloqueio operacional contra deploy integral do HEAD
-enquanto `30.11` live não estiver versionado
+(serving `30.11` **versionado no git**; freeze **não** encerrado)
 ([runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md)).
-**BG-128** aberto (remediações P0–P3). **P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS** no git
-(`2026-08-14`; sem deploy). Próximo código com GO: **P1-5** (package/daemon)
-ou commit allowlist `30.11`.
-Worktree sujo
-`30.11` **não** commitado. **GA6.7** continua
+**BG-128** aberto (remediações P0–P3). **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git
+(`2026-08-14`; sem deploy). Próximo código com GO: **P1-5** (package/daemon).
+Snapshot/`.env`/SPA `30.11` **fora do git**. **GA6.7** continua
 parecer jurídico externo. **Não** reabre AP0–AP4 / código / MITM.
 **`30.9` FECHADO no repo e deployado live** (`20260811T110043Z`).
 **`30.8` FECHADO:** contrato
@@ -1641,12 +1640,13 @@ publicado em `v1.9.58`; evidência campo residual = **BG-127**; soak vivo
 - **Backlog:** BG-114…BG-123 **Concluido** (incl. BG-101/118); **BG-028 Fase 1 Concluido** (`v1.9.58`)
 - **Ordem:** `30.0`→…→**`30.19` FECHADO** — **engenharia FECHADA**
 - **Ciclo evidência:** **BG-127 ABERTO** (GO `2026-08-14`; PARTIAL `20260814T051611Z` + `20260814T053905Z`)
-- **Auditoria `2026-08-14` / freeze deploy:** **BG-128 ABERTO** — P0-1 ACTIVO;
-  **P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS** no git (`2026-08-14`; sem deploy)
+- **Auditoria `2026-08-14` / freeze deploy:** **BG-128 ABERTO** — P0-1 ACTIVO
+  (serving `30.11` versionado no git; **não** encerrado);
+  **P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist `30.11` FEITOS** no git (`2026-08-14`; sem deploy)
   ([relatório](docs/09-blocking/auditoria-licencas-auth-deploy-2026-08-14.md);
   [runbook](docs/13-runbooks/bloqueio-deploy-integral-head-30.11.md))
 - **GOs humanos remanescentes (fora da engenharia):** parecer EULA externo (GA6.7);
-  GO para levantar P0-1 (commit allowlist 30.11 + primeiro rebuild)
+  GO para levantar P0-1 (primeiro rebuild `api` + smoke)
 - **Não-regressão:** N1–N8 (plano §1) — N3/N4 críticos
 - **Fora de escopo:** ofuscação, packers, anti-debug, fail-closed por rede,
   kill-switch, CRL offline, telemetria; reabrir AP0–AP4; alterar MITM
@@ -1659,7 +1659,7 @@ TRILHA ANTI-PIRATARIA — ENGENHARIA FECHADA / EVIDÊNCIA OPERACIONAL ABERTA
 - Evidência fecho: 20260812T025741Z-30.19-fecho
 - Ciclo evidência: BG-127 ABERTO (GO 2026-08-14); PARTIAL 20260814T051611Z + 20260814T053905Z
 - Campo: GA2.6 PASS parcial (monitor); GA2.7 PASS; GA3.7 PASS; GA4.8 DEFERRED; GA5.9 PASS 20260814T143406Z
-- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4 e P2-1 FEITOS no git; próximo código com GO = P1-5 ou commit allowlist 30.11
+- Auditoria 2026-08-14: registada; P0-1 ACTIVO (proibido deploy integral HEAD; serving 30.11 versionado no git; freeze NÃO encerrado); BG-128 ABERTO; P0-2, P1-1, P1-2, P1-3, P1-4, P2-1 e allowlist 30.11 FEITOS no git; próximo código com GO = P1-5
 - GA6.7: parecer EULA externo (fora do BG-127)
 - ADRs 0030-0033: Aceito
 - BG-114…123/101 Concluido; BG-028 Fase 1 Concluido (`v1.9.58`)
