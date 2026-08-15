@@ -4,6 +4,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.65] — 2026-08-15
+
 ### Added
 
 - **BG-156 — cobertura contínua i18n EN:** novo gate
