@@ -35,8 +35,11 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.63` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.63`;
-`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`;
+`1.9.64` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.64`;
+`SHA256=692ab615b0a45f70958f2b866d339e44f833f7953aeec5f780ee0af9e5afeb5f`;
+correções BG-155; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
+herda MITM como política de `1.9.63`
+(`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`;
 **MITM como política** (até desligar + copy operador; ADR-0035);
 herda copy de operador `1.9.62`
 (`SHA256=b6700576afb47cf9790c4c3fddb746b3021d7070e260ef0e6551c712a7948e5f`);
@@ -128,11 +131,11 @@ documental**; colisão TZ/expiry já provada em P2-13/REV-030;
 **P2-9 AVALIADO** neste bloco `2026-08-14` — **BG-154**; opção A —
 cadeado + docs; upgrade **não** injecta `true` (contrato `30.14`);
 sem mudança de runtime;
-**BG-155 FEITO no git (`3762c3c`, `8b70bb9`, `f0cf615`, `2026-08-15`; assinatura/release pendentes):** check-in
+**BG-155 PUBLICADO `v1.9.64` (`3762c3c`, `8b70bb9`, `f0cf615`, `daff1bc`, `0785f26`, `2026-08-15`):** check-in
 serializado com revoke/replace/rebind; PF rejeita IPv6 com zone-id; imagens
 Docker passam a exigir lockfile + `npm ci`; gate TLS local recebe flags de
 OpenSSL fora do loader path; smoke compila também o gate de licença e o stage
-de release usa build não interativo. Candidato de pacote `1.9.64`; **P0-1 permanece
+de release usa build não interativo. **P0-1 permanece
 ACTIVO** — não implantar o servidor `.244` sem GO específico;
 fecho
 [`docs/01-architecture/fecho-trilha-antipirataria-30.19.md`](docs/01-architecture/fecho-trilha-antipirataria-30.19.md);
@@ -2117,7 +2120,7 @@ CHECKPOINT CANONICO
 - Manual público do produto: **docs/MANUAL-PRODUTO.md** (hub + guia operador; SSOT de navegação pública; comanda → MANUAL-INSTALL)
 - Próximo trabalho docs: manter MANUAL-PRODUTO alinhado a cada release; activação enforce/MITM só com novo GO
 - F6: H1–H5 FECHADA; higiene residual BG-112 auditoria PASS — plano docs/00-overview/f6-plano-higiene-estrutural-residual.md (gate G0–G7; exclusões §3); P4 FAIL/ABORT preservado
-- Pacote publicado (canal `latest`): **1.9.63**; soak `.254`: **1.9.63**; rollback lab: **1.9.62**; rollback soak: **1.9.59**
+- Pacote publicado (canal `latest`): **1.9.64**; soak `.254`: **1.9.63**; rollback lab: **1.9.63**; rollback soak: **1.9.59**
 - Fonte canonica instalacao (comandos): docs/10-license-server/MANUAL-INSTALL.md
 - Fonte canonica release: docs/06-releases/RELEASE-CHECKLIST.md
 ```
@@ -2127,10 +2130,10 @@ CHECKPOINT CANONICO
 
 ### Tecnico
 
-- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.63`**
-  publicado em `pablomichelin/Layer7` tag `v1.9.63`
-  (`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`).
-  Soak `.254`: **`1.9.63`** (20.36 MITM OFF). Rollback lab imediato: **`v1.9.62`**. Rollback soak: **`v1.9.59`**.
+- A referencia de **canal publico / lab (`latest`)** e o pacote **`1.9.64`**
+  publicado em `pablomichelin/Layer7` tag `v1.9.64`
+  (`SHA256=692ab615b0a45f70958f2b866d339e44f833f7953aeec5f780ee0af9e5afeb5f`).
+  Soak `.254`: **`1.9.63`** (20.36 MITM OFF). Rollback lab imediato: **`v1.9.63`**. Rollback soak: **`v1.9.59`**.
 - A referencia de **producao enforce** e **`1.9.8`** (GV7.4 PASS `2026-08-05`;
   evidência `20260805T150500Z-gv7.4-promocao-1.9.8`). Promoção **para além
   de `1.9.8`** permanece **PENDENTE** GO humano (não confundir com `latest`).

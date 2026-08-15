@@ -101,6 +101,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   Cadeado `origin-bind-p19.test.js`. Sem `PORTVERSION`, sem deploy
   (P0-1 ACTIVO).
 
+## [1.9.64] — 2026-08-15
+
 ### Fixed
 
 - **BG-155 / revisão de código 2026-08-15 — integridade de check-in, PF,
@@ -111,9 +113,9 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   lockfiles versionados e `npm ci`; o gate TLS aceita flags explícitas para
   OpenSSL fora do loader path padrão no macOS. O smoke volta a compilar o
   módulo do gate de licença, e o preparador de release usa build não
-  interativo. Candidato de pacote `1.9.64`, código **FEITO no git**
-  (`3762c3c`, `8b70bb9`, `f0cf615`); build FreeBSD e stage validados,
-  pendentes de assinatura e publicação. **P0-1 permanece ativo:** nenhum
+  interativo. Publicado `v1.9.64`
+  (`SHA256=692ab615b0a45f70958f2b866d339e44f833f7953aeec5f780ee0af9e5afeb5f`)
+  com manifesto Ed25519 validado. **P0-1 permanece ativo:** nenhum
   deploy do servidor `.244`.
 
 - **BG-128 P3-6 / BG-144 — gate de alinhamento da chave de produção:**
