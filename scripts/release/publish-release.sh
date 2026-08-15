@@ -41,7 +41,7 @@ require_cmd openssl
 
 TAG="v$VERSION"
 
-"$SCRIPT_DIR/verify-release.sh" --stage-dir "$STAGE_DIR"
+sh "$SCRIPT_DIR/verify-release.sh" --stage-dir "$STAGE_DIR"
 
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "execute dentro do repositorio git"
 
