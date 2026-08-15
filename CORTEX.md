@@ -143,6 +143,11 @@ comandos em `docs/10-license-server/MANUAL-INSTALL.md`).
 Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab actual: **`1.9.62`**;
 rollback soak: **`1.9.59`**. `1.9.54` = histórico e2e AP2 / rollback da era `30.x`,
 **não** o soak vivo (`.254` = `1.9.63`, 20.36).
+
+**BG-156 IMPLEMENTADO, pendente de gates/build/release (`1.9.65`):** cobertura
+EN completa de chaves literais GUI e descrições de perfis; página pública de
+bloqueio respeita `layer7.language`; regressão local `test_i18n_coverage.js`.
+Somente package/GUI — daemon, licença e servidor `.244` intactos.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

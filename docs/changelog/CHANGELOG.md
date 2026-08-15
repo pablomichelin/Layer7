@@ -6,6 +6,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Added
 
+- **BG-156 — cobertura contínua i18n EN:** novo gate
+  `tests/functional/test_i18n_coverage.js` verifica todas as chaves literais
+  `l7_t()` da GUI, descrições do catálogo de perfis e a página pública de
+  bloqueio no idioma escolhido.
+
 - **BG-128 P0-1 git — serving `30.11` versionado:** allowlist de 7 paths
   (`content-auth.js` + teste, `routes/content.js`, `.gitkeep`,
   `CONTENT_BLACKLISTS_DIR` + volume `:ro`, vhost `downloads` sobre o nginx
@@ -15,6 +20,12 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `index.js`/auth/TOTP/SPA/package/daemon/`.env`/bind/snapshot/host.
 
 ### Changed
+
+- **BG-156 — inglês completo no pacote:** completado o catálogo EN para
+  Allowlist, Blacklists, Diagnostics, Identity, MITM, remoção e mensagens de
+  validação; corrigidas traduções mistas. A página pública de bloqueio passa a
+  apresentar título, mensagem padrão, rótulos e idioma HTML em EN quando
+  `layer7.language=en`, preservando textos personalizados do operador.
 
 - **BG-128 P2-9 / BG-154 — upgrade não injecta check-in ON:**
   AVALIADO neste bloco (opção A — cadeado + docs). O GO `30.14` /

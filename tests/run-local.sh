@@ -548,6 +548,16 @@ else
 	fail "sh syntax ($N_FAIL erro(s) em $((N_OK + N_FAIL)) scripts)"
 fi
 
+step "Regress: cobertura i18n EN"
+NODE_BIN=$(command -v node 2>/dev/null || true)
+if [ -z "$NODE_BIN" ]; then
+	printf "SKIP: node nao instalado, saltando cobertura i18n EN\n"
+elif "$NODE_BIN" tests/functional/test_i18n_coverage.js; then
+	pass "test_i18n_coverage"
+else
+	fail "test_i18n_coverage"
+fi
+
 step "Resumo"
 if [ "$RC" -eq 0 ]; then
 	printf "ALL LOCAL TESTS PASSED\n"

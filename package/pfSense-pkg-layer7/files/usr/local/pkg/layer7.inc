@@ -9313,10 +9313,8 @@ function layer7_mitm_validate($mitm)
 			$why = layer7_mitm_intercept_list_forbidden_reason(
 			    isset($ic_raw[$k]) ? $ic_raw[$k] : array());
 			if ($why !== null) {
-				$errors[] = l7_t(
-				    "Scope MITM proibido em {$k}: any / 0.0.0.0/0 / IPv6 / " .
-				    "loopback / prefixo </8 — sem redirect generico nem expansao silenciosa."
-				);
+				$errors[] = sprintf(l7_t(
+				    "MITM scope prohibited in %s: any / 0.0.0.0/0 / IPv6 / loopback / prefixes shorter than /8 — no generic redirect or silent expansion."), $k);
 				break;
 			}
 		}
@@ -9325,11 +9323,8 @@ function layer7_mitm_validate($mitm)
 			$wm = (int)$mitm["window"]["max_minutes"];
 			if ($wm < L7_MITM_WINDOW_MAX_MINUTES_MIN ||
 			    $wm > L7_MITM_WINDOW_MAX_MINUTES_CAP) {
-				$errors[] = l7_t(
-				    "max_window (minutos) deve estar entre " .
-				    L7_MITM_WINDOW_MAX_MINUTES_MIN . " e " .
-				    L7_MITM_WINDOW_MAX_MINUTES_CAP . "."
-				);
+				$errors[] = sprintf(l7_t("max_window (minutes) must be between %d and %d."),
+				    L7_MITM_WINDOW_MAX_MINUTES_MIN, L7_MITM_WINDOW_MAX_MINUTES_CAP);
 			}
 		}
 	}

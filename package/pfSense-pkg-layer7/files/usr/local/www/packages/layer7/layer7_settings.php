@@ -417,7 +417,7 @@ if ($_POST["save"] ?? false) {
 		$input_errors[] = l7_t("IP portal da pagina de bloqueio invalido.");
 	}
 	if ($bp_title === "") {
-		$bp_title = "Acesso bloqueado";
+		$bp_title = l7_t("Acesso bloqueado");
 	}
 	if (strlen($bp_title) > 120) {
 		$bp_title = substr($bp_title, 0, 120);

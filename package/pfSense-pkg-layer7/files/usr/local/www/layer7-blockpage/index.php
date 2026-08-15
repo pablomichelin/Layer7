@@ -9,33 +9,56 @@ header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Pragma: no-cache');
 
 $cfg_path = '/usr/local/etc/layer7.json';
-$defaults = array(
+$language = 'pt';
+$pt_defaults = array(
 	'title' => 'Acesso bloqueado',
 	'message' => 'Este site ou servico foi bloqueado pela politica de rede do seu administrador.',
+	'host_label' => 'Endereco bloqueado',
+	'policy_label' => 'Politica',
+	'contact_label' => 'Contacto',
 	'contact' => '',
-	'show_host' => true,
-	'show_policy' => false,
+	'footer' => 'filtragem de rede gerida pelo administrador',
+	'html_lang' => 'pt',
 );
-
-$bp = $defaults;
+$en_defaults = array(
+	'title' => 'Access blocked',
+	'message' => 'This site or service was blocked by your administrator’s network policy.',
+	'host_label' => 'Blocked address',
+	'policy_label' => 'Policy',
+	'contact_label' => 'Contact',
+	'contact' => '',
+	'footer' => 'network filtering managed by the administrator',
+	'html_lang' => 'en',
+);
+$defaults = $pt_defaults;
+$configured = array();
 if (is_readable($cfg_path)) {
 	$raw = @file_get_contents($cfg_path);
 	$j = @json_decode($raw, true);
+	if (is_array($j) && isset($j['layer7']['language']) && $j['layer7']['language'] === 'en') {
+		$language = 'en';
+		$defaults = $en_defaults;
+	}
 	if (is_array($j) && isset($j['layer7']['block_page']) &&
 	    is_array($j['layer7']['block_page'])) {
-		$src = $j['layer7']['block_page'];
-		if (!empty($src['title'])) {
-			$bp['title'] = (string)$src['title'];
-		}
-		if (!empty($src['message'])) {
-			$bp['message'] = (string)$src['message'];
-		}
-		if (isset($src['contact'])) {
-			$bp['contact'] = trim((string)$src['contact']);
-		}
-		$bp['show_host'] = !isset($src['show_host']) || !empty($src['show_host']);
-		$bp['show_policy'] = !empty($src['show_policy']);
+		$configured = $j['layer7']['block_page'];
 	}
+}
+$bp = $defaults;
+if (!empty($configured)) {
+	/* Preserve custom copy. Old Portuguese defaults inherit the selected locale. */
+	foreach (array('title', 'message', 'contact') as $field) {
+		if (isset($configured[$field]) && $configured[$field] !== '' &&
+		    !($language === 'en' && isset($pt_defaults[$field]) &&
+		    $configured[$field] === $pt_defaults[$field])) {
+			$bp[$field] = (string)$configured[$field];
+		}
+	}
+	$bp['show_host'] = !isset($configured['show_host']) || !empty($configured['show_host']);
+	$bp['show_policy'] = !empty($configured['show_policy']);
+} else {
+	$bp['show_host'] = true;
+	$bp['show_policy'] = false;
 }
 
 $host = '';
@@ -61,7 +84,7 @@ function l7bp_h($s)
 }
 
 ?><!DOCTYPE html>
-<html lang="pt">
+<html lang="<?= l7bp_h($bp['html_lang']) ?>">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -158,24 +181,24 @@ function l7bp_h($s)
 		<p class="msg"><?= l7bp_h($bp['message']) ?></p>
 		<?php if ($bp['show_host'] && $host !== '') { ?>
 		<dl class="detail">
-			<dt>Endereco bloqueado</dt>
+			<dt><?= l7bp_h($bp['host_label']) ?></dt>
 			<dd><?= l7bp_h($host) ?></dd>
 		</dl>
 		<?php } ?>
 		<?php if ($bp['show_policy'] && $policy_name !== '') { ?>
 		<dl class="detail">
-			<dt>Politica</dt>
+			<dt><?= l7bp_h($bp['policy_label']) ?></dt>
 			<dd><?= l7bp_h($policy_name) ?></dd>
 		</dl>
 		<?php } ?>
 		<?php if ($bp['contact'] !== '') { ?>
 		<dl class="detail">
-			<dt>Contacto</dt>
+			<dt><?= l7bp_h($bp['contact_label']) ?></dt>
 			<dd><?= l7bp_h($bp['contact']) ?></dd>
 		</dl>
 		<?php } ?>
 		<div class="footer">
-			<strong>Layer7</strong> — filtragem de rede gerida pelo administrador
+			<strong>Layer7</strong> — <?= l7bp_h($bp['footer']) ?>
 		</div>
 	</div>
 </body>
