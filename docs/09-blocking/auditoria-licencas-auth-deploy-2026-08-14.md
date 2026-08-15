@@ -985,7 +985,7 @@ SSOTs e checklist **não** antecipam «FEITO no git». Código do bloco:
 | Objectivo | Fechar achados da revisão: resposta de check-in `active` concorrente a revoke; zone-id IPv6 inválido no PF; imagens Node não reproduzíveis; gates de smoke/release divergentes do build oficial. |
 | Impacto | `check-in` usa transação + `FOR UPDATE OF l`; `enforce.c` rejeita `%iface`; Docker usa lockfiles versionados + `npm ci`; Makefile/runner TLS recebem flags OpenSSL explícitas; smoke inclui `license_enforce_gate.c`; `deployz` usa `DISABLE_LICENSES=yes`. `PORTVERSION=1.9.64`. |
 | Risco | O lock reduz concorrência por licença durante assinatura/log; não muda contrato de sucesso/erro. O package carrega só a correção PF; as correções do servidor exigem deploy separado. **P0-1 não é encerrado.** |
-| Teste | Backend 258/258 PASS; frontend 59/59 PASS + build; regressão C de zone-id PASS; `git diff --check` PASS; builder FreeBSD: pubkey, port-files, smoke e `make package` PASS (SHA256 `33e6abb370ee52b70c0c5f711a78308544c4e562c1df86d12b429057abe589e4`). Código **FEITO no git** (`3762c3c`, `8b70bb9`, próximo commit). Assinatura e release pendentes. |
+| Teste | Backend 258/258 PASS; frontend 59/59 PASS + build; regressão C de zone-id PASS; `git diff --check` PASS; builder FreeBSD: pubkey, port-files, smoke e `make package` PASS. Stage oficial `1.9.64` criado, SHA256 `692ab615b0a45f70958f2b866d339e44f833f7953aeec5f780ee0af9e5afeb5f`. Código **FEITO no git** (`3762c3c`, `8b70bb9`, `f0cf615`). Assinatura e release pendentes. |
 | Rollback | Reverter o commit do bloco e permanecer em `1.9.63`; não executar deploy integral do servidor `.244`. |
 
 ## Objectivo / impacto / risco / teste / rollback deste registo documental

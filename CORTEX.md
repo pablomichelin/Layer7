@@ -128,7 +128,7 @@ documental**; colisão TZ/expiry já provada em P2-13/REV-030;
 **P2-9 AVALIADO** neste bloco `2026-08-14` — **BG-154**; opção A —
 cadeado + docs; upgrade **não** injecta `true` (contrato `30.14`);
 sem mudança de runtime;
-**BG-155 FEITO no git (`3762c3c`, `8b70bb9`, `2026-08-15`; build/release pendentes):** check-in
+**BG-155 FEITO no git (`3762c3c`, `8b70bb9`, `f0cf615`, `2026-08-15`; assinatura/release pendentes):** check-in
 serializado com revoke/replace/rebind; PF rejeita IPv6 com zone-id; imagens
 Docker passam a exigir lockfile + `npm ci`; gate TLS local recebe flags de
 OpenSSL fora do loader path; smoke compila também o gate de licença e o stage
