@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.69] — 2026-08-15
+
+### Fixed
+
+- **BG-160 — migrar defaults após upgrade:** a migração dos defaults da página
+  de bloqueio ocorre ao guardar Configurações no idioma selecionado, mesmo se
+  esse idioma já estava selecionado antes da atualização.
+
 ## [1.9.68] — 2026-08-15
 
 ### Fixed

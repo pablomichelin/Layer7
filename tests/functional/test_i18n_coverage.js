@@ -138,8 +138,8 @@ if (!localeHelper.includes("function layer7_t_for_language") ||
     !localeHelper.includes("function layer7_blockpage_default_texts")) {
     failures.set("Localized built-in block-page defaults", ["pkg/layer7.inc"]);
 }
-if (!settings.includes("Only migrate the package defaults on a language switch")) {
-    failures.set("Default block-page copy migration on language switch", ["www/packages/layer7/layer7_settings.php"]);
+if (!settings.includes("Apply the selected language only to recognized package defaults")) {
+	failures.set("Default block-page copy migration on settings save", ["www/packages/layer7/layer7_settings.php"]);
 }
 
 const blockPage = fs.readFileSync(path.join(local, "www/layer7-blockpage/index.php"), "utf8");
