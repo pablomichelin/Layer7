@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **BG-157 — opção Español:** o idioma espanhol passa a estar disponível na
+  configuração do serviço e na página pública de bloqueio. O catálogo espanhol
+  traduz a interface operacional e usa o catálogo EN como fallback seguro para
+  mensagens técnicas ainda não especializadas, sem retorno ao português.
+
 ## [1.9.65] — 2026-08-15
 
 ### Added

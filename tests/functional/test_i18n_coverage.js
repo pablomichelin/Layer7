@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-/* Ensures English users do not fall back to Portuguese GUI text. */
+/* Ensures supported locales cover GUI text and public block-page defaults. */
 const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "../..");
 const local = path.join(root, "package/pfSense-pkg-layer7/files/usr/local");
 const enFile = path.join(local, "etc/layer7/lang/en.php");
+const esFile = path.join(local, "etc/layer7/lang/es.php");
 
 function decodePhpDoubleQuoted(value) {
     return JSON.parse('"' + value.replace(/\n/g, "\\n") + '"');
@@ -46,8 +47,14 @@ for (const profile of (Array.isArray(profiles) ? profiles : profiles.profiles ||
     }
 }
 
+const spanish = fs.readFileSync(esFile, "utf8");
+if (!spanish.includes('include(__DIR__ . "/en.php")') ||
+    !spanish.includes('"Acesso bloqueado" => "Acceso bloqueado"')) {
+    missing.set("Spanish catalogue with English safe fallback", ["etc/layer7/lang/es.php"]);
+}
+
 const blockPage = fs.readFileSync(path.join(local, "www/layer7-blockpage/index.php"), "utf8");
-if (!blockPage.includes("$en_defaults") ||
+if (!blockPage.includes("$en_defaults") || !blockPage.includes("$es_defaults") ||
     !blockPage.includes("$bp['html_lang']") ||
     blockPage.includes('<html lang="pt">')) {
     missing.set("English-aware public block page", ["www/layer7-blockpage/index.php"]);
@@ -55,8 +62,8 @@ if (!blockPage.includes("$en_defaults") ||
 
 if (missing.size) {
     for (const [key, locations] of missing) {
-        console.error(`Missing EN translation: ${JSON.stringify(key)} (${locations.join(", ")})`);
+        console.error(`Missing locale coverage: ${JSON.stringify(key)} (${locations.join(", ")})`);
     }
     process.exit(1);
 }
-console.log(`PASS: i18n coverage (${strings.size} EN strings, ${guiFiles.length} GUI files)`);
+console.log(`PASS: i18n coverage (${strings.size} EN keys, ES safe fallback, ${guiFiles.length} GUI files)`);

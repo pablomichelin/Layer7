@@ -30,14 +30,29 @@ $en_defaults = array(
 	'footer' => 'network filtering managed by the administrator',
 	'html_lang' => 'en',
 );
+$es_defaults = array(
+	'title' => 'Acceso bloqueado',
+	'message' => 'Este sitio o servicio fue bloqueado por la política de red de su administrador.',
+	'host_label' => 'Dirección bloqueada',
+	'policy_label' => 'Política',
+	'contact_label' => 'Contacto',
+	'contact' => '',
+	'footer' => 'filtrado de red administrado por el administrador',
+	'html_lang' => 'es',
+);
 $defaults = $pt_defaults;
 $configured = array();
 if (is_readable($cfg_path)) {
 	$raw = @file_get_contents($cfg_path);
 	$j = @json_decode($raw, true);
-	if (is_array($j) && isset($j['layer7']['language']) && $j['layer7']['language'] === 'en') {
-		$language = 'en';
-		$defaults = $en_defaults;
+	if (is_array($j) && isset($j['layer7']['language'])) {
+		if ($j['layer7']['language'] === 'en') {
+			$language = 'en';
+			$defaults = $en_defaults;
+		} elseif ($j['layer7']['language'] === 'es') {
+			$language = 'es';
+			$defaults = $es_defaults;
+		}
 	}
 	if (is_array($j) && isset($j['layer7']['block_page']) &&
 	    is_array($j['layer7']['block_page'])) {
@@ -49,7 +64,7 @@ if (!empty($configured)) {
 	/* Preserve custom copy. Old Portuguese defaults inherit the selected locale. */
 	foreach (array('title', 'message', 'contact') as $field) {
 		if (isset($configured[$field]) && $configured[$field] !== '' &&
-		    !($language === 'en' && isset($pt_defaults[$field]) &&
+		    !($language !== 'pt' && isset($pt_defaults[$field]) &&
 		    $configured[$field] === $pt_defaults[$field])) {
 			$bp[$field] = (string)$configured[$field];
 		}

@@ -303,7 +303,7 @@ if ($_POST["save"] ?? false) {
 
 	$language = $is_general_save ? ($_POST["language"] ?? "pt") :
 	    (isset($current_l7["language"]) ? $current_l7["language"] : "pt");
-	if (!in_array($language, array("pt", "en"), true)) {
+	if (!in_array($language, array("pt", "en", "es"), true)) {
 		$language = "pt";
 	}
 
@@ -617,7 +617,7 @@ $bp_cfg = layer7_blockpage_config_get($data);
 $bp_portal_detected = layer7_blockpage_portal_ip($data);
 $bp_domain_info = layer7_blockpage_collect_domains($data);
 $cur_lang = isset($L["language"]) ? $L["language"] : "pt";
-if (!in_array($cur_lang, array("pt", "en"), true)) {
+if (!in_array($cur_lang, array("pt", "en", "es"), true)) {
 	$cur_lang = "pt";
 }
 
@@ -661,6 +661,7 @@ layer7_render_styles();
 							<select name="language" class="form-control" style="max-width: 260px;">
 								<option value="pt" <?= $cur_lang === "pt" ? 'selected="selected"' : ""; ?>>Portugues</option>
 								<option value="en" <?= $cur_lang === "en" ? 'selected="selected"' : ""; ?>>English</option>
+								<option value="es" <?= $cur_lang === "es" ? 'selected="selected"' : ""; ?>>Español</option>
 							</select>
 						</div>
 					</div>

@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.65
+PORTVERSION=	1.9.66
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -217,6 +217,8 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/layer7/blacklists
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/layer7/lang
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/lang/en.php \
+		${STAGEDIR}${PREFIX}/etc/layer7/lang
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/lang/es.php \
 		${STAGEDIR}${PREFIX}/etc/layer7/lang
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/etc/layer7/lang/pt.php \
 		${STAGEDIR}${PREFIX}/etc/layer7/lang

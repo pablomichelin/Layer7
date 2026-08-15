@@ -12,7 +12,7 @@ require_once(__DIR__ . "/layer7-fa47-icons.inc");
 /**
  * Translation helper. Returns the translated string for the current language.
  * Keys are the original Portuguese strings. When lang=pt, returns the key as-is.
- * When lang=en (or other), looks up the translation file.
+ * When lang=en/es, looks up the translation file.
  */
 function l7_t($key)
 {
@@ -47,7 +47,7 @@ function layer7_get_language()
 		$j = @json_decode($raw, true);
 		if (is_array($j) && isset($j["layer7"]["language"])) {
 			$l = $j["layer7"]["language"];
-			if ($l === "en" || $l === "pt") {
+			if ($l === "en" || $l === "es" || $l === "pt") {
 				return $l;
 			}
 		}
