@@ -109,9 +109,11 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   revoke/replace/rebind. A validação PF rejeita IPv6 com zone-id em vez de
   passar um membro inválido ao `pfctl`. As imagens Docker passam a usar
   lockfiles versionados e `npm ci`; o gate TLS aceita flags explícitas para
-  OpenSSL fora do loader path padrão no macOS. Candidato de pacote
-  `1.9.64`, código **FEITO no git** (`3762c3c`); pendente de build FreeBSD,
-  validação do artefacto e publicação. **P0-1 permanece ativo:** nenhum
+  OpenSSL fora do loader path padrão no macOS. O smoke volta a compilar o
+  módulo do gate de licença, e o preparador de release usa build não
+  interativo. Candidato de pacote `1.9.64`, código **FEITO no git**
+  (`3762c3c`, `8b70bb9`, próximo commit); build FreeBSD validado, pendente de
+  assinatura e publicação. **P0-1 permanece ativo:** nenhum
   deploy do servidor `.244`.
 
 - **BG-128 P3-6 / BG-144 — gate de alinhamento da chave de produção:**

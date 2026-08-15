@@ -91,7 +91,7 @@ DISTRIBUTION_REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}"
 echo "==> Build do pacote em $PORT_DIR"
 (
   cd "$PORT_ABS"
-  make package
+  DISABLE_LICENSES=yes make package
 )
 
 # Localizar .pkg mais recente
