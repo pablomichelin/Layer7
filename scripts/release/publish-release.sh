@@ -64,6 +64,7 @@ fi
 echo "==> Criando GitHub Release $TAG"
 gh release create "$TAG" \
   "$STAGE_DIR"/* \
+  --repo "$REPO_OWNER/$REPO_NAME" \
   --title "$TAG" \
   --notes "Release oficial assinada do Layer7 para pfSense CE. Ver docs/06-releases/RELEASE-SIGNING.md"
 
