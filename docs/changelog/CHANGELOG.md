@@ -4,6 +4,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.66] — 2026-08-15
+
 ### Added
 
 - **BG-157 — opção Español:** o idioma espanhol passa a estar disponível na

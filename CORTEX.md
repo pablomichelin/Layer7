@@ -35,9 +35,9 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.65` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.65`;
-`SHA256=0c12cf38f44347ba69af876eea1e0b3cefc22cde07d9e5fd85ae208876ce0d6f`;
-tradução inglesa BG-156; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
+`1.9.66` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.66`;
+`SHA256=c621b4f803cf527e01678886eb93f3aa73d55f304c3c265bcc7d3da2f00e3b18`;
+opção Español BG-157; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
 herda MITM como política de `1.9.63`
 (`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`;
 **MITM como política** (até desligar + copy operador; ADR-0035);
@@ -149,7 +149,7 @@ EN completa de chaves literais GUI e descrições de perfis; página pública de
 bloqueio respeita `layer7.language`; regressão local `test_i18n_coverage.js`.
 Somente package/GUI — daemon, licença e servidor `.244` intactos.
 
-**BG-157 IMPLEMENTADO, pendente de gates/build/release (`1.9.66`):** opção
+**BG-157 PUBLICADO `v1.9.66` (`f7f3c29`, `c111a74`, `2026-08-15`):** opção
 Español, catálogo ES com fallback EN seguro e página pública de bloqueio ES.
 Somente package/GUI — daemon, licença e servidor `.244` intactos.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
