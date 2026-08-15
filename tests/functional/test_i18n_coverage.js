@@ -92,6 +92,17 @@ const criticalEnglish = new Map([
     ["Allowlist", "Allowlist"],
     ["Configuracao do servico", "Service configuration"],
     ["Aguardando eventos...", "Waiting for events..."],
+	["Inspecao por SNI (TLS)", "SNI inspection (TLS)"],
+	["Modelo de enforcement PF", "PF enforcement model"],
+	["Pagina de bloqueio", "Block page"],
+	["IP portal", "Portal IP"],
+	["Titulo da pagina", "Page title"],
+	["Mensagem", "Message"],
+	["Redireccionar todo o DNS (porta 53) dos clientes para o resolver local", "Redirect all client DNS (port 53) to the local resolver"],
+	["Incluir dominios de categorias activas no sinkhole", "Include domains from active categories in the sinkhole"],
+	["Limite de dominios blacklist", "Blacklist domain limit"],
+	["Mostrar nome da politica", "Show policy name"],
+	["Selecione as interfaces onde QUIC (UDP 443) deve ser bloqueado. Vazio = desativado. Forca apps a usar HTTPS/TLS, melhorando a deteccao por SNI.", "Select the interfaces where QUIC (UDP 443) must be blocked. Empty = disabled. Forces apps to use HTTPS/TLS, improving SNI detection."],
 ]);
 for (const [key, value] of criticalEnglish) {
     if (english.parsed.get(key) !== value) {
@@ -121,6 +132,14 @@ if (settings.includes(" / Language")) {
 }
 if (events.includes("'Aguardando eventos...'" ) || events.includes("' linha(s)'")) {
     failures.set("Hard-coded event-page text bypasses locale catalogues", ["www/packages/layer7/layer7_events.php"]);
+}
+const localeHelper = fs.readFileSync(path.join(local, "pkg/layer7.inc"), "utf8");
+if (!localeHelper.includes("function layer7_t_for_language") ||
+    !localeHelper.includes("function layer7_blockpage_default_texts")) {
+    failures.set("Localized built-in block-page defaults", ["pkg/layer7.inc"]);
+}
+if (!settings.includes("Only migrate the package defaults on a language switch")) {
+    failures.set("Default block-page copy migration on language switch", ["www/packages/layer7/layer7_settings.php"]);
 }
 
 const blockPage = fs.readFileSync(path.join(local, "www/layer7-blockpage/index.php"), "utf8");

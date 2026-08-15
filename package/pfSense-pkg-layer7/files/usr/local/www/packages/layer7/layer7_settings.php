@@ -401,6 +401,32 @@ if ($_POST["save"] ?? false) {
 		$bp_sinkhole_bl = isset($_POST["block_page_sinkhole_blacklists"]);
 		$bp_bl_limit = (int)($_POST["block_page_blacklist_limit"] ?? 256);
 		$bp_force_dns = isset($_POST["block_page_force_dns"]);
+
+		/* Only migrate the package defaults on a language switch. Custom copy is
+		 * intentionally never translated or replaced. */
+		$old_language = isset($current_l7["language"]) ? $current_l7["language"] : "pt";
+		if (!in_array($old_language, array("pt", "en", "es"), true)) {
+			$old_language = "pt";
+		}
+		if ($language !== $old_language) {
+			$known_defaults = array();
+			foreach (array("pt", "en", "es") as $known_language) {
+				$known_defaults[] = layer7_blockpage_default_texts($known_language);
+			}
+			$target_defaults = layer7_blockpage_default_texts($language);
+			foreach (array("title", "message") as $field) {
+				$current_value = (string)($bp_cfg[$field] ?? "");
+				$known_values = array_column($known_defaults, $field);
+				if ($field === "title" && $bp_title === $current_value &&
+				    in_array($current_value, $known_values, true)) {
+					$bp_title = $target_defaults["title"];
+				}
+				if ($field === "message" && $bp_message === $current_value &&
+				    in_array($current_value, $known_values, true)) {
+					$bp_message = $target_defaults["message"];
+				}
+			}
+		}
 	} else {
 		$bp_enabled = !empty($bp_cfg["enabled"]);
 		$bp_portal = $bp_cfg["portal_ip"];

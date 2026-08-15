@@ -14,25 +14,41 @@ require_once(__DIR__ . "/layer7-fa47-icons.inc");
  * Keys are primarily Portuguese strings. All supported languages look up their
  * catalogue so that legacy English keys cannot leak into the Portuguese UI.
  */
-function l7_t($key)
+function layer7_t_for_language($key, $lang)
 {
-	static $strings = null;
-	static $lang_loaded = "";
-
-	$lang = layer7_get_language();
-	if ($strings === null || $lang_loaded !== $lang) {
+	static $catalogues = array();
+	if (!in_array($lang, array("pt", "en", "es"), true)) {
+		$lang = "pt";
+	}
+	if (!isset($catalogues[$lang])) {
 		$path = "/usr/local/etc/layer7/lang/{$lang}.php";
 		if (file_exists($path)) {
 			$L7_STRINGS = array();
 			include($path);
-			$strings = $L7_STRINGS;
+			$catalogues[$lang] = $L7_STRINGS;
 		} else {
-			$strings = array();
+			$catalogues[$lang] = array();
 		}
-		$lang_loaded = $lang;
 	}
+	return isset($catalogues[$lang][$key]) ? $catalogues[$lang][$key] : $key;
+}
 
-	return isset($strings[$key]) ? $strings[$key] : $key;
+function l7_t($key)
+{
+	return layer7_t_for_language($key, layer7_get_language());
+}
+
+function layer7_blockpage_default_texts($lang = null)
+{
+	if ($lang === null) {
+		$lang = layer7_get_language();
+	}
+	return array(
+		"title" => layer7_t_for_language("Acesso bloqueado", $lang),
+		"message" => layer7_t_for_language(
+		    "Este site ou servico foi bloqueado pela politica de rede do seu administrador.",
+		    $lang)
+	);
 }
 
 function layer7_get_language()
@@ -2907,8 +2923,9 @@ function layer7_blockpage_config_get($data = null)
 	    is_array($data["layer7"]["block_page"])) {
 		$raw = $data["layer7"]["block_page"];
 	}
-	$def_title = "Acesso bloqueado";
-	$def_msg = "Este site ou servico foi bloqueado pela politica de rede do seu administrador.";
+	$defaults = layer7_blockpage_default_texts();
+	$def_title = $defaults["title"];
+	$def_msg = $defaults["message"];
 	return array(
 		"enabled" => !empty($raw["enabled"]),
 		"portal_ip" => isset($raw["portal_ip"]) ? trim((string)$raw["portal_ip"]) : "",

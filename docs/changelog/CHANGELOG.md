@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.68] — 2026-08-15
+
+### Fixed
+
+- **BG-159 — completar inglês de Configurações:** traduzidos os rótulos,
+  explicações e opções que ainda continham termos em português. Ao trocar de
+  idioma, os títulos e mensagens padrão da página de bloqueio são migrados
+  apenas se ainda forem os defaults do pacote; conteúdo personalizado não é
+  alterado.
+
 ## [1.9.67] — 2026-08-15
 
 ### Fixed
