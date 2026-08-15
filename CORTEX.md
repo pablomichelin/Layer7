@@ -35,9 +35,9 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.66` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.66`;
-`SHA256=c621b4f803cf527e01678886eb93f3aa73d55f304c3c265bcc7d3da2f00e3b18`;
-opção Español BG-157; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
+`1.9.67` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.67`;
+`SHA256=0d85bbf00f33147c7655fa0ab091a71b02c4f7dcb4149d877da2b03a2ad1fdb3`;
+integridade PT/EN/ES BG-158; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
 herda MITM como política de `1.9.63`
 (`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`;
 **MITM como política** (até desligar + copy operador; ADR-0035);
@@ -152,6 +152,11 @@ Somente package/GUI — daemon, licença e servidor `.244` intactos.
 **BG-157 PUBLICADO `v1.9.66` (`f7f3c29`, `c111a74`, `2026-08-15`):** opção
 Español, catálogo ES com fallback EN seguro e página pública de bloqueio ES.
 Somente package/GUI — daemon, licença e servidor `.244` intactos.
+**BG-158 PUBLICADO `v1.9.67` (`96b22ec`, `115d014`, `2026-08-15`):**
+integridade completa de textos PT/EN/ES: ES não recorre mais ao fallback EN;
+PT cobre chaves históricas em inglês; Eventos e Configurações não mantêm
+textos fora do catálogo. Gate local e manifesto assinado PASS. Somente
+package/GUI — daemon, licença e servidor `.244` intactos.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

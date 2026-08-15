@@ -4,6 +4,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.67] — 2026-08-15
+
 ### Fixed
 
 - **BG-158 — integridade PT/EN/ES da interface:** substituído o fallback
