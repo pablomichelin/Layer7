@@ -4,7 +4,12 @@ CC ?= cc
 CFLAGS ?= -O2 -Wall -Wextra -Werror
 CPPFLAGS += -DLAYER7_TLSPROXY_VERSION=\"0.1.3\"
 SRCS = main.c ipc.c tls_lab.c
-LDLIBS ?= -lssl -lcrypto
+# Sobrescrevível pelo runner local quando o OpenSSL não vive no loader path
+# padrão (por exemplo, Homebrew em macOS ARM). FreeBSD mantém o default.
+OPENSSL_CFLAGS ?=
+OPENSSL_LDFLAGS ?=
+CPPFLAGS += $(OPENSSL_CFLAGS)
+LDLIBS ?= $(OPENSSL_LDFLAGS) -lssl -lcrypto
 STUB ?= ./poc-upstream-stub.py
 
 .PHONY: all clean test test-regress test-poc3 test-poc4

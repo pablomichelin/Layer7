@@ -84,14 +84,14 @@ layer7_pf_host_ok(const char *ip)
 		return 0;
 	if (layer7_pf_ipv4_host_ok(ip))
 		return 1;
-	/* Reject zone id in PF table members (fe80::1%em0). */
+	/* PF table members never accept an IPv6 zone id (fe80::1%em0). */
 	n = strlen(ip);
 	if (n >= sizeof(tmp))
 		return 0;
 	memcpy(tmp, ip, n + 1);
 	pct = strchr(tmp, '%');
 	if (pct)
-		*pct = '\0';
+		return 0;
 	if (inet_pton(AF_INET6, tmp, &a6) == 1)
 		return 1;
 	if (inet_pton(AF_INET, tmp, &a4) == 1)
@@ -122,7 +122,7 @@ layer7_pf_host_enforce_ok(const char *ip)
 	memcpy(tmp, ip, n + 1);
 	pct = strchr(tmp, '%');
 	if (pct)
-		*pct = '\0';
+		return 0;
 	if (inet_pton(AF_INET6, tmp, &a6) != 1)
 		return 0;
 

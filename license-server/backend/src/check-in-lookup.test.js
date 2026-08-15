@@ -5,6 +5,7 @@ const {
   ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL,
   VISIBLE_CHECK_IN_LICENSE_SQL,
   loadLicenseForCheckIn,
+  withLicenseLock,
 } = require('./check-in-lookup');
 const { createActivationStateError } = require('./activation-policy');
 const { getEffectiveLicenseState } = require('./license-state');
@@ -26,6 +27,12 @@ function mockQueryable({ visibleRows = [], archivedRows = [] } = {}) {
     },
   };
 }
+
+test('P1 check-in: lookup sob transacao bloqueia a linha da licenca', () => {
+  assert.match(withLicenseLock(VISIBLE_CHECK_IN_LICENSE_SQL, true), /FOR UPDATE OF l/);
+  assert.match(withLicenseLock(ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL, true), /FOR UPDATE OF l/);
+  assert.equal(withLicenseLock(VISIBLE_CHECK_IN_LICENSE_SQL, false), VISIBLE_CHECK_IN_LICENSE_SQL);
+});
 
 test('P1-1 — chave inexistente continua 404', async () => {
   await assert.rejects(

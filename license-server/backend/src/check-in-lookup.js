@@ -32,14 +32,21 @@ const ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL = `
        LIMIT 1
 `;
 
-async function loadLicenseForCheckIn(queryable, licenseKey) {
-  const visible = await queryable.query(VISIBLE_CHECK_IN_LICENSE_SQL, [licenseKey]);
+function withLicenseLock(sql, forUpdate) {
+  return forUpdate ? `${sql}\n       FOR UPDATE OF l` : sql;
+}
+
+async function loadLicenseForCheckIn(queryable, licenseKey, { forUpdate = false } = {}) {
+  const visible = await queryable.query(
+    withLicenseLock(VISIBLE_CHECK_IN_LICENSE_SQL, forUpdate),
+    [licenseKey]
+  );
   if (visible.rows.length > 0) {
     return visible.rows[0];
   }
 
   const archivedDenied = await queryable.query(
-    ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL,
+    withLicenseLock(ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL, forUpdate),
     [licenseKey]
   );
   if (archivedDenied.rows.length > 0) {
@@ -53,4 +60,5 @@ module.exports = {
   ARCHIVED_DENIED_CHECK_IN_LICENSE_SQL,
   VISIBLE_CHECK_IN_LICENSE_SQL,
   loadLicenseForCheckIn,
+  withLicenseLock,
 };

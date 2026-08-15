@@ -475,6 +475,14 @@ fi
 step "Regress: layer7-tlsproxy (junto ao codigo)"
 if [ -f src/layer7-tlsproxy/test-regress.sh ]; then
 	if command -v cc >/dev/null 2>&1 && command -v openssl >/dev/null 2>&1; then
+		L7_TLS_OPENSSL_PREFIX=""
+		if [ "$(uname -s)" = "Darwin" ] && command -v brew >/dev/null 2>&1; then
+			L7_TLS_OPENSSL_PREFIX="$(brew --prefix openssl@3 2>/dev/null || true)"
+		fi
+		if [ -n "$L7_TLS_OPENSSL_PREFIX" ]; then
+			export OPENSSL_CFLAGS="-I$L7_TLS_OPENSSL_PREFIX/include"
+			export OPENSSL_LDFLAGS="-L$L7_TLS_OPENSSL_PREFIX/lib"
+		fi
 		if make -C src/layer7-tlsproxy test-regress; then
 			pass "tlsproxy test-regress"
 		else

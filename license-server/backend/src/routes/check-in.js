@@ -14,7 +14,7 @@ const {
   mapActivationErrorToDeniedResponse,
   wrapSignedCheckInEnvelope,
 } = require('../check-in-policy');
-const { createHttpError, isHttpError } = require('../crud-integrity');
+const { createHttpError, isHttpError, runInTransaction } = require('../crud-integrity');
 const { loadLicenseForCheckIn } = require('../check-in-lookup');
 const { getEffectiveLicenseState } = require('../license-state');
 const { parseCheckInPayload } = require('../crud-validation');
@@ -126,47 +126,41 @@ router.post('/license/check-in', checkInLimiter, async (req, res) => {
     requestedHardwareId = hardwareId;
     requestedNonce = nonce;
 
-    const license = await loadLicenseForCheckIn(pool, key);
-    effectiveState = getEffectiveLicenseState(license);
+    const responseBody = await runInTransaction(async (client) => {
+      /* P1: serializa check-in com revoke/replace/rebind da mesma licenca. */
+      const license = await loadLicenseForCheckIn(client, key, { forUpdate: true });
+      effectiveState = getEffectiveLicenseState(license);
 
-    if (!effectiveState.activated) {
-      const error = createHttpError(409, 'Licenca nao activada.');
-      error.licenseId = license.id;
-      throw error;
-    }
+      if (!effectiveState.activated) {
+        const error = createHttpError(409, 'Licenca nao activada.');
+        error.licenseId = license.id;
+        throw error;
+      }
 
-    const activationStateError = createActivationStateError(license, effectiveState);
-    if (activationStateError) {
-      throw activationStateError;
-    }
+      const activationStateError = createActivationStateError(license, effectiveState);
+      if (activationStateError) {
+        throw activationStateError;
+      }
 
-    const hardwareBindingError = createHardwareBindingError(license, hardwareId);
-    if (hardwareBindingError) {
-      throw hardwareBindingError;
-    }
+      const hardwareBindingError = createHardwareBindingError(license, hardwareId);
+      if (hardwareBindingError) {
+        throw hardwareBindingError;
+      }
 
-    const policy = getCheckInPolicy();
-    /* 30.9: emite content_subscription assinado (contrato 30.8). */
-    const legacyBody = buildActiveCheckInResponse(license, policy, {
-      hardwareId,
+      const policy = getCheckInPolicy();
+      await logCheckIn(client, license.id, hardwareId, ip, ua, 'active', null);
+
+      if (nonce) {
+        return wrapSignedCheckInEnvelope(
+          buildActiveCheckInPayloadV2(license, policy, { hardwareId, nonce }),
+          {}
+        );
+      }
+
+      return buildActiveCheckInResponse(license, policy, { hardwareId });
     });
 
-    await logCheckIn(pool, license.id, hardwareId, ip, ua, 'active', null);
-
-    /* 30.13: dual-mode — nonce ⇒ envelope v2; sem nonce ⇒ legado ADR-0021. */
-    if (nonce) {
-      return res.json(
-        wrapSignedCheckInEnvelope(
-          buildActiveCheckInPayloadV2(license, policy, {
-            hardwareId,
-            nonce,
-          }),
-          {}
-        )
-      );
-    }
-
-    return res.json(legacyBody);
+    return res.json(responseBody);
   } catch (error) {
     if (isHttpError(error)) {
       const failure = resolveCheckInFailure(error, effectiveState);

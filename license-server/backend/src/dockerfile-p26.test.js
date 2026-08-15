@@ -41,6 +41,15 @@ test('P2-6A: frontend Dockerfile does not use USER node (nginx listen 80)', () =
   assert.match(text, /listen 80;/);
 });
 
+test('P1 supply-chain: Docker builds use committed lockfiles and npm ci', () => {
+  for (const filePath of [BACKEND_DOCKERFILE, FRONTEND_DOCKERFILE]) {
+    const text = load(filePath);
+    assert.match(text, /COPY package\.json package-lock\.json \.\//);
+    assert.match(text, /RUN npm ci(?:\s|$)/m);
+    assert.doesNotMatch(text, /RUN npm install(?:\s|$)/m);
+  }
+});
+
 test('P2-6A: backend and frontend .dockerignore exclude .env and context junk', () => {
   for (const filePath of [BACKEND_DOCKERIGNORE, FRONTEND_DOCKERIGNORE]) {
     const patterns = activeLines(load(filePath));

@@ -167,9 +167,13 @@ test_host_ok_dualstack(void)
 {
 	check(layer7_pf_host_ok("10.0.0.1") == 1, "host_ok v4");
 	check(layer7_pf_host_ok("2804:6c4:11d:cc00::1009") == 1, "host_ok v6");
+	check(layer7_pf_host_ok("2001:db8::1%em0") == 0,
+	    "host_ok rejects IPv6 zone id");
 	check(layer7_pf_host_ok("not-an-ip") == 0, "host_ok reject junk");
 	check(layer7_pf_host_enforce_ok("2001:db8::1") == 1,
 	    "enforce_ok gua/ula doc");
+	check(layer7_pf_host_enforce_ok("2001:db8::1%em0") == 0,
+	    "enforce_ok rejects IPv6 zone id");
 	check(layer7_pf_host_enforce_ok("::1") == 0, "S-03 reject loopback");
 	check(layer7_pf_host_enforce_ok("fe80::1") == 0,
 	    "S-03 reject link-local");
