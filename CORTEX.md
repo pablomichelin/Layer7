@@ -35,9 +35,9 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.64` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.64`;
-`SHA256=692ab615b0a45f70958f2b866d339e44f833f7953aeec5f780ee0af9e5afeb5f`;
-correções BG-155; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
+`1.9.65` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.65`;
+`SHA256=0c12cf38f44347ba69af876eea1e0b3cefc22cde07d9e5fd85ae208876ce0d6f`;
+tradução inglesa BG-156; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
 herda MITM como política de `1.9.63`
 (`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`;
 **MITM como política** (até desligar + copy operador; ADR-0035);
@@ -144,8 +144,7 @@ Builder FreeBSD **15**. Plus/16: `pkg add -f` (BG-106). Rollback lab actual: **`
 rollback soak: **`1.9.59`**. `1.9.54` = histórico e2e AP2 / rollback da era `30.x`,
 **não** o soak vivo (`.254` = `1.9.63`, 20.36).
 
-**BG-156 IMPLEMENTADO, pacote validado e publicação pendente (`1.9.65`;
-`6cea537`, `2026-08-15`):** cobertura
+**BG-156 PUBLICADO `v1.9.65` (`6cea537`, `c893e91`, `2026-08-15`):** cobertura
 EN completa de chaves literais GUI e descrições de perfis; página pública de
 bloqueio respeita `layer7.language`; regressão local `test_i18n_coverage.js`.
 Somente package/GUI — daemon, licença e servidor `.244` intactos.
