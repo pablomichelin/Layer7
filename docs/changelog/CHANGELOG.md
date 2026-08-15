@@ -103,6 +103,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ### Fixed
 
+- **BG-155 / revisão de código 2026-08-15 — integridade de check-in, PF,
+  dependências e gate TLS:** o check-in passa a usar transação e `FOR UPDATE`
+  na linha da licença antes de emitir a resposta assinada, serializando com
+  revoke/replace/rebind. A validação PF rejeita IPv6 com zone-id em vez de
+  passar um membro inválido ao `pfctl`. As imagens Docker passam a usar
+  lockfiles versionados e `npm ci`; o gate TLS aceita flags explícitas para
+  OpenSSL fora do loader path padrão no macOS. Candidato de pacote
+  `1.9.64`, código **FEITO no git** (`3762c3c`); pendente de build FreeBSD,
+  validação do artefacto e publicação. **P0-1 permanece ativo:** nenhum
+  deploy do servidor `.244`.
+
 - **BG-128 P3-6 / BG-144 — gate de alinhamento da chave de produção:**
   FEITO no git após gates deste bloco. `verify-prod-pubkey.sh` deixa de
   comparar só o array C de `license.c` com o SoT do builder: extrai os

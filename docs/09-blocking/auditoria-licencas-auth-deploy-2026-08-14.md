@@ -978,6 +978,18 @@ SSOTs e checklist **não** antecipam «FEITO no git». Código do bloco:
 
 ## Objectivo / impacto / risco / teste / rollback deste registo documental
 
+## Objectivo / impacto / risco / teste / rollback — BG-155 (`2026-08-15`)
+
+| Campo | Valor |
+|-------|--------|
+| Objectivo | Fechar achados da revisão: resposta de check-in `active` concorrente a revoke; zone-id IPv6 inválido no PF; imagens Node não reproduzíveis; gate TLS local dependente do loader path. |
+| Impacto | `check-in` usa transação + `FOR UPDATE OF l`; `enforce.c` rejeita `%iface`; Docker usa lockfiles versionados + `npm ci`; Makefile/runner TLS recebem flags OpenSSL explícitas. `PORTVERSION=1.9.64`. |
+| Risco | O lock reduz concorrência por licença durante assinatura/log; não muda contrato de sucesso/erro. O package carrega só a correção PF; as correções do servidor exigem deploy separado. **P0-1 não é encerrado.** |
+| Teste | Backend 258/258 PASS; frontend 59/59 PASS + build; regressão C de zone-id PASS; `git diff --check` PASS. Código **FEITO no git** (`3762c3c`). Build FreeBSD, artefacto e release pendentes. |
+| Rollback | Reverter o commit do bloco e permanecer em `1.9.63`; não executar deploy integral do servidor `.244`. |
+
+## Objectivo / impacto / risco / teste / rollback deste registo documental
+
 | Campo | Valor |
 |-------|--------|
 | Objectivo | Tornar a auditoria canónica e o freeze P0-1 visível a qualquer chat novo |
