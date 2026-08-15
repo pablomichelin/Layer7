@@ -186,6 +186,8 @@ layer7_render_styles();
 	var timer     = null;
 	var refreshMs = 2000;
 	var ajaxUrl   = 'layer7_events.php?ajax=1&source=<?= rawurlencode($source); ?>&filter=<?= rawurlencode($filter); ?>';
+	var l7WaitingEvents = <?= json_encode(l7_t("Aguardando eventos...")); ?>;
+	var l7LineSuffix = <?= json_encode(l7_t("linha(s)")); ?>;
 
 	/* Buffer acumulado — novas linhas sao sempre adicionadas, nunca removidas */
 	var seenLines = [];
@@ -195,11 +197,11 @@ layer7_render_styles();
 		if (!liveView) return;
 		liveView.textContent = seenLines.length > 0
 			? seenLines.join('\n')
-			: 'Aguardando eventos...';
+			: l7WaitingEvents;
 		liveView.scrollTop = liveView.scrollHeight;
 		if (countEl) {
 			countEl.textContent = seenLines.length > 0
-				? seenLines.length + ' linha(s)' : '';
+				? seenLines.length + ' ' + l7LineSuffix : '';
 		}
 	}
 
@@ -300,7 +302,7 @@ layer7_render_styles();
 	}
 
 	/* Carregar contexto inicial */
-	liveView.textContent = 'Aguardando eventos...';
+	liveView.textContent = l7WaitingEvents;
 	fetchLive();
 	schedule();
 })();

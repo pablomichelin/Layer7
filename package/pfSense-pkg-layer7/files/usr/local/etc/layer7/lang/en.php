@@ -1566,4 +1566,6 @@ sub.site2.com",
     "Bloqueia UltraViewer." => "Blocks UltraViewer.",
     "Bloqueia VNC (genérico)." => "Blocks VNC (generic).",
     "Bloqueia Zoho Assist." => "Blocks Zoho Assist.",
+    "Aguardando eventos..." => "Waiting for events...",
+    "linha(s)" => "line(s)",
 );

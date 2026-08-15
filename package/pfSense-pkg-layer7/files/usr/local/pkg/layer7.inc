@@ -11,8 +11,8 @@ require_once(__DIR__ . "/layer7-fa47-icons.inc");
 
 /**
  * Translation helper. Returns the translated string for the current language.
- * Keys are the original Portuguese strings. When lang=pt, returns the key as-is.
- * When lang=en/es, looks up the translation file.
+ * Keys are primarily Portuguese strings. All supported languages look up their
+ * catalogue so that legacy English keys cannot leak into the Portuguese UI.
  */
 function l7_t($key)
 {
@@ -20,10 +20,6 @@ function l7_t($key)
 	static $lang_loaded = "";
 
 	$lang = layer7_get_language();
-	if ($lang === "pt") {
-		return $key;
-	}
-
 	if ($strings === null || $lang_loaded !== $lang) {
 		$path = "/usr/local/etc/layer7/lang/{$lang}.php";
 		if (file_exists($path)) {

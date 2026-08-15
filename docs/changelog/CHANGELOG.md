@@ -4,6 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **BG-158 — integridade PT/EN/ES da interface:** substituído o fallback
+  espanhol para inglês por catálogo ES completo; o português passa a carregar
+  as chaves históricas em inglês; textos dinâmicos de Eventos e o rótulo de
+  idioma de Configurações passam pelo catálogo. O gate de i18n agora exige
+  cobertura PT/EN/ES e bloqueia o retorno ao fallback EN em espanhol.
+
 ## [1.9.66] — 2026-08-15
 
 ### Added

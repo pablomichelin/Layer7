@@ -147,7 +147,7 @@ $block_rate = $total_events > 0 ? round(($blocked_events / $total_events) * 100,
 
 $period_label = date("d/m/Y H:i", $from_ts) . " - " . date("d/m/Y H:i", $to_ts);
 
-$pgtitle = array("Services", "Layer 7", l7_t("Relatorios"));
+$pgtitle = array(l7_t("Services"), l7_t("Layer 7"), l7_t("Relatorios"));
 include("head.inc");
 layer7_render_styles();
 ?>

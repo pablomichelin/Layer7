@@ -656,7 +656,7 @@ layer7_render_styles();
 				<div class="layer7-admin-block__header"><?= l7_t("Configuracao do servico"); ?></div>
 				<div class="layer7-admin-block__body">
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?= l7_t("Idioma"); ?> / Language</label>
+						<label class="col-sm-3 control-label"><?= l7_t("Idioma"); ?></label>
 						<div class="col-sm-9">
 							<select name="language" class="form-control" style="max-width: 260px;">
 								<option value="pt" <?= $cur_lang === "pt" ? 'selected="selected"' : ""; ?>>Portugues</option>
