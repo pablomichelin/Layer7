@@ -88,6 +88,8 @@ estado canónico é «implementado, pendente de gates/commit» (`AGENTS.md`).
 | `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Aceito (T1) | Canónico | — | manter vivo com IM1 | novo plano |
 | `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | **Aceito — runtime shipped** (rev.r; emenda 0035) | Canónico | ADR-0017 com MITM OFF | ponto 12 tecto NGFW substituído | novo plano |
 | `docs/03-adr/ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md` | ambição NGFW + ficha fora | **Aceito** (`2026-08-14`) | Canónico | emenda ADR-0026 + P5 | manter | novo plano |
+| `docs/03-adr/ADR-0036-install-ping-sem-serial.md` | sinal instalação sem serial | **Aceito** (`2026-08-22`) | Canónico | BG-162; portal Instalações | P0-1 / publish pendentes | manutenção |
+| `docs/01-architecture/contrato-install-ping-bg162.md` | contrato install-ping | implementado no git | Canónico | ADR-0036 | actualizar se o payload mudar | manutenção |
 | `docs/03-adr/ADR-0027-identity-userid-multi-fonte.md` | ADR User-ID | Aceito | Canónico | evolui ADR-0011/0012 | IM3–IM6 | novo plano |
 | `docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md` | ADR concorrência/IO daemon | Aceito | Canónico | pré-requisito IM3–IM5; baseline perf 20.11a | IM3 | novo plano |
 | `docs/02-roadmap/plano-fecho-producao-e-consolidacao.md` | stub 【FECHADO】 | redirect → arquivo | Stub | texto em `docs/archive/planos-fechados/` | nao reabrir | F6 H5 |
@@ -219,6 +221,9 @@ estado canónico é «implementado, pendente de gates/commit» (`AGENTS.md`).
 | `docs/changelog/CHANGELOG.md` | changelog | linha temporal oficial | Canónico | substitui historicos dispersos de entrega | manter vivo | F0+ |
 | `docs/commercial/LAYER7-PRODUCT-OVERVIEW-PT.md` | collateral PT | material comercial/publico | Suplementar | — | rever quando docs publicas forem refrescadas | F7 |
 | `docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md` | collateral EN | material comercial/publico | Suplementar | — | rever quando docs publicas forem refrescadas | F7 |
+| `docs/commercial/LAYER7-PRICE-LIST-PT.md` | lista preços USD PT | proposta comercial indicativa | Suplementar | — | não publicar como SSOT até GO de preço | F7 |
+| `docs/commercial/LAYER7-PRICE-LIST-EN.md` | USD price list EN | indicative commercial proposal | Suplementar | — | do not publish as SSOT until price GO | F7 |
+| `docs/commercial/LAYER7-PRICE-LIST-ES.md` | lista precios USD ES | propuesta comercial indicativa | Suplementar | — | no publicar como SSOT hasta GO de precio | F7 |
 | `docs/core/README.md` | indice do core | entrada canónica do modelo tecnico | Canónico | resume e aponta para docs core | manter vivo | F0+ |
 | `docs/core/categories.md` | categorias | referencia canónica de categorias | Canónico | — | manter/rever quando politica mudar | F4/F5 |
 | `docs/core/config-model.md` | configuracao | referencia canónica de persistencia/config | Canónico | — | manter | F4/F5 |

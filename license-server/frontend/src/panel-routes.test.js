@@ -8,8 +8,10 @@ import {
   ADMIN_LICENSES_ROUTE,
   ADMIN_LOGIN_ROUTE,
   ADMIN_USERS_ROUTE,
+  ADMIN_INSTALLATIONS_ROUTE,
   buildAdminCustomerDetailRoute,
   buildAdminCustomerEditRoute,
+  buildAdminInstallationDetailRoute,
   buildAdminLicenseDetailRoute,
   buildAdminLicenseEditRoute,
   buildAdminLicenseNewRoute,
@@ -23,6 +25,7 @@ test('panel routes expose the canonical navigation destinations', () => {
   assert.equal(ADMIN_LICENSES_NEW_ROUTE, '/licenses/new');
   assert.equal(ADMIN_CUSTOMERS_NEW_ROUTE, '/customers/new');
   assert.equal(ADMIN_USERS_ROUTE, '/users');
+  assert.equal(ADMIN_INSTALLATIONS_ROUTE, '/installations');
 });
 
 test('panel routes build canonical detail and edit destinations', () => {
@@ -34,4 +37,5 @@ test('panel routes build canonical detail and edit destinations', () => {
   assert.equal(buildAdminCustomerEditRoute(7), '/customers/7/edit');
   assert.equal(buildAdminLicenseNewRoute(), '/licenses/new');
   assert.equal(buildAdminLicenseNewRoute({ customerId: 9 }), '/licenses/new?customer_id=9');
+  assert.equal(buildAdminInstallationDetailRoute(3), '/installations/3');
 });

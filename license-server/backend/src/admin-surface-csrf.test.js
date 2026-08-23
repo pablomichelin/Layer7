@@ -46,11 +46,14 @@ const ADMIN_READ_PATHS = [
   '/api/search',
   '/api/users',
   '/api/users/permissions',
+  '/api/installations',
+  '/api/installations/1',
 ];
 
 const PUBLIC_MUTATING_PATHS = [
   '/api/activate',
   '/api/license/check-in',
+  '/api/license/install-ping',
 ];
 
 function probe({ method, path: urlPath, headers = {} }) {
@@ -111,8 +114,15 @@ test('P2-2: users and search are admin API paths', () => {
 test('P2-2: public activate/check-in/health stay outside the admin CSRF surface', () => {
   assert.equal(isAdminApiPath('/api/activate'), false);
   assert.equal(isAdminApiPath('/api/license/check-in'), false);
+  assert.equal(isAdminApiPath('/api/license/install-ping'), false);
   assert.equal(isAdminApiPath('/api/health'), false);
   assert.equal(isAdminApiPath('/layer7/blacklists/ut1/current/x'), false);
+});
+
+test('BG-162: installations admin API is inside CSRF; install-ping is public', () => {
+  assert.equal(isAdminApiPath('/api/installations'), true);
+  assert.equal(isAdminApiPath('/api/installations/1'), true);
+  assert.equal(isAdminApiPath('/api/license/install-ping'), false);
 });
 
 test('P2-2: every mutating admin route is classified as an admin API path', () => {

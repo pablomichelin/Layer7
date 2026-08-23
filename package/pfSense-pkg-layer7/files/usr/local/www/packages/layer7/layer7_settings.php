@@ -187,6 +187,7 @@ if ($_POST["register_license"] ?? false) {
 	if ($license_code === "" || preg_match('/^[A-Za-z0-9]{16,128}$/', $license_code) !== 1) {
 		$input_errors[] = l7_t("Informe um codigo de licenca valido.");
 	} else {
+		$before_ent = layer7_entitlements();
 		$act = layer7_exec_timeout(
 		    "/usr/local/sbin/layer7d --activate " . escapeshellarg($license_code),
 		    L7_CTRL_TIMEOUT_ACTIVATE
@@ -197,6 +198,10 @@ if ($_POST["register_license"] ?? false) {
 		$rc = (int)$act["rc"];
 		if (!empty($act["ok"])) {
 			$data = layer7_load_or_default();
+			$after_ent = layer7_entitlements();
+			$tr = layer7_addon_apply_license_transition($data,
+			    $before_ent, $after_ent);
+			$data = $tr["data"];
 			$data["layer7"]["license_key_mask"] = substr($license_code, 0, 5) . "************";
 			if (layer7_save_json($data)) {
 				layer7_restart_service();

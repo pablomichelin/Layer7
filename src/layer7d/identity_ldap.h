@@ -57,6 +57,12 @@ void layer7_ldap_cfg_defaults(struct l7_ldap_cfg *c);
 int layer7_ldap_cfg_parse_json(const char *json, size_t len,
     struct l7_ldap_cfg *out);
 
+/*
+ * Toggle identity.enabled no JSON (chave rasa do objecto identity).
+ * 0 se ausente / false. Não concede entitlement.
+ */
+int layer7_identity_operator_enabled(const char *json, size_t len);
+
 /* Lê secret 0600. path NULL → L7_LDAP_SECRET_PATH. 0 OK, -1 ausente/erro. */
 int layer7_ldap_cfg_load_secret(struct l7_ldap_cfg *c, const char *path);
 
@@ -136,7 +142,7 @@ int layer7_ldap_resolve_user_groups(struct l7_ldap_cache *cache,
 struct l7_ldap_worker;
 
 /*
- * Arranca thread se cfg.ldap_enabled && identity. Para se OFF.
+ * Arranca thread se cfg.identity_enabled && cfg.ldap_enabled. Para se OFF.
  * map pode ser NULL só em testes de cache; em produção passa o mapa.
  */
 struct l7_ldap_worker *layer7_ldap_worker_start(struct l7_id_map *map,

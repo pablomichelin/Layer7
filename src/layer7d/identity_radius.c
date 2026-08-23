@@ -284,6 +284,11 @@ layer7_radius_cfg_parse_json(const char *json, size_t len,
 	q = find_key(id, (size_t)(json + len - id), "enabled");
 	if (q != NULL && parse_bool_val(q, &v) == 0)
 		out->identity_enabled = v;
+	/*
+	 * Heurístico: o primeiro "enabled" pode ser ldap.enabled se a
+	 * ordem no JSON for anómala. O gate canónico é
+	 * layer7_identity_operator_enabled() + identity_module_sync.
+	 */
 
 	rad = find_key(id, (size_t)(json + len - id), "radius");
 	if (rad == NULL)
@@ -641,7 +646,7 @@ layer7_radius_worker_start(struct l7_id_map *map, const struct l7_radius_cfg *cf
 	struct l7_radius_worker *w;
 	int fd;
 
-	if (cfg == NULL || !cfg->radius_enabled)
+	if (cfg == NULL || !cfg->identity_enabled || !cfg->radius_enabled)
 		return NULL;
 	if (!cfg->secret_loaded || cfg->secret[0] == '\0') {
 		L7_WARN("identity: radius start refused — secret ausente");

@@ -24,7 +24,8 @@ Licença legada `full` = **apenas base** (T1). Identity exige **reemissão** exp
 
 1. Políticas Layer7 por **utilizador ou grupo AD**, sem depender só de IP estático.
 2. Fontes: **RADIUS accounting** e/ou **agente leve no Domain Controller** + LDAP para grupos.
-3. Mesmo pacote pfSense; add-on **opt-in** (não liga sozinho no upgrade).
+3. Mesmo pacote pfSense; add-on **opt-in** (não liga sozinho no upgrade de
+   pacote **nem** no upgrade de licença). O operador liga o toggle na GUI.
 4. Exactidão = **User-ID de rede** (IP visto no firewall), não agente em cada PC.
 
 ## O que **não** prometer

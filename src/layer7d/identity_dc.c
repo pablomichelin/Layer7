@@ -931,7 +931,7 @@ layer7_dc_worker_start(struct l7_id_map *map, const struct l7_dc_cfg *cfg)
 	int fd;
 	SSL_CTX *ctx;
 
-	if (cfg == NULL || !cfg->dc_enabled)
+	if (cfg == NULL || !cfg->identity_enabled || !cfg->dc_enabled)
 		return NULL;
 	if (!cfg->secret_loaded || cfg->secret[0] == '\0') {
 		L7_WARN("identity: dc_agent start refused — secret ausente");

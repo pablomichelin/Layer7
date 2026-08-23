@@ -940,7 +940,11 @@ Exactidão = **rede** (RADIUS/DC/LDAP), não paridade GlobalProtect.
 1. Emitir `features=base,identity` (preset Y no painel).
 2. Activar no appliance (online ou offline) como qualquer `.lic`.
 3. Na GUI **Services > Layer 7 > Identity**: entitlement presente + toggle
-   **Activar Identity** (default **OFF**). Upgrade de pacote **não** liga o módulo.
+   **Activar Identity** (default **OFF**). Upgrade de pacote **não** liga o
+   módulo. Upgrade de licença (passar a `base,identity`) **também não** liga:
+   o operador tem de activar o toggle. Sem o token `identity` no `.lic`
+   assinado, pôr o toggle a ON no JSON ou nos defaults do pacote **não**
+   arranca o mapa nem os workers.
 4. Configurar fontes (LDAP e/ou RADIUS e/ou agente DC) e políticas `ad_*`.
 
 ### Retirada comercial

@@ -45,7 +45,8 @@ function isAdminApiPath(pathname = '') {
     || pathname.startsWith('/api/customers')
     || pathname.startsWith('/api/audit')
     || pathname.startsWith('/api/users')
-    || pathname.startsWith('/api/search');
+    || pathname.startsWith('/api/search')
+    || pathname.startsWith('/api/installations');
 }
 
 function isStateChangingAdminMethod(method = '') {

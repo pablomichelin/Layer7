@@ -1,8 +1,9 @@
 # ADR-0025 — Entitlements de add-on: Identity + MITM (SKU X/Y)
 
-**Estado:** Aceito (rev. `c` — contrato técnico de parse + precedência check-in)  
+**Estado:** Aceito (rev. `d` — BG-161: token ≠ runtime; toggle do operador)  
 **Data:** 2026-08-05  
 **Aceite:** `2026-08-05` — passo **20.2** / GI0  
+**Emenda BG-161:** `2026-08-16` — upgrade de licença não liga add-on  
 **Decisores:** Operador (GO aceitação no passo 20.2)  
 **Transição legado:** **T1** (`full` / vazio / desconhecido antigo → `base` apenas)  
 **Plano:** [`../02-roadmap/plano-identity-mitm-addon.md`](../02-roadmap/plano-identity-mitm-addon.md)  
@@ -83,6 +84,23 @@ da struct `l7_license_info` em todos os consumidores.
   que estava adiada para IM1.
 - GI1 testa: retirar `identity` via check-in → módulo desliga sem reinstalar
   `.lic`.
+
+### Opt-in do operador (rev. `d` — BG-161)
+
+O token no `.lic` **não** liga Identity nem MITM. Runtime exige:
+
+| Módulo | Liga só se |
+|--------|------------|
+| Identity | token `identity` **e** `identity.enabled` (toggle GUI; default OFF) |
+| MITM | token `mitm` **e** `mitm.enabled` **e** CA/scope/janela (`mitm_effective`) |
+
+Contrato comercial:
+
+1. Upgrade de **pacote** não altera os toggles.
+2. Upgrade de **licença** que **ganha** `identity`/`mitm` persiste os toggles OFF (o operador liga na GUI).
+3. Renovação com o mesmo token **mantém** o toggle que o operador já tinha ligado.
+4. Perder o token persiste o toggle OFF.
+5. Editar `layer7.json` ou defaults do pacote para ON **sem** o token no `.lic` assinado **não** activa (daemon / `mitm_effective` / `layer7-mitm-entitle-ok`). Root a patchar o produto (R-A) permanece residual.
 
 ---
 

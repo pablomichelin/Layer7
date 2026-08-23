@@ -274,6 +274,11 @@ else
 fi
 
 step "Gate: prod pubkey PEM vs SoT (P3-6)"
+if sh tests/functional/test_install_ping_failopen.sh; then
+	pass "test_install_ping_failopen (BG-162)"
+else
+	fail "test_install_ping_failopen (BG-162)"
+fi
 if sh tests/functional/test_verify_prod_pubkey.sh; then
 	pass "test_verify_prod_pubkey"
 else
@@ -445,6 +450,11 @@ else
 	else
 		fail "test_check_in_default_30.14"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_install_ping_inventory.php; then
+		pass "test_install_ping_inventory"
+	else
+		fail "test_install_ping_inventory"
+	fi
 	if "$PHP_BIN_E2" tests/functional/test_license_revoke_state.php; then
 		pass "test_license_revoke_state"
 	else
@@ -530,6 +540,7 @@ for f in package/pfSense-pkg-layer7/files/usr/local/etc/rc.d/layer7d \
     tests/unit/test_flush_coverage.sh \
     tests/unit/test_pkg_deinstall_lifecycle.sh \
     tests/functional/test_verify_prod_pubkey.sh \
+    tests/functional/test_install_ping_failopen.sh \
     scripts/package/verify-prod-pubkey.sh \
     tests/lab/smoke-monitor-mode.sh \
     tests/lab/smoke-caminho-a.sh \

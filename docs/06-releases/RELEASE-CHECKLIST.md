@@ -84,6 +84,7 @@
 | 6.2 | Smoke mínimo lab (se mudança funcional) | `tests/lab/run-f5-smoke-checklist.sh` | |
 | 6.3 | Evidência `run_id` em `docs/tests/evidence/` | |
 | 6.4 | Rollback documentado (`_68` imediato pós-GO) | |
+| 6.5 | Canal `latest` = esta versão e **só** ela no updater | `sh scripts/release/verify-latest-release.sh --expect VERSION` — `/releases/latest` não-prerelease, `.pkg`+`.sha256`+`install.sh`. O GUI só consome `latest`. Releases antigas ficam para rollback documentado, **não** como download oficial. | |
 
 ---
 

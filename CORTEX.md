@@ -167,6 +167,18 @@ os defaults reconhecidos passam ao idioma selecionado em qualquer save de
 Configurações, inclusive após upgrade com o idioma já selecionado. Gate local,
 build, assinatura e manifesto PASS. Somente package/GUI — daemon, licença e
 servidor `.244` intactos.
+**BG-161 implementado, pendente de gates/commit (`1.9.70`, `2026-08-16`):**
+Identity no daemon exige token **e** toggle (default OFF). Upgrade de licença
+que ganha `identity`/`mitm` não liga o add-on; perder o token persiste OFF.
+Editar JSON/defaults sem entitlement não activa. Residual R-A (root a patchar
+o produto). Sem publish neste bloco.
+**BG-162 implementado, pendente de gates/commit/deploy/publish (`1.9.71` +
+portal `2.2.0`, `2026-08-22`):** sinal de instalação/heartbeat **sem serial**
+para `license.systemup.inf.br` (FQDN, IP público, IPs/nomes de interfaces,
+uniqueid/plataforma); página **Instalações** no portal. ADR-0036. Fail-open
+(N3). **P0-1:** sem overlay `.244`. Canal GitHub `latest` **não** muda até
+Release com `.pkg` assinado — até lá `latest` continua a última publicada
+(`1.9.69`). Residual: RR-1; caixas antigas não pingam.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

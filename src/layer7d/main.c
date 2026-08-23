@@ -110,6 +110,7 @@ static int s_cap_interfaces;
 static struct l7_license_info s_lic;
 static time_t s_last_lic_check;
 static time_t s_last_checkin_tick;
+static time_t s_last_install_ping_tick;
 
 /* Identity map (20.15) + LDAP worker (20.17): só com entitlement; zero threads OFF. */
 static struct l7_id_map s_idmap;
@@ -958,7 +959,8 @@ license_apply_invalidation(const char *reason)
 }
 
 /*
- * ADR-0028 / 20.15–20.19: sem entitlement → zero threads / zero mapa.
+ * ADR-0028 / 20.15–20.19 / BG-161: sem entitlement OU sem
+ * identity.enabled → zero threads / zero mapa. Token no .lic não liga.
  * SIGHUP: mapa sobrevive; workers LDAP/RADIUS relêem config.
  */
 static void
@@ -976,7 +978,8 @@ identity_ldap_sync_worker(const char *reason)
 	}
 	(void)layer7_ldap_cfg_load_secret(&cfg, NULL);
 
-	if (cfg.ldap_enabled && cfg.server[0] != '\0') {
+	if (cfg.identity_enabled && cfg.ldap_enabled &&
+	    cfg.server[0] != '\0') {
 		if (s_ldap_worker == NULL) {
 			s_ldap_worker = layer7_ldap_worker_start(&s_idmap, &cfg);
 			if (s_ldap_worker)
@@ -1012,7 +1015,7 @@ identity_radius_sync_worker(const char *reason)
 	}
 	(void)layer7_radius_cfg_load_secret(&cfg, NULL);
 
-	if (cfg.radius_enabled) {
+	if (cfg.identity_enabled && cfg.radius_enabled) {
 		if (s_radius_worker == NULL) {
 			s_radius_worker = layer7_radius_worker_start(&s_idmap,
 			    &cfg);
@@ -1049,7 +1052,7 @@ identity_dc_sync_worker(const char *reason)
 	}
 	(void)layer7_dc_cfg_load_secret(&cfg, NULL);
 
-	if (cfg.dc_enabled) {
+	if (cfg.identity_enabled && cfg.dc_enabled) {
 		if (s_dc_worker == NULL) {
 			s_dc_worker = layer7_dc_worker_start(&s_idmap, &cfg);
 			if (s_dc_worker)
@@ -1070,10 +1073,26 @@ identity_dc_sync_worker(const char *reason)
 	layer7_dc_cfg_wipe_secret(&cfg);
 }
 
+static int
+identity_operator_on(void)
+{
+	char *buf = NULL;
+	size_t len = 0;
+	int on = 0;
+
+	buf = read_file(config_path, &len);
+	if (buf != NULL) {
+		on = layer7_identity_operator_enabled(buf, len);
+		free(buf);
+	}
+	return on;
+}
+
 static void
 identity_module_sync(const char *reason)
 {
-	int want = layer7_features_allows_identity(s_lic.features_flags);
+	int want = layer7_features_identity_want(s_lic.features_flags,
+	    identity_operator_on());
 	time_t now = time(NULL);
 
 	if (want && !s_idmap_active) {
@@ -1186,6 +1205,24 @@ license_checkin_tick(void)
 			identity_module_sync("license_checkin");
 		}
 	}
+}
+
+#define L7_INSTALL_PING_BIN "/usr/local/libexec/layer7-install-ping"
+#define L7_INSTALL_PING_INTERVAL_SEC 86400
+
+static void
+install_ping_tick(void)
+{
+	time_t tnow = time(NULL);
+
+	if (s_last_install_ping_tick != 0 &&
+	    tnow - s_last_install_ping_tick < L7_INSTALL_PING_INTERVAL_SEC)
+		return;
+	s_last_install_ping_tick = tnow;
+	if (access(L7_INSTALL_PING_BIN, X_OK) != 0)
+		return;
+	/* Fail-open: background, never bloqueia o loop do daemon. */
+	(void)system(L7_INSTALL_PING_BIN " >/dev/null 2>&1 &");
 }
 
 static void
@@ -3528,6 +3565,7 @@ int main(int argc, char **argv)
 		}
 
 		license_checkin_tick();
+		install_ping_tick();
 
 		s_loop_ticks++;
 		tick++;

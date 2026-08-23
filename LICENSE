@@ -85,9 +85,20 @@ destroy all copies in your possession.
 8. DATA COLLECTION
 
 The Software may transmit the hardware fingerprint and license key to the
-Licensor's activation server for the purpose of license verification. No
-network traffic data, user data, or personally identifiable information is
-collected or transmitted.
+Licensor's activation server for the purpose of license verification.
+
+From version 1.9.71 onwards the Software also sends an installation and
+periodic heartbeat signal (even without a license key) to the same server.
+That signal may include: hardware fingerprint, a local install identifier,
+hostname and domain of the pfSense system, pfSense/FreeBSD/package versions,
+platform and uniqueid/serial when present, WAN and local interface addresses
+and names, and a hardware inventory (model, CPU count, memory). The server
+records the public source IP of the connection. This is used solely for
+installation accounting, support and abuse detection.
+
+No network traffic data, end-user browsing data, GUI/VPN/captive-portal
+accounts, firewall policies, or full configuration dumps are collected or
+transmitted.
 
 9. GOVERNING LAW
 

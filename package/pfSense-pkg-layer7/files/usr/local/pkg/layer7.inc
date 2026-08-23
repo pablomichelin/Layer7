@@ -7475,6 +7475,63 @@ function layer7_has_entitlement($token)
 	return false;
 }
 
+/**
+ * BG-161 — transicao de licenca nao liga add-on.
+ *
+ * Mantem o toggle do operador so se o entitlement ja existia e continua.
+ * Ganhar o token (upgrade) ou perde-lo (downgrade/ausente) persiste OFF.
+ * Nunca liga identity.enabled / mitm.enabled.
+ *
+ * @param array|null $data
+ * @param array $before layer7_entitlements() antes da activacao
+ * @param array $after  layer7_entitlements() depois
+ * @return array{changed:bool,data:array}
+ */
+function layer7_addon_apply_license_transition($data, $before, $after)
+{
+	if ($data === null || !is_array($data)) {
+		$data = layer7_load_or_default();
+	}
+	if (!is_array($before)) {
+		$before = array();
+	}
+	if (!is_array($after)) {
+		$after = array();
+	}
+	$changed = false;
+	$keep_id = !empty($before["has_identity"]) &&
+	    !empty($after["has_identity"]);
+	$keep_mitm = !empty($before["has_mitm"]) &&
+	    !empty($after["has_mitm"]);
+
+	$identity = layer7_identity_from_config($data);
+	if (!$keep_id && !empty($identity["enabled"])) {
+		$identity["enabled"] = false;
+		$data = layer7_identity_apply_to_config($data, $identity);
+		$changed = true;
+	}
+	$mitm = layer7_mitm_from_config($data);
+	if (!$keep_mitm && !empty($mitm["enabled"])) {
+		$mitm["enabled"] = false;
+		$data = layer7_mitm_apply_to_config($data, $mitm);
+		$changed = true;
+	}
+	return array("changed" => $changed, "data" => $data);
+}
+
+/**
+ * Sem entitlement: persistir toggles add-on OFF (nao ressuscitar leftover).
+ * Nunca liga nada. Em LAYER7_TEST_ROOT o caller decide se persiste.
+ *
+ * @param array|null $data
+ * @return array{changed:bool,data:array}
+ */
+function layer7_addon_disarm_unentitled($data = null)
+{
+	$e = layer7_entitlements();
+	return layer7_addon_apply_license_transition($data, $e, $e);
+}
+
 /* ============================================================
  * IM2 / 20.8–20.10a — MITM config (opt-in OFF; effective só com intercept).
  *

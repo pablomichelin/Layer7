@@ -11,6 +11,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Licenses from './pages/Licenses';
 import LicenseDetail from './pages/LicenseDetail';
+import Installations from './pages/Installations';
+import InstallationDetail from './pages/InstallationDetail';
 import LicenseForm from './pages/LicenseForm';
 import Customers from './pages/Customers';
 import CustomerForm from './pages/CustomerForm';
@@ -41,6 +43,8 @@ export default function App() {
         <Route path="licenses/new" element={<LicenseForm />} />
         <Route path="licenses/:id" element={<LicenseDetail />} />
         <Route path="licenses/:id/edit" element={<LicenseForm />} />
+        <Route path="installations" element={<Installations />} />
+        <Route path="installations/:id" element={<InstallationDetail />} />
         <Route path="customers" element={<Customers />} />
         <Route path="customers/new" element={<CustomerForm />} />
         <Route path="customers/:id" element={<CustomerDetail />} />

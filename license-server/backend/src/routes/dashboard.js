@@ -155,6 +155,31 @@ router.get('/', async (_req, res) => {
       sampleLimit: SAMPLE_LIMIT,
     });
 
+    let installStats = { total: 0, unlicensed: 0, stale_7d: 0 };
+    try {
+      const installRows = await pool.query(`
+      SELECT
+        COUNT(*) AS total,
+        COUNT(*) FILTER (WHERE last_seen_at < NOW() - INTERVAL '7 days') AS stale_7d,
+        COUNT(*) FILTER (
+          WHERE NOT EXISTS (
+            SELECT 1
+              FROM licenses l
+             WHERE l.archived_at IS NULL
+               AND lower(btrim(COALESCE(l.hardware_id, ''))) = i.hardware_id
+          )
+        ) AS unlicensed
+      FROM install_instances i
+    `);
+      installStats = {
+        total: parseInt(installRows.rows[0].total, 10),
+        unlicensed: parseInt(installRows.rows[0].unlicensed, 10),
+        stale_7d: parseInt(installRows.rows[0].stale_7d, 10),
+      };
+    } catch (installErr) {
+      console.error('[DASHBOARD] Installations stats skipped:', installErr.message);
+    }
+
     res.json({
       licenses: {
         active: parseInt(stats.rows[0].active, 10),
@@ -166,6 +191,11 @@ router.get('/', async (_req, res) => {
         unbound_stale_7d: parseInt(unboundStale.rows[0].total, 10),
         stale_checkin_7d: parseInt(staleCheckin.rows[0].total, 10),
         multi_appliance_abuse: multiAppliance.total,
+      },
+      installations: {
+        total: installStats.total,
+        unlicensed: installStats.unlicensed,
+        stale_7d: installStats.stale_7d,
       },
       customers: parseInt(customers.rows[0].total, 10),
       activations_24h: parseInt(activations24h.rows[0].count, 10),

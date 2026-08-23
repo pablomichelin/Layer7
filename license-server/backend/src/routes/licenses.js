@@ -303,10 +303,28 @@ router.get('/:id', requirePermission('licenses.read'), async (req, res) => {
       [licenseId]
     );
 
+    const license = applyEffectiveLicenseState(licenseResult.rows[0]);
+    let installation = null;
+    const boundHardwareId = normalizeStoredHardwareId(license.hardware_id);
+    if (boundHardwareId) {
+      try {
+        const installationResult = await pool.query(
+          `SELECT *
+             FROM install_instances
+            WHERE hardware_id = $1`,
+          [boundHardwareId]
+        );
+        installation = installationResult.rows[0] || null;
+      } catch (installErr) {
+        console.error('[LICENSES] Installation lookup skipped:', installErr.message);
+      }
+    }
+
     return res.json({
-      license: applyEffectiveLicenseState(licenseResult.rows[0]),
+      license,
       activations: activationsResult.rows,
       check_ins: checkInsResult.rows,
+      installation,
     });
   } catch (error) {
     if (isHttpError(error)) {

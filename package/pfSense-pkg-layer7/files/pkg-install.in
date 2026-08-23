@@ -104,6 +104,11 @@ sysrc layer7d_enable=YES > /dev/null 2>&1
 service layer7d onestop > /dev/null 2>&1 || true
 service layer7d onestart > /dev/null 2>&1 || true
 
+# BG-162: sinal de instalação (fail-open; não bloqueia pkg add).
+if [ -x "${PKG_ROOTDIR}/usr/local/libexec/layer7-install-ping" ]; then
+	"${PKG_ROOTDIR}/usr/local/libexec/layer7-install-ping" >/dev/null 2>&1 &
+fi
+
 echo ""
 echo "=== Layer7 instalado com sucesso ==="
 echo "  Versão:  $(/usr/local/sbin/layer7d -V 2>/dev/null || echo '?')"

@@ -45,7 +45,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0022](ADR-0022-compatibilidade-pfsense-ce-escopo-e-limitacao.md) | Compatibilidade pfSense CE — escopo e limitação (Onda E) | Aceito + GO Onda F | CE físico pendente; produção enforce = `_69` |
 | [ADR-0023](ADR-0023-trust-chain-pacote-ativacao-faseada.md) | Trust chain pacote — ativação faseada (BG-028) | Aceito (**fase 1** `v1.9.58`) | F1.2 activo; fingerprint `d26e3f00…c5a998` |
 | [ADR-0024](ADR-0024-suporte-ipv6-ativacao-faseada.md) | Suporte IPv6 — ativação faseada (trilha V0–V6) | Aceito | Trilha IPv6 **FECHADA**; produção `1.9.8` |
-| [ADR-0025](ADR-0025-entitlements-addon-identity-mitm.md) | Entitlements add-on Identity + MITM (SKU X/Y) | **Aceito** (rev.c; T1) | `features` CSV (P1–P6); gate daemon; legado `full`→`base`; check-in ∩ `.lic` |
+| [ADR-0025](ADR-0025-entitlements-addon-identity-mitm.md) | Entitlements add-on Identity + MITM (SKU X/Y) | **Aceito** (rev.d; T1; BG-161) | `features` CSV (P1–P6); gate daemon; legado `full`→`base`; check-in ∩ `.lic`; token ≠ toggle |
 | [ADR-0026](ADR-0026-mitm-tls-inspection-opt-in.md) | MITM TLS inspection opt-in (CA/certificado) | **Aceito — runtime shipped** (rev.r; ADR-0035) | P3/P4 PASS; ficha **RETIRADA**; ponto 12 (tecto NGFW) substituído; Squid rejeitado |
 | [ADR-0027](ADR-0027-identity-userid-multi-fonte.md) | Identity User-ID multi-fonte (sem captive) | **Aceito** (rev.c) | Mapa no daemon; RADIUS; agente DC A1–A7; fail-mode; NAT `multi-user` |
 | [ADR-0028](ADR-0028-concorrencia-io-daemon-identity.md) | Concorrência e IO do daemon para Identity | **Aceito** | Sem IO bloqueante no hot path; threads + rwlock; baseline perf no 20.11a |
@@ -55,6 +55,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0032](ADR-0032-check-in-obrigatorio-e-assinado.md) | Check-in obrigatório por defeito e resposta assinada com anti-replay | **Aceito** (`2026-08-10`, `30.1b`) | **Emenda ADR-0021**; desenho `30.12` FECHADO ([contrato](../01-architecture/contrato-check-in-assinado-30.12.md)); GO `30.14`; BG-101 reaberto |
 | [ADR-0033](ADR-0033-anti-rollback-relogio.md) | Anti-rollback de relógio e estado temporal suspeito | **Aceito** (`2026-08-10`, `30.1b`) | Emenda `f3-expiracao-revogacao-grace.md`; RR-4/R-J; passo `30.6` |
 | [ADR-0035](ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md) | Ambição de paridade NGFW no tempo + retirada da ficha | **Aceito** (`2026-08-14`) | Emenda ADR-0026 §12; P5/ficha **RETIRADOS**; **20.35 PASS** |
+| [ADR-0036](ADR-0036-install-ping-sem-serial.md) | Sinal de instalação e heartbeat sem serial | **Aceito** (`2026-08-22`) | BG-162; `POST /api/license/install-ping`; portal Instalações; fail-open; P0-1 / publish pendentes |
 
 **Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`);
 trilha **FECHADA** em **`30.19`** (`2026-08-12`) — fecho
@@ -102,7 +103,8 @@ reutilizado. Conflito registado em vez de silenciado.
 | Proximo ID sugerido | Tema | Fase | Motivo |
 |---------------------|------|------|--------|
 | ADR-0034 | Reorganizacao estrutural controlada / higiene residual (se GO exigir ADR formal além do plano BG-112) | F6 residual | **reservado** — não usar para outro tema; condicional BG-112 |
-| ADR-0036 | (livre) | — | próximo ID livre após **0035** (ambição NGFW / ficha retirada) |
+| ADR-0036 | Sinal de instalação / heartbeat sem serial | manutenção | **Aceito** — ver tabela acima |
+| ADR-0037 | (livre) | — | próximo ID livre após **0036** |
 
 ---
 

@@ -110,3 +110,51 @@ CREATE INDEX idx_admin_audit_log_actor_admin ON admin_audit_log(actor_admin_id);
 CREATE INDEX idx_admin_login_guards_locked_until ON admin_login_guards(locked_until);
 CREATE INDEX idx_admin_totp_challenges_admin ON admin_totp_challenges(admin_id);
 CREATE INDEX idx_admin_totp_challenges_expires ON admin_totp_challenges(expires_at);
+
+-- BG-162 / ADR-0036 — sinal de instalação (também criado em runtime por
+-- ensureInstallPingSchema(); aqui para installs novos do schema).
+CREATE TABLE install_instances (
+    id          SERIAL PRIMARY KEY,
+    hardware_id VARCHAR(64) NOT NULL UNIQUE,
+    install_id  VARCHAR(64),
+    hostname    VARCHAR(255),
+    domain      VARCHAR(255),
+    fqdn        VARCHAR(255),
+    package_version VARCHAR(32),
+    pfsense_version VARCHAR(64),
+    pfsense_version_patch VARCHAR(32),
+    platform    VARCHAR(64),
+    uniqueid    VARCHAR(128),
+    system_serial VARCHAR(128),
+    os_release  VARCHAR(64),
+    hw_model    VARCHAR(128),
+    ncpu        INTEGER,
+    mem_mb      INTEGER,
+    wan_ipv4    VARCHAR(45),
+    wan_ipv6    VARCHAR(45),
+    gateway_v4  VARCHAR(45),
+    license_key VARCHAR(64),
+    egress_ip   VARCHAR(45),
+    last_event  VARCHAR(16),
+    inventory   JSONB,
+    last_user_agent VARCHAR(255),
+    first_seen_at TIMESTAMP DEFAULT NOW(),
+    last_seen_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE install_pings_log (
+    id          SERIAL PRIMARY KEY,
+    instance_id INTEGER REFERENCES install_instances(id) ON DELETE CASCADE,
+    hardware_id VARCHAR(64),
+    event       VARCHAR(16),
+    package_version VARCHAR(32),
+    egress_ip   VARCHAR(45),
+    user_agent  VARCHAR(255),
+    result      VARCHAR(20),
+    error_message TEXT,
+    created_at  TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_install_instances_last_seen ON install_instances(last_seen_at);
+CREATE INDEX idx_install_pings_log_hardware ON install_pings_log(hardware_id);
+CREATE INDEX idx_install_pings_log_created ON install_pings_log(created_at);

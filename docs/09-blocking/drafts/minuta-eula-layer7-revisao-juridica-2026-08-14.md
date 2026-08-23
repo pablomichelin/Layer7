@@ -82,9 +82,10 @@ decidir o que entra no contrato; o agente **não** os transforma em direito.
 | Multi-appliance | Fase 1 = **só alerta**; **sem** `max_activations` | `30.15`; decisão 7 |
 | Conteúdo (blacklists) | Download corrente exige token de subscrição (AP2); cópia local histórica permanece | [ADR-0031](../../03-adr/ADR-0031-entitlement-entrega-conteudo.md); [`../../01-architecture/contrato-token-subscricao-conteudo-30.8.md`](../../01-architecture/contrato-token-subscricao-conteudo-30.8.md) |
 | Marcação local | Sidecar opaco `SHA256(license_id \|\| hardware_id)`; **sem** telemetria / PII cleartext | [`../../01-architecture/marcacao-cliente-30.17.md`](../../01-architecture/marcacao-cliente-30.17.md) |
+| Sinal de instalação (sem serial) | Desde `1.9.71`: heartbeat/install para o license-server **mesmo sem chave**. Inventário de equipamento (FQDN, uniqueid, IPs/nomes de iface, versões). IP público = hop TLS no servidor. Fail-open. **Não** é a marca `30.17`. | [ADR-0036](../../03-adr/ADR-0036-install-ping-sem-serial.md); `LICENSE` §8 |
 | Actualizações de pacote | Canal público GitHub Releases `pablomichelin/Layer7`; manifesto + `.sig` (F1.2) | ADR-0003; ADR-0023 |
 | Suporte / SLA | **Não** há SLA publicado. Contacto comercial: canais contratuais do cliente; e-mail `contato@systemup.inf.br` | [`../../MANUAL-PRODUTO.md`](../../MANUAL-PRODUTO.md) §16; `LICENSE` §11 |
-| Relatórios / eventos | Ficam **no appliance** (`reports.db`, logs locais). A EULA publicada afirma que tráfego, dados de utilizador e PII **não** são transmitidos | `LICENSE` §8; `MANUAL-PRODUTO` |
+| Relatórios / eventos | Ficam **no appliance** (`reports.db`, logs locais). Tráfego, contas de pessoas e políticas **não** são transmitidos. Hostname, uniqueid e IPs de equipamento **são** enviados no sinal de instalação (`1.9.71+`) | `LICENSE` §8 (rev. BG-162); ADR-0036 |
 | Add-ons | Identity / MITM são entitlements separados; MITM permanente **NO-GO** sem novo GO | ADR-0025; ADR-0035 |
 | Residual anti-pirataria | Root continua capaz de contornar (RR-1…RR-5). Proibido overclaim «impossível de piratar» | [`../../01-architecture/fecho-trilha-antipirataria-30.19.md`](../../01-architecture/fecho-trilha-antipirataria-30.19.md) |
 
@@ -284,7 +285,9 @@ e cópias não autorizadas, sem prejuízo de cópias exigidas por lei
 | Dado | Onde | Transmitido ao Licenciador? | Finalidade técnica declarada |
 |------|------|-----------------------------|------------------------------|
 | Chave de licença | Activação / check-in | Sim | Verificação e bind |
-| `hardware_id` (hash) | Activação / check-in / `.lic` | Sim | Bind e detecção de abuso |
+| `hardware_id` (hash) | Activação / check-in / `.lic` / install-ping | Sim | Bind, abuso e inventário de instalação |
+| Inventário de instalação (hostname, domínio, uniqueid, IPs de iface, versões, `install_id`) | `POST /api/license/install-ping` (`≥ 1.9.71`) | Sim | Contabilidade de instalação, suporte, anti-abuso. **Sem** serial obrigatório |
+| IP público (`egress_ip`) | Servidor (hop TLS confiável; não XFF do cliente) | Sim (gravado no servidor) | Identificar a caixa atrás de CGNAT |
 | Estado da licença / timestamps | License-server | Sim (servidor próprio) | Ciclo de vida |
 | Token de conteúdo | Check-in → appliance | Emitido pelo servidor | Entitlement de download |
 | Marca de atribuição | Sidecar **local** | Não (GA6.4) | Atribuição offline (RR-2) |
@@ -296,10 +299,12 @@ e cópias não autorizadas, sem prejuízo de cópias exigidas por lei
 obrigação legal), encarregado, direitos do titular, transferência
 internacional e retenção: **`[PENDENTE — C-14]`**.
 
-6.3. A afirmação da EULA publicada («no personally identifiable information
-is collected or transmitted») é **insumo a reavaliar**. Fingerprint de
-appliance e chave podem ser dados pessoais **ou** dados de pessoa jurídica
-conforme o caso. O agente **não** qualifica.
+6.3. A EULA publicada (`LICENSE` §8, emenda BG-162 / `2026-08-22`) **deixou
+de** afirmar que não há PII. Lista o inventário de instalação/heartbeat
+(hostname, domínio, uniqueid, IPs, IP público no servidor) e a finalidade
+(suporte / anti-abuso). Fingerprint, hostname e IPs LAN podem ser dados
+pessoais **ou** de pessoa jurídica conforme o caso. O agente **não**
+qualifica. Residual jurídico: `[PENDENTE — C-14 / Q-08]`.
 
 6.4. O Licenciado (administrador do firewall) é, em regra, quem trata dados
 de **seus** utilizadores finais no appliance. Este rascunho **não** transfere
@@ -387,6 +392,8 @@ circunvenção.
 
 - registo de activações e `hardware_id`;
 - check-ins;
+- sinal de instalação / heartbeat sem serial (ADR-0036; inventário de
+  equipamento, não de utilizadores finais);
 - alertas de uso em múltiplos appliances;
 - atribuição local de conteúdo (`30.17`), sem phone-home da marca.
 
@@ -488,7 +495,7 @@ pendente). O agente **não** as responde.
 | Q-05 | A **revogação imediata** via check-in (enforce → monitor, remoção do `.lic`) exige aviso prévio, contraditório ou proporcionalidade graduada? Em que hipóteses o imediato é defensável? | Artigo 5; ADR-0021/0032 |
 | Q-06 | Check-in **default ON** em instalações novas e migração de bases antigas: o contrato deve exigir consentimento adicional ou basta execução contratual? | Decisão 2 / `30.14` |
 | Q-07 | Token de conteúdo (AP2) e corte do espelho público: o Licenciado tem direito adquirido a listas correntes após fim da subscrição? | ADR-0031; RR-1/RR-2 |
-| Q-08 | `hardware_id`, chave, logs de activação/check-in e cadastro (nome, e-mail, CNPJ) são **dados pessoais**? Quem é controlador? Que base legal, retenção, RIPD e aviso de privacidade são exigíveis? A frase actual do `LICENSE` §8 é sustentável? | LGPD; GA6.3/6.4 |
+| Q-08 | `hardware_id`, chave, logs de activação/check-in, **inventário de instalação (FQDN, uniqueid, IPs LAN, IP público)** e cadastro (nome, e-mail, CNPJ) são **dados pessoais**? Quem é controlador? Que base legal, retenção, RIPD e aviso de privacidade são exigíveis? A emenda `LICENSE` §8 (BG-162) alinha o texto ao produto; o advogado confirma se basta. | LGPD; GA6.3/6.4; ADR-0036 |
 | Q-09 | Deve existir **SLA**? Se não, como excluir uptime de license-server/GitHub/CDN sem cláusula abusiva? | Não há SLA hoje |
 | Q-10 | A limitação de responsabilidade e a exclusão de garantia da EULA inglesa sobrevivem no Brasil? Que redacção mínima (vícios, dolo, serviço essencial de firewall) é recomendada? | Artigo 8 |
 | Q-11 | Engenharia reversa / interoperabilidade: o que **não** pode ser proibido na Lei do Software e no CC? Como redigir anti-circunvenção sem nulidade? | Artigo 9 |
@@ -510,6 +517,7 @@ pendente). O agente **não** as responde.
 | EULA **publicada** (inglês) | [`../../../LICENSE`](../../../LICENSE) |
 | ADR anti-pirataria | [0030](../../03-adr/ADR-0030-postura-anti-tamper-layer7d.md), [0031](../../03-adr/ADR-0031-entitlement-entrega-conteudo.md), [0032](../../03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md), [0033](../../03-adr/ADR-0033-anti-rollback-relogio.md) |
 | Check-in / revogação | [ADR-0021](../../03-adr/ADR-0021-check-in-online-e-revogacao-remota.md) |
+| Sinal de instalação sem serial | [ADR-0036](../../03-adr/ADR-0036-install-ping-sem-serial.md); [`../../01-architecture/contrato-install-ping-bg162.md`](../../01-architecture/contrato-install-ping-bg162.md) |
 | Fingerprint | [`../../01-architecture/f3-fingerprint-e-binding.md`](../../01-architecture/f3-fingerprint-e-binding.md) |
 | Expiração / grace | [`../../01-architecture/f3-expiracao-revogacao-grace.md`](../../01-architecture/f3-expiracao-revogacao-grace.md) |
 | Privacidade da marca | [`../../01-architecture/marcacao-cliente-30.17.md`](../../01-architecture/marcacao-cliente-30.17.md) |

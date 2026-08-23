@@ -182,6 +182,86 @@ find_key(const char *json, size_t len, const char *key)
 }
 
 /*
+ * Chave no nível 1 de um objecto JSON (obj aponta para '{').
+ * Evita apanhar "enabled" aninhado em ldap/radius/dc_agent.
+ */
+static const char *
+find_key_at_depth1(const char *obj, size_t len, const char *key)
+{
+	const char *end;
+	const char *p;
+	size_t klen;
+	int depth = 0;
+	int in_str = 0;
+	int esc = 0;
+
+	if (obj == NULL || key == NULL || *obj != '{')
+		return NULL;
+	end = obj + len;
+	klen = strlen(key);
+	p = obj;
+	while (p < end && *p != '\0') {
+		char c = *p;
+
+		if (in_str) {
+			if (esc)
+				esc = 0;
+			else if (c == '\\')
+				esc = 1;
+			else if (c == '"')
+				in_str = 0;
+			p++;
+			continue;
+		}
+		if (c == '"') {
+			if (depth == 1 &&
+			    (size_t)(end - p) > klen + 2 &&
+			    strncmp(p + 1, key, klen) == 0 &&
+			    p[1 + klen] == '"') {
+				const char *q = p + 1 + klen + 1;
+
+				skip_ws(&q);
+				if (*q == ':')
+					return q + 1;
+			}
+			in_str = 1;
+			p++;
+			continue;
+		}
+		if (c == '{' || c == '[')
+			depth++;
+		else if (c == '}' || c == ']') {
+			depth--;
+			if (depth <= 0)
+				return NULL;
+		}
+		p++;
+	}
+	return NULL;
+}
+
+int
+layer7_identity_operator_enabled(const char *json, size_t len)
+{
+	const char *id;
+	const char *q;
+	int v = 0;
+
+	if (json == NULL || len == 0)
+		return 0;
+	id = find_key(json, len, "identity");
+	if (id == NULL)
+		return 0;
+	skip_ws(&id);
+	if (*id != '{')
+		return 0;
+	q = find_key_at_depth1(id, (size_t)(json + len - id), "enabled");
+	if (q != NULL && parse_bool_val(q, &v) == 0)
+		return v ? 1 : 0;
+	return 0;
+}
+
+/*
  * Encontra o objecto "identity" { ... } e depois "ldap" dentro — parse
  * heurístico suficiente para o schema GUI 20.16.
  */
@@ -204,8 +284,8 @@ layer7_ldap_cfg_parse_json(const char *json, size_t len, struct l7_ldap_cfg *out
 	if (*id != '{')
 		return 0;
 
-	/* identity.enabled */
-	q = find_key(id, (size_t)(json + len - id), "enabled");
+	/* identity.enabled — só a chave rasa (não ldap.enabled). */
+	q = find_key_at_depth1(id, (size_t)(json + len - id), "enabled");
 	if (q != NULL && parse_bool_val(q, &v) == 0)
 		out->identity_enabled = v;
 
@@ -1003,7 +1083,7 @@ layer7_ldap_worker_start(struct l7_id_map *map, const struct l7_ldap_cfg *cfg)
 {
 	struct l7_ldap_worker *w;
 
-	if (cfg == NULL || !cfg->ldap_enabled)
+	if (cfg == NULL || !cfg->identity_enabled || !cfg->ldap_enabled)
 		return NULL;
 	w = calloc(1, sizeof(*w));
 	if (w == NULL)

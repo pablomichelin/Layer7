@@ -19,6 +19,7 @@ import {
   buildAdminCustomerDetailRoute,
   buildAdminLicenseDetailRoute,
   buildAdminLicenseEditRoute,
+  buildAdminInstallationDetailRoute,
 } from '../panel-routes.js';
 import { usePermission } from '../use-permission.js';
 
@@ -220,7 +221,7 @@ export default function LicenseDetail() {
   if (loading) return <p className="text-gray-500">Carregando...</p>;
   if (!data) return <p className="text-red-500">Licença não encontrada</p>;
 
-  const { license, activations, check_ins: checkIns = [] } = data;
+  const { license, activations, check_ins: checkIns = [], installation } = data;
   const bound = isLicenseBound(license);
   const canRenew = canRenewPerm && license.status !== 'revoked';
   const canRebind = canRebindPerm && license.status !== 'revoked' && bound;
@@ -387,6 +388,25 @@ export default function LicenseDetail() {
           {license.revoked_at && <div><span className="text-gray-500">Revogada em:</span> <span className="ml-2">{formatDateTime(license.revoked_at)}</span></div>}
           {license.notes && <div className="md:col-span-2"><span className="text-gray-500">Notas:</span> <span className="ml-2">{license.notes}</span></div>}
         </div>
+
+        {installation ? (
+          <div className="mt-6 border border-brand-100 bg-brand-50 rounded-lg p-4 text-sm">
+            <h4 className="font-semibold text-gray-800 mb-2">Esta caixa no inventário</h4>
+            <p className="text-gray-700">
+              {installation.fqdn || installation.hostname || 'sem nome'}
+              {installation.egress_ip ? ` · público ${installation.egress_ip}` : ''}
+              {installation.wan_ipv4 ? ` · WAN ${installation.wan_ipv4}` : ''}
+              {installation.package_version ? ` · Layer7 ${installation.package_version}` : ''}
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate(buildAdminInstallationDetailRoute(installation.id))}
+              className="mt-2 text-brand-700 hover:underline"
+            >
+              Ver instalação completa
+            </button>
+          </div>
+        ) : null}
 
         {bound && license.status === 'active' && (
           <p className="mt-4 text-xs text-amber-800 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">

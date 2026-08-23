@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.69
+PORTVERSION=	1.9.71
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -126,6 +126,8 @@ do-install:
 		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7.inc \
 		${STAGEDIR}${PREFIX}/pkg
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7-install-ping.inc \
+		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7-fa47-icons.inc \
 		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/priv/layer7.priv.inc \
@@ -184,6 +186,8 @@ do-install:
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-blockpage \
 		${STAGEDIR}${PREFIX}/libexec
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-mitm-entitle-ok \
+		${STAGEDIR}${PREFIX}/libexec
+	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/libexec/layer7-install-ping \
 		${STAGEDIR}${PREFIX}/libexec
 	${INSTALL_SCRIPT} ${FILESDIR}${PREFIX}/etc/rc.d/layer7-blockpage \
 		${STAGEDIR}${PREFIX}/etc/rc.d

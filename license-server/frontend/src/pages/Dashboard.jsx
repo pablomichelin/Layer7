@@ -7,6 +7,7 @@ import StatusBadge from '../components/StatusBadge';
 import { formatCalendarDate } from '../format-date.js';
 import {
   ADMIN_LICENSES_ROUTE,
+  ADMIN_INSTALLATIONS_ROUTE,
   buildAdminLicenseDetailRoute,
 } from '../panel-routes.js';
 
@@ -91,6 +92,18 @@ export default function Dashboard() {
         </Link>
         <StatsCard label="Total Clientes" value={data.customers} color="blue" />
         <StatsCard label="Total Licenças" value={licenses.total} color="blue" />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <Link to={ADMIN_INSTALLATIONS_ROUTE} className="block">
+          <StatsCard label="Instalações vistas" value={data.installations?.total ?? 0} color="blue" />
+        </Link>
+        <Link to={`${ADMIN_INSTALLATIONS_ROUTE}?licensed=no`} className="block">
+          <StatsCard label="Sem serial" value={data.installations?.unlicensed ?? 0} color="yellow" />
+        </Link>
+        <Link to={`${ADMIN_INSTALLATIONS_ROUTE}?stale_days=7`} className="block">
+          <StatsCard label="Instalações stale (7d)" value={data.installations?.stale_7d ?? 0} color="yellow" />
+        </Link>
       </div>
 
       <h3 className="text-lg font-semibold text-gray-700 mb-3">Precisa de acção</h3>

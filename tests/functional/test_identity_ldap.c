@@ -69,6 +69,45 @@ main(void)
 	check(cfg.identity_enabled == 1 && cfg.ldap_enabled == 1, "enabled");
 	check(strcmp(cfg.server, "dc.example.local") == 0, "server");
 	check(cfg.group_depth == 3 && cfg.max_members == 100, "limits");
+	check(layer7_identity_operator_enabled(json, strlen(json)) == 1,
+	    "operator ON");
+
+	{
+		const char *nested =
+		    "{\"layer7\":{\"identity\":{\"ldap\":{\"enabled\":true,"
+		    "\"server\":\"dc.example.local\"},\"enabled\":false}}}";
+		struct l7_ldap_cfg nested_cfg;
+
+		check(layer7_identity_operator_enabled(nested,
+		    strlen(nested)) == 0,
+		    "ldap.enabled first must not arm operator toggle");
+		check(layer7_ldap_cfg_parse_json(nested, strlen(nested),
+		    &nested_cfg) == 0, "parse nested order");
+		check(nested_cfg.identity_enabled == 0,
+		    "identity.enabled false despite ldap.enabled true");
+		check(nested_cfg.ldap_enabled == 1, "ldap.enabled still true");
+	}
+	{
+		const char *off =
+		    "{\"layer7\":{\"identity\":{\"enabled\":false,\"ldap\":{"
+		    "\"enabled\":true,\"server\":\"dc.example.local\"}}}}";
+
+		check(layer7_identity_operator_enabled(off, strlen(off)) == 0,
+		    "operator OFF");
+	}
+	check(layer7_identity_operator_enabled(NULL, 0) == 0,
+	    "missing json = OFF");
+	{
+		struct l7_ldap_cfg wcfg;
+
+		layer7_ldap_cfg_defaults(&wcfg);
+		wcfg.ldap_enabled = 1;
+		wcfg.identity_enabled = 0;
+		snprintf(wcfg.server, sizeof(wcfg.server), "%s",
+		    "dc.example.local");
+		check(layer7_ldap_worker_start(NULL, &wcfg) == NULL,
+		    "worker refused without identity.enabled");
+	}
 
 	cache = layer7_ldap_cache_create(10);
 	check(cache != NULL, "cache create");

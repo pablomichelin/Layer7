@@ -140,6 +140,14 @@ main(void)
 		    "sem mitm entitlement");
 		check(layer7_features_allows_identity(L7_FEAT_BASE) == 0,
 		    "sem identity entitlement");
+		check(layer7_features_identity_want(
+		    L7_FEAT_BASE | L7_FEAT_IDENTITY, 0) == 0,
+		    "token identity + toggle OFF = nao liga");
+		check(layer7_features_identity_want(
+		    L7_FEAT_BASE | L7_FEAT_IDENTITY, 1) == 1,
+		    "token identity + toggle ON = pode ligar");
+		check(layer7_features_identity_want(L7_FEAT_BASE, 1) == 0,
+		    "toggle ON sem token = nao liga");
 		/* check-in nao pode acrescentar alem do .lic */
 		eff = layer7_features_intersect(L7_FEAT_BASE,
 		    L7_FEAT_BASE | L7_FEAT_IDENTITY | L7_FEAT_MITM);

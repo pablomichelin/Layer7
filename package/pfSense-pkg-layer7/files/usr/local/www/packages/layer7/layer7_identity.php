@@ -290,8 +290,8 @@ if ($savemsg !== "") {
 						</label>
 						<p class="help-block">
 							<?= htmlspecialchars(l7_t(
-							    "O mapa de utilizadores so fica activo com o add-on na licenca. " .
-							    "Esta opcao prepara a configuracao neste appliance."
+							    "O mapa so fica activo com o add-on na licenca e este interruptor ligado. " .
+							    "Upgrade de licenca nao liga sozinho."
 							)); ?>
 						</p>
 					</div>

@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-22 — BG-162 Instalações (sinal sem serial)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | backend + SPA (sem deploy) |
+| Versão | `2.2.0` git / SPA live intocada |
+| Objectivo | Ver quem instalou o pacote mesmo sem serial: FQDN, IP público, IPs/nomes de interfaces, uniqueid |
+| Impacto | `POST /api/license/install-ping`, tabelas, `/installations`, dashboard, ADR-0036. Pacote `1.9.71` no mesmo bloco |
+| Risco | Endpoint público (rate-limit + schema). P0-1: sem overlay `.244`. Sem `latest` novo |
+| Teste | `node --test` parse + CSRF; PHP inventário |
+| Rollback | Reverter commit; tabelas só existem após deploy futuro |
+| Resultado | **FEITO no git** — sem `.244` / sem GitHub Release |
+
 ## 2026-08-14 — BG-154 P2-9 upgrade não injecta check-in ON
 
 | Campo | Valor |

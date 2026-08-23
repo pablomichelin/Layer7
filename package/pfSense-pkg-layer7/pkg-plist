@@ -1,5 +1,6 @@
 /usr/local/pkg/layer7.xml
 /usr/local/pkg/layer7.inc
+/usr/local/pkg/layer7-install-ping.inc
 /usr/local/pkg/layer7-fa47-icons.inc
 /etc/inc/priv/layer7.priv.inc
 /usr/local/www/packages/layer7/layer7_status.php
@@ -39,6 +40,7 @@
 /usr/local/libexec/layer7-unbound-anti-doh
 /usr/local/libexec/layer7-blockpage
 /usr/local/libexec/layer7-mitm-entitle-ok
+/usr/local/libexec/layer7-install-ping
 /usr/local/etc/rc.d/layer7-blockpage
 /usr/local/www/layer7-blockpage/router.php
 /usr/local/www/layer7-blockpage/index.php

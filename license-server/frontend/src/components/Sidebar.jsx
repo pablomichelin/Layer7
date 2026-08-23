@@ -12,6 +12,7 @@ import {
   ADMIN_AUDIT_ROUTE,
   ADMIN_SECURITY_ROUTE,
   ADMIN_USERS_ROUTE,
+  ADMIN_INSTALLATIONS_ROUTE,
   ADMIN_LOGIN_ROUTE,
   buildAdminCustomerDetailRoute,
   buildAdminLicenseDetailRoute,
@@ -21,6 +22,7 @@ import { PORTAL_VERSION } from '../portal-version.js';
 const ALL_LINKS = [
   { to: ADMIN_DASHBOARD_ROUTE, label: 'Dashboard', icon: '📊', permission: 'dashboard.read' },
   { to: ADMIN_LICENSES_ROUTE, label: 'Licenças', icon: '🔑', permission: 'licenses.read' },
+  { to: ADMIN_INSTALLATIONS_ROUTE, label: 'Instalações', icon: '🖥️', permission: 'licenses.read' },
   { to: ADMIN_CUSTOMERS_ROUTE, label: 'Clientes', icon: '👥', permission: 'customers.read' },
   { to: ADMIN_AUDIT_ROUTE, label: 'Auditoria', icon: '📋', permission: 'audit.read' },
   { to: ADMIN_USERS_ROUTE, label: 'Utilizadores', icon: '🧑‍💻', permission: 'users.manage' },

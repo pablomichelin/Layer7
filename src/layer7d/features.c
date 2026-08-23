@@ -177,3 +177,10 @@ layer7_features_allows_mitm(unsigned flags)
 {
 	return (flags & L7_FEAT_MITM) != 0 ? 1 : 0;
 }
+
+int
+layer7_features_identity_want(unsigned flags, int operator_enabled)
+{
+	return (layer7_features_allows_identity(flags) &&
+	    operator_enabled) ? 1 : 0;
+}

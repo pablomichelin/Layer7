@@ -24,7 +24,8 @@ Legacy `full` = **base only** (T1). Identity requires an explicit re-issue.
 
 1. Layer7 policies by **AD user/group**, not only static IP.
 2. Sources: **RADIUS accounting** and/or **light DC agent** + LDAP for groups.
-3. Same pfSense package; add-on is **opt-in** (upgrade does not enable it).
+3. Same pfSense package; add-on is **opt-in** (package upgrade **and**
+   license upgrade do not enable it). The operator turns the GUI toggle on.
 4. Accuracy = **network User-ID** (IP seen at the firewall), not a per-PC agent.
 
 ## Do **not** promise

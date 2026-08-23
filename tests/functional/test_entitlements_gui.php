@@ -242,6 +242,39 @@ $cfg = layer7_bare_config();
 $r = layer7_mitm_sync_helper($cfg, true);
 need($r === false, "sync false without effective prerequisites");
 
+/* BG-161: toggle JSON ON sem token nao activa; ganhar token nao ressuscita. */
+l7_sign_lic($priv, "base", $lic, "test-hw-30.7", $exp_ok);
+$armed = layer7_bare_config();
+$armed["layer7"]["identity"]["enabled"] = true;
+$armed["layer7"]["mitm"]["enabled"] = true;
+$mitm_armed = layer7_mitm_from_config($armed);
+need(layer7_mitm_effective($mitm_armed, false) === false,
+    "mitm JSON ON sem entitlement = effective false");
+need(layer7_has_entitlement("identity") === false,
+    "base lic has no identity");
+$before_base = array("has_identity" => false, "has_mitm" => false);
+$after_id = array("has_identity" => true, "has_mitm" => false);
+$tr = layer7_addon_apply_license_transition($armed, $before_base, $after_id);
+need($tr["changed"] === true, "gaining identity disarms leftover toggles");
+$tr_id = layer7_identity_from_config($tr["data"]);
+$tr_mitm = layer7_mitm_from_config($tr["data"]);
+need(empty($tr_id["enabled"]), "upgrade identity keeps toggle OFF");
+need(empty($tr_mitm["enabled"]), "upgrade without mitm token disarms mitm");
+
+$keep_src = layer7_bare_config();
+$keep_src["layer7"]["identity"]["enabled"] = true;
+$keep = layer7_addon_apply_license_transition($keep_src,
+    array("has_identity" => true, "has_mitm" => false),
+    array("has_identity" => true, "has_mitm" => false));
+$keep_id = layer7_identity_from_config($keep["data"]);
+need(!empty($keep_id["enabled"]), "renewal with identity keeps operator ON");
+
+$lost = layer7_addon_apply_license_transition($keep_src,
+    array("has_identity" => true, "has_mitm" => false),
+    array("has_identity" => false, "has_mitm" => false));
+$lost_id = layer7_identity_from_config($lost["data"]);
+need(empty($lost_id["enabled"]), "losing identity persists toggle OFF");
+
 fwrite(STDOUT, "PASS test_entitlements_gui.php\n");
 l7_ent_cleanup($testdir);
 exit(0);

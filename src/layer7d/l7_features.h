@@ -43,4 +43,10 @@ unsigned layer7_features_intersect(unsigned lic_flags, unsigned checkin_flags);
 int layer7_features_allows_identity(unsigned flags);
 int layer7_features_allows_mitm(unsigned flags);
 
+/*
+ * Runtime Identity: token no .lic NÃO liga o módulo.
+ * Só entitled ∧ toggle do operador (identity.enabled).
+ */
+int layer7_features_identity_want(unsigned flags, int operator_enabled);
+
 #endif /* LAYER7_FEATURES_H */

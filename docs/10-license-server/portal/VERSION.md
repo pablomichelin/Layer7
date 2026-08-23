@@ -4,20 +4,20 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `2.1.0` |
-| **Codinome** | 30.15 — alerta multi-appliance |
-| **Estado** | Entregue no git (**sem** deploy live neste passo) |
-| **Data** | `2026-08-12` |
+| **Versão** | `2.2.0` |
+| **Codinome** | BG-162 — Instalações |
+| **Estado** | Entregue no git (**sem** deploy live neste passo; P0-1) |
+| **Data** | `2026-08-22` |
 
 ## Inclui
 
-- Fila «Abuso multi-appliance (30d)» no Dashboard
-- Contagem `licenses.multi_appliance_abuse` na API `/dashboard`
-- Política fase 1: **só alerta** (decisão 7); sem `max_activations`
-- Rebind autorizado não gera falso positivo
+- Menu **Instalações** (lista + detalhe)
+- Cartões no Dashboard: vistas / sem serial / stale 7d
+- Bloco «esta caixa no inventário» na ficha da licença
+- API `GET /api/installations` + `POST /api/license/install-ping`
 
 ## Próxima
 
-Deploy live sob GO operacional; ideias de escala só com GO.
+Deploy live sob GO (P0-1). Canal `latest` do pacote **não** muda neste bump.
 
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

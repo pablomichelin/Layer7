@@ -7,7 +7,20 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ## [Unreleased]
 
-- (vazio)
+## [2.2.0] — 2026-08-22
+
+### Added
+
+- Página **Instalações**: lista e detalhe de caixas que enviaram o sinal
+  de instalação/heartbeat (com ou sem serial)
+- Dashboard: cartões vistas / sem serial / stale 7d
+- Ficha da licença: bloco «esta caixa no inventário»
+- Backend: `POST /api/license/install-ping` + `GET /api/installations`
+
+### Notes
+
+- Código no git; **deploy live não** incluído (P0-1)
+- Pacote correspondente: candidato `1.9.71` (GitHub `latest` inalterado até Release)
 
 ---
 
