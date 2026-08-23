@@ -35,9 +35,12 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.69` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.69`;
-`SHA256=b08acf83798da7bd3541194bcf5758febada8aa0794423930afc6a162f928735`;
-migração de defaults pós-upgrade BG-160; cadeia F1.2 validada; **sem deploy do servidor `.244`**);
+`1.9.71` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.71`;
+`SHA256=67d04bbf817c8fa75c4ed5043df94995b4ad0f025d3cd0030bbe650bda96a081`;
+BG-162 install-ping + BG-161 Identity gate; overlay `.244` `20260823T022826Z`;
+cadeia F1.2); herda `1.9.69`
+(`SHA256=b08acf83798da7bd3541194bcf5758febada8aa0794423930afc6a162f928735`;
+migração de defaults pós-upgrade BG-160);
 herda MITM como política de `1.9.63`
 (`SHA256=f47b1dd82e7d99f8a1f8e6bbd2fe101c0ed33688b45cfcfbb356367db853c373`;
 **MITM como política** (até desligar + copy operador; ADR-0035);
@@ -167,18 +170,13 @@ os defaults reconhecidos passam ao idioma selecionado em qualquer save de
 Configurações, inclusive após upgrade com o idioma já selecionado. Gate local,
 build, assinatura e manifesto PASS. Somente package/GUI — daemon, licença e
 servidor `.244` intactos.
-**BG-161 implementado, pendente de gates/commit (`1.9.70`, `2026-08-16`):**
-Identity no daemon exige token **e** toggle (default OFF). Upgrade de licença
-que ganha `identity`/`mitm` não liga o add-on; perder o token persiste OFF.
-Editar JSON/defaults sem entitlement não activa. Residual R-A (root a patchar
-o produto). Sem publish neste bloco.
-**BG-162 implementado, pendente de gates/commit/deploy/publish (`1.9.71` +
-portal `2.2.0`, `2026-08-22`):** sinal de instalação/heartbeat **sem serial**
-para `license.systemup.inf.br` (FQDN, IP público, IPs/nomes de interfaces,
-uniqueid/plataforma); página **Instalações** no portal. ADR-0036. Fail-open
-(N3). **P0-1:** sem overlay `.244`. Canal GitHub `latest` **não** muda até
-Release com `.pkg` assinado — até lá `latest` continua a última publicada
-(`1.9.69`). Residual: RR-1; caixas antigas não pingam.
+**BG-161 + BG-162 PUBLICADOS `v1.9.71` (`c0d8e24`, `2026-08-22`):**
+Identity no daemon exige token **e** toggle (default OFF). Sinal de
+instalação/heartbeat **sem serial** para `license.systemup.inf.br` (FQDN,
+IP público, IPs/nomes de interfaces, uniqueid/plataforma); página
+**Instalações** no portal `2.2.0`. ADR-0036. Fail-open (N3). Overlay
+cirúrgico `.244` `20260823T022826Z` (API+SPA; sem rsync integral). Residual:
+RR-1; caixas ≤`1.9.69` não pingam até upgrade.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

@@ -6,7 +6,7 @@
 |-------|-------|
 | **Versão** | `2.2.0` |
 | **Codinome** | BG-162 — Instalações |
-| **Estado** | Entregue no git (**sem** deploy live neste passo; P0-1) |
+| **Estado** | Live overlay `.244` `20260823T022826Z` + pacote `1.9.71` |
 | **Data** | `2026-08-22` |
 
 ## Inclui
@@ -18,6 +18,6 @@
 
 ## Próxima
 
-Deploy live sob GO (P0-1). Canal `latest` do pacote **não** muda neste bump.
+Live overlay BG-162 (`20260823T022826Z`). Canal `latest` do pacote = `1.9.71`.
 
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

@@ -2,10 +2,9 @@
 
 ## Status
 
-**Aceito** (`2026-08-22`) — implementado no git (candidato `1.9.71` + portal
-`2.2.0`). **Sem** deploy no license-server live (P0-1) e **sem** GitHub
-Release neste bloco. Canal `latest` permanece a última release publicada
-até GO de publish.
+**Aceito** (`2026-08-22`) — implementado, overlay `.244`
+`20260823T022826Z` (API + SPA Instalações). Pacote `1.9.71` + portal
+`2.2.0`. Canal `latest` = GitHub Release `v1.9.71`.
 
 ## Contexto
 

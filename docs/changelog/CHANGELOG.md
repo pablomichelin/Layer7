@@ -4,14 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.71] — 2026-08-22
+
 ### Added
 
 - **BG-162 — sinal de instalação/heartbeat sem serial:** o pacote
-  `1.9.71` envia inventário (FQDN, WAN, IPs/nomes de interfaces,
+  envia inventário (FQDN, WAN, IPs/nomes de interfaces,
   uniqueid/plataforma) a `license.systemup.inf.br` na instalação e a
   cada 24 h, mesmo sem chave. Fail-open (N3). Portal `2.2.0` página
-  Instalações. ADR-0036. **Pendente** overlay `.244` + GitHub Release —
-  o canal `latest` continua a última versão **publicada** até esse GO.
+  Instalações. ADR-0036. Overlay `.244` `20260823T022826Z`.
 
 ### Fixed
 
@@ -19,8 +20,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   passa a exigir token **e** toggle `identity.enabled` (default OFF).
   Ganhar `identity`/`mitm` na activação persiste os toggles OFF; perder o
   token desliga. Editar JSON/defaults sem entitlement não activa MITM
-  (`mitm_effective`) nem Identity. Candidato `1.9.70` — pendente de
-  gates/commit/publish.
+  (`mitm_effective`) nem Identity.
 
 ## [1.9.69] — 2026-08-15
 

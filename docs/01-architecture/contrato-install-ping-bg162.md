@@ -1,9 +1,10 @@
 # Contrato — Sinal de instalação / heartbeat (BG-162)
 
-**Estado:** implementado no git (`2026-08-22`) · **ADR-0036**  
+**Estado:** overlay live `.244` (`20260823T022826Z`) · **ADR-0036**  
 **Código:** license-server `POST /api/license/install-ping` + portal
 `/installations` · pacote `1.9.71` (libexec + tick `layer7d`)  
-**Live `.244` / GitHub Release:** **não** neste bloco (P0-1 + GO publish)
+**Live `.244`:** endpoint + página Instalações **activos**. GitHub Release
+`v1.9.71` no mesmo bloco de publish.
 
 ## Objectivo / impacto / risco / teste / rollback
 

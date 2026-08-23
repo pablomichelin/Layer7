@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-22 — BG-162 Instalações LIVE + `1.9.71`
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | overlay `.244` (API+SPA) + pacote |
+| Versão | `2.2.0` live / pacote `1.9.71` |
+| Objectivo | Ver quem instalou mesmo sem serial |
+| Impacto | `POST /api/license/install-ping` live; menu Instalações; sem rsync integral |
+| Risco | Endpoint público (rate-limit + schema). Rollback: tags `pre-bg162-20260823T022826Z` |
+| Teste | health 200; ping 200 `{status:ok}`; garbage 400; GET /api/installations 401; check-in 404 intacto |
+| Rollback | `docker tag layer7-license-api:pre-bg162-20260823T022826Z layer7-license-api:latest` (+ web) |
+| Resultado | **Overlay PASS**. GitHub Release `v1.9.71` F1.2 no mesmo bloco |
+
 ## 2026-08-22 — BG-162 Instalações (sinal sem serial)
 
 | Campo | Valor |
@@ -16,7 +29,7 @@ Mais recente no topo.
 | Risco | Endpoint público (rate-limit + schema). P0-1: sem overlay `.244`. Sem `latest` novo |
 | Teste | `node --test` parse + CSRF; PHP inventário |
 | Rollback | Reverter commit; tabelas só existem após deploy futuro |
-| Resultado | **FEITO no git** — sem `.244` / sem GitHub Release |
+| Resultado | **FEITO no git** — superseded pelo overlay live no mesmo dia |
 
 ## 2026-08-14 — BG-154 P2-9 upgrade não injecta check-in ON
 

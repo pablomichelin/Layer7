@@ -19,8 +19,8 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 
 ### Notes
 
-- Código no git; **deploy live não** incluído (P0-1)
-- Pacote correspondente: candidato `1.9.71` (GitHub `latest` inalterado até Release)
+- Código no git; overlay live `.244` `20260823T022826Z`
+- Pacote correspondente: `1.9.71`
 
 ---
 

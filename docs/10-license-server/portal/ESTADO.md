@@ -1,7 +1,8 @@
 # Estado Actual — Portal Admin
 
-> Snapshot: **2026-08-14** — API live **`30.13`** (`20260814T142739Z`); SPA visual **`2.0.0`** intocada.
-> **P0-1 ACTIVO:** serving `30.11` versionado no git; **proibido** deploy integral do HEAD (freeze **não** encerrado).
+> Snapshot: **2026-08-22** — overlay BG-162 (`20260823T022826Z`); SPA visual **`2.2.0`**.
+> **P0-1 ACTIVO:** freeze **não** encerrado; este bloco foi overlay por allowlist
+> (API + SPA Instalações), **não** rsync integral do HEAD.
 
 ## Ambiente
 
@@ -9,10 +10,10 @@
 |------|-------|
 | Host | `192.168.100.244` |
 | URL | `https://license.systemup.inf.br` |
-| Versão visual | **`2.0.0`** (SPA **não** rebuild neste bloco) |
-| API live | **`30.13`** dual-mode nonce/envelope (`5754bfa`) |
-| Imagem API | `sha256:bbc74a53651f835d4dd0b07f2d5f97c2a3cd25e99c8e965309aa6ea018aadb9f` |
-| Rollback preferido | overlay `30.13` / imagem `bbc74a5…` (commit conhecido `5754bfa` + serving `30.11`) |
+| Versão visual | **`2.2.0`** (Instalações) |
+| API live | overlay `30.13` + BG-162 install-ping |
+| Imagem API | `layer7-license-api` pós-BG-162 (`2f27f47f…`) |
+| Rollback | tags `pre-bg162-20260823T022826Z` (api+web); dump `/var/backups/layer7/license-server-pre-bg162-20260823T022826Z.sql` |
 | Tag `pre-30.13` | `layer7-license-api:pre-30.13-20260814T142739Z` — **só** incidente específico do overlay `30.13`; **não** é rollback padrão/`latest` (P2-16) |
 | Health | `ok` (público + origin `8445`) |
 | TZ | `UTC` |
