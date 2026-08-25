@@ -1,7 +1,8 @@
 <?php
 /**
  * BG-162 / ADR-0036 — inventário de instalação (fail-open).
- * Testável sem pfSense: passar $config e $opts.
+ * BG-163: não carregar config.inc (fatal em CLI); curl por caminho absoluto;
+ * throttle de retry. Testável sem pfSense: passar $config e $opts.
  */
 
 function layer7_install_ping_url()
@@ -28,6 +29,40 @@ function layer7_install_ping_id_path()
 	return layer7_install_ping_state_dir() . "/install-id";
 }
 
+function layer7_install_ping_putenv_path()
+{
+	$extra = "/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin";
+	$cur = getenv("PATH");
+	if (!is_string($cur) || $cur === "") {
+		putenv("PATH=" . $extra);
+		return;
+	}
+	if (strpos($cur, "/usr/local/bin") === false) {
+		putenv("PATH=" . $cur . ":" . $extra);
+	}
+}
+
+function layer7_install_ping_cmd($cmd)
+{
+	if (!is_string($cmd) || $cmd === "") {
+		return "";
+	}
+	if (function_exists("exec")) {
+		$lines = array();
+		$rc = 0;
+		@exec($cmd . " 2>/dev/null", $lines, $rc);
+		if (is_array($lines) && $lines !== array()) {
+			return implode("\n", $lines);
+		}
+		return "";
+	}
+	if (function_exists("shell_exec")) {
+		$out = @shell_exec($cmd . " 2>/dev/null");
+		return is_string($out) ? $out : "";
+	}
+	return "";
+}
+
 function layer7_install_ping_read_trimmed($path, $max = 128)
 {
 	if (!is_string($path) || $path === "" || !is_readable($path)) {
@@ -50,10 +85,8 @@ function layer7_install_ping_sysctl($name, $max = 128)
 	if ($name === "") {
 		return "";
 	}
-	$out = @shell_exec("sysctl -n " . escapeshellarg($name) . " 2>/dev/null");
-	if (!is_string($out)) {
-		return "";
-	}
+	$bin = is_executable("/sbin/sysctl") ? "/sbin/sysctl" : "sysctl";
+	$out = layer7_install_ping_cmd($bin . " -n " . escapeshellarg($name));
 	$out = trim($out);
 	if (strlen($out) > $max) {
 		$out = substr($out, 0, $max);
@@ -67,10 +100,8 @@ function layer7_install_ping_kenv($key, $max = 128)
 	if ($key === "") {
 		return "";
 	}
-	$out = @shell_exec("kenv -q " . escapeshellarg($key) . " 2>/dev/null");
-	if (!is_string($out)) {
-		return "";
-	}
+	$bin = is_executable("/bin/kenv") ? "/bin/kenv" : "kenv";
+	$out = layer7_install_ping_cmd($bin . " -q " . escapeshellarg($key));
 	$out = trim($out);
 	if (strlen($out) > $max) {
 		$out = substr($out, 0, $max);
@@ -93,7 +124,38 @@ function layer7_install_ping_valid_ipv6($ip)
 	if ($ip === "::1") {
 		return false;
 	}
+	if (stripos($ip, "fe80:") === 0) {
+		return false;
+	}
 	return (bool)filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
+}
+
+function layer7_install_ping_ifconfig_ip($real, $family = 4)
+{
+	$real = preg_replace('/[^a-zA-Z0-9_.-]/', "", (string)$real);
+	if ($real === "") {
+		return "";
+	}
+	$bin = is_executable("/sbin/ifconfig") ? "/sbin/ifconfig" : "ifconfig";
+	$out = layer7_install_ping_cmd($bin . " " . escapeshellarg($real));
+	if ($out === "") {
+		return "";
+	}
+	if ($family === 4) {
+		if (preg_match('/\binet\s+(\d+\.\d+\.\d+\.\d+)\b/', $out, $m)
+		    && layer7_install_ping_valid_ipv4($m[1])) {
+			return $m[1];
+		}
+		return "";
+	}
+	if (preg_match_all('/\binet6\s+([0-9a-fA-F:]+)/', $out, $mm)) {
+		foreach ($mm[1] as $cand) {
+			if (layer7_install_ping_valid_ipv6($cand)) {
+				return explode("%", $cand)[0];
+			}
+		}
+	}
+	return "";
 }
 
 function layer7_install_ping_iface_ip($ifname, $cfg, $family = 4)
@@ -109,7 +171,8 @@ function layer7_install_ping_iface_ip($ifname, $cfg, $family = 4)
 				return $got;
 			}
 		}
-		return "";
+		$real = isset($cfg["if"]) ? (string)$cfg["if"] : "";
+		return layer7_install_ping_ifconfig_ip($real, 4);
 	}
 	$raw = isset($cfg["ipaddrv6"]) ? trim((string)$cfg["ipaddrv6"]) : "";
 	if (layer7_install_ping_valid_ipv6($raw)) {
@@ -121,7 +184,120 @@ function layer7_install_ping_iface_ip($ifname, $cfg, $family = 4)
 			return explode("%", (string)$got)[0];
 		}
 	}
-	return "";
+	$real = isset($cfg["if"]) ? (string)$cfg["if"] : "";
+	return layer7_install_ping_ifconfig_ip($real, 6);
+}
+
+function layer7_install_ping_xml_decode($value)
+{
+	$value = html_entity_decode(trim((string)$value), ENT_QUOTES, "UTF-8");
+	return $value;
+}
+
+function layer7_install_ping_xml_inner($raw, $tag)
+{
+	$tag = preg_replace('/[^a-zA-Z0-9_]/', "", (string)$tag);
+	if ($tag === "" || !is_string($raw)) {
+		return "";
+	}
+	if (!preg_match('/<' . $tag . '>(.*?)<\/' . $tag . '>/s', $raw, $m)) {
+		return "";
+	}
+	return $m[1];
+}
+
+function layer7_install_ping_xml_leaf($raw, $tag)
+{
+	$tag = preg_replace('/[^a-zA-Z0-9_]/', "", (string)$tag);
+	if ($tag === "" || !is_string($raw) || $raw === "") {
+		return "";
+	}
+	if (!preg_match('/<' . $tag . '>([^<]*)<\/' . $tag . '>/', $raw, $m)) {
+		return "";
+	}
+	return layer7_install_ping_xml_decode($m[1]);
+}
+
+function layer7_install_ping_config_xml_paths()
+{
+	$paths = array("/cf/conf/config.xml", "/conf/config.xml");
+	if (defined("LAYER7_TEST_ROOT") && LAYER7_TEST_ROOT) {
+		$root = rtrim((string)LAYER7_TEST_ROOT, "/");
+		array_unshift($paths, $root . "/cf/conf/config.xml", $root . "/conf/config.xml");
+	}
+	return $paths;
+}
+
+function layer7_install_ping_load_pfsense_config()
+{
+	$raw = "";
+	foreach (layer7_install_ping_config_xml_paths() as $path) {
+		if (!is_readable($path)) {
+			continue;
+		}
+		$raw = @file_get_contents($path);
+		if (is_string($raw) && $raw !== "") {
+			break;
+		}
+	}
+	if ($raw === "") {
+		return array();
+	}
+
+	$config = array(
+		"system" => array(),
+		"interfaces" => array(),
+		"gateways" => array(),
+	);
+
+	$system = layer7_install_ping_xml_inner($raw, "system");
+	$hostname = layer7_install_ping_xml_leaf($system, "hostname");
+	$domain = layer7_install_ping_xml_leaf($system, "domain");
+	if ($hostname !== "") {
+		$config["system"]["hostname"] = $hostname;
+	}
+	if ($domain !== "") {
+		$config["system"]["domain"] = $domain;
+	}
+
+	$ifaces_blob = layer7_install_ping_xml_inner($raw, "interfaces");
+	if ($ifaces_blob !== ""
+	    && preg_match_all('/<(wan|lan|opt[0-9]+)>(.*?)<\/\1>/s', $ifaces_blob, $mm, PREG_SET_ORDER)) {
+		foreach ($mm as $block) {
+			$id = $block[1];
+			$body = $block[2];
+			$entry = array();
+			foreach (array("if", "descr", "ipaddr", "ipaddrv6", "gateway") as $field) {
+				$val = layer7_install_ping_xml_leaf($body, $field);
+				if ($val !== "") {
+					$entry[$field] = $val;
+				}
+			}
+			$config["interfaces"][$id] = $entry;
+		}
+	}
+
+	$gw_blob = layer7_install_ping_xml_inner($raw, "gateways");
+	if ($gw_blob !== "") {
+		$dgw = layer7_install_ping_xml_leaf($gw_blob, "defaultgw4");
+		if ($dgw !== "") {
+			$config["gateways"]["defaultgw4"] = $dgw;
+		}
+		$items = array();
+		if (preg_match_all('/<gateway_item>(.*?)<\/gateway_item>/s', $gw_blob, $gm, PREG_SET_ORDER)) {
+			foreach ($gm as $item) {
+				$items[] = array(
+					"name" => layer7_install_ping_xml_leaf($item[1], "name"),
+					"gateway" => layer7_install_ping_xml_leaf($item[1], "gateway"),
+				);
+			}
+		}
+		if ($items !== array()) {
+			$config["gateways"]["gateway_item"] = $items;
+		}
+	}
+
+	return $config;
 }
 
 function layer7_install_ping_ensure_install_id()
@@ -175,32 +351,45 @@ function layer7_install_ping_package_version()
 {
 	$bin = "/usr/local/sbin/layer7d";
 	if (is_executable($bin)) {
-		$out = @shell_exec(escapeshellarg($bin) . " -V 2>/dev/null");
-		if (is_string($out)) {
-			$out = trim($out);
-			if ($out !== "" && strlen($out) <= 32) {
-				return $out;
-			}
+		$out = trim(layer7_install_ping_cmd(escapeshellarg($bin) . " -V"));
+		if ($out !== "" && strlen($out) <= 32) {
+			return $out;
 		}
 	}
-	return "1.9.71";
+	return "1.9.72";
 }
 
 function layer7_install_ping_fingerprint()
 {
 	$bin = "/usr/local/sbin/layer7d";
-	if (!is_executable($bin)) {
-		return "";
-	}
-	$out = @shell_exec(escapeshellarg($bin) . " --fingerprint 2>/dev/null");
-	if (!is_string($out)) {
-		return "";
-	}
-	$out = strtolower(trim($out));
-	if (preg_match('/^[a-f0-9]{64}$/', $out)) {
-		return $out;
+	if (is_executable($bin)) {
+		$out = strtolower(trim(layer7_install_ping_cmd(escapeshellarg($bin) . " --fingerprint")));
+		if (preg_match('/^[a-f0-9]{64}$/', $out)) {
+			return $out;
+		}
 	}
 	return "";
+}
+
+function layer7_install_ping_hardware_id_fallback()
+{
+	$parts = array(
+		layer7_install_ping_read_trimmed("/etc/hostid", 128),
+		layer7_install_ping_read_trimmed("/var/db/uniqueid", 128),
+	);
+	if (defined("LAYER7_TEST_ROOT") && LAYER7_TEST_ROOT) {
+		$root = rtrim((string)LAYER7_TEST_ROOT, "/");
+		$parts[] = layer7_install_ping_read_trimmed($root . "/etc/hostid", 128);
+		$parts[] = layer7_install_ping_read_trimmed($root . "/var/db/uniqueid", 128);
+	}
+	$parts[] = layer7_install_ping_sysctl("kern.hostuuid", 128);
+	$seed = implode(":", array_filter($parts, function ($v) {
+		return is_string($v) && $v !== "";
+	}));
+	if ($seed === "") {
+		$seed = layer7_install_ping_ensure_install_id();
+	}
+	return hash("sha256", "layer7-install-ping-fallback:" . $seed);
 }
 
 function layer7_install_ping_license_key()
@@ -234,10 +423,35 @@ function layer7_install_ping_classify_event($state, $package_version)
 	return "heartbeat";
 }
 
+function layer7_install_ping_should_send($state, $now = null)
+{
+	if (!is_array($state)) {
+		$state = array();
+	}
+	$now = $now === null ? time() : (int)$now;
+	$last_ok = isset($state["last_ok"]) ? (int)$state["last_ok"] : 0;
+	$last_http = isset($state["last_http"]) ? (int)$state["last_http"] : 0;
+	$last_attempt = isset($state["last_attempt"]) ? (int)$state["last_attempt"] : 0;
+
+	if ($last_ok > 0 && ($now - $last_ok) < 86400 && $last_http >= 200 && $last_http < 300) {
+		return false;
+	}
+	if ($last_attempt > 0 && ($now - $last_attempt) < 900) {
+		return false;
+	}
+	return true;
+}
+
 function layer7_install_inventory($config = null, $opts = array())
 {
 	if (!is_array($config)) {
 		global $config;
+	}
+	if (!is_array($config) || $config === array()) {
+		$loaded = layer7_install_ping_load_pfsense_config();
+		if (is_array($loaded) && $loaded !== array()) {
+			$config = $loaded;
+		}
 	}
 	if (!is_array($config)) {
 		$config = array();
@@ -334,6 +548,23 @@ function layer7_install_inventory($config = null, $opts = array())
 	$hardware_id = isset($opts["hardware_id"])
 		? (string)$opts["hardware_id"]
 		: layer7_install_ping_fingerprint();
+	if ($hardware_id === "") {
+		$hardware_id = layer7_install_ping_hardware_id_fallback();
+	}
+
+	$uniqueid_path = "/var/db/uniqueid";
+	$hostid_path = "/etc/hostid";
+	$version_path = "/etc/version";
+	$version_patch_path = "/etc/version.patch";
+	$platform_path = "/etc/platform";
+	if (defined("LAYER7_TEST_ROOT") && LAYER7_TEST_ROOT) {
+		$root = rtrim((string)LAYER7_TEST_ROOT, "/");
+		$uniqueid_path = $root . "/var/db/uniqueid";
+		$hostid_path = $root . "/etc/hostid";
+		$version_path = $root . "/etc/version";
+		$version_patch_path = $root . "/etc/version.patch";
+		$platform_path = $root . "/etc/platform";
+	}
 
 	$payload = array(
 		"hardware_id" => $hardware_id,
@@ -352,16 +583,16 @@ function layer7_install_inventory($config = null, $opts = array())
 		"fqdn" => substr($fqdn, 0, 255),
 		"pfsense_version" => isset($opts["pfsense_version"])
 			? (string)$opts["pfsense_version"]
-			: layer7_install_ping_read_trimmed("/etc/version", 64),
+			: layer7_install_ping_read_trimmed($version_path, 64),
 		"pfsense_version_patch" => isset($opts["pfsense_version_patch"])
 			? (string)$opts["pfsense_version_patch"]
-			: layer7_install_ping_read_trimmed("/etc/version.patch", 32),
+			: layer7_install_ping_read_trimmed($version_patch_path, 32),
 		"platform" => isset($opts["platform"])
 			? (string)$opts["platform"]
-			: layer7_install_ping_read_trimmed("/etc/platform", 64),
+			: layer7_install_ping_read_trimmed($platform_path, 64),
 		"uniqueid" => isset($opts["uniqueid"])
 			? (string)$opts["uniqueid"]
-			: layer7_install_ping_read_trimmed("/var/db/uniqueid", 128),
+			: layer7_install_ping_read_trimmed($uniqueid_path, 128),
 		"system_serial" => isset($opts["system_serial"])
 			? (string)$opts["system_serial"]
 			: layer7_install_ping_kenv("smbios.system.serial", 128),
@@ -382,6 +613,10 @@ function layer7_install_inventory($config = null, $opts = array())
 		"gateway_v4" => $gateway,
 		"interfaces" => $ifaces,
 	);
+
+	if ($payload["uniqueid"] === "" && is_readable($hostid_path)) {
+		$payload["uniqueid"] = layer7_install_ping_read_trimmed($hostid_path, 128);
+	}
 
 	if ($payload["ncpu"] < 1) {
 		unset($payload["ncpu"]);
@@ -406,44 +641,116 @@ function layer7_install_inventory($config = null, $opts = array())
 	return $payload;
 }
 
+function layer7_install_ping_curl_bin()
+{
+	foreach (array("/usr/local/bin/curl", "/usr/bin/curl") as $bin) {
+		if (is_executable($bin)) {
+			return $bin;
+		}
+	}
+	return "curl";
+}
+
 function layer7_install_ping_post($payload, $url = null)
 {
 	if (!is_array($payload) || empty($payload["hardware_id"])) {
-		return array("ok" => false, "error" => "hardware_id ausente");
+		return array("ok" => false, "error" => "hardware_id ausente", "http" => 0);
 	}
 	$url = $url ?: layer7_install_ping_url();
 	$json = json_encode($payload, JSON_UNESCAPED_SLASHES);
 	if (!is_string($json)) {
-		return array("ok" => false, "error" => "json");
+		return array("ok" => false, "error" => "json", "http" => 0);
 	}
 
-	$cmd = "curl -sS -o /dev/null -w '%{http_code}'"
+	$ua = "layer7-install-ping/1.9.72";
+	$ext_error = "";
+	if (function_exists("curl_init")) {
+		$ch = curl_init($url);
+		if ($ch !== false) {
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+				"Content-Type: application/json",
+				"User-Agent: " . $ua,
+			));
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+			@curl_exec($ch);
+			$http = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$cerr = curl_error($ch);
+			curl_close($ch);
+			if ($http > 0) {
+				$result = array(
+					"ok" => ($http >= 200 && $http < 300),
+					"http" => $http,
+				);
+				return $result;
+			}
+			$ext_error = $cerr !== "" ? substr($cerr, 0, 200) : "curl_ext_http_0";
+		}
+	}
+
+	$cmd = layer7_install_ping_curl_bin()
+		. " -sS -o /dev/null -w '%{http_code}'"
 		. " --connect-timeout 10 --max-time 30"
 		. " -H " . escapeshellarg("Content-Type: application/json")
-		. " -H " . escapeshellarg("User-Agent: layer7-install-ping/1.9.71")
+		. " -H " . escapeshellarg("User-Agent: " . $ua)
 		. " --data-binary " . escapeshellarg($json)
 		. " " . escapeshellarg($url);
-	$code = trim((string)@shell_exec($cmd . " 2>/dev/null"));
+	$code = trim(layer7_install_ping_cmd($cmd));
 	$http = (int)$code;
 	return array(
 		"ok" => ($http >= 200 && $http < 300),
 		"http" => $http,
+		"error" => $http === 0 ? ($ext_error !== "" ? $ext_error : "curl_http_0") : "",
 	);
+}
+
+function layer7_install_ping_note($msg)
+{
+	$msg = preg_replace('/[^a-zA-Z0-9 _.:\\/=-]/', "", (string)$msg);
+	if ($msg === "") {
+		return;
+	}
+	if (is_executable("/usr/bin/logger")) {
+		layer7_install_ping_cmd("/usr/bin/logger -t layer7-install-ping " . escapeshellarg($msg));
+	}
 }
 
 function layer7_install_ping_run($config = null, $opts = array())
 {
+	if (!is_array($opts)) {
+		$opts = array();
+	}
+	layer7_install_ping_putenv_path();
+
+	$force = !empty($opts["force"]) || getenv("LAYER7_INSTALL_PING_FORCE") === "1";
+	$state = layer7_install_ping_load_state();
+	if (!$force && !layer7_install_ping_should_send($state)) {
+		return array("ok" => true, "skipped" => true, "http" => isset($state["last_http"]) ? (int)$state["last_http"] : 0);
+	}
+
 	$payload = layer7_install_inventory($config, $opts);
 	$result = layer7_install_ping_post($payload, isset($opts["url"]) ? $opts["url"] : null);
 	$state = layer7_install_ping_load_state();
 	$state["last_attempt"] = time();
 	$state["last_event"] = isset($payload["event"]) ? $payload["event"] : "";
 	$state["last_http"] = isset($result["http"]) ? (int)$result["http"] : 0;
+	if (!empty($result["error"])) {
+		$state["last_error"] = substr((string)$result["error"], 0, 200);
+	} else {
+		unset($state["last_error"]);
+	}
 	if (!empty($result["ok"])) {
 		$state["last_ok"] = time();
 		$state["last_version"] = isset($payload["package_version"])
 			? $payload["package_version"] : "";
 	}
 	layer7_install_ping_save_state($state);
+	layer7_install_ping_note(
+		"event=" . (isset($payload["event"]) ? $payload["event"] : "?")
+		. " http=" . $state["last_http"]
+	);
 	return $result;
 }

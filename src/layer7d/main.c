@@ -1208,7 +1208,8 @@ license_checkin_tick(void)
 }
 
 #define L7_INSTALL_PING_BIN "/usr/local/libexec/layer7-install-ping"
-#define L7_INSTALL_PING_INTERVAL_SEC 86400
+/* 15 min: o PHP faz throttle (24 h se OK, 15 min se falhou). */
+#define L7_INSTALL_PING_INTERVAL_SEC 900
 
 static void
 install_ping_tick(void)

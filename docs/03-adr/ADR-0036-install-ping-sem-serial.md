@@ -3,8 +3,10 @@
 ## Status
 
 **Aceito** (`2026-08-22`) — implementado, overlay `.244`
-`20260823T022826Z` (API + SPA Instalações). Pacote `1.9.71` + portal
-`2.2.0`. Canal `latest` = GitHub Release `v1.9.71`.
+`20260823T022826Z` (API + SPA Instalações). Portal `2.2.0`. Canal
+`latest` publicado = `v1.9.71`. **BG-163** (`2026-08-25`): o cliente
+`1.9.71` falhava em silêncio (não é falha do endpoint live). Candidato
+de pacote `1.9.72` — **sem** publish neste bloco.
 
 ## Contexto
 
@@ -38,6 +40,9 @@ nomes das interfaces e os identificadores do pfSense — mesmo sem licença.
   Root pode calar ou mentir no JSON (RR-1); `egress_ip` não é forjável.
 - Deploy do endpoint no `.244` exige **GO** (P0-1). Sem isso o pacote
   novo faz ping para 404 e falha em silêncio.
+- Cliente `1.9.71`: `require config.inc` em CLI, `curl` fora do PATH do
+  daemon e retry só às 24 h — caixa instalada não aparece. Correcção no
+  cliente (`1.9.72` / BG-163); o endpoint live **não** mudou.
 
 ## Relação
 

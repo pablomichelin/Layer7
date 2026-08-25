@@ -1,11 +1,12 @@
 #!/bin/sh
-# layer7-install-ping — BG-162 / ADR-0036
+# layer7-install-ping — BG-162 / BG-163 / ADR-0036
 # Inventário + POST fail-open. Exit 0 sempre (não parte pkg add / daemon).
 
 INC="${LAYER7_INSTALL_PING_INC:-/usr/local/pkg/layer7-install-ping.inc}"
+CLI="${LAYER7_INSTALL_PING_CLI:-/usr/local/pkg/layer7-install-ping-cli.php}"
 
 PHP_BIN=""
-for _p in /usr/local/bin/php /usr/local/mds-php/bin/php; do
+for _p in /usr/local/bin/php /usr/local/sbin/php /usr/local/mds-php/bin/php; do
 	if [ -x "$_p" ]; then
 		PHP_BIN="$_p"
 		break
@@ -15,22 +16,25 @@ if [ -z "$PHP_BIN" ] && command -v php >/dev/null 2>&1; then
 	PHP_BIN=$(command -v php)
 fi
 
-if [ -z "$PHP_BIN" ] || [ ! -r "$INC" ]; then
+if [ -z "$PHP_BIN" ] || [ ! -r "$INC" ] || [ ! -r "$CLI" ]; then
 	exit 0
 fi
 
-# Carregar config.xml do pfSense quando existir (nomes/IPs).
-"$PHP_BIN" -r '
-$inc = $argv[1];
-if (is_readable("/etc/inc/config.inc")) {
-	require_once "/etc/inc/config.inc";
-}
-require_once $inc;
-if (isset($argv[2]) && $argv[2] === "--inventory") {
-	echo json_encode(layer7_install_inventory(), JSON_UNESCAPED_SLASHES), "\n";
-	exit(0);
-}
-layer7_install_ping_run();
-exit(0);
-' "$INC" "${1:-}" >/dev/null 2>&1 || true
+export PATH="/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin${PATH:+:$PATH}"
+export LAYER7_INSTALL_PING_INC="$INC"
+
+INVENTORY=0
+for _a in "$@"; do
+	if [ "$_a" = "--inventory" ]; then
+		INVENTORY=1
+		break
+	fi
+done
+
+if [ "$INVENTORY" -eq 1 ]; then
+	"$PHP_BIN" -f "$CLI" -- --inventory
+	exit $?
+fi
+
+"$PHP_BIN" -f "$CLI" >/dev/null 2>&1 || true
 exit 0

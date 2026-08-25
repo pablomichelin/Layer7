@@ -18,11 +18,11 @@ else
 fi
 
 if grep -F '/usr/local/libexec/layer7-install-ping' "$MAIN_C" >/dev/null \
-	&& grep -F 'L7_INSTALL_PING_INTERVAL_SEC 86400' "$MAIN_C" >/dev/null \
+	&& grep -F 'L7_INSTALL_PING_INTERVAL_SEC 900' "$MAIN_C" >/dev/null \
 	&& grep -F '>/dev/null 2>&1 &' "$MAIN_C" >/dev/null; then
-	pass "layer7d tick 24h fail-open em background"
+	pass "layer7d tick 15min fail-open em background"
 else
-	failmsg "layer7d tick 24h fail-open em background"
+	failmsg "layer7d tick 15min fail-open em background"
 fi
 
 if grep -F 'layer7-install-ping' "$PKG_INSTALL" >/dev/null \
@@ -33,10 +33,23 @@ else
 fi
 
 if grep -F 'fail-open' "$LIBEXEC" >/dev/null \
-	&& grep -E '^exit 0$' "$LIBEXEC" >/dev/null; then
-	pass "libexec fail-open (exit 0)"
+	&& grep -E '^exit 0$' "$LIBEXEC" >/dev/null \
+	&& grep -F '"$PHP_BIN" -f' "$LIBEXEC" >/dev/null \
+	&& ! grep -F 'config.inc' "$LIBEXEC" >/dev/null; then
+	pass "libexec fail-open (exit 0, php -f, sem config.inc)"
 else
-	failmsg "libexec fail-open (exit 0)"
+	failmsg "libexec fail-open (exit 0, php -f, sem config.inc)"
+fi
+
+INC="$ROOT/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7-install-ping.inc"
+CLI="$ROOT/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7-install-ping-cli.php"
+if grep -F '/usr/local/bin/curl' "$INC" >/dev/null \
+	&& grep -F 'layer7_install_ping_load_pfsense_config' "$INC" >/dev/null \
+	&& grep -F 'layer7_install_ping_should_send' "$INC" >/dev/null \
+	&& [ -f "$CLI" ]; then
+	pass "cliente usa XML + curl absoluto + throttle + cli.php"
+else
+	failmsg "cliente usa XML + curl absoluto + throttle + cli.php"
 fi
 
 exit "$fail"

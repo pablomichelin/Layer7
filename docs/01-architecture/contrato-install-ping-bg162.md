@@ -2,9 +2,9 @@
 
 **Estado:** overlay live `.244` (`20260823T022826Z`) · **ADR-0036**  
 **Código:** license-server `POST /api/license/install-ping` + portal
-`/installations` · pacote `1.9.71` (libexec + tick `layer7d`)  
-**Live `.244`:** endpoint + página Instalações **activos**. GitHub Release
-`v1.9.71` no mesmo bloco de publish.
+`/installations` · pacote `1.9.72` (libexec + tick `layer7d`)  
+**Live `.244`:** endpoint + página Instalações **activos**. Canal
+`latest` publicado = `v1.9.71` até GO de publish `1.9.72` (BG-163).
 
 ## Objectivo / impacto / risco / teste / rollback
 
@@ -51,8 +51,19 @@ ARP/DHCP, `config.xml` completo.
 
 ## Cliente
 
-- Inventário PHP (`layer7-install-ping.inc`)
-- Libexec `/usr/local/libexec/layer7-install-ping` (curl 10/30 s)
+- Inventário PHP (`layer7-install-ping.inc`) — lê `config.xml` directo
+  (`/cf/conf/config.xml` ou `/conf/config.xml`) com parser PCRE. **Não**
+  carrega `config.inc` (fatal frequente em CLI pfSense).
+- Driver `layer7-install-ping-cli.php` via `php -f` (nunca `php -r` +
+  `$argv`).
+- Libexec `/usr/local/libexec/layer7-install-ping` (fail-open, exit 0)
+- POST: extensão cURL se responder; senão `/usr/local/bin/curl`
+  (PATH do `daemon(8)` não inclui `/usr/local/bin`)
+- `hardware_id`: `layer7d --fingerprint`; se vazio, SHA-256 estável de
+  hostid/uniqueid (prefixo `layer7-install-ping-fallback:`)
 - `pkg-install.in` dispara em background após `onestart`
-- `layer7d` dispara a cada 24 h (e no primeiro tick)
+- `layer7d` acorda o helper a cada 15 min; o PHP envia heartbeat às 24 h
+  se o último POST foi 2xx, e re-tenta aos 15 min se falhou
+- Estado local `/var/db/layer7/install-ping.json` (`last_http`,
+  `last_error`); syslog `layer7-install-ping`
 - Sem interruptor GUI

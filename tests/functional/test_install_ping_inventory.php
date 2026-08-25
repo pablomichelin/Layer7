@@ -103,6 +103,82 @@ check(is_array($lo) && empty($lo['ipv4']), 'loopback 127.0.0.1 nao enviado como 
 check(layer7_install_ping_url() === 'https://license.systemup.inf.br/api/license/install-ping',
 	'URL canonica do license server');
 
+check(layer7_install_ping_should_send(array(), 1000) === true,
+	'primeira vez envia');
+check(layer7_install_ping_should_send(array(
+	'last_ok' => 1000,
+	'last_http' => 200,
+	'last_attempt' => 1000,
+), 2000) === false, 'sucesso recente nao reenvia');
+check(layer7_install_ping_should_send(array(
+	'last_ok' => 1000,
+	'last_http' => 200,
+	'last_attempt' => 1000,
+), 1000 + 86401) === true, 'sucesso com mais de 24h reenvia');
+check(layer7_install_ping_should_send(array(
+	'last_attempt' => 1000,
+	'last_http' => 0,
+), 1100) === false, 'falha recente nao martela');
+check(layer7_install_ping_should_send(array(
+	'last_attempt' => 1000,
+	'last_http' => 0,
+), 1000 + 901) === true, 'falha com 15 min reenvia');
+
+@mkdir($tmpdir . '/cf/conf', 0750, true);
+@mkdir($tmpdir . '/var/db', 0750, true);
+file_put_contents($tmpdir . '/var/db/uniqueid', "uid-xml-test\n");
+file_put_contents($tmpdir . '/cf/conf/config.xml', <<<'XML'
+<?xml version="1.0"?>
+<pfsense>
+  <system>
+    <hostname>fw-xml</hostname>
+    <domain>lab.local</domain>
+  </system>
+  <interfaces>
+    <wan>
+      <if>igb0</if>
+      <descr>WAN XML</descr>
+      <ipaddr>198.51.100.10</ipaddr>
+      <gateway>WANGW</gateway>
+    </wan>
+    <lan>
+      <if>igb1</if>
+      <descr>LAN XML</descr>
+      <ipaddr>10.0.0.1</ipaddr>
+    </lan>
+  </interfaces>
+  <gateways>
+    <defaultgw4>WANGW</defaultgw4>
+    <gateway_item>
+      <name>WANGW</name>
+      <gateway>198.51.100.1</gateway>
+    </gateway_item>
+  </gateways>
+</pfsense>
+XML
+);
+$fromXml = layer7_install_ping_load_pfsense_config();
+check(($fromXml['system']['hostname'] ?? '') === 'fw-xml', 'XML hostname');
+check(($fromXml['interfaces']['wan']['ipaddr'] ?? '') === '198.51.100.10', 'XML WAN ipaddr');
+$xmlPayload = layer7_install_inventory(null, array(
+	'hardware_id' => str_repeat('c', 64),
+	'install_id' => str_repeat('d', 32),
+	'package_version' => '1.9.72',
+	'event' => 'install',
+	'os_release' => '',
+	'hw_model' => '',
+	'ncpu' => 0,
+	'mem_mb' => 0,
+	'system_serial' => '',
+));
+check(($xmlPayload['fqdn'] ?? '') === 'fw-xml.lab.local', 'inventario a partir do config.xml');
+check(($xmlPayload['gateway_v4'] ?? '') === '198.51.100.1', 'gateway a partir do XML');
+check(($xmlPayload['uniqueid'] ?? '') === 'uid-xml-test', 'uniqueid via LAYER7_TEST_ROOT');
+
+$fallback = layer7_install_ping_hardware_id_fallback();
+check((bool)preg_match('/^[a-f0-9]{64}$/', $fallback), 'fallback hardware_id 64 hex');
+check(layer7_install_ping_curl_bin() !== '', 'curl bin resolvido');
+
 function rrmdir($dir) {
 	if (!is_dir($dir)) {
 		return;

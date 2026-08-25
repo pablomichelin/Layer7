@@ -2,7 +2,7 @@
 # Fontes: ../../src/layer7d/main.c, config_parse.c, policy.c, enforce.c, capture.c
 
 PORTNAME=	pfSense-pkg-layer7
-PORTVERSION=	1.9.71
+PORTVERSION=	1.9.72
 PORTREVISION=	0
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
@@ -127,6 +127,8 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7.inc \
 		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7-install-ping.inc \
+		${STAGEDIR}${PREFIX}/pkg
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7-install-ping-cli.php \
 		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/pkg/layer7-fa47-icons.inc \
 		${STAGEDIR}${PREFIX}/pkg

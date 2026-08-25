@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-25 — BG-163 cliente install-ping (sem overlay)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | só pacote (sem SPA / sem `.244`) |
+| Versão | portal live `2.2.0` intacto / candidato pacote `1.9.72` |
+| Objectivo | O sinal de instalação voltar a chegar ao endpoint já live |
+| Impacto | Helper PHP/libexec + tick 15 min. API e página Instalações **não** mudam |
+| Risco | Baixo. Fail-open mantido. Fallback `hardware_id` pode criar 2.ª linha se o fingerprint passar a funcionar depois |
+| Teste | `test_install_ping_failopen.sh`; inventário PHP (XML + throttle) |
+| Rollback | Reverter o commit do `1.9.72`; caixas voltam ao helper `1.9.71` silencioso |
+| Resultado | **Implementado, pendente de gates/commit/publish** — endpoint live 200 confirmado |
+
 ## 2026-08-22 — BG-162 Instalações LIVE + `1.9.71`
 
 | Campo | Valor |

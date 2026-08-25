@@ -177,6 +177,11 @@ IP público, IPs/nomes de interfaces, uniqueid/plataforma); página
 **Instalações** no portal `2.2.0`. ADR-0036. Fail-open (N3). Overlay
 cirúrgico `.244` `20260823T022826Z` (API+SPA; sem rsync integral). Residual:
 RR-1; caixas ≤`1.9.69` não pingam até upgrade.
+**BG-163 (`2026-08-25`) — cliente `1.9.71` silencioso:** o endpoint live
+`POST /api/license/install-ping` responde 200; o helper do pacote é que
+não enviava (`config.inc` fatal em CLI, `curl` fora do PATH do
+`daemon(8)`, retry só às 24 h). Candidato `1.9.72` no git — **pendente
+de gates/commit/publish**. Sem overlay `.244` (P0-1).
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
