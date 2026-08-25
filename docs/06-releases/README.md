@@ -33,6 +33,10 @@ Esta pasta concentra a governanca documental de release.
    destacada e public key de verificacao.
 5. Quando a F7 abrir, esta pasta passa a concentrar tambem o checklist
    operacional de publicacao.
+6. **Latest-only (BG-164):** o canal publico `pablomichelin/Layer7` deixa
+   disponivel para download **apenas** a release de pacote `latest`.
+   `publish-release.sh` retira as anteriores. `pfsense-layer7` nao hospeda
+   Releases de pacote.
 
 ## Arquivos desta area
 

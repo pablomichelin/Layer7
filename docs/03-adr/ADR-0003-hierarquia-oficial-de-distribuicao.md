@@ -2,7 +2,7 @@
 
 ## Status
 
-Aceito
+Aceito — emenda **latest-only** `2026-08-25` (BG-164)
 
 ## Contexto
 
@@ -138,6 +138,24 @@ subfase correspondente:
 
 Documentos e fluxos antigos que mencionem `.txz` ficam preservados por
 compatibilidade e rastreabilidade, mas deixam de ter valor normativo actual.
+
+### 12. Canal publico latest-only (emenda `2026-08-25` / BG-164)
+
+O repositorio `pablomichelin/Layer7` publica **uma** release de pacote: a
+`latest` actual. Releases de pacote anteriores sao **retiradas do download
+publico** (`gh release delete`; tags git preservadas). Excepcao: snapshot
+de blacklists `blacklists-ut1-current` (nao e pacote).
+
+O repositorio de origem `pablomichelin/pfsense-layer7` **nao** e canal de
+download. As suas GitHub Releases de pacote sao retiradas para nao
+competir com `Layer7` nem anunciar um `latest` stale.
+
+Textos operacionais e instaladores publicos apontam **so** para a versao
+`latest`. Pin enforce (`1.9.8`) continua referencia de politica; o
+artefacto vive no builder/arquivo interno, nao no canal publico.
+
+`publish-release.sh` retira automaticamente as releases de pacote
+anteriores apos publicar a nova.
 
 ## Alternativas consideradas
 

@@ -16,17 +16,16 @@ CA/secrets é `/var/db/layer7/deinstall-preserve` (0700, 0600 nos
 segredos); se o backup obrigatório falhar, o hook **não** faz
 `rm -rf /usr/local/etc/layer7` (A1/A2).
 
+O canal público publica **apenas** `latest` (`1.9.72`). Não há URL para
+pacotes anteriores (BG-164). Rollback público = reinstalar o actual:
+
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-VERSAO.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/vVERSAO/pfSense-pkg-layer7-VERSAO.pkg
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-VERSAO.pkg
-sysrc layer7d_enable=YES
-service layer7d onestart
-layer7d -V
+fetch -o /tmp/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh \
+  && sh /tmp/install.sh
 ```
 
-Versões canónicas: lab `1.9.62`; soak `1.9.59`; enforce produção `1.9.0`
-(pin histórico; produção enforce permanece `1.9.8`).
+Pin enforce `1.9.8` e artefactos históricos ficam no builder/arquivo interno.
 
 ---
 

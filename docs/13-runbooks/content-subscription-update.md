@@ -101,12 +101,8 @@ Instalar `.pkg` anterior (lab: `1.9.53`) mantém o mecanismo de token; para
 cliente **sem** exigir token no update, usar `1.9.52` ou anterior. O ficheiro
 `content-subscription.json` pode permanecer; versões antigas ignoram-no.
 
-```sh
-# exemplo — rollback lab a partir de 1.9.54 → 1.9.53
-fetch -o /tmp/pfSense-pkg-layer7-1.9.53.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.53/pfSense-pkg-layer7-1.9.53.pkg
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.53.pkg
-```
+Pacotes anteriores **não** estão no canal público (BG-164). Rollback
+público = reinstalar `1.9.72`. Artefacto antigo só no builder/arquivo.
 
 Produção observada pós-e2e: `1.9.54`. Comandos completos:
 `docs/10-license-server/MANUAL-INSTALL.md`.

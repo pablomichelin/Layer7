@@ -68,6 +68,14 @@ gh release create "$TAG" \
   --title "$TAG" \
   --notes "Release oficial assinada do Layer7 para pfSense CE. Ver docs/06-releases/RELEASE-SIGNING.md"
 
+if [ "$REPO_NAME" = "Layer7" ]; then
+  echo "==> Canal latest-only: retirar releases de pacote anteriores"
+  sh "$SCRIPT_DIR/retire-old-releases.sh" \
+    --repo "$REPO_OWNER/$REPO_NAME" \
+    --keep "$TAG" \
+    --keep blacklists-ut1-current
+fi
+
 echo ""
 echo "=============================================="
 echo "Release publicada: $TAG"

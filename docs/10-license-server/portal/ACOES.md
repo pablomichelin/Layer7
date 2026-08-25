@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-25 — BG-164 canal publico latest-only
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | distribuicao / docs (sem overlay `.244`) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.72` unico no canal |
+| Objectivo | Impedir download de pacotes antigos que nao reportam instalacao |
+| Impacto | Releases antigas retiradas em `Layer7` e `pfsense-layer7`; textos so `1.9.72` |
+| Risco | Rollback publico deixa de ter URL; pin `1.9.8` so no builder/arquivo |
+| Teste | `releases/latest` = `v1.9.72`; grep operacional so `v1.9.72` |
+| Rollback | Re-publicar release antiga a partir do builder (tags git preservadas) |
+| Resultado | **PUBLICADO** — `Layer7` `latest`=`v1.9.72` + blacklists (138 pacotes retirados); `pfsense-layer7` sem Releases (40 retiradas) |
+
 ## 2026-08-25 — BG-163 cliente install-ping (sem overlay)
 
 | Campo | Valor |

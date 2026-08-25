@@ -73,13 +73,8 @@ conhece a hora real. Sem AP3, `30.6` é higiene temporal.
 Instalar `.pkg` anterior (`1.9.50` ou abaixo) **ignora** o ficheiro de estado
 sem erro. O ficheiro pode permanecer em disco; versões antigas não o lêem.
 
-```sh
-# exemplo — rollback lab a partir de 1.9.51
-fetch -o /tmp/pfSense-pkg-layer7-1.9.50.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.50/pfSense-pkg-layer7-1.9.50.pkg
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.50.pkg
-service layer7d onestart
-```
+Pacotes anteriores **não** estão no canal público (BG-164). Rollback
+público = reinstalar `1.9.72`. Artefacto antigo só no builder/arquivo.
 
 ---
 

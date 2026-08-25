@@ -60,7 +60,8 @@ for f in \
   docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md \
   docs/commercial/LAYER7-PRODUCT-OVERVIEW-PT.md \
   docs/commercial/LAYER7-INSTALL-GUIDE-EN.md \
-  docs/commercial/LAYER7-INSTALL-GUIDE-PT.md
+  docs/commercial/LAYER7-INSTALL-GUIDE-PT.md \
+  docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md
 do
   copy_file "$f" "$f"
 done

@@ -136,7 +136,7 @@ estado canónico é «implementado, pendente de gates/commit» (`AGENTS.md`).
 | `docs/03-adr/README.md` | indice ADR | politica e indice de decisoes | Canónico | substitui resumo antigo insuficiente | manter vivo | F0+ |
 | `docs/03-adr/ADR-0001-engine-classificacao-ndpi.md` | decisao nDPI | ADR aceite e normativo | Canónico | — | manter | F0+ |
 | `docs/03-adr/ADR-0002-distribuicao-artefato-txz.md` | distribuicao antiga | ADR preservado para rastreabilidade | Historico | precisa de ADR substituto | preservar ate ser superado formalmente | F1/F7 |
-| `docs/03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md` | distribuicao oficial | ADR normativo da hierarquia oficial de distribuicao | Canónico | substitui ADR-0002 como referencia operacional | manter vivo | F1+ |
+| `docs/03-adr/ADR-0003-hierarquia-oficial-de-distribuicao.md` | distribuicao oficial | ADR normativo da hierarquia oficial de distribuicao | Canónico | emenda latest-only BG-164 (`2026-08-25`) | so `latest` no canal publico | F1+ / F7 |
 | `docs/03-adr/ADR-0004-cadeia-de-confianca-dos-artefatos.md` | confianca de artefactos | ADR normativo da autenticidade e integridade de artefactos | Canónico | novo | manter vivo | F1+ |
 | `docs/03-adr/ADR-0005-pipeline-seguro-de-blacklists.md` | blacklists seguras | ADR normativo do pipeline seguro de blacklists | Canónico | novo | manter vivo | F1+ |
 | `docs/03-adr/ADR-0006-fallback-e-degradacao-segura.md` | fallback seguro | ADR normativo da degradacao segura | Canónico | novo | manter vivo | F1+ |

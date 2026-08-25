@@ -18,18 +18,10 @@
 ## Install (latest release)
 
 ```bash
-# On pfSense — replace VERSION with the latest tag from GitHub Releases:
+# On pfSense — only the current public package (`latest` = 1.9.72):
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/vVERSION/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh \
   && sh /tmp/install.sh
-```
-
-Example with a specific version:
-
-```bash
-fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_65/install.sh \
-  && sh /tmp/install.sh --version 1.8.11_65
 ```
 
 Then open **Services → Layer 7** in the pfSense web UI.
@@ -40,8 +32,8 @@ Then open **Services → Layer 7** in the pfSense web UI.
 
 ```bash
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/vNEW_VERSION/install.sh \
-  && sh /tmp/install.sh --version NEW_VERSION
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh \
+  && sh /tmp/install.sh
 ```
 
 Or use **Services → Layer 7 → Settings → Check for updates** in the GUI.
@@ -52,7 +44,7 @@ Or use **Services → Layer 7 → Settings → Check for updates** in the GUI.
 
 ```bash
 fetch -o /tmp/uninstall.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/vVERSION/uninstall.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/uninstall.sh \
   && sh /tmp/uninstall.sh
 ```
 

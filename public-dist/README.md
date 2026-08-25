@@ -2,8 +2,15 @@
 
 > **Systemup Solução em Tecnologia** · [www.systemup.inf.br](https://www.systemup.inf.br)
 
-Public repository for **signed releases and product documentation only**.
+Public repository for **the current signed package and product documentation**.
 Source code and internal engineering docs are not published here.
+
+**Current public package (`latest`):** **`1.9.72`**  
+SHA256: `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`  
+Release: [v1.9.72](https://github.com/pablomichelin/Layer7/releases/tag/v1.9.72)
+
+This repository publishes **only the latest package**. Older package releases
+are not available for download.
 
 ---
 
@@ -11,25 +18,27 @@ Source code and internal engineering docs are not published here.
 
 | Document | Description |
 |----------|-------------|
-| [Evaluation Pack (EN)](docs/commercial/LAYER7-EVALUATION-PACK-EN.md) | Start here for product evaluation |
+| **[Manual do Produto (PT)](docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md)** | **Start here** — hub + guia do operador |
+| [Evaluation Pack (EN)](docs/commercial/LAYER7-EVALUATION-PACK-EN.md) | Product evaluation |
 | [Evaluation Pack (PT)](docs/commercial/LAYER7-EVALUATION-PACK-PT.md) | Avaliação do produto |
 | [Product Overview (EN)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md) | Features and use cases |
 | [Product Overview (PT)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-PT.md) | Funcionalidades |
 | [Installation Guide (EN)](docs/commercial/LAYER7-INSTALL-GUIDE-EN.md) | Install, upgrade, uninstall |
 | [Installation Guide (PT)](docs/commercial/LAYER7-INSTALL-GUIDE-PT.md) | Instalação |
-| [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) | `.pkg`, installers, checksums, release notes |
+| [GitHub Releases](https://github.com/pablomichelin/Layer7/releases/latest) | Current `.pkg`, installer, checksums |
 
-**Licensing and activation** are not documented publicly. Contact Systemup for
-commercial licenses, trials, and enforce mode.
+**Licensing and activation** are not documented in depth publicly. Contact
+Systemup for commercial licenses, trials, and enforce mode.
 
 ---
 
-## Quick install
+## Quick install (`1.9.72`)
+
+On pfSense CE (SSH as **root**):
 
 ```bash
-# On pfSense CE (SSH as root). Use the latest tag from Releases:
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_65/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh \
   && sh /tmp/install.sh
 ```
 

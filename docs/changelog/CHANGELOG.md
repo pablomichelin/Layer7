@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- **BG-164 — canal publico latest-only:** `pablomichelin/Layer7` publica
+  apenas o pacote `latest`; releases de pacote anteriores sao retiradas.
+  `pfsense-layer7` deixa de ter GitHub Releases de pacote. Textos e
+  instaladores passam a apontar so para a versao actual.
+
 ## [1.9.72] — 2026-08-25
 
 ### Fixed

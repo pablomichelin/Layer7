@@ -125,9 +125,9 @@ Installation uses a signed `.pkg` from GitHub Releases and a one-line installer 
 Full steps: [Installation Guide](LAYER7-INSTALL-GUIDE-EN.md).
 
 ```bash
-# On pfSense (SSH as root) — replace VERSION with the latest release tag:
+# On pfSense (SSH as root) — only the current public package (`1.9.72`):
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/vVERSION/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh \
   && sh /tmp/install.sh
 ```
 

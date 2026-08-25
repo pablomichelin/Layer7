@@ -56,6 +56,12 @@ personalizadas pelo administrador são preservadas sem alteração.
 upgrade, guardar Configurações com o idioma desejado aplica a tradução aos
 defaults reconhecidos mesmo quando esse idioma já está selecionado.
 
+**Addendum operacional BG-164 (`2026-08-25`):** o canal publico
+`pablomichelin/Layer7` fica **latest-only** — so o pacote `1.9.72` esta
+disponivel para download. Releases de pacote anteriores sao retiradas
+(tags git preservadas). `pfsense-layer7` deixa de ter GitHub Releases de
+pacote. Textos/instaladores passam a apontar so para `latest`/`1.9.72`.
+
 **Addendum operacional BG-163 (`2026-08-25`, `v1.9.72`):** o cliente
 de install-ping deixa de falhar em silêncio. Lê `config.xml` (sem
 `config.inc` em CLI), usa `php -f` e `/usr/local/bin/curl`, e re-tenta
@@ -1138,23 +1144,18 @@ com block page activa: corrige bug critico em que o daemon adicionava o
 **IP do proprio firewall** (portal do sinkhole) a `layer7_block_dst`,
 cortando GUI/SSH a partir de todas as redes.
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_44`
-- **Pacote:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_44/pfSense-pkg-layer7-1.8.11_44.pkg`
+- **Release (historico, sem download):** tag `v1.8.11_44`
 - **SHA256 esperado:** `efa4f0d5f8e55cae319ecc27343c83604947e85f13062f1512c8f77d90789df2`
 - **Remediacao imediata sem upgrade:** `pfctl -t layer7_block_dst -T delete <IP-do-firewall>`
 
 Referencia producao enforce: continua `_24` ate gates G2–G7.
 
-**Addendum do candidato `1.8.11_32` (publicado no canal de download):**
-Publicado em `2026-07-30` em **`pablomichelin/Layer7`** (candidato interno;
-**nao** promover enforce sem gates G2–G7). BG-061: flush lifecycle PF.
+**Addendum do candidato `1.8.11_32` (historico; retirado do canal publico):**
+Foi publicado em `2026-07-30` (candidato interno; BG-061). **Nao** esta
+disponivel para download. O updater GUI aponta para `latest` (`1.9.72`).
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_32`
-- **Pacote:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_32/pfSense-pkg-layer7-1.8.11_32.pkg`
+- **Release (historico, sem download):** tag `v1.8.11_32`
 - **SHA256 esperado:** `c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`
-
-O botao **Verificar actualizacao** oferece `_32`. Referencia producao enforce:
-continua `_24` ate veredicto humano.
 
 **Addendum do candidato `1.8.11_31` (supersedido por `_32`):**
 Corrige FP-020: o daemon não encerra mais DPI num resultado
@@ -1323,16 +1324,14 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > 7. seccao **6. Desinstalar** (nota "Nesta release") e **Apos desinstalar**
 >    (comando de reinstalacao).
 >
-> Verificacao rapida (deve devolver apenas referencias historicas fora do
-> caminho operacional actual):
-> `grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md`.
-> **Estado actual:** lab/`latest` = **`1.9.72`**; pin enforce = **`1.9.8`**
-> (não alinhados). Histórico Onda F (`2026-08-05`) alinhou temporariamente
-> em `_69` — apenas contexto; não usar como canal actual.
+> Verificacao rapida: `grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md`
+> deve devolver **apenas** URLs de `v1.9.72` (canal unico).
+> **Estado actual:** canal publico/`latest` = **`1.9.72`** (BG-164 latest-only).
+> Pin enforce `1.9.8` e referencia de politica, **sem** download publico.
 
-> **Release `1.9.72` (BG-163 — install-ping deixa de falhar em silêncio, `2026-08-25`):** canal publico
-> `latest` / comandos abaixo → **`1.9.72`**. **Produção enforce** permanece
-> **`1.9.8`**. Rollback lab: **`1.9.71`**. Rollback enforce: **`1.9.0`**.
+> **Release `1.9.72` (BG-163 + BG-164, `2026-08-25`):** unico pacote no canal
+> publico. Rollback publico = reinstalar `1.9.72`. Pin enforce `1.9.8`
+> permanece politica interna; artefactos antigos so no builder/arquivo.
 
 **Versao canal publico / lab (`latest` e comandos abaixo):** `1.9.72`
 
@@ -1343,328 +1342,28 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Fingerprint chave pública de release:** `d26e3f007e81298bad910f99dd62a22e2109740158b3b3c7f4e79490bdc5a998`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
-**Versao anterior lab (rollback a partir de `1.9.72`):** `1.9.71`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.71`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.71/pfSense-pkg-layer7-1.9.71.pkg`
-- **SHA256 esperado:** `67d04bbf817c8fa75c4ed5043df94995b4ad0f025d3cd0030bbe650bda96a081`
-
-**Versao anterior lab (rollback a partir de `1.9.71`):** `1.9.69`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.69`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.69/pfSense-pkg-layer7-1.9.69.pkg`
-- **SHA256 esperado:** `b08acf83798da7bd3541194bcf5758febada8aa0794423930afc6a162f928735`
-
-**Versao anterior lab (rollback a partir de `1.9.69`):** `1.9.68`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.68`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.68/pfSense-pkg-layer7-1.9.68.pkg`
-- **SHA256 esperado:** `d73fd0ea3b41fc8c621ae5572ec826bdae271a1abfa8f4ba8aa05a3d8d243f3f`
-
-**Versao anterior lab (rollback a partir de `1.9.63`):** `1.9.62`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.62`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.62/pfSense-pkg-layer7-1.9.62.pkg`
-- **SHA256 esperado:** `b6700576afb47cf9790c4c3fddb746b3021d7070e260ef0e6551c712a7948e5f`
-
-**Versao anterior lab (rollback a partir de `1.9.62`):** `1.9.61`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.61`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.61/pfSense-pkg-layer7-1.9.61.pkg`
-- **SHA256 esperado:** `eda5a10e1a9ca597d3bf8051c0ee372840caddffa133abee5e8d9383a5dba426`
-
-**Versao anterior lab (rollback a partir de `1.9.61`):** `1.9.60`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.60`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.60/pfSense-pkg-layer7-1.9.60.pkg`
-- **SHA256 esperado:** `ec22d3b636adf73bbb6497c2bec05a6ae2c34984e0b92815bfb36dc8ff89329f`
-
-**Versao anterior lab (rollback a partir de `1.9.60`):** `1.9.59`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.59`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.59/pfSense-pkg-layer7-1.9.59.pkg`
-- **SHA256 esperado:** `64899e157d97adf659dfb265bff169801ffe6109f32d2f75377ca5963b2c34b9`
-
-**Versao anterior lab (rollback a partir de `1.9.59`):** `1.9.58`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.58`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.58/pfSense-pkg-layer7-1.9.58.pkg`
-- **SHA256 esperado:** `8b4a2dc6ecd62c126222186112ea80ee75407d35c35049f94631980092108d3d`
-
-**Versao anterior lab (rollback a partir de `1.9.58`):** `1.9.54`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.54`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.54/pfSense-pkg-layer7-1.9.54.pkg`
-- **SHA256 esperado:** `e9935975990448d46aaf1f6e598d2b76b986f43d5df8b50a5aee35000aa0351a`
-
-**Versao anterior lab (rollback a partir de `1.9.54`):** `1.9.53`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.53`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.53/pfSense-pkg-layer7-1.9.53.pkg`
-- **SHA256 esperado:** `5a13e3b7c4272c98e975e4af499aaf5f7f990600a3ebc1a6423140dcaae4a1b4`
-
-**Versao anterior lab (rollback a partir de `1.9.53`):** `1.9.52`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.52`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.52/pfSense-pkg-layer7-1.9.52.pkg`
-- **SHA256 esperado:** `79312d1b73eb8744be817c9ef2b9a7cdf768439632dabbad35e9fb7bfa607134`
-
-**Versao anterior lab (rollback a partir de `1.9.52`):** `1.9.51`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.51`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.51/pfSense-pkg-layer7-1.9.51.pkg`
-- **SHA256 esperado:** `aec3642824df0fd8b3a49d9cc41b4b8a30e8c88dd5be6d6da7e142965b722204`
-
-**Versao anterior lab (rollback a partir de `1.9.51`):** `1.9.50`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.50`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.50/pfSense-pkg-layer7-1.9.50.pkg`
-- **SHA256 esperado:** `3598828d057948732efb10ac0e958b3078f93a7ce86ad35f73d5f5ce086ec85e`
-
-**Versao anterior lab (rollback a partir de `1.9.50`):** `1.9.49`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.49`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.49/pfSense-pkg-layer7-1.9.49.pkg`
-- **SHA256 esperado:** `f380ad493c5229fc08704673abf758edaa5e15ea05061820d04bb9abdca4d3cb`
-
-**Versao anterior lab (rollback a partir de `1.9.49`):** `1.9.48`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.48`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.48/pfSense-pkg-layer7-1.9.48.pkg`
-- **SHA256 esperado:** `78fb0cfd151d2d32c19d8892ed176df8992f9c265a0d88fdfd005a624eab84eb`
-
-**Versao anterior lab (rollback a partir de `1.9.48`):** `1.9.47`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.47`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.47/pfSense-pkg-layer7-1.9.47.pkg`
-- **SHA256 esperado:** `2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`
-
-**Versao anterior lab (rollback a partir de `1.9.47`):** `1.9.46`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.46`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.46/pfSense-pkg-layer7-1.9.46.pkg`
-- **SHA256 esperado:** `10998477ef7ae966e6c3566baeb973f922858fc72cc4d3a2dcdd0fb17bae72f5`
-
-**Versao anterior lab (rollback a partir de `1.9.46`):** `1.9.42`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.42`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.42/pfSense-pkg-layer7-1.9.42.pkg`
-- **SHA256 esperado:** `6bd6ba374b398ec82cd43ea2246f16a3774f4377d3cac6411265472d3d3a4c4b`
-
-**Versao anterior lab (rollback a partir de `1.9.42`):** `1.9.41`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.41`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.41/pfSense-pkg-layer7-1.9.41.pkg`
-- **SHA256 esperado:** `1518ad6825aad51bb97897335e441ac630be0ce6af74b80738ec06e77ca0c1f4`
-
-**Versao anterior lab (rollback a partir de `1.9.41`):** `1.9.40`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.40`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.40/pfSense-pkg-layer7-1.9.40.pkg`
-- **SHA256 esperado:** `fbbf206d1b159722a28073dd402f9b0c8ef381eff07eb3a886e5ef8310a41afe`
-
-**Versao anterior lab (rollback a partir de `1.9.40`):** `1.9.39`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.39`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.39/pfSense-pkg-layer7-1.9.39.pkg`
-- **SHA256 esperado:** `6e7f4e9fe751c73a0dbdb990bd7799b37aa6136288dcb3d3941d1b42f2f4f4c9`
-
-**Versao anterior lab (rollback a partir de `1.9.39`):** `1.9.38`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.38`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.38/pfSense-pkg-layer7-1.9.38.pkg`
-- **SHA256 esperado:** `7c60f6b1a052b675fd064825bd7f0ae79012143b271215d39ed9848b059d1dab`
-
-**Versao anterior lab (rollback a partir de `1.9.38`):** `1.9.37`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.37`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.37/pfSense-pkg-layer7-1.9.37.pkg`
-- **SHA256 esperado:** `d80b522d386165dcd540c8c90577e3292e6b31c4cd7600305ba5f70fec223868`
-
-
-
-**Versao anterior lab (rollback a partir de `1.9.34`):** `1.9.33`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.33`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.33/pfSense-pkg-layer7-1.9.33.pkg`
-- **SHA256 esperado:** `71e55377fef2de7051b472f3253e51dc56bcb1ca36bd4f9b708ae5418590ec29`
-
-
-**Versao anterior lab (rollback a partir de `1.9.33`):** `1.9.30`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.30`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.30/pfSense-pkg-layer7-1.9.30.pkg`
-- **SHA256 esperado:** `40b9046f33d3c02cd9c472e3cf9ee98c961ffcda7966b20a9cf0a64f6e20a2bf`
-
-
-**Versao anterior lab (rollback a partir de `1.9.30`):** `1.9.29`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.29`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.29/pfSense-pkg-layer7-1.9.29.pkg`
-- **SHA256 esperado:** `cab8d2d13e12e57f6078d1f3a4a15b90dcc6c19e953f6f79409f910502c45fec`
-
-
-**Versao anterior lab (rollback a partir de `1.9.29`):** `1.9.28`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.28`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.28/pfSense-pkg-layer7-1.9.28.pkg`
-- **SHA256 esperado:** `510c29c8c10ec48ebcac10056db980de0c379d8073a344548b2a2ca2eff76923`
-
-
-**Versao anterior lab (rollback a partir de `1.9.28`):** `1.9.27`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.27`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.27/pfSense-pkg-layer7-1.9.27.pkg`
-- **SHA256 esperado:** `ab92ad64f59a6acf87ed8c5a868c4fd79fa8c3d594100b09d60db68cad671a2b`
-
-
-**Versao anterior lab (rollback a partir de `1.9.27`):** `1.9.26`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.26`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.26/pfSense-pkg-layer7-1.9.26.pkg`
-- **SHA256 esperado:** `d1399c711091a7c4b0bbccfef9f71c6016ef9f2423eca8deb190d3c8a79bd5db`
-
-
-**Versao anterior lab (rollback a partir de `1.9.26`):** `1.9.25`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.25`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.25/pfSense-pkg-layer7-1.9.25.pkg`
-- **SHA256 esperado:** `967f059f90c09b388d93baa4bb4546a407fed5b2ed5c1f14193e5b54fb356006`
-
-
-**Versao anterior lab (rollback a partir de `1.9.25`):** `1.9.24`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.24`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.24/pfSense-pkg-layer7-1.9.24.pkg`
-- **SHA256 esperado:** `7490a5950fd3bcb0bafaaeed01e88afda58db83f86dcaf215a6c74fff9c29bc1`
-
-
-**Versao anterior lab (rollback a partir de `1.9.24`):** `1.9.23`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.23`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.23/pfSense-pkg-layer7-1.9.23.pkg`
-- **SHA256 esperado:** `2e17628e092248da20fab70991e4d2199955585aa290f8edd40e86ff12384573`
-
-
-**Versao anterior lab (rollback a partir de `1.9.23`):** `1.9.22`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.22`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.22/pfSense-pkg-layer7-1.9.22.pkg`
-- **SHA256 esperado:** `79fb1ba64136b88781b123bfab8942b46f466f4185813d484c9bb08aa87e4fe2`
-
-
-**Versao anterior lab (rollback a partir de `1.9.22`):** `1.9.21`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.21`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.21/pfSense-pkg-layer7-1.9.21.pkg`
-- **SHA256 esperado:** `763d60e4f1ac447818ea5fdbd595187aca5d4857e67d22e62e011a5c1a07d68c`
-
-
-**Versao anterior lab (rollback a partir de `1.9.21`):** `1.9.20`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.20`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.20/pfSense-pkg-layer7-1.9.20.pkg`
-- **SHA256 esperado:** `a41e7287c257c6842adbda4f81b1e2b411dbc912cc2da8433bbcc62fc1d8f254`
-
-
-**Versao anterior lab (rollback a partir de `1.9.20`):** `1.9.19`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.19`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.19/pfSense-pkg-layer7-1.9.19.pkg`
-- **SHA256 esperado:** `19509802932a86d1d37ae65569bf75f55fc2c888fc68950ef9eab9d11ec97815`
-
-
-**Versao anterior lab (rollback a partir de `1.9.19`):** `1.9.18`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.18`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.18/pfSense-pkg-layer7-1.9.18.pkg`
-- **SHA256 esperado:** `cda98abcba72de8878dddc881412af0b64d833aa686637a361c57cb8cdfff834`
-
-**Versao anterior lab (rollback a partir de `1.9.18`):** `1.9.17`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.17`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.17/pfSense-pkg-layer7-1.9.17.pkg`
-- **SHA256 esperado:** `72d1a1717ac88cb68015d7912c8828099ff944e976f85f5901dfdb0471c7c49f`
-
-**Versao anterior lab (rollback a partir de `1.9.17`):** `1.9.16`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.16`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.16/pfSense-pkg-layer7-1.9.16.pkg`
-- **SHA256 esperado:** `dc061b5caa179731b9cf471d37868fb722a6d3701752b81f41668d079259ff3d`
-
-**Versao producao enforce (GV7.4; rollback enforce a partir de lab):** `1.9.8`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.8`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.8/pfSense-pkg-layer7-1.9.8.pkg`
-- **SHA256 esperado:** `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec`
-
-**Versao anterior lab (rollback a partir de `1.9.8`):** `1.9.7`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.7`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.7/pfSense-pkg-layer7-1.9.7.pkg`
-- **SHA256 esperado:** `4a00b40226fb0d92d974c3156d0c6881aa07fde2fe96e8d1821548157cd4fb50`
-
-**Versao de referencia producao enforce anterior (rollback a partir de `1.9.8`):** `1.9.0`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.0`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.0/pfSense-pkg-layer7-1.9.0.pkg`
-- **SHA256 esperado:** `cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f`
-
-**Versao lab antiga (rollback a partir de `1.9.7`):** `1.9.6`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.6`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.6/pfSense-pkg-layer7-1.9.6.pkg`
-- **SHA256 esperado:** `fc2d7fce624f8ac0afaf68ee9b2c0850b1e956767baeb16dfc11498517e3c6e4`
-
-**Versao lab antiga (rollback a partir de `1.9.6`):** `1.9.5`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.5`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.5/pfSense-pkg-layer7-1.9.5.pkg`
-- **SHA256 esperado:** `9278d5d61b55aad1a4b158cf8fa49b39ed6b4d4c7ab7be36f663e2547386da6f`
-
-**Versao lab antiga (rollback a partir de `1.9.5`):** `1.9.4`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.4`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.4/pfSense-pkg-layer7-1.9.4.pkg`
-- **SHA256 esperado:** `43f754613da16ab377f2b4258b3d5a924ef20d9171cab9ed78ca1995d6cee816`
-
-**Versao lab antiga (rollback a partir de `1.9.4`):** `1.9.3`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.3`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.3/pfSense-pkg-layer7-1.9.3.pkg`
-- **SHA256 esperado:** `fa2dca21bb5fe6e70b40f8a47ee36ce2a71670e93ba009ebd90b0f3c0ac8c8dc`
-
-**Versao lab antiga (rollback a partir de `1.9.3`):** `1.9.2`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.2`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.2/pfSense-pkg-layer7-1.9.2.pkg`
-- **SHA256 esperado:** `a3bda092f35b63f7559f1cee95e6abfd50a4338f6591a6c2b7f478722c9e0d34`
-
-**Versao anterior (rollback a partir de `1.9.0`):** `1.8.11_69`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_69`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_69/pfSense-pkg-layer7-1.8.11_69.pkg`
-- **SHA256 esperado:** `b6d11ccdbb0b59209a501ee4240706e873153c2780c283721d904158f6b06764`
-
-**Versao lab antiga (rollback a partir de `1.9.2`):** `1.9.1`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.1`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.1/pfSense-pkg-layer7-1.9.1.pkg`
-- **SHA256 esperado:** `c7c6b755cedfc2b8aacfc39b95129442499e2ced133c0ac5666fa962962844fd`
-
-**Versao historica (rollback enforce legado):** `1.8.11_24`
-
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_24`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_24/pfSense-pkg-layer7-1.8.11_24.pkg`
-- **SHA256 esperado:** `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818`
+**Politica do canal publico (BG-164 / ADR-0003 emenda `2026-08-25`):**
+`pablomichelin/Layer7` publica **apenas** a release de pacote `latest`
+(`1.9.72`). Pacotes anteriores **nao** tem URL de download. Tags git e
+SHAs abaixo ficam como arquivo interno. Rollback de emergencia = reinstalar
+`1.9.72`. Pin enforce `1.9.8` continua referencia de politica, **sem**
+download publico. Snapshot de blacklists `blacklists-ut1-current` nao e
+pacote e permanece publicado.
+
+Arquivo de integridade (sem URL):
+
+| Versao | SHA256 | Nota |
+|--------|--------|------|
+| `1.9.72` | `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7` | canal publico actual |
+| `1.9.71` | `67d04bbf817c8fa75c4ed5043df94995b4ad0f025d3cd0030bbe650bda96a081` | lab anterior (arquivo) |
+| `1.9.69` | `b08acf83798da7bd3541194bcf5758febada8aa0794423930afc6a162f928735` | lab anterior (arquivo) |
+| `1.9.8` | `229639243fc31333251fa286690bf87db9f20b644039b857ca283d16501a99ec` | pin enforce (politica; sem download) |
+| `1.9.0` | `cde469a105db0b9f07dee1bf65838494ce209a1e86912d2169b0f124d631569f` | rollback enforce (arquivo) |
+| `1.8.11_24` | `1d5573f0a0c7803a87d8cb536ad9eee43e85daa9bf98bf7edc84ef554e2c7818` | historico enforce (arquivo) |
 
 > **Nota:** o ficheiro `/usr/local/etc/layer7/` **nao** e substituido nos upgrades;
 > o backup XML do pfSense **nao** o inclui — use Export/Import em Definicoes
 > Layer7. **`1.8.11_55` e defeituosa — nao instalar.**
-
-> **Versao anterior (rollback):** `1.8.11_23` em
-> `https://github.com/pablomichelin/Layer7/releases/tag/v1.8.11_23`
-> (SHA256 `3c9e488d48c441a9859a1d953b603e9cecb242fc9d2e93ce144e05cdacb8d7d4`).
 
 **Blacklists UT1 oficiais (F1.3 — primeira publicacao):**
 
@@ -2449,28 +2148,16 @@ release):
 service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
-Para reinstalar uma versao anterior conhecida:
-rollback **lab** imediato a partir de `1.9.64` (`latest`) → **`1.9.63`**;
-rollback **enforce** → **`1.9.0`** (pin produção **`1.9.8`**);
-histórico pos-`1.9.0` → `1.8.11_69`; rollback historico antigo → `1.8.11_24`;
+O canal publico **nao** hospeda pacotes anteriores (BG-164).
+Rollback publico = reinstalar **`1.9.72`** (seccoes 1 / 5).
+Pin enforce `1.9.8` e artefactos historicos (`1.9.0`, `_24`) existem
+so no builder/arquivo interno — **nao** ha URL publico.
 **nao** usar `1.8.11_55` (defeituosa).
 
-Rollback lab (`1.9.63` — a partir de `1.9.64`):
+Reinstalar o pacote actual:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.63.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.63/pfSense-pkg-layer7-1.9.63.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.63.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
-```
-
-Rollback enforce (`1.9.0` — pin histórico; produção enforce permanece `1.9.8`):
-
-```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.0.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.0/pfSense-pkg-layer7-1.9.0.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.0.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
-```
-
-Rollback histórico (`1.8.11_69`):
-
-```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.8.11_69.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.8.11_69/pfSense-pkg-layer7-1.8.11_69.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.8.11_69.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh && sh /tmp/install.sh
 ```
 
 `pkg add -f` sobre o pacote já instalado (upgrade) preserva

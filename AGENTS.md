@@ -286,11 +286,11 @@ operacionais** que embutem versao/URL do pacote:
 
 Gate de verificacao antes do commit de release:
 `grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md` —
-fora dos addenda historicos e da referencia de producao (`_24` ate gates
-G2–G7, que e intencional), **nenhum** comando pode apontar para versao
-anterior a da release publicada. A checklist completa esta na
-**Nota de manutencao** no topo da seccao *Links da versao actual* do proprio
-manual.
+**apenas** URLs da versao `latest` publicada (hoje `v1.9.72`). Addenda
+historicos podem citar tag/SHA **sem** URL de download. Pin enforce e
+`_24` sao arquivo interno, nao canal publico (BG-164 / ADR-0003 §12).
+A checklist completa esta na **Nota de manutencao** no topo da seccao
+*Links da versao actual* do proprio manual.
 
 ---
 

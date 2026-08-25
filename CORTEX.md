@@ -185,6 +185,13 @@ em silêncio (`config.inc` fatal em CLI, `curl` fora do PATH do
 e `/usr/local/bin/curl`, e re-tenta aos 15 min. Endpoint live intacto.
 Sem overlay `.244` (P0-1). Caixas ≤`1.9.71` precisam de upgrade para
 aparecer em Instalações.
+**BG-164 (`2026-08-25`) — canal publico latest-only:**
+`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.72`).
+Releases de pacote anteriores sao retiradas (tags git preservadas).
+`pfsense-layer7` nao e canal de download (Releases de pacote retiradas).
+Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
+so para `1.9.72`. Pin enforce `1.9.8` permanece politica, sem URL publico.
+ADR-0003 §12. `publish-release.sh` retira as anteriores apos cada publish.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

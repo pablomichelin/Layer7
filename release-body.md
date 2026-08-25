@@ -50,8 +50,8 @@ Instalações existentes com `block_quic: true` (checkbox antigo activado) conti
 ## Instalação / Upgrade
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.8.3/install.sh
-sh /tmp/install.sh --version 1.8.3
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh
+sh /tmp/install.sh --version 1.9.72
 ```
 
 ## Verificação
