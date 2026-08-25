@@ -20,7 +20,7 @@ Formato: Keep a Changelog (resumo). Versão = versão **visual** do portal
 ### Notes
 
 - Código no git; overlay live `.244` `20260823T022826Z`
-- Pacote correspondente: `1.9.71`
+- Pacote correspondente: `1.9.71`; cliente corrigido em `1.9.72`
 
 ---
 

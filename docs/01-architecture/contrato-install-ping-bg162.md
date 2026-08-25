@@ -4,7 +4,7 @@
 **Código:** license-server `POST /api/license/install-ping` + portal
 `/installations` · pacote `1.9.72` (libexec + tick `layer7d`)  
 **Live `.244`:** endpoint + página Instalações **activos**. Canal
-`latest` publicado = `v1.9.71` até GO de publish `1.9.72` (BG-163).
+`latest` publicado = `v1.9.72` (BG-163 — cliente deixa de falhar em silêncio).
 
 ## Objectivo / impacto / risco / teste / rollback
 

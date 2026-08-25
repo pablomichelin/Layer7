@@ -35,8 +35,10 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.71` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.71`;
-`SHA256=67d04bbf817c8fa75c4ed5043df94995b4ad0f025d3cd0030bbe650bda96a081`;
+`1.9.72` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.72`;
+`SHA256=0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`;
+BG-163 install-ping deixa de falhar em silêncio; cadeia F1.2); herda `1.9.71`
+(`SHA256=67d04bbf817c8fa75c4ed5043df94995b4ad0f025d3cd0030bbe650bda96a081`;
 BG-162 install-ping + BG-161 Identity gate; overlay `.244` `20260823T022826Z`;
 cadeia F1.2); herda `1.9.69`
 (`SHA256=b08acf83798da7bd3541194bcf5758febada8aa0794423930afc6a162f928735`;
@@ -177,11 +179,12 @@ IP público, IPs/nomes de interfaces, uniqueid/plataforma); página
 **Instalações** no portal `2.2.0`. ADR-0036. Fail-open (N3). Overlay
 cirúrgico `.244` `20260823T022826Z` (API+SPA; sem rsync integral). Residual:
 RR-1; caixas ≤`1.9.69` não pingam até upgrade.
-**BG-163 (`2026-08-25`) — cliente `1.9.71` silencioso:** o endpoint live
-`POST /api/license/install-ping` responde 200; o helper do pacote é que
-não enviava (`config.inc` fatal em CLI, `curl` fora do PATH do
-`daemon(8)`, retry só às 24 h). Candidato `1.9.72` no git — **pendente
-de gates/commit/publish**. Sem overlay `.244` (P0-1).
+**BG-163 PUBLICADO `v1.9.72` (`2026-08-25`):** o cliente `1.9.71` falhava
+em silêncio (`config.inc` fatal em CLI, `curl` fora do PATH do
+`daemon(8)`, retry só às 24 h). O `1.9.72` lê `config.xml`, usa `php -f`
+e `/usr/local/bin/curl`, e re-tenta aos 15 min. Endpoint live intacto.
+Sem overlay `.244` (P0-1). Caixas ≤`1.9.71` precisam de upgrade para
+aparecer em Instalações.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

@@ -88,7 +88,7 @@ estado canónico é «implementado, pendente de gates/commit» (`AGENTS.md`).
 | `docs/03-adr/ADR-0025-entitlements-addon-identity-mitm.md` | ADR SKU/features | Aceito (T1) | Canónico | — | manter vivo com IM1 | novo plano |
 | `docs/03-adr/ADR-0026-mitm-tls-inspection-opt-in.md` | ADR MITM opt-in | **Aceito — runtime shipped** (rev.r; emenda 0035) | Canónico | ADR-0017 com MITM OFF | ponto 12 tecto NGFW substituído | novo plano |
 | `docs/03-adr/ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md` | ambição NGFW + ficha fora | **Aceito** (`2026-08-14`) | Canónico | emenda ADR-0026 + P5 | manter | novo plano |
-| `docs/03-adr/ADR-0036-install-ping-sem-serial.md` | sinal instalação sem serial | **Aceito** (`2026-08-22`) | Canónico | BG-162 live; BG-163 cliente | publish `1.9.72` pendente | manutenção |
+| `docs/03-adr/ADR-0036-install-ping-sem-serial.md` | sinal instalação sem serial | **Aceito** (`2026-08-22`) | Canónico | BG-162 live; BG-163 `v1.9.72` | cliente ≥`1.9.72` para aparecer | manutenção |
 | `docs/01-architecture/contrato-install-ping-bg162.md` | contrato install-ping | cliente `1.9.72` | Canónico | ADR-0036 | actualizar se o payload mudar | manutenção |
 | `docs/03-adr/ADR-0027-identity-userid-multi-fonte.md` | ADR User-ID | Aceito | Canónico | evolui ADR-0011/0012 | IM3–IM6 | novo plano |
 | `docs/03-adr/ADR-0028-concorrencia-io-daemon-identity.md` | ADR concorrência/IO daemon | Aceito | Canónico | pré-requisito IM3–IM5; baseline perf 20.11a | IM3 | novo plano |

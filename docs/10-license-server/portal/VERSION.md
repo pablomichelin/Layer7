@@ -6,7 +6,7 @@
 |-------|-------|
 | **Versão** | `2.2.0` |
 | **Codinome** | BG-162 — Instalações |
-| **Estado** | Live overlay `.244` `20260823T022826Z` + pacote `1.9.71` |
+| **Estado** | Live overlay `.244` `20260823T022826Z` + pacote `1.9.72` |
 | **Data** | `2026-08-22` |
 
 ## Inclui
@@ -18,6 +18,6 @@
 
 ## Próxima
 
-Live overlay BG-162 (`20260823T022826Z`). Canal `latest` do pacote = `1.9.71`.
+Live overlay BG-162 (`20260823T022826Z`). Canal `latest` do pacote = `1.9.72`.
 
 Histórico: [`CHANGELOG.md`](CHANGELOG.md).

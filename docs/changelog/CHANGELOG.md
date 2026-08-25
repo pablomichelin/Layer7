@@ -4,13 +4,14 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.72] — 2026-08-25
+
 ### Fixed
 
 - **BG-163 — install-ping deixava de enviar:** o helper já não carrega
   `config.inc` (lê `config.xml`), usa `php -f` e `/usr/local/bin/curl`
   (o `PATH` do daemon não inclui `/usr/local/bin`), e volta a tentar
-  aos 15 min se o POST falhar. Fail-open mantido. Candidato `1.9.72` —
-  **não** publicado neste bloco.
+  aos 15 min se o POST falhar. Fail-open mantido.
 
 ## [1.9.71] — 2026-08-22
 

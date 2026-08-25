@@ -4,9 +4,9 @@
 
 **Aceito** (`2026-08-22`) — implementado, overlay `.244`
 `20260823T022826Z` (API + SPA Instalações). Portal `2.2.0`. Canal
-`latest` publicado = `v1.9.71`. **BG-163** (`2026-08-25`): o cliente
-`1.9.71` falhava em silêncio (não é falha do endpoint live). Candidato
-de pacote `1.9.72` — **sem** publish neste bloco.
+`latest` publicado = `v1.9.72`. **BG-163** (`2026-08-25`): o cliente
+`1.9.71` falhava em silêncio (não é falha do endpoint live). Pacote
+`1.9.72` publicado no mesmo dia.
 
 ## Contexto
 
