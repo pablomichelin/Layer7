@@ -79,27 +79,31 @@ INSERT INTO install_instances (
 )
 ON CONFLICT (hardware_id) DO UPDATE SET
   install_id = COALESCE(EXCLUDED.install_id, install_instances.install_id),
-  hostname = EXCLUDED.hostname,
-  domain = EXCLUDED.domain,
-  fqdn = EXCLUDED.fqdn,
-  package_version = EXCLUDED.package_version,
-  pfsense_version = EXCLUDED.pfsense_version,
-  pfsense_version_patch = EXCLUDED.pfsense_version_patch,
-  platform = EXCLUDED.platform,
+  hostname = COALESCE(NULLIF(btrim(EXCLUDED.hostname), ''), install_instances.hostname),
+  domain = COALESCE(NULLIF(btrim(EXCLUDED.domain), ''), install_instances.domain),
+  fqdn = COALESCE(NULLIF(btrim(EXCLUDED.fqdn), ''), install_instances.fqdn),
+  package_version = COALESCE(NULLIF(btrim(EXCLUDED.package_version), ''), install_instances.package_version),
+  pfsense_version = COALESCE(NULLIF(btrim(EXCLUDED.pfsense_version), ''), install_instances.pfsense_version),
+  pfsense_version_patch = COALESCE(NULLIF(btrim(EXCLUDED.pfsense_version_patch), ''), install_instances.pfsense_version_patch),
+  platform = COALESCE(NULLIF(btrim(EXCLUDED.platform), ''), install_instances.platform),
   uniqueid = COALESCE(EXCLUDED.uniqueid, install_instances.uniqueid),
   system_serial = COALESCE(EXCLUDED.system_serial, install_instances.system_serial),
-  os_release = EXCLUDED.os_release,
-  hw_model = EXCLUDED.hw_model,
-  ncpu = EXCLUDED.ncpu,
-  mem_mb = EXCLUDED.mem_mb,
-  wan_ipv4 = EXCLUDED.wan_ipv4,
-  wan_ipv6 = EXCLUDED.wan_ipv6,
-  gateway_v4 = EXCLUDED.gateway_v4,
+  os_release = COALESCE(NULLIF(btrim(EXCLUDED.os_release), ''), install_instances.os_release),
+  hw_model = COALESCE(NULLIF(btrim(EXCLUDED.hw_model), ''), install_instances.hw_model),
+  ncpu = COALESCE(NULLIF(EXCLUDED.ncpu, 0), install_instances.ncpu),
+  mem_mb = COALESCE(NULLIF(EXCLUDED.mem_mb, 0), install_instances.mem_mb),
+  wan_ipv4 = COALESCE(NULLIF(btrim(EXCLUDED.wan_ipv4), ''), install_instances.wan_ipv4),
+  wan_ipv6 = COALESCE(NULLIF(btrim(EXCLUDED.wan_ipv6), ''), install_instances.wan_ipv6),
+  gateway_v4 = COALESCE(NULLIF(btrim(EXCLUDED.gateway_v4), ''), install_instances.gateway_v4),
   license_key = COALESCE(EXCLUDED.license_key, install_instances.license_key),
-  egress_ip = EXCLUDED.egress_ip,
-  last_event = EXCLUDED.last_event,
-  inventory = EXCLUDED.inventory,
-  last_user_agent = EXCLUDED.last_user_agent,
+  egress_ip = COALESCE(NULLIF(btrim(EXCLUDED.egress_ip), ''), install_instances.egress_ip),
+  last_event = COALESCE(NULLIF(btrim(EXCLUDED.last_event), ''), install_instances.last_event),
+  inventory = CASE
+    WHEN EXCLUDED.inventory IS NULL OR EXCLUDED.inventory = '{}'::jsonb
+    THEN install_instances.inventory
+    ELSE EXCLUDED.inventory
+  END,
+  last_user_agent = COALESCE(NULLIF(btrim(EXCLUDED.last_user_agent), ''), install_instances.last_user_agent),
   last_seen_at = NOW()
 RETURNING *
 `;

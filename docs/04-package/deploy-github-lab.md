@@ -70,7 +70,7 @@ Seguir a saída do script e [`scripts/release/README.md`](../../scripts/release/
 Alinhado ao README de release — usar o **`install.sh`** do asset publicado (versão/tag conforme o teu release):
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/install.sh && sh /tmp/install.sh
 ```
 
 (Substituir owner/repo/tag pela combinação do teu fork e versão.)

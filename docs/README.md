@@ -40,7 +40,7 @@ Quando houver conflito, seguir esta ordem:
 | Classificacao dos documentos | [`00-overview/document-classification.md`](00-overview/document-classification.md) | diz o que e canónico, historico, placeholder ou preservado |
 | Equivalencia raiz <-> docs | [`00-overview/document-equivalence-map.md`](00-overview/document-equivalence-map.md) | resolve sobreposicoes e conflitos |
 | Decisoes formais | [`03-adr/README.md`](03-adr/README.md) | indice e politica de ADR |
-| **Manual público do produto** | [`MANUAL-PRODUTO.md`](MANUAL-PRODUTO.md) | **Hub + guia operador** (SSOT de navegação pública; `1.9.72`) |
+| **Manual público do produto** | [`MANUAL-PRODUTO.md`](MANUAL-PRODUTO.md) | **Hub + guia operador** (SSOT de navegação pública; `1.9.73`) |
 | **Pack produto** | [`00-overview/pack-produto-layer7.md`](00-overview/pack-produto-layer7.md) → [`prd-layer7.md`](00-overview/prd-layer7.md), [`uml-layer7.md`](00-overview/uml-layer7.md), [`catalogo-funcionalidades.md`](00-overview/catalogo-funcionalidades.md) | Índice + PRD + UML + catálogo (navegável) |
 | Instalacao/upgrade/uninstall | [`10-license-server/MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md) | referencia operacional canónica de comandos |
 | Portal admin licenças (UI) | [`10-license-server/portal/README.md`](10-license-server/portal/README.md) | trilha activa: versão visual, governação, planos |

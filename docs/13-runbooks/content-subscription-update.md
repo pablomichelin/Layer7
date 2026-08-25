@@ -102,7 +102,7 @@ cliente **sem** exigir token no update, usar `1.9.52` ou anterior. O ficheiro
 `content-subscription.json` pode permanecer; versões antigas ignoram-no.
 
 Pacotes anteriores **não** estão no canal público (BG-164). Rollback
-público = reinstalar `1.9.72`. Artefacto antigo só no builder/arquivo.
+público = reinstalar `1.9.73`. Artefacto antigo só no builder/arquivo.
 
 Produção observada pós-e2e: `1.9.54`. Comandos completos:
 `docs/10-license-server/MANUAL-INSTALL.md`.

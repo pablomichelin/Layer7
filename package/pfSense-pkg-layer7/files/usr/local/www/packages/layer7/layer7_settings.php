@@ -83,6 +83,8 @@ if ($_POST["import_config"] ?? false) {
 					if (!isset($data["layer7"]["exceptions"]) || !is_array($data["layer7"]["exceptions"])) {
 						$data["layer7"]["exceptions"] = array();
 					}
+					$tr = layer7_addon_disarm_unentitled($data);
+					$data = $tr["data"];
 					$save_ok = layer7_save_json($data);
 					if ($save_ok && isset($imported["blacklists"]) && is_array($imported["blacklists"])) {
 						$save_ok = layer7_bl_config_save($imported["blacklists"]) &&
@@ -238,6 +240,8 @@ if ($_POST["revoke_license"] ?? false) {
 	if (isset($data["layer7"]["license_key_mask"])) {
 		unset($data["layer7"]["license_key_mask"]);
 	}
+	$tr = layer7_addon_disarm_unentitled($data);
+	$data = $tr["data"];
 	if (layer7_save_json($data)) {
 		layer7_restart_service();
 		$savemsg = l7_t("Licenca revogada com sucesso.");
@@ -570,6 +574,10 @@ if ($_POST["save"] ?? false) {
 			"event_interfaces" => $rpt_event_ifaces
 		);
 
+		if ($is_general_save) {
+			$tr = layer7_addon_disarm_unentitled($data);
+			$data = $tr["data"];
+		}
 		if (layer7_save_json($data)) {
 			$old_em = (isset($current_l7["enforcement_model"]) &&
 			    (string)$current_l7["enforcement_model"] === "scoped_hybrid")

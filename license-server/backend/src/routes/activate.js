@@ -12,9 +12,11 @@ const { createHttpError, isHttpError, runInTransaction } = require('../crud-inte
 const { buildLicenseArtifactAuditMetadata } = require('../license-artifact-audit');
 const { getEffectiveLicenseState } = require('../license-state');
 const {
+  normalizeFeatures,
   normalizeStoredHardwareId,
   parseActivatePayload,
 } = require('../crud-validation');
+const { getClientIp } = require('../session');
 
 const router = Router();
 
@@ -43,7 +45,7 @@ async function logActivationBestEffort(licenseId, hardwareId, ip, ua, result, er
 }
 
 router.post('/activate', activateLimiter, async (req, res) => {
-  const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip;
+  const ip = getClientIp(req);
   const ua = req.headers['user-agent'] || '';
   let requestedHardwareId = null;
 
@@ -129,11 +131,18 @@ router.post('/activate', activateLimiter, async (req, res) => {
           effectiveHardwareId;
       }
 
+      let features = 'base';
+      try {
+        features = normalizeFeatures(license.features || 'base');
+      } catch (_err) {
+        features = 'base';
+      }
+
       const signed = generateSignedLicense({
         hardware_id: effectiveHardwareId,
         expiry: new Date(license.expiry).toISOString().slice(0, 10),
         customer: license.customer_name || 'Unknown',
-        features: license.features || 'base',
+        features,
       });
 
       await logActivation(client, license.id, effectiveHardwareId, ip, ua, 'success', null);

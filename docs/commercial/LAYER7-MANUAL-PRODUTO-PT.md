@@ -3,9 +3,9 @@
 **Systemup Solução em Tecnologia** · [www.systemup.inf.br](https://www.systemup.inf.br)
 
 > Guia público do operador. Fiel ao estado publicado em GitHub Releases.  
-> **Pacote de referência (canal `latest`):** **`1.9.72`**  
+> **Pacote de referência (canal `latest`):** **`1.9.73`**  
 > **SHA256:** `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`  
-> **Release:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.72>  
+> **Release:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.73>  
 > **Latest:** <https://github.com/pablomichelin/Layer7/releases/latest>  
 > **Alinhamento:** `2026-08-25`
 
@@ -24,7 +24,7 @@ Licenciamento comercial, activação e suporte de enforce: **contactar a Systemu
 | [Pacote de Avaliação](LAYER7-EVALUATION-PACK-PT.md) | Avaliação comercial |
 | [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) | `.pkg` + `.sha256` oficiais |
 
-**Regra:** os comandos abaixo correspondem à release **`1.9.72`**. Em cada
+**Regra:** os comandos abaixo correspondem à release **`1.9.73`**. Em cada
 nova release, actualizar este manual no mesmo bloco da publicação.
 
 ---
@@ -33,19 +33,19 @@ nova release, actualizar este manual no mesmo bloco da publicação.
 
 | Canal | Versão | Papel |
 |-------|--------|--------|
-| **`latest` / updater GUI** | **`1.9.72`** | Único pacote público para download |
+| **`latest` / updater GUI** | **`1.9.73`** | Único pacote público para download |
 | **Produção enforce (pin de política)** | **`1.9.8`** | Referência estável até GO — **não** está no canal público |
 
 **MITM (inspecção TLS):**
 
 - Default **OFF** no pacote.
 - Só com escopo explícito origem **e** destino (proibido origem aberta/`from any`).
-- Janela temporal com auto-desactivação (failsafe) a partir de `1.9.72`.
+- Janela temporal com auto-desactivação (failsafe) a partir de `1.9.73`.
 - Piloto externo / intercept permanente em produção: **não** está liberado
   neste canal sem GO comercial e ficha de site com a Systemup.
 - Squid **não** é o caminho MITM do produto.
 
-**Não confundir:** ter o pacote `1.9.72` instalado **não** activa MITM nem
+**Não confundir:** ter o pacote `1.9.73` instalado **não** activa MITM nem
 equivale a pin de produção enforce `1.9.8`.
 
 ---
@@ -73,10 +73,10 @@ Cada release publica pelo menos:
 - `pfSense-pkg-layer7-<versão>.pkg`
 - `pfSense-pkg-layer7-<versão>.pkg.sha256`
 
-**Canal público `1.9.72`:**
+**Canal público `1.9.73`:**
 
-- Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg>
-- SHA256: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg.sha256>
+- Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg>
+- SHA256: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg.sha256>
 - **SHA256 esperado:** `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`
 
 > Caminho oficial: **`install.sh`** assinado (F1.2). O canal público
@@ -85,15 +85,15 @@ Cada release publica pelo menos:
 **Verificar integridade:**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.72.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.72.pkg.sha256 \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg.sha256 \
-  && sha256 -q /tmp/pfSense-pkg-layer7-1.9.72.pkg | tee /tmp/l7-actual.sha256 \
-  && cat /tmp/pfSense-pkg-layer7-1.9.72.pkg.sha256
+fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg.sha256 \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg.sha256 \
+  && sha256 -q /tmp/pfSense-pkg-layer7-1.9.73.pkg | tee /tmp/l7-actual.sha256 \
+  && cat /tmp/pfSense-pkg-layer7-1.9.73.pkg.sha256
 ```
 
 Os dois hashes devem coincidir com
@@ -110,34 +110,34 @@ substitui validação no vosso ambiente.
 Executar como **root** (SSH ou Diagnostics → Command Prompt). Em Command
 Prompt preferir o **comando único** (uma linha).
 
-### 4.1 Instalar (primeira vez) — `1.9.72`
+### 4.1 Instalar (primeira vez) — `1.9.73`
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/install.sh && sh /tmp/install.sh
 ```
 
 Alternativa manual:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.72.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.72.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.73.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 Passo a passo:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.72.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.72.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.73.pkg
 sysrc layer7d_enable=YES
 service layer7d onestart
 layer7d -V
 service layer7d onestatus
 ```
 
-### 4.2 Actualizar para `1.9.72`
+### 4.2 Actualizar para `1.9.73`
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.72.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.72.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.73.pkg && service layer7d onestart && layer7d -V
 ```
 
 Após upgrade, recompilar o ruleset PF uma vez:
@@ -158,7 +158,7 @@ Alternativa GUI: **Services → Layer 7 → Definições → Verificar actualiza
 ### 4.3 Reinstalar a mesma versão
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.72.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/pfSense-pkg-layer7-1.9.72.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.72.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.73.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 ### 4.4 Desinstalar
@@ -172,7 +172,7 @@ pkg delete -y pfSense-pkg-layer7
 ### 4.5 Rollback
 
 O canal público **não** disponibiliza pacotes anteriores. Reinstalar
-`1.9.72` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
+`1.9.73` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
 Systemup — contactar suporte; **não** há URL público.
 
 ---
@@ -258,7 +258,7 @@ add-on Identity do Layer7. Detalhe comercial e implantação: contactar Systemup
 |-------|--------|
 | Default | **OFF** |
 | Escopo | Origem **e** destino explícitos; proibido origem aberta |
-| Janela | Failsafe / auto-disable (`1.9.72`) |
+| Janela | Failsafe / auto-disable (`1.9.73`) |
 | Payload TLS | Não persistir conteúdo TLS; auditoria de metadados apenas |
 | Piloto externo | **Não** liberado sem GO + ficha de site com Systemup |
 | Permanente | **NO-GO** sem decisão humana explícita |

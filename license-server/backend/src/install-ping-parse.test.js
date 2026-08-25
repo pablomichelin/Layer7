@@ -107,3 +107,26 @@ test('BG-162 lista: filtros licensed/stale/search', () => {
 test('BG-162 schema: upsert por hardware_id', () => {
   assert.match(UPSERT_INSTALL_SQL, /ON CONFLICT \(hardware_id\) DO UPDATE/);
 });
+
+test('BG-166 / LS-3: UPSERT nao apaga inventario com payload minimo', () => {
+  assert.match(
+    UPSERT_INSTALL_SQL,
+    /hostname = COALESCE\(NULLIF\(btrim\(EXCLUDED\.hostname\), ''\), install_instances\.hostname\)/
+  );
+  assert.match(
+    UPSERT_INSTALL_SQL,
+    /inventory = CASE/
+  );
+  assert.match(
+    UPSERT_INSTALL_SQL,
+    /EXCLUDED\.inventory = '\{\}'::jsonb/
+  );
+  assert.match(
+    UPSERT_INSTALL_SQL,
+    /ncpu = COALESCE\(NULLIF\(EXCLUDED\.ncpu, 0\), install_instances\.ncpu\)/
+  );
+  assert.match(
+    UPSERT_INSTALL_SQL,
+    /mem_mb = COALESCE\(NULLIF\(EXCLUDED\.mem_mb, 0\), install_instances\.mem_mb\)/
+  );
+});

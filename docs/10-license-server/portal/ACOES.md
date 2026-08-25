@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-25 — BG-165/BG-166 auditoria licença (sem overlay)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | pacote `1.9.73` + license-server HEAD (git privado) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.73` |
+| Objectivo | Fechar achados da auditoria sem rsync integral no `.244` |
+| Impacto | Cliente: curl absoluto, badge `.lic`, disarm, ping sem ID inventado. Servidor: só git (COALESCE, normalizeFeatures, getClientIp) |
+| Risco | Médio no cliente. Live `.244` sem mudança |
+| Teste | persistência C; testes JS contrato; PHP no builder |
+| Rollback | Reinstalar `1.9.73` (latest); LS `git revert`; `.244` intacto |
+| Resultado | **Implementado, pendente de gates/publish** |
+
 ## 2026-08-25 — BG-164 canal publico latest-only
 
 | Campo | Valor |

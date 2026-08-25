@@ -4,12 +4,19 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
-### Changed
+## [1.9.73] — 2026-08-25
 
-- **BG-164 — canal publico latest-only:** `pablomichelin/Layer7` publica
-  apenas o pacote `latest`; releases de pacote anteriores sao retiradas.
-  `pfsense-layer7` deixa de ter GitHub Releases de pacote. Textos e
-  instaladores passam a apontar so para a versao actual.
+### Fixed
+
+- **BG-165 — auditoria de licença no cliente:** activate/check-in do
+  daemon usam `/usr/local/bin/curl`; estado de check-in com `flock`;
+  badge da GUI lê o `.lic` se as stats do daemon faltarem; revoke,
+  import e save desarmam Identity/MITM sem entitlement; install-ping
+  não inventa `hardware_id` e não embute PORTVERSION.
+- **BG-166 — license-server (git privado):** UPSERT de install-ping
+  deixa de apagar inventário com payload mínimo; activate e download
+  passam por `normalizeFeatures`; logs de activate/check-in usam
+  `getClientIp`. Sem overlay `.244` (P0-1).
 
 ## [1.9.72] — 2026-08-25
 

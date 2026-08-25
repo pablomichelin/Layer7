@@ -34,6 +34,7 @@ const {
 } = require('../license-replace-policy');
 const {
   assertEmptyBody,
+  normalizeFeatures,
   normalizeStoredHardwareId,
   parseIdParam,
   parseLicenseCreatePayload,
@@ -972,11 +973,18 @@ router.get('/:id/download', requirePermission('licenses.download'), async (req, 
 
     const effectiveHardwareId = getDownloadHardwareId(license);
 
+    let features = 'base';
+    try {
+      features = normalizeFeatures(license.features || 'base');
+    } catch (_err) {
+      features = 'base';
+    }
+
     const signed = generateSignedLicense({
       hardware_id: effectiveHardwareId,
       expiry: new Date(license.expiry).toISOString().slice(0, 10),
       customer: license.customer_name || 'Unknown',
-      features: license.features || 'base',
+      features,
     });
 
     res.setHeader('Content-Type', 'application/json');

@@ -8,6 +8,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -15,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/file.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -865,11 +867,11 @@ layer7_activate(const char *key, const char *url)
 	    "{\"key\":\"%s\",\"hardware_id\":\"%s\"}", key, hw_id);
 
 	snprintf(cmd, sizeof(cmd),
-	    "curl -sS --connect-timeout 10 --max-time 30 "
+	    "%s -sS --connect-timeout 10 --max-time 30 "
 	    "-o %s -w '%%{http_code}' -X POST "
 	    "-H 'Content-Type: application/json' "
 	    "-d '%s' '%s' > %s 2>/dev/null",
-	    L7_ACTIVATE_BODY_TMP, body, url, L7_ACTIVATE_HTTP_TMP);
+	    L7_CURL_BIN, L7_ACTIVATE_BODY_TMP, body, url, L7_ACTIVATE_HTTP_TMP);
 
 	rc = system(cmd);
 	if (rc != 0 || read_text_file_trim(L7_ACTIVATE_HTTP_TMP, http_code,
@@ -1114,17 +1116,53 @@ json_escape_fprint(FILE *f, const char *s)
 }
 
 static int
+checkin_state_lock(const char *state_path)
+{
+	char lock_path[1024];
+	int fd;
+
+	if (!state_path || state_path[0] == '\0')
+		return -1;
+	if (snprintf(lock_path, sizeof(lock_path), "%s.lock",
+	    state_path) >= (int)sizeof(lock_path))
+		return -1;
+	fd = open(lock_path, O_RDWR | O_CREAT, 0600);
+	if (fd < 0)
+		return -1;
+	if (flock(fd, LOCK_EX) != 0) {
+		(void)close(fd);
+		return -1;
+	}
+	return fd;
+}
+
+static void
+checkin_state_unlock(int fd)
+{
+	if (fd < 0)
+		return;
+	(void)flock(fd, LOCK_UN);
+	(void)close(fd);
+}
+
+static int
 checkin_save_state(const struct l7_checkin_state *st)
 {
 	const char *path;
 	const char *tmp;
 	char tmp_buf[1024];
 	FILE *f;
+	int lockfd;
+	int rc;
 
 	if (!st)
 		return -1;
 
 	path = checkin_state_path();
+	lockfd = checkin_state_lock(path);
+	if (lockfd < 0)
+		return -1;
+
 #ifdef L7_TEST_CHECKIN_STATE
 	{
 		const char *e = getenv("L7_CHECKIN_STATE_TMP");
@@ -1133,21 +1171,27 @@ checkin_save_state(const struct l7_checkin_state *st)
 			tmp = e;
 		else {
 			if (snprintf(tmp_buf, sizeof(tmp_buf), "%s.tmp",
-			    path) >= (int)sizeof(tmp_buf))
+			    path) >= (int)sizeof(tmp_buf)) {
+				checkin_state_unlock(lockfd);
 				return -1;
+			}
 			tmp = tmp_buf;
 		}
 	}
 #else
 	if (snprintf(tmp_buf, sizeof(tmp_buf), "%s.tmp", path) >=
-	    (int)sizeof(tmp_buf))
+	    (int)sizeof(tmp_buf)) {
+		checkin_state_unlock(lockfd);
 		return -1;
+	}
 	tmp = tmp_buf;
 #endif
 
 	f = fopen(tmp, "w");
-	if (!f)
+	if (!f) {
+		checkin_state_unlock(lockfd);
 		return -1;
+	}
 
 	fputs("{\n  \"license_key\": \"", f);
 	json_escape_fprint(f, st->license_key);
@@ -1169,20 +1213,23 @@ checkin_save_state(const struct l7_checkin_state *st)
 	if (fflush(f) != 0) {
 		fclose(f);
 		(void)unlink(tmp);
+		checkin_state_unlock(lockfd);
 		return -1;
 	}
 	(void)fchmod(fileno(f), 0600);
 	if (fclose(f) != 0) {
 		(void)unlink(tmp);
+		checkin_state_unlock(lockfd);
 		return -1;
 	}
 	(void)chmod(tmp, 0600);
-	if (rename(tmp, path) != 0) {
+	rc = rename(tmp, path);
+	if (rc != 0)
 		(void)unlink(tmp);
-		return -1;
-	}
-	(void)chmod(path, 0600);
-	return 0;
+	else
+		(void)chmod(path, 0600);
+	checkin_state_unlock(lockfd);
+	return rc == 0 ? 0 : -1;
 }
 
 /*
@@ -1603,11 +1650,11 @@ layer7_check_in(const char *url)
 	    st.license_key, hw_id, nonce);
 
 	snprintf(cmd, sizeof(cmd),
-	    "curl -sS --connect-timeout 10 --max-time 30 "
+	    "%s -sS --connect-timeout 10 --max-time 30 "
 	    "-o %s -w '%%{http_code}' -X POST "
 	    "-H 'Content-Type: application/json' "
 	    "-d '%s' '%s' > %s 2>/dev/null",
-	    L7_CHECKIN_BODY_TMP, body, url, L7_CHECKIN_HTTP_TMP);
+	    L7_CURL_BIN, L7_CHECKIN_BODY_TMP, body, url, L7_CHECKIN_HTTP_TMP);
 
 	rc = system(cmd);
 	if (rc != 0 || read_text_file_trim(L7_CHECKIN_HTTP_TMP, http_code,

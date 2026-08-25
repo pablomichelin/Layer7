@@ -275,6 +275,19 @@ $lost = layer7_addon_apply_license_transition($keep_src,
 $lost_id = layer7_identity_from_config($lost["data"]);
 need(empty($lost_id["enabled"]), "losing identity persists toggle OFF");
 
+/* BG-165 / PKG-1: .lic valido sem stats do daemon → badge valida. */
+@unlink(layer7_stats_path());
+l7_sign_lic($priv, "base,identity", $lic, "test-hw-30.7", $exp_ok);
+$st = layer7_read_license_status();
+need(!empty($st["valid"]), "PKG-1 status valid without daemon stats");
+need(empty($st["error"]), "PKG-1 status error empty when .lic binds");
+need(($st["customer"] ?? "") === "GA2.8", "PKG-1 customer from verified .lic");
+
+@unlink($lic);
+$st_none = layer7_read_license_status();
+need(empty($st_none["valid"]), "PKG-1 valid false without .lic");
+need(($st_none["error"] ?? "") === "no license file", "PKG-1 error no license file");
+
 fwrite(STDOUT, "PASS test_entitlements_gui.php\n");
 l7_ent_cleanup($testdir);
 exit(0);

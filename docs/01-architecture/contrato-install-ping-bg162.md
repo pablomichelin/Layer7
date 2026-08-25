@@ -2,9 +2,10 @@
 
 **Estado:** overlay live `.244` (`20260823T022826Z`) · **ADR-0036**  
 **Código:** license-server `POST /api/license/install-ping` + portal
-`/installations` · pacote `1.9.72` (libexec + tick `layer7d`)  
+`/installations` · pacote `1.9.73` (libexec + tick `layer7d`)  
 **Live `.244`:** endpoint + página Instalações **activos**. Canal
-`latest` publicado = `v1.9.72` (BG-163 — cliente deixa de falhar em silêncio).
+`latest` publicado = `v1.9.73` (BG-165). Cliente sem fingerprint **não**
+inventa `hardware_id`.
 
 ## Objectivo / impacto / risco / teste / rollback
 

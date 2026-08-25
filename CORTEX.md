@@ -35,8 +35,10 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.72` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.72`;
-`SHA256=0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`;
+`1.9.73` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.73`;
+`SHA256=PENDENTE-APOS-BUILD`; BG-165 auditoria cliente; cadeia F1.2);
+herda `1.9.72`
+(`SHA256=0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`;
 BG-163 install-ping deixa de falhar em silêncio; cadeia F1.2); herda `1.9.71`
 (`SHA256=67d04bbf817c8fa75c4ed5043df94995b4ad0f025d3cd0030bbe650bda96a081`;
 BG-162 install-ping + BG-161 Identity gate; overlay `.244` `20260823T022826Z`;
@@ -190,8 +192,17 @@ aparecer em Instalações.
 Releases de pacote anteriores sao retiradas (tags git preservadas).
 `pfsense-layer7` nao e canal de download (Releases de pacote retiradas).
 Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
-so para `1.9.72`. Pin enforce `1.9.8` permanece politica, sem URL publico.
+so para `latest`. Pin enforce `1.9.8` permanece politica, sem URL publico.
 ADR-0003 §12. `publish-release.sh` retira as anteriores apos cada publish.
+**BG-165 (cliente `1.9.73`) + BG-166 (license-server HEAD):** auditoria
+de licença. Daemon usa `/usr/local/bin/curl` em activate/check-in e
+`flock` no estado de check-in. GUI: badge via `.lic` se o daemon estiver
+parado; disarm Identity/MITM em revoke/import/save; install-ping não
+inventa `hardware_id` e não embute PORTVERSION. License-server (git
+privado apenas): UPSERT com COALESCE, `normalizeFeatures` em
+activate/download, `getClientIp` em activate/check-in. **Sem overlay
+`.244`** (P0-1). Estado até publish: implementado, pendente de
+gates/commit.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

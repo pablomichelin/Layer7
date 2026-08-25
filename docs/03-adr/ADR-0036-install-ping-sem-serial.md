@@ -4,9 +4,10 @@
 
 **Aceito** (`2026-08-22`) — implementado, overlay `.244`
 `20260823T022826Z` (API + SPA Instalações). Portal `2.2.0`. Canal
-`latest` publicado = `v1.9.72`. **BG-163** (`2026-08-25`): o cliente
+`latest` publicado = `v1.9.73`. **BG-163** (`2026-08-25`): o cliente
 `1.9.71` falhava em silêncio (não é falha do endpoint live). Pacote
-`1.9.72` publicado no mesmo dia.
+`1.9.72` corrigiu o silêncio. **BG-165:** o cliente **não** inventa
+`hardware_id` (fail-open: não envia se o fingerprint faltar).
 
 ## Contexto
 
@@ -43,6 +44,9 @@ nomes das interfaces e os identificadores do pfSense — mesmo sem licença.
 - Cliente `1.9.71`: `require config.inc` em CLI, `curl` fora do PATH do
   daemon e retry só às 24 h — caixa instalada não aparece. Correcção no
   cliente (`1.9.72` / BG-163); o endpoint live **não** mudou.
+- Cliente `1.9.73` (BG-165): se `layer7d --fingerprint` falhar e não
+  houver `last_hardware_id`, o ping **não** é enviado (não cria segunda
+  linha no portal). Fail-open mantido.
 
 ## Relação
 

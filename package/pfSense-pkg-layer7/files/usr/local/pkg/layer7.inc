@@ -6829,7 +6829,8 @@ function layer7_lic_path()
 /**
  * Read license status from the daemon stats JSON.
  * Returns associative array with license_valid, license_expired, etc.
- * Falls back to running layer7d --fingerprint for hardware_id if stats missing.
+ * If stats are missing, verify the local .lic (PKG-1 / BG-165) instead of
+ * reporting "no license". Fingerprint still comes from layer7d --fingerprint.
  */
 function layer7_read_license_status()
 {
@@ -6859,7 +6860,7 @@ function layer7_read_license_status()
 	$hw = layer7_hw_fingerprint_from_daemon();
 	$lic_path = layer7_lic_path();
 	$has_lic = file_exists($lic_path);
-	return array(
+	$out = array(
 		"valid" => false,
 		"expired" => false,
 		"grace" => false,
@@ -6874,6 +6875,47 @@ function layer7_read_license_status()
 		"features_flags" => 0,
 		"features_truncated" => false
 	);
+	if (!$has_lic) {
+		return $out;
+	}
+	/* BG-165 / PKG-1: stats ausentes nao implica sem .lic. Verify local
+	 * (sem layer7_entitlements — essa funcao chama esta). */
+	$verified = layer7_license_read_verified($lic_path);
+	if ($verified === null) {
+		$out["error"] = "license file present — signature invalid or unreadable";
+		return $out;
+	}
+	$bind = layer7_license_binding_ok($verified);
+	$out["customer"] = isset($verified["customer"]) ?
+	    (string)$verified["customer"] : "";
+	$out["expiry"] = isset($verified["expiry"]) ?
+	    (string)$verified["expiry"] : "";
+	$out["features"] = isset($verified["features"]) ?
+	    (string)$verified["features"] : "";
+	if (function_exists("layer7_features_parse_php")) {
+		$parsed = layer7_features_parse_php($out["features"]);
+		$out["features_flags"] = ((int)$parsed["flags"]) | L7_FEAT_BASE;
+		$out["features_truncated"] = !empty($parsed["truncated"]);
+	}
+	$out["days_left"] = isset($bind["days_left"]) ? (int)$bind["days_left"] : 0;
+	$out["grace"] = !empty($bind["grace"]);
+	if (($bind["reason"] ?? "") === "hw_unavailable") {
+		$out["error"] = "daemon not running — cannot verify";
+		return $out;
+	}
+	if (!empty($bind["ok"])) {
+		$out["valid"] = true;
+		$out["expired"] = !empty($bind["grace"]);
+		$out["error"] = "";
+		return $out;
+	}
+	if (($bind["reason"] ?? "") === "expired") {
+		$out["expired"] = true;
+		$out["error"] = "license expired";
+		return $out;
+	}
+	$out["error"] = "license binding failed: " . (string)($bind["reason"] ?? "invalid");
+	return $out;
 }
 
 /**

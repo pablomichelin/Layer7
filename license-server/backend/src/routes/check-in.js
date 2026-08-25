@@ -18,6 +18,7 @@ const { createHttpError, isHttpError, runInTransaction } = require('../crud-inte
 const { loadLicenseForCheckIn } = require('../check-in-lookup');
 const { getEffectiveLicenseState } = require('../license-state');
 const { parseCheckInPayload } = require('../crud-validation');
+const { getClientIp } = require('../session');
 
 const router = Router();
 
@@ -115,7 +116,7 @@ function maybeSignCheckInBody(body, { nonce, hardwareId, nowSec, signFn } = {}) 
 }
 
 router.post('/license/check-in', checkInLimiter, async (req, res) => {
-  const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip;
+  const ip = getClientIp(req);
   const ua = req.headers['user-agent'] || '';
   let requestedHardwareId = null;
   let requestedNonce = null;

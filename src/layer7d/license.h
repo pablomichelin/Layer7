@@ -10,6 +10,7 @@
 #include <time.h>
 
 #define L7_LIC_PATH        "/usr/local/etc/layer7.lic"
+#define L7_CURL_BIN        "/usr/local/bin/curl"
 #define L7_HW_ID_LEN       65  /* 64 hex chars + NUL */
 #define L7_LIC_GRACE_DAYS  14
 #define L7_CHECKIN_STATE_PATH "/var/db/layer7-checkin.json"

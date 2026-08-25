@@ -55,7 +55,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0032](ADR-0032-check-in-obrigatorio-e-assinado.md) | Check-in obrigatório por defeito e resposta assinada com anti-replay | **Aceito** (`2026-08-10`, `30.1b`) | **Emenda ADR-0021**; desenho `30.12` FECHADO ([contrato](../01-architecture/contrato-check-in-assinado-30.12.md)); GO `30.14`; BG-101 reaberto |
 | [ADR-0033](ADR-0033-anti-rollback-relogio.md) | Anti-rollback de relógio e estado temporal suspeito | **Aceito** (`2026-08-10`, `30.1b`) | Emenda `f3-expiracao-revogacao-grace.md`; RR-4/R-J; passo `30.6` |
 | [ADR-0035](ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md) | Ambição de paridade NGFW no tempo + retirada da ficha | **Aceito** (`2026-08-14`) | Emenda ADR-0026 §12; P5/ficha **RETIRADOS**; **20.35 PASS** |
-| [ADR-0036](ADR-0036-install-ping-sem-serial.md) | Sinal de instalação e heartbeat sem serial | **Aceito** (`2026-08-22`) | BG-162 live; BG-163 cliente `1.9.72` (silêncio `1.9.71`); fail-open |
+| [ADR-0036](ADR-0036-install-ping-sem-serial.md) | Sinal de instalação e heartbeat sem serial | **Aceito** (`2026-08-22`) | BG-162 live; BG-165 cliente `1.9.73`; fail-open; sem inventar hardware_id |
 
 **Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`);
 trilha **FECHADA** em **`30.19`** (`2026-08-12`) — fecho

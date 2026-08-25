@@ -74,7 +74,7 @@ Instalar `.pkg` anterior (`1.9.50` ou abaixo) **ignora** o ficheiro de estado
 sem erro. O ficheiro pode permanecer em disco; versões antigas não o lêem.
 
 Pacotes anteriores **não** estão no canal público (BG-164). Rollback
-público = reinstalar `1.9.72`. Artefacto antigo só no builder/arquivo.
+público = reinstalar `1.9.73`. Artefacto antigo só no builder/arquivo.
 
 ---
 

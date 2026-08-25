@@ -78,6 +78,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 			}
 			$mitm = layer7_mitm_prepare_window_on_save($prev_mitm, $mitm);
 			$data = layer7_mitm_apply_to_config($data, $mitm);
+			$tr = layer7_addon_disarm_unentitled($data);
+			$data = $tr["data"];
 			if (empty($input_errors) && layer7_save_json($data)) {
 				$want_helper = layer7_mitm_should_start_helper($mitm, true);
 				$sync_ok = layer7_mitm_sync_helper($data, true);

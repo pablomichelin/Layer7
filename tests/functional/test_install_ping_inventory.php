@@ -179,6 +179,51 @@ $fallback = layer7_install_ping_hardware_id_fallback();
 check((bool)preg_match('/^[a-f0-9]{64}$/', $fallback), 'fallback hardware_id 64 hex');
 check(layer7_install_ping_curl_bin() !== '', 'curl bin resolvido');
 
+$src = file_get_contents($inc);
+check(strpos($src, 'return "1.9.72"') === false &&
+    strpos($src, "return '1.9.72'") === false,
+	'PKG-6 versao sem PORTVERSION embutido');
+check(layer7_install_ping_package_version() !== '1.9.72' ||
+    strpos($src, 'return "unknown"') !== false,
+	'PKG-6 fallback unknown, nao 1.9.72');
+
+$noHw = layer7_install_inventory(null, array(
+	'package_version' => '1.9.73',
+	'event' => 'heartbeat',
+	'install_id' => str_repeat('e', 32),
+	'os_release' => '',
+	'hw_model' => '',
+	'ncpu' => 0,
+	'mem_mb' => 0,
+	'system_serial' => '',
+));
+check(empty($noHw['hardware_id']), 'PKG-5 sem fingerprint nao inventa hardware_id');
+
+layer7_install_ping_save_state(array(
+	'last_hardware_id' => str_repeat('f', 64),
+));
+$reused = layer7_install_inventory(null, array(
+	'package_version' => '1.9.73',
+	'event' => 'heartbeat',
+	'install_id' => str_repeat('e', 32),
+	'os_release' => '',
+	'hw_model' => '',
+	'ncpu' => 0,
+	'mem_mb' => 0,
+	'system_serial' => '',
+));
+check(($reused['hardware_id'] ?? '') === str_repeat('f', 64),
+	'PKG-5 reusa last_hardware_id do estado');
+
+layer7_install_ping_save_state(array());
+$skipped = layer7_install_ping_run(null, array(
+	'force' => true,
+	'package_version' => '1.9.73',
+	'install_id' => str_repeat('e', 32),
+));
+check(!empty($skipped['skipped']) && (($skipped['reason'] ?? '') === 'hardware_id'),
+	'PKG-5 run sem fingerprint nao envia');
+
 function rrmdir($dir) {
 	if (!is_dir($dir)) {
 		return;

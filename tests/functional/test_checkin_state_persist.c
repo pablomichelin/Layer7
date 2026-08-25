@@ -203,6 +203,23 @@ main(void)
 	    st.last_ok == 12345,
 	    "P2-7 get_status ve intervalos antigos");
 
+	/* D-5: lock exclusivo ao lado do estado; escritas sequenciais. */
+	{
+		char lockp[320];
+
+		snprintf(lockp, sizeof(lockp), "%s.lock", state);
+		check(access(lockp, F_OK) == 0, "D-5 ficheiro .lock criado");
+		check(layer7_checkin_store_key("LOCKKEY1") == 0 &&
+		    layer7_checkin_store_key("LOCKKEY2") == 0,
+		    "D-5 escritas sequenciais");
+		raw = read_text(state);
+		check(raw != NULL &&
+		    strstr(raw, "\"license_key\": \"LOCKKEY2\"") != NULL,
+		    "D-5 ultima escrita prevalece");
+		free(raw);
+		unlink(lockp);
+	}
+
 	/* P2-10: promote/.lic via o mesmo helper 0600. */
 	{
 		const char *body = "{\"data\":\"x\",\"sig\":\"y\"}";

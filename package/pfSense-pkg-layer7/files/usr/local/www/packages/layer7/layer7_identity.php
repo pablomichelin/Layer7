@@ -157,6 +157,8 @@ if ($unlocked && isset($_POST["test_ldap"])) {
 
 	if (empty($input_errors)) {
 		$data = layer7_identity_apply_to_config($data, $identity);
+		$tr = layer7_addon_disarm_unentitled($data);
+		$data = $tr["data"];
 		if (!layer7_save_json($data)) {
 			$input_errors[] = l7_t("Nao foi possivel gravar a configuracao Identity.");
 		} else {

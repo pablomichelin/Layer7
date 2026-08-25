@@ -47,6 +47,20 @@ check(!file_exists($ci), 'revoke apaga layer7-checkin.json');
 check(!file_exists($clock), 'revoke apaga clock-mark.json');
 check(!file_exists($sub), 'revoke apaga content-subscription.json');
 
+/* BG-165 / PKG-2: sem entitlement, disarm persiste toggles OFF. */
+$armed = array(
+	"layer7" => array(
+		"identity" => array("enabled" => true),
+		"mitm" => array("enabled" => true),
+	),
+);
+$dis = layer7_addon_disarm_unentitled($armed);
+$did = layer7_identity_from_config($dis["data"]);
+$dmitm = layer7_mitm_from_config($dis["data"]);
+check(!empty($dis["changed"]), 'PKG-2 disarm marca changed');
+check(empty($did["enabled"]), 'PKG-2 disarm identity OFF');
+check(empty($dmitm["enabled"]), 'PKG-2 disarm mitm OFF');
+
 @unlink($lic);
 @unlink($ci);
 @unlink($clock);

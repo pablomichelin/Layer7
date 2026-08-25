@@ -356,7 +356,46 @@ function layer7_install_ping_package_version()
 			return $out;
 		}
 	}
-	return "1.9.72";
+	if (function_exists("layer7_pkg_version")) {
+		$pkg = trim((string)layer7_pkg_version());
+		if ($pkg !== "" && strlen($pkg) <= 32) {
+			return $pkg;
+		}
+	}
+	$out = array();
+	$rc = 0;
+	exec("/usr/sbin/pkg query %v pfSense-pkg-layer7 2>/dev/null", $out, $rc);
+	if ($rc === 0 && !empty($out[0])) {
+		$v = trim((string)$out[0]);
+		if ($v !== "" && strlen($v) <= 32) {
+			return $v;
+		}
+	}
+	return "unknown";
+}
+
+function layer7_install_ping_resolve_hardware_id($opts = array())
+{
+	if (!is_array($opts)) {
+		$opts = array();
+	}
+	if (isset($opts["hardware_id"])) {
+		$hw = strtolower(trim((string)$opts["hardware_id"]));
+		if (preg_match('/^[a-f0-9]{64}$/', $hw)) {
+			return $hw;
+		}
+	}
+	$hw = layer7_install_ping_fingerprint();
+	if ($hw !== "") {
+		return $hw;
+	}
+	$state = layer7_install_ping_load_state();
+	$prev = isset($state["last_hardware_id"])
+		? strtolower(trim((string)$state["last_hardware_id"])) : "";
+	if (preg_match('/^[a-f0-9]{64}$/', $prev)) {
+		return $prev;
+	}
+	return "";
 }
 
 function layer7_install_ping_fingerprint()
@@ -545,12 +584,7 @@ function layer7_install_inventory($config = null, $opts = array())
 	$package_version = isset($opts["package_version"])
 		? (string)$opts["package_version"]
 		: layer7_install_ping_package_version();
-	$hardware_id = isset($opts["hardware_id"])
-		? (string)$opts["hardware_id"]
-		: layer7_install_ping_fingerprint();
-	if ($hardware_id === "") {
-		$hardware_id = layer7_install_ping_hardware_id_fallback();
-	}
+	$hardware_id = layer7_install_ping_resolve_hardware_id($opts);
 
 	$uniqueid_path = "/var/db/uniqueid";
 	$hostid_path = "/etc/hostid";
@@ -662,7 +696,8 @@ function layer7_install_ping_post($payload, $url = null)
 		return array("ok" => false, "error" => "json", "http" => 0);
 	}
 
-	$ua = "layer7-install-ping/1.9.72";
+	$ver = layer7_install_ping_package_version();
+	$ua = "layer7-install-ping/" . ($ver !== "" ? $ver : "unknown");
 	$ext_error = "";
 	if (function_exists("curl_init")) {
 		$ch = curl_init($url);
@@ -732,6 +767,15 @@ function layer7_install_ping_run($config = null, $opts = array())
 	}
 
 	$payload = layer7_install_inventory($config, $opts);
+	if (empty($payload["hardware_id"])) {
+		layer7_install_ping_note("event=skip reason=hardware_id");
+		return array(
+			"ok" => true,
+			"skipped" => true,
+			"reason" => "hardware_id",
+			"http" => 0,
+		);
+	}
 	$result = layer7_install_ping_post($payload, isset($opts["url"]) ? $opts["url"] : null);
 	$state = layer7_install_ping_load_state();
 	$state["last_attempt"] = time();
@@ -746,6 +790,7 @@ function layer7_install_ping_run($config = null, $opts = array())
 		$state["last_ok"] = time();
 		$state["last_version"] = isset($payload["package_version"])
 			? $payload["package_version"] : "";
+		$state["last_hardware_id"] = (string)$payload["hardware_id"];
 	}
 	layer7_install_ping_save_state($state);
 	layer7_install_ping_note(
