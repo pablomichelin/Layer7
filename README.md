@@ -2,12 +2,15 @@
 
 > **Systemup Solução em Tecnologia** · [www.systemup.inf.br](https://www.systemup.inf.br)
 
-Public repository for **signed releases and product documentation only**.
+Public repository for **the current signed package and product documentation**.
 Source code and internal engineering docs are not published here.
 
-**Current public package (`latest`):** **`1.9.47`**  
-SHA256: `2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`  
-Release: [v1.9.47](https://github.com/pablomichelin/Layer7/releases/tag/v1.9.47)
+**Current public package (`latest`):** **`1.9.72`**  
+SHA256: `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`  
+Release: [v1.9.72](https://github.com/pablomichelin/Layer7/releases/tag/v1.9.72)
+
+This repository publishes **only the latest package**. Older package releases
+are not available for download.
 
 ---
 
@@ -15,37 +18,29 @@ Release: [v1.9.47](https://github.com/pablomichelin/Layer7/releases/tag/v1.9.47)
 
 | Document | Description |
 |----------|-------------|
-| **[Manual do Produto (PT)](docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md)** | **Start here** — hub + guia completo do operador |
+| **[Manual do Produto (PT)](docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md)** | **Start here** — hub + guia do operador |
 | [Evaluation Pack (EN)](docs/commercial/LAYER7-EVALUATION-PACK-EN.md) | Product evaluation |
 | [Evaluation Pack (PT)](docs/commercial/LAYER7-EVALUATION-PACK-PT.md) | Avaliação do produto |
 | [Product Overview (EN)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-EN.md) | Features and use cases |
 | [Product Overview (PT)](docs/commercial/LAYER7-PRODUCT-OVERVIEW-PT.md) | Funcionalidades |
 | [Installation Guide (EN)](docs/commercial/LAYER7-INSTALL-GUIDE-EN.md) | Install, upgrade, uninstall |
 | [Installation Guide (PT)](docs/commercial/LAYER7-INSTALL-GUIDE-PT.md) | Instalação |
-| [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) | `.pkg`, checksums, release notes |
+| [GitHub Releases](https://github.com/pablomichelin/Layer7/releases/latest) | Current `.pkg`, installer, checksums |
 
 **Licensing and activation** are not documented in depth publicly. Contact
 Systemup for commercial licenses, trials, and enforce mode.
 
 ---
 
-## Quick install (`1.9.47`)
+## Quick install (`1.9.72`)
 
-On pfSense (SSH as **root**). Official path for this release is **fetch + `pkg add`**
-(`install.sh` is not attached to `v1.9.47`):
+On pfSense CE (SSH as **root**):
 
 ```bash
-fetch -o /tmp/pfSense-pkg-layer7-1.9.47.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.47/pfSense-pkg-layer7-1.9.47.pkg \
-  && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.47.pkg \
-  && sysrc layer7d_enable=YES \
-  && service layer7d onestart \
-  && layer7d -V
+fetch -o /tmp/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh \
+  && sh /tmp/install.sh
 ```
-
-Verify SHA256 against
-`2155daca7f80eb0c90af4f736d71131d01d22b63942831aa1c0191240f9df833`
-(see the [product manual](docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md)).
 
 Then open **Services → Layer 7** in the pfSense web UI.
 
@@ -55,11 +50,8 @@ Then open **Services → Layer 7** in the pfSense web UI.
 
 | Mode | Description |
 |------|-------------|
-| **Monitor** | Observe traffic, no Layer7 blocking |
+| **Monitor** | Free — observe traffic, no blocking |
 | **Enforce** | Commercial license from Systemup (contact sales) |
-
-**MITM** (TLS inspection) ships **OFF** by default and is not released for
-external/permanent pilot without an explicit commercial GO and site scope.
 
 ---
 

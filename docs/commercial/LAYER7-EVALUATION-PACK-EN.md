@@ -15,7 +15,12 @@ identifies network traffic by real application (YouTube, BitTorrent, TikTok,
 VPN, etc.) using Deep Packet Inspection (nDPI), and lets administrators
 **monitor**, **allow**, or **block** traffic with policies by interface,
 subnet, device group, and schedule — integrated into the pfSense GUI, **without
-MITM**.
+MITM** on the base product.
+
+**Identity add-on (SKU Y, opt-in):** network User-ID (RADIUS / DC agent / LDAP)
+and policies by AD user or group. Network accuracy — **not** a per-PC agent in
+this phase. See
+[`LAYER7-IDENTITY-ADDON-NOTES-EN.md`](LAYER7-IDENTITY-ADDON-NOTES-EN.md).
 
 | | |
 |--|--|
@@ -120,9 +125,9 @@ Installation uses a signed `.pkg` from GitHub Releases and a one-line installer 
 Full steps: [Installation Guide](LAYER7-INSTALL-GUIDE-EN.md).
 
 ```bash
-# On pfSense (SSH as root) — replace VERSION with the latest release tag:
+# On pfSense (SSH as root) — only the current public package (`1.9.72`):
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/vVERSION/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.72/install.sh \
   && sh /tmp/install.sh
 ```
 

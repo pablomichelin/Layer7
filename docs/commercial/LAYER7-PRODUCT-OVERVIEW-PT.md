@@ -48,6 +48,7 @@ Crie regras precisas de bloqueio ou monitorização com combinações de:
 - **Por interface de rede** — regras diferentes para LAN, WiFi, Visitantes
 - **Por sub-rede ou IP** — bloquear redes sociais só para a rede dos alunos
 - **Por grupo de dispositivos** — criar grupos nomeados ("Funcionários", "Visitantes", "Diretoria") e aplicar regras por grupo
+- **Por utilizador / grupo AD (add-on Identity)** — User-ID de rede (RADIUS/DC/LDAP); ver notes comerciais Identity
 - **Por horário** — bloquear YouTube apenas em horário de trabalho (8h-18h, seg-sex)
 - **Por site/domínio** — bloquear domínios específicos manualmente
 

@@ -49,6 +49,7 @@ Create precise blocking or monitoring rules combining:
 - **By subnet or IP** — block social media only for the student network
 - **By device group** — create named groups ("Employees", "Guests", "Directors") and apply rules per group
 - **By schedule** — block YouTube only during work hours (8am-6pm, Mon-Fri)
+- **By AD user/group (Identity add-on)** — network User-ID (RADIUS/DC/LDAP); see Identity commercial notes
 - **By site/domain** — manually block specific domains
 
 ### 3. Four action types
