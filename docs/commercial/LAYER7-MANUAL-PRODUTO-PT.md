@@ -4,7 +4,7 @@
 
 > Guia público do operador. Fiel ao estado publicado em GitHub Releases.  
 > **Pacote de referência (canal `latest`):** **`1.9.73`**  
-> **SHA256:** `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`  
+> **SHA256:** `9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`  
 > **Release:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.73>  
 > **Latest:** <https://github.com/pablomichelin/Layer7/releases/latest>  
 > **Alinhamento:** `2026-08-25`
@@ -77,7 +77,7 @@ Cada release publica pelo menos:
 
 - Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg>
 - SHA256: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg.sha256>
-- **SHA256 esperado:** `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`
+- **SHA256 esperado:** `9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`
 
 > Caminho oficial: **`install.sh`** assinado (F1.2). O canal público
 > publica **apenas** esta release de pacote.
@@ -97,7 +97,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg.sha256 \
 ```
 
 Os dois hashes devem coincidir com
-`0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`.
+`9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`.
 
 **Nota ABI:** em alguns ambientes (ex. pfSense Plus / FreeBSD 16 vs builder 15)
 usa-se `IGNORE_OSVERSION=yes` e `pkg add -f`. Isto é aceite operacional; não

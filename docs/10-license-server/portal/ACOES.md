@@ -16,7 +16,7 @@ Mais recente no topo.
 | Risco | Médio no cliente. Live `.244` sem mudança |
 | Teste | persistência C; testes JS contrato; PHP no builder |
 | Rollback | Reinstalar `1.9.73` (latest); LS `git revert`; `.244` intacto |
-| Resultado | **Implementado, pendente de gates/publish** |
+| Resultado | **PUBLICADO** `v1.9.73` F1.2 (`SHA256=9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`); latest-only retirou `1.9.72`; LS só no git privado |
 
 ## 2026-08-25 — BG-164 canal publico latest-only
 

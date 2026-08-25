@@ -6,7 +6,7 @@
 > [`docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md`](https://github.com/pablomichelin/Layer7/blob/main/docs/commercial/LAYER7-MANUAL-PRODUTO-PT.md)
 > (versão sanitizada: sem SSOTs internos / license server).  
 > **Pacote de referência (canal `latest`):** **`1.9.73`**  
-> **SHA256:** `PENDENTE-APOS-BUILD`  
+> **SHA256:** `9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`  
 > **Release:** <https://github.com/pablomichelin/Layer7/releases/latest>  
 > **Data de alinhamento:** `2026-08-25`
 ---
@@ -96,7 +96,7 @@ Fonte canónica: secção **Links da versao actual** em
 - Release: <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.73>
 - Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg>
 - SHA256 ficheiro: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg.sha256>
-- **SHA256 esperado:** `PENDENTE-APOS-BUILD`
+- **SHA256 esperado:** `9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`
 - Latest: <https://github.com/pablomichelin/Layer7/releases/latest>
 
 > Caminho oficial: **`install.sh`** assinado (F1.2). Pacotes anteriores
@@ -114,7 +114,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg.sha256 https://github.com/pablomiche
 ```
 
 Os dois hashes devem coincidir com
-`PENDENTE-APOS-BUILD`.
+`9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`.
 
 **Nota ABI (pfSense Plus / FreeBSD 16 vs builder 15):** os comandos usam
 `IGNORE_OSVERSION=yes` e `pkg add -f` (BG-106). Isto é aceite operacional;

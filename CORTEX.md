@@ -36,7 +36,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.73` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.73`;
-`SHA256=PENDENTE-APOS-BUILD`; BG-165 auditoria cliente; cadeia F1.2);
+`SHA256=9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`; BG-165 auditoria cliente; cadeia F1.2);
 herda `1.9.72`
 (`SHA256=0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7`;
 BG-163 install-ping deixa de falhar em silêncio; cadeia F1.2); herda `1.9.71`
@@ -201,8 +201,8 @@ parado; disarm Identity/MITM em revoke/import/save; install-ping não
 inventa `hardware_id` e não embute PORTVERSION. License-server (git
 privado apenas): UPSERT com COALESCE, `normalizeFeatures` em
 activate/download, `getClientIp` em activate/check-in. **Sem overlay
-`.244`** (P0-1). Estado até publish: implementado, pendente de
-gates/commit.
+`.244`** (P0-1). **PUBLICADO** `v1.9.73`
+(`SHA256=9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`).
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

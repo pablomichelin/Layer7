@@ -1347,7 +1347,7 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 - **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.73`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/pfSense-pkg-layer7-1.9.73.pkg.sha256`
-- **SHA256 esperado:** `PENDENTE-APOS-BUILD`
+- **SHA256 esperado:** `9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`
 - **Fingerprint chave pública de release:** `d26e3f007e81298bad910f99dd62a22e2109740158b3b3c7f4e79490bdc5a998`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
@@ -1363,7 +1363,7 @@ Arquivo de integridade (sem URL):
 
 | Versao | SHA256 | Nota |
 |--------|--------|------|
-| `1.9.73` | `PENDENTE-APOS-BUILD` | canal publico actual |
+| `1.9.73` | `9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af` | canal publico actual |
 | `1.9.72` | `0c016c8dab7b46f9a78b9f0c23fbd58359ccd2d860ac5be3fd2854252dab12d7` | arquivo (tag git) |
 | `1.9.71` | `67d04bbf817c8fa75c4ed5043df94995b4ad0f025d3cd0030bbe650bda96a081` | lab anterior (arquivo) |
 | `1.9.69` | `b08acf83798da7bd3541194bcf5758febada8aa0794423930afc6a162f928735` | lab anterior (arquivo) |
@@ -1430,7 +1430,7 @@ fetch -o /tmp/pfSense-pkg-layer7-1.9.73.pkg.sha256 https://github.com/pablomiche
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`PENDENTE-APOS-BUILD`.
+`9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`.
 
 ---
 
