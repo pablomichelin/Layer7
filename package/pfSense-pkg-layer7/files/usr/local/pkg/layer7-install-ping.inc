@@ -401,6 +401,14 @@ function layer7_install_ping_resolve_hardware_id($opts = array())
 function layer7_install_ping_fingerprint()
 {
 	$bin = "/usr/local/sbin/layer7d";
+	if (defined("LAYER7_TEST_ROOT") && LAYER7_TEST_ROOT) {
+		$cand = rtrim((string)LAYER7_TEST_ROOT, "/") . "/usr/local/sbin/layer7d";
+		if (is_executable($cand)) {
+			$bin = $cand;
+		} else {
+			return "";
+		}
+	}
 	if (is_executable($bin)) {
 		$out = strtolower(trim(layer7_install_ping_cmd(escapeshellarg($bin) . " --fingerprint")));
 		if (preg_match('/^[a-f0-9]{64}$/', $out)) {
