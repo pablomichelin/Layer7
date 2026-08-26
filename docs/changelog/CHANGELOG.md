@@ -12,6 +12,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   e Definições mostram o modo **efectivo** do daemon (`enforce_mode`). Sem
   licença o badge passa a **monitorizar**, com nota «pedido aplicar», em
   vez do vermelho **aplicar**. O selector continua a gravar o pedido.
+  Pacote `SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542`.
 
 ## [1.9.73] — 2026-08-25
 

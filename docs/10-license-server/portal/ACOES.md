@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-26 — BG-167 GUI modo efectivo (`1.9.74`)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | pacote `1.9.74` (sem overlay `.244`) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.74` |
+| Objectivo | Sem licença o dashboard mostra monitorizar, não aplicar |
+| Impacto | Só GUI; daemon já era monitor-only sem `.lic` |
+| Risco | Baixo |
+| Teste | i18n coverage; build builder `SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542` |
+| Rollback | Reinstalar `1.9.74` (latest) ou rebuild `v1.9.73` |
+| Resultado | **pendente publish** `v1.9.74` F1.2 |
+
 ## 2026-08-25 — BG-165/BG-166 auditoria licença (sem overlay)
 
 | Campo | Valor |
