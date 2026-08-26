@@ -21,7 +21,7 @@ pacotes anteriores (BG-164). Rollback público = reinstalar o actual:
 
 ```sh
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.74/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.75/install.sh \
   && sh /tmp/install.sh
 ```
 

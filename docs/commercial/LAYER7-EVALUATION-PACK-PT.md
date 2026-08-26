@@ -125,9 +125,9 @@ A instalação usa `.pkg` assinado das GitHub Releases e script de uma linha.
 Passos completos: [Guia de Instalação](LAYER7-INSTALL-GUIDE-PT.md).
 
 ```bash
-# No pfSense (SSH root) — único pacote público (`1.9.74`):
+# No pfSense (SSH root) — único pacote público (`1.9.75`):
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.74/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.75/install.sh \
   && sh /tmp/install.sh
 ```
 

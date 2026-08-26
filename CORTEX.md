@@ -35,8 +35,10 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.74` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.74`;
-`SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542`; BG-167 GUI modo efectivo; cadeia F1.2);
+`1.9.75` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.75`;
+`SHA256=90e5bb2e6369ca2c5b2ce5afc926cacd2ea0fdd2426b13d400901b1de3c72e75`; BG-168 PF só arma com licença; cadeia F1.2);
+herda `1.9.74`
+(`SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542`; BG-167 GUI modo efectivo; cadeia F1.2);
 herda `1.9.73`
 (`SHA256=9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`; BG-165 auditoria cliente; cadeia F1.2);
 herda `1.9.72`
@@ -190,7 +192,7 @@ e `/usr/local/bin/curl`, e re-tenta aos 15 min. Endpoint live intacto.
 Sem overlay `.244` (P0-1). Caixas ≤`1.9.71` precisam de upgrade para
 aparecer em Instalações.
 **BG-164 (`2026-08-25`) — canal publico latest-only:**
-`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.74`).
+`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.75`).
 Releases de pacote anteriores sao retiradas (tags git preservadas).
 `pfsense-layer7` nao e canal de download (Releases de pacote retiradas).
 Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
@@ -211,11 +213,9 @@ o operador vê **monitorizar** + nota do pedido.
 `releases/latest` = `v1.9.74`;
 `SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542`.
 `v1.9.73` retirada do download (latest-only / BG-164).
-**BG-168 (`1.9.75`, urgente):** o mesmo critério passa ao PF —
-`layer7_pf_should_enforce()` só é verdadeiro com `enforce_mode=1`.
-Pedido aplicar sem licença já não injecta anti-QUIC/`block drop`
-(incidente mercado). Pendente build/publish; latest continua `1.9.74`
-até `v1.9.75` no canal público.
+**BG-168 (`1.9.75`):** o PF só arma com pedido aplicar **e**
+`enforce_mode=1`. Sem licença não há anti-QUIC/`block drop`.
+SHA e `releases/latest` actualizados neste bloco após publish.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

@@ -13,6 +13,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   **aplicar** sem `.lic` já não injecta anti-QUIC, `block drop` nem NAT de
   bloqueio. Causa do incidente no mercado: JSON `mode=enforce` armava o
   pfSense enquanto o daemon ficava em monitor.
+  Pacote `SHA256=90e5bb2e6369ca2c5b2ce5afc926cacd2ea0fdd2426b13d400901b1de3c72e75`.
 
 ## [1.9.74] — 2026-08-26
 
