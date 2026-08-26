@@ -203,9 +203,9 @@ privado apenas): UPSERT com COALESCE, `normalizeFeatures` em
 activate/download, `getClientIp` em activate/check-in. **Sem overlay
 `.244`** (P0-1). **PUBLICADO** `v1.9.73`
 (`SHA256=9ea84e54115280c53f3b77f5359bd99e652839a8aebf8a5eb22d9b1ecf0352af`).
-**BG-167 (GUI, FEITO no git):** o badge de modo no dashboard deixa de
-mostrar «aplicar» sem `enforce_mode=1`; sem licença o operador vê
-**monitorizar** + nota do pedido. Sem `PORTVERSION`/release neste bloco.
+**BG-167 (GUI, `PORTVERSION=1.9.74`, pendente build/release):** o badge
+de modo no dashboard deixa de mostrar «aplicar» sem `enforce_mode=1`;
+sem licença o operador vê **monitorizar** + nota do pedido.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
