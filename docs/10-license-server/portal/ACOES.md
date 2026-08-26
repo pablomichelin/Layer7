@@ -16,7 +16,7 @@ Mais recente no topo.
 | Risco | Baixo |
 | Teste | i18n coverage; build builder `SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542` |
 | Rollback | Reinstalar `1.9.74` (latest) ou rebuild `v1.9.73` |
-| Resultado | **pendente publish** `v1.9.74` F1.2 |
+| Resultado | **PUBLICADO** `v1.9.74` F1.2; `releases/latest` confirmado |
 
 ## 2026-08-25 — BG-165/BG-166 auditoria licença (sem overlay)
 
