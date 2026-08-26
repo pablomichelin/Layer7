@@ -6,7 +6,7 @@ Referência rápida do que o PHP valida antes de gravar `layer7.json`.
 
 | Campo | Regra |
 |-------|--------|
-| `mode` | `monitor` \| `enforce` |
+| `mode` | `monitor` \| `enforce` (pedido gravado). O badge do painel/Diagnósticos mostra o modo **efectivo** (`enforce_mode` do daemon). Sem licença = **monitorizar**, mesmo com pedido `enforce` (BG-167). |
 | `log_level` | `error` \| `warn` \| `info` \| `debug` |
 | `syslog_remote` | checkbox |
 | `syslog_remote_host` | Se remoto ativo: não vazio; **IPv4** ou **hostname** (A–Z, a–z, 0–9, `.`, `-`; 1–255 chars; sem `..`) |

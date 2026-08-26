@@ -269,14 +269,13 @@ $unbound_anti_doh = layer7_unbound_anti_doh_configured();
 
 $data = layer7_load_or_default();
 $L = isset($data["layer7"]) ? $data["layer7"] : array();
-$cfg_enabled = !empty($L["enabled"]);
-$cfg_mode = isset($L["mode"]) ? (string)$L["mode"] : "monitor";
 $cfg_ifaces = isset($L["interfaces"]) && is_array($L["interfaces"]) ? $L["interfaces"] : array();
 $cfg_enforcement_model = (isset($L["enforcement_model"]) &&
     (string)$L["enforcement_model"] === "scoped_hybrid")
     ? "scoped_hybrid" : "legacy_global";
+$enf = layer7_gui_enforce_state($data);
 $pf_scoped_active = ($cfg_enforcement_model === "scoped_hybrid" &&
-    $cfg_enabled && $cfg_mode === "enforce");
+    !empty($enf["enforce_armed"]));
 $pf_scoped_tables = array();
 $pf_scoped_rules_hits = array();
 if ($pf_scoped_active) {
@@ -373,13 +372,7 @@ layer7_render_styles();
 
 					<dt><?= l7_t("Modo"); ?></dt>
 					<dd>
-						<?php if (!$cfg_enabled) { ?>
-						<span class="label label-warning"><?= l7_t("desativado"); ?></span>
-						<?php } elseif ($cfg_mode === "enforce") { ?>
-						<span class="label label-danger"><?= l7_t("enforce"); ?></span>
-						<?php } else { ?>
-						<span class="label label-info"><?= l7_t("monitor"); ?></span>
-						<?php } ?>
+						<?= layer7_gui_mode_badge_html($enf); ?>
 					</dd>
 
 					<dt><?= l7_t("Enforcement model"); ?></dt>

@@ -626,6 +626,7 @@ $data = layer7_load_or_default();
 $L = $data["layer7"];
 $en = !empty($L["enabled"]);
 $mode = isset($L["mode"]) ? $L["mode"] : "monitor";
+$enf = layer7_gui_enforce_state($data);
 $ll = isset($L["log_level"]) ? $L["log_level"] : "info";
 $sr = !empty($L["syslog_remote"]);
 $sr_host = isset($L["syslog_remote_host"]) ? (string)$L["syslog_remote_host"] : "";
@@ -716,6 +717,11 @@ layer7_render_styles();
 								<option value="monitor" <?= $mode === "monitor" ? 'selected="selected"' : ""; ?>><?= l7_t("monitor"); ?></option>
 								<option value="enforce" <?= $mode === "enforce" ? 'selected="selected"' : ""; ?>><?= l7_t("enforce"); ?></option>
 							</select>
+							<p class="help-block"><?= l7_t("O modo gravado e o pedido. Sem licenca valida o daemon so monitoriza; o painel mostra o modo efectivo."); ?></p>
+							<?php if (($enf["requested_mode"] ?? "") === "enforce" &&
+							    ($enf["display_mode"] ?? "") !== "enforce") { ?>
+							<p class="help-block text-warning"><?= htmlspecialchars(layer7_gui_enforce_reason_text($enf)); ?></p>
+							<?php } ?>
 						</div>
 					</div>
 

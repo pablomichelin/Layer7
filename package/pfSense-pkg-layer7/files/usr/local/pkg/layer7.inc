@@ -4902,6 +4902,105 @@ function layer7_read_stats()
 	return is_array($j) ? $j : null;
 }
 
+/**
+ * Modo efectivo para a GUI (BG-167).
+ * O pedido do operador (layer7.json mode) nao e o que o daemon arma.
+ * Sem enforce_mode=1 nas stats, a GUI nunca mostra "aplicar".
+ *
+ * @param array|null $data  layer7_load_or_default(); null = ler
+ * @param array|null $stats stats do daemon; null = layer7_read_stats()
+ * @return array{
+ *   enabled: bool,
+ *   requested_mode: string,
+ *   daemon_stats: bool,
+ *   enforce_armed: bool,
+ *   license_valid: bool,
+ *   display_mode: string,
+ *   reason: string
+ * }
+ */
+function layer7_gui_enforce_state($data = null, $stats = null)
+{
+	if ($data === null) {
+		$data = layer7_load_or_default();
+	}
+	$l7 = (isset($data["layer7"]) && is_array($data["layer7"]))
+	    ? $data["layer7"] : array();
+	$enabled = !empty($l7["enabled"]);
+	$requested = (isset($l7["mode"]) && (string)$l7["mode"] === "enforce")
+	    ? "enforce" : "monitor";
+	if ($stats === null) {
+		$stats = layer7_read_stats();
+	}
+	$has_stats = is_array($stats) && array_key_exists("enforce_mode", $stats);
+	$armed = $has_stats && ((int)$stats["enforce_mode"] === 1);
+	$lic_valid = false;
+	if (is_array($stats) && array_key_exists("license_valid", $stats)) {
+		$lic_valid = !empty($stats["license_valid"]);
+	}
+
+	$out = array(
+		"enabled" => $enabled,
+		"requested_mode" => $requested,
+		"daemon_stats" => $has_stats,
+		"enforce_armed" => $armed,
+		"license_valid" => $lic_valid,
+		"display_mode" => "monitor",
+		"reason" => "monitor"
+	);
+	if (!$enabled) {
+		$out["display_mode"] = "disabled";
+		$out["reason"] = "service_off";
+		return $out;
+	}
+	if ($armed) {
+		$out["display_mode"] = "enforce";
+		$out["reason"] = "armed";
+		return $out;
+	}
+	if ($requested === "enforce") {
+		if (!$has_stats) {
+			$out["reason"] = "daemon_down";
+		} elseif (!$lic_valid) {
+			$out["reason"] = "no_license";
+		} else {
+			$out["reason"] = "not_armed";
+		}
+	}
+	return $out;
+}
+
+function layer7_gui_enforce_reason_text($state)
+{
+	switch (isset($state["reason"]) ? (string)$state["reason"] : "") {
+	case "no_license":
+		return l7_t("Pedido aplicar - sem licenca, so monitoriza.");
+	case "daemon_down":
+		return l7_t("Pedido aplicar - daemon sem estado, so monitoriza.");
+	case "not_armed":
+		return l7_t("Pedido aplicar - o daemon nao armou o bloqueio.");
+	default:
+		return "";
+	}
+}
+
+function layer7_gui_mode_badge_html($state)
+{
+	$mode = isset($state["display_mode"]) ? (string)$state["display_mode"] : "monitor";
+	if ($mode === "disabled") {
+		return '<span class="label label-warning">' . l7_t("desativado") . '</span>';
+	}
+	if ($mode === "enforce") {
+		return '<span class="label label-danger">' . l7_t("enforce") . '</span>';
+	}
+	$html = '<span class="label label-info">' . l7_t("monitor") . '</span>';
+	$note = layer7_gui_enforce_reason_text($state);
+	if ($note !== "") {
+		$html .= ' <span class="text-muted">' . htmlspecialchars($note) . '</span>';
+	}
+	return $html;
+}
+
 function layer7_profiles_path()
 {
 	$test = getenv("LAYER7_PROFILES_TEST_DIR");

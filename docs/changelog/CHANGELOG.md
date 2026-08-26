@@ -4,6 +4,13 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **BG-167 — GUI sem falso positivo de enforce:** o dashboard, Diagnósticos
+  e Definições mostram o modo **efectivo** do daemon (`enforce_mode`). Sem
+  licença o badge passa a **monitorizar**, com nota «pedido aplicar», em
+  vez do vermelho **aplicar**. O selector continua a gravar o pedido.
+
 ## [1.9.73] — 2026-08-25
 
 ### Fixed

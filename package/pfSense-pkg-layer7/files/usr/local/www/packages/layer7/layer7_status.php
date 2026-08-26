@@ -22,8 +22,6 @@ if ($pid !== null) {
 
 $data = layer7_load_or_default();
 $L = isset($data["layer7"]) ? $data["layer7"] : array();
-$cfg_enabled = !empty($L["enabled"]);
-$cfg_mode = isset($L["mode"]) ? (string)$L["mode"] : "monitor";
 $cfg_ifaces = isset($L["interfaces"]) && is_array($L["interfaces"]) ? $L["interfaces"] : array();
 $n_policies = isset($L["policies"]) && is_array($L["policies"]) ? count($L["policies"]) : 0;
 $n_exceptions = isset($L["exceptions"]) && is_array($L["exceptions"]) ? count($L["exceptions"]) : 0;
@@ -81,6 +79,8 @@ if (isset($_POST["restart_service"])) {
 	}
 	$stats = $running ? layer7_read_stats() : null;
 }
+
+$enf = layer7_gui_enforce_state($data, $stats);
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"));
 include("head.inc");
@@ -234,13 +234,7 @@ layer7_render_styles();
 
 					<dt><?= l7_t("Modo"); ?></dt>
 					<dd>
-						<?php if (!$cfg_enabled) { ?>
-						<span class="label label-warning"><?= l7_t("desativado"); ?></span>
-						<?php } elseif ($cfg_mode === "enforce") { ?>
-						<span class="label label-danger"><?= l7_t("enforce"); ?></span>
-						<?php } else { ?>
-						<span class="label label-info"><?= l7_t("monitor"); ?></span>
-						<?php } ?>
+						<?= layer7_gui_mode_badge_html($enf); ?>
 					</dd>
 
 					<dt><?= l7_t("Interfaces"); ?></dt>
@@ -256,7 +250,11 @@ layer7_render_styles();
 					<dd>
 						<?= $n_policies_active; ?>/<?= $n_policies; ?> <?= l7_t("ativas"); ?>
 						<?php if ($n_block_policies > 0) { ?>
+						<?php if (!empty($enf["enforce_armed"])) { ?>
 						(<span class="text-danger"><?= $n_block_policies; ?> block</span>)
+						<?php } else { ?>
+						(<span class="text-muted"><?= (int)$n_block_policies; ?> <?= l7_t("block gravada, nao aplicada"); ?></span>)
+						<?php } ?>
 						<?php } ?>
 					</dd>
 
