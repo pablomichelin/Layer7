@@ -213,9 +213,11 @@ o operador vê **monitorizar** + nota do pedido.
 `releases/latest` = `v1.9.74`;
 `SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542`.
 `v1.9.73` retirada do download (latest-only / BG-164).
-**BG-168 (`1.9.75`):** o PF só arma com pedido aplicar **e**
-`enforce_mode=1`. Sem licença não há anti-QUIC/`block drop`.
-SHA e `releases/latest` actualizados neste bloco após publish.
+**BG-168 PUBLICADO `v1.9.75` (`2026-08-26`):** o PF só arma com pedido
+aplicar **e** `enforce_mode=1`. Sem licença não há anti-QUIC/`block drop`.
+`releases/latest` = `v1.9.75`;
+`SHA256=90e5bb2e6369ca2c5b2ce5afc926cacd2ea0fdd2426b13d400901b1de3c72e75`.
+`v1.9.74` retirada do download (latest-only / BG-164).
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

@@ -16,7 +16,7 @@ Mais recente no topo.
 | Risco | Médio (muda o gate PF; fail-closed sem stats) |
 | Teste | `test_pf_should_enforce.php`; `test_gui_enforce_state.php`; i18n |
 | Rollback | Reinstalar `1.9.74` (até `1.9.75` ser latest) |
-| Resultado | **pendente publish** `v1.9.75` F1.2 |
+| Resultado | **PUBLICADO** `v1.9.75` F1.2; `releases/latest` confirmado; `v1.9.74` retirada |
 
 ## 2026-08-26 — BG-167 GUI modo efectivo (`1.9.74`)
 
