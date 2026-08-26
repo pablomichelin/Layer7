@@ -879,8 +879,9 @@ function layer7_generate_nat_anchor_snippet($data = null)
 function layer7_pf_should_enforce($data = null, $stats = null)
 {
 	$state = layer7_gui_enforce_state($data, $stats);
-	return (isset($state["display_mode"]) &&
-	    $state["display_mode"] === "enforce");
+	return !empty($state["enabled"]) &&
+	    (($state["requested_mode"] ?? "") === "enforce") &&
+	    !empty($state["enforce_armed"]);
 }
 
 /**

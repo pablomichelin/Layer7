@@ -91,6 +91,8 @@ need(layer7_pf_should_enforce($data_enforce, $armed) === true,
     "BG-168: PF enforces only when daemon armed");
 need(layer7_pf_should_enforce($data_enforce, array()) === false,
     "BG-168: empty stats never arm PF");
+need(layer7_pf_should_enforce($data_monitor, $armed) === false,
+    "BG-168: requested monitor never arms PF");
 
 $it = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($testdir, FilesystemIterator::SKIP_DOTS),
