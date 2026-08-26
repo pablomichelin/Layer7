@@ -56,6 +56,11 @@ personalizadas pelo administrador são preservadas sem alteração.
 upgrade, guardar Configurações com o idioma desejado aplica a tradução aos
 defaults reconhecidos mesmo quando esse idioma já está selecionado.
 
+**Addendum operacional BG-168 (`2026-08-26`, `v1.9.75`):** o PF deixa de
+armar enforce só porque o JSON pede **aplicar**. Sem `enforce_mode=1`
+não há anti-QUIC, `block drop` nem NAT de bloqueio. Overlay `.244`
+intacto (P0-1). Pin enforce permanece **`1.9.8`**.
+
 **Addendum operacional BG-167 (`2026-08-26`, `v1.9.74`):** o dashboard,
 Diagnósticos e Definições mostram o modo **efectivo** (`enforce_mode`).
 Sem licença o badge é **monitorizar**, com nota do pedido aplicar — sem

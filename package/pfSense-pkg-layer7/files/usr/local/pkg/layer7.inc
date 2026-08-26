@@ -868,26 +868,19 @@ function layer7_generate_nat_anchor_snippet($data = null)
 
 /**
  * Decide se o produto deve emitir regras `block drop` do Layer7.
- * Regra unica e auditavel: enabled=true E mode=="enforce".
- * Em qualquer outro estado (monitor / disabled / mode em falta) o snippet PF
- * fica passivo: apenas as tabelas `persist` sao mantidas para o daemon poder
- * operar / fazer self-heal, mas nenhuma regra de bloqueio do core e emitida.
+ * BG-168: o pedido JSON (enabled+mode=enforce) NAO basta. O PF so arma
+ * quando o daemon ja armou enforce (`enforce_mode=1`) — a mesma regra
+ * do badge BG-167. Sem licenca / daemon em baixo / nao armado: so
+ * tabelas persist, zero anti-QUIC / blacklist / NAT de bloqueio.
+ *
+ * @param array|null $data  layer7_load_or_default(); null = ler
+ * @param array|null $stats stats do daemon; null = layer7_read_stats()
  */
-function layer7_pf_should_enforce($data = null)
+function layer7_pf_should_enforce($data = null, $stats = null)
 {
-	if ($data === null) {
-		$data = layer7_load_or_default();
-	}
-	if (!is_array($data) || !isset($data["layer7"]) ||
-	    !is_array($data["layer7"])) {
-		return false;
-	}
-	$l7 = $data["layer7"];
-	if (empty($l7["enabled"])) {
-		return false;
-	}
-	$mode = isset($l7["mode"]) ? (string)$l7["mode"] : "monitor";
-	return ($mode === "enforce");
+	$state = layer7_gui_enforce_state($data, $stats);
+	return (isset($state["display_mode"]) &&
+	    $state["display_mode"] === "enforce");
 }
 
 /**
@@ -2539,8 +2532,9 @@ function layer7_generate_rules($type)
 
 	$data = layer7_load_or_default();
 
-	/* Gate F4/Bloco 1: em modo passivo (monitor / desactivado) o produto nao
-	 * emite NENHUM block drop, anti-QUIC, blacklists nem injecta NAT.
+	/* Gate F4/Bloco 1 + BG-168: em modo passivo (monitor / desactivado /
+	 * sem enforce_mode=1) o produto nao emite NENHUM block drop, anti-QUIC,
+	 * blacklists nem injecta NAT.
 	 *
 	 * IMPORTANTE: nao usar `layer7_pf_rules_text()` aqui — essa funcao
 	 * prefere o `pf.conf` em disco (escrito por `layer7-pfctl` com os blocks

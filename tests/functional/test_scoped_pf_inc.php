@@ -4,6 +4,11 @@
  * Uso: php tests/functional/test_scoped_pf_inc.php
  */
 $root = dirname(__DIR__, 2);
+$l7_test_root = sys_get_temp_dir() . "/layer7-scoped-pf-" . getmypid();
+@mkdir($l7_test_root . "/var/db/layer7", 0755, true);
+putenv("LAYER7_TEST_ROOT=" . $l7_test_root);
+file_put_contents($l7_test_root . "/var/db/layer7/layer7-stats.json",
+    json_encode(array("enforce_mode" => 1, "license_valid" => true)));
 require_once $root . "/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc";
 
 $data = array(
@@ -408,6 +413,15 @@ if (!is_string($layer7_inc) ||
 	fwrite(STDERR, "FAIL: layer7_generate_rules must handle pfnearly hook\n");
 	exit(1);
 }
+
+$it = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($l7_test_root, FilesystemIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::CHILD_FIRST
+);
+foreach ($it as $f) {
+	$f->isDir() ? @rmdir($f->getPathname()) : @unlink($f->getPathname());
+}
+@rmdir($l7_test_root);
 
 echo "PASS: test_scoped_pf_inc\n";
 exit(0);

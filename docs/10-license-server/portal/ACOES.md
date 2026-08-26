@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-26 — BG-168 PF só arma com licença (`1.9.75`)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | pacote `1.9.75` (sem overlay `.244`) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.75` |
+| Objectivo | Sem licença o PF não injecta anti-QUIC nem blocks |
+| Impacto | `layer7_pf_should_enforce()` alinhado ao daemon armado |
+| Risco | Médio (muda o gate PF; fail-closed sem stats) |
+| Teste | `test_pf_should_enforce.php`; `test_gui_enforce_state.php`; i18n |
+| Rollback | Reinstalar `1.9.74` (até `1.9.75` ser latest) |
+| Resultado | **pendente publish** `v1.9.75` F1.2 |
+
 ## 2026-08-26 — BG-167 GUI modo efectivo (`1.9.74`)
 
 | Campo | Valor |

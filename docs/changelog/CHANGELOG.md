@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.75] — 2026-08-26
+
+### Fixed
+
+- **BG-168 — PF sem licença deixava de ser passivo:** `layer7_pf_should_enforce()`
+  passa a exigir `enforce_mode=1` (o mesmo critério do badge BG-167). Pedido
+  **aplicar** sem `.lic` já não injecta anti-QUIC, `block drop` nem NAT de
+  bloqueio. Causa do incidente no mercado: JSON `mode=enforce` armava o
+  pfSense enquanto o daemon ficava em monitor.
+
 ## [1.9.74] — 2026-08-26
 
 ### Fixed

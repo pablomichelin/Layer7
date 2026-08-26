@@ -211,6 +211,11 @@ o operador vê **monitorizar** + nota do pedido.
 `releases/latest` = `v1.9.74`;
 `SHA256=bb4cc7810b26d2246ffd71912d04b0c83299eb826f09b7a324a83dfa42084542`.
 `v1.9.73` retirada do download (latest-only / BG-164).
+**BG-168 (`1.9.75`, urgente):** o mesmo critério passa ao PF —
+`layer7_pf_should_enforce()` só é verdadeiro com `enforce_mode=1`.
+Pedido aplicar sem licença já não injecta anti-QUIC/`block drop`
+(incidente mercado). Pendente build/publish; latest continua `1.9.74`
+até `v1.9.75` no canal público.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

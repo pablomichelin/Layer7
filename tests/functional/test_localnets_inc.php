@@ -4,6 +4,11 @@
  * Uso: php tests/functional/test_localnets_inc.php
  */
 $root = dirname(__DIR__, 2);
+$l7_test_root = sys_get_temp_dir() . "/layer7-localnets-" . getmypid();
+@mkdir($l7_test_root . "/var/db/layer7", 0755, true);
+putenv("LAYER7_TEST_ROOT=" . $l7_test_root);
+file_put_contents($l7_test_root . "/var/db/layer7/layer7-stats.json",
+    json_encode(array("enforce_mode" => 1, "license_valid" => true)));
 require_once $root . "/package/pfSense-pkg-layer7/files/usr/local/pkg/layer7.inc";
 
 if (layer7_pf_localnets_table_name() !== "layer7_localnets") {
@@ -98,6 +103,15 @@ if (strpos($quic, "to !<layer7_localnets>") === false ||
 	fwrite(STDERR, $quic);
 	exit(1);
 }
+
+$it = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($l7_test_root, FilesystemIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::CHILD_FIRST
+);
+foreach ($it as $f) {
+	$f->isDir() ? @rmdir($f->getPathname()) : @unlink($f->getPathname());
+}
+@rmdir($l7_test_root);
 
 echo "PASS test_localnets_inc\n";
 exit(0);

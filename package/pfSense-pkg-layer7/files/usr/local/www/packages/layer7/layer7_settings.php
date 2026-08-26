@@ -717,7 +717,7 @@ layer7_render_styles();
 								<option value="monitor" <?= $mode === "monitor" ? 'selected="selected"' : ""; ?>><?= l7_t("monitor"); ?></option>
 								<option value="enforce" <?= $mode === "enforce" ? 'selected="selected"' : ""; ?>><?= l7_t("enforce"); ?></option>
 							</select>
-							<p class="help-block"><?= l7_t("O modo gravado e o pedido. Sem licenca valida o daemon so monitoriza; o painel mostra o modo efectivo."); ?></p>
+							<p class="help-block"><?= l7_t("O modo gravado e o pedido. Sem licenca valida o daemon e o PF so monitorizam; o painel mostra o modo efectivo."); ?></p>
 							<?php if (($enf["requested_mode"] ?? "") === "enforce" &&
 							    ($enf["display_mode"] ?? "") !== "enforce") { ?>
 							<p class="help-block text-warning"><?= htmlspecialchars(layer7_gui_enforce_reason_text($enf)); ?></p>
