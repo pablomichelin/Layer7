@@ -16,7 +16,7 @@ Mais recente no topo.
 | Risco | Baixo (mais destinos bloqueados no atalho já ligado) |
 | Teste | `test_i18n_coverage.js`; `test_profiles_json.sh`; `layer7d -V` |
 | Rollback | Reinstalar `1.9.75` (tag git / builder) |
-| Resultado | SHA `a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`; publicação F1.2 em curso |
+| Resultado | **PUBLICADO** `v1.9.76` F1.2; `releases/latest` confirmado; `v1.9.75` retirada |
 
 ## 2026-08-26 — BG-168 PF só arma com licença (`1.9.75`)
 

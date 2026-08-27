@@ -35,7 +35,7 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.76` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.76` pendente de publish F1.2;
+`1.9.76` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.76`;
 `SHA256=a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`; BG-169 Pornografia; cadeia F1.2);
 herda `1.9.75`
 (`SHA256=90e5bb2e6369ca2c5b2ce5afc926cacd2ea0fdd2426b13d400901b1de3c72e75`; BG-168 PF só arma com licença; cadeia F1.2);
@@ -194,7 +194,7 @@ e `/usr/local/bin/curl`, e re-tenta aos 15 min. Endpoint live intacto.
 Sem overlay `.244` (P0-1). Caixas ≤`1.9.71` precisam de upgrade para
 aparecer em Instalações.
 **BG-164 (`2026-08-25`) — canal publico latest-only:**
-`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.76` após F1.2).
+`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.76`).
 Releases de pacote anteriores sao retiradas (tags git preservadas).
 `pfsense-layer7` nao e canal de download (Releases de pacote retiradas).
 Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
@@ -220,10 +220,12 @@ aplicar **e** `enforce_mode=1`. Sem licença não há anti-QUIC/`block drop`.
 `releases/latest` = `v1.9.75`;
 `SHA256=90e5bb2e6369ca2c5b2ce5afc926cacd2ea0fdd2426b13d400901b1de3c72e75`.
 `v1.9.74` retirada do download (latest-only / BG-164).
-**BG-169 (`1.9.76`, SHA registado, publish F1.2 em curso):** atalho
-`adulto` renomeado para **Pornografia**; catálogo 64 hosts + nDPI
-`AdultContent`; preset Protecção infantil alargado.
+**BG-169 PUBLICADO `v1.9.76` (`2026-08-26`):** atalho `adulto` renomeado
+para **Pornografia**; catálogo 64 hosts + nDPI `AdultContent`; preset
+Protecção infantil alargado.
+`releases/latest` = `v1.9.76`;
 `SHA256=a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`.
+`v1.9.75` retirada do download (latest-only / BG-164).
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
