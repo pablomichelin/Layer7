@@ -4,6 +4,17 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.76] — 2026-08-26
+
+### Changed
+
+- **BG-169 — perfil rápido Pornografia:** o atalho `adulto` passa a
+  chamar-se **Pornografia** (id estável, políticas `profile-adulto`
+  intactas). Hosts 15 → 64 (teto do daemon) + categoria nDPI
+  `AdultContent`. O preset Protecção infantil herda um subconjunto
+  alargado. Cobertura completa continua na blacklist UT1 adult.
+  Pacote pendente de gates/commit/publicação.
+
 ## [1.9.75] — 2026-08-26
 
 ### Fixed

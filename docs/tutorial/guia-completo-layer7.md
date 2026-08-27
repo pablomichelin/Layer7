@@ -311,8 +311,9 @@ sao pontos coloridos. O grupo **Presets** tem fundo ligeiramente tintado.
 Exemplos de perfis individuais: Zoom, Teams, Threads, Bluesky, Deezer, DAZN,
 Anonymizers, Roblox, Free Fire. Agregados: Videoconferencia, Musica, Redes
 alternativas. **Presets:** Distracoes no trabalho, Protecao infantil, Higiene
-de rede. O atalho **Conteudo adulto** e leve — para cobertura completa use
-blacklists UT1.
+de rede. O atalho **Pornografia** (id `adulto`) cobre tubos/cams/plataformas
+pagas até 64 hosts e a categoria nDPI `AdultContent` — para cobertura completa
+use a blacklist UT1 adult.
 
 ### 7.3 Acoes disponiveis
 

@@ -218,6 +218,10 @@ aplicar **e** `enforce_mode=1`. Sem licença não há anti-QUIC/`block drop`.
 `releases/latest` = `v1.9.75`;
 `SHA256=90e5bb2e6369ca2c5b2ce5afc926cacd2ea0fdd2426b13d400901b1de3c72e75`.
 `v1.9.74` retirada do download (latest-only / BG-164).
+**BG-169 (`1.9.76`, implementado, pendente de gates/commit):** atalho
+`adulto` renomeado para **Pornografia**; catálogo 64 hosts + nDPI
+`AdultContent`; preset Protecção infantil alargado. Latest publicado
+continua `1.9.75` até publish.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
