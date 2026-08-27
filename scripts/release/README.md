@@ -16,7 +16,7 @@ repositório — ver `MANUAL-INSTALL.md` §11b.1 e `AGENTS.md`.
 No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.75/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.76/install.sh && sh /tmp/install.sh
 ```
 
 O script faz **tudo automaticamente**:
@@ -32,7 +32,7 @@ O script faz **tudo automaticamente**:
 ### Versão específica
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.75/install.sh && sh /tmp/install.sh --version 1.9.75
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.76/install.sh && sh /tmp/install.sh --version 1.9.76
 ```
 
 ### Reinstalar
@@ -127,7 +127,7 @@ Se preferir instalar um a um via GUI do pfSense:
 
 Em cada pfSense, **Diagnostics > Command Prompt**:
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.75/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.76/install.sh && sh /tmp/install.sh
 ```
 
 ---

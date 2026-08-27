@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-26 — BG-169 perfil rápido Pornografia (`1.9.76`)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | pacote `1.9.76` (sem overlay `.244`) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.76` |
+| Objectivo | Atalho adulto visível como Pornografia, catálogo 64 hosts |
+| Impacto | `profiles.json` + i18n; id `adulto` estável |
+| Risco | Baixo (mais destinos bloqueados no atalho já ligado) |
+| Teste | `test_i18n_coverage.js`; `test_profiles_json.sh`; `layer7d -V` |
+| Rollback | Reinstalar `1.9.75` (tag git / builder) |
+| Resultado | SHA `a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`; publicação F1.2 em curso |
+
 ## 2026-08-26 — BG-168 PF só arma com licença (`1.9.75`)
 
 | Campo | Valor |
