@@ -5,9 +5,9 @@
 Public repository for **the current signed package and product documentation**.
 Source code and internal engineering docs are not published here.
 
-**Current public package (`latest`):** **`1.9.76`**  
-SHA256: `a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`  
-Release: [v1.9.76](https://github.com/pablomichelin/Layer7/releases/tag/v1.9.76)
+**Current public package (`latest`):** **`1.9.77`**  
+SHA256: `1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`  
+Release: [v1.9.77](https://github.com/pablomichelin/Layer7/releases/tag/v1.9.77)
 
 This repository publishes **only the latest package**. Older package releases
 are not available for download.
@@ -32,13 +32,13 @@ Systemup for commercial licenses, trials, and enforce mode.
 
 ---
 
-## Quick install (`1.9.76`)
+## Quick install (`1.9.77`)
 
 On pfSense CE (SSH as **root**):
 
 ```bash
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.76/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.77/install.sh \
   && sh /tmp/install.sh
 ```
 
