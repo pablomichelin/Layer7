@@ -12,7 +12,8 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   check-in periódico. O daemon ignora `check_in_enabled=false` no JSON;
   a GUI deixa de expor o interruptor. Revogar no portal volta a cortar
   caixas que tinham opt-out. Falha de rede continua a não derrubar o
-  bloqueio (N3). Pacote pendente de gates/commit/publicação.
+  bloqueio (N3).
+  Pacote `SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`.
 
 ## [1.9.76] — 2026-08-26
 
