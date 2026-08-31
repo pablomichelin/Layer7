@@ -184,6 +184,31 @@ test_dedup(void)
 	    "dedup is case-insensitive and exact-value");
 }
 
+static void
+test_captive_probe(void)
+{
+	CHECK(l7_host_is_captive_probe("captive.apple.com") == 1,
+	    "captive.apple.com");
+	CHECK(l7_host_is_captive_probe("www.captive.apple.com") == 1,
+	    "suffix captive.apple.com");
+	CHECK(l7_host_is_captive_probe("connectivitycheck.gstatic.com") == 1,
+	    "gstatic connectivity");
+	CHECK(l7_host_is_captive_probe("clients3.google.com") == 1,
+	    "clients3.google.com");
+	CHECK(l7_host_is_captive_probe("www.msftconnecttest.com") == 1,
+	    "msftconnecttest");
+	CHECK(l7_host_is_captive_probe("dns.msftncsi.com") == 1,
+	    "msftncsi");
+	CHECK(l7_host_is_captive_probe("www.apple.com") == 0,
+	    "www.apple.com is not a probe");
+	CHECK(l7_host_is_captive_probe("gateway.icloud.com") == 0,
+	    "gateway.icloud.com is not a probe");
+	CHECK(l7_host_is_captive_probe("mask.icloud.com") == 0,
+	    "mask.icloud.com is not a probe");
+	CHECK(l7_host_is_captive_probe("") == 0, "empty host");
+	CHECK(l7_host_is_captive_probe(NULL) == 0, "null host");
+}
+
 int
 main(void)
 {
@@ -195,6 +220,7 @@ main(void)
 	test_json_parse();
 	test_json_parse_v6();
 	test_dedup();
+	test_captive_probe();
 	if (g_fail) {
 		fprintf(stderr, "\n%d test(s) FAILED\n", g_fail);
 		return g_fail;

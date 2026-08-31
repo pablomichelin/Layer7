@@ -1219,6 +1219,70 @@ test_profile_adulto_compat_without_match_mode(void)
 	check(dec.action == LAYER7_ACTION_BLOCK, "compat leftover blocks");
 }
 
+static int
+load_anti_bypass_new(struct layer7_policy_rule *rules, int *n)
+{
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"anti-bypass-dns\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":1,"
+	    "\"scope_global\":true,\"match\":{"
+	    "\"ndpi_app\":[\"DoH_DoT\",\"iCloudPrivateRelay\"],"
+	    "\"hosts\":[\"mask.icloud.com\",\"mask-h2.icloud.com\","
+	    "\"dns.google\"]}}]}}";
+
+	memset(rules, 0, sizeof(*rules));
+	*n = 0;
+	if (layer7_policies_parse(json, strlen(json), rules, n, 1) != 0)
+		return -1;
+	if (*n != 1)
+		return -1;
+	layer7_policies_sort(rules, 1);
+	return 0;
+}
+
+static void
+test_anti_bypass_no_appleicloud(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	int n = 0;
+
+	check(load_anti_bypass_new(rules, &n) == 0, "anti-bypass parse");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.9.62", "gateway.icloud.com", "AppleiCloud", "Web",
+	    &dec) == 0, "gw+AppleiCloud decide");
+	check(dec.action != LAYER7_ACTION_BLOCK,
+	    "gw+AppleiCloud not blocked by anti-bypass");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.9.62", "captive.apple.com", "TLS", "Web", &dec) == 0,
+	    "captive.apple decide");
+	check(dec.action != LAYER7_ACTION_BLOCK,
+	    "captive.apple.com not blocked by anti-bypass");
+}
+
+static void
+test_anti_bypass_mask_and_relay(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	int n = 0;
+
+	check(load_anti_bypass_new(rules, &n) == 0, "anti-bypass parse 2");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.9.62", "mask.icloud.com", "TLS", "Web", &dec) == 0,
+	    "mask.icloud decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "mask.icloud.com blocked");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.9.62", "cdn.example", "iCloudPrivateRelay", "Web",
+	    &dec) == 0, "relay decide");
+	check(dec.action == LAYER7_ACTION_BLOCK,
+	    "iCloudPrivateRelay blocked");
+}
+
 int
 main(void)
 {
@@ -1259,6 +1323,8 @@ main(void)
 	test_adulto_or_not_shadowed_by_pmon();
 	test_mixed_hosts_cat_and_default_unchanged();
 	test_profile_adulto_compat_without_match_mode();
+	test_anti_bypass_no_appleicloud();
+	test_anti_bypass_mask_and_relay();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");

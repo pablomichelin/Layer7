@@ -56,6 +56,16 @@ personalizadas pelo administrador são preservadas sem alteração.
 upgrade, guardar Configurações com o idioma desejado aplica a tradução aos
 defaults reconhecidos mesmo quando esse idioma já está selecionado.
 
+**Addendum operacional BG-173 (`2026-08-31`, `v1.9.79` candidato):**
+compatibilidade com o Captive Portal nativo do pfSense. A política de
+fábrica anti-bypass deixa de incluir `AppleiCloud` (continua a bloquear
+DoH/DoT, iCloud Private Relay e hosts `mask*.icloud.com`). Destinos
+locais e o IP do portal nunca entram em `layer7_block_dst`. Sem rdr
+Layer7 em 80/443 no mesmo IP/interface do portal nativo. Endpoints CNA
+são ignorados pelo Layer7; o portal pfSense continua soberano. Pornografia
+(`profile-adulto`) intacta. Overlay `.244` intacto (P0-1). Pin enforce
+permanece **`1.9.8`**. Canal `latest` só muda após publish de `v1.9.79`.
+
 **Addendum operacional BG-171 (`2026-08-31`, `v1.9.78`):** o
 perfil rápido **Pornografia** passa a casar host conhecido **ou**
 categoria nDPI `AdultContent`. Upgrade carimba `profile-adulto` existente

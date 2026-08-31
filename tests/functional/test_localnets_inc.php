@@ -32,8 +32,11 @@ if ($c6 === null || !preg_match('#^2804:6c4:11d:cc00::/64$#', $c6)) {
 }
 
 $nets = layer7_pf_collect_local_networks();
-if (!in_array("fe80::/10", $nets, true)) {
-	fwrite(STDERR, "FAIL: fe80::/10 must always be in localnets\n");
+if (!in_array("fe80::/10", $nets, true) ||
+    !in_array("127.0.0.1/32", $nets, true) ||
+    !in_array("::1/128", $nets, true)) {
+	fwrite(STDERR, "FAIL: loopback/fe80 must always be in localnets\n");
+	fwrite(STDERR, implode(", ", $nets) . "\n");
 	exit(1);
 }
 
@@ -50,6 +53,7 @@ $GLOBALS["config"] = array(
 );
 $nets2 = layer7_pf_collect_local_networks();
 if (!in_array("192.168.100.0/24", $nets2, true) ||
+    !in_array("192.168.100.254/32", $nets2, true) ||
     !in_array("2804:6c4:11d:cc00::/64", $nets2, true) ||
     !in_array("fe80::/10", $nets2, true)) {
 	fwrite(STDERR, "FAIL: collect from config missed LAN v4/v6\n");
@@ -90,8 +94,13 @@ $actions = layer7_pf_action_rules_text($data);
 if (strpos($actions, "to !<layer7_localnets>") === false ||
     strpos($actions, "<localsubnets>") !== false ||
     strpos($actions, "layer7:block:src6") === false ||
-    strpos($actions, "layer7:anti-dot6") === false) {
-	fwrite(STDERR, "FAIL: action rules must use layer7_localnets\n");
+    strpos($actions, "layer7:anti-dot6") === false ||
+    strpos($actions, "match inet to <layer7_localnets> tag L7ALLOW") === false ||
+    strpos($actions, "match inet6 to <layer7_localnets> tag L7ALLOW") === false ||
+    strpos($actions, "block drop quick inet to <layer7_block_dst>") === false ||
+    strpos($actions, "block drop quick inet6 to <layer7_block_dst>") === false ||
+    strpos($actions, "pass quick") !== false) {
+	fwrite(STDERR, "FAIL: action rules must protect localnets and dest-block\n");
 	fwrite(STDERR, $actions);
 	exit(1);
 }

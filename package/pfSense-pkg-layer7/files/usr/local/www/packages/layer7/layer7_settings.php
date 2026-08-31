@@ -637,6 +637,7 @@ $enforcement_model = (isset($L["enforcement_model"]) &&
     ? "scoped_hybrid" : "legacy_global";
 $bp_cfg = layer7_blockpage_config_get($data);
 $bp_portal_detected = layer7_blockpage_portal_ip($data);
+$bp_cp_conflict = layer7_blockpage_conflicts_with_native_captive($data);
 $bp_domain_info = layer7_blockpage_collect_domains($data);
 $cur_lang = isset($L["language"]) ? $L["language"] : "pt";
 if (!in_array($cur_lang, array("pt", "en", "es"), true)) {
@@ -764,7 +765,7 @@ layer7_render_styles();
 								<option value="legacy_global" <?= $enforcement_model === "legacy_global" ? 'selected="selected"' : ""; ?>><?= l7_t("Legacy global (actual — tabela layer7_block_dst partilhada)"); ?></option>
 								<option value="scoped_hybrid" <?= $enforcement_model === "scoped_hybrid" ? 'selected="selected"' : ""; ?>><?= l7_t("Escopado hibrido (experimental — Caminho B; requer blocos E2+)"); ?></option>
 							</select>
-							<p class="help-block"><?= l7_t("Por defeito: legacy global (recomendado). O modo escopado hibrido e experimental: bloqueia por politica e origem via tabelas layer7_pdst_* / layer7_psrc_*. So IPv4; DoH/DoT/QUIC podem contornar DNS/SNI; politicas app-only exigem flag quarantine_origin para quarentenar origem. Validar em laboratorio antes de produzao."); ?></p>
+							<p class="help-block"><?= l7_t("Por defeito: legacy global (recomendado). Neste modo, um destino que entre em layer7_block_dst fica bloqueado para TODOS os clientes. Destinos locais (interfaces, Captive Portal nativo, DNS, pagina de bloqueio) nunca entram nessa tabela. O modo escopado hibrido e experimental e so muda com GO humano + ADR. DoH/DoT/QUIC podem contornar DNS/SNI; politicas app-only exigem flag quarantine_origin para quarentenar origem."); ?></p>
 						</div>
 					</div>
 
@@ -776,9 +777,26 @@ layer7_render_styles();
 									<?= !empty($bp_cfg["enabled"]) ? 'checked="checked"' : ""; ?> />
 								<?= l7_t("Mostrar pagina informativa ao utilizador (requer mode=enforce)"); ?>
 							</label>
-							<p class="help-block"><?= l7_t("DNS sinkhole via Unbound + pagina HTTP no IP portal. Funciona em HTTP; HTTPS mostra erro de certificado (sem MITM). CDN/QUIC/DoH podem contornar. Desligado por defeito."); ?></p>
+							<p class="help-block"><?= l7_t("DNS sinkhole via Unbound + pagina HTTP no IP portal. Funciona em HTTP; HTTPS mostra erro de certificado (sem MITM). CDN/QUIC/DoH podem contornar. Desligado por defeito. Se o Captive Portal nativo estiver activo no mesmo IP/interface, o Layer7 nao instala rdr em 80/443 — o portal pfSense continua dono do fluxo."); ?></p>
 							<?php if (!empty($bp_cfg["enabled"]) && $mode !== "enforce") { ?>
 							<p class="text-warning"><i class="fa fa-warning"></i> <?= l7_t("A pagina so e activa com Servico ligado e modo enforce."); ?></p>
+							<?php } ?>
+							<?php if (!empty($bp_cp_conflict["conflict"])) { ?>
+							<p class="text-warning"><i class="fa fa-warning"></i>
+								<?= l7_t("Captive Portal nativo activo nesta interface/IP. A pagina de bloqueio Layer7 nao instala redireccionamento em 80/443 neste endereco. O portal pfSense continua a ser o dono do fluxo."); ?>
+								<?php
+								$cp_bits = array();
+								if (!empty($bp_cp_conflict["zones"])) {
+									$cp_bits[] = "zona " . htmlspecialchars(implode(", ", $bp_cp_conflict["zones"]));
+								}
+								if (!empty($bp_cp_conflict["ips"])) {
+									$cp_bits[] = "IP " . htmlspecialchars(implode(", ", $bp_cp_conflict["ips"]));
+								}
+								if (!empty($cp_bits)) {
+									echo " (" . implode("; ", $cp_bits) . ")";
+								}
+								?>
+							</p>
 							<?php } ?>
 						</div>
 					</div>

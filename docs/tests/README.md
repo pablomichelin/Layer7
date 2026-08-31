@@ -61,6 +61,8 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 | `tests/functional/test_scoped_pf_inc.php` | E2/E4/BG-056 | regras PF scoped, quarentena, allow por tag sem `pass quick` e flush |
 | `tests/functional/test_interface_normalization.php` | BG-053 | `lan`/`optN` → interface real em todos os consumidores |
 | `tests/functional/test_logging_reports.php` | BG-054 | parser de auditoria, sem dupla contagem e cursor através da rotação |
+| `tests/functional/test_anti_bypass_migrate.php` | BG-173 | anti-bypass sem `AppleiCloud`; migração idempotente |
+| `tests/functional/test_captive_portal_guard.php` | BG-173 | localnets + L7ALLOW; sem rdr no IP do Captive Portal nativo |
 
 - `make -C src/layer7d check` após `make` no mesmo diretório.
 - `cd license-server/backend && npm test` para smoke tests puros da trilha

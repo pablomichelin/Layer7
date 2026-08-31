@@ -4,6 +4,23 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.79] — 2026-08-31
+
+### Fixed
+
+- **BG-173 — Captive Portal nativo + anti-bypass:** `AppleiCloud` saiu
+  da política de fábrica `anti-bypass-dns` (era amplo demais e punha
+  `gateway.icloud.com` em `layer7_block_dst` para todos os clientes,
+  partindo o assistente iOS após o ACCEPT do portal). Default novo:
+  `DoH_DoT`, `iCloudPrivateRelay`, `mask.icloud.com`, `mask-h2.icloud.com`
+  e hosts DoH documentados. Migração idempotente só no ID de fábrica com
+  os seletores antigos conhecidos. Regras legacy de destino passam a
+  marcar `layer7_localnets` com `match`/`tag L7ALLOW` (nunca `pass quick`).
+  Sem rdr Layer7 80/443 quando o Captive Portal nativo usa o mesmo
+  IP/interface. Endpoints CNA são ignorados pelo Layer7 sem furar a
+  autenticação pfSense. `legacy_global` permanece o default (efeito
+  global documentado; `scoped_hybrid` só com GO + ADR).
+
 ## [1.9.78] — 2026-08-31
 
 ### Changed

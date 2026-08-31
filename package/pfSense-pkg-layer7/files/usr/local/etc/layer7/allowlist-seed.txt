@@ -76,6 +76,18 @@ hipercard.com.br
 paypal.com
 paypalobjects.com
 
+# --- Captive Network Assistant (CNA) ---
+# Layer7 ignora estes hosts (L7ALLOW / skip block). O Captive Portal
+# nativo do pfSense continua a decidir se o cliente passa ou e
+# redireccionado. Nao incluir www.apple.com (demasiado amplo).
+captive.apple.com
+captive.g.aaplimg.com
+connectivitycheck.gstatic.com
+clients3.google.com
+connectivitycheck.android.com
+www.msftconnecttest.com
+dns.msftncsi.com
+
 # --- Push e infra mobile essencial (apps falham sem isto) ---
 push.apple.com
 gateway.push.apple.com

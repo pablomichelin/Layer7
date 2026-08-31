@@ -6,6 +6,12 @@
 
 **Regra:** sem outputs reais, o gate nao esta fechado.
 
+**BG-173 (`1.9.79`) — prova no appliance (após install):** cliente não
+autenticado abre o Captive Portal nativo; `portalauth.log` mostra ACCEPT;
+assistente iOS conclui sem «servidor não encontrado»; `pornhub.com` continua
+bloqueado por `profile-adulto`; `example.com` continua monitorado/permitido.
+Não usar `pass quick` para endpoints CNA. `legacy_global` permanece o default.
+
 **Gates oficiais F4 (subfases):** antes de declarar F4.1 / F4.2 / F4.3
 concluidas em relatorio, cumprir
 [`docs/02-roadmap/checklist-mestre.md`](../02-roadmap/checklist-mestre.md)

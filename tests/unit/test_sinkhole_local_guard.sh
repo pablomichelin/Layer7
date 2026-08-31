@@ -31,6 +31,12 @@ printf '%s\n' "$flow" | grep -Fq 'if (dst_ip && ip_is_local_iface_addr(dst_ip))'
     fail 'fluxo local sem guarda'
 printf '%s\n' "$flow" | grep -Fq 'flow_skip: local sinkhole/portal' ||
     fail 'fluxo local sem diagnostico debug'
+printf '%s\n' "$flow" | grep -Fq 'l7_host_is_captive_probe' ||
+    fail 'fluxo sem guarda CNA'
+printf '%s\n' "$flow" | grep -Fq 'flow_skip: captive_probe' ||
+    fail 'fluxo CNA sem diagnostico debug'
+printf '%s\n' "$flow" | grep -Fq 'pass quick' &&
+    fail 'fluxo CNA nao pode emitir pass quick'
 
 guard_line=$(printf '%s\n' "$flow" | grep -n -F 'if (dst_ip && ip_is_local_iface_addr(dst_ip))' | head -n 1 | cut -d: -f1)
 decide_line=$(printf '%s\n' "$flow" | grep -n -F 'layer7_flow_decide(' | head -n 1 | cut -d: -f1)

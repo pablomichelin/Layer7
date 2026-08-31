@@ -5,11 +5,24 @@
 Ligar decisões **block** / **tag** a **tabelas PF** no pfSense, sem MITM.
 
 > **Semantica actual de `block`:** em `legacy_global`, o IP de destino entra
-> em `layer7_block_dst` e afecta todos os clientes. Em `scoped_hybrid`, match
+> em `layer7_block_dst` e **fica bloqueado para todos os clientes** (não só
+> para a origem que disparou a classificação). Em `scoped_hybrid`, match
 > por host/DNS/SNI ou app/categoria normal usa `layer7_pdst_N`; somente
 > quarentena explícita usa `layer7_psrc_N`. Em
 > `mode=monitor`/`enabled=false` não há qualquer
 > `block drop`.
+>
+> **Default permanece `legacy_global`.** Mudar para `scoped_hybrid` é
+> mudança arquitectural: exige backlog + ADR + GO humano. Não trocar em
+> silêncio.
+>
+> **Destinos locais nunca entram no bloqueio global:** IPs das interfaces,
+> Captive Portal nativo, DNS Resolver local, redes das LAN e página de
+> bloqueio. O PF marca `layer7_localnets` com `match`/`tag L7ALLOW` (nunca
+> `pass quick`). O daemon recusa inserir IPs locais em `layer7_block_dst`
+> (`flow_skip: local sinkhole/portal`). Endpoints CNA (`captive.apple.com`,
+> etc.) são ignorados pelo Layer7 sem furar a autenticação do portal
+> pfSense.
 
 ## Estado atual
 

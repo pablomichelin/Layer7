@@ -83,4 +83,12 @@ int l7_allowlist_contains_ip(const struct l7_allowlist *al,
 /* Numero de entradas. */
 int l7_allowlist_count(const struct l7_allowlist *al);
 
+/*
+ * Endpoints de deteccao de rede cativa (CNA). O Layer7 ignora o fluxo
+ * (nao bloqueia; pode marcar L7ALLOW). O Captive Portal nativo do
+ * pfSense continua a decidir se o cliente passa ou e redireccionado.
+ * Nao inclui www.apple.com (demasiado amplo).
+ */
+int l7_host_is_captive_probe(const char *host);
+
 #endif

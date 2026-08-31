@@ -1934,6 +1934,23 @@ layer7_on_dns_resolved(const char *iface, const char *client_ip,
 		    sizeof(dec.enforce_dst_ip) - 1);
 		dec.enforce_dst_ip[sizeof(dec.enforce_dst_ip) - 1] = '\0';
 	}
+	/* CNA: Layer7 nao bloqueia; Captive Portal nativo decide. */
+	if (domain && l7_host_is_captive_probe(domain)) {
+		if (resolved_ip && *resolved_ip &&
+		    layer7_pf_host_enforce_ok(resolved_ip)) {
+			if (pf_table_add_entry(L7_PF_TABLE_ALLOW_DST,
+			    resolved_ip) == 0)
+				allow_cache_add(resolved_ip, ttl);
+		}
+		s_allow_hits++;
+		L7_EVENT_INFO(iface,
+		    "captive_probe_dns: iface=%s domain=%s ip=%s "
+		    "— L7ALLOW only (captive portal nativo decide)",
+		    iface ? iface : "-", domain ? domain : "-",
+		    resolved_ip ? resolved_ip : "-");
+		return;
+	}
+
 	/* Politica block prevalece sobre allowlist (ex.: youtube.com na seed). */
 	if (dec.would_enforce_block_or_tag &&
 	    dec.action == LAYER7_ACTION_BLOCK &&
@@ -2070,6 +2087,15 @@ layer7_on_classified_flow(const char *iface, const char *src_ip,
 		    "host=%s app=%s",
 		    iface ? iface : "-", src_ip, dst_ip,
 		    host ? host : "-", ndpi_app ? ndpi_app : "-");
+		return;
+	}
+	if (host && l7_host_is_captive_probe(host)) {
+		if (dst_ip && layer7_pf_host_enforce_ok(dst_ip))
+			(void)pf_table_add_entry(L7_PF_TABLE_ALLOW_DST, dst_ip);
+		L7_DBG("flow_skip: captive_probe iface=%s src=%s dst=%s "
+		    "host=%s app=%s",
+		    iface ? iface : "-", src_ip, dst_ip ? dst_ip : "-",
+		    host, ndpi_app ? ndpi_app : "-");
 		return;
 	}
 	layer7_flow_decide(s_exc, s_nx, s_rules, s_np, enforce_armed(),

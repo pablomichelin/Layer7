@@ -455,6 +455,16 @@ else
 	else
 		fail "test_profile_adulto_match_mode"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_anti_bypass_migrate.php; then
+		pass "test_anti_bypass_migrate"
+	else
+		fail "test_anti_bypass_migrate"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_captive_portal_guard.php; then
+		pass "test_captive_portal_guard"
+	else
+		fail "test_captive_portal_guard"
+	fi
 	if "$PHP_BIN_E2" tests/functional/test_events_humanize.php; then
 		pass "test_events_humanize"
 	else

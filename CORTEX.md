@@ -250,6 +250,13 @@ casa host conhecido **ou** `AdultContent`. `match_mode=or` só em
 linguagem de operador (`flow_decide`/`dns_query`/`dns_resolved` → frases).
 Linha crua só com «Mostrar detalhe tecnico». Ingest de relatórios intacto
 (`dns_resolved` continua fora do SQLite). Sem overlay `.244`.
+**BG-173 (`1.9.79`, `2026-08-31`) — implementado, pendente de
+gates/commit/build:** incompatibilidade Captive Portal nativo +
+`anti-bypass-dns` com `AppleiCloud` em `legacy_global`. Default novo sem
+`AppleiCloud`; migração só no ID de fábrica com seletores antigos;
+`layer7_localnets` via `match`/`tag L7ALLOW`; sem rdr Layer7 no IP do
+portal nativo; CNA ignorado sem `pass quick`. Default PF **não** muda
+para `scoped_hybrid`. Sem overlay `.244`.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

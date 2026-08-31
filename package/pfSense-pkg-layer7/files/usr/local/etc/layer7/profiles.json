@@ -1684,9 +1684,10 @@
       "name": "Anti-bypass DNS",
       "group": "Segurança e bypass",
       "icon": "fa-random",
-      "description": "Bloqueia bypass DNS: DoH, DoT e iCloud Private Relay. Tambem configura Unbound anti-DoH.",
+      "description": "Bloqueia bypass DNS: DoH, DoT e iCloud Private Relay (mask.icloud.com / mask-h2.icloud.com). Nao bloqueia AppleiCloud generico nem gateway.icloud.com.",
       "ndpi_apps": [
-        "DoH_DoT"
+        "DoH_DoT",
+        "iCloudPrivateRelay"
       ],
       "ndpi_categories": [],
       "hosts": [

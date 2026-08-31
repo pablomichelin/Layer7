@@ -39,7 +39,21 @@
         "action": "block",
         "priority": 1,
         "match": {
-          "ndpi_app": ["DoH_DoT", "AppleiCloud", "iCloudPrivateRelay"]
+          "ndpi_app": ["DoH_DoT", "iCloudPrivateRelay"],
+          "hosts": [
+            "mask.icloud.com",
+            "mask-h2.icloud.com",
+            "use-application-dns.net",
+            "dns.google",
+            "dns.google.com",
+            "cloudflare-dns.com",
+            "one.one.one.one",
+            "dns.quad9.net",
+            "dns.adguard.com",
+            "doh.opendns.com",
+            "doh.cleanbrowsing.org",
+            "dns.nextdns.io"
+          ]
         }
       }
     ],

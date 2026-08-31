@@ -382,3 +382,27 @@ l7_allowlist_contains_ip(const struct l7_allowlist *al, const char *ip_str)
 	}
 	return 0;
 }
+
+int
+l7_host_is_captive_probe(const char *host)
+{
+	static const char *const probes[] = {
+		"captive.apple.com",
+		"captive.g.aaplimg.com",
+		"connectivitycheck.gstatic.com",
+		"clients3.google.com",
+		"connectivitycheck.android.com",
+		"www.msftconnecttest.com",
+		"dns.msftncsi.com",
+		NULL
+	};
+	int i;
+
+	if (!host || !*host)
+		return 0;
+	for (i = 0; probes[i] != NULL; i++) {
+		if (domain_suffix_match(host, probes[i]))
+			return 1;
+	}
+	return 0;
+}

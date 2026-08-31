@@ -1615,6 +1615,202 @@ function layer7_pf_not_localnets_clause()
 }
 
 /**
+ * Zonas Captive Portal nativas activas (pfSense: chave `enable` presente).
+ * @return array<int,array{zone:string,interfaces:string[]}>
+ */
+function layer7_native_captive_portal_zones()
+{
+	global $config;
+	$out = array();
+	if (!isset($config["captiveportal"]) ||
+	    !is_array($config["captiveportal"])) {
+		return $out;
+	}
+	foreach ($config["captiveportal"] as $zid => $cp) {
+		if (!is_array($cp) || !isset($cp["enable"])) {
+			continue;
+		}
+		$ifaces = array();
+		$raw = isset($cp["interface"]) ? (string)$cp["interface"] : "";
+		foreach (explode(",", $raw) as $ifid) {
+			$ifid = trim($ifid);
+			if ($ifid !== "") {
+				$ifaces[] = $ifid;
+			}
+		}
+		$out[] = array(
+			"zone" => isset($cp["zone"]) && (string)$cp["zone"] !== ""
+			    ? (string)$cp["zone"] : (string)$zid,
+			"interfaces" => array_values(array_unique($ifaces))
+		);
+	}
+	return $out;
+}
+
+/**
+ * IPv4 (e IPv6 quando existir) das interfaces do Captive Portal nativo.
+ * @return string[]
+ */
+function layer7_native_captive_portal_ips()
+{
+	global $config;
+	$ips = array();
+	$add = function ($ip) use (&$ips) {
+		$ip = trim((string)$ip);
+		if ($ip !== "" && (layer7_ipv4_valid($ip) ||
+		    (function_exists("layer7_ipv6_valid") &&
+		    layer7_ipv6_valid($ip)))) {
+			$ips[] = $ip;
+		}
+	};
+	foreach (layer7_native_captive_portal_zones() as $z) {
+		foreach ($z["interfaces"] as $ifid) {
+			if (function_exists("get_interface_ip")) {
+				$add(get_interface_ip($ifid));
+			}
+			if (function_exists("get_interface_ipv6")) {
+				$add(get_interface_ipv6($ifid));
+			}
+			$keys = array($ifid);
+			$real = layer7_real_interface_name($ifid);
+			if ($real !== "" && $real !== $ifid) {
+				$keys[] = $real;
+			}
+			if (!isset($config["interfaces"]) ||
+			    !is_array($config["interfaces"])) {
+				continue;
+			}
+			foreach ($keys as $key) {
+				if (isset($config["interfaces"][$key]) &&
+				    is_array($config["interfaces"][$key])) {
+					$add($config["interfaces"][$key]["ipaddr"] ?? "");
+					$add($config["interfaces"][$key]["ipaddrv6"] ?? "");
+				}
+			}
+			foreach ($config["interfaces"] as $cfg) {
+				if (!is_array($cfg) || !isset($cfg["if"])) {
+					continue;
+				}
+				if ((string)$cfg["if"] !== $ifid &&
+				    (string)$cfg["if"] !== $real) {
+					continue;
+				}
+				$add($cfg["ipaddr"] ?? "");
+				$add($cfg["ipaddrv6"] ?? "");
+			}
+		}
+	}
+	return array_values(array_unique($ips));
+}
+
+/**
+ * Nomes reais PF das interfaces com Captive Portal nativo activo.
+ * @return string[]
+ */
+function layer7_native_captive_portal_real_ifaces()
+{
+	$out = array();
+	foreach (layer7_native_captive_portal_zones() as $z) {
+		foreach ($z["interfaces"] as $ifid) {
+			$real = layer7_real_interface_name($ifid);
+			if ($real !== "" && layer7_pf_ifname_for_rules($real)) {
+				$out[] = $real;
+			}
+			if (layer7_pf_ifname_for_rules($ifid)) {
+				$out[] = $ifid;
+			}
+		}
+	}
+	return array_values(array_unique($out));
+}
+
+/**
+ * Conflito entre pagina de bloqueio Layer7 e Captive Portal nativo.
+ *
+ * @param array|null $data
+ * @return array{conflict:bool,zones:string[],ifaces:string[],ips:string[],portal_ip:?string}
+ */
+function layer7_blockpage_conflicts_with_native_captive($data = null)
+{
+	$zones = layer7_native_captive_portal_zones();
+	$cp_ifaces = layer7_native_captive_portal_real_ifaces();
+	$cp_ips = layer7_native_captive_portal_ips();
+	$portal = layer7_blockpage_portal_ip($data);
+	$conflict = false;
+	if ($portal !== null && in_array($portal, $cp_ips, true)) {
+		$conflict = true;
+	}
+	$l7_ifaces = array();
+	if (is_array($data) && isset($data["layer7"]["interfaces"]) &&
+	    is_array($data["layer7"]["interfaces"])) {
+		foreach ($data["layer7"]["interfaces"] as $ifid) {
+			$real = layer7_real_interface_name((string)$ifid);
+			if ($real !== "") {
+				$l7_ifaces[] = $real;
+			}
+		}
+	}
+	if (!$conflict && !empty(array_intersect($l7_ifaces, $cp_ifaces))) {
+		$conflict = true;
+	}
+	$znames = array();
+	foreach ($zones as $z) {
+		$znames[] = $z["zone"];
+	}
+	return array(
+		"conflict" => $conflict,
+		"zones" => $znames,
+		"ifaces" => $cp_ifaces,
+		"ips" => $cp_ips,
+		"portal_ip" => $portal
+	);
+}
+
+/**
+ * Hosts de deteccao de rede cativa. Layer7 ignora (L7ALLOW / skip);
+ * o Captive Portal nativo continua soberano. Sem www.apple.com.
+ * @return string[]
+ */
+function layer7_captive_probe_hosts()
+{
+	return array(
+		"captive.apple.com",
+		"captive.g.aaplimg.com",
+		"connectivitycheck.gstatic.com",
+		"clients3.google.com",
+		"connectivitycheck.android.com",
+		"www.msftconnecttest.com",
+		"dns.msftncsi.com"
+	);
+}
+
+/**
+ * True se o host e um endpoint CNA (sufixo).
+ *
+ * @param string $host
+ * @return bool
+ */
+function layer7_host_is_captive_probe($host)
+{
+	$host = strtolower(trim((string)$host));
+	if ($host === "") {
+		return false;
+	}
+	if (strpos($host, "/") !== false) {
+		$parsed = parse_url("http://" . $host);
+		if (is_array($parsed) && !empty($parsed["host"])) {
+			$host = strtolower((string)$parsed["host"]);
+		}
+	}
+	foreach (layer7_captive_probe_hosts() as $h) {
+		if (layer7_policy_host_matches($host, $h)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Rede IPv4 a partir de host+prefixo (sem depender de gen_subnet do pfSense).
  * @return string|null CIDR ou null
  */
@@ -1679,7 +1875,7 @@ function layer7_pf_collect_local_networks()
 {
 	global $config;
 
-	$nets = array("fe80::/10");
+	$nets = array("fe80::/10", "127.0.0.1/32", "::1/128");
 
 	$add = function ($cidr) use (&$nets) {
 		$cidr = trim((string)$cidr);
@@ -1687,6 +1883,17 @@ function layer7_pf_collect_local_networks()
 			return;
 		}
 		$nets[] = $cidr;
+	};
+	$add_host = function ($ip) use ($add) {
+		$ip = trim((string)$ip);
+		if ($ip === "") {
+			return;
+		}
+		if (layer7_ipv4_valid($ip)) {
+			$add($ip . "/32");
+		} elseif (layer7_ipv6_valid($ip)) {
+			$add($ip . "/128");
+		}
 	};
 
 	/* Preferir helpers runtime do pfSense (DHCP/PPP/VIP actualizados). */
@@ -1698,11 +1905,13 @@ function layer7_pf_collect_local_networks()
 				    function_exists("get_interface_subnet")) {
 					$ip = get_interface_ip($ifid);
 					$sn = get_interface_subnet($ifid);
-					if (is_string($ip) && $ip !== "" &&
-					    $sn !== null && $sn !== false && $sn !== "") {
-						$c = layer7_ipv4_network_cidr($ip, (int)$sn);
-						if ($c !== null) {
-							$add($c);
+					if (is_string($ip) && $ip !== "") {
+						$add_host($ip);
+						if ($sn !== null && $sn !== false && $sn !== "") {
+							$c = layer7_ipv4_network_cidr($ip, (int)$sn);
+							if ($c !== null) {
+								$add($c);
+							}
 						}
 					}
 				}
@@ -1710,11 +1919,13 @@ function layer7_pf_collect_local_networks()
 				    function_exists("get_interface_subnetv6")) {
 					$ip6 = get_interface_ipv6($ifid);
 					$sn6 = get_interface_subnetv6($ifid);
-					if (is_string($ip6) && $ip6 !== "" &&
-					    $sn6 !== null && $sn6 !== false && $sn6 !== "") {
-						$c = layer7_ipv6_network_cidr($ip6, (int)$sn6);
-						if ($c !== null) {
-							$add($c);
+					if (is_string($ip6) && $ip6 !== "") {
+						$add_host($ip6);
+						if ($sn6 !== null && $sn6 !== false && $sn6 !== "") {
+							$c = layer7_ipv6_network_cidr($ip6, (int)$sn6);
+							if ($c !== null) {
+								$add($c);
+							}
 						}
 					}
 				}
@@ -1728,23 +1939,33 @@ function layer7_pf_collect_local_networks()
 			if (!is_array($ifcfg)) {
 				continue;
 			}
-			if (!empty($ifcfg["ipaddr"]) && isset($ifcfg["subnet"]) &&
-			    is_numeric($ifcfg["subnet"])) {
-				$c = layer7_ipv4_network_cidr(
-				    $ifcfg["ipaddr"], (int)$ifcfg["subnet"]);
-				if ($c !== null) {
-					$add($c);
+			if (!empty($ifcfg["ipaddr"])) {
+				$add_host($ifcfg["ipaddr"]);
+				if (isset($ifcfg["subnet"]) &&
+				    is_numeric($ifcfg["subnet"])) {
+					$c = layer7_ipv4_network_cidr(
+					    $ifcfg["ipaddr"], (int)$ifcfg["subnet"]);
+					if ($c !== null) {
+						$add($c);
+					}
 				}
 			}
-			if (!empty($ifcfg["ipaddrv6"]) && isset($ifcfg["subnetv6"]) &&
-			    is_numeric($ifcfg["subnetv6"])) {
-				$c = layer7_ipv6_network_cidr(
-				    $ifcfg["ipaddrv6"], (int)$ifcfg["subnetv6"]);
-				if ($c !== null) {
-					$add($c);
+			if (!empty($ifcfg["ipaddrv6"])) {
+				$add_host($ifcfg["ipaddrv6"]);
+				if (isset($ifcfg["subnetv6"]) &&
+				    is_numeric($ifcfg["subnetv6"])) {
+					$c = layer7_ipv6_network_cidr(
+					    $ifcfg["ipaddrv6"], (int)$ifcfg["subnetv6"]);
+					if ($c !== null) {
+						$add($c);
+					}
 				}
 			}
 		}
+	}
+
+	foreach (layer7_native_captive_portal_ips() as $cpip) {
+		$add_host($cpip);
 	}
 
 	return array_values(array_unique($nets));
@@ -1834,6 +2055,15 @@ function layer7_pf_action_rules_text($data = null, $bl_config = null)
 	$out .= layer7_pf_inet46_rules(
 	    "match",
 	    "to <layer7_allow_dst> tag L7ALLOW label \"layer7:allow:dst\"");
+	/* Destinos locais (interfaces, portal nativo, DNS, block page):
+	 * match/tag apenas. Equivalente valido de
+	 * `block ... to <block_dst> AND NOT to <localnets>` — o PF so
+	 * aceita um `to` por regra. Nunca `pass quick`. */
+	$out .= "\n# Destinos locais: L7ALLOW (match/tag). Captive Portal nativo decide.\n";
+	$out .= layer7_pf_inet46_rules(
+	    "match",
+	    "to <" . layer7_pf_localnets_table_name() .
+		"> tag L7ALLOW label \"layer7:allow:local\"");
 	$out .= "\n# Explicit allow por politica (destino aprendido em runtime).\n";
 	$out .= layer7_policy_allow_rules_text($data);
 	$out .= "\n# Excecoes allow: somente destinos bloqueados pelo Layer7.\n";
@@ -1864,7 +2094,8 @@ function layer7_pf_action_rules_text($data = null, $bl_config = null)
 	if (!layer7_enforcement_is_scoped_hybrid($data)) {
 		$out .= implode("\n", array(
 			"",
-			"# Bloqueio por destino (sites/apps bloqueados via policies).",
+			"# Bloqueio por destino (legacy_global: o IP entra para TODOS os clientes).",
+			"# Destinos em layer7_localnets ja tem L7ALLOW (match acima) — nao sao atingidos.",
 			"block drop quick inet to <layer7_block_dst> ! tagged L7ALLOW label \"layer7:block:dst\"",
 			"block drop quick inet6 to <layer7_block_dst> ! tagged L7ALLOW label \"layer7:block:dst6\"",
 		)) . "\n";
@@ -2638,6 +2869,7 @@ function layer7_load_or_default()
 		$j = json_decode($raw, true);
 		if (is_array($j) && isset($j["layer7"]) && is_array($j["layer7"])) {
 			layer7_policies_migrate_adulto_match_mode($j);
+			layer7_policies_migrate_anti_bypass_dns($j);
 			return $j;
 		}
 	}
@@ -2659,6 +2891,7 @@ function layer7_save_json($data)
 	$data = layer7_config_interfaces_normalize($data);
 	if (isset($data["layer7"]) && is_array($data["layer7"])) {
 		layer7_policies_migrate_adulto_match_mode($data);
+		layer7_policies_migrate_anti_bypass_dns($data);
 		$data["layer7"]["check_in_enabled"] = true;
 		if (isset($data["layer7"]["mitm"])) {
 			$data["layer7"]["mitm"] = layer7_mitm_normalize($data["layer7"]["mitm"]);
@@ -3750,6 +3983,24 @@ function layer7_generate_blockpage_rdr_snippet($data = null)
 	$portal = $ctx["portal"];
 	$portal6 = isset($ctx["portal6"]) ? $ctx["portal6"] : null;
 	$real_ifaces = $ctx["ifaces"];
+	$cp_ifaces = layer7_native_captive_portal_real_ifaces();
+	$cp_ips = layer7_native_captive_portal_ips();
+	$portal_is_cp = ($portal !== null && in_array($portal, $cp_ips, true));
+	$filtered = array();
+	foreach ($real_ifaces as $iface) {
+		if (in_array($iface, $cp_ifaces, true)) {
+			continue;
+		}
+		if ($portal_is_cp) {
+			continue;
+		}
+		$filtered[] = $iface;
+	}
+	$real_ifaces = array_values(array_unique($filtered));
+	if (empty($real_ifaces)) {
+		return "# Pagina de bloqueio Layer7: rdr omitido — " .
+		    "Captive Portal nativo e dono do IP/interface\n";
+	}
 	$port = (int)L7_BLOCKPAGE_PORT;
 	$webgui_port = layer7_webgui_port();
 	$rdr_ports = array();
@@ -4099,6 +4350,151 @@ function layer7_policies_migrate_adulto_match_mode(&$data)
 	}
 	foreach ($data["layer7"]["policies"] as &$pol) {
 		if (layer7_policy_stamp_adulto_match_mode($pol)) {
+			$n++;
+		}
+	}
+	unset($pol);
+	return $n;
+}
+
+/**
+ * IDs de fabrica da politica anti-bypass DNS.
+ * @return string[]
+ */
+function layer7_anti_bypass_factory_ids()
+{
+	return array("anti-bypass-dns", "profile-anti-bypass-dns");
+}
+
+/**
+ * Default antigo conhecido (sample ate 1.9.78): so estas 3 apps, sem hosts.
+ * @return string[]
+ */
+function layer7_anti_bypass_old_default_apps()
+{
+	return array("DoH_DoT", "AppleiCloud", "iCloudPrivateRelay");
+}
+
+/**
+ * Default novo: DoH/DoT + Private Relay. Sem AppleiCloud generico.
+ * @return string[]
+ */
+function layer7_anti_bypass_new_default_apps()
+{
+	return array("DoH_DoT", "iCloudPrivateRelay");
+}
+
+/**
+ * Hosts explicitos de bypass DNS / Private Relay (alinhados a profiles.json).
+ * @return string[]
+ */
+function layer7_anti_bypass_new_default_hosts()
+{
+	return array(
+		"mask.icloud.com",
+		"mask-h2.icloud.com",
+		"use-application-dns.net",
+		"dns.google",
+		"dns.google.com",
+		"cloudflare-dns.com",
+		"one.one.one.one",
+		"dns.quad9.net",
+		"dns.adguard.com",
+		"doh.opendns.com",
+		"doh.cleanbrowsing.org",
+		"dns.nextdns.io"
+	);
+}
+
+/**
+ * Normaliza lista de strings para comparacao estavel.
+ * @param mixed $arr
+ * @return string[]
+ */
+function layer7_string_list_norm($arr)
+{
+	if (!is_array($arr)) {
+		return array();
+	}
+	$out = array();
+	foreach ($arr as $v) {
+		$v = trim((string)$v);
+		if ($v !== "") {
+			$out[] = $v;
+		}
+	}
+	sort($out, SORT_STRING);
+	return array_values(array_unique($out));
+}
+
+/**
+ * True se a politica e o default antigo de fabrica (seguro de migrar).
+ * Nao toca politicas personalizadas pelo operador.
+ *
+ * @param array $policy
+ * @return bool
+ */
+function layer7_policy_is_old_factory_anti_bypass($policy)
+{
+	if (!is_array($policy)) {
+		return false;
+	}
+	$id = (string)($policy["id"] ?? "");
+	if (!in_array($id, layer7_anti_bypass_factory_ids(), true)) {
+		return false;
+	}
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	$apps = layer7_string_list_norm($match["ndpi_app"] ?? array());
+	$hosts = layer7_string_list_norm($match["hosts"] ?? array());
+	$cats = layer7_string_list_norm($match["ndpi_category"] ?? array());
+	$old = layer7_string_list_norm(layer7_anti_bypass_old_default_apps());
+	if ($apps !== $old) {
+		return false;
+	}
+	if (!empty($hosts) || !empty($cats)) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Aplica os seletores novos de anti-bypass (in-place, sem mudar o ID).
+ *
+ * @param array $policy
+ * @return bool
+ */
+function layer7_policy_apply_anti_bypass_new_defaults(&$policy)
+{
+	if (!is_array($policy)) {
+		return false;
+	}
+	if (!isset($policy["match"]) || !is_array($policy["match"])) {
+		$policy["match"] = array();
+	}
+	$policy["match"]["ndpi_app"] = layer7_anti_bypass_new_default_apps();
+	$policy["match"]["hosts"] = layer7_anti_bypass_new_default_hosts();
+	unset($policy["match"]["ndpi_category"]);
+	return true;
+}
+
+/**
+ * BG-173 — remove AppleiCloud do default antigo de fabrica.
+ * Idempotente; nao duplica politicas; nao altera regras personalizadas.
+ *
+ * @param array $data
+ * @return int numero de politicas alteradas
+ */
+function layer7_policies_migrate_anti_bypass_dns(&$data)
+{
+	$n = 0;
+	if (!isset($data["layer7"]["policies"]) ||
+	    !is_array($data["layer7"]["policies"])) {
+		return 0;
+	}
+	foreach ($data["layer7"]["policies"] as &$pol) {
+		if (layer7_policy_is_old_factory_anti_bypass($pol)) {
+			layer7_policy_apply_anti_bypass_new_defaults($pol);
 			$n++;
 		}
 	}
