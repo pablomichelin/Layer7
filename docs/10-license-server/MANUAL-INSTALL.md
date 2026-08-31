@@ -56,6 +56,14 @@ personalizadas pelo administrador são preservadas sem alteração.
 upgrade, guardar Configurações com o idioma desejado aplica a tradução aos
 defaults reconhecidos mesmo quando esse idioma já está selecionado.
 
+**Addendum operacional BG-174 / GUI1 (`2026-08-31`, candidato `v1.9.80`):**
+página Status reorganizada frontend-only com `Form_*`, painéis e tabelas
+nativos do pfSense. Sem alteração de handler, daemon, PF, licença,
+defaults ou segurança. SHA256 `PENDING_BUILD`. Estado: **candidato
+1.9.80 implementado, pendente de gates/commit/build/publicação**.
+Overlay `.244` intacto (P0-1). Pin enforce permanece **`1.9.8`**.
+URLs e comandos deste manual continuam em `v1.9.79` até a publicação.
+
 **Addendum operacional BG-173 (`2026-08-31`, `v1.9.79`):**
 compatibilidade com o Captive Portal nativo do pfSense. A política de
 fábrica anti-bypass deixa de incluir `AppleiCloud` (continua a bloquear

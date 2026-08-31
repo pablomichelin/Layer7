@@ -3,8 +3,11 @@
 **Backlog:** BG-174.
 **Estado:** GUI0 documental `3563757`, ADR-0037 `f44a14b` e emenda visual
 `c429be3` concluídos após gates PASS. Emenda frontend-only **FEITA no git**
-(`3b18f82`) após gates PASS; GUI1–GUI7 bloqueados até GO humano.
-**Baseline:** `1.9.79`, `main@4354aec`.
+(`3b18f82`) após gates PASS. GUI1 piloto Status **candidato `1.9.80`
+implementado, pendente de gates/commit/build/publicação** (`2026-08-31`;
+`layer7_status.php` + `PORTVERSION` 1.9.80; SHA256 `PENDING_BUILD`).
+**`latest` continua `1.9.79`**. GUI2–GUI7 bloqueados até GO humano.
+**Baseline publicada:** `1.9.79`. **Candidato:** `1.9.80`.
 **Nota de fase:** `GUI0…GUI7` são ondas internas deste plano, não substituem as
 fases canónicas F0…F7. A execução técnica cruza F4/F5/F7 e obedece aos seus
 gates.
@@ -172,16 +175,20 @@ A melhoria deve vir da ordem e do fluxo, não de decoração:
 
 - **Objectivo:** remover a camada visual paralela numa página piloto e provar
   que o pfSense sozinho entrega o padrão, sem mudar comportamento.
-- **Ficheiros previstos:** secção de apresentação da página piloto,
-  `layer7.inc` apenas para retirar/reduzir renderização visual compartilhada,
-  testes e docs. CSS/JS novo não é resultado esperado.
+- **Ficheiros previstos:** secção de apresentação da página piloto
+  (`layer7_status.php`). `layer7.inc` **não** foi tocado neste piloto (include
+  partilhado; retirar `layer7_render_styles()` só nesta página). CSS/JS novo
+  não é resultado esperado.
 - **Preserva:** tabs, handlers, campos, POSTs, mensagens e defaults.
 - **Impacto:** consistência de `Form_Section`/`Form_*`, linhas planas, `table`,
   `nav-tabs`, `alert`, `btn` e `print_info_box()`; retirada gradual de
   `layer7_render_styles()`, estilos inline, cards, sombras, chips e sticky bars.
 - **Risco:** CSS global/pfSense Plus/CE e CSP.
-- **Testes:** PHP, DOM/assets antes/depois, zero alteração de request/efeito,
-  snapshots visuais manuais, sem-JS, teclado, PT/EN/ES e orçamento frontend.
+- **Testes:** gate estático `tests/functional/test_status_native_view.php`
+  (texto da view; sem guiconfig/daemon/PF); PHP, DOM/assets antes/depois,
+  zero alteração de request/efeito, snapshots visuais manuais, sem-JS,
+  teclado, PT/EN/ES e orçamento frontend. Estado do piloto: **implementado,
+  pendente de gates/commit**.
 - **Gate:** uma página piloto read-only renderizada no mesmo padrão de formulário
   da referência pfSense, com G-UX10…G-UX13 PASS e sem regressão.
 - **Rollback:** include/style antigo por página; pacote anterior.
@@ -341,3 +348,16 @@ GUI0 não concede autorização para GUI1. O GO humano deve nomear:
    ambas permanecem na posição e rota actuais.
 
 Até esse GO, é proibido alterar código, `PORTVERSION`, build ou release.
+
+**GO GUI1 piloto Status (`2026-08-31`):** o GO inicial autorizou apenas
+a view de `layer7_status.php` (apresentação). Sem `layer7.inc`, sem
+`PORTVERSION`, sem commit/push/build/appliance nesse bloco.
+
+**GO preparação governada da release `1.9.80` (após aceitação do
+piloto pelo manager):** autorizado bump de `PORTVERSION`/`PKGVERSION` e
+documentação de candidato (changelog, CORTEX, roadmap, backlog,
+checklist, plano, addendum MANUAL-INSTALL). **Não** antecipar URLs
+operacionais `v1.9.80` neste commit — isso fica no segundo commit, após
+o asset existir (fluxo igual a `1.9.79`). Estado canónico: **candidato
+1.9.80 implementado, pendente de gates/commit/build/publicação**.
+`latest` continua `1.9.79`.

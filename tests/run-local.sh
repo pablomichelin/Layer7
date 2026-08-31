@@ -500,6 +500,11 @@ else
 	else
 		fail "test_license_expiry_policy"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_status_native_view.php; then
+		pass "test_status_native_view"
+	else
+		fail "test_status_native_view"
+	fi
 fi
 
 step "Regress: layer7-tlsproxy (junto ao codigo)"

@@ -63,6 +63,7 @@ O workflow **[`.github/workflows/smoke-layer7d.yml`](../../.github/workflows/smo
 | `tests/functional/test_logging_reports.php` | BG-054 | parser de auditoria, sem dupla contagem e cursor através da rotação |
 | `tests/functional/test_anti_bypass_migrate.php` | BG-173 | anti-bypass sem `AppleiCloud`; migração idempotente |
 | `tests/functional/test_captive_portal_guard.php` | BG-173 | localnets + L7ALLOW; sem rdr no IP do Captive Portal nativo |
+| `tests/functional/test_status_native_view.php` | BG-174 / GUI1 | gate estático da view nativa de Status; lê o PHP como texto; sem guiconfig/daemon/PF |
 
 - `make -C src/layer7d check` após `make` no mesmo diretório.
 - `cd license-server/backend && npm test` para smoke tests puros da trilha

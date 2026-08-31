@@ -8,6 +8,7 @@
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/layer7.inc");
+require_once("classes/Form.class.php");
 
 $daemon_ver = layer7_daemon_version();
 
@@ -84,196 +85,183 @@ $enf = layer7_gui_enforce_state($data, $stats);
 
 $pgtitle = array(l7_t("Services"), l7_t("Layer 7"));
 include("head.inc");
-layer7_render_styles();
+
+layer7_render_tabs("status");
+
+if ($restart_msg !== "") {
+	print_info_box($restart_msg, "success");
+}
+if ($restart_err !== "") {
+	print_info_box($restart_err, "danger");
+}
+
+if ($running) {
+	$daemon_html = '<span class="text-success"><i class="fa fa-check-circle"></i> ' .
+	    htmlspecialchars(l7_t("Em execucao")) . ' (PID ' . htmlspecialchars((string)$pid) . ')</span>';
+} else {
+	$daemon_html = '<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> ' .
+	    htmlspecialchars(l7_t("Parado")) . '</span>';
+}
+
+if (count($cfg_ifaces) > 0) {
+	$ifaces_html = '<code>' . htmlspecialchars(implode(", ", $cfg_ifaces)) . '</code>';
+} else {
+	$ifaces_html = '<span class="text-muted">' . htmlspecialchars(l7_t("Nenhuma")) . '</span>';
+}
+
+$policies_html = (int)$n_policies_active . '/' . (int)$n_policies . ' ' . htmlspecialchars(l7_t("ativas"));
+if ($n_block_policies > 0) {
+	if (!empty($enf["enforce_armed"])) {
+		$policies_html .= ' (<span class="text-danger">' . (int)$n_block_policies . ' block</span>)';
+	} else {
+		$policies_html .= ' (<span class="text-muted">' . (int)$n_block_policies . ' ' .
+		    htmlspecialchars(l7_t("block gravada, nao aplicada")) . '</span>)';
+	}
+}
+
+$form = new Form(false);
+
+$sec_state = new Form_Section(l7_t("Estado do daemon"));
+$sec_state->addInput(new Form_StaticText(l7_t("Daemon"), $daemon_html));
+if ($daemon_ver !== "") {
+	$sec_state->addInput(new Form_StaticText(
+	    l7_t("Versao"),
+	    '<code>' . htmlspecialchars($daemon_ver) . '</code>'
+	));
+}
+$sec_state->addInput(new Form_StaticText(l7_t("Uptime"), htmlspecialchars($uptime_str)));
+$sec_state->addInput(new Form_StaticText(l7_t("Modo"), layer7_gui_mode_badge_html($enf)));
+$sec_state->addInput(new Form_StaticText(l7_t("Interfaces"), $ifaces_html));
+$sec_state->addInput(new Form_StaticText(l7_t("Politicas"), $policies_html));
+$form->add($sec_state);
+
+$sec_resumo = new Form_Section(l7_t("Resumo"));
+$sec_resumo->addInput(new Form_StaticText(
+    l7_t("Conexoes classificadas"),
+    htmlspecialchars(number_format($total_classified))
+));
+$sec_resumo->addInput(new Form_StaticText(
+    l7_t("Bloqueios"),
+    htmlspecialchars(number_format($total_blocked))
+));
+$sec_resumo->addInput(new Form_StaticText(
+    l7_t("Permitidos"),
+    htmlspecialchars(number_format($total_allowed))
+));
+$sec_resumo->addInput(new Form_StaticText(
+    l7_t("Politicas activas"),
+    htmlspecialchars((string)$n_policies_active)
+));
+$form->add($sec_resumo);
+
+print($form);
 ?>
-<div class="panel panel-default layer7-page">
+<div class="panel panel-default">
 	<div class="panel-heading">
-		<h2 class="panel-title"><?= l7_t("Layer 7 - Dashboard"); ?></h2>
+		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Top 10 apps bloqueadas")); ?></h2>
 	</div>
 	<div class="panel-body">
-		<?php layer7_render_tabs("status"); ?>
-		<div class="layer7-content">
-
-		<?php if ($restart_msg !== "") { ?>
-		<div class="alert alert-success"><i class="fa fa-check-circle"></i> <?= htmlspecialchars($restart_msg); ?></div>
+		<?php if (empty($top_apps)) { ?>
+		<p class="text-muted"><?= htmlspecialchars(l7_t("Sem dados. O daemon precisa de trafego classificado para gerar estatisticas.")); ?></p>
+		<?php } else { ?>
+		<div class="table-responsive">
+			<table class="table table-striped table-condensed">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th><?= htmlspecialchars(l7_t("App")); ?></th>
+						<th><?= htmlspecialchars(l7_t("Bloqueios")); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php foreach ($top_apps as $rank => $entry) {
+					$app_name = isset($entry["app"]) ? $entry["app"] : "?";
+					$app_count = isset($entry["count"]) ? (int)$entry["count"] : 0;
+				?>
+					<tr>
+						<td><?= (int)($rank + 1); ?></td>
+						<td><?= htmlspecialchars($app_name); ?></td>
+						<td><?= htmlspecialchars(number_format($app_count)); ?></td>
+					</tr>
+				<?php } ?>
+				</tbody>
+			</table>
+		</div>
 		<?php } ?>
-		<?php if ($restart_err !== "") { ?>
-		<div class="alert alert-danger"><i class="fa fa-times-circle"></i> <?= htmlspecialchars($restart_err); ?></div>
-		<?php } ?>
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Resumo"); ?></div>
-			<div class="layer7-admin-block__body">
-				<div class="l7-kpi-cards">
-					<div class="l7-kpi-card">
-						<div class="l7-kpi-card__value"><?= number_format($total_classified); ?></div>
-						<div class="l7-kpi-card__label"><?= l7_t("Conexoes classificadas"); ?></div>
-					</div>
-					<div class="l7-kpi-card l7-kpi-card--danger">
-						<div class="l7-kpi-card__value"><?= number_format($total_blocked); ?></div>
-						<div class="l7-kpi-card__label"><?= l7_t("Bloqueios"); ?></div>
-					</div>
-					<div class="l7-kpi-card l7-kpi-card--success">
-						<div class="l7-kpi-card__value"><?= number_format($total_allowed); ?></div>
-						<div class="l7-kpi-card__label"><?= l7_t("Permitidos"); ?></div>
-					</div>
-					<div class="l7-kpi-card">
-						<div class="l7-kpi-card__value"><?= $n_policies_active; ?></div>
-						<div class="l7-kpi-card__label"><?= l7_t("Politicas activas"); ?></div>
-					</div>
-				</div>
-				<div class="l7-kpi-shortcuts">
-					<a href="layer7_policies.php" class="btn btn-sm btn-default"><i class="fa fa-sliders"></i> <?= l7_t("Perfis rapidos"); ?></a>
-					<a href="layer7_events.php" class="btn btn-sm btn-default"><i class="fa fa-list"></i> <?= l7_t("Eventos"); ?></a>
-					<a href="layer7_reports.php" class="btn btn-sm btn-default"><i class="fa fa-bar-chart"></i> <?= l7_t("Relatorios"); ?></a>
-				</div>
-			</div>
-		</div>
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Tops"); ?></div>
-			<div class="layer7-admin-block__body">
-			<div class="row">
-				<div class="col-md-6">
-					<h4 class="layer7-form-card__title"><?= l7_t("Top 10 apps bloqueadas"); ?></h4>
-					<?php if (empty($top_apps)) { ?>
-					<p class="text-muted"><?= l7_t("Sem dados. O daemon precisa de trafego classificado para gerar estatisticas."); ?></p>
-					<?php } else { ?>
-					<table class="table table-striped table-condensed">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th><?= l7_t("App"); ?></th>
-								<th><?= l7_t("Bloqueios"); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-						<?php foreach ($top_apps as $rank => $entry) {
-							$app_name = isset($entry["app"]) ? $entry["app"] : "?";
-							$app_count = isset($entry["count"]) ? (int)$entry["count"] : 0;
-						?>
-							<tr>
-								<td><?= $rank + 1; ?></td>
-								<td><strong><?= htmlspecialchars($app_name); ?></strong></td>
-								<td><?= number_format($app_count); ?></td>
-							</tr>
-						<?php } ?>
-						</tbody>
-					</table>
-					<?php } ?>
-				</div>
-				<div class="col-md-6">
-					<h4 class="layer7-form-card__title"><?= l7_t("Top 10 clientes bloqueados"); ?></h4>
-					<?php if (empty($top_sources)) { ?>
-					<p class="text-muted"><?= l7_t("Sem dados."); ?></p>
-					<?php } else {
-						$dev_by_ip = array();
-						if (function_exists("layer7_device_inventory")) {
-							$inv = layer7_device_inventory();
-							foreach ((is_array($inv) ? $inv : array()) as $d) {
-								$ip = (string)($d["ip"] ?? "");
-								if ($ip === "") { continue; }
-								$lbl = trim((string)($d["alias"] ?? ""));
-								if ($lbl === "") { $lbl = trim((string)($d["hostname"] ?? "")); }
-								if ($lbl === "") { $lbl = trim((string)($d["vendor"] ?? "")); }
-								if ($lbl !== "" && $lbl !== "-") { $dev_by_ip[$ip] = $lbl; }
-							}
-						}
-					?>
-					<table class="table table-striped table-condensed">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th><?= l7_t("IP de origem"); ?></th>
-								<th><?= l7_t("Dispositivo"); ?></th>
-								<th><?= l7_t("Bloqueios"); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-						<?php foreach ($top_sources as $rank => $entry) {
-							$src_ip = isset($entry["ip"]) ? $entry["ip"] : "?";
-							$src_count = isset($entry["count"]) ? (int)$entry["count"] : 0;
-							$dev_lbl = isset($dev_by_ip[$src_ip]) ? $dev_by_ip[$src_ip] : "";
-						?>
-							<tr>
-								<td><?= $rank + 1; ?></td>
-								<td><code><?= htmlspecialchars($src_ip); ?></code></td>
-								<td><?= $dev_lbl !== "" ? htmlspecialchars($dev_lbl) : '<span class="text-muted">-</span>'; ?></td>
-								<td><?= number_format($src_count); ?></td>
-							</tr>
-						<?php } ?>
-						</tbody>
-					</table>
-					<?php } ?>
-				</div>
-			</div>
-			</div>
-		</div>
-
-		<div class="layer7-admin-block">
-			<div class="layer7-admin-block__header"><?= l7_t("Estado do daemon"); ?></div>
-			<div class="layer7-admin-block__body">
-			<div class="layer7-callout">
-				<dl class="dl-horizontal layer7-summary">
-					<dt><?= l7_t("Daemon"); ?></dt>
-					<dd>
-						<?php if ($running) { ?>
-						<span class="text-success"><i class="fa fa-check-circle"></i> <?= l7_t("Em execucao"); ?> (PID <?= htmlspecialchars($pid); ?>)</span>
-						<?php } else { ?>
-						<span class="text-warning"><i class="fa fa-exclamation-triangle"></i> <?= l7_t("Parado"); ?></span>
-						<?php } ?>
-					</dd>
-
-					<?php if ($daemon_ver !== "") { ?>
-					<dt><?= l7_t("Versao"); ?></dt>
-					<dd><code><?= htmlspecialchars($daemon_ver); ?></code></dd>
-					<?php } ?>
-
-					<dt><?= l7_t("Uptime"); ?></dt>
-					<dd><?= htmlspecialchars($uptime_str); ?></dd>
-
-					<dt><?= l7_t("Modo"); ?></dt>
-					<dd>
-						<?= layer7_gui_mode_badge_html($enf); ?>
-					</dd>
-
-					<dt><?= l7_t("Interfaces"); ?></dt>
-					<dd>
-						<?php if (count($cfg_ifaces) > 0) { ?>
-						<code><?= htmlspecialchars(implode(", ", $cfg_ifaces)); ?></code>
-						<?php } else { ?>
-						<span class="text-muted"><?= l7_t("Nenhuma"); ?></span>
-						<?php } ?>
-					</dd>
-
-					<dt><?= l7_t("Politicas"); ?></dt>
-					<dd>
-						<?= $n_policies_active; ?>/<?= $n_policies; ?> <?= l7_t("ativas"); ?>
-						<?php if ($n_block_policies > 0) { ?>
-						<?php if (!empty($enf["enforce_armed"])) { ?>
-						(<span class="text-danger"><?= $n_block_policies; ?> block</span>)
-						<?php } else { ?>
-						(<span class="text-muted"><?= (int)$n_block_policies; ?> <?= l7_t("block gravada, nao aplicada"); ?></span>)
-						<?php } ?>
-						<?php } ?>
-					</dd>
-
-					</dl>
-			</div>
-			<div class="layer7-toolbar" id="l7-toolbar" style="margin-top:14px;">
-				<form method="post" action="layer7_status.php#l7-toolbar" style="display: inline-block; margin-right: 8px; margin-bottom: 8px;">
-					<button type="submit" name="restart_service" value="1" class="btn btn-warning"
-						onclick="return confirm(<?= json_encode(l7_t('Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart.')) ?>);">
-						<i class="fa fa-refresh"></i> <?= l7_t("Reiniciar servico"); ?>
-					</button>
-				</form>
-				<a href="layer7_settings.php" class="btn btn-primary"><?= l7_t("Abrir definicoes"); ?></a>
-				<a href="layer7_diagnostics.php" class="btn btn-default"><?= l7_t("Diagnosticos"); ?></a>
-			</div>
-			</div>
-		</div>
-		</div>
 	</div>
 </div>
-<?php layer7_render_footer(); ?>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Top 10 clientes bloqueados")); ?></h2>
+	</div>
+	<div class="panel-body">
+		<?php if (empty($top_sources)) { ?>
+		<p class="text-muted"><?= htmlspecialchars(l7_t("Sem dados.")); ?></p>
+		<?php } else {
+			$dev_by_ip = array();
+			if (function_exists("layer7_device_inventory")) {
+				$inv = layer7_device_inventory();
+				foreach ((is_array($inv) ? $inv : array()) as $d) {
+					$ip = (string)($d["ip"] ?? "");
+					if ($ip === "") { continue; }
+					$lbl = trim((string)($d["alias"] ?? ""));
+					if ($lbl === "") { $lbl = trim((string)($d["hostname"] ?? "")); }
+					if ($lbl === "") { $lbl = trim((string)($d["vendor"] ?? "")); }
+					if ($lbl !== "" && $lbl !== "-") { $dev_by_ip[$ip] = $lbl; }
+				}
+			}
+		?>
+		<div class="table-responsive">
+			<table class="table table-striped table-condensed">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th><?= htmlspecialchars(l7_t("IP de origem")); ?></th>
+						<th><?= htmlspecialchars(l7_t("Dispositivo")); ?></th>
+						<th><?= htmlspecialchars(l7_t("Bloqueios")); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php foreach ($top_sources as $rank => $entry) {
+					$src_ip = isset($entry["ip"]) ? $entry["ip"] : "?";
+					$src_count = isset($entry["count"]) ? (int)$entry["count"] : 0;
+					$dev_lbl = isset($dev_by_ip[$src_ip]) ? $dev_by_ip[$src_ip] : "";
+				?>
+					<tr>
+						<td><?= (int)($rank + 1); ?></td>
+						<td><code><?= htmlspecialchars($src_ip); ?></code></td>
+						<td><?= $dev_lbl !== "" ? htmlspecialchars($dev_lbl) : '<span class="text-muted">-</span>'; ?></td>
+						<td><?= htmlspecialchars(number_format($src_count)); ?></td>
+					</tr>
+				<?php } ?>
+				</tbody>
+			</table>
+		</div>
+		<?php } ?>
+	</div>
+</div>
+<div class="panel panel-default" id="l7-toolbar">
+	<div class="panel-heading">
+		<h2 class="panel-title"><?= htmlspecialchars(l7_t("Acoes")); ?></h2>
+	</div>
+	<div class="panel-body">
+		<form method="post" action="layer7_status.php#l7-toolbar">
+			<button type="submit" name="restart_service" value="1" class="btn btn-warning"
+				onclick="return confirm(<?= json_encode(l7_t('Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart.')) ?>);">
+				<i class="fa fa-refresh"></i> <?= htmlspecialchars(l7_t("Reiniciar servico")); ?>
+			</button>
+			<span class="help-block"><?= htmlspecialchars(l7_t("Reiniciar o servico layer7d? O trafego nao sera classificado durante o restart.")); ?></span>
+		</form>
+		<a href="layer7_settings.php" class="btn btn-primary"><?= htmlspecialchars(l7_t("Abrir definicoes")); ?></a>
+		<a href="layer7_diagnostics.php" class="btn btn-default"><?= htmlspecialchars(l7_t("Diagnosticos")); ?></a>
+		<a href="layer7_policies.php" class="btn btn-default"><i class="fa fa-sliders"></i> <?= htmlspecialchars(l7_t("Perfis rapidos")); ?></a>
+		<a href="layer7_events.php" class="btn btn-default"><i class="fa fa-list"></i> <?= htmlspecialchars(l7_t("Eventos")); ?></a>
+		<a href="layer7_reports.php" class="btn btn-default"><i class="fa fa-bar-chart"></i> <?= htmlspecialchars(l7_t("Relatorios")); ?></a>
+	</div>
+</div>
+<p class="text-center text-muted">
+	Layer7 para pfSense CE &mdash;
+	<a href="https://www.systemup.inf.br" target="_blank">Systemup</a>
+	Solu&ccedil;&atilde;o em Tecnologia
+</p>
 <?php require_once("foot.inc"); ?>

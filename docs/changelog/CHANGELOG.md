@@ -4,6 +4,18 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.80] — 2026-08-31
+
+### Changed
+
+- **BG-174 / GUI1 — página Status nativa ao pfSense:** a view de
+  `layer7_status.php` passa a `Form(false)` / `Form_Section` /
+  `Form_StaticText`, painéis e tabelas nativos. Sem KPI cards, sem
+  `layer7_render_styles()`, sem CSS/JS novo. Nenhuma alteração funcional,
+  de handler, daemon, PF, licença, defaults ou segurança.
+  Estado: **candidato 1.9.80 implementado, pendente de
+  gates/commit/build/publicação**. SHA256 `PENDING_BUILD`.
+
 ## [1.9.79] — 2026-08-31
 
 ### Fixed

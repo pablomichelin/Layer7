@@ -138,8 +138,10 @@ Paridade: [`../01-architecture/frontend-redesign-inventario-paridade.md`](../01-
 Wireframes: [`../00-overview/frontend-redesign-wireframes.md`](../00-overview/frontend-redesign-wireframes.md).
 
 **Estado (`2026-08-31`):** GUI0 **FEITO no git** (`3563757`) após gates PASS.
-GUI1–GUI7 aguardam **GO humano**; nenhuma alteração
-de código, `PORTVERSION`, build, release ou appliance foi autorizada.
+GUI1 piloto Status **candidato `1.9.80` implementado, pendente de
+gates/commit/build/publicação** (`layer7_status.php` + `PORTVERSION` 1.9.80;
+SHA256 `PENDING_BUILD`). **`latest` continua `1.9.79`**. GUI2–GUI7 aguardam
+**GO humano**.
 
 A trilha não substitui F0–F7: mudanças de package/GUI pertencem à manutenção
 F4, a regressão repetível e acessibilidade à F5, e empacotamento/release à F7.
