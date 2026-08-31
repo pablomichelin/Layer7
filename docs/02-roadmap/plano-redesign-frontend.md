@@ -2,8 +2,8 @@
 
 **Backlog:** BG-174.
 **Estado:** GUI0 documental `3563757`, ADR-0037 `f44a14b` e emenda visual
-`c429be3` concluídos após gates PASS. Emenda frontend-only implementada,
-pendente de gates/commit; GUI1–GUI7 bloqueados até GO humano.
+`c429be3` concluídos após gates PASS. Emenda frontend-only **FEITA no git**
+(`3b18f82`) após gates PASS; GUI1–GUI7 bloqueados até GO humano.
 **Baseline:** `1.9.79`, `main@4354aec`.
 **Nota de fase:** `GUI0…GUI7` são ondas internas deste plano, não substituem as
 fases canónicas F0…F7. A execução técnica cruza F4/F5/F7 e obedece aos seus
@@ -14,7 +14,7 @@ trilha não autoriza desenvolver, refatorar ou reinterpretar a ferramenta. O
 único problema a resolver é a apresentação e a organização operacional da GUI:
 encontrar, compreender e executar as funções existentes com menos confusão,
 usando a WebGUI que o próprio pfSense já fornece. Emenda documental
-implementada, pendente de gates/commit.
+**FEITA no git** (`3b18f82`) após gates PASS.
 
 ## 1. Escopo e não-escopo
 

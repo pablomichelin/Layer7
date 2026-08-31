@@ -13,7 +13,7 @@ label à esquerda e controlo/ajuda à direita. Emenda documental **FEITA no git*
 **Emenda de implementação nativa (`2026-08-31`):** o frontend deve consumir o
 padrão pré-carregado pelo pfSense, não recriá-lo dentro do package. A lógica do
 produto fica congelada; somente renderização, organização e linguagem podem
-mudar. Emenda implementada documentalmente, pendente de gates/commit.
+mudar. Emenda documental **FEITA no git** (`3b18f82`) após gates PASS.
 
 ## Contexto
 

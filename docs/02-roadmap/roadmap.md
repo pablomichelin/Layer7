@@ -155,10 +155,10 @@ direita. Grades de cards, caixas decorativas, chips e barras fixas de alteraçõ
 ficam rejeitados como estrutura primária, mesmo quando usam cores semelhantes
 às do pfSense.
 
-Emenda frontend-only de `2026-08-31`, pendente de gates/commit: o produto e os
-efeitos de servidor ficam congelados. Cada onda reorganiza somente a view,
-consome `head.inc`/`foot.inc`, `Form_*` e assets já fornecidos pelo pfSense, com
-alvo de zero CSS visual próprio e medição de recursos por rota.
+Emenda frontend-only de `2026-08-31` **FEITA no git** (`3b18f82`) após gates
+PASS: o produto e os efeitos de servidor ficam congelados. Cada onda reorganiza
+somente a view, consome `head.inc`/`foot.inc`, `Form_*` e assets já fornecidos
+pelo pfSense, com alvo de zero CSS visual próprio e medição de recursos por rota.
 
 ---
 
