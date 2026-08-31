@@ -145,6 +145,8 @@ A trilha não substitui F0–F7: mudanças de package/GUI pertencem à manutenç
 F4, a regressão repetível e acessibilidade à F5, e empacotamento/release à F7.
 Cada onda técnica será pequena, versionada, reversível e governada pela matriz
 de paridade. Identity+MITM continua fila fechada e MITM permanente NO-GO.
+ADR-0037 fixa o padrão visual/organizacional: frontend nativo ao pfSense; cinco
+áreas são taxonomia, não shell ou reorganização automática de tabs/rotas.
 
 ---
 

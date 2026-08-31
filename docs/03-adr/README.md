@@ -56,6 +56,7 @@ Criar ADR quando a mudanca afectar:
 | [ADR-0033](ADR-0033-anti-rollback-relogio.md) | Anti-rollback de relógio e estado temporal suspeito | **Aceito** (`2026-08-10`, `30.1b`) | Emenda `f3-expiracao-revogacao-grace.md`; RR-4/R-J; passo `30.6` |
 | [ADR-0035](ADR-0035-ambicao-paridade-ngfw-retirada-ficha.md) | Ambição de paridade NGFW no tempo + retirada da ficha | **Aceito** (`2026-08-14`) | Emenda ADR-0026 §12; P5/ficha **RETIRADOS**; **20.35 PASS** |
 | [ADR-0036](ADR-0036-install-ping-sem-serial.md) | Sinal de instalação e heartbeat sem serial | **Aceito** (`2026-08-22`) | BG-162 live; BG-165 cliente `1.9.73`; fail-open; sem inventar hardware_id |
+| [ADR-0037](ADR-0037-frontend-nativo-pfsense.md) | Frontend Layer7 nativo ao pfSense | **Aceito** (`2026-08-31`) | BG-174; shell/tabs/componentes pfSense; cinco áreas apenas taxonomia; sem frontend paralelo |
 
 **Trilha anti-pirataria (ADR-0030…0033):** **`Aceito`** no **`30.1b`** (`2026-08-10`);
 trilha **FECHADA** em **`30.19`** (`2026-08-12`) — fecho
@@ -104,7 +105,8 @@ reutilizado. Conflito registado em vez de silenciado.
 |---------------------|------|------|--------|
 | ADR-0034 | Reorganizacao estrutural controlada / higiene residual (se GO exigir ADR formal além do plano BG-112) | F6 residual | **reservado** — não usar para outro tema; condicional BG-112 |
 | ADR-0036 | Sinal de instalação / heartbeat sem serial | manutenção | **Aceito** — ver tabela acima |
-| ADR-0037 | (livre) | — | próximo ID livre após **0036** |
+| ADR-0037 | Frontend Layer7 nativo ao pfSense | manutenção F4/F5/F7 | **Aceito** — ver tabela acima |
+| ADR-0038 | (livre) | — | próximo ID livre após **0037** |
 
 ---
 

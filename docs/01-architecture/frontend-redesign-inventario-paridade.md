@@ -58,8 +58,8 @@ forma incremental, sem alterar os handlers de segurança.
 | Exceptions — `layer7_exceptions.php` | isenção global e excepções gerais | `vip-isentos`, labels, DHCP static maps, modo DNS VIP, exceptions | VIP directa; picker DHCP; bulk; import file; exception add/edit/delete | save JSON + PF resync(true); export txt | limites 32 IP/16 CIDR, alvo/descrição, host/CIDR, interfaces, managed exception | Proteção > Excepções e VIP |
 | Categories — `layer7_categories.php` | referência nDPI | `layer7_ndpi_list()` protocolos/categorias | nenhum | expandir/consultar apenas no browser | nDPI indisponível/vazio | Proteção > Catálogo nDPI |
 | Simulator — `layer7_test.php` | explicar decisão sem aplicar | políticas, grupos, selectors, precedência | domínio/IP destino, IP origem, app, categoria | avaliação PHP somente; sem save/PF | input inválido; allow/exception/block/monitor/no match | Proteção > Simulador |
-| Identity — `layer7_identity.php` | configurar user↔IP add-on | entitlement, LDAP, RADIUS accounting, DC agent, secrets separados, teste LDAP | enable; LDAP; RADIUS; DC; generate/clear secrets; save/test | valida, save secrets/config, TLS cert DC, disarm se sem entitlement, SIGHUP | bloqueado sem entitlement; teste/secret/runtime errors | Clientes > Avançado > Identity; **fila fechada** |
-| MITM — `layer7_mitm.php` | configurar inspeção TLS governada | entitlement, CA, runtime/helper, janela, source/dest/SNI/bypass | gerar/importar/exportar/apagar CA; enable/window/intercept/bypass; break-glass | ficheiros CA 0600, helper sync, PF reload, failsafe rollback | sem entitlement/runtime/CA; expiry; helper falha; NO-GO permanente | Sistema > Avançado > MITM; **sem mudança funcional** |
+| Identity — `layer7_identity.php` | configurar user↔IP add-on | entitlement, LDAP, RADIUS accounting, DC agent, secrets separados, teste LDAP | enable; LDAP; RADIUS; DC; generate/clear secrets; save/test | valida, save secrets/config, TLS cert DC, disarm se sem entitlement, SIGHUP | bloqueado sem entitlement; teste/secret/runtime errors | tab/rota Identity actual; **fila fechada** |
+| MITM — `layer7_mitm.php` | configurar inspeção TLS governada | entitlement, CA, runtime/helper, janela, source/dest/SNI/bypass | gerar/importar/exportar/apagar CA; enable/window/intercept/bypass; break-glass | ficheiros CA 0600, helper sync, PF reload, failsafe rollback | sem entitlement/runtime/CA; expiry; helper falha; NO-GO permanente | tab/rota MITM actual; **sem mudança funcional** |
 | Blacklists — `layer7_blacklists.php` | snapshot assinado, regras e categorias | config, discovered, subscription, runtime/fallback/LKG/stats | download; regra; categoria custom; whitelist domínio; limites/cron | fetch assíncrono, saves auxiliares, `layer7_bl_apply()`, cron/PF | token ausente/expirado; degraded/fail-closed; memória/limites | Proteção > Blacklists |
 | Blacklist progress — `layer7_bl_ajax.php` | polling de download | ficheiro de progresso | nenhum | GET `action=progress`, text/no-store | 400 para acção inválida | componente de Blacklists |
 | Allowlist — `layer7_allowlist.php` | destinos nunca bloqueados pelo Layer7 | seed + `dst_allowlist` | textarea IPv4/IPv6/CIDR | save JSON, apply tabela PF, SIGHUP, filter reload | entrada inválida/dedup/save/apply | Proteção > Allowlist |
@@ -199,8 +199,8 @@ migrar a função.
 | Diagnostics | anti-DoH add/remove | diagnostics | Unbound | ferramenta avançada | P | config/write/restart |
 | Diagnostics | repair PF tables | diagnostics | PF unhealthy | reparação confirmada | P | before/after/failure |
 | Diagnostics | GitHub issue/copy URL | diagnostics | summary ≤500 | Suporte | P | privacy/no internet |
-| Identity | todas funções §3.5 | identity | entitlement | Clientes/Avançado | P | gates/secrets/fail-safe |
-| MITM | todas funções §3.5 | mitm | entitlement/runtime/CA | Sistema/Avançado | P | gates/break-glass; NO-GO |
+| Identity | todas funções §3.5 | identity | entitlement | tab/rota Identity actual; taxonomia Clientes apenas documental | P | gates/secrets/fail-safe |
+| MITM | todas funções §3.5 | mitm | entitlement/runtime/CA | tab/rota MITM actual; taxonomia Sistema apenas documental | P | gates/break-glass; NO-GO |
 | Removal | keep licence/config precedence | removal | installed | Zona de perigo | P | 4 combinations |
 | Removal | typed confirmation/job/status/log | removal | POST/CSRF | Zona de perigo | P | wrong text/running/complete |
 | Block page | PT/EN/ES copy/host/policy/contact | blockpage | public | página pública | P | locale/XSS/empty |
@@ -208,6 +208,9 @@ migrar a função.
 | Segurança | privilégios por página | headers | pfSense ACL | mesmas/fronteiras menores | P | RBAC deny/allow |
 | Segurança | CSRF e server validation | guiconfig/handlers | mutações | inalterado | P | token missing/invalid |
 | Segurança | nenhuma mutação GET | todas | contrato | inalterado | P | crawler GET read-only |
+| Plataforma | shell `Services > Layer7` e breadcrumb pfSense | XML/header/footer | todas as páginas | preservar nativamente | P | comparação com package nativo |
+| Plataforma | tabs/subtabs, ordem e rotas existentes | `layer7.inc`/XML | navegação actual | organização baseline | P | cada tab/deep link/active state |
+| Plataforma | painéis, tabelas, forms, alerts e botões pfSense | PHP/CSS/include | tema WebGUI | primitivos nativos, sem design system paralelo | P | tema/desktop/320/CSS próprio mínimo e escopado |
 
 ## 5. Dependências e superfícies alteradas por acção
 

@@ -44,6 +44,12 @@ justifique React, Vue ou uma SPA: isso acrescentaria build, CSP, dependências e
 um segundo modelo de estado sem resolver os contratos de servidor já
 existentes.
 
+**Decisão humana posterior — ADR-0037:** o redesign deve conservar também a
+identidade visual e a organização nativas do pfSense. `Services > Layer7`,
+breadcrumb, tabs/subtabs, painéis, tabelas, formulários, alerts e botões do
+pfSense são invariantes. As cinco áreas abaixo passam a ser taxonomia para
+organizar conteúdo e linguagem, não um shell, sidebar ou frontend paralelo.
+
 ## 2. Evidência e método
 
 Foram cruzadas três fontes:
@@ -108,11 +114,24 @@ renderizada é construída por `layer7_nav_items()` e
 | Alternativa | Vantagem | Limitação | Decisão |
 |---|---|---|---|
 | A — manter tabs por módulo | alteração pequena | preserva o modelo interno e excesso de destinos | rejeitada como arquitectura final |
-| B — cinco áreas por tarefa | linguagem de operador, progressive disclosure, escala | exige mapa de rotas e migração faseada | **recomendada** |
+| B — cinco áreas como shell próprio | linguagem de operador e progressive disclosure | quebra o padrão/organização pfSense | **rejeitada pela ADR-0037** |
+| B2 — tabs pfSense + cinco áreas como taxonomia | preserva organização e familiaridade; melhora hierarquia interna | tabs continuam numerosas e exigem subordinação cuidadosa | **recomendada** |
 | C — dashboard único + busca de comandos | acesso rápido para expert | descoberta e acessibilidade fracas; complexidade desnecessária | não usar como navegação principal |
 | D — SPA completa | transições sem reload | novo build/CSP/estado/ataque/rollback; desalinhada ao pfSense | rejeitada sem ADR e prova específica |
 
-## 6. Arquitectura recomendada
+## 6. Arquitectura de informação recomendada
+
+A estrutura visual permanece a do pfSense:
+
+```text
+pfSense > Services > Layer7
+└── tabs primárias existentes
+    ├── subtabs nativas quando uma página precisar de divisão
+    └── painéis, tabelas e formulários nativos dentro da tab activa
+```
+
+O mapa abaixo classifica o conteúdo; não substitui as tabs nem autoriza mover
+rotas. Qualquer alteração futura da organização actual volta ao gate humano.
 
 ```text
 Visão geral
@@ -213,13 +232,12 @@ preserva contexto. Ações destrutivas permanecem `POST` + CSRF + confirmação.
 
 | Componente | Contrato |
 |---|---|
-| cabeçalho de página | título de operador, resumo, estado e acção primária única |
-| navegação principal/secundária | cinco áreas + destinos locais; estado activo e teclado |
-| cartão de estado | valor, significado e próxima acção; sem métricas decorativas |
-| tabela/lista | busca, filtros, paginação, total, empty/error/loading, ações nomeadas |
-| chips | app, categoria, host, interface; texto sempre disponível |
-| badge | pedido/efectivo/licença/daemon distintos; cor nunca é o único sinal |
-| painel de detalhe | leitura técnica sob demanda, sem esconder acções essenciais |
+| cabeçalho de página | breadcrumb/título/panel heading nativos; acção primária no local esperado pelo pfSense |
+| navegação principal/secundária | tabs/subtabs pfSense; rotas e ordem existentes são baseline |
+| resumo de estado | `panel`, tabela ou `dl` nativos; sem grelha de cards com identidade própria |
+| tabela/lista | `table`/`table-responsive`, busca, paginação, total e ações nomeadas |
+| labels/badges | Bootstrap nativo e texto sempre disponível; sem linguagem visual exclusiva |
+| painel de detalhe | `panel`, `collapse` ou bloco nativo sob demanda |
 | secção avançada | `<details>` ou painel acessível, estado persistido por página |
 | aviso/erro/confirmação | impacto, causa, recuperação e foco programático |
 | barra de alterações | resumo do dirty state, `Descartar`, `Salvar`/`Aplicar` |
@@ -228,8 +246,9 @@ preserva contexto. Ações destrutivas permanecem `POST` + CSRF + confirmação.
 | loading/skeleton | apenas para AJAX real; texto `aria-live` e fallback sem JS |
 | zona de perigo | separada da configuração normal; confirmação proporcional |
 
-Implementação futura deve extrair componentes PHP partilhados, reutilizar o
-Bootstrap/Form stack do pfSense e adoptar JS externo progressivo. Nenhuma
+Implementação futura deve criar apenas wrappers funcionais mínimos sobre o
+Bootstrap/Form stack do pfSense e adoptar JS externo progressivo. Não será
+criado design system visual concorrente. Nenhuma
 autorização, validação ou decisão de segurança pode existir apenas no browser.
 
 ## 11. Acessibilidade, responsividade e i18n
@@ -250,11 +269,12 @@ autorização, validação ou decisão de segurança pode existir apenas no brow
 
 ## 12. Decisões humanas exigidas
 
-1. GO para adoptar as cinco áreas como IA alvo.
-2. GO para página exclusiva de edição/criação de políticas.
-3. Confirmar se Identity fica em `Clientes > Avançado` e MITM em
-   `Sistema > Avançado`, mantendo ambos visíveis apenas conforme contrato
-   actual de entitlement.
+1. **Resolvido — ADR-0037:** manter padrão e organização nativos do pfSense;
+   cinco áreas são taxonomia, não navegação paralela.
+2. GO para página exclusiva de edição/criação de políticas dentro do shell
+   pfSense.
+3. Qualquer mudança de posição de Identity/MITM exige GO próprio; por defeito,
+   manter tabs/rotas actuais e os contratos de entitlement.
 4. Confirmar estratégia de rollout: uma versão por bloco técnico, sem “big
    bang”, e manutenção temporária de links/rotas antigas.
 5. Confirmar se o primeiro bloco técnico autorizado será apenas fundação

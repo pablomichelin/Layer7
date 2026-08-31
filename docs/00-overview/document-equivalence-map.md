@@ -75,6 +75,7 @@ Ele existe para evitar tres erros comuns:
 | Builder ABI 15 vs 16 | «preferir a mesma major» em `builder-freebsd.md` vs builder 15 + appliance Plus/16 | `CORTEX.md` + BG-106 + P2-14 (BG-152) + [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md) | builder permanece 15; `-f` no Plus/16 é workaround aceite, **não** suporte nativo ABI 16; builder 16 **não** provado |
 | Expiry TZ / `timegm` | REV-030 «meio-dia UTC ou `timegm`» vs P2-13/P3-7 (meia-noite local) | [`../01-architecture/f3-expiracao-revogacao-grace.md`](../01-architecture/f3-expiracao-revogacao-grace.md) + auditoria P2-13/P3-7 (BG-153) | REV-030 é histórico; **não** aplicar `timegm`/`gmmktime` (altera o contrato e piora Brasil/UTC) |
 | Frontend package / BG-174 | GUI conceptual, plano VIP/UX e auditoria/redesign novo | [`frontend-redesign-analise.md`](frontend-redesign-analise.md) = decisão; [`../01-architecture/frontend-redesign-inventario-paridade.md`](../01-architecture/frontend-redesign-inventario-paridade.md) = paridade; [`frontend-redesign-wireframes.md`](frontend-redesign-wireframes.md) = aceitação visual; [`../02-roadmap/plano-redesign-frontend.md`](../02-roadmap/plano-redesign-frontend.md) = execução | documentos anteriores permanecem contexto/histórico; Identity+MITM só entra no inventário e **não** é reaberta |
+| Frontend: cinco áreas vs organização pfSense | hipótese de shell `Visão geral/Proteção/Clientes/Atividade/Sistema` vs tabs/rotas actuais | [`../03-adr/ADR-0037-frontend-nativo-pfsense.md`](../03-adr/ADR-0037-frontend-nativo-pfsense.md) | cinco áreas = taxonomia; vence organização nativa `Services > Layer7`, sem sidebar/design system paralelo |
 
 ---
 
@@ -109,6 +110,9 @@ Ele existe para evitar tres erros comuns:
    BG-164 no backlog ainda citavam `v1.9.78`, enquanto o `CORTEX.md`, a tag
    e a release publicada confirmam `v1.9.79`. Resolvido neste bloco a favor
    de `v1.9.79`; referências antigas do CORTEX permanecem histórico datado.
+8. **Frontend BG-174 (`2026-08-31`):** a proposta GUI0 podia sugerir um shell
+   próprio de cinco áreas. Decisão humana formalizada na ADR-0037: preservar
+   organização e padrão visual do pfSense; cinco áreas são apenas taxonomia.
 
 ---
 

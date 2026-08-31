@@ -5,6 +5,12 @@ Todos assumem o shell do pfSense, navegação por teclado e largura mínima de
 320 px. Em ecrã estreito, colunas empilham, filtros recolhem numa secção e cada
 linha de tabela vira bloco sem ocultar ações.
 
+**Invariante ADR-0037:** todos os desenhos vivem em `Services > Layer7`, sob o
+header, breadcrumb e tabs/subtabs nativos. Caixas representam `panel`, listas
+representam `table`/`table-responsive`, formulários seguem `Form_*`/Bootstrap e
+mensagens seguem `print_info_box()`/`alert`. As cinco áreas são apenas taxonomia;
+não existe sidebar Layer7 nem shell visual próprio.
+
 ## Convenções
 
 `[primário]` acção principal; `[secundário]` acção reversível; `[perigo]`
@@ -13,6 +19,8 @@ acção destrutiva; `●` estado; `▾` detalhe recolhível; `!` aviso.
 ## 1. Dashboard
 
 ```text
+pfSense > Services > Layer7
+[Estado] [Dispositivos] [Políticas] [Identity] [MITM] [...] [Definições]
 ┌ Visão geral ───────────────────────────── [Ver diagnóstico] ┐
 │ ● Proteção efectiva: MONITOR   Pedido: ENFORCE              │
 │ ! Licença inválida impede o PF de armar   [Ver licença]     │
@@ -32,6 +40,8 @@ Diagnostics; sucesso pós-acção mostra etapas daemon/PF separadas.
 ## 2. Lista de políticas
 
 ```text
+pfSense > Services > Layer7 > Políticas
+[Políticas] [Grupos] [Exceções] [Categorias nDPI] [Simular teste]
 ┌ Proteção / Políticas aplicadas ─────── [Criar política] ┐
 │ [Buscar________________] [Estado▾] [Acção▾] [Limpar]    │
 │ 6 políticas · filtros no URL                            │
@@ -49,6 +59,8 @@ substitui a lista já carregada. A remoção fica em `Mais ações`, com confirm
 ## 3. Edição de política
 
 ```text
+pfSense > Services > Layer7 > Políticas > Editar
+[Políticas] [Grupos] [Exceções] [Categorias nDPI] [Simular teste]
 ┌ ← Políticas / Editar Pornografia            ● Activa ┐
 │ ID profile-pornografia (somente leitura)               │
 ├ Âmbito ────────────────────────────────────────────────┤

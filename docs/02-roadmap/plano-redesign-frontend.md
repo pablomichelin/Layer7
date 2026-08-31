@@ -19,6 +19,10 @@ Não-escopo sem novo GO:
 - mudar daemon, política, PF, licença, defaults ou segurança;
 - reabrir Identity/MITM; MITM continua NO-GO permanente;
 - criar SPA/framework pesado;
+- criar shell, sidebar, paleta, tipografia ou design system concorrente com o
+  pfSense;
+- reorganizar amplamente tabs/rotas existentes com base apenas na taxonomia de
+  cinco áreas;
 - mover/renomear rotas/ficheiros antes do lote permitido e sem compatibilidade;
 - alterar `PORTVERSION` durante GUI0;
 - executar um big bang ou publicar duas mudanças críticas juntas.
@@ -37,6 +41,7 @@ Não-escopo sem novo GO:
 | G-UX7 | paridade por linha tocada, config antiga e rollback PASS |
 | G-UX8 | appliance pfSense CE/lab: monitor primeiro; nenhum PF inesperado |
 | G-UX9 | diff revisto, staging explícito, versão nova e release checklist |
+| G-UX10 | conformidade ADR-0037: shell/tabs/forms/panels/buttons/tema pfSense |
 
 ## 3. Ondas
 
@@ -54,28 +59,31 @@ Não-escopo sem novo GO:
 - **Rollback:** reverter o commit documental.
 - **Versão/build:** não.
 
-### GUI1 — fundação server-rendered e componentes
+### GUI1 — fundação nativa pfSense e componentes mínimos
 
-- **Objectivo:** extrair componentes PHP/CSS/JS partilhados sem mudar rotas ou
-  comportamento.
+- **Objectivo:** reutilizar os primitivos nativos pfSense e extrair apenas
+  helpers funcionais mínimos, sem mudar rotas, organização ou comportamento.
 - **Ficheiros previstos:** `layer7.inc` ou includes novos no mesmo package,
   CSS/JS externos, páginas piloto, testes e docs.
 - **Preserva:** tabs, handlers, campos, POSTs, mensagens e defaults.
-- **Impacto:** base de header, status, alerts, dirty bar, result steps, list.
+- **Impacto:** consistência de `panel`, `table`, `nav-tabs`, `alert`, `btn`,
+  `print_info_box()` e `Form_*`; dirty/result states sem identidade paralela.
 - **Risco:** CSS global/pfSense Plus/CE e CSP.
 - **Testes:** PHP/JS, snapshots visuais manuais, sem-JS, teclado, PT/EN/ES.
 - **Gate:** uma página piloto read-only (Status) sem regressão.
 - **Rollback:** include/style antigo por página; pacote anterior.
 - **Versão/build:** sim; novo `PORTVERSION/PKGVERSION`, build/pkg/release.
 
-### GUI2 — navegação e shell das cinco áreas
+### GUI2 — organização nativa e subtabs controladas
 
-- **Objectivo:** introduzir IA `Visão geral/Proteção/Clientes/Atividade/Sistema`
-  e subnav, preservando rotas antigas.
+- **Objectivo:** melhorar tabs/subtabs dentro da organização actual do package;
+  usar `Visão geral/Proteção/Clientes/Atividade/Sistema` apenas como taxonomia
+  de conteúdo e linguagem.
 - **Ficheiros:** nav helpers/XML, páginas, i18n, testes/docs.
 - **Preserva:** privilégios, URLs, deep links, Identity/MITM visíveis conforme
   contrato e redirect Remote Access.
-- **Risco:** operadores/bookmarks/ACL perderem destino.
+- **Risco:** tabs customizadas divergirem do pfSense ou operadores/bookmarks/ACL
+  perderem destino.
 - **Testes:** cada URL/privilege, active state, 320 px, teclado, back/forward.
 - **Gate:** G-UX2/G-UX4/G-UX5/G-UX6.
 - **Rollback:** helper de nav anterior; pacote anterior.
@@ -164,7 +172,7 @@ Não-escopo sem novo GO:
 | HTTP | GET read-only, POST/CSRF, PRG, status codes, headers/downloads, ACL deny |
 | persistência | JSON antes/depois, defaults/migrations, secrets separados, config antiga |
 | efeitos | SIGHUP vs restart vs PF/filter vs Unbound/cron, incluindo falha parcial |
-| UX | 13 fluxos prioritários; ≤3 interações para Pornografia; contexto/dirty |
+| UX | 13 fluxos prioritários; ≤3 interações para Pornografia; contexto/dirty; aparência e posição de controles coerentes com pfSense |
 | acessibilidade | teclado completo, foco após erro/save, labels, aria-live, zoom/contraste |
 | responsivo | 320, 768 e desktop; tabelas/listas, modais curtos, sem clipping |
 | i18n | PT/EN/ES mesma função/copy/default; strings dinâmicas e públicas |
@@ -194,10 +202,12 @@ qualquer pressão para reabrir Identity/MITM.
 
 GUI0 não concede autorização para GUI1. O GO humano deve nomear:
 
-1. IA aprovada ou ajustes;
+1. IA aprovada ou ajustes; **ADR-0037 já fixa:** cinco áreas = taxonomia e
+   shell/organização = pfSense.
 2. padrão de edição de políticas;
 3. onda inicial autorizada;
 4. appliance/lab e janela de validação;
-5. decisão sobre localização de Identity/MITM na nova navegação.
+5. qualquer proposta futura de mover Identity/MITM nas tabs; por defeito,
+   ambas permanecem na posição e rota actuais.
 
 Até esse GO, é proibido alterar código, `PORTVERSION`, build ou release.
