@@ -20,6 +20,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   IP/interface. Endpoints CNA são ignorados pelo Layer7 sem furar a
   autenticação pfSense. `legacy_global` permanece o default (efeito
   global documentado; `scoped_hybrid` só com GO + ADR).
+  Pacote `SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`.
 
 ## [1.9.78] — 2026-08-31
 

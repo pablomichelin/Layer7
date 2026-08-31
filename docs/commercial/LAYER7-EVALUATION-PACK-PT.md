@@ -127,7 +127,7 @@ Passos completos: [Guia de Instalação](LAYER7-INSTALL-GUIDE-PT.md).
 ```bash
 # No pfSense (SSH root) — único pacote público (`1.9.77`):
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.78/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh \
   && sh /tmp/install.sh
 ```
 
