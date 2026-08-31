@@ -1,6 +1,8 @@
 # Runbook — Check-in default ON e migração (`30.14` / BG-118)
 
-**Estado:** activo com GO humano `2026-08-12`  
+**Estado:** histórico `30.14` — **supersedido por BG-170** (`2026-08-31`):
+o opt-out do cliente foi removido. Check-in é obrigatório; rollback =
+reinstalar `.pkg` anterior, não um toggle na GUI.  
 **ADR:** [ADR-0032](../03-adr/ADR-0032-check-in-obrigatorio-e-assinado.md) (emenda ADR-0021)  
 **Gates:** GA5.7–5.11  
 **GO literal:** ficha [`../09-blocking/decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md) (addendum `30.14`)

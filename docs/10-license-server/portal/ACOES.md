@@ -5,6 +5,19 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-31 — BG-170 check-in obrigatório (`1.9.77`)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | pacote `1.9.77` (sem overlay `.244`) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.77` |
+| Objectivo | Cliente não pode desligar o check-in; revogação remota deixa de ter opt-out |
+| Impacto | daemon + GUI Definições; emenda ADR-0032 |
+| Risco | Médio (caixas que tinham opt-out passam a telefonar; N3 intacto) |
+| Teste | `test_checkin_config_enabled.c`; `test_check_in_default_30.14.php`; i18n |
+| Rollback | Reinstalar `1.9.76` |
+| Resultado | **implementado, pendente de gates/commit** |
+
 ## 2026-08-26 — BG-169 perfil rápido Pornografia (`1.9.76`)
 
 | Campo | Valor |

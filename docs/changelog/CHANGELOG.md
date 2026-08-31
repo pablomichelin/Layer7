@@ -4,6 +4,16 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.77] — 2026-08-31
+
+### Security
+
+- **BG-170 — check-in obrigatório:** o operador já não pode desligar o
+  check-in periódico. O daemon ignora `check_in_enabled=false` no JSON;
+  a GUI deixa de expor o interruptor. Revogar no portal volta a cortar
+  caixas que tinham opt-out. Falha de rede continua a não derrubar o
+  bloqueio (N3). Pacote pendente de gates/commit/publicação.
+
 ## [1.9.76] — 2026-08-26
 
 ### Changed

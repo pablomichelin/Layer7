@@ -1,5 +1,5 @@
 /*
- * test_checkin_config_enabled.c — 30.14: ler check_in_enabled do JSON.
+ * test_checkin_config_enabled.c — BG-170: check-in always on.
  *
  *   cc -Wall -Wextra -O2 -I src/layer7d -o /tmp/t_ci_cfg \
  *      tests/functional/test_checkin_config_enabled.c \
@@ -59,14 +59,13 @@ main(void)
 
 	check(write_cfg(path,
 	    "{\"layer7\":{\"check_in_enabled\":false}}\n") == 0 &&
-	    layer7_checkin_config_enabled(path) == 0,
-	    "false => disabled (isolado)");
+	    layer7_checkin_config_enabled(path) == 1,
+	    "BG-170 false JSON nao desliga");
 
 	check(write_cfg(path, "{\"layer7\":{\"enabled\":false}}\n") == 0 &&
-	    layer7_checkin_config_enabled(path) == 0,
-	    "ausente => disabled (nao regressivo)");
+	    layer7_checkin_config_enabled(path) == 1,
+	    "BG-170 ausente => enabled");
 
-	/* P1-5 / BG-128: enforce_ready + due/offline sem chave. */
 	{
 		char state[256];
 		time_t now = time(NULL);
@@ -90,19 +89,19 @@ main(void)
 
 		check(write_cfg(path,
 		    "{\"layer7\":{\"check_in_enabled\":false}}\n") == 0 &&
-		    layer7_checkin_enforce_ready(path) == 1,
-		    "P1-5 air-gap (false) => enforce_ready=1");
+		    layer7_checkin_enforce_ready(path) == 0,
+		    "BG-170 false JSON sem chave => enforce_ready=0");
 
 		check(write_cfg(path, "{\"layer7\":{\"enabled\":false}}\n") == 0 &&
-		    layer7_checkin_enforce_ready(path) == 1,
-		    "P1-5 chave ausente no JSON => enforce_ready=1");
+		    layer7_checkin_enforce_ready(path) == 0,
+		    "BG-170 chave ausente no JSON => enforce_ready=0");
 
 		check(write_cfg(state,
 		    "{\"license_key\":\"ABC123\",\"last_check_in_ok\":1}\n") == 0 &&
 		    write_cfg(path,
-		    "{\"layer7\":{\"check_in_enabled\":true}}\n") == 0 &&
+		    "{\"layer7\":{\"check_in_enabled\":false}}\n") == 0 &&
 		    layer7_checkin_enforce_ready(path) == 1,
-		    "P1-5 enabled + chave => enforce_ready=1");
+		    "BG-170 false JSON + chave => enforce_ready=1");
 
 		check(write_cfg(state, "{\"license_key\":\"\"}\n") == 0 &&
 		    layer7_checkin_enforce_ready(path) == 0,

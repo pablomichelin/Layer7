@@ -111,9 +111,9 @@ int layer7_checkin_store_key(const char *key);
 void layer7_checkin_mark_ok_from_activate(void);
 int layer7_checkin_config_enabled(const char *config_path);
 /*
- * P1-5 / BG-128: 1 se o check-in NÃO é obrigatório (flag ausente/false =
- * air-gap) OU existe license_key no estado. 0 se check_in_enabled e não
- * há chave — enforce deve recusar. Não trata falha de rede (N3).
+ * BG-170: check-in é sempre obrigatório (o JSON é ignorado). 1 se existe
+ * license_key no estado; 0 sem chave — enforce recusa. Não trata falha
+ * de rede (N3).
  */
 int layer7_checkin_enforce_ready(const char *config_path);
 int layer7_checkin_due(time_t now);

@@ -2553,8 +2553,7 @@ function layer7_generate_rules($type)
 }
 
 /**
- * 30.14 / BG-118 — default seguro para instalações novas (sample/bare).
- * Existentes: ver layer7_check_in_effective_enabled() (ausente/false = OFF).
+ * BG-170 — check-in é obrigatório (produto de filtro de Internet).
  */
 function layer7_check_in_default_new_install()
 {
@@ -2562,27 +2561,15 @@ function layer7_check_in_default_new_install()
 }
 
 /**
- * Efectivo para runtime/GUI. Chave ausente ⇒ OFF (migração não regressiva).
- * Nunca falha-fechado por rede: o daemon só age se explicitamente true.
+ * Efectivo para runtime/GUI. Sempre ON — o cliente não opta out.
  */
 function layer7_check_in_effective_enabled($data = null)
 {
-	if (!is_array($data)) {
-		$data = layer7_load_or_default();
-	}
-	if (!isset($data["layer7"]) || !is_array($data["layer7"])) {
-		return false;
-	}
-	if (!array_key_exists("check_in_enabled", $data["layer7"])) {
-		return false;
-	}
-	return !empty($data["layer7"]["check_in_enabled"]);
+	return true;
 }
 
 /**
- * Upgrade não regressivo: se a chave já existe, preserva o valor.
- * Se ausente numa config existente, NÃO injecta true (opt-in / anúncio).
- * Instalações novas obtêm true via layer7.json.sample / bare_config.
+ * BG-170: grava sempre true (upgrade e JSON false deixam de desligar).
  */
 function layer7_check_in_apply_migration_policy($data, $is_existing_config)
 {
@@ -2590,13 +2577,7 @@ function layer7_check_in_apply_migration_policy($data, $is_existing_config)
 	    !is_array($data["layer7"])) {
 		return $data;
 	}
-	if ($is_existing_config) {
-		return $data;
-	}
-	if (!array_key_exists("check_in_enabled", $data["layer7"])) {
-		$data["layer7"]["check_in_enabled"] =
-		    layer7_check_in_default_new_install();
-	}
+	$data["layer7"]["check_in_enabled"] = true;
 	return $data;
 }
 
@@ -2676,6 +2657,7 @@ function layer7_save_json($data)
 	$cfgpath = layer7_cfg_path();
 	$data = layer7_config_interfaces_normalize($data);
 	if (isset($data["layer7"]) && is_array($data["layer7"])) {
+		$data["layer7"]["check_in_enabled"] = true;
 		if (isset($data["layer7"]["mitm"])) {
 			$data["layer7"]["mitm"] = layer7_mitm_normalize($data["layer7"]["mitm"]);
 		}

@@ -1,6 +1,6 @@
 # ADR-0032 — Check-in obrigatório por defeito e resposta assinada com anti-replay
 
-**Estado:** Aceito  
+**Estado:** Aceito — emenda **BG-170** `2026-08-31` (opt-out do cliente **removido**)  
 **Data:** 2026-08-10  
 **Aceite:** `2026-08-10` — passo **`30.1b`**; GO humano («concordo com tudo» / recomendações do plano); ficha [`../09-blocking/decisoes-humanas-30.1.md`](../09-blocking/decisoes-humanas-30.1.md) — dec. 1/2 = Sim (GO execução `30.14`); BG-101 reaberto  
 **Tipo:** **Emenda** a [`ADR-0021-check-in-online-e-revogacao-remota.md`](ADR-0021-check-in-online-e-revogacao-remota.md)  
@@ -41,6 +41,18 @@ CRL offline continua **fora de escopo** (rejeitada na ADR-0021).
    e dependência de rede.
 4. Relação com BG-101: no `30.1b`, reabrir como lacuna comercial a corrigir
    **ou** manter com justificação escrita (decisão n.º 5).
+
+### 1b. Emenda BG-170 (`2026-08-31`) — opt-out removido
+
+GO produto: Layer7 é filtro de Internet; appliance sem Internet não é
+caso de uso. O operador **não** pode desligar o check-in.
+
+1. O daemon trata o check-in como **sempre ligado** (ignora
+   `check_in_enabled=false` no JSON).
+2. A GUI deixa de expor o interruptor; `save_json` grava sempre `true`.
+3. **N3 / R-C intactos:** falha de rede não invalida `.lic` válido.
+4. Residual: root a patchar o binário ou a bloquear o destino do
+   license-server (R-A / `max_offline_hours`).
 
 ### 2. Protocolo assinado com anti-replay (`30.12`–`30.13`)
 

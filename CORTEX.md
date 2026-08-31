@@ -226,6 +226,9 @@ Protecção infantil alargado.
 `releases/latest` = `v1.9.76`;
 `SHA256=a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`.
 `v1.9.75` retirada do download (latest-only / BG-164).
+**BG-170 (`1.9.77`, implementado, pendente de gates/commit):** check-in
+obrigatório. GUI sem interruptor; daemon ignora JSON `false`. Latest
+publicado continua `1.9.76` até publish.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

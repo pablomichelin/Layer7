@@ -976,23 +976,6 @@ checkin_cleanup_temp(void)
 	(void)unlink(L7_CHECKIN_HTTP_TMP);
 }
 
-static int
-parse_bool_json_value(const char *p)
-{
-	if (!p)
-		return 0;
-	while (*p && *p != ':')
-		p++;
-	if (*p != ':')
-		return 0;
-	p++;
-	while (*p == ' ' || *p == '\t')
-		p++;
-	if (strncmp(p, "true", 4) == 0)
-		return 1;
-	return 0;
-}
-
 static int parse_int_json_field(const char *json, const char *key, int *out)
 {
 	char needle[128];
@@ -1359,26 +1342,13 @@ layer7_checkin_mark_ok_from_activate(void)
 int
 layer7_checkin_config_enabled(const char *config_path)
 {
-	char *json;
-	const char *p;
-	int enabled = 0;
-
-	if (getenv("L7_CHECK_IN_FORCE") != NULL)
-		return 1;
-
-	if (!config_path)
-		config_path = "/usr/local/etc/layer7.json";
-
-	json = read_file_alloc(config_path, NULL);
-	if (!json)
-		return 0;
-
-	p = strstr(json, "\"check_in_enabled\"");
-	if (p)
-		enabled = parse_bool_json_value(p);
-
-	free(json);
-	return enabled;
+	/*
+	 * BG-170: check-in is mandatory. The JSON flag is ignored so a
+	 * GUI/JSON opt-out cannot disable remote revocation. N3 intact:
+	 * network failure still does not invalidate a valid .lic.
+	 */
+	(void)config_path;
+	return 1;
 }
 
 int
