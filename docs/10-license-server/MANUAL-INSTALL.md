@@ -1800,7 +1800,7 @@ apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
 ### Apos desinstalar
 
 O pfSense volta ao funcionamento normal imediatamente.
-Para reinstalar a versao actual (`1.9.76`), usar o **`install.sh`** da
+Para reinstalar a versao actual (`1.9.77`), usar o **`install.sh`** da
 seccao **1** (ou o comando unico manual):
 
 ```sh

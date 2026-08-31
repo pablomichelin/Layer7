@@ -8,7 +8,7 @@
 > **Pacote de referência (canal `latest`):** **`1.9.77`**  
 > **SHA256:** `1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`  
 > **Release:** <https://github.com/pablomichelin/Layer7/releases/latest>  
-> **Data de alinhamento:** `2026-08-26`
+> **Data de alinhamento:** `2026-08-31`
 ---
 
 ## 0. Como usar este manual
@@ -91,7 +91,7 @@ Charter resumido: [`00-overview/product-charter.md`](00-overview/product-charter
 Fonte canónica: secção **Links da versao actual** em
 [`MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md).
 
-**Canal público `1.9.76` (único pacote para download):**
+**Canal público `1.9.77` (único pacote para download):**
 
 - Release: <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.77>
 - Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.77/pfSense-pkg-layer7-1.9.77.pkg>
@@ -128,7 +128,7 @@ Fonte completa: [`MANUAL-INSTALL.md`](10-license-server/MANUAL-INSTALL.md)
 (secções 1–6). Executar como **root**. Em **Diagnostics > Command Prompt**,
 usar o **comando único** (uma linha).
 
-### 4.1 Instalar (primeira vez) — `1.9.76`
+### 4.1 Instalar (primeira vez) — `1.9.77`
 
 **Comando único oficial:**
 
@@ -168,7 +168,7 @@ layer7d -V
 service layer7d onestatus
 ```
 
-### 4.2 Actualizar (upgrade) — para `1.9.76`
+### 4.2 Actualizar (upgrade) — para `1.9.77`
 
 **Comando único:**
 

@@ -7,7 +7,7 @@
 > **SHA256:** `1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`  
 > **Release:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.77>  
 > **Latest:** <https://github.com/pablomichelin/Layer7/releases/latest>  
-> **Alinhamento:** `2026-08-26`
+> **Alinhamento:** `2026-08-31`
 
 Licenciamento comercial, activação e suporte de enforce: **contactar a Systemup**
 (não há detalhe de license server neste repositório público).
@@ -73,7 +73,7 @@ Cada release publica pelo menos:
 - `pfSense-pkg-layer7-<versão>.pkg`
 - `pfSense-pkg-layer7-<versão>.pkg.sha256`
 
-**Canal público `1.9.76`:**
+**Canal público `1.9.77`:**
 
 - Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.77/pfSense-pkg-layer7-1.9.77.pkg>
 - SHA256: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.77/pfSense-pkg-layer7-1.9.77.pkg.sha256>
@@ -110,7 +110,7 @@ substitui validação no vosso ambiente.
 Executar como **root** (SSH ou Diagnostics → Command Prompt). Em Command
 Prompt preferir o **comando único** (uma linha).
 
-### 4.1 Instalar (primeira vez) — `1.9.76`
+### 4.1 Instalar (primeira vez) — `1.9.77`
 
 ```sh
 fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.77/install.sh && sh /tmp/install.sh
@@ -134,7 +134,7 @@ layer7d -V
 service layer7d onestatus
 ```
 
-### 4.2 Actualizar para `1.9.76`
+### 4.2 Actualizar para `1.9.77`
 
 ```sh
 service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.77.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.77/pfSense-pkg-layer7-1.9.77.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.77.pkg && service layer7d onestart && layer7d -V
@@ -172,7 +172,7 @@ pkg delete -y pfSense-pkg-layer7
 ### 4.5 Rollback
 
 O canal público **não** disponibiliza pacotes anteriores. Reinstalar
-`1.9.76` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
+`1.9.77` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
 Systemup — contactar suporte; **não** há URL público.
 
 ---
