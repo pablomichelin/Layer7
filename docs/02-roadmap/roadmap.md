@@ -148,11 +148,12 @@ de paridade. Identity+MITM continua fila fechada e MITM permanente NO-GO.
 ADR-0037 fixa o padrão visual/organizacional: frontend nativo ao pfSense; cinco
 áreas são taxonomia, não shell ou reorganização automática de tabs/rotas.
 
-Emenda visual de `2026-08-31`, pendente de gates/commit: a referência passa a
-ser também a composição nativa de formulários do pfSense — barras escuras de
-secção, linhas planas, rótulo à esquerda e campo/ajuda à direita. Grades de
-cards, caixas decorativas, chips e barras fixas de alterações ficam rejeitados
-como estrutura primária, mesmo quando usam cores semelhantes às do pfSense.
+Emenda visual de `2026-08-31` **FEITA no git** (`c429be3`) após gates PASS: a
+referência passa a ser também a composição nativa de formulários do pfSense —
+barras escuras de secção, linhas planas, rótulo à esquerda e campo/ajuda à
+direita. Grades de cards, caixas decorativas, chips e barras fixas de alterações
+ficam rejeitados como estrutura primária, mesmo quando usam cores semelhantes
+às do pfSense.
 
 ---
 

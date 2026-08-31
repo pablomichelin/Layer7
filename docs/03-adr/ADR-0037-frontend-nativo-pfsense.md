@@ -7,8 +7,8 @@ git** (`f44a14b`) após gates PASS. Aplica-se à trilha BG-174 / GUI1–GUI7.
 
 **Emenda visual (`2026-08-31`):** a referência normativa entregue pelo humano
 é o formulário nativo do pfSense com barras de secção escuras, linhas planas,
-label à esquerda e controlo/ajuda à direita. Emenda implementada
-documentalmente, pendente de gates/commit neste bloco.
+label à esquerda e controlo/ajuda à direita. Emenda documental **FEITA no git**
+(`c429be3`) após gates PASS.
 
 ## Contexto
 
