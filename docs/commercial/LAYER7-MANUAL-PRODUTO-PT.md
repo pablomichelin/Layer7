@@ -172,7 +172,7 @@ pkg delete -y pfSense-pkg-layer7
 ### 4.5 Rollback
 
 O canal público **não** disponibiliza pacotes anteriores. Reinstalar
-`1.9.73` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
+`1.9.76` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
 Systemup — contactar suporte; **não** há URL público.
 
 ---
