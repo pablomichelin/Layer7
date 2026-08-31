@@ -105,7 +105,14 @@ struct layer7_policy_rule {
 	char ad_groups[L7_MAX_AD_GROUPS_PER_POLICY][L7_AD_GROUP_LEN];
 	int scope_global;       /* 1 = regra PF global explicita (E4) */
 	int quarantine_origin;  /* 1 = app-only block pode quarentenar origem */
+	/* 0 = and (default: categoria obrigatoria; apps+hosts = OR).
+	 * 1 = or (qualquer selector configurado: app OU cat OU host).
+	 * Interface/origem/horario/exclusoes continuam AND. */
+	int match_mode;
 };
+
+#define L7_MATCH_MODE_AND 0
+#define L7_MATCH_MODE_OR  1
 
 struct layer7_group {
 	char id[L7_GROUP_ID_LEN];

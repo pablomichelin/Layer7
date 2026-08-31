@@ -14,7 +14,7 @@
 | # | Item | Comando / prova | ☐ |
 |---|------|-----------------|---|
 | 1.1 | Working tree limpo (ou stash consciente) | `git status` | |
-| 1.2 | `PORTREVISION` bump se código mudou | `package/pfSense-pkg-layer7/Makefile` | |
+| 1.2 | **Versao nova obrigatoria** — bump `PORTVERSION`/`PORTREVISION`; proibido reusar a PKGVERSION publicada como «reinstall» | `package/pfSense-pkg-layer7/Makefile` | |
 | 1.3 | Testes locais | `tests/run-local.sh` (macOS) | |
 | 1.4 | Lint shell release | `sh -n scripts/release/*.sh` | |
 | 1.5 | Pull + stash license local (builder) | fluxo `AGENTS.md` | |
@@ -57,6 +57,7 @@
 | 4.3 | Asset `.sha256` anexado | release page | |
 | 4.4 | `releases/latest` aponta para tag correcta | `gh api .../releases/latest` | |
 | 4.5 | Rolling tags (`blacklists-ut1-current`) como **prerelease** | `MANUAL-INSTALL.md` §11b | |
+| 4.6 | Releases de pacote **anteriores retiradas** do download publico | `gh release list` em `pablomichelin/Layer7` — so a nova + snapshot blacklists | |
 
 ---
 
@@ -84,7 +85,7 @@
 | 6.2 | Smoke mínimo lab (se mudança funcional) | `tests/lab/run-f5-smoke-checklist.sh` | |
 | 6.3 | Evidência `run_id` em `docs/tests/evidence/` | |
 | 6.4 | Rollback documentado (`_68` imediato pós-GO) | |
-| 6.5 | Canal `latest` = esta versão e **só** ela no updater | `sh scripts/release/verify-latest-release.sh --expect VERSION` — `/releases/latest` não-prerelease, `.pkg`+`.sha256`+`install.sh`. O GUI só consome `latest`. Releases antigas ficam para rollback documentado, **não** como download oficial. | |
+| 6.5 | Canal `latest` = esta versão e **só** ela no updater e no GitHub publico | `sh scripts/release/verify-latest-release.sh --expect VERSION` — `/releases/latest` não-prerelease, `.pkg`+`.sha256`+`install.sh`. O GUI só consome `latest`. Pacotes anteriores **retirados** do download publico (tags git + arquivo interno para rollback). | |
 
 ---
 

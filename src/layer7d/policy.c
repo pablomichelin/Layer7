@@ -660,6 +660,19 @@ parse_one_policy(const char *ob, const char *oe,
 	if (extract_bool_after_key(ob, oe, "quarantine", &quarantine) == 0 &&
 	    quarantine)
 		r->quarantine_origin = 1;
+	{
+		char mm[8];
+
+		r->match_mode = L7_MATCH_MODE_AND;
+		if (extract_quoted_after_key(ob, oe, "match_mode", mm,
+		    sizeof(mm)) == 0) {
+			if (strcmp(mm, "or") == 0)
+				r->match_mode = L7_MATCH_MODE_OR;
+		} else if (strcmp(r->id, "profile-adulto") == 0) {
+			/* BG-171: leftover 1.9.76 sem o campo. */
+			r->match_mode = L7_MATCH_MODE_OR;
+		}
+	}
 	parse_schedule_in_policy(ob, oe, &r->schedule);
 	(void)parse_string_array_in_object(ob, oe, "interfaces",
 	    (char *)r->ifaces, L7_MAX_IFACES_PER_RULE,
@@ -1271,16 +1284,13 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 	if (!src_matches_rule(r, src_ip))
 		return 0;
 
-	if (r->n_ndpi_cats > 0) {
-		if (!ndpi_cat)
-			return 0;
+	if (r->n_ndpi_cats > 0 && ndpi_cat) {
 		for (i = 0; i < r->n_ndpi_cats; i++) {
-			if (strcmp(ndpi_cat, r->ndpi_cats[i]) == 0)
+			if (strcmp(ndpi_cat, r->ndpi_cats[i]) == 0) {
+				cat_matched = 1;
 				break;
+			}
 		}
-		if (i >= r->n_ndpi_cats)
-			return 0;
-		cat_matched = 1;
 	}
 
 	if (r->n_ndpi_apps > 0 && ndpi_app) {
@@ -1307,16 +1317,23 @@ rule_matches(const struct layer7_policy_rule *r, const char *iface,
 	if (host_match_out)
 		*host_match_out = host_matched;
 
+	if (r->match_mode == L7_MATCH_MODE_OR) {
+		if (r->n_ndpi_cats == 0 && r->n_ndpi_apps == 0 &&
+		    r->n_hosts == 0)
+			return 1;
+		return cat_matched || app_matched || host_matched;
+	}
+
 	/*
-	 * When BOTH apps AND hosts are configured: OR between them.
-	 * Catches QUIC/TLS flows by host when nDPI reports generic protocol.
+	 * Default AND: categoria, quando presente, e obrigatoria.
+	 * Apps+hosts continuam OR (QUIC/TLS generico).
 	 */
+	if (r->n_ndpi_cats > 0 && !cat_matched)
+		return 0;
 	if (r->n_ndpi_apps > 0 && r->n_hosts > 0)
 		return app_matched || host_matched;
-
 	if (r->n_ndpi_apps > 0)
 		return app_matched;
-
 	if (r->n_hosts > 0)
 		return host_matched;
 

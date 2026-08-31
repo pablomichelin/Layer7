@@ -107,18 +107,7 @@ if ($_POST["add_profile_policy"] ?? false) {
 						$rule["match"]["src_exclude_groups"] = $prof_exc_groups;
 					}
 
-					$apps = isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]) ? $profile["ndpi_apps"] : array();
-					$hosts = isset($profile["hosts"]) && is_array($profile["hosts"]) ? $profile["hosts"] : array();
-					$cats = isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]) ? $profile["ndpi_categories"] : array();
-					if (!empty($apps)) {
-						$rule["match"]["ndpi_app"] = array_slice($apps, 0, 64);
-					}
-					if (!empty($cats)) {
-						$rule["match"]["ndpi_category"] = array_slice($cats, 0, 8);
-					}
-					if (!empty($hosts)) {
-						$rule["match"]["hosts"] = array_slice($hosts, 0, 64);
-					}
+					layer7_policy_apply_profile_selectors($rule, $profile);
 
 					if ($prof_act === "block" &&
 					    layer7_enforcement_is_scoped_hybrid($data) &&
@@ -857,6 +846,7 @@ if ($_POST["save_policy_edit"] ?? false) {
 				if (!empty($edit_exc_groups)) {
 					$rule["match"]["src_exclude_groups"] = $edit_exc_groups;
 				}
+				layer7_policy_stamp_adulto_match_mode($rule);
 				if ($act === "tag") {
 					$rule["tag_table"] = $tag_table;
 				}

@@ -4,6 +4,28 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.78] — 2026-08-31
+
+### Changed
+
+- **BG-172 — Eventos em linguagem de operador:** a página Eventos deixa
+  de mostrar só `flow_decide` / `dns_query` / `dns_resolved`. Cada linha
+  passa a ter título e frase («Tráfego observado», «Pedido de nome (DNS)»).
+  O detalhe técnico fica atrás de «Mostrar detalhe tecnico». O filtro
+  casa texto humano e a linha crua. O ingest SQLite não muda
+  (`dns_resolved` continua fora dos relatórios).
+
+### Fixed
+
+- **BG-171 — Pornografia (host OU categoria):** o perfil rápido exigia
+  `AdultContent` **e** host da lista. `pornhub.com` falhava quando o nDPI
+  reportava `Web`/`TLS`/vazio e o simulador caía em `p-mon-001`.
+  `match_mode=or` no catálogo `adulto` e na política `profile-adulto`;
+  default das restantes políticas continua AND. Interface, origem, horário
+  e exclusões permanecem obrigatórios. Upgrade carimba `profile-adulto`
+  existente sem duplicar. Simulador alinhado ao daemon (OR + catch-all
+  em fallback).
+
 ## [1.9.77] — 2026-08-31
 
 ### Security

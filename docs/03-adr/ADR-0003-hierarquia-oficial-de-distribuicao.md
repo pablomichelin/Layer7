@@ -2,7 +2,8 @@
 
 ## Status
 
-Aceito — emenda **latest-only** `2026-08-25` (BG-164)
+Aceito — emenda **latest-only** `2026-08-25` (BG-164);
+emenda **versao-sempre-nova** `2026-08-31`
 
 ## Contexto
 
@@ -156,6 +157,13 @@ artefacto vive no builder/arquivo interno, nao no canal publico.
 
 `publish-release.sh` retira automaticamente as releases de pacote
 anteriores apos publicar a nova.
+
+**Versao sempre nova (`2026-08-31`):** e proibido rebuild ou republicar
+a mesma `PORTVERSION`/`PKGVERSION` como «pacote para reinstall». Qualquer
+entrega ao appliance exige versao nova e actualizacao de **todas** as
+mencoes da versao `latest` (Makefile, CORTEX, changelog, `MANUAL-INSTALL.md`
+links e comandos operacionais). Rollback de campo usa artefacto de
+arquivo interno / pin, nao a republicacao da tag antiga no canal publico.
 
 ## Alternativas consideradas
 

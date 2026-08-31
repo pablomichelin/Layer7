@@ -93,6 +93,14 @@ ponto 4 da lista *Conflitos documentais formais registados na F0*).
 9. Melhorar todos os dias, sem tecto. Estado actual honesto nao e destino
    nem trava. Proibido tratar «nao somos X» (NGFW ou outro) como teto
    permanente — ver ADR-0035.
+10. **Versao sempre nova (inviolavel):** nunca construir nem publicar um
+    pacote «para reinstall» da mesma `PORTVERSION`/`PKGVERSION`. Qualquer
+    mudanca que va para o appliance e **versao nova**. Actualizar **todas**
+    as mencoes da versao `latest` (Makefile, CORTEX, changelog,
+    `MANUAL-INSTALL.md` links **e** comandos, GUI/updater, ACOES). No
+    GitHub publico `pablomichelin/Layer7` fica **so** a ultima release de
+    pacote (BG-164 / ADR-0003 §12). Rollback de campo = versao anterior
+    de arquivo interno, nao republicar a mesma tag.
 
 ---
 
@@ -109,7 +117,10 @@ operacional.
 - deixar defaults indefinidos;
 - esconder limitacao tecnica;
 - alterar seguranca sensivel sem gate e validacao humana;
-- tratar documento historico como se fosse SSOT.
+- tratar documento historico como se fosse SSOT;
+- rebuild / republicar a mesma `PORTVERSION` como «pacote para reinstall»;
+- deixar releases de pacote antigas descarregaveis em `pablomichelin/Layer7`;
+- deixar URLs ou comandos de versao antiga no canal `latest`.
 
 ### E obrigatorio
 
@@ -192,7 +203,9 @@ como um unico bloco governado por checklist.
 
 1. Editar os ficheiros fonte necessarios.
 2. Actualizar documentacao no mesmo bloco.
-3. Actualizar `PORTVERSION` quando a alteracao exigir novo pacote.
+3. **Sempre** bump de `PORTVERSION`/`PORTREVISION` (PKGVERSION nova).
+   Proibido reusar a versao publicada para «reinstall». Actualizar
+   **todas** as mencoes da versao em todos os sitios onde aparece.
 4. Fazer commit local.
 5. Fazer build no builder FreeBSD.
 6. Validar o pacote/artefacto.
@@ -204,8 +217,9 @@ como um unico bloco governado por checklist.
    a versao **nao existe** para clientes/lab, mesmo com build no builder.
    Candidatos internos (NO-GO enforce) **tambem** devem ser publicados aqui;
    veredicto de producao e distinto de disponibilidade para download.
-9. Confirmar que `/releases/latest` aponta para a tag correcta e que o asset
-   `.pkg` esta anexado.
+9. Confirmar que `/releases/latest` aponta para a tag correcta, que o asset
+   `.pkg` esta anexado, e que as releases de pacote **anteriores** foram
+   retiradas do download publico (so a ultima fica em `pablomichelin/Layer7`).
 
 ---
 

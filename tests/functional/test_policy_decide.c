@@ -1048,6 +1048,177 @@ test_ad_after_expire_no_match(void)
 	layer7_idmap_fini(&map);
 }
 
+static int
+load_adulto_or(struct layer7_policy_rule *rules, int *n)
+{
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"profile-adulto\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":20,"
+	    "\"scope_global\":true,\"match_mode\":\"or\",\"match\":{"
+	    "\"hosts\":[\"pornhub.com\"],"
+	    "\"ndpi_category\":[\"AdultContent\"]}}]}}";
+
+	memset(rules, 0, sizeof(*rules));
+	*n = 0;
+	if (layer7_policies_parse(json, strlen(json), rules, n, 1) != 0)
+		return -1;
+	if (*n != 1)
+		return -1;
+	layer7_policies_sort(rules, 1);
+	return 0;
+}
+
+static void
+test_adulto_or_host_empty_cat(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	int n = 0;
+
+	check(load_adulto_or(rules, &n) == 0, "adulto parse or");
+	check(rules[0].match_mode == L7_MATCH_MODE_OR, "adulto match_mode or");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.8.130", "pornhub.com", "TLS", NULL, &dec) == 0,
+	    "adulto empty cat decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "adulto empty cat block");
+	check(strcmp(dec.matched_policy_id, "profile-adulto") == 0,
+	    "adulto empty cat id");
+}
+
+static void
+test_adulto_or_host_web_cat(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	int n = 0;
+
+	check(load_adulto_or(rules, &n) == 0, "adulto web parse");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.8.130", "www.pornhub.com", "TLS", "Web", &dec) == 0,
+	    "adulto web decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "adulto web block");
+	check(strcmp(dec.matched_policy_id, "profile-adulto") == 0,
+	    "adulto web id");
+}
+
+static void
+test_adulto_or_unknown_host_adultcontent(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	int n = 0;
+
+	check(load_adulto_or(rules, &n) == 0, "adulto unknown+cat parse");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.8.130", "random-tube.example", "TLS", "AdultContent",
+	    &dec) == 0, "adulto unknown+cat decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "adulto unknown+cat block");
+}
+
+static void
+test_adulto_or_unknown_host_web_no_block(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	int n = 0;
+
+	check(load_adulto_or(rules, &n) == 0, "adulto unknown+web parse");
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.8.130", "example.com", "TLS", "Web", &dec) == 0,
+	    "adulto unknown+web decide");
+	check(dec.action == LAYER7_ACTION_ALLOW, "adulto unknown+web no block");
+	check(dec.reason == L7_DECIDE_DEFAULT_ALLOW,
+	    "adulto unknown+web default");
+}
+
+static void
+test_adulto_or_not_shadowed_by_pmon(void)
+{
+	struct layer7_policy_rule rules[2];
+	struct layer7_decision dec;
+	const char *json =
+	    "{\"layer7\":{\"policies\":["
+	    "{\"id\":\"p-mon-001\",\"action\":\"monitor\",\"enabled\":true,"
+	    "\"priority\":50,\"match\":{}},"
+	    "{\"id\":\"profile-adulto\",\"action\":\"block\",\"enabled\":true,"
+	    "\"priority\":20,\"scope_global\":true,\"match_mode\":\"or\","
+	    "\"match\":{\"hosts\":[\"pornhub.com\"],"
+	    "\"ndpi_category\":[\"AdultContent\"]}}"
+	    "]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 2) == 0,
+	    "pmon+adulto parse");
+	check(n == 2, "pmon+adulto count");
+	layer7_policies_sort(rules, 2);
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 2, 1, NULL,
+	    "172.16.8.130", "pornhub.com", "TLS", "Web", &dec) == 0,
+	    "pmon+adulto decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "pmon does not shadow");
+	check(strcmp(dec.matched_policy_id, "profile-adulto") == 0,
+	    "pmon loser");
+}
+
+static void
+test_mixed_hosts_cat_and_default_unchanged(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"profile-escolas\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":20,"
+	    "\"scope_global\":true,\"match\":{"
+	    "\"hosts\":[\"pornhub.com\"],"
+	    "\"ndpi_category\":[\"AdultContent\"]}}]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "mixed and parse");
+	check(n == 1, "mixed and loaded");
+	check(rules[0].match_mode == L7_MATCH_MODE_AND, "mixed default and");
+	layer7_policies_sort(rules, 1);
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.8.130", "pornhub.com", "TLS", "Web", &dec) == 0,
+	    "mixed and web decide");
+	check(dec.action == LAYER7_ACTION_ALLOW,
+	    "mixed and still requires category");
+}
+
+static void
+test_profile_adulto_compat_without_match_mode(void)
+{
+	struct layer7_policy_rule rules[1];
+	struct layer7_decision dec;
+	const char *json =
+	    "{\"layer7\":{\"policies\":[{\"id\":\"profile-adulto\","
+	    "\"action\":\"block\",\"enabled\":true,\"priority\":20,"
+	    "\"scope_global\":true,\"match\":{"
+	    "\"hosts\":[\"pornhub.com\"],"
+	    "\"ndpi_category\":[\"AdultContent\"]}}]}}";
+	int n = 0;
+
+	memset(rules, 0, sizeof(rules));
+	check(layer7_policies_parse(json, strlen(json), rules, &n, 1) == 0,
+	    "compat parse");
+	check(n == 1, "compat loaded");
+	check(rules[0].match_mode == L7_MATCH_MODE_OR,
+	    "compat id implies or");
+	layer7_policies_sort(rules, 1);
+	memset(&dec, 0, sizeof(dec));
+	check(layer7_decide_for_client(NULL, 0, rules, 1, 1, NULL,
+	    "172.16.8.130", "pornhub.com", "TLS", "Web", &dec) == 0,
+	    "compat decide");
+	check(dec.action == LAYER7_ACTION_BLOCK, "compat leftover blocks");
+}
+
 int
 main(void)
 {
@@ -1081,6 +1252,13 @@ main(void)
 	test_ad_group_only_members();
 	test_ad_user_ip_remap();
 	test_ad_after_expire_no_match();
+	test_adulto_or_host_empty_cat();
+	test_adulto_or_host_web_cat();
+	test_adulto_or_unknown_host_adultcontent();
+	test_adulto_or_unknown_host_web_no_block();
+	test_adulto_or_not_shadowed_by_pmon();
+	test_mixed_hosts_cat_and_default_unchanged();
+	test_profile_adulto_compat_without_match_mode();
 
 	if (g_fail) {
 		printf("\nSOME TESTS FAILED\n");

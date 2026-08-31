@@ -5,6 +5,45 @@ Mais recente no topo.
 
 ---
 
+## 2026-08-31 — Regra inviolavel: versao sempre nova
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | documental (governanca de release) |
+| Versão | portal live `2.2.0` intacto / latest publico `1.9.77` |
+| Objectivo | Nunca pacote «para reinstall» da mesma versao; GitHub publico so a ultima |
+| Impacto | `AGENTS.md`, `CORTEX.md`, ADR-0003 §12, checklist de release, `MANUAL-INSTALL.md` |
+| Risco | Nenhum de runtime |
+| Teste | N/A (regra de processo) |
+| Rollback | Reverter os docs desta emenda |
+| Resultado | **registado**; candidato `1.9.78` continua versao nova, nao republicacao de `1.9.77` |
+
+## 2026-08-31 — BG-172 Eventos em linguagem de operador (`1.9.78`)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | pacote `1.9.78` (sem overlay `.244`) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.78` |
+| Objectivo | Pessoa sem jargão lê Eventos (tráfego observado, pedido de nome, nome encontrado) |
+| Impacto | GUI `layer7_events.php`; helper `layer7_event_explain_line`; i18n EN/ES |
+| Risco | Baixo (só apresentação; ingest de relatórios intacto) |
+| Teste | `test_events_humanize.php`; `test_i18n_coverage.js` |
+| Rollback | Reinstalar `1.9.77` |
+| Resultado | **implementado, pendente de gates/commit** |
+
+## 2026-08-31 — BG-171 Pornografia host OU categoria (`1.9.78`)
+
+| Campo | Valor |
+|-------|--------|
+| Tipo | pacote `1.9.78` (sem overlay `.244`) |
+| Versão | portal live `2.2.0` intacto / pacote `1.9.78` |
+| Objectivo | `pornhub.com` bloqueia mesmo sem nDPI AdultContent; categoria sozinha também |
+| Impacto | daemon `rule_matches`; simulador; catálogo `adulto`; migração `profile-adulto` |
+| Risco | Médio (só o perfil Pornografia passa a OR; restantes AND) |
+| Teste | `test_policy_decide.c`; `test_profile_adulto_match_mode.php` |
+| Rollback | Reinstalar `1.9.77` |
+| Resultado | **implementado, pendente de gates/commit** |
+
 ## 2026-08-31 — BG-170 check-in obrigatório (`1.9.77`)
 
 | Campo | Valor |

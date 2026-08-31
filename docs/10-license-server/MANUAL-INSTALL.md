@@ -56,6 +56,18 @@ personalizadas pelo administrador são preservadas sem alteração.
 upgrade, guardar Configurações com o idioma desejado aplica a tradução aos
 defaults reconhecidos mesmo quando esse idioma já está selecionado.
 
+**Addendum operacional BG-171 (`2026-08-31`, candidato `1.9.78`):** o
+perfil rápido **Pornografia** passa a casar host conhecido **ou**
+categoria nDPI `AdultContent`. Upgrade carimba `profile-adulto` existente
+(`match_mode=or`) sem duplicar políticas. Canal `latest` continua `1.9.77`
+até publish. Overlay `.244` intacto (P0-1). Pin enforce permanece **`1.9.8`**.
+
+**Addendum operacional BG-172 (`2026-08-31`, candidato `1.9.78`):** a
+página Eventos passa a frases de operador. A linha técnica (`flow_decide`,
+`dns_query`, `dns_resolved`) fica atrás de «Mostrar detalhe tecnico».
+Canal `latest` continua `1.9.77` até publish. Overlay `.244` intacto
+(P0-1). Pin enforce permanece **`1.9.8`**.
+
 **Addendum operacional BG-170 (`2026-08-31`, `v1.9.77`):** o check-in
 periódico é **obrigatório**. O operador já não pode desligar o comunicado
 com o servidor de licenças. Overlay `.244` intacto (P0-1). Pin enforce
@@ -1341,8 +1353,9 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 > [`docs/06-releases/aviso-releases-antigas-rr3-30.19.md`](../06-releases/aviso-releases-antigas-rr3-30.19.md).
 > Pin enforce de produção permanece **`1.9.8`** até GO de promoção.
 
-> **Nota de manutencao (obrigatoria em cada release publicada):** ao publicar
-> uma nova versao do pacote, actualizar **todas** as seccoes deste manual que
+> **Nota de manutencao (obrigatoria em cada release publicada):** nunca
+> republicar a mesma `PORTVERSION` «para reinstall». Sempre versao nova.
+> Ao publicar, actualizar **todas** as seccoes deste manual que
 > apontam para a versao do canal publico:
 > 1. esta seccao (**Links da versao actual**: versao, release, `.pkg`, sha256);
 > 2. o **addendum** da release no topo do manual;

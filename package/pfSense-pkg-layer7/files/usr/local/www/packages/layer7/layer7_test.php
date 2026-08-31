@@ -17,23 +17,7 @@ $test_results = null;
 
 function l7_test_host_matches($flow_host, $rule_host)
 {
-	if ($flow_host === "" || $rule_host === "") {
-		return false;
-	}
-	$flow_host = strtolower($flow_host);
-	$rule_host = strtolower($rule_host);
-	if ($flow_host === $rule_host) {
-		return true;
-	}
-	$fl = strlen($flow_host);
-	$rl = strlen($rule_host);
-	if ($fl <= $rl) {
-		return false;
-	}
-	if ($flow_host[$fl - $rl - 1] !== '.') {
-		return false;
-	}
-	return substr($flow_host, $fl - $rl) === $rule_host;
+	return layer7_policy_host_matches($flow_host, $rule_host);
 }
 
 function l7_test_ip_in_cidr($ip, $cidr)
@@ -196,6 +180,8 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 	});
 
 	$matched_policy = null;
+	$catchall_candidate = null;
+	$catchall_reason = "";
 	foreach ($policies as $pol) {
 		if (empty($pol["enabled"])) {
 			continue;
@@ -224,92 +210,56 @@ function l7_run_policy_test($domain, $src_ip, $ndpi_app, $ndpi_cat)
 			continue;
 		}
 
-		$app_match = true;
-		$apps = isset($pol["match"]["ndpi_app"]) && is_array($pol["match"]["ndpi_app"]) ? $pol["match"]["ndpi_app"] : array();
-		if (!empty($apps)) {
-			if ($ndpi_app === "" || !in_array($ndpi_app, $apps, true)) {
-				$app_match = false;
-			}
-		}
-
-		$cat_match = true;
-		$cats = isset($pol["match"]["ndpi_category"]) && is_array($pol["match"]["ndpi_category"]) ? $pol["match"]["ndpi_category"] : array();
-		if (!empty($cats)) {
-			if ($ndpi_cat === "" || !in_array($ndpi_cat, $cats, true)) {
-				$cat_match = false;
-			}
-		}
-
-		$host_match = true;
-		$hosts = isset($pol["match"]["hosts"]) && is_array($pol["match"]["hosts"]) ? $pol["match"]["hosts"] : array();
-		if (!empty($hosts)) {
-			$host_match = false;
-			if ($domain !== "") {
-				foreach ($hosts as $rh) {
-					if (l7_test_host_matches($domain, $rh)) {
-						$host_match = true;
-						break;
-					}
-				}
-			}
-		}
-
-		if (!$app_match) {
+		$sel = layer7_policy_selectors_evaluate($pol, $domain, $ndpi_app, $ndpi_cat);
+		if (empty($sel["matched"])) {
 			$results[] = array(
 				"type" => "policy", "id" => $pid, "name" => $pname,
 				"action" => $paction, "priority" => $ppri,
-				"matched" => false, "reason" => "App nDPI nao corresponde"
-			);
-			continue;
-		}
-		if (!$cat_match) {
-			$results[] = array(
-				"type" => "policy", "id" => $pid, "name" => $pname,
-				"action" => $paction, "priority" => $ppri,
-				"matched" => false, "reason" => "Categoria nDPI nao corresponde"
-			);
-			continue;
-		}
-		if (!$host_match) {
-			$results[] = array(
-				"type" => "policy", "id" => $pid, "name" => $pname,
-				"action" => $paction, "priority" => $ppri,
-				"matched" => false, "reason" => "Dominio nao corresponde"
+				"matched" => false, "reason" => $sel["reason"]
 			);
 			continue;
 		}
 
-		$match_reasons = array();
-		if (!empty($apps)) {
-			$match_reasons[] = "app=" . $ndpi_app;
-		}
-		if (!empty($cats)) {
-			$match_reasons[] = "cat=" . $ndpi_cat;
-		}
-		if (!empty($hosts) && $domain !== "") {
-			$match_reasons[] = "host=" . $domain;
-		}
-		if (empty($match_reasons)) {
-			$match_reasons[] = "sem filtros (match-all)";
-		}
-
+		$is_catchall = layer7_policy_is_catch_all($pol);
 		$results[] = array(
 			"type" => "policy", "id" => $pid, "name" => $pname,
 			"action" => $paction, "priority" => $ppri,
-			"matched" => true, "reason" => implode(", ", $match_reasons),
-			"final" => true
+			"matched" => true, "reason" => $sel["reason"],
+			"final" => !$is_catchall
 		);
-		$matched_policy = $pol;
+		if ($is_catchall) {
+			if ($catchall_candidate === null) {
+				$catchall_candidate = $pol;
+				$catchall_reason = $sel["reason"];
+			}
+			continue;
+		}
 
+		$matched_policy = $pol;
 		$results[] = array(
 			"type" => "verdict",
 			"action" => $paction,
 			"label" => l7_test_verdict_label($paction),
 			"reason" => l7_test_verdict_reason_policy($pid, $paction),
-			"detail" => "Politica '" . $pid . "' casou: " . implode(", ", $match_reasons),
+			"detail" => "Politica '" . $pid . "' casou: " . $sel["reason"],
 			"enforce" => $enforce
 		);
 		break;
+	}
+
+	if ($matched_policy === null && $catchall_candidate !== null) {
+		$matched_policy = $catchall_candidate;
+		$cpid = isset($catchall_candidate["id"]) ? (string)$catchall_candidate["id"] : "?";
+		$caction = isset($catchall_candidate["action"])
+		    ? (string)$catchall_candidate["action"] : "monitor";
+		$results[] = array(
+			"type" => "verdict",
+			"action" => $caction,
+			"label" => l7_test_verdict_label($caction),
+			"reason" => l7_test_verdict_reason_policy($cpid, $caction),
+			"detail" => "Politica '" . $cpid . "' casou: " . $catchall_reason,
+			"enforce" => $enforce
+		);
 	}
 
 	if ($matched_policy === null) {

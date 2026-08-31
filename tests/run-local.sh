@@ -450,6 +450,16 @@ else
 	else
 		fail "test_check_in_default_30.14"
 	fi
+	if "$PHP_BIN_E2" tests/functional/test_profile_adulto_match_mode.php; then
+		pass "test_profile_adulto_match_mode"
+	else
+		fail "test_profile_adulto_match_mode"
+	fi
+	if "$PHP_BIN_E2" tests/functional/test_events_humanize.php; then
+		pass "test_events_humanize"
+	else
+		fail "test_events_humanize"
+	fi
 	if "$PHP_BIN_E2" tests/functional/test_install_ping_inventory.php; then
 		pass "test_install_ping_inventory"
 	else

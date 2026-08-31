@@ -312,8 +312,8 @@ Exemplos de perfis individuais: Zoom, Teams, Threads, Bluesky, Deezer, DAZN,
 Anonymizers, Roblox, Free Fire. Agregados: Videoconferencia, Musica, Redes
 alternativas. **Presets:** Distracoes no trabalho, Protecao infantil, Higiene
 de rede. O atalho **Pornografia** (id `adulto`) cobre tubos/cams/plataformas
-pagas até 64 hosts e a categoria nDPI `AdultContent` — para cobertura completa
-use a blacklist UT1 adult.
+pagas até 64 hosts **ou** a categoria nDPI `AdultContent` (`match_mode=or`) —
+para cobertura completa use a blacklist UT1 adult.
 
 ### 7.3 Acoes disponiveis
 

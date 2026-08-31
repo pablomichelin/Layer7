@@ -2637,6 +2637,7 @@ function layer7_load_or_default()
 		$raw = file_get_contents($cfgpath);
 		$j = json_decode($raw, true);
 		if (is_array($j) && isset($j["layer7"]) && is_array($j["layer7"])) {
+			layer7_policies_migrate_adulto_match_mode($j);
 			return $j;
 		}
 	}
@@ -2657,6 +2658,7 @@ function layer7_save_json($data)
 	$cfgpath = layer7_cfg_path();
 	$data = layer7_config_interfaces_normalize($data);
 	if (isset($data["layer7"]) && is_array($data["layer7"])) {
+		layer7_policies_migrate_adulto_match_mode($data);
 		$data["layer7"]["check_in_enabled"] = true;
 		if (isset($data["layer7"]["mitm"])) {
 			$data["layer7"]["mitm"] = layer7_mitm_normalize($data["layer7"]["mitm"]);
@@ -3887,6 +3889,255 @@ function layer7_policy_block_valid($policy)
 	    ? $policy["match"] : array();
 	return !empty($match["hosts"]) || !empty($match["ndpi_app"]) ||
 	    !empty($match["ndpi_category"]);
+}
+
+/**
+ * BG-171 — match_mode da política. Default "and" (semântica histórica).
+ * profile-adulto sem campo herda "or" (leftover 1.9.76).
+ */
+function layer7_policy_match_mode($policy)
+{
+	if (!is_array($policy)) {
+		return "and";
+	}
+	$raw = strtolower(trim((string)($policy["match_mode"] ?? "")));
+	if ($raw === "or") {
+		return "or";
+	}
+	if ($raw === "and") {
+		return "and";
+	}
+	if ((string)($policy["id"] ?? "") === "profile-adulto") {
+		return "or";
+	}
+	return "and";
+}
+
+function layer7_profile_match_mode($profile)
+{
+	if (!is_array($profile)) {
+		return "and";
+	}
+	$raw = strtolower(trim((string)($profile["match_mode"] ?? "and")));
+	return ($raw === "or") ? "or" : "and";
+}
+
+function layer7_policy_host_matches($flow_host, $rule_host)
+{
+	if ($flow_host === "" || $rule_host === "") {
+		return false;
+	}
+	$flow_host = strtolower($flow_host);
+	$rule_host = strtolower($rule_host);
+	if ($flow_host === $rule_host) {
+		return true;
+	}
+	$fl = strlen($flow_host);
+	$rl = strlen($rule_host);
+	if ($fl <= $rl) {
+		return false;
+	}
+	if ($flow_host[$fl - $rl - 1] !== ".") {
+		return false;
+	}
+	return substr($flow_host, $fl - $rl) === $rule_host;
+}
+
+function layer7_policy_is_catch_all($policy)
+{
+	if (!is_array($policy)) {
+		return true;
+	}
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	$ifaces = (isset($policy["interfaces"]) && is_array($policy["interfaces"]))
+	    ? $policy["interfaces"] : array();
+	return empty($match["ndpi_app"]) && empty($match["ndpi_category"]) &&
+	    empty($match["hosts"]) && empty($ifaces) &&
+	    empty($match["src_hosts"]) && empty($match["src_cidrs"]) &&
+	    empty($match["ad_users"]) && empty($match["ad_groups"]);
+}
+
+/**
+ * Selectors only (após interface/origem/horário). Alinhado a rule_matches().
+ *
+ * @return array{matched:bool,app:bool,cat:bool,host:bool,reason:string}
+ */
+function layer7_policy_selectors_evaluate($policy, $domain, $ndpi_app, $ndpi_cat)
+{
+	$match = (isset($policy["match"]) && is_array($policy["match"]))
+	    ? $policy["match"] : array();
+	$apps = (isset($match["ndpi_app"]) && is_array($match["ndpi_app"]))
+	    ? $match["ndpi_app"] : array();
+	$cats = (isset($match["ndpi_category"]) && is_array($match["ndpi_category"]))
+	    ? $match["ndpi_category"] : array();
+	$hosts = (isset($match["hosts"]) && is_array($match["hosts"]))
+	    ? $match["hosts"] : array();
+	$has_apps = !empty($apps);
+	$has_cats = !empty($cats);
+	$has_hosts = !empty($hosts);
+	$app_ok = false;
+	$cat_ok = false;
+	$host_ok = false;
+	if ($has_apps && $ndpi_app !== "" && in_array($ndpi_app, $apps, true)) {
+		$app_ok = true;
+	}
+	if ($has_cats && $ndpi_cat !== "" && in_array($ndpi_cat, $cats, true)) {
+		$cat_ok = true;
+	}
+	if ($has_hosts && $domain !== "") {
+		foreach ($hosts as $rh) {
+			if (layer7_policy_host_matches($domain, (string)$rh)) {
+				$host_ok = true;
+				break;
+			}
+		}
+	}
+
+	$mode = layer7_policy_match_mode($policy);
+	if ($mode === "or") {
+		$matched = (!$has_apps && !$has_cats && !$has_hosts) ||
+		    $app_ok || $cat_ok || $host_ok;
+		$reason = $matched ? "match_mode=or" : "Nenhum selector corresponde";
+		if ($matched && $host_ok) {
+			$reason = "host=" . $domain;
+		} elseif ($matched && $cat_ok) {
+			$reason = "cat=" . $ndpi_cat;
+		} elseif ($matched && $app_ok) {
+			$reason = "app=" . $ndpi_app;
+		} elseif ($matched && !$has_apps && !$has_cats && !$has_hosts) {
+			$reason = "sem filtros (match-all)";
+		}
+		return array(
+			"matched" => $matched,
+			"app" => $app_ok,
+			"cat" => $cat_ok,
+			"host" => $host_ok,
+			"reason" => $reason,
+		);
+	}
+
+	if ($has_cats && !$cat_ok) {
+		return array(
+			"matched" => false,
+			"app" => $app_ok,
+			"cat" => false,
+			"host" => $host_ok,
+			"reason" => "Categoria nDPI nao corresponde",
+		);
+	}
+	if ($has_apps && $has_hosts) {
+		$matched = $app_ok || $host_ok;
+		$reason = $matched
+		    ? ($host_ok ? ("host=" . $domain) : ("app=" . $ndpi_app))
+		    : "App/host nDPI nao corresponde";
+		return array(
+			"matched" => $matched,
+			"app" => $app_ok,
+			"cat" => $cat_ok || !$has_cats,
+			"host" => $host_ok,
+			"reason" => $reason,
+		);
+	}
+	if ($has_apps && !$app_ok) {
+		return array(
+			"matched" => false,
+			"app" => false,
+			"cat" => $cat_ok || !$has_cats,
+			"host" => $host_ok,
+			"reason" => "App nDPI nao corresponde",
+		);
+	}
+	if ($has_hosts && !$host_ok) {
+		return array(
+			"matched" => false,
+			"app" => $app_ok,
+			"cat" => $cat_ok || !$has_cats,
+			"host" => false,
+			"reason" => "Dominio nao corresponde",
+		);
+	}
+	$reasons = array();
+	if ($has_apps) {
+		$reasons[] = "app=" . $ndpi_app;
+	}
+	if ($has_cats) {
+		$reasons[] = "cat=" . $ndpi_cat;
+	}
+	if ($has_hosts && $domain !== "") {
+		$reasons[] = "host=" . $domain;
+	}
+	if (empty($reasons)) {
+		$reasons[] = "sem filtros (match-all)";
+	}
+	return array(
+		"matched" => true,
+		"app" => $app_ok || !$has_apps,
+		"cat" => $cat_ok || !$has_cats,
+		"host" => $host_ok || !$has_hosts,
+		"reason" => implode(", ", $reasons),
+	);
+}
+
+function layer7_policy_stamp_adulto_match_mode(&$policy)
+{
+	if (!is_array($policy) || (string)($policy["id"] ?? "") !== "profile-adulto") {
+		return false;
+	}
+	if (($policy["match_mode"] ?? "") === "or") {
+		return false;
+	}
+	$policy["match_mode"] = "or";
+	return true;
+}
+
+function layer7_policies_migrate_adulto_match_mode(&$data)
+{
+	$n = 0;
+	if (!isset($data["layer7"]["policies"]) || !is_array($data["layer7"]["policies"])) {
+		return 0;
+	}
+	foreach ($data["layer7"]["policies"] as &$pol) {
+		if (layer7_policy_stamp_adulto_match_mode($pol)) {
+			$n++;
+		}
+	}
+	unset($pol);
+	return $n;
+}
+
+function layer7_policy_apply_profile_selectors(&$rule, $profile)
+{
+	if (!is_array($rule) || !is_array($profile)) {
+		return;
+	}
+	if (!isset($rule["match"]) || !is_array($rule["match"])) {
+		$rule["match"] = array();
+	}
+	$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]))
+	    ? $profile["ndpi_apps"] : array();
+	$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"]))
+	    ? $profile["hosts"] : array();
+	$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]))
+	    ? $profile["ndpi_categories"] : array();
+	unset($rule["match"]["ndpi_app"], $rule["match"]["ndpi_category"],
+	    $rule["match"]["hosts"]);
+	if (!empty($apps)) {
+		$rule["match"]["ndpi_app"] = array_slice($apps, 0, 64);
+	}
+	if (!empty($cats)) {
+		$rule["match"]["ndpi_category"] = array_slice($cats, 0, 8);
+	}
+	if (!empty($hosts)) {
+		$rule["match"]["hosts"] = array_slice($hosts, 0, 64);
+	}
+	if (layer7_profile_match_mode($profile) === "or") {
+		$rule["match_mode"] = "or";
+	} elseif ((string)($rule["id"] ?? "") === "profile-adulto") {
+		$rule["match_mode"] = "or";
+	} else {
+		unset($rule["match_mode"]);
+	}
 }
 
 /**
@@ -5563,22 +5814,8 @@ function layer7_profile_reconnect_policy(&$data, $profile)
 				$keep[$mk] = $pol["match"][$mk];
 			}
 		}
-		$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]))
-		    ? $profile["ndpi_apps"] : array();
-		$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"]))
-		    ? $profile["hosts"] : array();
-		$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]))
-		    ? $profile["ndpi_categories"] : array();
 		$pol["match"] = $keep;
-		if (!empty($apps)) {
-			$pol["match"]["ndpi_app"] = array_slice($apps, 0, 64);
-		}
-		if (!empty($cats)) {
-			$pol["match"]["ndpi_category"] = array_slice($cats, 0, 8);
-		}
-		if (!empty($hosts)) {
-			$pol["match"]["hosts"] = array_slice($hosts, 0, 64);
-		}
+		layer7_policy_apply_profile_selectors($pol, $profile);
 		if (isset($profile["name"]) && is_string($profile["name"]) &&
 		    trim($profile["name"]) !== "") {
 			$pol["name"] = trim($profile["name"]);
@@ -5755,21 +5992,7 @@ function layer7_apply_profile_toggles($enable_ids, $disable_ids)
 			"priority" => 20,
 			"match" => array(),
 		);
-		$apps = (isset($profile["ndpi_apps"]) && is_array($profile["ndpi_apps"]))
-		    ? $profile["ndpi_apps"] : array();
-		$hosts = (isset($profile["hosts"]) && is_array($profile["hosts"]))
-		    ? $profile["hosts"] : array();
-		$cats = (isset($profile["ndpi_categories"]) && is_array($profile["ndpi_categories"]))
-		    ? $profile["ndpi_categories"] : array();
-		if (!empty($apps)) {
-			$rule["match"]["ndpi_app"] = array_slice($apps, 0, 64);
-		}
-		if (!empty($cats)) {
-			$rule["match"]["ndpi_category"] = array_slice($cats, 0, 8);
-		}
-		if (!empty($hosts)) {
-			$rule["match"]["hosts"] = array_slice($hosts, 0, 64);
-		}
+		layer7_policy_apply_profile_selectors($rule, $profile);
 		$policies[] = $rule;
 		$changed = true;
 		$out["enabled"]++;
@@ -10889,6 +11112,25 @@ function layer7_render_styles()
 	.layer7-page .help-block { margin-bottom: 0; max-width: 760px; }
 	.layer7-page .table > thead > tr > th { vertical-align: middle; }
 	.layer7-page .pre-scrollable { margin-bottom: 0; background: #fbfbfb; border: 1px solid #ddd; padding: 12px; }
+	.layer7-page .l7-event-legend { margin: 0 0 14px; padding: 10px 12px; background: #f7f9fb; border: 1px solid #e5e5e5; border-radius: 3px; }
+	.layer7-page .l7-event-legend p { margin: 0; font-weight: 600; color: #333; }
+	.layer7-page .l7-event-legend ul { margin: 6px 0 0; padding-left: 18px; }
+	.layer7-page .l7-event-legend li { margin: 2px 0; color: #555; font-size: 13px; }
+	.layer7-page .l7-event-list { max-height: 420px; overflow: auto; border: 1px solid #ddd; background: #fff; }
+	.layer7-page .l7-event-list--live { max-height: 320px; }
+	.layer7-page .l7-event-empty { padding: 14px 12px; color: #888; font-size: 13px; }
+	.layer7-page .l7-event-row { padding: 10px 12px; border-bottom: 1px solid #eee; }
+	.layer7-page .l7-event-row:last-child { border-bottom: 0; }
+	.layer7-page .l7-event-row--monitor { border-left: 3px solid #6c7a89; }
+	.layer7-page .l7-event-row--block { border-left: 3px solid #c0392b; }
+	.layer7-page .l7-event-row--allow { border-left: 3px solid #1e8449; }
+	.layer7-page .l7-event-row--dns { border-left: 3px solid #2471a3; }
+	.layer7-page .l7-event-row--info { border-left: 3px solid #bdc3c7; }
+	.layer7-page .l7-event-meta { color: #888; font-size: 12px; margin-right: 8px; }
+	.layer7-page .l7-event-title { font-weight: 700; font-size: 13px; color: #333; }
+	.layer7-page .l7-event-summary { margin: 4px 0 0; color: #444; font-size: 13px; line-height: 1.45; }
+	.layer7-page .l7-event-raw { display: none; margin: 6px 0 0; color: #777; font-size: 11px; font-family: Menlo, Consolas, monospace; word-break: break-all; }
+	.layer7-page.l7-show-tech .l7-event-raw { display: block; }
 	.layer7-page .alert { margin-bottom: 18px; }
 	.layer7-page .checkbox-inline,
 	.layer7-page .radio-inline { padding-top: 0; }
@@ -11975,6 +12217,181 @@ function layer7_reports_parse_kv_line($text)
 		}
 	}
 	return $out;
+}
+
+function layer7_event_category_plain($cat)
+{
+	$map = array(
+		"SocialNetwork" => l7_t("rede social"),
+		"AdultContent" => l7_t("conteudo adulto"),
+		"Streaming" => l7_t("video / streaming"),
+		"Chat" => l7_t("mensagens"),
+		"Game" => l7_t("jogos"),
+		"Advertisement" => l7_t("publicidade"),
+		"Web" => l7_t("site web"),
+		"VPN" => "VPN",
+		"Download" => l7_t("transferencias"),
+		"ConnCheck" => l7_t("verificacao de ligacao"),
+	);
+	$cat = trim((string)$cat);
+	if ($cat === "" || $cat === "-") {
+		return "";
+	}
+	return $map[$cat] ?? $cat;
+}
+
+function layer7_event_what_plain($app, $cat, $host)
+{
+	$app = trim((string)$app);
+	$host = trim((string)$host);
+	$generic = array("TLS", "HTTP", "QUIC", "Unknown", "Unspecified", "DNS", "");
+	$cat_plain = layer7_event_category_plain($cat);
+	$parts = array();
+	if ($host !== "" && $host !== "-") {
+		$parts[] = $host;
+	}
+	if ($app !== "" && !in_array($app, $generic, true)) {
+		$parts[] = $app;
+	}
+	if ($cat_plain !== "") {
+		$parts[] = $cat_plain;
+	}
+	return implode(" — ", $parts);
+}
+
+/**
+ * BG-172 — frase de operador para uma linha de log. Nao altera o ficheiro.
+ *
+ * @return array{when:string,title:string,summary:string,tone:string,kind:string,raw:string}
+ */
+function layer7_event_explain_line($line)
+{
+	$line = rtrim((string)$line, "\r\n");
+	$out = array(
+		"when" => "",
+		"title" => l7_t("Mensagem do sistema"),
+		"summary" => $line,
+		"tone" => "info",
+		"kind" => "",
+		"raw" => $line,
+	);
+	if ($line === "") {
+		return $out;
+	}
+
+	$ts = 0;
+	$ts_text = "";
+	$rest = $line;
+	if (layer7_reports_parse_line_timestamp($line, $ts, $ts_text, $rest)) {
+		$out["when"] = ($ts > 0) ? date("H:i:s", $ts) : "";
+	}
+	if (preg_match('/^\[(\w+)\]\s*(.*)$/', $rest, $m)) {
+		$rest = $m[2];
+	}
+	$kv = layer7_reports_parse_kv_line($rest);
+	$src = trim((string)($kv["src"] ?? ($kv["client"] ?? "")));
+	$host = trim((string)($kv["host"] ?? ($kv["qname"] ?? ($kv["domain"] ?? ""))));
+	$dst = trim((string)($kv["dst"] ?? ($kv["ip"] ?? "")));
+	$what = layer7_event_what_plain($kv["app"] ?? "", $kv["cat"] ?? "", $host);
+	$action = strtolower(trim((string)($kv["action"] ?? "")));
+
+	if (strpos($rest, "flow_decide:") === 0) {
+		$out["kind"] = "flow_decide";
+		$who = ($src !== "") ? $src : l7_t("um dispositivo");
+		$target = ($what !== "") ? $what : l7_t("um destino na Internet");
+		if ($action === "block") {
+			$out["title"] = l7_t("Trafego bloqueado");
+			$out["tone"] = "block";
+			$out["summary"] = sprintf(l7_t("O dispositivo %s tentou aceder a %s."), $who, $target)
+			    . " " . l7_t("O Layer7 bloqueou este acesso.");
+		} elseif ($action === "allow") {
+			$out["title"] = l7_t("Trafego permitido");
+			$out["tone"] = "allow";
+			$out["summary"] = sprintf(l7_t("O dispositivo %s acedeu a %s."), $who, $target)
+			    . " " . l7_t("O Layer7 permitiu este acesso.");
+		} else {
+			$out["title"] = l7_t("Trafego observado");
+			$out["tone"] = "monitor";
+			$out["summary"] = sprintf(l7_t("O dispositivo %s acedeu a %s."), $who, $target)
+			    . " " . l7_t("O Layer7 so esta a observar - nao bloqueou.");
+		}
+		return $out;
+	}
+	if (strpos($rest, "dns_query:") === 0) {
+		$out["kind"] = "dns_query";
+		$out["title"] = l7_t("Pedido de nome (DNS)");
+		$out["tone"] = "dns";
+		$who = ($src !== "") ? $src : l7_t("um dispositivo");
+		$name = ($host !== "") ? $host : l7_t("um site");
+		$out["summary"] = sprintf(l7_t("O dispositivo %s perguntou o endereco de %s."), $who, $name);
+		return $out;
+	}
+	if (strpos($rest, "dns_resolved:") === 0) {
+		$out["kind"] = "dns_resolved";
+		$out["title"] = l7_t("Nome encontrado (DNS)");
+		$out["tone"] = "dns";
+		$name = ($host !== "") ? $host : l7_t("um site");
+		$ip = ($dst !== "") ? $dst : l7_t("um endereco");
+		$out["summary"] = sprintf(l7_t("%s passou a ter o endereco %s."), $name, $ip);
+		return $out;
+	}
+	if (strpos($rest, "dns_block:") === 0) {
+		$out["kind"] = "dns_block";
+		$out["title"] = l7_t("Nome bloqueado (DNS)");
+		$out["tone"] = "block";
+		$name = ($host !== "") ? $host : l7_t("um site");
+		$out["summary"] = sprintf(l7_t("O Layer7 impediu o nome %s."), $name);
+		return $out;
+	}
+	if (strpos($rest, "enforce_block") === 0) {
+		$out["kind"] = "enforce_block";
+		$out["title"] = l7_t("Bloqueio aplicado no firewall");
+		$out["tone"] = "block";
+		$who = ($src !== "") ? $src : l7_t("um dispositivo");
+		$target = ($dst !== "") ? $dst : (($host !== "") ? $host : l7_t("um destino"));
+		$out["summary"] = sprintf(
+		    l7_t("O firewall passou a recusar %s para o dispositivo %s."),
+		    $target, $who
+		);
+		return $out;
+	}
+	if (strpos($rest, "bl_block:") === 0 || strpos($rest, "sni_bl_block:") === 0) {
+		$out["kind"] = "blacklist";
+		$out["title"] = l7_t("Bloqueado pela lista negra");
+		$out["tone"] = "block";
+		$who = ($src !== "") ? $src : l7_t("um dispositivo");
+		$target = ($what !== "") ? $what : l7_t("um destino");
+		$out["summary"] = sprintf(l7_t("O dispositivo %s tentou aceder a %s."), $who, $target)
+		    . " " . l7_t("O Layer7 bloqueou este acesso.");
+		return $out;
+	}
+	if (strpos($rest, "allowlist_") === 0) {
+		$out["kind"] = "allowlist";
+		$out["title"] = l7_t("Destino de confianca");
+		$out["tone"] = "allow";
+		$target = ($what !== "") ? $what : l7_t("um destino");
+		$out["summary"] = sprintf(l7_t("Destino na lista de confianca: %s."), $target);
+		return $out;
+	}
+
+	if ($rest !== $line && $rest !== "") {
+		$out["summary"] = $rest;
+	}
+	return $out;
+}
+
+function layer7_events_line_matches($line, $filter)
+{
+	$filter = trim((string)$filter);
+	if ($filter === "") {
+		return true;
+	}
+	if (stripos((string)$line, $filter) !== false) {
+		return true;
+	}
+	$ex = layer7_event_explain_line($line);
+	return (stripos((string)$ex["title"], $filter) !== false)
+	    || (stripos((string)$ex["summary"], $filter) !== false);
 }
 
 function layer7_reports_resolver_domains()

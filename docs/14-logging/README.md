@@ -66,6 +66,11 @@ cópias `.1` a `.10`, consome o restante e termina no ficheiro activo.
 - **Limpar histórico** remove eventos do SQLite e avança os cursores;
 - **Limpar visualização** na página Eventos só limpa o buffer do browser;
 - logs de texto não são apagados pela GUI; expiram pela rotação limitada.
+- **BG-172:** a página Eventos mostra título + frase de operador
+  (`Tráfego observado`, `Pedido de nome (DNS)`, `Nome encontrado (DNS)`).
+  A linha crua (`flow_decide`, `dns_query`, `dns_resolved`) só aparece com
+  «Mostrar detalhe tecnico». Isto é apresentação: o colector SQLite não
+  passa a ingerir `dns_resolved`.
 
 ## Syslog
 

@@ -37,6 +37,7 @@ appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 **Ultima versao do pacote publicada em release (canal publico/updater):**
 `1.9.77` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.77`;
 `SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`; BG-170 check-in obrigatório; cadeia F1.2);
+**Candidato em curso (não publicado):** `1.9.78` (BG-171 Pornografia host OU AdultContent + BG-172 Eventos em linguagem de operador).
 herda `1.9.76`
 (`SHA256=a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`; BG-169 Pornografia; cadeia F1.2);
 herda `1.9.75`
@@ -202,6 +203,11 @@ Releases de pacote anteriores sao retiradas (tags git preservadas).
 Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
 so para `latest`. Pin enforce `1.9.8` permanece politica, sem URL publico.
 ADR-0003 §12. `publish-release.sh` retira as anteriores apos cada publish.
+**Regra inviolavel de versao (`2026-08-31`):** nunca um pacote «para
+reinstall» da mesma `PORTVERSION`. Toda entrega ao appliance e **versao
+nova**; actualizar **todas** as mencoes da versao `latest`; no GitHub
+publico fica **so** a ultima release de pacote. Candidato actual `1.9.78`
+(nao republicar `1.9.77`).
 **BG-165 (cliente `1.9.73`) + BG-166 (license-server HEAD):** auditoria
 de licença. Daemon usa `/usr/local/bin/curl` em activate/check-in e
 `flock` no estado de check-in. GUI: badge via `.lic` se o daemon estiver
@@ -233,6 +239,13 @@ GUI sem interruptor; daemon ignora JSON `false`.
 `releases/latest` = `v1.9.77`;
 `SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`.
 `v1.9.76` retirada do download (latest-only / BG-164).
+**BG-171 (`1.9.78`, implementado, pendente de gates/commit):** Pornografia
+casa host conhecido **ou** `AdultContent`. `match_mode=or` só em
+`profile-adulto`; default AND intacto. Simulador alinhado. Sem overlay `.244`.
+**BG-172 (`1.9.78`, implementado, pendente de gates/commit):** Eventos em
+linguagem de operador (`flow_decide`/`dns_query`/`dns_resolved` → frases).
+Linha crua só com «Mostrar detalhe tecnico». Ingest de relatórios intacto
+(`dns_resolved` continua fora do SQLite). Sem overlay `.244`.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

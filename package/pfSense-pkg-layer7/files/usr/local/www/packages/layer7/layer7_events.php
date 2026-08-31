@@ -24,6 +24,20 @@ function layer7_events_human_bytes($bytes)
 	return $bytes . " B";
 }
 
+function layer7_events_render_row($ex)
+{
+	$tone = preg_replace('/[^a-z]/', '', (string)($ex["tone"] ?? "info"));
+	if ($tone === "") {
+		$tone = "info";
+	}
+	echo '<div class="l7-event-row l7-event-row--' . htmlspecialchars($tone) . '">';
+	echo '<span class="l7-event-meta">' . htmlspecialchars((string)($ex["when"] ?? "")) . '</span>';
+	echo '<span class="l7-event-title">' . htmlspecialchars((string)($ex["title"] ?? "")) . '</span>';
+	echo '<p class="l7-event-summary">' . htmlspecialchars((string)($ex["summary"] ?? "")) . '</p>';
+	echo '<div class="l7-event-raw">' . htmlspecialchars((string)($ex["raw"] ?? "")) . '</div>';
+	echo '</div>';
+}
+
 $filter = isset($_GET["filter"]) ? trim($_GET["filter"]) : "";
 $source = isset($_GET["source"]) ? trim((string)$_GET["source"]) : "events";
 if (!in_array($source, array("events", "operational"), true)) {
@@ -43,28 +57,26 @@ if (file_exists($log_path)) {
 }
 
 if (isset($_GET["ajax"]) && $_GET["ajax"] === "1") {
-	$live_logs = $all_logs;
-	if ($filter !== "") {
-		$live_logs = array();
-		foreach ($all_logs as $line) {
-			if (stripos($line, $filter) !== false) {
-				$live_logs[] = $line;
-			}
+	$live_logs = array();
+	foreach ($all_logs as $line) {
+		if (layer7_events_line_matches($line, $filter)) {
+			$live_logs[] = $line;
 		}
 	}
 	$live_logs = array_slice($live_logs, -$live_lines);
-	header("Content-Type: text/plain; charset=utf-8");
-	echo implode("\n", $live_logs);
+	$explained = array();
+	foreach ($live_logs as $line) {
+		$explained[] = layer7_event_explain_line($line);
+	}
+	header("Content-Type: application/json; charset=utf-8");
+	echo json_encode($explained, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 	exit;
 }
 
-$filtered_logs = $all_logs;
-if ($filter !== "") {
-	$filtered_logs = array();
-	foreach ($all_logs as $line) {
-		if (stripos($line, $filter) !== false) {
-			$filtered_logs[] = $line;
-		}
+$filtered_logs = array();
+foreach ($all_logs as $line) {
+	if (layer7_events_line_matches($line, $filter)) {
+		$filtered_logs[] = $line;
 	}
 }
 
@@ -115,6 +127,19 @@ layer7_render_styles();
 				href="layer7_events.php?source=events"><?= l7_t("Eventos de trafego"); ?></a>
 			<a class="btn btn-sm <?= $source === "operational" ? "btn-primary" : "btn-default"; ?>"
 				href="layer7_events.php?source=operational"><?= l7_t("Log operacional"); ?></a>
+			<label class="checkbox-inline" style="margin-left:12px;">
+				<input type="checkbox" id="l7-show-tech" />
+				<?= l7_t("Mostrar detalhe tecnico"); ?>
+			</label>
+		</div>
+
+		<div class="l7-event-legend">
+			<p><?= l7_t("O que significa cada linha"); ?></p>
+			<ul>
+				<li><?= l7_t("Trafego observado: o Layer7 viu um acesso e nao bloqueou."); ?></li>
+				<li><?= l7_t("Pedido de nome (DNS): o aparelho perguntou o endereco de um site."); ?></li>
+				<li><?= l7_t("Nome encontrado (DNS): o sistema descobriu o numero (IP) desse site."); ?></li>
+			</ul>
 		</div>
 
 		<div class="layer7-admin-block">
@@ -127,7 +152,9 @@ layer7_render_styles();
 				<button type="button" class="btn btn-default btn-sm" id="l7-live-clear"><?= l7_t("Limpar visualizacao"); ?></button>
 				<span id="l7-live-count" class="text-muted" style="font-size:12px; margin-left:8px;"></span>
 			</div>
-				<pre id="l7-live-view" class="pre-scrollable" style="max-height: 320px; font-size: 12px; white-space: pre-wrap;">Carregando...</pre>
+				<div id="l7-live-view" class="l7-event-list l7-event-list--live">
+					<div class="l7-event-empty"><?= l7_t("Aguardando eventos..."); ?></div>
+				</div>
 			</div>
 		</div>
 
@@ -138,7 +165,7 @@ layer7_render_styles();
 					<input type="hidden" name="source" value="<?= htmlspecialchars($source); ?>">
 					<div class="form-group">
 						<input type="text" name="filter" class="form-control" style="width: 320px;" maxlength="100"
-							value="<?= htmlspecialchars($filter); ?>" placeholder="<?= l7_t("Ex: enforce, flow_decide, BitTorrent, SIGUSR1..."); ?>" />
+							value="<?= htmlspecialchars($filter); ?>" placeholder="<?= l7_t("Ex: TikTok, bloqueado, 172.16..."); ?>" />
 					</div>
 					<button type="submit" class="btn btn-primary"><?= l7_t("Filtrar"); ?></button>
 					<?php if ($filter !== "") { ?>
@@ -156,10 +183,13 @@ layer7_render_styles();
 			<div class="layer7-admin-block__body">
 				<?php if ($filter !== "") { ?>
 				<p class="small text-muted"><?= l7_t("filtro"); ?>: <?= htmlspecialchars($filter); ?></p>
-				<?php } else { ?>
 				<?php } ?>
 				<?php if (count($filtered_logs) > 0) { ?>
-				<pre class="pre-scrollable" style="max-height: 400px; font-size: 12px;"><?= htmlspecialchars(implode("\n", $filtered_logs)); ?></pre>
+				<div class="l7-event-list">
+					<?php foreach ($filtered_logs as $line) {
+						layer7_events_render_row(layer7_event_explain_line($line));
+					} ?>
+				</div>
 				<?php } else { ?>
 				<div class="alert alert-info">
 					<?php if ($filter !== "") { ?>
@@ -182,22 +212,63 @@ layer7_render_styles();
 	var refreshBtn = document.getElementById('l7-live-refresh');
 	var clearBtn  = document.getElementById('l7-live-clear');
 	var countEl   = document.getElementById('l7-live-count');
+	var techBox   = document.getElementById('l7-show-tech');
+	var pageEl    = document.querySelector('.layer7-page');
 	var paused    = false;
 	var timer     = null;
 	var refreshMs = 2000;
 	var ajaxUrl   = 'layer7_events.php?ajax=1&source=<?= rawurlencode($source); ?>&filter=<?= rawurlencode($filter); ?>';
 	var l7WaitingEvents = <?= json_encode(l7_t("Aguardando eventos...")); ?>;
 	var l7LineSuffix = <?= json_encode(l7_t("linha(s)")); ?>;
+	var techKey = 'l7-events-show-tech';
 
 	/* Buffer acumulado — novas linhas sao sempre adicionadas, nunca removidas */
 	var seenLines = [];
 	var maxLines  = 500;
 
+	function eventRaw(item) {
+		if (!item) return '';
+		if (typeof item === 'string') return item;
+		return item.raw || '';
+	}
+
+	function renderRow(ex) {
+		var tone = String((ex && ex.tone) || 'info').replace(/[^a-z]/g, '');
+		if (!tone) tone = 'info';
+		var row = document.createElement('div');
+		row.className = 'l7-event-row l7-event-row--' + tone;
+		var meta = document.createElement('span');
+		meta.className = 'l7-event-meta';
+		meta.textContent = (ex && ex.when) ? ex.when : '';
+		var title = document.createElement('span');
+		title.className = 'l7-event-title';
+		title.textContent = (ex && ex.title) ? ex.title : '';
+		var summary = document.createElement('p');
+		summary.className = 'l7-event-summary';
+		summary.textContent = (ex && ex.summary) ? ex.summary : '';
+		var raw = document.createElement('div');
+		raw.className = 'l7-event-raw';
+		raw.textContent = eventRaw(ex);
+		row.appendChild(meta);
+		row.appendChild(title);
+		row.appendChild(summary);
+		row.appendChild(raw);
+		return row;
+	}
+
 	function updateView() {
 		if (!liveView) return;
-		liveView.textContent = seenLines.length > 0
-			? seenLines.join('\n')
-			: l7WaitingEvents;
+		liveView.textContent = '';
+		if (seenLines.length === 0) {
+			var empty = document.createElement('div');
+			empty.className = 'l7-event-empty';
+			empty.textContent = l7WaitingEvents;
+			liveView.appendChild(empty);
+		} else {
+			for (var i = 0; i < seenLines.length; i++) {
+				liveView.appendChild(renderRow(seenLines[i]));
+			}
+		}
 		liveView.scrollTop = liveView.scrollHeight;
 		if (countEl) {
 			countEl.textContent = seenLines.length > 0
@@ -211,37 +282,27 @@ layer7_render_styles();
 		var newLines = [];
 
 		if (seenLines.length === 0) {
-			/* Buffer vazio — aceitar tudo */
 			newLines = incoming;
 		} else {
-			/*
-			 * Procurar a ultima linha ja vista dentro das incoming.
-			 * O que vier depois e novo.
-			 */
-			var lastSeen   = seenLines[seenLines.length - 1];
+			var lastSeen = eventRaw(seenLines[seenLines.length - 1]);
 			var overlapIdx = -1;
 			for (var i = incoming.length - 1; i >= 0; i--) {
-				if (incoming[i] === lastSeen) {
+				if (eventRaw(incoming[i]) === lastSeen) {
 					overlapIdx = i;
 					break;
 				}
 			}
 
 			if (overlapIdx >= 0) {
-				/* Sobreposicao encontrada — so o que vem depois e novo */
 				newLines = incoming.slice(overlapIdx + 1);
 			} else {
-				/*
-				 * Sem sobreposicao (linhas antigas saiam do tail).
-				 * Filtrar duplicados recentes para evitar repeticoes.
-				 */
 				var recentSet = {};
 				var window100 = seenLines.slice(-100);
 				for (var j = 0; j < window100.length; j++) {
-					recentSet[window100[j]] = true;
+					recentSet[eventRaw(window100[j])] = true;
 				}
 				newLines = incoming.filter(function(l) {
-					return !recentSet[l];
+					return !recentSet[eventRaw(l)];
 				});
 			}
 		}
@@ -251,7 +312,6 @@ layer7_render_styles();
 		for (var k = 0; k < newLines.length; k++) {
 			seenLines.push(newLines[k]);
 		}
-		/* Limitar tamanho maximo do buffer */
 		if (seenLines.length > maxLines) {
 			seenLines = seenLines.slice(seenLines.length - maxLines);
 		}
@@ -264,11 +324,13 @@ layer7_render_styles();
 		xhr.open('GET', ajaxUrl, true);
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState !== 4 || xhr.status !== 200) return;
-			var text = xhr.responseText.trim();
-			if (!text) return; /* Resposta vazia — manter o buffer actual */
-			var incoming = text.split('\n').filter(function(l) {
-				return l.trim() !== '';
-			});
+			var incoming = [];
+			try {
+				incoming = JSON.parse(xhr.responseText);
+			} catch (e) {
+				return;
+			}
+			if (!incoming || !incoming.length) return;
 			mergeIncoming(incoming);
 		};
 		xhr.send(null);
@@ -279,10 +341,30 @@ layer7_render_styles();
 		timer = setInterval(fetchLive, refreshMs);
 	}
 
+	function applyTech() {
+		if (!pageEl || !techBox) return;
+		if (techBox.checked) {
+			pageEl.classList.add('l7-show-tech');
+		} else {
+			pageEl.classList.remove('l7-show-tech');
+		}
+		try {
+			localStorage.setItem(techKey, techBox.checked ? '1' : '0');
+		} catch (e) {}
+	}
+
+	if (techBox && pageEl) {
+		try {
+			techBox.checked = localStorage.getItem(techKey) === '1';
+		} catch (e) {}
+		techBox.addEventListener('change', applyTech);
+		applyTech();
+	}
+
 	if (toggleBtn) {
 		toggleBtn.addEventListener('click', function() {
 			paused = !paused;
-			toggleBtn.textContent   = paused ? '<?= l7_t("Retomar") ?>' : '<?= l7_t("Pausar") ?>';
+			toggleBtn.textContent   = paused ? <?= json_encode(l7_t("Retomar")); ?> : <?= json_encode(l7_t("Pausar")); ?>;
 			toggleBtn.className     = paused
 				? 'btn btn-warning btn-sm'
 				: 'btn btn-success btn-sm';
@@ -301,8 +383,7 @@ layer7_render_styles();
 		});
 	}
 
-	/* Carregar contexto inicial */
-	liveView.textContent = l7WaitingEvents;
+	updateView();
 	fetchLive();
 	schedule();
 })();

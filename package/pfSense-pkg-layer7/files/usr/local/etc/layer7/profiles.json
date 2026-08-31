@@ -1814,7 +1814,8 @@
       "name": "Pornografia",
       "group": "Segurança e bypass",
       "icon": "fa-ban",
-      "description": "Perfis rapidos: tubos, cams, plataformas pagas e categoria nDPI AdultContent. Limite 64 hosts; cobertura completa continua na blacklist UT1 adult.",
+      "description": "Perfis rapidos: tubos, cams, plataformas pagas e categoria nDPI AdultContent (host conhecido OU AdultContent). Limite 64 hosts; cobertura completa continua na blacklist UT1 adult.",
+      "match_mode": "or",
       "ndpi_apps": [],
       "ndpi_categories": [
         "AdultContent"
