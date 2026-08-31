@@ -213,6 +213,11 @@ migrar a função.
 | Plataforma | secções escuras, linhas planas, label esquerda, campo/help direita | `Form_*`/PHP/CSS/include | formulário WebGUI | reproduzir estrutura nativa, sem cards decorativos | P | comparação lado a lado com formulário pfSense |
 | Plataforma | tabelas, alerts e botões pfSense | PHP/CSS/include | tema WebGUI | primitivos nativos, sem design system paralelo | P | tema/desktop/320/CSS próprio mínimo e escopado |
 | Plataforma | ausência de cards/sombras/chips/sticky bars | todas | contrato ADR-0037 | estrutura plana e densa | P | revisão visual + busca CSS/classes |
+| Plataforma | `head.inc`/`foot.inc` e assets WebGUI | todas | pfSense pré-carrega tema/runtime | consumir sem duplicar | P | DOM: CSS/JS/fontes por rota |
+| Plataforma | `Form.class.php`/`Form_*` antes de HTML manual | formulários | API disponível na versão alvo | componente nativo | P | revisão de fonte + DOM comparado |
+| Plataforma | zero `<style>` inline/`style=` visual na página migrada | `layer7.inc`/PHP | legado actual injeta CSS | remover; excepção só formal | P | busca estática + contagem DOM |
+| Plataforma | orçamento de recursos próprios | CSS/JS/libs | somente necessidade funcional | não aumentar sem GO | P | bytes/requests antes/depois |
+| Fronteira | lógica funcional congelada | handlers/includes/daemon | trilha frontend-only | mesmos inputs/defaults/efeitos | P | diff de handler + requests/JSON/efeitos |
 
 ## 5. Dependências e superfícies alteradas por acção
 

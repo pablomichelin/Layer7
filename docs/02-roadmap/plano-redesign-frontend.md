@@ -1,18 +1,61 @@
 # Plano governado — redesenho do frontend Layer7
 
 **Backlog:** BG-174.
-**Estado:** GUI0 documental concluído no commit `3563757` após gates PASS;
-GUI1–GUI7 bloqueados até GO humano.
+**Estado:** GUI0 documental `3563757`, ADR-0037 `f44a14b` e emenda visual
+`c429be3` concluídos após gates PASS. Emenda frontend-only implementada,
+pendente de gates/commit; GUI1–GUI7 bloqueados até GO humano.
 **Baseline:** `1.9.79`, `main@4354aec`.
 **Nota de fase:** `GUI0…GUI7` são ondas internas deste plano, não substituem as
 fases canónicas F0…F7. A execução técnica cruza F4/F5/F7 e obedece aos seus
 gates.
 
+**Contrato humano reafirmado (`2026-08-31`):** o produto está funcional. Esta
+trilha não autoriza desenvolver, refatorar ou reinterpretar a ferramenta. O
+único problema a resolver é a apresentação e a organização operacional da GUI:
+encontrar, compreender e executar as funções existentes com menos confusão,
+usando a WebGUI que o próprio pfSense já fornece. Emenda documental
+implementada, pendente de gates/commit.
+
 ## 1. Escopo e não-escopo
 
-Objectivo: redefinir arquitectura da informação, fluxos, componentes,
-linguagem, feedback, acessibilidade e responsividade preservando todas as
-funções inventariadas.
+Objectivo: reorganizar arquitectura da informação, fluxos, formulários,
+linguagem, feedback, acessibilidade e responsividade preservando integralmente
+as funções inventariadas e a sua semântica de servidor.
+
+### 1.1 Envelope permitido — somente frontend
+
+Pode mudar, uma página por bloco:
+
+- ordem e agrupamento visual de conteúdo já existente;
+- divisão de uma página longa em vistas/modos de apresentação nativos;
+- HTML/PHP de renderização depois de concluída a lógica do handler;
+- labels, help text e mensagens PT/EN/ES, sem alterar o significado técnico;
+- tabs/subtabs, filtros, foco, retorno, paginação e progressive disclosure,
+  desde que sejam apenas apresentação sobre os mesmos dados e que rotas,
+  privilégios, parâmetros e deep links permaneçam compatíveis; se exigirem
+  mudar o handler, a onda para e volta ao GO humano;
+- JavaScript progressivo apenas para contexto, foco, confirmação, filtro e
+  apresentação; tudo deve continuar seguro e compreensível sem JavaScript;
+- CSS estritamente funcional quando não existir primitivo equivalente no
+  pfSense, mediante excepção documentada e teste de tema/responsividade.
+
+### 1.2 Envelope proibido — lógica funcional congelada
+
+É proibido nesta trilha:
+
+- alterar handlers, decisões, defaults, validações, clamps ou contratos de
+  dados para acomodar o novo layout;
+- alterar formato/persistência de `layer7.json`, migrações ou secrets;
+- alterar comandos, sinais, reload/restart, PF, Unbound, cron, daemon, nDPI,
+  licença, update, backup, importação, remoção ou Captive Portal;
+- alterar ordem ou condição dos efeitos produzidos pelos POSTs;
+- alterar privilégios, CSRF, método HTTP ou transformar acção destrutiva em GET;
+- introduzir feature, comportamento, automatismo ou “melhoria” do motor;
+- refatorar backend junto com uma mudança visual;
+- tocar funcionalmente Identity/MITM; apenas a apresentação existente entra na
+  paridade, mantendo os gates e o NO-GO;
+- criar componente visual quando `head.inc`, `foot.inc`, `Form.class.php`,
+  `Form_*`, Bootstrap/pfSense, `print_info_box()` ou a tabela nativa já resolvem.
 
 Não-escopo sem novo GO:
 
@@ -42,6 +85,72 @@ Não-escopo sem novo GO:
 | G-UX8 | appliance pfSense CE/lab: monitor primeiro; nenhum PF inesperado |
 | G-UX9 | diff revisto, staging explícito, versão nova e release checklist |
 | G-UX10 | conformidade ADR-0037: barras escuras de secção, linhas planas, label esquerda, controlo/help direita; sem cards/sticky/design paralelo |
+| G-UX11 | integração nativa: `head.inc`/`foot.inc` e primitivos pfSense; zero `<style>` inline e zero duplicação de tema na página tocada, salvo excepção formal |
+| G-UX12 | congelamento funcional: mesmos inputs/defaults/POSTs/handlers/efeitos, comprovados por matriz e comparação antes/depois |
+| G-UX13 | orçamento frontend: nenhum framework novo; recursos próprios só na página que usa; bytes/requests próprios medidos e não aumentados sem GO |
+
+### 2.1 Contrato técnico de renderização nativa
+
+O pfSense é o design system e o runtime visual. O package não desenha uma cópia
+dele.
+
+1. Toda página entra pelo `head.inc` e termina pelo `foot.inc`.
+2. Formulários usam prioritariamente `Form`, `Form_Section`, `Form_Input`,
+   `Form_Select`, `Form_Checkbox`, `Form_StaticText` e equivalentes disponíveis
+   na versão alvo. HTML manual só quando a API nativa não expressar o caso.
+3. Listas usam tabelas/classes nativas; mensagens usam `print_info_box()`,
+   `print_input_errors()` e alerts do host; navegação usa tabs do host.
+4. Cor, tipografia, espaçamento, borda, foco, responsividade e estado de botão
+   vêm de `/css/pfSense.css` e dos assets carregados pelo `head.inc`.
+5. O alvo por página é **zero CSS visual próprio**. CSS permitido deve resolver
+   apenas uma lacuna funcional comprovada, ficar escopado, sem cores/medidas de
+   tema duplicadas e com justificativa na revisão.
+6. São proibidos `<style>` inline, atributo `style=`, cards, chips, sombras,
+   grids decorativos, tabs redesenhadas e helpers que recriem `Form_*`.
+7. JavaScript nativo já carregado é preferido. Biblioteca adicional só pode ser
+   carregada na rota que a utiliza e por necessidade funcional existente; não
+   pode ser adicionada para decoração ou transição visual.
+8. Helpers Layer7 podem normalizar dados para a view ou reduzir repetição
+   semântica, mas não formar um design system próprio.
+
+### 2.2 Método obrigatório por página
+
+Cada bloco técnico futuro deve seguir esta sequência:
+
+1. congelar a rota, privilege, GET/POST, campos, defaults, validações, mensagens,
+   ficheiros alterados e efeitos externos na matriz;
+2. capturar baseline visual/DOM e recursos carregados no appliance;
+3. reorganizar somente a camada de renderização;
+4. comparar requests e estado persistido antes/depois com os mesmos inputs;
+5. provar que nenhuma chamada, comando, sinal, PF ou serviço mudou;
+6. validar sem JavaScript, teclado, PT/EN/ES, 320/768/desktop e tema pfSense;
+7. validar bytes/requests e ausência de estilo visual duplicado;
+8. submeter o bloco à revisão humana antes de avançar para outra página.
+
+### 2.3 Regras de organização operacional
+
+A melhoria deve vir da ordem e do fluxo, não de decoração:
+
+- cada página declara uma finalidade principal e uma acção primária;
+- estado e leitura aparecem antes de configuração; configuração aparece antes
+  de diagnóstico/reparação; perigo fica por último e isolado;
+- tarefas frequentes ficam abertas; opções avançadas ficam recolhidas, mas
+  continuam localizáveis por título e help text;
+- listas, criação, edição e biblioteca não competem na mesma área visível;
+- `Editar` abre imediatamente o formulário no topo de uma vista dedicada ou
+  move foco de forma inequívoca; nunca recarrega no topo deixando-o abaixo;
+- filtros, paginação, categoria aberta, retorno e posição são preservados na
+  camada de apresentação sem alterar o conjunto de dados;
+- o operador vê separadamente: alteração local, validação, gravação, reload do
+  daemon, aplicação PF e restart; a GUI descreve os efeitos existentes, não
+  cria novos efeitos;
+- nomes começam pela linguagem operacional; paths, tabelas PF, sinais e detalhe
+  cru ficam disponíveis sob detalhe técnico;
+- botões usam verbo + objecto + consequência quando houver ambiguidade;
+- estados vazio, carregando, erro, aviso, pendente e sucesso ocupam o ponto
+  normal da página pfSense e sempre indicam a próxima acção segura;
+- nenhuma função é removida, escondida sem destino ou condicionada apenas por
+  JavaScript; a matriz decide onde cada função reaparece.
 
 ## 3. Ondas
 
@@ -61,18 +170,20 @@ Não-escopo sem novo GO:
 
 ### GUI1 — fundação nativa pfSense e componentes mínimos
 
-- **Objectivo:** reutilizar os primitivos nativos pfSense e extrair apenas
-  helpers funcionais mínimos, sem mudar rotas, organização ou comportamento.
-- **Ficheiros previstos:** `layer7.inc` ou includes novos no mesmo package,
-  CSS/JS externos, páginas piloto, testes e docs.
+- **Objectivo:** remover a camada visual paralela numa página piloto e provar
+  que o pfSense sozinho entrega o padrão, sem mudar comportamento.
+- **Ficheiros previstos:** secção de apresentação da página piloto,
+  `layer7.inc` apenas para retirar/reduzir renderização visual compartilhada,
+  testes e docs. CSS/JS novo não é resultado esperado.
 - **Preserva:** tabs, handlers, campos, POSTs, mensagens e defaults.
 - **Impacto:** consistência de `Form_Section`/`Form_*`, linhas planas, `table`,
-  `nav-tabs`, `alert`, `btn` e `print_info_box()`; remoção gradual de cards,
-  sombras, chips e barras sticky.
+  `nav-tabs`, `alert`, `btn` e `print_info_box()`; retirada gradual de
+  `layer7_render_styles()`, estilos inline, cards, sombras, chips e sticky bars.
 - **Risco:** CSS global/pfSense Plus/CE e CSP.
-- **Testes:** PHP/JS, snapshots visuais manuais, sem-JS, teclado, PT/EN/ES.
+- **Testes:** PHP, DOM/assets antes/depois, zero alteração de request/efeito,
+  snapshots visuais manuais, sem-JS, teclado, PT/EN/ES e orçamento frontend.
 - **Gate:** uma página piloto read-only renderizada no mesmo padrão de formulário
-  da referência pfSense, sem cards e sem regressão.
+  da referência pfSense, com G-UX10…G-UX13 PASS e sem regressão.
 - **Rollback:** include/style antigo por página; pacote anterior.
 - **Versão/build:** sim; novo `PORTVERSION/PKGVERSION`, build/pkg/release.
 
@@ -81,6 +192,8 @@ Não-escopo sem novo GO:
 - **Objectivo:** melhorar tabs/subtabs dentro da organização actual do package;
   usar `Visão geral/Proteção/Clientes/Atividade/Sistema` apenas como taxonomia
   de conteúdo e linguagem.
+- **Regra:** organizar primeiro dentro de cada rota. Mover, fundir ou esconder
+  tabs primárias não faz parte desta onda sem GO humano específico.
 - **Ficheiros:** nav helpers/XML, páginas, i18n, testes/docs.
 - **Preserva:** privilégios, URLs, deep links, Identity/MITM visíveis conforme
   contrato e redirect Remote Access.
@@ -94,6 +207,9 @@ Não-escopo sem novo GO:
 ### GUI3 — Policies e Biblioteca de perfis
 
 - **Objectivo:** separar aplicadas/biblioteca/criar/editar; edição dedicada.
+- **Limite funcional:** os handlers não mudam; payloads, defaults, perfis,
+  seletores, ordem de avaliação e resync permanecem semanticamente equivalentes;
+  a separação é de vista e contexto, não de motor.
 - **Ficheiros:** `layer7_policies.php` e possivelmente novas rotas de modo,
   includes/JS/i18n, profiles UI tests/docs.
 - **Preserva:** todas as linhas Policies/Profiles da matriz, inclusive
@@ -110,6 +226,8 @@ Não-escopo sem novo GO:
 ### GUI4 — Clientes e Atividade
 
 - **Objectivo:** Devices paginado/filtrável, Groups; Events/Reports com contexto.
+- **Limite funcional:** paginação/filtro não podem alterar o conjunto persistido
+  nem a semântica de bulk; eventos/exports mantêm a mesma fonte e conteúdo.
 - **Ficheiros:** devices/groups/events/reports/export, shared list, JS/i18n/docs.
 - **Preserva:** alias/bulk group, resync, live/pause/clear visual, raw detail,
   filtros/paginação/export/clear DB.
@@ -124,6 +242,8 @@ Não-escopo sem novo GO:
 ### GUI5 — Settings e Diagnostics
 
 - **Objectivo:** separar secções, impacto antes de salvar e resultado por etapa.
+- **Limite funcional:** `save_scope`, campos, valores, validações e efeitos são
+  congelados. A GUI apenas torna o impacto existente compreensível.
 - **Ficheiros:** settings/ajax/js, diagnostics, shared components/i18n/tests/docs.
 - **Preserva:** todos os 83 campos/acções, defaults, clamps, anti-bypass,
   blockpage/CP, logs/reports, signals, anti-DoH, repair e support.
@@ -138,6 +258,8 @@ Não-escopo sem novo GO:
 ### GUI6 — licença, update, backup e remoção
 
 - **Objectivo:** isolar operações de sistema e zona de perigo.
+- **Limite funcional:** não reimplementar nenhuma operação; apenas apresentar os
+  handlers existentes com separação, explicação e confirmação nativas.
 - **Ficheiros:** settings/update JS/AJAX, removal, componentes/i18n/tests/docs.
 - **Preserva:** activate/revoke, entitlement transitions, export sem secrets,
   import/disarm, GitHub allowlist, update stop/fetch/pkg/start, keep flags e
@@ -175,6 +297,7 @@ Não-escopo sem novo GO:
 | persistência | JSON antes/depois, defaults/migrations, secrets separados, config antiga |
 | efeitos | SIGHUP vs restart vs PF/filter vs Unbound/cron, incluindo falha parcial |
 | UX | 13 fluxos prioritários; ≤3 interações para Pornografia; contexto/dirty; comparação lado a lado com formulário pfSense e zero cards estruturais |
+| assets | `head.inc`/`foot.inc`; CSS/JS/fonts carregados; `<style>`/`style=`; bytes e requests próprios por rota |
 | acessibilidade | teclado completo, foco após erro/save, labels, aria-live, zoom/contraste |
 | responsivo | 320, 768 e desktop; tabelas/listas, modais curtos, sem clipping |
 | i18n | PT/EN/ES mesma função/copy/default; strings dinâmicas e públicas |
@@ -188,12 +311,17 @@ Não-escopo sem novo GO:
 Sucesso exige todos os critérios do pedido, com destaque para:
 
 - 100% das linhas da matriz com destino/teste;
+- 100% dos handlers, defaults, validações e efeitos preservados;
 - nenhum formulário aberto fora da área visível sem foco/indicação;
 - estado salvo/daemon/PF/restart distinto;
 - filtros/contexto preservados;
 - funções avançadas encontráveis e recolhidas;
 - PT/EN/ES e teclado equivalentes;
 - zero mudança de segurança causada apenas pela apresentação.
+- zero framework novo, zero design system Layer7 e zero CSS visual próprio nas
+  páginas migradas, salvo excepção formal aprovada;
+- cada página migrada carrega o padrão do pfSense, não uma reprodução dele;
+- nenhuma onda mistura frontend com refactor ou desenvolvimento funcional.
 
 Parar e pedir validação se surgir incompatibilidade CE, necessidade de novo
 framework/build/CSP, alteração de privilege/CSRF, mudança de default/contrato,

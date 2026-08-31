@@ -117,6 +117,11 @@ Ele existe para evitar tres erros comuns:
    primeiros wireframes ainda usavam cards/quadrados. A referência humana
    resolve a ambiguidade: vence o formulário pfSense plano definido na emenda
    ADR-0037; cards não são a unidade visual do redesign.
+10. **Frontend nativo: imitar vs consumir o pfSense (`2026-08-31`):** usar cores
+    e classes semelhantes não autoriza uma camada visual Layer7. A emenda
+    frontend-only da ADR-0037 e o plano BG-174 prevalecem: `head.inc`/`foot.inc`,
+    `Form_*` e assets do host primeiro; lógica congelada; CSS visual próprio é
+    zero por defeito e qualquer excepção exige prova e gate.
 
 ---
 

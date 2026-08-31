@@ -14,6 +14,8 @@ em `2026-08-31`.
 - tabelas nativas para colecções;
 - botões com classes, cores, tamanho e posição do pfSense;
 - `print_info_box()`/`alert` para aviso, erro, sucesso e dirty state;
+- renderização pelos componentes/assets pré-carregados do pfSense, não por uma
+  reprodução CSS destes wireframes;
 - sem cards, grelhas de KPI, chips, sombras, skeleton cards, sticky bars,
   painéis laterais ou caixas arredondadas como estrutura principal.
 

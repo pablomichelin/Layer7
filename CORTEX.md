@@ -279,6 +279,11 @@ esquerda, controlo/help à direita. Cards, quadrados decorativos, sombras, chips
 skeleton cards e sticky bars ficam rejeitados. Documentação/wireframes
 **FEITOS no git** (`c429be3`) após gates PASS; sem
 código/`PORTVERSION`/appliance.
+**BG-174 / ADR-0037 emenda frontend-only (`2026-08-31`):** decisão humana
+reafirma produto funcional e congela motor/handlers/defaults/efeitos. O pfSense
+pré-carrega o padrão via `head.inc`/`foot.inc`; GUI deve consumir `Form_*` e
+assets nativos, com alvo de zero CSS visual próprio. Plano/paridade/análise
+implementados, pendentes de gates/commit; sem código/`PORTVERSION`/appliance.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

@@ -524,4 +524,8 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
   após gates PASS; referência humana incorporada:
   barras escuras de secção, linhas planas, label esquerda, campo/help direita;
   cards/sticky/chips/sombras rejeitados.
+- [ ] **BG-174 / ADR-0037 emenda frontend-only** — produto/handlers/efeitos
+  congelados; `head.inc`/`foot.inc` + `Form_*` + assets pfSense são a base;
+  alvo zero CSS visual próprio; orçamento de assets e paridade antes/depois.
+  Pendente de gates/commit.
 - [ ] **BG-128** remediações restantes — P0-1 ACTIVO (falta GO rebuild `api` + smoke); próximo = P0-1 rebuild api + smoke (sem P2-9; sem P2-7/8/10/11; sem M1/P2-17/P2-3; sem P1-9 runtime; sem P2-2; sem P2-13; sem P2-4; sem P2-6 Bloco A; sem P2-6 Bloco B; sem P3-1; sem P3-2; sem P3-3A; sem P3-3B; sem P3-3C; sem P3-4; sem P3-5; sem P3-6; sem P3-8; sem P3-9; sem P2-16; sem P2-14; sem P3-7; sem P0-2 residual; sem `.244` neste bloco)

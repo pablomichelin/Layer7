@@ -56,6 +56,15 @@ label fixa à esquerda, campo e ajuda à direita, densidade funcional e quase
 nenhuma caixa decorativa. A revisão anterior ainda tinha excesso de quadrados e
 cards; esse desenho fica rejeitado.
 
+**Verificação técnica complementar:** no appliance, a página DHCP nativa
+carrega `/css/pfSense.css` e os assets comuns via `head.inc`, usa
+`form-horizontal`, `panel` e `form-group`, e não contém bloco `<style>` próprio.
+A página Reports do Layer7 carrega os mesmos assets do host, mas acrescenta dois
+blocos `<style>`, cerca de 13,6 KB de CSS inline, atributos `style=` e dezenas
+de ocorrências de classes `layer7-*`/`l7*`. Portanto o problema não é ausência
+do padrão pfSense: é a camada visual própria aplicada por cima dele. GUI1 deve
+retirar essa duplicação por página, sem tocar na lógica funcional.
+
 ## 2. Evidência e método
 
 Foram cruzadas três fontes:
@@ -254,8 +263,9 @@ preserva contexto. Ações destrutivas permanecem `POST` + CSRF + confirmação.
 | acção destrutiva | secção nativa isolada por ordem/conteúdo e confirmação; sem caixa visual de outro produto |
 
 Implementação futura deve criar apenas wrappers funcionais mínimos sobre o
-Bootstrap/Form stack do pfSense e adoptar JS externo progressivo. Não será
-criado design system visual concorrente. Nenhuma
+Bootstrap/Form stack do pfSense. O alvo é zero CSS visual próprio; JavaScript
+progressivo só entra para comportamento operacional que o servidor já suporta.
+Não será criado design system visual concorrente. Nenhuma
 autorização, validação ou decisão de segurança pode existir apenas no browser.
 
 ## 11. Acessibilidade, responsividade e i18n

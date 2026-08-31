@@ -10,6 +10,11 @@ git** (`f44a14b`) após gates PASS. Aplica-se à trilha BG-174 / GUI1–GUI7.
 label à esquerda e controlo/ajuda à direita. Emenda documental **FEITA no git**
 (`c429be3`) após gates PASS.
 
+**Emenda de implementação nativa (`2026-08-31`):** o frontend deve consumir o
+padrão pré-carregado pelo pfSense, não recriá-lo dentro do package. A lógica do
+produto fica congelada; somente renderização, organização e linguagem podem
+mudar. Emenda implementada documentalmente, pendente de gates/commit.
+
 ## Contexto
 
 O diagnóstico GUI0 propôs cinco áreas conceptuais para reduzir a carga
@@ -58,6 +63,17 @@ risco de incompatibilidade com futuras versões da WebGUI.
     padrão nativo de adicionar/activar quando semanticamente aplicável; perigo
     usa o padrão nativo de confirmação, sem uma “zona” desenhada como produto
     separado.
+13. `head.inc`/`foot.inc` e os recursos do host são a fonte visual. O alvo de
+    cada página migrada é zero CSS visual próprio e zero duplicação de tema.
+14. `Form.class.php`/`Form_*` e os componentes nativos têm precedência sobre
+    HTML/CSS manual. Uma excepção deve provar que o pfSense não oferece o
+    comportamento, ser mínima, escopada, documentada e testada.
+15. São proibidos `<style>` inline, atributos `style=` e helpers que recriem
+    tabs, painéis, campos, botões, cores, espaçamentos ou responsividade do host.
+16. Recursos adicionais são carregados só na rota que realmente precisa deles.
+    Nenhum framework, biblioteca ou JavaScript entra por decoração.
+17. Esta trilha congela handlers, GET/POST, defaults, validações, persistência,
+    comandos, sinais e efeitos. Organizar a view não autoriza alterar o motor.
 
 ## Consequências
 
