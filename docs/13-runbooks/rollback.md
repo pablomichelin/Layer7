@@ -16,10 +16,8 @@ CA/secrets é `/var/db/layer7/deinstall-preserve` (0700, 0600 nos
 segredos); se o backup obrigatório falhar, o hook **não** faz
 `rm -rf /usr/local/etc/layer7` (A1/A2).
 
-O canal público publica **apenas** `latest` (`1.9.79` agora). Não há URL
-para pacotes anteriores (BG-164). Rollback público actual = reinstalar
-`1.9.79`. URL abaixo **preparada** para o artefacto `1.9.80` (build/sign/verify
-PASS; **não publicado**):
+O canal público publica **apenas** `latest` (`1.9.80`). Não há URL para
+pacotes anteriores (BG-164). Rollback público = reinstalar o actual:
 
 ```sh
 fetch -o /tmp/install.sh \

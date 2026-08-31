@@ -3,10 +3,9 @@
 **Systemup Solução em Tecnologia** · [www.systemup.inf.br](https://www.systemup.inf.br)
 
 > Guia público do operador. Fiel ao estado publicado em GitHub Releases.  
-> **Comandos/artefacto (nao publicado):** **`1.9.80`**
-> **GitHub `latest` neste momento:** **`1.9.79`**
-> **SHA256 (artefacto 1.9.80):** `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
-> **Release `latest`:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.79>
+> **Pacote de referência (canal `latest`):** **`1.9.80`**
+> **SHA256:** `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
+> **Release:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.80>
 > **Latest:** <https://github.com/pablomichelin/Layer7/releases/latest>  
 > **Alinhamento:** `2026-08-31`
 
@@ -25,9 +24,8 @@ Licenciamento comercial, activação e suporte de enforce: **contactar a Systemu
 | [Pacote de Avaliação](LAYER7-EVALUATION-PACK-PT.md) | Avaliação comercial |
 | [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) | `.pkg` + `.sha256` oficiais |
 
-**Regra:** os comandos abaixo correspondem ao artefacto **`1.9.80`**
-(ainda **não publicado**). GitHub `latest` continua **`1.9.79`**. Em cada
-publicação, actualizar este manual no mesmo bloco.
+**Regra:** os comandos abaixo correspondem à release **`1.9.80`**. Em cada
+nova release, actualizar este manual no mesmo bloco da publicação.
 
 ---
 
@@ -35,8 +33,7 @@ publicação, actualizar este manual no mesmo bloco.
 
 | Canal | Versão | Papel |
 |-------|--------|--------|
-| **`latest` / updater GUI** | **`1.9.79`** | Único pacote público no GitHub agora |
-| **Artefacto F1.2 (comandos)** | **`1.9.80`** | Build/sign/verify PASS; **não publicado** |
+| **`latest` / updater GUI** | **`1.9.80`** | Único pacote público para download |
 | **Produção enforce (pin de política)** | **`1.9.8`** | Referência estável até GO — **não** está no canal público |
 
 **MITM (inspecção TLS):**
@@ -76,14 +73,14 @@ Cada release publica pelo menos:
 - `pfSense-pkg-layer7-<versão>.pkg`
 - `pfSense-pkg-layer7-<versão>.pkg.sha256`
 
-**Artefacto `1.9.80` (comandos; ainda não publicado). `latest` GitHub = `1.9.79`:**
+**Canal público `1.9.80`:**
 
 - Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg>
 - SHA256: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg.sha256>
 - **SHA256 esperado:** `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
 
 > Caminho oficial: **`install.sh`** assinado (F1.2). O canal público
-> publica **apenas** a release `latest` (`1.9.79` agora).
+> publica **apenas** esta release de pacote.
 
 **Verificar integridade:**
 
@@ -174,11 +171,9 @@ pkg delete -y pfSense-pkg-layer7
 
 ### 4.5 Rollback
 
-O canal público **não** disponibiliza pacotes anteriores. Rollback
-público actual = reinstalar `1.9.79` (`latest` GitHub). A secção 4.1
-prepara comandos do artefacto `1.9.80` (ainda não publicado). Qualquer
-pin enforce antigo é arquivo interno Systemup — contactar suporte;
-**não** há URL público.
+O canal público **não** disponibiliza pacotes anteriores. Reinstalar
+`1.9.80` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
+Systemup — contactar suporte; **não** há URL público.
 
 ---
 

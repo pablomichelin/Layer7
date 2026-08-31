@@ -35,12 +35,15 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.79` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.79`;
-`SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`; BG-173 Captive Portal + anti-bypass; cadeia F1.2).
-**Candidato seguinte (nao publicado):** `1.9.80` (BG-174 / GUI1 Status nativo;
-SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
-source/build `b84634c`; estado: **build/sign/verify PASS; pendente de
-commit/tag/publicação/appliance**);
+`1.9.80` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.80` →
+`7bd1fd012e6b8dcf00780f980d62f1a955de061a`;
+`SHA256=f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
+BG-174 / GUI1 Status nativo; cadeia F1.2). **PUBLICADO.** Appliance/visual
+**pendentes** (`.254` SSH timeout; nao instalado).
+herda `1.9.79`
+(`SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`;
+BG-173 Captive Portal + anti-bypass; cadeia F1.2; tag git preservada;
+retirada do download publico / latest-only);
 herda `1.9.77`
 (`SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`; BG-170 check-in obrigatório; cadeia F1.2);
 herda `1.9.76`
@@ -202,10 +205,8 @@ e `/usr/local/bin/curl`, e re-tenta aos 15 min. Endpoint live intacto.
 Sem overlay `.244` (P0-1). Caixas ≤`1.9.71` precisam de upgrade para
 aparecer em Instalações.
 **BG-164 (`2026-08-25`) — canal publico latest-only:**
-`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.79`
-até haver publicação nova). Candidato `1.9.80` (SHA256
-`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
-**nao** e `latest`; **nao publicado**).
+`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.80`
+agora). `v1.9.79` retirada do download publico (tag git preservada).
 Releases de pacote anteriores sao retiradas (tags git preservadas).
 `pfsense-layer7` nao e canal de download (Releases de pacote retiradas).
 Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
@@ -214,10 +215,9 @@ ADR-0003 §12. `publish-release.sh` retira as anteriores apos cada publish.
 **Regra inviolavel de versao (`2026-08-31`):** nunca um pacote «para
 reinstall» da mesma `PORTVERSION`. Toda entrega ao appliance e **versao
 nova**; actualizar **todas** as mencoes da versao `latest`; no GitHub
-publico fica **so** a ultima release de pacote. Actual `latest` = `1.9.79`.
-Candidato `1.9.80` (SHA256
-`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
-build/sign/verify PASS; nao publicado; nao republicar `1.9.79`).
+publico fica **so** a ultima release de pacote. Actual `latest` = `1.9.80`.
+`v1.9.79` retirada do download (latest-only / BG-164; tag git preservada).
+Nao republicar `1.9.79`.
 **BG-165 (cliente `1.9.73`) + BG-166 (license-server HEAD):** auditoria
 de licença. Daemon usa `/usr/local/bin/curl` em activate/check-in e
 `flock` no estado de check-in. GUI: badge via `.lic` se o daemon estiver
@@ -264,9 +264,18 @@ anti-bypass. `AppleiCloud` saiu do default de fábrica; migração
 idempotente; destinos locais via L7ALLOW; sem rdr Layer7 no IP do portal
 nativo; CNA ignorado sem `pass quick`. Default PF continua
 `legacy_global`. Sem overlay `.244`.
-`releases/latest` = `v1.9.79`;
+`releases/latest` foi `v1.9.79` ate `1.9.80`;
 `SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`.
 `v1.9.78` retirada do download (latest-only / BG-164).
+**BG-174 / GUI1 PUBLICADO `v1.9.80` (`2026-08-31`):** Status nativo
+(`Form(false)` / `Form_Section` / `Form_StaticText` / painéis). Frontend-only.
+`releases/latest` = `v1.9.80`;
+`SHA256=f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
+tag `7bd1fd012e6b8dcf00780f980d62f1a955de061a`; 7 assets F1.2.
+`v1.9.79` retirada do download (latest-only / BG-164; tag git preservada).
+`blacklists-ut1-current` preservada. Appliance/visual **pendentes**
+(`.254` SSH timeout; nao instalado). **Nao** homologado no appliance.
+GUI2–GUI7 bloqueados ate GO.
 **BG-174 / GUI0 (`2026-08-31`):** análise integral do frontend,
 inventário técnico, matriz de paridade, arquitectura de informação,
 wireframes e plano GUI0–GUI7 **FEITOS no git** (`3563757`) após gates PASS.
@@ -297,11 +306,11 @@ código/`PORTVERSION`/appliance.
 **BG-174 / GUI1 piloto Status (`2026-08-31`):** apresentação nativa de
 `layer7_status.php` (`Form_Section`/`Form_StaticText`/`panel`/`table`; sem
 `layer7_render_styles()`, sem CSS/JS novo). Handler `restart_service` e
-cálculos intactos. `layer7.inc` não tocado. Candidato **`1.9.80`**
+cálculos intactos. `layer7.inc` não tocado. **PUBLICADO** **`1.9.80`**
 (SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
-source/build `b84634c`). Estado: **build/sign/verify PASS; pendente de
-commit/tag/publicação/appliance**. Sem tag, release ou appliance.
-GUI2–GUI7 continuam bloqueados até GO.
+source/build `b84634c`; tag `7bd1fd0`). `releases/latest` = `v1.9.80`.
+Appliance/visual **pendentes** (`.254` inacessível). GUI2–GUI7 continuam
+bloqueados até GO.
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.

@@ -6,22 +6,23 @@
 
 **Regra:** sem outputs reais, o gate nao esta fechado.
 
-**BG-174 (`1.9.80`) — builder/stage (appliance ainda NÃO instalado):**
+**BG-174 (`1.9.80`) — PUBLICADO; appliance ainda NÃO instalado:**
 frontend-only (`layer7_status.php` nativo; handler/daemon/PF/licença
-intactos). Source/build `b84634c`. Pacote staged F1.2
-`pfSense-pkg-layer7-1.9.80.pkg`. SHA256 canónico
-`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
-Builder FreeBSD 15: pubkey PASS, `check-port-files` PASS, smoke PASS,
-`make package` PASS. Stage `sign-release` + `verify-release` PASS;
-fingerprint
+intactos). Source/build `b84634c`. Tag `v1.9.80` → `7bd1fd0`. SHA256
+canónico
+`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
+(reconfirmado no pacote público). `releases/latest` = `v1.9.80`; 7 assets
+F1.2. `v1.9.79` retirada do download (tag git preservada).
+`blacklists-ut1-current` preservada. Builder FreeBSD 15: pubkey PASS,
+`check-port-files` PASS, smoke PASS, `make package` PASS. Stage
+`sign-release` + `verify-release` PASS; fingerprint
 `d26e3f007e81298bad910f99dd62a22e2109740158b3b3c7f4e79490bdc5a998`.
 Metadata `1.9.80` / `FreeBSD:15:amd64`. Status extraído: lint + gate
 27/27 PASS. Suite completa do builder tem FAILs pré-existentes
 (pkg-deinstall mutant / VIP / DNS force IPv6), reproduzidos iguais no
-baseline `855cb28` — **não** causados pelo GUI1. Appliance e prova
-visual **pendentes**. Estado: **build/sign/verify PASS; pendente de
-commit/tag/publicação/appliance**. **Não publicado.** GitHub `latest`
-continua `1.9.79`.
+baseline `855cb28` — **não** causados pelo GUI1. Appliance `.254`
+inacessível (SSH timeout); prova visual **pendente**. **Não** homologado
+no appliance.
 
 **BG-173 (`1.9.79`) — prova no appliance (após install):** cliente não
 autenticado abre o Captive Portal nativo; `portalauth.log` mostra ACCEPT;

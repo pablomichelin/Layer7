@@ -56,15 +56,15 @@ personalizadas pelo administrador são preservadas sem alteração.
 upgrade, guardar Configurações com o idioma desejado aplica a tradução aos
 defaults reconhecidos mesmo quando esse idioma já está selecionado.
 
-**Addendum operacional BG-174 / GUI1 (`2026-08-31`, candidato `v1.9.80`):**
+**Addendum operacional BG-174 / GUI1 (`2026-08-31`, `v1.9.80`):**
 página Status reorganizada frontend-only com `Form_*`, painéis e tabelas
 nativos do pfSense. Sem alteração de handler, daemon, PF, licença,
-defaults ou segurança. Artefacto F1.2 no builder (source/build `b84634c`).
+defaults ou segurança. **PUBLICADO.** Canal `latest` = **`1.9.80`**.
 SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
-Estado: **build/sign/verify PASS; pendente de
-commit/tag/publicação/appliance**. **Não publicado.** Overlay `.244`
-intacto (P0-1). Pin enforce permanece **`1.9.8`**.
-GitHub `latest` continua **`1.9.79`** até a publicação.
+Tag `7bd1fd012e6b8dcf00780f980d62f1a955de061a`. `v1.9.79` retirada do
+download (latest-only / BG-164; tag git preservada). Overlay `.244`
+intacto (P0-1). Pin enforce permanece **`1.9.8`**. Appliance/visual
+**pendentes** (`.254` SSH timeout).
 
 **Addendum operacional BG-173 (`2026-08-31`, `v1.9.79`):**
 compatibilidade com o Captive Portal nativo do pfSense. A política de
@@ -1213,7 +1213,7 @@ Referencia producao enforce: continua `_24` ate gates G2–G7.
 
 **Addendum do candidato `1.8.11_32` (historico; retirado do canal publico):**
 Foi publicado em `2026-07-30` (candidato interno; BG-061). **Nao** esta
-disponivel para download. O updater GUI aponta para `latest` (`1.9.79`).
+disponivel para download. O updater GUI aponta para `latest` (`1.9.80`).
 
 - **Release (historico, sem download):** tag `v1.8.11_32`
 - **SHA256 esperado:** `c36ab91ef66504671e109009bdce9df3bb81c75d580b83313dee52f8c3b9640e`
@@ -1387,23 +1387,19 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 >    (comando de reinstalacao).
 >
 > Verificacao rapida: `grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md`
-> deve devolver **apenas** URLs de `v1.9.80` (comandos do artefacto).
-> **Estado actual:** comandos/artefacto = **`1.9.80`** (BG-174; build/sign/verify
-> PASS; **nao publicado**). GitHub `latest` continua **`1.9.79`** ate a
-> publicacao. Pin enforce `1.9.8` e referencia de politica, **sem**
-> download publico.
+> deve devolver **apenas** URLs de `v1.9.80` (canal unico).
+> **Estado actual:** canal publico/`latest` = **`1.9.80`** (BG-174;
+> **PUBLICADO**). Pin enforce `1.9.8` e referencia de politica, **sem**
+> download publico. Appliance/visual **pendentes**.
 
-> **Release `1.9.80` (BG-174, `2026-08-31`):** artefacto F1.2 no builder
-> (source/build `b84634c`). **Nao publicado.** Rollback publico actual no
-> GitHub = `1.9.79` ate a publicacao; comandos abaixo apontam para
-> `1.9.80`. Pin enforce `1.9.8` permanece politica interna; artefactos
-> antigos so no builder/arquivo.
+> **Release `1.9.80` (BG-174, `2026-08-31`):** unico pacote no canal
+> publico. Rollback publico = reinstalar `1.9.80` (latest-only; `1.9.79`
+> fica so na tag git / builder). Pin enforce `1.9.8` permanece politica
+> interna; artefactos antigos so no builder/arquivo.
 
-**Versao dos comandos (artefacto F1.2, nao publicado):** `1.9.80`
+**Versao canal publico / lab (`latest` e comandos abaixo):** `1.9.80`
 
-**GitHub `releases/latest` neste momento:** `1.9.79`
-
-- **Release (preparada):** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.80`
+- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.80`
 - **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg`
 - **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg.sha256`
 - **SHA256 esperado:** `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
@@ -1412,10 +1408,10 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 
 **Politica do canal publico (BG-164 / ADR-0003 emenda `2026-08-25`):**
 `pablomichelin/Layer7` publica **apenas** a release de pacote `latest`
-(`1.9.79` agora; `1.9.80` so apos publicacao). Pacotes anteriores **nao**
-tem URL de download. Tags git e SHAs abaixo ficam como arquivo interno.
-Rollback de emergencia actual = reinstalar `1.9.79` (ainda `latest`) ou,
-apos publicacao, reinstalar `1.9.80`. Pin enforce `1.9.8` continua
+(`1.9.80`). Pacotes anteriores **nao** tem URL de download. `v1.9.79`
+retirada do download (tag git preservada). Tags git e SHAs abaixo ficam
+como arquivo interno. Rollback de emergencia = reinstalar `1.9.80` ou
+rebuild da tag git `v1.9.79` no builder. Pin enforce `1.9.8` continua
 referencia de politica, **sem** download publico. Snapshot de blacklists
 `blacklists-ut1-current` nao e pacote e permanece publicado.
 
@@ -1423,8 +1419,8 @@ Arquivo de integridade (sem URL):
 
 | Versao | SHA256 | Nota |
 |--------|--------|------|
-| `1.9.80` | `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782` | artefacto F1.2; comandos abaixo; **nao publicado** |
-| `1.9.79` | `26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482` | GitHub `latest` actual |
+| `1.9.80` | `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782` | canal publico / `latest` actual |
+| `1.9.79` | `26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482` | arquivo (tag git; retirada do download) |
 | `1.9.78` | `8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7` | arquivo (tag git) |
 | `1.9.77` | `1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57` | arquivo (tag git) |
 | `1.9.76` | `a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0` | arquivo (tag git) |
@@ -1527,8 +1523,7 @@ Cada seccao abaixo inclui:
 
 > **Nesta release (`1.9.80`)** o caminho oficial e o **`install.sh`**
 > carimbado F1.2 (fail-closed). O comando unico manual permanece como
-> alternativa. **Comandos:** **`1.9.80`** (nao publicado).
-> **GitHub `latest` neste momento:** **`1.9.79`**. **Producao enforce:**
+> alternativa. **Canal lab/`latest`:** **`1.9.80`**. **Producao enforce:**
 > permanece **`1.9.8`** (GV7.4) ate GO de promocao. Soak `.254`
 > = **`1.9.63`** MITM OFF (20.36).
 
@@ -1631,7 +1626,7 @@ layer7d --license-status
 > **Nesta release (`1.9.80`)** o caminho oficial e o **`install.sh`**
 > (valida manifesto + assinatura antes de instalar). O comando unico
 > manual permanece como alternativa. Ver nota em **Links da versao actual**.
-> GitHub `latest` continua `1.9.79` ate a publicacao.
+> Canal `latest` = `1.9.80`.
 
 **Comando unico oficial (`install.sh`):**
 
@@ -1728,10 +1723,9 @@ service layer7d onestart
 
 ## 6. Desinstalar
 
-> **Nesta release (`1.9.80`)** o `uninstall.sh` automatico e o asset F1.2
-> do artefacto (ainda **nao publicado** no GitHub). Use-o como caminho
-> oficial apos a publicacao; a desinstalacao manual abaixo permanece
-> como alternativa. GitHub `latest` continua `1.9.79` ate la.
+> **Nesta release (`1.9.80`)** o `uninstall.sh` automatico **e publicado**
+> como asset F1.2. Use-o como caminho oficial; a desinstalacao manual
+> abaixo permanece como alternativa.
 
 ### Remocao pela GUI (desde `1.8.11_17`; em `1.8.11_16` a pagina podia falhar por erro PHP)
 
@@ -1845,8 +1839,8 @@ apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
 ### Apos desinstalar
 
 O pfSense volta ao funcionamento normal imediatamente.
-Para reinstalar a versao dos comandos (`1.9.80`, nao publicada), usar o
-**`install.sh`** da seccao **1** (ou o comando unico manual):
+Para reinstalar a versao actual (`1.9.80`), usar o **`install.sh`** da
+seccao **1** (ou o comando unico manual):
 
 ```sh
 fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
@@ -2229,9 +2223,8 @@ service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
 O canal publico **nao** hospeda pacotes anteriores (BG-164).
-Rollback publico actual no GitHub = reinstalar **`1.9.79`** (ainda
-`latest`). Apos publicacao, rollback publico = reinstalar **`1.9.80`**
-(seccoes 1 / 5). Tag git `v1.9.73` permanece no builder/arquivo.
+Rollback publico = reinstalar **`1.9.80`** (seccoes 1 / 5). Tag git
+`v1.9.79` permanece no builder/arquivo.
 Pin enforce `1.9.8` e artefactos historicos (`1.9.0`, `_24`) existem
 so no builder/arquivo interno — **nao** ha URL publico.
 **nao** usar `1.8.11_55` (defeituosa).

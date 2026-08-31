@@ -516,15 +516,14 @@ SSOT: [`plano-ipv6-completo.md`](plano-ipv6-completo.md), gates
 - [x] **BG-173** — PUBLICADO `v1.9.79` — Captive Portal nativo + anti-bypass (sem `AppleiCloud` de fábrica; L7ALLOW local; sem rdr no portal nativo)
 - [x] **BG-174 / GUI0** — **FEITO no git** (`3563757`) após gates PASS —
   análise, inventário, matriz de paridade, IA, wireframes e plano canónicos.
-- [ ] **BG-174 / GUI1 piloto Status** — **candidato `1.9.80` —
-  build/sign/verify PASS; pendente de commit/tag/publicação/appliance**
-  (`2026-08-31`): `layer7_status.php` nativo; handler intacto;
-  `layer7.inc` intocado; `PORTVERSION` 1.9.80; SHA256
-  `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
-  source/build `b84634c`. **Não publicado.** **`latest` continua
-  `1.9.79`**. Gate estático `tests/functional/test_status_native_view.php`
-  + lint extraído 27/27 PASS. Appliance/visual pendentes. GUI2–GUI7
-  bloqueados até GO; sem tag/release.
+- [ ] **BG-174 / GUI1 piloto Status** — **PUBLICADO `v1.9.80`**
+  (`2026-08-31`; `releases/latest`; tag `7bd1fd0`):
+  `layer7_status.php` nativo; handler intacto; `layer7.inc` intocado;
+  SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
+  `v1.9.79` retirada do download (latest-only / BG-164; tag git
+  preservada). Gate estático + lint extraído 27/27 PASS. Residual:
+  appliance/visual **pendentes** (`.254` SSH timeout; **não** homologado
+  no appliance). GUI2–GUI7 bloqueados até GO.
 - [x] **BG-174 / ADR-0037** — **FEITO no git** (`f44a14b`) após gates PASS —
   decisão humana de frontend nativo pfSense. Cinco áreas =
   taxonomia; sem shell, design system ou reorganização ampla paralela.

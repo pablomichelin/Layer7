@@ -1,12 +1,11 @@
 # Redesenho integral da GUI Layer7 — análise e decisão
 
 **Estado:** GUI0 documental concluído no commit `3563757` após gates PASS.
-GUI1 piloto Status **candidato `1.9.80` — build/sign/verify PASS; pendente
-de commit/tag/publicação/appliance** (`2026-08-31`; só apresentação de
-`layer7_status.php`; SHA256
+GUI1 piloto Status **PUBLICADO `v1.9.80`** (`2026-08-31`;
+`releases/latest`; só apresentação de `layer7_status.php`; SHA256
 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`).
-**Não publicado.** GitHub `latest` continua `1.9.79`. GUI2–GUI7 bloqueadas
-até GO humano explícito.
+Appliance/visual **pendentes**. GUI2–GUI7 bloqueadas até GO humano
+explícito.
 **Baseline auditada:** `main` em `4354aec`, pacote `1.9.79`, pfSense autenticado
 em `https://45.238.165.144:9999`, inspeção exclusivamente de leitura em
 `2026-08-31`. A tag leve `v1.9.79` aponta para `4d210d5` (commit do artefacto);
@@ -302,7 +301,7 @@ autorização, validação ou decisão de segurança pode existir apenas no brow
 5. Confirmar se o primeiro bloco técnico autorizado será apenas fundação
    compartilhada (GUI1) ou navegação + fundação (GUI1–GUI2).
 
-GUI1 piloto Status recebeu GO e está **build/sign/verify PASS; pendente de
-commit/tag/publicação/appliance**. **Não publicado.**
+GUI1 piloto Status recebeu GO e está **PUBLICADO `v1.9.80`** (`latest`).
+Appliance/visual **pendentes** (`.254` inacessível; **não** homologado).
 GUI2–GUI7 permanecem **analisados e planeados; código GUI não autorizado**
 sem GO próprio.

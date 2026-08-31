@@ -18,7 +18,7 @@
 ## Install (latest release)
 
 ```bash
-# GitHub latest actual = 1.9.79; command prepared for 1.9.80 (not published)
+# On pfSense — only the current public package (`latest` = 1.9.80):
 fetch -o /tmp/install.sh \
   https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh \
   && sh /tmp/install.sh
