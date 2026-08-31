@@ -35,9 +35,10 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.77` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.77`;
-`SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`; BG-170 check-in obrigatório; cadeia F1.2);
-**Candidato em curso (não publicado):** `1.9.78` (BG-171 Pornografia host OU AdultContent + BG-172 Eventos em linguagem de operador).
+`1.9.78` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.78` pendente de publish F1.2;
+`SHA256=8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7`; BG-171 + BG-172; cadeia F1.2);
+herda `1.9.77`
+(`SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`; BG-170 check-in obrigatório; cadeia F1.2);
 herda `1.9.76`
 (`SHA256=a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0`; BG-169 Pornografia; cadeia F1.2);
 herda `1.9.75`
@@ -197,7 +198,7 @@ e `/usr/local/bin/curl`, e re-tenta aos 15 min. Endpoint live intacto.
 Sem overlay `.244` (P0-1). Caixas ≤`1.9.71` precisam de upgrade para
 aparecer em Instalações.
 **BG-164 (`2026-08-25`) — canal publico latest-only:**
-`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.77`).
+`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.78`).
 Releases de pacote anteriores sao retiradas (tags git preservadas).
 `pfsense-layer7` nao e canal de download (Releases de pacote retiradas).
 Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
@@ -206,7 +207,7 @@ ADR-0003 §12. `publish-release.sh` retira as anteriores apos cada publish.
 **Regra inviolavel de versao (`2026-08-31`):** nunca um pacote «para
 reinstall» da mesma `PORTVERSION`. Toda entrega ao appliance e **versao
 nova**; actualizar **todas** as mencoes da versao `latest`; no GitHub
-publico fica **so** a ultima release de pacote. Candidato actual `1.9.78`
+publico fica **so** a ultima release de pacote. Actual `1.9.78`
 (nao republicar `1.9.77`).
 **BG-165 (cliente `1.9.73`) + BG-166 (license-server HEAD):** auditoria
 de licença. Daemon usa `/usr/local/bin/curl` em activate/check-in e
@@ -239,10 +240,11 @@ GUI sem interruptor; daemon ignora JSON `false`.
 `releases/latest` = `v1.9.77`;
 `SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`.
 `v1.9.76` retirada do download (latest-only / BG-164).
-**BG-171 (`1.9.78`, implementado, pendente de gates/commit):** Pornografia
+**BG-171 (`1.9.78`, SHA registado, publish F1.2 em curso):** Pornografia
 casa host conhecido **ou** `AdultContent`. `match_mode=or` só em
 `profile-adulto`; default AND intacto. Simulador alinhado. Sem overlay `.244`.
-**BG-172 (`1.9.78`, implementado, pendente de gates/commit):** Eventos em
+`SHA256=8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7`.
+**BG-172 (`1.9.78`, SHA registado, publish F1.2 em curso):** Eventos em
 linguagem de operador (`flow_decide`/`dns_query`/`dns_resolved` → frases).
 Linha crua só com «Mostrar detalhe tecnico». Ingest de relatórios intacto
 (`dns_resolved` continua fora do SQLite). Sem overlay `.244`.

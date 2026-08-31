@@ -25,6 +25,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   e exclusões permanecem obrigatórios. Upgrade carimba `profile-adulto`
   existente sem duplicar. Simulador alinhado ao daemon (OR + catch-all
   em fallback).
+  Pacote `SHA256=8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7`.
 
 ## [1.9.77] — 2026-08-31
 
