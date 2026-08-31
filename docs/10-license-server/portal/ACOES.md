@@ -16,7 +16,7 @@ Mais recente no topo.
 | Risco | Médio (caixas que tinham opt-out passam a telefonar; N3 intacto) |
 | Teste | `test_checkin_config_enabled.c`; `test_check_in_default_30.14.php`; i18n |
 | Rollback | Reinstalar `1.9.76` |
-| Resultado | **implementado, pendente de gates/commit** |
+| Resultado | **PUBLICADO** `v1.9.77` F1.2; `releases/latest` confirmado; `v1.9.76` retirada |
 
 ## 2026-08-26 — BG-169 perfil rápido Pornografia (`1.9.76`)
 
