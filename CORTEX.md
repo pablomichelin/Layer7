@@ -35,7 +35,7 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.78` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.78` pendente de publish F1.2;
+`1.9.78` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.78`;
 `SHA256=8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7`; BG-171 + BG-172; cadeia F1.2);
 herda `1.9.77`
 (`SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`; BG-170 check-in obrigatório; cadeia F1.2);
@@ -240,11 +240,13 @@ GUI sem interruptor; daemon ignora JSON `false`.
 `releases/latest` = `v1.9.77`;
 `SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`.
 `v1.9.76` retirada do download (latest-only / BG-164).
-**BG-171 (`1.9.78`, SHA registado, publish F1.2 em curso):** Pornografia
+**BG-171 PUBLICADO `v1.9.78` (`2026-08-31`):** Pornografia
 casa host conhecido **ou** `AdultContent`. `match_mode=or` só em
 `profile-adulto`; default AND intacto. Simulador alinhado. Sem overlay `.244`.
+`releases/latest` = `v1.9.78`;
 `SHA256=8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7`.
-**BG-172 (`1.9.78`, SHA registado, publish F1.2 em curso):** Eventos em
+`v1.9.77` retirada do download (latest-only / BG-164).
+**BG-172 PUBLICADO `v1.9.78` (`2026-08-31`):** Eventos em
 linguagem de operador (`flow_decide`/`dns_query`/`dns_resolved` → frases).
 Linha crua só com «Mostrar detalhe tecnico». Ingest de relatórios intacto
 (`dns_resolved` continua fora do SQLite). Sem overlay `.244`.

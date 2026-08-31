@@ -10,13 +10,13 @@ Mais recente no topo.
 | Campo | Valor |
 |-------|--------|
 | Tipo | documental (governanca de release) |
-| Versão | portal live `2.2.0` intacto / latest publico `1.9.77` |
+| Versão | portal live `2.2.0` intacto / latest publico `1.9.78` |
 | Objectivo | Nunca pacote «para reinstall» da mesma versao; GitHub publico so a ultima |
 | Impacto | `AGENTS.md`, `CORTEX.md`, ADR-0003 §12, checklist de release, `MANUAL-INSTALL.md` |
 | Risco | Nenhum de runtime |
 | Teste | N/A (regra de processo) |
 | Rollback | Reverter os docs desta emenda |
-| Resultado | **registado**; candidato `1.9.78` continua versao nova, nao republicacao de `1.9.77` |
+| Resultado | **registado e aplicado** em `v1.9.78` (versao nova; `v1.9.77` retirada do download) |
 
 ## 2026-08-31 — BG-172 Eventos em linguagem de operador (`1.9.78`)
 
@@ -28,8 +28,8 @@ Mais recente no topo.
 | Impacto | GUI `layer7_events.php`; helper `layer7_event_explain_line`; i18n EN/ES |
 | Risco | Baixo (só apresentação; ingest de relatórios intacto) |
 | Teste | `test_events_humanize.php`; `test_i18n_coverage.js` |
-| Rollback | Reinstalar `1.9.77` |
-| Resultado | **implementado, pendente de gates/commit** |
+| Rollback | Reinstalar `1.9.77` (arquivo interno / tag git) |
+| Resultado | **PUBLICADO** `v1.9.78` F1.2; `releases/latest` confirmado; `v1.9.77` retirada |
 
 ## 2026-08-31 — BG-171 Pornografia host OU categoria (`1.9.78`)
 
@@ -41,8 +41,8 @@ Mais recente no topo.
 | Impacto | daemon `rule_matches`; simulador; catálogo `adulto`; migração `profile-adulto` |
 | Risco | Médio (só o perfil Pornografia passa a OR; restantes AND) |
 | Teste | `test_policy_decide.c`; `test_profile_adulto_match_mode.php` |
-| Rollback | Reinstalar `1.9.77` |
-| Resultado | **implementado, pendente de gates/commit** |
+| Rollback | Reinstalar `1.9.77` (arquivo interno / tag git) |
+| Resultado | **PUBLICADO** `v1.9.78` F1.2; `releases/latest` confirmado; `v1.9.77` retirada |
 
 ## 2026-08-31 — BG-170 check-in obrigatório (`1.9.77`)
 
