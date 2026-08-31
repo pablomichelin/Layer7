@@ -260,8 +260,8 @@ nativo; CNA ignorado sem `pass quick`. Default PF continua
 `v1.9.78` retirada do download (latest-only / BG-164).
 **BG-174 / GUI0 (`2026-08-31`):** análise integral do frontend,
 inventário técnico, matriz de paridade, arquitectura de informação,
-wireframes e plano GUI0–GUI7 implementados documentalmente; pendentes de
-gates/commit neste bloco. GUI1–GUI7 permanecem bloqueados até **GO humano**.
+wireframes e plano GUI0–GUI7 **FEITOS no git** (`3563757`) após gates PASS.
+GUI1–GUI7 permanecem bloqueados até **GO humano**.
 Sem alteração de código, `PORTVERSION`, build, release ou estado do appliance.
 SSOT: [`docs/00-overview/frontend-redesign-analise.md`](docs/00-overview/frontend-redesign-analise.md),
 [`docs/01-architecture/frontend-redesign-inventario-paridade.md`](docs/01-architecture/frontend-redesign-inventario-paridade.md),

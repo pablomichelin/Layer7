@@ -1,7 +1,7 @@
 # Plano governado — redesenho do frontend Layer7
 
 **Backlog:** BG-174.
-**Estado:** GUI0 implementado documentalmente, pendente de gates/commit;
+**Estado:** GUI0 documental concluído no commit `3563757` após gates PASS;
 GUI1–GUI7 bloqueados até GO humano.
 **Baseline:** `1.9.79`, `main@4354aec`.
 **Nota de fase:** `GUI0…GUI7` são ondas internas deste plano, não substituem as

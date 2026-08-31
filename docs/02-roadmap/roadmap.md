@@ -137,8 +137,8 @@ Análise: [`../00-overview/frontend-redesign-analise.md`](../00-overview/fronten
 Paridade: [`../01-architecture/frontend-redesign-inventario-paridade.md`](../01-architecture/frontend-redesign-inventario-paridade.md).
 Wireframes: [`../00-overview/frontend-redesign-wireframes.md`](../00-overview/frontend-redesign-wireframes.md).
 
-**Estado (`2026-08-31`):** GUI0 implementado documentalmente, pendente de
-gates/commit neste bloco. GUI1–GUI7 aguardam **GO humano**; nenhuma alteração
+**Estado (`2026-08-31`):** GUI0 **FEITO no git** (`3563757`) após gates PASS.
+GUI1–GUI7 aguardam **GO humano**; nenhuma alteração
 de código, `PORTVERSION`, build, release ou appliance foi autorizada.
 
 A trilha não substitui F0–F7: mudanças de package/GUI pertencem à manutenção

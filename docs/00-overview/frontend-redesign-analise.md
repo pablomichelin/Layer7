@@ -1,7 +1,7 @@
 # Redesenho integral da GUI Layer7 — análise e decisão
 
-**Estado:** GUI0 implementado documentalmente, pendente de gates/commit;
-implementação bloqueada até GO humano explícito.
+**Estado:** GUI0 documental concluído no commit `3563757` após gates PASS;
+implementação GUI1–GUI7 bloqueada até GO humano explícito.
 **Baseline auditada:** `main` em `4354aec`, pacote `1.9.79`, pfSense autenticado
 em `https://45.238.165.144:9999`, inspeção exclusivamente de leitura em
 `2026-08-31`. A tag leve `v1.9.79` aponta para `4d210d5` (commit do artefacto);
