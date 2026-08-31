@@ -18,9 +18,9 @@
 ## Install (latest release)
 
 ```bash
-# On pfSense — only the current public package (`latest` = 1.9.73):
+# On pfSense — only the current public package (`latest` = 1.9.76):
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.76/install.sh \
   && sh /tmp/install.sh
 ```
 
@@ -32,7 +32,7 @@ Then open **Services → Layer 7** in the pfSense web UI.
 
 ```bash
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.76/install.sh \
   && sh /tmp/install.sh
 ```
 
@@ -44,7 +44,7 @@ Or use **Services → Layer 7 → Settings → Check for updates** in the GUI.
 
 ```bash
 fetch -o /tmp/uninstall.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.73/uninstall.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.76/uninstall.sh \
   && sh /tmp/uninstall.sh
 ```
 
