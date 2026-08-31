@@ -7,6 +7,7 @@
 | [`checklist-mestre.md`](checklist-mestre.md) | **ACTIVO** | Gates |
 | [`f4-plano-de-implementacao.md`](f4-plano-de-implementacao.md) | ACTIVO (área F4) | Blacklists / package |
 | [`f5-preparacao-malha.md`](f5-preparacao-malha.md) | ACTIVO (área F5) | Malha de testes |
+| [`plano-redesign-frontend.md`](plano-redesign-frontend.md) | **GUI0 documental; GUI1–GUI7 aguardam GO** | Redesenho integral package GUI / BG-174 |
 | [`plano-isencao-vip-e-ux-gui.md`](plano-isencao-vip-e-ux-gui.md) | Ver backlog | VIP / UX |
 | [`plano-identity-mitm-addon.md`](plano-identity-mitm-addon.md) | **【FECHADA】** | 20.37; soak/`latest` `1.9.63` MITM OFF |
 | [`plano-antipirataria-anti-tamper.md`](plano-antipirataria-anti-tamper.md) | **engenharia FECHADA** / evidência **ABERTA** | `30.19`; ciclo **BG-127**; `.254` vivo `1.9.63` MITM OFF |

@@ -74,6 +74,7 @@ Ele existe para evitar tres erros comuns:
 | Anti-pirataria estado vivo | START-HERE / plano §0 / fecho `30.19` / gates vs soak 20.36 | `CORTEX.md` (vivo) + `START-HERE-antipirataria.md`; fecho `30.19` = engenharia; **BG-127** = evidência | `.254` vivo = `1.9.63` MITM OFF (`20260814T034904Z-20.36-soak-align-163-254`); BG-127 **PASS** `20260814T224213Z` (histórico PARTIAL `20260814T051611Z`); `1.9.54` = histórico e2e AP2 |
 | Builder ABI 15 vs 16 | «preferir a mesma major» em `builder-freebsd.md` vs builder 15 + appliance Plus/16 | `CORTEX.md` + BG-106 + P2-14 (BG-152) + [`../08-lab/builder-freebsd.md`](../08-lab/builder-freebsd.md) | builder permanece 15; `-f` no Plus/16 é workaround aceite, **não** suporte nativo ABI 16; builder 16 **não** provado |
 | Expiry TZ / `timegm` | REV-030 «meio-dia UTC ou `timegm`» vs P2-13/P3-7 (meia-noite local) | [`../01-architecture/f3-expiracao-revogacao-grace.md`](../01-architecture/f3-expiracao-revogacao-grace.md) + auditoria P2-13/P3-7 (BG-153) | REV-030 é histórico; **não** aplicar `timegm`/`gmmktime` (altera o contrato e piora Brasil/UTC) |
+| Frontend package / BG-174 | GUI conceptual, plano VIP/UX e auditoria/redesign novo | [`frontend-redesign-analise.md`](frontend-redesign-analise.md) = decisão; [`../01-architecture/frontend-redesign-inventario-paridade.md`](../01-architecture/frontend-redesign-inventario-paridade.md) = paridade; [`frontend-redesign-wireframes.md`](frontend-redesign-wireframes.md) = aceitação visual; [`../02-roadmap/plano-redesign-frontend.md`](../02-roadmap/plano-redesign-frontend.md) = execução | documentos anteriores permanecem contexto/histórico; Identity+MITM só entra no inventário e **não** é reaberta |
 
 ---
 
@@ -104,6 +105,10 @@ Ele existe para evitar tres erros comuns:
    lab é FreeBSD 16 e o builder de produto é 15. Fonte canónica: builder
    permanece 15; `-f` no Plus/16 é política BG-106, **não** suporte nativo
    ABI 16. Builder 16 **não** está provado.
+7. **Versão `latest` na governação (`2026-08-31`):** `AGENTS.md` e a nota
+   BG-164 no backlog ainda citavam `v1.9.78`, enquanto o `CORTEX.md`, a tag
+   e a release publicada confirmam `v1.9.79`. Resolvido neste bloco a favor
+   de `v1.9.79`; referências antigas do CORTEX permanecem histórico datado.
 
 ---
 

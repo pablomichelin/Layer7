@@ -258,6 +258,15 @@ nativo; CNA ignorado sem `pass quick`. Default PF continua
 `releases/latest` = `v1.9.79`;
 `SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`.
 `v1.9.78` retirada do download (latest-only / BG-164).
+**BG-174 / GUI0 (`2026-08-31`):** análise integral do frontend,
+inventário técnico, matriz de paridade, arquitectura de informação,
+wireframes e plano GUI0–GUI7 implementados documentalmente; pendentes de
+gates/commit neste bloco. GUI1–GUI7 permanecem bloqueados até **GO humano**.
+Sem alteração de código, `PORTVERSION`, build, release ou estado do appliance.
+SSOT: [`docs/00-overview/frontend-redesign-analise.md`](docs/00-overview/frontend-redesign-analise.md),
+[`docs/01-architecture/frontend-redesign-inventario-paridade.md`](docs/01-architecture/frontend-redesign-inventario-paridade.md),
+[`docs/00-overview/frontend-redesign-wireframes.md`](docs/00-overview/frontend-redesign-wireframes.md)
+e [`docs/02-roadmap/plano-redesign-frontend.md`](docs/02-roadmap/plano-redesign-frontend.md).
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
