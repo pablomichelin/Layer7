@@ -210,7 +210,9 @@ migrar a função.
 | Segurança | nenhuma mutação GET | todas | contrato | inalterado | P | crawler GET read-only |
 | Plataforma | shell `Services > Layer7` e breadcrumb pfSense | XML/header/footer | todas as páginas | preservar nativamente | P | comparação com package nativo |
 | Plataforma | tabs/subtabs, ordem e rotas existentes | `layer7.inc`/XML | navegação actual | organização baseline | P | cada tab/deep link/active state |
-| Plataforma | painéis, tabelas, forms, alerts e botões pfSense | PHP/CSS/include | tema WebGUI | primitivos nativos, sem design system paralelo | P | tema/desktop/320/CSS próprio mínimo e escopado |
+| Plataforma | secções escuras, linhas planas, label esquerda, campo/help direita | `Form_*`/PHP/CSS/include | formulário WebGUI | reproduzir estrutura nativa, sem cards decorativos | P | comparação lado a lado com formulário pfSense |
+| Plataforma | tabelas, alerts e botões pfSense | PHP/CSS/include | tema WebGUI | primitivos nativos, sem design system paralelo | P | tema/desktop/320/CSS próprio mínimo e escopado |
+| Plataforma | ausência de cards/sombras/chips/sticky bars | todas | contrato ADR-0037 | estrutura plana e densa | P | revisão visual + busca CSS/classes |
 
 ## 5. Dependências e superfícies alteradas por acção
 

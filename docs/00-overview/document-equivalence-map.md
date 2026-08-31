@@ -113,6 +113,10 @@ Ele existe para evitar tres erros comuns:
 8. **Frontend BG-174 (`2026-08-31`):** a proposta GUI0 podia sugerir um shell
    próprio de cinco áreas. Decisão humana formalizada na ADR-0037: preservar
    organização e padrão visual do pfSense; cinco áreas são apenas taxonomia.
+9. **Frontend nativo: “componentes” vs formulário real (`2026-08-31`):** os
+   primeiros wireframes ainda usavam cards/quadrados. A referência humana
+   resolve a ambiguidade: vence o formulário pfSense plano definido na emenda
+   ADR-0037; cards não são a unidade visual do redesign.
 
 ---
 

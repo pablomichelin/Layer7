@@ -50,6 +50,12 @@ breadcrumb, tabs/subtabs, painéis, tabelas, formulários, alerts e botões do
 pfSense são invariantes. As cinco áreas abaixo passam a ser taxonomia para
 organizar conteúdo e linguagem, não um shell, sidebar ou frontend paralelo.
 
+**Referência visual humana:** o padrão esperado é o formulário administrativo
+nativo do pfSense: barra horizontal escura por secção, linhas brancas separadas,
+label fixa à esquerda, campo e ajuda à direita, densidade funcional e quase
+nenhuma caixa decorativa. A revisão anterior ainda tinha excesso de quadrados e
+cards; esse desenho fica rejeitado.
+
 ## 2. Evidência e método
 
 Foram cruzadas três fontes:
@@ -234,17 +240,18 @@ preserva contexto. Ações destrutivas permanecem `POST` + CSRF + confirmação.
 |---|---|
 | cabeçalho de página | breadcrumb/título/panel heading nativos; acção primária no local esperado pelo pfSense |
 | navegação principal/secundária | tabs/subtabs pfSense; rotas e ordem existentes são baseline |
-| resumo de estado | `panel`, tabela ou `dl` nativos; sem grelha de cards com identidade própria |
+| resumo de estado | linhas, `dl` ou tabela plana sob barra de secção; sem cards |
 | tabela/lista | `table`/`table-responsive`, busca, paginação, total e ações nomeadas |
-| labels/badges | Bootstrap nativo e texto sempre disponível; sem linguagem visual exclusiva |
-| painel de detalhe | `panel`, `collapse` ou bloco nativo sob demanda |
+| campos | linha horizontal nativa: label à esquerda; controlo e help à direita |
+| labels/badges | apenas quando já forem convenção pfSense; texto sempre disponível |
+| detalhe | nova secção, linha expansível ou tabela nativa; nunca card decorativo |
 | secção avançada | `<details>` ou painel acessível, estado persistido por página |
 | aviso/erro/confirmação | impacto, causa, recuperação e foco programático |
-| barra de alterações | resumo do dirty state, `Descartar`, `Salvar`/`Aplicar` |
+| alterações pendentes | `print_info_box()`/`alert` junto do formulário e botões no rodapé normal; sem sticky bar |
 | resultado de aplicação | etapas salvar/reload/PF/restart com sucesso parcial explícito |
 | estado vazio | explicação + uma próxima acção válida |
-| loading/skeleton | apenas para AJAX real; texto `aria-live` e fallback sem JS |
-| zona de perigo | separada da configuração normal; confirmação proporcional |
+| loading | texto/ícone discreto apenas para AJAX real; sem skeleton cards |
+| acção destrutiva | secção nativa isolada por ordem/conteúdo e confirmação; sem caixa visual de outro produto |
 
 Implementação futura deve criar apenas wrappers funcionais mínimos sobre o
 Bootstrap/Form stack do pfSense e adoptar JS externo progressivo. Não será

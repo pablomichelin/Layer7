@@ -41,7 +41,7 @@ Não-escopo sem novo GO:
 | G-UX7 | paridade por linha tocada, config antiga e rollback PASS |
 | G-UX8 | appliance pfSense CE/lab: monitor primeiro; nenhum PF inesperado |
 | G-UX9 | diff revisto, staging explícito, versão nova e release checklist |
-| G-UX10 | conformidade ADR-0037: shell/tabs/forms/panels/buttons/tema pfSense |
+| G-UX10 | conformidade ADR-0037: barras escuras de secção, linhas planas, label esquerda, controlo/help direita; sem cards/sticky/design paralelo |
 
 ## 3. Ondas
 
@@ -66,11 +66,13 @@ Não-escopo sem novo GO:
 - **Ficheiros previstos:** `layer7.inc` ou includes novos no mesmo package,
   CSS/JS externos, páginas piloto, testes e docs.
 - **Preserva:** tabs, handlers, campos, POSTs, mensagens e defaults.
-- **Impacto:** consistência de `panel`, `table`, `nav-tabs`, `alert`, `btn`,
-  `print_info_box()` e `Form_*`; dirty/result states sem identidade paralela.
+- **Impacto:** consistência de `Form_Section`/`Form_*`, linhas planas, `table`,
+  `nav-tabs`, `alert`, `btn` e `print_info_box()`; remoção gradual de cards,
+  sombras, chips e barras sticky.
 - **Risco:** CSS global/pfSense Plus/CE e CSP.
 - **Testes:** PHP/JS, snapshots visuais manuais, sem-JS, teclado, PT/EN/ES.
-- **Gate:** uma página piloto read-only (Status) sem regressão.
+- **Gate:** uma página piloto read-only renderizada no mesmo padrão de formulário
+  da referência pfSense, sem cards e sem regressão.
 - **Rollback:** include/style antigo por página; pacote anterior.
 - **Versão/build:** sim; novo `PORTVERSION/PKGVERSION`, build/pkg/release.
 
@@ -172,7 +174,7 @@ Não-escopo sem novo GO:
 | HTTP | GET read-only, POST/CSRF, PRG, status codes, headers/downloads, ACL deny |
 | persistência | JSON antes/depois, defaults/migrations, secrets separados, config antiga |
 | efeitos | SIGHUP vs restart vs PF/filter vs Unbound/cron, incluindo falha parcial |
-| UX | 13 fluxos prioritários; ≤3 interações para Pornografia; contexto/dirty; aparência e posição de controles coerentes com pfSense |
+| UX | 13 fluxos prioritários; ≤3 interações para Pornografia; contexto/dirty; comparação lado a lado com formulário pfSense e zero cards estruturais |
 | acessibilidade | teclado completo, foco após erro/save, labels, aria-live, zoom/contraste |
 | responsivo | 320, 768 e desktop; tabelas/listas, modais curtos, sem clipping |
 | i18n | PT/EN/ES mesma função/copy/default; strings dinâmicas e públicas |

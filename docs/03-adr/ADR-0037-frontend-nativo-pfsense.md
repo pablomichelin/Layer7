@@ -5,6 +5,11 @@
 **Aceito** (`2026-08-31`) por decisão humana. Registo documental **FEITO no
 git** (`f44a14b`) após gates PASS. Aplica-se à trilha BG-174 / GUI1–GUI7.
 
+**Emenda visual (`2026-08-31`):** a referência normativa entregue pelo humano
+é o formulário nativo do pfSense com barras de secção escuras, linhas planas,
+label à esquerda e controlo/ajuda à direita. Emenda implementada
+documentalmente, pendente de gates/commit neste bloco.
+
 ## Contexto
 
 O diagnóstico GUI0 propôs cinco áreas conceptuais para reduzir a carga
@@ -40,6 +45,19 @@ risco de incompatibilidade com futuras versões da WebGUI.
    formulário nativos, além das rotas/deep links anteriores.
 8. PHP server-rendered, PRG, CSRF, privilégios e validação de servidor continuam
    obrigatórios. JavaScript é apenas melhoria progressiva.
+9. A unidade visual básica não é card. É a secção/form nativo do pfSense:
+   barra de título escura, corpo branco, linhas horizontais, coluna de label
+   alinhada à esquerda do campo e help text imediatamente sob o controlo.
+10. Status, licença, diagnóstico e biblioteca usam secções, `dl` ou tabelas
+    planas. Proibidas grelhas de cards, blocos arredondados, sombras, chips,
+    skeleton cards e caixas decorativas como estrutura principal.
+11. Acções aparecem na linha ou no rodapé normal do formulário. Não criar
+    barras flutuantes/sticky com aparência de aplicação externa. Dirty state e
+    resultado usam `print_info_box()`/`alert` e os pontos normais de acção.
+12. Botões seguem tamanho, cor e posição do pfSense. Verde fica reservado ao
+    padrão nativo de adicionar/activar quando semanticamente aplicável; perigo
+    usa o padrão nativo de confirmação, sem uma “zona” desenhada como produto
+    separado.
 
 ## Consequências
 
@@ -47,6 +65,8 @@ risco de incompatibilidade com futuras versões da WebGUI.
 - O trabalho prioriza hierarquia, divisão de páginas, foco, contexto e feedback,
   sem redesenhar a identidade visual do produto hospedeiro.
 - A hipótese de shell próprio das cinco áreas fica rejeitada.
+- A hipótese de dashboard por cards e formulários compostos por caixas também
+  fica rejeitada.
 - GUI1 deve começar por inventariar e reutilizar os primitivos nativos antes de
   extrair qualquer helper visual.
 - Wireframes e testes devem mostrar o chrome/tabs/painéis do pfSense e comparar

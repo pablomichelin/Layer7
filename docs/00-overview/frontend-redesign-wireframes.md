@@ -1,229 +1,257 @@
-# Wireframes de baixa fidelidade — GUI Layer7
+# Wireframes nativos pfSense — GUI Layer7
 
-Estes wireframes definem hierarquia e estados, não identidade visual final.
-Todos assumem o shell do pfSense, navegação por teclado e largura mínima de
-320 px. Em ecrã estreito, colunas empilham, filtros recolhem numa secção e cada
-linha de tabela vira bloco sem ocultar ações.
+Estes wireframes definem hierarquia e estados, não uma nova identidade visual.
+A referência normativa é o formulário WebGUI do pfSense entregue pelo humano
+em `2026-08-31`.
 
-**Invariante ADR-0037:** todos os desenhos vivem em `Services > Layer7`, sob o
-header, breadcrumb e tabs/subtabs nativos. Caixas representam `panel`, listas
-representam `table`/`table-responsive`, formulários seguem `Form_*`/Bootstrap e
-mensagens seguem `print_info_box()`/`alert`. As cinco áreas são apenas taxonomia;
-não existe sidebar Layer7 nem shell visual próprio.
+## Contrato visual inviolável
 
-## Convenções
+- `Services > Layer7`, breadcrumb e tabs existentes;
+- barra escura horizontal para o título de cada secção;
+- corpo branco e plano, com uma linha horizontal por campo ou informação;
+- label alinhada na coluna esquerda;
+- controlo, valor e help text na coluna direita;
+- tabelas nativas para colecções;
+- botões com classes, cores, tamanho e posição do pfSense;
+- `print_info_box()`/`alert` para aviso, erro, sucesso e dirty state;
+- sem cards, grelhas de KPI, chips, sombras, skeleton cards, sticky bars,
+  painéis laterais ou caixas arredondadas como estrutura principal.
 
-`[primário]` acção principal; `[secundário]` acção reversível; `[perigo]`
-acção destrutiva; `●` estado; `▾` detalhe recolhível; `!` aviso.
+Em ecrã estreito, a linha pode empilhar label sobre campo/help usando o
+comportamento responsivo do pfSense; a ordem semântica permanece igual.
 
-## 1. Dashboard
+## 1. Estado
 
 ```text
 pfSense > Services > Layer7
-[Estado] [Dispositivos] [Políticas] [Identity] [MITM] [...] [Definições]
-┌ Visão geral ───────────────────────────── [Ver diagnóstico] ┐
-│ ● Proteção efectiva: MONITOR   Pedido: ENFORCE              │
-│ ! Licença inválida impede o PF de armar   [Ver licença]     │
-├ Saúde ─────────┬ Políticas ────────┬ Actividade ─────────────┤
-│ daemon activo  │ 6 activas         │ 124 bloqueios / 24 h    │
-│ PF não armado  │ 2 com aviso       │ último evento 2 min     │
-├ Alertas operacionais ────────────────────────────────────────┤
-│ Captive Portal detectado; página Layer7 não será aplicada.   │
-├ Mais bloqueados ───────────────┬ Clientes com mais eventos ─┤
-│ tabela curta / estado vazio    │ tabela curta / estado vazio │
-└────────────────────────────────┴──────────────────────────────┘
+[Estado] [Dispositivos] [Políticas] [...] [Definições]
+
+████ Estado do Layer7 █████████████████████████████████████
+ Serviço             Activo · PID 1234
+ Modo pedido         Aplicar bloqueios
+ Modo efectivo       Monitorizar
+                     A licença actual não permite aplicar o PF.
+ Licença             Inválida                         [Ver licença]
+
+████ Protecção e actividade ███████████████████████████████
+ Políticas activas   6
+ Último evento       há 2 minutos
+ Mais bloqueado      Pornografia · 61 eventos
+
+████ Ações ████████████████████████████████████████████████
+ Daemon              [Reiniciar serviço]
+                     Interrompe brevemente a classificação.
 ```
 
-Loading usa texto “A carregar estado”; erro mantém links para Settings e
-Diagnostics; sucesso pós-acção mostra etapas daemon/PF separadas.
+Sem cards de métricas. Loading aparece como texto discreto na linha afectada;
+erro usa `print_info_box()` antes da primeira secção.
 
-## 2. Lista de políticas
+## 2. Políticas aplicadas
 
 ```text
 pfSense > Services > Layer7 > Políticas
-[Políticas] [Grupos] [Exceções] [Categorias nDPI] [Simular teste]
-┌ Proteção / Políticas aplicadas ─────── [Criar política] ┐
-│ [Buscar________________] [Estado▾] [Acção▾] [Limpar]    │
-│ 6 políticas · filtros no URL                            │
-├ Nome          Estado   Âmbito     Resultado    Ações ───┤
-│ Pornografia   Activa   Todas LAN  Bloquear     [Editar] │
-│ YouTube       Activa   Gestores   Monitorar    [Editar] │
-│                              [Detalhes] [Mais ações▾]   │
-├ Alterações pendentes: 2  [Descartar] [Aplicar mudanças]┤
-└──────────────────────────────────────────────────────────┘
+[Políticas] [Grupos] [Excepções] [Categorias nDPI] [Simular]
+
+████ Filtros ███████████████████████████████████████████████
+ Procurar            [Pornografia________________________]
+ Estado              [Todos ▾]       Resultado [Todos ▾]
+
+████ Políticas aplicadas █████████████████████ [Adicionar]
+ Nome             Estado    Âmbito       Resultado     Ações
+ Pornografia      Activa    Todas LAN    Bloquear      [Editar]
+ YouTube          Activa    Gestores     Monitorizar   [Editar]
+
+ Resultados          1–2 de 6                  [Anterior] [Próxima]
 ```
 
-Empty: “Nenhuma política aplicada” + atalhos para Biblioteca/Criar. Erro não
-substitui a lista já carregada. A remoção fica em `Mais ações`, com confirmação.
+Empty state ocupa uma linha normal da tabela. Detalhes abrem abaixo da linha
+ou numa página nativa, sem card.
 
-## 3. Edição de política
+## 3. Editar política
 
 ```text
 pfSense > Services > Layer7 > Políticas > Editar
-[Políticas] [Grupos] [Exceções] [Categorias nDPI] [Simular teste]
-┌ ← Políticas / Editar Pornografia            ● Activa ┐
-│ ID profile-pornografia (somente leitura)               │
-├ Âmbito ────────────────────────────────────────────────┤
-│ Nome [Pornografia____]  Prioridade [50]  [✓] Activa   │
-│ Interfaces [LAN ✓] [Visitantes ]  Origens [Todas▾]    │
-├ O que proteger ────────────────────────────────────────┤
-│ [Apps 3] [Categorias 1] [Sites 12] [Ver seletores]    │
-├ Resultado ─────────────────────────────────────────────┤
-│ ( ) Monitorar  (●) Bloquear  ( ) Permitir  ( ) Tag   │
-├ Horário ▾       Avançado ▾ (exclusões, AD, escopo)    │
-├ ! Alterações não salvas       [Cancelar] [Salvar]     │
-└────────────────────────────────────────────────────────┘
+[Políticas] [Grupos] [Excepções] [Categorias nDPI] [Simular]
+
+████ Identificação █████████████████████████████████████████
+ ID                  profile-pornografia (somente leitura)
+ Nome                [Pornografia________________________]
+ Activa              [✓] Usar esta política
+ Prioridade          [50___]
+
+████ Âmbito ████████████████████████████████████████████████
+ Interfaces          [✓ LAN] [ Visitantes]
+ Origens             [Todas ▾]
+                     Quem será abrangido pela política.
+
+████ Conteúdo ██████████████████████████████████████████████
+ Apps                [Selecionar…]  3 seleccionadas
+ Categorias          [Selecionar…]  1 seleccionada
+ Sites               [Editar lista…] 12 entradas
+
+████ Resultado █████████████████████████████████████████████
+ Acção               ( ) Monitorizar  (●) Bloquear  ( ) Permitir
+
+[aviso nativo: Existem alterações não guardadas.]
+                                             [Cancelar] [Guardar]
 ```
 
-Erro move foco ao resumo e associa cada mensagem ao campo. Após salvar, a tela
-mostra “config salva / daemon recarregado / PF aplicado” e oferece voltar à
-lista no mesmo filtro/posição.
+O formulário abre no topo. Erro move foco ao info box e à linha inválida.
 
 ## 4. Biblioteca de perfis
 
 ```text
-┌ Proteção / Biblioteca                    [Criar perfil] ┐
-│ [Buscar Pornografia___] [Grupo▾] [Estado▾]             │
-│ Aplicados 6 | Disponíveis 99 | Personalizados 2        │
-├ Pornografia ────────────────────────────────────────────┤
-│ Sites adultos · 3 apps · 1 categoria · 12 hosts        │
-│ ● Aplicado   [Ver conteúdo] [Editar] [Desligar]         │
-├ Streaming / YouTube ────────────────────────────────────┤
-│ Disponível                         [Opções] [Activar]    │
-└──────────────────────────────────────────────────────────┘
+████ Filtros da biblioteca █████████████████████████████████
+ Procurar            [Pornografia________________________]
+ Grupo               [Todos ▾]       Estado [Todos ▾]
+
+████ Perfis disponíveis ███████████████████████ [Criar perfil]
+ Perfil           Grupo        Conteúdo              Estado/Ações
+ Pornografia      Segurança    3 apps · 1 cat · 12   Activo [Editar]
+ YouTube          Streaming    2 apps · 8 sites      [Opções] [Activar]
 ```
 
-Cards não renderizam centenas de checkboxes até abrir edição. Loading existe
-somente se a lista for carregada progressivamente; sem JS, tudo permanece
-operável em páginas server-rendered.
+Os 105 perfis são linhas paginadas/filtradas, não quadrados individuais.
 
-## 5. Devices
+## 5. Dispositivos
 
 ```text
-┌ Clientes / Dispositivos                         [Atualizar] ┐
-│ [Buscar IP, MAC, nome____] [Interface▾] [Estado▾]         │
-│ 674 encontrados · 1–50                     [50 por página▾]│
-├ □  Dispositivo   IP/MAC        Interface  Estado  Ações ───┤
-│ □  Recepção      10.0.0.21     LAN        Online  [Abrir]  │
-│ □  Sem nome      10.0.0.22     Wi-Fi      Offline [Abrir]  │
-├ 2 seleccionados  [Atribuir ao grupo▾]                       │
-└ Página 1 de 14                         [Anterior] [Próxima] ┘
+████ Filtros ███████████████████████████████████ [Actualizar]
+ Procurar            [IP, MAC, nome______________________]
+ Interface           [Todas ▾]       Estado [Todos ▾]
+
+████ Dispositivos ████████████████████████████████████████
+ □  Nome          IP / MAC              Interface  Estado   Ações
+ □  Recepção      10.0.0.21 / 00:…      LAN        Online   [Editar]
+ □  Sem nome      10.0.0.22 / A2:…      Wi-Fi      Offline  [Editar]
+
+ Seleccionados       2    Grupo [Escolher ▾] [Atribuir]
+ Resultados          1–50 de 674             [Anterior] [Próxima]
 ```
 
-Alias é editado no detalhe/linha sob demanda, não como 674 inputs simultâneos.
-Empty distingue “sem dispositivos” de “nenhum resultado para o filtro”.
+Aliases são editados numa linha/página sob demanda; não existem 674 inputs no
+mesmo POST.
 
-## 6. Events
+## 6. Eventos
 
 ```text
-┌ Atividade / Eventos                      ● Actualização live ┐
-│ [Tráfego | Operacional] [Buscar____] [Resultado▾] [Pausar] │
-├ 14:32  BLOQUEADO · Pornografia · Cliente Recepção          │
-│ site.example · app/category         [Investigar] [Técnico▾]│
-├ 14:31  MONITORADO · YouTube · 10.0.0.22                    │
-│ youtube.com                         [Investigar] [Técnico▾] │
-└ [Carregar anteriores]                                         ┘
+████ Filtros de eventos ████████████████████████████████████
+ Fonte               (●) Tráfego  ( ) Operacional
+ Procurar            [___________________________________]
+ Actualização        Activa                              [Pausar]
+
+████ Eventos █████████████████████████████████████████████
+ Hora    Resultado   Cliente       Destino          Política     Ações
+ 14:32   Bloqueado   Recepção      site.example     Pornografia  [Detalhes]
+ 14:31   Monitorado  10.0.0.22     youtube.com      YouTube      [Detalhes]
 ```
 
-`Limpar vista` explicita que não apaga logs. Erro de polling pausa live e
-preserva eventos existentes. Raw técnico é disclosure, não texto dominante.
+Detalhe técnico expande uma linha. “Limpar vista” nunca parece apagar logs.
 
-## 7. Settings
+## 7. Definições
 
 ```text
-┌ Sistema / Configurações                         [Salvar] ┐
-│ Geral | Interfaces | Anti-bypass | Página de bloqueio   │
-│ Logs e relatórios | Avançado                              │
-├ Geral ────────────────────────────────────────────────────┤
-│ Idioma [Português▾]  Serviço [✓] Activo                  │
-│ Modo pedido ( ) Monitorar (●) Aplicar bloqueios          │
-│ ! O modo efectivo continuará MONITOR até licença válida. │
-├ Impacto desta mudança ────────────────────────────────────┤
-│ Salva config; recarrega daemon; PF só se necessário.      │
-├ ! 3 alterações não salvas     [Descartar] [Salvar mudanças]│
-└────────────────────────────────────────────────────────────┘
+[Geral] [Interfaces] [Anti-bypass] [Página de bloqueio]
+[Logs e relatórios] [Licença/actualização] [Avançado]
+
+████ Definições gerais █████████████████████████████████████
+ Idioma              [Português ▾]
+ Serviço             [✓] Activar Layer7
+ Modo pedido         (●) Monitorizar  ( ) Aplicar bloqueios
+                     O modo efectivo também depende da licença e do daemon.
+
+████ Impacto operacional ███████████████████████████████████
+ Ao guardar          Configuração será gravada e o daemon recarregado.
+ PF                  Só será aplicado se os campos alterados exigirem.
+
+[aviso nativo: 3 alterações ainda não foram guardadas.]
+                                                        [Guardar]
 ```
 
-Cada secção tem URL/âncora, resumo de impacto e erros próprios. Captive Portal
-gera warning bloqueante/explicativo na secção Página de bloqueio.
+As secções/abas organizam os 83 campos sem criar cartões.
 
-## 8. Diagnostics
+## 8. Diagnósticos
 
 ```text
-┌ Sistema / Diagnóstico                    [Atualizar estado] ┐
-│ ● Daemon  ● Config  ! PF  ● nDPI  ● Logs                 │
-├ Problema detectado ────────────────────────────────────────┤
-│ Duas tabelas PF obrigatórias estão ausentes.               │
-│ [Ver evidência técnica]              [Reparar tabelas PF]  │
-├ Ações no daemon ────────────────────────────────────────────┤
-│ [Recolher estatísticas] [Recarregar configuração]          │
-├ Suporte ▾  [Copiar URL] [Abrir issue no GitHub]            │
-└─────────────────────────────────────────────────────────────┘
+████ Estado dos componentes ████████████████████████████████
+ Daemon              Activo
+ Configuração        Válida
+ PF                  Duas tabelas obrigatórias ausentes
+ nDPI                Disponível
+
+[aviso nativo: Foram detectadas tabelas PF ausentes.]
+
+████ Acções de diagnóstico █████████████████████████████████
+ Estatísticas        [Recolher agora]
+ Configuração        [Recarregar daemon]
+ Tabelas PF          [Ver evidência] [Reparar tabelas]
+                     A reparação altera o PF e exige confirmação.
 ```
 
-Reparação pede confirmação e depois mostra before/after. Read-only vem antes
-das mutações. Loading/erro por componente não bloqueia os demais diagnósticos.
+Leitura vem antes das reparações; não há grelha de status cards.
 
-## 9. Licença e atualização
+## 9. Licença e actualização
 
 ```text
-┌ Sistema / Licença e atualização                         ┐
-├ Licença ────────────────────────────────────────────────┤
-│ ● Válida · Empresa · expira em … · Identity incluído   │
-│ [Registar nova licença]                    [Revogar…]    │
-├ Atualização ─────────────────────────────────────────────┤
-│ Instalada 1.9.79  ·  Verificação ainda não executada    │
-│ [Verificar atualização]                                 │
-│ Resultado: disponível 1.9.80                            │
-│ ! O daemon será interrompido durante a instalação.      │
-│ [Ver notas]                              [Atualizar…]    │
-└──────────────────────────────────────────────────────────┘
+████ Licença ███████████████████████████████████████████████
+ Estado              Válida
+ Cliente             Empresa
+ Expiração           …
+ Funcionalidades     Identity incluído
+ Acções              [Registar nova] [Revogar…]
+
+████ Actualização ██████████████████████████████████████████
+ Versão instalada    1.9.79
+ Última verificação  Ainda não executada
+ Acções              [Verificar actualização]
+                     A instalação interrompe o daemon temporariamente.
 ```
 
-Verificação tem loading/erro/up-to-date/no-asset. Update exige confirmação e
-mostra etapas stop/download/install/start; falha nunca aparece como sucesso.
+Progresso e resultado aparecem em info box/linhas, não em cards de etapas.
 
 ## 10. Remoção do pacote
 
 ```text
-┌ Sistema / Zona de perigo / Remover Layer7                ┐
-│ ! Remove daemon, GUI, blacklists, cron e tabelas PF.      │
-│ Preservar: (●) configuração completa                     │
-│            ( ) apenas licença  ( ) nada                  │
-│ Digite REMOVER [__________]                               │
-│ [Cancelar]                         [perigo Remover pacote]│
-└────────────────────────────────────────────────────────────┘
+[alerta nativo: Esta operação remove o Layer7 e pode interromper protecção.]
+
+████ Opções de remoção █████████████████████████████████████
+ Preservar dados      (●) Configuração completa
+                     ( ) Apenas licença
+                     ( ) Não preservar
+ Confirmação          [____________________]
+                     Digite REMOVER para continuar.
+
+                                              [Cancelar] [Remover pacote]
 ```
 
-Se o job já iniciou, o formulário desaparece e entra estado “remoção em
-curso”, com log/caminho de verificação. A precedência das opções actuais é
-preservada, mas apresentada como escolhas mutuamente exclusivas.
+A separação de risco vem da ordem, título, alert e confirmação nativos — não
+de uma caixa desenhada como aplicação externa.
 
-## 11. Matriz de estados obrigatórios
+## 11. Estados obrigatórios
 
-| Estado | Lista/tabela | Formulário | Acção assíncrona | Destrutiva |
-|---|---|---|---|---|
-| normal | total, filtros, resultados | valores + ajuda | botão disponível | isolada |
-| vazio | causa + próxima acção | N/A | N/A | N/A |
-| loading | skeleton curto + texto | bloqueia só campos dependentes | progresso/etapa | nunca simula conclusão |
-| erro | preserva contexto + retry | resumo + erro por campo | etapa falhada + recuperação | confirmação permanece |
-| pendente | filtros/contexto mantidos | barra dirty fixa ao conteúdo | aguardando confirmação | texto digitado |
-| sucesso | lista actualizada | etapas de aplicação | conclusão inequívoca | job iniciado/concluído |
-| aviso | limitação/impacto | antes do submit | risco operacional | consequências completas |
-| destrutivo | acção fora da linha principal | confirmação proporcional | sem auto-retry | cor + texto + ícone, não só cor |
+| Estado | Representação pfSense |
+|---|---|
+| normal | secções, linhas e tabelas nativas |
+| vazio | linha de tabela ou info box com próxima acção |
+| loading | texto/ícone discreto na linha afectada |
+| erro | `print_info_box()`/`alert-danger` + erro junto do campo |
+| pendente | info box próximo do rodapé do formulário |
+| sucesso | `print_info_box()` com etapas textuais realizadas |
+| aviso | `alert-warning` antes da acção afectada |
+| destrutivo | secção nativa + alerta + confirmação explícita |
 
-## 12. Fluxos de aceitação nos wireframes
+## 12. Fluxos de aceitação
 
-1. Pornografia: Proteção → buscar → Editar, no máximo três interações.
-2. Perfil pronto: Biblioteca → Activar → opções curtas → confirmar.
-3. Política personalizada: Políticas → Criar → página dedicada.
-4. Sites/apps/categorias: `Ver conteúdo`/`Detalhes`, sem perder filtro.
-5. Excepção cliente: Dispositivo → acções → criar excepção/VIP com contexto.
+1. Pornografia: Políticas → procurar → Editar, no máximo três interações.
+2. Perfil pronto: Políticas/Biblioteca → Activar → opções → confirmar.
+3. Política personalizada: Políticas → Adicionar → formulário nativo dedicado.
+4. Conteúdo de política: detalhes/linha sem perder filtros.
+5. Excepção: Dispositivo → acções → criar excepção/VIP.
 6. Dispositivo: busca paginada por alias/IP/MAC/hostname.
-7. Bloqueio: Evento → Investigar → política, cliente e evidência técnica.
-8. Simular: Proteção → Simulador; read-only inequívoco.
-9. Monitor→enforce: Settings Geral; pedido e efectivo separados.
-10. Captive Portal: warning na Página de bloqueio com conflito e resolução.
-11. Licença/update: Sistema → Licença e atualização.
-12. Backup/restore: Sistema → Backup e restauração, confirmação de import.
-13. Uninstall: Sistema → Zona de perigo → confirmação tipada.
+7. Bloqueio: Evento → Detalhes → política, cliente e evidência técnica.
+8. Simular: subtab Simular; read-only inequívoco.
+9. Monitor→enforce: Definições; pedido e efectivo separados.
+10. Captive Portal: alert nativo na secção Página de bloqueio.
+11. Licença/update: Definições → Licença/actualização.
+12. Backup/restore: secção própria com confirmação de import.
+13. Uninstall: Remoção → confirmação tipada.
