@@ -35,8 +35,8 @@ dispositivo, SNI/Host via nDPI opt-in, UX de perfis com toggle e contadores)
 appliance (`192.168.100.254`) com `smoke-monitor-mode.sh` e `smoke-caminho-a.sh`
 (ambos exit 0).
 **Ultima versao do pacote publicada em release (canal publico/updater):**
-`1.9.78` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.78`;
-`SHA256=8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7`; BG-171 + BG-172; cadeia F1.2);
+`1.9.79` (GitHub Releases `pablomichelin/Layer7`, tag `v1.9.79`;
+`SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`; BG-173 Captive Portal + anti-bypass; cadeia F1.2);
 herda `1.9.77`
 (`SHA256=1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57`; BG-170 check-in obrigatório; cadeia F1.2);
 herda `1.9.76`
@@ -198,7 +198,7 @@ e `/usr/local/bin/curl`, e re-tenta aos 15 min. Endpoint live intacto.
 Sem overlay `.244` (P0-1). Caixas ≤`1.9.71` precisam de upgrade para
 aparecer em Instalações.
 **BG-164 (`2026-08-25`) — canal publico latest-only:**
-`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.78`).
+`pablomichelin/Layer7` publica **apenas** o pacote `latest` (`1.9.79`).
 Releases de pacote anteriores sao retiradas (tags git preservadas).
 `pfsense-layer7` nao e canal de download (Releases de pacote retiradas).
 Excepcao: snapshot `blacklists-ut1-current`. Textos/instaladores apontam
@@ -207,8 +207,8 @@ ADR-0003 §12. `publish-release.sh` retira as anteriores apos cada publish.
 **Regra inviolavel de versao (`2026-08-31`):** nunca um pacote «para
 reinstall» da mesma `PORTVERSION`. Toda entrega ao appliance e **versao
 nova**; actualizar **todas** as mencoes da versao `latest`; no GitHub
-publico fica **so** a ultima release de pacote. Actual `1.9.78`
-(nao republicar `1.9.77`).
+publico fica **so** a ultima release de pacote. Actual `1.9.79`
+(nao republicar `1.9.78`).
 **BG-165 (cliente `1.9.73`) + BG-166 (license-server HEAD):** auditoria
 de licença. Daemon usa `/usr/local/bin/curl` em activate/check-in e
 `flock` no estado de check-in. GUI: badge via `.lic` se o daemon estiver
@@ -250,13 +250,14 @@ casa host conhecido **ou** `AdultContent`. `match_mode=or` só em
 linguagem de operador (`flow_decide`/`dns_query`/`dns_resolved` → frases).
 Linha crua só com «Mostrar detalhe tecnico». Ingest de relatórios intacto
 (`dns_resolved` continua fora do SQLite). Sem overlay `.244`.
-**BG-173 (`1.9.79`, `2026-08-31`) — implementado, pendente de
-gates/commit/build:** incompatibilidade Captive Portal nativo +
-`anti-bypass-dns` com `AppleiCloud` em `legacy_global`. Default novo sem
-`AppleiCloud`; migração só no ID de fábrica com seletores antigos;
-`layer7_localnets` via `match`/`tag L7ALLOW`; sem rdr Layer7 no IP do
-portal nativo; CNA ignorado sem `pass quick`. Default PF **não** muda
-para `scoped_hybrid`. Sem overlay `.244`.
+**BG-173 PUBLICADO `v1.9.79` (`2026-08-31`):** Captive Portal nativo +
+anti-bypass. `AppleiCloud` saiu do default de fábrica; migração
+idempotente; destinos locais via L7ALLOW; sem rdr Layer7 no IP do portal
+nativo; CNA ignorado sem `pass quick`. Default PF continua
+`legacy_global`. Sem overlay `.244`.
+`releases/latest` = `v1.9.79`;
+`SHA256=26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`.
+`v1.9.78` retirada do download (latest-only / BG-164).
 **MITM:** **GO produto** `2026-08-09`; **20.11 PASS**; **Gate C PASS** (`1.9.46`);
 **GO teste controlado `.254` PASS** (`215442Z`); **sem** intercept permanente
 sem novo GO + runbook.
