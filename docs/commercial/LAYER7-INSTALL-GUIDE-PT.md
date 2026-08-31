@@ -18,9 +18,9 @@
 ## Instalar (release mais recente)
 
 ```bash
-# No pfSense — único pacote público (`latest` = 1.9.77):
+# latest GitHub actual = 1.9.79; comando preparado para 1.9.80 (nao publicado)
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh \
   && sh /tmp/install.sh
 ```
 
@@ -32,7 +32,7 @@ Depois abrir **Services → Layer 7** na GUI do pfSense.
 
 ```bash
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh \
   && sh /tmp/install.sh
 ```
 
@@ -44,7 +44,7 @@ Ou usar **Services → Layer 7 → Definições → Verificar actualização** n
 
 ```bash
 fetch -o /tmp/uninstall.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/uninstall.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/uninstall.sh \
   && sh /tmp/uninstall.sh
 ```
 

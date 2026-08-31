@@ -59,10 +59,12 @@ defaults reconhecidos mesmo quando esse idioma já está selecionado.
 **Addendum operacional BG-174 / GUI1 (`2026-08-31`, candidato `v1.9.80`):**
 página Status reorganizada frontend-only com `Form_*`, painéis e tabelas
 nativos do pfSense. Sem alteração de handler, daemon, PF, licença,
-defaults ou segurança. SHA256 `PENDING_BUILD`. Estado: **candidato
-1.9.80 implementado, pendente de gates/commit/build/publicação**.
-Overlay `.244` intacto (P0-1). Pin enforce permanece **`1.9.8`**.
-URLs e comandos deste manual continuam em `v1.9.79` até a publicação.
+defaults ou segurança. Artefacto F1.2 no builder (source/build `b84634c`).
+SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
+Estado: **build/sign/verify PASS; pendente de
+commit/tag/publicação/appliance**. **Não publicado.** Overlay `.244`
+intacto (P0-1). Pin enforce permanece **`1.9.8`**.
+GitHub `latest` continua **`1.9.79`** até a publicação.
 
 **Addendum operacional BG-173 (`2026-08-31`, `v1.9.79`):**
 compatibilidade com o Captive Portal nativo do pfSense. A política de
@@ -1385,37 +1387,44 @@ disparado por **Apply** em **Firewall > Rules** na GUI).
 >    (comando de reinstalacao).
 >
 > Verificacao rapida: `grep -n "releases/download/v" docs/10-license-server/MANUAL-INSTALL.md`
-> deve devolver **apenas** URLs de `v1.9.79` (canal unico).
-> **Estado actual:** canal publico/`latest` = **`1.9.79`** (BG-173).
-> Pin enforce `1.9.8` e referencia de politica, **sem** download publico.
+> deve devolver **apenas** URLs de `v1.9.80` (comandos do artefacto).
+> **Estado actual:** comandos/artefacto = **`1.9.80`** (BG-174; build/sign/verify
+> PASS; **nao publicado**). GitHub `latest` continua **`1.9.79`** ate a
+> publicacao. Pin enforce `1.9.8` e referencia de politica, **sem**
+> download publico.
 
-> **Release `1.9.79` (BG-173, `2026-08-31`):** unico pacote no canal
-> publico. Rollback publico = reinstalar `1.9.79` (latest-only; `1.9.78`
-> fica so na tag git / builder). Pin enforce `1.9.8` permanece politica
-> interna; artefactos antigos so no builder/arquivo.
+> **Release `1.9.80` (BG-174, `2026-08-31`):** artefacto F1.2 no builder
+> (source/build `b84634c`). **Nao publicado.** Rollback publico actual no
+> GitHub = `1.9.79` ate a publicacao; comandos abaixo apontam para
+> `1.9.80`. Pin enforce `1.9.8` permanece politica interna; artefactos
+> antigos so no builder/arquivo.
 
-**Versao canal publico / lab (`latest` e comandos abaixo):** `1.9.79`
+**Versao dos comandos (artefacto F1.2, nao publicado):** `1.9.80`
 
-- **Release:** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.79`
-- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg`
-- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg.sha256`
-- **SHA256 esperado:** `26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`
+**GitHub `releases/latest` neste momento:** `1.9.79`
+
+- **Release (preparada):** `https://github.com/pablomichelin/Layer7/releases/tag/v1.9.80`
+- **Pacote `.pkg`:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg`
+- **SHA256:** `https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg.sha256`
+- **SHA256 esperado:** `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
 - **Fingerprint chave pública de release:** `d26e3f007e81298bad910f99dd62a22e2109740158b3b3c7f4e79490bdc5a998`
 - **`releases/latest`:** `https://github.com/pablomichelin/Layer7/releases/latest`
 
 **Politica do canal publico (BG-164 / ADR-0003 emenda `2026-08-25`):**
 `pablomichelin/Layer7` publica **apenas** a release de pacote `latest`
-(`1.9.79`). Pacotes anteriores **nao** tem URL de download. Tags git e
-SHAs abaixo ficam como arquivo interno. Rollback de emergencia = reinstalar
-`1.9.79` ou rebuild da tag git `v1.9.78` no builder. Pin enforce `1.9.8`
-continua referencia de politica, **sem** download publico. Snapshot de
-blacklists `blacklists-ut1-current` nao e pacote e permanece publicado.
+(`1.9.79` agora; `1.9.80` so apos publicacao). Pacotes anteriores **nao**
+tem URL de download. Tags git e SHAs abaixo ficam como arquivo interno.
+Rollback de emergencia actual = reinstalar `1.9.79` (ainda `latest`) ou,
+apos publicacao, reinstalar `1.9.80`. Pin enforce `1.9.8` continua
+referencia de politica, **sem** download publico. Snapshot de blacklists
+`blacklists-ut1-current` nao e pacote e permanece publicado.
 
 Arquivo de integridade (sem URL):
 
 | Versao | SHA256 | Nota |
 |--------|--------|------|
-| `1.9.79` | `26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482` | canal publico actual |
+| `1.9.80` | `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782` | artefacto F1.2; comandos abaixo; **nao publicado** |
+| `1.9.79` | `26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482` | GitHub `latest` actual |
 | `1.9.78` | `8b7b9a67bd24b275c37ac4df57de68ecc270b5d7f6d411c7423fa942f1eafff7` | arquivo (tag git) |
 | `1.9.77` | `1b595f5014316f0fa25e52a974b1e7137a13ec443af80f5e000849c103445f57` | arquivo (tag git) |
 | `1.9.76` | `a7d6ba444351f57611c1a6ca70c480bce1b26322425577330b01e6cac805bcc0` | arquivo (tag git) |
@@ -1472,23 +1481,23 @@ Arquivo de integridade (sem URL):
 Instalar via `install.sh` oficial (F1.2 fail-closed):
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
-Baixar o `.pkg` directo da versao `1.9.79`:
+Baixar o `.pkg` directo da versao `1.9.80`:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 Validar checksum:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg.sha256 https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg.sha256 && sha256 -q /tmp/pfSense-pkg-layer7-1.9.79.pkg | tee /tmp/l7-actual.sha256 && cat /tmp/pfSense-pkg-layer7-1.9.79.pkg.sha256
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg.sha256 https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg.sha256 && sha256 -q /tmp/pfSense-pkg-layer7-1.9.80.pkg | tee /tmp/l7-actual.sha256 && cat /tmp/pfSense-pkg-layer7-1.9.80.pkg.sha256
 ```
 
 Os dois ultimos `cat` devem mostrar o mesmo `sha256`. Esperado:
-`26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`.
+`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
 
 ---
 
@@ -1516,32 +1525,33 @@ Cada seccao abaixo inclui:
 
 ## 1. Instalar (primeira vez)
 
-> **Nesta release (`1.9.79`)** o caminho oficial e o **`install.sh`**
+> **Nesta release (`1.9.80`)** o caminho oficial e o **`install.sh`**
 > carimbado F1.2 (fail-closed). O comando unico manual permanece como
-> alternativa. **Canal lab/`latest`:** **`1.9.79`**. **Producao enforce:**
+> alternativa. **Comandos:** **`1.9.80`** (nao publicado).
+> **GitHub `latest` neste momento:** **`1.9.79`**. **Producao enforce:**
 > permanece **`1.9.8`** (GV7.4) ate GO de promocao. Soak `.254`
 > = **`1.9.63`** MITM OFF (20.36).
 
 **Comando unico oficial (`install.sh` — Command Prompt ou SSH):**
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
 **Comando unico manual (alternativa — `pkg add -f`):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 ```sh
@@ -1618,20 +1628,21 @@ layer7d --license-status
 
 ## 4. Actualizar (upgrade)
 
-> **Nesta release (`1.9.79`)** o caminho oficial e o **`install.sh`**
+> **Nesta release (`1.9.80`)** o caminho oficial e o **`install.sh`**
 > (valida manifesto + assinatura antes de instalar). O comando unico
 > manual permanece como alternativa. Ver nota em **Links da versao actual**.
+> GitHub `latest` continua `1.9.79` ate a publicacao.
 
 **Comando unico oficial (`install.sh`):**
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
 **Comando unico manual (alternativa — uma linha, Command Prompt ou SSH):**
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg && service layer7d onestart && layer7d -V
 ```
 
 **Passo a passo (SSH/Console):**
@@ -1641,11 +1652,11 @@ service layer7d onestop
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 ```sh
@@ -1684,7 +1695,7 @@ pfctl -sr | grep -i layer7
 **Comando unico (Command Prompt):**
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 **Passo a passo (SSH/Console):**
@@ -1698,11 +1709,11 @@ pkg delete -y pfSense-pkg-layer7
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 ```sh
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 ```sh
@@ -1717,9 +1728,10 @@ service layer7d onestart
 
 ## 6. Desinstalar
 
-> **Nesta release (`1.9.79`)** o `uninstall.sh` automatico **e publicado**
-> como asset F1.2. Use-o como caminho oficial; a desinstalacao manual
-> abaixo permanece como alternativa.
+> **Nesta release (`1.9.80`)** o `uninstall.sh` automatico e o asset F1.2
+> do artefacto (ainda **nao publicado** no GitHub). Use-o como caminho
+> oficial apos a publicacao; a desinstalacao manual abaixo permanece
+> como alternativa. GitHub `latest` continua `1.9.79` ate la.
 
 ### Remocao pela GUI (desde `1.8.11_17`; em `1.8.11_16` a pagina podia falhar por erro PHP)
 
@@ -1737,7 +1749,7 @@ com opcoes de preservacao e limpeza alargada nos hooks `pkg-deinstall`.
 Descarregar o script da tag actual:
 
 ```sh
-fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/uninstall.sh
+fetch -o /tmp/uninstall.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/uninstall.sh
 ```
 
 | Flag | O que faz |
@@ -1833,11 +1845,11 @@ apague todo o conteudo entre `# --- Layer7 anti-DoH/Relay START ---` e
 ### Apos desinstalar
 
 O pfSense volta ao funcionamento normal imediatamente.
-Para reinstalar a versao actual (`1.9.79`), usar o **`install.sh`** da
-seccao **1** (ou o comando unico manual):
+Para reinstalar a versao dos comandos (`1.9.80`, nao publicada), usar o
+**`install.sh`** da seccao **1** (ou o comando unico manual):
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
 ---
@@ -2217,8 +2229,9 @@ service layer7d onestop && pkg delete -y pfSense-pkg-layer7
 ```
 
 O canal publico **nao** hospeda pacotes anteriores (BG-164).
-Rollback publico = reinstalar **`1.9.79`** (seccoes 1 / 5). Tag git
-`v1.9.73` permanece no builder/arquivo.
+Rollback publico actual no GitHub = reinstalar **`1.9.79`** (ainda
+`latest`). Apos publicacao, rollback publico = reinstalar **`1.9.80`**
+(seccoes 1 / 5). Tag git `v1.9.73` permanece no builder/arquivo.
 Pin enforce `1.9.8` e artefactos historicos (`1.9.0`, `_24`) existem
 so no builder/arquivo interno — **nao** ha URL publico.
 **nao** usar `1.8.11_55` (defeituosa).
@@ -2226,7 +2239,7 @@ so no builder/arquivo interno — **nao** ha URL publico.
 Reinstalar o pacote actual:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
 `pkg add -f` sobre o pacote já instalado (upgrade) preserva

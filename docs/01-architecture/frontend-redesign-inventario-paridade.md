@@ -51,7 +51,7 @@ forma incremental, sem alterar os handlers de segurança.
 
 | Área/rota | Finalidade e público | Dados/estado | Formulários e campos principais | Ações e efeitos | Condições/erros/empty | Destino proposto |
 |---|---|---|---|---|---|---|
-| Status — `layer7_status.php` | saúde operacional | versão pkg/daemon, PID, config, stats, modo pedido/efectivo, licença, políticas, top apps/devices | `restart_service` | `layer7_restart_service()`; status recalculado | daemon/config/stats ausentes; licença impede enforce | GUI1 piloto: mesma rota; view nativa pfSense (pendente gates/commit); taxonomia Visão geral |
+| Status — `layer7_status.php` | saúde operacional | versão pkg/daemon, PID, config, stats, modo pedido/efectivo, licença, políticas, top apps/devices | `restart_service` | `layer7_restart_service()`; status recalculado | daemon/config/stats ausentes; licença impede enforce | GUI1 piloto: mesma rota; view nativa pfSense (build/sign/verify PASS; pendente commit/tag/publicação/appliance); taxonomia Visão geral |
 | Devices — `layer7_devices.php` | inventário e identidade legível do cliente | DHCP/ARP, MAC, hostname, vendor, interface, online/source, aliases, grupos | `alias[MAC]`, `assign_macs[]`, `assign_group` | grava aliases; atribui MACs a grupo; resolve IPs; save JSON + PF resync | MAC inválido, grupo inexistente, save falha; lista grande sem paginação | Clientes > Dispositivos |
 | Policies — `layer7_policies.php` | aplicação, catálogo e autoria de políticas | JSON, 105 perfis factory/custom/override, grupos, VIP, nDPI, stats | activação de perfil; editor de perfil; batch toggles; política nova/editar; delete | save JSON/perfis custom; resync PF; anti-DoH em perfil; redirects após edit | entitlement Identity, scoped gate, conflitos include/exclude, limites, hidden/override | Proteção > Políticas / Biblioteca / Editar |
 | Groups — `layer7_groups.php` | agrupar origens | grupos, políticas consumidoras, inventário | id/nome, CIDRs, hosts, MACs; edit/delete/resync | save JSON + PF resync; resolve MAC→IP | id único/válido; CIDR/IPv4/MAC e limites; empty | Clientes > Grupos |
@@ -243,10 +243,14 @@ teste de paridade. Uma função só pode mudar de `P` para retirada/substituída
 com GO humano, backlog e, se alterar contrato de segurança/arquitectura, ADR.
 Até então a ausência de uma linha na nova interface é regressão.
 
-**GUI1 piloto Status (`2026-08-31`, pendente de gates/commit):** a linha Status
-mantém todos os dados e a acção `restart_service`. A view passou a
+**GUI1 piloto Status (`2026-08-31`, build/sign/verify PASS; pendente de
+commit/tag/publicação/appliance):** a linha Status mantém todos os dados
+e a acção `restart_service`. A view passou a
 `Form_Section`/`Form_StaticText` (estado + resumo), dois `panel` nativos
 (top apps / top clientes) e botões nativos (acções). Licença continua a
 aparecer via `layer7_gui_mode_badge_html()` / `reason`; `$n_exceptions`
 continua calculado e não renderizado (legado pré-piloto). `layer7.inc` não
-foi alterado. Gate estático: `tests/functional/test_status_native_view.php`.
+foi alterado. Gate estático: `tests/functional/test_status_native_view.php`
++ lint extraído 27/27 PASS. Candidato `1.9.80` SHA256
+`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
+**Não publicado.** `latest` continua `1.9.79`.

@@ -125,9 +125,9 @@ A instalação usa `.pkg` assinado das GitHub Releases e script de uma linha.
 Passos completos: [Guia de Instalação](LAYER7-INSTALL-GUIDE-PT.md).
 
 ```bash
-# No pfSense (SSH root) — único pacote público (`1.9.77`):
+# latest GitHub actual = 1.9.79; comando preparado para 1.9.80 (nao publicado)
 fetch -o /tmp/install.sh \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh \
   && sh /tmp/install.sh
 ```
 

@@ -3,9 +3,10 @@
 **Systemup Solução em Tecnologia** · [www.systemup.inf.br](https://www.systemup.inf.br)
 
 > Guia público do operador. Fiel ao estado publicado em GitHub Releases.  
-> **Pacote de referência (canal `latest`):** **`1.9.79`**  
-> **SHA256:** `26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`  
-> **Release:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.79>  
+> **Comandos/artefacto (nao publicado):** **`1.9.80`**
+> **GitHub `latest` neste momento:** **`1.9.79`**
+> **SHA256 (artefacto 1.9.80):** `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
+> **Release `latest`:** <https://github.com/pablomichelin/Layer7/releases/tag/v1.9.79>
 > **Latest:** <https://github.com/pablomichelin/Layer7/releases/latest>  
 > **Alinhamento:** `2026-08-31`
 
@@ -24,8 +25,9 @@ Licenciamento comercial, activação e suporte de enforce: **contactar a Systemu
 | [Pacote de Avaliação](LAYER7-EVALUATION-PACK-PT.md) | Avaliação comercial |
 | [GitHub Releases](https://github.com/pablomichelin/Layer7/releases) | `.pkg` + `.sha256` oficiais |
 
-**Regra:** os comandos abaixo correspondem à release **`1.9.79`**. Em cada
-nova release, actualizar este manual no mesmo bloco da publicação.
+**Regra:** os comandos abaixo correspondem ao artefacto **`1.9.80`**
+(ainda **não publicado**). GitHub `latest` continua **`1.9.79`**. Em cada
+publicação, actualizar este manual no mesmo bloco.
 
 ---
 
@@ -33,7 +35,8 @@ nova release, actualizar este manual no mesmo bloco da publicação.
 
 | Canal | Versão | Papel |
 |-------|--------|--------|
-| **`latest` / updater GUI** | **`1.9.79`** | Único pacote público para download |
+| **`latest` / updater GUI** | **`1.9.79`** | Único pacote público no GitHub agora |
+| **Artefacto F1.2 (comandos)** | **`1.9.80`** | Build/sign/verify PASS; **não publicado** |
 | **Produção enforce (pin de política)** | **`1.9.8`** | Referência estável até GO — **não** está no canal público |
 
 **MITM (inspecção TLS):**
@@ -73,31 +76,31 @@ Cada release publica pelo menos:
 - `pfSense-pkg-layer7-<versão>.pkg`
 - `pfSense-pkg-layer7-<versão>.pkg.sha256`
 
-**Canal público `1.9.79`:**
+**Artefacto `1.9.80` (comandos; ainda não publicado). `latest` GitHub = `1.9.79`:**
 
-- Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg>
-- SHA256: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg.sha256>
-- **SHA256 esperado:** `26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`
+- Pacote: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg>
+- SHA256: <https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg.sha256>
+- **SHA256 esperado:** `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`
 
 > Caminho oficial: **`install.sh`** assinado (F1.2). O canal público
-> publica **apenas** esta release de pacote.
+> publica **apenas** a release `latest` (`1.9.79` agora).
 
 **Verificar integridade:**
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg
 ```
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg.sha256 \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg.sha256 \
-  && sha256 -q /tmp/pfSense-pkg-layer7-1.9.79.pkg | tee /tmp/l7-actual.sha256 \
-  && cat /tmp/pfSense-pkg-layer7-1.9.79.pkg.sha256
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg.sha256 \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg.sha256 \
+  && sha256 -q /tmp/pfSense-pkg-layer7-1.9.80.pkg | tee /tmp/l7-actual.sha256 \
+  && cat /tmp/pfSense-pkg-layer7-1.9.80.pkg.sha256
 ```
 
 Os dois hashes devem coincidir com
-`26ef9ef1b28bee63a886bb169ead27208292548b29b47149280c1a8acfcaa482`.
+`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
 
 **Nota ABI:** em alguns ambientes (ex. pfSense Plus / FreeBSD 16 vs builder 15)
 usa-se `IGNORE_OSVERSION=yes` e `pkg add -f`. Isto é aceite operacional; não
@@ -110,34 +113,34 @@ substitui validação no vosso ambiente.
 Executar como **root** (SSH ou Diagnostics → Command Prompt). Em Command
 Prompt preferir o **comando único** (uma linha).
 
-### 4.1 Instalar (primeira vez) — `1.9.79`
+### 4.1 Instalar (primeira vez) — `1.9.80`
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
 Alternativa manual:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg && sysrc layer7d_enable=YES && service layer7d onestart && layer7d -V
 ```
 
 Passo a passo:
 
 ```sh
-fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg \
-  https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg
-IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg
+fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg \
+  https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg
+IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg
 sysrc layer7d_enable=YES
 service layer7d onestart
 layer7d -V
 service layer7d onestatus
 ```
 
-### 4.2 Actualizar para `1.9.79`
+### 4.2 Actualizar para `1.9.80`
 
 ```sh
-service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg && service layer7d onestart && layer7d -V
+service layer7d onestop && fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg && service layer7d onestart && layer7d -V
 ```
 
 Após upgrade, recompilar o ruleset PF uma vez:
@@ -158,7 +161,7 @@ Alternativa GUI: **Services → Layer 7 → Definições → Verificar actualiza
 ### 4.3 Reinstalar a mesma versão
 
 ```sh
-service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.79.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/pfSense-pkg-layer7-1.9.79.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.79.pkg && sysrc layer7d_enable=YES && service layer7d onestart
+service layer7d onestop && pkg delete -y pfSense-pkg-layer7 && fetch -o /tmp/pfSense-pkg-layer7-1.9.80.pkg https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/pfSense-pkg-layer7-1.9.80.pkg && IGNORE_OSVERSION=yes pkg add -f /tmp/pfSense-pkg-layer7-1.9.80.pkg && sysrc layer7d_enable=YES && service layer7d onestart
 ```
 
 ### 4.4 Desinstalar
@@ -171,9 +174,11 @@ pkg delete -y pfSense-pkg-layer7
 
 ### 4.5 Rollback
 
-O canal público **não** disponibiliza pacotes anteriores. Reinstalar
-`1.9.79` (secção 4.1). Qualquer pin enforce antigo é arquivo interno
-Systemup — contactar suporte; **não** há URL público.
+O canal público **não** disponibiliza pacotes anteriores. Rollback
+público actual = reinstalar `1.9.79` (`latest` GitHub). A secção 4.1
+prepara comandos do artefacto `1.9.80` (ainda não publicado). Qualquer
+pin enforce antigo é arquivo interno Systemup — contactar suporte;
+**não** há URL público.
 
 ---
 

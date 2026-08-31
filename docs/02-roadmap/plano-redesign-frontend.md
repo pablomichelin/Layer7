@@ -3,10 +3,12 @@
 **Backlog:** BG-174.
 **Estado:** GUI0 documental `3563757`, ADR-0037 `f44a14b` e emenda visual
 `c429be3` concluídos após gates PASS. Emenda frontend-only **FEITA no git**
-(`3b18f82`) após gates PASS. GUI1 piloto Status **candidato `1.9.80`
-implementado, pendente de gates/commit/build/publicação** (`2026-08-31`;
-`layer7_status.php` + `PORTVERSION` 1.9.80; SHA256 `PENDING_BUILD`).
-**`latest` continua `1.9.79`**. GUI2–GUI7 bloqueados até GO humano.
+(`3b18f82`) após gates PASS. GUI1 piloto Status **candidato `1.9.80` —
+build/sign/verify PASS; pendente de commit/tag/publicação/appliance**
+(`2026-08-31`; `layer7_status.php` + `PORTVERSION` 1.9.80; SHA256
+`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
+source/build `b84634c`). **Não publicado.** **`latest` continua `1.9.79`**.
+GUI2–GUI7 bloqueados até GO humano.
 **Baseline publicada:** `1.9.79`. **Candidato:** `1.9.80`.
 **Nota de fase:** `GUI0…GUI7` são ondas internas deste plano, não substituem as
 fases canónicas F0…F7. A execução técnica cruza F4/F5/F7 e obedece aos seus
@@ -355,9 +357,9 @@ a view de `layer7_status.php` (apresentação). Sem `layer7.inc`, sem
 
 **GO preparação governada da release `1.9.80` (após aceitação do
 piloto pelo manager):** autorizado bump de `PORTVERSION`/`PKGVERSION` e
-documentação de candidato (changelog, CORTEX, roadmap, backlog,
-checklist, plano, addendum MANUAL-INSTALL). **Não** antecipar URLs
-operacionais `v1.9.80` neste commit — isso fica no segundo commit, após
-o asset existir (fluxo igual a `1.9.79`). Estado canónico: **candidato
-1.9.80 implementado, pendente de gates/commit/build/publicação**.
-`latest` continua `1.9.79`.
+documentação de candidato. O segundo bloco (artefacto existente) actualiza
+URLs operacionais para `v1.9.80` com SHA canónico
+`f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
+Estado canónico: **build/sign/verify PASS; pendente de
+commit/tag/publicação/appliance**. **Não publicado.** `latest` continua
+`1.9.79`.

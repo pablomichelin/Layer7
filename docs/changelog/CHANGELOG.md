@@ -13,8 +13,10 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
   `Form_StaticText`, painéis e tabelas nativos. Sem KPI cards, sem
   `layer7_render_styles()`, sem CSS/JS novo. Nenhuma alteração funcional,
   de handler, daemon, PF, licença, defaults ou segurança.
-  Estado: **candidato 1.9.80 implementado, pendente de
-  gates/commit/build/publicação**. SHA256 `PENDING_BUILD`.
+  Estado: **build/sign/verify PASS; pendente de
+  commit/tag/publicação/appliance**. **Não publicado.**
+  SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`.
+  Source/build `b84634c`. GitHub `latest` continua `1.9.79`.
 
 ## [1.9.79] — 2026-08-31
 

@@ -13,10 +13,14 @@ repositório — ver `MANUAL-INSTALL.md` §11b.1 e `AGENTS.md`.
 
 ## Instalação em 1 pfSense (um comando)
 
+GitHub `latest` actual = **`1.9.79`**. URLs abaixo preparam o artefacto
+`1.9.80` (SHA256 `f7186ee3c58d6ad948b322e45098adaf06f03b0400eab29ed1dd112c2c908782`;
+build/sign/verify PASS; **nao publicado**).
+
 No pfSense, via **SSH** ou **Diagnostics > Command Prompt**:
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
 O script faz **tudo automaticamente**:
@@ -32,7 +36,7 @@ O script faz **tudo automaticamente**:
 ### Versão específica
 
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh --version 1.9.79
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh --version 1.9.80
 ```
 
 ### Reinstalar
@@ -127,7 +131,7 @@ Se preferir instalar um a um via GUI do pfSense:
 
 Em cada pfSense, **Diagnostics > Command Prompt**:
 ```sh
-fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.79/install.sh && sh /tmp/install.sh
+fetch -o /tmp/install.sh https://github.com/pablomichelin/Layer7/releases/download/v1.9.80/install.sh && sh /tmp/install.sh
 ```
 
 ---
