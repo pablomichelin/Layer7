@@ -2,8 +2,8 @@
 
 ## Status
 
-**Aceito** (`2026-08-31`) por decisão humana. Registo documental implementado,
-pendente de gates/commit neste bloco. Aplica-se à trilha BG-174 / GUI1–GUI7.
+**Aceito** (`2026-08-31`) por decisão humana. Registo documental **FEITO no
+git** (`f44a14b`) após gates PASS. Aplica-se à trilha BG-174 / GUI1–GUI7.
 
 ## Contexto
 
